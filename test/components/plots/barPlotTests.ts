@@ -453,7 +453,7 @@ describe("Plots", () => {
         verticalBarPlot.project("y", "y", yScale);
       });
 
-      it("getAllSelections retrieves all dataset selections with no args",() => {
+      it("retrieves all dataset selections with no args", () => {
         var barData = [{ x: "foo", y: 5 }, { x: "bar", y: 640 }, { x: "zoo", y: 12345 }];
         var barData2 = [{ x: "one", y: 5 }, { x: "two", y: 640 }, { x: "three", y: 12345 }];
         verticalBarPlot.addDataset("a", barData);
@@ -461,13 +461,13 @@ describe("Plots", () => {
         verticalBarPlot.renderTo(svg);
 
         var allBars = verticalBarPlot.getAllSelections();
-        var allBars2 = verticalBarPlot.getAllSelections(["a", "b"]);
+        var allBars2 = verticalBarPlot.getAllSelections((<any> verticalBarPlot)._datasetKeysInOrder);
         assert.deepEqual(allBars, allBars2, "both ways of getting all selections work");
 
         svg.remove();
       });
 
-      it("getAllSelections retrieves correct selections (dataset string arg)",() => {
+      it("retrieves correct selections (dataset string arg)", () => {
         var barData = [{ x: "foo", y: 5 }, { x: "bar", y: 640 }, { x: "zoo", y: 12345 }];
         var barData2 = [{ x: "one", y: 5 }, { x: "two", y: 640 }, { x: "three", y: 12345 }];
         verticalBarPlot.addDataset("a", barData);
@@ -482,7 +482,7 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("getAllSelections retrieves correct selections (dataset array arg)",() => {
+      it("retrieves correct selections (dataset array arg)", () => {
         var barData = [{ x: "foo", y: 5 }, { x: "bar", y: 640 }, { x: "zoo", y: 12345 }];
         var barData2 = [{ x: "one", y: 5 }, { x: "two", y: 640 }, { x: "three", y: 12345 }];
         verticalBarPlot.addDataset("a", barData);
@@ -498,7 +498,7 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("getAllSelections skips invalid keys",() => {
+      it("skips invalid keys", () => {
         var barData = [{ x: "foo", y: 5 }, { x: "bar", y: 640 }, { x: "zoo", y: 12345 }];
         var barData2 = [{ x: "one", y: 5 }, { x: "two", y: 640 }, { x: "three", y: 12345 }];
         verticalBarPlot.addDataset("a", barData);

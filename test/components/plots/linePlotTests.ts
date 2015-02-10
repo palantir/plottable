@@ -165,7 +165,7 @@ describe("Plots", () => {
 
     describe("getAllSelections()",() => {
 
-      it("getAllSelections retrieves all dataset selections with no args", () => {
+      it("retrieves all dataset selections with no args", () => {
         var dataset3 = [
           { foo: 0, bar: 1 },
           { foo: 1, bar: 0.95 }
@@ -173,13 +173,13 @@ describe("Plots", () => {
         linePlot.addDataset("d3", dataset3);
 
         var allLines = linePlot.getAllSelections();
-        var allLines2 = linePlot.getAllSelections(["s1", "s2", "d3"]);
+        var allLines2 = linePlot.getAllSelections((<any> linePlot)._datasetKeysInOrder);
         assert.deepEqual(allLines, allLines2, "all lines retrieved");
 
         svg.remove();
       });
 
-      it("getAllSelections retrieves correct selections (dataset array arg)", () => {
+      it("retrieves correct selections (string arg)", () => {
         var dataset3 = [
           { foo: 0, bar: 1 },
           { foo: 1, bar: 0.95 }
@@ -194,7 +194,22 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("getAllSelections ignores invalid selections",() => {
+      it("retrieves correct selections (dataset array arg)", () => {
+        var dataset3 = [
+          { foo: 0, bar: 1 },
+          { foo: 1, bar: 0.95 }
+        ];
+        linePlot.addDataset("d3", dataset3);
+
+        var allLines = linePlot.getAllSelections(["d3"]);
+        assert.strictEqual(allLines.size(), 1, "all lines retrieved");
+        var selectionData = allLines.data();
+        assert.include(selectionData, dataset3, "third dataset data in selection data");
+
+        svg.remove();
+      });
+
+      it("skips invalid keys",() => {
         var dataset3 = [
           { foo: 0, bar: 1 },
           { foo: 1, bar: 0.95 }

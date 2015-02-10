@@ -2032,20 +2032,27 @@ describe("Plots", function () {
             svg.remove();
         });
         describe("getAllSelections", function () {
-            it("getAllSelections retrieves all dataset selections with no args", function () {
+            it("retrieves all dataset selections with no args", function () {
                 var allSectors = piePlot.getAllSelections();
-                var allSectors2 = piePlot.getAllSelections(["simpleDataset"]);
+                var allSectors2 = piePlot.getAllSelections(piePlot._datasetKeysInOrder);
                 assert.deepEqual(allSectors, allSectors2, "all sectors retrieved");
                 svg.remove();
             });
-            it("getAllSelections retrieves correct selections (dataset array arg)", function () {
+            it("retrieves correct selections (dataset array arg)", function () {
                 var allSectors = piePlot.getAllSelections(["simpleDataset"]);
                 assert.strictEqual(allSectors.size(), 2, "all sectors retrieved");
                 var selectionData = allSectors.data();
                 assert.includeMembers(selectionData.map(function (datum) { return datum.data; }), simpleData, "dataset data in selection data");
                 svg.remove();
             });
-            it("getAllSelections ignores invalid selections", function () {
+            it("retrieves correct selections (string arg)", function () {
+                var allSectors = piePlot.getAllSelections("simpleDataset");
+                assert.strictEqual(allSectors.size(), 2, "all sectors retrieved");
+                var selectionData = allSectors.data();
+                assert.includeMembers(selectionData.map(function (datum) { return datum.data; }), simpleData, "dataset data in selection data");
+                svg.remove();
+            });
+            it("skips invalid keys", function () {
                 var allSectors = piePlot.getAllSelections(["whoo"]);
                 assert.strictEqual(allSectors.size(), 0, "all sectors retrieved");
                 svg.remove();
@@ -2300,18 +2307,18 @@ describe("Plots", function () {
             svg.remove();
         });
         describe("getAllSelections()", function () {
-            it("getAllSelections retrieves all dataset selections with no args", function () {
+            it("retrieves all dataset selections with no args", function () {
                 var dataset3 = [
                     { foo: 0, bar: 1 },
                     { foo: 1, bar: 0.95 }
                 ];
                 linePlot.addDataset("d3", dataset3);
                 var allLines = linePlot.getAllSelections();
-                var allLines2 = linePlot.getAllSelections(["s1", "s2", "d3"]);
+                var allLines2 = linePlot.getAllSelections(linePlot._datasetKeysInOrder);
                 assert.deepEqual(allLines, allLines2, "all lines retrieved");
                 svg.remove();
             });
-            it("getAllSelections retrieves correct selections (dataset array arg)", function () {
+            it("retrieves correct selections (string arg)", function () {
                 var dataset3 = [
                     { foo: 0, bar: 1 },
                     { foo: 1, bar: 0.95 }
@@ -2323,7 +2330,19 @@ describe("Plots", function () {
                 assert.include(selectionData, dataset3, "third dataset data in selection data");
                 svg.remove();
             });
-            it("getAllSelections ignores invalid selections", function () {
+            it("retrieves correct selections (dataset array arg)", function () {
+                var dataset3 = [
+                    { foo: 0, bar: 1 },
+                    { foo: 1, bar: 0.95 }
+                ];
+                linePlot.addDataset("d3", dataset3);
+                var allLines = linePlot.getAllSelections(["d3"]);
+                assert.strictEqual(allLines.size(), 1, "all lines retrieved");
+                var selectionData = allLines.data();
+                assert.include(selectionData, dataset3, "third dataset data in selection data");
+                svg.remove();
+            });
+            it("skips invalid keys", function () {
                 var dataset3 = [
                     { foo: 0, bar: 1 },
                     { foo: 1, bar: 0.95 }
@@ -2377,7 +2396,7 @@ describe("Plots", function () {
             svg = generateSVG(500, 500);
             simpleDataset = new Plottable.Dataset(twoPointData);
             areaPlot = new Plottable.Plot.Area(xScale, yScale);
-            areaPlot.addDataset(simpleDataset).project("x", xAccessor, xScale).project("y", yAccessor, yScale).project("y0", y0Accessor, yScale).project("fill", fillAccessor).project("stroke", colorAccessor).renderTo(svg);
+            areaPlot.addDataset("sd", simpleDataset).project("x", xAccessor, xScale).project("y", yAccessor, yScale).project("y0", y0Accessor, yScale).project("fill", fillAccessor).project("stroke", colorAccessor).renderTo(svg);
             renderArea = areaPlot._renderArea;
         });
         it("draws area and line correctly", function () {
@@ -2438,16 +2457,46 @@ describe("Plots", function () {
             assertAreaPathCloseTo(areaPathString, expectedPath, 0.1, "area d was set correctly (x=undefined case)");
             svg.remove();
         });
-        it("getAllSelections retrieves correct selections", function () {
-            var newTwoPointData = [{ foo: 2, bar: 1 }, { foo: 3, bar: 2 }];
-            var newDataset = new Plottable.Dataset(twoPointData);
-            areaPlot.addDataset(new Plottable.Dataset(newTwoPointData));
-            var allAreas = areaPlot.getAllSelections();
-            assert.strictEqual(allAreas.size(), 2, "all areas retrieved");
-            var selectionData = allAreas.data();
-            assert.include(selectionData, twoPointData, "first dataset data in selection data");
-            assert.include(selectionData, newTwoPointData, "new dataset data in selection data");
-            svg.remove();
+        describe("getAllSelections()", function () {
+            it("retrieves all selections with no args", function () {
+                var newTwoPointData = [{ foo: 2, bar: 1 }, { foo: 3, bar: 2 }];
+                var newDataset = new Plottable.Dataset(twoPointData);
+                areaPlot.addDataset("newTwo", new Plottable.Dataset(newTwoPointData));
+                var allAreas = areaPlot.getAllSelections();
+                var allAreas2 = areaPlot.getAllSelections(areaPlot._datasetKeysInOrder);
+                assert.deepEqual(allAreas, allAreas2, "all areas retrieved");
+                svg.remove();
+            });
+            it("retrieves correct selections (string arg)", function () {
+                var newTwoPointData = [{ foo: 2, bar: 1 }, { foo: 3, bar: 2 }];
+                var newDataset = new Plottable.Dataset(twoPointData);
+                areaPlot.addDataset("newTwo", new Plottable.Dataset(newTwoPointData));
+                var allAreas = areaPlot.getAllSelections("newTwo");
+                assert.strictEqual(allAreas.size(), 1, "all areas retrieved");
+                var selectionData = allAreas.data();
+                assert.include(selectionData, newTwoPointData, "new dataset data in selection data");
+                svg.remove();
+            });
+            it("retrieves correct selections (string arg)", function () {
+                var newTwoPointData = [{ foo: 2, bar: 1 }, { foo: 3, bar: 2 }];
+                var newDataset = new Plottable.Dataset(twoPointData);
+                areaPlot.addDataset("newTwo", new Plottable.Dataset(newTwoPointData));
+                var allAreas = areaPlot.getAllSelections(["newTwo"]);
+                assert.strictEqual(allAreas.size(), 1, "all areas retrieved");
+                var selectionData = allAreas.data();
+                assert.include(selectionData, newTwoPointData, "new dataset data in selection data");
+                svg.remove();
+            });
+            it("skips invalid keys", function () {
+                var newTwoPointData = [{ foo: 2, bar: 1 }, { foo: 3, bar: 2 }];
+                var newDataset = new Plottable.Dataset(twoPointData);
+                areaPlot.addDataset("newTwo", new Plottable.Dataset(newTwoPointData));
+                var allAreas = areaPlot.getAllSelections(["newTwo", "test"]);
+                assert.strictEqual(allAreas.size(), 1, "all areas retrieved");
+                var selectionData = allAreas.data();
+                assert.include(selectionData, newTwoPointData, "new dataset data in selection data");
+                svg.remove();
+            });
         });
         it("retains original classes when class is projected", function () {
             var newClassProjector = function () { return "pink"; };
@@ -2853,18 +2902,18 @@ describe("Plots", function () {
                 verticalBarPlot.project("x", "x", xScale);
                 verticalBarPlot.project("y", "y", yScale);
             });
-            it("getAllSelections retrieves all dataset selections with no args", function () {
+            it("retrieves all dataset selections with no args", function () {
                 var barData = [{ x: "foo", y: 5 }, { x: "bar", y: 640 }, { x: "zoo", y: 12345 }];
                 var barData2 = [{ x: "one", y: 5 }, { x: "two", y: 640 }, { x: "three", y: 12345 }];
                 verticalBarPlot.addDataset("a", barData);
                 verticalBarPlot.addDataset("b", barData2);
                 verticalBarPlot.renderTo(svg);
                 var allBars = verticalBarPlot.getAllSelections();
-                var allBars2 = verticalBarPlot.getAllSelections(["a", "b"]);
+                var allBars2 = verticalBarPlot.getAllSelections(verticalBarPlot._datasetKeysInOrder);
                 assert.deepEqual(allBars, allBars2, "both ways of getting all selections work");
                 svg.remove();
             });
-            it("getAllSelections retrieves correct selections (dataset string arg)", function () {
+            it("retrieves correct selections (dataset string arg)", function () {
                 var barData = [{ x: "foo", y: 5 }, { x: "bar", y: 640 }, { x: "zoo", y: 12345 }];
                 var barData2 = [{ x: "one", y: 5 }, { x: "two", y: 640 }, { x: "three", y: 12345 }];
                 verticalBarPlot.addDataset("a", barData);
@@ -2876,7 +2925,7 @@ describe("Plots", function () {
                 assert.includeMembers(selectionData, barData, "first dataset data in selection data");
                 svg.remove();
             });
-            it("getAllSelections retrieves correct selections (dataset array arg)", function () {
+            it("retrieves correct selections (dataset array arg)", function () {
                 var barData = [{ x: "foo", y: 5 }, { x: "bar", y: 640 }, { x: "zoo", y: 12345 }];
                 var barData2 = [{ x: "one", y: 5 }, { x: "two", y: 640 }, { x: "three", y: 12345 }];
                 verticalBarPlot.addDataset("a", barData);
@@ -2889,7 +2938,7 @@ describe("Plots", function () {
                 assert.includeMembers(selectionData, barData2, "second dataset data in selection data");
                 svg.remove();
             });
-            it("getAllSelections skips invalid keys", function () {
+            it("skips invalid keys", function () {
                 var barData = [{ x: "foo", y: 5 }, { x: "bar", y: 640 }, { x: "zoo", y: 12345 }];
                 var barData2 = [{ x: "one", y: 5 }, { x: "two", y: 640 }, { x: "three", y: 12345 }];
                 verticalBarPlot.addDataset("a", barData);
