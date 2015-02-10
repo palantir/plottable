@@ -2816,13 +2816,36 @@ describe("Plots", function () {
                 verticalBarPlot.project("x", "x", xScale);
                 verticalBarPlot.project("y", "y", yScale);
             });
-            it("getAllSelections retrieves correct selections", function () {
+            it("getAllSelections retrieves all dataset selections with no args", function () {
                 var barData = [{ x: "foo", y: 5 }, { x: "bar", y: 640 }, { x: "zoo", y: 12345 }];
                 var barData2 = [{ x: "one", y: 5 }, { x: "two", y: 640 }, { x: "three", y: 12345 }];
-                verticalBarPlot.addDataset(barData);
-                verticalBarPlot.addDataset(barData2);
+                verticalBarPlot.addDataset("a", barData);
+                verticalBarPlot.addDataset("b", barData2);
                 verticalBarPlot.renderTo(svg);
                 var allBars = verticalBarPlot.getAllSelections();
+                var allBars2 = verticalBarPlot.getAllSelections(["a", "b"]);
+                assert.deepEqual(allBars, allBars2, "both ways of getting all selections work");
+                svg.remove();
+            });
+            it("getAllSelections retrieves correct selections (dataset string arg)", function () {
+                var barData = [{ x: "foo", y: 5 }, { x: "bar", y: 640 }, { x: "zoo", y: 12345 }];
+                var barData2 = [{ x: "one", y: 5 }, { x: "two", y: 640 }, { x: "three", y: 12345 }];
+                verticalBarPlot.addDataset("a", barData);
+                verticalBarPlot.addDataset(barData2);
+                verticalBarPlot.renderTo(svg);
+                var allBars = verticalBarPlot.getAllSelections("a");
+                assert.strictEqual(allBars.size(), 3, "all bars retrieved");
+                var selectionData = allBars.data();
+                assert.includeMembers(selectionData, barData, "first dataset data in selection data");
+                svg.remove();
+            });
+            it("getAllSelections retrieves correct selections (dataset array arg)", function () {
+                var barData = [{ x: "foo", y: 5 }, { x: "bar", y: 640 }, { x: "zoo", y: 12345 }];
+                var barData2 = [{ x: "one", y: 5 }, { x: "two", y: 640 }, { x: "three", y: 12345 }];
+                verticalBarPlot.addDataset("a", barData);
+                verticalBarPlot.addDataset("b", barData2);
+                verticalBarPlot.renderTo(svg);
+                var allBars = verticalBarPlot.getAllSelections(["a", "b"]);
                 assert.strictEqual(allBars.size(), 6, "all bars retrieved");
                 var selectionData = allBars.data();
                 assert.includeMembers(selectionData, barData, "first dataset data in selection data");

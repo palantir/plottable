@@ -6512,14 +6512,27 @@ var Plottable;
             /**
              * Retrieves all of the selections of this plot for the specified dataset(s)
              *
-             * @param {string | string[]} datasetKeys The datasets to retrieve the selections from.
+             * @param {string | string[]} datasetKeys The dataset(s) to retrieve the selections from.
              * If not provided, all selections will be retrieved.
              * @returns {D3.Selection} The retrieved selections.
              */
             AbstractPlot.prototype.getAllSelections = function (datasetKeys) {
+                var _this = this;
+                var datasetKeyArray = [];
+                if (datasetKeys == null) {
+                    datasetKeyArray = this._datasetKeysInOrder;
+                }
+                else if (typeof (datasetKeys) === "string") {
+                    datasetKeyArray = [datasetKeys];
+                }
+                else {
+                    datasetKeyArray = datasetKeys;
+                }
                 var allSelections = d3.select();
                 allSelections[0] = [];
-                this._getDrawersInOrder().forEach(function (drawer) {
+                datasetKeyArray.forEach(function (datasetKey) {
+                    var plotDatasetKey = _this._key2PlotDatasetKey.get(datasetKey);
+                    var drawer = plotDatasetKey.drawer;
                     drawer._getRenderArea().selectAll(drawer._getSelector())[0].forEach(function (selection) {
                         allSelections[0].push(selection);
                     });

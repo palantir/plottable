@@ -423,14 +423,26 @@ export module Plot {
     /**
      * Retrieves all of the selections of this plot for the specified dataset(s)
      *
-     * @param {string | string[]} datasetKeys The datasets to retrieve the selections from.
+     * @param {string | string[]} datasetKeys The dataset(s) to retrieve the selections from.
      * If not provided, all selections will be retrieved.
      * @returns {D3.Selection} The retrieved selections.
      */
     public getAllSelections(datasetKeys?: string | string[]): D3.Selection {
+      var datasetKeyArray: string[] = [];
+      if (datasetKeys == null) {
+        datasetKeyArray = this._datasetKeysInOrder;
+      } else if (typeof(datasetKeys) === "string") {
+        datasetKeyArray = [<string> datasetKeys];
+      } else {
+        datasetKeyArray = <string[]> datasetKeys;
+      }
+
       var allSelections = d3.select();
       allSelections[0] = [];
-      this._getDrawersInOrder().forEach((drawer) => {
+
+      datasetKeyArray.forEach((datasetKey) => {
+        var plotDatasetKey = this._key2PlotDatasetKey.get(datasetKey);
+        var drawer = plotDatasetKey.drawer;
         drawer._getRenderArea().selectAll(drawer._getSelector())[0].forEach((selection: EventTarget) => {
           allSelections[0].push(selection);
         });
