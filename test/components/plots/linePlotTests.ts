@@ -27,11 +27,11 @@ describe("Plots", () => {
       svg = generateSVG(500, 500);
       simpleDataset = new Plottable.Dataset(twoPointData);
       linePlot = new Plottable.Plot.Line(xScale, yScale);
-      linePlot.addDataset(simpleDataset)
+      linePlot.addDataset("s1", simpleDataset)
               .project("x", xAccessor, xScale)
               .project("y", yAccessor, yScale)
               .project("stroke", colorAccessor)
-              .addDataset(simpleDataset)
+              .addDataset("s2", simpleDataset)
               .renderTo(svg);
       renderArea = (<any> linePlot)._renderArea;
     });
@@ -163,20 +163,52 @@ describe("Plots", () => {
       svg.remove();
     });
 
-    it("getAllSelections retrieves correct selections",() => {
-      var dataset3 = [
-        { foo: 0, bar: 1 },
-        { foo: 1, bar: 0.95 }
-      ];
-      linePlot.addDataset(dataset3);
+    describe("getAllSelections()",() => {
 
-      var allLines = linePlot.getAllSelections();
-      assert.strictEqual(allLines.size(), 3, "all lines retrieved");
-      var selectionData = allLines.data();
-      assert.include(selectionData, twoPointData, "first dataset data in selection data");
-      assert.include(selectionData, dataset3, "third dataset data in selection data");
+      it("getAllSelections retrieves all dataset selections with no args", () => {
+        var dataset3 = [
+          { foo: 0, bar: 1 },
+          { foo: 1, bar: 0.95 }
+        ];
+        linePlot.addDataset("d3", dataset3);
 
-      svg.remove();
+        var allLines = linePlot.getAllSelections();
+        var allLines2 = linePlot.getAllSelections(["s1", "s2", "d3"]);
+        assert.deepEqual(allLines, allLines2, "all lines retrieved");
+
+        svg.remove();
+      });
+
+      it("getAllSelections retrieves correct selections (dataset array arg)", () => {
+        var dataset3 = [
+          { foo: 0, bar: 1 },
+          { foo: 1, bar: 0.95 }
+        ];
+        linePlot.addDataset("d3", dataset3);
+
+        var allLines = linePlot.getAllSelections("d3");
+        assert.strictEqual(allLines.size(), 1, "all lines retrieved");
+        var selectionData = allLines.data();
+        assert.include(selectionData, dataset3, "third dataset data in selection data");
+
+        svg.remove();
+      });
+
+      it("getAllSelections ignores invalid selections",() => {
+        var dataset3 = [
+          { foo: 0, bar: 1 },
+          { foo: 1, bar: 0.95 }
+        ];
+        linePlot.addDataset("d3", dataset3);
+
+        var allLines = linePlot.getAllSelections(["d3", "test"]);
+        assert.strictEqual(allLines.size(), 1, "all lines retrieved");
+        var selectionData = allLines.data();
+        assert.include(selectionData, dataset3, "third dataset data in selection data");
+
+        svg.remove();
+      });
+
     });
 
     it("retains original classes when class is projected", () => {

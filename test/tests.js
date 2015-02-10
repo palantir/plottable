@@ -2031,12 +2031,25 @@ describe("Plots", function () {
             piePlot.project("outer-radius", function () { return 250; });
             svg.remove();
         });
-        it("getAllSelections retrieves correct selections", function () {
-            var allSectors = piePlot.getAllSelections();
-            assert.strictEqual(allSectors.size(), 2, "all sectors retrieved");
-            var selectionData = allSectors.data();
-            assert.includeMembers(selectionData.map(function (datum) { return datum.data; }), simpleData, "dataset data in selection data");
-            svg.remove();
+        describe("getAllSelections", function () {
+            it("getAllSelections retrieves all dataset selections with no args", function () {
+                var allSectors = piePlot.getAllSelections();
+                var allSectors2 = piePlot.getAllSelections(["simpleDataset"]);
+                assert.deepEqual(allSectors, allSectors2, "all sectors retrieved");
+                svg.remove();
+            });
+            it("getAllSelections retrieves correct selections (dataset array arg)", function () {
+                var allSectors = piePlot.getAllSelections(["simpleDataset"]);
+                assert.strictEqual(allSectors.size(), 2, "all sectors retrieved");
+                var selectionData = allSectors.data();
+                assert.includeMembers(selectionData.map(function (datum) { return datum.data; }), simpleData, "dataset data in selection data");
+                svg.remove();
+            });
+            it("getAllSelections ignores invalid selections", function () {
+                var allSectors = piePlot.getAllSelections(["whoo"]);
+                assert.strictEqual(allSectors.size(), 0, "all sectors retrieved");
+                svg.remove();
+            });
         });
         describe("Fill", function () {
             it("sectors are filled in according to defaults", function () {
@@ -2175,7 +2188,7 @@ describe("Plots", function () {
             svg = generateSVG(500, 500);
             simpleDataset = new Plottable.Dataset(twoPointData);
             linePlot = new Plottable.Plot.Line(xScale, yScale);
-            linePlot.addDataset(simpleDataset).project("x", xAccessor, xScale).project("y", yAccessor, yScale).project("stroke", colorAccessor).addDataset(simpleDataset).renderTo(svg);
+            linePlot.addDataset("s1", simpleDataset).project("x", xAccessor, xScale).project("y", yAccessor, yScale).project("stroke", colorAccessor).addDataset("s2", simpleDataset).renderTo(svg);
             renderArea = linePlot._renderArea;
         });
         it("draws a line correctly", function () {
@@ -2286,18 +2299,42 @@ describe("Plots", function () {
             assert.strictEqual(parseFloat(hoverTarget.attr("cy")), yScale.scale(expectedDatum.bar), "hover target was positioned correctly (y)");
             svg.remove();
         });
-        it("getAllSelections retrieves correct selections", function () {
-            var dataset3 = [
-                { foo: 0, bar: 1 },
-                { foo: 1, bar: 0.95 }
-            ];
-            linePlot.addDataset(dataset3);
-            var allLines = linePlot.getAllSelections();
-            assert.strictEqual(allLines.size(), 3, "all lines retrieved");
-            var selectionData = allLines.data();
-            assert.include(selectionData, twoPointData, "first dataset data in selection data");
-            assert.include(selectionData, dataset3, "third dataset data in selection data");
-            svg.remove();
+        describe("getAllSelections()", function () {
+            it("getAllSelections retrieves all dataset selections with no args", function () {
+                var dataset3 = [
+                    { foo: 0, bar: 1 },
+                    { foo: 1, bar: 0.95 }
+                ];
+                linePlot.addDataset("d3", dataset3);
+                var allLines = linePlot.getAllSelections();
+                var allLines2 = linePlot.getAllSelections(["s1", "s2", "d3"]);
+                assert.deepEqual(allLines, allLines2, "all lines retrieved");
+                svg.remove();
+            });
+            it("getAllSelections retrieves correct selections (dataset array arg)", function () {
+                var dataset3 = [
+                    { foo: 0, bar: 1 },
+                    { foo: 1, bar: 0.95 }
+                ];
+                linePlot.addDataset("d3", dataset3);
+                var allLines = linePlot.getAllSelections("d3");
+                assert.strictEqual(allLines.size(), 1, "all lines retrieved");
+                var selectionData = allLines.data();
+                assert.include(selectionData, dataset3, "third dataset data in selection data");
+                svg.remove();
+            });
+            it("getAllSelections ignores invalid selections", function () {
+                var dataset3 = [
+                    { foo: 0, bar: 1 },
+                    { foo: 1, bar: 0.95 }
+                ];
+                linePlot.addDataset("d3", dataset3);
+                var allLines = linePlot.getAllSelections(["d3", "test"]);
+                assert.strictEqual(allLines.size(), 1, "all lines retrieved");
+                var selectionData = allLines.data();
+                assert.include(selectionData, dataset3, "third dataset data in selection data");
+                svg.remove();
+            });
         });
         it("retains original classes when class is projected", function () {
             var newClassProjector = function () { return "pink"; };
