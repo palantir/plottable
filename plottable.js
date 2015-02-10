@@ -8907,7 +8907,7 @@ var Plottable;
             };
             Drag.prototype._dragend = function () {
                 var location = d3.mouse(this._hitBox[0][0].parentNode);
-                this._setLocation(location[0], location[1]);
+                this._setLocation(this._constrainX(location[0]), this._constrainY(location[1]));
                 this._isDragging = false;
                 this._doDragend();
             };
