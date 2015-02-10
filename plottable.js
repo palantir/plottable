@@ -4559,11 +4559,16 @@ var Plottable;
                 this._tierMarkContainers[index].selectAll("." + Axis.AbstractAxis.TICK_MARK_CLASS).remove();
                 this._tierBaselines[index].style("visibility", "hidden");
             };
+            Time.prototype._getTickValuesForConfiguration = function (config) {
+                var tickPos = this._scale.tickInterval(config.interval, config.step);
+                var domain = this._scale.domain();
+                tickPos.unshift(domain[0]);
+                tickPos.push(domain[1]);
+                return tickPos;
+            };
             Time.prototype._renderTierLabels = function (container, config, index) {
                 var _this = this;
-                var tickPos = this._scale.tickInterval(config.interval, config.step);
-                tickPos.splice(0, 0, this._scale.domain()[0]);
-                tickPos.push(this._scale.domain()[1]);
+                var tickPos = this._getTickValuesForConfiguration(config);
                 var labelPos = [];
                 if (this._tierLabelPositions[index] === "between" && config.step === 1) {
                     tickPos.map(function (datum, index) {
@@ -4598,13 +4603,6 @@ var Plottable;
                 tickLabels.attr("transform", function (d) { return "translate(" + _this._scale.scale(d) + ",0)"; });
                 var anchor = (this._tierLabelPositions[index] === "center" || config.step === 1) ? "middle" : "start";
                 tickLabels.selectAll("text").text(config.formatter).style("text-anchor", anchor);
-                if (filteredTicks.indexOf(this._scale.domain()[0]) === -1) {
-                    filteredTicks.splice(0, 1, this._scale.domain()[0]);
-                }
-                if (filteredTicks.indexOf(this._scale.domain()[1]) === -1) {
-                    filteredTicks.push(this._scale.domain()[1]);
-                }
-                return filteredTicks;
             };
             Time.prototype._canFitLabelFilter = function (position, bounds, config, labelPosition) {
                 if (labelPosition === "center") {
@@ -4671,7 +4669,10 @@ var Plottable;
                 for (var i = 0; i < Time._NUM_TIERS; ++i) {
                     this._cleanTier(i);
                 }
-                var tierTicks = tierConfigs.map(function (config, i) { return _this._renderTierLabels(_this._tierLabelContainers[i], config, i); });
+                var tierTicks = tierConfigs.map(function (config, i) {
+                    _this._renderTierLabels(_this._tierLabelContainers[i], config, i);
+                    return _this._getTickValuesForConfiguration(config);
+                });
                 var baselineOffset = 0;
                 for (i = 0; i < Math.max(tierConfigs.length, 1); ++i) {
                     var attr = this._generateBaselineAttrHash();

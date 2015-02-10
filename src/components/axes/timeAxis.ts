@@ -306,10 +306,16 @@ export module Axis {
       this._tierBaselines[index].style("visibility", "hidden");
     }
 
-    private _renderTierLabels(container: D3.Selection, config: TimeAxisTierConfiguration, index: number) {
+    private _getTickValuesForConfiguration(config: TimeAxisTierConfiguration) {
       var tickPos = (<Scale.Time> this._scale).tickInterval(config.interval, config.step);
-      tickPos.splice(0, 0, this._scale.domain()[0]);
-      tickPos.push(this._scale.domain()[1]);
+      var domain = this._scale.domain();
+      tickPos.unshift(domain[0]);
+      tickPos.push(domain[1]);
+      return tickPos;
+    }
+
+    private _renderTierLabels(container: D3.Selection, config: TimeAxisTierConfiguration, index: number) {
+      var tickPos = this._getTickValuesForConfiguration(config);
       var labelPos: Date[] = [];
       if (this._tierLabelPositions[index] === "between" && config.step === 1) {
         tickPos.map((datum: any, index: any) => {
@@ -347,14 +353,6 @@ export module Axis {
       tickLabels.attr("transform", (d: any) => "translate(" + this._scale.scale(d) + ",0)");
       var anchor = (this._tierLabelPositions[index] === "center" || config.step === 1) ? "middle" : "start";
       tickLabels.selectAll("text").text(config.formatter).style("text-anchor", anchor);
-      if (filteredTicks.indexOf(this._scale.domain()[0]) === -1) {
-        filteredTicks.splice(0, 1, this._scale.domain()[0]);
-      }
-      if (filteredTicks.indexOf(this._scale.domain()[1]) === -1) {
-        filteredTicks.push(this._scale.domain()[1]);
-      }
-
-      return filteredTicks;
     }
 
     private _canFitLabelFilter(position: Date, bounds: Date[], config: TimeAxisTierConfiguration, labelPosition: string): boolean {
@@ -427,9 +425,10 @@ export module Axis {
         this._cleanTier(i);
       }
 
-      var tierTicks = tierConfigs.map((config: TimeAxisTierConfiguration, i: number) =>
-        this._renderTierLabels(this._tierLabelContainers[i], config, i)
-      );
+      var tierTicks = tierConfigs.map((config: TimeAxisTierConfiguration, i: number) => {
+        this._renderTierLabels(this._tierLabelContainers[i], config, i);
+        return this._getTickValuesForConfiguration(config);
+      });
 
       var baselineOffset = 0;
       for (i = 0; i < Math.max(tierConfigs.length, 1); ++i) {
