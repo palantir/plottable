@@ -420,7 +420,14 @@ export module Plot {
       this._additionalPaint(maxTime);
     }
 
-    public getAllSelections(): D3.Selection {
+    /**
+     * Retrieves all of the selections of this plot for the specified dataset(s)
+     *
+     * @param {string | string[]} datasetKeys The datasets to retrieve the selections from.
+     * If not provided, all selections will be retrieved.
+     * @returns {D3.Selection} The retrieved selections.
+     */
+    public getAllSelections(datasetKeys?: string | string[]): D3.Selection {
       var allSelections = d3.select();
       allSelections[0] = [];
       this._getDrawersInOrder().forEach((drawer) => {
