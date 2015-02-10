@@ -4559,11 +4559,21 @@ var Plottable;
                 this._tierMarkContainers[index].selectAll("." + Axis.AbstractAxis.TICK_MARK_CLASS).remove();
                 this._tierBaselines[index].style("visibility", "hidden");
             };
+            Time.prototype._getTickValuesForConfiguration = function (config) {
+                var tickPos = this._scale.tickInterval(config.interval, config.step);
+                var domain = this._scale.domain();
+                var tickPosValues = tickPos.map(function (d) { return d.valueOf(); }); // can't indexOf with objects
+                if (tickPosValues.indexOf(domain[0].valueOf()) === -1) {
+                    tickPos.unshift(domain[0]);
+                }
+                if (tickPosValues.indexOf(domain[1].valueOf()) === -1) {
+                    tickPos.push(domain[1]);
+                }
+                return tickPos;
+            };
             Time.prototype._renderTierLabels = function (container, config, index) {
                 var _this = this;
-                var tickPos = this._scale.tickInterval(config.interval, config.step);
-                tickPos.splice(0, 0, this._scale.domain()[0]);
-                tickPos.push(this._scale.domain()[1]);
+                var tickPos = this._getTickValuesForConfiguration(config);
                 var labelPos = [];
                 if (this._tierLabelPositions[index] === "between" && config.step === 1) {
                     tickPos.map(function (datum, index) {
@@ -4576,14 +4586,6 @@ var Plottable;
                 else {
                     labelPos = tickPos;
                 }
-                var filteredTicks = [];
-                labelPos = labelPos.filter(function (d, i) {
-                    var fits = _this._canFitLabelFilter(d, tickPos.slice(i, i + 2), config, _this._tierLabelPositions[index]);
-                    if (fits) {
-                        filteredTicks.push(tickPos[i]);
-                    }
-                    return fits;
-                });
                 var tickLabels = container.selectAll("." + Axis.AbstractAxis.TICK_LABEL_CLASS).data(labelPos, function (d) { return d.valueOf(); });
                 var tickLabelsEnter = tickLabels.enter().append("g").classed(Axis.AbstractAxis.TICK_LABEL_CLASS, true);
                 tickLabelsEnter.append("text");
@@ -4598,32 +4600,6 @@ var Plottable;
                 tickLabels.attr("transform", function (d) { return "translate(" + _this._scale.scale(d) + ",0)"; });
                 var anchor = (this._tierLabelPositions[index] === "center" || config.step === 1) ? "middle" : "start";
                 tickLabels.selectAll("text").text(config.formatter).style("text-anchor", anchor);
-                if (filteredTicks.indexOf(this._scale.domain()[0]) === -1) {
-                    filteredTicks.splice(0, 1, this._scale.domain()[0]);
-                }
-                if (filteredTicks.indexOf(this._scale.domain()[1]) === -1) {
-                    filteredTicks.push(this._scale.domain()[1]);
-                }
-                return filteredTicks;
-            };
-            Time.prototype._canFitLabelFilter = function (position, bounds, config, labelPosition) {
-                if (labelPosition === "center") {
-                    return true;
-                }
-                var endPosition;
-                var startPosition;
-                var width = this._measurer.measure(config.formatter(position)).width + ((config.step !== 1) ? this.tickLabelPadding() : 0);
-                var leftBound = this._scale.scale(bounds[0]);
-                var rightBound = this._scale.scale(bounds[1]);
-                if (labelPosition === "center" || config.step === 1) {
-                    endPosition = this._scale.scale(position) + width / 2;
-                    startPosition = this._scale.scale(position) - width / 2;
-                }
-                else {
-                    endPosition = this._scale.scale(position) + width;
-                    startPosition = this._scale.scale(position);
-                }
-                return endPosition <= rightBound && startPosition >= leftBound;
             };
             Time.prototype._renderTickMarks = function (tickValues, index) {
                 var tickMarks = this._tierMarkContainers[index].selectAll("." + Axis.AbstractAxis.TICK_MARK_CLASS).data(tickValues);
@@ -4671,7 +4647,8 @@ var Plottable;
                 for (var i = 0; i < Time._NUM_TIERS; ++i) {
                     this._cleanTier(i);
                 }
-                var tierTicks = tierConfigs.map(function (config, i) { return _this._renderTierLabels(_this._tierLabelContainers[i], config, i); });
+                tierConfigs.forEach(function (config, i) { return _this._renderTierLabels(_this._tierLabelContainers[i], config, i); });
+                var tierTicks = tierConfigs.map(function (config, i) { return _this._getTickValuesForConfiguration(config); });
                 var baselineOffset = 0;
                 for (i = 0; i < Math.max(tierConfigs.length, 1); ++i) {
                     var attr = this._generateBaselineAttrHash();
