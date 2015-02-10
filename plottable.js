@@ -4562,8 +4562,13 @@ var Plottable;
             Time.prototype._getTickValuesForConfiguration = function (config) {
                 var tickPos = this._scale.tickInterval(config.interval, config.step);
                 var domain = this._scale.domain();
-                tickPos.unshift(domain[0]);
-                tickPos.push(domain[1]);
+                var tickPosValues = tickPos.map(function (d) { return d.valueOf(); }); // can't indexOf with objects
+                if (tickPosValues.indexOf(domain[0].valueOf()) === -1) {
+                    tickPos.unshift(domain[0]);
+                }
+                if (tickPosValues.indexOf(domain[1].valueOf()) === -1) {
+                    tickPos.push(domain[1]);
+                }
                 return tickPos;
             };
             Time.prototype._renderTierLabels = function (container, config, index) {
@@ -4642,10 +4647,8 @@ var Plottable;
                 for (var i = 0; i < Time._NUM_TIERS; ++i) {
                     this._cleanTier(i);
                 }
-                var tierTicks = tierConfigs.map(function (config, i) {
-                    _this._renderTierLabels(_this._tierLabelContainers[i], config, i);
-                    return _this._getTickValuesForConfiguration(config);
-                });
+                tierConfigs.forEach(function (config, i) { return _this._renderTierLabels(_this._tierLabelContainers[i], config, i); });
+                var tierTicks = tierConfigs.map(function (config, i) { return _this._getTickValuesForConfiguration(config); });
                 var baselineOffset = 0;
                 for (i = 0; i < Math.max(tierConfigs.length, 1); ++i) {
                     var attr = this._generateBaselineAttrHash();

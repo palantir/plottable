@@ -309,8 +309,13 @@ export module Axis {
     private _getTickValuesForConfiguration(config: TimeAxisTierConfiguration) {
       var tickPos = (<Scale.Time> this._scale).tickInterval(config.interval, config.step);
       var domain = this._scale.domain();
-      tickPos.unshift(domain[0]);
-      tickPos.push(domain[1]);
+      var tickPosValues = tickPos.map((d: Date) => d.valueOf()); // can't indexOf with objects
+      if (tickPosValues.indexOf(domain[0].valueOf()) === -1) {
+        tickPos.unshift(domain[0]);
+      }
+      if (tickPosValues.indexOf(domain[1].valueOf()) === -1) {
+        tickPos.push(domain[1]);
+      }
       return tickPos;
     }
 
@@ -397,10 +402,12 @@ export module Axis {
         this._cleanTier(i);
       }
 
-      var tierTicks = tierConfigs.map((config: TimeAxisTierConfiguration, i: number) => {
-        this._renderTierLabels(this._tierLabelContainers[i], config, i);
-        return this._getTickValuesForConfiguration(config);
-      });
+      tierConfigs.forEach((config: TimeAxisTierConfiguration, i: number) =>
+        this._renderTierLabels(this._tierLabelContainers[i], config, i)
+      );
+      var tierTicks = tierConfigs.map((config: TimeAxisTierConfiguration, i: number) =>
+        this._getTickValuesForConfiguration(config)
+      );
 
       var baselineOffset = 0;
       for (i = 0; i < Math.max(tierConfigs.length, 1); ++i) {
