@@ -467,7 +467,7 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("retrieves correct selections (dataset string arg)", () => {
+      it("retrieves correct selections (string arg)", () => {
         var barData = [{ x: "foo", y: 5 }, { x: "bar", y: 640 }, { x: "zoo", y: 12345 }];
         var barData2 = [{ x: "one", y: 5 }, { x: "two", y: 640 }, { x: "three", y: 12345 }];
         verticalBarPlot.addDataset("a", barData);
@@ -482,7 +482,7 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("retrieves correct selections (dataset array arg)", () => {
+      it("retrieves correct selections (array arg)", () => {
         var barData = [{ x: "foo", y: 5 }, { x: "bar", y: 640 }, { x: "zoo", y: 12345 }];
         var barData2 = [{ x: "one", y: 5 }, { x: "two", y: 640 }, { x: "three", y: 12345 }];
         verticalBarPlot.addDataset("a", barData);

@@ -139,7 +139,7 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("retrieves correct selections (dataset array arg)",() => {
+      it("retrieves correct selections (array arg)",() => {
         var allSectors = piePlot.getAllSelections(["simpleDataset"]);
         assert.strictEqual(allSectors.size(), 2, "all sectors retrieved");
         var selectionData = allSectors.data();

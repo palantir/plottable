@@ -194,7 +194,7 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("retrieves correct selections (dataset array arg)", () => {
+      it("retrieves correct selections (array arg)", () => {
         var dataset3 = [
           { foo: 0, bar: 1 },
           { foo: 1, bar: 0.95 }

@@ -138,7 +138,7 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("retrieves correct selections (string arg)", () => {
+      it("retrieves correct selections (array arg)", () => {
         var newTwoPointData = [{ foo: 2, bar: 1 }, { foo: 3, bar: 2 }];
         var newDataset = new Plottable.Dataset(twoPointData);
         areaPlot.addDataset("newTwo", new Plottable.Dataset(newTwoPointData));

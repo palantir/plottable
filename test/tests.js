@@ -2038,7 +2038,7 @@ describe("Plots", function () {
                 assert.deepEqual(allSectors, allSectors2, "all sectors retrieved");
                 svg.remove();
             });
-            it("retrieves correct selections (dataset array arg)", function () {
+            it("retrieves correct selections (array arg)", function () {
                 var allSectors = piePlot.getAllSelections(["simpleDataset"]);
                 assert.strictEqual(allSectors.size(), 2, "all sectors retrieved");
                 var selectionData = allSectors.data();
@@ -2330,7 +2330,7 @@ describe("Plots", function () {
                 assert.include(selectionData, dataset3, "third dataset data in selection data");
                 svg.remove();
             });
-            it("retrieves correct selections (dataset array arg)", function () {
+            it("retrieves correct selections (array arg)", function () {
                 var dataset3 = [
                     { foo: 0, bar: 1 },
                     { foo: 1, bar: 0.95 }
@@ -2477,7 +2477,7 @@ describe("Plots", function () {
                 assert.include(selectionData, newTwoPointData, "new dataset data in selection data");
                 svg.remove();
             });
-            it("retrieves correct selections (string arg)", function () {
+            it("retrieves correct selections (array arg)", function () {
                 var newTwoPointData = [{ foo: 2, bar: 1 }, { foo: 3, bar: 2 }];
                 var newDataset = new Plottable.Dataset(twoPointData);
                 areaPlot.addDataset("newTwo", new Plottable.Dataset(newTwoPointData));
@@ -2913,7 +2913,7 @@ describe("Plots", function () {
                 assert.deepEqual(allBars, allBars2, "both ways of getting all selections work");
                 svg.remove();
             });
-            it("retrieves correct selections (dataset string arg)", function () {
+            it("retrieves correct selections (string arg)", function () {
                 var barData = [{ x: "foo", y: 5 }, { x: "bar", y: 640 }, { x: "zoo", y: 12345 }];
                 var barData2 = [{ x: "one", y: 5 }, { x: "two", y: 640 }, { x: "three", y: 12345 }];
                 verticalBarPlot.addDataset("a", barData);
@@ -2925,7 +2925,7 @@ describe("Plots", function () {
                 assert.includeMembers(selectionData, barData, "first dataset data in selection data");
                 svg.remove();
             });
-            it("retrieves correct selections (dataset array arg)", function () {
+            it("retrieves correct selections (array arg)", function () {
                 var barData = [{ x: "foo", y: 5 }, { x: "bar", y: 640 }, { x: "zoo", y: 12345 }];
                 var barData2 = [{ x: "one", y: 5 }, { x: "two", y: 640 }, { x: "three", y: 12345 }];
                 verticalBarPlot.addDataset("a", barData);
@@ -3060,19 +3060,62 @@ describe("Plots", function () {
             cellAV.attr("y", "100");
             svg.remove();
         });
-        it("getAllSelections retrieves correct selections", function () {
-            var xScale = new Plottable.Scale.Ordinal();
-            var yScale = new Plottable.Scale.Ordinal();
-            var colorScale = new Plottable.Scale.InterpolatedColor(["black", "white"]);
-            var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-            var gridPlot = new Plottable.Plot.Grid(xScale, yScale, colorScale);
-            gridPlot.addDataset(DATA).project("fill", "magnitude", colorScale).project("x", "x", xScale).project("y", "y", yScale);
-            gridPlot.renderTo(svg);
-            var allCells = gridPlot.getAllSelections();
-            assert.strictEqual(allCells.size(), 4, "all cells retrieved");
-            var selectionData = allCells.data();
-            assert.includeMembers(selectionData, DATA, "data in selection data");
-            svg.remove();
+        describe("getAllSelections()", function () {
+            it("retrieves all selections with no args", function () {
+                var xScale = new Plottable.Scale.Ordinal();
+                var yScale = new Plottable.Scale.Ordinal();
+                var colorScale = new Plottable.Scale.InterpolatedColor(["black", "white"]);
+                var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+                var gridPlot = new Plottable.Plot.Grid(xScale, yScale, colorScale);
+                gridPlot.addDataset("a", DATA).project("fill", "magnitude", colorScale).project("x", "x", xScale).project("y", "y", yScale);
+                gridPlot.renderTo(svg);
+                var allCells = gridPlot.getAllSelections();
+                var allCells2 = gridPlot.getAllSelections(gridPlot._datasetKeysInOrder);
+                assert.deepEqual(allCells, allCells2, "all cells retrieved");
+                svg.remove();
+            });
+            it("retrieves correct selections (string arg)", function () {
+                var xScale = new Plottable.Scale.Ordinal();
+                var yScale = new Plottable.Scale.Ordinal();
+                var colorScale = new Plottable.Scale.InterpolatedColor(["black", "white"]);
+                var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+                var gridPlot = new Plottable.Plot.Grid(xScale, yScale, colorScale);
+                gridPlot.addDataset("a", DATA).project("fill", "magnitude", colorScale).project("x", "x", xScale).project("y", "y", yScale);
+                gridPlot.renderTo(svg);
+                var allCells = gridPlot.getAllSelections("a");
+                assert.strictEqual(allCells.size(), 4, "all cells retrieved");
+                var selectionData = allCells.data();
+                assert.includeMembers(selectionData, DATA, "data in selection data");
+                svg.remove();
+            });
+            it("retrieves correct selections (array arg)", function () {
+                var xScale = new Plottable.Scale.Ordinal();
+                var yScale = new Plottable.Scale.Ordinal();
+                var colorScale = new Plottable.Scale.InterpolatedColor(["black", "white"]);
+                var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+                var gridPlot = new Plottable.Plot.Grid(xScale, yScale, colorScale);
+                gridPlot.addDataset("a", DATA).project("fill", "magnitude", colorScale).project("x", "x", xScale).project("y", "y", yScale);
+                gridPlot.renderTo(svg);
+                var allCells = gridPlot.getAllSelections(["a"]);
+                assert.strictEqual(allCells.size(), 4, "all cells retrieved");
+                var selectionData = allCells.data();
+                assert.includeMembers(selectionData, DATA, "data in selection data");
+                svg.remove();
+            });
+            it("skips invalid keys", function () {
+                var xScale = new Plottable.Scale.Ordinal();
+                var yScale = new Plottable.Scale.Ordinal();
+                var colorScale = new Plottable.Scale.InterpolatedColor(["black", "white"]);
+                var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+                var gridPlot = new Plottable.Plot.Grid(xScale, yScale, colorScale);
+                gridPlot.addDataset("a", DATA).project("fill", "magnitude", colorScale).project("x", "x", xScale).project("y", "y", yScale);
+                gridPlot.renderTo(svg);
+                var allCells = gridPlot.getAllSelections(["a", "b"]);
+                assert.strictEqual(allCells.size(), 4, "all cells retrieved");
+                var selectionData = allCells.data();
+                assert.includeMembers(selectionData, DATA, "data in selection data");
+                svg.remove();
+            });
         });
     });
 });
