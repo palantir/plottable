@@ -304,10 +304,21 @@ export module Axis {
       this._tierBaselines[index].style("visibility", "hidden");
     }
 
-    private _renderTierLabels(container: D3.Selection, config: TimeAxisTierConfiguration, index: number) {
+    private _getTickValuesForConfiguration(config: TimeAxisTierConfiguration) {
       var tickPos = (<Scale.Time> this._scale).tickInterval(config.interval, config.step);
-      tickPos.splice(0, 0, this._scale.domain()[0]);
-      tickPos.push(this._scale.domain()[1]);
+      var domain = this._scale.domain();
+      var tickPosValues = tickPos.map((d: Date) => d.valueOf()); // can't indexOf with objects
+      if (tickPosValues.indexOf(domain[0].valueOf()) === -1) {
+        tickPos.unshift(domain[0]);
+      }
+      if (tickPosValues.indexOf(domain[1].valueOf()) === -1) {
+        tickPos.push(domain[1]);
+      }
+      return tickPos;
+    }
+
+    private _renderTierLabels(container: D3.Selection, config: TimeAxisTierConfiguration, index: number) {
+      var tickPos = this._getTickValuesForConfiguration(config);
       var labelPos: Date[] = [];
       if (this._tierLabelPositions[index] === "between" && config.step === 1) {
         tickPos.map((datum: any, index: any) => {
@@ -319,14 +330,6 @@ export module Axis {
       } else {
         labelPos = tickPos;
       }
-      var filteredTicks: Date[] = [];
-      labelPos = labelPos.filter((d: any, i: number) => {
-        var fits = this._canFitLabelFilter(d, tickPos.slice(i, i + 2), config, this._tierLabelPositions[index]);
-        if (fits) {
-          filteredTicks.push(tickPos[i]);
-        }
-        return fits;
-      });
 
       var tickLabels = container.selectAll("." + AbstractAxis.TICK_LABEL_CLASS).data(labelPos, (d) => d.valueOf());
       var tickLabelsEnter = tickLabels.enter().append("g").classed(AbstractAxis.TICK_LABEL_CLASS, true);
@@ -345,34 +348,6 @@ export module Axis {
       tickLabels.attr("transform", (d: any) => "translate(" + this._scale.scale(d) + ",0)");
       var anchor = (this._tierLabelPositions[index] === "center" || config.step === 1) ? "middle" : "start";
       tickLabels.selectAll("text").text(config.formatter).style("text-anchor", anchor);
-      if (filteredTicks.indexOf(this._scale.domain()[0]) === -1) {
-        filteredTicks.splice(0, 1, this._scale.domain()[0]);
-      }
-      if (filteredTicks.indexOf(this._scale.domain()[1]) === -1) {
-        filteredTicks.push(this._scale.domain()[1]);
-      }
-
-      return filteredTicks;
-    }
-
-    private _canFitLabelFilter(position: Date, bounds: Date[], config: TimeAxisTierConfiguration, labelPosition: string): boolean {
-      if (labelPosition === "center") {
-        return true;
-      }
-      var endPosition: number;
-      var startPosition: number;
-      var width = this._measurer.measure(config.formatter(position)).width + ((config.step !== 1) ? this.tickLabelPadding() : 0);
-      var leftBound = this._scale.scale(bounds[0]);
-      var rightBound = this._scale.scale(bounds[1]);
-      if (labelPosition === "center" || config.step === 1) {
-          endPosition = this._scale.scale(position) + width / 2;
-          startPosition = this._scale.scale(position) - width / 2;
-      } else {
-          endPosition = this._scale.scale(position) + width;
-          startPosition = this._scale.scale(position);
-      }
-
-      return endPosition <= rightBound && startPosition >= leftBound;
     }
 
     private _renderTickMarks(tickValues: Date[], index: number) {
@@ -429,8 +404,11 @@ export module Axis {
         this._cleanTier(i);
       }
 
-      var tierTicks = tierConfigs.map((config: TimeAxisTierConfiguration, i: number) =>
+      tierConfigs.forEach((config: TimeAxisTierConfiguration, i: number) =>
         this._renderTierLabels(this._tierLabelContainers[i], config, i)
+      );
+      var tierTicks = tierConfigs.map((config: TimeAxisTierConfiguration, i: number) =>
+        this._getTickValuesForConfiguration(config)
       );
 
       var baselineOffset = 0;
