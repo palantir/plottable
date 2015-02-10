@@ -143,6 +143,13 @@ var Plottable;
                 return result;
             }
             Methods.uniq = uniq;
+            /**
+             * Creates an array of length `count`, filled with value or (if value is a function), value()
+             *
+             * @param {T | ((index?: number) => T)} value The value to fill the array with or a value generator (called with index as arg)
+             * @param {number} count The length of the array to generate
+             * @return {any[]}
+             */
             function createFilledArray(value, count) {
                 var out = [];
                 for (var i = 0; i < count; i++) {
@@ -2579,7 +2586,7 @@ var Plottable;
                 this.broadcaster.broadcast();
             };
             InterpolatedColor.prototype._resolveColorValues = function (colorRange) {
-                if (colorRange instanceof Array) {
+                if (typeof (colorRange) === "object") {
                     return colorRange;
                 }
                 else if (InterpolatedColor._COLOR_SCALES[colorRange] != null) {
@@ -3389,14 +3396,20 @@ var Plottable;
                     }
                 }
             };
+            /**
+             * Renders the Component into a given DOM element. The element must be as <svg>.
+             *
+             * @param {String|D3.Selection} element A D3 selection or a selector for getting the element to render into.
+             * @returns {Component} The calling component.
+             */
             AbstractComponent.prototype.renderTo = function (element) {
                 if (element != null) {
                     var selection;
-                    if (typeof (element.node) === "function") {
-                        selection = element;
+                    if (typeof (element) === "string") {
+                        selection = d3.select(element);
                     }
                     else {
-                        selection = d3.select(element);
+                        selection = element;
                     }
                     if (!selection.node() || selection.node().nodeName.toLowerCase() !== "svg") {
                         throw new Error("Plottable requires a valid SVG to renderTo");
@@ -7102,6 +7115,16 @@ var Plottable;
                     return this;
                 }
             };
+            /**
+             * Gets the bar under the given pixel position (if [xValOrExtent]
+             * and [yValOrExtent] are {number}s), under a given line (if only one
+             * of [xValOrExtent] or [yValOrExtent] are {Extent}s) or are under a
+             * 2D area (if [xValOrExtent] and [yValOrExtent] are both {Extent}s).
+             *
+             * @param {number | Extent} xValOrExtent The pixel x position, or range of x values.
+             * @param {number | Extent} yValOrExtent The pixel y position, or range of y values.
+             * @returns {D3.Selection} The selected bar, or null if no bar was selected.
+             */
             Bar.prototype.getBars = function (xValOrExtent, yValOrExtent) {
                 var _this = this;
                 if (!this._isSetup) {

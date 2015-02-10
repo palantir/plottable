@@ -28,11 +28,9 @@ export module Core {
     var _isCurrentlyFlushing: boolean = false;
     export var _renderPolicy: RenderPolicy.RenderPolicy = new RenderPolicy.AnimationFrame();
 
-    export function setRenderPolicy(policy: string): void;
-    export function setRenderPolicy(policy: RenderPolicy.RenderPolicy): void;
-    export function setRenderPolicy(policy: any): void {
+    export function setRenderPolicy(policy: string | RenderPolicy.RenderPolicy): void {
       if (typeof(policy) === "string") {
-        switch (policy.toLowerCase()) {
+        switch ((<string> policy).toLowerCase()) {
           case "immediate":
           policy = new RenderPolicy.Immediate();
           break;
@@ -47,7 +45,7 @@ export module Core {
           return;
         }
       }
-      _renderPolicy = policy;
+      _renderPolicy = <RenderPolicy.RenderPolicy> policy;
     }
 
     /**

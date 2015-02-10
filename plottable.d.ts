@@ -68,12 +68,11 @@ declare module Plottable {
             /**
              * Creates an array of length `count`, filled with value or (if value is a function), value()
              *
-             * @param {any} value The value to fill the array with, or, if a function, a generator for values (called with index as arg)
+             * @param {T | ((index?: number) => T)} value The value to fill the array with or a value generator (called with index as arg)
              * @param {number} count The length of the array to generate
              * @return {any[]}
              */
-            function createFilledArray<T>(value: T, count: number): T[];
-            function createFilledArray<T>(func: (index?: number) => T, count: number): T[];
+            function createFilledArray<T>(value: T | ((index?: number) => T), count: number): T[];
             /**
              * @param {T[][]} a The 2D array that will have its elements joined together.
              * @return {T[]} Every array in a, concatenated together in the order they appear.
@@ -641,8 +640,7 @@ declare module Plottable {
          */
         module RenderController {
             var _renderPolicy: RenderPolicy.RenderPolicy;
-            function setRenderPolicy(policy: string): void;
-            function setRenderPolicy(policy: RenderPolicy.RenderPolicy): void;
+            function setRenderPolicy(policy: string | RenderPolicy.RenderPolicy): void;
             /**
              * If the RenderController is enabled, we enqueue the component for
              * render. Otherwise, it is rendered immediately.
@@ -1398,7 +1396,7 @@ declare module Plottable {
              * values across the domain.
              * @returns {InterpolatedColor} The calling InterpolatedColor.
              */
-            colorRange(colorRange: any): InterpolatedColor;
+            colorRange(colorRange: string | string[]): InterpolatedColor;
             /**
              * Gets the internal scale type.
              *
@@ -1660,8 +1658,7 @@ declare module Plottable {
              * @param {String|D3.Selection} element A D3 selection or a selector for getting the element to render into.
              * @returns {Component} The calling component.
              */
-            renderTo(selector: String): AbstractComponent;
-            renderTo(element: D3.Selection): AbstractComponent;
+            renderTo(element: String | D3.Selection): AbstractComponent;
             /**
              * Causes the Component to recompute layout and redraw. If passed arguments, will resize the root SVG it lives in.
              *
@@ -2621,13 +2618,11 @@ declare module Plottable {
              * A key is automatically generated if not supplied.
              *
              * @param {string} [key] The key of the dataset.
-             * @param {any[]|Dataset} dataset dataset to add.
+             * @param {Dataset | any[]} dataset dataset to add.
              * @returns {Plot} The calling Plot.
              */
-            addDataset(key: string, dataset: Dataset): AbstractPlot;
-            addDataset(key: string, dataset: any[]): AbstractPlot;
-            addDataset(dataset: Dataset): AbstractPlot;
-            addDataset(dataset: any[]): AbstractPlot;
+            addDataset(dataset: Dataset | any[]): AbstractPlot;
+            addDataset(key: string, dataset: Dataset | any[]): AbstractPlot;
             protected _getDrawer(key: string): _Drawer.AbstractDrawer;
             protected _getAnimator(key: string): Animator.PlotAnimator;
             protected _onDatasetUpdate(): void;
@@ -2965,14 +2960,11 @@ declare module Plottable {
              * of [xValOrExtent] or [yValOrExtent] are {Extent}s) or are under a
              * 2D area (if [xValOrExtent] and [yValOrExtent] are both {Extent}s).
              *
-             * @param {any} xValOrExtent The pixel x position, or range of x values.
-             * @param {any} yValOrExtent The pixel y position, or range of y values.
+             * @param {number | Extent} xValOrExtent The pixel x position, or range of x values.
+             * @param {number | Extent} yValOrExtent The pixel y position, or range of y values.
              * @returns {D3.Selection} The selected bar, or null if no bar was selected.
              */
-            getBars(xValOrExtent: Extent, yValOrExtent: Extent): D3.Selection;
-            getBars(xValOrExtent: number, yValOrExtent: Extent): D3.Selection;
-            getBars(xValOrExtent: Extent, yValOrExtent: number): D3.Selection;
-            getBars(xValOrExtent: number, yValOrExtent: number): D3.Selection;
+            getBars(xValOrExtent: number | Extent, yValOrExtent: number | Extent): D3.Selection;
             protected _updateDomainer(scale: Scale.AbstractScale<any, number>): void;
             protected _updateYDomainer(): void;
             protected _updateXDomainer(): void;
@@ -3238,7 +3230,7 @@ declare module Plottable {
              *     transition object so that plots may chain the transitions between
              *     animators.
              */
-            animate(selection: any, attrToProjector: AttributeToProjector): any;
+            animate(selection: any, attrToProjector: AttributeToProjector): D3.Selection | D3.Transition.Transition;
             /**
              * Given the number of elements, return the total time the animation requires
              * @param number numberofIterations The number of elements that will be drawn
@@ -3261,7 +3253,7 @@ declare module Plottable {
          */
         class Null implements PlotAnimator {
             getTiming(selection: any): number;
-            animate(selection: any, attrToProjector: AttributeToProjector): any;
+            animate(selection: any, attrToProjector: AttributeToProjector): D3.Selection;
         }
     }
 }
@@ -3309,7 +3301,7 @@ declare module Plottable {
              */
             constructor();
             getTiming(numberOfIterations: number): number;
-            animate(selection: any, attrToProjector: AttributeToProjector): any;
+            animate(selection: any, attrToProjector: AttributeToProjector): D3.Transition.Transition;
             /**
              * Gets the duration of the animation in milliseconds.
              *
@@ -3390,7 +3382,7 @@ declare module Plottable {
             isVertical: boolean;
             isReverse: boolean;
             constructor(isVertical?: boolean, isReverse?: boolean);
-            animate(selection: any, attrToProjector: AttributeToProjector): any;
+            animate(selection: any, attrToProjector: AttributeToProjector): D3.Transition.Transition;
             protected _startMovingProjector(attrToProjector: AttributeToProjector): (datum: any, index: number, userMetadata: any, plotMetadata: Plot.PlotMetadata) => any;
         }
     }

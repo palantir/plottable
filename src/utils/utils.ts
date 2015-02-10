@@ -135,16 +135,14 @@ export module _Util {
     /**
      * Creates an array of length `count`, filled with value or (if value is a function), value()
      *
-     * @param {any} value The value to fill the array with, or, if a function, a generator for values (called with index as arg)
+     * @param {T | ((index?: number) => T)} value The value to fill the array with or a value generator (called with index as arg)
      * @param {number} count The length of the array to generate
      * @return {any[]}
      */
-    export function createFilledArray<T>(value: T, count: number): T[];
-    export function createFilledArray<T>(func: (index?: number) => T, count: number): T[];
-    export function createFilledArray<T>(value: any, count: number) {
+    export function createFilledArray<T>(value: T | ((index?: number) => T), count: number) {
       var out: T[] = [];
       for (var i = 0; i<count; i++) {
-        out[i] = typeof(value) === "function" ? value(i) : value;
+        out[i] = typeof(value) === "function" ? (<(index?: number) => T> value)(i) : <T> value;
       }
       return out;
     }

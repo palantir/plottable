@@ -157,8 +157,8 @@ export module Scale {
      * values across the domain.
      * @returns {InterpolatedColor} The calling InterpolatedColor.
      */
-    public colorRange(colorRange: any): InterpolatedColor;
-    public colorRange(colorRange?: any): any {
+    public colorRange(colorRange: string | string[]): InterpolatedColor;
+    public colorRange(colorRange?: string | string[]): any {
       if (colorRange == null) {
         return this._colorRange;
       }
@@ -195,11 +195,11 @@ export module Scale {
       this.broadcaster.broadcast();
     }
 
-    private _resolveColorValues(colorRange: any): string[] {
-      if (colorRange instanceof Array) {
-        return colorRange;
-      } else if (InterpolatedColor._COLOR_SCALES[colorRange] != null) {
-        return InterpolatedColor._COLOR_SCALES[colorRange];
+    private _resolveColorValues(colorRange: string | string[]): string[] {
+      if (typeof(colorRange) === "object") {
+        return <string[]> colorRange;
+      } else if (InterpolatedColor._COLOR_SCALES[<string> colorRange] != null) {
+        return InterpolatedColor._COLOR_SCALES[<string> colorRange];
       } else {
         return InterpolatedColor._COLOR_SCALES["reds"];
       }

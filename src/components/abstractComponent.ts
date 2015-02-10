@@ -192,15 +192,13 @@ export module Component {
      * @param {String|D3.Selection} element A D3 selection or a selector for getting the element to render into.
      * @returns {Component} The calling component.
      */
-    public renderTo(selector: String): AbstractComponent;
-    public renderTo(element: D3.Selection): AbstractComponent;
-    public renderTo(element: any): AbstractComponent {
+    public renderTo(element: String | D3.Selection): AbstractComponent {
       if (element != null) {
         var selection: D3.Selection;
-        if (typeof(element.node) === "function") {
-          selection = (<D3.Selection> element);
+        if (typeof(element) === "string") {
+          selection = d3.select(<string> element);
         } else {
-          selection = d3.select(element);
+          selection = <D3.Selection> element;
         }
         if (!selection.node() || selection.node().nodeName.toLowerCase() !== "svg") {
           throw new Error("Plottable requires a valid SVG to renderTo");
