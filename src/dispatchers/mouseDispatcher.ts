@@ -3,7 +3,7 @@
 module Plottable {
 export module Dispatcher {
   export class Mouse {
-    private static dispatcherKey = "__Plottable_Dispatcher_Mouse";
+    private static _DISPATCHER_KEY = "__Plottable_Dispatcher_Mouse";
     private _svg: SVGElement;
     private _measureRect: SVGElement;
     private _lastMousePosition: Point;
@@ -19,10 +19,10 @@ export module Dispatcher {
     public static getDispatcher(elem: SVGElement): Dispatcher.Mouse {
       var svg = _Util.DOM.getBoundingSVG(elem);
 
-      var dispatcher: Mouse = (<any> svg)[Mouse.dispatcherKey];
+      var dispatcher: Mouse = (<any> svg)[Mouse._DISPATCHER_KEY];
       if (dispatcher == null) {
         dispatcher = new Mouse(svg);
-        (<any> svg)[Mouse.dispatcherKey] = dispatcher;
+        (<any> svg)[Mouse._DISPATCHER_KEY] = dispatcher;
       }
       return dispatcher;
     }
@@ -71,7 +71,7 @@ export module Dispatcher {
     }
 
     private _processMoveEvent(e: MouseEvent) {
-      this._computeMousePosition(e.clientX, e.clientY);
+      this._lastMousePosition = this._computeMousePosition(e.clientX, e.clientY);
       this.broadcaster.broadcast();
     }
 
@@ -85,14 +85,15 @@ export module Dispatcher {
       var mrBCR = this._measureRect.getBoundingClientRect();
       var origin = { x: mrBCR.left, y: mrBCR.top };
 
-      // caculate the scale
-      this._measureRect.setAttribute("x", "100");
-      this._measureRect.setAttribute("y", "100");
+      // calculate the scale
+      var sampleDistance = 100;
+      this._measureRect.setAttribute("x", String(sampleDistance));
+      this._measureRect.setAttribute("y", String(sampleDistance));
       mrBCR = this._measureRect.getBoundingClientRect();
       var testPoint = { x: mrBCR.left, y: mrBCR.top };
 
-      var scaleX = (testPoint.x - origin.x) / 100;
-      var scaleY = (testPoint.y - origin.y) / 100;
+      var scaleX = (testPoint.x - origin.x) / sampleDistance;
+      var scaleY = (testPoint.y - origin.y) / sampleDistance;
 
       // get the true cursor position
       this._measureRect.setAttribute("x", String((clientX - origin.x)/scaleX) );
@@ -105,7 +106,7 @@ export module Dispatcher {
         y: (trueCursorPosition.y - origin.y) / scaleY
       };
 
-      this._lastMousePosition = scaledPosition;
+      return scaledPosition;
     }
 
     /**

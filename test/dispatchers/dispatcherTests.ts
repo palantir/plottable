@@ -91,7 +91,7 @@ describe("Dispatchers", () => {
       svg.remove();
     });
 
-    it("getLastMousePosition() defaults to a safe value", () => {
+    it("getLastMousePosition() defaults to a non-null value", () => {
       var svg = generateSVG();
 
       var md = Plottable.Dispatcher.Mouse.getDispatcher(<SVGElement> svg.node());

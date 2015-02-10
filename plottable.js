@@ -8526,10 +8526,10 @@ var Plottable;
              */
             Mouse.getDispatcher = function (elem) {
                 var svg = Plottable._Util.DOM.getBoundingSVG(elem);
-                var dispatcher = svg[Mouse.dispatcherKey];
+                var dispatcher = svg[Mouse._DISPATCHER_KEY];
                 if (dispatcher == null) {
                     dispatcher = new Mouse(svg);
-                    svg[Mouse.dispatcherKey] = dispatcher;
+                    svg[Mouse._DISPATCHER_KEY] = dispatcher;
                 }
                 return dispatcher;
             };
@@ -8557,7 +8557,7 @@ var Plottable;
                 return this;
             };
             Mouse.prototype._processMoveEvent = function (e) {
-                this._computeMousePosition(e.clientX, e.clientY);
+                this._lastMousePosition = this._computeMousePosition(e.clientX, e.clientY);
                 this.broadcaster.broadcast();
             };
             /**
@@ -8569,13 +8569,14 @@ var Plottable;
                 this._measureRect.setAttribute("y", "0");
                 var mrBCR = this._measureRect.getBoundingClientRect();
                 var origin = { x: mrBCR.left, y: mrBCR.top };
-                // caculate the scale
-                this._measureRect.setAttribute("x", "100");
-                this._measureRect.setAttribute("y", "100");
+                // calculate the scale
+                var sampleDistance = 100;
+                this._measureRect.setAttribute("x", String(sampleDistance));
+                this._measureRect.setAttribute("y", String(sampleDistance));
                 mrBCR = this._measureRect.getBoundingClientRect();
                 var testPoint = { x: mrBCR.left, y: mrBCR.top };
-                var scaleX = (testPoint.x - origin.x) / 100;
-                var scaleY = (testPoint.y - origin.y) / 100;
+                var scaleX = (testPoint.x - origin.x) / sampleDistance;
+                var scaleY = (testPoint.y - origin.y) / sampleDistance;
                 // get the true cursor position
                 this._measureRect.setAttribute("x", String((clientX - origin.x) / scaleX));
                 this._measureRect.setAttribute("y", String((clientY - origin.y) / scaleY));
@@ -8585,7 +8586,7 @@ var Plottable;
                     x: (trueCursorPosition.x - origin.x) / scaleX,
                     y: (trueCursorPosition.y - origin.y) / scaleY
                 };
-                this._lastMousePosition = scaledPosition;
+                return scaledPosition;
             };
             /**
              * Returns the last computed mouse position.
@@ -8595,7 +8596,7 @@ var Plottable;
             Mouse.prototype.getLastMousePosition = function () {
                 return this._lastMousePosition;
             };
-            Mouse.dispatcherKey = "__Plottable_Dispatcher_Mouse";
+            Mouse._DISPATCHER_KEY = "__Plottable_Dispatcher_Mouse";
             return Mouse;
         })();
         Dispatcher.Mouse = Mouse;

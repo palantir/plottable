@@ -48,7 +48,7 @@ export module Interaction {
       super._anchor(component, hitBox);
       this._dispatcher = Dispatcher.Mouse.getDispatcher(<SVGElement> (<any> this._componentToListenTo)._element.node());
 
-      this._dispatcher.onMouseMove("hover"+this.getID(), (p: Point) => this._handleMouseEvent(p));
+      this._dispatcher.onMouseMove("hover" + this.getID(), (p: Point) => this._handleMouseEvent(p));
     }
 
     private _handleMouseEvent(p: Point) {

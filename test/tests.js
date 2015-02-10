@@ -7393,7 +7393,7 @@ describe("Dispatchers", function () {
             assert.strictEqual(md1, md2, "returned the existing Dispatcher if called again with same <svg>");
             svg.remove();
         });
-        it("getLastMousePosition() defaults to a safe value", function () {
+        it("getLastMousePosition() defaults to a non-null value", function () {
             var svg = generateSVG();
             var md = Plottable.Dispatcher.Mouse.getDispatcher(svg.node());
             var p = md.getLastMousePosition();
