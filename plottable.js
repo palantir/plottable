@@ -4581,14 +4581,6 @@ var Plottable;
                 else {
                     labelPos = tickPos;
                 }
-                var filteredTicks = [];
-                labelPos = labelPos.filter(function (d, i) {
-                    var fits = _this._canFitLabelFilter(d, tickPos.slice(i, i + 2), config, _this._tierLabelPositions[index]);
-                    if (fits) {
-                        filteredTicks.push(tickPos[i]);
-                    }
-                    return fits;
-                });
                 var tickLabels = container.selectAll("." + Axis.AbstractAxis.TICK_LABEL_CLASS).data(labelPos, function (d) { return d.valueOf(); });
                 var tickLabelsEnter = tickLabels.enter().append("g").classed(Axis.AbstractAxis.TICK_LABEL_CLASS, true);
                 tickLabelsEnter.append("text");
@@ -4603,25 +4595,6 @@ var Plottable;
                 tickLabels.attr("transform", function (d) { return "translate(" + _this._scale.scale(d) + ",0)"; });
                 var anchor = (this._tierLabelPositions[index] === "center" || config.step === 1) ? "middle" : "start";
                 tickLabels.selectAll("text").text(config.formatter).style("text-anchor", anchor);
-            };
-            Time.prototype._canFitLabelFilter = function (position, bounds, config, labelPosition) {
-                if (labelPosition === "center") {
-                    return true;
-                }
-                var endPosition;
-                var startPosition;
-                var width = this._measurer.measure(config.formatter(position)).width + ((config.step !== 1) ? this.tickLabelPadding() : 0);
-                var leftBound = this._scale.scale(bounds[0]);
-                var rightBound = this._scale.scale(bounds[1]);
-                if (labelPosition === "center" || config.step === 1) {
-                    endPosition = this._scale.scale(position) + width / 2;
-                    startPosition = this._scale.scale(position) - width / 2;
-                }
-                else {
-                    endPosition = this._scale.scale(position) + width;
-                    startPosition = this._scale.scale(position);
-                }
-                return endPosition <= rightBound && startPosition >= leftBound;
             };
             Time.prototype._renderTickMarks = function (tickValues, index) {
                 var tickMarks = this._tierMarkContainers[index].selectAll("." + Axis.AbstractAxis.TICK_MARK_CLASS).data(tickValues);
