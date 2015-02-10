@@ -6532,6 +6532,9 @@ var Plottable;
                 allSelections[0] = [];
                 datasetKeyArray.forEach(function (datasetKey) {
                     var plotDatasetKey = _this._key2PlotDatasetKey.get(datasetKey);
+                    if (plotDatasetKey == null) {
+                        return;
+                    }
                     var drawer = plotDatasetKey.drawer;
                     drawer._getRenderArea().selectAll(drawer._getSelector())[0].forEach(function (selection) {
                         allSelections[0].push(selection);

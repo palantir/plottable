@@ -442,6 +442,7 @@ export module Plot {
 
       datasetKeyArray.forEach((datasetKey) => {
         var plotDatasetKey = this._key2PlotDatasetKey.get(datasetKey);
+        if (plotDatasetKey == null) { return; }
         var drawer = plotDatasetKey.drawer;
         drawer._getRenderArea().selectAll(drawer._getSelector())[0].forEach((selection: EventTarget) => {
           allSelections[0].push(selection);

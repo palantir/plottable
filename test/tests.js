@@ -2852,6 +2852,18 @@ describe("Plots", function () {
                 assert.includeMembers(selectionData, barData2, "second dataset data in selection data");
                 svg.remove();
             });
+            it("getAllSelections skips invalid keys", function () {
+                var barData = [{ x: "foo", y: 5 }, { x: "bar", y: 640 }, { x: "zoo", y: 12345 }];
+                var barData2 = [{ x: "one", y: 5 }, { x: "two", y: 640 }, { x: "three", y: 12345 }];
+                verticalBarPlot.addDataset("a", barData);
+                verticalBarPlot.addDataset("b", barData2);
+                verticalBarPlot.renderTo(svg);
+                var allBars = verticalBarPlot.getAllSelections(["a", "c"]);
+                assert.strictEqual(allBars.size(), 3, "all bars retrieved");
+                var selectionData = allBars.data();
+                assert.includeMembers(selectionData, barData, "first dataset data in selection data");
+                svg.remove();
+            });
         });
         it("plot auto domain scale to visible points on ordinal scale", function () {
             var svg = generateSVG(500, 500);
