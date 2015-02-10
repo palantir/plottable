@@ -15,7 +15,7 @@ describe("Plots", () => {
       simpleData = [{value: 5, value2: 10, type: "A"}, {value: 15, value2: 10, type: "B"}];
       simpleDataset = new Plottable.Dataset(simpleData);
       piePlot = new Plottable.Plot.Pie();
-      piePlot.addDataset("simpleDataset", simpleDataset);
+      piePlot.addDataset(simpleDataset, "simpleDataset");
       piePlot.project("value", "value");
       piePlot.renderTo(svg);
       renderArea = (<any> piePlot)._renderArea;
@@ -182,7 +182,7 @@ describe("Plots", () => {
       Plottable._Util.Methods.warn = (warn) => message = warn;
       piePlot.removeDataset("simpleDataset");
       var negativeDataset = new Plottable.Dataset([{value: -5}, {value: 15}]);
-      piePlot.addDataset("negativeDataset", negativeDataset);
+      piePlot.addDataset(negativeDataset, "negativeDataset");
       assert.equal(message, "Negative values will not render correctly in a pie chart.");
       Plottable._Util.Methods.warn = oldWarn;
       svg.remove();

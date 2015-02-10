@@ -1628,11 +1628,11 @@ describe("Plots", function () {
             var dFoo = new Plottable.Dataset(["foo"], { cssClass: "bar" });
             var dBar = new Plottable.Dataset(["bar"], { cssClass: "boo" });
             var r = new CountingPlot();
-            r.addDataset("foo", dFoo);
+            r.addDataset(dFoo, "foo");
             assert.equal(1, r.renders, "initial render due to addDataset");
             dFoo.broadcaster.broadcast();
             assert.equal(2, r.renders, "we re-render when our dataset changes");
-            r.addDataset("bar", dBar);
+            r.addDataset(dBar, "bar");
             assert.equal(3, r.renders, "we should redraw when we add a dataset");
             dFoo.broadcaster.broadcast();
             assert.equal(4, r.renders, "we should still listen to the first dataset");
@@ -1646,7 +1646,7 @@ describe("Plots", function () {
         it("Updates its projectors when the Dataset is changed", function () {
             var d1 = new Plottable.Dataset([{ x: 5, y: 6 }], { cssClass: "bar" });
             var r = new Plottable.Plot.AbstractPlot();
-            r.addDataset("d1", d1);
+            r.addDataset(d1, "d1");
             var xScaleCalls = 0;
             var yScaleCalls = 0;
             var xScale = new Plottable.Scale.Linear();
@@ -1682,7 +1682,7 @@ describe("Plots", function () {
         });
         it("Plot automatically generates a Dataset if only data is provided", function () {
             var data = ["foo", "bar"];
-            var r = new Plottable.Plot.AbstractPlot().addDataset("foo", data);
+            var r = new Plottable.Plot.AbstractPlot().addDataset(data, "foo");
             var dataset = r.datasets()[0];
             assert.isNotNull(dataset, "A Dataset was automatically generated");
             assert.deepEqual(dataset.data(), data, "The generated Dataset has the correct data");
@@ -1717,8 +1717,8 @@ describe("Plots", function () {
                 plot = new Plottable.Plot.AbstractPlot();
                 d1 = new Plottable.Dataset();
                 d2 = new Plottable.Dataset();
-                plot.addDataset("foo", d1);
-                plot.addDataset("bar", d2);
+                plot.addDataset(d1, "foo");
+                plot.addDataset(d2, "bar");
                 assert.deepEqual(plot.datasets(), [d1, d2], "datasets as expected");
             });
             it("removeDataset can work on keys", function () {
@@ -1753,7 +1753,7 @@ describe("Plots", function () {
             });
             it("removeDataset behaves appropriately when the key 'undefined' is used", function () {
                 var a = [1, 2, 3];
-                plot.addDataset("undefined", a);
+                plot.addDataset(a, "undefined");
                 assert.lengthOf(plot.datasets(), 3, "there are three datasets initially");
                 plot.removeDataset("foofoofoofoofoofoofoofoo");
                 assert.lengthOf(plot.datasets(), 3, "there are three datasets after bad key removal");
@@ -1827,7 +1827,7 @@ describe("Plots", function () {
             var ordinalScale = new Plottable.Scale.Ordinal();
             var dataset1 = [{ key: "A" }];
             var dataset2 = [{ key: "B" }];
-            var plot = new Plottable.Plot.AbstractPlot().addDataset("b", dataset2).addDataset("a", dataset1);
+            var plot = new Plottable.Plot.AbstractPlot().addDataset(dataset2, "b").addDataset(dataset1, "a");
             plot.project("key", "key", ordinalScale);
             plot.datasetOrder(["a", "b"]);
             var svg = generateSVG();
@@ -1944,7 +1944,7 @@ describe("Plots", function () {
             simpleData = [{ value: 5, value2: 10, type: "A" }, { value: 15, value2: 10, type: "B" }];
             simpleDataset = new Plottable.Dataset(simpleData);
             piePlot = new Plottable.Plot.Pie();
-            piePlot.addDataset("simpleDataset", simpleDataset);
+            piePlot.addDataset(simpleDataset, "simpleDataset");
             piePlot.project("value", "value");
             piePlot.renderTo(svg);
             renderArea = piePlot._renderArea;
@@ -2069,7 +2069,7 @@ describe("Plots", function () {
             Plottable._Util.Methods.warn = function (warn) { return message = warn; };
             piePlot.removeDataset("simpleDataset");
             var negativeDataset = new Plottable.Dataset([{ value: -5 }, { value: 15 }]);
-            piePlot.addDataset("negativeDataset", negativeDataset);
+            piePlot.addDataset(negativeDataset, "negativeDataset");
             assert.equal(message, "Negative values will not render correctly in a pie chart.");
             Plottable._Util.Methods.warn = oldWarn;
             svg.remove();
@@ -2091,9 +2091,9 @@ describe("Plots", function () {
             Plottable._Util.Methods.warn = oldWarn;
         });
         it("Datasets can be added and removed as expected", function () {
-            p.addDataset("foo", [1, 2, 3]);
+            p.addDataset([1, 2, 3], "foo");
             var d2 = new Plottable.Dataset([4, 5, 6]);
-            p.addDataset("bar", d2);
+            p.addDataset(d2, "bar");
             p.addDataset([7, 8, 9]);
             var d4 = new Plottable.Dataset([10, 11, 12]);
             p.addDataset(d4);
@@ -2113,7 +2113,7 @@ describe("Plots", function () {
             var callback = function () { return callbackCounter++; };
             p._onDatasetUpdate = callback;
             var d = new Plottable.Dataset([1, 2, 3]);
-            p.addDataset("foo", d);
+            p.addDataset(d, "foo");
             assert.equal(callbackCounter, 1, "adding dataset triggers listener");
             d.data([1, 2, 3, 4]);
             assert.equal(callbackCounter, 2, "modifying data triggers listener");
@@ -2121,9 +2121,9 @@ describe("Plots", function () {
             assert.equal(callbackCounter, 3, "removing dataset triggers listener");
         });
         it("Datasets can be reordered", function () {
-            p.addDataset("foo", [1]);
-            p.addDataset("bar", [2]);
-            p.addDataset("baz", [3]);
+            p.addDataset([1], "foo");
+            p.addDataset([2], "bar");
+            p.addDataset([3], "baz");
             assert.deepEqual(p.datasetOrder(), ["foo", "bar", "baz"]);
             p.datasetOrder(["bar", "baz", "foo"]);
             assert.deepEqual(p.datasetOrder(), ["bar", "baz", "foo"]);
@@ -2136,10 +2136,10 @@ describe("Plots", function () {
         it("Has proper warnings", function () {
             var warned = 0;
             Plottable._Util.Methods.warn = function () { return warned++; };
-            p.addDataset("_foo", []);
+            p.addDataset([], "_foo");
             assert.equal(warned, 1);
-            p.addDataset("2", []);
-            p.addDataset("4", []);
+            p.addDataset([], "2");
+            p.addDataset([], "4");
             // get warning for not a permutation
             p.datasetOrder(["_bar", "4", "2"]);
             assert.equal(warned, 2);
@@ -3157,11 +3157,11 @@ describe("Plots", function () {
                 { x: 1, y: 0 },
                 { x: 3, y: 1 }
             ];
-            stackedPlot.addDataset("d1", data1);
-            stackedPlot.addDataset("d2", data2);
-            stackedPlot.addDataset("d3", data3);
-            stackedPlot.addDataset("d4", data4);
-            stackedPlot.addDataset("d5", data5);
+            stackedPlot.addDataset(data1, "d1");
+            stackedPlot.addDataset(data2, "d2");
+            stackedPlot.addDataset(data3, "d3");
+            stackedPlot.addDataset(data4, "d4");
+            stackedPlot.addDataset(data5, "d5");
             var ds2PlotMetadata = stackedPlot._key2PlotDatasetKey.get("d2").plotMetadata;
             var ds5PlotMetadata = stackedPlot._key2PlotDatasetKey.get("d5").plotMetadata;
             assert.strictEqual(ds2PlotMetadata.offsets.get("1"), 1, "positive offset was used");
@@ -3180,10 +3180,10 @@ describe("Plots", function () {
             var data4 = [
                 { x: 1, y: 0 }
             ];
-            stackedPlot.addDataset("d1", data1);
-            stackedPlot.addDataset("d2", data2);
-            stackedPlot.addDataset("d3", data3);
-            stackedPlot.addDataset("d4", data4);
+            stackedPlot.addDataset(data1, "d1");
+            stackedPlot.addDataset(data2, "d2");
+            stackedPlot.addDataset(data3, "d3");
+            stackedPlot.addDataset(data4, "d4");
             var ds2PlotMetadata = stackedPlot._key2PlotDatasetKey.get("d2").plotMetadata;
             var ds4PlotMetadata = stackedPlot._key2PlotDatasetKey.get("d4").plotMetadata;
             assert.strictEqual(ds2PlotMetadata.offsets.get("1"), -2, "positive offset was used");
@@ -3196,8 +3196,8 @@ describe("Plots", function () {
             var data2 = [
                 { a: 1, b: 4 }
             ];
-            stackedPlot.addDataset("d1", data1);
-            stackedPlot.addDataset("d2", data2);
+            stackedPlot.addDataset(data1, "d1");
+            stackedPlot.addDataset(data2, "d2");
             var ds1PlotMetadata = stackedPlot._key2PlotDatasetKey.get("d1").plotMetadata;
             var ds2PlotMetadata = stackedPlot._key2PlotDatasetKey.get("d2").plotMetadata;
             assert.isTrue(isNaN(ds1PlotMetadata.offsets.get("1")), "stacking is initially incorrect");
@@ -3224,12 +3224,12 @@ describe("Plots", function () {
             var data6 = [
                 { x: 1, y: "-1" }
             ];
-            stackedPlot.addDataset("d1", data1);
-            stackedPlot.addDataset("d2", data2);
-            stackedPlot.addDataset("d3", data3);
-            stackedPlot.addDataset("d4", data4);
-            stackedPlot.addDataset("d5", data5);
-            stackedPlot.addDataset("d6", data6);
+            stackedPlot.addDataset(data1, "d1");
+            stackedPlot.addDataset(data2, "d2");
+            stackedPlot.addDataset(data3, "d3");
+            stackedPlot.addDataset(data4, "d4");
+            stackedPlot.addDataset(data5, "d5");
+            stackedPlot.addDataset(data6, "d6");
             var ds3PlotMetadata = stackedPlot._key2PlotDatasetKey.get("d3").plotMetadata;
             var ds4PlotMetadata = stackedPlot._key2PlotDatasetKey.get("d4").plotMetadata;
             var ds5PlotMetadata = stackedPlot._key2PlotDatasetKey.get("d5").plotMetadata;
@@ -3254,7 +3254,7 @@ describe("Plots", function () {
             var data1 = [
                 { x: 1, y: -2 }
             ];
-            stackedPlot.addDataset("a", data1);
+            stackedPlot.addDataset(data1, "a");
             assert.doesNotThrow(function () { return stackedPlot.removeDataset("a"); }, Error);
         });
     });
@@ -3367,8 +3367,8 @@ describe("Plots", function () {
                 { key: "b", value: -2 }
             ];
             var dataset2 = new Plottable.Dataset(data2);
-            stackedBarPlot.addDataset("d1", data1);
-            stackedBarPlot.addDataset("d2", dataset2);
+            stackedBarPlot.addDataset(data1);
+            stackedBarPlot.addDataset(dataset2);
             assert.closeTo(yScale.domain()[0], -6, 1, "min stacked extent is as normal");
             assert.closeTo(yScale.domain()[1], 4, 1, "max stacked extent is as normal");
             dataset2.data(data2_b);
@@ -3502,7 +3502,7 @@ describe("Plots", function () {
                 { x: 1, y: 0, type: "c" },
                 { x: 3, y: 0, type: "c" }
             ];
-            renderer.addDataset("a", new Plottable.Dataset(data));
+            renderer.addDataset(new Plottable.Dataset(data), "a");
             renderer.renderTo(svg);
             assert.strictEqual(oldLowerBound, yScale.domain()[0], "lower bound doesn't change with 0 added");
             assert.strictEqual(oldUpperBound, yScale.domain()[1], "upper bound doesn't change with 0 added");
@@ -3513,7 +3513,7 @@ describe("Plots", function () {
                 { x: 1, y: 10, type: "d" },
                 { x: 3, y: 3, type: "d" }
             ];
-            renderer.addDataset("b", new Plottable.Dataset(data));
+            renderer.addDataset(new Plottable.Dataset(data), "b");
             renderer.renderTo(svg);
             assert.closeTo(oldLowerBound, yScale.domain()[0], 2, "lower bound doesn't change on positive addition");
             assert.closeTo(oldUpperBound + 10, yScale.domain()[1], 2, "upper bound increases");
@@ -3523,7 +3523,7 @@ describe("Plots", function () {
                 { x: 1, y: 0, type: "e" },
                 { x: 3, y: 1, type: "e" }
             ];
-            renderer.addDataset("c", new Plottable.Dataset(data));
+            renderer.addDataset(new Plottable.Dataset(data), "c");
             renderer.renderTo(svg);
             assert.strictEqual(oldUpperBound, yScale.domain()[1], "upper bound doesn't increase since maximum doesn't increase");
             renderer.removeDataset("a");
@@ -3537,17 +3537,17 @@ describe("Plots", function () {
                 { x: 1, y: 0, type: "c" },
                 { x: 3, y: 0, type: "c" }
             ];
-            renderer.addDataset("a", new Plottable.Dataset(data));
+            renderer.addDataset(new Plottable.Dataset(data), "a");
             data = [
                 { x: 1, y: 10, type: "d" },
                 { x: 3, y: 3, type: "d" }
             ];
-            renderer.addDataset("b", new Plottable.Dataset(data));
+            renderer.addDataset(new Plottable.Dataset(data), "b");
             data = [
                 { x: 1, y: 0, type: "e" },
                 { x: 3, y: 1, type: "e" }
             ];
-            renderer.addDataset("c", new Plottable.Dataset(data));
+            renderer.addDataset(new Plottable.Dataset(data), "c");
             renderer.project("x", "x", xScale);
             renderer.project("y", "y", yScale);
             renderer.renderTo(svg);
@@ -4235,7 +4235,7 @@ describe("Metadata", function () {
     });
     it("plot metadata is set properly", function () {
         var d1 = new Plottable.Dataset();
-        var r = new Plottable.Plot.AbstractPlot().addDataset("d1", d1).addDataset(d1).addDataset("d2", []).addDataset([]);
+        var r = new Plottable.Plot.AbstractPlot().addDataset(d1, "d1").addDataset(d1).addDataset([], "d2").addDataset([]);
         r._datasetKeysInOrder.forEach(function (key) {
             var plotMetadata = r._key2PlotDatasetKey.get(key).plotMetadata;
             assert.propertyVal(plotMetadata, "datasetKey", key, "metadata has correct dataset key");
@@ -4383,7 +4383,7 @@ describe("Metadata", function () {
         var dataset1 = new Plottable.Dataset(data1, metadata);
         var dataset2 = new Plottable.Dataset(data2, metadata);
         var checkPlot = function (plot) {
-            plot.addDataset("ds1", dataset1).addDataset("ds2", dataset2).project("x", function (d, i, u, m) { return d.x + u.foo + m.datasetKey.length; }).project("y", function (d, i, u, m) { return d.y + u.foo - m.datasetKey.length; });
+            plot.addDataset(dataset1, "ds1").addDataset(dataset2, "ds2").project("x", function (d, i, u, m) { return d.x + u.foo + m.datasetKey.length; }).project("y", function (d, i, u, m) { return d.y + u.foo - m.datasetKey.length; });
             // This should not crash. If some metadata is not passed, undefined property error will be raised during accessor call.
             plot.renderTo(svg);
             plot.remove();

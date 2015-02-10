@@ -42,11 +42,11 @@ describe("Plots", () => {
         {x: 3, y: 1}
       ];
 
-      stackedPlot.addDataset("d1", data1);
-      stackedPlot.addDataset("d2", data2);
-      stackedPlot.addDataset("d3", data3);
-      stackedPlot.addDataset("d4", data4);
-      stackedPlot.addDataset("d5", data5);
+      stackedPlot.addDataset(data1, "d1");
+      stackedPlot.addDataset(data2, "d2");
+      stackedPlot.addDataset(data3, "d3");
+      stackedPlot.addDataset(data4, "d4");
+      stackedPlot.addDataset(data5, "d5");
 
       var ds2PlotMetadata = <Plottable.Plot.StackedPlotMetadata>(<any> stackedPlot)._key2PlotDatasetKey.get("d2").plotMetadata;
       var ds5PlotMetadata = <Plottable.Plot.StackedPlotMetadata>(<any> stackedPlot)._key2PlotDatasetKey.get("d5").plotMetadata;
@@ -68,10 +68,10 @@ describe("Plots", () => {
         {x: 1, y: 0}
       ];
 
-      stackedPlot.addDataset("d1", data1);
-      stackedPlot.addDataset("d2", data2);
-      stackedPlot.addDataset("d3", data3);
-      stackedPlot.addDataset("d4", data4);
+      stackedPlot.addDataset(data1, "d1");
+      stackedPlot.addDataset(data2, "d2");
+      stackedPlot.addDataset(data3, "d3");
+      stackedPlot.addDataset(data4, "d4");
 
       var ds2PlotMetadata = <Plottable.Plot.StackedPlotMetadata>(<any> stackedPlot)._key2PlotDatasetKey.get("d2").plotMetadata;
       var ds4PlotMetadata = <Plottable.Plot.StackedPlotMetadata>(<any> stackedPlot)._key2PlotDatasetKey.get("d4").plotMetadata;
@@ -87,8 +87,8 @@ describe("Plots", () => {
         { a: 1, b: 4 }
       ];
 
-      stackedPlot.addDataset("d1", data1);
-      stackedPlot.addDataset("d2", data2);
+      stackedPlot.addDataset(data1, "d1");
+      stackedPlot.addDataset(data2, "d2");
       var ds1PlotMetadata = <Plottable.Plot.StackedPlotMetadata>(<any> stackedPlot)._key2PlotDatasetKey.get("d1").plotMetadata;
       var ds2PlotMetadata = <Plottable.Plot.StackedPlotMetadata>(<any> stackedPlot)._key2PlotDatasetKey.get("d2").plotMetadata;
 
@@ -120,12 +120,12 @@ describe("Plots", () => {
         { x: 1, y: "-1" }
       ];
 
-      stackedPlot.addDataset("d1", data1);
-      stackedPlot.addDataset("d2", data2);
-      stackedPlot.addDataset("d3", data3);
-      stackedPlot.addDataset("d4", data4);
-      stackedPlot.addDataset("d5", data5);
-      stackedPlot.addDataset("d6", data6);
+      stackedPlot.addDataset(data1, "d1");
+      stackedPlot.addDataset(data2, "d2");
+      stackedPlot.addDataset(data3, "d3");
+      stackedPlot.addDataset(data4, "d4");
+      stackedPlot.addDataset(data5, "d5");
+      stackedPlot.addDataset(data6, "d6");
 
       var ds3PlotMetadata = <Plottable.Plot.StackedPlotMetadata>(<any> stackedPlot)._key2PlotDatasetKey.get("d3").plotMetadata;
       var ds4PlotMetadata = <Plottable.Plot.StackedPlotMetadata>(<any> stackedPlot)._key2PlotDatasetKey.get("d4").plotMetadata;
@@ -158,7 +158,7 @@ describe("Plots", () => {
         {x: 1, y: -2}
       ];
 
-      stackedPlot.addDataset("a", data1);
+      stackedPlot.addDataset(data1, "a");
       assert.doesNotThrow(() => stackedPlot.removeDataset("a"), Error);
     });
   });
@@ -305,8 +305,8 @@ describe("Plots", () => {
       ];
 
       var dataset2 = new Plottable.Dataset(data2);
-      stackedBarPlot.addDataset("d1", data1);
-      stackedBarPlot.addDataset("d2", dataset2);
+      stackedBarPlot.addDataset(data1);
+      stackedBarPlot.addDataset(dataset2);
 
       assert.closeTo(yScale.domain()[0], -6, 1, "min stacked extent is as normal");
       assert.closeTo(yScale.domain()[1], 4, 1, "max stacked extent is as normal");

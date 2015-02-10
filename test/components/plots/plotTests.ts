@@ -32,7 +32,7 @@ describe("Plots", () => {
       var dFoo = new Plottable.Dataset(["foo"], {cssClass: "bar"});
       var dBar = new Plottable.Dataset(["bar"], {cssClass: "boo"});
       var r = new CountingPlot();
-      r.addDataset("foo", dFoo);
+      r.addDataset(dFoo, "foo");
 
       assert.equal(1, r.renders, "initial render due to addDataset");
 
@@ -40,7 +40,7 @@ describe("Plots", () => {
       assert.equal(2, r.renders, "we re-render when our dataset changes");
 
 
-      r.addDataset("bar", dBar);
+      r.addDataset(dBar, "bar");
       assert.equal(3, r.renders, "we should redraw when we add a dataset");
 
       dFoo.broadcaster.broadcast();
@@ -59,7 +59,7 @@ describe("Plots", () => {
     it("Updates its projectors when the Dataset is changed", () => {
       var d1 = new Plottable.Dataset([{x: 5, y: 6}], {cssClass: "bar"});
       var r = new Plottable.Plot.AbstractPlot();
-      r.addDataset("d1", d1);
+      r.addDataset(d1, "d1");
 
       var xScaleCalls: number = 0;
       var yScaleCalls: number = 0;
@@ -103,7 +103,7 @@ describe("Plots", () => {
 
     it("Plot automatically generates a Dataset if only data is provided", () => {
       var data = ["foo", "bar"];
-      var r = new Plottable.Plot.AbstractPlot().addDataset("foo", data);
+      var r = new Plottable.Plot.AbstractPlot().addDataset(data, "foo");
       var dataset = r.datasets()[0];
       assert.isNotNull(dataset, "A Dataset was automatically generated");
       assert.deepEqual(dataset.data(), data, "The generated Dataset has the correct data");
@@ -148,8 +148,8 @@ describe("Plots", () => {
         plot = new Plottable.Plot.AbstractPlot();
         d1 = new Plottable.Dataset();
         d2 = new Plottable.Dataset();
-        plot.addDataset("foo", d1);
-        plot.addDataset("bar", d2);
+        plot.addDataset(d1, "foo");
+        plot.addDataset(d2, "bar");
         assert.deepEqual(plot.datasets(), [d1, d2], "datasets as expected");
       });
 
@@ -189,7 +189,7 @@ describe("Plots", () => {
 
       it("removeDataset behaves appropriately when the key 'undefined' is used", () => {
         var a = [1,2,3];
-        plot.addDataset("undefined", a);
+        plot.addDataset(a, "undefined");
         assert.lengthOf(plot.datasets(), 3, "there are three datasets initially");
         plot.removeDataset("foofoofoofoofoofoofoofoo");
         assert.lengthOf(plot.datasets(), 3, "there are three datasets after bad key removal");
@@ -277,8 +277,8 @@ describe("Plots", () => {
       var dataset1 = [{key: "A"}];
       var dataset2 = [{key: "B"}];
       var plot = new Plottable.Plot.AbstractPlot()
-                                   .addDataset("b", dataset2)
-                                   .addDataset("a", dataset1);
+                                   .addDataset(dataset2, "b")
+                                   .addDataset(dataset1, "a");
       plot.project("key", "key", ordinalScale);
 
       plot.datasetOrder(["a", "b"]);

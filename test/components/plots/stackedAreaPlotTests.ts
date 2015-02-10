@@ -146,7 +146,7 @@ describe("Plots", () => {
         {x: 1, y: 0, type: "c"},
         {x: 3, y: 0, type: "c"}
       ];
-      renderer.addDataset("a", new Plottable.Dataset(data));
+      renderer.addDataset(new Plottable.Dataset(data), "a");
       renderer.renderTo(svg);
 
       assert.strictEqual(oldLowerBound, yScale.domain()[0], "lower bound doesn't change with 0 added");
@@ -159,7 +159,7 @@ describe("Plots", () => {
         {x: 1, y: 10, type: "d"},
         {x: 3, y: 3, type: "d"}
       ];
-      renderer.addDataset("b", new Plottable.Dataset(data));
+      renderer.addDataset(new Plottable.Dataset(data), "b");
       renderer.renderTo(svg);
 
       assert.closeTo(oldLowerBound, yScale.domain()[0], 2, "lower bound doesn't change on positive addition");
@@ -171,7 +171,7 @@ describe("Plots", () => {
         {x: 1, y: 0, type: "e"},
         {x: 3, y: 1, type: "e"}
       ];
-      renderer.addDataset("c", new Plottable.Dataset(data));
+      renderer.addDataset(new Plottable.Dataset(data), "c");
       renderer.renderTo(svg);
 
       assert.strictEqual(oldUpperBound, yScale.domain()[1], "upper bound doesn't increase since maximum doesn't increase");
@@ -189,19 +189,19 @@ describe("Plots", () => {
         {x: 1, y: 0, type: "c"},
         {x: 3, y: 0, type: "c"}
       ];
-      renderer.addDataset("a", new Plottable.Dataset(data));
+      renderer.addDataset(new Plottable.Dataset(data), "a");
 
       data = [
         {x: 1, y: 10, type: "d"},
         {x: 3, y: 3, type: "d"}
       ];
-      renderer.addDataset("b", new Plottable.Dataset(data));
+      renderer.addDataset(new Plottable.Dataset(data), "b");
 
       data = [
         {x: 1, y: 0, type: "e"},
         {x: 3, y: 1, type: "e"}
       ];
-      renderer.addDataset("c", new Plottable.Dataset(data));
+      renderer.addDataset(new Plottable.Dataset(data), "c");
       renderer.project("x", "x", xScale);
       renderer.project("y", "y", yScale);
 

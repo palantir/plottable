@@ -16,9 +16,9 @@ describe("Plots", () => {
     });
 
     it("Datasets can be added and removed as expected", () => {
-      p.addDataset("foo", [1,2,3]);
+      p.addDataset([1,2,3], "foo");
       var d2 = new Plottable.Dataset([4,5,6]);
-      p.addDataset("bar", d2);
+      p.addDataset(d2, "bar");
       p.addDataset([7,8,9]);
       var d4 = new Plottable.Dataset([10,11,12]);
       p.addDataset(d4);
@@ -42,7 +42,7 @@ describe("Plots", () => {
       var callback = () => callbackCounter++;
       (<any> p)._onDatasetUpdate = callback;
       var d = new Plottable.Dataset([1,2,3]);
-      p.addDataset("foo", d);
+      p.addDataset(d, "foo");
       assert.equal(callbackCounter, 1, "adding dataset triggers listener");
       d.data([1,2,3,4]);
       assert.equal(callbackCounter, 2, "modifying data triggers listener");
@@ -51,9 +51,9 @@ describe("Plots", () => {
     });
 
     it("Datasets can be reordered", () => {
-      p.addDataset("foo", [1]);
-      p.addDataset("bar", [2]);
-      p.addDataset("baz", [3]);
+      p.addDataset([1], "foo");
+      p.addDataset([2], "bar");
+      p.addDataset([3], "baz");
       assert.deepEqual(p.datasetOrder(), ["foo", "bar", "baz"]);
       p.datasetOrder(["bar", "baz", "foo"]);
       assert.deepEqual(p.datasetOrder(), ["bar", "baz", "foo"]);
@@ -67,10 +67,10 @@ describe("Plots", () => {
     it("Has proper warnings", () => {
       var warned = 0;
       Plottable._Util.Methods.warn = () => warned++;
-      p.addDataset("_foo", []);
+      p.addDataset([], "_foo");
       assert.equal(warned, 1);
-      p.addDataset("2", []);
-      p.addDataset("4", []);
+      p.addDataset([], "2");
+      p.addDataset([], "4");
 
       // get warning for not a permutation
       p.datasetOrder(["_bar", "4", "2"]);
