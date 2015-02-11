@@ -234,7 +234,7 @@ describe("Tables", () => {
       fixComponentSize(c1, 50, 50);
       fixComponentSize(c4, 20, 10);
       var result = (<any> table)._iterateLayout(500, 500);
-      verifyLayoutResult(result, [215, 215], [220, 220], [50, 20], [50, 10], false, false, "");
+      verifyLayoutResult(result, [200, 230], [200, 240], [50, 20], [50, 10], false, false, "");
     });
 
     it.skip("iterateLayout works in the difficult case where there is a shortage of space and layout requires iterations", () => {

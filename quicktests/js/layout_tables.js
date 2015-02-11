@@ -24,7 +24,7 @@ function run(div, data, Plottable) {
     var yAxis3 = new Plottable.Axis.Numeric(yScale, "left");
 
     //test Component constructor (default, should be no issues)
-
+    yAxis0.xAlign("left");
 
 
     var renderAreaD0 = new Plottable.Plot.Line(xScale, yScale).addDataset(dataseries1);

@@ -1,0 +1,49 @@
+<html>
+  <head>
+    <title>Basic VerticalBar</title>
+    <link rel="stylesheet" type="text/css" href="../../plottable.css">
+    <style>
+      svg {
+        margin-bottom: 20px;
+      }
+
+      div {
+        height: 300px;
+        padding: 20px;
+        width: 400px;
+      }
+    </style>
+    <script src="../../bower_components/d3/d3.js" charset="utf-8"></script>
+    <script src="../../plottable.js"></script>
+    <script src="../exampleUtil.js"></script>
+
+    <script>
+    var data = [
+    {x: "value1", y: 1},
+    {x: "valueeee2", y: 2},
+    {x: "valueeeeeeeee3", y: 2}
+    ];
+
+    window.onload = function() {
+        var xScale = new Plottable.Scale.Ordinal();
+        var xAxis = new Plottable.Axis.Category(xScale, "bottom");
+        xAxis.tickLabelAngle(-90);
+        var yScale = new Plottable.Scale.Linear();
+        var plot = new Plottable.Plot.Bar(xScale, yScale);
+        plot.addDataset(data);
+        plot.project("x", "x", xScale).project("y", "y", yScale);
+        
+        var chart = new Plottable.Component.Table([
+            [plot],
+            [xAxis]
+            ]);
+        chart.renderTo("#chart");
+    }
+    </script>
+  </head>
+
+  <body>
+    <svg id="chart" width="400" height="300"></svg>
+  </body>
+
+</html>
