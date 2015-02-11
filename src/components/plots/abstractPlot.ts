@@ -431,10 +431,6 @@ export module Plot {
     }
 
     public getSelections(xValOrExtent: number | Extent, yValOrExtent: number | Extent): D3.Selection {
-      if (!this._isSetup) {
-        return d3.select();
-      }
-
       var xExtent: Extent = AbstractPlot._parseExtent(xValOrExtent);
       var yExtent: Extent = AbstractPlot._parseExtent(yValOrExtent);
       var tolerance: number = 0.5;
@@ -442,7 +438,8 @@ export module Plot {
       var selections: EventTarget[] = [];
       this._datasetKeysInOrder.forEach((key: string) => {
         var drawer = this._key2PlotDatasetKey.get(key).drawer;
-        drawer._getRenderArea().selectAll(drawer._getSelector())[0].forEach((selection: EventTarget) => {
+        drawer._getRenderArea().selectAll(drawer._getSelector()).each(function () {
+          var selection = d3.select(this);
           // Check if extent covers the selection
           if (true) {
             selections.push(selection);

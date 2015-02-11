@@ -6511,16 +6511,14 @@ var Plottable;
             };
             AbstractPlot.prototype.getSelections = function (xValOrExtent, yValOrExtent) {
                 var _this = this;
-                if (!this._isSetup) {
-                    return d3.select();
-                }
                 var xExtent = AbstractPlot._parseExtent(xValOrExtent);
                 var yExtent = AbstractPlot._parseExtent(yValOrExtent);
                 var tolerance = 0.5;
                 var selections = [];
                 this._datasetKeysInOrder.forEach(function (key) {
                     var drawer = _this._key2PlotDatasetKey.get(key).drawer;
-                    drawer._getRenderArea().selectAll(drawer._getSelector())[0].forEach(function (selection) {
+                    drawer._getRenderArea().selectAll(drawer._getSelector()).each(function () {
+                        var selection = d3.select(this);
                         // Check if extent covers the selection
                         if (true) {
                             selections.push(selection);
