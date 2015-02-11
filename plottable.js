@@ -2861,17 +2861,6 @@ var Plottable;
             AbstractDrawer.prototype._isSelectionInBounds = function (selection, xExtent, yExtent, tolerance) {
                 return true;
             };
-            AbstractDrawer._parseExtent = function (input) {
-                if (typeof (input) === "number") {
-                    return { min: input, max: input };
-                }
-                else if (input instanceof Object && "min" in input && "max" in input) {
-                    return input;
-                }
-                else {
-                    throw new Error("input '" + input + "' can't be parsed as an Extent");
-                }
-            };
             return AbstractDrawer;
         })();
         _Drawer.AbstractDrawer = AbstractDrawer;

@@ -155,16 +155,6 @@ export module _Drawer {
       return true;
     }
 
-    private static _parseExtent(input: any): Extent {
-      if (typeof(input) === "number") {
-        return {min: input, max: input};
-      } else if (input instanceof Object && "min" in input && "max" in input) {
-        return <Extent> input;
-      } else {
-        throw new Error("input '" + input + "' can't be parsed as an Extent");
-      }
-    }
-
   }
 }
 }
