@@ -27,8 +27,8 @@ export module Plot {
       _Util.Methods.uniqPush(this._cssClasses, "pie-plot");
     }
 
-    public _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
-      super._computeLayout(xOffset, yOffset, availableWidth, availableHeight);
+    public _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number) {
+      super._computeLayout(offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
       this._renderArea.attr("transform", "translate(" + this.width() / 2 + "," + this.height() / 2 + ")");
     }
 

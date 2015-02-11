@@ -6,7 +6,7 @@ export module Plot {
     offsets: D3.Map<number>;
   }
 
-  export interface StackedDatum {
+  export type StackedDatum = {
     key: any;
     value: number;
     offset?: number;
@@ -31,11 +31,10 @@ export module Plot {
     }
 
     public _onDatasetUpdate() {
-      super._onDatasetUpdate();
-      // HACKHACK Caused since onDataSource is called before projectors are set up.  Should be fixed by #803
-      if (this._datasetKeysInOrder && this._projections["x"]  && this._projections["y"]) {
+      if (this._projectorsReady()) {
         this._updateStackOffsets();
       }
+      super._onDatasetUpdate();
     }
 
     public _updateStackOffsets() {

@@ -23,7 +23,7 @@ function run(svg, data, Plottable) {
         animator.maxIterativeDelay(100);
         
 
-    var vbar = new Plottable.Plot.VerticalBar(xScale, yScale)
+    var vbar = new Plottable.Plot.Bar(xScale, yScale)
       .project("x", "x", xScale)
       .project("y", "y", yScale)
       .project("fill", "type", colorScale)

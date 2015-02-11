@@ -2,14 +2,14 @@
 
 module Plottable {
 export module Component {
-  interface _LayoutAllocation {
+  type _LayoutAllocation = {
     guaranteedWidths : number[];
     guaranteedHeights: number[];
     wantsWidthArr : boolean[];
     wantsHeightArr: boolean[];
   }
 
-  export interface _IterateLayoutResult {
+  export type _IterateLayoutResult = {
     colProportionalSpace: number[];
     rowProportionalSpace: number[];
     guaranteedWidths    : number[];
@@ -250,26 +250,25 @@ export module Component {
               wantsHeight: this._calculatedLayout.wantsHeight};
     }
 
-    // xOffset is relative to parent element, not absolute
-    public _computeLayout(xOffset?: number, yOffset?: number, availableWidth ?: number, availableHeight?: number) {
-      super._computeLayout(xOffset, yOffset, availableWidth , availableHeight);
+    public _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number) {
+      super._computeLayout(offeredXOrigin, offeredYOrigin, availableWidth , availableHeight);
       var layout = this._useLastCalculatedLayout() ? this._calculatedLayout : this._iterateLayout(this.width(), this.height());
 
       this._useLastCalculatedLayout(true);
 
-      var childYOffset = 0;
+      var childYOrigin = 0;
       var rowHeights = _Util.Methods.addArrays(layout.rowProportionalSpace, layout.guaranteedHeights);
       var colWidths  = _Util.Methods.addArrays(layout.colProportionalSpace, layout.guaranteedWidths );
       this._rows.forEach((row: AbstractComponent[], rowIndex: number) => {
-        var childXOffset = 0;
+        var childXOrigin = 0;
         row.forEach((component: AbstractComponent, colIndex: number) => {
           // recursively compute layout
           if (component != null) {
-            component._computeLayout(childXOffset, childYOffset, colWidths[colIndex], rowHeights[rowIndex]);
+            component._computeLayout(childXOrigin, childYOrigin, colWidths[colIndex], rowHeights[rowIndex]);
           }
-          childXOffset += colWidths[colIndex] + this._colPadding;
+          childXOrigin += colWidths[colIndex] + this._colPadding;
         });
-        childYOffset += rowHeights[rowIndex] + this._rowPadding;
+        childYOrigin += rowHeights[rowIndex] + this._rowPadding;
       });
     }
 

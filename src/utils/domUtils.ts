@@ -107,6 +107,15 @@ export module _Util {
       if (boxA.top > boxB.bottom) { return false; }
       return true;
     }
+
+    export function boxIsInside(inner: ClientRect, outer: ClientRect) {
+      return (
+        Math.floor(outer.left) <= Math.ceil(inner.left) &&
+        Math.floor(outer.top)  <= Math.ceil(inner.top)  &&
+        Math.floor(inner.right)  <= Math.ceil(outer.right) &&
+        Math.floor(inner.bottom) <= Math.ceil(outer.bottom)
+      );
+    }
   }
 }
 }

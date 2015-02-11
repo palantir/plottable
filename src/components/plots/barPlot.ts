@@ -5,6 +5,8 @@ export module Plot {
   export class Bar<X,Y> extends AbstractXYPlot<X,Y> implements Interaction.Hoverable {
     protected static _BarAlignmentToFactor: {[alignment: string]: number} = {"left": 0, "center": 0.5, "right": 1};
     protected static _DEFAULT_WIDTH = 10;
+    private static _BAR_WIDTH_RATIO = 0.95;
+    private static _SINGLE_BAR_DIMENSION_RATIO = 0.4;
     private _baseline: D3.Selection;
     private _baselineValue: number;
     private _barAlignmentFactor = 0.5;
@@ -149,29 +151,16 @@ export module Plot {
     }
 
     /**
-     * Gets all the bars in the bar plot
-     *
-     * @returns {D3.Selection} All of the bars in the bar plot.
-     */
-    public getAllBars(): D3.Selection {
-      return this._renderArea.selectAll("rect");
-    }
-
-    /**
      * Gets the bar under the given pixel position (if [xValOrExtent]
      * and [yValOrExtent] are {number}s), under a given line (if only one
      * of [xValOrExtent] or [yValOrExtent] are {Extent}s) or are under a
      * 2D area (if [xValOrExtent] and [yValOrExtent] are both {Extent}s).
      *
-     * @param {any} xValOrExtent The pixel x position, or range of x values.
-     * @param {any} yValOrExtent The pixel y position, or range of y values.
+     * @param {number | Extent} xValOrExtent The pixel x position, or range of x values.
+     * @param {number | Extent} yValOrExtent The pixel y position, or range of y values.
      * @returns {D3.Selection} The selected bar, or null if no bar was selected.
      */
-    public getBars(xValOrExtent: Extent, yValOrExtent: Extent): D3.Selection;
-    public getBars(xValOrExtent: number, yValOrExtent: Extent): D3.Selection;
-    public getBars(xValOrExtent: Extent, yValOrExtent: number): D3.Selection;
-    public getBars(xValOrExtent: number, yValOrExtent: number): D3.Selection;
-    public getBars(xValOrExtent: any, yValOrExtent: any): D3.Selection {
+    public getBars(xValOrExtent: number | Extent, yValOrExtent: number | Extent): D3.Selection {
       if (!this._isSetup) {
         return d3.select();
       }
@@ -313,15 +302,12 @@ export module Plot {
       attrToProjector["width"] = this._isVertical ? widthF : heightF;
       attrToProjector["height"] = this._isVertical ? heightF : widthF;
 
-      var bandsMode = (secondaryScale instanceof Plottable.Scale.Ordinal)
-                      && (<Plottable.Scale.Ordinal> <any> secondaryScale).rangeType() === "bands";
-      if (!bandsMode) {
+      if (secondaryScale instanceof Plottable.Scale.Ordinal) {
+        attrToProjector[secondaryAttr] = (d: any, i: number, u: any, m: PlotMetadata) =>
+          positionF(d, i, u, m) - widthF(d, i, u, m) / 2;
+      } else {
         attrToProjector[secondaryAttr] = (d: any, i: number, u: any, m: PlotMetadata) =>
           positionF(d, i, u, m) - widthF(d, i, u, m) * this._barAlignmentFactor;
-      } else {
-        var bandWidth = (<Plottable.Scale.Ordinal> <any> secondaryScale).rangeBand();
-        attrToProjector[secondaryAttr] = (d: any, i: number, u: any, m: PlotMetadata) =>
-          positionF(d, i, u, m) - widthF(d, i, u, m) / 2 + bandWidth / 2;
       }
 
       attrToProjector[primaryAttr] = (d: any, i: number, u: any, m: PlotMetadata) => {
@@ -358,30 +344,9 @@ export module Plot {
       var barPixelWidth: number;
       var barScale: Scale.AbstractScale<any,number>  = this._isVertical ? this._xScale : this._yScale;
       if (barScale instanceof Plottable.Scale.Ordinal) {
-        var ordScale = <Plottable.Scale.Ordinal> barScale;
-        if (ordScale.rangeType() === "bands") {
-          barPixelWidth = ordScale.rangeBand();
-        } else {
-          // padding is defined as 2 * the ordinal scale's _outerPadding variable
-          // HACKHACK need to use _outerPadding for formula as above
-          var padding = (<any> ordScale)._outerPadding * 2;
-
-          // step is defined as the range_interval / (padding + number of bars)
-          var secondaryDimension = this._isVertical ? this.width() : this.height();
-          var step = secondaryDimension / (padding + ordScale.domain().length - 1);
-
-          barPixelWidth = step * padding * 0.5;
-        }
+        barPixelWidth = (<Plottable.Scale.Ordinal> barScale).rangeBand();
       } else {
         var barAccessor = this._isVertical ? this._projections["x"].accessor : this._projections["y"].accessor;
-
-        var barAccessorData = d3.set(_Util.Methods.flatten(this._datasetKeysInOrder.map((k) => {
-          var dataset = this._key2PlotDatasetKey.get(k).dataset;
-          var plotMetadata = this._key2PlotDatasetKey.get(k).plotMetadata;
-          return dataset.data().map((d, i) => barAccessor(d, i, dataset.metadata(), plotMetadata));
-        }))).values();
-
-        if (barAccessorData.some((datum) => datum === "undefined")) { return -1; }
 
         var numberBarAccessorData = d3.set(_Util.Methods.flatten(this._datasetKeysInOrder.map((k) => {
           var dataset = this._key2PlotDatasetKey.get(k).dataset;
@@ -396,7 +361,20 @@ export module Plot {
 
         barPixelWidth = _Util.Methods.min(barAccessorDataPairs, (pair: any[], i: number) => {
           return Math.abs(barScale.scale(pair[1]) - barScale.scale(pair[0]));
-        }, barWidthDimension * 0.4) * 0.95;
+        }, barWidthDimension * Bar._SINGLE_BAR_DIMENSION_RATIO);
+
+        var scaledData = numberBarAccessorData.map((datum: number) => barScale.scale(datum));
+        var minScaledDatum = _Util.Methods.min(scaledData, 0);
+        if (this._barAlignmentFactor !== 0 && minScaledDatum > 0) {
+          barPixelWidth = Math.min(barPixelWidth, minScaledDatum / this._barAlignmentFactor);
+        }
+        var maxScaledDatum = _Util.Methods.max(scaledData, 0);
+        if (this._barAlignmentFactor !== 1 && maxScaledDatum < barWidthDimension) {
+          var margin = barWidthDimension - maxScaledDatum;
+          barPixelWidth = Math.min(barPixelWidth, margin / (1 - this._barAlignmentFactor));
+        }
+
+        barPixelWidth *= Bar._BAR_WIDTH_RATIO;
       }
       return barPixelWidth;
     }

@@ -17,7 +17,7 @@ function run(svg, data, Plottable) {
   var yScale = new Plottable.Scale.Linear();
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
-  var barPlot = new Plottable.Plot.VerticalBar(xScale, yScale).addDataset(dataseries);
+  var barPlot = new Plottable.Plot.Bar(xScale, yScale, true).addDataset(dataseries);
   barPlot.project("x", "x", xScale).project("y", "y", yScale);
   var gridlines = new Plottable.Component.Gridlines(xScale, yScale);
   var renderGroup = gridlines.merge(barPlot);

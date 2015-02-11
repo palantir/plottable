@@ -3,6 +3,8 @@
 module Plottable {
 export module _Drawer {
   export class Line extends AbstractDrawer {
+    public static LINE_CLASS = "line";
+
     private _pathSelection: D3.Selection;
 
     protected _enterData(data: any[]) {
@@ -12,7 +14,7 @@ export module _Drawer {
 
     public setup(area: D3.Selection) {
       this._pathSelection = area.append("path")
-                               .classed("line", true)
+                               .classed(Line.LINE_CLASS, true)
                                .style({
                                  "fill": "none",
                                  "vector-effect": "non-scaling-stroke"
@@ -41,6 +43,7 @@ export module _Drawer {
       var xFunction       = attrToProjector["x"];
       var yFunction       = attrToProjector["y"];
       var definedFunction = attrToProjector["defined"];
+
       delete attrToProjector["x"];
       delete attrToProjector["y"];
       if (attrToProjector["defined"]) {
@@ -48,11 +51,18 @@ export module _Drawer {
       }
 
       attrToProjector["d"] = this._createLine(xFunction, yFunction, definedFunction);
-
       if (attrToProjector["fill"]) {
         this._pathSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
       }
+
       step.animator.animate(this._pathSelection, attrToProjector);
+
+      // Restore classes that may have been overridden by class projectors
+      this._pathSelection.classed(Line.LINE_CLASS, true);
+    }
+
+    public _getSelector() {
+      return "." + Line.LINE_CLASS;
     }
   }
 }

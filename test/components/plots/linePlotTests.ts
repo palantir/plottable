@@ -162,5 +162,31 @@ describe("Plots", () => {
 
       svg.remove();
     });
+
+    it("getAllSelections retrieves correct selections",() => {
+      var dataset3 = [
+        { foo: 0, bar: 1 },
+        { foo: 1, bar: 0.95 }
+      ];
+      linePlot.addDataset(dataset3);
+
+      var allLines = linePlot.getAllSelections();
+      assert.strictEqual(allLines.size(), 3, "all lines retrieved");
+      var selectionData = allLines.data();
+      assert.include(selectionData, twoPointData, "first dataset data in selection data");
+      assert.include(selectionData, dataset3, "third dataset data in selection data");
+
+      svg.remove();
+    });
+
+    it("retains original classes when class is projected", () => {
+      var newClassProjector = () => "pink";
+      linePlot.project("class", newClassProjector);
+      linePlot.renderTo(svg);
+      var linePath = renderArea.select("." + Plottable._Drawer.Line.LINE_CLASS);
+      assert.isTrue(linePath.classed("pink"));
+      assert.isTrue(linePath.classed(Plottable._Drawer.Line.LINE_CLASS));
+      svg.remove();
+    });
   });
 });

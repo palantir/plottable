@@ -315,7 +315,7 @@ describe("NumericAxis", () => {
     var yScale = new Plottable.Scale.Linear();
     var yAxis = new Plottable.Axis.Numeric(yScale, "left");
     var yLabel = new Plottable.Component.AxisLabel("LABEL", "left");
-    var barPlot = new Plottable.Plot.VerticalBar(xScale, yScale);
+    var barPlot = new Plottable.Plot.Bar(xScale, yScale);
     barPlot.project("x", "x", xScale);
     barPlot.project("y", "y", yScale);
     barPlot.addDataset(data);
@@ -329,6 +329,55 @@ describe("NumericAxis", () => {
     d3.selectAll(".tick-label").each(function() {
       assertBBoxInclusion(labelContainer, d3.select(this));
     });
+    svg.remove();
+  });
+
+  it("confines labels to the bounding box for the axis", () => {
+    var SVG_WIDTH = 500;
+    var SVG_HEIGHT = 100;
+    var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+    var scale = new Plottable.Scale.Linear();
+    var axis = new Plottable.Axis.Numeric(scale, "bottom");
+    axis.formatter((d: any) => "longstringsareverylong");
+    axis.renderTo(svg);
+    var boundingBox = d3.select(".x-axis .bounding-box");
+    d3.selectAll(".x-axis .tick-label").each(function() {
+      var tickLabel = d3.select(this);
+      if (tickLabel.style("visibility") === "inherit") {
+        assertBBoxInclusion(boundingBox, tickLabel);
+      }
+    });
+    svg.remove();
+  });
+
+  function getClientRectCenter(rect: ClientRect) {
+    return rect.left + rect.width / 2;
+  }
+
+  it("tick labels follow a sensible interval", () => {
+    var SVG_WIDTH = 500;
+    var SVG_HEIGHT = 100;
+    var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+
+    var scale = new Plottable.Scale.Linear();
+    scale.domain([-2500000, 2500000]);
+
+    var baseAxis = new Plottable.Axis.Numeric(scale, "bottom");
+    baseAxis.renderTo(svg);
+
+    var visibleTickLabels = (<any> baseAxis)._element.selectAll(".tick-label")
+      .filter(function(d: any, i: number) {
+        var visibility = d3.select(this).style("visibility");
+        return (visibility === "visible") || (visibility === "inherit");
+      });
+
+    var visibleTickLabelRects = visibleTickLabels[0].map((label: HTMLScriptElement) => label.getBoundingClientRect());
+    var interval = getClientRectCenter(visibleTickLabelRects[1]) - getClientRectCenter(visibleTickLabelRects[0]);
+    for (var i = 0; i < visibleTickLabelRects.length - 1; i++) {
+      assert.closeTo(getClientRectCenter(visibleTickLabelRects[i+1]) - getClientRectCenter(visibleTickLabelRects[i]),
+        interval, 0.5, "intervals are all spaced the same");
+    }
+
     svg.remove();
   });
 });

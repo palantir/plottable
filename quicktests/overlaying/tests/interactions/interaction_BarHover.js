@@ -15,7 +15,7 @@ function run(svg, data, Plottable) {
 
   var ds = new Plottable.Dataset(data, { foo: "!" });
 
-  var plot = new Plottable.Plot.VerticalBar(xScale, yScale)
+  var plot = new Plottable.Plot.Bar(xScale, yScale, true)
     .addDataset(ds)
     .project("x", function (d, i, u) { return d.name + u.foo; }, xScale)
     .project("y", "y", yScale)

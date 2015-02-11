@@ -8,13 +8,13 @@ function makeData() {
 function run(svg, data, Plottable) {
   "use strict";
 
-  var xScale = new Plottable.Scale.Ordinal().rangeType("points");
+  var xScale = new Plottable.Scale.Ordinal();
   var yScale = new Plottable.Scale.Linear();
   var colorScale = new Plottable.Scale.Color("10");
 
   var xAxis = new Plottable.Axis.Category(xScale, "bottom");
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");
-  var clusteredBarRenderer = new Plottable.Plot.VerticalBar(xScale, yScale)
+  var clusteredBarRenderer = new Plottable.Plot.Bar(xScale, yScale, true)
     .addDataset("d1", data)
     .attr("x", "name", xScale)
     .attr("y", "y", yScale)

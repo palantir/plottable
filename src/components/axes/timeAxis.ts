@@ -9,7 +9,7 @@ export module Axis {
    * step - number of intervals between each tick.
    * formatter - formatter used to format tick labels.
    */
-  export interface TimeAxisTierConfiguration {
+  export type TimeAxisTierConfiguration = {
     interval: D3.Time.Interval;
     step: number;
     formatter: Formatter;
@@ -20,9 +20,7 @@ export module Axis {
    * Each configuration will be shown on a different tier.
    * Currently, up to two tiers are supported.
    */
-  export interface TimeAxisConfiguration {
-    tierConfigurations: TimeAxisTierConfiguration[];
-  }
+  export type TimeAxisConfiguration = TimeAxisTierConfiguration[];
 
   export class Time extends AbstractAxis {
 
@@ -30,113 +28,113 @@ export module Axis {
      * Default possible axis configurations.
      */
     private _possibleTimeAxisConfigurations: TimeAxisConfiguration[] = [
-      {tierConfigurations: [
+      [
         {interval: d3.time.second, step: 1, formatter: Formatters.time("%I:%M:%S %p")},
         {interval: d3.time.day, step: 1, formatter: Formatters.time("%B %e, %Y")}
-      ]},
-      {tierConfigurations: [
+      ],
+      [
         {interval: d3.time.second, step: 5, formatter: Formatters.time("%I:%M:%S %p")},
         {interval: d3.time.day, step: 1, formatter: Formatters.time("%B %e, %Y")}
-      ]},
-      {tierConfigurations: [
+      ],
+      [
         {interval: d3.time.second, step: 10, formatter: Formatters.time("%I:%M:%S %p")},
         {interval: d3.time.day, step: 1, formatter: Formatters.time("%B %e, %Y")}
-      ]},
-        {tierConfigurations: [
+      ],
+      [
         {interval: d3.time.second, step: 15, formatter: Formatters.time("%I:%M:%S %p")},
         {interval: d3.time.day, step: 1, formatter: Formatters.time("%B %e, %Y")}
-      ]},
-      {tierConfigurations: [
+      ],
+      [
         {interval: d3.time.second, step: 30, formatter: Formatters.time("%I:%M:%S %p")},
         {interval: d3.time.day, step: 1, formatter: Formatters.time("%B %e, %Y")}
-      ]},
-      {tierConfigurations: [
+      ],
+      [
         {interval: d3.time.minute, step: 1, formatter: Formatters.time("%I:%M %p")},
         {interval: d3.time.day, step: 1, formatter: Formatters.time("%B %e, %Y")}
-      ]},
-      {tierConfigurations: [
+      ],
+      [
         {interval: d3.time.minute, step: 5, formatter: Formatters.time("%I:%M %p")},
         {interval: d3.time.day, step: 1, formatter: Formatters.time("%B %e, %Y")}
-      ]},
-      {tierConfigurations: [
+      ],
+      [
         {interval: d3.time.minute, step: 10, formatter: Formatters.time("%I:%M %p")},
         {interval: d3.time.day, step: 1, formatter: Formatters.time("%B %e, %Y")}
-      ]},
-      {tierConfigurations: [
+      ],
+      [
         {interval: d3.time.minute, step: 15, formatter: Formatters.time("%I:%M %p")},
         {interval: d3.time.day, step: 1, formatter: Formatters.time("%B %e, %Y")}
-      ]},
-      {tierConfigurations: [
+      ],
+      [
         {interval: d3.time.minute, step: 30, formatter: Formatters.time("%I:%M %p")},
         {interval: d3.time.day, step: 1, formatter: Formatters.time("%B %e, %Y")}
-      ]},
-      {tierConfigurations: [
+      ],
+      [
         {interval: d3.time.hour, step: 1, formatter: Formatters.time("%I %p")},
         {interval: d3.time.day, step: 1, formatter: Formatters.time("%B %e, %Y")}
-      ]},
-      {tierConfigurations: [
+      ],
+      [
         {interval: d3.time.hour, step: 3, formatter: Formatters.time("%I %p")},
         {interval: d3.time.day, step: 1,formatter: Formatters.time("%B %e, %Y")}
-      ]},
-      {tierConfigurations: [
+      ],
+      [
         {interval: d3.time.hour, step: 6, formatter: Formatters.time("%I %p")},
         {interval: d3.time.day, step: 1, formatter: Formatters.time("%B %e, %Y")}
-      ]},
-      {tierConfigurations: [
+      ],
+      [
         {interval: d3.time.hour, step: 12, formatter: Formatters.time("%I %p")},
         {interval: d3.time.day, step: 1, formatter: Formatters.time("%B %e, %Y")}
-      ]},
-      {tierConfigurations: [
+      ],
+      [
         {interval: d3.time.day, step: 1, formatter: Formatters.time("%a %e")},
         {interval: d3.time.month, step: 1, formatter: Formatters.time("%B %Y")}
-        ]},
-      {tierConfigurations: [
+      ],
+      [
         {interval: d3.time.day, step: 1, formatter: Formatters.time("%e")},
         {interval: d3.time.month, step: 1, formatter: Formatters.time("%B %Y")}
-        ]},
-      {tierConfigurations: [
+      ],
+      [
         {interval: d3.time.month, step: 1, formatter: Formatters.time("%B")},
         {interval: d3.time.year, step: 1, formatter: Formatters.time("%Y")}
-      ]},
-      {tierConfigurations: [
+      ],
+      [
         {interval: d3.time.month, step: 1, formatter: Formatters.time("%b")},
         {interval: d3.time.year, step: 1, formatter: Formatters.time("%Y")}
-      ]},
-      {tierConfigurations: [
+      ],
+      [
         {interval: d3.time.month, step: 3, formatter: Formatters.time("%b")},
         {interval: d3.time.year, step: 1, formatter: Formatters.time("%Y")}
-      ]},
-      {tierConfigurations: [
+      ],
+      [
         {interval: d3.time.month, step: 6, formatter: Formatters.time("%b")},
         {interval: d3.time.year, step: 1, formatter: Formatters.time("%Y")}
-      ]},
-      {tierConfigurations: [
+      ],
+      [
         {interval: d3.time.year, step: 1, formatter: Formatters.time("%Y")}
-      ]},
-      {tierConfigurations: [
+      ],
+      [
         {interval: d3.time.year, step: 1, formatter: Formatters.time("%y")}
-      ]},
-      {tierConfigurations: [
+      ],
+      [
         {interval: d3.time.year, step: 5, formatter: Formatters.time("%Y")}
-      ]},
-      {tierConfigurations: [
+      ],
+      [
         {interval: d3.time.year, step: 25, formatter: Formatters.time("%Y")}
-      ]},
-      {tierConfigurations: [
+      ],
+      [
         {interval: d3.time.year, step: 50, formatter: Formatters.time("%Y")}
-      ]},
-      {tierConfigurations: [
+      ],
+      [
         {interval: d3.time.year, step: 100, formatter: Formatters.time("%Y")}
-      ]},
-      {tierConfigurations: [
+      ],
+      [
         {interval: d3.time.year, step: 200, formatter: Formatters.time("%Y")}
-      ]},
-      {tierConfigurations: [
+      ],
+      [
         {interval: d3.time.year, step: 500, formatter: Formatters.time("%Y")}
-      ]},
-      {tierConfigurations: [
+      ],
+      [
         {interval: d3.time.year, step: 1000, formatter: Formatters.time("%Y")}
-      ]}
+      ]
     ];
 
     private _tierLabelContainers: D3.Selection[];
@@ -224,7 +222,7 @@ export module Axis {
     private _getMostPreciseConfigurationIndex(): number {
       var mostPreciseIndex = this._possibleTimeAxisConfigurations.length;
       this._possibleTimeAxisConfigurations.forEach((interval: TimeAxisConfiguration, index: number) => {
-        if (index < mostPreciseIndex && interval.tierConfigurations.every((tier: TimeAxisTierConfiguration) =>
+        if (index < mostPreciseIndex && interval.every((tier: TimeAxisTierConfiguration) =>
           this._checkTimeAxisTierConfigurationWidth(tier))) {
           mostPreciseIndex = index;
         }
@@ -309,7 +307,7 @@ export module Axis {
     }
 
     protected _getTickValues(): any[] {
-      return this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex].tierConfigurations.reduce(
+      return this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex].reduce(
           (ticks: any[], config: TimeAxisTierConfiguration) => ticks.concat(this._getTickIntervalValues(config)),
           []
         );
@@ -321,10 +319,21 @@ export module Axis {
       this._tierBaselines[index].style("visibility", "hidden");
     }
 
-    private _renderTierLabels(container: D3.Selection, config: TimeAxisTierConfiguration, index: number) {
+    private _getTickValuesForConfiguration(config: TimeAxisTierConfiguration) {
       var tickPos = (<Scale.Time> this._scale).tickInterval(config.interval, config.step);
-      tickPos.splice(0, 0, this._scale.domain()[0]);
-      tickPos.push(this._scale.domain()[1]);
+      var domain = this._scale.domain();
+      var tickPosValues = tickPos.map((d: Date) => d.valueOf()); // can't indexOf with objects
+      if (tickPosValues.indexOf(domain[0].valueOf()) === -1) {
+        tickPos.unshift(domain[0]);
+      }
+      if (tickPosValues.indexOf(domain[1].valueOf()) === -1) {
+        tickPos.push(domain[1]);
+      }
+      return tickPos;
+    }
+
+    private _renderTierLabels(container: D3.Selection, config: TimeAxisTierConfiguration, index: number) {
+      var tickPos = this._getTickValuesForConfiguration(config);
       var labelPos: Date[] = [];
       if (this._tierLabelPositions[index] === "between" && config.step === 1) {
         tickPos.map((datum: any, index: any) => {
@@ -336,14 +345,6 @@ export module Axis {
       } else {
         labelPos = tickPos;
       }
-      var filteredTicks: Date[] = [];
-      labelPos = labelPos.filter((d: any, i: number) => {
-        var fits = this._canFitLabelFilter(d, tickPos.slice(i, i + 2), config, this._tierLabelPositions[index]);
-        if (fits) {
-          filteredTicks.push(tickPos[i]);
-        }
-        return fits;
-      });
 
       var tickLabels = container.selectAll("." + AbstractAxis.TICK_LABEL_CLASS).data(labelPos, (d) => d.valueOf());
       var tickLabelsEnter = tickLabels.enter().append("g").classed(AbstractAxis.TICK_LABEL_CLASS, true);
@@ -362,34 +363,6 @@ export module Axis {
       tickLabels.attr("transform", (d: any) => "translate(" + this._scale.scale(d) + ",0)");
       var anchor = (this._tierLabelPositions[index] === "center" || config.step === 1) ? "middle" : "start";
       tickLabels.selectAll("text").text(config.formatter).style("text-anchor", anchor);
-      if (filteredTicks.indexOf(this._scale.domain()[0]) === -1) {
-        filteredTicks.splice(0, 0, this._scale.domain()[0]);
-      }
-      if (filteredTicks.indexOf(this._scale.domain()[1]) === -1) {
-        tickPos.push(this._scale.domain()[1]);
-      }
-
-      return filteredTicks;
-    }
-
-    private _canFitLabelFilter(position: Date, bounds: Date[], config: TimeAxisTierConfiguration, labelPosition: string): boolean {
-      if (labelPosition === "center") {
-        return true;
-      }
-      var endPosition: number;
-      var startPosition: number;
-      var width = this._measurer.measure(config.formatter(position)).width + ((config.step !== 1) ? this.tickLabelPadding() : 0);
-      var leftBound = this._scale.scale(bounds[0]);
-      var rightBound = this._scale.scale(bounds[1]);
-      if (labelPosition === "center" || config.step === 1) {
-          endPosition = this._scale.scale(position) + width / 2;
-          startPosition = this._scale.scale(position) - width / 2;
-      } else {
-          endPosition = this._scale.scale(position) + width;
-          startPosition = this._scale.scale(position);
-      }
-
-      return endPosition <= rightBound && startPosition >= leftBound;
     }
 
     private _renderTickMarks(tickValues: Date[], index: number) {
@@ -414,6 +387,11 @@ export module Axis {
         attr["y2"] = this.height() - (offset + this._tierHeights[index]);
       }
       d3.select(tickMarks[0][0]).attr(attr);
+
+      // Add end-tick classes to first and last tick for CSS customization purposes
+      d3.select(tickMarks[0][0]).classed(AbstractAxis.END_TICK_MARK_CLASS, true);
+      d3.select(tickMarks[0][tickMarks.size() - 1]).classed(AbstractAxis.END_TICK_MARK_CLASS, true);
+
       tickMarks.exit().remove();
     }
 
@@ -431,19 +409,21 @@ export module Axis {
         return [];
       }
 
-      return this._getTickIntervalValues(this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex - 1].
-                                            tierConfigurations[0]);
+      return this._getTickIntervalValues(this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex - 1][0]);
     }
 
     public _doRender() {
       this._mostPreciseConfigIndex = this._getMostPreciseConfigurationIndex();
-      var tierConfigs = this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex].tierConfigurations;
+      var tierConfigs = this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex];
       for (var i = 0; i < Time._NUM_TIERS; ++i) {
         this._cleanTier(i);
       }
 
-      var tierTicks = tierConfigs.map((config: TimeAxisTierConfiguration, i: number) =>
+      tierConfigs.forEach((config: TimeAxisTierConfiguration, i: number) =>
         this._renderTierLabels(this._tierLabelContainers[i], config, i)
+      );
+      var tierTicks = tierConfigs.map((config: TimeAxisTierConfiguration, i: number) =>
+        this._getTickValuesForConfiguration(config)
       );
 
       var baselineOffset = 0;

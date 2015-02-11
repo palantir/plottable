@@ -14,7 +14,7 @@ function run(div, data, Plottable) {
   var yScale = new Plottable.Scale.Linear();
   var ds = new Plottable.Dataset(dates);
   var parse = function(d) {return d3.time.format("%x").parse(d.x);};
-  var plot = new Plottable.Plot.VerticalBar(xScale, yScale)
+  var plot = new Plottable.Plot.Bar(xScale, yScale)
                       .addDataset(ds)
                       .attr("x", parse, xScale)
                       .project("y", "y", yScale);

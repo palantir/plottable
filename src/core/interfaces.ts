@@ -2,28 +2,22 @@ module Plottable {
   /**
    * Access specific datum property.
    */
-  export interface _Accessor {
-    (datum: any, index?: number, userMetadata?: any, plotMetadata?: Plot.PlotMetadata): any;
-  };
+  export type _Accessor = (datum: any, index?: number, userMetadata?: any, plotMetadata?: Plot.PlotMetadata) => any;
 
   /**
    * Retrieves scaled datum property.
    */
-  export interface _Projector {
-    (datum: any, index: number, userMetadata: any, plotMetadata: Plot.PlotMetadata) : any;
-  }
+  export type _Projector = (datum: any, index: number, userMetadata: any, plotMetadata: Plot.PlotMetadata) => any;
 
   /**
    * Projector with applied user and plot metadata
    */
-  export interface _AppliedProjector {
-    (datum: any, index: number) : any;
-  }
+  export type _AppliedProjector = (datum: any, index: number) => any;
 
   /**
    * Defines a way how specific attribute needs be retrieved before rendering.
    */
-  export interface _Projection {
+  export type _Projection = {
     accessor: _Accessor;
     scale?: Scale.AbstractScale<any, any>;
     attribute: string;
@@ -37,32 +31,28 @@ module Plottable {
    * with both `foo` and `bar`, an entry in this type might be `{"r":
    * function(d) { return foo + bar; }`.
    */
-  export interface AttributeToProjector {
-    [attrToSet: string]: _Projector;
-  }
+  export type AttributeToProjector = { [attrToSet: string]: _Projector; };
 
-  export interface _AttributeToAppliedProjector {
-    [attrToSet: string]: _AppliedProjector;
-  }
+  export type _AttributeToAppliedProjector = { [attrToSet: string]: _AppliedProjector; };
 
   /**
    * A simple bounding box.
    */
-  export interface SelectionArea {
+  export type SelectionArea = {
     xMin: number;
     xMax: number;
     yMin: number;
     yMax: number;
   }
 
-  export interface _SpaceRequest {
+  export type _SpaceRequest = {
     width: number;
     height: number;
     wantsWidth: boolean;
     wantsHeight: boolean;
   }
 
-  export interface _PixelArea {
+  export type _PixelArea = {
     xMin: number;
     xMax: number;
     yMin: number;
@@ -76,7 +66,7 @@ module Plottable {
    * The point of this type is to hopefully replace the less-elegant `[min,
    * max]` extents produced by d3.
    */
-  export interface Extent {
+  export type Extent = {
     min: number;
     max: number;
   }
@@ -84,7 +74,7 @@ module Plottable {
   /**
    * A simple location on the screen.
    */
-  export interface Point {
+  export type Point = {
     x: number;
     y: number;
   }

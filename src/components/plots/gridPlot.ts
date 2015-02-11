@@ -22,8 +22,8 @@ export module Plot {
       _Util.Methods.uniqPush(this._cssClasses, "grid-plot");
 
       // The x and y scales should render in bands with no padding
-      (<Scale.Ordinal> this._xScale).rangeType("bands", 0, 0);
-      (<Scale.Ordinal> this._yScale).rangeType("bands", 0, 0);
+      xScale.innerPadding(0).outerPadding(0);
+      yScale.innerPadding(0).outerPadding(0);
 
       this._colorScale = colorScale;
       this._animators["cells"] = new Animator.Null();
@@ -60,6 +60,10 @@ export module Plot {
       var yStep = (<Scale.Ordinal> this._yScale).rangeBand();
       attrToProjector["width"]  = () => xStep;
       attrToProjector["height"] = () => yStep;
+      var xAttr = attrToProjector["x"];
+      var yAttr = attrToProjector["y"];
+      attrToProjector["x"] = (d, i, u, m) => xAttr(d, i, u, m) - xStep / 2;
+      attrToProjector["y"] = (d, i, u, m) => yAttr(d, i, u, m) - yStep / 2;
       return attrToProjector;
     }
 

@@ -21,7 +21,7 @@ function run(div, data, Plottable) {
     var xScale = new Plottable.Scale.Linear();
     var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
 
-    var barPlot = new Plottable.Plot.HorizontalBar(xScale, yScale)
+    var barPlot = new Plottable.Plot.Bar(xScale, yScale, false)
         .addDataset(ds)
         .attr("y", "name", yScale)
         .attr("x", "age", xScale)

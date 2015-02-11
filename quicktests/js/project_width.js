@@ -32,7 +32,7 @@ function run(div, data, Plottable) {
     return w;
   };
 
-  var barRenderer = new Plottable.Plot.VerticalBar(xScale, yScale)
+  var barRenderer = new Plottable.Plot.Bar(xScale, yScale)
                                  .addDataset(ds)
                                  .attr("x", "name", xScale)
                                  .attr("y", "age", yScale)

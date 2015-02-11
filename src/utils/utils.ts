@@ -135,16 +135,14 @@ export module _Util {
     /**
      * Creates an array of length `count`, filled with value or (if value is a function), value()
      *
-     * @param {any} value The value to fill the array with, or, if a function, a generator for values (called with index as arg)
+     * @param {T | ((index?: number) => T)} value The value to fill the array with or a value generator (called with index as arg)
      * @param {number} count The length of the array to generate
      * @return {any[]}
      */
-    export function createFilledArray<T>(value: T, count: number): T[];
-    export function createFilledArray<T>(func: (index?: number) => T, count: number): T[];
-    export function createFilledArray<T>(value: any, count: number) {
+    export function createFilledArray<T>(value: T | ((index?: number) => T), count: number) {
       var out: T[] = [];
       for (var i = 0; i<count; i++) {
-        out[i] = typeof(value) === "function" ? value(i) : value;
+        out[i] = typeof(value) === "function" ? (<(index?: number) => T> value)(i) : <T> value;
       }
       return out;
     }
@@ -301,26 +299,9 @@ export module _Util {
       return hexCode;
     }
 
-    // Code adapted from https://stackoverflow.com/questions/5560248/programmatically-lighten-or-darken-a-hex-color-or-rgb-and-blend-colors
-    export function lightenColor(color: string, factor: number, lightenAmount: number) {
-      var r = parseInt(color.substring(1, 3), 16);
-      var g = parseInt(color.substring(3, 5), 16);
-      var b = parseInt(color.substring(5, 7), 16);
-
-      var hsl = _Util.Color.rgbToHsl(r, g, b);
-
-      var newL = Math.min(hsl[2] + lightenAmount * factor, 1);
-
-      var newRgb = _Util.Color.hslToRgb(hsl[0], hsl[1], newL);
-      var rHex = newRgb[0].toString(16);
-      var gHex = newRgb[1].toString(16);
-      var bHex = newRgb[2].toString(16);
-
-      rHex = rHex.length < 2 ? "0" + rHex : rHex;
-      gHex = gHex.length < 2 ? "0" + gHex : gHex;
-      bHex = bHex.length < 2 ? "0" + bHex : bHex;
-
-      return "#" + rHex + gHex + bHex;
+    export function lightenColor(color: string, factor: number) {
+      var hsl = <D3.Color.HSLColor> d3.hsl(color).brighter(factor);
+      return hsl.rgb().toString();
     }
 
     // Code adapted from https://stackoverflow.com/questions/5560248/programmatically-lighten-or-darken-a-hex-color-or-rgb-and-blend-colors

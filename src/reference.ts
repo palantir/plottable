@@ -52,6 +52,7 @@
 
 /// <reference path="components/label.ts" />
 /// <reference path="components/legend.ts" />
+/// <reference path="components/interpolatedColorLegend.ts" />
 /// <reference path="components/gridlines.ts" />
 /// <reference path="components/table.ts" />
 
@@ -61,8 +62,6 @@
 /// <reference path="components/plots/scatterPlot.ts" />
 /// <reference path="components/plots/gridPlot.ts" />
 /// <reference path="components/plots/barPlot.ts" />
-/// <reference path="components/plots/verticalBarPlot.ts" />
-/// <reference path="components/plots/horizontalBarPlot.ts" />
 /// <reference path="components/plots/linePlot.ts" />
 /// <reference path="components/plots/areaPlot.ts" />
 /// <reference path="components/plots/clusteredBarPlot.ts" />

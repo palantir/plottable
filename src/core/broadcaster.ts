@@ -24,10 +24,7 @@ export module Core {
    * The Listenable is passed as the first argument so that it is easy for the callback to reference the
    * current state of the Listenable in the resolution logic.
    */
-  export interface BroadcasterCallback {
-    (listenable: Listenable, ...args: any[]): any;
-  }
-
+  export type BroadcasterCallback = (listenable: Listenable, ...args: any[]) => any;
 
   /**
    * The Broadcaster class is owned by an Listenable. Third parties can register and deregister listeners

@@ -41,11 +41,11 @@ export module Component {
       return this;
     }
 
-    public _computeLayout(xOrigin?: number,
-                          yOrigin?: number,
+    public _computeLayout(offeredXOrigin?: number,
+                          offeredYOrigin?: number,
                    availableWidth?: number,
                   availableHeight?: number): Group {
-      super._computeLayout(xOrigin, yOrigin, availableWidth, availableHeight);
+      super._computeLayout(offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
       this.components().forEach((c) => {
         c._computeLayout(0, 0, this.width(), this.height());
       });

@@ -206,53 +206,25 @@ describe("Scales", () => {
   });
 
   describe("Ordinal Scales", () => {
-    it("defaults to \"bands\" range type", () => {
-      var scale = new Plottable.Scale.Ordinal();
-      assert.deepEqual(scale.rangeType(), "bands");
-    });
 
-    it("rangeBand returns 0 when in \"points\" mode", () => {
-      var scale = new Plottable.Scale.Ordinal().rangeType("points");
-      assert.deepEqual(scale.rangeType(), "points");
-      assert.deepEqual(scale.rangeBand(), 0);
-    });
-
-    it("rangeBand is updated when domain changes in \"bands\" mode", () => {
+    it("rangeBand is updated when domain changes", () => {
       var scale = new Plottable.Scale.Ordinal();
-      scale.rangeType("bands");
-      assert.deepEqual(scale.rangeType(), "bands");
       scale.range([0, 2679]);
 
       scale.domain(["1","2","3","4"]);
-      assert.deepEqual(scale.rangeBand(), 399);
+      assert.closeTo(scale.rangeBand(), 399, 1);
 
       scale.domain(["1","2","3","4","5"]);
-      assert.deepEqual(scale.rangeBand(), 329);
+      assert.closeTo(scale.rangeBand(), 329, 1);
     });
 
-    it("rangeBand is updated when mode is changed", () => {
+    it("stepWidth operates normally", () => {
       var scale = new Plottable.Scale.Ordinal();
-      scale.rangeType("bands");
-      assert.deepEqual(scale.rangeType(), "bands");
-      scale.range([0, 2679]);
+      scale.range([0, 3000]);
 
       scale.domain(["1","2","3","4"]);
-      assert.deepEqual(scale.rangeBand(), 399);
-
-      scale.rangeType("points");
-      assert.deepEqual(scale.rangeBand(), 0, "Band width should be 0 in points mode");
-    });
-
-    it("rangeType triggers broadcast", () => {
-      var scale = new Plottable.Scale.Ordinal();
-      var callbackWasCalled = false;
-      var testCallback: Plottable.Core.BroadcasterCallback = (listenable: Plottable.Core.Listenable) => {
-        assert.equal(listenable, scale, "Callback received the calling scale as the first argument");
-        callbackWasCalled = true;
-      };
-      scale.broadcaster.registerListener(null, testCallback);
-      scale.rangeType("points");
-      assert.isTrue(callbackWasCalled, "The registered callback was called");
+      var widthSum = scale.rangeBand() * (1 + scale.innerPadding());
+      assert.strictEqual(scale.stepWidth(), widthSum, "step width is the sum of innerPadding width and band width");
     });
   });
 
@@ -264,7 +236,7 @@ describe("Scales", () => {
     var dB = {x: "B", y: 2};
     var dC = {x: "C", y: 2};
     var dataset = new Plottable.Dataset([dA, dB]);
-    var barPlot = new Plottable.Plot.VerticalBar(xScale, yScale).addDataset(dataset);
+    var barPlot = new Plottable.Plot.Bar(xScale, yScale).addDataset(dataset);
     barPlot.project("x", "x", xScale);
     barPlot.project("y", "y", yScale);
     var svg = generateSVG();
@@ -310,6 +282,14 @@ describe("Scales", () => {
       scale.range(["#5279c7", "#fd373e"]);
       scale.domain(["a", "b", "c"]);
       assert.notEqual(scale.scale("c"), "#5279c7");
+    });
+
+    it("interprets named color values correctly", () => {
+      var scale = new Plottable.Scale.Color();
+      scale.range(["red", "blue"]);
+      scale.domain(["a", "b"]);
+      assert.equal(scale.scale("a"), "#ff0000");
+      assert.equal(scale.scale("b"), "#0000ff");
     });
   });
 

@@ -124,6 +124,7 @@ svg.plottable {
 }
 
 .plottable .legend text {
+  fill: #32313F;
   font-family: "Helvetica Neue", sans-serif;
   font-size: 12px;
   font-weight: bold;
@@ -132,6 +133,12 @@ svg.plottable {
 
 .plottable .legend .toggled-off circle {
   fill: #d3d3d3;
+}
+
+.plottable .interpolated-color-legend rect.swatch-bounding-box {
+  fill: none;
+  stroke: #CCC;
+  stroke-width: 1px;
 }
 
 .plottable .plot.toggled-on {
