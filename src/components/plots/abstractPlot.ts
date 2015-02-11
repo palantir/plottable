@@ -313,10 +313,10 @@ export module Plot {
     /**
      * Removes a dataset by the given identifier
      *
-     * @param {string | Dataset | any[]} datasetIdentifer The identifier for the dataset to remove
-     * If a string is inputted, it is interpreted as the dataset key to remove.
-     * If a Dataset is inputted, the first Dataset in the plot that is the same will be removed.
-     * If an any[] is inputted, the first data array in the plot that is the same will be removed.
+     * @param {string | Dataset | any[]} datasetIdentifer The identifier as the key of the Dataset to remove
+     * If string is inputted, it is interpreted as the dataset key to remove.
+     * If Dataset is inputted, the first Dataset in the plot that is the same will be removed.
+     * If any[] is inputted, the first data array in the plot that is the same will be removed.
      * @returns {AbstractPlot} The calling AbstractPlot.
      */
     public removeDataset(datasetIdentifier: string | Dataset | any[]): AbstractPlot {
