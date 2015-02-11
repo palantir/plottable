@@ -1063,7 +1063,7 @@ var Plottable;
              * Constructs a broadcaster, taking a "listenable" object to broadcast about.
              *
              * @constructor
-             * @param {L} listenable The listenable object to broadcast about.
+             * @param {L} listenable The listenable object to broadcast.
              */
             function Broadcaster(listenable) {
                 _super.call(this);
@@ -1076,7 +1076,7 @@ var Plottable;
              * If there is already a callback associated with that key, then the callback will be replaced.
              *
              * @param key The key associated with the callback. Key uniqueness is determined by deep equality.
-             * @param {(listenable: L, ...args: any[]) => any} callback A callback to be called.
+             * @param {BroadcasterCallback<L>} callback A callback to be called.
              * @returns {Broadcaster} The calling Broadcaster
              */
             Broadcaster.prototype.registerListener = function (key, callback) {

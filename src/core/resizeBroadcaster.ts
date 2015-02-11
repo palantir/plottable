@@ -19,7 +19,7 @@ export module Core {
 
     function _lazyInitialize() {
       if (broadcaster === undefined) {
-        broadcaster = new Core.Broadcaster<any>(<any> ResizeBroadcaster);
+        broadcaster = new Core.Broadcaster<any>(ResizeBroadcaster);
         window.addEventListener("resize", _onResize);
       }
     }

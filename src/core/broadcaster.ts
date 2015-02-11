@@ -2,6 +2,17 @@
 
 module Plottable {
 export module Core {
+
+  /**
+   * A callback for a Broadcaster. The callback will be called with the Broadcaster's
+   * "listenable" as the first argument, with subsequent optional arguments depending
+   * on the listenable.
+   */
+  // HACKHACK: An interface because the "type" keyword doesn't work with generics.
+  export interface BroadcasterCallback<L> {
+    (listenable: L, ...args: any[]): any;
+  }
+
   /**
    * The Broadcaster holds a reference to a "listenable" object.
    * Third parties can register and deregister listeners from the Broadcaster.
@@ -19,7 +30,7 @@ export module Core {
      * Constructs a broadcaster, taking a "listenable" object to broadcast about.
      *
      * @constructor
-     * @param {L} listenable The listenable object to broadcast about.
+     * @param {L} listenable The listenable object to broadcast.
      */
     constructor(listenable: L) {
       super();
@@ -32,10 +43,10 @@ export module Core {
      * If there is already a callback associated with that key, then the callback will be replaced.
      *
      * @param key The key associated with the callback. Key uniqueness is determined by deep equality.
-     * @param {(listenable: L, ...args: any[]) => any} callback A callback to be called.
+     * @param {BroadcasterCallback<L>} callback A callback to be called.
      * @returns {Broadcaster} The calling Broadcaster
      */
-    public registerListener(key: any, callback: (listenable: L, ...args: any[]) => any) {
+    public registerListener(key: any, callback: BroadcasterCallback<L>) {
       this._key2callback.set(key, callback);
       return this;
     }
