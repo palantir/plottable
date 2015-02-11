@@ -14,12 +14,12 @@ export module Core {
    * animations during resize.
    */
   export module ResizeBroadcaster {
-    var broadcaster: Core.Broadcaster;
+    var broadcaster: Core.Broadcaster<any>;
     var _resizing: boolean = false;
 
     function _lazyInitialize() {
       if (broadcaster === undefined) {
-        broadcaster = new Core.Broadcaster(<any> ResizeBroadcaster);
+        broadcaster = new Core.Broadcaster<any>(<any> ResizeBroadcaster);
         window.addEventListener("resize", _onResize);
       }
     }

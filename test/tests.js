@@ -1655,11 +1655,11 @@ describe("Plots", function () {
             r.project("x", "x", xScale);
             r.project("y", "y", yScale);
             r.project("meta", metadataProjector);
-            xScale.broadcaster.registerListener(null, function (listenable) {
+            xScale.broadcaster.registerListener("unitTest", function (listenable) {
                 assert.equal(listenable, xScale, "Callback received the calling scale as the first argument");
                 ++xScaleCalls;
             });
-            yScale.broadcaster.registerListener(null, function (listenable) {
+            yScale.broadcaster.registerListener("unitTest", function (listenable) {
                 assert.equal(listenable, yScale, "Callback received the calling scale as the first argument");
                 ++yScaleCalls;
             });
@@ -4159,10 +4159,9 @@ describe("Broadcasters", function () {
     var b;
     var called;
     var cb;
-    var listenable = { broadcaster: null };
+    var listenable = {};
     beforeEach(function () {
         b = new Plottable.Core.Broadcaster(listenable);
-        listenable.broadcaster = b;
         called = false;
         cb = function () {
             called = true;
@@ -4924,18 +4923,10 @@ describe("Component behavior", function () {
         svg.remove();
     });
     it("detach() works as expected", function () {
-        var cbCalled = 0;
-        var cb = function (b) { return cbCalled++; };
-        var b = new Plottable.Core.Broadcaster(null);
         var c1 = new Plottable.Component.AbstractComponent();
-        b.registerListener(c1, cb);
         c1.renderTo(svg);
-        b.broadcast();
-        assert.equal(cbCalled, 1, "the callback was called");
         assert.isTrue(svg.node().hasChildNodes(), "the svg has children");
         c1.detach();
-        b.broadcast();
-        assert.equal(cbCalled, 2, "the callback is still attached to the component");
         assert.isFalse(svg.node().hasChildNodes(), "the svg has no children");
         svg.remove();
     });
@@ -5700,7 +5691,7 @@ describe("Coordinators", function () {
 var assert = chai.assert;
 describe("Scales", function () {
     it("Scale's copy() works correctly", function () {
-        var testCallback = function (broadcaster) {
+        var testCallback = function (listenable) {
             return true; // doesn't do anything
         };
         var scale = new Plottable.Scale.Linear();

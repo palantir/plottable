@@ -461,72 +461,50 @@ declare module Plottable {
 declare module Plottable {
     module Core {
         /**
-         * This interface represents anything in Plottable which can have a listener attached.
-         * Listeners attach by referencing the Listenable's broadcaster, and calling registerListener
-         * on it.
-         *
-         * e.g.:
-         * listenable: Plottable.Listenable;
-         * listenable.broadcaster.registerListener(callbackToCallOnBroadcast)
-         */
-        interface Listenable {
-            broadcaster: Broadcaster;
-        }
-        /**
-         * This interface represents the callback that should be passed to the Broadcaster on a Listenable.
-         *
-         * The callback will be called with the attached Listenable as the first object, and optional arguments
-         * as the subsequent arguments.
-         *
-         * The Listenable is passed as the first argument so that it is easy for the callback to reference the
-         * current state of the Listenable in the resolution logic.
-         */
-        type BroadcasterCallback = (listenable: Listenable, ...args: any[]) => any;
-        /**
-         * The Broadcaster class is owned by an Listenable. Third parties can register and deregister listeners
-         * from the broadcaster. When the broadcaster.broadcast method is activated, all registered callbacks are
-         * called. The registered callbacks are called with the registered Listenable that the broadcaster is attached
-         * to, along with optional arguments passed to the `broadcast` method.
+         * The Broadcaster holds a reference to a "listenable" object.
+         * Third parties can register and deregister listeners from the Broadcaster.
+         * When the broadcaster.broadcast() method is called, all registered callbacks
+         * are called with the Broadcaster's "listenable", along with optional
+         * arguments passed to the `broadcast` method.
          *
          * The listeners are called synchronously.
          */
-        class Broadcaster extends Core.PlottableObject {
-            listenable: Listenable;
+        class Broadcaster<L> extends Core.PlottableObject {
             /**
-             * Constructs a broadcaster, taking the Listenable that the broadcaster will be attached to.
+             * Constructs a broadcaster, taking a "listenable" object to broadcast about.
              *
              * @constructor
-             * @param {Listenable} listenable The Listenable-object that this broadcaster is attached to.
+             * @param {L} listenable The listenable object to broadcast about.
              */
-            constructor(listenable: Listenable);
+            constructor(listenable: L);
             /**
              * Registers a callback to be called when the broadcast method is called. Also takes a key which
              * is used to support deregistering the same callback later, by passing in the same key.
              * If there is already a callback associated with that key, then the callback will be replaced.
              *
              * @param key The key associated with the callback. Key uniqueness is determined by deep equality.
-             * @param {BroadcasterCallback} callback A callback to be called when the Scale's domain changes.
-             * @returns {Broadcaster} this object
+             * @param {(listenable: L, ...args: any[]) => any} callback A callback to be called.
+             * @returns {Broadcaster} The calling Broadcaster
              */
-            registerListener(key: any, callback: BroadcasterCallback): Broadcaster;
+            registerListener(key: any, callback: (listenable: L, ...args: any[]) => any): Broadcaster<L>;
             /**
              * Call all listening callbacks, optionally with arguments passed through.
              *
              * @param ...args A variable number of optional arguments
-             * @returns {Broadcaster} this object
+             * @returns {Broadcaster} The calling Broadcaster
              */
-            broadcast(...args: any[]): Broadcaster;
+            broadcast(...args: any[]): Broadcaster<L>;
             /**
              * Deregisters the callback associated with a key.
              *
              * @param key The key to deregister.
-             * @returns {Broadcaster} this object
+             * @returns {Broadcaster} The calling Broadcaster
              */
-            deregisterListener(key: any): Broadcaster;
+            deregisterListener(key: any): Broadcaster<L>;
             /**
              * Deregisters all listeners and callbacks associated with the broadcaster.
              *
-             * @returns {Broadcaster} this object
+             * @returns {Broadcaster} The calling Broadcaster
              */
             deregisterAllListeners(): void;
         }
@@ -535,8 +513,8 @@ declare module Plottable {
 
 
 declare module Plottable {
-    class Dataset extends Core.PlottableObject implements Core.Listenable {
-        broadcaster: Core.Broadcaster;
+    class Dataset extends Core.PlottableObject {
+        broadcaster: Core.Broadcaster<Dataset>;
         /**
          * Constructs a new set.
          *
@@ -894,9 +872,9 @@ declare module Plottable {
 
 declare module Plottable {
     module Scale {
-        class AbstractScale<D, R> extends Core.PlottableObject implements Core.Listenable {
+        class AbstractScale<D, R> extends Core.PlottableObject {
             protected _d3Scale: D3.Scale.Scale;
-            broadcaster: Core.Broadcaster;
+            broadcaster: Core.Broadcaster<AbstractScale<D, R>>;
             _typeCoercer: (d: any) => any;
             /**
              * Constructs a new Scale.
