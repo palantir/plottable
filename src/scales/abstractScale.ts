@@ -2,10 +2,10 @@
 
 module Plottable {
 export module Scale {
-  export class AbstractScale<D,R> extends Core.PlottableObject implements Core.Listenable {
+  export class AbstractScale<D,R> extends Core.PlottableObject {
     protected _d3Scale: D3.Scale.Scale;
     private _autoDomainAutomatically = true;
-    public broadcaster: Core.Broadcaster;
+    public broadcaster: Core.Broadcaster<AbstractScale<D, R>>;
     private _rendererAttrID2Extent: {[rendererAttrID: string]: D[]} = {};
     public _typeCoercer: (d: any) => any = (d: any) => d;
     private _domainModificationInProgress: boolean = false;

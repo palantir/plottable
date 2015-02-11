@@ -318,22 +318,11 @@ describe("Component behavior", () => {
   });
 
   it("detach() works as expected", () => {
-    var cbCalled = 0;
-    var cb = (b: Plottable.Core.Listenable) => cbCalled++;
-    var b = new Plottable.Core.Broadcaster(null);
-
     var c1 = new Plottable.Component.AbstractComponent();
 
-    b.registerListener(c1, cb);
-
     c1.renderTo(svg);
-    b.broadcast();
-    assert.equal(cbCalled, 1, "the callback was called");
     assert.isTrue(svg.node().hasChildNodes(), "the svg has children");
     c1.detach();
-
-    b.broadcast();
-    assert.equal(cbCalled, 2, "the callback is still attached to the component");
     assert.isFalse(svg.node().hasChildNodes(), "the svg has no children");
 
     svg.remove();

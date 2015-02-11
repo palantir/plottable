@@ -1056,25 +1056,26 @@ var Plottable;
     var Core;
     (function (Core) {
         /**
-         * The Broadcaster class is owned by an Listenable. Third parties can register and deregister listeners
-         * from the broadcaster. When the broadcaster.broadcast method is activated, all registered callbacks are
-         * called. The registered callbacks are called with the registered Listenable that the broadcaster is attached
-         * to, along with optional arguments passed to the `broadcast` method.
+         * The Broadcaster holds a reference to a "listenable" object.
+         * Third parties can register and deregister listeners from the Broadcaster.
+         * When the broadcaster.broadcast() method is called, all registered callbacks
+         * are called with the Broadcaster's "listenable", along with optional
+         * arguments passed to the `broadcast` method.
          *
          * The listeners are called synchronously.
          */
         var Broadcaster = (function (_super) {
             __extends(Broadcaster, _super);
             /**
-             * Constructs a broadcaster, taking the Listenable that the broadcaster will be attached to.
+             * Constructs a broadcaster, taking a "listenable" object to broadcast about.
              *
              * @constructor
-             * @param {Listenable} listenable The Listenable-object that this broadcaster is attached to.
+             * @param {L} listenable The listenable object to broadcast.
              */
             function Broadcaster(listenable) {
                 _super.call(this);
                 this._key2callback = new Plottable._Util.StrictEqualityAssociativeArray();
-                this.listenable = listenable;
+                this._listenable = listenable;
             }
             /**
              * Registers a callback to be called when the broadcast method is called. Also takes a key which
@@ -1082,8 +1083,8 @@ var Plottable;
              * If there is already a callback associated with that key, then the callback will be replaced.
              *
              * @param key The key associated with the callback. Key uniqueness is determined by deep equality.
-             * @param {BroadcasterCallback} callback A callback to be called when the Scale's domain changes.
-             * @returns {Broadcaster} this object
+             * @param {BroadcasterCallback<L>} callback A callback to be called.
+             * @returns {Broadcaster} The calling Broadcaster
              */
             Broadcaster.prototype.registerListener = function (key, callback) {
                 this._key2callback.set(key, callback);
@@ -1093,7 +1094,7 @@ var Plottable;
              * Call all listening callbacks, optionally with arguments passed through.
              *
              * @param ...args A variable number of optional arguments
-             * @returns {Broadcaster} this object
+             * @returns {Broadcaster} The calling Broadcaster
              */
             Broadcaster.prototype.broadcast = function () {
                 var _this = this;
@@ -1101,14 +1102,14 @@ var Plottable;
                 for (var _i = 0; _i < arguments.length; _i++) {
                     args[_i - 0] = arguments[_i];
                 }
-                this._key2callback.values().forEach(function (callback) { return callback(_this.listenable, args); });
+                this._key2callback.values().forEach(function (callback) { return callback(_this._listenable, args); });
                 return this;
             };
             /**
              * Deregisters the callback associated with a key.
              *
              * @param key The key to deregister.
-             * @returns {Broadcaster} this object
+             * @returns {Broadcaster} The calling Broadcaster
              */
             Broadcaster.prototype.deregisterListener = function (key) {
                 this._key2callback.delete(key);
@@ -1117,7 +1118,7 @@ var Plottable;
             /**
              * Deregisters all listeners and callbacks associated with the broadcaster.
              *
-             * @returns {Broadcaster} this object
+             * @returns {Broadcaster} The calling Broadcaster
              */
             Broadcaster.prototype.deregisterAllListeners = function () {
                 this._key2callback = new Plottable._Util.StrictEqualityAssociativeArray();
