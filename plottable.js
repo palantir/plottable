@@ -3124,6 +3124,13 @@ var Plottable;
             Rect.prototype._getIfLabelsTooWide = function () {
                 return this._labelsTooWide;
             };
+            Rect.prototype._isSelectionInBounds = function (selection, xExtent, yExtent, tolerance) {
+                var selectionX = parseFloat(selection.attr("x"));
+                var selectionY = parseFloat(selection.attr("y"));
+                var selectionWidth = parseFloat(selection.attr("width"));
+                var selectionHeight = parseFloat(selection.attr("height"));
+                return selectionX + selectionWidth >= xExtent.min - tolerance && selectionX <= xExtent.max + tolerance && selectionY + selectionHeight >= yExtent.min - tolerance && selectionY <= yExtent.max + tolerance;
+            };
             Rect.prototype.drawText = function (data, attrToProjector, userMetadata, plotMetadata) {
                 var _this = this;
                 var labelTooWide = data.map(function (d, i) {

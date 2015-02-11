@@ -33,6 +33,15 @@ export module _Drawer {
       return this._labelsTooWide;
     }
 
+    public _isSelectionInBounds(selection: D3.Selection, xExtent: Extent, yExtent: Extent, tolerance: number): boolean {
+      var selectionX = parseFloat(selection.attr("x"));
+      var selectionY = parseFloat(selection.attr("y"));
+      var selectionWidth = parseFloat(selection.attr("width"));
+      var selectionHeight = parseFloat(selection.attr("height"));
+      return selectionX + selectionWidth >= xExtent.min - tolerance && selectionX <= xExtent.max + tolerance &&
+        selectionY + selectionHeight >= yExtent.min - tolerance && selectionY <= yExtent.max + tolerance;
+    }
+
     public drawText(data: any[], attrToProjector: AttributeToProjector, userMetadata: any, plotMetadata: Plot.PlotMetadata) {
       var labelTooWide: boolean[] = data.map((d, i) => {
         var text = attrToProjector["label"](d, i, userMetadata, plotMetadata).toString();
