@@ -5,8 +5,8 @@ export module Plot {
   export class AbstractXYPlot<X,Y> extends AbstractPlot {
     protected _xScale: Scale.AbstractScale<X, number>;
     protected _yScale: Scale.AbstractScale<Y, number>;
-    private _autoAdjustXScaleDomain = false;
-    private _autoAdjustYScaleDomain = false;
+    private _autoAdjustXScaleDomain: boolean;
+    private _autoAdjustYScaleDomain: boolean;
 
     /**
      * Constructs an XYPlot.
@@ -20,18 +20,23 @@ export module Plot {
      * @param {Scale} yScale The y scale to use.
      */
     constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<Y, number>) {
-      super();
       if (xScale == null || yScale == null) {
         throw new Error("XYPlots require an xScale and yScale");
       }
-      this.classed("xy-plot", true);
+
+      super();
+      _Util.Methods.uniqPush(this._cssClasses, "xy-plot");
 
       this._xScale = xScale;
       this._yScale = yScale;
-      this._updateXDomainer();
+
+      AbstractXYPlot.updateScaleDomainer(xScale);
       xScale.broadcaster.registerListener("yDomainAdjustment" + this.getID(), () => this._adjustYDomainOnChangeFromX());
-      this._updateYDomainer();
+      AbstractXYPlot.updateScaleDomainer(yScale);
       yScale.broadcaster.registerListener("xDomainAdjustment" + this.getID(), () => this._adjustXDomainOnChangeFromY());
+
+      this._autoAdjustXScaleDomain = false;
+      this._autoAdjustYScaleDomain = false;
     }
 
     /**
@@ -127,19 +132,18 @@ export module Plot {
     }
 
     protected _updateXDomainer() {
-      if (this._xScale instanceof Scale.AbstractQuantitative) {
-        var scale = <Scale.AbstractQuantitative<any>> this._xScale;
-        if (!scale._userSetDomainer) {
-          scale.domainer().pad().nice();
-        }
-      }
+      AbstractXYPlot.updateScaleDomainer(this._xScale);
     }
 
     protected _updateYDomainer() {
-      if (this._yScale instanceof Scale.AbstractQuantitative) {
-        var scale = <Scale.AbstractQuantitative<any>> this._yScale;
-        if (!scale._userSetDomainer) {
-          scale.domainer().pad().nice();
+      AbstractXYPlot.updateScaleDomainer(this._yScale);
+    }
+
+    private static updateScaleDomainer(scale: Scale.AbstractScale<any, number>) {
+      if (scale instanceof Scale.AbstractQuantitative) {
+        var qScale = <Scale.AbstractQuantitative<any>> scale;
+        if (!qScale._userSetDomainer) {
+          qScale.domainer().pad().nice();
         }
       }
     }

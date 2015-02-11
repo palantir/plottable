@@ -6002,7 +6002,7 @@ var Plottable;
                 this._animators = {};
                 this._animateOnNextRender = true;
                 this.clipPathEnabled = true;
-                this.classed("plot", true);
+                Plottable._Util.Methods.uniqPush(this._cssClasses, "plot");
                 this._key2PlotDatasetKey = d3.map();
                 this._datasetKeysInOrder = [];
                 this._nextSeriesIndex = 0;
@@ -6328,7 +6328,7 @@ var Plottable;
             function Pie() {
                 _super.call(this);
                 this._colorScale = new Plottable.Scale.Color();
-                this.classed("pie-plot", true);
+                Plottable._Util.Methods.uniqPush(this._cssClasses, "pie-plot");
             }
             Pie.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
                 _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
@@ -6386,19 +6386,19 @@ var Plottable;
              */
             function AbstractXYPlot(xScale, yScale) {
                 var _this = this;
-                _super.call(this);
-                this._autoAdjustXScaleDomain = false;
-                this._autoAdjustYScaleDomain = false;
                 if (xScale == null || yScale == null) {
                     throw new Error("XYPlots require an xScale and yScale");
                 }
-                this.classed("xy-plot", true);
+                _super.call(this);
+                Plottable._Util.Methods.uniqPush(this._cssClasses, "xy-plot");
                 this._xScale = xScale;
                 this._yScale = yScale;
-                this._updateXDomainer();
+                AbstractXYPlot.updateScaleDomainer(xScale);
                 xScale.broadcaster.registerListener("yDomainAdjustment" + this.getID(), function () { return _this._adjustYDomainOnChangeFromX(); });
-                this._updateYDomainer();
+                AbstractXYPlot.updateScaleDomainer(yScale);
                 yScale.broadcaster.registerListener("xDomainAdjustment" + this.getID(), function () { return _this._adjustXDomainOnChangeFromY(); });
+                this._autoAdjustXScaleDomain = false;
+                this._autoAdjustYScaleDomain = false;
             }
             /**
              * @param {string} attrToSet One of ["x", "y"] which determines the point's
@@ -6485,18 +6485,16 @@ var Plottable;
                 }
             };
             AbstractXYPlot.prototype._updateXDomainer = function () {
-                if (this._xScale instanceof Plottable.Scale.AbstractQuantitative) {
-                    var scale = this._xScale;
-                    if (!scale._userSetDomainer) {
-                        scale.domainer().pad().nice();
-                    }
-                }
+                AbstractXYPlot.updateScaleDomainer(this._xScale);
             };
             AbstractXYPlot.prototype._updateYDomainer = function () {
-                if (this._yScale instanceof Plottable.Scale.AbstractQuantitative) {
-                    var scale = this._yScale;
-                    if (!scale._userSetDomainer) {
-                        scale.domainer().pad().nice();
+                AbstractXYPlot.updateScaleDomainer(this._yScale);
+            };
+            AbstractXYPlot.updateScaleDomainer = function (scale) {
+                if (scale instanceof Plottable.Scale.AbstractQuantitative) {
+                    var qScale = scale;
+                    if (!qScale._userSetDomainer) {
+                        qScale.domainer().pad().nice();
                     }
                 }
             };
@@ -6600,10 +6598,10 @@ var Plottable;
             function Scatter(xScale, yScale) {
                 _super.call(this, xScale, yScale);
                 this._closeDetectionRadius = 5;
-                this.classed("scatter-plot", true);
+                Plottable._Util.Methods.uniqPush(this._cssClasses, "scatter-plot");
                 this._defaultFillColor = new Plottable.Scale.Color().range()[0];
-                this.animator("circles-reset", new Plottable.Animator.Null());
-                this.animator("circles", new Plottable.Animator.Base().duration(250).delay(5));
+                this._animators["circles-reset"] = new Plottable.Animator.Null();
+                this._animators["circles"] = new Plottable.Animator.Base().duration(250).delay(5);
             }
             /**
              * @param {string} attrToSet One of ["x", "y", "cx", "cy", "r",
@@ -6744,12 +6742,12 @@ var Plottable;
              */
             function Grid(xScale, yScale, colorScale) {
                 _super.call(this, xScale, yScale);
-                this.classed("grid-plot", true);
+                Plottable._Util.Methods.uniqPush(this._cssClasses, "grid-plot");
                 // The x and y scales should render in bands with no padding
                 this._xScale.rangeType("bands", 0, 0);
                 this._yScale.rangeType("bands", 0, 0);
                 this._colorScale = colorScale;
-                this.animator("cells", new Plottable.Animator.Null());
+                this._animators["cells"] = new Plottable.Animator.Null();
             }
             Grid.prototype.addDataset = function (keyOrDataset, dataset) {
                 if (this._datasetKeysInOrder.length === 1) {
@@ -6819,13 +6817,13 @@ var Plottable;
                 this._barLabelsEnabled = false;
                 this._hoverMode = "point";
                 this._hideBarsIfAnyAreTooWide = true;
-                this.classed("bar-plot", true);
+                Plottable._Util.Methods.uniqPush(this._cssClasses, "bar-plot");
                 this._defaultFillColor = new Plottable.Scale.Color().range()[0];
-                this.animator("bars-reset", new Plottable.Animator.Null());
-                this.animator("bars", new Plottable.Animator.Base());
-                this.animator("baseline", new Plottable.Animator.Null());
+                this._animators["bar-reset"] = new Plottable.Animator.Null();
+                this._animators["bars"] = new Plottable.Animator.Base();
+                this._animators["baseline"] = new Plottable.Animator.Null();
                 this._isVertical = isVertical;
-                this.baseline(0);
+                this._baselineValue = 0;
             }
             Bar.prototype._getDrawer = function (key) {
                 return new Plottable._Drawer.Rect(key, this._isVertical);
@@ -7307,9 +7305,9 @@ var Plottable;
             function Line(xScale, yScale) {
                 _super.call(this, xScale, yScale);
                 this._hoverDetectionRadius = 15;
-                this.classed("line-plot", true);
-                this.animator("reset", new Plottable.Animator.Null());
-                this.animator("main", new Plottable.Animator.Base().duration(600).easing("exp-in-out"));
+                Plottable._Util.Methods.uniqPush(this._cssClasses, "line-plot");
+                this._animators["reset"] = new Plottable.Animator.Null();
+                this._animators["main"] = new Plottable.Animator.Base().duration(600).easing("exp-in-out");
                 this._defaultStrokeColor = new Plottable.Scale.Color().range()[0];
             }
             Line.prototype._setup = function () {
@@ -7456,11 +7454,15 @@ var Plottable;
              */
             function Area(xScale, yScale) {
                 _super.call(this, xScale, yScale);
-                this.classed("area-plot", true);
-                this.project("y0", 0, yScale); // default
-                this.animator("reset", new Plottable.Animator.Null());
-                this.animator("main", new Plottable.Animator.Base().duration(600).easing("exp-in-out"));
+                Plottable._Util.Methods.uniqPush(this._cssClasses, "area-plot");
+                this._animators["reset"] = new Plottable.Animator.Null();
+                this._animators["main"] = new Plottable.Animator.Base().duration(600).easing("exp-in-out");
                 this._defaultFillColor = new Plottable.Scale.Color().range()[0];
+                this._projections["y0"] = {
+                    accessor: d3.functor(0),
+                    scale: yScale,
+                    attribute: "y0"
+                };
             }
             Area.prototype._onDatasetUpdate = function () {
                 _super.prototype._onDatasetUpdate.call(this);
@@ -7831,7 +7833,6 @@ var Plottable;
             function StackedArea(xScale, yScale) {
                 _super.call(this, xScale, yScale);
                 this._baselineValue = 0;
-                this.classed("area-plot", true);
                 this._isVertical = true;
             }
             StackedArea.prototype._getDrawer = function (key) {

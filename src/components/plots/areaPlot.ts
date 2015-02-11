@@ -18,14 +18,19 @@ export module Plot {
      */
     constructor(xScale: Scale.AbstractQuantitative<X>, yScale: Scale.AbstractQuantitative<number>) {
       super(xScale, yScale);
-      this.classed("area-plot", true);
-      this.project("y0", 0, yScale); // default
+      _Util.Methods.uniqPush(this._cssClasses, "area-plot");
 
-      this.animator("reset", new Animator.Null());
-      this.animator("main", new Animator.Base()
-                                        .duration(600)
-                                        .easing("exp-in-out"));
+      this._animators["reset"] = new Animator.Null();
+      this._animators["main"] = new Animator.Base()
+                                            .duration(600)
+                                            .easing("exp-in-out");
       this._defaultFillColor = new Scale.Color().range()[0];
+
+      this._projections["y0"] = {
+        accessor: d3.functor(0),
+        scale: yScale,
+        attribute: "y0"
+      };
     }
 
     protected _onDatasetUpdate() {

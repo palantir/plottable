@@ -25,7 +25,7 @@ export module Plot {
     protected _projections: { [attrToSet: string]: _Projection; } = {};
 
     protected _animate: boolean = false;
-    private _animators: Animator.PlotAnimatorMap = {};
+    protected _animators: Animator.PlotAnimatorMap = {};
     protected _animateOnNextRender = true;
     private _nextSeriesIndex: number;
 
@@ -43,7 +43,7 @@ export module Plot {
     constructor() {
       super();
       this.clipPathEnabled = true;
-      this.classed("plot", true);
+      _Util.Methods.uniqPush(this._cssClasses, "plot");
       this._key2PlotDatasetKey = d3.map();
       this._datasetKeysInOrder = [];
       this._nextSeriesIndex = 0;

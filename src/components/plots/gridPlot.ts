@@ -19,14 +19,14 @@ export module Plot {
      */
     constructor(xScale: Scale.Ordinal, yScale: Scale.Ordinal, colorScale: Scale.AbstractScale<any, string>) {
       super(xScale, yScale);
-      this.classed("grid-plot", true);
+      _Util.Methods.uniqPush(this._cssClasses, "grid-plot");
 
       // The x and y scales should render in bands with no padding
       (<Scale.Ordinal> this._xScale).rangeType("bands", 0, 0);
       (<Scale.Ordinal> this._yScale).rangeType("bands", 0, 0);
 
       this._colorScale = colorScale;
-      this.animator("cells", new Animator.Null());
+      this._animators["cells"] = new Animator.Null();
     }
 
     public addDataset(keyOrDataset: any, dataset?: any) {

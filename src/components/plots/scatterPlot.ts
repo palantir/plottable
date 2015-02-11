@@ -15,13 +15,14 @@ export module Plot {
      */
     constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<Y, number>) {
       super(xScale, yScale);
-      this.classed("scatter-plot", true);
+
+      _Util.Methods.uniqPush(this._cssClasses, "scatter-plot");
       this._defaultFillColor = new Scale.Color().range()[0];
 
-      this.animator("circles-reset", new Animator.Null());
-      this.animator("circles", new Animator.Base()
-                                           .duration(250)
-                                           .delay(5));
+      this._animators["circles-reset"] = new Animator.Null();
+      this._animators["circles"] = new Animator.Base()
+                                               .duration(250)
+                                               .delay(5);
     }
 
     /**
