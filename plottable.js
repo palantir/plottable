@@ -6425,16 +6425,32 @@ var Plottable;
                 }
                 return this;
             };
-            AbstractPlot.prototype.removeDataset = function (datasetOrKeyOrArray) {
+            /**
+             * Removes a dataset by the given identifier
+             *
+             * @param {string | Dataset | any[]} datasetIdentifer The identifier for the dataset to remove
+             * If a string is inputted, it is interpreted as the dataset key to remove.
+             * If a Dataset is inputted, the first Dataset in the plot that is the same will be removed.
+             * If an any[] is inputted, the first data array in the plot that is the same will be removed.
+             * @returns {AbstractPlot} The calling AbstractPlot.
+             */
+            AbstractPlot.prototype.removeDataset = function (datasetIdentifier) {
                 var key;
-                if (typeof (datasetOrKeyOrArray) === "string") {
-                    key = datasetOrKeyOrArray;
+                if (typeof (datasetIdentifier) === "string") {
+                    key = datasetIdentifier;
                 }
-                else if (datasetOrKeyOrArray instanceof Plottable.Dataset || datasetOrKeyOrArray instanceof Array) {
-                    var array = (datasetOrKeyOrArray instanceof Plottable.Dataset) ? this.datasets() : this.datasets().map(function (d) { return d.data(); });
-                    var idx = array.indexOf(datasetOrKeyOrArray);
-                    if (idx !== -1) {
-                        key = this._datasetKeysInOrder[idx];
+                else if (typeof (datasetIdentifier) === "object") {
+                    var index = -1;
+                    if (typeof (datasetIdentifier.data) !== "undefined") {
+                        var datasetArray = this.datasets();
+                        index = datasetArray.indexOf(datasetIdentifier);
+                    }
+                    else if (typeof (datasetIdentifier.map) !== "undefined") {
+                        var dataArray = this.datasets().map(function (d) { return d.data(); });
+                        index = dataArray.indexOf(datasetIdentifier);
+                    }
+                    if (index !== -1) {
+                        key = this._datasetKeysInOrder[index];
                     }
                 }
                 return this._removeDataset(key);
