@@ -1528,6 +1528,16 @@ declare module Plottable {
              */
             _getRenderArea(): D3.Selection;
             _getSelector(): string;
+            /**
+             * Checks if the given selection is within the specified bounds
+             *
+             * @param {D3.Selection} selection The selection to check
+             * @param {Extent} xExtent The bounds on the x-coordinate space
+             * @param {Extent} yExtent The bounds on the y-coordinate space
+             * @param {number} tolerance The tolerance of how close the selection is
+             * @returns {boolean} if the selection is within the bounds
+             */
+            _isSelectionInBounds(selection: D3.Selection, xExtent: Extent, yExtent: Extent, tolerance: number): boolean;
         }
     }
 }
@@ -2732,7 +2742,17 @@ declare module Plottable {
              */
             protected _getPlotMetadataForDataset(key: string): PlotMetadata;
             getAllSelections(): D3.Selection;
-            getSelections(xValOrExtent: number | Extent, yValOrExtent: number | Extent): D3.Selection;
+            /**
+             * Gets the selections under the given pixel position (if [xValOrExtent]
+             * and [yValOrExtent] are {number}s), under a given line (if only one
+             * of [xValOrExtent] or [yValOrExtent] are {Extent}s) or are under a
+             * 2D area (if [xValOrExtent] and [yValOrExtent] are both {Extent}s).
+             *
+             * @param {number | Extent} xValOrExtent The pixel x position, or range of x values.
+             * @param {number | Extent} yValOrExtent The pixel y position, or range of y values.
+             * @returns {D3.Selection} The selections within under the given bounds
+             */
+            getSelections(xValOrExtent: number | Extent, yValOrExtent: number | Extent, tolerance?: number): D3.Selection;
         }
     }
 }

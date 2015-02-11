@@ -2849,6 +2849,29 @@ var Plottable;
             AbstractDrawer.prototype._getSelector = function () {
                 return "";
             };
+            /**
+             * Checks if the given selection is within the specified bounds
+             *
+             * @param {D3.Selection} selection The selection to check
+             * @param {Extent} xExtent The bounds on the x-coordinate space
+             * @param {Extent} yExtent The bounds on the y-coordinate space
+             * @param {number} tolerance The tolerance of how close the selection is
+             * @returns {boolean} if the selection is within the bounds
+             */
+            AbstractDrawer.prototype._isSelectionInBounds = function (selection, xExtent, yExtent, tolerance) {
+                return true;
+            };
+            AbstractDrawer._parseExtent = function (input) {
+                if (typeof (input) === "number") {
+                    return { min: input, max: input };
+                }
+                else if (input instanceof Object && "min" in input && "max" in input) {
+                    return input;
+                }
+                else {
+                    throw new Error("input '" + input + "' can't be parsed as an Extent");
+                }
+            };
             return AbstractDrawer;
         })();
         _Drawer.AbstractDrawer = AbstractDrawer;
@@ -6519,19 +6542,19 @@ var Plottable;
              * @param {number | Extent} yValOrExtent The pixel y position, or range of y values.
              * @returns {D3.Selection} The selections within under the given bounds
              */
-            AbstractPlot.prototype.getSelections = function (xValOrExtent, yValOrExtent) {
+            AbstractPlot.prototype.getSelections = function (xValOrExtent, yValOrExtent, tolerance) {
                 var _this = this;
+                if (tolerance === void 0) { tolerance = 0.5; }
                 var xExtent = AbstractPlot._parseExtent(xValOrExtent);
                 var yExtent = AbstractPlot._parseExtent(yValOrExtent);
-                var tolerance = 0.5;
                 var selections = [];
                 this._datasetKeysInOrder.forEach(function (key) {
                     var drawer = _this._key2PlotDatasetKey.get(key).drawer;
                     drawer._getRenderArea().selectAll(drawer._getSelector()).each(function () {
                         var selection = d3.select(this);
                         // Check if extent covers the selection
-                        if (true) {
-                            selections.push(selection);
+                        if (drawer._isSelectionInBounds(selection, xExtent, yExtent, tolerance)) {
+                            selections.push(this);
                         }
                     });
                 });

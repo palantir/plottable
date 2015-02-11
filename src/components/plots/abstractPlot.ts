@@ -440,10 +440,9 @@ export module Plot {
      * @param {number | Extent} yValOrExtent The pixel y position, or range of y values.
      * @returns {D3.Selection} The selections within under the given bounds
      */
-    public getSelections(xValOrExtent: number | Extent, yValOrExtent: number | Extent): D3.Selection {
+    public getSelections(xValOrExtent: number | Extent, yValOrExtent: number | Extent, tolerance = 0.5): D3.Selection {
       var xExtent: Extent = AbstractPlot._parseExtent(xValOrExtent);
       var yExtent: Extent = AbstractPlot._parseExtent(yValOrExtent);
-      var tolerance: number = 0.5;
 
       var selections: EventTarget[] = [];
       this._datasetKeysInOrder.forEach((key: string) => {
@@ -451,8 +450,8 @@ export module Plot {
         drawer._getRenderArea().selectAll(drawer._getSelector()).each(function () {
           var selection = d3.select(this);
           // Check if extent covers the selection
-          if (true) {
-            selections.push(selection);
+          if (drawer._isSelectionInBounds(selection, xExtent, yExtent, tolerance)) {
+            selections.push(this);
           }
         });
       });
@@ -469,6 +468,7 @@ export module Plot {
         throw new Error("input '" + input + "' can't be parsed as an Extent");
       }
     }
+
   }
 }
 }
