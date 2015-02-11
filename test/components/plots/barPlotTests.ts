@@ -76,7 +76,7 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("getBar()", () => {
+      it("getSelections()", () => {
         var bar: D3.Selection = barPlot.getSelections(155, 150); // in the middle of bar 0
 
         assert.lengthOf(bar[0], 1, "getBar returns a bar");

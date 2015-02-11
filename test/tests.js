@@ -2493,7 +2493,7 @@ describe("Plots", function () {
                 assert.equal(baseline.attr("x2"), SVG_WIDTH, "the baseline ends at the edge of the chart");
                 svg.remove();
             });
-            it("getBar()", function () {
+            it("getSelections()", function () {
                 var bar = barPlot.getSelections(155, 150); // in the middle of bar 0
                 assert.lengthOf(bar[0], 1, "getBar returns a bar");
                 assert.equal(bar.data()[0], dataset.data()[0], "the data in the bar matches the datasource");
