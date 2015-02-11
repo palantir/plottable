@@ -63,7 +63,7 @@ export module Animator {
       return time;
     }
 
-    public animate(selection: any, attrToProjector: AttributeToProjector): any {
+    public animate(selection: any, attrToProjector: AttributeToProjector): D3.Transition.Transition {
       var numberOfIterations = selection[0].length;
       var maxDelayForLastIteration = Math.max(this.maxTotalDuration() - this.duration(), 0);
       var adjustedIterativeDelay = Math.min(this.maxIterativeDelay(), maxDelayForLastIteration / Math.max(numberOfIterations - 1, 1));
