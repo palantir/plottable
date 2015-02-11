@@ -14,15 +14,15 @@ function run(svg, data, Plottable) {
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");
   var title = new Plottable.Component.TitleLabel("Hover over points");
 
-  var ds1 = new Plottable.Dataset(data[0], { color: "blue", r: 10, shift: 0.2 });
-  var ds2 = new Plottable.Dataset(data[1], { color: "red", r: 15, shift: 0 });
+  var ds1 = new Plottable.Dataset(data[0], { color: "blue", r: 10 });
+  var ds2 = new Plottable.Dataset(data[1], { color: "red", r: 15 });
 
   var plot = new Plottable.Plot.Scatter(xScale, yScale)
     .addDataset(ds1)
     .addDataset(ds2)
     .project("r", function(d, i, u) { return u.r; })
     .project("fill", function(d, i, u) { return u.color; })
-    .project("x", function(d, i, u) { return d.x + u.shift; }, xScale)
+    .project("x", function(d, i, u) { return d.x; }, xScale)
     .project("y", "y", yScale);
 
   var chart = new Plottable.Component.Table([
