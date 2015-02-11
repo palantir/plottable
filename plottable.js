@@ -4695,24 +4695,21 @@ var Plottable;
                 });
                 // We use the ClientRects because x1/x2 attributes are not comparable to ClientRects of labels
                 var visibleTickMarkRects = visibleTickMarks[0].map(function (mark) { return mark.getBoundingClientRect(); });
-                // Checks to see whether a tickLabel is overlapping with any visible tick marks
-                var isOverlappingTick = function (tickLabel) {
-                    for (var i = 0; i < visibleTickMarkRects.length; i++) {
-                        var tickPosition = visibleTickMarkRects[i].left;
-                        if (tickPosition > tickLabel.left && tickPosition < tickLabel.right) {
-                            return true;
-                        }
-                    }
-                    return false;
-                };
                 var visibleTickLabels = this._tierLabelContainers[index].selectAll("." + Axis.AbstractAxis.TICK_LABEL_CLASS).filter(function (d, i) {
                     return d3.select(this).style("visibility") === "visible";
                 });
                 var lastLabelClientRect;
-                visibleTickLabels.each(function (d) {
+                /*
+                 * Strategy for approaching this issue
+                 * - Measure the text width and see if the text can fit into the section provided. If not, hide it
+                 * - Then do the greedy hiding algorithm described here
+                 */
+                visibleTickLabels.each(function (d, i) {
                     var clientRect = this.getBoundingClientRect();
                     var tickLabel = d3.select(this);
-                    if (!isInsideBBox(clientRect) || (lastLabelClientRect != null && Plottable._Util.DOM.boxesOverlap(clientRect, lastLabelClientRect)) || isOverlappingTick(clientRect)) {
+                    var leadingTickMark = visibleTickMarkRects[i];
+                    var trailingTickMark = visibleTickMarkRects[i + 1];
+                    if (!isInsideBBox(clientRect) || (lastLabelClientRect != null && Plottable._Util.DOM.boxesOverlap(clientRect, lastLabelClientRect)) || (leadingTickMark.left > clientRect.left || trailingTickMark.left < clientRect.right)) {
                         tickLabel.style("visibility", "hidden");
                     }
                     else {
