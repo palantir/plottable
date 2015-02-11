@@ -6509,6 +6509,37 @@ var Plottable;
                 });
                 return allSelections;
             };
+            AbstractPlot.prototype.getSelections = function (xValOrExtent, yValOrExtent) {
+                var _this = this;
+                if (!this._isSetup) {
+                    return d3.select();
+                }
+                var xExtent = AbstractPlot._parseExtent(xValOrExtent);
+                var yExtent = AbstractPlot._parseExtent(yValOrExtent);
+                var tolerance = 0.5;
+                var selections = [];
+                this._datasetKeysInOrder.forEach(function (key) {
+                    var drawer = _this._key2PlotDatasetKey.get(key).drawer;
+                    drawer._getRenderArea().selectAll(drawer._getSelector())[0].forEach(function (selection) {
+                        // Check if extent covers the selection
+                        if (true) {
+                            selections.push(selection);
+                        }
+                    });
+                });
+                return d3.selectAll(selections);
+            };
+            AbstractPlot._parseExtent = function (input) {
+                if (typeof (input) === "number") {
+                    return { min: input, max: input };
+                }
+                else if (input instanceof Object && "min" in input && "max" in input) {
+                    return input;
+                }
+                else {
+                    throw new Error("input '" + input + "' can't be parsed as an Extent");
+                }
+            };
             return AbstractPlot;
         })(Plottable.Component.AbstractComponent);
         Plot.AbstractPlot = AbstractPlot;

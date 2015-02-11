@@ -2732,6 +2732,7 @@ declare module Plottable {
              */
             protected _getPlotMetadataForDataset(key: string): PlotMetadata;
             getAllSelections(): D3.Selection;
+            getSelections(xValOrExtent: number | Extent, yValOrExtent: number | Extent): D3.Selection;
         }
     }
 }

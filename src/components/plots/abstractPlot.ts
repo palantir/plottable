@@ -429,6 +429,39 @@ export module Plot {
 
       return allSelections;
     }
+
+    public getSelections(xValOrExtent: number | Extent, yValOrExtent: number | Extent): D3.Selection {
+      if (!this._isSetup) {
+        return d3.select();
+      }
+
+      var xExtent: Extent = AbstractPlot._parseExtent(xValOrExtent);
+      var yExtent: Extent = AbstractPlot._parseExtent(yValOrExtent);
+      var tolerance: number = 0.5;
+
+      var selections: EventTarget[] = [];
+      this._datasetKeysInOrder.forEach((key: string) => {
+        var drawer = this._key2PlotDatasetKey.get(key).drawer;
+        drawer._getRenderArea().selectAll(drawer._getSelector())[0].forEach((selection: EventTarget) => {
+          // Check if extent covers the selection
+          if (true) {
+            selections.push(selection);
+          }
+        });
+      });
+
+      return d3.selectAll(selections);
+    }
+
+    private static _parseExtent(input: any): Extent {
+      if (typeof(input) === "number") {
+        return {min: input, max: input};
+      } else if (input instanceof Object && "min" in input && "max" in input) {
+        return <Extent> input;
+      } else {
+        throw new Error("input '" + input + "' can't be parsed as an Extent");
+      }
+    }
   }
 }
 }
