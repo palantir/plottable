@@ -40,8 +40,8 @@ export module Component {
       _Util.Methods.uniqPush(this._cssClasses, "legend");
       this._maxEntriesPerRow = 1;
       this._scale = colorScale;
-      this._xAlignProportion = AbstractComponent._xAlignmentToProportion("center");
-      this._yAlignProportion = AbstractComponent._yAlignmentToProportion("center");
+      this._xAlignProportion = AbstractComponent._xAlignmentToProportion("right");
+      this._yAlignProportion = AbstractComponent._yAlignmentToProportion("top");
       this._fixedWidthFlag = true;
       this._fixedHeightFlag = true;
       this._sortFn = (a: string, b: string) => this._scale.domain().indexOf(a) - this._scale.domain().indexOf(b);
