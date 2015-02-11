@@ -437,19 +437,18 @@ export module Plot {
         datasetKeyArray = <string[]> datasetKeys;
       }
 
-      var allSelections = d3.select();
-      allSelections[0] = [];
+      var allSelections: EventTarget[] = [];
 
       datasetKeyArray.forEach((datasetKey) => {
         var plotDatasetKey = this._key2PlotDatasetKey.get(datasetKey);
         if (plotDatasetKey == null) { return; }
         var drawer = plotDatasetKey.drawer;
-        drawer._getRenderArea().selectAll(drawer._getSelector())[0].forEach((selection: EventTarget) => {
-          allSelections[0].push(selection);
+        drawer._getRenderArea().selectAll(drawer._getSelector()).each(function () {
+          allSelections.push(this);
         });
       });
 
-      return allSelections;
+      return d3.selectAll(allSelections);
     }
   }
 }
