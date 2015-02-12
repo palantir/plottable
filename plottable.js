@@ -6679,9 +6679,9 @@ var Plottable;
                 Plottable._Util.Methods.uniqPush(this._cssClasses, "xy-plot");
                 this._xScale = xScale;
                 this._yScale = yScale;
-                AbstractXYPlot.updateScaleDomainer(xScale);
+                AbstractXYPlot._updateScaleDomainer(xScale);
                 xScale.broadcaster.registerListener("yDomainAdjustment" + this.getID(), function () { return _this._adjustYDomainOnChangeFromX(); });
-                AbstractXYPlot.updateScaleDomainer(yScale);
+                AbstractXYPlot._updateScaleDomainer(yScale);
                 yScale.broadcaster.registerListener("xDomainAdjustment" + this.getID(), function () { return _this._adjustXDomainOnChangeFromY(); });
                 this._autoAdjustXScaleDomain = false;
                 this._autoAdjustYScaleDomain = false;
@@ -6771,12 +6771,12 @@ var Plottable;
                 }
             };
             AbstractXYPlot.prototype._updateXDomainer = function () {
-                AbstractXYPlot.updateScaleDomainer(this._xScale);
+                AbstractXYPlot._updateScaleDomainer(this._xScale);
             };
             AbstractXYPlot.prototype._updateYDomainer = function () {
-                AbstractXYPlot.updateScaleDomainer(this._yScale);
+                AbstractXYPlot._updateScaleDomainer(this._yScale);
             };
-            AbstractXYPlot.updateScaleDomainer = function (scale) {
+            AbstractXYPlot._updateScaleDomainer = function (scale) {
                 if (scale instanceof Plottable.Scale.AbstractQuantitative) {
                     var qScale = scale;
                     if (!qScale._userSetDomainer) {
