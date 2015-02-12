@@ -138,11 +138,11 @@ describe("TimeAxis", () => {
     scale.domain([new Date("2009-12-20"), new Date("2011-01-01")]);
     axis = new Plottable.Axis.Time(scale, "bottom");
     axis.renderTo(svg);
-    var tickRects = d3.selectAll("." + Plottable.Axis.AbstractAxis.TICK_MARK_CLASS)[0].map((mark: any) => mark.getBoundingClientRect());
+    var tickRects = d3.selectAll("." + Plottable.Axis.AbstractAxis.TICK_MARK_CLASS)[0].map((mark: Element) => mark.getBoundingClientRect());
     var labelRects = d3.selectAll("." + Plottable.Axis.AbstractAxis.TICK_LABEL_CLASS)
-        .filter(function(d: any, i: number) {
+        .filter(function(d: Element, i: number) {
           return d3.select(this).style("visibility") === "visible";
-        })[0].map((label: any) => label.getBoundingClientRect());
+        })[0].map((label: Element) => label.getBoundingClientRect());
     labelRects.forEach(function(labelRect: ClientRect) {
       tickRects.forEach(function(tickRect: ClientRect) {
         assert.isFalse(Plottable._Util.DOM.boxesOverlap(labelRect, tickRect), "visible label does not overlap with a tick");

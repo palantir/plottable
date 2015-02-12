@@ -4699,11 +4699,6 @@ var Plottable;
                     return d3.select(this).style("visibility") === "visible";
                 });
                 var lastLabelClientRect;
-                /*
-                 * Strategy for approaching this issue
-                 * - Measure the text width and see if the text can fit into the section provided. If not, hide it
-                 * - Then do the greedy hiding algorithm described here
-                 */
                 visibleTickLabels.each(function (d, i) {
                     var clientRect = this.getBoundingClientRect();
                     var tickLabel = d3.select(this);
