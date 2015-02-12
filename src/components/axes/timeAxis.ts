@@ -471,7 +471,7 @@ export module Axis {
         var leadingTickMark = visibleTickMarkRects[i];
         var trailingTickMark = visibleTickMarkRects[i+1];
         if (!isInsideBBox(clientRect) || (lastLabelClientRect != null && _Util.DOM.boxesOverlap(clientRect, lastLabelClientRect))
-            || (leadingTickMark.left > clientRect.left || trailingTickMark.left < clientRect.right)) {
+            || (leadingTickMark.right > clientRect.left || trailingTickMark.left < clientRect.right)) {
           tickLabel.style("visibility", "hidden");
         } else {
           lastLabelClientRect = clientRect;
