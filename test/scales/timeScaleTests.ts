@@ -20,6 +20,11 @@ describe("TimeScale tests", () => {
 		checkDomain(["Oct 1, 2014", "Nov 1, 2014"]);
 	});
 
+	it("can't set reversed domain", () => {
+		var scale = new Plottable.Scale.Time();
+		assert.throws(() => scale.domain(["1985-10-26", "1955-11-05"]), "chronological");
+	});
+
 	it("time coercer works as intended", () => {
 		var tc = new Plottable.Scale.Time()._typeCoercer;
 		assert.equal(tc(null).getMilliseconds(), 0, "null converted to Date(0)");
