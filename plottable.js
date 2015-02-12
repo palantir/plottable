@@ -7113,7 +7113,13 @@ var Plottable;
                 this._animators["bars"] = new Plottable.Animator.Base();
                 this._animators["baseline"] = new Plottable.Animator.Null();
                 this._isVertical = isVertical;
-                this._baselineValue = 0;
+                this.baseline(0);
+                if (isVertical) {
+                    Bar._updateDomainerBaseline(yScale, 0, this._plottableID);
+                }
+                else {
+                    Bar._updateDomainerBaseline(xScale, 0, this._plottableID);
+                }
             }
             Bar.prototype._getDrawer = function (key) {
                 return new Plottable._Drawer.Rect(key, this._isVertical);
@@ -7218,21 +7224,24 @@ var Plottable;
                 });
                 return bars;
             };
-            Bar.prototype._updateDomainer = function (scale) {
+            Bar._updateDomainerBaseline = function (scale, baselineValue, id) {
                 if (scale instanceof Plottable.Scale.AbstractQuantitative) {
                     var qscale = scale;
                     if (!qscale._userSetDomainer) {
-                        if (this._baselineValue != null) {
-                            qscale.domainer().addPaddingException(this._baselineValue, "BAR_PLOT+" + this.getID()).addIncludedValue(this._baselineValue, "BAR_PLOT+" + this.getID());
+                        if (baselineValue != null) {
+                            qscale.domainer().addPaddingException(baselineValue, "BAR_PLOT+" + id).addIncludedValue(baselineValue, "BAR_PLOT+" + id);
                         }
                         else {
-                            qscale.domainer().removePaddingException("BAR_PLOT+" + this.getID()).removeIncludedValue("BAR_PLOT+" + this.getID());
+                            qscale.domainer().removePaddingException("BAR_PLOT+" + id).removeIncludedValue("BAR_PLOT+" + id);
                         }
                         qscale.domainer().pad().nice();
                     }
                     // prepending "BAR_PLOT" is unnecessary but reduces likely of user accidentally creating collisions
                     qscale._autoDomainIfAutomaticMode();
                 }
+            };
+            Bar.prototype._updateDomainer = function (scale) {
+                Bar._updateDomainerBaseline(scale, this.baseline(), this.getID());
             };
             Bar.prototype._updateYDomainer = function () {
                 if (this._isVertical) {

@@ -452,6 +452,7 @@ declare module Plottable {
          * unique ID.
          */
         class PlottableObject {
+            protected _plottableID: number;
             getID(): number;
         }
     }
@@ -2813,6 +2814,7 @@ declare module Plottable {
             _computeLayout(offeredXOrigin?: number, offeredYOffset?: number, availableWidth?: number, availableHeight?: number): void;
             protected _updateXDomainer(): void;
             protected _updateYDomainer(): void;
+            protected static updateScaleDomainer(scale: Scale.AbstractScale<any, number>): void;
             /**
              * Adjusts both domains' extents to show all datasets.
              *

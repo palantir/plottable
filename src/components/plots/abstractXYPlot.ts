@@ -139,7 +139,7 @@ export module Plot {
       AbstractXYPlot.updateScaleDomainer(this._yScale);
     }
 
-    private static updateScaleDomainer(scale: Scale.AbstractScale<any, number>) {
+    protected static updateScaleDomainer(scale: Scale.AbstractScale<any, number>) {
       if (scale instanceof Scale.AbstractQuantitative) {
         var qScale = <Scale.AbstractQuantitative<any>> scale;
         if (!qScale._userSetDomainer) {
