@@ -2850,6 +2850,9 @@ var Plottable;
             AbstractDrawer.prototype._getSelector = function () {
                 return "";
             };
+            AbstractDrawer.prototype._getDistance = function (selection, xValue, yValue) {
+                return 0;
+            };
             return AbstractDrawer;
         })();
         _Drawer.AbstractDrawer = AbstractDrawer;
@@ -6509,6 +6512,28 @@ var Plottable;
                     });
                 });
                 return allSelections;
+            };
+            /**
+             * Retrieves the closest selection to the specified x/y point within a specified value
+             *
+             * @param {number} xValue The x value to compare against
+             * @param {number} yValue The y value to compare against
+             * @param {number} withinValue The maximum distance the closest selection can be to the point (default = Infinity)
+             * @returns {D3.Selection} The closest selection to the point within a specified value.  An empty selection otherwise.
+             */
+            AbstractPlot.prototype.getClosestSelection = function (xValue, yValue, withinValue) {
+                if (withinValue === void 0) { withinValue = Infinity; }
+                var closestSelection = d3.select();
+                var closestSelectionDistance = withinValue;
+                this._getDrawersInOrder().forEach(function (drawer) {
+                    drawer._getRenderArea().selectAll(drawer._getSelector()).each(function () {
+                        var selection = d3.select(this);
+                        if (drawer._getDistance(selection, xValue, yValue) < closestSelectionDistance) {
+                            closestSelection = selection;
+                        }
+                    });
+                });
+                return closestSelection;
             };
             return AbstractPlot;
         })(Plottable.Component.AbstractComponent);

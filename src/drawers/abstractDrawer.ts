@@ -142,6 +142,10 @@ export module _Drawer {
       return "";
     }
 
+    public _getDistance(selection: D3.Selection, xValue: number, yValue: number): number {
+      return 0;
+    }
+
   }
 }
 }
