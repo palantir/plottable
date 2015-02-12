@@ -452,6 +452,7 @@ declare module Plottable {
          * unique ID.
          */
         class PlottableObject {
+            protected _plottableID: number;
             getID(): number;
         }
     }

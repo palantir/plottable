@@ -30,9 +30,9 @@ export module Plot {
       this._xScale = xScale;
       this._yScale = yScale;
 
-      AbstractXYPlot.updateScaleDomainer(xScale);
+      AbstractXYPlot._updateScaleDomainer(xScale);
       xScale.broadcaster.registerListener("yDomainAdjustment" + this.getID(), () => this._adjustYDomainOnChangeFromX());
-      AbstractXYPlot.updateScaleDomainer(yScale);
+      AbstractXYPlot._updateScaleDomainer(yScale);
       yScale.broadcaster.registerListener("xDomainAdjustment" + this.getID(), () => this._adjustXDomainOnChangeFromY());
 
       this._autoAdjustXScaleDomain = false;
@@ -132,14 +132,14 @@ export module Plot {
     }
 
     protected _updateXDomainer() {
-      AbstractXYPlot.updateScaleDomainer(this._xScale);
+      AbstractXYPlot._updateScaleDomainer(this._xScale);
     }
 
     protected _updateYDomainer() {
-      AbstractXYPlot.updateScaleDomainer(this._yScale);
+      AbstractXYPlot._updateScaleDomainer(this._yScale);
     }
 
-    private static updateScaleDomainer(scale: Scale.AbstractScale<any, number>) {
+    private static _updateScaleDomainer(scale: Scale.AbstractScale<any, number>) {
       if (scale instanceof Scale.AbstractQuantitative) {
         var qScale = <Scale.AbstractQuantitative<any>> scale;
         if (!qScale._userSetDomainer) {

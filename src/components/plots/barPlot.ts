@@ -34,6 +34,12 @@ export module Plot {
       this._animators["baseline"] = new Animator.Null();
       this._isVertical = isVertical;
       this._baselineValue = 0;
+
+      if (isVertical) {
+        Bar._updateDomainerBaseline(yScale, 0, this._plottableID);
+      } else {
+        Bar._updateDomainerBaseline(xScale, 0, this._plottableID);
+      }
     }
 
     protected _getDrawer(key: string) {
@@ -195,24 +201,28 @@ export module Plot {
       return bars;
     }
 
-    protected _updateDomainer(scale: Scale.AbstractScale<any, number>) {
+    private static _updateDomainerBaseline(scale: Scale.AbstractScale<any, number>, baselineValue: number, id: number) {
       if (scale instanceof Scale.AbstractQuantitative) {
         var qscale = <Scale.AbstractQuantitative<any>> scale;
         if (!qscale._userSetDomainer) {
-          if (this._baselineValue != null) {
+          if (baselineValue != null) {
             qscale.domainer()
-              .addPaddingException(this._baselineValue, "BAR_PLOT+" + this.getID())
-              .addIncludedValue(this._baselineValue, "BAR_PLOT+" + this.getID());
+              .addPaddingException(baselineValue, "BAR_PLOT+" + id)
+              .addIncludedValue(baselineValue, "BAR_PLOT+" + id);
           } else {
             qscale.domainer()
-              .removePaddingException("BAR_PLOT+" + this.getID())
-              .removeIncludedValue("BAR_PLOT+" + this.getID());
+              .removePaddingException("BAR_PLOT+" + id)
+              .removeIncludedValue("BAR_PLOT+" + id);
           }
           qscale.domainer().pad().nice();
         }
             // prepending "BAR_PLOT" is unnecessary but reduces likely of user accidentally creating collisions
         qscale._autoDomainIfAutomaticMode();
       }
+    }
+
+    protected _updateDomainer(scale: Scale.AbstractScale<any, number>) {
+      Bar._updateDomainerBaseline(scale, this.baseline(), this.getID());
     }
 
     protected _updateYDomainer() {

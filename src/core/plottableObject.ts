@@ -8,7 +8,7 @@ export module Core {
    */
   export class PlottableObject {
     private static _nextID = 0;
-    private _plottableID = PlottableObject._nextID++;
+    protected _plottableID = PlottableObject._nextID++;
 
     public getID() {
       return this._plottableID;
