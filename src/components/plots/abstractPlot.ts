@@ -321,16 +321,15 @@ export module Plot {
      */
     public removeDataset(datasetIdentifier: string | Dataset | any[]): AbstractPlot {
       var key: string;
-      if (typeof(datasetIdentifier) === "string") {
+      if (typeof datasetIdentifier === "string") {
         key = <string> datasetIdentifier;
-      } else if (typeof (datasetIdentifier) === "object") {
+      } else if (typeof datasetIdentifier === "object") {
 
         var index = -1;
-        // HACKHACK: forced to any cast to use instanceof
-        if ((<any> datasetIdentifier) instanceof Dataset) {
+        if (datasetIdentifier instanceof Dataset) {
           var datasetArray = this.datasets();
           index = datasetArray.indexOf(<Dataset> datasetIdentifier);
-        } else if ((<any> datasetIdentifier) instanceof Array) {
+        } else if (datasetIdentifier instanceof Array) {
           var dataArray = this.datasets().map(d => d.data());
           index = dataArray.indexOf(<any[]> datasetIdentifier);
         }
