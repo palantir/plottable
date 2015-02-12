@@ -2460,7 +2460,6 @@ describe("Plots", function () {
         describe("getAllSelections()", function () {
             it("retrieves all selections with no args", function () {
                 var newTwoPointData = [{ foo: 2, bar: 1 }, { foo: 3, bar: 2 }];
-                var newDataset = new Plottable.Dataset(twoPointData);
                 areaPlot.addDataset("newTwo", new Plottable.Dataset(newTwoPointData));
                 var allAreas = areaPlot.getAllSelections();
                 var allAreas2 = areaPlot.getAllSelections(areaPlot._datasetKeysInOrder);
@@ -2469,7 +2468,6 @@ describe("Plots", function () {
             });
             it("retrieves correct selections (string arg)", function () {
                 var newTwoPointData = [{ foo: 2, bar: 1 }, { foo: 3, bar: 2 }];
-                var newDataset = new Plottable.Dataset(twoPointData);
                 areaPlot.addDataset("newTwo", new Plottable.Dataset(newTwoPointData));
                 var allAreas = areaPlot.getAllSelections("newTwo");
                 assert.strictEqual(allAreas.size(), 1, "all areas retrieved");
@@ -2479,7 +2477,6 @@ describe("Plots", function () {
             });
             it("retrieves correct selections (array arg)", function () {
                 var newTwoPointData = [{ foo: 2, bar: 1 }, { foo: 3, bar: 2 }];
-                var newDataset = new Plottable.Dataset(twoPointData);
                 areaPlot.addDataset("newTwo", new Plottable.Dataset(newTwoPointData));
                 var allAreas = areaPlot.getAllSelections(["newTwo"]);
                 assert.strictEqual(allAreas.size(), 1, "all areas retrieved");
@@ -2489,7 +2486,6 @@ describe("Plots", function () {
             });
             it("skips invalid keys", function () {
                 var newTwoPointData = [{ foo: 2, bar: 1 }, { foo: 3, bar: 2 }];
-                var newDataset = new Plottable.Dataset(twoPointData);
                 areaPlot.addDataset("newTwo", new Plottable.Dataset(newTwoPointData));
                 var allAreas = areaPlot.getAllSelections(["newTwo", "test"]);
                 assert.strictEqual(allAreas.size(), 1, "all areas retrieved");
