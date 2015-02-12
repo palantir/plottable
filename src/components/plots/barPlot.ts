@@ -33,7 +33,7 @@ export module Plot {
       this._animators["bars"] = new Animator.Base();
       this._animators["baseline"] = new Animator.Null();
       this._isVertical = isVertical;
-      this.baseline(0);
+      this._baselineValue = 0;
 
       if (isVertical) {
         Bar._updateDomainerBaseline(yScale, 0, this._plottableID);

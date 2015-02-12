@@ -7113,7 +7113,7 @@ var Plottable;
                 this._animators["bars"] = new Plottable.Animator.Base();
                 this._animators["baseline"] = new Plottable.Animator.Null();
                 this._isVertical = isVertical;
-                this.baseline(0);
+                this._baselineValue = 0;
                 if (isVertical) {
                     Bar._updateDomainerBaseline(yScale, 0, this._plottableID);
                 }
