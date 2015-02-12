@@ -326,10 +326,11 @@ export module Plot {
       } else if (typeof (datasetIdentifier) === "object") {
 
         var index = -1;
+        // HACKHACK: forced to any cast to use instanceof
         if ((<any> datasetIdentifier) instanceof Dataset) {
           var datasetArray = this.datasets();
           index = datasetArray.indexOf(<Dataset> datasetIdentifier);
-        } else if ((<any[]> datasetIdentifier) instanceof Array) {
+        } else if ((<any> datasetIdentifier) instanceof Array) {
           var dataArray = this.datasets().map(d => d.data());
           index = dataArray.indexOf(<any[]> datasetIdentifier);
         }

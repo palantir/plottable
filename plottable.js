@@ -6441,6 +6441,7 @@ var Plottable;
                 }
                 else if (typeof (datasetIdentifier) === "object") {
                     var index = -1;
+                    // HACKHACK: forced to any cast to use instanceof
                     if (datasetIdentifier instanceof Plottable.Dataset) {
                         var datasetArray = this.datasets();
                         index = datasetArray.indexOf(datasetIdentifier);
