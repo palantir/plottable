@@ -6441,11 +6441,11 @@ var Plottable;
                 }
                 else if (typeof (datasetIdentifier) === "object") {
                     var index = -1;
-                    if (typeof (datasetIdentifier.data) !== "undefined") {
+                    if (datasetIdentifier instanceof Plottable.Dataset) {
                         var datasetArray = this.datasets();
                         index = datasetArray.indexOf(datasetIdentifier);
                     }
-                    else if (typeof (datasetIdentifier.map) !== "undefined") {
+                    else if (datasetIdentifier instanceof Array) {
                         var dataArray = this.datasets().map(function (d) { return d.data(); });
                         index = dataArray.indexOf(datasetIdentifier);
                     }

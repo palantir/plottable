@@ -326,10 +326,10 @@ export module Plot {
       } else if (typeof (datasetIdentifier) === "object") {
 
         var index = -1;
-        if (typeof ((<Dataset> datasetIdentifier).data) !== "undefined") {
+        if ((<any> datasetIdentifier) instanceof Dataset) {
           var datasetArray = this.datasets();
           index = datasetArray.indexOf(<Dataset> datasetIdentifier);
-        } else if (typeof ((<any[]> datasetIdentifier).map) !== "undefined") {
+        } else if ((<any[]> datasetIdentifier) instanceof Array) {
           var dataArray = this.datasets().map(d => d.data());
           index = dataArray.indexOf(<any[]> datasetIdentifier);
         }
