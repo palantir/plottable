@@ -13,19 +13,19 @@ function run(svg, data, Plottable) {
     var xScale = new Plottable.Scale.Time();
     var yScale = new Plottable.Scale.Linear();
     var colorScale = new Plottable.Scale.Color();
-    
-    
-    var axisconf = {tierConfigurations: [
+
+
+    var axisconf = [
         {interval: d3.time.hour, step: 1, formatter: d3.time.format("  %I o'clock")},
-        {interval: d3.time.day, step: 1, formatter: d3.time.format("%d")}]};
-    var axisconf2 = {tierConfigurations: [
+        {interval: d3.time.day, step: 1, formatter: d3.time.format("%d")}];
+    var axisconf2 = [
         {interval: d3.time.day, step: 2, formatter: d3.time.format("%e")},
-        {interval: d3.time.month, step: 1, formatter: d3.time.format("%b")}]};
-    var axisconf3 = {tierConfigurations: [
+        {interval: d3.time.month, step: 1, formatter: d3.time.format("%b")}];
+    var axisconf3 = [
         {interval: d3.time.month, step: 1, formatter: d3.time.format("%b")},
-        {interval: d3.time.year, step: 1, formatter: d3.time.format("%y")}]};
-    var axisconf4 = {tierConfigurations: [
-        {interval: d3.time.year, step: 1, formatter: d3.time.format("%Y")}]}; 
+        {interval: d3.time.year, step: 1, formatter: d3.time.format("%y")}];
+    var axisconf4 = [
+        {interval: d3.time.year, step: 1, formatter: d3.time.format("%Y")}];
         var axisconf5 = {tierConfigurations: []};
 
 
@@ -34,14 +34,14 @@ function run(svg, data, Plottable) {
 
     var yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
-    
+
     var plot = new Plottable.Plot.Line(xScale, yScale)
-      .animate(true) 
+      .animate(true)
       .project("x",function (d) { return d3.time.format("%m/%d/%y/%H").parse(d.x);}, xScale)
       .project("y", "y", yScale)
       .project("fill", "type", colorScale)
       .addDataset("d1", data);
-    
+
 
 
     var chart = new Plottable.Component.Table([
@@ -50,7 +50,7 @@ function run(svg, data, Plottable) {
                     [null,  xAxis1]
                   ]);
     chart.renderTo(svg);
-    
+
     var pzi = new Plottable.Interaction.PanZoom(xScale, yScale);
     plot.registerInteraction(pzi);
 }
