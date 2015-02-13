@@ -2686,26 +2686,15 @@ declare module Plottable {
              */
             datasetOrder(order: string[]): AbstractPlot;
             /**
-             * Removes a dataset by string key
+             * Removes a dataset by the given identifier
              *
-             * @param {string} key The key of the dataset
-             * @return {Plot} The calling Plot.
+             * @param {string | Dataset | any[]} datasetIdentifer The identifier as the key of the Dataset to remove
+             * If string is inputted, it is interpreted as the dataset key to remove.
+             * If Dataset is inputted, the first Dataset in the plot that is the same will be removed.
+             * If any[] is inputted, the first data array in the plot that is the same will be removed.
+             * @returns {AbstractPlot} The calling AbstractPlot.
              */
-            removeDataset(key: string): AbstractPlot;
-            /**
-             * Remove a dataset given the dataset itself
-             *
-             * @param {Dataset} dataset The dataset to remove
-             * @return {Plot} The calling Plot.
-             */
-            removeDataset(dataset: Dataset): AbstractPlot;
-            /**
-             * Remove a dataset given the underlying data array
-             *
-             * @param {any[]} dataArray The data to remove
-             * @return {Plot} The calling Plot.
-             */
-            removeDataset(dataArray: any[]): AbstractPlot;
+            removeDataset(datasetIdentifier: string | Dataset | any[]): AbstractPlot;
             datasets(): Dataset[];
             protected _getDrawersInOrder(): _Drawer.AbstractDrawer[];
             protected _generateDrawSteps(): _Drawer.DrawStep[];
