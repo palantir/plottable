@@ -3091,7 +3091,7 @@ var Plottable;
                     var circleY = parseFloat(selection.attr("cy"));
                     var extentPoints = [{ x: xExtent.min, y: yExtent.min }, { x: xExtent.min, y: yExtent.max }, { x: xExtent.max, y: yExtent.min }, { x: xExtent.max, y: yExtent.max }];
                     return extentPoints.some(function (point) {
-                        return Element.pointDistance(circleX, circleY, point.x, point.y) <= radius;
+                        return Element.pointDistance(circleX, circleY, point.x, point.y) <= radius + tolerance;
                     });
                 }
                 return true;
