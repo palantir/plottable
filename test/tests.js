@@ -1011,20 +1011,14 @@ describe("Category Axes", function () {
         assert.include(axis._content.selectAll(".text-area").attr("transform"), -90, "the ticks were rotated left");
         svg.remove();
     });
-    it("layout calculated correctly under 0 width/height surrounding component conditions", function () {
+    it("axis should request more space if there's not enough space to fit the text", function () {
         var svg = generateSVG(300, 300);
         var years = ["2000", "2001", "2002", "2003"];
         var scale = new Plottable.Scale.Ordinal().domain(years);
         var axis = new Plottable.Axis.Category(scale, "bottom");
-        var table = new Plottable.Component.Table([
-            [null],
-            [axis],
-            [null],
-            [new Plottable.Component.Label("")]
-        ]);
-        table.renderTo(svg);
-        assert.closeTo(axis.height(), 44, 2, "height is calculated correctly");
-        assert.strictEqual(axis.width(), 300, "width is calculated correctly");
+        axis.renderTo(svg);
+        var requestedSpace = axis._requestedSpace(300, 10);
+        assert.isTrue(requestedSpace.wantsHeight, "axis should want to ask for more space");
         svg.remove();
     });
 });
