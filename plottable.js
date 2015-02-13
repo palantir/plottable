@@ -2451,6 +2451,9 @@ var Plottable;
             Time.prototype._setDomain = function (values) {
                 // attempt to parse dates
                 values = values.map(this._typeCoercer);
+                if (values[1] < values[0]) {
+                    throw new Error("Scale.Time domain values must be in chronological order");
+                }
                 return _super.prototype._setDomain.call(this, values);
             };
             Time.prototype.copy = function () {

@@ -31,6 +31,9 @@ export module Scale {
     protected _setDomain(values: any[]) {
       // attempt to parse dates
       values = values.map(this._typeCoercer);
+      if (values[1] < values[0]) {
+        throw new Error("Scale.Time domain values must be in chronological order");
+      }
       return super._setDomain(values);
     }
 
