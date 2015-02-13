@@ -5073,7 +5073,7 @@ var Plottable;
                 var widthFn = this._isHorizontal() ? d3.sum : Plottable._Util.Methods.max;
                 var heightFn = this._isHorizontal() ? Plottable._Util.Methods.max : d3.sum;
                 return {
-                    textFits: wrappingResults.every(function (t) { return !SVGTypewriter.Utils.StringMethods.isNotEmptyString(t.truncatedText) && t.noLines === 1; }),
+                    textFits: wrappingResults.every(function (t) { return SVGTypewriter.Utils.StringMethods.isNotEmptyString(t.truncatedText) && t.noLines === 1; }),
                     usedWidth: widthFn(wrappingResults, function (t) { return _this._measurer.measure(t.wrappedText).width; }, 0),
                     usedHeight: heightFn(wrappingResults, function (t) { return _this._measurer.measure(t.wrappedText).height; }, 0)
                 };
