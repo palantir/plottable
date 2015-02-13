@@ -3,6 +3,8 @@
 module Plottable {
   export module Scale {
     export module TickGenerators {
+      // HACKHACK: Generic types in type definition fails compilation
+      // https://github.com/Microsoft/TypeScript/issues/1616
       export interface TickGenerator<D> {
         (scale: Plottable.Scale.AbstractQuantitative<D>): D[]
       }

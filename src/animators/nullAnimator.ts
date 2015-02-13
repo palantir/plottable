@@ -12,7 +12,7 @@ export module Animator {
     public getTiming(selection: any) {
       return 0;
     }
-    public animate(selection: any, attrToProjector: AttributeToProjector): any {
+    public animate(selection: any, attrToProjector: AttributeToProjector): D3.Selection {
       return selection.attr(attrToProjector);
     }
   }

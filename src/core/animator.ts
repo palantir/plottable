@@ -14,7 +14,7 @@ export module Animator {
      *     transition object so that plots may chain the transitions between
      *     animators.
      */
-    animate(selection: any, attrToProjector: AttributeToProjector): any;
+    animate(selection: any, attrToProjector: AttributeToProjector): D3.Selection | D3.Transition.Transition;
 
     /**
      * Given the number of elements, return the total time the animation requires
@@ -24,9 +24,7 @@ export module Animator {
     getTiming(numberOfIterations: number): number;
   }
 
-  export interface PlotAnimatorMap {
-    [animatorKey: string] : PlotAnimator;
-  }
+  export type PlotAnimatorMap = { [animatorKey: string] : PlotAnimator; };
 
 }
 }

@@ -1,15 +1,15 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-  interface CachedExtent {
+  type CachedExtent = {
     accessor: _Accessor;
     extent: any[];
   }
-  export class Dataset extends Core.PlottableObject implements Core.Listenable {
+  export class Dataset extends Core.PlottableObject {
     private _data: any[];
     private _metadata: any;
     private _accessor2cachedExtent: _Util.StrictEqualityAssociativeArray;
-    public broadcaster: Core.Broadcaster;
+    public broadcaster: Core.Broadcaster<Dataset>;
 
     /**
      * Constructs a new set.

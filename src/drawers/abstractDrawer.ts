@@ -7,12 +7,12 @@ export module _Drawer {
    *
    * Specifies how AttributeToProjector needs to be animated.
    */
-  export interface DrawStep {
+  export type DrawStep = {
     attrToProjector: AttributeToProjector;
     animator: Animator.PlotAnimator;
   }
 
-  export interface AppliedDrawStep {
+  export type AppliedDrawStep = {
     attrToProjector: _AttributeToAppliedProjector;
     animator: Animator.PlotAnimator;
   }

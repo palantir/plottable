@@ -1,5 +1,5 @@
 /*!
-Plottable 0.43.2 (https://github.com/palantir/plottable)
+Plottable 0.44.0 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -143,6 +143,13 @@ var Plottable;
                 return result;
             }
             Methods.uniq = uniq;
+            /**
+             * Creates an array of length `count`, filled with value or (if value is a function), value()
+             *
+             * @param {T | ((index?: number) => T)} value The value to fill the array with or a value generator (called with index as arg)
+             * @param {number} count The length of the array to generate
+             * @return {any[]}
+             */
             function createFilledArray(value, count) {
                 var out = [];
                 for (var i = 0; i < count; i++) {
@@ -795,9 +802,7 @@ var Plottable;
         function fixed(precision) {
             if (precision === void 0) { precision = 3; }
             verifyPrecision(precision);
-            return function (d) {
-                return d.toFixed(precision);
-            };
+            return function (d) { return d.toFixed(precision); };
         }
         Formatters.fixed = fixed;
         /**
@@ -829,9 +834,7 @@ var Plottable;
          * @returns {Formatter} A formatter that stringifies its input.
          */
         function identity() {
-            return function (d) {
-                return String(d);
-            };
+            return function (d) { return String(d); };
         }
         Formatters.identity = identity;
         /**
@@ -867,9 +870,7 @@ var Plottable;
         function siSuffix(precision) {
             if (precision === void 0) { precision = 3; }
             verifyPrecision(precision);
-            return function (d) {
-                return d3.format("." + precision + "s")(d);
-            };
+            return function (d) { return d3.format("." + precision + "s")(d); };
         }
         Formatters.siSuffix = siSuffix;
         /**
@@ -978,7 +979,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "0.43.2";
+    Plottable.version = "0.44.0";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -1055,25 +1056,26 @@ var Plottable;
     var Core;
     (function (Core) {
         /**
-         * The Broadcaster class is owned by an Listenable. Third parties can register and deregister listeners
-         * from the broadcaster. When the broadcaster.broadcast method is activated, all registered callbacks are
-         * called. The registered callbacks are called with the registered Listenable that the broadcaster is attached
-         * to, along with optional arguments passed to the `broadcast` method.
+         * The Broadcaster holds a reference to a "listenable" object.
+         * Third parties can register and deregister listeners from the Broadcaster.
+         * When the broadcaster.broadcast() method is called, all registered callbacks
+         * are called with the Broadcaster's "listenable", along with optional
+         * arguments passed to the `broadcast` method.
          *
          * The listeners are called synchronously.
          */
         var Broadcaster = (function (_super) {
             __extends(Broadcaster, _super);
             /**
-             * Constructs a broadcaster, taking the Listenable that the broadcaster will be attached to.
+             * Constructs a broadcaster, taking a "listenable" object to broadcast about.
              *
              * @constructor
-             * @param {Listenable} listenable The Listenable-object that this broadcaster is attached to.
+             * @param {L} listenable The listenable object to broadcast.
              */
             function Broadcaster(listenable) {
                 _super.call(this);
                 this._key2callback = new Plottable._Util.StrictEqualityAssociativeArray();
-                this.listenable = listenable;
+                this._listenable = listenable;
             }
             /**
              * Registers a callback to be called when the broadcast method is called. Also takes a key which
@@ -1081,8 +1083,8 @@ var Plottable;
              * If there is already a callback associated with that key, then the callback will be replaced.
              *
              * @param key The key associated with the callback. Key uniqueness is determined by deep equality.
-             * @param {BroadcasterCallback} callback A callback to be called when the Scale's domain changes.
-             * @returns {Broadcaster} this object
+             * @param {BroadcasterCallback<L>} callback A callback to be called.
+             * @returns {Broadcaster} The calling Broadcaster
              */
             Broadcaster.prototype.registerListener = function (key, callback) {
                 this._key2callback.set(key, callback);
@@ -1092,7 +1094,7 @@ var Plottable;
              * Call all listening callbacks, optionally with arguments passed through.
              *
              * @param ...args A variable number of optional arguments
-             * @returns {Broadcaster} this object
+             * @returns {Broadcaster} The calling Broadcaster
              */
             Broadcaster.prototype.broadcast = function () {
                 var _this = this;
@@ -1100,14 +1102,14 @@ var Plottable;
                 for (var _i = 0; _i < arguments.length; _i++) {
                     args[_i - 0] = arguments[_i];
                 }
-                this._key2callback.values().forEach(function (callback) { return callback(_this.listenable, args); });
+                this._key2callback.values().forEach(function (callback) { return callback(_this._listenable, args); });
                 return this;
             };
             /**
              * Deregisters the callback associated with a key.
              *
              * @param key The key to deregister.
-             * @returns {Broadcaster} this object
+             * @returns {Broadcaster} The calling Broadcaster
              */
             Broadcaster.prototype.deregisterListener = function (key) {
                 this._key2callback.delete(key);
@@ -1116,7 +1118,7 @@ var Plottable;
             /**
              * Deregisters all listeners and callbacks associated with the broadcaster.
              *
-             * @returns {Broadcaster} this object
+             * @returns {Broadcaster} The calling Broadcaster
              */
             Broadcaster.prototype.deregisterAllListeners = function () {
                 this._key2callback = new Plottable._Util.StrictEqualityAssociativeArray();
@@ -1479,7 +1481,6 @@ var Plottable;
 
 var Plottable;
 (function (Plottable) {
-    ;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -2450,6 +2451,9 @@ var Plottable;
             Time.prototype._setDomain = function (values) {
                 // attempt to parse dates
                 values = values.map(this._typeCoercer);
+                if (values[1] < values[0]) {
+                    throw new Error("Scale.Time domain values must be in chronological order");
+                }
                 return _super.prototype._setDomain.call(this, values);
             };
             Time.prototype.copy = function () {
@@ -2477,7 +2481,6 @@ var Plottable;
 (function (Plottable) {
     var Scale;
     (function (Scale) {
-        ;
         /**
          * This class implements a color scale that takes quantitive input and
          * interpolates between a list of color values. It returns a hex string
@@ -2587,7 +2590,7 @@ var Plottable;
                 this.broadcaster.broadcast();
             };
             InterpolatedColor.prototype._resolveColorValues = function (colorRange) {
-                if (colorRange instanceof Array) {
+                if (typeof (colorRange) === "object") {
                     return colorRange;
                 }
                 else if (InterpolatedColor._COLOR_SCALES[colorRange] != null) {
@@ -2877,7 +2880,7 @@ var Plottable;
                 this._pathSelection.datum(data);
             };
             Line.prototype.setup = function (area) {
-                this._pathSelection = area.append("path").classed("line", true).style({
+                this._pathSelection = area.append("path").classed(Line.LINE_CLASS, true).style({
                     "fill": "none",
                     "vector-effect": "non-scaling-stroke"
                 });
@@ -2908,10 +2911,13 @@ var Plottable;
                     this._pathSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
                 }
                 step.animator.animate(this._pathSelection, attrToProjector);
+                // Restore classes that may have been overridden by class projectors
+                this._pathSelection.classed(Line.LINE_CLASS, true);
             };
             Line.prototype._getSelector = function () {
-                return ".line";
+                return "." + Line.LINE_CLASS;
             };
+            Line.LINE_CLASS = "line";
             return Line;
         })(_Drawer.AbstractDrawer);
         _Drawer.Line = Line;
@@ -2955,7 +2961,7 @@ var Plottable;
                 return this;
             };
             Area.prototype.setup = function (area) {
-                this._areaSelection = area.append("path").classed("area", true).style({ "stroke": "none" });
+                this._areaSelection = area.append("path").classed(Area.AREA_CLASS, true).style({ "stroke": "none" });
                 if (this._drawLine) {
                     _super.prototype.setup.call(this, area);
                 }
@@ -2993,10 +2999,13 @@ var Plottable;
                     this._areaSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
                 }
                 step.animator.animate(this._areaSelection, attrToProjector);
+                // Restore default classes that may have been wiped out by class projectors
+                this._areaSelection.classed(Area.AREA_CLASS, true);
             };
             Area.prototype._getSelector = function () {
-                return ".area";
+                return "." + Area.AREA_CLASS;
             };
+            Area.AREA_CLASS = "area";
             return Area;
         })(_Drawer.Line);
         _Drawer.Area = Area;
@@ -3391,14 +3400,20 @@ var Plottable;
                     }
                 }
             };
+            /**
+             * Renders the Component into a given DOM element. The element must be as <svg>.
+             *
+             * @param {String|D3.Selection} element A D3 selection or a selector for getting the element to render into.
+             * @returns {Component} The calling component.
+             */
             AbstractComponent.prototype.renderTo = function (element) {
                 if (element != null) {
                     var selection;
-                    if (typeof (element.node) === "function") {
-                        selection = element;
+                    if (typeof (element) === "string") {
+                        selection = d3.select(element);
                     }
                     else {
-                        selection = d3.select(element);
+                        selection = element;
                     }
                     if (!selection.node() || selection.node().nodeName.toLowerCase() !== "svg") {
                         throw new Error("Plottable requires a valid SVG to renderTo");
@@ -4269,7 +4284,8 @@ var Plottable;
             };
             AbstractAxis.prototype._hideOverlappingTickLabels = function () {
                 var visibleTickLabels = this._tickLabelContainer.selectAll("." + AbstractAxis.TICK_LABEL_CLASS).filter(function (d, i) {
-                    return d3.select(this).style("visibility") === "visible";
+                    var visibility = d3.select(this).style("visibility");
+                    return (visibility === "inherit") || (visibility === "visible");
                 });
                 var lastLabelClientRect;
                 var visibleTickLabelRects = visibleTickLabels[0].map(function (label) { return label.getBoundingClientRect(); });
@@ -4330,7 +4346,6 @@ var Plottable;
 (function (Plottable) {
     var Axis;
     (function (Axis) {
-        ;
         var Time = (function (_super) {
             __extends(Time, _super);
             /**
@@ -4348,113 +4363,113 @@ var Plottable;
                  * Default possible axis configurations.
                  */
                 this._possibleTimeAxisConfigurations = [
-                    { tierConfigurations: [
+                    [
                         { interval: d3.time.second, step: 1, formatter: Plottable.Formatters.time("%I:%M:%S %p") },
                         { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
-                    ] },
-                    { tierConfigurations: [
+                    ],
+                    [
                         { interval: d3.time.second, step: 5, formatter: Plottable.Formatters.time("%I:%M:%S %p") },
                         { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
-                    ] },
-                    { tierConfigurations: [
+                    ],
+                    [
                         { interval: d3.time.second, step: 10, formatter: Plottable.Formatters.time("%I:%M:%S %p") },
                         { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
-                    ] },
-                    { tierConfigurations: [
+                    ],
+                    [
                         { interval: d3.time.second, step: 15, formatter: Plottable.Formatters.time("%I:%M:%S %p") },
                         { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
-                    ] },
-                    { tierConfigurations: [
+                    ],
+                    [
                         { interval: d3.time.second, step: 30, formatter: Plottable.Formatters.time("%I:%M:%S %p") },
                         { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
-                    ] },
-                    { tierConfigurations: [
+                    ],
+                    [
                         { interval: d3.time.minute, step: 1, formatter: Plottable.Formatters.time("%I:%M %p") },
                         { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
-                    ] },
-                    { tierConfigurations: [
+                    ],
+                    [
                         { interval: d3.time.minute, step: 5, formatter: Plottable.Formatters.time("%I:%M %p") },
                         { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
-                    ] },
-                    { tierConfigurations: [
+                    ],
+                    [
                         { interval: d3.time.minute, step: 10, formatter: Plottable.Formatters.time("%I:%M %p") },
                         { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
-                    ] },
-                    { tierConfigurations: [
+                    ],
+                    [
                         { interval: d3.time.minute, step: 15, formatter: Plottable.Formatters.time("%I:%M %p") },
                         { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
-                    ] },
-                    { tierConfigurations: [
+                    ],
+                    [
                         { interval: d3.time.minute, step: 30, formatter: Plottable.Formatters.time("%I:%M %p") },
                         { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
-                    ] },
-                    { tierConfigurations: [
+                    ],
+                    [
                         { interval: d3.time.hour, step: 1, formatter: Plottable.Formatters.time("%I %p") },
                         { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
-                    ] },
-                    { tierConfigurations: [
+                    ],
+                    [
                         { interval: d3.time.hour, step: 3, formatter: Plottable.Formatters.time("%I %p") },
                         { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
-                    ] },
-                    { tierConfigurations: [
+                    ],
+                    [
                         { interval: d3.time.hour, step: 6, formatter: Plottable.Formatters.time("%I %p") },
                         { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
-                    ] },
-                    { tierConfigurations: [
+                    ],
+                    [
                         { interval: d3.time.hour, step: 12, formatter: Plottable.Formatters.time("%I %p") },
                         { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
-                    ] },
-                    { tierConfigurations: [
+                    ],
+                    [
                         { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%a %e") },
                         { interval: d3.time.month, step: 1, formatter: Plottable.Formatters.time("%B %Y") }
-                    ] },
-                    { tierConfigurations: [
+                    ],
+                    [
                         { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%e") },
                         { interval: d3.time.month, step: 1, formatter: Plottable.Formatters.time("%B %Y") }
-                    ] },
-                    { tierConfigurations: [
+                    ],
+                    [
                         { interval: d3.time.month, step: 1, formatter: Plottable.Formatters.time("%B") },
                         { interval: d3.time.year, step: 1, formatter: Plottable.Formatters.time("%Y") }
-                    ] },
-                    { tierConfigurations: [
+                    ],
+                    [
                         { interval: d3.time.month, step: 1, formatter: Plottable.Formatters.time("%b") },
                         { interval: d3.time.year, step: 1, formatter: Plottable.Formatters.time("%Y") }
-                    ] },
-                    { tierConfigurations: [
+                    ],
+                    [
                         { interval: d3.time.month, step: 3, formatter: Plottable.Formatters.time("%b") },
                         { interval: d3.time.year, step: 1, formatter: Plottable.Formatters.time("%Y") }
-                    ] },
-                    { tierConfigurations: [
+                    ],
+                    [
                         { interval: d3.time.month, step: 6, formatter: Plottable.Formatters.time("%b") },
                         { interval: d3.time.year, step: 1, formatter: Plottable.Formatters.time("%Y") }
-                    ] },
-                    { tierConfigurations: [
+                    ],
+                    [
                         { interval: d3.time.year, step: 1, formatter: Plottable.Formatters.time("%Y") }
-                    ] },
-                    { tierConfigurations: [
+                    ],
+                    [
                         { interval: d3.time.year, step: 1, formatter: Plottable.Formatters.time("%y") }
-                    ] },
-                    { tierConfigurations: [
+                    ],
+                    [
                         { interval: d3.time.year, step: 5, formatter: Plottable.Formatters.time("%Y") }
-                    ] },
-                    { tierConfigurations: [
+                    ],
+                    [
                         { interval: d3.time.year, step: 25, formatter: Plottable.Formatters.time("%Y") }
-                    ] },
-                    { tierConfigurations: [
+                    ],
+                    [
                         { interval: d3.time.year, step: 50, formatter: Plottable.Formatters.time("%Y") }
-                    ] },
-                    { tierConfigurations: [
+                    ],
+                    [
                         { interval: d3.time.year, step: 100, formatter: Plottable.Formatters.time("%Y") }
-                    ] },
-                    { tierConfigurations: [
+                    ],
+                    [
                         { interval: d3.time.year, step: 200, formatter: Plottable.Formatters.time("%Y") }
-                    ] },
-                    { tierConfigurations: [
+                    ],
+                    [
                         { interval: d3.time.year, step: 500, formatter: Plottable.Formatters.time("%Y") }
-                    ] },
-                    { tierConfigurations: [
+                    ],
+                    [
                         { interval: d3.time.year, step: 1000, formatter: Plottable.Formatters.time("%Y") }
-                    ] }
+                    ]
                 ];
                 this.classed("time-axis", true);
                 this.tickLabelPadding(5);
@@ -4488,7 +4503,7 @@ var Plottable;
                 var _this = this;
                 var mostPreciseIndex = this._possibleTimeAxisConfigurations.length;
                 this._possibleTimeAxisConfigurations.forEach(function (interval, index) {
-                    if (index < mostPreciseIndex && interval.tierConfigurations.every(function (tier) { return _this._checkTimeAxisTierConfigurationWidth(tier); })) {
+                    if (index < mostPreciseIndex && interval.every(function (tier) { return _this._checkTimeAxisTierConfigurationWidth(tier); })) {
                         mostPreciseIndex = index;
                     }
                 });
@@ -4552,7 +4567,7 @@ var Plottable;
             };
             Time.prototype._getTickValues = function () {
                 var _this = this;
-                return this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex].tierConfigurations.reduce(function (ticks, config) { return ticks.concat(_this._getTickIntervalValues(config)); }, []);
+                return this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex].reduce(function (ticks, config) { return ticks.concat(_this._getTickIntervalValues(config)); }, []);
             };
             Time.prototype._cleanTier = function (index) {
                 this._tierLabelContainers[index].selectAll("." + Axis.AbstractAxis.TICK_LABEL_CLASS).remove();
@@ -4624,6 +4639,9 @@ var Plottable;
                     attr["y2"] = this.height() - (offset + this._tierHeights[index]);
                 }
                 d3.select(tickMarks[0][0]).attr(attr);
+                // Add end-tick classes to first and last tick for CSS customization purposes
+                d3.select(tickMarks[0][0]).classed(Axis.AbstractAxis.END_TICK_MARK_CLASS, true);
+                d3.select(tickMarks[0][tickMarks.size() - 1]).classed(Axis.AbstractAxis.END_TICK_MARK_CLASS, true);
                 tickMarks.exit().remove();
             };
             Time.prototype._renderLabellessTickMarks = function (tickValues) {
@@ -4638,12 +4656,12 @@ var Plottable;
                 if (this._mostPreciseConfigIndex < 1) {
                     return [];
                 }
-                return this._getTickIntervalValues(this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex - 1].tierConfigurations[0]);
+                return this._getTickIntervalValues(this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex - 1][0]);
             };
             Time.prototype._doRender = function () {
                 var _this = this;
                 this._mostPreciseConfigIndex = this._getMostPreciseConfigurationIndex();
-                var tierConfigs = this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex].tierConfigurations;
+                var tierConfigs = this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex];
                 for (var i = 0; i < Time._NUM_TIERS; ++i) {
                     this._cleanTier(i);
                 }
@@ -4676,14 +4694,21 @@ var Plottable;
                 var isInsideBBox = function (tickBox) {
                     return (Math.floor(boundingBox.left) <= Math.ceil(tickBox.left) && Math.floor(boundingBox.top) <= Math.ceil(tickBox.top) && Math.floor(tickBox.right) <= Math.ceil(boundingBox.left + _this.width()) && Math.floor(tickBox.bottom) <= Math.ceil(boundingBox.top + _this.height()));
                 };
+                var visibleTickMarks = this._tierMarkContainers[index].selectAll("." + Axis.AbstractAxis.TICK_MARK_CLASS).filter(function (d, i) {
+                    return d3.select(this).style("visibility") === "visible";
+                });
+                // We use the ClientRects because x1/x2 attributes are not comparable to ClientRects of labels
+                var visibleTickMarkRects = visibleTickMarks[0].map(function (mark) { return mark.getBoundingClientRect(); });
                 var visibleTickLabels = this._tierLabelContainers[index].selectAll("." + Axis.AbstractAxis.TICK_LABEL_CLASS).filter(function (d, i) {
                     return d3.select(this).style("visibility") === "visible";
                 });
                 var lastLabelClientRect;
-                visibleTickLabels.each(function (d) {
+                visibleTickLabels.each(function (d, i) {
                     var clientRect = this.getBoundingClientRect();
                     var tickLabel = d3.select(this);
-                    if (!isInsideBBox(clientRect) || (lastLabelClientRect != null && Plottable._Util.DOM.boxesOverlap(clientRect, lastLabelClientRect))) {
+                    var leadingTickMark = visibleTickMarkRects[i];
+                    var trailingTickMark = visibleTickMarkRects[i + 1];
+                    if (!isInsideBBox(clientRect) || (lastLabelClientRect != null && Plottable._Util.DOM.boxesOverlap(clientRect, lastLabelClientRect)) || (leadingTickMark.right > clientRect.left || trailingTickMark.left < clientRect.right)) {
                         tickLabel.style("visibility", "hidden");
                     }
                     else {
@@ -4860,7 +4885,7 @@ var Plottable;
                 var tickLabels = this._tickLabelContainer.selectAll("." + Axis.AbstractAxis.TICK_LABEL_CLASS).data(tickLabelValues);
                 tickLabels.enter().append("text").classed(Axis.AbstractAxis.TICK_LABEL_CLASS, true);
                 tickLabels.exit().remove();
-                tickLabels.style("text-anchor", tickLabelTextAnchor).style("visibility", "visible").attr(tickLabelAttrHash).text(function (s) {
+                tickLabels.style("text-anchor", tickLabelTextAnchor).style("visibility", "inherit").attr(tickLabelAttrHash).text(function (s) {
                     var formattedText = _this.formatter()(s);
                     if (!_this._isHorizontal()) {
                         var availableTextSpace = _this.width() - _this.tickLabelPadding();
@@ -5832,7 +5857,6 @@ var Plottable;
 (function (Plottable) {
     var Component;
     (function (Component) {
-        ;
         var Table = (function (_super) {
             __extends(Table, _super);
             /**
@@ -6412,16 +6436,32 @@ var Plottable;
                 }
                 return this;
             };
-            AbstractPlot.prototype.removeDataset = function (datasetOrKeyOrArray) {
+            /**
+             * Removes a dataset by the given identifier
+             *
+             * @param {string | Dataset | any[]} datasetIdentifer The identifier as the key of the Dataset to remove
+             * If string is inputted, it is interpreted as the dataset key to remove.
+             * If Dataset is inputted, the first Dataset in the plot that is the same will be removed.
+             * If any[] is inputted, the first data array in the plot that is the same will be removed.
+             * @returns {AbstractPlot} The calling AbstractPlot.
+             */
+            AbstractPlot.prototype.removeDataset = function (datasetIdentifier) {
                 var key;
-                if (typeof (datasetOrKeyOrArray) === "string") {
-                    key = datasetOrKeyOrArray;
+                if (typeof datasetIdentifier === "string") {
+                    key = datasetIdentifier;
                 }
-                else if (datasetOrKeyOrArray instanceof Plottable.Dataset || datasetOrKeyOrArray instanceof Array) {
-                    var array = (datasetOrKeyOrArray instanceof Plottable.Dataset) ? this.datasets() : this.datasets().map(function (d) { return d.data(); });
-                    var idx = array.indexOf(datasetOrKeyOrArray);
-                    if (idx !== -1) {
-                        key = this._datasetKeysInOrder[idx];
+                else if (typeof datasetIdentifier === "object") {
+                    var index = -1;
+                    if (datasetIdentifier instanceof Plottable.Dataset) {
+                        var datasetArray = this.datasets();
+                        index = datasetArray.indexOf(datasetIdentifier);
+                    }
+                    else if (datasetIdentifier instanceof Array) {
+                        var dataArray = this.datasets().map(function (d) { return d.data(); });
+                        index = dataArray.indexOf(datasetIdentifier);
+                    }
+                    if (index !== -1) {
+                        key = this._datasetKeysInOrder[index];
                     }
                 }
                 return this._removeDataset(key);
@@ -7102,6 +7142,16 @@ var Plottable;
                     return this;
                 }
             };
+            /**
+             * Gets the bar under the given pixel position (if [xValOrExtent]
+             * and [yValOrExtent] are {number}s), under a given line (if only one
+             * of [xValOrExtent] or [yValOrExtent] are {Extent}s) or are under a
+             * 2D area (if [xValOrExtent] and [yValOrExtent] are both {Extent}s).
+             *
+             * @param {number | Extent} xValOrExtent The pixel x position, or range of x values.
+             * @param {number | Extent} yValOrExtent The pixel y position, or range of y values.
+             * @returns {D3.Selection} The selected bar, or null if no bar was selected.
+             */
             Bar.prototype.getBars = function (xValOrExtent, yValOrExtent) {
                 var _this = this;
                 if (!this._isSetup) {
@@ -8146,6 +8196,12 @@ var Plottable;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
+var Plottable;
+(function (Plottable) {
+    var Animator;
+    (function (Animator) {
+    })(Animator = Plottable.Animator || (Plottable.Animator = {}));
+})(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
 var Plottable;
@@ -8901,7 +8957,7 @@ var Plottable;
             };
             Drag.prototype._dragend = function () {
                 var location = d3.mouse(this._hitBox[0][0].parentNode);
-                this._setLocation(location[0], location[1]);
+                this._setLocation(this._constrainX(location[0]), this._constrainY(location[1]));
                 this._isDragging = false;
                 this._doDragend();
             };

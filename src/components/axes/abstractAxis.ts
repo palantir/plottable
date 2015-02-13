@@ -488,7 +488,8 @@ export module Axis {
       var visibleTickLabels = this._tickLabelContainer
                                     .selectAll("." + AbstractAxis.TICK_LABEL_CLASS)
                                     .filter(function(d: any, i: number) {
-                                      return d3.select(this).style("visibility") === "visible";
+                                      var visibility = d3.select(this).style("visibility");
+                                      return (visibility === "inherit") || (visibility === "visible");
                                     });
       var lastLabelClientRect: ClientRect;
 

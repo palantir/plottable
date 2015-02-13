@@ -6,7 +6,7 @@ export module Interaction {
    * A DragBox is an interaction that automatically draws a box across the
    * element you attach it to when you drag.
    */
-  interface ResizeDimension {
+  type ResizeDimension = {
     offset: number; // px offset between where the resize drag started and the edge of the box (<= RESIZE_PADDING)
     origin: boolean; // whether we are resizing the origin coordinate or the location coordinate
     positive: boolean; // whether the resize is on the positive edge or the negative edge of the dragbox

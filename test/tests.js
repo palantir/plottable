@@ -546,7 +546,7 @@ describe("TimeAxis", function () {
         var axis = new Plottable.Axis.Time(scale, "bottom");
         var configurations = axis.axisConfigurations();
         var newPossibleConfigurations = configurations.slice(0, 3);
-        newPossibleConfigurations.forEach(function (axisConfig) { return axisConfig.tierConfigurations.forEach(function (tierConfig) {
+        newPossibleConfigurations.forEach(function (axisConfig) { return axisConfig.forEach(function (tierConfig) {
             tierConfig.interval = d3.time.minute;
             tierConfig.step += 3;
         }); });
@@ -557,7 +557,7 @@ describe("TimeAxis", function () {
         scale.domain([twoMinutesBefore, now]);
         scale.range([0, 800]);
         axis.renderTo(svg);
-        var configs = newPossibleConfigurations[axis._mostPreciseConfigIndex].tierConfigurations;
+        var configs = newPossibleConfigurations[axis._mostPreciseConfigIndex];
         assert.deepEqual(configs[0].interval, d3.time.minute, "axis used new time unit");
         assert.deepEqual(configs[0].step, 4, "axis used new step");
         svg.remove();
@@ -573,6 +573,34 @@ describe("TimeAxis", function () {
         var lastTick = d3.select(d3.selectAll(".tick-mark")[0].pop());
         assert.equal(lastTick.attr("x1"), width, "xPos (x1) of last end tick is at the end of the axis container");
         assert.equal(lastTick.attr("x2"), width, "xPos (x2) of last end tick is at the end of the axis container");
+        svg.remove();
+    });
+    it("adds a class corresponding to the end-tick for the first and last ticks", function () {
+        var width = 500;
+        var svg = generateSVG(width, 100);
+        scale.domain(["2010", "2014"]);
+        axis.renderTo(svg);
+        var firstTick = d3.select("." + Plottable.Axis.AbstractAxis.TICK_MARK_CLASS);
+        assert.isTrue(firstTick.classed(Plottable.Axis.AbstractAxis.END_TICK_MARK_CLASS), "first end tick has the end-tick-mark class");
+        var lastTick = d3.select(d3.selectAll("." + Plottable.Axis.AbstractAxis.TICK_MARK_CLASS)[0].pop());
+        assert.isTrue(lastTick.classed(Plottable.Axis.AbstractAxis.END_TICK_MARK_CLASS), "last end tick has the end-tick-mark class");
+        svg.remove();
+    });
+    it("tick labels do not overlap with tick marks", function () {
+        var svg = generateSVG(400, 100);
+        scale = new Plottable.Scale.Time();
+        scale.domain([new Date("2009-12-20"), new Date("2011-01-01")]);
+        axis = new Plottable.Axis.Time(scale, "bottom");
+        axis.renderTo(svg);
+        var tickRects = d3.selectAll("." + Plottable.Axis.AbstractAxis.TICK_MARK_CLASS)[0].map(function (mark) { return mark.getBoundingClientRect(); });
+        var labelRects = d3.selectAll("." + Plottable.Axis.AbstractAxis.TICK_LABEL_CLASS).filter(function (d, i) {
+            return d3.select(this).style("visibility") === "visible";
+        })[0].map(function (label) { return label.getBoundingClientRect(); });
+        labelRects.forEach(function (labelRect) {
+            tickRects.forEach(function (tickRect) {
+                assert.isFalse(Plottable._Util.DOM.boxesOverlap(labelRect, tickRect), "visible label does not overlap with a tick");
+            });
+        });
         svg.remove();
     });
 });
@@ -879,7 +907,7 @@ describe("NumericAxis", function () {
         var boundingBox = d3.select(".x-axis .bounding-box");
         d3.selectAll(".x-axis .tick-label").each(function () {
             var tickLabel = d3.select(this);
-            if (tickLabel.style("visibility") === "visible") {
+            if (tickLabel.style("visibility") === "inherit") {
                 assertBBoxInclusion(boundingBox, tickLabel);
             }
         });
@@ -897,7 +925,8 @@ describe("NumericAxis", function () {
         var baseAxis = new Plottable.Axis.Numeric(scale, "bottom");
         baseAxis.renderTo(svg);
         var visibleTickLabels = baseAxis._element.selectAll(".tick-label").filter(function (d, i) {
-            return d3.select(this).style("visibility") === "visible";
+            var visibility = d3.select(this).style("visibility");
+            return (visibility === "visible") || (visibility === "inherit");
         });
         var visibleTickLabelRects = visibleTickLabels[0].map(function (label) { return label.getBoundingClientRect(); });
         var interval = getClientRectCenter(visibleTickLabelRects[1]) - getClientRectCenter(visibleTickLabelRects[0]);
@@ -1643,11 +1672,11 @@ describe("Plots", function () {
             r.project("x", "x", xScale);
             r.project("y", "y", yScale);
             r.project("meta", metadataProjector);
-            xScale.broadcaster.registerListener(null, function (listenable) {
+            xScale.broadcaster.registerListener("unitTest", function (listenable) {
                 assert.equal(listenable, xScale, "Callback received the calling scale as the first argument");
                 ++xScaleCalls;
             });
-            yScale.broadcaster.registerListener(null, function (listenable) {
+            yScale.broadcaster.registerListener("unitTest", function (listenable) {
                 assert.equal(listenable, yScale, "Callback received the calling scale as the first argument");
                 ++yScaleCalls;
             });
@@ -2287,6 +2316,15 @@ describe("Plots", function () {
             assert.include(selectionData, dataset3, "third dataset data in selection data");
             svg.remove();
         });
+        it("retains original classes when class is projected", function () {
+            var newClassProjector = function () { return "pink"; };
+            linePlot.project("class", newClassProjector);
+            linePlot.renderTo(svg);
+            var linePath = renderArea.select("." + Plottable._Drawer.Line.LINE_CLASS);
+            assert.isTrue(linePath.classed("pink"));
+            assert.isTrue(linePath.classed(Plottable._Drawer.Line.LINE_CLASS));
+            svg.remove();
+        });
     });
 });
 
@@ -2389,6 +2427,15 @@ describe("Plots", function () {
             var selectionData = allAreas.data();
             assert.include(selectionData, twoPointData, "first dataset data in selection data");
             assert.include(selectionData, newTwoPointData, "new dataset data in selection data");
+            svg.remove();
+        });
+        it("retains original classes when class is projected", function () {
+            var newClassProjector = function () { return "pink"; };
+            areaPlot.project("class", newClassProjector);
+            areaPlot.renderTo(svg);
+            var areaPath = renderArea.select("." + Plottable._Drawer.Area.AREA_CLASS);
+            assert.isTrue(areaPath.classed("pink"));
+            assert.isTrue(areaPath.classed(Plottable._Drawer.Area.AREA_CLASS));
             svg.remove();
         });
     });
@@ -4129,10 +4176,9 @@ describe("Broadcasters", function () {
     var b;
     var called;
     var cb;
-    var listenable = { broadcaster: null };
+    var listenable = {};
     beforeEach(function () {
         b = new Plottable.Core.Broadcaster(listenable);
-        listenable.broadcaster = b;
         called = false;
         cb = function () {
             called = true;
@@ -4894,18 +4940,10 @@ describe("Component behavior", function () {
         svg.remove();
     });
     it("detach() works as expected", function () {
-        var cbCalled = 0;
-        var cb = function (b) { return cbCalled++; };
-        var b = new Plottable.Core.Broadcaster(null);
         var c1 = new Plottable.Component.AbstractComponent();
-        b.registerListener(c1, cb);
         c1.renderTo(svg);
-        b.broadcast();
-        assert.equal(cbCalled, 1, "the callback was called");
         assert.isTrue(svg.node().hasChildNodes(), "the svg has children");
         c1.detach();
-        b.broadcast();
-        assert.equal(cbCalled, 2, "the callback is still attached to the component");
         assert.isFalse(svg.node().hasChildNodes(), "the svg has no children");
         svg.remove();
     });
@@ -5670,7 +5708,7 @@ describe("Coordinators", function () {
 var assert = chai.assert;
 describe("Scales", function () {
     it("Scale's copy() works correctly", function () {
-        var testCallback = function (broadcaster) {
+        var testCallback = function (listenable) {
             return true; // doesn't do anything
         };
         var scale = new Plottable.Scale.Linear();
@@ -5851,6 +5889,13 @@ describe("Scales", function () {
             assert.closeTo(scale.rangeBand(), 399, 1);
             scale.domain(["1", "2", "3", "4", "5"]);
             assert.closeTo(scale.rangeBand(), 329, 1);
+        });
+        it("stepWidth operates normally", function () {
+            var scale = new Plottable.Scale.Ordinal();
+            scale.range([0, 3000]);
+            scale.domain(["1", "2", "3", "4"]);
+            var widthSum = scale.rangeBand() * (1 + scale.innerPadding());
+            assert.strictEqual(scale.stepWidth(), widthSum, "step width is the sum of innerPadding width and band width");
         });
     });
     it("OrdinalScale + BarPlot combo works as expected when the data is swapped", function () {
@@ -6073,6 +6118,10 @@ describe("TimeScale tests", function () {
         checkDomain(["10/1/2014", "11/1/2014"]);
         checkDomain(["October 1, 2014", "November 1, 2014"]);
         checkDomain(["Oct 1, 2014", "Nov 1, 2014"]);
+    });
+    it("can't set reversed domain", function () {
+        var scale = new Plottable.Scale.Time();
+        assert.throws(function () { return scale.domain(["1985-10-26", "1955-11-05"]); }, "chronological");
     });
     it("time coercer works as intended", function () {
         var tc = new Plottable.Scale.Time()._typeCoercer;
