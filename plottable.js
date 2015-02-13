@@ -3086,15 +3086,30 @@ var Plottable;
             };
             Element.prototype._isSelectionInBounds = function (selection, xExtent, yExtent, tolerance) {
                 if (this._svgElement === "circle") {
-                    var radius = parseFloat(selection.attr("r"));
-                    var circleX = parseFloat(selection.attr("cx"));
-                    var circleY = parseFloat(selection.attr("cy"));
-                    var extentPoints = [{ x: xExtent.min, y: yExtent.min }, { x: xExtent.min, y: yExtent.max }, { x: xExtent.max, y: yExtent.min }, { x: xExtent.max, y: yExtent.max }];
-                    return extentPoints.some(function (point) {
-                        return Element.pointDistance(circleX, circleY, point.x, point.y) <= radius + tolerance;
-                    });
+                    return Element._ifCircleIntersect(selection, xExtent, yExtent, tolerance);
                 }
                 return true;
+            };
+            Element._ifCircleIntersect = function (selection, xExtent, yExtent, tolerance) {
+                var circleX = parseFloat(selection.attr("cx"));
+                var circleY = parseFloat(selection.attr("cy"));
+                var radius = parseFloat(selection.attr("r"));
+                var closestX = Element.clamp(circleX, xExtent.min, xExtent.max);
+                var closestY = Element.clamp(circleY, yExtent.min, yExtent.max);
+                var distanceX = Math.abs(circleX - closestX);
+                var distanceY = Math.abs(circleY - closestY);
+                return Math.pow(distanceX, 2) + Math.pow(distanceY, 2) <= Math.pow(radius + tolerance, 2);
+            };
+            Element.clamp = function (value, min, max) {
+                if (value < min) {
+                    return min;
+                }
+                else if (value > max) {
+                    return max;
+                }
+                else {
+                    return value;
+                }
             };
             Element.pointDistance = function (x1, y1, x2, y2) {
                 return Math.pow(Math.pow(y2 - y1, 2) + Math.pow(x2 - x1, 2), 0.5);

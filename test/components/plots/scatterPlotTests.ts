@@ -45,7 +45,7 @@ describe("Plots", () => {
       svg.remove();
     });
 
-    it("the accessors properly access data, index, and metadata", () => {
+    it("getAllSelections()", () => {
       var svg = generateSVG(400, 400);
       var xScale = new Plottable.Scale.Linear();
       var yScale = new Plottable.Scale.Linear();
@@ -65,6 +65,30 @@ describe("Plots", () => {
 
       svg.remove();
     });
+
+    it("getSelections()", () => {
+      var svg = generateSVG(400, 400);
+      var xScale = new Plottable.Scale.Linear();
+      var yScale = new Plottable.Scale.Linear();
+      var data = [{x: 0, y: 0}, {x: 1, y: 1}];
+      var data2 = [{x: 1, y: 2}, {x: 3, y: 4}];
+      var plot = new Plottable.Plot.Scatter(xScale, yScale)
+                                   .project("x", "x", xScale)
+                                   .project("y", "y", yScale)
+                                   .addDataset(data)
+                                   .addDataset(data2);
+      plot.renderTo(svg);
+      var circles = plot.getSelections(xScale.scale(1), yScale.scale(1));
+      var selectionData = circles.data();
+      assert.deepEqual(selectionData, [{x: 1, y: 1}], "retrieved selection for specified point");
+
+      var circles2 = plot.getSelections({min: xScale.scale(1), max: xScale.scale(3)}, {min: yScale.scale(4), max: yScale.scale(1)});
+      var selectionData2 = circles2.data();
+      assert.deepEqual(selectionData2, [{x: 1, y: 1}, {x: 1, y: 2}, {x: 3, y: 4}], "retrieved selection for specified extent");
+
+      svg.remove();
+    });
+
 
     it("_getClosestStruckPoint()", () => {
       var svg = generateSVG(400, 400);
