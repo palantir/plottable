@@ -108,4 +108,22 @@ describe("Category Axes", () => {
 
     svg.remove();
   });
+
+  it("layout calculated correctly under 0 width/height surrounding component conditions", () => {
+    var svg = generateSVG(300, 300);
+    var years = ["2000", "2001", "2002", "2003"];
+    var scale = new Plottable.Scale.Ordinal().domain(years);
+    var axis = new Plottable.Axis.Category(scale, "bottom");
+    var table = new Plottable.Component.Table([
+                                               [null],
+                                               [axis],
+                                               [null],
+                                               [new Plottable.Component.Label("")]
+                                                                                  ]);
+    table.renderTo(svg);
+    assert.strictEqual(axis.height(), 44, "height is calculated correctly");
+    assert.strictEqual(axis.width(), 300, "width is calculated correctly");
+
+    svg.remove();
+  });
 });
