@@ -1018,10 +1018,10 @@ describe("Category Axes", function () {
         var axis = new Plottable.Axis.Category(scale, "bottom");
         axis.renderTo(svg);
         var requestedSpace = axis._requestedSpace(300, 10);
-        assert.isTrue(requestedSpace.wantsHeight, "axis should ask for more space");
+        assert.isTrue(requestedSpace.wantsHeight, "axis should ask for more space (horizontal orientation)");
         axis.orient("left");
         requestedSpace = axis._requestedSpace(10, 300);
-        assert.isTrue(requestedSpace.wantsWidth, "axis should ask for more space");
+        assert.isTrue(requestedSpace.wantsWidth, "axis should ask for more space (vertical orientation)");
         svg.remove();
     });
 });
