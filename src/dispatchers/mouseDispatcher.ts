@@ -4,10 +4,12 @@ module Plottable {
 export module Dispatcher {
   export class Mouse {
     private static _DISPATCHER_KEY = "__Plottable_Dispatcher_Mouse";
+    private _connected = false;
     private _svg: SVGElement;
     private _measureRect: SVGElement;
     private _lastMousePosition: Point;
-    public broadcaster: Core.Broadcaster;
+    private _moveBroadcaster: Core.Broadcaster<Dispatcher.Mouse>;
+    private _processMoveCallback = (e: MouseEvent) => this._processMoveEvent(e);
 
     /**
      * Get a Dispatcher.Mouse for the <svg> containing elem. If one already exists
@@ -43,11 +45,26 @@ export module Dispatcher {
       this._svg.appendChild(this._measureRect);
 
       this._lastMousePosition = { x: -1, y: -1 };
-      this.broadcaster = new Core.Broadcaster(this);
+      this._moveBroadcaster = new Core.Broadcaster(this);
+    }
 
-      svg.addEventListener("mouseover", (e) => this._processMoveEvent(e));
-      svg.addEventListener("mousemove", (e) => this._processMoveEvent(e));
-      svg.addEventListener("mouseout", (e) => this._processMoveEvent(e));
+    private _connect() {
+      if (!this._connected) {
+        document.addEventListener("mouseover", this._processMoveCallback);
+        document.addEventListener("mousemove", this._processMoveCallback);
+        document.addEventListener("mouseout", this._processMoveCallback);
+        this._connected = true;
+      }
+    }
+
+    private _disconnect() {
+      if (this._connected &&
+          this._moveBroadcaster.getListenerKeys().length === 0) {
+        document.removeEventListener("mouseover", this._processMoveCallback);
+        document.removeEventListener("mousemove", this._processMoveCallback);
+        document.removeEventListener("mouseout", this._processMoveCallback);
+        this._connected = false;
+      }
     }
 
     /**
@@ -63,16 +80,22 @@ export module Dispatcher {
      */
     public onMouseMove(key: any, callback: (p: Point) => any): Mouse {
       if (callback === null) { // remove listener if callback is null
-        this.broadcaster.deregisterListener(key);
+        this._moveBroadcaster.deregisterListener(key);
+        this._disconnect();
       } else {
-        this.broadcaster.registerListener(key, () => { callback(this.getLastMousePosition()); });
+        this._connect();
+        this._moveBroadcaster.registerListener(key, () => { callback(this.getLastMousePosition()); });
       }
       return this;
     }
 
     private _processMoveEvent(e: MouseEvent) {
-      this._lastMousePosition = this._computeMousePosition(e.clientX, e.clientY);
-      this.broadcaster.broadcast();
+      var newMousePosition = this._computeMousePosition(e.clientX, e.clientY);
+      if (newMousePosition.x == null || newMousePosition.y == null) {
+        return; // couldn't measure
+      }
+      this._lastMousePosition = newMousePosition;
+      this._moveBroadcaster.broadcast();
     }
 
     /**
@@ -91,6 +114,11 @@ export module Dispatcher {
       this._measureRect.setAttribute("y", String(sampleDistance));
       mrBCR = this._measureRect.getBoundingClientRect();
       var testPoint = { x: mrBCR.left, y: mrBCR.top };
+
+      // invalid measurements -- SVG might not be in the DOM
+      if (origin.x === testPoint.x || origin.y === testPoint.y) {
+        return { x: null, y: null };
+      }
 
       var scaleX = (testPoint.x - origin.x) / sampleDistance;
       var scaleY = (testPoint.y - origin.y) / sampleDistance;

@@ -1127,7 +1127,15 @@ var Plottable;
                 return this;
             };
             /**
-             * Deregisters all listeners and callbacks associated with the broadcaster.
+             * Gets the keys for all listeners attached to the Broadcaster.
+             *
+             * @returns {any[]} An array of the keys.
+             */
+            Broadcaster.prototype.getListenerKeys = function () {
+                return this._key2callback.keys();
+            };
+            /**
+             * Deregisters all listeners and callbacks associated with the Broadcaster.
              *
              * @returns {Broadcaster} The calling Broadcaster
              */
@@ -8513,6 +8521,8 @@ var Plottable;
              */
             function Mouse(svg) {
                 var _this = this;
+                this._connected = false;
+                this._processMoveCallback = function (e) { return _this._processMoveEvent(e); };
                 this._svg = svg;
                 this._measureRect = document.createElementNS(svg.namespaceURI, "rect");
                 this._measureRect.setAttribute("class", "measure-rect");
@@ -8521,10 +8531,7 @@ var Plottable;
                 this._measureRect.setAttribute("height", "1");
                 this._svg.appendChild(this._measureRect);
                 this._lastMousePosition = { x: -1, y: -1 };
-                this.broadcaster = new Plottable.Core.Broadcaster(this);
-                svg.addEventListener("mouseover", function (e) { return _this._processMoveEvent(e); });
-                svg.addEventListener("mousemove", function (e) { return _this._processMoveEvent(e); });
-                svg.addEventListener("mouseout", function (e) { return _this._processMoveEvent(e); });
+                this._moveBroadcaster = new Plottable.Core.Broadcaster(this);
             }
             /**
              * Get a Dispatcher.Mouse for the <svg> containing elem. If one already exists
@@ -8542,6 +8549,22 @@ var Plottable;
                 }
                 return dispatcher;
             };
+            Mouse.prototype._connect = function () {
+                if (!this._connected) {
+                    document.addEventListener("mouseover", this._processMoveCallback);
+                    document.addEventListener("mousemove", this._processMoveCallback);
+                    document.addEventListener("mouseout", this._processMoveCallback);
+                    this._connected = true;
+                }
+            };
+            Mouse.prototype._disconnect = function () {
+                if (this._connected && this._moveBroadcaster.getListenerKeys().length === 0) {
+                    document.removeEventListener("mouseover", this._processMoveCallback);
+                    document.removeEventListener("mousemove", this._processMoveCallback);
+                    document.removeEventListener("mouseout", this._processMoveCallback);
+                    this._connected = false;
+                }
+            };
             /**
              * Registers a callback to be called whenever the mouse position changes,
              * or removes the callback if `null` is passed as the callback.
@@ -8556,18 +8579,24 @@ var Plottable;
             Mouse.prototype.onMouseMove = function (key, callback) {
                 var _this = this;
                 if (callback === null) {
-                    this.broadcaster.deregisterListener(key);
+                    this._moveBroadcaster.deregisterListener(key);
+                    this._disconnect();
                 }
                 else {
-                    this.broadcaster.registerListener(key, function () {
+                    this._connect();
+                    this._moveBroadcaster.registerListener(key, function () {
                         callback(_this.getLastMousePosition());
                     });
                 }
                 return this;
             };
             Mouse.prototype._processMoveEvent = function (e) {
-                this._lastMousePosition = this._computeMousePosition(e.clientX, e.clientY);
-                this.broadcaster.broadcast();
+                var newMousePosition = this._computeMousePosition(e.clientX, e.clientY);
+                if (newMousePosition.x == null || newMousePosition.y == null) {
+                    return; // couldn't measure
+                }
+                this._lastMousePosition = newMousePosition;
+                this._moveBroadcaster.broadcast();
             };
             /**
              * Computes the mouse position relative to the <svg> in svg-coordinate-space.
@@ -8584,6 +8613,10 @@ var Plottable;
                 this._measureRect.setAttribute("y", String(sampleDistance));
                 mrBCR = this._measureRect.getBoundingClientRect();
                 var testPoint = { x: mrBCR.left, y: mrBCR.top };
+                // invalid measurements -- SVG might not be in the DOM
+                if (origin.x === testPoint.x || origin.y === testPoint.y) {
+                    return { x: null, y: null };
+                }
                 var scaleX = (testPoint.x - origin.x) / sampleDistance;
                 var scaleY = (testPoint.y - origin.y) / sampleDistance;
                 // get the true cursor position
