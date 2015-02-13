@@ -179,7 +179,7 @@ export module Component {
           } else {
             // If they are all equal, divide free space to make components as equal as possible
             xWeights = colWeights;
-            var xWeightMax = _Util.Methods.max(guaranteedWidths, 0);
+            var xWeightMax = _Util.Methods.max(guaranteedWidths);
             var freeAdjustedWidth = freeWidth;
             xWeights = guaranteedWidths.map((w) => {
               freeAdjustedWidth -= (xWeightMax - w);
@@ -200,7 +200,7 @@ export module Component {
             yWeights = rowWeights;
           } else {
             // If they are all equal, divide free space to make components as equal as possible
-            var yWeightMax = _Util.Methods.max(guaranteedHeights, 0);
+            var yWeightMax = _Util.Methods.max(guaranteedHeights);
             var freeAdjustedHeight = freeHeight;
             yWeights = guaranteedHeights.map((h) => {
               freeAdjustedHeight -= (yWeightMax - h);

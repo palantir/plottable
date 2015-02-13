@@ -5992,7 +5992,7 @@ var Plottable;
                         else {
                             // If they are all equal, divide free space to make components as equal as possible
                             xWeights = colWeights;
-                            var xWeightMax = Plottable._Util.Methods.max(guaranteedWidths, 0);
+                            var xWeightMax = Plottable._Util.Methods.max(guaranteedWidths);
                             var freeAdjustedWidth = freeWidth;
                             xWeights = guaranteedWidths.map(function (w) {
                                 freeAdjustedWidth -= (xWeightMax - w);
@@ -6013,7 +6013,7 @@ var Plottable;
                         }
                         else {
                             // If they are all equal, divide free space to make components as equal as possible
-                            var yWeightMax = Plottable._Util.Methods.max(guaranteedHeights, 0);
+                            var yWeightMax = Plottable._Util.Methods.max(guaranteedHeights);
                             var freeAdjustedHeight = freeHeight;
                             yWeights = guaranteedHeights.map(function (h) {
                                 freeAdjustedHeight -= (yWeightMax - h);
