@@ -60,6 +60,24 @@ export module _Drawer {
     public _getSelector(): string {
       return this._svgElement;
     }
+
+    public _isSelectionInBounds(selection: D3.Selection, xExtent: Extent, yExtent: Extent, tolerance: number): boolean {
+      if (this._svgElement === "circle") {
+        var radius = parseFloat(selection.attr("r"));
+        var circleX = parseFloat(selection.attr("cx"));
+        var circleY = parseFloat(selection.attr("cy"));
+        var extentPoints = [{x: xExtent.min, y: yExtent.min}, {x: xExtent.min, y: yExtent.max},
+                            {x: xExtent.max, y: yExtent.min}, {x: xExtent.max, y: yExtent.max}];
+        return extentPoints.some((point: Point) => {
+          return Element.pointDistance(circleX, circleY, point.x, point.y) <= radius;
+        });
+      }
+      return true;
+    }
+
+    private static pointDistance(x1: number, y1: number, x2: number, y2: number) {
+      return Math.pow(Math.pow(y2 - y1, 2) + Math.pow(x2 - x1, 2), 0.5);
+    }
   }
 }
 }

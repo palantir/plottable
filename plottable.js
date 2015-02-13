@@ -3084,6 +3084,21 @@ var Plottable;
             Element.prototype._getSelector = function () {
                 return this._svgElement;
             };
+            Element.prototype._isSelectionInBounds = function (selection, xExtent, yExtent, tolerance) {
+                if (this._svgElement === "circle") {
+                    var radius = parseFloat(selection.attr("r"));
+                    var circleX = parseFloat(selection.attr("cx"));
+                    var circleY = parseFloat(selection.attr("cy"));
+                    var extentPoints = [{ x: xExtent.min, y: yExtent.min }, { x: xExtent.min, y: yExtent.max }, { x: xExtent.max, y: yExtent.min }, { x: xExtent.max, y: yExtent.max }];
+                    return extentPoints.some(function (point) {
+                        return Element.pointDistance(circleX, circleY, point.x, point.y) <= radius;
+                    });
+                }
+                return true;
+            };
+            Element.pointDistance = function (x1, y1, x2, y2) {
+                return Math.pow(Math.pow(y2 - y1, 2) + Math.pow(x2 - x1, 2), 0.5);
+            };
             return Element;
         })(_Drawer.AbstractDrawer);
         _Drawer.Element = Element;
