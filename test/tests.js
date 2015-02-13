@@ -1023,7 +1023,7 @@ describe("Category Axes", function () {
             [new Plottable.Component.Label("")]
         ]);
         table.renderTo(svg);
-        assert.closeTo(axis.height(), 44, 1, "height is calculated correctly");
+        assert.closeTo(axis.height(), 44, 2, "height is calculated correctly");
         assert.strictEqual(axis.width(), 300, "width is calculated correctly");
         svg.remove();
     });
