@@ -91,7 +91,7 @@ export module Dispatcher {
 
     private _processMoveEvent(e: MouseEvent) {
       var newMousePosition = this._computeMousePosition(e.clientX, e.clientY);
-      if (newMousePosition.x == null || newMousePosition.y == null) {
+      if (newMousePosition == null) {
         return; // couldn't measure
       }
       this._lastMousePosition = newMousePosition;
@@ -117,7 +117,7 @@ export module Dispatcher {
 
       // invalid measurements -- SVG might not be in the DOM
       if (origin.x === testPoint.x || origin.y === testPoint.y) {
-        return { x: null, y: null };
+        return null;
       }
 
       var scaleX = (testPoint.x - origin.x) / sampleDistance;

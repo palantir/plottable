@@ -8592,7 +8592,7 @@ var Plottable;
             };
             Mouse.prototype._processMoveEvent = function (e) {
                 var newMousePosition = this._computeMousePosition(e.clientX, e.clientY);
-                if (newMousePosition.x == null || newMousePosition.y == null) {
+                if (newMousePosition == null) {
                     return; // couldn't measure
                 }
                 this._lastMousePosition = newMousePosition;
@@ -8615,7 +8615,7 @@ var Plottable;
                 var testPoint = { x: mrBCR.left, y: mrBCR.top };
                 // invalid measurements -- SVG might not be in the DOM
                 if (origin.x === testPoint.x || origin.y === testPoint.y) {
-                    return { x: null, y: null };
+                    return null;
                 }
                 var scaleX = (testPoint.x - origin.x) / sampleDistance;
                 var scaleY = (testPoint.y - origin.y) / sampleDistance;
