@@ -510,7 +510,13 @@ declare module Plottable {
              */
             deregisterListener(key: any): Broadcaster<L>;
             /**
-             * Deregisters all listeners and callbacks associated with the broadcaster.
+             * Gets the keys for all listeners attached to the Broadcaster.
+             *
+             * @returns {any[]} An array of the keys.
+             */
+            getListenerKeys(): any[];
+            /**
+             * Deregisters all listeners and callbacks associated with the Broadcaster.
              *
              * @returns {Broadcaster} The calling Broadcaster
              */
@@ -3451,7 +3457,6 @@ declare module Plottable {
 declare module Plottable {
     module Dispatcher {
         class Mouse {
-            broadcaster: Core.Broadcaster;
             /**
              * Get a Dispatcher.Mouse for the <svg> containing elem. If one already exists
              * on that <svg>, it will be returned; otherwise, a new one will be created.
@@ -3484,7 +3489,10 @@ declare module Plottable {
              *
              * @return {Point} The last known mouse position in <svg> coordinate space.
              */
-            getLastMousePosition(): Point;
+            getLastMousePosition(): {
+                x: number;
+                y: number;
+            };
         }
     }
 }
