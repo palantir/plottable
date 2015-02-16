@@ -1391,91 +1391,9 @@ var Plottable;
                     _animationRequested = false;
                     _isCurrentlyFlushing = false;
                 }
-                // Reset resize flag regardless of queue'd components
-                Core.ResizeBroadcaster.clearResizing();
             }
             RenderController.flush = flush;
         })(RenderController = Core.RenderController || (Core.RenderController = {}));
-    })(Core = Plottable.Core || (Plottable.Core = {}));
-})(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var Plottable;
-(function (Plottable) {
-    var Core;
-    (function (Core) {
-        /**
-         * The ResizeBroadcaster will broadcast a notification to any registered
-         * components when the window is resized.
-         *
-         * The broadcaster and single event listener are lazily constructed.
-         *
-         * Upon resize, the _resized flag will be set to true until after the next
-         * flush of the RenderController. This is used, for example, to disable
-         * animations during resize.
-         */
-        var ResizeBroadcaster;
-        (function (ResizeBroadcaster) {
-            var broadcaster;
-            var _resizing = false;
-            function _lazyInitialize() {
-                if (broadcaster === undefined) {
-                    broadcaster = new Core.Broadcaster(ResizeBroadcaster);
-                    window.addEventListener("resize", _onResize);
-                }
-            }
-            function _onResize() {
-                _resizing = true;
-                broadcaster.broadcast();
-            }
-            /**
-             * Checks if the window has been resized and the RenderController
-             * has not yet been flushed.
-             *
-             * @returns {boolean} If the window has been resized/RenderController
-             * has not yet been flushed.
-             */
-            function resizing() {
-                return _resizing;
-            }
-            ResizeBroadcaster.resizing = resizing;
-            /**
-             * Sets that it is not resizing anymore. Good if it stubbornly thinks
-             * it is still resizing, or for cancelling the effects of resizing
-             * prematurely.
-             */
-            function clearResizing() {
-                _resizing = false;
-            }
-            ResizeBroadcaster.clearResizing = clearResizing;
-            /**
-             * Registers a component.
-             *
-             * When the window is resized, ._invalidateLayout() is invoked on the
-             * component, which will enqueue the component for layout and rendering
-             * with the RenderController.
-             *
-             * @param {Component} component Any Plottable component.
-             */
-            function register(c) {
-                _lazyInitialize();
-                broadcaster.registerListener(c.getID(), function () { return c._invalidateLayout(); });
-            }
-            ResizeBroadcaster.register = register;
-            /**
-             * Deregisters the components.
-             *
-             * The component will no longer receive updates on window resize.
-             *
-             * @param {Component} component Any Plottable component.
-             */
-            function deregister(c) {
-                if (broadcaster) {
-                    broadcaster.deregisterListener(c.getID());
-                }
-            }
-            ResizeBroadcaster.deregister = deregister;
-        })(ResizeBroadcaster = Core.ResizeBroadcaster || (Core.ResizeBroadcaster = {}));
     })(Core = Plottable.Core || (Plottable.Core = {}));
 })(Plottable || (Plottable = {}));
 
@@ -3314,9 +3232,6 @@ var Plottable;
                 this._boundingBox = this._addBox("bounding-box");
                 this._interactionsToRegister.forEach(function (r) { return _this.registerInteraction(r); });
                 this._interactionsToRegister = null;
-                if (this._isTopLevelComponent) {
-                    this.autoResize(this._autoResize);
-                }
                 this._isSetup = true;
             };
             AbstractComponent.prototype._requestedSpace = function (availableWidth, availableHeight) {
@@ -3440,7 +3355,7 @@ var Plottable;
              * @param {number} [availableHeight] - the height of the container element
              * @returns {Component} The calling component.
              */
-            AbstractComponent.prototype.resize = function (width, height) {
+            AbstractComponent.prototype.forceRedraw = function (width, height) {
                 if (!this._isTopLevelComponent) {
                     throw new Error("Cannot resize on non top-level component");
                 }
@@ -3448,26 +3363,6 @@ var Plottable;
                     this._rootSVG.attr({ width: width, height: height });
                 }
                 this._invalidateLayout();
-                return this;
-            };
-            /**
-             * Enables or disables resize on window resizes.
-             *
-             * If enabled, window resizes will enqueue this component for a re-layout
-             * and re-render. Animations are disabled during window resizes when auto-
-             * resize is enabled.
-             *
-             * @param {boolean} flag Enable (true) or disable (false) auto-resize.
-             * @returns {Component} The calling component.
-             */
-            AbstractComponent.prototype.autoResize = function (flag) {
-                if (flag) {
-                    Plottable.Core.ResizeBroadcaster.register(this);
-                }
-                else {
-                    Plottable.Core.ResizeBroadcaster.deregister(this);
-                }
-                this._autoResize = flag; // if _setup were called by constructor, this var could be _removed #591
                 return this;
             };
             /**
@@ -3703,7 +3598,6 @@ var Plottable;
             AbstractComponent.prototype.remove = function () {
                 this._removed = true;
                 this.detach();
-                Plottable.Core.ResizeBroadcaster.deregister(this);
             };
             /**
              * Return the width of the component

@@ -93,9 +93,6 @@ export module Component {
 
       this._interactionsToRegister.forEach((r) => this.registerInteraction(r));
       this._interactionsToRegister = null;
-      if (this._isTopLevelComponent) {
-        this.autoResize(this._autoResize);
-      }
       this._isSetup = true;
     }
 
@@ -226,7 +223,7 @@ export module Component {
      * @param {number} [availableHeight] - the height of the container element
      * @returns {Component} The calling component.
      */
-    public resize(width?: number, height?: number): AbstractComponent {
+    public forceRedraw(width?: number, height?: number): AbstractComponent {
       if (!this._isTopLevelComponent) {
         throw new Error("Cannot resize on non top-level component");
       }
@@ -234,26 +231,6 @@ export module Component {
         this._rootSVG.attr({width: width, height: height});
       }
       this._invalidateLayout();
-      return this;
-    }
-
-    /**
-     * Enables or disables resize on window resizes.
-     *
-     * If enabled, window resizes will enqueue this component for a re-layout
-     * and re-render. Animations are disabled during window resizes when auto-
-     * resize is enabled.
-     *
-     * @param {boolean} flag Enable (true) or disable (false) auto-resize.
-     * @returns {Component} The calling component.
-     */
-    public autoResize(flag: boolean): AbstractComponent {
-      if (flag) {
-        Core.ResizeBroadcaster.register(this);
-      } else {
-        Core.ResizeBroadcaster.deregister(this);
-      }
-      this._autoResize = flag; // if _setup were called by constructor, this var could be _removed #591
       return this;
     }
 
@@ -498,7 +475,6 @@ export module Component {
     public remove() {
       this._removed = true;
       this.detach();
-      Core.ResizeBroadcaster.deregister(this);
     }
 
     /**
