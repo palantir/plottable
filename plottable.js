@@ -4793,7 +4793,9 @@ var Plottable;
                 return this._computedHeight;
             };
             Numeric.prototype._getTickValues = function () {
-                return this._scale.ticks();
+                var scale = this._scale;
+                var domain = scale.domain();
+                return scale.ticks().filter(function (i) { return i >= domain[0] && i <= domain[1]; });
             };
             Numeric.prototype._rescale = function () {
                 if (!this._isSetup) {
