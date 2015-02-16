@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <script type = "text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+        <script type = "text/javascript" src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+        <script type = "text/javascript" src="https://rawgithub.com/palantir/plottable/develop/plottable.js"></script>
+        <script type = "text/javascript" src="http://rawgithub.com/palantir/plottable/develop/quicktests/exampleUtil.js"></script>
+        <script type = "text/javascript" src="http://localhost:9999/quicktests/overlaying/playground.js"></script>
+        <link rel="stylesheet" type="text/css" href="https://rawgithub.com/palantir/plottable/master/plottable.css">
+        <link rel="stylesheet" type="text/css" href="http://localhost:9999/quicktests/overlaying/playground.css">
+
+    </head>
+    <body>
+        <div align="center">
+        <br><br>
+        <svg id="playground" width="400" height="400"></svg>
+        </div>
+
+        <br>
+
+        <div align="center">
+            <button id="updateButton" onclick="svg_size()"> Update </button>
+            <br>
+            <br>        
+            <span> width (px): </span>
+            <input type="text" id="svg_w" rows="1" cols="10" value="400" class="changable"></textarea>
+            <span> height (px): </span>
+            <input type="text" id="svg_h" rows="1" cols="10" value="400" class="changable"></textarea>
+        </div>
+
+        <br>
+
+        <div align="center">
+            <span> x-axis type </span>
+            <select id="xAxisType" class="changable">
+              <option>Numeric(Linear)</option>
+              <option>Numeric(Log)</option>   
+              <option>Time</option>
+              <option>Category</option>  
+            </select>
+            <br>
+            <span> y-axis type </span>
+            <select id="yAxisType" class="changable">
+              <option>Numeric(Linear)</option>
+              <option>Numeric(Log)</option>  
+              <option>Category</option>
+            </select>
+            <br>
+            <span> plot type </span>
+            <select id="plotType" class="changable">
+              <option>Scatter</option>
+              <option>Line</option>
+              <option>Area</option>
+              <option>Bar</option>
+            </select>
+        </div>
+
+        <br>
+
+        <div align="center">
+          <form action="">
+          <input type="checkbox" id="red" name="projections" value="Color" class="changable">Color the graph red<br>
+          <input type="checkbox" id="gridlines" name="projections" value="Gridlines" class="changable">Add gridlines
+          </form>
+
+        </div>
+
+        <br>
+
+        <div align="center">
+            <textarea id="code" rows="50" cols="80"></textarea>
+        </div>
+
+    </body>
+</html>
