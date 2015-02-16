@@ -214,22 +214,14 @@ export module Component {
     }
 
     /**
-     * Causes the Component to recompute layout and redraw. If passed arguments, will resize the root SVG it lives in.
+     * Causes the Component to recompute layout and redraw.
      *
      * This function should be called when CSS changes could influence the size
      * of the components, e.g. changing the font size.
      *
-     * @param {number} [availableWidth]  - the width of the container element
-     * @param {number} [availableHeight] - the height of the container element
      * @returns {Component} The calling component.
      */
-    public forceRedraw(width?: number, height?: number): AbstractComponent {
-      if (!this._isTopLevelComponent) {
-        throw new Error("Cannot resize on non top-level component");
-      }
-      if (width != null && height != null && this._isAnchored) {
-        this._rootSVG.attr({width: width, height: height});
-      }
+    public redraw(): AbstractComponent {
       this._invalidateLayout();
       return this;
     }
