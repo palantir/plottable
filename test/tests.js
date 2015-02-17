@@ -4253,10 +4253,10 @@ describe("Broadcasters", function () {
     it("arguments are passed through to callback", function () {
         var g2 = {};
         var g3 = "foo";
-        var cb = function (a1, rest) {
-            assert.equal(listenable, a1, "broadcaster passed through");
-            assert.equal(g2, rest[0], "arg1 passed through");
-            assert.equal(g3, rest[1], "arg2 passed through");
+        var cb = function (arg1, arg2, arg3) {
+            assert.strictEqual(listenable, arg1, "broadcaster passed through");
+            assert.strictEqual(g2, arg2, "g2 passed through");
+            assert.strictEqual(g3, arg3, "g3 passed through");
             called = true;
         };
         b.registerListener(null, cb);

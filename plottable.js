@@ -1081,6 +1081,7 @@ var Plottable;
              * Registers a callback to be called when the broadcast method is called. Also takes a key which
              * is used to support deregistering the same callback later, by passing in the same key.
              * If there is already a callback associated with that key, then the callback will be replaced.
+             * The callback will be passed the Broadcaster's "listenable" as the `this` context.
              *
              * @param key The key associated with the callback. Key uniqueness is determined by deep equality.
              * @param {BroadcasterCallback<L>} callback A callback to be called.
@@ -1102,7 +1103,10 @@ var Plottable;
                 for (var _i = 0; _i < arguments.length; _i++) {
                     args[_i - 0] = arguments[_i];
                 }
-                this._key2callback.values().forEach(function (callback) { return callback(_this._listenable, args); });
+                args.unshift(this._listenable);
+                this._key2callback.values().forEach(function (callback) {
+                    callback.apply(_this._listenable, args);
+                });
                 return this;
             };
             /**
