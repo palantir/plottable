@@ -148,7 +148,7 @@ export module Axis {
 
       return {
         textFits: wrappingResults.every((t: SVGTypewriter.Wrappers.WrappingResult) =>
-                    !SVGTypewriter.Utils.StringMethods.isNotEmptyString(t.truncatedText) && t.noLines === 1),
+                    SVGTypewriter.Utils.StringMethods.isNotEmptyString(t.truncatedText) && t.noLines === 1),
         usedWidth : widthFn<SVGTypewriter.Wrappers.WrappingResult, number>(wrappingResults,
                       (t: SVGTypewriter.Wrappers.WrappingResult) => this._measurer.measure(t.wrappedText).width, 0),
         usedHeight: heightFn<SVGTypewriter.Wrappers.WrappingResult, number>(wrappingResults,

@@ -449,17 +449,29 @@ export module Axis {
         );
       };
 
+      var visibleTickMarks = this._tierMarkContainers[index]
+                                    .selectAll("." + AbstractAxis.TICK_MARK_CLASS)
+                                    .filter(function(d: Element, i: number) {
+                                      return d3.select(this).style("visibility") === "visible";
+                                    });
+
+      // We use the ClientRects because x1/x2 attributes are not comparable to ClientRects of labels
+      var visibleTickMarkRects = visibleTickMarks[0].map((mark: Element) => mark.getBoundingClientRect() );
+
       var visibleTickLabels = this._tierLabelContainers[index]
                                     .selectAll("." + AbstractAxis.TICK_LABEL_CLASS)
-                                    .filter(function(d: any, i: number) {
+                                    .filter(function(d: Element, i: number) {
                                       return d3.select(this).style("visibility") === "visible";
                                     });
       var lastLabelClientRect: ClientRect;
 
-      visibleTickLabels.each(function (d: any) {
+      visibleTickLabels.each(function (d: Element, i: number) {
         var clientRect = this.getBoundingClientRect();
         var tickLabel = d3.select(this);
-        if (!isInsideBBox(clientRect) || (lastLabelClientRect != null && _Util.DOM.boxesOverlap(clientRect, lastLabelClientRect))) {
+        var leadingTickMark = visibleTickMarkRects[i];
+        var trailingTickMark = visibleTickMarkRects[i+1];
+        if (!isInsideBBox(clientRect) || (lastLabelClientRect != null && _Util.DOM.boxesOverlap(clientRect, lastLabelClientRect))
+            || (leadingTickMark.right > clientRect.left || trailingTickMark.left < clientRect.right)) {
           tickLabel.style("visibility", "hidden");
         } else {
           lastLabelClientRect = clientRect;

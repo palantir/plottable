@@ -586,6 +586,23 @@ describe("TimeAxis", function () {
         assert.isTrue(lastTick.classed(Plottable.Axis.AbstractAxis.END_TICK_MARK_CLASS), "last end tick has the end-tick-mark class");
         svg.remove();
     });
+    it("tick labels do not overlap with tick marks", function () {
+        var svg = generateSVG(400, 100);
+        scale = new Plottable.Scale.Time();
+        scale.domain([new Date("2009-12-20"), new Date("2011-01-01")]);
+        axis = new Plottable.Axis.Time(scale, "bottom");
+        axis.renderTo(svg);
+        var tickRects = d3.selectAll("." + Plottable.Axis.AbstractAxis.TICK_MARK_CLASS)[0].map(function (mark) { return mark.getBoundingClientRect(); });
+        var labelRects = d3.selectAll("." + Plottable.Axis.AbstractAxis.TICK_LABEL_CLASS).filter(function (d, i) {
+            return d3.select(this).style("visibility") === "visible";
+        })[0].map(function (label) { return label.getBoundingClientRect(); });
+        labelRects.forEach(function (labelRect) {
+            tickRects.forEach(function (tickRect) {
+                assert.isFalse(Plottable._Util.DOM.boxesOverlap(labelRect, tickRect), "visible label does not overlap with a tick");
+            });
+        });
+        svg.remove();
+    });
 });
 
 ///<reference path="../testReference.ts" />
@@ -918,6 +935,25 @@ describe("NumericAxis", function () {
         }
         svg.remove();
     });
+    it("does not draw ticks marks outside of the svg", function () {
+        var SVG_WIDTH = 300;
+        var SVG_HEIGHT = 100;
+        var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        var scale = new Plottable.Scale.Linear();
+        scale.domain([0, 3]);
+        scale.tickGenerator(function (s) {
+            return [0, 1, 2, 3, 4];
+        });
+        var baseAxis = new Plottable.Axis.Numeric(scale, "bottom");
+        baseAxis.renderTo(svg);
+        var tickMarks = baseAxis._element.selectAll(".tick-mark");
+        tickMarks.each(function () {
+            var tickMark = d3.select(this);
+            var tickMarkPosition = Number(tickMark.attr("x"));
+            assert.isTrue(tickMarkPosition >= 0 && tickMarkPosition <= SVG_WIDTH, "tick marks are located within the bounding SVG");
+        });
+        svg.remove();
+    });
 });
 
 ///<reference path="../testReference.ts" />
@@ -1009,6 +1045,19 @@ describe("Category Axes", function () {
         text = ticks[0].map(function (d) { return d3.select(d).text(); });
         assert.deepEqual(text, years, "text displayed correctly when horizontal");
         assert.include(axis._content.selectAll(".text-area").attr("transform"), -90, "the ticks were rotated left");
+        svg.remove();
+    });
+    it("axis should request more space if there's not enough space to fit the text", function () {
+        var svg = generateSVG(300, 300);
+        var years = ["2000", "2001", "2002", "2003"];
+        var scale = new Plottable.Scale.Ordinal().domain(years);
+        var axis = new Plottable.Axis.Category(scale, "bottom");
+        axis.renderTo(svg);
+        var requestedSpace = axis._requestedSpace(300, 10);
+        assert.isTrue(requestedSpace.wantsHeight, "axis should ask for more space (horizontal orientation)");
+        axis.orient("left");
+        requestedSpace = axis._requestedSpace(10, 300);
+        assert.isTrue(requestedSpace.wantsWidth, "axis should ask for more space (vertical orientation)");
         svg.remove();
     });
 });
@@ -4204,10 +4253,10 @@ describe("Broadcasters", function () {
     it("arguments are passed through to callback", function () {
         var g2 = {};
         var g3 = "foo";
-        var cb = function (a1, rest) {
-            assert.equal(listenable, a1, "broadcaster passed through");
-            assert.equal(g2, rest[0], "arg1 passed through");
-            assert.equal(g3, rest[1], "arg2 passed through");
+        var cb = function (arg1, arg2, arg3) {
+            assert.strictEqual(listenable, arg1, "broadcaster passed through");
+            assert.strictEqual(g2, arg2, "g2 passed through");
+            assert.strictEqual(g3, arg3, "g3 passed through");
             called = true;
         };
         b.registerListener(null, cb);
@@ -5099,62 +5148,6 @@ describe("Component behavior", function () {
             assert.strictEqual(origin.x, groupWidth - cWidth + groupXOffset, "returns correct value (xAlign right)");
             assert.strictEqual(origin.y, groupHeight - cHeight + groupYOffset, "returns correct value (yAlign bottom)");
             svg.remove();
-        });
-    });
-    describe("resizeBroadcaster testing", function () {
-        var oldRegister;
-        var oldDeregister;
-        var registeredComponents;
-        var id;
-        before(function () {
-            oldRegister = Plottable.Core.ResizeBroadcaster.register;
-            oldDeregister = Plottable.Core.ResizeBroadcaster.deregister;
-            var mockRegister = function (c) {
-                registeredComponents.add(c.getID());
-            };
-            var mockDeregister = function (c) {
-                registeredComponents.remove(c.getID());
-            };
-            Plottable.Core.ResizeBroadcaster.register = mockRegister;
-            Plottable.Core.ResizeBroadcaster.deregister = mockDeregister;
-        });
-        after(function () {
-            Plottable.Core.ResizeBroadcaster.register = oldRegister;
-            Plottable.Core.ResizeBroadcaster.deregister = oldDeregister;
-        });
-        beforeEach(function () {
-            registeredComponents = d3.set();
-            id = c.getID();
-        });
-        afterEach(function () {
-            svg.remove(); // svg contains no useful info
-        });
-        it("components can be removed from resizeBroadcaster before rendering", function () {
-            c.autoResize(false);
-            c.renderTo(svg);
-            assert.isFalse(registeredComponents.has(id), "component not registered to broadcaster");
-        });
-        it("components register by default", function () {
-            c.renderTo(svg);
-            assert.isTrue(registeredComponents.has(id), "component is registered");
-        });
-        it("component can be deregistered then registered before render", function () {
-            c.autoResize(false);
-            c.autoResize(true);
-            c.renderTo(svg);
-            assert.isTrue(registeredComponents.has(id), "component is registered");
-        });
-        it("component can be deregistered after rendering", function () {
-            c.renderTo(svg);
-            c.autoResize(false);
-            assert.isFalse(registeredComponents.has(id), "component was deregistered after rendering");
-        });
-        it("calling .remove deregisters a component", function () {
-            c.autoResize(true);
-            c.renderTo(svg);
-            assert.isTrue(registeredComponents.has(id), "component is registered");
-            c.remove();
-            assert.isFalse(registeredComponents.has(id), "component is deregistered after removal");
         });
     });
 });
@@ -6101,6 +6094,10 @@ describe("TimeScale tests", function () {
         checkDomain(["10/1/2014", "11/1/2014"]);
         checkDomain(["October 1, 2014", "November 1, 2014"]);
         checkDomain(["Oct 1, 2014", "Nov 1, 2014"]);
+    });
+    it("can't set reversed domain", function () {
+        var scale = new Plottable.Scale.Time();
+        assert.throws(function () { return scale.domain(["1985-10-26", "1955-11-05"]); }, "chronological");
     });
     it("time coercer works as intended", function () {
         var tc = new Plottable.Scale.Time()._typeCoercer;

@@ -18,7 +18,6 @@
 /// <reference path="core/dataset.ts" />
 /// <reference path="core/renderPolicy.ts" />
 /// <reference path="core/renderController.ts" />
-/// <reference path="core/resizeBroadcaster.ts" />
 /// <reference path="core/interfaces.ts" />
 /// <reference path="core/domainer.ts" />
 

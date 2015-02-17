@@ -1,5 +1,5 @@
 /*!
-Plottable 0.43.1 (https://github.com/palantir/plottable)
+Plottable 0.44.0 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -990,7 +990,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "0.43.1";
+    Plottable.version = "0.44.0";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -1092,6 +1092,7 @@ var Plottable;
              * Registers a callback to be called when the broadcast method is called. Also takes a key which
              * is used to support deregistering the same callback later, by passing in the same key.
              * If there is already a callback associated with that key, then the callback will be replaced.
+             * The callback will be passed the Broadcaster's "listenable" as the `this` context.
              *
              * @param key The key associated with the callback. Key uniqueness is determined by deep equality.
              * @param {BroadcasterCallback<L>} callback A callback to be called.
@@ -1113,7 +1114,10 @@ var Plottable;
                 for (var _i = 0; _i < arguments.length; _i++) {
                     args[_i - 0] = arguments[_i];
                 }
-                this._key2callback.values().forEach(function (callback) { return callback(_this._listenable, args); });
+                args.unshift(this._listenable);
+                this._key2callback.values().forEach(function (callback) {
+                    callback.apply(_this._listenable, args);
+                });
                 return this;
             };
             /**
@@ -1410,91 +1414,9 @@ var Plottable;
                     _animationRequested = false;
                     _isCurrentlyFlushing = false;
                 }
-                // Reset resize flag regardless of queue'd components
-                Core.ResizeBroadcaster.clearResizing();
             }
             RenderController.flush = flush;
         })(RenderController = Core.RenderController || (Core.RenderController = {}));
-    })(Core = Plottable.Core || (Plottable.Core = {}));
-})(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var Plottable;
-(function (Plottable) {
-    var Core;
-    (function (Core) {
-        /**
-         * The ResizeBroadcaster will broadcast a notification to any registered
-         * components when the window is resized.
-         *
-         * The broadcaster and single event listener are lazily constructed.
-         *
-         * Upon resize, the _resized flag will be set to true until after the next
-         * flush of the RenderController. This is used, for example, to disable
-         * animations during resize.
-         */
-        var ResizeBroadcaster;
-        (function (ResizeBroadcaster) {
-            var broadcaster;
-            var _resizing = false;
-            function _lazyInitialize() {
-                if (broadcaster === undefined) {
-                    broadcaster = new Core.Broadcaster(ResizeBroadcaster);
-                    window.addEventListener("resize", _onResize);
-                }
-            }
-            function _onResize() {
-                _resizing = true;
-                broadcaster.broadcast();
-            }
-            /**
-             * Checks if the window has been resized and the RenderController
-             * has not yet been flushed.
-             *
-             * @returns {boolean} If the window has been resized/RenderController
-             * has not yet been flushed.
-             */
-            function resizing() {
-                return _resizing;
-            }
-            ResizeBroadcaster.resizing = resizing;
-            /**
-             * Sets that it is not resizing anymore. Good if it stubbornly thinks
-             * it is still resizing, or for cancelling the effects of resizing
-             * prematurely.
-             */
-            function clearResizing() {
-                _resizing = false;
-            }
-            ResizeBroadcaster.clearResizing = clearResizing;
-            /**
-             * Registers a component.
-             *
-             * When the window is resized, ._invalidateLayout() is invoked on the
-             * component, which will enqueue the component for layout and rendering
-             * with the RenderController.
-             *
-             * @param {Component} component Any Plottable component.
-             */
-            function register(c) {
-                _lazyInitialize();
-                broadcaster.registerListener(c.getID(), function () { return c._invalidateLayout(); });
-            }
-            ResizeBroadcaster.register = register;
-            /**
-             * Deregisters the components.
-             *
-             * The component will no longer receive updates on window resize.
-             *
-             * @param {Component} component Any Plottable component.
-             */
-            function deregister(c) {
-                if (broadcaster) {
-                    broadcaster.deregisterListener(c.getID());
-                }
-            }
-            ResizeBroadcaster.deregister = deregister;
-        })(ResizeBroadcaster = Core.ResizeBroadcaster || (Core.ResizeBroadcaster = {}));
     })(Core = Plottable.Core || (Plottable.Core = {}));
 })(Plottable || (Plottable = {}));
 
@@ -2470,6 +2392,9 @@ var Plottable;
             Time.prototype._setDomain = function (values) {
                 // attempt to parse dates
                 values = values.map(this._typeCoercer);
+                if (values[1] < values[0]) {
+                    throw new Error("Scale.Time domain values must be in chronological order");
+                }
                 return _super.prototype._setDomain.call(this, values);
             };
             Time.prototype.copy = function () {
@@ -3330,9 +3255,6 @@ var Plottable;
                 this._boundingBox = this._addBox("bounding-box");
                 this._interactionsToRegister.forEach(function (r) { return _this.registerInteraction(r); });
                 this._interactionsToRegister = null;
-                if (this._isTopLevelComponent) {
-                    this.autoResize(this._autoResize);
-                }
                 this._isSetup = true;
             };
             AbstractComponent.prototype._requestedSpace = function (availableWidth, availableHeight) {
@@ -3447,43 +3369,15 @@ var Plottable;
                 return this;
             };
             /**
-             * Causes the Component to recompute layout and redraw. If passed arguments, will resize the root SVG it lives in.
+             * Causes the Component to recompute layout and redraw.
              *
              * This function should be called when CSS changes could influence the size
              * of the components, e.g. changing the font size.
              *
-             * @param {number} [availableWidth]  - the width of the container element
-             * @param {number} [availableHeight] - the height of the container element
              * @returns {Component} The calling component.
              */
-            AbstractComponent.prototype.resize = function (width, height) {
-                if (!this._isTopLevelComponent) {
-                    throw new Error("Cannot resize on non top-level component");
-                }
-                if (width != null && height != null && this._isAnchored) {
-                    this._rootSVG.attr({ width: width, height: height });
-                }
+            AbstractComponent.prototype.redraw = function () {
                 this._invalidateLayout();
-                return this;
-            };
-            /**
-             * Enables or disables resize on window resizes.
-             *
-             * If enabled, window resizes will enqueue this component for a re-layout
-             * and re-render. Animations are disabled during window resizes when auto-
-             * resize is enabled.
-             *
-             * @param {boolean} flag Enable (true) or disable (false) auto-resize.
-             * @returns {Component} The calling component.
-             */
-            AbstractComponent.prototype.autoResize = function (flag) {
-                if (flag) {
-                    Plottable.Core.ResizeBroadcaster.register(this);
-                }
-                else {
-                    Plottable.Core.ResizeBroadcaster.deregister(this);
-                }
-                this._autoResize = flag; // if _setup were called by constructor, this var could be _removed #591
                 return this;
             };
             /**
@@ -3719,7 +3613,6 @@ var Plottable;
             AbstractComponent.prototype.remove = function () {
                 this._removed = true;
                 this.detach();
-                Plottable.Core.ResizeBroadcaster.deregister(this);
             };
             /**
              * Return the width of the component
@@ -4710,14 +4603,21 @@ var Plottable;
                 var isInsideBBox = function (tickBox) {
                     return (Math.floor(boundingBox.left) <= Math.ceil(tickBox.left) && Math.floor(boundingBox.top) <= Math.ceil(tickBox.top) && Math.floor(tickBox.right) <= Math.ceil(boundingBox.left + _this.width()) && Math.floor(tickBox.bottom) <= Math.ceil(boundingBox.top + _this.height()));
                 };
+                var visibleTickMarks = this._tierMarkContainers[index].selectAll("." + Axis.AbstractAxis.TICK_MARK_CLASS).filter(function (d, i) {
+                    return d3.select(this).style("visibility") === "visible";
+                });
+                // We use the ClientRects because x1/x2 attributes are not comparable to ClientRects of labels
+                var visibleTickMarkRects = visibleTickMarks[0].map(function (mark) { return mark.getBoundingClientRect(); });
                 var visibleTickLabels = this._tierLabelContainers[index].selectAll("." + Axis.AbstractAxis.TICK_LABEL_CLASS).filter(function (d, i) {
                     return d3.select(this).style("visibility") === "visible";
                 });
                 var lastLabelClientRect;
-                visibleTickLabels.each(function (d) {
+                visibleTickLabels.each(function (d, i) {
                     var clientRect = this.getBoundingClientRect();
                     var tickLabel = d3.select(this);
-                    if (!isInsideBBox(clientRect) || (lastLabelClientRect != null && Plottable._Util.DOM.boxesOverlap(clientRect, lastLabelClientRect))) {
+                    var leadingTickMark = visibleTickMarkRects[i];
+                    var trailingTickMark = visibleTickMarkRects[i + 1];
+                    if (!isInsideBBox(clientRect) || (lastLabelClientRect != null && Plottable._Util.DOM.boxesOverlap(clientRect, lastLabelClientRect)) || (leadingTickMark.right > clientRect.left || trailingTickMark.left < clientRect.right)) {
                         tickLabel.style("visibility", "hidden");
                     }
                     else {
@@ -4802,7 +4702,9 @@ var Plottable;
                 return this._computedHeight;
             };
             Numeric.prototype._getTickValues = function () {
-                return this._scale.ticks();
+                var scale = this._scale;
+                var domain = scale.domain();
+                return scale.ticks().filter(function (i) { return i >= domain[0] && i <= domain[1]; });
             };
             Numeric.prototype._rescale = function () {
                 if (!this._isSetup) {
@@ -5092,7 +4994,7 @@ var Plottable;
                 var widthFn = this._isHorizontal() ? d3.sum : Plottable._Util.Methods.max;
                 var heightFn = this._isHorizontal() ? Plottable._Util.Methods.max : d3.sum;
                 return {
-                    textFits: wrappingResults.every(function (t) { return !SVGTypewriter.Utils.StringMethods.isNotEmptyString(t.truncatedText) && t.noLines === 1; }),
+                    textFits: wrappingResults.every(function (t) { return SVGTypewriter.Utils.StringMethods.isNotEmptyString(t.truncatedText) && t.noLines === 1; }),
                     usedWidth: widthFn(wrappingResults, function (t) { return _this._measurer.measure(t.wrappedText).width; }, 0),
                     usedHeight: heightFn(wrappingResults, function (t) { return _this._measurer.measure(t.wrappedText).height; }, 0)
                 };
@@ -6445,16 +6347,32 @@ var Plottable;
                 }
                 return this;
             };
-            AbstractPlot.prototype.removeDataset = function (datasetOrKeyOrArray) {
+            /**
+             * Removes a dataset by the given identifier
+             *
+             * @param {string | Dataset | any[]} datasetIdentifer The identifier as the key of the Dataset to remove
+             * If string is inputted, it is interpreted as the dataset key to remove.
+             * If Dataset is inputted, the first Dataset in the plot that is the same will be removed.
+             * If any[] is inputted, the first data array in the plot that is the same will be removed.
+             * @returns {AbstractPlot} The calling AbstractPlot.
+             */
+            AbstractPlot.prototype.removeDataset = function (datasetIdentifier) {
                 var key;
-                if (typeof (datasetOrKeyOrArray) === "string") {
-                    key = datasetOrKeyOrArray;
+                if (typeof datasetIdentifier === "string") {
+                    key = datasetIdentifier;
                 }
-                else if (datasetOrKeyOrArray instanceof Plottable.Dataset || datasetOrKeyOrArray instanceof Array) {
-                    var array = (datasetOrKeyOrArray instanceof Plottable.Dataset) ? this.datasets() : this.datasets().map(function (d) { return d.data(); });
-                    var idx = array.indexOf(datasetOrKeyOrArray);
-                    if (idx !== -1) {
-                        key = this._datasetKeysInOrder[idx];
+                else if (typeof datasetIdentifier === "object") {
+                    var index = -1;
+                    if (datasetIdentifier instanceof Plottable.Dataset) {
+                        var datasetArray = this.datasets();
+                        index = datasetArray.indexOf(datasetIdentifier);
+                    }
+                    else if (datasetIdentifier instanceof Array) {
+                        var dataArray = this.datasets().map(function (d) { return d.data(); });
+                        index = dataArray.indexOf(datasetIdentifier);
+                    }
+                    if (index !== -1) {
+                        key = this._datasetKeysInOrder[index];
                     }
                 }
                 return this._removeDataset(key);
@@ -9105,7 +9023,7 @@ var Plottable;
             };
             Drag.prototype._dragend = function () {
                 var location = d3.mouse(this._hitBox[0][0].parentNode);
-                this._setLocation(location[0], location[1]);
+                this._setLocation(this._constrainX(location[0]), this._constrainY(location[1]));
                 this._isDragging = false;
                 this._doDragend();
             };

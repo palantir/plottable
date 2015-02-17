@@ -131,4 +131,23 @@ describe("TimeAxis", () => {
     assert.isTrue(lastTick.classed(Plottable.Axis.AbstractAxis.END_TICK_MARK_CLASS), "last end tick has the end-tick-mark class");
     svg.remove();
   });
+
+  it("tick labels do not overlap with tick marks", () => {
+    var svg = generateSVG(400, 100);
+    scale = new Plottable.Scale.Time();
+    scale.domain([new Date("2009-12-20"), new Date("2011-01-01")]);
+    axis = new Plottable.Axis.Time(scale, "bottom");
+    axis.renderTo(svg);
+    var tickRects = d3.selectAll("." + Plottable.Axis.AbstractAxis.TICK_MARK_CLASS)[0].map((mark: Element) => mark.getBoundingClientRect());
+    var labelRects = d3.selectAll("." + Plottable.Axis.AbstractAxis.TICK_LABEL_CLASS)
+        .filter(function(d: Element, i: number) {
+          return d3.select(this).style("visibility") === "visible";
+        })[0].map((label: Element) => label.getBoundingClientRect());
+    labelRects.forEach(function(labelRect: ClientRect) {
+      tickRects.forEach(function(tickRect: ClientRect) {
+        assert.isFalse(Plottable._Util.DOM.boxesOverlap(labelRect, tickRect), "visible label does not overlap with a tick");
+      });
+    });
+    svg.remove();
+  });
 });
