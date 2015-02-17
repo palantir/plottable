@@ -83,6 +83,13 @@ export module _Drawer {
       });
       this._labelsTooWide = labelTooWide.some((d: boolean) => d);
     }
+
+    public _getPixelPoints(selection: D3.Selection) {
+      var width = parseFloat(selection.attr("width"));
+      var x = parseFloat(selection.attr("x"));
+      var y = parseFloat(selection.attr("y"));
+      return [ { x: x + width / 2, y: y } ];
+    }
   }
 
 }

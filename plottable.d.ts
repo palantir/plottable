@@ -1582,6 +1582,10 @@ declare module Plottable {
             removeLabels(): void;
             _getIfLabelsTooWide(): boolean;
             drawText(data: any[], attrToProjector: AttributeToProjector, userMetadata: any, plotMetadata: Plot.PlotMetadata): void;
+            _getPixelPoints(selection: D3.Selection): {
+                x: number;
+                y: number;
+            }[];
         }
     }
 }
