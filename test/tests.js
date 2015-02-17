@@ -6680,6 +6680,11 @@ describe("_Util.Methods", function () {
         var lDarkenedColor = Plottable._Util.Color.rgbToHsl(parseInt(darkenedColor.substring(1, 3), 16), parseInt(darkenedColor.substring(3, 5), 16), parseInt(darkenedColor.substring(5, 7), 16))[2];
         assert.operator(lDarkenedColor, "<", lColor, "color got darker");
     });
+    it("pointDistance()", function () {
+        var p1 = { x: 3, y: 5 };
+        var p2 = { x: 6, y: 1 };
+        assert.strictEqual(Plottable._Util.Methods.pointDistance(p1, p2), 5, "pointDistance correctly calculated");
+    });
 });
 
 ///<reference path="../testReference.ts" />
