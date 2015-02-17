@@ -2858,7 +2858,7 @@ var Plottable;
                 return [];
             };
             AbstractDrawer.prototype._getDatum = function (selection, point) {
-                return null;
+                return selection.data();
             };
             return AbstractDrawer;
         })();

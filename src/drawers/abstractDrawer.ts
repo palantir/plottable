@@ -147,7 +147,7 @@ export module _Drawer {
     }
 
     public _getDatum(selection: D3.Selection, point: Point): any {
-      return null;
+      return selection.data();
     }
 
   }
