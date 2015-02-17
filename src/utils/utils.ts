@@ -325,6 +325,10 @@ export module _Util {
 
       return "#" + rHex + gHex + bHex;
     }
+
+    export function pointDistance(p1: Point, p2: Point): number {
+      throw new Error("not yet implemented");
+    }
   }
 }
 }

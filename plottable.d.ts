@@ -128,6 +128,7 @@ declare module Plottable {
             function colorTest(colorTester: D3.Selection, className: string): string;
             function lightenColor(color: string, factor: number): string;
             function darkenColor(color: string, factor: number, darkenAmount: number): string;
+            function pointDistance(p1: Point, p2: Point): number;
         }
     }
 }
@@ -1515,6 +1516,8 @@ declare module Plottable {
             _getRenderArea(): D3.Selection;
             _getSelector(): string;
             _getDistance(selection: D3.Selection, xValue: number, yValue: number): number;
+            _getPixelPoints(selection: D3.Selection): Point[];
+            _getDatum(selection: D3.Selection, point: Point): any;
         }
     }
 }
@@ -2574,6 +2577,11 @@ declare module Plottable {
         interface PlotMetadata {
             datasetKey: string;
         }
+        type PlotData = {
+            data: any[];
+            pixelPoints: Point[];
+            selection: D3.Selection;
+        };
         class AbstractPlot extends Component.AbstractComponent {
             protected _dataChanged: boolean;
             protected _key2PlotDatasetKey: D3.Map<PlotDatasetKey>;
@@ -2720,14 +2728,14 @@ declare module Plottable {
             protected _getPlotMetadataForDataset(key: string): PlotMetadata;
             getAllSelections(): D3.Selection;
             /**
-             * Retrieves the closest selection to the specified x/y point within a specified value
+             * Retrieves the closest PlotData to the specified x/y point within a specified value
              *
              * @param {number} xValue The x value to compare against
              * @param {number} yValue The y value to compare against
              * @param {number} withinValue The maximum distance the closest selection can be to the point (default = Infinity)
-             * @returns {D3.Selection} The closest selection to the point within a specified value.  An empty selection otherwise.
+             * @returns {PlotData} The closest plot data to the point within a specified value.  nulls and null selection returned otherwise
              */
-            getClosestSelection(xValue: number, yValue: number, withinValue?: number): D3.Selection;
+            getClosestData(xValue: number, yValue: number, withinValue?: number): PlotData;
         }
     }
 }

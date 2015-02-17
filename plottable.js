@@ -322,6 +322,10 @@ var Plottable;
                 return "#" + rHex + gHex + bHex;
             }
             Methods.darkenColor = darkenColor;
+            function pointDistance(p1, p2) {
+                throw new Error("not yet implemented");
+            }
+            Methods.pointDistance = pointDistance;
         })(Methods = _Util.Methods || (_Util.Methods = {}));
     })(_Util = Plottable._Util || (Plottable._Util = {}));
 })(Plottable || (Plottable = {}));
@@ -2852,6 +2856,12 @@ var Plottable;
             };
             AbstractDrawer.prototype._getDistance = function (selection, xValue, yValue) {
                 return 0;
+            };
+            AbstractDrawer.prototype._getPixelPoints = function (selection) {
+                return [];
+            };
+            AbstractDrawer.prototype._getDatum = function (selection, point) {
+                return null;
             };
             return AbstractDrawer;
         })();
@@ -6514,26 +6524,34 @@ var Plottable;
                 return allSelections;
             };
             /**
-             * Retrieves the closest selection to the specified x/y point within a specified value
+             * Retrieves the closest PlotData to the specified x/y point within a specified value
              *
              * @param {number} xValue The x value to compare against
              * @param {number} yValue The y value to compare against
              * @param {number} withinValue The maximum distance the closest selection can be to the point (default = Infinity)
-             * @returns {D3.Selection} The closest selection to the point within a specified value.  An empty selection otherwise.
+             * @returns {PlotData} The closest plot data to the point within a specified value.  nulls and null selection returned otherwise
              */
-            AbstractPlot.prototype.getClosestSelection = function (xValue, yValue, withinValue) {
+            AbstractPlot.prototype.getClosestData = function (xValue, yValue, withinValue) {
                 if (withinValue === void 0) { withinValue = Infinity; }
+                var closestDatum = null;
                 var closestSelection = d3.select();
-                var closestSelectionDistance = withinValue;
+                var closestPixelPoint = null;
+                var closestPointDistance = withinValue;
                 this._getDrawersInOrder().forEach(function (drawer) {
                     drawer._getRenderArea().selectAll(drawer._getSelector()).each(function () {
                         var selection = d3.select(this);
-                        if (drawer._getDistance(selection, xValue, yValue) < closestSelectionDistance) {
-                            closestSelection = selection;
-                        }
+                        drawer._getPixelPoints(selection).forEach(function (pixelPoint) {
+                            var pointDistance = Plottable._Util.Methods.pointDistance(pixelPoint, closestPixelPoint);
+                            if (pointDistance < closestPointDistance) {
+                                closestDatum = drawer._getDatum(selection, pixelPoint);
+                                closestPixelPoint = pixelPoint;
+                                closestSelection = selection;
+                                closestPointDistance = pointDistance;
+                            }
+                        });
                     });
                 });
-                return closestSelection;
+                return { data: [closestDatum], pixelPoints: [closestPixelPoint], selection: d3.selectAll(closestSelection) };
             };
             return AbstractPlot;
         })(Plottable.Component.AbstractComponent);
