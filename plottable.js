@@ -2853,6 +2853,9 @@ var Plottable;
             AbstractDrawer.prototype._getSelector = function () {
                 return "";
             };
+            AbstractDrawer.prototype._getDatum = function (selection, pixelPoint) {
+                return selection.data();
+            };
             return AbstractDrawer;
         })();
         _Drawer.AbstractDrawer = AbstractDrawer;

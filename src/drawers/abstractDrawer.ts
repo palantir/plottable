@@ -142,6 +142,10 @@ export module _Drawer {
       return "";
     }
 
+    public _getDatum(selection: D3.Selection, pixelPoint: Point): any {
+      return selection.data();
+    }
+
   }
 }
 }
