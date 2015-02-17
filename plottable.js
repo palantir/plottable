@@ -2920,10 +2920,10 @@ var Plottable;
             Line.prototype._getSelector = function () {
                 return "." + Line.LINE_CLASS;
             };
-            Line.prototype._getPixelPoints = function () {
+            Line.prototype._getPixelPoints = function (selection) {
                 var _this = this;
                 var pixelPoints = [];
-                this._pathSelection.data().forEach(function (datum, i) {
+                selection.data().forEach(function (datum, i) {
                     pixelPoints.push({ x: _this._xFunction(datum, i), y: _this._yFunction(datum, i) });
                 });
                 return pixelPoints;

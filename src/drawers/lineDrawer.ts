@@ -67,9 +67,9 @@ export module _Drawer {
       return "." + Line.LINE_CLASS;
     }
 
-    public _getPixelPoints(): Point[] {
+    public _getPixelPoints(selection: D3.Selection): Point[] {
       var pixelPoints: Point[] = [];
-      this._pathSelection.data().forEach((datum: any, i: number) => {
+      selection.data().forEach((datum: any, i: number) => {
         pixelPoints.push({ x: this._xFunction(datum, i), y: this._yFunction(datum, i) });
       });
       return pixelPoints;
