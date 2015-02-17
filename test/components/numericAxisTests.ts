@@ -380,4 +380,24 @@ describe("NumericAxis", () => {
 
     svg.remove();
   });
+
+  it("does not draw ticks marks outside of the svg", () => {
+    var SVG_WIDTH = 300;
+    var SVG_HEIGHT = 100;
+    var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+    var scale = new Plottable.Scale.Linear();
+    scale.domain([0, 3]);
+    scale.tickGenerator(function(s) {
+      return [0, 1, 2, 3, 4];
+    });
+    var baseAxis = new Plottable.Axis.Numeric(scale, "bottom");
+    baseAxis.renderTo(svg);
+    var tickMarks = (<any> baseAxis)._element.selectAll(".tick-mark");
+    tickMarks.each(function() {
+      var tickMark = d3.select(this);
+      var tickMarkPosition = Number(tickMark.attr("x"));
+      assert.isTrue(tickMarkPosition >= 0 && tickMarkPosition <=  SVG_WIDTH, "tick marks are located within the bounding SVG");
+    });
+    svg.remove();
+  });
 });
