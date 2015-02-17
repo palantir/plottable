@@ -3,34 +3,31 @@
 module Plottable {
 export module Interaction {
   export class Key extends AbstractInteraction {
-
-    private _dispatcher: Plottable.Dispatcher.Keypress;
-    private _keyCode2Callback: { [keyCode: string]: () => void; } = {};
-
     /**
-     * Creates a KeyInteraction.
-     *
-     * KeyInteraction listens to key events that occur while the component is
+     * KeyInteraction listens to key events that occur while the Component is
      * moused over.
-     *
-     * @constructor
      */
-    constructor() {
-      super();
-      this._dispatcher = new Plottable.Dispatcher.Keypress();
-    }
+    private _positionDispatcher: Plottable.Dispatcher.Mouse;
+    private _keyDispatcher: Plottable.Dispatcher.KeyEvent;
+    private _keyCode2Callback: { [keyCode: string]: () => void; } = {};
 
     public _anchor(component: Component.AbstractComponent, hitBox: D3.Selection) {
       super._anchor(component, hitBox);
 
-      this._dispatcher.target(this._hitBox);
+      this._positionDispatcher = Dispatcher.Mouse.getDispatcher(
+                                   <SVGElement> (<any> this._componentToListenTo)._element.node()
+                                 );
+      this._positionDispatcher.onMouseMove("Interaction.Key" + this.getID(), (p: Point) => 0); // need to register
 
-      this._dispatcher.onKeyDown((e: D3.D3Event) => {
-        if (this._keyCode2Callback[e.keyCode]) {
-          this._keyCode2Callback[e.keyCode]();
-        }
-      });
-      this._dispatcher.connect();
+      this._keyDispatcher = Dispatcher.KeyEvent.getDispatcher();
+      this._keyDispatcher.onKeydown("Interaction.Key" + this.getID(), (e: KeyboardEvent) => this._handleKeyEvent(e));
+    }
+
+    private _handleKeyEvent(e: KeyboardEvent) {
+      var p = this._translateToComponentSpace(this._positionDispatcher.getLastMousePosition());
+      if (this._isInsideComponent(p) && this._keyCode2Callback[e.keyCode]) {
+        this._keyCode2Callback[e.keyCode]();
+      }
     }
 
     /**

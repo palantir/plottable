@@ -76,7 +76,6 @@
 
 /// <reference path="dispatchers/abstractDispatcher.ts" />
 /// <reference path="dispatchers/mouseDispatcher.ts" />
-/// <reference path="dispatchers/keypressDispatcher.ts" />
 /// <reference path="dispatchers/keyEventDispatcher.ts" />
 
 /// <reference path="interactions/abstractInteraction.ts" />
