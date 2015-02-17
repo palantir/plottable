@@ -60,6 +60,13 @@ export module _Drawer {
     public _getSelector(): string {
       return this._svgElement;
     }
+
+    public _getPixelPoints(selection: D3.Selection) {
+      if (this._svgElement === "circle") {
+        return [{ x: parseFloat(selection.attr("cx")), y: parseFloat(selection.attr("cy")) }];
+      }
+      return [];
+    }
   }
 }
 }

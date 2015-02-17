@@ -1569,6 +1569,10 @@ declare module Plottable {
             protected _prepareDrawSteps(drawSteps: AppliedDrawStep[]): void;
             protected _prepareData(data: any[], drawSteps: AppliedDrawStep[]): any[];
             _getSelector(): string;
+            _getPixelPoints(selection: D3.Selection): {
+                x: number;
+                y: number;
+            }[];
         }
     }
 }

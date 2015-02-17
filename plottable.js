@@ -3087,6 +3087,12 @@ var Plottable;
             Element.prototype._getSelector = function () {
                 return this._svgElement;
             };
+            Element.prototype._getPixelPoints = function (selection) {
+                if (this._svgElement === "circle") {
+                    return [{ x: parseFloat(selection.attr("cx")), y: parseFloat(selection.attr("cy")) }];
+                }
+                return [];
+            };
             return Element;
         })(_Drawer.AbstractDrawer);
         _Drawer.Element = Element;
