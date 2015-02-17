@@ -2573,6 +2573,11 @@ declare module Plottable {
         interface PlotMetadata {
             datasetKey: string;
         }
+        type PlotData = {
+            data: any[];
+            pixelPoints: Point[];
+            selection: D3.Selection;
+        };
         class AbstractPlot extends Component.AbstractComponent {
             protected _dataChanged: boolean;
             protected _key2PlotDatasetKey: D3.Map<PlotDatasetKey>;
