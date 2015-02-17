@@ -4222,9 +4222,9 @@ describe("Broadcasters", function () {
         var g2 = {};
         var g3 = "foo";
         var cb = function (arg1, arg2, arg3) {
-            assert.equal(listenable, arg1, "broadcaster passed through");
-            assert.equal(g2, arg2, "g2 passed through");
-            assert.equal(g3, arg3, "g3 passed through");
+            assert.strictEqual(listenable, arg1, "broadcaster passed through");
+            assert.strictEqual(g2, arg2, "g2 passed through");
+            assert.strictEqual(g3, arg3, "g3 passed through");
             called = true;
         };
         b.registerListener(null, cb);
