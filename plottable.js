@@ -8708,6 +8708,70 @@ var Plottable;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
+var Plottable;
+(function (Plottable) {
+    var Dispatcher;
+    (function (Dispatcher) {
+        var KeyEvent = (function () {
+            function KeyEvent() {
+                var _this = this;
+                this._connected = false;
+                // private _keyupBroadcaster: Core.Broadcaster<Dispatcher.KeyEvent>;
+                this._processDownCallback = function (e) { return _this._processKeydown(e); };
+                this._keydownBroadcaster = new Plottable.Core.Broadcaster(this);
+            }
+            KeyEvent.getDispatcher = function () {
+                var dispatcher = document[KeyEvent._DISPATCHER_KEY];
+                if (dispatcher == null) {
+                    dispatcher = new KeyEvent();
+                    document[KeyEvent._DISPATCHER_KEY] = dispatcher;
+                }
+                return dispatcher;
+            };
+            KeyEvent.prototype._connect = function () {
+                if (!this._connected) {
+                    document.addEventListener("keydown", this._processDownCallback);
+                    this._connected = true;
+                }
+            };
+            KeyEvent.prototype._disconnect = function () {
+                if (this._connected && this._keydownBroadcaster.getListenerKeys().length === 0) {
+                    document.removeEventListener("keydown", this._processDownCallback);
+                    this._connected = false;
+                }
+            };
+            /**
+             * Registers a callback to be called whenever a key is pressed,
+             * or removes the callback if `null` is passed as the callback.
+             *
+             * @param {any} key The registration key associated with the callback.
+             *                  Registration key uniqueness is determined by deep equality.
+             * @param {(e: KeyboardEvent) => any} callback A callback that takes the
+             *                                             keydown KeyboardEvent.
+             * @return {Dispatcher.KeyEvent} The calling Dispatcher.KeyEvent.
+             */
+            KeyEvent.prototype.onKeydown = function (key, callback) {
+                if (callback === null) {
+                    this._keydownBroadcaster.deregisterListener(key);
+                    this._disconnect();
+                }
+                else {
+                    this._connect();
+                    this._keydownBroadcaster.registerListener(key, function (d, e) { return callback(e); });
+                }
+                return this;
+            };
+            KeyEvent.prototype._processKeydown = function (e) {
+                this._keydownBroadcaster.broadcast(e);
+            };
+            KeyEvent._DISPATCHER_KEY = "__Plottable_Dispatcher_Key";
+            return KeyEvent;
+        })();
+        Dispatcher.KeyEvent = KeyEvent;
+    })(Dispatcher = Plottable.Dispatcher || (Plottable.Dispatcher = {}));
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }

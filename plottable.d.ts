@@ -3529,6 +3529,27 @@ declare module Plottable {
 
 
 declare module Plottable {
+    module Dispatcher {
+        class KeyEvent {
+            static getDispatcher(): Dispatcher.KeyEvent;
+            constructor();
+            /**
+             * Registers a callback to be called whenever a key is pressed,
+             * or removes the callback if `null` is passed as the callback.
+             *
+             * @param {any} key The registration key associated with the callback.
+             *                  Registration key uniqueness is determined by deep equality.
+             * @param {(e: KeyboardEvent) => any} callback A callback that takes the
+             *                                             keydown KeyboardEvent.
+             * @return {Dispatcher.KeyEvent} The calling Dispatcher.KeyEvent.
+             */
+            onKeydown(key: any, callback: (e: KeyboardEvent) => any): KeyEvent;
+        }
+    }
+}
+
+
+declare module Plottable {
     module Interaction {
         class AbstractInteraction extends Core.PlottableObject {
             /**
