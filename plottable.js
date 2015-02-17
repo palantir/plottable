@@ -3228,11 +3228,11 @@ var Plottable;
             Arc.prototype._drawStep = function (step) {
                 var attrToProjector = Plottable._Util.Methods.copyMap(step.attrToProjector);
                 attrToProjector = this.retargetProjectors(attrToProjector);
-                var innerRadiusF = attrToProjector["inner-radius"];
-                var outerRadiusF = attrToProjector["outer-radius"];
+                this._innerRadiusF = attrToProjector["inner-radius"];
+                this._outerRadiusF = attrToProjector["outer-radius"];
                 delete attrToProjector["inner-radius"];
                 delete attrToProjector["outer-radius"];
-                attrToProjector["d"] = this._createArc(innerRadiusF, outerRadiusF);
+                attrToProjector["d"] = this._createArc(this._innerRadiusF, this._outerRadiusF);
                 return _super.prototype._drawStep.call(this, { attrToProjector: attrToProjector, animator: step.animator });
             };
             Arc.prototype.draw = function (data, drawSteps, userMetadata, plotMetadata) {
@@ -3246,6 +3246,13 @@ var Plottable;
                     }
                 });
                 return _super.prototype.draw.call(this, pie, drawSteps, userMetadata, plotMetadata);
+            };
+            Arc.prototype._getPixelPoints = function (selection) {
+                var pieDatum = selection.datum();
+                var avgAngle = (pieDatum.startAngle + pieDatum.endAngle) / 2;
+                var datumIndex = this._getRenderArea().selectAll(this._svgElement)[0].indexOf(selection.node());
+                var avgRadius = (this._innerRadiusF(pieDatum, datumIndex) + this._outerRadiusF(pieDatum, datumIndex)) / 2;
+                return [{ x: Math.sin(avgAngle) * avgRadius, y: Math.cos(avgAngle) * avgRadius }];
             };
             return Arc;
         })(_Drawer.Element);
