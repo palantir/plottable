@@ -488,6 +488,7 @@ declare module Plottable {
              * Registers a callback to be called when the broadcast method is called. Also takes a key which
              * is used to support deregistering the same callback later, by passing in the same key.
              * If there is already a callback associated with that key, then the callback will be replaced.
+             * The callback will be passed the Broadcaster's "listenable" as the `this` context.
              *
              * @param key The key associated with the callback. Key uniqueness is determined by deep equality.
              * @param {BroadcasterCallback<L>} callback A callback to be called.

@@ -61,7 +61,7 @@ export module Core {
     public broadcast(...args: any[]) {
       args.unshift(this._listenable);
       this._key2callback.values().forEach((callback) => {
-        callback.apply(this.listenable, args);
+        callback.apply(this._listenable, args);
       });
       return this;
     }

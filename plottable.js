@@ -1105,7 +1105,7 @@ var Plottable;
                 }
                 args.unshift(this._listenable);
                 this._key2callback.values().forEach(function (callback) {
-                    callback.apply(_this.listenable, args);
+                    callback.apply(_this._listenable, args);
                 });
                 return this;
             };
