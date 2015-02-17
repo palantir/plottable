@@ -2853,6 +2853,9 @@ var Plottable;
             AbstractDrawer.prototype._getSelector = function () {
                 return "";
             };
+            AbstractDrawer.prototype._getPixelPoints = function (selection) {
+                return [];
+            };
             return AbstractDrawer;
         })();
         _Drawer.AbstractDrawer = AbstractDrawer;
@@ -2898,15 +2901,15 @@ var Plottable;
             Line.prototype._drawStep = function (step) {
                 var baseTime = _super.prototype._drawStep.call(this, step);
                 var attrToProjector = Plottable._Util.Methods.copyMap(step.attrToProjector);
-                var xFunction = attrToProjector["x"];
-                var yFunction = attrToProjector["y"];
+                this._xFunction = attrToProjector["x"];
+                this._yFunction = attrToProjector["y"];
                 var definedFunction = attrToProjector["defined"];
                 delete attrToProjector["x"];
                 delete attrToProjector["y"];
                 if (attrToProjector["defined"]) {
                     delete attrToProjector["defined"];
                 }
-                attrToProjector["d"] = this._createLine(xFunction, yFunction, definedFunction);
+                attrToProjector["d"] = this._createLine(this._xFunction, this._yFunction, definedFunction);
                 if (attrToProjector["fill"]) {
                     this._pathSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
                 }
@@ -2916,6 +2919,14 @@ var Plottable;
             };
             Line.prototype._getSelector = function () {
                 return "." + Line.LINE_CLASS;
+            };
+            Line.prototype._getPixelPoints = function (selection) {
+                var _this = this;
+                var pixelPoints = [];
+                selection.data().forEach(function (datum, i) {
+                    pixelPoints.push({ x: _this._xFunction(datum, i), y: _this._yFunction(datum, i) });
+                });
+                return pixelPoints;
             };
             Line.LINE_CLASS = "line";
             return Line;
@@ -3076,6 +3087,12 @@ var Plottable;
             Element.prototype._getSelector = function () {
                 return this._svgElement;
             };
+            Element.prototype._getPixelPoints = function (selection) {
+                if (this._svgElement === "circle") {
+                    return [{ x: parseFloat(selection.attr("cx")), y: parseFloat(selection.attr("cy")) }];
+                }
+                return [];
+            };
             return Element;
         })(_Drawer.AbstractDrawer);
         _Drawer.Element = Element;
@@ -3169,6 +3186,12 @@ var Plottable;
                 });
                 this._labelsTooWide = labelTooWide.some(function (d) { return d; });
             };
+            Rect.prototype._getPixelPoints = function (selection) {
+                var width = parseFloat(selection.attr("width"));
+                var x = parseFloat(selection.attr("x"));
+                var y = parseFloat(selection.attr("y"));
+                return [{ x: x + width / 2, y: y }];
+            };
             return Rect;
         })(_Drawer.Element);
         _Drawer.Rect = Rect;
@@ -3205,11 +3228,11 @@ var Plottable;
             Arc.prototype._drawStep = function (step) {
                 var attrToProjector = Plottable._Util.Methods.copyMap(step.attrToProjector);
                 attrToProjector = this.retargetProjectors(attrToProjector);
-                var innerRadiusF = attrToProjector["inner-radius"];
-                var outerRadiusF = attrToProjector["outer-radius"];
+                this._innerRadiusF = attrToProjector["inner-radius"];
+                this._outerRadiusF = attrToProjector["outer-radius"];
                 delete attrToProjector["inner-radius"];
                 delete attrToProjector["outer-radius"];
-                attrToProjector["d"] = this._createArc(innerRadiusF, outerRadiusF);
+                attrToProjector["d"] = this._createArc(this._innerRadiusF, this._outerRadiusF);
                 return _super.prototype._drawStep.call(this, { attrToProjector: attrToProjector, animator: step.animator });
             };
             Arc.prototype.draw = function (data, drawSteps, userMetadata, plotMetadata) {
@@ -3223,6 +3246,13 @@ var Plottable;
                     }
                 });
                 return _super.prototype.draw.call(this, pie, drawSteps, userMetadata, plotMetadata);
+            };
+            Arc.prototype._getPixelPoints = function (selection) {
+                var pieDatum = selection.datum();
+                var avgAngle = (pieDatum.startAngle + pieDatum.endAngle) / 2;
+                var datumIndex = this._getRenderArea().selectAll(this._svgElement)[0].indexOf(selection.node());
+                var avgRadius = (this._innerRadiusF(pieDatum, datumIndex) + this._outerRadiusF(pieDatum, datumIndex)) / 2;
+                return [{ x: Math.sin(avgAngle) * avgRadius, y: Math.cos(avgAngle) * avgRadius }];
             };
             return Arc;
         })(_Drawer.Element);
