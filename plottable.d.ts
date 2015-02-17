@@ -1529,6 +1529,7 @@ declare module Plottable {
             protected _numberOfAnimationIterations(data: any[]): number;
             protected _drawStep(step: AppliedDrawStep): void;
             _getSelector(): string;
+            _getDatum(selection: D3.Selection, pixelPoint: Point): any;
         }
     }
 }
