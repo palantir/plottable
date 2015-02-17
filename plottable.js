@@ -2854,9 +2854,6 @@ var Plottable;
             AbstractDrawer.prototype._getSelector = function () {
                 return "";
             };
-            AbstractDrawer.prototype._getDistance = function (selection, xValue, yValue) {
-                return 0;
-            };
             AbstractDrawer.prototype._getPixelPoints = function (selection) {
                 return [];
             };

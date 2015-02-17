@@ -1515,7 +1515,6 @@ declare module Plottable {
              */
             _getRenderArea(): D3.Selection;
             _getSelector(): string;
-            _getDistance(selection: D3.Selection, xValue: number, yValue: number): number;
             _getPixelPoints(selection: D3.Selection): Point[];
             _getDatum(selection: D3.Selection, point: Point): any;
         }
