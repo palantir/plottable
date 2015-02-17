@@ -2853,6 +2853,9 @@ var Plottable;
             AbstractDrawer.prototype._getSelector = function () {
                 return "";
             };
+            AbstractDrawer.prototype._getDatum = function (selection, pixelPoint) {
+                return selection.data();
+            };
             return AbstractDrawer;
         })();
         _Drawer.AbstractDrawer = AbstractDrawer;
@@ -2898,15 +2901,15 @@ var Plottable;
             Line.prototype._drawStep = function (step) {
                 var baseTime = _super.prototype._drawStep.call(this, step);
                 var attrToProjector = Plottable._Util.Methods.copyMap(step.attrToProjector);
-                var xFunction = attrToProjector["x"];
-                var yFunction = attrToProjector["y"];
+                this._xFunction = attrToProjector["x"];
+                this._yFunction = attrToProjector["y"];
                 var definedFunction = attrToProjector["defined"];
                 delete attrToProjector["x"];
                 delete attrToProjector["y"];
                 if (attrToProjector["defined"]) {
                     delete attrToProjector["defined"];
                 }
-                attrToProjector["d"] = this._createLine(xFunction, yFunction, definedFunction);
+                attrToProjector["d"] = this._createLine(this._xFunction, this._yFunction, definedFunction);
                 if (attrToProjector["fill"]) {
                     this._pathSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
                 }
@@ -2916,6 +2919,16 @@ var Plottable;
             };
             Line.prototype._getSelector = function () {
                 return "." + Line.LINE_CLASS;
+            };
+            Line.prototype._getDatum = function (selection, pixelPoint) {
+                var _this = this;
+                var datum;
+                selection.data().forEach(function (selectionDatum, index) {
+                    if (_this._xFunction(selectionDatum, index) === pixelPoint.x && _this._yFunction(selectionDatum, index) === pixelPoint.y) {
+                        datum = selectionDatum;
+                    }
+                });
+                return datum;
             };
             Line.LINE_CLASS = "line";
             return Line;
