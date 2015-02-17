@@ -142,6 +142,10 @@ export module _Drawer {
       return "";
     }
 
+    public _getPixelPoints(): Point[] {
+      return [];
+    }
+
   }
 }
 }
