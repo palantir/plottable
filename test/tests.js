@@ -1709,6 +1709,42 @@ describe("Plots", function () {
             svg1.remove();
             svg2.remove();
         });
+        it("getAllSelections() with dataset retrieval", function () {
+            var svg = generateSVG(400, 400);
+            var plot = new Plottable.Plot.AbstractPlot();
+            // Create mock drawers with already drawn items
+            var mockDrawer1 = new Plottable._Drawer.AbstractDrawer("ds1");
+            var renderArea1 = svg.append("g");
+            renderArea1.append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
+            mockDrawer1.setup = function () { return mockDrawer1._renderArea = renderArea1; };
+            mockDrawer1._getSelector = function () { return "circle"; };
+            var renderArea2 = svg.append("g");
+            renderArea2.append("circle").attr("cx", 10).attr("cy", 10).attr("r", 10);
+            var mockDrawer2 = new Plottable._Drawer.AbstractDrawer("ds2");
+            mockDrawer2.setup = function () { return mockDrawer2._renderArea = renderArea2; };
+            mockDrawer2._getSelector = function () { return "circle"; };
+            // Mock _getDrawer to return the mock drawers
+            plot._getDrawer = function (key) {
+                if (key === "ds1") {
+                    return mockDrawer1;
+                }
+                else {
+                    return mockDrawer2;
+                }
+            };
+            plot.addDataset("ds1", [{ value: 0 }, { value: 1 }, { value: 2 }]);
+            plot.addDataset("ds2", [{ value: 1 }, { value: 2 }, { value: 3 }]);
+            plot.renderTo(svg);
+            var selections = plot.getAllSelections();
+            assert.strictEqual(selections.size(), 2, "all circle selections gotten");
+            var oneSelection = plot.getAllSelections("ds1");
+            assert.strictEqual(oneSelection.size(), 1);
+            assert.strictEqual(numAttr(oneSelection, "cx"), 100, "retrieved selection in renderArea1");
+            var oneElementSelection = plot.getAllSelections(["ds2"]);
+            assert.strictEqual(oneElementSelection.size(), 1);
+            assert.strictEqual(numAttr(oneElementSelection, "cy"), 10, "retreieved selection in renderArea2");
+            svg.remove();
+        });
         describe("Dataset removal", function () {
             var plot;
             var d1;
