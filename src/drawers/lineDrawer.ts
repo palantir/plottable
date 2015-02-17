@@ -6,6 +6,8 @@ export module _Drawer {
     public static LINE_CLASS = "line";
 
     private _pathSelection: D3.Selection;
+    private _xFunction: _AppliedProjector;
+    private _yFunction: _AppliedProjector;
 
     protected _enterData(data: any[]) {
       super._enterData(data);
@@ -40,8 +42,8 @@ export module _Drawer {
     protected _drawStep(step: AppliedDrawStep) {
       var baseTime = super._drawStep(step);
       var attrToProjector = <_AttributeToAppliedProjector>_Util.Methods.copyMap(step.attrToProjector);
-      var xFunction       = attrToProjector["x"];
-      var yFunction       = attrToProjector["y"];
+      this._xFunction       = attrToProjector["x"];
+      this._yFunction       = attrToProjector["y"];
       var definedFunction = attrToProjector["defined"];
 
       delete attrToProjector["x"];
@@ -50,7 +52,7 @@ export module _Drawer {
         delete attrToProjector["defined"];
       }
 
-      attrToProjector["d"] = this._createLine(xFunction, yFunction, definedFunction);
+      attrToProjector["d"] = this._createLine(this._xFunction, this._yFunction, definedFunction);
       if (attrToProjector["fill"]) {
         this._pathSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
       }
@@ -63,6 +65,14 @@ export module _Drawer {
 
     public _getSelector() {
       return "." + Line.LINE_CLASS;
+    }
+
+    public _getPixelPoints(): Point[] {
+      var pixelPoints: Point[] = [];
+      this._pathSelection.data().forEach((datum: any, i: number) => {
+        pixelPoints.push({ x: this._xFunction(datum, i), y: this._yFunction(datum, i) });
+      });
+      return pixelPoints;
     }
   }
 }

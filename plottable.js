@@ -2901,15 +2901,15 @@ var Plottable;
             Line.prototype._drawStep = function (step) {
                 var baseTime = _super.prototype._drawStep.call(this, step);
                 var attrToProjector = Plottable._Util.Methods.copyMap(step.attrToProjector);
-                var xFunction = attrToProjector["x"];
-                var yFunction = attrToProjector["y"];
+                this._xFunction = attrToProjector["x"];
+                this._yFunction = attrToProjector["y"];
                 var definedFunction = attrToProjector["defined"];
                 delete attrToProjector["x"];
                 delete attrToProjector["y"];
                 if (attrToProjector["defined"]) {
                     delete attrToProjector["defined"];
                 }
-                attrToProjector["d"] = this._createLine(xFunction, yFunction, definedFunction);
+                attrToProjector["d"] = this._createLine(this._xFunction, this._yFunction, definedFunction);
                 if (attrToProjector["fill"]) {
                     this._pathSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
                 }
@@ -2919,6 +2919,14 @@ var Plottable;
             };
             Line.prototype._getSelector = function () {
                 return "." + Line.LINE_CLASS;
+            };
+            Line.prototype._getPixelPoints = function () {
+                var _this = this;
+                var pixelPoints = [];
+                this._pathSelection.data().forEach(function (datum, i) {
+                    pixelPoints.push({ x: _this._xFunction(datum, i), y: _this._yFunction(datum, i) });
+                });
+                return pixelPoints;
             };
             Line.LINE_CLASS = "line";
             return Line;
