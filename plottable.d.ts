@@ -652,56 +652,6 @@ declare module Plottable {
     }
 }
 
-
-declare module Plottable {
-    module Core {
-        /**
-         * The ResizeBroadcaster will broadcast a notification to any registered
-         * components when the window is resized.
-         *
-         * The broadcaster and single event listener are lazily constructed.
-         *
-         * Upon resize, the _resized flag will be set to true until after the next
-         * flush of the RenderController. This is used, for example, to disable
-         * animations during resize.
-         */
-        module ResizeBroadcaster {
-            /**
-             * Checks if the window has been resized and the RenderController
-             * has not yet been flushed.
-             *
-             * @returns {boolean} If the window has been resized/RenderController
-             * has not yet been flushed.
-             */
-            function resizing(): boolean;
-            /**
-             * Sets that it is not resizing anymore. Good if it stubbornly thinks
-             * it is still resizing, or for cancelling the effects of resizing
-             * prematurely.
-             */
-            function clearResizing(): void;
-            /**
-             * Registers a component.
-             *
-             * When the window is resized, ._invalidateLayout() is invoked on the
-             * component, which will enqueue the component for layout and rendering
-             * with the RenderController.
-             *
-             * @param {Component} component Any Plottable component.
-             */
-            function register(c: Component.AbstractComponent): void;
-            /**
-             * Deregisters the components.
-             *
-             * The component will no longer receive updates on window resize.
-             *
-             * @param {Component} component Any Plottable component.
-             */
-            function deregister(c: Component.AbstractComponent): void;
-        }
-    }
-}
-
 declare module Plottable {
     /**
      * Access specific datum property.
@@ -1646,27 +1596,14 @@ declare module Plottable {
              */
             renderTo(element: String | D3.Selection): AbstractComponent;
             /**
-             * Causes the Component to recompute layout and redraw. If passed arguments, will resize the root SVG it lives in.
+             * Causes the Component to recompute layout and redraw.
              *
              * This function should be called when CSS changes could influence the size
              * of the components, e.g. changing the font size.
              *
-             * @param {number} [availableWidth]  - the width of the container element
-             * @param {number} [availableHeight] - the height of the container element
              * @returns {Component} The calling component.
              */
-            resize(width?: number, height?: number): AbstractComponent;
-            /**
-             * Enables or disables resize on window resizes.
-             *
-             * If enabled, window resizes will enqueue this component for a re-layout
-             * and re-render. Animations are disabled during window resizes when auto-
-             * resize is enabled.
-             *
-             * @param {boolean} flag Enable (true) or disable (false) auto-resize.
-             * @returns {Component} The calling component.
-             */
-            autoResize(flag: boolean): AbstractComponent;
+            redraw(): AbstractComponent;
             /**
              * Sets the x alignment of the Component. This will be used if the
              * Component is given more space than it needs.
