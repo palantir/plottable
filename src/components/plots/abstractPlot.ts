@@ -441,8 +441,8 @@ export module Plot {
      * @returns {D3.Selection} The selections within under the given bounds
      */
     public getSelections(xValOrExtent: number | Extent, yValOrExtent: number | Extent, tolerance = 0.5): D3.Selection {
-      var xExtent: Extent = AbstractPlot._parseExtent(xValOrExtent);
-      var yExtent: Extent = AbstractPlot._parseExtent(yValOrExtent);
+      var xExtent = (typeof xValOrExtent === "number") ? Plottable._Util.Methods.toExtent(xValOrExtent) : <Extent> xValOrExtent;
+      var yExtent = (typeof yValOrExtent === "number") ? Plottable._Util.Methods.toExtent(yValOrExtent) : <Extent> yValOrExtent;
 
       var selections: EventTarget[] = [];
       this._datasetKeysInOrder.forEach((key: string) => {
@@ -457,16 +457,6 @@ export module Plot {
       });
 
       return d3.selectAll(selections);
-    }
-
-    private static _parseExtent(input: any): Extent {
-      if (typeof(input) === "number") {
-        return {min: input, max: input};
-      } else if (input instanceof Object && "min" in input && "max" in input) {
-        return <Extent> input;
-      } else {
-        throw new Error("input '" + input + "' can't be parsed as an Extent");
-      }
     }
 
   }

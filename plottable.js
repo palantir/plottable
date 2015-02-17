@@ -322,6 +322,10 @@ var Plottable;
                 return "#" + rHex + gHex + bHex;
             }
             Methods.darkenColor = darkenColor;
+            function toExtent(input) {
+                return { min: input, max: input };
+            }
+            Methods.toExtent = toExtent;
         })(Methods = _Util.Methods || (_Util.Methods = {}));
     })(_Util = Plottable._Util || (Plottable._Util = {}));
 })(Plottable || (Plottable = {}));
@@ -6541,8 +6545,8 @@ var Plottable;
             AbstractPlot.prototype.getSelections = function (xValOrExtent, yValOrExtent, tolerance) {
                 var _this = this;
                 if (tolerance === void 0) { tolerance = 0.5; }
-                var xExtent = AbstractPlot._parseExtent(xValOrExtent);
-                var yExtent = AbstractPlot._parseExtent(yValOrExtent);
+                var xExtent = (typeof xValOrExtent === "number") ? Plottable._Util.Methods.toExtent(xValOrExtent) : xValOrExtent;
+                var yExtent = (typeof yValOrExtent === "number") ? Plottable._Util.Methods.toExtent(yValOrExtent) : yValOrExtent;
                 var selections = [];
                 this._datasetKeysInOrder.forEach(function (key) {
                     var drawer = _this._key2PlotDatasetKey.get(key).drawer;
@@ -6555,17 +6559,6 @@ var Plottable;
                     });
                 });
                 return d3.selectAll(selections);
-            };
-            AbstractPlot._parseExtent = function (input) {
-                if (typeof (input) === "number") {
-                    return { min: input, max: input };
-                }
-                else if (input instanceof Object && "min" in input && "max" in input) {
-                    return input;
-                }
-                else {
-                    throw new Error("input '" + input + "' can't be parsed as an Extent");
-                }
             };
             return AbstractPlot;
         })(Plottable.Component.AbstractComponent);
