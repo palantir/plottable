@@ -1514,7 +1514,7 @@ declare module Plottable {
              */
             _getRenderArea(): D3.Selection;
             _getSelector(): string;
-            _getPixelPoints(): Point[];
+            _getPixelPoints(selection: D3.Selection): Point[];
         }
     }
 }
@@ -1529,7 +1529,7 @@ declare module Plottable {
             protected _numberOfAnimationIterations(data: any[]): number;
             protected _drawStep(step: AppliedDrawStep): void;
             _getSelector(): string;
-            _getPixelPoints(): Point[];
+            _getPixelPoints(selection: D3.Selection): Point[];
         }
     }
 }

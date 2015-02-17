@@ -142,7 +142,7 @@ export module _Drawer {
       return "";
     }
 
-    public _getPixelPoints(): Point[] {
+    public _getPixelPoints(selection: D3.Selection): Point[] {
       return [];
     }
 
