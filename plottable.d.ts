@@ -2599,6 +2599,11 @@ declare module Plottable {
         interface PlotMetadata {
             datasetKey: string;
         }
+        type PlotData = {
+            data: any[];
+            pixelPoints: Point[];
+            selection: D3.Selection;
+        };
         class AbstractPlot extends Component.AbstractComponent {
             protected _dataChanged: boolean;
             protected _key2PlotDatasetKey: D3.Map<PlotDatasetKey>;
@@ -2754,7 +2759,7 @@ declare module Plottable {
              * @param {number | Extent} yValOrExtent The pixel y position, or range of y values.
              * @returns {D3.Selection} The selections within under the given bounds
              */
-            getSelections(xValOrExtent: number | Extent, yValOrExtent: number | Extent, tolerance?: number): D3.Selection;
+            getPlotData(xValOrExtent: number | Extent, yValOrExtent: number | Extent, tolerance?: number): PlotData;
         }
     }
 }

@@ -6542,11 +6542,13 @@ var Plottable;
              * @param {number | Extent} yValOrExtent The pixel y position, or range of y values.
              * @returns {D3.Selection} The selections within under the given bounds
              */
-            AbstractPlot.prototype.getSelections = function (xValOrExtent, yValOrExtent, tolerance) {
+            AbstractPlot.prototype.getPlotData = function (xValOrExtent, yValOrExtent, tolerance) {
                 var _this = this;
                 if (tolerance === void 0) { tolerance = 0.5; }
                 var xExtent = (typeof xValOrExtent === "number") ? Plottable._Util.Methods.toExtent(xValOrExtent) : xValOrExtent;
                 var yExtent = (typeof yValOrExtent === "number") ? Plottable._Util.Methods.toExtent(yValOrExtent) : yValOrExtent;
+                var data = [];
+                var pixelPoints = [];
                 var selections = [];
                 this._datasetKeysInOrder.forEach(function (key) {
                     var drawer = _this._key2PlotDatasetKey.get(key).drawer;
@@ -6558,7 +6560,7 @@ var Plottable;
                         }
                     });
                 });
-                return d3.selectAll(selections);
+                return { data: data, pixelPoints: pixelPoints, selection: d3.selectAll(selections) };
             };
             return AbstractPlot;
         })(Plottable.Component.AbstractComponent);

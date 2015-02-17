@@ -2493,23 +2493,23 @@ describe("Plots", function () {
                 assert.equal(baseline.attr("x2"), SVG_WIDTH, "the baseline ends at the edge of the chart");
                 svg.remove();
             });
-            it("getSelections()", function () {
-                var bar = barPlot.getSelections(155, 150); // in the middle of bar 0
+            it("getPlotData()", function () {
+                var bar = barPlot.getPlotData(155, 150).selection; // in the middle of bar 0
                 assert.lengthOf(bar[0], 1, "getBar returns a bar");
                 assert.equal(bar.data()[0], dataset.data()[0], "the data in the bar matches the datasource");
-                bar = barPlot.getSelections(-1, -1); // no bars here
+                bar = barPlot.getPlotData(-1, -1).selection; // no bars here
                 assert.isTrue(bar.empty(), "returns empty selection if no bar was selected");
-                bar = barPlot.getSelections(200, 50); // between the two bars
+                bar = barPlot.getPlotData(200, 50).selection; // between the two bars
                 assert.isTrue(bar.empty(), "returns empty selection if no bar was selected");
-                bar = barPlot.getSelections(155, 10); // above bar 0
+                bar = barPlot.getPlotData(155, 10).selection; // above bar 0
                 assert.isTrue(bar.empty(), "returns empty selection if no bar was selected");
                 // the bars are now (140,100),(150,300) and (440,300),(450,350) - the
                 // origin is at the top left!
-                bar = barPlot.getSelections({ min: 155, max: 455 }, { min: 150, max: 150 });
+                bar = barPlot.getPlotData({ min: 155, max: 455 }, { min: 150, max: 150 }).selection;
                 assert.lengthOf(bar.data(), 2, "selected 2 bars (not the negative one)");
                 assert.equal(bar.data()[0], dataset.data()[0], "the data in bar 0 matches the datasource");
                 assert.equal(bar.data()[1], dataset.data()[2], "the data in bar 1 matches the datasource");
-                bar = barPlot.getSelections({ min: 155, max: 455 }, { min: 150, max: 350 });
+                bar = barPlot.getPlotData({ min: 155, max: 455 }, { min: 150, max: 350 }).selection;
                 assert.lengthOf(bar.data(), 3, "selected all the bars");
                 assert.equal(bar.data()[0], dataset.data()[0], "the data in bar 0 matches the datasource");
                 assert.equal(bar.data()[1], dataset.data()[1], "the data in bar 1 matches the datasource");

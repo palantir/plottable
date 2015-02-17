@@ -16,6 +16,12 @@ export module Plot {
     datasetKey: string
   }
 
+  export type PlotData = {
+    data: any[];
+    pixelPoints: Point[];
+    selection: D3.Selection;
+  };
+
   export class AbstractPlot extends Component.AbstractComponent {
     protected _dataChanged = false;
     protected _key2PlotDatasetKey: D3.Map<PlotDatasetKey>;
@@ -440,10 +446,12 @@ export module Plot {
      * @param {number | Extent} yValOrExtent The pixel y position, or range of y values.
      * @returns {D3.Selection} The selections within under the given bounds
      */
-    public getSelections(xValOrExtent: number | Extent, yValOrExtent: number | Extent, tolerance = 0.5): D3.Selection {
+    public getPlotData(xValOrExtent: number | Extent, yValOrExtent: number | Extent, tolerance = 0.5): PlotData {
       var xExtent = (typeof xValOrExtent === "number") ? Plottable._Util.Methods.toExtent(xValOrExtent) : <Extent> xValOrExtent;
       var yExtent = (typeof yValOrExtent === "number") ? Plottable._Util.Methods.toExtent(yValOrExtent) : <Extent> yValOrExtent;
 
+      var data: any[] = [];
+      var pixelPoints: Point[] = [];
       var selections: EventTarget[] = [];
       this._datasetKeysInOrder.forEach((key: string) => {
         var drawer = this._key2PlotDatasetKey.get(key).drawer;
@@ -456,7 +464,7 @@ export module Plot {
         });
       });
 
-      return d3.selectAll(selections);
+      return { data: data, pixelPoints: pixelPoints, selection: d3.selectAll(selections) };
     }
 
   }
