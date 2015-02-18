@@ -4,9 +4,8 @@ module Plottable {
 export module Dispatcher {
   export type KeyCallback = (keyCode: number) => any;
 
-  export class Key {
+  export class Key extends AbstractDispatcher {
     private static _DISPATCHER_KEY = "__Plottable_Dispatcher_Key";
-    private _connected = false; // TODO: move to Abstract
     private _keydownBroadcaster: Core.Broadcaster<Dispatcher.Key>;
     private _downCallback = (e: KeyboardEvent) => this._processKeydown(e);
 
@@ -32,22 +31,16 @@ export module Dispatcher {
      * @param {SVGElement} svg The root <svg> element to attach to.
      */
     constructor() {
+      super();
+
+      this._event2Callback["keydown"] = this._downCallback;
+
       this._keydownBroadcaster = new Core.Broadcaster(this);
+      this._broadcasters = [this._keydownBroadcaster];
     }
 
-    private _connect() {
-      if (!this._connected) {
-        document.addEventListener("keydown", this._downCallback);
-        this._connected = true;
-      }
-    }
-
-    private _disconnect() {
-      if (this._connected &&
-          this._keydownBroadcaster.getListenerKeys().length === 0) {
-        document.removeEventListener("keydown", this._downCallback);
-        this._connected = false;
-      }
+    protected _getWrappedCallback(callback: Function): Core.BroadcasterCallback<Dispatcher.Key> {
+      return (d: Dispatcher.Key, e: KeyboardEvent) => callback(e.keyCode);
     }
 
     /**
@@ -60,14 +53,7 @@ export module Dispatcher {
      * @return {Dispatcher.Key} The calling Dispatcher.Key.
      */
     public onKeydown(key: any, callback: KeyCallback): Key {
-      if (callback === null) { // remove listener if callback is null
-        this._keydownBroadcaster.deregisterListener(key);
-        this._disconnect();
-      } else {
-        this._connect();
-        this._keydownBroadcaster.registerListener(key,
-          (d: Dispatcher.Key, e: KeyboardEvent) => callback(e.keyCode));
-      }
+      this._setCallback(this._keydownBroadcaster, key, callback);
       return this;
     }
 

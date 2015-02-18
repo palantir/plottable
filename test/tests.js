@@ -7182,63 +7182,60 @@ describe("Interactions", function () {
 ///<reference path="../testReference.ts" />
 var assert = chai.assert;
 describe("Dispatchers", function () {
-    it("correctly registers for and deregisters from events", function () {
-        var target = generateSVG();
-        var dispatcher = new Plottable.Dispatcher.AbstractDispatcher(target);
-        var callbackWasCalled = false;
-        dispatcher._event2Callback["click"] = function () {
-            callbackWasCalled = true;
-        };
-        triggerFakeUIEvent("click", target);
-        assert.isFalse(callbackWasCalled, "The callback is not called before the dispatcher connect()s");
-        dispatcher.connect();
-        triggerFakeUIEvent("click", target);
-        assert.isTrue(callbackWasCalled, "The dispatcher called its callback");
-        callbackWasCalled = false;
-        dispatcher.disconnect();
-        triggerFakeUIEvent("click", target);
-        assert.isFalse(callbackWasCalled, "The callback is not called after the dispatcher disconnect()s");
-        target.remove();
-    });
-    it("target can be changed", function () {
-        var target1 = generateSVG();
-        var target2 = generateSVG();
-        var dispatcher = new Plottable.Dispatcher.AbstractDispatcher(target1);
-        var callbackWasCalled = false;
-        dispatcher._event2Callback["click"] = function () { return callbackWasCalled = true; };
-        dispatcher.connect();
-        triggerFakeUIEvent("click", target1);
-        assert.isTrue(callbackWasCalled, "The dispatcher received the event on the target");
-        dispatcher.target(target2);
-        callbackWasCalled = false;
-        triggerFakeUIEvent("click", target1);
-        assert.isFalse(callbackWasCalled, "The dispatcher did not receive the event on the old target");
-        triggerFakeUIEvent("click", target2);
-        assert.isTrue(callbackWasCalled, "The dispatcher received the event on the new target");
-        target1.remove();
-        target2.remove();
-    });
-    it("multiple dispatchers can be attached to the same target", function () {
-        var target = generateSVG();
-        var dispatcher1 = new Plottable.Dispatcher.AbstractDispatcher(target);
-        var called1 = false;
-        dispatcher1._event2Callback["click"] = function () { return called1 = true; };
-        dispatcher1.connect();
-        var dispatcher2 = new Plottable.Dispatcher.AbstractDispatcher(target);
-        var called2 = false;
-        dispatcher2._event2Callback["click"] = function () { return called2 = true; };
-        dispatcher2.connect();
-        triggerFakeUIEvent("click", target);
-        assert.isTrue(called1, "The first dispatcher called its callback");
-        assert.isTrue(called2, "The second dispatcher also called its callback");
-        target.remove();
-    });
-    it("can't double-connect", function () {
-        var target = generateSVG();
-        var dispatcher = new Plottable.Dispatcher.AbstractDispatcher(target);
-        dispatcher.connect();
-        assert.throws(function () { return dispatcher.connect(); }, "connect");
-        target.remove();
+    describe("AbstractDispatcher", function () {
+        it("_connect() and _disconnect()", function () {
+            var dispatcher = new Plottable.Dispatcher.AbstractDispatcher();
+            var callbackCalls = 0;
+            dispatcher._event2Callback["click"] = function () { return callbackCalls++; };
+            var d3document = d3.select(document);
+            dispatcher._connect();
+            triggerFakeUIEvent("click", d3document);
+            assert.strictEqual(callbackCalls, 1, "connected correctly (callback was called)");
+            dispatcher._connect();
+            callbackCalls = 0;
+            triggerFakeUIEvent("click", d3document);
+            assert.strictEqual(callbackCalls, 1, "can't double-connect (callback only called once)");
+            dispatcher._disconnect();
+            callbackCalls = 0;
+            triggerFakeUIEvent("click", d3document);
+            assert.strictEqual(callbackCalls, 0, "disconnected correctly (callback not called)");
+        });
+        it("won't _disconnect() if broadcasters still have listeners", function () {
+            var dispatcher = new Plottable.Dispatcher.AbstractDispatcher();
+            var callbackWasCalled = false;
+            dispatcher._event2Callback["click"] = function () { return callbackWasCalled = true; };
+            var b = new Plottable.Core.Broadcaster(dispatcher);
+            var key = "unit test";
+            b.registerListener(key, function () { return null; });
+            dispatcher._broadcasters = [b];
+            var d3document = d3.select(document);
+            dispatcher._connect();
+            triggerFakeUIEvent("click", d3document);
+            assert.isTrue(callbackWasCalled, "connected correctly (callback was called)");
+            dispatcher._disconnect();
+            callbackWasCalled = false;
+            triggerFakeUIEvent("click", d3document);
+            assert.isTrue(callbackWasCalled, "didn't disconnect while broadcaster had listener");
+            b.deregisterListener(key);
+            dispatcher._disconnect();
+            callbackWasCalled = false;
+            triggerFakeUIEvent("click", d3document);
+            assert.isFalse(callbackWasCalled, "disconnected when broadcaster had no listeners");
+        });
+        it("_setCallback()", function () {
+            var dispatcher = new Plottable.Dispatcher.AbstractDispatcher();
+            var b = new Plottable.Core.Broadcaster(dispatcher);
+            var key = "unit test";
+            var callbackWasCalled = false;
+            var callback = function () { return callbackWasCalled = true; };
+            dispatcher._setCallback(b, key, callback);
+            b.broadcast();
+            assert.isTrue(callbackWasCalled, "callback was called after setting with _setCallback()");
+            dispatcher._setCallback(b, key, null);
+            callbackWasCalled = false;
+            b.broadcast();
+            assert.isFalse(callbackWasCalled, "callback was removed by calling _setCallback() with null");
+        });
     });
     describe("Mouse Dispatcher", function () {
         it("getDispatcher() creates only one Dispatcher.Mouse per <svg>", function () {
