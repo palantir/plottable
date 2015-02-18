@@ -4,6 +4,9 @@ module Plottable {
 export module _Drawer {
   export class Arc extends Element {
 
+    private _innerRadiusAccessor: _AppliedProjector;
+    private _outerRadiusAccessor: _AppliedProjector;
+
     constructor(key: string) {
       super(key);
       this._svgElement = "path";
@@ -26,12 +29,12 @@ export module _Drawer {
     public _drawStep(step: AppliedDrawStep) {
       var attrToProjector = <_AttributeToAppliedProjector>_Util.Methods.copyMap(step.attrToProjector);
       attrToProjector = this.retargetProjectors(attrToProjector);
-      var innerRadiusF = attrToProjector["inner-radius"];
-      var outerRadiusF = attrToProjector["outer-radius"];
+      this._innerRadiusAccessor = attrToProjector["inner-radius"];
+      this._outerRadiusAccessor = attrToProjector["outer-radius"];
       delete attrToProjector["inner-radius"];
       delete attrToProjector["outer-radius"];
 
-      attrToProjector["d"] = this._createArc(innerRadiusF, outerRadiusF);
+      attrToProjector["d"] = this._createArc(this._innerRadiusAccessor, this._outerRadiusAccessor);
       return super._drawStep({attrToProjector: attrToProjector, animator: step.animator});
     }
 
@@ -49,6 +52,12 @@ export module _Drawer {
         }
       });
       return super.draw(pie, drawSteps, userMetadata, plotMetadata);
+    }
+
+    public _getPixelPoint(selection: D3.Selection, datum: any, index: number): Point {
+      var avgRadius = (this._innerRadiusAccessor(datum, index) + this._outerRadiusAccessor(datum, index)) / 2;
+      var avgAngle = (datum.startAngle + datum.endAngle) / 2;
+      return { x: avgRadius * Math.sin(avgAngle), y: avgRadius * Math.cos(avgAngle) };
     }
   }
 }

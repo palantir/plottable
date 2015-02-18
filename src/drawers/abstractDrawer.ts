@@ -155,6 +155,10 @@ export module _Drawer {
       return true;
     }
 
+    public _getPixelPoint(selection: D3.Selection, datum: any, index: number): Point {
+      return null;
+    }
+
   }
 }
 }

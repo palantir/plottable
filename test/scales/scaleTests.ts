@@ -4,7 +4,7 @@ var assert = chai.assert;
 
 describe("Scales", () => {
   it("Scale's copy() works correctly", () => {
-    var testCallback: Plottable.Core.BroadcasterCallback = (broadcaster: Plottable.Core.Listenable) => {
+    var testCallback = (listenable: any) => {
       return true; // doesn't do anything
     };
     var scale = new Plottable.Scale.Linear();
@@ -19,7 +19,7 @@ describe("Scales", () => {
   it("Scale alerts listeners when its domain is updated", () => {
     var scale = new Plottable.Scale.Linear();
     var callbackWasCalled = false;
-    var testCallback: Plottable.Core.BroadcasterCallback = (listenable: Plottable.Core.Listenable) => {
+    var testCallback = (listenable: Plottable.Scale.Linear) => {
       assert.equal(listenable, scale, "Callback received the calling scale as the first argument");
       callbackWasCalled = true;
     };

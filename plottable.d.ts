@@ -461,72 +461,58 @@ declare module Plottable {
 declare module Plottable {
     module Core {
         /**
-         * This interface represents anything in Plottable which can have a listener attached.
-         * Listeners attach by referencing the Listenable's broadcaster, and calling registerListener
-         * on it.
-         *
-         * e.g.:
-         * listenable: Plottable.Listenable;
-         * listenable.broadcaster.registerListener(callbackToCallOnBroadcast)
+         * A callback for a Broadcaster. The callback will be called with the Broadcaster's
+         * "listenable" as the first argument, with subsequent optional arguments depending
+         * on the listenable.
          */
-        interface Listenable {
-            broadcaster: Broadcaster;
+        interface BroadcasterCallback<L> {
+            (listenable: L, ...args: any[]): any;
         }
         /**
-         * This interface represents the callback that should be passed to the Broadcaster on a Listenable.
-         *
-         * The callback will be called with the attached Listenable as the first object, and optional arguments
-         * as the subsequent arguments.
-         *
-         * The Listenable is passed as the first argument so that it is easy for the callback to reference the
-         * current state of the Listenable in the resolution logic.
-         */
-        type BroadcasterCallback = (listenable: Listenable, ...args: any[]) => any;
-        /**
-         * The Broadcaster class is owned by an Listenable. Third parties can register and deregister listeners
-         * from the broadcaster. When the broadcaster.broadcast method is activated, all registered callbacks are
-         * called. The registered callbacks are called with the registered Listenable that the broadcaster is attached
-         * to, along with optional arguments passed to the `broadcast` method.
+         * The Broadcaster holds a reference to a "listenable" object.
+         * Third parties can register and deregister listeners from the Broadcaster.
+         * When the broadcaster.broadcast() method is called, all registered callbacks
+         * are called with the Broadcaster's "listenable", along with optional
+         * arguments passed to the `broadcast` method.
          *
          * The listeners are called synchronously.
          */
-        class Broadcaster extends Core.PlottableObject {
-            listenable: Listenable;
+        class Broadcaster<L> extends Core.PlottableObject {
             /**
-             * Constructs a broadcaster, taking the Listenable that the broadcaster will be attached to.
+             * Constructs a broadcaster, taking a "listenable" object to broadcast about.
              *
              * @constructor
-             * @param {Listenable} listenable The Listenable-object that this broadcaster is attached to.
+             * @param {L} listenable The listenable object to broadcast.
              */
-            constructor(listenable: Listenable);
+            constructor(listenable: L);
             /**
              * Registers a callback to be called when the broadcast method is called. Also takes a key which
              * is used to support deregistering the same callback later, by passing in the same key.
              * If there is already a callback associated with that key, then the callback will be replaced.
              *
              * @param key The key associated with the callback. Key uniqueness is determined by deep equality.
-             * @param {BroadcasterCallback} callback A callback to be called when the Scale's domain changes.
-             * @returns {Broadcaster} this object
+             * @param {BroadcasterCallback<L>} callback A callback to be called.
+             * @returns {Broadcaster} The calling Broadcaster
              */
-            registerListener(key: any, callback: BroadcasterCallback): Broadcaster;
+            registerListener(key: any, callback: BroadcasterCallback<L>): Broadcaster<L>;
             /**
              * Call all listening callbacks, optionally with arguments passed through.
              *
              * @param ...args A variable number of optional arguments
-             * @returns {Broadcaster} this object
+             * @returns {Broadcaster} The calling Broadcaster
              */
-            broadcast(...args: any[]): Broadcaster;
+            broadcast(...args: any[]): Broadcaster<L>;
             /**
              * Deregisters the callback associated with a key.
              *
              * @param key The key to deregister.
-             * @returns {Broadcaster} this object
+             * @returns {Broadcaster} The calling Broadcaster
              */
-            deregisterListener(key: any): Broadcaster;
+            deregisterListener(key: any): Broadcaster<L>;
             /**
              * Deregisters all listeners and callbacks associated with the broadcaster.
              *
-             * @returns {Broadcaster} this object
+             * @returns {Broadcaster} The calling Broadcaster
              */
             deregisterAllListeners(): void;
         }
@@ -535,8 +521,8 @@ declare module Plottable {
 
 
 declare module Plottable {
-    class Dataset extends Core.PlottableObject implements Core.Listenable {
-        broadcaster: Core.Broadcaster;
+    class Dataset extends Core.PlottableObject {
+        broadcaster: Core.Broadcaster<Dataset>;
         /**
          * Constructs a new set.
          *
@@ -893,9 +879,9 @@ declare module Plottable {
 
 declare module Plottable {
     module Scale {
-        class AbstractScale<D, R> extends Core.PlottableObject implements Core.Listenable {
+        class AbstractScale<D, R> extends Core.PlottableObject {
             protected _d3Scale: D3.Scale.Scale;
-            broadcaster: Core.Broadcaster;
+            broadcaster: Core.Broadcaster<AbstractScale<D, R>>;
             _typeCoercer: (d: any) => any;
             /**
              * Constructs a new Scale.
@@ -1539,6 +1525,7 @@ declare module Plottable {
              * @returns {boolean} if the selection is within the bounds
              */
             _isSelectionInBounds(selection: D3.Selection, xExtent: Extent, yExtent: Extent, tolerance: number): boolean;
+            _getPixelPoint(selection: D3.Selection, datum: any, index: number): Point;
         }
     }
 }
@@ -1553,6 +1540,7 @@ declare module Plottable {
             protected _numberOfAnimationIterations(data: any[]): number;
             protected _drawStep(step: AppliedDrawStep): void;
             _getSelector(): string;
+            _getPixelPoint(selection: D3.Selection, datum: any, index: number): Point;
         }
     }
 }
@@ -1592,6 +1580,7 @@ declare module Plottable {
             protected _prepareDrawSteps(drawSteps: AppliedDrawStep[]): void;
             protected _prepareData(data: any[], drawSteps: AppliedDrawStep[]): any[];
             _getSelector(): string;
+            _getPixelPoint(selection: D3.Selection, datum: any, index: number): Point;
         }
     }
 }
@@ -1606,6 +1595,7 @@ declare module Plottable {
             _getIfLabelsTooWide(): boolean;
             _isSelectionInBounds(selection: D3.Selection, xExtent: Extent, yExtent: Extent, tolerance: number): boolean;
             drawText(data: any[], attrToProjector: AttributeToProjector, userMetadata: any, plotMetadata: Plot.PlotMetadata): void;
+            _getPixelPoint(selection: D3.Selection, datum: any, index: number): Point;
         }
     }
 }
@@ -1617,6 +1607,7 @@ declare module Plottable {
             constructor(key: string);
             _drawStep(step: AppliedDrawStep): void;
             draw(data: any[], drawSteps: DrawStep[], userMetadata: any, plotMetadata: Plot.PlotMetadata): number;
+            _getPixelPoint(selection: D3.Selection, datum: any, index: number): Point;
         }
     }
 }
@@ -2717,26 +2708,15 @@ declare module Plottable {
              */
             datasetOrder(order: string[]): AbstractPlot;
             /**
-             * Removes a dataset by string key
+             * Removes a dataset by the given identifier
              *
-             * @param {string} key The key of the dataset
-             * @return {Plot} The calling Plot.
+             * @param {string | Dataset | any[]} datasetIdentifer The identifier as the key of the Dataset to remove
+             * If string is inputted, it is interpreted as the dataset key to remove.
+             * If Dataset is inputted, the first Dataset in the plot that is the same will be removed.
+             * If any[] is inputted, the first data array in the plot that is the same will be removed.
+             * @returns {AbstractPlot} The calling AbstractPlot.
              */
-            removeDataset(key: string): AbstractPlot;
-            /**
-             * Remove a dataset given the dataset itself
-             *
-             * @param {Dataset} dataset The dataset to remove
-             * @return {Plot} The calling Plot.
-             */
-            removeDataset(dataset: Dataset): AbstractPlot;
-            /**
-             * Remove a dataset given the underlying data array
-             *
-             * @param {any[]} dataArray The data to remove
-             * @return {Plot} The calling Plot.
-             */
-            removeDataset(dataArray: any[]): AbstractPlot;
+            removeDataset(datasetIdentifier: string | Dataset | any[]): AbstractPlot;
             datasets(): Dataset[];
             protected _getDrawersInOrder(): _Drawer.AbstractDrawer[];
             protected _generateDrawSteps(): _Drawer.DrawStep[];

@@ -20,7 +20,7 @@ export module Plot {
     data: any[];
     pixelPoints: Point[];
     selection: D3.Selection;
-  };
+  }
 
   export class AbstractPlot extends Component.AbstractComponent {
     protected _dataChanged = false;
@@ -317,37 +317,34 @@ export module Plot {
     }
 
     /**
-     * Removes a dataset by string key
+     * Removes a dataset by the given identifier
      *
-     * @param {string} key The key of the dataset
-     * @return {Plot} The calling Plot.
+     * @param {string | Dataset | any[]} datasetIdentifer The identifier as the key of the Dataset to remove
+     * If string is inputted, it is interpreted as the dataset key to remove.
+     * If Dataset is inputted, the first Dataset in the plot that is the same will be removed.
+     * If any[] is inputted, the first data array in the plot that is the same will be removed.
+     * @returns {AbstractPlot} The calling AbstractPlot.
      */
-    public removeDataset(key: string): AbstractPlot;
-    /**
-     * Remove a dataset given the dataset itself
-     *
-     * @param {Dataset} dataset The dataset to remove
-     * @return {Plot} The calling Plot.
-     */
-    public removeDataset(dataset: Dataset): AbstractPlot;
-    /**
-     * Remove a dataset given the underlying data array
-     *
-     * @param {any[]} dataArray The data to remove
-     * @return {Plot} The calling Plot.
-     */
-    public removeDataset(dataArray: any[]): AbstractPlot;
-    public removeDataset(datasetOrKeyOrArray: any): AbstractPlot {
+    public removeDataset(datasetIdentifier: string | Dataset | any[]): AbstractPlot {
       var key: string;
-      if (typeof(datasetOrKeyOrArray) === "string") {
-        key = datasetOrKeyOrArray;
-      } else if (datasetOrKeyOrArray instanceof Dataset || datasetOrKeyOrArray instanceof Array) {
-        var array: any[] = (datasetOrKeyOrArray instanceof Dataset) ? this.datasets() : this.datasets().map(d => d.data());
-        var idx = array.indexOf(datasetOrKeyOrArray);
-        if (idx !== -1) {
-          key = this._datasetKeysInOrder[idx];
+      if (typeof datasetIdentifier === "string") {
+        key = <string> datasetIdentifier;
+      } else if (typeof datasetIdentifier === "object") {
+
+        var index = -1;
+        if (datasetIdentifier instanceof Dataset) {
+          var datasetArray = this.datasets();
+          index = datasetArray.indexOf(<Dataset> datasetIdentifier);
+        } else if (datasetIdentifier instanceof Array) {
+          var dataArray = this.datasets().map(d => d.data());
+          index = dataArray.indexOf(<any[]> datasetIdentifier);
         }
+        if (index !== -1) {
+          key = this._datasetKeysInOrder[index];
+        }
+
       }
+
       return this._removeDataset(key);
     }
 

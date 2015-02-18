@@ -1,5 +1,5 @@
 /*!
-Plottable 0.43.1 (https://github.com/palantir/plottable)
+Plottable 0.44.0 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -983,7 +983,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "0.43.1";
+    Plottable.version = "0.44.0";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -1060,25 +1060,26 @@ var Plottable;
     var Core;
     (function (Core) {
         /**
-         * The Broadcaster class is owned by an Listenable. Third parties can register and deregister listeners
-         * from the broadcaster. When the broadcaster.broadcast method is activated, all registered callbacks are
-         * called. The registered callbacks are called with the registered Listenable that the broadcaster is attached
-         * to, along with optional arguments passed to the `broadcast` method.
+         * The Broadcaster holds a reference to a "listenable" object.
+         * Third parties can register and deregister listeners from the Broadcaster.
+         * When the broadcaster.broadcast() method is called, all registered callbacks
+         * are called with the Broadcaster's "listenable", along with optional
+         * arguments passed to the `broadcast` method.
          *
          * The listeners are called synchronously.
          */
         var Broadcaster = (function (_super) {
             __extends(Broadcaster, _super);
             /**
-             * Constructs a broadcaster, taking the Listenable that the broadcaster will be attached to.
+             * Constructs a broadcaster, taking a "listenable" object to broadcast about.
              *
              * @constructor
-             * @param {Listenable} listenable The Listenable-object that this broadcaster is attached to.
+             * @param {L} listenable The listenable object to broadcast.
              */
             function Broadcaster(listenable) {
                 _super.call(this);
                 this._key2callback = new Plottable._Util.StrictEqualityAssociativeArray();
-                this.listenable = listenable;
+                this._listenable = listenable;
             }
             /**
              * Registers a callback to be called when the broadcast method is called. Also takes a key which
@@ -1086,8 +1087,8 @@ var Plottable;
              * If there is already a callback associated with that key, then the callback will be replaced.
              *
              * @param key The key associated with the callback. Key uniqueness is determined by deep equality.
-             * @param {BroadcasterCallback} callback A callback to be called when the Scale's domain changes.
-             * @returns {Broadcaster} this object
+             * @param {BroadcasterCallback<L>} callback A callback to be called.
+             * @returns {Broadcaster} The calling Broadcaster
              */
             Broadcaster.prototype.registerListener = function (key, callback) {
                 this._key2callback.set(key, callback);
@@ -1097,7 +1098,7 @@ var Plottable;
              * Call all listening callbacks, optionally with arguments passed through.
              *
              * @param ...args A variable number of optional arguments
-             * @returns {Broadcaster} this object
+             * @returns {Broadcaster} The calling Broadcaster
              */
             Broadcaster.prototype.broadcast = function () {
                 var _this = this;
@@ -1105,14 +1106,14 @@ var Plottable;
                 for (var _i = 0; _i < arguments.length; _i++) {
                     args[_i - 0] = arguments[_i];
                 }
-                this._key2callback.values().forEach(function (callback) { return callback(_this.listenable, args); });
+                this._key2callback.values().forEach(function (callback) { return callback(_this._listenable, args); });
                 return this;
             };
             /**
              * Deregisters the callback associated with a key.
              *
              * @param key The key to deregister.
-             * @returns {Broadcaster} this object
+             * @returns {Broadcaster} The calling Broadcaster
              */
             Broadcaster.prototype.deregisterListener = function (key) {
                 this._key2callback.delete(key);
@@ -1121,7 +1122,7 @@ var Plottable;
             /**
              * Deregisters all listeners and callbacks associated with the broadcaster.
              *
-             * @returns {Broadcaster} this object
+             * @returns {Broadcaster} The calling Broadcaster
              */
             Broadcaster.prototype.deregisterAllListeners = function () {
                 this._key2callback = new Plottable._Util.StrictEqualityAssociativeArray();
@@ -2454,6 +2455,9 @@ var Plottable;
             Time.prototype._setDomain = function (values) {
                 // attempt to parse dates
                 values = values.map(this._typeCoercer);
+                if (values[1] < values[0]) {
+                    throw new Error("Scale.Time domain values must be in chronological order");
+                }
                 return _super.prototype._setDomain.call(this, values);
             };
             Time.prototype.copy = function () {
@@ -2865,6 +2869,9 @@ var Plottable;
             AbstractDrawer.prototype._isSelectionInBounds = function (selection, xExtent, yExtent, tolerance) {
                 return true;
             };
+            AbstractDrawer.prototype._getPixelPoint = function (selection, datum, index) {
+                return null;
+            };
             return AbstractDrawer;
         })();
         _Drawer.AbstractDrawer = AbstractDrawer;
@@ -2910,15 +2917,15 @@ var Plottable;
             Line.prototype._drawStep = function (step) {
                 var baseTime = _super.prototype._drawStep.call(this, step);
                 var attrToProjector = Plottable._Util.Methods.copyMap(step.attrToProjector);
-                var xFunction = attrToProjector["x"];
-                var yFunction = attrToProjector["y"];
+                this._xProjector = attrToProjector["x"];
+                this._yProjector = attrToProjector["y"];
                 var definedFunction = attrToProjector["defined"];
                 delete attrToProjector["x"];
                 delete attrToProjector["y"];
                 if (attrToProjector["defined"]) {
                     delete attrToProjector["defined"];
                 }
-                attrToProjector["d"] = this._createLine(xFunction, yFunction, definedFunction);
+                attrToProjector["d"] = this._createLine(this._xProjector, this._yProjector, definedFunction);
                 if (attrToProjector["fill"]) {
                     this._pathSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
                 }
@@ -2928,6 +2935,9 @@ var Plottable;
             };
             Line.prototype._getSelector = function () {
                 return "." + Line.LINE_CLASS;
+            };
+            Line.prototype._getPixelPoint = function (selection, datum, index) {
+                return { x: this._xProjector(datum, index), y: this._yProjector(datum, index) };
             };
             Line.LINE_CLASS = "line";
             return Line;
@@ -3088,6 +3098,14 @@ var Plottable;
             Element.prototype._getSelector = function () {
                 return this._svgElement;
             };
+            Element.prototype._getPixelPoint = function (selection, datum, index) {
+                switch (this._svgElement) {
+                    case "circle":
+                        return { x: parseFloat(selection.attr("cx")), y: parseFloat(selection.attr("cy")) };
+                    default:
+                        return null;
+                }
+            };
             return Element;
         })(_Drawer.AbstractDrawer);
         _Drawer.Element = Element;
@@ -3188,6 +3206,15 @@ var Plottable;
                 });
                 this._labelsTooWide = labelTooWide.some(function (d) { return d; });
             };
+            Rect.prototype._getPixelPoint = function (selection, datum, index) {
+                var rectX = parseFloat(selection.attr("x"));
+                var rectY = parseFloat(selection.attr("y"));
+                var rectWidth = parseFloat(selection.attr("width"));
+                var rectHeight = parseFloat(selection.attr("height"));
+                var x = this._isVertical ? rectX + rectWidth / 2 : rectWidth;
+                var y = this._isVertical ? rectY : rectY + rectHeight / 2;
+                return { x: x, y: y };
+            };
             return Rect;
         })(_Drawer.Element);
         _Drawer.Rect = Rect;
@@ -3224,11 +3251,11 @@ var Plottable;
             Arc.prototype._drawStep = function (step) {
                 var attrToProjector = Plottable._Util.Methods.copyMap(step.attrToProjector);
                 attrToProjector = this.retargetProjectors(attrToProjector);
-                var innerRadiusF = attrToProjector["inner-radius"];
-                var outerRadiusF = attrToProjector["outer-radius"];
+                this._innerRadiusAccessor = attrToProjector["inner-radius"];
+                this._outerRadiusAccessor = attrToProjector["outer-radius"];
                 delete attrToProjector["inner-radius"];
                 delete attrToProjector["outer-radius"];
-                attrToProjector["d"] = this._createArc(innerRadiusF, outerRadiusF);
+                attrToProjector["d"] = this._createArc(this._innerRadiusAccessor, this._outerRadiusAccessor);
                 return _super.prototype._drawStep.call(this, { attrToProjector: attrToProjector, animator: step.animator });
             };
             Arc.prototype.draw = function (data, drawSteps, userMetadata, plotMetadata) {
@@ -3242,6 +3269,11 @@ var Plottable;
                     }
                 });
                 return _super.prototype.draw.call(this, pie, drawSteps, userMetadata, plotMetadata);
+            };
+            Arc.prototype._getPixelPoint = function (selection, datum, index) {
+                var avgRadius = (this._innerRadiusAccessor(datum, index) + this._outerRadiusAccessor(datum, index)) / 2;
+                var avgAngle = (datum.startAngle + datum.endAngle) / 2;
+                return { x: avgRadius * Math.sin(avgAngle), y: avgRadius * Math.cos(avgAngle) };
             };
             return Arc;
         })(_Drawer.Element);
@@ -4713,14 +4745,21 @@ var Plottable;
                 var isInsideBBox = function (tickBox) {
                     return (Math.floor(boundingBox.left) <= Math.ceil(tickBox.left) && Math.floor(boundingBox.top) <= Math.ceil(tickBox.top) && Math.floor(tickBox.right) <= Math.ceil(boundingBox.left + _this.width()) && Math.floor(tickBox.bottom) <= Math.ceil(boundingBox.top + _this.height()));
                 };
+                var visibleTickMarks = this._tierMarkContainers[index].selectAll("." + Axis.AbstractAxis.TICK_MARK_CLASS).filter(function (d, i) {
+                    return d3.select(this).style("visibility") === "visible";
+                });
+                // We use the ClientRects because x1/x2 attributes are not comparable to ClientRects of labels
+                var visibleTickMarkRects = visibleTickMarks[0].map(function (mark) { return mark.getBoundingClientRect(); });
                 var visibleTickLabels = this._tierLabelContainers[index].selectAll("." + Axis.AbstractAxis.TICK_LABEL_CLASS).filter(function (d, i) {
                     return d3.select(this).style("visibility") === "visible";
                 });
                 var lastLabelClientRect;
-                visibleTickLabels.each(function (d) {
+                visibleTickLabels.each(function (d, i) {
                     var clientRect = this.getBoundingClientRect();
                     var tickLabel = d3.select(this);
-                    if (!isInsideBBox(clientRect) || (lastLabelClientRect != null && Plottable._Util.DOM.boxesOverlap(clientRect, lastLabelClientRect))) {
+                    var leadingTickMark = visibleTickMarkRects[i];
+                    var trailingTickMark = visibleTickMarkRects[i + 1];
+                    if (!isInsideBBox(clientRect) || (lastLabelClientRect != null && Plottable._Util.DOM.boxesOverlap(clientRect, lastLabelClientRect)) || (leadingTickMark.right > clientRect.left || trailingTickMark.left < clientRect.right)) {
                         tickLabel.style("visibility", "hidden");
                     }
                     else {
@@ -5095,7 +5134,7 @@ var Plottable;
                 var widthFn = this._isHorizontal() ? d3.sum : Plottable._Util.Methods.max;
                 var heightFn = this._isHorizontal() ? Plottable._Util.Methods.max : d3.sum;
                 return {
-                    textFits: wrappingResults.every(function (t) { return !SVGTypewriter.Utils.StringMethods.isNotEmptyString(t.truncatedText) && t.noLines === 1; }),
+                    textFits: wrappingResults.every(function (t) { return SVGTypewriter.Utils.StringMethods.isNotEmptyString(t.truncatedText) && t.noLines === 1; }),
                     usedWidth: widthFn(wrappingResults, function (t) { return _this._measurer.measure(t.wrappedText).width; }, 0),
                     usedHeight: heightFn(wrappingResults, function (t) { return _this._measurer.measure(t.wrappedText).height; }, 0)
                 };
@@ -6448,16 +6487,32 @@ var Plottable;
                 }
                 return this;
             };
-            AbstractPlot.prototype.removeDataset = function (datasetOrKeyOrArray) {
+            /**
+             * Removes a dataset by the given identifier
+             *
+             * @param {string | Dataset | any[]} datasetIdentifer The identifier as the key of the Dataset to remove
+             * If string is inputted, it is interpreted as the dataset key to remove.
+             * If Dataset is inputted, the first Dataset in the plot that is the same will be removed.
+             * If any[] is inputted, the first data array in the plot that is the same will be removed.
+             * @returns {AbstractPlot} The calling AbstractPlot.
+             */
+            AbstractPlot.prototype.removeDataset = function (datasetIdentifier) {
                 var key;
-                if (typeof (datasetOrKeyOrArray) === "string") {
-                    key = datasetOrKeyOrArray;
+                if (typeof datasetIdentifier === "string") {
+                    key = datasetIdentifier;
                 }
-                else if (datasetOrKeyOrArray instanceof Plottable.Dataset || datasetOrKeyOrArray instanceof Array) {
-                    var array = (datasetOrKeyOrArray instanceof Plottable.Dataset) ? this.datasets() : this.datasets().map(function (d) { return d.data(); });
-                    var idx = array.indexOf(datasetOrKeyOrArray);
-                    if (idx !== -1) {
-                        key = this._datasetKeysInOrder[idx];
+                else if (typeof datasetIdentifier === "object") {
+                    var index = -1;
+                    if (datasetIdentifier instanceof Plottable.Dataset) {
+                        var datasetArray = this.datasets();
+                        index = datasetArray.indexOf(datasetIdentifier);
+                    }
+                    else if (datasetIdentifier instanceof Array) {
+                        var dataArray = this.datasets().map(function (d) { return d.data(); });
+                        index = dataArray.indexOf(datasetIdentifier);
+                    }
+                    if (index !== -1) {
+                        key = this._datasetKeysInOrder[index];
                     }
                 }
                 return this._removeDataset(key);
@@ -8983,7 +9038,7 @@ var Plottable;
             };
             Drag.prototype._dragend = function () {
                 var location = d3.mouse(this._hitBox[0][0].parentNode);
-                this._setLocation(location[0], location[1]);
+                this._setLocation(this._constrainX(location[0]), this._constrainY(location[1]));
                 this._isDragging = false;
                 this._doDragend();
             };

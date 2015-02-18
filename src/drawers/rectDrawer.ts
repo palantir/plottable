@@ -92,6 +92,16 @@ export module _Drawer {
       });
       this._labelsTooWide = labelTooWide.some((d: boolean) => d);
     }
+
+    public _getPixelPoint(selection: D3.Selection, datum: any, index: number): Point {
+      var rectX = parseFloat(selection.attr("x"));
+      var rectY = parseFloat(selection.attr("y"));
+      var rectWidth = parseFloat(selection.attr("width"));
+      var rectHeight = parseFloat(selection.attr("height"));
+      var x = this._isVertical ? rectX + rectWidth / 2 : rectWidth;
+      var y = this._isVertical ? rectY : rectY + rectHeight / 2;
+      return { x: x, y: y };
+    }
   }
 
 }
