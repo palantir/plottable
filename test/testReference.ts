@@ -11,6 +11,7 @@
 
 ///<reference path="drawers/drawerTests.ts" />
 ///<reference path="drawers/rectDrawerTests.ts" />
+///<reference path="drawers/lineDrawerTests.ts" />
 
 ///<reference path="components/baseAxisTests.ts" />
 ///<reference path="components/timeAxisTests.ts" />
