@@ -3180,6 +3180,15 @@ var Plottable;
                 });
                 this._labelsTooWide = labelTooWide.some(function (d) { return d; });
             };
+            Rect.prototype._getPixelPoint = function (selection, datum) {
+                var rectX = parseFloat(selection.attr("x"));
+                var rectY = parseFloat(selection.attr("y"));
+                var rectWidth = parseFloat(selection.attr("width"));
+                var rectHeight = parseFloat(selection.attr("height"));
+                var x = this._isVertical ? rectX + rectWidth / 2 : rectWidth;
+                var y = this._isVertical ? rectY : rectY + rectHeight / 2;
+                return { x: x, y: y };
+            };
             return Rect;
         })(_Drawer.Element);
         _Drawer.Rect = Rect;
