@@ -4,7 +4,7 @@ module Plottable {
 export module Dispatcher {
   export class Mouse {
     private static _DISPATCHER_KEY = "__Plottable_Dispatcher_Mouse";
-    private _connected = false;
+    private _connected = false; // TODO: move to Abstract
     private _svg: SVGElement;
     private _measureRect: SVGElement;
     private _lastMousePosition: Point;

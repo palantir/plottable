@@ -3427,29 +3427,32 @@ declare module Plottable {
 
 declare module Plottable {
     module Dispatcher {
-        class Keypress extends Dispatcher.AbstractDispatcher {
+        type KeyCallback = (keyCode: number) => any;
+        class Key {
             /**
-             * Constructs a Keypress Dispatcher with the specified target.
+             * Get a Dispatcher.Key. If one already exists it will be returned;
+             * otherwise, a new one will be created.
              *
-             * @constructor
-             * @param {D3.Selection} [target] The selection to listen for events on.
+             * @return {Dispatcher.Key} A Dispatcher.Key
              */
-            constructor(target?: D3.Selection);
-            connect(): Keypress;
-            disconnect(): Keypress;
+            static getDispatcher(): Dispatcher.Key;
             /**
-             * Gets the callback to be called when a key is pressed.
+             * Creates a Dispatcher.Key.
+             * This constructor not be invoked directly under most circumstances.
              *
-             * @return {(e: D3.D3Event) => void} The current keydown callback.
+             * @param {SVGElement} svg The root <svg> element to attach to.
              */
-            onKeyDown(): (e: D3.D3Event) => void;
+            constructor();
             /**
-             * Sets a callback to be called when a key is pressed.
+             * Registers a callback to be called whenever a key is pressed,
+             * or removes the callback if `null` is passed as the callback.
              *
-             * @param {(e: D3.D3Event) => void} A callback that takes in a D3Event.
-             * @return {Keypress} The calling Dispatcher.Keypress.
+             * @param {any} key The registration key associated with the callback.
+             *                  Registration key uniqueness is determined by deep equality.
+             * @param {KeyCallback} callback
+             * @return {Dispatcher.Key} The calling Dispatcher.Key.
              */
-            onKeyDown(callback: (e: D3.D3Event) => void): Keypress;
+            onKeydown(key: any, callback: KeyCallback): Key;
         }
     }
 }
@@ -3511,15 +3514,6 @@ declare module Plottable {
 declare module Plottable {
     module Interaction {
         class Key extends AbstractInteraction {
-            /**
-             * Creates a KeyInteraction.
-             *
-             * KeyInteraction listens to key events that occur while the component is
-             * moused over.
-             *
-             * @constructor
-             */
-            constructor();
             _anchor(component: Component.AbstractComponent, hitBox: D3.Selection): void;
             /**
              * Sets a callback to be called when the key with the given keyCode is

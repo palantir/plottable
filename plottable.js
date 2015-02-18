@@ -8439,7 +8439,7 @@ var Plottable;
              */
             function Mouse(svg) {
                 var _this = this;
-                this._connected = false;
+                this._connected = false; // TODO: move to Abstract
                 this._processMoveCallback = function (e) { return _this._processMoveEvent(e); };
                 this._svg = svg;
                 this._measureRect = document.createElementNS(svg.namespaceURI, "rect");
@@ -8564,64 +8564,76 @@ var Plottable;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
 var Plottable;
 (function (Plottable) {
     var Dispatcher;
     (function (Dispatcher) {
-        var Keypress = (function (_super) {
-            __extends(Keypress, _super);
+        var Key = (function () {
             /**
-             * Constructs a Keypress Dispatcher with the specified target.
+             * Creates a Dispatcher.Key.
+             * This constructor not be invoked directly under most circumstances.
              *
-             * @constructor
-             * @param {D3.Selection} [target] The selection to listen for events on.
+             * @param {SVGElement} svg The root <svg> element to attach to.
              */
-            function Keypress(target) {
+            function Key() {
                 var _this = this;
-                _super.call(this, target);
-                this._mousedOverTarget = false;
-                // Can't attach the key listener to the target (a sub-svg element)
-                // because "focusable" is only in SVG 1.2 / 2, which most browsers don't
-                // yet implement
-                this._keydownListenerTarget = d3.select(document);
-                this._event2Callback["mouseover"] = function () {
-                    _this._mousedOverTarget = true;
-                };
-                this._event2Callback["mouseout"] = function () {
-                    _this._mousedOverTarget = false;
-                };
+                this._connected = false; // TODO: move to Abstract
+                this._downCallback = function (e) { return _this._processKeydown(e); };
+                this._keydownBroadcaster = new Plottable.Core.Broadcaster(this);
             }
-            Keypress.prototype.connect = function () {
-                var _this = this;
-                _super.prototype.connect.call(this);
-                this._keydownListenerTarget.on(this._getEventString("keydown"), function () {
-                    if (_this._mousedOverTarget && _this._onKeyDown) {
-                        _this._onKeyDown(d3.event);
-                    }
-                });
-                return this;
-            };
-            Keypress.prototype.disconnect = function () {
-                _super.prototype.disconnect.call(this);
-                this._keydownListenerTarget.on(this._getEventString("keydown"), null);
-                return this;
-            };
-            Keypress.prototype.onKeyDown = function (callback) {
-                if (callback === undefined) {
-                    return this._onKeyDown;
+            /**
+             * Get a Dispatcher.Key. If one already exists it will be returned;
+             * otherwise, a new one will be created.
+             *
+             * @return {Dispatcher.Key} A Dispatcher.Key
+             */
+            Key.getDispatcher = function () {
+                var dispatcher = document[Key._DISPATCHER_KEY];
+                if (dispatcher == null) {
+                    dispatcher = new Key();
+                    document[Key._DISPATCHER_KEY] = dispatcher;
                 }
-                this._onKeyDown = callback;
+                return dispatcher;
+            };
+            Key.prototype._connect = function () {
+                if (!this._connected) {
+                    document.addEventListener("keydown", this._downCallback);
+                    this._connected = true;
+                }
+            };
+            Key.prototype._disconnect = function () {
+                if (this._connected && this._keydownBroadcaster.getListenerKeys().length === 0) {
+                    document.removeEventListener("keydown", this._downCallback);
+                    this._connected = false;
+                }
+            };
+            /**
+             * Registers a callback to be called whenever a key is pressed,
+             * or removes the callback if `null` is passed as the callback.
+             *
+             * @param {any} key The registration key associated with the callback.
+             *                  Registration key uniqueness is determined by deep equality.
+             * @param {KeyCallback} callback
+             * @return {Dispatcher.Key} The calling Dispatcher.Key.
+             */
+            Key.prototype.onKeydown = function (key, callback) {
+                if (callback === null) {
+                    this._keydownBroadcaster.deregisterListener(key);
+                    this._disconnect();
+                }
+                else {
+                    this._connect();
+                    this._keydownBroadcaster.registerListener(key, function (d, e) { return callback(e.keyCode); });
+                }
                 return this;
             };
-            return Keypress;
-        })(Dispatcher.AbstractDispatcher);
-        Dispatcher.Keypress = Keypress;
+            Key.prototype._processKeydown = function (e) {
+                this._keydownBroadcaster.broadcast(e);
+            };
+            Key._DISPATCHER_KEY = "__Plottable_Dispatcher_Key";
+            return Key;
+        })();
+        Dispatcher.Key = Key;
     })(Dispatcher = Plottable.Dispatcher || (Plottable.Dispatcher = {}));
 })(Plottable || (Plottable = {}));
 
@@ -8743,29 +8755,23 @@ var Plottable;
     (function (Interaction) {
         var Key = (function (_super) {
             __extends(Key, _super);
-            /**
-             * Creates a KeyInteraction.
-             *
-             * KeyInteraction listens to key events that occur while the component is
-             * moused over.
-             *
-             * @constructor
-             */
             function Key() {
-                _super.call(this);
+                _super.apply(this, arguments);
                 this._keyCode2Callback = {};
-                this._dispatcher = new Plottable.Dispatcher.Keypress();
             }
             Key.prototype._anchor = function (component, hitBox) {
                 var _this = this;
                 _super.prototype._anchor.call(this, component, hitBox);
-                this._dispatcher.target(this._hitBox);
-                this._dispatcher.onKeyDown(function (e) {
-                    if (_this._keyCode2Callback[e.keyCode]) {
-                        _this._keyCode2Callback[e.keyCode]();
-                    }
-                });
-                this._dispatcher.connect();
+                this._positionDispatcher = Plottable.Dispatcher.Mouse.getDispatcher(this._componentToListenTo._element.node());
+                this._positionDispatcher.onMouseMove("Interaction.Key" + this.getID(), function (p) { return null; }); // HACKHACK: registering a listener
+                this._keyDispatcher = Plottable.Dispatcher.Key.getDispatcher();
+                this._keyDispatcher.onKeydown("Interaction.Key" + this.getID(), function (keyCode) { return _this._handleKeyEvent(keyCode); });
+            };
+            Key.prototype._handleKeyEvent = function (keyCode) {
+                var p = this._translateToComponentSpace(this._positionDispatcher.getLastMousePosition());
+                if (this._isInsideComponent(p) && this._keyCode2Callback[keyCode]) {
+                    this._keyCode2Callback[keyCode]();
+                }
             };
             /**
              * Sets a callback to be called when the key with the given keyCode is
