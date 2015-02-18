@@ -8569,13 +8569,24 @@ var Plottable;
     var Dispatcher;
     (function (Dispatcher) {
         var KeyEvent = (function () {
+            /**
+             * Creates a Dispatcher.KeyEvent.
+             * This constructor not be invoked directly under most circumstances.
+             *
+             * @param {SVGElement} svg The root <svg> element to attach to.
+             */
             function KeyEvent() {
                 var _this = this;
                 this._connected = false;
-                // private _keyupBroadcaster: Core.Broadcaster<Dispatcher.KeyEvent>;
-                this._processDownCallback = function (e) { return _this._processKeydown(e); };
+                this._downCallback = function (e) { return _this._processKeydown(e); };
                 this._keydownBroadcaster = new Plottable.Core.Broadcaster(this);
             }
+            /**
+             * Get a Dispatcher.KeyEvent. If one already exists it will be returned;
+             * otherwise, a new one will be created.
+             *
+             * @return {Dispatcher.KeyEvent} A Dispatcher.KeyEvent
+             */
             KeyEvent.getDispatcher = function () {
                 var dispatcher = document[KeyEvent._DISPATCHER_KEY];
                 if (dispatcher == null) {
@@ -8586,13 +8597,13 @@ var Plottable;
             };
             KeyEvent.prototype._connect = function () {
                 if (!this._connected) {
-                    document.addEventListener("keydown", this._processDownCallback);
+                    document.addEventListener("keydown", this._downCallback);
                     this._connected = true;
                 }
             };
             KeyEvent.prototype._disconnect = function () {
                 if (this._connected && this._keydownBroadcaster.getListenerKeys().length === 0) {
-                    document.removeEventListener("keydown", this._processDownCallback);
+                    document.removeEventListener("keydown", this._downCallback);
                     this._connected = false;
                 }
             };
@@ -8602,8 +8613,7 @@ var Plottable;
              *
              * @param {any} key The registration key associated with the callback.
              *                  Registration key uniqueness is determined by deep equality.
-             * @param {(e: KeyboardEvent) => any} callback A callback that takes the
-             *                                             keydown KeyboardEvent.
+             * @param {KeyCallback} callback
              * @return {Dispatcher.KeyEvent} The calling Dispatcher.KeyEvent.
              */
             KeyEvent.prototype.onKeydown = function (key, callback) {
@@ -8613,7 +8623,7 @@ var Plottable;
                 }
                 else {
                     this._connect();
-                    this._keydownBroadcaster.registerListener(key, function (d, e) { return callback(e); });
+                    this._keydownBroadcaster.registerListener(key, function (d, e) { return callback(e.keyCode); });
                 }
                 return this;
             };
@@ -8755,12 +8765,12 @@ var Plottable;
                 this._positionDispatcher = Plottable.Dispatcher.Mouse.getDispatcher(this._componentToListenTo._element.node());
                 this._positionDispatcher.onMouseMove("Interaction.Key" + this.getID(), function (p) { return 0; }); // need to register
                 this._keyDispatcher = Plottable.Dispatcher.KeyEvent.getDispatcher();
-                this._keyDispatcher.onKeydown("Interaction.Key" + this.getID(), function (e) { return _this._handleKeyEvent(e); });
+                this._keyDispatcher.onKeydown("Interaction.Key" + this.getID(), function (keyCode) { return _this._handleKeyEvent(keyCode); });
             };
-            Key.prototype._handleKeyEvent = function (e) {
+            Key.prototype._handleKeyEvent = function (keyCode) {
                 var p = this._translateToComponentSpace(this._positionDispatcher.getLastMousePosition());
-                if (this._isInsideComponent(p) && this._keyCode2Callback[e.keyCode]) {
-                    this._keyCode2Callback[e.keyCode]();
+                if (this._isInsideComponent(p) && this._keyCode2Callback[keyCode]) {
+                    this._keyCode2Callback[keyCode]();
                 }
             };
             /**

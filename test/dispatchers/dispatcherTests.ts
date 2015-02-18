@@ -217,9 +217,8 @@ describe("Dispatchers", () => {
       var ked = Plottable.Dispatcher.KeyEvent.getDispatcher();
 
       var keyDowned = false;
-      var callback = function() {
-        keyDowned = true;
-      };
+      var callback = () => keyDowned = true;
+
       var keyString = "unit test";
       ked.onKeydown(keyString, callback);
 

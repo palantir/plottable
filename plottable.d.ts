@@ -3427,8 +3427,21 @@ declare module Plottable {
 
 declare module Plottable {
     module Dispatcher {
+        type KeyCallback = (keyCode: number) => any;
         class KeyEvent {
+            /**
+             * Get a Dispatcher.KeyEvent. If one already exists it will be returned;
+             * otherwise, a new one will be created.
+             *
+             * @return {Dispatcher.KeyEvent} A Dispatcher.KeyEvent
+             */
             static getDispatcher(): Dispatcher.KeyEvent;
+            /**
+             * Creates a Dispatcher.KeyEvent.
+             * This constructor not be invoked directly under most circumstances.
+             *
+             * @param {SVGElement} svg The root <svg> element to attach to.
+             */
             constructor();
             /**
              * Registers a callback to be called whenever a key is pressed,
@@ -3436,11 +3449,10 @@ declare module Plottable {
              *
              * @param {any} key The registration key associated with the callback.
              *                  Registration key uniqueness is determined by deep equality.
-             * @param {(e: KeyboardEvent) => any} callback A callback that takes the
-             *                                             keydown KeyboardEvent.
+             * @param {KeyCallback} callback
              * @return {Dispatcher.KeyEvent} The calling Dispatcher.KeyEvent.
              */
-            onKeydown(key: any, callback: (e: KeyboardEvent) => any): KeyEvent;
+            onKeydown(key: any, callback: KeyCallback): KeyEvent;
         }
     }
 }

@@ -7349,9 +7349,7 @@ describe("Dispatchers", function () {
         it("triggers callback on mousedown", function () {
             var ked = Plottable.Dispatcher.KeyEvent.getDispatcher();
             var keyDowned = false;
-            var callback = function () {
-                keyDowned = true;
-            };
+            var callback = function () { return keyDowned = true; };
             var keyString = "unit test";
             ked.onKeydown(keyString, callback);
             $("body").simulate("keydown", { keyCode: 65 });

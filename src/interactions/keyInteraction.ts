@@ -20,13 +20,13 @@ export module Interaction {
       this._positionDispatcher.onMouseMove("Interaction.Key" + this.getID(), (p: Point) => 0); // need to register
 
       this._keyDispatcher = Dispatcher.KeyEvent.getDispatcher();
-      this._keyDispatcher.onKeydown("Interaction.Key" + this.getID(), (e: KeyboardEvent) => this._handleKeyEvent(e));
+      this._keyDispatcher.onKeydown("Interaction.Key" + this.getID(), (keyCode: number) => this._handleKeyEvent(keyCode));
     }
 
-    private _handleKeyEvent(e: KeyboardEvent) {
+    private _handleKeyEvent(keyCode: number) {
       var p = this._translateToComponentSpace(this._positionDispatcher.getLastMousePosition());
-      if (this._isInsideComponent(p) && this._keyCode2Callback[e.keyCode]) {
-        this._keyCode2Callback[e.keyCode]();
+      if (this._isInsideComponent(p) && this._keyCode2Callback[keyCode]) {
+        this._keyCode2Callback[keyCode]();
       }
     }
 
