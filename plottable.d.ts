@@ -1514,7 +1514,7 @@ declare module Plottable {
              */
             _getRenderArea(): D3.Selection;
             _getSelector(): string;
-            _getPixelPoint(selection: D3.Selection, datum: any): Point;
+            _getPixelPoint(selection: D3.Selection, datum: any, index: number): Point;
         }
     }
 }
@@ -1529,6 +1529,10 @@ declare module Plottable {
             protected _numberOfAnimationIterations(data: any[]): number;
             protected _drawStep(step: AppliedDrawStep): void;
             _getSelector(): string;
+            _getPixelPoint(selection: D3.Selection, datum: any, index: number): {
+                x: any;
+                y: any;
+            };
         }
     }
 }
@@ -1568,7 +1572,7 @@ declare module Plottable {
             protected _prepareDrawSteps(drawSteps: AppliedDrawStep[]): void;
             protected _prepareData(data: any[], drawSteps: AppliedDrawStep[]): any[];
             _getSelector(): string;
-            _getPixelPoint(selection: D3.Selection, datum: any): Point;
+            _getPixelPoint(selection: D3.Selection, datum: any, index: number): Point;
         }
     }
 }
@@ -1582,7 +1586,7 @@ declare module Plottable {
             removeLabels(): void;
             _getIfLabelsTooWide(): boolean;
             drawText(data: any[], attrToProjector: AttributeToProjector, userMetadata: any, plotMetadata: Plot.PlotMetadata): void;
-            _getPixelPoint(selection: D3.Selection, datum: any): Point;
+            _getPixelPoint(selection: D3.Selection, datum: any, index: number): Point;
         }
     }
 }

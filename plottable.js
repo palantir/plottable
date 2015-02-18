@@ -2853,7 +2853,7 @@ var Plottable;
             AbstractDrawer.prototype._getSelector = function () {
                 return "";
             };
-            AbstractDrawer.prototype._getPixelPoint = function (selection, datum) {
+            AbstractDrawer.prototype._getPixelPoint = function (selection, datum, index) {
                 return null;
             };
             return AbstractDrawer;
@@ -2901,15 +2901,15 @@ var Plottable;
             Line.prototype._drawStep = function (step) {
                 var baseTime = _super.prototype._drawStep.call(this, step);
                 var attrToProjector = Plottable._Util.Methods.copyMap(step.attrToProjector);
-                var xFunction = attrToProjector["x"];
-                var yFunction = attrToProjector["y"];
+                this._xProjector = attrToProjector["x"];
+                this._yProjector = attrToProjector["y"];
                 var definedFunction = attrToProjector["defined"];
                 delete attrToProjector["x"];
                 delete attrToProjector["y"];
                 if (attrToProjector["defined"]) {
                     delete attrToProjector["defined"];
                 }
-                attrToProjector["d"] = this._createLine(xFunction, yFunction, definedFunction);
+                attrToProjector["d"] = this._createLine(this._xProjector, this._yProjector, definedFunction);
                 if (attrToProjector["fill"]) {
                     this._pathSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
                 }
@@ -2919,6 +2919,9 @@ var Plottable;
             };
             Line.prototype._getSelector = function () {
                 return "." + Line.LINE_CLASS;
+            };
+            Line.prototype._getPixelPoint = function (selection, datum, index) {
+                return { x: this._xProjector(datum, index), y: this._yProjector(datum, index) };
             };
             Line.LINE_CLASS = "line";
             return Line;
@@ -3079,7 +3082,7 @@ var Plottable;
             Element.prototype._getSelector = function () {
                 return this._svgElement;
             };
-            Element.prototype._getPixelPoint = function (selection, datum) {
+            Element.prototype._getPixelPoint = function (selection, datum, index) {
                 switch (this._svgElement) {
                     case "circle":
                         return { x: parseFloat(selection.attr("cx")), y: parseFloat(selection.attr("cy")) };
@@ -3180,7 +3183,7 @@ var Plottable;
                 });
                 this._labelsTooWide = labelTooWide.some(function (d) { return d; });
             };
-            Rect.prototype._getPixelPoint = function (selection, datum) {
+            Rect.prototype._getPixelPoint = function (selection, datum, index) {
                 var rectX = parseFloat(selection.attr("x"));
                 var rectY = parseFloat(selection.attr("y"));
                 var rectWidth = parseFloat(selection.attr("width"));

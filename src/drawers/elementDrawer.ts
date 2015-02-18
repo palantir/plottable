@@ -61,7 +61,7 @@ export module _Drawer {
       return this._svgElement;
     }
 
-    public _getPixelPoint(selection: D3.Selection, datum: any): Point {
+    public _getPixelPoint(selection: D3.Selection, datum: any, index: number): Point {
       switch(this._svgElement) {
         case "circle":
           return { x: parseFloat(selection.attr("cx")), y: parseFloat(selection.attr("cy")) };

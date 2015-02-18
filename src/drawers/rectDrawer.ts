@@ -84,7 +84,7 @@ export module _Drawer {
       this._labelsTooWide = labelTooWide.some((d: boolean) => d);
     }
 
-    public _getPixelPoint(selection: D3.Selection, datum: any): Point {
+    public _getPixelPoint(selection: D3.Selection, datum: any, index: number): Point {
       var rectX = parseFloat(selection.attr("x"));
       var rectY = parseFloat(selection.attr("y"));
       var rectWidth = parseFloat(selection.attr("width"));
