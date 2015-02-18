@@ -8,7 +8,7 @@ export module Interaction {
      * moused over.
      */
     private _positionDispatcher: Plottable.Dispatcher.Mouse;
-    private _keyDispatcher: Plottable.Dispatcher.KeyEvent;
+    private _keyDispatcher: Plottable.Dispatcher.Key;
     private _keyCode2Callback: { [keyCode: string]: () => void; } = {};
 
     public _anchor(component: Component.AbstractComponent, hitBox: D3.Selection) {
@@ -19,7 +19,7 @@ export module Interaction {
                                  );
       this._positionDispatcher.onMouseMove("Interaction.Key" + this.getID(), (p: Point) => 0); // need to register
 
-      this._keyDispatcher = Dispatcher.KeyEvent.getDispatcher();
+      this._keyDispatcher = Dispatcher.Key.getDispatcher();
       this._keyDispatcher.onKeydown("Interaction.Key" + this.getID(), (keyCode: number) => this._handleKeyEvent(keyCode));
     }
 

@@ -212,9 +212,9 @@ describe("Dispatchers", () => {
 
   });
 
-  describe("KeyEvent Dispatcher", () => {
+  describe("Key Dispatcher", () => {
     it("triggers callback on mousedown", () => {
-      var ked = Plottable.Dispatcher.KeyEvent.getDispatcher();
+      var ked = Plottable.Dispatcher.Key.getDispatcher();
 
       var keyDowned = false;
       var callback = () => keyDowned = true;

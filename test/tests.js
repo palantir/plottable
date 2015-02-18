@@ -7345,9 +7345,9 @@ describe("Dispatchers", function () {
             target.remove();
         });
     });
-    describe("KeyEvent Dispatcher", function () {
+    describe("Key Dispatcher", function () {
         it("triggers callback on mousedown", function () {
-            var ked = Plottable.Dispatcher.KeyEvent.getDispatcher();
+            var ked = Plottable.Dispatcher.Key.getDispatcher();
             var keyDowned = false;
             var callback = function () { return keyDowned = true; };
             var keyString = "unit test";

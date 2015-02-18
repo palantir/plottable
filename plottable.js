@@ -8568,40 +8568,40 @@ var Plottable;
 (function (Plottable) {
     var Dispatcher;
     (function (Dispatcher) {
-        var KeyEvent = (function () {
+        var Key = (function () {
             /**
-             * Creates a Dispatcher.KeyEvent.
+             * Creates a Dispatcher.Key.
              * This constructor not be invoked directly under most circumstances.
              *
              * @param {SVGElement} svg The root <svg> element to attach to.
              */
-            function KeyEvent() {
+            function Key() {
                 var _this = this;
                 this._connected = false;
                 this._downCallback = function (e) { return _this._processKeydown(e); };
                 this._keydownBroadcaster = new Plottable.Core.Broadcaster(this);
             }
             /**
-             * Get a Dispatcher.KeyEvent. If one already exists it will be returned;
+             * Get a Dispatcher.Key. If one already exists it will be returned;
              * otherwise, a new one will be created.
              *
-             * @return {Dispatcher.KeyEvent} A Dispatcher.KeyEvent
+             * @return {Dispatcher.Key} A Dispatcher.Key
              */
-            KeyEvent.getDispatcher = function () {
-                var dispatcher = document[KeyEvent._DISPATCHER_KEY];
+            Key.getDispatcher = function () {
+                var dispatcher = document[Key._DISPATCHER_KEY];
                 if (dispatcher == null) {
-                    dispatcher = new KeyEvent();
-                    document[KeyEvent._DISPATCHER_KEY] = dispatcher;
+                    dispatcher = new Key();
+                    document[Key._DISPATCHER_KEY] = dispatcher;
                 }
                 return dispatcher;
             };
-            KeyEvent.prototype._connect = function () {
+            Key.prototype._connect = function () {
                 if (!this._connected) {
                     document.addEventListener("keydown", this._downCallback);
                     this._connected = true;
                 }
             };
-            KeyEvent.prototype._disconnect = function () {
+            Key.prototype._disconnect = function () {
                 if (this._connected && this._keydownBroadcaster.getListenerKeys().length === 0) {
                     document.removeEventListener("keydown", this._downCallback);
                     this._connected = false;
@@ -8614,9 +8614,9 @@ var Plottable;
              * @param {any} key The registration key associated with the callback.
              *                  Registration key uniqueness is determined by deep equality.
              * @param {KeyCallback} callback
-             * @return {Dispatcher.KeyEvent} The calling Dispatcher.KeyEvent.
+             * @return {Dispatcher.Key} The calling Dispatcher.Key.
              */
-            KeyEvent.prototype.onKeydown = function (key, callback) {
+            Key.prototype.onKeydown = function (key, callback) {
                 if (callback === null) {
                     this._keydownBroadcaster.deregisterListener(key);
                     this._disconnect();
@@ -8627,13 +8627,13 @@ var Plottable;
                 }
                 return this;
             };
-            KeyEvent.prototype._processKeydown = function (e) {
+            Key.prototype._processKeydown = function (e) {
                 this._keydownBroadcaster.broadcast(e);
             };
-            KeyEvent._DISPATCHER_KEY = "__Plottable_Dispatcher_Key";
-            return KeyEvent;
+            Key._DISPATCHER_KEY = "__Plottable_Dispatcher_Key";
+            return Key;
         })();
-        Dispatcher.KeyEvent = KeyEvent;
+        Dispatcher.Key = Key;
     })(Dispatcher = Plottable.Dispatcher || (Plottable.Dispatcher = {}));
 })(Plottable || (Plottable = {}));
 
@@ -8764,7 +8764,7 @@ var Plottable;
                 _super.prototype._anchor.call(this, component, hitBox);
                 this._positionDispatcher = Plottable.Dispatcher.Mouse.getDispatcher(this._componentToListenTo._element.node());
                 this._positionDispatcher.onMouseMove("Interaction.Key" + this.getID(), function (p) { return 0; }); // need to register
-                this._keyDispatcher = Plottable.Dispatcher.KeyEvent.getDispatcher();
+                this._keyDispatcher = Plottable.Dispatcher.Key.getDispatcher();
                 this._keyDispatcher.onKeydown("Interaction.Key" + this.getID(), function (keyCode) { return _this._handleKeyEvent(keyCode); });
             };
             Key.prototype._handleKeyEvent = function (keyCode) {

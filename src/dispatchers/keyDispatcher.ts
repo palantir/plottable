@@ -4,29 +4,29 @@ module Plottable {
 export module Dispatcher {
   export type KeyCallback = (keyCode: number) => any;
 
-  export class KeyEvent {
+  export class Key {
     private static _DISPATCHER_KEY = "__Plottable_Dispatcher_Key";
     private _connected = false;
-    private _keydownBroadcaster: Core.Broadcaster<Dispatcher.KeyEvent>;
+    private _keydownBroadcaster: Core.Broadcaster<Dispatcher.Key>;
     private _downCallback = (e: KeyboardEvent) => this._processKeydown(e);
 
     /**
-     * Get a Dispatcher.KeyEvent. If one already exists it will be returned;
+     * Get a Dispatcher.Key. If one already exists it will be returned;
      * otherwise, a new one will be created.
      *
-     * @return {Dispatcher.KeyEvent} A Dispatcher.KeyEvent
+     * @return {Dispatcher.Key} A Dispatcher.Key
      */
-    public static getDispatcher(): Dispatcher.KeyEvent {
-      var dispatcher: KeyEvent = (<any> document)[KeyEvent._DISPATCHER_KEY];
+    public static getDispatcher(): Dispatcher.Key {
+      var dispatcher: Key = (<any> document)[Key._DISPATCHER_KEY];
       if (dispatcher == null) {
-        dispatcher = new KeyEvent();
-        (<any> document)[KeyEvent._DISPATCHER_KEY] = dispatcher;
+        dispatcher = new Key();
+        (<any> document)[Key._DISPATCHER_KEY] = dispatcher;
       }
       return dispatcher;
     }
 
     /**
-     * Creates a Dispatcher.KeyEvent.
+     * Creates a Dispatcher.Key.
      * This constructor not be invoked directly under most circumstances.
      *
      * @param {SVGElement} svg The root <svg> element to attach to.
@@ -57,16 +57,16 @@ export module Dispatcher {
      * @param {any} key The registration key associated with the callback.
      *                  Registration key uniqueness is determined by deep equality.
      * @param {KeyCallback} callback
-     * @return {Dispatcher.KeyEvent} The calling Dispatcher.KeyEvent.
+     * @return {Dispatcher.Key} The calling Dispatcher.Key.
      */
-    public onKeydown(key: any, callback: KeyCallback): KeyEvent {
+    public onKeydown(key: any, callback: KeyCallback): Key {
       if (callback === null) { // remove listener if callback is null
         this._keydownBroadcaster.deregisterListener(key);
         this._disconnect();
       } else {
         this._connect();
         this._keydownBroadcaster.registerListener(key,
-          (d: Dispatcher.KeyEvent, e: KeyboardEvent) => callback(e.keyCode));
+          (d: Dispatcher.Key, e: KeyboardEvent) => callback(e.keyCode));
       }
       return this;
     }
