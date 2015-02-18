@@ -67,7 +67,7 @@ export module _Drawer {
       return "." + Line.LINE_CLASS;
     }
 
-    public _getPixelPoint(selection: D3.Selection, datum: any, index: number) {
+    public _getPixelPoint(selection: D3.Selection, datum: any, index: number): Point {
       return { x: this._xProjector(datum, index), y: this._yProjector(datum, index) };
     }
   }

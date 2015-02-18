@@ -1529,10 +1529,7 @@ declare module Plottable {
             protected _numberOfAnimationIterations(data: any[]): number;
             protected _drawStep(step: AppliedDrawStep): void;
             _getSelector(): string;
-            _getPixelPoint(selection: D3.Selection, datum: any, index: number): {
-                x: any;
-                y: any;
-            };
+            _getPixelPoint(selection: D3.Selection, datum: any, index: number): Point;
         }
     }
 }
@@ -1598,10 +1595,7 @@ declare module Plottable {
             constructor(key: string);
             _drawStep(step: AppliedDrawStep): void;
             draw(data: any[], drawSteps: DrawStep[], userMetadata: any, plotMetadata: Plot.PlotMetadata): number;
-            _getPixelPoint(selection: D3.Selection, datum: any, index: number): {
-                x: number;
-                y: number;
-            };
+            _getPixelPoint(selection: D3.Selection, datum: any, index: number): Point;
         }
     }
 }

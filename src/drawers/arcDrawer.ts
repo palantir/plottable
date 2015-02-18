@@ -54,7 +54,7 @@ export module _Drawer {
       return super.draw(pie, drawSteps, userMetadata, plotMetadata);
     }
 
-    public _getPixelPoint(selection: D3.Selection, datum: any, index: number) {
+    public _getPixelPoint(selection: D3.Selection, datum: any, index: number): Point {
       var avgRadius = (this._innerRadiusAccessor(datum, index) + this._outerRadiusAccessor(datum, index)) / 2;
       var avgAngle = (datum.startAngle + datum.endAngle) / 2;
       return { x: avgRadius * Math.sin(avgAngle), y: avgRadius * Math.cos(avgAngle) };
