@@ -66,7 +66,11 @@ export module Axis {
     protected _getTickValues(): any[] {
       var scale = (<Scale.AbstractQuantitative<number>> this._scale);
       var domain = scale.domain();
-      return scale.ticks().filter((i: number) => i >= domain[0] && i <= domain[1]);
+      if (domain[0] < domain[1]) {
+        return scale.ticks().filter((i: number) => i >= domain[0] && i <= domain[1]);
+      } else {
+        return scale.ticks().filter((i: number) => i <= domain[0] && i >= domain[1]);
+      }
     }
 
     protected _rescale() {

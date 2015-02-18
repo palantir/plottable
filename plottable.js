@@ -4191,17 +4191,32 @@ var Plottable;
                 });
             };
             AbstractAxis.prototype._hasOverlapWithInterval = function (interval, rects) {
+                var domain = this._scale.domain();
                 for (var i = 0; i < rects.length - (interval); i += interval) {
                     var currRect = rects[i];
                     var nextRect = rects[i + interval];
-                    if (this._isHorizontal()) {
-                        if (currRect.right + this._tickLabelPadding >= nextRect.left) {
-                            return false;
+                    if (domain[0] <= domain[1]) {
+                        if (this._isHorizontal()) {
+                            if (currRect.right + this._tickLabelPadding >= nextRect.left) {
+                                return false;
+                            }
+                        }
+                        else {
+                            if (currRect.top - this._tickLabelPadding <= nextRect.bottom) {
+                                return false;
+                            }
                         }
                     }
                     else {
-                        if (currRect.top - this._tickLabelPadding <= nextRect.bottom) {
-                            return false;
+                        if (this._isHorizontal()) {
+                            if (currRect.left - this._tickLabelPadding <= nextRect.right) {
+                                return false;
+                            }
+                        }
+                        else {
+                            if (currRect.bottom + this._tickLabelPadding >= nextRect.bottom) {
+                                return false;
+                            }
                         }
                     }
                 }
@@ -4685,7 +4700,12 @@ var Plottable;
             Numeric.prototype._getTickValues = function () {
                 var scale = this._scale;
                 var domain = scale.domain();
-                return scale.ticks().filter(function (i) { return i >= domain[0] && i <= domain[1]; });
+                if (domain[0] < domain[1]) {
+                    return scale.ticks().filter(function (i) { return i >= domain[0] && i <= domain[1]; });
+                }
+                else {
+                    return scale.ticks().filter(function (i) { return i <= domain[0] && i >= domain[1]; });
+                }
             };
             Numeric.prototype._rescale = function () {
                 if (!this._isSetup) {
