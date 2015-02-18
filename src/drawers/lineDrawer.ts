@@ -6,8 +6,6 @@ export module _Drawer {
     public static LINE_CLASS = "line";
 
     private _pathSelection: D3.Selection;
-    private _xProjector: _AppliedProjector;
-    private _yProjector: _AppliedProjector;
 
     protected _enterData(data: any[]) {
       super._enterData(data);
@@ -41,23 +39,24 @@ export module _Drawer {
 
     protected _drawStep(step: AppliedDrawStep) {
       var baseTime = super._drawStep(step);
+      this._attrToProjector = <_AttributeToAppliedProjector>_Util.Methods.copyMap(step.attrToProjector);
       var attrToProjector = <_AttributeToAppliedProjector>_Util.Methods.copyMap(step.attrToProjector);
-      this._xProjector    = attrToProjector["x"];
-      this._yProjector    = attrToProjector["y"];
       var definedFunction = attrToProjector["defined"];
 
+      var xProjector = attrToProjector["x"];
+      var yProjector = attrToProjector["y"];
       delete attrToProjector["x"];
       delete attrToProjector["y"];
-      if (attrToProjector["defined"]) {
+      if (this._attrToProjector["defined"]) {
         delete attrToProjector["defined"];
       }
 
-      attrToProjector["d"] = this._createLine(this._xProjector, this._yProjector, definedFunction);
+      this._attrToProjector["d"] = this._createLine(xProjector, yProjector, definedFunction);
       if (attrToProjector["fill"]) {
-        this._pathSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
+        this._pathSelection.attr("fill", this._attrToProjector["fill"]); // so colors don't animate
       }
 
-      step.animator.animate(this._pathSelection, attrToProjector);
+      step.animator.animate(this._pathSelection, this._attrToProjector);
 
       // Restore classes that may have been overridden by class projectors
       this._pathSelection.classed(Line.LINE_CLASS, true);
@@ -67,8 +66,8 @@ export module _Drawer {
       return "." + Line.LINE_CLASS;
     }
 
-    public _getPixelPoint(selection: D3.Selection, datum: any, index: number): Point {
-      return { x: this._xProjector(datum, index), y: this._yProjector(datum, index) };
+    public _getPixelPoint(datum: any, index: number): Point {
+      return { x: this._attrToProjector["x"](datum, index), y: this._attrToProjector["x"](datum, index) };
     }
   }
 }
