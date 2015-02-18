@@ -1598,6 +1598,10 @@ declare module Plottable {
             constructor(key: string);
             _drawStep(step: AppliedDrawStep): void;
             draw(data: any[], drawSteps: DrawStep[], userMetadata: any, plotMetadata: Plot.PlotMetadata): number;
+            _getPixelPoint(selection: D3.Selection, datum: any, index: number): {
+                x: number;
+                y: number;
+            };
         }
     }
 }
