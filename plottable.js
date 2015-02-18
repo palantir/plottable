@@ -6591,7 +6591,7 @@ var Plottable;
                     drawer._getRenderArea().selectAll(drawer._getSelector()).each(function () {
                         var selection = d3.select(this);
                         selection.each(function (datum, index) {
-                            var pixelPoint = drawer._getPixelPoint(selection, datum, index);
+                            var pixelPoint = drawer._getPixelPoint(datum, index);
                             var pointDistance = Plottable._Util.Methods.pointDistance(pixelPoint, closestPixelPoint);
                             if (pointDistance < closestPointDistance) {
                                 closestDatum = datum;
