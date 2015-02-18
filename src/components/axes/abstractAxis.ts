@@ -509,32 +509,18 @@ export module Axis {
     }
 
     private _hasOverlapWithInterval(interval: number, rects: ClientRect[]): boolean {
-      var domain = this._scale.domain();
       for (var i = 0; i < rects.length - (interval); i += interval) {
         var currRect = rects[i];
         var nextRect = rects[i + interval];
-        if (domain[0] <= domain[1]) { // Ascending order
-          if (this._isHorizontal()) {
-            if (currRect.right + this._tickLabelPadding >= nextRect.left) {
-              return false;
-            }
-          } else {
-            if (currRect.top - this._tickLabelPadding <= nextRect.bottom) {
-              return false;
-            }
+        if (this._isHorizontal()) {
+          if (currRect.right + this._tickLabelPadding >= nextRect.left) {
+            return false;
           }
-        } else { // Descending order
-          if (this._isHorizontal()) {
-            if (currRect.left - this._tickLabelPadding <= nextRect.right) {
-              return false;
-            }
-          } else {
-            if (currRect.bottom + this._tickLabelPadding >= nextRect.bottom) {
-              return false;
-            }
+        } else {
+          if (currRect.top - this._tickLabelPadding <= nextRect.bottom) {
+            return false;
           }
         }
-
       }
       return true;
     }
