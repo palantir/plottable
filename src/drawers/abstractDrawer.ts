@@ -108,8 +108,10 @@ export module _Drawer {
      */
     public draw(data: any[], drawSteps: DrawStep[], userMetadata: any, plotMetadata: Plot.PlotMetadata) {
       var appliedDrawSteps: AppliedDrawStep[] = drawSteps.map((dr: DrawStep) => {
+        var appliedAttrToProjector = this._applyMetadata(dr.attrToProjector, userMetadata, plotMetadata);
+        this._attrToProjector = <_AttributeToAppliedProjector>_Util.Methods.copyMap(appliedAttrToProjector);
         return {
-          attrToProjector: this._applyMetadata(dr.attrToProjector, userMetadata, plotMetadata),
+          attrToProjector: appliedAttrToProjector,
           animator: dr.animator
         };
       });

@@ -17,8 +17,10 @@ describe("Drawers", () => {
       piePlot.getAllSelections().each(function (datum: any, index: number) {
         var selection = d3.select(this);
         var pixelPoint = drawer._getPixelPoint(datum, index);
-        var expectedX = index < 2 ? 0.75 * 300 : 0.25 * 300;
-        var expectedY = index === 1 || index === 2 ? 0.75 * 300 : 0.25 * 300;
+        var radius = 75;
+        var angle = Math.PI / 4 + ((Math.PI * index) / 2);
+        var expectedX = radius * Math.sin(angle);
+        var expectedY = radius * Math.cos(angle);
         assert.closeTo(pixelPoint.x, expectedX, 1, "x coordinate correct");
         assert.closeTo(pixelPoint.y, expectedY, 1, "y coordinate correct");
       });

@@ -22,7 +22,6 @@ export module _Drawer {
     protected _drawStep(step: AppliedDrawStep) {
       super._drawStep(step);
       var drawSelection = this._getDrawSelection();
-      this._attrToProjector = step.attrToProjector;
       if (step.attrToProjector["fill"]) {
         drawSelection.attr("fill", step.attrToProjector["fill"]); // so colors don't animate
       }

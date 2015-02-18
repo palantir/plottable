@@ -2826,8 +2826,10 @@ var Plottable;
             AbstractDrawer.prototype.draw = function (data, drawSteps, userMetadata, plotMetadata) {
                 var _this = this;
                 var appliedDrawSteps = drawSteps.map(function (dr) {
+                    var appliedAttrToProjector = _this._applyMetadata(dr.attrToProjector, userMetadata, plotMetadata);
+                    _this._attrToProjector = Plottable._Util.Methods.copyMap(appliedAttrToProjector);
                     return {
-                        attrToProjector: _this._applyMetadata(dr.attrToProjector, userMetadata, plotMetadata),
+                        attrToProjector: appliedAttrToProjector,
                         animator: dr.animator
                     };
                 });
@@ -2900,7 +2902,6 @@ var Plottable;
             };
             Line.prototype._drawStep = function (step) {
                 var baseTime = _super.prototype._drawStep.call(this, step);
-                this._attrToProjector = Plottable._Util.Methods.copyMap(step.attrToProjector);
                 var attrToProjector = Plottable._Util.Methods.copyMap(step.attrToProjector);
                 var definedFunction = attrToProjector["defined"];
                 var xProjector = attrToProjector["x"];
@@ -3050,7 +3051,6 @@ var Plottable;
             Element.prototype._drawStep = function (step) {
                 _super.prototype._drawStep.call(this, step);
                 var drawSelection = this._getDrawSelection();
-                this._attrToProjector = step.attrToProjector;
                 if (step.attrToProjector["fill"]) {
                     drawSelection.attr("fill", step.attrToProjector["fill"]); // so colors don't animate
                 }
@@ -3230,7 +3230,7 @@ var Plottable;
             Arc.prototype._drawStep = function (step) {
                 var attrToProjector = Plottable._Util.Methods.copyMap(step.attrToProjector);
                 attrToProjector = this.retargetProjectors(attrToProjector);
-                this._attrToProjector = Plottable._Util.Methods.copyMap(attrToProjector);
+                this._attrToProjector = this.retargetProjectors(this._attrToProjector);
                 var innerRadiusAccessor = attrToProjector["inner-radius"];
                 var outerRadiusAccessor = attrToProjector["outer-radius"];
                 delete attrToProjector["inner-radius"];
