@@ -3336,46 +3336,15 @@ declare module Plottable {
 declare module Plottable {
     module Dispatcher {
         class AbstractDispatcher extends Core.PlottableObject {
-            protected _target: D3.Selection;
             protected _event2Callback: {
-                [eventName: string]: () => any;
+                [eventName: string]: (e: Event) => any;
             };
+            protected _broadcasters: Core.Broadcaster<AbstractDispatcher>[];
             /**
-             * Constructs a Dispatcher with the specified target.
-             *
-             * @constructor
-             * @param {D3.Selection} [target] The selection to listen for events on.
+             * Creates a wrapped version of the callback that can be registered to a Broadcaster
              */
-            constructor(target?: D3.Selection);
-            /**
-             * Gets the target of the Dispatcher.
-             *
-             * @returns {D3.Selection} The Dispatcher's current target.
-             */
-            target(): D3.Selection;
-            /**
-             * Sets the target of the Dispatcher.
-             *
-             * @param {D3.Selection} target The element to listen for updates on.
-             * @returns {Dispatcher} The calling Dispatcher.
-             */
-            target(targetElement: D3.Selection): AbstractDispatcher;
-            /**
-             * Gets a namespaced version of the event name.
-             */
-            protected _getEventString(eventName: string): string;
-            /**
-             * Attaches the Dispatcher's listeners to the Dispatcher's target element.
-             *
-             * @returns {Dispatcher} The calling Dispatcher.
-             */
-            connect(): AbstractDispatcher;
-            /**
-             * Detaches the Dispatcher's listeners from the Dispatchers' target element.
-             *
-             * @returns {Dispatcher} The calling Dispatcher.
-             */
-            disconnect(): AbstractDispatcher;
+            protected _getWrappedCallback(callback: Function): Core.BroadcasterCallback<AbstractDispatcher>;
+            protected _setCallback(b: Core.Broadcaster<AbstractDispatcher>, key: any, callback: Function): void;
         }
     }
 }
@@ -3383,7 +3352,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Dispatcher {
-        class Mouse {
+        class Mouse extends AbstractDispatcher {
             /**
              * Get a Dispatcher.Mouse for the <svg> containing elem. If one already exists
              * on that <svg>, it will be returned; otherwise, a new one will be created.
@@ -3399,6 +3368,7 @@ declare module Plottable {
              * @param {SVGElement} svg The root <svg> element to attach to.
              */
             constructor(svg: SVGElement);
+            protected _getWrappedCallback(callback: Function): Core.BroadcasterCallback<Dispatcher.Mouse>;
             /**
              * Registers a callback to be called whenever the mouse position changes,
              * or removes the callback if `null` is passed as the callback.
@@ -3410,7 +3380,7 @@ declare module Plottable {
              *                                     to remove a callback.
              * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
              */
-            onMouseMove(key: any, callback: (p: Point) => any): Mouse;
+            onMouseMove(key: any, callback: (p: Point) => any): Dispatcher.Mouse;
             /**
              * Returns the last computed mouse position.
              *
@@ -3428,7 +3398,7 @@ declare module Plottable {
 declare module Plottable {
     module Dispatcher {
         type KeyCallback = (keyCode: number) => any;
-        class Key {
+        class Key extends AbstractDispatcher {
             /**
              * Get a Dispatcher.Key. If one already exists it will be returned;
              * otherwise, a new one will be created.
@@ -3443,6 +3413,7 @@ declare module Plottable {
              * @param {SVGElement} svg The root <svg> element to attach to.
              */
             constructor();
+            protected _getWrappedCallback(callback: Function): Core.BroadcasterCallback<Dispatcher.Key>;
             /**
              * Registers a callback to be called whenever a key is pressed,
              * or removes the callback if `null` is passed as the callback.

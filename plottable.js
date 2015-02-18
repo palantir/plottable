@@ -8354,70 +8354,50 @@ var Plottable;
     (function (Dispatcher) {
         var AbstractDispatcher = (function (_super) {
             __extends(AbstractDispatcher, _super);
-            /**
-             * Constructs a Dispatcher with the specified target.
-             *
-             * @constructor
-             * @param {D3.Selection} [target] The selection to listen for events on.
-             */
-            function AbstractDispatcher(target) {
-                _super.call(this);
+            function AbstractDispatcher() {
+                _super.apply(this, arguments);
                 this._event2Callback = {};
+                this._broadcasters = [];
                 this._connected = false;
-                this._target = target;
             }
-            AbstractDispatcher.prototype.target = function (targetElement) {
-                if (targetElement == null) {
-                    return this._target;
-                }
-                var wasConnected = this._connected;
-                this.disconnect();
-                this._target = targetElement;
-                if (wasConnected) {
-                    // re-connect to the new target
-                    this.connect();
-                }
-                return this;
+            AbstractDispatcher.prototype._hasNoListeners = function () {
+                return this._broadcasters.every(function (b) { return b.getListenerKeys().length === 0; });
             };
-            /**
-             * Gets a namespaced version of the event name.
-             */
-            AbstractDispatcher.prototype._getEventString = function (eventName) {
-                return eventName + ".dispatcher" + this.getID();
-            };
-            /**
-             * Attaches the Dispatcher's listeners to the Dispatcher's target element.
-             *
-             * @returns {Dispatcher} The calling Dispatcher.
-             */
-            AbstractDispatcher.prototype.connect = function () {
+            AbstractDispatcher.prototype._connect = function () {
                 var _this = this;
-                if (this._connected) {
-                    throw new Error("Can't connect dispatcher twice!");
-                }
-                if (this._target) {
-                    this._connected = true;
+                if (!this._connected) {
                     Object.keys(this._event2Callback).forEach(function (event) {
                         var callback = _this._event2Callback[event];
-                        _this._target.on(_this._getEventString(event), callback);
+                        document.addEventListener(event, callback);
                     });
+                    this._connected = true;
                 }
-                return this;
+            };
+            AbstractDispatcher.prototype._disconnect = function () {
+                var _this = this;
+                if (this._connected && this._hasNoListeners()) {
+                    Object.keys(this._event2Callback).forEach(function (event) {
+                        var callback = _this._event2Callback[event];
+                        document.removeEventListener(event, callback);
+                    });
+                    this._connected = false;
+                }
             };
             /**
-             * Detaches the Dispatcher's listeners from the Dispatchers' target element.
-             *
-             * @returns {Dispatcher} The calling Dispatcher.
+             * Creates a wrapped version of the callback that can be registered to a Broadcaster
              */
-            AbstractDispatcher.prototype.disconnect = function () {
-                var _this = this;
-                this._connected = false;
-                if (this._target) {
-                    Object.keys(this._event2Callback).forEach(function (event) {
-                        _this._target.on(_this._getEventString(event), null);
-                    });
+            AbstractDispatcher.prototype._getWrappedCallback = function (callback) {
+                return function () { return callback(); };
+            };
+            AbstractDispatcher.prototype._setCallback = function (b, key, callback) {
+                if (callback === null) {
+                    b.deregisterListener(key);
+                    this._disconnect();
                 }
-                return this;
+                else {
+                    this._connect();
+                    b.registerListener(key, this._getWrappedCallback(callback));
+                }
             };
             return AbstractDispatcher;
         })(Plottable.Core.PlottableObject);
@@ -8426,11 +8406,18 @@ var Plottable;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
 var Plottable;
 (function (Plottable) {
     var Dispatcher;
     (function (Dispatcher) {
-        var Mouse = (function () {
+        var Mouse = (function (_super) {
+            __extends(Mouse, _super);
             /**
              * Creates a Dispatcher.Mouse.
              * This constructor not be invoked directly under most circumstances.
@@ -8439,7 +8426,7 @@ var Plottable;
              */
             function Mouse(svg) {
                 var _this = this;
-                this._connected = false; // TODO: move to Abstract
+                _super.call(this);
                 this._processMoveCallback = function (e) { return _this._processMoveEvent(e); };
                 this._svg = svg;
                 this._measureRect = document.createElementNS(svg.namespaceURI, "rect");
@@ -8450,6 +8437,10 @@ var Plottable;
                 this._svg.appendChild(this._measureRect);
                 this._lastMousePosition = { x: -1, y: -1 };
                 this._moveBroadcaster = new Plottable.Core.Broadcaster(this);
+                this._event2Callback["mouseover"] = this._processMoveCallback;
+                this._event2Callback["mousemove"] = this._processMoveCallback;
+                this._event2Callback["mouseout"] = this._processMoveCallback;
+                this._broadcasters = [this._moveBroadcaster];
             }
             /**
              * Get a Dispatcher.Mouse for the <svg> containing elem. If one already exists
@@ -8467,21 +8458,9 @@ var Plottable;
                 }
                 return dispatcher;
             };
-            Mouse.prototype._connect = function () {
-                if (!this._connected) {
-                    document.addEventListener("mouseover", this._processMoveCallback);
-                    document.addEventListener("mousemove", this._processMoveCallback);
-                    document.addEventListener("mouseout", this._processMoveCallback);
-                    this._connected = true;
-                }
-            };
-            Mouse.prototype._disconnect = function () {
-                if (this._connected && this._moveBroadcaster.getListenerKeys().length === 0) {
-                    document.removeEventListener("mouseover", this._processMoveCallback);
-                    document.removeEventListener("mousemove", this._processMoveCallback);
-                    document.removeEventListener("mouseout", this._processMoveCallback);
-                    this._connected = false;
-                }
+            Mouse.prototype._getWrappedCallback = function (callback) {
+                var _this = this;
+                return function () { return callback(_this.getLastMousePosition()); };
             };
             /**
              * Registers a callback to be called whenever the mouse position changes,
@@ -8495,17 +8474,7 @@ var Plottable;
              * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
              */
             Mouse.prototype.onMouseMove = function (key, callback) {
-                var _this = this;
-                if (callback === null) {
-                    this._moveBroadcaster.deregisterListener(key);
-                    this._disconnect();
-                }
-                else {
-                    this._connect();
-                    this._moveBroadcaster.registerListener(key, function () {
-                        callback(_this.getLastMousePosition());
-                    });
-                }
+                this._setCallback(this._moveBroadcaster, key, callback);
                 return this;
             };
             Mouse.prototype._processMoveEvent = function (e) {
@@ -8558,17 +8527,24 @@ var Plottable;
             };
             Mouse._DISPATCHER_KEY = "__Plottable_Dispatcher_Mouse";
             return Mouse;
-        })();
+        })(Dispatcher.AbstractDispatcher);
         Dispatcher.Mouse = Mouse;
     })(Dispatcher = Plottable.Dispatcher || (Plottable.Dispatcher = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
 var Plottable;
 (function (Plottable) {
     var Dispatcher;
     (function (Dispatcher) {
-        var Key = (function () {
+        var Key = (function (_super) {
+            __extends(Key, _super);
             /**
              * Creates a Dispatcher.Key.
              * This constructor not be invoked directly under most circumstances.
@@ -8577,9 +8553,11 @@ var Plottable;
              */
             function Key() {
                 var _this = this;
-                this._connected = false; // TODO: move to Abstract
+                _super.call(this);
                 this._downCallback = function (e) { return _this._processKeydown(e); };
+                this._event2Callback["keydown"] = this._downCallback;
                 this._keydownBroadcaster = new Plottable.Core.Broadcaster(this);
+                this._broadcasters = [this._keydownBroadcaster];
             }
             /**
              * Get a Dispatcher.Key. If one already exists it will be returned;
@@ -8595,17 +8573,8 @@ var Plottable;
                 }
                 return dispatcher;
             };
-            Key.prototype._connect = function () {
-                if (!this._connected) {
-                    document.addEventListener("keydown", this._downCallback);
-                    this._connected = true;
-                }
-            };
-            Key.prototype._disconnect = function () {
-                if (this._connected && this._keydownBroadcaster.getListenerKeys().length === 0) {
-                    document.removeEventListener("keydown", this._downCallback);
-                    this._connected = false;
-                }
+            Key.prototype._getWrappedCallback = function (callback) {
+                return function (d, e) { return callback(e.keyCode); };
             };
             /**
              * Registers a callback to be called whenever a key is pressed,
@@ -8617,14 +8586,7 @@ var Plottable;
              * @return {Dispatcher.Key} The calling Dispatcher.Key.
              */
             Key.prototype.onKeydown = function (key, callback) {
-                if (callback === null) {
-                    this._keydownBroadcaster.deregisterListener(key);
-                    this._disconnect();
-                }
-                else {
-                    this._connect();
-                    this._keydownBroadcaster.registerListener(key, function (d, e) { return callback(e.keyCode); });
-                }
+                this._setCallback(this._keydownBroadcaster, key, callback);
                 return this;
             };
             Key.prototype._processKeydown = function (e) {
@@ -8632,7 +8594,7 @@ var Plottable;
             };
             Key._DISPATCHER_KEY = "__Plottable_Dispatcher_Key";
             return Key;
-        })();
+        })(Dispatcher.AbstractDispatcher);
         Dispatcher.Key = Key;
     })(Dispatcher = Plottable.Dispatcher || (Plottable.Dispatcher = {}));
 })(Plottable || (Plottable = {}));

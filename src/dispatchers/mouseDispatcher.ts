@@ -2,9 +2,8 @@
 
 module Plottable {
 export module Dispatcher {
-  export class Mouse {
+  export class Mouse extends AbstractDispatcher {
     private static _DISPATCHER_KEY = "__Plottable_Dispatcher_Mouse";
-    private _connected = false; // TODO: move to Abstract
     private _svg: SVGElement;
     private _measureRect: SVGElement;
     private _lastMousePosition: Point;
@@ -36,6 +35,8 @@ export module Dispatcher {
      * @param {SVGElement} svg The root <svg> element to attach to.
      */
     constructor(svg: SVGElement) {
+      super();
+
       this._svg = svg;
       this._measureRect = <SVGElement> <any>document.createElementNS(svg.namespaceURI, "rect");
       this._measureRect.setAttribute("class", "measure-rect");
@@ -46,25 +47,16 @@ export module Dispatcher {
 
       this._lastMousePosition = { x: -1, y: -1 };
       this._moveBroadcaster = new Core.Broadcaster(this);
+
+      this._event2Callback["mouseover"] = this._processMoveCallback;
+      this._event2Callback["mousemove"] = this._processMoveCallback;
+      this._event2Callback["mouseout"] = this._processMoveCallback;
+
+      this._broadcasters = [this._moveBroadcaster];
     }
 
-    private _connect() {
-      if (!this._connected) {
-        document.addEventListener("mouseover", this._processMoveCallback);
-        document.addEventListener("mousemove", this._processMoveCallback);
-        document.addEventListener("mouseout", this._processMoveCallback);
-        this._connected = true;
-      }
-    }
-
-    private _disconnect() {
-      if (this._connected &&
-          this._moveBroadcaster.getListenerKeys().length === 0) {
-        document.removeEventListener("mouseover", this._processMoveCallback);
-        document.removeEventListener("mousemove", this._processMoveCallback);
-        document.removeEventListener("mouseout", this._processMoveCallback);
-        this._connected = false;
-      }
+    protected _getWrappedCallback(callback: Function): Core.BroadcasterCallback<Dispatcher.Mouse> {
+      return () => callback(this.getLastMousePosition());
     }
 
     /**
@@ -78,14 +70,8 @@ export module Dispatcher {
      *                                     to remove a callback.
      * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
      */
-    public onMouseMove(key: any, callback: (p: Point) => any): Mouse {
-      if (callback === null) { // remove listener if callback is null
-        this._moveBroadcaster.deregisterListener(key);
-        this._disconnect();
-      } else {
-        this._connect();
-        this._moveBroadcaster.registerListener(key, () => { callback(this.getLastMousePosition()); });
-      }
+    public onMouseMove(key: any, callback: (p: Point) => any): Dispatcher.Mouse {
+      this._setCallback(this._moveBroadcaster, key, callback);
       return this;
     }
 
