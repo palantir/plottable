@@ -2853,6 +2853,9 @@ var Plottable;
             AbstractDrawer.prototype._getSelector = function () {
                 return "";
             };
+            AbstractDrawer.prototype._getPixelPoint = function (selection, datum) {
+                return null;
+            };
             return AbstractDrawer;
         })();
         _Drawer.AbstractDrawer = AbstractDrawer;
@@ -3075,6 +3078,14 @@ var Plottable;
             };
             Element.prototype._getSelector = function () {
                 return this._svgElement;
+            };
+            Element.prototype._getPixelPoint = function (selection, datum) {
+                switch (this._svgElement) {
+                    case "circle":
+                        return { x: parseFloat(selection.attr("cx")), y: parseFloat(selection.attr("cy")) };
+                    default:
+                        return null;
+                }
             };
             return Element;
         })(_Drawer.AbstractDrawer);

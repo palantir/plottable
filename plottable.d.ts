@@ -1514,6 +1514,7 @@ declare module Plottable {
              */
             _getRenderArea(): D3.Selection;
             _getSelector(): string;
+            _getPixelPoint(selection: D3.Selection, datum: any): Point;
         }
     }
 }
@@ -1567,6 +1568,7 @@ declare module Plottable {
             protected _prepareDrawSteps(drawSteps: AppliedDrawStep[]): void;
             protected _prepareData(data: any[], drawSteps: AppliedDrawStep[]): any[];
             _getSelector(): string;
+            _getPixelPoint(selection: D3.Selection, datum: any): Point;
         }
     }
 }
