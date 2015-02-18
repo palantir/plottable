@@ -7348,10 +7348,10 @@ describe("Dispatchers", function () {
             var keyDowned = false;
             var callback = function () { return keyDowned = true; };
             var keyString = "unit test";
-            ked.onKeydown(keyString, callback);
+            ked.onKeyDown(keyString, callback);
             $("body").simulate("keydown", { keyCode: 65 });
             assert.isTrue(keyDowned, "callback when a key was pressed");
-            ked.onKeydown(keyString, null); // clean up
+            ked.onKeyDown(keyString, null); // clean up
         });
     });
 });

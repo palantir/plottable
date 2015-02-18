@@ -52,7 +52,7 @@ export module Dispatcher {
      * @param {KeyCallback} callback
      * @return {Dispatcher.Key} The calling Dispatcher.Key.
      */
-    public onKeydown(key: any, callback: KeyCallback): Key {
+    public onKeyDown(key: any, callback: KeyCallback): Key {
       this._setCallback(this._keydownBroadcaster, key, callback);
       return this;
     }
