@@ -8763,7 +8763,7 @@ var Plottable;
                 var _this = this;
                 _super.prototype._anchor.call(this, component, hitBox);
                 this._positionDispatcher = Plottable.Dispatcher.Mouse.getDispatcher(this._componentToListenTo._element.node());
-                this._positionDispatcher.onMouseMove("Interaction.Key" + this.getID(), function (p) { return 0; }); // need to register
+                this._positionDispatcher.onMouseMove("Interaction.Key" + this.getID(), function (p) { return null; }); // HACKHACK: registering a listener
                 this._keyDispatcher = Plottable.Dispatcher.Key.getDispatcher();
                 this._keyDispatcher.onKeydown("Interaction.Key" + this.getID(), function (keyCode) { return _this._handleKeyEvent(keyCode); });
             };
