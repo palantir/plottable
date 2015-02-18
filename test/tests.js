@@ -966,11 +966,11 @@ describe("NumericAxis", function () {
             var visibility = d3.select(this).style("visibility");
             return (visibility === "visible") || (visibility === "inherit");
         });
-        assert.isTrue(tickLabels[0].length > 1);
+        assert.isTrue(tickLabels[0].length > 1, "more than one tick label is shown");
         for (var i = 0; i < tickLabels[0].length - 1; i++) {
             var currLabel = d3.select(tickLabels[0][i]);
             var nextLabel = d3.select(tickLabels[0][i + 1]);
-            assert.isTrue(Number(currLabel.text()) > Number(nextLabel.text()));
+            assert.isTrue(Number(currLabel.text()) > Number(nextLabel.text()), "numbers are arranged in descending order from left to right");
         }
         svg.remove();
     });
