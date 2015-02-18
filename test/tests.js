@@ -586,6 +586,23 @@ describe("TimeAxis", function () {
         assert.isTrue(lastTick.classed(Plottable.Axis.AbstractAxis.END_TICK_MARK_CLASS), "last end tick has the end-tick-mark class");
         svg.remove();
     });
+    it("tick labels do not overlap with tick marks", function () {
+        var svg = generateSVG(400, 100);
+        scale = new Plottable.Scale.Time();
+        scale.domain([new Date("2009-12-20"), new Date("2011-01-01")]);
+        axis = new Plottable.Axis.Time(scale, "bottom");
+        axis.renderTo(svg);
+        var tickRects = d3.selectAll("." + Plottable.Axis.AbstractAxis.TICK_MARK_CLASS)[0].map(function (mark) { return mark.getBoundingClientRect(); });
+        var labelRects = d3.selectAll("." + Plottable.Axis.AbstractAxis.TICK_LABEL_CLASS).filter(function (d, i) {
+            return d3.select(this).style("visibility") === "visible";
+        })[0].map(function (label) { return label.getBoundingClientRect(); });
+        labelRects.forEach(function (labelRect) {
+            tickRects.forEach(function (tickRect) {
+                assert.isFalse(Plottable._Util.DOM.boxesOverlap(labelRect, tickRect), "visible label does not overlap with a tick");
+            });
+        });
+        svg.remove();
+    });
 });
 
 ///<reference path="../testReference.ts" />
@@ -1009,6 +1026,19 @@ describe("Category Axes", function () {
         text = ticks[0].map(function (d) { return d3.select(d).text(); });
         assert.deepEqual(text, years, "text displayed correctly when horizontal");
         assert.include(axis._content.selectAll(".text-area").attr("transform"), -90, "the ticks were rotated left");
+        svg.remove();
+    });
+    it("axis should request more space if there's not enough space to fit the text", function () {
+        var svg = generateSVG(300, 300);
+        var years = ["2000", "2001", "2002", "2003"];
+        var scale = new Plottable.Scale.Ordinal().domain(years);
+        var axis = new Plottable.Axis.Category(scale, "bottom");
+        axis.renderTo(svg);
+        var requestedSpace = axis._requestedSpace(300, 10);
+        assert.isTrue(requestedSpace.wantsHeight, "axis should ask for more space (horizontal orientation)");
+        axis.orient("left");
+        requestedSpace = axis._requestedSpace(10, 300);
+        assert.isTrue(requestedSpace.wantsWidth, "axis should ask for more space (vertical orientation)");
         svg.remove();
     });
 });
@@ -6101,6 +6131,10 @@ describe("TimeScale tests", function () {
         checkDomain(["10/1/2014", "11/1/2014"]);
         checkDomain(["October 1, 2014", "November 1, 2014"]);
         checkDomain(["Oct 1, 2014", "Nov 1, 2014"]);
+    });
+    it("can't set reversed domain", function () {
+        var scale = new Plottable.Scale.Time();
+        assert.throws(function () { return scale.domain(["1985-10-26", "1955-11-05"]); }, "chronological");
     });
     it("time coercer works as intended", function () {
         var tc = new Plottable.Scale.Time()._typeCoercer;

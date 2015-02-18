@@ -142,12 +142,8 @@ export module _Drawer {
       return "";
     }
 
-    public _getPixelPoints(selection: D3.Selection): Point[] {
-      return [];
-    }
-
-    public _getDatum(selection: D3.Selection, point: Point): any {
-      return selection.data();
+    public _getPixelPoint(selection: D3.Selection, datum: any, index: number): Point {
+      return null;
     }
 
   }
