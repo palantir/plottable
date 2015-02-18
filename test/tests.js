@@ -296,6 +296,31 @@ describe("Drawers", function () {
 
 ///<reference path="../testReference.ts" />
 describe("Drawers", function () {
+    describe("Arc Drawer", function () {
+        it("getPixelPoint", function () {
+            var svg = generateSVG(300, 300);
+            var data = [{ value: 10 }, { value: 10 }, { value: 10 }, { value: 10 }];
+            var piePlot = new Plottable.Plot.Pie();
+            var drawer = new Plottable._Drawer.Arc("one");
+            piePlot._getDrawer = function () { return drawer; };
+            piePlot.addDataset("one", data);
+            piePlot.project("value", "value");
+            piePlot.renderTo(svg);
+            piePlot.getAllSelections().each(function (datum, index) {
+                var selection = d3.select(this);
+                var pixelPoint = drawer._getPixelPoint(datum, index);
+                var expectedX = index < 2 ? 0.75 * 300 : 0.25 * 300;
+                var expectedY = index === 1 || index === 2 ? 0.75 * 300 : 0.25 * 300;
+                assert.closeTo(pixelPoint.x, expectedX, 1, "x coordinate correct");
+                assert.closeTo(pixelPoint.y, expectedY, 1, "y coordinate correct");
+            });
+            svg.remove();
+        });
+    });
+});
+
+///<reference path="../testReference.ts" />
+describe("Drawers", function () {
     describe("Rect Drawer", function () {
         it("getPixelPoint vertical", function () {
             var svg = generateSVG(300, 300);
