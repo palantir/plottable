@@ -447,22 +447,23 @@ export module Plot {
       var closestPixelPoint: Point = null;
       var closestPointDistance = withinValue;
 
-//      this._getDrawersInOrder().forEach((drawer) => {
-//        drawer._getRenderArea().selectAll(drawer._getSelector()).each(function() {
-//          var selection = d3.select(this);
-//          drawer._getPixelPoints(selection).forEach((pixelPoint: Point) => {
-//            var pointDistance = Plottable._Util.Methods.pointDistance(pixelPoint, closestPixelPoint);
-//            if (pointDistance < closestPointDistance) {
-//              closestDatum = drawer._getDatum(selection, pixelPoint);
-//              closestPixelPoint = pixelPoint;
-//              closestSelection = selection;
-//              closestPointDistance = pointDistance;
-//            }
-//          });
-//        });
-//      });
+      this._getDrawersInOrder().forEach((drawer) => {
+        drawer._getRenderArea().selectAll(drawer._getSelector()).each(function() {
+          var selection = d3.select(this);
+          selection.each((datum: any, index: number) => {
+            var pixelPoint = drawer._getPixelPoint(selection, datum, index);
+            var pointDistance = Plottable._Util.Methods.pointDistance(pixelPoint, closestPixelPoint);
+            if (pointDistance < closestPointDistance) {
+              closestDatum = datum;
+              closestPixelPoint = pixelPoint;
+              closestSelection = selection;
+              closestPointDistance = pointDistance;
+            }
+          });
+        });
+      });
 
-      return { data: [closestDatum], pixelPoints: [closestPixelPoint], selection: d3.selectAll(closestSelection) };
+      return { data: [closestDatum], pixelPoints: [closestPixelPoint], selection: closestSelection };
     }
   }
 }
