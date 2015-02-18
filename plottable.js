@@ -3190,7 +3190,7 @@ var Plottable;
                 var rectY = this._attrToProjector["y"](datum, index);
                 var rectWidth = this._attrToProjector["width"](datum, index);
                 var rectHeight = this._attrToProjector["height"](datum, index);
-                var x = this._isVertical ? rectX + rectWidth / 2 : rectWidth;
+                var x = this._isVertical ? rectX + rectWidth / 2 : rectX + rectWidth;
                 var y = this._isVertical ? rectY : rectY + rectHeight / 2;
                 return { x: x, y: y };
             };
