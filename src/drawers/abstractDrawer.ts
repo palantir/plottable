@@ -21,6 +21,7 @@ export module _Drawer {
     private _renderArea: D3.Selection;
     protected _className: string;
     public key: string;
+    protected _attrToProjector: _AttributeToAppliedProjector;
 
     /**
      * Sets the class, which needs to be applied to bound elements.
@@ -142,7 +143,7 @@ export module _Drawer {
       return "";
     }
 
-    public _getPixelPoint(selection: D3.Selection, datum: any, index: number): Point {
+    public _getPixelPoint(datum: any, index: number): Point {
       return null;
     }
 

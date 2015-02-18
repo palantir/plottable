@@ -2853,7 +2853,7 @@ var Plottable;
             AbstractDrawer.prototype._getSelector = function () {
                 return "";
             };
-            AbstractDrawer.prototype._getPixelPoint = function (selection, datum, index) {
+            AbstractDrawer.prototype._getPixelPoint = function (datum, index) {
                 return null;
             };
             return AbstractDrawer;
@@ -2900,28 +2900,29 @@ var Plottable;
             };
             Line.prototype._drawStep = function (step) {
                 var baseTime = _super.prototype._drawStep.call(this, step);
+                this._attrToProjector = Plottable._Util.Methods.copyMap(step.attrToProjector);
                 var attrToProjector = Plottable._Util.Methods.copyMap(step.attrToProjector);
-                this._xProjector = attrToProjector["x"];
-                this._yProjector = attrToProjector["y"];
                 var definedFunction = attrToProjector["defined"];
+                var xProjector = attrToProjector["x"];
+                var yProjector = attrToProjector["y"];
                 delete attrToProjector["x"];
                 delete attrToProjector["y"];
-                if (attrToProjector["defined"]) {
+                if (this._attrToProjector["defined"]) {
                     delete attrToProjector["defined"];
                 }
-                attrToProjector["d"] = this._createLine(this._xProjector, this._yProjector, definedFunction);
+                this._attrToProjector["d"] = this._createLine(xProjector, yProjector, definedFunction);
                 if (attrToProjector["fill"]) {
-                    this._pathSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
+                    this._pathSelection.attr("fill", this._attrToProjector["fill"]); // so colors don't animate
                 }
-                step.animator.animate(this._pathSelection, attrToProjector);
+                step.animator.animate(this._pathSelection, this._attrToProjector);
                 // Restore classes that may have been overridden by class projectors
                 this._pathSelection.classed(Line.LINE_CLASS, true);
             };
             Line.prototype._getSelector = function () {
                 return "." + Line.LINE_CLASS;
             };
-            Line.prototype._getPixelPoint = function (selection, datum, index) {
-                return { x: this._xProjector(datum, index), y: this._yProjector(datum, index) };
+            Line.prototype._getPixelPoint = function (datum, index) {
+                return { x: this._attrToProjector["x"](datum, index), y: this._attrToProjector["x"](datum, index) };
             };
             Line.LINE_CLASS = "line";
             return Line;
@@ -3049,6 +3050,7 @@ var Plottable;
             Element.prototype._drawStep = function (step) {
                 _super.prototype._drawStep.call(this, step);
                 var drawSelection = this._getDrawSelection();
+                this._attrToProjector = step.attrToProjector;
                 if (step.attrToProjector["fill"]) {
                     drawSelection.attr("fill", step.attrToProjector["fill"]); // so colors don't animate
                 }
@@ -3082,10 +3084,10 @@ var Plottable;
             Element.prototype._getSelector = function () {
                 return this._svgElement;
             };
-            Element.prototype._getPixelPoint = function (selection, datum, index) {
+            Element.prototype._getPixelPoint = function (datum, index) {
                 switch (this._svgElement) {
                     case "circle":
-                        return { x: parseFloat(selection.attr("cx")), y: parseFloat(selection.attr("cy")) };
+                        return { x: this._attrToProjector["cx"](datum, index), y: this._attrToProjector["cy"](datum, index) };
                     default:
                         return null;
                 }
@@ -3183,11 +3185,11 @@ var Plottable;
                 });
                 this._labelsTooWide = labelTooWide.some(function (d) { return d; });
             };
-            Rect.prototype._getPixelPoint = function (selection, datum, index) {
-                var rectX = parseFloat(selection.attr("x"));
-                var rectY = parseFloat(selection.attr("y"));
-                var rectWidth = parseFloat(selection.attr("width"));
-                var rectHeight = parseFloat(selection.attr("height"));
+            Rect.prototype._getPixelPoint = function (datum, index) {
+                var rectX = this._attrToProjector["x"](datum, index);
+                var rectY = this._attrToProjector["y"](datum, index);
+                var rectWidth = this._attrToProjector["width"](datum, index);
+                var rectHeight = this._attrToProjector["height"](datum, index);
                 var x = this._isVertical ? rectX + rectWidth / 2 : rectWidth;
                 var y = this._isVertical ? rectY : rectY + rectHeight / 2;
                 return { x: x, y: y };
@@ -3228,11 +3230,12 @@ var Plottable;
             Arc.prototype._drawStep = function (step) {
                 var attrToProjector = Plottable._Util.Methods.copyMap(step.attrToProjector);
                 attrToProjector = this.retargetProjectors(attrToProjector);
-                this._innerRadiusAccessor = attrToProjector["inner-radius"];
-                this._outerRadiusAccessor = attrToProjector["outer-radius"];
+                this._attrToProjector = Plottable._Util.Methods.copyMap(attrToProjector);
+                var innerRadiusAccessor = attrToProjector["inner-radius"];
+                var outerRadiusAccessor = attrToProjector["outer-radius"];
                 delete attrToProjector["inner-radius"];
                 delete attrToProjector["outer-radius"];
-                attrToProjector["d"] = this._createArc(this._innerRadiusAccessor, this._outerRadiusAccessor);
+                attrToProjector["d"] = this._createArc(innerRadiusAccessor, outerRadiusAccessor);
                 return _super.prototype._drawStep.call(this, { attrToProjector: attrToProjector, animator: step.animator });
             };
             Arc.prototype.draw = function (data, drawSteps, userMetadata, plotMetadata) {
@@ -3247,8 +3250,10 @@ var Plottable;
                 });
                 return _super.prototype.draw.call(this, pie, drawSteps, userMetadata, plotMetadata);
             };
-            Arc.prototype._getPixelPoint = function (selection, datum, index) {
-                var avgRadius = (this._innerRadiusAccessor(datum, index) + this._outerRadiusAccessor(datum, index)) / 2;
+            Arc.prototype._getPixelPoint = function (datum, index) {
+                var innerRadiusAccessor = this._attrToProjector["inner-radius"];
+                var outerRadiusAccessor = this._attrToProjector["outer-radius"];
+                var avgRadius = (innerRadiusAccessor(datum, index) + outerRadiusAccessor(datum, index)) / 2;
                 var avgAngle = (datum.startAngle + datum.endAngle) / 2;
                 return { x: avgRadius * Math.sin(avgAngle), y: avgRadius * Math.cos(avgAngle) };
             };
