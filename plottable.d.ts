@@ -2644,7 +2644,14 @@ declare module Plottable {
              * @param {string} key The key of new dataset
              */
             protected _getPlotMetadataForDataset(key: string): PlotMetadata;
-            getAllSelections(): D3.Selection;
+            /**
+             * Retrieves all of the selections of this plot for the specified dataset(s)
+             *
+             * @param {string | string[]} datasetKeys The dataset(s) to retrieve the selections from.
+             * If not provided, all selections will be retrieved.
+             * @returns {D3.Selection} The retrieved selections.
+             */
+            getAllSelections(datasetKeys?: string | string[]): D3.Selection;
         }
     }
 }
