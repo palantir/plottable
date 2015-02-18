@@ -6,7 +6,7 @@ export module Dispatcher {
 
   export class Key {
     private static _DISPATCHER_KEY = "__Plottable_Dispatcher_Key";
-    private _connected = false;
+    private _connected = false; // TODO: move to Abstract
     private _keydownBroadcaster: Core.Broadcaster<Dispatcher.Key>;
     private _downCallback = (e: KeyboardEvent) => this._processKeydown(e);
 

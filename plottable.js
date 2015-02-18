@@ -8439,7 +8439,7 @@ var Plottable;
              */
             function Mouse(svg) {
                 var _this = this;
-                this._connected = false;
+                this._connected = false; // TODO: move to Abstract
                 this._processMoveCallback = function (e) { return _this._processMoveEvent(e); };
                 this._svg = svg;
                 this._measureRect = document.createElementNS(svg.namespaceURI, "rect");
@@ -8577,7 +8577,7 @@ var Plottable;
              */
             function Key() {
                 var _this = this;
-                this._connected = false;
+                this._connected = false; // TODO: move to Abstract
                 this._downCallback = function (e) { return _this._processKeydown(e); };
                 this._keydownBroadcaster = new Plottable.Core.Broadcaster(this);
             }
