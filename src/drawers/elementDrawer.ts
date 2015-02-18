@@ -60,6 +60,15 @@ export module _Drawer {
     public _getSelector(): string {
       return this._svgElement;
     }
+
+    public _getPixelPoint(datum: any, index: number): Point {
+      switch(this._svgElement) {
+        case "circle":
+          return { x: this._attrToProjector["cx"](datum, index), y: this._attrToProjector["cy"](datum, index) };
+        default:
+          return null;
+      }
+    }
   }
 }
 }
