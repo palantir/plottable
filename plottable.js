@@ -2908,14 +2908,14 @@ var Plottable;
                 var yProjector = attrToProjector["y"];
                 delete attrToProjector["x"];
                 delete attrToProjector["y"];
-                if (this._attrToProjector["defined"]) {
+                if (attrToProjector["defined"]) {
                     delete attrToProjector["defined"];
                 }
-                this._attrToProjector["d"] = this._createLine(xProjector, yProjector, definedFunction);
+                attrToProjector["d"] = this._createLine(xProjector, yProjector, definedFunction);
                 if (attrToProjector["fill"]) {
-                    this._pathSelection.attr("fill", this._attrToProjector["fill"]); // so colors don't animate
+                    this._pathSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
                 }
-                step.animator.animate(this._pathSelection, this._attrToProjector);
+                step.animator.animate(this._pathSelection, attrToProjector);
                 // Restore classes that may have been overridden by class projectors
                 this._pathSelection.classed(Line.LINE_CLASS, true);
             };
