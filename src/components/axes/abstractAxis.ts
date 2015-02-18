@@ -523,8 +523,7 @@ export module Axis {
               return false;
             }
           }
-        }
-        else { // Descending order
+        } else { // Descending order
           if (this._isHorizontal()) {
             if (currRect.left - this._tickLabelPadding <= nextRect.right) {
               return false;
