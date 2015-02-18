@@ -39,7 +39,6 @@ export module _Drawer {
 
     protected _drawStep(step: AppliedDrawStep) {
       var baseTime = super._drawStep(step);
-      this._attrToProjector = <_AttributeToAppliedProjector>_Util.Methods.copyMap(step.attrToProjector);
       var attrToProjector = <_AttributeToAppliedProjector>_Util.Methods.copyMap(step.attrToProjector);
       var definedFunction = attrToProjector["defined"];
 
@@ -67,7 +66,7 @@ export module _Drawer {
     }
 
     public _getPixelPoint(datum: any, index: number): Point {
-      return { x: this._attrToProjector["x"](datum, index), y: this._attrToProjector["x"](datum, index) };
+      return { x: this._attrToProjector["x"](datum, index), y: this._attrToProjector["y"](datum, index) };
     }
   }
 }
