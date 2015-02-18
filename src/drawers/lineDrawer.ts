@@ -67,7 +67,7 @@ export module _Drawer {
     }
 
     public _getPixelPoint(datum: any, index: number): Point {
-      return { x: this._attrToProjector["x"](datum, index), y: this._attrToProjector["x"](datum, index) };
+      return { x: this._attrToProjector["x"](datum, index), y: this._attrToProjector["y"](datum, index) };
     }
   }
 }

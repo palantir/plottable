@@ -7,9 +7,9 @@ describe("Drawers", () => {
       var data = [{a: "foo", b: 10}, {a: "bar", b: 24}, {a: "baz", b: 21}, {a: "garply", b: 14}];
       var xScale = new Plottable.Scale.Ordinal();
       var yScale = new Plottable.Scale.Linear();
-      var linePlot = new Plottable.Plot.Bar(xScale, yScale);
+      var linePlot = new Plottable.Plot.Line(xScale, yScale);
 
-      var drawer = new Plottable._Drawer.Rect("one", true);
+      var drawer = new Plottable._Drawer.Line("one");
       (<any> linePlot)._getDrawer = () => drawer;
 
       linePlot.addDataset("one", data);
@@ -19,8 +19,8 @@ describe("Drawers", () => {
 
       data.forEach((datum: any, index: number) => {
         var pixelPoint = drawer._getPixelPoint(datum, index);
-        assert.closeTo(pixelPoint.x, xScale.scale(datum.a), 1, "x coordinate correct");
-        assert.closeTo(pixelPoint.y, yScale.scale(datum.b), 1, "y coordinate correct");
+        assert.closeTo(pixelPoint.x, xScale.scale(datum.a), 1, "x coordinate correct for index " + index);
+        assert.closeTo(pixelPoint.y, yScale.scale(datum.b), 1, "y coordinate correct for index " + index);
       });
 
       svg.remove();

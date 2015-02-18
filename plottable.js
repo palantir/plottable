@@ -2922,7 +2922,7 @@ var Plottable;
                 return "." + Line.LINE_CLASS;
             };
             Line.prototype._getPixelPoint = function (datum, index) {
-                return { x: this._attrToProjector["x"](datum, index), y: this._attrToProjector["x"](datum, index) };
+                return { x: this._attrToProjector["x"](datum, index), y: this._attrToProjector["y"](datum, index) };
             };
             Line.LINE_CLASS = "line";
             return Line;
