@@ -2925,7 +2925,7 @@ var Plottable;
                 this._areaSelection.classed(Area.AREA_CLASS, true);
             };
             Area.prototype._getSelector = function () {
-                return "." + Area.AREA_CLASS;
+                return "path";
             };
             Area.AREA_CLASS = "area";
             return Area;

@@ -2548,14 +2548,16 @@ describe("Plots", function () {
                 areaPlot.addDataset("newTwo", new Plottable.Dataset(newTwoPointData));
                 var allAreas = areaPlot.getAllSelections();
                 var allAreas2 = areaPlot.getAllSelections(areaPlot._datasetKeysInOrder);
-                assert.deepEqual(allAreas, allAreas2, "all areas retrieved");
+                assert.deepEqual(allAreas, allAreas2, "all areas/lines retrieved");
+                assert.strictEqual(allAreas.filter(".line").size(), 2, "2 lines retrieved");
+                assert.strictEqual(allAreas.filter(".area").size(), 2, "2 areas retrieved");
                 svg.remove();
             });
             it("retrieves correct selections (string arg)", function () {
                 var newTwoPointData = [{ foo: 2, bar: 1 }, { foo: 3, bar: 2 }];
                 areaPlot.addDataset("newTwo", new Plottable.Dataset(newTwoPointData));
                 var allAreas = areaPlot.getAllSelections("newTwo");
-                assert.strictEqual(allAreas.size(), 1, "all areas retrieved");
+                assert.strictEqual(allAreas.size(), 2, "areas/lines retrieved");
                 var selectionData = allAreas.data();
                 assert.include(selectionData, newTwoPointData, "new dataset data in selection data");
                 svg.remove();
@@ -2564,7 +2566,7 @@ describe("Plots", function () {
                 var newTwoPointData = [{ foo: 2, bar: 1 }, { foo: 3, bar: 2 }];
                 areaPlot.addDataset("newTwo", new Plottable.Dataset(newTwoPointData));
                 var allAreas = areaPlot.getAllSelections(["newTwo"]);
-                assert.strictEqual(allAreas.size(), 1, "all areas retrieved");
+                assert.strictEqual(allAreas.size(), 2, "areas/lines retrieved");
                 var selectionData = allAreas.data();
                 assert.include(selectionData, newTwoPointData, "new dataset data in selection data");
                 svg.remove();
@@ -2573,7 +2575,7 @@ describe("Plots", function () {
                 var newTwoPointData = [{ foo: 2, bar: 1 }, { foo: 3, bar: 2 }];
                 areaPlot.addDataset("newTwo", new Plottable.Dataset(newTwoPointData));
                 var allAreas = areaPlot.getAllSelections(["newTwo", "test"]);
-                assert.strictEqual(allAreas.size(), 1, "all areas retrieved");
+                assert.strictEqual(allAreas.size(), 2, "areas/lines retrieved");
                 var selectionData = allAreas.data();
                 assert.include(selectionData, newTwoPointData, "new dataset data in selection data");
                 svg.remove();
