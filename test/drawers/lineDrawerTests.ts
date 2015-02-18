@@ -4,8 +4,8 @@ describe("Drawers", () => {
   describe("Line Drawer", () => {
     it("getPixelPoint", () => {
       var svg = generateSVG(300, 300);
-      var data = [{a: "foo", b: 10}, {a: "bar", b: 24}, {a: "baz", b: 21}, {a: "garply", b: 14}];
-      var xScale = new Plottable.Scale.Ordinal();
+      var data = [{a: 12, b: 10}, {a: 13, b: 24}, {a: 14, b: 21}, {a: 15, b: 14}];
+      var xScale = new Plottable.Scale.Linear();
       var yScale = new Plottable.Scale.Linear();
       var linePlot = new Plottable.Plot.Line(xScale, yScale);
 

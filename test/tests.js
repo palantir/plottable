@@ -345,8 +345,8 @@ describe("Drawers", function () {
     describe("Line Drawer", function () {
         it("getPixelPoint", function () {
             var svg = generateSVG(300, 300);
-            var data = [{ a: "foo", b: 10 }, { a: "bar", b: 24 }, { a: "baz", b: 21 }, { a: "garply", b: 14 }];
-            var xScale = new Plottable.Scale.Ordinal();
+            var data = [{ a: 12, b: 10 }, { a: 13, b: 24 }, { a: 14, b: 21 }, { a: 15, b: 14 }];
+            var xScale = new Plottable.Scale.Linear();
             var yScale = new Plottable.Scale.Linear();
             var linePlot = new Plottable.Plot.Line(xScale, yScale);
             var drawer = new Plottable._Drawer.Line("one");
@@ -359,6 +359,32 @@ describe("Drawers", function () {
                 var pixelPoint = drawer._getPixelPoint(datum, index);
                 assert.closeTo(pixelPoint.x, xScale.scale(datum.a), 1, "x coordinate correct for index " + index);
                 assert.closeTo(pixelPoint.y, yScale.scale(datum.b), 1, "y coordinate correct for index " + index);
+            });
+            svg.remove();
+        });
+    });
+});
+
+///<reference path="../testReference.ts" />
+describe("Drawers", function () {
+    describe("Element Drawer", function () {
+        it("getPixelPoint circle", function () {
+            var svg = generateSVG(300, 300);
+            var data = [{ a: 12, b: 10 }, { a: 31, b: 24 }, { a: 22, b: 21 }, { a: 15, b: 14 }];
+            var xScale = new Plottable.Scale.Linear();
+            var yScale = new Plottable.Scale.Linear();
+            var scatterPlot = new Plottable.Plot.Scatter(xScale, yScale);
+            var drawer = new Plottable._Drawer.Element("one");
+            drawer._svgElement = "circle";
+            scatterPlot._getDrawer = function () { return drawer; };
+            scatterPlot.addDataset("one", data);
+            scatterPlot.project("x", "a", xScale);
+            scatterPlot.project("y", "b", yScale);
+            scatterPlot.renderTo(svg);
+            data.forEach(function (datum, index) {
+                var pixelPoint = drawer._getPixelPoint(datum, index);
+                assert.closeTo(pixelPoint.x, xScale.scale(datum.a), 1, "x coordinate correct");
+                assert.closeTo(pixelPoint.y, yScale.scale(datum.b), 1, "y coordinate correct");
             });
             svg.remove();
         });
