@@ -2455,7 +2455,7 @@ describe("Plots", function () {
             var newDataset = new Plottable.Dataset(twoPointData);
             areaPlot.addDataset(new Plottable.Dataset(newTwoPointData));
             var allAreas = areaPlot.getAllSelections();
-            assert.strictEqual(allAreas.size(), 2, "all areas retrieved");
+            assert.strictEqual(allAreas.size(), 4, "all areas retrieved");
             var selectionData = allAreas.data();
             assert.include(selectionData, twoPointData, "first dataset data in selection data");
             assert.include(selectionData, newTwoPointData, "new dataset data in selection data");
