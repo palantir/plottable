@@ -461,6 +461,8 @@ export module Plot {
      * @returns {PlotData} The closest plot data to the point within a specified value.  nulls and null selection returned otherwise
      */
     public getClosestData(xValue: number, yValue: number, withinValue: number = Infinity): PlotData {
+      var queryPoint = {x: xValue, y: yValue};
+
       var closestDatum: any = null;
       var closestSelection = d3.select();
       var closestPixelPoint: Point = null;
@@ -473,7 +475,7 @@ export module Plot {
                             (<any[]> datum).map((lineDatum, lineIndex) => drawer._getPixelPoint(lineDatum, lineIndex)) :
                             [drawer._getPixelPoint(datum, index)];
           pixelPoints.forEach((pixelPoint: Point) => {
-            var pointDistance = Plottable._Util.Methods.pointDistance(pixelPoint, closestPixelPoint);
+            var pointDistance = Plottable._Util.Methods.pointDistance(pixelPoint, queryPoint);
             if (pointDistance < closestPointDistance) {
               closestDatum = datum;
               closestPixelPoint = pixelPoint;

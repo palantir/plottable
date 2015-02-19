@@ -6497,6 +6497,7 @@ var Plottable;
              */
             AbstractPlot.prototype.getClosestData = function (xValue, yValue, withinValue) {
                 if (withinValue === void 0) { withinValue = Infinity; }
+                var queryPoint = { x: xValue, y: yValue };
                 var closestDatum = null;
                 var closestSelection = d3.select();
                 var closestPixelPoint = null;
@@ -6506,7 +6507,7 @@ var Plottable;
                         var selection = d3.select(this);
                         var pixelPoints = (drawer instanceof Plottable._Drawer.Line) ? datum.map(function (lineDatum, lineIndex) { return drawer._getPixelPoint(lineDatum, lineIndex); }) : [drawer._getPixelPoint(datum, index)];
                         pixelPoints.forEach(function (pixelPoint) {
-                            var pointDistance = Plottable._Util.Methods.pointDistance(pixelPoint, closestPixelPoint);
+                            var pointDistance = Plottable._Util.Methods.pointDistance(pixelPoint, queryPoint);
                             if (pointDistance < closestPointDistance) {
                                 closestDatum = datum;
                                 closestPixelPoint = pixelPoint;
