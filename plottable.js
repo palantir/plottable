@@ -2799,6 +2799,16 @@ var Plottable;
             AbstractDrawer.prototype._getPixelPoint = function (datum, index) {
                 return null;
             };
+            AbstractDrawer.prototype._getSelection = function (datum, index) {
+                var selection = d3.select();
+                var allSelections = this._getRenderArea().selectAll(this._getSelector());
+                allSelections.each(function (selectionDatum, selectionIndex) {
+                    if (selectionDatum === datum && selectionIndex === index) {
+                        selection = d3.select(this);
+                    }
+                });
+                return selection;
+            };
             return AbstractDrawer;
         })();
         _Drawer.AbstractDrawer = AbstractDrawer;
@@ -2865,6 +2875,18 @@ var Plottable;
             };
             Line.prototype._getPixelPoint = function (datum, index) {
                 return { x: this._attrToProjector["x"](datum, index), y: this._attrToProjector["y"](datum, index) };
+            };
+            Line.prototype._getSelection = function (datum, index) {
+                var selection = d3.select();
+                var lineSelection = this._getRenderArea().select(this._getSelector());
+                lineSelection.each(function (lineData) {
+                    lineData.forEach(function (lineDatum, lineIndex) {
+                        if (datum === lineDatum && index && lineIndex) {
+                            selection = lineSelection;
+                        }
+                    });
+                });
+                return selection;
             };
             Line.LINE_CLASS = "line";
             return Line;
