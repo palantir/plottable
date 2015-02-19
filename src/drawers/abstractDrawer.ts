@@ -149,7 +149,7 @@ export module _Drawer {
       return null;
     }
 
-    public _getSelection(datum: any, index: number): D3.Selection {
+    public _getSelection(index: number): D3.Selection {
       var allSelections = this._getRenderArea().selectAll(this._getSelector());
       return d3.select(allSelections[0][index]);
     }
