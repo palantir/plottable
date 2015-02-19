@@ -6588,10 +6588,16 @@ var Plottable;
                 var closestPixelPoint = null;
                 var closestPointDistance = withinValue;
                 this._getDrawersInOrder().forEach(function (drawer) {
-                    drawer._getRenderArea().selectAll(drawer._getSelector()).each(function () {
+                    drawer._getRenderArea().selectAll(drawer._getSelector()).each(function (datum, index) {
                         var selection = d3.select(this);
-                        selection.each(function (datum, index) {
-                            var pixelPoint = drawer._getPixelPoint(datum, index);
+                        var pixelPoints = [];
+                        if (drawer instanceof Plottable._Drawer.Line) {
+                            datum.forEach(function (lineDatum, lineIndex) { return pixelPoints.push(drawer._getPixelPoint(lineDatum, lineIndex)); });
+                        }
+                        else {
+                            pixelPoints.push(drawer._getPixelPoint(datum, index));
+                        }
+                        pixelPoints.forEach(function (pixelPoint) {
                             var pointDistance = Plottable._Util.Methods.pointDistance(pixelPoint, closestPixelPoint);
                             if (pointDistance < closestPointDistance) {
                                 closestDatum = datum;
