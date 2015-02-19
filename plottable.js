@@ -6538,7 +6538,7 @@ var Plottable;
                         if (pointDistance < closestPointDistance) {
                             closestDatum = datum;
                             closestPixelPoint = pixelPoint;
-                            closestSelection = drawer._getSelection(datum, index);
+                            closestSelection = drawer._getSelection(index);
                             closestPointDistance = pointDistance;
                         }
                     });
