@@ -295,6 +295,130 @@ describe("Drawers", function () {
 });
 
 ///<reference path="../testReference.ts" />
+describe("Drawers", function () {
+    describe("Arc Drawer", function () {
+        it("getPixelPoint", function () {
+            var svg = generateSVG(300, 300);
+            var data = [{ value: 10 }, { value: 10 }, { value: 10 }, { value: 10 }];
+            var piePlot = new Plottable.Plot.Pie();
+            var drawer = new Plottable._Drawer.Arc("one");
+            piePlot._getDrawer = function () { return drawer; };
+            piePlot.addDataset("one", data);
+            piePlot.project("value", "value");
+            piePlot.renderTo(svg);
+            piePlot.getAllSelections().each(function (datum, index) {
+                var selection = d3.select(this);
+                var pixelPoint = drawer._getPixelPoint(datum, index);
+                var radius = 75;
+                var angle = Math.PI / 4 + ((Math.PI * index) / 2);
+                var expectedX = radius * Math.sin(angle);
+                var expectedY = radius * Math.cos(angle);
+                assert.closeTo(pixelPoint.x, expectedX, 1, "x coordinate correct");
+                assert.closeTo(pixelPoint.y, expectedY, 1, "y coordinate correct");
+            });
+            svg.remove();
+        });
+    });
+});
+
+///<reference path="../testReference.ts" />
+describe("Drawers", function () {
+    describe("Rect Drawer", function () {
+        it("getPixelPoint vertical", function () {
+            var svg = generateSVG(300, 300);
+            var data = [{ a: "foo", b: 10 }, { a: "bar", b: 24 }];
+            var xScale = new Plottable.Scale.Ordinal();
+            var yScale = new Plottable.Scale.Linear();
+            var barPlot = new Plottable.Plot.Bar(xScale, yScale);
+            var drawer = new Plottable._Drawer.Rect("one", true);
+            barPlot._getDrawer = function () { return drawer; };
+            barPlot.addDataset("one", data);
+            barPlot.project("x", "a", xScale);
+            barPlot.project("y", "b", yScale);
+            barPlot.renderTo(svg);
+            barPlot.getAllSelections().each(function (datum, index) {
+                var selection = d3.select(this);
+                var pixelPoint = drawer._getPixelPoint(datum, index);
+                assert.closeTo(pixelPoint.x, parseFloat(selection.attr("x")) + parseFloat(selection.attr("width")) / 2, 1, "x coordinate correct");
+                assert.closeTo(pixelPoint.y, parseFloat(selection.attr("y")), 1, "y coordinate correct");
+            });
+            svg.remove();
+        });
+        it("getPixelPoint horizontal", function () {
+            var svg = generateSVG(300, 300);
+            var data = [{ a: "foo", b: 10 }, { a: "bar", b: 24 }];
+            var xScale = new Plottable.Scale.Linear();
+            var yScale = new Plottable.Scale.Ordinal();
+            var barPlot = new Plottable.Plot.Bar(xScale, yScale, false);
+            var drawer = new Plottable._Drawer.Rect("one", false);
+            barPlot._getDrawer = function () { return drawer; };
+            barPlot.addDataset("one", data);
+            barPlot.project("x", "b", xScale);
+            barPlot.project("y", "a", yScale);
+            barPlot.renderTo(svg);
+            barPlot.getAllSelections().each(function (datum, index) {
+                var selection = d3.select(this);
+                var pixelPoint = drawer._getPixelPoint(datum, index);
+                assert.closeTo(pixelPoint.x, parseFloat(selection.attr("x")) + parseFloat(selection.attr("width")), 1, "x coordinate correct");
+                assert.closeTo(pixelPoint.y, parseFloat(selection.attr("y")) + parseFloat(selection.attr("height")) / 2, 1, "y coordinate correct");
+            });
+            svg.remove();
+        });
+    });
+});
+
+///<reference path="../testReference.ts" />
+describe("Drawers", function () {
+    describe("Line Drawer", function () {
+        it("getPixelPoint", function () {
+            var svg = generateSVG(300, 300);
+            var data = [{ a: 12, b: 10 }, { a: 13, b: 24 }, { a: 14, b: 21 }, { a: 15, b: 14 }];
+            var xScale = new Plottable.Scale.Linear();
+            var yScale = new Plottable.Scale.Linear();
+            var linePlot = new Plottable.Plot.Line(xScale, yScale);
+            var drawer = new Plottable._Drawer.Line("one");
+            linePlot._getDrawer = function () { return drawer; };
+            linePlot.addDataset("one", data);
+            linePlot.project("x", "a", xScale);
+            linePlot.project("y", "b", yScale);
+            linePlot.renderTo(svg);
+            data.forEach(function (datum, index) {
+                var pixelPoint = drawer._getPixelPoint(datum, index);
+                assert.closeTo(pixelPoint.x, xScale.scale(datum.a), 1, "x coordinate correct for index " + index);
+                assert.closeTo(pixelPoint.y, yScale.scale(datum.b), 1, "y coordinate correct for index " + index);
+            });
+            svg.remove();
+        });
+    });
+});
+
+///<reference path="../testReference.ts" />
+describe("Drawers", function () {
+    describe("Element Drawer", function () {
+        it("getPixelPoint circle", function () {
+            var svg = generateSVG(300, 300);
+            var data = [{ a: 12, b: 10 }, { a: 31, b: 24 }, { a: 22, b: 21 }, { a: 15, b: 14 }];
+            var xScale = new Plottable.Scale.Linear();
+            var yScale = new Plottable.Scale.Linear();
+            var scatterPlot = new Plottable.Plot.Scatter(xScale, yScale);
+            var drawer = new Plottable._Drawer.Element("one");
+            drawer._svgElement = "circle";
+            scatterPlot._getDrawer = function () { return drawer; };
+            scatterPlot.addDataset("one", data);
+            scatterPlot.project("x", "a", xScale);
+            scatterPlot.project("y", "b", yScale);
+            scatterPlot.renderTo(svg);
+            data.forEach(function (datum, index) {
+                var pixelPoint = drawer._getPixelPoint(datum, index);
+                assert.closeTo(pixelPoint.x, xScale.scale(datum.a), 1, "x coordinate correct");
+                assert.closeTo(pixelPoint.y, yScale.scale(datum.b), 1, "y coordinate correct");
+            });
+            svg.remove();
+        });
+    });
+});
+
+///<reference path="../testReference.ts" />
 var assert = chai.assert;
 describe("BaseAxis", function () {
     it("orientation", function () {
@@ -1792,6 +1916,46 @@ describe("Plots", function () {
             var oneElementSelection = plot.getAllSelections(["ds2"]);
             assert.strictEqual(oneElementSelection.size(), 1);
             assert.strictEqual(numAttr(oneElementSelection, "cy"), 10, "retreieved selection in renderArea2");
+            svg.remove();
+        });
+        it("getClosestPlotData()", function () {
+            var svg = generateSVG(400, 400);
+            var plot = new Plottable.Plot.AbstractPlot();
+            var data1 = [{ value: 0 }, { value: 1 }, { value: 2 }];
+            var data2 = [{ value: 4 }, { value: 5 }, { value: 3 }];
+            // Create mock drawers with already drawn items
+            var mockDrawer1 = new Plottable._Drawer.AbstractDrawer("ds1");
+            var renderArea1 = svg.append("g");
+            renderArea1.selectAll("circle").data(data1).enter().append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
+            mockDrawer1.setup = function () { return mockDrawer1._renderArea = renderArea1; };
+            mockDrawer1._getSelector = function () { return "circle"; };
+            mockDrawer1._getPixelPoint = function (datum) {
+                return { x: datum.value, y: 100 };
+            };
+            var renderArea2 = svg.append("g");
+            renderArea2.selectAll("circle").data(data2).enter().append("circle").attr("cx", 10).attr("cy", 10).attr("r", 10);
+            var mockDrawer2 = new Plottable._Drawer.AbstractDrawer("ds2");
+            mockDrawer2.setup = function () { return mockDrawer2._renderArea = renderArea2; };
+            mockDrawer2._getSelector = function () { return "circle"; };
+            mockDrawer2._getPixelPoint = function (datum) {
+                return { x: datum.value * 2, y: 100 };
+            };
+            // Mock _getDrawer to return the mock drawers
+            plot._getDrawer = function (key) {
+                if (key === "ds1") {
+                    return mockDrawer1;
+                }
+                else {
+                    return mockDrawer2;
+                }
+            };
+            plot.addDataset("ds1", data1);
+            plot.addDataset("ds2", data2);
+            plot.renderTo(svg);
+            var plotData = plot.getClosestData(0, 99);
+            assert.strictEqual(plotData.selection.size(), 1, "only 1 selection retrieved");
+            assert.deepEqual(plotData.data, [data1[0]], "correct datum retrieved");
+            assert.deepEqual(plotData.pixelPoints, [{ x: 0, y: 100 }], "correct pixel point retrieved");
             svg.remove();
         });
         describe("Dataset removal", function () {
@@ -6872,6 +7036,11 @@ describe("_Util.Methods", function () {
         var lColor = Plottable._Util.Color.rgbToHsl(parseInt("12", 16), parseInt("fc", 16), parseInt("ed", 16))[2];
         var lDarkenedColor = Plottable._Util.Color.rgbToHsl(parseInt(darkenedColor.substring(1, 3), 16), parseInt(darkenedColor.substring(3, 5), 16), parseInt(darkenedColor.substring(5, 7), 16))[2];
         assert.operator(lDarkenedColor, "<", lColor, "color got darker");
+    });
+    it("pointDistance()", function () {
+        var p1 = { x: 3, y: 5 };
+        var p2 = { x: 6, y: 1 };
+        assert.strictEqual(Plottable._Util.Methods.pointDistance(p1, p2), 5, "pointDistance correctly calculated");
     });
 });
 

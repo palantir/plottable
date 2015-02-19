@@ -26,12 +26,13 @@ export module _Drawer {
     public _drawStep(step: AppliedDrawStep) {
       var attrToProjector = <_AttributeToAppliedProjector>_Util.Methods.copyMap(step.attrToProjector);
       attrToProjector = this.retargetProjectors(attrToProjector);
-      var innerRadiusF = attrToProjector["inner-radius"];
-      var outerRadiusF = attrToProjector["outer-radius"];
+      this._attrToProjector = this.retargetProjectors(this._attrToProjector);
+      var innerRadiusAccessor = attrToProjector["inner-radius"];
+      var outerRadiusAccessor = attrToProjector["outer-radius"];
       delete attrToProjector["inner-radius"];
       delete attrToProjector["outer-radius"];
 
-      attrToProjector["d"] = this._createArc(innerRadiusF, outerRadiusF);
+      attrToProjector["d"] = this._createArc(innerRadiusAccessor, outerRadiusAccessor);
       return super._drawStep({attrToProjector: attrToProjector, animator: step.animator});
     }
 
@@ -49,6 +50,14 @@ export module _Drawer {
         }
       });
       return super.draw(pie, drawSteps, userMetadata, plotMetadata);
+    }
+
+    public _getPixelPoint(datum: any, index: number): Point {
+      var innerRadiusAccessor = this._attrToProjector["inner-radius"];
+      var outerRadiusAccessor = this._attrToProjector["outer-radius"];
+      var avgRadius = (innerRadiusAccessor(datum, index) + outerRadiusAccessor(datum, index)) / 2;
+      var avgAngle = (datum.startAngle + datum.endAngle) / 2;
+      return { x: avgRadius * Math.sin(avgAngle), y: avgRadius * Math.cos(avgAngle) };
     }
   }
 }

@@ -211,4 +211,10 @@ describe("_Util.Methods", () => {
                                                          parseInt(darkenedColor.substring(5, 7), 16))[2];
     assert.operator(lDarkenedColor, "<", lColor, "color got darker");
   });
+
+  it("pointDistance()", () => {
+    var p1 = {x: 3, y: 5};
+    var p2 = {x: 6, y: 1};
+    assert.strictEqual(Plottable._Util.Methods.pointDistance(p1, p2), 5, "pointDistance correctly calculated");
+  });
 });

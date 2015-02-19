@@ -128,6 +128,7 @@ declare module Plottable {
             function colorTest(colorTester: D3.Selection, className: string): string;
             function lightenColor(color: string, factor: number): string;
             function darkenColor(color: string, factor: number, darkenAmount: number): string;
+            function pointDistance(p1: Point, p2: Point): number;
         }
     }
 }
@@ -1416,6 +1417,7 @@ declare module Plottable {
         class AbstractDrawer {
             protected _className: string;
             key: string;
+            protected _attrToProjector: _AttributeToAppliedProjector;
             /**
              * Sets the class, which needs to be applied to bound elements.
              *
@@ -1465,6 +1467,7 @@ declare module Plottable {
              */
             _getRenderArea(): D3.Selection;
             _getSelector(): string;
+            _getPixelPoint(datum: any, index: number): Point;
         }
     }
 }
@@ -1479,6 +1482,7 @@ declare module Plottable {
             protected _numberOfAnimationIterations(data: any[]): number;
             protected _drawStep(step: AppliedDrawStep): void;
             _getSelector(): string;
+            _getPixelPoint(datum: any, index: number): Point;
         }
     }
 }
@@ -1518,6 +1522,7 @@ declare module Plottable {
             protected _prepareDrawSteps(drawSteps: AppliedDrawStep[]): void;
             protected _prepareData(data: any[], drawSteps: AppliedDrawStep[]): any[];
             _getSelector(): string;
+            _getPixelPoint(datum: any, index: number): Point;
         }
     }
 }
@@ -1531,6 +1536,7 @@ declare module Plottable {
             removeLabels(): void;
             _getIfLabelsTooWide(): boolean;
             drawText(data: any[], attrToProjector: AttributeToProjector, userMetadata: any, plotMetadata: Plot.PlotMetadata): void;
+            _getPixelPoint(datum: any, index: number): Point;
         }
     }
 }
@@ -1542,6 +1548,7 @@ declare module Plottable {
             constructor(key: string);
             _drawStep(step: AppliedDrawStep): void;
             draw(data: any[], drawSteps: DrawStep[], userMetadata: any, plotMetadata: Plot.PlotMetadata): number;
+            _getPixelPoint(datum: any, index: number): Point;
         }
     }
 }
@@ -2511,6 +2518,11 @@ declare module Plottable {
         interface PlotMetadata {
             datasetKey: string;
         }
+        type PlotData = {
+            data: any[];
+            pixelPoints: Point[];
+            selection: D3.Selection;
+        };
         class AbstractPlot extends Component.AbstractComponent {
             protected _dataChanged: boolean;
             protected _key2PlotDatasetKey: D3.Map<PlotDatasetKey>;
@@ -2652,6 +2664,15 @@ declare module Plottable {
              * @returns {D3.Selection} The retrieved selections.
              */
             getAllSelections(datasetKeys?: string | string[]): D3.Selection;
+            /**
+             * Retrieves the closest PlotData to the specified x/y point within a specified value
+             *
+             * @param {number} xValue The x value to compare against
+             * @param {number} yValue The y value to compare against
+             * @param {number} withinValue The maximum distance the closest selection can be to the point (default = Infinity)
+             * @returns {PlotData} The closest plot data to the point within a specified value.  nulls and null selection returned otherwise
+             */
+            getClosestData(xValue: number, yValue: number, withinValue?: number): PlotData;
         }
     }
 }
