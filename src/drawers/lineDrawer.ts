@@ -68,6 +68,10 @@ export module _Drawer {
     public _getPixelPoint(datum: any, index: number): Point {
       return { x: this._attrToProjector["x"](datum, index), y: this._attrToProjector["y"](datum, index) };
     }
+
+    public _getSelection(index: number): D3.Selection {
+      return this._getRenderArea().select(this._getSelector());
+    }
   }
 }
 }
