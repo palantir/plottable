@@ -2803,7 +2803,7 @@ var Plottable;
             AbstractDrawer.prototype._getPixelPoint = function (datum, index) {
                 return null;
             };
-            AbstractDrawer.prototype._getSelection = function (datum, index) {
+            AbstractDrawer.prototype._getSelection = function (index) {
                 var allSelections = this._getRenderArea().selectAll(this._getSelector());
                 return d3.select(allSelections[0][index]);
             };
