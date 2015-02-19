@@ -6537,25 +6537,25 @@ var Plottable;
              * @returns {PlotData} The closest plot data to the point within a specified value.  nulls and null selection returned otherwise
              */
             AbstractPlot.prototype.getClosestData = function (xValue, yValue, withinValue) {
+                var _this = this;
                 if (withinValue === void 0) { withinValue = Infinity; }
                 var queryPoint = { x: xValue, y: yValue };
                 var closestDatum = null;
                 var closestSelection = d3.select();
                 var closestPixelPoint = null;
                 var closestPointDistance = withinValue;
-                this._getDrawersInOrder().forEach(function (drawer) {
-                    drawer._getRenderArea().selectAll(drawer._getSelector()).each(function (datum, index) {
-                        var selection = d3.select(this);
-                        var pixelPoints = (drawer instanceof Plottable._Drawer.Line) ? datum.map(function (lineDatum, lineIndex) { return drawer._getPixelPoint(lineDatum, lineIndex); }) : [drawer._getPixelPoint(datum, index)];
-                        pixelPoints.forEach(function (pixelPoint) {
-                            var pointDistance = Plottable._Util.Methods.pointDistance(pixelPoint, queryPoint);
-                            if (pointDistance < closestPointDistance) {
-                                closestDatum = datum;
-                                closestPixelPoint = pixelPoint;
-                                closestSelection = selection;
-                                closestPointDistance = pointDistance;
-                            }
-                        });
+                this.datasetOrder().forEach(function (datasetKey) {
+                    var plotDatasetKey = _this._key2PlotDatasetKey.get(datasetKey);
+                    plotDatasetKey.dataset.data().forEach(function (datum, index) {
+                        var drawer = plotDatasetKey.drawer;
+                        var pixelPoint = drawer._getPixelPoint(datum, index);
+                        var pointDistance = Plottable._Util.Methods.pointDistance(pixelPoint, queryPoint);
+                        if (pointDistance < closestPointDistance) {
+                            closestDatum = datum;
+                            closestPixelPoint = pixelPoint;
+                            closestSelection = drawer._getSelection(datum, index);
+                            closestPointDistance = pointDistance;
+                        }
                     });
                 });
                 return { data: [closestDatum], pixelPoints: [closestPixelPoint], selection: closestSelection };
