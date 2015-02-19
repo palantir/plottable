@@ -16,6 +16,12 @@ export module Plot {
     datasetKey: string
   }
 
+  export type PlotData = {
+    data: any[];
+    pixelPoints: Point[];
+    selection: D3.Selection;
+  }
+
   export class AbstractPlot extends Component.AbstractComponent {
     protected _dataChanged = false;
     protected _key2PlotDatasetKey: D3.Map<PlotDatasetKey>;

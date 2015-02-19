@@ -1416,6 +1416,7 @@ declare module Plottable {
         class AbstractDrawer {
             protected _className: string;
             key: string;
+            protected _attrToProjector: _AttributeToAppliedProjector;
             /**
              * Sets the class, which needs to be applied to bound elements.
              *
@@ -1465,6 +1466,7 @@ declare module Plottable {
              */
             _getRenderArea(): D3.Selection;
             _getSelector(): string;
+            _getPixelPoint(datum: any, index: number): Point;
         }
     }
 }
@@ -1479,6 +1481,7 @@ declare module Plottable {
             protected _numberOfAnimationIterations(data: any[]): number;
             protected _drawStep(step: AppliedDrawStep): void;
             _getSelector(): string;
+            _getPixelPoint(datum: any, index: number): Point;
         }
     }
 }
@@ -1518,6 +1521,7 @@ declare module Plottable {
             protected _prepareDrawSteps(drawSteps: AppliedDrawStep[]): void;
             protected _prepareData(data: any[], drawSteps: AppliedDrawStep[]): any[];
             _getSelector(): string;
+            _getPixelPoint(datum: any, index: number): Point;
         }
     }
 }
@@ -1531,6 +1535,7 @@ declare module Plottable {
             removeLabels(): void;
             _getIfLabelsTooWide(): boolean;
             drawText(data: any[], attrToProjector: AttributeToProjector, userMetadata: any, plotMetadata: Plot.PlotMetadata): void;
+            _getPixelPoint(datum: any, index: number): Point;
         }
     }
 }
@@ -1542,6 +1547,7 @@ declare module Plottable {
             constructor(key: string);
             _drawStep(step: AppliedDrawStep): void;
             draw(data: any[], drawSteps: DrawStep[], userMetadata: any, plotMetadata: Plot.PlotMetadata): number;
+            _getPixelPoint(datum: any, index: number): Point;
         }
     }
 }
@@ -2511,6 +2517,11 @@ declare module Plottable {
         interface PlotMetadata {
             datasetKey: string;
         }
+        type PlotData = {
+            data: any[];
+            pixelPoints: Point[];
+            selection: D3.Selection;
+        };
         class AbstractPlot extends Component.AbstractComponent {
             protected _dataChanged: boolean;
             protected _key2PlotDatasetKey: D3.Map<PlotDatasetKey>;
