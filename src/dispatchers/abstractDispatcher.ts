@@ -3,88 +3,49 @@
 module Plottable {
 export module Dispatcher {
   export class AbstractDispatcher extends Core.PlottableObject {
-    protected _target: D3.Selection;
-    protected _event2Callback: { [eventName: string]: () => any; } = {};
+    protected _event2Callback: { [eventName: string]: (e: Event) => any; } = {};
+    protected _broadcasters: Core.Broadcaster<AbstractDispatcher>[] = [];
     private _connected = false;
 
-    /**
-     * Constructs a Dispatcher with the specified target.
-     *
-     * @constructor
-     * @param {D3.Selection} [target] The selection to listen for events on.
-     */
-    constructor(target?: D3.Selection) {
-      super();
-      this._target = target;
+    private _hasNoListeners() {
+      return this._broadcasters.every((b) => b.getListenerKeys().length === 0);
     }
 
-    /**
-     * Gets the target of the Dispatcher.
-     *
-     * @returns {D3.Selection} The Dispatcher's current target.
-     */
-    public target(): D3.Selection;
-    /**
-     * Sets the target of the Dispatcher.
-     *
-     * @param {D3.Selection} target The element to listen for updates on.
-     * @returns {Dispatcher} The calling Dispatcher.
-     */
-    public target(targetElement: D3.Selection): AbstractDispatcher;
-    public target(targetElement?: D3.Selection): any {
-      if (targetElement == null) {
-        return this._target;
-      }
-      var wasConnected = this._connected;
-      this.disconnect();
-      this._target = targetElement;
-      if (wasConnected) {
-        // re-connect to the new target
-        this.connect();
-      }
-      return this;
-    }
-
-    /**
-     * Gets a namespaced version of the event name.
-     */
-    protected _getEventString(eventName: string) {
-      return eventName + ".dispatcher" + this.getID();
-    }
-
-    /**
-     * Attaches the Dispatcher's listeners to the Dispatcher's target element.
-     *
-     * @returns {Dispatcher} The calling Dispatcher.
-     */
-    public connect() {
-      if (this._connected) {
-        throw new Error("Can't connect dispatcher twice!");
-      }
-      if (this._target) {
-        this._connected = true;
+    private _connect() {
+      if (!this._connected) {
         Object.keys(this._event2Callback).forEach((event: string) => {
           var callback = this._event2Callback[event];
-          this._target.on(this._getEventString(event), callback);
+          document.addEventListener(event, callback);
         });
+        this._connected = true;
       }
+    }
 
-      return this;
+    private _disconnect() {
+      if (this._connected && this._hasNoListeners()) {
+        Object.keys(this._event2Callback).forEach((event: string) => {
+          var callback = this._event2Callback[event];
+          document.removeEventListener(event, callback);
+        });
+        this._connected = false;
+      }
     }
 
     /**
-     * Detaches the Dispatcher's listeners from the Dispatchers' target element.
-     *
-     * @returns {Dispatcher} The calling Dispatcher.
+     * Creates a wrapped version of the callback that can be registered to a Broadcaster
      */
-    public disconnect() {
-      this._connected = false;
-      if (this._target) {
-        Object.keys(this._event2Callback).forEach((event: string) => {
-          this._target.on(this._getEventString(event), null);
-        });
+    protected _getWrappedCallback(callback: Function): Core.BroadcasterCallback<AbstractDispatcher> {
+      return () => callback();
+    }
+
+    protected _setCallback(b: Core.Broadcaster<AbstractDispatcher>, key: any, callback: Function) {
+      if (callback === null) { // remove listener if callback is null
+        b.deregisterListener(key);
+        this._disconnect();
+      } else {
+        this._connect();
+        b.registerListener(key, this._getWrappedCallback(callback));
       }
-      return this;
     }
   }
 }

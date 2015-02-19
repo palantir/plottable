@@ -85,7 +85,7 @@ export module _Drawer {
     }
 
     public _getSelector(): string {
-      return "." + Area.AREA_CLASS;
+      return "path";
     }
   }
 }

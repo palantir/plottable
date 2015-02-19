@@ -99,7 +99,7 @@ describe("Interactions", () => {
 
       var $hitbox = $((<any> component)._hitBox.node());
 
-      $hitbox.simulate("mouseover");
+      triggerFakeMouseEvent("mouseover", (<any> component)._hitBox, 100, 100);
       $hitbox.simulate("keydown", { keyCode: aCode });
       assert.isTrue(aCallbackCalled, "callback for \"a\" was called when \"a\" key was pressed");
       assert.isFalse(bCallbackCalled, "callback for \"b\" was not called when \"a\" key was pressed");
@@ -108,6 +108,12 @@ describe("Interactions", () => {
       $hitbox.simulate("keydown", { keyCode: bCode });
       assert.isFalse(aCallbackCalled, "callback for \"a\" was not called when \"b\" key was pressed");
       assert.isTrue(bCallbackCalled, "callback for \"b\" was called when \"b\" key was pressed");
+
+      triggerFakeMouseEvent("mouseout", (<any> component)._hitBox, -100, -100);
+      aCallbackCalled = false;
+      $hitbox.simulate("keydown", { keyCode: aCode });
+      assert.isFalse(aCallbackCalled, "callback for \"a\" was not called when not moused over the Component");
+
       svg.remove();
     });
   });
