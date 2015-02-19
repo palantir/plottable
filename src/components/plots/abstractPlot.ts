@@ -22,6 +22,12 @@ export module Plot {
     selection: D3.Selection;
   }
 
+  type PlotDatum = {
+    datum: any;
+    pixelPoint: Point;
+    selection: D3.Selection;
+  }
+
   export class AbstractPlot extends Component.AbstractComponent {
     protected _dataChanged = false;
     protected _key2PlotDatasetKey: D3.Map<PlotDatasetKey>;
@@ -450,6 +456,30 @@ export module Plot {
       });
 
       return d3.selectAll(allSelections);
+    }
+
+    /**
+     * Retrieves all of the plot datums of this plot
+     *
+     * @returns {PlotDatum[]} The retrieved selections.
+     */
+    private _getPlotDatumArray(): PlotDatum[] {
+
+      var plotDatumArray: PlotDatum[] = [];
+
+      this._getDrawersInOrder().forEach((drawer) => {
+        drawer._getRenderArea().selectAll(drawer._getSelector()).each(function(datum: any, index: number) {
+          var selection = d3.select(this);
+          var pixelPoints: Point[] = (drawer instanceof _Drawer.Line) ?
+                                     (<any[]> datum).map((lineDatum, lineIndex) => drawer._getPixelPoint(lineDatum, lineIndex)) :
+                                     [drawer._getPixelPoint(datum, index)];
+          pixelPoints.forEach((pixelPoint: Point) => {
+            plotDatumArray.push({datum: datum, pixelPoint: pixelPoint, selection: selection});
+          });
+        });
+      });
+
+      return plotDatumArray;
     }
   }
 }
