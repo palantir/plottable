@@ -6515,14 +6515,13 @@ var Plottable;
              * @returns {PlotDatum[]} The retrieved selections.
              */
             AbstractPlot.prototype._getPlotDatumArray = function () {
+                var _this = this;
                 var plotDatumArray = [];
-                this._getDrawersInOrder().forEach(function (drawer) {
-                    drawer._getRenderArea().selectAll(drawer._getSelector()).each(function (datum, index) {
-                        var selection = d3.select(this);
-                        var pixelPoints = (drawer instanceof Plottable._Drawer.Line) ? datum.map(function (lineDatum, lineIndex) { return drawer._getPixelPoint(lineDatum, lineIndex); }) : [drawer._getPixelPoint(datum, index)];
-                        pixelPoints.forEach(function (pixelPoint) {
-                            plotDatumArray.push({ datum: datum, pixelPoint: pixelPoint, selection: selection });
-                        });
+                this.datasetOrder().forEach(function (datasetKey) {
+                    var plotDatasetKey = _this._key2PlotDatasetKey.get(datasetKey);
+                    var drawer = plotDatasetKey.drawer;
+                    plotDatasetKey.dataset.data().forEach(function (datum, index) {
+                        plotDatumArray.push({ datum: datum, pixelPoint: drawer._getPixelPoint(datum, index), selection: drawer._getSelection(index) });
                     });
                 });
                 return plotDatumArray;

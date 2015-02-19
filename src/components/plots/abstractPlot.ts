@@ -464,18 +464,13 @@ export module Plot {
      * @returns {PlotDatum[]} The retrieved selections.
      */
     private _getPlotDatumArray(): PlotDatum[] {
-
       var plotDatumArray: PlotDatum[] = [];
 
-      this._getDrawersInOrder().forEach((drawer) => {
-        drawer._getRenderArea().selectAll(drawer._getSelector()).each(function(datum: any, index: number) {
-          var selection = d3.select(this);
-          var pixelPoints: Point[] = (drawer instanceof _Drawer.Line) ?
-                                     (<any[]> datum).map((lineDatum, lineIndex) => drawer._getPixelPoint(lineDatum, lineIndex)) :
-                                     [drawer._getPixelPoint(datum, index)];
-          pixelPoints.forEach((pixelPoint: Point) => {
-            plotDatumArray.push({datum: datum, pixelPoint: pixelPoint, selection: selection});
-          });
+      this.datasetOrder().forEach((datasetKey) => {
+        var plotDatasetKey = this._key2PlotDatasetKey.get(datasetKey);
+        var drawer = plotDatasetKey.drawer;
+        plotDatasetKey.dataset.data().forEach((datum, index) => {
+          plotDatumArray.push({ datum: datum, pixelPoint: drawer._getPixelPoint(datum, index), selection: drawer._getSelection(index)});
         });
       });
 
