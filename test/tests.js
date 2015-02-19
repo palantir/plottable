@@ -6954,7 +6954,7 @@ describe("Interactions", function () {
             ki.on(bCode, bCallback);
             component.registerInteraction(ki);
             var $hitbox = $(component._hitBox.node());
-            $hitbox.simulate("mouseover");
+            triggerFakeMouseEvent("mouseover", component._hitBox, 100, 100);
             $hitbox.simulate("keydown", { keyCode: aCode });
             assert.isTrue(aCallbackCalled, "callback for \"a\" was called when \"a\" key was pressed");
             assert.isFalse(bCallbackCalled, "callback for \"b\" was not called when \"a\" key was pressed");
@@ -6962,6 +6962,10 @@ describe("Interactions", function () {
             $hitbox.simulate("keydown", { keyCode: bCode });
             assert.isFalse(aCallbackCalled, "callback for \"a\" was not called when \"b\" key was pressed");
             assert.isTrue(bCallbackCalled, "callback for \"b\" was called when \"b\" key was pressed");
+            triggerFakeMouseEvent("mouseout", component._hitBox, -100, -100);
+            aCallbackCalled = false;
+            $hitbox.simulate("keydown", { keyCode: aCode });
+            assert.isFalse(aCallbackCalled, "callback for \"a\" was not called when not moused over the Component");
             svg.remove();
         });
     });
@@ -7327,7 +7331,7 @@ describe("Interactions", function () {
             assert.isTrue(overCallbackCalled, "onHoverOver was called when mousing into a new region");
             assert.deepEqual(overData.pixelPositions, [testTarget.rightPoint], "onHoverOver was called with the correct pixel position (left --> center)");
             assert.deepEqual(overData.data, ["right"], "onHoverOver was called with the new data only (left --> center)");
-            triggerFakeMouseEvent("mouseout", hitbox, 400, 200);
+            triggerFakeMouseEvent("mouseout", hitbox, 401, 200);
             overCallbackCalled = false;
             triggerFakeMouseEvent("mouseover", hitbox, 200, 200);
             assert.deepEqual(overData.pixelPositions, [testTarget.leftPoint, testTarget.rightPoint], "onHoverOver was called with the correct pixel positions");
@@ -7345,13 +7349,13 @@ describe("Interactions", function () {
             assert.deepEqual(outData.pixelPositions, [testTarget.leftPoint], "onHoverOut was called with the correct pixel position (center --> right)");
             assert.deepEqual(outData.data, ["left"], "onHoverOut was called with the correct data (center --> right)");
             outCallbackCalled = false;
-            triggerFakeMouseEvent("mouseout", hitbox, 400, 200);
+            triggerFakeMouseEvent("mouseout", hitbox, 401, 200);
             assert.isTrue(outCallbackCalled, "onHoverOut is called on mousing out of the Component");
             assert.deepEqual(outData.pixelPositions, [testTarget.rightPoint], "onHoverOut was called with the correct pixel position");
             assert.deepEqual(outData.data, ["right"], "onHoverOut was called with the correct data");
             outCallbackCalled = false;
             triggerFakeMouseEvent("mouseover", hitbox, 200, 200);
-            triggerFakeMouseEvent("mouseout", hitbox, 200, 400);
+            triggerFakeMouseEvent("mouseout", hitbox, 200, 401);
             assert.deepEqual(outData.pixelPositions, [testTarget.leftPoint, testTarget.rightPoint], "onHoverOut was called with the correct pixel positions");
             assert.deepEqual(outData.data, ["left", "right"], "onHoverOut is called with the correct data");
             svg.remove();
@@ -7365,7 +7369,7 @@ describe("Interactions", function () {
             currentlyHovered = hoverInteraction.getCurrentHoverData();
             assert.deepEqual(currentlyHovered.pixelPositions, [testTarget.leftPoint, testTarget.rightPoint], "retrieves pixel positions corresponding to the current position");
             assert.deepEqual(currentlyHovered.data, ["left", "right"], "retrieves data corresponding to the current position");
-            triggerFakeMouseEvent("mouseout", hitbox, 400, 200);
+            triggerFakeMouseEvent("mouseout", hitbox, 401, 200);
             currentlyHovered = hoverInteraction.getCurrentHoverData();
             assert.isNull(currentlyHovered.data, "returns null if not currently hovering");
             svg.remove();
@@ -7376,67 +7380,135 @@ describe("Interactions", function () {
 ///<reference path="../testReference.ts" />
 var assert = chai.assert;
 describe("Dispatchers", function () {
-    it("correctly registers for and deregisters from events", function () {
-        var target = generateSVG();
-        var dispatcher = new Plottable.Dispatcher.AbstractDispatcher(target);
-        var callbackWasCalled = false;
-        dispatcher._event2Callback["click"] = function () {
-            callbackWasCalled = true;
-        };
-        triggerFakeUIEvent("click", target);
-        assert.isFalse(callbackWasCalled, "The callback is not called before the dispatcher connect()s");
-        dispatcher.connect();
-        triggerFakeUIEvent("click", target);
-        assert.isTrue(callbackWasCalled, "The dispatcher called its callback");
-        callbackWasCalled = false;
-        dispatcher.disconnect();
-        triggerFakeUIEvent("click", target);
-        assert.isFalse(callbackWasCalled, "The callback is not called after the dispatcher disconnect()s");
-        target.remove();
-    });
-    it("target can be changed", function () {
-        var target1 = generateSVG();
-        var target2 = generateSVG();
-        var dispatcher = new Plottable.Dispatcher.AbstractDispatcher(target1);
-        var callbackWasCalled = false;
-        dispatcher._event2Callback["click"] = function () { return callbackWasCalled = true; };
-        dispatcher.connect();
-        triggerFakeUIEvent("click", target1);
-        assert.isTrue(callbackWasCalled, "The dispatcher received the event on the target");
-        dispatcher.target(target2);
-        callbackWasCalled = false;
-        triggerFakeUIEvent("click", target1);
-        assert.isFalse(callbackWasCalled, "The dispatcher did not receive the event on the old target");
-        triggerFakeUIEvent("click", target2);
-        assert.isTrue(callbackWasCalled, "The dispatcher received the event on the new target");
-        target1.remove();
-        target2.remove();
-    });
-    it("multiple dispatchers can be attached to the same target", function () {
-        var target = generateSVG();
-        var dispatcher1 = new Plottable.Dispatcher.AbstractDispatcher(target);
-        var called1 = false;
-        dispatcher1._event2Callback["click"] = function () { return called1 = true; };
-        dispatcher1.connect();
-        var dispatcher2 = new Plottable.Dispatcher.AbstractDispatcher(target);
-        var called2 = false;
-        dispatcher2._event2Callback["click"] = function () { return called2 = true; };
-        dispatcher2.connect();
-        triggerFakeUIEvent("click", target);
-        assert.isTrue(called1, "The first dispatcher called its callback");
-        assert.isTrue(called2, "The second dispatcher also called its callback");
-        target.remove();
-    });
-    it("can't double-connect", function () {
-        var target = generateSVG();
-        var dispatcher = new Plottable.Dispatcher.AbstractDispatcher(target);
-        dispatcher.connect();
-        assert.throws(function () { return dispatcher.connect(); }, "connect");
-        target.remove();
+    describe("AbstractDispatcher", function () {
+        it("_connect() and _disconnect()", function () {
+            var dispatcher = new Plottable.Dispatcher.AbstractDispatcher();
+            var callbackCalls = 0;
+            dispatcher._event2Callback["click"] = function () { return callbackCalls++; };
+            var d3document = d3.select(document);
+            dispatcher._connect();
+            triggerFakeUIEvent("click", d3document);
+            assert.strictEqual(callbackCalls, 1, "connected correctly (callback was called)");
+            dispatcher._connect();
+            callbackCalls = 0;
+            triggerFakeUIEvent("click", d3document);
+            assert.strictEqual(callbackCalls, 1, "can't double-connect (callback only called once)");
+            dispatcher._disconnect();
+            callbackCalls = 0;
+            triggerFakeUIEvent("click", d3document);
+            assert.strictEqual(callbackCalls, 0, "disconnected correctly (callback not called)");
+        });
+        it("won't _disconnect() if broadcasters still have listeners", function () {
+            var dispatcher = new Plottable.Dispatcher.AbstractDispatcher();
+            var callbackWasCalled = false;
+            dispatcher._event2Callback["click"] = function () { return callbackWasCalled = true; };
+            var b = new Plottable.Core.Broadcaster(dispatcher);
+            var key = "unit test";
+            b.registerListener(key, function () { return null; });
+            dispatcher._broadcasters = [b];
+            var d3document = d3.select(document);
+            dispatcher._connect();
+            triggerFakeUIEvent("click", d3document);
+            assert.isTrue(callbackWasCalled, "connected correctly (callback was called)");
+            dispatcher._disconnect();
+            callbackWasCalled = false;
+            triggerFakeUIEvent("click", d3document);
+            assert.isTrue(callbackWasCalled, "didn't disconnect while broadcaster had listener");
+            b.deregisterListener(key);
+            dispatcher._disconnect();
+            callbackWasCalled = false;
+            triggerFakeUIEvent("click", d3document);
+            assert.isFalse(callbackWasCalled, "disconnected when broadcaster had no listeners");
+        });
+        it("_setCallback()", function () {
+            var dispatcher = new Plottable.Dispatcher.AbstractDispatcher();
+            var b = new Plottable.Core.Broadcaster(dispatcher);
+            var key = "unit test";
+            var callbackWasCalled = false;
+            var callback = function () { return callbackWasCalled = true; };
+            dispatcher._setCallback(b, key, callback);
+            b.broadcast();
+            assert.isTrue(callbackWasCalled, "callback was called after setting with _setCallback()");
+            dispatcher._setCallback(b, key, null);
+            callbackWasCalled = false;
+            b.broadcast();
+            assert.isFalse(callbackWasCalled, "callback was removed by calling _setCallback() with null");
+        });
     });
     describe("Mouse Dispatcher", function () {
-        it("passes event position to mouseover, mousemove, and mouseout callbacks", function () {
-            var target = generateSVG();
+        it("getDispatcher() creates only one Dispatcher.Mouse per <svg>", function () {
+            var svg = generateSVG();
+            var md1 = Plottable.Dispatcher.Mouse.getDispatcher(svg.node());
+            assert.isNotNull(md1, "created a new Dispatcher on an SVG");
+            var md2 = Plottable.Dispatcher.Mouse.getDispatcher(svg.node());
+            assert.strictEqual(md1, md2, "returned the existing Dispatcher if called again with same <svg>");
+            svg.remove();
+        });
+        it("getLastMousePosition() defaults to a non-null value", function () {
+            var svg = generateSVG();
+            var md = Plottable.Dispatcher.Mouse.getDispatcher(svg.node());
+            var p = md.getLastMousePosition();
+            assert.isNotNull(p, "returns a value after initialization");
+            assert.isNotNull(p.x, "x value is set");
+            assert.isNotNull(p.y, "y value is set");
+            svg.remove();
+        });
+        it("can remove callbacks by passing null", function () {
+            var targetWidth = 400, targetHeight = 400;
+            var target = generateSVG(targetWidth, targetHeight);
+            // HACKHACK: PhantomJS can't measure SVGs unless they have something in them occupying space
+            target.append("rect").attr("width", targetWidth).attr("height", targetHeight);
+            var targetX = 17;
+            var targetY = 76;
+            var md = Plottable.Dispatcher.Mouse.getDispatcher(target.node());
+            var cb1Called = false;
+            var cb1 = function (p) {
+                cb1Called = true;
+            };
+            var cb2Called = false;
+            var cb2 = function (p) {
+                cb2Called = true;
+            };
+            md.onMouseMove("callback1", cb1);
+            md.onMouseMove("callback2", cb2);
+            triggerFakeMouseEvent("mousemove", target, targetX, targetY);
+            assert.isTrue(cb1Called, "callback 1 was called on mousemove");
+            assert.isTrue(cb2Called, "callback 2 was called on mousemove");
+            cb1Called = false;
+            cb2Called = false;
+            md.onMouseMove("callback1", null);
+            triggerFakeMouseEvent("mousemove", target, targetX, targetY);
+            assert.isFalse(cb1Called, "callback was not called after blanking");
+            assert.isTrue(cb2Called, "callback 2 was still called");
+            target.remove();
+        });
+        it("doesn't call callbacks if not in the DOM", function () {
+            var targetWidth = 400, targetHeight = 400;
+            var target = generateSVG(targetWidth, targetHeight);
+            // HACKHACK: PhantomJS can't measure SVGs unless they have something in them occupying space
+            target.append("rect").attr("width", targetWidth).attr("height", targetHeight);
+            var targetX = 17;
+            var targetY = 76;
+            var md = Plottable.Dispatcher.Mouse.getDispatcher(target.node());
+            var callbackWasCalled = false;
+            var callback = function (p) {
+                callbackWasCalled = true;
+            };
+            var keyString = "notInDomTest";
+            md.onMouseMove(keyString, callback);
+            triggerFakeMouseEvent("mousemove", target, targetX, targetY);
+            assert.isTrue(callbackWasCalled, "callback was called on mousemove");
+            target.remove();
+            callbackWasCalled = false;
+            triggerFakeMouseEvent("mousemove", target, targetX, targetY);
+            assert.isFalse(callbackWasCalled, "callback was not called after <svg> was removed from DOM");
+            md.onMouseMove(keyString, null);
+        });
+        it("calls callbacks on mouseover, mousemove, and mouseout", function () {
+            var targetWidth = 400, targetHeight = 400;
+            var target = generateSVG(targetWidth, targetHeight);
+            // HACKHACK: PhantomJS can't measure SVGs unless they have something in them occupying space
+            target.append("rect").attr("width", targetWidth).attr("height", targetHeight);
             var targetX = 17;
             var targetY = 76;
             var expectedPoint = {
@@ -7448,55 +7520,36 @@ describe("Dispatchers", function () {
                 assert.closeTo(actual.y, expected.y, epsilon, message + " (y)");
             }
             ;
-            var md = new Plottable.Dispatcher.Mouse(target);
-            var mouseoverCalled = false;
-            md.mouseover(function (p) {
-                mouseoverCalled = true;
-                assertPointsClose(p, expectedPoint, 0.5, "the mouse position was passed to the callback");
-            });
-            var mousemoveCalled = false;
-            md.mousemove(function (p) {
-                mousemoveCalled = true;
-                assertPointsClose(p, expectedPoint, 0.5, "the mouse position was passed to the callback");
-            });
-            var mouseoutCalled = false;
-            md.mouseout(function (p) {
-                mouseoutCalled = true;
-                assertPointsClose(p, expectedPoint, 0.5, "the mouse position was passed to the callback");
-            });
-            md.connect();
+            var md = Plottable.Dispatcher.Mouse.getDispatcher(target.node());
+            var callbackWasCalled = false;
+            var callback = function (p) {
+                callbackWasCalled = true;
+                assertPointsClose(p, expectedPoint, 0.5, "mouse position is correct");
+            };
+            var keyString = "unit test";
+            md.onMouseMove(keyString, callback);
             triggerFakeMouseEvent("mouseover", target, targetX, targetY);
-            assert.isTrue(mouseoverCalled, "mouseover callback was called");
+            assert.isTrue(callbackWasCalled, "callback was called on mouseover");
+            callbackWasCalled = false;
             triggerFakeMouseEvent("mousemove", target, targetX, targetY);
-            assert.isTrue(mousemoveCalled, "mousemove callback was called");
+            assert.isTrue(callbackWasCalled, "callback was called on mousemove");
+            callbackWasCalled = false;
             triggerFakeMouseEvent("mouseout", target, targetX, targetY);
-            assert.isTrue(mouseoutCalled, "mouseout callback was called");
+            assert.isTrue(callbackWasCalled, "callback was called on mouseout");
+            md.onMouseMove(keyString, null);
             target.remove();
         });
     });
-    describe("Keypress Dispatcher", function () {
-        it("triggers the callback only when moused over the target", function () {
-            var target = generateSVG(400, 400);
-            var kpd = new Plottable.Dispatcher.Keypress(target);
-            var keyDownCalled = false;
-            var lastKeyCode;
-            kpd.onKeyDown(function (e) {
-                keyDownCalled = true;
-                lastKeyCode = e.keyCode;
-            });
-            kpd.connect();
-            var $target = $(target.node());
-            $target.simulate("keydown", { keyCode: 80 });
-            assert.isFalse(keyDownCalled, "didn't trigger callback if not moused over the target");
-            $target.simulate("mouseover");
-            $target.simulate("keydown", { keyCode: 80 });
-            assert.isTrue(keyDownCalled, "correctly triggers callback if moused over the target");
-            assert.strictEqual(lastKeyCode, 80, "correct event info was passed to the callback");
-            keyDownCalled = false;
-            $target.simulate("mouseout");
-            $target.simulate("keydown", { keyCode: 80 });
-            assert.isFalse(keyDownCalled, "didn't trigger callback after mousing out of the target");
-            target.remove();
+    describe("Key Dispatcher", function () {
+        it("triggers callback on mousedown", function () {
+            var ked = Plottable.Dispatcher.Key.getDispatcher();
+            var keyDowned = false;
+            var callback = function () { return keyDowned = true; };
+            var keyString = "unit test";
+            ked.onKeyDown(keyString, callback);
+            $("body").simulate("keydown", { keyCode: 65 });
+            assert.isTrue(keyDowned, "callback when a key was pressed");
+            ked.onKeyDown(keyString, null); // clean up
         });
     });
 });

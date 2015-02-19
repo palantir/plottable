@@ -78,7 +78,16 @@ export module Core {
     }
 
     /**
-     * Deregisters all listeners and callbacks associated with the broadcaster.
+     * Gets the keys for all listeners attached to the Broadcaster.
+     *
+     * @returns {any[]} An array of the keys.
+     */
+    public getListenerKeys() {
+      return this._key2callback.keys();
+    }
+
+    /**
+     * Deregisters all listeners and callbacks associated with the Broadcaster.
      *
      * @returns {Broadcaster} The calling Broadcaster
      */
