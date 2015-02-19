@@ -389,6 +389,25 @@ describe("Drawers", function () {
             });
             svg.remove();
         });
+        it("getSelection", function () {
+            var svg = generateSVG(300, 300);
+            var data = [{ a: 12, b: 10 }, { a: 13, b: 24 }, { a: 14, b: 21 }, { a: 15, b: 14 }];
+            var xScale = new Plottable.Scale.Linear();
+            var yScale = new Plottable.Scale.Linear();
+            var linePlot = new Plottable.Plot.Line(xScale, yScale);
+            var drawer = new Plottable._Drawer.Line("one");
+            linePlot._getDrawer = function () { return drawer; };
+            linePlot.addDataset("one", data);
+            linePlot.project("x", "a", xScale);
+            linePlot.project("y", "b", yScale);
+            linePlot.renderTo(svg);
+            var lineSelection = linePlot.getAllSelections();
+            data.forEach(function (datum, index) {
+                var selection = drawer._getSelection(index);
+                assert.strictEqual(selection.node(), lineSelection.node(), "line selection retrieved");
+            });
+            svg.remove();
+        });
     });
 });
 
