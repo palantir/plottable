@@ -1078,6 +1078,26 @@ describe("NumericAxis", function () {
         });
         svg.remove();
     });
+    it("renders tick labels properly when the domain is reversed", function () {
+        var SVG_WIDTH = 300;
+        var SVG_HEIGHT = 100;
+        var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        var scale = new Plottable.Scale.Linear();
+        scale.domain([3, 0]);
+        var baseAxis = new Plottable.Axis.Numeric(scale, "bottom");
+        baseAxis.renderTo(svg);
+        var tickLabels = baseAxis._element.selectAll(".tick-label").filter(function (d, i) {
+            var visibility = d3.select(this).style("visibility");
+            return (visibility === "visible") || (visibility === "inherit");
+        });
+        assert.isTrue(tickLabels[0].length > 1, "more than one tick label is shown");
+        for (var i = 0; i < tickLabels[0].length - 1; i++) {
+            var currLabel = d3.select(tickLabels[0][i]);
+            var nextLabel = d3.select(tickLabels[0][i + 1]);
+            assert.isTrue(Number(currLabel.text()) > Number(nextLabel.text()), "numbers are arranged in descending order from left to right");
+        }
+        svg.remove();
+    });
 });
 
 ///<reference path="../testReference.ts" />

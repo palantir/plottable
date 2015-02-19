@@ -4737,7 +4737,14 @@ var Plottable;
             Numeric.prototype._getTickValues = function () {
                 var scale = this._scale;
                 var domain = scale.domain();
-                return scale.ticks().filter(function (i) { return i >= domain[0] && i <= domain[1]; });
+                var min = domain[0] <= domain[1] ? domain[0] : domain[1];
+                var max = domain[0] >= domain[1] ? domain[0] : domain[1];
+                if (min === domain[0]) {
+                    return scale.ticks().filter(function (i) { return i >= min && i <= max; });
+                }
+                else {
+                    return scale.ticks().filter(function (i) { return i >= min && i <= max; }).reverse();
+                }
             };
             Numeric.prototype._rescale = function () {
                 if (!this._isSetup) {
