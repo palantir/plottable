@@ -149,6 +149,17 @@ export module _Drawer {
       return null;
     }
 
+    public _getSelection(datum: any, index: number): D3.Selection {
+      var selection = d3.select();
+      var allSelections = this._getRenderArea().selectAll(this._getSelector());
+      allSelections.each(function (selectionDatum: any, selectionIndex: number) {
+        if (selectionDatum === datum && selectionIndex === index) {
+          selection = d3.select(this);
+        }
+      });
+      return selection;
+    }
+
   }
 }
 }
