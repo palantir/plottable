@@ -1085,6 +1085,7 @@ var Plottable;
              * Registers a callback to be called when the broadcast method is called. Also takes a key which
              * is used to support deregistering the same callback later, by passing in the same key.
              * If there is already a callback associated with that key, then the callback will be replaced.
+             * The callback will be passed the Broadcaster's "listenable" as the `this` context.
              *
              * @param key The key associated with the callback. Key uniqueness is determined by deep equality.
              * @param {BroadcasterCallback<L>} callback A callback to be called.
@@ -1106,7 +1107,10 @@ var Plottable;
                 for (var _i = 0; _i < arguments.length; _i++) {
                     args[_i - 0] = arguments[_i];
                 }
-                this._key2callback.values().forEach(function (callback) { return callback(_this._listenable, args); });
+                args.unshift(this._listenable);
+                this._key2callback.values().forEach(function (callback) {
+                    callback.apply(_this._listenable, args);
+                });
                 return this;
             };
             /**
@@ -1395,91 +1399,9 @@ var Plottable;
                     _animationRequested = false;
                     _isCurrentlyFlushing = false;
                 }
-                // Reset resize flag regardless of queue'd components
-                Core.ResizeBroadcaster.clearResizing();
             }
             RenderController.flush = flush;
         })(RenderController = Core.RenderController || (Core.RenderController = {}));
-    })(Core = Plottable.Core || (Plottable.Core = {}));
-})(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var Plottable;
-(function (Plottable) {
-    var Core;
-    (function (Core) {
-        /**
-         * The ResizeBroadcaster will broadcast a notification to any registered
-         * components when the window is resized.
-         *
-         * The broadcaster and single event listener are lazily constructed.
-         *
-         * Upon resize, the _resized flag will be set to true until after the next
-         * flush of the RenderController. This is used, for example, to disable
-         * animations during resize.
-         */
-        var ResizeBroadcaster;
-        (function (ResizeBroadcaster) {
-            var broadcaster;
-            var _resizing = false;
-            function _lazyInitialize() {
-                if (broadcaster === undefined) {
-                    broadcaster = new Core.Broadcaster(ResizeBroadcaster);
-                    window.addEventListener("resize", _onResize);
-                }
-            }
-            function _onResize() {
-                _resizing = true;
-                broadcaster.broadcast();
-            }
-            /**
-             * Checks if the window has been resized and the RenderController
-             * has not yet been flushed.
-             *
-             * @returns {boolean} If the window has been resized/RenderController
-             * has not yet been flushed.
-             */
-            function resizing() {
-                return _resizing;
-            }
-            ResizeBroadcaster.resizing = resizing;
-            /**
-             * Sets that it is not resizing anymore. Good if it stubbornly thinks
-             * it is still resizing, or for cancelling the effects of resizing
-             * prematurely.
-             */
-            function clearResizing() {
-                _resizing = false;
-            }
-            ResizeBroadcaster.clearResizing = clearResizing;
-            /**
-             * Registers a component.
-             *
-             * When the window is resized, ._invalidateLayout() is invoked on the
-             * component, which will enqueue the component for layout and rendering
-             * with the RenderController.
-             *
-             * @param {Component} component Any Plottable component.
-             */
-            function register(c) {
-                _lazyInitialize();
-                broadcaster.registerListener(c.getID(), function () { return c._invalidateLayout(); });
-            }
-            ResizeBroadcaster.register = register;
-            /**
-             * Deregisters the components.
-             *
-             * The component will no longer receive updates on window resize.
-             *
-             * @param {Component} component Any Plottable component.
-             */
-            function deregister(c) {
-                if (broadcaster) {
-                    broadcaster.deregisterListener(c.getID());
-                }
-            }
-            ResizeBroadcaster.deregister = deregister;
-        })(ResizeBroadcaster = Core.ResizeBroadcaster || (Core.ResizeBroadcaster = {}));
     })(Core = Plottable.Core || (Plottable.Core = {}));
 })(Plottable || (Plottable = {}));
 
@@ -3351,9 +3273,6 @@ var Plottable;
                 this._boundingBox = this._addBox("bounding-box");
                 this._interactionsToRegister.forEach(function (r) { return _this.registerInteraction(r); });
                 this._interactionsToRegister = null;
-                if (this._isTopLevelComponent) {
-                    this.autoResize(this._autoResize);
-                }
                 this._isSetup = true;
             };
             AbstractComponent.prototype._requestedSpace = function (availableWidth, availableHeight) {
@@ -3468,43 +3387,15 @@ var Plottable;
                 return this;
             };
             /**
-             * Causes the Component to recompute layout and redraw. If passed arguments, will resize the root SVG it lives in.
+             * Causes the Component to recompute layout and redraw.
              *
              * This function should be called when CSS changes could influence the size
              * of the components, e.g. changing the font size.
              *
-             * @param {number} [availableWidth]  - the width of the container element
-             * @param {number} [availableHeight] - the height of the container element
              * @returns {Component} The calling component.
              */
-            AbstractComponent.prototype.resize = function (width, height) {
-                if (!this._isTopLevelComponent) {
-                    throw new Error("Cannot resize on non top-level component");
-                }
-                if (width != null && height != null && this._isAnchored) {
-                    this._rootSVG.attr({ width: width, height: height });
-                }
+            AbstractComponent.prototype.redraw = function () {
                 this._invalidateLayout();
-                return this;
-            };
-            /**
-             * Enables or disables resize on window resizes.
-             *
-             * If enabled, window resizes will enqueue this component for a re-layout
-             * and re-render. Animations are disabled during window resizes when auto-
-             * resize is enabled.
-             *
-             * @param {boolean} flag Enable (true) or disable (false) auto-resize.
-             * @returns {Component} The calling component.
-             */
-            AbstractComponent.prototype.autoResize = function (flag) {
-                if (flag) {
-                    Plottable.Core.ResizeBroadcaster.register(this);
-                }
-                else {
-                    Plottable.Core.ResizeBroadcaster.deregister(this);
-                }
-                this._autoResize = flag; // if _setup were called by constructor, this var could be _removed #591
                 return this;
             };
             /**
@@ -3740,7 +3631,6 @@ var Plottable;
             AbstractComponent.prototype.remove = function () {
                 this._removed = true;
                 this.detach();
-                Plottable.Core.ResizeBroadcaster.deregister(this);
             };
             /**
              * Return the width of the component
@@ -4830,7 +4720,9 @@ var Plottable;
                 return this._computedHeight;
             };
             Numeric.prototype._getTickValues = function () {
-                return this._scale.ticks();
+                var scale = this._scale;
+                var domain = scale.domain();
+                return scale.ticks().filter(function (i) { return i >= domain[0] && i <= domain[1]; });
             };
             Numeric.prototype._rescale = function () {
                 if (!this._isSetup) {
@@ -6563,15 +6455,37 @@ var Plottable;
                 var maxTime = Plottable._Util.Methods.max(times, 0);
                 this._additionalPaint(maxTime);
             };
-            AbstractPlot.prototype.getAllSelections = function () {
-                var allSelections = d3.select();
-                allSelections[0] = [];
-                this._getDrawersInOrder().forEach(function (drawer) {
-                    drawer._getRenderArea().selectAll(drawer._getSelector())[0].forEach(function (selection) {
-                        allSelections[0].push(selection);
+            /**
+             * Retrieves all of the selections of this plot for the specified dataset(s)
+             *
+             * @param {string | string[]} datasetKeys The dataset(s) to retrieve the selections from.
+             * If not provided, all selections will be retrieved.
+             * @returns {D3.Selection} The retrieved selections.
+             */
+            AbstractPlot.prototype.getAllSelections = function (datasetKeys) {
+                var _this = this;
+                var datasetKeyArray = [];
+                if (datasetKeys == null) {
+                    datasetKeyArray = this._datasetKeysInOrder;
+                }
+                else if (typeof (datasetKeys) === "string") {
+                    datasetKeyArray = [datasetKeys];
+                }
+                else {
+                    datasetKeyArray = datasetKeys;
+                }
+                var allSelections = [];
+                datasetKeyArray.forEach(function (datasetKey) {
+                    var plotDatasetKey = _this._key2PlotDatasetKey.get(datasetKey);
+                    if (plotDatasetKey == null) {
+                        return;
+                    }
+                    var drawer = plotDatasetKey.drawer;
+                    drawer._getRenderArea().selectAll(drawer._getSelector()).each(function () {
+                        allSelections.push(this);
                     });
                 });
-                return allSelections;
+                return d3.selectAll(allSelections);
             };
             /**
              * Retrieves the closest PlotData to the specified x/y point within a specified value
