@@ -291,6 +291,18 @@ describe("Drawers", function () {
             drawer.draw([], steps, null, null);
             assert.deepEqual(timings, [0, 20, 30], "setTimeout called with appropriate times");
         });
+        it("_getSelection", function () {
+            var svg = generateSVG(300, 300);
+            var drawer = new Plottable._Drawer.AbstractDrawer("test");
+            drawer.setup(svg.append("g"));
+            drawer._getSelector = function () { return "circle"; };
+            var data = [{ one: 2, two: 1 }, { one: 33, two: 21 }, { one: 11, two: 10 }];
+            var circles = drawer._getRenderArea().selectAll("circle").data(data);
+            circles.enter().append("circle").attr("cx", function (datum) { return datum.one; }).attr("cy", function (datum) { return datum.two; }).attr("r", 10);
+            var selection = drawer._getSelection(1);
+            assert.strictEqual(selection.node(), circles[0][1], "correct selection gotten");
+            svg.remove();
+        });
     });
 });
 
