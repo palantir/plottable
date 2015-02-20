@@ -291,6 +291,18 @@ describe("Drawers", function () {
             drawer.draw([], steps, null, null);
             assert.deepEqual(timings, [0, 20, 30], "setTimeout called with appropriate times");
         });
+        it("_getSelection", function () {
+            var svg = generateSVG(300, 300);
+            var drawer = new Plottable._Drawer.AbstractDrawer("test");
+            drawer.setup(svg.append("g"));
+            drawer._getSelector = function () { return "circle"; };
+            var data = [{ one: 2, two: 1 }, { one: 33, two: 21 }, { one: 11, two: 10 }];
+            var circles = drawer._getRenderArea().selectAll("circle").data(data);
+            circles.enter().append("circle").attr("cx", function (datum) { return datum.one; }).attr("cy", function (datum) { return datum.two; }).attr("r", 10);
+            var selection = drawer._getSelection(1);
+            assert.strictEqual(selection.node(), circles[0][1], "correct selection gotten");
+            svg.remove();
+        });
     });
 });
 
@@ -386,6 +398,25 @@ describe("Drawers", function () {
                 var pixelPoint = drawer._getPixelPoint(datum, index);
                 assert.closeTo(pixelPoint.x, xScale.scale(datum.a), 1, "x coordinate correct for index " + index);
                 assert.closeTo(pixelPoint.y, yScale.scale(datum.b), 1, "y coordinate correct for index " + index);
+            });
+            svg.remove();
+        });
+        it("getSelection", function () {
+            var svg = generateSVG(300, 300);
+            var data = [{ a: 12, b: 10 }, { a: 13, b: 24 }, { a: 14, b: 21 }, { a: 15, b: 14 }];
+            var xScale = new Plottable.Scale.Linear();
+            var yScale = new Plottable.Scale.Linear();
+            var linePlot = new Plottable.Plot.Line(xScale, yScale);
+            var drawer = new Plottable._Drawer.Line("one");
+            linePlot._getDrawer = function () { return drawer; };
+            linePlot.addDataset("one", data);
+            linePlot.project("x", "a", xScale);
+            linePlot.project("y", "b", yScale);
+            linePlot.renderTo(svg);
+            var lineSelection = linePlot.getAllSelections();
+            data.forEach(function (datum, index) {
+                var selection = drawer._getSelection(index);
+                assert.strictEqual(selection.node(), lineSelection.node(), "line selection retrieved");
             });
             svg.remove();
         });
@@ -1076,6 +1107,26 @@ describe("NumericAxis", function () {
             var tickMarkPosition = Number(tickMark.attr("x"));
             assert.isTrue(tickMarkPosition >= 0 && tickMarkPosition <= SVG_WIDTH, "tick marks are located within the bounding SVG");
         });
+        svg.remove();
+    });
+    it("renders tick labels properly when the domain is reversed", function () {
+        var SVG_WIDTH = 300;
+        var SVG_HEIGHT = 100;
+        var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        var scale = new Plottable.Scale.Linear();
+        scale.domain([3, 0]);
+        var baseAxis = new Plottable.Axis.Numeric(scale, "bottom");
+        baseAxis.renderTo(svg);
+        var tickLabels = baseAxis._element.selectAll(".tick-label").filter(function (d, i) {
+            var visibility = d3.select(this).style("visibility");
+            return (visibility === "visible") || (visibility === "inherit");
+        });
+        assert.isTrue(tickLabels[0].length > 1, "more than one tick label is shown");
+        for (var i = 0; i < tickLabels[0].length - 1; i++) {
+            var currLabel = d3.select(tickLabels[0][i]);
+            var nextLabel = d3.select(tickLabels[0][i + 1]);
+            assert.isTrue(Number(currLabel.text()) > Number(nextLabel.text()), "numbers are arranged in descending order from left to right");
+        }
         svg.remove();
     });
 });
