@@ -6860,7 +6860,7 @@ var Plottable;
                 return this;
             };
             Scatter.prototype._getDrawer = function (key) {
-                return new Plottable._Drawer.Element(key).svgElement("circle");
+                return new Plottable._Drawer.Circle(key);
             };
             Scatter.prototype._generateAttrToProjector = function () {
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
