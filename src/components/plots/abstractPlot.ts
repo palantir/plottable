@@ -16,6 +16,12 @@ export module Plot {
     datasetKey: string
   }
 
+  export type PlotData = {
+    data: any[];
+    pixelPoints: Point[];
+    selection: D3.Selection;
+  }
+
   export class AbstractPlot extends Component.AbstractComponent {
     protected _dataChanged = false;
     protected _key2PlotDatasetKey: D3.Map<PlotDatasetKey>;
@@ -415,16 +421,35 @@ export module Plot {
       this._additionalPaint(maxTime);
     }
 
-    public getAllSelections(): D3.Selection {
-      var allSelections = d3.select();
-      allSelections[0] = [];
-      this._getDrawersInOrder().forEach((drawer) => {
-        drawer._getRenderArea().selectAll(drawer._getSelector())[0].forEach((selection: EventTarget) => {
-          allSelections[0].push(selection);
+    /**
+     * Retrieves all of the selections of this plot for the specified dataset(s)
+     *
+     * @param {string | string[]} datasetKeys The dataset(s) to retrieve the selections from.
+     * If not provided, all selections will be retrieved.
+     * @returns {D3.Selection} The retrieved selections.
+     */
+    public getAllSelections(datasetKeys?: string | string[]): D3.Selection {
+      var datasetKeyArray: string[] = [];
+      if (datasetKeys == null) {
+        datasetKeyArray = this._datasetKeysInOrder;
+      } else if (typeof(datasetKeys) === "string") {
+        datasetKeyArray = [<string> datasetKeys];
+      } else {
+        datasetKeyArray = <string[]> datasetKeys;
+      }
+
+      var allSelections: EventTarget[] = [];
+
+      datasetKeyArray.forEach((datasetKey) => {
+        var plotDatasetKey = this._key2PlotDatasetKey.get(datasetKey);
+        if (plotDatasetKey == null) { return; }
+        var drawer = plotDatasetKey.drawer;
+        drawer._getRenderArea().selectAll(drawer._getSelector()).each(function () {
+          allSelections.push(this);
         });
       });
 
-      return allSelections;
+      return d3.selectAll(allSelections);
     }
   }
 }

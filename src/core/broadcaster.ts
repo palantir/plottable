@@ -41,6 +41,7 @@ export module Core {
      * Registers a callback to be called when the broadcast method is called. Also takes a key which
      * is used to support deregistering the same callback later, by passing in the same key.
      * If there is already a callback associated with that key, then the callback will be replaced.
+     * The callback will be passed the Broadcaster's "listenable" as the `this` context.
      *
      * @param key The key associated with the callback. Key uniqueness is determined by deep equality.
      * @param {BroadcasterCallback<L>} callback A callback to be called.
@@ -58,7 +59,10 @@ export module Core {
      * @returns {Broadcaster} The calling Broadcaster
      */
     public broadcast(...args: any[]) {
-      this._key2callback.values().forEach((callback) => callback(this._listenable, args));
+      args.unshift(this._listenable);
+      this._key2callback.values().forEach((callback) => {
+        callback.apply(this._listenable, args);
+      });
       return this;
     }
 
@@ -74,7 +78,16 @@ export module Core {
     }
 
     /**
-     * Deregisters all listeners and callbacks associated with the broadcaster.
+     * Gets the keys for all listeners attached to the Broadcaster.
+     *
+     * @returns {any[]} An array of the keys.
+     */
+    public getListenerKeys() {
+      return this._key2callback.keys();
+    }
+
+    /**
+     * Deregisters all listeners and callbacks associated with the Broadcaster.
      *
      * @returns {Broadcaster} The calling Broadcaster
      */
