@@ -1530,6 +1530,15 @@ declare module Plottable {
             protected _prepareDrawSteps(drawSteps: AppliedDrawStep[]): void;
             protected _prepareData(data: any[], drawSteps: AppliedDrawStep[]): any[];
             _getSelector(): string;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module _Drawer {
+        class Circle extends Element {
+            constructor(key: string);
             _getPixelPoint(datum: any, index: number): Point;
         }
     }
