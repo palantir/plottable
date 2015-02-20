@@ -131,13 +131,13 @@ describe("Category Axes", () => {
           var tickLabelBox = tickLabels[0][i].getBoundingClientRect();
           var tickMarkBox = tickMarks[0][i].getBoundingClientRect();
           assert.isFalse(Plottable._Util.DOM.boxesOverlap(tickLabelBox, tickMarkBox), "tick label and box do not overlap");
-        }       
+        }
     }
 
     var svg = generateSVG(400, 300);
     var yScale = new Plottable.Scale.Ordinal();
-    var axis = new Plottable.Axis.Category(yScale, "left");        
-    yScale.domain(["A", "B", "C"]);        
+    var axis = new Plottable.Axis.Category(yScale, "left");
+    yScale.domain(["A", "B", "C"]);
     axis.renderTo(svg);
 
     var tickLabels = (<any> axis)._content.selectAll(".tick-label");
