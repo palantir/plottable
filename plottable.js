@@ -881,7 +881,12 @@ var Plottable;
         function siSuffix(precision) {
             if (precision === void 0) { precision = 3; }
             verifyPrecision(precision);
-            return function (d) { return d3.format("." + precision + "s")(d); };
+            return function (d) {
+                var multiplier = Math.pow(10, precision);
+                var val = Math.round(d * multiplier) / multiplier;
+                return d3.format("." + precision + "s")(val === -0 ? -val : val);
+            };
+            // return (d: any) => d3.format("." + precision + "s")(val === -0 ? -val : val);
         }
         Formatters.siSuffix = siSuffix;
         /**
@@ -4845,6 +4850,7 @@ var Plottable;
                 tickLabels.exit().remove();
                 tickLabels.style("text-anchor", tickLabelTextAnchor).style("visibility", "inherit").attr(tickLabelAttrHash).text(function (s) {
                     var formattedText = _this.formatter()(s);
+                    console.log(s, formattedText);
                     if (!_this._isHorizontal()) {
                         var availableTextSpace = _this.width() - _this.tickLabelPadding();
                         availableTextSpace -= _this._tickLabelPositioning === "center" ? _this._maxLabelTickLength() : 0;

@@ -183,6 +183,7 @@ export module Axis {
                 .attr(tickLabelAttrHash)
                 .text((s: any) => {
                   var formattedText = this.formatter()(s);
+                  console.log(s, formattedText);
                   if (!this._isHorizontal()) {
                     var availableTextSpace = this.width() - this.tickLabelPadding();
                     availableTextSpace -= this._tickLabelPositioning === "center" ? this._maxLabelTickLength() : 0;
