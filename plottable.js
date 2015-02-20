@@ -5065,10 +5065,14 @@ var Plottable;
                 tickLabels.text("");
                 this._drawTicks(this.width(), this.height(), ordScale, tickLabels);
                 var translate = this._isHorizontal() ? [ordScale.rangeBand() / 2, 0] : [0, ordScale.rangeBand() / 2];
-                var xTranslate = this.orient() === "left" ? 0 : this._maxLabelTickLength() + this.tickLabelPadding();
-                var yTranslate = this.orient() === "bottom" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
+                var xTranslate = this._isOriented(["top", "bottom", "left"]) ? 0 : this._maxLabelTickLength() + this.tickLabelPadding();
+                var yTranslate = this._isOriented(["bottom"]) ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
                 Plottable._Util.DOM.translate(this._tickLabelContainer, xTranslate, yTranslate);
                 return this;
+            };
+            Category.prototype._isOriented = function (orientations) {
+                var _this = this;
+                return orientations.some(function (orientation) { return _this.orient() === orientation; });
             };
             Category.prototype._computeLayout = function (offeredXOrigin, offeredYOrigin, availableWidth, availableHeight) {
                 // When anyone calls _invalidateLayout, _computeLayout will be called

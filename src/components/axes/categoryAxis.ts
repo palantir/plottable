@@ -176,12 +176,15 @@ export module Axis {
       this._drawTicks(this.width(), this.height(), ordScale, tickLabels);
       var translate = this._isHorizontal() ? [ordScale.rangeBand() / 2, 0] : [0, ordScale.rangeBand() / 2];
 
-      var xTranslate = this.orient() === "left" ? 0 : this._maxLabelTickLength() + this.tickLabelPadding();
-      var yTranslate = this.orient() === "bottom" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
+      var xTranslate = this._isOriented(["top", "bottom", "left"]) ? 0 : this._maxLabelTickLength() + this.tickLabelPadding();
+      var yTranslate = this._isOriented(["bottom"]) ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
       _Util.DOM.translate(this._tickLabelContainer, xTranslate, yTranslate);
       return this;
     }
 
+    private _isOriented(orientations: string[]) {
+      return orientations.some((orientation: string) => this.orient() === orientation);
+    }
 
     public _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number) {
       // When anyone calls _invalidateLayout, _computeLayout will be called
