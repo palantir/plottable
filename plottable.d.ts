@@ -2808,7 +2808,7 @@ declare module Plottable {
              */
             constructor(xScale: Scale.Ordinal, yScale: Scale.Ordinal, colorScale: Scale.AbstractScale<any, string>);
             addDataset(keyOrDataset: any, dataset?: any): Grid;
-            protected _getDrawer(key: string): _Drawer.Element;
+            protected _getDrawer(key: string): _Drawer.Rect;
             /**
              * @param {string} attrToSet One of ["x", "y", "fill"]. If "fill" is used,
              * the data should return a valid CSS color.
