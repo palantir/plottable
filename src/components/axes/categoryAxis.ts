@@ -178,7 +178,7 @@ export module Axis {
 
       var xTranslate = this.orient() === "left" ? 0 : this._maxLabelTickLength() + this.tickLabelPadding();
       var yTranslate = this.orient() === "bottom" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
-      _Util.DOM.translate(this._tickLabelContainer, 0, yTranslate);
+      _Util.DOM.translate(this._tickLabelContainer, xTranslate, yTranslate);
       return this;
     }
 
