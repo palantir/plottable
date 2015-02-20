@@ -129,13 +129,41 @@ describe("Plots", () => {
       svg.remove();
     });
 
-    it("getAllSelections retrieves correct selections",() => {
-      var allSectors = piePlot.getAllSelections();
-      assert.strictEqual(allSectors.size(), 2, "all sectors retrieved");
-      var selectionData = allSectors.data();
-      assert.includeMembers(selectionData.map((datum) => datum.data), simpleData, "dataset data in selection data");
+    describe("getAllSelections", () => {
 
-      svg.remove();
+      it("retrieves all dataset selections with no args",() => {
+        var allSectors = piePlot.getAllSelections();
+        var allSectors2 = piePlot.getAllSelections((<any> piePlot)._datasetKeysInOrder);
+        assert.deepEqual(allSectors, allSectors2, "all sectors retrieved");
+
+        svg.remove();
+      });
+
+      it("retrieves correct selections (array arg)",() => {
+        var allSectors = piePlot.getAllSelections(["simpleDataset"]);
+        assert.strictEqual(allSectors.size(), 2, "all sectors retrieved");
+        var selectionData = allSectors.data();
+        assert.includeMembers(selectionData.map((datum) => datum.data), simpleData, "dataset data in selection data");
+
+        svg.remove();
+      });
+
+      it("retrieves correct selections (string arg)",() => {
+        var allSectors = piePlot.getAllSelections("simpleDataset");
+        assert.strictEqual(allSectors.size(), 2, "all sectors retrieved");
+        var selectionData = allSectors.data();
+        assert.includeMembers(selectionData.map((datum) => datum.data), simpleData, "dataset data in selection data");
+
+        svg.remove();
+      });
+
+      it("skips invalid keys",() => {
+        var allSectors = piePlot.getAllSelections(["whoo"]);
+        assert.strictEqual(allSectors.size(), 0, "all sectors retrieved");
+
+        svg.remove();
+      });
+
     });
 
     describe("Fill", () => {

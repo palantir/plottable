@@ -116,6 +116,17 @@ export module _Util {
         Math.floor(inner.bottom) <= Math.ceil(outer.bottom)
       );
     }
+
+    export function getBoundingSVG(elem: SVGElement): SVGElement {
+      var ownerSVG = elem.ownerSVGElement;
+      if (ownerSVG != null) {
+        return ownerSVG;
+      }
+      if (elem.nodeName.toLowerCase() === "svg") { // elem itself is an SVG
+        return elem;
+      }
+      return null; // not in the DOM
+    }
   }
 }
 }

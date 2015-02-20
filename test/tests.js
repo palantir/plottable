@@ -291,6 +291,161 @@ describe("Drawers", function () {
             drawer.draw([], steps, null, null);
             assert.deepEqual(timings, [0, 20, 30], "setTimeout called with appropriate times");
         });
+        it("_getSelection", function () {
+            var svg = generateSVG(300, 300);
+            var drawer = new Plottable._Drawer.AbstractDrawer("test");
+            drawer.setup(svg.append("g"));
+            drawer._getSelector = function () { return "circle"; };
+            var data = [{ one: 2, two: 1 }, { one: 33, two: 21 }, { one: 11, two: 10 }];
+            var circles = drawer._getRenderArea().selectAll("circle").data(data);
+            circles.enter().append("circle").attr("cx", function (datum) { return datum.one; }).attr("cy", function (datum) { return datum.two; }).attr("r", 10);
+            var selection = drawer._getSelection(1);
+            assert.strictEqual(selection.node(), circles[0][1], "correct selection gotten");
+            svg.remove();
+        });
+    });
+});
+
+///<reference path="../testReference.ts" />
+describe("Drawers", function () {
+    describe("Arc Drawer", function () {
+        it("getPixelPoint", function () {
+            var svg = generateSVG(300, 300);
+            var data = [{ value: 10 }, { value: 10 }, { value: 10 }, { value: 10 }];
+            var piePlot = new Plottable.Plot.Pie();
+            var drawer = new Plottable._Drawer.Arc("one");
+            piePlot._getDrawer = function () { return drawer; };
+            piePlot.addDataset("one", data);
+            piePlot.project("value", "value");
+            piePlot.renderTo(svg);
+            piePlot.getAllSelections().each(function (datum, index) {
+                var selection = d3.select(this);
+                var pixelPoint = drawer._getPixelPoint(datum, index);
+                var radius = 75;
+                var angle = Math.PI / 4 + ((Math.PI * index) / 2);
+                var expectedX = radius * Math.sin(angle);
+                var expectedY = radius * Math.cos(angle);
+                assert.closeTo(pixelPoint.x, expectedX, 1, "x coordinate correct");
+                assert.closeTo(pixelPoint.y, expectedY, 1, "y coordinate correct");
+            });
+            svg.remove();
+        });
+    });
+});
+
+///<reference path="../testReference.ts" />
+describe("Drawers", function () {
+    describe("Rect Drawer", function () {
+        it("getPixelPoint vertical", function () {
+            var svg = generateSVG(300, 300);
+            var data = [{ a: "foo", b: 10 }, { a: "bar", b: 24 }];
+            var xScale = new Plottable.Scale.Ordinal();
+            var yScale = new Plottable.Scale.Linear();
+            var barPlot = new Plottable.Plot.Bar(xScale, yScale);
+            var drawer = new Plottable._Drawer.Rect("one", true);
+            barPlot._getDrawer = function () { return drawer; };
+            barPlot.addDataset("one", data);
+            barPlot.project("x", "a", xScale);
+            barPlot.project("y", "b", yScale);
+            barPlot.renderTo(svg);
+            barPlot.getAllSelections().each(function (datum, index) {
+                var selection = d3.select(this);
+                var pixelPoint = drawer._getPixelPoint(datum, index);
+                assert.closeTo(pixelPoint.x, parseFloat(selection.attr("x")) + parseFloat(selection.attr("width")) / 2, 1, "x coordinate correct");
+                assert.closeTo(pixelPoint.y, parseFloat(selection.attr("y")), 1, "y coordinate correct");
+            });
+            svg.remove();
+        });
+        it("getPixelPoint horizontal", function () {
+            var svg = generateSVG(300, 300);
+            var data = [{ a: "foo", b: 10 }, { a: "bar", b: 24 }];
+            var xScale = new Plottable.Scale.Linear();
+            var yScale = new Plottable.Scale.Ordinal();
+            var barPlot = new Plottable.Plot.Bar(xScale, yScale, false);
+            var drawer = new Plottable._Drawer.Rect("one", false);
+            barPlot._getDrawer = function () { return drawer; };
+            barPlot.addDataset("one", data);
+            barPlot.project("x", "b", xScale);
+            barPlot.project("y", "a", yScale);
+            barPlot.renderTo(svg);
+            barPlot.getAllSelections().each(function (datum, index) {
+                var selection = d3.select(this);
+                var pixelPoint = drawer._getPixelPoint(datum, index);
+                assert.closeTo(pixelPoint.x, parseFloat(selection.attr("x")) + parseFloat(selection.attr("width")), 1, "x coordinate correct");
+                assert.closeTo(pixelPoint.y, parseFloat(selection.attr("y")) + parseFloat(selection.attr("height")) / 2, 1, "y coordinate correct");
+            });
+            svg.remove();
+        });
+    });
+});
+
+///<reference path="../testReference.ts" />
+describe("Drawers", function () {
+    describe("Line Drawer", function () {
+        it("getPixelPoint", function () {
+            var svg = generateSVG(300, 300);
+            var data = [{ a: 12, b: 10 }, { a: 13, b: 24 }, { a: 14, b: 21 }, { a: 15, b: 14 }];
+            var xScale = new Plottable.Scale.Linear();
+            var yScale = new Plottable.Scale.Linear();
+            var linePlot = new Plottable.Plot.Line(xScale, yScale);
+            var drawer = new Plottable._Drawer.Line("one");
+            linePlot._getDrawer = function () { return drawer; };
+            linePlot.addDataset("one", data);
+            linePlot.project("x", "a", xScale);
+            linePlot.project("y", "b", yScale);
+            linePlot.renderTo(svg);
+            data.forEach(function (datum, index) {
+                var pixelPoint = drawer._getPixelPoint(datum, index);
+                assert.closeTo(pixelPoint.x, xScale.scale(datum.a), 1, "x coordinate correct for index " + index);
+                assert.closeTo(pixelPoint.y, yScale.scale(datum.b), 1, "y coordinate correct for index " + index);
+            });
+            svg.remove();
+        });
+        it("getSelection", function () {
+            var svg = generateSVG(300, 300);
+            var data = [{ a: 12, b: 10 }, { a: 13, b: 24 }, { a: 14, b: 21 }, { a: 15, b: 14 }];
+            var xScale = new Plottable.Scale.Linear();
+            var yScale = new Plottable.Scale.Linear();
+            var linePlot = new Plottable.Plot.Line(xScale, yScale);
+            var drawer = new Plottable._Drawer.Line("one");
+            linePlot._getDrawer = function () { return drawer; };
+            linePlot.addDataset("one", data);
+            linePlot.project("x", "a", xScale);
+            linePlot.project("y", "b", yScale);
+            linePlot.renderTo(svg);
+            var lineSelection = linePlot.getAllSelections();
+            data.forEach(function (datum, index) {
+                var selection = drawer._getSelection(index);
+                assert.strictEqual(selection.node(), lineSelection.node(), "line selection retrieved");
+            });
+            svg.remove();
+        });
+    });
+});
+
+///<reference path="../testReference.ts" />
+describe("Drawers", function () {
+    describe("Element Drawer", function () {
+        it("getPixelPoint circle", function () {
+            var svg = generateSVG(300, 300);
+            var data = [{ a: 12, b: 10 }, { a: 31, b: 24 }, { a: 22, b: 21 }, { a: 15, b: 14 }];
+            var xScale = new Plottable.Scale.Linear();
+            var yScale = new Plottable.Scale.Linear();
+            var scatterPlot = new Plottable.Plot.Scatter(xScale, yScale);
+            var drawer = new Plottable._Drawer.Element("one");
+            drawer._svgElement = "circle";
+            scatterPlot._getDrawer = function () { return drawer; };
+            scatterPlot.addDataset("one", data);
+            scatterPlot.project("x", "a", xScale);
+            scatterPlot.project("y", "b", yScale);
+            scatterPlot.renderTo(svg);
+            data.forEach(function (datum, index) {
+                var pixelPoint = drawer._getPixelPoint(datum, index);
+                assert.closeTo(pixelPoint.x, xScale.scale(datum.a), 1, "x coordinate correct");
+                assert.closeTo(pixelPoint.y, yScale.scale(datum.b), 1, "y coordinate correct");
+            });
+            svg.remove();
+        });
     });
 });
 
@@ -932,6 +1087,45 @@ describe("NumericAxis", function () {
         var interval = getClientRectCenter(visibleTickLabelRects[1]) - getClientRectCenter(visibleTickLabelRects[0]);
         for (var i = 0; i < visibleTickLabelRects.length - 1; i++) {
             assert.closeTo(getClientRectCenter(visibleTickLabelRects[i + 1]) - getClientRectCenter(visibleTickLabelRects[i]), interval, 0.5, "intervals are all spaced the same");
+        }
+        svg.remove();
+    });
+    it("does not draw ticks marks outside of the svg", function () {
+        var SVG_WIDTH = 300;
+        var SVG_HEIGHT = 100;
+        var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        var scale = new Plottable.Scale.Linear();
+        scale.domain([0, 3]);
+        scale.tickGenerator(function (s) {
+            return [0, 1, 2, 3, 4];
+        });
+        var baseAxis = new Plottable.Axis.Numeric(scale, "bottom");
+        baseAxis.renderTo(svg);
+        var tickMarks = baseAxis._element.selectAll(".tick-mark");
+        tickMarks.each(function () {
+            var tickMark = d3.select(this);
+            var tickMarkPosition = Number(tickMark.attr("x"));
+            assert.isTrue(tickMarkPosition >= 0 && tickMarkPosition <= SVG_WIDTH, "tick marks are located within the bounding SVG");
+        });
+        svg.remove();
+    });
+    it("renders tick labels properly when the domain is reversed", function () {
+        var SVG_WIDTH = 300;
+        var SVG_HEIGHT = 100;
+        var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        var scale = new Plottable.Scale.Linear();
+        scale.domain([3, 0]);
+        var baseAxis = new Plottable.Axis.Numeric(scale, "bottom");
+        baseAxis.renderTo(svg);
+        var tickLabels = baseAxis._element.selectAll(".tick-label").filter(function (d, i) {
+            var visibility = d3.select(this).style("visibility");
+            return (visibility === "visible") || (visibility === "inherit");
+        });
+        assert.isTrue(tickLabels[0].length > 1, "more than one tick label is shown");
+        for (var i = 0; i < tickLabels[0].length - 1; i++) {
+            var currLabel = d3.select(tickLabels[0][i]);
+            var nextLabel = d3.select(tickLabels[0][i + 1]);
+            assert.isTrue(Number(currLabel.text()) > Number(nextLabel.text()), "numbers are arranged in descending order from left to right");
         }
         svg.remove();
     });
@@ -1739,6 +1933,42 @@ describe("Plots", function () {
             svg1.remove();
             svg2.remove();
         });
+        it("getAllSelections() with dataset retrieval", function () {
+            var svg = generateSVG(400, 400);
+            var plot = new Plottable.Plot.AbstractPlot();
+            // Create mock drawers with already drawn items
+            var mockDrawer1 = new Plottable._Drawer.AbstractDrawer("ds1");
+            var renderArea1 = svg.append("g");
+            renderArea1.append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
+            mockDrawer1.setup = function () { return mockDrawer1._renderArea = renderArea1; };
+            mockDrawer1._getSelector = function () { return "circle"; };
+            var renderArea2 = svg.append("g");
+            renderArea2.append("circle").attr("cx", 10).attr("cy", 10).attr("r", 10);
+            var mockDrawer2 = new Plottable._Drawer.AbstractDrawer("ds2");
+            mockDrawer2.setup = function () { return mockDrawer2._renderArea = renderArea2; };
+            mockDrawer2._getSelector = function () { return "circle"; };
+            // Mock _getDrawer to return the mock drawers
+            plot._getDrawer = function (key) {
+                if (key === "ds1") {
+                    return mockDrawer1;
+                }
+                else {
+                    return mockDrawer2;
+                }
+            };
+            plot.addDataset("ds1", [{ value: 0 }, { value: 1 }, { value: 2 }]);
+            plot.addDataset("ds2", [{ value: 1 }, { value: 2 }, { value: 3 }]);
+            plot.renderTo(svg);
+            var selections = plot.getAllSelections();
+            assert.strictEqual(selections.size(), 2, "all circle selections gotten");
+            var oneSelection = plot.getAllSelections("ds1");
+            assert.strictEqual(oneSelection.size(), 1);
+            assert.strictEqual(numAttr(oneSelection, "cx"), 100, "retrieved selection in renderArea1");
+            var oneElementSelection = plot.getAllSelections(["ds2"]);
+            assert.strictEqual(oneElementSelection.size(), 1);
+            assert.strictEqual(numAttr(oneElementSelection, "cy"), 10, "retreieved selection in renderArea2");
+            svg.remove();
+        });
         describe("Dataset removal", function () {
             var plot;
             var d1;
@@ -2061,12 +2291,32 @@ describe("Plots", function () {
             piePlot.project("outer-radius", function () { return 250; });
             svg.remove();
         });
-        it("getAllSelections retrieves correct selections", function () {
-            var allSectors = piePlot.getAllSelections();
-            assert.strictEqual(allSectors.size(), 2, "all sectors retrieved");
-            var selectionData = allSectors.data();
-            assert.includeMembers(selectionData.map(function (datum) { return datum.data; }), simpleData, "dataset data in selection data");
-            svg.remove();
+        describe("getAllSelections", function () {
+            it("retrieves all dataset selections with no args", function () {
+                var allSectors = piePlot.getAllSelections();
+                var allSectors2 = piePlot.getAllSelections(piePlot._datasetKeysInOrder);
+                assert.deepEqual(allSectors, allSectors2, "all sectors retrieved");
+                svg.remove();
+            });
+            it("retrieves correct selections (array arg)", function () {
+                var allSectors = piePlot.getAllSelections(["simpleDataset"]);
+                assert.strictEqual(allSectors.size(), 2, "all sectors retrieved");
+                var selectionData = allSectors.data();
+                assert.includeMembers(selectionData.map(function (datum) { return datum.data; }), simpleData, "dataset data in selection data");
+                svg.remove();
+            });
+            it("retrieves correct selections (string arg)", function () {
+                var allSectors = piePlot.getAllSelections("simpleDataset");
+                assert.strictEqual(allSectors.size(), 2, "all sectors retrieved");
+                var selectionData = allSectors.data();
+                assert.includeMembers(selectionData.map(function (datum) { return datum.data; }), simpleData, "dataset data in selection data");
+                svg.remove();
+            });
+            it("skips invalid keys", function () {
+                var allSectors = piePlot.getAllSelections(["whoo"]);
+                assert.strictEqual(allSectors.size(), 0, "all sectors retrieved");
+                svg.remove();
+            });
         });
         describe("Fill", function () {
             it("sectors are filled in according to defaults", function () {
@@ -2205,7 +2455,7 @@ describe("Plots", function () {
             svg = generateSVG(500, 500);
             simpleDataset = new Plottable.Dataset(twoPointData);
             linePlot = new Plottable.Plot.Line(xScale, yScale);
-            linePlot.addDataset(simpleDataset).project("x", xAccessor, xScale).project("y", yAccessor, yScale).project("stroke", colorAccessor).addDataset(simpleDataset).renderTo(svg);
+            linePlot.addDataset("s1", simpleDataset).project("x", xAccessor, xScale).project("y", yAccessor, yScale).project("stroke", colorAccessor).addDataset("s2", simpleDataset).renderTo(svg);
             renderArea = linePlot._renderArea;
         });
         it("draws a line correctly", function () {
@@ -2316,18 +2566,54 @@ describe("Plots", function () {
             assert.strictEqual(parseFloat(hoverTarget.attr("cy")), yScale.scale(expectedDatum.bar), "hover target was positioned correctly (y)");
             svg.remove();
         });
-        it("getAllSelections retrieves correct selections", function () {
-            var dataset3 = [
-                { foo: 0, bar: 1 },
-                { foo: 1, bar: 0.95 }
-            ];
-            linePlot.addDataset(dataset3);
-            var allLines = linePlot.getAllSelections();
-            assert.strictEqual(allLines.size(), 3, "all lines retrieved");
-            var selectionData = allLines.data();
-            assert.include(selectionData, twoPointData, "first dataset data in selection data");
-            assert.include(selectionData, dataset3, "third dataset data in selection data");
-            svg.remove();
+        describe("getAllSelections()", function () {
+            it("retrieves all dataset selections with no args", function () {
+                var dataset3 = [
+                    { foo: 0, bar: 1 },
+                    { foo: 1, bar: 0.95 }
+                ];
+                linePlot.addDataset("d3", dataset3);
+                var allLines = linePlot.getAllSelections();
+                var allLines2 = linePlot.getAllSelections(linePlot._datasetKeysInOrder);
+                assert.deepEqual(allLines, allLines2, "all lines retrieved");
+                svg.remove();
+            });
+            it("retrieves correct selections (string arg)", function () {
+                var dataset3 = [
+                    { foo: 0, bar: 1 },
+                    { foo: 1, bar: 0.95 }
+                ];
+                linePlot.addDataset("d3", dataset3);
+                var allLines = linePlot.getAllSelections("d3");
+                assert.strictEqual(allLines.size(), 1, "all lines retrieved");
+                var selectionData = allLines.data();
+                assert.include(selectionData, dataset3, "third dataset data in selection data");
+                svg.remove();
+            });
+            it("retrieves correct selections (array arg)", function () {
+                var dataset3 = [
+                    { foo: 0, bar: 1 },
+                    { foo: 1, bar: 0.95 }
+                ];
+                linePlot.addDataset("d3", dataset3);
+                var allLines = linePlot.getAllSelections(["d3"]);
+                assert.strictEqual(allLines.size(), 1, "all lines retrieved");
+                var selectionData = allLines.data();
+                assert.include(selectionData, dataset3, "third dataset data in selection data");
+                svg.remove();
+            });
+            it("skips invalid keys", function () {
+                var dataset3 = [
+                    { foo: 0, bar: 1 },
+                    { foo: 1, bar: 0.95 }
+                ];
+                linePlot.addDataset("d3", dataset3);
+                var allLines = linePlot.getAllSelections(["d3", "test"]);
+                assert.strictEqual(allLines.size(), 1, "all lines retrieved");
+                var selectionData = allLines.data();
+                assert.include(selectionData, dataset3, "third dataset data in selection data");
+                svg.remove();
+            });
         });
         it("retains original classes when class is projected", function () {
             var newClassProjector = function () { return "pink"; };
@@ -2370,7 +2656,7 @@ describe("Plots", function () {
             svg = generateSVG(500, 500);
             simpleDataset = new Plottable.Dataset(twoPointData);
             areaPlot = new Plottable.Plot.Area(xScale, yScale);
-            areaPlot.addDataset(simpleDataset).project("x", xAccessor, xScale).project("y", yAccessor, yScale).project("y0", y0Accessor, yScale).project("fill", fillAccessor).project("stroke", colorAccessor).renderTo(svg);
+            areaPlot.addDataset("sd", simpleDataset).project("x", xAccessor, xScale).project("y", yAccessor, yScale).project("y0", y0Accessor, yScale).project("fill", fillAccessor).project("stroke", colorAccessor).renderTo(svg);
             renderArea = areaPlot._renderArea;
         });
         it("draws area and line correctly", function () {
@@ -2431,16 +2717,44 @@ describe("Plots", function () {
             assertAreaPathCloseTo(areaPathString, expectedPath, 0.1, "area d was set correctly (x=undefined case)");
             svg.remove();
         });
-        it("getAllSelections retrieves correct selections", function () {
-            var newTwoPointData = [{ foo: 2, bar: 1 }, { foo: 3, bar: 2 }];
-            var newDataset = new Plottable.Dataset(twoPointData);
-            areaPlot.addDataset(new Plottable.Dataset(newTwoPointData));
-            var allAreas = areaPlot.getAllSelections();
-            assert.strictEqual(allAreas.size(), 2, "all areas retrieved");
-            var selectionData = allAreas.data();
-            assert.include(selectionData, twoPointData, "first dataset data in selection data");
-            assert.include(selectionData, newTwoPointData, "new dataset data in selection data");
-            svg.remove();
+        describe("getAllSelections()", function () {
+            it("retrieves all selections with no args", function () {
+                var newTwoPointData = [{ foo: 2, bar: 1 }, { foo: 3, bar: 2 }];
+                areaPlot.addDataset("newTwo", new Plottable.Dataset(newTwoPointData));
+                var allAreas = areaPlot.getAllSelections();
+                var allAreas2 = areaPlot.getAllSelections(areaPlot._datasetKeysInOrder);
+                assert.deepEqual(allAreas, allAreas2, "all areas/lines retrieved");
+                assert.strictEqual(allAreas.filter(".line").size(), 2, "2 lines retrieved");
+                assert.strictEqual(allAreas.filter(".area").size(), 2, "2 areas retrieved");
+                svg.remove();
+            });
+            it("retrieves correct selections (string arg)", function () {
+                var newTwoPointData = [{ foo: 2, bar: 1 }, { foo: 3, bar: 2 }];
+                areaPlot.addDataset("newTwo", new Plottable.Dataset(newTwoPointData));
+                var allAreas = areaPlot.getAllSelections("newTwo");
+                assert.strictEqual(allAreas.size(), 2, "areas/lines retrieved");
+                var selectionData = allAreas.data();
+                assert.include(selectionData, newTwoPointData, "new dataset data in selection data");
+                svg.remove();
+            });
+            it("retrieves correct selections (array arg)", function () {
+                var newTwoPointData = [{ foo: 2, bar: 1 }, { foo: 3, bar: 2 }];
+                areaPlot.addDataset("newTwo", new Plottable.Dataset(newTwoPointData));
+                var allAreas = areaPlot.getAllSelections(["newTwo"]);
+                assert.strictEqual(allAreas.size(), 2, "areas/lines retrieved");
+                var selectionData = allAreas.data();
+                assert.include(selectionData, newTwoPointData, "new dataset data in selection data");
+                svg.remove();
+            });
+            it("skips invalid keys", function () {
+                var newTwoPointData = [{ foo: 2, bar: 1 }, { foo: 3, bar: 2 }];
+                areaPlot.addDataset("newTwo", new Plottable.Dataset(newTwoPointData));
+                var allAreas = areaPlot.getAllSelections(["newTwo", "test"]);
+                assert.strictEqual(allAreas.size(), 2, "areas/lines retrieved");
+                var selectionData = allAreas.data();
+                assert.include(selectionData, newTwoPointData, "new dataset data in selection data");
+                svg.remove();
+            });
         });
         it("retains original classes when class is projected", function () {
             var newClassProjector = function () { return "pink"; };
@@ -2846,17 +3160,52 @@ describe("Plots", function () {
                 verticalBarPlot.project("x", "x", xScale);
                 verticalBarPlot.project("y", "y", yScale);
             });
-            it("getAllSelections retrieves correct selections", function () {
+            it("retrieves all dataset selections with no args", function () {
                 var barData = [{ x: "foo", y: 5 }, { x: "bar", y: 640 }, { x: "zoo", y: 12345 }];
                 var barData2 = [{ x: "one", y: 5 }, { x: "two", y: 640 }, { x: "three", y: 12345 }];
-                verticalBarPlot.addDataset(barData);
-                verticalBarPlot.addDataset(barData2);
+                verticalBarPlot.addDataset("a", barData);
+                verticalBarPlot.addDataset("b", barData2);
                 verticalBarPlot.renderTo(svg);
                 var allBars = verticalBarPlot.getAllSelections();
+                var allBars2 = verticalBarPlot.getAllSelections(verticalBarPlot._datasetKeysInOrder);
+                assert.deepEqual(allBars, allBars2, "both ways of getting all selections work");
+                svg.remove();
+            });
+            it("retrieves correct selections (string arg)", function () {
+                var barData = [{ x: "foo", y: 5 }, { x: "bar", y: 640 }, { x: "zoo", y: 12345 }];
+                var barData2 = [{ x: "one", y: 5 }, { x: "two", y: 640 }, { x: "three", y: 12345 }];
+                verticalBarPlot.addDataset("a", barData);
+                verticalBarPlot.addDataset(barData2);
+                verticalBarPlot.renderTo(svg);
+                var allBars = verticalBarPlot.getAllSelections("a");
+                assert.strictEqual(allBars.size(), 3, "all bars retrieved");
+                var selectionData = allBars.data();
+                assert.includeMembers(selectionData, barData, "first dataset data in selection data");
+                svg.remove();
+            });
+            it("retrieves correct selections (array arg)", function () {
+                var barData = [{ x: "foo", y: 5 }, { x: "bar", y: 640 }, { x: "zoo", y: 12345 }];
+                var barData2 = [{ x: "one", y: 5 }, { x: "two", y: 640 }, { x: "three", y: 12345 }];
+                verticalBarPlot.addDataset("a", barData);
+                verticalBarPlot.addDataset("b", barData2);
+                verticalBarPlot.renderTo(svg);
+                var allBars = verticalBarPlot.getAllSelections(["a", "b"]);
                 assert.strictEqual(allBars.size(), 6, "all bars retrieved");
                 var selectionData = allBars.data();
                 assert.includeMembers(selectionData, barData, "first dataset data in selection data");
                 assert.includeMembers(selectionData, barData2, "second dataset data in selection data");
+                svg.remove();
+            });
+            it("skips invalid keys", function () {
+                var barData = [{ x: "foo", y: 5 }, { x: "bar", y: 640 }, { x: "zoo", y: 12345 }];
+                var barData2 = [{ x: "one", y: 5 }, { x: "two", y: 640 }, { x: "three", y: 12345 }];
+                verticalBarPlot.addDataset("a", barData);
+                verticalBarPlot.addDataset("b", barData2);
+                verticalBarPlot.renderTo(svg);
+                var allBars = verticalBarPlot.getAllSelections(["a", "c"]);
+                assert.strictEqual(allBars.size(), 3, "all bars retrieved");
+                var selectionData = allBars.data();
+                assert.includeMembers(selectionData, barData, "first dataset data in selection data");
                 svg.remove();
             });
         });
@@ -2969,19 +3318,62 @@ describe("Plots", function () {
             cellAV.attr("y", "100");
             svg.remove();
         });
-        it("getAllSelections retrieves correct selections", function () {
-            var xScale = new Plottable.Scale.Ordinal();
-            var yScale = new Plottable.Scale.Ordinal();
-            var colorScale = new Plottable.Scale.InterpolatedColor(["black", "white"]);
-            var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-            var gridPlot = new Plottable.Plot.Grid(xScale, yScale, colorScale);
-            gridPlot.addDataset(DATA).project("fill", "magnitude", colorScale).project("x", "x", xScale).project("y", "y", yScale);
-            gridPlot.renderTo(svg);
-            var allCells = gridPlot.getAllSelections();
-            assert.strictEqual(allCells.size(), 4, "all cells retrieved");
-            var selectionData = allCells.data();
-            assert.includeMembers(selectionData, DATA, "data in selection data");
-            svg.remove();
+        describe("getAllSelections()", function () {
+            it("retrieves all selections with no args", function () {
+                var xScale = new Plottable.Scale.Ordinal();
+                var yScale = new Plottable.Scale.Ordinal();
+                var colorScale = new Plottable.Scale.InterpolatedColor(["black", "white"]);
+                var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+                var gridPlot = new Plottable.Plot.Grid(xScale, yScale, colorScale);
+                gridPlot.addDataset("a", DATA).project("fill", "magnitude", colorScale).project("x", "x", xScale).project("y", "y", yScale);
+                gridPlot.renderTo(svg);
+                var allCells = gridPlot.getAllSelections();
+                var allCells2 = gridPlot.getAllSelections(gridPlot._datasetKeysInOrder);
+                assert.deepEqual(allCells, allCells2, "all cells retrieved");
+                svg.remove();
+            });
+            it("retrieves correct selections (string arg)", function () {
+                var xScale = new Plottable.Scale.Ordinal();
+                var yScale = new Plottable.Scale.Ordinal();
+                var colorScale = new Plottable.Scale.InterpolatedColor(["black", "white"]);
+                var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+                var gridPlot = new Plottable.Plot.Grid(xScale, yScale, colorScale);
+                gridPlot.addDataset("a", DATA).project("fill", "magnitude", colorScale).project("x", "x", xScale).project("y", "y", yScale);
+                gridPlot.renderTo(svg);
+                var allCells = gridPlot.getAllSelections("a");
+                assert.strictEqual(allCells.size(), 4, "all cells retrieved");
+                var selectionData = allCells.data();
+                assert.includeMembers(selectionData, DATA, "data in selection data");
+                svg.remove();
+            });
+            it("retrieves correct selections (array arg)", function () {
+                var xScale = new Plottable.Scale.Ordinal();
+                var yScale = new Plottable.Scale.Ordinal();
+                var colorScale = new Plottable.Scale.InterpolatedColor(["black", "white"]);
+                var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+                var gridPlot = new Plottable.Plot.Grid(xScale, yScale, colorScale);
+                gridPlot.addDataset("a", DATA).project("fill", "magnitude", colorScale).project("x", "x", xScale).project("y", "y", yScale);
+                gridPlot.renderTo(svg);
+                var allCells = gridPlot.getAllSelections(["a"]);
+                assert.strictEqual(allCells.size(), 4, "all cells retrieved");
+                var selectionData = allCells.data();
+                assert.includeMembers(selectionData, DATA, "data in selection data");
+                svg.remove();
+            });
+            it("skips invalid keys", function () {
+                var xScale = new Plottable.Scale.Ordinal();
+                var yScale = new Plottable.Scale.Ordinal();
+                var colorScale = new Plottable.Scale.InterpolatedColor(["black", "white"]);
+                var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+                var gridPlot = new Plottable.Plot.Grid(xScale, yScale, colorScale);
+                gridPlot.addDataset("a", DATA).project("fill", "magnitude", colorScale).project("x", "x", xScale).project("y", "y", yScale);
+                gridPlot.renderTo(svg);
+                var allCells = gridPlot.getAllSelections(["a", "b"]);
+                assert.strictEqual(allCells.size(), 4, "all cells retrieved");
+                var selectionData = allCells.data();
+                assert.includeMembers(selectionData, DATA, "data in selection data");
+                svg.remove();
+            });
         });
     });
 });
@@ -4234,10 +4626,10 @@ describe("Broadcasters", function () {
     it("arguments are passed through to callback", function () {
         var g2 = {};
         var g3 = "foo";
-        var cb = function (a1, rest) {
-            assert.equal(listenable, a1, "broadcaster passed through");
-            assert.equal(g2, rest[0], "arg1 passed through");
-            assert.equal(g3, rest[1], "arg2 passed through");
+        var cb = function (arg1, arg2, arg3) {
+            assert.strictEqual(listenable, arg1, "broadcaster passed through");
+            assert.strictEqual(g2, arg2, "g2 passed through");
+            assert.strictEqual(g3, arg3, "g3 passed through");
             called = true;
         };
         b.registerListener(null, cb);
@@ -5129,62 +5521,6 @@ describe("Component behavior", function () {
             assert.strictEqual(origin.x, groupWidth - cWidth + groupXOffset, "returns correct value (xAlign right)");
             assert.strictEqual(origin.y, groupHeight - cHeight + groupYOffset, "returns correct value (yAlign bottom)");
             svg.remove();
-        });
-    });
-    describe("resizeBroadcaster testing", function () {
-        var oldRegister;
-        var oldDeregister;
-        var registeredComponents;
-        var id;
-        before(function () {
-            oldRegister = Plottable.Core.ResizeBroadcaster.register;
-            oldDeregister = Plottable.Core.ResizeBroadcaster.deregister;
-            var mockRegister = function (c) {
-                registeredComponents.add(c.getID());
-            };
-            var mockDeregister = function (c) {
-                registeredComponents.remove(c.getID());
-            };
-            Plottable.Core.ResizeBroadcaster.register = mockRegister;
-            Plottable.Core.ResizeBroadcaster.deregister = mockDeregister;
-        });
-        after(function () {
-            Plottable.Core.ResizeBroadcaster.register = oldRegister;
-            Plottable.Core.ResizeBroadcaster.deregister = oldDeregister;
-        });
-        beforeEach(function () {
-            registeredComponents = d3.set();
-            id = c.getID();
-        });
-        afterEach(function () {
-            svg.remove(); // svg contains no useful info
-        });
-        it("components can be removed from resizeBroadcaster before rendering", function () {
-            c.autoResize(false);
-            c.renderTo(svg);
-            assert.isFalse(registeredComponents.has(id), "component not registered to broadcaster");
-        });
-        it("components register by default", function () {
-            c.renderTo(svg);
-            assert.isTrue(registeredComponents.has(id), "component is registered");
-        });
-        it("component can be deregistered then registered before render", function () {
-            c.autoResize(false);
-            c.autoResize(true);
-            c.renderTo(svg);
-            assert.isTrue(registeredComponents.has(id), "component is registered");
-        });
-        it("component can be deregistered after rendering", function () {
-            c.renderTo(svg);
-            c.autoResize(false);
-            assert.isFalse(registeredComponents.has(id), "component was deregistered after rendering");
-        });
-        it("calling .remove deregisters a component", function () {
-            c.autoResize(true);
-            c.renderTo(svg);
-            assert.isTrue(registeredComponents.has(id), "component is registered");
-            c.remove();
-            assert.isFalse(registeredComponents.has(id), "component is deregistered after removal");
         });
     });
 });
@@ -6793,7 +7129,7 @@ describe("Interactions", function () {
             ki.on(bCode, bCallback);
             component.registerInteraction(ki);
             var $hitbox = $(component._hitBox.node());
-            $hitbox.simulate("mouseover");
+            triggerFakeMouseEvent("mouseover", component._hitBox, 100, 100);
             $hitbox.simulate("keydown", { keyCode: aCode });
             assert.isTrue(aCallbackCalled, "callback for \"a\" was called when \"a\" key was pressed");
             assert.isFalse(bCallbackCalled, "callback for \"b\" was not called when \"a\" key was pressed");
@@ -6801,6 +7137,10 @@ describe("Interactions", function () {
             $hitbox.simulate("keydown", { keyCode: bCode });
             assert.isFalse(aCallbackCalled, "callback for \"a\" was not called when \"b\" key was pressed");
             assert.isTrue(bCallbackCalled, "callback for \"b\" was called when \"b\" key was pressed");
+            triggerFakeMouseEvent("mouseout", component._hitBox, -100, -100);
+            aCallbackCalled = false;
+            $hitbox.simulate("keydown", { keyCode: aCode });
+            assert.isFalse(aCallbackCalled, "callback for \"a\" was not called when not moused over the Component");
             svg.remove();
         });
     });
@@ -7166,7 +7506,7 @@ describe("Interactions", function () {
             assert.isTrue(overCallbackCalled, "onHoverOver was called when mousing into a new region");
             assert.deepEqual(overData.pixelPositions, [testTarget.rightPoint], "onHoverOver was called with the correct pixel position (left --> center)");
             assert.deepEqual(overData.data, ["right"], "onHoverOver was called with the new data only (left --> center)");
-            triggerFakeMouseEvent("mouseout", hitbox, 400, 200);
+            triggerFakeMouseEvent("mouseout", hitbox, 401, 200);
             overCallbackCalled = false;
             triggerFakeMouseEvent("mouseover", hitbox, 200, 200);
             assert.deepEqual(overData.pixelPositions, [testTarget.leftPoint, testTarget.rightPoint], "onHoverOver was called with the correct pixel positions");
@@ -7184,13 +7524,13 @@ describe("Interactions", function () {
             assert.deepEqual(outData.pixelPositions, [testTarget.leftPoint], "onHoverOut was called with the correct pixel position (center --> right)");
             assert.deepEqual(outData.data, ["left"], "onHoverOut was called with the correct data (center --> right)");
             outCallbackCalled = false;
-            triggerFakeMouseEvent("mouseout", hitbox, 400, 200);
+            triggerFakeMouseEvent("mouseout", hitbox, 401, 200);
             assert.isTrue(outCallbackCalled, "onHoverOut is called on mousing out of the Component");
             assert.deepEqual(outData.pixelPositions, [testTarget.rightPoint], "onHoverOut was called with the correct pixel position");
             assert.deepEqual(outData.data, ["right"], "onHoverOut was called with the correct data");
             outCallbackCalled = false;
             triggerFakeMouseEvent("mouseover", hitbox, 200, 200);
-            triggerFakeMouseEvent("mouseout", hitbox, 200, 400);
+            triggerFakeMouseEvent("mouseout", hitbox, 200, 401);
             assert.deepEqual(outData.pixelPositions, [testTarget.leftPoint, testTarget.rightPoint], "onHoverOut was called with the correct pixel positions");
             assert.deepEqual(outData.data, ["left", "right"], "onHoverOut is called with the correct data");
             svg.remove();
@@ -7204,7 +7544,7 @@ describe("Interactions", function () {
             currentlyHovered = hoverInteraction.getCurrentHoverData();
             assert.deepEqual(currentlyHovered.pixelPositions, [testTarget.leftPoint, testTarget.rightPoint], "retrieves pixel positions corresponding to the current position");
             assert.deepEqual(currentlyHovered.data, ["left", "right"], "retrieves data corresponding to the current position");
-            triggerFakeMouseEvent("mouseout", hitbox, 400, 200);
+            triggerFakeMouseEvent("mouseout", hitbox, 401, 200);
             currentlyHovered = hoverInteraction.getCurrentHoverData();
             assert.isNull(currentlyHovered.data, "returns null if not currently hovering");
             svg.remove();
@@ -7215,67 +7555,135 @@ describe("Interactions", function () {
 ///<reference path="../testReference.ts" />
 var assert = chai.assert;
 describe("Dispatchers", function () {
-    it("correctly registers for and deregisters from events", function () {
-        var target = generateSVG();
-        var dispatcher = new Plottable.Dispatcher.AbstractDispatcher(target);
-        var callbackWasCalled = false;
-        dispatcher._event2Callback["click"] = function () {
-            callbackWasCalled = true;
-        };
-        triggerFakeUIEvent("click", target);
-        assert.isFalse(callbackWasCalled, "The callback is not called before the dispatcher connect()s");
-        dispatcher.connect();
-        triggerFakeUIEvent("click", target);
-        assert.isTrue(callbackWasCalled, "The dispatcher called its callback");
-        callbackWasCalled = false;
-        dispatcher.disconnect();
-        triggerFakeUIEvent("click", target);
-        assert.isFalse(callbackWasCalled, "The callback is not called after the dispatcher disconnect()s");
-        target.remove();
-    });
-    it("target can be changed", function () {
-        var target1 = generateSVG();
-        var target2 = generateSVG();
-        var dispatcher = new Plottable.Dispatcher.AbstractDispatcher(target1);
-        var callbackWasCalled = false;
-        dispatcher._event2Callback["click"] = function () { return callbackWasCalled = true; };
-        dispatcher.connect();
-        triggerFakeUIEvent("click", target1);
-        assert.isTrue(callbackWasCalled, "The dispatcher received the event on the target");
-        dispatcher.target(target2);
-        callbackWasCalled = false;
-        triggerFakeUIEvent("click", target1);
-        assert.isFalse(callbackWasCalled, "The dispatcher did not receive the event on the old target");
-        triggerFakeUIEvent("click", target2);
-        assert.isTrue(callbackWasCalled, "The dispatcher received the event on the new target");
-        target1.remove();
-        target2.remove();
-    });
-    it("multiple dispatchers can be attached to the same target", function () {
-        var target = generateSVG();
-        var dispatcher1 = new Plottable.Dispatcher.AbstractDispatcher(target);
-        var called1 = false;
-        dispatcher1._event2Callback["click"] = function () { return called1 = true; };
-        dispatcher1.connect();
-        var dispatcher2 = new Plottable.Dispatcher.AbstractDispatcher(target);
-        var called2 = false;
-        dispatcher2._event2Callback["click"] = function () { return called2 = true; };
-        dispatcher2.connect();
-        triggerFakeUIEvent("click", target);
-        assert.isTrue(called1, "The first dispatcher called its callback");
-        assert.isTrue(called2, "The second dispatcher also called its callback");
-        target.remove();
-    });
-    it("can't double-connect", function () {
-        var target = generateSVG();
-        var dispatcher = new Plottable.Dispatcher.AbstractDispatcher(target);
-        dispatcher.connect();
-        assert.throws(function () { return dispatcher.connect(); }, "connect");
-        target.remove();
+    describe("AbstractDispatcher", function () {
+        it("_connect() and _disconnect()", function () {
+            var dispatcher = new Plottable.Dispatcher.AbstractDispatcher();
+            var callbackCalls = 0;
+            dispatcher._event2Callback["click"] = function () { return callbackCalls++; };
+            var d3document = d3.select(document);
+            dispatcher._connect();
+            triggerFakeUIEvent("click", d3document);
+            assert.strictEqual(callbackCalls, 1, "connected correctly (callback was called)");
+            dispatcher._connect();
+            callbackCalls = 0;
+            triggerFakeUIEvent("click", d3document);
+            assert.strictEqual(callbackCalls, 1, "can't double-connect (callback only called once)");
+            dispatcher._disconnect();
+            callbackCalls = 0;
+            triggerFakeUIEvent("click", d3document);
+            assert.strictEqual(callbackCalls, 0, "disconnected correctly (callback not called)");
+        });
+        it("won't _disconnect() if broadcasters still have listeners", function () {
+            var dispatcher = new Plottable.Dispatcher.AbstractDispatcher();
+            var callbackWasCalled = false;
+            dispatcher._event2Callback["click"] = function () { return callbackWasCalled = true; };
+            var b = new Plottable.Core.Broadcaster(dispatcher);
+            var key = "unit test";
+            b.registerListener(key, function () { return null; });
+            dispatcher._broadcasters = [b];
+            var d3document = d3.select(document);
+            dispatcher._connect();
+            triggerFakeUIEvent("click", d3document);
+            assert.isTrue(callbackWasCalled, "connected correctly (callback was called)");
+            dispatcher._disconnect();
+            callbackWasCalled = false;
+            triggerFakeUIEvent("click", d3document);
+            assert.isTrue(callbackWasCalled, "didn't disconnect while broadcaster had listener");
+            b.deregisterListener(key);
+            dispatcher._disconnect();
+            callbackWasCalled = false;
+            triggerFakeUIEvent("click", d3document);
+            assert.isFalse(callbackWasCalled, "disconnected when broadcaster had no listeners");
+        });
+        it("_setCallback()", function () {
+            var dispatcher = new Plottable.Dispatcher.AbstractDispatcher();
+            var b = new Plottable.Core.Broadcaster(dispatcher);
+            var key = "unit test";
+            var callbackWasCalled = false;
+            var callback = function () { return callbackWasCalled = true; };
+            dispatcher._setCallback(b, key, callback);
+            b.broadcast();
+            assert.isTrue(callbackWasCalled, "callback was called after setting with _setCallback()");
+            dispatcher._setCallback(b, key, null);
+            callbackWasCalled = false;
+            b.broadcast();
+            assert.isFalse(callbackWasCalled, "callback was removed by calling _setCallback() with null");
+        });
     });
     describe("Mouse Dispatcher", function () {
-        it("passes event position to mouseover, mousemove, and mouseout callbacks", function () {
-            var target = generateSVG();
+        it("getDispatcher() creates only one Dispatcher.Mouse per <svg>", function () {
+            var svg = generateSVG();
+            var md1 = Plottable.Dispatcher.Mouse.getDispatcher(svg.node());
+            assert.isNotNull(md1, "created a new Dispatcher on an SVG");
+            var md2 = Plottable.Dispatcher.Mouse.getDispatcher(svg.node());
+            assert.strictEqual(md1, md2, "returned the existing Dispatcher if called again with same <svg>");
+            svg.remove();
+        });
+        it("getLastMousePosition() defaults to a non-null value", function () {
+            var svg = generateSVG();
+            var md = Plottable.Dispatcher.Mouse.getDispatcher(svg.node());
+            var p = md.getLastMousePosition();
+            assert.isNotNull(p, "returns a value after initialization");
+            assert.isNotNull(p.x, "x value is set");
+            assert.isNotNull(p.y, "y value is set");
+            svg.remove();
+        });
+        it("can remove callbacks by passing null", function () {
+            var targetWidth = 400, targetHeight = 400;
+            var target = generateSVG(targetWidth, targetHeight);
+            // HACKHACK: PhantomJS can't measure SVGs unless they have something in them occupying space
+            target.append("rect").attr("width", targetWidth).attr("height", targetHeight);
+            var targetX = 17;
+            var targetY = 76;
+            var md = Plottable.Dispatcher.Mouse.getDispatcher(target.node());
+            var cb1Called = false;
+            var cb1 = function (p) {
+                cb1Called = true;
+            };
+            var cb2Called = false;
+            var cb2 = function (p) {
+                cb2Called = true;
+            };
+            md.onMouseMove("callback1", cb1);
+            md.onMouseMove("callback2", cb2);
+            triggerFakeMouseEvent("mousemove", target, targetX, targetY);
+            assert.isTrue(cb1Called, "callback 1 was called on mousemove");
+            assert.isTrue(cb2Called, "callback 2 was called on mousemove");
+            cb1Called = false;
+            cb2Called = false;
+            md.onMouseMove("callback1", null);
+            triggerFakeMouseEvent("mousemove", target, targetX, targetY);
+            assert.isFalse(cb1Called, "callback was not called after blanking");
+            assert.isTrue(cb2Called, "callback 2 was still called");
+            target.remove();
+        });
+        it("doesn't call callbacks if not in the DOM", function () {
+            var targetWidth = 400, targetHeight = 400;
+            var target = generateSVG(targetWidth, targetHeight);
+            // HACKHACK: PhantomJS can't measure SVGs unless they have something in them occupying space
+            target.append("rect").attr("width", targetWidth).attr("height", targetHeight);
+            var targetX = 17;
+            var targetY = 76;
+            var md = Plottable.Dispatcher.Mouse.getDispatcher(target.node());
+            var callbackWasCalled = false;
+            var callback = function (p) {
+                callbackWasCalled = true;
+            };
+            var keyString = "notInDomTest";
+            md.onMouseMove(keyString, callback);
+            triggerFakeMouseEvent("mousemove", target, targetX, targetY);
+            assert.isTrue(callbackWasCalled, "callback was called on mousemove");
+            target.remove();
+            callbackWasCalled = false;
+            triggerFakeMouseEvent("mousemove", target, targetX, targetY);
+            assert.isFalse(callbackWasCalled, "callback was not called after <svg> was removed from DOM");
+            md.onMouseMove(keyString, null);
+        });
+        it("calls callbacks on mouseover, mousemove, and mouseout", function () {
+            var targetWidth = 400, targetHeight = 400;
+            var target = generateSVG(targetWidth, targetHeight);
+            // HACKHACK: PhantomJS can't measure SVGs unless they have something in them occupying space
+            target.append("rect").attr("width", targetWidth).attr("height", targetHeight);
             var targetX = 17;
             var targetY = 76;
             var expectedPoint = {
@@ -7287,55 +7695,36 @@ describe("Dispatchers", function () {
                 assert.closeTo(actual.y, expected.y, epsilon, message + " (y)");
             }
             ;
-            var md = new Plottable.Dispatcher.Mouse(target);
-            var mouseoverCalled = false;
-            md.mouseover(function (p) {
-                mouseoverCalled = true;
-                assertPointsClose(p, expectedPoint, 0.5, "the mouse position was passed to the callback");
-            });
-            var mousemoveCalled = false;
-            md.mousemove(function (p) {
-                mousemoveCalled = true;
-                assertPointsClose(p, expectedPoint, 0.5, "the mouse position was passed to the callback");
-            });
-            var mouseoutCalled = false;
-            md.mouseout(function (p) {
-                mouseoutCalled = true;
-                assertPointsClose(p, expectedPoint, 0.5, "the mouse position was passed to the callback");
-            });
-            md.connect();
+            var md = Plottable.Dispatcher.Mouse.getDispatcher(target.node());
+            var callbackWasCalled = false;
+            var callback = function (p) {
+                callbackWasCalled = true;
+                assertPointsClose(p, expectedPoint, 0.5, "mouse position is correct");
+            };
+            var keyString = "unit test";
+            md.onMouseMove(keyString, callback);
             triggerFakeMouseEvent("mouseover", target, targetX, targetY);
-            assert.isTrue(mouseoverCalled, "mouseover callback was called");
+            assert.isTrue(callbackWasCalled, "callback was called on mouseover");
+            callbackWasCalled = false;
             triggerFakeMouseEvent("mousemove", target, targetX, targetY);
-            assert.isTrue(mousemoveCalled, "mousemove callback was called");
+            assert.isTrue(callbackWasCalled, "callback was called on mousemove");
+            callbackWasCalled = false;
             triggerFakeMouseEvent("mouseout", target, targetX, targetY);
-            assert.isTrue(mouseoutCalled, "mouseout callback was called");
+            assert.isTrue(callbackWasCalled, "callback was called on mouseout");
+            md.onMouseMove(keyString, null);
             target.remove();
         });
     });
-    describe("Keypress Dispatcher", function () {
-        it("triggers the callback only when moused over the target", function () {
-            var target = generateSVG(400, 400);
-            var kpd = new Plottable.Dispatcher.Keypress(target);
-            var keyDownCalled = false;
-            var lastKeyCode;
-            kpd.onKeyDown(function (e) {
-                keyDownCalled = true;
-                lastKeyCode = e.keyCode;
-            });
-            kpd.connect();
-            var $target = $(target.node());
-            $target.simulate("keydown", { keyCode: 80 });
-            assert.isFalse(keyDownCalled, "didn't trigger callback if not moused over the target");
-            $target.simulate("mouseover");
-            $target.simulate("keydown", { keyCode: 80 });
-            assert.isTrue(keyDownCalled, "correctly triggers callback if moused over the target");
-            assert.strictEqual(lastKeyCode, 80, "correct event info was passed to the callback");
-            keyDownCalled = false;
-            $target.simulate("mouseout");
-            $target.simulate("keydown", { keyCode: 80 });
-            assert.isFalse(keyDownCalled, "didn't trigger callback after mousing out of the target");
-            target.remove();
+    describe("Key Dispatcher", function () {
+        it("triggers callback on mousedown", function () {
+            var ked = Plottable.Dispatcher.Key.getDispatcher();
+            var keyDowned = false;
+            var callback = function () { return keyDowned = true; };
+            var keyString = "unit test";
+            ked.onKeyDown(keyString, callback);
+            $("body").simulate("keydown", { keyCode: 65 });
+            assert.isTrue(keyDowned, "callback when a key was pressed");
+            ked.onKeyDown(keyString, null); // clean up
         });
     });
 });

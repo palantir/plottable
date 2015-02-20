@@ -119,24 +119,88 @@ describe("Plots", () => {
       svg.remove();
     });
 
-    it("getAllSelections retrieves correct selections",() => {
-      var xScale: Plottable.Scale.Ordinal = new Plottable.Scale.Ordinal();
-      var yScale: Plottable.Scale.Ordinal = new Plottable.Scale.Ordinal();
-      var colorScale: Plottable.Scale.InterpolatedColor = new Plottable.Scale.InterpolatedColor(["black", "white"]);
-      var svg: D3.Selection = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var gridPlot: Plottable.Plot.Grid = new Plottable.Plot.Grid(xScale, yScale, colorScale);
-      gridPlot.addDataset(DATA)
-        .project("fill", "magnitude", colorScale)
-        .project("x", "x", xScale)
-        .project("y", "y", yScale);
-      gridPlot.renderTo(svg);
+    describe("getAllSelections()", () => {
 
-      var allCells = gridPlot.getAllSelections();
-      assert.strictEqual(allCells.size(), 4, "all cells retrieved");
-      var selectionData = allCells.data();
-      assert.includeMembers(selectionData, DATA, "data in selection data");
+      it("retrieves all selections with no args", () => {
+        var xScale: Plottable.Scale.Ordinal = new Plottable.Scale.Ordinal();
+        var yScale: Plottable.Scale.Ordinal = new Plottable.Scale.Ordinal();
+        var colorScale: Plottable.Scale.InterpolatedColor = new Plottable.Scale.InterpolatedColor(["black", "white"]);
+        var svg: D3.Selection = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        var gridPlot: Plottable.Plot.Grid = new Plottable.Plot.Grid(xScale, yScale, colorScale);
+        gridPlot.addDataset("a", DATA)
+                .project("fill", "magnitude", colorScale)
+                .project("x", "x", xScale)
+                .project("y", "y", yScale);
+        gridPlot.renderTo(svg);
 
-      svg.remove();
+        var allCells = gridPlot.getAllSelections();
+        var allCells2 = gridPlot.getAllSelections((<any> gridPlot)._datasetKeysInOrder);
+        assert.deepEqual(allCells, allCells2, "all cells retrieved");
+
+        svg.remove();
+      });
+
+      it("retrieves correct selections (string arg)", () => {
+        var xScale: Plottable.Scale.Ordinal = new Plottable.Scale.Ordinal();
+        var yScale: Plottable.Scale.Ordinal = new Plottable.Scale.Ordinal();
+        var colorScale: Plottable.Scale.InterpolatedColor = new Plottable.Scale.InterpolatedColor(["black", "white"]);
+        var svg: D3.Selection = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        var gridPlot: Plottable.Plot.Grid = new Plottable.Plot.Grid(xScale, yScale, colorScale);
+        gridPlot.addDataset("a", DATA)
+                .project("fill", "magnitude", colorScale)
+                .project("x", "x", xScale)
+                .project("y", "y", yScale);
+        gridPlot.renderTo(svg);
+
+        var allCells = gridPlot.getAllSelections("a");
+        assert.strictEqual(allCells.size(), 4, "all cells retrieved");
+        var selectionData = allCells.data();
+        assert.includeMembers(selectionData, DATA, "data in selection data");
+
+        svg.remove();
+      });
+
+      it("retrieves correct selections (array arg)", () => {
+        var xScale: Plottable.Scale.Ordinal = new Plottable.Scale.Ordinal();
+        var yScale: Plottable.Scale.Ordinal = new Plottable.Scale.Ordinal();
+        var colorScale: Plottable.Scale.InterpolatedColor = new Plottable.Scale.InterpolatedColor(["black", "white"]);
+        var svg: D3.Selection = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        var gridPlot: Plottable.Plot.Grid = new Plottable.Plot.Grid(xScale, yScale, colorScale);
+        gridPlot.addDataset("a", DATA)
+          .project("fill", "magnitude", colorScale)
+          .project("x", "x", xScale)
+          .project("y", "y", yScale);
+        gridPlot.renderTo(svg);
+
+        var allCells = gridPlot.getAllSelections(["a"]);
+        assert.strictEqual(allCells.size(), 4, "all cells retrieved");
+        var selectionData = allCells.data();
+        assert.includeMembers(selectionData, DATA, "data in selection data");
+
+        svg.remove();
+      });
+
+      it("skips invalid keys", () => {
+        var xScale: Plottable.Scale.Ordinal = new Plottable.Scale.Ordinal();
+        var yScale: Plottable.Scale.Ordinal = new Plottable.Scale.Ordinal();
+        var colorScale: Plottable.Scale.InterpolatedColor = new Plottable.Scale.InterpolatedColor(["black", "white"]);
+        var svg: D3.Selection = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        var gridPlot: Plottable.Plot.Grid = new Plottable.Plot.Grid(xScale, yScale, colorScale);
+        gridPlot.addDataset("a", DATA)
+          .project("fill", "magnitude", colorScale)
+          .project("x", "x", xScale)
+          .project("y", "y", yScale);
+        gridPlot.renderTo(svg);
+
+        var allCells = gridPlot.getAllSelections(["a", "b"]);
+        assert.strictEqual(allCells.size(), 4, "all cells retrieved");
+        var selectionData = allCells.data();
+        assert.includeMembers(selectionData, DATA, "data in selection data");
+
+        svg.remove();
+      });
+
     });
+
   });
 });

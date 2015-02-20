@@ -64,7 +64,15 @@ export module Axis {
     }
 
     protected _getTickValues(): any[] {
-      return (<Scale.AbstractQuantitative<number>> this._scale).ticks();
+      var scale = (<Scale.AbstractQuantitative<number>> this._scale);
+      var domain = scale.domain();
+      var min = domain[0] <= domain[1] ? domain[0] : domain[1];
+      var max = domain[0] >= domain[1] ? domain[0] : domain[1];
+      if (min === domain[0]) {
+        return scale.ticks().filter((i: number) => i >= min && i <= max);
+      } else {
+        return scale.ticks().filter((i: number) => i >= min && i <= max).reverse();
+      }
     }
 
     protected _rescale() {
