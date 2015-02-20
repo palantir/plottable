@@ -121,9 +121,8 @@ module Plottable {
       return (d: any) => {
         var multiplier = Math.pow(10, precision);
         var val = Math.round(d * multiplier) / multiplier;
-        return d3.format("." + precision + "s")(val === -0 ? -val : val);
-      }
-      // return (d: any) => d3.format("." + precision + "s")(val === -0 ? -val : val);
+        return d3.format("." + precision + "s")(val === -0 ? -val : val); // fix for -0.00
+      };
     }
 
     /**
