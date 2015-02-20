@@ -118,7 +118,11 @@ module Plottable {
      */
     export function siSuffix(precision = 3) {
       verifyPrecision(precision);
-      return (d: any) => d3.format("." + precision + "s")(d);
+      return (d: any) => {
+        var multiplier = Math.pow(10, precision);
+        var val = Math.round(d * multiplier) / multiplier;
+        return d3.format("." + precision + "s")(val === -0 ? -val : val); // fix for -0.00
+      };
     }
 
     /**

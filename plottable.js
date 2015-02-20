@@ -881,7 +881,11 @@ var Plottable;
         function siSuffix(precision) {
             if (precision === void 0) { precision = 3; }
             verifyPrecision(precision);
-            return function (d) { return d3.format("." + precision + "s")(d); };
+            return function (d) {
+                var multiplier = Math.pow(10, precision);
+                var val = Math.round(d * multiplier) / multiplier;
+                return d3.format("." + precision + "s")(val === -0 ? -val : val); // fix for -0.00
+            };
         }
         Formatters.siSuffix = siSuffix;
         /**
