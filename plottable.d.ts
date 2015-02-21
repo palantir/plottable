@@ -129,6 +129,7 @@ declare module Plottable {
             function lightenColor(color: string, factor: number): string;
             function darkenColor(color: string, factor: number, darkenAmount: number): string;
             function pointDistance(p1: Point, p2: Point): number;
+            function clamp(value: number, min: number, max: number): number;
         }
     }
 }
@@ -1556,6 +1557,7 @@ declare module Plottable {
             _getIfLabelsTooWide(): boolean;
             drawText(data: any[], attrToProjector: AttributeToProjector, userMetadata: any, plotMetadata: Plot.PlotMetadata): void;
             _getPixelPoint(datum: any, index: number): Point;
+            _getClosestPixelPoint(datum: any, index: number, pixelPoint: Point): Point;
         }
     }
 }

@@ -329,6 +329,16 @@ export module _Util {
     export function pointDistance(p1: Point, p2: Point): number {
       return Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
     }
+
+    export function clamp(value: number, min: number, max: number): number {
+      if (value < min) {
+        return min;
+      } else if (value < max) {
+        return max;
+      } else {
+        return value;
+      }
+    }
   }
 }
 }

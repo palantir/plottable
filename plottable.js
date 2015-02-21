@@ -326,6 +326,18 @@ var Plottable;
                 return Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
             }
             Methods.pointDistance = pointDistance;
+            function clamp(value, min, max) {
+                if (value < min) {
+                    return min;
+                }
+                else if (value < max) {
+                    return max;
+                }
+                else {
+                    return value;
+                }
+            }
+            Methods.clamp = clamp;
         })(Methods = _Util.Methods || (_Util.Methods = {}));
     })(_Util = Plottable._Util || (Plottable._Util = {}));
 })(Plottable || (Plottable = {}));
@@ -3166,6 +3178,18 @@ var Plottable;
                 var x = this._isVertical ? rectX + rectWidth / 2 : rectX + rectWidth;
                 var y = this._isVertical ? rectY : rectY + rectHeight / 2;
                 return { x: x, y: y };
+            };
+            Rect.prototype._getClosestPixelPoint = function (datum, index, pixelPoint) {
+                var rectX = this._attrToProjector["x"](datum, index);
+                var rectY = this._attrToProjector["y"](datum, index);
+                var rectWidth = this._attrToProjector["width"](datum, index);
+                var rectHeight = this._attrToProjector["height"](datum, index);
+                if (Plottable._Util.Methods.inRange(pixelPoint.x, rectX, rectX + rectWidth) && Plottable._Util.Methods.inRange(pixelPoint.y, rectY, rectY + rectHeight)) {
+                    return pixelPoint;
+                }
+                else {
+                    return { x: Plottable._Util.Methods.clamp(pixelPoint.x, rectX, rectX + rectWidth), y: Plottable._Util.Methods.clamp(pixelPoint.y, rectY, rectY + rectHeight) };
+                }
             };
             return Rect;
         })(_Drawer.Element);
