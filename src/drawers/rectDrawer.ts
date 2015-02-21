@@ -94,11 +94,11 @@ export module _Drawer {
       return { x: x, y: y };
     }
 
-    public _getClosestPixelPoint(datum: any, index: number, pixelPoint: Point): Point {
-      var rectX = this._attrToProjector["x"](datum, index);
-      var rectY = this._attrToProjector["y"](datum, index);
-      var rectWidth = this._attrToProjector["width"](datum, index);
-      var rectHeight = this._attrToProjector["height"](datum, index);
+    public _getClosestPixelPoint(selection: D3.Selection, pixelPoint: Point): Point {
+      var rectX = parseFloat(selection.attr("x"));
+      var rectY = parseFloat(selection.attr("y"));
+      var rectWidth = parseFloat(selection.attr("width"));
+      var rectHeight = parseFloat(selection.attr("height"));
 
       if (Plottable._Util.Methods.inRange(pixelPoint.x, rectX, rectX + rectWidth) &&
           Plottable._Util.Methods.inRange(pixelPoint.y, rectY, rectY + rectHeight)) {

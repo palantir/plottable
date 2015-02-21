@@ -2819,7 +2819,7 @@ var Plottable;
                 var allSelections = this._getRenderArea().selectAll(this._getSelector());
                 return d3.select(allSelections[0][index]);
             };
-            AbstractDrawer.prototype._getClosestPixelPoint = function (datum, index, pixelPoint) {
+            AbstractDrawer.prototype._getClosestPixelPoint = function (selection, pixelPoint) {
                 return null;
             };
             return AbstractDrawer;
@@ -3077,10 +3077,10 @@ var Plottable;
             Circle.prototype._getPixelPoint = function (datum, index) {
                 return { x: this._attrToProjector["cx"](datum, index), y: this._attrToProjector["cy"](datum, index) };
             };
-            Circle.prototype._getClosestPixelPoint = function (datum, index, pixelPoint) {
-                var circleX = this._attrToProjector["cx"](datum, index);
-                var circleY = this._attrToProjector["cy"](datum, index);
-                var circleRadius = this._attrToProjector["r"](datum, index);
+            Circle.prototype._getClosestPixelPoint = function (selection, pixelPoint) {
+                var circleX = parseFloat(selection.attr("cx"));
+                var circleY = parseFloat(selection.attr("cy"));
+                var circleRadius = parseFloat(selection.attr("r"));
                 var circleCenter = { x: circleX, y: circleY };
                 if (Plottable._Util.Methods.pointDistance(circleCenter, pixelPoint) <= circleRadius) {
                     return pixelPoint;
@@ -3192,11 +3192,11 @@ var Plottable;
                 var y = this._isVertical ? rectY : rectY + rectHeight / 2;
                 return { x: x, y: y };
             };
-            Rect.prototype._getClosestPixelPoint = function (datum, index, pixelPoint) {
-                var rectX = this._attrToProjector["x"](datum, index);
-                var rectY = this._attrToProjector["y"](datum, index);
-                var rectWidth = this._attrToProjector["width"](datum, index);
-                var rectHeight = this._attrToProjector["height"](datum, index);
+            Rect.prototype._getClosestPixelPoint = function (selection, pixelPoint) {
+                var rectX = parseFloat(selection.attr("x"));
+                var rectY = parseFloat(selection.attr("y"));
+                var rectWidth = parseFloat(selection.attr("width"));
+                var rectHeight = parseFloat(selection.attr("height"));
                 if (Plottable._Util.Methods.inRange(pixelPoint.x, rectX, rectX + rectWidth) && Plottable._Util.Methods.inRange(pixelPoint.y, rectY, rectY + rectHeight)) {
                     return pixelPoint;
                 }

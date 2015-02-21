@@ -154,7 +154,7 @@ export module _Drawer {
       return d3.select(allSelections[0][index]);
     }
 
-    public _getClosestPixelPoint(datum: any, index: number, pixelPoint: Point): Point {
+    public _getClosestPixelPoint(selection: D3.Selection, pixelPoint: Point): Point {
       return null;
     }
 

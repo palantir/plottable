@@ -13,10 +13,10 @@ export module _Drawer {
       return { x: this._attrToProjector["cx"](datum, index), y: this._attrToProjector["cy"](datum, index) };
     }
 
-    public _getClosestPixelPoint(datum: any, index: number, pixelPoint: Point): Point {
-      var circleX = this._attrToProjector["cx"](datum, index);
-      var circleY = this._attrToProjector["cy"](datum, index);
-      var circleRadius = this._attrToProjector["r"](datum, index);
+    public _getClosestPixelPoint(selection: D3.Selection, pixelPoint: Point): Point {
+      var circleX = parseFloat(selection.attr("cx"));
+      var circleY = parseFloat(selection.attr("cy"));
+      var circleRadius = parseFloat(selection.attr("r"));
 
       var circleCenter = {x: circleX, y: circleY};
       if (_Util.Methods.pointDistance(circleCenter, pixelPoint) <= circleRadius) {

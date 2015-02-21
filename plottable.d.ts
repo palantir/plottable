@@ -1477,7 +1477,7 @@ declare module Plottable {
             _getSelector(): string;
             _getPixelPoint(datum: any, index: number): Point;
             _getSelection(index: number): D3.Selection;
-            _getClosestPixelPoint(datum: any, index: number, pixelPoint: Point): Point;
+            _getClosestPixelPoint(selection: D3.Selection, pixelPoint: Point): Point;
         }
     }
 }
@@ -1543,7 +1543,7 @@ declare module Plottable {
         class Circle extends Element {
             constructor(key: string);
             _getPixelPoint(datum: any, index: number): Point;
-            _getClosestPixelPoint(datum: any, index: number, pixelPoint: Point): Point;
+            _getClosestPixelPoint(selection: D3.Selection, pixelPoint: Point): Point;
         }
     }
 }
@@ -1558,7 +1558,7 @@ declare module Plottable {
             _getIfLabelsTooWide(): boolean;
             drawText(data: any[], attrToProjector: AttributeToProjector, userMetadata: any, plotMetadata: Plot.PlotMetadata): void;
             _getPixelPoint(datum: any, index: number): Point;
-            _getClosestPixelPoint(datum: any, index: number, pixelPoint: Point): Point;
+            _getClosestPixelPoint(selection: D3.Selection, pixelPoint: Point): Point;
         }
     }
 }
