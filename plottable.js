@@ -2807,6 +2807,9 @@ var Plottable;
                 var allSelections = this._getRenderArea().selectAll(this._getSelector());
                 return d3.select(allSelections[0][index]);
             };
+            AbstractDrawer.prototype._getClosestPixelPoint = function (datum, index, pixelPoint) {
+                return null;
+            };
             return AbstractDrawer;
         })();
         _Drawer.AbstractDrawer = AbstractDrawer;
