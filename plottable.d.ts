@@ -1543,6 +1543,7 @@ declare module Plottable {
         class Circle extends Element {
             constructor(key: string);
             _getPixelPoint(datum: any, index: number): Point;
+            _getClosestPixelPoint(datum: any, index: number, pixelPoint: Point): Point;
         }
     }
 }
