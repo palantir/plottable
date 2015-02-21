@@ -1494,6 +1494,7 @@ declare module Plottable {
             _getSelector(): string;
             _getPixelPoint(datum: any, index: number): Point;
             _getSelection(index: number): D3.Selection;
+            _getClosestPixelPoint(selection: D3.Selection, pixelPoint: Point): Point;
         }
     }
 }

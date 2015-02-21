@@ -2892,6 +2892,33 @@ var Plottable;
             Line.prototype._getSelection = function (index) {
                 return this._getRenderArea().select(this._getSelector());
             };
+            Line.prototype._getClosestPixelPoint = function (selection, pixelPoint) {
+                var _this = this;
+                var closestPixelPoint;
+                var closestDistance = Infinity;
+                var lineSegments = d3.pairs(selection.data().map(function (datum, index) { return _this._getPixelPoint(datum, index); }));
+                lineSegments.forEach(function (lineSegment) {
+                    var slope = (lineSegment[1].y - lineSegment[0].y) / (lineSegment[1].x - lineSegment[0].x);
+                    var lineConstant = lineSegment[0].y - slope * lineSegment[0].x;
+                    if (Plottable._Util.Methods.inRange(pixelPoint.x, lineSegment[0].x, lineSegment[1].x) && Plottable._Util.Methods.inRange(pixelPoint.y, lineSegment[0].y, lineSegment[1].y) && (slope * pixelPoint.x + lineConstant === pixelPoint.y)) {
+                        closestPixelPoint = pixelPoint;
+                        closestDistance = 0;
+                    }
+                    else {
+                        var intersectingSlope = -1 / slope;
+                        var intersectingConstant = pixelPoint.y - intersectingSlope * pixelPoint.x;
+                        var intersectionPointX = (intersectingConstant - lineConstant) / (slope - intersectingSlope);
+                        var intersectionPointY = intersectingSlope * intersectingPointX + intersectingConstant;
+                        var intersectionPoint = { x: intersectionPointX, y: intersectionPointY };
+                        var intersectionPointDistance = Plottable._Util.Methods.pointDistance(intersectionPoint, pixelPoint);
+                        if (intersectionPointDistance < closestDistance) {
+                            closestPixelPoint = intersectionPoint;
+                            closestDistance = intersectionPointDistance;
+                        }
+                    }
+                });
+                return closestPixelPoint;
+            };
             Line.LINE_CLASS = "line";
             return Line;
         })(_Drawer.AbstractDrawer);

@@ -72,6 +72,36 @@ export module _Drawer {
     public _getSelection(index: number): D3.Selection {
       return this._getRenderArea().select(this._getSelector());
     }
+
+    public _getClosestPixelPoint(selection: D3.Selection, pixelPoint: Point): Point {
+      var closestPixelPoint: Point;
+      var closestDistance = Infinity;
+      var lineSegments = d3.pairs(selection.data().map((datum, index) => this._getPixelPoint(datum, index)));
+      lineSegments.forEach((lineSegment: Point[]) => {
+        var slope = (lineSegment[1].y - lineSegment[0].y) / (lineSegment[1].x - lineSegment[0].x);
+        var lineConstant = lineSegment[0].y - slope * lineSegment[0].x;
+
+        if (_Util.Methods.inRange(pixelPoint.x, lineSegment[0].x, lineSegment[1].x) &&
+            _Util.Methods.inRange(pixelPoint.y, lineSegment[0].y, lineSegment[1].y) &&
+            (slope * pixelPoint.x + lineConstant === pixelPoint.y)) {
+          closestPixelPoint = pixelPoint;
+          closestDistance = 0;
+        } else {
+          var intersectingSlope = - 1 / slope;
+          var intersectingConstant = pixelPoint.y - intersectingSlope * pixelPoint.x;
+          var intersectionPointX = (intersectingConstant - lineConstant) / (slope - intersectingSlope);
+          var intersectionPointY = intersectingSlope * intersectingPointX + intersectingConstant;
+          var intersectionPoint = {x: intersectionPointX, y: intersectionPointY};
+
+          var intersectionPointDistance = _Util.Methods.pointDistance(intersectionPoint, pixelPoint);
+          if (intersectionPointDistance < closestDistance) {
+            closestPixelPoint = intersectionPoint;
+            closestDistance = intersectionPointDistance;
+          }
+        }
+      });
+      return closestPixelPoint;
+    }
   }
 }
 }
