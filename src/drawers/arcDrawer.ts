@@ -59,6 +59,40 @@ export module _Drawer {
       var avgAngle = (datum.startAngle + datum.endAngle) / 2;
       return { x: avgRadius * Math.sin(avgAngle), y: avgRadius * Math.cos(avgAngle) };
     }
+
+    public _getClosestPixelPoint(selection: D3.Selection, pixelPoint: Point): Point {
+      var datum = selection.datum();
+      var selectionIndex: number;
+      this._getRenderArea().selectAll(this._getSelector()).each((datum, index) => {
+        if (datum === selection.data()) {
+          selectionIndex = index;
+        }
+      });
+      var innerRadius = this._attrToProjector["inner-radius"](datum, selectionIndex);
+      var outerRadius = this._attrToProjector["outer-radius"](datum, selectionIndex);
+      var startAngle = datum.startAngle;
+      var endAngle = datum.endAngle;
+      var pixelPointAngle = Math.atan(pixelPoint.y / pixelPoint.x);
+      var pixelPointDistance = _Util.Methods.pointDistance({x: 0, y: 0}, pixelPoint);
+
+      if (_Util.Methods.inRange(pixelPointAngle, startAngle, endAngle)) {
+        if (_Util.Methods.inRange(pixelPointDistance, innerRadius, outerRadius)) {
+          return pixelPoint;
+        }
+        return { x: outerRadius * Math.sin(pixelPointAngle), y: outerRadius * Math.cos(pixelPointAngle) };
+      } else {
+        var innerSegmentPoint: Point;
+        var outerSegmentPoint: Point;
+        if (pixelPointAngle < startAngle) {
+          innerSegmentPoint = { x: innerRadius * Math.sin(startAngle), y: innerRadius * Math.cos(startAngle) };
+          outerSegmentPoint = { x: outerRadius * Math.sin(startAngle), y: outerRadius * Math.cos(startAngle) };
+        } else {
+          innerSegmentPoint = { x: innerRadius * Math.sin(endAngle), y: innerRadius * Math.cos(endAngle) };
+          outerSegmentPoint = { x: outerRadius * Math.sin(endAngle), y: outerRadius * Math.cos(endAngle) };
+        }
+        return _Util.Methods.intersectionPoint(pixelPoint, innerSegmentPoint, outerSegmentPoint);
+      }
+    }
   }
 }
 }

@@ -87,12 +87,7 @@ export module _Drawer {
           closestPixelPoint = pixelPoint;
           closestDistance = 0;
         } else {
-          var intersectingSlope = - 1 / slope;
-          var intersectingConstant = pixelPoint.y - intersectingSlope * pixelPoint.x;
-          var intersectionPointX = (intersectingConstant - lineConstant) / (slope - intersectingSlope);
-          var intersectionPointY = intersectingSlope * intersectingPointX + intersectingConstant;
-          var intersectionPoint = {x: intersectionPointX, y: intersectionPointY};
-
+          var intersectionPoint = _Util.Methods.intersectionPoint(pixelPoint, lineSegment[0], lineSegment[1]);
           var intersectionPointDistance = _Util.Methods.pointDistance(intersectionPoint, pixelPoint);
           if (intersectionPointDistance < closestDistance) {
             closestPixelPoint = intersectionPoint;

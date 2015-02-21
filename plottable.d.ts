@@ -130,6 +130,7 @@ declare module Plottable {
             function darkenColor(color: string, factor: number, darkenAmount: number): string;
             function pointDistance(p1: Point, p2: Point): number;
             function clamp(value: number, min: number, max: number): number;
+            function intersectionPoint(searchPoint: Point, startPoint: Point, endPoint: Point): Point;
         }
     }
 }
@@ -1572,6 +1573,7 @@ declare module Plottable {
             _drawStep(step: AppliedDrawStep): void;
             draw(data: any[], drawSteps: DrawStep[], userMetadata: any, plotMetadata: Plot.PlotMetadata): number;
             _getPixelPoint(datum: any, index: number): Point;
+            _getClosestPixelPoint(selection: D3.Selection, pixelPoint: Point): Point;
         }
     }
 }

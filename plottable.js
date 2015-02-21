@@ -338,6 +338,16 @@ var Plottable;
                 }
             }
             Methods.clamp = clamp;
+            function intersectionPoint(searchPoint, startPoint, endPoint) {
+                var slope = (endPoint.y - startPoint.y) / (endPoint.x - startPoint.x);
+                var constant = startPoint.y - slope * startPoint.x;
+                var intersectingSlope = -1 / slope;
+                var intersectingConstant = searchPoint.y - intersectingSlope * searchPoint.x;
+                var intersectingPointX = (intersectingConstant - constant) / (slope - intersectingSlope);
+                var intersectingPointY = intersectingSlope * intersectingPointX + intersectingConstant;
+                return { x: intersectingPointX, y: intersectingPointY };
+            }
+            Methods.intersectionPoint = intersectionPoint;
         })(Methods = _Util.Methods || (_Util.Methods = {}));
     })(_Util = Plottable._Util || (Plottable._Util = {}));
 })(Plottable || (Plottable = {}));
@@ -2905,11 +2915,7 @@ var Plottable;
                         closestDistance = 0;
                     }
                     else {
-                        var intersectingSlope = -1 / slope;
-                        var intersectingConstant = pixelPoint.y - intersectingSlope * pixelPoint.x;
-                        var intersectionPointX = (intersectingConstant - lineConstant) / (slope - intersectingSlope);
-                        var intersectionPointY = intersectingSlope * intersectingPointX + intersectingConstant;
-                        var intersectionPoint = { x: intersectionPointX, y: intersectionPointY };
+                        var intersectionPoint = Plottable._Util.Methods.intersectionPoint(pixelPoint, lineSegment[0], lineSegment[1]);
                         var intersectionPointDistance = Plottable._Util.Methods.pointDistance(intersectionPoint, pixelPoint);
                         if (intersectionPointDistance < closestDistance) {
                             closestPixelPoint = intersectionPoint;
@@ -3293,6 +3299,40 @@ var Plottable;
                 var avgRadius = (innerRadiusAccessor(datum, index) + outerRadiusAccessor(datum, index)) / 2;
                 var avgAngle = (datum.startAngle + datum.endAngle) / 2;
                 return { x: avgRadius * Math.sin(avgAngle), y: avgRadius * Math.cos(avgAngle) };
+            };
+            Arc.prototype._getClosestPixelPoint = function (selection, pixelPoint) {
+                var datum = selection.datum();
+                var selectionIndex;
+                this._getRenderArea().selectAll(this._getSelector()).each(function (datum, index) {
+                    if (datum === selection.data()) {
+                        selectionIndex = index;
+                    }
+                });
+                var innerRadius = this._attrToProjector["inner-radius"](datum, selectionIndex);
+                var outerRadius = this._attrToProjector["outer-radius"](datum, selectionIndex);
+                var startAngle = datum.startAngle;
+                var endAngle = datum.endAngle;
+                var pixelPointAngle = Math.atan(pixelPoint.y / pixelPoint.x);
+                var pixelPointDistance = Plottable._Util.Methods.pointDistance({ x: 0, y: 0 }, pixelPoint);
+                if (Plottable._Util.Methods.inRange(pixelPointAngle, startAngle, endAngle)) {
+                    if (Plottable._Util.Methods.inRange(pixelPointDistance, innerRadius, outerRadius)) {
+                        return pixelPoint;
+                    }
+                    return { x: outerRadius * Math.sin(pixelPointAngle), y: outerRadius * Math.cos(pixelPointAngle) };
+                }
+                else {
+                    var innerSegmentPoint;
+                    var outerSegmentPoint;
+                    if (pixelPointAngle < startAngle) {
+                        innerSegmentPoint = { x: innerRadius * Math.sin(startAngle), y: innerRadius * Math.cos(startAngle) };
+                        outerSegmentPoint = { x: outerRadius * Math.sin(startAngle), y: outerRadius * Math.cos(startAngle) };
+                    }
+                    else {
+                        innerSegmentPoint = { x: innerRadius * Math.sin(endAngle), y: innerRadius * Math.cos(endAngle) };
+                        outerSegmentPoint = { x: outerRadius * Math.sin(endAngle), y: outerRadius * Math.cos(endAngle) };
+                    }
+                    return Plottable._Util.Methods.intersectionPoint(pixelPoint, innerSegmentPoint, outerSegmentPoint);
+                }
             };
             return Arc;
         })(_Drawer.Element);

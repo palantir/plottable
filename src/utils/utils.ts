@@ -339,6 +339,16 @@ export module _Util {
         return value;
       }
     }
+
+    export function intersectionPoint(searchPoint: Point, startPoint: Point, endPoint: Point): Point {
+      var slope = (endPoint.y - startPoint.y) / (endPoint.x - startPoint.x);
+      var constant = startPoint.y - slope * startPoint.x;
+      var intersectingSlope = - 1 / slope;
+      var intersectingConstant = searchPoint.y - intersectingSlope * searchPoint.x;
+      var intersectingPointX = (intersectingConstant - constant) / (slope - intersectingSlope);
+      var intersectingPointY = intersectingSlope * intersectingPointX + intersectingConstant;
+      return {x: intersectingPointX, y: intersectingPointY};
+    }
   }
 }
 }
