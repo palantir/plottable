@@ -425,14 +425,14 @@ describe("Drawers", function () {
 
 ///<reference path="../testReference.ts" />
 describe("Drawers", function () {
-    describe("Element Drawer", function () {
-        it("getPixelPoint circle", function () {
+    describe("Circle Drawer", function () {
+        it("getPixelPoint", function () {
             var svg = generateSVG(300, 300);
             var data = [{ a: 12, b: 10 }, { a: 31, b: 24 }, { a: 22, b: 21 }, { a: 15, b: 14 }];
             var xScale = new Plottable.Scale.Linear();
             var yScale = new Plottable.Scale.Linear();
             var scatterPlot = new Plottable.Plot.Scatter(xScale, yScale);
-            var drawer = new Plottable._Drawer.Element("one");
+            var drawer = new Plottable._Drawer.Circle("one");
             drawer._svgElement = "circle";
             scatterPlot._getDrawer = function () { return drawer; };
             scatterPlot.addDataset("one", data);

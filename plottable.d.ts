@@ -1531,6 +1531,15 @@ declare module Plottable {
             protected _prepareDrawSteps(drawSteps: AppliedDrawStep[]): void;
             protected _prepareData(data: any[], drawSteps: AppliedDrawStep[]): any[];
             _getSelector(): string;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module _Drawer {
+        class Circle extends Element {
+            constructor(key: string);
             _getPixelPoint(datum: any, index: number): Point;
         }
     }
@@ -2787,7 +2796,7 @@ declare module Plottable {
              * radius, and "fill" is the CSS color of the datum.
              */
             project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): Scatter<X, Y>;
-            protected _getDrawer(key: string): _Drawer.Element;
+            protected _getDrawer(key: string): _Drawer.Circle;
             protected _generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
             };

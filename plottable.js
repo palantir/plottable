@@ -1,5 +1,5 @@
 /*!
-Plottable 0.44.0 (https://github.com/palantir/plottable)
+Plottable 0.45.0 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -994,7 +994,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "0.44.0";
+    Plottable.version = "0.45.0";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -3036,17 +3036,35 @@ var Plottable;
             Element.prototype._getSelector = function () {
                 return this._svgElement;
             };
-            Element.prototype._getPixelPoint = function (datum, index) {
-                switch (this._svgElement) {
-                    case "circle":
-                        return { x: this._attrToProjector["cx"](datum, index), y: this._attrToProjector["cy"](datum, index) };
-                    default:
-                        return null;
-                }
-            };
             return Element;
         })(_Drawer.AbstractDrawer);
         _Drawer.Element = Element;
+    })(_Drawer = Plottable._Drawer || (Plottable._Drawer = {}));
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    var _Drawer;
+    (function (_Drawer) {
+        var Circle = (function (_super) {
+            __extends(Circle, _super);
+            function Circle(key) {
+                _super.call(this, key);
+                this.svgElement("circle");
+            }
+            Circle.prototype._getPixelPoint = function (datum, index) {
+                return { x: this._attrToProjector["cx"](datum, index), y: this._attrToProjector["cy"](datum, index) };
+            };
+            return Circle;
+        })(_Drawer.Element);
+        _Drawer.Circle = Circle;
     })(_Drawer = Plottable._Drawer || (Plottable._Drawer = {}));
 })(Plottable || (Plottable = {}));
 
@@ -6878,7 +6896,7 @@ var Plottable;
                 return this;
             };
             Scatter.prototype._getDrawer = function (key) {
-                return new Plottable._Drawer.Element(key).svgElement("circle");
+                return new Plottable._Drawer.Circle(key);
             };
             Scatter.prototype._generateAttrToProjector = function () {
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
