@@ -37,7 +37,7 @@ export module Plot {
     }
 
     protected _getDrawer(key: string) {
-      return new Plottable._Drawer.Element(key).svgElement("circle");
+      return new Plottable._Drawer.Circle(key);
     }
 
     protected _generateAttrToProjector() {
