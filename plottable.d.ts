@@ -1541,7 +1541,6 @@ declare module Plottable {
             protected _prepareDrawSteps(drawSteps: AppliedDrawStep[]): void;
             protected _prepareData(data: any[], drawSteps: AppliedDrawStep[]): any[];
             _getSelector(): string;
-            _isSelectionInBounds(selection: D3.Selection, xExtent: Extent, yExtent: Extent, tolerance: number): boolean;
         }
     }
 }
@@ -1552,6 +1551,7 @@ declare module Plottable {
         class Circle extends Element {
             constructor(key: string);
             _getPixelPoint(datum: any, index: number): Point;
+            _isSelectionInBounds(selection: D3.Selection, xExtent: Extent, yExtent: Extent, tolerance: number): boolean;
         }
     }
 }

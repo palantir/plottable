@@ -3440,10 +3440,10 @@ describe("Plots", function () {
             var data2 = [{ x: 1, y: 2 }, { x: 3, y: 4 }];
             var plot = new Plottable.Plot.Scatter(xScale, yScale).project("x", "x", xScale).project("y", "y", yScale).addDataset(data).addDataset(data2);
             plot.renderTo(svg);
-            var circles = plot.getSelections(xScale.scale(1), yScale.scale(1));
+            var circles = plot.getPlotData(xScale.scale(1), yScale.scale(1)).selection;
             var selectionData = circles.data();
             assert.deepEqual(selectionData, [{ x: 1, y: 1 }], "retrieved selection for specified point");
-            var circles2 = plot.getSelections({ min: xScale.scale(1), max: xScale.scale(3) }, { min: yScale.scale(4), max: yScale.scale(1) });
+            var circles2 = plot.getPlotData({ min: xScale.scale(1), max: xScale.scale(3) }, { min: yScale.scale(4), max: yScale.scale(1) }).selection;
             var selectionData2 = circles2.data();
             assert.deepEqual(selectionData2, [{ x: 1, y: 1 }, { x: 1, y: 2 }, { x: 3, y: 4 }], "retrieved selection for specified extent");
             svg.remove();

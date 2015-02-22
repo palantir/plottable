@@ -3048,36 +3048,6 @@ var Plottable;
             Element.prototype._getSelector = function () {
                 return this._svgElement;
             };
-            Element.prototype._isSelectionInBounds = function (selection, xExtent, yExtent, tolerance) {
-                if (this._svgElement === "circle") {
-                    return Element._ifCircleIntersect(selection, xExtent, yExtent, tolerance);
-                }
-                return true;
-            };
-            Element._ifCircleIntersect = function (selection, xExtent, yExtent, tolerance) {
-                var circleX = parseFloat(selection.attr("cx"));
-                var circleY = parseFloat(selection.attr("cy"));
-                var radius = parseFloat(selection.attr("r"));
-                var closestX = Element.clamp(circleX, xExtent.min, xExtent.max);
-                var closestY = Element.clamp(circleY, yExtent.min, yExtent.max);
-                var distanceX = Math.abs(circleX - closestX);
-                var distanceY = Math.abs(circleY - closestY);
-                return Math.pow(distanceX, 2) + Math.pow(distanceY, 2) <= Math.pow(radius + tolerance, 2);
-            };
-            Element.clamp = function (value, min, max) {
-                if (value < min) {
-                    return min;
-                }
-                else if (value > max) {
-                    return max;
-                }
-                else {
-                    return value;
-                }
-            };
-            Element.pointDistance = function (x1, y1, x2, y2) {
-                return Math.pow(Math.pow(y2 - y1, 2) + Math.pow(x2 - x1, 2), 0.5);
-            };
             return Element;
         })(_Drawer.AbstractDrawer);
         _Drawer.Element = Element;
@@ -3103,6 +3073,33 @@ var Plottable;
             }
             Circle.prototype._getPixelPoint = function (datum, index) {
                 return { x: this._attrToProjector["cx"](datum, index), y: this._attrToProjector["cy"](datum, index) };
+            };
+            Circle.prototype._isSelectionInBounds = function (selection, xExtent, yExtent, tolerance) {
+                return Circle._ifCircleIntersect(selection, xExtent, yExtent, tolerance);
+            };
+            Circle._ifCircleIntersect = function (selection, xExtent, yExtent, tolerance) {
+                var circleX = parseFloat(selection.attr("cx"));
+                var circleY = parseFloat(selection.attr("cy"));
+                var radius = parseFloat(selection.attr("r"));
+                var closestX = Circle.clamp(circleX, xExtent.min, xExtent.max);
+                var closestY = Circle.clamp(circleY, yExtent.min, yExtent.max);
+                var distanceX = Math.abs(circleX - closestX);
+                var distanceY = Math.abs(circleY - closestY);
+                return Math.pow(distanceX, 2) + Math.pow(distanceY, 2) <= Math.pow(radius + tolerance, 2);
+            };
+            Circle.clamp = function (value, min, max) {
+                if (value < min) {
+                    return min;
+                }
+                else if (value > max) {
+                    return max;
+                }
+                else {
+                    return value;
+                }
+            };
+            Circle.pointDistance = function (x1, y1, x2, y2) {
+                return Math.pow(Math.pow(y2 - y1, 2) + Math.pow(x2 - x1, 2), 0.5);
             };
             return Circle;
         })(_Drawer.Element);
