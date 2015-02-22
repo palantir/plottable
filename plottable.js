@@ -322,6 +322,10 @@ var Plottable;
                 return "#" + rHex + gHex + bHex;
             }
             Methods.darkenColor = darkenColor;
+            function toExtent(input) {
+                return { min: input, max: input };
+            }
+            Methods.toExtent = toExtent;
         })(Methods = _Util.Methods || (_Util.Methods = {}));
     })(_Util = Plottable._Util || (Plottable._Util = {}));
 })(Plottable || (Plottable = {}));
@@ -2796,6 +2800,18 @@ var Plottable;
             AbstractDrawer.prototype._getSelector = function () {
                 return "";
             };
+            /**
+             * Checks if the given selection is within the specified bounds
+             *
+             * @param {D3.Selection} selection The selection to check
+             * @param {Extent} xExtent The bounds on the x-coordinate space
+             * @param {Extent} yExtent The bounds on the y-coordinate space
+             * @param {number} tolerance The tolerance of how close the selection is
+             * @returns {boolean} if the selection is within the bounds
+             */
+            AbstractDrawer.prototype._isSelectionInBounds = function (selection, xExtent, yExtent, tolerance) {
+                return true;
+            };
             AbstractDrawer.prototype._getPixelPoint = function (datum, index) {
                 return null;
             };
@@ -3097,6 +3113,13 @@ var Plottable;
             };
             Rect.prototype._getIfLabelsTooWide = function () {
                 return this._labelsTooWide;
+            };
+            Rect.prototype._isSelectionInBounds = function (selection, xExtent, yExtent, tolerance) {
+                var selectionX = parseFloat(selection.attr("x"));
+                var selectionY = parseFloat(selection.attr("y"));
+                var selectionWidth = parseFloat(selection.attr("width"));
+                var selectionHeight = parseFloat(selection.attr("height"));
+                return selectionX + selectionWidth >= xExtent.min - tolerance && selectionX <= xExtent.max + tolerance && selectionY + selectionHeight >= yExtent.min - tolerance && selectionY <= yExtent.max + tolerance;
             };
             Rect.prototype.drawText = function (data, attrToProjector, userMetadata, plotMetadata) {
                 var _this = this;
@@ -6533,6 +6556,36 @@ var Plottable;
                     });
                 });
                 return d3.selectAll(allSelections);
+            };
+            /**
+             * Gets the selections under the given pixel position (if [xValOrExtent]
+             * and [yValOrExtent] are {number}s), under a given line (if only one
+             * of [xValOrExtent] or [yValOrExtent] are {Extent}s) or are under a
+             * 2D area (if [xValOrExtent] and [yValOrExtent] are both {Extent}s).
+             *
+             * @param {number | Extent} xValOrExtent The pixel x position, or range of x values.
+             * @param {number | Extent} yValOrExtent The pixel y position, or range of y values.
+             * @returns {D3.Selection} The selections within under the given bounds
+             */
+            AbstractPlot.prototype.getPlotData = function (xValOrExtent, yValOrExtent, tolerance) {
+                var _this = this;
+                if (tolerance === void 0) { tolerance = 0.5; }
+                var xExtent = (typeof xValOrExtent === "number") ? Plottable._Util.Methods.toExtent(xValOrExtent) : xValOrExtent;
+                var yExtent = (typeof yValOrExtent === "number") ? Plottable._Util.Methods.toExtent(yValOrExtent) : yValOrExtent;
+                var data = [];
+                var pixelPoints = [];
+                var selections = [];
+                this._datasetKeysInOrder.forEach(function (key) {
+                    var drawer = _this._key2PlotDatasetKey.get(key).drawer;
+                    drawer._getRenderArea().selectAll(drawer._getSelector()).each(function () {
+                        var selection = d3.select(this);
+                        // Check if extent covers the selection
+                        if (drawer._isSelectionInBounds(selection, xExtent, yExtent, tolerance)) {
+                            selections.push(this);
+                        }
+                    });
+                });
+                return { data: data, pixelPoints: pixelPoints, selection: d3.selectAll(selections) };
             };
             return AbstractPlot;
         })(Plottable.Component.AbstractComponent);
