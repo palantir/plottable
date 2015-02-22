@@ -128,6 +128,7 @@ declare module Plottable {
             function colorTest(colorTester: D3.Selection, className: string): string;
             function lightenColor(color: string, factor: number): string;
             function darkenColor(color: string, factor: number, darkenAmount: number): string;
+            function toExtent(input: number): Extent;
         }
     }
 }
@@ -271,6 +272,7 @@ declare module Plottable {
             function translate(s: D3.Selection, x?: number, y?: number): any;
             function boxesOverlap(boxA: ClientRect, boxB: ClientRect): boolean;
             function boxIsInside(inner: ClientRect, outer: ClientRect): boolean;
+            function getBoundingSVG(elem: SVGElement): SVGElement;
         }
     }
 }
@@ -460,72 +462,65 @@ declare module Plottable {
 declare module Plottable {
     module Core {
         /**
-         * This interface represents anything in Plottable which can have a listener attached.
-         * Listeners attach by referencing the Listenable's broadcaster, and calling registerListener
-         * on it.
-         *
-         * e.g.:
-         * listenable: Plottable.Listenable;
-         * listenable.broadcaster.registerListener(callbackToCallOnBroadcast)
+         * A callback for a Broadcaster. The callback will be called with the Broadcaster's
+         * "listenable" as the first argument, with subsequent optional arguments depending
+         * on the listenable.
          */
-        interface Listenable {
-            broadcaster: Broadcaster;
+        interface BroadcasterCallback<L> {
+            (listenable: L, ...args: any[]): any;
         }
         /**
-         * This interface represents the callback that should be passed to the Broadcaster on a Listenable.
-         *
-         * The callback will be called with the attached Listenable as the first object, and optional arguments
-         * as the subsequent arguments.
-         *
-         * The Listenable is passed as the first argument so that it is easy for the callback to reference the
-         * current state of the Listenable in the resolution logic.
-         */
-        type BroadcasterCallback = (listenable: Listenable, ...args: any[]) => any;
-        /**
-         * The Broadcaster class is owned by an Listenable. Third parties can register and deregister listeners
-         * from the broadcaster. When the broadcaster.broadcast method is activated, all registered callbacks are
-         * called. The registered callbacks are called with the registered Listenable that the broadcaster is attached
-         * to, along with optional arguments passed to the `broadcast` method.
+         * The Broadcaster holds a reference to a "listenable" object.
+         * Third parties can register and deregister listeners from the Broadcaster.
+         * When the broadcaster.broadcast() method is called, all registered callbacks
+         * are called with the Broadcaster's "listenable", along with optional
+         * arguments passed to the `broadcast` method.
          *
          * The listeners are called synchronously.
          */
-        class Broadcaster extends Core.PlottableObject {
-            listenable: Listenable;
+        class Broadcaster<L> extends Core.PlottableObject {
             /**
-             * Constructs a broadcaster, taking the Listenable that the broadcaster will be attached to.
+             * Constructs a broadcaster, taking a "listenable" object to broadcast about.
              *
              * @constructor
-             * @param {Listenable} listenable The Listenable-object that this broadcaster is attached to.
+             * @param {L} listenable The listenable object to broadcast.
              */
-            constructor(listenable: Listenable);
+            constructor(listenable: L);
             /**
              * Registers a callback to be called when the broadcast method is called. Also takes a key which
              * is used to support deregistering the same callback later, by passing in the same key.
              * If there is already a callback associated with that key, then the callback will be replaced.
+             * The callback will be passed the Broadcaster's "listenable" as the `this` context.
              *
              * @param key The key associated with the callback. Key uniqueness is determined by deep equality.
-             * @param {BroadcasterCallback} callback A callback to be called when the Scale's domain changes.
-             * @returns {Broadcaster} this object
+             * @param {BroadcasterCallback<L>} callback A callback to be called.
+             * @returns {Broadcaster} The calling Broadcaster
              */
-            registerListener(key: any, callback: BroadcasterCallback): Broadcaster;
+            registerListener(key: any, callback: BroadcasterCallback<L>): Broadcaster<L>;
             /**
              * Call all listening callbacks, optionally with arguments passed through.
              *
              * @param ...args A variable number of optional arguments
-             * @returns {Broadcaster} this object
+             * @returns {Broadcaster} The calling Broadcaster
              */
-            broadcast(...args: any[]): Broadcaster;
+            broadcast(...args: any[]): Broadcaster<L>;
             /**
              * Deregisters the callback associated with a key.
              *
              * @param key The key to deregister.
-             * @returns {Broadcaster} this object
+             * @returns {Broadcaster} The calling Broadcaster
              */
-            deregisterListener(key: any): Broadcaster;
+            deregisterListener(key: any): Broadcaster<L>;
             /**
-             * Deregisters all listeners and callbacks associated with the broadcaster.
+             * Gets the keys for all listeners attached to the Broadcaster.
              *
-             * @returns {Broadcaster} this object
+             * @returns {any[]} An array of the keys.
+             */
+            getListenerKeys(): any[];
+            /**
+             * Deregisters all listeners and callbacks associated with the Broadcaster.
+             *
+             * @returns {Broadcaster} The calling Broadcaster
              */
             deregisterAllListeners(): void;
         }
@@ -534,8 +529,8 @@ declare module Plottable {
 
 
 declare module Plottable {
-    class Dataset extends Core.PlottableObject implements Core.Listenable {
-        broadcaster: Core.Broadcaster;
+    class Dataset extends Core.PlottableObject {
+        broadcaster: Core.Broadcaster<Dataset>;
         /**
          * Constructs a new set.
          *
@@ -662,56 +657,6 @@ declare module Plottable {
              * Useful to call when debugging.
              */
             function flush(): void;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Core {
-        /**
-         * The ResizeBroadcaster will broadcast a notification to any registered
-         * components when the window is resized.
-         *
-         * The broadcaster and single event listener are lazily constructed.
-         *
-         * Upon resize, the _resized flag will be set to true until after the next
-         * flush of the RenderController. This is used, for example, to disable
-         * animations during resize.
-         */
-        module ResizeBroadcaster {
-            /**
-             * Checks if the window has been resized and the RenderController
-             * has not yet been flushed.
-             *
-             * @returns {boolean} If the window has been resized/RenderController
-             * has not yet been flushed.
-             */
-            function resizing(): boolean;
-            /**
-             * Sets that it is not resizing anymore. Good if it stubbornly thinks
-             * it is still resizing, or for cancelling the effects of resizing
-             * prematurely.
-             */
-            function clearResizing(): void;
-            /**
-             * Registers a component.
-             *
-             * When the window is resized, ._invalidateLayout() is invoked on the
-             * component, which will enqueue the component for layout and rendering
-             * with the RenderController.
-             *
-             * @param {Component} component Any Plottable component.
-             */
-            function register(c: Component.AbstractComponent): void;
-            /**
-             * Deregisters the components.
-             *
-             * The component will no longer receive updates on window resize.
-             *
-             * @param {Component} component Any Plottable component.
-             */
-            function deregister(c: Component.AbstractComponent): void;
         }
     }
 }
@@ -892,9 +837,9 @@ declare module Plottable {
 
 declare module Plottable {
     module Scale {
-        class AbstractScale<D, R> extends Core.PlottableObject implements Core.Listenable {
+        class AbstractScale<D, R> extends Core.PlottableObject {
             protected _d3Scale: D3.Scale.Scale;
-            broadcaster: Core.Broadcaster;
+            broadcaster: Core.Broadcaster<AbstractScale<D, R>>;
             _typeCoercer: (d: any) => any;
             /**
              * Constructs a new Scale.
@@ -1479,6 +1424,7 @@ declare module Plottable {
         class AbstractDrawer {
             protected _className: string;
             key: string;
+            protected _attrToProjector: _AttributeToAppliedProjector;
             /**
              * Sets the class, which needs to be applied to bound elements.
              *
@@ -1538,6 +1484,8 @@ declare module Plottable {
              * @returns {boolean} if the selection is within the bounds
              */
             _isSelectionInBounds(selection: D3.Selection, xExtent: Extent, yExtent: Extent, tolerance: number): boolean;
+            _getPixelPoint(datum: any, index: number): Point;
+            _getSelection(index: number): D3.Selection;
         }
     }
 }
@@ -1552,6 +1500,8 @@ declare module Plottable {
             protected _numberOfAnimationIterations(data: any[]): number;
             protected _drawStep(step: AppliedDrawStep): void;
             _getSelector(): string;
+            _getPixelPoint(datum: any, index: number): Point;
+            _getSelection(index: number): D3.Selection;
         }
     }
 }
@@ -1599,6 +1549,16 @@ declare module Plottable {
 
 declare module Plottable {
     module _Drawer {
+        class Circle extends Element {
+            constructor(key: string);
+            _getPixelPoint(datum: any, index: number): Point;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module _Drawer {
         class Rect extends Element {
             constructor(key: string, isVertical: boolean);
             setup(area: D3.Selection): void;
@@ -1606,6 +1566,7 @@ declare module Plottable {
             _getIfLabelsTooWide(): boolean;
             _isSelectionInBounds(selection: D3.Selection, xExtent: Extent, yExtent: Extent, tolerance: number): boolean;
             drawText(data: any[], attrToProjector: AttributeToProjector, userMetadata: any, plotMetadata: Plot.PlotMetadata): void;
+            _getPixelPoint(datum: any, index: number): Point;
         }
     }
 }
@@ -1617,6 +1578,7 @@ declare module Plottable {
             constructor(key: string);
             _drawStep(step: AppliedDrawStep): void;
             draw(data: any[], drawSteps: DrawStep[], userMetadata: any, plotMetadata: Plot.PlotMetadata): number;
+            _getPixelPoint(datum: any, index: number): Point;
         }
     }
 }
@@ -1672,27 +1634,14 @@ declare module Plottable {
              */
             renderTo(element: String | D3.Selection): AbstractComponent;
             /**
-             * Causes the Component to recompute layout and redraw. If passed arguments, will resize the root SVG it lives in.
+             * Causes the Component to recompute layout and redraw.
              *
              * This function should be called when CSS changes could influence the size
              * of the components, e.g. changing the font size.
              *
-             * @param {number} [availableWidth]  - the width of the container element
-             * @param {number} [availableHeight] - the height of the container element
              * @returns {Component} The calling component.
              */
-            resize(width?: number, height?: number): AbstractComponent;
-            /**
-             * Enables or disables resize on window resizes.
-             *
-             * If enabled, window resizes will enqueue this component for a re-layout
-             * and re-render. Animations are disabled during window resizes when auto-
-             * resize is enabled.
-             *
-             * @param {boolean} flag Enable (true) or disable (false) auto-resize.
-             * @returns {Component} The calling component.
-             */
-            autoResize(flag: boolean): AbstractComponent;
+            redraw(): AbstractComponent;
             /**
              * Sets the x alignment of the Component. This will be used if the
              * Component is given more space than it needs.
@@ -2599,6 +2548,11 @@ declare module Plottable {
         interface PlotMetadata {
             datasetKey: string;
         }
+        type PlotData = {
+            data: any[];
+            pixelPoints: Point[];
+            selection: D3.Selection;
+        };
         class AbstractPlot extends Component.AbstractComponent {
             protected _dataChanged: boolean;
             protected _key2PlotDatasetKey: D3.Map<PlotDatasetKey>;
@@ -2712,26 +2666,15 @@ declare module Plottable {
              */
             datasetOrder(order: string[]): AbstractPlot;
             /**
-             * Removes a dataset by string key
+             * Removes a dataset by the given identifier
              *
-             * @param {string} key The key of the dataset
-             * @return {Plot} The calling Plot.
+             * @param {string | Dataset | any[]} datasetIdentifer The identifier as the key of the Dataset to remove
+             * If string is inputted, it is interpreted as the dataset key to remove.
+             * If Dataset is inputted, the first Dataset in the plot that is the same will be removed.
+             * If any[] is inputted, the first data array in the plot that is the same will be removed.
+             * @returns {AbstractPlot} The calling AbstractPlot.
              */
-            removeDataset(key: string): AbstractPlot;
-            /**
-             * Remove a dataset given the dataset itself
-             *
-             * @param {Dataset} dataset The dataset to remove
-             * @return {Plot} The calling Plot.
-             */
-            removeDataset(dataset: Dataset): AbstractPlot;
-            /**
-             * Remove a dataset given the underlying data array
-             *
-             * @param {any[]} dataArray The data to remove
-             * @return {Plot} The calling Plot.
-             */
-            removeDataset(dataArray: any[]): AbstractPlot;
+            removeDataset(datasetIdentifier: string | Dataset | any[]): AbstractPlot;
             datasets(): Dataset[];
             protected _getDrawersInOrder(): _Drawer.AbstractDrawer[];
             protected _generateDrawSteps(): _Drawer.DrawStep[];
@@ -2743,7 +2686,14 @@ declare module Plottable {
              * @param {string} key The key of new dataset
              */
             protected _getPlotMetadataForDataset(key: string): PlotMetadata;
-            getAllSelections(): D3.Selection;
+            /**
+             * Retrieves all of the selections of this plot for the specified dataset(s)
+             *
+             * @param {string | string[]} datasetKeys The dataset(s) to retrieve the selections from.
+             * If not provided, all selections will be retrieved.
+             * @returns {D3.Selection} The retrieved selections.
+             */
+            getAllSelections(datasetKeys?: string | string[]): D3.Selection;
             /**
              * Gets the selections under the given pixel position (if [xValOrExtent]
              * and [yValOrExtent] are {number}s), under a given line (if only one
@@ -2754,7 +2704,7 @@ declare module Plottable {
              * @param {number | Extent} yValOrExtent The pixel y position, or range of y values.
              * @returns {D3.Selection} The selections within under the given bounds
              */
-            getSelections(xValOrExtent: number | Extent, yValOrExtent: number | Extent, tolerance?: number): D3.Selection;
+            getPlotData(xValOrExtent: number | Extent, yValOrExtent: number | Extent, tolerance?: number): PlotData;
         }
     }
 }
@@ -2860,7 +2810,7 @@ declare module Plottable {
              * radius, and "fill" is the CSS color of the datum.
              */
             project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): Scatter<X, Y>;
-            protected _getDrawer(key: string): _Drawer.Element;
+            protected _getDrawer(key: string): _Drawer.Circle;
             protected _generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
             };
@@ -3439,46 +3389,15 @@ declare module Plottable {
 declare module Plottable {
     module Dispatcher {
         class AbstractDispatcher extends Core.PlottableObject {
-            protected _target: D3.Selection;
             protected _event2Callback: {
-                [eventName: string]: () => any;
+                [eventName: string]: (e: Event) => any;
             };
+            protected _broadcasters: Core.Broadcaster<AbstractDispatcher>[];
             /**
-             * Constructs a Dispatcher with the specified target.
-             *
-             * @constructor
-             * @param {D3.Selection} [target] The selection to listen for events on.
+             * Creates a wrapped version of the callback that can be registered to a Broadcaster
              */
-            constructor(target?: D3.Selection);
-            /**
-             * Gets the target of the Dispatcher.
-             *
-             * @returns {D3.Selection} The Dispatcher's current target.
-             */
-            target(): D3.Selection;
-            /**
-             * Sets the target of the Dispatcher.
-             *
-             * @param {D3.Selection} target The element to listen for updates on.
-             * @returns {Dispatcher} The calling Dispatcher.
-             */
-            target(targetElement: D3.Selection): AbstractDispatcher;
-            /**
-             * Gets a namespaced version of the event name.
-             */
-            protected _getEventString(eventName: string): string;
-            /**
-             * Attaches the Dispatcher's listeners to the Dispatcher's target element.
-             *
-             * @returns {Dispatcher} The calling Dispatcher.
-             */
-            connect(): AbstractDispatcher;
-            /**
-             * Detaches the Dispatcher's listeners from the Dispatchers' target element.
-             *
-             * @returns {Dispatcher} The calling Dispatcher.
-             */
-            disconnect(): AbstractDispatcher;
+            protected _getWrappedCallback(callback: Function): Core.BroadcasterCallback<AbstractDispatcher>;
+            protected _setCallback(b: Core.Broadcaster<AbstractDispatcher>, key: any, callback: Function): void;
         }
     }
 }
@@ -3486,55 +3405,44 @@ declare module Plottable {
 
 declare module Plottable {
     module Dispatcher {
-        class Mouse extends Dispatcher.AbstractDispatcher {
+        class Mouse extends AbstractDispatcher {
             /**
-             * Constructs a Mouse Dispatcher with the specified target.
+             * Get a Dispatcher.Mouse for the <svg> containing elem. If one already exists
+             * on that <svg>, it will be returned; otherwise, a new one will be created.
              *
-             * @param {D3.Selection} target The selection to listen for events on.
+             * @param {SVGElement} elem A svg DOM element.
+             * @return {Dispatcher.Mouse} A Dispatcher.Mouse
              */
-            constructor(target: D3.Selection);
+            static getDispatcher(elem: SVGElement): Dispatcher.Mouse;
             /**
-             * Gets the current callback to be called on mouseover.
+             * Creates a Dispatcher.Mouse.
+             * This constructor not be invoked directly under most circumstances.
              *
-             * @return {(location: Point) => any} The current mouseover callback.
+             * @param {SVGElement} svg The root <svg> element to attach to.
              */
-            mouseover(): (location: Point) => any;
+            constructor(svg: SVGElement);
+            protected _getWrappedCallback(callback: Function): Core.BroadcasterCallback<Dispatcher.Mouse>;
             /**
-             * Attaches a callback to be called on mouseover.
+             * Registers a callback to be called whenever the mouse position changes,
+             * or removes the callback if `null` is passed as the callback.
              *
-             * @param {(location: Point) => any} callback A function that takes the pixel position of the mouse event.
-             *                                            Pass in null to remove the callback.
-             * @return {Mouse} The calling Mouse Handler.
+             * @param {any} key The key associated with the callback.
+             *                  Key uniqueness is determined by deep equality.
+             * @param {(p: Point) => any} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space. Pass `null`
+             *                                     to remove a callback.
+             * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
              */
-            mouseover(callback: (location: Point) => any): Mouse;
+            onMouseMove(key: any, callback: (p: Point) => any): Dispatcher.Mouse;
             /**
-             * Gets the current callback to be called on mousemove.
+             * Returns the last computed mouse position.
              *
-             * @return {(location: Point) => any} The current mousemove callback.
+             * @return {Point} The last known mouse position in <svg> coordinate space.
              */
-            mousemove(): (location: Point) => any;
-            /**
-             * Attaches a callback to be called on mousemove.
-             *
-             * @param {(location: Point) => any} callback A function that takes the pixel position of the mouse event.
-             *                                            Pass in null to remove the callback.
-             * @return {Mouse} The calling Mouse Handler.
-             */
-            mousemove(callback: (location: Point) => any): Mouse;
-            /**
-             * Gets the current callback to be called on mouseout.
-             *
-             * @return {(location: Point) => any} The current mouseout callback.
-             */
-            mouseout(): (location: Point) => any;
-            /**
-             * Attaches a callback to be called on mouseout.
-             *
-             * @param {(location: Point) => any} callback A function that takes the pixel position of the mouse event.
-             *                                            Pass in null to remove the callback.
-             * @return {Mouse} The calling Mouse Handler.
-             */
-            mouseout(callback: (location: Point) => any): Mouse;
+            getLastMousePosition(): {
+                x: number;
+                y: number;
+            };
         }
     }
 }
@@ -3542,29 +3450,33 @@ declare module Plottable {
 
 declare module Plottable {
     module Dispatcher {
-        class Keypress extends Dispatcher.AbstractDispatcher {
+        type KeyCallback = (keyCode: number) => any;
+        class Key extends AbstractDispatcher {
             /**
-             * Constructs a Keypress Dispatcher with the specified target.
+             * Get a Dispatcher.Key. If one already exists it will be returned;
+             * otherwise, a new one will be created.
              *
-             * @constructor
-             * @param {D3.Selection} [target] The selection to listen for events on.
+             * @return {Dispatcher.Key} A Dispatcher.Key
              */
-            constructor(target?: D3.Selection);
-            connect(): Keypress;
-            disconnect(): Keypress;
+            static getDispatcher(): Dispatcher.Key;
             /**
-             * Gets the callback to be called when a key is pressed.
+             * Creates a Dispatcher.Key.
+             * This constructor not be invoked directly under most circumstances.
              *
-             * @return {(e: D3.D3Event) => void} The current keydown callback.
+             * @param {SVGElement} svg The root <svg> element to attach to.
              */
-            onKeyDown(): (e: D3.D3Event) => void;
+            constructor();
+            protected _getWrappedCallback(callback: Function): Core.BroadcasterCallback<Dispatcher.Key>;
             /**
-             * Sets a callback to be called when a key is pressed.
+             * Registers a callback to be called whenever a key is pressed,
+             * or removes the callback if `null` is passed as the callback.
              *
-             * @param {(e: D3.D3Event) => void} A callback that takes in a D3Event.
-             * @return {Keypress} The calling Dispatcher.Keypress.
+             * @param {any} key The registration key associated with the callback.
+             *                  Registration key uniqueness is determined by deep equality.
+             * @param {KeyCallback} callback
+             * @return {Dispatcher.Key} The calling Dispatcher.Key.
              */
-            onKeyDown(callback: (e: D3.D3Event) => void): Keypress;
+            onKeyDown(key: any, callback: KeyCallback): Key;
         }
     }
 }
@@ -3583,6 +3495,22 @@ declare module Plottable {
             protected _hitBox: D3.Selection;
             protected _componentToListenTo: Component.AbstractComponent;
             _anchor(component: Component.AbstractComponent, hitBox: D3.Selection): void;
+            /**
+             * Translates an <svg>-coordinate-space point to Component-space coordinates.
+             *
+             * @param {Point} p A Point in <svg>-space coordinates.
+             *
+             * @return {Point} The same location in Component-space coordinates.
+             */
+            protected _translateToComponentSpace(p: Point): Point;
+            /**
+             * Checks whether a Component-coordinate-space Point is inside the Component.
+             *
+             * @param {Point} p A Point in Coordinate-space coordinates.
+             *
+             * @return {boolean} Whether or not the point is inside the Component.
+             */
+            protected _isInsideComponent(p: Point): boolean;
         }
     }
 }
@@ -3610,15 +3538,6 @@ declare module Plottable {
 declare module Plottable {
     module Interaction {
         class Key extends AbstractInteraction {
-            /**
-             * Creates a KeyInteraction.
-             *
-             * KeyInteraction listens to key events that occur while the component is
-             * moused over.
-             *
-             * @constructor
-             */
-            constructor();
             _anchor(component: Component.AbstractComponent, hitBox: D3.Selection): void;
             /**
              * Sets a callback to be called when the key with the given keyCode is

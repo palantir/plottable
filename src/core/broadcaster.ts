@@ -2,63 +2,52 @@
 
 module Plottable {
 export module Core {
+
   /**
-   * This interface represents anything in Plottable which can have a listener attached.
-   * Listeners attach by referencing the Listenable's broadcaster, and calling registerListener
-   * on it.
-   *
-   * e.g.:
-   * listenable: Plottable.Listenable;
-   * listenable.broadcaster.registerListener(callbackToCallOnBroadcast)
+   * A callback for a Broadcaster. The callback will be called with the Broadcaster's
+   * "listenable" as the first argument, with subsequent optional arguments depending
+   * on the listenable.
    */
-  export interface Listenable {
-    broadcaster: Broadcaster;
+  // HACKHACK: An interface because the "type" keyword doesn't work with generics.
+  export interface BroadcasterCallback<L> {
+    (listenable: L, ...args: any[]): any;
   }
 
   /**
-   * This interface represents the callback that should be passed to the Broadcaster on a Listenable.
-   *
-   * The callback will be called with the attached Listenable as the first object, and optional arguments
-   * as the subsequent arguments.
-   *
-   * The Listenable is passed as the first argument so that it is easy for the callback to reference the
-   * current state of the Listenable in the resolution logic.
-   */
-  export type BroadcasterCallback = (listenable: Listenable, ...args: any[]) => any;
-
-  /**
-   * The Broadcaster class is owned by an Listenable. Third parties can register and deregister listeners
-   * from the broadcaster. When the broadcaster.broadcast method is activated, all registered callbacks are
-   * called. The registered callbacks are called with the registered Listenable that the broadcaster is attached
-   * to, along with optional arguments passed to the `broadcast` method.
+   * The Broadcaster holds a reference to a "listenable" object.
+   * Third parties can register and deregister listeners from the Broadcaster.
+   * When the broadcaster.broadcast() method is called, all registered callbacks
+   * are called with the Broadcaster's "listenable", along with optional
+   * arguments passed to the `broadcast` method.
    *
    * The listeners are called synchronously.
    */
-  export class Broadcaster extends Core.PlottableObject {
+  export class Broadcaster<L> extends Core.PlottableObject {
     private _key2callback = new _Util.StrictEqualityAssociativeArray();
-    public listenable: Listenable;
+    private _listenable: L;
 
     /**
-     * Constructs a broadcaster, taking the Listenable that the broadcaster will be attached to.
+     * Constructs a broadcaster, taking a "listenable" object to broadcast about.
      *
      * @constructor
-     * @param {Listenable} listenable The Listenable-object that this broadcaster is attached to.
+     * @param {L} listenable The listenable object to broadcast.
      */
-    constructor(listenable: Listenable) {
+    constructor(listenable: L) {
       super();
-      this.listenable = listenable;
+      this._listenable = listenable;
     }
 
     /**
      * Registers a callback to be called when the broadcast method is called. Also takes a key which
      * is used to support deregistering the same callback later, by passing in the same key.
      * If there is already a callback associated with that key, then the callback will be replaced.
+     * The callback will be passed the Broadcaster's "listenable" as the `this` context.
      *
      * @param key The key associated with the callback. Key uniqueness is determined by deep equality.
-     * @param {BroadcasterCallback} callback A callback to be called when the Scale's domain changes.
-     * @returns {Broadcaster} this object
+     * @param {BroadcasterCallback<L>} callback A callback to be called.
+     * @returns {Broadcaster} The calling Broadcaster
      */
-    public registerListener(key: any, callback: BroadcasterCallback) {
+    public registerListener(key: any, callback: BroadcasterCallback<L>) {
       this._key2callback.set(key, callback);
       return this;
     }
@@ -67,10 +56,13 @@ export module Core {
      * Call all listening callbacks, optionally with arguments passed through.
      *
      * @param ...args A variable number of optional arguments
-     * @returns {Broadcaster} this object
+     * @returns {Broadcaster} The calling Broadcaster
      */
     public broadcast(...args: any[]) {
-      this._key2callback.values().forEach((callback) => callback(this.listenable, args));
+      args.unshift(this._listenable);
+      this._key2callback.values().forEach((callback) => {
+        callback.apply(this._listenable, args);
+      });
       return this;
     }
 
@@ -78,7 +70,7 @@ export module Core {
      * Deregisters the callback associated with a key.
      *
      * @param key The key to deregister.
-     * @returns {Broadcaster} this object
+     * @returns {Broadcaster} The calling Broadcaster
      */
     public deregisterListener(key: any) {
       this._key2callback.delete(key);
@@ -86,9 +78,18 @@ export module Core {
     }
 
     /**
-     * Deregisters all listeners and callbacks associated with the broadcaster.
+     * Gets the keys for all listeners attached to the Broadcaster.
      *
-     * @returns {Broadcaster} this object
+     * @returns {any[]} An array of the keys.
+     */
+    public getListenerKeys() {
+      return this._key2callback.keys();
+    }
+
+    /**
+     * Deregisters all listeners and callbacks associated with the Broadcaster.
+     *
+     * @returns {Broadcaster} The calling Broadcaster
      */
     public deregisterAllListeners() {
       this._key2callback = new _Util.StrictEqualityAssociativeArray();

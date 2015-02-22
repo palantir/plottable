@@ -21,6 +21,7 @@ export module _Drawer {
     private _renderArea: D3.Selection;
     protected _className: string;
     public key: string;
+    protected _attrToProjector: _AttributeToAppliedProjector;
 
     /**
      * Sets the class, which needs to be applied to bound elements.
@@ -107,8 +108,10 @@ export module _Drawer {
      */
     public draw(data: any[], drawSteps: DrawStep[], userMetadata: any, plotMetadata: Plot.PlotMetadata) {
       var appliedDrawSteps: AppliedDrawStep[] = drawSteps.map((dr: DrawStep) => {
+        var appliedAttrToProjector = this._applyMetadata(dr.attrToProjector, userMetadata, plotMetadata);
+        this._attrToProjector = <_AttributeToAppliedProjector>_Util.Methods.copyMap(appliedAttrToProjector);
         return {
-          attrToProjector: this._applyMetadata(dr.attrToProjector, userMetadata, plotMetadata),
+          attrToProjector: appliedAttrToProjector,
           animator: dr.animator
         };
       });
@@ -153,6 +156,15 @@ export module _Drawer {
      */
     public _isSelectionInBounds(selection: D3.Selection, xExtent: Extent, yExtent: Extent, tolerance: number): boolean {
       return true;
+    }
+
+    public _getPixelPoint(datum: any, index: number): Point {
+      return null;
+    }
+
+    public _getSelection(index: number): D3.Selection {
+      var allSelections = this._getRenderArea().selectAll(this._getSelector());
+      return d3.select(allSelections[0][index]);
     }
 
   }

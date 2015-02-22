@@ -93,9 +93,6 @@ export module Component {
 
       this._interactionsToRegister.forEach((r) => this.registerInteraction(r));
       this._interactionsToRegister = null;
-      if (this._isTopLevelComponent) {
-        this.autoResize(this._autoResize);
-      }
       this._isSetup = true;
     }
 
@@ -217,43 +214,15 @@ export module Component {
     }
 
     /**
-     * Causes the Component to recompute layout and redraw. If passed arguments, will resize the root SVG it lives in.
+     * Causes the Component to recompute layout and redraw.
      *
      * This function should be called when CSS changes could influence the size
      * of the components, e.g. changing the font size.
      *
-     * @param {number} [availableWidth]  - the width of the container element
-     * @param {number} [availableHeight] - the height of the container element
      * @returns {Component} The calling component.
      */
-    public resize(width?: number, height?: number): AbstractComponent {
-      if (!this._isTopLevelComponent) {
-        throw new Error("Cannot resize on non top-level component");
-      }
-      if (width != null && height != null && this._isAnchored) {
-        this._rootSVG.attr({width: width, height: height});
-      }
+    public redraw(): AbstractComponent {
       this._invalidateLayout();
-      return this;
-    }
-
-    /**
-     * Enables or disables resize on window resizes.
-     *
-     * If enabled, window resizes will enqueue this component for a re-layout
-     * and re-render. Animations are disabled during window resizes when auto-
-     * resize is enabled.
-     *
-     * @param {boolean} flag Enable (true) or disable (false) auto-resize.
-     * @returns {Component} The calling component.
-     */
-    public autoResize(flag: boolean): AbstractComponent {
-      if (flag) {
-        Core.ResizeBroadcaster.register(this);
-      } else {
-        Core.ResizeBroadcaster.deregister(this);
-      }
-      this._autoResize = flag; // if _setup were called by constructor, this var could be _removed #591
       return this;
     }
 
@@ -498,7 +467,6 @@ export module Component {
     public remove() {
       this._removed = true;
       this.detach();
-      Core.ResizeBroadcaster.deregister(this);
     }
 
     /**

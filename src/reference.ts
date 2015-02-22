@@ -18,7 +18,6 @@
 /// <reference path="core/dataset.ts" />
 /// <reference path="core/renderPolicy.ts" />
 /// <reference path="core/renderController.ts" />
-/// <reference path="core/resizeBroadcaster.ts" />
 /// <reference path="core/interfaces.ts" />
 /// <reference path="core/domainer.ts" />
 
@@ -38,6 +37,7 @@
 /// <reference path="drawers/lineDrawer.ts" />
 /// <reference path="drawers/areaDrawer.ts" />
 /// <reference path="drawers/elementDrawer.ts" />
+/// <reference path="drawers/circleDrawer.ts" />
 /// <reference path="drawers/rectDrawer.ts" />
 /// <reference path="drawers/arcDrawer.ts" />
 
@@ -77,7 +77,7 @@
 
 /// <reference path="dispatchers/abstractDispatcher.ts" />
 /// <reference path="dispatchers/mouseDispatcher.ts" />
-/// <reference path="dispatchers/keypressDispatcher.ts" />
+/// <reference path="dispatchers/keyDispatcher.ts" />
 
 /// <reference path="interactions/abstractInteraction.ts" />
 /// <reference path="interactions/clickInteraction.ts" />

@@ -318,22 +318,11 @@ describe("Component behavior", () => {
   });
 
   it("detach() works as expected", () => {
-    var cbCalled = 0;
-    var cb = (b: Plottable.Core.Listenable) => cbCalled++;
-    var b = new Plottable.Core.Broadcaster(null);
-
     var c1 = new Plottable.Component.AbstractComponent();
 
-    b.registerListener(c1, cb);
-
     c1.renderTo(svg);
-    b.broadcast();
-    assert.equal(cbCalled, 1, "the callback was called");
     assert.isTrue(svg.node().hasChildNodes(), "the svg has children");
     c1.detach();
-
-    b.broadcast();
-    assert.equal(cbCalled, 2, "the callback is still attached to the component");
     assert.isFalse(svg.node().hasChildNodes(), "the svg has no children");
 
     svg.remove();
@@ -546,72 +535,6 @@ describe("Component behavior", () => {
       assert.strictEqual(origin.y, groupHeight - cHeight + groupYOffset, "returns correct value (yAlign bottom)");
 
       svg.remove();
-    });
-  });
-
-  describe("resizeBroadcaster testing", () => {
-    var oldRegister: any;
-    var oldDeregister: any;
-    var registeredComponents: D3.Set<number>;
-    var id: number;
-    before(() => {
-      oldRegister = Plottable.Core.ResizeBroadcaster.register;
-      oldDeregister = Plottable.Core.ResizeBroadcaster.deregister;
-      var mockRegister = (c: Plottable.Component.AbstractComponent) => {
-        registeredComponents.add(c.getID());
-      };
-
-      var mockDeregister = (c: Plottable.Component.AbstractComponent) => {
-        registeredComponents.remove(c.getID());
-      };
-      Plottable.Core.ResizeBroadcaster.register = mockRegister;
-      Plottable.Core.ResizeBroadcaster.deregister = mockDeregister;
-    });
-
-    after(() => {
-      Plottable.Core.ResizeBroadcaster.register = oldRegister;
-      Plottable.Core.ResizeBroadcaster.deregister = oldDeregister;
-    });
-
-    beforeEach(() => {
-      registeredComponents = d3.set();
-      id = c.getID();
-    });
-
-    afterEach(() => {
-      svg.remove(); // svg contains no useful info
-    });
-
-    it("components can be removed from resizeBroadcaster before rendering", () => {
-      c.autoResize(false);
-      c.renderTo(svg);
-      assert.isFalse(registeredComponents.has(id), "component not registered to broadcaster");
-    });
-
-    it("components register by default", () => {
-      c.renderTo(svg);
-      assert.isTrue(registeredComponents.has(id), "component is registered");
-    });
-
-    it("component can be deregistered then registered before render", () => {
-      c.autoResize(false);
-      c.autoResize(true);
-      c.renderTo(svg);
-      assert.isTrue(registeredComponents.has(id), "component is registered");
-    });
-
-    it("component can be deregistered after rendering", () => {
-      c.renderTo(svg);
-      c.autoResize(false);
-      assert.isFalse(registeredComponents.has(id), "component was deregistered after rendering");
-    });
-
-    it("calling .remove deregisters a component", () => {
-      c.autoResize(true);
-      c.renderTo(svg);
-      assert.isTrue(registeredComponents.has(id), "component is registered");
-      c.remove();
-      assert.isFalse(registeredComponents.has(id), "component is deregistered after removal");
     });
   });
 });

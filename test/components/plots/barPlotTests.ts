@@ -76,30 +76,30 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("getSelections()", () => {
-        var bar: D3.Selection = barPlot.getSelections(155, 150); // in the middle of bar 0
+      it("getPlotData()", () => {
+        var bar: D3.Selection = barPlot.getPlotData(155, 150).selection; // in the middle of bar 0
 
         assert.lengthOf(bar[0], 1, "getBar returns a bar");
         assert.equal(bar.data()[0], dataset.data()[0], "the data in the bar matches the datasource");
 
-        bar = barPlot.getSelections(-1, -1); // no bars here
+        bar = barPlot.getPlotData(-1, -1).selection; // no bars here
         assert.isTrue(bar.empty(), "returns empty selection if no bar was selected");
 
-        bar = barPlot.getSelections(200, 50); // between the two bars
+        bar = barPlot.getPlotData(200, 50).selection; // between the two bars
         assert.isTrue(bar.empty(), "returns empty selection if no bar was selected");
 
-        bar = barPlot.getSelections(155, 10); // above bar 0
+        bar = barPlot.getPlotData(155, 10).selection; // above bar 0
         assert.isTrue(bar.empty(), "returns empty selection if no bar was selected");
 
         // the bars are now (140,100),(150,300) and (440,300),(450,350) - the
         // origin is at the top left!
 
-        bar = barPlot.getSelections({min: 155, max: 455}, {min: 150, max: 150});
+        bar = barPlot.getPlotData({min: 155, max: 455}, {min: 150, max: 150}).selection;
         assert.lengthOf(bar.data(), 2, "selected 2 bars (not the negative one)");
         assert.equal(bar.data()[0], dataset.data()[0], "the data in bar 0 matches the datasource");
         assert.equal(bar.data()[1], dataset.data()[2], "the data in bar 1 matches the datasource");
 
-        bar = barPlot.getSelections({min: 155, max: 455}, {min: 150, max: 350});
+        bar = barPlot.getPlotData({min: 155, max: 455}, {min: 150, max: 350}).selection;
         assert.lengthOf(bar.data(), 3, "selected all the bars");
         assert.equal(bar.data()[0], dataset.data()[0], "the data in bar 0 matches the datasource");
         assert.equal(bar.data()[1], dataset.data()[1], "the data in bar 1 matches the datasource");
@@ -453,18 +453,62 @@ describe("Plots", () => {
         verticalBarPlot.project("y", "y", yScale);
       });
 
-      it("getAllSelections retrieves correct selections",() => {
+      it("retrieves all dataset selections with no args", () => {
         var barData = [{ x: "foo", y: 5 }, { x: "bar", y: 640 }, { x: "zoo", y: 12345 }];
         var barData2 = [{ x: "one", y: 5 }, { x: "two", y: 640 }, { x: "three", y: 12345 }];
-        verticalBarPlot.addDataset(barData);
-        verticalBarPlot.addDataset(barData2);
+        verticalBarPlot.addDataset("a", barData);
+        verticalBarPlot.addDataset("b", barData2);
         verticalBarPlot.renderTo(svg);
 
         var allBars = verticalBarPlot.getAllSelections();
+        var allBars2 = verticalBarPlot.getAllSelections((<any> verticalBarPlot)._datasetKeysInOrder);
+        assert.deepEqual(allBars, allBars2, "both ways of getting all selections work");
+
+        svg.remove();
+      });
+
+      it("retrieves correct selections (string arg)", () => {
+        var barData = [{ x: "foo", y: 5 }, { x: "bar", y: 640 }, { x: "zoo", y: 12345 }];
+        var barData2 = [{ x: "one", y: 5 }, { x: "two", y: 640 }, { x: "three", y: 12345 }];
+        verticalBarPlot.addDataset("a", barData);
+        verticalBarPlot.addDataset(barData2);
+        verticalBarPlot.renderTo(svg);
+
+        var allBars = verticalBarPlot.getAllSelections("a");
+        assert.strictEqual(allBars.size(), 3, "all bars retrieved");
+        var selectionData = allBars.data();
+        assert.includeMembers(selectionData, barData, "first dataset data in selection data");
+
+        svg.remove();
+      });
+
+      it("retrieves correct selections (array arg)", () => {
+        var barData = [{ x: "foo", y: 5 }, { x: "bar", y: 640 }, { x: "zoo", y: 12345 }];
+        var barData2 = [{ x: "one", y: 5 }, { x: "two", y: 640 }, { x: "three", y: 12345 }];
+        verticalBarPlot.addDataset("a", barData);
+        verticalBarPlot.addDataset("b", barData2);
+        verticalBarPlot.renderTo(svg);
+
+        var allBars = verticalBarPlot.getAllSelections(["a", "b"]);
         assert.strictEqual(allBars.size(), 6, "all bars retrieved");
         var selectionData = allBars.data();
         assert.includeMembers(selectionData, barData, "first dataset data in selection data");
         assert.includeMembers(selectionData, barData2, "second dataset data in selection data");
+
+        svg.remove();
+      });
+
+      it("skips invalid keys", () => {
+        var barData = [{ x: "foo", y: 5 }, { x: "bar", y: 640 }, { x: "zoo", y: 12345 }];
+        var barData2 = [{ x: "one", y: 5 }, { x: "two", y: 640 }, { x: "three", y: 12345 }];
+        verticalBarPlot.addDataset("a", barData);
+        verticalBarPlot.addDataset("b", barData2);
+        verticalBarPlot.renderTo(svg);
+
+        var allBars = verticalBarPlot.getAllSelections(["a", "c"]);
+        assert.strictEqual(allBars.size(), 3, "all bars retrieved");
+        var selectionData = allBars.data();
+        assert.includeMembers(selectionData, barData, "first dataset data in selection data");
 
         svg.remove();
       });

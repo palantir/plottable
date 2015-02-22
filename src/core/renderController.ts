@@ -123,9 +123,6 @@ export module Core {
         _animationRequested = false;
         _isCurrentlyFlushing = false;
       }
-
-      // Reset resize flag regardless of queue'd components
-      ResizeBroadcaster.clearResizing();
     }
   }
 

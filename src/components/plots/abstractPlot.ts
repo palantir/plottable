@@ -16,6 +16,12 @@ export module Plot {
     datasetKey: string
   }
 
+  export type PlotData = {
+    data: any[];
+    pixelPoints: Point[];
+    selection: D3.Selection;
+  }
+
   export class AbstractPlot extends Component.AbstractComponent {
     protected _dataChanged = false;
     protected _key2PlotDatasetKey: D3.Map<PlotDatasetKey>;
@@ -311,37 +317,34 @@ export module Plot {
     }
 
     /**
-     * Removes a dataset by string key
+     * Removes a dataset by the given identifier
      *
-     * @param {string} key The key of the dataset
-     * @return {Plot} The calling Plot.
+     * @param {string | Dataset | any[]} datasetIdentifer The identifier as the key of the Dataset to remove
+     * If string is inputted, it is interpreted as the dataset key to remove.
+     * If Dataset is inputted, the first Dataset in the plot that is the same will be removed.
+     * If any[] is inputted, the first data array in the plot that is the same will be removed.
+     * @returns {AbstractPlot} The calling AbstractPlot.
      */
-    public removeDataset(key: string): AbstractPlot;
-    /**
-     * Remove a dataset given the dataset itself
-     *
-     * @param {Dataset} dataset The dataset to remove
-     * @return {Plot} The calling Plot.
-     */
-    public removeDataset(dataset: Dataset): AbstractPlot;
-    /**
-     * Remove a dataset given the underlying data array
-     *
-     * @param {any[]} dataArray The data to remove
-     * @return {Plot} The calling Plot.
-     */
-    public removeDataset(dataArray: any[]): AbstractPlot;
-    public removeDataset(datasetOrKeyOrArray: any): AbstractPlot {
+    public removeDataset(datasetIdentifier: string | Dataset | any[]): AbstractPlot {
       var key: string;
-      if (typeof(datasetOrKeyOrArray) === "string") {
-        key = datasetOrKeyOrArray;
-      } else if (datasetOrKeyOrArray instanceof Dataset || datasetOrKeyOrArray instanceof Array) {
-        var array: any[] = (datasetOrKeyOrArray instanceof Dataset) ? this.datasets() : this.datasets().map(d => d.data());
-        var idx = array.indexOf(datasetOrKeyOrArray);
-        if (idx !== -1) {
-          key = this._datasetKeysInOrder[idx];
+      if (typeof datasetIdentifier === "string") {
+        key = <string> datasetIdentifier;
+      } else if (typeof datasetIdentifier === "object") {
+
+        var index = -1;
+        if (datasetIdentifier instanceof Dataset) {
+          var datasetArray = this.datasets();
+          index = datasetArray.indexOf(<Dataset> datasetIdentifier);
+        } else if (datasetIdentifier instanceof Array) {
+          var dataArray = this.datasets().map(d => d.data());
+          index = dataArray.indexOf(<any[]> datasetIdentifier);
         }
+        if (index !== -1) {
+          key = this._datasetKeysInOrder[index];
+        }
+
       }
+
       return this._removeDataset(key);
     }
 
@@ -418,16 +421,35 @@ export module Plot {
       this._additionalPaint(maxTime);
     }
 
-    public getAllSelections(): D3.Selection {
-      var allSelections = d3.select();
-      allSelections[0] = [];
-      this._getDrawersInOrder().forEach((drawer) => {
-        drawer._getRenderArea().selectAll(drawer._getSelector())[0].forEach((selection: EventTarget) => {
-          allSelections[0].push(selection);
+    /**
+     * Retrieves all of the selections of this plot for the specified dataset(s)
+     *
+     * @param {string | string[]} datasetKeys The dataset(s) to retrieve the selections from.
+     * If not provided, all selections will be retrieved.
+     * @returns {D3.Selection} The retrieved selections.
+     */
+    public getAllSelections(datasetKeys?: string | string[]): D3.Selection {
+      var datasetKeyArray: string[] = [];
+      if (datasetKeys == null) {
+        datasetKeyArray = this._datasetKeysInOrder;
+      } else if (typeof(datasetKeys) === "string") {
+        datasetKeyArray = [<string> datasetKeys];
+      } else {
+        datasetKeyArray = <string[]> datasetKeys;
+      }
+
+      var allSelections: EventTarget[] = [];
+
+      datasetKeyArray.forEach((datasetKey) => {
+        var plotDatasetKey = this._key2PlotDatasetKey.get(datasetKey);
+        if (plotDatasetKey == null) { return; }
+        var drawer = plotDatasetKey.drawer;
+        drawer._getRenderArea().selectAll(drawer._getSelector()).each(function () {
+          allSelections.push(this);
         });
       });
 
-      return allSelections;
+      return d3.selectAll(allSelections);
     }
 
     /**
@@ -440,10 +462,12 @@ export module Plot {
      * @param {number | Extent} yValOrExtent The pixel y position, or range of y values.
      * @returns {D3.Selection} The selections within under the given bounds
      */
-    public getSelections(xValOrExtent: number | Extent, yValOrExtent: number | Extent, tolerance = 0.5): D3.Selection {
-      var xExtent: Extent = AbstractPlot._parseExtent(xValOrExtent);
-      var yExtent: Extent = AbstractPlot._parseExtent(yValOrExtent);
+    public getPlotData(xValOrExtent: number | Extent, yValOrExtent: number | Extent, tolerance = 0.5): PlotData {
+      var xExtent = (typeof xValOrExtent === "number") ? Plottable._Util.Methods.toExtent(xValOrExtent) : <Extent> xValOrExtent;
+      var yExtent = (typeof yValOrExtent === "number") ? Plottable._Util.Methods.toExtent(yValOrExtent) : <Extent> yValOrExtent;
 
+      var data: any[] = [];
+      var pixelPoints: Point[] = [];
       var selections: EventTarget[] = [];
       this._datasetKeysInOrder.forEach((key: string) => {
         var drawer = this._key2PlotDatasetKey.get(key).drawer;
@@ -456,17 +480,7 @@ export module Plot {
         });
       });
 
-      return d3.selectAll(selections);
-    }
-
-    private static _parseExtent(input: any): Extent {
-      if (typeof(input) === "number") {
-        return {min: input, max: input};
-      } else if (input instanceof Object && "min" in input && "max" in input) {
-        return <Extent> input;
-      } else {
-        throw new Error("input '" + input + "' can't be parsed as an Extent");
-      }
+      return { data: data, pixelPoints: pixelPoints, selection: d3.selectAll(selections) };
     }
 
   }
