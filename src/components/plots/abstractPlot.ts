@@ -451,6 +451,38 @@ export module Plot {
 
       return d3.selectAll(allSelections);
     }
+
+    /**
+     * Gets the selections under the given pixel position (if [xValOrExtent]
+     * and [yValOrExtent] are {number}s), under a given line (if only one
+     * of [xValOrExtent] or [yValOrExtent] are {Extent}s) or are under a
+     * 2D area (if [xValOrExtent] and [yValOrExtent] are both {Extent}s).
+     *
+     * @param {number | Extent} xValOrExtent The pixel x position, or range of x values.
+     * @param {number | Extent} yValOrExtent The pixel y position, or range of y values.
+     * @returns {D3.Selection} The selections within under the given bounds
+     */
+    public getPlotData(xValOrExtent: number | Extent, yValOrExtent: number | Extent, tolerance = 0.5): PlotData {
+      var xExtent = (typeof xValOrExtent === "number") ? Plottable._Util.Methods.toExtent(xValOrExtent) : <Extent> xValOrExtent;
+      var yExtent = (typeof yValOrExtent === "number") ? Plottable._Util.Methods.toExtent(yValOrExtent) : <Extent> yValOrExtent;
+
+      var data: any[] = [];
+      var pixelPoints: Point[] = [];
+      var selections: EventTarget[] = [];
+      this._datasetKeysInOrder.forEach((key: string) => {
+        var drawer = this._key2PlotDatasetKey.get(key).drawer;
+        drawer._getRenderArea().selectAll(drawer._getSelector()).each(function () {
+          var selection = d3.select(this);
+          // Check if extent covers the selection
+          if (drawer._isSelectionInBounds(selection, xExtent, yExtent, tolerance)) {
+            selections.push(this);
+          }
+        });
+      });
+
+      return { data: data, pixelPoints: pixelPoints, selection: d3.selectAll(selections) };
+    }
+
   }
 }
 }

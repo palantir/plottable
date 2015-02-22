@@ -128,6 +128,7 @@ declare module Plottable {
             function colorTest(colorTester: D3.Selection, className: string): string;
             function lightenColor(color: string, factor: number): string;
             function darkenColor(color: string, factor: number, darkenAmount: number): string;
+            function toExtent(input: number): Extent;
         }
     }
 }
@@ -1473,6 +1474,16 @@ declare module Plottable {
              */
             _getRenderArea(): D3.Selection;
             _getSelector(): string;
+            /**
+             * Checks if the given selection is within the specified bounds
+             *
+             * @param {D3.Selection} selection The selection to check
+             * @param {Extent} xExtent The bounds on the x-coordinate space
+             * @param {Extent} yExtent The bounds on the y-coordinate space
+             * @param {number} tolerance The tolerance of how close the selection is
+             * @returns {boolean} if the selection is within the bounds
+             */
+            _isSelectionInBounds(selection: D3.Selection, xExtent: Extent, yExtent: Extent, tolerance: number): boolean;
             _getPixelPoint(datum: any, index: number): Point;
             _getSelection(index: number): D3.Selection;
         }
@@ -1540,6 +1551,7 @@ declare module Plottable {
         class Circle extends Element {
             constructor(key: string);
             _getPixelPoint(datum: any, index: number): Point;
+            _isSelectionInBounds(selection: D3.Selection, xExtent: Extent, yExtent: Extent, tolerance: number): boolean;
         }
     }
 }
@@ -1552,6 +1564,7 @@ declare module Plottable {
             setup(area: D3.Selection): void;
             removeLabels(): void;
             _getIfLabelsTooWide(): boolean;
+            _isSelectionInBounds(selection: D3.Selection, xExtent: Extent, yExtent: Extent, tolerance: number): boolean;
             drawText(data: any[], attrToProjector: AttributeToProjector, userMetadata: any, plotMetadata: Plot.PlotMetadata): void;
             _getPixelPoint(datum: any, index: number): Point;
         }
@@ -2681,6 +2694,17 @@ declare module Plottable {
              * @returns {D3.Selection} The retrieved selections.
              */
             getAllSelections(datasetKeys?: string | string[]): D3.Selection;
+            /**
+             * Gets the selections under the given pixel position (if [xValOrExtent]
+             * and [yValOrExtent] are {number}s), under a given line (if only one
+             * of [xValOrExtent] or [yValOrExtent] are {Extent}s) or are under a
+             * 2D area (if [xValOrExtent] and [yValOrExtent] are both {Extent}s).
+             *
+             * @param {number | Extent} xValOrExtent The pixel x position, or range of x values.
+             * @param {number | Extent} yValOrExtent The pixel y position, or range of y values.
+             * @returns {D3.Selection} The selections within under the given bounds
+             */
+            getPlotData(xValOrExtent: number | Extent, yValOrExtent: number | Extent, tolerance?: number): PlotData;
         }
     }
 }

@@ -2837,23 +2837,23 @@ describe("Plots", function () {
                 assert.equal(baseline.attr("x2"), SVG_WIDTH, "the baseline ends at the edge of the chart");
                 svg.remove();
             });
-            it("getBar()", function () {
-                var bar = barPlot.getBars(155, 150); // in the middle of bar 0
+            it("getPlotData()", function () {
+                var bar = barPlot.getPlotData(155, 150).selection; // in the middle of bar 0
                 assert.lengthOf(bar[0], 1, "getBar returns a bar");
                 assert.equal(bar.data()[0], dataset.data()[0], "the data in the bar matches the datasource");
-                bar = barPlot.getBars(-1, -1); // no bars here
+                bar = barPlot.getPlotData(-1, -1).selection; // no bars here
                 assert.isTrue(bar.empty(), "returns empty selection if no bar was selected");
-                bar = barPlot.getBars(200, 50); // between the two bars
+                bar = barPlot.getPlotData(200, 50).selection; // between the two bars
                 assert.isTrue(bar.empty(), "returns empty selection if no bar was selected");
-                bar = barPlot.getBars(155, 10); // above bar 0
+                bar = barPlot.getPlotData(155, 10).selection; // above bar 0
                 assert.isTrue(bar.empty(), "returns empty selection if no bar was selected");
                 // the bars are now (140,100),(150,300) and (440,300),(450,350) - the
                 // origin is at the top left!
-                bar = barPlot.getBars({ min: 155, max: 455 }, { min: 150, max: 150 });
+                bar = barPlot.getPlotData({ min: 155, max: 455 }, { min: 150, max: 150 }).selection;
                 assert.lengthOf(bar.data(), 2, "selected 2 bars (not the negative one)");
                 assert.equal(bar.data()[0], dataset.data()[0], "the data in bar 0 matches the datasource");
                 assert.equal(bar.data()[1], dataset.data()[2], "the data in bar 1 matches the datasource");
-                bar = barPlot.getBars({ min: 155, max: 455 }, { min: 150, max: 350 });
+                bar = barPlot.getPlotData({ min: 155, max: 455 }, { min: 150, max: 350 }).selection;
                 assert.lengthOf(bar.data(), 3, "selected all the bars");
                 assert.equal(bar.data()[0], dataset.data()[0], "the data in bar 0 matches the datasource");
                 assert.equal(bar.data()[1], dataset.data()[1], "the data in bar 1 matches the datasource");
@@ -3417,7 +3417,7 @@ describe("Plots", function () {
             assert.closeTo(parseFloat(c2.attr("cy")), 0, 0.01, "second circle cy is correct after metadata change");
             svg.remove();
         });
-        it("the accessors properly access data, index, and metadata", function () {
+        it("getAllSelections()", function () {
             var svg = generateSVG(400, 400);
             var xScale = new Plottable.Scale.Linear();
             var yScale = new Plottable.Scale.Linear();
@@ -3430,6 +3430,22 @@ describe("Plots", function () {
             var selectionData = allCircles.data();
             assert.includeMembers(selectionData, data, "first dataset data in selection data");
             assert.includeMembers(selectionData, data2, "second dataset data in selection data");
+            svg.remove();
+        });
+        it("getSelections()", function () {
+            var svg = generateSVG(400, 400);
+            var xScale = new Plottable.Scale.Linear();
+            var yScale = new Plottable.Scale.Linear();
+            var data = [{ x: 0, y: 0 }, { x: 1, y: 1 }];
+            var data2 = [{ x: 1, y: 2 }, { x: 3, y: 4 }];
+            var plot = new Plottable.Plot.Scatter(xScale, yScale).project("x", "x", xScale).project("y", "y", yScale).addDataset(data).addDataset(data2);
+            plot.renderTo(svg);
+            var circles = plot.getPlotData(xScale.scale(1), yScale.scale(1)).selection;
+            var selectionData = circles.data();
+            assert.deepEqual(selectionData, [{ x: 1, y: 1 }], "retrieved selection for specified point");
+            var circles2 = plot.getPlotData({ min: xScale.scale(1), max: xScale.scale(3) }, { min: yScale.scale(4), max: yScale.scale(1) }).selection;
+            var selectionData2 = circles2.data();
+            assert.deepEqual(selectionData2, [{ x: 1, y: 1 }, { x: 1, y: 2 }, { x: 3, y: 4 }], "retrieved selection for specified extent");
             svg.remove();
         });
         it("_getClosestStruckPoint()", function () {

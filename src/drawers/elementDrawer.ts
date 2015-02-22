@@ -60,6 +60,7 @@ export module _Drawer {
     public _getSelector(): string {
       return this._svgElement;
     }
+
   }
 }
 }

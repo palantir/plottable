@@ -145,6 +145,19 @@ export module _Drawer {
       return "";
     }
 
+    /**
+     * Checks if the given selection is within the specified bounds
+     *
+     * @param {D3.Selection} selection The selection to check
+     * @param {Extent} xExtent The bounds on the x-coordinate space
+     * @param {Extent} yExtent The bounds on the y-coordinate space
+     * @param {number} tolerance The tolerance of how close the selection is
+     * @returns {boolean} if the selection is within the bounds
+     */
+    public _isSelectionInBounds(selection: D3.Selection, xExtent: Extent, yExtent: Extent, tolerance: number): boolean {
+      return true;
+    }
+
     public _getPixelPoint(datum: any, index: number): Point {
       return null;
     }

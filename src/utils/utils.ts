@@ -325,6 +325,10 @@ export module _Util {
 
       return "#" + rHex + gHex + bHex;
     }
+
+    export function toExtent(input: number): Extent {
+      return {min: input, max: input};
+    }
   }
 }
 }
