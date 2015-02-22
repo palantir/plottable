@@ -2916,6 +2916,8 @@ var Plottable;
                     }
                     else {
                         var intersectionPoint = Plottable._Util.Methods.intersectionPoint(pixelPoint, lineSegment[0], lineSegment[1]);
+                        var closestPointX = Plottable._Util.Methods.clamp(intersectionPoint.x, lineSegment[0].x, lineSegment[1].x);
+                        var closestPoint = { x: closestPointX, y: slope * closestPointX + lineConstant };
                         var intersectionPointDistance = Plottable._Util.Methods.pointDistance(intersectionPoint, pixelPoint);
                         if (intersectionPointDistance < closestDistance) {
                             closestPixelPoint = intersectionPoint;
