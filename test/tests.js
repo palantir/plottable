@@ -1977,19 +1977,19 @@ describe("Plots", function () {
             // Create mock drawers with already drawn items
             var mockDrawer1 = new Plottable._Drawer.AbstractDrawer("ds1");
             var renderArea1 = svg.append("g");
-            renderArea1.selectAll("circle").data(data1).enter().append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
+            renderArea1.selectAll("circle").data(data1).enter().append("circle").attr("cx", function (datum) { return datum.value * 100; }).attr("cy", 100);
             mockDrawer1.setup = function () { return mockDrawer1._renderArea = renderArea1; };
             mockDrawer1._getSelector = function () { return "circle"; };
-            mockDrawer1._getPixelPoint = function (datum) {
-                return { x: datum.value, y: 100 };
+            mockDrawer1._getClosestPixelPoint = function (selection, datum) {
+                return { x: parseFloat(selection.attr("cx")), y: parseFloat(selection.attr("cy")) };
             };
             var renderArea2 = svg.append("g");
-            renderArea2.selectAll("circle").data(data2).enter().append("circle").attr("cx", 10).attr("cy", 10).attr("r", 10);
+            renderArea2.selectAll("circle").data(data2).enter().append("circle").attr("cx", function (datum) { return datum.value * 100; }).attr("cy", 10);
             var mockDrawer2 = new Plottable._Drawer.AbstractDrawer("ds2");
             mockDrawer2.setup = function () { return mockDrawer2._renderArea = renderArea2; };
             mockDrawer2._getSelector = function () { return "circle"; };
-            mockDrawer2._getPixelPoint = function (datum) {
-                return { x: datum.value * 2, y: 100 };
+            mockDrawer2._getClosestPixelPoint = function (selection, datum) {
+                return { x: parseFloat(selection.attr("cx")), y: parseFloat(selection.attr("cy")) };
             };
             // Mock _getDrawer to return the mock drawers
             plot._getDrawer = function (key) {
@@ -2003,10 +2003,10 @@ describe("Plots", function () {
             plot.addDataset("ds1", data1);
             plot.addDataset("ds2", data2);
             plot.renderTo(svg);
-            var plotData = plot.getClosestData(0, 99);
+            var plotData = plot.getClosestData(100, 99);
             assert.strictEqual(plotData.selection.size(), 1, "only 1 selection retrieved");
-            assert.deepEqual(plotData.data, [data1[0]], "correct datum retrieved");
-            assert.deepEqual(plotData.pixelPoints, [{ x: 0, y: 100 }], "correct pixel point retrieved");
+            assert.deepEqual(plotData.data, [data1[1]], "correct datum retrieved");
+            assert.deepEqual(plotData.pixelPoints, [{ x: 100, y: 100 }], "correct pixel point retrieved");
             svg.remove();
         });
         describe("Dataset removal", function () {

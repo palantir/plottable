@@ -468,16 +468,15 @@ export module Plot {
       var closestPixelPoint: Point = null;
       var closestPointDistance = withinValue;
 
-      this.datasetOrder().forEach((datasetKey) => {
-        var plotDatasetKey = this._key2PlotDatasetKey.get(datasetKey);
-        plotDatasetKey.dataset.data().forEach((datum, index) => {
-          var drawer = plotDatasetKey.drawer;
-          var pixelPoint = drawer._getPixelPoint(datum, index);
+      this._getDrawersInOrder().forEach((drawer) => {
+        drawer._getRenderArea().selectAll(drawer._getSelector()).each(function (datum) {
+          var selection = d3.select(this);
+          var pixelPoint = drawer._getClosestPixelPoint(selection, queryPoint);
           var pointDistance = Plottable._Util.Methods.pointDistance(pixelPoint, queryPoint);
           if (pointDistance < closestPointDistance) {
             closestDatum = datum;
             closestPixelPoint = pixelPoint;
-            closestSelection = drawer._getSelection(index);
+            closestSelection = selection;
             closestPointDistance = pointDistance;
           }
         });

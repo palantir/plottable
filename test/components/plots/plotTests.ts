@@ -192,20 +192,20 @@ describe("Plots", () => {
       // Create mock drawers with already drawn items
       var mockDrawer1 = new Plottable._Drawer.AbstractDrawer("ds1");
       var renderArea1 = svg.append("g");
-      renderArea1.selectAll("circle").data(data1).enter().append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
+      renderArea1.selectAll("circle").data(data1).enter().append("circle").attr("cx", (datum: any) => datum.value * 100).attr("cy", 100);
       (<any> mockDrawer1).setup = () => (<any> mockDrawer1)._renderArea = renderArea1;
       (<any> mockDrawer1)._getSelector = () => "circle";
-      (<any> mockDrawer1)._getPixelPoint = (datum: any) => {
-        return {x: datum.value, y: 100};
+      (<any> mockDrawer1)._getClosestPixelPoint = (selection: D3.Selection, datum: any) => {
+        return {x: parseFloat(selection.attr("cx")), y: parseFloat(selection.attr("cy"))};
       };
 
       var renderArea2 = svg.append("g");
-      renderArea2.selectAll("circle").data(data2).enter().append("circle").attr("cx", 10).attr("cy", 10).attr("r", 10);
+      renderArea2.selectAll("circle").data(data2).enter().append("circle").attr("cx", (datum: any) => datum.value * 100).attr("cy", 10);
       var mockDrawer2 = new Plottable._Drawer.AbstractDrawer("ds2");
       (<any> mockDrawer2).setup = () => (<any> mockDrawer2)._renderArea = renderArea2;
       (<any> mockDrawer2)._getSelector = () => "circle";
-      (<any> mockDrawer2)._getPixelPoint = (datum: any) => {
-        return {x: datum.value * 2, y: 100};
+      (<any> mockDrawer2)._getClosestPixelPoint = (selection: D3.Selection, datum: any) => {
+        return {x: parseFloat(selection.attr("cx")), y: parseFloat(selection.attr("cy"))};
       };
 
       // Mock _getDrawer to return the mock drawers
@@ -221,10 +221,10 @@ describe("Plots", () => {
       plot.addDataset("ds2", data2);
       plot.renderTo(svg);
 
-      var plotData = plot.getClosestData(0, 99);
+      var plotData = plot.getClosestData(100, 99);
       assert.strictEqual(plotData.selection.size(), 1, "only 1 selection retrieved");
-      assert.deepEqual(plotData.data, [data1[0]], "correct datum retrieved");
-      assert.deepEqual(plotData.pixelPoints, [{x: 0, y: 100}], "correct pixel point retrieved");
+      assert.deepEqual(plotData.data, [data1[1]], "correct datum retrieved");
+      assert.deepEqual(plotData.pixelPoints, [{x: 100, y: 100}], "correct pixel point retrieved");
       svg.remove();
     });
 
