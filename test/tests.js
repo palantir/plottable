@@ -1255,6 +1255,19 @@ describe("Category Axes", function () {
         verifyTickLabelOverlaps(tickLabels, tickMarks);
         svg.remove();
     });
+    it("axis should request more space when rotated than not rotated", function () {
+        var svg = generateSVG(300, 300);
+        var labels = ["label1", "label2", "label100"];
+        var scale = new Plottable.Scale.Ordinal().domain(labels);
+        var axis = new Plottable.Axis.Category(scale, "bottom");
+        axis.renderTo(svg);
+        var requestedSpace = axis._requestedSpace(300, 50);
+        var flatHeight = requestedSpace.height;
+        axis.tickLabelAngle(-90);
+        requestedSpace = axis._requestedSpace(300, 50);
+        assert.isTrue(flatHeight < requestedSpace.height, "axis should request more height when tick labels are rotated");
+        svg.remove();
+    });
 });
 
 ///<reference path="../testReference.ts" />

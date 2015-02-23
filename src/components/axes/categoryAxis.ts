@@ -164,6 +164,7 @@ export module Axis {
                       (t: SVGTypewriter.Wrappers.WrappingResult) => this._measurer.measure(t.wrappedText).height, 0);
 
       // If the tick labels are rotated, reverse usedWidth and usedHeight
+      // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
       if (this._tickLabelAngle !== 0) {
         var tempHeight = usedHeight;
         usedHeight = usedWidth;

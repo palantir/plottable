@@ -5075,6 +5075,7 @@ var Plottable;
                 var usedWidth = widthFn(wrappingResults, function (t) { return _this._measurer.measure(t.wrappedText).width; }, 0);
                 var usedHeight = heightFn(wrappingResults, function (t) { return _this._measurer.measure(t.wrappedText).height; }, 0);
                 // If the tick labels are rotated, reverse usedWidth and usedHeight
+                // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
                 if (this._tickLabelAngle !== 0) {
                     var tempHeight = usedHeight;
                     usedHeight = usedWidth;
