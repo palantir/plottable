@@ -139,6 +139,7 @@ export module Axis {
       var wrappingResults = ticks.map((s: string) => {
         var bandWidth = scale.stepWidth();
 
+        // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
         var width = bandWidth;
         if (this._isHorizontal()) {
           if (this._tickLabelAngle !== 0) {
@@ -174,15 +175,6 @@ export module Axis {
         usedWidth: usedWidth,
         usedHeight: usedHeight
       };
-
-      // return {
-      //   textFits: wrappingResults.every((t: SVGTypewriter.Wrappers.WrappingResult) =>
-      //               SVGTypewriter.Utils.StringMethods.isNotEmptyString(t.truncatedText) && t.noLines === 1),
-      //   usedWidth : widthFn<SVGTypewriter.Wrappers.WrappingResult, number>(wrappingResults,
-      //                 (t: SVGTypewriter.Wrappers.WrappingResult) => this._measurer.measure(t.wrappedText).width, 0),
-      //   usedHeight: heightFn<SVGTypewriter.Wrappers.WrappingResult, number>(wrappingResults,
-      //                 (t: SVGTypewriter.Wrappers.WrappingResult) => this._measurer.measure(t.wrappedText).height, 0)
-      // };
     }
 
     public _doRender() {

@@ -5056,6 +5056,7 @@ var Plottable;
                 var _this = this;
                 var wrappingResults = ticks.map(function (s) {
                     var bandWidth = scale.stepWidth();
+                    // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
                     var width = bandWidth;
                     if (_this._isHorizontal()) {
                         if (_this._tickLabelAngle !== 0) {
@@ -5084,14 +5085,6 @@ var Plottable;
                     usedWidth: usedWidth,
                     usedHeight: usedHeight
                 };
-                // return {
-                //   textFits: wrappingResults.every((t: SVGTypewriter.Wrappers.WrappingResult) =>
-                //               SVGTypewriter.Utils.StringMethods.isNotEmptyString(t.truncatedText) && t.noLines === 1),
-                //   usedWidth : widthFn<SVGTypewriter.Wrappers.WrappingResult, number>(wrappingResults,
-                //                 (t: SVGTypewriter.Wrappers.WrappingResult) => this._measurer.measure(t.wrappedText).width, 0),
-                //   usedHeight: heightFn<SVGTypewriter.Wrappers.WrappingResult, number>(wrappingResults,
-                //                 (t: SVGTypewriter.Wrappers.WrappingResult) => this._measurer.measure(t.wrappedText).height, 0)
-                // };
             };
             Category.prototype._doRender = function () {
                 var _this = this;
