@@ -5056,17 +5056,42 @@ var Plottable;
                 var _this = this;
                 var wrappingResults = ticks.map(function (s) {
                     var bandWidth = scale.stepWidth();
-                    var width = _this._isHorizontal() ? bandWidth : axisWidth - _this._maxLabelTickLength() - _this.tickLabelPadding();
+                    var width = bandWidth;
+                    if (_this._isHorizontal()) {
+                        if (_this._tickLabelAngle !== 0) {
+                            width = bandWidth - _this._maxLabelTickLength() - _this.tickLabelPadding();
+                        }
+                        else {
+                            width = axisWidth - _this._maxLabelTickLength() - _this.tickLabelPadding();
+                        }
+                    }
                     var height = _this._isHorizontal() ? axisHeight - _this._maxLabelTickLength() - _this.tickLabelPadding() : bandWidth;
                     return _this._wrapper.wrap(_this.formatter()(s), _this._measurer, width, height);
                 });
                 var widthFn = this._isHorizontal() ? d3.sum : Plottable._Util.Methods.max;
                 var heightFn = this._isHorizontal() ? Plottable._Util.Methods.max : d3.sum;
+                var textFits = wrappingResults.every(function (t) { return SVGTypewriter.Utils.StringMethods.isNotEmptyString(t.truncatedText) && t.noLines === 1; });
+                var usedWidth = widthFn(wrappingResults, function (t) { return _this._measurer.measure(t.wrappedText).width; }, 0);
+                var usedHeight = heightFn(wrappingResults, function (t) { return _this._measurer.measure(t.wrappedText).height; }, 0);
+                // If the tick labels are rotated, reverse usedWidth and usedHeight
+                if (this._tickLabelAngle !== 0) {
+                    var tempHeight = usedHeight;
+                    usedHeight = usedWidth;
+                    usedWidth = tempHeight;
+                }
                 return {
-                    textFits: wrappingResults.every(function (t) { return SVGTypewriter.Utils.StringMethods.isNotEmptyString(t.truncatedText) && t.noLines === 1; }),
-                    usedWidth: widthFn(wrappingResults, function (t) { return _this._measurer.measure(t.wrappedText).width; }, 0),
-                    usedHeight: heightFn(wrappingResults, function (t) { return _this._measurer.measure(t.wrappedText).height; }, 0)
+                    textFits: textFits,
+                    usedWidth: usedWidth,
+                    usedHeight: usedHeight
                 };
+                // return {
+                //   textFits: wrappingResults.every((t: SVGTypewriter.Wrappers.WrappingResult) =>
+                //               SVGTypewriter.Utils.StringMethods.isNotEmptyString(t.truncatedText) && t.noLines === 1),
+                //   usedWidth : widthFn<SVGTypewriter.Wrappers.WrappingResult, number>(wrappingResults,
+                //                 (t: SVGTypewriter.Wrappers.WrappingResult) => this._measurer.measure(t.wrappedText).width, 0),
+                //   usedHeight: heightFn<SVGTypewriter.Wrappers.WrappingResult, number>(wrappingResults,
+                //                 (t: SVGTypewriter.Wrappers.WrappingResult) => this._measurer.measure(t.wrappedText).height, 0)
+                // };
             };
             Category.prototype._doRender = function () {
                 var _this = this;

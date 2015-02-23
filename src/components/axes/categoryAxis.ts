@@ -138,22 +138,51 @@ export module Axis {
     private _measureTicks(axisWidth: number, axisHeight: number, scale: Scale.Ordinal, ticks: string[]) {
       var wrappingResults = ticks.map((s: string) => {
         var bandWidth = scale.stepWidth();
-        var width  = this._isHorizontal() ? bandWidth  : axisWidth - this._maxLabelTickLength() - this.tickLabelPadding();
+
+        var width = bandWidth;
+        if (this._isHorizontal()) {
+          if (this._tickLabelAngle !== 0) {
+            width = bandWidth - this._maxLabelTickLength() - this.tickLabelPadding();
+          } else {
+            width = axisWidth - this._maxLabelTickLength() - this.tickLabelPadding();
+          }
+        }
         var height = this._isHorizontal() ? axisHeight - this._maxLabelTickLength() - this.tickLabelPadding() : bandWidth;
+
         return this._wrapper.wrap(this.formatter()(s), this._measurer, width, height);
       });
 
       var widthFn  = this._isHorizontal() ? d3.sum : _Util.Methods.max;
       var heightFn = this._isHorizontal() ? _Util.Methods.max : d3.sum;
 
+      var textFits = wrappingResults.every((t: SVGTypewriter.Wrappers.WrappingResult) =>
+                    SVGTypewriter.Utils.StringMethods.isNotEmptyString(t.truncatedText) && t.noLines === 1);
+      var usedWidth = widthFn<SVGTypewriter.Wrappers.WrappingResult, number>(wrappingResults,
+                      (t: SVGTypewriter.Wrappers.WrappingResult) => this._measurer.measure(t.wrappedText).width, 0);
+      var usedHeight = heightFn<SVGTypewriter.Wrappers.WrappingResult, number>(wrappingResults,
+                      (t: SVGTypewriter.Wrappers.WrappingResult) => this._measurer.measure(t.wrappedText).height, 0);
+
+      // If the tick labels are rotated, reverse usedWidth and usedHeight
+      if (this._tickLabelAngle !== 0) {
+        var tempHeight = usedHeight;
+        usedHeight = usedWidth;
+        usedWidth = tempHeight;
+      }
+
       return {
-        textFits: wrappingResults.every((t: SVGTypewriter.Wrappers.WrappingResult) =>
-                    SVGTypewriter.Utils.StringMethods.isNotEmptyString(t.truncatedText) && t.noLines === 1),
-        usedWidth : widthFn<SVGTypewriter.Wrappers.WrappingResult, number>(wrappingResults,
-                      (t: SVGTypewriter.Wrappers.WrappingResult) => this._measurer.measure(t.wrappedText).width, 0),
-        usedHeight: heightFn<SVGTypewriter.Wrappers.WrappingResult, number>(wrappingResults,
-                      (t: SVGTypewriter.Wrappers.WrappingResult) => this._measurer.measure(t.wrappedText).height, 0)
+        textFits: textFits,
+        usedWidth: usedWidth,
+        usedHeight: usedHeight
       };
+
+      // return {
+      //   textFits: wrappingResults.every((t: SVGTypewriter.Wrappers.WrappingResult) =>
+      //               SVGTypewriter.Utils.StringMethods.isNotEmptyString(t.truncatedText) && t.noLines === 1),
+      //   usedWidth : widthFn<SVGTypewriter.Wrappers.WrappingResult, number>(wrappingResults,
+      //                 (t: SVGTypewriter.Wrappers.WrappingResult) => this._measurer.measure(t.wrappedText).width, 0),
+      //   usedHeight: heightFn<SVGTypewriter.Wrappers.WrappingResult, number>(wrappingResults,
+      //                 (t: SVGTypewriter.Wrappers.WrappingResult) => this._measurer.measure(t.wrappedText).height, 0)
+      // };
     }
 
     public _doRender() {
