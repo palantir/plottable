@@ -7009,7 +7009,7 @@ var Plottable;
                 return this;
             };
             Grid.prototype._getDrawer = function (key) {
-                return new Plottable._Drawer.Element(key).svgElement("rect");
+                return new Plottable._Drawer.Rect(key, true);
             };
             /**
              * @param {string} attrToSet One of ["x", "y", "fill"]. If "fill" is used,
