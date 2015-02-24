@@ -15,7 +15,7 @@ function run(svg, data, Plottable) {
   var deep_copy = function(from, to){
     var deep_copy_xy = function(d){
       to.push({'x': d.x, 'y': d.y});
-    }
+    };
     from.forEach(deep_copy_xy);
   };
 
