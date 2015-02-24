@@ -353,6 +353,13 @@ export module _Util {
     }
 
     export function closestPoint(searchPoint: Point, startPoint: Point, endPoint: Point): Point {
+      if (startPoint.x === endPoint.x && startPoint.y === endPoint.y) {
+        return {x: startPoint.x, y: startPoint.y};
+      } else if (startPoint.x === endPoint.x) {
+        return {x: startPoint.x, y: searchPoint.y};
+      } else if (startPoint.y === endPoint.y) {
+        return {x: searchPoint.x, y: startPoint.y};
+      }
       var slope = (endPoint.y - startPoint.y) / (endPoint.x - startPoint.x);
       var constant = startPoint.y - slope * startPoint.x;
       var intersectingSlope = - 1 / slope;

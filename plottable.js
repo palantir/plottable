@@ -351,6 +351,15 @@ var Plottable;
             }
             Methods.intersectionPoint = intersectionPoint;
             function closestPoint(searchPoint, startPoint, endPoint) {
+                if (startPoint.x === endPoint.x && startPoint.y === endPoint.y) {
+                    return { x: startPoint.x, y: startPoint.y };
+                }
+                else if (startPoint.x === endPoint.x) {
+                    return { x: startPoint.x, y: searchPoint.y };
+                }
+                else if (startPoint.y === endPoint.y) {
+                    return { x: searchPoint.x, y: startPoint.y };
+                }
                 var slope = (endPoint.y - startPoint.y) / (endPoint.x - startPoint.x);
                 var constant = startPoint.y - slope * startPoint.x;
                 var intersectingSlope = -1 / slope;
@@ -2927,7 +2936,7 @@ var Plottable;
             };
             Line.prototype._getSelectionDistance = function (selection, pixelPoint) {
                 var _this = this;
-                var lineSegments = d3.pairs(selection.data().map(function (datum, index) { return _this._getPixelPoint(datum, index); }));
+                var lineSegments = d3.pairs(selection.datum().map(function (datum, index) { return _this._getPixelPoint(datum, index); }));
                 return Plottable._Util.Methods.min(lineSegments, function (lineSegment) {
                     if (lineSegment[0].x === lineSegment[1].x) {
                         var closestY = Plottable._Util.Methods.clamp(pixelPoint.y, lineSegment[0].y, lineSegment[1].y);
@@ -2939,9 +2948,7 @@ var Plottable;
                         return 0;
                     }
                     else {
-                        var intersectionPoint = Plottable._Util.Methods.intersectionPoint(pixelPoint, lineSegment[0], lineSegment[1]);
-                        var closestPointX = Plottable._Util.Methods.clamp(intersectionPoint.x, lineSegment[0].x, lineSegment[1].x);
-                        var closestPoint = { x: closestPointX, y: slope * closestPointX + lineConstant };
+                        var closestPoint = Plottable._Util.Methods.closestPoint(pixelPoint, lineSegment[0], lineSegment[1]);
                         return Plottable._Util.Methods.pointDistance(closestPoint, pixelPoint);
                     }
                 }, Infinity);
