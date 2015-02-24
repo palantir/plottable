@@ -130,7 +130,6 @@ declare module Plottable {
             function darkenColor(color: string, factor: number, darkenAmount: number): string;
             function pointDistance(p1: Point, p2: Point): number;
             function clamp(value: number, a: number, b: number): number;
-            function intersectionPoint(searchPoint: Point, startPoint: Point, endPoint: Point): Point;
             function closestPoint(searchPoint: Point, startPoint: Point, endPoint: Point): Point;
             function positiveMod(a: number, b: number): number;
         }

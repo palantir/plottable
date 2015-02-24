@@ -74,7 +74,7 @@ export module _Drawer {
     }
 
     public _getSelectionDistance(selection: D3.Selection, pixelPoint: Point): number {
-      var lineSegments = d3.pairs(selection.datum().map((datum, index) => this._getPixelPoint(datum, index)));
+      var lineSegments = d3.pairs(selection.datum().map((lineDatum: any, index: number) => this._getPixelPoint(lineDatum, index)));
       return _Util.Methods.min(lineSegments, (lineSegment: Point[]) => {
         if (lineSegment[0].x === lineSegment[1].x) {
           var closestY = _Util.Methods.clamp(pixelPoint.y, lineSegment[0].y, lineSegment[1].y);

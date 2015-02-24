@@ -340,16 +340,6 @@ var Plottable;
                 }
             }
             Methods.clamp = clamp;
-            function intersectionPoint(searchPoint, startPoint, endPoint) {
-                var slope = (endPoint.y - startPoint.y) / (endPoint.x - startPoint.x);
-                var constant = startPoint.y - slope * startPoint.x;
-                var intersectingSlope = -1 / slope;
-                var intersectingConstant = searchPoint.y - intersectingSlope * searchPoint.x;
-                var intersectingPointX = (intersectingConstant - constant) / (slope - intersectingSlope);
-                var intersectingPointY = intersectingSlope * intersectingPointX + intersectingConstant;
-                return { x: intersectingPointX, y: intersectingPointY };
-            }
-            Methods.intersectionPoint = intersectionPoint;
             function closestPoint(searchPoint, startPoint, endPoint) {
                 if (startPoint.x === endPoint.x && startPoint.y === endPoint.y) {
                     return { x: startPoint.x, y: startPoint.y };
@@ -2936,7 +2926,7 @@ var Plottable;
             };
             Line.prototype._getSelectionDistance = function (selection, pixelPoint) {
                 var _this = this;
-                var lineSegments = d3.pairs(selection.datum().map(function (datum, index) { return _this._getPixelPoint(datum, index); }));
+                var lineSegments = d3.pairs(selection.datum().map(function (lineDatum, index) { return _this._getPixelPoint(lineDatum, index); }));
                 return Plottable._Util.Methods.min(lineSegments, function (lineSegment) {
                     if (lineSegment[0].x === lineSegment[1].x) {
                         var closestY = Plottable._Util.Methods.clamp(pixelPoint.y, lineSegment[0].y, lineSegment[1].y);
