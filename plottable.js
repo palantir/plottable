@@ -2916,28 +2916,24 @@ var Plottable;
             Line.prototype._getSelectionDistance = function (selection, pixelPoint) {
                 var _this = this;
                 var closestPixelPoint;
-                var closestDistance = Infinity;
                 var lineSegments = d3.pairs(selection.data().map(function (datum, index) { return _this._getPixelPoint(datum, index); }));
-                lineSegments.forEach(function (lineSegment) {
+                return Plottable._Util.Methods.min(lineSegments, function (lineSegment) {
                     var slope = (lineSegment[1].y - lineSegment[0].y) / (lineSegment[1].x - lineSegment[0].x);
                     var lineConstant = lineSegment[0].y - slope * lineSegment[0].x;
                     if (Plottable._Util.Methods.inRange(pixelPoint.x, lineSegment[0].x, lineSegment[1].x) && Plottable._Util.Methods.inRange(pixelPoint.y, lineSegment[0].y, lineSegment[1].y) && (slope * pixelPoint.x + lineConstant === pixelPoint.y)) {
-                        closestDistance = 0;
+                        return 0;
                     }
                     else {
                         var intersectionPoint = Plottable._Util.Methods.intersectionPoint(pixelPoint, lineSegment[0], lineSegment[1]);
                         var closestPointX = Plottable._Util.Methods.clamp(intersectionPoint.x, lineSegment[0].x, lineSegment[1].x);
                         var closestPoint = { x: closestPointX, y: slope * closestPointX + lineConstant };
-                        var closestPointDistance = Plottable._Util.Methods.pointDistance(closestPoint, pixelPoint);
-                        closestDistance = Math.min(closestDistance, closestPointDistance);
+                        return Plottable._Util.Methods.pointDistance(closestPoint, pixelPoint);
                     }
-                });
-                return closestDistance;
+                }, Infinity);
             };
             Line.prototype._getClosestDatumPoint = function (selection, pixelPoint) {
                 var _this = this;
                 var pixelPoints = selection.data().map(function (datum, index) { return _this._getPixelPoint(datum, index); });
-                var test = function (point) { return Plottable._Util.Methods.pointDistance(pixelPoint, point); };
                 return Plottable._Util.Methods.min(pixelPoints, function (point) { return Plottable._Util.Methods.pointDistance(pixelPoint, point); }, null);
             };
             Line.LINE_CLASS = "line";

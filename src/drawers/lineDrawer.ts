@@ -75,30 +75,26 @@ export module _Drawer {
 
     public _getSelectionDistance(selection: D3.Selection, pixelPoint: Point): number {
       var closestPixelPoint: Point;
-      var closestDistance = Infinity;
       var lineSegments = d3.pairs(selection.data().map((datum, index) => this._getPixelPoint(datum, index)));
-      lineSegments.forEach((lineSegment: Point[]) => {
+      return _Util.Methods.min(lineSegments, (lineSegment: Point[]) => {
         var slope = (lineSegment[1].y - lineSegment[0].y) / (lineSegment[1].x - lineSegment[0].x);
         var lineConstant = lineSegment[0].y - slope * lineSegment[0].x;
 
         if (_Util.Methods.inRange(pixelPoint.x, lineSegment[0].x, lineSegment[1].x) &&
             _Util.Methods.inRange(pixelPoint.y, lineSegment[0].y, lineSegment[1].y) &&
             (slope * pixelPoint.x + lineConstant === pixelPoint.y)) {
-          closestDistance = 0;
+          return 0;
         } else {
           var intersectionPoint = _Util.Methods.intersectionPoint(pixelPoint, lineSegment[0], lineSegment[1]);
           var closestPointX = _Util.Methods.clamp(intersectionPoint.x, lineSegment[0].x, lineSegment[1].x);
           var closestPoint = {x: closestPointX, y: slope * closestPointX + lineConstant};
-          var closestPointDistance = _Util.Methods.pointDistance(closestPoint, pixelPoint);
-          closestDistance = Math.min(closestDistance, closestPointDistance);
+          return _Util.Methods.pointDistance(closestPoint, pixelPoint);
         }
-      });
-      return closestDistance;
+      }, Infinity);
     }
 
     public _getClosestDatumPoint(selection: D3.Selection, pixelPoint: Point): Point {
       var pixelPoints = selection.data().map((datum, index) =>  this._getPixelPoint(datum, index));
-      var test = (point: Point) => _Util.Methods.pointDistance(pixelPoint, point);
       return _Util.Methods.min(pixelPoints, (point: Point) => _Util.Methods.pointDistance(pixelPoint, point), <any> null);
     }
   }
