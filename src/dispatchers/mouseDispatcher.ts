@@ -2,13 +2,19 @@
 
 module Plottable {
 export module Dispatcher {
+  export type MouseCallback = (p: Point) => any;
+
   export class Mouse extends AbstractDispatcher {
     private static _DISPATCHER_KEY = "__Plottable_Dispatcher_Mouse";
     private _svg: SVGElement;
     private _measureRect: SVGElement;
     private _lastMousePosition: Point;
     private _moveBroadcaster: Core.Broadcaster<Dispatcher.Mouse>;
-    private _processMoveCallback = (e: MouseEvent) => this._processMoveEvent(e);
+    private _downBroadcaster: Core.Broadcaster<Dispatcher.Mouse>;
+    private _upBroadcaster: Core.Broadcaster<Dispatcher.Mouse>;
+    private _processMoveCallback: (e: MouseEvent) => any;
+    private _processDownCallback: (e: MouseEvent) => any;
+    private _processUpCallback: (e: MouseEvent) => any;
 
     /**
      * Get a Dispatcher.Mouse for the <svg> containing elem. If one already exists
@@ -48,11 +54,32 @@ export module Dispatcher {
       this._lastMousePosition = { x: -1, y: -1 };
       this._moveBroadcaster = new Core.Broadcaster(this);
 
+      this._processMoveCallback = (e: MouseEvent) => {
+        if (this._processMouseEvent(e)) {
+          this._moveBroadcaster.broadcast();
+        }
+      };
       this._event2Callback["mouseover"] = this._processMoveCallback;
       this._event2Callback["mousemove"] = this._processMoveCallback;
       this._event2Callback["mouseout"] = this._processMoveCallback;
 
-      this._broadcasters = [this._moveBroadcaster];
+      this._downBroadcaster = new Core.Broadcaster(this);
+      this._processDownCallback = (e: MouseEvent) => {
+        if (this._processMouseEvent(e)) {
+          this._downBroadcaster.broadcast();
+        }
+      };
+      this._event2Callback["mousedown"] = this._processDownCallback;
+
+      this._upBroadcaster = new Core.Broadcaster(this);
+      this._processUpCallback = (e: MouseEvent) => {
+        if (this._processMouseEvent(e)) {
+          this._upBroadcaster.broadcast();
+        }
+      };
+      this._event2Callback["mouseup"] = this._processUpCallback;
+
+      this._broadcasters = [this._moveBroadcaster, this._downBroadcaster, this._upBroadcaster];
     }
 
     protected _getWrappedCallback(callback: Function): Core.BroadcasterCallback<Dispatcher.Mouse> {
@@ -75,13 +102,26 @@ export module Dispatcher {
       return this;
     }
 
-    private _processMoveEvent(e: MouseEvent) {
+    public onMouseDown(key: any, callback: MouseCallback): Dispatcher.Mouse {
+      this._setCallback(this._downBroadcaster, key, callback);
+      return this;
+    }
+
+    public onMouseUp(key: any, callback: MouseCallback): Dispatcher.Mouse {
+      this._setCallback(this._upBroadcaster, key, callback);
+      return this;
+    }
+
+    /**
+     * Processes a MouseEvent. Returns false if measurement fails.
+     */
+    private _processMouseEvent(e: MouseEvent) {
       var newMousePosition = this._computeMousePosition(e.clientX, e.clientY);
       if (newMousePosition == null) {
-        return; // couldn't measure
+        return false; // couldn't measure
       }
       this._lastMousePosition = newMousePosition;
-      this._moveBroadcaster.broadcast();
+      return true;
     }
 
     /**

@@ -8514,7 +8514,6 @@ var Plottable;
             function Mouse(svg) {
                 var _this = this;
                 _super.call(this);
-                this._processMoveCallback = function (e) { return _this._processMoveEvent(e); };
                 this._svg = svg;
                 this._measureRect = document.createElementNS(svg.namespaceURI, "rect");
                 this._measureRect.setAttribute("class", "measure-rect");
@@ -8524,10 +8523,29 @@ var Plottable;
                 this._svg.appendChild(this._measureRect);
                 this._lastMousePosition = { x: -1, y: -1 };
                 this._moveBroadcaster = new Plottable.Core.Broadcaster(this);
+                this._processMoveCallback = function (e) {
+                    if (_this._processMouseEvent(e)) {
+                        _this._moveBroadcaster.broadcast();
+                    }
+                };
                 this._event2Callback["mouseover"] = this._processMoveCallback;
                 this._event2Callback["mousemove"] = this._processMoveCallback;
                 this._event2Callback["mouseout"] = this._processMoveCallback;
-                this._broadcasters = [this._moveBroadcaster];
+                this._downBroadcaster = new Plottable.Core.Broadcaster(this);
+                this._processDownCallback = function (e) {
+                    if (_this._processMouseEvent(e)) {
+                        _this._downBroadcaster.broadcast();
+                    }
+                };
+                this._event2Callback["mousedown"] = this._processDownCallback;
+                this._upBroadcaster = new Plottable.Core.Broadcaster(this);
+                this._processUpCallback = function (e) {
+                    if (_this._processMouseEvent(e)) {
+                        _this._upBroadcaster.broadcast();
+                    }
+                };
+                this._event2Callback["mouseup"] = this._processUpCallback;
+                this._broadcasters = [this._moveBroadcaster, this._downBroadcaster, this._upBroadcaster];
             }
             /**
              * Get a Dispatcher.Mouse for the <svg> containing elem. If one already exists
@@ -8564,13 +8582,24 @@ var Plottable;
                 this._setCallback(this._moveBroadcaster, key, callback);
                 return this;
             };
-            Mouse.prototype._processMoveEvent = function (e) {
+            Mouse.prototype.onMouseDown = function (key, callback) {
+                this._setCallback(this._downBroadcaster, key, callback);
+                return this;
+            };
+            Mouse.prototype.onMouseUp = function (key, callback) {
+                this._setCallback(this._upBroadcaster, key, callback);
+                return this;
+            };
+            /**
+             * Processes a MouseEvent. Returns false if measurement fails.
+             */
+            Mouse.prototype._processMouseEvent = function (e) {
                 var newMousePosition = this._computeMousePosition(e.clientX, e.clientY);
                 if (newMousePosition == null) {
-                    return; // couldn't measure
+                    return false; // couldn't measure
                 }
                 this._lastMousePosition = newMousePosition;
-                this._moveBroadcaster.broadcast();
+                return true;
             };
             /**
              * Computes the mouse position relative to the <svg> in svg-coordinate-space.

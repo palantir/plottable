@@ -3381,6 +3381,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Dispatcher {
+        type MouseCallback = (p: Point) => any;
         class Mouse extends AbstractDispatcher {
             /**
              * Get a Dispatcher.Mouse for the <svg> containing elem. If one already exists
@@ -3410,6 +3411,8 @@ declare module Plottable {
              * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
              */
             onMouseMove(key: any, callback: (p: Point) => any): Dispatcher.Mouse;
+            onMouseDown(key: any, callback: MouseCallback): Dispatcher.Mouse;
+            onMouseUp(key: any, callback: MouseCallback): Dispatcher.Mouse;
             /**
              * Returns the last computed mouse position.
              *
