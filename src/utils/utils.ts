@@ -335,7 +335,7 @@ export module _Util {
       var max = Math.max(a, b);
       if (value < min) {
         return min;
-      } else if (value < max) {
+      } else if (value > max) {
         return max;
       } else {
         return value;
@@ -350,6 +350,16 @@ export module _Util {
       var intersectingPointX = (intersectingConstant - constant) / (slope - intersectingSlope);
       var intersectingPointY = intersectingSlope * intersectingPointX + intersectingConstant;
       return {x: intersectingPointX, y: intersectingPointY};
+    }
+
+    export function closestPoint(searchPoint: Point, startPoint: Point, endPoint: Point): Point {
+      var slope = (endPoint.y - startPoint.y) / (endPoint.x - startPoint.x);
+      var constant = startPoint.y - slope * startPoint.x;
+      var intersectingSlope = - 1 / slope;
+      var intersectingConstant = searchPoint.y - intersectingSlope * searchPoint.x;
+      var intersectingPointX = (intersectingConstant - constant) / (slope - intersectingSlope);
+      var closestX = _Util.Methods.clamp(intersectingPointX, startPoint.x, endPoint.x);
+      return {x: closestX, y: slope * closestX + constant};
     }
 
     export function positiveMod(a: number, b: number) {

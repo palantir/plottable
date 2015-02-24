@@ -332,7 +332,7 @@ var Plottable;
                 if (value < min) {
                     return min;
                 }
-                else if (value < max) {
+                else if (value > max) {
                     return max;
                 }
                 else {
@@ -350,6 +350,16 @@ var Plottable;
                 return { x: intersectingPointX, y: intersectingPointY };
             }
             Methods.intersectionPoint = intersectionPoint;
+            function closestPoint(searchPoint, startPoint, endPoint) {
+                var slope = (endPoint.y - startPoint.y) / (endPoint.x - startPoint.x);
+                var constant = startPoint.y - slope * startPoint.x;
+                var intersectingSlope = -1 / slope;
+                var intersectingConstant = searchPoint.y - intersectingSlope * searchPoint.x;
+                var intersectingPointX = (intersectingConstant - constant) / (slope - intersectingSlope);
+                var closestX = _Util.Methods.clamp(intersectingPointX, startPoint.x, endPoint.x);
+                return { x: closestX, y: slope * closestX + constant };
+            }
+            Methods.closestPoint = closestPoint;
             function positiveMod(a, b) {
                 var mod = a % b;
                 if (mod < 0) {
@@ -3335,17 +3345,18 @@ var Plottable;
             Arc.prototype._getSelectionDistance = function (selection, pixelPoint) {
                 var datum = selection.datum();
                 var selectionIndex;
-                this._getRenderArea().selectAll(this._getSelector()).each(function (datum, index) {
-                    if (datum === selection.data()) {
+                this._getRenderArea().selectAll(this._getSelector()).each(function (pieDatum, index) {
+                    if (datum === pieDatum) {
                         selectionIndex = index;
                     }
                 });
                 var innerRadius = this._attrToProjector["inner-radius"](datum, selectionIndex);
                 var outerRadius = this._attrToProjector["outer-radius"](datum, selectionIndex);
-                var startAngle = Plottable._Util.Methods.positiveMod(datum.startAngle, 2 * Math.PI);
-                var endAngle = Plottable._Util.Methods.positiveMod(datum.endAngle, 2 * Math.PI);
-                var pixelPointAngle = Plottable._Util.Methods.positiveMod(Math.atan(pixelPoint.y / pixelPoint.x), 2 * Math.PI);
-                var pixelPointDistance = Plottable._Util.Methods.pointDistance({ x: 0, y: 0 }, pixelPoint);
+                var startAngle = datum.startAngle;
+                var endAngle = datum.endAngle;
+                var cardinalPoint = { x: pixelPoint.x, y: -pixelPoint.y };
+                var pixelPointAngle = Plottable._Util.Methods.positiveMod(-(Math.atan2(cardinalPoint.y, cardinalPoint.x) - Math.PI / 2), 2 * Math.PI);
+                var pixelPointDistance = Plottable._Util.Methods.pointDistance({ x: 0, y: 0 }, cardinalPoint);
                 var closestPoint;
                 if (Plottable._Util.Methods.inRange(pixelPointAngle, startAngle, endAngle)) {
                     if (Plottable._Util.Methods.inRange(pixelPointDistance, innerRadius, outerRadius)) {
@@ -3353,14 +3364,16 @@ var Plottable;
                     }
                     else {
                         var closerRadius = pixelPointDistance > outerRadius ? outerRadius : innerRadius;
-                        closestPoint = { x: closerRadius * Math.sin(pixelPointAngle), y: closerRadius * Math.cos(pixelPointAngle) };
+                        var rawAngle = Math.atan2(pixelPoint.y, pixelPoint.x);
+                        closestPoint = { x: closerRadius * Math.cos(rawAngle), y: closerRadius * Math.sin(rawAngle) };
                     }
                 }
                 else {
                     var closerAngle = pixelPointAngle < startAngle ? startAngle : endAngle;
                     var innerSegmentPoint = { x: innerRadius * Math.sin(closerAngle), y: innerRadius * Math.cos(closerAngle) };
                     var outerSegmentPoint = { x: outerRadius * Math.sin(closerAngle), y: outerRadius * Math.cos(closerAngle) };
-                    closestPoint = Plottable._Util.Methods.intersectionPoint(pixelPoint, innerSegmentPoint, outerSegmentPoint);
+                    closestPoint = Plottable._Util.Methods.closestPoint(cardinalPoint, innerSegmentPoint, outerSegmentPoint);
+                    closestPoint.y = -closestPoint.y;
                 }
                 return Plottable._Util.Methods.pointDistance(pixelPoint, closestPoint);
             };
