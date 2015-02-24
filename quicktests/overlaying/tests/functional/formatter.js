@@ -1,7 +1,7 @@
 function makeData() {
   "use strict";
 
-  return [makeRandomData(50), makeRandomData(50)];
+  return [makeRandomData(5), makeRandomData(50)];
 }
 
 function run(svg, data, Plottable) {
@@ -12,7 +12,17 @@ function run(svg, data, Plottable) {
     };
 
 
-  var big_numbers = data[0].slice(0, 5);
+
+    var deep_copy = function(from){
+      var deep_copy_xy = function(d){
+        big_numbers.push({'x': d.x, 'y': d.y})
+      }
+      from.forEach(deep_copy_xy)
+    }
+
+
+  var big_numbers = [];
+  deep_copy(data[0]);
   big_numbers.forEach(large_x);
   var dataseries1 = new Plottable.Dataset(big_numbers);
 
