@@ -532,6 +532,28 @@ describe("Drawers", function () {
             });
             svg.remove();
         });
+        it("getSelectionDistance", function () {
+            var svg = generateSVG(300, 300);
+            var data = [{ a: 15, b: 14 }];
+            var xScale = new Plottable.Scale.Linear();
+            var yScale = new Plottable.Scale.Linear();
+            var scatterPlot = new Plottable.Plot.Scatter(xScale, yScale);
+            var drawer = new Plottable._Drawer.Circle("one");
+            drawer._svgElement = "circle";
+            scatterPlot._getDrawer = function () { return drawer; };
+            scatterPlot.addDataset("one", data);
+            scatterPlot.project("x", "a", xScale);
+            scatterPlot.project("y", "b", yScale);
+            scatterPlot.project("r", 25);
+            scatterPlot.renderTo(svg);
+            var queryPoint = { x: 150, y: 100 };
+            data.forEach(function (datum, index) {
+                var selection = drawer._getSelection(index);
+                var selectionDistance = drawer._getSelectionDistance(selection, queryPoint);
+                assert.closeTo(selectionDistance, 25, 1, "correct distance calculated");
+            });
+            svg.remove();
+        });
     });
 });
 

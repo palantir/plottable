@@ -22,8 +22,8 @@ export module _Drawer {
       if (_Util.Methods.pointDistance(circleCenter, pixelPoint) <= circleRadius) {
         return 0;
       } else {
-        var angle = Math.atan((pixelPoint.x - circleX) / (pixelPoint.y - circleY));
-        var closestPoint =  { x: circleRadius * Math.cos(angle), y: circleRadius * Math.sin(angle) };
+        var angle = Math.atan2(pixelPoint.y - circleY, pixelPoint.x - circleX);
+        var closestPoint =  { x: circleX + circleRadius * Math.cos(angle), y: circleY + circleRadius * Math.sin(angle) };
         return _Util.Methods.pointDistance(pixelPoint, closestPoint);
       }
     }
