@@ -2860,9 +2860,12 @@ var Plottable;
                 if (attrToProjector["fill"]) {
                     this._pathSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
                 }
+                if (attrToProjector["class"]) {
+                    this._pathSelection.attr("class", attrToProjector["class"]);
+                    this._pathSelection.classed(Line.LINE_CLASS, true);
+                    delete attrToProjector["class"];
+                }
                 step.animator.animate(this._pathSelection, attrToProjector);
-                // Restore classes that may have been overridden by class projectors
-                this._pathSelection.classed(Line.LINE_CLASS, true);
             };
             Line.prototype._getSelector = function () {
                 return "." + Line.LINE_CLASS;
@@ -2954,9 +2957,12 @@ var Plottable;
                 if (attrToProjector["fill"]) {
                     this._areaSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
                 }
+                if (attrToProjector["class"]) {
+                    this._areaSelection.attr("class", attrToProjector["class"]);
+                    this._areaSelection.classed(Area.AREA_CLASS, true);
+                    delete attrToProjector["class"];
+                }
                 step.animator.animate(this._areaSelection, attrToProjector);
-                // Restore default classes that may have been wiped out by class projectors
-                this._areaSelection.classed(Area.AREA_CLASS, true);
             };
             Area.prototype._getSelector = function () {
                 return "path";

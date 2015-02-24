@@ -78,10 +78,13 @@ export module _Drawer {
       if (attrToProjector["fill"]) {
         this._areaSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
       }
-      step.animator.animate(this._areaSelection, attrToProjector);
+      if (attrToProjector["class"]) {
+        this._areaSelection.attr("class", attrToProjector["class"]);
+        this._areaSelection.classed(Area.AREA_CLASS, true);
+        delete attrToProjector["class"];
+      }
 
-      // Restore default classes that may have been wiped out by class projectors
-      this._areaSelection.classed(Area.AREA_CLASS, true);
+      step.animator.animate(this._areaSelection, attrToProjector);
     }
 
     public _getSelector(): string {
