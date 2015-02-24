@@ -195,8 +195,8 @@ describe("Plots", () => {
       renderArea1.selectAll("circle").data(data1).enter().append("circle").attr("cx", (datum: any) => datum.value * 100).attr("cy", 100);
       (<any> mockDrawer1).setup = () => (<any> mockDrawer1)._renderArea = renderArea1;
       (<any> mockDrawer1)._getSelector = () => "circle";
-      (<any> mockDrawer1)._getClosestPixelPoint = (selection: D3.Selection, datum: any) => {
-        return {x: parseFloat(selection.attr("cx")), y: parseFloat(selection.attr("cy"))};
+      (<any> mockDrawer1)._getSelectionDistance = (selection: D3.Selection, point: Plottable.Point) => {
+        return Plottable._Util.Methods.pointDistance(point, {x: parseFloat(selection.attr("cx")), y: parseFloat(selection.attr("cy"))});
       };
 
       var renderArea2 = svg.append("g");
@@ -204,8 +204,8 @@ describe("Plots", () => {
       var mockDrawer2 = new Plottable._Drawer.AbstractDrawer("ds2");
       (<any> mockDrawer2).setup = () => (<any> mockDrawer2)._renderArea = renderArea2;
       (<any> mockDrawer2)._getSelector = () => "circle";
-      (<any> mockDrawer2)._getClosestPixelPoint = (selection: D3.Selection, datum: any) => {
-        return {x: parseFloat(selection.attr("cx")), y: parseFloat(selection.attr("cy"))};
+      (<any> mockDrawer2)._getSelectionDistance = (selection: D3.Selection, point: Plottable.Point) => {
+        return Plottable._Util.Methods.pointDistance(point, {x: parseFloat(selection.attr("cx")), y: parseFloat(selection.attr("cy"))});
       };
 
       // Mock _getDrawer to return the mock drawers
