@@ -54,29 +54,17 @@ export module Dispatcher {
       this._lastMousePosition = { x: -1, y: -1 };
       this._moveBroadcaster = new Core.Broadcaster(this);
 
-      this._processMoveCallback = (e: MouseEvent) => {
-        if (this._processMouseEvent(e)) {
-          this._moveBroadcaster.broadcast();
-        }
-      };
+      this._processMoveCallback = (e: MouseEvent) => this._measureAndBroadcast(e, this._moveBroadcaster);
       this._event2Callback["mouseover"] = this._processMoveCallback;
       this._event2Callback["mousemove"] = this._processMoveCallback;
       this._event2Callback["mouseout"] = this._processMoveCallback;
 
       this._downBroadcaster = new Core.Broadcaster(this);
-      this._processDownCallback = (e: MouseEvent) => {
-        if (this._processMouseEvent(e)) {
-          this._downBroadcaster.broadcast();
-        }
-      };
+      this._processDownCallback = (e: MouseEvent) => this._measureAndBroadcast(e, this._downBroadcaster);
       this._event2Callback["mousedown"] = this._processDownCallback;
 
       this._upBroadcaster = new Core.Broadcaster(this);
-      this._processUpCallback = (e: MouseEvent) => {
-        if (this._processMouseEvent(e)) {
-          this._upBroadcaster.broadcast();
-        }
-      };
+      this._processUpCallback = (e: MouseEvent) => this._measureAndBroadcast(e, this._upBroadcaster);
       this._event2Callback["mouseup"] = this._processUpCallback;
 
       this._broadcasters = [this._moveBroadcaster, this._downBroadcaster, this._upBroadcaster];
@@ -102,26 +90,48 @@ export module Dispatcher {
       return this;
     }
 
+    /**
+     * Registers a callback to be called whenever a mousedown occurs,
+     * or removes the callback if `null` is passed as the callback.
+     *
+     * @param {any} key The key associated with the callback.
+     *                  Key uniqueness is determined by deep equality.
+     * @param {(p: Point) => any} callback A callback that takes the pixel position
+     *                                     in svg-coordinate-space. Pass `null`
+     *                                     to remove a callback.
+     * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+     */
     public onMouseDown(key: any, callback: MouseCallback): Dispatcher.Mouse {
       this._setCallback(this._downBroadcaster, key, callback);
       return this;
     }
 
+    /**
+     * Registers a callback to be called whenever a mouseup occurs,
+     * or removes the callback if `null` is passed as the callback.
+     *
+     * @param {any} key The key associated with the callback.
+     *                  Key uniqueness is determined by deep equality.
+     * @param {(p: Point) => any} callback A callback that takes the pixel position
+     *                                     in svg-coordinate-space. Pass `null`
+     *                                     to remove a callback.
+     * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+     */
     public onMouseUp(key: any, callback: MouseCallback): Dispatcher.Mouse {
       this._setCallback(this._upBroadcaster, key, callback);
       return this;
     }
 
     /**
-     * Processes a MouseEvent. Returns false if measurement fails.
+     * Computes the mouse position from the given event, and if successful
+     * calls broadcast() on the supplied Broadcaster.
      */
-    private _processMouseEvent(e: MouseEvent) {
+    private _measureAndBroadcast(e: MouseEvent, b: Core.Broadcaster) {
       var newMousePosition = this._computeMousePosition(e.clientX, e.clientY);
-      if (newMousePosition == null) {
-        return false; // couldn't measure
+      if (newMousePosition != null) {
+        this._lastMousePosition = newMousePosition;
+        b.broadcast();
       }
-      this._lastMousePosition = newMousePosition;
-      return true;
     }
 
     /**
