@@ -1498,6 +1498,7 @@ declare module Plottable {
             _getPixelPoint(datum: any, index: number): Point;
             _getSelection(index: number): D3.Selection;
             _getSelectionDistance(selection: D3.Selection, pixelPoint: Point): number;
+            _getClosestDatumPoint(selection: D3.Selection, pixelPoint: Point): Point;
         }
     }
 }
@@ -1548,6 +1549,7 @@ declare module Plottable {
             constructor(key: string);
             _getPixelPoint(datum: any, index: number): Point;
             _getSelectionDistance(selection: D3.Selection, pixelPoint: Point): number;
+            _getClosestDatumPoint(selection: D3.Selection, pixelPoint: Point): Point;
         }
     }
 }
@@ -1563,6 +1565,7 @@ declare module Plottable {
             drawText(data: any[], attrToProjector: AttributeToProjector, userMetadata: any, plotMetadata: Plot.PlotMetadata): void;
             _getPixelPoint(datum: any, index: number): Point;
             _getSelectionDistance(selection: D3.Selection, pixelPoint: Point): number;
+            _getClosestDatumPoint(selection: D3.Selection, pixelPoint: Point): Point;
         }
     }
 }
@@ -1576,6 +1579,7 @@ declare module Plottable {
             draw(data: any[], drawSteps: DrawStep[], userMetadata: any, plotMetadata: Plot.PlotMetadata): number;
             _getPixelPoint(datum: any, index: number): Point;
             _getSelectionDistance(selection: D3.Selection, pixelPoint: Point): number;
+            _getClosestDatumPoint(selection: D3.Selection, pixelPoint: Point): Point;
         }
     }
 }

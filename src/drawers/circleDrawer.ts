@@ -27,6 +27,12 @@ export module _Drawer {
         return _Util.Methods.pointDistance(pixelPoint, closestPoint);
       }
     }
+
+    public _getClosestDatumPoint(selection: D3.Selection, pixelPoint: Point): Point {
+      var circleX = parseFloat(selection.attr("cx"));
+      var circleY = parseFloat(selection.attr("cy"));
+      return {x: circleX, y: circleY};
+    }
   }
 }
 }

@@ -1983,6 +1983,9 @@ describe("Plots", function () {
             mockDrawer1._getSelectionDistance = function (selection, point) {
                 return Plottable._Util.Methods.pointDistance(point, { x: parseFloat(selection.attr("cx")), y: parseFloat(selection.attr("cy")) });
             };
+            mockDrawer1._getClosestDatumPoint = function (selection, point) {
+                return { x: parseFloat(selection.attr("cx")), y: parseFloat(selection.attr("cy")) };
+            };
             var renderArea2 = svg.append("g");
             renderArea2.selectAll("circle").data(data2).enter().append("circle").attr("cx", function (datum) { return datum.value * 100; }).attr("cy", 10);
             var mockDrawer2 = new Plottable._Drawer.AbstractDrawer("ds2");
@@ -1990,6 +1993,9 @@ describe("Plots", function () {
             mockDrawer2._getSelector = function () { return "circle"; };
             mockDrawer2._getSelectionDistance = function (selection, point) {
                 return Plottable._Util.Methods.pointDistance(point, { x: parseFloat(selection.attr("cx")), y: parseFloat(selection.attr("cy")) });
+            };
+            mockDrawer2._getClosestDatumPoint = function (selection, point) {
+                return { x: parseFloat(selection.attr("cx")), y: parseFloat(selection.attr("cy")) };
             };
             // Mock _getDrawer to return the mock drawers
             plot._getDrawer = function (key) {

@@ -92,6 +92,21 @@ export module _Drawer {
 
       return _Util.Methods.pointDistance(pixelPoint, closestPoint);
     }
+
+    public _getClosestDatumPoint(selection: D3.Selection, pixelPoint: Point): Point {
+      var datum = selection.datum();
+      var selectionIndex: number;
+      this._getRenderArea().selectAll(this._getSelector()).each((datum, index) => {
+        if (datum === selection.data()) {
+          selectionIndex = index;
+        }
+      });
+      var outerRadius = this._attrToProjector["outer-radius"](datum, selectionIndex);
+      var startAngle = _Util.Methods.positiveMod(datum.startAngle, 2 * Math.PI);
+      var endAngle = _Util.Methods.positiveMod(datum.endAngle, 2 * Math.PI);
+      var avgAngle = (startAngle + endAngle) / 2;
+      return { x: outerRadius * Math.sin(avgAngle), y: outerRadius * Math.cos(avgAngle) };
+    }
   }
 }
 }

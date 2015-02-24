@@ -95,6 +95,12 @@ export module _Drawer {
       });
       return closestDistance;
     }
+
+    public _getClosestDatumPoint(selection: D3.Selection, pixelPoint: Point): Point {
+      var pixelPoints = selection.data().map((datum, index) =>  this._getPixelPoint(datum, index));
+      var test = (point: Point) => _Util.Methods.pointDistance(pixelPoint, point);
+      return _Util.Methods.min(pixelPoints, (point: Point) => _Util.Methods.pointDistance(pixelPoint, point), <any> null);
+    }
   }
 }
 }

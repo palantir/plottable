@@ -109,6 +109,16 @@ export module _Drawer {
         return _Util.Methods.pointDistance(pixelPoint, closestPoint);
       }
     }
+
+    public _getClosestDatumPoint(selection: D3.Selection, pixelPoint: Point): Point {
+      var rectX = parseFloat(selection.attr("x"));
+      var rectY = parseFloat(selection.attr("y"));
+      var rectWidth = parseFloat(selection.attr("width"));
+      var rectHeight = parseFloat(selection.attr("height"));
+      var x = this._isVertical ? rectX + rectWidth / 2 : rectX + rectWidth;
+      var y = this._isVertical ? rectY : rectY + rectHeight / 2;
+      return { x: x, y: y };
+    }
   }
 
 }
