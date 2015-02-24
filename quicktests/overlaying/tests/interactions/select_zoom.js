@@ -49,7 +49,7 @@ function run(svg, data, Plottable) {
   var outerTable = new Plottable.Component.Table([[chart, legendTable]]);
   outerTable.renderTo(svg);
 
-  var dragboxInteraction = new Plottable.Interaction.XYDragBox();
+  var dragboxInteraction = new Plottable.Interaction.DragBox();
 
   var cb = function(start, end) {
     var startX = xScale.invert(start.x);
