@@ -330,7 +330,9 @@ export module _Util {
       return Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
     }
 
-    export function clamp(value: number, min: number, max: number): number {
+    export function clamp(value: number, a: number, b: number): number {
+      var min = Math.min(a, b);
+      var max = Math.max(a, b);
       if (value < min) {
         return min;
       } else if (value < max) {

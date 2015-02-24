@@ -326,7 +326,9 @@ var Plottable;
                 return Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
             }
             Methods.pointDistance = pointDistance;
-            function clamp(value, min, max) {
+            function clamp(value, a, b) {
+                var min = Math.min(a, b);
+                var max = Math.max(a, b);
                 if (value < min) {
                     return min;
                 }
@@ -2915,11 +2917,11 @@ var Plottable;
             };
             Line.prototype._getSelectionDistance = function (selection, pixelPoint) {
                 var _this = this;
-                var closestPixelPoint;
                 var lineSegments = d3.pairs(selection.data().map(function (datum, index) { return _this._getPixelPoint(datum, index); }));
                 return Plottable._Util.Methods.min(lineSegments, function (lineSegment) {
-                    if (lineSegment[0].x === lineSegment[1].x && lineSegment[0].y === lineSegment[1].y) {
-                        return Plottable._Util.Methods.pointDistance(lineSegment[0], pixelPoint);
+                    if (lineSegment[0].x === lineSegment[1].x) {
+                        var closestY = Plottable._Util.Methods.clamp(pixelPoint.y, lineSegment[0].y, lineSegment[1].y);
+                        return Plottable._Util.Methods.pointDistance({ x: lineSegment[0].x, y: closestY }, pixelPoint);
                     }
                     var slope = (lineSegment[1].y - lineSegment[0].y) / (lineSegment[1].x - lineSegment[0].x);
                     var lineConstant = lineSegment[0].y - slope * lineSegment[0].x;
