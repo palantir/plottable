@@ -349,6 +349,14 @@ export module _Util {
       var intersectingPointY = intersectingSlope * intersectingPointX + intersectingConstant;
       return {x: intersectingPointX, y: intersectingPointY};
     }
+
+    export function positiveMod(a: number, b: number) {
+      var mod = a % b;
+      if (mod < 0) {
+        mod += b;
+      }
+      return mod;
+    }
   }
 }
 }

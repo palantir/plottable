@@ -60,7 +60,7 @@ export module _Drawer {
       return { x: avgRadius * Math.sin(avgAngle), y: avgRadius * Math.cos(avgAngle) };
     }
 
-    public _getClosestPixelPoint(selection: D3.Selection, pixelPoint: Point): Point {
+    public _getSelectionDistance(selection: D3.Selection, pixelPoint: Point): number {
       var datum = selection.datum();
       var selectionIndex: number;
       this._getRenderArea().selectAll(this._getSelector()).each((datum, index) => {
@@ -70,28 +70,27 @@ export module _Drawer {
       });
       var innerRadius = this._attrToProjector["inner-radius"](datum, selectionIndex);
       var outerRadius = this._attrToProjector["outer-radius"](datum, selectionIndex);
-      var startAngle = datum.startAngle;
-      var endAngle = datum.endAngle;
-      var pixelPointAngle = Math.atan(pixelPoint.y / pixelPoint.x);
+      var startAngle = _Util.Methods.positiveMod(datum.startAngle, 2 * Math.PI);
+      var endAngle = _Util.Methods.positiveMod(datum.endAngle, 2 * Math.PI);
+      var pixelPointAngle = _Util.Methods.positiveMod(Math.atan(pixelPoint.y / pixelPoint.x), 2 * Math.PI);
       var pixelPointDistance = _Util.Methods.pointDistance({x: 0, y: 0}, pixelPoint);
+      var closestPoint: Point;
 
       if (_Util.Methods.inRange(pixelPointAngle, startAngle, endAngle)) {
         if (_Util.Methods.inRange(pixelPointDistance, innerRadius, outerRadius)) {
-          return pixelPoint;
-        }
-        return { x: outerRadius * Math.sin(pixelPointAngle), y: outerRadius * Math.cos(pixelPointAngle) };
-      } else {
-        var innerSegmentPoint: Point;
-        var outerSegmentPoint: Point;
-        if (pixelPointAngle < startAngle) {
-          innerSegmentPoint = { x: innerRadius * Math.sin(startAngle), y: innerRadius * Math.cos(startAngle) };
-          outerSegmentPoint = { x: outerRadius * Math.sin(startAngle), y: outerRadius * Math.cos(startAngle) };
+          return 0;
         } else {
-          innerSegmentPoint = { x: innerRadius * Math.sin(endAngle), y: innerRadius * Math.cos(endAngle) };
-          outerSegmentPoint = { x: outerRadius * Math.sin(endAngle), y: outerRadius * Math.cos(endAngle) };
+          var closerRadius = pixelPointDistance > outerRadius ? outerRadius : innerRadius;
+          closestPoint = { x: closerRadius * Math.sin(pixelPointAngle), y: closerRadius * Math.cos(pixelPointAngle) };
         }
-        return _Util.Methods.intersectionPoint(pixelPoint, innerSegmentPoint, outerSegmentPoint);
+      } else {
+        var closerAngle = pixelPointAngle < startAngle ? startAngle : endAngle;
+        var innerSegmentPoint = { x: innerRadius * Math.sin(closerAngle), y: innerRadius * Math.cos(closerAngle) };
+        var outerSegmentPoint = { x: outerRadius * Math.sin(closerAngle), y: outerRadius * Math.cos(closerAngle) };
+        closestPoint = _Util.Methods.intersectionPoint(pixelPoint, innerSegmentPoint, outerSegmentPoint);
       }
+
+      return _Util.Methods.pointDistance(pixelPoint, closestPoint);
     }
   }
 }

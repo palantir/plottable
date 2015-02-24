@@ -466,18 +466,17 @@ export module Plot {
       var closestDatum: any = null;
       var closestSelection = d3.select();
       var closestPixelPoint: Point = null;
-      var closestPointDistance = withinValue;
+      var closestSelectionDistance = withinValue;
 
       this._getDrawersInOrder().forEach((drawer) => {
         drawer._getRenderArea().selectAll(drawer._getSelector()).each(function (datum) {
           var selection = d3.select(this);
-          var pixelPoint = drawer._getClosestPixelPoint(selection, queryPoint);
-          var pointDistance = Plottable._Util.Methods.pointDistance(pixelPoint, queryPoint);
-          if (pointDistance < closestPointDistance) {
+          var selectionDistance = drawer._getSelectionDistance(selection, queryPoint);
+          if (selectionDistance < closestSelectionDistance) {
             closestDatum = datum;
-            closestPixelPoint = pixelPoint;
+            closestPixelPoint = drawer._getClosestDatumPoint(selection, queryPoint);
             closestSelection = selection;
-            closestPointDistance = pointDistance;
+            closestSelectionDistance = selectionDistance;
           }
         });
       });
