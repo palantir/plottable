@@ -77,6 +77,9 @@ export module _Drawer {
       var closestPixelPoint: Point;
       var lineSegments = d3.pairs(selection.data().map((datum, index) => this._getPixelPoint(datum, index)));
       return _Util.Methods.min(lineSegments, (lineSegment: Point[]) => {
+        if (lineSegment[0].x === lineSegment[1].x && lineSegment[0].y === lineSegment[1].y) {
+          return _Util.Methods.pointDistance(lineSegment[0], pixelPoint);
+        }
         var slope = (lineSegment[1].y - lineSegment[0].y) / (lineSegment[1].x - lineSegment[0].x);
         var lineConstant = lineSegment[0].y - slope * lineSegment[0].x;
 

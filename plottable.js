@@ -2918,6 +2918,9 @@ var Plottable;
                 var closestPixelPoint;
                 var lineSegments = d3.pairs(selection.data().map(function (datum, index) { return _this._getPixelPoint(datum, index); }));
                 return Plottable._Util.Methods.min(lineSegments, function (lineSegment) {
+                    if (lineSegment[0].x === lineSegment[1].x && lineSegment[0].y === lineSegment[1].y) {
+                        return Plottable._Util.Methods.pointDistance(lineSegment[0], pixelPoint);
+                    }
                     var slope = (lineSegment[1].y - lineSegment[0].y) / (lineSegment[1].x - lineSegment[0].x);
                     var lineConstant = lineSegment[0].y - slope * lineSegment[0].x;
                     if (Plottable._Util.Methods.inRange(pixelPoint.x, lineSegment[0].x, lineSegment[1].x) && Plottable._Util.Methods.inRange(pixelPoint.y, lineSegment[0].y, lineSegment[1].y) && (slope * pixelPoint.x + lineConstant === pixelPoint.y)) {
