@@ -3411,7 +3411,29 @@ declare module Plottable {
              * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
              */
             onMouseMove(key: any, callback: (p: Point) => any): Dispatcher.Mouse;
+            /**
+             * Registers a callback to be called whenever a mousedown occurs,
+             * or removes the callback if `null` is passed as the callback.
+             *
+             * @param {any} key The key associated with the callback.
+             *                  Key uniqueness is determined by deep equality.
+             * @param {(p: Point) => any} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space. Pass `null`
+             *                                     to remove a callback.
+             * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+             */
             onMouseDown(key: any, callback: MouseCallback): Dispatcher.Mouse;
+            /**
+             * Registers a callback to be called whenever a mouseup occurs,
+             * or removes the callback if `null` is passed as the callback.
+             *
+             * @param {any} key The key associated with the callback.
+             *                  Key uniqueness is determined by deep equality.
+             * @param {(p: Point) => any} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space. Pass `null`
+             *                                     to remove a callback.
+             * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+             */
             onMouseUp(key: any, callback: MouseCallback): Dispatcher.Mouse;
             /**
              * Returns the last computed mouse position.

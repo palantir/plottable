@@ -126,7 +126,7 @@ export module Dispatcher {
      * Computes the mouse position from the given event, and if successful
      * calls broadcast() on the supplied Broadcaster.
      */
-    private _measureAndBroadcast(e: MouseEvent, b: Core.Broadcaster) {
+    private _measureAndBroadcast(e: MouseEvent, b: Core.Broadcaster<Dispatcher.Mouse>) {
       var newMousePosition = this._computeMousePosition(e.clientX, e.clientY);
       if (newMousePosition != null) {
         this._lastMousePosition = newMousePosition;
