@@ -14,10 +14,10 @@ function run(svg, data, Plottable) {
 
   var deep_copy = function(from, to){
     var deep_copy_xy = function(d){
-      to.push({'x': d.x, 'y': d.y})
+      to.push({'x': d.x, 'y': d.y});
     }
-    from.forEach(deep_copy_xy)
-  }
+    from.forEach(deep_copy_xy);
+  };
 
   var dataseries = [];
   deep_copy(data[0], dataseries);
@@ -40,7 +40,7 @@ function run(svg, data, Plottable) {
   var areaPlot1 = new Plottable.Plot.Area(xScale, yScale)
   .addDataset(dataseries).project("x", "x", xScale)
   .project("y", "y", yScale);
-  1
+  
   var areaPlot2 = new Plottable.Plot.Area(xScale, yScale)
   .addDataset(dataseries_top)
   .attr("y0", y0Accessor, yScale)

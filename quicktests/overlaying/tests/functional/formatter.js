@@ -13,16 +13,16 @@ function run(svg, data, Plottable) {
 
 
 
-    var deep_copy = function(from){
-      var deep_copy_xy = function(d){
-        big_numbers.push({'x': d.x, 'y': d.y})
-      }
-      from.forEach(deep_copy_xy)
+  var deep_copy = function(from, to){
+    var deep_copy_xy = function(d){
+      to.push({'x': d.x, 'y': d.y});
     }
+    from.forEach(deep_copy_xy);
+  };
 
 
   var big_numbers = [];
-  deep_copy(data[0]);
+  deep_copy(data[0], big_numbers);
   big_numbers.forEach(large_x);
   var dataseries1 = new Plottable.Dataset(big_numbers);
 
