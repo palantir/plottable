@@ -39,7 +39,7 @@ export module Plot {
     }
 
     protected _getDrawer(key: string) {
-      return new _Drawer.Element(key).svgElement("rect");
+      return new _Drawer.Rect(key, true);
     }
 
     /**

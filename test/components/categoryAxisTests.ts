@@ -123,4 +123,29 @@ describe("Category Axes", () => {
 
     svg.remove();
   });
+
+  it("axis labels respect tick labels", () => {
+
+    function verifyTickLabelOverlaps(tickLabels: D3.Selection, tickMarks: D3.Selection) {
+        for (var i = 0; i < tickLabels[0].length; i++) {
+          var tickLabelBox = tickLabels[0][i].getBoundingClientRect();
+          var tickMarkBox = tickMarks[0][i].getBoundingClientRect();
+          assert.isFalse(Plottable._Util.DOM.boxesOverlap(tickLabelBox, tickMarkBox), "tick label and box do not overlap");
+        }
+    }
+
+    var svg = generateSVG(400, 300);
+    var yScale = new Plottable.Scale.Ordinal();
+    var axis = new Plottable.Axis.Category(yScale, "left");
+    yScale.domain(["A", "B", "C"]);
+    axis.renderTo(svg);
+
+    var tickLabels = (<any> axis)._content.selectAll(".tick-label");
+    var tickMarks = (<any> axis)._content.selectAll(".tick-mark");
+    verifyTickLabelOverlaps(tickLabels, tickMarks);
+    axis.orient("right");
+    verifyTickLabelOverlaps(tickLabels, tickMarks);
+
+    svg.remove();
+  });
 });

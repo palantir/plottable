@@ -2860,9 +2860,12 @@ var Plottable;
                 if (attrToProjector["fill"]) {
                     this._pathSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
                 }
+                if (attrToProjector["class"]) {
+                    this._pathSelection.attr("class", attrToProjector["class"]);
+                    this._pathSelection.classed(Line.LINE_CLASS, true);
+                    delete attrToProjector["class"];
+                }
                 step.animator.animate(this._pathSelection, attrToProjector);
-                // Restore classes that may have been overridden by class projectors
-                this._pathSelection.classed(Line.LINE_CLASS, true);
             };
             Line.prototype._getSelector = function () {
                 return "." + Line.LINE_CLASS;
@@ -2954,9 +2957,12 @@ var Plottable;
                 if (attrToProjector["fill"]) {
                     this._areaSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
                 }
+                if (attrToProjector["class"]) {
+                    this._areaSelection.attr("class", attrToProjector["class"]);
+                    this._areaSelection.classed(Area.AREA_CLASS, true);
+                    delete attrToProjector["class"];
+                }
                 step.animator.animate(this._areaSelection, attrToProjector);
-                // Restore default classes that may have been wiped out by class projectors
-                this._areaSelection.classed(Area.AREA_CLASS, true);
             };
             Area.prototype._getSelector = function () {
                 return "path";
@@ -5083,9 +5089,9 @@ var Plottable;
                 tickLabels.text("");
                 this._drawTicks(this.width(), this.height(), ordScale, tickLabels);
                 var translate = this._isHorizontal() ? [ordScale.rangeBand() / 2, 0] : [0, ordScale.rangeBand() / 2];
-                var xTranslate = this.orient() === "left" ? 0 : this._maxLabelTickLength() + this.tickLabelPadding();
+                var xTranslate = this.orient() === "right" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
                 var yTranslate = this.orient() === "bottom" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
-                Plottable._Util.DOM.translate(this._tickLabelContainer, 0, yTranslate);
+                Plottable._Util.DOM.translate(this._tickLabelContainer, xTranslate, yTranslate);
                 return this;
             };
             Category.prototype._computeLayout = function (offeredXOrigin, offeredYOrigin, availableWidth, availableHeight) {
@@ -7003,7 +7009,7 @@ var Plottable;
                 return this;
             };
             Grid.prototype._getDrawer = function (key) {
-                return new Plottable._Drawer.Element(key).svgElement("rect");
+                return new Plottable._Drawer.Rect(key, true);
             };
             /**
              * @param {string} attrToSet One of ["x", "y", "fill"]. If "fill" is used,
