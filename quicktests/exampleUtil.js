@@ -110,7 +110,8 @@ function generateHeightWeightData(n) {
   return data;
 }
 
-var deep_copy = function(from, to){
+function deep_copy(from, to){
+  "use strict"
   var deep_copy_xy = function(d){
     to.push({'x': d.x, 'y': d.y});
   };
