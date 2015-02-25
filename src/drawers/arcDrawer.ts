@@ -85,7 +85,7 @@ export module _Drawer {
           closestPoint = { x: closerRadius * Math.cos(rawAngle), y: closerRadius * Math.sin(rawAngle) };
         }
       } else {
-        var closerAngle = pixelPointAngle < startAngle ? startAngle : endAngle;
+        var closerAngle = _Util.Methods.clamp(pixelPointAngle, startAngle, endAngle);
         var innerSegmentPoint = { x: innerRadius * Math.sin(closerAngle), y: -innerRadius * Math.cos(closerAngle) };
         var outerSegmentPoint = { x: outerRadius * Math.sin(closerAngle), y: -outerRadius * Math.cos(closerAngle) };
         closestPoint = _Util.Methods.closestPoint(pixelPoint, innerSegmentPoint, outerSegmentPoint);

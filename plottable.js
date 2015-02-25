@@ -3372,7 +3372,7 @@ var Plottable;
                     }
                 }
                 else {
-                    var closerAngle = pixelPointAngle < startAngle ? startAngle : endAngle;
+                    var closerAngle = Plottable._Util.Methods.clamp(pixelPointAngle, startAngle, endAngle);
                     var innerSegmentPoint = { x: innerRadius * Math.sin(closerAngle), y: -innerRadius * Math.cos(closerAngle) };
                     var outerSegmentPoint = { x: outerRadius * Math.sin(closerAngle), y: -outerRadius * Math.cos(closerAngle) };
                     closestPoint = Plottable._Util.Methods.closestPoint(pixelPoint, innerSegmentPoint, outerSegmentPoint);
@@ -9738,6 +9738,7 @@ var Plottable;
         Interaction.Hover = Hover;
     })(Interaction = Plottable.Interaction || (Plottable.Interaction = {}));
 })(Plottable || (Plottable = {}));
+;
 
 /*!
 SVG Typewriter 0.1.10 (https://github.com/palantir/svg-typewriter)
