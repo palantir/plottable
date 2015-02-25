@@ -487,7 +487,7 @@ describe("Drawers", function () {
         });
         it("getSelectionDistance", function () {
             var svg = generateSVG(300, 300);
-            var data = [{ a: 12, b: 10 }, { a: 13, b: 10 }, { a: 14, b: 10 }, { a: 15, b: 10 }];
+            var data = [{ a: 12, b: 15 }, { a: 13, b: 18 }, { a: 14, b: 10 }, { a: 15, b: 20 }];
             var xScale = new Plottable.Scale.Linear();
             var yScale = new Plottable.Scale.Linear();
             var linePlot = new Plottable.Plot.Line(xScale, yScale);
@@ -497,12 +497,12 @@ describe("Drawers", function () {
             linePlot.project("x", "a", xScale);
             linePlot.project("y", "b", yScale);
             linePlot.renderTo(svg);
-            var queryPoint = { x: 50, y: 200 };
+            var queryPoint = { x: xScale.scale(14), y: yScale.scale(10) + 10 };
             var lineSelection = linePlot.getAllSelections();
             data.forEach(function (datum, index) {
                 var selection = drawer._getSelection(index);
                 var selectionDistance = drawer._getSelectionDistance(selection, queryPoint);
-                assert.closeTo(selectionDistance, 50, 1, "correct distance calculated");
+                assert.closeTo(selectionDistance, 10, 1, "correct distance calculated");
             });
             svg.remove();
         });
