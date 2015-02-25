@@ -1,7 +1,7 @@
 function makeData() {
   "use strict";
 
-  return [makeRandomData(5), makeRandomData(50)];
+  return [makeRandomData(50), makeRandomData(50)];
 }
 
 function run(svg, data, Plottable) {
@@ -10,15 +10,6 @@ function run(svg, data, Plottable) {
     var large_x = function(d){
          d.x = d.x*100000000;
     };
-
-
-
-  var deep_copy = function(from, to){
-    var deep_copy_xy = function(d){
-      to.push({'x': d.x, 'y': d.y});
-    };
-    from.forEach(deep_copy_xy);
-  };
 
 
   var big_numbers = [];

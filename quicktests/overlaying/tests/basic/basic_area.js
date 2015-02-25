@@ -12,13 +12,6 @@ function run(svg, data, Plottable) {
   // Will receive function arguments: (svg, data, Plottable)
   function getY(d) { return d.y; }
 
-  var deep_copy = function(from, to){
-    var deep_copy_xy = function(d){
-      to.push({'x': d.x, 'y': d.y});
-    };
-    from.forEach(deep_copy_xy);
-  };
-
   var dataseries = [];
   deep_copy(data[0], dataseries);
   var dataseries_top = [];
