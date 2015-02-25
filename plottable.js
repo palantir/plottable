@@ -2951,6 +2951,10 @@ var Plottable;
                 var pixelPoints = selection.data().map(function (datum, index) { return _this._getPixelPoint(datum, index); });
                 return Plottable._Util.Methods.min(pixelPoints, function (point) { return Plottable._Util.Methods.pointDistance(pixelPoint, point); }, null);
             };
+            Line.prototype._getClosestDatum = function (selection, pixelPoint) {
+                var _this = this;
+                return Plottable._Util.Methods.min(selection.data(), function (datum, index) { return Plottable._Util.Methods.pointDistance(_this._getPixelPoint(datum, index), pixelPoint); }, null);
+            };
             Line.LINE_CLASS = "line";
             return Line;
         })(_Drawer.AbstractDrawer);

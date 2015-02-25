@@ -98,6 +98,12 @@ export module _Drawer {
       var pixelPoints = selection.data().map((datum, index) =>  this._getPixelPoint(datum, index));
       return _Util.Methods.min(pixelPoints, (point: Point) => _Util.Methods.pointDistance(pixelPoint, point), <any> null);
     }
+
+    public _getClosestDatum(selection: D3.Selection, pixelPoint: Point): any {
+      return _Util.Methods.min(selection.data(),
+                               (datum: any, index: number) => _Util.Methods.pointDistance(this._getPixelPoint(datum, index),pixelPoint),
+                               <any> null);
+    }
   }
 }
 }
