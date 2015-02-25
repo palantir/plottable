@@ -1574,7 +1574,6 @@ declare module Plottable {
 declare module Plottable {
     module Component {
         class AbstractComponent extends Core.PlottableObject {
-            static AUTORESIZE_BY_DEFAULT: boolean;
             protected _element: D3.Selection;
             protected _content: D3.Selection;
             protected _boundingBox: D3.Selection;

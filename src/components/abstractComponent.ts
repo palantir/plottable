@@ -3,8 +3,6 @@
 module Plottable {
 export module Component {
   export class AbstractComponent extends Core.PlottableObject {
-    public static AUTORESIZE_BY_DEFAULT = true;
-
     protected _element: D3.Selection;
     protected _content: D3.Selection;
     protected _boundingBox: D3.Selection;
@@ -34,7 +32,6 @@ export module Component {
     private _yOffset = 0;
     private _cssClasses: string[] = ["component"];
     private _removed = false;
-    private _autoResize = AbstractComponent.AUTORESIZE_BY_DEFAULT;
     private _usedLastLayout = false;
 
     /**

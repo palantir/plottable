@@ -3264,7 +3264,6 @@ var Plottable;
                 this._yOffset = 0;
                 this._cssClasses = ["component"];
                 this._removed = false;
-                this._autoResize = AbstractComponent.AUTORESIZE_BY_DEFAULT;
                 this._usedLastLayout = false;
             }
             /**
@@ -3754,7 +3753,6 @@ var Plottable;
             AbstractComponent.prototype.hitBox = function () {
                 return this._hitBox;
             };
-            AbstractComponent.AUTORESIZE_BY_DEFAULT = true;
             return AbstractComponent;
         })(Plottable.Core.PlottableObject);
         Component.AbstractComponent = AbstractComponent;
