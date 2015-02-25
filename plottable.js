@@ -8520,7 +8520,6 @@ var Plottable;
             function Mouse(svg) {
                 var _this = this;
                 _super.call(this);
-                this._processMoveCallback = function (e) { return _this._processMoveEvent(e); };
                 this._svg = svg;
                 this._measureRect = document.createElementNS(svg.namespaceURI, "rect");
                 this._measureRect.setAttribute("class", "measure-rect");
@@ -8530,10 +8529,17 @@ var Plottable;
                 this._svg.appendChild(this._measureRect);
                 this._lastMousePosition = { x: -1, y: -1 };
                 this._moveBroadcaster = new Plottable.Core.Broadcaster(this);
+                this._processMoveCallback = function (e) { return _this._measureAndBroadcast(e, _this._moveBroadcaster); };
                 this._event2Callback["mouseover"] = this._processMoveCallback;
                 this._event2Callback["mousemove"] = this._processMoveCallback;
                 this._event2Callback["mouseout"] = this._processMoveCallback;
-                this._broadcasters = [this._moveBroadcaster];
+                this._downBroadcaster = new Plottable.Core.Broadcaster(this);
+                this._processDownCallback = function (e) { return _this._measureAndBroadcast(e, _this._downBroadcaster); };
+                this._event2Callback["mousedown"] = this._processDownCallback;
+                this._upBroadcaster = new Plottable.Core.Broadcaster(this);
+                this._processUpCallback = function (e) { return _this._measureAndBroadcast(e, _this._upBroadcaster); };
+                this._event2Callback["mouseup"] = this._processUpCallback;
+                this._broadcasters = [this._moveBroadcaster, this._downBroadcaster, this._upBroadcaster];
             }
             /**
              * Get a Dispatcher.Mouse for the <svg> containing elem. If one already exists
@@ -8570,13 +8576,46 @@ var Plottable;
                 this._setCallback(this._moveBroadcaster, key, callback);
                 return this;
             };
-            Mouse.prototype._processMoveEvent = function (e) {
+            /**
+             * Registers a callback to be called whenever a mousedown occurs,
+             * or removes the callback if `null` is passed as the callback.
+             *
+             * @param {any} key The key associated with the callback.
+             *                  Key uniqueness is determined by deep equality.
+             * @param {(p: Point) => any} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space. Pass `null`
+             *                                     to remove a callback.
+             * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+             */
+            Mouse.prototype.onMouseDown = function (key, callback) {
+                this._setCallback(this._downBroadcaster, key, callback);
+                return this;
+            };
+            /**
+             * Registers a callback to be called whenever a mouseup occurs,
+             * or removes the callback if `null` is passed as the callback.
+             *
+             * @param {any} key The key associated with the callback.
+             *                  Key uniqueness is determined by deep equality.
+             * @param {(p: Point) => any} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space. Pass `null`
+             *                                     to remove a callback.
+             * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+             */
+            Mouse.prototype.onMouseUp = function (key, callback) {
+                this._setCallback(this._upBroadcaster, key, callback);
+                return this;
+            };
+            /**
+             * Computes the mouse position from the given event, and if successful
+             * calls broadcast() on the supplied Broadcaster.
+             */
+            Mouse.prototype._measureAndBroadcast = function (e, b) {
                 var newMousePosition = this._computeMousePosition(e.clientX, e.clientY);
-                if (newMousePosition == null) {
-                    return; // couldn't measure
+                if (newMousePosition != null) {
+                    this._lastMousePosition = newMousePosition;
+                    b.broadcast();
                 }
-                this._lastMousePosition = newMousePosition;
-                this._moveBroadcaster.broadcast();
             };
             /**
              * Computes the mouse position relative to the <svg> in svg-coordinate-space.
