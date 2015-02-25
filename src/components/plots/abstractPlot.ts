@@ -469,11 +469,11 @@ export module Plot {
       var closestSelectionDistance = withinValue;
 
       this._getDrawersInOrder().forEach((drawer) => {
-        drawer._getRenderArea().selectAll(drawer._getSelector()).each(function (datum) {
+        drawer._getRenderArea().selectAll(drawer._getSelector()).each(function () {
           var selection = d3.select(this);
           var selectionDistance = drawer._getSelectionDistance(selection, queryPoint);
           if (selectionDistance < closestSelectionDistance) {
-            closestDatum = datum;
+            closestDatum = drawer._getClosestDatum(selection, queryPoint);
             closestPixelPoint = drawer._getClosestDatumPoint(selection, queryPoint);
             closestSelection = selection;
             closestSelectionDistance = selectionDistance;

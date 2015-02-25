@@ -2854,6 +2854,9 @@ var Plottable;
             AbstractDrawer.prototype._getClosestDatumPoint = function (selection, pixelPoint) {
                 return null;
             };
+            AbstractDrawer.prototype._getClosestDatum = function (selection, pixelPoint) {
+                return selection.datum();
+            };
             return AbstractDrawer;
         })();
         _Drawer.AbstractDrawer = AbstractDrawer;
@@ -3383,10 +3386,11 @@ var Plottable;
                     }
                 });
                 var outerRadius = this._attrToProjector["outer-radius"](datum, selectionIndex);
-                var startAngle = Plottable._Util.Methods.positiveMod(datum.startAngle, 2 * Math.PI);
-                var endAngle = Plottable._Util.Methods.positiveMod(datum.endAngle, 2 * Math.PI);
-                var avgAngle = (startAngle + endAngle) / 2;
+                var avgAngle = (datum.startAngle + datum.endAngle) / 2;
                 return { x: outerRadius * Math.sin(avgAngle), y: outerRadius * Math.cos(avgAngle) };
+            };
+            Arc.prototype._getClosestDatum = function (selection, pixelPoint) {
+                return selection.datum();
             };
             return Arc;
         })(_Drawer.Element);
@@ -6715,11 +6719,11 @@ var Plottable;
                 var closestPixelPoint = null;
                 var closestSelectionDistance = withinValue;
                 this._getDrawersInOrder().forEach(function (drawer) {
-                    drawer._getRenderArea().selectAll(drawer._getSelector()).each(function (datum) {
+                    drawer._getRenderArea().selectAll(drawer._getSelector()).each(function () {
                         var selection = d3.select(this);
                         var selectionDistance = drawer._getSelectionDistance(selection, queryPoint);
                         if (selectionDistance < closestSelectionDistance) {
-                            closestDatum = datum;
+                            closestDatum = drawer._getClosestDatum(selection, queryPoint);
                             closestPixelPoint = drawer._getClosestDatumPoint(selection, queryPoint);
                             closestSelection = selection;
                             closestSelectionDistance = selectionDistance;

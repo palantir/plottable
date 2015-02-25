@@ -104,10 +104,12 @@ export module _Drawer {
         }
       });
       var outerRadius = this._attrToProjector["outer-radius"](datum, selectionIndex);
-      var startAngle = _Util.Methods.positiveMod(datum.startAngle, 2 * Math.PI);
-      var endAngle = _Util.Methods.positiveMod(datum.endAngle, 2 * Math.PI);
-      var avgAngle = (startAngle + endAngle) / 2;
+      var avgAngle = (datum.startAngle + datum.endAngle) / 2;
       return { x: outerRadius * Math.sin(avgAngle), y: outerRadius * Math.cos(avgAngle) };
+    }
+
+    public _getClosestDatum(selection: D3.Selection, pixelPoint: Point): any {
+      return selection.datum();
     }
   }
 }

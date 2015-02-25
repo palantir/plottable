@@ -1481,6 +1481,7 @@ declare module Plottable {
             _getSelection(index: number): D3.Selection;
             _getSelectionDistance(selection: D3.Selection, pixelPoint: Point): number;
             _getClosestDatumPoint(selection: D3.Selection, pixelPoint: Point): Point;
+            _getClosestDatum(selection: D3.Selection, pixelPoint: Point): any;
         }
     }
 }
@@ -1580,6 +1581,7 @@ declare module Plottable {
             _getPixelPoint(datum: any, index: number): Point;
             _getSelectionDistance(selection: D3.Selection, pixelPoint: Point): number;
             _getClosestDatumPoint(selection: D3.Selection, pixelPoint: Point): Point;
+            _getClosestDatum(selection: D3.Selection, pixelPoint: Point): any;
         }
     }
 }

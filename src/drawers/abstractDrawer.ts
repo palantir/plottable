@@ -162,6 +162,10 @@ export module _Drawer {
       return null;
     }
 
+    public _getClosestDatum(selection: D3.Selection, pixelPoint: Point): any {
+      return selection.datum();
+    }
+
   }
 }
 }
