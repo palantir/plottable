@@ -105,7 +105,7 @@ export module _Drawer {
       });
       var outerRadius = this._attrToProjector["outer-radius"](datum, selectionIndex);
       var avgAngle = (datum.startAngle + datum.endAngle) / 2;
-      return { x: outerRadius * Math.sin(avgAngle), y: outerRadius * Math.cos(avgAngle) };
+      return { x: outerRadius * Math.sin(avgAngle), y: -outerRadius * Math.cos(avgAngle) };
     }
 
     public _getClosestDatum(selection: D3.Selection, pixelPoint: Point): any {
