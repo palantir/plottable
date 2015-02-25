@@ -72,9 +72,8 @@ export module _Drawer {
       var outerRadius = this._attrToProjector["outer-radius"](datum, selectionIndex);
       var startAngle = datum.startAngle;
       var endAngle = datum.endAngle;
-      var cardinalPoint = {x: pixelPoint.x, y: -pixelPoint.y};
-      var pixelPointAngle = _Util.Methods.positiveMod(-(Math.atan2(cardinalPoint.y, cardinalPoint.x) - Math.PI / 2), 2 * Math.PI);
-      var pixelPointDistance = _Util.Methods.pointDistance({x: 0, y: 0}, cardinalPoint);
+      var pixelPointAngle = _Util.Methods.positiveMod(Math.atan2(pixelPoint.x, -pixelPoint.y), 2 * Math.PI);
+      var pixelPointDistance = _Util.Methods.pointDistance({x: 0, y: 0}, pixelPoint);
       var closestPoint: Point;
 
       if (_Util.Methods.inRange(pixelPointAngle, startAngle, endAngle)) {
@@ -87,10 +86,9 @@ export module _Drawer {
         }
       } else {
         var closerAngle = pixelPointAngle < startAngle ? startAngle : endAngle;
-        var innerSegmentPoint = { x: innerRadius * Math.sin(closerAngle), y: innerRadius * Math.cos(closerAngle) };
-        var outerSegmentPoint = { x: outerRadius * Math.sin(closerAngle), y: outerRadius * Math.cos(closerAngle) };
-        closestPoint = _Util.Methods.closestPoint(cardinalPoint, innerSegmentPoint, outerSegmentPoint);
-        closestPoint.y = -closestPoint.y;
+        var innerSegmentPoint = { x: innerRadius * Math.sin(closerAngle), y: -innerRadius * Math.cos(closerAngle) };
+        var outerSegmentPoint = { x: outerRadius * Math.sin(closerAngle), y: -outerRadius * Math.cos(closerAngle) };
+        closestPoint = _Util.Methods.closestPoint(pixelPoint, innerSegmentPoint, outerSegmentPoint);
       }
       return _Util.Methods.pointDistance(pixelPoint, closestPoint);
     }

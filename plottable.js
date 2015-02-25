@@ -3358,9 +3358,8 @@ var Plottable;
                 var outerRadius = this._attrToProjector["outer-radius"](datum, selectionIndex);
                 var startAngle = datum.startAngle;
                 var endAngle = datum.endAngle;
-                var cardinalPoint = { x: pixelPoint.x, y: -pixelPoint.y };
-                var pixelPointAngle = Plottable._Util.Methods.positiveMod(-(Math.atan2(cardinalPoint.y, cardinalPoint.x) - Math.PI / 2), 2 * Math.PI);
-                var pixelPointDistance = Plottable._Util.Methods.pointDistance({ x: 0, y: 0 }, cardinalPoint);
+                var pixelPointAngle = Plottable._Util.Methods.positiveMod(Math.atan2(pixelPoint.x, -pixelPoint.y), 2 * Math.PI);
+                var pixelPointDistance = Plottable._Util.Methods.pointDistance({ x: 0, y: 0 }, pixelPoint);
                 var closestPoint;
                 if (Plottable._Util.Methods.inRange(pixelPointAngle, startAngle, endAngle)) {
                     if (Plottable._Util.Methods.inRange(pixelPointDistance, innerRadius, outerRadius)) {
@@ -3374,10 +3373,9 @@ var Plottable;
                 }
                 else {
                     var closerAngle = pixelPointAngle < startAngle ? startAngle : endAngle;
-                    var innerSegmentPoint = { x: innerRadius * Math.sin(closerAngle), y: innerRadius * Math.cos(closerAngle) };
-                    var outerSegmentPoint = { x: outerRadius * Math.sin(closerAngle), y: outerRadius * Math.cos(closerAngle) };
-                    closestPoint = Plottable._Util.Methods.closestPoint(cardinalPoint, innerSegmentPoint, outerSegmentPoint);
-                    closestPoint.y = -closestPoint.y;
+                    var innerSegmentPoint = { x: innerRadius * Math.sin(closerAngle), y: -innerRadius * Math.cos(closerAngle) };
+                    var outerSegmentPoint = { x: outerRadius * Math.sin(closerAngle), y: -outerRadius * Math.cos(closerAngle) };
+                    closestPoint = Plottable._Util.Methods.closestPoint(pixelPoint, innerSegmentPoint, outerSegmentPoint);
                 }
                 return Plottable._Util.Methods.pointDistance(pixelPoint, closestPoint);
             };
