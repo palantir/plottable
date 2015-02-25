@@ -74,23 +74,22 @@ export module _Drawer {
       var endAngle = datum.endAngle;
       var pixelPointAngle = _Util.Methods.positiveMod(Math.atan2(pixelPoint.x, -pixelPoint.y), 2 * Math.PI);
       var pixelPointDistance = _Util.Methods.pointDistance({x: 0, y: 0}, pixelPoint);
-      var closestPoint: Point;
 
       if (_Util.Methods.inRange(pixelPointAngle, startAngle, endAngle)) {
         if (_Util.Methods.inRange(pixelPointDistance, innerRadius, outerRadius)) {
           return 0;
-        } else {
-          var closerRadius = pixelPointDistance > outerRadius ? outerRadius : innerRadius;
-          var rawAngle = Math.atan2(pixelPoint.y, pixelPoint.x);
-          closestPoint = { x: closerRadius * Math.cos(rawAngle), y: closerRadius * Math.sin(rawAngle) };
+        } else if (pixelPointDistance > outerRadius) {
+          return pixelPointDistance - outerRadius;
+        } else if (pixelPointDistance < innerRadius) {
+          return innerRadius - pixelPointDistance;
         }
       } else {
         var closerAngle = _Util.Methods.clamp(pixelPointAngle, startAngle, endAngle);
         var innerSegmentPoint = { x: innerRadius * Math.sin(closerAngle), y: -innerRadius * Math.cos(closerAngle) };
         var outerSegmentPoint = { x: outerRadius * Math.sin(closerAngle), y: -outerRadius * Math.cos(closerAngle) };
-        closestPoint = _Util.Methods.closestPoint(pixelPoint, innerSegmentPoint, outerSegmentPoint);
+        var closestPoint = _Util.Methods.closestPoint(pixelPoint, innerSegmentPoint, outerSegmentPoint);
+        return _Util.Methods.pointDistance(pixelPoint, closestPoint);
       }
-      return _Util.Methods.pointDistance(pixelPoint, closestPoint);
     }
 
     public _getClosestDatumPoint(selection: D3.Selection, pixelPoint: Point): Point {
