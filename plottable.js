@@ -3390,7 +3390,7 @@ var Plottable;
                 return { x: outerRadius * Math.sin(avgAngle), y: -outerRadius * Math.cos(avgAngle) };
             };
             Arc.prototype._getClosestDatum = function (selection, pixelPoint) {
-                return selection.datum();
+                return selection.datum().data;
             };
             return Arc;
         })(_Drawer.Element);
