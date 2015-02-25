@@ -19,13 +19,8 @@ export module _Drawer {
       var circleRadius = parseFloat(selection.attr("r"));
 
       var circleCenter = {x: circleX, y: circleY};
-      if (_Util.Methods.pointDistance(circleCenter, pixelPoint) <= circleRadius) {
-        return 0;
-      } else {
-        var angle = Math.atan2(pixelPoint.y - circleY, pixelPoint.x - circleX);
-        var closestPoint =  { x: circleX + circleRadius * Math.cos(angle), y: circleY + circleRadius * Math.sin(angle) };
-        return _Util.Methods.pointDistance(pixelPoint, closestPoint);
-      }
+      var centerToPointDistance = _Util.Methods.pointDistance(pixelPoint, circleCenter);
+      return centerToPointDistance < circleRadius ? 0 : centerToPointDistance - circleRadius;
     }
 
     public _getClosestDatumPoint(selection: D3.Selection, pixelPoint: Point): Point {

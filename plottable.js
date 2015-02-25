@@ -3145,14 +3145,8 @@ var Plottable;
                 var circleY = parseFloat(selection.attr("cy"));
                 var circleRadius = parseFloat(selection.attr("r"));
                 var circleCenter = { x: circleX, y: circleY };
-                if (Plottable._Util.Methods.pointDistance(circleCenter, pixelPoint) <= circleRadius) {
-                    return 0;
-                }
-                else {
-                    var angle = Math.atan2(pixelPoint.y - circleY, pixelPoint.x - circleX);
-                    var closestPoint = { x: circleX + circleRadius * Math.cos(angle), y: circleY + circleRadius * Math.sin(angle) };
-                    return Plottable._Util.Methods.pointDistance(pixelPoint, closestPoint);
-                }
+                var centerToPointDistance = Plottable._Util.Methods.pointDistance(pixelPoint, circleCenter);
+                return centerToPointDistance < circleRadius ? 0 : centerToPointDistance - circleRadius;
             };
             Circle.prototype._getClosestDatumPoint = function (selection, pixelPoint) {
                 var circleX = parseFloat(selection.attr("cx"));
@@ -9738,7 +9732,6 @@ var Plottable;
         Interaction.Hover = Hover;
     })(Interaction = Plottable.Interaction || (Plottable.Interaction = {}));
 })(Plottable || (Plottable = {}));
-;
 
 /*!
 SVG Typewriter 0.1.10 (https://github.com/palantir/svg-typewriter)
