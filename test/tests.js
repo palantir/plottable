@@ -546,11 +546,11 @@ describe("Drawers", function () {
             scatterPlot.project("y", "b", yScale);
             scatterPlot.project("r", 25);
             scatterPlot.renderTo(svg);
-            var queryPoint = { x: 150, y: 100 };
+            var queryPoint = { x: 200, y: 100 };
             data.forEach(function (datum, index) {
                 var selection = drawer._getSelection(index);
                 var selectionDistance = drawer._getSelectionDistance(selection, queryPoint);
-                assert.closeTo(selectionDistance, 25, 1, "correct distance calculated");
+                assert.closeTo(selectionDistance, 50 * Math.SQRT2 - 25, 1, "correct distance calculated");
             });
             svg.remove();
         });
