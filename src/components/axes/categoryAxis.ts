@@ -140,21 +140,29 @@ export module Axis {
         var bandWidth = scale.stepWidth();
 
         // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
-        var width = bandWidth;
-        if (this._isHorizontal()) {
-          if (this._tickLabelAngle !== 0) {
-            width = bandWidth - this._maxLabelTickLength() - this.tickLabelPadding();
-          } else {
-            width = axisWidth - this._maxLabelTickLength() - this.tickLabelPadding();
+        var width = axisWidth - this._maxLabelTickLength() - this.tickLabelPadding(); // default for left/right
+        if (this._isHorizontal()) { // case for top/bottom
+          width = bandWidth; // defaults to the band width
+          if (this._tickLabelAngle !== 0) { // rotated label
+            width = axisHeight - this._maxLabelTickLength() - this.tickLabelPadding(); // use the axis height
           }
         }
-        var height = this._isHorizontal() ? axisHeight - this._maxLabelTickLength() - this.tickLabelPadding() : bandWidth;
+
+        // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
+        var height = bandWidth; // default for left/right
+        if (this._isHorizontal()) { // case for top/bottom
+          height = axisHeight;
+          if (this._tickLabelAngle !== 0) { // rotated label
+            height = axisWidth - this._maxLabelTickLength() - this.tickLabelPadding();
+          }
+        }
 
         return this._wrapper.wrap(this.formatter()(s), this._measurer, width, height);
       });
 
-      var widthFn  = this._isHorizontal() ? d3.sum : _Util.Methods.max;
-      var heightFn = this._isHorizontal() ? _Util.Methods.max : d3.sum;
+      // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
+      var widthFn = (this._isHorizontal() && this._tickLabelAngle === 0) ? d3.sum : _Util.Methods.max;
+      var heightFn = (this._isHorizontal() && this._tickLabelAngle === 0) ? _Util.Methods.max : d3.sum;
 
       var textFits = wrappingResults.every((t: SVGTypewriter.Wrappers.WrappingResult) =>
                     SVGTypewriter.Utils.StringMethods.isNotEmptyString(t.truncatedText) && t.noLines === 1);
