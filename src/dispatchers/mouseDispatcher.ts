@@ -46,7 +46,7 @@ export module Dispatcher {
       this._svg = svg;
       this._measureRect = <SVGElement> <any>document.createElementNS(svg.namespaceURI, "rect");
       this._measureRect.setAttribute("class", "measure-rect");
-      this._measureRect.setAttribute("style", "opacity: 0;");
+      this._measureRect.setAttribute("style", "opacity: 0; visibility: hidden;");
       this._measureRect.setAttribute("width", "1");
       this._measureRect.setAttribute("height", "1");
       this._svg.appendChild(this._measureRect);
