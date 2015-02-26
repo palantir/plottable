@@ -130,7 +130,7 @@ export module Dispatcher {
       var newMousePosition = this._computeMousePosition(e.clientX, e.clientY);
       if (newMousePosition != null) {
         this._lastMousePosition = newMousePosition;
-        b.broadcast(this._lastMousePosition, e);
+        b.broadcast(this.getLastMousePosition(), e);
       }
     }
 
