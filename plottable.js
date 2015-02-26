@@ -6538,17 +6538,22 @@ var Plottable;
              * If not provided, all selections will be retrieved.
              * @returns {D3.Selection} The retrieved selections.
              */
-            AbstractPlot.prototype.getAllSelections = function (datasetKeys) {
+            AbstractPlot.prototype.getAllSelections = function (datasetKeys, exclude) {
                 var _this = this;
+                if (exclude === void 0) { exclude = false; }
                 var datasetKeyArray = [];
                 if (datasetKeys == null) {
-                    datasetKeyArray = this._datasetKeysInOrder;
+                    datasetKeyArray = this.datasetOrder();
                 }
                 else if (typeof (datasetKeys) === "string") {
                     datasetKeyArray = [datasetKeys];
                 }
                 else {
                     datasetKeyArray = datasetKeys;
+                }
+                if (exclude) {
+                    var excludedDatasetKeys = d3.set(datasetKeyArray);
+                    datasetKeyArray = this.datasetOrder().filter(function (datasetKey) { return !excludedDatasetKeys.has(datasetKey); });
                 }
                 var allSelections = [];
                 datasetKeyArray.forEach(function (datasetKey) {

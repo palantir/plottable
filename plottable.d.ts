@@ -2679,7 +2679,7 @@ declare module Plottable {
              * If not provided, all selections will be retrieved.
              * @returns {D3.Selection} The retrieved selections.
              */
-            getAllSelections(datasetKeys?: string | string[]): D3.Selection;
+            getAllSelections(datasetKeys?: string | string[], exclude?: boolean): D3.Selection;
         }
     }
 }
