@@ -6708,25 +6708,57 @@ var Plottable;
              * @returns {PlotData} The closest plot data to the point within a specified value.  nulls and null selection returned otherwise
              */
             AbstractPlot.prototype.getClosestData = function (xValue, yValue, withinValue) {
+                var _this = this;
                 if (withinValue === void 0) { withinValue = Infinity; }
                 var queryPoint = { x: xValue, y: yValue };
                 var closestDatum = null;
                 var closestSelection = d3.select();
                 var closestPixelPoint = null;
                 var closestSelectionDistance = withinValue;
-                this._getDrawersInOrder().forEach(function (drawer) {
-                    drawer._getRenderArea().selectAll(drawer._getSelector()).each(function () {
-                        var selection = d3.select(this);
-                        var selectionDistance = drawer._getSelectionDistance(selection, queryPoint);
+                var datasetKeyArray = this.datasetOrder();
+                datasetKeyArray.forEach(function (datasetKey) {
+                    var plotDatasetKey = _this._key2PlotDatasetKey.get(datasetKey);
+                    var appliedAttrToProjector = plotDatasetKey.drawer._attrToProjector;
+                    plotDatasetKey.dataset.data().forEach(function (datum, index) {
+                        var computedAttrToProjector = AbstractPlot._computeAttrToProjector(appliedAttrToProjector, datum, index);
+                        var selectionDistance = _this.elementDistanceCalculator()(computedAttrToProjector, queryPoint);
                         if (selectionDistance < closestSelectionDistance) {
-                            closestDatum = drawer._getClosestDatum(selection, queryPoint);
-                            closestPixelPoint = drawer._getClosestDatumPoint(selection, queryPoint);
-                            closestSelection = selection;
                             closestSelectionDistance = selectionDistance;
+                            closestDatum = datum;
+                            closestPixelPoint = _this.datumToPointConverter()(computedAttrToProjector);
                         }
                     });
                 });
                 return { data: [closestDatum], pixelPoints: [closestPixelPoint], selection: closestSelection };
+            };
+            AbstractPlot._computeAttrToProjector = function (appliedAttrToProjector, datum, index) {
+                var computedAttrToProjector = {};
+                var copiedAppliedAttrToProjector = Plottable._Util.Methods.copyMap(appliedAttrToProjector);
+                Object.keys(copiedAppliedAttrToProjector).forEach(function (attr) {
+                    computedAttrToProjector[attr] = copiedAppliedAttrToProjector[attr](datum, index);
+                });
+                return computedAttrToProjector;
+            };
+            AbstractPlot.prototype._convertDatumToPixelPoint = function (computedAttrToProjector) {
+                return null;
+            };
+            AbstractPlot.prototype.datumToPointConverter = function (converter) {
+                if (converter == null) {
+                    return this._datumToPointConverter;
+                }
+                else {
+                    this._datumToPointConverter = converter;
+                    return this;
+                }
+            };
+            AbstractPlot.prototype.elementDistanceCalculator = function (calculator) {
+                if (calculator == null) {
+                    return this._elementDistanceCalculator;
+                }
+                else {
+                    this._elementDistanceCalculator = calculator;
+                    return this;
+                }
             };
             return AbstractPlot;
         })(Plottable.Component.AbstractComponent);

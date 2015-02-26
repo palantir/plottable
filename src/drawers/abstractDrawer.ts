@@ -21,7 +21,7 @@ export module _Drawer {
     private _renderArea: D3.Selection;
     protected _className: string;
     public key: string;
-    protected _attrToProjector: _AttributeToAppliedProjector;
+    public _attrToProjector: _AttributeToAppliedProjector;
 
     /**
      * Sets the class, which needs to be applied to bound elements.

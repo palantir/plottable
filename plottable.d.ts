@@ -1427,7 +1427,7 @@ declare module Plottable {
         class AbstractDrawer {
             protected _className: string;
             key: string;
-            protected _attrToProjector: _AttributeToAppliedProjector;
+            _attrToProjector: _AttributeToAppliedProjector;
             /**
              * Sets the class, which needs to be applied to bound elements.
              *
@@ -2707,6 +2707,18 @@ declare module Plottable {
              * @returns {PlotData} The closest plot data to the point within a specified value.  nulls and null selection returned otherwise
              */
             getClosestData(xValue: number, yValue: number, withinValue?: number): PlotData;
+            datumToPointConverter(): (computedAttrToProjector: {
+                [attrToSet: string]: any;
+            }) => Point;
+            datumToPointConverter(converter: (computedAttrToProjector: {
+                [attrToSet: string]: any;
+            }) => Point): AbstractPlot;
+            elementDistanceCalculator(): (computedAttrToProjector: {
+                [attrToSet: string]: any;
+            }, queryPoint: Point) => number;
+            elementDistanceCalculator(calculator: (computedAttrToProjector: {
+                [attrToSet: string]: any;
+            }, queryPoint: Point) => number): AbstractPlot;
         }
     }
 }
