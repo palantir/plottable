@@ -7675,13 +7675,9 @@ describe("Dispatchers", function () {
             var targetY = 76;
             var md = Plottable.Dispatcher.Mouse.getDispatcher(target.node());
             var cb1Called = false;
-            var cb1 = function (p, e) {
-                cb1Called = true;
-            };
+            var cb1 = function (p, e) { return cb1Called = true; };
             var cb2Called = false;
-            var cb2 = function (p, e) {
-                cb2Called = true;
-            };
+            var cb2 = function (p, e) { return cb2Called = true; };
             md.onMouseMove("callback1", cb1);
             md.onMouseMove("callback2", cb2);
             triggerFakeMouseEvent("mousemove", target, targetX, targetY);
@@ -7704,9 +7700,7 @@ describe("Dispatchers", function () {
             var targetY = 76;
             var md = Plottable.Dispatcher.Mouse.getDispatcher(target.node());
             var callbackWasCalled = false;
-            var callback = function (p, e) {
-                callbackWasCalled = true;
-            };
+            var callback = function (p, e) { return callbackWasCalled = true; };
             var keyString = "notInDomTest";
             md.onMouseMove(keyString, callback);
             triggerFakeMouseEvent("mousemove", target, targetX, targetY);

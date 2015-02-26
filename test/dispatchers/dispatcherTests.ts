@@ -115,13 +115,9 @@ describe("Dispatchers", () => {
       var md = Plottable.Dispatcher.Mouse.getDispatcher(<SVGElement> target.node());
 
       var cb1Called = false;
-      var cb1 = function(p: Plottable.Point, e: MouseEvent) {
-        cb1Called = true;
-      };
+      var cb1 = (p: Plottable.Point, e: MouseEvent) => cb1Called = true;
       var cb2Called = false;
-      var cb2 = function(p: Plottable.Point, e: MouseEvent) {
-        cb2Called = true;
-      };
+      var cb2 = (p: Plottable.Point, e: MouseEvent) => cb2Called = true;
 
       md.onMouseMove("callback1", cb1);
       md.onMouseMove("callback2", cb2);
@@ -151,9 +147,7 @@ describe("Dispatchers", () => {
       var md = Plottable.Dispatcher.Mouse.getDispatcher(<SVGElement> target.node());
 
       var callbackWasCalled = false;
-      var callback = function(p: Plottable.Point, e: MouseEvent) {
-        callbackWasCalled = true;
-      };
+      var callback = (p: Plottable.Point, e: MouseEvent) => callbackWasCalled = true;
 
       var keyString = "notInDomTest";
       md.onMouseMove(keyString, callback);
@@ -184,7 +178,7 @@ describe("Dispatchers", () => {
       var md = Plottable.Dispatcher.Mouse.getDispatcher(<SVGElement> target.node());
 
       var callbackWasCalled = false;
-      var callback = function(p: Plottable.Point, e: MouseEvent) {
+      var callback = (p: Plottable.Point, e: MouseEvent) => {
         callbackWasCalled = true;
         assertPointsClose(p, expectedPoint, 0.5, "mouse position is correct");
         assert.isNotNull(e, "mouse event was passed to the callback");
@@ -222,7 +216,7 @@ describe("Dispatchers", () => {
       var md = Plottable.Dispatcher.Mouse.getDispatcher(<SVGElement> target.node());
 
       var callbackWasCalled = false;
-      var callback = function(p: Plottable.Point, e: MouseEvent) {
+      var callback = (p: Plottable.Point, e: MouseEvent) => {
         callbackWasCalled = true;
         assertPointsClose(p, expectedPoint, 0.5, "mouse position is correct");
         assert.isNotNull(e, "mouse event was passed to the callback");
@@ -254,7 +248,7 @@ describe("Dispatchers", () => {
       var md = Plottable.Dispatcher.Mouse.getDispatcher(<SVGElement> target.node());
 
       var callbackWasCalled = false;
-      var callback = function(p: Plottable.Point, e: MouseEvent) {
+      var callback = (p: Plottable.Point, e: MouseEvent) => {
         callbackWasCalled = true;
         assertPointsClose(p, expectedPoint, 0.5, "mouse position is correct");
         assert.isNotNull(e, "mouse event was passed to the callback");
