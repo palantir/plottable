@@ -6563,6 +6563,42 @@ var Plottable;
                 });
                 return d3.selectAll(allSelections);
             };
+            /**
+             * Retrieves all of the PlotData of this plot for the specified dataset(s)
+             *
+             * @param {string | string[]} datasetKeys The dataset(s) to retrieve the selections from.
+             * If not provided, all selections will be retrieved.
+             * @returns {PlotData} The retrieved PlotData.
+             */
+            AbstractPlot.prototype.getAllPlotData = function (datasetKeys) {
+                var _this = this;
+                var datasetKeyArray = [];
+                if (datasetKeys == null) {
+                    datasetKeyArray = this._datasetKeysInOrder;
+                }
+                else if (typeof (datasetKeys) === "string") {
+                    datasetKeyArray = [datasetKeys];
+                }
+                else {
+                    datasetKeyArray = datasetKeys;
+                }
+                var data = [];
+                var pixelPoints = [];
+                var allElements = [];
+                datasetKeyArray.forEach(function (datasetKey) {
+                    var plotDatasetKey = _this._key2PlotDatasetKey.get(datasetKey);
+                    if (plotDatasetKey == null) {
+                        return;
+                    }
+                    var drawer = plotDatasetKey.drawer;
+                    plotDatasetKey.dataset.data().forEach(function (datum, index) {
+                        data.push(datum);
+                        pixelPoints.push(drawer._getPixelPoint(datum, index));
+                        allElements.push(drawer._getSelection(index).node());
+                    });
+                });
+                return { data: data, pixelPoints: pixelPoints, selection: d3.selectAll(allElements) };
+            };
             return AbstractPlot;
         })(Plottable.Component.AbstractComponent);
         Plot.AbstractPlot = AbstractPlot;

@@ -451,6 +451,41 @@ export module Plot {
 
       return d3.selectAll(allSelections);
     }
+
+    /**
+     * Retrieves all of the PlotData of this plot for the specified dataset(s)
+     *
+     * @param {string | string[]} datasetKeys The dataset(s) to retrieve the selections from.
+     * If not provided, all selections will be retrieved.
+     * @returns {PlotData} The retrieved PlotData.
+     */
+    public getAllPlotData(datasetKeys?: string | string[]): PlotData {
+      var datasetKeyArray: string[] = [];
+      if (datasetKeys == null) {
+        datasetKeyArray = this._datasetKeysInOrder;
+      } else if (typeof(datasetKeys) === "string") {
+        datasetKeyArray = [<string> datasetKeys];
+      } else {
+        datasetKeyArray = <string[]> datasetKeys;
+      }
+
+      var data: any[] = [];
+      var pixelPoints: Point[] = [];
+      var allElements: EventTarget[] = [];
+
+      datasetKeyArray.forEach((datasetKey) => {
+        var plotDatasetKey = this._key2PlotDatasetKey.get(datasetKey);
+        if (plotDatasetKey == null) { return; }
+        var drawer = plotDatasetKey.drawer;
+        plotDatasetKey.dataset.data().forEach((datum: any, index: number) => {
+          data.push(datum);
+          pixelPoints.push(drawer._getPixelPoint(datum, index));
+          allElements.push(drawer._getSelection(index).node());
+        });
+      });
+
+      return { data: data, pixelPoints: pixelPoints, selection: d3.selectAll(allElements) };
+    }
   }
 }
 }

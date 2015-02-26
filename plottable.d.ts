@@ -2680,6 +2680,14 @@ declare module Plottable {
              * @returns {D3.Selection} The retrieved selections.
              */
             getAllSelections(datasetKeys?: string | string[]): D3.Selection;
+            /**
+             * Retrieves all of the PlotData of this plot for the specified dataset(s)
+             *
+             * @param {string | string[]} datasetKeys The dataset(s) to retrieve the selections from.
+             * If not provided, all selections will be retrieved.
+             * @returns {PlotData} The retrieved PlotData.
+             */
+            getAllPlotData(datasetKeys?: string | string[]): PlotData;
         }
     }
 }
