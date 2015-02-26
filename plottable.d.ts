@@ -2607,6 +2607,16 @@ declare module Plottable {
              */
             project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): AbstractPlot;
             protected _generateAttrToProjector(): AttributeToProjector;
+            /**
+             * Generates a map from a projected attribute to the function to calculate the value of that attribute
+             * in accordance with the given datasetKey.
+             *
+             * Note that this will return all of the data attributes, which may not perfectly align to svg attributes
+             *
+             * @param {datasetKey} the key of the dataset to generate the map for
+             * @returns {AttributeToProjector} A map from attributes to functions to calculate that attribute
+             */
+            generateDataAttrToProjector(datasetKey: string): AttributeToProjector;
             _doRender(): void;
             /**
              * Enables or disables animation.
