@@ -1999,7 +1999,10 @@ describe("Plots", function () {
             assert.strictEqual(numAttr(oneSelection, "cx"), 100, "retrieved selection in renderArea1");
             var oneElementSelection = plot.getAllSelections(["ds2"]);
             assert.strictEqual(oneElementSelection.size(), 1);
-            assert.strictEqual(numAttr(oneElementSelection, "cy"), 10, "retreieved selection in renderArea2");
+            assert.strictEqual(numAttr(oneElementSelection, "cy"), 10, "retreived selection in renderArea2");
+            var nonExcludedSelection = plot.getAllSelections(["ds1"], true);
+            assert.strictEqual(nonExcludedSelection.size(), 1);
+            assert.strictEqual(numAttr(nonExcludedSelection, "cy"), 10, "retreived non-excluded selection in renderArea2");
             svg.remove();
         });
         describe("Dataset removal", function () {
