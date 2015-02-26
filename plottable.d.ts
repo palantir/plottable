@@ -129,6 +129,9 @@ declare module Plottable {
             function lightenColor(color: string, factor: number): string;
             function darkenColor(color: string, factor: number, darkenAmount: number): string;
             function pointDistance(p1: Point, p2: Point): number;
+            function clamp(value: number, a: number, b: number): number;
+            function closestPoint(searchPoint: Point, startPoint: Point, endPoint: Point): Point;
+            function positiveMod(a: number, b: number): number;
         }
     }
 }
@@ -1424,7 +1427,7 @@ declare module Plottable {
         class AbstractDrawer {
             protected _className: string;
             key: string;
-            protected _attrToProjector: _AttributeToAppliedProjector;
+            _attrToProjector: _AttributeToAppliedProjector;
             /**
              * Sets the class, which needs to be applied to bound elements.
              *
@@ -1476,6 +1479,9 @@ declare module Plottable {
             _getSelector(): string;
             _getPixelPoint(datum: any, index: number): Point;
             _getSelection(index: number): D3.Selection;
+            _getSelectionDistance(selection: D3.Selection, pixelPoint: Point): number;
+            _getClosestDatumPoint(selection: D3.Selection, pixelPoint: Point): Point;
+            _getClosestDatum(selection: D3.Selection, pixelPoint: Point): any;
         }
     }
 }
@@ -1492,6 +1498,9 @@ declare module Plottable {
             _getSelector(): string;
             _getPixelPoint(datum: any, index: number): Point;
             _getSelection(index: number): D3.Selection;
+            _getSelectionDistance(selection: D3.Selection, pixelPoint: Point): number;
+            _getClosestDatumPoint(selection: D3.Selection, pixelPoint: Point): Point;
+            _getClosestDatum(selection: D3.Selection, pixelPoint: Point): any;
         }
     }
 }
@@ -1541,6 +1550,8 @@ declare module Plottable {
         class Circle extends Element {
             constructor(key: string);
             _getPixelPoint(datum: any, index: number): Point;
+            _getSelectionDistance(selection: D3.Selection, pixelPoint: Point): number;
+            _getClosestDatumPoint(selection: D3.Selection, pixelPoint: Point): Point;
         }
     }
 }
@@ -1555,6 +1566,8 @@ declare module Plottable {
             _getIfLabelsTooWide(): boolean;
             drawText(data: any[], attrToProjector: AttributeToProjector, userMetadata: any, plotMetadata: Plot.PlotMetadata): void;
             _getPixelPoint(datum: any, index: number): Point;
+            _getSelectionDistance(selection: D3.Selection, pixelPoint: Point): number;
+            _getClosestDatumPoint(selection: D3.Selection, pixelPoint: Point): Point;
         }
     }
 }
@@ -1567,6 +1580,9 @@ declare module Plottable {
             _drawStep(step: AppliedDrawStep): void;
             draw(data: any[], drawSteps: DrawStep[], userMetadata: any, plotMetadata: Plot.PlotMetadata): number;
             _getPixelPoint(datum: any, index: number): Point;
+            _getSelectionDistance(selection: D3.Selection, pixelPoint: Point): number;
+            _getClosestDatumPoint(selection: D3.Selection, pixelPoint: Point): Point;
+            _getClosestDatum(selection: D3.Selection, pixelPoint: Point): any;
         }
     }
 }
@@ -2691,6 +2707,18 @@ declare module Plottable {
              * @returns {PlotData} The closest plot data to the point within a specified value.  nulls and null selection returned otherwise
              */
             getClosestData(xValue: number, yValue: number, withinValue?: number): PlotData;
+            datumToPointConverter(): (computedAttrToProjector: {
+                [attrToSet: string]: any;
+            }) => Point;
+            datumToPointConverter(converter: (computedAttrToProjector: {
+                [attrToSet: string]: any;
+            }) => Point): AbstractPlot;
+            elementDistanceCalculator(): (computedAttrToProjector: {
+                [attrToSet: string]: any;
+            }, queryPoint: Point) => number;
+            elementDistanceCalculator(calculator: (computedAttrToProjector: {
+                [attrToSet: string]: any;
+            }, queryPoint: Point) => number): AbstractPlot;
         }
     }
 }

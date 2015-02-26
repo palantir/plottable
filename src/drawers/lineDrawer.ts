@@ -72,6 +72,38 @@ export module _Drawer {
     public _getSelection(index: number): D3.Selection {
       return this._getRenderArea().select(this._getSelector());
     }
+
+    public _getSelectionDistance(selection: D3.Selection, pixelPoint: Point): number {
+      var lineSegments = d3.pairs(selection.datum().map((lineDatum: any, index: number) => this._getPixelPoint(lineDatum, index)));
+      return _Util.Methods.min(lineSegments, (lineSegment: Point[]) => {
+        if (lineSegment[0].x === lineSegment[1].x) {
+          var closestY = _Util.Methods.clamp(pixelPoint.y, lineSegment[0].y, lineSegment[1].y);
+          return _Util.Methods.pointDistance({x: lineSegment[0].x, y: closestY}, pixelPoint);
+        }
+        var slope = (lineSegment[1].y - lineSegment[0].y) / (lineSegment[1].x - lineSegment[0].x);
+        var lineConstant = lineSegment[0].y - slope * lineSegment[0].x;
+
+        if (_Util.Methods.inRange(pixelPoint.x, lineSegment[0].x, lineSegment[1].x) &&
+            _Util.Methods.inRange(pixelPoint.y, lineSegment[0].y, lineSegment[1].y) &&
+            (slope * pixelPoint.x + lineConstant === pixelPoint.y)) {
+          return 0;
+        } else {
+          var closestPoint = _Util.Methods.closestPoint(pixelPoint, lineSegment[0], lineSegment[1]);
+          return _Util.Methods.pointDistance(closestPoint, pixelPoint);
+        }
+      }, Infinity);
+    }
+
+    public _getClosestDatumPoint(selection: D3.Selection, pixelPoint: Point): Point {
+      var pixelPoints = selection.data().map((datum, index) =>  this._getPixelPoint(datum, index));
+      return _Util.Methods.min(pixelPoints, (point: Point) => _Util.Methods.pointDistance(pixelPoint, point), <any> null);
+    }
+
+    public _getClosestDatum(selection: D3.Selection, pixelPoint: Point): any {
+      return _Util.Methods.min(selection.data(),
+                               (datum: any, index: number) => _Util.Methods.pointDistance(this._getPixelPoint(datum, index),pixelPoint),
+                               <any> null);
+    }
   }
 }
 }

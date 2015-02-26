@@ -59,6 +59,55 @@ export module _Drawer {
       var avgAngle = (datum.startAngle + datum.endAngle) / 2;
       return { x: avgRadius * Math.sin(avgAngle), y: avgRadius * Math.cos(avgAngle) };
     }
+
+    public _getSelectionDistance(selection: D3.Selection, pixelPoint: Point): number {
+      var datum = selection.datum();
+      var selectionIndex: number;
+      this._getRenderArea().selectAll(this._getSelector()).each((pieDatum, index) => {
+        if (datum === pieDatum) {
+          selectionIndex = index;
+        }
+      });
+      var innerRadius = this._attrToProjector["inner-radius"](datum, selectionIndex);
+      var outerRadius = this._attrToProjector["outer-radius"](datum, selectionIndex);
+      var startAngle = datum.startAngle;
+      var endAngle = datum.endAngle;
+      var pixelPointAngle = _Util.Methods.positiveMod(Math.atan2(pixelPoint.x, -pixelPoint.y), 2 * Math.PI);
+      var pixelPointDistance = _Util.Methods.pointDistance({x: 0, y: 0}, pixelPoint);
+
+      if (_Util.Methods.inRange(pixelPointAngle, startAngle, endAngle)) {
+        if (_Util.Methods.inRange(pixelPointDistance, innerRadius, outerRadius)) {
+          return 0;
+        } else if (pixelPointDistance > outerRadius) {
+          return pixelPointDistance - outerRadius;
+        } else if (pixelPointDistance < innerRadius) {
+          return innerRadius - pixelPointDistance;
+        }
+      } else {
+        var closerAngle = _Util.Methods.clamp(pixelPointAngle, startAngle, endAngle);
+        var innerSegmentPoint = { x: innerRadius * Math.sin(closerAngle), y: -innerRadius * Math.cos(closerAngle) };
+        var outerSegmentPoint = { x: outerRadius * Math.sin(closerAngle), y: -outerRadius * Math.cos(closerAngle) };
+        var closestPoint = _Util.Methods.closestPoint(pixelPoint, innerSegmentPoint, outerSegmentPoint);
+        return _Util.Methods.pointDistance(pixelPoint, closestPoint);
+      }
+    }
+
+    public _getClosestDatumPoint(selection: D3.Selection, pixelPoint: Point): Point {
+      var datum = selection.datum();
+      var selectionIndex: number;
+      this._getRenderArea().selectAll(this._getSelector()).each((datum, index) => {
+        if (datum === selection.data()) {
+          selectionIndex = index;
+        }
+      });
+      var outerRadius = this._attrToProjector["outer-radius"](datum, selectionIndex);
+      var avgAngle = (datum.startAngle + datum.endAngle) / 2;
+      return { x: outerRadius * Math.sin(avgAngle), y: -outerRadius * Math.cos(avgAngle) };
+    }
+
+    public _getClosestDatum(selection: D3.Selection, pixelPoint: Point): any {
+      return selection.datum().data;
+    }
   }
 }
 }

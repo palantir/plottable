@@ -330,6 +330,40 @@ describe("Drawers", function () {
             });
             svg.remove();
         });
+        it("getSelectionDistance", function () {
+            var svg = generateSVG(300, 300);
+            var data = [{ value: 10 }, { value: 10 }, { value: 10 }, { value: 10 }];
+            var piePlot = new Plottable.Plot.Pie();
+            var drawer = new Plottable._Drawer.Arc("one");
+            piePlot._getDrawer = function () { return drawer; };
+            piePlot.addDataset("one", data);
+            piePlot.project("value", "value");
+            piePlot.renderTo(svg);
+            var queryPoint = { x: 150, y: 150 };
+            piePlot.getAllSelections().each(function (datum, index) {
+                var selection = d3.select(this);
+                var selectionDistance = drawer._getSelectionDistance(selection, queryPoint);
+                var expectedDistance;
+                switch (index) {
+                    case 0:
+                        expectedDistance = 150;
+                        break;
+                    case 1:
+                        expectedDistance = 150 * (Math.SQRT2 - 1);
+                        break;
+                    case 2:
+                        expectedDistance = 150;
+                        break;
+                    case 3:
+                        expectedDistance = 150 * Math.SQRT2;
+                        break;
+                    default:
+                        expectedDistance = 0;
+                }
+                assert.closeTo(selectionDistance, expectedDistance, 1, "works for arc " + index);
+            });
+            svg.remove();
+        });
     });
 });
 
@@ -373,6 +407,37 @@ describe("Drawers", function () {
                 var pixelPoint = drawer._getPixelPoint(datum, index);
                 assert.closeTo(pixelPoint.x, parseFloat(selection.attr("x")) + parseFloat(selection.attr("width")), 1, "x coordinate correct");
                 assert.closeTo(pixelPoint.y, parseFloat(selection.attr("y")) + parseFloat(selection.attr("height")) / 2, 1, "y coordinate correct");
+            });
+            svg.remove();
+        });
+        it("getSelectionDistance", function () {
+            var svg = generateSVG(300, 300);
+            var data = [{ a: "foo", b: 10 }, { a: "bar", b: 24 }];
+            var xScale = new Plottable.Scale.Ordinal();
+            var yScale = new Plottable.Scale.Linear();
+            var barPlot = new Plottable.Plot.Bar(xScale, yScale);
+            var drawer = new Plottable._Drawer.Rect("one", true);
+            barPlot._getDrawer = function () { return drawer; };
+            barPlot.addDataset("one", data);
+            barPlot.project("x", "a", xScale);
+            barPlot.project("y", "b", yScale);
+            barPlot.renderTo(svg);
+            var queryPoint = { x: 60, y: 130 };
+            barPlot.getAllSelections().each(function (datum, index) {
+                var selection = d3.select(this);
+                var selectionDistance = drawer._getSelectionDistance(selection, queryPoint);
+                var expectedDistance;
+                switch (index) {
+                    case 0:
+                        expectedDistance = 54.6;
+                        break;
+                    case 1:
+                        expectedDistance = 106.66;
+                        break;
+                    default:
+                        expectedDistance = 0;
+                }
+                assert.closeTo(selectionDistance, expectedDistance, 1, "correct distance for index " + index);
             });
             svg.remove();
         });
@@ -420,6 +485,27 @@ describe("Drawers", function () {
             });
             svg.remove();
         });
+        it("getSelectionDistance", function () {
+            var svg = generateSVG(300, 300);
+            var data = [{ a: 12, b: 15 }, { a: 13, b: 18 }, { a: 14, b: 10 }, { a: 15, b: 20 }];
+            var xScale = new Plottable.Scale.Linear();
+            var yScale = new Plottable.Scale.Linear();
+            var linePlot = new Plottable.Plot.Line(xScale, yScale);
+            var drawer = new Plottable._Drawer.Line("one");
+            linePlot._getDrawer = function () { return drawer; };
+            linePlot.addDataset("one", data);
+            linePlot.project("x", "a", xScale);
+            linePlot.project("y", "b", yScale);
+            linePlot.renderTo(svg);
+            var queryPoint = { x: xScale.scale(14), y: yScale.scale(10) + 10 };
+            var lineSelection = linePlot.getAllSelections();
+            data.forEach(function (datum, index) {
+                var selection = drawer._getSelection(index);
+                var selectionDistance = drawer._getSelectionDistance(selection, queryPoint);
+                assert.closeTo(selectionDistance, 10, 1, "correct distance calculated");
+            });
+            svg.remove();
+        });
     });
 });
 
@@ -443,6 +529,28 @@ describe("Drawers", function () {
                 var pixelPoint = drawer._getPixelPoint(datum, index);
                 assert.closeTo(pixelPoint.x, xScale.scale(datum.a), 1, "x coordinate correct");
                 assert.closeTo(pixelPoint.y, yScale.scale(datum.b), 1, "y coordinate correct");
+            });
+            svg.remove();
+        });
+        it("getSelectionDistance", function () {
+            var svg = generateSVG(300, 300);
+            var data = [{ a: 15, b: 14 }];
+            var xScale = new Plottable.Scale.Linear();
+            var yScale = new Plottable.Scale.Linear();
+            var scatterPlot = new Plottable.Plot.Scatter(xScale, yScale);
+            var drawer = new Plottable._Drawer.Circle("one");
+            drawer._svgElement = "circle";
+            scatterPlot._getDrawer = function () { return drawer; };
+            scatterPlot.addDataset("one", data);
+            scatterPlot.project("x", "a", xScale);
+            scatterPlot.project("y", "b", yScale);
+            scatterPlot.project("r", 25);
+            scatterPlot.renderTo(svg);
+            var queryPoint = { x: 200, y: 100 };
+            data.forEach(function (datum, index) {
+                var selection = drawer._getSelection(index);
+                var selectionDistance = drawer._getSelectionDistance(selection, queryPoint);
+                assert.closeTo(selectionDistance, 50 * Math.SQRT2 - 25, 1, "correct distance calculated");
             });
             svg.remove();
         });
@@ -1977,19 +2085,25 @@ describe("Plots", function () {
             // Create mock drawers with already drawn items
             var mockDrawer1 = new Plottable._Drawer.AbstractDrawer("ds1");
             var renderArea1 = svg.append("g");
-            renderArea1.selectAll("circle").data(data1).enter().append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
+            renderArea1.selectAll("circle").data(data1).enter().append("circle").attr("cx", function (datum) { return datum.value * 100; }).attr("cy", 100);
             mockDrawer1.setup = function () { return mockDrawer1._renderArea = renderArea1; };
             mockDrawer1._getSelector = function () { return "circle"; };
-            mockDrawer1._getPixelPoint = function (datum) {
-                return { x: datum.value, y: 100 };
+            mockDrawer1._getSelectionDistance = function (selection, point) {
+                return Plottable._Util.Methods.pointDistance(point, { x: parseFloat(selection.attr("cx")), y: parseFloat(selection.attr("cy")) });
+            };
+            mockDrawer1._getClosestDatumPoint = function (selection, point) {
+                return { x: parseFloat(selection.attr("cx")), y: parseFloat(selection.attr("cy")) };
             };
             var renderArea2 = svg.append("g");
-            renderArea2.selectAll("circle").data(data2).enter().append("circle").attr("cx", 10).attr("cy", 10).attr("r", 10);
+            renderArea2.selectAll("circle").data(data2).enter().append("circle").attr("cx", function (datum) { return datum.value * 100; }).attr("cy", 10);
             var mockDrawer2 = new Plottable._Drawer.AbstractDrawer("ds2");
             mockDrawer2.setup = function () { return mockDrawer2._renderArea = renderArea2; };
             mockDrawer2._getSelector = function () { return "circle"; };
-            mockDrawer2._getPixelPoint = function (datum) {
-                return { x: datum.value * 2, y: 100 };
+            mockDrawer2._getSelectionDistance = function (selection, point) {
+                return Plottable._Util.Methods.pointDistance(point, { x: parseFloat(selection.attr("cx")), y: parseFloat(selection.attr("cy")) });
+            };
+            mockDrawer2._getClosestDatumPoint = function (selection, point) {
+                return { x: parseFloat(selection.attr("cx")), y: parseFloat(selection.attr("cy")) };
             };
             // Mock _getDrawer to return the mock drawers
             plot._getDrawer = function (key) {
@@ -2003,10 +2117,10 @@ describe("Plots", function () {
             plot.addDataset("ds1", data1);
             plot.addDataset("ds2", data2);
             plot.renderTo(svg);
-            var plotData = plot.getClosestData(0, 99);
+            var plotData = plot.getClosestData(100, 99);
             assert.strictEqual(plotData.selection.size(), 1, "only 1 selection retrieved");
-            assert.deepEqual(plotData.data, [data1[0]], "correct datum retrieved");
-            assert.deepEqual(plotData.pixelPoints, [{ x: 0, y: 100 }], "correct pixel point retrieved");
+            assert.deepEqual(plotData.data, [data1[1]], "correct datum retrieved");
+            assert.deepEqual(plotData.pixelPoints, [{ x: 100, y: 100 }], "correct pixel point retrieved");
             svg.remove();
         });
         describe("Dataset removal", function () {

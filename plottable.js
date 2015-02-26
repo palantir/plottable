@@ -326,6 +326,47 @@ var Plottable;
                 return Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
             }
             Methods.pointDistance = pointDistance;
+            function clamp(value, a, b) {
+                var min = Math.min(a, b);
+                var max = Math.max(a, b);
+                if (value < min) {
+                    return min;
+                }
+                else if (value > max) {
+                    return max;
+                }
+                else {
+                    return value;
+                }
+            }
+            Methods.clamp = clamp;
+            function closestPoint(searchPoint, startPoint, endPoint) {
+                if (startPoint.x === endPoint.x && startPoint.y === endPoint.y) {
+                    return { x: startPoint.x, y: startPoint.y };
+                }
+                else if (startPoint.x === endPoint.x) {
+                    return { x: startPoint.x, y: searchPoint.y };
+                }
+                else if (startPoint.y === endPoint.y) {
+                    return { x: searchPoint.x, y: startPoint.y };
+                }
+                var slope = (endPoint.y - startPoint.y) / (endPoint.x - startPoint.x);
+                var constant = startPoint.y - slope * startPoint.x;
+                var intersectingSlope = -1 / slope;
+                var intersectingConstant = searchPoint.y - intersectingSlope * searchPoint.x;
+                var intersectingPointX = (intersectingConstant - constant) / (slope - intersectingSlope);
+                var closestX = _Util.Methods.clamp(intersectingPointX, startPoint.x, endPoint.x);
+                return { x: closestX, y: slope * closestX + constant };
+            }
+            Methods.closestPoint = closestPoint;
+            function positiveMod(a, b) {
+                var mod = a % b;
+                if (mod < 0) {
+                    mod += b;
+                }
+                return mod;
+            }
+            Methods.positiveMod = positiveMod;
         })(Methods = _Util.Methods || (_Util.Methods = {}));
     })(_Util = Plottable._Util || (Plottable._Util = {}));
 })(Plottable || (Plottable = {}));
@@ -2807,6 +2848,15 @@ var Plottable;
                 var allSelections = this._getRenderArea().selectAll(this._getSelector());
                 return d3.select(allSelections[0][index]);
             };
+            AbstractDrawer.prototype._getSelectionDistance = function (selection, pixelPoint) {
+                return Infinity;
+            };
+            AbstractDrawer.prototype._getClosestDatumPoint = function (selection, pixelPoint) {
+                return null;
+            };
+            AbstractDrawer.prototype._getClosestDatum = function (selection, pixelPoint) {
+                return selection.datum();
+            };
             return AbstractDrawer;
         })();
         _Drawer.AbstractDrawer = AbstractDrawer;
@@ -2876,6 +2926,34 @@ var Plottable;
             };
             Line.prototype._getSelection = function (index) {
                 return this._getRenderArea().select(this._getSelector());
+            };
+            Line.prototype._getSelectionDistance = function (selection, pixelPoint) {
+                var _this = this;
+                var lineSegments = d3.pairs(selection.datum().map(function (lineDatum, index) { return _this._getPixelPoint(lineDatum, index); }));
+                return Plottable._Util.Methods.min(lineSegments, function (lineSegment) {
+                    if (lineSegment[0].x === lineSegment[1].x) {
+                        var closestY = Plottable._Util.Methods.clamp(pixelPoint.y, lineSegment[0].y, lineSegment[1].y);
+                        return Plottable._Util.Methods.pointDistance({ x: lineSegment[0].x, y: closestY }, pixelPoint);
+                    }
+                    var slope = (lineSegment[1].y - lineSegment[0].y) / (lineSegment[1].x - lineSegment[0].x);
+                    var lineConstant = lineSegment[0].y - slope * lineSegment[0].x;
+                    if (Plottable._Util.Methods.inRange(pixelPoint.x, lineSegment[0].x, lineSegment[1].x) && Plottable._Util.Methods.inRange(pixelPoint.y, lineSegment[0].y, lineSegment[1].y) && (slope * pixelPoint.x + lineConstant === pixelPoint.y)) {
+                        return 0;
+                    }
+                    else {
+                        var closestPoint = Plottable._Util.Methods.closestPoint(pixelPoint, lineSegment[0], lineSegment[1]);
+                        return Plottable._Util.Methods.pointDistance(closestPoint, pixelPoint);
+                    }
+                }, Infinity);
+            };
+            Line.prototype._getClosestDatumPoint = function (selection, pixelPoint) {
+                var _this = this;
+                var pixelPoints = selection.data().map(function (datum, index) { return _this._getPixelPoint(datum, index); });
+                return Plottable._Util.Methods.min(pixelPoints, function (point) { return Plottable._Util.Methods.pointDistance(pixelPoint, point); }, null);
+            };
+            Line.prototype._getClosestDatum = function (selection, pixelPoint) {
+                var _this = this;
+                return Plottable._Util.Methods.min(selection.data(), function (datum, index) { return Plottable._Util.Methods.pointDistance(_this._getPixelPoint(datum, index), pixelPoint); }, null);
             };
             Line.LINE_CLASS = "line";
             return Line;
@@ -3062,6 +3140,19 @@ var Plottable;
             Circle.prototype._getPixelPoint = function (datum, index) {
                 return { x: this._attrToProjector["cx"](datum, index), y: this._attrToProjector["cy"](datum, index) };
             };
+            Circle.prototype._getSelectionDistance = function (selection, pixelPoint) {
+                var circleX = parseFloat(selection.attr("cx"));
+                var circleY = parseFloat(selection.attr("cy"));
+                var circleRadius = parseFloat(selection.attr("r"));
+                var circleCenter = { x: circleX, y: circleY };
+                var centerToPointDistance = Plottable._Util.Methods.pointDistance(pixelPoint, circleCenter);
+                return centerToPointDistance < circleRadius ? 0 : centerToPointDistance - circleRadius;
+            };
+            Circle.prototype._getClosestDatumPoint = function (selection, pixelPoint) {
+                var circleX = parseFloat(selection.attr("cx"));
+                var circleY = parseFloat(selection.attr("cy"));
+                return { x: circleX, y: circleY };
+            };
             return Circle;
         })(_Drawer.Element);
         _Drawer.Circle = Circle;
@@ -3164,6 +3255,28 @@ var Plottable;
                 var y = this._isVertical ? rectY : rectY + rectHeight / 2;
                 return { x: x, y: y };
             };
+            Rect.prototype._getSelectionDistance = function (selection, pixelPoint) {
+                var rectX = parseFloat(selection.attr("x"));
+                var rectY = parseFloat(selection.attr("y"));
+                var rectWidth = parseFloat(selection.attr("width"));
+                var rectHeight = parseFloat(selection.attr("height"));
+                if (Plottable._Util.Methods.inRange(pixelPoint.x, rectX, rectX + rectWidth) && Plottable._Util.Methods.inRange(pixelPoint.y, rectY, rectY + rectHeight)) {
+                    return 0;
+                }
+                else {
+                    var closestPoint = { x: Plottable._Util.Methods.clamp(pixelPoint.x, rectX, rectX + rectWidth), y: Plottable._Util.Methods.clamp(pixelPoint.y, rectY, rectY + rectHeight) };
+                    return Plottable._Util.Methods.pointDistance(pixelPoint, closestPoint);
+                }
+            };
+            Rect.prototype._getClosestDatumPoint = function (selection, pixelPoint) {
+                var rectX = parseFloat(selection.attr("x"));
+                var rectY = parseFloat(selection.attr("y"));
+                var rectWidth = parseFloat(selection.attr("width"));
+                var rectHeight = parseFloat(selection.attr("height"));
+                var x = this._isVertical ? rectX + rectWidth / 2 : rectX + rectWidth;
+                var y = this._isVertical ? rectY : rectY + rectHeight / 2;
+                return { x: x, y: y };
+            };
             return Rect;
         })(_Drawer.Element);
         _Drawer.Rect = Rect;
@@ -3226,6 +3339,54 @@ var Plottable;
                 var avgRadius = (innerRadiusAccessor(datum, index) + outerRadiusAccessor(datum, index)) / 2;
                 var avgAngle = (datum.startAngle + datum.endAngle) / 2;
                 return { x: avgRadius * Math.sin(avgAngle), y: avgRadius * Math.cos(avgAngle) };
+            };
+            Arc.prototype._getSelectionDistance = function (selection, pixelPoint) {
+                var datum = selection.datum();
+                var selectionIndex;
+                this._getRenderArea().selectAll(this._getSelector()).each(function (pieDatum, index) {
+                    if (datum === pieDatum) {
+                        selectionIndex = index;
+                    }
+                });
+                var innerRadius = this._attrToProjector["inner-radius"](datum, selectionIndex);
+                var outerRadius = this._attrToProjector["outer-radius"](datum, selectionIndex);
+                var startAngle = datum.startAngle;
+                var endAngle = datum.endAngle;
+                var pixelPointAngle = Plottable._Util.Methods.positiveMod(Math.atan2(pixelPoint.x, -pixelPoint.y), 2 * Math.PI);
+                var pixelPointDistance = Plottable._Util.Methods.pointDistance({ x: 0, y: 0 }, pixelPoint);
+                if (Plottable._Util.Methods.inRange(pixelPointAngle, startAngle, endAngle)) {
+                    if (Plottable._Util.Methods.inRange(pixelPointDistance, innerRadius, outerRadius)) {
+                        return 0;
+                    }
+                    else if (pixelPointDistance > outerRadius) {
+                        return pixelPointDistance - outerRadius;
+                    }
+                    else if (pixelPointDistance < innerRadius) {
+                        return innerRadius - pixelPointDistance;
+                    }
+                }
+                else {
+                    var closerAngle = Plottable._Util.Methods.clamp(pixelPointAngle, startAngle, endAngle);
+                    var innerSegmentPoint = { x: innerRadius * Math.sin(closerAngle), y: -innerRadius * Math.cos(closerAngle) };
+                    var outerSegmentPoint = { x: outerRadius * Math.sin(closerAngle), y: -outerRadius * Math.cos(closerAngle) };
+                    var closestPoint = Plottable._Util.Methods.closestPoint(pixelPoint, innerSegmentPoint, outerSegmentPoint);
+                    return Plottable._Util.Methods.pointDistance(pixelPoint, closestPoint);
+                }
+            };
+            Arc.prototype._getClosestDatumPoint = function (selection, pixelPoint) {
+                var datum = selection.datum();
+                var selectionIndex;
+                this._getRenderArea().selectAll(this._getSelector()).each(function (datum, index) {
+                    if (datum === selection.data()) {
+                        selectionIndex = index;
+                    }
+                });
+                var outerRadius = this._attrToProjector["outer-radius"](datum, selectionIndex);
+                var avgAngle = (datum.startAngle + datum.endAngle) / 2;
+                return { x: outerRadius * Math.sin(avgAngle), y: -outerRadius * Math.cos(avgAngle) };
+            };
+            Arc.prototype._getClosestDatum = function (selection, pixelPoint) {
+                return selection.datum().data;
             };
             return Arc;
         })(_Drawer.Element);
@@ -6553,22 +6714,51 @@ var Plottable;
                 var closestDatum = null;
                 var closestSelection = d3.select();
                 var closestPixelPoint = null;
-                var closestPointDistance = withinValue;
-                this.datasetOrder().forEach(function (datasetKey) {
+                var closestSelectionDistance = withinValue;
+                var datasetKeyArray = this.datasetOrder();
+                datasetKeyArray.forEach(function (datasetKey) {
                     var plotDatasetKey = _this._key2PlotDatasetKey.get(datasetKey);
+                    var appliedAttrToProjector = plotDatasetKey.drawer._attrToProjector;
                     plotDatasetKey.dataset.data().forEach(function (datum, index) {
-                        var drawer = plotDatasetKey.drawer;
-                        var pixelPoint = drawer._getPixelPoint(datum, index);
-                        var pointDistance = Plottable._Util.Methods.pointDistance(pixelPoint, queryPoint);
-                        if (pointDistance < closestPointDistance) {
+                        var computedAttrToProjector = AbstractPlot._computeAttrToProjector(appliedAttrToProjector, datum, index);
+                        var selectionDistance = _this.elementDistanceCalculator()(computedAttrToProjector, queryPoint);
+                        if (selectionDistance < closestSelectionDistance) {
+                            closestSelectionDistance = selectionDistance;
                             closestDatum = datum;
-                            closestPixelPoint = pixelPoint;
-                            closestSelection = drawer._getSelection(index);
-                            closestPointDistance = pointDistance;
+                            closestPixelPoint = _this.datumToPointConverter()(computedAttrToProjector);
                         }
                     });
                 });
                 return { data: [closestDatum], pixelPoints: [closestPixelPoint], selection: closestSelection };
+            };
+            AbstractPlot._computeAttrToProjector = function (appliedAttrToProjector, datum, index) {
+                var computedAttrToProjector = {};
+                var copiedAppliedAttrToProjector = Plottable._Util.Methods.copyMap(appliedAttrToProjector);
+                Object.keys(copiedAppliedAttrToProjector).forEach(function (attr) {
+                    computedAttrToProjector[attr] = copiedAppliedAttrToProjector[attr](datum, index);
+                });
+                return computedAttrToProjector;
+            };
+            AbstractPlot.prototype._convertDatumToPixelPoint = function (computedAttrToProjector) {
+                return null;
+            };
+            AbstractPlot.prototype.datumToPointConverter = function (converter) {
+                if (converter == null) {
+                    return this._datumToPointConverter;
+                }
+                else {
+                    this._datumToPointConverter = converter;
+                    return this;
+                }
+            };
+            AbstractPlot.prototype.elementDistanceCalculator = function (calculator) {
+                if (calculator == null) {
+                    return this._elementDistanceCalculator;
+                }
+                else {
+                    this._elementDistanceCalculator = calculator;
+                    return this;
+                }
             };
             return AbstractPlot;
         })(Plottable.Component.AbstractComponent);

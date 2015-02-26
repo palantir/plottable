@@ -21,7 +21,7 @@ export module _Drawer {
     private _renderArea: D3.Selection;
     protected _className: string;
     public key: string;
-    protected _attrToProjector: _AttributeToAppliedProjector;
+    public _attrToProjector: _AttributeToAppliedProjector;
 
     /**
      * Sets the class, which needs to be applied to bound elements.
@@ -152,6 +152,18 @@ export module _Drawer {
     public _getSelection(index: number): D3.Selection {
       var allSelections = this._getRenderArea().selectAll(this._getSelector());
       return d3.select(allSelections[0][index]);
+    }
+
+    public _getSelectionDistance(selection: D3.Selection, pixelPoint: Point): number {
+      return Infinity;
+    }
+
+    public _getClosestDatumPoint(selection: D3.Selection, pixelPoint: Point): Point {
+      return null;
+    }
+
+    public _getClosestDatum(selection: D3.Selection, pixelPoint: Point): any {
+      return selection.datum();
     }
 
   }

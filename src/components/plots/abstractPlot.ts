@@ -35,6 +35,9 @@ export module Plot {
     protected _animateOnNextRender = true;
     private _nextSeriesIndex: number;
 
+    private _datumToPointConverter: (computedAttrToProjector: { [attrToSet: string]: any; }) => Point;
+    private _elementDistanceCalculator: (computedAttrToProjector: { [attrToSet: string]: any; }, queryPoint: Point) => number;
+
     /**
      * Constructs a Plot.
      *
@@ -466,24 +469,59 @@ export module Plot {
       var closestDatum: any = null;
       var closestSelection = d3.select();
       var closestPixelPoint: Point = null;
-      var closestPointDistance = withinValue;
+      var closestSelectionDistance = withinValue;
 
-      this.datasetOrder().forEach((datasetKey) => {
+      var datasetKeyArray = this.datasetOrder();
+      datasetKeyArray.forEach((datasetKey: string) => {
         var plotDatasetKey = this._key2PlotDatasetKey.get(datasetKey);
+        var appliedAttrToProjector = plotDatasetKey.drawer._attrToProjector;
         plotDatasetKey.dataset.data().forEach((datum, index) => {
-          var drawer = plotDatasetKey.drawer;
-          var pixelPoint = drawer._getPixelPoint(datum, index);
-          var pointDistance = Plottable._Util.Methods.pointDistance(pixelPoint, queryPoint);
-          if (pointDistance < closestPointDistance) {
+          var computedAttrToProjector = AbstractPlot._computeAttrToProjector(appliedAttrToProjector, datum, index);
+          var selectionDistance = this.elementDistanceCalculator()(computedAttrToProjector, queryPoint);
+          if (selectionDistance < closestSelectionDistance) {
+            closestSelectionDistance = selectionDistance;
             closestDatum = datum;
-            closestPixelPoint = pixelPoint;
-            closestSelection = drawer._getSelection(index);
-            closestPointDistance = pointDistance;
+            closestPixelPoint = this.datumToPointConverter()(computedAttrToProjector);
           }
         });
       });
 
       return { data: [closestDatum], pixelPoints: [closestPixelPoint], selection: closestSelection };
+    }
+
+    private static _computeAttrToProjector(appliedAttrToProjector: _AttributeToAppliedProjector, datum: any, index: number) {
+      var computedAttrToProjector: { [attrToSet: string]: any; } = {};
+      var copiedAppliedAttrToProjector = _Util.Methods.copyMap(appliedAttrToProjector);
+      Object.keys(copiedAppliedAttrToProjector).forEach((attr: string) => {
+        computedAttrToProjector[attr] = copiedAppliedAttrToProjector[attr](datum, index);
+      });
+      return computedAttrToProjector;
+    }
+
+    private _convertDatumToPixelPoint(computedAttrToProjector: { [attrToSet: string]: any; }): Point {
+      return null;
+    }
+
+    public datumToPointConverter(): (computedAttrToProjector: { [attrToSet: string]: any; }) => Point;
+    public datumToPointConverter(converter: (computedAttrToProjector: { [attrToSet: string]: any; }) => Point): AbstractPlot;
+    public datumToPointConverter(converter?: (computedAttrToProjector: { [attrToSet: string]: any; }) => Point): any {
+      if (converter == null) {
+        return this._datumToPointConverter;
+      } else {
+        this._datumToPointConverter = converter;
+        return this;
+      }
+    }
+
+    public elementDistanceCalculator(): (computedAttrToProjector: { [attrToSet: string]: any; }, queryPoint: Point) => number;
+    public elementDistanceCalculator(calculator: (computedAttrToProjector: { [attrToSet: string]: any; }, queryPoint: Point) => number): AbstractPlot;
+    public elementDistanceCalculator(calculator?: (computedAttrToProjector: { [attrToSet: string]: any; }, queryPoint: Point) => number): any {
+      if (calculator == null) {
+        return this._elementDistanceCalculator;
+      } else {
+        this._elementDistanceCalculator = calculator;
+        return this;
+      }
     }
   }
 }

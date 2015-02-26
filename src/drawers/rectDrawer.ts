@@ -93,6 +93,32 @@ export module _Drawer {
       var y = this._isVertical ? rectY : rectY + rectHeight / 2;
       return { x: x, y: y };
     }
+
+    public _getSelectionDistance(selection: D3.Selection, pixelPoint: Point): number {
+      var rectX = parseFloat(selection.attr("x"));
+      var rectY = parseFloat(selection.attr("y"));
+      var rectWidth = parseFloat(selection.attr("width"));
+      var rectHeight = parseFloat(selection.attr("height"));
+
+      if (_Util.Methods.inRange(pixelPoint.x, rectX, rectX + rectWidth) &&
+          _Util.Methods.inRange(pixelPoint.y, rectY, rectY + rectHeight)) {
+        return 0;
+      } else {
+        var closestPoint = {x: _Util.Methods.clamp(pixelPoint.x, rectX, rectX + rectWidth),
+                            y: _Util.Methods.clamp(pixelPoint.y, rectY, rectY + rectHeight)};
+        return _Util.Methods.pointDistance(pixelPoint, closestPoint);
+      }
+    }
+
+    public _getClosestDatumPoint(selection: D3.Selection, pixelPoint: Point): Point {
+      var rectX = parseFloat(selection.attr("x"));
+      var rectY = parseFloat(selection.attr("y"));
+      var rectWidth = parseFloat(selection.attr("width"));
+      var rectHeight = parseFloat(selection.attr("height"));
+      var x = this._isVertical ? rectX + rectWidth / 2 : rectX + rectWidth;
+      var y = this._isVertical ? rectY : rectY + rectHeight / 2;
+      return { x: x, y: y };
+    }
   }
 
 }

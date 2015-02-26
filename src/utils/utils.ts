@@ -329,6 +329,43 @@ export module _Util {
     export function pointDistance(p1: Point, p2: Point): number {
       return Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
     }
+
+    export function clamp(value: number, a: number, b: number): number {
+      var min = Math.min(a, b);
+      var max = Math.max(a, b);
+      if (value < min) {
+        return min;
+      } else if (value > max) {
+        return max;
+      } else {
+        return value;
+      }
+    }
+
+    export function closestPoint(searchPoint: Point, startPoint: Point, endPoint: Point): Point {
+      if (startPoint.x === endPoint.x && startPoint.y === endPoint.y) {
+        return {x: startPoint.x, y: startPoint.y};
+      } else if (startPoint.x === endPoint.x) {
+        return {x: startPoint.x, y: searchPoint.y};
+      } else if (startPoint.y === endPoint.y) {
+        return {x: searchPoint.x, y: startPoint.y};
+      }
+      var slope = (endPoint.y - startPoint.y) / (endPoint.x - startPoint.x);
+      var constant = startPoint.y - slope * startPoint.x;
+      var intersectingSlope = - 1 / slope;
+      var intersectingConstant = searchPoint.y - intersectingSlope * searchPoint.x;
+      var intersectingPointX = (intersectingConstant - constant) / (slope - intersectingSlope);
+      var closestX = _Util.Methods.clamp(intersectingPointX, startPoint.x, endPoint.x);
+      return {x: closestX, y: slope * closestX + constant};
+    }
+
+    export function positiveMod(a: number, b: number) {
+      var mod = a % b;
+      if (mod < 0) {
+        mod += b;
+      }
+      return mod;
+    }
   }
 }
 }

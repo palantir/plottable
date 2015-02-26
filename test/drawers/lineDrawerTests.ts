@@ -49,5 +49,32 @@ describe("Drawers", () => {
 
       svg.remove();
     });
+
+    it("getSelectionDistance", () => {
+      var svg = generateSVG(300, 300);
+      var data = [{a: 12, b: 15}, {a: 13, b: 18}, {a: 14, b: 10}, {a: 15, b: 20}];
+      var xScale = new Plottable.Scale.Linear();
+      var yScale = new Plottable.Scale.Linear();
+      var linePlot = new Plottable.Plot.Line(xScale, yScale);
+
+      var drawer = new Plottable._Drawer.Line("one");
+      (<any> linePlot)._getDrawer = () => drawer;
+
+      linePlot.addDataset("one", data);
+      linePlot.project("x", "a", xScale);
+      linePlot.project("y", "b", yScale);
+      linePlot.renderTo(svg);
+
+      var queryPoint = {x: xScale.scale(14), y: yScale.scale(10) + 10};
+
+      var lineSelection = linePlot.getAllSelections();
+      data.forEach((datum: any, index: number) => {
+        var selection = drawer._getSelection(index);
+        var selectionDistance = drawer._getSelectionDistance(selection, queryPoint);
+        assert.closeTo(selectionDistance, 10, 1, "correct distance calculated");
+      });
+
+      svg.remove();
+    });
   });
 });
