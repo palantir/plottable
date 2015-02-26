@@ -8581,8 +8581,7 @@ var Plottable;
                 return dispatcher;
             };
             Mouse.prototype._getWrappedCallback = function (callback) {
-                var _this = this;
-                return function () { return callback(_this.getLastMousePosition()); };
+                return function (md, p, e) { return callback(p, e); };
             };
             /**
              * Registers a callback to be called whenever the mouse position changes,
@@ -8637,7 +8636,7 @@ var Plottable;
                 var newMousePosition = this._computeMousePosition(e.clientX, e.clientY);
                 if (newMousePosition != null) {
                     this._lastMousePosition = newMousePosition;
-                    b.broadcast();
+                    b.broadcast(this._lastMousePosition, e);
                 }
             };
             /**
@@ -8729,7 +8728,7 @@ var Plottable;
                 return dispatcher;
             };
             Key.prototype._getWrappedCallback = function (callback) {
-                return function (d, e) { return callback(e.keyCode); };
+                return function (d, e) { return callback(e.keyCode, e); };
             };
             /**
              * Registers a callback to be called whenever a key is pressed,

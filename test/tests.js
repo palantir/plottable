@@ -7675,11 +7675,11 @@ describe("Dispatchers", function () {
             var targetY = 76;
             var md = Plottable.Dispatcher.Mouse.getDispatcher(target.node());
             var cb1Called = false;
-            var cb1 = function (p) {
+            var cb1 = function (p, e) {
                 cb1Called = true;
             };
             var cb2Called = false;
-            var cb2 = function (p) {
+            var cb2 = function (p, e) {
                 cb2Called = true;
             };
             md.onMouseMove("callback1", cb1);
@@ -7704,7 +7704,7 @@ describe("Dispatchers", function () {
             var targetY = 76;
             var md = Plottable.Dispatcher.Mouse.getDispatcher(target.node());
             var callbackWasCalled = false;
-            var callback = function (p) {
+            var callback = function (p, e) {
                 callbackWasCalled = true;
             };
             var keyString = "notInDomTest";
@@ -7730,9 +7730,10 @@ describe("Dispatchers", function () {
             };
             var md = Plottable.Dispatcher.Mouse.getDispatcher(target.node());
             var callbackWasCalled = false;
-            var callback = function (p) {
+            var callback = function (p, e) {
                 callbackWasCalled = true;
                 assertPointsClose(p, expectedPoint, 0.5, "mouse position is correct");
+                assert.isNotNull(e, "mouse event was passed to the callback");
             };
             var keyString = "unit test";
             md.onMouseMove(keyString, callback);
@@ -7760,9 +7761,10 @@ describe("Dispatchers", function () {
             };
             var md = Plottable.Dispatcher.Mouse.getDispatcher(target.node());
             var callbackWasCalled = false;
-            var callback = function (p) {
+            var callback = function (p, e) {
                 callbackWasCalled = true;
                 assertPointsClose(p, expectedPoint, 0.5, "mouse position is correct");
+                assert.isNotNull(e, "mouse event was passed to the callback");
             };
             var keyString = "unit test";
             md.onMouseDown(keyString, callback);
@@ -7784,9 +7786,10 @@ describe("Dispatchers", function () {
             };
             var md = Plottable.Dispatcher.Mouse.getDispatcher(target.node());
             var callbackWasCalled = false;
-            var callback = function (p) {
+            var callback = function (p, e) {
                 callbackWasCalled = true;
                 assertPointsClose(p, expectedPoint, 0.5, "mouse position is correct");
+                assert.isNotNull(e, "mouse event was passed to the callback");
             };
             var keyString = "unit test";
             md.onMouseUp(keyString, callback);
@@ -7799,11 +7802,16 @@ describe("Dispatchers", function () {
     describe("Key Dispatcher", function () {
         it("triggers callback on mousedown", function () {
             var ked = Plottable.Dispatcher.Key.getDispatcher();
+            var keyCodeToSend = 65;
             var keyDowned = false;
-            var callback = function () { return keyDowned = true; };
+            var callback = function (code, e) {
+                keyDowned = true;
+                assert.strictEqual(code, keyCodeToSend, "correct keycode was passed");
+                assert.isNotNull(e, "key event was passed to the callback");
+            };
             var keyString = "unit test";
             ked.onKeyDown(keyString, callback);
-            $("body").simulate("keydown", { keyCode: 65 });
+            $("body").simulate("keydown", { keyCode: keyCodeToSend });
             assert.isTrue(keyDowned, "callback when a key was pressed");
             ked.onKeyDown(keyString, null); // clean up
         });
