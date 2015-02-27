@@ -5034,12 +5034,41 @@ var Plottable;
                 var _this = this;
                 var wrappingResults = ticks.map(function (s) {
                     var bandWidth = scale.stepWidth();
-                    var width = _this._isHorizontal() ? bandWidth : axisWidth - _this._maxLabelTickLength() - _this.tickLabelPadding();
-                    var height = _this._isHorizontal() ? axisHeight - _this._maxLabelTickLength() - _this.tickLabelPadding() : bandWidth;
+                    // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
+                    var width = axisWidth - _this._maxLabelTickLength() - _this.tickLabelPadding(); // default for left/right
+                    if (_this._isHorizontal()) {
+                        width = bandWidth; // defaults to the band width
+                        if (_this._tickLabelAngle !== 0) {
+                            width = axisHeight - _this._maxLabelTickLength() - _this.tickLabelPadding(); // use the axis height
+                        }
+                        // HACKHACK: Wrapper fails under negative circumstances
+                        width = Math.max(width, 0);
+                    }
+                    // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
+                    var height = bandWidth; // default for left/right
+                    if (_this._isHorizontal()) {
+                        height = axisHeight - _this._maxLabelTickLength() - _this.tickLabelPadding();
+                        if (_this._tickLabelAngle !== 0) {
+                            height = axisWidth - _this._maxLabelTickLength() - _this.tickLabelPadding();
+                        }
+                        // HACKHACK: Wrapper fails under negative circumstances
+                        height = Math.max(height, 0);
+                    }
                     return _this._wrapper.wrap(_this.formatter()(s), _this._measurer, width, height);
                 });
-                var widthFn = this._isHorizontal() ? d3.sum : Plottable._Util.Methods.max;
-                var heightFn = this._isHorizontal() ? Plottable._Util.Methods.max : d3.sum;
+                // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
+                var widthFn = (this._isHorizontal() && this._tickLabelAngle === 0) ? d3.sum : Plottable._Util.Methods.max;
+                var heightFn = (this._isHorizontal() && this._tickLabelAngle === 0) ? Plottable._Util.Methods.max : d3.sum;
+                var textFits = wrappingResults.every(function (t) { return !SVGTypewriter.Utils.StringMethods.isNotEmptyString(t.truncatedText) && t.noLines === 1; });
+                var usedWidth = widthFn(wrappingResults, function (t) { return _this._measurer.measure(t.wrappedText).width; }, 0);
+                var usedHeight = heightFn(wrappingResults, function (t) { return _this._measurer.measure(t.wrappedText).height; }, 0);
+                // If the tick labels are rotated, reverse usedWidth and usedHeight
+                // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
+                if (this._tickLabelAngle !== 0) {
+                    var tempHeight = usedHeight;
+                    usedHeight = usedWidth;
+                    usedWidth = tempHeight;
+                }
                 return {
                     textFits: wrappingResults.every(function (t) { return SVGTypewriter.Utils.StringMethods.isNotEmptyString(t.truncatedText) && t.noLines === 1; }),
                     usedWidth: widthFn(wrappingResults, function (t) { return _this._measurer.measure(t.wrappedText).width; }, 0),
