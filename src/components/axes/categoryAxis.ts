@@ -146,15 +146,19 @@ export module Axis {
           if (this._tickLabelAngle !== 0) { // rotated label
             width = axisHeight - this._maxLabelTickLength() - this.tickLabelPadding(); // use the axis height
           }
+          // HACKHACK: Wrapper fails under negative circumstances
+          width = Math.max(width, 0);
         }
 
         // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
         var height = bandWidth; // default for left/right
         if (this._isHorizontal()) { // case for top/bottom
-          height = axisHeight;
+          height = axisHeight - this._maxLabelTickLength() - this.tickLabelPadding();
           if (this._tickLabelAngle !== 0) { // rotated label
             height = axisWidth - this._maxLabelTickLength() - this.tickLabelPadding();
           }
+          // HACKHACK: Wrapper fails under negative circumstances
+          height = Math.max(height, 0);
         }
 
         return this._wrapper.wrap(this.formatter()(s), this._measurer, width, height);
@@ -165,7 +169,7 @@ export module Axis {
       var heightFn = (this._isHorizontal() && this._tickLabelAngle === 0) ? _Util.Methods.max : d3.sum;
 
       var textFits = wrappingResults.every((t: SVGTypewriter.Wrappers.WrappingResult) =>
-                    SVGTypewriter.Utils.StringMethods.isNotEmptyString(t.truncatedText) && t.noLines === 1);
+                    !SVGTypewriter.Utils.StringMethods.isNotEmptyString(t.truncatedText) && t.noLines === 1);
       var usedWidth = widthFn<SVGTypewriter.Wrappers.WrappingResult, number>(wrappingResults,
                       (t: SVGTypewriter.Wrappers.WrappingResult) => this._measurer.measure(t.wrappedText).width, 0);
       var usedHeight = heightFn<SVGTypewriter.Wrappers.WrappingResult, number>(wrappingResults,
