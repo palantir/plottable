@@ -1595,7 +1595,8 @@ var Plottable;
                     return [d - Domainer._PADDING_FOR_IDENTICAL_DOMAIN, d + Domainer._PADDING_FOR_IDENTICAL_DOMAIN];
                 }
             }
-            if (scale.domain()[0] === scale.domain()[1]) {
+            var scaleDomain = scale.domain();
+            if (scaleDomain[0].valueOf() === scaleDomain[1].valueOf()) {
                 return domain;
             }
             var p = this._padProportion / 2;
