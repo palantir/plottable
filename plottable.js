@@ -1,5 +1,5 @@
 /*!
-Plottable 0.45.0 (https://github.com/palantir/plottable)
+Plottable 0.45.1 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -990,7 +990,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "0.45.0";
+    Plottable.version = "0.45.1";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -3264,7 +3264,6 @@ var Plottable;
                 this._yOffset = 0;
                 this._cssClasses = ["component"];
                 this._removed = false;
-                this._autoResize = AbstractComponent.AUTORESIZE_BY_DEFAULT;
                 this._usedLastLayout = false;
             }
             /**
@@ -3754,7 +3753,6 @@ var Plottable;
             AbstractComponent.prototype.hitBox = function () {
                 return this._hitBox;
             };
-            AbstractComponent.AUTORESIZE_BY_DEFAULT = true;
             return AbstractComponent;
         })(Plottable.Core.PlottableObject);
         Component.AbstractComponent = AbstractComponent;
@@ -5058,16 +5056,45 @@ var Plottable;
                 var _this = this;
                 var wrappingResults = ticks.map(function (s) {
                     var bandWidth = scale.stepWidth();
-                    var width = _this._isHorizontal() ? bandWidth : axisWidth - _this._maxLabelTickLength() - _this.tickLabelPadding();
-                    var height = _this._isHorizontal() ? axisHeight - _this._maxLabelTickLength() - _this.tickLabelPadding() : bandWidth;
+                    // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
+                    var width = axisWidth - _this._maxLabelTickLength() - _this.tickLabelPadding(); // default for left/right
+                    if (_this._isHorizontal()) {
+                        width = bandWidth; // defaults to the band width
+                        if (_this._tickLabelAngle !== 0) {
+                            width = axisHeight - _this._maxLabelTickLength() - _this.tickLabelPadding(); // use the axis height
+                        }
+                        // HACKHACK: Wrapper fails under negative circumstances
+                        width = Math.max(width, 0);
+                    }
+                    // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
+                    var height = bandWidth; // default for left/right
+                    if (_this._isHorizontal()) {
+                        height = axisHeight - _this._maxLabelTickLength() - _this.tickLabelPadding();
+                        if (_this._tickLabelAngle !== 0) {
+                            height = axisWidth - _this._maxLabelTickLength() - _this.tickLabelPadding();
+                        }
+                        // HACKHACK: Wrapper fails under negative circumstances
+                        height = Math.max(height, 0);
+                    }
                     return _this._wrapper.wrap(_this.formatter()(s), _this._measurer, width, height);
                 });
-                var widthFn = this._isHorizontal() ? d3.sum : Plottable._Util.Methods.max;
-                var heightFn = this._isHorizontal() ? Plottable._Util.Methods.max : d3.sum;
+                // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
+                var widthFn = (this._isHorizontal() && this._tickLabelAngle === 0) ? d3.sum : Plottable._Util.Methods.max;
+                var heightFn = (this._isHorizontal() && this._tickLabelAngle === 0) ? Plottable._Util.Methods.max : d3.sum;
+                var textFits = wrappingResults.every(function (t) { return !SVGTypewriter.Utils.StringMethods.isNotEmptyString(t.truncatedText) && t.noLines === 1; });
+                var usedWidth = widthFn(wrappingResults, function (t) { return _this._measurer.measure(t.wrappedText).width; }, 0);
+                var usedHeight = heightFn(wrappingResults, function (t) { return _this._measurer.measure(t.wrappedText).height; }, 0);
+                // If the tick labels are rotated, reverse usedWidth and usedHeight
+                // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
+                if (this._tickLabelAngle !== 0) {
+                    var tempHeight = usedHeight;
+                    usedHeight = usedWidth;
+                    usedWidth = tempHeight;
+                }
                 return {
-                    textFits: wrappingResults.every(function (t) { return SVGTypewriter.Utils.StringMethods.isNotEmptyString(t.truncatedText) && t.noLines === 1; }),
-                    usedWidth: widthFn(wrappingResults, function (t) { return _this._measurer.measure(t.wrappedText).width; }, 0),
-                    usedHeight: heightFn(wrappingResults, function (t) { return _this._measurer.measure(t.wrappedText).height; }, 0)
+                    textFits: textFits,
+                    usedWidth: usedWidth,
+                    usedHeight: usedHeight
                 };
             };
             Category.prototype._doRender = function () {
@@ -8520,20 +8547,26 @@ var Plottable;
             function Mouse(svg) {
                 var _this = this;
                 _super.call(this);
-                this._processMoveCallback = function (e) { return _this._processMoveEvent(e); };
                 this._svg = svg;
                 this._measureRect = document.createElementNS(svg.namespaceURI, "rect");
                 this._measureRect.setAttribute("class", "measure-rect");
-                this._measureRect.setAttribute("style", "opacity: 0;");
+                this._measureRect.setAttribute("style", "opacity: 0; visibility: hidden;");
                 this._measureRect.setAttribute("width", "1");
                 this._measureRect.setAttribute("height", "1");
                 this._svg.appendChild(this._measureRect);
                 this._lastMousePosition = { x: -1, y: -1 };
                 this._moveBroadcaster = new Plottable.Core.Broadcaster(this);
+                this._processMoveCallback = function (e) { return _this._measureAndBroadcast(e, _this._moveBroadcaster); };
                 this._event2Callback["mouseover"] = this._processMoveCallback;
                 this._event2Callback["mousemove"] = this._processMoveCallback;
                 this._event2Callback["mouseout"] = this._processMoveCallback;
-                this._broadcasters = [this._moveBroadcaster];
+                this._downBroadcaster = new Plottable.Core.Broadcaster(this);
+                this._processDownCallback = function (e) { return _this._measureAndBroadcast(e, _this._downBroadcaster); };
+                this._event2Callback["mousedown"] = this._processDownCallback;
+                this._upBroadcaster = new Plottable.Core.Broadcaster(this);
+                this._processUpCallback = function (e) { return _this._measureAndBroadcast(e, _this._upBroadcaster); };
+                this._event2Callback["mouseup"] = this._processUpCallback;
+                this._broadcasters = [this._moveBroadcaster, this._downBroadcaster, this._upBroadcaster];
             }
             /**
              * Get a Dispatcher.Mouse for the <svg> containing elem. If one already exists
@@ -8570,13 +8603,46 @@ var Plottable;
                 this._setCallback(this._moveBroadcaster, key, callback);
                 return this;
             };
-            Mouse.prototype._processMoveEvent = function (e) {
+            /**
+             * Registers a callback to be called whenever a mousedown occurs,
+             * or removes the callback if `null` is passed as the callback.
+             *
+             * @param {any} key The key associated with the callback.
+             *                  Key uniqueness is determined by deep equality.
+             * @param {(p: Point) => any} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space. Pass `null`
+             *                                     to remove a callback.
+             * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+             */
+            Mouse.prototype.onMouseDown = function (key, callback) {
+                this._setCallback(this._downBroadcaster, key, callback);
+                return this;
+            };
+            /**
+             * Registers a callback to be called whenever a mouseup occurs,
+             * or removes the callback if `null` is passed as the callback.
+             *
+             * @param {any} key The key associated with the callback.
+             *                  Key uniqueness is determined by deep equality.
+             * @param {(p: Point) => any} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space. Pass `null`
+             *                                     to remove a callback.
+             * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+             */
+            Mouse.prototype.onMouseUp = function (key, callback) {
+                this._setCallback(this._upBroadcaster, key, callback);
+                return this;
+            };
+            /**
+             * Computes the mouse position from the given event, and if successful
+             * calls broadcast() on the supplied Broadcaster.
+             */
+            Mouse.prototype._measureAndBroadcast = function (e, b) {
                 var newMousePosition = this._computeMousePosition(e.clientX, e.clientY);
-                if (newMousePosition == null) {
-                    return; // couldn't measure
+                if (newMousePosition != null) {
+                    this._lastMousePosition = newMousePosition;
+                    b.broadcast();
                 }
-                this._lastMousePosition = newMousePosition;
-                this._moveBroadcaster.broadcast();
             };
             /**
              * Computes the mouse position relative to the <svg> in svg-coordinate-space.

@@ -1255,6 +1255,19 @@ describe("Category Axes", function () {
         verifyTickLabelOverlaps(tickLabels, tickMarks);
         svg.remove();
     });
+    it("axis should request more space when rotated than not rotated", function () {
+        var svg = generateSVG(300, 300);
+        var labels = ["label1", "label2", "label100"];
+        var scale = new Plottable.Scale.Ordinal().domain(labels);
+        var axis = new Plottable.Axis.Category(scale, "bottom");
+        axis.renderTo(svg);
+        var requestedSpace = axis._requestedSpace(300, 50);
+        var flatHeight = requestedSpace.height;
+        axis.tickLabelAngle(-90);
+        requestedSpace = axis._requestedSpace(300, 50);
+        assert.isTrue(flatHeight < requestedSpace.height, "axis should request more height when tick labels are rotated");
+        svg.remove();
+    });
 });
 
 ///<reference path="../testReference.ts" />
@@ -7631,6 +7644,11 @@ describe("Dispatchers", function () {
         });
     });
     describe("Mouse Dispatcher", function () {
+        function assertPointsClose(actual, expected, epsilon, message) {
+            assert.closeTo(actual.x, expected.x, epsilon, message + " (x)");
+            assert.closeTo(actual.y, expected.y, epsilon, message + " (y)");
+        }
+        ;
         it("getDispatcher() creates only one Dispatcher.Mouse per <svg>", function () {
             var svg = generateSVG();
             var md1 = Plottable.Dispatcher.Mouse.getDispatcher(svg.node());
@@ -7710,11 +7728,6 @@ describe("Dispatchers", function () {
                 x: targetX,
                 y: targetY
             };
-            function assertPointsClose(actual, expected, epsilon, message) {
-                assert.closeTo(actual.x, expected.x, epsilon, message + " (x)");
-                assert.closeTo(actual.y, expected.y, epsilon, message + " (y)");
-            }
-            ;
             var md = Plottable.Dispatcher.Mouse.getDispatcher(target.node());
             var callbackWasCalled = false;
             var callback = function (p) {
@@ -7732,6 +7745,54 @@ describe("Dispatchers", function () {
             triggerFakeMouseEvent("mouseout", target, targetX, targetY);
             assert.isTrue(callbackWasCalled, "callback was called on mouseout");
             md.onMouseMove(keyString, null);
+            target.remove();
+        });
+        it("onMouseDown()", function () {
+            var targetWidth = 400, targetHeight = 400;
+            var target = generateSVG(targetWidth, targetHeight);
+            // HACKHACK: PhantomJS can't measure SVGs unless they have something in them occupying space
+            target.append("rect").attr("width", targetWidth).attr("height", targetHeight);
+            var targetX = 17;
+            var targetY = 76;
+            var expectedPoint = {
+                x: targetX,
+                y: targetY
+            };
+            var md = Plottable.Dispatcher.Mouse.getDispatcher(target.node());
+            var callbackWasCalled = false;
+            var callback = function (p) {
+                callbackWasCalled = true;
+                assertPointsClose(p, expectedPoint, 0.5, "mouse position is correct");
+            };
+            var keyString = "unit test";
+            md.onMouseDown(keyString, callback);
+            triggerFakeMouseEvent("mousedown", target, targetX, targetY);
+            assert.isTrue(callbackWasCalled, "callback was called on mousedown");
+            md.onMouseDown(keyString, null);
+            target.remove();
+        });
+        it("onMouseUp()", function () {
+            var targetWidth = 400, targetHeight = 400;
+            var target = generateSVG(targetWidth, targetHeight);
+            // HACKHACK: PhantomJS can't measure SVGs unless they have something in them occupying space
+            target.append("rect").attr("width", targetWidth).attr("height", targetHeight);
+            var targetX = 17;
+            var targetY = 76;
+            var expectedPoint = {
+                x: targetX,
+                y: targetY
+            };
+            var md = Plottable.Dispatcher.Mouse.getDispatcher(target.node());
+            var callbackWasCalled = false;
+            var callback = function (p) {
+                callbackWasCalled = true;
+                assertPointsClose(p, expectedPoint, 0.5, "mouse position is correct");
+            };
+            var keyString = "unit test";
+            md.onMouseUp(keyString, callback);
+            triggerFakeMouseEvent("mouseup", target, targetX, targetY);
+            assert.isTrue(callbackWasCalled, "callback was called on mouseup");
+            md.onMouseUp(keyString, null);
             target.remove();
         });
     });
