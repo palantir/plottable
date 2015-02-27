@@ -1586,8 +1586,9 @@ var Plottable;
         Domainer.prototype._padDomain = function (scale, domain) {
             var min = domain[0];
             var max = domain[1];
-            if (min === max && this._padProportion > 0.0) {
-                var d = min.valueOf(); // valueOf accounts for dates properly
+            // valueOf accounts for dates properly
+            if (min.valueOf() === max.valueOf() && this._padProportion > 0.0) {
+                var d = min.valueOf();
                 if (min instanceof Date) {
                     return [d - Domainer._ONE_DAY, d + Domainer._ONE_DAY];
                 }
@@ -1595,7 +1596,8 @@ var Plottable;
                     return [d - Domainer._PADDING_FOR_IDENTICAL_DOMAIN, d + Domainer._PADDING_FOR_IDENTICAL_DOMAIN];
                 }
             }
-            if (scale.domain()[0] === scale.domain()[1]) {
+            var scaleDomain = scale.domain();
+            if (scaleDomain[0].valueOf() === scaleDomain[1].valueOf()) {
                 return domain;
             }
             var p = this._padProportion / 2;
