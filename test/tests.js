@@ -2037,8 +2037,6 @@ describe("Plots", function () {
                     return mockDrawer2;
                 }
             };
-            var data1 = [{ value: 0 }, { value: 1 }, { value: 2 }];
-            var data2 = [{ value: 0 }, { value: 1 }, { value: 2 }];
             plot.addDataset("ds1", data1);
             plot.addDataset("ds2", data2);
             plot.renderTo(svg);
