@@ -2240,37 +2240,36 @@ var Plottable;
 (function (Plottable) {
     var Scale;
     (function (Scale) {
-        var Ordinal = (function (_super) {
-            __extends(Ordinal, _super);
+        var Category = (function (_super) {
+            __extends(Category, _super);
             /**
-             * Creates an OrdinalScale.
+             * Creates a CategoryScale.
              *
-             * An OrdinalScale maps strings to numbers. A common use is to map the
-             * labels of a bar plot (strings) to their pixel locations (numbers).
+             * A CategoryScale maps domain values to pixel ranges.
              *
              * @constructor
              */
-            function Ordinal(scale) {
+            function Category(scale) {
                 if (scale === void 0) { scale = d3.scale.ordinal(); }
                 _super.call(this, scale);
                 this._range = [0, 1];
                 this._typeCoercer = function (d) { return d != null && d.toString ? d.toString() : d; };
                 var d3InnerPadding = 0.3;
-                this._innerPadding = Ordinal._convertToPlottableInnerPadding(d3InnerPadding);
-                this._outerPadding = Ordinal._convertToPlottableOuterPadding(0.5, d3InnerPadding);
+                this._innerPadding = Category._convertToPlottableInnerPadding(d3InnerPadding);
+                this._outerPadding = Category._convertToPlottableOuterPadding(0.5, d3InnerPadding);
             }
-            Ordinal.prototype._getExtent = function () {
+            Category.prototype._getExtent = function () {
                 var extents = this._getAllExtents();
                 return Plottable._Util.Methods.uniq(Plottable._Util.Methods.flatten(extents));
             };
-            Ordinal.prototype.domain = function (values) {
+            Category.prototype.domain = function (values) {
                 return _super.prototype.domain.call(this, values);
             };
-            Ordinal.prototype._setDomain = function (values) {
+            Category.prototype._setDomain = function (values) {
                 _super.prototype._setDomain.call(this, values);
                 this.range(this.range()); // update range
             };
-            Ordinal.prototype.range = function (values) {
+            Category.prototype.range = function (values) {
                 if (values == null) {
                     return this._range;
                 }
@@ -2282,10 +2281,10 @@ var Plottable;
                     return this;
                 }
             };
-            Ordinal._convertToPlottableInnerPadding = function (d3InnerPadding) {
+            Category._convertToPlottableInnerPadding = function (d3InnerPadding) {
                 return 1 / (1 - d3InnerPadding) - 1;
             };
-            Ordinal._convertToPlottableOuterPadding = function (d3OuterPadding, d3InnerPadding) {
+            Category._convertToPlottableOuterPadding = function (d3OuterPadding, d3InnerPadding) {
                 return d3OuterPadding / (1 - d3InnerPadding);
             };
             /**
@@ -2293,7 +2292,7 @@ var Plottable;
              *
              * @returns {number} The range band width
              */
-            Ordinal.prototype.rangeBand = function () {
+            Category.prototype.rangeBand = function () {
                 return this._d3Scale.rangeBand();
             };
             /**
@@ -2304,10 +2303,10 @@ var Plottable;
              *
              * @returns {number} the full band width of the scale
              */
-            Ordinal.prototype.stepWidth = function () {
+            Category.prototype.stepWidth = function () {
                 return this.rangeBand() * (1 + this.innerPadding());
             };
-            Ordinal.prototype.innerPadding = function (innerPadding) {
+            Category.prototype.innerPadding = function (innerPadding) {
                 if (innerPadding == null) {
                     return this._innerPadding;
                 }
@@ -2316,7 +2315,7 @@ var Plottable;
                 this.broadcaster.broadcast();
                 return this;
             };
-            Ordinal.prototype.outerPadding = function (outerPadding) {
+            Category.prototype.outerPadding = function (outerPadding) {
                 if (outerPadding == null) {
                     return this._outerPadding;
                 }
@@ -2325,16 +2324,16 @@ var Plottable;
                 this.broadcaster.broadcast();
                 return this;
             };
-            Ordinal.prototype.copy = function () {
-                return new Ordinal(this._d3Scale.copy());
+            Category.prototype.copy = function () {
+                return new Category(this._d3Scale.copy());
             };
-            Ordinal.prototype.scale = function (value) {
+            Category.prototype.scale = function (value) {
                 //scale it to the middle
                 return _super.prototype.scale.call(this, value) + this.rangeBand() / 2;
             };
-            return Ordinal;
+            return Category;
         })(Scale.AbstractScale);
-        Scale.Ordinal = Ordinal;
+        Scale.Category = Category;
     })(Scale = Plottable.Scale || (Plottable.Scale = {}));
 })(Plottable || (Plottable = {}));
 
@@ -5015,12 +5014,12 @@ var Plottable;
             /**
              * Constructs a CategoryAxis.
              *
-             * A CategoryAxis takes an OrdinalScale and includes word-wrapping
+             * A CategoryAxis takes a CategoryScale and includes word-wrapping
              * algorithms and advanced layout logic to try to display the scale as
              * efficiently as possible.
              *
              * @constructor
-             * @param {OrdinalScale} scale The scale to base the Axis on.
+             * @param {CategoryScale} scale The scale to base the Axis on.
              * @param {string} orientation The orientation of the Axis (top/bottom/left/right) (default = "bottom").
              * @param {Formatter} formatter The Formatter for the Axis (default Formatters.identity())
              */
@@ -5046,15 +5045,15 @@ var Plottable;
                 if (this._scale.domain().length === 0) {
                     return { width: 0, height: 0, wantsWidth: false, wantsHeight: false };
                 }
-                var ordinalScale = this._scale;
-                var fakeScale = ordinalScale.copy();
+                var categoryScale = this._scale;
+                var fakeScale = categoryScale.copy();
                 if (this._isHorizontal()) {
                     fakeScale.range([0, offeredWidth]);
                 }
                 else {
                     fakeScale.range([offeredHeight, 0]);
                 }
-                var textResult = this._measureTicks(offeredWidth, offeredHeight, fakeScale, ordinalScale.domain());
+                var textResult = this._measureTicks(offeredWidth, offeredHeight, fakeScale, categoryScale.domain());
                 return {
                     width: textResult.usedWidth + widthRequiredByTicks,
                     height: textResult.usedHeight + heightRequiredByTicks,
@@ -5165,11 +5164,11 @@ var Plottable;
             Category.prototype._doRender = function () {
                 var _this = this;
                 _super.prototype._doRender.call(this);
-                var ordScale = this._scale;
+                var catScale = this._scale;
                 var tickLabels = this._tickLabelContainer.selectAll("." + Axis.AbstractAxis.TICK_LABEL_CLASS).data(this._scale.domain(), function (d) { return d; });
                 var getTickLabelTransform = function (d, i) {
-                    var innerPaddingWidth = ordScale.stepWidth() - ordScale.rangeBand();
-                    var scaledValue = ordScale.scale(d) - ordScale.rangeBand() / 2 - innerPaddingWidth / 2;
+                    var innerPaddingWidth = catScale.stepWidth() - catScale.rangeBand();
+                    var scaledValue = catScale.scale(d) - catScale.rangeBand() / 2 - innerPaddingWidth / 2;
                     var x = _this._isHorizontal() ? scaledValue : 0;
                     var y = _this._isHorizontal() ? 0 : scaledValue;
                     return "translate(" + x + "," + y + ")";
@@ -5179,8 +5178,8 @@ var Plottable;
                 tickLabels.attr("transform", getTickLabelTransform);
                 // erase all text first, then rewrite
                 tickLabels.text("");
-                this._drawTicks(this.width(), this.height(), ordScale, tickLabels);
-                var translate = this._isHorizontal() ? [ordScale.rangeBand() / 2, 0] : [0, ordScale.rangeBand() / 2];
+                this._drawTicks(this.width(), this.height(), catScale, tickLabels);
+                var translate = this._isHorizontal() ? [catScale.rangeBand() / 2, 0] : [0, catScale.rangeBand() / 2];
                 var xTranslate = this.orient() === "right" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
                 var yTranslate = this.orient() === "bottom" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
                 Plottable._Util.DOM.translate(this._tickLabelContainer, xTranslate, yTranslate);
@@ -6818,7 +6817,7 @@ var Plottable;
             AbstractXYPlot.prototype._computeLayout = function (offeredXOrigin, offeredYOffset, availableWidth, availableHeight) {
                 _super.prototype._computeLayout.call(this, offeredXOrigin, offeredYOffset, availableWidth, availableHeight);
                 this._xScale.range([0, this.width()]);
-                if (this._yScale instanceof Plottable.Scale.Ordinal) {
+                if (this._yScale instanceof Plottable.Scale.Category) {
                     this._yScale.range([0, this.height()]);
                 }
                 else {
@@ -7078,8 +7077,8 @@ var Plottable;
              * grid, and the datum can control what color it is.
              *
              * @constructor
-             * @param {Scale.Ordinal} xScale The x scale to use.
-             * @param {Scale.Ordinal} yScale The y scale to use.
+             * @param {Scale.Category} xScale The x scale to use.
+             * @param {Scale.Category} yScale The y scale to use.
              * @param {Scale.Color|Scale.InterpolatedColor} colorScale The color scale
              * to use for each grid cell.
              */
@@ -7370,7 +7369,7 @@ var Plottable;
                 };
                 attrToProjector["width"] = this._isVertical ? widthF : heightF;
                 attrToProjector["height"] = this._isVertical ? heightF : widthF;
-                if (secondaryScale instanceof Plottable.Scale.Ordinal) {
+                if (secondaryScale instanceof Plottable.Scale.Category) {
                     attrToProjector[secondaryAttr] = function (d, i, u, m) { return positionF(d, i, u, m) - widthF(d, i, u, m) / 2; };
                 }
                 else {
@@ -7396,8 +7395,8 @@ var Plottable;
             /**
              * Computes the barPixelWidth of all the bars in the plot.
              *
-             * If the position scale of the plot is an OrdinalScale and in bands mode, then the rangeBands function will be used.
-             * If the position scale of the plot is an OrdinalScale and in points mode, then
+             * If the position scale of the plot is a CategoryScale and in bands mode, then the rangeBands function will be used.
+             * If the position scale of the plot is a CategoryScale and in points mode, then
              *   from https://github.com/mbostock/d3/wiki/Ordinal-Scales#ordinal_rangePoints, the max barPixelWidth is step * padding
              * If the position scale of the plot is a QuantitativeScale, then _getMinimumDataWidth is scaled to compute the barPixelWidth
              */
@@ -7405,7 +7404,7 @@ var Plottable;
                 var _this = this;
                 var barPixelWidth;
                 var barScale = this._isVertical ? this._xScale : this._yScale;
-                if (barScale instanceof Plottable.Scale.Ordinal) {
+                if (barScale instanceof Plottable.Scale.Category) {
                     barPixelWidth = barScale.rangeBand();
                 }
                 else {
@@ -7819,7 +7818,7 @@ var Plottable;
                 });
             };
             ClusteredBar.prototype._makeInnerScale = function () {
-                var innerScale = new Plottable.Scale.Ordinal();
+                var innerScale = new Plottable.Scale.Category();
                 innerScale.domain(this._datasetKeysInOrder);
                 if (!this._projections["width"]) {
                     innerScale.range([0, this._getBarPixelWidth()]);

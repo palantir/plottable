@@ -372,7 +372,7 @@ describe("Drawers", function () {
         it("getPixelPoint vertical", function () {
             var svg = generateSVG(300, 300);
             var data = [{ a: "foo", b: 10 }, { a: "bar", b: 24 }];
-            var xScale = new Plottable.Scale.Ordinal();
+            var xScale = new Plottable.Scale.Category();
             var yScale = new Plottable.Scale.Linear();
             var barPlot = new Plottable.Plot.Bar(xScale, yScale);
             var drawer = new Plottable._Drawer.Rect("one", true);
@@ -393,7 +393,7 @@ describe("Drawers", function () {
             var svg = generateSVG(300, 300);
             var data = [{ a: "foo", b: 10 }, { a: "bar", b: 24 }];
             var xScale = new Plottable.Scale.Linear();
-            var yScale = new Plottable.Scale.Ordinal();
+            var yScale = new Plottable.Scale.Category();
             var barPlot = new Plottable.Plot.Bar(xScale, yScale, false);
             var drawer = new Plottable._Drawer.Rect("one", false);
             barPlot._getDrawer = function () { return drawer; };
@@ -1066,7 +1066,7 @@ describe("NumericAxis", function () {
         var SVG_WIDTH = 120;
         var SVG_HEIGHT = 300;
         var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        var xScale = new Plottable.Scale.Ordinal();
+        var xScale = new Plottable.Scale.Category();
         var yScale = new Plottable.Scale.Linear();
         var yAxis = new Plottable.Axis.Numeric(yScale, "left");
         var yLabel = new Plottable.Component.AxisLabel("LABEL", "left");
@@ -1169,7 +1169,7 @@ var assert = chai.assert;
 describe("Category Axes", function () {
     it("re-renders appropriately when data is changed", function () {
         var svg = generateSVG(400, 400);
-        var xScale = new Plottable.Scale.Ordinal().domain(["foo", "bar", "baz"]).range([400, 0]);
+        var xScale = new Plottable.Scale.Category().domain(["foo", "bar", "baz"]).range([400, 0]);
         var ca = new Plottable.Axis.Category(xScale, "left");
         ca.renderTo(svg);
         assert.deepEqual(ca._tickLabelContainer.selectAll(".tick-label").data(), xScale.domain(), "tick labels render domain");
@@ -1179,7 +1179,7 @@ describe("Category Axes", function () {
     });
     it("requests appropriate space when the scale has no domain", function () {
         var svg = generateSVG(400, 400);
-        var scale = new Plottable.Scale.Ordinal();
+        var scale = new Plottable.Scale.Category();
         var ca = new Plottable.Axis.Category(scale);
         ca._anchor(svg);
         var s = ca._requestedSpace(400, 400);
@@ -1192,7 +1192,7 @@ describe("Category Axes", function () {
     it("doesnt blow up for non-string data", function () {
         var svg = generateSVG(1000, 400);
         var domain = [null, undefined, true, 2, "foo"];
-        var scale = new Plottable.Scale.Ordinal().domain(domain);
+        var scale = new Plottable.Scale.Category().domain(domain);
         var axis = new Plottable.Axis.Category(scale);
         axis.renderTo(svg);
         var texts = svg.selectAll("text")[0].map(function (s) { return d3.select(s).text(); });
@@ -1201,7 +1201,7 @@ describe("Category Axes", function () {
     });
     it("width accounts for gutter. ticklength, and padding on vertical axes", function () {
         var svg = generateSVG(400, 400);
-        var xScale = new Plottable.Scale.Ordinal().domain(["foo", "bar", "baz"]).range([400, 0]);
+        var xScale = new Plottable.Scale.Category().domain(["foo", "bar", "baz"]).range([400, 0]);
         var ca = new Plottable.Axis.Category(xScale, "left");
         ca.renderTo(svg);
         var axisWidth = ca.width();
@@ -1217,7 +1217,7 @@ describe("Category Axes", function () {
     });
     it("height accounts for gutter. ticklength, and padding on horizontal axes", function () {
         var svg = generateSVG(400, 400);
-        var xScale = new Plottable.Scale.Ordinal().domain(["foo", "bar", "baz"]).range([400, 0]);
+        var xScale = new Plottable.Scale.Category().domain(["foo", "bar", "baz"]).range([400, 0]);
         var ca = new Plottable.Axis.Category(xScale, "bottom");
         ca.renderTo(svg);
         var axisHeight = ca.height();
@@ -1235,7 +1235,7 @@ describe("Category Axes", function () {
         var SVG_WIDTH = 400;
         var svg = generateSVG(SVG_WIDTH, 100);
         var years = ["2000", "2001", "2002", "2003"];
-        var scale = new Plottable.Scale.Ordinal().domain(years).range([0, SVG_WIDTH]);
+        var scale = new Plottable.Scale.Category().domain(years).range([0, SVG_WIDTH]);
         var axis = new Plottable.Axis.Category(scale, "bottom");
         axis.renderTo(svg);
         var ticks = axis._content.selectAll("text");
@@ -1258,7 +1258,7 @@ describe("Category Axes", function () {
     it("axis should request more space if there's not enough space to fit the text", function () {
         var svg = generateSVG(300, 300);
         var years = ["2000", "2001", "2002", "2003"];
-        var scale = new Plottable.Scale.Ordinal().domain(years);
+        var scale = new Plottable.Scale.Category().domain(years);
         var axis = new Plottable.Axis.Category(scale, "bottom");
         axis.renderTo(svg);
         var requestedSpace = axis._requestedSpace(300, 10);
@@ -1277,7 +1277,7 @@ describe("Category Axes", function () {
             }
         }
         var svg = generateSVG(400, 300);
-        var yScale = new Plottable.Scale.Ordinal();
+        var yScale = new Plottable.Scale.Category();
         var axis = new Plottable.Axis.Category(yScale, "left");
         yScale.domain(["A", "B", "C"]);
         axis.renderTo(svg);
@@ -2150,15 +2150,15 @@ describe("Plots", function () {
         });
         it("extent calculation done in correct dataset order", function () {
             var animator = new Plottable.Animator.Base().delay(10).duration(10).maxIterativeDelay(0);
-            var ordinalScale = new Plottable.Scale.Ordinal();
+            var CategoryScale = new Plottable.Scale.Category();
             var dataset1 = [{ key: "A" }];
             var dataset2 = [{ key: "B" }];
             var plot = new Plottable.Plot.AbstractPlot().addDataset("b", dataset2).addDataset("a", dataset1);
-            plot.project("key", "key", ordinalScale);
+            plot.project("key", "key", CategoryScale);
             plot.datasetOrder(["a", "b"]);
             var svg = generateSVG();
             plot.renderTo(svg);
-            assert.deepEqual(ordinalScale.domain(), ["A", "B"], "extent is in the right order");
+            assert.deepEqual(CategoryScale.domain(), ["A", "B"], "extent is in the right order");
             svg.remove();
         });
     });
@@ -2848,7 +2848,7 @@ describe("Plots", function () {
             var SVG_HEIGHT = 400;
             beforeEach(function () {
                 svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-                xScale = new Plottable.Scale.Ordinal().domain(["A", "B"]);
+                xScale = new Plottable.Scale.Category().domain(["A", "B"]);
                 yScale = new Plottable.Scale.Linear();
                 var data = [
                     { x: "A", y: 1 },
@@ -3069,7 +3069,7 @@ describe("Plots", function () {
             var SVG_HEIGHT = 400;
             beforeEach(function () {
                 svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-                yScale = new Plottable.Scale.Ordinal().domain(["A", "B"]);
+                yScale = new Plottable.Scale.Category().domain(["A", "B"]);
                 xScale = new Plottable.Scale.Linear();
                 xScale.domain([-3, 3]);
                 var data = [
@@ -3151,7 +3151,7 @@ describe("Plots", function () {
                 svg = generateSVG();
                 data = [{ x: "foo", y: 5 }, { x: "bar", y: 640 }, { x: "zoo", y: 12345 }];
                 dataset = new Plottable.Dataset(data);
-                xScale = new Plottable.Scale.Ordinal();
+                xScale = new Plottable.Scale.Category();
                 yScale = new Plottable.Scale.Linear();
                 plot = new Plottable.Plot.Bar(xScale, yScale);
                 plot.addDataset(dataset);
@@ -3220,7 +3220,7 @@ describe("Plots", function () {
             beforeEach(function () {
                 svg = generateSVG();
                 dataset = new Plottable.Dataset();
-                var xScale = new Plottable.Scale.Ordinal();
+                var xScale = new Plottable.Scale.Category();
                 var yScale = new Plottable.Scale.Linear();
                 verticalBarPlot = new Plottable.Plot.Bar(xScale, yScale);
                 verticalBarPlot.project("x", "x", xScale);
@@ -3275,12 +3275,12 @@ describe("Plots", function () {
                 svg.remove();
             });
         });
-        it("plot auto domain scale to visible points on ordinal scale", function () {
+        it("plot auto domain scale to visible points on Category scale", function () {
             var svg = generateSVG(500, 500);
             var xAccessor = function (d, i, u) { return d.a; };
             var yAccessor = function (d, i, u) { return d.b + u.foo; };
             var simpleDataset = new Plottable.Dataset([{ a: "a", b: 6 }, { a: "b", b: 2 }, { a: "c", b: -2 }, { a: "d", b: -6 }], { foo: 0 });
-            var xScale = new Plottable.Scale.Ordinal();
+            var xScale = new Plottable.Scale.Category();
             var yScale = new Plottable.Scale.Linear();
             var plot = new Plottable.Plot.Bar(xScale, yScale);
             plot.addDataset(simpleDataset).project("x", xAccessor, xScale).project("y", yAccessor, yScale).renderTo(svg);
@@ -3333,8 +3333,8 @@ describe("Plots", function () {
             assert.equal(cellBV.attr("fill"), "#777777", "cell 'BV' color is correct");
         };
         it("renders correctly", function () {
-            var xScale = new Plottable.Scale.Ordinal();
-            var yScale = new Plottable.Scale.Ordinal();
+            var xScale = new Plottable.Scale.Category();
+            var yScale = new Plottable.Scale.Category();
             var colorScale = new Plottable.Scale.InterpolatedColor(["black", "white"]);
             var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
             var gridPlot = new Plottable.Plot.Grid(xScale, yScale, colorScale);
@@ -3344,8 +3344,8 @@ describe("Plots", function () {
             svg.remove();
         });
         it("renders correctly when data is set after construction", function () {
-            var xScale = new Plottable.Scale.Ordinal();
-            var yScale = new Plottable.Scale.Ordinal();
+            var xScale = new Plottable.Scale.Category();
+            var yScale = new Plottable.Scale.Category();
             var colorScale = new Plottable.Scale.InterpolatedColor(["black", "white"]);
             var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
             var dataset = new Plottable.Dataset();
@@ -3356,8 +3356,8 @@ describe("Plots", function () {
             svg.remove();
         });
         it("can invert y axis correctly", function () {
-            var xScale = new Plottable.Scale.Ordinal();
-            var yScale = new Plottable.Scale.Ordinal();
+            var xScale = new Plottable.Scale.Category();
+            var yScale = new Plottable.Scale.Category();
             var colorScale = new Plottable.Scale.InterpolatedColor(["black", "white"]);
             var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
             var gridPlot = new Plottable.Plot.Grid(xScale, yScale, colorScale);
@@ -3386,8 +3386,8 @@ describe("Plots", function () {
         });
         describe("getAllSelections()", function () {
             it("retrieves all selections with no args", function () {
-                var xScale = new Plottable.Scale.Ordinal();
-                var yScale = new Plottable.Scale.Ordinal();
+                var xScale = new Plottable.Scale.Category();
+                var yScale = new Plottable.Scale.Category();
                 var colorScale = new Plottable.Scale.InterpolatedColor(["black", "white"]);
                 var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
                 var gridPlot = new Plottable.Plot.Grid(xScale, yScale, colorScale);
@@ -3399,8 +3399,8 @@ describe("Plots", function () {
                 svg.remove();
             });
             it("retrieves correct selections (string arg)", function () {
-                var xScale = new Plottable.Scale.Ordinal();
-                var yScale = new Plottable.Scale.Ordinal();
+                var xScale = new Plottable.Scale.Category();
+                var yScale = new Plottable.Scale.Category();
                 var colorScale = new Plottable.Scale.InterpolatedColor(["black", "white"]);
                 var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
                 var gridPlot = new Plottable.Plot.Grid(xScale, yScale, colorScale);
@@ -3413,8 +3413,8 @@ describe("Plots", function () {
                 svg.remove();
             });
             it("retrieves correct selections (array arg)", function () {
-                var xScale = new Plottable.Scale.Ordinal();
-                var yScale = new Plottable.Scale.Ordinal();
+                var xScale = new Plottable.Scale.Category();
+                var yScale = new Plottable.Scale.Category();
                 var colorScale = new Plottable.Scale.InterpolatedColor(["black", "white"]);
                 var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
                 var gridPlot = new Plottable.Plot.Grid(xScale, yScale, colorScale);
@@ -3427,8 +3427,8 @@ describe("Plots", function () {
                 svg.remove();
             });
             it("skips invalid keys", function () {
-                var xScale = new Plottable.Scale.Ordinal();
-                var yScale = new Plottable.Scale.Ordinal();
+                var xScale = new Plottable.Scale.Category();
+                var yScale = new Plottable.Scale.Category();
                 var colorScale = new Plottable.Scale.InterpolatedColor(["black", "white"]);
                 var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
                 var gridPlot = new Plottable.Plot.Grid(xScale, yScale, colorScale);
@@ -3785,7 +3785,7 @@ describe("Plots", function () {
             svg.remove();
         });
     });
-    describe("auto scale domain on ordinal", function () {
+    describe("auto scale domain on Category", function () {
         var svg;
         var SVG_WIDTH = 600;
         var SVG_HEIGHT = 400;
@@ -3795,7 +3795,7 @@ describe("Plots", function () {
         var data2;
         beforeEach(function () {
             svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-            xScale = new Plottable.Scale.Ordinal().domain(["a", "b"]);
+            xScale = new Plottable.Scale.Category().domain(["a", "b"]);
             ;
             yScale = new Plottable.Scale.Linear();
             data1 = [
@@ -3831,7 +3831,7 @@ describe("Plots", function () {
         var stackedBarPlot;
         beforeEach(function () {
             svg = generateSVG(600, 400);
-            xScale = new Plottable.Scale.Ordinal();
+            xScale = new Plottable.Scale.Category();
             yScale = new Plottable.Scale.Linear();
             stackedBarPlot = new Plottable.Plot.StackedBar(xScale, yScale);
             stackedBarPlot.project("x", "key", xScale);
@@ -4196,7 +4196,7 @@ describe("Plots", function () {
         var originalData2;
         beforeEach(function () {
             svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-            xScale = new Plottable.Scale.Ordinal();
+            xScale = new Plottable.Scale.Category();
             yScale = new Plottable.Scale.Linear().domain([0, 3]);
             originalData1 = [
                 { x: "A", y: 1 },
@@ -4273,7 +4273,7 @@ describe("Plots", function () {
         var bandWidth = 0;
         beforeEach(function () {
             svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-            xScale = new Plottable.Scale.Ordinal();
+            xScale = new Plottable.Scale.Category();
             yScale = new Plottable.Scale.Linear();
             var data1 = [
                 { x: "A", y: -1 },
@@ -4340,7 +4340,7 @@ describe("Plots", function () {
         beforeEach(function () {
             svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
             xScale = new Plottable.Scale.Linear().domain([0, 6]);
-            yScale = new Plottable.Scale.Ordinal();
+            yScale = new Plottable.Scale.Category();
             var data1 = [
                 { name: "jon", y: 0, type: "q1" },
                 { name: "dan", y: 2, type: "q1" }
@@ -4403,7 +4403,7 @@ describe("Plots", function () {
         var numAttr = function (s, a) { return parseFloat(s.attr(a)); };
         beforeEach(function () {
             svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-            var xScale = new Plottable.Scale.Ordinal();
+            var xScale = new Plottable.Scale.Category();
             var yScale = new Plottable.Scale.Linear();
             var data1 = [
                 { x: "A", y: 1, type: "a" },
@@ -4464,7 +4464,7 @@ describe("Plots", function () {
         var originalData2;
         beforeEach(function () {
             svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-            xScale = new Plottable.Scale.Ordinal();
+            xScale = new Plottable.Scale.Category();
             yScale = new Plottable.Scale.Linear().domain([0, 2]);
             originalData1 = [
                 { x: "A", y: 1 },
@@ -4540,7 +4540,7 @@ describe("Plots", function () {
         var bandWidth = 0;
         beforeEach(function () {
             svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-            yScale = new Plottable.Scale.Ordinal();
+            yScale = new Plottable.Scale.Category();
             xScale = new Plottable.Scale.Linear().domain([0, 2]);
             var data1 = [
                 { y: "A", x: 1 },
@@ -4601,7 +4601,7 @@ describe("Plots", function () {
             var SVG_WIDTH = 600;
             var SVG_HEIGHT = 400;
             svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-            var xScale = new Plottable.Scale.Ordinal();
+            var xScale = new Plottable.Scale.Category();
             var yScale = new Plottable.Scale.Linear();
             var data1 = [{ x: "A", y: 1 }, { x: "B", y: 2 }, { x: "C", y: 1 }];
             var data2 = [{ x: "A", y: 2 }, { x: "B", y: 4 }];
@@ -6297,9 +6297,9 @@ describe("Scales", function () {
             assert.deepEqual(ticks, [0, 3, 6, 9], "ticks were generated correctly with custom generator");
         });
     });
-    describe("Ordinal Scales", function () {
+    describe("Category Scales", function () {
         it("rangeBand is updated when domain changes", function () {
-            var scale = new Plottable.Scale.Ordinal();
+            var scale = new Plottable.Scale.Category();
             scale.range([0, 2679]);
             scale.domain(["1", "2", "3", "4"]);
             assert.closeTo(scale.rangeBand(), 399, 1);
@@ -6307,16 +6307,16 @@ describe("Scales", function () {
             assert.closeTo(scale.rangeBand(), 329, 1);
         });
         it("stepWidth operates normally", function () {
-            var scale = new Plottable.Scale.Ordinal();
+            var scale = new Plottable.Scale.Category();
             scale.range([0, 3000]);
             scale.domain(["1", "2", "3", "4"]);
             var widthSum = scale.rangeBand() * (1 + scale.innerPadding());
             assert.strictEqual(scale.stepWidth(), widthSum, "step width is the sum of innerPadding width and band width");
         });
     });
-    it("OrdinalScale + BarPlot combo works as expected when the data is swapped", function () {
+    it("CategoryScale + BarPlot combo works as expected when the data is swapped", function () {
         // This unit test taken from SLATE, see SLATE-163 a fix for SLATE-102
-        var xScale = new Plottable.Scale.Ordinal();
+        var xScale = new Plottable.Scale.Category();
         var yScale = new Plottable.Scale.Linear();
         var dA = { x: "A", y: 2 };
         var dB = { x: "B", y: 2 };
@@ -6347,7 +6347,7 @@ describe("Scales", function () {
         svg.remove();
     });
     describe("Color Scales", function () {
-        it("accepts categorical string types and ordinal domain", function () {
+        it("accepts categorical string types and Category domain", function () {
             var scale = new Plottable.Scale.Color("10");
             scale.domain(["yes", "no", "maybe"]);
             assert.equal("#1f77b4", scale.scale("yes"));
