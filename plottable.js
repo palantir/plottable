@@ -5063,21 +5063,25 @@ var Plottable;
                         if (_this._tickLabelAngle !== 0) {
                             width = axisHeight - _this._maxLabelTickLength() - _this.tickLabelPadding(); // use the axis height
                         }
+                        // HACKHACK: Wrapper fails under negative circumstances
+                        width = Math.max(width, 0);
                     }
                     // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
                     var height = bandWidth; // default for left/right
                     if (_this._isHorizontal()) {
-                        height = axisHeight;
+                        height = axisHeight - _this._maxLabelTickLength() - _this.tickLabelPadding();
                         if (_this._tickLabelAngle !== 0) {
                             height = axisWidth - _this._maxLabelTickLength() - _this.tickLabelPadding();
                         }
+                        // HACKHACK: Wrapper fails under negative circumstances
+                        height = Math.max(height, 0);
                     }
                     return _this._wrapper.wrap(_this.formatter()(s), _this._measurer, width, height);
                 });
                 // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
                 var widthFn = (this._isHorizontal() && this._tickLabelAngle === 0) ? d3.sum : Plottable._Util.Methods.max;
                 var heightFn = (this._isHorizontal() && this._tickLabelAngle === 0) ? Plottable._Util.Methods.max : d3.sum;
-                var textFits = wrappingResults.every(function (t) { return "...".indexOf(t.wrappedText) === -1 && t.noLines === 1; });
+                var textFits = wrappingResults.every(function (t) { return !SVGTypewriter.Utils.StringMethods.isNotEmptyString(t.truncatedText) && t.noLines === 1; });
                 var usedWidth = widthFn(wrappingResults, function (t) { return _this._measurer.measure(t.wrappedText).width; }, 0);
                 var usedHeight = heightFn(wrappingResults, function (t) { return _this._measurer.measure(t.wrappedText).height; }, 0);
                 // If the tick labels are rotated, reverse usedWidth and usedHeight
