@@ -168,8 +168,9 @@ module Plottable {
     private _padDomain(scale: Scale.AbstractQuantitative<any>, domain: any[]): any[] {
       var min = domain[0];
       var max = domain[1];
-      if (min === max && this._padProportion > 0.0) {
-        var d = min.valueOf(); // valueOf accounts for dates properly
+      // valueOf accounts for dates properly
+      if (min.valueOf() === max.valueOf() && this._padProportion > 0.0) {
+        var d = min.valueOf();
         if (min instanceof Date) {
           return [d - Domainer._ONE_DAY, d + Domainer._ONE_DAY];
         } else {
