@@ -165,7 +165,7 @@ export module Axis {
       var heightFn = (this._isHorizontal() && this._tickLabelAngle === 0) ? _Util.Methods.max : d3.sum;
 
       var textFits = wrappingResults.every((t: SVGTypewriter.Wrappers.WrappingResult) =>
-                    SVGTypewriter.Utils.StringMethods.isNotEmptyString(t.truncatedText) && t.noLines === 1);
+                    "...".indexOf(t.wrappedText) === -1 && t.noLines === 1);
       var usedWidth = widthFn<SVGTypewriter.Wrappers.WrappingResult, number>(wrappingResults,
                       (t: SVGTypewriter.Wrappers.WrappingResult) => this._measurer.measure(t.wrappedText).width, 0);
       var usedHeight = heightFn<SVGTypewriter.Wrappers.WrappingResult, number>(wrappingResults,
