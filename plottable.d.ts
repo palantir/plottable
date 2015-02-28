@@ -2569,12 +2569,11 @@ declare module Plottable {
              *
              * A key is automatically generated if not supplied.
              *
-             * @param {string} [key] The key of the dataset.
              * @param {Dataset | any[]} dataset dataset to add.
+             * @param {string} [key] The key of the dataset.
              * @returns {Plot} The calling Plot.
              */
-            addDataset(dataset: Dataset | any[]): AbstractPlot;
-            addDataset(key: string, dataset: Dataset | any[]): AbstractPlot;
+            addDataset(data: Dataset | any[], key?: string): AbstractPlot;
             protected _getDrawer(key: string): _Drawer.AbstractDrawer;
             protected _getAnimator(key: string): Animator.PlotAnimator;
             protected _onDatasetUpdate(): void;

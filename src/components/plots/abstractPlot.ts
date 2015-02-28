@@ -87,28 +87,21 @@ export module Plot {
      *
      * A key is automatically generated if not supplied.
      *
-     * @param {string} [key] The key of the dataset.
      * @param {Dataset | any[]} dataset dataset to add.
+     * @param {string} [key] The key of the dataset.
      * @returns {Plot} The calling Plot.
      */
-    public addDataset(dataset: Dataset | any[]): AbstractPlot;
-    public addDataset(key: string, dataset: Dataset | any[]): AbstractPlot;
-    public addDataset(keyOrDataset: any, dataset?: any): AbstractPlot {
-      if (typeof(keyOrDataset) !== "string" && dataset !== undefined) {
-        throw new Error("invalid input to addDataset");
-      }
-      if (typeof(keyOrDataset) === "string" && keyOrDataset[0] === "_") {
+    public addDataset(data: Dataset | any[], key: string = "_" + this._nextSeriesIndex++): AbstractPlot {
+      if (key[0] === "_") {
         _Util.Methods.warn("Warning: Using _named series keys may produce collisions with unlabeled data sources");
       }
-      var key  = typeof(keyOrDataset) === "string" ? keyOrDataset : "_" + this._nextSeriesIndex++;
-      var data = typeof(keyOrDataset) !== "string" ? keyOrDataset : dataset;
-      dataset = (data instanceof Dataset) ? data : new Dataset(data);
+      var dataset = (data instanceof Dataset) ? <Dataset> data : new Dataset(<any[]> data);
 
-      this._addDataset(key, dataset);
+      this._addDataset(dataset, key);
       return this;
     }
 
-    private _addDataset(key: string, dataset: Dataset) {
+    private _addDataset(dataset: Dataset, key: string) {
       if (this._key2PlotDatasetKey.has(key)) {
         this.removeDataset(key);
       };

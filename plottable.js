@@ -6263,20 +6263,25 @@ var Plottable;
                     }
                 });
             };
-            AbstractPlot.prototype.addDataset = function (keyOrDataset, dataset) {
-                if (typeof (keyOrDataset) !== "string" && dataset !== undefined) {
-                    throw new Error("invalid input to addDataset");
-                }
-                if (typeof (keyOrDataset) === "string" && keyOrDataset[0] === "_") {
+            /**
+             * Adds a dataset to this plot. Identify this dataset with a key.
+             *
+             * A key is automatically generated if not supplied.
+             *
+             * @param {Dataset | any[]} dataset dataset to add.
+             * @param {string} [key] The key of the dataset.
+             * @returns {Plot} The calling Plot.
+             */
+            AbstractPlot.prototype.addDataset = function (data, key) {
+                if (key === void 0) { key = "_" + this._nextSeriesIndex++; }
+                if (key[0] === "_") {
                     Plottable._Util.Methods.warn("Warning: Using _named series keys may produce collisions with unlabeled data sources");
                 }
-                var key = typeof (keyOrDataset) === "string" ? keyOrDataset : "_" + this._nextSeriesIndex++;
-                var data = typeof (keyOrDataset) !== "string" ? keyOrDataset : dataset;
-                dataset = (data instanceof Plottable.Dataset) ? data : new Plottable.Dataset(data);
-                this._addDataset(key, dataset);
+                var dataset = (data instanceof Plottable.Dataset) ? data : new Plottable.Dataset(data);
+                this._addDataset(dataset, key);
                 return this;
             };
-            AbstractPlot.prototype._addDataset = function (key, dataset) {
+            AbstractPlot.prototype._addDataset = function (dataset, key) {
                 var _this = this;
                 if (this._key2PlotDatasetKey.has(key)) {
                     this.removeDataset(key);
