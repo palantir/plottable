@@ -11,7 +11,7 @@ function run(svg, data, Plottable) {
 
     var numPts = 5;
 
-    var dataseries1 = new Plottable.Dataset(data[0].splice(0, 5));
+    var dataseries1 = new Plottable.Dataset(data[0].slice(0, 5));
 
     var xScale = new Plottable.Scale.Linear();
     var yScale = new Plottable.Scale.Linear();
