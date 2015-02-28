@@ -672,7 +672,7 @@ declare module Plottable {
     /**
      * Projector with applied user and plot metadata
      */
-    type _AppliedProjector = (datum: any, index: number) => any;
+    type AppliedProjector = (datum: any, index: number) => any;
     /**
      * Defines a way how specific attribute needs be retrieved before rendering.
      */
@@ -692,8 +692,8 @@ declare module Plottable {
     type AttributeToProjector = {
         [attrToSet: string]: _Projector;
     };
-    type _AttributeToAppliedProjector = {
-        [attrToSet: string]: _AppliedProjector;
+    type AttributeToAppliedProjector = {
+        [attrToSet: string]: AppliedProjector;
     };
     /**
      * A simple bounding box.
@@ -1417,13 +1417,13 @@ declare module Plottable {
             animator: Animator.PlotAnimator;
         };
         type AppliedDrawStep = {
-            attrToProjector: _AttributeToAppliedProjector;
+            attrToProjector: AttributeToAppliedProjector;
             animator: Animator.PlotAnimator;
         };
         class AbstractDrawer {
             protected _className: string;
             key: string;
-            protected _attrToProjector: _AttributeToAppliedProjector;
+            protected _attrToProjector: AttributeToAppliedProjector;
             /**
              * Sets the class, which needs to be applied to bound elements.
              *
@@ -2614,9 +2614,9 @@ declare module Plottable {
              * Note that this will return all of the data attributes, which may not perfectly align to svg attributes
              *
              * @param {datasetKey} the key of the dataset to generate the map for
-             * @returns {AttributeToProjector} A map from attributes to functions to calculate that attribute
+             * @returns {AttributeToAppliedProjector} A map from attributes to functions to calculate that attribute
              */
-            generateDataAttrToProjector(datasetKey: string): _AttributeToAppliedProjector;
+            generateAppliedProjections(datasetKey: string): AttributeToAppliedProjector;
             _doRender(): void;
             /**
              * Enables or disables animation.

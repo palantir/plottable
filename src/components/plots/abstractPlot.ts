@@ -215,9 +215,9 @@ export module Plot {
      * Note that this will return all of the data attributes, which may not perfectly align to svg attributes
      *
      * @param {datasetKey} the key of the dataset to generate the map for
-     * @returns {AttributeToProjector} A map from attributes to functions to calculate that attribute
+     * @returns {AttributeToAppliedProjector} A map from attributes to functions to calculate that attribute
      */
-    public generateDataAttrToProjector(datasetKey: string): _AttributeToAppliedProjector {
+    public generateAppliedProjections(datasetKey: string): AttributeToAppliedProjector {
       return null;
     }
 

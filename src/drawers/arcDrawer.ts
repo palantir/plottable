@@ -9,14 +9,14 @@ export module _Drawer {
       this._svgElement = "path";
     }
 
-    private _createArc(innerRadiusF: _AppliedProjector, outerRadiusF: _AppliedProjector) {
+    private _createArc(innerRadiusF: AppliedProjector, outerRadiusF: AppliedProjector) {
       return d3.svg.arc()
                    .innerRadius(innerRadiusF)
                    .outerRadius(outerRadiusF);
     }
 
-    private retargetProjectors(attrToProjector: _AttributeToAppliedProjector): _AttributeToAppliedProjector {
-      var retargetedAttrToProjector: _AttributeToAppliedProjector = {};
+    private retargetProjectors(attrToProjector: AttributeToAppliedProjector): AttributeToAppliedProjector {
+      var retargetedAttrToProjector: AttributeToAppliedProjector = {};
       d3.entries(attrToProjector).forEach((entry) => {
         retargetedAttrToProjector[entry.key] = (d: D3.Layout.ArcDescriptor, i: number) => entry.value(d.data, i);
       });
@@ -24,7 +24,7 @@ export module _Drawer {
     }
 
     public _drawStep(step: AppliedDrawStep) {
-      var attrToProjector = <_AttributeToAppliedProjector>_Util.Methods.copyMap(step.attrToProjector);
+      var attrToProjector = <AttributeToAppliedProjector>_Util.Methods.copyMap(step.attrToProjector);
       attrToProjector = this.retargetProjectors(attrToProjector);
       this._attrToProjector = this.retargetProjectors(this._attrToProjector);
       var innerRadiusAccessor = attrToProjector["inner-radius"];
