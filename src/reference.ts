@@ -9,6 +9,8 @@
 
 /// <reference path="utils/formatters.ts" />
 
+/// <reference path="utils/clientToSVGTranslator.ts" />
+
 /// <reference path="core/config.ts" />
 /// <reference path="core/version.ts" />
 /// <reference path="core/colors.ts" />

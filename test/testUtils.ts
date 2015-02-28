@@ -116,6 +116,11 @@ function assertBBoxNonIntersection(firstEl: D3.Selection, secondEl: D3.Selection
           "bounding rects are not intersecting");
 }
 
+function assertPointsClose(actual: Plottable.Point, expected: Plottable.Point, epsilon: number, message: String) {
+  assert.closeTo(actual.x, expected.x, epsilon, message + " (x)");
+  assert.closeTo(actual.y, expected.y, epsilon, message + " (y)");
+};
+
 function assertXY(el: D3.Selection, xExpected: number, yExpected: number, message: string) {
   var x = el.attr("x");
   var y = el.attr("y");

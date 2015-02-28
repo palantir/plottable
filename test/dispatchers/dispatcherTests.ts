@@ -75,11 +75,6 @@ describe("Dispatchers", () => {
   });
 
   describe("Mouse Dispatcher", () => {
-    function assertPointsClose(actual: Plottable.Point, expected: Plottable.Point, epsilon: number, message: String) {
-      assert.closeTo(actual.x, expected.x, epsilon, message + " (x)");
-      assert.closeTo(actual.y, expected.y, epsilon, message + " (y)");
-    };
-
     it("getDispatcher() creates only one Dispatcher.Mouse per <svg>", () => {
       var svg = generateSVG();
 

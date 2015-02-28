@@ -978,6 +978,69 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
+    var _Util;
+    (function (_Util) {
+        var ClientToSVGTranslator = (function () {
+            function ClientToSVGTranslator(svg) {
+                this._svg = svg;
+                this._measureRect = document.createElementNS(svg.namespaceURI, "rect");
+                this._measureRect.setAttribute("class", "measure-rect");
+                this._measureRect.setAttribute("style", "opacity: 0; visibility: hidden;");
+                this._measureRect.setAttribute("width", "1");
+                this._measureRect.setAttribute("height", "1");
+                this._svg.appendChild(this._measureRect);
+            }
+            ClientToSVGTranslator.getTranslator = function (elem) {
+                var svg = _Util.DOM.getBoundingSVG(elem);
+                var translator = svg[ClientToSVGTranslator._TRANSLATOR_KEY];
+                if (translator == null) {
+                    translator = new ClientToSVGTranslator(svg);
+                    svg[ClientToSVGTranslator._TRANSLATOR_KEY] = translator;
+                }
+                return translator;
+            };
+            /**
+             * Computes the position relative to the <svg> in svg-coordinate-space.
+             */
+            ClientToSVGTranslator.prototype.computePosition = function (clientX, clientY) {
+                // get the origin
+                this._measureRect.setAttribute("x", "0");
+                this._measureRect.setAttribute("y", "0");
+                var mrBCR = this._measureRect.getBoundingClientRect();
+                var origin = { x: mrBCR.left, y: mrBCR.top };
+                // calculate the scale
+                var sampleDistance = 100;
+                this._measureRect.setAttribute("x", String(sampleDistance));
+                this._measureRect.setAttribute("y", String(sampleDistance));
+                mrBCR = this._measureRect.getBoundingClientRect();
+                var testPoint = { x: mrBCR.left, y: mrBCR.top };
+                // invalid measurements -- SVG might not be in the DOM
+                if (origin.x === testPoint.x || origin.y === testPoint.y) {
+                    return null;
+                }
+                var scaleX = (testPoint.x - origin.x) / sampleDistance;
+                var scaleY = (testPoint.y - origin.y) / sampleDistance;
+                // get the true cursor position
+                this._measureRect.setAttribute("x", String((clientX - origin.x) / scaleX));
+                this._measureRect.setAttribute("y", String((clientY - origin.y) / scaleY));
+                mrBCR = this._measureRect.getBoundingClientRect();
+                var trueCursorPosition = { x: mrBCR.left, y: mrBCR.top };
+                var scaledPosition = {
+                    x: (trueCursorPosition.x - origin.x) / scaleX,
+                    y: (trueCursorPosition.y - origin.y) / scaleY
+                };
+                return scaledPosition;
+            };
+            ClientToSVGTranslator._TRANSLATOR_KEY = "__Plottable_ClientToSVGTranslator";
+            return ClientToSVGTranslator;
+        })();
+        _Util.ClientToSVGTranslator = ClientToSVGTranslator;
+    })(_Util = Plottable._Util || (Plottable._Util = {}));
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var Plottable;
+(function (Plottable) {
     var Config;
     (function (Config) {
         /**
@@ -8547,13 +8610,7 @@ var Plottable;
             function Mouse(svg) {
                 var _this = this;
                 _super.call(this);
-                this._svg = svg;
-                this._measureRect = document.createElementNS(svg.namespaceURI, "rect");
-                this._measureRect.setAttribute("class", "measure-rect");
-                this._measureRect.setAttribute("style", "opacity: 0; visibility: hidden;");
-                this._measureRect.setAttribute("width", "1");
-                this._measureRect.setAttribute("height", "1");
-                this._svg.appendChild(this._measureRect);
+                this.translator = Plottable._Util.ClientToSVGTranslator.getTranslator(svg);
                 this._lastMousePosition = { x: -1, y: -1 };
                 this._moveBroadcaster = new Plottable.Core.Broadcaster(this);
                 this._processMoveCallback = function (e) { return _this._measureAndBroadcast(e, _this._moveBroadcaster); };
@@ -8638,43 +8695,11 @@ var Plottable;
              * calls broadcast() on the supplied Broadcaster.
              */
             Mouse.prototype._measureAndBroadcast = function (e, b) {
-                var newMousePosition = this._computeMousePosition(e.clientX, e.clientY);
+                var newMousePosition = this.translator.computePosition(e.clientX, e.clientY);
                 if (newMousePosition != null) {
                     this._lastMousePosition = newMousePosition;
                     b.broadcast();
                 }
-            };
-            /**
-             * Computes the mouse position relative to the <svg> in svg-coordinate-space.
-             */
-            Mouse.prototype._computeMousePosition = function (clientX, clientY) {
-                // get the origin
-                this._measureRect.setAttribute("x", "0");
-                this._measureRect.setAttribute("y", "0");
-                var mrBCR = this._measureRect.getBoundingClientRect();
-                var origin = { x: mrBCR.left, y: mrBCR.top };
-                // calculate the scale
-                var sampleDistance = 100;
-                this._measureRect.setAttribute("x", String(sampleDistance));
-                this._measureRect.setAttribute("y", String(sampleDistance));
-                mrBCR = this._measureRect.getBoundingClientRect();
-                var testPoint = { x: mrBCR.left, y: mrBCR.top };
-                // invalid measurements -- SVG might not be in the DOM
-                if (origin.x === testPoint.x || origin.y === testPoint.y) {
-                    return null;
-                }
-                var scaleX = (testPoint.x - origin.x) / sampleDistance;
-                var scaleY = (testPoint.y - origin.y) / sampleDistance;
-                // get the true cursor position
-                this._measureRect.setAttribute("x", String((clientX - origin.x) / scaleX));
-                this._measureRect.setAttribute("y", String((clientY - origin.y) / scaleY));
-                mrBCR = this._measureRect.getBoundingClientRect();
-                var trueCursorPosition = { x: mrBCR.left, y: mrBCR.top };
-                var scaledPosition = {
-                    x: (trueCursorPosition.x - origin.x) / scaleX,
-                    y: (trueCursorPosition.y - origin.y) / scaleY
-                };
-                return scaledPosition;
             };
             /**
              * Returns the last computed mouse position.
