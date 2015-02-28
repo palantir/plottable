@@ -16,8 +16,14 @@ export module Component {
      */
     constructor(components: AbstractComponent[] = []){
       super();
-      this.classed("component-group", true);
-      components.forEach((c: AbstractComponent) => this._addComponent(c));
+      _Util.Methods.uniqPush(this._cssClasses, "component-group");
+
+      components.forEach((c: AbstractComponent) => {
+        if (c !== null) {
+          _Util.Methods.uniqPush(this._components, c);
+          c._parent = this;
+        }
+      });
     }
 
     public _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {

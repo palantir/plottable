@@ -13,7 +13,7 @@ export module _Drawer {
 
     constructor(key: string, isVertical: boolean) {
       super(key);
-      this.svgElement("rect");
+      this._svgElement = "rect";
       this._isVertical = isVertical;
     }
 

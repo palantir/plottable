@@ -23,9 +23,13 @@ export module Component {
         throw new Error("yScale needs to inherit from Scale.AbstractQuantitative");
       }
       super();
-      this.classed("gridlines", true);
+      _Util.Methods.uniqPush(this._cssClasses, "gridlines");
       this._xScale = xScale;
       this._yScale = yScale;
+    }
+
+    public _anchor(element: D3.Selection) {
+      super._anchor(element);
       if (this._xScale) {
         this._xScale.broadcaster.registerListener(this, () => this._render());
       }

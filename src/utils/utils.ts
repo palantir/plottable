@@ -325,6 +325,12 @@ export module _Util {
 
       return "#" + rHex + gHex + bHex;
     }
+
+    export function uniqPush<T>(arr: T[], item: T) {
+      if (arr.indexOf(item) === -1) {
+        arr.push(item);
+      }
+    }
   }
 }
 }

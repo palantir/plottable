@@ -12,7 +12,7 @@ export module Component {
      */
     public static LEGEND_ENTRY_CLASS = "legend-entry";
 
-    private _padding = 5;
+    private _padding: number;
     private _scale: Scale.Color;
     private _maxEntriesPerRow: number;
     private _sortFn: (a: string, b: string) => number;
@@ -30,18 +30,18 @@ export module Component {
      * @param {Scale.Color} colorScale
      */
     constructor(colorScale: Scale.Color) {
-      super();
-      this.classed("legend", true);
-      this.maxEntriesPerRow(1);
-
-      if (colorScale == null ) {
+      if (colorScale == null) {
         throw new Error("Legend requires a colorScale");
       }
 
-      this._scale = colorScale;
-      this._scale.broadcaster.registerListener(this, () => this._invalidateLayout());
+      super();
 
-      this.xAlign("right").yAlign("top");
+      this._padding = 5;
+      _Util.Methods.uniqPush(this._cssClasses, "legend");
+      this._maxEntriesPerRow = 1;
+      this._scale = colorScale;
+      this._xAlignProportion = AbstractComponent._xAlignmentToProportion("right");
+      this._yAlignProportion = AbstractComponent._yAlignmentToProportion("top");
       this._fixedWidthFlag = true;
       this._fixedHeightFlag = true;
       this._sortFn = (a: string, b: string) => this._scale.domain().indexOf(a) - this._scale.domain().indexOf(b);
@@ -55,6 +55,11 @@ export module Component {
       this._measurer = new SVGTypewriter.Measurers.Measurer(fakeLegendRow);
       this._wrapper = new SVGTypewriter.Wrappers.Wrapper().maxLines(1);
       this._writer = new SVGTypewriter.Writers.Writer(this._measurer, this._wrapper).addTitleElement(true);
+    }
+
+    public _anchor(element: D3.Selection) {
+      super._anchor(element);
+      this._scale.broadcaster.registerListener(this, () => this._invalidateLayout());
     }
 
     /**

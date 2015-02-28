@@ -23,11 +23,11 @@ export module Axis {
     private _orientation: string;
     protected _computedWidth: number;
     protected _computedHeight: number;
-    private _endTickLength = 5;
-    private _tickLength = 5;
-    private _tickLabelPadding = 10;
-    private _gutter = 15;
-    private _showEndTickLabels = false;
+    private _endTickLength: number;
+    private _tickLength: number;
+    protected _tickLabelPadding: number;
+    private _gutter: number;
+    private _showEndTickLabels: boolean;
 
     /**
      * Constructs an axis. An axis is a wrapper around a scale for rendering.
@@ -41,21 +41,44 @@ export module Axis {
      * displayed.
      */
     constructor(scale: Scale.AbstractScale<any, number>, orientation: string, formatter = Formatters.identity()) {
-      super();
       if (scale == null || orientation == null) {throw new Error("Axis requires a scale and orientation");}
+
+      super();
+
       this._scale = scale;
-      this.orient(orientation);
-      this._setDefaultAlignment();
-      this.classed("axis", true);
+
+      this._orientation = AbstractAxis.ensureAxisOrientation(orientation);
+      if (AbstractAxis._isHorizontalOrientation(orientation)) {
+        var yAlignmentString = orientation === "top" ? "bottom" : "top";
+        this._yAlignProportion = Component.AbstractComponent._yAlignmentToProportion(yAlignmentString);
+      } else {
+        var xAlignmentString = orientation === "left" ? "right" : "left";
+        this._xAlignProportion = Component.AbstractComponent._xAlignmentToProportion(xAlignmentString);
+      }
+
+      this._formatter = formatter;
+
+      _Util.Methods.uniqPush(this._cssClasses, "axis");
+
+      this._endTickLength = 5;
+      this._tickLength = 5;
+      this._tickLabelPadding = 10;
+      this._gutter = 15;
+      this._showEndTickLabels = false;
+    }
+
+    public _anchor(element: D3.Selection) {
+      super._anchor(element);
+
+      this._isAnchored = false;
       if (this._isHorizontal()) {
         this.classed("x-axis", true);
       } else {
         this.classed("y-axis", true);
       }
 
-      this.formatter(formatter);
-
       this._scale.broadcaster.registerListener(this, () => this._rescale());
+      this._isAnchored = true;
     }
 
     public remove() {
@@ -64,7 +87,11 @@ export module Axis {
     }
 
     protected _isHorizontal() {
-      return this._orientation === "top" || this._orientation === "bottom";
+      return AbstractAxis._isHorizontalOrientation(this._orientation);
+    }
+
+    private static _isHorizontalOrientation(orientation: string) {
+      return orientation === "top" || orientation === "bottom";
     }
 
     protected _computeWidth() {
@@ -415,17 +442,18 @@ export module Axis {
       if (newOrientation == null) {
         return this._orientation;
       } else {
-        var newOrientationLC = newOrientation.toLowerCase();
-        if (newOrientationLC !== "top" &&
-            newOrientationLC !== "bottom" &&
-            newOrientationLC !== "left" &&
-            newOrientationLC !== "right") {
-          throw new Error("unsupported orientation");
-        }
-        this._orientation = newOrientationLC;
+        this._orientation = AbstractAxis.ensureAxisOrientation(newOrientation);
         this._invalidateLayout();
         return this;
       }
+    }
+
+    private static ensureAxisOrientation(orientation: string) {
+      orientation = orientation.toLowerCase();
+      if (["top", "bottom", "left", "right"].indexOf(orientation) === -1) {
+        throw new Error("unsupported orientation");
+      }
+      return orientation;
     }
 
     /**

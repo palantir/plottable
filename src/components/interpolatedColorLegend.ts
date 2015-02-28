@@ -46,7 +46,8 @@ export module Component {
 
       this._fixedWidthFlag = true;
       this._fixedHeightFlag = true;
-      this.classed("legend", true).classed("interpolated-color-legend", true);
+      _Util.Methods.uniqPush(this._cssClasses, "legend");
+      _Util.Methods.uniqPush(this._cssClasses, "interpolated-color-legend");
     }
 
     public remove() {
