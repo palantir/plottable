@@ -6374,7 +6374,7 @@ var Plottable;
              * @param {datasetKey} the key of the dataset to generate the map for
              * @returns {AttributeToAppliedProjector} A map from attributes to functions to calculate that attribute
              */
-            AbstractPlot.prototype.generateAppliedProjections = function (datasetKey) {
+            AbstractPlot.prototype.generateAppliedProjectors = function (datasetKey) {
                 return null;
             };
             AbstractPlot.prototype._doRender = function () {

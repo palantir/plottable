@@ -2616,7 +2616,7 @@ declare module Plottable {
              * @param {datasetKey} the key of the dataset to generate the map for
              * @returns {AttributeToAppliedProjector} A map from attributes to functions to calculate that attribute
              */
-            generateAppliedProjections(datasetKey: string): AttributeToAppliedProjector;
+            generateAppliedProjectors(datasetKey: string): AttributeToAppliedProjector;
             _doRender(): void;
             /**
              * Enables or disables animation.

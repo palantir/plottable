@@ -217,7 +217,7 @@ export module Plot {
      * @param {datasetKey} the key of the dataset to generate the map for
      * @returns {AttributeToAppliedProjector} A map from attributes to functions to calculate that attribute
      */
-    public generateAppliedProjections(datasetKey: string): AttributeToAppliedProjector {
+    public generateAppliedProjectors(datasetKey: string): AttributeToAppliedProjector {
       return null;
     }
 
