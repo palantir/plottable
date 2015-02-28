@@ -1,5 +1,5 @@
 /*!
-Plottable 0.45.2 (https://github.com/palantir/plottable)
+Plottable 0.46.0 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -990,7 +990,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "0.45.2";
+    Plottable.version = "0.46.0";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -2860,9 +2860,12 @@ var Plottable;
                 if (attrToProjector["fill"]) {
                     this._pathSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
                 }
+                if (attrToProjector["class"]) {
+                    this._pathSelection.attr("class", attrToProjector["class"]);
+                    this._pathSelection.classed(Line.LINE_CLASS, true);
+                    delete attrToProjector["class"];
+                }
                 step.animator.animate(this._pathSelection, attrToProjector);
-                // Restore classes that may have been overridden by class projectors
-                this._pathSelection.classed(Line.LINE_CLASS, true);
             };
             Line.prototype._getSelector = function () {
                 return "." + Line.LINE_CLASS;
@@ -2954,9 +2957,12 @@ var Plottable;
                 if (attrToProjector["fill"]) {
                     this._areaSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
                 }
+                if (attrToProjector["class"]) {
+                    this._areaSelection.attr("class", attrToProjector["class"]);
+                    this._areaSelection.classed(Area.AREA_CLASS, true);
+                    delete attrToProjector["class"];
+                }
                 step.animator.animate(this._areaSelection, attrToProjector);
-                // Restore default classes that may have been wiped out by class projectors
-                this._areaSelection.classed(Area.AREA_CLASS, true);
             };
             Area.prototype._getSelector = function () {
                 return "path";
@@ -3032,17 +3038,35 @@ var Plottable;
             Element.prototype._getSelector = function () {
                 return this._svgElement;
             };
-            Element.prototype._getPixelPoint = function (datum, index) {
-                switch (this._svgElement) {
-                    case "circle":
-                        return { x: this._attrToProjector["cx"](datum, index), y: this._attrToProjector["cy"](datum, index) };
-                    default:
-                        return null;
-                }
-            };
             return Element;
         })(_Drawer.AbstractDrawer);
         _Drawer.Element = Element;
+    })(_Drawer = Plottable._Drawer || (Plottable._Drawer = {}));
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    var _Drawer;
+    (function (_Drawer) {
+        var Circle = (function (_super) {
+            __extends(Circle, _super);
+            function Circle(key) {
+                _super.call(this, key);
+                this.svgElement("circle");
+            }
+            Circle.prototype._getPixelPoint = function (datum, index) {
+                return { x: this._attrToProjector["cx"](datum, index), y: this._attrToProjector["cy"](datum, index) };
+            };
+            return Circle;
+        })(_Drawer.Element);
+        _Drawer.Circle = Circle;
     })(_Drawer = Plottable._Drawer || (Plottable._Drawer = {}));
 })(Plottable || (Plottable = {}));
 
@@ -3240,7 +3264,6 @@ var Plottable;
                 this._yOffset = 0;
                 this._cssClasses = ["component"];
                 this._removed = false;
-                this._autoResize = AbstractComponent.AUTORESIZE_BY_DEFAULT;
                 this._usedLastLayout = false;
             }
             /**
@@ -3730,7 +3753,6 @@ var Plottable;
             AbstractComponent.prototype.hitBox = function () {
                 return this._hitBox;
             };
-            AbstractComponent.AUTORESIZE_BY_DEFAULT = true;
             return AbstractComponent;
         })(Plottable.Core.PlottableObject);
         Component.AbstractComponent = AbstractComponent;
@@ -5094,9 +5116,9 @@ var Plottable;
                 tickLabels.text("");
                 this._drawTicks(this.width(), this.height(), ordScale, tickLabels);
                 var translate = this._isHorizontal() ? [ordScale.rangeBand() / 2, 0] : [0, ordScale.rangeBand() / 2];
-                var xTranslate = this.orient() === "left" ? 0 : this._maxLabelTickLength() + this.tickLabelPadding();
+                var xTranslate = this.orient() === "right" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
                 var yTranslate = this.orient() === "bottom" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
-                Plottable._Util.DOM.translate(this._tickLabelContainer, 0, yTranslate);
+                Plottable._Util.DOM.translate(this._tickLabelContainer, xTranslate, yTranslate);
                 return this;
             };
             Category.prototype._computeLayout = function (offeredXOrigin, offeredYOrigin, availableWidth, availableHeight) {
@@ -6871,7 +6893,7 @@ var Plottable;
                 return this;
             };
             Scatter.prototype._getDrawer = function (key) {
-                return new Plottable._Drawer.Element(key).svgElement("circle");
+                return new Plottable._Drawer.Circle(key);
             };
             Scatter.prototype._generateAttrToProjector = function () {
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
@@ -7014,7 +7036,7 @@ var Plottable;
                 return this;
             };
             Grid.prototype._getDrawer = function (key) {
-                return new Plottable._Drawer.Element(key).svgElement("rect");
+                return new Plottable._Drawer.Rect(key, true);
             };
             /**
              * @param {string} attrToSet One of ["x", "y", "fill"]. If "fill" is used,
@@ -8525,7 +8547,6 @@ var Plottable;
             function Mouse(svg) {
                 var _this = this;
                 _super.call(this);
-                this._processMoveCallback = function (e) { return _this._processMoveEvent(e); };
                 this._svg = svg;
                 this._measureRect = document.createElementNS(svg.namespaceURI, "rect");
                 this._measureRect.setAttribute("class", "measure-rect");
@@ -8535,10 +8556,17 @@ var Plottable;
                 this._svg.appendChild(this._measureRect);
                 this._lastMousePosition = { x: -1, y: -1 };
                 this._moveBroadcaster = new Plottable.Core.Broadcaster(this);
+                this._processMoveCallback = function (e) { return _this._measureAndBroadcast(e, _this._moveBroadcaster); };
                 this._event2Callback["mouseover"] = this._processMoveCallback;
                 this._event2Callback["mousemove"] = this._processMoveCallback;
                 this._event2Callback["mouseout"] = this._processMoveCallback;
-                this._broadcasters = [this._moveBroadcaster];
+                this._downBroadcaster = new Plottable.Core.Broadcaster(this);
+                this._processDownCallback = function (e) { return _this._measureAndBroadcast(e, _this._downBroadcaster); };
+                this._event2Callback["mousedown"] = this._processDownCallback;
+                this._upBroadcaster = new Plottable.Core.Broadcaster(this);
+                this._processUpCallback = function (e) { return _this._measureAndBroadcast(e, _this._upBroadcaster); };
+                this._event2Callback["mouseup"] = this._processUpCallback;
+                this._broadcasters = [this._moveBroadcaster, this._downBroadcaster, this._upBroadcaster];
             }
             /**
              * Get a Dispatcher.Mouse for the <svg> containing elem. If one already exists
@@ -8575,13 +8603,46 @@ var Plottable;
                 this._setCallback(this._moveBroadcaster, key, callback);
                 return this;
             };
-            Mouse.prototype._processMoveEvent = function (e) {
+            /**
+             * Registers a callback to be called whenever a mousedown occurs,
+             * or removes the callback if `null` is passed as the callback.
+             *
+             * @param {any} key The key associated with the callback.
+             *                  Key uniqueness is determined by deep equality.
+             * @param {(p: Point) => any} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space. Pass `null`
+             *                                     to remove a callback.
+             * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+             */
+            Mouse.prototype.onMouseDown = function (key, callback) {
+                this._setCallback(this._downBroadcaster, key, callback);
+                return this;
+            };
+            /**
+             * Registers a callback to be called whenever a mouseup occurs,
+             * or removes the callback if `null` is passed as the callback.
+             *
+             * @param {any} key The key associated with the callback.
+             *                  Key uniqueness is determined by deep equality.
+             * @param {(p: Point) => any} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space. Pass `null`
+             *                                     to remove a callback.
+             * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+             */
+            Mouse.prototype.onMouseUp = function (key, callback) {
+                this._setCallback(this._upBroadcaster, key, callback);
+                return this;
+            };
+            /**
+             * Computes the mouse position from the given event, and if successful
+             * calls broadcast() on the supplied Broadcaster.
+             */
+            Mouse.prototype._measureAndBroadcast = function (e, b) {
                 var newMousePosition = this._computeMousePosition(e.clientX, e.clientY);
-                if (newMousePosition == null) {
-                    return; // couldn't measure
+                if (newMousePosition != null) {
+                    this._lastMousePosition = newMousePosition;
+                    b.broadcast();
                 }
-                this._lastMousePosition = newMousePosition;
-                this._moveBroadcaster.broadcast();
             };
             /**
              * Computes the mouse position relative to the <svg> in svg-coordinate-space.

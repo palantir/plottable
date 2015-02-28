@@ -7,8 +7,8 @@ function makeData() {
 function run(svg, data, Plottable) {
   "use strict";
 
-    var dataseries1 = makeRandomData(20);
-    var dataseries2 = makeRandomData(50);
+    var dataseries1 = data[0].slice();
+    var dataseries2 = data[0].slice();
 
     var xScale = new Plottable.Scale.Linear();
     var yScale = new Plottable.Scale.Linear();

@@ -55,10 +55,13 @@ export module _Drawer {
         this._pathSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
       }
 
-      step.animator.animate(this._pathSelection, attrToProjector);
+      if (attrToProjector["class"]) {
+        this._pathSelection.attr("class", attrToProjector["class"]);
+        this._pathSelection.classed(Line.LINE_CLASS, true);
+        delete attrToProjector["class"];
+      }
 
-      // Restore classes that may have been overridden by class projectors
-      this._pathSelection.classed(Line.LINE_CLASS, true);
+      step.animator.animate(this._pathSelection, attrToProjector);
     }
 
     public _getSelector() {

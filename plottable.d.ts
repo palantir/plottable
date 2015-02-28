@@ -1530,6 +1530,15 @@ declare module Plottable {
             protected _prepareDrawSteps(drawSteps: AppliedDrawStep[]): void;
             protected _prepareData(data: any[], drawSteps: AppliedDrawStep[]): any[];
             _getSelector(): string;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module _Drawer {
+        class Circle extends Element {
+            constructor(key: string);
             _getPixelPoint(datum: any, index: number): Point;
         }
     }
@@ -1565,7 +1574,6 @@ declare module Plottable {
 declare module Plottable {
     module Component {
         class AbstractComponent extends Core.PlottableObject {
-            static AUTORESIZE_BY_DEFAULT: boolean;
             protected _element: D3.Selection;
             protected _content: D3.Selection;
             protected _boundingBox: D3.Selection;
@@ -2777,7 +2785,7 @@ declare module Plottable {
              * radius, and "fill" is the CSS color of the datum.
              */
             project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): Scatter<X, Y>;
-            protected _getDrawer(key: string): _Drawer.Element;
+            protected _getDrawer(key: string): _Drawer.Circle;
             protected _generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
             };
@@ -2808,7 +2816,7 @@ declare module Plottable {
              */
             constructor(xScale: Scale.Ordinal, yScale: Scale.Ordinal, colorScale: Scale.AbstractScale<any, string>);
             addDataset(keyOrDataset: any, dataset?: any): Grid;
-            protected _getDrawer(key: string): _Drawer.Element;
+            protected _getDrawer(key: string): _Drawer.Rect;
             /**
              * @param {string} attrToSet One of ["x", "y", "fill"]. If "fill" is used,
              * the data should return a valid CSS color.
@@ -3372,6 +3380,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Dispatcher {
+        type MouseCallback = (p: Point) => any;
         class Mouse extends AbstractDispatcher {
             /**
              * Get a Dispatcher.Mouse for the <svg> containing elem. If one already exists
@@ -3401,6 +3410,30 @@ declare module Plottable {
              * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
              */
             onMouseMove(key: any, callback: (p: Point) => any): Dispatcher.Mouse;
+            /**
+             * Registers a callback to be called whenever a mousedown occurs,
+             * or removes the callback if `null` is passed as the callback.
+             *
+             * @param {any} key The key associated with the callback.
+             *                  Key uniqueness is determined by deep equality.
+             * @param {(p: Point) => any} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space. Pass `null`
+             *                                     to remove a callback.
+             * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+             */
+            onMouseDown(key: any, callback: MouseCallback): Dispatcher.Mouse;
+            /**
+             * Registers a callback to be called whenever a mouseup occurs,
+             * or removes the callback if `null` is passed as the callback.
+             *
+             * @param {any} key The key associated with the callback.
+             *                  Key uniqueness is determined by deep equality.
+             * @param {(p: Point) => any} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space. Pass `null`
+             *                                     to remove a callback.
+             * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+             */
+            onMouseUp(key: any, callback: MouseCallback): Dispatcher.Mouse;
             /**
              * Returns the last computed mouse position.
              *

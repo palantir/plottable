@@ -123,4 +123,45 @@ describe("Category Axes", () => {
 
     svg.remove();
   });
+
+  it("axis labels respect tick labels", () => {
+
+    function verifyTickLabelOverlaps(tickLabels: D3.Selection, tickMarks: D3.Selection) {
+        for (var i = 0; i < tickLabels[0].length; i++) {
+          var tickLabelBox = tickLabels[0][i].getBoundingClientRect();
+          var tickMarkBox = tickMarks[0][i].getBoundingClientRect();
+          assert.isFalse(Plottable._Util.DOM.boxesOverlap(tickLabelBox, tickMarkBox), "tick label and box do not overlap");
+        }
+    }
+
+    var svg = generateSVG(400, 300);
+    var yScale = new Plottable.Scale.Ordinal();
+    var axis = new Plottable.Axis.Category(yScale, "left");
+    yScale.domain(["A", "B", "C"]);
+    axis.renderTo(svg);
+
+    var tickLabels = (<any> axis)._content.selectAll(".tick-label");
+    var tickMarks = (<any> axis)._content.selectAll(".tick-mark");
+    verifyTickLabelOverlaps(tickLabels, tickMarks);
+    axis.orient("right");
+    verifyTickLabelOverlaps(tickLabels, tickMarks);
+    svg.remove();
+  });
+
+  it("axis should request more space when rotated than not rotated", () => {
+    var svg = generateSVG(300, 300);
+    var labels = ["label1", "label2", "label100"];
+    var scale = new Plottable.Scale.Ordinal().domain(labels);
+    var axis = new Plottable.Axis.Category(scale, "bottom");
+    axis.renderTo(svg);
+
+    var requestedSpace = axis._requestedSpace(300, 50);
+    var flatHeight = requestedSpace.height;
+
+    axis.tickLabelAngle(-90);
+    requestedSpace = axis._requestedSpace(300, 50);
+    assert.isTrue(flatHeight < requestedSpace.height, "axis should request more height when tick labels are rotated");
+
+    svg.remove();
+  });
 });
