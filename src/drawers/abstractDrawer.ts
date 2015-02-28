@@ -99,7 +99,7 @@ export module _Drawer {
     }
 
     /**
-     * Draws the data into the renderArea using the spefic steps and metadata
+     * Draws the data into the renderArea using the specific steps and metadata
      *
      * @param{any[]} data The data to be drawn
      * @param{DrawStep[]} drawSteps The list of steps, which needs to be drawn
