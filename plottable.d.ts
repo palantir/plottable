@@ -128,6 +128,7 @@ declare module Plottable {
             function colorTest(colorTester: D3.Selection, className: string): string;
             function lightenColor(color: string, factor: number): string;
             function darkenColor(color: string, factor: number, darkenAmount: number): string;
+            function pointDistance(p1: Point, p2: Point): number;
         }
     }
 }
@@ -2680,6 +2681,15 @@ declare module Plottable {
              * @returns {D3.Selection} The retrieved selections.
              */
             getAllSelections(datasetKeys?: string | string[]): D3.Selection;
+            /**
+             * Retrieves the closest PlotData to the specified x/y point within a specified value
+             *
+             * @param {number} xValue The x value to compare against
+             * @param {number} yValue The y value to compare against
+             * @param {number} withinValue The maximum distance the closest selection can be to the point (default = Infinity)
+             * @returns {PlotData} The closest plot data to the point within a specified value.  nulls and null selection returned otherwise
+             */
+            getClosestData(xValue: number, yValue: number, withinValue?: number): PlotData;
         }
     }
 }

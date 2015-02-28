@@ -2002,6 +2002,46 @@ describe("Plots", function () {
             assert.strictEqual(numAttr(oneElementSelection, "cy"), 10, "retreieved selection in renderArea2");
             svg.remove();
         });
+        it("getClosestPlotData()", function () {
+            var svg = generateSVG(400, 400);
+            var plot = new Plottable.Plot.AbstractPlot();
+            var data1 = [{ value: 0 }, { value: 1 }, { value: 2 }];
+            var data2 = [{ value: 4 }, { value: 5 }, { value: 3 }];
+            // Create mock drawers with already drawn items
+            var mockDrawer1 = new Plottable._Drawer.AbstractDrawer("ds1");
+            var renderArea1 = svg.append("g");
+            renderArea1.selectAll("circle").data(data1).enter().append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
+            mockDrawer1.setup = function () { return mockDrawer1._renderArea = renderArea1; };
+            mockDrawer1._getSelector = function () { return "circle"; };
+            mockDrawer1._getPixelPoint = function (datum) {
+                return { x: datum.value, y: 100 };
+            };
+            var renderArea2 = svg.append("g");
+            renderArea2.selectAll("circle").data(data2).enter().append("circle").attr("cx", 10).attr("cy", 10).attr("r", 10);
+            var mockDrawer2 = new Plottable._Drawer.AbstractDrawer("ds2");
+            mockDrawer2.setup = function () { return mockDrawer2._renderArea = renderArea2; };
+            mockDrawer2._getSelector = function () { return "circle"; };
+            mockDrawer2._getPixelPoint = function (datum) {
+                return { x: datum.value * 2, y: 100 };
+            };
+            // Mock _getDrawer to return the mock drawers
+            plot._getDrawer = function (key) {
+                if (key === "ds1") {
+                    return mockDrawer1;
+                }
+                else {
+                    return mockDrawer2;
+                }
+            };
+            plot.addDataset("ds1", data1);
+            plot.addDataset("ds2", data2);
+            plot.renderTo(svg);
+            var plotData = plot.getClosestData(0, 99);
+            assert.strictEqual(plotData.selection.size(), 1, "only 1 selection retrieved");
+            assert.deepEqual(plotData.data, [data1[0]], "correct datum retrieved");
+            assert.deepEqual(plotData.pixelPoints, [{ x: 0, y: 100 }], "correct pixel point retrieved");
+            svg.remove();
+        });
         describe("Dataset removal", function () {
             var plot;
             var d1;
@@ -7083,6 +7123,11 @@ describe("_Util.Methods", function () {
         var lColor = Plottable._Util.Color.rgbToHsl(parseInt("12", 16), parseInt("fc", 16), parseInt("ed", 16))[2];
         var lDarkenedColor = Plottable._Util.Color.rgbToHsl(parseInt(darkenedColor.substring(1, 3), 16), parseInt(darkenedColor.substring(3, 5), 16), parseInt(darkenedColor.substring(5, 7), 16))[2];
         assert.operator(lDarkenedColor, "<", lColor, "color got darker");
+    });
+    it("pointDistance()", function () {
+        var p1 = { x: 3, y: 5 };
+        var p2 = { x: 6, y: 1 };
+        assert.strictEqual(Plottable._Util.Methods.pointDistance(p1, p2), 5, "pointDistance correctly calculated");
     });
 });
 

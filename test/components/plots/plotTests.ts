@@ -182,6 +182,52 @@ describe("Plots", () => {
       svg.remove();
     });
 
+    it("getClosestPlotData()", () => {
+      var svg = generateSVG(400, 400);
+      var plot = new Plottable.Plot.AbstractPlot();
+
+      var data1 = [{value: 0}, {value: 1}, {value: 2}];
+      var data2 = [{value: 4}, {value: 5}, {value: 3}];
+
+      // Create mock drawers with already drawn items
+      var mockDrawer1 = new Plottable._Drawer.AbstractDrawer("ds1");
+      var renderArea1 = svg.append("g");
+      renderArea1.selectAll("circle").data(data1).enter().append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
+      (<any> mockDrawer1).setup = () => (<any> mockDrawer1)._renderArea = renderArea1;
+      (<any> mockDrawer1)._getSelector = () => "circle";
+      (<any> mockDrawer1)._getPixelPoint = (datum: any) => {
+        return {x: datum.value, y: 100};
+      };
+
+      var renderArea2 = svg.append("g");
+      renderArea2.selectAll("circle").data(data2).enter().append("circle").attr("cx", 10).attr("cy", 10).attr("r", 10);
+      var mockDrawer2 = new Plottable._Drawer.AbstractDrawer("ds2");
+      (<any> mockDrawer2).setup = () => (<any> mockDrawer2)._renderArea = renderArea2;
+      (<any> mockDrawer2)._getSelector = () => "circle";
+      (<any> mockDrawer2)._getPixelPoint = (datum: any) => {
+        return {x: datum.value * 2, y: 100};
+      };
+
+      // Mock _getDrawer to return the mock drawers
+      (<any> plot)._getDrawer = (key: string) => {
+        if (key === "ds1") {
+          return mockDrawer1;
+        } else {
+          return mockDrawer2;
+        }
+      };
+
+      plot.addDataset("ds1", data1);
+      plot.addDataset("ds2", data2);
+      plot.renderTo(svg);
+
+      var plotData = plot.getClosestData(0, 99);
+      assert.strictEqual(plotData.selection.size(), 1, "only 1 selection retrieved");
+      assert.deepEqual(plotData.data, [data1[0]], "correct datum retrieved");
+      assert.deepEqual(plotData.pixelPoints, [{x: 0, y: 100}], "correct pixel point retrieved");
+      svg.remove();
+    });
+
     describe("Dataset removal", () => {
       var plot: Plottable.Plot.AbstractPlot;
       var d1: Plottable.Dataset;

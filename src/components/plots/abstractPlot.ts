@@ -451,6 +451,40 @@ export module Plot {
 
       return d3.selectAll(allSelections);
     }
+
+    /**
+     * Retrieves the closest PlotData to the specified x/y point within a specified value
+     *
+     * @param {number} xValue The x value to compare against
+     * @param {number} yValue The y value to compare against
+     * @param {number} withinValue The maximum distance the closest selection can be to the point (default = Infinity)
+     * @returns {PlotData} The closest plot data to the point within a specified value.  nulls and null selection returned otherwise
+     */
+    public getClosestData(xValue: number, yValue: number, withinValue: number = Infinity): PlotData {
+      var queryPoint = {x: xValue, y: yValue};
+
+      var closestDatum: any = null;
+      var closestSelection = d3.select();
+      var closestPixelPoint: Point = null;
+      var closestPointDistance = withinValue;
+
+      this.datasetOrder().forEach((datasetKey) => {
+        var plotDatasetKey = this._key2PlotDatasetKey.get(datasetKey);
+        plotDatasetKey.dataset.data().forEach((datum, index) => {
+          var drawer = plotDatasetKey.drawer;
+          var pixelPoint = drawer._getPixelPoint(datum, index);
+          var pointDistance = Plottable._Util.Methods.pointDistance(pixelPoint, queryPoint);
+          if (pointDistance < closestPointDistance) {
+            closestDatum = datum;
+            closestPixelPoint = pixelPoint;
+            closestSelection = drawer._getSelection(index);
+            closestPointDistance = pointDistance;
+          }
+        });
+      });
+
+      return { data: [closestDatum], pixelPoints: [closestPixelPoint], selection: closestSelection };
+    }
   }
 }
 }
