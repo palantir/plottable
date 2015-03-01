@@ -6375,7 +6375,15 @@ var Plottable;
              * @returns {AttributeToAppliedProjector} A map from attributes to functions to calculate that attribute
              */
             AbstractPlot.prototype.generateAppliedProjectors = function (datasetKey) {
-                return null;
+                var attrToProjector = this._generateAttrToProjector();
+                var plotDatasetKey = this._key2PlotDatasetKey.get(datasetKey);
+                var plotMetadata = plotDatasetKey.plotMetadata;
+                var userMetadata = plotDatasetKey.dataset.metadata();
+                var attrToAppliedProjector = {};
+                d3.entries(attrToProjector).forEach(function (keyValue) {
+                    attrToAppliedProjector[keyValue.key] = function (datum, index) { return keyValue.value(datum, index, userMetadata, plotMetadata); };
+                });
+                return attrToAppliedProjector;
             };
             AbstractPlot.prototype._doRender = function () {
                 if (this._isAnchored) {

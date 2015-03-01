@@ -218,7 +218,15 @@ export module Plot {
      * @returns {AttributeToAppliedProjector} A map from attributes to functions to calculate that attribute
      */
     public generateAppliedProjectors(datasetKey: string): AttributeToAppliedProjector {
-      return null;
+      var attrToProjector = this._generateAttrToProjector();
+      var plotDatasetKey = this._key2PlotDatasetKey.get(datasetKey);
+      var plotMetadata = plotDatasetKey.plotMetadata;
+      var userMetadata = plotDatasetKey.dataset.metadata();
+      var attrToAppliedProjector: AttributeToAppliedProjector = {};
+      d3.entries(attrToProjector).forEach((keyValue: any) => {
+        attrToAppliedProjector[keyValue.key] = (datum: any, index: number) => keyValue.value(datum, index, userMetadata, plotMetadata);
+      });
+      return attrToAppliedProjector;
     }
 
     public _doRender() {
