@@ -198,7 +198,7 @@ describe("Plots", () => {
                                .project("y", "y", yScale);
       (<any>plot).automaticallyAdjustYScaleOverVisiblePoints(true);
       plot.renderTo(svg);
-      assert.deepEqual(yScale.domain(), [0, 4.5], "auto scales takes stacking into account");
+      assert.deepEqual(yScale.domain(), [0, 4], "auto scales takes stacking into account");
       svg.remove();
     });
 
@@ -250,7 +250,7 @@ describe("Plots", () => {
                                .project("y", "y", yScale);
       (<any>plot).automaticallyAdjustYScaleOverVisiblePoints(true);
       plot.renderTo(svg);
-      assert.deepEqual(yScale.domain(), [0, 4.5], "auto scales takes stacking into account");
+      assert.deepEqual(yScale.domain(), [0, 4], "auto scales takes stacking into account");
       svg.remove();
     });
 
