@@ -7644,6 +7644,11 @@ describe("Dispatchers", function () {
             assert.isFalse(callbackWasCalled, "callback was removed by calling _setCallback() with null");
         });
     });
+});
+
+///<reference path="../testReference.ts" />
+var assert = chai.assert;
+describe("Dispatchers", function () {
     describe("Mouse Dispatcher", function () {
         function assertPointsClose(actual, expected, epsilon, message) {
             assert.closeTo(actual.x, expected.x, epsilon, message + " (x)");
@@ -7797,6 +7802,11 @@ describe("Dispatchers", function () {
             target.remove();
         });
     });
+});
+
+///<reference path="../testReference.ts" />
+var assert = chai.assert;
+describe("Dispatchers", function () {
     describe("Key Dispatcher", function () {
         it("triggers callback on mousedown", function () {
             var ked = Plottable.Dispatcher.Key.getDispatcher();
