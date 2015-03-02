@@ -7672,35 +7672,6 @@ describe("Dispatchers", function () {
             assert.isNotNull(p.y, "y value is set");
             svg.remove();
         });
-        it("can remove callbacks by passing null", function () {
-            var targetWidth = 400, targetHeight = 400;
-            var target = generateSVG(targetWidth, targetHeight);
-            // HACKHACK: PhantomJS can't measure SVGs unless they have something in them occupying space
-            target.append("rect").attr("width", targetWidth).attr("height", targetHeight);
-            var targetX = 17;
-            var targetY = 76;
-            var md = Plottable.Dispatcher.Mouse.getDispatcher(target.node());
-            var cb1Called = false;
-            var cb1 = function (p) {
-                cb1Called = true;
-            };
-            var cb2Called = false;
-            var cb2 = function (p) {
-                cb2Called = true;
-            };
-            md.onMouseMove("callback1", cb1);
-            md.onMouseMove("callback2", cb2);
-            triggerFakeMouseEvent("mousemove", target, targetX, targetY);
-            assert.isTrue(cb1Called, "callback 1 was called on mousemove");
-            assert.isTrue(cb2Called, "callback 2 was called on mousemove");
-            cb1Called = false;
-            cb2Called = false;
-            md.onMouseMove("callback1", null);
-            triggerFakeMouseEvent("mousemove", target, targetX, targetY);
-            assert.isFalse(cb1Called, "callback was not called after blanking");
-            assert.isTrue(cb2Called, "callback 2 was still called");
-            target.remove();
-        });
         it("doesn't call callbacks if not in the DOM", function () {
             var targetWidth = 400, targetHeight = 400;
             var target = generateSVG(targetWidth, targetHeight);
