@@ -46,6 +46,10 @@ export module Plot {
       this._getAnimator("baseline").animate(this._baseline, baselineAttr);
     }
 
+    protected _updateXDomainer() {
+      // no-op, used to get rid of padding by default
+    }
+
     protected _updateYDomainer() {
       super._updateYDomainer();
       var scale = <Scale.AbstractQuantitative<any>> this._yScale;

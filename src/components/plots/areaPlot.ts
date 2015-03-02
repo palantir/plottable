@@ -39,6 +39,10 @@ export module Plot {
       return new Plottable._Drawer.Area(key);
     }
 
+    protected _updateXDomainer() {
+      // no-op, used to get rid of padding by default
+    }
+
     protected _updateYDomainer() {
       super._updateYDomainer();
 

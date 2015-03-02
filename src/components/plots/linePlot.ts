@@ -132,6 +132,14 @@ export module Plot {
       };
     }
 
+    protected _updateXDomainer() {
+      // no-op, used to get rid of padding by default
+    }
+
+    protected _updateYDomainer() {
+      // no-op, used to get rid of padding by default
+    }
+
     //===== Hover logic =====
     public _hoverOverComponent(p: Point) {
       // no-op

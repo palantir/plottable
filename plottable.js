@@ -7577,6 +7577,12 @@ var Plottable;
                     closestPoint: closestPoint
                 };
             };
+            Line.prototype._updateXDomainer = function () {
+                // no-op, used to get rid of padding by default
+            };
+            Line.prototype._updateYDomainer = function () {
+                // no-op, used to get rid of padding by default
+            };
             //===== Hover logic =====
             Line.prototype._hoverOverComponent = function (p) {
                 // no-op
@@ -7650,6 +7656,9 @@ var Plottable;
             };
             Area.prototype._getDrawer = function (key) {
                 return new Plottable._Drawer.Area(key);
+            };
+            Area.prototype._updateXDomainer = function () {
+                // no-op, used to get rid of padding by default
             };
             Area.prototype._updateYDomainer = function () {
                 var _this = this;
@@ -8032,6 +8041,9 @@ var Plottable;
                     "y2": scaledBaseline
                 };
                 this._getAnimator("baseline").animate(this._baseline, baselineAttr);
+            };
+            StackedArea.prototype._updateXDomainer = function () {
+                // no-op, used to get rid of padding by default
             };
             StackedArea.prototype._updateYDomainer = function () {
                 _super.prototype._updateYDomainer.call(this);
