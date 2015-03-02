@@ -2245,7 +2245,8 @@ var Plottable;
             /**
              * Creates a CategoryScale.
              *
-             * A CategoryScale maps domain values to pixel ranges.
+             * A CategoryScale maps strings to numbers. A common use is to map the
+             * labels of a bar plot (strings) to their pixel locations (numbers).
              *
              * @constructor
              */
