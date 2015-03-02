@@ -1,7 +1,7 @@
 function makeData() {
   "use strict";
 
-  return [makeRandomData(50), makeRandomData(50)];
+  return [makeRandomData(10), makeRandomData(10)];
 }
 
 function run(svg, data, Plottable) {
@@ -12,10 +12,12 @@ function run(svg, data, Plottable) {
   // Will receive function arguments: (svg, data, Plottable)
   function getY(d) { return d.y; }
 
-  var dataseries = data[0].slice(0, 20);
-  var dataseries_top = data[1].slice(0, 20);
+  var dataseries = [];
+  deep_copy(data[0], dataseries);
+  var dataseries_top = [];
+  deep_copy(data[1], dataseries_top);
 
-  for (var i = 0; i < 20; ++i) {
+  for (var i = 0; i < 10; ++i) {
     dataseries_top[i].x = dataseries[i].x;
     dataseries_top[i].y += dataseries[i].y;
   }
@@ -28,8 +30,15 @@ function run(svg, data, Plottable) {
 
   var y0Accessor = function(d, i) { return dataseries[i].y; };
 
-  var areaPlot1 = new Plottable.Plot.Area(xScale, yScale).addDataset(dataseries).project("x", "x", xScale).project("y", "y", yScale);
-  var areaPlot2 = new Plottable.Plot.Area(xScale, yScale).addDataset(dataseries_top).attr("y0", y0Accessor, yScale).project("x", "x", xScale).project("y", "y", yScale);
+  var areaPlot1 = new Plottable.Plot.Area(xScale, yScale)
+  .addDataset(dataseries).project("x", "x", xScale)
+  .project("y", "y", yScale);
+  
+  var areaPlot2 = new Plottable.Plot.Area(xScale, yScale)
+  .addDataset(dataseries_top)
+  .attr("y0", y0Accessor, yScale)
+  .project("x", "x", xScale)
+  .project("y", "y", yScale);
 
   var fillAccessor = function() { return "steelblue"; };
   var fillAccessorTop = function() { return "pink"; };

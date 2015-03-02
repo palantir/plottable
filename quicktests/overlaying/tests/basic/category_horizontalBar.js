@@ -25,8 +25,8 @@ function run(svg, data, Plottable) {
         .attr("y", "name", yScale)
         .attr("x", "age", xScale)
         .animate(true);
-    var chart = new Plottable.Component.Table([[yAxis, barPlot],
-                                               [null,  xAxis]]);
+    var chart = new Plottable.Component.Table([[new Plottable.Component.Label(""), yAxis, barPlot],
+                                               [null,  null, xAxis]]);
     chart.renderTo(svg);
 
 }

@@ -409,6 +409,20 @@ declare module Plottable {
 
 
 declare module Plottable {
+    module _Util {
+        class ClientToSVGTranslator {
+            static getTranslator(elem: SVGElement): ClientToSVGTranslator;
+            constructor(svg: SVGElement);
+            /**
+             * Computes the position relative to the <svg> in svg-coordinate-space.
+             */
+            computePosition(clientX: number, clientY: number): Point;
+        }
+    }
+}
+
+
+declare module Plottable {
     module Config {
         /**
          * Specifies if Plottable should show warnings.

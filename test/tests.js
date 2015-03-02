@@ -100,6 +100,11 @@ function assertBBoxNonIntersection(firstEl, secondEl) {
     // +1 for inaccuracy in IE
     assert.isTrue(intersectionBox.left + 1 >= intersectionBox.right || intersectionBox.bottom + 1 >= intersectionBox.top, "bounding rects are not intersecting");
 }
+function assertPointsClose(actual, expected, epsilon, message) {
+    assert.closeTo(actual.x, expected.x, epsilon, message + " (x)");
+    assert.closeTo(actual.y, expected.y, epsilon, message + " (y)");
+}
+;
 function assertXY(el, xExpected, yExpected, message) {
     var x = el.attr("x");
     var y = el.attr("y");
@@ -5935,13 +5940,14 @@ describe("Domainer", function () {
     });
     it("pad() defaults to [v-1 day, v+1 day] if there's only one date value", function () {
         var d = new Date(2000, 5, 5);
+        var d2 = new Date(2000, 5, 5);
         var dayBefore = new Date(2000, 5, 4);
         var dayAfter = new Date(2000, 5, 6);
         var timeScale = new Plottable.Scale.Time();
         // the result of computeDomain() will be number[], but when it
         // gets fed back into timeScale, it will be adjusted back to a Date.
         // That's why I'm using _updateExtent() instead of domainer.computeDomain()
-        timeScale._updateExtent("1", "x", [d, d]);
+        timeScale._updateExtent("1", "x", [d, d2]);
         timeScale.domainer(new Plottable.Domainer().pad());
         assert.deepEqual(timeScale.domain(), [dayBefore, dayAfter]);
     });
@@ -6922,6 +6928,37 @@ describe("StrictEqualityAssociativeArray", function () {
 
 ///<reference path="../testReference.ts" />
 var assert = chai.assert;
+describe("ClientToSVGTranslator", function () {
+    it("getTranslator() creates only one Dispatcher.Mouse per <svg>", function () {
+        var svg = generateSVG();
+        var t1 = Plottable._Util.ClientToSVGTranslator.getTranslator(svg.node());
+        assert.isNotNull(t1, "created a new ClientToSVGTranslator on a <svg>");
+        var t2 = Plottable._Util.ClientToSVGTranslator.getTranslator(svg.node());
+        assert.strictEqual(t1, t2, "returned the existing ClientToSVGTranslator if called again with same <svg>");
+        svg.remove();
+    });
+    it("converts points to <svg>-space correctly", function () {
+        var svg = generateSVG();
+        var rectOrigin = {
+            x: 19,
+            y: 85
+        };
+        var rect = svg.append("rect").attr({
+            x: rectOrigin.x,
+            y: rectOrigin.y,
+            width: 30,
+            height: 30
+        });
+        var translator = Plottable._Util.ClientToSVGTranslator.getTranslator(svg.node());
+        var rectBCR = rect.node().getBoundingClientRect();
+        var computedOrigin = translator.computePosition(rectBCR.left, rectBCR.top);
+        assertPointsClose(computedOrigin, rectOrigin, 0.5, "translates client coordinates to <svg> coordinates correctly");
+        svg.remove();
+    });
+});
+
+///<reference path="../testReference.ts" />
+var assert = chai.assert;
 describe("_Util.Methods", function () {
     it("inRange works correct", function () {
         assert.isTrue(Plottable._Util.Methods.inRange(0, -1, 1), "basic functionality works");
@@ -7643,6 +7680,11 @@ describe("Dispatchers", function () {
             assert.isFalse(callbackWasCalled, "callback was removed by calling _setCallback() with null");
         });
     });
+});
+
+///<reference path="../testReference.ts" />
+var assert = chai.assert;
+describe("Dispatchers", function () {
     describe("Mouse Dispatcher", function () {
         function assertPointsClose(actual, expected, epsilon, message) {
             assert.closeTo(actual.x, expected.x, epsilon, message + " (x)");
@@ -7793,6 +7835,11 @@ describe("Dispatchers", function () {
             target.remove();
         });
     });
+});
+
+///<reference path="../testReference.ts" />
+var assert = chai.assert;
+describe("Dispatchers", function () {
     describe("Key Dispatcher", function () {
         it("triggers callback on mousedown", function () {
             var ked = Plottable.Dispatcher.Key.getDispatcher();

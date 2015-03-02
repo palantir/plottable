@@ -1,5 +1,5 @@
 /*!
-Plottable 0.45.1 (https://github.com/palantir/plottable)
+Plottable 0.46.0 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -978,6 +978,69 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
+    var _Util;
+    (function (_Util) {
+        var ClientToSVGTranslator = (function () {
+            function ClientToSVGTranslator(svg) {
+                this._svg = svg;
+                this._measureRect = document.createElementNS(svg.namespaceURI, "rect");
+                this._measureRect.setAttribute("class", "measure-rect");
+                this._measureRect.setAttribute("style", "opacity: 0; visibility: hidden;");
+                this._measureRect.setAttribute("width", "1");
+                this._measureRect.setAttribute("height", "1");
+                this._svg.appendChild(this._measureRect);
+            }
+            ClientToSVGTranslator.getTranslator = function (elem) {
+                var svg = _Util.DOM.getBoundingSVG(elem);
+                var translator = svg[ClientToSVGTranslator._TRANSLATOR_KEY];
+                if (translator == null) {
+                    translator = new ClientToSVGTranslator(svg);
+                    svg[ClientToSVGTranslator._TRANSLATOR_KEY] = translator;
+                }
+                return translator;
+            };
+            /**
+             * Computes the position relative to the <svg> in svg-coordinate-space.
+             */
+            ClientToSVGTranslator.prototype.computePosition = function (clientX, clientY) {
+                // get the origin
+                this._measureRect.setAttribute("x", "0");
+                this._measureRect.setAttribute("y", "0");
+                var mrBCR = this._measureRect.getBoundingClientRect();
+                var origin = { x: mrBCR.left, y: mrBCR.top };
+                // calculate the scale
+                var sampleDistance = 100;
+                this._measureRect.setAttribute("x", String(sampleDistance));
+                this._measureRect.setAttribute("y", String(sampleDistance));
+                mrBCR = this._measureRect.getBoundingClientRect();
+                var testPoint = { x: mrBCR.left, y: mrBCR.top };
+                // invalid measurements -- SVG might not be in the DOM
+                if (origin.x === testPoint.x || origin.y === testPoint.y) {
+                    return null;
+                }
+                var scaleX = (testPoint.x - origin.x) / sampleDistance;
+                var scaleY = (testPoint.y - origin.y) / sampleDistance;
+                // get the true cursor position
+                this._measureRect.setAttribute("x", String((clientX - origin.x) / scaleX));
+                this._measureRect.setAttribute("y", String((clientY - origin.y) / scaleY));
+                mrBCR = this._measureRect.getBoundingClientRect();
+                var trueCursorPosition = { x: mrBCR.left, y: mrBCR.top };
+                var scaledPosition = {
+                    x: (trueCursorPosition.x - origin.x) / scaleX,
+                    y: (trueCursorPosition.y - origin.y) / scaleY
+                };
+                return scaledPosition;
+            };
+            ClientToSVGTranslator._TRANSLATOR_KEY = "__Plottable_ClientToSVGTranslator";
+            return ClientToSVGTranslator;
+        })();
+        _Util.ClientToSVGTranslator = ClientToSVGTranslator;
+    })(_Util = Plottable._Util || (Plottable._Util = {}));
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var Plottable;
+(function (Plottable) {
     var Config;
     (function (Config) {
         /**
@@ -990,7 +1053,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "0.45.1";
+    Plottable.version = "0.46.0";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -1586,8 +1649,9 @@ var Plottable;
         Domainer.prototype._padDomain = function (scale, domain) {
             var min = domain[0];
             var max = domain[1];
-            if (min === max && this._padProportion > 0.0) {
-                var d = min.valueOf(); // valueOf accounts for dates properly
+            // valueOf accounts for dates properly
+            if (min.valueOf() === max.valueOf() && this._padProportion > 0.0) {
+                var d = min.valueOf();
                 if (min instanceof Date) {
                     return [d - Domainer._ONE_DAY, d + Domainer._ONE_DAY];
                 }
@@ -1595,7 +1659,8 @@ var Plottable;
                     return [d - Domainer._PADDING_FOR_IDENTICAL_DOMAIN, d + Domainer._PADDING_FOR_IDENTICAL_DOMAIN];
                 }
             }
-            if (scale.domain()[0] === scale.domain()[1]) {
+            var scaleDomain = scale.domain();
+            if (scaleDomain[0].valueOf() === scaleDomain[1].valueOf()) {
                 return domain;
             }
             var p = this._padProportion / 2;
@@ -5063,21 +5128,25 @@ var Plottable;
                         if (_this._tickLabelAngle !== 0) {
                             width = axisHeight - _this._maxLabelTickLength() - _this.tickLabelPadding(); // use the axis height
                         }
+                        // HACKHACK: Wrapper fails under negative circumstances
+                        width = Math.max(width, 0);
                     }
                     // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
                     var height = bandWidth; // default for left/right
                     if (_this._isHorizontal()) {
-                        height = axisHeight;
+                        height = axisHeight - _this._maxLabelTickLength() - _this.tickLabelPadding();
                         if (_this._tickLabelAngle !== 0) {
                             height = axisWidth - _this._maxLabelTickLength() - _this.tickLabelPadding();
                         }
+                        // HACKHACK: Wrapper fails under negative circumstances
+                        height = Math.max(height, 0);
                     }
                     return _this._wrapper.wrap(_this.formatter()(s), _this._measurer, width, height);
                 });
                 // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
                 var widthFn = (this._isHorizontal() && this._tickLabelAngle === 0) ? d3.sum : Plottable._Util.Methods.max;
                 var heightFn = (this._isHorizontal() && this._tickLabelAngle === 0) ? Plottable._Util.Methods.max : d3.sum;
-                var textFits = wrappingResults.every(function (t) { return SVGTypewriter.Utils.StringMethods.isNotEmptyString(t.truncatedText) && t.noLines === 1; });
+                var textFits = wrappingResults.every(function (t) { return !SVGTypewriter.Utils.StringMethods.isNotEmptyString(t.truncatedText) && t.noLines === 1; });
                 var usedWidth = widthFn(wrappingResults, function (t) { return _this._measurer.measure(t.wrappedText).width; }, 0);
                 var usedHeight = heightFn(wrappingResults, function (t) { return _this._measurer.measure(t.wrappedText).height; }, 0);
                 // If the tick labels are rotated, reverse usedWidth and usedHeight
@@ -8543,13 +8612,7 @@ var Plottable;
             function Mouse(svg) {
                 var _this = this;
                 _super.call(this);
-                this._svg = svg;
-                this._measureRect = document.createElementNS(svg.namespaceURI, "rect");
-                this._measureRect.setAttribute("class", "measure-rect");
-                this._measureRect.setAttribute("style", "opacity: 0; visibility: hidden;");
-                this._measureRect.setAttribute("width", "1");
-                this._measureRect.setAttribute("height", "1");
-                this._svg.appendChild(this._measureRect);
+                this.translator = Plottable._Util.ClientToSVGTranslator.getTranslator(svg);
                 this._lastMousePosition = { x: -1, y: -1 };
                 this._moveBroadcaster = new Plottable.Core.Broadcaster(this);
                 this._processMoveCallback = function (e) { return _this._measureAndBroadcast(e, _this._moveBroadcaster); };
@@ -8633,43 +8696,11 @@ var Plottable;
              * calls broadcast() on the supplied Broadcaster.
              */
             Mouse.prototype._measureAndBroadcast = function (e, b) {
-                var newMousePosition = this._computeMousePosition(e.clientX, e.clientY);
+                var newMousePosition = this.translator.computePosition(e.clientX, e.clientY);
                 if (newMousePosition != null) {
                     this._lastMousePosition = newMousePosition;
                     b.broadcast(this.getLastMousePosition(), e);
                 }
-            };
-            /**
-             * Computes the mouse position relative to the <svg> in svg-coordinate-space.
-             */
-            Mouse.prototype._computeMousePosition = function (clientX, clientY) {
-                // get the origin
-                this._measureRect.setAttribute("x", "0");
-                this._measureRect.setAttribute("y", "0");
-                var mrBCR = this._measureRect.getBoundingClientRect();
-                var origin = { x: mrBCR.left, y: mrBCR.top };
-                // calculate the scale
-                var sampleDistance = 100;
-                this._measureRect.setAttribute("x", String(sampleDistance));
-                this._measureRect.setAttribute("y", String(sampleDistance));
-                mrBCR = this._measureRect.getBoundingClientRect();
-                var testPoint = { x: mrBCR.left, y: mrBCR.top };
-                // invalid measurements -- SVG might not be in the DOM
-                if (origin.x === testPoint.x || origin.y === testPoint.y) {
-                    return null;
-                }
-                var scaleX = (testPoint.x - origin.x) / sampleDistance;
-                var scaleY = (testPoint.y - origin.y) / sampleDistance;
-                // get the true cursor position
-                this._measureRect.setAttribute("x", String((clientX - origin.x) / scaleX));
-                this._measureRect.setAttribute("y", String((clientY - origin.y) / scaleY));
-                mrBCR = this._measureRect.getBoundingClientRect();
-                var trueCursorPosition = { x: mrBCR.left, y: mrBCR.top };
-                var scaledPosition = {
-                    x: (trueCursorPosition.x - origin.x) / scaleX,
-                    y: (trueCursorPosition.y - origin.y) / scaleY
-                };
-                return scaledPosition;
             };
             /**
              * Returns the last computed mouse position.

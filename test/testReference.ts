@@ -54,6 +54,7 @@
 ///<reference path="utils/formattersTests.ts" />
 ///<reference path="utils/idCounterTests.ts" />
 ///<reference path="utils/strictEqualityAssociativeArrayTests.ts" />
+///<reference path="utils/clientToSVGTranslatorTests.ts" />
 ///<reference path="utils/utilsTests.ts" />
 
 ///<reference path="interactions/interactionTests.ts" />
@@ -61,3 +62,5 @@
 ///<reference path="interactions/hoverInteractionTests.ts" />
 
 ///<reference path="dispatchers/dispatcherTests.ts" />
+///<reference path="dispatchers/mouseDispatcherTests.ts" />
+///<reference path="dispatchers/keyDispatcherTests.ts" />
