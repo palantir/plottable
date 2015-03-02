@@ -7686,6 +7686,11 @@ describe("Dispatchers", function () {
 var assert = chai.assert;
 describe("Dispatchers", function () {
     describe("Mouse Dispatcher", function () {
+        function assertPointsClose(actual, expected, epsilon, message) {
+            assert.closeTo(actual.x, expected.x, epsilon, message + " (x)");
+            assert.closeTo(actual.y, expected.y, epsilon, message + " (y)");
+        }
+        ;
         it("getDispatcher() creates only one Dispatcher.Mouse per <svg>", function () {
             var svg = generateSVG();
             var md1 = Plottable.Dispatcher.Mouse.getDispatcher(svg.node());
