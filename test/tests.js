@@ -100,6 +100,11 @@ function assertBBoxNonIntersection(firstEl, secondEl) {
     // +1 for inaccuracy in IE
     assert.isTrue(intersectionBox.left + 1 >= intersectionBox.right || intersectionBox.bottom + 1 >= intersectionBox.top, "bounding rects are not intersecting");
 }
+function assertPointsClose(actual, expected, epsilon, message) {
+    assert.closeTo(actual.x, expected.x, epsilon, message + " (x)");
+    assert.closeTo(actual.y, expected.y, epsilon, message + " (y)");
+}
+;
 function assertXY(el, xExpected, yExpected, message) {
     var x = el.attr("x");
     var y = el.attr("y");
@@ -6923,6 +6928,37 @@ describe("StrictEqualityAssociativeArray", function () {
 
 ///<reference path="../testReference.ts" />
 var assert = chai.assert;
+describe("ClientToSVGTranslator", function () {
+    it("getTranslator() creates only one Dispatcher.Mouse per <svg>", function () {
+        var svg = generateSVG();
+        var t1 = Plottable._Util.ClientToSVGTranslator.getTranslator(svg.node());
+        assert.isNotNull(t1, "created a new ClientToSVGTranslator on a <svg>");
+        var t2 = Plottable._Util.ClientToSVGTranslator.getTranslator(svg.node());
+        assert.strictEqual(t1, t2, "returned the existing ClientToSVGTranslator if called again with same <svg>");
+        svg.remove();
+    });
+    it("converts points to <svg>-space correctly", function () {
+        var svg = generateSVG();
+        var rectOrigin = {
+            x: 19,
+            y: 85
+        };
+        var rect = svg.append("rect").attr({
+            x: rectOrigin.x,
+            y: rectOrigin.y,
+            width: 30,
+            height: 30
+        });
+        var translator = Plottable._Util.ClientToSVGTranslator.getTranslator(svg.node());
+        var rectBCR = rect.node().getBoundingClientRect();
+        var computedOrigin = translator.computePosition(rectBCR.left, rectBCR.top);
+        assertPointsClose(computedOrigin, rectOrigin, 0.5, "translates client coordinates to <svg> coordinates correctly");
+        svg.remove();
+    });
+});
+
+///<reference path="../testReference.ts" />
+var assert = chai.assert;
 describe("_Util.Methods", function () {
     it("inRange works correct", function () {
         assert.isTrue(Plottable._Util.Methods.inRange(0, -1, 1), "basic functionality works");
@@ -7650,11 +7686,6 @@ describe("Dispatchers", function () {
 var assert = chai.assert;
 describe("Dispatchers", function () {
     describe("Mouse Dispatcher", function () {
-        function assertPointsClose(actual, expected, epsilon, message) {
-            assert.closeTo(actual.x, expected.x, epsilon, message + " (x)");
-            assert.closeTo(actual.y, expected.y, epsilon, message + " (y)");
-        }
-        ;
         it("getDispatcher() creates only one Dispatcher.Mouse per <svg>", function () {
             var svg = generateSVG();
             var md1 = Plottable.Dispatcher.Mouse.getDispatcher(svg.node());
