@@ -8729,6 +8729,133 @@ var Plottable;
 (function (Plottable) {
     var Dispatcher;
     (function (Dispatcher) {
+        var Touch = (function (_super) {
+            __extends(Touch, _super);
+            /**
+             * Creates a Dispatcher.Touch.
+             * This constructor not be invoked directly under most circumstances.
+             *
+             * @param {SVGElement} svg The root <svg> element to attach to.
+             */
+            function Touch(svg) {
+                var _this = this;
+                _super.call(this);
+                this.translator = Plottable._Util.ClientToSVGTranslator.getTranslator(svg);
+                this._lastTouchPosition = { x: -1, y: -1 };
+                this._moveBroadcaster = new Plottable.Core.Broadcaster(this);
+                this._processMoveCallback = function (e) { return _this._measureAndBroadcast(e, _this._moveBroadcaster); };
+                this._event2Callback["touchmove"] = this._processMoveCallback;
+                this._startBroadcaster = new Plottable.Core.Broadcaster(this);
+                this._processStartCallback = function (e) { return _this._measureAndBroadcast(e, _this._startBroadcaster); };
+                this._event2Callback["touchstart"] = this._processStartCallback;
+                this._endBroadcaster = new Plottable.Core.Broadcaster(this);
+                this._processEndCallback = function (e) { return _this._measureAndBroadcast(e, _this._endBroadcaster); };
+                this._event2Callback["touchend"] = this._processEndCallback;
+                this._broadcasters = [this._moveBroadcaster, this._startBroadcaster, this._endBroadcaster];
+            }
+            /**
+             * Get a Dispatcher.Touch for the <svg> containing elem. If one already exists
+             * on that <svg>, it will be returned; otherwise, a new one will be created.
+             *
+             * @param {SVGElement} elem A svg DOM element.
+             * @return {Dispatcher.Touch} A Dispatcher.Touch
+             */
+            Touch.getDispatcher = function (elem) {
+                var svg = Plottable._Util.DOM.getBoundingSVG(elem);
+                var dispatcher = svg[Touch._DISPATCHER_KEY];
+                if (dispatcher == null) {
+                    dispatcher = new Touch(svg);
+                    svg[Touch._DISPATCHER_KEY] = dispatcher;
+                }
+                return dispatcher;
+            };
+            Touch.prototype._getWrappedCallback = function (callback) {
+                var _this = this;
+                return function () { return callback(_this.getLastTouchPosition()); };
+            };
+            /**
+             * Registers a callback to be called whenever the touch position changes,
+             * or removes the callback if `null` is passed as the callback.
+             *
+             * @param {any} key The key associated with the callback.
+             *                  Key uniqueness is determined by deep equality.
+             * @param {(p: Point) => any} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space. Pass `null`
+             *                                     to remove a callback.
+             * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+             */
+            Touch.prototype.onTouchMove = function (key, callback) {
+                this._setCallback(this._moveBroadcaster, key, callback);
+                return this;
+            };
+            /**
+             * Registers a callback to be called whenever a touch starts,
+             * or removes the callback if `null` is passed as the callback.
+             *
+             * @param {any} key The key associated with the callback.
+             *                  Key uniqueness is determined by deep equality.
+             * @param {(p: Point) => any} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space. Pass `null`
+             *                                     to remove a callback.
+             * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
+             */
+            Touch.prototype.onTouchStart = function (key, callback) {
+                this._setCallback(this._startBroadcaster, key, callback);
+                return this;
+            };
+            /**
+             * Registers a callback to be called whenever a touch ends,
+             * or removes the callback if `null` is passed as the callback.
+             *
+             * @param {any} key The key associated with the callback.
+             *                  Key uniqueness is determined by deep equality.
+             * @param {(p: Point) => any} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space. Pass `null`
+             *                                     to remove a callback.
+             * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
+             */
+            Touch.prototype.onTouchEnd = function (key, callback) {
+                this._setCallback(this._endBroadcaster, key, callback);
+                return this;
+            };
+            /**
+             * Computes the Touch position from the given event, and if successful
+             * calls broadcast() on the supplied Broadcaster.
+             */
+            Touch.prototype._measureAndBroadcast = function (e, b) {
+                var touch = e.changedTouches[0];
+                var newTouchPosition = this.translator.computePosition(touch.clientX, touch.clientY);
+                if (newTouchPosition != null) {
+                    this._lastTouchPosition = newTouchPosition;
+                    b.broadcast();
+                }
+            };
+            /**
+             * Returns the last computed Touch position.
+             *
+             * @return {Point} The last known Touch position in <svg> coordinate space.
+             */
+            Touch.prototype.getLastTouchPosition = function () {
+                return this._lastTouchPosition;
+            };
+            Touch._DISPATCHER_KEY = "__Plottable_Dispatcher_Touch";
+            return Touch;
+        })(Dispatcher.AbstractDispatcher);
+        Dispatcher.Touch = Touch;
+    })(Dispatcher = Plottable.Dispatcher || (Plottable.Dispatcher = {}));
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    var Dispatcher;
+    (function (Dispatcher) {
         var Key = (function (_super) {
             __extends(Key, _super);
             /**

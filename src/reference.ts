@@ -79,6 +79,7 @@
 
 /// <reference path="dispatchers/abstractDispatcher.ts" />
 /// <reference path="dispatchers/mouseDispatcher.ts" />
+/// <reference path="dispatchers/touchDispatcher.ts" />
 /// <reference path="dispatchers/keyDispatcher.ts" />
 
 /// <reference path="interactions/abstractInteraction.ts" />

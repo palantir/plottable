@@ -3464,6 +3464,76 @@ declare module Plottable {
 
 declare module Plottable {
     module Dispatcher {
+        type TouchCallback = (p: Point) => any;
+        class Touch extends AbstractDispatcher {
+            /**
+             * Get a Dispatcher.Touch for the <svg> containing elem. If one already exists
+             * on that <svg>, it will be returned; otherwise, a new one will be created.
+             *
+             * @param {SVGElement} elem A svg DOM element.
+             * @return {Dispatcher.Touch} A Dispatcher.Touch
+             */
+            static getDispatcher(elem: SVGElement): Dispatcher.Touch;
+            /**
+             * Creates a Dispatcher.Touch.
+             * This constructor not be invoked directly under most circumstances.
+             *
+             * @param {SVGElement} svg The root <svg> element to attach to.
+             */
+            constructor(svg: SVGElement);
+            protected _getWrappedCallback(callback: Function): Core.BroadcasterCallback<Dispatcher.Touch>;
+            /**
+             * Registers a callback to be called whenever the touch position changes,
+             * or removes the callback if `null` is passed as the callback.
+             *
+             * @param {any} key The key associated with the callback.
+             *                  Key uniqueness is determined by deep equality.
+             * @param {(p: Point) => any} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space. Pass `null`
+             *                                     to remove a callback.
+             * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+             */
+            onTouchMove(key: any, callback: (p: Point) => any): Dispatcher.Touch;
+            /**
+             * Registers a callback to be called whenever a touch starts,
+             * or removes the callback if `null` is passed as the callback.
+             *
+             * @param {any} key The key associated with the callback.
+             *                  Key uniqueness is determined by deep equality.
+             * @param {(p: Point) => any} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space. Pass `null`
+             *                                     to remove a callback.
+             * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
+             */
+            onTouchStart(key: any, callback: TouchCallback): Dispatcher.Touch;
+            /**
+             * Registers a callback to be called whenever a touch ends,
+             * or removes the callback if `null` is passed as the callback.
+             *
+             * @param {any} key The key associated with the callback.
+             *                  Key uniqueness is determined by deep equality.
+             * @param {(p: Point) => any} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space. Pass `null`
+             *                                     to remove a callback.
+             * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
+             */
+            onTouchEnd(key: any, callback: TouchCallback): Dispatcher.Touch;
+            /**
+             * Returns the last computed Touch position.
+             *
+             * @return {Point} The last known Touch position in <svg> coordinate space.
+             */
+            getLastTouchPosition(): {
+                x: number;
+                y: number;
+            };
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Dispatcher {
         type KeyCallback = (keyCode: number) => any;
         class Key extends AbstractDispatcher {
             /**
