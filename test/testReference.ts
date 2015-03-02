@@ -61,3 +61,5 @@
 ///<reference path="interactions/hoverInteractionTests.ts" />
 
 ///<reference path="dispatchers/dispatcherTests.ts" />
+///<reference path="dispatchers/mouseDispatcherTests.ts" />
+///<reference path="dispatchers/keyDispatcherTests.ts" />
