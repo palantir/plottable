@@ -33,9 +33,9 @@ export module Plot {
       attrToProjector["r"] = attrToProjector["r"] || d3.functor(3);
       attrToProjector["opacity"] = attrToProjector["opacity"] || d3.functor(0.6);
       attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this._defaultFillColor);
-      var defaultCircleSymbolGenerator = Plottable.SymbolGenerators.d3Symbol("circle");
-      var wrappedDefault = (d: any, i: number, userMetdata: any, plotMetadata: PlotMetadata) => defaultCircleSymbolGenerator;
-      attrToProjector["symbol"] = attrToProjector["symbol"] || wrappedDefault;
+      var defaultSymbolGenerator = (d: any, i: number, userMetdata: any, plotMetadata: PlotMetadata) =>
+        Plottable.SymbolGenerators.d3Symbol("circle");
+      attrToProjector["symbol"] = attrToProjector["symbol"] || defaultSymbolGenerator;
       return attrToProjector;
     }
 
