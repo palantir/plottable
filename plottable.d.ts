@@ -3394,7 +3394,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Dispatcher {
-        type MouseCallback = (p: Point) => any;
+        type MouseCallback = (p: Point, e: MouseEvent) => any;
         class Mouse extends AbstractDispatcher {
             /**
              * Get a Dispatcher.Mouse for the <svg> containing elem. If one already exists
@@ -3423,7 +3423,7 @@ declare module Plottable {
              *                                     to remove a callback.
              * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
              */
-            onMouseMove(key: any, callback: (p: Point) => any): Dispatcher.Mouse;
+            onMouseMove(key: any, callback: MouseCallback): Dispatcher.Mouse;
             /**
              * Registers a callback to be called whenever a mousedown occurs,
              * or removes the callback if `null` is passed as the callback.
@@ -3534,7 +3534,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Dispatcher {
-        type KeyCallback = (keyCode: number) => any;
+        type KeyCallback = (keyCode: number, e: KeyboardEvent) => any;
         class Key extends AbstractDispatcher {
             /**
              * Get a Dispatcher.Key. If one already exists it will be returned;

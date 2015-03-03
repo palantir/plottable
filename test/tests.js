@@ -7736,6 +7736,31 @@ describe("Dispatchers", function () {
             assert.isNotNull(p.y, "y value is set");
             svg.remove();
         });
+        it("can remove callbacks by passing null", function () {
+            var targetWidth = 400, targetHeight = 400;
+            var target = generateSVG(targetWidth, targetHeight);
+            // HACKHACK: PhantomJS can't measure SVGs unless they have something in them occupying space
+            target.append("rect").attr("width", targetWidth).attr("height", targetHeight);
+            var targetX = 17;
+            var targetY = 76;
+            var md = Plottable.Dispatcher.Mouse.getDispatcher(target.node());
+            var cb1Called = false;
+            var cb1 = function (p, e) { return cb1Called = true; };
+            var cb2Called = false;
+            var cb2 = function (p, e) { return cb2Called = true; };
+            md.onMouseMove("callback1", cb1);
+            md.onMouseMove("callback2", cb2);
+            triggerFakeMouseEvent("mousemove", target, targetX, targetY);
+            assert.isTrue(cb1Called, "callback 1 was called on mousemove");
+            assert.isTrue(cb2Called, "callback 2 was called on mousemove");
+            cb1Called = false;
+            cb2Called = false;
+            md.onMouseMove("callback1", null);
+            triggerFakeMouseEvent("mousemove", target, targetX, targetY);
+            assert.isFalse(cb1Called, "callback was not called after blanking");
+            assert.isTrue(cb2Called, "callback 2 was still called");
+            target.remove();
+        });
         it("doesn't call callbacks if not in the DOM", function () {
             var targetWidth = 400, targetHeight = 400;
             var target = generateSVG(targetWidth, targetHeight);
@@ -7745,9 +7770,7 @@ describe("Dispatchers", function () {
             var targetY = 76;
             var md = Plottable.Dispatcher.Mouse.getDispatcher(target.node());
             var callbackWasCalled = false;
-            var callback = function (p) {
-                callbackWasCalled = true;
-            };
+            var callback = function (p, e) { return callbackWasCalled = true; };
             var keyString = "notInDomTest";
             md.onMouseMove(keyString, callback);
             triggerFakeMouseEvent("mousemove", target, targetX, targetY);
@@ -7771,9 +7794,10 @@ describe("Dispatchers", function () {
             };
             var md = Plottable.Dispatcher.Mouse.getDispatcher(target.node());
             var callbackWasCalled = false;
-            var callback = function (p) {
+            var callback = function (p, e) {
                 callbackWasCalled = true;
                 assertPointsClose(p, expectedPoint, 0.5, "mouse position is correct");
+                assert.isNotNull(e, "mouse event was passed to the callback");
             };
             var keyString = "unit test";
             md.onMouseMove(keyString, callback);
@@ -7801,9 +7825,10 @@ describe("Dispatchers", function () {
             };
             var md = Plottable.Dispatcher.Mouse.getDispatcher(target.node());
             var callbackWasCalled = false;
-            var callback = function (p) {
+            var callback = function (p, e) {
                 callbackWasCalled = true;
                 assertPointsClose(p, expectedPoint, 0.5, "mouse position is correct");
+                assert.isNotNull(e, "mouse event was passed to the callback");
             };
             var keyString = "unit test";
             md.onMouseDown(keyString, callback);
@@ -7825,9 +7850,10 @@ describe("Dispatchers", function () {
             };
             var md = Plottable.Dispatcher.Mouse.getDispatcher(target.node());
             var callbackWasCalled = false;
-            var callback = function (p) {
+            var callback = function (p, e) {
                 callbackWasCalled = true;
                 assertPointsClose(p, expectedPoint, 0.5, "mouse position is correct");
+                assert.isNotNull(e, "mouse event was passed to the callback");
             };
             var keyString = "unit test";
             md.onMouseUp(keyString, callback);
@@ -7963,11 +7989,16 @@ describe("Dispatchers", function () {
     describe("Key Dispatcher", function () {
         it("triggers callback on mousedown", function () {
             var ked = Plottable.Dispatcher.Key.getDispatcher();
+            var keyCodeToSend = 65;
             var keyDowned = false;
-            var callback = function () { return keyDowned = true; };
+            var callback = function (code, e) {
+                keyDowned = true;
+                assert.strictEqual(code, keyCodeToSend, "correct keycode was passed");
+                assert.isNotNull(e, "key event was passed to the callback");
+            };
             var keyString = "unit test";
             ked.onKeyDown(keyString, callback);
-            $("body").simulate("keydown", { keyCode: 65 });
+            $("body").simulate("keydown", { keyCode: keyCodeToSend });
             assert.isTrue(keyDowned, "callback when a key was pressed");
             ked.onKeyDown(keyString, null); // clean up
         });
