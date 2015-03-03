@@ -26,7 +26,7 @@ export module _Drawer {
     public _drawStep(step: AppliedDrawStep) {
       var attrToProjector = <_AttributeToAppliedProjector>_Util.Methods.copyMap(step.attrToProjector);
       attrToProjector = this.retargetProjectors(attrToProjector);
-      this._attrToProjector = <_AttributeToAppliedProjector>_Util.Methods.copyMap(this.retargetProjectors(this._attrToProjector));
+      this._attrToProjector = this.retargetProjectors(this._attrToProjector);
       var innerRadiusAccessor = attrToProjector["inner-radius"];
       var outerRadiusAccessor = attrToProjector["outer-radius"];
       delete attrToProjector["inner-radius"];
@@ -56,8 +56,10 @@ export module _Drawer {
       var innerRadiusAccessor = this._attrToProjector["inner-radius"];
       var outerRadiusAccessor = this._attrToProjector["outer-radius"];
       var avgRadius = (innerRadiusAccessor(datum, index) + outerRadiusAccessor(datum, index)) / 2;
-      var avgAngle = (datum.startAngle + datum.endAngle) / 2;
-      return { x: avgRadius * Math.sin(avgAngle), y: avgRadius * Math.cos(avgAngle) };
+      var startAngle = +this._getSelection(index).datum().startAngle;
+      var endAngle = +this._getSelection(index).datum().endAngle;
+      var avgAngle = (startAngle + endAngle) / 2;
+      return { x: avgRadius * Math.sin(avgAngle), y: -avgRadius * Math.cos(avgAngle) };
     }
   }
 }
