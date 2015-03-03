@@ -3202,7 +3202,7 @@ var Plottable;
             Arc.prototype._drawStep = function (step) {
                 var attrToProjector = Plottable._Util.Methods.copyMap(step.attrToProjector);
                 attrToProjector = this.retargetProjectors(attrToProjector);
-                this._attrToProjector = this.retargetProjectors(this._attrToProjector);
+                this._attrToProjector = Plottable._Util.Methods.copyMap(this.retargetProjectors(this._attrToProjector));
                 var innerRadiusAccessor = attrToProjector["inner-radius"];
                 var outerRadiusAccessor = attrToProjector["outer-radius"];
                 delete attrToProjector["inner-radius"];
