@@ -6998,7 +6998,7 @@ var Plottable;
                 attrToProjector["r"] = attrToProjector["r"] || d3.functor(3);
                 attrToProjector["opacity"] = attrToProjector["opacity"] || d3.functor(0.6);
                 attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this._defaultFillColor);
-                var defaultSymbolGenerator = function (d, i, userMetdata, plotMetadata) { return Plottable.SymbolGenerators.d3Symbol("circle"); };
+                var defaultSymbolGenerator = function () { return Plottable.SymbolGenerators.d3Symbol("circle"); };
                 attrToProjector["symbol"] = attrToProjector["symbol"] || defaultSymbolGenerator;
                 return attrToProjector;
             };
