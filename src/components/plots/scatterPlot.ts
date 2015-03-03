@@ -33,7 +33,7 @@ export module Plot {
       attrToProjector["r"] = attrToProjector["r"] || d3.functor(3);
       attrToProjector["opacity"] = attrToProjector["opacity"] || d3.functor(0.6);
       attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this._defaultFillColor);
-      var defaultCircleSymbolGenerator = (radius) => d3.svg.symbol().type("circle").size(radius);
+      var defaultCircleSymbolGenerator = Plottable.SymbolGenerators.d3Symbol("circle");
       var wrappedDefault = (d: any, i: number, userMetdata: any, plotMetadata: PlotMetadata) => defaultCircleSymbolGenerator;
       attrToProjector["symbol"] = attrToProjector["symbol"] || wrappedDefault;
       return attrToProjector;

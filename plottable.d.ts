@@ -409,6 +409,14 @@ declare module Plottable {
 
 
 declare module Plottable {
+    type SymbolGenerator = (d: any) => string;
+    module SymbolGenerators {
+        function d3Symbol(symbolType: string): (radius: number) => D3.Svg.Symbol;
+    }
+}
+
+
+declare module Plottable {
     module _Util {
         class ClientToSVGTranslator {
             static getTranslator(elem: SVGElement): ClientToSVGTranslator;

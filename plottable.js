@@ -978,6 +978,18 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
+    var SymbolGenerators;
+    (function (SymbolGenerators) {
+        function d3Symbol(symbolType) {
+            return function (radius) { return d3.svg.symbol().type(symbolType).size(Math.pow(radius, 2)); };
+        }
+        SymbolGenerators.d3Symbol = d3Symbol;
+    })(SymbolGenerators = Plottable.SymbolGenerators || (Plottable.SymbolGenerators = {}));
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var Plottable;
+(function (Plottable) {
     var _Util;
     (function (_Util) {
         var ClientToSVGTranslator = (function () {
@@ -6986,7 +6998,7 @@ var Plottable;
                 attrToProjector["r"] = attrToProjector["r"] || d3.functor(3);
                 attrToProjector["opacity"] = attrToProjector["opacity"] || d3.functor(0.6);
                 attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this._defaultFillColor);
-                var defaultCircleSymbolGenerator = function (radius) { return d3.svg.symbol().type("circle").size(radius); };
+                var defaultCircleSymbolGenerator = Plottable.SymbolGenerators.d3Symbol("circle");
                 var wrappedDefault = function (d, i, userMetdata, plotMetadata) { return defaultCircleSymbolGenerator; };
                 attrToProjector["symbol"] = attrToProjector["symbol"] || wrappedDefault;
                 return attrToProjector;
