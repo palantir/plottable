@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Dispatcher {
-  export type MouseCallback = (p: Point) => any;
+  export type MouseCallback = (p: Point, e: MouseEvent) => any;
 
   export class Mouse extends AbstractDispatcher {
     private static _DISPATCHER_KEY = "__Plottable_Dispatcher_Mouse";
@@ -64,7 +64,7 @@ export module Dispatcher {
     }
 
     protected _getWrappedCallback(callback: Function): Core.BroadcasterCallback<Dispatcher.Mouse> {
-      return () => callback(this.getLastMousePosition());
+      return (md: Dispatcher.Mouse, p: Point, e: MouseEvent) => callback(p, e);
     }
 
     /**
@@ -78,7 +78,7 @@ export module Dispatcher {
      *                                     to remove a callback.
      * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
      */
-    public onMouseMove(key: any, callback: (p: Point) => any): Dispatcher.Mouse {
+    public onMouseMove(key: any, callback: MouseCallback): Dispatcher.Mouse {
       this._setCallback(this._moveBroadcaster, key, callback);
       return this;
     }
@@ -123,7 +123,7 @@ export module Dispatcher {
       var newMousePosition = this.translator.computePosition(e.clientX, e.clientY);
       if (newMousePosition != null) {
         this._lastMousePosition = newMousePosition;
-        b.broadcast();
+        b.broadcast(this.getLastMousePosition(), e);
       }
     }
 

@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Dispatcher {
-  export type KeyCallback = (keyCode: number) => any;
+  export type KeyCallback = (keyCode: number, e: KeyboardEvent) => any;
 
   export class Key extends AbstractDispatcher {
     private static _DISPATCHER_KEY = "__Plottable_Dispatcher_Key";
@@ -40,7 +40,7 @@ export module Dispatcher {
     }
 
     protected _getWrappedCallback(callback: Function): Core.BroadcasterCallback<Dispatcher.Key> {
-      return (d: Dispatcher.Key, e: KeyboardEvent) => callback(e.keyCode);
+      return (d: Dispatcher.Key, e: KeyboardEvent) => callback(e.keyCode, e);
     }
 
     /**
