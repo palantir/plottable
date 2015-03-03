@@ -178,6 +178,37 @@ function triggerFakeMouseEvent(type: string, target: D3.Selection, relativeX: nu
   target.node().dispatchEvent(e);
 }
 
+function triggerFakeTouchEvent(type: string, target: D3.Selection, relativeX: number, relativeY: number) {
+  var targetNode = target.node();
+  var clientRect = targetNode.getBoundingClientRect();
+  var xPos = clientRect.left + relativeX;
+  var yPos = clientRect.top + relativeY;
+  var e = <TouchEvent> document.createEvent("UIEvent");
+  e.initUIEvent(type, true, true, window, 1);
+  var fakeTouch: Touch = {
+    identifier: 0,
+    target: targetNode,
+    screenX: xPos,
+    screenY: yPos,
+    clientX: xPos,
+    clientY: yPos,
+    pageX: xPos,
+    pageY: yPos
+  };
+
+  var fakeTouchList: any = [fakeTouch];
+  fakeTouchList.item = (index: number) => fakeTouchList[index];
+  e.touches = <TouchList> fakeTouchList;
+  e.targetTouches = <TouchList> fakeTouchList;
+  e.changedTouches = <TouchList> fakeTouchList;
+
+  e.altKey = false;
+  e.metaKey = false;
+  e.ctrlKey = false;
+  e.shiftKey = false;
+  target.node().dispatchEvent(e);
+}
+
 function assertAreaPathCloseTo(actualPath: string, expectedPath: string, precision: number, msg: string) {
   var actualAreaPathStrings = actualPath.split("Z");
   var expectedAreaPathStrings = expectedPath.split("Z");
