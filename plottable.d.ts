@@ -3476,43 +3476,43 @@ declare module Plottable {
             static getDispatcher(elem: SVGElement): Dispatcher.Touch;
             /**
              * Creates a Dispatcher.Touch.
-             * This constructor not be invoked directly under most circumstances.
+             * This constructor should not be invoked directly under most circumstances.
              *
              * @param {SVGElement} svg The root <svg> element to attach to.
              */
             constructor(svg: SVGElement);
             protected _getWrappedCallback(callback: Function): Core.BroadcasterCallback<Dispatcher.Touch>;
             /**
-             * Registers a callback to be called whenever the touch position changes,
-             * or removes the callback if `null` is passed as the callback.
-             *
-             * @param {any} key The key associated with the callback.
-             *                  Key uniqueness is determined by deep equality.
-             * @param {(p: Point) => any} callback A callback that takes the pixel position
-             *                                     in svg-coordinate-space. Pass `null`
-             *                                     to remove a callback.
-             * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
-             */
-            onTouchMove(key: any, callback: (p: Point) => any): Dispatcher.Touch;
-            /**
              * Registers a callback to be called whenever a touch starts,
              * or removes the callback if `null` is passed as the callback.
              *
              * @param {any} key The key associated with the callback.
              *                  Key uniqueness is determined by deep equality.
-             * @param {(p: Point) => any} callback A callback that takes the pixel position
+             * @param {TouchCallback} callback A callback that takes the pixel position
              *                                     in svg-coordinate-space. Pass `null`
              *                                     to remove a callback.
              * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
              */
             onTouchStart(key: any, callback: TouchCallback): Dispatcher.Touch;
             /**
+             * Registers a callback to be called whenever the touch position changes,
+             * or removes the callback if `null` is passed as the callback.
+             *
+             * @param {any} key The key associated with the callback.
+             *                  Key uniqueness is determined by deep equality.
+             * @param {TouchCallback} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space. Pass `null`
+             *                                     to remove a callback.
+             * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
+             */
+            onTouchMove(key: any, callback: TouchCallback): Dispatcher.Touch;
+            /**
              * Registers a callback to be called whenever a touch ends,
              * or removes the callback if `null` is passed as the callback.
              *
              * @param {any} key The key associated with the callback.
              *                  Key uniqueness is determined by deep equality.
-             * @param {(p: Point) => any} callback A callback that takes the pixel position
+             * @param {TouchCallback} callback A callback that takes the pixel position
              *                                     in svg-coordinate-space. Pass `null`
              *                                     to remove a callback.
              * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
