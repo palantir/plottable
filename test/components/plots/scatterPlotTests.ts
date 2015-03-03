@@ -23,8 +23,8 @@ describe("Plots", () => {
       var symbols = plot.getAllSelections();
       var c1 = d3.select(symbols[0][0]);
       var c2 = d3.select(symbols[0][1]);
-      var c1Position = c1.attr("transform").match(/\((.*)\)/)[1].split(",");
-      var c2Position = c2.attr("transform").match(/\((.*)\)/)[1].split(",");
+      var c1Position = d3.transform(c1.attr("transform")).translate;
+      var c2Position = d3.transform(c2.attr("transform")).translate;
       assert.closeTo(parseFloat(c1Position[0]), 0, 0.01, "first symbol cx is correct");
       assert.closeTo(parseFloat(c1Position[1]), 20, 0.01, "first symbol cy is correct");
       assert.closeTo(parseFloat(c2Position[0]), 11, 0.01, "second symbol cx is correct");
@@ -32,8 +32,8 @@ describe("Plots", () => {
 
       data = [{x: 2, y: 2}, {x: 4, y: 4}];
       dataset.data(data);
-      c1Position = c1.attr("transform").match(/\((.*)\)/)[1].split(",");
-      c2Position = c2.attr("transform").match(/\((.*)\)/)[1].split(",");
+      c1Position = d3.transform(c1.attr("transform")).translate;
+      c2Position = d3.transform(c2.attr("transform")).translate;
       assert.closeTo(parseFloat(c1Position[0]), 2, 0.01, "first symbol cx is correct after data change");
       assert.closeTo(parseFloat(c1Position[1]), 20, 0.01, "first symbol cy is correct after data change");
       assert.closeTo(parseFloat(c2Position[0]), 14, 0.01, "second symbol cx is correct after data change");
@@ -41,8 +41,9 @@ describe("Plots", () => {
 
       metadata = {foo: 0, bar: 0};
       dataset.metadata(metadata);
-      c1Position = c1.attr("transform").match(/\((.*)\)/)[1].split(",");
-      c2Position = c2.attr("transform").match(/\((.*)\)/)[1].split(",");
+      c1Position = d3.transform(c1.attr("transform")).translate;
+      c2Position = d3.transform(c2.attr("transform")).translate;
+
       assert.closeTo(parseFloat(c1Position[0]), 2, 0.01, "first symbol cx is correct after metadata change");
       assert.closeTo(parseFloat(c1Position[1]), 0, 0.01, "first symbol cy is correct after metadata change");
       assert.closeTo(parseFloat(c2Position[0]), 4, 0.01, "second symbol cx is correct after metadata change");
@@ -138,7 +139,7 @@ describe("Plots", () => {
           // into account.
           var selection = d3.select(this);
 
-          var circlePosition = selection.attr("transform").match(/\((.*)\)/)[1].split(",");
+          var circlePosition = d3.transform(selection.attr("transform")).translate;
           var x = +circlePosition[0] * scale[0] + translate[0];
           var y = +circlePosition[1] * scale[1] + translate[1];
           if (0 <= x && x <= SVG_WIDTH && 0 <= y && y <= SVG_HEIGHT) {
