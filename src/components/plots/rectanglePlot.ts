@@ -62,10 +62,24 @@ export module Plot {
       var x2Attr = attrToProjector["x2"];
       var y2Attr = attrToProjector["y2"];
 
-      // Infer width
-      attrToProjector["width"] = (d, i, u, m) => {
-        return Math.abs(x2Attr(d, i, u, m) - x1Attr(d, i, u, m));
-      };
+      // Infer width, with an exception for ordinal scales
+      if (x2Attr === undefined) {
+        attrToProjector["width"] = () => (<Scale.Ordinal> this._xScale).rangeBand();
+      } else {
+        attrToProjector["width"] = (d, i, u, m) => {
+          return Math.abs(x2Attr(d, i, u, m) - x1Attr(d, i, u, m));
+        };
+      }
+
+      // Adjust x to respect the width for ordinal scales
+      attrToProjector["x"] = (d, i, u, m) => {
+        var offset = 0;
+        if (x2Attr === undefined) {
+          offset = attrToProjector["height"](d, i, u, m) / 2;
+        }
+        return x1Attr(d, i, u, m) - offset;
+      }
+
 
       // Infer height, with an exception for ordinal scales
       if (y2Attr === undefined) {
