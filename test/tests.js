@@ -149,6 +149,34 @@ function triggerFakeMouseEvent(type, target, relativeX, relativeY) {
     e.initMouseEvent(type, true, true, window, 1, xPos, yPos, xPos, yPos, false, false, false, false, 1, null);
     target.node().dispatchEvent(e);
 }
+function triggerFakeTouchEvent(type, target, relativeX, relativeY) {
+    var targetNode = target.node();
+    var clientRect = targetNode.getBoundingClientRect();
+    var xPos = clientRect.left + relativeX;
+    var yPos = clientRect.top + relativeY;
+    var e = document.createEvent("UIEvent");
+    e.initUIEvent(type, true, true, window, 1);
+    var fakeTouch = {
+        identifier: 0,
+        target: targetNode,
+        screenX: xPos,
+        screenY: yPos,
+        clientX: xPos,
+        clientY: yPos,
+        pageX: xPos,
+        pageY: yPos
+    };
+    var fakeTouchList = [fakeTouch];
+    fakeTouchList.item = function (index) { return fakeTouchList[index]; };
+    e.touches = fakeTouchList;
+    e.targetTouches = fakeTouchList;
+    e.changedTouches = fakeTouchList;
+    e.altKey = false;
+    e.metaKey = false;
+    e.ctrlKey = false;
+    e.shiftKey = false;
+    target.node().dispatchEvent(e);
+}
 function assertAreaPathCloseTo(actualPath, expectedPath, precision, msg) {
     var actualAreaPathStrings = actualPath.split("Z");
     var expectedAreaPathStrings = expectedPath.split("Z");
@@ -7807,6 +7835,124 @@ describe("Dispatchers", function () {
             assert.isTrue(callbackWasCalled, "callback was called on mouseup");
             md.onMouseUp(keyString, null);
             target.remove();
+        });
+    });
+});
+
+///<reference path="../testReference.ts" />
+var assert = chai.assert;
+describe("Dispatchers", function () {
+    describe("Touch Dispatcher", function () {
+        it("getDispatcher() creates only one Dispatcher.Touch per <svg>", function () {
+            var svg = generateSVG();
+            var td1 = Plottable.Dispatcher.Touch.getDispatcher(svg.node());
+            assert.isNotNull(td1, "created a new Dispatcher on an SVG");
+            var td2 = Plottable.Dispatcher.Touch.getDispatcher(svg.node());
+            assert.strictEqual(td1, td2, "returned the existing Dispatcher if called again with same <svg>");
+            svg.remove();
+        });
+        it("getLastTouchPosition() defaults to a non-null value", function () {
+            var svg = generateSVG();
+            var td = Plottable.Dispatcher.Touch.getDispatcher(svg.node());
+            var p = td.getLastTouchPosition();
+            assert.isNotNull(p, "returns a value after initialization");
+            assert.isNotNull(p.x, "x value is set");
+            assert.isNotNull(p.y, "y value is set");
+            svg.remove();
+        });
+        it("onTouchStart()", function () {
+            var targetWidth = 400, targetHeight = 400;
+            var target = generateSVG(targetWidth, targetHeight);
+            // HACKHACK: PhantomJS can't measure SVGs unless they have something in them occupying space
+            target.append("rect").attr("width", targetWidth).attr("height", targetHeight);
+            var targetX = 17;
+            var targetY = 76;
+            var expectedPoint = {
+                x: targetX,
+                y: targetY
+            };
+            var td = Plottable.Dispatcher.Touch.getDispatcher(target.node());
+            var callbackWasCalled = false;
+            var callback = function (p) {
+                callbackWasCalled = true;
+                assertPointsClose(p, expectedPoint, 0.5, "touch position is correct");
+            };
+            var keyString = "unit test";
+            td.onTouchStart(keyString, callback);
+            triggerFakeTouchEvent("touchstart", target, targetX, targetY);
+            assert.isTrue(callbackWasCalled, "callback was called on touchstart");
+            td.onTouchStart(keyString, null);
+            target.remove();
+        });
+        it("onTouchMove()", function () {
+            var targetWidth = 400, targetHeight = 400;
+            var target = generateSVG(targetWidth, targetHeight);
+            // HACKHACK: PhantomJS can't measure SVGs unless they have something in them occupying space
+            target.append("rect").attr("width", targetWidth).attr("height", targetHeight);
+            var targetX = 17;
+            var targetY = 76;
+            var expectedPoint = {
+                x: targetX,
+                y: targetY
+            };
+            var td = Plottable.Dispatcher.Touch.getDispatcher(target.node());
+            var callbackWasCalled = false;
+            var callback = function (p) {
+                callbackWasCalled = true;
+                assertPointsClose(p, expectedPoint, 0.5, "touch position is correct");
+            };
+            var keyString = "unit test";
+            td.onTouchMove(keyString, callback);
+            triggerFakeTouchEvent("touchmove", target, targetX, targetY);
+            assert.isTrue(callbackWasCalled, "callback was called on touchmove");
+            td.onTouchMove(keyString, null);
+            target.remove();
+        });
+        it("onTouchEnd()", function () {
+            var targetWidth = 400, targetHeight = 400;
+            var target = generateSVG(targetWidth, targetHeight);
+            // HACKHACK: PhantomJS can't measure SVGs unless they have something in them occupying space
+            target.append("rect").attr("width", targetWidth).attr("height", targetHeight);
+            var targetX = 17;
+            var targetY = 76;
+            var expectedPoint = {
+                x: targetX,
+                y: targetY
+            };
+            var td = Plottable.Dispatcher.Touch.getDispatcher(target.node());
+            var callbackWasCalled = false;
+            var callback = function (p) {
+                callbackWasCalled = true;
+                assertPointsClose(p, expectedPoint, 0.5, "touch position is correct");
+            };
+            var keyString = "unit test";
+            td.onTouchEnd(keyString, callback);
+            triggerFakeTouchEvent("touchend", target, targetX, targetY);
+            assert.isTrue(callbackWasCalled, "callback was called on touchend");
+            td.onTouchEnd(keyString, null);
+            target.remove();
+        });
+        it("doesn't call callbacks if not in the DOM", function () {
+            var targetWidth = 400, targetHeight = 400;
+            var target = generateSVG(targetWidth, targetHeight);
+            // HACKHACK: PhantomJS can't measure SVGs unless they have something in them occupying space
+            target.append("rect").attr("width", targetWidth).attr("height", targetHeight);
+            var targetX = 17;
+            var targetY = 76;
+            var td = Plottable.Dispatcher.Touch.getDispatcher(target.node());
+            var callbackWasCalled = false;
+            var callback = function (p) {
+                callbackWasCalled = true;
+            };
+            var keyString = "notInDomTest";
+            td.onTouchMove(keyString, callback);
+            triggerFakeTouchEvent("touchmove", target, targetX, targetY);
+            assert.isTrue(callbackWasCalled, "callback was called on touchmove");
+            target.remove();
+            callbackWasCalled = false;
+            triggerFakeTouchEvent("touchmove", target, targetX, targetY);
+            assert.isFalse(callbackWasCalled, "callback was not called after <svg> was removed from DOM");
+            td.onTouchMove(keyString, null);
         });
     });
 });
