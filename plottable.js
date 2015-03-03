@@ -3325,7 +3325,7 @@ var Plottable;
                 var rProjector = attrToProjector["r"];
                 delete attrToProjector["symbol"];
                 delete attrToProjector["r"];
-                attrToProjector["d"] = function (datum, index) { return symbolProjector(datum, index)(Math.pow(rProjector(datum, index), 2))(datum, index); };
+                attrToProjector["d"] = function (datum, index) { return symbolProjector(datum, index)(rProjector(datum, index))(datum, index); };
                 var drawSelection = this._getDrawSelection();
                 if (attrToProjector["fill"]) {
                     drawSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate

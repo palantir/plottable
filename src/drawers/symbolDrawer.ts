@@ -35,7 +35,7 @@ export module _Drawer {
       delete attrToProjector["r"];
 
       attrToProjector["d"] = (datum: any, index: number) =>
-        symbolProjector(datum, index)(Math.pow(rProjector(datum, index), 2))(datum, index);
+        symbolProjector(datum, index)(rProjector(datum, index))(datum, index);
 
       var drawSelection = this._getDrawSelection();
       if (attrToProjector["fill"]) {
