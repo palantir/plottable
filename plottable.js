@@ -8837,6 +8837,11 @@ var Plottable;
             Touch.prototype.getLastTouchPosition = function () {
                 return this._lastTouchPosition;
             };
+            /**
+             * Dispatcher.Touch calls callbacks when touch events occur.
+             * It reports the (x, y) position of the first Touch relative to the
+             * <svg> it is attached to.
+             */
             Touch._DISPATCHER_KEY = "__Plottable_Dispatcher_Touch";
             return Touch;
         })(Dispatcher.AbstractDispatcher);

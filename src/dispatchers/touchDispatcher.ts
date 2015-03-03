@@ -5,6 +5,12 @@ export module Dispatcher {
   export type TouchCallback = (p: Point, e: TouchEvent) => any;
 
   export class Touch extends AbstractDispatcher {
+    /**
+     * Dispatcher.Touch calls callbacks when touch events occur.
+     * It reports the (x, y) position of the first Touch relative to the
+     * <svg> it is attached to.
+     */
+
     private static _DISPATCHER_KEY = "__Plottable_Dispatcher_Touch";
     private translator: _Util.ClientToSVGTranslator;
     private _lastTouchPosition: Point;
