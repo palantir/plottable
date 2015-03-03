@@ -26,16 +26,17 @@ export module _Drawer {
       delete attrToProjector["x"];
       delete attrToProjector["y"];
 
-      attrToProjector["transform"] = (datum: any, index: number) =>
-        "translate(" + xProjector(datum, index) + "," + yProjector(datum, index) + ")";
-
-      var symbolProjector = attrToProjector["symbol"];
       var rProjector = attrToProjector["r"];
-      delete attrToProjector["symbol"];
       delete attrToProjector["r"];
 
-      attrToProjector["d"] = (datum: any, index: number) =>
-        symbolProjector(datum, index)(rProjector(datum, index))(datum, index);
+      attrToProjector["transform"] = (datum: any, index: number) =>
+        "translate(" + xProjector(datum, index) + "," + yProjector(datum, index) + ") " +
+        "scale(" + rProjector(datum, index) / 100 + ")";
+
+      var symbolProjector = attrToProjector["symbol"];
+      delete attrToProjector["symbol"];
+
+      attrToProjector["d"] = symbolProjector;
 
       var drawSelection = this._getDrawSelection();
       if (attrToProjector["fill"]) {

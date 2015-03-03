@@ -981,7 +981,7 @@ var Plottable;
     var SymbolGenerators;
     (function (SymbolGenerators) {
         function d3Symbol(symbolType) {
-            return function (radius) { return d3.svg.symbol().type(symbolType).size(Math.pow(radius, 2)); };
+            return d3.svg.symbol().type(symbolType).size(Math.pow(100, 2));
         }
         SymbolGenerators.d3Symbol = d3Symbol;
     })(SymbolGenerators = Plottable.SymbolGenerators || (Plottable.SymbolGenerators = {}));
@@ -3320,12 +3320,12 @@ var Plottable;
                 var yProjector = attrToProjector["y"];
                 delete attrToProjector["x"];
                 delete attrToProjector["y"];
-                attrToProjector["transform"] = function (datum, index) { return "translate(" + xProjector(datum, index) + "," + yProjector(datum, index) + ")"; };
-                var symbolProjector = attrToProjector["symbol"];
                 var rProjector = attrToProjector["r"];
-                delete attrToProjector["symbol"];
                 delete attrToProjector["r"];
-                attrToProjector["d"] = function (datum, index) { return symbolProjector(datum, index)(rProjector(datum, index))(datum, index); };
+                attrToProjector["transform"] = function (datum, index) { return "translate(" + xProjector(datum, index) + "," + yProjector(datum, index) + ") " + "scale(" + rProjector(datum, index) / 100 + ")"; };
+                var symbolProjector = attrToProjector["symbol"];
+                delete attrToProjector["symbol"];
+                attrToProjector["d"] = symbolProjector;
                 var drawSelection = this._getDrawSelection();
                 if (attrToProjector["fill"]) {
                     drawSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
@@ -6998,8 +6998,8 @@ var Plottable;
                 attrToProjector["r"] = attrToProjector["r"] || d3.functor(3);
                 attrToProjector["opacity"] = attrToProjector["opacity"] || d3.functor(0.6);
                 attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this._defaultFillColor);
-                var defaultSymbolGenerator = function () { return Plottable.SymbolGenerators.d3Symbol("circle"); };
-                attrToProjector["symbol"] = attrToProjector["symbol"] || defaultSymbolGenerator;
+                attrToProjector["symbol"] = attrToProjector["symbol"] || Plottable.SymbolGenerators.d3Symbol("circle");
+                attrToProjector["vector-effect"] = attrToProjector["vector-effect"] || d3.functor("non-scaling-stroke");
                 return attrToProjector;
             };
             Scatter.prototype._generateDrawSteps = function () {
