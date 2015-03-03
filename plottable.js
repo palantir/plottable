@@ -9660,9 +9660,19 @@ var Plottable;
                 var _this = this;
                 _super.prototype._anchor.call(this, component, hitBox);
                 this._dispatcher = Plottable.Dispatcher.Mouse.getDispatcher(this._componentToListenTo._element.node());
-                this._dispatcher.onMouseMove("hover" + this.getID(), function (p) { return _this._handleMouseEvent(p); });
+                this._dispatcher.onMouseMove("hover" + this.getID(), function (p) { return _this._handlePointerEvent(p); });
+                this._touchDispatcher = Plottable.Dispatcher.Touch.getDispatcher(this._componentToListenTo._element.node());
+                this._touchDispatcher.onTouchStart("hover" + this.getID(), function (p, e) { return _this._handleTouchEvent(p, e); });
+                this._touchDispatcher.onTouchMove("hover" + this.getID(), function (p, e) { return _this._handleTouchEvent(p, e); });
             };
-            Hover.prototype._handleMouseEvent = function (p) {
+            Hover.prototype._handleTouchEvent = function (p, e) {
+                var translatedP = this._translateToComponentSpace(p);
+                if (this._isInsideComponent(translatedP)) {
+                    e.preventDefault();
+                }
+                this._handlePointerEvent(p);
+            };
+            Hover.prototype._handlePointerEvent = function (p) {
                 p = this._translateToComponentSpace(p);
                 if (this._isInsideComponent(p)) {
                     if (!this._overComponent) {
