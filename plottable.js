@@ -9663,7 +9663,6 @@ var Plottable;
                 this._mouseDispatcher.onMouseMove("hover" + this.getID(), function (p) { return _this._handlePointerEvent(p); });
                 this._touchDispatcher = Plottable.Dispatcher.Touch.getDispatcher(this._componentToListenTo._element.node());
                 this._touchDispatcher.onTouchStart("hover" + this.getID(), function (p, e) { return _this._handleTouchEvent(p, e); });
-                this._touchDispatcher.onTouchMove("hover" + this.getID(), function (p, e) { return _this._handleTouchEvent(p, e); });
             };
             Hover.prototype._handleTouchEvent = function (p, e) {
                 var translatedP = this._translateToComponentSpace(p);
