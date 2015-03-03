@@ -9667,10 +9667,12 @@ var Plottable;
             };
             Hover.prototype._handleTouchEvent = function (p, e) {
                 var translatedP = this._translateToComponentSpace(p);
-                if (this._isInsideComponent(translatedP)) {
+                if (this._isInsideComponent(translatedP) && e.touches.length === 1) {
                     e.preventDefault();
                 }
-                this._handlePointerEvent(p);
+                if (e.touches.length === 1) {
+                    this._handlePointerEvent(p);
+                }
             };
             Hover.prototype._handlePointerEvent = function (p) {
                 p = this._translateToComponentSpace(p);

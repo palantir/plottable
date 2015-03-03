@@ -57,10 +57,12 @@ export module Interaction {
 
     private _handleTouchEvent(p: Point, e: TouchEvent) {
       var translatedP = this._translateToComponentSpace(p);
-      if (this._isInsideComponent(translatedP)) {
+      if (this._isInsideComponent(translatedP) && e.touches.length === 1) {
         e.preventDefault();
       }
-      this._handlePointerEvent(p);
+      if (e.touches.length === 1) {
+        this._handlePointerEvent(p);
+      }
     }
 
     private _handlePointerEvent(p: Point) {
