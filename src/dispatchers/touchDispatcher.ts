@@ -68,7 +68,6 @@ export module Dispatcher {
 
     protected _getWrappedCallback(callback: Function): Core.BroadcasterCallback<Dispatcher.Touch> {
       return (td: Dispatcher.Touch, p: Point, e: MouseEvent) => callback(p, e);
-      // return () => callback(this.getLastTouchPosition());
     }
 
     /**

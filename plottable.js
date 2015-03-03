@@ -8770,7 +8770,6 @@ var Plottable;
             };
             Touch.prototype._getWrappedCallback = function (callback) {
                 return function (td, p, e) { return callback(p, e); };
-                // return () => callback(this.getLastTouchPosition());
             };
             /**
              * Registers a callback to be called whenever a touch starts,
