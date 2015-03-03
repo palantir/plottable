@@ -209,15 +209,15 @@ export module Plot {
     }
 
     /**
-     * Generates a map from a projected attribute to the function to calculate the value of that attribute
+     * Generates a dictionary mapping an attribute to a function that calculate that attribute's value
      * in accordance with the given datasetKey.
      *
      * Note that this will return all of the data attributes, which may not perfectly align to svg attributes
      *
-     * @param {datasetKey} the key of the dataset to generate the map for
-     * @returns {AttributeToAppliedProjector} A map from attributes to functions to calculate that attribute
+     * @param {datasetKey} the key of the dataset to generate the dictionary for
+     * @returns {AttributeToAppliedProjector} A dictionary mapping attributes to functions
      */
-    public generateAppliedProjectors(datasetKey: string): AttributeToAppliedProjector {
+    public generateProjectors(datasetKey: string): AttributeToAppliedProjector {
       var attrToProjector = this._generateAttrToProjector();
       var plotDatasetKey = this._key2PlotDatasetKey.get(datasetKey);
       var plotMetadata = plotDatasetKey.plotMetadata;
