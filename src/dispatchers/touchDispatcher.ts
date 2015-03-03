@@ -2,7 +2,8 @@
 
 module Plottable {
 export module Dispatcher {
-  export type TouchCallback = (p: Point) => any;
+  export type TouchCallback = (p: Point, e: TouchEvent) => any;
+
   export class Touch extends AbstractDispatcher {
     private static _DISPATCHER_KEY = "__Plottable_Dispatcher_Touch";
     private translator: _Util.ClientToSVGTranslator;
@@ -60,7 +61,8 @@ export module Dispatcher {
     }
 
     protected _getWrappedCallback(callback: Function): Core.BroadcasterCallback<Dispatcher.Touch> {
-      return () => callback(this.getLastTouchPosition());
+      return (td: Dispatcher.Touch, p: Point, e: MouseEvent) => callback(p, e);
+      // return () => callback(this.getLastTouchPosition());
     }
 
     /**
@@ -120,7 +122,7 @@ export module Dispatcher {
       var newTouchPosition = this.translator.computePosition(touch.clientX, touch.clientY);
       if (newTouchPosition != null) {
         this._lastTouchPosition = newTouchPosition;
-        b.broadcast();
+        b.broadcast(this.getLastTouchPosition(), e);
       }
     }
 

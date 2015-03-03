@@ -43,9 +43,10 @@ describe("Dispatchers", () => {
       var td = Plottable.Dispatcher.Touch.getDispatcher(<SVGElement> target.node());
 
       var callbackWasCalled = false;
-      var callback = function(p: Plottable.Point) {
+      var callback = function(p: Plottable.Point, e: TouchEvent) {
         callbackWasCalled = true;
         assertPointsClose(p, expectedPoint, 0.5, "touch position is correct");
+        assert.isNotNull(e, "TouchEvent was passed to the Dispatcher");
       };
 
       var keyString = "unit test";
@@ -74,9 +75,10 @@ describe("Dispatchers", () => {
       var td = Plottable.Dispatcher.Touch.getDispatcher(<SVGElement> target.node());
 
       var callbackWasCalled = false;
-      var callback = function(p: Plottable.Point) {
+      var callback = function(p: Plottable.Point, e: TouchEvent) {
         callbackWasCalled = true;
         assertPointsClose(p, expectedPoint, 0.5, "touch position is correct");
+        assert.isNotNull(e, "TouchEvent was passed to the Dispatcher");
       };
 
       var keyString = "unit test";
@@ -105,9 +107,10 @@ describe("Dispatchers", () => {
       var td = Plottable.Dispatcher.Touch.getDispatcher(<SVGElement> target.node());
 
       var callbackWasCalled = false;
-      var callback = function(p: Plottable.Point) {
+      var callback = function(p: Plottable.Point, e: TouchEvent) {
         callbackWasCalled = true;
         assertPointsClose(p, expectedPoint, 0.5, "touch position is correct");
+        assert.isNotNull(e, "TouchEvent was passed to the Dispatcher");
       };
 
       var keyString = "unit test";
@@ -132,9 +135,10 @@ describe("Dispatchers", () => {
       var td = Plottable.Dispatcher.Touch.getDispatcher(<SVGElement> target.node());
 
       var callbackWasCalled = false;
-      var callback = function(p: Plottable.Point) {
+      var callback = function(p: Plottable.Point, e: TouchEvent) {
         callbackWasCalled = true;
-      };
+        assert.isNotNull(e, "TouchEvent was passed to the Dispatcher");}
+      ;
 
       var keyString = "notInDomTest";
       td.onTouchMove(keyString, callback);

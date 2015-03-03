@@ -8769,8 +8769,8 @@ var Plottable;
                 return dispatcher;
             };
             Touch.prototype._getWrappedCallback = function (callback) {
-                var _this = this;
-                return function () { return callback(_this.getLastTouchPosition()); };
+                return function (td, p, e) { return callback(p, e); };
+                // return () => callback(this.getLastTouchPosition());
             };
             /**
              * Registers a callback to be called whenever a touch starts,
@@ -8826,7 +8826,7 @@ var Plottable;
                 var newTouchPosition = this.translator.computePosition(touch.clientX, touch.clientY);
                 if (newTouchPosition != null) {
                     this._lastTouchPosition = newTouchPosition;
-                    b.broadcast();
+                    b.broadcast(this.getLastTouchPosition(), e);
                 }
             };
             /**

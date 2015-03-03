@@ -3464,7 +3464,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Dispatcher {
-        type TouchCallback = (p: Point) => any;
+        type TouchCallback = (p: Point, e: TouchEvent) => any;
         class Touch extends AbstractDispatcher {
             /**
              * Get a Dispatcher.Touch for the <svg> containing elem. If one already exists
