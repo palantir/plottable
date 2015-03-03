@@ -78,7 +78,7 @@ export module Plot {
           offset = attrToProjector["height"](d, i, u, m) / 2;
         }
         return x1Attr(d, i, u, m) - offset;
-      }
+      };
 
 
       // Infer height, with an exception for ordinal scales
