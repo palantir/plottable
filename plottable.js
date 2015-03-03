@@ -8298,6 +8298,100 @@ var Plottable;
     })(Plot = Plottable.Plot || (Plottable.Plot = {}));
 })(Plottable || (Plottable = {}));
 
+///<reference path="../../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    var Plot;
+    (function (Plot) {
+        var Rectangle = (function (_super) {
+            __extends(Rectangle, _super);
+            /**
+             * Constructs a RectanglePlot.
+             *
+             * A RectanglePlot consists of a bunch of rectangles. The user is required to
+             * project the top left corner of each rectangle (x1, y1) and the bottom right
+             * corner of each rectangle (x2, y2)
+             *
+             * @constructor
+             * @param {Scale.Ordinal} xScale The x scale to use.
+             * @param {Scale.Ordinal} yScale The y scale to use.
+             */
+            function Rectangle(xScale, yScale, colorScale) {
+                _super.call(this, xScale, yScale);
+                // Category scales should not have padding by default
+                if (xScale instanceof Plottable.Scale.Ordinal) {
+                    xScale.innerPadding(0).outerPadding(0);
+                }
+                if (yScale instanceof Plottable.Scale.Ordinal) {
+                    yScale.innerPadding(0).outerPadding(0);
+                }
+                this._colorScale = colorScale;
+                this.classed("rectangle-plot", true);
+            }
+            Rectangle.prototype.addDataset = function (keyOrDataset, dataset) {
+                _super.prototype.addDataset.call(this, keyOrDataset, dataset);
+                return this;
+            };
+            Rectangle.prototype._getDrawer = function (key) {
+                return new Plottable._Drawer.Rect(key, true);
+            };
+            /**
+             * @param {string} attrToSet One of ["x", "y", "fill"]. If "fill" is used,
+             * the data should return a valid CSS color.
+             */
+            Rectangle.prototype.project = function (attrToSet, accessor, scale) {
+                _super.prototype.project.call(this, attrToSet, accessor, scale);
+                if (attrToSet === "fill") {
+                    this._colorScale = this._projections["fill"].scale;
+                }
+                return this;
+            };
+            Rectangle.prototype._generateAttrToProjector = function () {
+                var _this = this;
+                var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
+                // Copy each of the different projectors
+                var x1Attr = attrToProjector["x"];
+                var y1Attr = attrToProjector["y"];
+                var x2Attr = attrToProjector["x2"];
+                var y2Attr = attrToProjector["y2"];
+                // Infer width
+                attrToProjector["width"] = function (d, i, u, m) {
+                    return Math.abs(x2Attr(d, i, u, m) - x1Attr(d, i, u, m));
+                };
+                // Infer height, with an exception for ordinal scales
+                if (y2Attr === undefined) {
+                    attrToProjector["height"] = function () { return _this._yScale.rangeBand(); };
+                }
+                else {
+                    attrToProjector["height"] = function (d, i, u, m) {
+                        return Math.abs(y2Attr(d, i, u, m) - y1Attr(d, i, u, m));
+                    };
+                }
+                // Adjust y to respect the height, with an exception for ordinal scales
+                attrToProjector["y"] = function (d, i, u, m) {
+                    var offset = attrToProjector["height"](d, i, u, m);
+                    if (y2Attr === undefined) {
+                        offset = offset / 2;
+                    }
+                    return y1Attr(d, i, u, m) - offset;
+                };
+                return attrToProjector;
+            };
+            Rectangle.prototype._generateDrawSteps = function () {
+                return [{ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("cells") }];
+            };
+            return Rectangle;
+        })(Plot.AbstractXYPlot);
+        Plot.Rectangle = Rectangle;
+    })(Plot = Plottable.Plot || (Plottable.Plot = {}));
+})(Plottable || (Plottable = {}));
+
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {

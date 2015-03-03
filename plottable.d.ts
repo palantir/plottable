@@ -3182,6 +3182,37 @@ declare module Plottable {
 
 
 declare module Plottable {
+    module Plot {
+        class Rectangle extends AbstractXYPlot<any, any> {
+            /**
+             * Constructs a RectanglePlot.
+             *
+             * A RectanglePlot consists of a bunch of rectangles. The user is required to
+             * project the top left corner of each rectangle (x1, y1) and the bottom right
+             * corner of each rectangle (x2, y2)
+             *
+             * @constructor
+             * @param {Scale.Ordinal} xScale The x scale to use.
+             * @param {Scale.Ordinal} yScale The y scale to use.
+             */
+            constructor(xScale: Scale.AbstractScale<any, any>, yScale: Scale.AbstractScale<any, any>, colorScale: Scale.AbstractScale<any, string>);
+            addDataset(keyOrDataset: any, dataset?: any): Rectangle;
+            protected _getDrawer(key: string): _Drawer.Rect;
+            /**
+             * @param {string} attrToSet One of ["x", "y", "fill"]. If "fill" is used,
+             * the data should return a valid CSS color.
+             */
+            project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): Rectangle;
+            protected _generateAttrToProjector(): {
+                [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
+            };
+            protected _generateDrawSteps(): _Drawer.DrawStep[];
+        }
+    }
+}
+
+
+declare module Plottable {
     module Animator {
         interface PlotAnimator {
             /**
