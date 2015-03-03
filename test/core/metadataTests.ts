@@ -38,20 +38,24 @@ describe("Metadata", () => {
                                 .project("y", yAccessor);
     plot.addDataset(dataset);
     plot.renderTo(svg);
-    var circles = (<any> plot)._renderArea.selectAll("circle");
+    var circles = plot.getAllSelections();
     var c1 = d3.select(circles[0][0]);
     var c2 = d3.select(circles[0][1]);
-    assert.closeTo(parseFloat(c1.attr("cx")), 0, 0.01, "first circle cx is correct");
-    assert.closeTo(parseFloat(c1.attr("cy")), 20, 0.01, "first circle cy is correct");
-    assert.closeTo(parseFloat(c2.attr("cx")), 11, 0.01, "second circle cx is correct");
-    assert.closeTo(parseFloat(c2.attr("cy")), 20, 0.01, "second circle cy is correct");
+    var c1Position = c1.attr("transform").match(/\((.*)\)/)[1].split(",");
+    var c2Position = c2.attr("transform").match(/\((.*)\)/)[1].split(",");
+    assert.closeTo(parseFloat(c1Position[0]), 0, 0.01, "first circle cx is correct");
+    assert.closeTo(parseFloat(c1Position[1]), 20, 0.01, "first circle cy is correct");
+    assert.closeTo(parseFloat(c2Position[0]), 11, 0.01, "second circle cx is correct");
+    assert.closeTo(parseFloat(c2Position[1]), 20, 0.01, "second circle cy is correct");
 
     metadata = {foo: 0, bar: 0};
     dataset.metadata(metadata);
-    assert.closeTo(parseFloat(c1.attr("cx")), 0, 0.01, "first circle cx is correct after metadata change");
-    assert.closeTo(parseFloat(c1.attr("cy")), 0, 0.01, "first circle cy is correct after metadata change");
-    assert.closeTo(parseFloat(c2.attr("cx")), 1, 0.01, "second circle cx is correct after metadata change");
-    assert.closeTo(parseFloat(c2.attr("cy")), 0, 0.01, "second circle cy is correct after metadata change");
+    c1Position = c1.attr("transform").match(/\((.*)\)/)[1].split(",");
+    c2Position = c2.attr("transform").match(/\((.*)\)/)[1].split(",");
+    assert.closeTo(parseFloat(c1Position[0]), 0, 0.01, "first circle cx is correct after metadata change");
+    assert.closeTo(parseFloat(c1Position[1]), 0, 0.01, "first circle cy is correct after metadata change");
+    assert.closeTo(parseFloat(c2Position[0]), 1, 0.01, "second circle cx is correct after metadata change");
+    assert.closeTo(parseFloat(c2Position[1]), 0, 0.01, "second circle cy is correct after metadata change");
 
     svg.remove();
   });
@@ -70,15 +74,20 @@ describe("Metadata", () => {
     plot.addDataset(dataset1);
     plot.addDataset(dataset2);
     plot.renderTo(svg);
-    var circles = (<any> plot)._renderArea.selectAll("circle");
+    var circles = plot.getAllSelections();
     var c1 = d3.select(circles[0][0]);
     var c2 = d3.select(circles[0][1]);
     var c3 = d3.select(circles[0][2]);
     var c4 = d3.select(circles[0][3]);
-    assert.closeTo(parseFloat(c1.attr("cx")), 10, 0.01, "first circle is correct");
-    assert.closeTo(parseFloat(c2.attr("cx")), 21, 0.01, "second circle is correct");
-    assert.closeTo(parseFloat(c3.attr("cx")), 32, 0.01, "third circle is correct");
-    assert.closeTo(parseFloat(c4.attr("cx")), 63, 0.01, "fourth circle is correct");
+
+    var c1Position = c1.attr("transform").match(/\((.*)\)/)[1].split(",");
+    var c2Position = c2.attr("transform").match(/\((.*)\)/)[1].split(",");
+    var c3Position = c3.attr("transform").match(/\((.*)\)/)[1].split(",");
+    var c4Position = c4.attr("transform").match(/\((.*)\)/)[1].split(",");
+    assert.closeTo(parseFloat(c1Position[0]), 10, 0.01, "first circle is correct");
+    assert.closeTo(parseFloat(c2Position[0]), 21, 0.01, "second circle is correct");
+    assert.closeTo(parseFloat(c3Position[0]), 32, 0.01, "third circle is correct");
+    assert.closeTo(parseFloat(c4Position[0]), 63, 0.01, "fourth circle is correct");
 
     svg.remove();
   });
@@ -99,15 +108,20 @@ describe("Metadata", () => {
     plot.addDataset(data1);
     plot.addDataset(data2);
     plot.renderTo(svg);
-    var circles = (<any> plot)._renderArea.selectAll("circle");
+    var circles = plot.getAllSelections();
     var c1 = d3.select(circles[0][0]);
     var c2 = d3.select(circles[0][1]);
     var c3 = d3.select(circles[0][2]);
     var c4 = d3.select(circles[0][3]);
-    assert.closeTo(parseFloat(c1.attr("cx")), 10, 0.01, "first circle is correct");
-    assert.closeTo(parseFloat(c2.attr("cx")), 21, 0.01, "second circle is correct");
-    assert.closeTo(parseFloat(c3.attr("cx")), 12, 0.01, "third circle is correct");
-    assert.closeTo(parseFloat(c4.attr("cx")), 23, 0.01, "fourth circle is correct");
+
+    var c1Position = c1.attr("transform").match(/\((.*)\)/)[1].split(",");
+    var c2Position = c2.attr("transform").match(/\((.*)\)/)[1].split(",");
+    var c3Position = c3.attr("transform").match(/\((.*)\)/)[1].split(",");
+    var c4Position = c4.attr("transform").match(/\((.*)\)/)[1].split(",");
+    assert.closeTo(parseFloat(c1Position[0]), 10, 0.01, "first circle is correct");
+    assert.closeTo(parseFloat(c2Position[0]), 21, 0.01, "second circle is correct");
+    assert.closeTo(parseFloat(c3Position[0]), 12, 0.01, "third circle is correct");
+    assert.closeTo(parseFloat(c4Position[0]), 23, 0.01, "fourth circle is correct");
 
     svg.remove();
   });
@@ -140,25 +154,35 @@ describe("Metadata", () => {
     plot2.addDataset(data2);
     plot1.renderTo(svg);
     plot2.renderTo(svg);
-    var circles = (<any> plot1)._renderArea.selectAll("circle");
+    var circles = plot1.getAllSelections();
     var c1 = d3.select(circles[0][0]);
     var c2 = d3.select(circles[0][1]);
     var c3 = d3.select(circles[0][2]);
     var c4 = d3.select(circles[0][3]);
-    assert.closeTo(parseFloat(c1.attr("cx")), 10, 0.01, "first circle is correct for first plot");
-    assert.closeTo(parseFloat(c2.attr("cx")), 21, 0.01, "second circle is correct for first plot");
-    assert.closeTo(parseFloat(c3.attr("cx")), 12, 0.01, "third circle is correct for first plot");
-    assert.closeTo(parseFloat(c4.attr("cx")), 23, 0.01, "fourth circle is correct for first plot");
 
-    circles = (<any> plot2)._renderArea.selectAll("circle");
+    var c1Position = c1.attr("transform").match(/\((.*)\)/)[1].split(",");
+    var c2Position = c2.attr("transform").match(/\((.*)\)/)[1].split(",");
+    var c3Position = c3.attr("transform").match(/\((.*)\)/)[1].split(",");
+    var c4Position = c4.attr("transform").match(/\((.*)\)/)[1].split(",");
+    assert.closeTo(parseFloat(c1Position[0]), 10, 0.01, "first circle is correct for first plot");
+    assert.closeTo(parseFloat(c2Position[0]), 21, 0.01, "second circle is correct for first plot");
+    assert.closeTo(parseFloat(c3Position[0]), 12, 0.01, "third circle is correct for first plot");
+    assert.closeTo(parseFloat(c4Position[0]), 23, 0.01, "fourth circle is correct for first plot");
+
+    circles = plot2.getAllSelections();
     c1 = d3.select(circles[0][0]);
     c2 = d3.select(circles[0][1]);
     c3 = d3.select(circles[0][2]);
     c4 = d3.select(circles[0][3]);
-    assert.closeTo(parseFloat(c1.attr("cx")), 20, 0.01, "first circle is correct for second plot");
-    assert.closeTo(parseFloat(c2.attr("cx")), 41, 0.01, "second circle is correct for second plot");
-    assert.closeTo(parseFloat(c3.attr("cx")), 22, 0.01, "third circle is correct for second plot");
-    assert.closeTo(parseFloat(c4.attr("cx")), 43, 0.01, "fourth circle is correct for second plot");
+
+    c1Position = c1.attr("transform").match(/\((.*)\)/)[1].split(",");
+    c2Position = c2.attr("transform").match(/\((.*)\)/)[1].split(",");
+    c3Position = c3.attr("transform").match(/\((.*)\)/)[1].split(",");
+    c4Position = c4.attr("transform").match(/\((.*)\)/)[1].split(",");
+    assert.closeTo(parseFloat(c1Position[0]), 20, 0.01, "first circle is correct for second plot");
+    assert.closeTo(parseFloat(c2Position[0]), 41, 0.01, "second circle is correct for second plot");
+    assert.closeTo(parseFloat(c3Position[0]), 22, 0.01, "third circle is correct for second plot");
+    assert.closeTo(parseFloat(c4Position[0]), 43, 0.01, "fourth circle is correct for second plot");
 
     svg.remove();
   });

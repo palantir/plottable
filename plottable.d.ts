@@ -1551,16 +1551,6 @@ declare module Plottable {
 
 declare module Plottable {
     module _Drawer {
-        class Circle extends Element {
-            constructor(key: string);
-            _getPixelPoint(datum: any, index: number): Point;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module _Drawer {
         class Rect extends Element {
             constructor(key: string, isVertical: boolean);
             setup(area: D3.Selection): void;
@@ -1579,6 +1569,18 @@ declare module Plottable {
             constructor(key: string);
             _drawStep(step: AppliedDrawStep): void;
             draw(data: any[], drawSteps: DrawStep[], userMetadata: any, plotMetadata: Plot.PlotMetadata): number;
+            _getPixelPoint(datum: any, index: number): Point;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module _Drawer {
+        class Symbol extends AbstractDrawer {
+            protected _enterData(data: any[]): void;
+            protected _drawStep(step: AppliedDrawStep): void;
+            _getSelector(): string;
             _getPixelPoint(datum: any, index: number): Point;
         }
     }
@@ -2793,13 +2795,7 @@ declare module Plottable {
              * @param {Scale} yScale The y scale to use.
              */
             constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<Y, number>);
-            /**
-             * @param {string} attrToSet One of ["x", "y", "cx", "cy", "r",
-             * "fill"]. "cx" and "cy" are aliases for "x" and "y". "r" is the datum's
-             * radius, and "fill" is the CSS color of the datum.
-             */
-            project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): Scatter<X, Y>;
-            protected _getDrawer(key: string): _Drawer.Circle;
+            protected _getDrawer(key: string): _Drawer.Symbol;
             protected _generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
             };
