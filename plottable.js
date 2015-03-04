@@ -6605,19 +6605,26 @@ var Plottable;
              *
              * @param {string | string[]} datasetKeys The dataset(s) to retrieve the selections from.
              * If not provided, all selections will be retrieved.
+             * @param {boolean} exclude If set to true, all datasets will be queried excluding the keys referenced
+             * in the previous datasetKeys argument (default = false).
              * @returns {D3.Selection} The retrieved selections.
              */
-            AbstractPlot.prototype.getAllSelections = function (datasetKeys) {
+            AbstractPlot.prototype.getAllSelections = function (datasetKeys, exclude) {
                 var _this = this;
+                if (exclude === void 0) { exclude = false; }
                 var datasetKeyArray = [];
                 if (datasetKeys == null) {
-                    datasetKeyArray = this._datasetKeysInOrder;
+                    datasetKeyArray = this.datasetOrder();
                 }
                 else if (typeof (datasetKeys) === "string") {
                     datasetKeyArray = [datasetKeys];
                 }
                 else {
                     datasetKeyArray = datasetKeys;
+                }
+                if (exclude) {
+                    var excludedDatasetKeys = d3.set(datasetKeyArray);
+                    datasetKeyArray = this.datasetOrder().filter(function (datasetKey) { return !excludedDatasetKeys.has(datasetKey); });
                 }
                 var allSelections = [];
                 datasetKeyArray.forEach(function (datasetKey) {

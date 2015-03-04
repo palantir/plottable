@@ -2691,9 +2691,11 @@ declare module Plottable {
              *
              * @param {string | string[]} datasetKeys The dataset(s) to retrieve the selections from.
              * If not provided, all selections will be retrieved.
+             * @param {boolean} exclude If set to true, all datasets will be queried excluding the keys referenced
+             * in the previous datasetKeys argument (default = false).
              * @returns {D3.Selection} The retrieved selections.
              */
-            getAllSelections(datasetKeys?: string | string[]): D3.Selection;
+            getAllSelections(datasetKeys?: string | string[], exclude?: boolean): D3.Selection;
         }
     }
 }
