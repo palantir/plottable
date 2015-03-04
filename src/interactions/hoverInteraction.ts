@@ -51,17 +51,7 @@ export module Interaction {
       this._mouseDispatcher.onMouseMove("hover" + this.getID(), (p: Point) => this._handlePointerEvent(p));
 
       this._touchDispatcher = Dispatcher.Touch.getDispatcher(<SVGElement> (<any> this._componentToListenTo)._element.node());
-      this._touchDispatcher.onTouchStart("hover" + this.getID(), (p: Point, e: TouchEvent) => this._handleTouchEvent(p, e));
-    }
-
-    private _handleTouchEvent(p: Point, e: TouchEvent) {
-      var translatedP = this._translateToComponentSpace(p);
-      if (e.touches.length === 1) {
-        if (this._isInsideComponent(translatedP)) {
-          e.preventDefault();
-        }
-        this._handlePointerEvent(p);
-      }
+      this._touchDispatcher.onTouchStart("hover" + this.getID(), (p: Point, e: TouchEvent) => this._handlePointerEvent(p, e));
     }
 
     private _handlePointerEvent(p: Point) {
