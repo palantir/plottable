@@ -1743,7 +1743,7 @@ var Plottable;
              * the data.
              *
              * Extent: The [min, max] pair for a Scale.Quantitative, all covered
-             * strings for a Scale.Ordinal.
+             * strings for a Scale.Category.
              *
              * Perspective: A combination of a Dataset and an Accessor that
              * represents a view in to the data.

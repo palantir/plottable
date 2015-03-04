@@ -19,8 +19,8 @@ function run(svg, data, Plottable) {
         {x: "D", y: 2, val: 0.9},
         {x: "E", y: 2, val: 1.0},
     ];
-    var xScale = new Plottable.Scale.Ordinal();
-    var yScale = new Plottable.Scale.Ordinal();
+    var xScale = new Plottable.Scale.Category();
+    var yScale = new Plottable.Scale.Category();
 
     var colorScale = new Plottable.Scale.Color();
     colorScale.range(["blue", "teal", "purple"]);  
