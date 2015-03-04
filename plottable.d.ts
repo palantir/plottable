@@ -2791,8 +2791,8 @@ declare module Plottable {
              * Constructs a RectanglePlot.
              *
              * A RectanglePlot consists of a bunch of rectangles. The user is required to
-             * project the top left corner of each rectangle (x1, y1) and the bottom right
-             * corner of each rectangle (x2, y2)
+             * project the left and right bounds of the rectangle (x1 and x2 respectively)
+             * as well as the bottom and top bounds (y1 and y2 respectively)
              *
              * @constructor
              * @param {Scale.AbstractScale} xScale The x scale to use.

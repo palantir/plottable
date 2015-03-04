@@ -6942,8 +6942,8 @@ var Plottable;
              * Constructs a RectanglePlot.
              *
              * A RectanglePlot consists of a bunch of rectangles. The user is required to
-             * project the top left corner of each rectangle (x1, y1) and the bottom right
-             * corner of each rectangle (x2, y2)
+             * project the left and right bounds of the rectangle (x1 and x2 respectively)
+             * as well as the bottom and top bounds (y1 and y2 respectively)
              *
              * @constructor
              * @param {Scale.AbstractScale} xScale The x scale to use.
@@ -6966,11 +6966,16 @@ var Plottable;
                 // Define width if both x1 and x2 are defined
                 if (x1Attr !== undefined && x2Attr !== undefined) {
                     attrToProjector["width"] = function (d, i, u, m) { return Math.abs(x2Attr(d, i, u, m) - x1Attr(d, i, u, m)); };
+                    attrToProjector["x"] = function (d, i, u, m) {
+                        return x1Attr(d, i, u, m) < x2Attr(d, i, u, m) ? x1Attr(d, i, u, m) : x2Attr(d, i, u, m);
+                    };
                 }
                 // Define height if both y1 and y2 are defined
                 if (y1Attr !== undefined && y2Attr !== undefined) {
                     attrToProjector["height"] = function (d, i, u, m) { return Math.abs(y2Attr(d, i, u, m) - y1Attr(d, i, u, m)); };
-                    attrToProjector["y"] = function (d, i, u, m) { return y1Attr(d, i, u, m) - attrToProjector["height"](d, i, u, m); };
+                    attrToProjector["y"] = function (d, i, u, m) {
+                        return y1Attr(d, i, u, m) > y2Attr(d, i, u, m) ? y1Attr(d, i, u, m) - attrToProjector["height"](d, i, u, m) : y2Attr(d, i, u, m) - attrToProjector["height"](d, i, u, m);
+                    };
                 }
                 return attrToProjector;
             };
