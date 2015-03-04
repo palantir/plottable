@@ -1,5 +1,5 @@
 /*!
-Plottable 0.46.0 (https://github.com/palantir/plottable)
+Plottable 0.47.0 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -978,6 +978,69 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
+    var _Util;
+    (function (_Util) {
+        var ClientToSVGTranslator = (function () {
+            function ClientToSVGTranslator(svg) {
+                this._svg = svg;
+                this._measureRect = document.createElementNS(svg.namespaceURI, "rect");
+                this._measureRect.setAttribute("class", "measure-rect");
+                this._measureRect.setAttribute("style", "opacity: 0; visibility: hidden;");
+                this._measureRect.setAttribute("width", "1");
+                this._measureRect.setAttribute("height", "1");
+                this._svg.appendChild(this._measureRect);
+            }
+            ClientToSVGTranslator.getTranslator = function (elem) {
+                var svg = _Util.DOM.getBoundingSVG(elem);
+                var translator = svg[ClientToSVGTranslator._TRANSLATOR_KEY];
+                if (translator == null) {
+                    translator = new ClientToSVGTranslator(svg);
+                    svg[ClientToSVGTranslator._TRANSLATOR_KEY] = translator;
+                }
+                return translator;
+            };
+            /**
+             * Computes the position relative to the <svg> in svg-coordinate-space.
+             */
+            ClientToSVGTranslator.prototype.computePosition = function (clientX, clientY) {
+                // get the origin
+                this._measureRect.setAttribute("x", "0");
+                this._measureRect.setAttribute("y", "0");
+                var mrBCR = this._measureRect.getBoundingClientRect();
+                var origin = { x: mrBCR.left, y: mrBCR.top };
+                // calculate the scale
+                var sampleDistance = 100;
+                this._measureRect.setAttribute("x", String(sampleDistance));
+                this._measureRect.setAttribute("y", String(sampleDistance));
+                mrBCR = this._measureRect.getBoundingClientRect();
+                var testPoint = { x: mrBCR.left, y: mrBCR.top };
+                // invalid measurements -- SVG might not be in the DOM
+                if (origin.x === testPoint.x || origin.y === testPoint.y) {
+                    return null;
+                }
+                var scaleX = (testPoint.x - origin.x) / sampleDistance;
+                var scaleY = (testPoint.y - origin.y) / sampleDistance;
+                // get the true cursor position
+                this._measureRect.setAttribute("x", String((clientX - origin.x) / scaleX));
+                this._measureRect.setAttribute("y", String((clientY - origin.y) / scaleY));
+                mrBCR = this._measureRect.getBoundingClientRect();
+                var trueCursorPosition = { x: mrBCR.left, y: mrBCR.top };
+                var scaledPosition = {
+                    x: (trueCursorPosition.x - origin.x) / scaleX,
+                    y: (trueCursorPosition.y - origin.y) / scaleY
+                };
+                return scaledPosition;
+            };
+            ClientToSVGTranslator._TRANSLATOR_KEY = "__Plottable_ClientToSVGTranslator";
+            return ClientToSVGTranslator;
+        })();
+        _Util.ClientToSVGTranslator = ClientToSVGTranslator;
+    })(_Util = Plottable._Util || (Plottable._Util = {}));
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var Plottable;
+(function (Plottable) {
     var Config;
     (function (Config) {
         /**
@@ -990,7 +1053,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "0.46.0";
+    Plottable.version = "0.47.0";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -1586,8 +1649,9 @@ var Plottable;
         Domainer.prototype._padDomain = function (scale, domain) {
             var min = domain[0];
             var max = domain[1];
-            if (min === max && this._padProportion > 0.0) {
-                var d = min.valueOf(); // valueOf accounts for dates properly
+            // valueOf accounts for dates properly
+            if (min.valueOf() === max.valueOf() && this._padProportion > 0.0) {
+                var d = min.valueOf();
                 if (min instanceof Date) {
                     return [d - Domainer._ONE_DAY, d + Domainer._ONE_DAY];
                 }
@@ -1595,7 +1659,8 @@ var Plottable;
                     return [d - Domainer._PADDING_FOR_IDENTICAL_DOMAIN, d + Domainer._PADDING_FOR_IDENTICAL_DOMAIN];
                 }
             }
-            if (scale.domain()[0] === scale.domain()[1]) {
+            var scaleDomain = scale.domain();
+            if (scaleDomain[0].valueOf() === scaleDomain[1].valueOf()) {
                 return domain;
             }
             var p = this._padProportion / 2;
@@ -8547,13 +8612,7 @@ var Plottable;
             function Mouse(svg) {
                 var _this = this;
                 _super.call(this);
-                this._svg = svg;
-                this._measureRect = document.createElementNS(svg.namespaceURI, "rect");
-                this._measureRect.setAttribute("class", "measure-rect");
-                this._measureRect.setAttribute("style", "opacity: 0; visibility: hidden;");
-                this._measureRect.setAttribute("width", "1");
-                this._measureRect.setAttribute("height", "1");
-                this._svg.appendChild(this._measureRect);
+                this.translator = Plottable._Util.ClientToSVGTranslator.getTranslator(svg);
                 this._lastMousePosition = { x: -1, y: -1 };
                 this._moveBroadcaster = new Plottable.Core.Broadcaster(this);
                 this._processMoveCallback = function (e) { return _this._measureAndBroadcast(e, _this._moveBroadcaster); };
@@ -8585,8 +8644,7 @@ var Plottable;
                 return dispatcher;
             };
             Mouse.prototype._getWrappedCallback = function (callback) {
-                var _this = this;
-                return function () { return callback(_this.getLastMousePosition()); };
+                return function (md, p, e) { return callback(p, e); };
             };
             /**
              * Registers a callback to be called whenever the mouse position changes,
@@ -8638,43 +8696,11 @@ var Plottable;
              * calls broadcast() on the supplied Broadcaster.
              */
             Mouse.prototype._measureAndBroadcast = function (e, b) {
-                var newMousePosition = this._computeMousePosition(e.clientX, e.clientY);
+                var newMousePosition = this.translator.computePosition(e.clientX, e.clientY);
                 if (newMousePosition != null) {
                     this._lastMousePosition = newMousePosition;
-                    b.broadcast();
+                    b.broadcast(this.getLastMousePosition(), e);
                 }
-            };
-            /**
-             * Computes the mouse position relative to the <svg> in svg-coordinate-space.
-             */
-            Mouse.prototype._computeMousePosition = function (clientX, clientY) {
-                // get the origin
-                this._measureRect.setAttribute("x", "0");
-                this._measureRect.setAttribute("y", "0");
-                var mrBCR = this._measureRect.getBoundingClientRect();
-                var origin = { x: mrBCR.left, y: mrBCR.top };
-                // calculate the scale
-                var sampleDistance = 100;
-                this._measureRect.setAttribute("x", String(sampleDistance));
-                this._measureRect.setAttribute("y", String(sampleDistance));
-                mrBCR = this._measureRect.getBoundingClientRect();
-                var testPoint = { x: mrBCR.left, y: mrBCR.top };
-                // invalid measurements -- SVG might not be in the DOM
-                if (origin.x === testPoint.x || origin.y === testPoint.y) {
-                    return null;
-                }
-                var scaleX = (testPoint.x - origin.x) / sampleDistance;
-                var scaleY = (testPoint.y - origin.y) / sampleDistance;
-                // get the true cursor position
-                this._measureRect.setAttribute("x", String((clientX - origin.x) / scaleX));
-                this._measureRect.setAttribute("y", String((clientY - origin.y) / scaleY));
-                mrBCR = this._measureRect.getBoundingClientRect();
-                var trueCursorPosition = { x: mrBCR.left, y: mrBCR.top };
-                var scaledPosition = {
-                    x: (trueCursorPosition.x - origin.x) / scaleX,
-                    y: (trueCursorPosition.y - origin.y) / scaleY
-                };
-                return scaledPosition;
             };
             /**
              * Returns the last computed mouse position.
@@ -8688,6 +8714,137 @@ var Plottable;
             return Mouse;
         })(Dispatcher.AbstractDispatcher);
         Dispatcher.Mouse = Mouse;
+    })(Dispatcher = Plottable.Dispatcher || (Plottable.Dispatcher = {}));
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    var Dispatcher;
+    (function (Dispatcher) {
+        var Touch = (function (_super) {
+            __extends(Touch, _super);
+            /**
+             * Creates a Dispatcher.Touch.
+             * This constructor should not be invoked directly under most circumstances.
+             *
+             * @param {SVGElement} svg The root <svg> element to attach to.
+             */
+            function Touch(svg) {
+                var _this = this;
+                _super.call(this);
+                this.translator = Plottable._Util.ClientToSVGTranslator.getTranslator(svg);
+                this._lastTouchPosition = { x: -1, y: -1 };
+                this._moveBroadcaster = new Plottable.Core.Broadcaster(this);
+                this._processMoveCallback = function (e) { return _this._measureAndBroadcast(e, _this._moveBroadcaster); };
+                this._event2Callback["touchmove"] = this._processMoveCallback;
+                this._startBroadcaster = new Plottable.Core.Broadcaster(this);
+                this._processStartCallback = function (e) { return _this._measureAndBroadcast(e, _this._startBroadcaster); };
+                this._event2Callback["touchstart"] = this._processStartCallback;
+                this._endBroadcaster = new Plottable.Core.Broadcaster(this);
+                this._processEndCallback = function (e) { return _this._measureAndBroadcast(e, _this._endBroadcaster); };
+                this._event2Callback["touchend"] = this._processEndCallback;
+                this._broadcasters = [this._moveBroadcaster, this._startBroadcaster, this._endBroadcaster];
+            }
+            /**
+             * Get a Dispatcher.Touch for the <svg> containing elem. If one already exists
+             * on that <svg>, it will be returned; otherwise, a new one will be created.
+             *
+             * @param {SVGElement} elem A svg DOM element.
+             * @return {Dispatcher.Touch} A Dispatcher.Touch
+             */
+            Touch.getDispatcher = function (elem) {
+                var svg = Plottable._Util.DOM.getBoundingSVG(elem);
+                var dispatcher = svg[Touch._DISPATCHER_KEY];
+                if (dispatcher == null) {
+                    dispatcher = new Touch(svg);
+                    svg[Touch._DISPATCHER_KEY] = dispatcher;
+                }
+                return dispatcher;
+            };
+            Touch.prototype._getWrappedCallback = function (callback) {
+                return function (td, p, e) { return callback(p, e); };
+            };
+            /**
+             * Registers a callback to be called whenever a touch starts,
+             * or removes the callback if `null` is passed as the callback.
+             *
+             * @param {any} key The key associated with the callback.
+             *                  Key uniqueness is determined by deep equality.
+             * @param {TouchCallback} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space. Pass `null`
+             *                                     to remove a callback.
+             * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
+             */
+            Touch.prototype.onTouchStart = function (key, callback) {
+                this._setCallback(this._startBroadcaster, key, callback);
+                return this;
+            };
+            /**
+             * Registers a callback to be called whenever the touch position changes,
+             * or removes the callback if `null` is passed as the callback.
+             *
+             * @param {any} key The key associated with the callback.
+             *                  Key uniqueness is determined by deep equality.
+             * @param {TouchCallback} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space. Pass `null`
+             *                                     to remove a callback.
+             * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
+             */
+            Touch.prototype.onTouchMove = function (key, callback) {
+                this._setCallback(this._moveBroadcaster, key, callback);
+                return this;
+            };
+            /**
+             * Registers a callback to be called whenever a touch ends,
+             * or removes the callback if `null` is passed as the callback.
+             *
+             * @param {any} key The key associated with the callback.
+             *                  Key uniqueness is determined by deep equality.
+             * @param {TouchCallback} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space. Pass `null`
+             *                                     to remove a callback.
+             * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
+             */
+            Touch.prototype.onTouchEnd = function (key, callback) {
+                this._setCallback(this._endBroadcaster, key, callback);
+                return this;
+            };
+            /**
+             * Computes the Touch position from the given event, and if successful
+             * calls broadcast() on the supplied Broadcaster.
+             */
+            Touch.prototype._measureAndBroadcast = function (e, b) {
+                var touch = e.changedTouches[0];
+                var newTouchPosition = this.translator.computePosition(touch.clientX, touch.clientY);
+                if (newTouchPosition != null) {
+                    this._lastTouchPosition = newTouchPosition;
+                    b.broadcast(this.getLastTouchPosition(), e);
+                }
+            };
+            /**
+             * Returns the last computed Touch position.
+             *
+             * @return {Point} The last known Touch position in <svg> coordinate space.
+             */
+            Touch.prototype.getLastTouchPosition = function () {
+                return this._lastTouchPosition;
+            };
+            /**
+             * Dispatcher.Touch calls callbacks when touch events occur.
+             * It reports the (x, y) position of the first Touch relative to the
+             * <svg> it is attached to.
+             */
+            Touch._DISPATCHER_KEY = "__Plottable_Dispatcher_Touch";
+            return Touch;
+        })(Dispatcher.AbstractDispatcher);
+        Dispatcher.Touch = Touch;
     })(Dispatcher = Plottable.Dispatcher || (Plottable.Dispatcher = {}));
 })(Plottable || (Plottable = {}));
 
@@ -8733,7 +8890,7 @@ var Plottable;
                 return dispatcher;
             };
             Key.prototype._getWrappedCallback = function (callback) {
-                return function (d, e) { return callback(e.keyCode); };
+                return function (d, e) { return callback(e.keyCode, e); };
             };
             /**
              * Registers a callback to be called whenever a key is pressed,
@@ -9502,10 +9659,12 @@ var Plottable;
             Hover.prototype._anchor = function (component, hitBox) {
                 var _this = this;
                 _super.prototype._anchor.call(this, component, hitBox);
-                this._dispatcher = Plottable.Dispatcher.Mouse.getDispatcher(this._componentToListenTo._element.node());
-                this._dispatcher.onMouseMove("hover" + this.getID(), function (p) { return _this._handleMouseEvent(p); });
+                this._mouseDispatcher = Plottable.Dispatcher.Mouse.getDispatcher(this._componentToListenTo._element.node());
+                this._mouseDispatcher.onMouseMove("hover" + this.getID(), function (p) { return _this._handlePointerEvent(p); });
+                this._touchDispatcher = Plottable.Dispatcher.Touch.getDispatcher(this._componentToListenTo._element.node());
+                this._touchDispatcher.onTouchStart("hover" + this.getID(), function (p, e) { return _this._handlePointerEvent(p); });
             };
-            Hover.prototype._handleMouseEvent = function (p) {
+            Hover.prototype._handlePointerEvent = function (p) {
                 p = this._translateToComponentSpace(p);
                 if (this._isInsideComponent(p)) {
                     if (!this._overComponent) {

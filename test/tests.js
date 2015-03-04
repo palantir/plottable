@@ -100,6 +100,11 @@ function assertBBoxNonIntersection(firstEl, secondEl) {
     // +1 for inaccuracy in IE
     assert.isTrue(intersectionBox.left + 1 >= intersectionBox.right || intersectionBox.bottom + 1 >= intersectionBox.top, "bounding rects are not intersecting");
 }
+function assertPointsClose(actual, expected, epsilon, message) {
+    assert.closeTo(actual.x, expected.x, epsilon, message + " (x)");
+    assert.closeTo(actual.y, expected.y, epsilon, message + " (y)");
+}
+;
 function assertXY(el, xExpected, yExpected, message) {
     var x = el.attr("x");
     var y = el.attr("y");
@@ -142,6 +147,34 @@ function triggerFakeMouseEvent(type, target, relativeX, relativeY) {
     var yPos = clientRect.top + relativeY;
     var e = document.createEvent("MouseEvents");
     e.initMouseEvent(type, true, true, window, 1, xPos, yPos, xPos, yPos, false, false, false, false, 1, null);
+    target.node().dispatchEvent(e);
+}
+function triggerFakeTouchEvent(type, target, relativeX, relativeY) {
+    var targetNode = target.node();
+    var clientRect = targetNode.getBoundingClientRect();
+    var xPos = clientRect.left + relativeX;
+    var yPos = clientRect.top + relativeY;
+    var e = document.createEvent("UIEvent");
+    e.initUIEvent(type, true, true, window, 1);
+    var fakeTouch = {
+        identifier: 0,
+        target: targetNode,
+        screenX: xPos,
+        screenY: yPos,
+        clientX: xPos,
+        clientY: yPos,
+        pageX: xPos,
+        pageY: yPos
+    };
+    var fakeTouchList = [fakeTouch];
+    fakeTouchList.item = function (index) { return fakeTouchList[index]; };
+    e.touches = fakeTouchList;
+    e.targetTouches = fakeTouchList;
+    e.changedTouches = fakeTouchList;
+    e.altKey = false;
+    e.metaKey = false;
+    e.ctrlKey = false;
+    e.shiftKey = false;
     target.node().dispatchEvent(e);
 }
 function assertAreaPathCloseTo(actualPath, expectedPath, precision, msg) {
@@ -5935,13 +5968,14 @@ describe("Domainer", function () {
     });
     it("pad() defaults to [v-1 day, v+1 day] if there's only one date value", function () {
         var d = new Date(2000, 5, 5);
+        var d2 = new Date(2000, 5, 5);
         var dayBefore = new Date(2000, 5, 4);
         var dayAfter = new Date(2000, 5, 6);
         var timeScale = new Plottable.Scale.Time();
         // the result of computeDomain() will be number[], but when it
         // gets fed back into timeScale, it will be adjusted back to a Date.
         // That's why I'm using _updateExtent() instead of domainer.computeDomain()
-        timeScale._updateExtent("1", "x", [d, d]);
+        timeScale._updateExtent("1", "x", [d, d2]);
         timeScale.domainer(new Plottable.Domainer().pad());
         assert.deepEqual(timeScale.domain(), [dayBefore, dayAfter]);
     });
@@ -6922,6 +6956,37 @@ describe("StrictEqualityAssociativeArray", function () {
 
 ///<reference path="../testReference.ts" />
 var assert = chai.assert;
+describe("ClientToSVGTranslator", function () {
+    it("getTranslator() creates only one Dispatcher.Mouse per <svg>", function () {
+        var svg = generateSVG();
+        var t1 = Plottable._Util.ClientToSVGTranslator.getTranslator(svg.node());
+        assert.isNotNull(t1, "created a new ClientToSVGTranslator on a <svg>");
+        var t2 = Plottable._Util.ClientToSVGTranslator.getTranslator(svg.node());
+        assert.strictEqual(t1, t2, "returned the existing ClientToSVGTranslator if called again with same <svg>");
+        svg.remove();
+    });
+    it("converts points to <svg>-space correctly", function () {
+        var svg = generateSVG();
+        var rectOrigin = {
+            x: 19,
+            y: 85
+        };
+        var rect = svg.append("rect").attr({
+            x: rectOrigin.x,
+            y: rectOrigin.y,
+            width: 30,
+            height: 30
+        });
+        var translator = Plottable._Util.ClientToSVGTranslator.getTranslator(svg.node());
+        var rectBCR = rect.node().getBoundingClientRect();
+        var computedOrigin = translator.computePosition(rectBCR.left, rectBCR.top);
+        assertPointsClose(computedOrigin, rectOrigin, 0.5, "translates client coordinates to <svg> coordinates correctly");
+        svg.remove();
+    });
+});
+
+///<reference path="../testReference.ts" />
+var assert = chai.assert;
 describe("_Util.Methods", function () {
     it("inRange works correct", function () {
         assert.isTrue(Plottable._Util.Methods.inRange(0, -1, 1), "basic functionality works");
@@ -7525,7 +7590,7 @@ describe("Interactions", function () {
             testTarget.registerInteraction(hoverInteraction);
             hitbox = testTarget._element.select(".hit-box");
         });
-        it("correctly triggers onHoverOver() callbacks", function () {
+        it("correctly triggers onHoverOver() callbacks (mouse events)", function () {
             overCallbackCalled = false;
             triggerFakeMouseEvent("mouseover", hitbox, 100, 200);
             assert.isTrue(overCallbackCalled, "onHoverOver was called on mousing over a target area");
@@ -7546,7 +7611,28 @@ describe("Interactions", function () {
             assert.deepEqual(overData.data, ["left", "right"], "onHoverOver is called with the correct data");
             svg.remove();
         });
-        it("correctly triggers onHoverOut() callbacks", function () {
+        it("correctly triggers onHoverOver() callbacks (touch events)", function () {
+            overCallbackCalled = false;
+            triggerFakeTouchEvent("touchstart", hitbox, 100, 200);
+            assert.isTrue(overCallbackCalled, "onHoverOver was called on touching a target area");
+            assert.deepEqual(overData.pixelPositions, [testTarget.leftPoint], "onHoverOver was called with the correct pixel position (mouse onto left)");
+            assert.deepEqual(overData.data, ["left"], "onHoverOver was called with the correct data (mouse onto left)");
+            overCallbackCalled = false;
+            triggerFakeTouchEvent("touchstart", hitbox, 100, 200);
+            assert.isFalse(overCallbackCalled, "onHoverOver isn't called if the hover data didn't change");
+            overCallbackCalled = false;
+            triggerFakeTouchEvent("touchstart", hitbox, 200, 200);
+            assert.isTrue(overCallbackCalled, "onHoverOver was called when touch moves into a new region");
+            assert.deepEqual(overData.pixelPositions, [testTarget.rightPoint], "onHoverOver was called with the correct pixel position (left --> center)");
+            assert.deepEqual(overData.data, ["right"], "onHoverOver was called with the new data only (left --> center)");
+            triggerFakeTouchEvent("touchstart", hitbox, 401, 200);
+            overCallbackCalled = false;
+            triggerFakeTouchEvent("touchstart", hitbox, 200, 200);
+            assert.deepEqual(overData.pixelPositions, [testTarget.leftPoint, testTarget.rightPoint], "onHoverOver was called with the correct pixel positions");
+            assert.deepEqual(overData.data, ["left", "right"], "onHoverOver is called with the correct data");
+            svg.remove();
+        });
+        it("correctly triggers onHoverOut() callbacks (mouse events)", function () {
             triggerFakeMouseEvent("mouseover", hitbox, 100, 200);
             outCallbackCalled = false;
             triggerFakeMouseEvent("mousemove", hitbox, 200, 200);
@@ -7564,6 +7650,28 @@ describe("Interactions", function () {
             outCallbackCalled = false;
             triggerFakeMouseEvent("mouseover", hitbox, 200, 200);
             triggerFakeMouseEvent("mouseout", hitbox, 200, 401);
+            assert.deepEqual(outData.pixelPositions, [testTarget.leftPoint, testTarget.rightPoint], "onHoverOut was called with the correct pixel positions");
+            assert.deepEqual(outData.data, ["left", "right"], "onHoverOut is called with the correct data");
+            svg.remove();
+        });
+        it("correctly triggers onHoverOut() callbacks (touch events)", function () {
+            triggerFakeTouchEvent("touchstart", hitbox, 100, 200);
+            outCallbackCalled = false;
+            triggerFakeTouchEvent("touchstart", hitbox, 200, 200);
+            assert.isFalse(outCallbackCalled, "onHoverOut isn't called when mousing into a new region without leaving the old one");
+            outCallbackCalled = false;
+            triggerFakeTouchEvent("touchstart", hitbox, 300, 200);
+            assert.isTrue(outCallbackCalled, "onHoverOut was called when the hover data changes");
+            assert.deepEqual(outData.pixelPositions, [testTarget.leftPoint], "onHoverOut was called with the correct pixel position (center --> right)");
+            assert.deepEqual(outData.data, ["left"], "onHoverOut was called with the correct data (center --> right)");
+            outCallbackCalled = false;
+            triggerFakeTouchEvent("touchstart", hitbox, 401, 200);
+            assert.isTrue(outCallbackCalled, "onHoverOut is called on mousing out of the Component");
+            assert.deepEqual(outData.pixelPositions, [testTarget.rightPoint], "onHoverOut was called with the correct pixel position");
+            assert.deepEqual(outData.data, ["right"], "onHoverOut was called with the correct data");
+            outCallbackCalled = false;
+            triggerFakeTouchEvent("touchstart", hitbox, 200, 200);
+            triggerFakeTouchEvent("touchstart", hitbox, 200, 401);
             assert.deepEqual(outData.pixelPositions, [testTarget.leftPoint, testTarget.rightPoint], "onHoverOut was called with the correct pixel positions");
             assert.deepEqual(outData.data, ["left", "right"], "onHoverOut is called with the correct data");
             svg.remove();
@@ -7643,6 +7751,11 @@ describe("Dispatchers", function () {
             assert.isFalse(callbackWasCalled, "callback was removed by calling _setCallback() with null");
         });
     });
+});
+
+///<reference path="../testReference.ts" />
+var assert = chai.assert;
+describe("Dispatchers", function () {
     describe("Mouse Dispatcher", function () {
         function assertPointsClose(actual, expected, epsilon, message) {
             assert.closeTo(actual.x, expected.x, epsilon, message + " (x)");
@@ -7675,13 +7788,9 @@ describe("Dispatchers", function () {
             var targetY = 76;
             var md = Plottable.Dispatcher.Mouse.getDispatcher(target.node());
             var cb1Called = false;
-            var cb1 = function (p) {
-                cb1Called = true;
-            };
+            var cb1 = function (p, e) { return cb1Called = true; };
             var cb2Called = false;
-            var cb2 = function (p) {
-                cb2Called = true;
-            };
+            var cb2 = function (p, e) { return cb2Called = true; };
             md.onMouseMove("callback1", cb1);
             md.onMouseMove("callback2", cb2);
             triggerFakeMouseEvent("mousemove", target, targetX, targetY);
@@ -7704,9 +7813,7 @@ describe("Dispatchers", function () {
             var targetY = 76;
             var md = Plottable.Dispatcher.Mouse.getDispatcher(target.node());
             var callbackWasCalled = false;
-            var callback = function (p) {
-                callbackWasCalled = true;
-            };
+            var callback = function (p, e) { return callbackWasCalled = true; };
             var keyString = "notInDomTest";
             md.onMouseMove(keyString, callback);
             triggerFakeMouseEvent("mousemove", target, targetX, targetY);
@@ -7730,9 +7837,10 @@ describe("Dispatchers", function () {
             };
             var md = Plottable.Dispatcher.Mouse.getDispatcher(target.node());
             var callbackWasCalled = false;
-            var callback = function (p) {
+            var callback = function (p, e) {
                 callbackWasCalled = true;
                 assertPointsClose(p, expectedPoint, 0.5, "mouse position is correct");
+                assert.isNotNull(e, "mouse event was passed to the callback");
             };
             var keyString = "unit test";
             md.onMouseMove(keyString, callback);
@@ -7760,9 +7868,10 @@ describe("Dispatchers", function () {
             };
             var md = Plottable.Dispatcher.Mouse.getDispatcher(target.node());
             var callbackWasCalled = false;
-            var callback = function (p) {
+            var callback = function (p, e) {
                 callbackWasCalled = true;
                 assertPointsClose(p, expectedPoint, 0.5, "mouse position is correct");
+                assert.isNotNull(e, "mouse event was passed to the callback");
             };
             var keyString = "unit test";
             md.onMouseDown(keyString, callback);
@@ -7784,9 +7893,10 @@ describe("Dispatchers", function () {
             };
             var md = Plottable.Dispatcher.Mouse.getDispatcher(target.node());
             var callbackWasCalled = false;
-            var callback = function (p) {
+            var callback = function (p, e) {
                 callbackWasCalled = true;
                 assertPointsClose(p, expectedPoint, 0.5, "mouse position is correct");
+                assert.isNotNull(e, "mouse event was passed to the callback");
             };
             var keyString = "unit test";
             md.onMouseUp(keyString, callback);
@@ -7796,14 +7906,146 @@ describe("Dispatchers", function () {
             target.remove();
         });
     });
+});
+
+///<reference path="../testReference.ts" />
+var assert = chai.assert;
+describe("Dispatchers", function () {
+    describe("Touch Dispatcher", function () {
+        it("getDispatcher() creates only one Dispatcher.Touch per <svg>", function () {
+            var svg = generateSVG();
+            var td1 = Plottable.Dispatcher.Touch.getDispatcher(svg.node());
+            assert.isNotNull(td1, "created a new Dispatcher on an SVG");
+            var td2 = Plottable.Dispatcher.Touch.getDispatcher(svg.node());
+            assert.strictEqual(td1, td2, "returned the existing Dispatcher if called again with same <svg>");
+            svg.remove();
+        });
+        it("getLastTouchPosition() defaults to a non-null value", function () {
+            var svg = generateSVG();
+            var td = Plottable.Dispatcher.Touch.getDispatcher(svg.node());
+            var p = td.getLastTouchPosition();
+            assert.isNotNull(p, "returns a value after initialization");
+            assert.isNotNull(p.x, "x value is set");
+            assert.isNotNull(p.y, "y value is set");
+            svg.remove();
+        });
+        it("onTouchStart()", function () {
+            var targetWidth = 400, targetHeight = 400;
+            var target = generateSVG(targetWidth, targetHeight);
+            // HACKHACK: PhantomJS can't measure SVGs unless they have something in them occupying space
+            target.append("rect").attr("width", targetWidth).attr("height", targetHeight);
+            var targetX = 17;
+            var targetY = 76;
+            var expectedPoint = {
+                x: targetX,
+                y: targetY
+            };
+            var td = Plottable.Dispatcher.Touch.getDispatcher(target.node());
+            var callbackWasCalled = false;
+            var callback = function (p, e) {
+                callbackWasCalled = true;
+                assertPointsClose(p, expectedPoint, 0.5, "touch position is correct");
+                assert.isNotNull(e, "TouchEvent was passed to the Dispatcher");
+            };
+            var keyString = "unit test";
+            td.onTouchStart(keyString, callback);
+            triggerFakeTouchEvent("touchstart", target, targetX, targetY);
+            assert.isTrue(callbackWasCalled, "callback was called on touchstart");
+            td.onTouchStart(keyString, null);
+            target.remove();
+        });
+        it("onTouchMove()", function () {
+            var targetWidth = 400, targetHeight = 400;
+            var target = generateSVG(targetWidth, targetHeight);
+            // HACKHACK: PhantomJS can't measure SVGs unless they have something in them occupying space
+            target.append("rect").attr("width", targetWidth).attr("height", targetHeight);
+            var targetX = 17;
+            var targetY = 76;
+            var expectedPoint = {
+                x: targetX,
+                y: targetY
+            };
+            var td = Plottable.Dispatcher.Touch.getDispatcher(target.node());
+            var callbackWasCalled = false;
+            var callback = function (p, e) {
+                callbackWasCalled = true;
+                assertPointsClose(p, expectedPoint, 0.5, "touch position is correct");
+                assert.isNotNull(e, "TouchEvent was passed to the Dispatcher");
+            };
+            var keyString = "unit test";
+            td.onTouchMove(keyString, callback);
+            triggerFakeTouchEvent("touchmove", target, targetX, targetY);
+            assert.isTrue(callbackWasCalled, "callback was called on touchmove");
+            td.onTouchMove(keyString, null);
+            target.remove();
+        });
+        it("onTouchEnd()", function () {
+            var targetWidth = 400, targetHeight = 400;
+            var target = generateSVG(targetWidth, targetHeight);
+            // HACKHACK: PhantomJS can't measure SVGs unless they have something in them occupying space
+            target.append("rect").attr("width", targetWidth).attr("height", targetHeight);
+            var targetX = 17;
+            var targetY = 76;
+            var expectedPoint = {
+                x: targetX,
+                y: targetY
+            };
+            var td = Plottable.Dispatcher.Touch.getDispatcher(target.node());
+            var callbackWasCalled = false;
+            var callback = function (p, e) {
+                callbackWasCalled = true;
+                assertPointsClose(p, expectedPoint, 0.5, "touch position is correct");
+                assert.isNotNull(e, "TouchEvent was passed to the Dispatcher");
+            };
+            var keyString = "unit test";
+            td.onTouchEnd(keyString, callback);
+            triggerFakeTouchEvent("touchend", target, targetX, targetY);
+            assert.isTrue(callbackWasCalled, "callback was called on touchend");
+            td.onTouchEnd(keyString, null);
+            target.remove();
+        });
+        it("doesn't call callbacks if not in the DOM", function () {
+            var targetWidth = 400, targetHeight = 400;
+            var target = generateSVG(targetWidth, targetHeight);
+            // HACKHACK: PhantomJS can't measure SVGs unless they have something in them occupying space
+            target.append("rect").attr("width", targetWidth).attr("height", targetHeight);
+            var targetX = 17;
+            var targetY = 76;
+            var td = Plottable.Dispatcher.Touch.getDispatcher(target.node());
+            var callbackWasCalled = false;
+            var callback = function (p, e) {
+                callbackWasCalled = true;
+                assert.isNotNull(e, "TouchEvent was passed to the Dispatcher");
+            };
+            var keyString = "notInDomTest";
+            td.onTouchMove(keyString, callback);
+            triggerFakeTouchEvent("touchmove", target, targetX, targetY);
+            assert.isTrue(callbackWasCalled, "callback was called on touchmove");
+            target.remove();
+            callbackWasCalled = false;
+            triggerFakeTouchEvent("touchmove", target, targetX, targetY);
+            assert.isFalse(callbackWasCalled, "callback was not called after <svg> was removed from DOM");
+            td.onTouchMove(keyString, null);
+        });
+    });
+});
+
+///<reference path="../testReference.ts" />
+var assert = chai.assert;
+describe("Dispatchers", function () {
     describe("Key Dispatcher", function () {
         it("triggers callback on mousedown", function () {
             var ked = Plottable.Dispatcher.Key.getDispatcher();
+            var keyCodeToSend = 65;
             var keyDowned = false;
-            var callback = function () { return keyDowned = true; };
+            var callback = function (code, e) {
+                keyDowned = true;
+                assert.strictEqual(code, keyCodeToSend, "correct keycode was passed");
+                assert.isNotNull(e, "key event was passed to the callback");
+            };
             var keyString = "unit test";
             ked.onKeyDown(keyString, callback);
-            $("body").simulate("keydown", { keyCode: 65 });
+            $("body").simulate("keydown", { keyCode: keyCodeToSend });
             assert.isTrue(keyDowned, "callback when a key was pressed");
             ked.onKeyDown(keyString, null); // clean up
         });

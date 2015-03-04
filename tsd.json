@@ -18,6 +18,9 @@
     },
     "jquery.simulate/jquery.simulate.d.ts": {
       "commit": "dfa8d86385232fabd220c43a81a0bf4ca418f761"
+    },
+    "touch-events/touch-events.d.ts": {
+      "commit": "bb465f2cc799a41a7ccb688c6d1a8f5583dda12d"
     }
   }
 }

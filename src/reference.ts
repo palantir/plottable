@@ -9,6 +9,8 @@
 
 /// <reference path="utils/formatters.ts" />
 
+/// <reference path="utils/clientToSVGTranslator.ts" />
+
 /// <reference path="core/config.ts" />
 /// <reference path="core/version.ts" />
 /// <reference path="core/colors.ts" />
@@ -77,6 +79,7 @@
 
 /// <reference path="dispatchers/abstractDispatcher.ts" />
 /// <reference path="dispatchers/mouseDispatcher.ts" />
+/// <reference path="dispatchers/touchDispatcher.ts" />
 /// <reference path="dispatchers/keyDispatcher.ts" />
 
 /// <reference path="interactions/abstractInteraction.ts" />
