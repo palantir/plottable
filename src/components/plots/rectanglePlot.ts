@@ -2,8 +2,7 @@
 
 module Plottable {
 export module Plot {
-  export class Rectangle extends AbstractXYPlot<any, any> {
-    private _colorScale: Scale.AbstractScale<any, string>;
+  export class Rectangle<X, Y> extends AbstractXYPlot<X, Y> {
 
     /**
      * Constructs a RectanglePlot.
@@ -13,44 +12,16 @@ export module Plot {
      * corner of each rectangle (x2, y2)
      *
      * @constructor
-     * @param {Scale.Ordinal} xScale The x scale to use.
-     * @param {Scale.Ordinal} yScale The y scale to use.
+     * @param {Scale.AbstractScale} xScale The x scale to use.
+     * @param {Scale.AbstractScale} yScale The y scale to use.
      */
-    constructor(xScale: Scale.AbstractScale<any, any>, yScale: Scale.AbstractScale<any, any>,
-        colorScale: Scale.AbstractScale<any, string>) {
+    constructor(xScale: Scale.AbstractScale<X, any>, yScale: Scale.AbstractScale<Y, any>) {
       super(xScale, yScale);
-
-      // Category scales should not have padding by default
-      if (xScale instanceof Scale.Ordinal) {
-        (<Scale.Ordinal> xScale).innerPadding(0).outerPadding(0);
-      }
-      if (yScale instanceof Scale.Ordinal) {
-        (<Scale.Ordinal> yScale).innerPadding(0).outerPadding(0);
-      }
-
-      this._colorScale = colorScale;
       this.classed("rectangle-plot", true);
-    }
-
-    public addDataset(keyOrDataset: any, dataset?: any) {
-      super.addDataset(keyOrDataset, dataset);
-      return this;
     }
 
     protected _getDrawer(key: string) {
       return new _Drawer.Rect(key, true);
-    }
-
-    /**
-     * @param {string} attrToSet One of ["x", "y", "fill"]. If "fill" is used,
-     * the data should return a valid CSS color.
-     */
-    public project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>) {
-      super.project(attrToSet, accessor, scale);
-      if (attrToSet === "fill") {
-        this._colorScale = this._projections["fill"].scale;
-      }
-      return this;
     }
 
     protected _generateAttrToProjector() {
@@ -62,48 +33,22 @@ export module Plot {
       var x2Attr = attrToProjector["x2"];
       var y2Attr = attrToProjector["y2"];
 
-      // Infer width, with an exception for ordinal scales
-      if (x2Attr === undefined) {
-        attrToProjector["width"] = () => (<Scale.Ordinal> this._xScale).rangeBand();
-      } else {
-        attrToProjector["width"] = (d, i, u, m) => {
-          return Math.abs(x2Attr(d, i, u, m) - x1Attr(d, i, u, m));
-        };
+      // Define width if both x1 and x2 are defined
+      if (x1Attr !== undefined && x2Attr !== undefined) {
+        attrToProjector["width"] = (d, i, u, m) => Math.abs(x2Attr(d, i, u, m) - x1Attr(d, i, u, m));
       }
 
-      // Adjust x to respect the width for ordinal scales
-      attrToProjector["x"] = (d, i, u, m) => {
-        var offset = 0;
-        if (x2Attr === undefined) {
-          offset = attrToProjector["height"](d, i, u, m) / 2;
-        }
-        return x1Attr(d, i, u, m) - offset;
-      };
-
-
-      // Infer height, with an exception for ordinal scales
-      if (y2Attr === undefined) {
-        attrToProjector["height"] = () => (<Scale.Ordinal> this._yScale).rangeBand();
-      } else {
-        attrToProjector["height"] = (d, i, u, m) => {
-          return Math.abs(y2Attr(d, i, u, m) - y1Attr(d, i, u, m));
-        };
+      // Define height if both y1 and y2 are defined
+      if (y1Attr !== undefined && y2Attr !== undefined) {
+        attrToProjector["height"] = (d, i, u, m) => Math.abs(y2Attr(d, i, u, m) - y1Attr(d, i, u, m));
+        attrToProjector["y"] = (d, i, u, m) => y1Attr(d, i, u, m) - attrToProjector["height"](d, i, u, m);
       }
-
-      // Adjust y to respect the height, with an exception for ordinal scales
-      attrToProjector["y"] = (d, i, u, m) => {
-        var offset = attrToProjector["height"](d, i, u, m);
-        if (y2Attr === undefined) {
-          offset = offset / 2;
-        }
-        return y1Attr(d, i, u, m) - offset;
-      };
 
       return attrToProjector;
     }
 
     protected _generateDrawSteps(): _Drawer.DrawStep[] {
-      return [{attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("cells")}];
+      return [{attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("rectangles")}];
     }
   }
 }
