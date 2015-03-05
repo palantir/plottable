@@ -980,8 +980,27 @@ var Plottable;
 (function (Plottable) {
     var SymbolGenerators;
     (function (SymbolGenerators) {
+        /**
+         * The generic circle symbol.
+         *
+         * @returns {SymbolGenerator} the symbol generator for a circle
+         */
+        function circle() {
+            return d3.svg.symbol().type("circle").size(Math.pow(50, 2) * Math.PI);
+        }
+        SymbolGenerators.circle = circle;
+        /**
+         * A wrapper for D3's symbol generator as documented here:
+         * https://github.com/mbostock/d3/wiki/SVG-Shapes#symbol
+         *
+         * Note that since D3 symbols compute the path strings by knowing how much area it can take up instead of
+         * knowing its dimensions, the total area expected may be off by some constant factor.
+         *
+         * @param {string | ((datum: any, index: number) => string)} symbolType Accessor for the d3 symbol type
+         * @returns {SymbolGenerator} the symbol generator for a D3 symbol
+         */
         function d3Symbol(symbolType) {
-            return d3.svg.symbol().type(symbolType).size(Math.pow(100, 2));
+            return d3.svg.symbol().type(symbolType).size(Math.pow(50, 2));
         }
         SymbolGenerators.d3Symbol = d3Symbol;
     })(SymbolGenerators = Plottable.SymbolGenerators || (Plottable.SymbolGenerators = {}));
@@ -3322,7 +3341,7 @@ var Plottable;
                 delete attrToProjector["y"];
                 var rProjector = attrToProjector["r"];
                 delete attrToProjector["r"];
-                attrToProjector["transform"] = function (datum, index) { return "translate(" + xProjector(datum, index) + "," + yProjector(datum, index) + ") " + "scale(" + rProjector(datum, index) / 100 + ")"; };
+                attrToProjector["transform"] = function (datum, index) { return "translate(" + xProjector(datum, index) + "," + yProjector(datum, index) + ") " + "scale(" + rProjector(datum, index) / 50 + ")"; };
                 var symbolProjector = attrToProjector["symbol"];
                 delete attrToProjector["symbol"];
                 attrToProjector["d"] = symbolProjector;
@@ -6998,7 +7017,7 @@ var Plottable;
                 attrToProjector["r"] = attrToProjector["r"] || d3.functor(3);
                 attrToProjector["opacity"] = attrToProjector["opacity"] || d3.functor(0.6);
                 attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this._defaultFillColor);
-                attrToProjector["symbol"] = attrToProjector["symbol"] || Plottable.SymbolGenerators.d3Symbol("circle");
+                attrToProjector["symbol"] = attrToProjector["symbol"] || Plottable.SymbolGenerators.circle();
                 attrToProjector["vector-effect"] = attrToProjector["vector-effect"] || d3.functor("non-scaling-stroke");
                 return attrToProjector;
             };

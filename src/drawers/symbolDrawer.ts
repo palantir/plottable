@@ -31,7 +31,7 @@ export module _Drawer {
 
       attrToProjector["transform"] = (datum: any, index: number) =>
         "translate(" + xProjector(datum, index) + "," + yProjector(datum, index) + ") " +
-        "scale(" + rProjector(datum, index) / 100 + ")";
+        "scale(" + rProjector(datum, index) / 50 + ")";
 
       var symbolProjector = attrToProjector["symbol"];
       delete attrToProjector["symbol"];
