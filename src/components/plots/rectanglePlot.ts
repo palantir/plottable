@@ -33,11 +33,15 @@ export module Plot {
       var x2Attr = attrToProjector["x2"];
       var y2Attr = attrToProjector["y2"];
 
-      attrToProjector["width"] = (d, i, u, m) => Math.abs(x2Attr(d, i, u, m) - x1Attr(d, i, u, m));
-      attrToProjector["height"] = (d, i, u, m) => Math.abs(y2Attr(d, i, u, m) - y1Attr(d, i, u, m));
+      if (x2Attr !== undefined) {
+        attrToProjector["width"] = (d, i, u, m) => Math.abs(x2Attr(d, i, u, m) - x1Attr(d, i, u, m));
+        attrToProjector["x"] = (d, i, u, m) => Math.min(x1Attr(d, i, u, m), x2Attr(d, i, u, m));
+      }
 
-      attrToProjector["x"] = (d, i, u, m) => Math.min(x1Attr(d, i, u, m), x2Attr(d, i, u, m));
-      attrToProjector["y"] = (d, i, u, m) => Math.max(y1Attr(d, i, u, m), y2Attr(d, i, u, m)) - attrToProjector["height"](d, i, u, m);
+      if (y2Attr !== undefined) {
+        attrToProjector["height"] = (d, i, u, m) => Math.abs(y2Attr(d, i, u, m) - y1Attr(d, i, u, m));
+        attrToProjector["y"] = (d, i, u, m) => Math.max(y1Attr(d, i, u, m), y2Attr(d, i, u, m)) - attrToProjector["height"](d, i, u, m);
+      }
 
       return attrToProjector;
     }

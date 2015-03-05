@@ -6963,13 +6963,11 @@ var Plottable;
                 var y1Attr = attrToProjector["y"];
                 var x2Attr = attrToProjector["x2"];
                 var y2Attr = attrToProjector["y2"];
-                // Define width if both x1 and x2 are defined
-                if (x1Attr !== undefined && x2Attr !== undefined) {
+                if (x2Attr !== undefined) {
                     attrToProjector["width"] = function (d, i, u, m) { return Math.abs(x2Attr(d, i, u, m) - x1Attr(d, i, u, m)); };
                     attrToProjector["x"] = function (d, i, u, m) { return Math.min(x1Attr(d, i, u, m), x2Attr(d, i, u, m)); };
                 }
-                // Define height if both y1 and y2 are defined
-                if (y1Attr !== undefined && y2Attr !== undefined) {
+                if (y2Attr !== undefined) {
                     attrToProjector["height"] = function (d, i, u, m) { return Math.abs(y2Attr(d, i, u, m) - y1Attr(d, i, u, m)); };
                     attrToProjector["y"] = function (d, i, u, m) { return Math.max(y1Attr(d, i, u, m), y2Attr(d, i, u, m)) - attrToProjector["height"](d, i, u, m); };
                 }
