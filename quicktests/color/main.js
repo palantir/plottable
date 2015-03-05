@@ -123,7 +123,7 @@ function addAllDatasets(plot, arr, numOfDatasets){
 function generatePlots(plots, dataType){
   var plottablePlots = [];
   plots.forEach(function(PlotType){
-    var xScale = new Plottable.Scale.Ordinal();
+    var xScale = new Plottable.Scale.Category();
     var yScale = new Plottable.Scale.Linear();
     var colorScale = new Plottable.Scale.Color();
     var plot = new PlotType(xScale, yScale);
@@ -140,7 +140,7 @@ function generatePlots(plots, dataType){
 
     if (singleHorizontalPlots.indexOf(PlotType) > -1) { //if single horizontal plot
       xScale = new Plottable.Scale.Linear();
-      yScale = new Plottable.Scale.Ordinal();
+      yScale = new Plottable.Scale.Category();
       colorScale = new Plottable.Scale.Color();
       plot = new PlotType(xScale, yScale);
       plot.project("x", "y", xScale)
@@ -163,7 +163,7 @@ function generatePlots(plots, dataType){
 
     if (stackedHorizontalPlots.indexOf(PlotType) > -1) { //if stacked horizontal dataset plot
       xScale = new Plottable.Scale.Linear();
-      yScale = new Plottable.Scale.Ordinal();
+      yScale = new Plottable.Scale.Category();
       colorScale = new Plottable.Scale.Color();
       plot = new PlotType(xScale, yScale, false);
 

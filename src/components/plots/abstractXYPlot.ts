@@ -119,7 +119,7 @@ export module Plot {
     public _computeLayout(offeredXOrigin?: number, offeredYOffset?: number, availableWidth?: number, availableHeight?: number) {
       super._computeLayout(offeredXOrigin, offeredYOffset, availableWidth, availableHeight);
       this._xScale.range([0, this.width()]);
-      if (this._yScale instanceof Scale.Ordinal) {
+      if (this._yScale instanceof Scale.Category) {
         this._yScale.range([0, this.height()]);
       } else {
         this._yScale.range([this.height(), 0]);
