@@ -418,6 +418,7 @@ declare module Plottable {
      */
     type SymbolGenerator = (datum: any, index: number) => string;
     module SymbolGenerators {
+        var SYMBOL_GENERATOR_RADIUS: number;
         /**
          * The generic circle symbol.
          *

@@ -13,13 +13,15 @@ module Plottable {
 
   export module SymbolGenerators {
 
+    export var SYMBOL_GENERATOR_RADIUS = 50;
+
     /**
      * The generic circle symbol.
      *
      * @returns {SymbolGenerator} the symbol generator for a circle
      */
     export function circle() {
-      return d3.svg.symbol().type("circle").size(Math.pow(50, 2) * Math.PI);
+      return d3.svg.symbol().type("circle").size(Math.pow(SYMBOL_GENERATOR_RADIUS, 2) * Math.PI);
     }
 
     /**
@@ -33,7 +35,7 @@ module Plottable {
      * @returns {SymbolGenerator} the symbol generator for a D3 symbol
      */
     export function d3Symbol(symbolType: string | ((datum: any, index: number) => string)) {
-      return d3.svg.symbol().type(symbolType).size(Math.pow(50, 2));
+      return d3.svg.symbol().type(symbolType).size(Math.pow(SYMBOL_GENERATOR_RADIUS, 2));
     }
 
   }

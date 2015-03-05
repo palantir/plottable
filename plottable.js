@@ -980,13 +980,14 @@ var Plottable;
 (function (Plottable) {
     var SymbolGenerators;
     (function (SymbolGenerators) {
+        SymbolGenerators.SYMBOL_GENERATOR_RADIUS = 50;
         /**
          * The generic circle symbol.
          *
          * @returns {SymbolGenerator} the symbol generator for a circle
          */
         function circle() {
-            return d3.svg.symbol().type("circle").size(Math.pow(50, 2) * Math.PI);
+            return d3.svg.symbol().type("circle").size(Math.pow(SymbolGenerators.SYMBOL_GENERATOR_RADIUS, 2) * Math.PI);
         }
         SymbolGenerators.circle = circle;
         /**
@@ -1000,7 +1001,7 @@ var Plottable;
          * @returns {SymbolGenerator} the symbol generator for a D3 symbol
          */
         function d3Symbol(symbolType) {
-            return d3.svg.symbol().type(symbolType).size(Math.pow(50, 2));
+            return d3.svg.symbol().type(symbolType).size(Math.pow(SymbolGenerators.SYMBOL_GENERATOR_RADIUS, 2));
         }
         SymbolGenerators.d3Symbol = d3Symbol;
     })(SymbolGenerators = Plottable.SymbolGenerators || (Plottable.SymbolGenerators = {}));
