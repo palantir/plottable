@@ -2863,9 +2863,6 @@ declare module Plottable {
              * the data should return a valid CSS color.
              */
             project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): Grid;
-            protected _generateAttrToProjector(): {
-                [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
-            };
             protected _generateDrawSteps(): _Drawer.DrawStep[];
         }
     }

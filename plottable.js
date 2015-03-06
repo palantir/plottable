@@ -6959,18 +6959,14 @@ var Plottable;
             Rectangle.prototype._generateAttrToProjector = function () {
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
                 // Copy each of the different projectors
-                var x1Attr = attrToProjector["x"];
-                var y1Attr = attrToProjector["y"];
+                var x1Attr = attrToProjector["x1"] ? attrToProjector["x1"] : attrToProjector["x"];
+                var y1Attr = attrToProjector["y1"] ? attrToProjector["y1"] : attrToProjector["y"];
                 var x2Attr = attrToProjector["x2"];
                 var y2Attr = attrToProjector["y2"];
-                if (x2Attr !== undefined) {
-                    attrToProjector["width"] = function (d, i, u, m) { return Math.abs(x2Attr(d, i, u, m) - x1Attr(d, i, u, m)); };
-                    attrToProjector["x"] = function (d, i, u, m) { return Math.min(x1Attr(d, i, u, m), x2Attr(d, i, u, m)); };
-                }
-                if (y2Attr !== undefined) {
-                    attrToProjector["height"] = function (d, i, u, m) { return Math.abs(y2Attr(d, i, u, m) - y1Attr(d, i, u, m)); };
-                    attrToProjector["y"] = function (d, i, u, m) { return Math.max(y1Attr(d, i, u, m), y2Attr(d, i, u, m)) - attrToProjector["height"](d, i, u, m); };
-                }
+                attrToProjector["width"] = function (d, i, u, m) { return Math.abs(x2Attr(d, i, u, m) - x1Attr(d, i, u, m)); };
+                attrToProjector["x"] = function (d, i, u, m) { return Math.min(x1Attr(d, i, u, m), x2Attr(d, i, u, m)); };
+                attrToProjector["height"] = function (d, i, u, m) { return Math.abs(y2Attr(d, i, u, m) - y1Attr(d, i, u, m)); };
+                attrToProjector["y"] = function (d, i, u, m) { return Math.max(y1Attr(d, i, u, m), y2Attr(d, i, u, m)) - attrToProjector["height"](d, i, u, m); };
                 return attrToProjector;
             };
             Rectangle.prototype._generateDrawSteps = function () {
@@ -7176,38 +7172,46 @@ var Plottable;
              * the data should return a valid CSS color.
              */
             Grid.prototype.project = function (attrToSet, accessor, scale) {
+                var _this = this;
                 _super.prototype.project.call(this, attrToSet, accessor, scale);
+                // Use x to determine x1 by default
+                if (attrToSet === "x") {
+                    _super.prototype.project.call(this, "x1", function (d, i, u, m) {
+                        return scale.scale(_this._projections["x"].accessor(d, i, u, m));
+                    });
+                }
+                // Use y to determine y1 by default
+                if (attrToSet === "y") {
+                    _super.prototype.project.call(this, "y1", function (d, i, u, m) {
+                        return scale.scale(_this._projections["y"].accessor(d, i, u, m));
+                    });
+                }
+                // Situation where x is defined but x2 is not defined
+                if (attrToSet === "x" && this._projections["x2"] === undefined) {
+                    if (scale instanceof Plottable.Scale.Category) {
+                        _super.prototype.project.call(this, "x1", function (d, i, u, m) {
+                            return scale.scale(_this._projections["x"].accessor(d, i, u, m)) - scale.rangeBand() / 2;
+                        });
+                        _super.prototype.project.call(this, "x2", function (d, i, u, m) {
+                            return scale.scale(_this._projections["x"].accessor(d, i, u, m)) + scale.rangeBand() / 2;
+                        });
+                    }
+                }
+                // Situation where y is defined but y2 is not defined
+                if (attrToSet === "y" && this._projections["y2"] === undefined) {
+                    if (scale instanceof Plottable.Scale.Category) {
+                        _super.prototype.project.call(this, "y1", function (d, i, u, m) {
+                            return scale.scale(_this._projections["y"].accessor(d, i, u, m)) - scale.rangeBand() / 2;
+                        });
+                        _super.prototype.project.call(this, "y2", function (d, i, u, m) {
+                            return scale.scale(_this._projections["y"].accessor(d, i, u, m)) + scale.rangeBand() / 2;
+                        });
+                    }
+                }
                 if (attrToSet === "fill") {
                     this._colorScale = this._projections["fill"].scale;
                 }
                 return this;
-            };
-            Grid.prototype._generateAttrToProjector = function () {
-                var _this = this;
-                var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
-                // Copy each of the different projectors
-                var x1Attr = attrToProjector["x"];
-                var y1Attr = attrToProjector["y"];
-                var x2Attr = attrToProjector["x2"];
-                var y2Attr = attrToProjector["y2"];
-                // Adjust the xScale if it is ordinal
-                if (this._xScale instanceof Plottable.Scale.Category) {
-                    attrToProjector["width"] = function () { return _this._xScale.rangeBand(); };
-                    attrToProjector["x"] = function (d, i, u, m) { return x1Attr(d, i, u, m) - attrToProjector["width"](d, i, u, m) / 2; };
-                }
-                else {
-                    attrToProjector["width"] = function (d, i, u, m) { return Math.abs(x2Attr(d, i, u, m) - x1Attr(d, i, u, m)); };
-                }
-                // Adjust the yScale if it is ordinal
-                if (this._yScale instanceof Plottable.Scale.Category) {
-                    attrToProjector["height"] = function () { return _this._yScale.rangeBand(); };
-                    attrToProjector["y"] = function (d, i, u, m) { return y1Attr(d, i, u, m) - attrToProjector["height"](d, i, u, m) / 2; };
-                }
-                else {
-                    attrToProjector["height"] = function (d, i, u, m) { return Math.abs(y2Attr(d, i, u, m) - y1Attr(d, i, u, m)); };
-                    attrToProjector["y"] = function (d, i, u, m) { return y1Attr(d, i, u, m) - attrToProjector["height"](d, i, u, m); };
-                }
-                return attrToProjector;
             };
             Grid.prototype._generateDrawSteps = function () {
                 return [{ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("cells") }];

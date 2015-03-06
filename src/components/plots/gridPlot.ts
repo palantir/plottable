@@ -53,39 +53,50 @@ export module Plot {
      */
     public project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>) {
       super.project(attrToSet, accessor, scale);
+
+      // Use x to determine x1 by default
+      if (attrToSet === "x") {
+        super.project("x1", (d: any, i: number, u: any, m: Plot.PlotMetadata) => {
+          return scale.scale(this._projections["x"].accessor(d, i, u, m));
+        });
+      }
+
+      // Use y to determine y1 by default
+      if (attrToSet === "y") {
+        super.project("y1", (d: any, i: number, u: any, m: Plot.PlotMetadata) => {
+          return scale.scale(this._projections["y"].accessor(d, i, u, m));
+        });
+      }
+
+      // Situation where x is defined but x2 is not defined
+      if (attrToSet === "x" && this._projections["x2"] === undefined) {
+        if (scale instanceof Scale.Category) {
+          super.project("x1", (d: any, i: number, u: any, m: Plot.PlotMetadata) => {
+            return scale.scale(this._projections["x"].accessor(d, i, u, m)) - scale.rangeBand() / 2;
+          });
+          super.project("x2", (d: any, i: number, u: any, m: Plot.PlotMetadata) => {
+            return scale.scale(this._projections["x"].accessor(d, i, u, m)) + scale.rangeBand() / 2;
+          });
+        }
+      }
+
+      // Situation where y is defined but y2 is not defined
+      if (attrToSet === "y" && this._projections["y2"] === undefined) {
+        if (scale instanceof Scale.Category) {
+          super.project("y1", (d: any, i: number, u: any, m: Plot.PlotMetadata) => {
+            return scale.scale(this._projections["y"].accessor(d, i, u, m)) - scale.rangeBand() / 2;
+          });
+          super.project("y2", (d: any, i: number, u: any, m: Plot.PlotMetadata) => {
+            return scale.scale(this._projections["y"].accessor(d, i, u, m)) + scale.rangeBand() / 2;
+          });
+        }
+      }
+
       if (attrToSet === "fill") {
         this._colorScale = this._projections["fill"].scale;
       }
+
       return this;
-    }
-
-    protected _generateAttrToProjector() {
-      var attrToProjector = super._generateAttrToProjector();
-
-      // Copy each of the different projectors
-      var x1Attr = attrToProjector["x"];
-      var y1Attr = attrToProjector["y"];
-      var x2Attr = attrToProjector["x2"];
-      var y2Attr = attrToProjector["y2"];
-
-      // Adjust the xScale if it is ordinal
-      if (this._xScale instanceof Scale.Category) {
-        attrToProjector["width"] = () => (<Scale.Category> this._xScale).rangeBand();
-        attrToProjector["x"] = (d, i, u, m) => x1Attr(d, i, u, m) - attrToProjector["width"](d, i, u, m) / 2;
-      } else {
-        attrToProjector["width"] = (d, i, u, m) => Math.abs(x2Attr(d, i, u, m) - x1Attr(d, i, u, m));
-      }
-
-      // Adjust the yScale if it is ordinal
-      if (this._yScale instanceof Scale.Category) {
-        attrToProjector["height"] = () => (<Scale.Category> this._yScale).rangeBand();
-        attrToProjector["y"] = (d, i, u, m) => y1Attr(d, i, u, m) - attrToProjector["height"](d, i, u, m) / 2;
-      } else {
-        attrToProjector["height"] = (d, i, u, m) => Math.abs(y2Attr(d, i, u, m) - y1Attr(d, i, u, m));
-        attrToProjector["y"] = (d, i, u, m) => y1Attr(d, i, u, m) - attrToProjector["height"](d, i, u, m);
-      }
-
-      return attrToProjector;
     }
 
     protected _generateDrawSteps(): _Drawer.DrawStep[] {

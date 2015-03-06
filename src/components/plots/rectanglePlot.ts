@@ -27,21 +27,20 @@ export module Plot {
     protected _generateAttrToProjector() {
       var attrToProjector = super._generateAttrToProjector();
 
-      // Copy each of the different projectors
-      var x1Attr = attrToProjector["x"];
-      var y1Attr = attrToProjector["y"];
+      // Copy each of the different projectors.
+      // In the event that x1/y1 are not present, x/y will be directly leveraged
+      var x1Attr = attrToProjector["x1"] ? attrToProjector["x1"] : attrToProjector["x"];
+      var y1Attr = attrToProjector["y1"] ? attrToProjector["y1"] : attrToProjector["y"];
       var x2Attr = attrToProjector["x2"];
       var y2Attr = attrToProjector["y2"];
 
-      if (x2Attr !== undefined) {
-        attrToProjector["width"] = (d, i, u, m) => Math.abs(x2Attr(d, i, u, m) - x1Attr(d, i, u, m));
-        attrToProjector["x"] = (d, i, u, m) => Math.min(x1Attr(d, i, u, m), x2Attr(d, i, u, m));
-      }
+      // Generate width based on difference, then adjust for the correct x origin
+      attrToProjector["width"] = (d, i, u, m) => Math.abs(x2Attr(d, i, u, m) - x1Attr(d, i, u, m));
+      attrToProjector["x"] = (d, i, u, m) => Math.min(x1Attr(d, i, u, m), x2Attr(d, i, u, m));
 
-      if (y2Attr !== undefined) {
-        attrToProjector["height"] = (d, i, u, m) => Math.abs(y2Attr(d, i, u, m) - y1Attr(d, i, u, m));
-        attrToProjector["y"] = (d, i, u, m) => Math.max(y1Attr(d, i, u, m), y2Attr(d, i, u, m)) - attrToProjector["height"](d, i, u, m);
-      }
+      // Generate height based on difference, then adjust for the correct y origin
+      attrToProjector["height"] = (d, i, u, m) => Math.abs(y2Attr(d, i, u, m) - y1Attr(d, i, u, m));
+      attrToProjector["y"] = (d, i, u, m) => Math.max(y1Attr(d, i, u, m), y2Attr(d, i, u, m)) - attrToProjector["height"](d, i, u, m);
 
       return attrToProjector;
     }
