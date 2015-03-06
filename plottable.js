@@ -6970,6 +6970,11 @@ var Plottable;
                 // Generate height based on difference, then adjust for the correct y origin
                 attrToProjector["height"] = function (d, i, u, m) { return Math.abs(y2Attr(d, i, u, m) - y1Attr(d, i, u, m)); };
                 attrToProjector["y"] = function (d, i, u, m) { return Math.max(y1Attr(d, i, u, m), y2Attr(d, i, u, m)) - attrToProjector["height"](d, i, u, m); };
+                // Clean up the attributes projected onto the SVG elements
+                delete attrToProjector["x1"];
+                delete attrToProjector["y1"];
+                delete attrToProjector["x2"];
+                delete attrToProjector["y2"];
                 return attrToProjector;
             };
             Rectangle.prototype._generateDrawSteps = function () {
@@ -7177,19 +7182,16 @@ var Plottable;
             Grid.prototype.project = function (attrToSet, accessor, scale) {
                 var _this = this;
                 _super.prototype.project.call(this, attrToSet, accessor, scale);
-                // Use x to determine x1 by default
                 if (attrToSet === "x") {
                     _super.prototype.project.call(this, "x1", function (d, i, u, m) {
                         return scale.scale(_this._projections["x"].accessor(d, i, u, m));
                     });
                 }
-                // Use y to determine y1 by default
                 if (attrToSet === "y") {
                     _super.prototype.project.call(this, "y1", function (d, i, u, m) {
                         return scale.scale(_this._projections["y"].accessor(d, i, u, m));
                     });
                 }
-                // Situation where x is defined but x2 is not defined
                 if (attrToSet === "x" && this._projections["x2"] === undefined) {
                     if (scale instanceof Plottable.Scale.Category) {
                         _super.prototype.project.call(this, "x1", function (d, i, u, m) {
@@ -7200,7 +7202,6 @@ var Plottable;
                         });
                     }
                 }
-                // Situation where y is defined but y2 is not defined
                 if (attrToSet === "y" && this._projections["y2"] === undefined) {
                     if (scale instanceof Plottable.Scale.Category) {
                         _super.prototype.project.call(this, "y1", function (d, i, u, m) {

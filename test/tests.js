@@ -3479,17 +3479,6 @@ describe("Plots", function () {
             VERIFY_CELLS(rectanglePlot._renderArea.selectAll("rect"));
             svg.remove();
         });
-        it("renders correctly when data is set after construction", function () {
-            var xScale = new Plottable.Scale.Linear();
-            var yScale = new Plottable.Scale.Linear();
-            var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-            var dataset = new Plottable.Dataset();
-            var rectanglePlot = new Plottable.Plot.Rectangle(xScale, yScale);
-            rectanglePlot.addDataset(dataset).project("x", "x", xScale).project("y", "y", yScale).project("x2", "x2", xScale).project("y2", "y2", yScale).renderTo(svg);
-            dataset.data(DATA);
-            VERIFY_CELLS(rectanglePlot._renderArea.selectAll("rect"));
-            svg.remove();
-        });
     });
 });
 

@@ -42,6 +42,12 @@ export module Plot {
       attrToProjector["height"] = (d, i, u, m) => Math.abs(y2Attr(d, i, u, m) - y1Attr(d, i, u, m));
       attrToProjector["y"] = (d, i, u, m) => Math.max(y1Attr(d, i, u, m), y2Attr(d, i, u, m)) - attrToProjector["height"](d, i, u, m);
 
+      // Clean up the attributes projected onto the SVG elements
+      delete attrToProjector["x1"];
+      delete attrToProjector["y1"];
+      delete attrToProjector["x2"];
+      delete attrToProjector["y2"];
+
       return attrToProjector;
     }
 

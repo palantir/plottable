@@ -54,21 +54,18 @@ export module Plot {
     public project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>) {
       super.project(attrToSet, accessor, scale);
 
-      // Use x to determine x1 by default
       if (attrToSet === "x") {
         super.project("x1", (d: any, i: number, u: any, m: Plot.PlotMetadata) => {
           return scale.scale(this._projections["x"].accessor(d, i, u, m));
         });
       }
 
-      // Use y to determine y1 by default
       if (attrToSet === "y") {
         super.project("y1", (d: any, i: number, u: any, m: Plot.PlotMetadata) => {
           return scale.scale(this._projections["y"].accessor(d, i, u, m));
         });
       }
 
-      // Situation where x is defined but x2 is not defined
       if (attrToSet === "x" && this._projections["x2"] === undefined) {
         if (scale instanceof Scale.Category) {
           super.project("x1", (d: any, i: number, u: any, m: Plot.PlotMetadata) => {
@@ -80,7 +77,6 @@ export module Plot {
         }
       }
 
-      // Situation where y is defined but y2 is not defined
       if (attrToSet === "y" && this._projections["y2"] === undefined) {
         if (scale instanceof Scale.Category) {
           super.project("y1", (d: any, i: number, u: any, m: Plot.PlotMetadata) => {
