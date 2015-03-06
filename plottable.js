@@ -1,5 +1,5 @@
 /*!
-Plottable 0.45.1 (https://github.com/palantir/plottable)
+Plottable 0.47.0 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -978,6 +978,69 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
+    var _Util;
+    (function (_Util) {
+        var ClientToSVGTranslator = (function () {
+            function ClientToSVGTranslator(svg) {
+                this._svg = svg;
+                this._measureRect = document.createElementNS(svg.namespaceURI, "rect");
+                this._measureRect.setAttribute("class", "measure-rect");
+                this._measureRect.setAttribute("style", "opacity: 0; visibility: hidden;");
+                this._measureRect.setAttribute("width", "1");
+                this._measureRect.setAttribute("height", "1");
+                this._svg.appendChild(this._measureRect);
+            }
+            ClientToSVGTranslator.getTranslator = function (elem) {
+                var svg = _Util.DOM.getBoundingSVG(elem);
+                var translator = svg[ClientToSVGTranslator._TRANSLATOR_KEY];
+                if (translator == null) {
+                    translator = new ClientToSVGTranslator(svg);
+                    svg[ClientToSVGTranslator._TRANSLATOR_KEY] = translator;
+                }
+                return translator;
+            };
+            /**
+             * Computes the position relative to the <svg> in svg-coordinate-space.
+             */
+            ClientToSVGTranslator.prototype.computePosition = function (clientX, clientY) {
+                // get the origin
+                this._measureRect.setAttribute("x", "0");
+                this._measureRect.setAttribute("y", "0");
+                var mrBCR = this._measureRect.getBoundingClientRect();
+                var origin = { x: mrBCR.left, y: mrBCR.top };
+                // calculate the scale
+                var sampleDistance = 100;
+                this._measureRect.setAttribute("x", String(sampleDistance));
+                this._measureRect.setAttribute("y", String(sampleDistance));
+                mrBCR = this._measureRect.getBoundingClientRect();
+                var testPoint = { x: mrBCR.left, y: mrBCR.top };
+                // invalid measurements -- SVG might not be in the DOM
+                if (origin.x === testPoint.x || origin.y === testPoint.y) {
+                    return null;
+                }
+                var scaleX = (testPoint.x - origin.x) / sampleDistance;
+                var scaleY = (testPoint.y - origin.y) / sampleDistance;
+                // get the true cursor position
+                this._measureRect.setAttribute("x", String((clientX - origin.x) / scaleX));
+                this._measureRect.setAttribute("y", String((clientY - origin.y) / scaleY));
+                mrBCR = this._measureRect.getBoundingClientRect();
+                var trueCursorPosition = { x: mrBCR.left, y: mrBCR.top };
+                var scaledPosition = {
+                    x: (trueCursorPosition.x - origin.x) / scaleX,
+                    y: (trueCursorPosition.y - origin.y) / scaleY
+                };
+                return scaledPosition;
+            };
+            ClientToSVGTranslator._TRANSLATOR_KEY = "__Plottable_ClientToSVGTranslator";
+            return ClientToSVGTranslator;
+        })();
+        _Util.ClientToSVGTranslator = ClientToSVGTranslator;
+    })(_Util = Plottable._Util || (Plottable._Util = {}));
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var Plottable;
+(function (Plottable) {
     var Config;
     (function (Config) {
         /**
@@ -990,7 +1053,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "0.45.1";
+    Plottable.version = "0.47.0";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -1586,8 +1649,9 @@ var Plottable;
         Domainer.prototype._padDomain = function (scale, domain) {
             var min = domain[0];
             var max = domain[1];
-            if (min === max && this._padProportion > 0.0) {
-                var d = min.valueOf(); // valueOf accounts for dates properly
+            // valueOf accounts for dates properly
+            if (min.valueOf() === max.valueOf() && this._padProportion > 0.0) {
+                var d = min.valueOf();
                 if (min instanceof Date) {
                     return [d - Domainer._ONE_DAY, d + Domainer._ONE_DAY];
                 }
@@ -1595,7 +1659,8 @@ var Plottable;
                     return [d - Domainer._PADDING_FOR_IDENTICAL_DOMAIN, d + Domainer._PADDING_FOR_IDENTICAL_DOMAIN];
                 }
             }
-            if (scale.domain()[0] === scale.domain()[1]) {
+            var scaleDomain = scale.domain();
+            if (scaleDomain[0].valueOf() === scaleDomain[1].valueOf()) {
                 return domain;
             }
             var p = this._padProportion / 2;
@@ -1678,7 +1743,7 @@ var Plottable;
              * the data.
              *
              * Extent: The [min, max] pair for a Scale.Quantitative, all covered
-             * strings for a Scale.Ordinal.
+             * strings for a Scale.Category.
              *
              * Perspective: A combination of a Dataset and an Accessor that
              * represents a view in to the data.
@@ -2175,37 +2240,37 @@ var Plottable;
 (function (Plottable) {
     var Scale;
     (function (Scale) {
-        var Ordinal = (function (_super) {
-            __extends(Ordinal, _super);
+        var Category = (function (_super) {
+            __extends(Category, _super);
             /**
-             * Creates an OrdinalScale.
+             * Creates a CategoryScale.
              *
-             * An OrdinalScale maps strings to numbers. A common use is to map the
+             * A CategoryScale maps strings to numbers. A common use is to map the
              * labels of a bar plot (strings) to their pixel locations (numbers).
              *
              * @constructor
              */
-            function Ordinal(scale) {
+            function Category(scale) {
                 if (scale === void 0) { scale = d3.scale.ordinal(); }
                 _super.call(this, scale);
                 this._range = [0, 1];
                 this._typeCoercer = function (d) { return d != null && d.toString ? d.toString() : d; };
                 var d3InnerPadding = 0.3;
-                this._innerPadding = Ordinal._convertToPlottableInnerPadding(d3InnerPadding);
-                this._outerPadding = Ordinal._convertToPlottableOuterPadding(0.5, d3InnerPadding);
+                this._innerPadding = Category._convertToPlottableInnerPadding(d3InnerPadding);
+                this._outerPadding = Category._convertToPlottableOuterPadding(0.5, d3InnerPadding);
             }
-            Ordinal.prototype._getExtent = function () {
+            Category.prototype._getExtent = function () {
                 var extents = this._getAllExtents();
                 return Plottable._Util.Methods.uniq(Plottable._Util.Methods.flatten(extents));
             };
-            Ordinal.prototype.domain = function (values) {
+            Category.prototype.domain = function (values) {
                 return _super.prototype.domain.call(this, values);
             };
-            Ordinal.prototype._setDomain = function (values) {
+            Category.prototype._setDomain = function (values) {
                 _super.prototype._setDomain.call(this, values);
                 this.range(this.range()); // update range
             };
-            Ordinal.prototype.range = function (values) {
+            Category.prototype.range = function (values) {
                 if (values == null) {
                     return this._range;
                 }
@@ -2217,10 +2282,10 @@ var Plottable;
                     return this;
                 }
             };
-            Ordinal._convertToPlottableInnerPadding = function (d3InnerPadding) {
+            Category._convertToPlottableInnerPadding = function (d3InnerPadding) {
                 return 1 / (1 - d3InnerPadding) - 1;
             };
-            Ordinal._convertToPlottableOuterPadding = function (d3OuterPadding, d3InnerPadding) {
+            Category._convertToPlottableOuterPadding = function (d3OuterPadding, d3InnerPadding) {
                 return d3OuterPadding / (1 - d3InnerPadding);
             };
             /**
@@ -2228,7 +2293,7 @@ var Plottable;
              *
              * @returns {number} The range band width
              */
-            Ordinal.prototype.rangeBand = function () {
+            Category.prototype.rangeBand = function () {
                 return this._d3Scale.rangeBand();
             };
             /**
@@ -2239,10 +2304,10 @@ var Plottable;
              *
              * @returns {number} the full band width of the scale
              */
-            Ordinal.prototype.stepWidth = function () {
+            Category.prototype.stepWidth = function () {
                 return this.rangeBand() * (1 + this.innerPadding());
             };
-            Ordinal.prototype.innerPadding = function (innerPadding) {
+            Category.prototype.innerPadding = function (innerPadding) {
                 if (innerPadding == null) {
                     return this._innerPadding;
                 }
@@ -2251,7 +2316,7 @@ var Plottable;
                 this.broadcaster.broadcast();
                 return this;
             };
-            Ordinal.prototype.outerPadding = function (outerPadding) {
+            Category.prototype.outerPadding = function (outerPadding) {
                 if (outerPadding == null) {
                     return this._outerPadding;
                 }
@@ -2260,16 +2325,16 @@ var Plottable;
                 this.broadcaster.broadcast();
                 return this;
             };
-            Ordinal.prototype.copy = function () {
-                return new Ordinal(this._d3Scale.copy());
+            Category.prototype.copy = function () {
+                return new Category(this._d3Scale.copy());
             };
-            Ordinal.prototype.scale = function (value) {
+            Category.prototype.scale = function (value) {
                 //scale it to the middle
                 return _super.prototype.scale.call(this, value) + this.rangeBand() / 2;
             };
-            return Ordinal;
+            return Category;
         })(Scale.AbstractScale);
-        Scale.Ordinal = Ordinal;
+        Scale.Category = Category;
     })(Scale = Plottable.Scale || (Plottable.Scale = {}));
 })(Plottable || (Plottable = {}));
 
@@ -4952,12 +5017,12 @@ var Plottable;
             /**
              * Constructs a CategoryAxis.
              *
-             * A CategoryAxis takes an OrdinalScale and includes word-wrapping
+             * A CategoryAxis takes a CategoryScale and includes word-wrapping
              * algorithms and advanced layout logic to try to display the scale as
              * efficiently as possible.
              *
              * @constructor
-             * @param {OrdinalScale} scale The scale to base the Axis on.
+             * @param {CategoryScale} scale The scale to base the Axis on.
              * @param {string} orientation The orientation of the Axis (top/bottom/left/right) (default = "bottom").
              * @param {Formatter} formatter The Formatter for the Axis (default Formatters.identity())
              */
@@ -4983,15 +5048,15 @@ var Plottable;
                 if (this._scale.domain().length === 0) {
                     return { width: 0, height: 0, wantsWidth: false, wantsHeight: false };
                 }
-                var ordinalScale = this._scale;
-                var fakeScale = ordinalScale.copy();
+                var categoryScale = this._scale;
+                var fakeScale = categoryScale.copy();
                 if (this._isHorizontal()) {
                     fakeScale.range([0, offeredWidth]);
                 }
                 else {
                     fakeScale.range([offeredHeight, 0]);
                 }
-                var textResult = this._measureTicks(offeredWidth, offeredHeight, fakeScale, ordinalScale.domain());
+                var textResult = this._measureTicks(offeredWidth, offeredHeight, fakeScale, categoryScale.domain());
                 return {
                     width: textResult.usedWidth + widthRequiredByTicks,
                     height: textResult.usedHeight + heightRequiredByTicks,
@@ -5065,21 +5130,25 @@ var Plottable;
                         if (_this._tickLabelAngle !== 0) {
                             width = axisHeight - _this._maxLabelTickLength() - _this.tickLabelPadding(); // use the axis height
                         }
+                        // HACKHACK: Wrapper fails under negative circumstances
+                        width = Math.max(width, 0);
                     }
                     // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
                     var height = bandWidth; // default for left/right
                     if (_this._isHorizontal()) {
-                        height = axisHeight;
+                        height = axisHeight - _this._maxLabelTickLength() - _this.tickLabelPadding();
                         if (_this._tickLabelAngle !== 0) {
                             height = axisWidth - _this._maxLabelTickLength() - _this.tickLabelPadding();
                         }
+                        // HACKHACK: Wrapper fails under negative circumstances
+                        height = Math.max(height, 0);
                     }
                     return _this._wrapper.wrap(_this.formatter()(s), _this._measurer, width, height);
                 });
                 // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
                 var widthFn = (this._isHorizontal() && this._tickLabelAngle === 0) ? d3.sum : Plottable._Util.Methods.max;
                 var heightFn = (this._isHorizontal() && this._tickLabelAngle === 0) ? Plottable._Util.Methods.max : d3.sum;
-                var textFits = wrappingResults.every(function (t) { return SVGTypewriter.Utils.StringMethods.isNotEmptyString(t.truncatedText) && t.noLines === 1; });
+                var textFits = wrappingResults.every(function (t) { return !SVGTypewriter.Utils.StringMethods.isNotEmptyString(t.truncatedText) && t.noLines === 1; });
                 var usedWidth = widthFn(wrappingResults, function (t) { return _this._measurer.measure(t.wrappedText).width; }, 0);
                 var usedHeight = heightFn(wrappingResults, function (t) { return _this._measurer.measure(t.wrappedText).height; }, 0);
                 // If the tick labels are rotated, reverse usedWidth and usedHeight
@@ -5098,11 +5167,11 @@ var Plottable;
             Category.prototype._doRender = function () {
                 var _this = this;
                 _super.prototype._doRender.call(this);
-                var ordScale = this._scale;
+                var catScale = this._scale;
                 var tickLabels = this._tickLabelContainer.selectAll("." + Axis.AbstractAxis.TICK_LABEL_CLASS).data(this._scale.domain(), function (d) { return d; });
                 var getTickLabelTransform = function (d, i) {
-                    var innerPaddingWidth = ordScale.stepWidth() - ordScale.rangeBand();
-                    var scaledValue = ordScale.scale(d) - ordScale.rangeBand() / 2 - innerPaddingWidth / 2;
+                    var innerPaddingWidth = catScale.stepWidth() - catScale.rangeBand();
+                    var scaledValue = catScale.scale(d) - catScale.rangeBand() / 2 - innerPaddingWidth / 2;
                     var x = _this._isHorizontal() ? scaledValue : 0;
                     var y = _this._isHorizontal() ? 0 : scaledValue;
                     return "translate(" + x + "," + y + ")";
@@ -5112,8 +5181,8 @@ var Plottable;
                 tickLabels.attr("transform", getTickLabelTransform);
                 // erase all text first, then rewrite
                 tickLabels.text("");
-                this._drawTicks(this.width(), this.height(), ordScale, tickLabels);
-                var translate = this._isHorizontal() ? [ordScale.rangeBand() / 2, 0] : [0, ordScale.rangeBand() / 2];
+                this._drawTicks(this.width(), this.height(), catScale, tickLabels);
+                var translate = this._isHorizontal() ? [catScale.rangeBand() / 2, 0] : [0, catScale.rangeBand() / 2];
                 var xTranslate = this.orient() === "right" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
                 var yTranslate = this.orient() === "bottom" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
                 Plottable._Util.DOM.translate(this._tickLabelContainer, xTranslate, yTranslate);
@@ -6538,19 +6607,26 @@ var Plottable;
              *
              * @param {string | string[]} datasetKeys The dataset(s) to retrieve the selections from.
              * If not provided, all selections will be retrieved.
+             * @param {boolean} exclude If set to true, all datasets will be queried excluding the keys referenced
+             * in the previous datasetKeys argument (default = false).
              * @returns {D3.Selection} The retrieved selections.
              */
-            AbstractPlot.prototype.getAllSelections = function (datasetKeys) {
+            AbstractPlot.prototype.getAllSelections = function (datasetKeys, exclude) {
                 var _this = this;
+                if (exclude === void 0) { exclude = false; }
                 var datasetKeyArray = [];
                 if (datasetKeys == null) {
-                    datasetKeyArray = this._datasetKeysInOrder;
+                    datasetKeyArray = this.datasetOrder();
                 }
                 else if (typeof (datasetKeys) === "string") {
                     datasetKeyArray = [datasetKeys];
                 }
                 else {
                     datasetKeyArray = datasetKeys;
+                }
+                if (exclude) {
+                    var excludedDatasetKeys = d3.set(datasetKeyArray);
+                    datasetKeyArray = this.datasetOrder().filter(function (datasetKey) { return !excludedDatasetKeys.has(datasetKey); });
                 }
                 var allSelections = [];
                 datasetKeyArray.forEach(function (datasetKey) {
@@ -6787,7 +6863,7 @@ var Plottable;
             AbstractXYPlot.prototype._computeLayout = function (offeredXOrigin, offeredYOffset, availableWidth, availableHeight) {
                 _super.prototype._computeLayout.call(this, offeredXOrigin, offeredYOffset, availableWidth, availableHeight);
                 this._xScale.range([0, this.width()]);
-                if (this._yScale instanceof Plottable.Scale.Ordinal) {
+                if (this._yScale instanceof Plottable.Scale.Category) {
                     this._yScale.range([0, this.height()]);
                 }
                 else {
@@ -7047,8 +7123,8 @@ var Plottable;
              * grid, and the datum can control what color it is.
              *
              * @constructor
-             * @param {Scale.Ordinal} xScale The x scale to use.
-             * @param {Scale.Ordinal} yScale The y scale to use.
+             * @param {Scale.Category} xScale The x scale to use.
+             * @param {Scale.Category} yScale The y scale to use.
              * @param {Scale.Color|Scale.InterpolatedColor} colorScale The color scale
              * to use for each grid cell.
              */
@@ -7339,7 +7415,7 @@ var Plottable;
                 };
                 attrToProjector["width"] = this._isVertical ? widthF : heightF;
                 attrToProjector["height"] = this._isVertical ? heightF : widthF;
-                if (secondaryScale instanceof Plottable.Scale.Ordinal) {
+                if (secondaryScale instanceof Plottable.Scale.Category) {
                     attrToProjector[secondaryAttr] = function (d, i, u, m) { return positionF(d, i, u, m) - widthF(d, i, u, m) / 2; };
                 }
                 else {
@@ -7365,8 +7441,8 @@ var Plottable;
             /**
              * Computes the barPixelWidth of all the bars in the plot.
              *
-             * If the position scale of the plot is an OrdinalScale and in bands mode, then the rangeBands function will be used.
-             * If the position scale of the plot is an OrdinalScale and in points mode, then
+             * If the position scale of the plot is a CategoryScale and in bands mode, then the rangeBands function will be used.
+             * If the position scale of the plot is a CategoryScale and in points mode, then
              *   from https://github.com/mbostock/d3/wiki/Ordinal-Scales#ordinal_rangePoints, the max barPixelWidth is step * padding
              * If the position scale of the plot is a QuantitativeScale, then _getMinimumDataWidth is scaled to compute the barPixelWidth
              */
@@ -7374,7 +7450,7 @@ var Plottable;
                 var _this = this;
                 var barPixelWidth;
                 var barScale = this._isVertical ? this._xScale : this._yScale;
-                if (barScale instanceof Plottable.Scale.Ordinal) {
+                if (barScale instanceof Plottable.Scale.Category) {
                     barPixelWidth = barScale.rangeBand();
                 }
                 else {
@@ -7788,7 +7864,7 @@ var Plottable;
                 });
             };
             ClusteredBar.prototype._makeInnerScale = function () {
-                var innerScale = new Plottable.Scale.Ordinal();
+                var innerScale = new Plottable.Scale.Category();
                 innerScale.domain(this._datasetKeysInOrder);
                 if (!this._projections["width"]) {
                     innerScale.range([0, this._getBarPixelWidth()]);
@@ -8581,13 +8657,7 @@ var Plottable;
             function Mouse(svg) {
                 var _this = this;
                 _super.call(this);
-                this._svg = svg;
-                this._measureRect = document.createElementNS(svg.namespaceURI, "rect");
-                this._measureRect.setAttribute("class", "measure-rect");
-                this._measureRect.setAttribute("style", "opacity: 0; visibility: hidden;");
-                this._measureRect.setAttribute("width", "1");
-                this._measureRect.setAttribute("height", "1");
-                this._svg.appendChild(this._measureRect);
+                this.translator = Plottable._Util.ClientToSVGTranslator.getTranslator(svg);
                 this._lastMousePosition = { x: -1, y: -1 };
                 this._moveBroadcaster = new Plottable.Core.Broadcaster(this);
                 this._processMoveCallback = function (e) { return _this._measureAndBroadcast(e, _this._moveBroadcaster); };
@@ -8619,8 +8689,7 @@ var Plottable;
                 return dispatcher;
             };
             Mouse.prototype._getWrappedCallback = function (callback) {
-                var _this = this;
-                return function () { return callback(_this.getLastMousePosition()); };
+                return function (md, p, e) { return callback(p, e); };
             };
             /**
              * Registers a callback to be called whenever the mouse position changes,
@@ -8672,43 +8741,11 @@ var Plottable;
              * calls broadcast() on the supplied Broadcaster.
              */
             Mouse.prototype._measureAndBroadcast = function (e, b) {
-                var newMousePosition = this._computeMousePosition(e.clientX, e.clientY);
+                var newMousePosition = this.translator.computePosition(e.clientX, e.clientY);
                 if (newMousePosition != null) {
                     this._lastMousePosition = newMousePosition;
-                    b.broadcast();
+                    b.broadcast(this.getLastMousePosition(), e);
                 }
-            };
-            /**
-             * Computes the mouse position relative to the <svg> in svg-coordinate-space.
-             */
-            Mouse.prototype._computeMousePosition = function (clientX, clientY) {
-                // get the origin
-                this._measureRect.setAttribute("x", "0");
-                this._measureRect.setAttribute("y", "0");
-                var mrBCR = this._measureRect.getBoundingClientRect();
-                var origin = { x: mrBCR.left, y: mrBCR.top };
-                // calculate the scale
-                var sampleDistance = 100;
-                this._measureRect.setAttribute("x", String(sampleDistance));
-                this._measureRect.setAttribute("y", String(sampleDistance));
-                mrBCR = this._measureRect.getBoundingClientRect();
-                var testPoint = { x: mrBCR.left, y: mrBCR.top };
-                // invalid measurements -- SVG might not be in the DOM
-                if (origin.x === testPoint.x || origin.y === testPoint.y) {
-                    return null;
-                }
-                var scaleX = (testPoint.x - origin.x) / sampleDistance;
-                var scaleY = (testPoint.y - origin.y) / sampleDistance;
-                // get the true cursor position
-                this._measureRect.setAttribute("x", String((clientX - origin.x) / scaleX));
-                this._measureRect.setAttribute("y", String((clientY - origin.y) / scaleY));
-                mrBCR = this._measureRect.getBoundingClientRect();
-                var trueCursorPosition = { x: mrBCR.left, y: mrBCR.top };
-                var scaledPosition = {
-                    x: (trueCursorPosition.x - origin.x) / scaleX,
-                    y: (trueCursorPosition.y - origin.y) / scaleY
-                };
-                return scaledPosition;
             };
             /**
              * Returns the last computed mouse position.
@@ -8722,6 +8759,137 @@ var Plottable;
             return Mouse;
         })(Dispatcher.AbstractDispatcher);
         Dispatcher.Mouse = Mouse;
+    })(Dispatcher = Plottable.Dispatcher || (Plottable.Dispatcher = {}));
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    var Dispatcher;
+    (function (Dispatcher) {
+        var Touch = (function (_super) {
+            __extends(Touch, _super);
+            /**
+             * Creates a Dispatcher.Touch.
+             * This constructor should not be invoked directly under most circumstances.
+             *
+             * @param {SVGElement} svg The root <svg> element to attach to.
+             */
+            function Touch(svg) {
+                var _this = this;
+                _super.call(this);
+                this.translator = Plottable._Util.ClientToSVGTranslator.getTranslator(svg);
+                this._lastTouchPosition = { x: -1, y: -1 };
+                this._moveBroadcaster = new Plottable.Core.Broadcaster(this);
+                this._processMoveCallback = function (e) { return _this._measureAndBroadcast(e, _this._moveBroadcaster); };
+                this._event2Callback["touchmove"] = this._processMoveCallback;
+                this._startBroadcaster = new Plottable.Core.Broadcaster(this);
+                this._processStartCallback = function (e) { return _this._measureAndBroadcast(e, _this._startBroadcaster); };
+                this._event2Callback["touchstart"] = this._processStartCallback;
+                this._endBroadcaster = new Plottable.Core.Broadcaster(this);
+                this._processEndCallback = function (e) { return _this._measureAndBroadcast(e, _this._endBroadcaster); };
+                this._event2Callback["touchend"] = this._processEndCallback;
+                this._broadcasters = [this._moveBroadcaster, this._startBroadcaster, this._endBroadcaster];
+            }
+            /**
+             * Get a Dispatcher.Touch for the <svg> containing elem. If one already exists
+             * on that <svg>, it will be returned; otherwise, a new one will be created.
+             *
+             * @param {SVGElement} elem A svg DOM element.
+             * @return {Dispatcher.Touch} A Dispatcher.Touch
+             */
+            Touch.getDispatcher = function (elem) {
+                var svg = Plottable._Util.DOM.getBoundingSVG(elem);
+                var dispatcher = svg[Touch._DISPATCHER_KEY];
+                if (dispatcher == null) {
+                    dispatcher = new Touch(svg);
+                    svg[Touch._DISPATCHER_KEY] = dispatcher;
+                }
+                return dispatcher;
+            };
+            Touch.prototype._getWrappedCallback = function (callback) {
+                return function (td, p, e) { return callback(p, e); };
+            };
+            /**
+             * Registers a callback to be called whenever a touch starts,
+             * or removes the callback if `null` is passed as the callback.
+             *
+             * @param {any} key The key associated with the callback.
+             *                  Key uniqueness is determined by deep equality.
+             * @param {TouchCallback} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space. Pass `null`
+             *                                     to remove a callback.
+             * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
+             */
+            Touch.prototype.onTouchStart = function (key, callback) {
+                this._setCallback(this._startBroadcaster, key, callback);
+                return this;
+            };
+            /**
+             * Registers a callback to be called whenever the touch position changes,
+             * or removes the callback if `null` is passed as the callback.
+             *
+             * @param {any} key The key associated with the callback.
+             *                  Key uniqueness is determined by deep equality.
+             * @param {TouchCallback} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space. Pass `null`
+             *                                     to remove a callback.
+             * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
+             */
+            Touch.prototype.onTouchMove = function (key, callback) {
+                this._setCallback(this._moveBroadcaster, key, callback);
+                return this;
+            };
+            /**
+             * Registers a callback to be called whenever a touch ends,
+             * or removes the callback if `null` is passed as the callback.
+             *
+             * @param {any} key The key associated with the callback.
+             *                  Key uniqueness is determined by deep equality.
+             * @param {TouchCallback} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space. Pass `null`
+             *                                     to remove a callback.
+             * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
+             */
+            Touch.prototype.onTouchEnd = function (key, callback) {
+                this._setCallback(this._endBroadcaster, key, callback);
+                return this;
+            };
+            /**
+             * Computes the Touch position from the given event, and if successful
+             * calls broadcast() on the supplied Broadcaster.
+             */
+            Touch.prototype._measureAndBroadcast = function (e, b) {
+                var touch = e.changedTouches[0];
+                var newTouchPosition = this.translator.computePosition(touch.clientX, touch.clientY);
+                if (newTouchPosition != null) {
+                    this._lastTouchPosition = newTouchPosition;
+                    b.broadcast(this.getLastTouchPosition(), e);
+                }
+            };
+            /**
+             * Returns the last computed Touch position.
+             *
+             * @return {Point} The last known Touch position in <svg> coordinate space.
+             */
+            Touch.prototype.getLastTouchPosition = function () {
+                return this._lastTouchPosition;
+            };
+            /**
+             * Dispatcher.Touch calls callbacks when touch events occur.
+             * It reports the (x, y) position of the first Touch relative to the
+             * <svg> it is attached to.
+             */
+            Touch._DISPATCHER_KEY = "__Plottable_Dispatcher_Touch";
+            return Touch;
+        })(Dispatcher.AbstractDispatcher);
+        Dispatcher.Touch = Touch;
     })(Dispatcher = Plottable.Dispatcher || (Plottable.Dispatcher = {}));
 })(Plottable || (Plottable = {}));
 
@@ -8767,7 +8935,7 @@ var Plottable;
                 return dispatcher;
             };
             Key.prototype._getWrappedCallback = function (callback) {
-                return function (d, e) { return callback(e.keyCode); };
+                return function (d, e) { return callback(e.keyCode, e); };
             };
             /**
              * Registers a callback to be called whenever a key is pressed,
@@ -9536,10 +9704,12 @@ var Plottable;
             Hover.prototype._anchor = function (component, hitBox) {
                 var _this = this;
                 _super.prototype._anchor.call(this, component, hitBox);
-                this._dispatcher = Plottable.Dispatcher.Mouse.getDispatcher(this._componentToListenTo._element.node());
-                this._dispatcher.onMouseMove("hover" + this.getID(), function (p) { return _this._handleMouseEvent(p); });
+                this._mouseDispatcher = Plottable.Dispatcher.Mouse.getDispatcher(this._componentToListenTo._element.node());
+                this._mouseDispatcher.onMouseMove("hover" + this.getID(), function (p) { return _this._handlePointerEvent(p); });
+                this._touchDispatcher = Plottable.Dispatcher.Touch.getDispatcher(this._componentToListenTo._element.node());
+                this._touchDispatcher.onTouchStart("hover" + this.getID(), function (p, e) { return _this._handlePointerEvent(p); });
             };
-            Hover.prototype._handleMouseEvent = function (p) {
+            Hover.prototype._handlePointerEvent = function (p) {
                 p = this._translateToComponentSpace(p);
                 if (this._isInsideComponent(p)) {
                     if (!this._overComponent) {

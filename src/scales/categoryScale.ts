@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Scale {
-  export class Ordinal extends AbstractScale<string, number> {
+  export class Category extends AbstractScale<string, number> {
     protected _d3Scale: D3.Scale.OrdinalScale;
     private _range = [0, 1];
 
@@ -11,9 +11,9 @@ export module Scale {
     public _typeCoercer: (d: any) => any = (d: any) => d != null && d.toString ? d.toString() : d;
 
     /**
-     * Creates an OrdinalScale.
+     * Creates a CategoryScale.
      *
-     * An OrdinalScale maps strings to numbers. A common use is to map the
+     * A CategoryScale maps strings to numbers. A common use is to map the
      * labels of a bar plot (strings) to their pixel locations (numbers).
      *
      * @constructor
@@ -22,8 +22,8 @@ export module Scale {
       super(scale);
 
       var d3InnerPadding = 0.3;
-      this._innerPadding = Ordinal._convertToPlottableInnerPadding(d3InnerPadding);
-      this._outerPadding = Ordinal._convertToPlottableOuterPadding(0.5, d3InnerPadding);
+      this._innerPadding = Category._convertToPlottableInnerPadding(d3InnerPadding);
+      this._outerPadding = Category._convertToPlottableOuterPadding(0.5, d3InnerPadding);
     }
 
     protected _getExtent(): string[] {
@@ -32,7 +32,7 @@ export module Scale {
     }
 
     public domain(): string[];
-    public domain(values: string[]): Ordinal;
+    public domain(values: string[]): Category;
     public domain(values?: string[]): any {
       return super.domain(values);
     }
@@ -43,7 +43,7 @@ export module Scale {
     }
 
     public range(): number[];
-    public range(values: number[]): Ordinal;
+    public range(values: number[]): Category;
     public range(values?: number[]): any {
       if (values == null) {
         return this._range;
@@ -102,7 +102,7 @@ export module Scale {
      *
      * @returns {Ordinal} The calling Scale.Ordinal
      */
-    public innerPadding(innerPadding: number): Ordinal;
+    public innerPadding(innerPadding: number): Category;
     public innerPadding(innerPadding?: number): any {
       if (innerPadding == null) {
         return this._innerPadding;
@@ -130,7 +130,7 @@ export module Scale {
      *
      * @returns {Ordinal} The calling Scale.Ordinal
      */
-    public outerPadding(outerPadding: number): Ordinal;
+    public outerPadding(outerPadding: number): Category;
     public outerPadding(outerPadding?: number): any {
       if (outerPadding == null) {
         return this._outerPadding;
@@ -141,8 +141,8 @@ export module Scale {
       return this;
     }
 
-    public copy(): Ordinal {
-      return new Ordinal(this._d3Scale.copy());
+    public copy(): Category {
+      return new Category(this._d3Scale.copy());
     }
 
     public scale(value: string): number {

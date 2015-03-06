@@ -2,12 +2,11 @@
 
 module Plottable {
 export module Dispatcher {
-  export type MouseCallback = (p: Point) => any;
+  export type MouseCallback = (p: Point, e: MouseEvent) => any;
 
   export class Mouse extends AbstractDispatcher {
     private static _DISPATCHER_KEY = "__Plottable_Dispatcher_Mouse";
-    private _svg: SVGElement;
-    private _measureRect: SVGElement;
+    private translator: _Util.ClientToSVGTranslator;
     private _lastMousePosition: Point;
     private _moveBroadcaster: Core.Broadcaster<Dispatcher.Mouse>;
     private _downBroadcaster: Core.Broadcaster<Dispatcher.Mouse>;
@@ -43,13 +42,7 @@ export module Dispatcher {
     constructor(svg: SVGElement) {
       super();
 
-      this._svg = svg;
-      this._measureRect = <SVGElement> <any>document.createElementNS(svg.namespaceURI, "rect");
-      this._measureRect.setAttribute("class", "measure-rect");
-      this._measureRect.setAttribute("style", "opacity: 0; visibility: hidden;");
-      this._measureRect.setAttribute("width", "1");
-      this._measureRect.setAttribute("height", "1");
-      this._svg.appendChild(this._measureRect);
+      this.translator = _Util.ClientToSVGTranslator.getTranslator(svg);
 
       this._lastMousePosition = { x: -1, y: -1 };
       this._moveBroadcaster = new Core.Broadcaster(this);
@@ -71,7 +64,7 @@ export module Dispatcher {
     }
 
     protected _getWrappedCallback(callback: Function): Core.BroadcasterCallback<Dispatcher.Mouse> {
-      return () => callback(this.getLastMousePosition());
+      return (md: Dispatcher.Mouse, p: Point, e: MouseEvent) => callback(p, e);
     }
 
     /**
@@ -85,7 +78,7 @@ export module Dispatcher {
      *                                     to remove a callback.
      * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
      */
-    public onMouseMove(key: any, callback: (p: Point) => any): Dispatcher.Mouse {
+    public onMouseMove(key: any, callback: MouseCallback): Dispatcher.Mouse {
       this._setCallback(this._moveBroadcaster, key, callback);
       return this;
     }
@@ -127,50 +120,11 @@ export module Dispatcher {
      * calls broadcast() on the supplied Broadcaster.
      */
     private _measureAndBroadcast(e: MouseEvent, b: Core.Broadcaster<Dispatcher.Mouse>) {
-      var newMousePosition = this._computeMousePosition(e.clientX, e.clientY);
+      var newMousePosition = this.translator.computePosition(e.clientX, e.clientY);
       if (newMousePosition != null) {
         this._lastMousePosition = newMousePosition;
-        b.broadcast();
+        b.broadcast(this.getLastMousePosition(), e);
       }
-    }
-
-    /**
-     * Computes the mouse position relative to the <svg> in svg-coordinate-space.
-     */
-    private _computeMousePosition(clientX: number, clientY: number) {
-      // get the origin
-      this._measureRect.setAttribute("x", "0");
-      this._measureRect.setAttribute("y", "0");
-      var mrBCR = this._measureRect.getBoundingClientRect();
-      var origin = { x: mrBCR.left, y: mrBCR.top };
-
-      // calculate the scale
-      var sampleDistance = 100;
-      this._measureRect.setAttribute("x", String(sampleDistance));
-      this._measureRect.setAttribute("y", String(sampleDistance));
-      mrBCR = this._measureRect.getBoundingClientRect();
-      var testPoint = { x: mrBCR.left, y: mrBCR.top };
-
-      // invalid measurements -- SVG might not be in the DOM
-      if (origin.x === testPoint.x || origin.y === testPoint.y) {
-        return null;
-      }
-
-      var scaleX = (testPoint.x - origin.x) / sampleDistance;
-      var scaleY = (testPoint.y - origin.y) / sampleDistance;
-
-      // get the true cursor position
-      this._measureRect.setAttribute("x", String((clientX - origin.x)/scaleX) );
-      this._measureRect.setAttribute("y", String((clientY - origin.y)/scaleY) );
-      mrBCR = this._measureRect.getBoundingClientRect();
-      var trueCursorPosition = { x: mrBCR.left, y: mrBCR.top };
-
-      var scaledPosition = {
-        x: (trueCursorPosition.x - origin.x) / scaleX,
-        y: (trueCursorPosition.y - origin.y) / scaleY
-      };
-
-      return scaledPosition;
     }
 
     /**

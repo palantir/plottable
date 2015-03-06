@@ -12,7 +12,8 @@ function run(svg, data, Plottable) {
     };
 
 
-  var big_numbers = data[0].slice(0, 5);
+  var big_numbers = [];
+  deep_copy(data[0], big_numbers);
   big_numbers.forEach(large_x);
   var dataseries1 = new Plottable.Dataset(big_numbers);
 

@@ -9,7 +9,7 @@ function makeData() {
 function run(svg, data, Plottable) {
   "use strict";
 
-  var yScale = new Plottable.Scale.Ordinal().domain(["jon", "dan", "zoo"]);
+  var yScale = new Plottable.Scale.Category().domain(["jon", "dan", "zoo"]);
   var xScale = new Plottable.Scale.Linear();
   var colorScale = new Plottable.Scale.Color();
 

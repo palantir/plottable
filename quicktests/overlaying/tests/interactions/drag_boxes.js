@@ -34,7 +34,7 @@ function run(svg, data, Plottable) {
   var table = new Plottable.Component.Table([[plot1, plot2, plot3]]);
 
   table.renderTo(svg);
-  makeVerifyingDragBox(new Plottable.Interaction.XYDragBox(), plot1);
-  makeVerifyingDragBox(new Plottable.Interaction.XDragBox() , plot2);
-  makeVerifyingDragBox(new Plottable.Interaction.YDragBox() , plot3);
+  makeVerifyingDragBox(new Plottable.Interaction.DragBox(), plot1);
+  makeVerifyingDragBox(new Plottable.Interaction.DragBox() , plot2);
+  makeVerifyingDragBox(new Plottable.Interaction.DragBox() , plot3);
 }

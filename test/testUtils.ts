@@ -116,6 +116,11 @@ function assertBBoxNonIntersection(firstEl: D3.Selection, secondEl: D3.Selection
           "bounding rects are not intersecting");
 }
 
+function assertPointsClose(actual: Plottable.Point, expected: Plottable.Point, epsilon: number, message: String) {
+  assert.closeTo(actual.x, expected.x, epsilon, message + " (x)");
+  assert.closeTo(actual.y, expected.y, epsilon, message + " (y)");
+};
+
 function assertXY(el: D3.Selection, xExpected: number, yExpected: number, message: string) {
   var x = el.attr("x");
   var y = el.attr("y");
@@ -170,6 +175,37 @@ function triggerFakeMouseEvent(type: string, target: D3.Selection, relativeX: nu
                     xPos, yPos,
                     false, false, false, false,
                     1, null);
+  target.node().dispatchEvent(e);
+}
+
+function triggerFakeTouchEvent(type: string, target: D3.Selection, relativeX: number, relativeY: number) {
+  var targetNode = target.node();
+  var clientRect = targetNode.getBoundingClientRect();
+  var xPos = clientRect.left + relativeX;
+  var yPos = clientRect.top + relativeY;
+  var e = <TouchEvent> document.createEvent("UIEvent");
+  e.initUIEvent(type, true, true, window, 1);
+  var fakeTouch: Touch = {
+    identifier: 0,
+    target: targetNode,
+    screenX: xPos,
+    screenY: yPos,
+    clientX: xPos,
+    clientY: yPos,
+    pageX: xPos,
+    pageY: yPos
+  };
+
+  var fakeTouchList: any = [fakeTouch];
+  fakeTouchList.item = (index: number) => fakeTouchList[index];
+  e.touches = <TouchList> fakeTouchList;
+  e.targetTouches = <TouchList> fakeTouchList;
+  e.changedTouches = <TouchList> fakeTouchList;
+
+  e.altKey = false;
+  e.metaKey = false;
+  e.ctrlKey = false;
+  e.shiftKey = false;
   target.node().dispatchEvent(e);
 }
 

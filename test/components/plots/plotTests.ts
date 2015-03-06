@@ -178,7 +178,11 @@ describe("Plots", () => {
 
       var oneElementSelection = plot.getAllSelections(["ds2"]);
       assert.strictEqual(oneElementSelection.size(), 1);
-      assert.strictEqual(numAttr(oneElementSelection, "cy"), 10, "retreieved selection in renderArea2");
+      assert.strictEqual(numAttr(oneElementSelection, "cy"), 10, "retreived selection in renderArea2");
+
+      var nonExcludedSelection = plot.getAllSelections(["ds1"], true);
+      assert.strictEqual(nonExcludedSelection.size(), 1);
+      assert.strictEqual(numAttr(nonExcludedSelection, "cy"), 10, "retreived non-excluded selection in renderArea2");
       svg.remove();
     });
 
@@ -380,20 +384,20 @@ describe("Plots", () => {
 
     it("extent calculation done in correct dataset order", () => {
       var animator = new Plottable.Animator.Base().delay(10).duration(10).maxIterativeDelay(0);
-      var ordinalScale = new Plottable.Scale.Ordinal();
+      var CategoryScale = new Plottable.Scale.Category();
       var dataset1 = [{key: "A"}];
       var dataset2 = [{key: "B"}];
       var plot = new Plottable.Plot.AbstractPlot()
                                    .addDataset("b", dataset2)
                                    .addDataset("a", dataset1);
-      plot.project("key", "key", ordinalScale);
+      plot.project("key", "key", CategoryScale);
 
       plot.datasetOrder(["a", "b"]);
 
       var svg = generateSVG();
       plot.renderTo(svg);
 
-      assert.deepEqual(ordinalScale.domain(), ["A", "B"], "extent is in the right order");
+      assert.deepEqual(CategoryScale.domain(), ["A", "B"], "extent is in the right order");
       svg.remove();
     });
   });

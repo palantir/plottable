@@ -6,7 +6,7 @@ function makeData() {
 function run(svg, data, Plottable) {
   "use strict";
 
-  var xScale = new Plottable.Scale.Ordinal();
+  var xScale = new Plottable.Scale.Category();
   var yScale = new Plottable.Scale.Linear();
   var xAxis = new Plottable.Axis.Category(xScale, "bottom");
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");

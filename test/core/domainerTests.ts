@@ -59,13 +59,14 @@ describe("Domainer", () => {
 
   it("pad() defaults to [v-1 day, v+1 day] if there's only one date value", () => {
     var d = new Date(2000, 5, 5);
+    var d2 = new Date(2000, 5, 5);
     var dayBefore = new Date(2000, 5, 4);
     var dayAfter = new Date(2000, 5, 6);
     var timeScale = new Plottable.Scale.Time();
     // the result of computeDomain() will be number[], but when it
     // gets fed back into timeScale, it will be adjusted back to a Date.
     // That's why I'm using _updateExtent() instead of domainer.computeDomain()
-    timeScale._updateExtent("1", "x", [d, d]);
+    timeScale._updateExtent("1", "x", [d, d2]);
     timeScale.domainer(new Plottable.Domainer().pad());
     assert.deepEqual(timeScale.domain(), [dayBefore, dayAfter]);
   });

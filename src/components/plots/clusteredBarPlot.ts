@@ -51,7 +51,7 @@ export module Plot {
     }
 
     private _makeInnerScale(){
-      var innerScale = new Scale.Ordinal();
+      var innerScale = new Scale.Category();
       innerScale.domain(this._datasetKeysInOrder);
       if (!this._projections["width"]) {
         innerScale.range([0, this._getBarPixelWidth()]);

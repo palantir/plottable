@@ -13,7 +13,7 @@ function run(div, data, Plottable) {
 
   var svg = div.append("svg").attr("height", 500);
 
-  var xScale = new Plottable.Scale.Ordinal();
+  var xScale = new Plottable.Scale.Category();
   var xAxis = new Plottable.Axis.Category(xScale, "bottom");
 
   var yScale = new Plottable.Scale.Linear();

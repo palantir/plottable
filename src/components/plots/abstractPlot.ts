@@ -426,16 +426,23 @@ export module Plot {
      *
      * @param {string | string[]} datasetKeys The dataset(s) to retrieve the selections from.
      * If not provided, all selections will be retrieved.
+     * @param {boolean} exclude If set to true, all datasets will be queried excluding the keys referenced
+     * in the previous datasetKeys argument (default = false).
      * @returns {D3.Selection} The retrieved selections.
      */
-    public getAllSelections(datasetKeys?: string | string[]): D3.Selection {
+    public getAllSelections(datasetKeys?: string | string[], exclude = false): D3.Selection {
       var datasetKeyArray: string[] = [];
       if (datasetKeys == null) {
-        datasetKeyArray = this._datasetKeysInOrder;
+        datasetKeyArray = this.datasetOrder();
       } else if (typeof(datasetKeys) === "string") {
         datasetKeyArray = [<string> datasetKeys];
       } else {
         datasetKeyArray = <string[]> datasetKeys;
+      }
+
+      if (exclude) {
+        var excludedDatasetKeys = d3.set(datasetKeyArray);
+        datasetKeyArray = this.datasetOrder().filter((datasetKey) => !excludedDatasetKeys.has(datasetKey));
       }
 
       var allSelections: EventTarget[] = [];
