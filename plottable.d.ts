@@ -2695,8 +2695,7 @@ declare module Plottable {
              * in the previous datasetKeys argument (default = false).
              * @returns {D3.Selection} The retrieved selections.
              */
-<<<<<<< HEAD
-            getAllSelections(datasetKeys?: string | string[]): D3.Selection;
+            getAllSelections(datasetKeys?: string | string[], exclude?: boolean): D3.Selection;
             /**
              * Retrieves all of the PlotData of this plot for the specified dataset(s)
              *
@@ -2705,9 +2704,6 @@ declare module Plottable {
              * @returns {PlotData} The retrieved PlotData.
              */
             getAllPlotData(datasetKeys?: string | string[]): PlotData;
-=======
-            getAllSelections(datasetKeys?: string | string[], exclude?: boolean): D3.Selection;
->>>>>>> develop
         }
     }
 }
@@ -2726,6 +2722,7 @@ declare module Plottable {
             addDataset(keyOrDataset: any, dataset?: any): Pie;
             protected _generateAttrToProjector(): AttributeToProjector;
             protected _getDrawer(key: string): _Drawer.AbstractDrawer;
+            getAllPlotData(datasetKeys?: string | string[]): PlotData;
         }
     }
 }

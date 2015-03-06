@@ -6740,6 +6740,15 @@ var Plottable;
             Pie.prototype._getDrawer = function (key) {
                 return new Plottable._Drawer.Arc(key).setClass("arc");
             };
+            Pie.prototype.getAllPlotData = function (datasetKeys) {
+                var _this = this;
+                var allPlotData = _super.prototype.getAllPlotData.call(this, datasetKeys);
+                allPlotData.pixelPoints.forEach(function (pixelPoint) {
+                    pixelPoint.x = pixelPoint.x + _this.width() / 2;
+                    pixelPoint.y = pixelPoint.y + _this.height() / 2;
+                });
+                return allPlotData;
+            };
             return Pie;
         })(Plot.AbstractPlot);
         Plot.Pie = Pie;
