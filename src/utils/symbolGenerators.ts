@@ -31,6 +31,8 @@ module Plottable {
      * @returns {SymbolGenerator} the symbol generator for a D3 symbol
      */
     export function d3Symbol(symbolType: string | StringAccessor) {
+      // Since D3 symbols use a size concept, we have to convert our radius value to the corresponding area value
+      // This is done by inspecting the symbol size calculation in d3.js and solving how sizes are calculated from a given radius
       var typeToSize = (symbolTypeString: string) => {
         var sizeFactor: number;
         switch(symbolTypeString) {
@@ -51,6 +53,7 @@ module Plottable {
             sizeFactor = Math.sqrt(3);
             break;
         }
+
         return sizeFactor * Math.pow(SYMBOL_GENERATOR_RADIUS, 2);
       };
 
