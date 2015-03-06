@@ -6958,13 +6958,16 @@ var Plottable;
             };
             Rectangle.prototype._generateAttrToProjector = function () {
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
-                // Copy each of the different projectors
+                // Copy each of the different projectors.
+                // In the event that x1/y1 are not present, x/y will be directly leveraged
                 var x1Attr = attrToProjector["x1"] ? attrToProjector["x1"] : attrToProjector["x"];
                 var y1Attr = attrToProjector["y1"] ? attrToProjector["y1"] : attrToProjector["y"];
                 var x2Attr = attrToProjector["x2"];
                 var y2Attr = attrToProjector["y2"];
+                // Generate width based on difference, then adjust for the correct x origin
                 attrToProjector["width"] = function (d, i, u, m) { return Math.abs(x2Attr(d, i, u, m) - x1Attr(d, i, u, m)); };
                 attrToProjector["x"] = function (d, i, u, m) { return Math.min(x1Attr(d, i, u, m), x2Attr(d, i, u, m)); };
+                // Generate height based on difference, then adjust for the correct y origin
                 attrToProjector["height"] = function (d, i, u, m) { return Math.abs(y2Attr(d, i, u, m) - y1Attr(d, i, u, m)); };
                 attrToProjector["y"] = function (d, i, u, m) { return Math.max(y1Attr(d, i, u, m), y2Attr(d, i, u, m)) - attrToProjector["height"](d, i, u, m); };
                 return attrToProjector;
