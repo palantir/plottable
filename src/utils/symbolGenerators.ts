@@ -31,9 +31,8 @@ module Plottable {
      * @returns {SymbolGenerator} the symbol generator for a D3 symbol
      */
     export function d3Symbol(symbolType: string | StringAccessor) {
-      return d3.svg.symbol().type(symbolType).size((datum: any, index: number) => {
+      var typeToSize = (symbolTypeString: string) => {
         var sizeFactor: number;
-        var symbolTypeString = typeof(symbolType) === "string" ? <string> symbolType : (<StringAccessor> symbolType)(datum, index);
         switch(symbolTypeString) {
           case "circle":
             sizeFactor = Math.PI;
@@ -42,7 +41,7 @@ module Plottable {
             sizeFactor = 4;
             break;
           case "cross":
-            sizeFactor = 20 / 9;
+            sizeFactor = 20/9;
             break;
           case "diamond":
             sizeFactor = 2 * Math.tan(Math.PI / 6);
@@ -52,8 +51,14 @@ module Plottable {
             sizeFactor = Math.sqrt(3);
             break;
         }
-        return Math.pow(SYMBOL_GENERATOR_RADIUS, 2) * sizeFactor;
-      });
+        return sizeFactor * Math.pow(SYMBOL_GENERATOR_RADIUS, 2);
+      };
+
+      var symbolSize = typeof(symbolType) === "string" ?
+                         typeToSize(<string> symbolType) :
+                         (datum: any, index: number) => typeToSize((<StringAccessor> symbolType)(datum, index));
+
+      return d3.svg.symbol().type(symbolType).size(symbolSize);
     }
 
   }

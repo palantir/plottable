@@ -995,9 +995,8 @@ var Plottable;
          * @returns {SymbolGenerator} the symbol generator for a D3 symbol
          */
         function d3Symbol(symbolType) {
-            return d3.svg.symbol().type(symbolType).size(function (datum, index) {
+            var typeToSize = function (symbolTypeString) {
                 var sizeFactor;
-                var symbolTypeString = typeof (symbolType) === "string" ? symbolType : symbolType(datum, index);
                 switch (symbolTypeString) {
                     case "circle":
                         sizeFactor = Math.PI;
@@ -1016,8 +1015,10 @@ var Plottable;
                         sizeFactor = Math.sqrt(3);
                         break;
                 }
-                return Math.pow(SymbolGenerators.SYMBOL_GENERATOR_RADIUS, 2) * sizeFactor;
-            });
+                return sizeFactor * Math.pow(SymbolGenerators.SYMBOL_GENERATOR_RADIUS, 2);
+            };
+            var symbolSize = typeof (symbolType) === "string" ? typeToSize(symbolType) : function (datum, index) { return typeToSize(symbolType(datum, index)); };
+            return d3.svg.symbol().type(symbolType).size(symbolSize);
         }
         SymbolGenerators.d3Symbol = d3Symbol;
     })(SymbolGenerators = Plottable.SymbolGenerators || (Plottable.SymbolGenerators = {}));
