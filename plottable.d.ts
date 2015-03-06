@@ -418,13 +418,11 @@ declare module Plottable {
      */
     type SymbolGenerator = (datum: any, index: number) => string;
     module SymbolGenerators {
-        var SYMBOL_GENERATOR_RADIUS: number;
         /**
-         * The generic circle symbol.
-         *
-         * @returns {SymbolGenerator} the symbol generator for a circle
+         * The radius that symbol generators will be assumed to have for their symbols.
          */
-        function circle(): D3.Svg.Symbol;
+        var SYMBOL_GENERATOR_RADIUS: number;
+        type StringAccessor = ((datum: any, index: number) => string);
         /**
          * A wrapper for D3's symbol generator as documented here:
          * https://github.com/mbostock/d3/wiki/SVG-Shapes#symbol
@@ -435,7 +433,7 @@ declare module Plottable {
          * @param {string | ((datum: any, index: number) => string)} symbolType Accessor for the d3 symbol type
          * @returns {SymbolGenerator} the symbol generator for a D3 symbol
          */
-        function d3Symbol(symbolType: string | ((datum: any, index: number) => string)): D3.Svg.Symbol;
+        function d3Symbol(symbolType: string | StringAccessor): D3.Svg.Symbol;
     }
 }
 

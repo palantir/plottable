@@ -13,16 +13,12 @@ module Plottable {
 
   export module SymbolGenerators {
 
+    /**
+     * The radius that symbol generators will be assumed to have for their symbols.
+     */
     export var SYMBOL_GENERATOR_RADIUS = 50;
 
-    /**
-     * The generic circle symbol.
-     *
-     * @returns {SymbolGenerator} the symbol generator for a circle
-     */
-    export function circle() {
-      return d3.svg.symbol().type("circle").size(Math.pow(SYMBOL_GENERATOR_RADIUS, 2) * Math.PI);
-    }
+    export type StringAccessor = ((datum: any, index: number) => string);
 
     /**
      * A wrapper for D3's symbol generator as documented here:
@@ -34,8 +30,30 @@ module Plottable {
      * @param {string | ((datum: any, index: number) => string)} symbolType Accessor for the d3 symbol type
      * @returns {SymbolGenerator} the symbol generator for a D3 symbol
      */
-    export function d3Symbol(symbolType: string | ((datum: any, index: number) => string)) {
-      return d3.svg.symbol().type(symbolType).size(Math.pow(SYMBOL_GENERATOR_RADIUS, 2));
+    export function d3Symbol(symbolType: string | StringAccessor) {
+      return d3.svg.symbol().type(symbolType).size((datum: any, index: number) => {
+        var sizeFactor: number;
+        var symbolTypeString = typeof(symbolType) === "string" ? <string> symbolType : (<StringAccessor> symbolType)(datum, index);
+        switch(symbolTypeString) {
+          case "circle":
+            sizeFactor = Math.PI;
+            break;
+          case "square":
+            sizeFactor = 4;
+            break;
+          case "cross":
+            sizeFactor = 20 / 9;
+            break;
+          case "diamond":
+            sizeFactor = 2 * Math.tan(Math.PI / 6);
+            break;
+          case "triangle-up":
+          case "triangle-down":
+            sizeFactor = Math.sqrt(3);
+            break;
+        }
+        return Math.pow(SYMBOL_GENERATOR_RADIUS, 2) * sizeFactor;
+      });
     }
 
   }

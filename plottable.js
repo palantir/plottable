@@ -980,16 +980,10 @@ var Plottable;
 (function (Plottable) {
     var SymbolGenerators;
     (function (SymbolGenerators) {
-        SymbolGenerators.SYMBOL_GENERATOR_RADIUS = 50;
         /**
-         * The generic circle symbol.
-         *
-         * @returns {SymbolGenerator} the symbol generator for a circle
+         * The radius that symbol generators will be assumed to have for their symbols.
          */
-        function circle() {
-            return d3.svg.symbol().type("circle").size(Math.pow(SymbolGenerators.SYMBOL_GENERATOR_RADIUS, 2) * Math.PI);
-        }
-        SymbolGenerators.circle = circle;
+        SymbolGenerators.SYMBOL_GENERATOR_RADIUS = 50;
         /**
          * A wrapper for D3's symbol generator as documented here:
          * https://github.com/mbostock/d3/wiki/SVG-Shapes#symbol
@@ -1001,7 +995,29 @@ var Plottable;
          * @returns {SymbolGenerator} the symbol generator for a D3 symbol
          */
         function d3Symbol(symbolType) {
-            return d3.svg.symbol().type(symbolType).size(Math.pow(SymbolGenerators.SYMBOL_GENERATOR_RADIUS, 2));
+            return d3.svg.symbol().type(symbolType).size(function (datum, index) {
+                var sizeFactor;
+                var symbolTypeString = typeof (symbolType) === "string" ? symbolType : symbolType(datum, index);
+                switch (symbolTypeString) {
+                    case "circle":
+                        sizeFactor = Math.PI;
+                        break;
+                    case "square":
+                        sizeFactor = 4;
+                        break;
+                    case "cross":
+                        sizeFactor = 20 / 9;
+                        break;
+                    case "diamond":
+                        sizeFactor = 2 * Math.tan(Math.PI / 6);
+                        break;
+                    case "triangle-up":
+                    case "triangle-down":
+                        sizeFactor = Math.sqrt(3);
+                        break;
+                }
+                return Math.pow(SymbolGenerators.SYMBOL_GENERATOR_RADIUS, 2) * sizeFactor;
+            });
         }
         SymbolGenerators.d3Symbol = d3Symbol;
     })(SymbolGenerators = Plottable.SymbolGenerators || (Plottable.SymbolGenerators = {}));
@@ -7018,7 +7034,7 @@ var Plottable;
                 attrToProjector["r"] = attrToProjector["r"] || d3.functor(3);
                 attrToProjector["opacity"] = attrToProjector["opacity"] || d3.functor(0.6);
                 attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this._defaultFillColor);
-                attrToProjector["symbol"] = attrToProjector["symbol"] || Plottable.SymbolGenerators.circle();
+                attrToProjector["symbol"] = attrToProjector["symbol"] || Plottable.SymbolGenerators.d3Symbol("circle");
                 attrToProjector["vector-effect"] = attrToProjector["vector-effect"] || d3.functor("non-scaling-stroke");
                 return attrToProjector;
             };

@@ -1673,7 +1673,7 @@ declare module D3 {
 
         export interface Symbol {
             type: (symbolType: string | ((datum: any, index: number) => string)) => Symbol;
-            size: (number:number) => Symbol;
+            size: (size: number | ((datum: any, index: number) => number)) => Symbol;
             (datum:any, index:number): string;
         }
 
