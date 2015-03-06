@@ -6639,6 +6639,23 @@ var Plottable;
                 });
                 return d3.selectAll(allSelections);
             };
+            /**
+             * Retrieves all of the plot datums of this plot
+             *
+             * @returns {PlotDatum[]} The retrieved selections.
+             */
+            AbstractPlot.prototype._getPlotDatumArray = function () {
+                var _this = this;
+                var plotDatumArray = [];
+                this.datasetOrder().forEach(function (datasetKey) {
+                    var plotDatasetKey = _this._key2PlotDatasetKey.get(datasetKey);
+                    var drawer = plotDatasetKey.drawer;
+                    plotDatasetKey.dataset.data().forEach(function (datum, index) {
+                        plotDatumArray.push({ datum: datum, pixelPoint: drawer._getPixelPoint(datum, index), selection: drawer._getSelection(index) });
+                    });
+                });
+                return plotDatumArray;
+            };
             return AbstractPlot;
         })(Plottable.Component.AbstractComponent);
         Plot.AbstractPlot = AbstractPlot;
