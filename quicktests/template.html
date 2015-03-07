@@ -1,7 +1,7 @@
 <html>
   <head>
     <title>Area Plot Quicktest</title>
-    <link rel="stylesheet" type="text/css" href="../../plottable.css">
+    <link rel="stylesheet" type="text/css" href="../plottable.css">
     <style>
       svg {
         background-color: #EEE;
@@ -11,19 +11,70 @@
         padding: 20px;
       }
     </style>
-    <script src="../../bower_components/d3/d3.js" charset="utf-8"></script>
-    <script src="plottable_multifile.js"></script>
+    <script src="exampleUtil.js"></script>
+    <script src="../bower_components/d3/d3.js" charset="utf-8"></script>
+    <script src="../plottable.js"></script>
 
     <script>
-      window.onload = function() {
+    window.onload = function() {
+          var data = makeRandomData(5);
+          var xScale = new Plottable.Scale.Linear();
+          var yScale = new Plottable.Scale.Linear();
+          var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
+          var yAxis = new Plottable.Axis.Numeric(yScale, "left");
+          
+          var plot = new Plottable.Plot.Scatter(xScale, yScale);
+          plot.addDataset(data);
+          plot.animate(true);
+          plot.project("x", "x", xScale)
+          .project("y", "y", yScale)
+          .project("r", 10);
+          
+          var title = new Plottable.Component.Label("n = new point, d = delete point, c = log points");
+          
+          var table = new Plottable.Component.Table([[null, null, title],
+                                                     [new Plottable.Component.AxisLabel(""), yAxis, plot],
+                                                     [null, null, xAxis],
+                                                     [null, null, ]]);
+          table.renderTo("#demo");
+          
+          var hover = new Plottable.Interaction.Hover();
+          hover.onHoverOver(function(hoverData) {
+            var xString = hoverData.data[0].x.toFixed(2);
+            var yString = hoverData.data[0].y.toFixed(2);
+            title.text("[ " + xString + ", " + yString + " ]");
+          });
+          hover.onHoverOut(function(hoverData) {
+            title.text("OUT n = new point, d = delete point, c = log points");
+          });
+          
+        //   var key = new Plottable.Interaction.Key();
+        //   key.on(78, function(keyData){
+        //       data.push({x: Math.random(), y: Math.random()});
+        //       table.redraw();
+        //   });
+        //   key.on(67, function(keyData){
+        //       console.log(data);
+        //   });
+        // key.on(68, function(keyData){
+        //     if(data.length > 0){
+        //       data.splice(data.length-1,1);
+        //       table.redraw();  
+        //     }     
+        // });
+          
+        plot.registerInteraction(hover);
+        // plot.registerInteraction(key);
+
         var div = d3.select("#testdiv");
-        run(div, makeData(), Plottable);
       }
   </script>
   </head>
 
   <body>
-    <div id="testdiv"></div>
+    <div id="testdiv">
+      <svg id="demo" width="800px" height="8ZA00px"></svg>
+    </div>
   </body>
 
 </html>
