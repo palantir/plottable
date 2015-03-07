@@ -5677,6 +5677,14 @@ var Plottable;
                 });
             };
             Legend.prototype.symbolGenerator = function (symbolGenerator) {
+                if (symbolGenerator == null) {
+                    return this._symbolGenerator;
+                }
+                else {
+                    this._symbolGenerator = symbolGenerator;
+                    this._render();
+                    return this;
+                }
             };
             /**
              * The css class applied to each legend row

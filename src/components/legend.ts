@@ -19,6 +19,7 @@ export module Component {
     private _measurer: SVGTypewriter.Measurers.Measurer;
     private _wrapper: SVGTypewriter.Wrappers.Wrapper;
     private _writer: SVGTypewriter.Writers.Writer;
+    private _symbolGenerator: SymbolGenerator;
 
     /**
      * Creates a Legend.
@@ -298,7 +299,13 @@ export module Component {
     public symbolGenerator(): SymbolGenerator;
     public symbolGenerator(symbolGenerator: SymbolGenerator): Legend;
     public symbolGenerator(symbolGenerator?: SymbolGenerator): any {
-
+      if (symbolGenerator == null) {
+        return this._symbolGenerator;
+      } else {
+        this._symbolGenerator = symbolGenerator;
+        this._render();
+        return this;
+      }
     }
   }
 }
