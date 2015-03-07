@@ -2387,6 +2387,8 @@ declare module Plottable {
              */
             getEntry(position: Point): D3.Selection;
             _doRender(): void;
+            symbolGenerator(): SymbolGenerator;
+            symbolGenerator(symbolGenerator: SymbolGenerator): Legend;
         }
     }
 }

@@ -294,6 +294,12 @@ export module Component {
                       self._writer.write(value, maxTextLength, self.height(), writeOptions);
                     });
     }
+
+    public symbolGenerator(): SymbolGenerator;
+    public symbolGenerator(symbolGenerator: SymbolGenerator): Legend;
+    public symbolGenerator(symbolGenerator?: SymbolGenerator): any {
+
+    }
   }
 }
 }

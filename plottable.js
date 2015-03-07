@@ -5676,6 +5676,8 @@ var Plottable;
                     self._writer.write(value, maxTextLength, self.height(), writeOptions);
                 });
             };
+            Legend.prototype.symbolGenerator = function (symbolGenerator) {
+            };
             /**
              * The css class applied to each legend row
              */
