@@ -28,8 +28,8 @@ describe("Legend", () => {
       var d3this = d3.select(this);
       var text = d3this.select("text").text();
       assert.equal(text, d, "the text node has correct text");
-      var circle = d3this.select("circle");
-      assert.equal(circle.attr("fill"), color.scale(d), "the circle's fill is set properly");
+      var symbol = d3this.select("." + Plottable.Component.Legend.LEGEND_SYMBOL_CLASS);
+      assert.equal(symbol.attr("fill"), color.scale(d), "the symbol's fill is set properly");
     });
     svg.remove();
   });
@@ -99,7 +99,7 @@ describe("Legend", () => {
       assert.equal(d, newDomain[i], "the data is set correctly");
       var text = d3.select(this).select("text").text();
       assert.equal(text, d, "the text was set properly");
-      var fill = d3.select(this).select("circle").attr("fill");
+      var fill = d3.select(this).select("." + Plottable.Component.Legend.LEGEND_SYMBOL_CLASS).attr("fill");
       assert.equal(fill, color.scale(d), "the fill was set properly");
     });
     assert.lengthOf((<any> legend)._content.selectAll(rowSelector)[0], 5, "there are the right number of legend elements");
@@ -120,7 +120,7 @@ describe("Legend", () => {
       assert.equal(d, newDomain[i], "the data is set correctly");
       var text = d3.select(this).select("text").text();
       assert.equal(text, d, "the text was set properly");
-      var fill = d3.select(this).select("circle").attr("fill");
+      var fill = d3.select(this).select("." + Plottable.Component.Legend.LEGEND_SYMBOL_CLASS).attr("fill");
       assert.equal(fill, newColorScale.scale(d), "the fill was set properly");
     });
 
@@ -142,7 +142,7 @@ describe("Legend", () => {
       assert.equal(d, newDomain[i], "the data is set correctly");
       var text = d3.select(this).select("text").text();
       assert.equal(text, d, "the text was set properly");
-      var fill = d3.select(this).select("circle").attr("fill");
+      var fill = d3.select(this).select("." + Plottable.Component.Legend.LEGEND_SYMBOL_CLASS).attr("fill");
       assert.equal(fill, newColorScale.scale(d), "the fill was set properly");
     });
     svg.remove();
@@ -156,11 +156,11 @@ describe("Legend", () => {
 
     function verifyCircleHeight() {
       var text = (<any> legend)._content.select("text");
-      var circle = (<any> legend)._content.select("circle");
+      var symbol = (<any> legend)._content.select("." + Plottable.Component.Legend.LEGEND_SYMBOL_CLASS);
       var textHeight = Plottable._Util.DOM.getBBox(text).height;
-      var circleHeight = Plottable._Util.DOM.getBBox(circle).height;
-      assert.operator(circleHeight, "<", textHeight, "icons too small: iconHeight < circleHeight");
-      assert.operator(circleHeight, ">", textHeight / 2, "icons too big: iconHeight / 2 > circleHeight");
+      var symbolHeight = symbol.node().getBoundingClientRect().height;
+      assert.operator(symbolHeight, "<", textHeight, "icons too small: iconHeight < circleHeight");
+      assert.operator(symbolHeight, ">", textHeight / 2, "icons too big: iconHeight / 2 > circleHeight");
     }
 
     verifyCircleHeight();

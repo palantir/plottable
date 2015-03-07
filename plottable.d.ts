@@ -2330,6 +2330,10 @@ declare module Plottable {
              */
             static LEGEND_ENTRY_CLASS: string;
             /**
+             * The css class applied to each legend symbol
+             */
+            static LEGEND_SYMBOL_CLASS: string;
+            /**
              * Creates a Legend.
              *
              * The legend consists of a series of legend entries, each with a color and label taken from the `colorScale`.

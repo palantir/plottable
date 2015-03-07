@@ -5492,6 +5492,7 @@ var Plottable;
                 this._fixedWidthFlag = true;
                 this._fixedHeightFlag = true;
                 this._sortFn = function (a, b) { return _this._scale.domain().indexOf(a) - _this._scale.domain().indexOf(b); };
+                this._symbolGenerator = Plottable.SymbolGenerators.d3Symbol("circle");
             }
             Legend.prototype._setup = function () {
                 _super.prototype._setup.call(this);
@@ -5645,7 +5646,7 @@ var Plottable;
                 entries.each(function (d) {
                     d3.select(this).classed(d.replace(" ", "-"), true);
                 });
-                entriesEnter.append("circle");
+                entriesEnter.append("path");
                 entriesEnter.append("g").classed("text-container", true);
                 entries.exit().remove();
                 var legendPadding = this._padding;
@@ -5658,7 +5659,7 @@ var Plottable;
                         return translateString;
                     });
                 });
-                entries.select("circle").attr("cx", layout.textHeight / 2).attr("cy", layout.textHeight / 2).attr("r", layout.textHeight * 0.3).attr("fill", function (value) { return _this._scale.scale(value); });
+                entries.select("path").attr("d", this.symbolGenerator()).attr("transform", "translate(" + (layout.textHeight / 2) + "," + layout.textHeight / 2 + ") " + "scale(" + (layout.textHeight * 0.3 / 50) + ")").attr("fill", function (value) { return _this._scale.scale(value); }).attr("vector-effect", "non-scaling-stroke").classed(Legend.LEGEND_SYMBOL_CLASS, true);
                 var padding = this._padding;
                 var textContainers = entries.select("g.text-container");
                 textContainers.text(""); // clear out previous results
@@ -5694,6 +5695,10 @@ var Plottable;
              * The css class applied to each legend entry
              */
             Legend.LEGEND_ENTRY_CLASS = "legend-entry";
+            /**
+             * The css class applied to each legend symbol
+             */
+            Legend.LEGEND_SYMBOL_CLASS = "legend-symbol";
             return Legend;
         })(Component.AbstractComponent);
         Component.Legend = Legend;

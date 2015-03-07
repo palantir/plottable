@@ -11,6 +11,10 @@ export module Component {
      * The css class applied to each legend entry
      */
     public static LEGEND_ENTRY_CLASS = "legend-entry";
+    /**
+     * The css class applied to each legend symbol
+     */
+    public static LEGEND_SYMBOL_CLASS = "legend-symbol";
 
     private _padding = 5;
     private _scale: Scale.Color;
@@ -46,6 +50,7 @@ export module Component {
       this._fixedWidthFlag = true;
       this._fixedHeightFlag = true;
       this._sortFn = (a: string, b: string) => this._scale.domain().indexOf(a) - this._scale.domain().indexOf(b);
+      this._symbolGenerator = SymbolGenerators.d3Symbol("circle");
     }
 
     protected _setup() {
@@ -255,7 +260,7 @@ export module Component {
       entries.each(function(d: string) {
         d3.select(this).classed(d.replace(" ", "-"), true);
       });
-      entriesEnter.append("circle");
+      entriesEnter.append("path");
       entriesEnter.append("g").classed("text-container", true);
       entries.exit().remove();
 
@@ -270,11 +275,12 @@ export module Component {
         });
       });
 
-      entries.select("circle")
-          .attr("cx", layout.textHeight / 2)
-          .attr("cy", layout.textHeight / 2)
-          .attr("r",  layout.textHeight * 0.3)
-          .attr("fill", (value: string) => this._scale.scale(value) );
+      entries.select("path").attr("d", this.symbolGenerator())
+                            .attr("transform", "translate(" + (layout.textHeight / 2) + "," + layout.textHeight / 2 + ") " +
+                                               "scale(" + (layout.textHeight * 0.3 / 50) + ")")
+                            .attr("fill", (value: string) => this._scale.scale(value) )
+                            .attr("vector-effect", "non-scaling-stroke")
+                            .classed(Legend.LEGEND_SYMBOL_CLASS, true);
 
       var padding = this._padding;
       var textContainers = entries.select("g.text-container");
