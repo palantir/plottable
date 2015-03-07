@@ -2535,6 +2535,21 @@ declare module Plottable {
 
 
 declare module Plottable {
+    module Component {
+        class SelectionBoxLayer extends AbstractComponent {
+            constructor();
+            protected _setup(): void;
+            setBox(topLeft: Point, bottomRight: Point): SelectionBoxLayer;
+            _doRender(): void;
+            detectionRadius(): number;
+            detectionRadius(radius: number): SelectionBoxLayer;
+            dismissBox(): void;
+        }
+    }
+}
+
+
+declare module Plottable {
     module Plot {
         /**
          * A key that is also coupled with a dataset, a drawer and a metadata in Plot.
