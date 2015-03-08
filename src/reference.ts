@@ -57,6 +57,7 @@
 /// <reference path="components/interpolatedColorLegend.ts" />
 /// <reference path="components/gridlines.ts" />
 /// <reference path="components/table.ts" />
+/// <reference path="components/selectionBoxContainer.ts" />
 
 /// <reference path="components/plots/abstractPlot.ts" />
 /// <reference path="components/plots/piePlot.ts" />
@@ -92,3 +93,5 @@
 /// <reference path="interactions/drag/xyDragBoxInteraction.ts" />
 /// <reference path="interactions/drag/yDragBoxInteraction.ts" />
 /// <reference path="interactions/hoverInteraction.ts" />
+
+/// <reference path="entities/selectionBox.ts" />

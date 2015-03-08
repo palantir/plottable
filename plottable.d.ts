@@ -2535,6 +2535,18 @@ declare module Plottable {
 
 
 declare module Plottable {
+    module Component {
+        class SelectionBoxContainer extends AbstractComponent {
+            constructor();
+            protected _setup(): void;
+            getSelectionBoxes(): Entity.SelectionBox[];
+            dismissAll(): SelectionBoxContainer;
+        }
+    }
+}
+
+
+declare module Plottable {
     module Plot {
         /**
          * A key that is also coupled with a dataset, a drawer and a metadata in Plot.
@@ -3897,6 +3909,21 @@ declare module Plottable {
              *                     the user is currently hovering over.
              */
             getCurrentHoverData(): HoverData;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Entity {
+        class SelectionBox {
+            constructor(parent: D3.Selection);
+            classed(cssClass: string): boolean;
+            classed(cssClass: string, addClass: boolean): SelectionBox;
+            setBounds(topLeft: Point, bottomRight: Point): SelectionBox;
+            detectionRadius(): number;
+            detectionRadius(radius: number): SelectionBox;
+            dismiss(): SelectionBox;
         }
     }
 }
