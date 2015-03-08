@@ -6960,7 +6960,7 @@ describe("StrictEqualityAssociativeArray", function () {
 ///<reference path="../testReference.ts" />
 var assert = chai.assert;
 describe("ClientToSVGTranslator", function () {
-    it("getTranslator() creates only one Dispatcher.Mouse per <svg>", function () {
+    it("getTranslator() creates only one ClientToSVGTranslator per <svg>", function () {
         var svg = generateSVG();
         var t1 = Plottable._Util.ClientToSVGTranslator.getTranslator(svg.node());
         assert.isNotNull(t1, "created a new ClientToSVGTranslator on a <svg>");
