@@ -120,8 +120,45 @@ svg.plottable {
   fill: aliceblue;
   opacity: .7;
   stroke: #C0C8FF;
-
 }
+
+/* SelectionBox */
+.plottable .selection-box .selection-area {
+  fill: black;
+  fill-opacity: 0.03;
+  stroke: #CCC;
+}
+
+.plottable .selection-box.x-movable .selection-area {
+  cursor: ew-resize;
+}
+.plottable .selection-box.y-movable .selection-area {
+  cursor: ns-resize;
+}
+.plottable .selection-box.x-movable.y-movable .selection-area {
+  cursor: move;
+}
+
+.plottable .selection-box.x-resizable .selection-edge-lr {
+  cursor: ew-resize;
+}
+.plottable .selection-box.y-resizable .selection-edge-tb {
+  cursor: ns-resize;
+}
+
+.plottable .selection-box.x-resizable.y-resizable .selection-corner-tl {
+  cursor: nwse-resize;
+}
+.plottable .selection-box.x-resizable.y-resizable .selection-corner-tr {
+  cursor: nesw-resize;
+}
+.plottable .selection-box.x-resizable.y-resizable .selection-corner-bl {
+  cursor: nesw-resize;
+}
+.plottable .selection-box.x-resizable.y-resizable .selection-corner-br {
+  cursor: nwse-resize;
+}
+/* /SelectionBox */
 
 .plottable .legend text {
   fill: #32313F;
