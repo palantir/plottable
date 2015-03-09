@@ -6263,6 +6263,118 @@ var Plottable;
     })(Component = Plottable.Component || (Plottable.Component = {}));
 })(Plottable || (Plottable = {}));
 
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    var Component;
+    (function (Component) {
+        var SelectionBoxLayer = (function (_super) {
+            __extends(SelectionBoxLayer, _super);
+            function SelectionBoxLayer() {
+                _super.call(this);
+                this._topLeft = { x: 0, y: 0 };
+                this._bottomRight = { x: 0, y: 0 };
+                this._detectionRadius = 2;
+                this.classed("selection-box", true);
+            }
+            SelectionBoxLayer.prototype._setup = function () {
+                var _this = this;
+                _super.prototype._setup.call(this);
+                this._box = this._content.append("g").classed("selection-box-layer", true).remove();
+                this._core = this._box.append("rect").classed("selection-area", true);
+                var createLine = function () { return _this._box.append("line").style({
+                    "opacity": 0,
+                    "stroke": "pink",
+                    "stroke-width": 2 * _this._detectionRadius
+                }); };
+                this._edgeT = createLine().classed("selection-edge-tb", true);
+                this._edgeB = createLine().classed("selection-edge-tb", true);
+                this._edgeL = createLine().classed("selection-edge-lr", true);
+                this._edgeR = createLine().classed("selection-edge-lr", true);
+                var createCorner = function () { return _this._box.append("circle").attr("r", _this._detectionRadius).style({
+                    "opacity": 0,
+                    "fill": "pink",
+                }); };
+                this._cornerTL = createCorner().classed("selection-corner-tl", true);
+                this._cornerTR = createCorner().classed("selection-corner-tr", true);
+                this._cornerBL = createCorner().classed("selection-corner-bl", true);
+                this._cornerBR = createCorner().classed("selection-corner-br", true);
+            };
+            SelectionBoxLayer.prototype.setBox = function (topLeft, bottomRight) {
+                this._topLeft = topLeft;
+                this._bottomRight = bottomRight;
+                this._render();
+                return this;
+            };
+            SelectionBoxLayer.prototype._doRender = function () {
+                var w = this._bottomRight.x - this._topLeft.x;
+                var h = this._bottomRight.y - this._topLeft.y;
+                this._core.attr({
+                    width: w,
+                    height: h
+                });
+                this._edgeT.attr({
+                    x1: 0,
+                    y1: 0,
+                    x2: w,
+                    y2: 0
+                });
+                this._edgeB.attr({
+                    x1: 0,
+                    y1: h,
+                    x2: w,
+                    y2: h
+                });
+                this._edgeL.attr({
+                    x1: 0,
+                    y1: 0,
+                    x2: 0,
+                    y2: h
+                });
+                this._edgeR.attr({
+                    x1: w,
+                    y1: 0,
+                    x2: w,
+                    y2: h
+                });
+                this._cornerTR.attr({ cx: w, cy: 0 });
+                this._cornerBL.attr({ cx: 0, cy: h });
+                this._cornerBR.attr({ cx: w, cy: h });
+                this._box.attr("transform", "translate(" + this._topLeft.x + ", " + this._topLeft.y + ")");
+                this._content.node().appendChild(this._box.node());
+            };
+            SelectionBoxLayer.prototype.detectionRadius = function (radius) {
+                if (radius == null) {
+                    return this._detectionRadius;
+                }
+                if (radius < 0) {
+                    throw new Error("Detection radius cannot be negative.");
+                }
+                this._detectionRadius = radius;
+                this._edgeT.style("stroke-width", 2 * this._detectionRadius);
+                this._edgeB.style("stroke-width", 2 * this._detectionRadius);
+                this._edgeL.style("stroke-width", 2 * this._detectionRadius);
+                this._edgeR.style("stroke-width", 2 * this._detectionRadius);
+                this._cornerTL.attr("r", this._detectionRadius);
+                this._cornerTR.attr("r", this._detectionRadius);
+                this._cornerBL.attr("r", this._detectionRadius);
+                this._cornerBR.attr("r", this._detectionRadius);
+            };
+            SelectionBoxLayer.prototype.dismissBox = function () {
+                this._box.remove();
+            };
+            return SelectionBoxLayer;
+        })(Component.AbstractComponent);
+        Component.SelectionBoxLayer = SelectionBoxLayer;
+    })(Component = Plottable.Component || (Plottable.Component = {}));
+})(Plottable || (Plottable = {}));
+
 ///<reference path="../../reference.ts" />
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
