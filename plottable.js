@@ -7176,22 +7176,14 @@ var Plottable;
                 return new Plottable._Drawer.Rect(key, true);
             };
             /**
-             * @param {string} attrToSet One of ["x", "y", "fill"]. If "fill" is used,
-             * the data should return a valid CSS color.
+             * @param {string} attrToSet One of ["x", "y", "x1", "y1", "x2", "y2", "fill"]. If "fill" is used,
+             * the data should return a valid CSS color. "x1" and "y1" can act as aliases to "x" and "y"
              */
             Grid.prototype.project = function (attrToSet, accessor, scale) {
                 var _this = this;
+                attrToSet = attrToSet === "x1" ? "x" : attrToSet;
+                attrToSet = attrToSet === "y1" ? "y" : attrToSet;
                 _super.prototype.project.call(this, attrToSet, accessor, scale);
-                if (attrToSet === "x") {
-                    _super.prototype.project.call(this, "x1", function (d, i, u, m) {
-                        return scale.scale(_this._projections["x"].accessor(d, i, u, m));
-                    });
-                }
-                if (attrToSet === "y") {
-                    _super.prototype.project.call(this, "y1", function (d, i, u, m) {
-                        return scale.scale(_this._projections["y"].accessor(d, i, u, m));
-                    });
-                }
                 if (attrToSet === "x" && this._projections["x2"] === undefined) {
                     if (scale instanceof Plottable.Scale.Category) {
                         _super.prototype.project.call(this, "x1", function (d, i, u, m) {

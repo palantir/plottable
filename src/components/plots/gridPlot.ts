@@ -48,23 +48,13 @@ export module Plot {
     }
 
     /**
-     * @param {string} attrToSet One of ["x", "y", "fill"]. If "fill" is used,
-     * the data should return a valid CSS color.
+     * @param {string} attrToSet One of ["x", "y", "x1", "y1", "x2", "y2", "fill"]. If "fill" is used,
+     * the data should return a valid CSS color. "x1" and "y1" can act as aliases to "x" and "y"
      */
     public project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>) {
+      attrToSet = attrToSet === "x1" ? "x" : attrToSet;
+      attrToSet = attrToSet === "y1" ? "y" : attrToSet;
       super.project(attrToSet, accessor, scale);
-
-      if (attrToSet === "x") {
-        super.project("x1", (d: any, i: number, u: any, m: Plot.PlotMetadata) => {
-          return scale.scale(this._projections["x"].accessor(d, i, u, m));
-        });
-      }
-
-      if (attrToSet === "y") {
-        super.project("y1", (d: any, i: number, u: any, m: Plot.PlotMetadata) => {
-          return scale.scale(this._projections["y"].accessor(d, i, u, m));
-        });
-      }
 
       if (attrToSet === "x" && this._projections["x2"] === undefined) {
         if (scale instanceof Scale.Category) {
