@@ -7,7 +7,7 @@ describe("Plots", () => {
     var svg: D3.Selection;
     var dataset1: Plottable.Dataset;
     var dataset2: Plottable.Dataset;
-    var xScale: Plottable.Scale.Ordinal;
+    var xScale: Plottable.Scale.Category;
     var yScale: Plottable.Scale.Linear;
     var renderer: Plottable.Plot.StackedBar<string, number>;
     var SVG_WIDTH = 600;
@@ -19,7 +19,7 @@ describe("Plots", () => {
 
     beforeEach(() => {
       svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      xScale = new Plottable.Scale.Ordinal();
+      xScale = new Plottable.Scale.Category();
       yScale = new Plottable.Scale.Linear().domain([0, 3]);
 
       originalData1 = [
@@ -93,7 +93,7 @@ describe("Plots", () => {
 
   describe("Stacked Bar Plot Negative Values", () => {
     var svg: D3.Selection;
-    var xScale: Plottable.Scale.Ordinal;
+    var xScale: Plottable.Scale.Category;
     var yScale: Plottable.Scale.Linear;
     var plot: Plottable.Plot.StackedBar<string, number>;
     var SVG_WIDTH = 600;
@@ -103,7 +103,7 @@ describe("Plots", () => {
 
     beforeEach(() => {
       svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      xScale = new Plottable.Scale.Ordinal();
+      xScale = new Plottable.Scale.Category();
       yScale = new Plottable.Scale.Linear();
 
       var data1 = [
@@ -168,7 +168,7 @@ describe("Plots", () => {
     var dataset1: Plottable.Dataset;
     var dataset2: Plottable.Dataset;
     var xScale: Plottable.Scale.Linear;
-    var yScale: Plottable.Scale.Ordinal;
+    var yScale: Plottable.Scale.Category;
     var renderer: Plottable.Plot.StackedBar<number, string>;
     var SVG_WIDTH = 600;
     var SVG_HEIGHT = 400;
@@ -178,7 +178,7 @@ describe("Plots", () => {
     beforeEach(() => {
       svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
       xScale = new Plottable.Scale.Linear().domain([0, 6]);
-      yScale = new Plottable.Scale.Ordinal();
+      yScale = new Plottable.Scale.Category();
 
       var data1 = [
         {name: "jon", y: 0, type: "q1"},
@@ -249,7 +249,7 @@ describe("Plots", () => {
 
     beforeEach(() => {
       svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var xScale = new Plottable.Scale.Ordinal();
+      var xScale = new Plottable.Scale.Category();
       var yScale = new Plottable.Scale.Linear();
 
       var data1 = [

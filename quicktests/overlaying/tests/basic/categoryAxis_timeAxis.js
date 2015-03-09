@@ -13,7 +13,7 @@ function run(svg, data, Plottable) {
   "use strict";
 
   var xScale = new Plottable.Scale.Time();
-  var yScale = new Plottable.Scale.Ordinal();
+  var yScale = new Plottable.Scale.Category();
 
   var hBarPlot = new Plottable.Plot.Bar(xScale, yScale, false)
     .addDataset(data)

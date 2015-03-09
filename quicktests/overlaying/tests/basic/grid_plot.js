@@ -10,8 +10,8 @@ function makeData() {
 function run(svg, data, Plottable) {
   "use strict";
 
-    var xScale = new Plottable.Scale.Ordinal();
-    var yScale = new Plottable.Scale.Ordinal();
+    var xScale = new Plottable.Scale.Category();
+    var yScale = new Plottable.Scale.Category();
     var colorScale = new Plottable.Scale.Color();
 
     var xAxis = new Plottable.Axis.Category(xScale, "bottom");

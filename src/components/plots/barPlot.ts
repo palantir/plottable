@@ -302,7 +302,7 @@ export module Plot {
       attrToProjector["width"] = this._isVertical ? widthF : heightF;
       attrToProjector["height"] = this._isVertical ? heightF : widthF;
 
-      if (secondaryScale instanceof Plottable.Scale.Ordinal) {
+      if (secondaryScale instanceof Plottable.Scale.Category) {
         attrToProjector[secondaryAttr] = (d: any, i: number, u: any, m: PlotMetadata) =>
           positionF(d, i, u, m) - widthF(d, i, u, m) / 2;
       } else {
@@ -335,16 +335,16 @@ export module Plot {
     /**
      * Computes the barPixelWidth of all the bars in the plot.
      *
-     * If the position scale of the plot is an OrdinalScale and in bands mode, then the rangeBands function will be used.
-     * If the position scale of the plot is an OrdinalScale and in points mode, then
+     * If the position scale of the plot is a CategoryScale and in bands mode, then the rangeBands function will be used.
+     * If the position scale of the plot is a CategoryScale and in points mode, then
      *   from https://github.com/mbostock/d3/wiki/Ordinal-Scales#ordinal_rangePoints, the max barPixelWidth is step * padding
      * If the position scale of the plot is a QuantitativeScale, then _getMinimumDataWidth is scaled to compute the barPixelWidth
      */
     protected _getBarPixelWidth(): number {
       var barPixelWidth: number;
       var barScale: Scale.AbstractScale<any,number>  = this._isVertical ? this._xScale : this._yScale;
-      if (barScale instanceof Plottable.Scale.Ordinal) {
-        barPixelWidth = (<Plottable.Scale.Ordinal> barScale).rangeBand();
+      if (barScale instanceof Plottable.Scale.Category) {
+        barPixelWidth = (<Plottable.Scale.Category> barScale).rangeBand();
       } else {
         var barAccessor = this._isVertical ? this._projections["x"].accessor : this._projections["y"].accessor;
 

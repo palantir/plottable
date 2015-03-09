@@ -205,10 +205,10 @@ describe("Scales", () => {
 
   });
 
-  describe("Ordinal Scales", () => {
+  describe("Category Scales", () => {
 
     it("rangeBand is updated when domain changes", () => {
-      var scale = new Plottable.Scale.Ordinal();
+      var scale = new Plottable.Scale.Category();
       scale.range([0, 2679]);
 
       scale.domain(["1","2","3","4"]);
@@ -219,7 +219,7 @@ describe("Scales", () => {
     });
 
     it("stepWidth operates normally", () => {
-      var scale = new Plottable.Scale.Ordinal();
+      var scale = new Plottable.Scale.Category();
       scale.range([0, 3000]);
 
       scale.domain(["1","2","3","4"]);
@@ -228,9 +228,9 @@ describe("Scales", () => {
     });
   });
 
-  it("OrdinalScale + BarPlot combo works as expected when the data is swapped", () => {
+  it("CategoryScale + BarPlot combo works as expected when the data is swapped", () => {
     // This unit test taken from SLATE, see SLATE-163 a fix for SLATE-102
-    var xScale = new Plottable.Scale.Ordinal();
+    var xScale = new Plottable.Scale.Category();
     var yScale = new Plottable.Scale.Linear();
     var dA = {x: "A", y: 2};
     var dB = {x: "B", y: 2};
@@ -261,7 +261,7 @@ describe("Scales", () => {
   });
 
   describe("Color Scales", () => {
-    it("accepts categorical string types and ordinal domain", () => {
+    it("accepts categorical string types and Category domain", () => {
       var scale = new Plottable.Scale.Color("10");
       scale.domain(["yes", "no", "maybe"]);
       assert.equal("#1f77b4", scale.scale("yes"));

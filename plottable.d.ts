@@ -905,7 +905,7 @@ declare module Plottable {
              * the data.
              *
              * Extent: The [min, max] pair for a Scale.Quantitative, all covered
-             * strings for a Scale.Ordinal.
+             * strings for a Scale.Category.
              *
              * Perspective: A combination of a Dataset and an Accessor that
              * represents a view in to the data.
@@ -1226,13 +1226,13 @@ declare module Plottable {
 
 declare module Plottable {
     module Scale {
-        class Ordinal extends AbstractScale<string, number> {
+        class Category extends AbstractScale<string, number> {
             protected _d3Scale: D3.Scale.OrdinalScale;
             _typeCoercer: (d: any) => any;
             /**
-             * Creates an OrdinalScale.
+             * Creates a CategoryScale.
              *
-             * An OrdinalScale maps strings to numbers. A common use is to map the
+             * A CategoryScale maps strings to numbers. A common use is to map the
              * labels of a bar plot (strings) to their pixel locations (numbers).
              *
              * @constructor
@@ -1240,10 +1240,10 @@ declare module Plottable {
             constructor(scale?: D3.Scale.OrdinalScale);
             protected _getExtent(): string[];
             domain(): string[];
-            domain(values: string[]): Ordinal;
+            domain(values: string[]): Category;
             protected _setDomain(values: string[]): void;
             range(): number[];
-            range(values: number[]): Ordinal;
+            range(values: number[]): Category;
             /**
              * Returns the width of the range band.
              *
@@ -1276,7 +1276,7 @@ declare module Plottable {
              *
              * @returns {Ordinal} The calling Scale.Ordinal
              */
-            innerPadding(innerPadding: number): Ordinal;
+            innerPadding(innerPadding: number): Category;
             /**
              * Returns the outer padding of the scale.
              *
@@ -1294,8 +1294,8 @@ declare module Plottable {
              *
              * @returns {Ordinal} The calling Scale.Ordinal
              */
-            outerPadding(outerPadding: number): Ordinal;
-            copy(): Ordinal;
+            outerPadding(outerPadding: number): Category;
+            copy(): Category;
             scale(value: string): number;
         }
     }
@@ -2189,16 +2189,16 @@ declare module Plottable {
             /**
              * Constructs a CategoryAxis.
              *
-             * A CategoryAxis takes an OrdinalScale and includes word-wrapping
+             * A CategoryAxis takes a CategoryScale and includes word-wrapping
              * algorithms and advanced layout logic to try to display the scale as
              * efficiently as possible.
              *
              * @constructor
-             * @param {OrdinalScale} scale The scale to base the Axis on.
+             * @param {CategoryScale} scale The scale to base the Axis on.
              * @param {string} orientation The orientation of the Axis (top/bottom/left/right) (default = "bottom").
              * @param {Formatter} formatter The Formatter for the Axis (default Formatters.identity())
              */
-            constructor(scale: Scale.Ordinal, orientation?: string, formatter?: (d: any) => string);
+            constructor(scale: Scale.Category, orientation?: string, formatter?: (d: any) => string);
             protected _setup(): void;
             protected _rescale(): void;
             _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
@@ -2723,9 +2723,11 @@ declare module Plottable {
              *
              * @param {string | string[]} datasetKeys The dataset(s) to retrieve the selections from.
              * If not provided, all selections will be retrieved.
+             * @param {boolean} exclude If set to true, all datasets will be queried excluding the keys referenced
+             * in the previous datasetKeys argument (default = false).
              * @returns {D3.Selection} The retrieved selections.
              */
-            getAllSelections(datasetKeys?: string | string[]): D3.Selection;
+            getAllSelections(datasetKeys?: string | string[], exclude?: boolean): D3.Selection;
         }
     }
 }
@@ -2849,12 +2851,12 @@ declare module Plottable {
              * grid, and the datum can control what color it is.
              *
              * @constructor
-             * @param {Scale.Ordinal} xScale The x scale to use.
-             * @param {Scale.Ordinal} yScale The y scale to use.
+             * @param {Scale.Category} xScale The x scale to use.
+             * @param {Scale.Category} yScale The y scale to use.
              * @param {Scale.Color|Scale.InterpolatedColor} colorScale The color scale
              * to use for each grid cell.
              */
-            constructor(xScale: Scale.Ordinal, yScale: Scale.Ordinal, colorScale: Scale.AbstractScale<any, string>);
+            constructor(xScale: Scale.Category, yScale: Scale.Category, colorScale: Scale.AbstractScale<any, string>);
             addDataset(keyOrDataset: any, dataset?: any): Grid;
             protected _getDrawer(key: string): _Drawer.Rect;
             /**
@@ -2965,8 +2967,8 @@ declare module Plottable {
             /**
              * Computes the barPixelWidth of all the bars in the plot.
              *
-             * If the position scale of the plot is an OrdinalScale and in bands mode, then the rangeBands function will be used.
-             * If the position scale of the plot is an OrdinalScale and in points mode, then
+             * If the position scale of the plot is a CategoryScale and in bands mode, then the rangeBands function will be used.
+             * If the position scale of the plot is a CategoryScale and in points mode, then
              *   from https://github.com/mbostock/d3/wiki/Ordinal-Scales#ordinal_rangePoints, the max barPixelWidth is step * padding
              * If the position scale of the plot is a QuantitativeScale, then _getMinimumDataWidth is scaled to compute the barPixelWidth
              */
@@ -3420,7 +3422,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Dispatcher {
-        type MouseCallback = (p: Point) => any;
+        type MouseCallback = (p: Point, e: MouseEvent) => any;
         class Mouse extends AbstractDispatcher {
             /**
              * Get a Dispatcher.Mouse for the <svg> containing elem. If one already exists
@@ -3449,7 +3451,7 @@ declare module Plottable {
              *                                     to remove a callback.
              * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
              */
-            onMouseMove(key: any, callback: (p: Point) => any): Dispatcher.Mouse;
+            onMouseMove(key: any, callback: MouseCallback): Dispatcher.Mouse;
             /**
              * Registers a callback to be called whenever a mousedown occurs,
              * or removes the callback if `null` is passed as the callback.
@@ -3490,7 +3492,77 @@ declare module Plottable {
 
 declare module Plottable {
     module Dispatcher {
-        type KeyCallback = (keyCode: number) => any;
+        type TouchCallback = (p: Point, e: TouchEvent) => any;
+        class Touch extends AbstractDispatcher {
+            /**
+             * Get a Dispatcher.Touch for the <svg> containing elem. If one already exists
+             * on that <svg>, it will be returned; otherwise, a new one will be created.
+             *
+             * @param {SVGElement} elem A svg DOM element.
+             * @return {Dispatcher.Touch} A Dispatcher.Touch
+             */
+            static getDispatcher(elem: SVGElement): Dispatcher.Touch;
+            /**
+             * Creates a Dispatcher.Touch.
+             * This constructor should not be invoked directly under most circumstances.
+             *
+             * @param {SVGElement} svg The root <svg> element to attach to.
+             */
+            constructor(svg: SVGElement);
+            protected _getWrappedCallback(callback: Function): Core.BroadcasterCallback<Dispatcher.Touch>;
+            /**
+             * Registers a callback to be called whenever a touch starts,
+             * or removes the callback if `null` is passed as the callback.
+             *
+             * @param {any} key The key associated with the callback.
+             *                  Key uniqueness is determined by deep equality.
+             * @param {TouchCallback} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space. Pass `null`
+             *                                     to remove a callback.
+             * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
+             */
+            onTouchStart(key: any, callback: TouchCallback): Dispatcher.Touch;
+            /**
+             * Registers a callback to be called whenever the touch position changes,
+             * or removes the callback if `null` is passed as the callback.
+             *
+             * @param {any} key The key associated with the callback.
+             *                  Key uniqueness is determined by deep equality.
+             * @param {TouchCallback} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space. Pass `null`
+             *                                     to remove a callback.
+             * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
+             */
+            onTouchMove(key: any, callback: TouchCallback): Dispatcher.Touch;
+            /**
+             * Registers a callback to be called whenever a touch ends,
+             * or removes the callback if `null` is passed as the callback.
+             *
+             * @param {any} key The key associated with the callback.
+             *                  Key uniqueness is determined by deep equality.
+             * @param {TouchCallback} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space. Pass `null`
+             *                                     to remove a callback.
+             * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
+             */
+            onTouchEnd(key: any, callback: TouchCallback): Dispatcher.Touch;
+            /**
+             * Returns the last computed Touch position.
+             *
+             * @return {Point} The last known Touch position in <svg> coordinate space.
+             */
+            getLastTouchPosition(): {
+                x: number;
+                y: number;
+            };
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Dispatcher {
+        type KeyCallback = (keyCode: number, e: KeyboardEvent) => any;
         class Key extends AbstractDispatcher {
             /**
              * Get a Dispatcher.Key. If one already exists it will be returned;

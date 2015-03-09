@@ -29,7 +29,7 @@
 /// <reference path="scales/linearScale.ts" />
 /// <reference path="scales/logScale.ts" />
 /// <reference path="scales/modifiedLogScale.ts" />
-/// <reference path="scales/ordinalScale.ts" />
+/// <reference path="scales/categoryScale.ts" />
 /// <reference path="scales/colorScale.ts" />
 /// <reference path="scales/timeScale.ts" />
 /// <reference path="scales/interpolatedColorScale.ts" />
@@ -80,6 +80,7 @@
 
 /// <reference path="dispatchers/abstractDispatcher.ts" />
 /// <reference path="dispatchers/mouseDispatcher.ts" />
+/// <reference path="dispatchers/touchDispatcher.ts" />
 /// <reference path="dispatchers/keyDispatcher.ts" />
 
 /// <reference path="interactions/abstractInteraction.ts" />

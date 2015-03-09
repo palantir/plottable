@@ -13,10 +13,10 @@ function makeData() {
 function run(div, data, Plottable) {
   "use strict";
   var svg = div.append("svg").attr("height", 800);
-  var xScale1 = new Plottable.Scale.Ordinal();
+  var xScale1 = new Plottable.Scale.Category();
   var yScale1 = new Plottable.Scale.Linear();
   var xScale2 = new Plottable.Scale.Linear();
-  var yScale2 = new Plottable.Scale.Ordinal();
+  var yScale2 = new Plottable.Scale.Category();
 
   var colorScale = new Plottable.Scale.Color();
 
