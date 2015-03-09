@@ -64,8 +64,7 @@ export module Plot {
           super.project("x2", (d: any, i: number, u: any, m: Plot.PlotMetadata) => {
             return scale.scale(this._projections["x"].accessor(d, i, u, m)) + scale.rangeBand() / 2;
           });
-        } 
-        else if (scale instanceof Scale.AbstractQuantitative) {
+        } else if (scale instanceof Scale.AbstractQuantitative) {
           super.project("x1", (d: any, i: number, u: any, m: Plot.PlotMetadata) => {
             return scale.scale(this._projections["x"].accessor(d, i, u, m));
           });
@@ -80,8 +79,7 @@ export module Plot {
           super.project("y2", (d: any, i: number, u: any, m: Plot.PlotMetadata) => {
             return scale.scale(this._projections["y"].accessor(d, i, u, m)) + scale.rangeBand() / 2;
           });
-        } 
-        else if (scale instanceof Scale.AbstractQuantitative) {
+        } else if (scale instanceof Scale.AbstractQuantitative) {
           super.project("y1", (d: any, i: number, u: any, m: Plot.PlotMetadata) => {
             return scale.scale(this._projections["y"].accessor(d, i, u, m));
           });
