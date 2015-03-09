@@ -6959,9 +6959,8 @@ var Plottable;
             Rectangle.prototype._generateAttrToProjector = function () {
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
                 // Copy each of the different projectors.
-                // In the event that x1/y1 are not present, x/y will be directly leveraged
-                var x1Attr = attrToProjector["x1"] ? attrToProjector["x1"] : attrToProjector["x"];
-                var y1Attr = attrToProjector["y1"] ? attrToProjector["y1"] : attrToProjector["y"];
+                var x1Attr = attrToProjector["x1"];
+                var y1Attr = attrToProjector["y1"];
                 var x2Attr = attrToProjector["x2"];
                 var y2Attr = attrToProjector["y2"];
                 // Generate width based on difference, then adjust for the correct x origin
@@ -7176,8 +7175,8 @@ var Plottable;
                 return new Plottable._Drawer.Rect(key, true);
             };
             /**
-             * @param {string} attrToSet One of ["x", "y", "x1", "y1", "x2", "y2", "fill"]. If "fill" is used,
-             * the data should return a valid CSS color. "x1" and "y1" can act as aliases to "x" and "y"
+             * @param {string} attrToSet One of ["x", "y", "x2", "y2", "fill"]. If "fill" is used,
+             * the data should return a valid CSS color.
              */
             Grid.prototype.project = function (attrToSet, accessor, scale) {
                 var _this = this;
@@ -7193,6 +7192,11 @@ var Plottable;
                             return scale.scale(_this._projections["x"].accessor(d, i, u, m)) + scale.rangeBand() / 2;
                         });
                     }
+                    else if (scale instanceof Plottable.Scale.AbstractQuantitative) {
+                        _super.prototype.project.call(this, "x1", function (d, i, u, m) {
+                            return scale.scale(_this._projections["x"].accessor(d, i, u, m));
+                        });
+                    }
                 }
                 if (attrToSet === "y" && this._projections["y2"] === undefined) {
                     if (scale instanceof Plottable.Scale.Category) {
@@ -7201,6 +7205,11 @@ var Plottable;
                         });
                         _super.prototype.project.call(this, "y2", function (d, i, u, m) {
                             return scale.scale(_this._projections["y"].accessor(d, i, u, m)) + scale.rangeBand() / 2;
+                        });
+                    }
+                    else if (scale instanceof Plottable.Scale.AbstractQuantitative) {
+                        _super.prototype.project.call(this, "y1", function (d, i, u, m) {
+                            return scale.scale(_this._projections["y"].accessor(d, i, u, m));
                         });
                     }
                 }

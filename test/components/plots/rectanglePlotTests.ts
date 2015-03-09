@@ -33,6 +33,8 @@ describe("Plots", () => {
       rectanglePlot.addDataset(DATA)
               .project("x", "x", xScale)
               .project("y", "y", yScale)
+              .project("x1", "x", xScale)
+              .project("y1", "y", yScale)
               .project("x2", "x2", xScale)
               .project("y2", "y2", yScale)
               .renderTo(svg);

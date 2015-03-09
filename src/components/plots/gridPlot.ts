@@ -48,8 +48,8 @@ export module Plot {
     }
 
     /**
-     * @param {string} attrToSet One of ["x", "y", "x1", "y1", "x2", "y2", "fill"]. If "fill" is used,
-     * the data should return a valid CSS color. "x1" and "y1" can act as aliases to "x" and "y"
+     * @param {string} attrToSet One of ["x", "y", "x2", "y2", "fill"]. If "fill" is used,
+     * the data should return a valid CSS color.
      */
     public project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>) {
       attrToSet = attrToSet === "x1" ? "x" : attrToSet;
@@ -64,6 +64,11 @@ export module Plot {
           super.project("x2", (d: any, i: number, u: any, m: Plot.PlotMetadata) => {
             return scale.scale(this._projections["x"].accessor(d, i, u, m)) + scale.rangeBand() / 2;
           });
+        } 
+        else if (scale instanceof Scale.AbstractQuantitative) {
+          super.project("x1", (d: any, i: number, u: any, m: Plot.PlotMetadata) => {
+            return scale.scale(this._projections["x"].accessor(d, i, u, m));
+          });
         }
       }
 
@@ -74,6 +79,11 @@ export module Plot {
           });
           super.project("y2", (d: any, i: number, u: any, m: Plot.PlotMetadata) => {
             return scale.scale(this._projections["y"].accessor(d, i, u, m)) + scale.rangeBand() / 2;
+          });
+        } 
+        else if (scale instanceof Scale.AbstractQuantitative) {
+          super.project("y1", (d: any, i: number, u: any, m: Plot.PlotMetadata) => {
+            return scale.scale(this._projections["y"].accessor(d, i, u, m));
           });
         }
       }

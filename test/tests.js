@@ -3475,7 +3475,7 @@ describe("Plots", function () {
             var yScale = new Plottable.Scale.Linear();
             var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
             var rectanglePlot = new Plottable.Plot.Rectangle(xScale, yScale);
-            rectanglePlot.addDataset(DATA).project("x", "x", xScale).project("y", "y", yScale).project("x2", "x2", xScale).project("y2", "y2", yScale).renderTo(svg);
+            rectanglePlot.addDataset(DATA).project("x", "x", xScale).project("y", "y", yScale).project("x1", "x", xScale).project("y1", "y", yScale).project("x2", "x2", xScale).project("y2", "y2", yScale).renderTo(svg);
             VERIFY_CELLS(rectanglePlot._renderArea.selectAll("rect"));
             svg.remove();
         });

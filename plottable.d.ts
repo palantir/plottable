@@ -2859,8 +2859,8 @@ declare module Plottable {
             addDataset(keyOrDataset: any, dataset?: any): Grid;
             protected _getDrawer(key: string): _Drawer.Rect;
             /**
-             * @param {string} attrToSet One of ["x", "y", "x1", "y1", "x2", "y2", "fill"]. If "fill" is used,
-             * the data should return a valid CSS color. "x1" and "y1" can act as aliases to "x" and "y"
+             * @param {string} attrToSet One of ["x", "y", "x2", "y2", "fill"]. If "fill" is used,
+             * the data should return a valid CSS color.
              */
             project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): Grid;
             protected _generateDrawSteps(): _Drawer.DrawStep[];

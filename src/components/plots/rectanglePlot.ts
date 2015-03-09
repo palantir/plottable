@@ -28,9 +28,8 @@ export module Plot {
       var attrToProjector = super._generateAttrToProjector();
 
       // Copy each of the different projectors.
-      // In the event that x1/y1 are not present, x/y will be directly leveraged
-      var x1Attr = attrToProjector["x1"] ? attrToProjector["x1"] : attrToProjector["x"];
-      var y1Attr = attrToProjector["y1"] ? attrToProjector["y1"] : attrToProjector["y"];
+      var x1Attr = attrToProjector["x1"];
+      var y1Attr = attrToProjector["y1"];
       var x2Attr = attrToProjector["x2"];
       var y2Attr = attrToProjector["y2"];
 
