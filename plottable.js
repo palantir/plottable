@@ -3291,8 +3291,10 @@ var Plottable;
                 var innerRadiusAccessor = this._attrToProjector["inner-radius"];
                 var outerRadiusAccessor = this._attrToProjector["outer-radius"];
                 var avgRadius = (innerRadiusAccessor(datum, index) + outerRadiusAccessor(datum, index)) / 2;
-                var avgAngle = (datum.startAngle + datum.endAngle) / 2;
-                return { x: avgRadius * Math.sin(avgAngle), y: avgRadius * Math.cos(avgAngle) };
+                var startAngle = +this._getSelection(index).datum().startAngle;
+                var endAngle = +this._getSelection(index).datum().endAngle;
+                var avgAngle = (startAngle + endAngle) / 2;
+                return { x: avgRadius * Math.sin(avgAngle), y: -avgRadius * Math.cos(avgAngle) };
             };
             return Arc;
         })(_Drawer.Element);
@@ -6639,6 +6641,42 @@ var Plottable;
                 });
                 return d3.selectAll(allSelections);
             };
+            /**
+             * Retrieves all of the PlotData of this plot for the specified dataset(s)
+             *
+             * @param {string | string[]} datasetKeys The dataset(s) to retrieve the selections from.
+             * If not provided, all selections will be retrieved.
+             * @returns {PlotData} The retrieved PlotData.
+             */
+            AbstractPlot.prototype.getAllPlotData = function (datasetKeys) {
+                var _this = this;
+                var datasetKeyArray = [];
+                if (datasetKeys == null) {
+                    datasetKeyArray = this._datasetKeysInOrder;
+                }
+                else if (typeof (datasetKeys) === "string") {
+                    datasetKeyArray = [datasetKeys];
+                }
+                else {
+                    datasetKeyArray = datasetKeys;
+                }
+                var data = [];
+                var pixelPoints = [];
+                var allElements = [];
+                datasetKeyArray.forEach(function (datasetKey) {
+                    var plotDatasetKey = _this._key2PlotDatasetKey.get(datasetKey);
+                    if (plotDatasetKey == null) {
+                        return;
+                    }
+                    var drawer = plotDatasetKey.drawer;
+                    plotDatasetKey.dataset.data().forEach(function (datum, index) {
+                        data.push(datum);
+                        pixelPoints.push(drawer._getPixelPoint(datum, index));
+                        allElements.push(drawer._getSelection(index).node());
+                    });
+                });
+                return { data: data, pixelPoints: pixelPoints, selection: d3.selectAll(allElements) };
+            };
             return AbstractPlot;
         })(Plottable.Component.AbstractComponent);
         Plot.AbstractPlot = AbstractPlot;
@@ -6701,6 +6739,15 @@ var Plottable;
             };
             Pie.prototype._getDrawer = function (key) {
                 return new Plottable._Drawer.Arc(key).setClass("arc");
+            };
+            Pie.prototype.getAllPlotData = function (datasetKeys) {
+                var _this = this;
+                var allPlotData = _super.prototype.getAllPlotData.call(this, datasetKeys);
+                allPlotData.pixelPoints.forEach(function (pixelPoint) {
+                    pixelPoint.x = pixelPoint.x + _this.width() / 2;
+                    pixelPoint.y = pixelPoint.y + _this.height() / 2;
+                });
+                return allPlotData;
             };
             return Pie;
         })(Plot.AbstractPlot);

@@ -357,7 +357,7 @@ describe("Drawers", function () {
                 var radius = 75;
                 var angle = Math.PI / 4 + ((Math.PI * index) / 2);
                 var expectedX = radius * Math.sin(angle);
-                var expectedY = radius * Math.cos(angle);
+                var expectedY = -radius * Math.cos(angle);
                 assert.closeTo(pixelPoint.x, expectedX, 1, "x coordinate correct");
                 assert.closeTo(pixelPoint.y, expectedY, 1, "y coordinate correct");
             });
@@ -2036,6 +2036,64 @@ describe("Plots", function () {
             var nonExcludedSelection = plot.getAllSelections(["ds1"], true);
             assert.strictEqual(nonExcludedSelection.size(), 1);
             assert.strictEqual(numAttr(nonExcludedSelection, "cy"), 10, "retreived non-excluded selection in renderArea2");
+            svg.remove();
+        });
+        it("getAllPlotData() with dataset retrieval", function () {
+            var svg = generateSVG(400, 400);
+            var plot = new Plottable.Plot.AbstractPlot();
+            var data1 = [{ value: 0 }, { value: 1 }, { value: 2 }];
+            var data2 = [{ value: 0 }, { value: 1 }, { value: 2 }];
+            var data1Points = data1.map(function (datum) {
+                return { x: datum.value, y: 100 };
+            });
+            var data2Points = data2.map(function (datum) {
+                return { x: datum.value, y: 10 };
+            });
+            var data1PointConverter = function (datum, index) { return data1Points[index]; };
+            var data2PointConverter = function (datum, index) { return data2Points[index]; };
+            // Create mock drawers with already drawn items
+            var mockDrawer1 = new Plottable._Drawer.AbstractDrawer("ds1");
+            var renderArea1 = svg.append("g");
+            renderArea1.append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
+            mockDrawer1.setup = function () { return mockDrawer1._renderArea = renderArea1; };
+            mockDrawer1._getSelector = function () { return "circle"; };
+            mockDrawer1._getPixelPoint = data1PointConverter;
+            var renderArea2 = svg.append("g");
+            renderArea2.append("circle").attr("cx", 10).attr("cy", 10).attr("r", 10);
+            var mockDrawer2 = new Plottable._Drawer.AbstractDrawer("ds2");
+            mockDrawer2.setup = function () { return mockDrawer2._renderArea = renderArea2; };
+            mockDrawer2._getSelector = function () { return "circle"; };
+            mockDrawer2._getPixelPoint = data2PointConverter;
+            // Mock _getDrawer to return the mock drawers
+            plot._getDrawer = function (key) {
+                if (key === "ds1") {
+                    return mockDrawer1;
+                }
+                else {
+                    return mockDrawer2;
+                }
+            };
+            plot.addDataset("ds1", data1);
+            plot.addDataset("ds2", data2);
+            plot.renderTo(svg);
+            var allPlotData = plot.getAllPlotData();
+            assert.strictEqual(allPlotData.selection.size(), 2, "all circle selections gotten");
+            assert.includeMembers(allPlotData.data, data1, "includes data1 members");
+            assert.includeMembers(allPlotData.data, data2, "includes data2 members");
+            assert.includeMembers(allPlotData.pixelPoints, data1.map(data1PointConverter), "includes data1 points");
+            assert.includeMembers(allPlotData.pixelPoints, data2.map(data2PointConverter), "includes data2 points");
+            var singlePlotData = plot.getAllPlotData("ds1");
+            var oneSelection = singlePlotData.selection;
+            assert.strictEqual(oneSelection.size(), 1);
+            assert.strictEqual(numAttr(oneSelection, "cx"), 100, "retrieved selection in renderArea1");
+            assert.includeMembers(singlePlotData.data, data1, "includes data1 members");
+            assert.includeMembers(singlePlotData.pixelPoints, data1.map(data1PointConverter), "includes data1 points");
+            var oneElementPlotData = plot.getAllPlotData(["ds2"]);
+            var oneElementSelection = oneElementPlotData.selection;
+            assert.strictEqual(oneElementSelection.size(), 1);
+            assert.strictEqual(numAttr(oneElementSelection, "cy"), 10, "retreieved selection in renderArea2");
+            assert.includeMembers(oneElementPlotData.data, data2, "includes data2 members");
+            assert.includeMembers(oneElementPlotData.pixelPoints, data2.map(data2PointConverter), "includes data2 points");
             svg.remove();
         });
         describe("Dataset removal", function () {
