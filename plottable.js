@@ -6263,6 +6263,41 @@ var Plottable;
     })(Component = Plottable.Component || (Plottable.Component = {}));
 })(Plottable || (Plottable = {}));
 
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    var Component;
+    (function (Component) {
+        var SelectionBoxContainer = (function (_super) {
+            __extends(SelectionBoxContainer, _super);
+            function SelectionBoxContainer() {
+                _super.call(this);
+                this._selectionBoxes = [];
+                this.classed("selection-box-container", true);
+            }
+            SelectionBoxContainer.prototype._setup = function () {
+                _super.prototype._setup.call(this);
+                this._selectionBoxes.push(new Plottable.Entity.SelectionBox(this._content));
+            };
+            SelectionBoxContainer.prototype.getSelectionBoxes = function () {
+                return this._selectionBoxes;
+            };
+            SelectionBoxContainer.prototype.dismissAll = function () {
+                this._selectionBoxes.forEach(function (b) { return b.dismiss(); });
+                return this;
+            };
+            return SelectionBoxContainer;
+        })(Component.AbstractComponent);
+        Component.SelectionBoxContainer = SelectionBoxContainer;
+    })(Component = Plottable.Component || (Plottable.Component = {}));
+})(Plottable || (Plottable = {}));
+
 ///<reference path="../../reference.ts" />
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -9775,6 +9810,121 @@ var Plottable;
         })(Interaction.AbstractInteraction);
         Interaction.Hover = Hover;
     })(Interaction = Plottable.Interaction || (Plottable.Interaction = {}));
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var Plottable;
+(function (Plottable) {
+    var Entity;
+    (function (Entity) {
+        var SelectionBox = (function () {
+            function SelectionBox(parent) {
+                var _this = this;
+                this._topLeft = { x: 0, y: 0 };
+                this._bottomRight = { x: 0, y: 0 };
+                this._detectionRadius = 2;
+                this._parentNode = parent.node();
+                this._box = parent.append("g").classed("selection-box", true).remove();
+                this._core = this._box.append("rect").classed("selection-area", true);
+                var createLine = function () { return _this._box.append("line").style({
+                    "opacity": 0,
+                    "stroke": "pink",
+                    "stroke-width": 2 * _this._detectionRadius
+                }); };
+                this._edgeT = createLine().classed("selection-edge-tb", true);
+                this._edgeB = createLine().classed("selection-edge-tb", true);
+                this._edgeL = createLine().classed("selection-edge-lr", true);
+                this._edgeR = createLine().classed("selection-edge-lr", true);
+                var createCorner = function () { return _this._box.append("circle").attr("r", _this._detectionRadius).style({
+                    "opacity": 0,
+                    "fill": "pink",
+                }); };
+                this._cornerTL = createCorner().classed("selection-corner-tl", true);
+                this._cornerTR = createCorner().classed("selection-corner-tr", true);
+                this._cornerBL = createCorner().classed("selection-corner-bl", true);
+                this._cornerBR = createCorner().classed("selection-corner-br", true);
+            }
+            SelectionBox.prototype.classed = function (cssClass, addClass) {
+                if (addClass == null) {
+                    if (cssClass == null) {
+                        return false;
+                    }
+                    else {
+                        return this._box.classed(cssClass);
+                    }
+                }
+                else {
+                    if (cssClass != null) {
+                        this._box.classed(cssClass, addClass);
+                    }
+                    return this;
+                }
+            };
+            SelectionBox.prototype.setBounds = function (topLeft, bottomRight) {
+                this._topLeft = topLeft;
+                this._bottomRight = bottomRight;
+                var w = this._bottomRight.x - this._topLeft.x;
+                var h = this._bottomRight.y - this._topLeft.y;
+                this._core.attr({
+                    width: w,
+                    height: h
+                });
+                this._edgeT.attr({
+                    x1: 0,
+                    y1: 0,
+                    x2: w,
+                    y2: 0
+                });
+                this._edgeB.attr({
+                    x1: 0,
+                    y1: h,
+                    x2: w,
+                    y2: h
+                });
+                this._edgeL.attr({
+                    x1: 0,
+                    y1: 0,
+                    x2: 0,
+                    y2: h
+                });
+                this._edgeR.attr({
+                    x1: w,
+                    y1: 0,
+                    x2: w,
+                    y2: h
+                });
+                this._cornerTR.attr({ cx: w, cy: 0 });
+                this._cornerBL.attr({ cx: 0, cy: h });
+                this._cornerBR.attr({ cx: w, cy: h });
+                this._box.attr("transform", "translate(" + this._topLeft.x + ", " + this._topLeft.y + ")");
+                this._parentNode.appendChild(this._box.node());
+                return this;
+            };
+            SelectionBox.prototype.detectionRadius = function (radius) {
+                if (radius == null) {
+                    return this._detectionRadius;
+                }
+                if (radius < 0) {
+                    throw new Error("Detection radius cannot be negative.");
+                }
+                this._detectionRadius = radius;
+                this._edgeT.style("stroke-width", 2 * this._detectionRadius);
+                this._edgeB.style("stroke-width", 2 * this._detectionRadius);
+                this._edgeL.style("stroke-width", 2 * this._detectionRadius);
+                this._edgeR.style("stroke-width", 2 * this._detectionRadius);
+                this._cornerTL.attr("r", this._detectionRadius);
+                this._cornerTR.attr("r", this._detectionRadius);
+                this._cornerBL.attr("r", this._detectionRadius);
+                this._cornerBR.attr("r", this._detectionRadius);
+            };
+            SelectionBox.prototype.dismiss = function () {
+                this._box.remove();
+                return this;
+            };
+            return SelectionBox;
+        })();
+        Entity.SelectionBox = SelectionBox;
+    })(Entity = Plottable.Entity || (Plottable.Entity = {}));
 })(Plottable || (Plottable = {}));
 
 /*!
