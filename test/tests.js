@@ -1498,7 +1498,7 @@ describe("Legend", function () {
             var d3this = d3.select(this);
             var text = d3this.select("text").text();
             assert.equal(text, d, "the text node has correct text");
-            var symbol = d3this.select("." + Plottable.Component.Legend.LEGEND_ICON_CLASS);
+            var symbol = d3this.select("." + Plottable.Component.Legend.LEGEND_SYMBOL_CLASS);
             assert.equal(symbol.attr("fill"), color.scale(d), "the symbol's fill is set properly");
         });
         svg.remove();
@@ -1561,7 +1561,7 @@ describe("Legend", function () {
             assert.equal(d, newDomain[i], "the data is set correctly");
             var text = d3.select(this).select("text").text();
             assert.equal(text, d, "the text was set properly");
-            var fill = d3.select(this).select("." + Plottable.Component.Legend.LEGEND_ICON_CLASS).attr("fill");
+            var fill = d3.select(this).select("." + Plottable.Component.Legend.LEGEND_SYMBOL_CLASS).attr("fill");
             assert.equal(fill, color.scale(d), "the fill was set properly");
         });
         assert.lengthOf(legend._content.selectAll(rowSelector)[0], 5, "there are the right number of legend elements");
@@ -1578,7 +1578,7 @@ describe("Legend", function () {
             assert.equal(d, newDomain[i], "the data is set correctly");
             var text = d3.select(this).select("text").text();
             assert.equal(text, d, "the text was set properly");
-            var fill = d3.select(this).select("." + Plottable.Component.Legend.LEGEND_ICON_CLASS).attr("fill");
+            var fill = d3.select(this).select("." + Plottable.Component.Legend.LEGEND_SYMBOL_CLASS).attr("fill");
             assert.equal(fill, newColorScale.scale(d), "the fill was set properly");
         });
         svg.remove();
@@ -1596,7 +1596,7 @@ describe("Legend", function () {
             assert.equal(d, newDomain[i], "the data is set correctly");
             var text = d3.select(this).select("text").text();
             assert.equal(text, d, "the text was set properly");
-            var fill = d3.select(this).select("." + Plottable.Component.Legend.LEGEND_ICON_CLASS).attr("fill");
+            var fill = d3.select(this).select("." + Plottable.Component.Legend.LEGEND_SYMBOL_CLASS).attr("fill");
             assert.equal(fill, newColorScale.scale(d), "the fill was set properly");
         });
         svg.remove();
@@ -1608,7 +1608,7 @@ describe("Legend", function () {
         style.attr("type", "text/css");
         function verifyIconHeight() {
             var text = legend._content.select("text");
-            var icon = legend._content.select("." + Plottable.Component.Legend.LEGEND_ICON_CLASS);
+            var icon = legend._content.select("." + Plottable.Component.Legend.LEGEND_SYMBOL_CLASS);
             var textHeight = Plottable._Util.DOM.getBBox(text).height;
             var iconHeight = icon.node().getBoundingClientRect().height;
             assert.operator(iconHeight, "<", textHeight, "icons too small: iconHeight < textHeight");
