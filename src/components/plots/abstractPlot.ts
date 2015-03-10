@@ -430,11 +430,9 @@ export module Plot {
      * in the previous datasetKeys argument (default = false).
      * @returns {D3.Selection} The retrieved selections.
      */
-    public getAllSelections(datasetKeys?: string | string[], exclude = false): D3.Selection {
+    public getAllSelections(datasetKeys: string | string[] = this.datasetOrder(), exclude = false): D3.Selection {
       var datasetKeyArray: string[] = [];
-      if (datasetKeys == null) {
-        datasetKeyArray = this.datasetOrder();
-      } else if (typeof(datasetKeys) === "string") {
+      if (typeof(datasetKeys) === "string") {
         datasetKeyArray = [<string> datasetKeys];
       } else {
         datasetKeyArray = <string[]> datasetKeys;
@@ -466,11 +464,9 @@ export module Plot {
      * If not provided, all selections will be retrieved.
      * @returns {PlotData} The retrieved PlotData.
      */
-    public getAllPlotData(datasetKeys?: string | string[]): PlotData {
+    public getAllPlotData(datasetKeys: string | string[] = this.datasetOrder()): PlotData {
       var datasetKeyArray: string[] = [];
-      if (datasetKeys == null) {
-        datasetKeyArray = this._datasetKeysInOrder;
-      } else if (typeof(datasetKeys) === "string") {
+      if (typeof(datasetKeys) === "string") {
         datasetKeyArray = [<string> datasetKeys];
       } else {
         datasetKeyArray = <string[]> datasetKeys;

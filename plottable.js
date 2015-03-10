@@ -6696,12 +6696,10 @@ var Plottable;
              */
             AbstractPlot.prototype.getAllSelections = function (datasetKeys, exclude) {
                 var _this = this;
+                if (datasetKeys === void 0) { datasetKeys = this.datasetOrder(); }
                 if (exclude === void 0) { exclude = false; }
                 var datasetKeyArray = [];
-                if (datasetKeys == null) {
-                    datasetKeyArray = this.datasetOrder();
-                }
-                else if (typeof (datasetKeys) === "string") {
+                if (typeof (datasetKeys) === "string") {
                     datasetKeyArray = [datasetKeys];
                 }
                 else {
@@ -6733,11 +6731,9 @@ var Plottable;
              */
             AbstractPlot.prototype.getAllPlotData = function (datasetKeys) {
                 var _this = this;
+                if (datasetKeys === void 0) { datasetKeys = this.datasetOrder(); }
                 var datasetKeyArray = [];
-                if (datasetKeys == null) {
-                    datasetKeyArray = this._datasetKeysInOrder;
-                }
-                else if (typeof (datasetKeys) === "string") {
+                if (typeof (datasetKeys) === "string") {
                     datasetKeyArray = [datasetKeys];
                 }
                 else {
