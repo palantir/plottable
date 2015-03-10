@@ -531,7 +531,7 @@ export module Component {
      *
      * Will return undefined if the Component has not been anchored.
      *
-     * @return {D3.Selection} foreground selection for the Component
+     * @return {D3.Selection} content selection for the Component
      */
     public content(): D3.Selection {
       return this._content;
