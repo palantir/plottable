@@ -11,7 +11,7 @@ function run(svg, data, Plottable) {
   var DOW = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
   var Emp = ["Justin", "Cassie", "Brandon", "Roger", "Dan", "Lewin", "Brian"];
   
-  var xScale = new Plottable.Scale.Ordinal();
+  var xScale = new Plottable.Scale.Category();
   var yScale = new Plottable.Scale.Linear();
   var xAxis = new Plottable.Axis.Category(xScale, "bottom");
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");

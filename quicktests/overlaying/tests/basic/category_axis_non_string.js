@@ -6,11 +6,11 @@ function makeData() {
 function run(svg, data, Plottable) {
   "use strict";
 
-  var scale1 = new Plottable.Scale.Ordinal().domain(["foo", "bar", "baz"]);
-    var scale2 = new Plottable.Scale.Ordinal().domain([null, undefined, true, false]);
-    var scale3 = new Plottable.Scale.Ordinal().domain([0, 1, 2, 3]);
-    var scale4 = new Plottable.Scale.Ordinal().domain([{}, function(){}, []]);
-    var scale5 = new Plottable.Scale.Ordinal().domain([]);
+    var scale1 = new Plottable.Scale.Category().domain(["foo", "bar", "baz"]);
+    var scale2 = new Plottable.Scale.Category().domain([null, undefined, true, false]);
+    var scale3 = new Plottable.Scale.Category().domain([0, 1, 2, 3]);
+    var scale4 = new Plottable.Scale.Category().domain([{}, function(){}, []]);
+    var scale5 = new Plottable.Scale.Category().domain([]);
 
     var axis1 = new Plottable.Axis.Category(scale1, "left");
     var axis2 = new Plottable.Axis.Category(scale2, "left");

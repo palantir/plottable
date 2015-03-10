@@ -62,4 +62,5 @@
 
 ///<reference path="dispatchers/dispatcherTests.ts" />
 ///<reference path="dispatchers/mouseDispatcherTests.ts" />
+///<reference path="dispatchers/touchDispatcherTests.ts" />
 ///<reference path="dispatchers/keyDispatcherTests.ts" />

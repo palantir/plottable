@@ -215,18 +215,18 @@ describe("Plots", () => {
     });
   });
 
-  describe("auto scale domain on ordinal", () => {
+  describe("auto scale domain on Category", () => {
     var svg: D3.Selection;
     var SVG_WIDTH = 600;
     var SVG_HEIGHT = 400;
     var yScale: Plottable.Scale.Linear;
-    var xScale: Plottable.Scale.Ordinal;
+    var xScale: Plottable.Scale.Category;
     var data1: any[];
     var data2: any[];
 
     beforeEach(() => {
       svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      xScale = new Plottable.Scale.Ordinal().domain(["a", "b"]);;
+      xScale = new Plottable.Scale.Category().domain(["a", "b"]);;
       yScale = new Plottable.Scale.Linear();
 
       data1 = [
@@ -269,14 +269,14 @@ describe("Plots", () => {
 
   describe("scale extent updates", () => {
     var svg: D3.Selection;
-    var xScale: Plottable.Scale.Ordinal;
+    var xScale: Plottable.Scale.Category;
     var yScale: Plottable.Scale.Linear;
     var stackedBarPlot: Plottable.Plot.StackedBar<string, number>;
 
     beforeEach(() => {
       svg = generateSVG(600, 400);
 
-      xScale = new Plottable.Scale.Ordinal();
+      xScale = new Plottable.Scale.Category();
       yScale = new Plottable.Scale.Linear();
 
       stackedBarPlot = new Plottable.Plot.StackedBar(xScale, yScale);

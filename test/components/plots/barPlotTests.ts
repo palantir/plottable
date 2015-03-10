@@ -7,7 +7,7 @@ describe("Plots", () => {
     describe("Vertical Bar Plot", () => {
       var svg: D3.Selection;
       var dataset: Plottable.Dataset;
-      var xScale: Plottable.Scale.Ordinal;
+      var xScale: Plottable.Scale.Category;
       var yScale: Plottable.Scale.Linear;
       var barPlot: Plottable.Plot.Bar<string, number>;
       var SVG_WIDTH = 600;
@@ -15,7 +15,7 @@ describe("Plots", () => {
 
       beforeEach(() => {
         svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        xScale = new Plottable.Scale.Ordinal().domain(["A", "B"]);
+        xScale = new Plottable.Scale.Category().domain(["A", "B"]);
         yScale = new Plottable.Scale.Linear();
         var data = [
           {x: "A", y: 1},
@@ -270,14 +270,14 @@ describe("Plots", () => {
     describe("Horizontal Bar Plot", () => {
       var svg: D3.Selection;
       var dataset: Plottable.Dataset;
-      var yScale: Plottable.Scale.Ordinal;
+      var yScale: Plottable.Scale.Category;
       var xScale: Plottable.Scale.Linear;
       var barPlot: Plottable.Plot.Bar<number, string>;
       var SVG_WIDTH = 600;
       var SVG_HEIGHT = 400;
       beforeEach(() => {
         svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        yScale = new Plottable.Scale.Ordinal().domain(["A", "B"]);
+        yScale = new Plottable.Scale.Category().domain(["A", "B"]);
         xScale = new Plottable.Scale.Linear();
         xScale.domain([-3, 3]);
 
@@ -361,7 +361,7 @@ describe("Plots", () => {
       var plot: Plottable.Plot.Bar<string, number>;
       var data: any[];
       var dataset: Plottable.Dataset;
-      var xScale: Plottable.Scale.Ordinal;
+      var xScale: Plottable.Scale.Category;
       var yScale: Plottable.Scale.Linear;
       var svg: D3.Selection;
 
@@ -369,7 +369,7 @@ describe("Plots", () => {
         svg = generateSVG();
         data = [{x: "foo", y: 5}, {x: "bar", y: 640}, {x: "zoo", y: 12345}];
         dataset = new Plottable.Dataset(data);
-        xScale = new Plottable.Scale.Ordinal();
+        xScale = new Plottable.Scale.Category();
         yScale = new Plottable.Scale.Linear();
         plot = new Plottable.Plot.Bar<string, number>(xScale, yScale);
         plot.addDataset(dataset);
@@ -446,7 +446,7 @@ describe("Plots", () => {
       beforeEach(() => {
         svg = generateSVG();
         dataset = new Plottable.Dataset();
-        var xScale = new Plottable.Scale.Ordinal();
+        var xScale = new Plottable.Scale.Category();
         var yScale = new Plottable.Scale.Linear();
         verticalBarPlot = new Plottable.Plot.Bar<string, number>(xScale, yScale);
         verticalBarPlot.project("x", "x", xScale);
@@ -515,12 +515,12 @@ describe("Plots", () => {
 
     });
 
-    it("plot auto domain scale to visible points on ordinal scale", () => {
+    it("plot auto domain scale to visible points on Category scale", () => {
       var svg = generateSVG(500, 500);
       var xAccessor = (d: any, i: number, u: any) => d.a;
       var yAccessor = (d: any, i: number, u: any) => d.b + u.foo;
       var simpleDataset = new Plottable.Dataset([{a: "a", b: 6}, {a: "b", b: 2}, {a: "c", b: -2}, {a: "d", b: -6}], {foo: 0});
-      var xScale = new Plottable.Scale.Ordinal();
+      var xScale = new Plottable.Scale.Category();
       var yScale = new Plottable.Scale.Linear();
       var plot = new Plottable.Plot.Bar(xScale, yScale);
       plot.addDataset(simpleDataset)

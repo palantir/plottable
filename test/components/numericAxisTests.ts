@@ -311,7 +311,7 @@ describe("NumericAxis", () => {
     var SVG_HEIGHT = 300;
     var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
 
-    var xScale = new Plottable.Scale.Ordinal();
+    var xScale = new Plottable.Scale.Category();
     var yScale = new Plottable.Scale.Linear();
     var yAxis = new Plottable.Axis.Numeric(yScale, "left");
     var yLabel = new Plottable.Component.AxisLabel("LABEL", "left");

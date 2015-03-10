@@ -32,6 +32,38 @@ describe("Dispatchers", () => {
       svg.remove();
     });
 
+    it("can remove callbacks by passing null", () => {
+      var targetWidth = 400, targetHeight = 400;
+      var target = generateSVG(targetWidth, targetHeight);
+      // HACKHACK: PhantomJS can't measure SVGs unless they have something in them occupying space
+      target.append("rect").attr("width", targetWidth).attr("height", targetHeight);
+
+      var targetX = 17;
+      var targetY = 76;
+
+      var md = Plottable.Dispatcher.Mouse.getDispatcher(<SVGElement> target.node());
+
+      var cb1Called = false;
+      var cb1 = (p: Plottable.Point, e: MouseEvent) => cb1Called = true;
+      var cb2Called = false;
+      var cb2 = (p: Plottable.Point, e: MouseEvent) => cb2Called = true;
+
+      md.onMouseMove("callback1", cb1);
+      md.onMouseMove("callback2", cb2);
+      triggerFakeMouseEvent("mousemove", target, targetX, targetY);
+      assert.isTrue(cb1Called, "callback 1 was called on mousemove");
+      assert.isTrue(cb2Called, "callback 2 was called on mousemove");
+
+      cb1Called = false;
+      cb2Called = false;
+      md.onMouseMove("callback1", null);
+      triggerFakeMouseEvent("mousemove", target, targetX, targetY);
+      assert.isFalse(cb1Called, "callback was not called after blanking");
+      assert.isTrue(cb2Called, "callback 2 was still called");
+
+      target.remove();
+    });
+
     it("doesn't call callbacks if not in the DOM", () => {
       var targetWidth = 400, targetHeight = 400;
       var target = generateSVG(targetWidth, targetHeight);
@@ -44,9 +76,7 @@ describe("Dispatchers", () => {
       var md = Plottable.Dispatcher.Mouse.getDispatcher(<SVGElement> target.node());
 
       var callbackWasCalled = false;
-      var callback = function(p: Plottable.Point) {
-        callbackWasCalled = true;
-      };
+      var callback = (p: Plottable.Point, e: MouseEvent) => callbackWasCalled = true;
 
       var keyString = "notInDomTest";
       md.onMouseMove(keyString, callback);
@@ -77,9 +107,10 @@ describe("Dispatchers", () => {
       var md = Plottable.Dispatcher.Mouse.getDispatcher(<SVGElement> target.node());
 
       var callbackWasCalled = false;
-      var callback = function(p: Plottable.Point) {
+      var callback = (p: Plottable.Point, e: MouseEvent) => {
         callbackWasCalled = true;
         assertPointsClose(p, expectedPoint, 0.5, "mouse position is correct");
+        assert.isNotNull(e, "mouse event was passed to the callback");
       };
 
       var keyString = "unit test";
@@ -114,9 +145,10 @@ describe("Dispatchers", () => {
       var md = Plottable.Dispatcher.Mouse.getDispatcher(<SVGElement> target.node());
 
       var callbackWasCalled = false;
-      var callback = function(p: Plottable.Point) {
+      var callback = (p: Plottable.Point, e: MouseEvent) => {
         callbackWasCalled = true;
         assertPointsClose(p, expectedPoint, 0.5, "mouse position is correct");
+        assert.isNotNull(e, "mouse event was passed to the callback");
       };
 
       var keyString = "unit test";
@@ -145,9 +177,10 @@ describe("Dispatchers", () => {
       var md = Plottable.Dispatcher.Mouse.getDispatcher(<SVGElement> target.node());
 
       var callbackWasCalled = false;
-      var callback = function(p: Plottable.Point) {
+      var callback = (p: Plottable.Point, e: MouseEvent) => {
         callbackWasCalled = true;
         assertPointsClose(p, expectedPoint, 0.5, "mouse position is correct");
+        assert.isNotNull(e, "mouse event was passed to the callback");
       };
 
       var keyString = "unit test";

@@ -56,8 +56,10 @@ export module _Drawer {
       var innerRadiusAccessor = this._attrToProjector["inner-radius"];
       var outerRadiusAccessor = this._attrToProjector["outer-radius"];
       var avgRadius = (innerRadiusAccessor(datum, index) + outerRadiusAccessor(datum, index)) / 2;
-      var avgAngle = (datum.startAngle + datum.endAngle) / 2;
-      return { x: avgRadius * Math.sin(avgAngle), y: avgRadius * Math.cos(avgAngle) };
+      var startAngle = +this._getSelection(index).datum().startAngle;
+      var endAngle = +this._getSelection(index).datum().endAngle;
+      var avgAngle = (startAngle + endAngle) / 2;
+      return { x: avgRadius * Math.sin(avgAngle), y: -avgRadius * Math.cos(avgAngle) };
     }
   }
 }

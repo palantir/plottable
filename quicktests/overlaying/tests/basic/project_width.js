@@ -13,7 +13,7 @@ function run(svg, data, Plottable) {
   "t", "u", "v", "w", "x", "y", "z"];
 
   var ds = new Plottable.Dataset();
-  var xScale = new Plottable.Scale.Ordinal();
+  var xScale = new Plottable.Scale.Category();
   var xAxis = new Plottable.Axis.Category(xScale, "bottom");
 
   var yScale = new Plottable.Scale.Linear();
