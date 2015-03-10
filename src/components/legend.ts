@@ -302,7 +302,18 @@ export module Component {
                     });
     }
 
+    /**
+     * Gets the SymbolGenerator of the legend, which dictates how
+     * the symbol in each entry is drawn.
+     *
+     * @returns {SymbolGenerator} The SymbolGenerator of the legend
+     */
     public symbolGenerator(): SymbolGenerator;
+    /**
+     * Sets the SymbolGenerator of the legend
+     *
+     * @returns {Legend} The calling Legend
+     */
     public symbolGenerator(symbolGenerator: SymbolGenerator): Legend;
     public symbolGenerator(symbolGenerator?: SymbolGenerator): any {
       if (symbolGenerator == null) {

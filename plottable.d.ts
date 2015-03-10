@@ -2391,7 +2391,18 @@ declare module Plottable {
              */
             getEntry(position: Point): D3.Selection;
             _doRender(): void;
+            /**
+             * Gets the SymbolGenerator of the legend, which dictates how
+             * the symbol in each entry is drawn.
+             *
+             * @returns {SymbolGenerator} The SymbolGenerator of the legend
+             */
             symbolGenerator(): SymbolGenerator;
+            /**
+             * Sets the SymbolGenerator of the legend
+             *
+             * @returns {Legend} The calling Legend
+             */
             symbolGenerator(symbolGenerator: SymbolGenerator): Legend;
         }
     }
