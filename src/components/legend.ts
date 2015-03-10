@@ -14,7 +14,7 @@ export module Component {
     /**
      * The css class applied to each legend symbol
      */
-    public static LEGEND_SYMBOL_CLASS = "legend-symbol";
+    public static LEGEND_ICON_CLASS = "legend-icon";
 
     private _padding = 5;
     private _scale: Scale.Color;
@@ -280,7 +280,7 @@ export module Component {
                                                "scale(" + (layout.textHeight * 0.3 / SymbolGenerators.SYMBOL_GENERATOR_RADIUS) + ")")
                             .attr("fill", (value: string) => this._scale.scale(value) )
                             .attr("vector-effect", "non-scaling-stroke")
-                            .classed(Legend.LEGEND_SYMBOL_CLASS, true);
+                            .classed(Legend.LEGEND_ICON_CLASS, true);
 
       var padding = this._padding;
       var textContainers = entries.select("g.text-container");

@@ -2332,7 +2332,7 @@ declare module Plottable {
             /**
              * The css class applied to each legend symbol
              */
-            static LEGEND_SYMBOL_CLASS: string;
+            static LEGEND_ICON_CLASS: string;
             /**
              * Creates a Legend.
              *
