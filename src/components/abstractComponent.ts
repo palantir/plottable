@@ -78,6 +78,11 @@ export module Component {
       this._cssClasses = null;
 
       this._backgroundContainer = this._element.append("g").classed("background-container", true);
+      this._boxes.push(
+        this._backgroundContainer.append("rect")
+                                 .classed("background-fill", true)
+                                 .attr("width", this.width()).attr("height", this.height())
+      );
       this._content = this._element.append("g").classed("content", true);
       this._foregroundContainer = this._element.append("g").classed("foreground-container", true);
       this._boxContainer = this._element.append("g").classed("box-container", true);
