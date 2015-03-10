@@ -148,32 +148,32 @@ describe("Legend", () => {
     svg.remove();
   });
 
-  it("scales icon sizes properly with font size (textHeight / 2 < iconHeight < textHeight)", () => {
+  it("scales icon sizes properly with font size (textHeight / 2 < symbolHeight < textHeight)", () => {
     color.domain(["foo"]);
     legend.renderTo(svg);
     var style = (<any> legend)._element.append("style");
     style.attr("type", "text/css");
 
-    function verifyIconHeight() {
+    function verifySymbolHeight() {
       var text = (<any> legend)._content.select("text");
       var icon = (<any> legend)._content.select("." + Plottable.Component.Legend.LEGEND_SYMBOL_CLASS);
       var textHeight = Plottable._Util.DOM.getBBox(text).height;
-      var iconHeight = icon.node().getBoundingClientRect().height;
-      assert.operator(iconHeight, "<", textHeight, "icons too small: iconHeight < textHeight");
-      assert.operator(iconHeight, ">", textHeight / 2, "icons too big: textHeight / 2 > iconHeight");
+      var symbolHeight = icon.node().getBoundingClientRect().height;
+      assert.operator(symbolHeight, "<", textHeight, "icons too small: symbolHeight < textHeight");
+      assert.operator(symbolHeight, ">", textHeight / 2, "icons too big: textHeight / 2 > symbolHeight");
     }
 
-    verifyIconHeight();
+    verifySymbolHeight();
 
     style.text(".plottable .legend text { font-size: 60px; }");
     legend._computeLayout();
     legend._render();
-    verifyIconHeight();
+    verifySymbolHeight();
 
     style.text(".plottable .legend text { font-size: 10px; }");
     legend._computeLayout();
     legend._render();
-    verifyIconHeight();
+    verifySymbolHeight();
 
     svg.remove();
   });
