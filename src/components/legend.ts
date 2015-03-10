@@ -277,7 +277,7 @@ export module Component {
 
       entries.select("path").attr("d", this.symbolGenerator())
                             .attr("transform", "translate(" + (layout.textHeight / 2) + "," + layout.textHeight / 2 + ") " +
-                                               "scale(" + (layout.textHeight * 0.3 / 50) + ")")
+                                               "scale(" + (layout.textHeight * 0.3 / SymbolGenerators.SYMBOL_GENERATOR_RADIUS) + ")")
                             .attr("fill", (value: string) => this._scale.scale(value) )
                             .attr("vector-effect", "non-scaling-stroke")
                             .classed(Legend.LEGEND_SYMBOL_CLASS, true);
