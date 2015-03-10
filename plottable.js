@@ -3458,6 +3458,7 @@ var Plottable;
                 });
                 this._cssClasses = null;
                 this._backgroundContainer = this._element.append("g").classed("background-container", true);
+                this._addBox("background-fill", this._backgroundContainer);
                 this._content = this._element.append("g").classed("content", true);
                 this._foregroundContainer = this._element.append("g").classed("foreground-container", true);
                 this._boxContainer = this._element.append("g").classed("box-container", true);
