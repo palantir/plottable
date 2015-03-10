@@ -409,6 +409,36 @@ declare module Plottable {
 
 
 declare module Plottable {
+    /**
+     * A SymbolGenerator is a function that takes in a datum and the index of the datum to
+     * produce an svg path string analogous to the datum/index pair.
+     *
+     * Note that SymbolGenerators used in Plottable will be assumed to work within a 100x100 square
+     * to be scaled appropriately for use within Plottable
+     */
+    type SymbolGenerator = (datum: any, index: number) => string;
+    module SymbolGenerators {
+        /**
+         * The radius that symbol generators will be assumed to have for their symbols.
+         */
+        var SYMBOL_GENERATOR_RADIUS: number;
+        type StringAccessor = ((datum: any, index: number) => string);
+        /**
+         * A wrapper for D3's symbol generator as documented here:
+         * https://github.com/mbostock/d3/wiki/SVG-Shapes#symbol
+         *
+         * Note that since D3 symbols compute the path strings by knowing how much area it can take up instead of
+         * knowing its dimensions, the total area expected may be off by some constant factor.
+         *
+         * @param {string | ((datum: any, index: number) => string)} symbolType Accessor for the d3 symbol type
+         * @returns {SymbolGenerator} the symbol generator for a D3 symbol
+         */
+        function d3Symbol(symbolType: string | StringAccessor): D3.Svg.Symbol;
+    }
+}
+
+
+declare module Plottable {
     module _Util {
         class ClientToSVGTranslator {
             static getTranslator(elem: SVGElement): ClientToSVGTranslator;
@@ -1551,16 +1581,6 @@ declare module Plottable {
 
 declare module Plottable {
     module _Drawer {
-        class Circle extends Element {
-            constructor(key: string);
-            _getPixelPoint(datum: any, index: number): Point;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module _Drawer {
         class Rect extends Element {
             constructor(key: string, isVertical: boolean);
             setup(area: D3.Selection): void;
@@ -1579,6 +1599,18 @@ declare module Plottable {
             constructor(key: string);
             _drawStep(step: AppliedDrawStep): void;
             draw(data: any[], drawSteps: DrawStep[], userMetadata: any, plotMetadata: Plot.PlotMetadata): number;
+            _getPixelPoint(datum: any, index: number): Point;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module _Drawer {
+        class Symbol extends AbstractDrawer {
+            protected _enterData(data: any[]): void;
+            protected _drawStep(step: AppliedDrawStep): void;
+            _getSelector(): string;
             _getPixelPoint(datum: any, index: number): Point;
         }
     }
@@ -2804,13 +2836,7 @@ declare module Plottable {
              * @param {Scale} yScale The y scale to use.
              */
             constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<Y, number>);
-            /**
-             * @param {string} attrToSet One of ["x", "y", "cx", "cy", "r",
-             * "fill"]. "cx" and "cy" are aliases for "x" and "y". "r" is the datum's
-             * radius, and "fill" is the CSS color of the datum.
-             */
-            project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): Scatter<X, Y>;
-            protected _getDrawer(key: string): _Drawer.Circle;
+            protected _getDrawer(key: string): _Drawer.Symbol;
             protected _generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
             };

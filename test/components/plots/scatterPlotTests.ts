@@ -20,32 +20,39 @@ describe("Plots", () => {
                                   .project("y", yAccessor);
       plot.addDataset(dataset);
       plot.renderTo(svg);
-      var circles = (<any> plot)._renderArea.selectAll("circle");
-      var c1 = d3.select(circles[0][0]);
-      var c2 = d3.select(circles[0][1]);
-      assert.closeTo(parseFloat(c1.attr("cx")), 0, 0.01, "first circle cx is correct");
-      assert.closeTo(parseFloat(c1.attr("cy")), 20, 0.01, "first circle cy is correct");
-      assert.closeTo(parseFloat(c2.attr("cx")), 11, 0.01, "second circle cx is correct");
-      assert.closeTo(parseFloat(c2.attr("cy")), 20, 0.01, "second circle cy is correct");
+      var symbols = plot.getAllSelections();
+      var c1 = d3.select(symbols[0][0]);
+      var c2 = d3.select(symbols[0][1]);
+      var c1Position = d3.transform(c1.attr("transform")).translate;
+      var c2Position = d3.transform(c2.attr("transform")).translate;
+      assert.closeTo(parseFloat(c1Position[0]), 0, 0.01, "first symbol cx is correct");
+      assert.closeTo(parseFloat(c1Position[1]), 20, 0.01, "first symbol cy is correct");
+      assert.closeTo(parseFloat(c2Position[0]), 11, 0.01, "second symbol cx is correct");
+      assert.closeTo(parseFloat(c2Position[1]), 20, 0.01, "second symbol cy is correct");
 
       data = [{x: 2, y: 2}, {x: 4, y: 4}];
       dataset.data(data);
-      assert.closeTo(parseFloat(c1.attr("cx")), 2, 0.01, "first circle cx is correct after data change");
-      assert.closeTo(parseFloat(c1.attr("cy")), 20, 0.01, "first circle cy is correct after data change");
-      assert.closeTo(parseFloat(c2.attr("cx")), 14, 0.01, "second circle cx is correct after data change");
-      assert.closeTo(parseFloat(c2.attr("cy")), 20, 0.01, "second circle cy is correct after data change");
+      c1Position = d3.transform(c1.attr("transform")).translate;
+      c2Position = d3.transform(c2.attr("transform")).translate;
+      assert.closeTo(parseFloat(c1Position[0]), 2, 0.01, "first symbol cx is correct after data change");
+      assert.closeTo(parseFloat(c1Position[1]), 20, 0.01, "first symbol cy is correct after data change");
+      assert.closeTo(parseFloat(c2Position[0]), 14, 0.01, "second symbol cx is correct after data change");
+      assert.closeTo(parseFloat(c2Position[1]), 20, 0.01, "second symbol cy is correct after data change");
 
       metadata = {foo: 0, bar: 0};
       dataset.metadata(metadata);
-      assert.closeTo(parseFloat(c1.attr("cx")), 2, 0.01, "first circle cx is correct after metadata change");
-      assert.closeTo(parseFloat(c1.attr("cy")), 0, 0.01, "first circle cy is correct after metadata change");
-      assert.closeTo(parseFloat(c2.attr("cx")), 4, 0.01, "second circle cx is correct after metadata change");
-      assert.closeTo(parseFloat(c2.attr("cy")), 0, 0.01, "second circle cy is correct after metadata change");
+      c1Position = d3.transform(c1.attr("transform")).translate;
+      c2Position = d3.transform(c2.attr("transform")).translate;
+
+      assert.closeTo(parseFloat(c1Position[0]), 2, 0.01, "first symbol cx is correct after metadata change");
+      assert.closeTo(parseFloat(c1Position[1]), 0, 0.01, "first symbol cy is correct after metadata change");
+      assert.closeTo(parseFloat(c2Position[0]), 4, 0.01, "second symbol cx is correct after metadata change");
+      assert.closeTo(parseFloat(c2Position[1]), 0, 0.01, "second symbol cy is correct after metadata change");
 
       svg.remove();
     });
 
-    it("the accessors properly access data, index, and metadata", () => {
+    it("getAllSelections()", () => {
       var svg = generateSVG(400, 400);
       var xScale = new Plottable.Scale.Linear();
       var yScale = new Plottable.Scale.Linear();
@@ -131,10 +138,10 @@ describe("Plots", () => {
           // This function takes special care to compute the position of circles after taking svg transformation
           // into account.
           var selection = d3.select(this);
-          var elementTransform = d3.transform(selection.attr("transform"));
-          var elementTranslate = elementTransform.translate;
-          var x = +selection.attr("cx") * scale[0] + translate[0] + elementTranslate[0];
-          var y = +selection.attr("cy") * scale[1] + translate[1] + elementTranslate[1];
+
+          var circlePosition = d3.transform(selection.attr("transform")).translate;
+          var x = +circlePosition[0] * scale[0] + translate[0];
+          var y = +circlePosition[1] * scale[1] + translate[1];
           if (0 <= x && x <= SVG_WIDTH && 0 <= y && y <= SVG_HEIGHT) {
             circlesInArea++;
             assert.closeTo(x, xScale.scale(datum.x), 0.01, "the scaled/translated x is correct");
@@ -159,7 +166,7 @@ describe("Plots", () => {
       it("setup is handled properly", () => {
         assert.deepEqual(xScale.range(), [0, SVG_WIDTH], "xScale range was set by the renderer");
         assert.deepEqual(yScale.range(), [SVG_HEIGHT, 0], "yScale range was set by the renderer");
-        (<any> circlePlot)._renderArea.selectAll("circle").each(getCirclePlotVerifier());
+        circlePlot.getAllSelections().each(getCirclePlotVerifier());
         assert.equal(circlesInArea, 10, "10 circles were drawn");
         svg.remove();
       });
@@ -167,7 +174,7 @@ describe("Plots", () => {
       it("rendering is idempotent", () => {
         circlePlot._render();
         circlePlot._render();
-        (<any> circlePlot)._renderArea.selectAll("circle").each(getCirclePlotVerifier());
+        circlePlot.getAllSelections().each(getCirclePlotVerifier());
         assert.equal(circlesInArea, 10, "10 circles were drawn");
         svg.remove();
       });
@@ -181,8 +188,7 @@ describe("Plots", () => {
         });
 
         it("the circles re-rendered properly", () => {
-          var renderArea = (<any> circlePlot)._renderArea;
-          var circles = renderArea.selectAll("circle");
+          var circles = circlePlot.getAllSelections();
           circles.each(getCirclePlotVerifier());
           assert.equal(circlesInArea, 4, "four circles were found in the render area");
           svg.remove();
