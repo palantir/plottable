@@ -1799,21 +1799,30 @@ declare module Plottable {
              */
             originToSVG(): Point;
             /**
-             * Returns the foreground selection for the component
-             * (A selection covering the front of the component)
+             * Returns the foreground selection for the Component
+             * (A selection covering the front of the Component)
              *
-             * Will return undefined if the component has not been anchored
+             * Will return undefined if the Component has not been anchored.
              *
-             * @return {D3.Selection} foreground selection for the component
+             * @return {D3.Selection} foreground selection for the Component
              */
             foreground(): D3.Selection;
             /**
-             * Returns the background selection for the component
-             * (A selection appearing behind of the component)
+             * Returns the content selection for the Component
+             * (A selection containing the visual elements of the Component)
              *
-             * Will return undefined if the component has not been anchored
+             * Will return undefined if the Component has not been anchored.
              *
-             * @return {D3.Selection} background selection for the component
+             * @return {D3.Selection} foreground selection for the Component
+             */
+            content(): D3.Selection;
+            /**
+             * Returns the background selection for the Component
+             * (A selection appearing behind of the Component)
+             *
+             * Will return undefined if the Component has not been anchored.
+             *
+             * @return {D3.Selection} background selection for the Component
              */
             background(): D3.Selection;
             /**
