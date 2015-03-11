@@ -16,38 +16,46 @@ function getSVGParent() {
         return d3.select("body");
     }
 }
-function makeFakeEvent(x, y) {
-    return {
-        dx: 0,
-        dy: 0,
-        clientX: x,
-        clientY: y,
-        translate: [x, y],
-        scale: 1,
-        sourceEvent: null,
-        x: x,
-        y: y,
-        keyCode: 0,
-        altKey: false
-    };
+function triggerFakeUIEvent(type, target) {
+    var e = document.createEvent("UIEvents");
+    e.initUIEvent(type, true, true, window, 1);
+    target.node().dispatchEvent(e);
 }
-function fakeDragSequence(anyedInteraction, startX, startY, endX, endY) {
-    var originalD3Mouse = d3.mouse;
-    d3.mouse = function () {
-        return [startX, startY];
+function triggerFakeMouseEvent(type, target, relativeX, relativeY) {
+    var clientRect = target.node().getBoundingClientRect();
+    var xPos = clientRect.left + relativeX;
+    var yPos = clientRect.top + relativeY;
+    var e = document.createEvent("MouseEvents");
+    e.initMouseEvent(type, true, true, window, 1, xPos, yPos, xPos, yPos, false, false, false, false, 1, null);
+    target.node().dispatchEvent(e);
+}
+function triggerFakeTouchEvent(type, target, relativeX, relativeY) {
+    var targetNode = target.node();
+    var clientRect = targetNode.getBoundingClientRect();
+    var xPos = clientRect.left + relativeX;
+    var yPos = clientRect.top + relativeY;
+    var e = document.createEvent("UIEvent");
+    e.initUIEvent(type, true, true, window, 1);
+    var fakeTouch = {
+        identifier: 0,
+        target: targetNode,
+        screenX: xPos,
+        screenY: yPos,
+        clientX: xPos,
+        clientY: yPos,
+        pageX: xPos,
+        pageY: yPos
     };
-    anyedInteraction._dragstart();
-    d3.mouse = originalD3Mouse;
-    d3.event = makeFakeEvent(startX, startY);
-    anyedInteraction._drag();
-    d3.event = makeFakeEvent(endX, endY);
-    anyedInteraction._drag();
-    d3.mouse = function () {
-        return [endX, endY];
-    };
-    anyedInteraction._dragend();
-    d3.event = null;
-    d3.mouse = originalD3Mouse;
+    var fakeTouchList = [fakeTouch];
+    fakeTouchList.item = function (index) { return fakeTouchList[index]; };
+    e.touches = fakeTouchList;
+    e.targetTouches = fakeTouchList;
+    e.changedTouches = fakeTouchList;
+    e.altKey = false;
+    e.metaKey = false;
+    e.ctrlKey = false;
+    e.shiftKey = false;
+    target.node().dispatchEvent(e);
 }
 function verifySpaceRequest(sr, w, h, ww, wh, id) {
     assert.equal(sr.width, w, "width requested is as expected #" + id);
@@ -135,47 +143,6 @@ function normalizePath(pathString) {
 }
 function numAttr(s, a) {
     return parseFloat(s.attr(a));
-}
-function triggerFakeUIEvent(type, target) {
-    var e = document.createEvent("UIEvents");
-    e.initUIEvent(type, true, true, window, 1);
-    target.node().dispatchEvent(e);
-}
-function triggerFakeMouseEvent(type, target, relativeX, relativeY) {
-    var clientRect = target.node().getBoundingClientRect();
-    var xPos = clientRect.left + relativeX;
-    var yPos = clientRect.top + relativeY;
-    var e = document.createEvent("MouseEvents");
-    e.initMouseEvent(type, true, true, window, 1, xPos, yPos, xPos, yPos, false, false, false, false, 1, null);
-    target.node().dispatchEvent(e);
-}
-function triggerFakeTouchEvent(type, target, relativeX, relativeY) {
-    var targetNode = target.node();
-    var clientRect = targetNode.getBoundingClientRect();
-    var xPos = clientRect.left + relativeX;
-    var yPos = clientRect.top + relativeY;
-    var e = document.createEvent("UIEvent");
-    e.initUIEvent(type, true, true, window, 1);
-    var fakeTouch = {
-        identifier: 0,
-        target: targetNode,
-        screenX: xPos,
-        screenY: yPos,
-        clientX: xPos,
-        clientY: yPos,
-        pageX: xPos,
-        pageY: yPos
-    };
-    var fakeTouchList = [fakeTouch];
-    fakeTouchList.item = function (index) { return fakeTouchList[index]; };
-    e.touches = fakeTouchList;
-    e.targetTouches = fakeTouchList;
-    e.changedTouches = fakeTouchList;
-    e.altKey = false;
-    e.metaKey = false;
-    e.ctrlKey = false;
-    e.shiftKey = false;
-    target.node().dispatchEvent(e);
 }
 function assertAreaPathCloseTo(actualPath, expectedPath, precision, msg) {
     var actualAreaPathStrings = actualPath.split("Z");
@@ -7368,6 +7335,128 @@ describe("Interactions", function () {
             triggerFakeMouseEvent("mouseout", hitbox, 401, 200);
             currentlyHovered = hoverInteraction.getCurrentHoverData();
             assert.isNull(currentlyHovered.data, "returns null if not currently hovering");
+            svg.remove();
+        });
+    });
+});
+
+///<reference path="../testReference.ts" />
+var assert = chai.assert;
+describe("Interactions", function () {
+    describe("Drag", function () {
+        var SVG_WIDTH = 400;
+        var SVG_HEIGHT = 400;
+        var startPoint = {
+            x: SVG_WIDTH / 4,
+            y: SVG_HEIGHT / 4
+        };
+        var endPoint = {
+            x: SVG_WIDTH / 2,
+            y: SVG_HEIGHT / 2
+        };
+        var outsidePointPos = {
+            x: SVG_WIDTH * 1.5,
+            y: SVG_HEIGHT * 1.5
+        };
+        var constrainedPos = {
+            x: SVG_WIDTH,
+            y: SVG_HEIGHT
+        };
+        var outsidePointNeg = {
+            x: -SVG_WIDTH / 2,
+            y: -SVG_HEIGHT / 2
+        };
+        var constrainedNeg = {
+            x: 0,
+            y: 0
+        };
+        it("onDragStart", function () {
+            var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var c = new Plottable.Component.AbstractComponent();
+            c.renderTo(svg);
+            var drag = new Plottable.Interaction.Drag();
+            var startCallbackCalled = false;
+            var receivedStart;
+            var startCallback = function (p) {
+                startCallbackCalled = true;
+                receivedStart = p;
+            };
+            drag.onDragStart(startCallback);
+            c.registerInteraction(drag);
+            var hitbox = c.hitBox();
+            triggerFakeMouseEvent("mousedown", hitbox, startPoint.x, startPoint.y);
+            assert.isTrue(startCallbackCalled, "callback was called on beginning drag (mousedown)");
+            assert.deepEqual(receivedStart, startPoint, "was passed the correct point");
+            startCallbackCalled = false;
+            triggerFakeMouseEvent("mousedown", hitbox, outsidePointPos.x, outsidePointPos.y);
+            assert.isFalse(startCallbackCalled, "does not trigger callback if drag starts outside the Component (positive) (mousedown)");
+            triggerFakeMouseEvent("mousedown", hitbox, outsidePointNeg.x, outsidePointNeg.y);
+            assert.isFalse(startCallbackCalled, "does not trigger callback if drag starts outside the Component (negative) (mousedown)");
+            assert.strictEqual(drag.onDragStart(), startCallback, "retrieves the callback if called with no arguments");
+            drag.onDragStart(null);
+            assert.isNull(drag.onDragStart(), "removes the callback if called with null");
+            svg.remove();
+        });
+        it("onDrag", function () {
+            var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var c = new Plottable.Component.AbstractComponent();
+            c.renderTo(svg);
+            var drag = new Plottable.Interaction.Drag();
+            var moveCallbackCalled = false;
+            var receivedStart;
+            var receivedEnd;
+            var moveCallback = function (start, end) {
+                moveCallbackCalled = true;
+                receivedStart = start;
+                receivedEnd = end;
+            };
+            drag.onDrag(moveCallback);
+            c.registerInteraction(drag);
+            var hitbox = c.hitBox();
+            triggerFakeMouseEvent("mousedown", hitbox, startPoint.x, startPoint.y);
+            triggerFakeMouseEvent("mousemove", hitbox, endPoint.x, endPoint.y);
+            assert.isTrue(moveCallbackCalled, "callback was called on dragging (mousemove)");
+            assert.deepEqual(receivedStart, startPoint, "was passed the correct starting point");
+            assert.deepEqual(receivedEnd, endPoint, "was passed the correct current point");
+            triggerFakeMouseEvent("mousemove", hitbox, outsidePointPos.x, outsidePointPos.y);
+            assert.deepEqual(receivedEnd, constrainedPos, "dragging outside the Component is constrained (positive) (mousemove)");
+            triggerFakeMouseEvent("mousemove", hitbox, outsidePointNeg.x, outsidePointNeg.y);
+            assert.deepEqual(receivedEnd, constrainedNeg, "dragging outside the Component is constrained (negative) (mousemove)");
+            assert.strictEqual(drag.onDrag(), moveCallback, "retrieves the callback if called with no arguments");
+            drag.onDrag(null);
+            assert.isNull(drag.onDrag(), "removes the callback if called with null");
+            svg.remove();
+        });
+        it("onDragEnd", function () {
+            var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var c = new Plottable.Component.AbstractComponent();
+            c.renderTo(svg);
+            var drag = new Plottable.Interaction.Drag();
+            var endCallbackCalled = false;
+            var receivedStart;
+            var receivedEnd;
+            var endCallback = function (start, end) {
+                endCallbackCalled = true;
+                receivedStart = start;
+                receivedEnd = end;
+            };
+            drag.onDragEnd(endCallback);
+            c.registerInteraction(drag);
+            var hitbox = c.hitBox();
+            triggerFakeMouseEvent("mousedown", hitbox, startPoint.x, startPoint.y);
+            triggerFakeMouseEvent("mouseup", hitbox, endPoint.x, endPoint.y);
+            assert.isTrue(endCallbackCalled, "callback was called on drag ending (mouseup)");
+            assert.deepEqual(receivedStart, startPoint, "was passed the correct starting point");
+            assert.deepEqual(receivedEnd, endPoint, "was passed the correct current point");
+            triggerFakeMouseEvent("mousedown", hitbox, startPoint.x, startPoint.y);
+            triggerFakeMouseEvent("mouseup", hitbox, outsidePointPos.x, outsidePointPos.y);
+            assert.deepEqual(receivedEnd, constrainedPos, "dragging outside the Component is constrained (positive) (mouseup)");
+            triggerFakeMouseEvent("mousedown", hitbox, startPoint.x, startPoint.y);
+            triggerFakeMouseEvent("mouseup", hitbox, outsidePointNeg.x, outsidePointNeg.y);
+            assert.deepEqual(receivedEnd, constrainedNeg, "dragging outside the Component is constrained (negative) (mouseup)");
+            assert.strictEqual(drag.onDragEnd(), endCallback, "retrieves the callback if called with no arguments");
+            drag.onDragEnd(null);
+            assert.isNull(drag.onDragEnd(), "removes the callback if called with null");
             svg.remove();
         });
     });
