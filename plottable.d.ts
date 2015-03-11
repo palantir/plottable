@@ -3664,179 +3664,46 @@ declare module Plottable {
 declare module Plottable {
     module Interaction {
         class Drag extends AbstractInteraction {
-            protected _isDragging: boolean;
-            protected _constrainX: (n: number) => number;
-            protected _constrainY: (n: number) => number;
-            /**
-             * Constructs a Drag. A Drag will signal its callbacks on mouse drag.
-             */
-            constructor();
+            _anchor(component: Component.AbstractComponent, hitBox: D3.Selection): void;
             /**
              * Gets the callback that is called when dragging starts.
              *
              * @returns {(start: Point) => void} The callback called when dragging starts.
              */
-            dragstart(): (start: Point) => void;
+            onDragStart(): (start: Point) => void;
             /**
              * Sets the callback to be called when dragging starts.
              *
-             * @param {(start: Point) => any} cb If provided, the function to be called. Takes in a Point in pixels.
-             * @returns {Drag} The calling Drag.
+             * @param {(start: Point) => any} cb The callback to be called. Takes in a Point in pixels.
+             * @returns {Drag} The calling Interaction.Drag.
              */
-            dragstart(cb: (start: Point) => any): Drag;
-            protected _setOrigin(x: number, y: number): void;
-            protected _getOrigin(): number[];
-            protected _setLocation(x: number, y: number): void;
-            protected _getLocation(): number[];
+            onDragStart(cb: (start: Point) => any): Drag;
             /**
              * Gets the callback that is called during dragging.
              *
              * @returns {(start: Point, end: Point) => void} The callback called during dragging.
              */
-            drag(): (start: Point, end: Point) => void;
+            onDrag(): (start: Point, end: Point) => void;
             /**
              * Adds a callback to be called during dragging.
              *
-             * @param {(start: Point, end: Point) => any} cb If provided, the function to be called. Takes in Points in pixels.
-             * @returns {Drag} The calling Drag.
+             * @param {(start: Point, end: Point) => any} cb The callback to be called. Takes in Points in pixels.
+             * @returns {Drag} The calling Interaction.Drag.
              */
-            drag(cb: (start: Point, end: Point) => any): Drag;
+            onDrag(cb: (start: Point, end: Point) => any): Drag;
             /**
              * Gets the callback that is called when dragging ends.
              *
              * @returns {(start: Point, end: Point) => void} The callback called when dragging ends.
              */
-            dragend(): (start: Point, end: Point) => void;
+            onDragEnd(): (start: Point, end: Point) => void;
             /**
              * Adds a callback to be called when the dragging ends.
              *
-             * @param {(start: Point, end: Point) => any} cb If provided, the function to be called. Takes in points in pixels.
-             * @returns {Drag} The calling Drag.
+             * @param {(start: Point, end: Point) => any} cb The callback to be called. Takes in Points in pixels.
+             * @returns {Drag} The calling Interaction.Drag.
              */
-            dragend(cb: (start: Point, end: Point) => any): Drag;
-            protected _dragstart(): void;
-            protected _doDragstart(): void;
-            protected _drag(): void;
-            protected _doDrag(): void;
-            protected _dragend(): void;
-            protected _doDragend(): void;
-            _anchor(component: Component.AbstractComponent, hitBox: D3.Selection): Drag;
-            /**
-             * Sets up so that the xScale and yScale that are passed have their
-             * domains automatically changed as you zoom.
-             *
-             * @param {QuantitativeScale} xScale The scale along the x-axis.
-             * @param {QuantitativeScale} yScale The scale along the y-axis.
-             * @returns {Drag} The calling Drag.
-             */
-            setupZoomCallback(xScale?: Scale.AbstractQuantitative<any>, yScale?: Scale.AbstractQuantitative<any>): Drag;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Interaction {
-        class DragBox extends Drag {
-            static RESIZE_PADDING: number;
-            static _CAN_RESIZE_X: boolean;
-            static _CAN_RESIZE_Y: boolean;
-            /**
-             * The DOM element of the box that is drawn. When no box is drawn, it is
-             * null.
-             */
-            dragBox: D3.Selection;
-            /**
-             * Gets whether resizing is enabled or not.
-             *
-             * @returns {boolean}
-             */
-            resizeEnabled(): boolean;
-            /**
-             * Enables or disables resizing.
-             *
-             * @param {boolean} enabled
-             */
-            resizeEnabled(enabled: boolean): DragBox;
-            /**
-             * Return true if box is resizing on the X dimension.
-             *
-             * @returns {boolean}
-             */
-            isResizingX(): boolean;
-            /**
-             * Return true if box is resizing on the Y dimension.
-             *
-             * @returns {boolean}
-             */
-            isResizingY(): boolean;
-            /**
-             * Whether or not dragBox has been rendered in a visible area.
-             *
-             * @returns {boolean}
-             */
-            boxIsDrawn(): boolean;
-            /**
-             * Return true if box is resizing.
-             *
-             * @returns {boolean}
-             */
-            isResizing(): boolean;
-            protected _dragstart(): void;
-            protected _drag(): void;
-            protected _dragend(): void;
-            /**
-             * Clears the highlighted drag-selection box drawn by the DragBox.
-             *
-             * @returns {DragBox} The calling DragBox.
-             */
-            clearBox(): DragBox;
-            /**
-             * Set where the box is draw explicitly.
-             *
-             * @param {number} x0 Left.
-             * @param {number} x1 Right.
-             * @param {number} y0 Top.
-             * @param {number} y1 Bottom.
-             *
-             * @returns {DragBox} The calling DragBox.
-             */
-            setBox(x0: number, x1: number, y0: number, y1: number): DragBox;
-            _anchor(component: Component.AbstractComponent, hitBox: D3.Selection): DragBox;
-            protected _hover(): void;
-            protected canResizeX(): boolean;
-            protected canResizeY(): boolean;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Interaction {
-        class XDragBox extends DragBox {
-            protected _setOrigin(x: number, y: number): void;
-            protected _setLocation(x: number, y: number): void;
-            protected canResizeY(): boolean;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Interaction {
-        class XYDragBox extends DragBox {
-            constructor();
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Interaction {
-        class YDragBox extends DragBox {
-            protected _setOrigin(x: number, y: number): void;
-            protected _setLocation(x: number, y: number): void;
-            protected canResizeX(): boolean;
+            onDragEnd(cb: (start: Point, end: Point) => any): Drag;
         }
     }
 }
