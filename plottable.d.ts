@@ -2330,6 +2330,10 @@ declare module Plottable {
              */
             static LEGEND_ENTRY_CLASS: string;
             /**
+             * The css class applied to each legend symbol
+             */
+            static LEGEND_SYMBOL_CLASS: string;
+            /**
              * Creates a Legend.
              *
              * The legend consists of a series of legend entries, each with a color and label taken from the `colorScale`.
@@ -2387,6 +2391,19 @@ declare module Plottable {
              */
             getEntry(position: Point): D3.Selection;
             _doRender(): void;
+            /**
+             * Gets the SymbolGenerator of the legend, which dictates how
+             * the symbol in each entry is drawn.
+             *
+             * @returns {SymbolGenerator} The SymbolGenerator of the legend
+             */
+            symbolGenerator(): SymbolGenerator;
+            /**
+             * Sets the SymbolGenerator of the legend
+             *
+             * @returns {Legend} The calling Legend
+             */
+            symbolGenerator(symbolGenerator: SymbolGenerator): Legend;
         }
     }
 }

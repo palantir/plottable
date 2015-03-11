@@ -11,6 +11,10 @@ export module Component {
      * The css class applied to each legend entry
      */
     public static LEGEND_ENTRY_CLASS = "legend-entry";
+    /**
+     * The css class applied to each legend symbol
+     */
+    public static LEGEND_SYMBOL_CLASS = "legend-symbol";
 
     private _padding = 5;
     private _scale: Scale.Color;
@@ -19,6 +23,7 @@ export module Component {
     private _measurer: SVGTypewriter.Measurers.Measurer;
     private _wrapper: SVGTypewriter.Wrappers.Wrapper;
     private _writer: SVGTypewriter.Writers.Writer;
+    private _symbolGenerator: SymbolGenerator;
 
     /**
      * Creates a Legend.
@@ -45,6 +50,7 @@ export module Component {
       this._fixedWidthFlag = true;
       this._fixedHeightFlag = true;
       this._sortFn = (a: string, b: string) => this._scale.domain().indexOf(a) - this._scale.domain().indexOf(b);
+      this._symbolGenerator = SymbolGenerators.d3Symbol("circle");
     }
 
     protected _setup() {
@@ -254,7 +260,7 @@ export module Component {
       entries.each(function(d: string) {
         d3.select(this).classed(d.replace(" ", "-"), true);
       });
-      entriesEnter.append("circle");
+      entriesEnter.append("path");
       entriesEnter.append("g").classed("text-container", true);
       entries.exit().remove();
 
@@ -269,11 +275,12 @@ export module Component {
         });
       });
 
-      entries.select("circle")
-          .attr("cx", layout.textHeight / 2)
-          .attr("cy", layout.textHeight / 2)
-          .attr("r",  layout.textHeight * 0.3)
-          .attr("fill", (value: string) => this._scale.scale(value) );
+      entries.select("path").attr("d", this.symbolGenerator())
+                            .attr("transform", "translate(" + (layout.textHeight / 2) + "," + layout.textHeight / 2 + ") " +
+                                               "scale(" + (layout.textHeight * 0.3 / SymbolGenerators.SYMBOL_GENERATOR_RADIUS) + ")")
+                            .attr("fill", (value: string) => this._scale.scale(value) )
+                            .attr("vector-effect", "non-scaling-stroke")
+                            .classed(Legend.LEGEND_SYMBOL_CLASS, true);
 
       var padding = this._padding;
       var textContainers = entries.select("g.text-container");
@@ -293,6 +300,29 @@ export module Component {
 
                       self._writer.write(value, maxTextLength, self.height(), writeOptions);
                     });
+    }
+
+    /**
+     * Gets the SymbolGenerator of the legend, which dictates how
+     * the symbol in each entry is drawn.
+     *
+     * @returns {SymbolGenerator} The SymbolGenerator of the legend
+     */
+    public symbolGenerator(): SymbolGenerator;
+    /**
+     * Sets the SymbolGenerator of the legend
+     *
+     * @returns {Legend} The calling Legend
+     */
+    public symbolGenerator(symbolGenerator: SymbolGenerator): Legend;
+    public symbolGenerator(symbolGenerator?: SymbolGenerator): any {
+      if (symbolGenerator == null) {
+        return this._symbolGenerator;
+      } else {
+        this._symbolGenerator = symbolGenerator;
+        this._render();
+        return this;
+      }
     }
   }
 }
