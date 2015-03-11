@@ -3464,10 +3464,10 @@ describe("Plots", function () {
             assert.equal(cells[0].length, 5);
             cells.each(function (d, i) {
                 var cell = d3.select(this);
-                assert.closeTo(Number(cell.attr("height")), 50, 0.5, "Cell height is correct");
-                assert.closeTo(Number(cell.attr("width")), 50, 0.5, "Cell width is correct");
-                assert.closeTo(Number(cell.attr("x")), 25 + 50 * i, 0.5, "Cell x coordinate is correct");
-                assert.closeTo(Number(cell.attr("y")), 25 + 50 * (cells[0].length - i - 1), 0.5, "Cell y coordinate is correct");
+                assert.closeTo(+cell.attr("height"), 50, 0.5, "Cell height is correct");
+                assert.closeTo(+cell.attr("width"), 50, 0.5, "Cell width is correct");
+                assert.closeTo(+cell.attr("x"), 25 + 50 * i, 0.5, "Cell x coordinate is correct");
+                assert.closeTo(+cell.attr("y"), 25 + 50 * (cells[0].length - i - 1), 0.5, "Cell y coordinate is correct");
             });
         };
         it("renders correctly", function () {
