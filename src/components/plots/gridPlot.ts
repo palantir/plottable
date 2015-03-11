@@ -52,35 +52,35 @@ export module Plot {
      * the data should return a valid CSS color.
      */
     public project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>) {
-      attrToSet = attrToSet === "x1" ? "x" : attrToSet;
-      attrToSet = attrToSet === "y1" ? "y" : attrToSet;
       super.project(attrToSet, accessor, scale);
 
-      if (attrToSet === "x" && this._projections["x2"] === undefined) {
+      if (attrToSet === "x") {
         if (scale instanceof Scale.Category) {
-          super.project("x1", (d: any, i: number, u: any, m: Plot.PlotMetadata) => {
+          this.project("x1", (d: any, i: number, u: any, m: Plot.PlotMetadata) => {
             return scale.scale(this._projections["x"].accessor(d, i, u, m)) - scale.rangeBand() / 2;
           });
-          super.project("x2", (d: any, i: number, u: any, m: Plot.PlotMetadata) => {
+          this.project("x2", (d: any, i: number, u: any, m: Plot.PlotMetadata) => {
             return scale.scale(this._projections["x"].accessor(d, i, u, m)) + scale.rangeBand() / 2;
           });
-        } else if (scale instanceof Scale.AbstractQuantitative) {
-          super.project("x1", (d: any, i: number, u: any, m: Plot.PlotMetadata) => {
+        }
+        if (scale instanceof Scale.AbstractQuantitative) {
+          this.project("x1", (d: any, i: number, u: any, m: Plot.PlotMetadata) => {
             return scale.scale(this._projections["x"].accessor(d, i, u, m));
           });
         }
       }
 
-      if (attrToSet === "y" && this._projections["y2"] === undefined) {
+      if (attrToSet === "y") {
         if (scale instanceof Scale.Category) {
-          super.project("y1", (d: any, i: number, u: any, m: Plot.PlotMetadata) => {
+          this.project("y1", (d: any, i: number, u: any, m: Plot.PlotMetadata) => {
             return scale.scale(this._projections["y"].accessor(d, i, u, m)) - scale.rangeBand() / 2;
           });
-          super.project("y2", (d: any, i: number, u: any, m: Plot.PlotMetadata) => {
+          this.project("y2", (d: any, i: number, u: any, m: Plot.PlotMetadata) => {
             return scale.scale(this._projections["y"].accessor(d, i, u, m)) + scale.rangeBand() / 2;
           });
-        } else if (scale instanceof Scale.AbstractQuantitative) {
-          super.project("y1", (d: any, i: number, u: any, m: Plot.PlotMetadata) => {
+        }
+        if (scale instanceof Scale.AbstractQuantitative) {
+          this.project("y1", (d: any, i: number, u: any, m: Plot.PlotMetadata) => {
             return scale.scale(this._projections["y"].accessor(d, i, u, m));
           });
         }

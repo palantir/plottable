@@ -7180,35 +7180,33 @@ var Plottable;
              */
             Grid.prototype.project = function (attrToSet, accessor, scale) {
                 var _this = this;
-                attrToSet = attrToSet === "x1" ? "x" : attrToSet;
-                attrToSet = attrToSet === "y1" ? "y" : attrToSet;
                 _super.prototype.project.call(this, attrToSet, accessor, scale);
-                if (attrToSet === "x" && this._projections["x2"] === undefined) {
+                if (attrToSet === "x") {
                     if (scale instanceof Plottable.Scale.Category) {
-                        _super.prototype.project.call(this, "x1", function (d, i, u, m) {
+                        this.project("x1", function (d, i, u, m) {
                             return scale.scale(_this._projections["x"].accessor(d, i, u, m)) - scale.rangeBand() / 2;
                         });
-                        _super.prototype.project.call(this, "x2", function (d, i, u, m) {
+                        this.project("x2", function (d, i, u, m) {
                             return scale.scale(_this._projections["x"].accessor(d, i, u, m)) + scale.rangeBand() / 2;
                         });
                     }
-                    else if (scale instanceof Plottable.Scale.AbstractQuantitative) {
-                        _super.prototype.project.call(this, "x1", function (d, i, u, m) {
+                    if (scale instanceof Plottable.Scale.AbstractQuantitative) {
+                        this.project("x1", function (d, i, u, m) {
                             return scale.scale(_this._projections["x"].accessor(d, i, u, m));
                         });
                     }
                 }
-                if (attrToSet === "y" && this._projections["y2"] === undefined) {
+                if (attrToSet === "y") {
                     if (scale instanceof Plottable.Scale.Category) {
-                        _super.prototype.project.call(this, "y1", function (d, i, u, m) {
+                        this.project("y1", function (d, i, u, m) {
                             return scale.scale(_this._projections["y"].accessor(d, i, u, m)) - scale.rangeBand() / 2;
                         });
-                        _super.prototype.project.call(this, "y2", function (d, i, u, m) {
+                        this.project("y2", function (d, i, u, m) {
                             return scale.scale(_this._projections["y"].accessor(d, i, u, m)) + scale.rangeBand() / 2;
                         });
                     }
-                    else if (scale instanceof Plottable.Scale.AbstractQuantitative) {
-                        _super.prototype.project.call(this, "y1", function (d, i, u, m) {
+                    if (scale instanceof Plottable.Scale.AbstractQuantitative) {
+                        this.project("y1", function (d, i, u, m) {
                             return scale.scale(_this._projections["y"].accessor(d, i, u, m));
                         });
                     }
