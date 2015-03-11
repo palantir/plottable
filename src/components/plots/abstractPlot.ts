@@ -493,6 +493,15 @@ export module Plot {
 
       return { data: data, pixelPoints: pixelPoints, selection: d3.selectAll(allElements) };
     }
+
+    public getClosestPlotData(xValue: number, yValue: number, datasetKeys: string | string[] = this.datasetOrder(), tolerance = 0.5) {
+      var datasetKeyArray: string[] = [];
+      if (typeof(datasetKeys) === "string") {
+        datasetKeyArray = [<string> datasetKeys];
+      } else {
+        datasetKeyArray = <string[]> datasetKeys;
+      }
+    }
   }
 }
 }

@@ -6677,6 +6677,17 @@ var Plottable;
                 });
                 return { data: data, pixelPoints: pixelPoints, selection: d3.selectAll(allElements) };
             };
+            AbstractPlot.prototype.getClosestPlotData = function (xValue, yValue, datasetKeys, tolerance) {
+                if (datasetKeys === void 0) { datasetKeys = this.datasetOrder(); }
+                if (tolerance === void 0) { tolerance = 0.5; }
+                var datasetKeyArray = [];
+                if (typeof (datasetKeys) === "string") {
+                    datasetKeyArray = [datasetKeys];
+                }
+                else {
+                    datasetKeyArray = datasetKeys;
+                }
+            };
             return AbstractPlot;
         })(Plottable.Component.AbstractComponent);
         Plot.AbstractPlot = AbstractPlot;

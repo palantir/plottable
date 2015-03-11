@@ -2704,6 +2704,7 @@ declare module Plottable {
              * @returns {PlotData} The retrieved PlotData.
              */
             getAllPlotData(datasetKeys?: string | string[]): PlotData;
+            getClosestPlotData(xValue: number, yValue: number, datasetKeys?: string | string[], tolerance?: number): void;
         }
     }
 }
