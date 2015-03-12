@@ -6535,6 +6535,26 @@ var Plottable;
                 });
                 return h;
             };
+            /**
+             * Generates a dictionary mapping an attribute to a function that calculate that attribute's value
+             * in accordance with the given datasetKey.
+             *
+             * Note that this will return all of the data attributes, which may not perfectly align to svg attributes
+             *
+             * @param {datasetKey} the key of the dataset to generate the map for
+             * @returns {AttributeToAppliedProjector} A dictionary mapping attributes to functions
+             */
+            AbstractPlot.prototype.generateProjectors = function (datasetKey) {
+                var attrToProjector = this._generateAttrToProjector();
+                var plotDatasetKey = this._key2PlotDatasetKey.get(datasetKey);
+                var plotMetadata = plotDatasetKey.plotMetadata;
+                var userMetadata = plotDatasetKey.dataset.metadata();
+                var attrToAppliedProjector = {};
+                d3.entries(attrToProjector).forEach(function (keyValue) {
+                    attrToAppliedProjector[keyValue.key] = function (datum, index) { return keyValue.value(datum, index, userMetadata, plotMetadata); };
+                });
+                return attrToAppliedProjector;
+            };
             AbstractPlot.prototype._doRender = function () {
                 if (this._isAnchored) {
                     this._paint();

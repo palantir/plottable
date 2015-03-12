@@ -208,6 +208,27 @@ export module Plot {
       return h;
     }
 
+    /**
+     * Generates a dictionary mapping an attribute to a function that calculate that attribute's value
+     * in accordance with the given datasetKey.
+     *
+     * Note that this will return all of the data attributes, which may not perfectly align to svg attributes
+     *
+     * @param {datasetKey} the key of the dataset to generate the dictionary for
+     * @returns {AttributeToAppliedProjector} A dictionary mapping attributes to functions
+     */
+    public generateProjectors(datasetKey: string): AttributeToAppliedProjector {
+      var attrToProjector = this._generateAttrToProjector();
+      var plotDatasetKey = this._key2PlotDatasetKey.get(datasetKey);
+      var plotMetadata = plotDatasetKey.plotMetadata;
+      var userMetadata = plotDatasetKey.dataset.metadata();
+      var attrToAppliedProjector: AttributeToAppliedProjector = {};
+      d3.entries(attrToProjector).forEach((keyValue: any) => {
+        attrToAppliedProjector[keyValue.key] = (datum: any, index: number) => keyValue.value(datum, index, userMetadata, plotMetadata);
+      });
+      return attrToAppliedProjector;
+    }
+
     public _doRender() {
       if (this._isAnchored) {
         this._paint();
