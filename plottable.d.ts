@@ -11,6 +11,15 @@ declare module Plottable {
              * @return {boolean} Whether x is in [a, b]
              */
             function inRange(x: number, a: number, b: number): boolean;
+            /**
+             * Clamps x to the range [min, max].
+             *
+             * @param {number} x The value to be clamped.
+             * @param {number} min The minimum value.
+             * @param {number} max The maximum value.
+             * @return {number} A clamped value in the range [min, max].
+             */
+            function clamp(x: number, min: number, max: number): number;
             /** Print a warning message to the console, if it is available.
              *
              * @param {string} The warnings to print
@@ -3668,9 +3677,9 @@ declare module Plottable {
             /**
              * Gets the callback that is called when dragging starts.
              *
-             * @returns {(start: Point) => void} The callback called when dragging starts.
+             * @returns {(start: Point) => any} The callback called when dragging starts.
              */
-            onDragStart(): (start: Point) => void;
+            onDragStart(): (start: Point) => any;
             /**
              * Sets the callback to be called when dragging starts.
              *
@@ -3681,9 +3690,9 @@ declare module Plottable {
             /**
              * Gets the callback that is called during dragging.
              *
-             * @returns {(start: Point, end: Point) => void} The callback called during dragging.
+             * @returns {(start: Point, end: Point) => any} The callback called during dragging.
              */
-            onDrag(): (start: Point, end: Point) => void;
+            onDrag(): (start: Point, end: Point) => any;
             /**
              * Adds a callback to be called during dragging.
              *
@@ -3694,9 +3703,9 @@ declare module Plottable {
             /**
              * Gets the callback that is called when dragging ends.
              *
-             * @returns {(start: Point, end: Point) => void} The callback called when dragging ends.
+             * @returns {(start: Point, end: Point) => any} The callback called when dragging ends.
              */
-            onDragEnd(): (start: Point, end: Point) => void;
+            onDragEnd(): (start: Point, end: Point) => any;
             /**
              * Adds a callback to be called when the dragging ends.
              *

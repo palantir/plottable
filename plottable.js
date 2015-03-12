@@ -23,6 +23,18 @@ var Plottable;
                 return (Math.min(a, b) <= x && x <= Math.max(a, b));
             }
             Methods.inRange = inRange;
+            /**
+             * Clamps x to the range [min, max].
+             *
+             * @param {number} x The value to be clamped.
+             * @param {number} min The minimum value.
+             * @param {number} max The maximum value.
+             * @return {number} A clamped value in the range [min, max].
+             */
+            function clamp(x, min, max) {
+                return Math.min(Math.max(min, x), max);
+            }
+            Methods.clamp = clamp;
             /** Print a warning message to the console, if it is available.
              *
              * @param {string} The warnings to print
@@ -9171,11 +9183,9 @@ var Plottable;
             };
             Drag.prototype._translateAndConstrain = function (p) {
                 var translatedP = this._translateToComponentSpace(p);
-                var constrainedX = Math.min(Math.max(0, translatedP.x), this._componentToListenTo.width());
-                var constrainedY = Math.min(Math.max(0, translatedP.y), this._componentToListenTo.height());
                 return {
-                    x: constrainedX,
-                    y: constrainedY
+                    x: Plottable._Util.Methods.clamp(translatedP.x, 0, this._componentToListenTo.width()),
+                    y: Plottable._Util.Methods.clamp(translatedP.y, 0, this._componentToListenTo.height())
                 };
             };
             Drag.prototype._startDrag = function (p, e) {

@@ -25,11 +25,9 @@ export module Interaction {
 
     private _translateAndConstrain(p: Point) {
       var translatedP = this._translateToComponentSpace(p);
-      var constrainedX = Math.min(Math.max(0, translatedP.x), this._componentToListenTo.width());
-      var constrainedY = Math.min(Math.max(0, translatedP.y), this._componentToListenTo.height());
       return {
-        x: constrainedX,
-        y: constrainedY
+        x: _Util.Methods.clamp(translatedP.x, 0, this._componentToListenTo.width()),
+        y: _Util.Methods.clamp(translatedP.y, 0, this._componentToListenTo.height())
       };
     }
 
@@ -67,9 +65,9 @@ export module Interaction {
     /**
      * Gets the callback that is called when dragging starts.
      *
-     * @returns {(start: Point) => void} The callback called when dragging starts.
+     * @returns {(start: Point) => any} The callback called when dragging starts.
      */
-    public onDragStart(): (start: Point) => void;
+    public onDragStart(): (start: Point) => any;
     /**
      * Sets the callback to be called when dragging starts.
      *
@@ -89,9 +87,9 @@ export module Interaction {
     /**
      * Gets the callback that is called during dragging.
      *
-     * @returns {(start: Point, end: Point) => void} The callback called during dragging.
+     * @returns {(start: Point, end: Point) => any} The callback called during dragging.
      */
-    public onDrag(): (start: Point, end: Point) => void;
+    public onDrag(): (start: Point, end: Point) => any;
     /**
      * Adds a callback to be called during dragging.
      *
@@ -111,9 +109,9 @@ export module Interaction {
     /**
      * Gets the callback that is called when dragging ends.
      *
-     * @returns {(start: Point, end: Point) => void} The callback called when dragging ends.
+     * @returns {(start: Point, end: Point) => any} The callback called when dragging ends.
      */
-    public onDragEnd(): (start: Point, end: Point) => void;
+    public onDragEnd(): (start: Point, end: Point) => any;
     /**
      * Adds a callback to be called when the dragging ends.
      *
