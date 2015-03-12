@@ -2704,7 +2704,14 @@ declare module Plottable {
              * @returns {PlotData} The retrieved PlotData.
              */
             getAllPlotData(datasetKeys?: string | string[]): PlotData;
-            getClosestPlotData(xValue: number, yValue: number, datasetKeys?: string | string[], tolerance?: number): void;
+            getClosestPlotData(queryPoint: Point, datasetKeys?: string | string[], withinValue?: number): {
+                data: any;
+                pixelPoints: {
+                    x: number;
+                    y: number;
+                };
+                selection: D3.Selection;
+            };
         }
     }
 }

@@ -494,13 +494,29 @@ export module Plot {
       return { data: data, pixelPoints: pixelPoints, selection: d3.selectAll(allElements) };
     }
 
-    public getClosestPlotData(xValue: number, yValue: number, datasetKeys: string | string[] = this.datasetOrder(), tolerance = 0.5) {
+    public getClosestPlotData(queryPoint: Point, datasetKeys: string | string[] = this.datasetOrder(), withinValue = Infinity) {
       var datasetKeyArray: string[] = [];
       if (typeof(datasetKeys) === "string") {
         datasetKeyArray = [<string> datasetKeys];
       } else {
         datasetKeyArray = <string[]> datasetKeys;
       }
+
+      var plotData = this.getAllPlotData();
+      var closestIndex: number;
+      var closestDistance = withinValue;
+      var pointDistance = (p1: Point, p2: Point) => Math.sqrt(Math.pow(p2.y - p1.y, 2) + Math.pow(p2.x - p1.x, 2));
+      plotData.pixelPoints.forEach((pixelPoint: Point, index: number) => {
+        var distance = pointDistance(pixelPoint, queryPoint);
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          closestIndex = index;
+        }
+      });
+
+      return {data: plotData.data[closestIndex],
+              pixelPoints: plotData.pixelPoints[closestIndex],
+              selection: d3.select(plotData.selection[0][closestIndex])};
     }
   }
 }

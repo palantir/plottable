@@ -6677,9 +6677,9 @@ var Plottable;
                 });
                 return { data: data, pixelPoints: pixelPoints, selection: d3.selectAll(allElements) };
             };
-            AbstractPlot.prototype.getClosestPlotData = function (xValue, yValue, datasetKeys, tolerance) {
+            AbstractPlot.prototype.getClosestPlotData = function (queryPoint, datasetKeys, withinValue) {
                 if (datasetKeys === void 0) { datasetKeys = this.datasetOrder(); }
-                if (tolerance === void 0) { tolerance = 0.5; }
+                if (withinValue === void 0) { withinValue = Infinity; }
                 var datasetKeyArray = [];
                 if (typeof (datasetKeys) === "string") {
                     datasetKeyArray = [datasetKeys];
@@ -6687,6 +6687,18 @@ var Plottable;
                 else {
                     datasetKeyArray = datasetKeys;
                 }
+                var plotData = this.getAllPlotData();
+                var closestIndex;
+                var closestDistance = withinValue;
+                var pointDistance = function (p1, p2) { return Math.sqrt(Math.pow(p2.y - p1.y, 2) + Math.pow(p2.x - p1.x, 2)); };
+                plotData.pixelPoints.forEach(function (pixelPoint, index) {
+                    var distance = pointDistance(pixelPoint, queryPoint);
+                    if (distance < closestDistance) {
+                        closestDistance = distance;
+                        closestIndex = index;
+                    }
+                });
+                return { data: plotData.data[closestIndex], pixelPoints: plotData.pixelPoints[closestIndex], selection: d3.select(plotData.selection[0][closestIndex]) };
             };
             return AbstractPlot;
         })(Plottable.Component.AbstractComponent);
