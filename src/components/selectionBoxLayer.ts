@@ -4,20 +4,21 @@ module Plottable {
 export module Component {
   export class SelectionBoxLayer extends AbstractComponent {
     private _box: D3.Selection;
-    private _core: D3.Selection;
-    private _edgeT: D3.Selection;
-    private _edgeB: D3.Selection;
-    private _edgeL: D3.Selection;
-    private _edgeR: D3.Selection;
-    private _cornerTL: D3.Selection;
-    private _cornerTR: D3.Selection;
-    private _cornerBL: D3.Selection;
-    private _cornerBR: D3.Selection;
+    private _boxArea: D3.Selection;
+    private _boxEdgeT: D3.Selection;
+    private _boxEdgeB: D3.Selection;
+    private _boxEdgeL: D3.Selection;
+    private _boxEdgeR: D3.Selection;
+    private _boxCornerTL: D3.Selection;
+    private _boxCornerTR: D3.Selection;
+    private _boxCornerBL: D3.Selection;
+    private _boxCornerBR: D3.Selection;
 
-    private _topLeft: Point = { x: 0, y: 0 };
-    private _bottomRight: Point = { x: 0, y: 0 };
-
-    private _detectionRadius = 2;
+    private _boxBounds: Bounds = {
+      topLeft: { x: 0, y: 0 },
+      bottomRight: { x: 0, y: 0 }
+    };
+    private _boxEdgeWidth = 2;
 
     constructor() {
       super();
@@ -27,85 +28,109 @@ export module Component {
     protected _setup() {
       super._setup();
 
-      this._box = this._content.append("g").classed("selection-box-layer", true).remove();
-      this._core = this._box.append("rect").classed("selection-area", true);
+      this._box = this._content.append("g").classed("selection-box", true).remove();
+      this._boxArea = this._box.append("rect").classed("selection-area", true);
 
       var createLine = () => this._box.append("line").style({
                                "opacity": 0,
                                "stroke": "pink",
-                               "stroke-width": 2 * this._detectionRadius
+                               "stroke-width": this._boxEdgeWidth
                              });
-      this._edgeT = createLine().classed("selection-edge-tb", true);
-      this._edgeB = createLine().classed("selection-edge-tb", true);
-      this._edgeL = createLine().classed("selection-edge-lr", true);
-      this._edgeR = createLine().classed("selection-edge-lr", true);
+      this._boxEdgeT = createLine().classed("selection-edge-tb", true);
+      this._boxEdgeB = createLine().classed("selection-edge-tb", true);
+      this._boxEdgeL = createLine().classed("selection-edge-lr", true);
+      this._boxEdgeR = createLine().classed("selection-edge-lr", true);
 
       var createCorner = () => this._box.append("circle")
-                                   .attr("r", this._detectionRadius)
+                                   .attr("r", this._boxEdgeWidth / 2)
                                    .style({
                                      "opacity": 0,
                                      "fill": "pink"
                                    });
-      this._cornerTL = createCorner().classed("selection-corner-tl", true);
-      this._cornerTR = createCorner().classed("selection-corner-tr", true);
-      this._cornerBL = createCorner().classed("selection-corner-bl", true);
-      this._cornerBR = createCorner().classed("selection-corner-br", true);
+      this._boxCornerTL = createCorner().classed("selection-corner-tl", true);
+      this._boxCornerTR = createCorner().classed("selection-corner-tr", true);
+      this._boxCornerBL = createCorner().classed("selection-corner-bl", true);
+      this._boxCornerBR = createCorner().classed("selection-corner-br", true);
     }
 
-    public setBox(topLeft: Point, bottomRight: Point) {
-      this._topLeft = topLeft;
-      this._bottomRight = bottomRight;
+    public bounds(): Bounds;
+    /**
+     * Sets the bounds of the box, and draws the box.
+     *
+     * @param {Bounds} newBounds The desired bounds of the box.
+     * @return {SelectionBoxLayer} The calling SelectionBoxLayer.
+     */
+    public bounds(newBounds: Bounds): SelectionBoxLayer;
+    public bounds(newBounds?: Bounds): any {
+      if (newBounds == null) {
+        return this._boxBounds;
+      }
+
+      this._boxBounds = newBounds;
       this._render();
       return this;
     }
 
     public _doRender() {
-      var w = this._bottomRight.x - this._topLeft.x;
-      var h = this._bottomRight.y - this._topLeft.y;
+      var l = this._boxBounds.topLeft.x;
+      var r = this._boxBounds.bottomRight.x;
+      var t = this._boxBounds.topLeft.y;
+      var b = this._boxBounds.bottomRight.y;
 
-      this._core.attr({
-        width: w, height: h
-      });
-
-      this._edgeT.attr({
-        x1: 0, y1: 0, x2: w, y2: 0
-      });
-      this._edgeB.attr({
-        x1: 0, y1: h, x2: w, y2: h
-      });
-      this._edgeL.attr({
-        x1: 0, y1: 0, x2: 0, y2: h
-      });
-      this._edgeR.attr({
-        x1: w, y1: 0, x2: w, y2: h
+      this._boxArea.attr({
+        x: l, y: t, width: r - l, height: b - t
       });
 
-      this._cornerTR.attr({ cx: w, cy: 0 });
-      this._cornerBL.attr({ cx: 0, cy: h });
-      this._cornerBR.attr({ cx: w, cy: h });
+      this._boxEdgeT.attr({
+        x1: l, y1: t, x2: r, y2: t
+      });
+      this._boxEdgeB.attr({
+        x1: l, y1: b, x2: r, y2: b
+      });
+      this._boxEdgeL.attr({
+        x1: l, y1: t, x2: l, y2: b
+      });
+      this._boxEdgeR.attr({
+        x1: r, y1: t, x2: r, y2: b
+      });
 
-      this._box.attr("transform", "translate("+this._topLeft.x+", "+this._topLeft.y+")");
+      this._boxCornerTL.attr({ cx: l, cy: t });
+      this._boxCornerTR.attr({ cx: r, cy: t });
+      this._boxCornerBL.attr({ cx: l, cy: b });
+      this._boxCornerBR.attr({ cx: r, cy: b });
+
       this._content.node().appendChild(this._box.node());
     }
 
-    public detectionRadius(): number;
-    public detectionRadius(radius: number): SelectionBoxLayer;
-    public detectionRadius(radius?: number): any {
-      if (radius == null) {
-        return this._detectionRadius;
+    /**
+     * Gets the edge width of the box.
+     *
+     * @return {number}
+     */
+    public edgeWidth(): number;
+    /**
+     * Sets the edge width of the box.
+     *
+     * @param {number} width The desired edge width.
+     * @return {SelectionBoxLayer} The calling SelectionBoxLayer.
+     */
+    public edgeWidth(width: number): SelectionBoxLayer;
+    public edgeWidth(width?: number): any {
+      if (width == null) {
+        return this._boxEdgeWidth;
       }
-      if (radius < 0) {
-        throw new Error("Detection radius cannot be negative.");
+      if (width < 0) {
+        throw new Error("Detection width cannot be negative.");
       }
-      this._detectionRadius = radius;
-      this._edgeT.style("stroke-width", 2 * this._detectionRadius);
-      this._edgeB.style("stroke-width", 2 * this._detectionRadius);
-      this._edgeL.style("stroke-width", 2 * this._detectionRadius);
-      this._edgeR.style("stroke-width", 2 * this._detectionRadius);
-      this._cornerTL.attr("r", this._detectionRadius);
-      this._cornerTR.attr("r", this._detectionRadius);
-      this._cornerBL.attr("r", this._detectionRadius);
-      this._cornerBR.attr("r", this._detectionRadius);
+      this._boxEdgeWidth = width;
+      this._boxEdgeT.style("stroke-width", this._boxEdgeWidth);
+      this._boxEdgeB.style("stroke-width", this._boxEdgeWidth);
+      this._boxEdgeL.style("stroke-width", this._boxEdgeWidth);
+      this._boxEdgeR.style("stroke-width", this._boxEdgeWidth);
+      this._boxCornerTL.attr("r", this._boxEdgeWidth / 2);
+      this._boxCornerTR.attr("r", this._boxEdgeWidth / 2);
+      this._boxCornerBL.attr("r", this._boxEdgeWidth / 2);
+      this._boxCornerBR.attr("r", this._boxEdgeWidth / 2);
     }
 
     public dismissBox() {

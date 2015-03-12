@@ -724,12 +724,6 @@ declare module Plottable {
         wantsWidth: boolean;
         wantsHeight: boolean;
     };
-    type _PixelArea = {
-        xMin: number;
-        xMax: number;
-        yMin: number;
-        yMax: number;
-    };
     /**
      * The range of your current data. For example, [1, 2, 6, -5] has the Extent
      * `{min: -5, max: 6}`.
@@ -747,6 +741,13 @@ declare module Plottable {
     type Point = {
         x: number;
         y: number;
+    };
+    /**
+     * The corners of a box.
+     */
+    type Bounds = {
+        topLeft: Point;
+        bottomRight: Point;
     };
 }
 
@@ -2539,10 +2540,28 @@ declare module Plottable {
         class SelectionBoxLayer extends AbstractComponent {
             constructor();
             protected _setup(): void;
-            setBox(topLeft: Point, bottomRight: Point): SelectionBoxLayer;
+            bounds(): Bounds;
+            /**
+             * Sets the bounds of the box, and draws the box.
+             *
+             * @param {Bounds} newBounds The desired bounds of the box.
+             * @return {SelectionBoxLayer} The calling SelectionBoxLayer.
+             */
+            bounds(newBounds: Bounds): SelectionBoxLayer;
             _doRender(): void;
-            detectionRadius(): number;
-            detectionRadius(radius: number): SelectionBoxLayer;
+            /**
+             * Gets the edge width of the box.
+             *
+             * @return {number}
+             */
+            edgeWidth(): number;
+            /**
+             * Sets the edge width of the box.
+             *
+             * @param {number} width The desired edge width.
+             * @return {SelectionBoxLayer} The calling SelectionBoxLayer.
+             */
+            edgeWidth(width: number): SelectionBoxLayer;
             dismissBox(): void;
         }
     }
