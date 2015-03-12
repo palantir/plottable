@@ -3047,6 +3047,8 @@ declare module Plottable {
                     y: number;
                 };
             };
+            protected _updateXDomainer(): void;
+            protected _updateYDomainer(): void;
             _hoverOverComponent(p: Point): void;
             _hoverOutComponent(p: Point): void;
             _doHover(p: Point): Interaction.HoverData;
@@ -3071,6 +3073,7 @@ declare module Plottable {
             constructor(xScale: Scale.AbstractQuantitative<X>, yScale: Scale.AbstractQuantitative<number>);
             protected _onDatasetUpdate(): void;
             protected _getDrawer(key: string): _Drawer.Area;
+            protected _updateXDomainer(): void;
             protected _updateYDomainer(): void;
             project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): Area<X>;
             protected _getResetYFunction(): (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
@@ -3168,6 +3171,7 @@ declare module Plottable {
             _getAnimator(key: string): Animator.PlotAnimator;
             protected _setup(): void;
             protected _additionalPaint(): void;
+            protected _updateXDomainer(): void;
             protected _updateYDomainer(): void;
             project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): StackedArea<X>;
             protected _onDatasetUpdate(): StackedArea<X>;

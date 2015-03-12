@@ -3813,7 +3813,7 @@ describe("Plots", function () {
             var plot = new Plottable.Plot.StackedArea(xScale, yScale).addDataset(data1).addDataset(data2).project("x", "x", xScale).project("y", "y", yScale);
             plot.automaticallyAdjustYScaleOverVisiblePoints(true);
             plot.renderTo(svg);
-            assert.deepEqual(yScale.domain(), [0, 4.5], "auto scales takes stacking into account");
+            assert.deepEqual(yScale.domain(), [0, 4], "auto scales takes stacking into account");
             svg.remove();
         });
         it("auto scales correctly on stacked bar", function () {
@@ -3852,7 +3852,7 @@ describe("Plots", function () {
             var plot = new Plottable.Plot.StackedArea(yScale, yScale).addDataset(data1).addDataset(data2).project("x", "x", xScale).project("y", "y", yScale);
             plot.automaticallyAdjustYScaleOverVisiblePoints(true);
             plot.renderTo(svg);
-            assert.deepEqual(yScale.domain(), [0, 4.5], "auto scales takes stacking into account");
+            assert.deepEqual(yScale.domain(), [0, 4], "auto scales takes stacking into account");
             svg.remove();
         });
         it("auto scales correctly on stacked bar", function () {
@@ -6142,18 +6142,7 @@ describe("Domainer", function () {
             }
             return exceptions;
         }
-        assert.deepEqual(getExceptions(), [0], "initializing the plot adds a padding exception at 0");
-        // assert.deepEqual(getExceptions(), [], "Initially there are no padding exceptions");
-        r.project("y0", "y0", yScale);
-        assert.deepEqual(getExceptions(), [], "projecting a non-constant y0 removes the padding exception");
-        r.project("y0", 0, yScale);
-        assert.deepEqual(getExceptions(), [0], "projecting constant y0 adds the exception back");
-        r.project("y0", function () { return 5; }, yScale);
-        assert.deepEqual(getExceptions(), [5], "projecting a different constant y0 removed the old exception and added a new one");
-        r.project("y0", "y0", yScale);
-        assert.deepEqual(getExceptions(), [], "projecting a non-constant y0 removes the padding exception");
-        dataset.data([{ x: 0, y: 0, y0: 0 }, { x: 5, y: 5, y0: 0 }]);
-        assert.deepEqual(getExceptions(), [0], "changing to constant values via change in datasource adds exception");
+        assert.deepEqual(getExceptions(), [0, 5], "initializing the plot adds a padding exception at both 0 and 5");
         svg.remove();
     });
 });
