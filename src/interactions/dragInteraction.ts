@@ -12,9 +12,8 @@ export module Interaction {
 
     public _anchor(component: Component.AbstractComponent, hitBox: D3.Selection) {
       super._anchor(component, hitBox);
-      this._mouseDispatcher = Dispatcher.Mouse.getDispatcher(
-                                <SVGElement> (<any> this._componentToListenTo)._element.node()
-                              );
+      this._mouseDispatcher = Dispatcher.Mouse.getDispatcher(<SVGElement> this._componentToListenTo.content().node());
+      // TODO: Add Dispatcher.Touch as well
       this._mouseDispatcher.onMouseDown("Interaction.Drag" + this.getID(),
         (p: Point, e: MouseEvent) => this._startDrag(p, e));
       this._mouseDispatcher.onMouseMove("Interaction.Drag" + this.getID(),
