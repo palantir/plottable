@@ -52,6 +52,9 @@ module Plottable {
           case "triangle-down":
             sizeFactor = Math.sqrt(3);
             break;
+          default:
+            sizeFactor = 1;
+            break;
         }
 
         return sizeFactor * Math.pow(SYMBOL_GENERATOR_RADIUS, 2);
