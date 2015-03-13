@@ -5657,9 +5657,6 @@ var Plottable;
                 rows.attr("transform", function (d, i) { return "translate(0, " + (i * layout.textHeight + _this._padding) + ")"; });
                 var entries = rows.selectAll("g." + Legend.LEGEND_ENTRY_CLASS).data(function (d) { return d; });
                 var entriesEnter = entries.enter().append("g").classed(Legend.LEGEND_ENTRY_CLASS, true);
-                entries.each(function (d) {
-                    d3.select(this).classed(d.replace(" ", "-"), true);
-                });
                 entriesEnter.append("path");
                 entriesEnter.append("g").classed("text-container", true);
                 entries.exit().remove();
