@@ -18,8 +18,8 @@ export module _Drawer {
 
     protected _drawStep(step: AppliedDrawStep) {
       super._drawStep(step);
-      var attrToProjector = <_AttributeToAppliedProjector>_Util.Methods.copyMap(step.attrToProjector);
-      this._attrToProjector = <_AttributeToAppliedProjector>_Util.Methods.copyMap(step.attrToProjector);
+      var attrToProjector = <AttributeToAppliedProjector>_Util.Methods.copyMap(step.attrToProjector);
+      this._attrToProjector = <AttributeToAppliedProjector>_Util.Methods.copyMap(step.attrToProjector);
 
       var xProjector = attrToProjector["x"];
       var yProjector = attrToProjector["y"];

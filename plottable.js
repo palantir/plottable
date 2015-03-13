@@ -6552,7 +6552,7 @@ var Plottable;
              *
              * Note that this will return all of the data attributes, which may not perfectly align to svg attributes
              *
-             * @param {datasetKey} the key of the dataset to generate the map for
+             * @param {datasetKey} the key of the dataset to generate the dictionary for
              * @returns {AttributeToAppliedProjector} A dictionary mapping attributes to functions
              */
             AbstractPlot.prototype.generateProjectors = function (datasetKey) {
