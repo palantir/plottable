@@ -15,7 +15,7 @@ function run(div, data, Plottable) {
   var dataseries1 = new Plottable.Dataset(data);
 
   //Axis
-  var xScale = new Plottable.Scale.Ordinal();
+  var xScale = new Plottable.Scale.Category();
   var yScale = new Plottable.Scale.Linear();
   var xAxis = new Plottable.Axis.Category(xScale, "bottom");
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");

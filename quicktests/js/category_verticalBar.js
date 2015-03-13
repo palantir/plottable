@@ -15,7 +15,7 @@ function run(svg, data, Plottable) {
 
     var ds = new Plottable.Dataset(data);
 
-    var xScale = new Plottable.Scale.Ordinal();
+    var xScale = new Plottable.Scale.Category();
     var xAxis = new Plottable.Axis.Category(xScale, "bottom");
 
     var yScale = new Plottable.Scale.Linear();

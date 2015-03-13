@@ -8,6 +8,7 @@
 /// <reference path="utils/color.ts" />
 
 /// <reference path="utils/formatters.ts" />
+/// <reference path="utils/symbolGenerators.ts" />
 
 /// <reference path="utils/clientToSVGTranslator.ts" />
 
@@ -28,7 +29,7 @@
 /// <reference path="scales/linearScale.ts" />
 /// <reference path="scales/logScale.ts" />
 /// <reference path="scales/modifiedLogScale.ts" />
-/// <reference path="scales/ordinalScale.ts" />
+/// <reference path="scales/categoryScale.ts" />
 /// <reference path="scales/colorScale.ts" />
 /// <reference path="scales/timeScale.ts" />
 /// <reference path="scales/interpolatedColorScale.ts" />
@@ -39,9 +40,9 @@
 /// <reference path="drawers/lineDrawer.ts" />
 /// <reference path="drawers/areaDrawer.ts" />
 /// <reference path="drawers/elementDrawer.ts" />
-/// <reference path="drawers/circleDrawer.ts" />
 /// <reference path="drawers/rectDrawer.ts" />
 /// <reference path="drawers/arcDrawer.ts" />
+/// <reference path="drawers/symbolDrawer.ts" />
 
 /// <reference path="components/abstractComponent.ts" />
 /// <reference path="components/abstractComponentContainer.ts" />

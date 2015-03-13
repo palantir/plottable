@@ -55,6 +55,17 @@ export module Plot {
     protected _getDrawer(key: string): _Drawer.AbstractDrawer {
       return new Plottable._Drawer.Arc(key).setClass("arc");
     }
+
+    public getAllPlotData(datasetKeys?: string | string[]): PlotData {
+      var allPlotData = super.getAllPlotData(datasetKeys);
+
+      allPlotData.pixelPoints.forEach((pixelPoint: Point) => {
+        pixelPoint.x = pixelPoint.x + this.width() / 2;
+        pixelPoint.y = pixelPoint.y + this.height() / 2;
+      });
+
+      return allPlotData;
+    }
   }
 }
 }

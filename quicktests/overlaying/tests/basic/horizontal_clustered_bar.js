@@ -10,7 +10,7 @@ function makeData() {
 function run(svg, data, Plottable) {
   "use strict";
 
-  var nameScale = new Plottable.Scale.Ordinal();
+  var nameScale = new Plottable.Scale.Category();
   var valueScale = new Plottable.Scale.Linear();
   var colorScale = new Plottable.Scale.Color("10");
 

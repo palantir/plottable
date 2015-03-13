@@ -1,5 +1,5 @@
 /*!
-Plottable 0.47.0 (https://github.com/palantir/plottable)
+Plottable 0.48.0 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -978,6 +978,66 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
+    var SymbolGenerators;
+    (function (SymbolGenerators) {
+        /**
+         * The radius that symbol generators will be assumed to have for their symbols.
+         */
+        SymbolGenerators.SYMBOL_GENERATOR_RADIUS = 50;
+        /**
+         * A wrapper for D3's symbol generator as documented here:
+         * https://github.com/mbostock/d3/wiki/SVG-Shapes#symbol
+         *
+         * Note that since D3 symbols compute the path strings by knowing how much area it can take up instead of
+         * knowing its dimensions, the total area expected may be off by some constant factor.
+         *
+         * @param {string | ((datum: any, index: number) => string)} symbolType Accessor for the d3 symbol type
+         * @returns {SymbolGenerator} the symbol generator for a D3 symbol
+         */
+        function d3Symbol(symbolType) {
+            // Since D3 symbols use a size concept, we have to convert our radius value to the corresponding area value
+            // This is done by inspecting the symbol size calculation in d3.js and solving how sizes are calculated from a given radius
+            var typeToSize = function (symbolTypeString) {
+                var sizeFactor;
+                switch (symbolTypeString) {
+                    case "circle":
+                        sizeFactor = Math.PI;
+                        break;
+                    case "square":
+                        sizeFactor = 4;
+                        break;
+                    case "cross":
+                        sizeFactor = 20 / 9;
+                        break;
+                    case "diamond":
+                        sizeFactor = 2 * Math.tan(Math.PI / 6);
+                        break;
+                    case "triangle-up":
+                    case "triangle-down":
+                        sizeFactor = Math.sqrt(3);
+                        break;
+                    default:
+                        sizeFactor = 1;
+                        break;
+                }
+                return sizeFactor * Math.pow(SymbolGenerators.SYMBOL_GENERATOR_RADIUS, 2);
+            };
+            function ensureSymbolType(symTypeString) {
+                if (d3.svg.symbolTypes.indexOf(symTypeString) === -1) {
+                    throw new Error(symTypeString + " is an invalid D3 symbol type.  d3.svg.symbolTypes can retrieve the valid symbol types.");
+                }
+                return symTypeString;
+            }
+            var symbolSize = typeof (symbolType) === "string" ? typeToSize(ensureSymbolType(symbolType)) : function (datum, index) { return typeToSize(ensureSymbolType(symbolType(datum, index))); };
+            return d3.svg.symbol().type(symbolType).size(symbolSize);
+        }
+        SymbolGenerators.d3Symbol = d3Symbol;
+    })(SymbolGenerators = Plottable.SymbolGenerators || (Plottable.SymbolGenerators = {}));
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var Plottable;
+(function (Plottable) {
     var _Util;
     (function (_Util) {
         var ClientToSVGTranslator = (function () {
@@ -1053,7 +1113,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "0.47.0";
+    Plottable.version = "0.48.0";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -1743,7 +1803,7 @@ var Plottable;
              * the data.
              *
              * Extent: The [min, max] pair for a Scale.Quantitative, all covered
-             * strings for a Scale.Ordinal.
+             * strings for a Scale.Category.
              *
              * Perspective: A combination of a Dataset and an Accessor that
              * represents a view in to the data.
@@ -2240,37 +2300,37 @@ var Plottable;
 (function (Plottable) {
     var Scale;
     (function (Scale) {
-        var Ordinal = (function (_super) {
-            __extends(Ordinal, _super);
+        var Category = (function (_super) {
+            __extends(Category, _super);
             /**
-             * Creates an OrdinalScale.
+             * Creates a CategoryScale.
              *
-             * An OrdinalScale maps strings to numbers. A common use is to map the
+             * A CategoryScale maps strings to numbers. A common use is to map the
              * labels of a bar plot (strings) to their pixel locations (numbers).
              *
              * @constructor
              */
-            function Ordinal(scale) {
+            function Category(scale) {
                 if (scale === void 0) { scale = d3.scale.ordinal(); }
                 _super.call(this, scale);
                 this._range = [0, 1];
                 this._typeCoercer = function (d) { return d != null && d.toString ? d.toString() : d; };
                 var d3InnerPadding = 0.3;
-                this._innerPadding = Ordinal._convertToPlottableInnerPadding(d3InnerPadding);
-                this._outerPadding = Ordinal._convertToPlottableOuterPadding(0.5, d3InnerPadding);
+                this._innerPadding = Category._convertToPlottableInnerPadding(d3InnerPadding);
+                this._outerPadding = Category._convertToPlottableOuterPadding(0.5, d3InnerPadding);
             }
-            Ordinal.prototype._getExtent = function () {
+            Category.prototype._getExtent = function () {
                 var extents = this._getAllExtents();
                 return Plottable._Util.Methods.uniq(Plottable._Util.Methods.flatten(extents));
             };
-            Ordinal.prototype.domain = function (values) {
+            Category.prototype.domain = function (values) {
                 return _super.prototype.domain.call(this, values);
             };
-            Ordinal.prototype._setDomain = function (values) {
+            Category.prototype._setDomain = function (values) {
                 _super.prototype._setDomain.call(this, values);
                 this.range(this.range()); // update range
             };
-            Ordinal.prototype.range = function (values) {
+            Category.prototype.range = function (values) {
                 if (values == null) {
                     return this._range;
                 }
@@ -2282,10 +2342,10 @@ var Plottable;
                     return this;
                 }
             };
-            Ordinal._convertToPlottableInnerPadding = function (d3InnerPadding) {
+            Category._convertToPlottableInnerPadding = function (d3InnerPadding) {
                 return 1 / (1 - d3InnerPadding) - 1;
             };
-            Ordinal._convertToPlottableOuterPadding = function (d3OuterPadding, d3InnerPadding) {
+            Category._convertToPlottableOuterPadding = function (d3OuterPadding, d3InnerPadding) {
                 return d3OuterPadding / (1 - d3InnerPadding);
             };
             /**
@@ -2293,7 +2353,7 @@ var Plottable;
              *
              * @returns {number} The range band width
              */
-            Ordinal.prototype.rangeBand = function () {
+            Category.prototype.rangeBand = function () {
                 return this._d3Scale.rangeBand();
             };
             /**
@@ -2304,10 +2364,10 @@ var Plottable;
              *
              * @returns {number} the full band width of the scale
              */
-            Ordinal.prototype.stepWidth = function () {
+            Category.prototype.stepWidth = function () {
                 return this.rangeBand() * (1 + this.innerPadding());
             };
-            Ordinal.prototype.innerPadding = function (innerPadding) {
+            Category.prototype.innerPadding = function (innerPadding) {
                 if (innerPadding == null) {
                     return this._innerPadding;
                 }
@@ -2316,7 +2376,7 @@ var Plottable;
                 this.broadcaster.broadcast();
                 return this;
             };
-            Ordinal.prototype.outerPadding = function (outerPadding) {
+            Category.prototype.outerPadding = function (outerPadding) {
                 if (outerPadding == null) {
                     return this._outerPadding;
                 }
@@ -2325,16 +2385,16 @@ var Plottable;
                 this.broadcaster.broadcast();
                 return this;
             };
-            Ordinal.prototype.copy = function () {
-                return new Ordinal(this._d3Scale.copy());
+            Category.prototype.copy = function () {
+                return new Category(this._d3Scale.copy());
             };
-            Ordinal.prototype.scale = function (value) {
+            Category.prototype.scale = function (value) {
                 //scale it to the middle
                 return _super.prototype.scale.call(this, value) + this.rangeBand() / 2;
             };
-            return Ordinal;
+            return Category;
         })(Scale.AbstractScale);
-        Scale.Ordinal = Ordinal;
+        Scale.Category = Category;
     })(Scale = Plottable.Scale || (Plottable.Scale = {}));
 })(Plottable || (Plottable = {}));
 
@@ -3120,32 +3180,6 @@ var Plottable;
 (function (Plottable) {
     var _Drawer;
     (function (_Drawer) {
-        var Circle = (function (_super) {
-            __extends(Circle, _super);
-            function Circle(key) {
-                _super.call(this, key);
-                this.svgElement("circle");
-            }
-            Circle.prototype._getPixelPoint = function (datum, index) {
-                return { x: this._attrToProjector["cx"](datum, index), y: this._attrToProjector["cy"](datum, index) };
-            };
-            return Circle;
-        })(_Drawer.Element);
-        _Drawer.Circle = Circle;
-    })(_Drawer = Plottable._Drawer || (Plottable._Drawer = {}));
-})(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    var _Drawer;
-    (function (_Drawer) {
         var LABEL_VERTICAL_PADDING = 5;
         var LABEL_HORIZONTAL_PADDING = 5;
         var Rect = (function (_super) {
@@ -3291,12 +3325,72 @@ var Plottable;
                 var innerRadiusAccessor = this._attrToProjector["inner-radius"];
                 var outerRadiusAccessor = this._attrToProjector["outer-radius"];
                 var avgRadius = (innerRadiusAccessor(datum, index) + outerRadiusAccessor(datum, index)) / 2;
-                var avgAngle = (datum.startAngle + datum.endAngle) / 2;
-                return { x: avgRadius * Math.sin(avgAngle), y: avgRadius * Math.cos(avgAngle) };
+                var startAngle = +this._getSelection(index).datum().startAngle;
+                var endAngle = +this._getSelection(index).datum().endAngle;
+                var avgAngle = (startAngle + endAngle) / 2;
+                return { x: avgRadius * Math.sin(avgAngle), y: -avgRadius * Math.cos(avgAngle) };
             };
             return Arc;
         })(_Drawer.Element);
         _Drawer.Arc = Arc;
+    })(_Drawer = Plottable._Drawer || (Plottable._Drawer = {}));
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    var _Drawer;
+    (function (_Drawer) {
+        var Symbol = (function (_super) {
+            __extends(Symbol, _super);
+            function Symbol() {
+                _super.apply(this, arguments);
+            }
+            Symbol.prototype._enterData = function (data) {
+                _super.prototype._enterData.call(this, data);
+                var dataElements = this._getDrawSelection().data(data);
+                dataElements.enter().append("path");
+                dataElements.exit().remove();
+                dataElements.classed("symbol", true);
+            };
+            Symbol.prototype._getDrawSelection = function () {
+                return this._getRenderArea().selectAll("path");
+            };
+            Symbol.prototype._drawStep = function (step) {
+                _super.prototype._drawStep.call(this, step);
+                var attrToProjector = Plottable._Util.Methods.copyMap(step.attrToProjector);
+                this._attrToProjector = Plottable._Util.Methods.copyMap(step.attrToProjector);
+                var xProjector = attrToProjector["x"];
+                var yProjector = attrToProjector["y"];
+                delete attrToProjector["x"];
+                delete attrToProjector["y"];
+                var rProjector = attrToProjector["r"];
+                delete attrToProjector["r"];
+                attrToProjector["transform"] = function (datum, index) { return "translate(" + xProjector(datum, index) + "," + yProjector(datum, index) + ") " + "scale(" + rProjector(datum, index) / 50 + ")"; };
+                var symbolProjector = attrToProjector["symbol"];
+                delete attrToProjector["symbol"];
+                attrToProjector["d"] = symbolProjector;
+                var drawSelection = this._getDrawSelection();
+                if (attrToProjector["fill"]) {
+                    drawSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
+                }
+                step.animator.animate(drawSelection, attrToProjector);
+            };
+            Symbol.prototype._getSelector = function () {
+                return "path";
+            };
+            Symbol.prototype._getPixelPoint = function (datum, index) {
+                return { x: this._attrToProjector["x"](datum, index), y: this._attrToProjector["y"](datum, index) };
+            };
+            return Symbol;
+        })(_Drawer.AbstractDrawer);
+        _Drawer.Symbol = Symbol;
     })(_Drawer = Plottable._Drawer || (Plottable._Drawer = {}));
 })(Plottable || (Plottable = {}));
 
@@ -3373,6 +3467,7 @@ var Plottable;
                 });
                 this._cssClasses = null;
                 this._backgroundContainer = this._element.append("g").classed("background-container", true);
+                this._addBox("background-fill", this._backgroundContainer);
                 this._content = this._element.append("g").classed("content", true);
                 this._foregroundContainer = this._element.append("g").classed("foreground-container", true);
                 this._boxContainer = this._element.append("g").classed("box-container", true);
@@ -3786,23 +3881,34 @@ var Plottable;
                 return origin;
             };
             /**
-             * Returns the foreground selection for the component
-             * (A selection covering the front of the component)
+             * Returns the foreground selection for the Component
+             * (A selection covering the front of the Component)
              *
-             * Will return undefined if the component has not been anchored
+             * Will return undefined if the Component has not been anchored.
              *
-             * @return {D3.Selection} foreground selection for the component
+             * @return {D3.Selection} foreground selection for the Component
              */
             AbstractComponent.prototype.foreground = function () {
                 return this._foregroundContainer;
             };
             /**
-             * Returns the background selection for the component
-             * (A selection appearing behind of the component)
+             * Returns the content selection for the Component
+             * (A selection containing the visual elements of the Component)
              *
-             * Will return undefined if the component has not been anchored
+             * Will return undefined if the Component has not been anchored.
              *
-             * @return {D3.Selection} background selection for the component
+             * @return {D3.Selection} content selection for the Component
+             */
+            AbstractComponent.prototype.content = function () {
+                return this._content;
+            };
+            /**
+             * Returns the background selection for the Component
+             * (A selection appearing behind of the Component)
+             *
+             * Will return undefined if the Component has not been anchored.
+             *
+             * @return {D3.Selection} background selection for the Component
              */
             AbstractComponent.prototype.background = function () {
                 return this._backgroundContainer;
@@ -5015,12 +5121,12 @@ var Plottable;
             /**
              * Constructs a CategoryAxis.
              *
-             * A CategoryAxis takes an OrdinalScale and includes word-wrapping
+             * A CategoryAxis takes a CategoryScale and includes word-wrapping
              * algorithms and advanced layout logic to try to display the scale as
              * efficiently as possible.
              *
              * @constructor
-             * @param {OrdinalScale} scale The scale to base the Axis on.
+             * @param {CategoryScale} scale The scale to base the Axis on.
              * @param {string} orientation The orientation of the Axis (top/bottom/left/right) (default = "bottom").
              * @param {Formatter} formatter The Formatter for the Axis (default Formatters.identity())
              */
@@ -5046,15 +5152,15 @@ var Plottable;
                 if (this._scale.domain().length === 0) {
                     return { width: 0, height: 0, wantsWidth: false, wantsHeight: false };
                 }
-                var ordinalScale = this._scale;
-                var fakeScale = ordinalScale.copy();
+                var categoryScale = this._scale;
+                var fakeScale = categoryScale.copy();
                 if (this._isHorizontal()) {
                     fakeScale.range([0, offeredWidth]);
                 }
                 else {
                     fakeScale.range([offeredHeight, 0]);
                 }
-                var textResult = this._measureTicks(offeredWidth, offeredHeight, fakeScale, ordinalScale.domain());
+                var textResult = this._measureTicks(offeredWidth, offeredHeight, fakeScale, categoryScale.domain());
                 return {
                     width: textResult.usedWidth + widthRequiredByTicks,
                     height: textResult.usedHeight + heightRequiredByTicks,
@@ -5165,11 +5271,11 @@ var Plottable;
             Category.prototype._doRender = function () {
                 var _this = this;
                 _super.prototype._doRender.call(this);
-                var ordScale = this._scale;
+                var catScale = this._scale;
                 var tickLabels = this._tickLabelContainer.selectAll("." + Axis.AbstractAxis.TICK_LABEL_CLASS).data(this._scale.domain(), function (d) { return d; });
                 var getTickLabelTransform = function (d, i) {
-                    var innerPaddingWidth = ordScale.stepWidth() - ordScale.rangeBand();
-                    var scaledValue = ordScale.scale(d) - ordScale.rangeBand() / 2 - innerPaddingWidth / 2;
+                    var innerPaddingWidth = catScale.stepWidth() - catScale.rangeBand();
+                    var scaledValue = catScale.scale(d) - catScale.rangeBand() / 2 - innerPaddingWidth / 2;
                     var x = _this._isHorizontal() ? scaledValue : 0;
                     var y = _this._isHorizontal() ? 0 : scaledValue;
                     return "translate(" + x + "," + y + ")";
@@ -5179,8 +5285,8 @@ var Plottable;
                 tickLabels.attr("transform", getTickLabelTransform);
                 // erase all text first, then rewrite
                 tickLabels.text("");
-                this._drawTicks(this.width(), this.height(), ordScale, tickLabels);
-                var translate = this._isHorizontal() ? [ordScale.rangeBand() / 2, 0] : [0, ordScale.rangeBand() / 2];
+                this._drawTicks(this.width(), this.height(), catScale, tickLabels);
+                var translate = this._isHorizontal() ? [catScale.rangeBand() / 2, 0] : [0, catScale.rangeBand() / 2];
                 var xTranslate = this.orient() === "right" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
                 var yTranslate = this.orient() === "bottom" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
                 Plottable._Util.DOM.translate(this._tickLabelContainer, xTranslate, yTranslate);
@@ -5409,6 +5515,7 @@ var Plottable;
                 this._fixedWidthFlag = true;
                 this._fixedHeightFlag = true;
                 this._sortFn = function (a, b) { return _this._scale.domain().indexOf(a) - _this._scale.domain().indexOf(b); };
+                this._symbolGenerator = Plottable.SymbolGenerators.d3Symbol("circle");
             }
             Legend.prototype._setup = function () {
                 _super.prototype._setup.call(this);
@@ -5559,10 +5666,7 @@ var Plottable;
                 rows.attr("transform", function (d, i) { return "translate(0, " + (i * layout.textHeight + _this._padding) + ")"; });
                 var entries = rows.selectAll("g." + Legend.LEGEND_ENTRY_CLASS).data(function (d) { return d; });
                 var entriesEnter = entries.enter().append("g").classed(Legend.LEGEND_ENTRY_CLASS, true);
-                entries.each(function (d) {
-                    d3.select(this).classed(d.replace(" ", "-"), true);
-                });
-                entriesEnter.append("circle");
+                entriesEnter.append("path");
                 entriesEnter.append("g").classed("text-container", true);
                 entries.exit().remove();
                 var legendPadding = this._padding;
@@ -5575,7 +5679,7 @@ var Plottable;
                         return translateString;
                     });
                 });
-                entries.select("circle").attr("cx", layout.textHeight / 2).attr("cy", layout.textHeight / 2).attr("r", layout.textHeight * 0.3).attr("fill", function (value) { return _this._scale.scale(value); });
+                entries.select("path").attr("d", this.symbolGenerator()).attr("transform", "translate(" + (layout.textHeight / 2) + "," + layout.textHeight / 2 + ") " + "scale(" + (layout.textHeight * 0.3 / Plottable.SymbolGenerators.SYMBOL_GENERATOR_RADIUS) + ")").attr("fill", function (value) { return _this._scale.scale(value); }).attr("vector-effect", "non-scaling-stroke").classed(Legend.LEGEND_SYMBOL_CLASS, true);
                 var padding = this._padding;
                 var textContainers = entries.select("g.text-container");
                 textContainers.text(""); // clear out previous results
@@ -5593,6 +5697,16 @@ var Plottable;
                     self._writer.write(value, maxTextLength, self.height(), writeOptions);
                 });
             };
+            Legend.prototype.symbolGenerator = function (symbolGenerator) {
+                if (symbolGenerator == null) {
+                    return this._symbolGenerator;
+                }
+                else {
+                    this._symbolGenerator = symbolGenerator;
+                    this._render();
+                    return this;
+                }
+            };
             /**
              * The css class applied to each legend row
              */
@@ -5601,6 +5715,10 @@ var Plottable;
              * The css class applied to each legend entry
              */
             Legend.LEGEND_ENTRY_CLASS = "legend-entry";
+            /**
+             * The css class applied to each legend symbol
+             */
+            Legend.LEGEND_SYMBOL_CLASS = "legend-symbol";
             return Legend;
         })(Component.AbstractComponent);
         Component.Legend = Legend;
@@ -6434,6 +6552,26 @@ var Plottable;
                 });
                 return h;
             };
+            /**
+             * Generates a dictionary mapping an attribute to a function that calculate that attribute's value
+             * in accordance with the given datasetKey.
+             *
+             * Note that this will return all of the data attributes, which may not perfectly align to svg attributes
+             *
+             * @param {datasetKey} the key of the dataset to generate the dictionary for
+             * @returns {AttributeToAppliedProjector} A dictionary mapping attributes to functions
+             */
+            AbstractPlot.prototype.generateProjectors = function (datasetKey) {
+                var attrToProjector = this._generateAttrToProjector();
+                var plotDatasetKey = this._key2PlotDatasetKey.get(datasetKey);
+                var plotMetadata = plotDatasetKey.plotMetadata;
+                var userMetadata = plotDatasetKey.dataset.metadata();
+                var attrToAppliedProjector = {};
+                d3.entries(attrToProjector).forEach(function (keyValue) {
+                    attrToAppliedProjector[keyValue.key] = function (datum, index) { return keyValue.value(datum, index, userMetadata, plotMetadata); };
+                });
+                return attrToAppliedProjector;
+            };
             AbstractPlot.prototype._doRender = function () {
                 if (this._isAnchored) {
                     this._paint();
@@ -6605,19 +6743,24 @@ var Plottable;
              *
              * @param {string | string[]} datasetKeys The dataset(s) to retrieve the selections from.
              * If not provided, all selections will be retrieved.
+             * @param {boolean} exclude If set to true, all datasets will be queried excluding the keys referenced
+             * in the previous datasetKeys argument (default = false).
              * @returns {D3.Selection} The retrieved selections.
              */
-            AbstractPlot.prototype.getAllSelections = function (datasetKeys) {
+            AbstractPlot.prototype.getAllSelections = function (datasetKeys, exclude) {
                 var _this = this;
+                if (datasetKeys === void 0) { datasetKeys = this.datasetOrder(); }
+                if (exclude === void 0) { exclude = false; }
                 var datasetKeyArray = [];
-                if (datasetKeys == null) {
-                    datasetKeyArray = this._datasetKeysInOrder;
-                }
-                else if (typeof (datasetKeys) === "string") {
+                if (typeof (datasetKeys) === "string") {
                     datasetKeyArray = [datasetKeys];
                 }
                 else {
                     datasetKeyArray = datasetKeys;
+                }
+                if (exclude) {
+                    var excludedDatasetKeys = d3.set(datasetKeyArray);
+                    datasetKeyArray = this.datasetOrder().filter(function (datasetKey) { return !excludedDatasetKeys.has(datasetKey); });
                 }
                 var allSelections = [];
                 datasetKeyArray.forEach(function (datasetKey) {
@@ -6631,6 +6774,40 @@ var Plottable;
                     });
                 });
                 return d3.selectAll(allSelections);
+            };
+            /**
+             * Retrieves all of the PlotData of this plot for the specified dataset(s)
+             *
+             * @param {string | string[]} datasetKeys The dataset(s) to retrieve the selections from.
+             * If not provided, all selections will be retrieved.
+             * @returns {PlotData} The retrieved PlotData.
+             */
+            AbstractPlot.prototype.getAllPlotData = function (datasetKeys) {
+                var _this = this;
+                if (datasetKeys === void 0) { datasetKeys = this.datasetOrder(); }
+                var datasetKeyArray = [];
+                if (typeof (datasetKeys) === "string") {
+                    datasetKeyArray = [datasetKeys];
+                }
+                else {
+                    datasetKeyArray = datasetKeys;
+                }
+                var data = [];
+                var pixelPoints = [];
+                var allElements = [];
+                datasetKeyArray.forEach(function (datasetKey) {
+                    var plotDatasetKey = _this._key2PlotDatasetKey.get(datasetKey);
+                    if (plotDatasetKey == null) {
+                        return;
+                    }
+                    var drawer = plotDatasetKey.drawer;
+                    plotDatasetKey.dataset.data().forEach(function (datum, index) {
+                        data.push(datum);
+                        pixelPoints.push(drawer._getPixelPoint(datum, index));
+                        allElements.push(drawer._getSelection(index).node());
+                    });
+                });
+                return { data: data, pixelPoints: pixelPoints, selection: d3.selectAll(allElements) };
             };
             return AbstractPlot;
         })(Plottable.Component.AbstractComponent);
@@ -6694,6 +6871,15 @@ var Plottable;
             };
             Pie.prototype._getDrawer = function (key) {
                 return new Plottable._Drawer.Arc(key).setClass("arc");
+            };
+            Pie.prototype.getAllPlotData = function (datasetKeys) {
+                var _this = this;
+                var allPlotData = _super.prototype.getAllPlotData.call(this, datasetKeys);
+                allPlotData.pixelPoints.forEach(function (pixelPoint) {
+                    pixelPoint.x = pixelPoint.x + _this.width() / 2;
+                    pixelPoint.y = pixelPoint.y + _this.height() / 2;
+                });
+                return allPlotData;
             };
             return Pie;
         })(Plot.AbstractPlot);
@@ -6818,7 +7004,7 @@ var Plottable;
             AbstractXYPlot.prototype._computeLayout = function (offeredXOrigin, offeredYOffset, availableWidth, availableHeight) {
                 _super.prototype._computeLayout.call(this, offeredXOrigin, offeredYOffset, availableWidth, availableHeight);
                 this._xScale.range([0, this.width()]);
-                if (this._yScale instanceof Plottable.Scale.Ordinal) {
+                if (this._yScale instanceof Plottable.Scale.Category) {
                     this._yScale.range([0, this.height()]);
                 }
                 else {
@@ -6943,32 +7129,19 @@ var Plottable;
                 this._closeDetectionRadius = 5;
                 this.classed("scatter-plot", true);
                 this._defaultFillColor = new Plottable.Scale.Color().range()[0];
-                this.animator("circles-reset", new Plottable.Animator.Null());
-                this.animator("circles", new Plottable.Animator.Base().duration(250).delay(5));
+                this.animator("symbols-reset", new Plottable.Animator.Null());
+                this.animator("symbols", new Plottable.Animator.Base().duration(250).delay(5));
             }
-            /**
-             * @param {string} attrToSet One of ["x", "y", "cx", "cy", "r",
-             * "fill"]. "cx" and "cy" are aliases for "x" and "y". "r" is the datum's
-             * radius, and "fill" is the CSS color of the datum.
-             */
-            Scatter.prototype.project = function (attrToSet, accessor, scale) {
-                attrToSet = attrToSet === "cx" ? "x" : attrToSet;
-                attrToSet = attrToSet === "cy" ? "y" : attrToSet;
-                _super.prototype.project.call(this, attrToSet, accessor, scale);
-                return this;
-            };
             Scatter.prototype._getDrawer = function (key) {
-                return new Plottable._Drawer.Circle(key);
+                return new Plottable._Drawer.Symbol(key);
             };
             Scatter.prototype._generateAttrToProjector = function () {
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
-                attrToProjector["cx"] = attrToProjector["x"];
-                delete attrToProjector["x"];
-                attrToProjector["cy"] = attrToProjector["y"];
-                delete attrToProjector["y"];
                 attrToProjector["r"] = attrToProjector["r"] || d3.functor(3);
                 attrToProjector["opacity"] = attrToProjector["opacity"] || d3.functor(0.6);
                 attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this._defaultFillColor);
+                attrToProjector["symbol"] = attrToProjector["symbol"] || Plottable.SymbolGenerators.d3Symbol("circle");
+                attrToProjector["vector-effect"] = attrToProjector["vector-effect"] || d3.functor("non-scaling-stroke");
                 return attrToProjector;
             };
             Scatter.prototype._generateDrawSteps = function () {
@@ -6976,9 +7149,9 @@ var Plottable;
                 if (this._dataChanged && this._animate) {
                     var resetAttrToProjector = this._generateAttrToProjector();
                     resetAttrToProjector["r"] = function () { return 0; };
-                    drawSteps.push({ attrToProjector: resetAttrToProjector, animator: this._getAnimator("circles-reset") });
+                    drawSteps.push({ attrToProjector: resetAttrToProjector, animator: this._getAnimator("symbols-reset") });
                 }
-                drawSteps.push({ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("circles") });
+                drawSteps.push({ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("symbols") });
                 return drawSteps;
             };
             Scatter.prototype._getClosestStruckPoint = function (p, range) {
@@ -6987,8 +7160,8 @@ var Plottable;
                 var xProjector = attrToProjector["x"];
                 var yProjector = attrToProjector["y"];
                 var getDistSq = function (d, i, userMetdata, plotMetadata) {
-                    var dx = attrToProjector["cx"](d, i, userMetdata, plotMetadata) - p.x;
-                    var dy = attrToProjector["cy"](d, i, userMetdata, plotMetadata) - p.y;
+                    var dx = attrToProjector["x"](d, i, userMetdata, plotMetadata) - p.x;
+                    var dy = attrToProjector["y"](d, i, userMetdata, plotMetadata) - p.y;
                     return (dx * dx + dy * dy);
                 };
                 var overAPoint = false;
@@ -7001,7 +7174,7 @@ var Plottable;
                     var dataset = _this._key2PlotDatasetKey.get(key).dataset;
                     var plotMetadata = _this._key2PlotDatasetKey.get(key).plotMetadata;
                     var drawer = _this._key2PlotDatasetKey.get(key).drawer;
-                    drawer._getRenderArea().selectAll("circle").each(function (d, i) {
+                    drawer._getRenderArea().selectAll("path").each(function (d, i) {
                         var distSq = getDistSq(d, i, dataset.metadata(), plotMetadata);
                         var r = attrToProjector["r"](d, i, dataset.metadata(), plotMetadata);
                         if (distSq < r * r) {
@@ -7033,8 +7206,8 @@ var Plottable;
                 var closestSelection = d3.select(closestElement);
                 var closestData = closestSelection.data();
                 var closestPoint = {
-                    x: attrToProjector["cx"](closestData[0], closestIndex, closestElementUserMetadata, closestElementPlotMetadata),
-                    y: attrToProjector["cy"](closestData[0], closestIndex, closestElementUserMetadata, closestElementPlotMetadata)
+                    x: attrToProjector["x"](closestData[0], closestIndex, closestElementUserMetadata, closestElementPlotMetadata),
+                    y: attrToProjector["y"](closestData[0], closestIndex, closestElementUserMetadata, closestElementPlotMetadata)
                 };
                 return {
                     selection: closestSelection,
@@ -7078,8 +7251,8 @@ var Plottable;
              * grid, and the datum can control what color it is.
              *
              * @constructor
-             * @param {Scale.Ordinal} xScale The x scale to use.
-             * @param {Scale.Ordinal} yScale The y scale to use.
+             * @param {Scale.Category} xScale The x scale to use.
+             * @param {Scale.Category} yScale The y scale to use.
              * @param {Scale.Color|Scale.InterpolatedColor} colorScale The color scale
              * to use for each grid cell.
              */
@@ -7370,7 +7543,7 @@ var Plottable;
                 };
                 attrToProjector["width"] = this._isVertical ? widthF : heightF;
                 attrToProjector["height"] = this._isVertical ? heightF : widthF;
-                if (secondaryScale instanceof Plottable.Scale.Ordinal) {
+                if (secondaryScale instanceof Plottable.Scale.Category) {
                     attrToProjector[secondaryAttr] = function (d, i, u, m) { return positionF(d, i, u, m) - widthF(d, i, u, m) / 2; };
                 }
                 else {
@@ -7396,8 +7569,8 @@ var Plottable;
             /**
              * Computes the barPixelWidth of all the bars in the plot.
              *
-             * If the position scale of the plot is an OrdinalScale and in bands mode, then the rangeBands function will be used.
-             * If the position scale of the plot is an OrdinalScale and in points mode, then
+             * If the position scale of the plot is a CategoryScale and in bands mode, then the rangeBands function will be used.
+             * If the position scale of the plot is a CategoryScale and in points mode, then
              *   from https://github.com/mbostock/d3/wiki/Ordinal-Scales#ordinal_rangePoints, the max barPixelWidth is step * padding
              * If the position scale of the plot is a QuantitativeScale, then _getMinimumDataWidth is scaled to compute the barPixelWidth
              */
@@ -7405,7 +7578,7 @@ var Plottable;
                 var _this = this;
                 var barPixelWidth;
                 var barScale = this._isVertical ? this._xScale : this._yScale;
-                if (barScale instanceof Plottable.Scale.Ordinal) {
+                if (barScale instanceof Plottable.Scale.Category) {
                     barPixelWidth = barScale.rangeBand();
                 }
                 else {
@@ -7819,7 +7992,7 @@ var Plottable;
                 });
             };
             ClusteredBar.prototype._makeInnerScale = function () {
-                var innerScale = new Plottable.Scale.Ordinal();
+                var innerScale = new Plottable.Scale.Category();
                 innerScale.domain(this._datasetKeysInOrder);
                 if (!this._projections["width"]) {
                     innerScale.range([0, this._getBarPixelWidth()]);

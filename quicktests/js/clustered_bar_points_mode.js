@@ -11,7 +11,7 @@ function run(div, data, Plottable) {
   "use strict";
 
   var svg = div.append("svg").attr("height", 500);
-  var nameScale = new Plottable.Scale.Ordinal().rangeType("points");
+  var nameScale = new Plottable.Scale.Category().rangeType("points");
   var valueScale = new Plottable.Scale.Linear();
   var colorScale = new Plottable.Scale.Color("10");
 
