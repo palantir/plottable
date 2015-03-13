@@ -3,6 +3,7 @@
 module Plottable {
 export module Plot {
   export class Rectangle<X, Y> extends AbstractXYPlot<X, Y> {
+    private _defaultFillColor: string;
 
     /**
      * Constructs a RectanglePlot.
@@ -17,6 +18,7 @@ export module Plot {
      */
     constructor(xScale: Scale.AbstractScale<X, any>, yScale: Scale.AbstractScale<Y, any>) {
       super(xScale, yScale);
+      this._defaultFillColor = new Scale.Color().range()[0];
       this.classed("rectangle-plot", true);
     }
 
@@ -47,6 +49,8 @@ export module Plot {
       delete attrToProjector["x2"];
       delete attrToProjector["y2"];
 
+
+      attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this._defaultFillColor);
       return attrToProjector;
     }
 

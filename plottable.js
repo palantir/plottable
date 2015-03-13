@@ -6951,6 +6951,7 @@ var Plottable;
              */
             function Rectangle(xScale, yScale) {
                 _super.call(this, xScale, yScale);
+                this._defaultFillColor = new Plottable.Scale.Color().range()[0];
                 this.classed("rectangle-plot", true);
             }
             Rectangle.prototype._getDrawer = function (key) {
@@ -6974,6 +6975,7 @@ var Plottable;
                 delete attrToProjector["y1"];
                 delete attrToProjector["x2"];
                 delete attrToProjector["y2"];
+                attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this._defaultFillColor);
                 return attrToProjector;
             };
             Rectangle.prototype._generateDrawSteps = function () {
