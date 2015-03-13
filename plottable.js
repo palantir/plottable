@@ -1,5 +1,5 @@
 /*!
-Plottable 0.47.0 (https://github.com/palantir/plottable)
+Plottable 0.48.0 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -1016,10 +1016,19 @@ var Plottable;
                     case "triangle-down":
                         sizeFactor = Math.sqrt(3);
                         break;
+                    default:
+                        sizeFactor = 1;
+                        break;
                 }
                 return sizeFactor * Math.pow(SymbolGenerators.SYMBOL_GENERATOR_RADIUS, 2);
             };
-            var symbolSize = typeof (symbolType) === "string" ? typeToSize(symbolType) : function (datum, index) { return typeToSize(symbolType(datum, index)); };
+            function ensureSymbolType(symTypeString) {
+                if (d3.svg.symbolTypes.indexOf(symTypeString) === -1) {
+                    throw new Error(symTypeString + " is an invalid D3 symbol type.  d3.svg.symbolTypes can retrieve the valid symbol types.");
+                }
+                return symTypeString;
+            }
+            var symbolSize = typeof (symbolType) === "string" ? typeToSize(ensureSymbolType(symbolType)) : function (datum, index) { return typeToSize(ensureSymbolType(symbolType(datum, index))); };
             return d3.svg.symbol().type(symbolType).size(symbolSize);
         }
         SymbolGenerators.d3Symbol = d3Symbol;
@@ -1104,7 +1113,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "0.47.0";
+    Plottable.version = "0.48.0";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
