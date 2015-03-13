@@ -10,8 +10,8 @@ function run(svg, data, Plottable) {
   var d1 = [{x: "200", y: 1}, {x: "250", y: 2}, {x: "400", y: 3}];
   var d2 = [{x: "200", y: 4}, {x: "300", y: 2}, {x: "400", y: 1}];
   
-  var xScale1 = new Plottable.Scale.Ordinal();
-  var xScale2 = new Plottable.Scale.Ordinal();
+  var xScale1 = new Plottable.Scale.Category();
+  var xScale2 = new Plottable.Scale.Category();
   var yScale = new Plottable.Scale.Linear();
   
   var plot1 = new Plottable.Plot.Area(xScale1, yScale);

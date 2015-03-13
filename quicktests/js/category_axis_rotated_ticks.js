@@ -52,7 +52,7 @@ function run(div, data, Plottable) {
   "use strict";
 
   var svg = div.append("svg").attr("height", 500);
-  var xScale = new Plottable.Scale.Ordinal();
+  var xScale = new Plottable.Scale.Category();
   var yScale = new Plottable.Scale.Linear();
 
   var xAxis1 = new Plottable.Axis.Category(xScale, "bottom").tickLabelAngle(-90);

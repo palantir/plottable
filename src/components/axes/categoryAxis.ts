@@ -11,16 +11,16 @@ export module Axis {
     /**
      * Constructs a CategoryAxis.
      *
-     * A CategoryAxis takes an OrdinalScale and includes word-wrapping
+     * A CategoryAxis takes a CategoryScale and includes word-wrapping
      * algorithms and advanced layout logic to try to display the scale as
      * efficiently as possible.
      *
      * @constructor
-     * @param {OrdinalScale} scale The scale to base the Axis on.
+     * @param {CategoryScale} scale The scale to base the Axis on.
      * @param {string} orientation The orientation of the Axis (top/bottom/left/right) (default = "bottom").
      * @param {Formatter} formatter The Formatter for the Axis (default Formatters.identity())
      */
-    constructor(scale: Scale.Ordinal, orientation = "bottom", formatter = Formatters.identity()) {
+    constructor(scale: Scale.Category, orientation = "bottom", formatter = Formatters.identity()) {
       super(scale, orientation, formatter);
       this.classed("category-axis", true);
     }
@@ -44,8 +44,8 @@ export module Axis {
         return {width: 0, height: 0, wantsWidth: false, wantsHeight: false };
       }
 
-      var ordinalScale: Scale.Ordinal = <Scale.Ordinal> this._scale;
-      var fakeScale = ordinalScale.copy();
+      var categoryScale: Scale.Category = <Scale.Category> this._scale;
+      var fakeScale = categoryScale.copy();
       if (this._isHorizontal()) {
         fakeScale.range([0, offeredWidth]);
       } else {
@@ -54,7 +54,7 @@ export module Axis {
       var textResult = this._measureTicks(offeredWidth,
                                           offeredHeight,
                                           fakeScale,
-                                          ordinalScale.domain());
+                                          categoryScale.domain());
       return {
         width : textResult.usedWidth  + widthRequiredByTicks,
         height: textResult.usedHeight + heightRequiredByTicks,
@@ -97,7 +97,7 @@ export module Axis {
      * Measures the size of the ticks while also writing them to the DOM.
      * @param {D3.Selection} ticks The tick elements to be written to.
      */
-    private _drawTicks(axisWidth: number, axisHeight: number, scale: Scale.Ordinal, ticks: D3.Selection) {
+    private _drawTicks(axisWidth: number, axisHeight: number, scale: Scale.Category, ticks: D3.Selection) {
       var self = this;
       var xAlign: {[s: string]: string};
       var yAlign: {[s: string]: string};
@@ -135,7 +135,7 @@ export module Axis {
      *
      * @param {string[]} ticks The strings that will be printed on the ticks.
      */
-    private _measureTicks(axisWidth: number, axisHeight: number, scale: Scale.Ordinal, ticks: string[]) {
+    private _measureTicks(axisWidth: number, axisHeight: number, scale: Scale.Category, ticks: string[]) {
       var wrappingResults = ticks.map((s: string) => {
         var bandWidth = scale.stepWidth();
 
@@ -192,12 +192,12 @@ export module Axis {
 
     public _doRender() {
       super._doRender();
-      var ordScale = <Scale.Ordinal> this._scale;
+      var catScale = <Scale.Category> this._scale;
       var tickLabels = this._tickLabelContainer.selectAll("." + AbstractAxis.TICK_LABEL_CLASS).data(this._scale.domain(), (d) => d);
 
       var getTickLabelTransform = (d: string, i: number) => {
-        var innerPaddingWidth = ordScale.stepWidth() - ordScale.rangeBand();
-        var scaledValue = ordScale.scale(d) - ordScale.rangeBand() / 2 - innerPaddingWidth / 2;
+        var innerPaddingWidth = catScale.stepWidth() - catScale.rangeBand();
+        var scaledValue = catScale.scale(d) - catScale.rangeBand() / 2 - innerPaddingWidth / 2;
         var x = this._isHorizontal() ? scaledValue : 0;
         var y = this._isHorizontal() ? 0 : scaledValue;
         return "translate(" + x + "," + y + ")";
@@ -207,8 +207,8 @@ export module Axis {
       tickLabels.attr("transform", getTickLabelTransform);
       // erase all text first, then rewrite
       tickLabels.text("");
-      this._drawTicks(this.width(), this.height(), ordScale, tickLabels);
-      var translate = this._isHorizontal() ? [ordScale.rangeBand() / 2, 0] : [0, ordScale.rangeBand() / 2];
+      this._drawTicks(this.width(), this.height(), catScale, tickLabels);
+      var translate = this._isHorizontal() ? [catScale.rangeBand() / 2, 0] : [0, catScale.rangeBand() / 2];
 
       var xTranslate = this.orient() === "right" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
       var yTranslate = this.orient() === "bottom" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;

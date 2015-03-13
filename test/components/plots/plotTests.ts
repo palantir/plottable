@@ -178,7 +178,75 @@ describe("Plots", () => {
 
       var oneElementSelection = plot.getAllSelections(["ds2"]);
       assert.strictEqual(oneElementSelection.size(), 1);
+      assert.strictEqual(numAttr(oneElementSelection, "cy"), 10, "retreived selection in renderArea2");
+
+      var nonExcludedSelection = plot.getAllSelections(["ds1"], true);
+      assert.strictEqual(nonExcludedSelection.size(), 1);
+      assert.strictEqual(numAttr(nonExcludedSelection, "cy"), 10, "retreived non-excluded selection in renderArea2");
+      svg.remove();
+    });
+
+    it("getAllPlotData() with dataset retrieval", () => {
+      var svg = generateSVG(400, 400);
+      var plot = new Plottable.Plot.AbstractPlot();
+
+      var data1 = [{value: 0}, {value: 1}, {value: 2}];
+      var data2 = [{value: 0}, {value: 1}, {value: 2}];
+
+      var data1Points = data1.map((datum: any) => { return {x: datum.value, y: 100}; });
+      var data2Points = data2.map((datum: any) => { return {x: datum.value, y: 10}; });
+
+      var data1PointConverter = (datum: any, index: number) => data1Points[index];
+      var data2PointConverter = (datum: any, index: number) => data2Points[index];
+
+      // Create mock drawers with already drawn items
+      var mockDrawer1 = new Plottable._Drawer.AbstractDrawer("ds1");
+      var renderArea1 = svg.append("g");
+      renderArea1.append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
+      (<any> mockDrawer1).setup = () => (<any> mockDrawer1)._renderArea = renderArea1;
+      (<any> mockDrawer1)._getSelector = () => "circle";
+      (<any> mockDrawer1)._getPixelPoint = data1PointConverter;
+
+      var renderArea2 = svg.append("g");
+      renderArea2.append("circle").attr("cx", 10).attr("cy", 10).attr("r", 10);
+      var mockDrawer2 = new Plottable._Drawer.AbstractDrawer("ds2");
+      (<any> mockDrawer2).setup = () => (<any> mockDrawer2)._renderArea = renderArea2;
+      (<any> mockDrawer2)._getSelector = () => "circle";
+      (<any> mockDrawer2)._getPixelPoint = data2PointConverter;
+
+      // Mock _getDrawer to return the mock drawers
+      (<any> plot)._getDrawer = (key: string) => {
+        if (key === "ds1") {
+          return mockDrawer1;
+        } else {
+          return mockDrawer2;
+        }
+      };
+
+      plot.addDataset("ds1", data1);
+      plot.addDataset("ds2", data2);
+      plot.renderTo(svg);
+
+      var allPlotData = plot.getAllPlotData();
+      assert.strictEqual(allPlotData.selection.size(), 2, "all circle selections gotten");
+      assert.includeMembers(allPlotData.data, data1, "includes data1 members");
+      assert.includeMembers(allPlotData.data, data2, "includes data2 members");
+      assert.includeMembers(allPlotData.pixelPoints, data1.map(data1PointConverter), "includes data1 points");
+      assert.includeMembers(allPlotData.pixelPoints, data2.map(data2PointConverter), "includes data2 points");
+
+      var singlePlotData = plot.getAllPlotData("ds1");
+      var oneSelection = singlePlotData.selection;
+      assert.strictEqual(oneSelection.size(), 1);
+      assert.strictEqual(numAttr(oneSelection, "cx"), 100, "retrieved selection in renderArea1");
+      assert.includeMembers(singlePlotData.data, data1, "includes data1 members");
+      assert.includeMembers(singlePlotData.pixelPoints, data1.map(data1PointConverter), "includes data1 points");
+
+      var oneElementPlotData = plot.getAllPlotData(["ds2"]);
+      var oneElementSelection = oneElementPlotData.selection;
+      assert.strictEqual(oneElementSelection.size(), 1);
       assert.strictEqual(numAttr(oneElementSelection, "cy"), 10, "retreieved selection in renderArea2");
+      assert.includeMembers(oneElementPlotData.data, data2, "includes data2 members");
+      assert.includeMembers(oneElementPlotData.pixelPoints, data2.map(data2PointConverter), "includes data2 points");
       svg.remove();
     });
 
@@ -316,20 +384,20 @@ describe("Plots", () => {
 
     it("extent calculation done in correct dataset order", () => {
       var animator = new Plottable.Animator.Base().delay(10).duration(10).maxIterativeDelay(0);
-      var ordinalScale = new Plottable.Scale.Ordinal();
+      var CategoryScale = new Plottable.Scale.Category();
       var dataset1 = [{key: "A"}];
       var dataset2 = [{key: "B"}];
       var plot = new Plottable.Plot.AbstractPlot()
                                    .addDataset("b", dataset2)
                                    .addDataset("a", dataset1);
-      plot.project("key", "key", ordinalScale);
+      plot.project("key", "key", CategoryScale);
 
       plot.datasetOrder(["a", "b"]);
 
       var svg = generateSVG();
       plot.renderTo(svg);
 
-      assert.deepEqual(ordinalScale.domain(), ["A", "B"], "extent is in the right order");
+      assert.deepEqual(CategoryScale.domain(), ["A", "B"], "extent is in the right order");
       svg.remove();
     });
   });

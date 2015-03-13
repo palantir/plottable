@@ -19,7 +19,7 @@ function run(svg, data, Plottable) {
         {x: "D", y: 1, val: 0.9},
         {x: "E", y: 1, val: 1.0},
     ];
-    var xScale = new Plottable.Scale.Ordinal();
+    var xScale = new Plottable.Scale.Category();
     var yScale = new Plottable.Scale.Linear();
 
     var colorScale = new Plottable.Scale.InterpolatedColor();

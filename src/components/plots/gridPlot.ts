@@ -12,12 +12,12 @@ export module Plot {
      * grid, and the datum can control what color it is.
      *
      * @constructor
-     * @param {Scale.Ordinal} xScale The x scale to use.
-     * @param {Scale.Ordinal} yScale The y scale to use.
+     * @param {Scale.Category} xScale The x scale to use.
+     * @param {Scale.Category} yScale The y scale to use.
      * @param {Scale.Color|Scale.InterpolatedColor} colorScale The color scale
      * to use for each grid cell.
      */
-    constructor(xScale: Scale.Ordinal, yScale: Scale.Ordinal, colorScale: Scale.AbstractScale<any, string>) {
+    constructor(xScale: Scale.Category, yScale: Scale.Category, colorScale: Scale.AbstractScale<any, string>) {
       super(xScale, yScale);
       this.classed("grid-plot", true);
 
@@ -56,8 +56,8 @@ export module Plot {
 
     protected _generateAttrToProjector() {
       var attrToProjector = super._generateAttrToProjector();
-      var xStep = (<Scale.Ordinal> this._xScale).rangeBand();
-      var yStep = (<Scale.Ordinal> this._yScale).rangeBand();
+      var xStep = (<Scale.Category> this._xScale).rangeBand();
+      var yStep = (<Scale.Category> this._yScale).rangeBand();
       attrToProjector["width"]  = () => xStep;
       attrToProjector["height"] = () => yStep;
       var xAttr = attrToProjector["x"];

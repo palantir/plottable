@@ -14,7 +14,7 @@ function run(div, data, Plottable) {
   var svg = div.append("svg").attr("height", 500);
 
   var xScale = new Plottable.Scale.Time();
-  var yScale = new Plottable.Scale.Ordinal();
+  var yScale = new Plottable.Scale.Category();
 
   var hBarPlot = new Plottable.Plot.Bar(xScale, yScale, "false")
     .addDataset(data)

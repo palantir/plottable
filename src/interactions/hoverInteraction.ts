@@ -33,7 +33,8 @@ export module Interaction {
 
   export class Hover extends Interaction.AbstractInteraction {
     public _componentToListenTo: Hoverable;
-    private _dispatcher: Dispatcher.Mouse;
+    private _mouseDispatcher: Dispatcher.Mouse;
+    private _touchDispatcher: Dispatcher.Touch;
     private _hoverOverCallback: (hoverData: HoverData) => any;
     private _hoverOutCallback: (hoverData: HoverData) => any;
     private _overComponent = false;
@@ -46,12 +47,14 @@ export module Interaction {
 
     public _anchor(component: Hoverable, hitBox: D3.Selection) {
       super._anchor(component, hitBox);
-      this._dispatcher = Dispatcher.Mouse.getDispatcher(<SVGElement> (<any> this._componentToListenTo)._element.node());
+      this._mouseDispatcher = Dispatcher.Mouse.getDispatcher(<SVGElement> (<any> this._componentToListenTo)._element.node());
+      this._mouseDispatcher.onMouseMove("hover" + this.getID(), (p: Point) => this._handlePointerEvent(p));
 
-      this._dispatcher.onMouseMove("hover" + this.getID(), (p: Point) => this._handleMouseEvent(p));
+      this._touchDispatcher = Dispatcher.Touch.getDispatcher(<SVGElement> (<any> this._componentToListenTo)._element.node());
+      this._touchDispatcher.onTouchStart("hover" + this.getID(), (p: Point, e: TouchEvent) => this._handlePointerEvent(p));
     }
 
-    private _handleMouseEvent(p: Point) {
+    private _handlePointerEvent(p: Point) {
       p = this._translateToComponentSpace(p);
       if (this._isInsideComponent(p)) {
         if (!this._overComponent) {

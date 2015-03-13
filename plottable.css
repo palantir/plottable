@@ -43,6 +43,10 @@ svg.plottable {
   display : block; /* SVGs must be block elements for width/height calculations to work in Firefox. */
 }
 
+.plottable .background-fill {
+  fill: none;
+}
+
 .plottable .bounding-box {
   /* Invisible pink bounding-box to allow for collision testing */
   fill: pink;

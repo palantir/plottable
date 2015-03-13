@@ -12,7 +12,7 @@ module Plottable {
   /**
    * Projector with applied user and plot metadata
    */
-  export type _AppliedProjector = (datum: any, index: number) => any;
+  export type AppliedProjector = (datum: any, index: number) => any;
 
   /**
    * Defines a way how specific attribute needs be retrieved before rendering.
@@ -33,7 +33,7 @@ module Plottable {
    */
   export type AttributeToProjector = { [attrToSet: string]: _Projector; };
 
-  export type _AttributeToAppliedProjector = { [attrToSet: string]: _AppliedProjector; };
+  export type AttributeToAppliedProjector = { [attrToSet: string]: AppliedProjector; };
 
   /**
    * A simple bounding box.
