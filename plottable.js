@@ -1016,10 +1016,19 @@ var Plottable;
                     case "triangle-down":
                         sizeFactor = Math.sqrt(3);
                         break;
+                    default:
+                        sizeFactor = 1;
+                        break;
                 }
                 return sizeFactor * Math.pow(SymbolGenerators.SYMBOL_GENERATOR_RADIUS, 2);
             };
-            var symbolSize = typeof (symbolType) === "string" ? typeToSize(symbolType) : function (datum, index) { return typeToSize(symbolType(datum, index)); };
+            function ensureSymbolType(symTypeString) {
+                if (d3.svg.symbolTypes.indexOf(symTypeString) === -1) {
+                    throw new Error(symTypeString + " is an invalid D3 symbol type.  d3.svg.symbolTypes can retrieve the valid symbol types.");
+                }
+                return symTypeString;
+            }
+            var symbolSize = typeof (symbolType) === "string" ? typeToSize(ensureSymbolType(symbolType)) : function (datum, index) { return typeToSize(ensureSymbolType(symbolType(datum, index))); };
             return d3.svg.symbol().type(symbolType).size(symbolSize);
         }
         SymbolGenerators.d3Symbol = d3Symbol;
