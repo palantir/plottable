@@ -13,7 +13,7 @@ export module _Drawer {
   }
 
   export type AppliedDrawStep = {
-    attrToProjector: _AttributeToAppliedProjector;
+    attrToProjector: AttributeToAppliedProjector;
     animator: Animator.PlotAnimator;
   }
 
@@ -21,7 +21,7 @@ export module _Drawer {
     private _renderArea: D3.Selection;
     protected _className: string;
     public key: string;
-    protected _attrToProjector: _AttributeToAppliedProjector;
+    protected _attrToProjector: AttributeToAppliedProjector;
 
     /**
      * Sets the class, which needs to be applied to bound elements.
@@ -80,8 +80,8 @@ export module _Drawer {
 
     private _applyMetadata(attrToProjector: AttributeToProjector,
                           userMetadata: any,
-                          plotMetadata: Plot.PlotMetadata): _AttributeToAppliedProjector {
-      var modifiedAttrToProjector: _AttributeToAppliedProjector = {};
+                          plotMetadata: Plot.PlotMetadata): AttributeToAppliedProjector {
+      var modifiedAttrToProjector: AttributeToAppliedProjector = {};
       d3.keys(attrToProjector).forEach((attr: string) => {
         modifiedAttrToProjector[attr] =
           (datum: any, index: number) => attrToProjector[attr](datum, index, userMetadata, plotMetadata);
@@ -109,7 +109,7 @@ export module _Drawer {
     public draw(data: any[], drawSteps: DrawStep[], userMetadata: any, plotMetadata: Plot.PlotMetadata) {
       var appliedDrawSteps: AppliedDrawStep[] = drawSteps.map((dr: DrawStep) => {
         var appliedAttrToProjector = this._applyMetadata(dr.attrToProjector, userMetadata, plotMetadata);
-        this._attrToProjector = <_AttributeToAppliedProjector>_Util.Methods.copyMap(appliedAttrToProjector);
+        this._attrToProjector = <AttributeToAppliedProjector>_Util.Methods.copyMap(appliedAttrToProjector);
         return {
           attrToProjector: appliedAttrToProjector,
           animator: dr.animator

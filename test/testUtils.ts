@@ -16,39 +16,54 @@ function getSVGParent(): D3.Selection {
   }
 }
 
-function makeFakeEvent(x: number, y: number): D3.D3Event {
-  return <D3.D3Event> <any> {
-      dx: 0,
-      dy: 0,
-      clientX: x,
-      clientY: y,
-      translate: [x, y],
-      scale: 1,
-      sourceEvent: <any> null,
-      x: x,
-      y: y,
-      keyCode: 0,
-      altKey: false
-    };
+function triggerFakeUIEvent(type: string, target: D3.Selection) {
+  var e = <UIEvent> document.createEvent("UIEvents");
+  e.initUIEvent(type, true, true, window, 1);
+  target.node().dispatchEvent(e);
 }
 
-function fakeDragSequence(anyedInteraction: any, startX: number, startY: number, endX: number, endY: number) {
-  var originalD3Mouse = d3.mouse;
-  d3.mouse = function() {
-    return [startX, startY];
+function triggerFakeMouseEvent(type: string, target: D3.Selection, relativeX: number, relativeY: number) {
+  var clientRect = target.node().getBoundingClientRect();
+  var xPos = clientRect.left + relativeX;
+  var yPos = clientRect.top + relativeY;
+  var e = <MouseEvent> document.createEvent("MouseEvents");
+  e.initMouseEvent(type, true, true, window, 1,
+                    xPos, yPos,
+                    xPos, yPos,
+                    false, false, false, false,
+                    1, null);
+  target.node().dispatchEvent(e);
+}
+
+function triggerFakeTouchEvent(type: string, target: D3.Selection, relativeX: number, relativeY: number) {
+  var targetNode = target.node();
+  var clientRect = targetNode.getBoundingClientRect();
+  var xPos = clientRect.left + relativeX;
+  var yPos = clientRect.top + relativeY;
+  var e = <TouchEvent> document.createEvent("UIEvent");
+  e.initUIEvent(type, true, true, window, 1);
+  var fakeTouch: Touch = {
+    identifier: 0,
+    target: targetNode,
+    screenX: xPos,
+    screenY: yPos,
+    clientX: xPos,
+    clientY: yPos,
+    pageX: xPos,
+    pageY: yPos
   };
-  anyedInteraction._dragstart();
-  d3.mouse = originalD3Mouse;
-  d3.event = makeFakeEvent(startX, startY);
-  anyedInteraction._drag();
-  d3.event = makeFakeEvent(endX, endY);
-  anyedInteraction._drag();
-  d3.mouse = function() {
-    return [endX, endY];
-  };
-  anyedInteraction._dragend();
-  d3.event = null;
-  d3.mouse = originalD3Mouse;
+
+  var fakeTouchList: any = [fakeTouch];
+  fakeTouchList.item = (index: number) => fakeTouchList[index];
+  e.touches = <TouchList> fakeTouchList;
+  e.targetTouches = <TouchList> fakeTouchList;
+  e.changedTouches = <TouchList> fakeTouchList;
+
+  e.altKey = false;
+  e.metaKey = false;
+  e.ctrlKey = false;
+  e.shiftKey = false;
+  target.node().dispatchEvent(e);
 }
 
 function verifySpaceRequest(sr: Plottable._SpaceRequest, w: number, h: number, ww: boolean, wh: boolean, id: string) {
@@ -157,56 +172,6 @@ function normalizePath(pathString: string) {
 
 function numAttr(s: D3.Selection, a: string) {
   return parseFloat(s.attr(a));
-}
-
-function triggerFakeUIEvent(type: string, target: D3.Selection) {
-  var e = <UIEvent> document.createEvent("UIEvents");
-  e.initUIEvent(type, true, true, window, 1);
-  target.node().dispatchEvent(e);
-}
-
-function triggerFakeMouseEvent(type: string, target: D3.Selection, relativeX: number, relativeY: number) {
-  var clientRect = target.node().getBoundingClientRect();
-  var xPos = clientRect.left + relativeX;
-  var yPos = clientRect.top + relativeY;
-  var e = <MouseEvent> document.createEvent("MouseEvents");
-  e.initMouseEvent(type, true, true, window, 1,
-                    xPos, yPos,
-                    xPos, yPos,
-                    false, false, false, false,
-                    1, null);
-  target.node().dispatchEvent(e);
-}
-
-function triggerFakeTouchEvent(type: string, target: D3.Selection, relativeX: number, relativeY: number) {
-  var targetNode = target.node();
-  var clientRect = targetNode.getBoundingClientRect();
-  var xPos = clientRect.left + relativeX;
-  var yPos = clientRect.top + relativeY;
-  var e = <TouchEvent> document.createEvent("UIEvent");
-  e.initUIEvent(type, true, true, window, 1);
-  var fakeTouch: Touch = {
-    identifier: 0,
-    target: targetNode,
-    screenX: xPos,
-    screenY: yPos,
-    clientX: xPos,
-    clientY: yPos,
-    pageX: xPos,
-    pageY: yPos
-  };
-
-  var fakeTouchList: any = [fakeTouch];
-  fakeTouchList.item = (index: number) => fakeTouchList[index];
-  e.touches = <TouchList> fakeTouchList;
-  e.targetTouches = <TouchList> fakeTouchList;
-  e.changedTouches = <TouchList> fakeTouchList;
-
-  e.altKey = false;
-  e.metaKey = false;
-  e.ctrlKey = false;
-  e.shiftKey = false;
-  target.node().dispatchEvent(e);
 }
 
 function assertAreaPathCloseTo(actualPath: string, expectedPath: string, precision: number, msg: string) {
