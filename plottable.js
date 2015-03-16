@@ -322,6 +322,10 @@ var Plottable;
                 return "#" + rHex + gHex + bHex;
             }
             Methods.darkenColor = darkenColor;
+            function pointDistance(p1, p2) {
+                return Math.sqrt(Math.pow(p2.y - p1.y, 2) - Math.pow(p2.x - p1.x, 2));
+            }
+            Methods.pointDistance = pointDistance;
         })(Methods = _Util.Methods || (_Util.Methods = {}));
     })(_Util = Plottable._Util || (Plottable._Util = {}));
 })(Plottable || (Plottable = {}));
@@ -6819,12 +6823,15 @@ var Plottable;
                 else {
                     datasetKeyArray = datasetKeys;
                 }
-                var plotData = this.getAllPlotData(datasetKeyArray);
+                return this._getClosestPlotData(queryPoint, datasetKeyArray, withinValue);
+            };
+            AbstractPlot.prototype._getClosestPlotData = function (queryPoint, datasetKeys, withinValue) {
+                if (withinValue === void 0) { withinValue = Infinity; }
+                var plotData = this.getAllPlotData(datasetKeys);
                 var closestIndex;
                 var closestDistance = withinValue;
-                var pointDistance = function (p1, p2) { return Math.sqrt(Math.pow(p2.y - p1.y, 2) + Math.pow(p2.x - p1.x, 2)); };
                 plotData.pixelPoints.forEach(function (pixelPoint, index) {
-                    var distance = pointDistance(pixelPoint, queryPoint);
+                    var distance = Plottable._Util.Methods.pointDistance(pixelPoint, queryPoint);
                     if (distance < closestDistance) {
                         closestDistance = distance;
                         closestIndex = index;
