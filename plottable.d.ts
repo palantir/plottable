@@ -2863,6 +2863,31 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
+        class Rectangle<X, Y> extends AbstractXYPlot<X, Y> {
+            /**
+             * Constructs a RectanglePlot.
+             *
+             * A RectanglePlot consists of a bunch of rectangles. The user is required to
+             * project the left and right bounds of the rectangle (x1 and x2 respectively)
+             * as well as the bottom and top bounds (y1 and y2 respectively)
+             *
+             * @constructor
+             * @param {Scale.AbstractScale} xScale The x scale to use.
+             * @param {Scale.AbstractScale} yScale The y scale to use.
+             */
+            constructor(xScale: Scale.AbstractScale<X, any>, yScale: Scale.AbstractScale<Y, any>);
+            protected _getDrawer(key: string): _Drawer.Rect;
+            protected _generateAttrToProjector(): {
+                [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
+            };
+            protected _generateDrawSteps(): _Drawer.DrawStep[];
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Plot {
         class Scatter<X, Y> extends AbstractXYPlot<X, Y> implements Interaction.Hoverable {
             /**
              * Constructs a ScatterPlot.
@@ -2888,7 +2913,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-        class Grid extends AbstractXYPlot<string, string> {
+        class Grid extends Rectangle<any, any> {
             /**
              * Constructs a GridPlot.
              *
@@ -2896,22 +2921,19 @@ declare module Plottable {
              * grid, and the datum can control what color it is.
              *
              * @constructor
-             * @param {Scale.Category} xScale The x scale to use.
-             * @param {Scale.Category} yScale The y scale to use.
+             * @param {Scale.AbstractScale} xScale The x scale to use.
+             * @param {Scale.AbstractScale} yScale The y scale to use.
              * @param {Scale.Color|Scale.InterpolatedColor} colorScale The color scale
              * to use for each grid cell.
              */
-            constructor(xScale: Scale.Category, yScale: Scale.Category, colorScale: Scale.AbstractScale<any, string>);
+            constructor(xScale: Scale.AbstractScale<any, any>, yScale: Scale.AbstractScale<any, any>, colorScale: Scale.AbstractScale<any, string>);
             addDataset(keyOrDataset: any, dataset?: any): Grid;
             protected _getDrawer(key: string): _Drawer.Rect;
             /**
-             * @param {string} attrToSet One of ["x", "y", "fill"]. If "fill" is used,
+             * @param {string} attrToSet One of ["x", "y", "x2", "y2", "fill"]. If "fill" is used,
              * the data should return a valid CSS color.
              */
             project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): Grid;
-            protected _generateAttrToProjector(): {
-                [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
-            };
             protected _generateDrawSteps(): _Drawer.DrawStep[];
         }
     }
