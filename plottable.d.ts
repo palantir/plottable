@@ -3662,6 +3662,42 @@ declare module Plottable {
 
 
 declare module Plottable {
+    module Dispatcher {
+        type WheelCallback = (scrollAmount: number, e: WheelEvent) => any;
+        class Wheel extends AbstractDispatcher {
+            /**
+             * Get a Dispatcher.Wheel for the <svg> containing elem. If one already exists
+             * on that <svg>, it will be returned; otherwise, a new one will be created.
+             *
+             * @param {SVGElement} elem A svg DOM element.
+             * @return {Dispatcher.Mouse} A Dispatcher.Wheel
+             */
+            static getDispatcher(elem: SVGElement): Dispatcher.Wheel;
+            /**
+             * Creates a Dispatcher.Wheel.
+             * This constructor not be invoked directly under most circumstances.
+             *
+             * @param {SVGElement} svg The root <svg> element to attach to.
+             */
+            constructor(svg: SVGElement);
+            protected _getWrappedCallback(callback: Function): Core.BroadcasterCallback<Dispatcher.Wheel>;
+            /**
+             * Registers a callback to be called whenever the mouse wheel moves,
+             * or removes the callback if `null` is passed as the callback.
+             *
+             * @param {any} key The key associated with the callback.
+             *                  Key uniqueness is determined by deep equality.
+             * @param {WheelCallback} callback A callback that takes the scroll amount.
+             *                                 Pass `null` to remove a callback.
+             * @return {Dispatcher.Wheel} The calling Dispatcher.Wheel.
+             */
+            onWheel(key: any, callback: WheelCallback): Dispatcher.Wheel;
+        }
+    }
+}
+
+
+declare module Plottable {
     module Interaction {
         class AbstractInteraction extends Core.PlottableObject {
             /**
