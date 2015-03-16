@@ -6819,7 +6819,7 @@ var Plottable;
                 else {
                     datasetKeyArray = datasetKeys;
                 }
-                var plotData = this.getAllPlotData();
+                var plotData = this.getAllPlotData(datasetKeyArray);
                 var closestIndex;
                 var closestDistance = withinValue;
                 var pointDistance = function (p1, p2) { return Math.sqrt(Math.pow(p2.y - p1.y, 2) + Math.pow(p2.x - p1.x, 2)); };

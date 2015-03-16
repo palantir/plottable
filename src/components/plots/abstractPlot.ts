@@ -519,7 +519,7 @@ export module Plot {
         datasetKeyArray = <string[]> datasetKeys;
       }
 
-      var plotData = this.getAllPlotData();
+      var plotData = this.getAllPlotData(datasetKeyArray);
       var closestIndex: number;
       var closestDistance = withinValue;
       var pointDistance = (p1: Point, p2: Point) => Math.sqrt(Math.pow(p2.y - p1.y, 2) + Math.pow(p2.x - p1.x, 2));
