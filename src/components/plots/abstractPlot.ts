@@ -523,9 +523,9 @@ export module Plot {
     }
 
     protected _getClosestPlotData(queryPoint: Point, datasetKeys: string[], withinValue = Infinity) {
-      var plotData = this.getAllPlotData(datasetKeys);
-      var closestIndex: number;
       var closestDistance = withinValue;
+      var closestIndex: number;
+      var plotData = this.getAllPlotData(datasetKeys);
       plotData.pixelPoints.forEach((pixelPoint: Point, index: number) => {
         var distance = _Util.Methods.pointDistance(pixelPoint, queryPoint);
         if (distance < closestDistance) {

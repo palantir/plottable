@@ -6827,9 +6827,9 @@ var Plottable;
             };
             AbstractPlot.prototype._getClosestPlotData = function (queryPoint, datasetKeys, withinValue) {
                 if (withinValue === void 0) { withinValue = Infinity; }
-                var plotData = this.getAllPlotData(datasetKeys);
-                var closestIndex;
                 var closestDistance = withinValue;
+                var closestIndex;
+                var plotData = this.getAllPlotData(datasetKeys);
                 plotData.pixelPoints.forEach(function (pixelPoint, index) {
                     var distance = Plottable._Util.Methods.pointDistance(pixelPoint, queryPoint);
                     if (distance < closestDistance) {
@@ -7894,6 +7894,27 @@ var Plottable;
             };
             Line.prototype._wholeDatumAttributes = function () {
                 return ["x", "y"];
+            };
+            Line.prototype._getClosestPlotData = function (queryPoint, datasetKeys, withinValue) {
+                var _this = this;
+                if (withinValue === void 0) { withinValue = Infinity; }
+                var closestDistance = withinValue;
+                var closestDatum;
+                var closestSelection;
+                var closestPoint;
+                datasetKeys.forEach(function (datasetKey) {
+                    var plotData = _this.getAllPlotData(datasetKey);
+                    plotData.pixelPoints.forEach(function (pixelPoint, index) {
+                        var pixelPointDist = Plottable._Util.Methods.pointDistance(queryPoint, pixelPoint);
+                        if (pixelPointDist < closestDistance) {
+                            closestDistance = pixelPointDist;
+                            closestDatum = plotData.data[index];
+                            closestPoint = pixelPoint;
+                            closestSelection = plotData.selection;
+                        }
+                    });
+                });
+                return { data: closestDatum, pixelPoints: closestPoint, selection: closestSelection };
             };
             Line.prototype._getClosestWithinRange = function (p, range) {
                 var _this = this;
