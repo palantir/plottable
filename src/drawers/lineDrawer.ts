@@ -22,7 +22,7 @@ export module _Drawer {
       super.setup(area);
     }
 
-    private _createLine(xFunction: _AppliedProjector, yFunction: _AppliedProjector, definedFunction: _AppliedProjector) {
+    private _createLine(xFunction: AppliedProjector, yFunction: AppliedProjector, definedFunction: AppliedProjector) {
       if(!definedFunction) {
         definedFunction = (d, i) => true;
       }
@@ -39,7 +39,7 @@ export module _Drawer {
 
     protected _drawStep(step: AppliedDrawStep) {
       var baseTime = super._drawStep(step);
-      var attrToProjector = <_AttributeToAppliedProjector>_Util.Methods.copyMap(step.attrToProjector);
+      var attrToProjector = <AttributeToAppliedProjector>_Util.Methods.copyMap(step.attrToProjector);
       var definedFunction = attrToProjector["defined"];
 
       var xProjector = attrToProjector["x"];

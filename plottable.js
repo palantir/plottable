@@ -1,5 +1,5 @@
 /*!
-Plottable 0.47.0 (https://github.com/palantir/plottable)
+Plottable 0.48.0 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -978,6 +978,66 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
+    var SymbolGenerators;
+    (function (SymbolGenerators) {
+        /**
+         * The radius that symbol generators will be assumed to have for their symbols.
+         */
+        SymbolGenerators.SYMBOL_GENERATOR_RADIUS = 50;
+        /**
+         * A wrapper for D3's symbol generator as documented here:
+         * https://github.com/mbostock/d3/wiki/SVG-Shapes#symbol
+         *
+         * Note that since D3 symbols compute the path strings by knowing how much area it can take up instead of
+         * knowing its dimensions, the total area expected may be off by some constant factor.
+         *
+         * @param {string | ((datum: any, index: number) => string)} symbolType Accessor for the d3 symbol type
+         * @returns {SymbolGenerator} the symbol generator for a D3 symbol
+         */
+        function d3Symbol(symbolType) {
+            // Since D3 symbols use a size concept, we have to convert our radius value to the corresponding area value
+            // This is done by inspecting the symbol size calculation in d3.js and solving how sizes are calculated from a given radius
+            var typeToSize = function (symbolTypeString) {
+                var sizeFactor;
+                switch (symbolTypeString) {
+                    case "circle":
+                        sizeFactor = Math.PI;
+                        break;
+                    case "square":
+                        sizeFactor = 4;
+                        break;
+                    case "cross":
+                        sizeFactor = 20 / 9;
+                        break;
+                    case "diamond":
+                        sizeFactor = 2 * Math.tan(Math.PI / 6);
+                        break;
+                    case "triangle-up":
+                    case "triangle-down":
+                        sizeFactor = Math.sqrt(3);
+                        break;
+                    default:
+                        sizeFactor = 1;
+                        break;
+                }
+                return sizeFactor * Math.pow(SymbolGenerators.SYMBOL_GENERATOR_RADIUS, 2);
+            };
+            function ensureSymbolType(symTypeString) {
+                if (d3.svg.symbolTypes.indexOf(symTypeString) === -1) {
+                    throw new Error(symTypeString + " is an invalid D3 symbol type.  d3.svg.symbolTypes can retrieve the valid symbol types.");
+                }
+                return symTypeString;
+            }
+            var symbolSize = typeof (symbolType) === "string" ? typeToSize(ensureSymbolType(symbolType)) : function (datum, index) { return typeToSize(ensureSymbolType(symbolType(datum, index))); };
+            return d3.svg.symbol().type(symbolType).size(symbolSize);
+        }
+        SymbolGenerators.d3Symbol = d3Symbol;
+    })(SymbolGenerators = Plottable.SymbolGenerators || (Plottable.SymbolGenerators = {}));
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var Plottable;
+(function (Plottable) {
     var _Util;
     (function (_Util) {
         var ClientToSVGTranslator = (function () {
@@ -1053,7 +1113,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "0.47.0";
+    Plottable.version = "0.48.0";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -3120,32 +3180,6 @@ var Plottable;
 (function (Plottable) {
     var _Drawer;
     (function (_Drawer) {
-        var Circle = (function (_super) {
-            __extends(Circle, _super);
-            function Circle(key) {
-                _super.call(this, key);
-                this.svgElement("circle");
-            }
-            Circle.prototype._getPixelPoint = function (datum, index) {
-                return { x: this._attrToProjector["cx"](datum, index), y: this._attrToProjector["cy"](datum, index) };
-            };
-            return Circle;
-        })(_Drawer.Element);
-        _Drawer.Circle = Circle;
-    })(_Drawer = Plottable._Drawer || (Plottable._Drawer = {}));
-})(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    var _Drawer;
-    (function (_Drawer) {
         var LABEL_VERTICAL_PADDING = 5;
         var LABEL_HORIZONTAL_PADDING = 5;
         var Rect = (function (_super) {
@@ -3311,6 +3345,64 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    var _Drawer;
+    (function (_Drawer) {
+        var Symbol = (function (_super) {
+            __extends(Symbol, _super);
+            function Symbol() {
+                _super.apply(this, arguments);
+            }
+            Symbol.prototype._enterData = function (data) {
+                _super.prototype._enterData.call(this, data);
+                var dataElements = this._getDrawSelection().data(data);
+                dataElements.enter().append("path");
+                dataElements.exit().remove();
+                dataElements.classed("symbol", true);
+            };
+            Symbol.prototype._getDrawSelection = function () {
+                return this._getRenderArea().selectAll("path");
+            };
+            Symbol.prototype._drawStep = function (step) {
+                _super.prototype._drawStep.call(this, step);
+                var attrToProjector = Plottable._Util.Methods.copyMap(step.attrToProjector);
+                this._attrToProjector = Plottable._Util.Methods.copyMap(step.attrToProjector);
+                var xProjector = attrToProjector["x"];
+                var yProjector = attrToProjector["y"];
+                delete attrToProjector["x"];
+                delete attrToProjector["y"];
+                var rProjector = attrToProjector["r"];
+                delete attrToProjector["r"];
+                attrToProjector["transform"] = function (datum, index) { return "translate(" + xProjector(datum, index) + "," + yProjector(datum, index) + ") " + "scale(" + rProjector(datum, index) / 50 + ")"; };
+                var symbolProjector = attrToProjector["symbol"];
+                delete attrToProjector["symbol"];
+                attrToProjector["d"] = symbolProjector;
+                var drawSelection = this._getDrawSelection();
+                if (attrToProjector["fill"]) {
+                    drawSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
+                }
+                step.animator.animate(drawSelection, attrToProjector);
+            };
+            Symbol.prototype._getSelector = function () {
+                return "path";
+            };
+            Symbol.prototype._getPixelPoint = function (datum, index) {
+                return { x: this._attrToProjector["x"](datum, index), y: this._attrToProjector["y"](datum, index) };
+            };
+            return Symbol;
+        })(_Drawer.AbstractDrawer);
+        _Drawer.Symbol = Symbol;
+    })(_Drawer = Plottable._Drawer || (Plottable._Drawer = {}));
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
     var Component;
     (function (Component) {
         var AbstractComponent = (function (_super) {
@@ -3375,6 +3467,7 @@ var Plottable;
                 });
                 this._cssClasses = null;
                 this._backgroundContainer = this._element.append("g").classed("background-container", true);
+                this._addBox("background-fill", this._backgroundContainer);
                 this._content = this._element.append("g").classed("content", true);
                 this._foregroundContainer = this._element.append("g").classed("foreground-container", true);
                 this._boxContainer = this._element.append("g").classed("box-container", true);
@@ -3788,23 +3881,34 @@ var Plottable;
                 return origin;
             };
             /**
-             * Returns the foreground selection for the component
-             * (A selection covering the front of the component)
+             * Returns the foreground selection for the Component
+             * (A selection covering the front of the Component)
              *
-             * Will return undefined if the component has not been anchored
+             * Will return undefined if the Component has not been anchored.
              *
-             * @return {D3.Selection} foreground selection for the component
+             * @return {D3.Selection} foreground selection for the Component
              */
             AbstractComponent.prototype.foreground = function () {
                 return this._foregroundContainer;
             };
             /**
-             * Returns the background selection for the component
-             * (A selection appearing behind of the component)
+             * Returns the content selection for the Component
+             * (A selection containing the visual elements of the Component)
              *
-             * Will return undefined if the component has not been anchored
+             * Will return undefined if the Component has not been anchored.
              *
-             * @return {D3.Selection} background selection for the component
+             * @return {D3.Selection} content selection for the Component
+             */
+            AbstractComponent.prototype.content = function () {
+                return this._content;
+            };
+            /**
+             * Returns the background selection for the Component
+             * (A selection appearing behind of the Component)
+             *
+             * Will return undefined if the Component has not been anchored.
+             *
+             * @return {D3.Selection} background selection for the Component
              */
             AbstractComponent.prototype.background = function () {
                 return this._backgroundContainer;
@@ -5411,6 +5515,7 @@ var Plottable;
                 this._fixedWidthFlag = true;
                 this._fixedHeightFlag = true;
                 this._sortFn = function (a, b) { return _this._scale.domain().indexOf(a) - _this._scale.domain().indexOf(b); };
+                this._symbolGenerator = Plottable.SymbolGenerators.d3Symbol("circle");
             }
             Legend.prototype._setup = function () {
                 _super.prototype._setup.call(this);
@@ -5561,10 +5666,7 @@ var Plottable;
                 rows.attr("transform", function (d, i) { return "translate(0, " + (i * layout.textHeight + _this._padding) + ")"; });
                 var entries = rows.selectAll("g." + Legend.LEGEND_ENTRY_CLASS).data(function (d) { return d; });
                 var entriesEnter = entries.enter().append("g").classed(Legend.LEGEND_ENTRY_CLASS, true);
-                entries.each(function (d) {
-                    d3.select(this).classed(d.replace(" ", "-"), true);
-                });
-                entriesEnter.append("circle");
+                entriesEnter.append("path");
                 entriesEnter.append("g").classed("text-container", true);
                 entries.exit().remove();
                 var legendPadding = this._padding;
@@ -5577,7 +5679,7 @@ var Plottable;
                         return translateString;
                     });
                 });
-                entries.select("circle").attr("cx", layout.textHeight / 2).attr("cy", layout.textHeight / 2).attr("r", layout.textHeight * 0.3).attr("fill", function (value) { return _this._scale.scale(value); });
+                entries.select("path").attr("d", this.symbolGenerator()).attr("transform", "translate(" + (layout.textHeight / 2) + "," + layout.textHeight / 2 + ") " + "scale(" + (layout.textHeight * 0.3 / Plottable.SymbolGenerators.SYMBOL_GENERATOR_RADIUS) + ")").attr("fill", function (value) { return _this._scale.scale(value); }).attr("vector-effect", "non-scaling-stroke").classed(Legend.LEGEND_SYMBOL_CLASS, true);
                 var padding = this._padding;
                 var textContainers = entries.select("g.text-container");
                 textContainers.text(""); // clear out previous results
@@ -5595,6 +5697,16 @@ var Plottable;
                     self._writer.write(value, maxTextLength, self.height(), writeOptions);
                 });
             };
+            Legend.prototype.symbolGenerator = function (symbolGenerator) {
+                if (symbolGenerator == null) {
+                    return this._symbolGenerator;
+                }
+                else {
+                    this._symbolGenerator = symbolGenerator;
+                    this._render();
+                    return this;
+                }
+            };
             /**
              * The css class applied to each legend row
              */
@@ -5603,6 +5715,10 @@ var Plottable;
              * The css class applied to each legend entry
              */
             Legend.LEGEND_ENTRY_CLASS = "legend-entry";
+            /**
+             * The css class applied to each legend symbol
+             */
+            Legend.LEGEND_SYMBOL_CLASS = "legend-symbol";
             return Legend;
         })(Component.AbstractComponent);
         Component.Legend = Legend;
@@ -6436,6 +6552,26 @@ var Plottable;
                 });
                 return h;
             };
+            /**
+             * Generates a dictionary mapping an attribute to a function that calculate that attribute's value
+             * in accordance with the given datasetKey.
+             *
+             * Note that this will return all of the data attributes, which may not perfectly align to svg attributes
+             *
+             * @param {datasetKey} the key of the dataset to generate the dictionary for
+             * @returns {AttributeToAppliedProjector} A dictionary mapping attributes to functions
+             */
+            AbstractPlot.prototype.generateProjectors = function (datasetKey) {
+                var attrToProjector = this._generateAttrToProjector();
+                var plotDatasetKey = this._key2PlotDatasetKey.get(datasetKey);
+                var plotMetadata = plotDatasetKey.plotMetadata;
+                var userMetadata = plotDatasetKey.dataset.metadata();
+                var attrToAppliedProjector = {};
+                d3.entries(attrToProjector).forEach(function (keyValue) {
+                    attrToAppliedProjector[keyValue.key] = function (datum, index) { return keyValue.value(datum, index, userMetadata, plotMetadata); };
+                });
+                return attrToAppliedProjector;
+            };
             AbstractPlot.prototype._doRender = function () {
                 if (this._isAnchored) {
                     this._paint();
@@ -6613,12 +6749,10 @@ var Plottable;
              */
             AbstractPlot.prototype.getAllSelections = function (datasetKeys, exclude) {
                 var _this = this;
+                if (datasetKeys === void 0) { datasetKeys = this.datasetOrder(); }
                 if (exclude === void 0) { exclude = false; }
                 var datasetKeyArray = [];
-                if (datasetKeys == null) {
-                    datasetKeyArray = this.datasetOrder();
-                }
-                else if (typeof (datasetKeys) === "string") {
+                if (typeof (datasetKeys) === "string") {
                     datasetKeyArray = [datasetKeys];
                 }
                 else {
@@ -6650,11 +6784,9 @@ var Plottable;
              */
             AbstractPlot.prototype.getAllPlotData = function (datasetKeys) {
                 var _this = this;
+                if (datasetKeys === void 0) { datasetKeys = this.datasetOrder(); }
                 var datasetKeyArray = [];
-                if (datasetKeys == null) {
-                    datasetKeyArray = this._datasetKeysInOrder;
-                }
-                else if (typeof (datasetKeys) === "string") {
+                if (typeof (datasetKeys) === "string") {
                     datasetKeyArray = [datasetKeys];
                 }
                 else {
@@ -7006,6 +7138,68 @@ var Plottable;
 (function (Plottable) {
     var Plot;
     (function (Plot) {
+        var Rectangle = (function (_super) {
+            __extends(Rectangle, _super);
+            /**
+             * Constructs a RectanglePlot.
+             *
+             * A RectanglePlot consists of a bunch of rectangles. The user is required to
+             * project the left and right bounds of the rectangle (x1 and x2 respectively)
+             * as well as the bottom and top bounds (y1 and y2 respectively)
+             *
+             * @constructor
+             * @param {Scale.AbstractScale} xScale The x scale to use.
+             * @param {Scale.AbstractScale} yScale The y scale to use.
+             */
+            function Rectangle(xScale, yScale) {
+                _super.call(this, xScale, yScale);
+                this._defaultFillColor = new Plottable.Scale.Color().range()[0];
+                this.classed("rectangle-plot", true);
+            }
+            Rectangle.prototype._getDrawer = function (key) {
+                return new Plottable._Drawer.Rect(key, true);
+            };
+            Rectangle.prototype._generateAttrToProjector = function () {
+                var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
+                // Copy each of the different projectors.
+                var x1Attr = attrToProjector["x1"];
+                var y1Attr = attrToProjector["y1"];
+                var x2Attr = attrToProjector["x2"];
+                var y2Attr = attrToProjector["y2"];
+                // Generate width based on difference, then adjust for the correct x origin
+                attrToProjector["width"] = function (d, i, u, m) { return Math.abs(x2Attr(d, i, u, m) - x1Attr(d, i, u, m)); };
+                attrToProjector["x"] = function (d, i, u, m) { return Math.min(x1Attr(d, i, u, m), x2Attr(d, i, u, m)); };
+                // Generate height based on difference, then adjust for the correct y origin
+                attrToProjector["height"] = function (d, i, u, m) { return Math.abs(y2Attr(d, i, u, m) - y1Attr(d, i, u, m)); };
+                attrToProjector["y"] = function (d, i, u, m) { return Math.max(y1Attr(d, i, u, m), y2Attr(d, i, u, m)) - attrToProjector["height"](d, i, u, m); };
+                // Clean up the attributes projected onto the SVG elements
+                delete attrToProjector["x1"];
+                delete attrToProjector["y1"];
+                delete attrToProjector["x2"];
+                delete attrToProjector["y2"];
+                attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this._defaultFillColor);
+                return attrToProjector;
+            };
+            Rectangle.prototype._generateDrawSteps = function () {
+                return [{ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("rectangles") }];
+            };
+            return Rectangle;
+        })(Plot.AbstractXYPlot);
+        Plot.Rectangle = Rectangle;
+    })(Plot = Plottable.Plot || (Plottable.Plot = {}));
+})(Plottable || (Plottable = {}));
+
+///<reference path="../../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    var Plot;
+    (function (Plot) {
         var Scatter = (function (_super) {
             __extends(Scatter, _super);
             /**
@@ -7020,32 +7214,19 @@ var Plottable;
                 this._closeDetectionRadius = 5;
                 this.classed("scatter-plot", true);
                 this._defaultFillColor = new Plottable.Scale.Color().range()[0];
-                this.animator("circles-reset", new Plottable.Animator.Null());
-                this.animator("circles", new Plottable.Animator.Base().duration(250).delay(5));
+                this.animator("symbols-reset", new Plottable.Animator.Null());
+                this.animator("symbols", new Plottable.Animator.Base().duration(250).delay(5));
             }
-            /**
-             * @param {string} attrToSet One of ["x", "y", "cx", "cy", "r",
-             * "fill"]. "cx" and "cy" are aliases for "x" and "y". "r" is the datum's
-             * radius, and "fill" is the CSS color of the datum.
-             */
-            Scatter.prototype.project = function (attrToSet, accessor, scale) {
-                attrToSet = attrToSet === "cx" ? "x" : attrToSet;
-                attrToSet = attrToSet === "cy" ? "y" : attrToSet;
-                _super.prototype.project.call(this, attrToSet, accessor, scale);
-                return this;
-            };
             Scatter.prototype._getDrawer = function (key) {
-                return new Plottable._Drawer.Circle(key);
+                return new Plottable._Drawer.Symbol(key);
             };
             Scatter.prototype._generateAttrToProjector = function () {
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
-                attrToProjector["cx"] = attrToProjector["x"];
-                delete attrToProjector["x"];
-                attrToProjector["cy"] = attrToProjector["y"];
-                delete attrToProjector["y"];
                 attrToProjector["r"] = attrToProjector["r"] || d3.functor(3);
                 attrToProjector["opacity"] = attrToProjector["opacity"] || d3.functor(0.6);
                 attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this._defaultFillColor);
+                attrToProjector["symbol"] = attrToProjector["symbol"] || Plottable.SymbolGenerators.d3Symbol("circle");
+                attrToProjector["vector-effect"] = attrToProjector["vector-effect"] || d3.functor("non-scaling-stroke");
                 return attrToProjector;
             };
             Scatter.prototype._generateDrawSteps = function () {
@@ -7053,9 +7234,9 @@ var Plottable;
                 if (this._dataChanged && this._animate) {
                     var resetAttrToProjector = this._generateAttrToProjector();
                     resetAttrToProjector["r"] = function () { return 0; };
-                    drawSteps.push({ attrToProjector: resetAttrToProjector, animator: this._getAnimator("circles-reset") });
+                    drawSteps.push({ attrToProjector: resetAttrToProjector, animator: this._getAnimator("symbols-reset") });
                 }
-                drawSteps.push({ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("circles") });
+                drawSteps.push({ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("symbols") });
                 return drawSteps;
             };
             Scatter.prototype._getClosestStruckPoint = function (p, range) {
@@ -7064,8 +7245,8 @@ var Plottable;
                 var xProjector = attrToProjector["x"];
                 var yProjector = attrToProjector["y"];
                 var getDistSq = function (d, i, userMetdata, plotMetadata) {
-                    var dx = attrToProjector["cx"](d, i, userMetdata, plotMetadata) - p.x;
-                    var dy = attrToProjector["cy"](d, i, userMetdata, plotMetadata) - p.y;
+                    var dx = attrToProjector["x"](d, i, userMetdata, plotMetadata) - p.x;
+                    var dy = attrToProjector["y"](d, i, userMetdata, plotMetadata) - p.y;
                     return (dx * dx + dy * dy);
                 };
                 var overAPoint = false;
@@ -7078,7 +7259,7 @@ var Plottable;
                     var dataset = _this._key2PlotDatasetKey.get(key).dataset;
                     var plotMetadata = _this._key2PlotDatasetKey.get(key).plotMetadata;
                     var drawer = _this._key2PlotDatasetKey.get(key).drawer;
-                    drawer._getRenderArea().selectAll("circle").each(function (d, i) {
+                    drawer._getRenderArea().selectAll("path").each(function (d, i) {
                         var distSq = getDistSq(d, i, dataset.metadata(), plotMetadata);
                         var r = attrToProjector["r"](d, i, dataset.metadata(), plotMetadata);
                         if (distSq < r * r) {
@@ -7110,8 +7291,8 @@ var Plottable;
                 var closestSelection = d3.select(closestElement);
                 var closestData = closestSelection.data();
                 var closestPoint = {
-                    x: attrToProjector["cx"](closestData[0], closestIndex, closestElementUserMetadata, closestElementPlotMetadata),
-                    y: attrToProjector["cy"](closestData[0], closestIndex, closestElementUserMetadata, closestElementPlotMetadata)
+                    x: attrToProjector["x"](closestData[0], closestIndex, closestElementUserMetadata, closestElementPlotMetadata),
+                    y: attrToProjector["y"](closestData[0], closestIndex, closestElementUserMetadata, closestElementPlotMetadata)
                 };
                 return {
                     selection: closestSelection,
@@ -7155,17 +7336,21 @@ var Plottable;
              * grid, and the datum can control what color it is.
              *
              * @constructor
-             * @param {Scale.Category} xScale The x scale to use.
-             * @param {Scale.Category} yScale The y scale to use.
+             * @param {Scale.AbstractScale} xScale The x scale to use.
+             * @param {Scale.AbstractScale} yScale The y scale to use.
              * @param {Scale.Color|Scale.InterpolatedColor} colorScale The color scale
              * to use for each grid cell.
              */
             function Grid(xScale, yScale, colorScale) {
                 _super.call(this, xScale, yScale);
                 this.classed("grid-plot", true);
-                // The x and y scales should render in bands with no padding
-                xScale.innerPadding(0).outerPadding(0);
-                yScale.innerPadding(0).outerPadding(0);
+                // The x and y scales should render in bands with no padding for category scales
+                if (xScale instanceof Plottable.Scale.Category) {
+                    xScale.innerPadding(0).outerPadding(0);
+                }
+                if (yScale instanceof Plottable.Scale.Category) {
+                    yScale.innerPadding(0).outerPadding(0);
+                }
                 this._colorScale = colorScale;
                 this.animator("cells", new Plottable.Animator.Null());
             }
@@ -7181,33 +7366,52 @@ var Plottable;
                 return new Plottable._Drawer.Rect(key, true);
             };
             /**
-             * @param {string} attrToSet One of ["x", "y", "fill"]. If "fill" is used,
+             * @param {string} attrToSet One of ["x", "y", "x2", "y2", "fill"]. If "fill" is used,
              * the data should return a valid CSS color.
              */
             Grid.prototype.project = function (attrToSet, accessor, scale) {
+                var _this = this;
                 _super.prototype.project.call(this, attrToSet, accessor, scale);
+                if (attrToSet === "x") {
+                    if (scale instanceof Plottable.Scale.Category) {
+                        this.project("x1", function (d, i, u, m) {
+                            return scale.scale(_this._projections["x"].accessor(d, i, u, m)) - scale.rangeBand() / 2;
+                        });
+                        this.project("x2", function (d, i, u, m) {
+                            return scale.scale(_this._projections["x"].accessor(d, i, u, m)) + scale.rangeBand() / 2;
+                        });
+                    }
+                    if (scale instanceof Plottable.Scale.AbstractQuantitative) {
+                        this.project("x1", function (d, i, u, m) {
+                            return scale.scale(_this._projections["x"].accessor(d, i, u, m));
+                        });
+                    }
+                }
+                if (attrToSet === "y") {
+                    if (scale instanceof Plottable.Scale.Category) {
+                        this.project("y1", function (d, i, u, m) {
+                            return scale.scale(_this._projections["y"].accessor(d, i, u, m)) - scale.rangeBand() / 2;
+                        });
+                        this.project("y2", function (d, i, u, m) {
+                            return scale.scale(_this._projections["y"].accessor(d, i, u, m)) + scale.rangeBand() / 2;
+                        });
+                    }
+                    if (scale instanceof Plottable.Scale.AbstractQuantitative) {
+                        this.project("y1", function (d, i, u, m) {
+                            return scale.scale(_this._projections["y"].accessor(d, i, u, m));
+                        });
+                    }
+                }
                 if (attrToSet === "fill") {
                     this._colorScale = this._projections["fill"].scale;
                 }
                 return this;
             };
-            Grid.prototype._generateAttrToProjector = function () {
-                var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
-                var xStep = this._xScale.rangeBand();
-                var yStep = this._yScale.rangeBand();
-                attrToProjector["width"] = function () { return xStep; };
-                attrToProjector["height"] = function () { return yStep; };
-                var xAttr = attrToProjector["x"];
-                var yAttr = attrToProjector["y"];
-                attrToProjector["x"] = function (d, i, u, m) { return xAttr(d, i, u, m) - xStep / 2; };
-                attrToProjector["y"] = function (d, i, u, m) { return yAttr(d, i, u, m) - yStep / 2; };
-                return attrToProjector;
-            };
             Grid.prototype._generateDrawSteps = function () {
                 return [{ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("cells") }];
             };
             return Grid;
-        })(Plot.AbstractXYPlot);
+        })(Plot.Rectangle);
         Plot.Grid = Grid;
     })(Plot = Plottable.Plot || (Plottable.Plot = {}));
 })(Plottable || (Plottable = {}));

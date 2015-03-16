@@ -3,7 +3,7 @@
 var assert = chai.assert;
 
 describe("ClientToSVGTranslator", () => {
-  it("getTranslator() creates only one Dispatcher.Mouse per <svg>", () => {
+  it("getTranslator() creates only one ClientToSVGTranslator per <svg>", () => {
     var svg = generateSVG();
 
     var t1 = Plottable._Util.ClientToSVGTranslator.getTranslator(<SVGElement> svg.node());
