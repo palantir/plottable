@@ -6813,6 +6813,16 @@ var Plottable;
                 });
                 return { data: data, pixelPoints: pixelPoints, selection: d3.selectAll(allElements) };
             };
+            /**
+             * Retrieves the closest PlotData for the specified dataset(s)
+             *
+             * @param {Point} queryPoint The point to query from
+             * @param {string | string[]} datasetKeys The dataset(s) to retrieve the plot data from.
+             *                                        (default = this.datasetOrder())
+             * @param {number} withinValue Will only return plot data that is of a distance below withinValue
+             *                             (default = Infinity)
+             * @returns {PlotData} The retrieved PlotData.
+             */
             AbstractPlot.prototype.getClosestPlotData = function (queryPoint, datasetKeys, withinValue) {
                 if (datasetKeys === void 0) { datasetKeys = this.datasetOrder(); }
                 if (withinValue === void 0) { withinValue = Infinity; }
