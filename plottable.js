@@ -8883,7 +8883,10 @@ var Plottable;
                 this._upBroadcaster = new Plottable.Core.Broadcaster(this);
                 this._processUpCallback = function (e) { return _this._measureAndBroadcast(e, _this._upBroadcaster); };
                 this._event2Callback["mouseup"] = this._processUpCallback;
-                this._broadcasters = [this._moveBroadcaster, this._downBroadcaster, this._upBroadcaster];
+                this._wheelBraodcaster = new Plottable.Core.Broadcaster(this);
+                this._processWheelCallback = function (e) { return _this._measureAndBroadcast(e, _this._wheelBraodcaster, [e.deltaY]); };
+                this._event2Callback["wheel"] = this._processWheelCallback;
+                this._broadcasters = [this._moveBroadcaster, this._downBroadcaster, this._upBroadcaster, this._wheelBraodcaster];
             }
             /**
              * Get a Dispatcher.Mouse for the <svg> containing elem. If one already exists
@@ -8953,11 +8956,13 @@ var Plottable;
              * Computes the mouse position from the given event, and if successful
              * calls broadcast() on the supplied Broadcaster.
              */
-            Mouse.prototype._measureAndBroadcast = function (e, b) {
+            Mouse.prototype._measureAndBroadcast = function (e, b, otherBroadcastData) {
+                if (otherBroadcastData === void 0) { otherBroadcastData = []; }
                 var newMousePosition = this.translator.computePosition(e.clientX, e.clientY);
                 if (newMousePosition != null) {
                     this._lastMousePosition = newMousePosition;
-                    b.broadcast(this.getLastMousePosition(), e);
+                    var broadcastArgList = [this.getLastMousePosition()].concat(otherBroadcastData).concat(e);
+                    b.broadcast.apply(b, broadcastArgList);
                 }
             };
             /**

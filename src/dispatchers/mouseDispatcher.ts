@@ -11,9 +11,11 @@ export module Dispatcher {
     private _moveBroadcaster: Core.Broadcaster<Dispatcher.Mouse>;
     private _downBroadcaster: Core.Broadcaster<Dispatcher.Mouse>;
     private _upBroadcaster: Core.Broadcaster<Dispatcher.Mouse>;
+    private _wheelBraodcaster: Core.Broadcaster<Dispatcher.Mouse>;
     private _processMoveCallback: (e: MouseEvent) => any;
     private _processDownCallback: (e: MouseEvent) => any;
     private _processUpCallback: (e: MouseEvent) => any;
+    private _processWheelCallback: (e: WheelEvent) => any;
 
     /**
      * Get a Dispatcher.Mouse for the <svg> containing elem. If one already exists
@@ -60,7 +62,11 @@ export module Dispatcher {
       this._processUpCallback = (e: MouseEvent) => this._measureAndBroadcast(e, this._upBroadcaster);
       this._event2Callback["mouseup"] = this._processUpCallback;
 
-      this._broadcasters = [this._moveBroadcaster, this._downBroadcaster, this._upBroadcaster];
+      this._wheelBraodcaster = new Core.Broadcaster(this);
+      this._processWheelCallback = (e: WheelEvent) => this._measureAndBroadcast(e, this._wheelBraodcaster, [e.deltaY]);
+      this._event2Callback["wheel"] = this._processWheelCallback;
+
+      this._broadcasters = [this._moveBroadcaster, this._downBroadcaster, this._upBroadcaster, this._wheelBraodcaster];
     }
 
     protected _getWrappedCallback(callback: Function): Core.BroadcasterCallback<Dispatcher.Mouse> {
@@ -119,11 +125,13 @@ export module Dispatcher {
      * Computes the mouse position from the given event, and if successful
      * calls broadcast() on the supplied Broadcaster.
      */
-    private _measureAndBroadcast(e: MouseEvent, b: Core.Broadcaster<Dispatcher.Mouse>) {
+    private _measureAndBroadcast(e: MouseEvent, b: Core.Broadcaster<Dispatcher.Mouse>,
+                                 otherBroadcastData: any[] = []) {
       var newMousePosition = this.translator.computePosition(e.clientX, e.clientY);
       if (newMousePosition != null) {
         this._lastMousePosition = newMousePosition;
-        b.broadcast(this.getLastMousePosition(), e);
+        var broadcastArgList = [this.getLastMousePosition()].concat(otherBroadcastData).concat(e);
+        b.broadcast.apply(b, broadcastArgList);
       }
     }
 
