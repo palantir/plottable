@@ -114,6 +114,10 @@ export module Plot {
         });
       });
 
+      if (closestDatum == null) {
+        return {data: [], pixelPoints: [], selection: d3.select()};
+      }
+
       return {data: [closestDatum],
               pixelPoints: [closestPoint],
               selection: closestSelection};

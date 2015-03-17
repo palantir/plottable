@@ -323,7 +323,7 @@ var Plottable;
             }
             Methods.darkenColor = darkenColor;
             function pointDistance(p1, p2) {
-                return Math.sqrt(Math.pow(p2.y - p1.y, 2) - Math.pow(p2.x - p1.x, 2));
+                return Math.sqrt(Math.pow(p2.y - p1.y, 2) + Math.pow(p2.x - p1.x, 2));
             }
             Methods.pointDistance = pointDistance;
         })(Methods = _Util.Methods || (_Util.Methods = {}));
@@ -6847,6 +6847,9 @@ var Plottable;
                         closestIndex = index;
                     }
                 });
+                if (closestIndex == null) {
+                    return { data: [], pixelPoints: [], selection: d3.select() };
+                }
                 return { data: [plotData.data[closestIndex]], pixelPoints: [plotData.pixelPoints[closestIndex]], selection: d3.select(plotData.selection[0][closestIndex]) };
             };
             return AbstractPlot;
@@ -7924,6 +7927,9 @@ var Plottable;
                         }
                     });
                 });
+                if (closestDatum == null) {
+                    return { data: [], pixelPoints: [], selection: d3.select() };
+                }
                 return { data: [closestDatum], pixelPoints: [closestPoint], selection: closestSelection };
             };
             Line.prototype._getClosestWithinRange = function (p, range) {
