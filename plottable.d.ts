@@ -2777,13 +2777,13 @@ declare module Plottable {
              * Retrieves the closest PlotData for the specified dataset(s)
              *
              * @param {Point} queryPoint The point to query from
-             * @param {string | string[]} datasetKeys The dataset(s) to retrieve the plot data from.
-             *                                        (default = this.datasetOrder())
              * @param {number} withinValue Will only return plot data that is of a distance below withinValue
              *                             (default = Infinity)
+             * @param {string | string[]} datasetKeys The dataset(s) to retrieve the plot data from.
+             *                                        (default = this.datasetOrder())
              * @returns {PlotData} The retrieved PlotData.
              */
-            getClosestPlotData(queryPoint: Point, datasetKeys?: string | string[], withinValue?: number): {
+            getClosestPlotData(queryPoint: Point, withinValue?: number, datasetKeys?: string | string[]): {
                 data: any;
                 pixelPoints: {
                     x: number;

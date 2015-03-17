@@ -515,13 +515,13 @@ export module Plot {
      * Retrieves the closest PlotData for the specified dataset(s)
      *
      * @param {Point} queryPoint The point to query from
-     * @param {string | string[]} datasetKeys The dataset(s) to retrieve the plot data from.
-     *                                        (default = this.datasetOrder())
      * @param {number} withinValue Will only return plot data that is of a distance below withinValue
      *                             (default = Infinity)
+     * @param {string | string[]} datasetKeys The dataset(s) to retrieve the plot data from.
+     *                                        (default = this.datasetOrder())
      * @returns {PlotData} The retrieved PlotData.
      */
-    public getClosestPlotData(queryPoint: Point, datasetKeys: string | string[] = this.datasetOrder(), withinValue = Infinity) {
+    public getClosestPlotData(queryPoint: Point, withinValue = Infinity, datasetKeys: string | string[] = this.datasetOrder()) {
       var datasetKeyArray: string[] = [];
       if (typeof(datasetKeys) === "string") {
         datasetKeyArray = [<string> datasetKeys];
