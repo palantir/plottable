@@ -9944,7 +9944,7 @@ var Plottable;
 })(Plottable || (Plottable = {}));
 
 /*!
-SVG Typewriter 0.1.10 (https://github.com/palantir/svg-typewriter)
+SVG Typewriter 0.1.11 (https://github.com/palantir/svg-typewriter)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/svg-typewriter/blob/develop/LICENSE)
 */
