@@ -2716,6 +2716,18 @@ describe("Plots", function () {
                 svg.remove();
             });
         });
+        describe("getAllPlotData()", function () {
+            it("selection only contains a line per dataset", function () {
+                var dataset3 = [
+                    { foo: 0, bar: 1 },
+                    { foo: 1, bar: 0.95 }
+                ];
+                linePlot.addDataset("d3", dataset3);
+                var allLines = linePlot.getAllPlotData().selection;
+                assert.strictEqual(allLines.size(), linePlot.datasets().length, "single line per dataset");
+                svg.remove();
+            });
+        });
         it("retains original classes when class is projected", function () {
             var newClassProjector = function () { return "pink"; };
             linePlot.project("class", newClassProjector);

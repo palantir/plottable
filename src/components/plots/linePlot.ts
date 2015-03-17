@@ -132,6 +132,28 @@ export module Plot {
       };
     }
 
+    protected _getAllPlotData(datasetKeys: string[]): PlotData {
+      var data: any[] = [];
+      var pixelPoints: Point[] = [];
+      var allElements: EventTarget[] = [];
+
+      datasetKeys.forEach((datasetKey) => {
+        var plotDatasetKey = this._key2PlotDatasetKey.get(datasetKey);
+        if (plotDatasetKey == null) { return; }
+        var drawer = plotDatasetKey.drawer;
+        plotDatasetKey.dataset.data().forEach((datum: any, index: number) => {
+          data.push(datum);
+          pixelPoints.push(drawer._getPixelPoint(datum, index));
+        });
+
+        if (plotDatasetKey.dataset.data().length > 0) {
+          allElements.push(drawer._getSelection(0).node());
+        }
+      });
+
+      return { data: data, pixelPoints: pixelPoints, selection: d3.selectAll(allElements) };
+    }
+
     //===== Hover logic =====
     public _hoverOverComponent(p: Point) {
       // no-op

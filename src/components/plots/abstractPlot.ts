@@ -493,11 +493,15 @@ export module Plot {
         datasetKeyArray = <string[]> datasetKeys;
       }
 
+      return this._getAllPlotData(datasetKeyArray);
+    }
+
+    protected _getAllPlotData(datasetKeys: string[]): PlotData {
       var data: any[] = [];
       var pixelPoints: Point[] = [];
       var allElements: EventTarget[] = [];
 
-      datasetKeyArray.forEach((datasetKey) => {
+      datasetKeys.forEach((datasetKey) => {
         var plotDatasetKey = this._key2PlotDatasetKey.get(datasetKey);
         if (plotDatasetKey == null) { return; }
         var drawer = plotDatasetKey.drawer;
