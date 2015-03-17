@@ -5763,6 +5763,7 @@ var Plottable;
                 this._scale = interpolatedColorScale;
                 this._scale.broadcaster.registerListener(this, function () { return _this._invalidateLayout(); });
                 this._formatter = formatter;
+                this._symbolGenerator = Plottable.SymbolGenerators.d3Symbol("square");
                 this._orientation = InterpolatedColorLegend._ensureOrientation(orientation);
                 this._fixedWidthFlag = true;
                 this._fixedHeightFlag = true;
@@ -5930,16 +5931,26 @@ var Plottable;
                 var lowerTranslateString = "translate(" + lowerLabelShift.x + ", " + lowerLabelShift.y + ")";
                 this._lowerLabel.attr("transform", lowerTranslateString);
                 this._swatchBoundingBox.attr(boundingBoxAttr);
+                var swatchTranslateX = function (d, i) { return swatchX(d, i) + swatchWidth / 2; };
+                var swatchTranslateY = function (d, i) { return swatchY(d, i) + swatchHeight / 2; };
                 var swatches = this._swatchContainer.selectAll("rect.swatch").data(ticks);
-                swatches.enter().append("rect").classed("swatch", true);
+                swatches.enter().append("path").classed("swatch", true);
                 swatches.exit().remove();
                 swatches.attr({
                     "fill": function (d, i) { return _this._scale.scale(d); },
-                    "width": swatchWidth,
-                    "height": swatchHeight,
-                    "x": swatchX,
-                    "y": swatchY
+                    "d": this.symbolGenerator(),
+                    "transform": function (d, i) { return "translate(" + swatchTranslateX(d, i) + "," + swatchTranslateY(d, i) + ")," + "scale(" + (swatchWidth / 100) + "," + (swatchHeight / 100) + ")"; }
                 });
+            };
+            InterpolatedColorLegend.prototype.symbolGenerator = function (symbolGenerator) {
+                if (symbolGenerator == null) {
+                    return this._symbolGenerator;
+                }
+                else {
+                    this._symbolGenerator = symbolGenerator;
+                    this._render();
+                    return this;
+                }
             };
             /**
              * The css class applied to the legend labels.
