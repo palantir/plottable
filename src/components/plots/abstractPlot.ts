@@ -544,8 +544,8 @@ export module Plot {
         }
       });
 
-      return {data: plotData.data[closestIndex],
-              pixelPoints: plotData.pixelPoints[closestIndex],
+      return {data: [plotData.data[closestIndex]],
+              pixelPoints: [plotData.pixelPoints[closestIndex]],
               selection: d3.select(plotData.selection[0][closestIndex])};
     }
   }

@@ -114,8 +114,8 @@ export module Plot {
         });
       });
 
-      return {data: closestDatum,
-              pixelPoints: closestPoint,
+      return {data: [closestDatum],
+              pixelPoints: [closestPoint],
               selection: closestSelection};
     }
 

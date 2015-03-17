@@ -2784,19 +2784,19 @@ declare module Plottable {
              * @returns {PlotData} The retrieved PlotData.
              */
             getClosestPlotData(queryPoint: Point, withinValue?: number, datasetKeys?: string | string[]): {
-                data: any;
+                data: any[];
                 pixelPoints: {
                     x: number;
                     y: number;
-                };
+                }[];
                 selection: D3.Selection;
             };
             protected _getClosestPlotData(queryPoint: Point, datasetKeys: string[], withinValue?: number): {
-                data: any;
+                data: any[];
                 pixelPoints: {
                     x: number;
                     y: number;
-                };
+                }[];
                 selection: D3.Selection;
             };
         }
@@ -3109,11 +3109,11 @@ declare module Plottable {
             };
             protected _wholeDatumAttributes(): string[];
             protected _getClosestPlotData(queryPoint: Point, datasetKeys: string[], withinValue?: number): {
-                data: any;
+                data: any[];
                 pixelPoints: {
                     x: number;
                     y: number;
-                };
+                }[];
                 selection: D3.Selection;
             };
             protected _getClosestWithinRange(p: Point, range: number): {

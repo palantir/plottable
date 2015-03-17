@@ -6847,7 +6847,7 @@ var Plottable;
                         closestIndex = index;
                     }
                 });
-                return { data: plotData.data[closestIndex], pixelPoints: plotData.pixelPoints[closestIndex], selection: d3.select(plotData.selection[0][closestIndex]) };
+                return { data: [plotData.data[closestIndex]], pixelPoints: [plotData.pixelPoints[closestIndex]], selection: d3.select(plotData.selection[0][closestIndex]) };
             };
             return AbstractPlot;
         })(Plottable.Component.AbstractComponent);
@@ -7924,7 +7924,7 @@ var Plottable;
                         }
                     });
                 });
-                return { data: closestDatum, pixelPoints: closestPoint, selection: closestSelection };
+                return { data: [closestDatum], pixelPoints: [closestPoint], selection: closestSelection };
             };
             Line.prototype._getClosestWithinRange = function (p, range) {
                 var _this = this;
