@@ -128,7 +128,7 @@ declare module Plottable {
             function colorTest(colorTester: D3.Selection, className: string): string;
             function lightenColor(color: string, factor: number): string;
             function darkenColor(color: string, factor: number, darkenAmount: number): string;
-            function pointDistance(p1: Point, p2: Point): number;
+            function distanceSquared(p1: Point, p2: Point): number;
         }
     }
 }

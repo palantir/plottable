@@ -104,7 +104,7 @@ export module Plot {
       datasetKeys.forEach((datasetKey: string) => {
         var plotData = this.getAllPlotData(datasetKey);
         plotData.pixelPoints.forEach((pixelPoint: Point, index: number) => {
-          var pixelPointDist = _Util.Methods.pointDistance(queryPoint, pixelPoint);
+          var pixelPointDist = _Util.Methods.distanceSquared(queryPoint, pixelPoint);
           if (pixelPointDist < closestDistance) {
             closestDistance = pixelPointDist;
             closestDatum = plotData.data[index];

@@ -322,10 +322,10 @@ var Plottable;
                 return "#" + rHex + gHex + bHex;
             }
             Methods.darkenColor = darkenColor;
-            function pointDistance(p1, p2) {
-                return Math.sqrt(Math.pow(p2.y - p1.y, 2) + Math.pow(p2.x - p1.x, 2));
+            function distanceSquared(p1, p2) {
+                return Math.pow(p2.y - p1.y, 2) + Math.pow(p2.x - p1.x, 2);
             }
-            Methods.pointDistance = pointDistance;
+            Methods.distanceSquared = distanceSquared;
         })(Methods = _Util.Methods || (_Util.Methods = {}));
     })(_Util = Plottable._Util || (Plottable._Util = {}));
 })(Plottable || (Plottable = {}));
@@ -6841,7 +6841,7 @@ var Plottable;
                 var closestIndex;
                 var plotData = this.getAllPlotData(datasetKeys);
                 plotData.pixelPoints.forEach(function (pixelPoint, index) {
-                    var distance = Plottable._Util.Methods.pointDistance(pixelPoint, queryPoint);
+                    var distance = Plottable._Util.Methods.distanceSquared(pixelPoint, queryPoint);
                     if (distance < closestDistance) {
                         closestDistance = distance;
                         closestIndex = index;
@@ -7918,7 +7918,7 @@ var Plottable;
                 datasetKeys.forEach(function (datasetKey) {
                     var plotData = _this.getAllPlotData(datasetKey);
                     plotData.pixelPoints.forEach(function (pixelPoint, index) {
-                        var pixelPointDist = Plottable._Util.Methods.pointDistance(queryPoint, pixelPoint);
+                        var pixelPointDist = Plottable._Util.Methods.distanceSquared(queryPoint, pixelPoint);
                         if (pixelPointDist < closestDistance) {
                             closestDistance = pixelPointDist;
                             closestDatum = plotData.data[index];

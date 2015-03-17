@@ -537,7 +537,7 @@ export module Plot {
       var closestIndex: number;
       var plotData = this.getAllPlotData(datasetKeys);
       plotData.pixelPoints.forEach((pixelPoint: Point, index: number) => {
-        var distance = _Util.Methods.pointDistance(pixelPoint, queryPoint);
+        var distance = _Util.Methods.distanceSquared(pixelPoint, queryPoint);
         if (distance < closestDistance) {
           closestDistance = distance;
           closestIndex = index;
