@@ -1618,6 +1618,21 @@ declare module Plottable {
 
 
 declare module Plottable {
+    module _Drawer {
+        class ErrorBar extends Element {
+            static ERROR_BAR_CLASS: string;
+            static ERROR_BAR_MIDDLE_CLASS: string;
+            static ERROR_BAR_LOWER_CLASS: string;
+            static ERROR_BAR_UPPER_CLASS: string;
+            constructor(key: string, isVertical: boolean);
+            protected _enterData(data: any[]): void;
+            protected _drawStep(step: AppliedDrawStep): void;
+        }
+    }
+}
+
+
+declare module Plottable {
     module Component {
         class AbstractComponent extends Core.PlottableObject {
             protected _element: D3.Selection;
@@ -3269,6 +3284,30 @@ declare module Plottable {
             _updateScaleExtents(): void;
             _keyAccessor(): _Accessor;
             _valueAccessor(): _Accessor;
+        }
+    }
+}
+
+declare module Plottable {
+    module Plot {
+        class ErrorBar<X> extends AbstractXYPlot<X, number> {
+            protected _isVertical: boolean;
+            /**
+             * Constructs an ErrorBarPlot.
+             *
+             * Error bar plots are used to show variability in a reported measurement on a plot.
+             * They are intended to be merged on top of other sorts of plots.
+             *
+             * @constructor
+             * @param {QuantitativeScale} xScale The x scale to use.
+             * @param {QuantitativeScale} yScale The y scale to use.
+             */
+            constructor(xScale: Scale.AbstractQuantitative<X>, yScale: Scale.AbstractQuantitative<number>, isVertical?: boolean);
+            project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): ErrorBar<X>;
+            protected _getDrawer(key: string): _Drawer.ErrorBar;
+            protected _generateAttrToProjector(): {
+                [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
+            };
         }
     }
 }
