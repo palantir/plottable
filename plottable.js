@@ -8976,8 +8976,7 @@ var Plottable;
                 var newMousePosition = this.translator.computePosition(e.clientX, e.clientY);
                 if (newMousePosition != null) {
                     this._lastMousePosition = newMousePosition;
-                    var broadcastArgList = otherBroadcastData.concat(this.getLastMousePosition(), e);
-                    b.broadcast.apply(b, broadcastArgList);
+                    b.broadcast.apply(b, otherBroadcastData.concat(this.getLastMousePosition(), e));
                 }
             };
             /**
