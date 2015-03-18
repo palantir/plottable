@@ -215,9 +215,9 @@ describe("Dispatchers", () => {
       var md = Plottable.Dispatcher.Mouse.getDispatcher(<SVGElement> svg.node());
 
       var callbackWasCalled = false;
-      var callback = (deltaY: number, p: Plottable.Point, e: WheelEvent) => {
+      var callback = (p: Plottable.Point, e: WheelEvent) => {
         callbackWasCalled = true;
-        assert.strictEqual(deltaY, targetDeltaY, "deltaY value was passed to callback");
+        assert.strictEqual(e.deltaY, targetDeltaY, "deltaY value was passed to callback");
         assertPointsClose(p, expectedPoint, 0.5, "mouse position is correct");
         assert.isNotNull(e, "mouse event was passed to the callback");
       };

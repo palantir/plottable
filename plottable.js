@@ -8884,7 +8884,7 @@ var Plottable;
                 this._processUpCallback = function (e) { return _this._measureAndBroadcast(e, _this._upBroadcaster); };
                 this._event2Callback["mouseup"] = this._processUpCallback;
                 this._wheelBroadcaster = new Plottable.Core.Broadcaster(this);
-                this._processWheelCallback = function (e) { return _this._measureAndBroadcast(e, _this._wheelBroadcaster, [Mouse._deltaYInPixels(e)]); };
+                this._processWheelCallback = function (e) { return _this._measureAndBroadcast(e, _this._wheelBroadcaster); };
                 this._event2Callback["wheel"] = this._processWheelCallback;
                 this._broadcasters = [this._moveBroadcaster, this._downBroadcaster, this._upBroadcaster, this._wheelBroadcaster];
             }
@@ -8904,16 +8904,8 @@ var Plottable;
                 }
                 return dispatcher;
             };
-            Mouse._deltaYInPixels = function (e) {
-                if (e.deltaMode === 0) {
-                    return e.deltaY;
-                }
-                else {
-                    return e.deltaY * Mouse._PIXELS_PER_LINE;
-                }
-            };
             Mouse.prototype._getWrappedCallback = function (callback) {
-                return function (md, p, e, wheelDelta) { return callback(p, e, wheelDelta); };
+                return function (md, p, e) { return callback(p, e); };
             };
             /**
              * Registers a callback to be called whenever the mouse position changes,
@@ -8966,8 +8958,8 @@ var Plottable;
              *
              * @param {any} key The key associated with the callback.
              *                  Key uniqueness is determined by deep equality.
-             * @param {WheelCallback} callback A callback that takes the amount of mouse scroll
-             *                                     and the pixel position in svg-coordinate-space.
+             * @param {WheelCallback} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space.
              *                                     Pass `null` to remove a callback.
              * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
              */
@@ -8979,12 +8971,11 @@ var Plottable;
              * Computes the mouse position from the given event, and if successful
              * calls broadcast() on the supplied Broadcaster.
              */
-            Mouse.prototype._measureAndBroadcast = function (e, b, otherBroadcastData) {
-                if (otherBroadcastData === void 0) { otherBroadcastData = []; }
+            Mouse.prototype._measureAndBroadcast = function (e, b) {
                 var newMousePosition = this.translator.computePosition(e.clientX, e.clientY);
                 if (newMousePosition != null) {
                     this._lastMousePosition = newMousePosition;
-                    b.broadcast.apply(b, otherBroadcastData.concat(this.getLastMousePosition(), e));
+                    b.broadcast(this.getLastMousePosition(), e);
                 }
             };
             /**
@@ -8996,7 +8987,6 @@ var Plottable;
                 return this._lastMousePosition;
             };
             Mouse._DISPATCHER_KEY = "__Plottable_Dispatcher_Mouse";
-            Mouse._PIXELS_PER_LINE = 40;
             return Mouse;
         })(Dispatcher.AbstractDispatcher);
         Dispatcher.Mouse = Mouse;

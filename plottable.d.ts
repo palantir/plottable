@@ -3490,7 +3490,6 @@ declare module Plottable {
 declare module Plottable {
     module Dispatcher {
         type MouseCallback = (p: Point, e: MouseEvent) => any;
-        type WheelCallback = (deltaY: number, p: Point, e: MouseEvent) => any;
         class Mouse extends AbstractDispatcher {
             /**
              * Get a Dispatcher.Mouse for the <svg> containing elem. If one already exists
@@ -3550,12 +3549,12 @@ declare module Plottable {
              *
              * @param {any} key The key associated with the callback.
              *                  Key uniqueness is determined by deep equality.
-             * @param {WheelCallback} callback A callback that takes the amount of mouse scroll
-             *                                     and the pixel position in svg-coordinate-space.
+             * @param {WheelCallback} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space.
              *                                     Pass `null` to remove a callback.
              * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
              */
-            onWheel(key: any, callback: WheelCallback): Dispatcher.Mouse;
+            onWheel(key: any, callback: MouseCallback): Dispatcher.Mouse;
             /**
              * Returns the last computed mouse position.
              *
