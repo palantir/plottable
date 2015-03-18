@@ -1,5 +1,5 @@
 /*!
-Plottable 0.47.0 (https://github.com/palantir/plottable)
+Plottable 0.48.1 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -1016,10 +1016,19 @@ var Plottable;
                     case "triangle-down":
                         sizeFactor = Math.sqrt(3);
                         break;
+                    default:
+                        sizeFactor = 1;
+                        break;
                 }
                 return sizeFactor * Math.pow(SymbolGenerators.SYMBOL_GENERATOR_RADIUS, 2);
             };
-            var symbolSize = typeof (symbolType) === "string" ? typeToSize(symbolType) : function (datum, index) { return typeToSize(symbolType(datum, index)); };
+            function ensureSymbolType(symTypeString) {
+                if (d3.svg.symbolTypes.indexOf(symTypeString) === -1) {
+                    throw new Error(symTypeString + " is an invalid D3 symbol type.  d3.svg.symbolTypes can retrieve the valid symbol types.");
+                }
+                return symTypeString;
+            }
+            var symbolSize = typeof (symbolType) === "string" ? typeToSize(ensureSymbolType(symbolType)) : function (datum, index) { return typeToSize(ensureSymbolType(symbolType(datum, index))); };
             return d3.svg.symbol().type(symbolType).size(symbolSize);
         }
         SymbolGenerators.d3Symbol = d3Symbol;
@@ -1104,7 +1113,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "0.47.0";
+    Plottable.version = "0.48.1";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -7106,6 +7115,68 @@ var Plottable;
 (function (Plottable) {
     var Plot;
     (function (Plot) {
+        var Rectangle = (function (_super) {
+            __extends(Rectangle, _super);
+            /**
+             * Constructs a RectanglePlot.
+             *
+             * A RectanglePlot consists of a bunch of rectangles. The user is required to
+             * project the left and right bounds of the rectangle (x1 and x2 respectively)
+             * as well as the bottom and top bounds (y1 and y2 respectively)
+             *
+             * @constructor
+             * @param {Scale.AbstractScale} xScale The x scale to use.
+             * @param {Scale.AbstractScale} yScale The y scale to use.
+             */
+            function Rectangle(xScale, yScale) {
+                _super.call(this, xScale, yScale);
+                this._defaultFillColor = new Plottable.Scale.Color().range()[0];
+                this.classed("rectangle-plot", true);
+            }
+            Rectangle.prototype._getDrawer = function (key) {
+                return new Plottable._Drawer.Rect(key, true);
+            };
+            Rectangle.prototype._generateAttrToProjector = function () {
+                var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
+                // Copy each of the different projectors.
+                var x1Attr = attrToProjector["x1"];
+                var y1Attr = attrToProjector["y1"];
+                var x2Attr = attrToProjector["x2"];
+                var y2Attr = attrToProjector["y2"];
+                // Generate width based on difference, then adjust for the correct x origin
+                attrToProjector["width"] = function (d, i, u, m) { return Math.abs(x2Attr(d, i, u, m) - x1Attr(d, i, u, m)); };
+                attrToProjector["x"] = function (d, i, u, m) { return Math.min(x1Attr(d, i, u, m), x2Attr(d, i, u, m)); };
+                // Generate height based on difference, then adjust for the correct y origin
+                attrToProjector["height"] = function (d, i, u, m) { return Math.abs(y2Attr(d, i, u, m) - y1Attr(d, i, u, m)); };
+                attrToProjector["y"] = function (d, i, u, m) { return Math.max(y1Attr(d, i, u, m), y2Attr(d, i, u, m)) - attrToProjector["height"](d, i, u, m); };
+                // Clean up the attributes projected onto the SVG elements
+                delete attrToProjector["x1"];
+                delete attrToProjector["y1"];
+                delete attrToProjector["x2"];
+                delete attrToProjector["y2"];
+                attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this._defaultFillColor);
+                return attrToProjector;
+            };
+            Rectangle.prototype._generateDrawSteps = function () {
+                return [{ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("rectangles") }];
+            };
+            return Rectangle;
+        })(Plot.AbstractXYPlot);
+        Plot.Rectangle = Rectangle;
+    })(Plot = Plottable.Plot || (Plottable.Plot = {}));
+})(Plottable || (Plottable = {}));
+
+///<reference path="../../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    var Plot;
+    (function (Plot) {
         var Scatter = (function (_super) {
             __extends(Scatter, _super);
             /**
@@ -7242,17 +7313,21 @@ var Plottable;
              * grid, and the datum can control what color it is.
              *
              * @constructor
-             * @param {Scale.Category} xScale The x scale to use.
-             * @param {Scale.Category} yScale The y scale to use.
+             * @param {Scale.AbstractScale} xScale The x scale to use.
+             * @param {Scale.AbstractScale} yScale The y scale to use.
              * @param {Scale.Color|Scale.InterpolatedColor} colorScale The color scale
              * to use for each grid cell.
              */
             function Grid(xScale, yScale, colorScale) {
                 _super.call(this, xScale, yScale);
                 this.classed("grid-plot", true);
-                // The x and y scales should render in bands with no padding
-                xScale.innerPadding(0).outerPadding(0);
-                yScale.innerPadding(0).outerPadding(0);
+                // The x and y scales should render in bands with no padding for category scales
+                if (xScale instanceof Plottable.Scale.Category) {
+                    xScale.innerPadding(0).outerPadding(0);
+                }
+                if (yScale instanceof Plottable.Scale.Category) {
+                    yScale.innerPadding(0).outerPadding(0);
+                }
                 this._colorScale = colorScale;
                 this.animator("cells", new Plottable.Animator.Null());
             }
@@ -7268,33 +7343,52 @@ var Plottable;
                 return new Plottable._Drawer.Rect(key, true);
             };
             /**
-             * @param {string} attrToSet One of ["x", "y", "fill"]. If "fill" is used,
+             * @param {string} attrToSet One of ["x", "y", "x2", "y2", "fill"]. If "fill" is used,
              * the data should return a valid CSS color.
              */
             Grid.prototype.project = function (attrToSet, accessor, scale) {
+                var _this = this;
                 _super.prototype.project.call(this, attrToSet, accessor, scale);
+                if (attrToSet === "x") {
+                    if (scale instanceof Plottable.Scale.Category) {
+                        this.project("x1", function (d, i, u, m) {
+                            return scale.scale(_this._projections["x"].accessor(d, i, u, m)) - scale.rangeBand() / 2;
+                        });
+                        this.project("x2", function (d, i, u, m) {
+                            return scale.scale(_this._projections["x"].accessor(d, i, u, m)) + scale.rangeBand() / 2;
+                        });
+                    }
+                    if (scale instanceof Plottable.Scale.AbstractQuantitative) {
+                        this.project("x1", function (d, i, u, m) {
+                            return scale.scale(_this._projections["x"].accessor(d, i, u, m));
+                        });
+                    }
+                }
+                if (attrToSet === "y") {
+                    if (scale instanceof Plottable.Scale.Category) {
+                        this.project("y1", function (d, i, u, m) {
+                            return scale.scale(_this._projections["y"].accessor(d, i, u, m)) - scale.rangeBand() / 2;
+                        });
+                        this.project("y2", function (d, i, u, m) {
+                            return scale.scale(_this._projections["y"].accessor(d, i, u, m)) + scale.rangeBand() / 2;
+                        });
+                    }
+                    if (scale instanceof Plottable.Scale.AbstractQuantitative) {
+                        this.project("y1", function (d, i, u, m) {
+                            return scale.scale(_this._projections["y"].accessor(d, i, u, m));
+                        });
+                    }
+                }
                 if (attrToSet === "fill") {
                     this._colorScale = this._projections["fill"].scale;
                 }
                 return this;
             };
-            Grid.prototype._generateAttrToProjector = function () {
-                var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
-                var xStep = this._xScale.rangeBand();
-                var yStep = this._yScale.rangeBand();
-                attrToProjector["width"] = function () { return xStep; };
-                attrToProjector["height"] = function () { return yStep; };
-                var xAttr = attrToProjector["x"];
-                var yAttr = attrToProjector["y"];
-                attrToProjector["x"] = function (d, i, u, m) { return xAttr(d, i, u, m) - xStep / 2; };
-                attrToProjector["y"] = function (d, i, u, m) { return yAttr(d, i, u, m) - yStep / 2; };
-                return attrToProjector;
-            };
             Grid.prototype._generateDrawSteps = function () {
                 return [{ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("cells") }];
             };
             return Grid;
-        })(Plot.AbstractXYPlot);
+        })(Plot.Rectangle);
         Plot.Grid = Grid;
     })(Plot = Plottable.Plot || (Plottable.Plot = {}));
 })(Plottable || (Plottable = {}));
@@ -9935,7 +10029,7 @@ var Plottable;
 })(Plottable || (Plottable = {}));
 
 /*!
-SVG Typewriter 0.1.10 (https://github.com/palantir/svg-typewriter)
+SVG Typewriter 0.1.11 (https://github.com/palantir/svg-typewriter)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/svg-typewriter/blob/develop/LICENSE)
 */

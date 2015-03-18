@@ -62,6 +62,7 @@
 /// <reference path="components/plots/abstractPlot.ts" />
 /// <reference path="components/plots/piePlot.ts" />
 /// <reference path="components/plots/abstractXYPlot.ts" />
+/// <reference path="components/plots/rectanglePlot.ts" />
 /// <reference path="components/plots/scatterPlot.ts" />
 /// <reference path="components/plots/gridPlot.ts" />
 /// <reference path="components/plots/barPlot.ts" />

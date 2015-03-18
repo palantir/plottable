@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Plot {
-  export class Grid extends AbstractXYPlot<string,string> {
+  export class Grid extends Rectangle<any, any> {
     private _colorScale: Scale.AbstractScale<any, string>;
 
     /**
@@ -12,18 +12,23 @@ export module Plot {
      * grid, and the datum can control what color it is.
      *
      * @constructor
-     * @param {Scale.Category} xScale The x scale to use.
-     * @param {Scale.Category} yScale The y scale to use.
+     * @param {Scale.AbstractScale} xScale The x scale to use.
+     * @param {Scale.AbstractScale} yScale The y scale to use.
      * @param {Scale.Color|Scale.InterpolatedColor} colorScale The color scale
      * to use for each grid cell.
      */
-    constructor(xScale: Scale.Category, yScale: Scale.Category, colorScale: Scale.AbstractScale<any, string>) {
+    constructor(xScale: Scale.AbstractScale<any, any>, yScale: Scale.AbstractScale<any, any>,
+      colorScale: Scale.AbstractScale<any, string>) {
       super(xScale, yScale);
       this.classed("grid-plot", true);
 
-      // The x and y scales should render in bands with no padding
-      xScale.innerPadding(0).outerPadding(0);
-      yScale.innerPadding(0).outerPadding(0);
+      // The x and y scales should render in bands with no padding for category scales
+      if (xScale instanceof Scale.Category) {
+        xScale.innerPadding(0).outerPadding(0);
+      }
+      if (yScale instanceof Scale.Category) {
+        yScale.innerPadding(0).outerPadding(0);
+      }
 
       this._colorScale = colorScale;
       this.animator("cells", new Animator.Null());
@@ -43,28 +48,49 @@ export module Plot {
     }
 
     /**
-     * @param {string} attrToSet One of ["x", "y", "fill"]. If "fill" is used,
+     * @param {string} attrToSet One of ["x", "y", "x2", "y2", "fill"]. If "fill" is used,
      * the data should return a valid CSS color.
      */
     public project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>) {
       super.project(attrToSet, accessor, scale);
+
+      if (attrToSet === "x") {
+        if (scale instanceof Scale.Category) {
+          this.project("x1", (d: any, i: number, u: any, m: Plot.PlotMetadata) => {
+            return scale.scale(this._projections["x"].accessor(d, i, u, m)) - scale.rangeBand() / 2;
+          });
+          this.project("x2", (d: any, i: number, u: any, m: Plot.PlotMetadata) => {
+            return scale.scale(this._projections["x"].accessor(d, i, u, m)) + scale.rangeBand() / 2;
+          });
+        }
+        if (scale instanceof Scale.AbstractQuantitative) {
+          this.project("x1", (d: any, i: number, u: any, m: Plot.PlotMetadata) => {
+            return scale.scale(this._projections["x"].accessor(d, i, u, m));
+          });
+        }
+      }
+
+      if (attrToSet === "y") {
+        if (scale instanceof Scale.Category) {
+          this.project("y1", (d: any, i: number, u: any, m: Plot.PlotMetadata) => {
+            return scale.scale(this._projections["y"].accessor(d, i, u, m)) - scale.rangeBand() / 2;
+          });
+          this.project("y2", (d: any, i: number, u: any, m: Plot.PlotMetadata) => {
+            return scale.scale(this._projections["y"].accessor(d, i, u, m)) + scale.rangeBand() / 2;
+          });
+        }
+        if (scale instanceof Scale.AbstractQuantitative) {
+          this.project("y1", (d: any, i: number, u: any, m: Plot.PlotMetadata) => {
+            return scale.scale(this._projections["y"].accessor(d, i, u, m));
+          });
+        }
+      }
+
       if (attrToSet === "fill") {
         this._colorScale = this._projections["fill"].scale;
       }
-      return this;
-    }
 
-    protected _generateAttrToProjector() {
-      var attrToProjector = super._generateAttrToProjector();
-      var xStep = (<Scale.Category> this._xScale).rangeBand();
-      var yStep = (<Scale.Category> this._yScale).rangeBand();
-      attrToProjector["width"]  = () => xStep;
-      attrToProjector["height"] = () => yStep;
-      var xAttr = attrToProjector["x"];
-      var yAttr = attrToProjector["y"];
-      attrToProjector["x"] = (d, i, u, m) => xAttr(d, i, u, m) - xStep / 2;
-      attrToProjector["y"] = (d, i, u, m) => yAttr(d, i, u, m) - yStep / 2;
-      return attrToProjector;
+      return this;
     }
 
     protected _generateDrawSteps(): _Drawer.DrawStep[] {
