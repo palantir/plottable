@@ -178,6 +178,27 @@ function triggerFakeMouseEvent(type: string, target: D3.Selection, relativeX: nu
   target.node().dispatchEvent(e);
 }
 
+interface WheelEvent {
+    new(eventType: string, init: any): WheelEvent;
+};
+
+function triggerFakeWheelEvent(type: string, target: D3.Selection, relativeX: number, relativeY: number, deltaY: number) {
+  var clientRect = target.node().getBoundingClientRect();
+  var xPos = clientRect.left + relativeX;
+  var yPos = clientRect.top + relativeY;
+  var event: WheelEvent;
+  // Use the WheelEvent Constructor semantics if possible
+  if (typeof WheelEvent === "function") {
+    // HACKHACK anycasting constructor to allow for the dictionary argument
+    // https://github.com/Microsoft/TypeScript/issues/2416
+    event = new (<any> WheelEvent)("wheel", { bubbles: true, clientX: xPos, clientY: yPos, deltaY: deltaY });
+  } else {
+    event = document.createEvent("WheelEvent");
+    event.initWheelEvent("wheel", true, true, window, 1, xPos, yPos, xPos, yPos, 0, null, null, 0, deltaY, 0, 0);
+  }
+  target.node().dispatchEvent(event);
+}
+
 function triggerFakeTouchEvent(type: string, target: D3.Selection, relativeX: number, relativeY: number) {
   var targetNode = target.node();
   var clientRect = targetNode.getBoundingClientRect();

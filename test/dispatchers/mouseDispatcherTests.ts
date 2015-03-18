@@ -192,5 +192,44 @@ describe("Dispatchers", () => {
       md.onMouseUp(keyString, null);
       target.remove();
     });
+
+    it("onWheel()", () => {
+      // HACKHACK PhantomJS doesn't implement fake creation of WheelEvents
+      // https://github.com/ariya/phantomjs/issues/11289
+      if (window.PHANTOMJS) {
+        return;
+      }
+      var targetWidth = 400, targetHeight = 400;
+      var svg = generateSVG(targetWidth, targetHeight);
+      // HACKHACK: PhantomJS can't measure SVGs unless they have something in them occupying space
+      svg.append("rect").attr("width", targetWidth).attr("height", targetHeight);
+
+      var targetX = 17;
+      var targetY = 76;
+      var expectedPoint = {
+        x: targetX,
+        y: targetY
+      };
+      var targetDeltaY = 10;
+
+      var md = Plottable.Dispatcher.Mouse.getDispatcher(<SVGElement> svg.node());
+
+      var callbackWasCalled = false;
+      var callback = (deltaY: number, p: Plottable.Point, e: WheelEvent) => {
+        callbackWasCalled = true;
+        assert.strictEqual(deltaY, targetDeltaY, "deltaY value was passed to callback");
+        assertPointsClose(p, expectedPoint, 0.5, "mouse position is correct");
+        assert.isNotNull(e, "mouse event was passed to the callback");
+      };
+
+      var keyString = "unit test";
+      md.onWheel(keyString, callback);
+
+      triggerFakeWheelEvent("wheel", svg, targetX, targetY, targetDeltaY);
+      assert.isTrue(callbackWasCalled, "callback was called on wheel");
+
+      md.onWheel(keyString, null);
+      svg.remove();
+    });
   });
 });

@@ -149,6 +149,24 @@ function triggerFakeMouseEvent(type, target, relativeX, relativeY) {
     e.initMouseEvent(type, true, true, window, 1, xPos, yPos, xPos, yPos, false, false, false, false, 1, null);
     target.node().dispatchEvent(e);
 }
+;
+function triggerFakeWheelEvent(type, target, relativeX, relativeY, deltaY) {
+    var clientRect = target.node().getBoundingClientRect();
+    var xPos = clientRect.left + relativeX;
+    var yPos = clientRect.top + relativeY;
+    var event;
+    // Use the WheelEvent Constructor semantics if possible
+    if (typeof WheelEvent === "function") {
+        // HACKHACK anycasting constructor to allow for the dictionary argument
+        // https://github.com/Microsoft/TypeScript/issues/2416
+        event = new WheelEvent("wheel", { bubbles: true, clientX: xPos, clientY: yPos, deltaY: deltaY });
+    }
+    else {
+        event = document.createEvent("WheelEvent");
+        event.initWheelEvent("wheel", true, true, window, 1, xPos, yPos, xPos, yPos, 0, null, null, 0, deltaY, 0, 0);
+    }
+    target.node().dispatchEvent(event);
+}
 function triggerFakeTouchEvent(type, target, relativeX, relativeY) {
     var targetNode = target.node();
     var clientRect = targetNode.getBoundingClientRect();
@@ -8008,6 +8026,38 @@ describe("Dispatchers", function () {
             assert.isTrue(callbackWasCalled, "callback was called on mouseup");
             md.onMouseUp(keyString, null);
             target.remove();
+        });
+        it("onWheel()", function () {
+            // HACKHACK PhantomJS doesn't implement fake creation of WheelEvents
+            // https://github.com/ariya/phantomjs/issues/11289
+            if (window.PHANTOMJS) {
+                return;
+            }
+            var targetWidth = 400, targetHeight = 400;
+            var svg = generateSVG(targetWidth, targetHeight);
+            // HACKHACK: PhantomJS can't measure SVGs unless they have something in them occupying space
+            svg.append("rect").attr("width", targetWidth).attr("height", targetHeight);
+            var targetX = 17;
+            var targetY = 76;
+            var expectedPoint = {
+                x: targetX,
+                y: targetY
+            };
+            var targetDeltaY = 10;
+            var md = Plottable.Dispatcher.Mouse.getDispatcher(svg.node());
+            var callbackWasCalled = false;
+            var callback = function (deltaY, p, e) {
+                callbackWasCalled = true;
+                assert.strictEqual(deltaY, targetDeltaY, "deltaY value was passed to callback");
+                assertPointsClose(p, expectedPoint, 0.5, "mouse position is correct");
+                assert.isNotNull(e, "mouse event was passed to the callback");
+            };
+            var keyString = "unit test";
+            md.onWheel(keyString, callback);
+            triggerFakeWheelEvent("wheel", svg, targetX, targetY, targetDeltaY);
+            assert.isTrue(callbackWasCalled, "callback was called on wheel");
+            md.onWheel(keyString, null);
+            svg.remove();
         });
     });
 });
