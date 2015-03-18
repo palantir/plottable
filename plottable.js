@@ -8884,7 +8884,7 @@ var Plottable;
                 this._processUpCallback = function (e) { return _this._measureAndBroadcast(e, _this._upBroadcaster); };
                 this._event2Callback["mouseup"] = this._processUpCallback;
                 this._wheelBroadcaster = new Plottable.Core.Broadcaster(this);
-                this._processWheelCallback = function (e) { return _this._measureAndBroadcast(e, _this._wheelBroadcaster, [e.deltaY]); };
+                this._processWheelCallback = function (e) { return _this._measureAndBroadcast(e, _this._wheelBroadcaster, [Mouse._deltaYInPixels(e)]); };
                 this._event2Callback["wheel"] = this._processWheelCallback;
                 this._broadcasters = [this._moveBroadcaster, this._downBroadcaster, this._upBroadcaster, this._wheelBroadcaster];
             }
@@ -8904,8 +8904,16 @@ var Plottable;
                 }
                 return dispatcher;
             };
+            Mouse._deltaYInPixels = function (e) {
+                if (e.deltaMode === 0) {
+                    return e.deltaY;
+                }
+                else {
+                    return e.deltaY * Mouse._PIXELS_PER_LINE;
+                }
+            };
             Mouse.prototype._getWrappedCallback = function (callback) {
-                return function (md, p, e) { return callback(p, e); };
+                return function (md, p, e, wheelDelta) { return callback(p, e, wheelDelta); };
             };
             /**
              * Registers a callback to be called whenever the mouse position changes,
@@ -8988,6 +8996,7 @@ var Plottable;
                 return this._lastMousePosition;
             };
             Mouse._DISPATCHER_KEY = "__Plottable_Dispatcher_Mouse";
+            Mouse._PIXELS_PER_LINE = 40;
             return Mouse;
         })(Dispatcher.AbstractDispatcher);
         Dispatcher.Mouse = Mouse;

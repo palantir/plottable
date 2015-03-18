@@ -7,6 +7,7 @@ export module Dispatcher {
 
   export class Mouse extends AbstractDispatcher {
     private static _DISPATCHER_KEY = "__Plottable_Dispatcher_Mouse";
+    private static _PIXELS_PER_LINE = 40;
     private translator: _Util.ClientToSVGTranslator;
     private _lastMousePosition: Point;
     private _moveBroadcaster: Core.Broadcaster<Dispatcher.Mouse>;
@@ -64,14 +65,22 @@ export module Dispatcher {
       this._event2Callback["mouseup"] = this._processUpCallback;
 
       this._wheelBroadcaster = new Core.Broadcaster(this);
-      this._processWheelCallback = (e: WheelEvent) => this._measureAndBroadcast(e, this._wheelBroadcaster, [e.deltaY]);
+      this._processWheelCallback = (e: WheelEvent) => this._measureAndBroadcast(e, this._wheelBroadcaster, [Mouse._deltaYInPixels(e)]);
       this._event2Callback["wheel"] = this._processWheelCallback;
 
       this._broadcasters = [this._moveBroadcaster, this._downBroadcaster, this._upBroadcaster, this._wheelBroadcaster];
     }
 
+    private static _deltaYInPixels(e: WheelEvent): number {
+      if (e.deltaMode === 0) {
+        return e.deltaY;
+      } else {
+        return e.deltaY * Mouse._PIXELS_PER_LINE;
+      }
+    }
+
     protected _getWrappedCallback(callback: Function): Core.BroadcasterCallback<Dispatcher.Mouse> {
-      return (md: Dispatcher.Mouse, p: Point, e: MouseEvent) => callback(p, e);
+      return (md: Dispatcher.Mouse, p: Point, e: MouseEvent, wheelDelta: number) => callback(p, e, wheelDelta);
     }
 
     /**
