@@ -8883,10 +8883,10 @@ var Plottable;
                 this._upBroadcaster = new Plottable.Core.Broadcaster(this);
                 this._processUpCallback = function (e) { return _this._measureAndBroadcast(e, _this._upBroadcaster); };
                 this._event2Callback["mouseup"] = this._processUpCallback;
-                this._wheelBraodcaster = new Plottable.Core.Broadcaster(this);
-                this._processWheelCallback = function (e) { return _this._measureAndBroadcast(e, _this._wheelBraodcaster, [e.deltaY]); };
+                this._wheelBroadcaster = new Plottable.Core.Broadcaster(this);
+                this._processWheelCallback = function (e) { return _this._measureAndBroadcast(e, _this._wheelBroadcaster, [e.deltaY]); };
                 this._event2Callback["wheel"] = this._processWheelCallback;
-                this._broadcasters = [this._moveBroadcaster, this._downBroadcaster, this._upBroadcaster, this._wheelBraodcaster];
+                this._broadcasters = [this._moveBroadcaster, this._downBroadcaster, this._upBroadcaster, this._wheelBroadcaster];
             }
             /**
              * Get a Dispatcher.Mouse for the <svg> containing elem. If one already exists
