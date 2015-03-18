@@ -226,6 +226,25 @@ describe("Plots", () => {
 
     });
 
+    describe("getClosestPlotData()",() => {
+
+      it("retrieves correct data",() => {
+        var dataset3 = [
+          { foo: 0, bar: 1 },
+          { foo: 1, bar: 0.95 }
+        ];
+        linePlot.addDataset("d3", dataset3);
+
+        var lineData = linePlot.getClosestPlotData({x: 490, y: 300});
+        //HACKHACK selection count mirrors datum count
+        assert.strictEqual(lineData.selection.size() / dataset3.length, 1, "only 1 line retreieved");
+        assert.strictEqual(lineData.data[0], dataset3[1], "correct datum retrieved");
+
+        svg.remove();
+      });
+
+    });
+
     it("retains original classes when class is projected", () => {
       var newClassProjector = () => "pink";
       linePlot.project("class", newClassProjector);
