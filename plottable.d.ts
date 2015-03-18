@@ -3490,7 +3490,7 @@ declare module Plottable {
 declare module Plottable {
     module Dispatcher {
         type MouseCallback = (p: Point, e: MouseEvent) => any;
-        type WheelCallback = (p: Point, deltaY: number, e: MouseEvent) => any;
+        type WheelCallback = (deltaY: number, p: Point, e: MouseEvent) => any;
         class Mouse extends AbstractDispatcher {
             /**
              * Get a Dispatcher.Mouse for the <svg> containing elem. If one already exists

@@ -3,7 +3,7 @@
 module Plottable {
 export module Dispatcher {
   export type MouseCallback = (p: Point, e: MouseEvent) => any;
-  export type WheelCallback = (p: Point, deltaY: number, e: MouseEvent) => any;
+  export type WheelCallback = (deltaY: number, p: Point, e: MouseEvent) => any;
 
   export class Mouse extends AbstractDispatcher {
     private static _DISPATCHER_KEY = "__Plottable_Dispatcher_Mouse";
@@ -147,7 +147,7 @@ export module Dispatcher {
       var newMousePosition = this.translator.computePosition(e.clientX, e.clientY);
       if (newMousePosition != null) {
         this._lastMousePosition = newMousePosition;
-        var broadcastArgList = [this.getLastMousePosition()].concat(otherBroadcastData).concat(e);
+        var broadcastArgList = otherBroadcastData.concat(this.getLastMousePosition(), e);
         b.broadcast.apply(b, broadcastArgList);
       }
     }
