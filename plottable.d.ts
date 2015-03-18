@@ -3291,7 +3291,6 @@ declare module Plottable {
 declare module Plottable {
     module Plot {
         class ErrorBar<X> extends AbstractXYPlot<X, number> {
-            protected _isVertical: boolean;
             /**
              * Constructs an ErrorBarPlot.
              *
@@ -3299,11 +3298,10 @@ declare module Plottable {
              * They are intended to be merged on top of other sorts of plots.
              *
              * @constructor
-             * @param {QuantitativeScale} xScale The x scale to use.
-             * @param {QuantitativeScale} yScale The y scale to use.
+             * @param {AbstractScale} xScale The x scale to use.
+             * @param {AbstractScale} yScale The y scale to use.
              */
-            constructor(xScale: Scale.AbstractQuantitative<X>, yScale: Scale.AbstractQuantitative<number>, isVertical?: boolean);
-            project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): ErrorBar<X>;
+            constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<X, number>, isVertical?: boolean);
             protected _getDrawer(key: string): _Drawer.ErrorBar;
             protected _generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;

@@ -2,7 +2,7 @@ module Plottable {
 export module Plot {
   export class ErrorBar<X> extends AbstractXYPlot<X,number> {
 
-    protected _isVertical: boolean;
+    private _isVertical: boolean;
     private _defaultStrokeColor: string;
 
     /**
@@ -12,19 +12,14 @@ export module Plot {
      * They are intended to be merged on top of other sorts of plots.
      *
      * @constructor
-     * @param {QuantitativeScale} xScale The x scale to use.
-     * @param {QuantitativeScale} yScale The y scale to use.
+     * @param {AbstractScale} xScale The x scale to use.
+     * @param {AbstractScale} yScale The y scale to use.
      */
-    constructor(xScale: Scale.AbstractQuantitative<X>, yScale: Scale.AbstractQuantitative<number>, isVertical = true) {
+    constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<X, number>, isVertical = true) {
       super(xScale, yScale);
       this.classed("error-plot", true);
       this._defaultStrokeColor = new Scale.Color().range()[1];
       this._isVertical = isVertical;
-    }
-
-    public project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>) {
-      super.project(attrToSet, accessor, scale);
-      return this;
     }
 
     protected _getDrawer(key: string) {

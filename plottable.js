@@ -8633,8 +8633,8 @@ var Plottable;
              * They are intended to be merged on top of other sorts of plots.
              *
              * @constructor
-             * @param {QuantitativeScale} xScale The x scale to use.
-             * @param {QuantitativeScale} yScale The y scale to use.
+             * @param {AbstractScale} xScale The x scale to use.
+             * @param {AbstractScale} yScale The y scale to use.
              */
             function ErrorBar(xScale, yScale, isVertical) {
                 if (isVertical === void 0) { isVertical = true; }
@@ -8643,10 +8643,6 @@ var Plottable;
                 this._defaultStrokeColor = new Plottable.Scale.Color().range()[1];
                 this._isVertical = isVertical;
             }
-            ErrorBar.prototype.project = function (attrToSet, accessor, scale) {
-                _super.prototype.project.call(this, attrToSet, accessor, scale);
-                return this;
-            };
             ErrorBar.prototype._getDrawer = function (key) {
                 return new Plottable._Drawer.ErrorBar(key, this._isVertical);
             };
