@@ -1,10 +1,10 @@
 function makeData() {
   "use strict";
-  return [{team: "Tigers", x1: "4/1/1901", x2: "8/1/2015", 
+  return [{team: "Detroit Tigers", x1: "4/1/1901", x2: "8/1/2015", 
                  y1: 0, y2: 1, 
                  fill: "#DE4406", stroke: "#001742"},
                 
-                {team: "Wolverines", x1: "4/1/1881", x2: "8/1/1888", 
+                {team: "Detroit Wolverines", x1: "4/1/1881", x2: "8/1/1888", 
                  y1: 1, y2: 2, 
                  fill: "#f5f5dc", stroke: "#CF0032"},
                 
