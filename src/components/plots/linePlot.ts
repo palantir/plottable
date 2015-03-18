@@ -96,7 +96,7 @@ export module Plot {
     }
 
     protected _getClosestPlotData(queryPoint: Point, datasetKeys: string[], withinValue = Infinity) {
-      var closestDistance = withinValue;
+      var closestDistanceSquared = withinValue;
       var closestDatum: any;
       var closestSelection: D3.Selection;
       var closestPoint: Point;
@@ -105,8 +105,8 @@ export module Plot {
         var plotData = this.getAllPlotData(datasetKey);
         plotData.pixelPoints.forEach((pixelPoint: Point, index: number) => {
           var pixelPointDist = _Util.Methods.distanceSquared(queryPoint, pixelPoint);
-          if (pixelPointDist < closestDistance) {
-            closestDistance = pixelPointDist;
+          if (pixelPointDist < closestDistanceSquared) {
+            closestDistanceSquared = pixelPointDist;
             closestDatum = plotData.data[index];
             closestPoint = pixelPoint;
             closestSelection = plotData.selection;

@@ -533,13 +533,13 @@ export module Plot {
     }
 
     protected _getClosestPlotData(queryPoint: Point, datasetKeys: string[], withinValue = Infinity) {
-      var closestDistance = withinValue;
+      var closestDistanceSquared = Math.pow(withinValue, 2);
       var closestIndex: number;
       var plotData = this.getAllPlotData(datasetKeys);
       plotData.pixelPoints.forEach((pixelPoint: Point, index: number) => {
         var distance = _Util.Methods.distanceSquared(pixelPoint, queryPoint);
-        if (distance < closestDistance) {
-          closestDistance = distance;
+        if (distance < closestDistanceSquared) {
+          closestDistanceSquared = distance;
           closestIndex = index;
         }
       });

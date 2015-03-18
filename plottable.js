@@ -6837,13 +6837,13 @@ var Plottable;
             };
             AbstractPlot.prototype._getClosestPlotData = function (queryPoint, datasetKeys, withinValue) {
                 if (withinValue === void 0) { withinValue = Infinity; }
-                var closestDistance = withinValue;
+                var closestDistanceSquared = Math.pow(withinValue, 2);
                 var closestIndex;
                 var plotData = this.getAllPlotData(datasetKeys);
                 plotData.pixelPoints.forEach(function (pixelPoint, index) {
                     var distance = Plottable._Util.Methods.distanceSquared(pixelPoint, queryPoint);
-                    if (distance < closestDistance) {
-                        closestDistance = distance;
+                    if (distance < closestDistanceSquared) {
+                        closestDistanceSquared = distance;
                         closestIndex = index;
                     }
                 });
@@ -7911,7 +7911,7 @@ var Plottable;
             Line.prototype._getClosestPlotData = function (queryPoint, datasetKeys, withinValue) {
                 var _this = this;
                 if (withinValue === void 0) { withinValue = Infinity; }
-                var closestDistance = withinValue;
+                var closestDistanceSquared = withinValue;
                 var closestDatum;
                 var closestSelection;
                 var closestPoint;
@@ -7919,8 +7919,8 @@ var Plottable;
                     var plotData = _this.getAllPlotData(datasetKey);
                     plotData.pixelPoints.forEach(function (pixelPoint, index) {
                         var pixelPointDist = Plottable._Util.Methods.distanceSquared(queryPoint, pixelPoint);
-                        if (pixelPointDist < closestDistance) {
-                            closestDistance = pixelPointDist;
+                        if (pixelPointDist < closestDistanceSquared) {
+                            closestDistanceSquared = pixelPointDist;
                             closestDatum = plotData.data[index];
                             closestPoint = pixelPoint;
                             closestSelection = plotData.selection;
