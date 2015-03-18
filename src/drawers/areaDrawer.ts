@@ -39,10 +39,10 @@ export module _Drawer {
       }
     }
 
-    private _createArea(xFunction: _AppliedProjector,
-                       y0Function: _AppliedProjector,
-                       y1Function: _AppliedProjector,
-                       definedFunction: _AppliedProjector) {
+    private _createArea(xFunction: AppliedProjector,
+                       y0Function: AppliedProjector,
+                       y1Function: AppliedProjector,
+                       definedFunction: AppliedProjector) {
       if(!definedFunction) {
         definedFunction = () => true;
       }
@@ -61,7 +61,7 @@ export module _Drawer {
         // HACKHACK Forced to use anycast to access protected var
         (<any> AbstractDrawer).prototype._drawStep.call(this, step);
       }
-      var attrToProjector = <_AttributeToAppliedProjector>_Util.Methods.copyMap(step.attrToProjector);
+      var attrToProjector = <AttributeToAppliedProjector>_Util.Methods.copyMap(step.attrToProjector);
       var xFunction       = attrToProjector["x"];
       var y0Function      = attrToProjector["y0"];
       var y1Function      = attrToProjector["y"];

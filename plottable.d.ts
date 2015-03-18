@@ -409,6 +409,36 @@ declare module Plottable {
 
 
 declare module Plottable {
+    /**
+     * A SymbolGenerator is a function that takes in a datum and the index of the datum to
+     * produce an svg path string analogous to the datum/index pair.
+     *
+     * Note that SymbolGenerators used in Plottable will be assumed to work within a 100x100 square
+     * to be scaled appropriately for use within Plottable
+     */
+    type SymbolGenerator = (datum: any, index: number) => string;
+    module SymbolGenerators {
+        /**
+         * The radius that symbol generators will be assumed to have for their symbols.
+         */
+        var SYMBOL_GENERATOR_RADIUS: number;
+        type StringAccessor = ((datum: any, index: number) => string);
+        /**
+         * A wrapper for D3's symbol generator as documented here:
+         * https://github.com/mbostock/d3/wiki/SVG-Shapes#symbol
+         *
+         * Note that since D3 symbols compute the path strings by knowing how much area it can take up instead of
+         * knowing its dimensions, the total area expected may be off by some constant factor.
+         *
+         * @param {string | ((datum: any, index: number) => string)} symbolType Accessor for the d3 symbol type
+         * @returns {SymbolGenerator} the symbol generator for a D3 symbol
+         */
+        function d3Symbol(symbolType: string | StringAccessor): D3.Svg.Symbol;
+    }
+}
+
+
+declare module Plottable {
     module _Util {
         class ClientToSVGTranslator {
             static getTranslator(elem: SVGElement): ClientToSVGTranslator;
@@ -686,7 +716,7 @@ declare module Plottable {
     /**
      * Projector with applied user and plot metadata
      */
-    type _AppliedProjector = (datum: any, index: number) => any;
+    type AppliedProjector = (datum: any, index: number) => any;
     /**
      * Defines a way how specific attribute needs be retrieved before rendering.
      */
@@ -706,8 +736,8 @@ declare module Plottable {
     type AttributeToProjector = {
         [attrToSet: string]: _Projector;
     };
-    type _AttributeToAppliedProjector = {
-        [attrToSet: string]: _AppliedProjector;
+    type AttributeToAppliedProjector = {
+        [attrToSet: string]: AppliedProjector;
     };
     /**
      * A simple bounding box.
@@ -1431,13 +1461,13 @@ declare module Plottable {
             animator: Animator.PlotAnimator;
         };
         type AppliedDrawStep = {
-            attrToProjector: _AttributeToAppliedProjector;
+            attrToProjector: AttributeToAppliedProjector;
             animator: Animator.PlotAnimator;
         };
         class AbstractDrawer {
             protected _className: string;
             key: string;
-            protected _attrToProjector: _AttributeToAppliedProjector;
+            protected _attrToProjector: AttributeToAppliedProjector;
             /**
              * Sets the class, which needs to be applied to bound elements.
              *
@@ -1551,16 +1581,6 @@ declare module Plottable {
 
 declare module Plottable {
     module _Drawer {
-        class Circle extends Element {
-            constructor(key: string);
-            _getPixelPoint(datum: any, index: number): Point;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module _Drawer {
         class Rect extends Element {
             constructor(key: string, isVertical: boolean);
             setup(area: D3.Selection): void;
@@ -1579,6 +1599,18 @@ declare module Plottable {
             constructor(key: string);
             _drawStep(step: AppliedDrawStep): void;
             draw(data: any[], drawSteps: DrawStep[], userMetadata: any, plotMetadata: Plot.PlotMetadata): number;
+            _getPixelPoint(datum: any, index: number): Point;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module _Drawer {
+        class Symbol extends AbstractDrawer {
+            protected _enterData(data: any[]): void;
+            protected _drawStep(step: AppliedDrawStep): void;
+            _getSelector(): string;
             _getPixelPoint(datum: any, index: number): Point;
         }
     }
@@ -1767,21 +1799,30 @@ declare module Plottable {
              */
             originToSVG(): Point;
             /**
-             * Returns the foreground selection for the component
-             * (A selection covering the front of the component)
+             * Returns the foreground selection for the Component
+             * (A selection covering the front of the Component)
              *
-             * Will return undefined if the component has not been anchored
+             * Will return undefined if the Component has not been anchored.
              *
-             * @return {D3.Selection} foreground selection for the component
+             * @return {D3.Selection} foreground selection for the Component
              */
             foreground(): D3.Selection;
             /**
-             * Returns the background selection for the component
-             * (A selection appearing behind of the component)
+             * Returns the content selection for the Component
+             * (A selection containing the visual elements of the Component)
              *
-             * Will return undefined if the component has not been anchored
+             * Will return undefined if the Component has not been anchored.
              *
-             * @return {D3.Selection} background selection for the component
+             * @return {D3.Selection} content selection for the Component
+             */
+            content(): D3.Selection;
+            /**
+             * Returns the background selection for the Component
+             * (A selection appearing behind of the Component)
+             *
+             * Will return undefined if the Component has not been anchored.
+             *
+             * @return {D3.Selection} background selection for the Component
              */
             background(): D3.Selection;
             /**
@@ -2298,6 +2339,10 @@ declare module Plottable {
              */
             static LEGEND_ENTRY_CLASS: string;
             /**
+             * The css class applied to each legend symbol
+             */
+            static LEGEND_SYMBOL_CLASS: string;
+            /**
              * Creates a Legend.
              *
              * The legend consists of a series of legend entries, each with a color and label taken from the `colorScale`.
@@ -2355,6 +2400,19 @@ declare module Plottable {
              */
             getEntry(position: Point): D3.Selection;
             _doRender(): void;
+            /**
+             * Gets the SymbolGenerator of the legend, which dictates how
+             * the symbol in each entry is drawn.
+             *
+             * @returns {SymbolGenerator} The SymbolGenerator of the legend
+             */
+            symbolGenerator(): SymbolGenerator;
+            /**
+             * Sets the SymbolGenerator of the legend
+             *
+             * @returns {Legend} The calling Legend
+             */
+            symbolGenerator(symbolGenerator: SymbolGenerator): Legend;
         }
     }
 }
@@ -2621,6 +2679,16 @@ declare module Plottable {
              */
             project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): AbstractPlot;
             protected _generateAttrToProjector(): AttributeToProjector;
+            /**
+             * Generates a dictionary mapping an attribute to a function that calculate that attribute's value
+             * in accordance with the given datasetKey.
+             *
+             * Note that this will return all of the data attributes, which may not perfectly align to svg attributes
+             *
+             * @param {datasetKey} the key of the dataset to generate the dictionary for
+             * @returns {AttributeToAppliedProjector} A dictionary mapping attributes to functions
+             */
+            generateProjectors(datasetKey: string): AttributeToAppliedProjector;
             _doRender(): void;
             /**
              * Enables or disables animation.
@@ -2696,6 +2764,14 @@ declare module Plottable {
              * @returns {D3.Selection} The retrieved selections.
              */
             getAllSelections(datasetKeys?: string | string[], exclude?: boolean): D3.Selection;
+            /**
+             * Retrieves all of the PlotData of this plot for the specified dataset(s)
+             *
+             * @param {string | string[]} datasetKeys The dataset(s) to retrieve the selections from.
+             * If not provided, all selections will be retrieved.
+             * @returns {PlotData} The retrieved PlotData.
+             */
+            getAllPlotData(datasetKeys?: string | string[]): PlotData;
         }
     }
 }
@@ -2714,6 +2790,7 @@ declare module Plottable {
             addDataset(keyOrDataset: any, dataset?: any): Pie;
             protected _generateAttrToProjector(): AttributeToProjector;
             protected _getDrawer(key: string): _Drawer.AbstractDrawer;
+            getAllPlotData(datasetKeys?: string | string[]): PlotData;
         }
     }
 }
@@ -2795,13 +2872,7 @@ declare module Plottable {
              * @param {Scale} yScale The y scale to use.
              */
             constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<Y, number>);
-            /**
-             * @param {string} attrToSet One of ["x", "y", "cx", "cy", "r",
-             * "fill"]. "cx" and "cy" are aliases for "x" and "y". "r" is the datum's
-             * radius, and "fill" is the CSS color of the datum.
-             */
-            project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): Scatter<X, Y>;
-            protected _getDrawer(key: string): _Drawer.Circle;
+            protected _getDrawer(key: string): _Drawer.Symbol;
             protected _generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
             };

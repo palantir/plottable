@@ -208,6 +208,27 @@ export module Plot {
       return h;
     }
 
+    /**
+     * Generates a dictionary mapping an attribute to a function that calculate that attribute's value
+     * in accordance with the given datasetKey.
+     *
+     * Note that this will return all of the data attributes, which may not perfectly align to svg attributes
+     *
+     * @param {datasetKey} the key of the dataset to generate the dictionary for
+     * @returns {AttributeToAppliedProjector} A dictionary mapping attributes to functions
+     */
+    public generateProjectors(datasetKey: string): AttributeToAppliedProjector {
+      var attrToProjector = this._generateAttrToProjector();
+      var plotDatasetKey = this._key2PlotDatasetKey.get(datasetKey);
+      var plotMetadata = plotDatasetKey.plotMetadata;
+      var userMetadata = plotDatasetKey.dataset.metadata();
+      var attrToAppliedProjector: AttributeToAppliedProjector = {};
+      d3.entries(attrToProjector).forEach((keyValue: any) => {
+        attrToAppliedProjector[keyValue.key] = (datum: any, index: number) => keyValue.value(datum, index, userMetadata, plotMetadata);
+      });
+      return attrToAppliedProjector;
+    }
+
     public _doRender() {
       if (this._isAnchored) {
         this._paint();
@@ -430,11 +451,9 @@ export module Plot {
      * in the previous datasetKeys argument (default = false).
      * @returns {D3.Selection} The retrieved selections.
      */
-    public getAllSelections(datasetKeys?: string | string[], exclude = false): D3.Selection {
+    public getAllSelections(datasetKeys: string | string[] = this.datasetOrder(), exclude = false): D3.Selection {
       var datasetKeyArray: string[] = [];
-      if (datasetKeys == null) {
-        datasetKeyArray = this.datasetOrder();
-      } else if (typeof(datasetKeys) === "string") {
+      if (typeof(datasetKeys) === "string") {
         datasetKeyArray = [<string> datasetKeys];
       } else {
         datasetKeyArray = <string[]> datasetKeys;
@@ -457,6 +476,39 @@ export module Plot {
       });
 
       return d3.selectAll(allSelections);
+    }
+
+    /**
+     * Retrieves all of the PlotData of this plot for the specified dataset(s)
+     *
+     * @param {string | string[]} datasetKeys The dataset(s) to retrieve the selections from.
+     * If not provided, all selections will be retrieved.
+     * @returns {PlotData} The retrieved PlotData.
+     */
+    public getAllPlotData(datasetKeys: string | string[] = this.datasetOrder()): PlotData {
+      var datasetKeyArray: string[] = [];
+      if (typeof(datasetKeys) === "string") {
+        datasetKeyArray = [<string> datasetKeys];
+      } else {
+        datasetKeyArray = <string[]> datasetKeys;
+      }
+
+      var data: any[] = [];
+      var pixelPoints: Point[] = [];
+      var allElements: EventTarget[] = [];
+
+      datasetKeyArray.forEach((datasetKey) => {
+        var plotDatasetKey = this._key2PlotDatasetKey.get(datasetKey);
+        if (plotDatasetKey == null) { return; }
+        var drawer = plotDatasetKey.drawer;
+        plotDatasetKey.dataset.data().forEach((datum: any, index: number) => {
+          data.push(datum);
+          pixelPoints.push(drawer._getPixelPoint(datum, index));
+          allElements.push(drawer._getSelection(index).node());
+        });
+      });
+
+      return { data: data, pixelPoints: pixelPoints, selection: d3.selectAll(allElements) };
     }
   }
 }
