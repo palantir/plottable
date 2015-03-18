@@ -2540,6 +2540,11 @@ declare module Plottable {
         class SelectionBoxLayer extends AbstractComponent {
             constructor();
             protected _setup(): void;
+            /**
+             * Gets the bounds of the box.
+             *
+             * @return {Bounds} The current bounds of the box.
+             */
             bounds(): Bounds;
             /**
              * Sets the bounds of the box, and draws the box.
@@ -2549,10 +2554,11 @@ declare module Plottable {
              */
             bounds(newBounds: Bounds): SelectionBoxLayer;
             _doRender(): void;
+            getEdges(p: Point): String[];
             /**
              * Gets the edge width of the box.
              *
-             * @return {number}
+             * @return {number} The edge width of the box.
              */
             edgeWidth(): number;
             /**

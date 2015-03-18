@@ -6283,7 +6283,7 @@ var Plottable;
                     bottomRight: { x: 0, y: 0 }
                 };
                 this._boxEdgeWidth = 2;
-                this.classed("selection-box", true);
+                this.classed("selection-box-layer", true);
             }
             SelectionBoxLayer.prototype._setup = function () {
                 var _this = this;
@@ -6317,10 +6317,10 @@ var Plottable;
                 return this;
             };
             SelectionBoxLayer.prototype._doRender = function () {
-                var l = this._boxBounds.topLeft.x;
-                var r = this._boxBounds.bottomRight.x;
                 var t = this._boxBounds.topLeft.y;
                 var b = this._boxBounds.bottomRight.y;
+                var l = this._boxBounds.topLeft.x;
+                var r = this._boxBounds.bottomRight.x;
                 this._boxArea.attr({
                     x: l,
                     y: t,
@@ -6357,12 +6357,37 @@ var Plottable;
                 this._boxCornerBR.attr({ cx: r, cy: b });
                 this._content.node().appendChild(this._box.node());
             };
+            SelectionBoxLayer.prototype.getEdges = function (p) {
+                var edges = [];
+                var t = this._boxBounds.topLeft.y;
+                var b = this._boxBounds.bottomRight.y;
+                var l = this._boxBounds.topLeft.x;
+                var r = this._boxBounds.bottomRight.x;
+                var he = this._boxEdgeWidth / 2;
+                if (l - he <= p.x && p.x <= r + he) {
+                    if (t - he <= p.y && p.y <= t + he) {
+                        edges.push("top");
+                    }
+                    if (b - he <= p.y && p.y <= b + he) {
+                        edges.push("bottom");
+                    }
+                }
+                if (t - he <= p.y && p.y <= b + he) {
+                    if (l - he <= p.x && p.x <= l + he) {
+                        edges.push("left");
+                    }
+                    if (r - he <= p.x && p.x <= r + he) {
+                        edges.push("right");
+                    }
+                }
+                return edges;
+            };
             SelectionBoxLayer.prototype.edgeWidth = function (width) {
                 if (width == null) {
                     return this._boxEdgeWidth;
                 }
                 if (width < 0) {
-                    throw new Error("Detection width cannot be negative.");
+                    throw new Error("Edge width cannot be negative.");
                 }
                 this._boxEdgeWidth = width;
                 this._boxEdgeT.style("stroke-width", this._boxEdgeWidth);

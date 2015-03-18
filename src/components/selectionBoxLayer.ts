@@ -22,7 +22,7 @@ export module Component {
 
     constructor() {
       super();
-      this.classed("selection-box", true);
+      this.classed("selection-box-layer", true);
     }
 
     protected _setup() {
@@ -53,6 +53,11 @@ export module Component {
       this._boxCornerBR = createCorner().classed("selection-corner-br", true);
     }
 
+    /**
+     * Gets the bounds of the box.
+     *
+     * @return {Bounds} The current bounds of the box.
+     */
     public bounds(): Bounds;
     /**
      * Sets the bounds of the box, and draws the box.
@@ -65,17 +70,16 @@ export module Component {
       if (newBounds == null) {
         return this._boxBounds;
       }
-
       this._boxBounds = newBounds;
       this._render();
       return this;
     }
 
     public _doRender() {
-      var l = this._boxBounds.topLeft.x;
-      var r = this._boxBounds.bottomRight.x;
       var t = this._boxBounds.topLeft.y;
       var b = this._boxBounds.bottomRight.y;
+      var l = this._boxBounds.topLeft.x;
+      var r = this._boxBounds.bottomRight.x;
 
       this._boxArea.attr({
         x: l, y: t, width: r - l, height: b - t
@@ -102,10 +106,40 @@ export module Component {
       this._content.node().appendChild(this._box.node());
     }
 
+    public getEdges(p: Point): String[] {
+      var edges: String[] = [];
+
+      var t = this._boxBounds.topLeft.y;
+      var b = this._boxBounds.bottomRight.y;
+      var l = this._boxBounds.topLeft.x;
+      var r = this._boxBounds.bottomRight.x;
+      var he = this._boxEdgeWidth / 2;
+
+      if (l - he <= p.x && p.x <= r + he) {
+        if (t - he <= p.y && p.y <= t + he) {
+          edges.push("top");
+        }
+        if (b - he <= p.y && p.y <= b + he) {
+          edges.push("bottom");
+        }
+      }
+
+      if (t - he <= p.y && p.y <= b + he) {
+        if (l - he <= p.x && p.x <= l + he) {
+          edges.push("left");
+        }
+        if (r - he <= p.x && p.x <= r + he) {
+          edges.push("right");
+        }
+      }
+
+      return edges;
+    }
+
     /**
      * Gets the edge width of the box.
      *
-     * @return {number}
+     * @return {number} The edge width of the box.
      */
     public edgeWidth(): number;
     /**
@@ -120,7 +154,7 @@ export module Component {
         return this._boxEdgeWidth;
       }
       if (width < 0) {
-        throw new Error("Detection width cannot be negative.");
+        throw new Error("Edge width cannot be negative.");
       }
       this._boxEdgeWidth = width;
       this._boxEdgeT.style("stroke-width", this._boxEdgeWidth);

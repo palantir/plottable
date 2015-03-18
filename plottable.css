@@ -123,39 +123,39 @@ svg.plottable {
 }
 
 /* SelectionBox */
-.plottable .selection-box .selection-area {
+.plottable .selection-box-layer .selection-area {
   fill: black;
   fill-opacity: 0.03;
   stroke: #CCC;
 }
 
-.plottable .selection-box.x-movable .selection-area {
+.plottable .selection-box-layer.x-movable .selection-area {
   cursor: ew-resize;
 }
-.plottable .selection-box.y-movable .selection-area {
+.plottable .selection-box-layer.y-movable .selection-area {
   cursor: ns-resize;
 }
-.plottable .selection-box.x-movable.y-movable .selection-area {
+.plottable .selection-box-layer.x-movable.y-movable .selection-area {
   cursor: move;
 }
 
-.plottable .selection-box.x-resizable .selection-edge-lr {
+.plottable .selection-box-layer.x-resizable .selection-edge-lr {
   cursor: ew-resize;
 }
-.plottable .selection-box.y-resizable .selection-edge-tb {
+.plottable .selection-box-layer.y-resizable .selection-edge-tb {
   cursor: ns-resize;
 }
 
-.plottable .selection-box.x-resizable.y-resizable .selection-corner-tl {
+.plottable .selection-box-layer.x-resizable.y-resizable .selection-corner-tl {
   cursor: nwse-resize;
 }
-.plottable .selection-box.x-resizable.y-resizable .selection-corner-tr {
+.plottable .selection-box-layer.x-resizable.y-resizable .selection-corner-tr {
   cursor: nesw-resize;
 }
-.plottable .selection-box.x-resizable.y-resizable .selection-corner-bl {
+.plottable .selection-box-layer.x-resizable.y-resizable .selection-corner-bl {
   cursor: nesw-resize;
 }
-.plottable .selection-box.x-resizable.y-resizable .selection-corner-br {
+.plottable .selection-box-layer.x-resizable.y-resizable .selection-corner-br {
   cursor: nwse-resize;
 }
 /* /SelectionBox */
