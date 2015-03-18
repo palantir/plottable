@@ -26,7 +26,7 @@ export module Plot {
       return new Plottable._Drawer.ErrorBar(key, this._isVertical);
     }
 
-  	protected _generateAttrToProjector() {
+    protected _generateAttrToProjector() {
       var attrToProjector = super._generateAttrToProjector();
 
       var xFunction = attrToProjector["x"];
