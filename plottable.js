@@ -6278,6 +6278,7 @@ var Plottable;
             __extends(SelectionBoxLayer, _super);
             function SelectionBoxLayer() {
                 _super.call(this);
+                this._dismissed = true;
                 this._boxBounds = {
                     topLeft: { x: 0, y: 0 },
                     bottomRight: { x: 0, y: 0 }
@@ -6305,23 +6306,27 @@ var Plottable;
                     topLeft: topLeft,
                     bottomRight: bottomRight
                 };
-                this._content.node().appendChild(this._box.node());
+                this._dismissed = false;
                 this._render();
                 return this;
             };
             SelectionBoxLayer.prototype._doRender = function () {
-                var t = this._boxBounds.topLeft.y;
-                var b = this._boxBounds.bottomRight.y;
-                var l = this._boxBounds.topLeft.x;
-                var r = this._boxBounds.bottomRight.x;
-                this._boxArea.attr({
-                    x: l,
-                    y: t,
-                    width: r - l,
-                    height: b - t
-                });
+                if (!this._dismissed) {
+                    var t = this._boxBounds.topLeft.y;
+                    var b = this._boxBounds.bottomRight.y;
+                    var l = this._boxBounds.topLeft.x;
+                    var r = this._boxBounds.bottomRight.x;
+                    this._boxArea.attr({
+                        x: l,
+                        y: t,
+                        width: r - l,
+                        height: b - t
+                    });
+                    this._content.node().appendChild(this._box.node());
+                }
             };
             SelectionBoxLayer.prototype.dismissBox = function () {
+                this._dismissed = true;
                 this._box.remove();
             };
             return SelectionBoxLayer;

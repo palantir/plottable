@@ -1885,7 +1885,6 @@ describe("SelectionBoxLayer", function () {
     it("bounds()", function () {
         var svg = generateSVG();
         var sbl = new Plottable.Component.SelectionBoxLayer();
-        sbl.renderTo(svg);
         var topLeft = {
             x: 100,
             y: 100
@@ -1894,6 +1893,11 @@ describe("SelectionBoxLayer", function () {
             x: 300,
             y: 300
         };
+        assert.doesNotThrow(function () { return sbl.bounds({
+            topLeft: topLeft,
+            bottomRight: bottomRight
+        }); }, Error, "can set bounds before anchoring");
+        sbl.renderTo(svg);
         function assertCorrectRendering(expectedTL, expectedBR, msg) {
             var selectionBox = svg.select(".selection-box");
             var bbox = selectionBox.node().getBBox();
@@ -1902,10 +1906,6 @@ describe("SelectionBoxLayer", function () {
             assert.strictEqual(bbox.width, expectedBR.x - expectedTL.x, msg + " (width)");
             assert.strictEqual(bbox.height, expectedBR.y - expectedTL.y, msg + " (height)");
         }
-        sbl.bounds({
-            topLeft: topLeft,
-            bottomRight: bottomRight
-        });
         assertCorrectRendering(topLeft, bottomRight, "rendered correctly");
         var queriedBounds = sbl.bounds();
         assert.deepEqual(queriedBounds.topLeft, topLeft, "returns correct top-left position");
@@ -1920,7 +1920,7 @@ describe("SelectionBoxLayer", function () {
         assert.deepEqual(queriedBounds.bottomRight, bottomRight, "returns correct bottom-right position");
         svg.remove();
     });
-    it("dismiss()", function () {
+    it("dismissBox()", function () {
         var svg = generateSVG();
         var sbl = new Plottable.Component.SelectionBoxLayer();
         sbl.renderTo(svg);

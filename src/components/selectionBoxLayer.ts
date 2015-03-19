@@ -5,11 +5,11 @@ export module Component {
   export class SelectionBoxLayer extends AbstractComponent {
     private _box: D3.Selection;
     private _boxArea: D3.Selection;
+    private _dismissed = true;
     private _boxBounds: Bounds = {
       topLeft: { x: 0, y: 0 },
       bottomRight: { x: 0, y: 0 }
     };
-
 
     constructor() {
       super();
@@ -54,23 +54,27 @@ export module Component {
         bottomRight: bottomRight
       };
 
-      this._content.node().appendChild(this._box.node());
+      this._dismissed = false;
       this._render();
       return this;
     }
 
     public _doRender() {
-      var t = this._boxBounds.topLeft.y;
-      var b = this._boxBounds.bottomRight.y;
-      var l = this._boxBounds.topLeft.x;
-      var r = this._boxBounds.bottomRight.x;
+      if (!this._dismissed) {
+        var t = this._boxBounds.topLeft.y;
+        var b = this._boxBounds.bottomRight.y;
+        var l = this._boxBounds.topLeft.x;
+        var r = this._boxBounds.bottomRight.x;
 
-      this._boxArea.attr({
-        x: l, y: t, width: r - l, height: b - t
-      });
+        this._boxArea.attr({
+          x: l, y: t, width: r - l, height: b - t
+        });
+        this._content.node().appendChild(this._box.node());
+      }
     }
 
     public dismissBox() {
+      this._dismissed = true;
       this._box.remove();
     }
   }
