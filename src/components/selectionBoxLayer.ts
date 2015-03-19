@@ -86,7 +86,7 @@ export module Component {
      * @return {SelectionBoxLayer} The calling SelectionBoxLayer.
      */
     public boxVisible(show: boolean): SelectionBoxLayer;
-    public boxVisible(show?: boolean) {
+    public boxVisible(show?: boolean): any {
       if (show == null) {
         return this._boxVisible;
       }

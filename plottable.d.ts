@@ -2554,7 +2554,19 @@ declare module Plottable {
              */
             bounds(newBounds: Bounds): SelectionBoxLayer;
             _doRender(): void;
-            showBox(show: boolean): SelectionBoxLayer;
+            /**
+             * Gets whether the box is being shown.
+             *
+             * @return {boolean} Whether the box is showing.
+             */
+            boxVisible(): boolean;
+            /**
+             * Shows or hides the selection box.
+             *
+             * @param {boolean} show Whether or not to show the box.
+             * @return {SelectionBoxLayer} The calling SelectionBoxLayer.
+             */
+            boxVisible(show: boolean): SelectionBoxLayer;
         }
     }
 }
