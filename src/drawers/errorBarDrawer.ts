@@ -8,7 +8,7 @@ export module _Drawer {
     public static ERROR_BAR_LOWER_CLASS = "error-bar-lower";
     public static ERROR_BAR_UPPER_CLASS = "error-bar-upper";
 
-    private _errorTickRadius = 10;
+    private _errorTickLength = 20;
     private _isVertical: boolean;
 
     constructor(key: string, isVertical: boolean) {
@@ -31,26 +31,34 @@ export module _Drawer {
     protected _drawStep(step: AppliedDrawStep) {
       super._drawStep(step);
 
-	    var attrToProjector = <AttributeToAppliedProjector>_Util.Methods.copyMap(step.attrToProjector);
+      var attrToProjector = <AttributeToAppliedProjector>_Util.Methods.copyMap(step.attrToProjector);
 
       var xProjector = attrToProjector["x"];
       var yProjector = attrToProjector["y"];
       var lowerProjector = attrToProjector["lower"];
       var upperProjector = attrToProjector["upper"];
 
+      var halfTickLength = this._errorTickLength / 2;
+
       if (this._isVertical) {
-        var xMinProjector = (d: any, i: number) => xProjector(d, i) - this._errorTickRadius;
-        var xMaxProjector = (d: any, i: number) => xProjector(d, i) + this._errorTickRadius;
+        var xMinProjector = (d: any, i: number) => xProjector(d, i) - halfTickLength;
+        var xMaxProjector = (d: any, i: number) => xProjector(d, i) + halfTickLength;
         this.setProjectorsForLine(ErrorBar.ERROR_BAR_LOWER_CLASS, xMinProjector, lowerProjector, xMaxProjector, lowerProjector);
         this.setProjectorsForLine(ErrorBar.ERROR_BAR_MIDDLE_CLASS, xProjector, lowerProjector, xProjector, upperProjector);
         this.setProjectorsForLine(ErrorBar.ERROR_BAR_UPPER_CLASS, xMinProjector, upperProjector, xMaxProjector, upperProjector);
       } else {
-        var yMinProjector = (d: any, i: number) => yProjector(d, i) - this._errorTickRadius;
-        var yMaxProjector = (d: any, i: number) => yProjector(d, i) + this._errorTickRadius;
+        var yMinProjector = (d: any, i: number) => yProjector(d, i) - halfTickLength;
+        var yMaxProjector = (d: any, i: number) => yProjector(d, i) + halfTickLength;
         this.setProjectorsForLine(ErrorBar.ERROR_BAR_LOWER_CLASS, lowerProjector, yMinProjector, lowerProjector, yMaxProjector);
         this.setProjectorsForLine(ErrorBar.ERROR_BAR_MIDDLE_CLASS, lowerProjector, yProjector, upperProjector, yProjector);
         this.setProjectorsForLine(ErrorBar.ERROR_BAR_UPPER_CLASS, upperProjector, yMinProjector, upperProjector, yMaxProjector);
       }
+
+      delete attrToProjector["x"];
+      delete attrToProjector["y"];
+      delete attrToProjector["lower"];
+      delete attrToProjector["upper"];
+
       return super._drawStep({attrToProjector: attrToProjector, animator: step.animator});
     }
 

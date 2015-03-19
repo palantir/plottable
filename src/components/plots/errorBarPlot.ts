@@ -29,9 +29,6 @@ export module Plot {
     protected _generateAttrToProjector() {
       var attrToProjector = super._generateAttrToProjector();
 
-      var xFunction = attrToProjector["x"];
-      var yFunction = attrToProjector["y"];
-
       attrToProjector["stroke"] = attrToProjector["stroke"] || d3.functor(this._defaultStrokeColor);
       attrToProjector["stroke-width"] = attrToProjector["stroke-width"] || d3.functor("2px");
 

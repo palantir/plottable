@@ -3409,7 +3409,7 @@ var Plottable;
             __extends(ErrorBar, _super);
             function ErrorBar(key, isVertical) {
                 _super.call(this, key);
-                this._errorTickRadius = 10;
+                this._errorTickLength = 20;
                 this.svgElement("g");
                 this._isVertical = isVertical;
             }
@@ -3423,27 +3423,31 @@ var Plottable;
                 errorBars.exit().remove();
             };
             ErrorBar.prototype._drawStep = function (step) {
-                var _this = this;
                 _super.prototype._drawStep.call(this, step);
                 var attrToProjector = Plottable._Util.Methods.copyMap(step.attrToProjector);
                 var xProjector = attrToProjector["x"];
                 var yProjector = attrToProjector["y"];
                 var lowerProjector = attrToProjector["lower"];
                 var upperProjector = attrToProjector["upper"];
+                var halfTickLength = this._errorTickLength / 2;
                 if (this._isVertical) {
-                    var xMinProjector = function (d, i) { return xProjector(d, i) - _this._errorTickRadius; };
-                    var xMaxProjector = function (d, i) { return xProjector(d, i) + _this._errorTickRadius; };
+                    var xMinProjector = function (d, i) { return xProjector(d, i) - halfTickLength; };
+                    var xMaxProjector = function (d, i) { return xProjector(d, i) + halfTickLength; };
                     this.setProjectorsForLine(ErrorBar.ERROR_BAR_LOWER_CLASS, xMinProjector, lowerProjector, xMaxProjector, lowerProjector);
                     this.setProjectorsForLine(ErrorBar.ERROR_BAR_MIDDLE_CLASS, xProjector, lowerProjector, xProjector, upperProjector);
                     this.setProjectorsForLine(ErrorBar.ERROR_BAR_UPPER_CLASS, xMinProjector, upperProjector, xMaxProjector, upperProjector);
                 }
                 else {
-                    var yMinProjector = function (d, i) { return yProjector(d, i) - _this._errorTickRadius; };
-                    var yMaxProjector = function (d, i) { return yProjector(d, i) + _this._errorTickRadius; };
+                    var yMinProjector = function (d, i) { return yProjector(d, i) - halfTickLength; };
+                    var yMaxProjector = function (d, i) { return yProjector(d, i) + halfTickLength; };
                     this.setProjectorsForLine(ErrorBar.ERROR_BAR_LOWER_CLASS, lowerProjector, yMinProjector, lowerProjector, yMaxProjector);
                     this.setProjectorsForLine(ErrorBar.ERROR_BAR_MIDDLE_CLASS, lowerProjector, yProjector, upperProjector, yProjector);
                     this.setProjectorsForLine(ErrorBar.ERROR_BAR_UPPER_CLASS, upperProjector, yMinProjector, upperProjector, yMaxProjector);
                 }
+                delete attrToProjector["x"];
+                delete attrToProjector["y"];
+                delete attrToProjector["lower"];
+                delete attrToProjector["upper"];
                 return _super.prototype._drawStep.call(this, { attrToProjector: attrToProjector, animator: step.animator });
             };
             ErrorBar.prototype.setProjectorsForLine = function (selector, x1Projector, y1Projector, x2Projector, y2Projector) {
@@ -8648,8 +8652,6 @@ var Plottable;
             };
             ErrorBar.prototype._generateAttrToProjector = function () {
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
-                var xFunction = attrToProjector["x"];
-                var yFunction = attrToProjector["y"];
                 attrToProjector["stroke"] = attrToProjector["stroke"] || d3.functor(this._defaultStrokeColor);
                 attrToProjector["stroke-width"] = attrToProjector["stroke-width"] || d3.functor("2px");
                 return attrToProjector;
