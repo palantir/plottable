@@ -3430,19 +3430,17 @@ var Plottable;
                 var lowerProjector = attrToProjector["lower"];
                 var upperProjector = attrToProjector["upper"];
                 var halfTickLength = this._errorTickLength / 2;
+                var minProjector = this._isVertical ? function (d, i) { return xProjector(d, i) - halfTickLength; } : function (d, i) { return yProjector(d, i) - halfTickLength; };
+                var maxProjector = this._isVertical ? function (d, i) { return xProjector(d, i) + halfTickLength; } : function (d, i) { return yProjector(d, i) + halfTickLength; };
                 if (this._isVertical) {
-                    var xMinProjector = function (d, i) { return xProjector(d, i) - halfTickLength; };
-                    var xMaxProjector = function (d, i) { return xProjector(d, i) + halfTickLength; };
-                    this.setProjectorsForLine(ErrorBar.ERROR_BAR_LOWER_CLASS, xMinProjector, lowerProjector, xMaxProjector, lowerProjector);
+                    this.setProjectorsForLine(ErrorBar.ERROR_BAR_LOWER_CLASS, minProjector, lowerProjector, maxProjector, lowerProjector);
                     this.setProjectorsForLine(ErrorBar.ERROR_BAR_MIDDLE_CLASS, xProjector, lowerProjector, xProjector, upperProjector);
-                    this.setProjectorsForLine(ErrorBar.ERROR_BAR_UPPER_CLASS, xMinProjector, upperProjector, xMaxProjector, upperProjector);
+                    this.setProjectorsForLine(ErrorBar.ERROR_BAR_UPPER_CLASS, minProjector, upperProjector, maxProjector, upperProjector);
                 }
                 else {
-                    var yMinProjector = function (d, i) { return yProjector(d, i) - halfTickLength; };
-                    var yMaxProjector = function (d, i) { return yProjector(d, i) + halfTickLength; };
-                    this.setProjectorsForLine(ErrorBar.ERROR_BAR_LOWER_CLASS, lowerProjector, yMinProjector, lowerProjector, yMaxProjector);
+                    this.setProjectorsForLine(ErrorBar.ERROR_BAR_LOWER_CLASS, lowerProjector, minProjector, lowerProjector, maxProjector);
                     this.setProjectorsForLine(ErrorBar.ERROR_BAR_MIDDLE_CLASS, lowerProjector, yProjector, upperProjector, yProjector);
-                    this.setProjectorsForLine(ErrorBar.ERROR_BAR_UPPER_CLASS, upperProjector, yMinProjector, upperProjector, yMaxProjector);
+                    this.setProjectorsForLine(ErrorBar.ERROR_BAR_UPPER_CLASS, upperProjector, minProjector, upperProjector, maxProjector);
                 }
                 delete attrToProjector["x"];
                 delete attrToProjector["y"];
