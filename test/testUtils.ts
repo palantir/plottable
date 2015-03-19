@@ -178,10 +178,6 @@ function triggerFakeMouseEvent(type: string, target: D3.Selection, relativeX: nu
   target.node().dispatchEvent(e);
 }
 
-interface WheelEvent {
-    new(eventType: string, init: any): WheelEvent;
-};
-
 function triggerFakeWheelEvent(type: string, target: D3.Selection, relativeX: number, relativeY: number, deltaY: number) {
   var clientRect = target.node().getBoundingClientRect();
   var xPos = clientRect.left + relativeX;

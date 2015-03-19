@@ -149,7 +149,6 @@ function triggerFakeMouseEvent(type, target, relativeX, relativeY) {
     e.initMouseEvent(type, true, true, window, 1, xPos, yPos, xPos, yPos, false, false, false, false, 1, null);
     target.node().dispatchEvent(e);
 }
-;
 function triggerFakeWheelEvent(type, target, relativeX, relativeY, deltaY) {
     var clientRect = target.node().getBoundingClientRect();
     var xPos = clientRect.left + relativeX;
