@@ -6387,6 +6387,84 @@ var Plottable;
     })(Component = Plottable.Component || (Plottable.Component = {}));
 })(Plottable || (Plottable = {}));
 
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    var Component;
+    (function (Component) {
+        var SelectionBoxLayer = (function (_super) {
+            __extends(SelectionBoxLayer, _super);
+            function SelectionBoxLayer() {
+                _super.call(this);
+                this._boxVisible = false;
+                this._boxBounds = {
+                    topLeft: { x: 0, y: 0 },
+                    bottomRight: { x: 0, y: 0 }
+                };
+                this.classed("selection-box-layer", true);
+            }
+            SelectionBoxLayer.prototype._setup = function () {
+                _super.prototype._setup.call(this);
+                this._box = this._content.append("g").classed("selection-box", true).remove();
+                this._boxArea = this._box.append("rect").classed("selection-area", true);
+            };
+            SelectionBoxLayer.prototype.bounds = function (newBounds) {
+                if (newBounds == null) {
+                    return this._boxBounds;
+                }
+                var topLeft = {
+                    x: Math.min(newBounds.topLeft.x, newBounds.bottomRight.x),
+                    y: Math.min(newBounds.topLeft.y, newBounds.bottomRight.y)
+                };
+                var bottomRight = {
+                    x: Math.max(newBounds.topLeft.x, newBounds.bottomRight.x),
+                    y: Math.max(newBounds.topLeft.y, newBounds.bottomRight.y)
+                };
+                this._boxBounds = {
+                    topLeft: topLeft,
+                    bottomRight: bottomRight
+                };
+                this._render();
+                return this;
+            };
+            SelectionBoxLayer.prototype._doRender = function () {
+                if (this._boxVisible) {
+                    var t = this._boxBounds.topLeft.y;
+                    var b = this._boxBounds.bottomRight.y;
+                    var l = this._boxBounds.topLeft.x;
+                    var r = this._boxBounds.bottomRight.x;
+                    this._boxArea.attr({
+                        x: l,
+                        y: t,
+                        width: r - l,
+                        height: b - t
+                    });
+                    this._content.node().appendChild(this._box.node());
+                }
+                else {
+                    this._box.remove();
+                }
+            };
+            SelectionBoxLayer.prototype.boxVisible = function (show) {
+                if (show == null) {
+                    return this._boxVisible;
+                }
+                this._boxVisible = show;
+                this._render();
+                return this;
+            };
+            return SelectionBoxLayer;
+        })(Component.AbstractComponent);
+        Component.SelectionBoxLayer = SelectionBoxLayer;
+    })(Component = Plottable.Component || (Plottable.Component = {}));
+})(Plottable || (Plottable = {}));
+
 ///<reference path="../../reference.ts" />
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];

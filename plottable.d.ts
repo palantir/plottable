@@ -763,12 +763,6 @@ declare module Plottable {
         wantsWidth: boolean;
         wantsHeight: boolean;
     };
-    type _PixelArea = {
-        xMin: number;
-        xMax: number;
-        yMin: number;
-        yMax: number;
-    };
     /**
      * The range of your current data. For example, [1, 2, 6, -5] has the Extent
      * `{min: -5, max: 6}`.
@@ -786,6 +780,13 @@ declare module Plottable {
     type Point = {
         x: number;
         y: number;
+    };
+    /**
+     * The corners of a box.
+     */
+    type Bounds = {
+        topLeft: Point;
+        bottomRight: Point;
     };
 }
 
@@ -2596,6 +2597,43 @@ declare module Plottable {
             colWeight(index: number, weight: number): Table;
             _isFixedWidth(): boolean;
             _isFixedHeight(): boolean;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Component {
+        class SelectionBoxLayer extends AbstractComponent {
+            constructor();
+            protected _setup(): void;
+            /**
+             * Gets the bounds of the box.
+             *
+             * @return {Bounds} The current bounds of the box.
+             */
+            bounds(): Bounds;
+            /**
+             * Sets the bounds of the box, and draws the box.
+             *
+             * @param {Bounds} newBounds The desired bounds of the box.
+             * @return {SelectionBoxLayer} The calling SelectionBoxLayer.
+             */
+            bounds(newBounds: Bounds): SelectionBoxLayer;
+            _doRender(): void;
+            /**
+             * Gets whether the box is being shown.
+             *
+             * @return {boolean} Whether the box is showing.
+             */
+            boxVisible(): boolean;
+            /**
+             * Shows or hides the selection box.
+             *
+             * @param {boolean} show Whether or not to show the box.
+             * @return {SelectionBoxLayer} The calling SelectionBoxLayer.
+             */
+            boxVisible(show: boolean): SelectionBoxLayer;
         }
     }
 }

@@ -124,8 +124,15 @@ svg.plottable {
   fill: aliceblue;
   opacity: .7;
   stroke: #C0C8FF;
-
 }
+
+/* SelectionBox */
+.plottable .selection-box-layer .selection-area {
+  fill: black;
+  fill-opacity: 0.03;
+  stroke: #CCC;
+}
+/* /SelectionBox */
 
 .plottable .legend text {
   fill: #32313F;

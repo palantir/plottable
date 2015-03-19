@@ -22,6 +22,8 @@
 ///<reference path="components/labelTests.ts" />
 ///<reference path="components/legendTests.ts" />
 ///<reference path="components/interpolatedColorLegendTests.ts" />
+///<reference path="components/selectionBoxLayerTests.ts" />
+
 ///<reference path="components/plots/plotTests.ts" />
 ///<reference path="components/plots/piePlotTests.ts" />
 ///<reference path="components/plots/newStylePlotTests.ts" />

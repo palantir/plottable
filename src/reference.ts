@@ -58,6 +58,7 @@
 /// <reference path="components/interpolatedColorLegend.ts" />
 /// <reference path="components/gridlines.ts" />
 /// <reference path="components/table.ts" />
+/// <reference path="components/selectionBoxLayer.ts" />
 
 /// <reference path="components/plots/abstractPlot.ts" />
 /// <reference path="components/plots/piePlot.ts" />
