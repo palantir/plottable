@@ -236,7 +236,8 @@ describe("Plots", () => {
         linePlot.addDataset("d3", dataset3);
 
         var lineData = linePlot.getClosestPlotData({x: 490, y: 300});
-        //HACKHACK selection count mirrors datum count
+        // HACKHACK selection count mirrors datum count
+        // https://github.com/palantir/plottable/pull/1742
         assert.strictEqual(lineData.selection.size() / dataset3.length, 1, "only 1 line retreieved");
         assert.strictEqual(lineData.data[0], dataset3[1], "correct datum retrieved");
 
