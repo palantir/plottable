@@ -3734,6 +3734,54 @@ declare module Plottable {
 
 declare module Plottable {
     module Interaction {
+        class Pointer extends Interaction.AbstractInteraction {
+            _anchor(component: Component.AbstractComponent, hitBox: D3.Selection): void;
+            /**
+             * Gets the callback called when the pointer enters the Component.
+             *
+             * @return {(p: Point) => any} The current callback.
+             */
+            onPointerEnter(): (p: Point) => any;
+            /**
+             * Sets the callback called when the pointer enters the Component.
+             *
+             * @param {(p: Point) => any} callback The callback to set.
+             * @return {Interaction.Pointer} The calling Interaction.Pointer.
+             */
+            onPointerEnter(callback: (p: Point) => any): Interaction.Pointer;
+            /**
+             * Gets the callback called when the pointer moves.
+             *
+             * @return {(p: Point) => any} The current callback.
+             */
+            onPointerMove(): (p: Point) => any;
+            /**
+             * Sets the callback called when the pointer moves.
+             *
+             * @param {(p: Point) => any} callback The callback to set.
+             * @return {Interaction.Pointer} The calling Interaction.Pointer.
+             */
+            onPointerMove(callback: (p: Point) => any): Interaction.Pointer;
+            /**
+             * Gets the callback called when the pointer exits the Component.
+             *
+             * @return {(p: Point) => any} The current callback.
+             */
+            onPointerExit(): (p: Point) => any;
+            /**
+             * Sets the callback called when the pointer exits the Component.
+             *
+             * @param {(p: Point) => any} callback The callback to set.
+             * @return {Interaction.Pointer} The calling Interaction.Pointer.
+             */
+            onPointerExit(callback: (p: Point) => any): Interaction.Pointer;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Interaction {
         class PanZoom extends AbstractInteraction {
             /**
              * Creates a PanZoomInteraction.
