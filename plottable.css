@@ -128,36 +128,6 @@ svg.plottable {
   fill-opacity: 0.03;
   stroke: #CCC;
 }
-
-.plottable .selection-box-layer.x-movable .selection-area {
-  cursor: ew-resize;
-}
-.plottable .selection-box-layer.y-movable .selection-area {
-  cursor: ns-resize;
-}
-.plottable .selection-box-layer.x-movable.y-movable .selection-area {
-  cursor: move;
-}
-
-.plottable .selection-box-layer.x-resizable .selection-edge-lr {
-  cursor: ew-resize;
-}
-.plottable .selection-box-layer.y-resizable .selection-edge-tb {
-  cursor: ns-resize;
-}
-
-.plottable .selection-box-layer.x-resizable.y-resizable .selection-corner-tl {
-  cursor: nwse-resize;
-}
-.plottable .selection-box-layer.x-resizable.y-resizable .selection-corner-tr {
-  cursor: nesw-resize;
-}
-.plottable .selection-box-layer.x-resizable.y-resizable .selection-corner-bl {
-  cursor: nesw-resize;
-}
-.plottable .selection-box-layer.x-resizable.y-resizable .selection-corner-br {
-  cursor: nwse-resize;
-}
 /* /SelectionBox */
 
 .plottable .legend text {
