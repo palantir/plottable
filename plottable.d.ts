@@ -2554,20 +2554,6 @@ declare module Plottable {
              */
             bounds(newBounds: Bounds): SelectionBoxLayer;
             _doRender(): void;
-            getEdges(p: Point): String[];
-            /**
-             * Gets the edge width of the box.
-             *
-             * @return {number} The edge width of the box.
-             */
-            edgeWidth(): number;
-            /**
-             * Sets the edge width of the box.
-             *
-             * @param {number} width The desired edge width.
-             * @return {SelectionBoxLayer} The calling SelectionBoxLayer.
-             */
-            edgeWidth(width: number): SelectionBoxLayer;
             dismissBox(): void;
         }
     }

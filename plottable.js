@@ -6282,37 +6282,30 @@ var Plottable;
                     topLeft: { x: 0, y: 0 },
                     bottomRight: { x: 0, y: 0 }
                 };
-                this._boxEdgeWidth = 2;
                 this.classed("selection-box-layer", true);
             }
             SelectionBoxLayer.prototype._setup = function () {
-                var _this = this;
                 _super.prototype._setup.call(this);
                 this._box = this._content.append("g").classed("selection-box", true).remove();
                 this._boxArea = this._box.append("rect").classed("selection-area", true);
-                var createLine = function () { return _this._box.append("line").style({
-                    "opacity": 0,
-                    "stroke": "pink",
-                    "stroke-width": _this._boxEdgeWidth
-                }); };
-                this._boxEdgeT = createLine().classed("selection-edge-tb", true);
-                this._boxEdgeB = createLine().classed("selection-edge-tb", true);
-                this._boxEdgeL = createLine().classed("selection-edge-lr", true);
-                this._boxEdgeR = createLine().classed("selection-edge-lr", true);
-                var createCorner = function () { return _this._box.append("circle").attr("r", _this._boxEdgeWidth / 2).style({
-                    "opacity": 0,
-                    "fill": "pink"
-                }); };
-                this._boxCornerTL = createCorner().classed("selection-corner-tl", true);
-                this._boxCornerTR = createCorner().classed("selection-corner-tr", true);
-                this._boxCornerBL = createCorner().classed("selection-corner-bl", true);
-                this._boxCornerBR = createCorner().classed("selection-corner-br", true);
             };
             SelectionBoxLayer.prototype.bounds = function (newBounds) {
                 if (newBounds == null) {
                     return this._boxBounds;
                 }
-                this._boxBounds = newBounds;
+                var topLeft = {
+                    x: Math.min(newBounds.topLeft.x, newBounds.bottomRight.x),
+                    y: Math.min(newBounds.topLeft.y, newBounds.bottomRight.y)
+                };
+                var bottomRight = {
+                    x: Math.max(newBounds.topLeft.x, newBounds.bottomRight.x),
+                    y: Math.max(newBounds.topLeft.y, newBounds.bottomRight.y)
+                };
+                this._boxBounds = {
+                    topLeft: topLeft,
+                    bottomRight: bottomRight
+                };
+                this._content.node().appendChild(this._box.node());
                 this._render();
                 return this;
             };
@@ -6327,77 +6320,6 @@ var Plottable;
                     width: r - l,
                     height: b - t
                 });
-                this._boxEdgeT.attr({
-                    x1: l,
-                    y1: t,
-                    x2: r,
-                    y2: t
-                });
-                this._boxEdgeB.attr({
-                    x1: l,
-                    y1: b,
-                    x2: r,
-                    y2: b
-                });
-                this._boxEdgeL.attr({
-                    x1: l,
-                    y1: t,
-                    x2: l,
-                    y2: b
-                });
-                this._boxEdgeR.attr({
-                    x1: r,
-                    y1: t,
-                    x2: r,
-                    y2: b
-                });
-                this._boxCornerTL.attr({ cx: l, cy: t });
-                this._boxCornerTR.attr({ cx: r, cy: t });
-                this._boxCornerBL.attr({ cx: l, cy: b });
-                this._boxCornerBR.attr({ cx: r, cy: b });
-                this._content.node().appendChild(this._box.node());
-            };
-            SelectionBoxLayer.prototype.getEdges = function (p) {
-                var edges = [];
-                var t = this._boxBounds.topLeft.y;
-                var b = this._boxBounds.bottomRight.y;
-                var l = this._boxBounds.topLeft.x;
-                var r = this._boxBounds.bottomRight.x;
-                var he = this._boxEdgeWidth / 2;
-                if (l - he <= p.x && p.x <= r + he) {
-                    if (t - he <= p.y && p.y <= t + he) {
-                        edges.push("top");
-                    }
-                    if (b - he <= p.y && p.y <= b + he) {
-                        edges.push("bottom");
-                    }
-                }
-                if (t - he <= p.y && p.y <= b + he) {
-                    if (l - he <= p.x && p.x <= l + he) {
-                        edges.push("left");
-                    }
-                    if (r - he <= p.x && p.x <= r + he) {
-                        edges.push("right");
-                    }
-                }
-                return edges;
-            };
-            SelectionBoxLayer.prototype.edgeWidth = function (width) {
-                if (width == null) {
-                    return this._boxEdgeWidth;
-                }
-                if (width < 0) {
-                    throw new Error("Edge width cannot be negative.");
-                }
-                this._boxEdgeWidth = width;
-                this._boxEdgeT.style("stroke-width", this._boxEdgeWidth);
-                this._boxEdgeB.style("stroke-width", this._boxEdgeWidth);
-                this._boxEdgeL.style("stroke-width", this._boxEdgeWidth);
-                this._boxEdgeR.style("stroke-width", this._boxEdgeWidth);
-                this._boxCornerTL.attr("r", this._boxEdgeWidth / 2);
-                this._boxCornerTR.attr("r", this._boxEdgeWidth / 2);
-                this._boxCornerBL.attr("r", this._boxEdgeWidth / 2);
-                this._boxCornerBR.attr("r", this._boxEdgeWidth / 2);
             };
             SelectionBoxLayer.prototype.dismissBox = function () {
                 this._box.remove();
