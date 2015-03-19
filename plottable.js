@@ -6278,7 +6278,7 @@ var Plottable;
             __extends(SelectionBoxLayer, _super);
             function SelectionBoxLayer() {
                 _super.call(this);
-                this._dismissed = true;
+                this._boxVisible = false;
                 this._boxBounds = {
                     topLeft: { x: 0, y: 0 },
                     bottomRight: { x: 0, y: 0 }
@@ -6306,12 +6306,11 @@ var Plottable;
                     topLeft: topLeft,
                     bottomRight: bottomRight
                 };
-                this._dismissed = false;
                 this._render();
                 return this;
             };
             SelectionBoxLayer.prototype._doRender = function () {
-                if (!this._dismissed) {
+                if (this._boxVisible) {
                     var t = this._boxBounds.topLeft.y;
                     var b = this._boxBounds.bottomRight.y;
                     var l = this._boxBounds.topLeft.x;
@@ -6324,10 +6323,17 @@ var Plottable;
                     });
                     this._content.node().appendChild(this._box.node());
                 }
+                else {
+                    this._box.remove();
+                }
             };
-            SelectionBoxLayer.prototype.dismissBox = function () {
-                this._dismissed = true;
-                this._box.remove();
+            SelectionBoxLayer.prototype.boxVisible = function (show) {
+                if (show == null) {
+                    return this._boxVisible;
+                }
+                this._boxVisible = show;
+                this._render();
+                return this;
             };
             return SelectionBoxLayer;
         })(Component.AbstractComponent);

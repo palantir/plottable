@@ -1882,6 +1882,20 @@ describe("InterpolatedColorLegend", function () {
 ///<reference path="../testReference.ts" />
 var assert = chai.assert;
 describe("SelectionBoxLayer", function () {
+    it("boxVisible()", function () {
+        var svg = generateSVG();
+        var sbl = new Plottable.Component.SelectionBoxLayer();
+        sbl.renderTo(svg);
+        var selectionBox = svg.select(".selection-box");
+        assert.isTrue(selectionBox.empty(), "initilizes without box in DOM");
+        sbl.boxVisible(true);
+        selectionBox = svg.select(".selection-box");
+        assert.isFalse(selectionBox.empty(), "box is inserted in DOM when showing");
+        sbl.boxVisible(false);
+        selectionBox = svg.select(".selection-box");
+        assert.isTrue(selectionBox.empty(), "box is removed from DOM when not showing");
+        svg.remove();
+    });
     it("bounds()", function () {
         var svg = generateSVG();
         var sbl = new Plottable.Component.SelectionBoxLayer();
@@ -1897,6 +1911,7 @@ describe("SelectionBoxLayer", function () {
             topLeft: topLeft,
             bottomRight: bottomRight
         }); }, Error, "can set bounds before anchoring");
+        sbl.boxVisible(true);
         sbl.renderTo(svg);
         function assertCorrectRendering(expectedTL, expectedBR, msg) {
             var selectionBox = svg.select(".selection-box");
@@ -1918,23 +1933,6 @@ describe("SelectionBoxLayer", function () {
         queriedBounds = sbl.bounds();
         assert.deepEqual(queriedBounds.topLeft, topLeft, "returns correct top-left position");
         assert.deepEqual(queriedBounds.bottomRight, bottomRight, "returns correct bottom-right position");
-        svg.remove();
-    });
-    it("dismissBox()", function () {
-        var svg = generateSVG();
-        var sbl = new Plottable.Component.SelectionBoxLayer();
-        sbl.renderTo(svg);
-        var selectionBox = svg.select(".selection-box");
-        assert.isTrue(selectionBox.empty(), "initilizes without box in DOM");
-        sbl.bounds({
-            topLeft: { x: 100, y: 100 },
-            bottomRight: { x: 300, y: 300 }
-        });
-        selectionBox = svg.select(".selection-box");
-        assert.isFalse(selectionBox.empty(), "draws to the DOM when bounds are set");
-        sbl.dismissBox();
-        selectionBox = svg.select(".selection-box");
-        assert.isTrue(selectionBox.empty(), "box is removed from DOM when dismiss()ed");
         svg.remove();
     });
 });

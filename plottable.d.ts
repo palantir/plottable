@@ -2554,7 +2554,7 @@ declare module Plottable {
              */
             bounds(newBounds: Bounds): SelectionBoxLayer;
             _doRender(): void;
-            dismissBox(): void;
+            showBox(show: boolean): SelectionBoxLayer;
         }
     }
 }

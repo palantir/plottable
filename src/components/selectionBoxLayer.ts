@@ -5,7 +5,7 @@ export module Component {
   export class SelectionBoxLayer extends AbstractComponent {
     private _box: D3.Selection;
     private _boxArea: D3.Selection;
-    private _dismissed = true;
+    private _boxVisible = false;
     private _boxBounds: Bounds = {
       topLeft: { x: 0, y: 0 },
       bottomRight: { x: 0, y: 0 }
@@ -53,14 +53,12 @@ export module Component {
         topLeft: topLeft,
         bottomRight: bottomRight
       };
-
-      this._dismissed = false;
       this._render();
       return this;
     }
 
     public _doRender() {
-      if (!this._dismissed) {
+      if (this._boxVisible) {
         var t = this._boxBounds.topLeft.y;
         var b = this._boxBounds.bottomRight.y;
         var l = this._boxBounds.topLeft.x;
@@ -70,12 +68,32 @@ export module Component {
           x: l, y: t, width: r - l, height: b - t
         });
         this._content.node().appendChild(this._box.node());
+      } else {
+        this._box.remove();
       }
     }
 
-    public dismissBox() {
-      this._dismissed = true;
-      this._box.remove();
+    /**
+     * Gets whether the box is being shown.
+     *
+     * @return {boolean} Whether the box is showing.
+     */
+    public boxVisible(): boolean;
+    /**
+     * Shows or hides the selection box.
+     *
+     * @param {boolean} show Whether or not to show the box.
+     * @return {SelectionBoxLayer} The calling SelectionBoxLayer.
+     */
+    public boxVisible(show: boolean): SelectionBoxLayer;
+    public boxVisible(show?: boolean) {
+      if (show == null) {
+        return this._boxVisible;
+      }
+
+      this._boxVisible = show;
+      this._render();
+      return this;
     }
   }
 }
