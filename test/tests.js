@@ -7386,6 +7386,9 @@ describe("Interactions", function () {
             assert.isFalse(callbackCalled, "callback not called again if already in Component (touch)");
             triggerFakeTouchEvent("touchstart", c.content(), 2 * SVG_WIDTH, 2 * SVG_HEIGHT);
             assert.isFalse(callbackCalled, "not called when moving outside of the Component (touch)");
+            pointerInteraction.onPointerEnter(null);
+            triggerFakeMouseEvent("mousemove", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+            assert.isFalse(callbackCalled, "callback removed by passing null");
             svg.remove();
         });
         it("onPointerMove", function () {
@@ -7423,6 +7426,9 @@ describe("Interactions", function () {
             callbackCalled = false;
             triggerFakeTouchEvent("touchstart", c.content(), 2 * SVG_WIDTH, 2 * SVG_HEIGHT);
             assert.isFalse(callbackCalled, "not called when moving outside of the Component (touch)");
+            pointerInteraction.onPointerMove(null);
+            triggerFakeMouseEvent("mousemove", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+            assert.isFalse(callbackCalled, "callback removed by passing null");
             svg.remove();
         });
         it("onPointerExit", function () {
@@ -7459,6 +7465,10 @@ describe("Interactions", function () {
             callbackCalled = false;
             triggerFakeTouchEvent("touchstart", c.content(), 3 * SVG_WIDTH, 3 * SVG_HEIGHT);
             assert.isFalse(callbackCalled, "callback not called again if already outside of Component (touch)");
+            pointerInteraction.onPointerExit(null);
+            triggerFakeMouseEvent("mousemove", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+            triggerFakeMouseEvent("mousemove", c.content(), 2 * SVG_WIDTH, 2 * SVG_HEIGHT);
+            assert.isFalse(callbackCalled, "callback removed by passing null");
             svg.remove();
         });
     });

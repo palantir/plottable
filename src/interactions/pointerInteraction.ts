@@ -16,7 +16,7 @@ export module Interaction {
       this._mouseDispatcher.onMouseMove("Interaction.Pointer" + this.getID(), (p: Point) => this._handlePointerEvent(p));
 
       this._touchDispatcher = Dispatcher.Touch.getDispatcher(<SVGElement> this._componentToListenTo.content().node());
-      this._touchDispatcher.onTouchStart("Interaction.Pointer" + this.getID(), (p: Point, e: TouchEvent) => this._handlePointerEvent(p));
+      this._touchDispatcher.onTouchStart("Interaction.Pointer" + this.getID(), (p: Point) => this._handlePointerEvent(p));
     }
 
     private _handlePointerEvent(p: Point) {
@@ -52,7 +52,7 @@ export module Interaction {
      */
     public onPointerEnter(callback: (p: Point) => any): Interaction.Pointer;
     public onPointerEnter(callback?: (p: Point) => any): any {
-      if (callback == null) {
+      if (callback === undefined) {
         return this._pointerEnterCallback;
       }
       this._pointerEnterCallback = callback;
@@ -73,7 +73,7 @@ export module Interaction {
      */
     public onPointerMove(callback: (p: Point) => any): Interaction.Pointer;
     public onPointerMove(callback?: (p: Point) => any): any {
-      if (callback == null) {
+      if (callback === undefined) {
         return this._pointerMoveCallback;
       }
       this._pointerMoveCallback = callback;
@@ -94,7 +94,7 @@ export module Interaction {
      */
     public onPointerExit(callback: (p: Point) => any): Interaction.Pointer;
     public onPointerExit(callback?: (p: Point) => any): any {
-      if (callback == null) {
+      if (callback === undefined) {
         return this._pointerExitCallback;
       }
       this._pointerExitCallback = callback;

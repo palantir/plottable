@@ -9350,7 +9350,7 @@ var Plottable;
                 this._mouseDispatcher = Plottable.Dispatcher.Mouse.getDispatcher(this._componentToListenTo.content().node());
                 this._mouseDispatcher.onMouseMove("Interaction.Pointer" + this.getID(), function (p) { return _this._handlePointerEvent(p); });
                 this._touchDispatcher = Plottable.Dispatcher.Touch.getDispatcher(this._componentToListenTo.content().node());
-                this._touchDispatcher.onTouchStart("Interaction.Pointer" + this.getID(), function (p, e) { return _this._handlePointerEvent(p); });
+                this._touchDispatcher.onTouchStart("Interaction.Pointer" + this.getID(), function (p) { return _this._handlePointerEvent(p); });
             };
             Pointer.prototype._handlePointerEvent = function (p) {
                 var translatedP = this._translateToComponentSpace(p);
@@ -9372,21 +9372,21 @@ var Plottable;
                 }
             };
             Pointer.prototype.onPointerEnter = function (callback) {
-                if (callback == null) {
+                if (callback === undefined) {
                     return this._pointerEnterCallback;
                 }
                 this._pointerEnterCallback = callback;
                 return this;
             };
             Pointer.prototype.onPointerMove = function (callback) {
-                if (callback == null) {
+                if (callback === undefined) {
                     return this._pointerMoveCallback;
                 }
                 this._pointerMoveCallback = callback;
                 return this;
             };
             Pointer.prototype.onPointerExit = function (callback) {
-                if (callback == null) {
+                if (callback === undefined) {
                     return this._pointerExitCallback;
                 }
                 this._pointerExitCallback = callback;
