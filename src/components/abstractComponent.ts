@@ -423,7 +423,7 @@ export module Component {
      * @param {Component} c The component to merge in.
      * @returns {ComponentGroup} The relevant ComponentGroup out of the above four cases.
      */
-    public merge(c: AbstractComponent, below = true): Component.Group {
+    public _merge(c: AbstractComponent, below: boolean): Component.Group {
       var cg: Component.Group;
       if (this._isSetup || this._isAnchored) {
         throw new Error("Can't presently merge a component that's already been anchored");
@@ -440,11 +440,11 @@ export module Component {
     }
 
     public above(c: AbstractComponent): Component.Group {
-      return this.merge(c, false);
+      return this._merge(c, false);
     }
 
     public below(c: AbstractComponent): Component.Group {
-      return this.merge(c, true);
+      return this._merge(c, true);
     }
 
     /**

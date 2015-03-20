@@ -1759,7 +1759,7 @@ declare module Plottable {
              * @param {Component} c The component to merge in.
              * @returns {ComponentGroup} The relevant ComponentGroup out of the above four cases.
              */
-            merge(c: AbstractComponent, below?: boolean): Component.Group;
+            _merge(c: AbstractComponent, below: boolean): Component.Group;
             above(c: AbstractComponent): Component.Group;
             below(c: AbstractComponent): Component.Group;
             /**
@@ -1890,7 +1890,7 @@ declare module Plottable {
              */
             constructor(components?: AbstractComponent[]);
             _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
-            merge(c: AbstractComponent): Group;
+            _merge(c: AbstractComponent, below: boolean): Group;
             _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): Group;
             _isFixedWidth(): boolean;
             _isFixedHeight(): boolean;

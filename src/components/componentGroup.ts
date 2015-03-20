@@ -30,8 +30,8 @@ export module Component {
       };
     }
 
-    public merge(c: AbstractComponent): Group {
-      this._addComponent(c);
+    public _merge(c: AbstractComponent, below: boolean): Group {
+      this._addComponent(c, !below);
       return this;
     }
 

@@ -3795,8 +3795,7 @@ var Plottable;
              * @param {Component} c The component to merge in.
              * @returns {ComponentGroup} The relevant ComponentGroup out of the above four cases.
              */
-            AbstractComponent.prototype.merge = function (c, below) {
-                if (below === void 0) { below = true; }
+            AbstractComponent.prototype._merge = function (c, below) {
                 var cg;
                 if (this._isSetup || this._isAnchored) {
                     throw new Error("Can't presently merge a component that's already been anchored");
@@ -3813,10 +3812,10 @@ var Plottable;
                 }
             };
             AbstractComponent.prototype.above = function (c) {
-                return this.merge(c, false);
+                return this._merge(c, false);
             };
             AbstractComponent.prototype.below = function (c) {
-                return this.merge(c, true);
+                return this._merge(c, true);
             };
             /**
              * Detaches a Component from the DOM. The component can be reused.
@@ -4075,8 +4074,8 @@ var Plottable;
                     wantsHeight: requests.map(function (r) { return r.wantsHeight; }).some(function (x) { return x; })
                 };
             };
-            Group.prototype.merge = function (c) {
-                this._addComponent(c);
+            Group.prototype._merge = function (c, below) {
+                this._addComponent(c, !below);
                 return this;
             };
             Group.prototype._computeLayout = function (offeredXOrigin, offeredYOrigin, availableWidth, availableHeight) {
