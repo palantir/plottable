@@ -128,6 +128,7 @@ declare module Plottable {
             function colorTest(colorTester: D3.Selection, className: string): string;
             function lightenColor(color: string, factor: number): string;
             function darkenColor(color: string, factor: number, darkenAmount: number): string;
+            function distanceSquared(p1: Point, p2: Point): number;
         }
     }
 }
@@ -2772,6 +2773,33 @@ declare module Plottable {
              * @returns {PlotData} The retrieved PlotData.
              */
             getAllPlotData(datasetKeys?: string | string[]): PlotData;
+            protected _getAllPlotData(datasetKeys: string[]): PlotData;
+            /**
+             * Retrieves the closest PlotData for the specified dataset(s)
+             *
+             * @param {Point} queryPoint The point to query from
+             * @param {number} withinValue Will only return plot data that is of a distance below withinValue
+             *                             (default = Infinity)
+             * @param {string | string[]} datasetKeys The dataset(s) to retrieve the plot data from.
+             *                                        (default = this.datasetOrder())
+             * @returns {PlotData} The retrieved PlotData.
+             */
+            getClosestPlotData(queryPoint: Point, withinValue?: number, datasetKeys?: string | string[]): {
+                data: any[];
+                pixelPoints: {
+                    x: number;
+                    y: number;
+                }[];
+                selection: D3.Selection;
+            };
+            protected _getClosestPlotData(queryPoint: Point, datasetKeys: string[], withinValue?: number): {
+                data: any[];
+                pixelPoints: {
+                    x: number;
+                    y: number;
+                }[];
+                selection: D3.Selection;
+            };
         }
     }
 }
@@ -2863,6 +2891,31 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
+        class Rectangle<X, Y> extends AbstractXYPlot<X, Y> {
+            /**
+             * Constructs a RectanglePlot.
+             *
+             * A RectanglePlot consists of a bunch of rectangles. The user is required to
+             * project the left and right bounds of the rectangle (x1 and x2 respectively)
+             * as well as the bottom and top bounds (y1 and y2 respectively)
+             *
+             * @constructor
+             * @param {Scale.AbstractScale} xScale The x scale to use.
+             * @param {Scale.AbstractScale} yScale The y scale to use.
+             */
+            constructor(xScale: Scale.AbstractScale<X, any>, yScale: Scale.AbstractScale<Y, any>);
+            protected _getDrawer(key: string): _Drawer.Rect;
+            protected _generateAttrToProjector(): {
+                [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
+            };
+            protected _generateDrawSteps(): _Drawer.DrawStep[];
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Plot {
         class Scatter<X, Y> extends AbstractXYPlot<X, Y> implements Interaction.Hoverable {
             /**
              * Constructs a ScatterPlot.
@@ -2888,7 +2941,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-        class Grid extends AbstractXYPlot<string, string> {
+        class Grid extends Rectangle<any, any> {
             /**
              * Constructs a GridPlot.
              *
@@ -2896,22 +2949,19 @@ declare module Plottable {
              * grid, and the datum can control what color it is.
              *
              * @constructor
-             * @param {Scale.Category} xScale The x scale to use.
-             * @param {Scale.Category} yScale The y scale to use.
+             * @param {Scale.AbstractScale} xScale The x scale to use.
+             * @param {Scale.AbstractScale} yScale The y scale to use.
              * @param {Scale.Color|Scale.InterpolatedColor} colorScale The color scale
              * to use for each grid cell.
              */
-            constructor(xScale: Scale.Category, yScale: Scale.Category, colorScale: Scale.AbstractScale<any, string>);
+            constructor(xScale: Scale.AbstractScale<any, any>, yScale: Scale.AbstractScale<any, any>, colorScale: Scale.AbstractScale<any, string>);
             addDataset(keyOrDataset: any, dataset?: any): Grid;
             protected _getDrawer(key: string): _Drawer.Rect;
             /**
-             * @param {string} attrToSet One of ["x", "y", "fill"]. If "fill" is used,
+             * @param {string} attrToSet One of ["x", "y", "x2", "y2", "fill"]. If "fill" is used,
              * the data should return a valid CSS color.
              */
             project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): Grid;
-            protected _generateAttrToProjector(): {
-                [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
-            };
             protected _generateDrawSteps(): _Drawer.DrawStep[];
         }
     }
@@ -3059,6 +3109,14 @@ declare module Plottable {
                 [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
             };
             protected _wholeDatumAttributes(): string[];
+            protected _getClosestPlotData(queryPoint: Point, datasetKeys: string[], withinValue?: number): {
+                data: any[];
+                pixelPoints: {
+                    x: number;
+                    y: number;
+                }[];
+                selection: D3.Selection;
+            };
             protected _getClosestWithinRange(p: Point, range: number): {
                 closestValue: any;
                 closestPoint: {
@@ -3066,6 +3124,7 @@ declare module Plottable {
                     y: number;
                 };
             };
+            protected _getAllPlotData(datasetKeys: string[]): PlotData;
             _hoverOverComponent(p: Point): void;
             _hoverOutComponent(p: Point): void;
             _doHover(p: Point): Interaction.HoverData;
@@ -3522,6 +3581,18 @@ declare module Plottable {
              */
             onMouseUp(key: any, callback: MouseCallback): Dispatcher.Mouse;
             /**
+             * Registers a callback to be called whenever a wheel occurs,
+             * or removes the callback if `null` is passed as the callback.
+             *
+             * @param {any} key The key associated with the callback.
+             *                  Key uniqueness is determined by deep equality.
+             * @param {WheelCallback} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space.
+             *                                     Pass `null` to remove a callback.
+             * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+             */
+            onWheel(key: any, callback: MouseCallback): Dispatcher.Mouse;
+            /**
              * Returns the last computed mouse position.
              *
              * @return {Point} The last known mouse position in <svg> coordinate space.
@@ -3705,6 +3776,54 @@ declare module Plottable {
              * @returns The calling Interaction.Key.
              */
             on(keyCode: number, callback: () => void): Key;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Interaction {
+        class Pointer extends Interaction.AbstractInteraction {
+            _anchor(component: Component.AbstractComponent, hitBox: D3.Selection): void;
+            /**
+             * Gets the callback called when the pointer enters the Component.
+             *
+             * @return {(p: Point) => any} The current callback.
+             */
+            onPointerEnter(): (p: Point) => any;
+            /**
+             * Sets the callback called when the pointer enters the Component.
+             *
+             * @param {(p: Point) => any} callback The callback to set.
+             * @return {Interaction.Pointer} The calling Interaction.Pointer.
+             */
+            onPointerEnter(callback: (p: Point) => any): Interaction.Pointer;
+            /**
+             * Gets the callback called when the pointer moves.
+             *
+             * @return {(p: Point) => any} The current callback.
+             */
+            onPointerMove(): (p: Point) => any;
+            /**
+             * Sets the callback called when the pointer moves.
+             *
+             * @param {(p: Point) => any} callback The callback to set.
+             * @return {Interaction.Pointer} The calling Interaction.Pointer.
+             */
+            onPointerMove(callback: (p: Point) => any): Interaction.Pointer;
+            /**
+             * Gets the callback called when the pointer exits the Component.
+             *
+             * @return {(p: Point) => any} The current callback.
+             */
+            onPointerExit(): (p: Point) => any;
+            /**
+             * Sets the callback called when the pointer exits the Component.
+             *
+             * @param {(p: Point) => any} callback The callback to set.
+             * @return {Interaction.Pointer} The calling Interaction.Pointer.
+             */
+            onPointerExit(callback: (p: Point) => any): Interaction.Pointer;
         }
     }
 }

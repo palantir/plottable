@@ -29,6 +29,7 @@
 ///<reference path="components/plots/areaPlotTests.ts" />
 ///<reference path="components/plots/barPlotTests.ts" />
 ///<reference path="components/plots/gridPlotTests.ts" />
+///<reference path="components/plots/rectanglePlotTests.ts" />
 ///<reference path="components/plots/scatterPlotTests.ts" />
 ///<reference path="components/plots/stackedPlotTests.ts" />
 ///<reference path="components/plots/stackedAreaPlotTests.ts" />
@@ -58,6 +59,7 @@
 ///<reference path="utils/utilsTests.ts" />
 
 ///<reference path="interactions/interactionTests.ts" />
+///<reference path="interactions/pointerInteractionTests.ts" />
 ///<reference path="interactions/dragBoxTests.ts" />
 ///<reference path="interactions/hoverInteractionTests.ts" />
 
