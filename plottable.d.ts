@@ -1760,6 +1760,8 @@ declare module Plottable {
              * @returns {ComponentGroup} The relevant ComponentGroup out of the above four cases.
              */
             merge(c: AbstractComponent, below?: boolean): Component.Group;
+            above(c: AbstractComponent): Component.Group;
+            below(c: AbstractComponent): Component.Group;
             /**
              * Detaches a Component from the DOM. The component can be reused.
              *

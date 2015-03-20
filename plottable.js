@@ -3812,35 +3812,11 @@ var Plottable;
                     return cg;
                 }
             };
-            /**
-             * Merges this Component with another Component, returning a
-             * ComponentGroup. This is used to layer Components on top of each other.
-             *
-             * There are four cases:
-             * Component + Component: Returns a ComponentGroup with both components inside it.
-             * ComponentGroup + Component: Returns the ComponentGroup with the Component appended.
-             * Component + ComponentGroup: Returns the ComponentGroup with the Component prepended.
-             * ComponentGroup + ComponentGroup: Returns a new ComponentGroup with two ComponentGroups inside it.
-             *
-             * @param {Component} c The component to merge in.
-             * @returns {ComponentGroup} The relevant ComponentGroup out of the above four cases.
-             */
-            AbstractComponent.prototype.merge = function (c, below) {
-                if (below === void 0) { below = true; }
-                var cg;
-                if (this._isSetup || this._isAnchored) {
-                    throw new Error("Can't presently merge a component that's already been anchored");
-                }
-                if (Plottable.Component.Group.prototype.isPrototypeOf(c)) {
-                    cg = c;
-                    cg._addComponent(this, below);
-                    return cg;
-                }
-                else {
-                    var mergedComponents = below ? [this, c] : [c, this];
-                    cg = new Plottable.Component.Group(mergedComponents);
-                    return cg;
-                }
+            AbstractComponent.prototype.above = function (c) {
+                return this.merge(c, false);
+            };
+            AbstractComponent.prototype.below = function (c) {
+                return this.merge(c, true);
             };
             /**
              * Detaches a Component from the DOM. The component can be reused.
