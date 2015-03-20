@@ -1746,21 +1746,34 @@ declare module Plottable {
              * @returns {boolean} Whether the component has a fixed height.
              */
             _isFixedHeight(): boolean;
+            _merge(c: AbstractComponent, below: boolean): Component.Group;
             /**
-             * Merges this Component with another Component, returning a
+             * Merges this Component below another Component, returning a
              * ComponentGroup. This is used to layer Components on top of each other.
              *
              * There are four cases:
-             * Component + Component: Returns a ComponentGroup with both components inside it.
+             * Component + Component: Returns a ComponentGroup with the first component before the second component.
              * ComponentGroup + Component: Returns the ComponentGroup with the Component appended.
              * Component + ComponentGroup: Returns the ComponentGroup with the Component prepended.
-             * ComponentGroup + ComponentGroup: Returns a new ComponentGroup with two ComponentGroups inside it.
+             * ComponentGroup + ComponentGroup: Returns a new ComponentGroup with the first group before the second group.
              *
              * @param {Component} c The component to merge in.
              * @returns {ComponentGroup} The relevant ComponentGroup out of the above four cases.
              */
-            _merge(c: AbstractComponent, below: boolean): Component.Group;
             above(c: AbstractComponent): Component.Group;
+            /**
+             * Merges this Component above another Component, returning a
+             * ComponentGroup. This is used to layer Components on top of each other.
+             *
+             * There are four cases:
+             * Component + Component: Returns a ComponentGroup with the first component after the second component.
+             * ComponentGroup + Component: Returns the ComponentGroup with the Component prepended.
+             * Component + ComponentGroup: Returns the ComponentGroup with the Component appended.
+             * ComponentGroup + ComponentGroup: Returns a new ComponentGroup with the first group after the second group.
+             *
+             * @param {Component} c The component to merge in.
+             * @returns {ComponentGroup} The relevant ComponentGroup out of the above four cases.
+             */
             below(c: AbstractComponent): Component.Group;
             /**
              * Detaches a Component from the DOM. The component can be reused.
