@@ -2773,6 +2773,7 @@ declare module Plottable {
              * @returns {PlotData} The retrieved PlotData.
              */
             getAllPlotData(datasetKeys?: string | string[]): PlotData;
+            protected _getAllPlotData(datasetKeys: string[]): PlotData;
             /**
              * Retrieves the closest PlotData for the specified dataset(s)
              *
@@ -3123,6 +3124,7 @@ declare module Plottable {
                     y: number;
                 };
             };
+            protected _getAllPlotData(datasetKeys: string[]): PlotData;
             _hoverOverComponent(p: Point): void;
             _hoverOutComponent(p: Point): void;
             _doHover(p: Point): Interaction.HoverData;

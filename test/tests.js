@@ -2781,6 +2781,18 @@ describe("Plots", function () {
                 svg.remove();
             });
         });
+        describe("getAllPlotData()", function () {
+            it("retrieves correct data", function () {
+                var dataset3 = [
+                    { foo: 0, bar: 1 },
+                    { foo: 1, bar: 0.95 }
+                ];
+                linePlot.addDataset("d3", dataset3);
+                var allLines = linePlot.getAllPlotData().selection;
+                assert.strictEqual(allLines.size(), linePlot.datasets().length, "single line per dataset");
+                svg.remove();
+            });
+        });
         describe("getClosestPlotData()", function () {
             it("retrieves correct data", function () {
                 var dataset3 = [
@@ -2789,9 +2801,7 @@ describe("Plots", function () {
                 ];
                 linePlot.addDataset("d3", dataset3);
                 var lineData = linePlot.getClosestPlotData({ x: 490, y: 300 });
-                // HACKHACK selection count mirrors datum count
-                // https://github.com/palantir/plottable/pull/1742
-                assert.strictEqual(lineData.selection.size() / dataset3.length, 1, "only 1 line retreieved");
+                assert.strictEqual(lineData.selection.size(), 1, "only 1 line retreieved");
                 assert.strictEqual(lineData.data[0], dataset3[1], "correct datum retrieved");
                 svg.remove();
             });

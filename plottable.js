@@ -6787,7 +6787,6 @@ var Plottable;
              * @returns {PlotData} The retrieved PlotData.
              */
             AbstractPlot.prototype.getAllPlotData = function (datasetKeys) {
-                var _this = this;
                 if (datasetKeys === void 0) { datasetKeys = this.datasetOrder(); }
                 var datasetKeyArray = [];
                 if (typeof (datasetKeys) === "string") {
@@ -6796,10 +6795,14 @@ var Plottable;
                 else {
                     datasetKeyArray = datasetKeys;
                 }
+                return this._getAllPlotData(datasetKeyArray);
+            };
+            AbstractPlot.prototype._getAllPlotData = function (datasetKeys) {
+                var _this = this;
                 var data = [];
                 var pixelPoints = [];
                 var allElements = [];
-                datasetKeyArray.forEach(function (datasetKey) {
+                datasetKeys.forEach(function (datasetKey) {
                     var plotDatasetKey = _this._key2PlotDatasetKey.get(datasetKey);
                     if (plotDatasetKey == null) {
                         return;
@@ -7964,6 +7967,27 @@ var Plottable;
                     closestValue: closestOverall,
                     closestPoint: closestPoint
                 };
+            };
+            Line.prototype._getAllPlotData = function (datasetKeys) {
+                var _this = this;
+                var data = [];
+                var pixelPoints = [];
+                var allElements = [];
+                datasetKeys.forEach(function (datasetKey) {
+                    var plotDatasetKey = _this._key2PlotDatasetKey.get(datasetKey);
+                    if (plotDatasetKey == null) {
+                        return;
+                    }
+                    var drawer = plotDatasetKey.drawer;
+                    plotDatasetKey.dataset.data().forEach(function (datum, index) {
+                        data.push(datum);
+                        pixelPoints.push(drawer._getPixelPoint(datum, index));
+                    });
+                    if (plotDatasetKey.dataset.data().length > 0) {
+                        allElements.push(drawer._getSelection(0).node());
+                    }
+                });
+                return { data: data, pixelPoints: pixelPoints, selection: d3.selectAll(allElements) };
             };
             //===== Hover logic =====
             Line.prototype._hoverOverComponent = function (p) {
