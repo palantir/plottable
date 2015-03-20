@@ -1759,7 +1759,7 @@ declare module Plottable {
              * @param {Component} c The component to merge in.
              * @returns {ComponentGroup} The relevant ComponentGroup out of the above four cases.
              */
-            merge(c: AbstractComponent): Component.Group;
+            merge(c: AbstractComponent, below?: boolean): Component.Group;
             /**
              * Detaches a Component from the DOM. The component can be reused.
              *
