@@ -11,9 +11,11 @@ export module Dispatcher {
     private _moveBroadcaster: Core.Broadcaster<Dispatcher.Mouse>;
     private _downBroadcaster: Core.Broadcaster<Dispatcher.Mouse>;
     private _upBroadcaster: Core.Broadcaster<Dispatcher.Mouse>;
+    private _wheelBroadcaster: Core.Broadcaster<Dispatcher.Mouse>;
     private _processMoveCallback: (e: MouseEvent) => any;
     private _processDownCallback: (e: MouseEvent) => any;
     private _processUpCallback: (e: MouseEvent) => any;
+    private _processWheelCallback: (e: MouseEvent) => any;
 
     /**
      * Get a Dispatcher.Mouse for the <svg> containing elem. If one already exists
@@ -60,7 +62,11 @@ export module Dispatcher {
       this._processUpCallback = (e: MouseEvent) => this._measureAndBroadcast(e, this._upBroadcaster);
       this._event2Callback["mouseup"] = this._processUpCallback;
 
-      this._broadcasters = [this._moveBroadcaster, this._downBroadcaster, this._upBroadcaster];
+      this._wheelBroadcaster = new Core.Broadcaster(this);
+      this._processWheelCallback = (e: WheelEvent) => this._measureAndBroadcast(e, this._wheelBroadcaster);
+      this._event2Callback["wheel"] = this._processWheelCallback;
+
+      this._broadcasters = [this._moveBroadcaster, this._downBroadcaster, this._upBroadcaster, this._wheelBroadcaster];
     }
 
     protected _getWrappedCallback(callback: Function): Core.BroadcasterCallback<Dispatcher.Mouse> {
@@ -112,6 +118,22 @@ export module Dispatcher {
      */
     public onMouseUp(key: any, callback: MouseCallback): Dispatcher.Mouse {
       this._setCallback(this._upBroadcaster, key, callback);
+      return this;
+    }
+
+    /**
+     * Registers a callback to be called whenever a wheel occurs,
+     * or removes the callback if `null` is passed as the callback.
+     *
+     * @param {any} key The key associated with the callback.
+     *                  Key uniqueness is determined by deep equality.
+     * @param {WheelCallback} callback A callback that takes the pixel position
+     *                                     in svg-coordinate-space.
+     *                                     Pass `null` to remove a callback.
+     * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+     */
+    public onWheel(key: any, callback: MouseCallback): Dispatcher.Mouse {
+      this._setCallback(this._wheelBroadcaster, key, callback);
       return this;
     }
 

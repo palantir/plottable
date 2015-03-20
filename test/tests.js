@@ -149,6 +149,23 @@ function triggerFakeMouseEvent(type, target, relativeX, relativeY) {
     e.initMouseEvent(type, true, true, window, 1, xPos, yPos, xPos, yPos, false, false, false, false, 1, null);
     target.node().dispatchEvent(e);
 }
+function triggerFakeWheelEvent(type, target, relativeX, relativeY, deltaY) {
+    var clientRect = target.node().getBoundingClientRect();
+    var xPos = clientRect.left + relativeX;
+    var yPos = clientRect.top + relativeY;
+    var event;
+    // Use the WheelEvent Constructor semantics if possible
+    if (typeof WheelEvent === "function") {
+        // HACKHACK anycasting constructor to allow for the dictionary argument
+        // https://github.com/Microsoft/TypeScript/issues/2416
+        event = new WheelEvent("wheel", { bubbles: true, clientX: xPos, clientY: yPos, deltaY: deltaY });
+    }
+    else {
+        event = document.createEvent("WheelEvent");
+        event.initWheelEvent("wheel", true, true, window, 1, xPos, yPos, xPos, yPos, 0, null, null, 0, deltaY, 0, 0);
+    }
+    target.node().dispatchEvent(event);
+}
 function triggerFakeTouchEvent(type, target, relativeX, relativeY) {
     var targetNode = target.node();
     var clientRect = targetNode.getBoundingClientRect();
@@ -2070,6 +2087,54 @@ describe("Plots", function () {
             assert.includeMembers(oneElementPlotData.pixelPoints, data2.map(data2PointConverter), "includes data2 points");
             svg.remove();
         });
+        it("getClosestPlotData", function () {
+            var svg = generateSVG(400, 400);
+            var plot = new Plottable.Plot.AbstractPlot();
+            var data1 = [{ value: 0 }, { value: 1 }, { value: 2 }];
+            var data2 = [{ value: 0 }, { value: 1 }, { value: 2 }];
+            var data1Points = data1.map(function (datum) {
+                return { x: datum.value, y: 100 };
+            });
+            var data2Points = data2.map(function (datum) {
+                return { x: datum.value, y: 10 };
+            });
+            var data1PointConverter = function (datum, index) { return data1Points[index]; };
+            var data2PointConverter = function (datum, index) { return data2Points[index]; };
+            // Create mock drawers with already drawn items
+            var mockDrawer1 = new Plottable._Drawer.AbstractDrawer("ds1");
+            var renderArea1 = svg.append("g");
+            renderArea1.append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
+            mockDrawer1.setup = function () { return mockDrawer1._renderArea = renderArea1; };
+            mockDrawer1._getSelector = function () { return "circle"; };
+            mockDrawer1._getPixelPoint = data1PointConverter;
+            var renderArea2 = svg.append("g");
+            renderArea2.append("circle").attr("cx", 10).attr("cy", 10).attr("r", 10);
+            var mockDrawer2 = new Plottable._Drawer.AbstractDrawer("ds2");
+            mockDrawer2.setup = function () { return mockDrawer2._renderArea = renderArea2; };
+            mockDrawer2._getSelector = function () { return "circle"; };
+            mockDrawer2._getPixelPoint = data2PointConverter;
+            // Mock _getDrawer to return the mock drawers
+            plot._getDrawer = function (key) {
+                if (key === "ds1") {
+                    return mockDrawer1;
+                }
+                else {
+                    return mockDrawer2;
+                }
+            };
+            plot.addDataset("ds1", data1);
+            plot.addDataset("ds2", data2);
+            plot.renderTo(svg);
+            var queryPoint = { x: 1, y: 11 };
+            var closestPlotData = plot.getClosestPlotData(queryPoint);
+            assert.deepEqual(closestPlotData.pixelPoints, [{ x: 1, y: 10 }], "retrieves the closest point across datasets");
+            closestPlotData = plot.getClosestPlotData(queryPoint, Infinity, "ds1");
+            assert.deepEqual(closestPlotData.pixelPoints, [{ x: 1, y: 100 }], "retrieves the closest point for a certain dataset");
+            queryPoint = { x: 1, y: 500 };
+            closestPlotData = plot.getClosestPlotData(queryPoint, 100);
+            assert.deepEqual(closestPlotData.pixelPoints, [], "retrieves no points if points are outside within value");
+            svg.remove();
+        });
         describe("Dataset removal", function () {
             var plot;
             var d1;
@@ -2717,7 +2782,7 @@ describe("Plots", function () {
             });
         });
         describe("getAllPlotData()", function () {
-            it("selection only contains a line per dataset", function () {
+            it("retrieves correct data", function () {
                 var dataset3 = [
                     { foo: 0, bar: 1 },
                     { foo: 1, bar: 0.95 }
@@ -2725,6 +2790,19 @@ describe("Plots", function () {
                 linePlot.addDataset("d3", dataset3);
                 var allLines = linePlot.getAllPlotData().selection;
                 assert.strictEqual(allLines.size(), linePlot.datasets().length, "single line per dataset");
+                svg.remove();
+            });
+        });
+        describe("getClosestPlotData()", function () {
+            it("retrieves correct data", function () {
+                var dataset3 = [
+                    { foo: 0, bar: 1 },
+                    { foo: 1, bar: 0.95 }
+                ];
+                linePlot.addDataset("d3", dataset3);
+                var lineData = linePlot.getClosestPlotData({ x: 490, y: 300 });
+                assert.strictEqual(lineData.selection.size(), 1, "only 1 line retreieved");
+                assert.strictEqual(lineData.data[0], dataset3[1], "correct datum retrieved");
                 svg.remove();
             });
         });
@@ -8020,6 +8098,38 @@ describe("Dispatchers", function () {
             assert.isTrue(callbackWasCalled, "callback was called on mouseup");
             md.onMouseUp(keyString, null);
             target.remove();
+        });
+        it("onWheel()", function () {
+            // HACKHACK PhantomJS doesn't implement fake creation of WheelEvents
+            // https://github.com/ariya/phantomjs/issues/11289
+            if (window.PHANTOMJS) {
+                return;
+            }
+            var targetWidth = 400, targetHeight = 400;
+            var svg = generateSVG(targetWidth, targetHeight);
+            // HACKHACK: PhantomJS can't measure SVGs unless they have something in them occupying space
+            svg.append("rect").attr("width", targetWidth).attr("height", targetHeight);
+            var targetX = 17;
+            var targetY = 76;
+            var expectedPoint = {
+                x: targetX,
+                y: targetY
+            };
+            var targetDeltaY = 10;
+            var md = Plottable.Dispatcher.Mouse.getDispatcher(svg.node());
+            var callbackWasCalled = false;
+            var callback = function (p, e) {
+                callbackWasCalled = true;
+                assert.strictEqual(e.deltaY, targetDeltaY, "deltaY value was passed to callback");
+                assertPointsClose(p, expectedPoint, 0.5, "mouse position is correct");
+                assert.isNotNull(e, "mouse event was passed to the callback");
+            };
+            var keyString = "unit test";
+            md.onWheel(keyString, callback);
+            triggerFakeWheelEvent("wheel", svg, targetX, targetY, targetDeltaY);
+            assert.isTrue(callbackWasCalled, "callback was called on wheel");
+            md.onWheel(keyString, null);
+            svg.remove();
         });
     });
 });

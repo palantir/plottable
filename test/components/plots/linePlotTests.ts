@@ -226,9 +226,9 @@ describe("Plots", () => {
 
     });
 
-    describe("getAllPlotData()",() => {
+    describe("getAllPlotData()", () => {
 
-      it("selection only contains a line per dataset", () => {
+      it("retrieves correct data", () => {
         var dataset3 = [
           { foo: 0, bar: 1 },
           { foo: 1, bar: 0.95 }
@@ -237,6 +237,22 @@ describe("Plots", () => {
 
         var allLines = linePlot.getAllPlotData().selection;
         assert.strictEqual(allLines.size(), linePlot.datasets().length, "single line per dataset");
+        svg.remove();
+      });
+    });
+
+    describe("getClosestPlotData()", () => {
+
+      it("retrieves correct data", () => {
+        var dataset3 = [
+          { foo: 0, bar: 1 },
+          { foo: 1, bar: 0.95 }
+        ];
+        linePlot.addDataset("d3", dataset3);
+
+        var lineData = linePlot.getClosestPlotData({x: 490, y: 300});
+        assert.strictEqual(lineData.selection.size(), 1, "only 1 line retreieved");
+        assert.strictEqual(lineData.data[0], dataset3[1], "correct datum retrieved");
 
         svg.remove();
       });

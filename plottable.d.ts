@@ -128,6 +128,7 @@ declare module Plottable {
             function colorTest(colorTester: D3.Selection, className: string): string;
             function lightenColor(color: string, factor: number): string;
             function darkenColor(color: string, factor: number, darkenAmount: number): string;
+            function distanceSquared(p1: Point, p2: Point): number;
         }
     }
 }
@@ -2773,6 +2774,32 @@ declare module Plottable {
              */
             getAllPlotData(datasetKeys?: string | string[]): PlotData;
             protected _getAllPlotData(datasetKeys: string[]): PlotData;
+            /**
+             * Retrieves the closest PlotData for the specified dataset(s)
+             *
+             * @param {Point} queryPoint The point to query from
+             * @param {number} withinValue Will only return plot data that is of a distance below withinValue
+             *                             (default = Infinity)
+             * @param {string | string[]} datasetKeys The dataset(s) to retrieve the plot data from.
+             *                                        (default = this.datasetOrder())
+             * @returns {PlotData} The retrieved PlotData.
+             */
+            getClosestPlotData(queryPoint: Point, withinValue?: number, datasetKeys?: string | string[]): {
+                data: any[];
+                pixelPoints: {
+                    x: number;
+                    y: number;
+                }[];
+                selection: D3.Selection;
+            };
+            protected _getClosestPlotData(queryPoint: Point, datasetKeys: string[], withinValue?: number): {
+                data: any[];
+                pixelPoints: {
+                    x: number;
+                    y: number;
+                }[];
+                selection: D3.Selection;
+            };
         }
     }
 }
@@ -3082,6 +3109,14 @@ declare module Plottable {
                 [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
             };
             protected _wholeDatumAttributes(): string[];
+            protected _getClosestPlotData(queryPoint: Point, datasetKeys: string[], withinValue?: number): {
+                data: any[];
+                pixelPoints: {
+                    x: number;
+                    y: number;
+                }[];
+                selection: D3.Selection;
+            };
             protected _getClosestWithinRange(p: Point, range: number): {
                 closestValue: any;
                 closestPoint: {
@@ -3545,6 +3580,18 @@ declare module Plottable {
              * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
              */
             onMouseUp(key: any, callback: MouseCallback): Dispatcher.Mouse;
+            /**
+             * Registers a callback to be called whenever a wheel occurs,
+             * or removes the callback if `null` is passed as the callback.
+             *
+             * @param {any} key The key associated with the callback.
+             *                  Key uniqueness is determined by deep equality.
+             * @param {WheelCallback} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space.
+             *                                     Pass `null` to remove a callback.
+             * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+             */
+            onWheel(key: any, callback: MouseCallback): Dispatcher.Mouse;
             /**
              * Returns the last computed mouse position.
              *
