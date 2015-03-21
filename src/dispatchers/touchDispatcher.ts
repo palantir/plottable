@@ -17,7 +17,6 @@ export module Dispatcher {
     private _startBroadcaster: Core.Broadcaster<Dispatcher.Touch>;
     private _moveBroadcaster: Core.Broadcaster<Dispatcher.Touch>;
     private _endBroadcaster: Core.Broadcaster<Dispatcher.Touch>;
-    private _processEndCallback: (e: TouchEvent) => any;
 
     /**
      * Get a Dispatcher.Touch for the <svg> containing elem. If one already exists
@@ -57,8 +56,7 @@ export module Dispatcher {
       this._event2Callback["touchmove"] = (e: TouchEvent) => this._measureAndBroadcast(e, this._moveBroadcaster);
 
       this._endBroadcaster = new Core.Broadcaster(this);
-      this._processEndCallback = (e: TouchEvent) => this._measureAndBroadcast(e, this._endBroadcaster);
-      this._event2Callback["touchend"] = this._processEndCallback;
+      this._event2Callback["touchend"] = (e: TouchEvent) => this._measureAndBroadcast(e, this._endBroadcaster);
 
       this._broadcasters = [this._moveBroadcaster, this._startBroadcaster, this._endBroadcaster];
     }

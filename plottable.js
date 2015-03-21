@@ -9110,8 +9110,7 @@ var Plottable;
                 this._moveBroadcaster = new Plottable.Core.Broadcaster(this);
                 this._event2Callback["touchmove"] = function (e) { return _this._measureAndBroadcast(e, _this._moveBroadcaster); };
                 this._endBroadcaster = new Plottable.Core.Broadcaster(this);
-                this._processEndCallback = function (e) { return _this._measureAndBroadcast(e, _this._endBroadcaster); };
-                this._event2Callback["touchend"] = this._processEndCallback;
+                this._event2Callback["touchend"] = function (e) { return _this._measureAndBroadcast(e, _this._endBroadcaster); };
                 this._broadcasters = [this._moveBroadcaster, this._startBroadcaster, this._endBroadcaster];
             }
             /**
