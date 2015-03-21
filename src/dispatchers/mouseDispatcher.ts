@@ -12,7 +12,6 @@ export module Dispatcher {
     private _downBroadcaster: Core.Broadcaster<Dispatcher.Mouse>;
     private _upBroadcaster: Core.Broadcaster<Dispatcher.Mouse>;
     private _wheelBroadcaster: Core.Broadcaster<Dispatcher.Mouse>;
-    private _processUpCallback: (e: MouseEvent) => any;
     private _processWheelCallback: (e: MouseEvent) => any;
 
     /**
@@ -56,8 +55,7 @@ export module Dispatcher {
       this._event2Callback["mousedown"] = (e: MouseEvent) => this._measureAndBroadcast(e, this._downBroadcaster);
 
       this._upBroadcaster = new Core.Broadcaster(this);
-      this._processUpCallback = (e: MouseEvent) => this._measureAndBroadcast(e, this._upBroadcaster);
-      this._event2Callback["mouseup"] = this._processUpCallback;
+      this._event2Callback["mouseup"] = (e: MouseEvent) => this._measureAndBroadcast(e, this._upBroadcaster);
 
       this._wheelBroadcaster = new Core.Broadcaster(this);
       this._processWheelCallback = (e: WheelEvent) => this._measureAndBroadcast(e, this._wheelBroadcaster);
