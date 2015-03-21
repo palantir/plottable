@@ -9237,8 +9237,7 @@ var Plottable;
             function Key() {
                 var _this = this;
                 _super.call(this);
-                this._downCallback = function (e) { return _this._processKeydown(e); };
-                this._event2Callback["keydown"] = this._downCallback;
+                this._event2Callback["keydown"] = function (e) { return _this._processKeydown(e); };
                 this._keydownBroadcaster = new Plottable.Core.Broadcaster(this);
                 this._broadcasters = [this._keydownBroadcaster];
             }
