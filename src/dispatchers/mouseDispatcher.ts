@@ -12,7 +12,6 @@ export module Dispatcher {
     private _downBroadcaster: Core.Broadcaster<Dispatcher.Mouse>;
     private _upBroadcaster: Core.Broadcaster<Dispatcher.Mouse>;
     private _wheelBroadcaster: Core.Broadcaster<Dispatcher.Mouse>;
-    private _processDownCallback: (e: MouseEvent) => any;
     private _processUpCallback: (e: MouseEvent) => any;
     private _processWheelCallback: (e: MouseEvent) => any;
 
@@ -46,16 +45,15 @@ export module Dispatcher {
       this.translator = _Util.ClientToSVGTranslator.getTranslator(svg);
 
       this._lastMousePosition = { x: -1, y: -1 };
-      this._moveBroadcaster = new Core.Broadcaster(this);
 
+      this._moveBroadcaster = new Core.Broadcaster(this);
       var processMoveCallback = (e: MouseEvent) => this._measureAndBroadcast(e, this._moveBroadcaster);
       this._event2Callback["mouseover"] = processMoveCallback;
       this._event2Callback["mousemove"] = processMoveCallback;
       this._event2Callback["mouseout"] = processMoveCallback;
 
       this._downBroadcaster = new Core.Broadcaster(this);
-      this._processDownCallback = (e: MouseEvent) => this._measureAndBroadcast(e, this._downBroadcaster);
-      this._event2Callback["mousedown"] = this._processDownCallback;
+      this._event2Callback["mousedown"] = (e: MouseEvent) => this._measureAndBroadcast(e, this._downBroadcaster);
 
       this._upBroadcaster = new Core.Broadcaster(this);
       this._processUpCallback = (e: MouseEvent) => this._measureAndBroadcast(e, this._upBroadcaster);
