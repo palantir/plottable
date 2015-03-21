@@ -17,7 +17,6 @@ export module Dispatcher {
     private _startBroadcaster: Core.Broadcaster<Dispatcher.Touch>;
     private _moveBroadcaster: Core.Broadcaster<Dispatcher.Touch>;
     private _endBroadcaster: Core.Broadcaster<Dispatcher.Touch>;
-    private _processStartCallback: (e: TouchEvent) => any;
     private _processEndCallback: (e: TouchEvent) => any;
 
     /**
@@ -51,12 +50,11 @@ export module Dispatcher {
 
       this._lastTouchPosition = { x: -1, y: -1 };
 
+      this._startBroadcaster = new Core.Broadcaster(this);
+      this._event2Callback["touchstart"] = (e: TouchEvent) => this._measureAndBroadcast(e, this._startBroadcaster);
+
       this._moveBroadcaster = new Core.Broadcaster(this);
       this._event2Callback["touchmove"] = (e: TouchEvent) => this._measureAndBroadcast(e, this._moveBroadcaster);
-
-      this._startBroadcaster = new Core.Broadcaster(this);
-      this._processStartCallback = (e: TouchEvent) => this._measureAndBroadcast(e, this._startBroadcaster);
-      this._event2Callback["touchstart"] = this._processStartCallback;
 
       this._endBroadcaster = new Core.Broadcaster(this);
       this._processEndCallback = (e: TouchEvent) => this._measureAndBroadcast(e, this._endBroadcaster);
