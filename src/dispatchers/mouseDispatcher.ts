@@ -12,7 +12,6 @@ export module Dispatcher {
     private _downBroadcaster: Core.Broadcaster<Dispatcher.Mouse>;
     private _upBroadcaster: Core.Broadcaster<Dispatcher.Mouse>;
     private _wheelBroadcaster: Core.Broadcaster<Dispatcher.Mouse>;
-    private _processWheelCallback: (e: MouseEvent) => any;
 
     /**
      * Get a Dispatcher.Mouse for the <svg> containing elem. If one already exists
@@ -58,8 +57,7 @@ export module Dispatcher {
       this._event2Callback["mouseup"] = (e: MouseEvent) => this._measureAndBroadcast(e, this._upBroadcaster);
 
       this._wheelBroadcaster = new Core.Broadcaster(this);
-      this._processWheelCallback = (e: WheelEvent) => this._measureAndBroadcast(e, this._wheelBroadcaster);
-      this._event2Callback["wheel"] = this._processWheelCallback;
+      this._event2Callback["wheel"] = (e: WheelEvent) => this._measureAndBroadcast(e, this._wheelBroadcaster);
 
       this._broadcasters = [this._moveBroadcaster, this._downBroadcaster, this._upBroadcaster, this._wheelBroadcaster];
     }

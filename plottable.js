@@ -8973,8 +8973,7 @@ var Plottable;
                 this._upBroadcaster = new Plottable.Core.Broadcaster(this);
                 this._event2Callback["mouseup"] = function (e) { return _this._measureAndBroadcast(e, _this._upBroadcaster); };
                 this._wheelBroadcaster = new Plottable.Core.Broadcaster(this);
-                this._processWheelCallback = function (e) { return _this._measureAndBroadcast(e, _this._wheelBroadcaster); };
-                this._event2Callback["wheel"] = this._processWheelCallback;
+                this._event2Callback["wheel"] = function (e) { return _this._measureAndBroadcast(e, _this._wheelBroadcaster); };
                 this._broadcasters = [this._moveBroadcaster, this._downBroadcaster, this._upBroadcaster, this._wheelBroadcaster];
             }
             /**
