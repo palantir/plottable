@@ -46,7 +46,7 @@ export module Interaction {
       super();
       if (!Hover.warned) {
         Hover.warned = true;
-        _Util.Methods.warn("Plottable.Interaction.Hover is deprecated and has been remade into Plottable.Interaction.Pointer.");
+        _Util.Methods.warn("Interaction.Hover is deprecated; use Interaction.Pointer in conjunction with getClosestPlotData() instead.");
       }
     }
 

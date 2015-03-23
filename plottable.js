@@ -10088,7 +10088,7 @@ var Plottable;
                 };
                 if (!Hover.warned) {
                     Hover.warned = true;
-                    Plottable._Util.Methods.warn("Plottable.Interaction.Hover is deprecated and has been remade into Plottable.Interaction.Pointer.");
+                    Plottable._Util.Methods.warn("Interaction.Hover is deprecated; use Interaction.Pointer in conjunction with getClosestPlotData() instead.");
                 }
             }
             Hover.prototype._anchor = function (component, hitBox) {
