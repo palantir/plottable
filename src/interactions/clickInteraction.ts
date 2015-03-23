@@ -15,6 +15,10 @@ export module Interaction {
       });
     }
 
+    public _requiresHitbox() {
+      return true;
+    }
+
     protected _listenTo(): string {
       return "click";
     }
