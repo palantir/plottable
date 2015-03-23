@@ -23,11 +23,11 @@ export module Interaction {
 
       this._touchDispatcher = Dispatcher.Touch.getDispatcher(<SVGElement> this._componentToListenTo.content().node());
       this._touchDispatcher.onTouchStart("Interaction.Drag" + this.getID(),
-        (p: Point, e: MouseEvent) => this._startDrag(p, e));
+        (p: Point, e: TouchEvent) => this._startDrag(p, e));
       this._touchDispatcher.onTouchMove("Interaction.Drag" + this.getID(),
-        (p: Point, e: MouseEvent) => this._doDrag(p, e));
+        (p: Point, e: TouchEvent) => this._doDrag(p, e));
       this._touchDispatcher.onTouchEnd("Interaction.Drag" + this.getID(),
-        (p: Point, e: MouseEvent) => this._endDrag(p, e));
+        (p: Point, e: TouchEvent) => this._endDrag(p, e));
     }
 
     private _translateAndConstrain(p: Point) {
@@ -38,7 +38,7 @@ export module Interaction {
       };
     }
 
-    private _startDrag(p: Point, e: MouseEvent) {
+    private _startDrag(p: Point, e: UIEvent) {
       var translatedP = this._translateToComponentSpace(p);
       if (this._isInsideComponent(translatedP)) {
         e.preventDefault();
@@ -50,7 +50,7 @@ export module Interaction {
       }
     }
 
-    private _doDrag(p: Point, e: MouseEvent) {
+    private _doDrag(p: Point, e: UIEvent) {
       if (this._dragging) {
         if (this._dragCallback) {
           var constrainedP = this._translateAndConstrain(p);
@@ -59,7 +59,7 @@ export module Interaction {
       }
     }
 
-    private _endDrag(p: Point, e: MouseEvent) {
+    private _endDrag(p: Point, e: UIEvent) {
       if (this._dragging) {
         this._dragging = false;
         if (this._dragEndCallback) {
