@@ -8964,19 +8964,16 @@ var Plottable;
                 this.translator = Plottable._Util.ClientToSVGTranslator.getTranslator(svg);
                 this._lastMousePosition = { x: -1, y: -1 };
                 this._moveBroadcaster = new Plottable.Core.Broadcaster(this);
-                this._processMoveCallback = function (e) { return _this._measureAndBroadcast(e, _this._moveBroadcaster); };
-                this._event2Callback["mouseover"] = this._processMoveCallback;
-                this._event2Callback["mousemove"] = this._processMoveCallback;
-                this._event2Callback["mouseout"] = this._processMoveCallback;
+                var processMoveCallback = function (e) { return _this._measureAndBroadcast(e, _this._moveBroadcaster); };
+                this._event2Callback["mouseover"] = processMoveCallback;
+                this._event2Callback["mousemove"] = processMoveCallback;
+                this._event2Callback["mouseout"] = processMoveCallback;
                 this._downBroadcaster = new Plottable.Core.Broadcaster(this);
-                this._processDownCallback = function (e) { return _this._measureAndBroadcast(e, _this._downBroadcaster); };
-                this._event2Callback["mousedown"] = this._processDownCallback;
+                this._event2Callback["mousedown"] = function (e) { return _this._measureAndBroadcast(e, _this._downBroadcaster); };
                 this._upBroadcaster = new Plottable.Core.Broadcaster(this);
-                this._processUpCallback = function (e) { return _this._measureAndBroadcast(e, _this._upBroadcaster); };
-                this._event2Callback["mouseup"] = this._processUpCallback;
+                this._event2Callback["mouseup"] = function (e) { return _this._measureAndBroadcast(e, _this._upBroadcaster); };
                 this._wheelBroadcaster = new Plottable.Core.Broadcaster(this);
-                this._processWheelCallback = function (e) { return _this._measureAndBroadcast(e, _this._wheelBroadcaster); };
-                this._event2Callback["wheel"] = this._processWheelCallback;
+                this._event2Callback["wheel"] = function (e) { return _this._measureAndBroadcast(e, _this._wheelBroadcaster); };
                 this._broadcasters = [this._moveBroadcaster, this._downBroadcaster, this._upBroadcaster, this._wheelBroadcaster];
             }
             /**
@@ -9108,15 +9105,12 @@ var Plottable;
                 _super.call(this);
                 this.translator = Plottable._Util.ClientToSVGTranslator.getTranslator(svg);
                 this._lastTouchPosition = { x: -1, y: -1 };
-                this._moveBroadcaster = new Plottable.Core.Broadcaster(this);
-                this._processMoveCallback = function (e) { return _this._measureAndBroadcast(e, _this._moveBroadcaster); };
-                this._event2Callback["touchmove"] = this._processMoveCallback;
                 this._startBroadcaster = new Plottable.Core.Broadcaster(this);
-                this._processStartCallback = function (e) { return _this._measureAndBroadcast(e, _this._startBroadcaster); };
-                this._event2Callback["touchstart"] = this._processStartCallback;
+                this._event2Callback["touchstart"] = function (e) { return _this._measureAndBroadcast(e, _this._startBroadcaster); };
+                this._moveBroadcaster = new Plottable.Core.Broadcaster(this);
+                this._event2Callback["touchmove"] = function (e) { return _this._measureAndBroadcast(e, _this._moveBroadcaster); };
                 this._endBroadcaster = new Plottable.Core.Broadcaster(this);
-                this._processEndCallback = function (e) { return _this._measureAndBroadcast(e, _this._endBroadcaster); };
-                this._event2Callback["touchend"] = this._processEndCallback;
+                this._event2Callback["touchend"] = function (e) { return _this._measureAndBroadcast(e, _this._endBroadcaster); };
                 this._broadcasters = [this._moveBroadcaster, this._startBroadcaster, this._endBroadcaster];
             }
             /**
@@ -9237,8 +9231,7 @@ var Plottable;
             function Key() {
                 var _this = this;
                 _super.call(this);
-                this._downCallback = function (e) { return _this._processKeydown(e); };
-                this._event2Callback["keydown"] = this._downCallback;
+                this._event2Callback["keydown"] = function (e) { return _this._processKeydown(e); };
                 this._keydownBroadcaster = new Plottable.Core.Broadcaster(this);
                 this._broadcasters = [this._keydownBroadcaster];
             }

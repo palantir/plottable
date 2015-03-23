@@ -12,10 +12,6 @@ export module Dispatcher {
     private _downBroadcaster: Core.Broadcaster<Dispatcher.Mouse>;
     private _upBroadcaster: Core.Broadcaster<Dispatcher.Mouse>;
     private _wheelBroadcaster: Core.Broadcaster<Dispatcher.Mouse>;
-    private _processMoveCallback: (e: MouseEvent) => any;
-    private _processDownCallback: (e: MouseEvent) => any;
-    private _processUpCallback: (e: MouseEvent) => any;
-    private _processWheelCallback: (e: MouseEvent) => any;
 
     /**
      * Get a Dispatcher.Mouse for the <svg> containing elem. If one already exists
@@ -47,24 +43,21 @@ export module Dispatcher {
       this.translator = _Util.ClientToSVGTranslator.getTranslator(svg);
 
       this._lastMousePosition = { x: -1, y: -1 };
-      this._moveBroadcaster = new Core.Broadcaster(this);
 
-      this._processMoveCallback = (e: MouseEvent) => this._measureAndBroadcast(e, this._moveBroadcaster);
-      this._event2Callback["mouseover"] = this._processMoveCallback;
-      this._event2Callback["mousemove"] = this._processMoveCallback;
-      this._event2Callback["mouseout"] = this._processMoveCallback;
+      this._moveBroadcaster = new Core.Broadcaster(this);
+      var processMoveCallback = (e: MouseEvent) => this._measureAndBroadcast(e, this._moveBroadcaster);
+      this._event2Callback["mouseover"] = processMoveCallback;
+      this._event2Callback["mousemove"] = processMoveCallback;
+      this._event2Callback["mouseout"] = processMoveCallback;
 
       this._downBroadcaster = new Core.Broadcaster(this);
-      this._processDownCallback = (e: MouseEvent) => this._measureAndBroadcast(e, this._downBroadcaster);
-      this._event2Callback["mousedown"] = this._processDownCallback;
+      this._event2Callback["mousedown"] = (e: MouseEvent) => this._measureAndBroadcast(e, this._downBroadcaster);
 
       this._upBroadcaster = new Core.Broadcaster(this);
-      this._processUpCallback = (e: MouseEvent) => this._measureAndBroadcast(e, this._upBroadcaster);
-      this._event2Callback["mouseup"] = this._processUpCallback;
+      this._event2Callback["mouseup"] = (e: MouseEvent) => this._measureAndBroadcast(e, this._upBroadcaster);
 
       this._wheelBroadcaster = new Core.Broadcaster(this);
-      this._processWheelCallback = (e: WheelEvent) => this._measureAndBroadcast(e, this._wheelBroadcaster);
-      this._event2Callback["wheel"] = this._processWheelCallback;
+      this._event2Callback["wheel"] = (e: WheelEvent) => this._measureAndBroadcast(e, this._wheelBroadcaster);
 
       this._broadcasters = [this._moveBroadcaster, this._downBroadcaster, this._upBroadcaster, this._wheelBroadcaster];
     }
