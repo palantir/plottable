@@ -4065,6 +4065,7 @@ declare module Plottable {
         }
         class Hover extends Interaction.AbstractInteraction {
             _componentToListenTo: Hoverable;
+            constructor();
             _anchor(component: Hoverable, hitBox: D3.Selection): void;
             /**
              * Attaches an callback to be called when the user mouses over an element.

@@ -32,12 +32,23 @@ export module Interaction {
   }
 
   export class Hover extends Interaction.AbstractInteraction {
+
+    private static warned = false;
+
     public _componentToListenTo: Hoverable;
     private _mouseDispatcher: Dispatcher.Mouse;
     private _touchDispatcher: Dispatcher.Touch;
     private _hoverOverCallback: (hoverData: HoverData) => any;
     private _hoverOutCallback: (hoverData: HoverData) => any;
     private _overComponent = false;
+
+    constructor() {
+      super();
+      if (!Hover.warned) {
+        Hover.warned = true;
+        _Util.Methods.warn("Plottable.Interaction.Hover is deprecated and has been remade into Plottable.Interaction.Pointer.");
+      }
+    }
 
     private _currentHoverData: HoverData = {
       data: null,
