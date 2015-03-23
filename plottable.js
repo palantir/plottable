@@ -10201,6 +10201,49 @@ var Plottable;
     })(Interaction = Plottable.Interaction || (Plottable.Interaction = {}));
 })(Plottable || (Plottable = {}));
 
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    var Interaction;
+    (function (Interaction) {
+        var Scroll = (function (_super) {
+            __extends(Scroll, _super);
+            function Scroll() {
+                _super.apply(this, arguments);
+            }
+            Scroll.prototype._anchor = function (component, hitBox) {
+                var _this = this;
+                _super.prototype._anchor.call(this, component, hitBox);
+                this._mouseDispatcher = Plottable.Dispatcher.Mouse.getDispatcher(this._componentToListenTo.content().node());
+                this._mouseDispatcher.onMouseMove("Interaction.Scroll" + this.getID(), function (p, e) { return _this._handleScrollEvent(p, e); });
+            };
+            Scroll.prototype._handleScrollEvent = function (p, e) {
+                var translatedP = this._translateToComponentSpace(p);
+                if (this._isInsideComponent(translatedP)) {
+                    if (this.onScroll()) {
+                        this.onScroll()(translatedP, e);
+                    }
+                }
+            };
+            Scroll.prototype.onScroll = function (callback) {
+                if (callback === undefined) {
+                    return this._scrollCallback;
+                }
+                this._scrollCallback = callback;
+                return this;
+            };
+            return Scroll;
+        })(Interaction.AbstractInteraction);
+        Interaction.Scroll = Scroll;
+    })(Interaction = Plottable.Interaction || (Plottable.Interaction = {}));
+})(Plottable || (Plottable = {}));
+
 /*!
 SVG Typewriter 0.1.11 (https://github.com/palantir/svg-typewriter)
 Copyright 2014 Palantir Technologies
