@@ -5,6 +5,7 @@ export module Interaction {
   export class Drag extends AbstractInteraction {
     private _dragging = false;
     private _mouseDispatcher: Plottable.Dispatcher.Mouse;
+    private _touchDispatcher: Dispatcher.Touch;
     private _dragOrigin: Point;
     private _dragStartCallback: (p: Point) => any;
     private _dragCallback: (start: Point, end: Point) => any;
@@ -13,13 +14,20 @@ export module Interaction {
     public _anchor(component: Component.AbstractComponent, hitBox: D3.Selection) {
       super._anchor(component, hitBox);
       this._mouseDispatcher = Dispatcher.Mouse.getDispatcher(<SVGElement> this._componentToListenTo.content().node());
-      // TODO: Add Dispatcher.Touch as well
       this._mouseDispatcher.onMouseDown("Interaction.Drag" + this.getID(),
         (p: Point, e: MouseEvent) => this._startDrag(p, e));
       this._mouseDispatcher.onMouseMove("Interaction.Drag" + this.getID(),
         (p: Point, e: MouseEvent) => this._doDrag(p, e));
       this._mouseDispatcher.onMouseUp("Interaction.Drag" + this.getID(),
         (p: Point, e: MouseEvent) => this._endDrag(p, e));
+
+      this._touchDispatcher = Dispatcher.Touch.getDispatcher(<SVGElement> this._componentToListenTo.content().node());
+      this._touchDispatcher.onTouchStart("Interaction.Drag" + this.getID(),
+        (p: Point, e: TouchEvent) => this._startDrag(p, e));
+      this._touchDispatcher.onTouchMove("Interaction.Drag" + this.getID(),
+        (p: Point, e: TouchEvent) => this._doDrag(p, e));
+      this._touchDispatcher.onTouchEnd("Interaction.Drag" + this.getID(),
+        (p: Point, e: TouchEvent) => this._endDrag(p, e));
     }
 
     private _translateAndConstrain(p: Point) {
@@ -30,7 +38,7 @@ export module Interaction {
       };
     }
 
-    private _startDrag(p: Point, e: MouseEvent) {
+    private _startDrag(p: Point, e: UIEvent) {
       var translatedP = this._translateToComponentSpace(p);
       if (this._isInsideComponent(translatedP)) {
         e.preventDefault();
@@ -42,7 +50,7 @@ export module Interaction {
       }
     }
 
-    private _doDrag(p: Point, e: MouseEvent) {
+    private _doDrag(p: Point, e: UIEvent) {
       if (this._dragging) {
         if (this._dragCallback) {
           var constrainedP = this._translateAndConstrain(p);
@@ -51,7 +59,7 @@ export module Interaction {
       }
     }
 
-    private _endDrag(p: Point, e: MouseEvent) {
+    private _endDrag(p: Point, e: UIEvent) {
       if (this._dragging) {
         this._dragging = false;
         if (this._dragEndCallback) {
