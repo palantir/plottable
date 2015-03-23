@@ -1748,20 +1748,6 @@ declare module Plottable {
             _isFixedHeight(): boolean;
             _merge(c: AbstractComponent, below: boolean): Component.Group;
             /**
-             * Merges this Component below another Component, returning a
-             * ComponentGroup. This is used to layer Components on top of each other.
-             *
-             * There are four cases:
-             * Component + Component: Returns a ComponentGroup with the first component before the second component.
-             * ComponentGroup + Component: Returns the ComponentGroup with the Component appended.
-             * Component + ComponentGroup: Returns the ComponentGroup with the Component prepended.
-             * ComponentGroup + ComponentGroup: Returns a new ComponentGroup with the first group before the second group.
-             *
-             * @param {Component} c The component to merge in.
-             * @returns {ComponentGroup} The relevant ComponentGroup out of the above four cases.
-             */
-            above(c: AbstractComponent): Component.Group;
-            /**
              * Merges this Component above another Component, returning a
              * ComponentGroup. This is used to layer Components on top of each other.
              *
@@ -1770,6 +1756,20 @@ declare module Plottable {
              * ComponentGroup + Component: Returns the ComponentGroup with the Component prepended.
              * Component + ComponentGroup: Returns the ComponentGroup with the Component appended.
              * ComponentGroup + ComponentGroup: Returns a new ComponentGroup with the first group after the second group.
+             *
+             * @param {Component} c The component to merge in.
+             * @returns {ComponentGroup} The relevant ComponentGroup out of the above four cases.
+             */
+            above(c: AbstractComponent): Component.Group;
+            /**
+             * Merges this Component below another Component, returning a
+             * ComponentGroup. This is used to layer Components on top of each other.
+             *
+             * There are four cases:
+             * Component + Component: Returns a ComponentGroup with the first component before the second component.
+             * ComponentGroup + Component: Returns the ComponentGroup with the Component appended.
+             * Component + ComponentGroup: Returns the ComponentGroup with the Component prepended.
+             * ComponentGroup + ComponentGroup: Returns a new ComponentGroup with the first group before the second group.
              *
              * @param {Component} c The component to merge in.
              * @returns {ComponentGroup} The relevant ComponentGroup out of the above four cases.
