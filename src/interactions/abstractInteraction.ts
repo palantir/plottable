@@ -18,6 +18,10 @@ export module Interaction {
       this._hitBox = hitBox;
     }
 
+    public _requiresHitbox() {
+      return false;
+    }
+
     /**
      * Translates an <svg>-coordinate-space point to Component-space coordinates.
      *

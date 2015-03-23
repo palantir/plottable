@@ -244,7 +244,7 @@ describe("Component behavior", () => {
     svg.remove();
   });
 
-  it("hitboxes are created iff there are registered interactions", () => {
+  it("hitboxes are created iff there are registered interactions (that require hitboxes)", () => {
     function verifyHitbox(component: Plottable.Component.AbstractComponent) {
       var hitBox = (<any> component)._hitBox;
       assert.isNotNull(hitBox, "the hitbox was created");
@@ -259,33 +259,23 @@ describe("Component behavior", () => {
     svg.remove();
     svg = generateSVG();
 
+    // registration before achoring
     c = new Plottable.Component.AbstractComponent();
     var i = new Plottable.Interaction.AbstractInteraction();
+    i._requiresHitbox = () => true;
     c.registerInteraction(i);
     c._anchor(svg);
     verifyHitbox(c);
     svg.remove();
     svg = generateSVG();
 
+    // registration after anchoring
     c = new Plottable.Component.AbstractComponent();
     c._anchor(svg);
     i = new Plottable.Interaction.AbstractInteraction();
+    i._requiresHitbox = () => true;
     c.registerInteraction(i);
     verifyHitbox(c);
-    svg.remove();
-  });
-
-  it("interaction registration works properly", () => {
-    var hitBox1: Element = null;
-    var hitBox2: Element = null;
-    var interaction1: any = {_anchor: (comp: Plottable.Component.AbstractComponent, hb: D3.Selection) => hitBox1 = hb.node()};
-    var interaction2: any = {_anchor: (comp: Plottable.Component.AbstractComponent, hb: D3.Selection) => hitBox2 = hb.node()};
-    c.registerInteraction(interaction1);
-    c.renderTo(svg);
-    c.registerInteraction(interaction2);
-    var hitNode = (<any> c)._hitBox.node();
-    assert.equal(hitBox1, hitNode, "hitBox1 was registerd");
-    assert.equal(hitBox2, hitNode, "hitBox2 was registerd");
     svg.remove();
   });
 

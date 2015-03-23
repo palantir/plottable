@@ -161,6 +161,10 @@ export module Interaction {
       return this;
     }
 
+    public _requiresHitbox() {
+      return true;
+    }
+
     /**
      * Sets up so that the xScale and yScale that are passed have their
      * domains automatically changed as you zoom.

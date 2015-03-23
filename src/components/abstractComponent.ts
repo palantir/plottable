@@ -342,7 +342,7 @@ export module Component {
       // pushed to this._interactionsToRegister and registered during anchoring. If after, they are
       // registered immediately
       if (this._element) {
-        if (!this._hitBox) {
+        if (!this._hitBox && interaction._requiresHitbox()) {
             this._hitBox = this._addBox("hit-box");
             this._hitBox.style("fill", "#ffffff").style("opacity", 0); // We need to set these so Chrome will register events
         }

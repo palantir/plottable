@@ -3723,6 +3723,7 @@ declare module Plottable {
             protected _hitBox: D3.Selection;
             protected _componentToListenTo: Component.AbstractComponent;
             _anchor(component: Component.AbstractComponent, hitBox: D3.Selection): void;
+            _requiresHitbox(): boolean;
             /**
              * Translates an <svg>-coordinate-space point to Component-space coordinates.
              *
@@ -3748,6 +3749,7 @@ declare module Plottable {
     module Interaction {
         class Click extends AbstractInteraction {
             _anchor(component: Component.AbstractComponent, hitBox: D3.Selection): void;
+            _requiresHitbox(): boolean;
             protected _listenTo(): string;
             /**
              * Sets a callback to be called when a click is received.
@@ -3848,6 +3850,7 @@ declare module Plottable {
              */
             resetZoom(): void;
             _anchor(component: Component.AbstractComponent, hitBox: D3.Selection): void;
+            _requiresHitbox(): boolean;
         }
     }
 }
@@ -3913,6 +3916,7 @@ declare module Plottable {
             protected _dragend(): void;
             protected _doDragend(): void;
             _anchor(component: Component.AbstractComponent, hitBox: D3.Selection): Drag;
+            _requiresHitbox(): boolean;
             /**
              * Sets up so that the xScale and yScale that are passed have their
              * domains automatically changed as you zoom.
