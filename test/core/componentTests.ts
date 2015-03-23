@@ -244,7 +244,7 @@ describe("Component behavior", () => {
     svg.remove();
   });
 
-  it("hitboxes are created iff there are registered interactions (that require hitboxes)", () => {
+  it("hitboxes are created iff there are registered interactions that require hitboxes", () => {
     function verifyHitbox(component: Plottable.Component.AbstractComponent) {
       var hitBox = (<any> component)._hitBox;
       assert.isNotNull(hitBox, "the hitbox was created");
@@ -259,7 +259,7 @@ describe("Component behavior", () => {
     svg.remove();
     svg = generateSVG();
 
-    // registration before achoring
+    // registration before anchoring
     c = new Plottable.Component.AbstractComponent();
     var i = new Plottable.Interaction.AbstractInteraction();
     i._requiresHitbox = () => true;

@@ -23,7 +23,7 @@ describe("Interactions", () => {
       var interaction = new Plottable.Interaction.PanZoom(xScale, yScale);
       plot.registerInteraction(interaction);
 
-      var hb = (<any> plot)._element.select(".hit-box").node();
+      var hb = plot.hitBox().node();
       var dragDistancePixelX = 10;
       var dragDistancePixelY = 20;
       $(hb).simulate("drag", {
@@ -97,7 +97,7 @@ describe("Interactions", () => {
       ki.on(bCode, bCallback);
       component.registerInteraction(ki);
 
-      var $target = $((<any> component).content().node());
+      var $target = $(component.content().node());
 
       triggerFakeMouseEvent("mouseover", component.content(), 100, 100);
       $target.simulate("keydown", { keyCode: aCode });

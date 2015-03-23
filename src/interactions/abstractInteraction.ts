@@ -18,6 +18,7 @@ export module Interaction {
       this._hitBox = hitBox;
     }
 
+    // HACKHACK: After all Interactions use Dispatchers, we won't need hitboxes at all (#1757)
     public _requiresHitbox() {
       return false;
     }

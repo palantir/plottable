@@ -5529,7 +5529,7 @@ describe("Component behavior", function () {
         });
         svg.remove();
     });
-    it("hitboxes are created iff there are registered interactions (that require hitboxes)", function () {
+    it("hitboxes are created iff there are registered interactions that require hitboxes", function () {
         function verifyHitbox(component) {
             var hitBox = component._hitBox;
             assert.isNotNull(hitBox, "the hitbox was created");
@@ -5542,7 +5542,7 @@ describe("Component behavior", function () {
         assert.isUndefined(c._hitBox, "no hitBox was created when there were no registered interactions");
         svg.remove();
         svg = generateSVG();
-        // registration before achoring
+        // registration before anchoring
         c = new Plottable.Component.AbstractComponent();
         var i = new Plottable.Interaction.AbstractInteraction();
         i._requiresHitbox = function () { return true; };
@@ -7354,7 +7354,7 @@ describe("Interactions", function () {
             var yDomainBefore = yScale.domain();
             var interaction = new Plottable.Interaction.PanZoom(xScale, yScale);
             plot.registerInteraction(interaction);
-            var hb = plot._element.select(".hit-box").node();
+            var hb = plot.hitBox().node();
             var dragDistancePixelX = 10;
             var dragDistancePixelY = 20;
             $(hb).simulate("drag", {

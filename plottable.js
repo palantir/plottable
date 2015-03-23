@@ -9302,6 +9302,7 @@ var Plottable;
                 this._componentToListenTo = component;
                 this._hitBox = hitBox;
             };
+            // HACKHACK: After all Interactions use Dispatchers, we won't need hitboxes at all (#1757)
             AbstractInteraction.prototype._requiresHitbox = function () {
                 return false;
             };
