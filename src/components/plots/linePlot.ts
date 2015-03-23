@@ -95,6 +95,34 @@ export module Plot {
       return ["x", "y"];
     }
 
+    protected _getClosestPlotData(queryPoint: Point, datasetKeys: string[], withinValue = Infinity) {
+      var closestDistanceSquared = withinValue;
+      var closestDatum: any;
+      var closestSelection: D3.Selection;
+      var closestPoint: Point;
+
+      datasetKeys.forEach((datasetKey: string) => {
+        var plotData = this.getAllPlotData(datasetKey);
+        plotData.pixelPoints.forEach((pixelPoint: Point, index: number) => {
+          var pixelPointDist = _Util.Methods.distanceSquared(queryPoint, pixelPoint);
+          if (pixelPointDist < closestDistanceSquared) {
+            closestDistanceSquared = pixelPointDist;
+            closestDatum = plotData.data[index];
+            closestPoint = pixelPoint;
+            closestSelection = plotData.selection;
+          }
+        });
+      });
+
+      if (closestDatum == null) {
+        return {data: [], pixelPoints: [], selection: d3.select()};
+      }
+
+      return {data: [closestDatum],
+              pixelPoints: [closestPoint],
+              selection: closestSelection};
+    }
+
     protected _getClosestWithinRange(p: Point, range: number) {
       var attrToProjector = this._generateAttrToProjector();
       var xProjector = attrToProjector["x"];
@@ -130,6 +158,28 @@ export module Plot {
         closestValue: closestOverall,
         closestPoint: closestPoint
       };
+    }
+
+    protected _getAllPlotData(datasetKeys: string[]): PlotData {
+      var data: any[] = [];
+      var pixelPoints: Point[] = [];
+      var allElements: EventTarget[] = [];
+
+      datasetKeys.forEach((datasetKey) => {
+        var plotDatasetKey = this._key2PlotDatasetKey.get(datasetKey);
+        if (plotDatasetKey == null) { return; }
+        var drawer = plotDatasetKey.drawer;
+        plotDatasetKey.dataset.data().forEach((datum: any, index: number) => {
+          data.push(datum);
+          pixelPoints.push(drawer._getPixelPoint(datum, index));
+        });
+
+        if (plotDatasetKey.dataset.data().length > 0) {
+          allElements.push(drawer._getSelection(0).node());
+        }
+      });
+
+      return { data: data, pixelPoints: pixelPoints, selection: d3.selectAll(allElements) };
     }
 
     //===== Hover logic =====

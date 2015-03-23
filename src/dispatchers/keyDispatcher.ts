@@ -7,7 +7,6 @@ export module Dispatcher {
   export class Key extends AbstractDispatcher {
     private static _DISPATCHER_KEY = "__Plottable_Dispatcher_Key";
     private _keydownBroadcaster: Core.Broadcaster<Dispatcher.Key>;
-    private _downCallback = (e: KeyboardEvent) => this._processKeydown(e);
 
     /**
      * Get a Dispatcher.Key. If one already exists it will be returned;
@@ -33,7 +32,7 @@ export module Dispatcher {
     constructor() {
       super();
 
-      this._event2Callback["keydown"] = this._downCallback;
+      this._event2Callback["keydown"] = (e: KeyboardEvent) => this._processKeydown(e);
 
       this._keydownBroadcaster = new Core.Broadcaster(this);
       this._broadcasters = [this._keydownBroadcaster];

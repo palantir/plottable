@@ -16,47 +16,6 @@ function getSVGParent() {
         return d3.select("body");
     }
 }
-function triggerFakeUIEvent(type, target) {
-    var e = document.createEvent("UIEvents");
-    e.initUIEvent(type, true, true, window, 1);
-    target.node().dispatchEvent(e);
-}
-function triggerFakeMouseEvent(type, target, relativeX, relativeY) {
-    var clientRect = target.node().getBoundingClientRect();
-    var xPos = clientRect.left + relativeX;
-    var yPos = clientRect.top + relativeY;
-    var e = document.createEvent("MouseEvents");
-    e.initMouseEvent(type, true, true, window, 1, xPos, yPos, xPos, yPos, false, false, false, false, 1, null);
-    target.node().dispatchEvent(e);
-}
-function triggerFakeTouchEvent(type, target, relativeX, relativeY) {
-    var targetNode = target.node();
-    var clientRect = targetNode.getBoundingClientRect();
-    var xPos = clientRect.left + relativeX;
-    var yPos = clientRect.top + relativeY;
-    var e = document.createEvent("UIEvent");
-    e.initUIEvent(type, true, true, window, 1);
-    var fakeTouch = {
-        identifier: 0,
-        target: targetNode,
-        screenX: xPos,
-        screenY: yPos,
-        clientX: xPos,
-        clientY: yPos,
-        pageX: xPos,
-        pageY: yPos
-    };
-    var fakeTouchList = [fakeTouch];
-    fakeTouchList.item = function (index) { return fakeTouchList[index]; };
-    e.touches = fakeTouchList;
-    e.targetTouches = fakeTouchList;
-    e.changedTouches = fakeTouchList;
-    e.altKey = false;
-    e.metaKey = false;
-    e.ctrlKey = false;
-    e.shiftKey = false;
-    target.node().dispatchEvent(e);
-}
 function verifySpaceRequest(sr, w, h, ww, wh, id) {
     assert.equal(sr.width, w, "width requested is as expected #" + id);
     assert.equal(sr.height, h, "height requested is as expected #" + id);
@@ -143,6 +102,64 @@ function normalizePath(pathString) {
 }
 function numAttr(s, a) {
     return parseFloat(s.attr(a));
+}
+function triggerFakeUIEvent(type, target) {
+    var e = document.createEvent("UIEvents");
+    e.initUIEvent(type, true, true, window, 1);
+    target.node().dispatchEvent(e);
+}
+function triggerFakeMouseEvent(type, target, relativeX, relativeY) {
+    var clientRect = target.node().getBoundingClientRect();
+    var xPos = clientRect.left + relativeX;
+    var yPos = clientRect.top + relativeY;
+    var e = document.createEvent("MouseEvents");
+    e.initMouseEvent(type, true, true, window, 1, xPos, yPos, xPos, yPos, false, false, false, false, 1, null);
+    target.node().dispatchEvent(e);
+}
+function triggerFakeWheelEvent(type, target, relativeX, relativeY, deltaY) {
+    var clientRect = target.node().getBoundingClientRect();
+    var xPos = clientRect.left + relativeX;
+    var yPos = clientRect.top + relativeY;
+    var event;
+    // Use the WheelEvent Constructor semantics if possible
+    if (typeof WheelEvent === "function") {
+        // HACKHACK anycasting constructor to allow for the dictionary argument
+        // https://github.com/Microsoft/TypeScript/issues/2416
+        event = new WheelEvent("wheel", { bubbles: true, clientX: xPos, clientY: yPos, deltaY: deltaY });
+    }
+    else {
+        event = document.createEvent("WheelEvent");
+        event.initWheelEvent("wheel", true, true, window, 1, xPos, yPos, xPos, yPos, 0, null, null, 0, deltaY, 0, 0);
+    }
+    target.node().dispatchEvent(event);
+}
+function triggerFakeTouchEvent(type, target, relativeX, relativeY) {
+    var targetNode = target.node();
+    var clientRect = targetNode.getBoundingClientRect();
+    var xPos = clientRect.left + relativeX;
+    var yPos = clientRect.top + relativeY;
+    var e = document.createEvent("UIEvent");
+    e.initUIEvent(type, true, true, window, 1);
+    var fakeTouch = {
+        identifier: 0,
+        target: targetNode,
+        screenX: xPos,
+        screenY: yPos,
+        clientX: xPos,
+        clientY: yPos,
+        pageX: xPos,
+        pageY: yPos
+    };
+    var fakeTouchList = [fakeTouch];
+    fakeTouchList.item = function (index) { return fakeTouchList[index]; };
+    e.touches = fakeTouchList;
+    e.targetTouches = fakeTouchList;
+    e.changedTouches = fakeTouchList;
+    e.altKey = false;
+    e.metaKey = false;
+    e.ctrlKey = false;
+    e.shiftKey = false;
+    target.node().dispatchEvent(e);
 }
 function assertAreaPathCloseTo(actualPath, expectedPath, precision, msg) {
     var actualAreaPathStrings = actualPath.split("Z");
@@ -2095,6 +2112,54 @@ describe("Plots", function () {
             assert.includeMembers(oneElementPlotData.pixelPoints, data2.map(data2PointConverter), "includes data2 points");
             svg.remove();
         });
+        it("getClosestPlotData", function () {
+            var svg = generateSVG(400, 400);
+            var plot = new Plottable.Plot.AbstractPlot();
+            var data1 = [{ value: 0 }, { value: 1 }, { value: 2 }];
+            var data2 = [{ value: 0 }, { value: 1 }, { value: 2 }];
+            var data1Points = data1.map(function (datum) {
+                return { x: datum.value, y: 100 };
+            });
+            var data2Points = data2.map(function (datum) {
+                return { x: datum.value, y: 10 };
+            });
+            var data1PointConverter = function (datum, index) { return data1Points[index]; };
+            var data2PointConverter = function (datum, index) { return data2Points[index]; };
+            // Create mock drawers with already drawn items
+            var mockDrawer1 = new Plottable._Drawer.AbstractDrawer("ds1");
+            var renderArea1 = svg.append("g");
+            renderArea1.append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
+            mockDrawer1.setup = function () { return mockDrawer1._renderArea = renderArea1; };
+            mockDrawer1._getSelector = function () { return "circle"; };
+            mockDrawer1._getPixelPoint = data1PointConverter;
+            var renderArea2 = svg.append("g");
+            renderArea2.append("circle").attr("cx", 10).attr("cy", 10).attr("r", 10);
+            var mockDrawer2 = new Plottable._Drawer.AbstractDrawer("ds2");
+            mockDrawer2.setup = function () { return mockDrawer2._renderArea = renderArea2; };
+            mockDrawer2._getSelector = function () { return "circle"; };
+            mockDrawer2._getPixelPoint = data2PointConverter;
+            // Mock _getDrawer to return the mock drawers
+            plot._getDrawer = function (key) {
+                if (key === "ds1") {
+                    return mockDrawer1;
+                }
+                else {
+                    return mockDrawer2;
+                }
+            };
+            plot.addDataset("ds1", data1);
+            plot.addDataset("ds2", data2);
+            plot.renderTo(svg);
+            var queryPoint = { x: 1, y: 11 };
+            var closestPlotData = plot.getClosestPlotData(queryPoint);
+            assert.deepEqual(closestPlotData.pixelPoints, [{ x: 1, y: 10 }], "retrieves the closest point across datasets");
+            closestPlotData = plot.getClosestPlotData(queryPoint, Infinity, "ds1");
+            assert.deepEqual(closestPlotData.pixelPoints, [{ x: 1, y: 100 }], "retrieves the closest point for a certain dataset");
+            queryPoint = { x: 1, y: 500 };
+            closestPlotData = plot.getClosestPlotData(queryPoint, 100);
+            assert.deepEqual(closestPlotData.pixelPoints, [], "retrieves no points if points are outside within value");
+            svg.remove();
+        });
         describe("Dataset removal", function () {
             var plot;
             var d1;
@@ -2738,6 +2803,31 @@ describe("Plots", function () {
                 assert.strictEqual(allLines.size(), 1, "all lines retrieved");
                 var selectionData = allLines.data();
                 assert.include(selectionData, dataset3, "third dataset data in selection data");
+                svg.remove();
+            });
+        });
+        describe("getAllPlotData()", function () {
+            it("retrieves correct data", function () {
+                var dataset3 = [
+                    { foo: 0, bar: 1 },
+                    { foo: 1, bar: 0.95 }
+                ];
+                linePlot.addDataset("d3", dataset3);
+                var allLines = linePlot.getAllPlotData().selection;
+                assert.strictEqual(allLines.size(), linePlot.datasets().length, "single line per dataset");
+                svg.remove();
+            });
+        });
+        describe("getClosestPlotData()", function () {
+            it("retrieves correct data", function () {
+                var dataset3 = [
+                    { foo: 0, bar: 1 },
+                    { foo: 1, bar: 0.95 }
+                ];
+                linePlot.addDataset("d3", dataset3);
+                var lineData = linePlot.getClosestPlotData({ x: 490, y: 300 });
+                assert.strictEqual(lineData.selection.size(), 1, "only 1 line retreieved");
+                assert.strictEqual(lineData.data[0], dataset3[1], "correct datum retrieved");
                 svg.remove();
             });
         });
@@ -3500,6 +3590,41 @@ describe("Plots", function () {
                 assert.includeMembers(selectionData, DATA, "data in selection data");
                 svg.remove();
             });
+        });
+    });
+});
+
+///<reference path="../../testReference.ts" />
+var assert = chai.assert;
+describe("Plots", function () {
+    describe("RectanglePlot", function () {
+        var SVG_WIDTH = 300;
+        var SVG_HEIGHT = 300;
+        var DATA = [
+            { x: 0, y: 0, x2: 1, y2: 1 },
+            { x: 1, y: 1, x2: 2, y2: 2 },
+            { x: 2, y: 2, x2: 3, y2: 3 },
+            { x: 3, y: 3, x2: 4, y2: 4 },
+            { x: 4, y: 4, x2: 5, y2: 5 }
+        ];
+        var VERIFY_CELLS = function (cells) {
+            assert.equal(cells[0].length, 5);
+            cells.each(function (d, i) {
+                var cell = d3.select(this);
+                assert.closeTo(+cell.attr("height"), 50, 0.5, "Cell height is correct");
+                assert.closeTo(+cell.attr("width"), 50, 0.5, "Cell width is correct");
+                assert.closeTo(+cell.attr("x"), 25 + 50 * i, 0.5, "Cell x coordinate is correct");
+                assert.closeTo(+cell.attr("y"), 25 + 50 * (cells[0].length - i - 1), 0.5, "Cell y coordinate is correct");
+            });
+        };
+        it("renders correctly", function () {
+            var xScale = new Plottable.Scale.Linear();
+            var yScale = new Plottable.Scale.Linear();
+            var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var rectanglePlot = new Plottable.Plot.Rectangle(xScale, yScale);
+            rectanglePlot.addDataset(DATA).project("x", "x", xScale).project("y", "y", yScale).project("x1", "x", xScale).project("y1", "y", yScale).project("x2", "x2", xScale).project("y2", "y2", yScale).renderTo(svg);
+            VERIFY_CELLS(rectanglePlot._renderArea.selectAll("rect"));
+            svg.remove();
         });
     });
 });
@@ -6987,6 +7112,16 @@ describe("Formatters", function () {
 
 ///<reference path="../testReference.ts" />
 var assert = chai.assert;
+describe("SymbolGenerators", function () {
+    describe("d3Symbol", function () {
+        it("throws an error if invalid symbol type is used", function () {
+            assert.throws(function () { return Plottable.SymbolGenerators.d3Symbol("aaa"); }, Error, "invalid D3 symbol type");
+        });
+    });
+});
+
+///<reference path="../testReference.ts" />
+var assert = chai.assert;
 describe("IDCounter", function () {
     it("IDCounter works as expected", function () {
         var i = new Plottable._Util.IDCounter();
@@ -7323,6 +7458,132 @@ describe("Interactions", function () {
             aCallbackCalled = false;
             $hitbox.simulate("keydown", { keyCode: aCode });
             assert.isFalse(aCallbackCalled, "callback for \"a\" was not called when not moused over the Component");
+            svg.remove();
+        });
+    });
+});
+
+///<reference path="../testReference.ts" />
+var assert = chai.assert;
+describe("Interactions", function () {
+    describe("Pointer", function () {
+        var SVG_WIDTH = 400;
+        var SVG_HEIGHT = 400;
+        it("onPointerEnter", function () {
+            var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var c = new Plottable.Component.AbstractComponent();
+            c.renderTo(svg);
+            var pointerInteraction = new Plottable.Interaction.Pointer();
+            c.registerInteraction(pointerInteraction);
+            var callbackCalled = false;
+            var lastPoint;
+            var callback = function (p) {
+                callbackCalled = true;
+                lastPoint = p;
+            };
+            pointerInteraction.onPointerEnter(callback);
+            assert.strictEqual(pointerInteraction.onPointerEnter(), callback, "callback can be retrieved");
+            triggerFakeMouseEvent("mousemove", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+            assert.isTrue(callbackCalled, "callback called on entering Component (mouse)");
+            assert.deepEqual(lastPoint, { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 }, "was passed correct point (mouse)");
+            callbackCalled = false;
+            triggerFakeMouseEvent("mousemove", c.content(), SVG_WIDTH / 4, SVG_HEIGHT / 4);
+            assert.isFalse(callbackCalled, "callback not called again if already in Component (mouse)");
+            triggerFakeMouseEvent("mousemove", c.content(), 2 * SVG_WIDTH, 2 * SVG_HEIGHT);
+            assert.isFalse(callbackCalled, "not called when moving outside of the Component (mouse)");
+            callbackCalled = false;
+            lastPoint = null;
+            triggerFakeTouchEvent("touchstart", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+            assert.isTrue(callbackCalled, "callback called on entering Component (touch)");
+            assert.deepEqual(lastPoint, { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 }, "was passed correct point (touch)");
+            callbackCalled = false;
+            triggerFakeTouchEvent("touchstart", c.content(), SVG_WIDTH / 4, SVG_HEIGHT / 4);
+            assert.isFalse(callbackCalled, "callback not called again if already in Component (touch)");
+            triggerFakeTouchEvent("touchstart", c.content(), 2 * SVG_WIDTH, 2 * SVG_HEIGHT);
+            assert.isFalse(callbackCalled, "not called when moving outside of the Component (touch)");
+            pointerInteraction.onPointerEnter(null);
+            triggerFakeMouseEvent("mousemove", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+            assert.isFalse(callbackCalled, "callback removed by passing null");
+            svg.remove();
+        });
+        it("onPointerMove", function () {
+            var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var c = new Plottable.Component.AbstractComponent();
+            c.renderTo(svg);
+            var pointerInteraction = new Plottable.Interaction.Pointer();
+            c.registerInteraction(pointerInteraction);
+            var callbackCalled = false;
+            var lastPoint;
+            var callback = function (p) {
+                callbackCalled = true;
+                lastPoint = p;
+            };
+            pointerInteraction.onPointerMove(callback);
+            assert.strictEqual(pointerInteraction.onPointerMove(), callback, "callback can be retrieved");
+            triggerFakeMouseEvent("mousemove", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+            assert.isTrue(callbackCalled, "callback called on entering Component (mouse)");
+            assert.deepEqual(lastPoint, { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 }, "was passed correct point (mouse)");
+            callbackCalled = false;
+            triggerFakeMouseEvent("mousemove", c.content(), SVG_WIDTH / 4, SVG_HEIGHT / 4);
+            assert.isTrue(callbackCalled, "callback on moving inside Component (mouse)");
+            assert.deepEqual(lastPoint, { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 }, "was passed correct point (mouse)");
+            callbackCalled = false;
+            triggerFakeMouseEvent("mousemove", c.content(), 2 * SVG_WIDTH, 2 * SVG_HEIGHT);
+            assert.isFalse(callbackCalled, "not called when moving outside of the Component (mouse)");
+            callbackCalled = false;
+            triggerFakeTouchEvent("touchstart", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+            assert.isTrue(callbackCalled, "callback called on entering Component (touch)");
+            assert.deepEqual(lastPoint, { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 }, "was passed correct point (touch)");
+            callbackCalled = false;
+            triggerFakeTouchEvent("touchstart", c.content(), SVG_WIDTH / 4, SVG_HEIGHT / 4);
+            assert.isTrue(callbackCalled, "callback on moving inside Component (touch)");
+            assert.deepEqual(lastPoint, { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 }, "was passed correct point (touch)");
+            callbackCalled = false;
+            triggerFakeTouchEvent("touchstart", c.content(), 2 * SVG_WIDTH, 2 * SVG_HEIGHT);
+            assert.isFalse(callbackCalled, "not called when moving outside of the Component (touch)");
+            pointerInteraction.onPointerMove(null);
+            triggerFakeMouseEvent("mousemove", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+            assert.isFalse(callbackCalled, "callback removed by passing null");
+            svg.remove();
+        });
+        it("onPointerExit", function () {
+            var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var c = new Plottable.Component.AbstractComponent();
+            c.renderTo(svg);
+            var pointerInteraction = new Plottable.Interaction.Pointer();
+            c.registerInteraction(pointerInteraction);
+            var callbackCalled = false;
+            var lastPoint;
+            var callback = function (p) {
+                callbackCalled = true;
+                lastPoint = p;
+            };
+            pointerInteraction.onPointerExit(callback);
+            assert.strictEqual(pointerInteraction.onPointerExit(), callback, "callback can be retrieved");
+            triggerFakeMouseEvent("mousemove", c.content(), 2 * SVG_WIDTH, 2 * SVG_HEIGHT);
+            assert.isFalse(callbackCalled, "not called when moving outside of the Component (mouse)");
+            triggerFakeMouseEvent("mousemove", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+            triggerFakeMouseEvent("mousemove", c.content(), 2 * SVG_WIDTH, 2 * SVG_HEIGHT);
+            assert.isTrue(callbackCalled, "callback called on exiting Component (mouse)");
+            assert.deepEqual(lastPoint, { x: 2 * SVG_WIDTH, y: 2 * SVG_HEIGHT }, "was passed correct point (mouse)");
+            callbackCalled = false;
+            triggerFakeMouseEvent("mousemove", c.content(), 3 * SVG_WIDTH, 3 * SVG_HEIGHT);
+            assert.isFalse(callbackCalled, "callback not called again if already outside of Component (mouse)");
+            callbackCalled = false;
+            lastPoint = null;
+            triggerFakeTouchEvent("touchstart", c.content(), 2 * SVG_WIDTH, 2 * SVG_HEIGHT);
+            assert.isFalse(callbackCalled, "not called when moving outside of the Component (touch)");
+            triggerFakeTouchEvent("touchstart", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+            triggerFakeTouchEvent("touchstart", c.content(), 2 * SVG_WIDTH, 2 * SVG_HEIGHT);
+            assert.isTrue(callbackCalled, "callback called on exiting Component (touch)");
+            assert.deepEqual(lastPoint, { x: 2 * SVG_WIDTH, y: 2 * SVG_HEIGHT }, "was passed correct point (touch)");
+            callbackCalled = false;
+            triggerFakeTouchEvent("touchstart", c.content(), 3 * SVG_WIDTH, 3 * SVG_HEIGHT);
+            assert.isFalse(callbackCalled, "callback not called again if already outside of Component (touch)");
+            pointerInteraction.onPointerExit(null);
+            triggerFakeMouseEvent("mousemove", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+            triggerFakeMouseEvent("mousemove", c.content(), 2 * SVG_WIDTH, 2 * SVG_HEIGHT);
+            assert.isFalse(callbackCalled, "callback removed by passing null");
             svg.remove();
         });
     });
@@ -7833,6 +8094,38 @@ describe("Dispatchers", function () {
             assert.isTrue(callbackWasCalled, "callback was called on mouseup");
             md.onMouseUp(keyString, null);
             target.remove();
+        });
+        it("onWheel()", function () {
+            // HACKHACK PhantomJS doesn't implement fake creation of WheelEvents
+            // https://github.com/ariya/phantomjs/issues/11289
+            if (window.PHANTOMJS) {
+                return;
+            }
+            var targetWidth = 400, targetHeight = 400;
+            var svg = generateSVG(targetWidth, targetHeight);
+            // HACKHACK: PhantomJS can't measure SVGs unless they have something in them occupying space
+            svg.append("rect").attr("width", targetWidth).attr("height", targetHeight);
+            var targetX = 17;
+            var targetY = 76;
+            var expectedPoint = {
+                x: targetX,
+                y: targetY
+            };
+            var targetDeltaY = 10;
+            var md = Plottable.Dispatcher.Mouse.getDispatcher(svg.node());
+            var callbackWasCalled = false;
+            var callback = function (p, e) {
+                callbackWasCalled = true;
+                assert.strictEqual(e.deltaY, targetDeltaY, "deltaY value was passed to callback");
+                assertPointsClose(p, expectedPoint, 0.5, "mouse position is correct");
+                assert.isNotNull(e, "mouse event was passed to the callback");
+            };
+            var keyString = "unit test";
+            md.onWheel(keyString, callback);
+            triggerFakeWheelEvent("wheel", svg, targetX, targetY, targetDeltaY);
+            assert.isTrue(callbackWasCalled, "callback was called on wheel");
+            md.onWheel(keyString, null);
+            svg.remove();
         });
     });
 });
