@@ -8,8 +8,11 @@ export module Component {
      * Constructs a GroupComponent.
      *
      * A GroupComponent is a set of Components that will be rendered on top of
-     * each other. When you call Component.merge(Component), it creates and
-     * returns a GroupComponent.
+     * each other. When you call Component.above(Component) or Component.below(Component),
+     * it creates and returns a GroupComponent.
+     *
+     * Note that the order of the components will determine placement on the z-axis,
+     * with the previous items rendered below the later items.
      *
      * @constructor
      * @param {Component[]} components The Components in the Group (default = []).
