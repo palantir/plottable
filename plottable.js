@@ -1,5 +1,5 @@
 /*!
-Plottable 0.48.1 (https://github.com/palantir/plottable)
+Plottable 0.49.0 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -322,6 +322,10 @@ var Plottable;
                 return "#" + rHex + gHex + bHex;
             }
             Methods.darkenColor = darkenColor;
+            function distanceSquared(p1, p2) {
+                return Math.pow(p2.y - p1.y, 2) + Math.pow(p2.x - p1.x, 2);
+            }
+            Methods.distanceSquared = distanceSquared;
         })(Methods = _Util.Methods || (_Util.Methods = {}));
     })(_Util = Plottable._Util || (Plottable._Util = {}));
 })(Plottable || (Plottable = {}));
@@ -1113,7 +1117,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "0.48.1";
+    Plottable.version = "0.49.0";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -3722,7 +3726,7 @@ var Plottable;
                 // pushed to this._interactionsToRegister and registered during anchoring. If after, they are
                 // registered immediately
                 if (this._element) {
-                    if (!this._hitBox) {
+                    if (!this._hitBox && interaction._requiresHitbox()) {
                         this._hitBox = this._addBox("hit-box");
                         this._hitBox.style("fill", "#ffffff").style("opacity", 0); // We need to set these so Chrome will register events
                     }
@@ -6783,7 +6787,6 @@ var Plottable;
              * @returns {PlotData} The retrieved PlotData.
              */
             AbstractPlot.prototype.getAllPlotData = function (datasetKeys) {
-                var _this = this;
                 if (datasetKeys === void 0) { datasetKeys = this.datasetOrder(); }
                 var datasetKeyArray = [];
                 if (typeof (datasetKeys) === "string") {
@@ -6792,10 +6795,14 @@ var Plottable;
                 else {
                     datasetKeyArray = datasetKeys;
                 }
+                return this._getAllPlotData(datasetKeyArray);
+            };
+            AbstractPlot.prototype._getAllPlotData = function (datasetKeys) {
+                var _this = this;
                 var data = [];
                 var pixelPoints = [];
                 var allElements = [];
-                datasetKeyArray.forEach(function (datasetKey) {
+                datasetKeys.forEach(function (datasetKey) {
                     var plotDatasetKey = _this._key2PlotDatasetKey.get(datasetKey);
                     if (plotDatasetKey == null) {
                         return;
@@ -6808,6 +6815,45 @@ var Plottable;
                     });
                 });
                 return { data: data, pixelPoints: pixelPoints, selection: d3.selectAll(allElements) };
+            };
+            /**
+             * Retrieves the closest PlotData for the specified dataset(s)
+             *
+             * @param {Point} queryPoint The point to query from
+             * @param {number} withinValue Will only return plot data that is of a distance below withinValue
+             *                             (default = Infinity)
+             * @param {string | string[]} datasetKeys The dataset(s) to retrieve the plot data from.
+             *                                        (default = this.datasetOrder())
+             * @returns {PlotData} The retrieved PlotData.
+             */
+            AbstractPlot.prototype.getClosestPlotData = function (queryPoint, withinValue, datasetKeys) {
+                if (withinValue === void 0) { withinValue = Infinity; }
+                if (datasetKeys === void 0) { datasetKeys = this.datasetOrder(); }
+                var datasetKeyArray = [];
+                if (typeof (datasetKeys) === "string") {
+                    datasetKeyArray = [datasetKeys];
+                }
+                else {
+                    datasetKeyArray = datasetKeys;
+                }
+                return this._getClosestPlotData(queryPoint, datasetKeyArray, withinValue);
+            };
+            AbstractPlot.prototype._getClosestPlotData = function (queryPoint, datasetKeys, withinValue) {
+                if (withinValue === void 0) { withinValue = Infinity; }
+                var closestDistanceSquared = Math.pow(withinValue, 2);
+                var closestIndex;
+                var plotData = this.getAllPlotData(datasetKeys);
+                plotData.pixelPoints.forEach(function (pixelPoint, index) {
+                    var distance = Plottable._Util.Methods.distanceSquared(pixelPoint, queryPoint);
+                    if (distance < closestDistanceSquared) {
+                        closestDistanceSquared = distance;
+                        closestIndex = index;
+                    }
+                });
+                if (closestIndex == null) {
+                    return { data: [], pixelPoints: [], selection: d3.select() };
+                }
+                return { data: [plotData.data[closestIndex]], pixelPoints: [plotData.pixelPoints[closestIndex]], selection: d3.select(plotData.selection[0][closestIndex]) };
             };
             return AbstractPlot;
         })(Plottable.Component.AbstractComponent);
@@ -7865,6 +7911,30 @@ var Plottable;
             Line.prototype._wholeDatumAttributes = function () {
                 return ["x", "y"];
             };
+            Line.prototype._getClosestPlotData = function (queryPoint, datasetKeys, withinValue) {
+                var _this = this;
+                if (withinValue === void 0) { withinValue = Infinity; }
+                var closestDistanceSquared = withinValue;
+                var closestDatum;
+                var closestSelection;
+                var closestPoint;
+                datasetKeys.forEach(function (datasetKey) {
+                    var plotData = _this.getAllPlotData(datasetKey);
+                    plotData.pixelPoints.forEach(function (pixelPoint, index) {
+                        var pixelPointDist = Plottable._Util.Methods.distanceSquared(queryPoint, pixelPoint);
+                        if (pixelPointDist < closestDistanceSquared) {
+                            closestDistanceSquared = pixelPointDist;
+                            closestDatum = plotData.data[index];
+                            closestPoint = pixelPoint;
+                            closestSelection = plotData.selection;
+                        }
+                    });
+                });
+                if (closestDatum == null) {
+                    return { data: [], pixelPoints: [], selection: d3.select() };
+                }
+                return { data: [closestDatum], pixelPoints: [closestPoint], selection: closestSelection };
+            };
             Line.prototype._getClosestWithinRange = function (p, range) {
                 var _this = this;
                 var attrToProjector = this._generateAttrToProjector();
@@ -7897,6 +7967,27 @@ var Plottable;
                     closestValue: closestOverall,
                     closestPoint: closestPoint
                 };
+            };
+            Line.prototype._getAllPlotData = function (datasetKeys) {
+                var _this = this;
+                var data = [];
+                var pixelPoints = [];
+                var allElements = [];
+                datasetKeys.forEach(function (datasetKey) {
+                    var plotDatasetKey = _this._key2PlotDatasetKey.get(datasetKey);
+                    if (plotDatasetKey == null) {
+                        return;
+                    }
+                    var drawer = plotDatasetKey.drawer;
+                    plotDatasetKey.dataset.data().forEach(function (datum, index) {
+                        data.push(datum);
+                        pixelPoints.push(drawer._getPixelPoint(datum, index));
+                    });
+                    if (plotDatasetKey.dataset.data().length > 0) {
+                        allElements.push(drawer._getSelection(0).node());
+                    }
+                });
+                return { data: data, pixelPoints: pixelPoints, selection: d3.selectAll(allElements) };
             };
             //===== Hover logic =====
             Line.prototype._hoverOverComponent = function (p) {
@@ -8873,17 +8964,17 @@ var Plottable;
                 this.translator = Plottable._Util.ClientToSVGTranslator.getTranslator(svg);
                 this._lastMousePosition = { x: -1, y: -1 };
                 this._moveBroadcaster = new Plottable.Core.Broadcaster(this);
-                this._processMoveCallback = function (e) { return _this._measureAndBroadcast(e, _this._moveBroadcaster); };
-                this._event2Callback["mouseover"] = this._processMoveCallback;
-                this._event2Callback["mousemove"] = this._processMoveCallback;
-                this._event2Callback["mouseout"] = this._processMoveCallback;
+                var processMoveCallback = function (e) { return _this._measureAndBroadcast(e, _this._moveBroadcaster); };
+                this._event2Callback["mouseover"] = processMoveCallback;
+                this._event2Callback["mousemove"] = processMoveCallback;
+                this._event2Callback["mouseout"] = processMoveCallback;
                 this._downBroadcaster = new Plottable.Core.Broadcaster(this);
-                this._processDownCallback = function (e) { return _this._measureAndBroadcast(e, _this._downBroadcaster); };
-                this._event2Callback["mousedown"] = this._processDownCallback;
+                this._event2Callback["mousedown"] = function (e) { return _this._measureAndBroadcast(e, _this._downBroadcaster); };
                 this._upBroadcaster = new Plottable.Core.Broadcaster(this);
-                this._processUpCallback = function (e) { return _this._measureAndBroadcast(e, _this._upBroadcaster); };
-                this._event2Callback["mouseup"] = this._processUpCallback;
-                this._broadcasters = [this._moveBroadcaster, this._downBroadcaster, this._upBroadcaster];
+                this._event2Callback["mouseup"] = function (e) { return _this._measureAndBroadcast(e, _this._upBroadcaster); };
+                this._wheelBroadcaster = new Plottable.Core.Broadcaster(this);
+                this._event2Callback["wheel"] = function (e) { return _this._measureAndBroadcast(e, _this._wheelBroadcaster); };
+                this._broadcasters = [this._moveBroadcaster, this._downBroadcaster, this._upBroadcaster, this._wheelBroadcaster];
             }
             /**
              * Get a Dispatcher.Mouse for the <svg> containing elem. If one already exists
@@ -8950,6 +9041,21 @@ var Plottable;
                 return this;
             };
             /**
+             * Registers a callback to be called whenever a wheel occurs,
+             * or removes the callback if `null` is passed as the callback.
+             *
+             * @param {any} key The key associated with the callback.
+             *                  Key uniqueness is determined by deep equality.
+             * @param {WheelCallback} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space.
+             *                                     Pass `null` to remove a callback.
+             * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+             */
+            Mouse.prototype.onWheel = function (key, callback) {
+                this._setCallback(this._wheelBroadcaster, key, callback);
+                return this;
+            };
+            /**
              * Computes the mouse position from the given event, and if successful
              * calls broadcast() on the supplied Broadcaster.
              */
@@ -8999,15 +9105,12 @@ var Plottable;
                 _super.call(this);
                 this.translator = Plottable._Util.ClientToSVGTranslator.getTranslator(svg);
                 this._lastTouchPosition = { x: -1, y: -1 };
-                this._moveBroadcaster = new Plottable.Core.Broadcaster(this);
-                this._processMoveCallback = function (e) { return _this._measureAndBroadcast(e, _this._moveBroadcaster); };
-                this._event2Callback["touchmove"] = this._processMoveCallback;
                 this._startBroadcaster = new Plottable.Core.Broadcaster(this);
-                this._processStartCallback = function (e) { return _this._measureAndBroadcast(e, _this._startBroadcaster); };
-                this._event2Callback["touchstart"] = this._processStartCallback;
+                this._event2Callback["touchstart"] = function (e) { return _this._measureAndBroadcast(e, _this._startBroadcaster); };
+                this._moveBroadcaster = new Plottable.Core.Broadcaster(this);
+                this._event2Callback["touchmove"] = function (e) { return _this._measureAndBroadcast(e, _this._moveBroadcaster); };
                 this._endBroadcaster = new Plottable.Core.Broadcaster(this);
-                this._processEndCallback = function (e) { return _this._measureAndBroadcast(e, _this._endBroadcaster); };
-                this._event2Callback["touchend"] = this._processEndCallback;
+                this._event2Callback["touchend"] = function (e) { return _this._measureAndBroadcast(e, _this._endBroadcaster); };
                 this._broadcasters = [this._moveBroadcaster, this._startBroadcaster, this._endBroadcaster];
             }
             /**
@@ -9128,8 +9231,7 @@ var Plottable;
             function Key() {
                 var _this = this;
                 _super.call(this);
-                this._downCallback = function (e) { return _this._processKeydown(e); };
-                this._event2Callback["keydown"] = this._downCallback;
+                this._event2Callback["keydown"] = function (e) { return _this._processKeydown(e); };
                 this._keydownBroadcaster = new Plottable.Core.Broadcaster(this);
                 this._broadcasters = [this._keydownBroadcaster];
             }
@@ -9193,6 +9295,10 @@ var Plottable;
                 this._componentToListenTo = component;
                 this._hitBox = hitBox;
             };
+            // HACKHACK: After all Interactions use Dispatchers, we won't need hitboxes at all (#1757)
+            AbstractInteraction.prototype._requiresHitbox = function () {
+                return false;
+            };
             /**
              * Translates an <svg>-coordinate-space point to Component-space coordinates.
              *
@@ -9248,6 +9354,9 @@ var Plottable;
                     var y = xy[1];
                     _this._callback({ x: x, y: y });
                 });
+            };
+            Click.prototype._requiresHitbox = function () {
+                return true;
             };
             Click.prototype._listenTo = function () {
                 return "click";
@@ -9338,6 +9447,77 @@ var Plottable;
 (function (Plottable) {
     var Interaction;
     (function (Interaction) {
+        var Pointer = (function (_super) {
+            __extends(Pointer, _super);
+            function Pointer() {
+                _super.apply(this, arguments);
+                this._overComponent = false;
+            }
+            Pointer.prototype._anchor = function (component, hitBox) {
+                var _this = this;
+                _super.prototype._anchor.call(this, component, hitBox);
+                this._mouseDispatcher = Plottable.Dispatcher.Mouse.getDispatcher(this._componentToListenTo.content().node());
+                this._mouseDispatcher.onMouseMove("Interaction.Pointer" + this.getID(), function (p) { return _this._handlePointerEvent(p); });
+                this._touchDispatcher = Plottable.Dispatcher.Touch.getDispatcher(this._componentToListenTo.content().node());
+                this._touchDispatcher.onTouchStart("Interaction.Pointer" + this.getID(), function (p) { return _this._handlePointerEvent(p); });
+            };
+            Pointer.prototype._handlePointerEvent = function (p) {
+                var translatedP = this._translateToComponentSpace(p);
+                if (this._isInsideComponent(translatedP)) {
+                    var wasOverComponent = this._overComponent;
+                    this._overComponent = true;
+                    if (!wasOverComponent && this._pointerEnterCallback) {
+                        this._pointerEnterCallback(translatedP);
+                    }
+                    if (this._pointerMoveCallback) {
+                        this._pointerMoveCallback(translatedP);
+                    }
+                }
+                else if (this._overComponent) {
+                    this._overComponent = false;
+                    if (this._pointerExitCallback) {
+                        this._pointerExitCallback(translatedP);
+                    }
+                }
+            };
+            Pointer.prototype.onPointerEnter = function (callback) {
+                if (callback === undefined) {
+                    return this._pointerEnterCallback;
+                }
+                this._pointerEnterCallback = callback;
+                return this;
+            };
+            Pointer.prototype.onPointerMove = function (callback) {
+                if (callback === undefined) {
+                    return this._pointerMoveCallback;
+                }
+                this._pointerMoveCallback = callback;
+                return this;
+            };
+            Pointer.prototype.onPointerExit = function (callback) {
+                if (callback === undefined) {
+                    return this._pointerExitCallback;
+                }
+                this._pointerExitCallback = callback;
+                return this;
+            };
+            return Pointer;
+        })(Interaction.AbstractInteraction);
+        Interaction.Pointer = Pointer;
+    })(Interaction = Plottable.Interaction || (Plottable.Interaction = {}));
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    var Interaction;
+    (function (Interaction) {
         var PanZoom = (function (_super) {
             __extends(PanZoom, _super);
             /**
@@ -9383,6 +9563,9 @@ var Plottable;
             PanZoom.prototype._anchor = function (component, hitBox) {
                 _super.prototype._anchor.call(this, component, hitBox);
                 this.resetZoom();
+            };
+            PanZoom.prototype._requiresHitbox = function () {
+                return true;
             };
             PanZoom.prototype._rerenderZoomed = function () {
                 // HACKHACK since the d3.zoom.x modifies d3 scales and not our TS scales, and the TS scales have the
@@ -9516,6 +9699,9 @@ var Plottable;
                 _super.prototype._anchor.call(this, component, hitBox);
                 hitBox.call(this._dragBehavior);
                 return this;
+            };
+            Drag.prototype._requiresHitbox = function () {
+                return true;
             };
             /**
              * Sets up so that the xScale and yScale that are passed have their

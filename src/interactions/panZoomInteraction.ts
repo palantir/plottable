@@ -53,6 +53,10 @@ export module Interaction {
       this.resetZoom();
     }
 
+    public _requiresHitbox() {
+      return true;
+    }
+
     private _rerenderZoomed() {
       // HACKHACK since the d3.zoom.x modifies d3 scales and not our TS scales, and the TS scales have the
       // event listener machinery, let's grab the domain out of the d3 scale and pipe it back into the TS scale

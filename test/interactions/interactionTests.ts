@@ -23,7 +23,7 @@ describe("Interactions", () => {
       var interaction = new Plottable.Interaction.PanZoom(xScale, yScale);
       plot.registerInteraction(interaction);
 
-      var hb = (<any> plot)._element.select(".hit-box").node();
+      var hb = plot.hitBox().node();
       var dragDistancePixelX = 10;
       var dragDistancePixelY = 20;
       $(hb).simulate("drag", {
@@ -97,21 +97,21 @@ describe("Interactions", () => {
       ki.on(bCode, bCallback);
       component.registerInteraction(ki);
 
-      var $hitbox = $((<any> component)._hitBox.node());
+      var $target = $(component.content().node());
 
-      triggerFakeMouseEvent("mouseover", (<any> component)._hitBox, 100, 100);
-      $hitbox.simulate("keydown", { keyCode: aCode });
+      triggerFakeMouseEvent("mouseover", component.content(), 100, 100);
+      $target.simulate("keydown", { keyCode: aCode });
       assert.isTrue(aCallbackCalled, "callback for \"a\" was called when \"a\" key was pressed");
       assert.isFalse(bCallbackCalled, "callback for \"b\" was not called when \"a\" key was pressed");
 
       aCallbackCalled = false;
-      $hitbox.simulate("keydown", { keyCode: bCode });
+      $target.simulate("keydown", { keyCode: bCode });
       assert.isFalse(aCallbackCalled, "callback for \"a\" was not called when \"b\" key was pressed");
       assert.isTrue(bCallbackCalled, "callback for \"b\" was called when \"b\" key was pressed");
 
-      triggerFakeMouseEvent("mouseout", (<any> component)._hitBox, -100, -100);
+      triggerFakeMouseEvent("mouseout", component.content(), -100, -100);
       aCallbackCalled = false;
-      $hitbox.simulate("keydown", { keyCode: aCode });
+      $target.simulate("keydown", { keyCode: aCode });
       assert.isFalse(aCallbackCalled, "callback for \"a\" was not called when not moused over the Component");
 
       svg.remove();
