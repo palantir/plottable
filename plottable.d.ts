@@ -11,15 +11,6 @@ declare module Plottable {
              * @return {boolean} Whether x is in [a, b]
              */
             function inRange(x: number, a: number, b: number): boolean;
-            /**
-             * Clamps x to the range [min, max].
-             *
-             * @param {number} x The value to be clamped.
-             * @param {number} min The minimum value.
-             * @param {number} max The maximum value.
-             * @return {number} A clamped value in the range [min, max].
-             */
-            function clamp(x: number, min: number, max: number): number;
             /** Print a warning message to the console, if it is available.
              *
              * @param {string} The warnings to print
@@ -764,6 +755,12 @@ declare module Plottable {
         wantsWidth: boolean;
         wantsHeight: boolean;
     };
+    type _PixelArea = {
+        xMin: number;
+        xMax: number;
+        yMin: number;
+        yMax: number;
+    };
     /**
      * The range of your current data. For example, [1, 2, 6, -5] has the Extent
      * `{min: -5, max: 6}`.
@@ -781,13 +778,6 @@ declare module Plottable {
     type Point = {
         x: number;
         y: number;
-    };
-    /**
-     * The corners of a box.
-     */
-    type Bounds = {
-        topLeft: Point;
-        bottomRight: Point;
     };
 }
 
@@ -3770,6 +3760,7 @@ declare module Plottable {
             protected _hitBox: D3.Selection;
             protected _componentToListenTo: Component.AbstractComponent;
             _anchor(component: Component.AbstractComponent, hitBox: D3.Selection): void;
+            _requiresHitbox(): boolean;
             /**
              * Translates an <svg>-coordinate-space point to Component-space coordinates.
              *
@@ -3795,6 +3786,7 @@ declare module Plottable {
     module Interaction {
         class Click extends AbstractInteraction {
             _anchor(component: Component.AbstractComponent, hitBox: D3.Selection): void;
+            _requiresHitbox(): boolean;
             protected _listenTo(): string;
             /**
              * Sets a callback to be called when a click is received.
@@ -3895,6 +3887,7 @@ declare module Plottable {
              */
             resetZoom(): void;
             _anchor(component: Component.AbstractComponent, hitBox: D3.Selection): void;
+            _requiresHitbox(): boolean;
         }
     }
 }

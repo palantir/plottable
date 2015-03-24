@@ -3738,7 +3738,7 @@ var Plottable;
                 // pushed to this._interactionsToRegister and registered during anchoring. If after, they are
                 // registered immediately
                 if (this._element) {
-                    if (!this._hitBox) {
+                    if (!this._hitBox && interaction._requiresHitbox()) {
                         this._hitBox = this._addBox("hit-box");
                         this._hitBox.style("fill", "#ffffff").style("opacity", 0); // We need to set these so Chrome will register events
                     }
@@ -9385,6 +9385,10 @@ var Plottable;
                 this._componentToListenTo = component;
                 this._hitBox = hitBox;
             };
+            // HACKHACK: After all Interactions use Dispatchers, we won't need hitboxes at all (#1757)
+            AbstractInteraction.prototype._requiresHitbox = function () {
+                return false;
+            };
             /**
              * Translates an <svg>-coordinate-space point to Component-space coordinates.
              *
@@ -9440,6 +9444,9 @@ var Plottable;
                     var y = xy[1];
                     _this._callback({ x: x, y: y });
                 });
+            };
+            Click.prototype._requiresHitbox = function () {
+                return true;
             };
             Click.prototype._listenTo = function () {
                 return "click";
@@ -9647,6 +9654,9 @@ var Plottable;
                 _super.prototype._anchor.call(this, component, hitBox);
                 this.resetZoom();
             };
+            PanZoom.prototype._requiresHitbox = function () {
+                return true;
+            };
             PanZoom.prototype._rerenderZoomed = function () {
                 // HACKHACK since the d3.zoom.x modifies d3 scales and not our TS scales, and the TS scales have the
                 // event listener machinery, let's grab the domain out of the d3 scale and pipe it back into the TS scale
@@ -9776,13 +9786,17 @@ var Plottable;
         var Hover = (function (_super) {
             __extends(Hover, _super);
             function Hover() {
-                _super.apply(this, arguments);
+                _super.call(this);
                 this._overComponent = false;
                 this._currentHoverData = {
                     data: null,
                     pixelPositions: null,
                     selection: null
                 };
+                if (!Hover.warned) {
+                    Hover.warned = true;
+                    Plottable._Util.Methods.warn("Interaction.Hover is deprecated; use Interaction.Pointer in conjunction with getClosestPlotData() instead.");
+                }
             }
             Hover.prototype._anchor = function (component, hitBox) {
                 var _this = this;
@@ -9892,6 +9906,7 @@ var Plottable;
             Hover.prototype.getCurrentHoverData = function () {
                 return this._currentHoverData;
             };
+            Hover.warned = false;
             return Hover;
         })(Interaction.AbstractInteraction);
         Interaction.Hover = Hover;
