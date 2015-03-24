@@ -10092,13 +10092,17 @@ var Plottable;
         var Hover = (function (_super) {
             __extends(Hover, _super);
             function Hover() {
-                _super.apply(this, arguments);
+                _super.call(this);
                 this._overComponent = false;
                 this._currentHoverData = {
                     data: null,
                     pixelPositions: null,
                     selection: null
                 };
+                if (!Hover.warned) {
+                    Hover.warned = true;
+                    Plottable._Util.Methods.warn("Interaction.Hover is deprecated; use Interaction.Pointer in conjunction with getClosestPlotData() instead.");
+                }
             }
             Hover.prototype._anchor = function (component, hitBox) {
                 var _this = this;
@@ -10208,6 +10212,7 @@ var Plottable;
             Hover.prototype.getCurrentHoverData = function () {
                 return this._currentHoverData;
             };
+            Hover.warned = false;
             return Hover;
         })(Interaction.AbstractInteraction);
         Interaction.Hover = Hover;
