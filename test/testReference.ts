@@ -62,6 +62,7 @@
 ///<reference path="interactions/pointerInteractionTests.ts" />
 ///<reference path="interactions/dragBoxTests.ts" />
 ///<reference path="interactions/hoverInteractionTests.ts" />
+///<reference path="interactions/scrollInteractionTests.ts" />
 
 ///<reference path="dispatchers/dispatcherTests.ts" />
 ///<reference path="dispatchers/mouseDispatcherTests.ts" />
