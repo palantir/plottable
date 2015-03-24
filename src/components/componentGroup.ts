@@ -5,14 +5,17 @@ export module Component {
   export class Group extends AbstractComponentContainer {
 
     /**
-     * Constructs a GroupComponent.
+     * Constructs a Component.Group.
      *
-     * A GroupComponent is a set of Components that will be rendered on top of
-     * each other. When you call Component.merge(Component), it creates and
-     * returns a GroupComponent.
+     * A Component.Group is a set of Components that will be rendered on top of
+     * each other. When you call Component.above(Component) or Component.below(Component),
+     * it creates and returns a Component.Group.
+     *
+     * Note that the order of the components will determine placement on the z-axis,
+     * with the previous items rendered below the later items.
      *
      * @constructor
-     * @param {Component[]} components The Components in the Group (default = []).
+     * @param {Component[]} components The Components in the resultant Component.Group (default = []).
      */
     constructor(components: AbstractComponent[] = []){
       super();
@@ -30,8 +33,8 @@ export module Component {
       };
     }
 
-    public merge(c: AbstractComponent): Group {
-      this._addComponent(c);
+    public _merge(c: AbstractComponent, below: boolean): Group {
+      this._addComponent(c, !below);
       return this;
     }
 
