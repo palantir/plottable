@@ -2488,6 +2488,19 @@ declare module Plottable {
             protected _setup(): void;
             _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
             _doRender(): void;
+            /**
+             * Gets the SymbolGenerator of the interpolated color legend, which dictates how
+             * the symbol in each entry is drawn.
+             *
+             * @returns {SymbolGenerator} The SymbolGenerator of the interpolated color legend
+             */
+            symbolGenerator(): SymbolGenerator;
+            /**
+             * Sets the SymbolGenerator of the interpolated color legend
+             *
+             * @returns {InterpolatedColorLegend} The calling InterpolatedColorLegend
+             */
+            symbolGenerator(symbolGenerator: SymbolGenerator): InterpolatedColorLegend;
         }
     }
 }

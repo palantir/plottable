@@ -11,6 +11,7 @@ export module Component {
     private _padding = 5;
     private _numSwatches = 10;
     private _formatter: Formatter;
+    private _symbolGenerator: SymbolGenerator;
 
     private _swatchContainer: D3.Selection;
     private _swatchBoundingBox: D3.Selection;
@@ -42,6 +43,7 @@ export module Component {
       this._scale = interpolatedColorScale;
       this._scale.broadcaster.registerListener(this, () => this._invalidateLayout());
       this._formatter = formatter;
+      this._symbolGenerator = SymbolGenerators.d3Symbol("square");
       this._orientation = InterpolatedColorLegend._ensureOrientation(orientation);
 
       this._fixedWidthFlag = true;
@@ -263,16 +265,41 @@ export module Component {
 
       this._swatchBoundingBox.attr(boundingBoxAttr);
 
+      var swatchTranslateX = (d: any, i: number) => swatchX(d, i) + swatchWidth / 2;
+      var swatchTranslateY = (d: any, i: number) => swatchY(d, i) + swatchHeight / 2;
+
       var swatches = this._swatchContainer.selectAll("rect.swatch").data(ticks);
-      swatches.enter().append("rect").classed("swatch", true);
+      swatches.enter().append("path").classed("swatch", true);
       swatches.exit().remove();
       swatches.attr({
         "fill": (d: any, i: number) => this._scale.scale(d),
-        "width": swatchWidth,
-        "height": swatchHeight,
-        "x": swatchX,
-        "y": swatchY
+        "d": this.symbolGenerator(),
+        "transform": (d: any, i: number) => "translate(" + swatchTranslateX(d, i) + "," + swatchTranslateY(d, i) + ")," +
+                                            "scale(" + (swatchWidth / 100) + "," + (swatchHeight / 100) + ")"
       });
+    }
+
+    /**
+     * Gets the SymbolGenerator of the interpolated color legend, which dictates how
+     * the symbol in each entry is drawn.
+     *
+     * @returns {SymbolGenerator} The SymbolGenerator of the interpolated color legend
+     */
+    public symbolGenerator(): SymbolGenerator;
+    /**
+     * Sets the SymbolGenerator of the interpolated color legend
+     *
+     * @returns {InterpolatedColorLegend} The calling InterpolatedColorLegend
+     */
+    public symbolGenerator(symbolGenerator: SymbolGenerator): InterpolatedColorLegend;
+    public symbolGenerator(symbolGenerator?: SymbolGenerator): any {
+      if (symbolGenerator == null) {
+        return this._symbolGenerator;
+      } else {
+        this._symbolGenerator = symbolGenerator;
+        this._render();
+        return this;
+      }
     }
 
   }
