@@ -10221,7 +10221,7 @@ var Plottable;
                 var _this = this;
                 _super.prototype._anchor.call(this, component, hitBox);
                 this._mouseDispatcher = Plottable.Dispatcher.Mouse.getDispatcher(this._componentToListenTo.content().node());
-                this._mouseDispatcher.onMouseMove("Interaction.Scroll" + this.getID(), function (p, e) { return _this._handleScrollEvent(p, e); });
+                this._mouseDispatcher.onWheel("Interaction.Scroll" + this.getID(), function (p, e) { return _this._handleScrollEvent(p, e); });
             };
             Scroll.prototype._handleScrollEvent = function (p, e) {
                 var translatedP = this._translateToComponentSpace(p);

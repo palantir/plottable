@@ -9,7 +9,7 @@ export module Interaction {
     public _anchor(component: Component.AbstractComponent, hitBox: D3.Selection) {
       super._anchor(component, hitBox);
       this._mouseDispatcher = Dispatcher.Mouse.getDispatcher(<SVGElement> this._componentToListenTo.content().node());
-      this._mouseDispatcher.onMouseMove("Interaction.Scroll" + this.getID(), (p: Point, e: WheelEvent) => this._handleScrollEvent(p, e));
+      this._mouseDispatcher.onWheel("Interaction.Scroll" + this.getID(), (p: Point, e: WheelEvent) => this._handleScrollEvent(p, e));
     }
 
     private _handleScrollEvent(p: Point, e: WheelEvent) {
