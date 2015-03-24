@@ -3786,53 +3786,33 @@ var Plottable;
             AbstractComponent.prototype._isFixedHeight = function () {
                 return this._fixedHeightFlag;
             };
-            AbstractComponent.prototype._merge = function (c, below) {
+            /**
+             * Merges this Component with another Component, returning a
+             * ComponentGroup. This is used to layer Components on top of each other.
+             *
+             * There are four cases:
+             * Component + Component: Returns a ComponentGroup with both components inside it.
+             * ComponentGroup + Component: Returns the ComponentGroup with the Component appended.
+             * Component + ComponentGroup: Returns the ComponentGroup with the Component prepended.
+             * ComponentGroup + ComponentGroup: Returns a new ComponentGroup with two ComponentGroups inside it.
+             *
+             * @param {Component} c The component to merge in.
+             * @returns {ComponentGroup} The relevant ComponentGroup out of the above four cases.
+             */
+            AbstractComponent.prototype.merge = function (c) {
                 var cg;
                 if (this._isSetup || this._isAnchored) {
                     throw new Error("Can't presently merge a component that's already been anchored");
                 }
                 if (Plottable.Component.Group.prototype.isPrototypeOf(c)) {
                     cg = c;
-                    cg._addComponent(this, below);
+                    cg._addComponent(this, true);
                     return cg;
                 }
                 else {
-                    var mergedComponents = below ? [this, c] : [c, this];
-                    cg = new Plottable.Component.Group(mergedComponents);
+                    cg = new Plottable.Component.Group([this, c]);
                     return cg;
                 }
-            };
-            /**
-             * Merges this Component above another Component, returning a
-             * ComponentGroup. This is used to layer Components on top of each other.
-             *
-             * There are four cases:
-             * Component + Component: Returns a ComponentGroup with the first component after the second component.
-             * ComponentGroup + Component: Returns the ComponentGroup with the Component prepended.
-             * Component + ComponentGroup: Returns the ComponentGroup with the Component appended.
-             * ComponentGroup + ComponentGroup: Returns a new ComponentGroup with the first group after the second group.
-             *
-             * @param {Component} c The component to merge in.
-             * @returns {ComponentGroup} The relevant ComponentGroup out of the above four cases.
-             */
-            AbstractComponent.prototype.above = function (c) {
-                return this._merge(c, false);
-            };
-            /**
-             * Merges this Component below another Component, returning a
-             * ComponentGroup. This is used to layer Components on top of each other.
-             *
-             * There are four cases:
-             * Component + Component: Returns a ComponentGroup with the first component before the second component.
-             * ComponentGroup + Component: Returns the ComponentGroup with the Component appended.
-             * Component + ComponentGroup: Returns the ComponentGroup with the Component prepended.
-             * ComponentGroup + ComponentGroup: Returns a new ComponentGroup with the first group before the second group.
-             *
-             * @param {Component} c The component to merge in.
-             * @returns {ComponentGroup} The relevant ComponentGroup out of the above four cases.
-             */
-            AbstractComponent.prototype.below = function (c) {
-                return this._merge(c, true);
             };
             /**
              * Detaches a Component from the DOM. The component can be reused.
@@ -4066,17 +4046,14 @@ var Plottable;
         var Group = (function (_super) {
             __extends(Group, _super);
             /**
-             * Constructs a Component.Group.
+             * Constructs a GroupComponent.
              *
-             * A Component.Group is a set of Components that will be rendered on top of
-             * each other. When you call Component.above(Component) or Component.below(Component),
-             * it creates and returns a Component.Group.
-             *
-             * Note that the order of the components will determine placement on the z-axis,
-             * with the previous items rendered below the later items.
+             * A GroupComponent is a set of Components that will be rendered on top of
+             * each other. When you call Component.merge(Component), it creates and
+             * returns a GroupComponent.
              *
              * @constructor
-             * @param {Component[]} components The Components in the resultant Component.Group (default = []).
+             * @param {Component[]} components The Components in the Group (default = []).
              */
             function Group(components) {
                 var _this = this;
@@ -4094,8 +4071,8 @@ var Plottable;
                     wantsHeight: requests.map(function (r) { return r.wantsHeight; }).some(function (x) { return x; })
                 };
             };
-            Group.prototype._merge = function (c, below) {
-                this._addComponent(c, !below);
+            Group.prototype.merge = function (c) {
+                this._addComponent(c);
                 return this;
             };
             Group.prototype._computeLayout = function (offeredXOrigin, offeredYOrigin, availableWidth, availableHeight) {
@@ -10115,17 +10092,13 @@ var Plottable;
         var Hover = (function (_super) {
             __extends(Hover, _super);
             function Hover() {
-                _super.call(this);
+                _super.apply(this, arguments);
                 this._overComponent = false;
                 this._currentHoverData = {
                     data: null,
                     pixelPositions: null,
                     selection: null
                 };
-                if (!Hover.warned) {
-                    Hover.warned = true;
-                    Plottable._Util.Methods.warn("Interaction.Hover is deprecated; use Interaction.Pointer in conjunction with getClosestPlotData() instead.");
-                }
             }
             Hover.prototype._anchor = function (component, hitBox) {
                 var _this = this;
@@ -10235,7 +10208,6 @@ var Plottable;
             Hover.prototype.getCurrentHoverData = function () {
                 return this._currentHoverData;
             };
-            Hover.warned = false;
             return Hover;
         })(Interaction.AbstractInteraction);
         Interaction.Hover = Hover;

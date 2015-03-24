@@ -1747,35 +1747,20 @@ declare module Plottable {
              * @returns {boolean} Whether the component has a fixed height.
              */
             _isFixedHeight(): boolean;
-            _merge(c: AbstractComponent, below: boolean): Component.Group;
             /**
-             * Merges this Component above another Component, returning a
+             * Merges this Component with another Component, returning a
              * ComponentGroup. This is used to layer Components on top of each other.
              *
              * There are four cases:
-             * Component + Component: Returns a ComponentGroup with the first component after the second component.
-             * ComponentGroup + Component: Returns the ComponentGroup with the Component prepended.
-             * Component + ComponentGroup: Returns the ComponentGroup with the Component appended.
-             * ComponentGroup + ComponentGroup: Returns a new ComponentGroup with the first group after the second group.
-             *
-             * @param {Component} c The component to merge in.
-             * @returns {ComponentGroup} The relevant ComponentGroup out of the above four cases.
-             */
-            above(c: AbstractComponent): Component.Group;
-            /**
-             * Merges this Component below another Component, returning a
-             * ComponentGroup. This is used to layer Components on top of each other.
-             *
-             * There are four cases:
-             * Component + Component: Returns a ComponentGroup with the first component before the second component.
+             * Component + Component: Returns a ComponentGroup with both components inside it.
              * ComponentGroup + Component: Returns the ComponentGroup with the Component appended.
              * Component + ComponentGroup: Returns the ComponentGroup with the Component prepended.
-             * ComponentGroup + ComponentGroup: Returns a new ComponentGroup with the first group before the second group.
+             * ComponentGroup + ComponentGroup: Returns a new ComponentGroup with two ComponentGroups inside it.
              *
              * @param {Component} c The component to merge in.
              * @returns {ComponentGroup} The relevant ComponentGroup out of the above four cases.
              */
-            below(c: AbstractComponent): Component.Group;
+            merge(c: AbstractComponent): Component.Group;
             /**
              * Detaches a Component from the DOM. The component can be reused.
              *
@@ -1893,21 +1878,18 @@ declare module Plottable {
     module Component {
         class Group extends AbstractComponentContainer {
             /**
-             * Constructs a Component.Group.
+             * Constructs a GroupComponent.
              *
-             * A Component.Group is a set of Components that will be rendered on top of
-             * each other. When you call Component.above(Component) or Component.below(Component),
-             * it creates and returns a Component.Group.
-             *
-             * Note that the order of the components will determine placement on the z-axis,
-             * with the previous items rendered below the later items.
+             * A GroupComponent is a set of Components that will be rendered on top of
+             * each other. When you call Component.merge(Component), it creates and
+             * returns a GroupComponent.
              *
              * @constructor
-             * @param {Component[]} components The Components in the resultant Component.Group (default = []).
+             * @param {Component[]} components The Components in the Group (default = []).
              */
             constructor(components?: AbstractComponent[]);
             _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
-            _merge(c: AbstractComponent, below: boolean): Group;
+            merge(c: AbstractComponent): Group;
             _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): Group;
             _isFixedWidth(): boolean;
             _isFixedHeight(): boolean;
@@ -4087,7 +4069,6 @@ declare module Plottable {
         }
         class Hover extends Interaction.AbstractInteraction {
             _componentToListenTo: Hoverable;
-            constructor();
             _anchor(component: Hoverable, hitBox: D3.Selection): void;
             /**
              * Attaches an callback to be called when the user mouses over an element.
