@@ -37,7 +37,7 @@ function run(svg, data, Plottable){
     
     var matrix = [[yLabel, yAxis, plot],
                  [null, null, xAxis],
-                 [null, null, xLabel]]  
+                 [null, null, xLabel]];  
 
     new Plottable.Component.Table(matrix)
                                 .renderTo(svg);
@@ -47,14 +47,14 @@ function run(svg, data, Plottable){
       var tmp = matrix[0][0];
       matrix[0][0] = matrix[0][2];
       matrix[0][2] = tmp;
-      var tmp = matrix[1][0];
+      tmp = matrix[1][0];
       matrix[1][0] = matrix[1][2];
       matrix[1][2] = tmp;  
-      var tmp = matrix[2][0];
+      tmp = matrix[2][0];
       matrix[2][0] = matrix[2][2];
       matrix[2][2] = tmp;  
 
-      yAxis.orient() === "left"?yAxis.orient("right"):yAxis.orient("left");
+      yAxis.orient(yAxis.orient() === "left"?"right":"left");
       new Plottable.Component.Table(matrix)
                                 .renderTo(svg);
     }   

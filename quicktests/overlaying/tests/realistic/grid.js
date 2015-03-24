@@ -48,7 +48,7 @@ function run(svg, data, Plottable) {
     .project("y", "team", yScale)
     .project("x2", timeFormatEnd, xScale)
     .project("fill", "fill")
-    .project("stroke", "stroke")
+    .project("stroke", "stroke");
                 
     var table = new Plottable.Component.Table([[yAxis, plot],
                                                [null, xAxis]]);

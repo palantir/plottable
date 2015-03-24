@@ -128,7 +128,6 @@ declare module Plottable {
             function colorTest(colorTester: D3.Selection, className: string): string;
             function lightenColor(color: string, factor: number): string;
             function darkenColor(color: string, factor: number, darkenAmount: number): string;
-            function distanceSquared(p1: Point, p2: Point): number;
         }
     }
 }
@@ -2773,33 +2772,6 @@ declare module Plottable {
              * @returns {PlotData} The retrieved PlotData.
              */
             getAllPlotData(datasetKeys?: string | string[]): PlotData;
-            protected _getAllPlotData(datasetKeys: string[]): PlotData;
-            /**
-             * Retrieves the closest PlotData for the specified dataset(s)
-             *
-             * @param {Point} queryPoint The point to query from
-             * @param {number} withinValue Will only return plot data that is of a distance below withinValue
-             *                             (default = Infinity)
-             * @param {string | string[]} datasetKeys The dataset(s) to retrieve the plot data from.
-             *                                        (default = this.datasetOrder())
-             * @returns {PlotData} The retrieved PlotData.
-             */
-            getClosestPlotData(queryPoint: Point, withinValue?: number, datasetKeys?: string | string[]): {
-                data: any[];
-                pixelPoints: {
-                    x: number;
-                    y: number;
-                }[];
-                selection: D3.Selection;
-            };
-            protected _getClosestPlotData(queryPoint: Point, datasetKeys: string[], withinValue?: number): {
-                data: any[];
-                pixelPoints: {
-                    x: number;
-                    y: number;
-                }[];
-                selection: D3.Selection;
-            };
         }
     }
 }
@@ -3109,14 +3081,6 @@ declare module Plottable {
                 [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
             };
             protected _wholeDatumAttributes(): string[];
-            protected _getClosestPlotData(queryPoint: Point, datasetKeys: string[], withinValue?: number): {
-                data: any[];
-                pixelPoints: {
-                    x: number;
-                    y: number;
-                }[];
-                selection: D3.Selection;
-            };
             protected _getClosestWithinRange(p: Point, range: number): {
                 closestValue: any;
                 closestPoint: {
@@ -3124,7 +3088,6 @@ declare module Plottable {
                     y: number;
                 };
             };
-            protected _getAllPlotData(datasetKeys: string[]): PlotData;
             _hoverOverComponent(p: Point): void;
             _hoverOutComponent(p: Point): void;
             _doHover(p: Point): Interaction.HoverData;
@@ -3581,18 +3544,6 @@ declare module Plottable {
              */
             onMouseUp(key: any, callback: MouseCallback): Dispatcher.Mouse;
             /**
-             * Registers a callback to be called whenever a wheel occurs,
-             * or removes the callback if `null` is passed as the callback.
-             *
-             * @param {any} key The key associated with the callback.
-             *                  Key uniqueness is determined by deep equality.
-             * @param {WheelCallback} callback A callback that takes the pixel position
-             *                                     in svg-coordinate-space.
-             *                                     Pass `null` to remove a callback.
-             * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
-             */
-            onWheel(key: any, callback: MouseCallback): Dispatcher.Mouse;
-            /**
              * Returns the last computed mouse position.
              *
              * @return {Point} The last known mouse position in <svg> coordinate space.
@@ -3723,7 +3674,6 @@ declare module Plottable {
             protected _hitBox: D3.Selection;
             protected _componentToListenTo: Component.AbstractComponent;
             _anchor(component: Component.AbstractComponent, hitBox: D3.Selection): void;
-            _requiresHitbox(): boolean;
             /**
              * Translates an <svg>-coordinate-space point to Component-space coordinates.
              *
@@ -3749,7 +3699,6 @@ declare module Plottable {
     module Interaction {
         class Click extends AbstractInteraction {
             _anchor(component: Component.AbstractComponent, hitBox: D3.Selection): void;
-            _requiresHitbox(): boolean;
             protected _listenTo(): string;
             /**
              * Sets a callback to be called when a click is received.
@@ -3785,54 +3734,6 @@ declare module Plottable {
 
 declare module Plottable {
     module Interaction {
-        class Pointer extends Interaction.AbstractInteraction {
-            _anchor(component: Component.AbstractComponent, hitBox: D3.Selection): void;
-            /**
-             * Gets the callback called when the pointer enters the Component.
-             *
-             * @return {(p: Point) => any} The current callback.
-             */
-            onPointerEnter(): (p: Point) => any;
-            /**
-             * Sets the callback called when the pointer enters the Component.
-             *
-             * @param {(p: Point) => any} callback The callback to set.
-             * @return {Interaction.Pointer} The calling Interaction.Pointer.
-             */
-            onPointerEnter(callback: (p: Point) => any): Interaction.Pointer;
-            /**
-             * Gets the callback called when the pointer moves.
-             *
-             * @return {(p: Point) => any} The current callback.
-             */
-            onPointerMove(): (p: Point) => any;
-            /**
-             * Sets the callback called when the pointer moves.
-             *
-             * @param {(p: Point) => any} callback The callback to set.
-             * @return {Interaction.Pointer} The calling Interaction.Pointer.
-             */
-            onPointerMove(callback: (p: Point) => any): Interaction.Pointer;
-            /**
-             * Gets the callback called when the pointer exits the Component.
-             *
-             * @return {(p: Point) => any} The current callback.
-             */
-            onPointerExit(): (p: Point) => any;
-            /**
-             * Sets the callback called when the pointer exits the Component.
-             *
-             * @param {(p: Point) => any} callback The callback to set.
-             * @return {Interaction.Pointer} The calling Interaction.Pointer.
-             */
-            onPointerExit(callback: (p: Point) => any): Interaction.Pointer;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Interaction {
         class PanZoom extends AbstractInteraction {
             /**
              * Creates a PanZoomInteraction.
@@ -3850,7 +3751,6 @@ declare module Plottable {
              */
             resetZoom(): void;
             _anchor(component: Component.AbstractComponent, hitBox: D3.Selection): void;
-            _requiresHitbox(): boolean;
         }
     }
 }
@@ -3916,7 +3816,6 @@ declare module Plottable {
             protected _dragend(): void;
             protected _doDragend(): void;
             _anchor(component: Component.AbstractComponent, hitBox: D3.Selection): Drag;
-            _requiresHitbox(): boolean;
             /**
              * Sets up so that the xScale and yScale that are passed have their
              * domains automatically changed as you zoom.

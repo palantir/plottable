@@ -1,5 +1,5 @@
 /*!
-Plottable 0.49.0 (https://github.com/palantir/plottable)
+Plottable 0.48.1 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -322,10 +322,6 @@ var Plottable;
                 return "#" + rHex + gHex + bHex;
             }
             Methods.darkenColor = darkenColor;
-            function distanceSquared(p1, p2) {
-                return Math.pow(p2.y - p1.y, 2) + Math.pow(p2.x - p1.x, 2);
-            }
-            Methods.distanceSquared = distanceSquared;
         })(Methods = _Util.Methods || (_Util.Methods = {}));
     })(_Util = Plottable._Util || (Plottable._Util = {}));
 })(Plottable || (Plottable = {}));
@@ -1117,7 +1113,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "0.49.0";
+    Plottable.version = "0.48.1";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -9433,77 +9429,6 @@ var Plottable;
             return Key;
         })(Interaction.AbstractInteraction);
         Interaction.Key = Key;
-    })(Interaction = Plottable.Interaction || (Plottable.Interaction = {}));
-})(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    var Interaction;
-    (function (Interaction) {
-        var Pointer = (function (_super) {
-            __extends(Pointer, _super);
-            function Pointer() {
-                _super.apply(this, arguments);
-                this._overComponent = false;
-            }
-            Pointer.prototype._anchor = function (component, hitBox) {
-                var _this = this;
-                _super.prototype._anchor.call(this, component, hitBox);
-                this._mouseDispatcher = Plottable.Dispatcher.Mouse.getDispatcher(this._componentToListenTo.content().node());
-                this._mouseDispatcher.onMouseMove("Interaction.Pointer" + this.getID(), function (p) { return _this._handlePointerEvent(p); });
-                this._touchDispatcher = Plottable.Dispatcher.Touch.getDispatcher(this._componentToListenTo.content().node());
-                this._touchDispatcher.onTouchStart("Interaction.Pointer" + this.getID(), function (p) { return _this._handlePointerEvent(p); });
-            };
-            Pointer.prototype._handlePointerEvent = function (p) {
-                var translatedP = this._translateToComponentSpace(p);
-                if (this._isInsideComponent(translatedP)) {
-                    var wasOverComponent = this._overComponent;
-                    this._overComponent = true;
-                    if (!wasOverComponent && this._pointerEnterCallback) {
-                        this._pointerEnterCallback(translatedP);
-                    }
-                    if (this._pointerMoveCallback) {
-                        this._pointerMoveCallback(translatedP);
-                    }
-                }
-                else if (this._overComponent) {
-                    this._overComponent = false;
-                    if (this._pointerExitCallback) {
-                        this._pointerExitCallback(translatedP);
-                    }
-                }
-            };
-            Pointer.prototype.onPointerEnter = function (callback) {
-                if (callback === undefined) {
-                    return this._pointerEnterCallback;
-                }
-                this._pointerEnterCallback = callback;
-                return this;
-            };
-            Pointer.prototype.onPointerMove = function (callback) {
-                if (callback === undefined) {
-                    return this._pointerMoveCallback;
-                }
-                this._pointerMoveCallback = callback;
-                return this;
-            };
-            Pointer.prototype.onPointerExit = function (callback) {
-                if (callback === undefined) {
-                    return this._pointerExitCallback;
-                }
-                this._pointerExitCallback = callback;
-                return this;
-            };
-            return Pointer;
-        })(Interaction.AbstractInteraction);
-        Interaction.Pointer = Pointer;
     })(Interaction = Plottable.Interaction || (Plottable.Interaction = {}));
 })(Plottable || (Plottable = {}));
 

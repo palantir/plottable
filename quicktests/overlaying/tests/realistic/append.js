@@ -17,7 +17,7 @@ function run(svg, data, Plottable){
     var plot = new Plottable.Plot.Scatter(xScale, yScale, false);
     plot.addDataset(dataset);
     plot.project("x", "x", xScale)
-    .project("y", "y", yScale)
+    .project("y", "y", yScale);
     
     var title_t = new Plottable.Component.Label("n = new point, d = delete point");
     var title_b = new Plottable.Component.Label("a = mark selection[0], c = clear");    
@@ -46,7 +46,7 @@ function run(svg, data, Plottable){
                     "r": 5,
                     "cx": x,
                     "cy": y});
-    }
+    };
     var key = new Plottable.Interaction.Key();
     key.on(78, function(keyData){
         data.push({x: Math.random(), y: Math.random()});
