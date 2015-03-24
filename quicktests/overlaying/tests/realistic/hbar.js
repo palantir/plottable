@@ -57,7 +57,7 @@ function run(svg, data, Plottable){
       yAxis.orient(yAxis.orient() === "left"?"right":"left");
       new Plottable.Component.Table(matrix)
                                 .renderTo(svg);
-    }   
+    };   
 
     var clickInteraction = new Plottable.Interaction.Click().callback(flipDomain);
     plot.registerInteraction(clickInteraction);
