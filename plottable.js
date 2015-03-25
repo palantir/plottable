@@ -1049,6 +1049,11 @@ var Plottable;
             return scale.range().map(translateTransform);
         }
         ScaleDomainTransformers.translate = translate;
+        function magnify(scale, magnifyAmount, centerValue) {
+            var magnifyTransform = function (rangeValue) { return scale.invert(centerValue - (centerValue - rangeValue) * magnifyAmount); };
+            return scale.range().map(magnifyTransform);
+        }
+        ScaleDomainTransformers.magnify = magnify;
     })(ScaleDomainTransformers = Plottable.ScaleDomainTransformers || (Plottable.ScaleDomainTransformers = {}));
 })(Plottable || (Plottable = {}));
 

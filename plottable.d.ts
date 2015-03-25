@@ -440,6 +440,14 @@ declare module Plottable {
 
 
 declare module Plottable {
+    module ScaleDomainTransformers {
+        function translate<D>(scale: Scale.AbstractQuantitative<D>, delta: number): D[];
+        function magnify<D>(scale: Scale.AbstractQuantitative<D>, magnifyAmount: number, centerValue: number): D[];
+    }
+}
+
+
+declare module Plottable {
     module _Util {
         class ClientToSVGTranslator {
             static getTranslator(elem: SVGElement): ClientToSVGTranslator;
