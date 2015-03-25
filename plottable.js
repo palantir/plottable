@@ -9385,7 +9385,7 @@ var Plottable;
                 }
             };
             Click.prototype._handleMouseUp = function (p) {
-                if (this._clickedDown && this._isInsideComponent(p)) {
+                if (this._clickedDown && this._isInsideComponent(p) && (this.onClick() != null)) {
                     this.onClick()(p);
                 }
                 this._clickedDown = false;
