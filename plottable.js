@@ -9401,11 +9401,33 @@ var Plottable;
             function DoubleClick() {
                 _super.apply(this, arguments);
             }
+            DoubleClick.prototype._anchor = function (component, hitBox) {
+                var _this = this;
+                _super.prototype._anchor.call(this, component, hitBox);
+                hitBox.on(this._listenTo(), function () {
+                    var xy = d3.mouse(hitBox.node());
+                    var x = xy[0];
+                    var y = xy[1];
+                    _this._callback({ x: x, y: y });
+                });
+            };
+            DoubleClick.prototype._requiresHitbox = function () {
+                return true;
+            };
             DoubleClick.prototype._listenTo = function () {
                 return "dblclick";
             };
+            /**
+             * Sets a callback to be called when a click is received.
+             *
+             * @param {(p: Point) => any} cb Callback that takes the pixel position of the click event.
+             */
+            DoubleClick.prototype.callback = function (cb) {
+                this._callback = cb;
+                return this;
+            };
             return DoubleClick;
-        })(Click);
+        })(Interaction.AbstractInteraction);
         Interaction.DoubleClick = DoubleClick;
     })(Interaction = Plottable.Interaction || (Plottable.Interaction = {}));
 })(Plottable || (Plottable = {}));
