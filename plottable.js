@@ -9691,6 +9691,7 @@ var Plottable;
             function Drag() {
                 _super.apply(this, arguments);
                 this._dragging = false;
+                this._constrain = true;
             }
             Drag.prototype._anchor = function (component, hitBox) {
                 var _this = this;
@@ -9706,6 +9707,9 @@ var Plottable;
             };
             Drag.prototype._translateAndConstrain = function (p) {
                 var translatedP = this._translateToComponentSpace(p);
+                if (!this._constrain) {
+                    return translatedP;
+                }
                 return {
                     x: Plottable._Util.Methods.clamp(translatedP.x, 0, this._componentToListenTo.width()),
                     y: Plottable._Util.Methods.clamp(translatedP.y, 0, this._componentToListenTo.height())
@@ -9738,6 +9742,13 @@ var Plottable;
                         this._dragEndCallback(this._dragOrigin, constrainedP);
                     }
                 }
+            };
+            Drag.prototype.constrain = function (doConstrain) {
+                if (doConstrain == null) {
+                    return this._constrain;
+                }
+                this._constrain = doConstrain;
+                return this;
             };
             Drag.prototype.onDragStart = function (cb) {
                 if (cb === undefined) {
