@@ -9373,18 +9373,18 @@ var Plottable;
                 var _this = this;
                 _super.prototype._anchor.call(this, component, hitBox);
                 this._mouseDispatcher = Plottable.Dispatcher.Mouse.getDispatcher(component.content().node());
-                this._mouseDispatcher.onMouseDown("Interaction.Click" + this.getID(), function (p) { return _this._handleMouseDown(p); });
-                this._mouseDispatcher.onMouseUp("Interaction.Click" + this.getID(), function (p) { return _this._handleMouseUp(p); });
+                this._mouseDispatcher.onMouseDown("Interaction.Click" + this.getID(), function (p) { return _this._handleClickDown(p); });
+                this._mouseDispatcher.onMouseUp("Interaction.Click" + this.getID(), function (p) { return _this._handleClickUp(p); });
                 this._touchDispatcher = Plottable.Dispatcher.Touch.getDispatcher(component.content().node());
-                this._touchDispatcher.onTouchStart("Interaction.Click" + this.getID(), function (p) { return _this._handleMouseDown(p); });
-                this._touchDispatcher.onTouchEnd("Interaction.Click" + this.getID(), function (p) { return _this._handleMouseUp(p); });
+                this._touchDispatcher.onTouchStart("Interaction.Click" + this.getID(), function (p) { return _this._handleClickDown(p); });
+                this._touchDispatcher.onTouchEnd("Interaction.Click" + this.getID(), function (p) { return _this._handleClickUp(p); });
             };
-            Click.prototype._handleMouseDown = function (p) {
+            Click.prototype._handleClickDown = function (p) {
                 if (this._isInsideComponent(p)) {
                     this._clickedDown = true;
                 }
             };
-            Click.prototype._handleMouseUp = function (p) {
+            Click.prototype._handleClickUp = function (p) {
                 if (this._clickedDown && this._isInsideComponent(p) && (this.onClick() != null)) {
                     this.onClick()(p);
                 }
