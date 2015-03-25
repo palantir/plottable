@@ -11,6 +11,15 @@ declare module Plottable {
              * @return {boolean} Whether x is in [a, b]
              */
             function inRange(x: number, a: number, b: number): boolean;
+            /**
+             * Clamps x to the range [min, max].
+             *
+             * @param {number} x The value to be clamped.
+             * @param {number} min The minimum value.
+             * @param {number} max The maximum value.
+             * @return {number} A clamped value in the range [min, max].
+             */
+            function clamp(x: number, min: number, max: number): number;
             /** Print a warning message to the console, if it is available.
              *
              * @param {string} The warnings to print
@@ -755,12 +764,6 @@ declare module Plottable {
         wantsWidth: boolean;
         wantsHeight: boolean;
     };
-    type _PixelArea = {
-        xMin: number;
-        xMax: number;
-        yMin: number;
-        yMax: number;
-    };
     /**
      * The range of your current data. For example, [1, 2, 6, -5] has the Extent
      * `{min: -5, max: 6}`.
@@ -778,6 +781,13 @@ declare module Plottable {
     type Point = {
         x: number;
         y: number;
+    };
+    /**
+     * The corners of a box.
+     */
+    type Bounds = {
+        topLeft: Point;
+        bottomRight: Point;
     };
 }
 
@@ -2596,6 +2606,7 @@ declare module Plottable {
 declare module Plottable {
     module Component {
         class SelectionBoxLayer extends AbstractComponent {
+            protected _box: D3.Selection;
             constructor();
             protected _setup(): void;
             /**
@@ -3972,6 +3983,7 @@ declare module Plottable {
         }
         class Hover extends Interaction.AbstractInteraction {
             _componentToListenTo: Hoverable;
+            constructor();
             _anchor(component: Hoverable, hitBox: D3.Selection): void;
             /**
              * Attaches an callback to be called when the user mouses over an element.
@@ -3996,6 +4008,46 @@ declare module Plottable {
              *                     the user is currently hovering over.
              */
             getCurrentHoverData(): HoverData;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Component {
+        module Interactive {
+            class DragBoxLayer extends Component.SelectionBoxLayer {
+                constructor();
+                protected _setup(): void;
+                _doRender(): void;
+                /**
+                 * Gets the edge width of the drag box.
+                 *
+                 * @return {number} The edge width of the drag box.
+                 */
+                edgeWidth(): number;
+                /**
+                 * Sets the edge width of the drag box.
+                 *
+                 * @param {number} width The desired edge width.
+                 * @return {DragBoxLayer} The calling DragBoxLayer.
+                 */
+                edgeWidth(width: number): DragBoxLayer;
+                /**
+                 * Gets whether or not the drag box is resizable.
+                 *
+                 * @return {boolean} Whether or not the drag box is resizable.
+                 */
+                resizable(): boolean;
+                /**
+                 * Sets whether or not the drag box is resizable.
+                 *
+                 * @param {boolean} canResize Whether or not the drag box should be resizable.
+                 * @return {DragBoxLayer} The calling DragBoxLayer.
+                 */
+                resizable(canResize: boolean): DragBoxLayer;
+                protected _setResizable(canResize: boolean): void;
+            }
         }
     }
 }

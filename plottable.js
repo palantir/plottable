@@ -9913,6 +9913,197 @@ var Plottable;
     })(Interaction = Plottable.Interaction || (Plottable.Interaction = {}));
 })(Plottable || (Plottable = {}));
 
+///<reference path="../../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    var Component;
+    (function (Component) {
+        var Interactive;
+        (function (Interactive) {
+            var DragBoxLayer = (function (_super) {
+                __extends(DragBoxLayer, _super);
+                function DragBoxLayer() {
+                    var _this = this;
+                    _super.call(this);
+                    this._boxEdgeWidth = 6;
+                    this._xResizable = false;
+                    this._yResizable = false;
+                    this.classed("drag-box-layer", true);
+                    this._dragInteraction = new Plottable.Interaction.Drag();
+                    this._dragInteraction.onDragStart(function (s) {
+                        _this.boxVisible(true);
+                        _this._grabbedEdges = _this._getEdges(s);
+                        if (!_this._yResizable) {
+                            _this._grabbedEdges.top = false;
+                            _this._grabbedEdges.bottom = false;
+                        }
+                        if (!_this._xResizable) {
+                            _this._grabbedEdges.left = false;
+                            _this._grabbedEdges.right = false;
+                        }
+                        if (!_this._grabbedEdges.top && !_this._grabbedEdges.bottom && !_this._grabbedEdges.left && !_this._grabbedEdges.right) {
+                            _this.bounds({
+                                topLeft: s,
+                                bottomRight: s
+                            });
+                            _this._grabbedEdges.bottom = true;
+                            _this._grabbedEdges.right = true;
+                        }
+                        var bounds = _this.bounds();
+                        _this._initTL = bounds.topLeft;
+                        _this._initBR = bounds.bottomRight;
+                    });
+                    this._dragInteraction.onDrag(function (s, e) {
+                        var topLeft = _this._initTL;
+                        var bottomRight = _this._initBR;
+                        if (_this._grabbedEdges.bottom) {
+                            bottomRight.y = e.y;
+                        }
+                        else if (_this._grabbedEdges.top) {
+                            topLeft.y = e.y;
+                        }
+                        if (_this._grabbedEdges.right) {
+                            bottomRight.x = e.x;
+                        }
+                        else if (_this._grabbedEdges.left) {
+                            topLeft.x = e.x;
+                        }
+                        _this.bounds({
+                            topLeft: topLeft,
+                            bottomRight: bottomRight
+                        });
+                    });
+                    this._dragInteraction.onDragEnd(function (s, e) {
+                        if (s.x === e.x && s.y === e.y) {
+                            _this.boxVisible(false);
+                        }
+                    });
+                    this.registerInteraction(this._dragInteraction);
+                }
+                DragBoxLayer.prototype._setup = function () {
+                    var _this = this;
+                    _super.prototype._setup.call(this);
+                    var createLine = function () { return _this._box.append("line").style({
+                        "opacity": 0,
+                        "stroke": "pink",
+                        "stroke-width": _this._boxEdgeWidth
+                    }); };
+                    this._boxEdgeT = createLine().classed("drag-edge-tb", true);
+                    this._boxEdgeB = createLine().classed("drag-edge-tb", true);
+                    this._boxEdgeL = createLine().classed("drag-edge-lr", true);
+                    this._boxEdgeR = createLine().classed("drag-edge-lr", true);
+                    var createCorner = function () { return _this._box.append("circle").attr("r", _this._boxEdgeWidth / 2).style({
+                        "opacity": 0,
+                        "fill": "pink"
+                    }); };
+                    this._boxCornerTL = createCorner().classed("drag-corner-tl", true);
+                    this._boxCornerTR = createCorner().classed("drag-corner-tr", true);
+                    this._boxCornerBL = createCorner().classed("drag-corner-bl", true);
+                    this._boxCornerBR = createCorner().classed("drag-corner-br", true);
+                };
+                DragBoxLayer.prototype._getEdges = function (p) {
+                    var edges = {
+                        top: false,
+                        bottom: false,
+                        left: false,
+                        right: false
+                    };
+                    var bounds = this.bounds();
+                    var t = bounds.topLeft.y;
+                    var b = bounds.bottomRight.y;
+                    var l = bounds.topLeft.x;
+                    var r = bounds.bottomRight.x;
+                    var he = this._boxEdgeWidth / 2;
+                    if (l - he <= p.x && p.x <= r + he) {
+                        edges.top = (t - he <= p.y && p.y <= t + he);
+                        edges.bottom = (b - he <= p.y && p.y <= b + he);
+                    }
+                    if (t - he <= p.y && p.y <= b + he) {
+                        edges.left = (l - he <= p.x && p.x <= l + he);
+                        edges.right = (r - he <= p.x && p.x <= r + he);
+                    }
+                    return edges;
+                };
+                DragBoxLayer.prototype._doRender = function () {
+                    _super.prototype._doRender.call(this);
+                    if (this.boxVisible()) {
+                        var bounds = this.bounds();
+                        var t = bounds.topLeft.y;
+                        var b = bounds.bottomRight.y;
+                        var l = bounds.topLeft.x;
+                        var r = bounds.bottomRight.x;
+                        this._boxEdgeT.attr({
+                            x1: l,
+                            y1: t,
+                            x2: r,
+                            y2: t
+                        });
+                        this._boxEdgeB.attr({
+                            x1: l,
+                            y1: b,
+                            x2: r,
+                            y2: b
+                        });
+                        this._boxEdgeL.attr({
+                            x1: l,
+                            y1: t,
+                            x2: l,
+                            y2: b
+                        });
+                        this._boxEdgeR.attr({
+                            x1: r,
+                            y1: t,
+                            x2: r,
+                            y2: b
+                        });
+                        this._boxCornerTL.attr({ cx: l, cy: t });
+                        this._boxCornerTR.attr({ cx: r, cy: t });
+                        this._boxCornerBL.attr({ cx: l, cy: b });
+                        this._boxCornerBR.attr({ cx: r, cy: b });
+                    }
+                };
+                DragBoxLayer.prototype.edgeWidth = function (width) {
+                    if (width == null) {
+                        return this._boxEdgeWidth;
+                    }
+                    if (width < 0) {
+                        throw new Error("Edge width cannot be negative.");
+                    }
+                    this._boxEdgeWidth = width;
+                    this._boxEdgeT.style("stroke-width", this._boxEdgeWidth);
+                    this._boxEdgeB.style("stroke-width", this._boxEdgeWidth);
+                    this._boxEdgeL.style("stroke-width", this._boxEdgeWidth);
+                    this._boxEdgeR.style("stroke-width", this._boxEdgeWidth);
+                    this._boxCornerTL.attr("r", this._boxEdgeWidth / 2);
+                    this._boxCornerTR.attr("r", this._boxEdgeWidth / 2);
+                    this._boxCornerBL.attr("r", this._boxEdgeWidth / 2);
+                    this._boxCornerBR.attr("r", this._boxEdgeWidth / 2);
+                };
+                DragBoxLayer.prototype.resizable = function (canResize) {
+                    if (canResize == null) {
+                        return this._xResizable || this._yResizable;
+                    }
+                    this._setResizable(canResize);
+                    this.classed("x-resizable", this._xResizable);
+                    this.classed("y-resizable", this._yResizable);
+                };
+                DragBoxLayer.prototype._setResizable = function (canResize) {
+                    this._xResizable = canResize;
+                    this._yResizable = canResize;
+                };
+                return DragBoxLayer;
+            })(Component.SelectionBoxLayer);
+            Interactive.DragBoxLayer = DragBoxLayer;
+        })(Interactive = Component.Interactive || (Component.Interactive = {}));
+    })(Component = Plottable.Component || (Plottable.Component = {}));
+})(Plottable || (Plottable = {}));
+
 /*!
 SVG Typewriter 0.1.11 (https://github.com/palantir/svg-typewriter)
 Copyright 2014 Palantir Technologies
