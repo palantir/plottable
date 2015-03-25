@@ -9374,6 +9374,9 @@ var Plottable;
                 this._mouseDispatcher = Plottable.Dispatcher.Mouse.getDispatcher(component.content().node());
                 this._mouseDispatcher.onMouseDown("Interaction.Click" + this.getID(), function (p) { return _this._handleMouseDown(p); });
                 this._mouseDispatcher.onMouseUp("Interaction.Click" + this.getID(), function (p) { return _this._handleMouseUp(p); });
+                this._touchDispatcher = Plottable.Dispatcher.Touch.getDispatcher(component.content().node());
+                this._touchDispatcher.onTouchStart("Interaction.Click" + this.getID(), function (p) { return _this._handleMouseDown(p); });
+                this._touchDispatcher.onTouchEnd("Interaction.Click" + this.getID(), function (p) { return _this._handleMouseUp(p); });
             };
             Click.prototype._handleMouseDown = function (p) {
                 // TODO: implement this
