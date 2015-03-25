@@ -20,7 +20,7 @@ export module Component {
       private _boxCornerTR: D3.Selection;
       private _boxCornerBL: D3.Selection;
       private _boxCornerBR: D3.Selection;
-      private _boxEdgeWidth = 6;
+      private _detectionRadius = 3;
 
       private _xResizable = false;
       private _yResizable = false;
@@ -97,8 +97,7 @@ export module Component {
 
         var createLine = () => this._box.append("line").style({
                                  "opacity": 0,
-                                 "stroke": "pink",
-                                 "stroke-width": this._boxEdgeWidth
+                                 "stroke": "pink"
                                });
         this._boxEdgeT = createLine().classed("drag-edge-tb", true);
         this._boxEdgeB = createLine().classed("drag-edge-tb", true);
@@ -106,7 +105,6 @@ export module Component {
         this._boxEdgeR = createLine().classed("drag-edge-lr", true);
 
         var createCorner = () => this._box.append("circle")
-                                     .attr("r", this._boxEdgeWidth / 2)
                                      .style({
                                        "opacity": 0,
                                        "fill": "pink"
@@ -115,6 +113,8 @@ export module Component {
         this._boxCornerTR = createCorner().classed("drag-corner-tr", true);
         this._boxCornerBL = createCorner().classed("drag-corner-bl", true);
         this._boxCornerBR = createCorner().classed("drag-corner-br", true);
+
+        this.detectionRadius(this._detectionRadius);
       }
 
       private _getEdges(p: Point) {
@@ -130,16 +130,16 @@ export module Component {
         var b = bounds.bottomRight.y;
         var l = bounds.topLeft.x;
         var r = bounds.bottomRight.x;
-        var he = this._boxEdgeWidth / 2;
+        var rad = this._detectionRadius;
 
-        if (l - he <= p.x && p.x <= r + he) {
-          edges.top = (t - he <= p.y && p.y <= t + he);
-          edges.bottom = (b - he <= p.y && p.y <= b + he);
+        if (l - rad <= p.x && p.x <= r + rad) {
+          edges.top = (t - rad <= p.y && p.y <= t + rad);
+          edges.bottom = (b - rad <= p.y && p.y <= b + rad);
         }
 
-        if (t - he <= p.y && p.y <= b + he) {
-          edges.left = (l - he <= p.x && p.x <= l + he);
-          edges.right = (r - he <= p.x && p.x <= r + he);
+        if (t - rad <= p.y && p.y <= b + rad) {
+          edges.left = (l - rad <= p.x && p.x <= l + rad);
+          edges.right = (r - rad <= p.x && p.x <= r + rad);
         }
 
         return edges;
@@ -175,34 +175,36 @@ export module Component {
       }
 
       /**
-       * Gets the edge width of the drag box.
+       * Gets the detection radius of the drag box.
        *
-       * @return {number} The edge width of the drag box.
+       * @return {number} The detection radius of the drag box.
        */
-      public edgeWidth(): number;
+      public detectionRadius(): number;
       /**
-       * Sets the edge width of the drag box.
+       * Sets the detection radius of the drag box.
        *
-       * @param {number} width The desired edge width.
+       * @param {number} r The desired detection radius.
        * @return {DragBoxLayer} The calling DragBoxLayer.
        */
-      public edgeWidth(width: number): DragBoxLayer;
-      public edgeWidth(width?: number): any {
-        if (width == null) {
-          return this._boxEdgeWidth;
+      public detectionRadius(r: number): DragBoxLayer;
+      public detectionRadius(r?: number): any {
+        if (r == null) {
+          return this._detectionRadius;
         }
-        if (width < 0) {
-          throw new Error("Edge width cannot be negative.");
+        if (r < 0) {
+          throw new Error("detection radius cannot be negative.");
         }
-        this._boxEdgeWidth = width;
-        this._boxEdgeT.style("stroke-width", this._boxEdgeWidth);
-        this._boxEdgeB.style("stroke-width", this._boxEdgeWidth);
-        this._boxEdgeL.style("stroke-width", this._boxEdgeWidth);
-        this._boxEdgeR.style("stroke-width", this._boxEdgeWidth);
-        this._boxCornerTL.attr("r", this._boxEdgeWidth / 2);
-        this._boxCornerTR.attr("r", this._boxEdgeWidth / 2);
-        this._boxCornerBL.attr("r", this._boxEdgeWidth / 2);
-        this._boxCornerBR.attr("r", this._boxEdgeWidth / 2);
+        this._detectionRadius = r;
+        if (this._isSetup) {
+          this._boxEdgeT.style("stroke-width", this._detectionRadius * 2);
+          this._boxEdgeB.style("stroke-width", this._detectionRadius * 2);
+          this._boxEdgeL.style("stroke-width", this._detectionRadius * 2);
+          this._boxEdgeR.style("stroke-width", this._detectionRadius * 2);
+          this._boxCornerTL.attr("r", this._detectionRadius);
+          this._boxCornerTR.attr("r", this._detectionRadius);
+          this._boxCornerBL.attr("r", this._detectionRadius);
+          this._boxCornerBR.attr("r", this._detectionRadius);
+        }
       }
 
       /**

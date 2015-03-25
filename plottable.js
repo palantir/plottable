@@ -9931,7 +9931,7 @@ var Plottable;
                 function DragBoxLayer() {
                     var _this = this;
                     _super.call(this);
-                    this._boxEdgeWidth = 6;
+                    this._detectionRadius = 3;
                     this._xResizable = false;
                     this._yResizable = false;
                     this.classed("drag-box-layer", true);
@@ -9991,14 +9991,13 @@ var Plottable;
                     _super.prototype._setup.call(this);
                     var createLine = function () { return _this._box.append("line").style({
                         "opacity": 0,
-                        "stroke": "pink",
-                        "stroke-width": _this._boxEdgeWidth
+                        "stroke": "pink"
                     }); };
                     this._boxEdgeT = createLine().classed("drag-edge-tb", true);
                     this._boxEdgeB = createLine().classed("drag-edge-tb", true);
                     this._boxEdgeL = createLine().classed("drag-edge-lr", true);
                     this._boxEdgeR = createLine().classed("drag-edge-lr", true);
-                    var createCorner = function () { return _this._box.append("circle").attr("r", _this._boxEdgeWidth / 2).style({
+                    var createCorner = function () { return _this._box.append("circle").style({
                         "opacity": 0,
                         "fill": "pink"
                     }); };
@@ -10006,6 +10005,7 @@ var Plottable;
                     this._boxCornerTR = createCorner().classed("drag-corner-tr", true);
                     this._boxCornerBL = createCorner().classed("drag-corner-bl", true);
                     this._boxCornerBR = createCorner().classed("drag-corner-br", true);
+                    this.detectionRadius(this._detectionRadius);
                 };
                 DragBoxLayer.prototype._getEdges = function (p) {
                     var edges = {
@@ -10019,14 +10019,14 @@ var Plottable;
                     var b = bounds.bottomRight.y;
                     var l = bounds.topLeft.x;
                     var r = bounds.bottomRight.x;
-                    var he = this._boxEdgeWidth / 2;
-                    if (l - he <= p.x && p.x <= r + he) {
-                        edges.top = (t - he <= p.y && p.y <= t + he);
-                        edges.bottom = (b - he <= p.y && p.y <= b + he);
+                    var rad = this._detectionRadius;
+                    if (l - rad <= p.x && p.x <= r + rad) {
+                        edges.top = (t - rad <= p.y && p.y <= t + rad);
+                        edges.bottom = (b - rad <= p.y && p.y <= b + rad);
                     }
-                    if (t - he <= p.y && p.y <= b + he) {
-                        edges.left = (l - he <= p.x && p.x <= l + he);
-                        edges.right = (r - he <= p.x && p.x <= r + he);
+                    if (t - rad <= p.y && p.y <= b + rad) {
+                        edges.left = (l - rad <= p.x && p.x <= l + rad);
+                        edges.right = (r - rad <= p.x && p.x <= r + rad);
                     }
                     return edges;
                 };
@@ -10068,22 +10068,24 @@ var Plottable;
                         this._boxCornerBR.attr({ cx: r, cy: b });
                     }
                 };
-                DragBoxLayer.prototype.edgeWidth = function (width) {
-                    if (width == null) {
-                        return this._boxEdgeWidth;
+                DragBoxLayer.prototype.detectionRadius = function (r) {
+                    if (r == null) {
+                        return this._detectionRadius;
                     }
-                    if (width < 0) {
-                        throw new Error("Edge width cannot be negative.");
+                    if (r < 0) {
+                        throw new Error("detection radius cannot be negative.");
                     }
-                    this._boxEdgeWidth = width;
-                    this._boxEdgeT.style("stroke-width", this._boxEdgeWidth);
-                    this._boxEdgeB.style("stroke-width", this._boxEdgeWidth);
-                    this._boxEdgeL.style("stroke-width", this._boxEdgeWidth);
-                    this._boxEdgeR.style("stroke-width", this._boxEdgeWidth);
-                    this._boxCornerTL.attr("r", this._boxEdgeWidth / 2);
-                    this._boxCornerTR.attr("r", this._boxEdgeWidth / 2);
-                    this._boxCornerBL.attr("r", this._boxEdgeWidth / 2);
-                    this._boxCornerBR.attr("r", this._boxEdgeWidth / 2);
+                    this._detectionRadius = r;
+                    if (this._isSetup) {
+                        this._boxEdgeT.style("stroke-width", this._detectionRadius * 2);
+                        this._boxEdgeB.style("stroke-width", this._detectionRadius * 2);
+                        this._boxEdgeL.style("stroke-width", this._detectionRadius * 2);
+                        this._boxEdgeR.style("stroke-width", this._detectionRadius * 2);
+                        this._boxCornerTL.attr("r", this._detectionRadius);
+                        this._boxCornerTR.attr("r", this._detectionRadius);
+                        this._boxCornerBL.attr("r", this._detectionRadius);
+                        this._boxCornerBR.attr("r", this._detectionRadius);
+                    }
                 };
                 DragBoxLayer.prototype.resizable = function (canResize) {
                     if (canResize == null) {

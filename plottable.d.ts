@@ -4021,18 +4021,18 @@ declare module Plottable {
                 protected _setup(): void;
                 _doRender(): void;
                 /**
-                 * Gets the edge width of the drag box.
+                 * Gets the detection radius of the drag box.
                  *
-                 * @return {number} The edge width of the drag box.
+                 * @return {number} The detection radius of the drag box.
                  */
-                edgeWidth(): number;
+                detectionRadius(): number;
                 /**
-                 * Sets the edge width of the drag box.
+                 * Sets the detection radius of the drag box.
                  *
-                 * @param {number} width The desired edge width.
+                 * @param {number} r The desired detection radius.
                  * @return {DragBoxLayer} The calling DragBoxLayer.
                  */
-                edgeWidth(width: number): DragBoxLayer;
+                detectionRadius(r: number): DragBoxLayer;
                 /**
                  * Gets whether or not the drag box is resizable.
                  *
