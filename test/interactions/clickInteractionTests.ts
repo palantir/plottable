@@ -24,14 +24,15 @@ describe("Interactions", () => {
       clickInteraction.onClick(callback);
       assert.strictEqual(clickInteraction.onClick(), callback, "callback can be retrieved");
 
-      triggerFakeMouseEvent("mousedown", c.content(), SVG_WIDTH/2, SVG_HEIGHT/2);
-      triggerFakeMouseEvent("mouseup", c.content(), SVG_WIDTH/2, SVG_HEIGHT/2);
+      triggerFakeMouseEvent("mousedown", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+      triggerFakeMouseEvent("mouseup", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
       assert.isTrue(callbackCalled, "callback called on clicking Component (mouse)");
-      assert.deepEqual(lastPoint, { x: SVG_WIDTH/2, y: SVG_HEIGHT/2 }, "was passed correct point (mouse)");
+      assert.deepEqual(lastPoint, { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 }, "was passed correct point (mouse)");
 
-//      callbackCalled = false;
-//      triggerFakeMouseEvent("mousemove", c.content(), SVG_WIDTH/4, SVG_HEIGHT/4);
-//      assert.isFalse(callbackCalled, "callback not called again if already in Component (mouse)");
+      callbackCalled = false;
+      triggerFakeMouseEvent("mousedown", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+      triggerFakeMouseEvent("mouseup", c.content(), SVG_WIDTH * 2, SVG_HEIGHT * 2);
+      assert.isFalse(callbackCalled, "callback not called if released outside component (mouse)");
 //
 //      triggerFakeMouseEvent("mousemove", c.content(), 2*SVG_WIDTH, 2*SVG_HEIGHT);
 //      assert.isFalse(callbackCalled, "not called when moving outside of the Component (mouse)");
@@ -42,6 +43,11 @@ describe("Interactions", () => {
       triggerFakeTouchEvent("touchend", c.content(), SVG_WIDTH/2, SVG_HEIGHT/2);
       assert.isTrue(callbackCalled, "callback called on entering Component (touch)");
       assert.deepEqual(lastPoint, { x: SVG_WIDTH/2, y: SVG_HEIGHT/2 }, "was passed correct point (touch)");
+
+      callbackCalled = false;
+      triggerFakeTouchEvent("touchstart", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+      triggerFakeTouchEvent("touchend", c.content(), SVG_WIDTH * 2, SVG_HEIGHT * 2);
+      assert.isFalse(callbackCalled, "callback not called if released outside component (touch)");
 
 //      callbackCalled = false;
 //      triggerFakeTouchEvent("touchstart", c.content(), SVG_WIDTH/4, SVG_HEIGHT/4);
