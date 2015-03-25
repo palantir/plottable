@@ -11,7 +11,6 @@ quicktests/overlaying/list_of_quicktests.json
 .idea/
 # Emacs
 .#*
-.ruby-version
 # vim
 *.swp
 *~
