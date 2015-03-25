@@ -28,10 +28,10 @@ export module Interaction {
     }
 
     private _handleMouseUp(p: Point) {
-      this._clickedDown = false;
-      if (this._isInsideComponent(p)) {
+      if (this._clickedDown && this._isInsideComponent(p)) {
         this.onClick()(p);
       }
+      this._clickedDown = false;
     }
 
     /**

@@ -9385,10 +9385,10 @@ var Plottable;
                 }
             };
             Click.prototype._handleMouseUp = function (p) {
-                this._clickedDown = false;
-                if (this._isInsideComponent(p)) {
+                if (this._clickedDown && this._isInsideComponent(p)) {
                     this.onClick()(p);
                 }
+                this._clickedDown = false;
             };
             Click.prototype.onClick = function (callback) {
                 if (callback === undefined) {

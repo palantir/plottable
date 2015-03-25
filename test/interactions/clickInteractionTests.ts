@@ -33,6 +33,10 @@ describe("Interactions", () => {
       triggerFakeMouseEvent("mousedown", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
       triggerFakeMouseEvent("mouseup", c.content(), SVG_WIDTH * 2, SVG_HEIGHT * 2);
       assert.isFalse(callbackCalled, "callback not called if released outside component (mouse)");
+
+      triggerFakeMouseEvent("mousedown", c.content(), SVG_WIDTH * 2, SVG_HEIGHT * 2);
+      triggerFakeMouseEvent("mouseup", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+      assert.isFalse(callbackCalled, "callback not called if started outside component (mouse)");
 //
 //      triggerFakeMouseEvent("mousemove", c.content(), 2*SVG_WIDTH, 2*SVG_HEIGHT);
 //      assert.isFalse(callbackCalled, "not called when moving outside of the Component (mouse)");
@@ -48,6 +52,11 @@ describe("Interactions", () => {
       triggerFakeTouchEvent("touchstart", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
       triggerFakeTouchEvent("touchend", c.content(), SVG_WIDTH * 2, SVG_HEIGHT * 2);
       assert.isFalse(callbackCalled, "callback not called if released outside component (touch)");
+
+      callbackCalled = false;
+      triggerFakeTouchEvent("touchstart", c.content(), SVG_WIDTH * 2, SVG_HEIGHT * 2);
+      triggerFakeTouchEvent("touchend", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+      assert.isFalse(callbackCalled, "callback not called if started outside component (touch)");
 
 //      callbackCalled = false;
 //      triggerFakeTouchEvent("touchstart", c.content(), SVG_WIDTH/4, SVG_HEIGHT/4);
