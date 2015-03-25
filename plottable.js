@@ -1042,6 +1042,19 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
+    var ScaleDomainTransformers;
+    (function (ScaleDomainTransformers) {
+        function translate(scale, delta) {
+            var translateTransform = function (rangeValue) { return scale.invert(rangeValue - delta); };
+            return scale.range().map(translateTransform);
+        }
+        ScaleDomainTransformers.translate = translate;
+    })(ScaleDomainTransformers = Plottable.ScaleDomainTransformers || (Plottable.ScaleDomainTransformers = {}));
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var Plottable;
+(function (Plottable) {
     var _Util;
     (function (_Util) {
         var ClientToSVGTranslator = (function () {
