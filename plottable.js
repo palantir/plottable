@@ -9396,6 +9396,20 @@ var Plottable;
             return Click;
         })(Interaction.AbstractInteraction);
         Interaction.Click = Click;
+    })(Interaction = Plottable.Interaction || (Plottable.Interaction = {}));
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    var Interaction;
+    (function (Interaction) {
         var DoubleClick = (function (_super) {
             __extends(DoubleClick, _super);
             function DoubleClick() {

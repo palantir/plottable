@@ -2,7 +2,8 @@
 
 module Plottable {
 export module Interaction {
-  export class Click extends AbstractInteraction {
+  export class DoubleClick extends AbstractInteraction {
+
     private _callback: (p: Point) => any;
 
     public _anchor(component: Component.AbstractComponent, hitBox: D3.Selection) {
@@ -20,7 +21,7 @@ export module Interaction {
     }
 
     protected _listenTo(): string {
-      return "click";
+      return "dblclick";
     }
 
     /**
@@ -28,11 +29,10 @@ export module Interaction {
      *
      * @param {(p: Point) => any} cb Callback that takes the pixel position of the click event.
      */
-    public callback(cb: (p: Point) => any): Click {
+    public callback(cb: (p: Point) => any): DoubleClick {
       this._callback = cb;
       return this;
     }
-
   }
 }
 }
