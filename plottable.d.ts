@@ -128,6 +128,7 @@ declare module Plottable {
             function colorTest(colorTester: D3.Selection, className: string): string;
             function lightenColor(color: string, factor: number): string;
             function darkenColor(color: string, factor: number, darkenAmount: number): string;
+            function distanceSquared(p1: Point, p2: Point): number;
         }
     }
 }
@@ -1746,20 +1747,35 @@ declare module Plottable {
              * @returns {boolean} Whether the component has a fixed height.
              */
             _isFixedHeight(): boolean;
+            _merge(c: AbstractComponent, below: boolean): Component.Group;
             /**
-             * Merges this Component with another Component, returning a
+             * Merges this Component above another Component, returning a
              * ComponentGroup. This is used to layer Components on top of each other.
              *
              * There are four cases:
-             * Component + Component: Returns a ComponentGroup with both components inside it.
-             * ComponentGroup + Component: Returns the ComponentGroup with the Component appended.
-             * Component + ComponentGroup: Returns the ComponentGroup with the Component prepended.
-             * ComponentGroup + ComponentGroup: Returns a new ComponentGroup with two ComponentGroups inside it.
+             * Component + Component: Returns a ComponentGroup with the first component after the second component.
+             * ComponentGroup + Component: Returns the ComponentGroup with the Component prepended.
+             * Component + ComponentGroup: Returns the ComponentGroup with the Component appended.
+             * ComponentGroup + ComponentGroup: Returns a new ComponentGroup with the first group after the second group.
              *
              * @param {Component} c The component to merge in.
              * @returns {ComponentGroup} The relevant ComponentGroup out of the above four cases.
              */
-            merge(c: AbstractComponent): Component.Group;
+            above(c: AbstractComponent): Component.Group;
+            /**
+             * Merges this Component below another Component, returning a
+             * ComponentGroup. This is used to layer Components on top of each other.
+             *
+             * There are four cases:
+             * Component + Component: Returns a ComponentGroup with the first component before the second component.
+             * ComponentGroup + Component: Returns the ComponentGroup with the Component appended.
+             * Component + ComponentGroup: Returns the ComponentGroup with the Component prepended.
+             * ComponentGroup + ComponentGroup: Returns a new ComponentGroup with the first group before the second group.
+             *
+             * @param {Component} c The component to merge in.
+             * @returns {ComponentGroup} The relevant ComponentGroup out of the above four cases.
+             */
+            below(c: AbstractComponent): Component.Group;
             /**
              * Detaches a Component from the DOM. The component can be reused.
              *
@@ -1877,18 +1893,21 @@ declare module Plottable {
     module Component {
         class Group extends AbstractComponentContainer {
             /**
-             * Constructs a GroupComponent.
+             * Constructs a Component.Group.
              *
-             * A GroupComponent is a set of Components that will be rendered on top of
-             * each other. When you call Component.merge(Component), it creates and
-             * returns a GroupComponent.
+             * A Component.Group is a set of Components that will be rendered on top of
+             * each other. When you call Component.above(Component) or Component.below(Component),
+             * it creates and returns a Component.Group.
+             *
+             * Note that the order of the components will determine placement on the z-axis,
+             * with the previous items rendered below the later items.
              *
              * @constructor
-             * @param {Component[]} components The Components in the Group (default = []).
+             * @param {Component[]} components The Components in the resultant Component.Group (default = []).
              */
             constructor(components?: AbstractComponent[]);
             _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
-            merge(c: AbstractComponent): Group;
+            _merge(c: AbstractComponent, below: boolean): Group;
             _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): Group;
             _isFixedWidth(): boolean;
             _isFixedHeight(): boolean;
@@ -2772,6 +2791,33 @@ declare module Plottable {
              * @returns {PlotData} The retrieved PlotData.
              */
             getAllPlotData(datasetKeys?: string | string[]): PlotData;
+            protected _getAllPlotData(datasetKeys: string[]): PlotData;
+            /**
+             * Retrieves the closest PlotData for the specified dataset(s)
+             *
+             * @param {Point} queryPoint The point to query from
+             * @param {number} withinValue Will only return plot data that is of a distance below withinValue
+             *                             (default = Infinity)
+             * @param {string | string[]} datasetKeys The dataset(s) to retrieve the plot data from.
+             *                                        (default = this.datasetOrder())
+             * @returns {PlotData} The retrieved PlotData.
+             */
+            getClosestPlotData(queryPoint: Point, withinValue?: number, datasetKeys?: string | string[]): {
+                data: any[];
+                pixelPoints: {
+                    x: number;
+                    y: number;
+                }[];
+                selection: D3.Selection;
+            };
+            protected _getClosestPlotData(queryPoint: Point, datasetKeys: string[], withinValue?: number): {
+                data: any[];
+                pixelPoints: {
+                    x: number;
+                    y: number;
+                }[];
+                selection: D3.Selection;
+            };
         }
     }
 }
@@ -3081,6 +3127,14 @@ declare module Plottable {
                 [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
             };
             protected _wholeDatumAttributes(): string[];
+            protected _getClosestPlotData(queryPoint: Point, datasetKeys: string[], withinValue?: number): {
+                data: any[];
+                pixelPoints: {
+                    x: number;
+                    y: number;
+                }[];
+                selection: D3.Selection;
+            };
             protected _getClosestWithinRange(p: Point, range: number): {
                 closestValue: any;
                 closestPoint: {
@@ -3088,6 +3142,7 @@ declare module Plottable {
                     y: number;
                 };
             };
+            protected _getAllPlotData(datasetKeys: string[]): PlotData;
             _hoverOverComponent(p: Point): void;
             _hoverOutComponent(p: Point): void;
             _doHover(p: Point): Interaction.HoverData;
@@ -3544,6 +3599,18 @@ declare module Plottable {
              */
             onMouseUp(key: any, callback: MouseCallback): Dispatcher.Mouse;
             /**
+             * Registers a callback to be called whenever a wheel occurs,
+             * or removes the callback if `null` is passed as the callback.
+             *
+             * @param {any} key The key associated with the callback.
+             *                  Key uniqueness is determined by deep equality.
+             * @param {WheelCallback} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space.
+             *                                     Pass `null` to remove a callback.
+             * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+             */
+            onWheel(key: any, callback: MouseCallback): Dispatcher.Mouse;
+            /**
              * Returns the last computed mouse position.
              *
              * @return {Point} The last known mouse position in <svg> coordinate space.
@@ -3674,6 +3741,7 @@ declare module Plottable {
             protected _hitBox: D3.Selection;
             protected _componentToListenTo: Component.AbstractComponent;
             _anchor(component: Component.AbstractComponent, hitBox: D3.Selection): void;
+            _requiresHitbox(): boolean;
             /**
              * Translates an <svg>-coordinate-space point to Component-space coordinates.
              *
@@ -3699,6 +3767,7 @@ declare module Plottable {
     module Interaction {
         class Click extends AbstractInteraction {
             _anchor(component: Component.AbstractComponent, hitBox: D3.Selection): void;
+            _requiresHitbox(): boolean;
             protected _listenTo(): string;
             /**
              * Sets a callback to be called when a click is received.
@@ -3734,6 +3803,54 @@ declare module Plottable {
 
 declare module Plottable {
     module Interaction {
+        class Pointer extends Interaction.AbstractInteraction {
+            _anchor(component: Component.AbstractComponent, hitBox: D3.Selection): void;
+            /**
+             * Gets the callback called when the pointer enters the Component.
+             *
+             * @return {(p: Point) => any} The current callback.
+             */
+            onPointerEnter(): (p: Point) => any;
+            /**
+             * Sets the callback called when the pointer enters the Component.
+             *
+             * @param {(p: Point) => any} callback The callback to set.
+             * @return {Interaction.Pointer} The calling Interaction.Pointer.
+             */
+            onPointerEnter(callback: (p: Point) => any): Interaction.Pointer;
+            /**
+             * Gets the callback called when the pointer moves.
+             *
+             * @return {(p: Point) => any} The current callback.
+             */
+            onPointerMove(): (p: Point) => any;
+            /**
+             * Sets the callback called when the pointer moves.
+             *
+             * @param {(p: Point) => any} callback The callback to set.
+             * @return {Interaction.Pointer} The calling Interaction.Pointer.
+             */
+            onPointerMove(callback: (p: Point) => any): Interaction.Pointer;
+            /**
+             * Gets the callback called when the pointer exits the Component.
+             *
+             * @return {(p: Point) => any} The current callback.
+             */
+            onPointerExit(): (p: Point) => any;
+            /**
+             * Sets the callback called when the pointer exits the Component.
+             *
+             * @param {(p: Point) => any} callback The callback to set.
+             * @return {Interaction.Pointer} The calling Interaction.Pointer.
+             */
+            onPointerExit(callback: (p: Point) => any): Interaction.Pointer;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Interaction {
         class PanZoom extends AbstractInteraction {
             /**
              * Creates a PanZoomInteraction.
@@ -3751,6 +3868,7 @@ declare module Plottable {
              */
             resetZoom(): void;
             _anchor(component: Component.AbstractComponent, hitBox: D3.Selection): void;
+            _requiresHitbox(): boolean;
         }
     }
 }
@@ -3816,6 +3934,7 @@ declare module Plottable {
             protected _dragend(): void;
             protected _doDragend(): void;
             _anchor(component: Component.AbstractComponent, hitBox: D3.Selection): Drag;
+            _requiresHitbox(): boolean;
             /**
              * Sets up so that the xScale and yScale that are passed have their
              * domains automatically changed as you zoom.
@@ -3968,6 +4087,7 @@ declare module Plottable {
         }
         class Hover extends Interaction.AbstractInteraction {
             _componentToListenTo: Hoverable;
+            constructor();
             _anchor(component: Hoverable, hitBox: D3.Selection): void;
             /**
              * Attaches an callback to be called when the user mouses over an element.
