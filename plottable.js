@@ -9371,26 +9371,21 @@ var Plottable;
             Click.prototype._anchor = function (component, hitBox) {
                 var _this = this;
                 _super.prototype._anchor.call(this, component, hitBox);
-                hitBox.on(this._listenTo(), function () {
-                    var xy = d3.mouse(hitBox.node());
-                    var x = xy[0];
-                    var y = xy[1];
-                    _this._callback({ x: x, y: y });
-                });
+                this._mouseDispatcher = Plottable.Dispatcher.Mouse.getDispatcher(component.content().node());
+                this._mouseDispatcher.onMouseDown("Interaction.Click" + this.getID(), function (p) { return _this._handleMouseDown(p); });
+                this._mouseDispatcher.onMouseUp("Interaction.Click" + this.getID(), function (p) { return _this._handleMouseUp(p); });
             };
-            Click.prototype._requiresHitbox = function () {
-                return true;
+            Click.prototype._handleMouseDown = function (p) {
+                // TODO: implement this
             };
-            Click.prototype._listenTo = function () {
-                return "click";
+            Click.prototype._handleMouseUp = function (p) {
+                // TODO: implement this
             };
-            /**
-             * Sets a callback to be called when a click is received.
-             *
-             * @param {(p: Point) => any} cb Callback that takes the pixel position of the click event.
-             */
-            Click.prototype.callback = function (cb) {
-                this._callback = cb;
+            Click.prototype.onClick = function (callback) {
+                if (callback === undefined) {
+                    return this._clickCallback;
+                }
+                this._clickCallback = callback;
                 return this;
             };
             return Click;
