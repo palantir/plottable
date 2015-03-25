@@ -9367,6 +9367,7 @@ var Plottable;
             __extends(Click, _super);
             function Click() {
                 _super.apply(this, arguments);
+                this._clickedDown = false;
             }
             Click.prototype._anchor = function (component, hitBox) {
                 var _this = this;
@@ -9379,10 +9380,15 @@ var Plottable;
                 this._touchDispatcher.onTouchEnd("Interaction.Click" + this.getID(), function (p) { return _this._handleMouseUp(p); });
             };
             Click.prototype._handleMouseDown = function (p) {
-                // TODO: implement this
+                if (this._isInsideComponent(p)) {
+                    this._clickedDown = true;
+                }
             };
             Click.prototype._handleMouseUp = function (p) {
-                // TODO: implement this
+                this._clickedDown = false;
+                if (this._isInsideComponent(p)) {
+                    this.onClick()(p);
+                }
             };
             Click.prototype.onClick = function (callback) {
                 if (callback === undefined) {

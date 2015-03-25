@@ -7,6 +7,7 @@ export module Interaction {
     private _mouseDispatcher: Plottable.Dispatcher.Mouse;
     private _touchDispatcher: Plottable.Dispatcher.Touch;
     private _clickCallback: (p: Point) => any;
+    private _clickedDown = false;
 
     public _anchor(component: Component.AbstractComponent, hitBox: D3.Selection) {
       super._anchor(component, hitBox);
@@ -21,11 +22,16 @@ export module Interaction {
     }
 
     private _handleMouseDown(p: Point) {
-      // TODO: implement this
+      if (this._isInsideComponent(p)) {
+        this._clickedDown = true;
+      }
     }
 
     private _handleMouseUp(p: Point) {
-      // TODO: implement this
+      this._clickedDown = false;
+      if (this._isInsideComponent(p)) {
+        this.onClick()(p);
+      }
     }
 
     /**
