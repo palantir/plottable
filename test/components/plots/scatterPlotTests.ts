@@ -132,15 +132,15 @@ describe("Plots", () => {
       var dataWithNaN = data.slice();
       dataWithNaN[2] = { foo: 0.4, bar: NaN };
       dataset.data(dataWithNaN);
-      assert.strictEqual(plot.getAllSelections().size(), 4, "does not retrieve NaN point");
+      assert.strictEqual(plot.getAllSelections().size(), 4, "does not draw NaN point");
 
       var dataWithUndefined = data.slice();
       dataWithUndefined[2] = { foo: 0.4, bar: undefined };
       dataset.data(dataWithUndefined);
-      assert.strictEqual(plot.getAllSelections().size(), 4, "does not retrieve undefined point");
+      assert.strictEqual(plot.getAllSelections().size(), 4, "does not draw undefined point");
       dataWithUndefined[2] = { foo: undefined, bar: 0.4 };
       dataset.data(dataWithUndefined);
-      assert.strictEqual(plot.getAllSelections().size(), 4, "does not retrieve undefined point");
+      assert.strictEqual(plot.getAllSelections().size(), 4, "does not draw undefined point");
 
       svg.remove();
     });
