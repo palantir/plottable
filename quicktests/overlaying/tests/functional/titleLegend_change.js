@@ -5,7 +5,7 @@ function makeData() {
 
 function run(svg, data, Plottable) {
   "use strict";
-  
+
   //data
   var dataseries1 = new Plottable.Dataset(data[0].slice(0, 10));
   dataseries1.metadata({name: "series1"});
@@ -58,7 +58,7 @@ function run(svg, data, Plottable) {
   renderOrange.attr("fill", colorProjector);
   renderGrape.attr("fill", colorProjector);
 
-  var renderArea = scatterPlot.merge(linePlot);
+  var renderArea = scatterPlot.below(linePlot);
   function emptyTitle() {
     title1.text("");
   }
@@ -88,19 +88,19 @@ function run(svg, data, Plottable) {
     renderOrange.detach();
     renderBanana.detach();
     renderArea
-    .merge(scatterPlot)
-    .merge(linePlot);
+    .below(scatterPlot)
+    .below(linePlot);
   }
 
   function sixPlots() {
     colorScale1.domain(["series1", "series2", "apples", "oranges", "bananas", "grapes"]);
     renderArea
-    .merge(renderApple)
-    .merge(renderBanana)
-    .merge(renderOrange)
-    .merge(renderGrape)
-    .merge(scatterPlot)
-    .merge(linePlot);
+    .below(renderApple)
+    .below(renderBanana)
+    .below(renderOrange)
+    .below(renderGrape)
+    .below(scatterPlot)
+    .below(linePlot);
     basicTable.renderTo();
   }
 
