@@ -11,6 +11,15 @@ declare module Plottable {
              * @return {boolean} Whether x is in [a, b]
              */
             function inRange(x: number, a: number, b: number): boolean;
+            /**
+             * Clamps x to the range [min, max].
+             *
+             * @param {number} x The value to be clamped.
+             * @param {number} min The minimum value.
+             * @param {number} max The maximum value.
+             * @return {number} A clamped value in the range [min, max].
+             */
+            function clamp(x: number, min: number, max: number): number;
             /** Print a warning message to the console, if it is available.
              *
              * @param {string} The warnings to print
@@ -755,12 +764,6 @@ declare module Plottable {
         wantsWidth: boolean;
         wantsHeight: boolean;
     };
-    type _PixelArea = {
-        xMin: number;
-        xMax: number;
-        yMin: number;
-        yMax: number;
-    };
     /**
      * The range of your current data. For example, [1, 2, 6, -5] has the Extent
      * `{min: -5, max: 6}`.
@@ -778,6 +781,13 @@ declare module Plottable {
     type Point = {
         x: number;
         y: number;
+    };
+    /**
+     * The corners of a box.
+     */
+    type Bounds = {
+        topLeft: Point;
+        bottomRight: Point;
     };
 }
 
@@ -3898,6 +3908,29 @@ declare module Plottable {
         class Drag extends AbstractInteraction {
             _anchor(component: Component.AbstractComponent, hitBox: D3.Selection): void;
             /**
+             * Returns whether or not this Interaction constrains Points passed to its
+             * callbacks to lie inside its Component.
+             *
+             * If true, when the user drags outside of the Component, the closest Point
+             * inside the Component will be passed to the callback instead of the actual
+             * cursor position.
+             *
+             * @return {boolean} Whether or not the Interaction.Drag constrains.
+             */
+            constrain(): boolean;
+            /**
+             * Sets whether or not this Interaction constrains Points passed to its
+             * callbacks to lie inside its Component.
+             *
+             * If true, when the user drags outside of the Component, the closest Point
+             * inside the Component will be passed to the callback instead of the actual
+             * cursor position.
+             *
+             * @param {boolean} doConstrain Whether or not to constrain Points.
+             * @return {Interaction.Drag} The calling Interaction.Drag.
+             */
+            constrain(doConstrain: boolean): Drag;
+            /**
              * Gets the callback that is called when dragging starts.
              *
              * @returns {(start: Point) => any} The callback called when dragging starts.
@@ -3972,6 +4005,7 @@ declare module Plottable {
         }
         class Hover extends Interaction.AbstractInteraction {
             _componentToListenTo: Hoverable;
+            constructor();
             _anchor(component: Hoverable, hitBox: D3.Selection): void;
             /**
              * Attaches an callback to be called when the user mouses over an element.

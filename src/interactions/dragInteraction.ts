@@ -4,6 +4,7 @@ module Plottable {
 export module Interaction {
   export class Drag extends AbstractInteraction {
     private _dragging = false;
+    private _constrain = true;
     private _mouseDispatcher: Plottable.Dispatcher.Mouse;
     private _touchDispatcher: Dispatcher.Touch;
     private _dragOrigin: Point;
@@ -32,6 +33,10 @@ export module Interaction {
 
     private _translateAndConstrain(p: Point) {
       var translatedP = this._translateToComponentSpace(p);
+      if (!this._constrain) {
+        return translatedP;
+      }
+
       return {
         x: _Util.Methods.clamp(translatedP.x, 0, this._componentToListenTo.width()),
         y: _Util.Methods.clamp(translatedP.y, 0, this._componentToListenTo.height())
@@ -67,6 +72,37 @@ export module Interaction {
           this._dragEndCallback(this._dragOrigin, constrainedP);
         }
       }
+    }
+
+    /**
+     * Returns whether or not this Interaction constrains Points passed to its
+     * callbacks to lie inside its Component.
+     *
+     * If true, when the user drags outside of the Component, the closest Point
+     * inside the Component will be passed to the callback instead of the actual
+     * cursor position.
+     *
+     * @return {boolean} Whether or not the Interaction.Drag constrains.
+     */
+    public constrain(): boolean;
+    /**
+     * Sets whether or not this Interaction constrains Points passed to its
+     * callbacks to lie inside its Component.
+     *
+     * If true, when the user drags outside of the Component, the closest Point
+     * inside the Component will be passed to the callback instead of the actual
+     * cursor position.
+     *
+     * @param {boolean} doConstrain Whether or not to constrain Points.
+     * @return {Interaction.Drag} The calling Interaction.Drag.
+     */
+    public constrain(doConstrain: boolean): Drag;
+    public constrain(doConstrain?: boolean): any {
+      if (doConstrain == null) {
+        return this._constrain;
+      }
+      this._constrain = doConstrain;
+      return this;
     }
 
     /**
