@@ -27,7 +27,7 @@ function run(svg, data, Plottable) {
     .attr("yval", "y")
     .barLabelsEnabled(true);
 
-  var center = clusteredBarRenderer.merge(new Plottable.Component.Legend(colorScale));
+  var center = clusteredBarRenderer.below(new Plottable.Component.Legend(colorScale));
 
   var horizChart = new Plottable.Component.Table([
     [nameAxis, center], [null, valueAxis]

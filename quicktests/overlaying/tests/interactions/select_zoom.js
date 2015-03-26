@@ -31,7 +31,7 @@ function run(svg, data, Plottable) {
             renderer
             .attr("fill", function() { return colors[i]; })
             .attr("r", function(){ return 6;});
-            cg.merge(renderer);
+            cg.below(renderer);
         });
 
   var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");

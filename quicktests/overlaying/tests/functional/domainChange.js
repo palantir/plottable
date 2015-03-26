@@ -41,7 +41,7 @@ function run(svg, data, Plottable) {
   ]);
 
   var basicTable = new Plottable.Component.Table([
-    [yAxis, yAxis2, linePlot.merge(scatterPlot)],
+    [yAxis, yAxis2, linePlot.below(scatterPlot)],
     [null, null, xAxis],
     [null, null, xAxis2],
     [null, null, labelTable]
