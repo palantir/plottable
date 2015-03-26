@@ -125,13 +125,29 @@ export module Dispatcher {
      *
      * @param {any} key The key associated with the callback.
      *                  Key uniqueness is determined by deep equality.
-     * @param {WheelCallback} callback A callback that takes the pixel position
+     * @param {MouseCallback} callback A callback that takes the pixel position
      *                                     in svg-coordinate-space.
      *                                     Pass `null` to remove a callback.
      * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
      */
     public onWheel(key: any, callback: MouseCallback): Dispatcher.Mouse {
       this._setCallback(this._wheelBroadcaster, key, callback);
+      return this;
+    }
+
+    /**
+     * Registers a callback to be called whenever a dblClick occurs,
+     * or removes the callback if `null` is passed as the callback.
+     *
+     * @param {any} key The key associated with the callback.
+     *                  Key uniqueness is determined by deep equality.
+     * @param {MouseCallback} callback A callback that takes the pixel position
+     *                                     in svg-coordinate-space.
+     *                                     Pass `null` to remove a callback.
+     * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+     */
+    public onDblClick(key: any, callback: MouseCallback): Dispatcher.Mouse {
+      this._setCallback(this._dblClickBroadcaster, key, callback);
       return this;
     }
 
