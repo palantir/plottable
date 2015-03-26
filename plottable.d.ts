@@ -1608,10 +1608,9 @@ declare module Plottable {
 
 declare module Plottable {
     module _Drawer {
-        class Symbol extends AbstractDrawer {
-            protected _enterData(data: any[]): void;
+        class Symbol extends Element {
+            constructor(key: string);
             protected _drawStep(step: AppliedDrawStep): void;
-            _getSelector(): string;
             _getPixelPoint(datum: any, index: number): Point;
         }
     }

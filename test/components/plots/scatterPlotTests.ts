@@ -111,6 +111,40 @@ describe("Plots", () => {
       svg.remove();
     });
 
+    it("correctly handles NaN and undefined x and y values", () => {
+      var svg = generateSVG(400, 400);
+      var data = [
+        { foo: 0.0, bar: 0.0 },
+        { foo: 0.2, bar: 0.2 },
+        { foo: 0.4, bar: 0.4 },
+        { foo: 0.6, bar: 0.6 },
+        { foo: 0.8, bar: 0.8 }
+      ];
+      var dataset = new Plottable.Dataset(data);
+      var xScale = new Plottable.Scale.Linear();
+      var yScale = new Plottable.Scale.Linear();
+      var plot = new Plottable.Plot.Scatter(xScale, yScale);
+      plot.addDataset(dataset)
+          .project("x", "foo", xScale)
+          .project("y", "bar", yScale);
+      plot.renderTo(svg);
+
+      var dataWithNaN = data.slice();
+      dataWithNaN[2] = { foo: 0.4, bar: NaN };
+      dataset.data(dataWithNaN);
+      assert.strictEqual(plot.getAllSelections().size(), 4, "does not retrieve NaN point");
+
+      var dataWithUndefined = data.slice();
+      dataWithUndefined[2] = { foo: 0.4, bar: undefined };
+      dataset.data(dataWithUndefined);
+      assert.strictEqual(plot.getAllSelections().size(), 4, "does not retrieve undefined point");
+      dataWithUndefined[2] = { foo: undefined, bar: 0.4 };
+      dataset.data(dataWithUndefined);
+      assert.strictEqual(plot.getAllSelections().size(), 4, "does not retrieve undefined point");
+
+      svg.remove();
+    });
+
     describe("Example ScatterPlot with quadratic series", () => {
       var svg: D3.Selection;
       var xScale: Plottable.Scale.Linear;
