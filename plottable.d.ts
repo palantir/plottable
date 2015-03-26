@@ -3911,6 +3911,10 @@ declare module Plottable {
              * Returns whether or not this Interaction constrains Points passed to its
              * callbacks to lie inside its Component.
              *
+             * If true, when the user drags outside of the Component, the closest Point
+             * inside the Component will be passed to the callback instead of the actual
+             * cursor position.
+             *
              * @return {boolean} Whether or not the Interaction.Drag constrains.
              */
             constrain(): boolean;
