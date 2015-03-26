@@ -3776,8 +3776,22 @@ declare module Plottable {
              */
             callback(cb: (p: Point) => any): Click;
         }
-        class DoubleClick extends Click {
+    }
+}
+
+
+declare module Plottable {
+    module Interaction {
+        class DoubleClick extends AbstractInteraction {
+            _anchor(component: Component.AbstractComponent, hitBox: D3.Selection): void;
+            _requiresHitbox(): boolean;
             protected _listenTo(): string;
+            /**
+             * Sets a callback to be called when a click is received.
+             *
+             * @param {(p: Point) => any} cb Callback that takes the pixel position of the click event.
+             */
+            callback(cb: (p: Point) => any): DoubleClick;
         }
     }
 }
