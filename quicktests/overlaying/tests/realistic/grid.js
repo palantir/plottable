@@ -33,24 +33,23 @@ function makeData() {
 function run(svg, data, Plottable) {
   "use strict";
   
-    var timeFormatStart = function (data) { return d3.time.format("%m/%d/%Y").parse(data.x1);}; 
-                
-    var timeFormatEnd = function (data) { return d3.time.format("%m/%d/%Y").parse(data.x2);};   
-                
-    var xScale = new Plottable.Scale.Time();
-    var yScale = new Plottable.Scale.Category();
-    yScale.innerPadding(0.25).outerPadding(0.25);
-    var xAxis = new Plottable.Axis.Time(xScale, "bottom");
-    var yAxis = new Plottable.Axis.Category(yScale, "left");
-    var plot = new Plottable.Plot.Grid(xScale, yScale);
-    plot.addDataset(data);
-    plot.project("x", timeFormatStart, xScale)
-    .project("y", "team", yScale)
-    .project("x2", timeFormatEnd, xScale)
-    .project("fill", "fill")
-    .project("stroke", "stroke");
-                
-    var table = new Plottable.Component.Table([[yAxis, plot],
-                                               [null, xAxis]]);
-    table.renderTo(svg);
+  var timeFormatStart = function (data) { return d3.time.format("%m/%d/%Y").parse(data.x1);}; 
+  var timeFormatEnd = function (data) { return d3.time.format("%m/%d/%Y").parse(data.x2);};   
+              
+  var xScale = new Plottable.Scale.Time();
+  var yScale = new Plottable.Scale.Category();
+  yScale.innerPadding(0.25).outerPadding(0.25);
+  var xAxis = new Plottable.Axis.Time(xScale, "bottom");
+  var yAxis = new Plottable.Axis.Category(yScale, "left");
+  var plot = new Plottable.Plot.Grid(xScale, yScale);
+  plot.addDataset(data);
+  plot.project("x", timeFormatStart, xScale)
+  .project("y", "team", yScale)
+  .project("x2", timeFormatEnd, xScale)
+  .project("fill", "fill")
+  .project("stroke", "stroke");
+              
+  var table = new Plottable.Component.Table([[yAxis, plot],
+                                             [null, xAxis]]);
+  table.renderTo(svg);
 }

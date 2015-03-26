@@ -67,6 +67,4 @@ function run(svg, data, Plottable){
     
   plot.registerInteraction(hover);
   plot.registerInteraction(key);
-
-
 }

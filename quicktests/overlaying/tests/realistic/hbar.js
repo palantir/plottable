@@ -1,6 +1,6 @@
 function makeData() {
   "use strict";
-    var data = [{x: 'Bicycle', y: 284},
+  var data = [{x: 'Bicycle', y: 284},
                 {x: 'Car - Truck', y: 253},
                 {x: 'Car - Sedan', y: 115},
                 {x: 'Car - Van', y: 58},
@@ -54,7 +54,7 @@ function run(svg, data, Plottable){
       matrix[2][0] = matrix[2][2];
       matrix[2][2] = tmp;  
 
-      yAxis.orient(yAxis.orient() === "left"?"right":"left");
+      yAxis.orient(yAxis.orient() === "left" ? "right" : "left");
       new Plottable.Component.Table(matrix)
                                 .renderTo(svg);
     };   

@@ -62,7 +62,7 @@ function run(svg, data, Plottable){
   cs.range(["#434343", "#923458", "#38ff58"]);
   var legend = new Plottable.Component.Legend(cs);
   
-  var plots = plot1.merge(plot2).merge(plot3);
+  var plots = plot1.above(plot2).above(plot3);
   var label = new Plottable.Component.Label("TITLE LABEL");
   
   var table = new Plottable.Component.Table([[null, label, null],
@@ -95,7 +95,6 @@ function run(svg, data, Plottable){
   .select('.background-fill')
   .style('fill', '#33e4e9')
   .style('opacity', 0.1);
-
 }
 
 
