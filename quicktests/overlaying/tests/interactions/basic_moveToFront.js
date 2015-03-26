@@ -49,11 +49,11 @@ function run(svg, data, Plottable) {
   var title1 = new Plottable.Component.TitleLabel( "front: areaPlot", "horizontal");
   var legend1 = new Plottable.Component.Legend(colorScale1);
   legend1.maxEntriesPerRow(1);
-  
+
   var titleTable = new Plottable.Component.Table().addComponent(0,0, title1)
                                         .addComponent(0,1, legend1);
 
-  var plotGroup = scatterPlot.merge(linePlot).merge(areaPlot);
+  var plotGroup = scatterPlot.below(linePlot).below(areaPlot);
 
   var basicTable = new Plottable.Component.Table()
               .addComponent(2, 0, yAxis)
