@@ -1044,11 +1044,28 @@ var Plottable;
 (function (Plottable) {
     var ScaleDomainTransformers;
     (function (ScaleDomainTransformers) {
-        function translate(scale, delta) {
-            var translateTransform = function (rangeValue) { return scale.invert(rangeValue - delta); };
+        /**
+         * Returns a translated domain of the input scale with a translation of the input translateAmount
+         * in range space
+         *
+         * @param {Scale.AbstractQuantitative<D>} scale The input scale whose domain is being translated
+         * @param {number} translateAmount The amount to translate
+         * @returns {D[]} The translated domain
+         */
+        function translate(scale, translateAmount) {
+            var translateTransform = function (rangeValue) { return scale.invert(rangeValue - translateAmount); };
             return scale.range().map(translateTransform);
         }
         ScaleDomainTransformers.translate = translate;
+        /**
+         * Returns a magnified domain of the input scale with a magnification of the input magnifyAmount
+         * in range space with the center point as the input centerValue, also in range space
+         *
+         * @param {Scale.AbstractQuantitative<D> scale The input scale whose domain is being magnified
+         * @param {number} magnifyAmount The amount to magnify
+         * @param {number} centerValue The center point of the magnification
+         * @returns {D[]} The magnified domain
+         */
         function magnify(scale, magnifyAmount, centerValue) {
             var magnifyTransform = function (rangeValue) { return scale.invert(centerValue - (centerValue - rangeValue) * magnifyAmount); };
             return scale.range().map(magnifyTransform);
