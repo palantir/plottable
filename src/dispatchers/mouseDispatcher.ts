@@ -61,7 +61,7 @@ export module Dispatcher {
       this._event2Callback["wheel"] = (e: WheelEvent) => this._measureAndBroadcast(e, this._wheelBroadcaster);
 
       this._dblClickBroadcaster = new Core.Broadcaster(this);
-      this._event2Callback["dblClick"] = (e: MouseEvent) => this._measureAndBroadcast(e, this._dblClickBroadcaster);
+      this._event2Callback["dblclick"] = (e: MouseEvent) => this._measureAndBroadcast(e, this._dblClickBroadcaster);
 
       this._broadcasters = [this._moveBroadcaster, this._downBroadcaster, this._upBroadcaster, this._wheelBroadcaster,
                             this._dblClickBroadcaster];

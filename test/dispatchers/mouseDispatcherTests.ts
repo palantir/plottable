@@ -231,5 +231,36 @@ describe("Dispatchers", () => {
       md.onWheel(keyString, null);
       svg.remove();
     });
+
+    it("onDblClick()", () => {
+      var targetWidth = 400, targetHeight = 400;
+      var target = generateSVG(targetWidth, targetHeight);
+      // HACKHACK: PhantomJS can't measure SVGs unless they have something in them occupying space
+      target.append("rect").attr("width", targetWidth).attr("height", targetHeight);
+
+      var targetX = 17;
+      var targetY = 76;
+      var expectedPoint = {
+        x: targetX,
+        y: targetY
+      };
+
+      var md = Plottable.Dispatcher.Mouse.getDispatcher(<SVGElement> target.node());
+
+      var callbackWasCalled = false;
+      var callback = (p: Plottable.Point, e: MouseEvent) => {
+        callbackWasCalled = true;
+        assert.isNotNull(e, "mouse event was passed to the callback");
+      };
+
+      var keyString = "unit test";
+      md.onDblClick(keyString, callback);
+
+      triggerFakeMouseEvent("dblclick", target, targetX, targetY);
+      assert.isTrue(callbackWasCalled, "callback was called on dblClick");
+
+      md.onDblClick(keyString, null);
+      target.remove();
+    });
   });
 });
