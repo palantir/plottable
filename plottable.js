@@ -9954,6 +9954,7 @@ var Plottable;
                                 topLeft: s,
                                 bottomRight: s
                             });
+                            // a new box is effectively "grabbed" at the bottom-right corner
                             grabbedEdges.bottom = true;
                             grabbedEdges.right = true;
                         }
