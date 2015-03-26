@@ -29,7 +29,7 @@ function run(svg, data, Plottable) {
 
   var legend = new Plottable.Component.Legend(colorScale);
   legend.maxEntriesPerRow(1);
-  var center = stackedAreaPlot.merge(legend);
+  var center = stackedAreaPlot.below(legend);
 
   new Plottable.Component.Table([
     [yAxis, center], [null, xAxis]

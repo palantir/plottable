@@ -20,7 +20,7 @@ function run(svg, data, Plottable) {
   var barPlot = new Plottable.Plot.Bar(xScale, yScale, true).addDataset(dataseries);
   barPlot.project("x", "x", xScale).project("y", "y", yScale);
   var gridlines = new Plottable.Component.Gridlines(xScale, yScale);
-  var renderGroup = gridlines.merge(barPlot);
+  var renderGroup = gridlines.below(barPlot);
   var title = new Plottable.Component.TitleLabel("reset");
 
   var chart = new Plottable.Component.Table([
