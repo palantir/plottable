@@ -9936,42 +9936,45 @@ var Plottable;
                     this._yResizable = false;
                     this.classed("drag-box-layer", true);
                     this._dragInteraction = new Plottable.Interaction.Drag();
+                    var grabbedEdges;
+                    var _initTL;
+                    var _initBR;
                     this._dragInteraction.onDragStart(function (s) {
-                        _this.boxVisible(true);
-                        _this._grabbedEdges = _this._getEdges(s);
+                        grabbedEdges = _this._getEdges(s);
                         if (!_this._yResizable) {
-                            _this._grabbedEdges.top = false;
-                            _this._grabbedEdges.bottom = false;
+                            grabbedEdges.top = false;
+                            grabbedEdges.bottom = false;
                         }
                         if (!_this._xResizable) {
-                            _this._grabbedEdges.left = false;
-                            _this._grabbedEdges.right = false;
+                            grabbedEdges.left = false;
+                            grabbedEdges.right = false;
                         }
-                        if (!_this._grabbedEdges.top && !_this._grabbedEdges.bottom && !_this._grabbedEdges.left && !_this._grabbedEdges.right) {
+                        if (!_this.boxVisible() || (!grabbedEdges.top && !grabbedEdges.bottom && !grabbedEdges.left && !grabbedEdges.right)) {
                             _this.bounds({
                                 topLeft: s,
                                 bottomRight: s
                             });
-                            _this._grabbedEdges.bottom = true;
-                            _this._grabbedEdges.right = true;
+                            grabbedEdges.bottom = true;
+                            grabbedEdges.right = true;
                         }
+                        _this.boxVisible(true);
                         var bounds = _this.bounds();
-                        _this._initTL = bounds.topLeft;
-                        _this._initBR = bounds.bottomRight;
+                        _initTL = bounds.topLeft;
+                        _initBR = bounds.bottomRight;
                     });
                     this._dragInteraction.onDrag(function (s, e) {
-                        var topLeft = _this._initTL;
-                        var bottomRight = _this._initBR;
-                        if (_this._grabbedEdges.bottom) {
+                        var topLeft = _initTL;
+                        var bottomRight = _initBR;
+                        if (grabbedEdges.bottom) {
                             bottomRight.y = e.y;
                         }
-                        else if (_this._grabbedEdges.top) {
+                        else if (grabbedEdges.top) {
                             topLeft.y = e.y;
                         }
-                        if (_this._grabbedEdges.right) {
+                        if (grabbedEdges.right) {
                             bottomRight.x = e.x;
                         }
-                        else if (_this._grabbedEdges.left) {
+                        else if (grabbedEdges.left) {
                             topLeft.x = e.x;
                         }
                         _this.bounds({

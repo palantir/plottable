@@ -20,13 +20,10 @@ export module Component {
       private _boxCornerTR: D3.Selection;
       private _boxCornerBL: D3.Selection;
       private _boxCornerBR: D3.Selection;
-      private _detectionRadius = 3;
 
+      private _detectionRadius = 3;
       private _xResizable = false;
       private _yResizable = false;
-      private _grabbedEdges: _EdgeIndicator;
-      private _initTL: Point;
-      private _initBR: Point;
 
       constructor() {
         super();
@@ -34,46 +31,52 @@ export module Component {
 
         this._dragInteraction = new Interaction.Drag();
 
-        this._dragInteraction.onDragStart((s: Point) => {
-          this.boxVisible(true);
+        var grabbedEdges: _EdgeIndicator;
+        var _initTL: Point;
+        var _initBR: Point;
 
-          this._grabbedEdges = this._getEdges(s);
+        this._dragInteraction.onDragStart((s: Point) => {
+          grabbedEdges = this._getEdges(s);
           if (!this._yResizable) {
-            this._grabbedEdges.top = false;
-            this._grabbedEdges.bottom = false;
+            grabbedEdges.top = false;
+            grabbedEdges.bottom = false;
           }
           if (!this._xResizable) {
-            this._grabbedEdges.left = false;
-            this._grabbedEdges.right = false;
+            grabbedEdges.left = false;
+            grabbedEdges.right = false;
           }
 
-          if (!this._grabbedEdges.top && !this._grabbedEdges.bottom &&
-              !this._grabbedEdges.left && !this._grabbedEdges.right) {
+          if (!this.boxVisible() ||
+              (!grabbedEdges.top && !grabbedEdges.bottom &&
+               !grabbedEdges.left && !grabbedEdges.right)
+             ) {
             this.bounds({
               topLeft: s,
               bottomRight: s
             });
-            this._grabbedEdges.bottom = true;
-            this._grabbedEdges.right = true;
+            grabbedEdges.bottom = true;
+            grabbedEdges.right = true;
           }
+
+          this.boxVisible(true);
           var bounds = this.bounds();
-          this._initTL = bounds.topLeft;
-          this._initBR = bounds.bottomRight;
+          _initTL = bounds.topLeft;
+          _initBR = bounds.bottomRight;
         });
 
         this._dragInteraction.onDrag((s: Point, e: Point) => {
-          var topLeft = this._initTL;
-          var bottomRight = this._initBR;
+          var topLeft = _initTL;
+          var bottomRight = _initBR;
 
-          if (this._grabbedEdges.bottom) {
+          if (grabbedEdges.bottom) {
             bottomRight.y = e.y;
-          } else if (this._grabbedEdges.top) {
+          } else if (grabbedEdges.top) {
             topLeft.y = e.y;
           }
 
-          if (this._grabbedEdges.right) {
+          if (grabbedEdges.right) {
             bottomRight.x = e.x;
-          } else if (this._grabbedEdges.left) {
+          } else if (grabbedEdges.left) {
             topLeft.x = e.x;
           }
 
