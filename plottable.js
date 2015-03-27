@@ -328,6 +328,7 @@ var Plottable;
             Methods.distanceSquared = distanceSquared;
             function isIE() {
                 var userAgent = window.navigator.userAgent;
+                console.log("AUGH");
                 return userAgent.indexOf("MSIE ") > -1 || userAgent.indexOf("Trident/") > -1;
             }
             Methods.isIE = isIE;
