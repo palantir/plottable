@@ -8407,7 +8407,7 @@ describe("Interactive Components", function () {
                 assert.strictEqual(bounds.bottomRight.x, initialBounds.bottomRight.x, "right edge was not moved");
                 resetBox();
                 triggerFakeDragSequence(target, { x: midPoint.x, y: initialBounds.topLeft.y }, { x: midPoint.x, y: SVG_HEIGHT });
-                var bounds = dbl.bounds();
+                bounds = dbl.bounds();
                 assert.strictEqual(bounds.bottomRight.y, SVG_HEIGHT, "can drag through to other side");
                 svg.remove();
             });
@@ -8421,7 +8421,7 @@ describe("Interactive Components", function () {
                 assert.strictEqual(bounds.bottomRight.x, initialBounds.bottomRight.x, "right edge was not moved");
                 resetBox();
                 triggerFakeDragSequence(target, { x: midPoint.x, y: initialBounds.bottomRight.y }, { x: midPoint.x, y: 0 });
-                var bounds = dbl.bounds();
+                bounds = dbl.bounds();
                 assert.strictEqual(bounds.topLeft.y, 0, "can drag through to other side");
                 svg.remove();
             });
@@ -8435,7 +8435,7 @@ describe("Interactive Components", function () {
                 assert.strictEqual(bounds.bottomRight.x, initialBounds.bottomRight.x, "right edge was not moved");
                 resetBox();
                 triggerFakeDragSequence(target, { x: initialBounds.topLeft.x, y: midPoint.y }, { x: SVG_WIDTH, y: midPoint.y });
-                var bounds = dbl.bounds();
+                bounds = dbl.bounds();
                 assert.strictEqual(bounds.bottomRight.x, SVG_WIDTH, "can drag through to other side");
                 svg.remove();
             });
@@ -8449,7 +8449,7 @@ describe("Interactive Components", function () {
                 assert.strictEqual(bounds.bottomRight.x, SVG_WIDTH, "right edge was repositioned");
                 resetBox();
                 triggerFakeDragSequence(target, { x: initialBounds.bottomRight.x, y: midPoint.y }, { x: 0, y: midPoint.y });
-                var bounds = dbl.bounds();
+                bounds = dbl.bounds();
                 assert.strictEqual(bounds.topLeft.x, 0, "can drag through to other side");
                 svg.remove();
             });
@@ -8465,7 +8465,7 @@ describe("Interactive Components", function () {
                 resetBox();
                 var startYOutside = initialBounds.bottomRight.y + detectionRadius + 1;
                 triggerFakeDragSequence(target, { x: midPoint.x, y: startYOutside }, { x: midPoint.x, y: SVG_HEIGHT });
-                var bounds = dbl.bounds();
+                bounds = dbl.bounds();
                 assert.strictEqual(bounds.topLeft.y, startYOutside, "new box was started at the drag start position");
                 svg.remove();
             });
