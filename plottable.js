@@ -9380,13 +9380,15 @@ var Plottable;
                 this._touchDispatcher.onTouchEnd("Interaction.Click" + this.getID(), function (p) { return _this._handleClickUp(p); });
             };
             Click.prototype._handleClickDown = function (p) {
-                if (this._isInsideComponent(p)) {
+                var translatedPoint = this._translateToComponentSpace(p);
+                if (this._isInsideComponent(translatedPoint)) {
                     this._clickedDown = true;
                 }
             };
             Click.prototype._handleClickUp = function (p) {
-                if (this._clickedDown && this._isInsideComponent(p) && (this._clickCallback != null)) {
-                    this._clickCallback(p);
+                var translatedPoint = this._translateToComponentSpace(p);
+                if (this._clickedDown && this._isInsideComponent(translatedPoint) && (this._clickCallback != null)) {
+                    this._clickCallback(translatedPoint);
                 }
                 this._clickedDown = false;
             };

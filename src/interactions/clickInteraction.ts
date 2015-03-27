@@ -22,14 +22,16 @@ export module Interaction {
     }
 
     private _handleClickDown(p: Point) {
-      if (this._isInsideComponent(p)) {
+      var translatedPoint = this._translateToComponentSpace(p);
+      if (this._isInsideComponent(translatedPoint)) {
         this._clickedDown = true;
       }
     }
 
     private _handleClickUp(p: Point) {
-      if (this._clickedDown && this._isInsideComponent(p) && (this._clickCallback != null)) {
-        this._clickCallback(p);
+      var translatedPoint = this._translateToComponentSpace(p);
+      if (this._clickedDown && this._isInsideComponent(translatedPoint) && (this._clickCallback != null)) {
+        this._clickCallback(translatedPoint);
       }
       this._clickedDown = false;
     }
