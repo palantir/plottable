@@ -7285,6 +7285,7 @@ var Plottable;
                             strokeWidthProjector(d, i, u, m) * Plottable.SymbolGenerators.SYMBOL_GENERATOR_RADIUS / attrToProjector["r"](d, i, u, m);
                         }
                     };
+                    console.log("HELP");
                 }
                 return attrToProjector;
             };
