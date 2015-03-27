@@ -9385,8 +9385,8 @@ var Plottable;
                 }
             };
             Click.prototype._handleClickUp = function (p) {
-                if (this._clickedDown && this._isInsideComponent(p) && (this.onClick() != null)) {
-                    this.onClick()(p);
+                if (this._clickedDown && this._isInsideComponent(p) && (this._clickCallback != null)) {
+                    this._clickCallback(p);
                 }
                 this._clickedDown = false;
             };
