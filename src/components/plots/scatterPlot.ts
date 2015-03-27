@@ -36,6 +36,8 @@ export module Plot {
       attrToProjector["symbol"] = attrToProjector["symbol"] || Plottable.SymbolGenerators.d3Symbol("circle");
       attrToProjector["vector-effect"] = attrToProjector["vector-effect"] || d3.functor("non-scaling-stroke");
 
+      // HACKHACK vector-effect non-scaling-stroke has no effect in IE
+      // https://connect.microsoft.com/IE/feedback/details/788819/svg-non-scaling-stroke
       if (_Util.Methods.isIE()) {
         var strokeWidthProjector = attrToProjector["stroke-width"];
         attrToProjector["stroke-width"] = (d, i, u, m) => {
