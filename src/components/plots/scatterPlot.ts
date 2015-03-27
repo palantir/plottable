@@ -35,6 +35,16 @@ export module Plot {
       attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this._defaultFillColor);
       attrToProjector["symbol"] = attrToProjector["symbol"] || Plottable.SymbolGenerators.d3Symbol("circle");
       attrToProjector["vector-effect"] = attrToProjector["vector-effect"] || d3.functor("non-scaling-stroke");
+
+      if (_Util.Methods.isIE()) {
+        var strokeWidthProjector = attrToProjector["stroke-width"];
+        attrToProjector["stroke-width"] = (d, i, u, m) => {
+          if (attrToProjector["vector-effect"](d, i, u, m) === "non-scaling-stroke") {
+            strokeWidthProjector(d, i, u, m) * SymbolGenerators.SYMBOL_GENERATOR_RADIUS / attrToProjector["r"](d, i, u, m);
+          }
+        };
+      }
+
       return attrToProjector;
     }
 

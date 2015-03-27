@@ -326,6 +326,11 @@ var Plottable;
                 return Math.pow(p2.y - p1.y, 2) + Math.pow(p2.x - p1.x, 2);
             }
             Methods.distanceSquared = distanceSquared;
+            function isIE() {
+                var userAgent = window.navigator.userAgent;
+                return userAgent.indexOf("MSIE ") > -1 || userAgent.indexOf("Trident/") > -1;
+            }
+            Methods.isIE = isIE;
         })(Methods = _Util.Methods || (_Util.Methods = {}));
     })(_Util = Plottable._Util || (Plottable._Util = {}));
 })(Plottable || (Plottable = {}));
@@ -7273,6 +7278,14 @@ var Plottable;
                 attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this._defaultFillColor);
                 attrToProjector["symbol"] = attrToProjector["symbol"] || Plottable.SymbolGenerators.d3Symbol("circle");
                 attrToProjector["vector-effect"] = attrToProjector["vector-effect"] || d3.functor("non-scaling-stroke");
+                if (Plottable._Util.Methods.isIE()) {
+                    var strokeWidthProjector = attrToProjector["stroke-width"];
+                    attrToProjector["stroke-width"] = function (d, i, u, m) {
+                        if (attrToProjector["vector-effect"](d, i, u, m) === "non-scaling-stroke") {
+                            strokeWidthProjector(d, i, u, m) * Plottable.SymbolGenerators.SYMBOL_GENERATOR_RADIUS / attrToProjector["r"](d, i, u, m);
+                        }
+                    };
+                }
                 return attrToProjector;
             };
             Scatter.prototype._generateDrawSteps = function () {
