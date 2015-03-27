@@ -7282,7 +7282,7 @@ var Plottable;
                     var strokeWidthProjector = attrToProjector["stroke-width"];
                     attrToProjector["stroke-width"] = function (d, i, u, m) {
                         if (attrToProjector["vector-effect"](d, i, u, m) === "non-scaling-stroke") {
-                            strokeWidthProjector(d, i, u, m) * Plottable.SymbolGenerators.SYMBOL_GENERATOR_RADIUS / attrToProjector["r"](d, i, u, m);
+                            return strokeWidthProjector(d, i, u, m) * Plottable.SymbolGenerators.SYMBOL_GENERATOR_RADIUS / attrToProjector["r"](d, i, u, m);
                         }
                     };
                 }
