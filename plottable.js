@@ -3353,22 +3353,13 @@ var Plottable;
     (function (_Drawer) {
         var Symbol = (function (_super) {
             __extends(Symbol, _super);
-            function Symbol() {
-                _super.apply(this, arguments);
+            function Symbol(key) {
+                _super.call(this, key);
+                this._svgElement = "path";
+                this._className = "symbol";
             }
-            Symbol.prototype._enterData = function (data) {
-                _super.prototype._enterData.call(this, data);
-                var dataElements = this._getDrawSelection().data(data);
-                dataElements.enter().append("path");
-                dataElements.exit().remove();
-                dataElements.classed("symbol", true);
-            };
-            Symbol.prototype._getDrawSelection = function () {
-                return this._getRenderArea().selectAll("path");
-            };
             Symbol.prototype._drawStep = function (step) {
-                _super.prototype._drawStep.call(this, step);
-                var attrToProjector = Plottable._Util.Methods.copyMap(step.attrToProjector);
+                var attrToProjector = step.attrToProjector;
                 this._attrToProjector = Plottable._Util.Methods.copyMap(step.attrToProjector);
                 var xProjector = attrToProjector["x"];
                 var yProjector = attrToProjector["y"];
@@ -3380,20 +3371,13 @@ var Plottable;
                 var symbolProjector = attrToProjector["symbol"];
                 delete attrToProjector["symbol"];
                 attrToProjector["d"] = symbolProjector;
-                var drawSelection = this._getDrawSelection();
-                if (attrToProjector["fill"]) {
-                    drawSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
-                }
-                step.animator.animate(drawSelection, attrToProjector);
-            };
-            Symbol.prototype._getSelector = function () {
-                return "path";
+                _super.prototype._drawStep.call(this, step);
             };
             Symbol.prototype._getPixelPoint = function (datum, index) {
                 return { x: this._attrToProjector["x"](datum, index), y: this._attrToProjector["y"](datum, index) };
             };
             return Symbol;
-        })(_Drawer.AbstractDrawer);
+        })(_Drawer.Element);
         _Drawer.Symbol = Symbol;
     })(_Drawer = Plottable._Drawer || (Plottable._Drawer = {}));
 })(Plottable || (Plottable = {}));
