@@ -73,7 +73,7 @@ function run(svg, data, Plottable) {
     if(backPlot === 1){ plot = linePlot; title1.text("front: linePlot");}
     if(backPlot === 2){ plot = areaPlot; title1.text("front: areaPlot");}
     plot.detach();
-    plotGroup.merge(plot);
+    plotGroup.below(plot);
     backPlot++;
     if(backPlot === 3){ backPlot = 0; }
   }
