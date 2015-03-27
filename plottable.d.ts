@@ -129,6 +129,7 @@ declare module Plottable {
             function lightenColor(color: string, factor: number): string;
             function darkenColor(color: string, factor: number, darkenAmount: number): string;
             function distanceSquared(p1: Point, p2: Point): number;
+            function isIE(): boolean;
         }
     }
 }
