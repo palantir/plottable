@@ -24,7 +24,7 @@ function run(svg, data, Plottable) {
   var title = new Plottable.Component.TitleLabel("Click to add data");
 
   var gridlines = new Plottable.Component.Gridlines(xScale, yScale);
-  var renderGroup = plot.merge(gridlines);
+  var renderGroup = plot.above(gridlines);
   var titleTable = new Plottable.Component.Table([[title]]);
   var contentTable = new Plottable.Component.Table([
                                                     [yAxis, renderGroup],

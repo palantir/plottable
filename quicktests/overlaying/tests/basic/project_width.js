@@ -36,7 +36,7 @@ function run(svg, data, Plottable) {
                                  .attr("y", "age", yScale)
                                  .attr("width", widthPicker);
   var chart = new Plottable.Component.Table([
-                                            [yAxis, gridlines.merge(barRenderer)],
+                                            [yAxis, gridlines.above(barRenderer)],
                                             [null,  xAxis],
                                             [addLabel, removeLabel]
   ]).renderTo(svg);
