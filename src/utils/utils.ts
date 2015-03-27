@@ -332,7 +332,7 @@ export module _Util {
 
     export function isIE() {
       var userAgent = window.navigator.userAgent;
-      return (userAgent.indexOf("MSIE ") > -1) || (userAgent.indexOf("Trident/") > -1);
+      return userAgent.indexOf("MSIE ") > -1 || userAgent.indexOf("Trident/") > -1;
     }
   }
 }

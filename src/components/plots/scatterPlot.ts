@@ -38,7 +38,7 @@ export module Plot {
 
       // HACKHACK vector-effect non-scaling-stroke has no effect in IE
       // https://connect.microsoft.com/IE/feedback/details/788819/svg-non-scaling-stroke
-      if (_Util.Methods.isIE()) {
+      if (_Util.Methods.isIE() && attrToProjector["stroke-width"] != null) {
         var strokeWidthProjector = attrToProjector["stroke-width"];
         attrToProjector["stroke-width"] = (d, i, u, m) => {
           var strokeWidth = strokeWidthProjector(d, i, u, m) ;
