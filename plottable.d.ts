@@ -449,7 +449,7 @@ declare module Plottable {
          * @param {number} translateAmount The amount to translate
          * @returns {D[]} The translated domain
          */
-        function translate<D>(scale: Scale.AbstractQuantitative<D>, translateAmount: number): D[];
+        function translate<D>(scale: Scale.AbstractQuantitative<D>, translateAmount: number): void;
         /**
          * Returns a magnified domain of the input scale with a magnification of the input magnifyAmount
          * in range space with the center point as the input centerValue, also in range space
@@ -459,7 +459,7 @@ declare module Plottable {
          * @param {number} centerValue The center point of the magnification
          * @returns {D[]} The magnified domain
          */
-        function magnify<D>(scale: Scale.AbstractQuantitative<D>, magnifyAmount: number, centerValue: number): D[];
+        function magnify<D>(scale: Scale.AbstractQuantitative<D>, magnifyAmount: number, centerValue: number): void;
     }
 }
 

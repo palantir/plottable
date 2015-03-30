@@ -14,7 +14,7 @@ module Plottable {
      */
     export function translate<D>(scale: Scale.AbstractQuantitative<D>, translateAmount: number) {
       var translateTransform = (rangeValue: number) => scale.invert(rangeValue - translateAmount);
-      return scale.range().map(translateTransform);
+      scale.domain(scale.range().map(translateTransform));
     }
 
     /**
@@ -28,7 +28,7 @@ module Plottable {
      */
     export function magnify<D>(scale: Scale.AbstractQuantitative<D>, magnifyAmount: number, centerValue: number) {
       var magnifyTransform = (rangeValue: number) => scale.invert(centerValue - (centerValue - rangeValue) * magnifyAmount);
-      return scale.range().map(magnifyTransform);
+      scale.domain(scale.range().map(magnifyTransform));
     }
 
   }

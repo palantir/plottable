@@ -1054,7 +1054,7 @@ var Plottable;
          */
         function translate(scale, translateAmount) {
             var translateTransform = function (rangeValue) { return scale.invert(rangeValue - translateAmount); };
-            return scale.range().map(translateTransform);
+            scale.domain(scale.range().map(translateTransform));
         }
         ScaleDomainTransformers.translate = translate;
         /**
@@ -1068,7 +1068,7 @@ var Plottable;
          */
         function magnify(scale, magnifyAmount, centerValue) {
             var magnifyTransform = function (rangeValue) { return scale.invert(centerValue - (centerValue - rangeValue) * magnifyAmount); };
-            return scale.range().map(magnifyTransform);
+            scale.domain(scale.range().map(magnifyTransform));
         }
         ScaleDomainTransformers.magnify = magnify;
     })(ScaleDomainTransformers = Plottable.ScaleDomainTransformers || (Plottable.ScaleDomainTransformers = {}));
