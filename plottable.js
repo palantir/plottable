@@ -3212,7 +3212,7 @@ var Plottable;
             Rect.prototype._getIfLabelsTooWide = function () {
                 return this._labelsTooWide;
             };
-            Rect.prototype.drawText = function (data, attrToProjector, userMetadata, plotMetadata) {
+            Rect.prototype.drawText = function (data, attrToProjector, boundingBox, userMetadata, plotMetadata) {
                 var _this = this;
                 var labelTooWide = data.map(function (d, i) {
                     var text = attrToProjector["label"](d, i, userMetadata, plotMetadata).toString();
@@ -3240,9 +3240,11 @@ var Plottable;
                         else {
                             x += offset;
                         }
+                        var isHidden = (x < 0 || x + w / 2 >= boundingBox.attr("width"));
                         var g = _this._textArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
                         var className = dark ? "dark-label" : "light-label";
                         g.classed(className, true);
+                        g.attr("display", isHidden ? "none" : "inline");
                         var xAlign;
                         var yAlign;
                         if (_this._isVertical) {
@@ -7659,7 +7661,7 @@ var Plottable;
                 var drawers = this._getDrawersInOrder();
                 var attrToProjector = this._generateAttrToProjector();
                 var dataToDraw = this._getDataToDraw();
-                this._datasetKeysInOrder.forEach(function (k, i) { return drawers[i].drawText(dataToDraw.get(k), attrToProjector, _this._key2PlotDatasetKey.get(k).dataset.metadata(), _this._key2PlotDatasetKey.get(k).plotMetadata); });
+                this._datasetKeysInOrder.forEach(function (k, i) { return drawers[i].drawText(dataToDraw.get(k), attrToProjector, _this._boundingBox, _this._key2PlotDatasetKey.get(k).dataset.metadata(), _this._key2PlotDatasetKey.get(k).plotMetadata); });
                 if (this._hideBarsIfAnyAreTooWide && drawers.some(function (d) { return d._getIfLabelsTooWide(); })) {
                     drawers.forEach(function (d) { return d.removeLabels(); });
                 }
