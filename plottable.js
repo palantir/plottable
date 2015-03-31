@@ -9929,16 +9929,20 @@ var Plottable;
             var DragBoxLayer = (function (_super) {
                 __extends(DragBoxLayer, _super);
                 function DragBoxLayer() {
-                    var _this = this;
                     _super.call(this);
                     this._detectionRadius = 3;
                     this._xResizable = false;
                     this._yResizable = false;
                     this.classed("drag-box-layer", true);
                     this._dragInteraction = new Plottable.Interaction.Drag();
+                    this._setUpCallbacks();
+                    this.registerInteraction(this._dragInteraction);
+                }
+                DragBoxLayer.prototype._setUpCallbacks = function () {
+                    var _this = this;
                     var grabbedEdges;
-                    var _initTL;
-                    var _initBR;
+                    var topLeft;
+                    var bottomRight;
                     this._dragInteraction.onDragStart(function (s) {
                         grabbedEdges = _this._getEdges(s);
                         if (!_this._yResizable) {
@@ -9960,12 +9964,14 @@ var Plottable;
                         }
                         _this.boxVisible(true);
                         var bounds = _this.bounds();
-                        _initTL = bounds.topLeft;
-                        _initBR = bounds.bottomRight;
+                        // copy points so changes to topLeft and bottomRight don't mutate bounds
+                        topLeft = { x: bounds.topLeft.x, y: bounds.topLeft.y };
+                        bottomRight = { x: bounds.bottomRight.x, y: bounds.bottomRight.y };
+                        if (_this._dragStartCallback) {
+                            _this._dragStartCallback(bounds);
+                        }
                     });
                     this._dragInteraction.onDrag(function (s, e) {
-                        var topLeft = _initTL;
-                        var bottomRight = _initBR;
                         if (grabbedEdges.bottom) {
                             bottomRight.y = e.y;
                         }
@@ -9982,14 +9988,19 @@ var Plottable;
                             topLeft: topLeft,
                             bottomRight: bottomRight
                         });
+                        if (_this._dragCallback) {
+                            _this._dragCallback(_this.bounds());
+                        }
                     });
                     this._dragInteraction.onDragEnd(function (s, e) {
                         if (s.x === e.x && s.y === e.y) {
                             _this.boxVisible(false);
                         }
+                        if (_this._dragEndCallback) {
+                            _this._dragEndCallback(_this.bounds());
+                        }
                     });
-                    this.registerInteraction(this._dragInteraction);
-                }
+                };
                 DragBoxLayer.prototype._setup = function () {
                     var _this = this;
                     _super.prototype._setup.call(this);
@@ -10098,10 +10109,39 @@ var Plottable;
                     this._setResizable(canResize);
                     this.classed("x-resizable", this._xResizable);
                     this.classed("y-resizable", this._yResizable);
+                    return this;
                 };
+                // Sets resizable properties. Overridden by subclasses that only resize in one dimension.
                 DragBoxLayer.prototype._setResizable = function (canResize) {
                     this._xResizable = canResize;
                     this._yResizable = canResize;
+                };
+                DragBoxLayer.prototype.onDragStart = function (cb) {
+                    if (cb === undefined) {
+                        return this._dragStartCallback;
+                    }
+                    else {
+                        this._dragStartCallback = cb;
+                        return this;
+                    }
+                };
+                DragBoxLayer.prototype.onDrag = function (cb) {
+                    if (cb === undefined) {
+                        return this._dragCallback;
+                    }
+                    else {
+                        this._dragCallback = cb;
+                        return this;
+                    }
+                };
+                DragBoxLayer.prototype.onDragEnd = function (cb) {
+                    if (cb === undefined) {
+                        return this._dragEndCallback;
+                    }
+                    else {
+                        this._dragEndCallback = cb;
+                        return this;
+                    }
                 };
                 return DragBoxLayer;
             })(Component.SelectionBoxLayer);

@@ -4047,6 +4047,45 @@ declare module Plottable {
                  */
                 resizable(canResize: boolean): DragBoxLayer;
                 protected _setResizable(canResize: boolean): void;
+                /**
+                 * Gets the callback that is called when dragging starts.
+                 *
+                 * @returns {(b: Bounds) => any} The callback called when dragging starts.
+                 */
+                onDragStart(): (b: Bounds) => any;
+                /**
+                 * Sets the callback to be called when dragging starts.
+                 *
+                 * @param {(b: Bounds) => any} cb The callback to be called. Passed the current Bounds in pixels.
+                 * @returns {DragBoxLayer} The calling DragBoxLayer.
+                 */
+                onDragStart(cb: (b: Bounds) => any): DragBoxLayer;
+                /**
+                 * Gets the callback that is called during dragging.
+                 *
+                 * @returns {(b: Bounds) => any} The callback called during dragging.
+                 */
+                onDrag(): (b: Bounds) => any;
+                /**
+                 * Sets a callback to be called during dragging.
+                 *
+                 * @param {(b: Bounds) => any} cb The callback to be called. Passed the current Bounds in pixels.
+                 * @returns {DragBoxLayer} The calling DragBoxLayer.
+                 */
+                onDrag(cb: (b: Bounds) => any): DragBoxLayer;
+                /**
+                 * Gets the callback that is called when dragging ends.
+                 *
+                 * @returns {(b: Bounds) => any} The callback called when dragging ends.
+                 */
+                onDragEnd(): (b: Bounds) => any;
+                /**
+                 * Sets a callback to be called when the dragging ends.
+                 *
+                 * @param {(b: Bounds) => any} cb The callback to be called. Passed the current Bounds in pixels.
+                 * @returns {DragBoxLayer} The calling DragBoxLayer.
+                 */
+                onDragEnd(cb: (b: Bounds) => any): DragBoxLayer;
             }
         }
     }

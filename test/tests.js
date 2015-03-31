@@ -8369,6 +8369,84 @@ describe("Interactive Components", function () {
             assert.throws(function () { return dbl.detectionRadius(-1); }, Error, "", "rejects negative values");
             svg.remove();
         });
+        it("onDragStart()", function () {
+            var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var dbl = new Plottable.Component.Interactive.DragBoxLayer();
+            dbl.renderTo(svg);
+            var startPoint = {
+                x: SVG_WIDTH / 4,
+                y: SVG_HEIGHT / 4
+            };
+            var endPoint = {
+                x: SVG_WIDTH / 2,
+                y: SVG_HEIGHT / 2
+            };
+            var receivedBounds;
+            var callback = function (b) {
+                receivedBounds = b;
+            };
+            dbl.onDragStart(callback);
+            var target = dbl.background();
+            triggerFakeDragSequence(target, startPoint, endPoint);
+            assert.deepEqual(receivedBounds.topLeft, startPoint, "top-left point was set correctly");
+            assert.deepEqual(receivedBounds.bottomRight, startPoint, "bottom-right point was set correctly");
+            assert.strictEqual(dbl.onDragStart(), callback, "can retrieve callback by calling with no args");
+            dbl.onDragStart(null);
+            assert.isNull(dbl.onDragStart(), "can blank callback by passing null");
+            svg.remove();
+        });
+        it("onDrag()", function () {
+            var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var dbl = new Plottable.Component.Interactive.DragBoxLayer();
+            dbl.renderTo(svg);
+            var startPoint = {
+                x: SVG_WIDTH / 4,
+                y: SVG_HEIGHT / 4
+            };
+            var endPoint = {
+                x: SVG_WIDTH / 2,
+                y: SVG_HEIGHT / 2
+            };
+            var receivedBounds;
+            var callback = function (b) {
+                receivedBounds = b;
+            };
+            dbl.onDrag(callback);
+            var target = dbl.background();
+            triggerFakeDragSequence(target, startPoint, endPoint);
+            assert.deepEqual(receivedBounds.topLeft, startPoint, "top-left point was set correctly");
+            assert.deepEqual(receivedBounds.bottomRight, endPoint, "bottom-right point was set correctly");
+            assert.strictEqual(dbl.onDrag(), callback, "can retrieve callback by calling with no args");
+            dbl.onDrag(null);
+            assert.isNull(dbl.onDrag(), "can blank callback by passing null");
+            svg.remove();
+        });
+        it("onDragEnd()", function () {
+            var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var dbl = new Plottable.Component.Interactive.DragBoxLayer();
+            dbl.renderTo(svg);
+            var startPoint = {
+                x: SVG_WIDTH / 4,
+                y: SVG_HEIGHT / 4
+            };
+            var endPoint = {
+                x: SVG_WIDTH / 2,
+                y: SVG_HEIGHT / 2
+            };
+            var receivedBounds;
+            var callback = function (b) {
+                receivedBounds = b;
+            };
+            dbl.onDragEnd(callback);
+            var target = dbl.background();
+            triggerFakeDragSequence(target, startPoint, endPoint);
+            assert.deepEqual(receivedBounds.topLeft, startPoint, "top-left point was set correctly");
+            assert.deepEqual(receivedBounds.bottomRight, endPoint, "bottom-right point was set correctly");
+            assert.strictEqual(dbl.onDragEnd(), callback, "can retrieve callback by calling with no args");
+            dbl.onDragEnd(null);
+            assert.isNull(dbl.onDragEnd(), "can blank callback by passing null");
+            svg.remove();
+        });
         describe("resizing", function () {
             var svg;
             var dbl;
