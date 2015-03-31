@@ -7940,19 +7940,27 @@ var Plottable;
             Line.prototype._getClosestPlotData = function (queryPoint, datasetKeys, withinValue) {
                 var _this = this;
                 if (withinValue === void 0) { withinValue = Infinity; }
-                var closestDistanceSquared = withinValue;
+                var closestXDistance = withinValue;
+                var closestYDistance = withinValue;
                 var closestDatum;
                 var closestSelection;
                 var closestPoint;
                 datasetKeys.forEach(function (datasetKey) {
                     var plotData = _this.getAllPlotData(datasetKey);
                     plotData.pixelPoints.forEach(function (pixelPoint, index) {
-                        var pixelPointDist = Plottable._Util.Methods.distanceSquared(queryPoint, pixelPoint);
-                        if (pixelPointDist < closestDistanceSquared) {
-                            closestDistanceSquared = pixelPointDist;
-                            closestDatum = plotData.data[index];
-                            closestPoint = pixelPoint;
-                            closestSelection = plotData.selection;
+                        var xDist = Math.abs(queryPoint.x - pixelPoint.x);
+                        if (xDist <= closestXDistance) {
+                            var yDist = Math.abs(queryPoint.y - pixelPoint.y);
+                            if (xDist < closestXDistance && yDist < withinValue) {
+                                closestXDistance = xDist;
+                                closestYDistance = withinValue;
+                            }
+                            if (yDist < closestYDistance) {
+                                closestYDistance = yDist;
+                                closestDatum = plotData.data[index];
+                                closestPoint = pixelPoint;
+                                closestSelection = plotData.selection;
+                            }
                         }
                     });
                 });
