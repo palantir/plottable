@@ -7244,6 +7244,15 @@ var Plottable;
                 this.animator("symbols-reset", new Plottable.Animator.Null());
                 this.animator("symbols", new Plottable.Animator.Base().duration(250).delay(5));
             }
+            /**
+             * Convenience function for easily setting the symbol generator used for this scatter plot.
+             *
+             * The symbolGenerator is wrapped into a proper project call and then called to project onto the plot.
+             *
+             * @param {string | SymbolGenerator} Denotes the symbolGenerator to use for this scatterPlot.
+             *                                   If a string is inputted, it is translated to one of Plottable's SymbolGenerators
+             *                                   If a SymbolGenerator is inputted, it is used directly.
+             */
             Scatter.prototype.setSymbolGenerator = function (symbolGenerator) {
                 if (typeof symbolGenerator === "string") {
                     this.project("symbol", function () { return Plottable.SymbolGenerators.d3Symbol(symbolGenerator); });
