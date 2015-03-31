@@ -5523,7 +5523,7 @@ var Plottable;
                 this._fixedWidthFlag = true;
                 this._fixedHeightFlag = true;
                 this._sortFn = function (a, b) { return _this._scale.domain().indexOf(a) - _this._scale.domain().indexOf(b); };
-                this._symbolGeneratorAccessor = function (d, i) { return Plottable.SymbolGenerators.d3Symbol("circle"); };
+                this._symbolGeneratorAccessor = function () { return Plottable.SymbolGenerators.d3Symbol("circle"); };
             }
             Legend.prototype._setup = function () {
                 _super.prototype._setup.call(this);
