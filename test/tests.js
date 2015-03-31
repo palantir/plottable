@@ -7147,7 +7147,7 @@ describe("Formatters", function () {
 
 ///<reference path="../testReference.ts" />
 var assert = chai.assert;
-describe("SymbolGenerators", function () {
+describe("SymbolGeneratorAccessors", function () {
     describe("d3Symbol", function () {
         it("throws an error if invalid symbol type is used", function () {
             assert.throws(function () { return Plottable.SymbolGeneratorAccessors.d3Symbol("aaa"); }, Error, "invalid D3 symbol type");

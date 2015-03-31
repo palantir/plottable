@@ -8,7 +8,7 @@
 /// <reference path="utils/color.ts" />
 
 /// <reference path="utils/formatters.ts" />
-/// <reference path="utils/symbolGenerators.ts" />
+/// <reference path="utils/symbolGeneratorAccessors.ts" />
 
 /// <reference path="utils/clientToSVGTranslator.ts" />
 

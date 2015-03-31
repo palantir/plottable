@@ -2,7 +2,7 @@
 
 var assert = chai.assert;
 
-describe("SymbolGenerators", () => {
+describe("SymbolGeneratorAccessors", () => {
   describe("d3Symbol", () => {
     it("throws an error if invalid symbol type is used", () => {
       assert.throws(() => Plottable.SymbolGeneratorAccessors.d3Symbol("aaa"), Error, "invalid D3 symbol type");
