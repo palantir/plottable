@@ -2419,13 +2419,13 @@ declare module Plottable {
              *
              * @returns {symbolGeneratorAccessor} The SymbolGeneratorAccessor of the legend
              */
-            symbolGeneratorAccessor(): SymbolGeneratorAccessor;
+            symbolGeneratorAccessor(): (datum: any, index: number) => SymbolGenerator;
             /**
              * Sets the SymbolGeneratorAccessor of the legend
              *
              * @returns {Legend} The calling Legend
              */
-            symbolGeneratorAccessor(symbolGeneratorAccessor: SymbolGeneratorAccessor): Legend;
+            symbolGeneratorAccessor(symbolGeneratorAccessor: (datum: any, index: number) => SymbolGenerator): Legend;
         }
     }
 }

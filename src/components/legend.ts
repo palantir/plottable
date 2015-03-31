@@ -2,9 +2,6 @@
 
 module Plottable {
 export module Component {
-
-  export type SymbolGeneratorAccessor = (datum: any, index: number) => SymbolGenerator;
-
   export class Legend extends AbstractComponent {
     /**
      * The css class applied to each legend row
@@ -306,14 +303,14 @@ export module Component {
      *
      * @returns {symbolGeneratorAccessor} The SymbolGeneratorAccessor of the legend
      */
-    public symbolGeneratorAccessor(): SymbolGeneratorAccessor;
+    public symbolGeneratorAccessor(): (datum: any, index: number) => SymbolGenerator;
     /**
      * Sets the SymbolGeneratorAccessor of the legend
      *
      * @returns {Legend} The calling Legend
      */
-    public symbolGeneratorAccessor(symbolGeneratorAccessor: SymbolGeneratorAccessor): Legend;
-    public symbolGeneratorAccessor(symbolGeneratorAccessor?: SymbolGeneratorAccessor): any {
+    public symbolGeneratorAccessor(symbolGeneratorAccessor: (datum: any, index: number) => SymbolGenerator): Legend;
+    public symbolGeneratorAccessor(symbolGeneratorAccessor?: (datum: any, index: number) => SymbolGenerator): any {
       if (symbolGeneratorAccessor == null) {
         return this._symbolGeneratorAccessor;
       } else {
