@@ -5692,7 +5692,7 @@ var Plottable;
                         return translateString;
                     });
                 });
-                entries.select("path").attr("d", function (d, i) { return _this.symbolGenerator()(d, i)(layout.textHeight * 0.3); }).attr("transform", "translate(" + (layout.textHeight / 2) + "," + layout.textHeight / 2 + ")").attr("fill", function (value) { return _this._scale.scale(value); }).classed(Legend.LEGEND_SYMBOL_CLASS, true);
+                entries.select("path").attr("d", function (d, i) { return _this.symbolGeneratorAccessor()(d, i)(layout.textHeight * 0.3); }).attr("transform", "translate(" + (layout.textHeight / 2) + "," + layout.textHeight / 2 + ")").attr("fill", function (value) { return _this._scale.scale(value); }).classed(Legend.LEGEND_SYMBOL_CLASS, true);
                 var padding = this._padding;
                 var textContainers = entries.select("g.text-container");
                 textContainers.text(""); // clear out previous results
@@ -5710,7 +5710,7 @@ var Plottable;
                     self._writer.write(value, maxTextLength, self.height(), writeOptions);
                 });
             };
-            Legend.prototype.symbolGenerator = function (symbolGeneratorAccessor) {
+            Legend.prototype.symbolGeneratorAccessor = function (symbolGeneratorAccessor) {
                 if (symbolGeneratorAccessor == null) {
                     return this._symbolGeneratorAccessor;
                 }

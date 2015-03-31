@@ -272,7 +272,7 @@ export module Component {
         });
       });
 
-      entries.select("path").attr("d", (d: any, i: number) => this.symbolGenerator()(d, i)(layout.textHeight * 0.3))
+      entries.select("path").attr("d", (d: any, i: number) => this.symbolGeneratorAccessor()(d, i)(layout.textHeight * 0.3))
                             .attr("transform", "translate(" + (layout.textHeight / 2) + "," + layout.textHeight / 2 + ")")
                             .attr("fill", (value: string) => this._scale.scale(value) )
                             .classed(Legend.LEGEND_SYMBOL_CLASS, true);
@@ -301,16 +301,16 @@ export module Component {
      * Gets the SymbolGeneratorAccessor of the legend, which dictates how
      * the symbol in each entry is drawn.
      *
-     * @returns {SymbolGenerator} The SymbolGeneratorAccessor of the legend
+     * @returns {symbolGeneratorAccessor} The SymbolGeneratorAccessor of the legend
      */
-    public symbolGenerator(): SymbolGeneratorAccessor;
+    public symbolGeneratorAccessor(): SymbolGeneratorAccessor;
     /**
      * Sets the SymbolGeneratorAccessor of the legend
      *
      * @returns {Legend} The calling Legend
      */
-    public symbolGenerator(symbolGeneratorAccessor: SymbolGeneratorAccessor): Legend;
-    public symbolGenerator(symbolGeneratorAccessor?: SymbolGeneratorAccessor): any {
+    public symbolGeneratorAccessor(symbolGeneratorAccessor: SymbolGeneratorAccessor): Legend;
+    public symbolGeneratorAccessor(symbolGeneratorAccessor?: SymbolGeneratorAccessor): any {
       if (symbolGeneratorAccessor == null) {
         return this._symbolGeneratorAccessor;
       } else {

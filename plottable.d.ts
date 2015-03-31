@@ -2421,15 +2421,15 @@ declare module Plottable {
              * Gets the SymbolGeneratorAccessor of the legend, which dictates how
              * the symbol in each entry is drawn.
              *
-             * @returns {SymbolGenerator} The SymbolGeneratorAccessor of the legend
+             * @returns {symbolGeneratorAccessor} The SymbolGeneratorAccessor of the legend
              */
-            symbolGenerator(): SymbolGeneratorAccessor;
+            symbolGeneratorAccessor(): SymbolGeneratorAccessor;
             /**
              * Sets the SymbolGeneratorAccessor of the legend
              *
              * @returns {Legend} The calling Legend
              */
-            symbolGenerator(symbolGeneratorAccessor: SymbolGeneratorAccessor): Legend;
+            symbolGeneratorAccessor(symbolGeneratorAccessor: SymbolGeneratorAccessor): Legend;
         }
     }
 }
