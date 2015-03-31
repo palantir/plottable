@@ -95,7 +95,7 @@ describe("Interactive Components", () => {
       var receivedBounds: Plottable.Bounds;
       var callback = (b: Plottable.Bounds) => {
         receivedBounds = b;
-      }
+      };
       dbl.onDragStart(callback);
 
       var target = dbl.background();
@@ -127,7 +127,7 @@ describe("Interactive Components", () => {
       var receivedBounds: Plottable.Bounds;
       var callback = (b: Plottable.Bounds) => {
         receivedBounds = b;
-      }
+      };
       dbl.onDrag(callback);
 
       var target = dbl.background();
@@ -159,7 +159,7 @@ describe("Interactive Components", () => {
       var receivedBounds: Plottable.Bounds;
       var callback = (b: Plottable.Bounds) => {
         receivedBounds = b;
-      }
+      };
       dbl.onDragEnd(callback);
 
       var target = dbl.background();

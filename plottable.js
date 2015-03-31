@@ -10008,18 +10008,18 @@ var Plottable;
                         "opacity": 0,
                         "stroke": "pink"
                     }); };
-                    this._boxEdgeT = createLine().classed("drag-edge-tb", true);
-                    this._boxEdgeB = createLine().classed("drag-edge-tb", true);
-                    this._boxEdgeL = createLine().classed("drag-edge-lr", true);
-                    this._boxEdgeR = createLine().classed("drag-edge-lr", true);
+                    this._detectionEdgeT = createLine().classed("drag-edge-tb", true);
+                    this._detectionEdgeB = createLine().classed("drag-edge-tb", true);
+                    this._detectionEdgeL = createLine().classed("drag-edge-lr", true);
+                    this._detectionEdgeR = createLine().classed("drag-edge-lr", true);
                     var createCorner = function () { return _this._box.append("circle").style({
                         "opacity": 0,
                         "fill": "pink"
                     }); };
-                    this._boxCornerTL = createCorner().classed("drag-corner-tl", true);
-                    this._boxCornerTR = createCorner().classed("drag-corner-tr", true);
-                    this._boxCornerBL = createCorner().classed("drag-corner-bl", true);
-                    this._boxCornerBR = createCorner().classed("drag-corner-br", true);
+                    this._detectionCornerTL = createCorner().classed("drag-corner-tl", true);
+                    this._detectionCornerTR = createCorner().classed("drag-corner-tr", true);
+                    this._detectionCornerBL = createCorner().classed("drag-corner-bl", true);
+                    this._detectionCornerBR = createCorner().classed("drag-corner-br", true);
                     this.detectionRadius(this._detectionRadius);
                 };
                 DragBoxLayer.prototype._getEdges = function (p) {
@@ -10053,34 +10053,34 @@ var Plottable;
                         var b = bounds.bottomRight.y;
                         var l = bounds.topLeft.x;
                         var r = bounds.bottomRight.x;
-                        this._boxEdgeT.attr({
+                        this._detectionEdgeT.attr({
                             x1: l,
                             y1: t,
                             x2: r,
                             y2: t
                         });
-                        this._boxEdgeB.attr({
+                        this._detectionEdgeB.attr({
                             x1: l,
                             y1: b,
                             x2: r,
                             y2: b
                         });
-                        this._boxEdgeL.attr({
+                        this._detectionEdgeL.attr({
                             x1: l,
                             y1: t,
                             x2: l,
                             y2: b
                         });
-                        this._boxEdgeR.attr({
+                        this._detectionEdgeR.attr({
                             x1: r,
                             y1: t,
                             x2: r,
                             y2: b
                         });
-                        this._boxCornerTL.attr({ cx: l, cy: t });
-                        this._boxCornerTR.attr({ cx: r, cy: t });
-                        this._boxCornerBL.attr({ cx: l, cy: b });
-                        this._boxCornerBR.attr({ cx: r, cy: b });
+                        this._detectionCornerTL.attr({ cx: l, cy: t });
+                        this._detectionCornerTR.attr({ cx: r, cy: t });
+                        this._detectionCornerBL.attr({ cx: l, cy: b });
+                        this._detectionCornerBR.attr({ cx: r, cy: b });
                     }
                 };
                 DragBoxLayer.prototype.detectionRadius = function (r) {
@@ -10092,14 +10092,14 @@ var Plottable;
                     }
                     this._detectionRadius = r;
                     if (this._isSetup) {
-                        this._boxEdgeT.style("stroke-width", this._detectionRadius * 2);
-                        this._boxEdgeB.style("stroke-width", this._detectionRadius * 2);
-                        this._boxEdgeL.style("stroke-width", this._detectionRadius * 2);
-                        this._boxEdgeR.style("stroke-width", this._detectionRadius * 2);
-                        this._boxCornerTL.attr("r", this._detectionRadius);
-                        this._boxCornerTR.attr("r", this._detectionRadius);
-                        this._boxCornerBL.attr("r", this._detectionRadius);
-                        this._boxCornerBR.attr("r", this._detectionRadius);
+                        this._detectionEdgeT.style("stroke-width", this._detectionRadius * 2);
+                        this._detectionEdgeB.style("stroke-width", this._detectionRadius * 2);
+                        this._detectionEdgeL.style("stroke-width", this._detectionRadius * 2);
+                        this._detectionEdgeR.style("stroke-width", this._detectionRadius * 2);
+                        this._detectionCornerTL.attr("r", this._detectionRadius);
+                        this._detectionCornerTR.attr("r", this._detectionRadius);
+                        this._detectionCornerBL.attr("r", this._detectionRadius);
+                        this._detectionCornerBR.attr("r", this._detectionRadius);
                     }
                 };
                 DragBoxLayer.prototype.resizable = function (canResize) {
