@@ -8,13 +8,7 @@ module Plottable {
    */
   export type SymbolGenerator = (symbolRadius: number) => string;
 
-  /**
-   * A SymbolGeneratorAccessor is a function that takes in a datum and an index and returns
-   * a SymbolGenerator
-   */
-  export type SymbolGeneratorAccessor = (datum: any, index: number) => SymbolGenerator;
-
-  export module SymbolGeneratorAccessors {
+  export module SymbolGenerators {
 
     export type StringAccessor = (datum: any, index: number) => string;
 
@@ -25,15 +19,19 @@ module Plottable {
      * Note that since D3 symbols compute the path strings by knowing how much area it can take up instead of
      * knowing its dimensions, the total area expected may be off by some constant factor.
      *
-     * @param {string | ((datum: any, index: number) => string)} symbolType Accessor for the d3 symbol type
+     * @param {string} symbolType String denoting the d3 symbol type
      * @returns {SymbolGenerator} the symbol generator for a D3 symbol
      */
-    export function d3Symbol(symbolType: string | StringAccessor): SymbolGeneratorAccessor {
+    export function d3Symbol(symbolType: string): SymbolGenerator {
+      if (d3.svg.symbolTypes.indexOf(symbolType) === -1) {
+        throw new Error(symbolType + " is an invalid D3 symbol type.  d3.svg.symbolTypes can retrieve the valid symbol types.");
+      }
+
       // Since D3 symbols use a size concept, we have to convert our radius value to the corresponding area value
       // This is done by inspecting the symbol size calculation in d3.js and solving how sizes are calculated from a given radius
-      var typeToSize = (symbolTypeString: string, symbolRadius: number) => {
+      var radiusToSize = (symbolRadius: number) => {
         var sizeFactor: number;
-        switch(symbolTypeString) {
+        switch(symbolType) {
           case "circle":
             sizeFactor = Math.PI;
             break;
@@ -58,24 +56,7 @@ module Plottable {
         return sizeFactor * Math.pow(symbolRadius, 2);
       };
 
-      function ensureSymbolType(symTypeString: string) {
-        if (d3.svg.symbolTypes.indexOf(symTypeString) === -1) {
-          throw new Error(symTypeString + " is an invalid D3 symbol type.  d3.svg.symbolTypes can retrieve the valid symbol types.");
-        }
-        return symTypeString;
-      }
-
-      var ensuredSymbolType = typeof(symbolType) === "string" ?
-                                ensureSymbolType(<string> symbolType) :
-                                (datum: any, index: number) => ensureSymbolType((<StringAccessor> symbolType)(datum, index));
-
-      var symbolSize = (symbolRadius: number) => typeof(ensuredSymbolType) === "string" ?
-                         typeToSize(<string> ensuredSymbolType, symbolRadius) :
-                         (datum: any, index: number) => typeToSize((<StringAccessor> ensuredSymbolType)(datum, index), symbolRadius);
-
-      return (datum: any, index: number) =>
-               (symbolRadius: number) =>
-                 d3.svg.symbol().type(symbolType).size(symbolSize(symbolRadius))(datum, index);
+      return (symbolRadius: number) => d3.svg.symbol().type(symbolType).size(radiusToSize(symbolRadius))();
     }
 
   }

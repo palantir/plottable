@@ -416,12 +416,7 @@ declare module Plottable {
      * and returns a string representing the 'd' attribute of the resultant 'path' element
      */
     type SymbolGenerator = (symbolRadius: number) => string;
-    /**
-     * A SymbolGeneratorAccessor is a function that takes in a datum and an index and returns
-     * a SymbolGenerator
-     */
-    type SymbolGeneratorAccessor = (datum: any, index: number) => SymbolGenerator;
-    module SymbolGeneratorAccessors {
+    module SymbolGenerators {
         type StringAccessor = (datum: any, index: number) => string;
         /**
          * A wrapper for D3's symbol generator as documented here:
@@ -430,10 +425,10 @@ declare module Plottable {
          * Note that since D3 symbols compute the path strings by knowing how much area it can take up instead of
          * knowing its dimensions, the total area expected may be off by some constant factor.
          *
-         * @param {string | ((datum: any, index: number) => string)} symbolType Accessor for the d3 symbol type
+         * @param {string} symbolType String denoting the d3 symbol type
          * @returns {SymbolGenerator} the symbol generator for a D3 symbol
          */
-        function d3Symbol(symbolType: string | StringAccessor): SymbolGeneratorAccessor;
+        function d3Symbol(symbolType: string): SymbolGenerator;
     }
 }
 
@@ -2346,6 +2341,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Component {
+        type SymbolGeneratorAccessor = (datum: any, index: number) => SymbolGenerator;
         class Legend extends AbstractComponent {
             /**
              * The css class applied to each legend row
@@ -2941,6 +2937,7 @@ declare module Plottable {
              * @param {Scale} yScale The y scale to use.
              */
             constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<Y, number>);
+            setSymbolGenerator(symbolGenerator: string | SymbolGenerator): void;
             protected _getDrawer(key: string): _Drawer.Symbol;
             protected _generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;

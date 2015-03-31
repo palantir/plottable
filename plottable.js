@@ -987,8 +987,8 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    var SymbolGeneratorAccessors;
-    (function (SymbolGeneratorAccessors) {
+    var SymbolGenerators;
+    (function (SymbolGenerators) {
         /**
          * A wrapper for D3's symbol generator as documented here:
          * https://github.com/mbostock/d3/wiki/SVG-Shapes#symbol
@@ -996,15 +996,18 @@ var Plottable;
          * Note that since D3 symbols compute the path strings by knowing how much area it can take up instead of
          * knowing its dimensions, the total area expected may be off by some constant factor.
          *
-         * @param {string | ((datum: any, index: number) => string)} symbolType Accessor for the d3 symbol type
+         * @param {string} symbolType String denoting the d3 symbol type
          * @returns {SymbolGenerator} the symbol generator for a D3 symbol
          */
         function d3Symbol(symbolType) {
+            if (d3.svg.symbolTypes.indexOf(symbolType) === -1) {
+                throw new Error(symbolType + " is an invalid D3 symbol type.  d3.svg.symbolTypes can retrieve the valid symbol types.");
+            }
             // Since D3 symbols use a size concept, we have to convert our radius value to the corresponding area value
             // This is done by inspecting the symbol size calculation in d3.js and solving how sizes are calculated from a given radius
-            var typeToSize = function (symbolTypeString, symbolRadius) {
+            var radiusToSize = function (symbolRadius) {
                 var sizeFactor;
-                switch (symbolTypeString) {
+                switch (symbolType) {
                     case "circle":
                         sizeFactor = Math.PI;
                         break;
@@ -1027,18 +1030,10 @@ var Plottable;
                 }
                 return sizeFactor * Math.pow(symbolRadius, 2);
             };
-            function ensureSymbolType(symTypeString) {
-                if (d3.svg.symbolTypes.indexOf(symTypeString) === -1) {
-                    throw new Error(symTypeString + " is an invalid D3 symbol type.  d3.svg.symbolTypes can retrieve the valid symbol types.");
-                }
-                return symTypeString;
-            }
-            var ensuredSymbolType = typeof (symbolType) === "string" ? ensureSymbolType(symbolType) : function (datum, index) { return ensureSymbolType(symbolType(datum, index)); };
-            var symbolSize = function (symbolRadius) { return typeof (ensuredSymbolType) === "string" ? typeToSize(ensuredSymbolType, symbolRadius) : function (datum, index) { return typeToSize(ensuredSymbolType(datum, index), symbolRadius); }; };
-            return function (datum, index) { return function (symbolRadius) { return d3.svg.symbol().type(symbolType).size(symbolSize(symbolRadius))(datum, index); }; };
+            return function (symbolRadius) { return d3.svg.symbol().type(symbolType).size(radiusToSize(symbolRadius))(); };
         }
-        SymbolGeneratorAccessors.d3Symbol = d3Symbol;
-    })(SymbolGeneratorAccessors = Plottable.SymbolGeneratorAccessors || (Plottable.SymbolGeneratorAccessors = {}));
+        SymbolGenerators.d3Symbol = d3Symbol;
+    })(SymbolGenerators = Plottable.SymbolGenerators || (Plottable.SymbolGenerators = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -5528,7 +5523,7 @@ var Plottable;
                 this._fixedWidthFlag = true;
                 this._fixedHeightFlag = true;
                 this._sortFn = function (a, b) { return _this._scale.domain().indexOf(a) - _this._scale.domain().indexOf(b); };
-                this._symbolGeneratorAccessor = Plottable.SymbolGeneratorAccessors.d3Symbol("circle");
+                this._symbolGeneratorAccessor = function (d, i) { return Plottable.SymbolGenerators.d3Symbol("circle"); };
             }
             Legend.prototype._setup = function () {
                 _super.prototype._setup.call(this);
@@ -7249,6 +7244,14 @@ var Plottable;
                 this.animator("symbols-reset", new Plottable.Animator.Null());
                 this.animator("symbols", new Plottable.Animator.Base().duration(250).delay(5));
             }
+            Scatter.prototype.setSymbolGenerator = function (symbolGenerator) {
+                if (typeof symbolGenerator === "string") {
+                    this.project("symbol", function () { return Plottable.SymbolGenerators.d3Symbol(symbolGenerator); });
+                }
+                else {
+                    this.project("symbol", function () { return symbolGenerator; });
+                }
+            };
             Scatter.prototype._getDrawer = function (key) {
                 return new Plottable._Drawer.Symbol(key);
             };
@@ -7257,7 +7260,7 @@ var Plottable;
                 attrToProjector["r"] = attrToProjector["r"] || d3.functor(3);
                 attrToProjector["opacity"] = attrToProjector["opacity"] || d3.functor(0.6);
                 attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this._defaultFillColor);
-                attrToProjector["symbol"] = attrToProjector["symbol"] || Plottable.SymbolGeneratorAccessors.d3Symbol("circle");
+                attrToProjector["symbol"] = attrToProjector["symbol"] || (function () { return Plottable.SymbolGenerators.d3Symbol("circle"); });
                 return attrToProjector;
             };
             Scatter.prototype._generateDrawSteps = function () {

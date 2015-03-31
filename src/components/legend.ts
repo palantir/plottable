@@ -2,6 +2,9 @@
 
 module Plottable {
 export module Component {
+
+  export type SymbolGeneratorAccessor = (datum: any, index: number) => SymbolGenerator;
+
   export class Legend extends AbstractComponent {
     /**
      * The css class applied to each legend row
@@ -50,7 +53,7 @@ export module Component {
       this._fixedWidthFlag = true;
       this._fixedHeightFlag = true;
       this._sortFn = (a: string, b: string) => this._scale.domain().indexOf(a) - this._scale.domain().indexOf(b);
-      this._symbolGeneratorAccessor = SymbolGeneratorAccessors.d3Symbol("circle");
+      this._symbolGeneratorAccessor = (d: any, i: number) => SymbolGenerators.d3Symbol("circle");
     }
 
     protected _setup() {

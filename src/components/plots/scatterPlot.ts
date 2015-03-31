@@ -24,6 +24,14 @@ export module Plot {
                                            .delay(5));
     }
 
+    public setSymbolGenerator(symbolGenerator: string | SymbolGenerator) {
+      if (typeof symbolGenerator === "string") {
+        this.project("symbol", () => SymbolGenerators.d3Symbol(symbolGenerator));
+      } else {
+        this.project("symbol", () => symbolGenerator);
+      }
+    }
+
     protected _getDrawer(key: string) {
       return new Plottable._Drawer.Symbol(key);
     }
@@ -33,7 +41,7 @@ export module Plot {
       attrToProjector["r"] = attrToProjector["r"] || d3.functor(3);
       attrToProjector["opacity"] = attrToProjector["opacity"] || d3.functor(0.6);
       attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this._defaultFillColor);
-      attrToProjector["symbol"] = attrToProjector["symbol"] || Plottable.SymbolGeneratorAccessors.d3Symbol("circle");
+      attrToProjector["symbol"] = attrToProjector["symbol"] || (() => SymbolGenerators.d3Symbol("circle"));
 
       return attrToProjector;
     }
