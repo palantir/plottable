@@ -28,8 +28,8 @@ export module _Drawer {
       var symbolProjector = attrToProjector["symbol"];
       delete attrToProjector["symbol"];
 
-      attrToProjector["d"] = (datum: any, index: number) =>
-        symbolProjector(datum, index)(rProjector(datum, index));
+      attrToProjector["d"] = attrToProjector["d"] || ((datum: any, index: number) =>
+        symbolProjector(datum, index)(rProjector(datum, index)));
 
       super._drawStep(step);
     }

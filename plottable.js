@@ -3367,7 +3367,7 @@ var Plottable;
                 attrToProjector["transform"] = function (datum, index) { return "translate(" + xProjector(datum, index) + "," + yProjector(datum, index) + ")"; };
                 var symbolProjector = attrToProjector["symbol"];
                 delete attrToProjector["symbol"];
-                attrToProjector["d"] = function (datum, index) { return symbolProjector(datum, index)(rProjector(datum, index)); };
+                attrToProjector["d"] = attrToProjector["d"] || (function (datum, index) { return symbolProjector(datum, index)(rProjector(datum, index)); });
                 _super.prototype._drawStep.call(this, step);
             };
             Symbol.prototype._getPixelPoint = function (datum, index) {
