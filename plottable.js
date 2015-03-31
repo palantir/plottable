@@ -7783,6 +7783,7 @@ var Plottable;
                         if (positionDist <= closestPositionDistance) {
                             var valueDist = _this._isVertical ? vertDist : horizDist;
                             if (positionDist < closestPositionDistance && valueDist < withinValue) {
+                                closestPositionDistance = positionDist;
                                 closestValueDistance = withinValue;
                             }
                             if (valueDist < closestValueDistance) {

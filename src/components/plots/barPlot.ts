@@ -398,6 +398,7 @@ export module Plot {
             var valueDist = this._isVertical ? vertDist : horizDist;
 
             if (positionDist < closestPositionDistance && valueDist < withinValue) {
+              closestPositionDistance = positionDist;
               closestValueDistance = withinValue;
             }
 
