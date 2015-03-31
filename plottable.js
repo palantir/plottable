@@ -987,12 +987,8 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    var SymbolGenerators;
-    (function (SymbolGenerators) {
-        /**
-         * The radius that symbol generators will be assumed to have for their symbols.
-         */
-        SymbolGenerators.SYMBOL_GENERATOR_RADIUS = 50;
+    var SymbolGeneratorAccessors;
+    (function (SymbolGeneratorAccessors) {
         /**
          * A wrapper for D3's symbol generator as documented here:
          * https://github.com/mbostock/d3/wiki/SVG-Shapes#symbol
@@ -1006,7 +1002,7 @@ var Plottable;
         function d3Symbol(symbolType) {
             // Since D3 symbols use a size concept, we have to convert our radius value to the corresponding area value
             // This is done by inspecting the symbol size calculation in d3.js and solving how sizes are calculated from a given radius
-            var typeToSize = function (symbolTypeString) {
+            var typeToSize = function (symbolTypeString, symbolRadius) {
                 var sizeFactor;
                 switch (symbolTypeString) {
                     case "circle":
@@ -1029,7 +1025,7 @@ var Plottable;
                         sizeFactor = 1;
                         break;
                 }
-                return sizeFactor * Math.pow(SymbolGenerators.SYMBOL_GENERATOR_RADIUS, 2);
+                return sizeFactor * Math.pow(symbolRadius, 2);
             };
             function ensureSymbolType(symTypeString) {
                 if (d3.svg.symbolTypes.indexOf(symTypeString) === -1) {
@@ -1037,11 +1033,12 @@ var Plottable;
                 }
                 return symTypeString;
             }
-            var symbolSize = typeof (symbolType) === "string" ? typeToSize(ensureSymbolType(symbolType)) : function (datum, index) { return typeToSize(ensureSymbolType(symbolType(datum, index))); };
-            return d3.svg.symbol().type(symbolType).size(symbolSize);
+            var ensuredSymbolType = typeof (symbolType) === "string" ? ensureSymbolType(symbolType) : function (datum, index) { return ensureSymbolType(symbolType(datum, index)); };
+            var symbolSize = function (symbolRadius) { return typeof (ensuredSymbolType) === "string" ? typeToSize(ensuredSymbolType, symbolRadius) : function (datum, index) { return typeToSize(ensuredSymbolType(datum, index), symbolRadius); }; };
+            return function (datum, index) { return function (symbolRadius) { return d3.svg.symbol().type(symbolType).size(symbolSize(symbolRadius))(datum, index); }; };
         }
-        SymbolGenerators.d3Symbol = d3Symbol;
-    })(SymbolGenerators = Plottable.SymbolGenerators || (Plottable.SymbolGenerators = {}));
+        SymbolGeneratorAccessors.d3Symbol = d3Symbol;
+    })(SymbolGeneratorAccessors = Plottable.SymbolGeneratorAccessors || (Plottable.SymbolGeneratorAccessors = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -3372,10 +3369,10 @@ var Plottable;
                 delete attrToProjector["y"];
                 var rProjector = attrToProjector["r"];
                 delete attrToProjector["r"];
-                attrToProjector["transform"] = function (datum, index) { return "translate(" + xProjector(datum, index) + "," + yProjector(datum, index) + ") " + "scale(" + rProjector(datum, index) / 50 + ")"; };
+                attrToProjector["transform"] = function (datum, index) { return "translate(" + xProjector(datum, index) + "," + yProjector(datum, index) + ")"; };
                 var symbolProjector = attrToProjector["symbol"];
                 delete attrToProjector["symbol"];
-                attrToProjector["d"] = symbolProjector;
+                attrToProjector["d"] = function (datum, index) { return symbolProjector(datum, index)(rProjector(datum, index)); };
                 _super.prototype._drawStep.call(this, step);
             };
             Symbol.prototype._getPixelPoint = function (datum, index) {
@@ -5531,7 +5528,7 @@ var Plottable;
                 this._fixedWidthFlag = true;
                 this._fixedHeightFlag = true;
                 this._sortFn = function (a, b) { return _this._scale.domain().indexOf(a) - _this._scale.domain().indexOf(b); };
-                this._symbolGenerator = Plottable.SymbolGenerators.d3Symbol("circle");
+                this._symbolGeneratorAccessor = Plottable.SymbolGeneratorAccessors.d3Symbol("circle");
             }
             Legend.prototype._setup = function () {
                 _super.prototype._setup.call(this);
@@ -5695,7 +5692,7 @@ var Plottable;
                         return translateString;
                     });
                 });
-                entries.select("path").attr("d", this.symbolGenerator()).attr("transform", "translate(" + (layout.textHeight / 2) + "," + layout.textHeight / 2 + ") " + "scale(" + (layout.textHeight * 0.3 / Plottable.SymbolGenerators.SYMBOL_GENERATOR_RADIUS) + ")").attr("fill", function (value) { return _this._scale.scale(value); }).attr("vector-effect", "non-scaling-stroke").classed(Legend.LEGEND_SYMBOL_CLASS, true);
+                entries.select("path").attr("d", function (d, i) { return _this.symbolGenerator()(d, i)(layout.textHeight * 0.3); }).attr("transform", "translate(" + (layout.textHeight / 2) + "," + layout.textHeight / 2 + ")").attr("fill", function (value) { return _this._scale.scale(value); }).classed(Legend.LEGEND_SYMBOL_CLASS, true);
                 var padding = this._padding;
                 var textContainers = entries.select("g.text-container");
                 textContainers.text(""); // clear out previous results
@@ -5713,12 +5710,12 @@ var Plottable;
                     self._writer.write(value, maxTextLength, self.height(), writeOptions);
                 });
             };
-            Legend.prototype.symbolGenerator = function (symbolGenerator) {
-                if (symbolGenerator == null) {
-                    return this._symbolGenerator;
+            Legend.prototype.symbolGenerator = function (symbolGeneratorAccessor) {
+                if (symbolGeneratorAccessor == null) {
+                    return this._symbolGeneratorAccessor;
                 }
                 else {
-                    this._symbolGenerator = symbolGenerator;
+                    this._symbolGeneratorAccessor = symbolGeneratorAccessor;
                     this._render();
                     return this;
                 }
@@ -7260,22 +7257,7 @@ var Plottable;
                 attrToProjector["r"] = attrToProjector["r"] || d3.functor(3);
                 attrToProjector["opacity"] = attrToProjector["opacity"] || d3.functor(0.6);
                 attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this._defaultFillColor);
-                attrToProjector["symbol"] = attrToProjector["symbol"] || Plottable.SymbolGenerators.d3Symbol("circle");
-                attrToProjector["vector-effect"] = attrToProjector["vector-effect"] || d3.functor("non-scaling-stroke");
-                // HACKHACK vector-effect non-scaling-stroke has no effect in IE
-                // https://connect.microsoft.com/IE/feedback/details/788819/svg-non-scaling-stroke
-                if (Plottable._Util.Methods.isIE() && attrToProjector["stroke-width"] != null) {
-                    var strokeWidthProjector = attrToProjector["stroke-width"];
-                    attrToProjector["stroke-width"] = function (d, i, u, m) {
-                        var strokeWidth = strokeWidthProjector(d, i, u, m);
-                        if (attrToProjector["vector-effect"](d, i, u, m) === "non-scaling-stroke") {
-                            return strokeWidth * Plottable.SymbolGenerators.SYMBOL_GENERATOR_RADIUS / attrToProjector["r"](d, i, u, m);
-                        }
-                        else {
-                            return strokeWidth;
-                        }
-                    };
-                }
+                attrToProjector["symbol"] = attrToProjector["symbol"] || Plottable.SymbolGeneratorAccessors.d3Symbol("circle");
                 return attrToProjector;
             };
             Scatter.prototype._generateDrawSteps = function () {

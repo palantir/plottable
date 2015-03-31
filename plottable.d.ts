@@ -412,19 +412,17 @@ declare module Plottable {
 
 declare module Plottable {
     /**
-     * A SymbolGenerator is a function that takes in a datum and the index of the datum to
-     * produce an svg path string analogous to the datum/index pair.
-     *
-     * Note that SymbolGenerators used in Plottable will be assumed to work within a 100x100 square
-     * to be scaled appropriately for use within Plottable
+     * A SymbolGenerator is a function that takes in a radius for the size of the symbol
+     * and returns a string representing the 'd' attribute of the resultant 'path' element
      */
-    type SymbolGenerator = (datum: any, index: number) => string;
-    module SymbolGenerators {
-        /**
-         * The radius that symbol generators will be assumed to have for their symbols.
-         */
-        var SYMBOL_GENERATOR_RADIUS: number;
-        type StringAccessor = ((datum: any, index: number) => string);
+    type SymbolGenerator = (symbolRadius: number) => string;
+    /**
+     * A SymbolGeneratorAccessor is a function that takes in a datum and an index and returns
+     * a SymbolGenerator
+     */
+    type SymbolGeneratorAccessor = (datum: any, index: number) => SymbolGenerator;
+    module SymbolGeneratorAccessors {
+        type StringAccessor = (datum: any, index: number) => string;
         /**
          * A wrapper for D3's symbol generator as documented here:
          * https://github.com/mbostock/d3/wiki/SVG-Shapes#symbol
@@ -435,7 +433,7 @@ declare module Plottable {
          * @param {string | ((datum: any, index: number) => string)} symbolType Accessor for the d3 symbol type
          * @returns {SymbolGenerator} the symbol generator for a D3 symbol
          */
-        function d3Symbol(symbolType: string | StringAccessor): D3.Svg.Symbol;
+        function d3Symbol(symbolType: string | StringAccessor): SymbolGeneratorAccessor;
     }
 }
 
@@ -2420,18 +2418,18 @@ declare module Plottable {
             getEntry(position: Point): D3.Selection;
             _doRender(): void;
             /**
-             * Gets the SymbolGenerator of the legend, which dictates how
+             * Gets the SymbolGeneratorAccessor of the legend, which dictates how
              * the symbol in each entry is drawn.
              *
-             * @returns {SymbolGenerator} The SymbolGenerator of the legend
+             * @returns {SymbolGenerator} The SymbolGeneratorAccessor of the legend
              */
-            symbolGenerator(): SymbolGenerator;
+            symbolGenerator(): SymbolGeneratorAccessor;
             /**
-             * Sets the SymbolGenerator of the legend
+             * Sets the SymbolGeneratorAccessor of the legend
              *
              * @returns {Legend} The calling Legend
              */
-            symbolGenerator(symbolGenerator: SymbolGenerator): Legend;
+            symbolGenerator(symbolGeneratorAccessor: SymbolGeneratorAccessor): Legend;
         }
     }
 }

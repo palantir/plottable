@@ -3,22 +3,20 @@
 module Plottable {
 
   /**
-   * A SymbolGenerator is a function that takes in a datum and the index of the datum to
-   * produce an svg path string analogous to the datum/index pair.
-   *
-   * Note that SymbolGenerators used in Plottable will be assumed to work within a 100x100 square
-   * to be scaled appropriately for use within Plottable
+   * A SymbolGenerator is a function that takes in a radius for the size of the symbol
+   * and returns a string representing the 'd' attribute of the resultant 'path' element
    */
-  export type SymbolGenerator = (datum: any, index: number) => string;
+  export type SymbolGenerator = (symbolRadius: number) => string;
 
-  export module SymbolGenerators {
+  /**
+   * A SymbolGeneratorAccessor is a function that takes in a datum and an index and returns
+   * a SymbolGenerator
+   */
+  export type SymbolGeneratorAccessor = (datum: any, index: number) => SymbolGenerator;
 
-    /**
-     * The radius that symbol generators will be assumed to have for their symbols.
-     */
-    export var SYMBOL_GENERATOR_RADIUS = 50;
+  export module SymbolGeneratorAccessors {
 
-    export type StringAccessor = ((datum: any, index: number) => string);
+    export type StringAccessor = (datum: any, index: number) => string;
 
     /**
      * A wrapper for D3's symbol generator as documented here:
@@ -30,10 +28,10 @@ module Plottable {
      * @param {string | ((datum: any, index: number) => string)} symbolType Accessor for the d3 symbol type
      * @returns {SymbolGenerator} the symbol generator for a D3 symbol
      */
-    export function d3Symbol(symbolType: string | StringAccessor) {
+    export function d3Symbol(symbolType: string | StringAccessor): SymbolGeneratorAccessor {
       // Since D3 symbols use a size concept, we have to convert our radius value to the corresponding area value
       // This is done by inspecting the symbol size calculation in d3.js and solving how sizes are calculated from a given radius
-      var typeToSize = (symbolTypeString: string) => {
+      var typeToSize = (symbolTypeString: string, symbolRadius: number) => {
         var sizeFactor: number;
         switch(symbolTypeString) {
           case "circle":
@@ -57,7 +55,7 @@ module Plottable {
             break;
         }
 
-        return sizeFactor * Math.pow(SYMBOL_GENERATOR_RADIUS, 2);
+        return sizeFactor * Math.pow(symbolRadius, 2);
       };
 
       function ensureSymbolType(symTypeString: string) {
@@ -67,11 +65,17 @@ module Plottable {
         return symTypeString;
       }
 
-      var symbolSize = typeof(symbolType) === "string" ?
-                         typeToSize(ensureSymbolType(<string> symbolType)) :
-                         (datum: any, index: number) => typeToSize(ensureSymbolType((<StringAccessor> symbolType)(datum, index)));
+      var ensuredSymbolType = typeof(symbolType) === "string" ?
+                                ensureSymbolType(<string> symbolType) :
+                                (datum: any, index: number) => ensureSymbolType((<StringAccessor> symbolType)(datum, index));
 
-      return d3.svg.symbol().type(symbolType).size(symbolSize);
+      var symbolSize = (symbolRadius: number) => typeof(ensuredSymbolType) === "string" ?
+                         typeToSize(<string> ensuredSymbolType, symbolRadius) :
+                         (datum: any, index: number) => typeToSize((<StringAccessor> ensuredSymbolType)(datum, index), symbolRadius);
+
+      return (datum: any, index: number) =>
+               (symbolRadius: number) =>
+                 d3.svg.symbol().type(symbolType).size(symbolSize(symbolRadius))(datum, index);
     }
 
   }
