@@ -3086,6 +3086,14 @@ declare module Plottable {
              * If the position scale of the plot is a QuantitativeScale, then _getMinimumDataWidth is scaled to compute the barPixelWidth
              */
             protected _getBarPixelWidth(): number;
+            protected _getClosestPlotData(queryPoint: Point, datasetKeys: string[], withinValue?: number): {
+                data: any[];
+                pixelPoints: {
+                    x: number;
+                    y: number;
+                }[];
+                selection: D3.Selection;
+            };
             hoverMode(): string;
             /**
              * Sets the hover mode for hover interactions. There are two modes:
