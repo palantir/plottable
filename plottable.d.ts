@@ -2416,12 +2416,13 @@ declare module Plottable {
              * Gets the SymbolGeneratorAccessor of the legend, which dictates how
              * the symbol in each entry is drawn.
              *
-             * @returns {symbolGeneratorAccessor} The SymbolGeneratorAccessor of the legend
+             * @returns {(datum: any, index: number) => SymbolGenerator} The SymbolGenerator accessor of the legend
              */
             symbolGeneratorAccessor(): (datum: any, index: number) => SymbolGenerator;
             /**
              * Sets the SymbolGeneratorAccessor of the legend
              *
+             * @param {(datum: any, index: number) => SymbolGenerator}  The SymbolGenerator accessor to set to
              * @returns {Legend} The calling Legend
              */
             symbolGeneratorAccessor(symbolGeneratorAccessor: (datum: any, index: number) => SymbolGenerator): Legend;
