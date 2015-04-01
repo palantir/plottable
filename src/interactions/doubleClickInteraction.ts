@@ -4,35 +4,37 @@ module Plottable {
 export module Interaction {
   export class DoubleClick extends AbstractInteraction {
 
-    private _callback: (p: Point) => any;
+    private _mouseDispatcher: Plottable.Dispatcher.Mouse;
+    private _touchDispatcher: Plottable.Dispatcher.Touch;
+    private _dblClickCallback: (p: Point) => any;
+    private _clickedDown = false;
 
     public _anchor(component: Component.AbstractComponent, hitBox: D3.Selection) {
       super._anchor(component, hitBox);
-      hitBox.on(this._listenTo(), () => {
-        var xy = d3.mouse(hitBox.node());
-        var x = xy[0];
-        var y = xy[1];
-        this._callback({x: x, y: y});
-      });
+
+      this._mouseDispatcher = Dispatcher.Mouse.getDispatcher(<SVGElement> component.content().node());
+      this._mouseDispatcher.onMouseDown("Interaction.Click" + this.getID(), (p: Point) => this._handleClickDown(p));
+      this._mouseDispatcher.onMouseUp("Interaction.Click" + this.getID(), (p: Point) => this._handleClickUp(p));
+      this._mouseDispatcher.onDblClick("Interaction.Click" + this.getID(), (p: Point) => this._handleDblClick(p));
+
+      this._touchDispatcher = Dispatcher.Touch.getDispatcher(<SVGElement> component.content().node());
+      this._touchDispatcher.onTouchStart("Interaction.Click" + this.getID(), (p: Point) => this._handleClickDown(p));
+      this._touchDispatcher.onTouchEnd("Interaction.Click" + this.getID(), (p: Point) => this._handleClickUp(p));
+      this._touchDispatcher.onDblClick("Interaction.Click" + this.getID(), (p: Point) => this._handleDblClick(p));
     }
 
-    public _requiresHitbox() {
-      return true;
+    private _handleClickDown(p: Point) {
+      // TODO: Implement
     }
 
-    protected _listenTo(): string {
-      return "dblclick";
+    private _handleClickUp(p: Point) {
+      // TODO: Implement
     }
 
-    /**
-     * Sets a callback to be called when a click is received.
-     *
-     * @param {(p: Point) => any} cb Callback that takes the pixel position of the click event.
-     */
-    public callback(cb: (p: Point) => any): DoubleClick {
-      this._callback = cb;
-      return this;
+    private _handleDblClick(p: Point) {
+      // TODO: Implement
     }
+
   }
 }
 }

@@ -9440,31 +9440,28 @@ var Plottable;
             __extends(DoubleClick, _super);
             function DoubleClick() {
                 _super.apply(this, arguments);
+                this._clickedDown = false;
             }
             DoubleClick.prototype._anchor = function (component, hitBox) {
                 var _this = this;
                 _super.prototype._anchor.call(this, component, hitBox);
-                hitBox.on(this._listenTo(), function () {
-                    var xy = d3.mouse(hitBox.node());
-                    var x = xy[0];
-                    var y = xy[1];
-                    _this._callback({ x: x, y: y });
-                });
+                this._mouseDispatcher = Plottable.Dispatcher.Mouse.getDispatcher(component.content().node());
+                this._mouseDispatcher.onMouseDown("Interaction.Click" + this.getID(), function (p) { return _this._handleClickDown(p); });
+                this._mouseDispatcher.onMouseUp("Interaction.Click" + this.getID(), function (p) { return _this._handleClickUp(p); });
+                this._mouseDispatcher.onDblClick("Interaction.Click" + this.getID(), function (p) { return _this._handleDblClick(p); });
+                this._touchDispatcher = Plottable.Dispatcher.Touch.getDispatcher(component.content().node());
+                this._touchDispatcher.onTouchStart("Interaction.Click" + this.getID(), function (p) { return _this._handleClickDown(p); });
+                this._touchDispatcher.onTouchEnd("Interaction.Click" + this.getID(), function (p) { return _this._handleClickUp(p); });
+                this._touchDispatcher.onDblClick("Interaction.Click" + this.getID(), function (p) { return _this._handleDblClick(p); });
             };
-            DoubleClick.prototype._requiresHitbox = function () {
-                return true;
+            DoubleClick.prototype._handleClickDown = function (p) {
+                // TODO: Implement
             };
-            DoubleClick.prototype._listenTo = function () {
-                return "dblclick";
+            DoubleClick.prototype._handleClickUp = function (p) {
+                // TODO: Implement
             };
-            /**
-             * Sets a callback to be called when a click is received.
-             *
-             * @param {(p: Point) => any} cb Callback that takes the pixel position of the click event.
-             */
-            DoubleClick.prototype.callback = function (cb) {
-                this._callback = cb;
-                return this;
+            DoubleClick.prototype._handleDblClick = function (p) {
+                // TODO: Implement
             };
             return DoubleClick;
         })(Interaction.AbstractInteraction);
