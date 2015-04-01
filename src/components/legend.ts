@@ -23,7 +23,7 @@ export module Component {
     private _measurer: SVGTypewriter.Measurers.Measurer;
     private _wrapper: SVGTypewriter.Wrappers.Wrapper;
     private _writer: SVGTypewriter.Writers.Writer;
-    private _symbolGeneratorAccessor: SymbolGeneratorAccessor;
+    private _symbolGeneratorAccessor: (datum: any, index: number) => SymbolGenerator;
 
     /**
      * Creates a Legend.

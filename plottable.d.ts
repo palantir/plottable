@@ -2341,7 +2341,6 @@ declare module Plottable {
 
 declare module Plottable {
     module Component {
-        type SymbolGeneratorAccessor = (datum: any, index: number) => SymbolGenerator;
         class Legend extends AbstractComponent {
             /**
              * The css class applied to each legend row
