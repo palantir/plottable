@@ -4880,8 +4880,8 @@ describe("Plots", function () {
                     assert.equal(errorBarUpper.attr("y1"), errorBarUpper.attr("y2"), "error-bar-upper is vertical");
                     assert.equal(errorBarMiddle.attr("x1"), errorBarMiddle.attr("x2"), "error-bar-middle is horizontal");
                     assert.equal(errorBarLower.attr("y1"), errorBarLower.attr("y2"), "error-bar-lower is vertical");
-                    assert.equal(+errorBarUpper.attr("x1") + (+errorBarUpper.attr("x2") - +errorBarUpper.attr("x1")) / 2, errorBarMiddle.attr("x1"), "error-bar-middle is properly positioned relative to error-bar-upper");
-                    assert.equal(+errorBarLower.attr("x1") + (+errorBarLower.attr("x2") - +errorBarLower.attr("x1")) / 2, errorBarMiddle.attr("x1"), "error-bar-middle is properly positioned relative to error-bar-lower");
+                    assert.closeTo(+errorBarUpper.attr("x1") + (+errorBarUpper.attr("x2") - +errorBarUpper.attr("x1")) / 2, +errorBarMiddle.attr("x1"), 0.5, "error-bar-middle is properly positioned relative to error-bar-upper");
+                    assert.closeTo(+errorBarLower.attr("x1") + (+errorBarLower.attr("x2") - +errorBarLower.attr("x1")) / 2, +errorBarMiddle.attr("x1"), 0.5, "error-bar-middle is properly positioned relative to error-bar-lower");
                 });
                 svg.remove();
             });
@@ -4921,8 +4921,8 @@ describe("Plots", function () {
                     assert.equal(errorBarUpper.attr("x1"), errorBarUpper.attr("x2"), "error-bar-upper is vertical");
                     assert.equal(errorBarMiddle.attr("y1"), errorBarMiddle.attr("y2"), "error-bar-middle is horizontal");
                     assert.equal(errorBarLower.attr("x1"), errorBarLower.attr("x2"), "error-bar-lower is vertical");
-                    assert.equal(+errorBarUpper.attr("y1") + (+errorBarUpper.attr("y2") - +errorBarUpper.attr("y1")) / 2, errorBarMiddle.attr("y1"), "error-bar-middle is properly positioned relative to error-bar-upper");
-                    assert.equal(+errorBarLower.attr("y1") + (+errorBarLower.attr("y2") - +errorBarLower.attr("y1")) / 2, errorBarMiddle.attr("y1"), "error-bar-middle is properly positioned relative to error-bar-lower");
+                    assert.closeTo(+errorBarUpper.attr("y1") + (+errorBarUpper.attr("y2") - +errorBarUpper.attr("y1")) / 2, +errorBarMiddle.attr("y1"), 0.5, "error-bar-middle is properly positioned relative to error-bar-upper");
+                    assert.closeTo(+errorBarLower.attr("y1") + (+errorBarLower.attr("y2") - +errorBarLower.attr("y1")) / 2, +errorBarMiddle.attr("y1"), 0.5, "error-bar-middle is properly positioned relative to error-bar-lower");
                 });
                 svg.remove();
             });
