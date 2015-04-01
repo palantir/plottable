@@ -45,7 +45,7 @@ export module Interaction {
      * @param {(p: Point) => any} callback The callback to set.
      * @return {Interaction.DoubleClick} The calling Interaction.DoubleClick.
      */
-    public onDblClick(callback: (p: Point) => any): DoubleClick;
+    public onDblClick(callback: (p: Point) => any): Interaction.DoubleClick;
     public onDblClick(callback?: (p: Point) => any): any {
       if (callback === undefined) {
         return this._dblClickCallback;
