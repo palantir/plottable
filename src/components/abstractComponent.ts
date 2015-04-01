@@ -342,7 +342,7 @@ export module Component {
       // pushed to this._interactionsToRegister and registered during anchoring. If after, they are
       // registered immediately
       if (this._element) {
-        if (!this._hitBox) {
+        if (!this._hitBox && interaction._requiresHitbox()) {
             this._hitBox = this._addBox("hit-box");
             this._hitBox.style("fill", "#ffffff").style("opacity", 0); // We need to set these so Chrome will register events
         }
@@ -410,32 +410,54 @@ export module Component {
       return this._fixedHeightFlag;
     }
 
-    /**
-     * Merges this Component with another Component, returning a
-     * ComponentGroup. This is used to layer Components on top of each other.
-     *
-     * There are four cases:
-     * Component + Component: Returns a ComponentGroup with both components inside it.
-     * ComponentGroup + Component: Returns the ComponentGroup with the Component appended.
-     * Component + ComponentGroup: Returns the ComponentGroup with the Component prepended.
-     * ComponentGroup + ComponentGroup: Returns a new ComponentGroup with two ComponentGroups inside it.
-     *
-     * @param {Component} c The component to merge in.
-     * @returns {ComponentGroup} The relevant ComponentGroup out of the above four cases.
-     */
-    public merge(c: AbstractComponent): Component.Group {
+    public _merge(c: AbstractComponent, below: boolean): Component.Group {
       var cg: Component.Group;
       if (this._isSetup || this._isAnchored) {
         throw new Error("Can't presently merge a component that's already been anchored");
       }
       if (Plottable.Component.Group.prototype.isPrototypeOf(c)) {
         cg = (<Plottable.Component.Group> c);
-        cg._addComponent(this, true);
+        cg._addComponent(this, below);
         return cg;
       } else {
-        cg = new Plottable.Component.Group([this, c]);
+        var mergedComponents = below ? [this, c] : [c, this];
+        cg = new Plottable.Component.Group(mergedComponents);
         return cg;
       }
+    }
+
+    /**
+     * Merges this Component above another Component, returning a
+     * ComponentGroup. This is used to layer Components on top of each other.
+     *
+     * There are four cases:
+     * Component + Component: Returns a ComponentGroup with the first component after the second component.
+     * ComponentGroup + Component: Returns the ComponentGroup with the Component prepended.
+     * Component + ComponentGroup: Returns the ComponentGroup with the Component appended.
+     * ComponentGroup + ComponentGroup: Returns a new ComponentGroup with the first group after the second group.
+     *
+     * @param {Component} c The component to merge in.
+     * @returns {ComponentGroup} The relevant ComponentGroup out of the above four cases.
+     */
+    public above(c: AbstractComponent): Component.Group {
+      return this._merge(c, false);
+    }
+
+    /**
+     * Merges this Component below another Component, returning a
+     * ComponentGroup. This is used to layer Components on top of each other.
+     *
+     * There are four cases:
+     * Component + Component: Returns a ComponentGroup with the first component before the second component.
+     * ComponentGroup + Component: Returns the ComponentGroup with the Component appended.
+     * Component + ComponentGroup: Returns the ComponentGroup with the Component prepended.
+     * ComponentGroup + ComponentGroup: Returns a new ComponentGroup with the first group before the second group.
+     *
+     * @param {Component} c The component to merge in.
+     * @returns {ComponentGroup} The relevant ComponentGroup out of the above four cases.
+     */
+    public below(c: AbstractComponent): Component.Group {
+      return this._merge(c, true);
     }
 
     /**

@@ -128,12 +128,12 @@ describe("Scales", () => {
       renderAreaD2.addDataset(ds2);
       renderAreaD2.project("x", "x", xScale);
       renderAreaD2.project("y", "y", yScale);
-      var renderAreas = renderAreaD1.merge(renderAreaD2);
+      var renderAreas = renderAreaD1.below(renderAreaD2);
       renderAreas.renderTo(svg);
       assert.deepEqual(xScale.domain(), [0, 2]);
       renderAreaD1.detach();
       assert.deepEqual(xScale.domain(), [1, 2], "resize on plot.detach()");
-      renderAreas.merge(renderAreaD1);
+      renderAreas.below(renderAreaD1);
       assert.deepEqual(xScale.domain(), [0, 2], "resize on plot.merge()");
       svg.remove();
     });

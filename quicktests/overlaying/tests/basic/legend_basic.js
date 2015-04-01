@@ -35,7 +35,7 @@ function run(svg, data, Plottable) {
   renderAreaD2.project("x", "x", xScale).project("y", "y", yScale);
   renderAreaD1.attr("fill", colorProjector);
   renderAreaD2.attr("stroke", colorProjector);
-  var renderAreas = renderAreaD1.merge(renderAreaD2);
+  var renderAreas = renderAreaD1.above(renderAreaD2);
 
 
   var title1 = new Plottable.Component.TitleLabel( "Four Data Series", "horizontal");

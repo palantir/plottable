@@ -1,5 +1,5 @@
 /*!
-Plottable 0.48.0 (https://github.com/palantir/plottable)
+Plottable 0.50.0 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -322,6 +322,15 @@ var Plottable;
                 return "#" + rHex + gHex + bHex;
             }
             Methods.darkenColor = darkenColor;
+            function distanceSquared(p1, p2) {
+                return Math.pow(p2.y - p1.y, 2) + Math.pow(p2.x - p1.x, 2);
+            }
+            Methods.distanceSquared = distanceSquared;
+            function isIE() {
+                var userAgent = window.navigator.userAgent;
+                return userAgent.indexOf("MSIE ") > -1 || userAgent.indexOf("Trident/") > -1;
+            }
+            Methods.isIE = isIE;
         })(Methods = _Util.Methods || (_Util.Methods = {}));
     })(_Util = Plottable._Util || (Plottable._Util = {}));
 })(Plottable || (Plottable = {}));
@@ -1113,7 +1122,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "0.48.0";
+    Plottable.version = "0.50.0";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -3349,22 +3358,13 @@ var Plottable;
     (function (_Drawer) {
         var Symbol = (function (_super) {
             __extends(Symbol, _super);
-            function Symbol() {
-                _super.apply(this, arguments);
+            function Symbol(key) {
+                _super.call(this, key);
+                this._svgElement = "path";
+                this._className = "symbol";
             }
-            Symbol.prototype._enterData = function (data) {
-                _super.prototype._enterData.call(this, data);
-                var dataElements = this._getDrawSelection().data(data);
-                dataElements.enter().append("path");
-                dataElements.exit().remove();
-                dataElements.classed("symbol", true);
-            };
-            Symbol.prototype._getDrawSelection = function () {
-                return this._getRenderArea().selectAll("path");
-            };
             Symbol.prototype._drawStep = function (step) {
-                _super.prototype._drawStep.call(this, step);
-                var attrToProjector = Plottable._Util.Methods.copyMap(step.attrToProjector);
+                var attrToProjector = step.attrToProjector;
                 this._attrToProjector = Plottable._Util.Methods.copyMap(step.attrToProjector);
                 var xProjector = attrToProjector["x"];
                 var yProjector = attrToProjector["y"];
@@ -3376,20 +3376,13 @@ var Plottable;
                 var symbolProjector = attrToProjector["symbol"];
                 delete attrToProjector["symbol"];
                 attrToProjector["d"] = symbolProjector;
-                var drawSelection = this._getDrawSelection();
-                if (attrToProjector["fill"]) {
-                    drawSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
-                }
-                step.animator.animate(drawSelection, attrToProjector);
-            };
-            Symbol.prototype._getSelector = function () {
-                return "path";
+                _super.prototype._drawStep.call(this, step);
             };
             Symbol.prototype._getPixelPoint = function (datum, index) {
                 return { x: this._attrToProjector["x"](datum, index), y: this._attrToProjector["y"](datum, index) };
             };
             return Symbol;
-        })(_Drawer.AbstractDrawer);
+        })(_Drawer.Element);
         _Drawer.Symbol = Symbol;
     })(_Drawer = Plottable._Drawer || (Plottable._Drawer = {}));
 })(Plottable || (Plottable = {}));
@@ -3789,7 +3782,7 @@ var Plottable;
                 // pushed to this._interactionsToRegister and registered during anchoring. If after, they are
                 // registered immediately
                 if (this._element) {
-                    if (!this._hitBox) {
+                    if (!this._hitBox && interaction._requiresHitbox()) {
                         this._hitBox = this._addBox("hit-box");
                         this._hitBox.style("fill", "#ffffff").style("opacity", 0); // We need to set these so Chrome will register events
                     }
@@ -3849,33 +3842,53 @@ var Plottable;
             AbstractComponent.prototype._isFixedHeight = function () {
                 return this._fixedHeightFlag;
             };
-            /**
-             * Merges this Component with another Component, returning a
-             * ComponentGroup. This is used to layer Components on top of each other.
-             *
-             * There are four cases:
-             * Component + Component: Returns a ComponentGroup with both components inside it.
-             * ComponentGroup + Component: Returns the ComponentGroup with the Component appended.
-             * Component + ComponentGroup: Returns the ComponentGroup with the Component prepended.
-             * ComponentGroup + ComponentGroup: Returns a new ComponentGroup with two ComponentGroups inside it.
-             *
-             * @param {Component} c The component to merge in.
-             * @returns {ComponentGroup} The relevant ComponentGroup out of the above four cases.
-             */
-            AbstractComponent.prototype.merge = function (c) {
+            AbstractComponent.prototype._merge = function (c, below) {
                 var cg;
                 if (this._isSetup || this._isAnchored) {
                     throw new Error("Can't presently merge a component that's already been anchored");
                 }
                 if (Plottable.Component.Group.prototype.isPrototypeOf(c)) {
                     cg = c;
-                    cg._addComponent(this, true);
+                    cg._addComponent(this, below);
                     return cg;
                 }
                 else {
-                    cg = new Plottable.Component.Group([this, c]);
+                    var mergedComponents = below ? [this, c] : [c, this];
+                    cg = new Plottable.Component.Group(mergedComponents);
                     return cg;
                 }
+            };
+            /**
+             * Merges this Component above another Component, returning a
+             * ComponentGroup. This is used to layer Components on top of each other.
+             *
+             * There are four cases:
+             * Component + Component: Returns a ComponentGroup with the first component after the second component.
+             * ComponentGroup + Component: Returns the ComponentGroup with the Component prepended.
+             * Component + ComponentGroup: Returns the ComponentGroup with the Component appended.
+             * ComponentGroup + ComponentGroup: Returns a new ComponentGroup with the first group after the second group.
+             *
+             * @param {Component} c The component to merge in.
+             * @returns {ComponentGroup} The relevant ComponentGroup out of the above four cases.
+             */
+            AbstractComponent.prototype.above = function (c) {
+                return this._merge(c, false);
+            };
+            /**
+             * Merges this Component below another Component, returning a
+             * ComponentGroup. This is used to layer Components on top of each other.
+             *
+             * There are four cases:
+             * Component + Component: Returns a ComponentGroup with the first component before the second component.
+             * ComponentGroup + Component: Returns the ComponentGroup with the Component appended.
+             * Component + ComponentGroup: Returns the ComponentGroup with the Component prepended.
+             * ComponentGroup + ComponentGroup: Returns a new ComponentGroup with the first group before the second group.
+             *
+             * @param {Component} c The component to merge in.
+             * @returns {ComponentGroup} The relevant ComponentGroup out of the above four cases.
+             */
+            AbstractComponent.prototype.below = function (c) {
+                return this._merge(c, true);
             };
             /**
              * Detaches a Component from the DOM. The component can be reused.
@@ -4109,14 +4122,17 @@ var Plottable;
         var Group = (function (_super) {
             __extends(Group, _super);
             /**
-             * Constructs a GroupComponent.
+             * Constructs a Component.Group.
              *
-             * A GroupComponent is a set of Components that will be rendered on top of
-             * each other. When you call Component.merge(Component), it creates and
-             * returns a GroupComponent.
+             * A Component.Group is a set of Components that will be rendered on top of
+             * each other. When you call Component.above(Component) or Component.below(Component),
+             * it creates and returns a Component.Group.
+             *
+             * Note that the order of the components will determine placement on the z-axis,
+             * with the previous items rendered below the later items.
              *
              * @constructor
-             * @param {Component[]} components The Components in the Group (default = []).
+             * @param {Component[]} components The Components in the resultant Component.Group (default = []).
              */
             function Group(components) {
                 var _this = this;
@@ -4134,8 +4150,8 @@ var Plottable;
                     wantsHeight: requests.map(function (r) { return r.wantsHeight; }).some(function (x) { return x; })
                 };
             };
-            Group.prototype.merge = function (c) {
-                this._addComponent(c);
+            Group.prototype._merge = function (c, below) {
+                this._addComponent(c, !below);
                 return this;
             };
             Group.prototype._computeLayout = function (offeredXOrigin, offeredYOrigin, availableWidth, availableHeight) {
@@ -6850,7 +6866,6 @@ var Plottable;
              * @returns {PlotData} The retrieved PlotData.
              */
             AbstractPlot.prototype.getAllPlotData = function (datasetKeys) {
-                var _this = this;
                 if (datasetKeys === void 0) { datasetKeys = this.datasetOrder(); }
                 var datasetKeyArray = [];
                 if (typeof (datasetKeys) === "string") {
@@ -6859,10 +6874,14 @@ var Plottable;
                 else {
                     datasetKeyArray = datasetKeys;
                 }
+                return this._getAllPlotData(datasetKeyArray);
+            };
+            AbstractPlot.prototype._getAllPlotData = function (datasetKeys) {
+                var _this = this;
                 var data = [];
                 var pixelPoints = [];
                 var allElements = [];
-                datasetKeyArray.forEach(function (datasetKey) {
+                datasetKeys.forEach(function (datasetKey) {
                     var plotDatasetKey = _this._key2PlotDatasetKey.get(datasetKey);
                     if (plotDatasetKey == null) {
                         return;
@@ -6875,6 +6894,45 @@ var Plottable;
                     });
                 });
                 return { data: data, pixelPoints: pixelPoints, selection: d3.selectAll(allElements) };
+            };
+            /**
+             * Retrieves the closest PlotData for the specified dataset(s)
+             *
+             * @param {Point} queryPoint The point to query from
+             * @param {number} withinValue Will only return plot data that is of a distance below withinValue
+             *                             (default = Infinity)
+             * @param {string | string[]} datasetKeys The dataset(s) to retrieve the plot data from.
+             *                                        (default = this.datasetOrder())
+             * @returns {PlotData} The retrieved PlotData.
+             */
+            AbstractPlot.prototype.getClosestPlotData = function (queryPoint, withinValue, datasetKeys) {
+                if (withinValue === void 0) { withinValue = Infinity; }
+                if (datasetKeys === void 0) { datasetKeys = this.datasetOrder(); }
+                var datasetKeyArray = [];
+                if (typeof (datasetKeys) === "string") {
+                    datasetKeyArray = [datasetKeys];
+                }
+                else {
+                    datasetKeyArray = datasetKeys;
+                }
+                return this._getClosestPlotData(queryPoint, datasetKeyArray, withinValue);
+            };
+            AbstractPlot.prototype._getClosestPlotData = function (queryPoint, datasetKeys, withinValue) {
+                if (withinValue === void 0) { withinValue = Infinity; }
+                var closestDistanceSquared = Math.pow(withinValue, 2);
+                var closestIndex;
+                var plotData = this.getAllPlotData(datasetKeys);
+                plotData.pixelPoints.forEach(function (pixelPoint, index) {
+                    var distance = Plottable._Util.Methods.distanceSquared(pixelPoint, queryPoint);
+                    if (distance < closestDistanceSquared) {
+                        closestDistanceSquared = distance;
+                        closestIndex = index;
+                    }
+                });
+                if (closestIndex == null) {
+                    return { data: [], pixelPoints: [], selection: d3.select() };
+                }
+                return { data: [plotData.data[closestIndex]], pixelPoints: [plotData.pixelPoints[closestIndex]], selection: d3.select(plotData.selection[0][closestIndex]) };
             };
             return AbstractPlot;
         })(Plottable.Component.AbstractComponent);
@@ -7271,6 +7329,20 @@ var Plottable;
                 attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this._defaultFillColor);
                 attrToProjector["symbol"] = attrToProjector["symbol"] || Plottable.SymbolGenerators.d3Symbol("circle");
                 attrToProjector["vector-effect"] = attrToProjector["vector-effect"] || d3.functor("non-scaling-stroke");
+                // HACKHACK vector-effect non-scaling-stroke has no effect in IE
+                // https://connect.microsoft.com/IE/feedback/details/788819/svg-non-scaling-stroke
+                if (Plottable._Util.Methods.isIE() && attrToProjector["stroke-width"] != null) {
+                    var strokeWidthProjector = attrToProjector["stroke-width"];
+                    attrToProjector["stroke-width"] = function (d, i, u, m) {
+                        var strokeWidth = strokeWidthProjector(d, i, u, m);
+                        if (attrToProjector["vector-effect"](d, i, u, m) === "non-scaling-stroke") {
+                            return strokeWidth * Plottable.SymbolGenerators.SYMBOL_GENERATOR_RADIUS / attrToProjector["r"](d, i, u, m);
+                        }
+                        else {
+                            return strokeWidth;
+                        }
+                    };
+                }
                 return attrToProjector;
             };
             Scatter.prototype._generateDrawSteps = function () {
@@ -7932,6 +8004,30 @@ var Plottable;
             Line.prototype._wholeDatumAttributes = function () {
                 return ["x", "y"];
             };
+            Line.prototype._getClosestPlotData = function (queryPoint, datasetKeys, withinValue) {
+                var _this = this;
+                if (withinValue === void 0) { withinValue = Infinity; }
+                var closestDistanceSquared = withinValue;
+                var closestDatum;
+                var closestSelection;
+                var closestPoint;
+                datasetKeys.forEach(function (datasetKey) {
+                    var plotData = _this.getAllPlotData(datasetKey);
+                    plotData.pixelPoints.forEach(function (pixelPoint, index) {
+                        var pixelPointDist = Plottable._Util.Methods.distanceSquared(queryPoint, pixelPoint);
+                        if (pixelPointDist < closestDistanceSquared) {
+                            closestDistanceSquared = pixelPointDist;
+                            closestDatum = plotData.data[index];
+                            closestPoint = pixelPoint;
+                            closestSelection = plotData.selection;
+                        }
+                    });
+                });
+                if (closestDatum == null) {
+                    return { data: [], pixelPoints: [], selection: d3.select() };
+                }
+                return { data: [closestDatum], pixelPoints: [closestPoint], selection: closestSelection };
+            };
             Line.prototype._getClosestWithinRange = function (p, range) {
                 var _this = this;
                 var attrToProjector = this._generateAttrToProjector();
@@ -7964,6 +8060,27 @@ var Plottable;
                     closestValue: closestOverall,
                     closestPoint: closestPoint
                 };
+            };
+            Line.prototype._getAllPlotData = function (datasetKeys) {
+                var _this = this;
+                var data = [];
+                var pixelPoints = [];
+                var allElements = [];
+                datasetKeys.forEach(function (datasetKey) {
+                    var plotDatasetKey = _this._key2PlotDatasetKey.get(datasetKey);
+                    if (plotDatasetKey == null) {
+                        return;
+                    }
+                    var drawer = plotDatasetKey.drawer;
+                    plotDatasetKey.dataset.data().forEach(function (datum, index) {
+                        data.push(datum);
+                        pixelPoints.push(drawer._getPixelPoint(datum, index));
+                    });
+                    if (plotDatasetKey.dataset.data().length > 0) {
+                        allElements.push(drawer._getSelection(0).node());
+                    }
+                });
+                return { data: data, pixelPoints: pixelPoints, selection: d3.selectAll(allElements) };
             };
             //===== Hover logic =====
             Line.prototype._hoverOverComponent = function (p) {
@@ -8984,17 +9101,19 @@ var Plottable;
                 this.translator = Plottable._Util.ClientToSVGTranslator.getTranslator(svg);
                 this._lastMousePosition = { x: -1, y: -1 };
                 this._moveBroadcaster = new Plottable.Core.Broadcaster(this);
-                this._processMoveCallback = function (e) { return _this._measureAndBroadcast(e, _this._moveBroadcaster); };
-                this._event2Callback["mouseover"] = this._processMoveCallback;
-                this._event2Callback["mousemove"] = this._processMoveCallback;
-                this._event2Callback["mouseout"] = this._processMoveCallback;
+                var processMoveCallback = function (e) { return _this._measureAndBroadcast(e, _this._moveBroadcaster); };
+                this._event2Callback["mouseover"] = processMoveCallback;
+                this._event2Callback["mousemove"] = processMoveCallback;
+                this._event2Callback["mouseout"] = processMoveCallback;
                 this._downBroadcaster = new Plottable.Core.Broadcaster(this);
-                this._processDownCallback = function (e) { return _this._measureAndBroadcast(e, _this._downBroadcaster); };
-                this._event2Callback["mousedown"] = this._processDownCallback;
+                this._event2Callback["mousedown"] = function (e) { return _this._measureAndBroadcast(e, _this._downBroadcaster); };
                 this._upBroadcaster = new Plottable.Core.Broadcaster(this);
-                this._processUpCallback = function (e) { return _this._measureAndBroadcast(e, _this._upBroadcaster); };
-                this._event2Callback["mouseup"] = this._processUpCallback;
-                this._broadcasters = [this._moveBroadcaster, this._downBroadcaster, this._upBroadcaster];
+                this._event2Callback["mouseup"] = function (e) { return _this._measureAndBroadcast(e, _this._upBroadcaster); };
+                this._wheelBroadcaster = new Plottable.Core.Broadcaster(this);
+                this._event2Callback["wheel"] = function (e) { return _this._measureAndBroadcast(e, _this._wheelBroadcaster); };
+                this._dblClickBroadcaster = new Plottable.Core.Broadcaster(this);
+                this._event2Callback["dblclick"] = function (e) { return _this._measureAndBroadcast(e, _this._dblClickBroadcaster); };
+                this._broadcasters = [this._moveBroadcaster, this._downBroadcaster, this._upBroadcaster, this._wheelBroadcaster, this._dblClickBroadcaster];
             }
             /**
              * Get a Dispatcher.Mouse for the <svg> containing elem. If one already exists
@@ -9061,6 +9180,36 @@ var Plottable;
                 return this;
             };
             /**
+             * Registers a callback to be called whenever a wheel occurs,
+             * or removes the callback if `null` is passed as the callback.
+             *
+             * @param {any} key The key associated with the callback.
+             *                  Key uniqueness is determined by deep equality.
+             * @param {MouseCallback} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space.
+             *                                     Pass `null` to remove a callback.
+             * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+             */
+            Mouse.prototype.onWheel = function (key, callback) {
+                this._setCallback(this._wheelBroadcaster, key, callback);
+                return this;
+            };
+            /**
+             * Registers a callback to be called whenever a dblClick occurs,
+             * or removes the callback if `null` is passed as the callback.
+             *
+             * @param {any} key The key associated with the callback.
+             *                  Key uniqueness is determined by deep equality.
+             * @param {MouseCallback} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space.
+             *                                     Pass `null` to remove a callback.
+             * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+             */
+            Mouse.prototype.onDblClick = function (key, callback) {
+                this._setCallback(this._dblClickBroadcaster, key, callback);
+                return this;
+            };
+            /**
              * Computes the mouse position from the given event, and if successful
              * calls broadcast() on the supplied Broadcaster.
              */
@@ -9110,15 +9259,12 @@ var Plottable;
                 _super.call(this);
                 this.translator = Plottable._Util.ClientToSVGTranslator.getTranslator(svg);
                 this._lastTouchPosition = { x: -1, y: -1 };
-                this._moveBroadcaster = new Plottable.Core.Broadcaster(this);
-                this._processMoveCallback = function (e) { return _this._measureAndBroadcast(e, _this._moveBroadcaster); };
-                this._event2Callback["touchmove"] = this._processMoveCallback;
                 this._startBroadcaster = new Plottable.Core.Broadcaster(this);
-                this._processStartCallback = function (e) { return _this._measureAndBroadcast(e, _this._startBroadcaster); };
-                this._event2Callback["touchstart"] = this._processStartCallback;
+                this._event2Callback["touchstart"] = function (e) { return _this._measureAndBroadcast(e, _this._startBroadcaster); };
+                this._moveBroadcaster = new Plottable.Core.Broadcaster(this);
+                this._event2Callback["touchmove"] = function (e) { return _this._measureAndBroadcast(e, _this._moveBroadcaster); };
                 this._endBroadcaster = new Plottable.Core.Broadcaster(this);
-                this._processEndCallback = function (e) { return _this._measureAndBroadcast(e, _this._endBroadcaster); };
-                this._event2Callback["touchend"] = this._processEndCallback;
+                this._event2Callback["touchend"] = function (e) { return _this._measureAndBroadcast(e, _this._endBroadcaster); };
                 this._broadcasters = [this._moveBroadcaster, this._startBroadcaster, this._endBroadcaster];
             }
             /**
@@ -9239,8 +9385,7 @@ var Plottable;
             function Key() {
                 var _this = this;
                 _super.call(this);
-                this._downCallback = function (e) { return _this._processKeydown(e); };
-                this._event2Callback["keydown"] = this._downCallback;
+                this._event2Callback["keydown"] = function (e) { return _this._processKeydown(e); };
                 this._keydownBroadcaster = new Plottable.Core.Broadcaster(this);
                 this._broadcasters = [this._keydownBroadcaster];
             }
@@ -9304,6 +9449,10 @@ var Plottable;
                 this._componentToListenTo = component;
                 this._hitBox = hitBox;
             };
+            // HACKHACK: After all Interactions use Dispatchers, we won't need hitboxes at all (#1757)
+            AbstractInteraction.prototype._requiresHitbox = function () {
+                return false;
+            };
             /**
              * Translates an <svg>-coordinate-space point to Component-space coordinates.
              *
@@ -9360,6 +9509,9 @@ var Plottable;
                     _this._callback({ x: x, y: y });
                 });
             };
+            Click.prototype._requiresHitbox = function () {
+                return true;
+            };
             Click.prototype._listenTo = function () {
                 return "click";
             };
@@ -9375,16 +9527,52 @@ var Plottable;
             return Click;
         })(Interaction.AbstractInteraction);
         Interaction.Click = Click;
+    })(Interaction = Plottable.Interaction || (Plottable.Interaction = {}));
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    var Interaction;
+    (function (Interaction) {
         var DoubleClick = (function (_super) {
             __extends(DoubleClick, _super);
             function DoubleClick() {
                 _super.apply(this, arguments);
             }
+            DoubleClick.prototype._anchor = function (component, hitBox) {
+                var _this = this;
+                _super.prototype._anchor.call(this, component, hitBox);
+                hitBox.on(this._listenTo(), function () {
+                    var xy = d3.mouse(hitBox.node());
+                    var x = xy[0];
+                    var y = xy[1];
+                    _this._callback({ x: x, y: y });
+                });
+            };
+            DoubleClick.prototype._requiresHitbox = function () {
+                return true;
+            };
             DoubleClick.prototype._listenTo = function () {
                 return "dblclick";
             };
+            /**
+             * Sets a callback to be called when a click is received.
+             *
+             * @param {(p: Point) => any} cb Callback that takes the pixel position of the click event.
+             */
+            DoubleClick.prototype.callback = function (cb) {
+                this._callback = cb;
+                return this;
+            };
             return DoubleClick;
-        })(Click);
+        })(Interaction.AbstractInteraction);
         Interaction.DoubleClick = DoubleClick;
     })(Interaction = Plottable.Interaction || (Plottable.Interaction = {}));
 })(Plottable || (Plottable = {}));
@@ -9449,6 +9637,77 @@ var Plottable;
 (function (Plottable) {
     var Interaction;
     (function (Interaction) {
+        var Pointer = (function (_super) {
+            __extends(Pointer, _super);
+            function Pointer() {
+                _super.apply(this, arguments);
+                this._overComponent = false;
+            }
+            Pointer.prototype._anchor = function (component, hitBox) {
+                var _this = this;
+                _super.prototype._anchor.call(this, component, hitBox);
+                this._mouseDispatcher = Plottable.Dispatcher.Mouse.getDispatcher(this._componentToListenTo.content().node());
+                this._mouseDispatcher.onMouseMove("Interaction.Pointer" + this.getID(), function (p) { return _this._handlePointerEvent(p); });
+                this._touchDispatcher = Plottable.Dispatcher.Touch.getDispatcher(this._componentToListenTo.content().node());
+                this._touchDispatcher.onTouchStart("Interaction.Pointer" + this.getID(), function (p) { return _this._handlePointerEvent(p); });
+            };
+            Pointer.prototype._handlePointerEvent = function (p) {
+                var translatedP = this._translateToComponentSpace(p);
+                if (this._isInsideComponent(translatedP)) {
+                    var wasOverComponent = this._overComponent;
+                    this._overComponent = true;
+                    if (!wasOverComponent && this._pointerEnterCallback) {
+                        this._pointerEnterCallback(translatedP);
+                    }
+                    if (this._pointerMoveCallback) {
+                        this._pointerMoveCallback(translatedP);
+                    }
+                }
+                else if (this._overComponent) {
+                    this._overComponent = false;
+                    if (this._pointerExitCallback) {
+                        this._pointerExitCallback(translatedP);
+                    }
+                }
+            };
+            Pointer.prototype.onPointerEnter = function (callback) {
+                if (callback === undefined) {
+                    return this._pointerEnterCallback;
+                }
+                this._pointerEnterCallback = callback;
+                return this;
+            };
+            Pointer.prototype.onPointerMove = function (callback) {
+                if (callback === undefined) {
+                    return this._pointerMoveCallback;
+                }
+                this._pointerMoveCallback = callback;
+                return this;
+            };
+            Pointer.prototype.onPointerExit = function (callback) {
+                if (callback === undefined) {
+                    return this._pointerExitCallback;
+                }
+                this._pointerExitCallback = callback;
+                return this;
+            };
+            return Pointer;
+        })(Interaction.AbstractInteraction);
+        Interaction.Pointer = Pointer;
+    })(Interaction = Plottable.Interaction || (Plottable.Interaction = {}));
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    var Interaction;
+    (function (Interaction) {
         var PanZoom = (function (_super) {
             __extends(PanZoom, _super);
             /**
@@ -9494,6 +9753,9 @@ var Plottable;
             PanZoom.prototype._anchor = function (component, hitBox) {
                 _super.prototype._anchor.call(this, component, hitBox);
                 this.resetZoom();
+            };
+            PanZoom.prototype._requiresHitbox = function () {
+                return true;
             };
             PanZoom.prototype._rerenderZoomed = function () {
                 // HACKHACK since the d3.zoom.x modifies d3 scales and not our TS scales, and the TS scales have the
@@ -9627,6 +9889,9 @@ var Plottable;
                 _super.prototype._anchor.call(this, component, hitBox);
                 hitBox.call(this._dragBehavior);
                 return this;
+            };
+            Drag.prototype._requiresHitbox = function () {
+                return true;
             };
             /**
              * Sets up so that the xScale and yScale that are passed have their
@@ -10017,13 +10282,17 @@ var Plottable;
         var Hover = (function (_super) {
             __extends(Hover, _super);
             function Hover() {
-                _super.apply(this, arguments);
+                _super.call(this);
                 this._overComponent = false;
                 this._currentHoverData = {
                     data: null,
                     pixelPositions: null,
                     selection: null
                 };
+                if (!Hover.warned) {
+                    Hover.warned = true;
+                    Plottable._Util.Methods.warn("Interaction.Hover is deprecated; use Interaction.Pointer in conjunction with getClosestPlotData() instead.");
+                }
             }
             Hover.prototype._anchor = function (component, hitBox) {
                 var _this = this;
@@ -10133,6 +10402,7 @@ var Plottable;
             Hover.prototype.getCurrentHoverData = function () {
                 return this._currentHoverData;
             };
+            Hover.warned = false;
             return Hover;
         })(Interaction.AbstractInteraction);
         Interaction.Hover = Hover;
@@ -10140,7 +10410,7 @@ var Plottable;
 })(Plottable || (Plottable = {}));
 
 /*!
-SVG Typewriter 0.1.10 (https://github.com/palantir/svg-typewriter)
+SVG Typewriter 0.1.11 (https://github.com/palantir/svg-typewriter)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/svg-typewriter/blob/develop/LICENSE)
 */
