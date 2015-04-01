@@ -132,8 +132,6 @@ export module Component {
         this._detectionCornerTR = createCorner().classed("drag-corner-tr", true);
         this._detectionCornerBL = createCorner().classed("drag-corner-bl", true);
         this._detectionCornerBR = createCorner().classed("drag-corner-br", true);
-
-        this.detectionRadius(this._detectionRadius);
       }
 
       private _getEdges(p: Point) {
@@ -174,22 +172,27 @@ export module Component {
           var r = bounds.bottomRight.x;
 
           this._detectionEdgeT.attr({
-            x1: l, y1: t, x2: r, y2: t
+            x1: l, y1: t, x2: r, y2: t,
+            "stroke-width": this._detectionRadius * 2
           });
           this._detectionEdgeB.attr({
-            x1: l, y1: b, x2: r, y2: b
+            x1: l, y1: b, x2: r, y2: b,
+            "stroke-width": this._detectionRadius * 2
           });
           this._detectionEdgeL.attr({
-            x1: l, y1: t, x2: l, y2: b
+            x1: l, y1: t, x2: l, y2: b,
+            "stroke-width": this._detectionRadius * 2
           });
           this._detectionEdgeR.attr({
-            x1: r, y1: t, x2: r, y2: b
+            x1: r, y1: t, x2: r, y2: b,
+            "stroke-width": this._detectionRadius * 2
           });
 
-          this._detectionCornerTL.attr({ cx: l, cy: t });
-          this._detectionCornerTR.attr({ cx: r, cy: t });
-          this._detectionCornerBL.attr({ cx: l, cy: b });
-          this._detectionCornerBR.attr({ cx: r, cy: b });
+          this._detectionCornerTL.attr({ cx: l, cy: t, r: this._detectionRadius });
+          this._detectionCornerTR.attr({ cx: r, cy: t, r: this._detectionRadius });
+          this._detectionCornerBL.attr({ cx: l, cy: b, r: this._detectionRadius });
+          this._detectionCornerBR.attr({ cx: r, cy: b, r: this._detectionRadius });
+
         }
       }
 
@@ -214,16 +217,8 @@ export module Component {
           throw new Error("detection radius cannot be negative.");
         }
         this._detectionRadius = r;
-        if (this._isSetup) {
-          this._detectionEdgeT.style("stroke-width", this._detectionRadius * 2);
-          this._detectionEdgeB.style("stroke-width", this._detectionRadius * 2);
-          this._detectionEdgeL.style("stroke-width", this._detectionRadius * 2);
-          this._detectionEdgeR.style("stroke-width", this._detectionRadius * 2);
-          this._detectionCornerTL.attr("r", this._detectionRadius);
-          this._detectionCornerTR.attr("r", this._detectionRadius);
-          this._detectionCornerBL.attr("r", this._detectionRadius);
-          this._detectionCornerBR.attr("r", this._detectionRadius);
-        }
+        this._render();
+        return this;
       }
 
       /**
