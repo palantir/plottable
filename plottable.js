@@ -9440,19 +9440,17 @@ var Plottable;
             __extends(DoubleClick, _super);
             function DoubleClick() {
                 _super.apply(this, arguments);
-                this._clickedDown = false;
             }
             DoubleClick.prototype._anchor = function (component, hitBox) {
                 var _this = this;
                 _super.prototype._anchor.call(this, component, hitBox);
                 this._mouseDispatcher = Plottable.Dispatcher.Mouse.getDispatcher(component.content().node());
-                this._mouseDispatcher.onMouseDown("Interaction.Click" + this.getID(), function (p) { return _this._handleClickDown(p); });
-                this._mouseDispatcher.onMouseUp("Interaction.Click" + this.getID(), function (p) { return _this._handleClickUp(p); });
-                this._mouseDispatcher.onDblClick("Interaction.Click" + this.getID(), function (p) { return _this._handleDblClick(p); });
+                this._mouseDispatcher.onMouseDown("Interaction.DoubleClick" + this.getID(), function (p) { return _this._handleClickDown(p); });
+                this._mouseDispatcher.onMouseUp("Interaction.DoubleClick" + this.getID(), function (p) { return _this._handleClickUp(p); });
+                this._mouseDispatcher.onDblClick("Interaction.DoubleClick" + this.getID(), function (p) { return _this._handleDblClick(p); });
                 this._touchDispatcher = Plottable.Dispatcher.Touch.getDispatcher(component.content().node());
-                this._touchDispatcher.onTouchStart("Interaction.Click" + this.getID(), function (p) { return _this._handleClickDown(p); });
-                this._touchDispatcher.onTouchEnd("Interaction.Click" + this.getID(), function (p) { return _this._handleClickUp(p); });
-                this._touchDispatcher.onDblClick("Interaction.Click" + this.getID(), function (p) { return _this._handleDblClick(p); });
+                this._touchDispatcher.onTouchStart("Interaction.DoubleClick" + this.getID(), function (p) { return _this._handleClickDown(p); });
+                this._touchDispatcher.onTouchEnd("Interaction.DoubleClick" + this.getID(), function (p) { return _this._handleClickUp(p); });
             };
             DoubleClick.prototype._handleClickDown = function (p) {
                 // TODO: Implement
@@ -9462,6 +9460,13 @@ var Plottable;
             };
             DoubleClick.prototype._handleDblClick = function (p) {
                 // TODO: Implement
+            };
+            DoubleClick.prototype.onDblClick = function (callback) {
+                if (callback === undefined) {
+                    return this._dblClickCallback;
+                }
+                this._dblClickCallback = callback;
+                return this;
             };
             return DoubleClick;
         })(Interaction.AbstractInteraction);
