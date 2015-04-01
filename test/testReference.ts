@@ -71,3 +71,5 @@
 ///<reference path="dispatchers/keyDispatcherTests.ts" />
 
 ///<reference path="components/interactive/dragBoxLayerTests.ts" />
+///<reference path="components/interactive/xDragBoxLayerTests.ts" />
+///<reference path="components/interactive/yDragBoxLayerTests.ts" />

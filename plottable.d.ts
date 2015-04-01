@@ -2622,6 +2622,7 @@ declare module Plottable {
              * @return {SelectionBoxLayer} The calling SelectionBoxLayer.
              */
             bounds(newBounds: Bounds): SelectionBoxLayer;
+            protected _setBounds(newBounds: Bounds): void;
             _doRender(): void;
             /**
              * Gets whether the box is being shown.
@@ -4017,6 +4018,8 @@ declare module Plottable {
     module Component {
         module Interactive {
             class DragBoxLayer extends Component.SelectionBoxLayer {
+                protected _xResizable: boolean;
+                protected _yResizable: boolean;
                 constructor();
                 protected _setup(): void;
                 _doRender(): void;
@@ -4086,6 +4089,30 @@ declare module Plottable {
                  * @returns {DragBoxLayer} The calling DragBoxLayer.
                  */
                 onDragEnd(cb: (b: Bounds) => any): DragBoxLayer;
+            }
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Component {
+        module Interactive {
+            class XDragBoxLayer extends DragBoxLayer {
+                protected _setBounds(newBounds: Bounds): void;
+                protected _setResizable(canResize: boolean): void;
+            }
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Component {
+        module Interactive {
+            class YDragBoxLayer extends DragBoxLayer {
+                protected _setBounds(newBounds: Bounds): void;
+                protected _setResizable(canResize: boolean): void;
             }
         }
     }

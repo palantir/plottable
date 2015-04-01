@@ -94,3 +94,5 @@
 /// <reference path="interactions/hoverInteraction.ts" />
 
 /// <reference path="components/interactive/dragBoxLayer.ts" />
+/// <reference path="components/interactive/xDragBoxLayer.ts" />
+/// <reference path="components/interactive/yDragBoxLayer.ts" />

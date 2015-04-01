@@ -6428,6 +6428,11 @@ var Plottable;
                 if (newBounds == null) {
                     return this._boxBounds;
                 }
+                this._setBounds(newBounds);
+                this._render();
+                return this;
+            };
+            SelectionBoxLayer.prototype._setBounds = function (newBounds) {
                 var topLeft = {
                     x: Math.min(newBounds.topLeft.x, newBounds.bottomRight.x),
                     y: Math.min(newBounds.topLeft.y, newBounds.bottomRight.y)
@@ -6440,8 +6445,6 @@ var Plottable;
                     topLeft: topLeft,
                     bottomRight: bottomRight
                 };
-                this._render();
-                return this;
             };
             SelectionBoxLayer.prototype._doRender = function () {
                 if (this._boxVisible) {
@@ -10141,6 +10144,74 @@ var Plottable;
                 return DragBoxLayer;
             })(Component.SelectionBoxLayer);
             Interactive.DragBoxLayer = DragBoxLayer;
+        })(Interactive = Component.Interactive || (Component.Interactive = {}));
+    })(Component = Plottable.Component || (Plottable.Component = {}));
+})(Plottable || (Plottable = {}));
+
+///<reference path="../../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    var Component;
+    (function (Component) {
+        var Interactive;
+        (function (Interactive) {
+            var XDragBoxLayer = (function (_super) {
+                __extends(XDragBoxLayer, _super);
+                function XDragBoxLayer() {
+                    _super.apply(this, arguments);
+                }
+                XDragBoxLayer.prototype._setBounds = function (newBounds) {
+                    _super.prototype._setBounds.call(this, {
+                        topLeft: { x: newBounds.topLeft.x, y: 0 },
+                        bottomRight: { x: newBounds.bottomRight.x, y: this.height() }
+                    });
+                };
+                XDragBoxLayer.prototype._setResizable = function (canResize) {
+                    this._xResizable = canResize;
+                };
+                return XDragBoxLayer;
+            })(Interactive.DragBoxLayer);
+            Interactive.XDragBoxLayer = XDragBoxLayer;
+        })(Interactive = Component.Interactive || (Component.Interactive = {}));
+    })(Component = Plottable.Component || (Plottable.Component = {}));
+})(Plottable || (Plottable = {}));
+
+///<reference path="../../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    var Component;
+    (function (Component) {
+        var Interactive;
+        (function (Interactive) {
+            var YDragBoxLayer = (function (_super) {
+                __extends(YDragBoxLayer, _super);
+                function YDragBoxLayer() {
+                    _super.apply(this, arguments);
+                }
+                YDragBoxLayer.prototype._setBounds = function (newBounds) {
+                    _super.prototype._setBounds.call(this, {
+                        topLeft: { x: 0, y: newBounds.topLeft.y },
+                        bottomRight: { x: this.width(), y: newBounds.bottomRight.y }
+                    });
+                };
+                YDragBoxLayer.prototype._setResizable = function (canResize) {
+                    this._yResizable = canResize;
+                };
+                return YDragBoxLayer;
+            })(Interactive.DragBoxLayer);
+            Interactive.YDragBoxLayer = YDragBoxLayer;
         })(Interactive = Component.Interactive || (Component.Interactive = {}));
     })(Component = Plottable.Component || (Plottable.Component = {}));
 })(Plottable || (Plottable = {}));

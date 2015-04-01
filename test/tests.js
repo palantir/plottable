@@ -8558,3 +8558,129 @@ describe("Interactive Components", function () {
         });
     });
 });
+
+///<reference path="../../testReference.ts" />
+var assert = chai.assert;
+describe("Interactive Components", function () {
+    describe("XDragBoxLayer", function () {
+        var SVG_WIDTH = 400;
+        var SVG_HEIGHT = 400;
+        it("bounds()", function () {
+            var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var dbl = new Plottable.Component.Interactive.XDragBoxLayer();
+            dbl.boxVisible(true);
+            dbl.renderTo(svg);
+            var topLeft = {
+                x: SVG_WIDTH / 4,
+                y: SVG_HEIGHT / 4
+            };
+            var bottomRight = {
+                x: SVG_WIDTH / 2,
+                y: SVG_HEIGHT / 2
+            };
+            dbl.bounds({
+                topLeft: topLeft,
+                bottomRight: bottomRight
+            });
+            var actualBounds = dbl.bounds();
+            assert.strictEqual(actualBounds.topLeft.y, 0, "box starts at top");
+            assert.strictEqual(actualBounds.topLeft.x, topLeft.x, "left edge set correctly");
+            assert.strictEqual(actualBounds.bottomRight.y, dbl.height(), "box ends at bottom");
+            assert.strictEqual(actualBounds.bottomRight.x, bottomRight.x, "right edge set correctly");
+            svg.remove();
+        });
+        it("resizes only in x", function () {
+            var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var dbl = new Plottable.Component.Interactive.XDragBoxLayer();
+            dbl.boxVisible(true);
+            dbl.resizable(true);
+            dbl.renderTo(svg);
+            var topLeft = {
+                x: SVG_WIDTH / 4,
+                y: SVG_HEIGHT / 4
+            };
+            var bottomRight = {
+                x: SVG_WIDTH / 2,
+                y: SVG_HEIGHT / 2
+            };
+            dbl.bounds({
+                topLeft: topLeft,
+                bottomRight: bottomRight
+            });
+            var actualBounds = dbl.bounds();
+            var dragTo = {
+                x: SVG_WIDTH * 3 / 4,
+                y: SVG_HEIGHT / 2
+            };
+            var target = dbl.background();
+            triggerFakeDragSequence(target, actualBounds.bottomRight, dragTo);
+            actualBounds = dbl.bounds();
+            assert.strictEqual(actualBounds.bottomRight.x, dragTo.x, "resized in x");
+            assert.strictEqual(actualBounds.bottomRight.y, dbl.height(), "height did not change");
+            svg.remove();
+        });
+    });
+});
+
+///<reference path="../../testReference.ts" />
+var assert = chai.assert;
+describe("Interactive Components", function () {
+    describe("YDragBoxLayer", function () {
+        var SVG_WIDTH = 400;
+        var SVG_HEIGHT = 400;
+        it("bounds()", function () {
+            var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var dbl = new Plottable.Component.Interactive.YDragBoxLayer();
+            dbl.boxVisible(true);
+            dbl.renderTo(svg);
+            var topLeft = {
+                x: SVG_WIDTH / 4,
+                y: SVG_HEIGHT / 4
+            };
+            var bottomRight = {
+                x: SVG_WIDTH / 2,
+                y: SVG_HEIGHT / 2
+            };
+            dbl.bounds({
+                topLeft: topLeft,
+                bottomRight: bottomRight
+            });
+            var actualBounds = dbl.bounds();
+            assert.strictEqual(actualBounds.topLeft.x, 0, "box starts at left");
+            assert.strictEqual(actualBounds.topLeft.y, topLeft.y, "top edge set correctly");
+            assert.strictEqual(actualBounds.bottomRight.x, dbl.width(), "box ends at right");
+            assert.strictEqual(actualBounds.bottomRight.y, bottomRight.y, "bottom edge set correctly");
+            svg.remove();
+        });
+        it("resizes only in y", function () {
+            var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var dbl = new Plottable.Component.Interactive.YDragBoxLayer();
+            dbl.boxVisible(true);
+            dbl.resizable(true);
+            dbl.renderTo(svg);
+            var topLeft = {
+                x: SVG_WIDTH / 4,
+                y: SVG_HEIGHT / 4
+            };
+            var bottomRight = {
+                x: SVG_WIDTH / 2,
+                y: SVG_HEIGHT / 2
+            };
+            dbl.bounds({
+                topLeft: topLeft,
+                bottomRight: bottomRight
+            });
+            var actualBounds = dbl.bounds();
+            var dragTo = {
+                x: SVG_WIDTH / 2,
+                y: SVG_HEIGHT * 3 / 4
+            };
+            var target = dbl.background();
+            triggerFakeDragSequence(target, actualBounds.bottomRight, dragTo);
+            actualBounds = dbl.bounds();
+            assert.strictEqual(actualBounds.bottomRight.x, dbl.width(), "width did not change");
+            assert.strictEqual(actualBounds.bottomRight.y, dragTo.y, "resized in y");
+            svg.remove();
+        });
+    });
+});

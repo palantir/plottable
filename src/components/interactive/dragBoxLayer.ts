@@ -22,8 +22,8 @@ export module Component {
       private _detectionCornerBR: D3.Selection;
 
       private _detectionRadius = 3;
-      private _xResizable = false;
-      private _yResizable = false;
+      protected _xResizable = false;
+      protected _yResizable = false;
 
       private _dragStartCallback: (b: Bounds) => any;
       private _dragCallback: (b: Bounds) => any;

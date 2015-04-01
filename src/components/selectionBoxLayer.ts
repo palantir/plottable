@@ -41,6 +41,12 @@ export module Component {
         return this._boxBounds;
       }
 
+      this._setBounds(newBounds);
+      this._render();
+      return this;
+    }
+
+    protected _setBounds(newBounds: Bounds) {
       var topLeft: Point = {
         x: Math.min(newBounds.topLeft.x, newBounds.bottomRight.x),
         y: Math.min(newBounds.topLeft.y, newBounds.bottomRight.y)
@@ -53,8 +59,6 @@ export module Component {
         topLeft: topLeft,
         bottomRight: bottomRight
       };
-      this._render();
-      return this;
     }
 
     public _doRender() {
