@@ -3779,14 +3779,19 @@ declare module Plottable {
     module Interaction {
         class Click extends AbstractInteraction {
             _anchor(component: Component.AbstractComponent, hitBox: D3.Selection): void;
-            _requiresHitbox(): boolean;
-            protected _listenTo(): string;
             /**
-             * Sets a callback to be called when a click is received.
+             * Gets the callback called when the Component is clicked.
              *
-             * @param {(p: Point) => any} cb Callback that takes the pixel position of the click event.
+             * @return {(p: Point) => any} The current callback.
              */
-            callback(cb: (p: Point) => any): Click;
+            onClick(): (p: Point) => any;
+            /**
+             * Sets the callback called when the Component is clicked.
+             *
+             * @param {(p: Point) => any} callback The callback to set.
+             * @return {Interaction.Pointer} The calling Interaction.Click.
+             */
+            onClick(callback: (p: Point) => any): Interaction.Click;
         }
     }
 }
