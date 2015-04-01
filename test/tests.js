@@ -4865,7 +4865,7 @@ describe("Plots", function () {
                 errorBarPlot.project("y", "value", yScale);
                 errorBarPlot.project("lower", "lower", yScale);
                 errorBarPlot.project("upper", "upper", yScale);
-                var plot = barPlot.merge(errorBarPlot);
+                var plot = barPlot.below(errorBarPlot);
                 plot.renderTo(svg);
             });
             it("renders error bars in the vertical direction", function () {
@@ -4906,7 +4906,7 @@ describe("Plots", function () {
                 errorBarPlot.project("y", "key", yScale);
                 errorBarPlot.project("lower", "lower", xScale);
                 errorBarPlot.project("upper", "upper", xScale);
-                var plot = barPlot.merge(errorBarPlot);
+                var plot = barPlot.below(errorBarPlot);
                 plot.renderTo(svg);
             });
             it("renders error bars in the horizontal direction", function () {
