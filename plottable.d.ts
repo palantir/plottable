@@ -3789,7 +3789,7 @@ declare module Plottable {
              * Sets the callback called when the Component is clicked.
              *
              * @param {(p: Point) => any} callback The callback to set.
-             * @return {Interaction.Pointer} The calling Interaction.Click.
+             * @return {Interaction.Click} The calling Interaction.Click.
              */
             onClick(callback: (p: Point) => any): Interaction.Click;
         }
