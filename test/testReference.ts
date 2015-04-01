@@ -35,6 +35,7 @@
 ///<reference path="components/plots/stackedAreaPlotTests.ts" />
 ///<reference path="components/plots/stackedBarPlotTests.ts" />
 ///<reference path="components/plots/clusteredBarPlotTests.ts" />
+///<reference path="components/plots/errorBarPlotTests.ts" />
 
 ///<reference path="core/broadcasterTests.ts" />
 ///<reference path="core/metadataTests.ts" />

@@ -3290,7 +3290,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-        class ErrorBar<X> extends AbstractXYPlot<X, number> {
+        class ErrorBar<X, Y> extends AbstractXYPlot<X, Y> {
             /**
              * Constructs an ErrorBarPlot.
              *
@@ -3301,7 +3301,7 @@ declare module Plottable {
              * @param {AbstractScale} xScale The x scale to use.
              * @param {AbstractScale} yScale The y scale to use.
              */
-            constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<X, number>, isVertical?: boolean);
+            constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<Y, number>, isVertical?: boolean);
             protected _getDrawer(key: string): _Drawer.ErrorBar;
             protected _generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;

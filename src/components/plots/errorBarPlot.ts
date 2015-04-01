@@ -1,6 +1,6 @@
 module Plottable {
 export module Plot {
-  export class ErrorBar<X> extends AbstractXYPlot<X,number> {
+  export class ErrorBar<X, Y> extends AbstractXYPlot<X, Y> {
 
     private _isVertical: boolean;
     private _defaultStrokeColor: string;
@@ -15,7 +15,7 @@ export module Plot {
      * @param {AbstractScale} xScale The x scale to use.
      * @param {AbstractScale} yScale The y scale to use.
      */
-    constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<X, number>, isVertical = true) {
+    constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<Y, number>, isVertical = true) {
       super(xScale, yScale);
       this.classed("error-plot", true);
       this._defaultStrokeColor = new Scale.Color().range()[1];
