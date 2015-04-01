@@ -322,6 +322,17 @@ describe("Interactive Components", () => {
         svg.remove();
       });
 
+      it("doesn't dismiss on no-op resize", () => {
+        dbl.resizable(true);
+        triggerFakeDragSequence(target,
+                                { x: midPoint.x, y: initialBounds.topLeft.y },
+                                { x: midPoint.x, y: initialBounds.topLeft.y }
+                               );
+        var bounds = dbl.bounds();
+        assert.isTrue(dbl.boxVisible(), "box was not dismissed");
+        svg.remove();
+      });
+
       it("can't resize if hidden", () => {
         dbl.resizable(true);
         dbl.boxVisible(false);
