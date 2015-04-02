@@ -9456,7 +9456,14 @@ var Plottable;
                 this._touchDispatcher.onTouchEnd("Interaction.DoubleClick" + this.getID(), function (p) { return _this._handleClickUp(p); });
             };
             DoubleClick.prototype._handleClickDown = function (p) {
-                // TODO: Implement
+                var translatedP = this._translateToComponentSpace(p);
+                if (this._isInsideComponent(translatedP)) {
+                    if (!this._singleClicked || !(translatedP === this._clickedPoint)) {
+                        this._singleClicked = false;
+                    }
+                    this._clickedPoint = translatedP;
+                    this._clickedDown = true;
+                }
             };
             DoubleClick.prototype._handleClickUp = function (p) {
                 // TODO: Implement

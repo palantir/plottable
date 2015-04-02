@@ -26,7 +26,14 @@ export module Interaction {
     }
 
     private _handleClickDown(p: Point) {
-      // TODO: Implement
+      var translatedP = this._translateToComponentSpace(p);
+      if (this._isInsideComponent(translatedP)) {
+        if (!this._singleClicked || !(translatedP === this._clickedPoint)) {
+          this._singleClicked = false;
+        }
+        this._clickedPoint = translatedP;
+        this._clickedDown = true;
+      }
     }
 
     private _handleClickUp(p: Point) {
