@@ -2937,16 +2937,6 @@ declare module Plottable {
              * @param {Scale} yScale The y scale to use.
              */
             constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<Y, number>);
-            /**
-             * Convenience function for easily setting the symbol generator used for this scatter plot.
-             *
-             * The symbolGenerator is wrapped into a proper project call and then called to project onto the plot.
-             *
-             * @param {string | SymbolGenerator} Denotes the symbolGenerator to use for this scatterPlot.
-             *                                   If a string is inputted, it is translated to one of Plottable's SymbolGenerators
-             *                                   If a SymbolGenerator is inputted, it is used directly.
-             */
-            setSymbolGenerator(symbolGenerator: string | SymbolGenerator): void;
             protected _getDrawer(key: string): _Drawer.Symbol;
             protected _generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
