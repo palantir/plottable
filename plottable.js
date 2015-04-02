@@ -6428,6 +6428,11 @@ var Plottable;
                 if (newBounds == null) {
                     return this._boxBounds;
                 }
+                this._setBounds(newBounds);
+                this._render();
+                return this;
+            };
+            SelectionBoxLayer.prototype._setBounds = function (newBounds) {
                 var topLeft = {
                     x: Math.min(newBounds.topLeft.x, newBounds.bottomRight.x),
                     y: Math.min(newBounds.topLeft.y, newBounds.bottomRight.y)
@@ -6440,8 +6445,6 @@ var Plottable;
                     topLeft: topLeft,
                     bottomRight: bottomRight
                 };
-                this._render();
-                return this;
             };
             SelectionBoxLayer.prototype._doRender = function () {
                 if (this._boxVisible) {
@@ -9942,8 +9945,8 @@ var Plottable;
                 function DragBoxLayer() {
                     _super.call(this);
                     this._detectionRadius = 3;
-                    this._xResizable = false;
-                    this._yResizable = false;
+                    this._resizable = false;
+                    this._hasCorners = true;
                     this.classed("drag-box-layer", true);
                     this._dragInteraction = new Plottable.Interaction.Drag();
                     this._setUpCallbacks();
@@ -9956,15 +9959,7 @@ var Plottable;
                     var bottomRight;
                     var startedNewBox;
                     this._dragInteraction.onDragStart(function (s) {
-                        resizingEdges = _this._getEdges(s);
-                        if (!_this._yResizable) {
-                            resizingEdges.top = false;
-                            resizingEdges.bottom = false;
-                        }
-                        if (!_this._xResizable) {
-                            resizingEdges.left = false;
-                            resizingEdges.right = false;
-                        }
+                        resizingEdges = _this._getResizingEdges(s);
                         if (!_this.boxVisible() || (!resizingEdges.top && !resizingEdges.bottom && !resizingEdges.left && !resizingEdges.right)) {
                             _this.bounds({
                                 topLeft: s,
@@ -10031,22 +10026,27 @@ var Plottable;
                     this._detectionEdgeB = createLine().classed("drag-edge-tb", true);
                     this._detectionEdgeL = createLine().classed("drag-edge-lr", true);
                     this._detectionEdgeR = createLine().classed("drag-edge-lr", true);
-                    var createCorner = function () { return _this._box.append("circle").style({
-                        "opacity": 0,
-                        "fill": "pink"
-                    }); };
-                    this._detectionCornerTL = createCorner().classed("drag-corner-tl", true);
-                    this._detectionCornerTR = createCorner().classed("drag-corner-tr", true);
-                    this._detectionCornerBL = createCorner().classed("drag-corner-bl", true);
-                    this._detectionCornerBR = createCorner().classed("drag-corner-br", true);
+                    if (this._hasCorners) {
+                        var createCorner = function () { return _this._box.append("circle").style({
+                            "opacity": 0,
+                            "fill": "pink"
+                        }); };
+                        this._detectionCornerTL = createCorner().classed("drag-corner-tl", true);
+                        this._detectionCornerTR = createCorner().classed("drag-corner-tr", true);
+                        this._detectionCornerBL = createCorner().classed("drag-corner-bl", true);
+                        this._detectionCornerBR = createCorner().classed("drag-corner-br", true);
+                    }
                 };
-                DragBoxLayer.prototype._getEdges = function (p) {
+                DragBoxLayer.prototype._getResizingEdges = function (p) {
                     var edges = {
                         top: false,
                         bottom: false,
                         left: false,
                         right: false
                     };
+                    if (!this.resizable()) {
+                        return edges;
+                    }
                     var bounds = this.bounds();
                     var t = bounds.topLeft.y;
                     var b = bounds.bottomRight.y;
@@ -10099,10 +10099,12 @@ var Plottable;
                             y2: b,
                             "stroke-width": this._detectionRadius * 2
                         });
-                        this._detectionCornerTL.attr({ cx: l, cy: t, r: this._detectionRadius });
-                        this._detectionCornerTR.attr({ cx: r, cy: t, r: this._detectionRadius });
-                        this._detectionCornerBL.attr({ cx: l, cy: b, r: this._detectionRadius });
-                        this._detectionCornerBR.attr({ cx: r, cy: b, r: this._detectionRadius });
+                        if (this._hasCorners) {
+                            this._detectionCornerTL.attr({ cx: l, cy: t, r: this._detectionRadius });
+                            this._detectionCornerTR.attr({ cx: r, cy: t, r: this._detectionRadius });
+                            this._detectionCornerBL.attr({ cx: l, cy: b, r: this._detectionRadius });
+                            this._detectionCornerBR.attr({ cx: r, cy: b, r: this._detectionRadius });
+                        }
                     }
                 };
                 DragBoxLayer.prototype.detectionRadius = function (r) {
@@ -10118,17 +10120,16 @@ var Plottable;
                 };
                 DragBoxLayer.prototype.resizable = function (canResize) {
                     if (canResize == null) {
-                        return this._xResizable || this._yResizable;
+                        return this._resizable;
                     }
-                    this._setResizable(canResize);
-                    this.classed("x-resizable", this._xResizable);
-                    this.classed("y-resizable", this._yResizable);
+                    this._resizable = canResize;
+                    this._setResizableClasses(canResize);
                     return this;
                 };
-                // Sets resizable properties. Overridden by subclasses that only resize in one dimension.
-                DragBoxLayer.prototype._setResizable = function (canResize) {
-                    this._xResizable = canResize;
-                    this._yResizable = canResize;
+                // Sets resizable classes. Overridden by subclasses that only resize in one dimension.
+                DragBoxLayer.prototype._setResizableClasses = function (canResize) {
+                    this.classed("x-resizable", canResize);
+                    this.classed("y-resizable", canResize);
                 };
                 DragBoxLayer.prototype.onDragStart = function (cb) {
                     if (cb === undefined) {
@@ -10160,6 +10161,86 @@ var Plottable;
                 return DragBoxLayer;
             })(Component.SelectionBoxLayer);
             Interactive.DragBoxLayer = DragBoxLayer;
+        })(Interactive = Component.Interactive || (Component.Interactive = {}));
+    })(Component = Plottable.Component || (Plottable.Component = {}));
+})(Plottable || (Plottable = {}));
+
+///<reference path="../../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    var Component;
+    (function (Component) {
+        var Interactive;
+        (function (Interactive) {
+            var XDragBoxLayer = (function (_super) {
+                __extends(XDragBoxLayer, _super);
+                function XDragBoxLayer() {
+                    _super.call(this);
+                    this.classed("x-drag-box-layer", true);
+                    this._hasCorners = false;
+                }
+                XDragBoxLayer.prototype._computeLayout = function (offeredXOrigin, offeredYOrigin, availableWidth, availableHeight) {
+                    _super.prototype._computeLayout.call(this, offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
+                    this.bounds(this.bounds()); // set correct bounds when width/height changes
+                };
+                XDragBoxLayer.prototype._setBounds = function (newBounds) {
+                    _super.prototype._setBounds.call(this, {
+                        topLeft: { x: newBounds.topLeft.x, y: 0 },
+                        bottomRight: { x: newBounds.bottomRight.x, y: this.height() }
+                    });
+                };
+                XDragBoxLayer.prototype._setResizableClasses = function (canResize) {
+                    this.classed("x-resizable", canResize);
+                };
+                return XDragBoxLayer;
+            })(Interactive.DragBoxLayer);
+            Interactive.XDragBoxLayer = XDragBoxLayer;
+        })(Interactive = Component.Interactive || (Component.Interactive = {}));
+    })(Component = Plottable.Component || (Plottable.Component = {}));
+})(Plottable || (Plottable = {}));
+
+///<reference path="../../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    var Component;
+    (function (Component) {
+        var Interactive;
+        (function (Interactive) {
+            var YDragBoxLayer = (function (_super) {
+                __extends(YDragBoxLayer, _super);
+                function YDragBoxLayer() {
+                    _super.call(this);
+                    this.classed("y-drag-box-layer", true);
+                    this._hasCorners = false;
+                }
+                YDragBoxLayer.prototype._computeLayout = function (offeredXOrigin, offeredYOrigin, availableWidth, availableHeight) {
+                    _super.prototype._computeLayout.call(this, offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
+                    this.bounds(this.bounds()); // set correct bounds when width/height changes
+                };
+                YDragBoxLayer.prototype._setBounds = function (newBounds) {
+                    _super.prototype._setBounds.call(this, {
+                        topLeft: { x: 0, y: newBounds.topLeft.y },
+                        bottomRight: { x: this.width(), y: newBounds.bottomRight.y }
+                    });
+                };
+                YDragBoxLayer.prototype._setResizableClasses = function (canResize) {
+                    this.classed("y-resizable", canResize);
+                };
+                return YDragBoxLayer;
+            })(Interactive.DragBoxLayer);
+            Interactive.YDragBoxLayer = YDragBoxLayer;
         })(Interactive = Component.Interactive || (Component.Interactive = {}));
     })(Component = Plottable.Component || (Plottable.Component = {}));
 })(Plottable || (Plottable = {}));

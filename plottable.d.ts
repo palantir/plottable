@@ -2622,6 +2622,7 @@ declare module Plottable {
              * @return {SelectionBoxLayer} The calling SelectionBoxLayer.
              */
             bounds(newBounds: Bounds): SelectionBoxLayer;
+            protected _setBounds(newBounds: Bounds): void;
             _doRender(): void;
             /**
              * Gets whether the box is being shown.
@@ -4040,6 +4041,7 @@ declare module Plottable {
     module Component {
         module Interactive {
             class DragBoxLayer extends Component.SelectionBoxLayer {
+                protected _hasCorners: boolean;
                 constructor();
                 protected _setup(): void;
                 _doRender(): void;
@@ -4069,7 +4071,7 @@ declare module Plottable {
                  * @return {DragBoxLayer} The calling DragBoxLayer.
                  */
                 resizable(canResize: boolean): DragBoxLayer;
-                protected _setResizable(canResize: boolean): void;
+                protected _setResizableClasses(canResize: boolean): void;
                 /**
                  * Gets the callback that is called when dragging starts.
                  *
@@ -4109,6 +4111,34 @@ declare module Plottable {
                  * @returns {DragBoxLayer} The calling DragBoxLayer.
                  */
                 onDragEnd(cb: (b: Bounds) => any): DragBoxLayer;
+            }
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Component {
+        module Interactive {
+            class XDragBoxLayer extends DragBoxLayer {
+                constructor();
+                _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;
+                protected _setBounds(newBounds: Bounds): void;
+                protected _setResizableClasses(canResize: boolean): void;
+            }
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Component {
+        module Interactive {
+            class YDragBoxLayer extends DragBoxLayer {
+                constructor();
+                _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;
+                protected _setBounds(newBounds: Bounds): void;
+                protected _setResizableClasses(canResize: boolean): void;
             }
         }
     }
