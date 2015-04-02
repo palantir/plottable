@@ -9945,8 +9945,7 @@ var Plottable;
                 function DragBoxLayer() {
                     _super.call(this);
                     this._detectionRadius = 3;
-                    this._xResizable = false;
-                    this._yResizable = false;
+                    this._resizable = false;
                     this.classed("drag-box-layer", true);
                     this._dragInteraction = new Plottable.Interaction.Drag();
                     this._setUpCallbacks();
@@ -9959,15 +9958,7 @@ var Plottable;
                     var bottomRight;
                     var startedNewBox;
                     this._dragInteraction.onDragStart(function (s) {
-                        resizingEdges = _this._getEdges(s);
-                        if (!_this._yResizable) {
-                            resizingEdges.top = false;
-                            resizingEdges.bottom = false;
-                        }
-                        if (!_this._xResizable) {
-                            resizingEdges.left = false;
-                            resizingEdges.right = false;
-                        }
+                        resizingEdges = _this._getResizingEdges(s);
                         if (!_this.boxVisible() || (!resizingEdges.top && !resizingEdges.bottom && !resizingEdges.left && !resizingEdges.right)) {
                             _this.bounds({
                                 topLeft: s,
@@ -10043,7 +10034,7 @@ var Plottable;
                     this._detectionCornerBL = createCorner().classed("drag-corner-bl", true);
                     this._detectionCornerBR = createCorner().classed("drag-corner-br", true);
                 };
-                DragBoxLayer.prototype._getEdges = function (p) {
+                DragBoxLayer.prototype._getResizingEdges = function (p) {
                     var edges = {
                         top: false,
                         bottom: false,
@@ -10056,13 +10047,14 @@ var Plottable;
                     var l = bounds.topLeft.x;
                     var r = bounds.bottomRight.x;
                     var rad = this._detectionRadius;
+                    var resizable = this.resizable();
                     if (l - rad <= p.x && p.x <= r + rad) {
-                        edges.top = (t - rad <= p.y && p.y <= t + rad);
-                        edges.bottom = (b - rad <= p.y && p.y <= b + rad);
+                        edges.top = resizable && (t - rad <= p.y && p.y <= t + rad);
+                        edges.bottom = resizable && (b - rad <= p.y && p.y <= b + rad);
                     }
                     if (t - rad <= p.y && p.y <= b + rad) {
-                        edges.left = (l - rad <= p.x && p.x <= l + rad);
-                        edges.right = (r - rad <= p.x && p.x <= r + rad);
+                        edges.left = resizable && (l - rad <= p.x && p.x <= l + rad);
+                        edges.right = resizable && (r - rad <= p.x && p.x <= r + rad);
                     }
                     return edges;
                 };
@@ -10121,17 +10113,16 @@ var Plottable;
                 };
                 DragBoxLayer.prototype.resizable = function (canResize) {
                     if (canResize == null) {
-                        return this._xResizable || this._yResizable;
+                        return this._resizable;
                     }
-                    this._setResizable(canResize);
-                    this.classed("x-resizable", this._xResizable);
-                    this.classed("y-resizable", this._yResizable);
+                    this._resizable = canResize;
+                    this._setResizableClasses(canResize);
                     return this;
                 };
-                // Sets resizable properties. Overridden by subclasses that only resize in one dimension.
-                DragBoxLayer.prototype._setResizable = function (canResize) {
-                    this._xResizable = canResize;
-                    this._yResizable = canResize;
+                // Sets resizable classes. Overridden by subclasses that only resize in one dimension.
+                DragBoxLayer.prototype._setResizableClasses = function (canResize) {
+                    this.classed("x-resizable", canResize);
+                    this.classed("y-resizable", canResize);
                 };
                 DragBoxLayer.prototype.onDragStart = function (cb) {
                     if (cb === undefined) {
@@ -10191,8 +10182,8 @@ var Plottable;
                         bottomRight: { x: newBounds.bottomRight.x, y: this.height() }
                     });
                 };
-                XDragBoxLayer.prototype._setResizable = function (canResize) {
-                    this._xResizable = canResize;
+                XDragBoxLayer.prototype._setResizableClasses = function (canResize) {
+                    this.classed("x-resizable", canResize);
                 };
                 return XDragBoxLayer;
             })(Interactive.DragBoxLayer);
@@ -10225,8 +10216,8 @@ var Plottable;
                         bottomRight: { x: this.width(), y: newBounds.bottomRight.y }
                     });
                 };
-                YDragBoxLayer.prototype._setResizable = function (canResize) {
-                    this._yResizable = canResize;
+                YDragBoxLayer.prototype._setResizableClasses = function (canResize) {
+                    this.classed("y-resizable", canResize);
                 };
                 return YDragBoxLayer;
             })(Interactive.DragBoxLayer);

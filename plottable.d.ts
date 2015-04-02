@@ -4041,8 +4041,6 @@ declare module Plottable {
     module Component {
         module Interactive {
             class DragBoxLayer extends Component.SelectionBoxLayer {
-                protected _xResizable: boolean;
-                protected _yResizable: boolean;
                 constructor();
                 protected _setup(): void;
                 _doRender(): void;
@@ -4072,7 +4070,7 @@ declare module Plottable {
                  * @return {DragBoxLayer} The calling DragBoxLayer.
                  */
                 resizable(canResize: boolean): DragBoxLayer;
-                protected _setResizable(canResize: boolean): void;
+                protected _setResizableClasses(canResize: boolean): void;
                 /**
                  * Gets the callback that is called when dragging starts.
                  *
@@ -4123,7 +4121,7 @@ declare module Plottable {
         module Interactive {
             class XDragBoxLayer extends DragBoxLayer {
                 protected _setBounds(newBounds: Bounds): void;
-                protected _setResizable(canResize: boolean): void;
+                protected _setResizableClasses(canResize: boolean): void;
             }
         }
     }
@@ -4135,7 +4133,7 @@ declare module Plottable {
         module Interactive {
             class YDragBoxLayer extends DragBoxLayer {
                 protected _setBounds(newBounds: Bounds): void;
-                protected _setResizable(canResize: boolean): void;
+                protected _setResizableClasses(canResize: boolean): void;
             }
         }
     }

@@ -22,8 +22,7 @@ export module Component {
       private _detectionCornerBR: D3.Selection;
 
       private _detectionRadius = 3;
-      protected _xResizable = false;
-      protected _yResizable = false;
+      private _resizable = false;
 
       private _dragStartCallback: (b: Bounds) => any;
       private _dragCallback: (b: Bounds) => any;
@@ -45,15 +44,7 @@ export module Component {
         var startedNewBox: boolean;
 
         this._dragInteraction.onDragStart((s: Point) => {
-          resizingEdges = this._getEdges(s);
-          if (!this._yResizable) {
-            resizingEdges.top = false;
-            resizingEdges.bottom = false;
-          }
-          if (!this._xResizable) {
-            resizingEdges.left = false;
-            resizingEdges.right = false;
-          }
+          resizingEdges = this._getResizingEdges(s);
 
           if (!this.boxVisible() ||
               (!resizingEdges.top && !resizingEdges.bottom &&
@@ -140,7 +131,7 @@ export module Component {
         this._detectionCornerBR = createCorner().classed("drag-corner-br", true);
       }
 
-      private _getEdges(p: Point) {
+      private _getResizingEdges(p: Point) {
         var edges = {
           top: false,
           bottom: false,
@@ -155,14 +146,15 @@ export module Component {
         var r = bounds.bottomRight.x;
         var rad = this._detectionRadius;
 
+        var resizable = this.resizable();
         if (l - rad <= p.x && p.x <= r + rad) {
-          edges.top = (t - rad <= p.y && p.y <= t + rad);
-          edges.bottom = (b - rad <= p.y && p.y <= b + rad);
+          edges.top = resizable && (t - rad <= p.y && p.y <= t + rad);
+          edges.bottom = resizable && (b - rad <= p.y && p.y <= b + rad);
         }
 
         if (t - rad <= p.y && p.y <= b + rad) {
-          edges.left = (l - rad <= p.x && p.x <= l + rad);
-          edges.right = (r - rad <= p.x && p.x <= r + rad);
+          edges.left = resizable && (l - rad <= p.x && p.x <= l + rad);
+          edges.right = resizable && (r - rad <= p.x && p.x <= r + rad);
         }
 
         return edges;
@@ -242,18 +234,17 @@ export module Component {
       public resizable(canResize: boolean): DragBoxLayer;
       public resizable(canResize?: boolean): any {
         if (canResize == null) {
-          return this._xResizable || this._yResizable;
+          return this._resizable;
         }
-        this._setResizable(canResize);
-        this.classed("x-resizable", this._xResizable);
-        this.classed("y-resizable", this._yResizable);
+        this._resizable = canResize;
+        this._setResizableClasses(canResize);
         return this;
       }
 
-      // Sets resizable properties. Overridden by subclasses that only resize in one dimension.
-      protected _setResizable(canResize: boolean) {
-        this._xResizable = canResize;
-        this._yResizable = canResize;
+      // Sets resizable classes. Overridden by subclasses that only resize in one dimension.
+      protected _setResizableClasses(canResize: boolean) {
+        this.classed("x-resizable", canResize);
+        this.classed("y-resizable", canResize);
       }
 
       /**

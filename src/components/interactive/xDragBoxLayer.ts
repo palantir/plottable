@@ -11,8 +11,8 @@ export module Component {
         });
       }
 
-      protected _setResizable(canResize: boolean) {
-        this._xResizable = canResize;
+      protected _setResizableClasses(canResize: boolean) {
+        this.classed("x-resizable", canResize);
       }
     }
   }
