@@ -50,7 +50,7 @@ export module Component {
       this._fixedWidthFlag = true;
       this._fixedHeightFlag = true;
       this._sortFn = (a: string, b: string) => this._scale.domain().indexOf(a) - this._scale.domain().indexOf(b);
-      this._symbolFactoryAccessor = () => SymbolFactories.d3Symbol("circle");
+      this._symbolFactoryAccessor = () => SymbolFactories.circle();
     }
 
     protected _setup() {

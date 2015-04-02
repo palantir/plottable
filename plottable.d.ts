@@ -418,17 +418,12 @@ declare module Plottable {
     type SymbolFactory = (symbolRadius: number) => string;
     module SymbolFactories {
         type StringAccessor = (datum: any, index: number) => string;
-        /**
-         * A wrapper for D3's symbol generator as documented here:
-         * https://github.com/mbostock/d3/wiki/SVG-Shapes#symbol
-         *
-         * Note that since D3 symbols compute the path strings by knowing how much area it can take up instead of
-         * knowing its dimensions, the total area expected may be off by some constant factor.
-         *
-         * @param {string} symbolType String denoting the d3 symbol type
-         * @returns {SymbolGenerator} the symbol generator for a D3 symbol
-         */
-        function d3Symbol(symbolType: string): SymbolFactory;
+        function circle(): SymbolFactory;
+        function square(): SymbolFactory;
+        function cross(): SymbolFactory;
+        function diamond(): SymbolFactory;
+        function triangleUp(): SymbolFactory;
+        function triangleDown(): SymbolFactory;
     }
 }
 
