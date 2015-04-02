@@ -2818,6 +2818,16 @@ declare module Plottable {
                 }[];
                 selection: D3.Selection;
             };
+            /**
+             * Retrieves the PlotData at the specified x/y value or within the x/y extents
+             *
+             * @param {number | Extent} xValueOrExtent The x value or extent to query
+             * @param {number | Extent} yValueOrExtent The y value or extent to query
+             * @param {string | string[]} datasetKeys The dataset(s) to retrieve the plot data from.
+             *                                        (default = this.datasetOrder())
+             * @returns {PlotData} The retrieved PlotData.
+             */
+            getPlotData(xValueOrExtent: number | Extent, yValueOrExtent: number | Extent, datasetKeys?: string | string[]): PlotData;
         }
     }
 }

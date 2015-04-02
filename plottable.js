@@ -6878,6 +6878,34 @@ var Plottable;
                 }
                 return { data: [plotData.data[closestIndex]], pixelPoints: [plotData.pixelPoints[closestIndex]], selection: d3.select(plotData.selection[0][closestIndex]) };
             };
+            /**
+             * Retrieves the PlotData at the specified x/y value or within the x/y extents
+             *
+             * @param {number | Extent} xValueOrExtent The x value or extent to query
+             * @param {number | Extent} yValueOrExtent The y value or extent to query
+             * @param {string | string[]} datasetKeys The dataset(s) to retrieve the plot data from.
+             *                                        (default = this.datasetOrder())
+             * @returns {PlotData} The retrieved PlotData.
+             */
+            AbstractPlot.prototype.getPlotData = function (xValueOrExtent, yValueOrExtent, datasetKeys) {
+                if (datasetKeys === void 0) { datasetKeys = this.datasetOrder(); }
+                var xExtent = AbstractPlot._parseExtent(xValueOrExtent);
+                var yExtent = AbstractPlot._parseExtent(yValueOrExtent);
+                var datasetKeyArray = [];
+                if (typeof (datasetKeys) === "string") {
+                    datasetKeyArray = [datasetKeys];
+                }
+                else {
+                    datasetKeyArray = datasetKeys;
+                }
+                return this._getPlotData(xExtent, yExtent, datasetKeyArray);
+            };
+            AbstractPlot._parseExtent = function (input) {
+                return (typeof input === "number") ? { min: input, max: input } : input;
+            };
+            AbstractPlot.prototype._getPlotData = function (xExtent, yExtent, datasetKeys) {
+                return null;
+            };
             return AbstractPlot;
         })(Plottable.Component.AbstractComponent);
         Plot.AbstractPlot = AbstractPlot;
