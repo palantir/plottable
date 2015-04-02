@@ -4,6 +4,8 @@ module Plottable {
 export module Component {
   export module Interactive {
     export class YDragBoxLayer extends DragBoxLayer {
+      protected _hasCorners = false;
+
       constructor() {
         super();
         this.classed("y-drag-box-layer", true);

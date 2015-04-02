@@ -9946,6 +9946,7 @@ var Plottable;
                     _super.call(this);
                     this._detectionRadius = 3;
                     this._resizable = false;
+                    this._hasCorners = true;
                     this.classed("drag-box-layer", true);
                     this._dragInteraction = new Plottable.Interaction.Drag();
                     this._setUpCallbacks();
@@ -10025,14 +10026,16 @@ var Plottable;
                     this._detectionEdgeB = createLine().classed("drag-edge-tb", true);
                     this._detectionEdgeL = createLine().classed("drag-edge-lr", true);
                     this._detectionEdgeR = createLine().classed("drag-edge-lr", true);
-                    var createCorner = function () { return _this._box.append("circle").style({
-                        "opacity": 0,
-                        "fill": "pink"
-                    }); };
-                    this._detectionCornerTL = createCorner().classed("drag-corner-tl", true);
-                    this._detectionCornerTR = createCorner().classed("drag-corner-tr", true);
-                    this._detectionCornerBL = createCorner().classed("drag-corner-bl", true);
-                    this._detectionCornerBR = createCorner().classed("drag-corner-br", true);
+                    if (this._hasCorners) {
+                        var createCorner = function () { return _this._box.append("circle").style({
+                            "opacity": 0,
+                            "fill": "pink"
+                        }); };
+                        this._detectionCornerTL = createCorner().classed("drag-corner-tl", true);
+                        this._detectionCornerTR = createCorner().classed("drag-corner-tr", true);
+                        this._detectionCornerBL = createCorner().classed("drag-corner-bl", true);
+                        this._detectionCornerBR = createCorner().classed("drag-corner-br", true);
+                    }
                 };
                 DragBoxLayer.prototype._getResizingEdges = function (p) {
                     var edges = {
@@ -10096,10 +10099,12 @@ var Plottable;
                             y2: b,
                             "stroke-width": this._detectionRadius * 2
                         });
-                        this._detectionCornerTL.attr({ cx: l, cy: t, r: this._detectionRadius });
-                        this._detectionCornerTR.attr({ cx: r, cy: t, r: this._detectionRadius });
-                        this._detectionCornerBL.attr({ cx: l, cy: b, r: this._detectionRadius });
-                        this._detectionCornerBR.attr({ cx: r, cy: b, r: this._detectionRadius });
+                        if (this._hasCorners) {
+                            this._detectionCornerTL.attr({ cx: l, cy: t, r: this._detectionRadius });
+                            this._detectionCornerTR.attr({ cx: r, cy: t, r: this._detectionRadius });
+                            this._detectionCornerBL.attr({ cx: l, cy: b, r: this._detectionRadius });
+                            this._detectionCornerBR.attr({ cx: r, cy: b, r: this._detectionRadius });
+                        }
                     }
                 };
                 DragBoxLayer.prototype.detectionRadius = function (r) {
@@ -10176,7 +10181,9 @@ var Plottable;
             var XDragBoxLayer = (function (_super) {
                 __extends(XDragBoxLayer, _super);
                 function XDragBoxLayer() {
-                    _super.apply(this, arguments);
+                    _super.call(this);
+                    this._hasCorners = false;
+                    this.classed("x-drag-box-layer", true);
                 }
                 XDragBoxLayer.prototype._setBounds = function (newBounds) {
                     _super.prototype._setBounds.call(this, {
@@ -10210,7 +10217,9 @@ var Plottable;
             var YDragBoxLayer = (function (_super) {
                 __extends(YDragBoxLayer, _super);
                 function YDragBoxLayer() {
-                    _super.apply(this, arguments);
+                    _super.call(this);
+                    this._hasCorners = false;
+                    this.classed("y-drag-box-layer", true);
                 }
                 YDragBoxLayer.prototype._setBounds = function (newBounds) {
                     _super.prototype._setBounds.call(this, {

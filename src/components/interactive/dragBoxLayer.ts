@@ -23,6 +23,7 @@ export module Component {
 
       private _detectionRadius = 3;
       private _resizable = false;
+      protected _hasCorners = true;
 
       private _dragStartCallback: (b: Bounds) => any;
       private _dragCallback: (b: Bounds) => any;
@@ -120,15 +121,17 @@ export module Component {
         this._detectionEdgeL = createLine().classed("drag-edge-lr", true);
         this._detectionEdgeR = createLine().classed("drag-edge-lr", true);
 
-        var createCorner = () => this._box.append("circle")
-                                     .style({
-                                       "opacity": 0,
-                                       "fill": "pink"
-                                     });
-        this._detectionCornerTL = createCorner().classed("drag-corner-tl", true);
-        this._detectionCornerTR = createCorner().classed("drag-corner-tr", true);
-        this._detectionCornerBL = createCorner().classed("drag-corner-bl", true);
-        this._detectionCornerBR = createCorner().classed("drag-corner-br", true);
+        if (this._hasCorners) {
+          var createCorner = () => this._box.append("circle")
+                                       .style({
+                                         "opacity": 0,
+                                         "fill": "pink"
+                                       });
+          this._detectionCornerTL = createCorner().classed("drag-corner-tl", true);
+          this._detectionCornerTR = createCorner().classed("drag-corner-tr", true);
+          this._detectionCornerBL = createCorner().classed("drag-corner-bl", true);
+          this._detectionCornerBR = createCorner().classed("drag-corner-br", true);
+        }
       }
 
       private _getResizingEdges(p: Point) {
@@ -189,11 +192,12 @@ export module Component {
             "stroke-width": this._detectionRadius * 2
           });
 
-          this._detectionCornerTL.attr({ cx: l, cy: t, r: this._detectionRadius });
-          this._detectionCornerTR.attr({ cx: r, cy: t, r: this._detectionRadius });
-          this._detectionCornerBL.attr({ cx: l, cy: b, r: this._detectionRadius });
-          this._detectionCornerBR.attr({ cx: r, cy: b, r: this._detectionRadius });
-
+          if (this._hasCorners) {
+            this._detectionCornerTL.attr({ cx: l, cy: t, r: this._detectionRadius });
+            this._detectionCornerTR.attr({ cx: r, cy: t, r: this._detectionRadius });
+            this._detectionCornerBL.attr({ cx: l, cy: b, r: this._detectionRadius });
+            this._detectionCornerBR.attr({ cx: r, cy: b, r: this._detectionRadius });
+          }
         }
       }
 
