@@ -412,11 +412,11 @@ declare module Plottable {
 
 declare module Plottable {
     /**
-     * A SymbolGenerator is a function that takes in a radius for the size of the symbol
+     * A SymbolFactory is a function that takes in a radius for the size of the symbol
      * and returns a string representing the 'd' attribute of the resultant 'path' element
      */
-    type SymbolGenerator = (symbolRadius: number) => string;
-    module SymbolGenerators {
+    type SymbolFactory = (symbolRadius: number) => string;
+    module SymbolFactories {
         type StringAccessor = (datum: any, index: number) => string;
         /**
          * A wrapper for D3's symbol generator as documented here:
@@ -428,7 +428,7 @@ declare module Plottable {
          * @param {string} symbolType String denoting the d3 symbol type
          * @returns {SymbolGenerator} the symbol generator for a D3 symbol
          */
-        function d3Symbol(symbolType: string): SymbolGenerator;
+        function d3Symbol(symbolType: string): SymbolFactory;
     }
 }
 
@@ -2413,19 +2413,19 @@ declare module Plottable {
             getEntry(position: Point): D3.Selection;
             _doRender(): void;
             /**
-             * Gets the SymbolGeneratorAccessor of the legend, which dictates how
+             * Gets the symbolFactoryAccessor of the legend, which dictates how
              * the symbol in each entry is drawn.
              *
-             * @returns {(datum: any, index: number) => SymbolGenerator} The SymbolGenerator accessor of the legend
+             * @returns {(datum: any, index: number) => symbolFactory} The symbolFactory accessor of the legend
              */
-            symbolGeneratorAccessor(): (datum: any, index: number) => SymbolGenerator;
+            symbolFactoryAccessor(): (datum: any, index: number) => SymbolFactory;
             /**
-             * Sets the SymbolGeneratorAccessor of the legend
+             * Sets the symbolFactoryAccessor of the legend
              *
-             * @param {(datum: any, index: number) => SymbolGenerator}  The SymbolGenerator accessor to set to
+             * @param {(datum: any, index: number) => symbolFactory}  The symbolFactory accessor to set to
              * @returns {Legend} The calling Legend
              */
-            symbolGeneratorAccessor(symbolGeneratorAccessor: (datum: any, index: number) => SymbolGenerator): Legend;
+            symbolFactoryAccessor(symbolFactoryAccessor: (datum: any, index: number) => SymbolFactory): Legend;
         }
     }
 }

@@ -987,8 +987,8 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    var SymbolGenerators;
-    (function (SymbolGenerators) {
+    var SymbolFactories;
+    (function (SymbolFactories) {
         /**
          * A wrapper for D3's symbol generator as documented here:
          * https://github.com/mbostock/d3/wiki/SVG-Shapes#symbol
@@ -1032,8 +1032,8 @@ var Plottable;
             };
             return function (symbolRadius) { return d3.svg.symbol().type(symbolType).size(radiusToSize(symbolRadius))(); };
         }
-        SymbolGenerators.d3Symbol = d3Symbol;
-    })(SymbolGenerators = Plottable.SymbolGenerators || (Plottable.SymbolGenerators = {}));
+        SymbolFactories.d3Symbol = d3Symbol;
+    })(SymbolFactories = Plottable.SymbolFactories || (Plottable.SymbolFactories = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -5523,7 +5523,7 @@ var Plottable;
                 this._fixedWidthFlag = true;
                 this._fixedHeightFlag = true;
                 this._sortFn = function (a, b) { return _this._scale.domain().indexOf(a) - _this._scale.domain().indexOf(b); };
-                this._symbolGeneratorAccessor = function () { return Plottable.SymbolGenerators.d3Symbol("circle"); };
+                this._symbolFactoryAccessor = function () { return Plottable.SymbolFactories.d3Symbol("circle"); };
             }
             Legend.prototype._setup = function () {
                 _super.prototype._setup.call(this);
@@ -5687,7 +5687,7 @@ var Plottable;
                         return translateString;
                     });
                 });
-                entries.select("path").attr("d", function (d, i) { return _this.symbolGeneratorAccessor()(d, i)(layout.textHeight * 0.3); }).attr("transform", "translate(" + (layout.textHeight / 2) + "," + layout.textHeight / 2 + ")").attr("fill", function (value) { return _this._scale.scale(value); }).classed(Legend.LEGEND_SYMBOL_CLASS, true);
+                entries.select("path").attr("d", function (d, i) { return _this.symbolFactoryAccessor()(d, i)(layout.textHeight * 0.3); }).attr("transform", "translate(" + (layout.textHeight / 2) + "," + layout.textHeight / 2 + ")").attr("fill", function (value) { return _this._scale.scale(value); }).classed(Legend.LEGEND_SYMBOL_CLASS, true);
                 var padding = this._padding;
                 var textContainers = entries.select("g.text-container");
                 textContainers.text(""); // clear out previous results
@@ -5705,12 +5705,12 @@ var Plottable;
                     self._writer.write(value, maxTextLength, self.height(), writeOptions);
                 });
             };
-            Legend.prototype.symbolGeneratorAccessor = function (symbolGeneratorAccessor) {
-                if (symbolGeneratorAccessor == null) {
-                    return this._symbolGeneratorAccessor;
+            Legend.prototype.symbolFactoryAccessor = function (symbolFactoryAccessor) {
+                if (symbolFactoryAccessor == null) {
+                    return this._symbolFactoryAccessor;
                 }
                 else {
-                    this._symbolGeneratorAccessor = symbolGeneratorAccessor;
+                    this._symbolFactoryAccessor = symbolFactoryAccessor;
                     this._render();
                     return this;
                 }
@@ -7252,7 +7252,7 @@ var Plottable;
                 attrToProjector["r"] = attrToProjector["r"] || d3.functor(3);
                 attrToProjector["opacity"] = attrToProjector["opacity"] || d3.functor(0.6);
                 attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this._defaultFillColor);
-                attrToProjector["symbol"] = attrToProjector["symbol"] || (function () { return Plottable.SymbolGenerators.d3Symbol("circle"); });
+                attrToProjector["symbol"] = attrToProjector["symbol"] || (function () { return Plottable.SymbolFactories.d3Symbol("circle"); });
                 return attrToProjector;
             };
             Scatter.prototype._generateDrawSteps = function () {

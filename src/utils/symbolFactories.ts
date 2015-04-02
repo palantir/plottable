@@ -3,12 +3,12 @@
 module Plottable {
 
   /**
-   * A SymbolGenerator is a function that takes in a radius for the size of the symbol
+   * A SymbolFactory is a function that takes in a radius for the size of the symbol
    * and returns a string representing the 'd' attribute of the resultant 'path' element
    */
-  export type SymbolGenerator = (symbolRadius: number) => string;
+  export type SymbolFactory = (symbolRadius: number) => string;
 
-  export module SymbolGenerators {
+  export module SymbolFactories {
 
     export type StringAccessor = (datum: any, index: number) => string;
 
@@ -22,7 +22,7 @@ module Plottable {
      * @param {string} symbolType String denoting the d3 symbol type
      * @returns {SymbolGenerator} the symbol generator for a D3 symbol
      */
-    export function d3Symbol(symbolType: string): SymbolGenerator {
+    export function d3Symbol(symbolType: string): SymbolFactory {
       if (d3.svg.symbolTypes.indexOf(symbolType) === -1) {
         throw new Error(symbolType + " is an invalid D3 symbol type.  d3.svg.symbolTypes can retrieve the valid symbol types.");
       }
