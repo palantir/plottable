@@ -9440,6 +9440,9 @@ var Plottable;
             __extends(DoubleClick, _super);
             function DoubleClick() {
                 _super.apply(this, arguments);
+                this._singleClicked = false;
+                this._doubleClicked = false;
+                this._clickedDown = false;
             }
             DoubleClick.prototype._anchor = function (component, hitBox) {
                 var _this = this;
@@ -9447,7 +9450,7 @@ var Plottable;
                 this._mouseDispatcher = Plottable.Dispatcher.Mouse.getDispatcher(component.content().node());
                 this._mouseDispatcher.onMouseDown("Interaction.DoubleClick" + this.getID(), function (p) { return _this._handleClickDown(p); });
                 this._mouseDispatcher.onMouseUp("Interaction.DoubleClick" + this.getID(), function (p) { return _this._handleClickUp(p); });
-                this._mouseDispatcher.onDblClick("Interaction.DoubleClick" + this.getID(), function (p) { return _this._handleDblClick(p); });
+                this._mouseDispatcher.onDblClick("Interaction.DoubleClick" + this.getID(), function (p) { return _this._handleDblClick(); });
                 this._touchDispatcher = Plottable.Dispatcher.Touch.getDispatcher(component.content().node());
                 this._touchDispatcher.onTouchStart("Interaction.DoubleClick" + this.getID(), function (p) { return _this._handleClickDown(p); });
                 this._touchDispatcher.onTouchEnd("Interaction.DoubleClick" + this.getID(), function (p) { return _this._handleClickUp(p); });
@@ -9458,8 +9461,13 @@ var Plottable;
             DoubleClick.prototype._handleClickUp = function (p) {
                 // TODO: Implement
             };
-            DoubleClick.prototype._handleDblClick = function (p) {
-                // TODO: Implement
+            DoubleClick.prototype._handleDblClick = function () {
+                if (this._doubleClicked) {
+                    if (this._dblClickCallback) {
+                        this._dblClickCallback(this._clickedPoint);
+                    }
+                    this._doubleClicked = false;
+                }
             };
             DoubleClick.prototype.onDblClick = function (callback) {
                 if (callback === undefined) {

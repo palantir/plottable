@@ -7,6 +7,10 @@ export module Interaction {
     private _mouseDispatcher: Plottable.Dispatcher.Mouse;
     private _touchDispatcher: Plottable.Dispatcher.Touch;
     private _dblClickCallback: (p: Point) => any;
+    private _singleClicked = false;
+    private _doubleClicked = false;
+    private _clickedDown = false;
+    private _clickedPoint: Point;
 
     public _anchor(component: Component.AbstractComponent, hitBox: D3.Selection) {
       super._anchor(component, hitBox);
@@ -14,7 +18,7 @@ export module Interaction {
       this._mouseDispatcher = Dispatcher.Mouse.getDispatcher(<SVGElement> component.content().node());
       this._mouseDispatcher.onMouseDown("Interaction.DoubleClick" + this.getID(), (p: Point) => this._handleClickDown(p));
       this._mouseDispatcher.onMouseUp("Interaction.DoubleClick" + this.getID(), (p: Point) => this._handleClickUp(p));
-      this._mouseDispatcher.onDblClick("Interaction.DoubleClick" + this.getID(), (p: Point) => this._handleDblClick(p));
+      this._mouseDispatcher.onDblClick("Interaction.DoubleClick" + this.getID(), (p: Point) => this._handleDblClick());
 
       this._touchDispatcher = Dispatcher.Touch.getDispatcher(<SVGElement> component.content().node());
       this._touchDispatcher.onTouchStart("Interaction.DoubleClick" + this.getID(), (p: Point) => this._handleClickDown(p));
@@ -29,8 +33,13 @@ export module Interaction {
       // TODO: Implement
     }
 
-    private _handleDblClick(p: Point) {
-      // TODO: Implement
+    private _handleDblClick() {
+      if (this._doubleClicked) {
+        if (this._dblClickCallback) {
+          this._dblClickCallback(this._clickedPoint);
+        }
+        this._doubleClicked = false;
+      }
     }
 
     /**
