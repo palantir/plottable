@@ -2,13 +2,15 @@
 
 module Plottable {
 export module Interaction {
+
+  enum ClickState {NotClicked, SingleClicked, DoubleClicked};
+
   export class DoubleClick extends AbstractInteraction {
 
     private _mouseDispatcher: Plottable.Dispatcher.Mouse;
     private _touchDispatcher: Plottable.Dispatcher.Touch;
     private _dblClickCallback: (p: Point) => any;
-    private _singleClicked = false;
-    private _doubleClicked = false;
+    private _clickState = ClickState.NotClicked;
     private _clickedDown = false;
     private _clickedPoint: Point;
 
@@ -28,8 +30,8 @@ export module Interaction {
     private _handleClickDown(p: Point) {
       var translatedP = this._translateToComponentSpace(p);
       if (this._isInsideComponent(translatedP)) {
-        if (!this._singleClicked || !(translatedP === this._clickedPoint)) {
-          this._singleClicked = false;
+        if (!(this._clickState === ClickState.SingleClicked) || !DoubleClick.pointsEqual(translatedP, this._clickedPoint)) {
+          this._clickState = ClickState.NotClicked;
         }
         this._clickedPoint = translatedP;
         this._clickedDown = true;
@@ -38,24 +40,25 @@ export module Interaction {
 
     private _handleClickUp(p: Point) {
       var translatedP = this._translateToComponentSpace(p);
-      if (this._clickedDown && (translatedP === this._clickedPoint)) {
-        if (this._singleClicked) {
-          this._singleClicked = false;
-          this._doubleClicked = true;
-        } else {
-          this._singleClicked = true;
-        }
+      if (this._clickedDown && DoubleClick.pointsEqual(translatedP, this._clickedPoint)) {
+        this._clickState = this._clickState === ClickState.NotClicked ? ClickState.SingleClicked : ClickState.DoubleClicked;
+      } else {
+        this._clickState = ClickState.NotClicked;
       }
       this._clickedDown = false;
     }
 
     private _handleDblClick() {
-      if (this._doubleClicked) {
+      if (this._clickState === ClickState.DoubleClicked) {
         if (this._dblClickCallback) {
           this._dblClickCallback(this._clickedPoint);
         }
-        this._doubleClicked = false;
+        this._clickState = ClickState.NotClicked;
       }
+    }
+
+    private static pointsEqual(p1: Point, p2: Point) {
+      return p1.x === p2.x && p1.y === p2.y;
     }
 
     /**

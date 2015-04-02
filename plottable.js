@@ -9436,12 +9436,18 @@ var Plottable;
 (function (Plottable) {
     var Interaction;
     (function (Interaction) {
+        var ClickState;
+        (function (ClickState) {
+            ClickState[ClickState["NotClicked"] = 0] = "NotClicked";
+            ClickState[ClickState["SingleClicked"] = 1] = "SingleClicked";
+            ClickState[ClickState["DoubleClicked"] = 2] = "DoubleClicked";
+        })(ClickState || (ClickState = {}));
+        ;
         var DoubleClick = (function (_super) {
             __extends(DoubleClick, _super);
             function DoubleClick() {
                 _super.apply(this, arguments);
-                this._singleClicked = false;
-                this._doubleClicked = false;
+                this._clickState = 0 /* NotClicked */;
                 this._clickedDown = false;
             }
             DoubleClick.prototype._anchor = function (component, hitBox) {
@@ -9458,8 +9464,8 @@ var Plottable;
             DoubleClick.prototype._handleClickDown = function (p) {
                 var translatedP = this._translateToComponentSpace(p);
                 if (this._isInsideComponent(translatedP)) {
-                    if (!this._singleClicked || !(translatedP === this._clickedPoint)) {
-                        this._singleClicked = false;
+                    if (!(this._clickState === 1 /* SingleClicked */) || !DoubleClick.pointsEqual(translatedP, this._clickedPoint)) {
+                        this._clickState = 0 /* NotClicked */;
                     }
                     this._clickedPoint = translatedP;
                     this._clickedDown = true;
@@ -9467,24 +9473,24 @@ var Plottable;
             };
             DoubleClick.prototype._handleClickUp = function (p) {
                 var translatedP = this._translateToComponentSpace(p);
-                if (this._clickedDown && (translatedP === this._clickedPoint)) {
-                    if (this._singleClicked) {
-                        this._singleClicked = false;
-                        this._doubleClicked = true;
-                    }
-                    else {
-                        this._singleClicked = true;
-                    }
+                if (this._clickedDown && DoubleClick.pointsEqual(translatedP, this._clickedPoint)) {
+                    this._clickState = this._clickState === 0 /* NotClicked */ ? 1 /* SingleClicked */ : 2 /* DoubleClicked */;
+                }
+                else {
+                    this._clickState = 0 /* NotClicked */;
                 }
                 this._clickedDown = false;
             };
             DoubleClick.prototype._handleDblClick = function () {
-                if (this._doubleClicked) {
+                if (this._clickState === 2 /* DoubleClicked */) {
                     if (this._dblClickCallback) {
                         this._dblClickCallback(this._clickedPoint);
                     }
-                    this._doubleClicked = false;
+                    this._clickState = 0 /* NotClicked */;
                 }
+            };
+            DoubleClick.pointsEqual = function (p1, p2) {
+                return p1.x === p2.x && p1.y === p2.y;
             };
             DoubleClick.prototype.onDblClick = function (callback) {
                 if (callback === undefined) {
