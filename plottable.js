@@ -10182,9 +10182,13 @@ var Plottable;
                 __extends(XDragBoxLayer, _super);
                 function XDragBoxLayer() {
                     _super.call(this);
-                    this._hasCorners = false;
                     this.classed("x-drag-box-layer", true);
+                    this._hasCorners = false;
                 }
+                XDragBoxLayer.prototype._computeLayout = function (offeredXOrigin, offeredYOrigin, availableWidth, availableHeight) {
+                    _super.prototype._computeLayout.call(this, offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
+                    this.bounds(this.bounds()); // set correct bounds when width/height changes
+                };
                 XDragBoxLayer.prototype._setBounds = function (newBounds) {
                     _super.prototype._setBounds.call(this, {
                         topLeft: { x: newBounds.topLeft.x, y: 0 },
@@ -10218,9 +10222,13 @@ var Plottable;
                 __extends(YDragBoxLayer, _super);
                 function YDragBoxLayer() {
                     _super.call(this);
-                    this._hasCorners = false;
                     this.classed("y-drag-box-layer", true);
+                    this._hasCorners = false;
                 }
+                YDragBoxLayer.prototype._computeLayout = function (offeredXOrigin, offeredYOrigin, availableWidth, availableHeight) {
+                    _super.prototype._computeLayout.call(this, offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
+                    this.bounds(this.bounds()); // set correct bounds when width/height changes
+                };
                 YDragBoxLayer.prototype._setBounds = function (newBounds) {
                     _super.prototype._setBounds.call(this, {
                         topLeft: { x: 0, y: newBounds.topLeft.y },

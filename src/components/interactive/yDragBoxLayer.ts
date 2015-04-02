@@ -4,11 +4,16 @@ module Plottable {
 export module Component {
   export module Interactive {
     export class YDragBoxLayer extends DragBoxLayer {
-      protected _hasCorners = false;
-
       constructor() {
         super();
         this.classed("y-drag-box-layer", true);
+        this._hasCorners = false;
+      }
+
+      public _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number,
+                            availableWidth?: number, availableHeight?: number) {
+        super._computeLayout(offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
+        this.bounds(this.bounds()); // set correct bounds when width/height changes
       }
 
       protected _setBounds(newBounds: Bounds) {

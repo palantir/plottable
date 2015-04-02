@@ -4121,8 +4121,8 @@ declare module Plottable {
     module Component {
         module Interactive {
             class XDragBoxLayer extends DragBoxLayer {
-                protected _hasCorners: boolean;
                 constructor();
+                _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;
                 protected _setBounds(newBounds: Bounds): void;
                 protected _setResizableClasses(canResize: boolean): void;
             }
@@ -4135,8 +4135,8 @@ declare module Plottable {
     module Component {
         module Interactive {
             class YDragBoxLayer extends DragBoxLayer {
-                protected _hasCorners: boolean;
                 constructor();
+                _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;
                 protected _setBounds(newBounds: Bounds): void;
                 protected _setResizableClasses(canResize: boolean): void;
             }
