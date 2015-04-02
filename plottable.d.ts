@@ -2828,6 +2828,7 @@ declare module Plottable {
              * @returns {PlotData} The retrieved PlotData.
              */
             getPlotData(xValueOrExtent: number | Extent, yValueOrExtent: number | Extent, datasetKeys?: string | string[]): PlotData;
+            protected _getPlotData(xExtent: Extent, yExtent: Extent, datasetKeys: string[]): PlotData;
         }
     }
 }
@@ -3145,6 +3146,7 @@ declare module Plottable {
                 }[];
                 selection: D3.Selection;
             };
+            protected _getPlotData(xExtent: Extent, yExtent: Extent, datasetKeys: string[]): PlotData;
             protected _getClosestWithinRange(p: Point, range: number): {
                 closestValue: any;
                 closestPoint: {

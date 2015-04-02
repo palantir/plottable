@@ -585,7 +585,7 @@ export module Plot {
       return (typeof input === "number") ? {min: <number> input, max: <number> input} : <Extent> input;
     }
 
-    private _getPlotData(xExtent: Extent, yExtent: Extent, datasetKeys: string[]): PlotData {
+    protected _getPlotData(xExtent: Extent, yExtent: Extent, datasetKeys: string[]): PlotData {
       var data: any[] = [];
       var pixelPoints: Point[] = [];
       var selections: EventTarget[] = [];

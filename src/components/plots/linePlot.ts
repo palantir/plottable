@@ -123,6 +123,31 @@ export module Plot {
               selection: closestSelection};
     }
 
+    protected _getPlotData(xExtent: Extent, yExtent: Extent, datasetKeys: string[]): PlotData {
+      var data: any[] = [];
+      var pixelPoints: Point[] = [];
+      var selections: EventTarget[] = [];
+      datasetKeys.forEach((datasetKey) => {
+        var plotData = this.getAllPlotData(datasetKey);
+        var lineSelected = false;
+        plotData.pixelPoints.forEach((pixelPoint, index) => {
+          if (pixelPoint.x >= xExtent.min && pixelPoint.x <= xExtent.max &&
+              pixelPoint.y >= yExtent.min && pixelPoint.y <= yExtent.max) {
+            data.push(plotData.data[index]);
+            pixelPoints.push(pixelPoint);
+            lineSelected = true;
+          }
+        });
+        if (lineSelected) {
+          selections.push(plotData.selection.node());
+        }
+      });
+
+      return {data: data,
+              pixelPoints: pixelPoints,
+              selection: d3.selectAll(selections)};
+    }
+
     protected _getClosestWithinRange(p: Point, range: number) {
       var attrToProjector = this._generateAttrToProjector();
       var xProjector = attrToProjector["x"];

@@ -7998,6 +7998,27 @@ var Plottable;
                 }
                 return { data: [closestDatum], pixelPoints: [closestPoint], selection: closestSelection };
             };
+            Line.prototype._getPlotData = function (xExtent, yExtent, datasetKeys) {
+                var _this = this;
+                var data = [];
+                var pixelPoints = [];
+                var selections = [];
+                datasetKeys.forEach(function (datasetKey) {
+                    var plotData = _this.getAllPlotData(datasetKey);
+                    var lineSelected = false;
+                    plotData.pixelPoints.forEach(function (pixelPoint, index) {
+                        if (pixelPoint.x >= xExtent.min && pixelPoint.x <= xExtent.max && pixelPoint.y >= yExtent.min && pixelPoint.y <= yExtent.max) {
+                            data.push(plotData.data[index]);
+                            pixelPoints.push(pixelPoint);
+                            lineSelected = true;
+                        }
+                    });
+                    if (lineSelected) {
+                        selections.push(plotData.selection.node());
+                    }
+                });
+                return { data: data, pixelPoints: pixelPoints, selection: d3.selectAll(selections) };
+            };
             Line.prototype._getClosestWithinRange = function (p, range) {
                 var _this = this;
                 var attrToProjector = this._generateAttrToProjector();
