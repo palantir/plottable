@@ -3671,14 +3671,14 @@ describe("Plots", function () {
             xScale.domain([0, 400]);
             yScale.domain([400, 0]);
             var data1 = [
-                { x: 80, y: 200, r: 20 },
-                { x: 100, y: 200, r: 20 },
-                { x: 125, y: 200, r: 5 },
-                { x: 138, y: 200, r: 5 }
+                { x: 80, y: 200, size: 40 },
+                { x: 100, y: 200, size: 40 },
+                { x: 125, y: 200, size: 10 },
+                { x: 138, y: 200, size: 10 }
             ];
             var plot = new Plottable.Plot.Scatter(xScale, yScale);
             plot.addDataset(data1);
-            plot.project("x", "x").project("y", "y").project("r", "r");
+            plot.project("x", "x").project("y", "y").project("size", "size");
             plot.renderTo(svg);
             var twoOverlappingCirclesResult = plot._getClosestStruckPoint({ x: 85, y: 200 }, 10);
             assert.strictEqual(twoOverlappingCirclesResult.data[0], data1[0], "returns closest circle among circles that the test point touches");

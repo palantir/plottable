@@ -412,10 +412,10 @@ declare module Plottable {
 
 declare module Plottable {
     /**
-     * A SymbolFactory is a function that takes in a radius for the size of the symbol
+     * A SymbolFactory is a function that takes in a symbolSize which is the edge length of the render area
      * and returns a string representing the 'd' attribute of the resultant 'path' element
      */
-    type SymbolFactory = (symbolRadius: number) => string;
+    type SymbolFactory = (symbolSize: number) => string;
     module SymbolFactories {
         type StringAccessor = (datum: any, index: number) => string;
         function circle(): SymbolFactory;

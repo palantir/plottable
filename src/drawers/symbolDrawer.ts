@@ -19,8 +19,8 @@ export module _Drawer {
       delete attrToProjector["x"];
       delete attrToProjector["y"];
 
-      var rProjector = attrToProjector["r"];
-      delete attrToProjector["r"];
+      var rProjector = attrToProjector["size"];
+      delete attrToProjector["size"];
 
       attrToProjector["transform"] = (datum: any, index: number) =>
         "translate(" + xProjector(datum, index) + "," + yProjector(datum, index) + ")";

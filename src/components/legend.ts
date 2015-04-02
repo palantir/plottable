@@ -272,7 +272,7 @@ export module Component {
         });
       });
 
-      entries.select("path").attr("d", (d: any, i: number) => this.symbolFactoryAccessor()(d, i)(layout.textHeight * 0.3))
+      entries.select("path").attr("d", (d: any, i: number) => this.symbolFactoryAccessor()(d, i)(layout.textHeight * 0.6))
                             .attr("transform", "translate(" + (layout.textHeight / 2) + "," + layout.textHeight / 2 + ")")
                             .attr("fill", (value: string) => this._scale.scale(value) )
                             .classed(Legend.LEGEND_SYMBOL_CLASS, true);

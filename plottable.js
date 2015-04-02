@@ -990,27 +990,27 @@ var Plottable;
     var SymbolFactories;
     (function (SymbolFactories) {
         function circle() {
-            return function (symbolRadius) { return d3.svg.symbol().type("circle").size(Math.PI * Math.pow(symbolRadius, 2))(); };
+            return function (symbolSize) { return d3.svg.symbol().type("circle").size(Math.PI * Math.pow(symbolSize / 2, 2))(); };
         }
         SymbolFactories.circle = circle;
         function square() {
-            return function (symbolRadius) { return d3.svg.symbol().type("square").size(4 * Math.pow(symbolRadius, 2))(); };
+            return function (symbolSize) { return d3.svg.symbol().type("square").size(Math.pow(symbolSize, 2))(); };
         }
         SymbolFactories.square = square;
         function cross() {
-            return function (symbolRadius) { return d3.svg.symbol().type("cross").size((20 / 9) * Math.pow(symbolRadius, 2))(); };
+            return function (symbolSize) { return d3.svg.symbol().type("cross").size((5 / 9) * Math.pow(symbolSize, 2))(); };
         }
         SymbolFactories.cross = cross;
         function diamond() {
-            return function (symbolRadius) { return d3.svg.symbol().type("diamond").size(2 * Math.tan(Math.PI / 6) * Math.pow(symbolRadius, 2))(); };
+            return function (symbolSize) { return d3.svg.symbol().type("diamond").size(Math.tan(Math.PI / 6) * Math.pow(symbolSize, 2) / 2)(); };
         }
         SymbolFactories.diamond = diamond;
         function triangleUp() {
-            return function (symbolRadius) { return d3.svg.symbol().type("triangle-up").size(Math.sqrt(3) * Math.pow(symbolRadius, 2))(); };
+            return function (symbolSize) { return d3.svg.symbol().type("triangle-up").size(Math.sqrt(3) * Math.pow(symbolSize / 2, 2))(); };
         }
         SymbolFactories.triangleUp = triangleUp;
         function triangleDown() {
-            return function (symbolRadius) { return d3.svg.symbol().type("triangle-down").size(Math.sqrt(3) * Math.pow(symbolRadius, 2))(); };
+            return function (symbolSize) { return d3.svg.symbol().type("triangle-down").size(Math.sqrt(3) * Math.pow(symbolSize / 2, 2))(); };
         }
         SymbolFactories.triangleDown = triangleDown;
     })(SymbolFactories = Plottable.SymbolFactories || (Plottable.SymbolFactories = {}));
@@ -3342,8 +3342,8 @@ var Plottable;
                 var yProjector = attrToProjector["y"];
                 delete attrToProjector["x"];
                 delete attrToProjector["y"];
-                var rProjector = attrToProjector["r"];
-                delete attrToProjector["r"];
+                var rProjector = attrToProjector["size"];
+                delete attrToProjector["size"];
                 attrToProjector["transform"] = function (datum, index) { return "translate(" + xProjector(datum, index) + "," + yProjector(datum, index) + ")"; };
                 var symbolProjector = attrToProjector["symbol"];
                 delete attrToProjector["symbol"];
@@ -5667,7 +5667,7 @@ var Plottable;
                         return translateString;
                     });
                 });
-                entries.select("path").attr("d", function (d, i) { return _this.symbolFactoryAccessor()(d, i)(layout.textHeight * 0.3); }).attr("transform", "translate(" + (layout.textHeight / 2) + "," + layout.textHeight / 2 + ")").attr("fill", function (value) { return _this._scale.scale(value); }).classed(Legend.LEGEND_SYMBOL_CLASS, true);
+                entries.select("path").attr("d", function (d, i) { return _this.symbolFactoryAccessor()(d, i)(layout.textHeight * 0.6); }).attr("transform", "translate(" + (layout.textHeight / 2) + "," + layout.textHeight / 2 + ")").attr("fill", function (value) { return _this._scale.scale(value); }).classed(Legend.LEGEND_SYMBOL_CLASS, true);
                 var padding = this._padding;
                 var textContainers = entries.select("g.text-container");
                 textContainers.text(""); // clear out previous results
@@ -7229,7 +7229,7 @@ var Plottable;
             };
             Scatter.prototype._generateAttrToProjector = function () {
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
-                attrToProjector["r"] = attrToProjector["r"] || d3.functor(3);
+                attrToProjector["size"] = attrToProjector["size"] || d3.functor(6);
                 attrToProjector["opacity"] = attrToProjector["opacity"] || d3.functor(0.6);
                 attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this._defaultFillColor);
                 attrToProjector["symbol"] = attrToProjector["symbol"] || (function () { return Plottable.SymbolFactories.circle(); });
@@ -7239,7 +7239,7 @@ var Plottable;
                 var drawSteps = [];
                 if (this._dataChanged && this._animate) {
                     var resetAttrToProjector = this._generateAttrToProjector();
-                    resetAttrToProjector["r"] = function () { return 0; };
+                    resetAttrToProjector["size"] = function () { return 0; };
                     drawSteps.push({ attrToProjector: resetAttrToProjector, animator: this._getAnimator("symbols-reset") });
                 }
                 drawSteps.push({ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("symbols") });
@@ -7267,7 +7267,7 @@ var Plottable;
                     var drawer = _this._key2PlotDatasetKey.get(key).drawer;
                     drawer._getRenderArea().selectAll("path").each(function (d, i) {
                         var distSq = getDistSq(d, i, dataset.metadata(), plotMetadata);
-                        var r = attrToProjector["r"](d, i, dataset.metadata(), plotMetadata);
+                        var r = attrToProjector["size"](d, i, dataset.metadata(), plotMetadata) / 2;
                         if (distSq < r * r) {
                             if (!overAPoint || distSq < minDistSq) {
                                 closestElement = this;
