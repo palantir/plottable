@@ -48,7 +48,7 @@ describe("Interactions", () => {
       drag.onDragStart(startCallback);
       c.registerInteraction(drag);
 
-      var target = c.content();
+      var target = c.background();
       triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
       assert.isTrue(startCallbackCalled, "callback was called on beginning drag (mousedown)");
       assert.deepEqual(receivedStart, startPoint, "was passed the correct point");
@@ -92,7 +92,7 @@ describe("Interactions", () => {
       drag.onDrag(moveCallback);
       c.registerInteraction(drag);
 
-      var target = c.content();
+      var target = c.background();
       triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
       triggerFakeMouseEvent("mousemove", target, endPoint.x, endPoint.y);
       assert.isTrue(moveCallbackCalled, "callback was called on dragging (mousemove)");
@@ -130,7 +130,7 @@ describe("Interactions", () => {
       drag.onDragEnd(endCallback);
       c.registerInteraction(drag);
 
-      var target = c.content();
+      var target = c.background();
       triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
       triggerFakeMouseEvent("mouseup", target, endPoint.x, endPoint.y);
       assert.isTrue(endCallbackCalled, "callback was called on drag ending (mouseup)");

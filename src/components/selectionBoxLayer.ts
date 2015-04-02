@@ -3,7 +3,7 @@
 module Plottable {
 export module Component {
   export class SelectionBoxLayer extends AbstractComponent {
-    private _box: D3.Selection;
+    protected _box: D3.Selection;
     private _boxArea: D3.Selection;
     private _boxVisible = false;
     private _boxBounds: Bounds = {

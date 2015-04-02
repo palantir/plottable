@@ -143,6 +143,12 @@ function triggerFakeMouseEvent(type: string, target: D3.Selection, relativeX: nu
   target.node().dispatchEvent(e);
 }
 
+function triggerFakeDragSequence(target: D3.Selection, start: Plottable.Point, end: Plottable.Point) {
+  triggerFakeMouseEvent("mousedown", target, start.x , start.y);
+  triggerFakeMouseEvent("mousemove", target, end.x, end.y);
+  triggerFakeMouseEvent("mouseup", target, end.x, end.y);
+}
+
 function triggerFakeWheelEvent(type: string, target: D3.Selection, relativeX: number, relativeY: number, deltaY: number) {
   var clientRect = target.node().getBoundingClientRect();
   var xPos = clientRect.left + relativeX;

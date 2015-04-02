@@ -116,6 +116,11 @@ function triggerFakeMouseEvent(type, target, relativeX, relativeY) {
     e.initMouseEvent(type, true, true, window, 1, xPos, yPos, xPos, yPos, false, false, false, false, 1, null);
     target.node().dispatchEvent(e);
 }
+function triggerFakeDragSequence(target, start, end) {
+    triggerFakeMouseEvent("mousedown", target, start.x, start.y);
+    triggerFakeMouseEvent("mousemove", target, end.x, end.y);
+    triggerFakeMouseEvent("mouseup", target, end.x, end.y);
+}
 function triggerFakeWheelEvent(type, target, relativeX, relativeY, deltaY) {
     var clientRect = target.node().getBoundingClientRect();
     var xPos = clientRect.left + relativeX;
@@ -7436,8 +7441,8 @@ describe("Interactions", function () {
             ki.on(aCode, aCallback);
             ki.on(bCode, bCallback);
             component.registerInteraction(ki);
-            var $target = $(component.content().node());
-            triggerFakeMouseEvent("mouseover", component.content(), 100, 100);
+            var $target = $(component.background().node());
+            triggerFakeMouseEvent("mouseover", component.background(), 100, 100);
             $target.simulate("keydown", { keyCode: aCode });
             assert.isTrue(aCallbackCalled, "callback for \"a\" was called when \"a\" key was pressed");
             assert.isFalse(bCallbackCalled, "callback for \"b\" was not called when \"a\" key was pressed");
@@ -7445,7 +7450,7 @@ describe("Interactions", function () {
             $target.simulate("keydown", { keyCode: bCode });
             assert.isFalse(aCallbackCalled, "callback for \"a\" was not called when \"b\" key was pressed");
             assert.isTrue(bCallbackCalled, "callback for \"b\" was called when \"b\" key was pressed");
-            triggerFakeMouseEvent("mouseout", component.content(), -100, -100);
+            triggerFakeMouseEvent("mouseout", component.background(), -100, -100);
             aCallbackCalled = false;
             $target.simulate("keydown", { keyCode: aCode });
             assert.isFalse(aCallbackCalled, "callback for \"a\" was not called when not moused over the Component");
@@ -7474,26 +7479,27 @@ describe("Interactions", function () {
             };
             pointerInteraction.onPointerEnter(callback);
             assert.strictEqual(pointerInteraction.onPointerEnter(), callback, "callback can be retrieved");
-            triggerFakeMouseEvent("mousemove", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+            var target = c.background();
+            triggerFakeMouseEvent("mousemove", target, SVG_WIDTH / 2, SVG_HEIGHT / 2);
             assert.isTrue(callbackCalled, "callback called on entering Component (mouse)");
             assert.deepEqual(lastPoint, { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 }, "was passed correct point (mouse)");
             callbackCalled = false;
-            triggerFakeMouseEvent("mousemove", c.content(), SVG_WIDTH / 4, SVG_HEIGHT / 4);
+            triggerFakeMouseEvent("mousemove", target, SVG_WIDTH / 4, SVG_HEIGHT / 4);
             assert.isFalse(callbackCalled, "callback not called again if already in Component (mouse)");
-            triggerFakeMouseEvent("mousemove", c.content(), 2 * SVG_WIDTH, 2 * SVG_HEIGHT);
+            triggerFakeMouseEvent("mousemove", target, 2 * SVG_WIDTH, 2 * SVG_HEIGHT);
             assert.isFalse(callbackCalled, "not called when moving outside of the Component (mouse)");
             callbackCalled = false;
             lastPoint = null;
-            triggerFakeTouchEvent("touchstart", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+            triggerFakeTouchEvent("touchstart", target, SVG_WIDTH / 2, SVG_HEIGHT / 2);
             assert.isTrue(callbackCalled, "callback called on entering Component (touch)");
             assert.deepEqual(lastPoint, { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 }, "was passed correct point (touch)");
             callbackCalled = false;
-            triggerFakeTouchEvent("touchstart", c.content(), SVG_WIDTH / 4, SVG_HEIGHT / 4);
+            triggerFakeTouchEvent("touchstart", target, SVG_WIDTH / 4, SVG_HEIGHT / 4);
             assert.isFalse(callbackCalled, "callback not called again if already in Component (touch)");
-            triggerFakeTouchEvent("touchstart", c.content(), 2 * SVG_WIDTH, 2 * SVG_HEIGHT);
+            triggerFakeTouchEvent("touchstart", target, 2 * SVG_WIDTH, 2 * SVG_HEIGHT);
             assert.isFalse(callbackCalled, "not called when moving outside of the Component (touch)");
             pointerInteraction.onPointerEnter(null);
-            triggerFakeMouseEvent("mousemove", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+            triggerFakeMouseEvent("mousemove", target, SVG_WIDTH / 2, SVG_HEIGHT / 2);
             assert.isFalse(callbackCalled, "callback removed by passing null");
             svg.remove();
         });
@@ -7511,29 +7517,30 @@ describe("Interactions", function () {
             };
             pointerInteraction.onPointerMove(callback);
             assert.strictEqual(pointerInteraction.onPointerMove(), callback, "callback can be retrieved");
-            triggerFakeMouseEvent("mousemove", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+            var target = c.background();
+            triggerFakeMouseEvent("mousemove", target, SVG_WIDTH / 2, SVG_HEIGHT / 2);
             assert.isTrue(callbackCalled, "callback called on entering Component (mouse)");
             assert.deepEqual(lastPoint, { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 }, "was passed correct point (mouse)");
             callbackCalled = false;
-            triggerFakeMouseEvent("mousemove", c.content(), SVG_WIDTH / 4, SVG_HEIGHT / 4);
+            triggerFakeMouseEvent("mousemove", target, SVG_WIDTH / 4, SVG_HEIGHT / 4);
             assert.isTrue(callbackCalled, "callback on moving inside Component (mouse)");
             assert.deepEqual(lastPoint, { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 }, "was passed correct point (mouse)");
             callbackCalled = false;
-            triggerFakeMouseEvent("mousemove", c.content(), 2 * SVG_WIDTH, 2 * SVG_HEIGHT);
+            triggerFakeMouseEvent("mousemove", target, 2 * SVG_WIDTH, 2 * SVG_HEIGHT);
             assert.isFalse(callbackCalled, "not called when moving outside of the Component (mouse)");
             callbackCalled = false;
-            triggerFakeTouchEvent("touchstart", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+            triggerFakeTouchEvent("touchstart", target, SVG_WIDTH / 2, SVG_HEIGHT / 2);
             assert.isTrue(callbackCalled, "callback called on entering Component (touch)");
             assert.deepEqual(lastPoint, { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 }, "was passed correct point (touch)");
             callbackCalled = false;
-            triggerFakeTouchEvent("touchstart", c.content(), SVG_WIDTH / 4, SVG_HEIGHT / 4);
+            triggerFakeTouchEvent("touchstart", target, SVG_WIDTH / 4, SVG_HEIGHT / 4);
             assert.isTrue(callbackCalled, "callback on moving inside Component (touch)");
             assert.deepEqual(lastPoint, { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 }, "was passed correct point (touch)");
             callbackCalled = false;
-            triggerFakeTouchEvent("touchstart", c.content(), 2 * SVG_WIDTH, 2 * SVG_HEIGHT);
+            triggerFakeTouchEvent("touchstart", target, 2 * SVG_WIDTH, 2 * SVG_HEIGHT);
             assert.isFalse(callbackCalled, "not called when moving outside of the Component (touch)");
             pointerInteraction.onPointerMove(null);
-            triggerFakeMouseEvent("mousemove", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+            triggerFakeMouseEvent("mousemove", target, SVG_WIDTH / 2, SVG_HEIGHT / 2);
             assert.isFalse(callbackCalled, "callback removed by passing null");
             svg.remove();
         });
@@ -7551,29 +7558,30 @@ describe("Interactions", function () {
             };
             pointerInteraction.onPointerExit(callback);
             assert.strictEqual(pointerInteraction.onPointerExit(), callback, "callback can be retrieved");
-            triggerFakeMouseEvent("mousemove", c.content(), 2 * SVG_WIDTH, 2 * SVG_HEIGHT);
+            var target = c.background();
+            triggerFakeMouseEvent("mousemove", target, 2 * SVG_WIDTH, 2 * SVG_HEIGHT);
             assert.isFalse(callbackCalled, "not called when moving outside of the Component (mouse)");
-            triggerFakeMouseEvent("mousemove", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
-            triggerFakeMouseEvent("mousemove", c.content(), 2 * SVG_WIDTH, 2 * SVG_HEIGHT);
+            triggerFakeMouseEvent("mousemove", target, SVG_WIDTH / 2, SVG_HEIGHT / 2);
+            triggerFakeMouseEvent("mousemove", target, 2 * SVG_WIDTH, 2 * SVG_HEIGHT);
             assert.isTrue(callbackCalled, "callback called on exiting Component (mouse)");
             assert.deepEqual(lastPoint, { x: 2 * SVG_WIDTH, y: 2 * SVG_HEIGHT }, "was passed correct point (mouse)");
             callbackCalled = false;
-            triggerFakeMouseEvent("mousemove", c.content(), 3 * SVG_WIDTH, 3 * SVG_HEIGHT);
+            triggerFakeMouseEvent("mousemove", target, 3 * SVG_WIDTH, 3 * SVG_HEIGHT);
             assert.isFalse(callbackCalled, "callback not called again if already outside of Component (mouse)");
             callbackCalled = false;
             lastPoint = null;
-            triggerFakeTouchEvent("touchstart", c.content(), 2 * SVG_WIDTH, 2 * SVG_HEIGHT);
+            triggerFakeTouchEvent("touchstart", target, 2 * SVG_WIDTH, 2 * SVG_HEIGHT);
             assert.isFalse(callbackCalled, "not called when moving outside of the Component (touch)");
-            triggerFakeTouchEvent("touchstart", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
-            triggerFakeTouchEvent("touchstart", c.content(), 2 * SVG_WIDTH, 2 * SVG_HEIGHT);
+            triggerFakeTouchEvent("touchstart", target, SVG_WIDTH / 2, SVG_HEIGHT / 2);
+            triggerFakeTouchEvent("touchstart", target, 2 * SVG_WIDTH, 2 * SVG_HEIGHT);
             assert.isTrue(callbackCalled, "callback called on exiting Component (touch)");
             assert.deepEqual(lastPoint, { x: 2 * SVG_WIDTH, y: 2 * SVG_HEIGHT }, "was passed correct point (touch)");
             callbackCalled = false;
-            triggerFakeTouchEvent("touchstart", c.content(), 3 * SVG_WIDTH, 3 * SVG_HEIGHT);
+            triggerFakeTouchEvent("touchstart", target, 3 * SVG_WIDTH, 3 * SVG_HEIGHT);
             assert.isFalse(callbackCalled, "callback not called again if already outside of Component (touch)");
             pointerInteraction.onPointerExit(null);
-            triggerFakeMouseEvent("mousemove", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
-            triggerFakeMouseEvent("mousemove", c.content(), 2 * SVG_WIDTH, 2 * SVG_HEIGHT);
+            triggerFakeMouseEvent("mousemove", target, SVG_WIDTH / 2, SVG_HEIGHT / 2);
+            triggerFakeMouseEvent("mousemove", target, 2 * SVG_WIDTH, 2 * SVG_HEIGHT);
             assert.isFalse(callbackCalled, "callback removed by passing null");
             svg.remove();
         });
@@ -7647,7 +7655,7 @@ describe("Interactions", function () {
                 outData = hd;
             });
             testTarget.registerInteraction(hoverInteraction);
-            target = testTarget.content();
+            target = testTarget.background();
         });
         it("correctly triggers onHoverOver() callbacks (mouse events)", function () {
             overCallbackCalled = false;
@@ -7795,7 +7803,7 @@ describe("Interactions", function () {
             };
             drag.onDragStart(startCallback);
             c.registerInteraction(drag);
-            var target = c.content();
+            var target = c.background();
             triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
             assert.isTrue(startCallbackCalled, "callback was called on beginning drag (mousedown)");
             assert.deepEqual(receivedStart, startPoint, "was passed the correct point");
@@ -7832,7 +7840,7 @@ describe("Interactions", function () {
             };
             drag.onDrag(moveCallback);
             c.registerInteraction(drag);
-            var target = c.content();
+            var target = c.background();
             triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
             triggerFakeMouseEvent("mousemove", target, endPoint.x, endPoint.y);
             assert.isTrue(moveCallbackCalled, "callback was called on dragging (mousemove)");
@@ -7865,7 +7873,7 @@ describe("Interactions", function () {
             };
             drag.onDragEnd(endCallback);
             c.registerInteraction(drag);
-            var target = c.content();
+            var target = c.background();
             triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
             triggerFakeMouseEvent("mouseup", target, endPoint.x, endPoint.y);
             assert.isTrue(endCallbackCalled, "callback was called on drag ending (mouseup)");
@@ -8344,6 +8352,265 @@ describe("Dispatchers", function () {
             $("body").simulate("keydown", { keyCode: keyCodeToSend });
             assert.isTrue(keyDowned, "callback when a key was pressed");
             ked.onKeyDown(keyString, null); // clean up
+        });
+    });
+});
+
+///<reference path="../../testReference.ts" />
+var assert = chai.assert;
+describe("Interactive Components", function () {
+    describe("DragBoxLayer", function () {
+        var SVG_WIDTH = 400;
+        var SVG_HEIGHT = 400;
+        it("correctly draws box on drag", function () {
+            var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var dbl = new Plottable.Component.Interactive.DragBoxLayer();
+            dbl.renderTo(svg);
+            assert.isFalse(dbl.boxVisible(), "box is hidden initially");
+            var startPoint = {
+                x: SVG_WIDTH / 4,
+                y: SVG_HEIGHT / 4
+            };
+            var endPoint = {
+                x: SVG_WIDTH / 2,
+                y: SVG_HEIGHT / 2
+            };
+            var target = dbl.background();
+            triggerFakeDragSequence(target, startPoint, endPoint);
+            assert.isTrue(dbl.boxVisible(), "box is drawn on drag");
+            var bounds = dbl.bounds();
+            assert.deepEqual(bounds.topLeft, startPoint, "top-left point was set correctly");
+            assert.deepEqual(bounds.bottomRight, endPoint, "bottom-right point was set correctly");
+            svg.remove();
+        });
+        it("dismisses on click", function () {
+            var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var dbl = new Plottable.Component.Interactive.DragBoxLayer();
+            dbl.renderTo(svg);
+            var targetPoint = {
+                x: SVG_WIDTH / 2,
+                y: SVG_HEIGHT / 2
+            };
+            var target = dbl.background();
+            triggerFakeDragSequence(target, targetPoint, targetPoint);
+            assert.isFalse(dbl.boxVisible(), "box is hidden on click");
+            svg.remove();
+        });
+        it("detectionRadius()", function () {
+            var dbl = new Plottable.Component.Interactive.DragBoxLayer();
+            assert.doesNotThrow(function () { return dbl.detectionRadius(3); }, Error, "can set detection radius before anchoring");
+            var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            dbl.renderTo("svg");
+            var radius = 5;
+            dbl.detectionRadius(radius);
+            assert.strictEqual(dbl.detectionRadius(), radius, "can retrieve the detection radius");
+            var edges = dbl.content().selectAll("line");
+            edges.each(function () {
+                var edge = d3.select(this);
+                assert.strictEqual(edge.style("stroke-width"), 2 * radius, "edge width was set correctly");
+            });
+            var corners = dbl.content().selectAll("circle");
+            corners.each(function () {
+                var corner = d3.select(this);
+                assert.strictEqual(corner.attr("r"), radius, "corner radius was set correctly");
+            });
+            // HACKHACK: chai-assert.d.ts has the wrong signature
+            assert.throws(function () { return dbl.detectionRadius(-1); }, Error, "", "rejects negative values");
+            svg.remove();
+        });
+        it("onDragStart()", function () {
+            var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var dbl = new Plottable.Component.Interactive.DragBoxLayer();
+            dbl.renderTo(svg);
+            var startPoint = {
+                x: SVG_WIDTH / 4,
+                y: SVG_HEIGHT / 4
+            };
+            var endPoint = {
+                x: SVG_WIDTH / 2,
+                y: SVG_HEIGHT / 2
+            };
+            var receivedBounds;
+            var callback = function (b) {
+                receivedBounds = b;
+            };
+            dbl.onDragStart(callback);
+            var target = dbl.background();
+            triggerFakeDragSequence(target, startPoint, endPoint);
+            assert.deepEqual(receivedBounds.topLeft, startPoint, "top-left point was set correctly");
+            assert.deepEqual(receivedBounds.bottomRight, startPoint, "bottom-right point was set correctly");
+            assert.strictEqual(dbl.onDragStart(), callback, "can retrieve callback by calling with no args");
+            dbl.onDragStart(null);
+            assert.isNull(dbl.onDragStart(), "can blank callback by passing null");
+            svg.remove();
+        });
+        it("onDrag()", function () {
+            var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var dbl = new Plottable.Component.Interactive.DragBoxLayer();
+            dbl.renderTo(svg);
+            var startPoint = {
+                x: SVG_WIDTH / 4,
+                y: SVG_HEIGHT / 4
+            };
+            var endPoint = {
+                x: SVG_WIDTH / 2,
+                y: SVG_HEIGHT / 2
+            };
+            var receivedBounds;
+            var callback = function (b) {
+                receivedBounds = b;
+            };
+            dbl.onDrag(callback);
+            var target = dbl.background();
+            triggerFakeDragSequence(target, startPoint, endPoint);
+            assert.deepEqual(receivedBounds.topLeft, startPoint, "top-left point was set correctly");
+            assert.deepEqual(receivedBounds.bottomRight, endPoint, "bottom-right point was set correctly");
+            assert.strictEqual(dbl.onDrag(), callback, "can retrieve callback by calling with no args");
+            dbl.onDrag(null);
+            assert.isNull(dbl.onDrag(), "can blank callback by passing null");
+            svg.remove();
+        });
+        it("onDragEnd()", function () {
+            var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var dbl = new Plottable.Component.Interactive.DragBoxLayer();
+            dbl.renderTo(svg);
+            var startPoint = {
+                x: SVG_WIDTH / 4,
+                y: SVG_HEIGHT / 4
+            };
+            var endPoint = {
+                x: SVG_WIDTH / 2,
+                y: SVG_HEIGHT / 2
+            };
+            var receivedBounds;
+            var callback = function (b) {
+                receivedBounds = b;
+            };
+            dbl.onDragEnd(callback);
+            var target = dbl.background();
+            triggerFakeDragSequence(target, startPoint, endPoint);
+            assert.deepEqual(receivedBounds.topLeft, startPoint, "top-left point was set correctly");
+            assert.deepEqual(receivedBounds.bottomRight, endPoint, "bottom-right point was set correctly");
+            assert.strictEqual(dbl.onDragEnd(), callback, "can retrieve callback by calling with no args");
+            dbl.onDragEnd(null);
+            assert.isNull(dbl.onDragEnd(), "can blank callback by passing null");
+            svg.remove();
+        });
+        describe("resizing", function () {
+            var svg;
+            var dbl;
+            var target;
+            var midPoint = {
+                x: SVG_WIDTH / 2,
+                y: SVG_HEIGHT / 2
+            };
+            var initialBounds;
+            function resetBox() {
+                dbl.bounds({
+                    topLeft: { x: 0, y: 0 },
+                    bottomRight: { x: 0, y: 0 }
+                });
+                triggerFakeDragSequence(target, { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 }, { x: SVG_WIDTH * 3 / 4, y: SVG_HEIGHT * 3 / 4 });
+                initialBounds = dbl.bounds();
+            }
+            beforeEach(function () {
+                svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+                dbl = new Plottable.Component.Interactive.DragBoxLayer();
+                dbl.renderTo(svg);
+                target = dbl.background();
+                resetBox();
+            });
+            it("resizable() defaults to false", function () {
+                assert.isFalse(dbl.resizable(), "defaults to false");
+                svg.remove();
+            });
+            it("resize from top edge", function () {
+                dbl.resizable(true);
+                triggerFakeDragSequence(target, { x: midPoint.x, y: initialBounds.topLeft.y }, { x: midPoint.x, y: 0 });
+                var bounds = dbl.bounds();
+                assert.strictEqual(bounds.topLeft.y, 0, "top edge was repositioned");
+                assert.strictEqual(bounds.bottomRight.y, initialBounds.bottomRight.y, "bottom edge was not moved");
+                assert.strictEqual(bounds.topLeft.x, initialBounds.topLeft.x, "left edge was not moved");
+                assert.strictEqual(bounds.bottomRight.x, initialBounds.bottomRight.x, "right edge was not moved");
+                resetBox();
+                triggerFakeDragSequence(target, { x: midPoint.x, y: initialBounds.topLeft.y }, { x: midPoint.x, y: SVG_HEIGHT });
+                bounds = dbl.bounds();
+                assert.strictEqual(bounds.bottomRight.y, SVG_HEIGHT, "can drag through to other side");
+                svg.remove();
+            });
+            it("resize from bottom edge", function () {
+                dbl.resizable(true);
+                triggerFakeDragSequence(target, { x: midPoint.x, y: initialBounds.bottomRight.y }, { x: midPoint.x, y: SVG_HEIGHT });
+                var bounds = dbl.bounds();
+                assert.strictEqual(bounds.topLeft.y, initialBounds.topLeft.y, "top edge was not moved");
+                assert.strictEqual(bounds.bottomRight.y, SVG_HEIGHT, "bottom edge was repositioned");
+                assert.strictEqual(bounds.topLeft.x, initialBounds.topLeft.x, "left edge was not moved");
+                assert.strictEqual(bounds.bottomRight.x, initialBounds.bottomRight.x, "right edge was not moved");
+                resetBox();
+                triggerFakeDragSequence(target, { x: midPoint.x, y: initialBounds.bottomRight.y }, { x: midPoint.x, y: 0 });
+                bounds = dbl.bounds();
+                assert.strictEqual(bounds.topLeft.y, 0, "can drag through to other side");
+                svg.remove();
+            });
+            it("resize from left edge", function () {
+                dbl.resizable(true);
+                triggerFakeDragSequence(target, { x: initialBounds.topLeft.x, y: midPoint.y }, { x: 0, y: midPoint.y });
+                var bounds = dbl.bounds();
+                assert.strictEqual(bounds.topLeft.y, initialBounds.topLeft.y, "top edge was not moved");
+                assert.strictEqual(bounds.bottomRight.y, initialBounds.bottomRight.y, "bottom edge was not moved");
+                assert.strictEqual(bounds.topLeft.x, 0, "left edge was repositioned");
+                assert.strictEqual(bounds.bottomRight.x, initialBounds.bottomRight.x, "right edge was not moved");
+                resetBox();
+                triggerFakeDragSequence(target, { x: initialBounds.topLeft.x, y: midPoint.y }, { x: SVG_WIDTH, y: midPoint.y });
+                bounds = dbl.bounds();
+                assert.strictEqual(bounds.bottomRight.x, SVG_WIDTH, "can drag through to other side");
+                svg.remove();
+            });
+            it("resize from right edge", function () {
+                dbl.resizable(true);
+                triggerFakeDragSequence(target, { x: initialBounds.bottomRight.x, y: midPoint.y }, { x: SVG_WIDTH, y: midPoint.y });
+                var bounds = dbl.bounds();
+                assert.strictEqual(bounds.topLeft.y, initialBounds.topLeft.y, "top edge was not moved");
+                assert.strictEqual(bounds.bottomRight.y, initialBounds.bottomRight.y, "bottom edge was not moved");
+                assert.strictEqual(bounds.topLeft.x, initialBounds.topLeft.x, "left edge was not moved");
+                assert.strictEqual(bounds.bottomRight.x, SVG_WIDTH, "right edge was repositioned");
+                resetBox();
+                triggerFakeDragSequence(target, { x: initialBounds.bottomRight.x, y: midPoint.y }, { x: 0, y: midPoint.y });
+                bounds = dbl.bounds();
+                assert.strictEqual(bounds.topLeft.x, 0, "can drag through to other side");
+                svg.remove();
+            });
+            it("resizes if grabbed within detectionRadius()", function () {
+                dbl.resizable(true);
+                var detectionRadius = dbl.detectionRadius();
+                triggerFakeDragSequence(target, { x: midPoint.x, y: initialBounds.bottomRight.y + detectionRadius - 1 }, { x: midPoint.x, y: SVG_HEIGHT });
+                var bounds = dbl.bounds();
+                assert.strictEqual(bounds.topLeft.y, initialBounds.topLeft.y, "top edge was not moved");
+                assert.strictEqual(bounds.bottomRight.y, SVG_HEIGHT, "bottom edge was repositioned");
+                assert.strictEqual(bounds.topLeft.x, initialBounds.topLeft.x, "left edge was not moved");
+                assert.strictEqual(bounds.bottomRight.x, initialBounds.bottomRight.x, "right edge was not moved");
+                resetBox();
+                var startYOutside = initialBounds.bottomRight.y + detectionRadius + 1;
+                triggerFakeDragSequence(target, { x: midPoint.x, y: startYOutside }, { x: midPoint.x, y: SVG_HEIGHT });
+                bounds = dbl.bounds();
+                assert.strictEqual(bounds.topLeft.y, startYOutside, "new box was started at the drag start position");
+                svg.remove();
+            });
+            it("doesn't dismiss on no-op resize", function () {
+                dbl.resizable(true);
+                triggerFakeDragSequence(target, { x: midPoint.x, y: initialBounds.topLeft.y }, { x: midPoint.x, y: initialBounds.topLeft.y });
+                var bounds = dbl.bounds();
+                assert.isTrue(dbl.boxVisible(), "box was not dismissed");
+                svg.remove();
+            });
+            it("can't resize if hidden", function () {
+                dbl.resizable(true);
+                dbl.boxVisible(false);
+                triggerFakeDragSequence(target, { x: midPoint.x, y: initialBounds.bottomRight.y }, { x: midPoint.x, y: SVG_HEIGHT });
+                var bounds = dbl.bounds();
+                assert.strictEqual(bounds.topLeft.y, initialBounds.bottomRight.y, "new box was started at the drag start position");
+                svg.remove();
+            });
         });
     });
 });
