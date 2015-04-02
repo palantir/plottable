@@ -8672,7 +8672,8 @@ describe("Interactive Components", function () {
             triggerFakeDragSequence(target, actualBounds.bottomRight, dragTo);
             actualBounds = dbl.bounds();
             assert.strictEqual(actualBounds.bottomRight.x, dragTo.x, "resized in x");
-            assert.strictEqual(actualBounds.bottomRight.y, dbl.height(), "height did not change");
+            assert.strictEqual(actualBounds.topLeft.y, 0, "box still starts at top");
+            assert.strictEqual(actualBounds.bottomRight.y, dbl.height(), "box still ends at bottom");
             svg.remove();
         });
     });
@@ -8734,7 +8735,8 @@ describe("Interactive Components", function () {
             var target = dbl.background();
             triggerFakeDragSequence(target, actualBounds.bottomRight, dragTo);
             actualBounds = dbl.bounds();
-            assert.strictEqual(actualBounds.bottomRight.x, dbl.width(), "width did not change");
+            assert.strictEqual(actualBounds.topLeft.x, 0, "box still starts at left");
+            assert.strictEqual(actualBounds.bottomRight.x, dbl.width(), "box still ends at right");
             assert.strictEqual(actualBounds.bottomRight.y, dragTo.y, "resized in y");
             svg.remove();
         });

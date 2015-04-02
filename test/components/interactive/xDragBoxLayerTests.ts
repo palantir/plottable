@@ -66,7 +66,8 @@ describe("Interactive Components", () => {
       triggerFakeDragSequence(target, actualBounds.bottomRight, dragTo);
       actualBounds = dbl.bounds();
       assert.strictEqual(actualBounds.bottomRight.x, dragTo.x, "resized in x");
-      assert.strictEqual(actualBounds.bottomRight.y, dbl.height(), "height did not change");
+      assert.strictEqual(actualBounds.topLeft.y, 0, "box still starts at top");
+      assert.strictEqual(actualBounds.bottomRight.y, dbl.height(), "box still ends at bottom");
       svg.remove();
     });
   });

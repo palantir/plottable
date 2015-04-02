@@ -10041,20 +10041,22 @@ var Plottable;
                         left: false,
                         right: false
                     };
+                    if (!this.resizable()) {
+                        return edges;
+                    }
                     var bounds = this.bounds();
                     var t = bounds.topLeft.y;
                     var b = bounds.bottomRight.y;
                     var l = bounds.topLeft.x;
                     var r = bounds.bottomRight.x;
                     var rad = this._detectionRadius;
-                    var resizable = this.resizable();
                     if (l - rad <= p.x && p.x <= r + rad) {
-                        edges.top = resizable && (t - rad <= p.y && p.y <= t + rad);
-                        edges.bottom = resizable && (b - rad <= p.y && p.y <= b + rad);
+                        edges.top = (t - rad <= p.y && p.y <= t + rad);
+                        edges.bottom = (b - rad <= p.y && p.y <= b + rad);
                     }
                     if (t - rad <= p.y && p.y <= b + rad) {
-                        edges.left = resizable && (l - rad <= p.x && p.x <= l + rad);
-                        edges.right = resizable && (r - rad <= p.x && p.x <= r + rad);
+                        edges.left = (l - rad <= p.x && p.x <= l + rad);
+                        edges.right = (r - rad <= p.x && p.x <= r + rad);
                     }
                     return edges;
                 };
