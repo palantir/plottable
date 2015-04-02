@@ -3910,6 +3910,29 @@ declare module Plottable {
         class Drag extends AbstractInteraction {
             _anchor(component: Component.AbstractComponent, hitBox: D3.Selection): void;
             /**
+             * Returns whether or not this Interaction constrains Points passed to its
+             * callbacks to lie inside its Component.
+             *
+             * If true, when the user drags outside of the Component, the closest Point
+             * inside the Component will be passed to the callback instead of the actual
+             * cursor position.
+             *
+             * @return {boolean} Whether or not the Interaction.Drag constrains.
+             */
+            constrain(): boolean;
+            /**
+             * Sets whether or not this Interaction constrains Points passed to its
+             * callbacks to lie inside its Component.
+             *
+             * If true, when the user drags outside of the Component, the closest Point
+             * inside the Component will be passed to the callback instead of the actual
+             * cursor position.
+             *
+             * @param {boolean} doConstrain Whether or not to constrain Points.
+             * @return {Interaction.Drag} The calling Interaction.Drag.
+             */
+            constrain(doConstrain: boolean): Drag;
+            /**
              * Gets the callback that is called when dragging starts.
              *
              * @returns {(start: Point) => any} The callback called when dragging starts.

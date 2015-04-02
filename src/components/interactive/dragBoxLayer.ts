@@ -39,32 +39,33 @@ export module Component {
       }
 
       private _setUpCallbacks() {
-        var grabbedEdges: _EdgeIndicator;
+        var resizingEdges: _EdgeIndicator;
         var topLeft: Point;
         var bottomRight: Point;
+        var startedNewBox: boolean;
 
         this._dragInteraction.onDragStart((s: Point) => {
-          grabbedEdges = this._getEdges(s);
+          resizingEdges = this._getEdges(s);
           if (!this._yResizable) {
-            grabbedEdges.top = false;
-            grabbedEdges.bottom = false;
+            resizingEdges.top = false;
+            resizingEdges.bottom = false;
           }
           if (!this._xResizable) {
-            grabbedEdges.left = false;
-            grabbedEdges.right = false;
+            resizingEdges.left = false;
+            resizingEdges.right = false;
           }
 
           if (!this.boxVisible() ||
-              (!grabbedEdges.top && !grabbedEdges.bottom &&
-               !grabbedEdges.left && !grabbedEdges.right)
+              (!resizingEdges.top && !resizingEdges.bottom &&
+               !resizingEdges.left && !resizingEdges.right)
              ) {
             this.bounds({
               topLeft: s,
               bottomRight: s
             });
-            // a new box is effectively "grabbed" at the bottom-right corner
-            grabbedEdges.bottom = true;
-            grabbedEdges.right = true;
+            startedNewBox = true;
+          } else {
+            startedNewBox = false;
           }
 
           this.boxVisible(true);
@@ -78,16 +79,21 @@ export module Component {
         });
 
         this._dragInteraction.onDrag((s: Point, e: Point) => {
-          if (grabbedEdges.bottom) {
-            bottomRight.y = e.y;
-          } else if (grabbedEdges.top) {
-            topLeft.y = e.y;
-          }
-
-          if (grabbedEdges.right) {
+          if (startedNewBox) {
             bottomRight.x = e.x;
-          } else if (grabbedEdges.left) {
-            topLeft.x = e.x;
+            bottomRight.y = e.y;
+          } else {
+            if (resizingEdges.bottom) {
+              bottomRight.y = e.y;
+            } else if (resizingEdges.top) {
+              topLeft.y = e.y;
+            }
+
+            if (resizingEdges.right) {
+              bottomRight.x = e.x;
+            } else if (resizingEdges.left) {
+              topLeft.x = e.x;
+            }
           }
 
           this.bounds({
@@ -101,7 +107,7 @@ export module Component {
         });
 
         this._dragInteraction.onDragEnd((s: Point, e: Point) => {
-          if (s.x === e.x && s.y === e.y) {
+          if (startedNewBox && s.x === e.x && s.y === e.y) {
             this.boxVisible(false);
           }
 

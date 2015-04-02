@@ -7790,7 +7790,7 @@ describe("Interactions", function () {
             x: 0,
             y: 0
         };
-        it("onDragStart", function () {
+        it("onDragStart()", function () {
             var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
             var c = new Plottable.Component.AbstractComponent();
             c.renderTo(svg);
@@ -7825,7 +7825,7 @@ describe("Interactions", function () {
             assert.isNull(drag.onDragStart(), "removes the callback if called with null");
             svg.remove();
         });
-        it("onDrag", function () {
+        it("onDrag()", function () {
             var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
             var c = new Plottable.Component.AbstractComponent();
             c.renderTo(svg);
@@ -7853,21 +7853,12 @@ describe("Interactions", function () {
             assert.isTrue(moveCallbackCalled, "callback was called on dragging (touchmove)");
             assert.deepEqual(receivedStart, startPoint, "was passed the correct starting point");
             assert.deepEqual(receivedEnd, endPoint, "was passed the correct current point");
-            triggerFakeMouseEvent("mousemove", target, outsidePointPos.x, outsidePointPos.y);
-            assert.deepEqual(receivedEnd, constrainedPos, "dragging outside the Component is constrained (positive) (mousemove)");
-            triggerFakeMouseEvent("mousemove", target, outsidePointNeg.x, outsidePointNeg.y);
-            assert.deepEqual(receivedEnd, constrainedNeg, "dragging outside the Component is constrained (negative) (mousemove)");
-            receivedEnd = null;
-            triggerFakeTouchEvent("touchmove", target, outsidePointPos.x, outsidePointPos.y);
-            assert.deepEqual(receivedEnd, constrainedPos, "dragging outside the Component is constrained (positive) (touchmove)");
-            triggerFakeTouchEvent("touchmove", target, outsidePointNeg.x, outsidePointNeg.y);
-            assert.deepEqual(receivedEnd, constrainedNeg, "dragging outside the Component is constrained (negative) (touchmove)");
             assert.strictEqual(drag.onDrag(), moveCallback, "retrieves the callback if called with no arguments");
             drag.onDrag(null);
             assert.isNull(drag.onDrag(), "removes the callback if called with null");
             svg.remove();
         });
-        it("onDragEnd", function () {
+        it("onDragEnd()", function () {
             var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
             var c = new Plottable.Component.AbstractComponent();
             c.renderTo(svg);
@@ -7895,6 +7886,42 @@ describe("Interactions", function () {
             assert.isTrue(endCallbackCalled, "callback was called on drag ending (touchend)");
             assert.deepEqual(receivedStart, startPoint, "was passed the correct starting point");
             assert.deepEqual(receivedEnd, endPoint, "was passed the correct current point");
+            assert.strictEqual(drag.onDragEnd(), endCallback, "retrieves the callback if called with no arguments");
+            drag.onDragEnd(null);
+            assert.isNull(drag.onDragEnd(), "removes the callback if called with null");
+            svg.remove();
+        });
+        it("constrain()", function () {
+            var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var c = new Plottable.Component.AbstractComponent();
+            c.renderTo(svg);
+            var drag = new Plottable.Interaction.Drag();
+            assert.isTrue(drag.constrain(), "constrains by default");
+            var receivedStart;
+            var receivedEnd;
+            var moveCallback = function (start, end) {
+                receivedStart = start;
+                receivedEnd = end;
+            };
+            drag.onDrag(moveCallback);
+            var endCallback = function (start, end) {
+                receivedStart = start;
+                receivedEnd = end;
+            };
+            drag.onDragEnd(endCallback);
+            c.registerInteraction(drag);
+            var target = c.content();
+            triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
+            triggerFakeMouseEvent("mousemove", target, outsidePointPos.x, outsidePointPos.y);
+            assert.deepEqual(receivedEnd, constrainedPos, "dragging outside the Component is constrained (positive) (mousemove)");
+            triggerFakeMouseEvent("mousemove", target, outsidePointNeg.x, outsidePointNeg.y);
+            assert.deepEqual(receivedEnd, constrainedNeg, "dragging outside the Component is constrained (negative) (mousemove)");
+            receivedEnd = null;
+            triggerFakeTouchEvent("touchmove", target, outsidePointPos.x, outsidePointPos.y);
+            assert.deepEqual(receivedEnd, constrainedPos, "dragging outside the Component is constrained (positive) (touchmove)");
+            triggerFakeTouchEvent("touchmove", target, outsidePointNeg.x, outsidePointNeg.y);
+            assert.deepEqual(receivedEnd, constrainedNeg, "dragging outside the Component is constrained (negative) (touchmove)");
+            receivedEnd = null;
             triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
             triggerFakeMouseEvent("mouseup", target, outsidePointPos.x, outsidePointPos.y);
             assert.deepEqual(receivedEnd, constrainedPos, "dragging outside the Component is constrained (positive) (mouseup)");
@@ -7908,9 +7935,31 @@ describe("Interactions", function () {
             triggerFakeTouchEvent("touchstart", target, startPoint.x, startPoint.y);
             triggerFakeTouchEvent("touchend", target, outsidePointNeg.x, outsidePointNeg.y);
             assert.deepEqual(receivedEnd, constrainedNeg, "dragging outside the Component is constrained (negative) (touchend)");
-            assert.strictEqual(drag.onDragEnd(), endCallback, "retrieves the callback if called with no arguments");
-            drag.onDragEnd(null);
-            assert.isNull(drag.onDragEnd(), "removes the callback if called with null");
+            drag.constrain(false);
+            triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
+            triggerFakeMouseEvent("mousemove", target, outsidePointPos.x, outsidePointPos.y);
+            assert.deepEqual(receivedEnd, outsidePointPos, "dragging outside the Component is no longer constrained (positive) (mousemove)");
+            triggerFakeMouseEvent("mousemove", target, outsidePointNeg.x, outsidePointNeg.y);
+            assert.deepEqual(receivedEnd, outsidePointNeg, "dragging outside the Component is no longer constrained (negative) (mousemove)");
+            receivedEnd = null;
+            triggerFakeTouchEvent("touchmove", target, outsidePointPos.x, outsidePointPos.y);
+            assert.deepEqual(receivedEnd, outsidePointPos, "dragging outside the Component is no longer constrained (positive) (touchmove)");
+            triggerFakeTouchEvent("touchmove", target, outsidePointNeg.x, outsidePointNeg.y);
+            assert.deepEqual(receivedEnd, outsidePointNeg, "dragging outside the Component is no longer constrained (negative) (touchmove)");
+            receivedEnd = null;
+            triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
+            triggerFakeMouseEvent("mouseup", target, outsidePointPos.x, outsidePointPos.y);
+            assert.deepEqual(receivedEnd, outsidePointPos, "dragging outside the Component is no longer constrained (positive) (mouseup)");
+            triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
+            triggerFakeMouseEvent("mouseup", target, outsidePointNeg.x, outsidePointNeg.y);
+            assert.deepEqual(receivedEnd, outsidePointNeg, "dragging outside the Component is no longer constrained (negative) (mouseup)");
+            receivedEnd = null;
+            triggerFakeTouchEvent("touchstart", target, startPoint.x, startPoint.y);
+            triggerFakeTouchEvent("touchend", target, outsidePointPos.x, outsidePointPos.y);
+            assert.deepEqual(receivedEnd, outsidePointPos, "dragging outside the Component is no longer constrained (positive) (touchend)");
+            triggerFakeTouchEvent("touchstart", target, startPoint.x, startPoint.y);
+            triggerFakeTouchEvent("touchend", target, outsidePointNeg.x, outsidePointNeg.y);
+            assert.deepEqual(receivedEnd, outsidePointNeg, "dragging outside the Component is no longer constrained (negative) (touchend)");
             svg.remove();
         });
     });
@@ -8545,6 +8594,13 @@ describe("Interactive Components", function () {
                 triggerFakeDragSequence(target, { x: midPoint.x, y: startYOutside }, { x: midPoint.x, y: SVG_HEIGHT });
                 bounds = dbl.bounds();
                 assert.strictEqual(bounds.topLeft.y, startYOutside, "new box was started at the drag start position");
+                svg.remove();
+            });
+            it("doesn't dismiss on no-op resize", function () {
+                dbl.resizable(true);
+                triggerFakeDragSequence(target, { x: midPoint.x, y: initialBounds.topLeft.y }, { x: midPoint.x, y: initialBounds.topLeft.y });
+                var bounds = dbl.bounds();
+                assert.isTrue(dbl.boxVisible(), "box was not dismissed");
                 svg.remove();
             });
             it("can't resize if hidden", function () {

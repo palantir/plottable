@@ -9694,6 +9694,7 @@ var Plottable;
             function Drag() {
                 _super.apply(this, arguments);
                 this._dragging = false;
+                this._constrain = true;
             }
             Drag.prototype._anchor = function (component, hitBox) {
                 var _this = this;
@@ -9709,6 +9710,9 @@ var Plottable;
             };
             Drag.prototype._translateAndConstrain = function (p) {
                 var translatedP = this._translateToComponentSpace(p);
+                if (!this._constrain) {
+                    return translatedP;
+                }
                 return {
                     x: Plottable._Util.Methods.clamp(translatedP.x, 0, this._componentToListenTo.width()),
                     y: Plottable._Util.Methods.clamp(translatedP.y, 0, this._componentToListenTo.height())
@@ -9741,6 +9745,13 @@ var Plottable;
                         this._dragEndCallback(this._dragOrigin, constrainedP);
                     }
                 }
+            };
+            Drag.prototype.constrain = function (doConstrain) {
+                if (doConstrain == null) {
+                    return this._constrain;
+                }
+                this._constrain = doConstrain;
+                return this;
             };
             Drag.prototype.onDragStart = function (cb) {
                 if (cb === undefined) {
@@ -9943,27 +9954,29 @@ var Plottable;
                 }
                 DragBoxLayer.prototype._setUpCallbacks = function () {
                     var _this = this;
-                    var grabbedEdges;
+                    var resizingEdges;
                     var topLeft;
                     var bottomRight;
+                    var startedNewBox;
                     this._dragInteraction.onDragStart(function (s) {
-                        grabbedEdges = _this._getEdges(s);
+                        resizingEdges = _this._getEdges(s);
                         if (!_this._yResizable) {
-                            grabbedEdges.top = false;
-                            grabbedEdges.bottom = false;
+                            resizingEdges.top = false;
+                            resizingEdges.bottom = false;
                         }
                         if (!_this._xResizable) {
-                            grabbedEdges.left = false;
-                            grabbedEdges.right = false;
+                            resizingEdges.left = false;
+                            resizingEdges.right = false;
                         }
-                        if (!_this.boxVisible() || (!grabbedEdges.top && !grabbedEdges.bottom && !grabbedEdges.left && !grabbedEdges.right)) {
+                        if (!_this.boxVisible() || (!resizingEdges.top && !resizingEdges.bottom && !resizingEdges.left && !resizingEdges.right)) {
                             _this.bounds({
                                 topLeft: s,
                                 bottomRight: s
                             });
-                            // a new box is effectively "grabbed" at the bottom-right corner
-                            grabbedEdges.bottom = true;
-                            grabbedEdges.right = true;
+                            startedNewBox = true;
+                        }
+                        else {
+                            startedNewBox = false;
                         }
                         _this.boxVisible(true);
                         var bounds = _this.bounds();
@@ -9975,17 +9988,23 @@ var Plottable;
                         }
                     });
                     this._dragInteraction.onDrag(function (s, e) {
-                        if (grabbedEdges.bottom) {
+                        if (startedNewBox) {
+                            bottomRight.x = e.x;
                             bottomRight.y = e.y;
                         }
-                        else if (grabbedEdges.top) {
-                            topLeft.y = e.y;
-                        }
-                        if (grabbedEdges.right) {
-                            bottomRight.x = e.x;
-                        }
-                        else if (grabbedEdges.left) {
-                            topLeft.x = e.x;
+                        else {
+                            if (resizingEdges.bottom) {
+                                bottomRight.y = e.y;
+                            }
+                            else if (resizingEdges.top) {
+                                topLeft.y = e.y;
+                            }
+                            if (resizingEdges.right) {
+                                bottomRight.x = e.x;
+                            }
+                            else if (resizingEdges.left) {
+                                topLeft.x = e.x;
+                            }
                         }
                         _this.bounds({
                             topLeft: topLeft,
@@ -9996,7 +10015,7 @@ var Plottable;
                         }
                     });
                     this._dragInteraction.onDragEnd(function (s, e) {
-                        if (s.x === e.x && s.y === e.y) {
+                        if (startedNewBox && s.x === e.x && s.y === e.y) {
                             _this.boxVisible(false);
                         }
                         if (_this._dragEndCallback) {
