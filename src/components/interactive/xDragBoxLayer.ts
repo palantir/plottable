@@ -4,6 +4,11 @@ module Plottable {
 export module Component {
   export module Interactive {
     export class XDragBoxLayer extends DragBoxLayer {
+      constructor() {
+        super();
+        this.classed("x-drag-box-layer", true);
+      }
+
       protected _setBounds(newBounds: Bounds) {
         super._setBounds({
           topLeft: { x: newBounds.topLeft.x, y: 0 },
