@@ -6904,7 +6904,19 @@ var Plottable;
                 return (typeof input === "number") ? { min: input, max: input } : input;
             };
             AbstractPlot.prototype._getPlotData = function (xExtent, yExtent, datasetKeys) {
-                return null;
+                var data = [];
+                var pixelPoints = [];
+                var selections = [];
+                var plotData = this.getAllPlotData(datasetKeys);
+                plotData.selection.each(function (datum, index) {
+                    var bbox = this.getBBox();
+                    if (bbox.x + bbox.width >= xExtent.min && bbox.x <= xExtent.max && bbox.y + bbox.height >= yExtent.min && bbox.y <= yExtent.max) {
+                        data.push(plotData.data[index]);
+                        pixelPoints.push(plotData.pixelPoints[index]);
+                        selections.push(this);
+                    }
+                });
+                return { data: data, pixelPoints: pixelPoints, selection: d3.selectAll(selections) };
             };
             return AbstractPlot;
         })(Plottable.Component.AbstractComponent);
