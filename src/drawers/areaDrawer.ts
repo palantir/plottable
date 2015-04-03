@@ -8,6 +8,13 @@ export module _Drawer {
     private _areaSelection: D3.Selection;
     private _drawLine = true;
 
+    constructor(key: string, interpolationMode?: string) {
+      super(key);
+      if (interpolationMode !== null) {
+        this._interpolationMode = interpolationMode;
+      }
+    }
+
     protected _enterData(data: any[]) {
       if (this._drawLine) {
         super._enterData(data);
@@ -47,11 +54,17 @@ export module _Drawer {
         definedFunction = () => true;
       }
 
-      return d3.svg.area()
-                   .x(xFunction)
-                   .y0(y0Function)
-                   .y1(y1Function)
-                   .defined(definedFunction);
+      var area = d3.svg.area()
+              .x(xFunction)
+              .y0(y0Function)
+              .y1(y1Function)
+              .defined(definedFunction);
+
+      if (this._interpolationMode) {
+        area.interpolate(this._interpolationMode);
+      }
+
+      return area;
     }
 
     protected _drawStep(step: AppliedDrawStep) {

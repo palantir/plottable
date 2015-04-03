@@ -5,6 +5,7 @@ export module Plot {
   export class AbstractXYPlot<X,Y> extends AbstractPlot {
     protected _xScale: Scale.AbstractScale<X, number>;
     protected _yScale: Scale.AbstractScale<Y, number>;
+    protected _interpolationMode: string;
     private _autoAdjustXScaleDomain = false;
     private _autoAdjustYScaleDomain = false;
 
@@ -154,6 +155,13 @@ export module Plot {
       if(!this._autoAdjustYScaleDomain) {
         this._yScale.autoDomain();
       }
+    }
+
+    /**
+     * Sets an interpolation mode.
+     */
+    public interpolate(interpolationMode: string) {
+      this._interpolationMode = interpolationMode;
     }
 
     private _adjustYDomainOnChangeFromX() {

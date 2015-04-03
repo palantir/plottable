@@ -7,6 +7,13 @@ export module _Drawer {
 
     private _pathSelection: D3.Selection;
 
+    constructor(key: string, interpolationMode?: string) {
+      super(key);
+      if (interpolationMode !== null) {
+        this._interpolationMode = interpolationMode;
+      }
+    }
+
     protected _enterData(data: any[]) {
       super._enterData(data);
       this._pathSelection.datum(data);
@@ -27,10 +34,16 @@ export module _Drawer {
         definedFunction = (d, i) => true;
       }
 
-      return d3.svg.line()
+      var line = d3.svg.line()
                    .x(xFunction)
                    .y(yFunction)
                    .defined(definedFunction);
+
+      if (this._interpolationMode) {
+        line.interpolate(this._interpolationMode);
+      }
+
+      return line;
     }
 
     protected _numberOfAnimationIterations(data: any[]): number {

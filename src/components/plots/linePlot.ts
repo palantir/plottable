@@ -41,7 +41,7 @@ export module Plot {
     }
 
     protected _getDrawer(key: string) {
-      return new Plottable._Drawer.Line(key);
+      return new Plottable._Drawer.Line(key, this._interpolationMode);
     }
 
     protected _getResetYFunction() {

@@ -1458,6 +1458,7 @@ declare module Plottable {
             protected _className: string;
             key: string;
             protected _attrToProjector: AttributeToAppliedProjector;
+            protected _interpolationMode: string;
             /**
              * Sets the class, which needs to be applied to bound elements.
              *
@@ -1518,6 +1519,7 @@ declare module Plottable {
     module _Drawer {
         class Line extends AbstractDrawer {
             static LINE_CLASS: string;
+            constructor(key: string, interpolationMode?: string);
             protected _enterData(data: any[]): void;
             setup(area: D3.Selection): void;
             protected _numberOfAnimationIterations(data: any[]): number;
@@ -1534,6 +1536,7 @@ declare module Plottable {
     module _Drawer {
         class Area extends Line {
             static AREA_CLASS: string;
+            constructor(key: string, interpolationMode?: string);
             protected _enterData(data: any[]): void;
             /**
              * Sets the value determining if line should be drawn.
@@ -2836,6 +2839,7 @@ declare module Plottable {
         class AbstractXYPlot<X, Y> extends AbstractPlot {
             protected _xScale: Scale.AbstractScale<X, number>;
             protected _yScale: Scale.AbstractScale<Y, number>;
+            protected _interpolationMode: string;
             /**
              * Constructs an XYPlot.
              *
@@ -2882,6 +2886,10 @@ declare module Plottable {
              * This call does not override auto domain adjustment behavior over visible points.
              */
             showAllData(): void;
+            /**
+             * Sets an interpolation mode.
+             */
+            interpolate(interpolationMode: string): void;
             protected _normalizeDatasets<A, B>(fromX: boolean): {
                 a: A;
                 b: B;
