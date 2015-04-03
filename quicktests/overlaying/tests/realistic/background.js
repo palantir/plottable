@@ -96,5 +96,3 @@ function run(svg, data, Plottable){
   .style('fill', '#33e4e9')
   .style('opacity', 0.1);
 }
-
-

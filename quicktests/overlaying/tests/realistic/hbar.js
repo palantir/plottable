@@ -61,6 +61,4 @@ function run(svg, data, Plottable){
 
     var clickInteraction = new Plottable.Interaction.Click().callback(flipDomain);
     plot.registerInteraction(clickInteraction);
-
-
 }
