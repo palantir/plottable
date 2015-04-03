@@ -61,8 +61,6 @@ function run(svg, data, Plottable) {
       dataseries1.data(d);
     };
 
-    renderAreaD1.registerInteraction(
-      new Plottable.Interaction.Click(renderAreaD1).callback(cb)
-    );
+    renderAreaD1.registerInteraction(new Plottable.Interaction.Click().onClick(cb));
 
 }

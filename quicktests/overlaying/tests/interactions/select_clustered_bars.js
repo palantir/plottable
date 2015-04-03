@@ -30,7 +30,7 @@ function run(svg, data, Plottable) {
 
   var clickInteraction = new Plottable.Interaction.Click();
   barPlot.registerInteraction(clickInteraction);
-  clickInteraction.callback(function (p) {
+  clickInteraction.onClick(function (p) {
     var selectedBar = barPlot.selectBar(p.x, p.y, true);
     if (selectedBar == null) {
       d3.selectAll(".selected").style("fill", null);

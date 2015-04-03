@@ -55,12 +55,8 @@ function run(svg, data, Plottable) {
     //register interactions
   renderGroup.registerInteraction(dragBox);
 
-  renderGroup.registerInteraction(
-    new Plottable.Interaction.Click().callback(cb_click)
-  );
+  renderGroup.registerInteraction(new Plottable.Interaction.Click().onClick(cb_click));
 
-  title.registerInteraction(
-    new Plottable.Interaction.Click(title).callback(cb_reset)
-  );
+  title.registerInteraction(new Plottable.Interaction.Click().callback(cb_reset));
 
 }
