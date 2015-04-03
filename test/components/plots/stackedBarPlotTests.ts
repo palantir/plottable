@@ -301,4 +301,66 @@ describe("Plots", () => {
       svg.remove();
     });
   });
+
+  describe("Horizontal Stacked Bar Plot Weird Values", () => {
+    var svg: D3.Selection;
+    var plot: Plottable.Plot.StackedBar<number, string>;
+    var SVG_WIDTH = 600;
+    var SVG_HEIGHT = 400;
+
+    var numAttr = (s: D3.Selection, a: string) => parseFloat(s.attr(a));
+
+    beforeEach(() => {
+      svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      var xScale = new Plottable.Scale.Linear();
+      var yScale = new Plottable.Scale.Category();
+
+      var data1 = [
+        {y: "A", x: 1, type: "a"},
+        {y: "B", x: 2, type: "a"},
+        {y: "C", x: 1, type: "a"}
+      ];
+      var data2 = [
+        {y: "A", x: 2, type: "b"},
+        {y: "B", x: 3, type: "b"}
+      ];
+      var data3 = [
+        {y: "B", x: 1, type: "c"},
+        {y: "C", x: 7, type: "c"}
+      ];
+
+      plot = new Plottable.Plot.StackedBar(xScale, yScale, false);
+      plot.addDataset(data1);
+      plot.addDataset(data2);
+      plot.addDataset(data3);
+      plot.project("x", "x", xScale);
+      plot.project("y", "y", yScale);
+      plot.renderTo(svg);
+    });
+
+    it("renders correctly", () => {
+      var bars = plot.getAllSelections();
+
+      assert.strictEqual(bars.size(), 7, "draws a bar for each datum");
+
+      var aBars = [d3.select(bars[0][0]), d3.select(bars[0][3])];
+
+      var bBars = [d3.select(bars[0][1]), d3.select(bars[0][4]), d3.select(bars[0][5])];
+
+      var cBars = [d3.select(bars[0][2]), d3.select(bars[0][6])];
+
+      assert.closeTo(numAttr(aBars[0], "y"), numAttr(aBars[1], "y"), 0.01, "A bars at same y position");
+      assert.operator(numAttr(aBars[0], "x"), "<", numAttr(aBars[1], "x"), "first dataset A bar under second");
+
+      assert.closeTo(numAttr(bBars[0], "y"), numAttr(bBars[1], "y"), 0.01, "B bars at same y position");
+      assert.closeTo(numAttr(bBars[1], "y"), numAttr(bBars[2], "y"), 0.01, "B bars at same y position");
+      assert.operator(numAttr(bBars[0], "x"), "<", numAttr(bBars[1], "x"), "first dataset B bar under second");
+      assert.operator(numAttr(bBars[1], "x"), "<", numAttr(bBars[2], "x"), "second dataset B bar under third");
+
+      assert.closeTo(numAttr(cBars[0], "y"), numAttr(cBars[1], "y"), 0.01, "C bars at same y position");
+      assert.operator(numAttr(cBars[0], "x"), "<", numAttr(cBars[1], "x"), "first dataset C bar under second");
+
+      svg.remove();
+    });
+  });
 });
