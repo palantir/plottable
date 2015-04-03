@@ -29,7 +29,7 @@ function run(svg, data, Plottable) {
 
   var legend = new Plottable.Component.Legend(colorScale);
   legend.maxEntriesPerRow(1);
-  var center = clusteredBarRenderer.merge(legend);
+  var center = clusteredBarRenderer.below(legend);
 
   var horizChart = new Plottable.Component.Table([
     [yAxis, center], [null, xAxis]

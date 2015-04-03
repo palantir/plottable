@@ -1,5 +1,5 @@
 /*!
-Plottable 0.49.0 (https://github.com/palantir/plottable)
+Plottable 0.50.0 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -338,6 +338,11 @@ var Plottable;
                 return Math.pow(p2.y - p1.y, 2) + Math.pow(p2.x - p1.x, 2);
             }
             Methods.distanceSquared = distanceSquared;
+            function isIE() {
+                var userAgent = window.navigator.userAgent;
+                return userAgent.indexOf("MSIE ") > -1 || userAgent.indexOf("Trident/") > -1;
+            }
+            Methods.isIE = isIE;
         })(Methods = _Util.Methods || (_Util.Methods = {}));
     })(_Util = Plottable._Util || (Plottable._Util = {}));
 })(Plottable || (Plottable = {}));
@@ -1129,7 +1134,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "0.49.0";
+    Plottable.version = "0.50.0";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -3365,22 +3370,13 @@ var Plottable;
     (function (_Drawer) {
         var Symbol = (function (_super) {
             __extends(Symbol, _super);
-            function Symbol() {
-                _super.apply(this, arguments);
+            function Symbol(key) {
+                _super.call(this, key);
+                this._svgElement = "path";
+                this._className = "symbol";
             }
-            Symbol.prototype._enterData = function (data) {
-                _super.prototype._enterData.call(this, data);
-                var dataElements = this._getDrawSelection().data(data);
-                dataElements.enter().append("path");
-                dataElements.exit().remove();
-                dataElements.classed("symbol", true);
-            };
-            Symbol.prototype._getDrawSelection = function () {
-                return this._getRenderArea().selectAll("path");
-            };
             Symbol.prototype._drawStep = function (step) {
-                _super.prototype._drawStep.call(this, step);
-                var attrToProjector = Plottable._Util.Methods.copyMap(step.attrToProjector);
+                var attrToProjector = step.attrToProjector;
                 this._attrToProjector = Plottable._Util.Methods.copyMap(step.attrToProjector);
                 var xProjector = attrToProjector["x"];
                 var yProjector = attrToProjector["y"];
@@ -3392,20 +3388,13 @@ var Plottable;
                 var symbolProjector = attrToProjector["symbol"];
                 delete attrToProjector["symbol"];
                 attrToProjector["d"] = symbolProjector;
-                var drawSelection = this._getDrawSelection();
-                if (attrToProjector["fill"]) {
-                    drawSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
-                }
-                step.animator.animate(drawSelection, attrToProjector);
-            };
-            Symbol.prototype._getSelector = function () {
-                return "path";
+                _super.prototype._drawStep.call(this, step);
             };
             Symbol.prototype._getPixelPoint = function (datum, index) {
                 return { x: this._attrToProjector["x"](datum, index), y: this._attrToProjector["y"](datum, index) };
             };
             return Symbol;
-        })(_Drawer.AbstractDrawer);
+        })(_Drawer.Element);
         _Drawer.Symbol = Symbol;
     })(_Drawer = Plottable._Drawer || (Plottable._Drawer = {}));
 })(Plottable || (Plottable = {}));
@@ -3798,33 +3787,53 @@ var Plottable;
             AbstractComponent.prototype._isFixedHeight = function () {
                 return this._fixedHeightFlag;
             };
-            /**
-             * Merges this Component with another Component, returning a
-             * ComponentGroup. This is used to layer Components on top of each other.
-             *
-             * There are four cases:
-             * Component + Component: Returns a ComponentGroup with both components inside it.
-             * ComponentGroup + Component: Returns the ComponentGroup with the Component appended.
-             * Component + ComponentGroup: Returns the ComponentGroup with the Component prepended.
-             * ComponentGroup + ComponentGroup: Returns a new ComponentGroup with two ComponentGroups inside it.
-             *
-             * @param {Component} c The component to merge in.
-             * @returns {ComponentGroup} The relevant ComponentGroup out of the above four cases.
-             */
-            AbstractComponent.prototype.merge = function (c) {
+            AbstractComponent.prototype._merge = function (c, below) {
                 var cg;
                 if (this._isSetup || this._isAnchored) {
                     throw new Error("Can't presently merge a component that's already been anchored");
                 }
                 if (Plottable.Component.Group.prototype.isPrototypeOf(c)) {
                     cg = c;
-                    cg._addComponent(this, true);
+                    cg._addComponent(this, below);
                     return cg;
                 }
                 else {
-                    cg = new Plottable.Component.Group([this, c]);
+                    var mergedComponents = below ? [this, c] : [c, this];
+                    cg = new Plottable.Component.Group(mergedComponents);
                     return cg;
                 }
+            };
+            /**
+             * Merges this Component above another Component, returning a
+             * ComponentGroup. This is used to layer Components on top of each other.
+             *
+             * There are four cases:
+             * Component + Component: Returns a ComponentGroup with the first component after the second component.
+             * ComponentGroup + Component: Returns the ComponentGroup with the Component prepended.
+             * Component + ComponentGroup: Returns the ComponentGroup with the Component appended.
+             * ComponentGroup + ComponentGroup: Returns a new ComponentGroup with the first group after the second group.
+             *
+             * @param {Component} c The component to merge in.
+             * @returns {ComponentGroup} The relevant ComponentGroup out of the above four cases.
+             */
+            AbstractComponent.prototype.above = function (c) {
+                return this._merge(c, false);
+            };
+            /**
+             * Merges this Component below another Component, returning a
+             * ComponentGroup. This is used to layer Components on top of each other.
+             *
+             * There are four cases:
+             * Component + Component: Returns a ComponentGroup with the first component before the second component.
+             * ComponentGroup + Component: Returns the ComponentGroup with the Component appended.
+             * Component + ComponentGroup: Returns the ComponentGroup with the Component prepended.
+             * ComponentGroup + ComponentGroup: Returns a new ComponentGroup with the first group before the second group.
+             *
+             * @param {Component} c The component to merge in.
+             * @returns {ComponentGroup} The relevant ComponentGroup out of the above four cases.
+             */
+            AbstractComponent.prototype.below = function (c) {
+                return this._merge(c, true);
             };
             /**
              * Detaches a Component from the DOM. The component can be reused.
@@ -4058,14 +4067,17 @@ var Plottable;
         var Group = (function (_super) {
             __extends(Group, _super);
             /**
-             * Constructs a GroupComponent.
+             * Constructs a Component.Group.
              *
-             * A GroupComponent is a set of Components that will be rendered on top of
-             * each other. When you call Component.merge(Component), it creates and
-             * returns a GroupComponent.
+             * A Component.Group is a set of Components that will be rendered on top of
+             * each other. When you call Component.above(Component) or Component.below(Component),
+             * it creates and returns a Component.Group.
+             *
+             * Note that the order of the components will determine placement on the z-axis,
+             * with the previous items rendered below the later items.
              *
              * @constructor
-             * @param {Component[]} components The Components in the Group (default = []).
+             * @param {Component[]} components The Components in the resultant Component.Group (default = []).
              */
             function Group(components) {
                 var _this = this;
@@ -4083,8 +4095,8 @@ var Plottable;
                     wantsHeight: requests.map(function (r) { return r.wantsHeight; }).some(function (x) { return x; })
                 };
             };
-            Group.prototype.merge = function (c) {
-                this._addComponent(c);
+            Group.prototype._merge = function (c, below) {
+                this._addComponent(c, !below);
                 return this;
             };
             Group.prototype._computeLayout = function (offeredXOrigin, offeredYOrigin, availableWidth, availableHeight) {
@@ -7343,6 +7355,20 @@ var Plottable;
                 attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this._defaultFillColor);
                 attrToProjector["symbol"] = attrToProjector["symbol"] || Plottable.SymbolGenerators.d3Symbol("circle");
                 attrToProjector["vector-effect"] = attrToProjector["vector-effect"] || d3.functor("non-scaling-stroke");
+                // HACKHACK vector-effect non-scaling-stroke has no effect in IE
+                // https://connect.microsoft.com/IE/feedback/details/788819/svg-non-scaling-stroke
+                if (Plottable._Util.Methods.isIE() && attrToProjector["stroke-width"] != null) {
+                    var strokeWidthProjector = attrToProjector["stroke-width"];
+                    attrToProjector["stroke-width"] = function (d, i, u, m) {
+                        var strokeWidth = strokeWidthProjector(d, i, u, m);
+                        if (attrToProjector["vector-effect"](d, i, u, m) === "non-scaling-stroke") {
+                            return strokeWidth * Plottable.SymbolGenerators.SYMBOL_GENERATOR_RADIUS / attrToProjector["r"](d, i, u, m);
+                        }
+                        else {
+                            return strokeWidth;
+                        }
+                    };
+                }
                 return attrToProjector;
             };
             Scatter.prototype._generateDrawSteps = function () {
@@ -9067,7 +9093,9 @@ var Plottable;
                 this._event2Callback["mouseup"] = function (e) { return _this._measureAndBroadcast(e, _this._upBroadcaster); };
                 this._wheelBroadcaster = new Plottable.Core.Broadcaster(this);
                 this._event2Callback["wheel"] = function (e) { return _this._measureAndBroadcast(e, _this._wheelBroadcaster); };
-                this._broadcasters = [this._moveBroadcaster, this._downBroadcaster, this._upBroadcaster, this._wheelBroadcaster];
+                this._dblClickBroadcaster = new Plottable.Core.Broadcaster(this);
+                this._event2Callback["dblclick"] = function (e) { return _this._measureAndBroadcast(e, _this._dblClickBroadcaster); };
+                this._broadcasters = [this._moveBroadcaster, this._downBroadcaster, this._upBroadcaster, this._wheelBroadcaster, this._dblClickBroadcaster];
             }
             /**
              * Get a Dispatcher.Mouse for the <svg> containing elem. If one already exists
@@ -9139,13 +9167,28 @@ var Plottable;
              *
              * @param {any} key The key associated with the callback.
              *                  Key uniqueness is determined by deep equality.
-             * @param {WheelCallback} callback A callback that takes the pixel position
+             * @param {MouseCallback} callback A callback that takes the pixel position
              *                                     in svg-coordinate-space.
              *                                     Pass `null` to remove a callback.
              * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
              */
             Mouse.prototype.onWheel = function (key, callback) {
                 this._setCallback(this._wheelBroadcaster, key, callback);
+                return this;
+            };
+            /**
+             * Registers a callback to be called whenever a dblClick occurs,
+             * or removes the callback if `null` is passed as the callback.
+             *
+             * @param {any} key The key associated with the callback.
+             *                  Key uniqueness is determined by deep equality.
+             * @param {MouseCallback} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space.
+             *                                     Pass `null` to remove a callback.
+             * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+             */
+            Mouse.prototype.onDblClick = function (key, callback) {
+                this._setCallback(this._dblClickBroadcaster, key, callback);
                 return this;
             };
             /**
@@ -9437,8 +9480,61 @@ var Plottable;
             __extends(Click, _super);
             function Click() {
                 _super.apply(this, arguments);
+                this._clickedDown = false;
             }
             Click.prototype._anchor = function (component, hitBox) {
+                var _this = this;
+                _super.prototype._anchor.call(this, component, hitBox);
+                this._mouseDispatcher = Plottable.Dispatcher.Mouse.getDispatcher(component.content().node());
+                this._mouseDispatcher.onMouseDown("Interaction.Click" + this.getID(), function (p) { return _this._handleClickDown(p); });
+                this._mouseDispatcher.onMouseUp("Interaction.Click" + this.getID(), function (p) { return _this._handleClickUp(p); });
+                this._touchDispatcher = Plottable.Dispatcher.Touch.getDispatcher(component.content().node());
+                this._touchDispatcher.onTouchStart("Interaction.Click" + this.getID(), function (p) { return _this._handleClickDown(p); });
+                this._touchDispatcher.onTouchEnd("Interaction.Click" + this.getID(), function (p) { return _this._handleClickUp(p); });
+            };
+            Click.prototype._handleClickDown = function (p) {
+                var translatedPoint = this._translateToComponentSpace(p);
+                if (this._isInsideComponent(translatedPoint)) {
+                    this._clickedDown = true;
+                }
+            };
+            Click.prototype._handleClickUp = function (p) {
+                var translatedPoint = this._translateToComponentSpace(p);
+                if (this._clickedDown && this._isInsideComponent(translatedPoint) && (this._clickCallback != null)) {
+                    this._clickCallback(translatedPoint);
+                }
+                this._clickedDown = false;
+            };
+            Click.prototype.onClick = function (callback) {
+                if (callback === undefined) {
+                    return this._clickCallback;
+                }
+                this._clickCallback = callback;
+                return this;
+            };
+            return Click;
+        })(Interaction.AbstractInteraction);
+        Interaction.Click = Click;
+    })(Interaction = Plottable.Interaction || (Plottable.Interaction = {}));
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    var Interaction;
+    (function (Interaction) {
+        var DoubleClick = (function (_super) {
+            __extends(DoubleClick, _super);
+            function DoubleClick() {
+                _super.apply(this, arguments);
+            }
+            DoubleClick.prototype._anchor = function (component, hitBox) {
                 var _this = this;
                 _super.prototype._anchor.call(this, component, hitBox);
                 hitBox.on(this._listenTo(), function () {
@@ -9448,34 +9544,23 @@ var Plottable;
                     _this._callback({ x: x, y: y });
                 });
             };
-            Click.prototype._requiresHitbox = function () {
+            DoubleClick.prototype._requiresHitbox = function () {
                 return true;
             };
-            Click.prototype._listenTo = function () {
-                return "click";
+            DoubleClick.prototype._listenTo = function () {
+                return "dblclick";
             };
             /**
              * Sets a callback to be called when a click is received.
              *
              * @param {(p: Point) => any} cb Callback that takes the pixel position of the click event.
              */
-            Click.prototype.callback = function (cb) {
+            DoubleClick.prototype.callback = function (cb) {
                 this._callback = cb;
                 return this;
             };
-            return Click;
-        })(Interaction.AbstractInteraction);
-        Interaction.Click = Click;
-        var DoubleClick = (function (_super) {
-            __extends(DoubleClick, _super);
-            function DoubleClick() {
-                _super.apply(this, arguments);
-            }
-            DoubleClick.prototype._listenTo = function () {
-                return "dblclick";
-            };
             return DoubleClick;
-        })(Click);
+        })(Interaction.AbstractInteraction);
         Interaction.DoubleClick = DoubleClick;
     })(Interaction = Plottable.Interaction || (Plottable.Interaction = {}));
 })(Plottable || (Plottable = {}));

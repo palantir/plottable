@@ -87,6 +87,7 @@
 
 /// <reference path="interactions/abstractInteraction.ts" />
 /// <reference path="interactions/clickInteraction.ts" />
+/// <reference path="interactions/doubleClickInteraction.ts" />
 /// <reference path="interactions/keyInteraction.ts" />
 /// <reference path="interactions/pointerInteraction.ts" />
 /// <reference path="interactions/panZoomInteraction.ts" />

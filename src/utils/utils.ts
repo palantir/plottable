@@ -341,6 +341,11 @@ export module _Util {
     export function distanceSquared(p1: Point, p2: Point) {
       return Math.pow(p2.y - p1.y, 2) + Math.pow(p2.x - p1.x, 2);
     }
+
+    export function isIE() {
+      var userAgent = window.navigator.userAgent;
+      return userAgent.indexOf("MSIE ") > -1 || userAgent.indexOf("Trident/") > -1;
+    }
   }
 }
 }
