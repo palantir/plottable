@@ -162,6 +162,7 @@ export module Plot {
      */
     public interpolate(interpolationMode: string) {
       this._interpolationMode = interpolationMode;
+      return this;
     }
 
     private _adjustYDomainOnChangeFromX() {

@@ -2889,7 +2889,7 @@ declare module Plottable {
             /**
              * Sets an interpolation mode.
              */
-            interpolate(interpolationMode: string): void;
+            interpolate(interpolationMode: string): AbstractXYPlot<X, Y>;
             protected _normalizeDatasets<A, B>(fromX: boolean): {
                 a: A;
                 b: B;

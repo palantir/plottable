@@ -7087,6 +7087,7 @@ var Plottable;
              */
             AbstractXYPlot.prototype.interpolate = function (interpolationMode) {
                 this._interpolationMode = interpolationMode;
+                return this;
             };
             AbstractXYPlot.prototype._adjustYDomainOnChangeFromX = function () {
                 if (!this._projectorsReady()) {
