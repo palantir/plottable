@@ -2848,6 +2848,7 @@ declare module Plottable {
             protected _generateAttrToProjector(): AttributeToProjector;
             protected _getDrawer(key: string): _Drawer.AbstractDrawer;
             getAllPlotData(datasetKeys?: string | string[]): PlotData;
+            protected _getPlotData(xExtent: Extent, yExtent: Extent, datasetKeys: string[]): PlotData;
         }
     }
 }
