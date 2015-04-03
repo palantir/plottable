@@ -29,15 +29,14 @@ function run(svg, data, Plottable) {
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
   //rendering
-  var scatterPlot = new Plottable.Plot.Scatter(xScale, yScale)
-      .addDataset(d1)
-      .addDataset(d2)
-      .addDataset(d3)
-      .addDataset(d4)
-      .attr("fill", "color", colorScale)
-      .attr("r", function(d) {return d.x * 12;})
-      .project("x", "x", xScale)
-      .project("y", "y", yScale);
+  var scatterPlot = new Plottable.Plot.Scatter(xScale, yScale).addDataset(d1)
+                                                              .addDataset(d2)
+                                                              .addDataset(d3)
+                                                              .addDataset(d4)
+                                                              .attr("fill", "color", colorScale)
+                                                              .attr("size", function(d) {return d.x * 24;})
+                                                              .project("x", "x", xScale)
+                                                              .project("y", "y", yScale);
 
   //title + legend
   var title1 = new Plottable.Component.TitleLabel( "Two Data Series", "horizontal");
