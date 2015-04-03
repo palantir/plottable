@@ -3480,6 +3480,34 @@ describe("Plots", function () {
             VERIFY_CELLS(gridPlot._renderArea.selectAll("rect")[0]);
             svg.remove();
         });
+        it("renders correctly when there isn't data for every spot", function () {
+            var CELL_HEIGHT = 50;
+            var CELL_WIDTH = 100;
+            var xScale = new Plottable.Scale.Category();
+            var yScale = new Plottable.Scale.Category();
+            var colorScale = new Plottable.Scale.InterpolatedColor(["black", "white"]);
+            var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var dataset = new Plottable.Dataset();
+            var gridPlot = new Plottable.Plot.Grid(xScale, yScale, colorScale);
+            gridPlot.addDataset(dataset).project("fill", "magnitude", colorScale).project("x", "x", xScale).project("y", "y", yScale).renderTo(svg);
+            var data = [
+                { x: "A", y: "W", magnitude: 0 },
+                { x: "B", y: "X", magnitude: 8 },
+                { x: "C", y: "Y", magnitude: 16 },
+                { x: "D", y: "Z", magnitude: 24 }
+            ];
+            dataset.data(data);
+            var cells = gridPlot._renderArea.selectAll("rect")[0];
+            assert.equal(cells.length, data.length);
+            for (var i = 0; i < cells.length; i++) {
+                var cell = d3.select(cells[i]);
+                assert.equal(cell.attr("x"), i * CELL_WIDTH, "Cell x coord is correct");
+                assert.equal(cell.attr("y"), i * CELL_HEIGHT, "Cell y coord is correct");
+                assert.equal(cell.attr("width"), CELL_WIDTH, "Cell width is correct");
+                assert.equal(cell.attr("height"), CELL_HEIGHT, "Cell height is correct");
+            }
+            svg.remove();
+        });
         it("can invert y axis correctly", function () {
             var xScale = new Plottable.Scale.Category();
             var yScale = new Plottable.Scale.Category();
