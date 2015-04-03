@@ -2949,6 +2949,7 @@ declare module Plottable {
                 [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
             };
             protected _generateDrawSteps(): _Drawer.DrawStep[];
+            protected _getPlotData(xExtent: Extent, yExtent: Extent, datasetKeys: string[]): PlotData;
             protected _getClosestStruckPoint(p: Point, range: number): Interaction.HoverData;
             _hoverOverComponent(p: Point): void;
             _hoverOutComponent(p: Point): void;

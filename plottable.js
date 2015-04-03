@@ -7315,6 +7315,23 @@ var Plottable;
                 drawSteps.push({ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("symbols") });
                 return drawSteps;
             };
+            Scatter.prototype._getPlotData = function (xExtent, yExtent, datasetKeys) {
+                var _this = this;
+                var data = [];
+                var pixelPoints = [];
+                var selections = [];
+                datasetKeys.forEach(function (datasetKey) {
+                    var plotData = _this.getAllPlotData(datasetKey);
+                    plotData.pixelPoints.forEach(function (pixelPoint, index) {
+                        if (pixelPoint.x >= xExtent.min && pixelPoint.x <= xExtent.max && pixelPoint.y >= yExtent.min && pixelPoint.y <= yExtent.max) {
+                            data.push(plotData.data[index]);
+                            pixelPoints.push(pixelPoint);
+                            selections.push(plotData.selection[0][index]);
+                        }
+                    });
+                });
+                return { data: data, pixelPoints: pixelPoints, selection: d3.selectAll(selections) };
+            };
             Scatter.prototype._getClosestStruckPoint = function (p, range) {
                 var _this = this;
                 var attrToProjector = this._generateAttrToProjector();
