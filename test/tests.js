@@ -4636,7 +4636,7 @@ describe("Plots", function () {
             svg.remove();
         });
     });
-    describe("Horizontal Stacked Bar Plot Weird Values", function () {
+    describe("Horizontal Stacked Bar Plot Non-Overlapping Datasets", function () {
         var svg;
         var plot;
         var SVG_WIDTH = 600;

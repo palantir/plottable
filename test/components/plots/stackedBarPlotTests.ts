@@ -302,7 +302,7 @@ describe("Plots", () => {
     });
   });
 
-  describe("Horizontal Stacked Bar Plot Weird Values", () => {
+  describe("Horizontal Stacked Bar Plot Non-Overlapping Datasets", () => {
     var svg: D3.Selection;
     var plot: Plottable.Plot.StackedBar<number, string>;
     var SVG_WIDTH = 600;
