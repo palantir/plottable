@@ -27,7 +27,7 @@ function run(svg, data, Plottable) {
                                          .addDataset("d3", data[2])
                                          .animate(true);
 
-  var center = stackedAreaPlot.merge(new Plottable.Component.Legend(colorScale));
+  var center = stackedAreaPlot.below(new Plottable.Component.Legend(colorScale));
 
   var horizChart = new Plottable.Component.Table([
     [yAxis, center], [null, xAxis]

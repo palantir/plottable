@@ -32,7 +32,7 @@ function run(svg, data, Plottable) {
         .project("x", "x", xScale)
         .project("y", "y", yScale);
 
-    var renderGroup = barPlot.merge(scatterPlot);
+    var renderGroup = barPlot.below(scatterPlot);
 
     var basicTable = new Plottable.Component.Table()
                 .addComponent(2, 0, yAxis)

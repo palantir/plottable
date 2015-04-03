@@ -25,12 +25,11 @@ function run(svg, data, Plottable) {
   };
 
   //rendering
-  var scatterPlot = new Plottable.Plot.Scatter(xScale, yScale) //0
-          .addDataset(dataseries)
-          .attr("fill", colorScale1.scale("scatter"))
-          .attr("r", function(){return 10;})
-          .project("x", "x", xScale)
-          .project("y", "y", yScale);
+  var scatterPlot = new Plottable.Plot.Scatter(xScale, yScale).addDataset(dataseries) //0
+                                                              .attr("fill", colorScale1.scale("scatter"))
+                                                              .attr("size", function(){return 20;})
+                                                              .project("x", "x", xScale)
+                                                              .project("y", "y", yScale);
 
   var linePlot = new Plottable.Plot.Line(xScale, yScale)
           .addDataset(dataseries) //1
@@ -49,11 +48,11 @@ function run(svg, data, Plottable) {
   var title1 = new Plottable.Component.TitleLabel( "front: areaPlot", "horizontal");
   var legend1 = new Plottable.Component.Legend(colorScale1);
   legend1.maxEntriesPerRow(1);
-  
+
   var titleTable = new Plottable.Component.Table().addComponent(0,0, title1)
                                         .addComponent(0,1, legend1);
 
-  var plotGroup = scatterPlot.merge(linePlot).merge(areaPlot);
+  var plotGroup = scatterPlot.below(linePlot).below(areaPlot);
 
   var basicTable = new Plottable.Component.Table()
               .addComponent(2, 0, yAxis)
@@ -73,7 +72,7 @@ function run(svg, data, Plottable) {
     if(backPlot === 1){ plot = linePlot; title1.text("front: linePlot");}
     if(backPlot === 2){ plot = areaPlot; title1.text("front: areaPlot");}
     plot.detach();
-    plotGroup.merge(plot);
+    plotGroup.below(plot);
     backPlot++;
     if(backPlot === 3){ backPlot = 0; }
   }

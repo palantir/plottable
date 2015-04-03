@@ -40,7 +40,7 @@ function run(svg, data, Plottable) {
   var gridlines = new Plottable.Component.Gridlines(xScale, yScale);
 
   var basicTable = new Plottable.Component.Table([[null, xAxisTable2, null],
-                                    [yAxisTable, renderAreaD1.merge(gridlines), yAxisTable2],
+                                    [yAxisTable, renderAreaD1.above(gridlines), yAxisTable2],
                                     [null, xAxisTable, null]]);
 
   basicTable.renderTo(svg);

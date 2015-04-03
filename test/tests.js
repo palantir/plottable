@@ -3671,14 +3671,14 @@ describe("Plots", function () {
             xScale.domain([0, 400]);
             yScale.domain([400, 0]);
             var data1 = [
-                { x: 80, y: 200, r: 20 },
-                { x: 100, y: 200, r: 20 },
-                { x: 125, y: 200, r: 5 },
-                { x: 138, y: 200, r: 5 }
+                { x: 80, y: 200, size: 40 },
+                { x: 100, y: 200, size: 40 },
+                { x: 125, y: 200, size: 10 },
+                { x: 138, y: 200, size: 10 }
             ];
             var plot = new Plottable.Plot.Scatter(xScale, yScale);
             plot.addDataset(data1);
-            plot.project("x", "x").project("y", "y").project("r", "r");
+            plot.project("x", "x").project("y", "y").project("size", "size");
             plot.renderTo(svg);
             var twoOverlappingCirclesResult = plot._getClosestStruckPoint({ x: 85, y: 200 }, 10);
             assert.strictEqual(twoOverlappingCirclesResult.data[0], data1[0], "returns closest circle among circles that the test point touches");
@@ -3688,6 +3688,34 @@ describe("Plots", function () {
             assert.strictEqual(twoPointsInRangeResult.data[0], data1[2], "returns closest circle within range if test point does not touch any circles");
             var farFromAnyPointsResult = plot._getClosestStruckPoint({ x: 400, y: 400 }, 10);
             assert.isNull(farFromAnyPointsResult.data, "returns no data if no circle were within range and test point does not touch any circles");
+            svg.remove();
+        });
+        it("correctly handles NaN and undefined x and y values", function () {
+            var svg = generateSVG(400, 400);
+            var data = [
+                { foo: 0.0, bar: 0.0 },
+                { foo: 0.2, bar: 0.2 },
+                { foo: 0.4, bar: 0.4 },
+                { foo: 0.6, bar: 0.6 },
+                { foo: 0.8, bar: 0.8 }
+            ];
+            var dataset = new Plottable.Dataset(data);
+            var xScale = new Plottable.Scale.Linear();
+            var yScale = new Plottable.Scale.Linear();
+            var plot = new Plottable.Plot.Scatter(xScale, yScale);
+            plot.addDataset(dataset).project("x", "foo", xScale).project("y", "bar", yScale);
+            plot.renderTo(svg);
+            var dataWithNaN = data.slice();
+            dataWithNaN[2] = { foo: 0.4, bar: NaN };
+            dataset.data(dataWithNaN);
+            assert.strictEqual(plot.getAllSelections().size(), 4, "does not draw NaN point");
+            var dataWithUndefined = data.slice();
+            dataWithUndefined[2] = { foo: 0.4, bar: undefined };
+            dataset.data(dataWithUndefined);
+            assert.strictEqual(plot.getAllSelections().size(), 4, "does not draw undefined point");
+            dataWithUndefined[2] = { foo: undefined, bar: 0.4 };
+            dataset.data(dataWithUndefined);
+            assert.strictEqual(plot.getAllSelections().size(), 4, "does not draw undefined point");
             svg.remove();
         });
         describe("Example ScatterPlot with quadratic series", function () {
@@ -7119,16 +7147,6 @@ describe("Formatters", function () {
 
 ///<reference path="../testReference.ts" />
 var assert = chai.assert;
-describe("SymbolGenerators", function () {
-    describe("d3Symbol", function () {
-        it("throws an error if invalid symbol type is used", function () {
-            assert.throws(function () { return Plottable.SymbolGenerators.d3Symbol("aaa"); }, Error, "invalid D3 symbol type");
-        });
-    });
-});
-
-///<reference path="../testReference.ts" />
-var assert = chai.assert;
 describe("IDCounter", function () {
     it("IDCounter works as expected", function () {
         var i = new Plottable._Util.IDCounter();
@@ -8047,6 +8065,76 @@ describe("Interactions", function () {
 
 ///<reference path="../testReference.ts" />
 var assert = chai.assert;
+describe("Interactions", function () {
+    describe("Click", function () {
+        var SVG_WIDTH = 400;
+        var SVG_HEIGHT = 400;
+        it("onClick", function () {
+            var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var c = new Plottable.Component.AbstractComponent();
+            c.renderTo(svg);
+            var clickInteraction = new Plottable.Interaction.Click();
+            c.registerInteraction(clickInteraction);
+            var callbackCalled = false;
+            var lastPoint;
+            var callback = function (p) {
+                callbackCalled = true;
+                lastPoint = p;
+            };
+            clickInteraction.onClick(callback);
+            assert.strictEqual(clickInteraction.onClick(), callback, "callback can be retrieved");
+            triggerFakeMouseEvent("mousedown", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+            triggerFakeMouseEvent("mouseup", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+            assert.isTrue(callbackCalled, "callback called on clicking Component (mouse)");
+            assert.deepEqual(lastPoint, { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 }, "was passed correct point (mouse)");
+            callbackCalled = false;
+            lastPoint = null;
+            triggerFakeMouseEvent("mousedown", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+            triggerFakeMouseEvent("mouseup", c.content(), SVG_WIDTH / 4, SVG_HEIGHT / 4);
+            assert.isTrue(callbackCalled, "callback called on clicking Component (mouse)");
+            assert.deepEqual(lastPoint, { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 }, "was passed mouseup point (mouse)");
+            callbackCalled = false;
+            triggerFakeMouseEvent("mousedown", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+            triggerFakeMouseEvent("mouseup", c.content(), SVG_WIDTH * 2, SVG_HEIGHT * 2);
+            assert.isFalse(callbackCalled, "callback not called if released outside component (mouse)");
+            triggerFakeMouseEvent("mousedown", c.content(), SVG_WIDTH * 2, SVG_HEIGHT * 2);
+            triggerFakeMouseEvent("mouseup", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+            assert.isFalse(callbackCalled, "callback not called if started outside component (mouse)");
+            triggerFakeMouseEvent("mousedown", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+            triggerFakeMouseEvent("mousemove", c.content(), SVG_WIDTH * 2, SVG_HEIGHT * 2);
+            triggerFakeMouseEvent("mouseup", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+            assert.isTrue(callbackCalled, "callback called even if moved outside component (mouse)");
+            callbackCalled = false;
+            lastPoint = null;
+            triggerFakeTouchEvent("touchstart", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+            triggerFakeTouchEvent("touchend", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+            assert.isTrue(callbackCalled, "callback called on entering Component (touch)");
+            assert.deepEqual(lastPoint, { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 }, "was passed correct point (touch)");
+            callbackCalled = false;
+            lastPoint = null;
+            triggerFakeTouchEvent("touchstart", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+            triggerFakeTouchEvent("touchend", c.content(), SVG_WIDTH / 4, SVG_HEIGHT / 4);
+            assert.isTrue(callbackCalled, "callback called on clicking Component (mouse)");
+            assert.deepEqual(lastPoint, { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 }, "was passed mouseup point (touch)");
+            callbackCalled = false;
+            triggerFakeTouchEvent("touchstart", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+            triggerFakeTouchEvent("touchend", c.content(), SVG_WIDTH * 2, SVG_HEIGHT * 2);
+            assert.isFalse(callbackCalled, "callback not called if released outside component (touch)");
+            callbackCalled = false;
+            triggerFakeTouchEvent("touchstart", c.content(), SVG_WIDTH * 2, SVG_HEIGHT * 2);
+            triggerFakeTouchEvent("touchend", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+            assert.isFalse(callbackCalled, "callback not called if started outside component (touch)");
+            triggerFakeTouchEvent("touchstart", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+            triggerFakeTouchEvent("touchmove", c.content(), SVG_WIDTH * 2, SVG_HEIGHT * 2);
+            triggerFakeTouchEvent("touchend", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+            assert.isTrue(callbackCalled, "callback called even if moved outside component (touch)");
+            svg.remove();
+        });
+    });
+});
+
+///<reference path="../testReference.ts" />
+var assert = chai.assert;
 describe("Dispatchers", function () {
     describe("AbstractDispatcher", function () {
         it("_connect() and _disconnect()", function () {
@@ -8288,6 +8376,30 @@ describe("Dispatchers", function () {
             assert.isTrue(callbackWasCalled, "callback was called on wheel");
             md.onWheel(keyString, null);
             svg.remove();
+        });
+        it("onDblClick()", function () {
+            var targetWidth = 400, targetHeight = 400;
+            var target = generateSVG(targetWidth, targetHeight);
+            // HACKHACK: PhantomJS can't measure SVGs unless they have something in them occupying space
+            target.append("rect").attr("width", targetWidth).attr("height", targetHeight);
+            var targetX = 17;
+            var targetY = 76;
+            var expectedPoint = {
+                x: targetX,
+                y: targetY
+            };
+            var md = Plottable.Dispatcher.Mouse.getDispatcher(target.node());
+            var callbackWasCalled = false;
+            var callback = function (p, e) {
+                callbackWasCalled = true;
+                assert.isNotNull(e, "mouse event was passed to the callback");
+            };
+            var keyString = "unit test";
+            md.onDblClick(keyString, callback);
+            triggerFakeMouseEvent("dblclick", target, targetX, targetY);
+            assert.isTrue(callbackWasCalled, "callback was called on dblClick");
+            md.onDblClick(keyString, null);
+            target.remove();
         });
     });
 });

@@ -23,7 +23,7 @@ export module Component {
     private _measurer: SVGTypewriter.Measurers.Measurer;
     private _wrapper: SVGTypewriter.Wrappers.Wrapper;
     private _writer: SVGTypewriter.Writers.Writer;
-    private _symbolGenerator: SymbolGenerator;
+    private _symbolFactoryAccessor: (datum: any, index: number) => SymbolFactory;
 
     /**
      * Creates a Legend.
@@ -50,7 +50,7 @@ export module Component {
       this._fixedWidthFlag = true;
       this._fixedHeightFlag = true;
       this._sortFn = (a: string, b: string) => this._scale.domain().indexOf(a) - this._scale.domain().indexOf(b);
-      this._symbolGenerator = SymbolGenerators.d3Symbol("circle");
+      this._symbolFactoryAccessor = () => SymbolFactories.circle();
     }
 
     protected _setup() {
@@ -272,11 +272,9 @@ export module Component {
         });
       });
 
-      entries.select("path").attr("d", this.symbolGenerator())
-                            .attr("transform", "translate(" + (layout.textHeight / 2) + "," + layout.textHeight / 2 + ") " +
-                                               "scale(" + (layout.textHeight * 0.3 / SymbolGenerators.SYMBOL_GENERATOR_RADIUS) + ")")
+      entries.select("path").attr("d", (d: any, i: number) => this.symbolFactoryAccessor()(d, i)(layout.textHeight * 0.6))
+                            .attr("transform", "translate(" + (layout.textHeight / 2) + "," + layout.textHeight / 2 + ")")
                             .attr("fill", (value: string) => this._scale.scale(value) )
-                            .attr("vector-effect", "non-scaling-stroke")
                             .classed(Legend.LEGEND_SYMBOL_CLASS, true);
 
       var padding = this._padding;
@@ -300,23 +298,24 @@ export module Component {
     }
 
     /**
-     * Gets the SymbolGenerator of the legend, which dictates how
+     * Gets the symbolFactoryAccessor of the legend, which dictates how
      * the symbol in each entry is drawn.
      *
-     * @returns {SymbolGenerator} The SymbolGenerator of the legend
+     * @returns {(datum: any, index: number) => symbolFactory} The symbolFactory accessor of the legend
      */
-    public symbolGenerator(): SymbolGenerator;
+    public symbolFactoryAccessor(): (datum: any, index: number) => SymbolFactory;
     /**
-     * Sets the SymbolGenerator of the legend
+     * Sets the symbolFactoryAccessor of the legend
      *
+     * @param {(datum: any, index: number) => symbolFactory}  The symbolFactory accessor to set to
      * @returns {Legend} The calling Legend
      */
-    public symbolGenerator(symbolGenerator: SymbolGenerator): Legend;
-    public symbolGenerator(symbolGenerator?: SymbolGenerator): any {
-      if (symbolGenerator == null) {
-        return this._symbolGenerator;
+    public symbolFactoryAccessor(symbolFactoryAccessor: (datum: any, index: number) => SymbolFactory): Legend;
+    public symbolFactoryAccessor(symbolFactoryAccessor?: (datum: any, index: number) => SymbolFactory): any {
+      if (symbolFactoryAccessor == null) {
+        return this._symbolFactoryAccessor;
       } else {
-        this._symbolGenerator = symbolGenerator;
+        this._symbolFactoryAccessor = symbolFactoryAccessor;
         this._render();
         return this;
       }

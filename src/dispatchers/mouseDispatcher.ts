@@ -12,6 +12,7 @@ export module Dispatcher {
     private _downBroadcaster: Core.Broadcaster<Dispatcher.Mouse>;
     private _upBroadcaster: Core.Broadcaster<Dispatcher.Mouse>;
     private _wheelBroadcaster: Core.Broadcaster<Dispatcher.Mouse>;
+    private _dblClickBroadcaster: Core.Broadcaster<Dispatcher.Mouse>;
 
     /**
      * Get a Dispatcher.Mouse for the <svg> containing elem. If one already exists
@@ -59,7 +60,11 @@ export module Dispatcher {
       this._wheelBroadcaster = new Core.Broadcaster(this);
       this._event2Callback["wheel"] = (e: WheelEvent) => this._measureAndBroadcast(e, this._wheelBroadcaster);
 
-      this._broadcasters = [this._moveBroadcaster, this._downBroadcaster, this._upBroadcaster, this._wheelBroadcaster];
+      this._dblClickBroadcaster = new Core.Broadcaster(this);
+      this._event2Callback["dblclick"] = (e: MouseEvent) => this._measureAndBroadcast(e, this._dblClickBroadcaster);
+
+      this._broadcasters = [this._moveBroadcaster, this._downBroadcaster, this._upBroadcaster, this._wheelBroadcaster,
+                            this._dblClickBroadcaster];
     }
 
     protected _getWrappedCallback(callback: Function): Core.BroadcasterCallback<Dispatcher.Mouse> {
@@ -120,13 +125,29 @@ export module Dispatcher {
      *
      * @param {any} key The key associated with the callback.
      *                  Key uniqueness is determined by deep equality.
-     * @param {WheelCallback} callback A callback that takes the pixel position
+     * @param {MouseCallback} callback A callback that takes the pixel position
      *                                     in svg-coordinate-space.
      *                                     Pass `null` to remove a callback.
      * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
      */
     public onWheel(key: any, callback: MouseCallback): Dispatcher.Mouse {
       this._setCallback(this._wheelBroadcaster, key, callback);
+      return this;
+    }
+
+    /**
+     * Registers a callback to be called whenever a dblClick occurs,
+     * or removes the callback if `null` is passed as the callback.
+     *
+     * @param {any} key The key associated with the callback.
+     *                  Key uniqueness is determined by deep equality.
+     * @param {MouseCallback} callback A callback that takes the pixel position
+     *                                     in svg-coordinate-space.
+     *                                     Pass `null` to remove a callback.
+     * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+     */
+    public onDblClick(key: any, callback: MouseCallback): Dispatcher.Mouse {
+      this._setCallback(this._dblClickBroadcaster, key, callback);
       return this;
     }
 
