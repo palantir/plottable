@@ -2375,6 +2375,18 @@ describe("Plots", function () {
 var assert = chai.assert;
 describe("Plots", function () {
     describe("PiePlot", function () {
+        // HACKHACK beforeEach being used below
+        it("renders correctly with no data", function () {
+            var svg = generateSVG(400, 400);
+            var plot = new Plottable.Plot.Pie();
+            plot.project("value", function (d) { return d.value; });
+            assert.doesNotThrow(function () { return plot.renderTo(svg); }, Error);
+            assert.strictEqual(plot.width(), 400, "was allocated width");
+            assert.strictEqual(plot.height(), 400, "was allocated height");
+            svg.remove();
+        });
+    });
+    describe("PiePlot", function () {
         var svg;
         var simpleDataset;
         var simpleData;
@@ -2615,6 +2627,21 @@ describe("Plots", function () {
 var assert = chai.assert;
 describe("Plots", function () {
     describe("LinePlot", function () {
+        // HACKHACK beforeEach being used below
+        it("renders correctly with no data", function () {
+            var svg = generateSVG(400, 400);
+            var xScale = new Plottable.Scale.Linear();
+            var yScale = new Plottable.Scale.Linear();
+            var plot = new Plottable.Plot.Line(xScale, yScale);
+            plot.project("x", function (d) { return d.x; }, xScale);
+            plot.project("y", function (d) { return d.y; }, yScale);
+            assert.doesNotThrow(function () { return plot.renderTo(svg); }, Error);
+            assert.strictEqual(plot.width(), 400, "was allocated width");
+            assert.strictEqual(plot.height(), 400, "was allocated height");
+            svg.remove();
+        });
+    });
+    describe("LinePlot", function () {
         var svg;
         var xScale;
         var yScale;
@@ -2837,6 +2864,21 @@ describe("Plots", function () {
 var assert = chai.assert;
 describe("Plots", function () {
     describe("AreaPlot", function () {
+        // HACKHACK beforeEach being used below
+        it("renders correctly with no data", function () {
+            var svg = generateSVG(400, 400);
+            var xScale = new Plottable.Scale.Linear();
+            var yScale = new Plottable.Scale.Linear();
+            var plot = new Plottable.Plot.Area(xScale, yScale);
+            plot.project("x", function (d) { return d.x; }, xScale);
+            plot.project("y", function (d) { return d.y; }, yScale);
+            assert.doesNotThrow(function () { return plot.renderTo(svg); }, Error);
+            assert.strictEqual(plot.width(), 400, "was allocated width");
+            assert.strictEqual(plot.height(), 400, "was allocated height");
+            svg.remove();
+        });
+    });
+    describe("AreaPlot", function () {
         var svg;
         var xScale;
         var yScale;
@@ -2978,6 +3020,19 @@ describe("Plots", function () {
 var assert = chai.assert;
 describe("Plots", function () {
     describe("Bar Plot", function () {
+        // HACKHACK beforeEach being used below
+        it("renders correctly with no data", function () {
+            var svg = generateSVG(400, 400);
+            var xScale = new Plottable.Scale.Linear();
+            var yScale = new Plottable.Scale.Linear();
+            var plot = new Plottable.Plot.Bar(xScale, yScale);
+            plot.project("x", function (d) { return d.x; }, xScale);
+            plot.project("y", function (d) { return d.y; }, yScale);
+            assert.doesNotThrow(function () { return plot.renderTo(svg); }, Error);
+            assert.strictEqual(plot.width(), 400, "was allocated width");
+            assert.strictEqual(plot.height(), 400, "was allocated height");
+            svg.remove();
+        });
         describe("Vertical Bar Plot", function () {
             var svg;
             var dataset;
@@ -3651,6 +3706,18 @@ describe("Plots", function () {
 var assert = chai.assert;
 describe("Plots", function () {
     describe("ScatterPlot", function () {
+        it("renders correctly with no data", function () {
+            var svg = generateSVG(400, 400);
+            var xScale = new Plottable.Scale.Linear();
+            var yScale = new Plottable.Scale.Linear();
+            var plot = new Plottable.Plot.Scatter(xScale, yScale);
+            plot.project("x", function (d) { return d.x; }, xScale);
+            plot.project("y", function (d) { return d.y; }, yScale);
+            assert.doesNotThrow(function () { return plot.renderTo(svg); }, Error);
+            assert.strictEqual(plot.width(), 400, "was allocated width");
+            assert.strictEqual(plot.height(), 400, "was allocated height");
+            svg.remove();
+        });
         it("the accessors properly access data, index, and metadata", function () {
             var svg = generateSVG(400, 400);
             var xScale = new Plottable.Scale.Linear();
