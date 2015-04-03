@@ -4,7 +4,7 @@ var assert = chai.assert;
 
 describe("Plots", () => {
   describe("PiePlot", () => {
-    // HACKHACK beforeEach being used below
+    // HACKHACK #1798: beforeEach being used below
     it("renders correctly with no data", () => {
       var svg = generateSVG(400, 400);
       var plot = new Plottable.Plot.Pie();

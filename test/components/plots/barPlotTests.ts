@@ -4,7 +4,7 @@ var assert = chai.assert;
 
 describe("Plots", () => {
   describe("Bar Plot", () => {
-    // HACKHACK beforeEach being used below
+    // HACKHACK #1798: beforeEach being used below
     it("renders correctly with no data", () => {
       var svg = generateSVG(400, 400);
       var xScale = new Plottable.Scale.Linear();

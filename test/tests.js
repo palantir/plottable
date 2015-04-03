@@ -2360,6 +2360,18 @@ describe("Plots", function () {
 var assert = chai.assert;
 describe("Plots", function () {
     describe("PiePlot", function () {
+        // HACKHACK beforeEach being used below
+        it("renders correctly with no data", function () {
+            var svg = generateSVG(400, 400);
+            var plot = new Plottable.Plot.Pie();
+            plot.project("value", function (d) { return d.value; });
+            assert.doesNotThrow(function () { return plot.renderTo(svg); }, Error);
+            assert.strictEqual(plot.width(), 400, "was allocated width");
+            assert.strictEqual(plot.height(), 400, "was allocated height");
+            svg.remove();
+        });
+    });
+    describe("PiePlot", function () {
         var svg;
         var simpleDataset;
         var simpleData;
