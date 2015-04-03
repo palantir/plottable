@@ -1,5 +1,5 @@
 /*!
-Plottable 0.49.0 (https://github.com/palantir/plottable)
+Plottable 0.50.0 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -326,6 +326,11 @@ var Plottable;
                 return Math.pow(p2.y - p1.y, 2) + Math.pow(p2.x - p1.x, 2);
             }
             Methods.distanceSquared = distanceSquared;
+            function isIE() {
+                var userAgent = window.navigator.userAgent;
+                return userAgent.indexOf("MSIE ") > -1 || userAgent.indexOf("Trident/") > -1;
+            }
+            Methods.isIE = isIE;
         })(Methods = _Util.Methods || (_Util.Methods = {}));
     })(_Util = Plottable._Util || (Plottable._Util = {}));
 })(Plottable || (Plottable = {}));
@@ -982,66 +987,6 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    var SymbolGenerators;
-    (function (SymbolGenerators) {
-        /**
-         * The radius that symbol generators will be assumed to have for their symbols.
-         */
-        SymbolGenerators.SYMBOL_GENERATOR_RADIUS = 50;
-        /**
-         * A wrapper for D3's symbol generator as documented here:
-         * https://github.com/mbostock/d3/wiki/SVG-Shapes#symbol
-         *
-         * Note that since D3 symbols compute the path strings by knowing how much area it can take up instead of
-         * knowing its dimensions, the total area expected may be off by some constant factor.
-         *
-         * @param {string | ((datum: any, index: number) => string)} symbolType Accessor for the d3 symbol type
-         * @returns {SymbolGenerator} the symbol generator for a D3 symbol
-         */
-        function d3Symbol(symbolType) {
-            // Since D3 symbols use a size concept, we have to convert our radius value to the corresponding area value
-            // This is done by inspecting the symbol size calculation in d3.js and solving how sizes are calculated from a given radius
-            var typeToSize = function (symbolTypeString) {
-                var sizeFactor;
-                switch (symbolTypeString) {
-                    case "circle":
-                        sizeFactor = Math.PI;
-                        break;
-                    case "square":
-                        sizeFactor = 4;
-                        break;
-                    case "cross":
-                        sizeFactor = 20 / 9;
-                        break;
-                    case "diamond":
-                        sizeFactor = 2 * Math.tan(Math.PI / 6);
-                        break;
-                    case "triangle-up":
-                    case "triangle-down":
-                        sizeFactor = Math.sqrt(3);
-                        break;
-                    default:
-                        sizeFactor = 1;
-                        break;
-                }
-                return sizeFactor * Math.pow(SymbolGenerators.SYMBOL_GENERATOR_RADIUS, 2);
-            };
-            function ensureSymbolType(symTypeString) {
-                if (d3.svg.symbolTypes.indexOf(symTypeString) === -1) {
-                    throw new Error(symTypeString + " is an invalid D3 symbol type.  d3.svg.symbolTypes can retrieve the valid symbol types.");
-                }
-                return symTypeString;
-            }
-            var symbolSize = typeof (symbolType) === "string" ? typeToSize(ensureSymbolType(symbolType)) : function (datum, index) { return typeToSize(ensureSymbolType(symbolType(datum, index))); };
-            return d3.svg.symbol().type(symbolType).size(symbolSize);
-        }
-        SymbolGenerators.d3Symbol = d3Symbol;
-    })(SymbolGenerators = Plottable.SymbolGenerators || (Plottable.SymbolGenerators = {}));
-})(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var Plottable;
-(function (Plottable) {
     var ScaleDomainTransformers;
     (function (ScaleDomainTransformers) {
         /**
@@ -1075,6 +1020,38 @@ var Plottable;
         }
         ScaleDomainTransformers.magnify = magnify;
     })(ScaleDomainTransformers = Plottable.ScaleDomainTransformers || (Plottable.ScaleDomainTransformers = {}));
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var Plottable;
+(function (Plottable) {
+    var SymbolFactories;
+    (function (SymbolFactories) {
+        function circle() {
+            return function (symbolSize) { return d3.svg.symbol().type("circle").size(Math.PI * Math.pow(symbolSize / 2, 2))(); };
+        }
+        SymbolFactories.circle = circle;
+        function square() {
+            return function (symbolSize) { return d3.svg.symbol().type("square").size(Math.pow(symbolSize, 2))(); };
+        }
+        SymbolFactories.square = square;
+        function cross() {
+            return function (symbolSize) { return d3.svg.symbol().type("cross").size((5 / 9) * Math.pow(symbolSize, 2))(); };
+        }
+        SymbolFactories.cross = cross;
+        function diamond() {
+            return function (symbolSize) { return d3.svg.symbol().type("diamond").size(Math.tan(Math.PI / 6) * Math.pow(symbolSize, 2) / 2)(); };
+        }
+        SymbolFactories.diamond = diamond;
+        function triangleUp() {
+            return function (symbolSize) { return d3.svg.symbol().type("triangle-up").size(Math.sqrt(3) * Math.pow(symbolSize / 2, 2))(); };
+        }
+        SymbolFactories.triangleUp = triangleUp;
+        function triangleDown() {
+            return function (symbolSize) { return d3.svg.symbol().type("triangle-down").size(Math.sqrt(3) * Math.pow(symbolSize / 2, 2))(); };
+        }
+        SymbolFactories.triangleDown = triangleDown;
+    })(SymbolFactories = Plottable.SymbolFactories || (Plottable.SymbolFactories = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -1155,7 +1132,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "0.49.0";
+    Plottable.version = "0.50.0";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -3391,47 +3368,31 @@ var Plottable;
     (function (_Drawer) {
         var Symbol = (function (_super) {
             __extends(Symbol, _super);
-            function Symbol() {
-                _super.apply(this, arguments);
+            function Symbol(key) {
+                _super.call(this, key);
+                this._svgElement = "path";
+                this._className = "symbol";
             }
-            Symbol.prototype._enterData = function (data) {
-                _super.prototype._enterData.call(this, data);
-                var dataElements = this._getDrawSelection().data(data);
-                dataElements.enter().append("path");
-                dataElements.exit().remove();
-                dataElements.classed("symbol", true);
-            };
-            Symbol.prototype._getDrawSelection = function () {
-                return this._getRenderArea().selectAll("path");
-            };
             Symbol.prototype._drawStep = function (step) {
-                _super.prototype._drawStep.call(this, step);
-                var attrToProjector = Plottable._Util.Methods.copyMap(step.attrToProjector);
+                var attrToProjector = step.attrToProjector;
                 this._attrToProjector = Plottable._Util.Methods.copyMap(step.attrToProjector);
                 var xProjector = attrToProjector["x"];
                 var yProjector = attrToProjector["y"];
                 delete attrToProjector["x"];
                 delete attrToProjector["y"];
-                var rProjector = attrToProjector["r"];
-                delete attrToProjector["r"];
-                attrToProjector["transform"] = function (datum, index) { return "translate(" + xProjector(datum, index) + "," + yProjector(datum, index) + ") " + "scale(" + rProjector(datum, index) / 50 + ")"; };
+                var rProjector = attrToProjector["size"];
+                delete attrToProjector["size"];
+                attrToProjector["transform"] = function (datum, index) { return "translate(" + xProjector(datum, index) + "," + yProjector(datum, index) + ")"; };
                 var symbolProjector = attrToProjector["symbol"];
                 delete attrToProjector["symbol"];
-                attrToProjector["d"] = symbolProjector;
-                var drawSelection = this._getDrawSelection();
-                if (attrToProjector["fill"]) {
-                    drawSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
-                }
-                step.animator.animate(drawSelection, attrToProjector);
-            };
-            Symbol.prototype._getSelector = function () {
-                return "path";
+                attrToProjector["d"] = attrToProjector["d"] || (function (datum, index) { return symbolProjector(datum, index)(rProjector(datum, index)); });
+                _super.prototype._drawStep.call(this, step);
             };
             Symbol.prototype._getPixelPoint = function (datum, index) {
                 return { x: this._attrToProjector["x"](datum, index), y: this._attrToProjector["y"](datum, index) };
             };
             return Symbol;
-        })(_Drawer.AbstractDrawer);
+        })(_Drawer.Element);
         _Drawer.Symbol = Symbol;
     })(_Drawer = Plottable._Drawer || (Plottable._Drawer = {}));
 })(Plottable || (Plottable = {}));
@@ -5580,7 +5541,7 @@ var Plottable;
                 this._fixedWidthFlag = true;
                 this._fixedHeightFlag = true;
                 this._sortFn = function (a, b) { return _this._scale.domain().indexOf(a) - _this._scale.domain().indexOf(b); };
-                this._symbolGenerator = Plottable.SymbolGenerators.d3Symbol("circle");
+                this._symbolFactoryAccessor = function () { return Plottable.SymbolFactories.circle(); };
             }
             Legend.prototype._setup = function () {
                 _super.prototype._setup.call(this);
@@ -5744,7 +5705,7 @@ var Plottable;
                         return translateString;
                     });
                 });
-                entries.select("path").attr("d", this.symbolGenerator()).attr("transform", "translate(" + (layout.textHeight / 2) + "," + layout.textHeight / 2 + ") " + "scale(" + (layout.textHeight * 0.3 / Plottable.SymbolGenerators.SYMBOL_GENERATOR_RADIUS) + ")").attr("fill", function (value) { return _this._scale.scale(value); }).attr("vector-effect", "non-scaling-stroke").classed(Legend.LEGEND_SYMBOL_CLASS, true);
+                entries.select("path").attr("d", function (d, i) { return _this.symbolFactoryAccessor()(d, i)(layout.textHeight * 0.6); }).attr("transform", "translate(" + (layout.textHeight / 2) + "," + layout.textHeight / 2 + ")").attr("fill", function (value) { return _this._scale.scale(value); }).classed(Legend.LEGEND_SYMBOL_CLASS, true);
                 var padding = this._padding;
                 var textContainers = entries.select("g.text-container");
                 textContainers.text(""); // clear out previous results
@@ -5762,12 +5723,12 @@ var Plottable;
                     self._writer.write(value, maxTextLength, self.height(), writeOptions);
                 });
             };
-            Legend.prototype.symbolGenerator = function (symbolGenerator) {
-                if (symbolGenerator == null) {
-                    return this._symbolGenerator;
+            Legend.prototype.symbolFactoryAccessor = function (symbolFactoryAccessor) {
+                if (symbolFactoryAccessor == null) {
+                    return this._symbolFactoryAccessor;
                 }
                 else {
-                    this._symbolGenerator = symbolGenerator;
+                    this._symbolFactoryAccessor = symbolFactoryAccessor;
                     this._render();
                     return this;
                 }
@@ -7306,18 +7267,17 @@ var Plottable;
             };
             Scatter.prototype._generateAttrToProjector = function () {
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
-                attrToProjector["r"] = attrToProjector["r"] || d3.functor(3);
+                attrToProjector["size"] = attrToProjector["size"] || d3.functor(6);
                 attrToProjector["opacity"] = attrToProjector["opacity"] || d3.functor(0.6);
                 attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this._defaultFillColor);
-                attrToProjector["symbol"] = attrToProjector["symbol"] || Plottable.SymbolGenerators.d3Symbol("circle");
-                attrToProjector["vector-effect"] = attrToProjector["vector-effect"] || d3.functor("non-scaling-stroke");
+                attrToProjector["symbol"] = attrToProjector["symbol"] || (function () { return Plottable.SymbolFactories.circle(); });
                 return attrToProjector;
             };
             Scatter.prototype._generateDrawSteps = function () {
                 var drawSteps = [];
                 if (this._dataChanged && this._animate) {
                     var resetAttrToProjector = this._generateAttrToProjector();
-                    resetAttrToProjector["r"] = function () { return 0; };
+                    resetAttrToProjector["size"] = function () { return 0; };
                     drawSteps.push({ attrToProjector: resetAttrToProjector, animator: this._getAnimator("symbols-reset") });
                 }
                 drawSteps.push({ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("symbols") });
@@ -7345,7 +7305,7 @@ var Plottable;
                     var drawer = _this._key2PlotDatasetKey.get(key).drawer;
                     drawer._getRenderArea().selectAll("path").each(function (d, i) {
                         var distSq = getDistSq(d, i, dataset.metadata(), plotMetadata);
-                        var r = attrToProjector["r"](d, i, dataset.metadata(), plotMetadata);
+                        var r = attrToProjector["size"](d, i, dataset.metadata(), plotMetadata) / 2;
                         if (distSq < r * r) {
                             if (!overAPoint || distSq < minDistSq) {
                                 closestElement = this;
@@ -9035,7 +8995,9 @@ var Plottable;
                 this._event2Callback["mouseup"] = function (e) { return _this._measureAndBroadcast(e, _this._upBroadcaster); };
                 this._wheelBroadcaster = new Plottable.Core.Broadcaster(this);
                 this._event2Callback["wheel"] = function (e) { return _this._measureAndBroadcast(e, _this._wheelBroadcaster); };
-                this._broadcasters = [this._moveBroadcaster, this._downBroadcaster, this._upBroadcaster, this._wheelBroadcaster];
+                this._dblClickBroadcaster = new Plottable.Core.Broadcaster(this);
+                this._event2Callback["dblclick"] = function (e) { return _this._measureAndBroadcast(e, _this._dblClickBroadcaster); };
+                this._broadcasters = [this._moveBroadcaster, this._downBroadcaster, this._upBroadcaster, this._wheelBroadcaster, this._dblClickBroadcaster];
             }
             /**
              * Get a Dispatcher.Mouse for the <svg> containing elem. If one already exists
@@ -9107,13 +9069,28 @@ var Plottable;
              *
              * @param {any} key The key associated with the callback.
              *                  Key uniqueness is determined by deep equality.
-             * @param {WheelCallback} callback A callback that takes the pixel position
+             * @param {MouseCallback} callback A callback that takes the pixel position
              *                                     in svg-coordinate-space.
              *                                     Pass `null` to remove a callback.
              * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
              */
             Mouse.prototype.onWheel = function (key, callback) {
                 this._setCallback(this._wheelBroadcaster, key, callback);
+                return this;
+            };
+            /**
+             * Registers a callback to be called whenever a dblClick occurs,
+             * or removes the callback if `null` is passed as the callback.
+             *
+             * @param {any} key The key associated with the callback.
+             *                  Key uniqueness is determined by deep equality.
+             * @param {MouseCallback} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space.
+             *                                     Pass `null` to remove a callback.
+             * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+             */
+            Mouse.prototype.onDblClick = function (key, callback) {
+                this._setCallback(this._dblClickBroadcaster, key, callback);
                 return this;
             };
             /**
@@ -9405,8 +9382,61 @@ var Plottable;
             __extends(Click, _super);
             function Click() {
                 _super.apply(this, arguments);
+                this._clickedDown = false;
             }
             Click.prototype._anchor = function (component, hitBox) {
+                var _this = this;
+                _super.prototype._anchor.call(this, component, hitBox);
+                this._mouseDispatcher = Plottable.Dispatcher.Mouse.getDispatcher(component.content().node());
+                this._mouseDispatcher.onMouseDown("Interaction.Click" + this.getID(), function (p) { return _this._handleClickDown(p); });
+                this._mouseDispatcher.onMouseUp("Interaction.Click" + this.getID(), function (p) { return _this._handleClickUp(p); });
+                this._touchDispatcher = Plottable.Dispatcher.Touch.getDispatcher(component.content().node());
+                this._touchDispatcher.onTouchStart("Interaction.Click" + this.getID(), function (p) { return _this._handleClickDown(p); });
+                this._touchDispatcher.onTouchEnd("Interaction.Click" + this.getID(), function (p) { return _this._handleClickUp(p); });
+            };
+            Click.prototype._handleClickDown = function (p) {
+                var translatedPoint = this._translateToComponentSpace(p);
+                if (this._isInsideComponent(translatedPoint)) {
+                    this._clickedDown = true;
+                }
+            };
+            Click.prototype._handleClickUp = function (p) {
+                var translatedPoint = this._translateToComponentSpace(p);
+                if (this._clickedDown && this._isInsideComponent(translatedPoint) && (this._clickCallback != null)) {
+                    this._clickCallback(translatedPoint);
+                }
+                this._clickedDown = false;
+            };
+            Click.prototype.onClick = function (callback) {
+                if (callback === undefined) {
+                    return this._clickCallback;
+                }
+                this._clickCallback = callback;
+                return this;
+            };
+            return Click;
+        })(Interaction.AbstractInteraction);
+        Interaction.Click = Click;
+    })(Interaction = Plottable.Interaction || (Plottable.Interaction = {}));
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    var Interaction;
+    (function (Interaction) {
+        var DoubleClick = (function (_super) {
+            __extends(DoubleClick, _super);
+            function DoubleClick() {
+                _super.apply(this, arguments);
+            }
+            DoubleClick.prototype._anchor = function (component, hitBox) {
                 var _this = this;
                 _super.prototype._anchor.call(this, component, hitBox);
                 hitBox.on(this._listenTo(), function () {
@@ -9416,34 +9446,23 @@ var Plottable;
                     _this._callback({ x: x, y: y });
                 });
             };
-            Click.prototype._requiresHitbox = function () {
+            DoubleClick.prototype._requiresHitbox = function () {
                 return true;
             };
-            Click.prototype._listenTo = function () {
-                return "click";
+            DoubleClick.prototype._listenTo = function () {
+                return "dblclick";
             };
             /**
              * Sets a callback to be called when a click is received.
              *
              * @param {(p: Point) => any} cb Callback that takes the pixel position of the click event.
              */
-            Click.prototype.callback = function (cb) {
+            DoubleClick.prototype.callback = function (cb) {
                 this._callback = cb;
                 return this;
             };
-            return Click;
-        })(Interaction.AbstractInteraction);
-        Interaction.Click = Click;
-        var DoubleClick = (function (_super) {
-            __extends(DoubleClick, _super);
-            function DoubleClick() {
-                _super.apply(this, arguments);
-            }
-            DoubleClick.prototype._listenTo = function () {
-                return "dblclick";
-            };
             return DoubleClick;
-        })(Click);
+        })(Interaction.AbstractInteraction);
         Interaction.DoubleClick = DoubleClick;
     })(Interaction = Plottable.Interaction || (Plottable.Interaction = {}));
 })(Plottable || (Plottable = {}));

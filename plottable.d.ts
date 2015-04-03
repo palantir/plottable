@@ -129,6 +129,7 @@ declare module Plottable {
             function lightenColor(color: string, factor: number): string;
             function darkenColor(color: string, factor: number, darkenAmount: number): string;
             function distanceSquared(p1: Point, p2: Point): number;
+            function isIE(): boolean;
         }
     }
 }
@@ -410,36 +411,6 @@ declare module Plottable {
 
 
 declare module Plottable {
-    /**
-     * A SymbolGenerator is a function that takes in a datum and the index of the datum to
-     * produce an svg path string analogous to the datum/index pair.
-     *
-     * Note that SymbolGenerators used in Plottable will be assumed to work within a 100x100 square
-     * to be scaled appropriately for use within Plottable
-     */
-    type SymbolGenerator = (datum: any, index: number) => string;
-    module SymbolGenerators {
-        /**
-         * The radius that symbol generators will be assumed to have for their symbols.
-         */
-        var SYMBOL_GENERATOR_RADIUS: number;
-        type StringAccessor = ((datum: any, index: number) => string);
-        /**
-         * A wrapper for D3's symbol generator as documented here:
-         * https://github.com/mbostock/d3/wiki/SVG-Shapes#symbol
-         *
-         * Note that since D3 symbols compute the path strings by knowing how much area it can take up instead of
-         * knowing its dimensions, the total area expected may be off by some constant factor.
-         *
-         * @param {string | ((datum: any, index: number) => string)} symbolType Accessor for the d3 symbol type
-         * @returns {SymbolGenerator} the symbol generator for a D3 symbol
-         */
-        function d3Symbol(symbolType: string | StringAccessor): D3.Svg.Symbol;
-    }
-}
-
-
-declare module Plottable {
     module ScaleDomainTransformers {
         /**
          * Returns a translated domain of the input scale with a translation of the input translateAmount
@@ -461,6 +432,24 @@ declare module Plottable {
          * @returns {D[]} The magnified domain
          */
         function magnify<D>(scale: Scale.AbstractQuantitative<D>, magnifyAmount: number, centerValue: number | D, centerInDomainSpace?: boolean): void;
+    }
+}
+
+
+declare module Plottable {
+    /**
+     * A SymbolFactory is a function that takes in a symbolSize which is the edge length of the render area
+     * and returns a string representing the 'd' attribute of the resultant 'path' element
+     */
+    type SymbolFactory = (symbolSize: number) => string;
+    module SymbolFactories {
+        type StringAccessor = (datum: any, index: number) => string;
+        function circle(): SymbolFactory;
+        function square(): SymbolFactory;
+        function cross(): SymbolFactory;
+        function diamond(): SymbolFactory;
+        function triangleUp(): SymbolFactory;
+        function triangleDown(): SymbolFactory;
     }
 }
 
@@ -1634,10 +1623,9 @@ declare module Plottable {
 
 declare module Plottable {
     module _Drawer {
-        class Symbol extends AbstractDrawer {
-            protected _enterData(data: any[]): void;
+        class Symbol extends Element {
+            constructor(key: string);
             protected _drawStep(step: AppliedDrawStep): void;
-            _getSelector(): string;
             _getPixelPoint(datum: any, index: number): Point;
         }
     }
@@ -2446,18 +2434,19 @@ declare module Plottable {
             getEntry(position: Point): D3.Selection;
             _doRender(): void;
             /**
-             * Gets the SymbolGenerator of the legend, which dictates how
+             * Gets the symbolFactoryAccessor of the legend, which dictates how
              * the symbol in each entry is drawn.
              *
-             * @returns {SymbolGenerator} The SymbolGenerator of the legend
+             * @returns {(datum: any, index: number) => symbolFactory} The symbolFactory accessor of the legend
              */
-            symbolGenerator(): SymbolGenerator;
+            symbolFactoryAccessor(): (datum: any, index: number) => SymbolFactory;
             /**
-             * Sets the SymbolGenerator of the legend
+             * Sets the symbolFactoryAccessor of the legend
              *
+             * @param {(datum: any, index: number) => symbolFactory}  The symbolFactory accessor to set to
              * @returns {Legend} The calling Legend
              */
-            symbolGenerator(symbolGenerator: SymbolGenerator): Legend;
+            symbolFactoryAccessor(symbolFactoryAccessor: (datum: any, index: number) => SymbolFactory): Legend;
         }
     }
 }
@@ -3630,12 +3619,24 @@ declare module Plottable {
              *
              * @param {any} key The key associated with the callback.
              *                  Key uniqueness is determined by deep equality.
-             * @param {WheelCallback} callback A callback that takes the pixel position
+             * @param {MouseCallback} callback A callback that takes the pixel position
              *                                     in svg-coordinate-space.
              *                                     Pass `null` to remove a callback.
              * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
              */
             onWheel(key: any, callback: MouseCallback): Dispatcher.Mouse;
+            /**
+             * Registers a callback to be called whenever a dblClick occurs,
+             * or removes the callback if `null` is passed as the callback.
+             *
+             * @param {any} key The key associated with the callback.
+             *                  Key uniqueness is determined by deep equality.
+             * @param {MouseCallback} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space.
+             *                                     Pass `null` to remove a callback.
+             * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+             */
+            onDblClick(key: any, callback: MouseCallback): Dispatcher.Mouse;
             /**
              * Returns the last computed mouse position.
              *
@@ -3793,6 +3794,28 @@ declare module Plottable {
     module Interaction {
         class Click extends AbstractInteraction {
             _anchor(component: Component.AbstractComponent, hitBox: D3.Selection): void;
+            /**
+             * Gets the callback called when the Component is clicked.
+             *
+             * @return {(p: Point) => any} The current callback.
+             */
+            onClick(): (p: Point) => any;
+            /**
+             * Sets the callback called when the Component is clicked.
+             *
+             * @param {(p: Point) => any} callback The callback to set.
+             * @return {Interaction.Click} The calling Interaction.Click.
+             */
+            onClick(callback: (p: Point) => any): Interaction.Click;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Interaction {
+        class DoubleClick extends AbstractInteraction {
+            _anchor(component: Component.AbstractComponent, hitBox: D3.Selection): void;
             _requiresHitbox(): boolean;
             protected _listenTo(): string;
             /**
@@ -3800,10 +3823,7 @@ declare module Plottable {
              *
              * @param {(p: Point) => any} cb Callback that takes the pixel position of the click event.
              */
-            callback(cb: (p: Point) => any): Click;
-        }
-        class DoubleClick extends Click {
-            protected _listenTo(): string;
+            callback(cb: (p: Point) => any): DoubleClick;
         }
     }
 }

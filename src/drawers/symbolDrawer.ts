@@ -2,23 +2,16 @@
 
 module Plottable {
 export module _Drawer {
-  export class Symbol extends AbstractDrawer {
+  export class Symbol extends Element {
 
-    protected _enterData(data: any[]) {
-      super._enterData(data);
-      var dataElements = this._getDrawSelection().data(data);
-      dataElements.enter().append("path");
-      dataElements.exit().remove();
-      dataElements.classed("symbol", true);
-    }
-
-    private _getDrawSelection() {
-      return this._getRenderArea().selectAll("path");
+    constructor(key: string) {
+      super(key);
+      this._svgElement = "path";
+      this._className = "symbol";
     }
 
     protected _drawStep(step: AppliedDrawStep) {
-      super._drawStep(step);
-      var attrToProjector = <AttributeToAppliedProjector>_Util.Methods.copyMap(step.attrToProjector);
+      var attrToProjector = step.attrToProjector;
       this._attrToProjector = <AttributeToAppliedProjector>_Util.Methods.copyMap(step.attrToProjector);
 
       var xProjector = attrToProjector["x"];
@@ -26,28 +19,19 @@ export module _Drawer {
       delete attrToProjector["x"];
       delete attrToProjector["y"];
 
-      var rProjector = attrToProjector["r"];
-      delete attrToProjector["r"];
+      var rProjector = attrToProjector["size"];
+      delete attrToProjector["size"];
 
       attrToProjector["transform"] = (datum: any, index: number) =>
-        "translate(" + xProjector(datum, index) + "," + yProjector(datum, index) + ") " +
-        "scale(" + rProjector(datum, index) / 50 + ")";
+        "translate(" + xProjector(datum, index) + "," + yProjector(datum, index) + ")";
 
       var symbolProjector = attrToProjector["symbol"];
       delete attrToProjector["symbol"];
 
-      attrToProjector["d"] = symbolProjector;
+      attrToProjector["d"] = attrToProjector["d"] || ((datum: any, index: number) =>
+        symbolProjector(datum, index)(rProjector(datum, index)));
 
-      var drawSelection = this._getDrawSelection();
-      if (attrToProjector["fill"]) {
-        drawSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
-      }
-
-      step.animator.animate(drawSelection, attrToProjector);
-    }
-
-    public _getSelector() {
-      return "path";
+      super._drawStep(step);
     }
 
     public _getPixelPoint(datum: any, index: number): Point {
