@@ -70,6 +70,11 @@ export module Plot {
     protected _getPlotData(xExtent: Extent, yExtent: Extent, datasetKeys: string[]): PlotData {
       var queryPoint = {x: (xExtent.min + xExtent.max) / 2 - this.width() / 2,
                         y: (yExtent.min + yExtent.max) / 2 - this.height() / 2};
+      var radiusDistance = Math.sqrt(Math.pow(queryPoint.x, 2) + Math.pow(queryPoint.y, 2));
+      var pixelAngle = Math.atan2(queryPoint.x, -queryPoint.y);
+      if (pixelAngle < 0) {
+        pixelAngle += Math.PI * 2;
+      }
       var data: any[] = [];
       var pixelPoints: Point[] = [];
       var selections: EventTarget[] = [];
@@ -80,14 +85,12 @@ export module Plot {
           var piePlotSelection = d3.select(plotData.selection[0][index]);
           var innerRadius = projectors["inner-radius"](datum, index);
           var outerRadius = projectors["outer-radius"](datum, index);
-          var radiusDistance = Math.sqrt(Math.pow(queryPoint.x, 2) + Math.pow(queryPoint.y, 2));
           if (radiusDistance < innerRadius || radiusDistance > outerRadius) {
             return;
           }
 
           var startAngle = +piePlotSelection.datum()["startAngle"];
           var endAngle = +piePlotSelection.datum()["endAngle"];
-          var pixelAngle = Math.atan2(-queryPoint.y, queryPoint.x);
           if (pixelAngle < startAngle || pixelAngle > endAngle) {
             return;
           }
