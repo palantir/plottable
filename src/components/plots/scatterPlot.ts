@@ -30,25 +30,10 @@ export module Plot {
 
     protected _generateAttrToProjector() {
       var attrToProjector = super._generateAttrToProjector();
-      attrToProjector["r"] = attrToProjector["r"] || d3.functor(3);
+      attrToProjector["size"] = attrToProjector["size"] || d3.functor(6);
       attrToProjector["opacity"] = attrToProjector["opacity"] || d3.functor(0.6);
       attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this._defaultFillColor);
-      attrToProjector["symbol"] = attrToProjector["symbol"] || Plottable.SymbolGenerators.d3Symbol("circle");
-      attrToProjector["vector-effect"] = attrToProjector["vector-effect"] || d3.functor("non-scaling-stroke");
-
-      // HACKHACK vector-effect non-scaling-stroke has no effect in IE
-      // https://connect.microsoft.com/IE/feedback/details/788819/svg-non-scaling-stroke
-      if (_Util.Methods.isIE() && attrToProjector["stroke-width"] != null) {
-        var strokeWidthProjector = attrToProjector["stroke-width"];
-        attrToProjector["stroke-width"] = (d, i, u, m) => {
-          var strokeWidth = strokeWidthProjector(d, i, u, m) ;
-          if (attrToProjector["vector-effect"](d, i, u, m) === "non-scaling-stroke") {
-            return strokeWidth * SymbolGenerators.SYMBOL_GENERATOR_RADIUS / attrToProjector["r"](d, i, u, m);
-          } else {
-            return strokeWidth;
-          }
-        };
-      }
+      attrToProjector["symbol"] = attrToProjector["symbol"] || (() => SymbolFactories.circle());
 
       return attrToProjector;
     }
@@ -57,7 +42,7 @@ export module Plot {
       var drawSteps: _Drawer.DrawStep[] = [];
       if (this._dataChanged && this._animate) {
         var resetAttrToProjector = this._generateAttrToProjector();
-        resetAttrToProjector["r"] = () => 0;
+        resetAttrToProjector["size"] = () => 0;
         drawSteps.push({attrToProjector: resetAttrToProjector, animator: this._getAnimator("symbols-reset")});
       }
 
@@ -88,7 +73,7 @@ export module Plot {
         var drawer = <_Drawer.Symbol>this._key2PlotDatasetKey.get(key).drawer;
         drawer._getRenderArea().selectAll("path").each(function(d, i) {
           var distSq = getDistSq(d, i, dataset.metadata(), plotMetadata);
-          var r = attrToProjector["r"](d, i, dataset.metadata(), plotMetadata);
+          var r = attrToProjector["size"](d, i, dataset.metadata(), plotMetadata) / 2;
 
           if (distSq < r * r) { // cursor is over this point
             if (!overAPoint || distSq < minDistSq) {

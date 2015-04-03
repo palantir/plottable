@@ -25,12 +25,11 @@ function run(svg, data, Plottable) {
   };
 
   //rendering
-  var scatterPlot = new Plottable.Plot.Scatter(xScale, yScale) //0
-          .addDataset(dataseries)
-          .attr("fill", colorScale1.scale("scatter"))
-          .attr("r", function(){return 10;})
-          .project("x", "x", xScale)
-          .project("y", "y", yScale);
+  var scatterPlot = new Plottable.Plot.Scatter(xScale, yScale).addDataset(dataseries) //0
+                                                              .attr("fill", colorScale1.scale("scatter"))
+                                                              .attr("size", function(){return 20;})
+                                                              .project("x", "x", xScale)
+                                                              .project("y", "y", yScale);
 
   var linePlot = new Plottable.Plot.Line(xScale, yScale)
           .addDataset(dataseries) //1

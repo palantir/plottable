@@ -23,13 +23,12 @@ function run(svg, data, Plottable) {
     var yScale = new Plottable.Scale.Category();
 
     var colorScale = new Plottable.Scale.InterpolatedColor();
-    colorScale.colorRange(["#76DE5D","#A12A23"]);  
-    var plot = new Plottable.Plot.Scatter(xScale, yScale, colorScale);
-    plot.addDataset(data);
-    plot.project("x", "x", xScale).project("y", "y", yScale);
-    plot.project("r", function(){ return 10;});
-    plot.project("fill", function(d) { return d.val; }, colorScale);
-    
+    colorScale.colorRange(["#76DE5D","#A12A23"]);
+    var plot = new Plottable.Plot.Scatter(xScale, yScale).addDataset(data)
+                                                         .project("x", "x", xScale).project("y", "y", yScale)
+                                                         .project("size", function(){ return 20;})
+                                                         .project("fill", function(d) { return d.val; }, colorScale);
+
     plot.renderTo(svg);
 
 }
