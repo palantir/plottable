@@ -4746,6 +4746,54 @@ describe("Plots", function () {
             svg.remove();
         });
     });
+    describe("Horizontal Stacked Bar Plot Non-Overlapping Datasets", function () {
+        var svg;
+        var plot;
+        var SVG_WIDTH = 600;
+        var SVG_HEIGHT = 400;
+        var numAttr = function (s, a) { return parseFloat(s.attr(a)); };
+        beforeEach(function () {
+            svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var xScale = new Plottable.Scale.Linear();
+            var yScale = new Plottable.Scale.Category();
+            var data1 = [
+                { y: "A", x: 1, type: "a" },
+                { y: "B", x: 2, type: "a" },
+                { y: "C", x: 1, type: "a" }
+            ];
+            var data2 = [
+                { y: "A", x: 2, type: "b" },
+                { y: "B", x: 3, type: "b" }
+            ];
+            var data3 = [
+                { y: "B", x: 1, type: "c" },
+                { y: "C", x: 7, type: "c" }
+            ];
+            plot = new Plottable.Plot.StackedBar(xScale, yScale, false);
+            plot.addDataset(data1);
+            plot.addDataset(data2);
+            plot.addDataset(data3);
+            plot.project("x", "x", xScale);
+            plot.project("y", "y", yScale);
+            plot.renderTo(svg);
+        });
+        it("renders correctly", function () {
+            var bars = plot.getAllSelections();
+            assert.strictEqual(bars.size(), 7, "draws a bar for each datum");
+            var aBars = [d3.select(bars[0][0]), d3.select(bars[0][3])];
+            var bBars = [d3.select(bars[0][1]), d3.select(bars[0][4]), d3.select(bars[0][5])];
+            var cBars = [d3.select(bars[0][2]), d3.select(bars[0][6])];
+            assert.closeTo(numAttr(aBars[0], "y"), numAttr(aBars[1], "y"), 0.01, "A bars at same y position");
+            assert.operator(numAttr(aBars[0], "x"), "<", numAttr(aBars[1], "x"), "first dataset A bar under second");
+            assert.closeTo(numAttr(bBars[0], "y"), numAttr(bBars[1], "y"), 0.01, "B bars at same y position");
+            assert.closeTo(numAttr(bBars[1], "y"), numAttr(bBars[2], "y"), 0.01, "B bars at same y position");
+            assert.operator(numAttr(bBars[0], "x"), "<", numAttr(bBars[1], "x"), "first dataset B bar under second");
+            assert.operator(numAttr(bBars[1], "x"), "<", numAttr(bBars[2], "x"), "second dataset B bar under third");
+            assert.closeTo(numAttr(cBars[0], "y"), numAttr(cBars[1], "y"), 0.01, "C bars at same y position");
+            assert.operator(numAttr(cBars[0], "x"), "<", numAttr(cBars[1], "x"), "first dataset C bar under second");
+            svg.remove();
+        });
+    });
 });
 
 ///<reference path="../../testReference.ts" />
@@ -4938,6 +4986,49 @@ describe("Plots", function () {
             assert.operator(numAttr(bBar0, "x"), "<", numAttr(bBar1, "x"), "B bars clustered in dataset order");
             assert.operator(numAttr(bBar1, "x"), "<", numAttr(bBar2, "x"), "B bars clustered in dataset order");
             assert.operator(numAttr(cBar0, "x"), "<", numAttr(cBar1, "x"), "C bars clustered in dataset order");
+            svg.remove();
+        });
+    });
+    describe("Horizontal Clustered Bar Plot Missing Values", function () {
+        var svg;
+        var plot;
+        beforeEach(function () {
+            var SVG_WIDTH = 600;
+            var SVG_HEIGHT = 400;
+            svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var xScale = new Plottable.Scale.Linear();
+            var yScale = new Plottable.Scale.Category();
+            var data1 = [{ y: "A", x: 1 }, { y: "B", x: 2 }, { y: "C", x: 1 }];
+            var data2 = [{ y: "A", x: 2 }, { y: "B", x: 4 }];
+            var data3 = [{ y: "B", x: 15 }, { y: "C", x: 15 }];
+            plot = new Plottable.Plot.ClusteredBar(xScale, yScale, false);
+            plot.addDataset(data1);
+            plot.addDataset(data2);
+            plot.addDataset(data3);
+            plot.project("x", "x", xScale);
+            plot.project("y", "y", yScale);
+            plot.renderTo(svg);
+        });
+        it("renders correctly", function () {
+            var bars = plot.getAllSelections();
+            assert.strictEqual(bars.size(), 7, "Number of bars should be equivalent to number of datum");
+            var aBar0 = d3.select(bars[0][0]);
+            var aBar1 = d3.select(bars[0][3]);
+            var bBar0 = d3.select(bars[0][1]);
+            var bBar1 = d3.select(bars[0][4]);
+            var bBar2 = d3.select(bars[0][5]);
+            var cBar0 = d3.select(bars[0][2]);
+            var cBar1 = d3.select(bars[0][6]);
+            // check bars are in domain order
+            assert.operator(numAttr(aBar0, "y"), "<", numAttr(bBar0, "y"), "first dataset bars ordered correctly");
+            assert.operator(numAttr(bBar0, "y"), "<", numAttr(cBar0, "y"), "first dataset bars ordered correctly");
+            assert.operator(numAttr(aBar1, "y"), "<", numAttr(bBar1, "y"), "second dataset bars ordered correctly");
+            assert.operator(numAttr(bBar2, "y"), "<", numAttr(cBar1, "y"), "third dataset bars ordered correctly");
+            // check that clustering is correct
+            assert.operator(numAttr(aBar0, "y"), "<", numAttr(aBar1, "y"), "A bars clustered in dataset order");
+            assert.operator(numAttr(bBar0, "y"), "<", numAttr(bBar1, "y"), "B bars clustered in dataset order");
+            assert.operator(numAttr(bBar1, "y"), "<", numAttr(bBar2, "y"), "B bars clustered in dataset order");
+            assert.operator(numAttr(cBar0, "y"), "<", numAttr(cBar1, "y"), "C bars clustered in dataset order");
             svg.remove();
         });
     });
