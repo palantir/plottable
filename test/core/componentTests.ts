@@ -191,8 +191,8 @@ describe("Component behavior", () => {
     assert.equal(layout.height, 0, "requested height defaults to 0");
     assert.equal(layout.wantsWidth , false, "_requestedSpace().wantsWidth  defaults to false");
     assert.equal(layout.wantsHeight, false, "_requestedSpace().wantsHeight defaults to false");
-    assert.equal((<any> c)._xAlignProportion, 0, "_xAlignProportion defaults to 0");
-    assert.equal((<any> c)._yAlignProportion, 0, "_yAlignProportion defaults to 0");
+    assert.equal(c.xAlign(), "left", "x alignment defaults to \"left\"");
+    assert.equal(c.yAlign(), "top", "y alignment defaults to \"top\"");
     assert.equal((<any> c)._xOffset, 0, "xOffset defaults to 0");
     assert.equal((<any> c)._yOffset, 0, "yOffset defaults to 0");
     svg.remove();

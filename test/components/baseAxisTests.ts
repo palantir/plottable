@@ -200,12 +200,12 @@ describe("BaseAxis", () => {
   it("default alignment based on orientation", () => {
     var scale = new Plottable.Scale.Linear();
     var baseAxis = new Plottable.Axis.AbstractAxis(scale, "bottom");
-    assert.equal((<any> baseAxis)._yAlignProportion, 0, "yAlignProportion defaults to 0 for bottom axis");
+    assert.equal(baseAxis.yAlign(), "top", "y alignment defaults to \"top\" for bottom axis");
     baseAxis = new Plottable.Axis.AbstractAxis(scale, "top");
-    assert.equal((<any> baseAxis)._yAlignProportion, 1, "yAlignProportion defaults to 1 for top axis");
+    assert.equal(baseAxis.yAlign(), "bottom", "y alignment defaults to \"bottom\" for top axis");
     baseAxis = new Plottable.Axis.AbstractAxis(scale, "left");
-    assert.equal((<any> baseAxis)._xAlignProportion, 1, "xAlignProportion defaults to 1 for left axis");
+    assert.equal(baseAxis.xAlign(), "right", "x alignment defaults to \"right\" for left axis");
     baseAxis = new Plottable.Axis.AbstractAxis(scale, "right");
-    assert.equal((<any> baseAxis)._xAlignProportion, 0, "xAlignProportion defaults to 0 for right axis");
+    assert.equal(baseAxis.xAlign(), "left", "x alignment defaults to \"left\" for right axis");
   });
 });

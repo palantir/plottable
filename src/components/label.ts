@@ -9,8 +9,6 @@ export module Component {
     private _measurer: SVGTypewriter.Measurers.Measurer;
     private _wrapper: SVGTypewriter.Wrappers.Wrapper;
     private _writer: SVGTypewriter.Writers.Writer;
-    private _xAlignment: string;
-    private _yAlignment: string;
     private _padding: number;
 
     /**
@@ -32,34 +30,6 @@ export module Component {
       this._fixedHeightFlag = true;
       this._fixedWidthFlag = true;
       this._padding = 0;
-    }
-
-    /**
-     * Sets the horizontal side the label will go to given the label is given more space that it needs
-     *
-     * @param {string} alignment The new setting, one of `["left", "center",
-     * "right"]`. Defaults to `"center"`.
-     * @returns {Label} The calling Label.
-     */
-    public xAlign(alignment: string): Label {
-      var alignmentLC = alignment.toLowerCase();
-      super.xAlign(alignmentLC);
-      this._xAlignment = alignmentLC;
-      return this;
-    }
-
-    /**
-     * Sets the vertical side the label will go to given the label is given more space that it needs
-     *
-     * @param {string} alignment The new setting, one of `["top", "center",
-     * "bottom"]`. Defaults to `"center"`.
-     * @returns {Label} The calling Label.
-     */
-    public yAlign(alignment: string): Label {
-      var alignmentLC = alignment.toLowerCase();
-      super.yAlign(alignmentLC);
-      this._yAlignment = alignmentLC;
-      return this;
     }
 
     public _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
@@ -176,8 +146,8 @@ export module Component {
       var textRotation: {[s: string]: number} = {horizontal: 0, right: 90, left: -90};
       var writeOptions = {
                         selection: this._textContainer,
-                        xAlign: this._xAlignment,
-                        yAlign: this._yAlignment,
+                        xAlign: this.xAlign(),
+                        yAlign: this.yAlign(),
                         textRotation: textRotation[this.orient()]
                     };
       this._writer.write(this._text, writeWidth, writeHeight, writeOptions);

@@ -13,8 +13,18 @@ export module Component {
     private _yOrigin: number;
 
     public _parent: AbstractComponentContainer;
-    private _xAlignProportion = 0; // What % along the free space do we want to position (0 = left, .5 = center, 1 = right)
-    private _yAlignProportion = 0;
+    private _xAlignment: string = "left";
+    private static _xAlignToProportion: { [alignment: string]: number } = {
+      "left": 0,
+      "center": 0.5,
+      "right": 1
+    };
+    private _yAlignment: string = "top";
+    private static _yAlignToProportion: { [alignment: string]: number } = {
+      "top": 0,
+      "center": 0.5,
+      "bottom": 1
+    };
     protected _fixedHeightFlag = false;
     protected _fixedWidthFlag = false;
     protected _isSetup = false;
@@ -138,8 +148,10 @@ export module Component {
       this._width  = this._isFixedWidth()  ? Math.min(availableWidth , requestedSpace.width)  : availableWidth ;
       this._height = this._isFixedHeight() ? Math.min(availableHeight, requestedSpace.height) : availableHeight;
 
-      this._xOrigin = offeredXOrigin + this._xOffset + (availableWidth - this.width()) * this._xAlignProportion;
-      this._yOrigin = offeredYOrigin + this._yOffset + (availableHeight - this.height()) * this._yAlignProportion;;
+      var xAlignProportion = AbstractComponent._xAlignToProportion[this._xAlignment];
+      this._xOrigin = offeredXOrigin + this._xOffset + (availableWidth - this.width()) * xAlignProportion;
+      var yAlignProportion = AbstractComponent._yAlignToProportion[this._yAlignment];
+      this._yOrigin = offeredYOrigin + this._yOffset + (availableHeight - this.height()) * yAlignProportion;;
 
       this._element.attr("transform", "translate(" + this._xOrigin + "," + this._yOrigin + ")");
       this._boxes.forEach((b: D3.Selection) => b.attr("width", this.width()).attr("height", this.height()));
@@ -225,53 +237,55 @@ export module Component {
     }
 
     /**
-     * Sets the x alignment of the Component. This will be used if the
-     * Component is given more space than it needs.
+     * Gets the x alignment of the Component.
      *
-     * For example, you may want to make a Legend postition itself it the top
-     * right, so you would call `legend.xAlign("right")` and
-     * `legend.yAlign("top")`.
+     * @returns {string} The current x alignment.
+     */
+    public xAlign(): string;
+    /**
+     * Sets the x alignment of the Component.
      *
      * @param {string} alignment The x alignment of the Component (one of ["left", "center", "right"]).
      * @returns {Component} The calling Component.
      */
-    public xAlign(alignment: string): AbstractComponent {
-      alignment = alignment.toLowerCase();
-      if (alignment === "left") {
-        this._xAlignProportion = 0;
-      } else if (alignment === "center") {
-        this._xAlignProportion = 0.5;
-      } else if (alignment === "right") {
-        this._xAlignProportion = 1;
-      } else {
-        throw new Error("Unsupported alignment");
+    public xAlign(alignment: string): AbstractComponent;
+    public xAlign(alignment?: string): any {
+      if (alignment == null) {
+        return this._xAlignment;
       }
+
+      alignment = alignment.toLowerCase();
+      if (AbstractComponent._xAlignToProportion[alignment] == null) {
+        throw new Error("Unsupported alignment: " + alignment);
+      }
+      this._xAlignment = alignment;
       this._invalidateLayout();
       return this;
     }
 
     /**
-     * Sets the y alignment of the Component. This will be used if the
-     * Component is given more space than it needs.
+     * Gets the y alignment of the Component.
      *
-     * For example, you may want to make a Legend postition itself it the top
-     * right, so you would call `legend.xAlign("right")` and
-     * `legend.yAlign("top")`.
+     * @returns {string} The current y alignment.
+     */
+    public yAlign(): string;
+    /**
+     * Sets the y alignment of the Component.
      *
-     * @param {string} alignment The x alignment of the Component (one of ["top", "center", "bottom"]).
+     * @param {string} alignment The y alignment of the Component (one of ["top", "center", "bottom"]).
      * @returns {Component} The calling Component.
      */
-    public yAlign(alignment: string): AbstractComponent {
-      alignment = alignment.toLowerCase();
-      if (alignment === "top") {
-        this._yAlignProportion = 0;
-      } else if (alignment === "center") {
-        this._yAlignProportion = 0.5;
-      } else if (alignment === "bottom") {
-        this._yAlignProportion = 1;
-      } else {
-        throw new Error("Unsupported alignment");
+    public yAlign(alignment: string): AbstractComponent;
+    public yAlign(alignment?: string): any {
+      if (alignment == null) {
+        return this._yAlignment;
       }
+
+      alignment = alignment.toLowerCase();
+      if (AbstractComponent._yAlignToProportion[alignment] == null) {
+        throw new Error("Unsupported alignment: " + alignment);
+      }
+      this._yAlignment = alignment;
       this._invalidateLayout();
       return this;
     }

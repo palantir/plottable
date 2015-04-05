@@ -641,13 +641,13 @@ describe("BaseAxis", function () {
     it("default alignment based on orientation", function () {
         var scale = new Plottable.Scale.Linear();
         var baseAxis = new Plottable.Axis.AbstractAxis(scale, "bottom");
-        assert.equal(baseAxis._yAlignProportion, 0, "yAlignProportion defaults to 0 for bottom axis");
+        assert.equal(baseAxis.yAlign(), "top", "y alignment defaults to \"top\" for bottom axis");
         baseAxis = new Plottable.Axis.AbstractAxis(scale, "top");
-        assert.equal(baseAxis._yAlignProportion, 1, "yAlignProportion defaults to 1 for top axis");
+        assert.equal(baseAxis.yAlign(), "bottom", "y alignment defaults to \"bottom\" for top axis");
         baseAxis = new Plottable.Axis.AbstractAxis(scale, "left");
-        assert.equal(baseAxis._xAlignProportion, 1, "xAlignProportion defaults to 1 for left axis");
+        assert.equal(baseAxis.xAlign(), "right", "x alignment defaults to \"right\" for left axis");
         baseAxis = new Plottable.Axis.AbstractAxis(scale, "right");
-        assert.equal(baseAxis._xAlignProportion, 0, "xAlignProportion defaults to 0 for right axis");
+        assert.equal(baseAxis.xAlign(), "left", "x alignment defaults to \"left\" for right axis");
     });
 });
 
@@ -5551,8 +5551,8 @@ describe("Component behavior", function () {
         assert.equal(layout.height, 0, "requested height defaults to 0");
         assert.equal(layout.wantsWidth, false, "_requestedSpace().wantsWidth  defaults to false");
         assert.equal(layout.wantsHeight, false, "_requestedSpace().wantsHeight defaults to false");
-        assert.equal(c._xAlignProportion, 0, "_xAlignProportion defaults to 0");
-        assert.equal(c._yAlignProportion, 0, "_yAlignProportion defaults to 0");
+        assert.equal(c.xAlign(), "left", "x alignment defaults to \"left\"");
+        assert.equal(c.yAlign(), "top", "y alignment defaults to \"top\"");
         assert.equal(c._xOffset, 0, "xOffset defaults to 0");
         assert.equal(c._yOffset, 0, "yOffset defaults to 0");
         svg.remove();

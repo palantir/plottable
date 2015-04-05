@@ -3375,8 +3375,8 @@ var Plottable;
             function AbstractComponent() {
                 _super.apply(this, arguments);
                 this.clipPathEnabled = false;
-                this._xAlignProportion = 0; // What % along the free space do we want to position (0 = left, .5 = center, 1 = right)
-                this._yAlignProportion = 0;
+                this._xAlignment = "left";
+                this._yAlignment = "top";
                 this._fixedHeightFlag = false;
                 this._fixedWidthFlag = false;
                 this._isSetup = false;
@@ -3488,8 +3488,10 @@ var Plottable;
                 var requestedSpace = this._requestedSpace(availableWidth, availableHeight);
                 this._width = this._isFixedWidth() ? Math.min(availableWidth, requestedSpace.width) : availableWidth;
                 this._height = this._isFixedHeight() ? Math.min(availableHeight, requestedSpace.height) : availableHeight;
-                this._xOrigin = offeredXOrigin + this._xOffset + (availableWidth - this.width()) * this._xAlignProportion;
-                this._yOrigin = offeredYOrigin + this._yOffset + (availableHeight - this.height()) * this._yAlignProportion;
+                var xAlignProportion = AbstractComponent._xAlignToProportion[this._xAlignment];
+                this._xOrigin = offeredXOrigin + this._xOffset + (availableWidth - this.width()) * xAlignProportion;
+                var yAlignProportion = AbstractComponent._yAlignToProportion[this._yAlignment];
+                this._yOrigin = offeredYOrigin + this._yOffset + (availableHeight - this.height()) * yAlignProportion;
                 ;
                 this._element.attr("transform", "translate(" + this._xOrigin + "," + this._yOrigin + ")");
                 this._boxes.forEach(function (b) { return b.attr("width", _this.width()).attr("height", _this.height()); });
@@ -3568,59 +3570,27 @@ var Plottable;
                 this._invalidateLayout();
                 return this;
             };
-            /**
-             * Sets the x alignment of the Component. This will be used if the
-             * Component is given more space than it needs.
-             *
-             * For example, you may want to make a Legend postition itself it the top
-             * right, so you would call `legend.xAlign("right")` and
-             * `legend.yAlign("top")`.
-             *
-             * @param {string} alignment The x alignment of the Component (one of ["left", "center", "right"]).
-             * @returns {Component} The calling Component.
-             */
             AbstractComponent.prototype.xAlign = function (alignment) {
+                if (alignment == null) {
+                    return this._xAlignment;
+                }
                 alignment = alignment.toLowerCase();
-                if (alignment === "left") {
-                    this._xAlignProportion = 0;
+                if (AbstractComponent._xAlignToProportion[alignment] == null) {
+                    throw new Error("Unsupported alignment: " + alignment);
                 }
-                else if (alignment === "center") {
-                    this._xAlignProportion = 0.5;
-                }
-                else if (alignment === "right") {
-                    this._xAlignProportion = 1;
-                }
-                else {
-                    throw new Error("Unsupported alignment");
-                }
+                this._xAlignment = alignment;
                 this._invalidateLayout();
                 return this;
             };
-            /**
-             * Sets the y alignment of the Component. This will be used if the
-             * Component is given more space than it needs.
-             *
-             * For example, you may want to make a Legend postition itself it the top
-             * right, so you would call `legend.xAlign("right")` and
-             * `legend.yAlign("top")`.
-             *
-             * @param {string} alignment The x alignment of the Component (one of ["top", "center", "bottom"]).
-             * @returns {Component} The calling Component.
-             */
             AbstractComponent.prototype.yAlign = function (alignment) {
+                if (alignment == null) {
+                    return this._yAlignment;
+                }
                 alignment = alignment.toLowerCase();
-                if (alignment === "top") {
-                    this._yAlignProportion = 0;
+                if (AbstractComponent._yAlignToProportion[alignment] == null) {
+                    throw new Error("Unsupported alignment: " + alignment);
                 }
-                else if (alignment === "center") {
-                    this._yAlignProportion = 0.5;
-                }
-                else if (alignment === "bottom") {
-                    this._yAlignProportion = 1;
-                }
-                else {
-                    throw new Error("Unsupported alignment");
-                }
+                this._yAlignment = alignment;
                 this._invalidateLayout();
                 return this;
             };
@@ -3908,6 +3878,16 @@ var Plottable;
              */
             AbstractComponent.prototype.hitBox = function () {
                 return this._hitBox;
+            };
+            AbstractComponent._xAlignToProportion = {
+                "left": 0,
+                "center": 0.5,
+                "right": 1
+            };
+            AbstractComponent._yAlignToProportion = {
+                "top": 0,
+                "center": 0.5,
+                "bottom": 1
             };
             return AbstractComponent;
         })(Plottable.Core.PlottableObject);
@@ -5328,32 +5308,6 @@ var Plottable;
                 this._fixedWidthFlag = true;
                 this._padding = 0;
             }
-            /**
-             * Sets the horizontal side the label will go to given the label is given more space that it needs
-             *
-             * @param {string} alignment The new setting, one of `["left", "center",
-             * "right"]`. Defaults to `"center"`.
-             * @returns {Label} The calling Label.
-             */
-            Label.prototype.xAlign = function (alignment) {
-                var alignmentLC = alignment.toLowerCase();
-                _super.prototype.xAlign.call(this, alignmentLC);
-                this._xAlignment = alignmentLC;
-                return this;
-            };
-            /**
-             * Sets the vertical side the label will go to given the label is given more space that it needs
-             *
-             * @param {string} alignment The new setting, one of `["top", "center",
-             * "bottom"]`. Defaults to `"center"`.
-             * @returns {Label} The calling Label.
-             */
-            Label.prototype.yAlign = function (alignment) {
-                var alignmentLC = alignment.toLowerCase();
-                _super.prototype.yAlign.call(this, alignmentLC);
-                this._yAlignment = alignmentLC;
-                return this;
-            };
             Label.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
                 var desiredWH = this._measurer.measure(this._text);
                 var desiredWidth = (this.orient() === "horizontal" ? desiredWH.width : desiredWH.height) + 2 * this.padding();
@@ -5426,8 +5380,8 @@ var Plottable;
                 var textRotation = { horizontal: 0, right: 90, left: -90 };
                 var writeOptions = {
                     selection: this._textContainer,
-                    xAlign: this._xAlignment,
-                    yAlign: this._yAlignment,
+                    xAlign: this.xAlign(),
+                    yAlign: this.yAlign(),
                     textRotation: textRotation[this.orient()]
                 };
                 this._writer.write(this._text, writeWidth, writeHeight, writeOptions);
