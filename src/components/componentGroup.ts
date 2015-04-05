@@ -50,11 +50,17 @@ export module Component {
     }
 
     public _isFixedWidth(): boolean {
-      return false;
+      var components = this.components();
+      var allFixedWidth = components.every((c) => c._isFixedWidth());
+      var allSameXAlignment = components.every((c) => c.xAlign() === components[0].xAlign());
+      return allFixedWidth && allSameXAlignment;
     }
 
     public _isFixedHeight(): boolean {
-      return false;
+      var components = this.components();
+      var allFixedHeight = components.every((c) => c._isFixedHeight());
+      var allSameYAlignment = components.every((c) => c.yAlign() === components[0].yAlign());
+      return allFixedHeight && allSameYAlignment;
     }
   }
 }

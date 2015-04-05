@@ -4048,10 +4048,16 @@ var Plottable;
                 return this;
             };
             Group.prototype._isFixedWidth = function () {
-                return false;
+                var components = this.components();
+                var allFixedWidth = components.every(function (c) { return c._isFixedWidth(); });
+                var allSameXAlignment = components.every(function (c) { return c.xAlign() === components[0].xAlign(); });
+                return allFixedWidth && allSameXAlignment;
             };
             Group.prototype._isFixedHeight = function () {
-                return false;
+                var components = this.components();
+                var allFixedHeight = components.every(function (c) { return c._isFixedHeight(); });
+                var allSameYAlignment = components.every(function (c) { return c.yAlign() === components[0].yAlign(); });
+                return allFixedHeight && allSameYAlignment;
             };
             return Group;
         })(Component.AbstractComponentContainer);
