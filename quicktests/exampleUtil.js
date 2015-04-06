@@ -13,6 +13,18 @@ function makeRandomData(numPoints, scaleFactor) {
   return data;
 }
 
+function makeSinusoidalData(min, max, delta) {
+  "use strict";
+  if (typeof min === "undefined") { min = 0; }
+  if (typeof max === "undefined") { max = Math.PI; }
+  if (typeof delta === "undefined") { delta = 0.1; }
+  var results = [];
+  for (var i = 0; i < max; i += delta) {
+    results.push({ x: i, y: Math.sin(i) });
+  }
+  return results;
+}
+
 function makeNormallyDistributedData(n, xMean, xStdDev, yMean, yStdDev) {
   "use strict";
   if (typeof n === "undefined") { n = 100; }
