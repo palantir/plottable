@@ -6,7 +6,7 @@ export module Plot {
     private _hoverDetectionRadius = 15;
     private _hoverTarget: D3.Selection;
     private _defaultStrokeColor: string;
-
+    protected _interpolationMode: string | ((points: number[][]) => string) = "linear";
     protected _yScale: Scale.AbstractQuantitative<number>;
 
     /**
@@ -27,6 +27,16 @@ export module Plot {
       this._defaultStrokeColor = new Scale.Color().range()[0];
     }
 
+    public interpolate(): string | ((points: number[][]) => string);
+    public interpolate(interpolationMode: string | ((points: number[][]) => string)): void;
+    public interpolate(interpolationMode?: any) {
+      if (interpolationMode === null) {
+        return this._interpolationMode;
+      } else {
+        this._interpolationMode = interpolationMode;
+      }
+    }
+
     protected _setup() {
       super._setup();
       this._hoverTarget = this.foreground().append("circle")
@@ -41,7 +51,9 @@ export module Plot {
     }
 
     protected _getDrawer(key: string) {
-      return new Plottable._Drawer.Line(key, this._interpolationMode);
+      var lineDrawer = new Plottable._Drawer.Line(key);
+      lineDrawer.interpolationMode(this._interpolationMode);
+      return lineDrawer;
     }
 
     protected _getResetYFunction() {

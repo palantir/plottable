@@ -2928,11 +2928,8 @@ var Plottable;
     (function (_Drawer) {
         var Line = (function (_super) {
             __extends(Line, _super);
-            function Line(key, interpolationMode) {
-                _super.call(this, key);
-                if (interpolationMode !== null) {
-                    this._interpolationMode = interpolationMode;
-                }
+            function Line() {
+                _super.apply(this, arguments);
             }
             Line.prototype._enterData = function (data) {
                 _super.prototype._enterData.call(this, data);
@@ -2945,15 +2942,14 @@ var Plottable;
                 });
                 _super.prototype.setup.call(this, area);
             };
+            Line.prototype.interpolationMode = function (interpolationMode) {
+                this._interpolate = interpolationMode;
+            };
             Line.prototype._createLine = function (xFunction, yFunction, definedFunction) {
                 if (!definedFunction) {
                     definedFunction = function (d, i) { return true; };
                 }
-                var line = d3.svg.line().x(xFunction).y(yFunction).defined(definedFunction);
-                if (this._interpolationMode) {
-                    line.interpolate(this._interpolationMode);
-                }
-                return line;
+                return d3.svg.line().x(xFunction).y(yFunction).defined(definedFunction).interpolate(this._interpolate);
             };
             Line.prototype._numberOfAnimationIterations = function (data) {
                 return 1;
@@ -3009,12 +3005,9 @@ var Plottable;
     (function (_Drawer) {
         var Area = (function (_super) {
             __extends(Area, _super);
-            function Area(key, interpolationMode) {
-                _super.call(this, key);
+            function Area() {
+                _super.apply(this, arguments);
                 this._drawLine = true;
-                if (interpolationMode !== null) {
-                    this._interpolationMode = interpolationMode;
-                }
             }
             Area.prototype._enterData = function (data) {
                 if (this._drawLine) {
@@ -3048,11 +3041,7 @@ var Plottable;
                 if (!definedFunction) {
                     definedFunction = function () { return true; };
                 }
-                var area = d3.svg.area().x(xFunction).y0(y0Function).y1(y1Function).defined(definedFunction);
-                if (this._interpolationMode) {
-                    area.interpolate(this._interpolationMode);
-                }
-                return area;
+                return d3.svg.area().x(xFunction).y0(y0Function).y1(y1Function).defined(definedFunction).interpolate(this._interpolate);
             };
             Area.prototype._drawStep = function (step) {
                 if (this._drawLine) {
@@ -7082,13 +7071,6 @@ var Plottable;
                     this._yScale.autoDomain();
                 }
             };
-            /**
-             * Sets an interpolation mode.
-             */
-            AbstractXYPlot.prototype.interpolate = function (interpolationMode) {
-                this._interpolationMode = interpolationMode;
-                return this;
-            };
             AbstractXYPlot.prototype._adjustYDomainOnChangeFromX = function () {
                 if (!this._projectorsReady()) {
                     return;
@@ -7858,11 +7840,20 @@ var Plottable;
             function Line(xScale, yScale) {
                 _super.call(this, xScale, yScale);
                 this._hoverDetectionRadius = 15;
+                this._interpolationMode = "linear";
                 this.classed("line-plot", true);
                 this.animator("reset", new Plottable.Animator.Null());
                 this.animator("main", new Plottable.Animator.Base().duration(600).easing("exp-in-out"));
                 this._defaultStrokeColor = new Plottable.Scale.Color().range()[0];
             }
+            Line.prototype.interpolate = function (interpolationMode) {
+                if (interpolationMode === null) {
+                    return this._interpolationMode;
+                }
+                else {
+                    this._interpolationMode = interpolationMode;
+                }
+            };
             Line.prototype._setup = function () {
                 _super.prototype._setup.call(this);
                 this._hoverTarget = this.foreground().append("circle").classed("hover-target", true).attr("r", this._hoverDetectionRadius).style("visibility", "hidden");
@@ -7872,7 +7863,9 @@ var Plottable;
                 return value != null && value === value;
             };
             Line.prototype._getDrawer = function (key) {
-                return new Plottable._Drawer.Line(key, this._interpolationMode);
+                var lineDrawer = new Plottable._Drawer.Line(key);
+                lineDrawer.interpolationMode(this._interpolationMode);
+                return lineDrawer;
             };
             Line.prototype._getResetYFunction = function () {
                 // gets the y-value generator for the animation start point
@@ -8065,7 +8058,9 @@ var Plottable;
                 }
             };
             Area.prototype._getDrawer = function (key) {
-                return new Plottable._Drawer.Area(key, this._interpolationMode);
+                var areaDrawer = new Plottable._Drawer.Area(key);
+                areaDrawer.interpolationMode(this._interpolationMode);
+                return areaDrawer;
             };
             Area.prototype._updateYDomainer = function () {
                 var _this = this;

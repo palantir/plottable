@@ -1519,9 +1519,10 @@ declare module Plottable {
     module _Drawer {
         class Line extends AbstractDrawer {
             static LINE_CLASS: string;
-            constructor(key: string, interpolationMode?: string);
+            protected _interpolate: string | ((points: number[][]) => string);
             protected _enterData(data: any[]): void;
             setup(area: D3.Selection): void;
+            interpolationMode(interpolationMode: string | ((points: number[][]) => string)): void;
             protected _numberOfAnimationIterations(data: any[]): number;
             protected _drawStep(step: AppliedDrawStep): void;
             _getSelector(): string;
@@ -1536,7 +1537,6 @@ declare module Plottable {
     module _Drawer {
         class Area extends Line {
             static AREA_CLASS: string;
-            constructor(key: string, interpolationMode?: string);
             protected _enterData(data: any[]): void;
             /**
              * Sets the value determining if line should be drawn.
@@ -2839,7 +2839,6 @@ declare module Plottable {
         class AbstractXYPlot<X, Y> extends AbstractPlot {
             protected _xScale: Scale.AbstractScale<X, number>;
             protected _yScale: Scale.AbstractScale<Y, number>;
-            protected _interpolationMode: string;
             /**
              * Constructs an XYPlot.
              *
@@ -2886,10 +2885,6 @@ declare module Plottable {
              * This call does not override auto domain adjustment behavior over visible points.
              */
             showAllData(): void;
-            /**
-             * Sets an interpolation mode.
-             */
-            interpolate(interpolationMode: string): AbstractXYPlot<X, Y>;
             protected _normalizeDatasets<A, B>(fromX: boolean): {
                 a: A;
                 b: B;
@@ -3106,6 +3101,7 @@ declare module Plottable {
 declare module Plottable {
     module Plot {
         class Line<X> extends AbstractXYPlot<X, number> implements Interaction.Hoverable {
+            protected _interpolationMode: string | ((points: number[][]) => string);
             protected _yScale: Scale.AbstractQuantitative<number>;
             /**
              * Constructs a LinePlot.
@@ -3115,6 +3111,8 @@ declare module Plottable {
              * @param {QuantitativeScale} yScale The y scale to use.
              */
             constructor(xScale: Scale.AbstractQuantitative<X>, yScale: Scale.AbstractQuantitative<number>);
+            interpolate(): string | ((points: number[][]) => string);
+            interpolate(interpolationMode: string | ((points: number[][]) => string)): void;
             protected _setup(): void;
             protected _rejectNullsAndNaNs(d: any, i: number, userMetdata: any, plotMetadata: any, accessor: _Accessor): boolean;
             protected _getDrawer(key: string): _Drawer.Line;
