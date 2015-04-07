@@ -2528,7 +2528,12 @@ declare module Plottable {
              */
             constructor(rows?: AbstractComponent[][]);
             /**
-             * Adds a Component in the specified cell. The cell must be unoccupied.
+             * Adds a Component in the specified cell.
+             *
+             * If the cell is already occupied, there are 3 cases
+             *  - Component + Component => Group containing both components
+             *  - Component + Group => Component is added to the group
+             *  - Group + Component => Component is added to the group
              *
              * For example, instead of calling `new Table([[a, b], [null, c]])`, you
              * could call
