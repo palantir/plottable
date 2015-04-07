@@ -78,7 +78,9 @@ describe("Tables", () => {
     t.addComponent(0, 0, c2);
     t.addComponent(0, 2, c3);
 
-    var components: Plottable.Component.AbstractComponent[] = t._rows[0][2].components();
+    assert.isTrue(Plottable.Component.Group.prototype.isPrototypeOf((<any> t)._rows[0][2]));
+
+    var components: Plottable.Component.AbstractComponent[] = (<any> t)._rows[0][2].components();
     assert.lengthOf(components, 2, "The group created should have 2 components");
     assert.equal(components[0], c1, "First element in the group at (0, 2) should be c1");
     assert.equal(components[1], c3, "Second element in the group at (0, 2) should be c3");
@@ -94,7 +96,9 @@ describe("Tables", () => {
     t.addComponent(0, 2, c2);
     t.addComponent(0, 2, c3);
 
-    var components: Plottable.Component.AbstractComponent[] = t._rows[0][2].components();
+    assert.isTrue(Plottable.Component.Group.prototype.isPrototypeOf((<any> t)._rows[0][2]));
+
+    var components: Plottable.Component.AbstractComponent[] = (<any> t)._rows[0][2].components();
     assert.lengthOf(components, 3, "The group created should have 2 components");
     assert.equal(components[0], c1, "First element in the group at (0, 2) should be c1");
     assert.equal(components[1], c2, "Second element in the group at (0, 2) should be c2");

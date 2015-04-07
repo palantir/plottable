@@ -5954,6 +5954,7 @@ describe("Tables", function () {
         t.addComponent(0, 2, c1);
         t.addComponent(0, 0, c2);
         t.addComponent(0, 2, c3);
+        assert.isTrue(Plottable.Component.Group.prototype.isPrototypeOf(t._rows[0][2]));
         var components = t._rows[0][2].components();
         assert.lengthOf(components, 2, "The group created should have 2 components");
         assert.equal(components[0], c1, "First element in the group at (0, 2) should be c1");
@@ -5967,6 +5968,7 @@ describe("Tables", function () {
         t.addComponent(0, 2, c1);
         t.addComponent(0, 2, c2);
         t.addComponent(0, 2, c3);
+        assert.isTrue(Plottable.Component.Group.prototype.isPrototypeOf(t._rows[0][2]));
         var components = t._rows[0][2].components();
         assert.lengthOf(components, 3, "The group created should have 2 components");
         assert.equal(components[0], c1, "First element in the group at (0, 2) should be c1");
