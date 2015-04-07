@@ -4652,7 +4652,12 @@ var Plottable;
             Time.prototype._computeHeight = function () {
                 var _this = this;
                 var textHeight = this._measurer.measure().height;
-                this._tierHeights = this._tierLabelPositions.map(function (pos) { return textHeight + _this.tickLabelPadding() + ((pos === "between") ? 0 : _this._maxLabelTickLength()); });
+                this._tierHeights = this._tierLabelPositions.map(function (pos, index) {
+                    if (index >= _this._possibleTimeAxisConfigurations[0].length) {
+                        return 0;
+                    }
+                    return textHeight + _this.tickLabelPadding() + ((pos === "between") ? 0 : _this._maxLabelTickLength());
+                });
                 this._computedHeight = d3.sum(this._tierHeights);
                 return this._computedHeight;
             };

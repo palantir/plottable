@@ -240,8 +240,12 @@ export module Axis {
 
     public _computeHeight() {
       var textHeight = this._measurer.measure().height;
-      this._tierHeights = this._tierLabelPositions.map((pos: string) =>
-        textHeight + this.tickLabelPadding() + ((pos === "between") ? 0 : this._maxLabelTickLength()));
+      this._tierHeights = this._tierLabelPositions.map((pos: string, index: number) => {
+        if (index >= this._possibleTimeAxisConfigurations[0].length) {
+          return 0;
+        }
+        return textHeight + this.tickLabelPadding() + ((pos === "between") ? 0 : this._maxLabelTickLength());
+      });
       this._computedHeight = d3.sum(this._tierHeights);
       return this._computedHeight;
     }
