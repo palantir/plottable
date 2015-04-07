@@ -206,6 +206,7 @@ describe("Component behavior", () => {
     c._computeLayout(0, 0, 100, 100);
     c._render();
     var expectedPrefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
+    expectedPrefix = expectedPrefix.replace(/#.*/g, "");
     var expectedClipPathURL = "url(" + expectedPrefix + "#clipPath" + expectedClipPathID+ ")";
     // IE 9 has clipPath like 'url("#clipPath")', must accomodate
     var normalizeClipPath = (s: string) => s.replace(/"/g, "");
