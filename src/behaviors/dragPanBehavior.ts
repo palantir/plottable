@@ -67,7 +67,7 @@ export module Behavior {
           } else {
             return this._scale.scale(value);
           }
-        }
+        };
 
         var leftRangeValues = this.leftBounds().map((leftBound) => safeScale(leftBound) - this._scale.range()[0]);
         var rightRangeValues = this.rightBounds().map((rightBound) => safeScale(rightBound) - this._scale.range()[1]);
