@@ -4512,7 +4512,7 @@ var Plottable;
                     return this._currentTimeAxisConfigurations;
                 }
                 this._currentTimeAxisConfigurations = configurations;
-                this._maximumTires = Math.max.apply(null, configurations.map(function (config) { return config.length; }));
+                this._maximumTiers = Plottable._Util.Methods.max(configurations.map(function (config) { return config.length; }), 0);
                 this._invalidateLayout();
                 return this;
             };
@@ -4543,7 +4543,7 @@ var Plottable;
                 var _this = this;
                 var textHeight = this._measurer.measure().height;
                 this._tierHeights = this._tierLabelPositions.map(function (pos, index) {
-                    if (index >= _this._maximumTires) {
+                    if (index >= _this._maximumTiers) {
                         return 0;
                     }
                     return textHeight + _this.tickLabelPadding() + ((pos === "between") ? 0 : _this._maxLabelTickLength());

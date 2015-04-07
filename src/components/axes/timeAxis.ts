@@ -142,7 +142,7 @@ export module Axis {
     private _tierBaselines: D3.Selection[];
     private _tierHeights: number[];
     private _currentTimeAxisConfigurations: TimeAxisConfiguration[];
-    private _maximumTires: number;
+    private _maximumTiers: number;
     private _measurer: SVGTypewriter.Measurers.Measurer;
 
     private _mostPreciseConfigIndex: number;
@@ -208,7 +208,7 @@ export module Axis {
         return this._currentTimeAxisConfigurations;
       }
       this._currentTimeAxisConfigurations = configurations;
-      this._maximumTires = Math.max.apply(null, configurations.map((config: TimeAxisConfiguration) => config.length));
+      this._maximumTiers = _Util.Methods.max(configurations.map((config: TimeAxisConfiguration) => config.length), 0);
       this._invalidateLayout();
       return this;
     }
@@ -245,7 +245,7 @@ export module Axis {
     public _computeHeight() {
       var textHeight = this._measurer.measure().height;
       this._tierHeights = this._tierLabelPositions.map((pos: string, index: number) => {
-        if (index >= this._maximumTires) {
+        if (index >= this._maximumTiers) {
           return 0;
         }
         return textHeight + this.tickLabelPadding() + ((pos === "between") ? 0 : this._maxLabelTickLength());
