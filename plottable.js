@@ -4492,7 +4492,7 @@ var Plottable;
                 this.classed("time-axis", true);
                 this.tickLabelPadding(5);
                 this.tierLabelPositions(["between", "between"]);
-                this.axisConfigurations(this._DEFAULT_TIME_AXIS_CONFIGURATIONS);
+                this.axisConfigurations(Time._DEFAULT_TIME_AXIS_CONFIGURATIONS);
             }
             Time.prototype.tierLabelPositions = function (newPositions) {
                 if (newPositions == null) {
