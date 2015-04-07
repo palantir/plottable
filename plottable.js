@@ -4492,7 +4492,7 @@ var Plottable;
                 /*
                  * Default possible axis configurations.
                  */
-                this._possibleTimeAxisConfigurations = [
+                this._DEFAULT_TIME_AXIS_CONFIGURATIONS = [
                     [
                         { interval: d3.time.second, step: 1, formatter: Plottable.Formatters.time("%I:%M:%S %p") },
                         { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
@@ -4601,10 +4601,10 @@ var Plottable;
                         { interval: d3.time.year, step: 1000, formatter: Plottable.Formatters.time("%Y") }
                     ]
                 ];
-                this._maximumTires = 2;
                 this.classed("time-axis", true);
                 this.tickLabelPadding(5);
                 this.tierLabelPositions(["between", "between"]);
+                this.axisConfigurations(this._DEFAULT_TIME_AXIS_CONFIGURATIONS);
             }
             Time.prototype.tierLabelPositions = function (newPositions) {
                 if (newPositions == null) {
@@ -4621,12 +4621,10 @@ var Plottable;
             };
             Time.prototype.axisConfigurations = function (configurations) {
                 if (configurations == null) {
-                    return this._possibleTimeAxisConfigurations;
+                    return this._currentTimeAxisConfigurations;
                 }
-                this._possibleTimeAxisConfigurations = configurations;
-                this._maximumTires = Math.max.apply(null, configurations.map(function (e) {
-                    return e.length;
-                }));
+                this._currentTimeAxisConfigurations = configurations;
+                this._maximumTires = Math.max.apply(null, configurations.map(function (config) { return config.length; }));
                 this._invalidateLayout();
                 return this;
             };
@@ -4635,13 +4633,13 @@ var Plottable;
              */
             Time.prototype._getMostPreciseConfigurationIndex = function () {
                 var _this = this;
-                var mostPreciseIndex = this._possibleTimeAxisConfigurations.length;
-                this._possibleTimeAxisConfigurations.forEach(function (interval, index) {
+                var mostPreciseIndex = this._currentTimeAxisConfigurations.length;
+                this._currentTimeAxisConfigurations.forEach(function (interval, index) {
                     if (index < mostPreciseIndex && interval.every(function (tier) { return _this._checkTimeAxisTierConfigurationWidth(tier); })) {
                         mostPreciseIndex = index;
                     }
                 });
-                if (mostPreciseIndex === this._possibleTimeAxisConfigurations.length) {
+                if (mostPreciseIndex === this._currentTimeAxisConfigurations.length) {
                     Plottable._Util.Methods.warn("zoomed out too far: could not find suitable interval to display labels");
                     --mostPreciseIndex;
                 }
@@ -4706,7 +4704,7 @@ var Plottable;
             };
             Time.prototype._getTickValues = function () {
                 var _this = this;
-                return this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex].reduce(function (ticks, config) { return ticks.concat(_this._getTickIntervalValues(config)); }, []);
+                return this._currentTimeAxisConfigurations[this._mostPreciseConfigIndex].reduce(function (ticks, config) { return ticks.concat(_this._getTickIntervalValues(config)); }, []);
             };
             Time.prototype._cleanTier = function (index) {
                 this._tierLabelContainers[index].selectAll("." + Axis.AbstractAxis.TICK_LABEL_CLASS).remove();
@@ -4795,12 +4793,12 @@ var Plottable;
                 if (this._mostPreciseConfigIndex < 1) {
                     return [];
                 }
-                return this._getTickIntervalValues(this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex - 1][0]);
+                return this._getTickIntervalValues(this._currentTimeAxisConfigurations[this._mostPreciseConfigIndex - 1][0]);
             };
             Time.prototype._doRender = function () {
                 var _this = this;
                 this._mostPreciseConfigIndex = this._getMostPreciseConfigurationIndex();
-                var tierConfigs = this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex];
+                var tierConfigs = this._currentTimeAxisConfigurations[this._mostPreciseConfigIndex];
                 for (var i = 0; i < Time._NUM_TIERS; ++i) {
                     this._cleanTier(i);
                 }
