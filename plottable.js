@@ -10347,7 +10347,7 @@ var Plottable;
                     var startPointDragValue = _this._verticalPan ? startPoint.y : startPoint.x;
                     var endPointDragValue = _this._verticalPan ? endPoint.y : endPoint.x;
                     var dragAmount = endPointDragValue - (lastDragValue == null ? startPointDragValue : lastDragValue);
-                    Plottable.ScaleDomainTransformers.translate(_this._scale, dragAmount);
+                    Plottable.ScaleDomainTransformers.translate(_this._scale, dragAmount, _this.leftBounds(), _this.rightBounds());
                     lastDragValue = endPointDragValue;
                 });
                 dragInteraction.dragend(function () { return lastDragValue = null; });

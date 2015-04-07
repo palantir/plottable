@@ -59,7 +59,7 @@ export module Behavior {
         var endPointDragValue = this._verticalPan ? endPoint.y : endPoint.x;
         var dragAmount = endPointDragValue - (lastDragValue == null ? startPointDragValue : lastDragValue);
 
-        ScaleDomainTransformers.translate(this._scale, dragAmount);
+        ScaleDomainTransformers.translate(this._scale, dragAmount, this.leftBounds(), this.rightBounds());
         lastDragValue = endPointDragValue;
       });
 
