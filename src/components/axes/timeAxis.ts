@@ -27,7 +27,7 @@ export module Axis {
     /*
      * Default possible axis configurations.
      */
-    private _DEFAULT_TIME_AXIS_CONFIGURATIONS: TimeAxisConfiguration[] = [
+    private static _DEFAULT_TIME_AXIS_CONFIGURATIONS: TimeAxisConfiguration[] = [
       [
         {interval: d3.time.second, step: 1, formatter: Formatters.time("%I:%M:%S %p")},
         {interval: d3.time.day, step: 1, formatter: Formatters.time("%B %e, %Y")}
