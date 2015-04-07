@@ -78,7 +78,7 @@ describe("Tables", () => {
     t.addComponent(0, 0, c2);
     t.addComponent(0, 2, c3);
 
-    assert.isTrue(Plottable.Component.Group.prototype.isPrototypeOf((<any> t)._rows[0][2]));
+    assert.isTrue(Plottable.Component.Group.prototype.isPrototypeOf((<any> t)._rows[0][2]), "A group was created");
 
     var components: Plottable.Component.AbstractComponent[] = (<any> t)._rows[0][2].components();
     assert.lengthOf(components, 2, "The group created should have 2 components");
@@ -89,20 +89,21 @@ describe("Tables", () => {
   it("Add a component where a group already exists adds the component to the group", () => {
     var c1 = new Plottable.Component.AbstractComponent();
     var c2 = new Plottable.Component.AbstractComponent();
+    var grp = new Plottable.Component.Group([c1, c2]);
+
     var c3 = new Plottable.Component.AbstractComponent();
+
     var t = new Plottable.Component.Table();
 
-    t.addComponent(0, 2, c1);
-    t.addComponent(0, 2, c2);
+    t.addComponent(0, 2, grp);
     t.addComponent(0, 2, c3);
-
-    assert.isTrue(Plottable.Component.Group.prototype.isPrototypeOf((<any> t)._rows[0][2]));
+    assert.isTrue(Plottable.Component.Group.prototype.isPrototypeOf((<any> t)._rows[0][2]), "The cell still contains a group");
 
     var components: Plottable.Component.AbstractComponent[] = (<any> t)._rows[0][2].components();
-    assert.lengthOf(components, 3, "The group created should have 2 components");
-    assert.equal(components[0], c1, "First element in the group at (0, 2) should be c1");
-    assert.equal(components[1], c2, "Second element in the group at (0, 2) should be c2");
-    assert.equal(components[2], c3, "Third element in the group at (0, 2) should be c3");
+    assert.lengthOf(components, 3, "The group created should have 3 components");
+    assert.equal(components[0], c1, "First element in the group at (0, 2) should still be c1");
+    assert.equal(components[1], c2, "Second element in the group at (0, 2) should still be c2");
+    assert.equal(components[2], c3, "The Component was added to the existing Group");
   });
 
   it("addComponent works even if a component is added with a high column and low row index", () => {
