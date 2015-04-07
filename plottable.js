@@ -4601,6 +4601,7 @@ var Plottable;
                         { interval: d3.time.year, step: 1000, formatter: Plottable.Formatters.time("%Y") }
                     ]
                 ];
+                this._maximumTires = 2;
                 this.classed("time-axis", true);
                 this.tickLabelPadding(5);
                 this.tierLabelPositions(["between", "between"]);
@@ -4623,6 +4624,9 @@ var Plottable;
                     return this._possibleTimeAxisConfigurations;
                 }
                 this._possibleTimeAxisConfigurations = configurations;
+                this._maximumTires = Math.max.apply(null, configurations.map(function (e) {
+                    return e.length;
+                }));
                 this._invalidateLayout();
                 return this;
             };
@@ -4653,7 +4657,7 @@ var Plottable;
                 var _this = this;
                 var textHeight = this._measurer.measure().height;
                 this._tierHeights = this._tierLabelPositions.map(function (pos, index) {
-                    if (index >= _this._possibleTimeAxisConfigurations[0].length) {
+                    if (index >= _this._maximumTires) {
                         return 0;
                     }
                     return textHeight + _this.tickLabelPadding() + ((pos === "between") ? 0 : _this._maxLabelTickLength());
