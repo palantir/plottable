@@ -4176,7 +4176,7 @@ declare module Plottable {
              * @param {QuantitativeScale} [xScale] The X scale to update on panning/zooming.
              * @param {QuantitativeScale} [yScale] The Y scale to update on panning/zooming.
              */
-            constructor(scale: Scale.AbstractQuantitative<any>, isVertical: boolean);
+            constructor(scale: Scale.AbstractQuantitative<number>, isVertical: boolean);
             getInteraction(): Interaction.Drag;
             leftBounds(): number[];
             leftBounds(newBounds: number[]): Behavior.DragPan;

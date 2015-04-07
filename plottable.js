@@ -10337,7 +10337,7 @@ var Plottable;
                 if (newBounds == null) {
                     return this._rightBounds;
                 }
-                this._leftBounds = newBounds;
+                this._rightBounds = newBounds;
                 return this;
             };
             DragPan.prototype._setupInteraction = function (dragInteraction) {
@@ -10347,7 +10347,26 @@ var Plottable;
                     var startPointDragValue = _this._verticalPan ? startPoint.y : startPoint.x;
                     var endPointDragValue = _this._verticalPan ? endPoint.y : endPoint.x;
                     var dragAmount = endPointDragValue - (lastDragValue == null ? startPointDragValue : lastDragValue);
-                    Plottable.ScaleDomainTransformers.translate(_this._scale, dragAmount, _this.leftBounds(), _this.rightBounds());
+                    var safeScale = function (value) {
+                        if (value === Infinity) {
+                            return value;
+                        }
+                        else if (value === -Infinity) {
+                            return value;
+                        }
+                        else {
+                            return _this._scale.scale(value);
+                        }
+                    };
+                    var leftRangeValues = _this.leftBounds().map(function (leftBound) { return safeScale(leftBound) - _this._scale.range()[0]; });
+                    var rightRangeValues = _this.rightBounds().map(function (rightBound) { return safeScale(rightBound) - _this._scale.range()[1]; });
+                    if (dragAmount > 0) {
+                        dragAmount = Math.min(dragAmount, -Math.max(leftRangeValues[0], rightRangeValues[0]));
+                    }
+                    else {
+                        dragAmount = Math.max(dragAmount, -Math.min(leftRangeValues[1], rightRangeValues[1]));
+                    }
+                    Plottable.ScaleDomainTransformers.translate(_this._scale, dragAmount);
                     lastDragValue = endPointDragValue;
                 });
                 dragInteraction.dragend(function () { return lastDragValue = null; });

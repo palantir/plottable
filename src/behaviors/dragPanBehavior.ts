@@ -20,7 +20,7 @@ export module Behavior {
      * @param {QuantitativeScale} [xScale] The X scale to update on panning/zooming.
      * @param {QuantitativeScale} [yScale] The Y scale to update on panning/zooming.
      */
-    constructor(scale: Scale.AbstractQuantitative<any>, isVertical: boolean) {
+    constructor(scale: Scale.AbstractQuantitative<number>, isVertical: boolean) {
       this._scale = scale;
       this._dragInteraction = new Interaction.Drag();
       this._setupInteraction(this._dragInteraction);
@@ -47,7 +47,7 @@ export module Behavior {
       if (newBounds == null) {
         return this._rightBounds;
       }
-      this._leftBounds = newBounds;
+      this._rightBounds = newBounds;
       return this;
     }
 
@@ -59,7 +59,26 @@ export module Behavior {
         var endPointDragValue = this._verticalPan ? endPoint.y : endPoint.x;
         var dragAmount = endPointDragValue - (lastDragValue == null ? startPointDragValue : lastDragValue);
 
-        ScaleDomainTransformers.translate(this._scale, dragAmount, this.leftBounds(), this.rightBounds());
+        var safeScale = (value: number) => {
+          if (value === Infinity) {
+            return value;
+          } else if (value === -Infinity) {
+            return value;
+          } else {
+            return this._scale.scale(value);
+          }
+        }
+
+        var leftRangeValues = this.leftBounds().map((leftBound) => safeScale(leftBound) - this._scale.range()[0]);
+        var rightRangeValues = this.rightBounds().map((rightBound) => safeScale(rightBound) - this._scale.range()[1]);
+
+        if (dragAmount > 0) {
+          dragAmount = Math.min(dragAmount, -Math.max(leftRangeValues[0], rightRangeValues[0]));
+        } else {
+          dragAmount = Math.max(dragAmount, -Math.min(leftRangeValues[1], rightRangeValues[1]));
+        }
+
+        ScaleDomainTransformers.translate(this._scale, dragAmount);
         lastDragValue = endPointDragValue;
       });
 
