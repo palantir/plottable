@@ -31,6 +31,7 @@ export module Component {
 
       constructor() {
         super();
+        this.clipPathEnabled = true;
         this.classed("drag-box-layer", true);
 
         this._dragInteraction = new Interaction.Drag();

@@ -10032,6 +10032,7 @@ var Plottable;
                     this._detectionRadius = 3;
                     this._resizable = false;
                     this._hasCorners = true;
+                    this.clipPathEnabled = true;
                     this.classed("drag-box-layer", true);
                     this._dragInteraction = new Plottable.Interaction.Drag();
                     this._setUpCallbacks();

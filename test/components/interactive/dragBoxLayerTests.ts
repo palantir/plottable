@@ -50,6 +50,15 @@ describe("Interactive Components", () => {
       svg.remove();
     });
 
+    it("clipPath enabled", () => {
+      /*
+       * clipPath has to be enabled so the resize handle doesn't show on hovering
+       * over the edge of the drag box
+       */
+      var dbl = new Plottable.Component.Interactive.DragBoxLayer();
+      assert.isTrue(dbl.clipPathEnabled);
+    });
+
     it("detectionRadius()", () => {
       var dbl = new Plottable.Component.Interactive.DragBoxLayer();
 

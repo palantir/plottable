@@ -8559,6 +8559,14 @@ describe("Interactive Components", function () {
             assert.isFalse(dbl.boxVisible(), "box is hidden on click");
             svg.remove();
         });
+        it("clipPath enabled", function () {
+            /*
+             * clipPath has to be enabled so the resize handle doesn't show on hovering
+             * over the edge of the drag box
+             */
+            var dbl = new Plottable.Component.Interactive.DragBoxLayer();
+            assert.isTrue(dbl.clipPathEnabled);
+        });
         it("detectionRadius()", function () {
             var dbl = new Plottable.Component.Interactive.DragBoxLayer();
             assert.doesNotThrow(function () { return dbl.detectionRadius(3); }, Error, "can set detection radius before anchoring");
