@@ -10299,6 +10299,65 @@ var Plottable;
     })(Interaction = Plottable.Interaction || (Plottable.Interaction = {}));
 })(Plottable || (Plottable = {}));
 
+///<reference path="../reference.ts" />
+var Plottable;
+(function (Plottable) {
+    var Behavior;
+    (function (Behavior) {
+        var DragPan = (function () {
+            /**
+             * Creates a DragPan Behavior.
+             *
+             * The allows you to move around and zoom in on a plot, interactively. It
+             * does so by changing the xScale and yScales' domains repeatedly.
+             *
+             * @constructor
+             * @param {QuantitativeScale} [xScale] The X scale to update on panning/zooming.
+             * @param {QuantitativeScale} [yScale] The Y scale to update on panning/zooming.
+             */
+            function DragPan(scale, isVertical) {
+                this._leftBounds = [-Infinity, Infinity];
+                this._rightBounds = [-Infinity, Infinity];
+                this._scale = scale;
+                this._dragInteraction = new Plottable.Interaction.Drag();
+                this._setupInteraction(this._dragInteraction);
+                this._verticalPan = isVertical;
+            }
+            DragPan.prototype.getInteraction = function () {
+                return this._dragInteraction;
+            };
+            DragPan.prototype.leftBounds = function (newBounds) {
+                if (newBounds == null) {
+                    return this._leftBounds;
+                }
+                this._leftBounds = newBounds;
+                return this;
+            };
+            DragPan.prototype.rightBounds = function (newBounds) {
+                if (newBounds == null) {
+                    return this._rightBounds;
+                }
+                this._leftBounds = newBounds;
+                return this;
+            };
+            DragPan.prototype._setupInteraction = function (dragInteraction) {
+                var _this = this;
+                var lastDragValue;
+                dragInteraction.drag(function (startPoint, endPoint) {
+                    var startPointDragValue = _this._verticalPan ? startPoint.y : startPoint.x;
+                    var endPointDragValue = _this._verticalPan ? endPoint.y : endPoint.x;
+                    var dragAmount = endPointDragValue - (lastDragValue == null ? startPointDragValue : lastDragValue);
+                    Plottable.ScaleDomainTransformers.translate(_this._scale, dragAmount);
+                    lastDragValue = endPointDragValue;
+                });
+                dragInteraction.dragend(function () { return lastDragValue = null; });
+            };
+            return DragPan;
+        })();
+        Behavior.DragPan = DragPan;
+    })(Behavior = Plottable.Behavior || (Plottable.Behavior = {}));
+})(Plottable || (Plottable = {}));
+
 /*!
 SVG Typewriter 0.1.11 (https://github.com/palantir/svg-typewriter)
 Copyright 2014 Palantir Technologies

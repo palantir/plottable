@@ -4161,3 +4161,27 @@ declare module Plottable {
         }
     }
 }
+
+
+declare module Plottable {
+    module Behavior {
+        class DragPan {
+            /**
+             * Creates a DragPan Behavior.
+             *
+             * The allows you to move around and zoom in on a plot, interactively. It
+             * does so by changing the xScale and yScales' domains repeatedly.
+             *
+             * @constructor
+             * @param {QuantitativeScale} [xScale] The X scale to update on panning/zooming.
+             * @param {QuantitativeScale} [yScale] The Y scale to update on panning/zooming.
+             */
+            constructor(scale: Scale.AbstractQuantitative<any>, isVertical: boolean);
+            getInteraction(): Interaction.Drag;
+            leftBounds(): number[];
+            leftBounds(newBounds: number[]): Behavior.DragPan;
+            rightBounds(): number[];
+            rightBounds(newBounds: number[]): Behavior.DragPan;
+        }
+    }
+}
