@@ -216,6 +216,39 @@ function assertAreaPathCloseTo(actualPath, expectedPath, precision, msg) {
 }
 
 ///<reference path="testReference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Mocks;
+(function (Mocks) {
+    var FixedSizeComponent = (function (_super) {
+        __extends(FixedSizeComponent, _super);
+        function FixedSizeComponent(width, height) {
+            if (width === void 0) { width = 0; }
+            if (height === void 0) { height = 0; }
+            _super.call(this);
+            this.fixedWidth = width;
+            this.fixedHeight = height;
+            this._fixedWidthFlag = true;
+            this._fixedHeightFlag = true;
+        }
+        FixedSizeComponent.prototype._requestedSpace = function (availableWidth, availableHeight) {
+            return {
+                width: this.fixedWidth,
+                height: this.fixedHeight,
+                wantsWidth: availableWidth < this.fixedWidth,
+                wantsHeight: availableHeight < this.fixedHeight
+            };
+        };
+        return FixedSizeComponent;
+    })(Plottable.Component.AbstractComponent);
+    Mocks.FixedSizeComponent = FixedSizeComponent;
+})(Mocks || (Mocks = {}));
+
+///<reference path="testReference.ts" />
 before(function () {
     // Set the render policy to immediate to make sure ETE tests can check DOM change immediately
     Plottable.Core.RenderController.setRenderPolicy("immediate");
@@ -641,13 +674,13 @@ describe("BaseAxis", function () {
     it("default alignment based on orientation", function () {
         var scale = new Plottable.Scale.Linear();
         var baseAxis = new Plottable.Axis.AbstractAxis(scale, "bottom");
-        assert.equal(baseAxis._yAlignProportion, 0, "yAlignProportion defaults to 0 for bottom axis");
+        assert.equal(baseAxis.yAlign(), "top", "y alignment defaults to \"top\" for bottom axis");
         baseAxis = new Plottable.Axis.AbstractAxis(scale, "top");
-        assert.equal(baseAxis._yAlignProportion, 1, "yAlignProportion defaults to 1 for top axis");
+        assert.equal(baseAxis.yAlign(), "bottom", "y alignment defaults to \"bottom\" for top axis");
         baseAxis = new Plottable.Axis.AbstractAxis(scale, "left");
-        assert.equal(baseAxis._xAlignProportion, 1, "xAlignProportion defaults to 1 for left axis");
+        assert.equal(baseAxis.xAlign(), "right", "x alignment defaults to \"right\" for left axis");
         baseAxis = new Plottable.Axis.AbstractAxis(scale, "right");
-        assert.equal(baseAxis._xAlignProportion, 0, "xAlignProportion defaults to 0 for right axis");
+        assert.equal(baseAxis.xAlign(), "left", "x alignment defaults to \"left\" for right axis");
     });
 });
 
@@ -5170,20 +5203,6 @@ describe("ComponentGroups", function () {
         assertWidthHeight(t3, 400, 400, "rect3 sized correctly");
         svg.remove();
     });
-    it("components in componentGroups occupies all available space", function () {
-        var svg = generateSVG(400, 400);
-        var xAxis = new Plottable.Axis.Numeric(new Plottable.Scale.Linear(), "bottom");
-        var leftLabel = new Plottable.Component.Label("LEFT").xAlign("left");
-        var rightLabel = new Plottable.Component.Label("RIGHT").xAlign("right");
-        var labelGroup = new Plottable.Component.Group([leftLabel, rightLabel]);
-        var table = new Plottable.Component.Table([
-            [labelGroup],
-            [xAxis]
-        ]);
-        table.renderTo(svg);
-        assertBBoxNonIntersection(leftLabel._element.select(".bounding-box"), rightLabel._element.select(".bounding-box"));
-        svg.remove();
-    });
     it("components can be added before and after anchoring", function () {
         var c1 = makeFixedSizeComponent(10, 10);
         var c2 = makeFixedSizeComponent(20, 20);
@@ -5204,20 +5223,6 @@ describe("ComponentGroups", function () {
         var t3 = svg.select(".test-box3");
         assertWidthHeight(t3, 400, 400, "rect3 sized correctly");
         svg.remove();
-    });
-    it("component fixity is computed appropriately", function () {
-        var cg = new Plottable.Component.Group();
-        var c1 = new Plottable.Component.AbstractComponent();
-        var c2 = new Plottable.Component.AbstractComponent();
-        cg.below(c1).below(c2);
-        assert.isFalse(cg._isFixedHeight(), "height not fixed when both components unfixed");
-        assert.isFalse(cg._isFixedWidth(), "width not fixed when both components unfixed");
-        fixComponentSize(c1, 10, 10);
-        assert.isFalse(cg._isFixedHeight(), "height not fixed when one component unfixed");
-        assert.isFalse(cg._isFixedWidth(), "width not fixed when one component unfixed");
-        fixComponentSize(c2, null, 10);
-        assert.isFalse(cg._isFixedHeight(), "height unfixed when both components fixed");
-        assert.isFalse(cg._isFixedWidth(), "width unfixed when one component unfixed");
     });
     it("componentGroup subcomponents have xOffset, yOffset of 0", function () {
         var cg = new Plottable.Component.Group();
@@ -5280,30 +5285,70 @@ describe("ComponentGroups", function () {
         assert.isFalse(c3._isAnchored, "c3 was detached");
         assert.lengthOf(cg.components(), 0, "cg has no components");
     });
-    describe("ComponentGroup._requestedSpace works as expected", function () {
-        it("_works for an empty ComponentGroup", function () {
-            var cg = new Plottable.Component.Group();
-            var request = cg._requestedSpace(10, 10);
-            verifySpaceRequest(request, 0, 0, false, false, "");
+    describe("Sizing based on contents", function () {
+        var SVG_WIDTH = 400;
+        var SVG_HEIGHT = 400;
+        it("no Components", function () {
+            var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var cg = new Plottable.Component.Group([]);
+            cg.renderTo(svg);
+            assert.strictEqual(cg.width(), 0, "empty Group has zero width");
+            assert.strictEqual(cg.height(), 0, "empty Group has zero height");
+            svg.remove();
         });
-        it("works for a ComponentGroup with only proportional-size components", function () {
-            var cg = new Plottable.Component.Group();
-            var c1 = new Plottable.Component.AbstractComponent();
-            var c2 = new Plottable.Component.AbstractComponent();
-            cg.below(c1).below(c2);
-            var request = cg._requestedSpace(10, 10);
-            verifySpaceRequest(request, 0, 0, false, false, "");
+        it("expanding Components", function () {
+            var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var cg = new Plottable.Component.Group([
+                new Plottable.Component.AbstractComponent(),
+                new Plottable.Component.AbstractComponent()
+            ]);
+            cg.renderTo(svg);
+            assert.strictEqual(cg.width(), SVG_WIDTH, "expands to fill available width");
+            assert.strictEqual(cg.height(), SVG_HEIGHT, "expands to fill available height");
+            svg.remove();
         });
-        it("works when there are fixed-size components", function () {
-            var cg = new Plottable.Component.Group();
-            var c1 = new Plottable.Component.AbstractComponent();
-            var c2 = new Plottable.Component.AbstractComponent();
-            var c3 = new Plottable.Component.AbstractComponent();
-            cg.below(c1).below(c2).below(c3);
-            fixComponentSize(c1, null, 10);
-            fixComponentSize(c2, null, 50);
-            var request = cg._requestedSpace(10, 10);
-            verifySpaceRequest(request, 0, 50, false, true, "");
+        it("one expanding and one fixed-size Component", function () {
+            var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var cg = new Plottable.Component.Group([
+                new Plottable.Component.AbstractComponent(),
+                new Mocks.FixedSizeComponent(SVG_WIDTH / 2, SVG_HEIGHT / 2)
+            ]);
+            cg.renderTo(svg);
+            assert.strictEqual(cg.width(), SVG_WIDTH, "expands to fill available width");
+            assert.strictEqual(cg.height(), SVG_HEIGHT, "expands to fill available height");
+            svg.remove();
+        });
+        it("fixed-size Components, same x and same y alignments", function () {
+            var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var tall = new Mocks.FixedSizeComponent(SVG_WIDTH / 4, SVG_HEIGHT / 2);
+            var wide = new Mocks.FixedSizeComponent(SVG_WIDTH / 2, SVG_HEIGHT / 4);
+            var cg = new Plottable.Component.Group([tall, wide]);
+            cg.renderTo(svg);
+            var largestWidth = cg.components().map(function (c) { return c.width(); }).sort(function (a, b) { return b - a; })[0];
+            assert.strictEqual(cg.width(), largestWidth, "takes on the width of widest fixed-size component");
+            var largestHeight = cg.components().map(function (c) { return c.height(); }).sort(function (a, b) { return b - a; })[0];
+            assert.strictEqual(cg.height(), largestHeight, "takes on the height of tallest fixed-size component");
+            svg.remove();
+        });
+        it("fixed-size Components, different x alignments", function () {
+            var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var left = new Mocks.FixedSizeComponent(SVG_WIDTH / 4, SVG_HEIGHT / 4).xAlign("left");
+            var right = new Mocks.FixedSizeComponent(SVG_WIDTH / 4, SVG_HEIGHT / 4).xAlign("right");
+            var cg = new Plottable.Component.Group([left, right]);
+            cg.renderTo(svg);
+            assert.strictEqual(cg.width(), SVG_WIDTH, "expands to fill available width");
+            assert.strictEqual(cg.height(), left.height(), "takes on the height of fixed-size components");
+            svg.remove();
+        });
+        it("fixed-size Components, different y alignments", function () {
+            var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var top = new Mocks.FixedSizeComponent(SVG_WIDTH / 4, SVG_HEIGHT / 4).yAlign("top");
+            var bottom = new Mocks.FixedSizeComponent(SVG_WIDTH / 4, SVG_HEIGHT / 4).yAlign("bottom");
+            var cg = new Plottable.Component.Group([top, bottom]);
+            cg.renderTo(svg);
+            assert.strictEqual(cg.width(), top.width(), "takes on the width of fixed-size components");
+            assert.strictEqual(cg.height(), SVG_HEIGHT, "expands to fill available height");
+            svg.remove();
         });
     });
     describe("Merging components works as expected", function () {
@@ -5551,8 +5596,8 @@ describe("Component behavior", function () {
         assert.equal(layout.height, 0, "requested height defaults to 0");
         assert.equal(layout.wantsWidth, false, "_requestedSpace().wantsWidth  defaults to false");
         assert.equal(layout.wantsHeight, false, "_requestedSpace().wantsHeight defaults to false");
-        assert.equal(c._xAlignProportion, 0, "_xAlignProportion defaults to 0");
-        assert.equal(c._yAlignProportion, 0, "_yAlignProportion defaults to 0");
+        assert.equal(c.xAlign(), "left", "x alignment defaults to \"left\"");
+        assert.equal(c.yAlign(), "top", "y alignment defaults to \"top\"");
         assert.equal(c._xOffset, 0, "xOffset defaults to 0");
         assert.equal(c._yOffset, 0, "yOffset defaults to 0");
         svg.remove();
@@ -5668,19 +5713,6 @@ describe("Component behavior", function () {
         c1.renderTo(svg);
         c1.remove();
         assert.throws(function () { return c1.renderTo(svg); }, "reuse");
-        svg.remove();
-    });
-    it("_invalidateLayout works as expected", function () {
-        var cg = new Plottable.Component.Group();
-        var c = makeFixedSizeComponent(10, 10);
-        cg._addComponent(c);
-        cg.renderTo(svg);
-        assert.equal(cg.height(), 300, "height() is the entire available height");
-        assert.equal(cg.width(), 400, "width() is the entire available width");
-        fixComponentSize(c, 50, 50);
-        c._invalidateLayout();
-        assert.equal(cg.height(), 300, "height() after resizing is the entire available height");
-        assert.equal(cg.width(), 400, "width() after resizing is the entire available width");
         svg.remove();
     });
     it("components can be detached even if not anchored", function () {

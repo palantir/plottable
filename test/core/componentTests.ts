@@ -191,8 +191,8 @@ describe("Component behavior", () => {
     assert.equal(layout.height, 0, "requested height defaults to 0");
     assert.equal(layout.wantsWidth , false, "_requestedSpace().wantsWidth  defaults to false");
     assert.equal(layout.wantsHeight, false, "_requestedSpace().wantsHeight defaults to false");
-    assert.equal((<any> c)._xAlignProportion, 0, "_xAlignProportion defaults to 0");
-    assert.equal((<any> c)._yAlignProportion, 0, "_yAlignProportion defaults to 0");
+    assert.equal(c.xAlign(), "left", "x alignment defaults to \"left\"");
+    assert.equal(c.yAlign(), "top", "y alignment defaults to \"top\"");
     assert.equal((<any> c)._xOffset, 0, "xOffset defaults to 0");
     assert.equal((<any> c)._yOffset, 0, "yOffset defaults to 0");
     svg.remove();
@@ -325,20 +325,6 @@ describe("Component behavior", () => {
     c1.remove();
 
     assert.throws(() => c1.renderTo(svg), "reuse");
-    svg.remove();
-  });
-
-  it("_invalidateLayout works as expected", () => {
-    var cg = new Plottable.Component.Group();
-    var c = makeFixedSizeComponent(10, 10);
-    cg._addComponent(c);
-    cg.renderTo(svg);
-    assert.equal(cg.height(), 300, "height() is the entire available height");
-    assert.equal(cg.width(), 400, "width() is the entire available width");
-    fixComponentSize(c, 50, 50);
-    c._invalidateLayout();
-    assert.equal(cg.height(), 300, "height() after resizing is the entire available height");
-    assert.equal(cg.width(), 400, "width() after resizing is the entire available width");
     svg.remove();
   });
 
