@@ -997,9 +997,22 @@ var Plottable;
          * @param {number} translateAmount The amount to translate
          * @returns {D[]} The translated domain
          */
-        function translate(scale, translateAmount) {
+        function translate(scale, translateAmount, leftBounds, rightBounds) {
             var translateTransform = function (rangeValue) { return scale.invert(rangeValue - translateAmount); };
-            scale.domain(scale.range().map(translateTransform));
+            var translatedDomain = scale.range().map(translateTransform);
+            if (translatedDomain[0] < leftBounds[0]) {
+                translatedDomain[0] = leftBounds[0];
+            }
+            if (translatedDomain[0] > leftBounds[1]) {
+                translatedDomain[0] = leftBounds[1];
+            }
+            if (translatedDomain[1] < leftBounds[0]) {
+                translatedDomain[1] = rightBounds[0];
+            }
+            if (translatedDomain[1] > leftBounds[1]) {
+                translatedDomain[1] = rightBounds[1];
+            }
+            scale.domain(translatedDomain);
         }
         ScaleDomainTransformers.translate = translate;
         /**
