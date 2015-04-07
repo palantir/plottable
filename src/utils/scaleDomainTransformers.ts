@@ -12,23 +12,9 @@ module Plottable {
      * @param {number} translateAmount The amount to translate
      * @returns {D[]} The translated domain
      */
-    export function translate<D>(scale: Scale.AbstractQuantitative<D>, translateAmount: number,
-                                 leftBounds: D[], rightBounds: D[]) {
+    export function translate<D>(scale: Scale.AbstractQuantitative<D>, translateAmount: number) {
       var translateTransform = (rangeValue: number) => scale.invert(rangeValue - translateAmount);
-      var translatedDomain = scale.range().map(translateTransform);
-      if (translatedDomain[0] < leftBounds[0]) {
-        translatedDomain[0] = leftBounds[0];
-      }
-      if (translatedDomain[0] > leftBounds[1]) {
-        translatedDomain[0] = leftBounds[1];
-      }
-      if (translatedDomain[1] < leftBounds[0]) {
-        translatedDomain[1] = rightBounds[0];
-      }
-      if (translatedDomain[1] > leftBounds[1]) {
-        translatedDomain[1] = rightBounds[1];
-      }
-      scale.domain(translatedDomain);
+      scale.domain(scale.range().map(translateTransform));
     }
 
     /**
