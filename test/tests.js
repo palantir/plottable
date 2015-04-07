@@ -5946,14 +5946,32 @@ describe("Tables", function () {
         assert.isNull(rows[0][1], "component at (0, 1) is null");
         assert.isNull(rows[1][0], "component at (1, 0) is null");
     });
-    it("can't add a component where one already exists", function () {
+    it("Add a component where one already exists creates a new group", function () {
         var c1 = new Plottable.Component.AbstractComponent();
         var c2 = new Plottable.Component.AbstractComponent();
         var c3 = new Plottable.Component.AbstractComponent();
         var t = new Plottable.Component.Table();
         t.addComponent(0, 2, c1);
         t.addComponent(0, 0, c2);
-        assert.throws(function () { return t.addComponent(0, 2, c3); }, Error, "component already exists");
+        t.addComponent(0, 2, c3);
+        var components = t._rows[0][2].components();
+        assert.lengthOf(components, 2, "The group created should have 2 components");
+        assert.equal(components[0], c1, "First element in the group at (0, 2) should be c1");
+        assert.equal(components[1], c3, "Second element in the group at (0, 2) should be c3");
+    });
+    it("Add a component where a group already exists adds the component to the group", function () {
+        var c1 = new Plottable.Component.AbstractComponent();
+        var c2 = new Plottable.Component.AbstractComponent();
+        var c3 = new Plottable.Component.AbstractComponent();
+        var t = new Plottable.Component.Table();
+        t.addComponent(0, 2, c1);
+        t.addComponent(0, 2, c2);
+        t.addComponent(0, 2, c3);
+        var components = t._rows[0][2].components();
+        assert.lengthOf(components, 3, "The group created should have 2 components");
+        assert.equal(components[0], c1, "First element in the group at (0, 2) should be c1");
+        assert.equal(components[1], c2, "Second element in the group at (0, 2) should be c2");
+        assert.equal(components[2], c3, "Third element in the group at (0, 2) should be c3");
     });
     it("addComponent works even if a component is added with a high column and low row index", function () {
         // Solves #180, a weird bug
