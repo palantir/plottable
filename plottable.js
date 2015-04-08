@@ -3402,10 +3402,13 @@ var Plottable;
             __extends(ErrorBar, _super);
             function ErrorBar(key, isVertical) {
                 _super.call(this, key);
-                this._errorTickLength = 20;
                 this.svgElement("g");
                 this._isVertical = isVertical;
             }
+            ErrorBar.prototype.tickLength = function (tickLength) {
+                this._tickLength = tickLength;
+                return this;
+            };
             ErrorBar.prototype._enterData = function (data) {
                 var errorBars = this._getRenderArea().selectAll(this._svgElement).data(data);
                 errorBars.enter().append("g").classed(ErrorBar.ERROR_BAR_CLASS, true).each(function (d) {
@@ -3422,7 +3425,7 @@ var Plottable;
                 var yProjector = attrToProjector["y"];
                 var lowerProjector = attrToProjector["lower"];
                 var upperProjector = attrToProjector["upper"];
-                var halfTickLength = this._errorTickLength / 2;
+                var halfTickLength = this._tickLength / 2;
                 var minProjector = this._isVertical ? function (d, i) { return xProjector(d, i) - halfTickLength; } : function (d, i) { return yProjector(d, i) - halfTickLength; };
                 var maxProjector = this._isVertical ? function (d, i) { return xProjector(d, i) + halfTickLength; } : function (d, i) { return yProjector(d, i) + halfTickLength; };
                 if (this._isVertical) {
@@ -8758,12 +8761,20 @@ var Plottable;
             function ErrorBar(xScale, yScale, isVertical) {
                 if (isVertical === void 0) { isVertical = true; }
                 _super.call(this, xScale, yScale);
+                this._tickLength = 20;
                 this.classed("error-plot", true);
                 this._defaultStrokeColor = new Plottable.Scale.Color().range()[1];
                 this._isVertical = isVertical;
             }
+            ErrorBar.prototype.tickLength = function (length) {
+                if (length === null) {
+                    return this._tickLength;
+                }
+                this._tickLength = length;
+                return this;
+            };
             ErrorBar.prototype._getDrawer = function (key) {
-                return new Plottable._Drawer.ErrorBar(key, this._isVertical);
+                return new Plottable._Drawer.ErrorBar(key, this._isVertical).tickLength(this._tickLength);
             };
             ErrorBar.prototype._generateAttrToProjector = function () {
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);

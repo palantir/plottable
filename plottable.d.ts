@@ -1626,6 +1626,7 @@ declare module Plottable {
             static ERROR_BAR_LOWER_CLASS: string;
             static ERROR_BAR_UPPER_CLASS: string;
             constructor(key: string, isVertical: boolean);
+            tickLength(tickLength: number): ErrorBar;
             protected _enterData(data: any[]): void;
             protected _drawStep(step: AppliedDrawStep): void;
         }
@@ -3357,6 +3358,19 @@ declare module Plottable {
              * @param {AbstractScale} yScale The y scale to use.
              */
             constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<Y, number>, isVertical?: boolean);
+            /**
+             * Retrieves the length of error bar ticks. Defaults to 20px in length.
+             *
+             * @return {number} Length of error bar ticks
+             */
+            tickLength(): number;
+            /**
+             * Sets the length of error bar ticks.
+             *
+             * @param {number} length Length of error bar ticks in pixels.
+             * @return {Plot.ErrorBar} Current error bar plot
+             */
+            tickLength(length: number): ErrorBar<X, Y>;
             protected _getDrawer(key: string): _Drawer.ErrorBar;
             protected _generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;

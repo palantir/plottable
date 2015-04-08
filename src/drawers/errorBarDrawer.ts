@@ -8,13 +8,18 @@ export module _Drawer {
     public static ERROR_BAR_LOWER_CLASS = "error-bar-lower";
     public static ERROR_BAR_UPPER_CLASS = "error-bar-upper";
 
-    private _errorTickLength = 20;
     private _isVertical: boolean;
+    private _tickLength: number;
 
     constructor(key: string, isVertical: boolean) {
       super(key);
       this.svgElement("g");
       this._isVertical = isVertical;
+    }
+
+    public tickLength(tickLength: number) {
+      this._tickLength = tickLength;
+      return this;
     }
 
     protected _enterData(data: any[]) {
@@ -38,7 +43,7 @@ export module _Drawer {
       var lowerProjector = attrToProjector["lower"];
       var upperProjector = attrToProjector["upper"];
 
-      var halfTickLength = this._errorTickLength / 2;
+      var halfTickLength = this._tickLength / 2;
 
       var minProjector = this._isVertical ? (d: any, i: number) => xProjector(d, i) - halfTickLength :
                                             (d: any, i: number) => yProjector(d, i) - halfTickLength;
