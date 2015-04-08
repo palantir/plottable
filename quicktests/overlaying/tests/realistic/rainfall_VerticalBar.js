@@ -54,9 +54,9 @@ function run(svg, data, Plottable){
   var g1 = new Plottable.Component.Gridlines(null, yScale);
   var g2 = new Plottable.Component.Gridlines(null, yScale);
   var g3 = new Plottable.Component.Gridlines(null, yScale);
-  var bar1 = g1.merge(paloAltoBar);
-  var bar2 = g2.merge(sanFranciscoBar);
-  var bar3 = g3.merge(sanJoseBar);
+  var bar1 = g1.below(paloAltoBar);
+  var bar2 = g2.below(sanFranciscoBar);
+  var bar3 = g3.below(sanJoseBar);
 
   var chart = new Plottable.Component.Table([
                                             [null     ,   title ],

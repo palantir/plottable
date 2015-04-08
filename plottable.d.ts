@@ -129,6 +129,7 @@ declare module Plottable {
             function lightenColor(color: string, factor: number): string;
             function darkenColor(color: string, factor: number, darkenAmount: number): string;
             function distanceSquared(p1: Point, p2: Point): number;
+            function isIE(): boolean;
         }
     }
 }
@@ -411,30 +412,18 @@ declare module Plottable {
 
 declare module Plottable {
     /**
-     * A SymbolGenerator is a function that takes in a datum and the index of the datum to
-     * produce an svg path string analogous to the datum/index pair.
-     *
-     * Note that SymbolGenerators used in Plottable will be assumed to work within a 100x100 square
-     * to be scaled appropriately for use within Plottable
+     * A SymbolFactory is a function that takes in a symbolSize which is the edge length of the render area
+     * and returns a string representing the 'd' attribute of the resultant 'path' element
      */
-    type SymbolGenerator = (datum: any, index: number) => string;
-    module SymbolGenerators {
-        /**
-         * The radius that symbol generators will be assumed to have for their symbols.
-         */
-        var SYMBOL_GENERATOR_RADIUS: number;
-        type StringAccessor = ((datum: any, index: number) => string);
-        /**
-         * A wrapper for D3's symbol generator as documented here:
-         * https://github.com/mbostock/d3/wiki/SVG-Shapes#symbol
-         *
-         * Note that since D3 symbols compute the path strings by knowing how much area it can take up instead of
-         * knowing its dimensions, the total area expected may be off by some constant factor.
-         *
-         * @param {string | ((datum: any, index: number) => string)} symbolType Accessor for the d3 symbol type
-         * @returns {SymbolGenerator} the symbol generator for a D3 symbol
-         */
-        function d3Symbol(symbolType: string | StringAccessor): D3.Svg.Symbol;
+    type SymbolFactory = (symbolSize: number) => string;
+    module SymbolFactories {
+        type StringAccessor = (datum: any, index: number) => string;
+        function circle(): SymbolFactory;
+        function square(): SymbolFactory;
+        function cross(): SymbolFactory;
+        function diamond(): SymbolFactory;
+        function triangleUp(): SymbolFactory;
+        function triangleDown(): SymbolFactory;
     }
 }
 
@@ -1608,10 +1597,9 @@ declare module Plottable {
 
 declare module Plottable {
     module _Drawer {
-        class Symbol extends AbstractDrawer {
-            protected _enterData(data: any[]): void;
+        class Symbol extends Element {
+            constructor(key: string);
             protected _drawStep(step: AppliedDrawStep): void;
-            _getSelector(): string;
             _getPixelPoint(datum: any, index: number): Point;
         }
     }
@@ -1747,20 +1735,35 @@ declare module Plottable {
              * @returns {boolean} Whether the component has a fixed height.
              */
             _isFixedHeight(): boolean;
+            _merge(c: AbstractComponent, below: boolean): Component.Group;
             /**
-             * Merges this Component with another Component, returning a
+             * Merges this Component above another Component, returning a
              * ComponentGroup. This is used to layer Components on top of each other.
              *
              * There are four cases:
-             * Component + Component: Returns a ComponentGroup with both components inside it.
-             * ComponentGroup + Component: Returns the ComponentGroup with the Component appended.
-             * Component + ComponentGroup: Returns the ComponentGroup with the Component prepended.
-             * ComponentGroup + ComponentGroup: Returns a new ComponentGroup with two ComponentGroups inside it.
+             * Component + Component: Returns a ComponentGroup with the first component after the second component.
+             * ComponentGroup + Component: Returns the ComponentGroup with the Component prepended.
+             * Component + ComponentGroup: Returns the ComponentGroup with the Component appended.
+             * ComponentGroup + ComponentGroup: Returns a new ComponentGroup with the first group after the second group.
              *
              * @param {Component} c The component to merge in.
              * @returns {ComponentGroup} The relevant ComponentGroup out of the above four cases.
              */
-            merge(c: AbstractComponent): Component.Group;
+            above(c: AbstractComponent): Component.Group;
+            /**
+             * Merges this Component below another Component, returning a
+             * ComponentGroup. This is used to layer Components on top of each other.
+             *
+             * There are four cases:
+             * Component + Component: Returns a ComponentGroup with the first component before the second component.
+             * ComponentGroup + Component: Returns the ComponentGroup with the Component appended.
+             * Component + ComponentGroup: Returns the ComponentGroup with the Component prepended.
+             * ComponentGroup + ComponentGroup: Returns a new ComponentGroup with the first group before the second group.
+             *
+             * @param {Component} c The component to merge in.
+             * @returns {ComponentGroup} The relevant ComponentGroup out of the above four cases.
+             */
+            below(c: AbstractComponent): Component.Group;
             /**
              * Detaches a Component from the DOM. The component can be reused.
              *
@@ -1878,18 +1881,21 @@ declare module Plottable {
     module Component {
         class Group extends AbstractComponentContainer {
             /**
-             * Constructs a GroupComponent.
+             * Constructs a Component.Group.
              *
-             * A GroupComponent is a set of Components that will be rendered on top of
-             * each other. When you call Component.merge(Component), it creates and
-             * returns a GroupComponent.
+             * A Component.Group is a set of Components that will be rendered on top of
+             * each other. When you call Component.above(Component) or Component.below(Component),
+             * it creates and returns a Component.Group.
+             *
+             * Note that the order of the components will determine placement on the z-axis,
+             * with the previous items rendered below the later items.
              *
              * @constructor
-             * @param {Component[]} components The Components in the Group (default = []).
+             * @param {Component[]} components The Components in the resultant Component.Group (default = []).
              */
             constructor(components?: AbstractComponent[]);
             _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
-            merge(c: AbstractComponent): Group;
+            _merge(c: AbstractComponent, below: boolean): Group;
             _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): Group;
             _isFixedWidth(): boolean;
             _isFixedHeight(): boolean;
@@ -2402,18 +2408,19 @@ declare module Plottable {
             getEntry(position: Point): D3.Selection;
             _doRender(): void;
             /**
-             * Gets the SymbolGenerator of the legend, which dictates how
+             * Gets the symbolFactoryAccessor of the legend, which dictates how
              * the symbol in each entry is drawn.
              *
-             * @returns {SymbolGenerator} The SymbolGenerator of the legend
+             * @returns {(datum: any, index: number) => symbolFactory} The symbolFactory accessor of the legend
              */
-            symbolGenerator(): SymbolGenerator;
+            symbolFactoryAccessor(): (datum: any, index: number) => SymbolFactory;
             /**
-             * Sets the SymbolGenerator of the legend
+             * Sets the symbolFactoryAccessor of the legend
              *
+             * @param {(datum: any, index: number) => symbolFactory}  The symbolFactory accessor to set to
              * @returns {Legend} The calling Legend
              */
-            symbolGenerator(symbolGenerator: SymbolGenerator): Legend;
+            symbolFactoryAccessor(symbolFactoryAccessor: (datum: any, index: number) => SymbolFactory): Legend;
         }
     }
 }
@@ -3586,12 +3593,24 @@ declare module Plottable {
              *
              * @param {any} key The key associated with the callback.
              *                  Key uniqueness is determined by deep equality.
-             * @param {WheelCallback} callback A callback that takes the pixel position
+             * @param {MouseCallback} callback A callback that takes the pixel position
              *                                     in svg-coordinate-space.
              *                                     Pass `null` to remove a callback.
              * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
              */
             onWheel(key: any, callback: MouseCallback): Dispatcher.Mouse;
+            /**
+             * Registers a callback to be called whenever a dblClick occurs,
+             * or removes the callback if `null` is passed as the callback.
+             *
+             * @param {any} key The key associated with the callback.
+             *                  Key uniqueness is determined by deep equality.
+             * @param {MouseCallback} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space.
+             *                                     Pass `null` to remove a callback.
+             * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+             */
+            onDblClick(key: any, callback: MouseCallback): Dispatcher.Mouse;
             /**
              * Returns the last computed mouse position.
              *
@@ -3723,6 +3742,7 @@ declare module Plottable {
             protected _hitBox: D3.Selection;
             protected _componentToListenTo: Component.AbstractComponent;
             _anchor(component: Component.AbstractComponent, hitBox: D3.Selection): void;
+            _requiresHitbox(): boolean;
             /**
              * Translates an <svg>-coordinate-space point to Component-space coordinates.
              *
@@ -3748,16 +3768,36 @@ declare module Plottable {
     module Interaction {
         class Click extends AbstractInteraction {
             _anchor(component: Component.AbstractComponent, hitBox: D3.Selection): void;
+            /**
+             * Gets the callback called when the Component is clicked.
+             *
+             * @return {(p: Point) => any} The current callback.
+             */
+            onClick(): (p: Point) => any;
+            /**
+             * Sets the callback called when the Component is clicked.
+             *
+             * @param {(p: Point) => any} callback The callback to set.
+             * @return {Interaction.Click} The calling Interaction.Click.
+             */
+            onClick(callback: (p: Point) => any): Interaction.Click;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Interaction {
+        class DoubleClick extends AbstractInteraction {
+            _anchor(component: Component.AbstractComponent, hitBox: D3.Selection): void;
+            _requiresHitbox(): boolean;
             protected _listenTo(): string;
             /**
              * Sets a callback to be called when a click is received.
              *
              * @param {(p: Point) => any} cb Callback that takes the pixel position of the click event.
              */
-            callback(cb: (p: Point) => any): Click;
-        }
-        class DoubleClick extends Click {
-            protected _listenTo(): string;
+            callback(cb: (p: Point) => any): DoubleClick;
         }
     }
 }
@@ -3848,6 +3888,7 @@ declare module Plottable {
              */
             resetZoom(): void;
             _anchor(component: Component.AbstractComponent, hitBox: D3.Selection): void;
+            _requiresHitbox(): boolean;
         }
     }
 }
@@ -3913,6 +3954,7 @@ declare module Plottable {
             protected _dragend(): void;
             protected _doDragend(): void;
             _anchor(component: Component.AbstractComponent, hitBox: D3.Selection): Drag;
+            _requiresHitbox(): boolean;
             /**
              * Sets up so that the xScale and yScale that are passed have their
              * domains automatically changed as you zoom.
@@ -4065,6 +4107,7 @@ declare module Plottable {
         }
         class Hover extends Interaction.AbstractInteraction {
             _componentToListenTo: Hoverable;
+            constructor();
             _anchor(component: Hoverable, hitBox: D3.Selection): void;
             /**
              * Attaches an callback to be called when the user mouses over an element.

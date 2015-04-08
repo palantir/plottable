@@ -81,15 +81,15 @@ describe("Plots", () => {
       yScale.domain([400, 0]);
 
       var data1 = [
-        { x: 80, y: 200, r: 20 },
-        { x: 100, y: 200, r: 20 },
-        { x: 125, y: 200, r: 5 },
-        { x: 138, y: 200, r: 5 }
+        { x: 80, y: 200, size: 40 },
+        { x: 100, y: 200, size: 40 },
+        { x: 125, y: 200, size: 10 },
+        { x: 138, y: 200, size: 10 }
       ];
 
       var plot = new Plottable.Plot.Scatter(xScale, yScale);
       plot.addDataset(data1);
-      plot.project("x", "x").project("y", "y").project("r", "r");
+      plot.project("x", "x").project("y", "y").project("size", "size");
       plot.renderTo(svg);
 
       var twoOverlappingCirclesResult = (<any> plot)._getClosestStruckPoint({ x: 85, y: 200 }, 10);
@@ -107,6 +107,40 @@ describe("Plots", () => {
       var farFromAnyPointsResult = (<any> plot)._getClosestStruckPoint({ x: 400, y: 400 }, 10);
       assert.isNull(farFromAnyPointsResult.data,
         "returns no data if no circle were within range and test point does not touch any circles");
+
+      svg.remove();
+    });
+
+    it("correctly handles NaN and undefined x and y values", () => {
+      var svg = generateSVG(400, 400);
+      var data = [
+        { foo: 0.0, bar: 0.0 },
+        { foo: 0.2, bar: 0.2 },
+        { foo: 0.4, bar: 0.4 },
+        { foo: 0.6, bar: 0.6 },
+        { foo: 0.8, bar: 0.8 }
+      ];
+      var dataset = new Plottable.Dataset(data);
+      var xScale = new Plottable.Scale.Linear();
+      var yScale = new Plottable.Scale.Linear();
+      var plot = new Plottable.Plot.Scatter(xScale, yScale);
+      plot.addDataset(dataset)
+          .project("x", "foo", xScale)
+          .project("y", "bar", yScale);
+      plot.renderTo(svg);
+
+      var dataWithNaN = data.slice();
+      dataWithNaN[2] = { foo: 0.4, bar: NaN };
+      dataset.data(dataWithNaN);
+      assert.strictEqual(plot.getAllSelections().size(), 4, "does not draw NaN point");
+
+      var dataWithUndefined = data.slice();
+      dataWithUndefined[2] = { foo: 0.4, bar: undefined };
+      dataset.data(dataWithUndefined);
+      assert.strictEqual(plot.getAllSelections().size(), 4, "does not draw undefined point");
+      dataWithUndefined[2] = { foo: undefined, bar: 0.4 };
+      dataset.data(dataWithUndefined);
+      assert.strictEqual(plot.getAllSelections().size(), 4, "does not draw undefined point");
 
       svg.remove();
     });
