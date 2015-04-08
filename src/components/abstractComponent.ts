@@ -353,15 +353,20 @@ export module Component {
       return this;
     }
 
-
     /**
-     * Adds/removes a given CSS class to/from the Component, or checks if the Component has a particular CSS class.
+     * Checks if the Component has a given CSS class.
      *
-     * @param {string} cssClass The CSS class to add/remove/check for.
-     * @param {boolean} addClass Whether to add or remove the CSS class. If not supplied, checks for the CSS class.
-     * @returns {boolean|Component} Whether the Component has the given CSS class, or the calling Component (if addClass is supplied).
+     * @param {string} cssClass The CSS class to check for.
+     * @returns {boolean} Whether the Component has the given CSS class.
      */
     public classed(cssClass: string): boolean;
+    /**
+     * Adds/removes a given CSS class to/from the Component.
+     *
+     * @param {string} cssClass The CSS class to add or remove.
+     * @param {boolean} addClass If true, adds the provided CSS class; otherwise, removes it.
+     * @returns {AbstractComponent} The calling Component.
+     */
     public classed(cssClass: string, addClass: boolean): AbstractComponent;
     public classed(cssClass: string, addClass?: boolean): any {
       if (addClass == null) {
