@@ -556,6 +556,54 @@ export module Plot {
               pixelPoints: [plotData.pixelPoints[closestIndex]],
               selection: d3.select(plotData.selection[0][closestIndex])};
     }
+
+    /**
+     * Retrieves the PlotData at the specified x/y value or within the x/y extents
+     *
+     * @param {number | Extent} xValueOrExtent The x value or extent to query
+     * @param {number | Extent} yValueOrExtent The y value or extent to query
+     * @param {string | string[]} datasetKeys The dataset(s) to retrieve the plot data from.
+     *                                        (default = this.datasetOrder())
+     * @returns {PlotData} The retrieved PlotData.
+     */
+    public getPlotData(xValueOrExtent: number | Extent, yValueOrExtent: number | Extent,
+                       datasetKeys: string | string[] = this.datasetOrder()): PlotData {
+      var xExtent = AbstractPlot._parseExtent(xValueOrExtent);
+      var yExtent = AbstractPlot._parseExtent(yValueOrExtent);
+
+      var datasetKeyArray: string[] = [];
+      if (typeof(datasetKeys) === "string") {
+        datasetKeyArray = [<string> datasetKeys];
+      } else {
+        datasetKeyArray = <string[]> datasetKeys;
+      }
+
+      return this._getPlotData(xExtent, yExtent, datasetKeyArray);
+    }
+
+    private static _parseExtent(input: number | Extent): Extent {
+      return (typeof input === "number") ? {min: <number> input, max: <number> input} : <Extent> input;
+    }
+
+    protected _getPlotData(xExtent: Extent, yExtent: Extent, datasetKeys: string[]): PlotData {
+      var data: any[] = [];
+      var pixelPoints: Point[] = [];
+      var selections: EventTarget[] = [];
+      var plotData = this.getAllPlotData(datasetKeys);
+      plotData.selection.each(function(datum, index) {
+        var bbox = this.getBBox();
+        if (bbox.x + bbox.width >= xExtent.min && bbox.x <= xExtent.max &&
+            bbox.y + bbox.height >= yExtent.min && bbox.y <= yExtent.max) {
+          data.push(plotData.data[index]);
+          pixelPoints.push(plotData.pixelPoints[index]);
+          selections.push(this);
+        }
+      });
+
+      return {data: data,
+              pixelPoints: pixelPoints,
+              selection: d3.selectAll(selections)};
+    }
   }
 }
 }

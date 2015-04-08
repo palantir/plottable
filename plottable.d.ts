@@ -2818,6 +2818,17 @@ declare module Plottable {
                 }[];
                 selection: D3.Selection;
             };
+            /**
+             * Retrieves the PlotData at the specified x/y value or within the x/y extents
+             *
+             * @param {number | Extent} xValueOrExtent The x value or extent to query
+             * @param {number | Extent} yValueOrExtent The y value or extent to query
+             * @param {string | string[]} datasetKeys The dataset(s) to retrieve the plot data from.
+             *                                        (default = this.datasetOrder())
+             * @returns {PlotData} The retrieved PlotData.
+             */
+            getPlotData(xValueOrExtent: number | Extent, yValueOrExtent: number | Extent, datasetKeys?: string | string[]): PlotData;
+            protected _getPlotData(xExtent: Extent, yExtent: Extent, datasetKeys: string[]): PlotData;
         }
     }
 }
@@ -2837,6 +2848,7 @@ declare module Plottable {
             protected _generateAttrToProjector(): AttributeToProjector;
             protected _getDrawer(key: string): _Drawer.AbstractDrawer;
             getAllPlotData(datasetKeys?: string | string[]): PlotData;
+            protected _getPlotData(xExtent: Extent, yExtent: Extent, datasetKeys: string[]): PlotData;
         }
     }
 }
@@ -2948,6 +2960,7 @@ declare module Plottable {
                 [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
             };
             protected _generateDrawSteps(): _Drawer.DrawStep[];
+            protected _getPlotData(xExtent: Extent, yExtent: Extent, datasetKeys: string[]): PlotData;
             protected _getClosestStruckPoint(p: Point, range: number): Interaction.HoverData;
             _hoverOverComponent(p: Point): void;
             _hoverOutComponent(p: Point): void;
@@ -3135,6 +3148,7 @@ declare module Plottable {
                 }[];
                 selection: D3.Selection;
             };
+            protected _getPlotData(xExtent: Extent, yExtent: Extent, datasetKeys: string[]): PlotData;
             protected _getClosestWithinRange(p: Point, range: number): {
                 closestValue: any;
                 closestPoint: {

@@ -6845,6 +6845,46 @@ var Plottable;
                 }
                 return { data: [plotData.data[closestIndex]], pixelPoints: [plotData.pixelPoints[closestIndex]], selection: d3.select(plotData.selection[0][closestIndex]) };
             };
+            /**
+             * Retrieves the PlotData at the specified x/y value or within the x/y extents
+             *
+             * @param {number | Extent} xValueOrExtent The x value or extent to query
+             * @param {number | Extent} yValueOrExtent The y value or extent to query
+             * @param {string | string[]} datasetKeys The dataset(s) to retrieve the plot data from.
+             *                                        (default = this.datasetOrder())
+             * @returns {PlotData} The retrieved PlotData.
+             */
+            AbstractPlot.prototype.getPlotData = function (xValueOrExtent, yValueOrExtent, datasetKeys) {
+                if (datasetKeys === void 0) { datasetKeys = this.datasetOrder(); }
+                var xExtent = AbstractPlot._parseExtent(xValueOrExtent);
+                var yExtent = AbstractPlot._parseExtent(yValueOrExtent);
+                var datasetKeyArray = [];
+                if (typeof (datasetKeys) === "string") {
+                    datasetKeyArray = [datasetKeys];
+                }
+                else {
+                    datasetKeyArray = datasetKeys;
+                }
+                return this._getPlotData(xExtent, yExtent, datasetKeyArray);
+            };
+            AbstractPlot._parseExtent = function (input) {
+                return (typeof input === "number") ? { min: input, max: input } : input;
+            };
+            AbstractPlot.prototype._getPlotData = function (xExtent, yExtent, datasetKeys) {
+                var data = [];
+                var pixelPoints = [];
+                var selections = [];
+                var plotData = this.getAllPlotData(datasetKeys);
+                plotData.selection.each(function (datum, index) {
+                    var bbox = this.getBBox();
+                    if (bbox.x + bbox.width >= xExtent.min && bbox.x <= xExtent.max && bbox.y + bbox.height >= yExtent.min && bbox.y <= yExtent.max) {
+                        data.push(plotData.data[index]);
+                        pixelPoints.push(plotData.pixelPoints[index]);
+                        selections.push(this);
+                    }
+                });
+                return { data: data, pixelPoints: pixelPoints, selection: d3.selectAll(selections) };
+            };
             return AbstractPlot;
         })(Plottable.Component.AbstractComponent);
         Plot.AbstractPlot = AbstractPlot;
@@ -6916,6 +6956,39 @@ var Plottable;
                     pixelPoint.y = pixelPoint.y + _this.height() / 2;
                 });
                 return allPlotData;
+            };
+            Pie.prototype._getPlotData = function (xExtent, yExtent, datasetKeys) {
+                var _this = this;
+                var queryPoint = { x: (xExtent.min + xExtent.max) / 2 - this.width() / 2, y: (yExtent.min + yExtent.max) / 2 - this.height() / 2 };
+                var radiusDistance = Math.sqrt(Math.pow(queryPoint.x, 2) + Math.pow(queryPoint.y, 2));
+                var pixelAngle = Math.atan2(queryPoint.x, -queryPoint.y);
+                if (pixelAngle < 0) {
+                    pixelAngle += Math.PI * 2;
+                }
+                var data = [];
+                var pixelPoints = [];
+                var selections = [];
+                datasetKeys.forEach(function (datasetKey) {
+                    var plotData = _this.getAllPlotData(datasetKey);
+                    var projectors = _this.generateProjectors(datasetKey);
+                    plotData.data.forEach(function (datum, index) {
+                        var piePlotSelection = d3.select(plotData.selection[0][index]);
+                        var innerRadius = projectors["inner-radius"](datum, index);
+                        var outerRadius = projectors["outer-radius"](datum, index);
+                        if (radiusDistance < innerRadius || radiusDistance > outerRadius) {
+                            return;
+                        }
+                        var startAngle = +piePlotSelection.datum()["startAngle"];
+                        var endAngle = +piePlotSelection.datum()["endAngle"];
+                        if (pixelAngle < startAngle || pixelAngle > endAngle) {
+                            return;
+                        }
+                        data.push(datum);
+                        pixelPoints.push(plotData.pixelPoints[index]);
+                        selections.push(plotData.selection[0][index]);
+                    });
+                });
+                return { data: data, pixelPoints: pixelPoints, selection: d3.selectAll(selections) };
             };
             return Pie;
         })(Plot.AbstractPlot);
@@ -7250,6 +7323,23 @@ var Plottable;
                 }
                 drawSteps.push({ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("symbols") });
                 return drawSteps;
+            };
+            Scatter.prototype._getPlotData = function (xExtent, yExtent, datasetKeys) {
+                var _this = this;
+                var data = [];
+                var pixelPoints = [];
+                var selections = [];
+                datasetKeys.forEach(function (datasetKey) {
+                    var plotData = _this.getAllPlotData(datasetKey);
+                    plotData.pixelPoints.forEach(function (pixelPoint, index) {
+                        if (pixelPoint.x >= xExtent.min && pixelPoint.x <= xExtent.max && pixelPoint.y >= yExtent.min && pixelPoint.y <= yExtent.max) {
+                            data.push(plotData.data[index]);
+                            pixelPoints.push(pixelPoint);
+                            selections.push(plotData.selection[0][index]);
+                        }
+                    });
+                });
+                return { data: data, pixelPoints: pixelPoints, selection: d3.selectAll(selections) };
             };
             Scatter.prototype._getClosestStruckPoint = function (p, range) {
                 var _this = this;
@@ -7923,6 +8013,27 @@ var Plottable;
                     return { data: [], pixelPoints: [], selection: d3.select() };
                 }
                 return { data: [closestDatum], pixelPoints: [closestPoint], selection: closestSelection };
+            };
+            Line.prototype._getPlotData = function (xExtent, yExtent, datasetKeys) {
+                var _this = this;
+                var data = [];
+                var pixelPoints = [];
+                var selections = [];
+                datasetKeys.forEach(function (datasetKey) {
+                    var plotData = _this.getAllPlotData(datasetKey);
+                    var lineSelected = false;
+                    plotData.pixelPoints.forEach(function (pixelPoint, index) {
+                        if (pixelPoint.x >= xExtent.min && pixelPoint.x <= xExtent.max && pixelPoint.y >= yExtent.min && pixelPoint.y <= yExtent.max) {
+                            data.push(plotData.data[index]);
+                            pixelPoints.push(pixelPoint);
+                            lineSelected = true;
+                        }
+                    });
+                    if (lineSelected) {
+                        selections.push(plotData.selection.node());
+                    }
+                });
+                return { data: data, pixelPoints: pixelPoints, selection: d3.selectAll(selections) };
             };
             Line.prototype._getClosestWithinRange = function (p, range) {
                 var _this = this;

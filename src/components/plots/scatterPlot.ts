@@ -50,6 +50,27 @@ export module Plot {
       return drawSteps;
     }
 
+    protected _getPlotData(xExtent: Extent, yExtent: Extent, datasetKeys: string[]): PlotData {
+      var data: any[] = [];
+      var pixelPoints: Point[] = [];
+      var selections: EventTarget[] = [];
+      datasetKeys.forEach((datasetKey) => {
+        var plotData = this.getAllPlotData(datasetKey);
+        plotData.pixelPoints.forEach((pixelPoint, index) => {
+          if (pixelPoint.x >= xExtent.min && pixelPoint.x <= xExtent.max &&
+              pixelPoint.y >= yExtent.min && pixelPoint.y <= yExtent.max) {
+            data.push(plotData.data[index]);
+            pixelPoints.push(pixelPoint);
+            selections.push(plotData.selection[0][index]);
+          }
+        });
+      });
+
+      return {data: data,
+              pixelPoints: pixelPoints,
+              selection: d3.selectAll(selections)};
+    }
+
     protected _getClosestStruckPoint(p: Point, range: number): Interaction.HoverData {
       var attrToProjector = this._generateAttrToProjector();
       var xProjector = attrToProjector["x"];
