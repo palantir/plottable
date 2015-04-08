@@ -36,9 +36,7 @@ export module Plot {
     }
 
     protected _getDrawer(key: string) {
-      var areaDrawer = new Plottable._Drawer.Area(key);
-      areaDrawer.interpolationMode(this._interpolationMode);
-      return areaDrawer;
+      return new Plottable._Drawer.Area(key).interpolationMode(this._interpolationMode);
     }
 
     protected _updateYDomainer() {

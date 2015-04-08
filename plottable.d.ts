@@ -1458,7 +1458,6 @@ declare module Plottable {
             protected _className: string;
             key: string;
             protected _attrToProjector: AttributeToAppliedProjector;
-            protected _interpolationMode: string;
             /**
              * Sets the class, which needs to be applied to bound elements.
              *
@@ -1519,10 +1518,10 @@ declare module Plottable {
     module _Drawer {
         class Line extends AbstractDrawer {
             static LINE_CLASS: string;
-            protected _interpolate: string | ((points: number[][]) => string);
+            protected _interpolationMode: string | ((points: number[][]) => string);
             protected _enterData(data: any[]): void;
             setup(area: D3.Selection): void;
-            interpolationMode(interpolationMode: string | ((points: number[][]) => string)): void;
+            interpolationMode(interpolationMode: string | ((points: number[][]) => string)): Line;
             protected _numberOfAnimationIterations(data: any[]): number;
             protected _drawStep(step: AppliedDrawStep): void;
             _getSelector(): string;
@@ -3111,8 +3110,21 @@ declare module Plottable {
              * @param {QuantitativeScale} yScale The y scale to use.
              */
             constructor(xScale: Scale.AbstractQuantitative<X>, yScale: Scale.AbstractQuantitative<number>);
+            /**
+             * Gets the interpolation mode for the plot.
+             *
+             * @return {string | ((points: number[][]) => string)} The current interpolation named mode or function.
+             */
             interpolate(): string | ((points: number[][]) => string);
-            interpolate(interpolationMode: string | ((points: number[][]) => string)): void;
+            /**
+             * Sets the interpolation mode for the plot.
+             *
+             * The interpolation mode can either be a named D3 mode (see https://github.com/mbostock/d3/wiki/SVG-Shapes#line_interpolate)
+             * or a function that converts an array of points into an SVG path data string used to display the line.
+             *
+             * @param {string | ((points: number[][]) => string)} interpolationMode interpolation named mode or function.
+             */
+            interpolate(interpolationMode: string | ((points: number[][]) => string)): Line<X>;
             protected _setup(): void;
             protected _rejectNullsAndNaNs(d: any, i: number, userMetdata: any, plotMetadata: any, accessor: _Accessor): boolean;
             protected _getDrawer(key: string): _Drawer.Line;
@@ -3161,7 +3173,7 @@ declare module Plottable {
              */
             constructor(xScale: Scale.AbstractQuantitative<X>, yScale: Scale.AbstractQuantitative<number>);
             protected _onDatasetUpdate(): void;
-            protected _getDrawer(key: string): _Drawer.Area;
+            protected _getDrawer(key: string): _Drawer.Line;
             protected _updateYDomainer(): void;
             project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): Area<X>;
             protected _getResetYFunction(): (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;

@@ -4,7 +4,7 @@ module Plottable {
 export module _Drawer {
   export class Line extends AbstractDrawer {
     public static LINE_CLASS = "line";
-    protected _interpolate: string | ((points: number[][]) => string);
+    protected _interpolationMode: string | ((points: number[][]) => string);
     private _pathSelection: D3.Selection;
 
     protected _enterData(data: any[]) {
@@ -22,8 +22,9 @@ export module _Drawer {
       super.setup(area);
     }
 
-    public interpolationMode(interpolationMode: string | ((points: number[][]) => string)) {
-      this._interpolate = interpolationMode;
+    public interpolationMode(interpolationMode: string | ((points: number[][]) => string)): Line {
+      this._interpolationMode = interpolationMode;
+      return this;
     }
 
     private _createLine(xFunction: AppliedProjector, yFunction: AppliedProjector, definedFunction: AppliedProjector) {
@@ -35,7 +36,7 @@ export module _Drawer {
                    .x(xFunction)
                    .y(yFunction)
                    .defined(definedFunction)
-                   .interpolate(this._interpolate);
+                   .interpolate(this._interpolationMode);
     }
 
     protected _numberOfAnimationIterations(data: any[]): number {

@@ -22,7 +22,6 @@ export module _Drawer {
     protected _className: string;
     public key: string;
     protected _attrToProjector: AttributeToAppliedProjector;
-    protected _interpolationMode: string;
 
     /**
      * Sets the class, which needs to be applied to bound elements.
