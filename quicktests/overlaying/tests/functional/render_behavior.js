@@ -51,19 +51,11 @@ function run(svg, data, Plottable) {
     basicTable.renderTo(svg);
   }
 
-  label1.registerInteraction(
-    new Plottable.Interaction.Click().callback(newData)
-  );
+  label1.registerInteraction(new Plottable.Interaction.Click().onClick(newData));
 
-  label2.registerInteraction(
-    new Plottable.Interaction.Click().callback(changeWidth)
-  );
+  label2.registerInteraction(new Plottable.Interaction.Click().onClick(changeWidth));
 
-  label3.registerInteraction(
-    new Plottable.Interaction.Click().callback(removeAndRenderTo)
-  );
+  label3.registerInteraction(new Plottable.Interaction.Click().onClick(removeAndRenderTo));
 
-  label4.registerInteraction(
-    new Plottable.Interaction.Click().callback(function(){basicTable._render();})
-  );
+  label4.registerInteraction(new Plottable.Interaction.Click().onClick(function(){basicTable._render();}));
 }

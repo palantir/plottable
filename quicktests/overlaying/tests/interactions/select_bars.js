@@ -48,7 +48,7 @@ function run(svg, data, Plottable) {
   };
 
   var cb_reset = function() {
-    barPlot.deselectAll();
+    barPlot.getAllSelections().classed("selected", false);
     dragBox.clearBox();
   };
 
@@ -57,6 +57,6 @@ function run(svg, data, Plottable) {
 
   renderGroup.registerInteraction(new Plottable.Interaction.Click().onClick(cb_click));
 
-  title.registerInteraction(new Plottable.Interaction.Click().callback(cb_reset));
+  title.registerInteraction(new Plottable.Interaction.Click().onClick(cb_reset));
 
 }
