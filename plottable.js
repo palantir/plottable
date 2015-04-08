@@ -4509,9 +4509,9 @@ var Plottable;
             };
             Time.prototype.axisConfigurations = function (configurations) {
                 if (configurations == null) {
-                    return this._currentTimeAxisConfigurations;
+                    return this._possibleTimeAxisConfigurations;
                 }
-                this._currentTimeAxisConfigurations = configurations;
+                this._possibleTimeAxisConfigurations = configurations;
                 this._maximumTiers = Plottable._Util.Methods.max(configurations.map(function (config) { return config.length; }), 0);
                 this._invalidateLayout();
                 return this;
@@ -4521,13 +4521,13 @@ var Plottable;
              */
             Time.prototype._getMostPreciseConfigurationIndex = function () {
                 var _this = this;
-                var mostPreciseIndex = this._currentTimeAxisConfigurations.length;
-                this._currentTimeAxisConfigurations.forEach(function (interval, index) {
+                var mostPreciseIndex = this._possibleTimeAxisConfigurations.length;
+                this._possibleTimeAxisConfigurations.forEach(function (interval, index) {
                     if (index < mostPreciseIndex && interval.every(function (tier) { return _this._checkTimeAxisTierConfigurationWidth(tier); })) {
                         mostPreciseIndex = index;
                     }
                 });
-                if (mostPreciseIndex === this._currentTimeAxisConfigurations.length) {
+                if (mostPreciseIndex === this._possibleTimeAxisConfigurations.length) {
                     Plottable._Util.Methods.warn("zoomed out too far: could not find suitable interval to display labels");
                     --mostPreciseIndex;
                 }
@@ -4592,7 +4592,7 @@ var Plottable;
             };
             Time.prototype._getTickValues = function () {
                 var _this = this;
-                return this._currentTimeAxisConfigurations[this._mostPreciseConfigIndex].reduce(function (ticks, config) { return ticks.concat(_this._getTickIntervalValues(config)); }, []);
+                return this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex].reduce(function (ticks, config) { return ticks.concat(_this._getTickIntervalValues(config)); }, []);
             };
             Time.prototype._cleanTier = function (index) {
                 this._tierLabelContainers[index].selectAll("." + Axis.AbstractAxis.TICK_LABEL_CLASS).remove();
@@ -4681,12 +4681,12 @@ var Plottable;
                 if (this._mostPreciseConfigIndex < 1) {
                     return [];
                 }
-                return this._getTickIntervalValues(this._currentTimeAxisConfigurations[this._mostPreciseConfigIndex - 1][0]);
+                return this._getTickIntervalValues(this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex - 1][0]);
             };
             Time.prototype._doRender = function () {
                 var _this = this;
                 this._mostPreciseConfigIndex = this._getMostPreciseConfigurationIndex();
-                var tierConfigs = this._currentTimeAxisConfigurations[this._mostPreciseConfigIndex];
+                var tierConfigs = this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex];
                 for (var i = 0; i < Time._NUM_TIERS; ++i) {
                     this._cleanTier(i);
                 }

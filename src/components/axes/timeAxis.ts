@@ -141,7 +141,7 @@ export module Axis {
     private _tierMarkContainers: D3.Selection[];
     private _tierBaselines: D3.Selection[];
     private _tierHeights: number[];
-    private _currentTimeAxisConfigurations: TimeAxisConfiguration[];
+    private _possibleTimeAxisConfigurations: TimeAxisConfiguration[];
     private _maximumTiers: number;
     private _measurer: SVGTypewriter.Measurers.Measurer;
 
@@ -205,9 +205,9 @@ export module Axis {
     public axisConfigurations(configurations: TimeAxisConfiguration[]): Time;
     public axisConfigurations(configurations?: any): any {
       if(configurations == null){
-        return this._currentTimeAxisConfigurations;
+        return this._possibleTimeAxisConfigurations;
       }
-      this._currentTimeAxisConfigurations = configurations;
+      this._possibleTimeAxisConfigurations = configurations;
       this._maximumTiers = _Util.Methods.max(configurations.map((config: TimeAxisConfiguration) => config.length), 0);
       this._invalidateLayout();
       return this;
@@ -217,15 +217,15 @@ export module Axis {
      * Gets the index of the most precise TimeAxisConfiguration that will fit in the current width.
      */
     private _getMostPreciseConfigurationIndex(): number {
-      var mostPreciseIndex = this._currentTimeAxisConfigurations.length;
-      this._currentTimeAxisConfigurations.forEach((interval: TimeAxisConfiguration, index: number) => {
+      var mostPreciseIndex = this._possibleTimeAxisConfigurations.length;
+      this._possibleTimeAxisConfigurations.forEach((interval: TimeAxisConfiguration, index: number) => {
         if (index < mostPreciseIndex && interval.every((tier: TimeAxisTierConfiguration) =>
           this._checkTimeAxisTierConfigurationWidth(tier))) {
           mostPreciseIndex = index;
         }
       });
 
-      if (mostPreciseIndex === this._currentTimeAxisConfigurations.length) {
+      if (mostPreciseIndex === this._possibleTimeAxisConfigurations.length) {
         _Util.Methods.warn("zoomed out too far: could not find suitable interval to display labels");
         --mostPreciseIndex;
       }
@@ -300,7 +300,7 @@ export module Axis {
     }
 
     protected _getTickValues(): any[] {
-      return this._currentTimeAxisConfigurations[this._mostPreciseConfigIndex].reduce(
+      return this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex].reduce(
           (ticks: any[], config: TimeAxisTierConfiguration) => ticks.concat(this._getTickIntervalValues(config)),
           []
         );
@@ -402,12 +402,12 @@ export module Axis {
         return [];
       }
 
-      return this._getTickIntervalValues(this._currentTimeAxisConfigurations[this._mostPreciseConfigIndex - 1][0]);
+      return this._getTickIntervalValues(this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex - 1][0]);
     }
 
     public _doRender() {
       this._mostPreciseConfigIndex = this._getMostPreciseConfigurationIndex();
-      var tierConfigs = this._currentTimeAxisConfigurations[this._mostPreciseConfigIndex];
+      var tierConfigs = this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex];
       for (var i = 0; i < Time._NUM_TIERS; ++i) {
         this._cleanTier(i);
       }
