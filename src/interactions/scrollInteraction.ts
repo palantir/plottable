@@ -4,7 +4,7 @@ module Plottable {
 export module Interaction {
   export class Scroll extends Interaction.AbstractInteraction {
     private _mouseDispatcher: Dispatcher.Mouse;
-    private _scrollCallback: (p: Point, e: WheelEvent) => any;
+    private _scrollCallback: (p: Point, deltaAmount: number) => any;
 
     public _anchor(component: Component.AbstractComponent, hitBox: D3.Selection) {
       super._anchor(component, hitBox);
@@ -15,8 +15,9 @@ export module Interaction {
     private _handleScrollEvent(p: Point, e: WheelEvent) {
       var translatedP = this._translateToComponentSpace(p);
       if (this._isInsideComponent(translatedP)) {
-        if (this.onScroll()) {
-          this.onScroll()(translatedP, e);
+        if (this._scrollCallback) {
+          var deltaPixelAmount = e.deltaY * (e.deltaMode ? 120 : 1);
+          this._scrollCallback(translatedP, deltaPixelAmount);
         }
       }
     }
@@ -24,17 +25,17 @@ export module Interaction {
     /**
      * Gets the callback called when a scroll occurs
      *
-     * @return {(p: Point, e: WheelEvent) => any} The current callback.
+     * @return {(p: Point, deltaAmount: number) => any} The current callback.
      */
-    public onScroll(): (p: Point, e: WheelEvent) => any;
+    public onScroll(): (p: Point, deltaAmount: number) => any;
     /**
      * Sets the callback called when a scroll occurs
      *
-     * @param {(p: Point, e: WheelEvent) => any} callback The callback to set.
+     * @param {(p: Point, deltaAmount: number) => any} callback The callback to set.
      * @return {Interaction.Scroll} The calling Interaction.Scroll.
      */
-    public onScroll(callback: (p: Point, e: WheelEvent) => any): Interaction.Scroll;
-    public onScroll(callback?: (p: Point, e: WheelEvent) => any): any {
+    public onScroll(callback: (p: Point, deltaAmount: number) => any): Interaction.Scroll;
+    public onScroll(callback?: (p: Point, deltaAmount: number) => any): any {
       if (callback === undefined) {
         return this._scrollCallback;
       }

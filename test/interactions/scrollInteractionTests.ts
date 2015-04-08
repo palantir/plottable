@@ -24,10 +24,10 @@ describe("Interactions", () => {
       var callbackCalled = false;
       var lastPoint: Plottable.Point;
       var deltaY: number;
-      var callback = function(p: Plottable.Point, e: WheelEvent) {
+      var callback = function(p: Plottable.Point, delta: number) {
         callbackCalled = true;
         lastPoint = p;
-        deltaY = e.deltaY;
+        deltaY = delta;
       };
       scrollInteraction.onScroll(callback);
 

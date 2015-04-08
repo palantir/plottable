@@ -10226,8 +10226,9 @@ var Plottable;
             Scroll.prototype._handleScrollEvent = function (p, e) {
                 var translatedP = this._translateToComponentSpace(p);
                 if (this._isInsideComponent(translatedP)) {
-                    if (this.onScroll()) {
-                        this.onScroll()(translatedP, e);
+                    if (this._scrollCallback) {
+                        var deltaPixelAmount = e.deltaY * (e.deltaMode ? 120 : 1);
+                        this._scrollCallback(translatedP, deltaPixelAmount);
                     }
                 }
             };

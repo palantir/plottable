@@ -8033,10 +8033,10 @@ describe("Interactions", function () {
             var callbackCalled = false;
             var lastPoint;
             var deltaY;
-            var callback = function (p, e) {
+            var callback = function (p, delta) {
                 callbackCalled = true;
                 lastPoint = p;
-                deltaY = e.deltaY;
+                deltaY = delta;
             };
             scrollInteraction.onScroll(callback);
             var expectedDeltaY = 10;

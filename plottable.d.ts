@@ -4101,16 +4101,16 @@ declare module Plottable {
             /**
              * Gets the callback called when a scroll occurs
              *
-             * @return {(p: Point, e: WheelEvent) => any} The current callback.
+             * @return {(p: Point, deltaAmount: number) => any} The current callback.
              */
-            onScroll(): (p: Point, e: WheelEvent) => any;
+            onScroll(): (p: Point, deltaAmount: number) => any;
             /**
              * Sets the callback called when a scroll occurs
              *
-             * @param {(p: Point, e: WheelEvent) => any} callback The callback to set.
+             * @param {(p: Point, deltaAmount: number) => any} callback The callback to set.
              * @return {Interaction.Scroll} The calling Interaction.Scroll.
              */
-            onScroll(callback: (p: Point, e: WheelEvent) => any): Interaction.Scroll;
+            onScroll(callback: (p: Point, deltaAmount: number) => any): Interaction.Scroll;
         }
     }
 }
