@@ -12,11 +12,13 @@ describe("Plots", () => {
     ];
     var SVG_WIDTH = 600;
     var SVG_HEIGHT = 400;
+
     describe("Vertical ErrorBar Plot", () => {
       var xScale: Plottable.Scale.Category;
       var yScale: Plottable.Scale.Linear;
       var barPlot: Plottable.Plot.Bar<string, number>;
       var errorBarPlot: Plottable.Plot.ErrorBar<string, number>;
+
       beforeEach(() => {
         var dataset = new Plottable.Dataset(data);
         svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
@@ -47,6 +49,7 @@ describe("Plots", () => {
           var errorBarUpper = errorBar.select("line.error-bar-upper");
           var errorBarMiddle = errorBar.select("line.error-bar-middle");
           var errorBarLower = errorBar.select("line.error-bar-lower");
+
           assert.equal(errorBarUpper.attr("y1"), errorBarUpper.attr("y2"), "error-bar-upper is vertical");
           assert.equal(errorBarMiddle.attr("x1"), errorBarMiddle.attr("x2"), "error-bar-middle is horizontal");
           assert.equal(errorBarLower.attr("y1"), errorBarLower.attr("y2"), "error-bar-lower is vertical");
@@ -64,6 +67,7 @@ describe("Plots", () => {
       var yScale: Plottable.Scale.Category;
       var barPlot: Plottable.Plot.Bar<number, string>;
       var errorBarPlot: Plottable.Plot.ErrorBar<number, string>;
+
       beforeEach(() => {
         var dataset = new Plottable.Dataset(data);
         svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
@@ -85,6 +89,7 @@ describe("Plots", () => {
         var plot = barPlot.below(errorBarPlot);
         plot.renderTo(svg);
       });
+
       it("renders error bars in the horizontal direction", () => {
         var errorBarRenderArea = (<any> errorBarPlot)._renderArea;
         var errorBars = errorBarRenderArea.selectAll("g.error-bar");
@@ -94,6 +99,7 @@ describe("Plots", () => {
           var errorBarUpper = errorBar.select("line.error-bar-upper");
           var errorBarMiddle = errorBar.select("line.error-bar-middle");
           var errorBarLower = errorBar.select("line.error-bar-lower");
+
           assert.equal(errorBarUpper.attr("x1"), errorBarUpper.attr("x2"), "error-bar-upper is vertical");
           assert.equal(errorBarMiddle.attr("y1"), errorBarMiddle.attr("y2"), "error-bar-middle is horizontal");
           assert.equal(errorBarLower.attr("x1"), errorBarLower.attr("x2"), "error-bar-lower is vertical");
