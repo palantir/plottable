@@ -1618,6 +1618,8 @@ declare module Plottable {
             protected _fixedWidthFlag: boolean;
             protected _isSetup: boolean;
             protected _isAnchored: boolean;
+            protected _width: number;
+            protected _height: number;
             /**
              * Attaches the Component as a child of a given a DOM element. Usually only directly invoked on root-level Components.
              *
@@ -1642,6 +1644,7 @@ declare module Plottable {
              * @param {number} availableHeight available height for the Component to render in
              */
             _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;
+            protected _setSize(availableWidth: number, availableHeight: number): void;
             _render(): void;
             _doRender(): void;
             _useLastCalculatedLayout(): boolean;
@@ -1897,6 +1900,7 @@ declare module Plottable {
             _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
             _merge(c: AbstractComponent, below: boolean): Group;
             _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): Group;
+            protected _setSize(availableWidth: number, availableHeight: number): void;
             _isFixedWidth(): boolean;
             _isFixedHeight(): boolean;
         }

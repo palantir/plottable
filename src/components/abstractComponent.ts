@@ -26,8 +26,8 @@ export module Component {
     private _boxContainer: D3.Selection;
     private _rootSVG: D3.Selection;
     private _isTopLevelComponent = false;
-    private _width: number; // Width and height of the component. Used to size the hitbox, bounding box, etc
-    private _height: number;
+    protected _width: number; // Width and height of the component. Used to size the hitbox, bounding box, etc
+    protected _height: number;
     private _xOffset = 0; // Offset from Origin, used for alignment and floating positioning
     private _yOffset = 0;
     private _cssClasses: string[] = ["component"];
@@ -134,14 +134,16 @@ export module Component {
           throw new Error("null arguments cannot be passed to _computeLayout() on a non-root node");
         }
       }
+      this._setSize(availableWidth, availableHeight);
+      this._xOrigin = offeredXOrigin + this._xOffset + (availableWidth - this.width()) * this._xAlignProportion;
+      this._yOrigin = offeredYOrigin + this._yOffset + (availableHeight - this.height()) * this._yAlignProportion;;
+      this._element.attr("transform", "translate(" + this._xOrigin + "," + this._yOrigin + ")");
+    }
+
+    protected _setSize(availableWidth: number, availableHeight: number) {
       var requestedSpace = this._requestedSpace(availableWidth, availableHeight);
       this._width  = this._isFixedWidth()  ? Math.min(availableWidth , requestedSpace.width)  : availableWidth ;
       this._height = this._isFixedHeight() ? Math.min(availableHeight, requestedSpace.height) : availableHeight;
-
-      this._xOrigin = offeredXOrigin + this._xOffset + (availableWidth - this.width()) * this._xAlignProportion;
-      this._yOrigin = offeredYOrigin + this._yOffset + (availableHeight - this.height()) * this._yAlignProportion;;
-
-      this._element.attr("transform", "translate(" + this._xOrigin + "," + this._yOrigin + ")");
       this._boxes.forEach((b: D3.Selection) => b.attr("width", this.width()).attr("height", this.height()));
     }
 

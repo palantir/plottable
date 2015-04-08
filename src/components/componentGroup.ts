@@ -49,12 +49,17 @@ export module Component {
       return this;
     }
 
+    protected _setSize(availableWidth: number, availableHeight: number) {
+      this._width = availableWidth;
+      this._height = availableHeight;
+    }
+
     public _isFixedWidth(): boolean {
-      return false;
+      return this.components().every((c) => c._isFixedWidth());
     }
 
     public _isFixedHeight(): boolean {
-      return false;
+      return this.components().every((c) => c._isFixedHeight());
     }
   }
 }

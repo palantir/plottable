@@ -3459,7 +3459,6 @@ var Plottable;
              * @param {number} availableHeight available height for the Component to render in
              */
             AbstractComponent.prototype._computeLayout = function (offeredXOrigin, offeredYOrigin, availableWidth, availableHeight) {
-                var _this = this;
                 if (offeredXOrigin == null || offeredYOrigin == null || availableWidth == null || availableHeight == null) {
                     if (this._element == null) {
                         throw new Error("anchor must be called before computeLayout");
@@ -3485,13 +3484,17 @@ var Plottable;
                         throw new Error("null arguments cannot be passed to _computeLayout() on a non-root node");
                     }
                 }
-                var requestedSpace = this._requestedSpace(availableWidth, availableHeight);
-                this._width = this._isFixedWidth() ? Math.min(availableWidth, requestedSpace.width) : availableWidth;
-                this._height = this._isFixedHeight() ? Math.min(availableHeight, requestedSpace.height) : availableHeight;
+                this._setSize(availableWidth, availableHeight);
                 this._xOrigin = offeredXOrigin + this._xOffset + (availableWidth - this.width()) * this._xAlignProportion;
                 this._yOrigin = offeredYOrigin + this._yOffset + (availableHeight - this.height()) * this._yAlignProportion;
                 ;
                 this._element.attr("transform", "translate(" + this._xOrigin + "," + this._yOrigin + ")");
+            };
+            AbstractComponent.prototype._setSize = function (availableWidth, availableHeight) {
+                var _this = this;
+                var requestedSpace = this._requestedSpace(availableWidth, availableHeight);
+                this._width = this._isFixedWidth() ? Math.min(availableWidth, requestedSpace.width) : availableWidth;
+                this._height = this._isFixedHeight() ? Math.min(availableHeight, requestedSpace.height) : availableHeight;
                 this._boxes.forEach(function (b) { return b.attr("width", _this.width()).attr("height", _this.height()); });
             };
             AbstractComponent.prototype._render = function () {
@@ -4067,11 +4070,15 @@ var Plottable;
                 });
                 return this;
             };
+            Group.prototype._setSize = function (availableWidth, availableHeight) {
+                this._width = availableWidth;
+                this._height = availableHeight;
+            };
             Group.prototype._isFixedWidth = function () {
-                return false;
+                return this.components().every(function (c) { return c._isFixedWidth(); });
             };
             Group.prototype._isFixedHeight = function () {
-                return false;
+                return this.components().every(function (c) { return c._isFixedHeight(); });
             };
             return Group;
         })(Component.AbstractComponentContainer);
