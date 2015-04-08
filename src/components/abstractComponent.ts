@@ -138,13 +138,13 @@ export module Component {
       this._xOrigin = offeredXOrigin + this._xOffset + (availableWidth - this.width()) * this._xAlignProportion;
       this._yOrigin = offeredYOrigin + this._yOffset + (availableHeight - this.height()) * this._yAlignProportion;;
       this._element.attr("transform", "translate(" + this._xOrigin + "," + this._yOrigin + ")");
+      this._boxes.forEach((b: D3.Selection) => b.attr("width", this.width()).attr("height", this.height()));
     }
 
     protected _setSize(availableWidth: number, availableHeight: number) {
       var requestedSpace = this._requestedSpace(availableWidth, availableHeight);
       this._width  = this._isFixedWidth()  ? Math.min(availableWidth , requestedSpace.width)  : availableWidth ;
       this._height = this._isFixedHeight() ? Math.min(availableHeight, requestedSpace.height) : availableHeight;
-      this._boxes.forEach((b: D3.Selection) => b.attr("width", this.width()).attr("height", this.height()));
     }
 
     public _render() {

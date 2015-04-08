@@ -3459,6 +3459,7 @@ var Plottable;
              * @param {number} availableHeight available height for the Component to render in
              */
             AbstractComponent.prototype._computeLayout = function (offeredXOrigin, offeredYOrigin, availableWidth, availableHeight) {
+                var _this = this;
                 if (offeredXOrigin == null || offeredYOrigin == null || availableWidth == null || availableHeight == null) {
                     if (this._element == null) {
                         throw new Error("anchor must be called before computeLayout");
@@ -3489,13 +3490,12 @@ var Plottable;
                 this._yOrigin = offeredYOrigin + this._yOffset + (availableHeight - this.height()) * this._yAlignProportion;
                 ;
                 this._element.attr("transform", "translate(" + this._xOrigin + "," + this._yOrigin + ")");
+                this._boxes.forEach(function (b) { return b.attr("width", _this.width()).attr("height", _this.height()); });
             };
             AbstractComponent.prototype._setSize = function (availableWidth, availableHeight) {
-                var _this = this;
                 var requestedSpace = this._requestedSpace(availableWidth, availableHeight);
                 this._width = this._isFixedWidth() ? Math.min(availableWidth, requestedSpace.width) : availableWidth;
                 this._height = this._isFixedHeight() ? Math.min(availableHeight, requestedSpace.height) : availableHeight;
-                this._boxes.forEach(function (b) { return b.attr("width", _this.width()).attr("height", _this.height()); });
             };
             AbstractComponent.prototype._render = function () {
                 if (this._isAnchored && this._isSetup && this.width() >= 0 && this.height() >= 0) {
