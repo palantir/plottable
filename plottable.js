@@ -10308,12 +10308,13 @@ var Plottable;
             /**
              * Creates a DragPan Behavior.
              *
-             * The allows you to move around and zoom in on a plot, interactively. It
-             * does so by changing the xScale and yScales' domains repeatedly.
+             * This behavior allows a consumer of Plottable to drag around in a component
+             * in order to cause the input scale to translate,
+             * resulting in a panning behavior to the consumer.
              *
              * @constructor
-             * @param {QuantitativeScale} [xScale] The X scale to update on panning/zooming.
-             * @param {QuantitativeScale} [yScale] The Y scale to update on panning/zooming.
+             * @param {Scale.AbstractQuantitative<number>} scale The scale to update on panning
+             * @param {boolean} isVertical If the scale operates vertically or horizontally
              */
             function DragPan(scale, isVertical) {
                 this._leftBounds = [-Infinity, Infinity];
