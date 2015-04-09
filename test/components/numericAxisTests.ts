@@ -430,11 +430,43 @@ describe("NumericAxis", () => {
 
   it("constrained tick labels do not overlap tick marks", () => {
 
-    var svg = generageSVG(300, 400);
+    var svg = generateSVG(300, 400);
 
+    var yScale = new Plottable.Scale.Linear().numTicks(100);
+    yScale.domain([175, 185]);
+    var yAxis = new Plottable.Axis.Numeric(yScale, "left")
+                                  .tickLabelPosition("top")
+                                  .tickLength(50);
+
+    var chartTable = new Plottable.Component.Table([
+      [yAxis],
+    ]);
+
+    chartTable.renderTo(svg);
+
+    var tickLabels = (<any> yAxis)._element.selectAll("." + Plottable.Axis.AbstractAxis.TICK_LABEL_CLASS)
+        .filter(function(d: any, i: number) {
+          var visibility = d3.select(this).style("visibility");
+          return (visibility === "visible") || (visibility === "inherit");
+        });
+
+    var tickMarks = (<any> yAxis)._element.selectAll("." + Plottable.Axis.AbstractAxis.TICK_MARK_CLASS)
+        .filter(function(d: any, i: number) {
+          var visibility = d3.select(this).style("visibility");
+          return (visibility === "visible") || (visibility === "inherit");
+        });
+
+
+    tickLabels.each(function() {
+      var tickLabelBox = this.getBoundingClientRect();
+
+      tickMarks.each(function() {
+        var tickMarkBox = this.getBoundingClientRect();
+          assert.isFalse(Plottable._Util.DOM.boxesOverlap(tickLabelBox, tickMarkBox));
+      });
+    });
 
     svg.remove();
-
   });
 
 
