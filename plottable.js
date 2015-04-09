@@ -4958,7 +4958,6 @@ var Plottable;
                 };
                 var tickMarkLength = this._maxLabelTickLength();
                 var tickLabelPadding = this.tickLabelPadding();
-                console.log('a');
                 var tickLabelTextAnchor = "middle";
                 var labelGroupTransformX = 0;
                 var labelGroupTransformY = 0;
@@ -5052,22 +5051,12 @@ var Plottable;
                     var visibility = d3.select(this).style("visibility");
                     return (visibility === "inherit") || (visibility === "visible");
                 });
-                var visibleTickLabelRects = visibleTickLabels[0].map(function (label) { return label.getBoundingClientRect(); });
-                console.log(JSON.stringify(visibleTickLabelRects[0]));
-                console.log(JSON.stringify(visibleTickLabelRects[1]));
-                console.log(JSON.stringify(visibleTickLabelRects[2]));
-                visibleTickMarks.each(function (e) {
-                    var boundingRect = this.getBoundingClientRect();
-                    console.log(JSON.stringify(boundingRect));
-                    for (var i = 0; i < visibleTickLabelRects.length; i++) {
-                        if (Plottable._Util.DOM.boxesOverlap(boundingRect, visibleTickLabelRects[i])) {
-                            console.log("tried");
-                            d3.select(this).style("visibility", "hidden");
-                        }
+                var labelNumbersShown = [];
+                visibleTickLabels.each(function (labelNumber) { return labelNumbersShown.push(labelNumber); });
+                visibleTickMarks.each(function (e, i) {
+                    if (labelNumbersShown.indexOf(e) === -1) {
+                        d3.select(this).style("visibility", "hidden");
                     }
-                    // console.log(this);
-                    // console.log(visibleTickLabelRects);
-                    // console.log(boundingRect);
                 });
             };
             Numeric.prototype.tickLabelPosition = function (position) {

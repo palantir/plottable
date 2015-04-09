@@ -104,8 +104,6 @@ export module Axis {
       var tickMarkLength = this._maxLabelTickLength();
       var tickLabelPadding = this.tickLabelPadding();
 
-      console.log('a');
-
       var tickLabelTextAnchor = "middle";
 
       var labelGroupTransformX = 0;
@@ -218,29 +216,13 @@ export module Axis {
                                     return (visibility === "inherit") || (visibility === "visible");
                                   });
 
+      var labelNumbersShown: number[] = [];
+      visibleTickLabels.each((labelNumber: string) => labelNumbersShown.push(labelNumber));
 
-      var visibleTickLabelRects = visibleTickLabels[0].map((label: HTMLScriptElement) => label.getBoundingClientRect());
-
-      console.log(JSON.stringify(visibleTickLabelRects[0]));
-      console.log(JSON.stringify(visibleTickLabelRects[1]));
-      console.log(JSON.stringify(visibleTickLabelRects[2]));
-
-      visibleTickMarks.each(function(e) {
-
-        var boundingRect: HTMLScriptElement = this.getBoundingClientRect();
-
-        console.log(JSON.stringify(boundingRect));
-
-        for (var i = 0; i < visibleTickLabelRects.length; i++) {
-          if (_Util.DOM.boxesOverlap(boundingRect, visibleTickLabelRects[i])) {
-            console.log("tried");
+      visibleTickMarks.each(function(e, i) {
+        if (labelNumbersShown.indexOf(e) === -1) {
             d3.select(this).style("visibility", "hidden");
-          }
         }
-
-        // console.log(this);
-        // console.log(visibleTickLabelRects);
-        // console.log(boundingRect);
       });
     }
 
