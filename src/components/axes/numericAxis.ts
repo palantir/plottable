@@ -201,8 +201,10 @@ export module Axis {
       this._hideOverflowingTickLabels();
       this._hideOverlappingTickLabels();
 
-      if (this._tickLabelPositioning === "bottom") {
-        // console.log("attempting to hide ticks");
+      if (this._tickLabelPositioning === "bottom" ||
+          this._tickLabelPositioning === "top" ||
+          this._tickLabelPositioning === "left" ||
+          this._tickLabelPositioning === "right") {
         this._hideOverlappingTickMarks();
       }
     }

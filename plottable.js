@@ -4430,17 +4430,31 @@ var Plottable;
                     }
                 });
             };
+            /**
+             * The method is responsible for evenly spacing the labels on the axis.
+             * @return test to see if taking every `interval` recrangle from `rects`
+             *         will result in labels not overlapping
+             *
+             * For top, bottom, left, right positioning of the thicks, we want the padding
+             * between the labels to be 3x, such that the label will be  `padding` distance
+             * from the tick and 2 * `padding` distance (or more) from the next tick
+             *
+             */
             AbstractAxis.prototype._hasOverlapWithInterval = function (interval, rects) {
+                var padding = this._tickLabelPadding;
+                if (this._tickLabelPositioning === "bottom" || this._tickLabelPositioning === "top" || this._tickLabelPositioning === "left" || this._tickLabelPositioning === "right") {
+                    padding *= 3;
+                }
                 for (var i = 0; i < rects.length - (interval); i += interval) {
                     var currRect = rects[i];
                     var nextRect = rects[i + interval];
                     if (this._isHorizontal()) {
-                        if (currRect.right + this._tickLabelPadding >= nextRect.left) {
+                        if (currRect.right + padding >= nextRect.left) {
                             return false;
                         }
                     }
                     else {
-                        if (currRect.top - this._tickLabelPadding <= nextRect.bottom) {
+                        if (currRect.top - padding <= nextRect.bottom) {
                             return false;
                         }
                     }
@@ -5040,8 +5054,7 @@ var Plottable;
                 }
                 this._hideOverflowingTickLabels();
                 this._hideOverlappingTickLabels();
-                if (this._tickLabelPositioning === "bottom") {
-                    // console.log("attempting to hide ticks");
+                if (this._tickLabelPositioning === "bottom" || this._tickLabelPositioning === "top" || this._tickLabelPositioning === "left" || this._tickLabelPositioning === "right") {
                     this._hideOverlappingTickMarks();
                 }
             };
