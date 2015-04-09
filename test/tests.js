@@ -1339,7 +1339,10 @@ describe("Gridlines", function () {
         yScale.domain([0, 10]);
         var yAxis = new Plottable.Axis.Numeric(yScale, "left");
         var gridlines = new Plottable.Component.Gridlines(xScale, yScale);
-        var basicTable = new Plottable.Component.Table().addComponent(0, 0, yAxis).addComponent(0, 1, gridlines).addComponent(1, 1, xAxis);
+        var basicTable = new Plottable.Component.Table([
+            [yAxis, gridlines],
+            [null, xAxis]
+        ]);
         basicTable._anchor(svg);
         basicTable._computeLayout();
         xScale.range([0, xAxis.width()]); // manually set range since we don't have a renderer
@@ -1449,7 +1452,10 @@ describe("Labels", function () {
     it("centered text in a table is positioned properly", function () {
         var svg = generateSVG(400, 400);
         var label = new Plottable.Component.TitleLabel("X");
-        var t = new Plottable.Component.Table().addComponent(0, 0, label).addComponent(1, 0, new Plottable.Component.AbstractComponent());
+        var t = new Plottable.Component.Table([
+            [label],
+            [new Plottable.Component.AbstractComponent()]
+        ]);
         t.renderTo(svg);
         var textTranslate = d3.transform(label._content.select("g").attr("transform")).translate;
         var eleTranslate = d3.transform(label._element.attr("transform")).translate;
@@ -5720,7 +5726,7 @@ describe("Component behavior", function () {
         var horizontalComponent = new Plottable.Component.AbstractComponent();
         var verticalComponent = new Plottable.Component.AbstractComponent();
         var placeHolder = new Plottable.Component.AbstractComponent();
-        var t = new Plottable.Component.Table().addComponent(0, 0, verticalComponent).addComponent(0, 1, new Plottable.Component.AbstractComponent()).addComponent(1, 0, placeHolder).addComponent(1, 1, horizontalComponent);
+        var t = new Plottable.Component.Table().addComponent(verticalComponent, 0, 0).addComponent(new Plottable.Component.AbstractComponent(), 0, 1).addComponent(placeHolder, 1, 0).addComponent(horizontalComponent, 1, 1);
         t.renderTo(svg);
         horizontalComponent.xAlign("center");
         verticalComponent.yAlign("bottom");
@@ -5924,7 +5930,7 @@ function generateBasicTable(nRows, nCols) {
     for (var i = 0; i < nRows; i++) {
         for (var j = 0; j < nCols; j++) {
             var r = new Plottable.Component.AbstractComponent();
-            table.addComponent(i, j, r);
+            table.addComponent(r, i, j);
             components.push(r);
         }
     }
@@ -5957,15 +5963,15 @@ describe("Tables", function () {
         var table = new Plottable.Component.Table([row1, row2]);
         assert.equal(table._rows[0][1], c0, "the component is in the right spot");
         var c1 = new Plottable.Component.AbstractComponent();
-        table.addComponent(2, 2, c1);
+        table.addComponent(c1, 2, 2);
         assert.equal(table._rows[2][2], c1, "the inserted component went to the right spot");
     });
     it("tables can be constructed by adding components in matrix style", function () {
         var table = new Plottable.Component.Table();
         var c1 = new Plottable.Component.AbstractComponent();
         var c2 = new Plottable.Component.AbstractComponent();
-        table.addComponent(0, 0, c1);
-        table.addComponent(1, 1, c2);
+        table.addComponent(c1, 0, 0);
+        table.addComponent(c2, 1, 1);
         var rows = table._rows;
         assert.lengthOf(rows, 2, "there are two rows");
         assert.lengthOf(rows[0], 2, "two cols in first row");
@@ -5980,9 +5986,9 @@ describe("Tables", function () {
         var c2 = new Plottable.Component.AbstractComponent();
         var c3 = new Plottable.Component.AbstractComponent();
         var t = new Plottable.Component.Table();
-        t.addComponent(0, 2, c1);
-        t.addComponent(0, 0, c2);
-        t.addComponent(0, 2, c3);
+        t.addComponent(c1, 0, 2);
+        t.addComponent(c2, 0, 0);
+        t.addComponent(c3, 0, 2);
         assert.isTrue(Plottable.Component.Group.prototype.isPrototypeOf(t._rows[0][2]), "A group was created");
         var components = t._rows[0][2].components();
         assert.lengthOf(components, 2, "The group created should have 2 components");
@@ -5995,8 +6001,8 @@ describe("Tables", function () {
         var grp = new Plottable.Component.Group([c1, c2]);
         var c3 = new Plottable.Component.AbstractComponent();
         var t = new Plottable.Component.Table();
-        t.addComponent(0, 2, grp);
-        t.addComponent(0, 2, c3);
+        t.addComponent(grp, 0, 2);
+        t.addComponent(c3, 0, 2);
         assert.isTrue(Plottable.Component.Group.prototype.isPrototypeOf(t._rows[0][2]), "The cell still contains a group");
         var components = t._rows[0][2].components();
         assert.lengthOf(components, 3, "The group created should have 3 components");
@@ -6008,8 +6014,8 @@ describe("Tables", function () {
         // Solves #180, a weird bug
         var t = new Plottable.Component.Table();
         var svg = generateSVG();
-        t.addComponent(1, 0, new Plottable.Component.AbstractComponent());
-        t.addComponent(0, 2, new Plottable.Component.AbstractComponent());
+        t.addComponent(new Plottable.Component.AbstractComponent(), 1, 0);
+        t.addComponent(new Plottable.Component.AbstractComponent(), 0, 2);
         t.renderTo(svg); //would throw an error without the fix (tested);
         svg.remove();
     });

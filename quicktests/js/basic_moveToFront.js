@@ -51,20 +51,20 @@ function run(div, data, Plottable) {
   var title1 = new Plottable.Component.TitleLabel( "front: areaPlot", "horizontal");
   var legend1 = new Plottable.Component.Legend(colorScale1);
   legend1.maxEntriesPerRow(1);
-  
-  var titleTable = new Plottable.Component.Table().addComponent(0,0, title1)
-                                        .addComponent(0,1, legend1);
+
+  var titleTable = new Plottable.Component.Table().addComponent(title1, 0, 0)
+                                        .addComponent(legend1, 0, 1);
 
   var plotGroup = scatterPlot.merge(linePlot).merge(areaPlot);
 
   var basicTable = new Plottable.Component.Table()
-              .addComponent(2, 0, yAxis)
-              .addComponent(2, 1, plotGroup)
-              .addComponent(3, 1, xAxis);
+              .addComponent(yAxis, 2, 0)
+              .addComponent(plotGroup, 2, 1)
+              .addComponent(xAxis, 3, 1);
 
   var bigTable = new Plottable.Component.Table()
-             .addComponent(0, 0, titleTable)
-             .addComponent(1,0, basicTable);
+             .addComponent(titleTable, 0, 0)
+             .addComponent(basicTable, 1, 0);
 
   bigTable.renderTo(svg);
 

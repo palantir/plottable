@@ -11,7 +11,7 @@ function generateBasicTable(nRows: number, nCols: number) {
   for(var i = 0; i<nRows; i++) {
     for(var j = 0; j<nCols; j++) {
       var r = new Plottable.Component.AbstractComponent();
-      table.addComponent(i, j, r);
+      table.addComponent(r, i, j);
       components.push(r);
     }
   }
@@ -48,7 +48,7 @@ describe("Tables", () => {
     var table = new Plottable.Component.Table([row1, row2]);
     assert.equal((<any> table)._rows[0][1], c0, "the component is in the right spot");
     var c1 = new Plottable.Component.AbstractComponent();
-    table.addComponent(2, 2, c1);
+    table.addComponent(c1, 2, 2);
     assert.equal((<any> table)._rows[2][2], c1, "the inserted component went to the right spot");
   });
 
@@ -56,8 +56,8 @@ describe("Tables", () => {
     var table = new Plottable.Component.Table();
     var c1 = new Plottable.Component.AbstractComponent();
     var c2 = new Plottable.Component.AbstractComponent();
-    table.addComponent(0, 0, c1);
-    table.addComponent(1, 1, c2);
+    table.addComponent(c1, 0, 0);
+    table.addComponent(c2, 1, 1);
     var rows = (<any> table)._rows;
     assert.lengthOf(rows, 2, "there are two rows");
     assert.lengthOf(rows[0], 2, "two cols in first row");
@@ -74,9 +74,9 @@ describe("Tables", () => {
     var c3 = new Plottable.Component.AbstractComponent();
     var t = new Plottable.Component.Table();
 
-    t.addComponent(0, 2, c1);
-    t.addComponent(0, 0, c2);
-    t.addComponent(0, 2, c3);
+    t.addComponent(c1, 0, 2);
+    t.addComponent(c2, 0, 0);
+    t.addComponent(c3, 0, 2);
 
     assert.isTrue(Plottable.Component.Group.prototype.isPrototypeOf((<any> t)._rows[0][2]), "A group was created");
 
@@ -95,8 +95,8 @@ describe("Tables", () => {
 
     var t = new Plottable.Component.Table();
 
-    t.addComponent(0, 2, grp);
-    t.addComponent(0, 2, c3);
+    t.addComponent(grp, 0, 2);
+    t.addComponent(c3, 0, 2);
     assert.isTrue(Plottable.Component.Group.prototype.isPrototypeOf((<any> t)._rows[0][2]), "The cell still contains a group");
 
     var components: Plottable.Component.AbstractComponent[] = (<any> t)._rows[0][2].components();
@@ -110,8 +110,8 @@ describe("Tables", () => {
     // Solves #180, a weird bug
     var t = new Plottable.Component.Table();
     var svg = generateSVG();
-    t.addComponent(1, 0, new Plottable.Component.AbstractComponent());
-    t.addComponent(0, 2, new Plottable.Component.AbstractComponent());
+    t.addComponent(new Plottable.Component.AbstractComponent(), 1, 0);
+    t.addComponent(new Plottable.Component.AbstractComponent(), 0, 2);
     t.renderTo(svg); //would throw an error without the fix (tested);
     svg.remove();
   });

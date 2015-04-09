@@ -2542,28 +2542,25 @@ declare module Plottable {
              */
             constructor(rows?: AbstractComponent[][]);
             /**
-             * Adds a Component in the specified cell.
+             * Adds a Component at the specified row and column position.
              *
-             * If the cell is already occupied, there are 3 cases
-             *  - Component + Component => Group containing both components
-             *  - Component + Group => Component is added to the group
-             *  - Group + Component => Component is added to the group
+             * For example,
+             *     new Table([[a, b]]);
+             * is equivalent to
+             *     var table = new Table();
+             *     table.addComponent(a, 0, 0);
+             *     table.addComponent(b, 0, 1);
              *
-             * For example, instead of calling `new Table([[a, b], [null, c]])`, you
-             * could call
-             * ```typescript
-             * var table = new Table();
-             * table.addComponent(0, 0, a);
-             * table.addComponent(0, 1, b);
-             * table.addComponent(1, 1, c);
-             * ```
+             * If the cell is already occupied, the Component being added is combined
+             * with the existing Component:
+             *   componentToAdd.above(componentAlreadyThere)
              *
+             * @param {Component} component The Component to be added.
              * @param {number} row The row in which to add the Component.
              * @param {number} col The column in which to add the Component.
-             * @param {Component} component The Component to be added.
              * @returns {Table} The calling Table.
              */
-            addComponent(row: number, col: number, component: AbstractComponent): Table;
+            addComponent(componentToAdd: AbstractComponent, row: number, col: number): Table;
             _removeComponent(component: AbstractComponent): void;
             _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
             _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;

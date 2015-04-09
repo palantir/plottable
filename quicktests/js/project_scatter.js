@@ -50,10 +50,10 @@ function run(div, data, Plottable) {
     var title1 = new Plottable.Component.TitleLabel( "Opacity, r, color", "horizontal");
 
 
-    var basicTable = new Plottable.Component.Table().addComponent(0,2, title1)
-                .addComponent(1, 1, yAxis)
-                .addComponent(1, 2, renderAreaD1)
-                .addComponent(2, 2, xAxis);
+    var basicTable = new Plottable.Component.Table().addComponent(title1, 0, 2)
+                .addComponent(yAxis, 1, 1)
+                .addComponent(renderAreaD1, 1, 2)
+                .addComponent(xAxis, 2, 2);
 
     basicTable.renderTo(svg);
 
