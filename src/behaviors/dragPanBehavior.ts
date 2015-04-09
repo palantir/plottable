@@ -79,7 +79,7 @@ export module Behavior {
           dragAmount = Math.max(dragAmount, -Math.min(leftRangeValues[1], rightRangeValues[1]));
         }
 
-        ScaleDomainTransformers.translate(this._scale, dragAmount);
+        ScaleDomainTransformers.translate(this._scale, -dragAmount);
         lastDragValue = endPointDragValue;
       });
 
