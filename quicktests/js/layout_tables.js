@@ -42,32 +42,32 @@ function run(div, data, Plottable) {
     //test merge:
     //empty component + empty component
 
-    var basicTable0 = new Plottable.Component.Table().addComponent(0,0, yAxis0);
+    var basicTable0 = new Plottable.Component.Table().addComponent(yAxis0, 0, 0);
 
     //empty component + XYRenderer
-    var basicTable1 = new Plottable.Component.Table().addComponent(0,1, renderAreaD0);
+    var basicTable1 = new Plottable.Component.Table().addComponent(renderAreaD0, 0, 1);
 
 
     //XYRenderer + empty component
-    var basicTable2 = new Plottable.Component.Table().addComponent(0,0, yAxis2)
-                                          .addComponent(0,1, renderAreaD1)
-                                          .addComponent(1,1,xAxis2);
+    var basicTable2 = new Plottable.Component.Table().addComponent(yAxis2, 0, 0)
+                                          .addComponent(renderAreaD1, 0, 1)
+                                          .addComponent(xAxis2, 1, 1);
     //XYRenderer + XYRenderer
     var renderGroup3 = renderAreaD3.merge(renderAreaD2);
-    var basicTable3 = new Plottable.Component.Table().addComponent(0,1, renderGroup3)
-                                          .addComponent(1,1,xAxis3);
+    var basicTable3 = new Plottable.Component.Table().addComponent(renderGroup3, 0, 1)
+                                          .addComponent(xAxis3, 1, 1);
 
     var bigtable = new Plottable.Component.Table();
 
     var line1 = new Plottable.Component.Label("Tables in Tables", "horizontal");
     var line2 = new Plottable.Component.Label("for Dan", "horizontal");
 
-    bigtable = new Plottable.Component.Table().addComponent(0,0, basicTable0)
-                                          .addComponent(0,2, basicTable1)
-                                          .addComponent(3,0, basicTable2)
-                                          .addComponent(3,2,basicTable3)
-                                          .addComponent(1, 1, line1)
-                                          .addComponent(2, 1, line2);
+    bigtable = new Plottable.Component.Table().addComponent(basicTable0, 0, 0)
+                                          .addComponent(basicTable1, 0, 2)
+                                          .addComponent(basicTable2, 3, 0)
+                                          .addComponent(basicTable3, 3, 2)
+                                          .addComponent(line1, 1, 1)
+                                          .addComponent(line2, 2, 1);
     bigtable.renderTo(svg);
 
 

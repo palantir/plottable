@@ -37,10 +37,10 @@ function run(div, data, Plottable) {
   var label = new Plottable.Component.Label("Width is 3*d.x + 3", "horizontal");
 
   var xAxisTable = new Plottable.Component.Table([[xAxis],[label]]);
-  var basicTable = new Plottable.Component.Table().addComponent(0,2, title1)
-                                          .addComponent(1, 1, yAxis)
-                                          .addComponent(1, 2, renderAreaD1)
-                                          .addComponent(2, 2, xAxisTable);
+  var basicTable = new Plottable.Component.Table().addComponent(title1, 0, 2)
+                                          .addComponent(yAxis, 1, 1)
+                                          .addComponent(renderAreaD1, 1, 2)
+                                          .addComponent(xAxisTable, 2, 2);
 
   basicTable.renderTo(svg);
 }

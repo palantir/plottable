@@ -37,9 +37,9 @@ function run(div, data, Plottable) {
     var renderGroup = barPlot.merge(scatterPlot);
 
     var basicTable = new Plottable.Component.Table()
-                .addComponent(2, 0, yAxis)
-                .addComponent(2, 1, renderGroup)
-                .addComponent(3, 1, xAxis);
+                .addComponent(yAxis, 2, 0)
+                .addComponent(renderGroup, 2, 1)
+                .addComponent(xAxis, 3, 1);
 
     basicTable.renderTo(svg);
 

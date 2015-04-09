@@ -40,13 +40,13 @@ function run(svg, data, Plottable) {
 
   var title1 = new Plottable.Component.TitleLabel( "Four Data Series", "horizontal");
   var legend1 = new Plottable.Component.Legend(colorScale1).maxEntriesPerRow(1);
-  var titleTable = new Plottable.Component.Table().addComponent(0,0, title1)
-  .addComponent(0,1, legend1);
+  var titleTable = new Plottable.Component.Table().addComponent(title1, 0, 0)
+  .addComponent(legend1, 0, 1);
 
-  var basicTable = new Plottable.Component.Table().addComponent(0,2, titleTable)
-              .addComponent(1, 1, yAxis)
-              .addComponent(1, 2, renderAreas)
-              .addComponent(2, 2, xAxis);
+  var basicTable = new Plottable.Component.Table().addComponent(titleTable, 0, 2)
+              .addComponent(yAxis, 1, 1)
+              .addComponent(renderAreas, 1, 2)
+              .addComponent(xAxis, 2, 2);
 
   basicTable.renderTo(svg);
 }
