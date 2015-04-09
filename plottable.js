@@ -4958,6 +4958,7 @@ var Plottable;
                 };
                 var tickMarkLength = this._maxLabelTickLength();
                 var tickLabelPadding = this.tickLabelPadding();
+                console.log('a');
                 var tickLabelTextAnchor = "middle";
                 var labelGroupTransformX = 0;
                 var labelGroupTransformY = 0;
@@ -5040,6 +5041,34 @@ var Plottable;
                 }
                 this._hideOverflowingTickLabels();
                 this._hideOverlappingTickLabels();
+                if (this._tickLabelPositioning === "bottom") {
+                    // console.log("attempting to hide ticks");
+                    this._hideOverlappingTickMarks();
+                }
+            };
+            Numeric.prototype._hideOverlappingTickMarks = function () {
+                var visibleTickMarks = this._tickMarkContainer.selectAll("." + Axis.AbstractAxis.TICK_MARK_CLASS);
+                var visibleTickLabels = this._tickLabelContainer.selectAll("." + Axis.AbstractAxis.TICK_LABEL_CLASS).filter(function (d, i) {
+                    var visibility = d3.select(this).style("visibility");
+                    return (visibility === "inherit") || (visibility === "visible");
+                });
+                var visibleTickLabelRects = visibleTickLabels[0].map(function (label) { return label.getBoundingClientRect(); });
+                console.log(JSON.stringify(visibleTickLabelRects[0]));
+                console.log(JSON.stringify(visibleTickLabelRects[1]));
+                console.log(JSON.stringify(visibleTickLabelRects[2]));
+                visibleTickMarks.each(function (e) {
+                    var boundingRect = this.getBoundingClientRect();
+                    console.log(JSON.stringify(boundingRect));
+                    for (var i = 0; i < visibleTickLabelRects.length; i++) {
+                        if (Plottable._Util.DOM.boxesOverlap(boundingRect, visibleTickLabelRects[i])) {
+                            console.log("tried");
+                            d3.select(this).style("visibility", "hidden");
+                        }
+                    }
+                    // console.log(this);
+                    // console.log(visibleTickLabelRects);
+                    // console.log(boundingRect);
+                });
             };
             Numeric.prototype.tickLabelPosition = function (position) {
                 if (position == null) {
