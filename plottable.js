@@ -998,8 +998,8 @@ var Plottable;
          * @returns {D[]} The translated domain
          */
         function translate(scale, translateAmount) {
-            var translateTransform = function (rangeValue) { return scale.invert(rangeValue - translateAmount); };
-            scale.domain(scale.range().map(translateTransform));
+            var translateTransform = function (rangeValue) { return scale.invert(rangeValue + translateAmount); };
+            return scale.range().map(translateTransform);
         }
         ScaleDomainTransformers.translate = translate;
         /**
@@ -1016,7 +1016,7 @@ var Plottable;
             if (centerInDomainSpace === void 0) { centerInDomainSpace = false; }
             var centerNumber = centerInDomainSpace ? scale.scale(centerValue) : centerValue;
             var magnifyTransform = function (rangeValue) { return scale.invert(centerNumber - (centerNumber - rangeValue) * magnifyAmount); };
-            scale.domain(scale.range().map(magnifyTransform));
+            return scale.range().map(magnifyTransform);
         }
         ScaleDomainTransformers.magnify = magnify;
     })(ScaleDomainTransformers = Plottable.ScaleDomainTransformers || (Plottable.ScaleDomainTransformers = {}));
