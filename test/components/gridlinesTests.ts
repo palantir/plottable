@@ -14,10 +14,10 @@ describe("Gridlines", () => {
     var yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
     var gridlines = new Plottable.Component.Gridlines(xScale, yScale);
-    var basicTable = new Plottable.Component.Table().addComponent(0, 0, yAxis)
-                                          .addComponent(0, 1, gridlines)
-                                          .addComponent(1, 1, xAxis);
-
+    var basicTable = new Plottable.Component.Table([
+      [yAxis, gridlines],
+      [null,  xAxis    ]
+    ]);
     basicTable._anchor(svg);
     basicTable._computeLayout();
     xScale.range([0, xAxis.width() ]); // manually set range since we don't have a renderer

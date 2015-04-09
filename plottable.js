@@ -6068,43 +6068,40 @@ var Plottable;
                 this.classed("table", true);
                 rows.forEach(function (row, rowIndex) {
                     row.forEach(function (component, colIndex) {
-                        _this.addComponent(rowIndex, colIndex, component);
+                        _this.addComponent(component, rowIndex, colIndex);
                     });
                 });
             }
             /**
-             * Adds a Component in the specified cell.
+             * Adds a Component at the specified row and column position.
              *
-             * If the cell is already occupied, there are 3 cases
-             *  - Component + Component => Group containing both components
-             *  - Component + Group => Component is added to the group
-             *  - Group + Component => Component is added to the group
+             * For example,
+             *     new Table([[a, b]]);
+             * is equivalent to
+             *     var table = new Table();
+             *     table.addComponent(a, 0, 0);
+             *     table.addComponent(b, 0, 1);
              *
-             * For example, instead of calling `new Table([[a, b], [null, c]])`, you
-             * could call
-             * ```typescript
-             * var table = new Table();
-             * table.addComponent(0, 0, a);
-             * table.addComponent(0, 1, b);
-             * table.addComponent(1, 1, c);
-             * ```
+             * If the cell is already occupied, the Component being added is combined
+             * with the existing Component:
+             *   componentToAdd.above(componentAlreadyThere)
              *
+             * @param {Component} component The Component to be added.
              * @param {number} row The row in which to add the Component.
              * @param {number} col The column in which to add the Component.
-             * @param {Component} component The Component to be added.
              * @returns {Table} The calling Table.
              */
-            Table.prototype.addComponent = function (row, col, component) {
+            Table.prototype.addComponent = function (componentToAdd, row, col) {
                 var currentComponent = this._rows[row] && this._rows[row][col];
                 if (currentComponent) {
                     currentComponent.detach();
-                    component = component.above(currentComponent);
+                    componentToAdd = componentToAdd.above(currentComponent);
                 }
-                if (this._addComponent(component)) {
+                if (this._addComponent(componentToAdd)) {
                     this._nRows = Math.max(row + 1, this._nRows);
                     this._nCols = Math.max(col + 1, this._nCols);
                     this._padTableToSize(this._nRows, this._nCols);
-                    this._rows[row][col] = component;
+                    this._rows[row][col] = componentToAdd;
                 }
                 return this;
             };
