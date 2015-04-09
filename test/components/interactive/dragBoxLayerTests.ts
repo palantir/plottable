@@ -50,6 +50,11 @@ describe("Interactive Components", () => {
       svg.remove();
     });
 
+    it("clipPath enabled", () => {
+      var dbl = new Plottable.Component.Interactive.DragBoxLayer();
+      assert.isTrue(dbl.clipPathEnabled, "uses clipPath (to hide detection edges)");
+    });
+
     it("detectionRadius()", () => {
       var dbl = new Plottable.Component.Interactive.DragBoxLayer();
 
