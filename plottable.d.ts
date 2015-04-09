@@ -1642,6 +1642,10 @@ declare module Plottable {
              * @param {number} availableHeight available height for the Component to render in
              */
             _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;
+            protected _getSize(availableWidth: number, availableHeight: number): {
+                width: number;
+                height: number;
+            };
             _render(): void;
             _doRender(): void;
             _useLastCalculatedLayout(): boolean;
@@ -1903,6 +1907,10 @@ declare module Plottable {
             _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
             _merge(c: AbstractComponent, below: boolean): Group;
             _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): Group;
+            protected _getSize(availableWidth: number, availableHeight: number): {
+                width: number;
+                height: number;
+            };
             _isFixedWidth(): boolean;
             _isFixedHeight(): boolean;
         }

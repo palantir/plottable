@@ -3485,14 +3485,20 @@ var Plottable;
                         throw new Error("null arguments cannot be passed to _computeLayout() on a non-root node");
                     }
                 }
-                var requestedSpace = this._requestedSpace(availableWidth, availableHeight);
-                this._width = this._isFixedWidth() ? Math.min(availableWidth, requestedSpace.width) : availableWidth;
-                this._height = this._isFixedHeight() ? Math.min(availableHeight, requestedSpace.height) : availableHeight;
+                var size = this._getSize(availableWidth, availableHeight);
+                this._width = size.width;
+                this._height = size.height;
                 this._xOrigin = offeredXOrigin + this._xOffset + (availableWidth - this.width()) * this._xAlignProportion;
                 this._yOrigin = offeredYOrigin + this._yOffset + (availableHeight - this.height()) * this._yAlignProportion;
-                ;
                 this._element.attr("transform", "translate(" + this._xOrigin + "," + this._yOrigin + ")");
                 this._boxes.forEach(function (b) { return b.attr("width", _this.width()).attr("height", _this.height()); });
+            };
+            AbstractComponent.prototype._getSize = function (availableWidth, availableHeight) {
+                var requestedSpace = this._requestedSpace(availableWidth, availableHeight);
+                return {
+                    width: this._isFixedWidth() ? Math.min(availableWidth, requestedSpace.width) : availableWidth,
+                    height: this._isFixedHeight() ? Math.min(availableHeight, requestedSpace.height) : availableHeight
+                };
             };
             AbstractComponent.prototype._render = function () {
                 if (this._isAnchored && this._isSetup && this.width() >= 0 && this.height() >= 0) {
@@ -4067,11 +4073,17 @@ var Plottable;
                 });
                 return this;
             };
+            Group.prototype._getSize = function (availableWidth, availableHeight) {
+                return {
+                    width: availableWidth,
+                    height: availableHeight
+                };
+            };
             Group.prototype._isFixedWidth = function () {
-                return false;
+                return this.components().every(function (c) { return c._isFixedWidth(); });
             };
             Group.prototype._isFixedHeight = function () {
-                return false;
+                return this.components().every(function (c) { return c._isFixedHeight(); });
             };
             return Group;
         })(Component.AbstractComponentContainer);
