@@ -379,6 +379,57 @@ export module Plot {
       return barPixelWidth;
     }
 
+    protected _getClosestPlotData(queryPoint: Point, datasetKeys: string[], withinValue = Infinity) {
+      var closestPositionDistance = withinValue;
+      var closestValueDistance = withinValue;
+
+      var closestDatum: any;
+      var closestPixelPoint: Point;
+      var closestSelection: D3.Selection;
+
+      datasetKeys.forEach((datasetKey) => {
+        var datasetPlotData = this.getAllPlotData(datasetKey);
+        var projectors = this.generateProjectors(datasetKey);
+        datasetPlotData.data.forEach((datum, index) => {
+          var horizDist = Bar._distanceFromRange(queryPoint.x, projectors["x"](datum, index), projectors["width"](datum, index));
+          var vertDist = Bar._distanceFromRange(queryPoint.y, projectors["y"](datum, index), projectors["height"](datum, index));
+          var positionDist = this._isVertical ? horizDist : vertDist;
+          if (positionDist <= closestPositionDistance) {
+            var valueDist = this._isVertical ? vertDist : horizDist;
+
+            if (positionDist < closestPositionDistance && valueDist < withinValue) {
+              closestPositionDistance = positionDist;
+              closestValueDistance = withinValue;
+            }
+
+            if (valueDist < closestValueDistance) {
+              closestDatum = datum;
+              closestPixelPoint = datasetPlotData.pixelPoints[index];
+              closestSelection = d3.select(datasetPlotData.selection[0][index]);
+            }
+          }
+        });
+      });
+
+      if (closestPositionDistance === withinValue) {
+        return {data: [], pixelPoints: [], selection: d3.select()};
+      }
+
+      return {data: [closestDatum],
+              pixelPoints: [closestPixelPoint],
+              selection: closestSelection};
+    }
+
+    private static _distanceFromRange(point: number, start: number, end: number) {
+      if (point < start) {
+        return start - point;
+      } else if (point > end) {
+        return end - point;
+      } else {
+        return 0;
+      }
+    }
+
     /*
      * Gets the current hover mode.
      *

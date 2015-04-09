@@ -7728,6 +7728,51 @@ var Plottable;
                 }
                 return barPixelWidth;
             };
+            Bar.prototype._getClosestPlotData = function (queryPoint, datasetKeys, withinValue) {
+                var _this = this;
+                if (withinValue === void 0) { withinValue = Infinity; }
+                var closestPositionDistance = withinValue;
+                var closestValueDistance = withinValue;
+                var closestDatum;
+                var closestPixelPoint;
+                var closestSelection;
+                datasetKeys.forEach(function (datasetKey) {
+                    var datasetPlotData = _this.getAllPlotData(datasetKey);
+                    var projectors = _this.generateProjectors(datasetKey);
+                    datasetPlotData.data.forEach(function (datum, index) {
+                        var horizDist = Bar._distanceFromRange(queryPoint.x, projectors["x"](datum, index), projectors["width"](datum, index));
+                        var vertDist = Bar._distanceFromRange(queryPoint.y, projectors["y"](datum, index), projectors["height"](datum, index));
+                        var positionDist = _this._isVertical ? horizDist : vertDist;
+                        if (positionDist <= closestPositionDistance) {
+                            var valueDist = _this._isVertical ? vertDist : horizDist;
+                            if (positionDist < closestPositionDistance && valueDist < withinValue) {
+                                closestPositionDistance = positionDist;
+                                closestValueDistance = withinValue;
+                            }
+                            if (valueDist < closestValueDistance) {
+                                closestDatum = datum;
+                                closestPixelPoint = datasetPlotData.pixelPoints[index];
+                                closestSelection = d3.select(datasetPlotData.selection[0][index]);
+                            }
+                        }
+                    });
+                });
+                if (closestPositionDistance === withinValue) {
+                    return { data: [], pixelPoints: [], selection: d3.select() };
+                }
+                return { data: [closestDatum], pixelPoints: [closestPixelPoint], selection: closestSelection };
+            };
+            Bar._distanceFromRange = function (point, start, end) {
+                if (point < start) {
+                    return start - point;
+                }
+                else if (point > end) {
+                    return end - point;
+                }
+                else {
+                    return 0;
+                }
+            };
             Bar.prototype.hoverMode = function (mode) {
                 if (mode == null) {
                     return this._hoverMode;
