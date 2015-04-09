@@ -8145,6 +8145,66 @@ describe("Interactions", function () {
 
 ///<reference path="../testReference.ts" />
 var assert = chai.assert;
+describe("Interactions", function () {
+    describe("DoubleClick", function () {
+        var SVG_WIDTH = 400;
+        var SVG_HEIGHT = 400;
+        describe("onDblClick generic callback", function () {
+            var svg;
+            var dblClickInteraction;
+            var component;
+            var doubleClickedPoint = null;
+            var dblClickCallback = function (p) { return doubleClickedPoint = p; };
+            beforeEach(function () {
+                svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+                component = new Plottable.Component.AbstractComponent();
+                component.renderTo(svg);
+                dblClickInteraction = new Plottable.Interaction.DoubleClick();
+                component.registerInteraction(dblClickInteraction);
+                dblClickInteraction.onDblClick(dblClickCallback);
+            });
+            afterEach(function () {
+                doubleClickedPoint = null;
+            });
+            it("onDblClick callback can be retrieved", function () {
+                assert.strictEqual(dblClickInteraction.onDblClick(), dblClickCallback, "callback can be retrieved");
+                svg.remove();
+            });
+            it("callback sets correct point on normal case", function () {
+                var userClickPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
+                triggerFakeMouseEvent("mousedown", component.content(), userClickPoint.x, userClickPoint.y);
+                triggerFakeMouseEvent("mouseup", component.content(), userClickPoint.x, userClickPoint.y);
+                triggerFakeMouseEvent("mousedown", component.content(), userClickPoint.x, userClickPoint.y);
+                triggerFakeMouseEvent("mouseup", component.content(), userClickPoint.x, userClickPoint.y);
+                triggerFakeMouseEvent("dblclick", component.content(), userClickPoint.x, userClickPoint.y);
+                assert.deepEqual(doubleClickedPoint, userClickPoint, "was passed correct point (mouse)");
+                svg.remove();
+            });
+            it("callback not called if clicked in different locations", function () {
+                var userClickPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
+                triggerFakeMouseEvent("mousedown", component.content(), userClickPoint.x, userClickPoint.y);
+                triggerFakeMouseEvent("mouseup", component.content(), userClickPoint.x, userClickPoint.y);
+                triggerFakeMouseEvent("mousedown", component.content(), userClickPoint.x + 10, userClickPoint.y + 10);
+                triggerFakeMouseEvent("mouseup", component.content(), userClickPoint.x + 10, userClickPoint.y + 10);
+                triggerFakeMouseEvent("dblclick", component.content(), userClickPoint.x + 10, userClickPoint.y + 10);
+                assert.deepEqual(doubleClickedPoint, null, "point never set");
+                svg.remove();
+            });
+            it("callback not called does not receive dblclick confirmation", function () {
+                var userClickPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
+                triggerFakeMouseEvent("mousedown", component.content(), userClickPoint.x, userClickPoint.y);
+                triggerFakeMouseEvent("mouseup", component.content(), userClickPoint.x, userClickPoint.y);
+                triggerFakeMouseEvent("mousedown", component.content(), userClickPoint.x, userClickPoint.y);
+                triggerFakeMouseEvent("mouseup", component.content(), userClickPoint.x, userClickPoint.y);
+                assert.deepEqual(doubleClickedPoint, null, "point never set");
+                svg.remove();
+            });
+        });
+    });
+});
+
+///<reference path="../testReference.ts" />
+var assert = chai.assert;
 describe("Dispatchers", function () {
     describe("AbstractDispatcher", function () {
         it("_connect() and _disconnect()", function () {

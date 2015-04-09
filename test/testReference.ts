@@ -63,6 +63,7 @@
 ///<reference path="interactions/dragBoxTests.ts" />
 ///<reference path="interactions/hoverInteractionTests.ts" />
 ///<reference path="interactions/clickInteractionTests.ts" />
+///<reference path="interactions/doubleClickInteractionTests.ts" />
 
 ///<reference path="dispatchers/dispatcherTests.ts" />
 ///<reference path="dispatchers/mouseDispatcherTests.ts" />
