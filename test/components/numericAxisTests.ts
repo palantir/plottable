@@ -427,4 +427,16 @@ describe("NumericAxis", () => {
 
     svg.remove();
   });
+
+  it("constrained tick labels do not overlap tick marks", () => {
+
+    var svg = generageSVG(300, 400);
+
+
+    svg.remove();
+
+  });
+
+
+
 });

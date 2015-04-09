@@ -1153,6 +1153,10 @@ describe("NumericAxis", function () {
         }
         svg.remove();
     });
+    it("constrained tick labels do not overlap tick marks", function () {
+        var svg = generageSVG(300, 400);
+        svg.remove();
+    });
 });
 
 ///<reference path="../testReference.ts" />
