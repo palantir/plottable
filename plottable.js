@@ -4540,14 +4540,11 @@ var Plottable;
                 return _super.prototype.orient.call(this, orientation); // maintains getter-setter functionality
             };
             Time.prototype._computeHeight = function () {
-                var _this = this;
                 var textHeight = this._measurer.measure().height;
-                this._tierHeights = this._tierLabelPositions.map(function (pos, index) {
-                    if (index >= _this._maximumTiers) {
-                        return 0;
-                    }
-                    return textHeight + _this.tickLabelPadding() + ((pos === "between") ? 0 : _this._maxLabelTickLength());
-                });
+                this._tierHeights = [];
+                for (var i = 0; i < this._maximumTiers; i++) {
+                    this._tierHeights.push(textHeight + this.tickLabelPadding() + ((this._tierLabelPositions[i]) === "between" ? 0 : this._maxLabelTickLength()));
+                }
                 this._computedHeight = d3.sum(this._tierHeights);
                 return this._computedHeight;
             };

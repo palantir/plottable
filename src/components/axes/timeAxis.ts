@@ -244,12 +244,13 @@ export module Axis {
 
     public _computeHeight() {
       var textHeight = this._measurer.measure().height;
-      this._tierHeights = this._tierLabelPositions.map((pos: string, index: number) => {
-        if (index >= this._maximumTiers) {
-          return 0;
-        }
-        return textHeight + this.tickLabelPadding() + ((pos === "between") ? 0 : this._maxLabelTickLength());
-      });
+
+      this._tierHeights = [];
+      for (var i = 0; i < this._maximumTiers; i++) {
+        this._tierHeights.push(textHeight + this.tickLabelPadding() +
+                              ((this._tierLabelPositions[i]) === "between" ? 0 : this._maxLabelTickLength()));
+      }
+
       this._computedHeight = d3.sum(this._tierHeights);
       return this._computedHeight;
     }
