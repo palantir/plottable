@@ -4512,7 +4512,6 @@ var Plottable;
                     return this._possibleTimeAxisConfigurations;
                 }
                 this._possibleTimeAxisConfigurations = configurations;
-                this._maximumTiers = Plottable._Util.Methods.max(configurations.map(function (config) { return config.length; }), 0);
                 this._invalidateLayout();
                 return this;
             };
@@ -4541,8 +4540,9 @@ var Plottable;
             };
             Time.prototype._computeHeight = function () {
                 var textHeight = this._measurer.measure().height;
+                var maximumTiers = Plottable._Util.Methods.max(this._possibleTimeAxisConfigurations.map(function (config) { return config.length; }), 0);
                 this._tierHeights = [];
-                for (var i = 0; i < this._maximumTiers; i++) {
+                for (var i = 0; i < maximumTiers; i++) {
                     this._tierHeights.push(textHeight + this.tickLabelPadding() + ((this._tierLabelPositions[i]) === "between" ? 0 : this._maxLabelTickLength()));
                 }
                 this._computedHeight = d3.sum(this._tierHeights);
