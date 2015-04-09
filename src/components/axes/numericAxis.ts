@@ -231,7 +231,6 @@ export module Axis {
                                     return (visibility === "inherit") || (visibility === "visible");
                                   });
 
-      console.log('a');
       var labelNumbersShown: number[] = [];
       visibleTickLabels.each((labelNumber: number) => labelNumbersShown.push(labelNumber));
 

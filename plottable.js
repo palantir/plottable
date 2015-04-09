@@ -4996,7 +4996,6 @@ var Plottable;
                     var visibility = d3.select(this).style("visibility");
                     return (visibility === "inherit") || (visibility === "visible");
                 });
-                console.log('a');
                 var labelNumbersShown = [];
                 visibleTickLabels.each(function (labelNumber) { return labelNumbersShown.push(labelNumber); });
                 visibleTickMarks.each(function (e, i) {
