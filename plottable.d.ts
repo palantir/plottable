@@ -1618,8 +1618,6 @@ declare module Plottable {
             protected _fixedWidthFlag: boolean;
             protected _isSetup: boolean;
             protected _isAnchored: boolean;
-            protected _width: number;
-            protected _height: number;
             /**
              * Attaches the Component as a child of a given a DOM element. Usually only directly invoked on root-level Components.
              *
