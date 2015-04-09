@@ -421,30 +421,18 @@ declare module Plottable {
 
 declare module Plottable {
     /**
-     * A SymbolGenerator is a function that takes in a datum and the index of the datum to
-     * produce an svg path string analogous to the datum/index pair.
-     *
-     * Note that SymbolGenerators used in Plottable will be assumed to work within a 100x100 square
-     * to be scaled appropriately for use within Plottable
+     * A SymbolFactory is a function that takes in a symbolSize which is the edge length of the render area
+     * and returns a string representing the 'd' attribute of the resultant 'path' element
      */
-    type SymbolGenerator = (datum: any, index: number) => string;
-    module SymbolGenerators {
-        /**
-         * The radius that symbol generators will be assumed to have for their symbols.
-         */
-        var SYMBOL_GENERATOR_RADIUS: number;
-        type StringAccessor = ((datum: any, index: number) => string);
-        /**
-         * A wrapper for D3's symbol generator as documented here:
-         * https://github.com/mbostock/d3/wiki/SVG-Shapes#symbol
-         *
-         * Note that since D3 symbols compute the path strings by knowing how much area it can take up instead of
-         * knowing its dimensions, the total area expected may be off by some constant factor.
-         *
-         * @param {string | ((datum: any, index: number) => string)} symbolType Accessor for the d3 symbol type
-         * @returns {SymbolGenerator} the symbol generator for a D3 symbol
-         */
-        function d3Symbol(symbolType: string | StringAccessor): D3.Svg.Symbol;
+    type SymbolFactory = (symbolSize: number) => string;
+    module SymbolFactories {
+        type StringAccessor = (datum: any, index: number) => string;
+        function circle(): SymbolFactory;
+        function square(): SymbolFactory;
+        function cross(): SymbolFactory;
+        function diamond(): SymbolFactory;
+        function triangleUp(): SymbolFactory;
+        function triangleDown(): SymbolFactory;
     }
 }
 
@@ -1664,6 +1652,10 @@ declare module Plottable {
              * @param {number} availableHeight available height for the Component to render in
              */
             _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;
+            protected _getSize(availableWidth: number, availableHeight: number): {
+                width: number;
+                height: number;
+            };
             _render(): void;
             _doRender(): void;
             _useLastCalculatedLayout(): boolean;
@@ -1735,13 +1727,19 @@ declare module Plottable {
              */
             registerInteraction(interaction: Interaction.AbstractInteraction): AbstractComponent;
             /**
-             * Adds/removes a given CSS class to/from the Component, or checks if the Component has a particular CSS class.
+             * Checks if the Component has a given CSS class.
              *
-             * @param {string} cssClass The CSS class to add/remove/check for.
-             * @param {boolean} addClass Whether to add or remove the CSS class. If not supplied, checks for the CSS class.
-             * @returns {boolean|Component} Whether the Component has the given CSS class, or the calling Component (if addClass is supplied).
+             * @param {string} cssClass The CSS class to check for.
+             * @returns {boolean} Whether the Component has the given CSS class.
              */
             classed(cssClass: string): boolean;
+            /**
+             * Adds/removes a given CSS class to/from the Component.
+             *
+             * @param {string} cssClass The CSS class to add or remove.
+             * @param {boolean} addClass If true, adds the provided CSS class; otherwise, removes it.
+             * @returns {AbstractComponent} The calling Component.
+             */
             classed(cssClass: string, addClass: boolean): AbstractComponent;
             /**
              * Checks if the Component has a fixed width or false if it grows to fill available space.
@@ -1919,6 +1917,10 @@ declare module Plottable {
             _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
             _merge(c: AbstractComponent, below: boolean): Group;
             _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): Group;
+            protected _getSize(availableWidth: number, availableHeight: number): {
+                width: number;
+                height: number;
+            };
             _isFixedWidth(): boolean;
             _isFixedHeight(): boolean;
         }
@@ -2430,18 +2432,19 @@ declare module Plottable {
             getEntry(position: Point): D3.Selection;
             _doRender(): void;
             /**
-             * Gets the SymbolGenerator of the legend, which dictates how
+             * Gets the symbolFactoryAccessor of the legend, which dictates how
              * the symbol in each entry is drawn.
              *
-             * @returns {SymbolGenerator} The SymbolGenerator of the legend
+             * @returns {(datum: any, index: number) => symbolFactory} The symbolFactory accessor of the legend
              */
-            symbolGenerator(): SymbolGenerator;
+            symbolFactoryAccessor(): (datum: any, index: number) => SymbolFactory;
             /**
-             * Sets the SymbolGenerator of the legend
+             * Sets the symbolFactoryAccessor of the legend
              *
+             * @param {(datum: any, index: number) => symbolFactory}  The symbolFactory accessor to set to
              * @returns {Legend} The calling Legend
              */
-            symbolGenerator(symbolGenerator: SymbolGenerator): Legend;
+            symbolFactoryAccessor(symbolFactoryAccessor: (datum: any, index: number) => SymbolFactory): Legend;
         }
     }
 }
@@ -2549,7 +2552,12 @@ declare module Plottable {
              */
             constructor(rows?: AbstractComponent[][]);
             /**
-             * Adds a Component in the specified cell. The cell must be unoccupied.
+             * Adds a Component in the specified cell.
+             *
+             * If the cell is already occupied, there are 3 cases
+             *  - Component + Component => Group containing both components
+             *  - Component + Group => Component is added to the group
+             *  - Group + Component => Component is added to the group
              *
              * For example, instead of calling `new Table([[a, b], [null, c]])`, you
              * could call

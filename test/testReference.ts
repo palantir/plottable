@@ -3,9 +3,10 @@
 ///<reference path="../typings/d3/d3.d.ts" />
 ///<reference path="../typings/jquery/jquery.d.ts" />
 ///<reference path="../typings/jquery.simulate/jquery.simulate.d.ts" />
-///<reference path="testUtils.ts" />
 ///<reference path="../build/plottable.d.ts" />
 ///<reference path="../bower_components/svg-typewriter/svgtypewriter.d.ts" />
+///<reference path="testUtils.ts" />
+///<reference path="mocks.ts" />
 
 ///<reference path="globalInitialization.ts" />
 
@@ -54,7 +55,6 @@
 
 ///<reference path="utils/domUtilsTests.ts" />
 ///<reference path="utils/formattersTests.ts" />
-///<reference path="utils/symbolGeneratorsTests.ts" />
 ///<reference path="utils/idCounterTests.ts" />
 ///<reference path="utils/strictEqualityAssociativeArrayTests.ts" />
 ///<reference path="utils/clientToSVGTranslatorTests.ts" />

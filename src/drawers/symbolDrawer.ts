@@ -19,17 +19,17 @@ export module _Drawer {
       delete attrToProjector["x"];
       delete attrToProjector["y"];
 
-      var rProjector = attrToProjector["r"];
-      delete attrToProjector["r"];
+      var rProjector = attrToProjector["size"];
+      delete attrToProjector["size"];
 
       attrToProjector["transform"] = (datum: any, index: number) =>
-        "translate(" + xProjector(datum, index) + "," + yProjector(datum, index) + ") " +
-        "scale(" + rProjector(datum, index) / 50 + ")";
+        "translate(" + xProjector(datum, index) + "," + yProjector(datum, index) + ")";
 
       var symbolProjector = attrToProjector["symbol"];
       delete attrToProjector["symbol"];
 
-      attrToProjector["d"] = symbolProjector;
+      attrToProjector["d"] = attrToProjector["d"] || ((datum: any, index: number) =>
+        symbolProjector(datum, index)(rProjector(datum, index)));
 
       super._drawStep(step);
     }

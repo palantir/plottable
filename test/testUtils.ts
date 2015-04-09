@@ -16,11 +16,46 @@ function getSVGParent(): D3.Selection {
   }
 }
 
-function verifySpaceRequest(sr: Plottable._SpaceRequest, w: number, h: number, ww: boolean, wh: boolean, id: string) {
-  assert.equal(sr.width,  w, "width requested is as expected #"  + id);
-  assert.equal(sr.height, h, "height requested is as expected #" + id);
-  assert.equal(sr.wantsWidth , ww, "needs more width is as expected #"  + id);
-  assert.equal(sr.wantsHeight, wh, "needs more height is as expected #" + id);
+function makeFakeEvent(x: number, y: number): D3.D3Event {
+  return <D3.D3Event> <any> {
+      dx: 0,
+      dy: 0,
+      clientX: x,
+      clientY: y,
+      translate: [x, y],
+      scale: 1,
+      sourceEvent: <any> null,
+      x: x,
+      y: y,
+      keyCode: 0,
+      altKey: false
+    };
+}
+
+function fakeDragSequence(anyedInteraction: any, startX: number, startY: number, endX: number, endY: number) {
+  var originalD3Mouse = d3.mouse;
+  d3.mouse = function() {
+    return [startX, startY];
+  };
+  anyedInteraction._dragstart();
+  d3.mouse = originalD3Mouse;
+  d3.event = makeFakeEvent(startX, startY);
+  anyedInteraction._drag();
+  d3.event = makeFakeEvent(endX, endY);
+  anyedInteraction._drag();
+  d3.mouse = function() {
+    return [endX, endY];
+  };
+  anyedInteraction._dragend();
+  d3.event = null;
+  d3.mouse = originalD3Mouse;
+}
+
+function verifySpaceRequest(sr: Plottable._SpaceRequest, w: number, h: number, ww: boolean, wh: boolean, message: string) {
+  assert.equal(sr.width,  w, message + " (space request: width)");
+  assert.equal(sr.height, h, message + " (space request: height)");
+  assert.equal(sr.wantsWidth , ww, message + " (space request: wantsWidth)");
+  assert.equal(sr.wantsHeight, wh, message + " (space request: wantsHeight)");
 }
 
 function fixComponentSize(c: Plottable.Component.AbstractComponent, fixedWidth?: number, fixedHeight?: number) {
