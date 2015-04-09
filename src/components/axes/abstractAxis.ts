@@ -25,7 +25,7 @@ export module Axis {
     protected _computedHeight: number;
     private _endTickLength = 5;
     private _tickLength = 5;
-    protected _tickLabelPadding = 10;
+    private _tickLabelPadding = 10;
     private _gutter = 15;
     private _showEndTickLabels = false;
 

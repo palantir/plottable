@@ -5107,7 +5107,7 @@ var Plottable;
              *
              */
             Numeric.prototype._hasOverlapWithInterval = function (interval, rects) {
-                var padding = this._tickLabelPadding;
+                var padding = this.tickLabelPadding();
                 if (this._tickLabelPositioning === "bottom" || this._tickLabelPositioning === "top" || this._tickLabelPositioning === "left" || this._tickLabelPositioning === "right") {
                     padding *= 3;
                 }

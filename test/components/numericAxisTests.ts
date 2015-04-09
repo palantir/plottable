@@ -462,7 +462,8 @@ describe("NumericAxis", () => {
 
       tickMarks.each(function() {
         var tickMarkBox = this.getBoundingClientRect();
-          assert.isFalse(Plottable._Util.DOM.boxesOverlap(tickLabelBox, tickMarkBox));
+          assert.isFalse(Plottable._Util.DOM.boxesOverlap(tickLabelBox, tickMarkBox),
+            "tickMarks and tickLabels should not overlap when top/bottom/left/right position is used for the tickLabel");
       });
     });
 

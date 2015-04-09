@@ -393,7 +393,7 @@ export module Axis {
      */
     private _hasOverlapWithInterval(interval: number, rects: ClientRect[]): boolean {
 
-      var padding = this._tickLabelPadding;
+      var padding = this.tickLabelPadding();
 
       if (this._tickLabelPositioning === "bottom" ||
           this._tickLabelPositioning === "top"    ||
