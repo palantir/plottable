@@ -4107,7 +4107,6 @@ var Plottable;
                 var _this = this;
                 if (formatter === void 0) { formatter = Plottable.Formatters.identity(); }
                 _super.call(this);
-                this._biggerLabelPadding = false;
                 this._endTickLength = 5;
                 this._tickLength = 5;
                 this._tickLabelPadding = 10;

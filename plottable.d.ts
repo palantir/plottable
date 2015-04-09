@@ -1931,7 +1931,6 @@ declare module Plottable {
             protected _scale: Scale.AbstractScale<any, number>;
             protected _computedWidth: number;
             protected _computedHeight: number;
-            protected _biggerLabelPadding: boolean;
             protected _tickLabelPadding: number;
             /**
              * Constructs an axis. An axis is a wrapper around a scale for rendering.

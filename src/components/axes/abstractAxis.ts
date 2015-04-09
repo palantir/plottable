@@ -23,7 +23,6 @@ export module Axis {
     private _orientation: string;
     protected _computedWidth: number;
     protected _computedHeight: number;
-    protected _biggerLabelPadding: boolean = false;
     private _endTickLength = 5;
     private _tickLength = 5;
     protected _tickLabelPadding = 10;
