@@ -49,9 +49,11 @@ export module Component {
       return this;
     }
 
-    protected _setSize(availableWidth: number, availableHeight: number) {
-      this._width = availableWidth;
-      this._height = availableHeight;
+    protected _getSize(availableWidth: number, availableHeight: number) {
+      return {
+        width: availableWidth,
+        height: availableHeight
+      };
     }
 
     public _isFixedWidth(): boolean {
