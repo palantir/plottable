@@ -427,11 +427,9 @@ declare module Plottable {
          *
          * @param {Scale.AbstractQuantitative<D> scale The input scale whose domain is being magnified
          * @param {number} magnifyAmount The amount to magnify
-         * @param {number} centerValue The center point of the magnification
-         * @param {boolean} centerInDomainSpace Specifying if the domain is in domain space (default = false)
          * @returns {D[]} The magnified domain
          */
-        function magnify<D>(scale: Scale.AbstractQuantitative<D>, magnifyAmount: number, centerValue: number | D, centerInDomainSpace?: boolean): D[];
+        function magnify<D>(scale: Scale.AbstractQuantitative<D>, magnifyAmount: number): D[];
     }
 }
 

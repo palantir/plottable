@@ -1008,13 +1008,10 @@ var Plottable;
          *
          * @param {Scale.AbstractQuantitative<D> scale The input scale whose domain is being magnified
          * @param {number} magnifyAmount The amount to magnify
-         * @param {number} centerValue The center point of the magnification
-         * @param {boolean} centerInDomainSpace Specifying if the domain is in domain space (default = false)
          * @returns {D[]} The magnified domain
          */
-        function magnify(scale, magnifyAmount, centerValue, centerInDomainSpace) {
-            if (centerInDomainSpace === void 0) { centerInDomainSpace = false; }
-            var centerNumber = centerInDomainSpace ? scale.scale(centerValue) : centerValue;
+        function magnify(scale, magnifyAmount) {
+            var centerNumber = (scale.range()[0] + scale.range()[1]) / 2;
             var magnifyTransform = function (rangeValue) { return scale.invert(centerNumber - (centerNumber - rangeValue) * magnifyAmount); };
             return scale.range().map(magnifyTransform);
         }
