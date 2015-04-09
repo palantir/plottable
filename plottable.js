@@ -998,7 +998,7 @@ var Plottable;
          * @returns {D[]} The translated domain
          */
         function translate(scale, translateAmount) {
-            var translateTransform = function (rangeValue) { return scale.invert(rangeValue - translateAmount); };
+            var translateTransform = function (rangeValue) { return scale.invert(rangeValue + translateAmount); };
             return scale.range().map(translateTransform);
         }
         ScaleDomainTransformers.translate = translate;
