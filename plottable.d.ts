@@ -2635,6 +2635,10 @@ declare module Plottable {
             protected _box: D3.Selection;
             constructor();
             protected _setup(): void;
+            protected _getSize(availableWidth: number, availableHeight: number): {
+                width: number;
+                height: number;
+            };
             /**
              * Gets the bounds of the box.
              *
