@@ -194,6 +194,8 @@ export module Axis {
       var labelGroupTransform = "translate(" + labelGroupTransformX + ", " + labelGroupTransformY + ")";
       this._tickLabelContainer.attr("transform", labelGroupTransform);
 
+      this._showAllTickMarks();
+
       if (!this.showEndTickLabels()) {
         this._hideEndTickLabels();
       }
@@ -202,14 +204,25 @@ export module Axis {
       this._hideOverlappingTickLabels();
 
       if (this._tickLabelPositioning === "bottom" ||
-          this._tickLabelPositioning === "top" ||
-          this._tickLabelPositioning === "left" ||
+          this._tickLabelPositioning === "top"    ||
+          this._tickLabelPositioning === "left"   ||
           this._tickLabelPositioning === "right") {
-        this._hideOverlappingTickMarks();
+        this._hideTickMarksWithoutLabel();
       }
     }
 
-    private _hideOverlappingTickMarks() {
+    private _showAllTickMarks() {
+      var visibleTickMarks = this._tickMarkContainer
+                                 .selectAll("." + AbstractAxis.TICK_MARK_CLASS)
+                                 .each(function() {
+                                   d3.select(this).style("visibility", "inherit");
+                                 });
+    }
+
+    /**
+     * Hides the Tick Marks which have no corresponding Tick Labels
+     */
+    private _hideTickMarksWithoutLabel() {
       var visibleTickMarks = this._tickMarkContainer.selectAll("." + AbstractAxis.TICK_MARK_CLASS);
       var visibleTickLabels = this._tickLabelContainer
                                   .selectAll("." + AbstractAxis.TICK_LABEL_CLASS)

@@ -5049,16 +5049,25 @@ var Plottable;
                 });
                 var labelGroupTransform = "translate(" + labelGroupTransformX + ", " + labelGroupTransformY + ")";
                 this._tickLabelContainer.attr("transform", labelGroupTransform);
+                this._showAllTickMarks();
                 if (!this.showEndTickLabels()) {
                     this._hideEndTickLabels();
                 }
                 this._hideOverflowingTickLabels();
                 this._hideOverlappingTickLabels();
                 if (this._tickLabelPositioning === "bottom" || this._tickLabelPositioning === "top" || this._tickLabelPositioning === "left" || this._tickLabelPositioning === "right") {
-                    this._hideOverlappingTickMarks();
+                    this._hideTickMarksWithoutLabel();
                 }
             };
-            Numeric.prototype._hideOverlappingTickMarks = function () {
+            Numeric.prototype._showAllTickMarks = function () {
+                var visibleTickMarks = this._tickMarkContainer.selectAll("." + Axis.AbstractAxis.TICK_MARK_CLASS).each(function () {
+                    d3.select(this).style("visibility", "inherit");
+                });
+            };
+            /**
+             * Hides the Tick Marks which have no corresponding Tick Labels
+             */
+            Numeric.prototype._hideTickMarksWithoutLabel = function () {
                 var visibleTickMarks = this._tickMarkContainer.selectAll("." + Axis.AbstractAxis.TICK_MARK_CLASS);
                 var visibleTickLabels = this._tickLabelContainer.selectAll("." + Axis.AbstractAxis.TICK_LABEL_CLASS).filter(function (d, i) {
                     var visibility = d3.select(this).style("visibility");
