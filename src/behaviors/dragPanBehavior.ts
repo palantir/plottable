@@ -6,8 +6,8 @@ export module Behavior {
 
     private _dragInteraction: Interaction.Drag;
     private _scale: Scale.AbstractQuantitative<any>;
-    private _leftBounds = [-Infinity, Infinity];
-    private _rightBounds = [-Infinity, Infinity];
+    private _leftBound: number;
+    private _rightBound: number;
     private _verticalPan: boolean;
 
     /**
@@ -32,23 +32,23 @@ export module Behavior {
       return this._dragInteraction;
     }
 
-    public leftBounds(): number[];
-    public leftBounds(newBounds: number[]): Behavior.DragPan;
-    public leftBounds(newBounds?: number[]): any {
-      if (newBounds == null) {
-        return this._leftBounds;
+    public leftBound(): number;
+    public leftBound(newBound: number): Behavior.DragPan;
+    public leftBound(newBound?: number): any {
+      if (newBound === undefined) {
+        return this._leftBound;
       }
-      this._leftBounds = newBounds;
+      this._leftBound = newBound;
       return this;
     }
 
-    public rightBounds(): number[];
-    public rightBounds(newBounds: number[]): Behavior.DragPan;
-    public rightBounds(newBounds?: number[]): any {
-      if (newBounds == null) {
-        return this._rightBounds;
+    public rightBound(): number;
+    public rightBound(newBound: number): Behavior.DragPan;
+    public rightBound(newBound?: number): any {
+      if (newBound === undefined) {
+        return this._rightBound;
       }
-      this._rightBounds = newBounds;
+      this._rightBound = newBound;
       return this;
     }
 
@@ -60,23 +60,13 @@ export module Behavior {
         var endPointDragValue = this._verticalPan ? endPoint.y : endPoint.x;
         var dragAmount = endPointDragValue - (lastDragValue == null ? startPointDragValue : lastDragValue);
 
-        var safeScale = (value: number) => {
-          if (value === Infinity) {
-            return value;
-          } else if (value === -Infinity) {
-            return value;
-          } else {
-            return this._scale.scale(value);
-          }
-        };
-
-        var leftRangeValues = this.leftBounds().map((leftBound) => safeScale(leftBound) - this._scale.range()[0]);
-        var rightRangeValues = this.rightBounds().map((rightBound) => safeScale(rightBound) - this._scale.range()[1]);
+        var leftLimit = this._scale.range()[0] - (this.leftBound() === undefined ? -Infinity : this._scale.scale(this.leftBound()));
+        var rightLimit = this._scale.range()[1] - (this.rightBound() === undefined ? Infinity : this._scale.scale(this.rightBound()));
 
         if (dragAmount > 0) {
-          dragAmount = Math.min(dragAmount, -Math.max(leftRangeValues[0], rightRangeValues[0]));
+          dragAmount = Math.min(dragAmount, leftLimit);
         } else {
-          dragAmount = Math.max(dragAmount, -Math.min(leftRangeValues[1], rightRangeValues[1]));
+          dragAmount = Math.max(dragAmount, rightLimit);
         }
 
         this._scale.domain(ScaleDomainTransformers.translate(this._scale, -dragAmount));

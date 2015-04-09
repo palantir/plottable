@@ -10317,8 +10317,6 @@ var Plottable;
              * @param {boolean} isVertical If the scale operates vertically or horizontally
              */
             function DragPan(scale, isVertical) {
-                this._leftBounds = [-Infinity, Infinity];
-                this._rightBounds = [-Infinity, Infinity];
                 this._scale = scale;
                 this._dragInteraction = new Plottable.Interaction.Drag();
                 this._setupInteraction(this._dragInteraction);
@@ -10327,18 +10325,18 @@ var Plottable;
             DragPan.prototype.getInteraction = function () {
                 return this._dragInteraction;
             };
-            DragPan.prototype.leftBounds = function (newBounds) {
-                if (newBounds == null) {
-                    return this._leftBounds;
+            DragPan.prototype.leftBound = function (newBound) {
+                if (newBound === undefined) {
+                    return this._leftBound;
                 }
-                this._leftBounds = newBounds;
+                this._leftBound = newBound;
                 return this;
             };
-            DragPan.prototype.rightBounds = function (newBounds) {
-                if (newBounds == null) {
-                    return this._rightBounds;
+            DragPan.prototype.rightBound = function (newBound) {
+                if (newBound === undefined) {
+                    return this._rightBound;
                 }
-                this._rightBounds = newBounds;
+                this._rightBound = newBound;
                 return this;
             };
             DragPan.prototype._setupInteraction = function (dragInteraction) {
@@ -10348,24 +10346,13 @@ var Plottable;
                     var startPointDragValue = _this._verticalPan ? startPoint.y : startPoint.x;
                     var endPointDragValue = _this._verticalPan ? endPoint.y : endPoint.x;
                     var dragAmount = endPointDragValue - (lastDragValue == null ? startPointDragValue : lastDragValue);
-                    var safeScale = function (value) {
-                        if (value === Infinity) {
-                            return value;
-                        }
-                        else if (value === -Infinity) {
-                            return value;
-                        }
-                        else {
-                            return _this._scale.scale(value);
-                        }
-                    };
-                    var leftRangeValues = _this.leftBounds().map(function (leftBound) { return safeScale(leftBound) - _this._scale.range()[0]; });
-                    var rightRangeValues = _this.rightBounds().map(function (rightBound) { return safeScale(rightBound) - _this._scale.range()[1]; });
+                    var leftLimit = _this._scale.range()[0] - (_this.leftBound() === undefined ? -Infinity : _this._scale.scale(_this.leftBound()));
+                    var rightLimit = _this._scale.range()[1] - (_this.rightBound() === undefined ? Infinity : _this._scale.scale(_this.rightBound()));
                     if (dragAmount > 0) {
-                        dragAmount = Math.min(dragAmount, -Math.max(leftRangeValues[0], rightRangeValues[0]));
+                        dragAmount = Math.min(dragAmount, leftLimit);
                     }
                     else {
-                        dragAmount = Math.max(dragAmount, -Math.min(leftRangeValues[1], rightRangeValues[1]));
+                        dragAmount = Math.max(dragAmount, rightLimit);
                     }
                     _this._scale.domain(Plottable.ScaleDomainTransformers.translate(_this._scale, -dragAmount));
                     lastDragValue = endPointDragValue;

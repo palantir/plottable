@@ -4179,10 +4179,10 @@ declare module Plottable {
              */
             constructor(scale: Scale.AbstractQuantitative<number>, isVertical: boolean);
             getInteraction(): Interaction.Drag;
-            leftBounds(): number[];
-            leftBounds(newBounds: number[]): Behavior.DragPan;
-            rightBounds(): number[];
-            rightBounds(newBounds: number[]): Behavior.DragPan;
+            leftBound(): number;
+            leftBound(newBound: number): Behavior.DragPan;
+            rightBound(): number;
+            rightBound(newBound: number): Behavior.DragPan;
         }
     }
 }
