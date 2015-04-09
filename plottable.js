@@ -10367,7 +10367,7 @@ var Plottable;
                     else {
                         dragAmount = Math.max(dragAmount, -Math.min(leftRangeValues[1], rightRangeValues[1]));
                     }
-                    Plottable.ScaleDomainTransformers.translate(_this._scale, -dragAmount);
+                    _this._scale.domain(Plottable.ScaleDomainTransformers.translate(_this._scale, -dragAmount));
                     lastDragValue = endPointDragValue;
                 });
                 dragInteraction.dragend(function () { return lastDragValue = null; });
