@@ -1642,6 +1642,10 @@ declare module Plottable {
              * @param {number} availableHeight available height for the Component to render in
              */
             _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;
+            protected _getSize(availableWidth: number, availableHeight: number): {
+                width: number;
+                height: number;
+            };
             _render(): void;
             _doRender(): void;
             _useLastCalculatedLayout(): boolean;
@@ -1713,13 +1717,19 @@ declare module Plottable {
              */
             registerInteraction(interaction: Interaction.AbstractInteraction): AbstractComponent;
             /**
-             * Adds/removes a given CSS class to/from the Component, or checks if the Component has a particular CSS class.
+             * Checks if the Component has a given CSS class.
              *
-             * @param {string} cssClass The CSS class to add/remove/check for.
-             * @param {boolean} addClass Whether to add or remove the CSS class. If not supplied, checks for the CSS class.
-             * @returns {boolean|Component} Whether the Component has the given CSS class, or the calling Component (if addClass is supplied).
+             * @param {string} cssClass The CSS class to check for.
+             * @returns {boolean} Whether the Component has the given CSS class.
              */
             classed(cssClass: string): boolean;
+            /**
+             * Adds/removes a given CSS class to/from the Component.
+             *
+             * @param {string} cssClass The CSS class to add or remove.
+             * @param {boolean} addClass If true, adds the provided CSS class; otherwise, removes it.
+             * @returns {AbstractComponent} The calling Component.
+             */
             classed(cssClass: string, addClass: boolean): AbstractComponent;
             /**
              * Checks if the Component has a fixed width or false if it grows to fill available space.
@@ -1897,6 +1907,10 @@ declare module Plottable {
             _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
             _merge(c: AbstractComponent, below: boolean): Group;
             _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): Group;
+            protected _getSize(availableWidth: number, availableHeight: number): {
+                width: number;
+                height: number;
+            };
             _isFixedWidth(): boolean;
             _isFixedHeight(): boolean;
         }
@@ -2528,7 +2542,12 @@ declare module Plottable {
              */
             constructor(rows?: AbstractComponent[][]);
             /**
-             * Adds a Component in the specified cell. The cell must be unoccupied.
+             * Adds a Component in the specified cell.
+             *
+             * If the cell is already occupied, there are 3 cases
+             *  - Component + Component => Group containing both components
+             *  - Component + Group => Component is added to the group
+             *  - Group + Component => Component is added to the group
              *
              * For example, instead of calling `new Table([[a, b], [null, c]])`, you
              * could call
@@ -3768,14 +3787,19 @@ declare module Plottable {
     module Interaction {
         class Click extends AbstractInteraction {
             _anchor(component: Component.AbstractComponent, hitBox: D3.Selection): void;
-            _requiresHitbox(): boolean;
-            protected _listenTo(): string;
             /**
-             * Sets a callback to be called when a click is received.
+             * Gets the callback called when the Component is clicked.
              *
-             * @param {(p: Point) => any} cb Callback that takes the pixel position of the click event.
+             * @return {(p: Point) => any} The current callback.
              */
-            callback(cb: (p: Point) => any): Click;
+            onClick(): (p: Point) => any;
+            /**
+             * Sets the callback called when the Component is clicked.
+             *
+             * @param {(p: Point) => any} callback The callback to set.
+             * @return {Interaction.Click} The calling Interaction.Click.
+             */
+            onClick(callback: (p: Point) => any): Interaction.Click;
         }
     }
 }

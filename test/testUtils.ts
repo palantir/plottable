@@ -51,11 +51,11 @@ function fakeDragSequence(anyedInteraction: any, startX: number, startY: number,
   d3.mouse = originalD3Mouse;
 }
 
-function verifySpaceRequest(sr: Plottable._SpaceRequest, w: number, h: number, ww: boolean, wh: boolean, id: string) {
-  assert.equal(sr.width,  w, "width requested is as expected #"  + id);
-  assert.equal(sr.height, h, "height requested is as expected #" + id);
-  assert.equal(sr.wantsWidth , ww, "needs more width is as expected #"  + id);
-  assert.equal(sr.wantsHeight, wh, "needs more height is as expected #" + id);
+function verifySpaceRequest(sr: Plottable._SpaceRequest, w: number, h: number, ww: boolean, wh: boolean, message: string) {
+  assert.equal(sr.width,  w, message + " (space request: width)");
+  assert.equal(sr.height, h, message + " (space request: height)");
+  assert.equal(sr.wantsWidth , ww, message + " (space request: wantsWidth)");
+  assert.equal(sr.wantsHeight, wh, message + " (space request: wantsHeight)");
 }
 
 function fixComponentSize(c: Plottable.Component.AbstractComponent, fixedWidth?: number, fixedHeight?: number) {

@@ -49,11 +49,11 @@ function fakeDragSequence(anyedInteraction, startX, startY, endX, endY) {
     d3.event = null;
     d3.mouse = originalD3Mouse;
 }
-function verifySpaceRequest(sr, w, h, ww, wh, id) {
-    assert.equal(sr.width, w, "width requested is as expected #" + id);
-    assert.equal(sr.height, h, "height requested is as expected #" + id);
-    assert.equal(sr.wantsWidth, ww, "needs more width is as expected #" + id);
-    assert.equal(sr.wantsHeight, wh, "needs more height is as expected #" + id);
+function verifySpaceRequest(sr, w, h, ww, wh, message) {
+    assert.equal(sr.width, w, message + " (space request: width)");
+    assert.equal(sr.height, h, message + " (space request: height)");
+    assert.equal(sr.wantsWidth, ww, message + " (space request: wantsWidth)");
+    assert.equal(sr.wantsHeight, wh, message + " (space request: wantsHeight)");
 }
 function fixComponentSize(c, fixedWidth, fixedHeight) {
     c._requestedSpace = function (w, h) {
@@ -214,6 +214,39 @@ function assertAreaPathCloseTo(actualPath, expectedPath, precision, msg) {
         });
     });
 }
+
+///<reference path="testReference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Mocks;
+(function (Mocks) {
+    var FixedSizeComponent = (function (_super) {
+        __extends(FixedSizeComponent, _super);
+        function FixedSizeComponent(width, height) {
+            if (width === void 0) { width = 0; }
+            if (height === void 0) { height = 0; }
+            _super.call(this);
+            this.fixedWidth = width;
+            this.fixedHeight = height;
+            this._fixedWidthFlag = true;
+            this._fixedHeightFlag = true;
+        }
+        FixedSizeComponent.prototype._requestedSpace = function (availableWidth, availableHeight) {
+            return {
+                width: this.fixedWidth,
+                height: this.fixedHeight,
+                wantsWidth: availableWidth < this.fixedWidth,
+                wantsHeight: availableHeight < this.fixedHeight
+            };
+        };
+        return FixedSizeComponent;
+    })(Plottable.Component.AbstractComponent);
+    Mocks.FixedSizeComponent = FixedSizeComponent;
+})(Mocks || (Mocks = {}));
 
 ///<reference path="testReference.ts" />
 before(function () {
@@ -780,6 +813,29 @@ describe("TimeAxis", function () {
                 assert.isFalse(Plottable._Util.DOM.boxesOverlap(labelRect, tickRect), "visible label does not overlap with a tick");
             });
         });
+        svg.remove();
+    });
+    it("if the time only uses one tier, there should be no space left for the second tier", function () {
+        var svg = generateSVG();
+        var xScale = new Plottable.Scale.Time();
+        xScale.domain([new Date("2013-03-23 12:00"), new Date("2013-04-03 0:00")]);
+        var xAxis = new Plottable.Axis.Time(xScale, "bottom");
+        xAxis.gutter(0);
+        xAxis.axisConfigurations([
+            [
+                { interval: d3.time.day, step: 2, formatter: Plottable.Formatters.time("%a %e") }
+            ],
+        ]);
+        xAxis.renderTo(svg);
+        var oneTierSize = xAxis.height();
+        xAxis.axisConfigurations([
+            [
+                { interval: d3.time.day, step: 2, formatter: Plottable.Formatters.time("%a %e") },
+                { interval: d3.time.day, step: 2, formatter: Plottable.Formatters.time("%a %e") }
+            ],
+        ]);
+        var twoTierSize = xAxis.height();
+        assert.strictEqual(twoTierSize, oneTierSize * 2, "two-tier axis is twice as tall as one-tier axis");
         svg.remove();
     });
 });
@@ -5170,20 +5226,6 @@ describe("ComponentGroups", function () {
         assertWidthHeight(t3, 400, 400, "rect3 sized correctly");
         svg.remove();
     });
-    it("components in componentGroups occupies all available space", function () {
-        var svg = generateSVG(400, 400);
-        var xAxis = new Plottable.Axis.Numeric(new Plottable.Scale.Linear(), "bottom");
-        var leftLabel = new Plottable.Component.Label("LEFT").xAlign("left");
-        var rightLabel = new Plottable.Component.Label("RIGHT").xAlign("right");
-        var labelGroup = new Plottable.Component.Group([leftLabel, rightLabel]);
-        var table = new Plottable.Component.Table([
-            [labelGroup],
-            [xAxis]
-        ]);
-        table.renderTo(svg);
-        assertBBoxNonIntersection(leftLabel._element.select(".bounding-box"), rightLabel._element.select(".bounding-box"));
-        svg.remove();
-    });
     it("components can be added before and after anchoring", function () {
         var c1 = makeFixedSizeComponent(10, 10);
         var c2 = makeFixedSizeComponent(20, 20);
@@ -5204,20 +5246,6 @@ describe("ComponentGroups", function () {
         var t3 = svg.select(".test-box3");
         assertWidthHeight(t3, 400, 400, "rect3 sized correctly");
         svg.remove();
-    });
-    it("component fixity is computed appropriately", function () {
-        var cg = new Plottable.Component.Group();
-        var c1 = new Plottable.Component.AbstractComponent();
-        var c2 = new Plottable.Component.AbstractComponent();
-        cg.below(c1).below(c2);
-        assert.isFalse(cg._isFixedHeight(), "height not fixed when both components unfixed");
-        assert.isFalse(cg._isFixedWidth(), "width not fixed when both components unfixed");
-        fixComponentSize(c1, 10, 10);
-        assert.isFalse(cg._isFixedHeight(), "height not fixed when one component unfixed");
-        assert.isFalse(cg._isFixedWidth(), "width not fixed when one component unfixed");
-        fixComponentSize(c2, null, 10);
-        assert.isFalse(cg._isFixedHeight(), "height unfixed when both components fixed");
-        assert.isFalse(cg._isFixedWidth(), "width unfixed when one component unfixed");
     });
     it("componentGroup subcomponents have xOffset, yOffset of 0", function () {
         var cg = new Plottable.Component.Group();
@@ -5280,30 +5308,53 @@ describe("ComponentGroups", function () {
         assert.isFalse(c3._isAnchored, "c3 was detached");
         assert.lengthOf(cg.components(), 0, "cg has no components");
     });
-    describe("ComponentGroup._requestedSpace works as expected", function () {
-        it("_works for an empty ComponentGroup", function () {
-            var cg = new Plottable.Component.Group();
-            var request = cg._requestedSpace(10, 10);
-            verifySpaceRequest(request, 0, 0, false, false, "");
+    describe("requests space based on contents, but occupies total offered space", function () {
+        var SVG_WIDTH = 400;
+        var SVG_HEIGHT = 400;
+        it("with no Components", function () {
+            var svg = generateSVG();
+            var cg = new Plottable.Component.Group([]);
+            var request = cg._requestedSpace(SVG_WIDTH, SVG_HEIGHT);
+            verifySpaceRequest(request, 0, 0, false, false, "empty Group doesn't request any space");
+            cg.renderTo(svg);
+            assert.strictEqual(cg.width(), SVG_WIDTH, "occupies all offered width");
+            assert.strictEqual(cg.height(), SVG_HEIGHT, "occupies all offered height");
+            svg.remove();
         });
-        it("works for a ComponentGroup with only proportional-size components", function () {
-            var cg = new Plottable.Component.Group();
+        it("with a non-fixed-size Component", function () {
+            var svg = generateSVG();
             var c1 = new Plottable.Component.AbstractComponent();
             var c2 = new Plottable.Component.AbstractComponent();
-            cg.below(c1).below(c2);
-            var request = cg._requestedSpace(10, 10);
-            verifySpaceRequest(request, 0, 0, false, false, "");
+            var cg = new Plottable.Component.Group([c1, c2]);
+            var groupRequest = cg._requestedSpace(SVG_WIDTH, SVG_HEIGHT);
+            var c1Request = c1._requestedSpace(SVG_WIDTH, SVG_HEIGHT);
+            assert.deepEqual(groupRequest, c1Request, "request reflects request of sub-component");
+            assert.isFalse(cg._isFixedWidth(), "width is not fixed if subcomponents are not fixed width");
+            assert.isFalse(cg._isFixedHeight(), "height is not fixed if subcomponents are not fixed height");
+            cg.renderTo(svg);
+            assert.strictEqual(cg.width(), SVG_WIDTH, "occupies all offered width");
+            assert.strictEqual(cg.height(), SVG_HEIGHT, "occupies all offered height");
+            svg.remove();
         });
-        it("works when there are fixed-size components", function () {
-            var cg = new Plottable.Component.Group();
-            var c1 = new Plottable.Component.AbstractComponent();
-            var c2 = new Plottable.Component.AbstractComponent();
-            var c3 = new Plottable.Component.AbstractComponent();
-            cg.below(c1).below(c2).below(c3);
-            fixComponentSize(c1, null, 10);
-            fixComponentSize(c2, null, 50);
-            var request = cg._requestedSpace(10, 10);
-            verifySpaceRequest(request, 0, 50, false, true, "");
+        it("with fixed-size Components", function () {
+            var svg = generateSVG();
+            var tall = new Mocks.FixedSizeComponent(SVG_WIDTH / 4, SVG_WIDTH / 2);
+            var wide = new Mocks.FixedSizeComponent(SVG_WIDTH / 2, SVG_WIDTH / 4);
+            var cg = new Plottable.Component.Group([tall, wide]);
+            var request = cg._requestedSpace(SVG_WIDTH, SVG_HEIGHT);
+            assert.strictEqual(request.width, SVG_WIDTH / 2, "requested enough space for widest Component");
+            assert.isFalse(request.wantsWidth, "does not request more width if enough was supplied for widest Component");
+            assert.strictEqual(request.height, SVG_HEIGHT / 2, "requested enough space for tallest Component");
+            assert.isFalse(request.wantsHeight, "does not request more height if enough was supplied for tallest Component");
+            var constrainedRequest = cg._requestedSpace(SVG_WIDTH / 10, SVG_HEIGHT / 10);
+            assert.strictEqual(constrainedRequest.width, SVG_WIDTH / 2, "requested enough space for widest Component");
+            assert.isTrue(constrainedRequest.wantsWidth, "requests more width if not enough was supplied for widest Component");
+            assert.strictEqual(constrainedRequest.height, SVG_HEIGHT / 2, "requested enough space for tallest Component");
+            assert.isTrue(constrainedRequest.wantsHeight, "requests more height if not enough was supplied for tallest Component");
+            cg.renderTo(svg);
+            assert.strictEqual(cg.width(), SVG_WIDTH, "occupies all offered width");
+            assert.strictEqual(cg.height(), SVG_HEIGHT, "occupies all offered height");
+            svg.remove();
         });
     });
     describe("Merging components works as expected", function () {
@@ -5565,6 +5616,7 @@ describe("Component behavior", function () {
         c._computeLayout(0, 0, 100, 100);
         c._render();
         var expectedPrefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
+        expectedPrefix = expectedPrefix.replace(/#.*/g, "");
         var expectedClipPathURL = "url(" + expectedPrefix + "#clipPath" + expectedClipPathID + ")";
         // IE 9 has clipPath like 'url("#clipPath")', must accomodate
         var normalizeClipPath = function (s) { return s.replace(/"/g, ""); };
@@ -5946,14 +5998,34 @@ describe("Tables", function () {
         assert.isNull(rows[0][1], "component at (0, 1) is null");
         assert.isNull(rows[1][0], "component at (1, 0) is null");
     });
-    it("can't add a component where one already exists", function () {
+    it("Add a component where one already exists creates a new group", function () {
         var c1 = new Plottable.Component.AbstractComponent();
         var c2 = new Plottable.Component.AbstractComponent();
         var c3 = new Plottable.Component.AbstractComponent();
         var t = new Plottable.Component.Table();
         t.addComponent(0, 2, c1);
         t.addComponent(0, 0, c2);
-        assert.throws(function () { return t.addComponent(0, 2, c3); }, Error, "component already exists");
+        t.addComponent(0, 2, c3);
+        assert.isTrue(Plottable.Component.Group.prototype.isPrototypeOf(t._rows[0][2]), "A group was created");
+        var components = t._rows[0][2].components();
+        assert.lengthOf(components, 2, "The group created should have 2 components");
+        assert.equal(components[0], c1, "First element in the group at (0, 2) should be c1");
+        assert.equal(components[1], c3, "Second element in the group at (0, 2) should be c3");
+    });
+    it("Add a component where a group already exists adds the component to the group", function () {
+        var c1 = new Plottable.Component.AbstractComponent();
+        var c2 = new Plottable.Component.AbstractComponent();
+        var grp = new Plottable.Component.Group([c1, c2]);
+        var c3 = new Plottable.Component.AbstractComponent();
+        var t = new Plottable.Component.Table();
+        t.addComponent(0, 2, grp);
+        t.addComponent(0, 2, c3);
+        assert.isTrue(Plottable.Component.Group.prototype.isPrototypeOf(t._rows[0][2]), "The cell still contains a group");
+        var components = t._rows[0][2].components();
+        assert.lengthOf(components, 3, "The group created should have 3 components");
+        assert.equal(components[0], c1, "First element in the group at (0, 2) should still be c1");
+        assert.equal(components[1], c2, "Second element in the group at (0, 2) should still be c2");
+        assert.equal(components[2], c3, "The Component was added to the existing Group");
     });
     it("addComponent works even if a component is added with a high column and low row index", function () {
         // Solves #180, a weird bug
@@ -8058,6 +8130,76 @@ describe("Interactions", function () {
             triggerFakeMouseEvent("mouseout", target, 401, 200);
             currentlyHovered = hoverInteraction.getCurrentHoverData();
             assert.isNull(currentlyHovered.data, "returns null if not currently hovering");
+            svg.remove();
+        });
+    });
+});
+
+///<reference path="../testReference.ts" />
+var assert = chai.assert;
+describe("Interactions", function () {
+    describe("Click", function () {
+        var SVG_WIDTH = 400;
+        var SVG_HEIGHT = 400;
+        it("onClick", function () {
+            var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var c = new Plottable.Component.AbstractComponent();
+            c.renderTo(svg);
+            var clickInteraction = new Plottable.Interaction.Click();
+            c.registerInteraction(clickInteraction);
+            var callbackCalled = false;
+            var lastPoint;
+            var callback = function (p) {
+                callbackCalled = true;
+                lastPoint = p;
+            };
+            clickInteraction.onClick(callback);
+            assert.strictEqual(clickInteraction.onClick(), callback, "callback can be retrieved");
+            triggerFakeMouseEvent("mousedown", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+            triggerFakeMouseEvent("mouseup", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+            assert.isTrue(callbackCalled, "callback called on clicking Component (mouse)");
+            assert.deepEqual(lastPoint, { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 }, "was passed correct point (mouse)");
+            callbackCalled = false;
+            lastPoint = null;
+            triggerFakeMouseEvent("mousedown", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+            triggerFakeMouseEvent("mouseup", c.content(), SVG_WIDTH / 4, SVG_HEIGHT / 4);
+            assert.isTrue(callbackCalled, "callback called on clicking Component (mouse)");
+            assert.deepEqual(lastPoint, { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 }, "was passed mouseup point (mouse)");
+            callbackCalled = false;
+            triggerFakeMouseEvent("mousedown", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+            triggerFakeMouseEvent("mouseup", c.content(), SVG_WIDTH * 2, SVG_HEIGHT * 2);
+            assert.isFalse(callbackCalled, "callback not called if released outside component (mouse)");
+            triggerFakeMouseEvent("mousedown", c.content(), SVG_WIDTH * 2, SVG_HEIGHT * 2);
+            triggerFakeMouseEvent("mouseup", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+            assert.isFalse(callbackCalled, "callback not called if started outside component (mouse)");
+            triggerFakeMouseEvent("mousedown", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+            triggerFakeMouseEvent("mousemove", c.content(), SVG_WIDTH * 2, SVG_HEIGHT * 2);
+            triggerFakeMouseEvent("mouseup", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+            assert.isTrue(callbackCalled, "callback called even if moved outside component (mouse)");
+            callbackCalled = false;
+            lastPoint = null;
+            triggerFakeTouchEvent("touchstart", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+            triggerFakeTouchEvent("touchend", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+            assert.isTrue(callbackCalled, "callback called on entering Component (touch)");
+            assert.deepEqual(lastPoint, { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 }, "was passed correct point (touch)");
+            callbackCalled = false;
+            lastPoint = null;
+            triggerFakeTouchEvent("touchstart", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+            triggerFakeTouchEvent("touchend", c.content(), SVG_WIDTH / 4, SVG_HEIGHT / 4);
+            assert.isTrue(callbackCalled, "callback called on clicking Component (mouse)");
+            assert.deepEqual(lastPoint, { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 }, "was passed mouseup point (touch)");
+            callbackCalled = false;
+            triggerFakeTouchEvent("touchstart", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+            triggerFakeTouchEvent("touchend", c.content(), SVG_WIDTH * 2, SVG_HEIGHT * 2);
+            assert.isFalse(callbackCalled, "callback not called if released outside component (touch)");
+            callbackCalled = false;
+            triggerFakeTouchEvent("touchstart", c.content(), SVG_WIDTH * 2, SVG_HEIGHT * 2);
+            triggerFakeTouchEvent("touchend", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+            assert.isFalse(callbackCalled, "callback not called if started outside component (touch)");
+            triggerFakeTouchEvent("touchstart", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+            triggerFakeTouchEvent("touchmove", c.content(), SVG_WIDTH * 2, SVG_HEIGHT * 2);
+            triggerFakeTouchEvent("touchend", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+            assert.isTrue(callbackCalled, "callback called even if moved outside component (touch)");
             svg.remove();
         });
     });

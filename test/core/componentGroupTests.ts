@@ -25,26 +25,6 @@ describe("ComponentGroups", () => {
     svg.remove();
   });
 
-  it("components in componentGroups occupies all available space", () => {
-    var svg = generateSVG(400, 400);
-    var xAxis = new Plottable.Axis.Numeric(new Plottable.Scale.Linear(), "bottom");
-
-    var leftLabel = new Plottable.Component.Label("LEFT").xAlign("left");
-    var rightLabel = new Plottable.Component.Label("RIGHT").xAlign("right");
-
-    var labelGroup = new Plottable.Component.Group([leftLabel, rightLabel]);
-
-    var table = new Plottable.Component.Table([
-        [labelGroup],
-        [xAxis]
-    ]);
-
-    table.renderTo(svg);
-
-    assertBBoxNonIntersection((<any>leftLabel)._element.select(".bounding-box"), (<any>rightLabel)._element.select(".bounding-box"));
-    svg.remove();
-  });
-
   it("components can be added before and after anchoring", () => {
     var c1 = makeFixedSizeComponent(10, 10);
     var c2 = makeFixedSizeComponent(20, 20);
@@ -66,24 +46,6 @@ describe("ComponentGroups", () => {
     var t3 = svg.select(".test-box3");
     assertWidthHeight(t3, 400, 400, "rect3 sized correctly");
     svg.remove();
-  });
-
-  it("component fixity is computed appropriately", () => {
-    var cg = new Plottable.Component.Group();
-    var c1 = new Plottable.Component.AbstractComponent();
-    var c2 = new Plottable.Component.AbstractComponent();
-
-    cg.below(c1).below(c2);
-    assert.isFalse(cg._isFixedHeight(), "height not fixed when both components unfixed");
-    assert.isFalse(cg._isFixedWidth(), "width not fixed when both components unfixed");
-
-    fixComponentSize(c1, 10, 10);
-    assert.isFalse(cg._isFixedHeight(), "height not fixed when one component unfixed");
-    assert.isFalse(cg._isFixedWidth(), "width not fixed when one component unfixed");
-
-    fixComponentSize(c2, null, 10);
-    assert.isFalse(cg._isFixedHeight(), "height unfixed when both components fixed");
-    assert.isFalse(cg._isFixedWidth(), "width unfixed when one component unfixed");
   });
 
   it("componentGroup subcomponents have xOffset, yOffset of 0", () => {
@@ -164,32 +126,64 @@ describe("ComponentGroups", () => {
     assert.lengthOf(cg.components(), 0, "cg has no components");
   });
 
-  describe("ComponentGroup._requestedSpace works as expected", () => {
-    it("_works for an empty ComponentGroup", () => {
-        var cg = new Plottable.Component.Group();
-        var request = cg._requestedSpace(10, 10);
-        verifySpaceRequest(request, 0, 0, false, false, "");
+  describe("requests space based on contents, but occupies total offered space", () => {
+    var SVG_WIDTH = 400;
+    var SVG_HEIGHT = 400;
+
+    it("with no Components", () => {
+      var svg = generateSVG();
+      var cg = new Plottable.Component.Group([]);
+
+      var request = cg._requestedSpace(SVG_WIDTH, SVG_HEIGHT);
+      verifySpaceRequest(request, 0, 0, false, false, "empty Group doesn't request any space");
+
+      cg.renderTo(svg);
+      assert.strictEqual(cg.width(), SVG_WIDTH, "occupies all offered width");
+      assert.strictEqual(cg.height(), SVG_HEIGHT, "occupies all offered height");
+      svg.remove();
     });
 
-    it("works for a ComponentGroup with only proportional-size components", () => {
-      var cg = new Plottable.Component.Group();
+    it("with a non-fixed-size Component", () => {
+      var svg = generateSVG();
       var c1 = new Plottable.Component.AbstractComponent();
       var c2 = new Plottable.Component.AbstractComponent();
-      cg.below(c1).below(c2);
-      var request = cg._requestedSpace(10, 10);
-      verifySpaceRequest(request, 0, 0, false, false, "");
+      var cg = new Plottable.Component.Group([c1, c2]);
+
+      var groupRequest = cg._requestedSpace(SVG_WIDTH, SVG_HEIGHT);
+      var c1Request = c1._requestedSpace(SVG_WIDTH, SVG_HEIGHT);
+      assert.deepEqual(groupRequest, c1Request, "request reflects request of sub-component");
+      assert.isFalse(cg._isFixedWidth(), "width is not fixed if subcomponents are not fixed width");
+      assert.isFalse(cg._isFixedHeight(), "height is not fixed if subcomponents are not fixed height");
+
+      cg.renderTo(svg);
+      assert.strictEqual(cg.width(), SVG_WIDTH, "occupies all offered width");
+      assert.strictEqual(cg.height(), SVG_HEIGHT, "occupies all offered height");
+      svg.remove();
     });
 
-    it("works when there are fixed-size components", () => {
-      var cg = new Plottable.Component.Group();
-      var c1 = new Plottable.Component.AbstractComponent();
-      var c2 = new Plottable.Component.AbstractComponent();
-      var c3 = new Plottable.Component.AbstractComponent();
-      cg.below(c1).below(c2).below(c3);
-      fixComponentSize(c1, null, 10);
-      fixComponentSize(c2, null, 50);
-      var request = cg._requestedSpace(10, 10);
-      verifySpaceRequest(request, 0, 50, false, true, "");
+    it("with fixed-size Components", () => {
+      var svg = generateSVG();
+      var tall = new Mocks.FixedSizeComponent(SVG_WIDTH/4, SVG_WIDTH/2);
+      var wide = new Mocks.FixedSizeComponent(SVG_WIDTH/2, SVG_WIDTH/4);
+
+      var cg = new Plottable.Component.Group([tall, wide]);
+
+      var request = cg._requestedSpace(SVG_WIDTH, SVG_HEIGHT);
+      assert.strictEqual(request.width, SVG_WIDTH/2,"requested enough space for widest Component");
+      assert.isFalse(request.wantsWidth, "does not request more width if enough was supplied for widest Component");
+      assert.strictEqual(request.height, SVG_HEIGHT/2, "requested enough space for tallest Component");
+      assert.isFalse(request.wantsHeight, "does not request more height if enough was supplied for tallest Component");
+
+      var constrainedRequest = cg._requestedSpace(SVG_WIDTH/10, SVG_HEIGHT/10);
+      assert.strictEqual(constrainedRequest.width, SVG_WIDTH/2, "requested enough space for widest Component");
+      assert.isTrue(constrainedRequest.wantsWidth, "requests more width if not enough was supplied for widest Component");
+      assert.strictEqual(constrainedRequest.height, SVG_HEIGHT/2, "requested enough space for tallest Component");
+      assert.isTrue(constrainedRequest.wantsHeight, "requests more height if not enough was supplied for tallest Component");
+
+      cg.renderTo(svg);
+      assert.strictEqual(cg.width(), SVG_WIDTH, "occupies all offered width");
+      assert.strictEqual(cg.height(), SVG_HEIGHT, "occupies all offered height");
+      svg.remove();
     });
   });
 

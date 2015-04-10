@@ -134,15 +134,21 @@ export module Component {
           throw new Error("null arguments cannot be passed to _computeLayout() on a non-root node");
         }
       }
-      var requestedSpace = this._requestedSpace(availableWidth, availableHeight);
-      this._width  = this._isFixedWidth()  ? Math.min(availableWidth , requestedSpace.width)  : availableWidth ;
-      this._height = this._isFixedHeight() ? Math.min(availableHeight, requestedSpace.height) : availableHeight;
-
+      var size = this._getSize(availableWidth, availableHeight);
+      this._width = size.width;
+      this._height = size.height;
       this._xOrigin = offeredXOrigin + this._xOffset + (availableWidth - this.width()) * this._xAlignProportion;
-      this._yOrigin = offeredYOrigin + this._yOffset + (availableHeight - this.height()) * this._yAlignProportion;;
-
+      this._yOrigin = offeredYOrigin + this._yOffset + (availableHeight - this.height()) * this._yAlignProportion;
       this._element.attr("transform", "translate(" + this._xOrigin + "," + this._yOrigin + ")");
       this._boxes.forEach((b: D3.Selection) => b.attr("width", this.width()).attr("height", this.height()));
+    }
+
+    protected _getSize(availableWidth: number, availableHeight: number) {
+      var requestedSpace = this._requestedSpace(availableWidth, availableHeight);
+      return {
+        width: this._isFixedWidth()  ? Math.min(availableWidth , requestedSpace.width)  : availableWidth,
+        height: this._isFixedHeight() ? Math.min(availableHeight, requestedSpace.height) : availableHeight
+      };
     }
 
     public _render() {
@@ -353,15 +359,20 @@ export module Component {
       return this;
     }
 
-
     /**
-     * Adds/removes a given CSS class to/from the Component, or checks if the Component has a particular CSS class.
+     * Checks if the Component has a given CSS class.
      *
-     * @param {string} cssClass The CSS class to add/remove/check for.
-     * @param {boolean} addClass Whether to add or remove the CSS class. If not supplied, checks for the CSS class.
-     * @returns {boolean|Component} Whether the Component has the given CSS class, or the calling Component (if addClass is supplied).
+     * @param {string} cssClass The CSS class to check for.
+     * @returns {boolean} Whether the Component has the given CSS class.
      */
     public classed(cssClass: string): boolean;
+    /**
+     * Adds/removes a given CSS class to/from the Component.
+     *
+     * @param {string} cssClass The CSS class to add or remove.
+     * @param {boolean} addClass If true, adds the provided CSS class; otherwise, removes it.
+     * @returns {AbstractComponent} The calling Component.
+     */
     public classed(cssClass: string, addClass: boolean): AbstractComponent;
     public classed(cssClass: string, addClass?: boolean): any {
       if (addClass == null) {
