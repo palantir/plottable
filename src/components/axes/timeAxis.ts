@@ -142,6 +142,7 @@ export module Axis {
     private _tierBaselines: D3.Selection[];
     private _tierHeights: number[];
     private _possibleTimeAxisConfigurations: TimeAxisConfiguration[];
+    private _numTiers: number;;
     private _measurer: SVGTypewriter.Measurers.Measurer;
 
     private _mostPreciseConfigIndex: number;
@@ -149,11 +150,6 @@ export module Axis {
     private _tierLabelPositions: string[];
 
     private static _LONG_DATE = new Date(9999, 8, 29, 12, 59, 9999);
-
-    /**
-     * Number of possible tiers.
-     */
-    private static _NUM_TIERS = 2;
 
     /**
      * Constructs a TimeAxis.
@@ -207,6 +203,8 @@ export module Axis {
         return this._possibleTimeAxisConfigurations;
       }
       this._possibleTimeAxisConfigurations = configurations;
+      this._numTiers = _Util.Methods.max(this._possibleTimeAxisConfigurations.map((config: TimeAxisConfiguration) => config.length), 0);
+
       this._invalidateLayout();
       return this;
     }
@@ -242,10 +240,9 @@ export module Axis {
 
     public _computeHeight() {
       var textHeight = this._measurer.measure().height;
-      var maximumTiers = _Util.Methods.max(this._possibleTimeAxisConfigurations.map((config: TimeAxisConfiguration) => config.length), 0);
 
       this._tierHeights = [];
-      for (var i = 0; i < maximumTiers; i++) {
+      for (var i = 0; i < this._numTiers; i++) {
         this._tierHeights.push(textHeight + this.tickLabelPadding() +
                               ((this._tierLabelPositions[i]) === "between" ? 0 : this._maxLabelTickLength()));
       }
@@ -286,9 +283,7 @@ export module Axis {
       this._tickLabelContainer.remove();
       this._baseline.remove();
 
-      var numTiers = _Util.Methods.max(this._possibleTimeAxisConfigurations.map((config: TimeAxisConfiguration) => config.length), 0);
-
-      for (var i = 0; i < numTiers; ++i) {
+      for (var i = 0; i < this._numTiers; ++i) {
         var tierContainer = this._content.append("g").classed("time-axis-tier", true);
         this._tierLabelContainers.push(tierContainer.append("g").classed(AbstractAxis.TICK_LABEL_CLASS + "-container", true));
         this._tierMarkContainers.push(tierContainer.append("g").classed(AbstractAxis.TICK_MARK_CLASS + "-container", true));
@@ -412,9 +407,7 @@ export module Axis {
       this._mostPreciseConfigIndex = this._getMostPreciseConfigurationIndex();
       var tierConfigs = this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex];
 
-      var numTiers = _Util.Methods.max(this._possibleTimeAxisConfigurations.map((config: TimeAxisConfiguration) => config.length), 0);
-
-      for (var i = 0; i < numTiers; ++i) {
+      for (var i = 0; i < this._numTiers; ++i) {
         this._cleanTier(i);
       }
 
