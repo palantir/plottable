@@ -25,6 +25,7 @@ export module Interaction {
       var translatedP = this._translateToComponentSpace(p);
       if (this._isInsideComponent(translatedP)) {
         if (this._scrollCallback) {
+          e.preventDefault();
           var deltaPixelAmount = e.deltaY * (e.deltaMode ? Scroll.PIXELS_PER_LINE : 1);
           this._scrollCallback(translatedP, deltaPixelAmount);
         }
