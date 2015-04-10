@@ -319,10 +319,20 @@ export module Axis {
         );
     }
 
-    private _cleanTier(index: number) {
-      this._tierLabelContainers[index].selectAll("." + AbstractAxis.TICK_LABEL_CLASS).remove();
-      this._tierMarkContainers[index].selectAll("." + AbstractAxis.TICK_MARK_CLASS).remove();
-      this._tierBaselines[index].style("visibility", "hidden");
+    private _cleanTiers() {
+      var oldTiersNumber = this._tierLabelContainers.length;
+
+      if (! (this._tierLabelContainers.length === this._tierMarkContainers.length &&
+             this._tierLabelContainers.length === this._tierBaselines.length)) {
+        throw Error("Tiers could not be cleaned properly");
+      }
+
+      for (var index = 0; index < oldTiersNumber; index++) {
+        this._tierLabelContainers[index].selectAll("." + AbstractAxis.TICK_LABEL_CLASS).remove();
+        this._tierMarkContainers[index].selectAll("." + AbstractAxis.TICK_MARK_CLASS).remove();
+        this._tierBaselines[index].style("visibility", "hidden");
+      }
+
     }
 
     private _getTickValuesForConfiguration(config: TimeAxisTierConfiguration) {
@@ -422,9 +432,7 @@ export module Axis {
       this._mostPreciseConfigIndex = this._getMostPreciseConfigurationIndex();
       var tierConfigs = this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex];
 
-      for (var i = 0; i < this._tierLabelContainers.length; ++i) {
-        this._cleanTier(i);
-      }
+      this._cleanTiers();
 
       tierConfigs.forEach((config: TimeAxisTierConfiguration, i: number) =>
         this._renderTierLabels(this._tierLabelContainers[i], config, i)

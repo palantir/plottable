@@ -4615,10 +4615,16 @@ var Plottable;
                 var _this = this;
                 return this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex].reduce(function (ticks, config) { return ticks.concat(_this._getTickIntervalValues(config)); }, []);
             };
-            Time.prototype._cleanTier = function (index) {
-                this._tierLabelContainers[index].selectAll("." + Axis.AbstractAxis.TICK_LABEL_CLASS).remove();
-                this._tierMarkContainers[index].selectAll("." + Axis.AbstractAxis.TICK_MARK_CLASS).remove();
-                this._tierBaselines[index].style("visibility", "hidden");
+            Time.prototype._cleanTiers = function () {
+                var oldTiersNumber = this._tierLabelContainers.length;
+                if (!(this._tierLabelContainers.length === this._tierMarkContainers.length && this._tierLabelContainers.length === this._tierBaselines.length)) {
+                    throw Error("Tiers could not be cleaned properly");
+                }
+                for (var index = 0; index < oldTiersNumber; index++) {
+                    this._tierLabelContainers[index].selectAll("." + Axis.AbstractAxis.TICK_LABEL_CLASS).remove();
+                    this._tierMarkContainers[index].selectAll("." + Axis.AbstractAxis.TICK_MARK_CLASS).remove();
+                    this._tierBaselines[index].style("visibility", "hidden");
+                }
             };
             Time.prototype._getTickValuesForConfiguration = function (config) {
                 var tickPos = this._scale.tickInterval(config.interval, config.step);
@@ -4708,9 +4714,7 @@ var Plottable;
                 var _this = this;
                 this._mostPreciseConfigIndex = this._getMostPreciseConfigurationIndex();
                 var tierConfigs = this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex];
-                for (var i = 0; i < this._tierLabelContainers.length; ++i) {
-                    this._cleanTier(i);
-                }
+                this._cleanTiers();
                 tierConfigs.forEach(function (config, i) { return _this._renderTierLabels(_this._tierLabelContainers[i], config, i); });
                 var tierTicks = tierConfigs.map(function (config, i) { return _this._getTickValuesForConfiguration(config); });
                 var baselineOffset = 0;

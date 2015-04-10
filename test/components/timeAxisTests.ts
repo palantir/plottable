@@ -179,7 +179,57 @@ describe("TimeAxis", () => {
 
     assert.strictEqual(twoTierSize, oneTierSize * 2, "two-tier axis is twice as tall as one-tier axis");
 
+
+    xAxis.axisConfigurations([
+        [
+           {interval: d3.time.day, step: 2, formatter: Plottable.Formatters.time("%a %e")}
+        ],
+    ]);
+
+    var initialTierSize: number = xAxis.height();
+
+    assert.strictEqual(initialTierSize, oneTierSize,
+                      "2-tier time axis should shrink when prezented new configuration with 1 tier");
+
     svg.remove();
+  });
+
+  it("three tier time axis should be possible", () => {
+
+    var svg = generateSVG();
+    var xScale = new Plottable.Scale.Time();
+    xScale.domain([new Date("2013-03-23 12:00"), new Date("2013-04-03 0:00")]);
+    var xAxis = new Plottable.Axis.Time(xScale, "bottom");
+    xAxis.gutter(0);
+
+    xAxis.renderTo(svg);
+
+    xAxis.axisConfigurations([
+        [
+           {interval: d3.time.day, step: 2, formatter: Plottable.Formatters.time("%a %e")},
+           {interval: d3.time.day, step: 2, formatter: Plottable.Formatters.time("%a %e")},
+        ],
+    ]);
+
+    var twoTierAxisHeight: number = xAxis.height();
+
+    xAxis.axisConfigurations([
+        [
+           {interval: d3.time.day, step: 2, formatter: Plottable.Formatters.time("%a %e")},
+           {interval: d3.time.day, step: 2, formatter: Plottable.Formatters.time("%a %e")},
+           {interval: d3.time.day, step: 2, formatter: Plottable.Formatters.time("%a %e")},
+        ],
+    ]);
+
+    var threeTierAxisHeight: number = xAxis.height();
+
+    console.log(twoTierAxisHeight);
+    console.log(threeTierAxisHeight);
+
+    assert.strictEqual(threeTierAxisHeight * 2, twoTierAxisHeight * 3, "two-tier axis is twice as tall as one-tier axis");
+
+    svg.remove();
+
   });
 
 });
