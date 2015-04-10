@@ -14,6 +14,8 @@ export module Component {
     constructor() {
       super();
       this.classed("selection-box-layer", true);
+      this._fixedWidthFlag = true;
+      this._fixedHeightFlag = true;
     }
 
     protected _setup() {
@@ -21,6 +23,13 @@ export module Component {
 
       this._box = this._content.append("g").classed("selection-box", true).remove();
       this._boxArea = this._box.append("rect").classed("selection-area", true);
+    }
+
+    protected _getSize(availableWidth: number, availableHeight: number) {
+      return {
+        width: availableWidth,
+        height: availableHeight
+      };
     }
 
     /**

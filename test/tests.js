@@ -1964,6 +1964,13 @@ describe("SelectionBoxLayer", function () {
         assert.deepEqual(queriedBounds.bottomRight, bottomRight, "returns correct bottom-right position");
         svg.remove();
     });
+    it("has an effective size of 0, but will occupy all offered space", function () {
+        var sbl = new Plottable.Component.SelectionBoxLayer();
+        var request = sbl._requestedSpace(400, 400);
+        verifySpaceRequest(request, 0, 0, false, false, "occupies and asks for no space");
+        assert.isTrue(sbl._isFixedWidth(), "fixed width");
+        assert.isTrue(sbl._isFixedHeight(), "fixed height");
+    });
 });
 
 ///<reference path="../../testReference.ts" />
