@@ -8757,6 +8757,7 @@ var Plottable;
              * @constructor
              * @param {AbstractScale} xScale The x scale to use.
              * @param {AbstractScale} yScale The y scale to use.
+             * @param {boolean} isVertical Whether the plot is vertical or not. Defaults to true.
              */
             function ErrorBar(xScale, yScale, isVertical) {
                 if (isVertical === void 0) { isVertical = true; }
@@ -8767,7 +8768,7 @@ var Plottable;
                 this._isVertical = isVertical;
             }
             ErrorBar.prototype.tickLength = function (length) {
-                if (length === null) {
+                if (length == null) {
                     return this._tickLength;
                 }
                 this._tickLength = length;

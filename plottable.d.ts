@@ -3356,10 +3356,11 @@ declare module Plottable {
              * @constructor
              * @param {AbstractScale} xScale The x scale to use.
              * @param {AbstractScale} yScale The y scale to use.
+             * @param {boolean} isVertical Whether the plot is vertical or not. Defaults to true.
              */
             constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<Y, number>, isVertical?: boolean);
             /**
-             * Retrieves the length of error bar ticks. Defaults to 20px in length.
+             * Retrieves the length of error bar ticks in pixels. Defaults to 20px in length.
              *
              * @return {number} Length of error bar ticks
              */
@@ -3368,7 +3369,7 @@ declare module Plottable {
              * Sets the length of error bar ticks.
              *
              * @param {number} length Length of error bar ticks in pixels.
-             * @return {Plot.ErrorBar} Current error bar plot
+             * @return {Plot.ErrorBar} The calling Plot.ErrorBar
              */
             tickLength(length: number): ErrorBar<X, Y>;
             protected _getDrawer(key: string): _Drawer.ErrorBar;

@@ -4,7 +4,7 @@ export module Plot {
 
     private _isVertical: boolean;
     private _defaultStrokeColor: string;
-    private _tickLength: number = 20;
+    private _tickLength = 20;
 
     /**
      * Constructs an ErrorBarPlot.
@@ -15,6 +15,7 @@ export module Plot {
      * @constructor
      * @param {AbstractScale} xScale The x scale to use.
      * @param {AbstractScale} yScale The y scale to use.
+     * @param {boolean} isVertical Whether the plot is vertical or not. Defaults to true.
      */
     constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<Y, number>, isVertical = true) {
       super(xScale, yScale);
@@ -24,7 +25,7 @@ export module Plot {
     }
 
     /**
-     * Retrieves the length of error bar ticks. Defaults to 20px in length.
+     * Retrieves the length of error bar ticks in pixels. Defaults to 20px in length.
      *
      * @return {number} Length of error bar ticks
      */
@@ -33,11 +34,11 @@ export module Plot {
      * Sets the length of error bar ticks.
      *
      * @param {number} length Length of error bar ticks in pixels.
-     * @return {Plot.ErrorBar} Current error bar plot
+     * @return {Plot.ErrorBar} The calling Plot.ErrorBar
      */
     public tickLength(length: number): ErrorBar<X, Y>;
     public tickLength(length?: number): any {
-      if (length === null) {
+      if (length == null) {
         return this._tickLength;
       }
       this._tickLength = length;
