@@ -2,9 +2,18 @@
 
 module Plottable {
 export module Interaction {
+
+  export type ScrollCallback = (p: Point, deltaAmount: number) => any;
+
   export class Scroll extends Interaction.AbstractInteraction {
+
+    /**
+     * The number of pixels occupied in a line.
+     */
+    public static PIXELS_PER_LINE = 120;
+
     private _mouseDispatcher: Dispatcher.Mouse;
-    private _scrollCallback: (p: Point, deltaAmount: number) => any;
+    private _scrollCallback: ScrollCallback;
 
     public _anchor(component: Component.AbstractComponent, hitBox: D3.Selection) {
       super._anchor(component, hitBox);
@@ -16,7 +25,7 @@ export module Interaction {
       var translatedP = this._translateToComponentSpace(p);
       if (this._isInsideComponent(translatedP)) {
         if (this._scrollCallback) {
-          var deltaPixelAmount = e.deltaY * (e.deltaMode ? 120 : 1);
+          var deltaPixelAmount = e.deltaY * (e.deltaMode ? Scroll.PIXELS_PER_LINE : 1);
           this._scrollCallback(translatedP, deltaPixelAmount);
         }
       }
@@ -25,17 +34,17 @@ export module Interaction {
     /**
      * Gets the callback called when a scroll occurs
      *
-     * @return {(p: Point, deltaAmount: number) => any} The current callback.
+     * @return {ScrollCallback} The current callback.
      */
-    public onScroll(): (p: Point, deltaAmount: number) => any;
+    public onScroll(): ScrollCallback;
     /**
      * Sets the callback called when a scroll occurs
      *
-     * @param {(p: Point, deltaAmount: number) => any} callback The callback to set.
+     * @param {ScrollCallback} callback The callback to set.
      * @return {Interaction.Scroll} The calling Interaction.Scroll.
      */
-    public onScroll(callback: (p: Point, deltaAmount: number) => any): Interaction.Scroll;
-    public onScroll(callback?: (p: Point, deltaAmount: number) => any): any {
+    public onScroll(callback: ScrollCallback): Interaction.Scroll;
+    public onScroll(callback?: ScrollCallback): any {
       if (callback === undefined) {
         return this._scrollCallback;
       }

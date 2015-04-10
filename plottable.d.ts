@@ -4139,21 +4139,26 @@ declare module Plottable {
 
 declare module Plottable {
     module Interaction {
+        type ScrollCallback = (p: Point, deltaAmount: number) => any;
         class Scroll extends Interaction.AbstractInteraction {
+            /**
+             * The number of pixels occupied in a line.
+             */
+            static PIXELS_PER_LINE: number;
             _anchor(component: Component.AbstractComponent, hitBox: D3.Selection): void;
             /**
              * Gets the callback called when a scroll occurs
              *
-             * @return {(p: Point, deltaAmount: number) => any} The current callback.
+             * @return {ScrollCallback} The current callback.
              */
-            onScroll(): (p: Point, deltaAmount: number) => any;
+            onScroll(): ScrollCallback;
             /**
              * Sets the callback called when a scroll occurs
              *
-             * @param {(p: Point, deltaAmount: number) => any} callback The callback to set.
+             * @param {ScrollCallback} callback The callback to set.
              * @return {Interaction.Scroll} The calling Interaction.Scroll.
              */
-            onScroll(callback: (p: Point, deltaAmount: number) => any): Interaction.Scroll;
+            onScroll(callback: ScrollCallback): Interaction.Scroll;
         }
     }
 }

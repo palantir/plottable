@@ -10287,7 +10287,7 @@ var Plottable;
                 var translatedP = this._translateToComponentSpace(p);
                 if (this._isInsideComponent(translatedP)) {
                     if (this._scrollCallback) {
-                        var deltaPixelAmount = e.deltaY * (e.deltaMode ? 120 : 1);
+                        var deltaPixelAmount = e.deltaY * (e.deltaMode ? Scroll.PIXELS_PER_LINE : 1);
                         this._scrollCallback(translatedP, deltaPixelAmount);
                     }
                 }
@@ -10299,6 +10299,10 @@ var Plottable;
                 this._scrollCallback = callback;
                 return this;
             };
+            /**
+             * The number of pixels occupied in a line.
+             */
+            Scroll.PIXELS_PER_LINE = 120;
             return Scroll;
         })(Interaction.AbstractInteraction);
         Interaction.Scroll = Scroll;
