@@ -2801,31 +2801,14 @@ declare module Plottable {
             getAllPlotData(datasetKeys?: string | string[]): PlotData;
             protected _getAllPlotData(datasetKeys: string[]): PlotData;
             /**
-             * Retrieves the closest PlotData for the specified dataset(s)
+             * Retrieves the closest PlotData across all datasets, where distance is defined to be
+             * the Euclidiean norm.
              *
-             * @param {Point} queryPoint The point to query from
-             * @param {number} withinValue Will only return plot data that is of a distance below withinValue
-             *                             (default = Infinity)
-             * @param {string | string[]} datasetKeys The dataset(s) to retrieve the plot data from.
-             *                                        (default = this.datasetOrder())
-             * @returns {PlotData} The retrieved PlotData.
+             * @param {Point} queryPoint The point to which dataset points should be compared
+             *
+             * @returns {PlotData} The PlotData closest to queryPoint
              */
-            getClosestPlotData(queryPoint: Point, withinValue?: number, datasetKeys?: string | string[]): {
-                data: any[];
-                pixelPoints: {
-                    x: number;
-                    y: number;
-                }[];
-                selection: D3.Selection;
-            };
-            protected _getClosestPlotData(queryPoint: Point, datasetKeys: string[], withinValue?: number): {
-                data: any[];
-                pixelPoints: {
-                    x: number;
-                    y: number;
-                }[];
-                selection: D3.Selection;
-            };
+            getClosestPlotData(queryPoint: Point): PlotData;
         }
     }
 }
@@ -3135,14 +3118,6 @@ declare module Plottable {
                 [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
             };
             protected _wholeDatumAttributes(): string[];
-            protected _getClosestPlotData(queryPoint: Point, datasetKeys: string[], withinValue?: number): {
-                data: any[];
-                pixelPoints: {
-                    x: number;
-                    y: number;
-                }[];
-                selection: D3.Selection;
-            };
             protected _getClosestWithinRange(p: Point, range: number): {
                 closestValue: any;
                 closestPoint: {
@@ -3151,6 +3126,7 @@ declare module Plottable {
                 };
             };
             protected _getAllPlotData(datasetKeys: string[]): PlotData;
+            getClosestPlotData(queryPoint: Point): PlotData;
             _hoverOverComponent(p: Point): void;
             _hoverOutComponent(p: Point): void;
             _doHover(p: Point): Interaction.HoverData;

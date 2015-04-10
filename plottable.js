@@ -6819,32 +6819,17 @@ var Plottable;
                 return { data: data, pixelPoints: pixelPoints, selection: d3.selectAll(allElements) };
             };
             /**
-             * Retrieves the closest PlotData for the specified dataset(s)
+             * Retrieves the closest PlotData across all datasets, where distance is defined to be
+             * the Euclidiean norm.
              *
-             * @param {Point} queryPoint The point to query from
-             * @param {number} withinValue Will only return plot data that is of a distance below withinValue
-             *                             (default = Infinity)
-             * @param {string | string[]} datasetKeys The dataset(s) to retrieve the plot data from.
-             *                                        (default = this.datasetOrder())
-             * @returns {PlotData} The retrieved PlotData.
+             * @param {Point} queryPoint The point to which dataset points should be compared
+             *
+             * @returns {PlotData} The PlotData closest to queryPoint
              */
-            AbstractPlot.prototype.getClosestPlotData = function (queryPoint, withinValue, datasetKeys) {
-                if (withinValue === void 0) { withinValue = Infinity; }
-                if (datasetKeys === void 0) { datasetKeys = this.datasetOrder(); }
-                var datasetKeyArray = [];
-                if (typeof (datasetKeys) === "string") {
-                    datasetKeyArray = [datasetKeys];
-                }
-                else {
-                    datasetKeyArray = datasetKeys;
-                }
-                return this._getClosestPlotData(queryPoint, datasetKeyArray, withinValue);
-            };
-            AbstractPlot.prototype._getClosestPlotData = function (queryPoint, datasetKeys, withinValue) {
-                if (withinValue === void 0) { withinValue = Infinity; }
-                var closestDistanceSquared = Math.pow(withinValue, 2);
+            AbstractPlot.prototype.getClosestPlotData = function (queryPoint) {
+                var closestDistanceSquared = Infinity;
                 var closestIndex;
-                var plotData = this.getAllPlotData(datasetKeys);
+                var plotData = this.getAllPlotData();
                 plotData.pixelPoints.forEach(function (pixelPoint, index) {
                     var distance = Plottable._Util.Methods.distanceSquared(pixelPoint, queryPoint);
                     if (distance < closestDistanceSquared) {
@@ -7912,30 +7897,6 @@ var Plottable;
             Line.prototype._wholeDatumAttributes = function () {
                 return ["x", "y"];
             };
-            Line.prototype._getClosestPlotData = function (queryPoint, datasetKeys, withinValue) {
-                var _this = this;
-                if (withinValue === void 0) { withinValue = Infinity; }
-                var closestDistanceSquared = withinValue;
-                var closestDatum;
-                var closestSelection;
-                var closestPoint;
-                datasetKeys.forEach(function (datasetKey) {
-                    var plotData = _this.getAllPlotData(datasetKey);
-                    plotData.pixelPoints.forEach(function (pixelPoint, index) {
-                        var pixelPointDist = Plottable._Util.Methods.distanceSquared(queryPoint, pixelPoint);
-                        if (pixelPointDist < closestDistanceSquared) {
-                            closestDistanceSquared = pixelPointDist;
-                            closestDatum = plotData.data[index];
-                            closestPoint = pixelPoint;
-                            closestSelection = plotData.selection;
-                        }
-                    });
-                });
-                if (closestDatum == null) {
-                    return { data: [], pixelPoints: [], selection: d3.select() };
-                }
-                return { data: [closestDatum], pixelPoints: [closestPoint], selection: closestSelection };
-            };
             Line.prototype._getClosestWithinRange = function (p, range) {
                 var _this = this;
                 var attrToProjector = this._generateAttrToProjector();
@@ -7989,6 +7950,34 @@ var Plottable;
                     }
                 });
                 return { data: data, pixelPoints: pixelPoints, selection: d3.selectAll(allElements) };
+            };
+            Line.prototype.getClosestPlotData = function (queryPoint) {
+                var _this = this;
+                var closestDistanceSquared = Infinity;
+                var closestDatum;
+                var closestSelection;
+                var closestPoint;
+                var datasetKeys = this.datasetOrder();
+                datasetKeys.forEach(function (datasetKey) {
+                    var plotData = _this.getAllPlotData(datasetKey);
+                    plotData.pixelPoints.forEach(function (pixelPoint, index) {
+                        var pixelPointDist = Plottable._Util.Methods.distanceSquared(queryPoint, pixelPoint);
+                        if (pixelPointDist < closestDistanceSquared) {
+                            closestDistanceSquared = pixelPointDist;
+                            closestDatum = plotData.data[index];
+                            closestPoint = pixelPoint;
+                            closestSelection = plotData.selection;
+                        }
+                    });
+                });
+                if (closestDatum == null) {
+                    return { data: [], pixelPoints: [], selection: d3.select() };
+                }
+                return {
+                    data: [closestDatum],
+                    pixelPoints: [closestPoint],
+                    selection: closestSelection
+                };
             };
             //===== Hover logic =====
             Line.prototype._hoverOverComponent = function (p) {
