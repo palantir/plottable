@@ -204,8 +204,8 @@ export module Axis {
       this._possibleTimeAxisConfigurations = configurations;
       this._numTiers = _Util.Methods.max(this._possibleTimeAxisConfigurations.map((config: TimeAxisConfiguration) => config.length), 0);
 
-      var oldLabelPositions = this.tierLabelPositions();
-      var newLabelPositions = [];
+      var oldLabelPositions: string[] = this.tierLabelPositions();
+      var newLabelPositions: string[] = [];
       for (var i = 0; i < this._numTiers; i++) {
         newLabelPositions.push(oldLabelPositions[i] ? oldLabelPositions[i] : "between");
       }
