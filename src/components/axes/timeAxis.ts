@@ -147,7 +147,7 @@ export module Axis {
 
     private _mostPreciseConfigIndex: number;
 
-    private _tierLabelPositions: string[];
+    private _tierLabelPositions: string[] = [];
 
     private static _LONG_DATE = new Date(9999, 8, 29, 12, 59, 9999);
 
@@ -164,7 +164,6 @@ export module Axis {
       super(scale, orientation);
       this.classed("time-axis", true);
       this.tickLabelPadding(5);
-      this.tierLabelPositions(["between", "between"]);
       this.axisConfigurations(Time._DEFAULT_TIME_AXIS_CONFIGURATIONS);
     }
 
@@ -205,6 +204,13 @@ export module Axis {
       this._possibleTimeAxisConfigurations = configurations;
       this._numTiers = _Util.Methods.max(this._possibleTimeAxisConfigurations.map((config: TimeAxisConfiguration) => config.length), 0);
 
+      var oldLabelPositions = this.tierLabelPositions();
+      var newLabelPositions = [];
+      for (var i = 0; i < this._numTiers; i++) {
+        newLabelPositions.push(oldLabelPositions[i] ? oldLabelPositions[i] : "between");
+      }
+      this.tierLabelPositions(newLabelPositions);
+
       this._invalidateLayout();
       return this;
     }
@@ -240,8 +246,6 @@ export module Axis {
 
     public _computeHeight() {
       var textHeight = this._measurer.measure().height;
-
-      console.log('a');
 
       this._tierHeights = [];
       for (var i = 0; i < this._numTiers; i++) {

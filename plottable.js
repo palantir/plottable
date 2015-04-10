@@ -4501,9 +4501,9 @@ var Plottable;
              */
             function Time(scale, orientation) {
                 _super.call(this, scale, orientation);
+                this._tierLabelPositions = [];
                 this.classed("time-axis", true);
                 this.tickLabelPadding(5);
-                this.tierLabelPositions(["between", "between"]);
                 this.axisConfigurations(Time._DEFAULT_TIME_AXIS_CONFIGURATIONS);
             }
             Time.prototype.tierLabelPositions = function (newPositions) {
@@ -4525,6 +4525,12 @@ var Plottable;
                 }
                 this._possibleTimeAxisConfigurations = configurations;
                 this._numTiers = Plottable._Util.Methods.max(this._possibleTimeAxisConfigurations.map(function (config) { return config.length; }), 0);
+                var oldLabelPositions = this.tierLabelPositions();
+                var newLabelPositions = [];
+                for (var i = 0; i < this._numTiers; i++) {
+                    newLabelPositions.push(oldLabelPositions[i] ? oldLabelPositions[i] : "between");
+                }
+                this.tierLabelPositions(newLabelPositions);
                 this._invalidateLayout();
                 return this;
             };
@@ -4553,7 +4559,6 @@ var Plottable;
             };
             Time.prototype._computeHeight = function () {
                 var textHeight = this._measurer.measure().height;
-                console.log('a');
                 this._tierHeights = [];
                 for (var i = 0; i < this._numTiers; i++) {
                     this._tierHeights.push(textHeight + this.tickLabelPadding() + ((this._tierLabelPositions[i]) === "between" ? 0 : this._maxLabelTickLength()));
