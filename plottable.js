@@ -4588,7 +4588,8 @@ var Plottable;
                 this._tierBaselines = [];
                 this._tickLabelContainer.remove();
                 this._baseline.remove();
-                for (var i = 0; i < Time._NUM_TIERS; ++i) {
+                var numTiers = Plottable._Util.Methods.max(this._possibleTimeAxisConfigurations.map(function (config) { return config.length; }), 0);
+                for (var i = 0; i < numTiers; ++i) {
                     var tierContainer = this._content.append("g").classed("time-axis-tier", true);
                     this._tierLabelContainers.push(tierContainer.append("g").classed(Axis.AbstractAxis.TICK_LABEL_CLASS + "-container", true));
                     this._tierMarkContainers.push(tierContainer.append("g").classed(Axis.AbstractAxis.TICK_MARK_CLASS + "-container", true));
@@ -4696,7 +4697,8 @@ var Plottable;
                 var _this = this;
                 this._mostPreciseConfigIndex = this._getMostPreciseConfigurationIndex();
                 var tierConfigs = this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex];
-                for (var i = 0; i < Time._NUM_TIERS; ++i) {
+                var numTiers = Plottable._Util.Methods.max(this._possibleTimeAxisConfigurations.map(function (config) { return config.length; }), 0);
+                for (var i = 0; i < numTiers; ++i) {
                     this._cleanTier(i);
                 }
                 tierConfigs.forEach(function (config, i) { return _this._renderTierLabels(_this._tierLabelContainers[i], config, i); });

@@ -285,7 +285,10 @@ export module Axis {
       this._tierBaselines = [];
       this._tickLabelContainer.remove();
       this._baseline.remove();
-      for (var i = 0; i < Time._NUM_TIERS; ++i) {
+
+      var numTiers = _Util.Methods.max(this._possibleTimeAxisConfigurations.map((config: TimeAxisConfiguration) => config.length), 0);
+
+      for (var i = 0; i < numTiers; ++i) {
         var tierContainer = this._content.append("g").classed("time-axis-tier", true);
         this._tierLabelContainers.push(tierContainer.append("g").classed(AbstractAxis.TICK_LABEL_CLASS + "-container", true));
         this._tierMarkContainers.push(tierContainer.append("g").classed(AbstractAxis.TICK_MARK_CLASS + "-container", true));
@@ -408,7 +411,10 @@ export module Axis {
     public _doRender() {
       this._mostPreciseConfigIndex = this._getMostPreciseConfigurationIndex();
       var tierConfigs = this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex];
-      for (var i = 0; i < Time._NUM_TIERS; ++i) {
+
+      var numTiers = _Util.Methods.max(this._possibleTimeAxisConfigurations.map((config: TimeAxisConfiguration) => config.length), 0);
+
+      for (var i = 0; i < numTiers; ++i) {
         this._cleanTier(i);
       }
 
