@@ -150,4 +150,36 @@ describe("TimeAxis", () => {
     });
     svg.remove();
   });
+
+  it("if the time only uses one tier, there should be no space left for the second tier", () => {
+    var svg = generateSVG();
+    var xScale = new Plottable.Scale.Time();
+    xScale.domain([new Date("2013-03-23 12:00"), new Date("2013-04-03 0:00")]);
+    var xAxis = new Plottable.Axis.Time(xScale, "bottom");
+    xAxis.gutter(0);
+
+    xAxis.axisConfigurations([
+        [
+           {interval: d3.time.day, step: 2, formatter: Plottable.Formatters.time("%a %e")}
+        ],
+    ]);
+
+    xAxis.renderTo(svg);
+
+    var oneTierSize: number = xAxis.height();
+
+    xAxis.axisConfigurations([
+        [
+           {interval: d3.time.day, step: 2, formatter: Plottable.Formatters.time("%a %e")},
+           {interval: d3.time.day, step: 2, formatter: Plottable.Formatters.time("%a %e")}
+        ],
+    ]);
+
+    var twoTierSize: number = xAxis.height();
+
+    assert.strictEqual(twoTierSize, oneTierSize * 2, "two-tier axis is twice as tall as one-tier axis");
+
+    svg.remove();
+  });
+
 });
