@@ -4524,6 +4524,7 @@ var Plottable;
                     return this._possibleTimeAxisConfigurations;
                 }
                 this._possibleTimeAxisConfigurations = configurations;
+                this._numTiers = Plottable._Util.Methods.max(this._possibleTimeAxisConfigurations.map(function (config) { return config.length; }), 0);
                 this._invalidateLayout();
                 return this;
             };
@@ -4552,9 +4553,9 @@ var Plottable;
             };
             Time.prototype._computeHeight = function () {
                 var textHeight = this._measurer.measure().height;
-                var maximumTiers = Plottable._Util.Methods.max(this._possibleTimeAxisConfigurations.map(function (config) { return config.length; }), 0);
+                console.log('a');
                 this._tierHeights = [];
-                for (var i = 0; i < maximumTiers; i++) {
+                for (var i = 0; i < this._numTiers; i++) {
                     this._tierHeights.push(textHeight + this.tickLabelPadding() + ((this._tierLabelPositions[i]) === "between" ? 0 : this._maxLabelTickLength()));
                 }
                 this._computedHeight = d3.sum(this._tierHeights);
@@ -4588,8 +4589,7 @@ var Plottable;
                 this._tierBaselines = [];
                 this._tickLabelContainer.remove();
                 this._baseline.remove();
-                var numTiers = Plottable._Util.Methods.max(this._possibleTimeAxisConfigurations.map(function (config) { return config.length; }), 0);
-                for (var i = 0; i < numTiers; ++i) {
+                for (var i = 0; i < this._numTiers; ++i) {
                     var tierContainer = this._content.append("g").classed("time-axis-tier", true);
                     this._tierLabelContainers.push(tierContainer.append("g").classed(Axis.AbstractAxis.TICK_LABEL_CLASS + "-container", true));
                     this._tierMarkContainers.push(tierContainer.append("g").classed(Axis.AbstractAxis.TICK_MARK_CLASS + "-container", true));
@@ -4697,8 +4697,7 @@ var Plottable;
                 var _this = this;
                 this._mostPreciseConfigIndex = this._getMostPreciseConfigurationIndex();
                 var tierConfigs = this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex];
-                var numTiers = Plottable._Util.Methods.max(this._possibleTimeAxisConfigurations.map(function (config) { return config.length; }), 0);
-                for (var i = 0; i < numTiers; ++i) {
+                for (var i = 0; i < this._numTiers; ++i) {
                     this._cleanTier(i);
                 }
                 tierConfigs.forEach(function (config, i) { return _this._renderTierLabels(_this._tierLabelContainers[i], config, i); });
@@ -4866,10 +4865,6 @@ var Plottable;
                 ]
             ];
             Time._LONG_DATE = new Date(9999, 8, 29, 12, 59, 9999);
-            /**
-             * Number of possible tiers.
-             */
-            Time._NUM_TIERS = 2;
             return Time;
         })(Axis.AbstractAxis);
         Axis.Time = Time;

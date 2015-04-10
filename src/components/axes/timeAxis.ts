@@ -142,7 +142,7 @@ export module Axis {
     private _tierBaselines: D3.Selection[];
     private _tierHeights: number[];
     private _possibleTimeAxisConfigurations: TimeAxisConfiguration[];
-    private _numTiers: number;;
+    private _numTiers: number;
     private _measurer: SVGTypewriter.Measurers.Measurer;
 
     private _mostPreciseConfigIndex: number;
@@ -240,6 +240,8 @@ export module Axis {
 
     public _computeHeight() {
       var textHeight = this._measurer.measure().height;
+
+      console.log('a');
 
       this._tierHeights = [];
       for (var i = 0; i < this._numTiers; i++) {
