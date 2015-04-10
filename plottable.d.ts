@@ -3109,6 +3109,7 @@ declare module Plottable {
             _hoverOverComponent(p: Point): void;
             _hoverOutComponent(p: Point): void;
             _doHover(p: Point): Interaction.HoverData;
+            protected _getAllPlotData(datasetKeys: string[]): PlotData;
         }
     }
 }

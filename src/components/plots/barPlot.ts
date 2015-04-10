@@ -489,6 +489,26 @@ export module Plot {
       };
     }
     //===== /Hover logic =====
+
+    protected _getAllPlotData(datasetKeys: string[]): PlotData {
+      var plotData = super._getAllPlotData(datasetKeys);
+
+      var valueScale = this._isVertical ? this._yScale : this._xScale;
+      var scaledBaseline = (<Scale.AbstractScale<any, any>> (this._isVertical ? this._yScale : this._xScale)).scale(this.baseline());
+      var isVertical = this._isVertical;
+
+      plotData.selection.each(function (datum, index) {
+        var bar = d3.select(this);
+
+        if (isVertical && +bar.attr("y") + +bar.attr("height") > scaledBaseline) {
+          plotData.pixelPoints[index].y += +bar.attr("height");
+        } else if (!isVertical && +bar.attr("x") < scaledBaseline) {
+          plotData.pixelPoints[index].x -= +bar.attr("width");
+        }
+      });
+
+      return plotData;
+    }
   }
 }
 }

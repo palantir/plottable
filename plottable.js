@@ -7826,6 +7826,23 @@ var Plottable;
                     selection: barsSelection
                 };
             };
+            //===== /Hover logic =====
+            Bar.prototype._getAllPlotData = function (datasetKeys) {
+                var plotData = _super.prototype._getAllPlotData.call(this, datasetKeys);
+                var valueScale = this._isVertical ? this._yScale : this._xScale;
+                var scaledBaseline = (this._isVertical ? this._yScale : this._xScale).scale(this.baseline());
+                var isVertical = this._isVertical;
+                plotData.selection.each(function (datum, index) {
+                    var bar = d3.select(this);
+                    if (isVertical && +bar.attr("y") + +bar.attr("height") > scaledBaseline) {
+                        plotData.pixelPoints[index].y += +bar.attr("height");
+                    }
+                    else if (!isVertical && +bar.attr("x") < scaledBaseline) {
+                        plotData.pixelPoints[index].x -= +bar.attr("width");
+                    }
+                });
+                return plotData;
+            };
             Bar._BarAlignmentToFactor = { "left": 0, "center": 0.5, "right": 1 };
             Bar._DEFAULT_WIDTH = 10;
             Bar._BAR_WIDTH_RATIO = 0.95;
