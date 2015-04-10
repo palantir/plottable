@@ -204,6 +204,10 @@ export module Axis {
       this._possibleTimeAxisConfigurations = configurations;
       this._numTiers = _Util.Methods.max(this._possibleTimeAxisConfigurations.map((config: TimeAxisConfiguration) => config.length), 0);
 
+      if (this._isAnchored) {
+        this._createDomElements();
+      }
+
       var oldLabelPositions: string[] = this.tierLabelPositions();
       var newLabelPositions: string[] = [];
       for (var i = 0; i < this._numTiers; i++) {
@@ -283,6 +287,10 @@ export module Axis {
 
     protected _setup() {
       super._setup();
+      this._createDomElements();
+    }
+
+    private _createDomElements() {
       this._tierLabelContainers = [];
       this._tierMarkContainers = [];
       this._tierBaselines = [];
@@ -298,6 +306,7 @@ export module Axis {
 
       this._measurer = new SVGTypewriter.Measurers.Measurer(this._tierLabelContainers[0]);
     }
+
 
     private _getTickIntervalValues(config: TimeAxisTierConfiguration): any[] {
       return (<Scale.Time> this._scale).tickInterval(config.interval, config.step);
@@ -413,7 +422,7 @@ export module Axis {
       this._mostPreciseConfigIndex = this._getMostPreciseConfigurationIndex();
       var tierConfigs = this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex];
 
-      for (var i = 0; i < this._numTiers; ++i) {
+      for (var i = 0; i < this._tierLabelContainers.length; ++i) {
         this._cleanTier(i);
       }
 

@@ -4525,6 +4525,9 @@ var Plottable;
                 }
                 this._possibleTimeAxisConfigurations = configurations;
                 this._numTiers = Plottable._Util.Methods.max(this._possibleTimeAxisConfigurations.map(function (config) { return config.length; }), 0);
+                if (this._isAnchored) {
+                    this._createDomElements();
+                }
                 var oldLabelPositions = this.tierLabelPositions();
                 var newLabelPositions = [];
                 for (var i = 0; i < this._numTiers; i++) {
@@ -4589,6 +4592,9 @@ var Plottable;
             };
             Time.prototype._setup = function () {
                 _super.prototype._setup.call(this);
+                this._createDomElements();
+            };
+            Time.prototype._createDomElements = function () {
                 this._tierLabelContainers = [];
                 this._tierMarkContainers = [];
                 this._tierBaselines = [];
@@ -4702,7 +4708,7 @@ var Plottable;
                 var _this = this;
                 this._mostPreciseConfigIndex = this._getMostPreciseConfigurationIndex();
                 var tierConfigs = this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex];
-                for (var i = 0; i < this._numTiers; ++i) {
+                for (var i = 0; i < this._tierLabelContainers.length; ++i) {
                     this._cleanTier(i);
                 }
                 tierConfigs.forEach(function (config, i) { return _this._renderTierLabels(_this._tierLabelContainers[i], config, i); });
