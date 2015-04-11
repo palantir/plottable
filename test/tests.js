@@ -3113,6 +3113,20 @@ describe("Plots", function () {
                 assert.lengthOf(bars[0], 0, "no bars have been rendered");
                 svg.remove();
             });
+            it("getAllPlotData() pixel points corrected for negative-valued bars", function () {
+                var plotData = barPlot.getAllPlotData();
+                plotData.data.forEach(function (datum, i) {
+                    var barSelection = d3.select(plotData.selection[0][i]);
+                    var pixelPointY = plotData.pixelPoints[i].y;
+                    if (datum.y < 0) {
+                        assert.strictEqual(pixelPointY, +barSelection.attr("y") + +barSelection.attr("height"), "negative on bottom");
+                    }
+                    else {
+                        assert.strictEqual(pixelPointY, +barSelection.attr("y"), "positive on top");
+                    }
+                });
+                svg.remove();
+            });
         });
         describe("Vertical Bar Plot modified log scale", function () {
             var svg;
@@ -3318,6 +3332,20 @@ describe("Plots", function () {
                 assert.closeTo(numAttr(bar1, "width"), 150, 0.01, "bar1 width");
                 assert.closeTo(numAttr(bar0, "y"), yScale.scale(bar0y) - numAttr(bar0, "height") / 2, 0.01, "bar0 ypos");
                 assert.closeTo(numAttr(bar1, "y"), yScale.scale(bar1y) - numAttr(bar1, "height") / 2, 0.01, "bar1 ypos");
+                svg.remove();
+            });
+            it("getAllPlotData() pixel points corrected for negative-valued bars", function () {
+                var plotData = barPlot.getAllPlotData();
+                plotData.data.forEach(function (datum, i) {
+                    var barSelection = d3.select(plotData.selection[0][i]);
+                    var pixelPointX = plotData.pixelPoints[i].x;
+                    if (datum.x < 0) {
+                        assert.strictEqual(pixelPointX, +barSelection.attr("x"), "negative on left");
+                    }
+                    else {
+                        assert.strictEqual(pixelPointX, +barSelection.attr("x") + +barSelection.attr("width"), "positive on right");
+                    }
+                });
                 svg.remove();
             });
         });
