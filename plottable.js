@@ -4595,6 +4595,7 @@ var Plottable;
                 this._createDomElements();
             };
             Time.prototype._createDomElements = function () {
+                d3.selectAll('.time-axis-tier').remove();
                 this._tierLabelContainers = [];
                 this._tierMarkContainers = [];
                 this._tierBaselines = [];
