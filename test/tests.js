@@ -3127,6 +3127,26 @@ describe("Plots", function () {
                 });
                 svg.remove();
             });
+            it("getAllPlotData() pixel points corrected for barAlignment left", function () {
+                barPlot.barAlignment("left");
+                var plotData = barPlot.getAllPlotData();
+                plotData.data.forEach(function (datum, i) {
+                    var barSelection = d3.select(plotData.selection[0][i]);
+                    var pixelPointX = plotData.pixelPoints[i].x;
+                    assert.strictEqual(pixelPointX, +barSelection.attr("x"), "barAlignment left x correct");
+                });
+                svg.remove();
+            });
+            it("getAllPlotData() pixel points corrected for barAlignment right", function () {
+                barPlot.barAlignment("right");
+                var plotData = barPlot.getAllPlotData();
+                plotData.data.forEach(function (datum, i) {
+                    var barSelection = d3.select(plotData.selection[0][i]);
+                    var pixelPointX = plotData.pixelPoints[i].x;
+                    assert.strictEqual(pixelPointX, +barSelection.attr("x") + +barSelection.attr("width"), "barAlignment right x correct");
+                });
+                svg.remove();
+            });
         });
         describe("Vertical Bar Plot modified log scale", function () {
             var svg;
