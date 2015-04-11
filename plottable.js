@@ -7832,6 +7832,7 @@ var Plottable;
                 var valueScale = this._isVertical ? this._yScale : this._xScale;
                 var scaledBaseline = (this._isVertical ? this._yScale : this._xScale).scale(this.baseline());
                 var isVertical = this._isVertical;
+                var barAlignmentFactor = this._barAlignmentFactor;
                 plotData.selection.each(function (datum, index) {
                     var bar = d3.select(this);
                     if (isVertical && +bar.attr("y") + +bar.attr("height") > scaledBaseline) {
@@ -7839,6 +7840,12 @@ var Plottable;
                     }
                     else if (!isVertical && +bar.attr("x") < scaledBaseline) {
                         plotData.pixelPoints[index].x -= +bar.attr("width");
+                    }
+                    if (isVertical) {
+                        plotData.pixelPoints[index].x = +bar.attr("x") + +bar.attr("width") * barAlignmentFactor;
+                    }
+                    else {
+                        plotData.pixelPoints[index].y = +bar.attr("y") + +bar.attr("height") * barAlignmentFactor;
                     }
                 });
                 return plotData;
