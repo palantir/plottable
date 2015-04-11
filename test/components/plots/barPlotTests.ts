@@ -405,6 +405,28 @@ describe("Plots", () => {
         });
         svg.remove();
       });
+
+      it("getAllPlotData() pixel points corrected for barAlignment left", () => {
+        barPlot.barAlignment("left");
+        var plotData = barPlot.getAllPlotData();
+        plotData.data.forEach((datum, i) => {
+          var barSelection = d3.select(plotData.selection[0][i]);
+          var pixelPointY = plotData.pixelPoints[i].y;
+          assert.strictEqual(pixelPointY, +barSelection.attr("y"), "barAlignment left y correct");
+        });
+        svg.remove();
+      });
+
+      it("getAllPlotData() pixel points corrected for barAlignment right", () => {
+        barPlot.barAlignment("right");
+        var plotData = barPlot.getAllPlotData();
+        plotData.data.forEach((datum, i) => {
+          var barSelection = d3.select(plotData.selection[0][i]);
+          var pixelPointY = plotData.pixelPoints[i].y;
+          assert.strictEqual(pixelPointY, +barSelection.attr("y") + +barSelection.attr("height"), "barAlignment right y correct");
+        });
+        svg.remove();
+      });
     });
 
     describe("Vertical Bar Plot With Bar Labels", () => {
