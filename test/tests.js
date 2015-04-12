@@ -815,6 +815,29 @@ describe("TimeAxis", function () {
         });
         svg.remove();
     });
+    it("if the time only uses one tier, there should be no space left for the second tier", function () {
+        var svg = generateSVG();
+        var xScale = new Plottable.Scale.Time();
+        xScale.domain([new Date("2013-03-23 12:00"), new Date("2013-04-03 0:00")]);
+        var xAxis = new Plottable.Axis.Time(xScale, "bottom");
+        xAxis.gutter(0);
+        xAxis.axisConfigurations([
+            [
+                { interval: d3.time.day, step: 2, formatter: Plottable.Formatters.time("%a %e") }
+            ],
+        ]);
+        xAxis.renderTo(svg);
+        var oneTierSize = xAxis.height();
+        xAxis.axisConfigurations([
+            [
+                { interval: d3.time.day, step: 2, formatter: Plottable.Formatters.time("%a %e") },
+                { interval: d3.time.day, step: 2, formatter: Plottable.Formatters.time("%a %e") }
+            ],
+        ]);
+        var twoTierSize = xAxis.height();
+        assert.strictEqual(twoTierSize, oneTierSize * 2, "two-tier axis is twice as tall as one-tier axis");
+        svg.remove();
+    });
 });
 
 ///<reference path="../testReference.ts" />
@@ -3085,6 +3108,40 @@ describe("Plots", function () {
                 assert.lengthOf(bars[0], 0, "no bars have been rendered");
                 svg.remove();
             });
+            it("getAllPlotData() pixel points corrected for negative-valued bars", function () {
+                var plotData = barPlot.getAllPlotData();
+                plotData.data.forEach(function (datum, i) {
+                    var barSelection = d3.select(plotData.selection[0][i]);
+                    var pixelPointY = plotData.pixelPoints[i].y;
+                    if (datum.y < 0) {
+                        assert.strictEqual(pixelPointY, +barSelection.attr("y") + +barSelection.attr("height"), "negative on bottom");
+                    }
+                    else {
+                        assert.strictEqual(pixelPointY, +barSelection.attr("y"), "positive on top");
+                    }
+                });
+                svg.remove();
+            });
+            it("getAllPlotData() pixel points corrected for barAlignment left", function () {
+                barPlot.barAlignment("left");
+                var plotData = barPlot.getAllPlotData();
+                plotData.data.forEach(function (datum, i) {
+                    var barSelection = d3.select(plotData.selection[0][i]);
+                    var pixelPointX = plotData.pixelPoints[i].x;
+                    assert.strictEqual(pixelPointX, +barSelection.attr("x"), "barAlignment left x correct");
+                });
+                svg.remove();
+            });
+            it("getAllPlotData() pixel points corrected for barAlignment right", function () {
+                barPlot.barAlignment("right");
+                var plotData = barPlot.getAllPlotData();
+                plotData.data.forEach(function (datum, i) {
+                    var barSelection = d3.select(plotData.selection[0][i]);
+                    var pixelPointX = plotData.pixelPoints[i].x;
+                    assert.strictEqual(pixelPointX, +barSelection.attr("x") + +barSelection.attr("width"), "barAlignment right x correct");
+                });
+                svg.remove();
+            });
             it("returns correct closest plot data", function () {
                 var bars = d3.selectAll(".bar-area rect");
                 var zeroY = yScale.scale(0);
@@ -3119,9 +3176,13 @@ describe("Plots", function () {
                 closest = barPlot.getClosestPlotData({ x: d1Px.x, y: d1Px.y - 1 });
                 assert.deepEqual(expected, closest, "if inside a negative bar, it is closest");
                 closest = barPlot.getClosestPlotData({ x: d1Px.x, y: d1Px.y + 1 });
-                assert.equal(expected, closest, "if below a negative bar, it is closest");
+                assert.deepEqual(expected, closest, "if below a negative bar, it is closest");
                 // set the domain such that the first bar is out of view
                 yScale.domain([-2, -0.1]);
+                expected.pixelPoints = [{
+                    x: xScale.scale(d1.x),
+                    y: yScale.scale(d1.y)
+                }];
                 closest = barPlot.getClosestPlotData({ x: d0Px.x, y: zeroY + 1 });
                 assert.deepEqual(expected, closest, "only in-view bars are considered");
                 svg.remove();
@@ -3333,6 +3394,40 @@ describe("Plots", function () {
                 assert.closeTo(numAttr(bar1, "y"), yScale.scale(bar1y) - numAttr(bar1, "height") / 2, 0.01, "bar1 ypos");
                 svg.remove();
             });
+            it("getAllPlotData() pixel points corrected for negative-valued bars", function () {
+                var plotData = barPlot.getAllPlotData();
+                plotData.data.forEach(function (datum, i) {
+                    var barSelection = d3.select(plotData.selection[0][i]);
+                    var pixelPointX = plotData.pixelPoints[i].x;
+                    if (datum.x < 0) {
+                        assert.strictEqual(pixelPointX, +barSelection.attr("x"), "negative on left");
+                    }
+                    else {
+                        assert.strictEqual(pixelPointX, +barSelection.attr("x") + +barSelection.attr("width"), "positive on right");
+                    }
+                });
+                svg.remove();
+            });
+            it("getAllPlotData() pixel points corrected for barAlignment left", function () {
+                barPlot.barAlignment("left");
+                var plotData = barPlot.getAllPlotData();
+                plotData.data.forEach(function (datum, i) {
+                    var barSelection = d3.select(plotData.selection[0][i]);
+                    var pixelPointY = plotData.pixelPoints[i].y;
+                    assert.strictEqual(pixelPointY, +barSelection.attr("y"), "barAlignment left y correct");
+                });
+                svg.remove();
+            });
+            it("getAllPlotData() pixel points corrected for barAlignment right", function () {
+                barPlot.barAlignment("right");
+                var plotData = barPlot.getAllPlotData();
+                plotData.data.forEach(function (datum, i) {
+                    var barSelection = d3.select(plotData.selection[0][i]);
+                    var pixelPointY = plotData.pixelPoints[i].y;
+                    assert.strictEqual(pixelPointY, +barSelection.attr("y") + +barSelection.attr("height"), "barAlignment right y correct");
+                });
+                svg.remove();
+            });
             it("returns correct closest plot data", function () {
                 var bars = d3.selectAll(".bar-area rect");
                 var zeroX = xScale.scale(0);
@@ -3367,9 +3462,13 @@ describe("Plots", function () {
                 closest = barPlot.getClosestPlotData({ x: d1Px.x + 1, y: d1Px.y });
                 assert.deepEqual(expected, closest, "if inside a negative bar, it is closest");
                 closest = barPlot.getClosestPlotData({ x: d1Px.x - 1, y: d1Px.y });
-                assert.equal(expected, closest, "if left of a negative bar, it is closest");
+                assert.deepEqual(expected, closest, "if left of a negative bar, it is closest");
                 // set the domain such that the first bar is out of view
                 xScale.domain([-2, -0.1]);
+                expected.pixelPoints = [{
+                    x: xScale.scale(d1.x),
+                    y: yScale.scale(d1.y)
+                }];
                 closest = barPlot.getClosestPlotData({ x: zeroX - 1, y: d0Px.y });
                 assert.deepEqual(expected, closest, "only in-view bars are considered");
                 svg.remove();
