@@ -6,8 +6,7 @@ export module Behavior {
 
     private _dragInteraction: Interaction.Drag;
     private _scale: Scale.AbstractQuantitative<D>;
-    private _leftBound: D;
-    private _rightBound: D;
+    private _bounds: D[] = [null, null];
     private _verticalPan: boolean;
 
     /**
@@ -36,9 +35,9 @@ export module Behavior {
     public leftBound(newBound: D): Behavior.DragPan<D>;
     public leftBound(newBound?: D): any {
       if (newBound === undefined) {
-        return this._leftBound;
+        return this._bounds[0];
       }
-      this._leftBound = newBound;
+      this._bounds[0] = newBound;
       return this;
     }
 
@@ -46,9 +45,9 @@ export module Behavior {
     public rightBound(newBound: D): Behavior.DragPan<D>;
     public rightBound(newBound?: D): any {
       if (newBound === undefined) {
-        return this._rightBound;
+        return this._bounds[1];
       }
-      this._rightBound = newBound;
+      this._bounds[1] = newBound;
       return this;
     }
 
@@ -60,8 +59,8 @@ export module Behavior {
         var endPointDragValue = this._verticalPan ? endPoint.y : endPoint.x;
         var dragAmount = endPointDragValue - (lastDragValue == null ? startPointDragValue : lastDragValue);
 
-        var leftLimit = this._scale.range()[0] - (this.leftBound() === undefined ? -Infinity : this._scale.scale(this.leftBound()));
-        var rightLimit = this._scale.range()[1] - (this.rightBound() === undefined ? Infinity : this._scale.scale(this.rightBound()));
+        var leftLimit = this._scale.range()[0] - (this.leftBound() == null ? -Infinity : this._scale.scale(this.leftBound()));
+        var rightLimit = this._scale.range()[1] - (this.rightBound() == null ? Infinity : this._scale.scale(this.rightBound()));
 
         if (dragAmount > 0) {
           dragAmount = Math.min(dragAmount, leftLimit);

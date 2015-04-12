@@ -10317,6 +10317,7 @@ var Plottable;
              * @param {boolean} isVertical If the scale operates vertically or horizontally
              */
             function DragPan(scale, isVertical) {
+                this._bounds = [null, null];
                 this._scale = scale;
                 this._dragInteraction = new Plottable.Interaction.Drag();
                 this._setupInteraction(this._dragInteraction);
@@ -10327,16 +10328,16 @@ var Plottable;
             };
             DragPan.prototype.leftBound = function (newBound) {
                 if (newBound === undefined) {
-                    return this._leftBound;
+                    return this._bounds[0];
                 }
-                this._leftBound = newBound;
+                this._bounds[0] = newBound;
                 return this;
             };
             DragPan.prototype.rightBound = function (newBound) {
                 if (newBound === undefined) {
-                    return this._rightBound;
+                    return this._bounds[1];
                 }
-                this._rightBound = newBound;
+                this._bounds[1] = newBound;
                 return this;
             };
             DragPan.prototype._setupInteraction = function (dragInteraction) {
@@ -10346,8 +10347,8 @@ var Plottable;
                     var startPointDragValue = _this._verticalPan ? startPoint.y : startPoint.x;
                     var endPointDragValue = _this._verticalPan ? endPoint.y : endPoint.x;
                     var dragAmount = endPointDragValue - (lastDragValue == null ? startPointDragValue : lastDragValue);
-                    var leftLimit = _this._scale.range()[0] - (_this.leftBound() === undefined ? -Infinity : _this._scale.scale(_this.leftBound()));
-                    var rightLimit = _this._scale.range()[1] - (_this.rightBound() === undefined ? Infinity : _this._scale.scale(_this.rightBound()));
+                    var leftLimit = _this._scale.range()[0] - (_this.leftBound() == null ? -Infinity : _this._scale.scale(_this.leftBound()));
+                    var rightLimit = _this._scale.range()[1] - (_this.rightBound() == null ? Infinity : _this._scale.scale(_this.rightBound()));
                     if (dragAmount > 0) {
                         dragAmount = Math.min(dragAmount, leftLimit);
                     }
