@@ -2,12 +2,12 @@
 
 module Plottable {
 export module Behavior {
-  export class DragPan {
+  export class DragPan<D> {
 
     private _dragInteraction: Interaction.Drag;
-    private _scale: Scale.AbstractQuantitative<any>;
-    private _leftBound: number;
-    private _rightBound: number;
+    private _scale: Scale.AbstractQuantitative<D>;
+    private _leftBound: D;
+    private _rightBound: D;
     private _verticalPan: boolean;
 
     /**
@@ -21,7 +21,7 @@ export module Behavior {
      * @param {Scale.AbstractQuantitative<number>} scale The scale to update on panning
      * @param {boolean} isVertical If the scale operates vertically or horizontally
      */
-    constructor(scale: Scale.AbstractQuantitative<number>, isVertical: boolean) {
+    constructor(scale: Scale.AbstractQuantitative<D>, isVertical: boolean) {
       this._scale = scale;
       this._dragInteraction = new Interaction.Drag();
       this._setupInteraction(this._dragInteraction);
@@ -32,9 +32,9 @@ export module Behavior {
       return this._dragInteraction;
     }
 
-    public leftBound(): number;
-    public leftBound(newBound: number): Behavior.DragPan;
-    public leftBound(newBound?: number): any {
+    public leftBound(): D;
+    public leftBound(newBound: D): Behavior.DragPan<D>;
+    public leftBound(newBound?: D): any {
       if (newBound === undefined) {
         return this._leftBound;
       }
@@ -42,9 +42,9 @@ export module Behavior {
       return this;
     }
 
-    public rightBound(): number;
-    public rightBound(newBound: number): Behavior.DragPan;
-    public rightBound(newBound?: number): any {
+    public rightBound(): D;
+    public rightBound(newBound: D): Behavior.DragPan<D>;
+    public rightBound(newBound?: D): any {
       if (newBound === undefined) {
         return this._rightBound;
       }

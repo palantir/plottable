@@ -4165,7 +4165,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Behavior {
-        class DragPan {
+        class DragPan<D> {
             /**
              * Creates a DragPan Behavior.
              *
@@ -4177,12 +4177,12 @@ declare module Plottable {
              * @param {Scale.AbstractQuantitative<number>} scale The scale to update on panning
              * @param {boolean} isVertical If the scale operates vertically or horizontally
              */
-            constructor(scale: Scale.AbstractQuantitative<number>, isVertical: boolean);
+            constructor(scale: Scale.AbstractQuantitative<D>, isVertical: boolean);
             getInteraction(): Interaction.Drag;
-            leftBound(): number;
-            leftBound(newBound: number): Behavior.DragPan;
-            rightBound(): number;
-            rightBound(newBound: number): Behavior.DragPan;
+            leftBound(): D;
+            leftBound(newBound: D): Behavior.DragPan<D>;
+            rightBound(): D;
+            rightBound(newBound: D): Behavior.DragPan<D>;
         }
     }
 }
