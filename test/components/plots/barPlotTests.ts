@@ -4,6 +4,14 @@ var assert = chai.assert;
 
 describe("Plots", () => {
   describe("Bar Plot", () => {
+    function assertPlotDataEqual(expected: Plottable.Plot.PlotData, actual: Plottable.Plot.PlotData,
+        msg: string) {
+      assert.deepEqual(expected.data, actual.data, msg);
+      assert.closeTo(expected.pixelPoints[0].x, actual.pixelPoints[0].x, 0.01, msg);
+      assert.closeTo(expected.pixelPoints[0].y, actual.pixelPoints[0].y, 0.01, msg);
+      assert.deepEqual(expected.selection, actual.selection, msg);
+    }
+
     describe("Vertical Bar Plot", () => {
       var svg: D3.Selection;
       var dataset: Plottable.Dataset;
@@ -173,16 +181,16 @@ describe("Plots", () => {
         };
 
         var closest = barPlot.getClosestPlotData({ x: d0Px.x, y: d0Px.y + 1 });
-        assert.deepEqual(expected, closest, "if inside a bar, it is closest");
+        assertPlotDataEqual(expected, closest, "if inside a bar, it is closest");
 
         closest = barPlot.getClosestPlotData({ x: d0Px.x, y: d0Px.y - 1 });
-        assert.deepEqual(expected, closest, "if above a positive bar, it is closest");
+        assertPlotDataEqual(expected, closest, "if above a positive bar, it is closest");
 
         closest = barPlot.getClosestPlotData({ x: d0Px.x, y: zeroY + 1 });
-        assert.deepEqual(expected, closest, "if below a positive bar, it is closest");
+        assertPlotDataEqual(expected, closest, "if below a positive bar, it is closest");
 
         closest = barPlot.getClosestPlotData({ x: 0, y: d0Px.y });
-        assert.deepEqual(expected, closest, "if to the right of the first bar, it is closest");
+        assertPlotDataEqual(expected, closest, "if to the right of the first bar, it is closest");
 
         expected = {
           data: [d1],
@@ -191,10 +199,10 @@ describe("Plots", () => {
         };
 
         closest = barPlot.getClosestPlotData({ x: d1Px.x, y: d1Px.y - 1 });
-        assert.deepEqual(expected, closest, "if inside a negative bar, it is closest");
+        assertPlotDataEqual(expected, closest, "if inside a negative bar, it is closest");
 
         closest = barPlot.getClosestPlotData({ x: d1Px.x, y: d1Px.y + 1 });
-        assert.deepEqual(expected, closest, "if below a negative bar, it is closest");
+        assertPlotDataEqual(expected, closest, "if below a negative bar, it is closest");
 
         // set the domain such that the first bar is out of view
         yScale.domain([-2, -0.1]);
@@ -204,7 +212,7 @@ describe("Plots", () => {
         }];
 
         closest = barPlot.getClosestPlotData({ x: d0Px.x, y: zeroY + 1 });
-        assert.deepEqual(expected, closest, "only in-view bars are considered");
+        assertPlotDataEqual(expected, closest, "only in-view bars are considered");
 
         svg.remove();
       });
@@ -508,16 +516,16 @@ describe("Plots", () => {
         };
 
         var closest = barPlot.getClosestPlotData({ x: d0Px.x - 1, y: d0Px.y });
-        assert.deepEqual(expected, closest, "if inside a bar, it is closest");
+        assertPlotDataEqual(expected, closest, "if inside a bar, it is closest");
 
         closest = barPlot.getClosestPlotData({ x: d0Px.x + 1, y: d0Px.y });
-        assert.deepEqual(expected, closest, "if right of a positive bar, it is closest");
+        assertPlotDataEqual(expected, closest, "if right of a positive bar, it is closest");
 
         closest = barPlot.getClosestPlotData({ x: zeroX - 1, y: d0Px.y });
-        assert.deepEqual(expected, closest, "if left of a positive bar, it is closest");
+        assertPlotDataEqual(expected, closest, "if left of a positive bar, it is closest");
 
         closest = barPlot.getClosestPlotData({ x: d0Px.x, y: 0 });
-        assert.deepEqual(expected, closest, "if above the first bar, it is closest");
+        assertPlotDataEqual(expected, closest, "if above the first bar, it is closest");
 
         expected = {
           data: [d1],
@@ -526,10 +534,10 @@ describe("Plots", () => {
         };
 
         closest = barPlot.getClosestPlotData({ x: d1Px.x + 1, y: d1Px.y });
-        assert.deepEqual(expected, closest, "if inside a negative bar, it is closest");
+        assertPlotDataEqual(expected, closest, "if inside a negative bar, it is closest");
 
         closest = barPlot.getClosestPlotData({ x: d1Px.x - 1, y: d1Px.y });
-        assert.deepEqual(expected, closest, "if left of a negative bar, it is closest");
+        assertPlotDataEqual(expected, closest, "if left of a negative bar, it is closest");
 
         // set the domain such that the first bar is out of view
         xScale.domain([-2, -0.1]);
@@ -539,7 +547,7 @@ describe("Plots", () => {
         }];
 
         closest = barPlot.getClosestPlotData({ x: zeroX - 1, y: d0Px.y });
-        assert.deepEqual(expected, closest, "only in-view bars are considered");
+        assertPlotDataEqual(expected, closest, "only in-view bars are considered");
 
         svg.remove();
       });
