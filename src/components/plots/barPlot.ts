@@ -182,10 +182,15 @@ export module Plot {
       var chartYExtent = { min: 0, max: this.height() };
 
       var minDist = Infinity;
-      var closest;
+      var closest: any;
 
-      var dominantAxis = this._isVertical ? "x" : "y";
-      var secondaryAxis = this._isVertical ? "y" : "x";
+      var accessor: { [axis: string]: (p: Point) => number } = {
+        "x": (p) => p.x,
+        "y": (p) => p.y
+      };
+
+      var dominantAxis: string = this._isVertical ? "x" : "y";
+      var secondaryAxis: string = this._isVertical ? "y" : "x";
 
       keys.forEach((key) => {
         var plotData = this.getAllPlotData(key);
@@ -204,7 +209,7 @@ export module Plot {
               // queryPoint is inside of this bar
               dist = -Infinity;
             } else {
-              dist = Math.abs(queryPoint[dominantAxis] - plotPt[dominantAxis]);
+              dist = Math.abs(accessor[dominantAxis](queryPoint) - accessor[dominantAxis](plotPt));
             }
 
             // if we find a closer bar, record its distance and start a new candidate list
@@ -232,11 +237,11 @@ export module Plot {
       if (minDist >= 0) {
         // minDist >= 0 implies we're not inside of any bars
         // so, pick the one we're closest to in the secondary direction
-        var secondaryClosest;
+        var secondaryClosest: any;
         minDist = Infinity;
 
-        closest.forEach((candidate, i) => {
-          var dist = Math.abs(queryPoint[secondaryAxis] - candidate.pixelPoint[secondaryAxis]);
+        closest.forEach((candidate: any, i: number) => {
+          var dist = Math.abs(accessor[secondaryAxis](queryPoint) - accessor[secondaryAxis](candidate.pixelPoint));
 
           if (dist < minDist) {
             secondaryClosest = [];
@@ -251,11 +256,15 @@ export module Plot {
         closest = secondaryClosest;
       }
 
-      var data = [];
-      var pixelPoints = [];
-      var nodes = [];
+//          data: any[];
+//    pixelPoints: Point[];
+//    selection: D3.Selection;
 
-      closest.forEach((c) => {
+      var data: any[] = [];
+      var pixelPoints: Point[] = [];
+      var nodes: Node[] = [];
+
+      closest.forEach((c: any) => {
         data.push(c.datum);
         pixelPoints.push(c.pixelPoint);
         nodes.push(c.node);

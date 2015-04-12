@@ -7563,6 +7563,10 @@ var Plottable;
                 var chartYExtent = { min: 0, max: this.height() };
                 var minDist = Infinity;
                 var closest;
+                var accessor = {
+                    "x": function (p) { return p.x; },
+                    "y": function (p) { return p.y; }
+                };
                 var dominantAxis = this._isVertical ? "x" : "y";
                 var secondaryAxis = this._isVertical ? "y" : "x";
                 keys.forEach(function (key) {
@@ -7580,7 +7584,7 @@ var Plottable;
                                 dist = -Infinity;
                             }
                             else {
-                                dist = Math.abs(queryPoint[dominantAxis] - plotPt[dominantAxis]);
+                                dist = Math.abs(accessor[dominantAxis](queryPoint) - accessor[dominantAxis](plotPt));
                             }
                             // if we find a closer bar, record its distance and start a new candidate list
                             if (dist < minDist) {
@@ -7607,7 +7611,7 @@ var Plottable;
                     var secondaryClosest;
                     minDist = Infinity;
                     closest.forEach(function (candidate, i) {
-                        var dist = Math.abs(queryPoint[secondaryAxis] - candidate.pixelPoint[secondaryAxis]);
+                        var dist = Math.abs(accessor[secondaryAxis](queryPoint) - accessor[secondaryAxis](candidate.pixelPoint));
                         if (dist < minDist) {
                             secondaryClosest = [];
                             minDist = dist;
@@ -7618,6 +7622,9 @@ var Plottable;
                     });
                     closest = secondaryClosest;
                 }
+                //          data: any[];
+                //    pixelPoints: Point[];
+                //    selection: D3.Selection;
                 var data = [];
                 var pixelPoints = [];
                 var nodes = [];
