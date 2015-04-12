@@ -265,7 +265,7 @@ export module Plot {
         data: data,
         pixelPoints: pixelPoints,
         selection: d3.selectAll(nodes)
-      }
+      };
     }
 
     /**

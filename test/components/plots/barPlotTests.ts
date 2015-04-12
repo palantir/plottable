@@ -170,7 +170,7 @@ describe("Plots", () => {
           data: [d0],
           pixelPoints: [d0Px],
           selection: d3.selectAll([bars[0][0]])
-        }
+        };
 
         var closest = barPlot.getClosestPlotData({ x: d0Px.x, y: d0Px.y + 1 });
         assert.deepEqual(expected, closest, "if inside a bar, it is closest");
@@ -188,7 +188,7 @@ describe("Plots", () => {
           data: [d1],
           pixelPoints: [d1Px],
           selection: d3.selectAll([bars[0][1]])
-        }
+        };
 
         closest = barPlot.getClosestPlotData({ x: d1Px.x, y: d1Px.y - 1 });
         assert.deepEqual(expected, closest, "if inside a negative bar, it is closest");
@@ -505,7 +505,7 @@ describe("Plots", () => {
           data: [d0],
           pixelPoints: [d0Px],
           selection: d3.selectAll([bars[0][0]])
-        }
+        };
 
         var closest = barPlot.getClosestPlotData({ x: d0Px.x - 1, y: d0Px.y });
         assert.deepEqual(expected, closest, "if inside a bar, it is closest");
@@ -523,7 +523,7 @@ describe("Plots", () => {
           data: [d1],
           pixelPoints: [d1Px],
           selection: d3.selectAll([bars[0][1]])
-        }
+        };
 
         closest = barPlot.getClosestPlotData({ x: d1Px.x + 1, y: d1Px.y });
         assert.deepEqual(expected, closest, "if inside a negative bar, it is closest");
