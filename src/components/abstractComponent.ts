@@ -423,9 +423,6 @@ export module Component {
 
     public _merge(c: AbstractComponent, below: boolean): Component.Group {
       var cg: Component.Group;
-      if (this._isSetup || this._isAnchored) {
-        throw new Error("Can't presently merge a component that's already been anchored");
-      }
       if (Plottable.Component.Group.prototype.isPrototypeOf(c)) {
         cg = (<Plottable.Component.Group> c);
         cg._addComponent(this, below);
@@ -489,6 +486,11 @@ export module Component {
       this._isAnchored = false;
       this._parent = null;
       return this;
+    }
+
+    public _setParent(parent: AbstractComponent) {
+      this.detach();
+      this._parent = parent;
     }
 
     /**

@@ -3789,9 +3789,6 @@ var Plottable;
             };
             AbstractComponent.prototype._merge = function (c, below) {
                 var cg;
-                if (this._isSetup || this._isAnchored) {
-                    throw new Error("Can't presently merge a component that's already been anchored");
-                }
                 if (Plottable.Component.Group.prototype.isPrototypeOf(c)) {
                     cg = c;
                     cg._addComponent(this, below);
@@ -3853,6 +3850,10 @@ var Plottable;
                 this._isAnchored = false;
                 this._parent = null;
                 return this;
+            };
+            AbstractComponent.prototype._setParent = function (parent) {
+                this.detach();
+                this._parent = parent;
             };
             /**
              * Removes a Component from the DOM and disconnects it from everything it's
@@ -4002,7 +4003,7 @@ var Plottable;
                 else {
                     this.components().push(c);
                 }
-                c._parent = this;
+                c._setParent(this);
                 if (this._isAnchored) {
                     c._anchor(this._content);
                 }
@@ -6118,7 +6119,9 @@ var Plottable;
                 this.classed("table", true);
                 rows.forEach(function (row, rowIndex) {
                     row.forEach(function (component, colIndex) {
-                        _this.addComponent(rowIndex, colIndex, component);
+                        if (component != null) {
+                            _this.addComponent(rowIndex, colIndex, component);
+                        }
                     });
                 });
             }
@@ -6147,7 +6150,6 @@ var Plottable;
             Table.prototype.addComponent = function (row, col, component) {
                 var currentComponent = this._rows[row] && this._rows[row][col];
                 if (currentComponent) {
-                    currentComponent.detach();
                     component = component.above(currentComponent);
                 }
                 if (this._addComponent(component)) {

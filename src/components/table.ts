@@ -51,7 +51,9 @@ export module Component {
       this.classed("table", true);
       rows.forEach((row, rowIndex) => {
         row.forEach((component, colIndex) => {
-          this.addComponent(rowIndex, colIndex, component);
+          if (component != null) {
+            this.addComponent(rowIndex, colIndex, component);
+          }
         });
       });
     }
@@ -79,11 +81,9 @@ export module Component {
      * @returns {Table} The calling Table.
      */
     public addComponent(row: number, col: number, component: AbstractComponent): Table {
-
       var currentComponent = this._rows[row] && this._rows[row][col];
 
       if (currentComponent) {
-        currentComponent.detach();
         component = component.above(currentComponent);
       }
 
