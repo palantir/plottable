@@ -2816,7 +2816,7 @@ declare module Plottable {
                     x: number;
                     y: number;
                 }[];
-                selection: D3.Selection;
+                selection: D3._Selection<any>;
             };
             protected _getClosestPlotData(queryPoint: Point, datasetKeys: string[], withinValue?: number): {
                 data: any[];
@@ -2824,7 +2824,7 @@ declare module Plottable {
                     x: number;
                     y: number;
                 }[];
-                selection: D3.Selection;
+                selection: D3._Selection<any>;
             };
         }
     }
