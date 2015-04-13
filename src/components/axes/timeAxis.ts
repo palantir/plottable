@@ -292,7 +292,7 @@ export module Axis {
 
     private _createDomElements() {
 
-      d3.selectAll('.time-axis-tier').remove();
+      d3.selectAll(".time-axis-tier").remove();
 
       this._tierLabelContainers = [];
       this._tierMarkContainers = [];

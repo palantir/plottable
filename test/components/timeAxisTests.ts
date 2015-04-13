@@ -223,9 +223,6 @@ describe("TimeAxis", () => {
 
     var threeTierAxisHeight: number = xAxis.height();
 
-    console.log(twoTierAxisHeight);
-    console.log(threeTierAxisHeight);
-
     assert.strictEqual(threeTierAxisHeight * 2, twoTierAxisHeight * 3, "two-tier axis is twice as tall as one-tier axis");
 
     svg.remove();
