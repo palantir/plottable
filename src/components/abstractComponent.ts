@@ -488,7 +488,7 @@ export module Component {
       return this;
     }
 
-    public _setParent(parent: AbstractComponent) {
+    public _setParent(parent: AbstractComponentContainer) {
       this.detach();
       this._parent = parent;
     }

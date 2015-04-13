@@ -81,6 +81,7 @@ export module Component {
      * @returns {Table} The calling Table.
      */
     public addComponent(row: number, col: number, component: AbstractComponent): Table {
+
       var currentComponent = this._rows[row] && this._rows[row][col];
 
       if (currentComponent) {
