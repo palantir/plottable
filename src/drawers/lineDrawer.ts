@@ -12,14 +12,14 @@ export module _Drawer {
       this._pathSelection.datum(data);
     }
 
-    public setup(area: D3.Selection) {
-      this._pathSelection = area.append("path")
-                               .classed(Line.LINE_CLASS, true)
-                               .style({
-                                 "fill": "none",
-                                 "vector-effect": "non-scaling-stroke"
-                               });
-      super.setup(area);
+    public setup(renderArea: D3.Selection, boundingBox: D3.Selection) {
+      this._pathSelection = renderArea.append("path")
+                                      .classed(Line.LINE_CLASS, true)
+                                      .style({
+                                        "fill": "none",
+                                        "vector-effect": "non-scaling-stroke"
+                                      });
+      super.setup(renderArea, boundingBox);
     }
 
     private _createLine(xFunction: AppliedProjector, yFunction: AppliedProjector, definedFunction: AppliedProjector) {

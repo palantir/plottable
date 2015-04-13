@@ -28,14 +28,14 @@ export module _Drawer {
       return this;
     }
 
-    public setup(area: D3.Selection) {
-      this._areaSelection = area.append("path")
-                               .classed(Area.AREA_CLASS, true)
-                               .style({ "stroke": "none" });
+    public setup(renderArea: D3.Selection, boundingBox: D3.Selection) {
+      this._areaSelection = renderArea.append("path")
+                                      .classed(Area.AREA_CLASS, true)
+                                      .style({ "stroke": "none" });
       if (this._drawLine) {
-        super.setup(area);
+        super.setup(renderArea, boundingBox);
       } else {
-        AbstractDrawer.prototype.setup.call(this, area);
+        AbstractDrawer.prototype.setup.call(this, renderArea, boundingBox);
       }
     }
 

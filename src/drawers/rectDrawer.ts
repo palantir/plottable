@@ -17,10 +17,10 @@ export module _Drawer {
       this._isVertical = isVertical;
     }
 
-    public setup(area: D3.Selection) {
+    public setup(renderArea: D3.Selection, boundingBox: D3.Selection) {
       // need to put the bars in a seperate container so we can ensure that they don't cover labels
-      super.setup(area.append("g").classed("bar-area", true));
-      this._textArea = area.append("g").classed("bar-label-text-area", true);
+      super.setup(renderArea.append("g").classed("bar-area", true), boundingBox);
+      this._textArea = renderArea.append("g").classed("bar-label-text-area", true);
       this._measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(this._textArea);
       this._writer = new SVGTypewriter.Writers.Writer(this._measurer);
     }

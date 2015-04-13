@@ -44,8 +44,9 @@ export module _Drawer {
         this.key = key;
     }
 
-    public setup(area: D3.Selection) {
-      this._renderArea = area;
+    public setup(renderArea: D3.Selection, boundingBox: D3.Selection) {
+      this._renderArea = renderArea;
+      this._boundingBox = boundingBox;
     }
 
     /**
@@ -55,22 +56,6 @@ export module _Drawer {
       if (this._getRenderArea() != null) {
         this._getRenderArea().remove();
       }
-    }
-
-    /**
-     * Gets the boundingBox associated with a drawer
-     */
-    public boundingBox(): D3.Selection;
-    /**
-     * Registers the boundingBox associated with a drawer
-     */
-    public boundingBox(box: D3.Selection): AbstractDrawer;
-    public boundingBox(box?: D3.Selection): any {
-      if (box == null) {
-        return this._boundingBox;
-      }
-      this._boundingBox = box;
-      return this;
     }
 
     /**
