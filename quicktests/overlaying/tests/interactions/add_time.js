@@ -50,6 +50,6 @@ function run(svg, data, Plottable) {
     ds.data(d);
 
   }
-  var clickInteraction = new Plottable.Interaction.Click().callback(addData);
+  var clickInteraction = new Plottable.Interaction.Click().onClick(addData);
   title.registerInteraction(clickInteraction);
 }

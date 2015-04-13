@@ -23,8 +23,6 @@ function run(svg, data, Plottable) {
 
     //test Component constructor (default, should be no issues)
 
-
-
     var renderAreaD0 = new Plottable.Plot.Line(xScale, yScale).addDataset(dataseries1);
     renderAreaD0.project("x", "x", xScale).project("y", "y", yScale);
     var renderAreaD1 = new Plottable.Plot.Line(xScale, yScale).addDataset(dataseries2)
