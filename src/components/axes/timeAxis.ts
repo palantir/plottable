@@ -211,7 +211,7 @@ export module Axis {
       var oldLabelPositions: string[] = this.tierLabelPositions();
       var newLabelPositions: string[] = [];
       for (var i = 0; i < this._numTiers; i++) {
-        newLabelPositions.push(oldLabelPositions[i] ? oldLabelPositions[i] : "between");
+        newLabelPositions.push(oldLabelPositions[i] || "between");
       }
       this.tierLabelPositions(newLabelPositions);
 
@@ -291,7 +291,6 @@ export module Axis {
     }
 
     private _createDomElements() {
-
       d3.selectAll(".time-axis-tier").remove();
 
       this._tierLabelContainers = [];
@@ -309,7 +308,6 @@ export module Axis {
 
       this._measurer = new SVGTypewriter.Measurers.Measurer(this._tierLabelContainers[0]);
     }
-
 
     private _getTickIntervalValues(config: TimeAxisTierConfiguration): any[] {
       return (<Scale.Time> this._scale).tickInterval(config.interval, config.step);

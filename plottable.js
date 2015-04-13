@@ -4531,7 +4531,7 @@ var Plottable;
                 var oldLabelPositions = this.tierLabelPositions();
                 var newLabelPositions = [];
                 for (var i = 0; i < this._numTiers; i++) {
-                    newLabelPositions.push(oldLabelPositions[i] ? oldLabelPositions[i] : "between");
+                    newLabelPositions.push(oldLabelPositions[i] || "between");
                 }
                 this.tierLabelPositions(newLabelPositions);
                 this._invalidateLayout();
