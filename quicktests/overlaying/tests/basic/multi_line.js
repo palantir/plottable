@@ -54,5 +54,4 @@ function run(svg, data, Plottable) {
 
   basicTable.renderTo(svg);
 
-
 }
