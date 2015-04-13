@@ -1467,6 +1467,7 @@ declare module Plottable {
             animator: Animator.PlotAnimator;
         };
         class AbstractDrawer {
+            protected _boundingBox: D3.Selection;
             protected _className: string;
             key: string;
             protected _attrToProjector: AttributeToAppliedProjector;
@@ -1488,6 +1489,14 @@ declare module Plottable {
              * Removes the Drawer and its renderArea
              */
             remove(): void;
+            /**
+             * Gets the boundingBox associated with a drawer
+             */
+            boundingBox(): D3.Selection;
+            /**
+             * Registers the boundingBox associated with a drawer
+             */
+            boundingBox(box: D3.Selection): AbstractDrawer;
             /**
              * Enter new data to render area and creates binding
              *
@@ -1588,7 +1597,7 @@ declare module Plottable {
             setup(area: D3.Selection): void;
             removeLabels(): void;
             _getIfLabelsTooWide(): boolean;
-            drawText(data: any[], attrToProjector: AttributeToProjector, boundingBox: D3.Selection, userMetadata: any, plotMetadata: Plot.PlotMetadata): void;
+            drawText(data: any[], attrToProjector: AttributeToProjector, userMetadata: any, plotMetadata: Plot.PlotMetadata): void;
             _getPixelPoint(datum: any, index: number): Point;
         }
     }

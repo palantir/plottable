@@ -2858,6 +2858,13 @@ var Plottable;
                     this._getRenderArea().remove();
                 }
             };
+            AbstractDrawer.prototype.boundingBox = function (box) {
+                if (box == null) {
+                    return this._boundingBox;
+                }
+                this._boundingBox = box;
+                return this;
+            };
             /**
              * Enter new data to render area and creates binding
              *
@@ -3212,7 +3219,7 @@ var Plottable;
             Rect.prototype._getIfLabelsTooWide = function () {
                 return this._labelsTooWide;
             };
-            Rect.prototype.drawText = function (data, attrToProjector, boundingBox, userMetadata, plotMetadata) {
+            Rect.prototype.drawText = function (data, attrToProjector, userMetadata, plotMetadata) {
                 var _this = this;
                 var labelTooWide = data.map(function (d, i) {
                     var text = attrToProjector["label"](d, i, userMetadata, plotMetadata).toString();
@@ -3240,7 +3247,7 @@ var Plottable;
                         else {
                             x += offset;
                         }
-                        var isHidden = (x < 0 || x + w / 2 >= boundingBox.attr("width"));
+                        var isHidden = (x < 0 || x + w / 2 >= _this._boundingBox.attr("width"));
                         var g = _this._textArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
                         var className = dark ? "dark-label" : "light-label";
                         g.classed(className, true);
@@ -6447,7 +6454,10 @@ var Plottable;
                 _super.prototype._setup.call(this);
                 this._renderArea = this._content.append("g").classed("render-area", true);
                 // HACKHACK on 591
-                this._getDrawersInOrder().forEach(function (d) { return d.setup(_this._renderArea.append("g")); });
+                this._getDrawersInOrder().forEach(function (d) {
+                    d.setup(_this._renderArea.append("g"));
+                    d.boundingBox(_this._boundingBox);
+                });
             };
             AbstractPlot.prototype.remove = function () {
                 var _this = this;
@@ -7661,7 +7671,7 @@ var Plottable;
                 var drawers = this._getDrawersInOrder();
                 var attrToProjector = this._generateAttrToProjector();
                 var dataToDraw = this._getDataToDraw();
-                this._datasetKeysInOrder.forEach(function (k, i) { return drawers[i].drawText(dataToDraw.get(k), attrToProjector, _this._boundingBox, _this._key2PlotDatasetKey.get(k).dataset.metadata(), _this._key2PlotDatasetKey.get(k).plotMetadata); });
+                this._datasetKeysInOrder.forEach(function (k, i) { return drawers[i].drawText(dataToDraw.get(k), attrToProjector, _this._key2PlotDatasetKey.get(k).dataset.metadata(), _this._key2PlotDatasetKey.get(k).plotMetadata); });
                 if (this._hideBarsIfAnyAreTooWide && drawers.some(function (d) { return d._getIfLabelsTooWide(); })) {
                     drawers.forEach(function (d) { return d.removeLabels(); });
                 }

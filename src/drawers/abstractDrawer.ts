@@ -19,6 +19,7 @@ export module _Drawer {
 
   export class AbstractDrawer {
     private _renderArea: D3.Selection;
+    protected _boundingBox: D3.Selection;
     protected _className: string;
     public key: string;
     protected _attrToProjector: AttributeToAppliedProjector;
@@ -54,6 +55,22 @@ export module _Drawer {
       if (this._getRenderArea() != null) {
         this._getRenderArea().remove();
       }
+    }
+
+    /**
+     * Gets the boundingBox associated with a drawer
+     */
+    public boundingBox(): D3.Selection;
+    /**
+     * Registers the boundingBox associated with a drawer
+     */
+    public boundingBox(box: D3.Selection): AbstractDrawer;
+    public boundingBox(box?: D3.Selection): any {
+      if (box == null) {
+        return this._boundingBox;
+      }
+      this._boundingBox = box;
+      return this;
     }
 
     /**

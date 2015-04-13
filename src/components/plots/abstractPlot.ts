@@ -66,7 +66,10 @@ export module Plot {
       super._setup();
       this._renderArea = this._content.append("g").classed("render-area", true);
       // HACKHACK on 591
-      this._getDrawersInOrder().forEach((d) => d.setup(this._renderArea.append("g")));
+      this._getDrawersInOrder().forEach((d) => {
+        d.setup(this._renderArea.append("g"));
+        d.boundingBox(this._boundingBox);
+      });
     }
 
     public remove() {

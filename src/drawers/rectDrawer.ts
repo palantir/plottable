@@ -33,8 +33,7 @@ export module _Drawer {
       return this._labelsTooWide;
     }
 
-    public drawText(data: any[], attrToProjector: AttributeToProjector, boundingBox: D3.Selection, userMetadata: any,
-        plotMetadata: Plot.PlotMetadata) {
+    public drawText(data: any[], attrToProjector: AttributeToProjector, userMetadata: any, plotMetadata: Plot.PlotMetadata) {
       var labelTooWide: boolean[] = data.map((d, i) => {
         var text = attrToProjector["label"](d, i, userMetadata, plotMetadata).toString();
         var w = attrToProjector["width"](d, i, userMetadata, plotMetadata);
@@ -60,7 +59,7 @@ export module _Drawer {
             x += offset;
           }
 
-          var isHidden = (x < 0 || x + w / 2 >= boundingBox.attr("width"));
+          var isHidden = (x < 0 || x + w / 2 >= this._boundingBox.attr("width"));
 
           var g = this._textArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
           var className = dark ? "dark-label" : "light-label";
