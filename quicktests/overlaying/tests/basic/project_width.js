@@ -58,10 +58,6 @@ function run(svg, data, Plottable) {
     barRenderer.attr("width", widthPicker);
   }
 
-  addLabel.registerInteraction(
-    new Plottable.Interaction.Click().callback(addBar)
-  );
-  removeLabel.registerInteraction(
-    new Plottable.Interaction.Click().callback(removeBar)
-  );
+  addLabel.registerInteraction(new Plottable.Interaction.Click().onClick(addBar));
+  removeLabel.registerInteraction(new Plottable.Interaction.Click().onClick(removeBar));
 }
