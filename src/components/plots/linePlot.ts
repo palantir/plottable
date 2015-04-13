@@ -95,34 +95,6 @@ export module Plot {
       return ["x", "y"];
     }
 
-    protected _getClosestPlotData(queryPoint: Point, datasetKeys: string[], withinValue = Infinity) {
-      var closestDistanceSquared = withinValue;
-      var closestDatum: any;
-      var closestSelection: D3.Selection;
-      var closestPoint: Point;
-
-      datasetKeys.forEach((datasetKey: string) => {
-        var plotData = this.getAllPlotData(datasetKey);
-        plotData.pixelPoints.forEach((pixelPoint: Point, index: number) => {
-          var pixelPointDist = _Util.Methods.distanceSquared(queryPoint, pixelPoint);
-          if (pixelPointDist < closestDistanceSquared) {
-            closestDistanceSquared = pixelPointDist;
-            closestDatum = plotData.data[index];
-            closestPoint = pixelPoint;
-            closestSelection = plotData.selection;
-          }
-        });
-      });
-
-      if (closestDatum == null) {
-        return {data: [], pixelPoints: [], selection: d3.select()};
-      }
-
-      return {data: [closestDatum],
-              pixelPoints: [closestPoint],
-              selection: closestSelection};
-    }
-
     protected _getClosestWithinRange(p: Point, range: number) {
       var attrToProjector = this._generateAttrToProjector();
       var xProjector = attrToProjector["x"];
@@ -180,6 +152,36 @@ export module Plot {
       });
 
       return { data: data, pixelPoints: pixelPoints, selection: d3.selectAll(allElements) };
+    }
+
+    public getClosestPlotData(queryPoint: Point): PlotData {
+      var closestDistanceSquared = Infinity;
+      var closestDatum: any;
+      var closestSelection: D3.Selection;
+      var closestPoint: Point;
+
+      this.datasetOrder().forEach((datasetKey: string) => {
+        var plotData = this.getAllPlotData(datasetKey);
+        plotData.pixelPoints.forEach((pixelPoint: Point, index: number) => {
+          var pixelPointDist = _Util.Methods.distanceSquared(queryPoint, pixelPoint);
+          if (pixelPointDist < closestDistanceSquared) {
+            closestDistanceSquared = pixelPointDist;
+            closestDatum = plotData.data[index];
+            closestPoint = pixelPoint;
+            closestSelection = plotData.selection;
+          }
+        });
+      });
+
+      if (closestDatum == null) {
+        return { data: [], pixelPoints: [], selection: d3.select() };
+      }
+
+      return {
+        data: [closestDatum],
+        pixelPoints: [closestPoint],
+        selection: closestSelection
+      };
     }
 
     //===== Hover logic =====

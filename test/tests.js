@@ -2184,11 +2184,6 @@ describe("Plots", function () {
             var queryPoint = { x: 1, y: 11 };
             var closestPlotData = plot.getClosestPlotData(queryPoint);
             assert.deepEqual(closestPlotData.pixelPoints, [{ x: 1, y: 10 }], "retrieves the closest point across datasets");
-            closestPlotData = plot.getClosestPlotData(queryPoint, Infinity, "ds1");
-            assert.deepEqual(closestPlotData.pixelPoints, [{ x: 1, y: 100 }], "retrieves the closest point for a certain dataset");
-            queryPoint = { x: 1, y: 500 };
-            closestPlotData = plot.getClosestPlotData(queryPoint, 100);
-            assert.deepEqual(closestPlotData.pixelPoints, [], "retrieves no points if points are outside within value");
             svg.remove();
         });
         describe("Dataset removal", function () {
