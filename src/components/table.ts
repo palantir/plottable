@@ -163,23 +163,38 @@ export module Component {
       var nIterations = 0;
       while (true) {
         var offeredHeights = _Util.Methods.addArrays(guaranteedHeights, rowProportionalSpace);
-        var offeredWidths  = _Util.Methods.addArrays(guaranteedWidths,  colProportionalSpace);
+        var offeredWidths  = _Util.Methods.addArrays(guaranteedWidths, colProportionalSpace);
         var guarantees = this._determineGuarantees(offeredWidths, offeredHeights);
         guaranteedWidths = guarantees.guaranteedWidths;
         guaranteedHeights = guarantees.guaranteedHeights;
         var wantsWidth  = guarantees.wantsWidthArr .some((x: boolean) => x);
         var wantsHeight = guarantees.wantsHeightArr.some((x: boolean) => x);
 
-        var lastFreeWidth  = freeWidth ;
+        var lastFreeWidth  = freeWidth;
         var lastFreeHeight = freeHeight;
         freeWidth  = availableWidthAfterPadding  - d3.sum(guarantees.guaranteedWidths );
         freeHeight = availableHeightAfterPadding - d3.sum(guarantees.guaranteedHeights);
+
         var xWeights: number[];
         if (wantsWidth) { // If something wants width, divide free space between components that want more width
           xWeights = guarantees.wantsWidthArr.map((x) => x ? 0.1 : 0);
           xWeights = _Util.Methods.addArrays(xWeights, colWeights);
-        } else { // Otherwise, divide free space according to the weights
-          xWeights = colWeights;
+        } else {
+          if (d3.sum(colWeights) / colWeights.length !== colWeights[0] ||
+              d3.sum(colWeights) === 0) {
+            // Use colWeights if weights are not equal OR weights are all set to zero (fixed-width)
+            xWeights = colWeights;
+          } else {
+            // If they are all equal, divide free space to make components as equal as possible
+            xWeights = colWeights;
+            var xWeightMax = _Util.Methods.max(guaranteedWidths, 0);
+            var freeAdjustedWidth = freeWidth;
+            xWeights = guaranteedWidths.map((w) => {
+              freeAdjustedWidth -= (xWeightMax - w);
+              return xWeightMax - w;
+            });
+            xWeights = xWeights.map((w) => w + freeAdjustedWidth / xWeights.length);
+          }
         }
 
         var yWeights: number[];
@@ -187,7 +202,20 @@ export module Component {
           yWeights = guarantees.wantsHeightArr.map((x) => x ? 0.1 : 0);
           yWeights = _Util.Methods.addArrays(yWeights, rowWeights);
         } else {
-          yWeights = rowWeights;
+          if (d3.sum(rowWeights) / rowWeights.length !== rowWeights[0] ||
+              d3.sum(rowWeights) === 0) {
+            // If weights are all not equal, use rowWeights
+            yWeights = rowWeights;
+          } else {
+            // If they are all equal, divide free space to make components as equal as possible
+            var yWeightMax = _Util.Methods.max(guaranteedHeights, 0);
+            var freeAdjustedHeight = freeHeight;
+            yWeights = guaranteedHeights.map((h) => {
+              freeAdjustedHeight -= (yWeightMax - h);
+              return yWeightMax - h;
+            });
+            yWeights = yWeights.map((h) => h + freeAdjustedHeight / yWeights.length);
+          }
         }
 
         colProportionalSpace = Table._calcProportionalSpace(xWeights, freeWidth );
@@ -197,20 +225,10 @@ export module Component {
         var canImproveWidthAllocation  = freeWidth  > 0 && freeWidth  !== lastFreeWidth;
         var canImproveHeightAllocation = freeHeight > 0 && freeHeight !== lastFreeHeight;
 
-        if (!(canImproveWidthAllocation || canImproveHeightAllocation)) {
-          break;
-        }
-
-        if (nIterations > 5) {
+        if (!(canImproveWidthAllocation || canImproveHeightAllocation) || nIterations > 5) {
           break;
         }
       }
-
-      // Redo the proportional space one last time, to ensure we use the real weights not the wantsWidth/Height weights
-      freeWidth  = availableWidthAfterPadding  - d3.sum(guarantees.guaranteedWidths );
-      freeHeight = availableHeightAfterPadding - d3.sum(guarantees.guaranteedHeights);
-      colProportionalSpace = Table._calcProportionalSpace(colWeights, freeWidth );
-      rowProportionalSpace = Table._calcProportionalSpace(rowWeights, freeHeight);
 
       return {colProportionalSpace: colProportionalSpace        ,
               rowProportionalSpace: rowProportionalSpace        ,
