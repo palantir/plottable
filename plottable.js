@@ -6823,10 +6823,10 @@ var Plottable;
                 return { data: data, pixelPoints: pixelPoints, selection: d3.selectAll(allElements) };
             };
             /**
-             * Retrieves the closest PlotData across all datasets, where distance is defined to be
-             * the Euclidiean norm.
+             * Retrieves PlotData with the lowest distance, where distance is defined
+             * to be the Euclidiean norm.
              *
-             * @param {Point} queryPoint The point to which dataset points should be compared
+             * @param {Point} queryPoint The point to which plot data should be compared
              *
              * @returns {PlotData} The PlotData closest to queryPoint
              */
@@ -8084,8 +8084,7 @@ var Plottable;
                 var closestDatum;
                 var closestSelection;
                 var closestPoint;
-                var datasetKeys = this.datasetOrder();
-                datasetKeys.forEach(function (datasetKey) {
+                this.datasetOrder().forEach(function (datasetKey) {
                     var plotData = _this.getAllPlotData(datasetKey);
                     plotData.pixelPoints.forEach(function (pixelPoint, index) {
                         var pixelPointDist = Plottable._Util.Methods.distanceSquared(queryPoint, pixelPoint);

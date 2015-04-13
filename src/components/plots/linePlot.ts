@@ -159,9 +159,8 @@ export module Plot {
       var closestDatum: any;
       var closestSelection: D3.Selection;
       var closestPoint: Point;
-      var datasetKeys = this.datasetOrder();
 
-      datasetKeys.forEach((datasetKey: string) => {
+      this.datasetOrder().forEach((datasetKey: string) => {
         var plotData = this.getAllPlotData(datasetKey);
         plotData.pixelPoints.forEach((pixelPoint: Point, index: number) => {
           var pixelPointDist = _Util.Methods.distanceSquared(queryPoint, pixelPoint);
