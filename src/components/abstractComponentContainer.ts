@@ -36,7 +36,7 @@ export module Component {
       } else {
         this.components().push(c);
       }
-      c._setParent(this);
+      c._parent(this);
       if (this._isAnchored) {
         c._anchor(this._content);
       }

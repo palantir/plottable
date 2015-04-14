@@ -204,7 +204,7 @@ describe("ComponentGroups", () => {
 
       chart.renderTo(svg);
 
-      assert.strictEqual(label._parent, (<any> chart)._rows[1][1],
+      assert.strictEqual((<any> label)._parent, (<any> chart)._rows[1][1],
         "label's parent before moving should be the table cell [1][1]"
       );
 
@@ -220,7 +220,7 @@ describe("ComponentGroups", () => {
           "xAxis should be a group that contains 1 elements now (label and axis)");
       }
 
-      assert.strictEqual(label._parent, (<any> chart)._rows[0][0],
+      assert.strictEqual((<any> label)._parent, (<any> chart)._rows[0][0],
         "label's parent after moving should be the table cell [0][0]"
       );
 

@@ -12,7 +12,7 @@ export module Component {
     private _xOrigin: number; // Origin of the coordinate space for the component. Passed down from parent
     private _yOrigin: number;
 
-    public _parent: AbstractComponentContainer;
+    private _parentElement: AbstractComponentContainer;
     private _xAlignProportion = 0; // What % along the free space do we want to position (0 = left, .5 = center, 1 = right)
     private _yAlignProportion = 0;
     protected _fixedHeightFlag = false;
@@ -182,7 +182,7 @@ export module Component {
         if (this._isTopLevelComponent) {
           this._scheduleComputeLayout();
         } else {
-          this._parent._invalidateLayout();
+          this._parent()._invalidateLayout();
         }
       }
     }
@@ -480,17 +480,26 @@ export module Component {
       if (this._isAnchored) {
         this._element.remove();
       }
-      if (this._parent != null) {
-        this._parent._removeComponent(this);
+
+      var parent: AbstractComponentContainer = this._parent();
+
+      if (parent != null) {
+        parent._removeComponent(this);
       }
       this._isAnchored = false;
-      this._parent = null;
+      this._parentElement = null;
       return this;
     }
 
-    public _setParent(parent: AbstractComponentContainer) {
+    public _parent(): AbstractComponentContainer;
+    public _parent(parentElement: AbstractComponentContainer): any;
+    public _parent(parentElement?: AbstractComponentContainer): any {
+      if (parentElement === undefined) {
+        return this._parentElement;
+      }
+
       this.detach();
-      this._parent = parent;
+      this._parentElement = parentElement;
     }
 
     /**
@@ -539,12 +548,12 @@ export module Component {
      */
     public originToSVG(): Point {
       var origin = this.origin();
-      var ancestor = this._parent;
+      var ancestor = this._parent();
       while (ancestor != null) {
         var ancestorOrigin = ancestor.origin();
         origin.x += ancestorOrigin.x;
         origin.y += ancestorOrigin.y;
-        ancestor = ancestor._parent;
+        ancestor = ancestor._parent();
       }
       return origin;
     }

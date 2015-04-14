@@ -3563,7 +3563,7 @@ var Plottable;
                         this._scheduleComputeLayout();
                     }
                     else {
-                        this._parent._invalidateLayout();
+                        this._parent()._invalidateLayout();
                     }
                 }
             };
@@ -3844,16 +3844,20 @@ var Plottable;
                 if (this._isAnchored) {
                     this._element.remove();
                 }
-                if (this._parent != null) {
-                    this._parent._removeComponent(this);
+                var parent = this._parent();
+                if (parent != null) {
+                    parent._removeComponent(this);
                 }
                 this._isAnchored = false;
-                this._parent = null;
+                this._parentElement = null;
                 return this;
             };
-            AbstractComponent.prototype._setParent = function (parent) {
+            AbstractComponent.prototype._parent = function (parentElement) {
+                if (parentElement === undefined) {
+                    return this._parentElement;
+                }
                 this.detach();
-                this._parent = parent;
+                this._parentElement = parentElement;
             };
             /**
              * Removes a Component from the DOM and disconnects it from everything it's
@@ -3897,12 +3901,12 @@ var Plottable;
              */
             AbstractComponent.prototype.originToSVG = function () {
                 var origin = this.origin();
-                var ancestor = this._parent;
+                var ancestor = this._parent();
                 while (ancestor != null) {
                     var ancestorOrigin = ancestor.origin();
                     origin.x += ancestorOrigin.x;
                     origin.y += ancestorOrigin.y;
-                    ancestor = ancestor._parent;
+                    ancestor = ancestor._parent();
                 }
                 return origin;
             };
@@ -4003,7 +4007,7 @@ var Plottable;
                 else {
                     this.components().push(c);
                 }
-                c._setParent(this);
+                c._parent(this);
                 if (this._isAnchored) {
                     c._anchor(this._content);
                 }
