@@ -60,7 +60,7 @@ export module Scale {
 
     private static _getPlottableColors(): string[] {
       var plottableDefaultColors: string[] = [];
-      var colorTester = d3.select("body").append("plottable_color_testing");
+      var colorTester = d3.select("body").append("plottable-color-tester");
       var i = 0;
       var colorHex: string;
       while ((colorHex = _Util.Methods.colorTest(colorTester, "plottable-colors-" + i)) !== null) {
