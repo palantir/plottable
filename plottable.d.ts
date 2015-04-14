@@ -4165,24 +4165,48 @@ declare module Plottable {
 
 declare module Plottable {
     module Behavior {
-        class DragPan<D> {
-            /**
-             * Creates a DragPan Behavior.
-             *
-             * This behavior allows a consumer of Plottable to drag around in a component
-             * in order to cause the input scale to translate,
-             * resulting in a panning behavior to the consumer.
-             *
-             * @constructor
-             * @param {Scale.AbstractQuantitative<number>} scale The scale to update on panning
-             * @param {boolean} isVertical If the scale operates vertically or horizontally
-             */
-            constructor(scale: Scale.AbstractQuantitative<D>, isVertical: boolean);
-            getInteraction(): Interaction.Drag;
-            leftBound(): D;
-            leftBound(newBound: D): Behavior.DragPan<D>;
-            rightBound(): D;
-            rightBound(newBound: D): Behavior.DragPan<D>;
+        module Pan {
+            class AbstractPan<D> {
+                protected _scale: Scale.AbstractQuantitative<D>;
+                protected _verticalPan: boolean;
+                /**
+                 * Creates a DragPan Behavior.
+                 *
+                 * This behavior allows a consumer of Plottable to drag around in a component
+                 * in order to cause the input scale to translate,
+                 * resulting in a panning behavior to the consumer.
+                 *
+                 * @constructor
+                 * @param {Scale.AbstractQuantitative<number>} scale The scale to update on panning
+                 * @param {boolean} isVertical If the scale operates vertically or horizontally
+                 */
+                constructor(scale: Scale.AbstractQuantitative<D>, isVertical: boolean);
+                bounds(): D[];
+                bounds(newBounds: D[]): Behavior.Pan.AbstractPan<D>;
+            }
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Behavior {
+        module Pan {
+            class DragPan<D> extends AbstractPan<D> {
+                /**
+                 * Creates a DragPan Behavior.
+                 *
+                 * This behavior allows a consumer of Plottable to drag around in a component
+                 * in order to cause the input scale to translate,
+                 * resulting in a panning behavior to the consumer.
+                 *
+                 * @constructor
+                 * @param {Scale.AbstractQuantitative<number>} scale The scale to update on panning
+                 * @param {boolean} isVertical If the scale operates vertically or horizontally
+                 */
+                constructor(scale: Scale.AbstractQuantitative<D>, isVertical: boolean);
+                getInteraction(): Interaction.Drag;
+            }
         }
     }
 }

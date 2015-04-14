@@ -2,12 +2,10 @@
 
 module Plottable {
 export module Behavior {
-  export class DragPan<D> {
+export module Pan {
+  export class DragPan<D> extends AbstractPan<D> {
 
     private _dragInteraction: Interaction.Drag;
-    private _scale: Scale.AbstractQuantitative<D>;
-    private _bounds: D[] = [null, null];
-    private _verticalPan: boolean;
 
     /**
      * Creates a DragPan Behavior.
@@ -21,46 +19,25 @@ export module Behavior {
      * @param {boolean} isVertical If the scale operates vertically or horizontally
      */
     constructor(scale: Scale.AbstractQuantitative<D>, isVertical: boolean) {
-      this._scale = scale;
+      super(scale, isVertical);
       this._dragInteraction = new Interaction.Drag();
-      this._setupInteraction(this._dragInteraction);
-      this._verticalPan = isVertical;
+      this._setupInteraction();
     }
 
-    public getInteraction(): Interaction.Drag {
+    public getDragInteraction(): Interaction.Drag {
       return this._dragInteraction;
     }
 
-    public leftBound(): D;
-    public leftBound(newBound: D): Behavior.DragPan<D>;
-    public leftBound(newBound?: D): any {
-      if (newBound === undefined) {
-        return this._bounds[0];
-      }
-      this._bounds[0] = newBound;
-      return this;
-    }
-
-    public rightBound(): D;
-    public rightBound(newBound: D): Behavior.DragPan<D>;
-    public rightBound(newBound?: D): any {
-      if (newBound === undefined) {
-        return this._bounds[1];
-      }
-      this._bounds[1] = newBound;
-      return this;
-    }
-
-    private _setupInteraction(dragInteraction: Interaction.Drag) {
+    private _setupInteraction() {
       var lastDragValue: number;
 
-      dragInteraction.drag((startPoint: Point, endPoint: Point) => {
+      this._dragInteraction.drag((startPoint: Point, endPoint: Point) => {
         var startPointDragValue = this._verticalPan ? startPoint.y : startPoint.x;
         var endPointDragValue = this._verticalPan ? endPoint.y : endPoint.x;
         var dragAmount = endPointDragValue - (lastDragValue == null ? startPointDragValue : lastDragValue);
 
-        var leftLimit = this._scale.range()[0] - (this.leftBound() == null ? -Infinity : this._scale.scale(this.leftBound()));
-        var rightLimit = this._scale.range()[1] - (this.rightBound() == null ? Infinity : this._scale.scale(this.rightBound()));
+        var leftLimit = this._scale.range()[0] - (this.bounds()[0] == null ? -Infinity : this._scale.scale(this.bounds()[0]));
+        var rightLimit = this._scale.range()[1] - (this.bounds()[1] == null ? Infinity : this._scale.scale(this.bounds()[1]));
 
         if (dragAmount > 0) {
           dragAmount = Math.min(dragAmount, leftLimit);
@@ -72,8 +49,9 @@ export module Behavior {
         lastDragValue = endPointDragValue;
       });
 
-      dragInteraction.dragend(() => lastDragValue = null);
+      this._dragInteraction.dragend(() => lastDragValue = null);
     }
   }
+}
 }
 }

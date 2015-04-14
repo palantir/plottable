@@ -10304,65 +10304,97 @@ var Plottable;
 (function (Plottable) {
     var Behavior;
     (function (Behavior) {
-        var DragPan = (function () {
-            /**
-             * Creates a DragPan Behavior.
-             *
-             * This behavior allows a consumer of Plottable to drag around in a component
-             * in order to cause the input scale to translate,
-             * resulting in a panning behavior to the consumer.
-             *
-             * @constructor
-             * @param {Scale.AbstractQuantitative<number>} scale The scale to update on panning
-             * @param {boolean} isVertical If the scale operates vertically or horizontally
-             */
-            function DragPan(scale, isVertical) {
-                this._bounds = [null, null];
-                this._scale = scale;
-                this._dragInteraction = new Plottable.Interaction.Drag();
-                this._setupInteraction(this._dragInteraction);
-                this._verticalPan = isVertical;
-            }
-            DragPan.prototype.getInteraction = function () {
-                return this._dragInteraction;
-            };
-            DragPan.prototype.leftBound = function (newBound) {
-                if (newBound === undefined) {
-                    return this._bounds[0];
+        var Pan;
+        (function (Pan) {
+            var AbstractPan = (function () {
+                /**
+                 * Creates a DragPan Behavior.
+                 *
+                 * This behavior allows a consumer of Plottable to drag around in a component
+                 * in order to cause the input scale to translate,
+                 * resulting in a panning behavior to the consumer.
+                 *
+                 * @constructor
+                 * @param {Scale.AbstractQuantitative<number>} scale The scale to update on panning
+                 * @param {boolean} isVertical If the scale operates vertically or horizontally
+                 */
+                function AbstractPan(scale, isVertical) {
+                    this._panBounds = [null, null];
+                    this._scale = scale;
+                    this._verticalPan = isVertical;
                 }
-                this._bounds[0] = newBound;
-                return this;
-            };
-            DragPan.prototype.rightBound = function (newBound) {
-                if (newBound === undefined) {
-                    return this._bounds[1];
+                AbstractPan.prototype.bounds = function (newBounds) {
+                    if (newBounds == null) {
+                        return this._panBounds;
+                    }
+                    this._panBounds = newBounds;
+                    return this;
+                };
+                return AbstractPan;
+            })();
+            Pan.AbstractPan = AbstractPan;
+        })(Pan = Behavior.Pan || (Behavior.Pan = {}));
+    })(Behavior = Plottable.Behavior || (Plottable.Behavior = {}));
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    var Behavior;
+    (function (Behavior) {
+        var Pan;
+        (function (Pan) {
+            var DragPan = (function (_super) {
+                __extends(DragPan, _super);
+                /**
+                 * Creates a DragPan Behavior.
+                 *
+                 * This behavior allows a consumer of Plottable to drag around in a component
+                 * in order to cause the input scale to translate,
+                 * resulting in a panning behavior to the consumer.
+                 *
+                 * @constructor
+                 * @param {Scale.AbstractQuantitative<number>} scale The scale to update on panning
+                 * @param {boolean} isVertical If the scale operates vertically or horizontally
+                 */
+                function DragPan(scale, isVertical) {
+                    _super.call(this, scale, isVertical);
+                    this._dragInteraction = new Plottable.Interaction.Drag();
+                    this._setupInteraction();
                 }
-                this._bounds[1] = newBound;
-                return this;
-            };
-            DragPan.prototype._setupInteraction = function (dragInteraction) {
-                var _this = this;
-                var lastDragValue;
-                dragInteraction.drag(function (startPoint, endPoint) {
-                    var startPointDragValue = _this._verticalPan ? startPoint.y : startPoint.x;
-                    var endPointDragValue = _this._verticalPan ? endPoint.y : endPoint.x;
-                    var dragAmount = endPointDragValue - (lastDragValue == null ? startPointDragValue : lastDragValue);
-                    var leftLimit = _this._scale.range()[0] - (_this.leftBound() == null ? -Infinity : _this._scale.scale(_this.leftBound()));
-                    var rightLimit = _this._scale.range()[1] - (_this.rightBound() == null ? Infinity : _this._scale.scale(_this.rightBound()));
-                    if (dragAmount > 0) {
-                        dragAmount = Math.min(dragAmount, leftLimit);
-                    }
-                    else {
-                        dragAmount = Math.max(dragAmount, rightLimit);
-                    }
-                    _this._scale.domain(Plottable.ScaleDomainTransformers.translate(_this._scale, -dragAmount));
-                    lastDragValue = endPointDragValue;
-                });
-                dragInteraction.dragend(function () { return lastDragValue = null; });
-            };
-            return DragPan;
-        })();
-        Behavior.DragPan = DragPan;
+                DragPan.prototype.getInteraction = function () {
+                    return this._dragInteraction;
+                };
+                DragPan.prototype._setupInteraction = function () {
+                    var _this = this;
+                    var lastDragValue;
+                    this._dragInteraction.drag(function (startPoint, endPoint) {
+                        var startPointDragValue = _this._verticalPan ? startPoint.y : startPoint.x;
+                        var endPointDragValue = _this._verticalPan ? endPoint.y : endPoint.x;
+                        var dragAmount = endPointDragValue - (lastDragValue == null ? startPointDragValue : lastDragValue);
+                        var leftLimit = _this._scale.range()[0] - (_this.bounds()[0] == null ? -Infinity : _this._scale.scale(_this.bounds()[0]));
+                        var rightLimit = _this._scale.range()[1] - (_this.bounds()[1] == null ? Infinity : _this._scale.scale(_this.bounds()[1]));
+                        if (dragAmount > 0) {
+                            dragAmount = Math.min(dragAmount, leftLimit);
+                        }
+                        else {
+                            dragAmount = Math.max(dragAmount, rightLimit);
+                        }
+                        _this._scale.domain(Plottable.ScaleDomainTransformers.translate(_this._scale, -dragAmount));
+                        lastDragValue = endPointDragValue;
+                    });
+                    this._dragInteraction.dragend(function () { return lastDragValue = null; });
+                };
+                return DragPan;
+            })(Pan.AbstractPan);
+            Pan.DragPan = DragPan;
+        })(Pan = Behavior.Pan || (Behavior.Pan = {}));
     })(Behavior = Plottable.Behavior || (Plottable.Behavior = {}));
 })(Plottable || (Plottable = {}));
 
