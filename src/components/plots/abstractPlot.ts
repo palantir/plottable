@@ -525,7 +525,7 @@ export module Plot {
      *                                        (default = this.datasetOrder())
      * @returns {PlotData} The retrieved PlotData.
      */
-    public getClosestPlotData(queryPoint: Point, withinValue = Infinity, datasetKeys: string | string[] = this.datasetOrder()) {
+    public getClosestPlotData(queryPoint: Point, withinValue = Infinity, datasetKeys: string | string[] = this.datasetOrder()): PlotData {
       var datasetKeyArray: string[] = [];
       if (typeof(datasetKeys) === "string") {
         datasetKeyArray = [<string> datasetKeys];
@@ -536,7 +536,7 @@ export module Plot {
       return this._getClosestPlotData(queryPoint, datasetKeyArray, withinValue);
     }
 
-    protected _getClosestPlotData(queryPoint: Point, datasetKeys: string[], withinValue = Infinity) {
+    protected _getClosestPlotData(queryPoint: Point, datasetKeys: string[], withinValue = Infinity): PlotData {
       var closestDistanceSquared = Math.pow(withinValue, 2);
       var closestIndex: number;
       var plotData = this.getAllPlotData(datasetKeys);
