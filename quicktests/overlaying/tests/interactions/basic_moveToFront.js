@@ -78,7 +78,7 @@ function run(svg, data, Plottable) {
   }
 
   plotGroup.registerInteraction(
-    new Plottable.Interaction.Click(plotGroup).callback(cb)
+    new Plottable.Interaction.Click().onClick(cb)
   );
 
 }
