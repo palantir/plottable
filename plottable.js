@@ -6823,10 +6823,10 @@ var Plottable;
                 return { data: data, pixelPoints: pixelPoints, selection: d3.selectAll(allElements) };
             };
             /**
-             * Retrieves the closest PlotData across all datasets, where distance is defined to be
-             * the Euclidiean norm.
+             * Retrieves PlotData with the lowest distance, where distance is defined
+             * to be the Euclidiean norm.
              *
-             * @param {Point} queryPoint The point to which dataset points should be compared
+             * @param {Point} queryPoint The point to which plot data should be compared
              *
              * @returns {PlotData} The PlotData closest to queryPoint
              */
@@ -7955,32 +7955,58 @@ var Plottable;
                 });
                 return { data: data, pixelPoints: pixelPoints, selection: d3.selectAll(allElements) };
             };
+            /**
+             * Retrieves the closest PlotData to queryPoint.
+             *
+             * Lines implement an x-dominant notion of distance; points closest in x are
+             * tie-broken by y distance.
+             *
+             * @param {Point} queryPoint The point to which plot data should be compared
+             *
+             * @returns {PlotData} The PlotData closest to queryPoint
+             */
             Line.prototype.getClosestPlotData = function (queryPoint) {
                 var _this = this;
-                var closestDistanceSquared = Infinity;
-                var closestDatum;
-                var closestSelection;
-                var closestPoint;
-                var datasetKeys = this.datasetOrder();
-                datasetKeys.forEach(function (datasetKey) {
-                    var plotData = _this.getAllPlotData(datasetKey);
-                    plotData.pixelPoints.forEach(function (pixelPoint, index) {
-                        var pixelPointDist = Plottable._Util.Methods.distanceSquared(queryPoint, pixelPoint);
-                        if (pixelPointDist < closestDistanceSquared) {
-                            closestDistanceSquared = pixelPointDist;
-                            closestDatum = plotData.data[index];
-                            closestPoint = pixelPoint;
-                            closestSelection = plotData.selection;
+                var minXDist = Infinity;
+                var minYDist = Infinity;
+                var closest;
+                this.datasetOrder().forEach(function (key) {
+                    var plotData = _this.getAllPlotData(key);
+                    plotData.pixelPoints.forEach(function (pxPt, index) {
+                        if (pxPt.x < 0 || pxPt.y < 0 || pxPt.x > _this.width() || pxPt.y > _this.height()) {
+                            return;
+                        }
+                        var xDist = Math.abs(queryPoint.x - pxPt.x);
+                        var yDist = Math.abs(queryPoint.y - pxPt.y);
+                        if (xDist < minXDist || xDist === minXDist && yDist < minYDist) {
+                            closest = [];
+                            minXDist = xDist;
+                            minYDist = yDist;
+                        }
+                        if (xDist === minXDist && yDist === minYDist) {
+                            closest.push({
+                                datum: plotData.data[index],
+                                pixelPoint: pxPt,
+                                node: plotData.selection[0][0]
+                            });
                         }
                     });
                 });
-                if (closestDatum == null) {
+                if (minXDist === Infinity) {
                     return { data: [], pixelPoints: [], selection: d3.select() };
                 }
+                var data = [];
+                var pixelPoints = [];
+                var nodes = [];
+                closest.forEach(function (c) {
+                    data.push(c.datum);
+                    pixelPoints.push(c.pixelPoint);
+                    nodes.push(c.node);
+                });
                 return {
-                    data: [closestDatum],
-                    pixelPoints: [closestPoint],
-                    selection: closestSelection
+                    data: data,
+                    pixelPoints: pixelPoints,
+                    selection: d3.selectAll(nodes)
                 };
             };
             //===== Hover logic =====
