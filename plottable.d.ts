@@ -2810,22 +2810,8 @@ declare module Plottable {
              *                                        (default = this.datasetOrder())
              * @returns {PlotData} The retrieved PlotData.
              */
-            getClosestPlotData(queryPoint: Point, withinValue?: number, datasetKeys?: string | string[]): {
-                data: any[];
-                pixelPoints: {
-                    x: number;
-                    y: number;
-                }[];
-                selection: D3._Selection<any>;
-            };
-            protected _getClosestPlotData(queryPoint: Point, datasetKeys: string[], withinValue?: number): {
-                data: any[];
-                pixelPoints: {
-                    x: number;
-                    y: number;
-                }[];
-                selection: D3._Selection<any>;
-            };
+            getClosestPlotData(queryPoint: Point, withinValue?: number, datasetKeys?: string | string[]): PlotData;
+            protected _getClosestPlotData(queryPoint: Point, datasetKeys: string[], withinValue?: number): PlotData;
         }
     }
 }
