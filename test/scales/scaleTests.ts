@@ -293,16 +293,15 @@ describe("Scales", () => {
     });
 
     it("accepts CSS specified colors", () => {
-      var svg = generateSVG();
 
-      svg.append("style").html(".plottable-colors-0 {background-color: #ff0000 !important; }");
+      var style = d3.select("body").append("style");
+      style.html(".plottable-colors-0 {background-color: #ff0000 !important; }");
 
       var scale = new Plottable.Scale.Color();
       assert.strictEqual(scale.range()[0], "#ff0000", "User has specified red color for first color scale color");
       assert.strictEqual(scale.range()[1], "#fd373e", "The second color of the color scale should be the same");
 
-      // note that the remove unloads the stylesheet as well
-      svg.remove();
+      style.remove();
 
       var defaultScale = new Plottable.Scale.Color();
       assert.strictEqual(scale.range()[0], "#ff0000",

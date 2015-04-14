@@ -6666,13 +6666,12 @@ describe("Scales", function () {
             assert.equal(scale.scale("b"), "#0000ff");
         });
         it("accepts CSS specified colors", function () {
-            var svg = generateSVG();
-            svg.append("style").html(".plottable-colors-0 {background-color: #ff0000 !important; }");
+            var style = d3.select("body").append("style");
+            style.html(".plottable-colors-0 {background-color: #ff0000 !important; }");
             var scale = new Plottable.Scale.Color();
             assert.strictEqual(scale.range()[0], "#ff0000", "User has specified red color for first color scale color");
             assert.strictEqual(scale.range()[1], "#fd373e", "The second color of the color scale should be the same");
-            // note that the remove unloads the stylesheet as well
-            svg.remove();
+            style.remove();
             var defaultScale = new Plottable.Scale.Color();
             assert.strictEqual(scale.range()[0], "#ff0000", "Unloading the CSS should not modify the first scale color (this will not be the case if we support dynamic CSS");
             assert.strictEqual(defaultScale.range()[0], "#5279c7", "Unloading the CSS should cause color scales fallback to default colors");
