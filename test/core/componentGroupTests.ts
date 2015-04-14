@@ -219,7 +219,7 @@ describe("ComponentGroups", () => {
         "First group should have no components after movement");
 
       assert.strictEqual(c._parent(), cg2,
-        "component's parent after movement should be the group 1"
+        "component's parent after movement should be the group 2"
       );
 
       svg.remove();

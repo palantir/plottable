@@ -6079,7 +6079,7 @@ describe("ComponentGroups", function () {
             assert.doesNotThrow(function () { return cg2._addComponent(c); }, Error, "should be able to move components between groups after anchoring");
             assert.strictEqual(cg2.components().length, 1, "Second group should have 1 component after movement");
             assert.strictEqual(cg1.components().length, 0, "First group should have no components after movement");
-            assert.strictEqual(c._parent(), cg2, "component's parent after movement should be the group 1");
+            assert.strictEqual(c._parent(), cg2, "component's parent after movement should be the group 2");
             svg.remove();
         });
     });
