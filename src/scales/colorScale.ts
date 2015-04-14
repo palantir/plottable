@@ -68,7 +68,6 @@ export module Scale {
         i++;
       }
       colorTester.remove();
-      console.log("AAA", plottableDefaultColors);
       return plottableDefaultColors;
     }
 

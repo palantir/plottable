@@ -2451,7 +2451,6 @@ var Plottable;
                     i++;
                 }
                 colorTester.remove();
-                console.log("AAA", plottableDefaultColors);
                 return plottableDefaultColors;
             };
             // Modifying the original scale method so that colors that are looped are lightened according
