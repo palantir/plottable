@@ -205,7 +205,7 @@ export module Axis {
       this._numTiers = _Util.Methods.max(this._possibleTimeAxisConfigurations.map((config: TimeAxisConfiguration) => config.length), 0);
 
       if (this._isAnchored) {
-        this._createDomElements();
+        this._setupDomElements();
       }
 
       var oldLabelPositions: string[] = this.tierLabelPositions();
@@ -287,10 +287,10 @@ export module Axis {
 
     protected _setup() {
       super._setup();
-      this._createDomElements();
+      this._setupDomElements();
     }
 
-    private _createDomElements() {
+    private _setupDomElements() {
       d3.selectAll(".time-axis-tier").remove();
 
       this._tierLabelContainers = [];
@@ -322,11 +322,6 @@ export module Axis {
 
     private _cleanTiers() {
       var oldTiersNumber = this._tierLabelContainers.length;
-
-      if (! (this._tierLabelContainers.length === this._tierMarkContainers.length &&
-             this._tierLabelContainers.length === this._tierBaselines.length)) {
-        throw Error("Tiers could not be cleaned properly");
-      }
 
       for (var index = 0; index < oldTiersNumber; index++) {
         this._tierLabelContainers[index].selectAll("." + AbstractAxis.TICK_LABEL_CLASS).remove();
