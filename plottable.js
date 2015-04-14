@@ -4617,8 +4617,7 @@ var Plottable;
                 return this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex].reduce(function (ticks, config) { return ticks.concat(_this._getTickIntervalValues(config)); }, []);
             };
             Time.prototype._cleanTiers = function () {
-                var oldTiersNumber = this._tierLabelContainers.length;
-                for (var index = 0; index < oldTiersNumber; index++) {
+                for (var index = 0; index < this._tierLabelContainers.length; index++) {
                     this._tierLabelContainers[index].selectAll("." + Axis.AbstractAxis.TICK_LABEL_CLASS).remove();
                     this._tierMarkContainers[index].selectAll("." + Axis.AbstractAxis.TICK_MARK_CLASS).remove();
                     this._tierBaselines[index].style("visibility", "hidden");

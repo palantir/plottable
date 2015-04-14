@@ -321,14 +321,11 @@ export module Axis {
     }
 
     private _cleanTiers() {
-      var oldTiersNumber = this._tierLabelContainers.length;
-
-      for (var index = 0; index < oldTiersNumber; index++) {
+      for (var index = 0; index < this._tierLabelContainers.length; index++) {
         this._tierLabelContainers[index].selectAll("." + AbstractAxis.TICK_LABEL_CLASS).remove();
         this._tierMarkContainers[index].selectAll("." + AbstractAxis.TICK_MARK_CLASS).remove();
         this._tierBaselines[index].style("visibility", "hidden");
       }
-
     }
 
     private _getTickValuesForConfiguration(config: TimeAxisTierConfiguration) {
