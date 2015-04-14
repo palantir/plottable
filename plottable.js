@@ -2443,7 +2443,7 @@ var Plottable;
             };
             Color._getPlottableColors = function () {
                 var plottableDefaultColors = [];
-                var colorTester = d3.select("body").append("plottable");
+                var colorTester = d3.select("body").append("plottable_color_testing");
                 var i = 0;
                 var colorHex;
                 while ((colorHex = Plottable._Util.Methods.colorTest(colorTester, "plottable-colors-" + i)) !== null) {
