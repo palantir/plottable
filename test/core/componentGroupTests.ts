@@ -189,38 +189,44 @@ describe("ComponentGroups", () => {
     it("can move components to other groups after anchoring", () => {
       var svg = generateSVG();
 
-      var xScale = new Plottable.Scale.Category();
-      xScale.domain(["A", "B", "C"]);
-      var xAxis = new Plottable.Axis.Category(xScale, "bottom");
-      var yScale = new Plottable.Scale.Linear();
-      var yAxis = new Plottable.Axis.Numeric(yScale, "left");
-      var chart = new Plottable.Component.Table([
-          [yAxis, null],
-          [null,  xAxis]
-      ]);
+      // var xScale = new Plottable.Scale.Category();
+      // xScale.domain(["A", "B", "C"]);
+      // var xAxis = new Plottable.Axis.Category(xScale, "bottom");
+      // var yScale = new Plottable.Scale.Linear();
+      // var yAxis = new Plottable.Axis.Numeric(yScale, "left");
+      // var chart = new Plottable.Component.Table([
+      //     [yAxis, null],
+      //     [null,  xAxis]
+      // ]);
 
-      var label = new Plottable.Component.Label("Movable");
-      chart.addComponent(1, 1, label);
+      // var label = new Plottable.Component.Label("Movable");
+      // chart.addComponent(1, 1, label);
 
-      chart.renderTo(svg);
+      var cg1 = new Plottable.Component.AbstractComponentContainer();
+      var cg2 = new Plottable.Component.AbstractComponentContainer();
+      var c = new Plottable.Component.AbstractComponent();
 
-      assert.strictEqual((<any> label)._parent(), (<any> chart)._rows[1][1],
+      cg1._addComponent(c);
+
+      cg1.renderTo(svg);
+      cg2.renderTo(svg);
+
+
+      assert.strictEqual((<any> c)._parent(), cg1,
         "label's parent before moving should be the table cell [1][1]"
       );
 
-      assert.doesNotThrow(() => chart.addComponent(0, 0, label), Error,
+      assert.doesNotThrow(() => cg2._addComponent(c), Error,
         "should be able to move components between groups after anchoring"
       );
 
-      assert.strictEqual((<any> chart)._rows[0][0].components().length, 2,
+      assert.strictEqual((<any> cg2).components().length, 1,
         "yAxis should be a group that contains 2 elements now (label and axis)");
 
-      if (Plottable.Component.AbstractComponentContainer.prototype.isPrototypeOf((<any> chart)._rows[1][1])) {
-        assert.strictEqual((<any> chart)._rows[1][1].components().length, 1,
-          "xAxis should be a group that contains 1 elements now (label and axis)");
-      }
+      assert.strictEqual((<any> cg1).components().length, 0,
+        "xAxis should be a group that contains 1 elements now (label and axis)");
 
-      assert.strictEqual((<any> label)._parent(), (<any> chart)._rows[0][0],
+      assert.strictEqual((<any> c)._parent(), cg2,
         "label's parent after moving should be the table cell [0][0]"
       );
 
