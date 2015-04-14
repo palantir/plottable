@@ -2443,7 +2443,7 @@ var Plottable;
             };
             Color._getPlottableColors = function () {
                 var plottableDefaultColors = [];
-                var colorTester = d3.select("body").append("div");
+                var colorTester = d3.select("body").append("plottable");
                 var i = 0;
                 var colorHex;
                 while ((colorHex = Plottable._Util.Methods.colorTest(colorTester, "plottable-colors-" + i)) !== null) {
@@ -2451,6 +2451,7 @@ var Plottable;
                     i++;
                 }
                 colorTester.remove();
+                console.log("AAA", plottableDefaultColors);
                 return plottableDefaultColors;
             };
             // Modifying the original scale method so that colors that are looped are lightened according
