@@ -185,6 +185,31 @@ describe("ComponentGroups", () => {
       assert.strictEqual(cg.height(), SVG_HEIGHT, "occupies all offered height");
       svg.remove();
     });
+
+    it("can move components to other groups after anchoring", () => {
+      var svg = generateSVG();
+
+      var xScale = new Plottable.Scale.Category();
+      xScale.domain(["A", "B", "C"]);
+      var xAxis = new Plottable.Axis.Category(xScale, "bottom");
+      var yScale = new Plottable.Scale.Linear();
+      var yAxis = new Plottable.Axis.Numeric(yScale, "left");
+      var chart = new Plottable.Component.Table([
+          [yAxis, null],
+          [null,  xAxis]
+      ]);
+
+      var label = new Plottable.Component.Label("Movable");
+      chart.addComponent(0, 1, label);
+
+      chart.renderTo(svg);
+
+      assert.doesNotThrow(() => chart.addComponent(0, 0, label), Error,
+        "Should be able to move components between groups after anchoring");
+
+      svg.remove();
+    });
+
   });
 
     describe("Merging components works as expected", () => {
