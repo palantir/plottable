@@ -115,14 +115,14 @@ describe("Tables", () => {
 
     assert.strictEqual(t.components().length, 1, "Table should only have 1 component");
 
-    var groupInTable: Plottable.Component.Group = t.components()[0];
+    var groupInTable: Plottable.Component.Group = <Plottable.Component.Group> t.components()[0];
     assert.strictEqual(groupInTable.components().length, 2, "the group should contain the initial 2 elements");
 
     assert.doesNotThrow(() => t.addComponent(0, 0, null), "adding null to a table should not throw an Error");
 
     assert.strictEqual(t.components().length, 1, "Table should still have 1 component");
 
-    var newGroupInTable: Plottable.Component.Group = t.components()[0];
+    var newGroupInTable: Plottable.Component.Group = <Plottable.Component.Group> t.components()[0];
     assert.strictEqual(newGroupInTable.components().length, 2, "the group should still contain the initial 2 elements");
   });
 
