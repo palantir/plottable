@@ -155,8 +155,7 @@ export module Plot {
      * scaled in accordance with `xScale`
      *
      * @param {string} attrToSet The attribute to set across each data
-     * point. Popular examples include "x", "y". Scales that inherit from
-     * Plot define their meaning.
+     * point. Popular examples include "x", "y".
      *
      * @param {Function|string|any} accessor Function to apply to each element
      * of the dataSource. If a Function, use `accessor(d, i)`. If a string,
