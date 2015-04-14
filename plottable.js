@@ -6506,12 +6506,12 @@ var Plottable;
              *
              * Here's a common use case:
              * ```typescript
-             * plot.attr("r", function(d) { return d.foo; });
+             * plot.attr("x", function(d) { return d.foo; });
              * ```
              * This will set the radius of each datum `d` to be `d.foo`.
              *
              * @param {string} attrToSet The attribute to set across each data
-             * point. Popular examples include "x", "y", "r". Scales that inherit from
+             * point. Popular examples include "x", "y". Scales that inherit from
              * Plot define their meaning.
              *
              * @param {Function|string|any} accessor Function to apply to each element
