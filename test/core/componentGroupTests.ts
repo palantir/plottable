@@ -199,10 +199,10 @@ describe("ComponentGroups", () => {
       cg2.renderTo(svg);
 
       assert.strictEqual(cg2.components().length, 0,
-        "Second group should have no component before movement");
+        "second group should have no component before movement");
 
       assert.strictEqual(cg1.components().length, 1,
-        "First group should have 1 component before movement");
+        "first group should have 1 component before movement");
 
       assert.strictEqual(c._parent(), cg1,
         "component's parent before moving should be the group 1"
@@ -213,10 +213,10 @@ describe("ComponentGroups", () => {
       );
 
       assert.strictEqual(cg2.components().length, 1,
-        "Second group should have 1 component after movement");
+        "second group should have 1 component after movement");
 
       assert.strictEqual(cg1.components().length, 0,
-        "First group should have no components after movement");
+        "first group should have no components after movement");
 
       assert.strictEqual(c._parent(), cg2,
         "component's parent after movement should be the group 2"
@@ -225,6 +225,20 @@ describe("ComponentGroups", () => {
       svg.remove();
     });
 
+    it("can add null to a component without failing", () => {
+      var cg1 = new Plottable.Component.AbstractComponentContainer();
+      var c = new Plottable.Component.AbstractComponent;
+
+      cg1._addComponent(c);
+
+      assert.strictEqual(cg1.components().length, 1,
+        "there should first be 1 element in the group");
+
+      assert.doesNotThrow(() => cg1._addComponent(null));
+
+      assert.strictEqual(cg1.components().length, 1,
+        "adding null to a group should have no effect on the group");
+    });
   });
 
     describe("Merging components works as expected", () => {

@@ -6154,7 +6154,7 @@ var Plottable;
             Table.prototype.addComponent = function (row, col, component) {
                 var currentComponent = this._rows[row] && this._rows[row][col];
                 if (currentComponent) {
-                    component = component.above(currentComponent);
+                    component = currentComponent.below(component);
                 }
                 if (this._addComponent(component)) {
                     this._nRows = Math.max(row + 1, this._nRows);

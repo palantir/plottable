@@ -6073,14 +6073,22 @@ describe("ComponentGroups", function () {
             cg1._addComponent(c);
             cg1.renderTo(svg);
             cg2.renderTo(svg);
-            assert.strictEqual(cg2.components().length, 0, "Second group should have no component before movement");
-            assert.strictEqual(cg1.components().length, 1, "First group should have 1 component before movement");
+            assert.strictEqual(cg2.components().length, 0, "second group should have no component before movement");
+            assert.strictEqual(cg1.components().length, 1, "first group should have 1 component before movement");
             assert.strictEqual(c._parent(), cg1, "component's parent before moving should be the group 1");
             assert.doesNotThrow(function () { return cg2._addComponent(c); }, Error, "should be able to move components between groups after anchoring");
-            assert.strictEqual(cg2.components().length, 1, "Second group should have 1 component after movement");
-            assert.strictEqual(cg1.components().length, 0, "First group should have no components after movement");
+            assert.strictEqual(cg2.components().length, 1, "second group should have 1 component after movement");
+            assert.strictEqual(cg1.components().length, 0, "first group should have no components after movement");
             assert.strictEqual(c._parent(), cg2, "component's parent after movement should be the group 2");
             svg.remove();
+        });
+        it("can add null to a component without failing", function () {
+            var cg1 = new Plottable.Component.AbstractComponentContainer();
+            var c = new Plottable.Component.AbstractComponent;
+            cg1._addComponent(c);
+            assert.strictEqual(cg1.components().length, 1, "there should first be 1 element in the group");
+            assert.doesNotThrow(function () { return cg1._addComponent(null); });
+            assert.strictEqual(cg1.components().length, 1, "adding null to a group should have no effect on the group");
         });
     });
     describe("Merging components works as expected", function () {
@@ -6724,7 +6732,7 @@ describe("Tables", function () {
         assert.isNull(rows[0][1], "component at (0, 1) is null");
         assert.isNull(rows[1][0], "component at (1, 0) is null");
     });
-    it("Add a component where one already exists creates a new group", function () {
+    it("add a component where one already exists creates a new group", function () {
         var c1 = new Plottable.Component.AbstractComponent();
         var c2 = new Plottable.Component.AbstractComponent();
         var c3 = new Plottable.Component.AbstractComponent();
@@ -6738,7 +6746,7 @@ describe("Tables", function () {
         assert.equal(components[0], c1, "First element in the group at (0, 2) should be c1");
         assert.equal(components[1], c3, "Second element in the group at (0, 2) should be c3");
     });
-    it("Add a component where a group already exists adds the component to the group", function () {
+    it("add a component where a group already exists adds the component to the group", function () {
         var c1 = new Plottable.Component.AbstractComponent();
         var c2 = new Plottable.Component.AbstractComponent();
         var grp = new Plottable.Component.Group([c1, c2]);
@@ -6752,6 +6760,19 @@ describe("Tables", function () {
         assert.equal(components[0], c1, "First element in the group at (0, 2) should still be c1");
         assert.equal(components[1], c2, "Second element in the group at (0, 2) should still be c2");
         assert.equal(components[2], c3, "The Component was added to the existing Group");
+    });
+    it("add null to a table cell where there was a group should have no effect", function () {
+        var c1 = new Plottable.Component.AbstractComponent();
+        var c2 = new Plottable.Component.AbstractComponent();
+        var grp = new Plottable.Component.Group([c1, c2]);
+        var t = new Plottable.Component.Table([[grp]]);
+        assert.strictEqual(t.components().length, 1, "Table should only have 1 component");
+        var groupInTable = t.components()[0];
+        assert.strictEqual(groupInTable.components().length, 2, "the group should contain the initial 2 elements");
+        assert.doesNotThrow(function () { return t.addComponent(0, 0, null); }, "adding null to a table should not throw an Error");
+        assert.strictEqual(t.components().length, 1, "Table should still have 1 component");
+        var newGroupInTable = t.components()[0];
+        assert.strictEqual(newGroupInTable.components().length, 2, "the group should still contain the initial 2 elements");
     });
     it("addComponent works even if a component is added with a high column and low row index", function () {
         // Solves #180, a weird bug
