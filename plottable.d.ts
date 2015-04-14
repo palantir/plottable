@@ -2682,9 +2682,10 @@ declare module Plottable {
              *
              * Here's a common use case:
              * ```typescript
-             * plot.attr("x", function(d) { return d.foo; });
+             * plot.attr("x", function(d) { return d.foo; }, xScale);
              * ```
-             * This will set the radius of each datum `d` to be `d.foo`.
+             * This will set the x accessor of each datum `d` to be `d.foo`,
+             * scaled in accordance with `xScale`
              *
              * @param {string} attrToSet The attribute to set across each data
              * point. Popular examples include "x", "y". Scales that inherit from
