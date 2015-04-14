@@ -7398,32 +7398,48 @@ describe("_Util.Methods", function () {
 var assert = chai.assert;
 describe("ScaleDomainTransformers", function () {
     describe("translate", function () {
-        it("translation on arbitrary value", function () {
+        it("translation by positive value", function () {
             var domain = [0, 100];
             var range = [0, 200];
             var scale = new Plottable.Scale.Linear();
             scale.domain(domain).range(range);
             var translatedDomain = Plottable.ScaleDomainTransformers.translate(scale, 10);
-            assert.deepEqual(translatedDomain, [5, 105], "domain translated by correct amount");
+            assert.deepEqual(translatedDomain, [5, 105], "domain translated by positive amount");
+        });
+        it("translation by 0", function () {
+            var domain = [0, 100];
+            var range = [0, 200];
+            var scale = new Plottable.Scale.Linear();
+            scale.domain(domain).range(range);
+            var translatedDomain = Plottable.ScaleDomainTransformers.translate(scale, 0);
+            assert.deepEqual(translatedDomain, [0, 100], "domain remains constant");
+        });
+        it("translation by negative value", function () {
+            var domain = [0, 100];
+            var range = [0, 200];
+            var scale = new Plottable.Scale.Linear();
+            scale.domain(domain).range(range);
+            var translatedDomain = Plottable.ScaleDomainTransformers.translate(scale, -10);
+            assert.deepEqual(translatedDomain, [-5, 95], "domain translated by negative amount");
         });
     });
     describe("magnify", function () {
         describe("magnifyAmount", function () {
-            it("magnify on arbitrary value", function () {
+            it("magnifies by normal value", function () {
                 var domain = [0, 100];
                 var range = [0, 200];
                 var scale = new Plottable.Scale.Linear();
                 scale.domain(domain).range(range);
-                var translatedDomain = Plottable.ScaleDomainTransformers.magnify(scale, 0.50, 100);
+                var translatedDomain = Plottable.ScaleDomainTransformers.magnify(scale, 0.5, 100);
                 assert.deepEqual(translatedDomain, [25, 75], "domain magnified by correct amount");
             });
-            it("magnify on 1", function () {
+            it("magnifies by 1", function () {
                 var domain = [0, 100];
                 var range = [0, 200];
                 var scale = new Plottable.Scale.Linear();
                 scale.domain(domain).range(range);
                 var translatedDomain = Plottable.ScaleDomainTransformers.magnify(scale, 1, 100);
-                assert.deepEqual(translatedDomain, [0, 100], "domain magnified by correct amount");
+                assert.deepEqual(translatedDomain, [0, 100], "domain remains constant");
             });
             it("magnify on 0", function () {
                 var domain = [0, 100];
@@ -7433,8 +7449,16 @@ describe("ScaleDomainTransformers", function () {
                 var translatedDomain = Plottable.ScaleDomainTransformers.magnify(scale, 0, 100);
                 assert.deepEqual(translatedDomain, [50, 50], "domain magnified by correct amount");
             });
+            it("magnify on negative value", function () {
+                var domain = [0, 100];
+                var range = [0, 200];
+                var scale = new Plottable.Scale.Linear();
+                scale.domain(domain).range(range);
+                var translatedDomain = Plottable.ScaleDomainTransformers.magnify(scale, -1, 100);
+                assert.deepEqual(translatedDomain, [100, 0], "domain reverses on negative magnification");
+            });
         });
-        describe("centerValue pixel space", function () {
+        describe("centerValue", function () {
             it("magnify on arbitrary value at halfway value", function () {
                 var domain = [0, 100];
                 var range = [0, 200];
@@ -7459,15 +7483,13 @@ describe("ScaleDomainTransformers", function () {
                 var translatedDomain = Plottable.ScaleDomainTransformers.magnify(scale, 0.90, 200);
                 assert.deepEqual(translatedDomain, [10, 100], "domain magnified and correctly centered");
             });
-        });
-        describe("centerValue data space", function () {
-            it("magnify on arbitrary value at halfway data value", function () {
+            it("magnify on arbitrary value beyond range value", function () {
                 var domain = [0, 100];
                 var range = [0, 200];
                 var scale = new Plottable.Scale.Linear();
                 scale.domain(domain).range(range);
-                var translatedDomain = Plottable.ScaleDomainTransformers.magnify(scale, 0.90, 50, true);
-                assert.deepEqual(translatedDomain, [5, 95], "domain magnified and correctly centered");
+                var translatedDomain = Plottable.ScaleDomainTransformers.magnify(scale, 0.90, 300);
+                assert.deepEqual(translatedDomain, [15, 105], "domain magnified and correctly centered");
             });
         });
     });
