@@ -6077,9 +6077,15 @@ describe("ComponentGroups", function () {
                 [null, xAxis]
             ]);
             var label = new Plottable.Component.Label("Movable");
-            chart.addComponent(0, 1, label);
+            chart.addComponent(1, 1, label);
             chart.renderTo(svg);
-            assert.doesNotThrow(function () { return chart.addComponent(0, 0, label); }, Error, "Should be able to move components between groups after anchoring");
+            assert.strictEqual(label._parent, chart._rows[1][1], "label's parent before moving should be the table cell [1][1]");
+            assert.doesNotThrow(function () { return chart.addComponent(0, 0, label); }, Error, "should be able to move components between groups after anchoring");
+            assert.strictEqual(chart._rows[0][0].components().length, 2, "yAxis should be a group that contains 2 elements now (label and axis)");
+            if (Plottable.Component.AbstractComponentContainer.prototype.isPrototypeOf(chart._rows[1][1])) {
+                assert.strictEqual(chart._rows[1][1].components().length, 1, "xAxis should be a group that contains 1 elements now (label and axis)");
+            }
+            assert.strictEqual(label._parent, chart._rows[0][0], "label's parent after moving should be the table cell [0][0]");
             svg.remove();
         });
     });
