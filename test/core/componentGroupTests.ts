@@ -189,19 +189,6 @@ describe("ComponentGroups", () => {
     it("can move components to other groups after anchoring", () => {
       var svg = generateSVG();
 
-      // var xScale = new Plottable.Scale.Category();
-      // xScale.domain(["A", "B", "C"]);
-      // var xAxis = new Plottable.Axis.Category(xScale, "bottom");
-      // var yScale = new Plottable.Scale.Linear();
-      // var yAxis = new Plottable.Axis.Numeric(yScale, "left");
-      // var chart = new Plottable.Component.Table([
-      //     [yAxis, null],
-      //     [null,  xAxis]
-      // ]);
-
-      // var label = new Plottable.Component.Label("Movable");
-      // chart.addComponent(1, 1, label);
-
       var cg1 = new Plottable.Component.AbstractComponentContainer();
       var cg2 = new Plottable.Component.AbstractComponentContainer();
       var c = new Plottable.Component.AbstractComponent();
@@ -211,23 +198,28 @@ describe("ComponentGroups", () => {
       cg1.renderTo(svg);
       cg2.renderTo(svg);
 
+      assert.strictEqual(cg2.components().length, 0,
+        "Second group should have no component before movement");
 
-      assert.strictEqual((<any> c)._parent(), cg1,
-        "label's parent before moving should be the table cell [1][1]"
+      assert.strictEqual(cg1.components().length, 1,
+        "First group should have 1 component before movement");
+
+      assert.strictEqual(c._parent(), cg1,
+        "component's parent before moving should be the group 1"
       );
 
       assert.doesNotThrow(() => cg2._addComponent(c), Error,
         "should be able to move components between groups after anchoring"
       );
 
-      assert.strictEqual((<any> cg2).components().length, 1,
-        "yAxis should be a group that contains 2 elements now (label and axis)");
+      assert.strictEqual(cg2.components().length, 1,
+        "Second group should have 1 component after movement");
 
-      assert.strictEqual((<any> cg1).components().length, 0,
-        "xAxis should be a group that contains 1 elements now (label and axis)");
+      assert.strictEqual(cg1.components().length, 0,
+        "First group should have no components after movement");
 
-      assert.strictEqual((<any> c)._parent(), cg2,
-        "label's parent after moving should be the table cell [0][0]"
+      assert.strictEqual(c._parent(), cg2,
+        "component's parent after movement should be the group 1"
       );
 
       svg.remove();
