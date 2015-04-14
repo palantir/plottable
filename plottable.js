@@ -7622,9 +7622,6 @@ var Plottable;
                     });
                     closest = secondaryClosest;
                 }
-                //          data: any[];
-                //    pixelPoints: Point[];
-                //    selection: D3.Selection;
                 var data = [];
                 var pixelPoints = [];
                 var nodes = [];

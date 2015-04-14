@@ -256,10 +256,6 @@ export module Plot {
         closest = secondaryClosest;
       }
 
-//          data: any[];
-//    pixelPoints: Point[];
-//    selection: D3.Selection;
-
       var data: any[] = [];
       var pixelPoints: Point[] = [];
       var nodes: Node[] = [];
