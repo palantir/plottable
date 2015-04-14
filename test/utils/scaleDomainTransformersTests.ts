@@ -77,7 +77,7 @@ describe("ScaleDomainTransformers", () => {
 
     });
 
-    describe("centerValue pixel space", () => {
+    describe("centerValue", () => {
 
       it("magnify on arbitrary value at halfway value",() => {
         var domain = [0, 100];

@@ -7458,7 +7458,7 @@ describe("ScaleDomainTransformers", function () {
                 assert.deepEqual(translatedDomain, [100, 0], "domain reverses on negative magnification");
             });
         });
-        describe("centerValue pixel space", function () {
+        describe("centerValue", function () {
             it("magnify on arbitrary value at halfway value", function () {
                 var domain = [0, 100];
                 var range = [0, 200];

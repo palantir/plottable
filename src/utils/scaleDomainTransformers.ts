@@ -24,13 +24,10 @@ module Plottable {
      * @param {Scale.AbstractQuantitative<D> scale The input scale whose domain is being magnified
      * @param {number} magnifyAmount The amount to magnify
      * @param {number} centerValue The center point of the magnification
-     * @param {boolean} centerInDomainSpace Specifying if the domain is in domain space (default = false)
      * @returns {D[]} The magnified domain
      */
-    export function magnify<D>(scale: Scale.AbstractQuantitative<D>, magnifyAmount: number,
-                               centerValue: number | D, centerInDomainSpace = false) {
-      var centerNumber = centerInDomainSpace ? scale.scale(<D> centerValue) : <number> centerValue;
-      var magnifyTransform = (rangeValue: number) => scale.invert(centerNumber - (centerNumber - rangeValue) * magnifyAmount);
+    export function magnify<D>(scale: Scale.AbstractQuantitative<D>, magnifyAmount: number, centerValue: number) {
+      var magnifyTransform = (rangeValue: number) => scale.invert(centerValue - (centerValue - rangeValue) * magnifyAmount);
       return scale.range().map(magnifyTransform);
     }
 
