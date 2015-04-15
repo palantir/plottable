@@ -168,11 +168,9 @@ export module Plot {
       var minXDist = Infinity;
       var minYDist = Infinity;
 
-      var closest: {
-        datum: any;
-        pixelPoint: Point;
-        node: Node
-      }[];
+      var closestData: any[] = [];
+      var closestPixelPoints: Point[] = [];
+      var closestElements: Element[] = [];
 
       this.datasetOrder().forEach((key: string) => {
         var plotData = this.getAllPlotData(key);
@@ -185,39 +183,26 @@ export module Plot {
           var yDist = Math.abs(queryPoint.y - pxPt.y);
 
           if (xDist < minXDist || xDist === minXDist && yDist < minYDist) {
-            closest = [];
+            closestData = [];
+            closestPixelPoints = [];
+            closestElements = [];
+
             minXDist = xDist;
             minYDist = yDist;
           }
 
           if (xDist === minXDist && yDist === minYDist) {
-            closest.push({
-              datum: plotData.data[index],
-              pixelPoint: pxPt,
-              node: plotData.selection[0][0]
-            });
+            closestData.push(plotData.data[index]);
+            closestPixelPoints.push(pxPt);
+            closestElements.push(plotData.selection[0][0]);
           }
         });
       });
 
-      if (minXDist === Infinity) {
-        return { data: [], pixelPoints: [], selection: d3.select() };
-      }
-
-      var data: any[] = [];
-      var pixelPoints: Point[] = [];
-      var nodes: Node[] = [];
-
-      closest.forEach((c: any) => {
-        data.push(c.datum);
-        pixelPoints.push(c.pixelPoint);
-        nodes.push(c.node);
-      });
-
       return {
-        data: data,
-        pixelPoints: pixelPoints,
-        selection: d3.selectAll(nodes)
+        data: closestData,
+        pixelPoints: closestPixelPoints,
+        selection: d3.selectAll(closestElements)
       };
     }
 

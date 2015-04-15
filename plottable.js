@@ -7969,7 +7969,9 @@ var Plottable;
                 var _this = this;
                 var minXDist = Infinity;
                 var minYDist = Infinity;
-                var closest;
+                var closestData = [];
+                var closestPixelPoints = [];
+                var closestElements = [];
                 this.datasetOrder().forEach(function (key) {
                     var plotData = _this.getAllPlotData(key);
                     plotData.pixelPoints.forEach(function (pxPt, index) {
@@ -7979,34 +7981,23 @@ var Plottable;
                         var xDist = Math.abs(queryPoint.x - pxPt.x);
                         var yDist = Math.abs(queryPoint.y - pxPt.y);
                         if (xDist < minXDist || xDist === minXDist && yDist < minYDist) {
-                            closest = [];
+                            closestData = [];
+                            closestPixelPoints = [];
+                            closestElements = [];
                             minXDist = xDist;
                             minYDist = yDist;
                         }
                         if (xDist === minXDist && yDist === minYDist) {
-                            closest.push({
-                                datum: plotData.data[index],
-                                pixelPoint: pxPt,
-                                node: plotData.selection[0][0]
-                            });
+                            closestData.push(plotData.data[index]);
+                            closestPixelPoints.push(pxPt);
+                            closestElements.push(plotData.selection[0][0]);
                         }
                     });
                 });
-                if (minXDist === Infinity) {
-                    return { data: [], pixelPoints: [], selection: d3.select() };
-                }
-                var data = [];
-                var pixelPoints = [];
-                var nodes = [];
-                closest.forEach(function (c) {
-                    data.push(c.datum);
-                    pixelPoints.push(c.pixelPoint);
-                    nodes.push(c.node);
-                });
                 return {
-                    data: data,
-                    pixelPoints: pixelPoints,
-                    selection: d3.selectAll(nodes)
+                    data: closestData,
+                    pixelPoints: closestPixelPoints,
+                    selection: d3.selectAll(closestElements)
                 };
             };
             //===== Hover logic =====

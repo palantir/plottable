@@ -302,6 +302,18 @@ describe("Plots", () => {
         closest = linePlot.getClosestPlotData({x: xScale.scale(0.25), y: d1Px.y});
         assertPlotDataEqual(expected, closest, "only in-view points are considered");
 
+        linePlot = new Plottable.Plot.Line(xScale, yScale);
+        expected = {
+          data: [],
+          pixelPoints: [],
+          selection: d3.selection()
+        };
+
+        var closest = linePlot.getClosestPlotData({x: d0Px.x, y: d0Px.y});
+        assert.lengthOf(closest.data, 0, "empty plots return empty data");
+        assert.lengthOf(closest.pixelPoints, 0, "empty plots return empty pixelPoints");
+        assert.isTrue(closest.selection.empty(), "empty plots return empty selection");
+
         svg.remove();
       });
 
