@@ -66,10 +66,10 @@ export module Scale {
       var i = 0;
       var colorHex: string;
       while ((colorHex = _Util.Methods.colorTest(colorTester, "plottable-colors-" + i)) !== null) {
-        plottableDefaultColors.push(colorHex);
         if (colorHex === defaultColorHex && colorHex === plottableDefaultColors[plottableDefaultColors.length - 1]) {
           break;
         }
+        plottableDefaultColors.push(colorHex);
         i++;
       }
       colorTester.remove();
