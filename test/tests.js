@@ -3191,6 +3191,16 @@ describe("Plots", function () {
                 }];
                 closest = barPlot.getClosestPlotData({ x: d0Px.x, y: zeroY + 1 });
                 assertPlotDataEqual(expected, closest, "only in-view bars are considered");
+                barPlot = new Plottable.Plot.Bar(xScale, yScale);
+                expected = {
+                    data: [],
+                    pixelPoints: [],
+                    selection: d3.selection()
+                };
+                var closest = barPlot.getClosestPlotData({ x: d0Px.x, y: d0Px.y });
+                assert.lengthOf(closest.data, 0, "empty plots return empty data");
+                assert.lengthOf(closest.pixelPoints, 0, "empty plots return empty pixelPoints");
+                assert.isTrue(closest.selection.empty(), "empty plots return empty selection");
                 svg.remove();
             });
         });

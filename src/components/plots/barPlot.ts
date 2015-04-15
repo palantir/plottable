@@ -183,9 +183,9 @@ export module Plot {
       var minPrimaryDist = Infinity;
       var minSecondaryDist = Infinity;
 
-      var closestData: any[];
-      var closestPixelPoints: Point[];
-      var closestElements: Element[];
+      var closestData: any[] = [];
+      var closestPixelPoints: Point[] = [];
+      var closestElements: Element[] = [];
 
       var queryPtPrimary = this._isVertical ? queryPoint.x : queryPoint.y;
       var queryPtSecondary = this._isVertical ? queryPoint.y : queryPoint.x;
@@ -232,10 +232,6 @@ export module Plot {
           }
         });
       });
-
-      if (closestData == null) {
-        return {data: [], pixelPoints: [], selection: d3.select()};
-      }
 
       return {
         data: closestData,

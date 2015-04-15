@@ -7562,9 +7562,9 @@ var Plottable;
                 var chartYExtent = { min: 0, max: this.height() };
                 var minPrimaryDist = Infinity;
                 var minSecondaryDist = Infinity;
-                var closestData;
-                var closestPixelPoints;
-                var closestElements;
+                var closestData = [];
+                var closestPixelPoints = [];
+                var closestElements = [];
                 var queryPtPrimary = this._isVertical ? queryPoint.x : queryPoint.y;
                 var queryPtSecondary = this._isVertical ? queryPoint.y : queryPoint.x;
                 this.datasetOrder().forEach(function (key) {
@@ -7603,9 +7603,6 @@ var Plottable;
                         }
                     });
                 });
-                if (closestData == null) {
-                    return { data: [], pixelPoints: [], selection: d3.select() };
-                }
                 return {
                     data: closestData,
                     pixelPoints: closestPixelPoints,
