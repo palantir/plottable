@@ -8064,31 +8064,49 @@ var Plottable;
                 });
                 return { data: data, pixelPoints: pixelPoints, selection: d3.selectAll(allElements) };
             };
+            /**
+             * Retrieves the closest PlotData to queryPoint.
+             *
+             * Lines implement an x-dominant notion of distance; points closest in x are
+             * tie-broken by y distance.
+             *
+             * @param {Point} queryPoint The point to which plot data should be compared
+             *
+             * @returns {PlotData} The PlotData closest to queryPoint
+             */
             Line.prototype.getClosestPlotData = function (queryPoint) {
                 var _this = this;
-                var closestDistanceSquared = Infinity;
-                var closestDatum;
-                var closestSelection;
-                var closestPoint;
-                this.datasetOrder().forEach(function (datasetKey) {
-                    var plotData = _this.getAllPlotData(datasetKey);
-                    plotData.pixelPoints.forEach(function (pixelPoint, index) {
-                        var pixelPointDist = Plottable._Util.Methods.distanceSquared(queryPoint, pixelPoint);
-                        if (pixelPointDist < closestDistanceSquared) {
-                            closestDistanceSquared = pixelPointDist;
-                            closestDatum = plotData.data[index];
-                            closestPoint = pixelPoint;
-                            closestSelection = plotData.selection;
+                var minXDist = Infinity;
+                var minYDist = Infinity;
+                var closestData = [];
+                var closestPixelPoints = [];
+                var closestElements = [];
+                this.datasetOrder().forEach(function (key) {
+                    var plotData = _this.getAllPlotData(key);
+                    plotData.pixelPoints.forEach(function (pxPt, index) {
+                        if (pxPt.x < 0 || pxPt.y < 0 || pxPt.x > _this.width() || pxPt.y > _this.height()) {
+                            return;
+                        }
+                        var xDist = Math.abs(queryPoint.x - pxPt.x);
+                        var yDist = Math.abs(queryPoint.y - pxPt.y);
+                        if (xDist < minXDist || xDist === minXDist && yDist < minYDist) {
+                            closestData = [];
+                            closestPixelPoints = [];
+                            closestElements = [];
+                            minXDist = xDist;
+                            minYDist = yDist;
+                        }
+                        if (xDist === minXDist && yDist === minYDist) {
+                            closestData.push(plotData.data[index]);
+                            closestPixelPoints.push(pxPt);
+                            closestElements.push(plotData.selection[0][0]);
                         }
                     });
                 });
-                if (closestDatum == null) {
-                    return { data: [], pixelPoints: [], selection: d3.select() };
-                }
                 return {
-                    data: [closestDatum],
-                    pixelPoints: [closestPoint],
-                    selection: closestSelection
+                    data: closestData,
+                    pixelPoints: closestPixelPoints,
+                    selection: d3.selectAll(closestElements)
                 };
             };
             //===== Hover logic =====
