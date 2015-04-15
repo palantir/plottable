@@ -68,6 +68,9 @@ export module Interaction {
     }
 
     private _endDrag(p: Point, e: UIEvent) {
+      if (e instanceof MouseEvent && (<MouseEvent> e).button !== 0) {
+        return;
+      }
       if (this._dragging) {
         this._dragging = false;
         if (this._dragEndCallback) {

@@ -9809,6 +9809,9 @@ var Plottable;
                 }
             };
             Drag.prototype._endDrag = function (p, e) {
+                if (e instanceof MouseEvent && e.button !== 0) {
+                    return;
+                }
                 if (this._dragging) {
                     this._dragging = false;
                     if (this._dragEndCallback) {

@@ -145,6 +145,13 @@ describe("Interactions", () => {
 
       receivedStart = null;
       receivedEnd = null;
+      triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
+      triggerFakeMouseEvent("mouseup", target, endPoint.x, endPoint.y, 2);
+      assert.isTrue(endCallbackCalled, "callback was not called on mouseup from the right-click button");
+      triggerFakeMouseEvent("mouseup", target, endPoint.x, endPoint.y); // end the drag
+
+      receivedStart = null;
+      receivedEnd = null;
       triggerFakeTouchEvent("touchstart", target, startPoint.x, startPoint.y);
       triggerFakeTouchEvent("touchend", target, endPoint.x, endPoint.y);
       assert.isTrue(endCallbackCalled, "callback was called on drag ending (touchend)");
