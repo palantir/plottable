@@ -242,6 +242,11 @@ describe("Plots", () => {
     });
 
     describe("getClosestPlotData()", () => {
+      var lines: D3.Selection;
+      var d0: any, d1: any;
+      var d0Px: Plottable.Point, d1Px: Plottable.Point;
+      var dataset3: any[];
+
       function assertPlotDataEqual(expected: Plottable.Plot.PlotData, actual: Plottable.Plot.PlotData, msg: string) {
         assert.deepEqual(expected.data, actual.data, msg);
         assert.closeTo(expected.pixelPoints[0].x, actual.pixelPoints[0].x, 0.01, msg);
@@ -249,26 +254,29 @@ describe("Plots", () => {
         assert.deepEqual(expected.selection, actual.selection, msg);
       }
 
-      it("retrieves correct data", () => {
-        var dataset3 = [
+      beforeEach(() => {
+        dataset3 = [
           { foo: 0, bar: 0.75 },
           { foo: 1, bar: 0.25 }
         ];
+
         linePlot.addDataset("d3", dataset3);
 
-        var lines = d3.selectAll(".line-plot .line");
-        var d0 = dataset3[0];
-        var d0Px = {
+        lines = d3.selectAll(".line-plot .line");
+        d0 = dataset3[0];
+        d0Px = {
           x: xScale.scale(xAccessor(d0)),
           y: yScale.scale(yAccessor(d0))
         };
 
-        var d1 = dataset3[1];
-        var d1Px = {
+        d1 = dataset3[1];
+        d1Px = {
           x: xScale.scale(xAccessor(d1)),
           y: yScale.scale(yAccessor(d1))
         };
+      });
 
+      it("returns correct closest plot data", () => {
         var expected = {
           data: [d0],
           pixelPoints: [d0Px],
@@ -293,30 +301,37 @@ describe("Plots", () => {
         closest = linePlot.getClosestPlotData({x: d1Px.x - 1, y: d1Px.y});
         assertPlotDataEqual(expected, closest, "if left of a point, it is closest");
 
-        xScale.domain([0.25,1]);
-        expected.pixelPoints = [{
-          x: xScale.scale(xAccessor(d1)),
-          y: yScale.scale(yAccessor(d1))
-        }];
+        svg.remove();
+      });
 
-        closest = linePlot.getClosestPlotData({x: xScale.scale(0.25), y: d1Px.y});
-        assertPlotDataEqual(expected, closest, "only in-view points are considered");
+      it("considers only in-view points", () => {
+        xScale.domain([0.25, 1]);
 
-        linePlot = new Plottable.Plot.Line(xScale, yScale);
-        expected = {
-          data: [],
-          pixelPoints: [],
-          selection: d3.selection()
+        var expected = {
+          data: [d1],
+          pixelPoints: [{
+            x: xScale.scale(xAccessor(d1)),
+            y: yScale.scale(yAccessor(d1))
+          }],
+          selection: d3.selectAll([lines[0][2]])
         };
 
-        closest = linePlot.getClosestPlotData({x: d0Px.x, y: d0Px.y});
-        assert.lengthOf(closest.data, 0, "empty plots return empty data");
-        assert.lengthOf(closest.pixelPoints, 0, "empty plots return empty pixelPoints");
-        assert.isTrue(closest.selection.empty(), "empty plots return empty selection");
+        var closest = linePlot.getClosestPlotData({ x: xScale.scale(0.25), y: d1Px.y });
+        assertPlotDataEqual(expected, closest, "only in-view points are considered");
 
         svg.remove();
       });
 
+      it("handles empty plots gracefully", () => {
+        linePlot = new Plottable.Plot.Line(xScale, yScale);
+
+        var closest = linePlot.getClosestPlotData({ x: d0Px.x, y: d0Px.y });
+        assert.lengthOf(closest.data, 0);
+        assert.lengthOf(closest.pixelPoints, 0);
+        assert.isTrue(closest.selection.empty());
+
+        svg.remove();
+      });
     });
 
     it("retains original classes when class is projected", () => {
