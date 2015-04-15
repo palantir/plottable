@@ -6,7 +6,6 @@ export module Scale {
 
     private static HEX_SCALE_FACTOR = 20;
     private static LOOP_LIGHTEN_FACTOR = 1.6;
-    private static MAXIMUM_COLORS = 256;
 
     /**
      * Constructs a ColorScale.
@@ -62,11 +61,15 @@ export module Scale {
     private static _getPlottableColors(): string[] {
       var plottableDefaultColors: string[] = [];
       var colorTester = d3.select("body").append("plottable-color-tester");
+
+      var defaultColorHex: string = _Util.Methods.colorTest(colorTester, "");
       var i = 0;
       var colorHex: string;
-      while ((colorHex = _Util.Methods.colorTest(colorTester, "plottable-colors-" + i)) !== null &&
-              i < this.MAXIMUM_COLORS) {
+      while ((colorHex = _Util.Methods.colorTest(colorTester, "plottable-colors-" + i)) !== null) {
         plottableDefaultColors.push(colorHex);
+        if (colorHex === defaultColorHex && colorHex === plottableDefaultColors[plottableDefaultColors.length - 1]) {
+          break;
+        }
         i++;
       }
       colorTester.remove();
