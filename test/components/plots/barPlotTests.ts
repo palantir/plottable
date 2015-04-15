@@ -229,7 +229,7 @@ describe("Plots", () => {
           };
 
           var closest = barPlot.getClosestPlotData({ x: d0Px.x, y: zeroY + 1 });
-          assertPlotDataEqual(expected, closest);
+          assertPlotDataEqual(expected, closest, "closest plot data is on-plot data");
 
           svg.remove();
         });
@@ -593,7 +593,7 @@ describe("Plots", () => {
           };
 
           var closest = barPlot.getClosestPlotData({ x: zeroX - 1, y: d0Px.y });
-          assertPlotDataEqual(expected, closest);
+          assertPlotDataEqual(expected, closest, "closest plot data is on-plot data");
 
           svg.remove();
         });
