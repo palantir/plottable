@@ -163,7 +163,7 @@ describe("Plots", () => {
         var bars: D3.Selection;
         var zeroY: number;
         var d0: any, d1: any;
-        var d0Px: Point, d1Px: Point;
+        var d0Px: Plottable.Point, d1Px: Plottable.Point;
 
         beforeEach(() => {
           bars = d3.selectAll(".bar-area rect");
@@ -219,7 +219,7 @@ describe("Plots", () => {
           // set the domain such that the first bar is out of view
           yScale.domain([-2, -0.1]);
 
-          expected = {
+          var expected = {
             data: [d1],
             pixelPoints: [{
               x: xScale.scale(d1.x),
@@ -228,7 +228,7 @@ describe("Plots", () => {
             selection: d3.selectAll([bars[0][1]])
           };
 
-          closest = barPlot.getClosestPlotData({ x: d0Px.x, y: zeroY + 1 });
+          var closest = barPlot.getClosestPlotData({ x: d0Px.x, y: zeroY + 1 });
           assertPlotDataEqual(expected, closest);
 
           svg.remove();
@@ -237,7 +237,7 @@ describe("Plots", () => {
         it("handles empty plots gracefully", () => {
           barPlot = new Plottable.Plot.Bar(xScale, yScale);
 
-          closest = barPlot.getClosestPlotData({ x: d0Px.x, y: d0Px.y });
+          var closest = barPlot.getClosestPlotData({ x: d0Px.x, y: d0Px.y });
           assert.lengthOf(closest.data, 0, "empty plots return empty data");
           assert.lengthOf(closest.pixelPoints, 0, "empty plots return empty pixelPoints");
           assert.isTrue(closest.selection.empty(), "empty plots return empty selection");
@@ -527,7 +527,7 @@ describe("Plots", () => {
         var bars: D3.Selection;
         var zeroX: number;
         var d0: any, d1: any;
-        var d0Px: Point, d1Px: Point;
+        var d0Px: Plottable.Point, d1Px: Plottable.Point;
 
         beforeEach(() => {
           bars = d3.selectAll(".bar-area rect");
@@ -583,7 +583,7 @@ describe("Plots", () => {
           // set the domain such that the first bar is out of view
           xScale.domain([-2, -0.1]);
 
-          expected = {
+          var expected = {
             data: [d1],
             pixelPoints: [{
               x: xScale.scale(d1.x),
@@ -592,7 +592,7 @@ describe("Plots", () => {
             selection: d3.selectAll([bars[0][1]])
           };
 
-          closest = barPlot.getClosestPlotData({ x: zeroX - 1, y: d0Px.y });
+          var closest = barPlot.getClosestPlotData({ x: zeroX - 1, y: d0Px.y });
           assertPlotDataEqual(expected, closest);
 
           svg.remove();
