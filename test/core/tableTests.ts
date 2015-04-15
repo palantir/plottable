@@ -106,24 +106,11 @@ describe("Tables", () => {
     assert.equal(components[2], c3, "The Component was added to the existing Group");
   });
 
-  it("add null to a table cell where there was a group should have no effect", () => {
+  it("add null to a table cell where there was a group should throw an error", () => {
     var c1 = new Plottable.Component.AbstractComponent();
-    var c2 = new Plottable.Component.AbstractComponent();
-    var grp = new Plottable.Component.Group([c1, c2]);
+    var t = new Plottable.Component.Table([[c1]]);
 
-    var t = new Plottable.Component.Table([[grp]]);
-
-    assert.strictEqual(t.components().length, 1, "Table should only have 1 component");
-
-    var groupInTable: Plottable.Component.Group = <Plottable.Component.Group> t.components()[0];
-    assert.strictEqual(groupInTable.components().length, 2, "the group should contain the initial 2 elements");
-
-    assert.doesNotThrow(() => t.addComponent(0, 0, null), "adding null to a table should not throw an Error");
-
-    assert.strictEqual(t.components().length, 1, "Table should still have 1 component");
-
-    var newGroupInTable: Plottable.Component.Group = <Plottable.Component.Group> t.components()[0];
-    assert.strictEqual(newGroupInTable.components().length, 2, "the group should still contain the initial 2 elements");
+    assert.throw(() => t.addComponent(0, 0, null), "Cannot add null to a table cell");
   });
 
   it("addComponent works even if a component is added with a high column and low row index", () => {

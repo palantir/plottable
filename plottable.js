@@ -6152,9 +6152,12 @@ var Plottable;
              * @returns {Table} The calling Table.
              */
             Table.prototype.addComponent = function (row, col, component) {
+                if (component == null) {
+                    throw Error("Cannot add null to a table cell");
+                }
                 var currentComponent = this._rows[row] && this._rows[row][col];
                 if (currentComponent) {
-                    component = currentComponent.below(component);
+                    component = component.above(currentComponent);
                 }
                 if (this._addComponent(component)) {
                     this._nRows = Math.max(row + 1, this._nRows);
