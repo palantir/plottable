@@ -310,6 +310,38 @@ describe("Scales", () => {
         "Unloading the CSS should cause color scales fallback to default colors");
     });
 
+    it("should try to recover from malicious CSS styleseets", () => {
+      var defaultNumberOfColors = 10;
+
+      var initialScale = new Plottable.Scale.Color();
+      assert.strictEqual(initialScale.range().length, defaultNumberOfColors,
+        "there should initially be " + defaultNumberOfColors + " default colors");
+
+      var maliciousStyle = d3.select("body").append("style");
+      maliciousStyle.html("* {background-color: pink;}");
+
+      var affectedScale = new Plottable.Scale.Color();
+      assert.strictEqual(affectedScale.range().length, defaultNumberOfColors + 1,
+        "it should detect the end of the given colors and the fallback to the * selector, " +
+        "but should still include the last occurance of the * selector color");
+      maliciousStyle.remove();
+    });
+
+    it("does not crash by malicious CSS stylesheets", () => {
+      var initialScale = new Plottable.Scale.Color();
+      assert.strictEqual(initialScale.range().length, 10, "there should initially be 10 default colors");
+
+      var maliciousStyle = d3.select("body").append("style");
+      maliciousStyle.html("[class^='plottable-'] {background-color: pink;}");
+
+      var affectedScale = new Plottable.Scale.Color();
+      var maximumColorsFromCss = (<any> Plottable.Scale.Color).MAXIMUM_COLORS_FROM_CSS;
+      assert.strictEqual(affectedScale.range().length, maximumColorsFromCss,
+        "current malicious CSS countermeasure is to cap maximum number of colors to 256");
+
+      maliciousStyle.remove();
+    });
+
   });
 
   describe("Interpolated Color Scales", () => {
