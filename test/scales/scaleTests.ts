@@ -344,7 +344,6 @@ describe("Scales", () => {
 
       var affectedScale = new Plottable.Scale.Color();
       var maximumColorsFromCss = (<any> Plottable.Scale.Color).MAXIMUM_COLORS_FROM_CSS;
-
       assert.strictEqual(affectedScale.range().length, maximumColorsFromCss,
         "current malicious CSS countermeasure is to cap maximum number of colors to 256");
 
