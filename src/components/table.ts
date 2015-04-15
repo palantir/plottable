@@ -83,7 +83,7 @@ export module Component {
     public addComponent(row: number, col: number, component: AbstractComponent): Table {
 
       if (component == null) {
-        throw Error("Cannot add null to a table cell")
+        throw Error("Cannot add null to a table cell");
       }
 
       var currentComponent = this._rows[row] && this._rows[row][col];
