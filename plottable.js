@@ -7589,14 +7589,15 @@ var Plottable;
                     var plotData = _this.getAllPlotData(key);
                     plotData.pixelPoints.forEach(function (plotPt, i) {
                         var bar = plotData.selection[0][i];
-                        if (!Plottable._Util.Methods.intersectsBBox(chartXExtent, chartYExtent, bar.getBBox())) {
+                        var barBBox = bar.getBBox();
+                        if (!Plottable._Util.Methods.intersectsBBox(chartXExtent, chartYExtent, barBBox)) {
                             // bar isn't visible on plot; ignore it
                             return;
                         }
                         var primaryDist = 0;
                         var secondaryDist = 0;
                         // if we're inside a bar, distance in both directions should stay 0
-                        if (!Plottable._Util.Methods.intersectsBBox(queryPoint.x, queryPoint.y, bar.getBBox())) {
+                        if (!Plottable._Util.Methods.intersectsBBox(queryPoint.x, queryPoint.y, barBBox)) {
                             var plotPtPrimary = _this._isVertical ? plotPt.x : plotPt.y;
                             var plotPtSecondary = _this._isVertical ? plotPt.y : plotPt.x;
                             primaryDist = Math.abs(queryPtPrimary - plotPtPrimary);
