@@ -2446,7 +2446,7 @@ var Plottable;
                 var colorTester = d3.select("body").append("plottable-color-tester");
                 var i = 0;
                 var colorHex;
-                while ((colorHex = Plottable._Util.Methods.colorTest(colorTester, "plottable-colors-" + i)) !== null) {
+                while ((colorHex = Plottable._Util.Methods.colorTest(colorTester, "plottable-colors-" + i)) !== null && i < this.MAXIMUM_COLORS) {
                     plottableDefaultColors.push(colorHex);
                     i++;
                 }
@@ -2464,6 +2464,7 @@ var Plottable;
             };
             Color.HEX_SCALE_FACTOR = 20;
             Color.LOOP_LIGHTEN_FACTOR = 1.6;
+            Color.MAXIMUM_COLORS = 256;
             return Color;
         })(Scale.AbstractScale);
         Scale.Color = Color;
