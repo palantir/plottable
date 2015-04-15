@@ -44,8 +44,7 @@ export module Interaction {
     }
 
     private _startDrag(p: Point, e: UIEvent) {
-      var button = (<MouseEvent> e).button;
-      if (button != null && button !== 0) {
+      if (e instanceof MouseEvent && (<MouseEvent> e).button !== 0) {
         return;
       }
       var translatedP = this._translateToComponentSpace(p);

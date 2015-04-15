@@ -9787,8 +9787,7 @@ var Plottable;
                 };
             };
             Drag.prototype._startDrag = function (p, e) {
-                var button = e.button;
-                if (button != null && button !== 0) {
+                if (e instanceof MouseEvent && e.button !== 0) {
                     return;
                 }
                 var translatedP = this._translateToComponentSpace(p);
