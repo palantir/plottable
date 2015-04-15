@@ -106,7 +106,7 @@ describe("Tables", () => {
     assert.equal(components[2], c3, "The Component was added to the existing Group");
   });
 
-  it("add null to a table cell where there was a group should throw an error", () => {
+  it("adding null to a table cell should throw an error", () => {
     var c1 = new Plottable.Component.AbstractComponent();
     var t = new Plottable.Component.Table([[c1]]);
 

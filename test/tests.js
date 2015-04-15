@@ -6761,7 +6761,7 @@ describe("Tables", function () {
         assert.equal(components[1], c2, "Second element in the group at (0, 2) should still be c2");
         assert.equal(components[2], c3, "The Component was added to the existing Group");
     });
-    it("add null to a table cell where there was a group should throw an error", function () {
+    it("adding null to a table cell should throw an error", function () {
         var c1 = new Plottable.Component.AbstractComponent();
         var t = new Plottable.Component.Table([[c1]]);
         assert.throw(function () { return t.addComponent(0, 0, null); }, "Cannot add null to a table cell");
