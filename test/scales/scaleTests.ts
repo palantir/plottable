@@ -318,12 +318,20 @@ describe("Scales", () => {
         "there should initially be " + defaultNumberOfColors + " default colors");
 
       var maliciousStyle = d3.select("body").append("style");
-      maliciousStyle.html("* {background-color: pink;}");
+      maliciousStyle.html("* {background-color: #fff000;}");
 
       var affectedScale = new Plottable.Scale.Color();
-      assert.strictEqual(affectedScale.range().length, defaultNumberOfColors + 1,
+      var colorRange = affectedScale.range();
+      assert.strictEqual(colorRange.length, defaultNumberOfColors + 1,
         "it should detect the end of the given colors and the fallback to the * selector, " +
         "but should still include the last occurance of the * selector color");
+
+      assert.strictEqual(colorRange[colorRange.length - 1], "#fff000",
+        "the * selector background color should be added at least once at the end");
+
+      assert.notStrictEqual(colorRange[colorRange.length - 2], "#fff000",
+        "the * selector background color should be added at most once at the end");
+
       maliciousStyle.remove();
     });
 
@@ -336,6 +344,7 @@ describe("Scales", () => {
 
       var affectedScale = new Plottable.Scale.Color();
       var maximumColorsFromCss = (<any> Plottable.Scale.Color).MAXIMUM_COLORS_FROM_CSS;
+
       assert.strictEqual(affectedScale.range().length, maximumColorsFromCss,
         "current malicious CSS countermeasure is to cap maximum number of colors to 256");
 
