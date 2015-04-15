@@ -68,7 +68,7 @@ export module Scale {
       var i = 0;
       var colorHex: string;
       while ((colorHex = _Util.Methods.colorTest(colorTester, "plottable-colors-" + i)) !== null &&
-        i < this.MAXIMUM_COLORS_FROM_CSS) {
+              i < this.MAXIMUM_COLORS_FROM_CSS) {
         if (colorHex === defaultColorHex && colorHex === plottableDefaultColors[plottableDefaultColors.length - 1]) {
           break;
         }
