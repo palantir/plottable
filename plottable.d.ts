@@ -3052,10 +3052,10 @@ declare module Plottable {
              * Retrieves the closest PlotData to queryPoint.
              *
              * Bars containing the queryPoint are considered closest. If queryPoint lies outside
-             * of all bars, we return the closest in the dominant direction (x for horizontal
-             * charts, y for vertical) and break ties
+             * of all bars, we return the closest in the dominant axis (x for horizontal
+             * charts, y for vertical) and break ties using the secondary axis.
              *
-             * @param {Point} queryPoint The point to which dataset points should be compared
+             * @param {Point} queryPoint The point to which plot data should be compared
              *
              * @returns {PlotData} The PlotData closest to queryPoint
              */

@@ -7549,91 +7549,67 @@ var Plottable;
              * Retrieves the closest PlotData to queryPoint.
              *
              * Bars containing the queryPoint are considered closest. If queryPoint lies outside
-             * of all bars, we return the closest in the dominant direction (x for horizontal
-             * charts, y for vertical) and break ties
+             * of all bars, we return the closest in the dominant axis (x for horizontal
+             * charts, y for vertical) and break ties using the secondary axis.
              *
-             * @param {Point} queryPoint The point to which dataset points should be compared
+             * @param {Point} queryPoint The point to which plot data should be compared
              *
              * @returns {PlotData} The PlotData closest to queryPoint
              */
             Bar.prototype.getClosestPlotData = function (queryPoint) {
                 var _this = this;
-                var keys = this.datasetOrder();
                 var chartXExtent = { min: 0, max: this.width() };
                 var chartYExtent = { min: 0, max: this.height() };
-                var minDist = Infinity;
-                var closest;
-                var accessor = {
-                    "x": function (p) { return p.x; },
-                    "y": function (p) { return p.y; }
-                };
-                var dominantAxis = this._isVertical ? "x" : "y";
-                var secondaryAxis = this._isVertical ? "y" : "x";
-                keys.forEach(function (key) {
+                var minPrimaryDist = Infinity;
+                var minSecondaryDist = Infinity;
+                var closestData;
+                var closestPixelPoints;
+                var closestElements;
+                var queryPtPrimary = this._isVertical ? queryPoint.x : queryPoint.y;
+                var queryPtSecondary = this._isVertical ? queryPoint.y : queryPoint.x;
+                this.datasetOrder().forEach(function (key) {
                     var plotData = _this.getAllPlotData(key);
-                    if (plotData != null && plotData.pixelPoints != null) {
-                        plotData.pixelPoints.forEach(function (plotPt, i) {
-                            var bar = plotData.selection[0][i];
-                            if (!Bar._intersectsBBox(chartXExtent, chartYExtent, bar.getBBox())) {
-                                // bar isn't visible on plot; ignore it
-                                return;
-                            }
-                            var dist = Infinity;
-                            if (Bar._intersectsBBox(queryPoint.x, queryPoint.y, bar.getBBox())) {
-                                // queryPoint is inside of this bar
-                                dist = -Infinity;
-                            }
-                            else {
-                                dist = Math.abs(accessor[dominantAxis](queryPoint) - accessor[dominantAxis](plotPt));
-                            }
-                            // if we find a closer bar, record its distance and start a new candidate list
-                            if (dist < minDist) {
-                                closest = [];
-                                minDist = dist;
-                            }
-                            // bars minDist away are part of the closest set
-                            if (dist === minDist) {
-                                closest.push({
-                                    datum: plotData.data[i],
-                                    pixelPoint: plotPt,
-                                    node: bar
-                                });
-                            }
-                        });
-                    }
-                });
-                if (closest == null || closest.length === 0) {
-                    return { data: [], pixelPoints: [], selection: d3.select() };
-                }
-                if (minDist >= 0) {
-                    // minDist >= 0 implies we're not inside of any bars
-                    // so, pick the one we're closest to in the secondary direction
-                    var secondaryClosest;
-                    minDist = Infinity;
-                    closest.forEach(function (candidate, i) {
-                        var dist = Math.abs(accessor[secondaryAxis](queryPoint) - accessor[secondaryAxis](candidate.pixelPoint));
-                        if (dist < minDist) {
-                            secondaryClosest = [];
-                            minDist = dist;
+                    plotData.pixelPoints.forEach(function (plotPt, i) {
+                        var bar = plotData.selection[0][i];
+                        if (!Bar._intersectsBBox(chartXExtent, chartYExtent, bar.getBBox())) {
+                            // bar isn't visible on plot; ignore it
+                            return;
                         }
-                        if (dist === minDist) {
-                            secondaryClosest.push(candidate);
+                        var primaryDist, secondaryDist;
+                        if (Bar._intersectsBBox(queryPoint.x, queryPoint.y, bar.getBBox())) {
+                            // queryPoint is inside of this bar; this is as close as it can be to the bar
+                            primaryDist = -Infinity;
+                            secondaryDist = -Infinity;
+                        }
+                        else {
+                            var plotPtPrimary = _this._isVertical ? plotPt.x : plotPt.y;
+                            var plotPtSecondary = _this._isVertical ? plotPt.y : plotPt.x;
+                            primaryDist = Math.abs(queryPtPrimary - plotPtPrimary);
+                            secondaryDist = Math.abs(queryPtSecondary - plotPtSecondary);
+                        }
+                        // if we find a closer bar, record its distance and start new closest lists
+                        if (primaryDist < minPrimaryDist || primaryDist === minPrimaryDist && secondaryDist < minSecondaryDist) {
+                            closestData = [];
+                            closestPixelPoints = [];
+                            closestElements = [];
+                            minPrimaryDist = primaryDist;
+                            minSecondaryDist = secondaryDist;
+                        }
+                        // bars minPrimaryDist away are part of the closest set
+                        if (primaryDist === minPrimaryDist && secondaryDist === minSecondaryDist) {
+                            closestData.push(plotData.data[i]);
+                            closestPixelPoints.push(plotPt);
+                            closestElements.push(bar);
                         }
                     });
-                    closest = secondaryClosest;
-                }
-                var data = [];
-                var pixelPoints = [];
-                var nodes = [];
-                closest.forEach(function (c) {
-                    data.push(c.datum);
-                    pixelPoints.push(c.pixelPoint);
-                    nodes.push(c.node);
                 });
+                if (closestData == null) {
+                    return { data: [], pixelPoints: [], selection: d3.select() };
+                }
                 return {
-                    data: data,
-                    pixelPoints: pixelPoints,
-                    selection: d3.selectAll(nodes)
+                    data: closestData,
+                    pixelPoints: closestPixelPoints,
+                    selection: d3.selectAll(closestElements)
                 };
             };
             /**
