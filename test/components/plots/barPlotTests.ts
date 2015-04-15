@@ -159,74 +159,91 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("returns correct closest plot data",() => {
-        var bars = d3.selectAll(".bar-area rect");
-        var zeroY = yScale.scale(0);
+      describe("getClosestPlotData()", () => {
+        var bars: D3.Selection;
+        var zeroY: number;
+        var d0: any, d1: any;
+        var d0Px: Point, d1Px: Point;
 
-        var d0 = dataset.data()[0];
-        var d0Px = {
-          x: xScale.scale(d0.x),
-          y: yScale.scale(d0.y)
-        };
-        var d1 = dataset.data()[1];
-        var d1Px = {
-          x: xScale.scale(d1.x),
-          y: yScale.scale(d1.y)
-        };
+        beforeEach(() => {
+          bars = d3.selectAll(".bar-area rect");
+          zeroY = yScale.scale(0);
 
-        var expected = {
-          data: [d0],
-          pixelPoints: [d0Px],
-          selection: d3.selectAll([bars[0][0]])
-        };
+          d0 = dataset.data()[0];
+          d0Px = {
+            x: xScale.scale(d0.x),
+            y: yScale.scale(d0.y)
+          };
+          d1 = dataset.data()[1];
+          d1Px = {
+            x: xScale.scale(d1.x),
+            y: yScale.scale(d1.y)
+          };
+        });
 
-        var closest = barPlot.getClosestPlotData({ x: d0Px.x, y: d0Px.y + 1 });
-        assertPlotDataEqual(expected, closest, "if inside a bar, it is closest");
+        it("returns correct closest plot data", () => {
+          var expected = {
+            data: [d0],
+            pixelPoints: [d0Px],
+            selection: d3.selectAll([bars[0][0]])
+          };
 
-        closest = barPlot.getClosestPlotData({ x: d0Px.x, y: d0Px.y - 1 });
-        assertPlotDataEqual(expected, closest, "if above a positive bar, it is closest");
+          var closest = barPlot.getClosestPlotData({ x: d0Px.x, y: d0Px.y + 1 });
+          assertPlotDataEqual(expected, closest, "if inside a bar, it is closest");
 
-        closest = barPlot.getClosestPlotData({ x: d0Px.x, y: zeroY + 1 });
-        assertPlotDataEqual(expected, closest, "if below a positive bar, it is closest");
+          closest = barPlot.getClosestPlotData({ x: d0Px.x, y: d0Px.y - 1 });
+          assertPlotDataEqual(expected, closest, "if above a positive bar, it is closest");
 
-        closest = barPlot.getClosestPlotData({ x: 0, y: d0Px.y });
-        assertPlotDataEqual(expected, closest, "if to the right of the first bar, it is closest");
+          closest = barPlot.getClosestPlotData({ x: d0Px.x, y: zeroY + 1 });
+          assertPlotDataEqual(expected, closest, "if below a positive bar, it is closest");
 
-        expected = {
-          data: [d1],
-          pixelPoints: [d1Px],
-          selection: d3.selectAll([bars[0][1]])
-        };
+          closest = barPlot.getClosestPlotData({ x: 0, y: d0Px.y });
+          assertPlotDataEqual(expected, closest, "if to the right of the first bar, it is closest");
 
-        closest = barPlot.getClosestPlotData({ x: d1Px.x, y: d1Px.y - 1 });
-        assertPlotDataEqual(expected, closest, "if inside a negative bar, it is closest");
+          expected = {
+            data: [d1],
+            pixelPoints: [d1Px],
+            selection: d3.selectAll([bars[0][1]])
+          };
 
-        closest = barPlot.getClosestPlotData({ x: d1Px.x, y: d1Px.y + 1 });
-        assertPlotDataEqual(expected, closest, "if below a negative bar, it is closest");
+          closest = barPlot.getClosestPlotData({ x: d1Px.x, y: d1Px.y - 1 });
+          assertPlotDataEqual(expected, closest, "if inside a negative bar, it is closest");
 
-        // set the domain such that the first bar is out of view
-        yScale.domain([-2, -0.1]);
-        expected.pixelPoints = [{
-          x: xScale.scale(d1.x),
-          y: yScale.scale(d1.y)
-        }];
+          closest = barPlot.getClosestPlotData({ x: d1Px.x, y: d1Px.y + 1 });
+          assertPlotDataEqual(expected, closest, "if below a negative bar, it is closest");
 
-        closest = barPlot.getClosestPlotData({ x: d0Px.x, y: zeroY + 1 });
-        assertPlotDataEqual(expected, closest, "only in-view bars are considered");
+          svg.remove();
+        });
 
-        barPlot = new Plottable.Plot.Bar(xScale, yScale);
-        expected = {
-          data: [],
-          pixelPoints: [],
-          selection: d3.selection()
-        };
+        it("considers only in-view bars", () => {
+          // set the domain such that the first bar is out of view
+          yScale.domain([-2, -0.1]);
 
-        closest = barPlot.getClosestPlotData({ x: d0Px.x, y: d0Px.y });
-        assert.lengthOf(closest.data, 0, "empty plots return empty data");
-        assert.lengthOf(closest.pixelPoints, 0, "empty plots return empty pixelPoints");
-        assert.isTrue(closest.selection.empty(), "empty plots return empty selection");
+          expected = {
+            data: [d1],
+            pixelPoints: [{
+              x: xScale.scale(d1.x),
+              y: yScale.scale(d1.y)
+            }],
+            selection: d3.selectAll([bars[0][1]])
+          };
 
-        svg.remove();
+          closest = barPlot.getClosestPlotData({ x: d0Px.x, y: zeroY + 1 });
+          assertPlotDataEqual(expected, closest);
+
+          svg.remove();
+        });
+
+        it("handles empty plots gracefully", () => {
+          barPlot = new Plottable.Plot.Bar(xScale, yScale);
+
+          closest = barPlot.getClosestPlotData({ x: d0Px.x, y: d0Px.y });
+          assert.lengthOf(closest.data, 0, "empty plots return empty data");
+          assert.lengthOf(closest.pixelPoints, 0, "empty plots return empty pixelPoints");
+          assert.isTrue(closest.selection.empty(), "empty plots return empty selection");
+
+          svg.remove();
+        });
       });
     });
 
@@ -506,62 +523,81 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("returns correct closest plot data",() => {
-        var bars = d3.selectAll(".bar-area rect");
-        var zeroX = xScale.scale(0);
+      describe("getClosestPlotData()", () => {
+        var bars: D3.Selection;
+        var zeroX: number;
+        var d0: any, d1: any;
+        var d0Px: Point, d1Px: Point;
 
-        var d0 = dataset.data()[0];
-        var d0Px = {
-          x: xScale.scale(d0.x),
-          y: yScale.scale(d0.y)
-        };
-        var d1 = dataset.data()[1];
-        var d1Px = {
-          x: xScale.scale(d1.x),
-          y: yScale.scale(d1.y)
-        };
+        beforeEach(() => {
+          bars = d3.selectAll(".bar-area rect");
+          zeroX = xScale.scale(0);
 
-        var expected = {
-          data: [d0],
-          pixelPoints: [d0Px],
-          selection: d3.selectAll([bars[0][0]])
-        };
+          d0 = dataset.data()[0];
+          d0Px = {
+            x: xScale.scale(d0.x),
+            y: yScale.scale(d0.y)
+          };
+          d1 = dataset.data()[1];
+          d1Px = {
+            x: xScale.scale(d1.x),
+            y: yScale.scale(d1.y)
+          };
+        });
 
-        var closest = barPlot.getClosestPlotData({ x: d0Px.x - 1, y: d0Px.y });
-        assertPlotDataEqual(expected, closest, "if inside a bar, it is closest");
+        it("returns correct closest plot data", () => {
+          var expected = {
+            data: [d0],
+            pixelPoints: [d0Px],
+            selection: d3.selectAll([bars[0][0]])
+          };
 
-        closest = barPlot.getClosestPlotData({ x: d0Px.x + 1, y: d0Px.y });
-        assertPlotDataEqual(expected, closest, "if right of a positive bar, it is closest");
+          var closest = barPlot.getClosestPlotData({ x: d0Px.x - 1, y: d0Px.y });
+          assertPlotDataEqual(expected, closest, "if inside a bar, it is closest");
 
-        closest = barPlot.getClosestPlotData({ x: zeroX - 1, y: d0Px.y });
-        assertPlotDataEqual(expected, closest, "if left of a positive bar, it is closest");
+          closest = barPlot.getClosestPlotData({ x: d0Px.x + 1, y: d0Px.y });
+          assertPlotDataEqual(expected, closest, "if right of a positive bar, it is closest");
 
-        closest = barPlot.getClosestPlotData({ x: d0Px.x, y: 0 });
-        assertPlotDataEqual(expected, closest, "if above the first bar, it is closest");
+          closest = barPlot.getClosestPlotData({ x: zeroX - 1, y: d0Px.y });
+          assertPlotDataEqual(expected, closest, "if left of a positive bar, it is closest");
 
-        expected = {
-          data: [d1],
-          pixelPoints: [d1Px],
-          selection: d3.selectAll([bars[0][1]])
-        };
+          closest = barPlot.getClosestPlotData({ x: d0Px.x, y: 0 });
+          assertPlotDataEqual(expected, closest, "if above the first bar, it is closest");
 
-        closest = barPlot.getClosestPlotData({ x: d1Px.x + 1, y: d1Px.y });
-        assertPlotDataEqual(expected, closest, "if inside a negative bar, it is closest");
+          expected = {
+            data: [d1],
+            pixelPoints: [d1Px],
+            selection: d3.selectAll([bars[0][1]])
+          };
 
-        closest = barPlot.getClosestPlotData({ x: d1Px.x - 1, y: d1Px.y });
-        assertPlotDataEqual(expected, closest, "if left of a negative bar, it is closest");
+          closest = barPlot.getClosestPlotData({ x: d1Px.x + 1, y: d1Px.y });
+          assertPlotDataEqual(expected, closest, "if inside a negative bar, it is closest");
 
-        // set the domain such that the first bar is out of view
-        xScale.domain([-2, -0.1]);
-        expected.pixelPoints = [{
-          x: xScale.scale(d1.x),
-          y: yScale.scale(d1.y)
-        }];
+          closest = barPlot.getClosestPlotData({ x: d1Px.x - 1, y: d1Px.y });
+          assertPlotDataEqual(expected, closest, "if left of a negative bar, it is closest");
 
-        closest = barPlot.getClosestPlotData({ x: zeroX - 1, y: d0Px.y });
-        assertPlotDataEqual(expected, closest, "only in-view bars are considered");
+          svg.remove();
+        });
 
-        svg.remove();
+        it("considers only in-view bars", () => {
+          // set the domain such that the first bar is out of view
+          xScale.domain([-2, -0.1]);
+
+          expected = {
+            data: [d1],
+            pixelPoints: [{
+              x: xScale.scale(d1.x),
+              y: yScale.scale(d1.y)
+            }],
+            selection: d3.selectAll([bars[0][1]])
+          };
+
+          closest = barPlot.getClosestPlotData({ x: zeroX - 1, y: d0Px.y });
+          assertPlotDataEqual(expected, closest);
+
+          svg.remove();
+        });
+
       });
     });
 

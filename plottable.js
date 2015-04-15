@@ -331,6 +331,48 @@ var Plottable;
                 return userAgent.indexOf("MSIE ") > -1 || userAgent.indexOf("Trident/") > -1;
             }
             Methods.isIE = isIE;
+            /**
+             * Returns true if the supplied coordinates or Extents intersect or are contained by bbox.
+             *
+             * @param {number | Extent} xValOrExtent The x coordinate or Extent to test
+             * @param {number | Extent} yValOrExtent The y coordinate or Extent to test
+             * @param {SVGRect} bbox The bbox
+             * @param {number} tolerance Amount by which to expand bbox, in each dimension, before
+             * testing intersection
+             *
+             * @returns {boolean} True if the supplied coordinates or Extents intersect or are
+             * contained by bbox, false otherwise.
+             */
+            function intersectsBBox(xValOrExtent, yValOrExtent, bbox, tolerance) {
+                if (tolerance === void 0) { tolerance = 0.5; }
+                var xExtent = parseExtent(xValOrExtent);
+                var yExtent = parseExtent(yValOrExtent);
+                // SVGRects are positioned with sub-pixel accuracy (the default unit
+                // for the x, y, height & width attributes), but user selections (e.g. via
+                // mouse events) usually have pixel accuracy. A tolerance of half-a-pixel
+                // seems appropriate.
+                return bbox.x + bbox.width >= xExtent.min - tolerance && bbox.x <= xExtent.max + tolerance && bbox.y + bbox.height >= yExtent.min - tolerance && bbox.y <= yExtent.max + tolerance;
+            }
+            Methods.intersectsBBox = intersectsBBox;
+            /**
+             * Create an Extent from a number or an object with "min" and "max" defined.
+             *
+             * @param {any} input The object to parse
+             *
+             * @returns {Extent} The generated Extent
+             */
+            function parseExtent(input) {
+                if (typeof (input) === "number") {
+                    return { min: input, max: input };
+                }
+                else if (input instanceof Object && "min" in input && "max" in input) {
+                    return input;
+                }
+                else {
+                    throw new Error("input '" + input + "' can't be parsed as an Extent");
+                }
+            }
+            Methods.parseExtent = parseExtent;
         })(Methods = _Util.Methods || (_Util.Methods = {}));
     })(_Util = Plottable._Util || (Plottable._Util = {}));
 })(Plottable || (Plottable = {}));
@@ -7473,30 +7515,6 @@ var Plottable;
                 _super.prototype._setup.call(this);
                 this._baseline = this._renderArea.append("line").classed("baseline", true);
             };
-            /**
-             * Returns true if the supplied coordinates or Extents intersect or are contained by bbox.
-             */
-            Bar._intersectsBBox = function (xValOrExtent, yValOrExtent, bbox, tolerance) {
-                if (tolerance === void 0) { tolerance = 0.5; }
-                var xExtent = Bar._parseExtent(xValOrExtent);
-                var yExtent = Bar._parseExtent(yValOrExtent);
-                // SVGRects are positioned with sub-pixel accuracy (the default unit
-                // for the x, y, height & width attributes), but user selections (e.g. via
-                // mouse events) usually have pixel accuracy. A tolerance of half-a-pixel
-                // seems appropriate.
-                return bbox.x + bbox.width >= xExtent.min - tolerance && bbox.x <= xExtent.max + tolerance && bbox.y + bbox.height >= yExtent.min - tolerance && bbox.y <= yExtent.max + tolerance;
-            };
-            Bar._parseExtent = function (input) {
-                if (typeof (input) === "number") {
-                    return { min: input, max: input };
-                }
-                else if (input instanceof Object && "min" in input && "max" in input) {
-                    return input;
-                }
-                else {
-                    throw new Error("input '" + input + "' can't be parsed as an Extent");
-                }
-            };
             Bar.prototype.baseline = function (value) {
                 if (value == null) {
                     return this._baselineValue;
@@ -7571,17 +7589,14 @@ var Plottable;
                     var plotData = _this.getAllPlotData(key);
                     plotData.pixelPoints.forEach(function (plotPt, i) {
                         var bar = plotData.selection[0][i];
-                        if (!Bar._intersectsBBox(chartXExtent, chartYExtent, bar.getBBox())) {
+                        if (!Plottable._Util.Methods.intersectsBBox(chartXExtent, chartYExtent, bar.getBBox())) {
                             // bar isn't visible on plot; ignore it
                             return;
                         }
-                        var primaryDist, secondaryDist;
-                        if (Bar._intersectsBBox(queryPoint.x, queryPoint.y, bar.getBBox())) {
-                            // queryPoint is inside of this bar; this is as close as it can be to the bar
-                            primaryDist = -Infinity;
-                            secondaryDist = -Infinity;
-                        }
-                        else {
+                        var primaryDist = 0;
+                        var secondaryDist = 0;
+                        // if we're inside a bar, distance in both directions should stay 0
+                        if (!Plottable._Util.Methods.intersectsBBox(queryPoint.x, queryPoint.y, bar.getBBox())) {
                             var plotPtPrimary = _this._isVertical ? plotPt.x : plotPt.y;
                             var plotPtSecondary = _this._isVertical ? plotPt.y : plotPt.x;
                             primaryDist = Math.abs(queryPtPrimary - plotPtPrimary);
@@ -7632,7 +7647,7 @@ var Plottable;
                 var bars = [];
                 var drawer = this._key2PlotDatasetKey.get(key).drawer;
                 drawer._getRenderArea().selectAll("rect").each(function (d) {
-                    if (Bar._intersectsBBox(xValOrExtent, yValOrExtent, this.getBBox())) {
+                    if (Plottable._Util.Methods.intersectsBBox(xValOrExtent, yValOrExtent, this.getBBox())) {
                         bars.push(this);
                     }
                 });
@@ -7834,8 +7849,8 @@ var Plottable;
                         xPositionOrExtent = maxExtent;
                     }
                 }
-                var xExtent = Bar._parseExtent(xPositionOrExtent);
-                var yExtent = Bar._parseExtent(yPositionOrExtent);
+                var xExtent = Plottable._Util.Methods.parseExtent(xPositionOrExtent);
+                var yExtent = Plottable._Util.Methods.parseExtent(yPositionOrExtent);
                 var bars = [];
                 var points = [];
                 var projectors = this._generateAttrToProjector();

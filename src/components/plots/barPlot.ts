@@ -46,32 +46,6 @@ export module Plot {
     }
 
     /**
-     * Returns true if the supplied coordinates or Extents intersect or are contained by bbox.
-     */
-    private static _intersectsBBox(xValOrExtent: number | Extent, yValOrExtent: number | Extent,
-      bbox: SVGRect, tolerance = 0.5) {
-      var xExtent: Extent = Bar._parseExtent(xValOrExtent);
-      var yExtent: Extent = Bar._parseExtent(yValOrExtent);
-
-      // SVGRects are positioned with sub-pixel accuracy (the default unit
-      // for the x, y, height & width attributes), but user selections (e.g. via
-      // mouse events) usually have pixel accuracy. A tolerance of half-a-pixel
-      // seems appropriate.
-      return bbox.x + bbox.width >= xExtent.min - tolerance && bbox.x <= xExtent.max + tolerance &&
-        bbox.y + bbox.height >= yExtent.min - tolerance && bbox.y <= yExtent.max + tolerance;
-    }
-
-    private static _parseExtent(input: any): Extent {
-      if (typeof (input) === "number") {
-        return { min: input, max: input };
-      } else if (input instanceof Object && "min" in input && "max" in input) {
-        return <Extent> input;
-      } else {
-        throw new Error("input '" + input + "' can't be parsed as an Extent");
-      }
-    }
-
-    /**
      * Gets the baseline value for the bars
      *
      * The baseline is the line that the bars are drawn from, defaulting to 0.
@@ -195,17 +169,16 @@ export module Plot {
         plotData.pixelPoints.forEach((plotPt, i) => {
           var bar = plotData.selection[0][i];
 
-          if (!Bar._intersectsBBox(chartXExtent, chartYExtent, bar.getBBox())) {
+          if (!_Util.Methods.intersectsBBox(chartXExtent, chartYExtent, bar.getBBox())) {
             // bar isn't visible on plot; ignore it
             return;
           }
 
-          var primaryDist: number, secondaryDist: number;
-          if (Bar._intersectsBBox(queryPoint.x, queryPoint.y, bar.getBBox())) {
-            // queryPoint is inside of this bar; this is as close as it can be to the bar
-            primaryDist = -Infinity;
-            secondaryDist = -Infinity;
-          } else {
+          var primaryDist = 0;
+          var secondaryDist = 0;
+
+          // if we're inside a bar, distance in both directions should stay 0
+          if (!_Util.Methods.intersectsBBox(queryPoint.x, queryPoint.y, bar.getBBox())) {
             var plotPtPrimary = this._isVertical ? plotPt.x : plotPt.y;
             var plotPtSecondary = this._isVertical ? plotPt.y : plotPt.x;
 
@@ -268,7 +241,7 @@ export module Plot {
 
       var drawer = <_Drawer.Element>this._key2PlotDatasetKey.get(key).drawer;
       drawer._getRenderArea().selectAll("rect").each(function(d) {
-        if (Bar._intersectsBBox(xValOrExtent, yValOrExtent, this.getBBox())) {
+        if (_Util.Methods.intersectsBBox(xValOrExtent, yValOrExtent, this.getBBox())) {
           bars.push(this);
         }
       });
@@ -515,8 +488,8 @@ export module Plot {
         }
       }
 
-      var xExtent: Extent = Bar._parseExtent(xPositionOrExtent);
-      var yExtent: Extent = Bar._parseExtent(yPositionOrExtent);
+      var xExtent: Extent = _Util.Methods.parseExtent(xPositionOrExtent);
+      var yExtent: Extent = _Util.Methods.parseExtent(yPositionOrExtent);
 
       var bars: any[] = [];
       var points: Point[] = [];
