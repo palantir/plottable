@@ -3113,39 +3113,45 @@ describe("Plots", function () {
                 assert.lengthOf(bars[0], 0, "no bars have been rendered");
                 svg.remove();
             });
-            it("getAllPlotData() pixel points corrected for negative-valued bars", function () {
-                var plotData = barPlot.getAllPlotData();
-                plotData.data.forEach(function (datum, i) {
-                    var barSelection = d3.select(plotData.selection[0][i]);
-                    var pixelPointY = plotData.pixelPoints[i].y;
-                    if (datum.y < 0) {
-                        assert.strictEqual(pixelPointY, +barSelection.attr("y") + +barSelection.attr("height"), "negative on bottom");
-                    }
-                    else {
-                        assert.strictEqual(pixelPointY, +barSelection.attr("y"), "positive on top");
-                    }
+            describe("getAllPlotData()", function () {
+                describe("pixelPoints", function () {
+                    it("getAllPlotData() pixel points corrected for negative-valued bars", function () {
+                        var plotData = barPlot.getAllPlotData();
+                        plotData.data.forEach(function (datum, i) {
+                            var barSelection = d3.select(plotData.selection[0][i]);
+                            var pixelPointY = plotData.pixelPoints[i].y;
+                            if (datum.y < 0) {
+                                assert.strictEqual(pixelPointY, +barSelection.attr("y") + +barSelection.attr("height"), "negative on bottom");
+                            }
+                            else {
+                                assert.strictEqual(pixelPointY, +barSelection.attr("y"), "positive on top");
+                            }
+                        });
+                        svg.remove();
+                    });
+                    describe("barAlignment", function () {
+                        it("getAllPlotData() pixel points corrected for barAlignment left", function () {
+                            barPlot.barAlignment("left");
+                            var plotData = barPlot.getAllPlotData();
+                            plotData.data.forEach(function (datum, i) {
+                                var barSelection = d3.select(plotData.selection[0][i]);
+                                var pixelPointX = plotData.pixelPoints[i].x;
+                                assert.strictEqual(pixelPointX, +barSelection.attr("x"), "barAlignment left x correct");
+                            });
+                            svg.remove();
+                        });
+                        it("getAllPlotData() pixel points corrected for barAlignment right", function () {
+                            barPlot.barAlignment("right");
+                            var plotData = barPlot.getAllPlotData();
+                            plotData.data.forEach(function (datum, i) {
+                                var barSelection = d3.select(plotData.selection[0][i]);
+                                var pixelPointX = plotData.pixelPoints[i].x;
+                                assert.strictEqual(pixelPointX, +barSelection.attr("x") + +barSelection.attr("width"), "barAlignment right x correct");
+                            });
+                            svg.remove();
+                        });
+                    });
                 });
-                svg.remove();
-            });
-            it("getAllPlotData() pixel points corrected for barAlignment left", function () {
-                barPlot.barAlignment("left");
-                var plotData = barPlot.getAllPlotData();
-                plotData.data.forEach(function (datum, i) {
-                    var barSelection = d3.select(plotData.selection[0][i]);
-                    var pixelPointX = plotData.pixelPoints[i].x;
-                    assert.strictEqual(pixelPointX, +barSelection.attr("x"), "barAlignment left x correct");
-                });
-                svg.remove();
-            });
-            it("getAllPlotData() pixel points corrected for barAlignment right", function () {
-                barPlot.barAlignment("right");
-                var plotData = barPlot.getAllPlotData();
-                plotData.data.forEach(function (datum, i) {
-                    var barSelection = d3.select(plotData.selection[0][i]);
-                    var pixelPointX = plotData.pixelPoints[i].x;
-                    assert.strictEqual(pixelPointX, +barSelection.attr("x") + +barSelection.attr("width"), "barAlignment right x correct");
-                });
-                svg.remove();
             });
         });
         describe("Vertical Bar Plot modified log scale", function () {
@@ -3354,39 +3360,45 @@ describe("Plots", function () {
                 assert.closeTo(numAttr(bar1, "y"), yScale.scale(bar1y) - numAttr(bar1, "height") / 2, 0.01, "bar1 ypos");
                 svg.remove();
             });
-            it("getAllPlotData() pixel points corrected for negative-valued bars", function () {
-                var plotData = barPlot.getAllPlotData();
-                plotData.data.forEach(function (datum, i) {
-                    var barSelection = d3.select(plotData.selection[0][i]);
-                    var pixelPointX = plotData.pixelPoints[i].x;
-                    if (datum.x < 0) {
-                        assert.strictEqual(pixelPointX, +barSelection.attr("x"), "negative on left");
-                    }
-                    else {
-                        assert.strictEqual(pixelPointX, +barSelection.attr("x") + +barSelection.attr("width"), "positive on right");
-                    }
+            describe("getAllPlotData()", function () {
+                describe("pixelPoints", function () {
+                    it("getAllPlotData() pixel points corrected for negative-valued bars", function () {
+                        var plotData = barPlot.getAllPlotData();
+                        plotData.data.forEach(function (datum, i) {
+                            var barSelection = d3.select(plotData.selection[0][i]);
+                            var pixelPointX = plotData.pixelPoints[i].x;
+                            if (datum.x < 0) {
+                                assert.strictEqual(pixelPointX, +barSelection.attr("x"), "negative on left");
+                            }
+                            else {
+                                assert.strictEqual(pixelPointX, +barSelection.attr("x") + +barSelection.attr("width"), "positive on right");
+                            }
+                        });
+                        svg.remove();
+                    });
+                    describe("accounting for barAlignment", function () {
+                        it("getAllPlotData() pixel points corrected for barAlignment left", function () {
+                            barPlot.barAlignment("left");
+                            var plotData = barPlot.getAllPlotData();
+                            plotData.data.forEach(function (datum, i) {
+                                var barSelection = d3.select(plotData.selection[0][i]);
+                                var pixelPointY = plotData.pixelPoints[i].y;
+                                assert.strictEqual(pixelPointY, +barSelection.attr("y"), "barAlignment left y correct");
+                            });
+                            svg.remove();
+                        });
+                        it("getAllPlotData() pixel points corrected for barAlignment right", function () {
+                            barPlot.barAlignment("right");
+                            var plotData = barPlot.getAllPlotData();
+                            plotData.data.forEach(function (datum, i) {
+                                var barSelection = d3.select(plotData.selection[0][i]);
+                                var pixelPointY = plotData.pixelPoints[i].y;
+                                assert.strictEqual(pixelPointY, +barSelection.attr("y") + +barSelection.attr("height"), "barAlignment right y correct");
+                            });
+                            svg.remove();
+                        });
+                    });
                 });
-                svg.remove();
-            });
-            it("getAllPlotData() pixel points corrected for barAlignment left", function () {
-                barPlot.barAlignment("left");
-                var plotData = barPlot.getAllPlotData();
-                plotData.data.forEach(function (datum, i) {
-                    var barSelection = d3.select(plotData.selection[0][i]);
-                    var pixelPointY = plotData.pixelPoints[i].y;
-                    assert.strictEqual(pixelPointY, +barSelection.attr("y"), "barAlignment left y correct");
-                });
-                svg.remove();
-            });
-            it("getAllPlotData() pixel points corrected for barAlignment right", function () {
-                barPlot.barAlignment("right");
-                var plotData = barPlot.getAllPlotData();
-                plotData.data.forEach(function (datum, i) {
-                    var barSelection = d3.select(plotData.selection[0][i]);
-                    var pixelPointY = plotData.pixelPoints[i].y;
-                    assert.strictEqual(pixelPointY, +barSelection.attr("y") + +barSelection.attr("height"), "barAlignment right y correct");
-                });
-                svg.remove();
             });
         });
         describe("Vertical Bar Plot With Bar Labels", function () {
