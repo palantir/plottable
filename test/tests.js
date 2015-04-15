@@ -31,24 +31,6 @@ function makeFakeEvent(x, y) {
         altKey: false
     };
 }
-function fakeDragSequence(anyedInteraction, startX, startY, endX, endY) {
-    var originalD3Mouse = d3.mouse;
-    d3.mouse = function () {
-        return [startX, startY];
-    };
-    anyedInteraction._dragstart();
-    d3.mouse = originalD3Mouse;
-    d3.event = makeFakeEvent(startX, startY);
-    anyedInteraction._drag();
-    d3.event = makeFakeEvent(endX, endY);
-    anyedInteraction._drag();
-    d3.mouse = function () {
-        return [endX, endY];
-    };
-    anyedInteraction._dragend();
-    d3.event = null;
-    d3.mouse = originalD3Mouse;
-}
 function verifySpaceRequest(sr, w, h, ww, wh, message) {
     assert.equal(sr.width, w, message + " (space request: width)");
     assert.equal(sr.height, h, message + " (space request: height)");
@@ -141,12 +123,13 @@ function triggerFakeUIEvent(type, target) {
     e.initUIEvent(type, true, true, window, 1);
     target.node().dispatchEvent(e);
 }
-function triggerFakeMouseEvent(type, target, relativeX, relativeY) {
+function triggerFakeMouseEvent(type, target, relativeX, relativeY, button) {
+    if (button === void 0) { button = 0; }
     var clientRect = target.node().getBoundingClientRect();
     var xPos = clientRect.left + relativeX;
     var yPos = clientRect.top + relativeY;
     var e = document.createEvent("MouseEvents");
-    e.initMouseEvent(type, true, true, window, 1, xPos, yPos, xPos, yPos, false, false, false, false, 1, null);
+    e.initMouseEvent(type, true, true, window, 1, xPos, yPos, xPos, yPos, false, false, false, false, button, null);
     target.node().dispatchEvent(e);
 }
 function triggerFakeDragSequence(target, start, end) {
@@ -8025,6 +8008,11 @@ describe("Interactions", function () {
             triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
             assert.isTrue(startCallbackCalled, "callback was called on beginning drag (mousedown)");
             assert.deepEqual(receivedStart, startPoint, "was passed the correct point");
+            startCallbackCalled = false;
+            receivedStart = null;
+            triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y, 2);
+            assert.isFalse(startCallbackCalled, "callback is not called on right-click");
+            startCallbackCalled = false;
             receivedStart = null;
             triggerFakeTouchEvent("touchstart", target, startPoint.x, startPoint.y);
             assert.isTrue(startCallbackCalled, "callback was called on beginning drag (touchstart)");
@@ -8097,6 +8085,12 @@ describe("Interactions", function () {
             assert.isTrue(endCallbackCalled, "callback was called on drag ending (mouseup)");
             assert.deepEqual(receivedStart, startPoint, "was passed the correct starting point");
             assert.deepEqual(receivedEnd, endPoint, "was passed the correct current point");
+            receivedStart = null;
+            receivedEnd = null;
+            triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
+            triggerFakeMouseEvent("mouseup", target, endPoint.x, endPoint.y, 2);
+            assert.isTrue(endCallbackCalled, "callback was not called on mouseup from the right-click button");
+            triggerFakeMouseEvent("mouseup", target, endPoint.x, endPoint.y); // end the drag
             receivedStart = null;
             receivedEnd = null;
             triggerFakeTouchEvent("touchstart", target, startPoint.x, startPoint.y);

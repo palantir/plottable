@@ -53,6 +53,12 @@ describe("Interactions", () => {
       assert.isTrue(startCallbackCalled, "callback was called on beginning drag (mousedown)");
       assert.deepEqual(receivedStart, startPoint, "was passed the correct point");
 
+      startCallbackCalled = false;
+      receivedStart = null;
+      triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y, 2);
+      assert.isFalse(startCallbackCalled, "callback is not called on right-click");
+
+      startCallbackCalled = false;
       receivedStart = null;
       triggerFakeTouchEvent("touchstart", target, startPoint.x, startPoint.y);
       assert.isTrue(startCallbackCalled, "callback was called on beginning drag (touchstart)");
@@ -136,6 +142,13 @@ describe("Interactions", () => {
       assert.isTrue(endCallbackCalled, "callback was called on drag ending (mouseup)");
       assert.deepEqual(receivedStart, startPoint, "was passed the correct starting point");
       assert.deepEqual(receivedEnd, endPoint, "was passed the correct current point");
+
+      receivedStart = null;
+      receivedEnd = null;
+      triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
+      triggerFakeMouseEvent("mouseup", target, endPoint.x, endPoint.y, 2);
+      assert.isTrue(endCallbackCalled, "callback was not called on mouseup from the right-click button");
+      triggerFakeMouseEvent("mouseup", target, endPoint.x, endPoint.y); // end the drag
 
       receivedStart = null;
       receivedEnd = null;

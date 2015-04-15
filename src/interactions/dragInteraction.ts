@@ -44,6 +44,9 @@ export module Interaction {
     }
 
     private _startDrag(p: Point, e: UIEvent) {
+      if (e instanceof MouseEvent && (<MouseEvent> e).button !== 0) {
+        return;
+      }
       var translatedP = this._translateToComponentSpace(p);
       if (this._isInsideComponent(translatedP)) {
         e.preventDefault();
@@ -65,6 +68,9 @@ export module Interaction {
     }
 
     private _endDrag(p: Point, e: UIEvent) {
+      if (e instanceof MouseEvent && (<MouseEvent> e).button !== 0) {
+        return;
+      }
       if (this._dragging) {
         this._dragging = false;
         if (this._dragEndCallback) {
