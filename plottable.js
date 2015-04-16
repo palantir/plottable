@@ -9608,53 +9608,47 @@ var Plottable;
              * @param {QuantitativeScale} [yScale] The Y scale to update on panning/zooming.
              */
             function PanZoom(xScale, yScale) {
-                var _this = this;
                 _super.call(this);
-                if (xScale) {
-                    this._xScale = xScale;
-                    // HACKHACK #1388: self-register for resetZoom()
-                    this._xScale.broadcaster.registerListener("pziX" + this.getID(), function () { return _this.resetZoom(); });
-                }
-                if (yScale) {
-                    this._yScale = yScale;
-                    // HACKHACK #1388: self-register for resetZoom()
-                    this._yScale.broadcaster.registerListener("pziY" + this.getID(), function () { return _this.resetZoom(); });
-                }
+                this._xScale = xScale;
+                this._yScale = yScale;
+                this._dragInteraction = new Interaction.Drag();
+                this._scrollInteraction = new Interaction.Scroll();
+                this._setupInteractions();
             }
-            /**
-             * Sets the scales back to their original domains.
-             */
-            PanZoom.prototype.resetZoom = function () {
-                var _this = this;
-                // HACKHACK #254
-                this._zoom = d3.behavior.zoom();
-                if (this._xScale) {
-                    this._zoom.x(this._xScale._d3Scale);
-                }
-                if (this._yScale) {
-                    this._zoom.y(this._yScale._d3Scale);
-                }
-                this._zoom.on("zoom", function () { return _this._rerenderZoomed(); });
-                this._zoom(this._hitBox);
-            };
-            PanZoom.prototype._anchor = function (component, hitBox) {
-                _super.prototype._anchor.call(this, component, hitBox);
-                this.resetZoom();
-            };
             PanZoom.prototype._requiresHitbox = function () {
                 return true;
             };
-            PanZoom.prototype._rerenderZoomed = function () {
-                // HACKHACK since the d3.zoom.x modifies d3 scales and not our TS scales, and the TS scales have the
-                // event listener machinery, let's grab the domain out of the d3 scale and pipe it back into the TS scale
-                if (this._xScale) {
-                    var xDomain = this._xScale._d3Scale.domain();
-                    this._xScale.domain(xDomain);
-                }
-                if (this._yScale) {
-                    var yDomain = this._yScale._d3Scale.domain();
-                    this._yScale.domain(yDomain);
-                }
+            PanZoom.prototype._anchor = function (component, hitBox) {
+                _super.prototype._anchor.call(this, component, hitBox);
+                this._dragInteraction._anchor(component, hitBox);
+                this._scrollInteraction._anchor(component, hitBox);
+            };
+            PanZoom.prototype._setupInteractions = function () {
+                var _this = this;
+                var lastDragPoint;
+                this._dragInteraction.drag(function (startPoint, endPoint) {
+                    var dragAmountX = endPoint.x - (lastDragPoint == null ? startPoint.x : lastDragPoint.x);
+                    var dragAmountY = endPoint.y - (lastDragPoint == null ? startPoint.y : lastDragPoint.y);
+                    if (_this._xScale != null) {
+                        _this._xScale.domain(Plottable.ScaleDomainTransformers.translate(_this._xScale, -dragAmountX));
+                    }
+                    if (_this._yScale != null) {
+                        _this._yScale.domain(Plottable.ScaleDomainTransformers.translate(_this._yScale, -dragAmountY));
+                    }
+                    lastDragPoint = endPoint;
+                });
+                this._dragInteraction.dragend(function () { return lastDragPoint = null; });
+                var magnifyAmount = 1;
+                this._scrollInteraction.onScroll(function (point, deltaAmount) {
+                    var oldMagnifyAmount = magnifyAmount;
+                    magnifyAmount = Math.pow(2, -deltaAmount * .002) * magnifyAmount;
+                    if (_this._xScale != null) {
+                        _this._xScale.domain(Plottable.ScaleDomainTransformers.magnify(_this._xScale, magnifyAmount / oldMagnifyAmount, point.x));
+                    }
+                    if (_this._yScale != null) {
+                        _this._yScale.domain(Plottable.ScaleDomainTransformers.magnify(_this._yScale, magnifyAmount / oldMagnifyAmount, point.y));
+                    }
+                });
             };
             return PanZoom;
         })(Interaction.AbstractInteraction);

@@ -3908,12 +3908,8 @@ declare module Plottable {
              * @param {QuantitativeScale} [yScale] The Y scale to update on panning/zooming.
              */
             constructor(xScale?: Scale.AbstractQuantitative<any>, yScale?: Scale.AbstractQuantitative<any>);
-            /**
-             * Sets the scales back to their original domains.
-             */
-            resetZoom(): void;
-            _anchor(component: Component.AbstractComponent, hitBox: D3.Selection): void;
             _requiresHitbox(): boolean;
+            _anchor(component: Component.AbstractComponent, hitBox: D3.Selection): void;
         }
     }
 }
