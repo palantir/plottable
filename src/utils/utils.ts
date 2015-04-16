@@ -248,6 +248,14 @@ export module _Util {
     }
 
     /**
+     * Returns true if and only if x is NaN
+     * Will return false for values like undefined, null, infinity, strings
+     */
+    export function isNaN(n: any) {
+      return n !== n;
+    }
+
+    /**
      * Creates shallow copy of map.
      * @param {{ [key: string]: any }} oldMap Map to copy
      *

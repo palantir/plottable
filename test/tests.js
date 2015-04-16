@@ -4623,7 +4623,7 @@ describe("Plots", function () {
         afterEach(function () {
             svg.remove();
         });
-        it("conversion fails should be silent in stackedBarPlot", function () {
+        it("conversion fails should be silent in Plot.StackedBar", function () {
             var plot = new Plottable.Plot.StackedBar(xScale, yScale);
             plot.addDataset("d1", data1);
             plot.addDataset("d2", data2);
@@ -4631,10 +4631,14 @@ describe("Plots", function () {
             plot.project("x", "x", xScale).project("y", "y", yScale);
             var ds1PlotMetadata = plot._key2PlotDatasetKey.get("d1").plotMetadata;
             var ds2PlotMetadata = plot._key2PlotDatasetKey.get("d2").plotMetadata;
-            assert.isFalse(isNaN(ds1PlotMetadata.offsets.get("A")), "ds1 offset should be a number");
-            assert.isFalse(isNaN(ds2PlotMetadata.offsets.get("A")), "ds2 offset should be a number");
+            var ds1FirstColumnOffset = ds1PlotMetadata.offsets.get("A");
+            var ds2FirstColumnOffset = ds2PlotMetadata.offsets.get("A");
+            assert.strictEqual(typeof ds1FirstColumnOffset, "number", "ds1 offset should be a valid number");
+            assert.strictEqual(typeof ds2FirstColumnOffset, "number", "ds2 offset should be a valid number");
+            assert.isFalse(Plottable._Util.Methods.isNaN(ds1PlotMetadata.offsets.get("A")), "ds1 offset should be a valid number");
+            assert.isFalse(Plottable._Util.Methods.isNaN(ds2PlotMetadata.offsets.get("A")), "ds2 offset should be a valid number");
         });
-        it("conversion fails should be silent in stackedAreaPlot", function () {
+        it("conversion fails should be silent in Plot.StackedArea", function () {
             var plot = new Plottable.Plot.StackedArea(xScale, yScale);
             plot.addDataset("d1", data1);
             plot.addDataset("d2", data2);
@@ -4642,8 +4646,12 @@ describe("Plots", function () {
             plot.project("x", "x", xScale).project("y", "y", yScale);
             var ds1PlotMetadata = plot._key2PlotDatasetKey.get("d1").plotMetadata;
             var ds2PlotMetadata = plot._key2PlotDatasetKey.get("d2").plotMetadata;
-            assert.isFalse(isNaN(ds1PlotMetadata.offsets.get("A")), "ds1 offset should be a number");
-            assert.isFalse(isNaN(ds2PlotMetadata.offsets.get("A")), "ds2 offset should be a number");
+            var ds1FirstColumnOffset = ds1PlotMetadata.offsets.get("A");
+            var ds2FirstColumnOffset = ds2PlotMetadata.offsets.get("A");
+            assert.strictEqual(typeof ds1FirstColumnOffset, "number", "ds1 offset should be a valid number");
+            assert.strictEqual(typeof ds2FirstColumnOffset, "number", "ds2 offset should be a valid number");
+            assert.isFalse(Plottable._Util.Methods.isNaN(ds1PlotMetadata.offsets.get("A")), "ds1 offset should be a valid number");
+            assert.isFalse(Plottable._Util.Methods.isNaN(ds2PlotMetadata.offsets.get("A")), "ds2 offset should be a valid number");
         });
     });
     describe("scale extent updates", function () {

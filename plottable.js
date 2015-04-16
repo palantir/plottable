@@ -247,6 +247,14 @@ var Plottable;
             }
             Methods.min = min;
             /**
+             * Returns true if and only if x is NaN
+             * Will return false for values like undefined, null, infinity, strings
+             */
+            function isNaN(n) {
+                return n !== n;
+            }
+            Methods.isNaN = isNaN;
+            /**
              * Creates shallow copy of map.
              * @param {{ [key: string]: any }} oldMap Map to copy
              *
