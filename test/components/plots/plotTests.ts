@@ -256,12 +256,15 @@ describe("Plots", () => {
 
       var data1 = [{value: 0}, {value: 1}, {value: 2}];
       var data2 = [{value: 0}, {value: 1}, {value: 2}];
+      var data3 = [{value: 0}, {value: 1}, {value: 2}];
 
       var data1Points = data1.map((datum: any) => { return {x: datum.value, y: 100}; });
       var data2Points = data2.map((datum: any) => { return {x: datum.value, y: 10}; });
+      var data3Points = data3.map((datum: any) => { return {x: datum.value, y: -5}; });
 
       var data1PointConverter = (datum: any, index: number) => data1Points[index];
       var data2PointConverter = (datum: any, index: number) => data2Points[index];
+      var data3PointConverter = (datum: any, index: number) => data3Points[index];
 
       // Create mock drawers with already drawn items
       var mockDrawer1 = new Plottable._Drawer.AbstractDrawer("ds1");
@@ -278,22 +281,35 @@ describe("Plots", () => {
       (<any> mockDrawer2)._getSelector = () => "circle";
       (<any> mockDrawer2)._getPixelPoint = data2PointConverter;
 
+      var renderArea3 = svg.append("g");
+      renderArea3.append("circle").attr("cx", -5).attr("cy", -5).attr("r", 5);
+      var mockDrawer3 = new Plottable._Drawer.AbstractDrawer("ds3");
+      (<any> mockDrawer3).setup = () => (<any> mockDrawer3)._renderArea = renderArea3;
+      (<any> mockDrawer3)._getSelector = () => "circle";
+      (<any> mockDrawer3)._getPixelPoint = data3PointConverter;
+
       // Mock _getDrawer to return the mock drawers
       (<any> plot)._getDrawer = (key: string) => {
         if (key === "ds1") {
           return mockDrawer1;
-        } else {
+        } else if (key === "ds2") {
           return mockDrawer2;
+        } else {
+          return mockDrawer3;
         }
       };
 
       plot.addDataset("ds1", data1);
       plot.addDataset("ds2", data2);
+      plot.addDataset("ds3", data3);
       plot.renderTo(svg);
 
       var queryPoint = {x: 1, y: 11};
       var closestPlotData = plot.getClosestPlotData(queryPoint);
       assert.deepEqual(closestPlotData.pixelPoints, [{x: 1, y: 10}], "retrieves the closest point across datasets");
+
+      closestPlotData = plot.getClosestPlotData({ x: 1, y: 0});
+      assert.deepEqual(closestPlotData.pixelPoints, [{x: 1, y: 10}], "ignores closer, not-in-view data");
 
       svg.remove();
     });
