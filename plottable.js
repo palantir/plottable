@@ -6873,10 +6873,14 @@ var Plottable;
              * @returns {PlotData} The PlotData closest to queryPoint
              */
             AbstractPlot.prototype.getClosestPlotData = function (queryPoint) {
+                var _this = this;
                 var closestDistanceSquared = Infinity;
                 var closestIndex;
                 var plotData = this.getAllPlotData();
                 plotData.pixelPoints.forEach(function (pixelPoint, index) {
+                    if (pixelPoint.x < 0 || pixelPoint.y < 0 || pixelPoint.x > _this.width() || pixelPoint.y > _this.height()) {
+                        return;
+                    }
                     var distance = Plottable._Util.Methods.distanceSquared(pixelPoint, queryPoint);
                     if (distance < closestDistanceSquared) {
                         closestDistanceSquared = distance;

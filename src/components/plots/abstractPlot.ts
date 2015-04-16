@@ -528,6 +528,10 @@ export module Plot {
       var closestIndex: number;
       var plotData = this.getAllPlotData();
       plotData.pixelPoints.forEach((pixelPoint: Point, index: number) => {
+        if (pixelPoint.x < 0 || pixelPoint.y < 0 ||
+            pixelPoint.x > this.width() || pixelPoint.y > this.height()) {
+          return;
+        }
         var distance = _Util.Methods.distanceSquared(pixelPoint, queryPoint);
         if (distance < closestDistanceSquared) {
           closestDistanceSquared = distance;
