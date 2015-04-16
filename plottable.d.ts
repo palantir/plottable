@@ -2140,6 +2140,14 @@ declare module Plottable {
             orient(): string;
             orient(orientation: string): Time;
             _computeHeight(): number;
+            /**
+             * Makes sure that the size it requires is a multiple of tier sizes, such that
+             * we have no leftover tiers
+             */
+            protected _getSize(availableWidth: number, availableHeight: number): {
+                width: number;
+                height: number;
+            };
             protected _setup(): void;
             protected _getTickValues(): any[];
             _doRender(): Time;

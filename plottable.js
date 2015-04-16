@@ -4590,6 +4590,22 @@ var Plottable;
                 var worstWidth = this._maxWidthForInterval(config) + 2 * this.tickLabelPadding();
                 return Math.min(this._getIntervalLength(config), this.width()) >= worstWidth;
             };
+            /**
+             * Makes sure that the size it requires is a multiple of tier sizes, such that
+             * we have no leftover tiers
+             */
+            Time.prototype._getSize = function (availableWidth, availableHeight) {
+                var size = _super.prototype._getSize.call(this, availableWidth, availableHeight);
+                var adjustedHeight = 0;
+                for (var i = 0; i < this._tierHeights.length; i++) {
+                    if (adjustedHeight + this._tierHeights[i] > size.height) {
+                        break;
+                    }
+                    adjustedHeight += this._tierHeights[i];
+                }
+                size.height = adjustedHeight;
+                return size;
+            };
             Time.prototype._setup = function () {
                 _super.prototype._setup.call(this);
                 this._setupDomElements();

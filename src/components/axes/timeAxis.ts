@@ -285,6 +285,25 @@ export module Axis {
       return Math.min(this._getIntervalLength(config), this.width()) >= worstWidth;
     }
 
+    /**
+     * Makes sure that the size it requires is a multiple of tier sizes, such that
+     * we have no leftover tiers
+     */
+    protected _getSize(availableWidth: number, availableHeight: number) {
+      var size = super._getSize(availableWidth, availableHeight);
+
+      var adjustedHeight = 0;
+      for (var i = 0; i < this._tierHeights.length; i++) {
+        if (adjustedHeight + this._tierHeights[i] > size.height) {
+          break;
+        }
+        adjustedHeight += this._tierHeights[i];
+      }
+
+      size.height = adjustedHeight;
+      return size;
+    }
+
     protected _setup() {
       super._setup();
       this._setupDomElements();
