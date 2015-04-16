@@ -4745,11 +4745,31 @@ var Plottable;
                     labelLessTicks = this._generateLabellessTicks();
                 }
                 this._renderLabellessTickMarks(labelLessTicks);
+                this._hideOverflowingTiers();
                 for (i = 0; i < tierConfigs.length; ++i) {
                     this._renderTickMarks(tierTicks[i], i);
                     this._hideOverlappingAndCutOffLabels(i);
                 }
                 return this;
+            };
+            Time.prototype._hideOverflowingTiers = function () {
+                var boundingBox = this._element.select(".bounding-box")[0][0].getBoundingClientRect();
+                var isOutsideBBox = function (tickBox) {
+                    return (Math.floor(boundingBox.bottom) < Math.ceil(tickBox.top) || Math.floor(tickBox.bottom) < Math.ceil(boundingBox.top));
+                };
+                //TODO: rename, also don't use body
+                var visibleTickMarks = this._element.selectAll(".time-axis-tier").filter(function (d, i) {
+                    return d3.select(this).style("visibility") === "visible";
+                });
+                var visibleTickMarkRects = visibleTickMarks[0].map(function (mark) { return mark.getBoundingClientRect(); });
+                visibleTickMarks.each(function () {
+                    var clientRect = this.getBoundingClientRect();
+                    if (isOutsideBBox(clientRect)) {
+                        var axisTier = d3.select(this);
+                        axisTier.style("visibility", "hidden");
+                        axisTier.selectAll(".baseline").style("visibility", "inherit");
+                    }
+                });
             };
             Time.prototype._hideOverlappingAndCutOffLabels = function (index) {
                 var _this = this;
