@@ -164,13 +164,18 @@ export module Plot {
       var queryPtPrimary = this._isVertical ? queryPoint.x : queryPoint.y;
       var queryPtSecondary = this._isVertical ? queryPoint.y : queryPoint.x;
 
+      // SVGRects are positioned with sub-pixel accuracy (the default unit
+      // for the x, y, height & width attributes), but user selections (e.g. via
+      // mouse events) usually have pixel accuracy. We add a tolerance of 0.5 pixels.
+      var tolerance = 0.5;
+
       this.datasetOrder().forEach((key) => {
         var plotData = this.getAllPlotData(key);
         plotData.pixelPoints.forEach((plotPt, i) => {
           var bar = plotData.selection[0][i];
           var barBBox = bar.getBBox();
 
-          if (!_Util.Methods.intersectsBBox(chartXExtent, chartYExtent, barBBox)) {
+          if (!_Util.Methods.intersectsBBox(chartXExtent, chartYExtent, barBBox, tolerance)) {
             // bar isn't visible on plot; ignore it
             return;
           }
@@ -179,12 +184,21 @@ export module Plot {
           var secondaryDist = 0;
 
           // if we're inside a bar, distance in both directions should stay 0
-          if (!_Util.Methods.intersectsBBox(queryPoint.x, queryPoint.y, barBBox)) {
+          if (!_Util.Methods.intersectsBBox(queryPoint.x, queryPoint.y, barBBox, tolerance)) {
             var plotPtPrimary = this._isVertical ? plotPt.x : plotPt.y;
-            var plotPtSecondary = this._isVertical ? plotPt.y : plotPt.x;
-
             primaryDist = Math.abs(queryPtPrimary - plotPtPrimary);
-            secondaryDist = Math.abs(queryPtSecondary - plotPtSecondary);
+
+            // compute this bar's min and max along the secondary axis
+            var barMinSecondary = this._isVertical ? barBBox.y : barBBox.x;
+            var barMaxSecondary = barMinSecondary + (this._isVertical ? barBBox.height : barBBox.width);
+
+            if (queryPtSecondary >= barMinSecondary - tolerance && queryPtSecondary <= barMaxSecondary + tolerance) {
+              // if we're within a bar's secondary axis span, it is closest in that direction
+              secondaryDist = 0;
+            } else {
+              var plotPtSecondary = this._isVertical ? plotPt.y : plotPt.x;
+              secondaryDist = Math.abs(queryPtSecondary - plotPtSecondary);
+            }
           }
 
           // if we find a closer bar, record its distance and start new closest lists
