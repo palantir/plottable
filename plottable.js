@@ -8516,12 +8516,14 @@ var Plottable;
                 var domainKeys = this._getDomainKeys();
                 var positiveDataMapArray = dataMapArray.map(function (dataMap) {
                     return Plottable._Util.Methods.populateMap(domainKeys, function (domainKey) {
-                        return { key: domainKey, value: Math.max(0, dataMap.get(domainKey).value) || 0 };
+                        // return { key: domainKey, value: Math.max(0, dataMap.get(domainKey).value) || 0 };
+                        return { key: domainKey, value: Math.max(0, dataMap.get(domainKey).value) };
                     });
                 });
                 var negativeDataMapArray = dataMapArray.map(function (dataMap) {
                     return Plottable._Util.Methods.populateMap(domainKeys, function (domainKey) {
-                        return { key: domainKey, value: Math.min(dataMap.get(domainKey).value, 0) || 0 };
+                        // return { key: domainKey, value: Math.min(dataMap.get(domainKey).value, 0) || 0 };
+                        return { key: domainKey, value: Math.min(dataMap.get(domainKey).value, 0) };
                     });
                 });
                 this._setDatasetStackOffsets(this._stack(positiveDataMapArray), this._stack(negativeDataMapArray));

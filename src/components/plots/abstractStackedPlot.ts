@@ -43,13 +43,15 @@ export module Plot {
 
       var positiveDataMapArray: D3.Map<StackedDatum>[] = dataMapArray.map((dataMap) => {
         return _Util.Methods.populateMap(domainKeys, (domainKey) => {
-          return { key: domainKey, value: Math.max(0, dataMap.get(domainKey).value) || 0 };
+          // return { key: domainKey, value: Math.max(0, dataMap.get(domainKey).value) || 0 };
+          return { key: domainKey, value: Math.max(0, dataMap.get(domainKey).value) };
         });
       });
 
       var negativeDataMapArray: D3.Map<StackedDatum>[] = dataMapArray.map((dataMap) => {
         return _Util.Methods.populateMap(domainKeys, (domainKey) => {
-          return { key: domainKey, value: Math.min(dataMap.get(domainKey).value, 0) || 0 };
+          // return { key: domainKey, value: Math.min(dataMap.get(domainKey).value, 0) || 0 };
+          return { key: domainKey, value: Math.min(dataMap.get(domainKey).value, 0) };
         });
       });
 

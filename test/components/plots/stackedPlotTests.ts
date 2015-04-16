@@ -267,6 +267,55 @@ describe("Plots", () => {
     });
   });
 
+  describe("fail safe tests", () => {
+
+    var svg: D3.Selection;
+    var xScale: Plottable.Scale.Category;
+    var yScale: Plottable.Scale.Linear;
+    var data1: Object[];
+    var data2: Object[];
+
+    beforeEach(() => {
+      svg = generateSVG(600, 400);
+
+      data1 = [
+          { x: "A", y: "s", fill: "blue" },
+      ];
+      data2 = [
+          { x: "A", y: 1, fill: "red"},
+      ];
+      xScale = new Plottable.Scale.Category();
+      yScale = new Plottable.Scale.Linear();
+    });
+
+    afterEach(() => {
+      svg.remove();
+    });
+
+    it("conversion fails should be silent in stackedBarPlot", () => {
+      var plot = new Plottable.Plot.StackedBar(xScale, yScale);
+      plot.addDataset(data1);
+      plot.addDataset(data2);
+      plot.project("fill", "fill");
+      plot.project("x", "x", xScale).project("y", "y", yScale);
+
+      window.onerror = function(message, file, lineNumber) {
+        console.log('a');
+        alert('what');
+        return false;
+      }
+
+      plot.renderTo(svg);
+
+      assert.isTrue(true);
+
+
+      console.log(window.onerror);
+
+    });
+
+  });
+
   describe("scale extent updates", () => {
     var svg: D3.Selection;
     var xScale: Plottable.Scale.Category;
