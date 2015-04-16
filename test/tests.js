@@ -4766,7 +4766,7 @@ describe("Plots", function () {
             assert.deepEqual(dataset2.data(), originalData2, "underlying data is not modified");
             svg.remove();
         });
-        it("returns correct closest plot data", function () {
+        it("considers lying within a bar's y-range to mean it is closest", function () {
             function assertPlotDataEqual(expected, actual, msg) {
                 assert.deepEqual(expected.data, actual.data, msg);
                 assert.closeTo(expected.pixelPoints[0].x, actual.pixelPoints[0].x, 0.01, msg);

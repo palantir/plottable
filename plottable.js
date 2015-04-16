@@ -7603,7 +7603,7 @@ var Plottable;
                             // compute this bar's min and max along the secondary axis
                             var barMinSecondary = _this._isVertical ? barBBox.y : barBBox.x;
                             var barMaxSecondary = barMinSecondary + (_this._isVertical ? barBBox.height : barBBox.width);
-                            if (queryPtSecondary > barMinSecondary && queryPtSecondary <= barMaxSecondary) {
+                            if (queryPtSecondary >= barMinSecondary && queryPtSecondary <= barMaxSecondary) {
                                 // if we're within a bar's secondary axis span, it is closest in that direction
                                 secondaryDist = 0;
                             }

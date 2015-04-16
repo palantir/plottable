@@ -90,7 +90,7 @@ describe("Plots", () => {
       svg.remove();
     });
 
-    it("returns correct closest plot data", () => {
+    it("considers lying within a bar's y-range to mean it is closest", () => {
       function assertPlotDataEqual(expected: Plottable.Plot.PlotData, actual: Plottable.Plot.PlotData,
         msg: string) {
         assert.deepEqual(expected.data, actual.data, msg);

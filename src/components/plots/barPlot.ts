@@ -187,7 +187,7 @@ export module Plot {
             var barMinSecondary = this._isVertical ? barBBox.y : barBBox.x;
             var barMaxSecondary = barMinSecondary + (this._isVertical ? barBBox.height : barBBox.width);
 
-            if (queryPtSecondary > barMinSecondary && queryPtSecondary <= barMaxSecondary) {
+            if (queryPtSecondary >= barMinSecondary && queryPtSecondary <= barMaxSecondary) {
               // if we're within a bar's secondary axis span, it is closest in that direction
               secondaryDist = 0;
             } else {
