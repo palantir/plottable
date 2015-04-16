@@ -4121,7 +4121,12 @@ var Plottable;
                             var distanceSquared = Plottable._Util.Methods.distanceSquared(cpd.pixelPoints[0], queryPoint);
                             if (distanceSquared <= minDistSquared) {
                                 minDistSquared = distanceSquared;
-                                closestPlotData = cpd;
+                                closestPlotData = {
+                                    data: [cpd.data[0]],
+                                    pixelPoints: [cpd.pixelPoints[0]],
+                                    plot: cpd.plot,
+                                    selection: d3.select(cpd.selection[0][0])
+                                };
                             }
                         }
                     }
