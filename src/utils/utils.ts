@@ -248,8 +248,7 @@ export module _Util {
     }
 
     /**
-     * Returns true if and only if x is NaN
-     * Will return false for values like undefined, null, infinity, strings
+     * Returns true **only** if x is NaN
      */
     export function isNaN(n: any) {
       return n !== n;
