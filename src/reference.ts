@@ -8,6 +8,7 @@
 /// <reference path="utils/color.ts" />
 
 /// <reference path="utils/formatters.ts" />
+/// <reference path="utils/scaleDomainTransformers.ts" />
 /// <reference path="utils/symbolFactories.ts" />
 
 /// <reference path="utils/clientToSVGTranslator.ts" />
@@ -96,3 +97,6 @@
 /// <reference path="interactions/drag/xyDragBoxInteraction.ts" />
 /// <reference path="interactions/drag/yDragBoxInteraction.ts" />
 /// <reference path="interactions/hoverInteraction.ts" />
+
+/// <reference path="behaviors/abstractPanBehavior.ts" />
+/// <reference path="behaviors/dragPanBehavior.ts" />

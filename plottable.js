@@ -987,6 +987,41 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
+    var ScaleDomainTransformers;
+    (function (ScaleDomainTransformers) {
+        /**
+         * Returns a translated domain of the input scale with a translation of the input translateAmount
+         * in range space
+         *
+         * @param {Scale.AbstractQuantitative<D>} scale The input scale whose domain is being translated
+         * @param {number} translateAmount The amount to translate
+         * @returns {D[]} The translated domain
+         */
+        function translate(scale, translateAmount) {
+            var translateTransform = function (rangeValue) { return scale.invert(rangeValue + translateAmount); };
+            return scale.range().map(translateTransform);
+        }
+        ScaleDomainTransformers.translate = translate;
+        /**
+         * Returns a magnified domain of the input scale with a magnification of the input magnifyAmount
+         * in range space with the center point as the input centerValue, also in range space
+         *
+         * @param {Scale.AbstractQuantitative<D> scale The input scale whose domain is being magnified
+         * @param {number} magnifyAmount The amount to magnify
+         * @param {number} centerValue The center point of the magnification
+         * @returns {D[]} The magnified domain
+         */
+        function magnify(scale, magnifyAmount, centerValue) {
+            var magnifyTransform = function (rangeValue) { return scale.invert(centerValue - (centerValue - rangeValue) * magnifyAmount); };
+            return scale.range().map(magnifyTransform);
+        }
+        ScaleDomainTransformers.magnify = magnify;
+    })(ScaleDomainTransformers = Plottable.ScaleDomainTransformers || (Plottable.ScaleDomainTransformers = {}));
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var Plottable;
+(function (Plottable) {
     var SymbolFactories;
     (function (SymbolFactories) {
         function circle() {
@@ -10281,6 +10316,105 @@ var Plottable;
         })(Interaction.AbstractInteraction);
         Interaction.Hover = Hover;
     })(Interaction = Plottable.Interaction || (Plottable.Interaction = {}));
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var Plottable;
+(function (Plottable) {
+    var Behavior;
+    (function (Behavior) {
+        var Pan;
+        (function (Pan) {
+            var AbstractPan = (function () {
+                /**
+                 * Creates a DragPan Behavior.
+                 *
+                 * This behavior allows a consumer of Plottable to drag around in a component
+                 * in order to cause the input scale to translate,
+                 * resulting in a panning behavior to the consumer.
+                 *
+                 * @constructor
+                 * @param {Scale.AbstractQuantitative<number>} scale The scale to update on panning
+                 * @param {boolean} isVertical If the scale operates vertically or horizontally
+                 */
+                function AbstractPan(scale, isVertical) {
+                    this._panBounds = [null, null];
+                    this._scale = scale;
+                    this._verticalPan = isVertical;
+                }
+                AbstractPan.prototype.bounds = function (newBounds) {
+                    if (newBounds == null) {
+                        return this._panBounds;
+                    }
+                    this._panBounds = newBounds;
+                    return this;
+                };
+                return AbstractPan;
+            })();
+            Pan.AbstractPan = AbstractPan;
+        })(Pan = Behavior.Pan || (Behavior.Pan = {}));
+    })(Behavior = Plottable.Behavior || (Plottable.Behavior = {}));
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    var Behavior;
+    (function (Behavior) {
+        var Pan;
+        (function (Pan) {
+            var DragPan = (function (_super) {
+                __extends(DragPan, _super);
+                /**
+                 * Creates a DragPan Behavior.
+                 *
+                 * This behavior allows a consumer of Plottable to drag around in a component
+                 * in order to cause the input scale to translate,
+                 * resulting in a panning behavior to the consumer.
+                 *
+                 * @constructor
+                 * @param {Scale.AbstractQuantitative<number>} scale The scale to update on panning
+                 * @param {boolean} isVertical If the scale operates vertically or horizontally
+                 */
+                function DragPan(scale, isVertical) {
+                    _super.call(this, scale, isVertical);
+                    this._dragInteraction = new Plottable.Interaction.Drag();
+                    this._setupInteraction();
+                }
+                DragPan.prototype.getDragInteraction = function () {
+                    return this._dragInteraction;
+                };
+                DragPan.prototype._setupInteraction = function () {
+                    var _this = this;
+                    var lastDragValue;
+                    this._dragInteraction.drag(function (startPoint, endPoint) {
+                        var startPointDragValue = _this._verticalPan ? startPoint.y : startPoint.x;
+                        var endPointDragValue = _this._verticalPan ? endPoint.y : endPoint.x;
+                        var dragAmount = endPointDragValue - (lastDragValue == null ? startPointDragValue : lastDragValue);
+                        var leftLimit = _this._scale.range()[0] - (_this.bounds()[0] == null ? -Infinity : _this._scale.scale(_this.bounds()[0]));
+                        var rightLimit = _this._scale.range()[1] - (_this.bounds()[1] == null ? Infinity : _this._scale.scale(_this.bounds()[1]));
+                        if (dragAmount > 0) {
+                            dragAmount = Math.min(dragAmount, leftLimit);
+                        }
+                        else {
+                            dragAmount = Math.max(dragAmount, rightLimit);
+                        }
+                        _this._scale.domain(Plottable.ScaleDomainTransformers.translate(_this._scale, -dragAmount));
+                        lastDragValue = endPointDragValue;
+                    });
+                    this._dragInteraction.dragend(function () { return lastDragValue = null; });
+                };
+                return DragPan;
+            })(Pan.AbstractPan);
+            Pan.DragPan = DragPan;
+        })(Pan = Behavior.Pan || (Behavior.Pan = {}));
+    })(Behavior = Plottable.Behavior || (Plottable.Behavior = {}));
 })(Plottable || (Plottable = {}));
 
 /*!
