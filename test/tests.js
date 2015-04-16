@@ -4625,18 +4625,25 @@ describe("Plots", function () {
         });
         it("conversion fails should be silent in stackedBarPlot", function () {
             var plot = new Plottable.Plot.StackedBar(xScale, yScale);
-            plot.addDataset(data1);
-            plot.addDataset(data2);
+            plot.addDataset("d1", data1);
+            plot.addDataset("d2", data2);
             plot.project("fill", "fill");
             plot.project("x", "x", xScale).project("y", "y", yScale);
-            window.onerror = function (message, file, lineNumber) {
-                console.log('a');
-                alert('what');
-                return false;
-            };
-            plot.renderTo(svg);
-            assert.isTrue(true);
-            console.log(window.onerror);
+            var ds1PlotMetadata = plot._key2PlotDatasetKey.get("d1").plotMetadata;
+            var ds2PlotMetadata = plot._key2PlotDatasetKey.get("d2").plotMetadata;
+            assert.isFalse(isNaN(ds1PlotMetadata.offsets.get("A")), "ds1 offset should be a number");
+            assert.isFalse(isNaN(ds2PlotMetadata.offsets.get("A")), "ds2 offset should be a number");
+        });
+        it("conversion fails should be silent in stackedAreaPlot", function () {
+            var plot = new Plottable.Plot.StackedArea(xScale, yScale);
+            plot.addDataset("d1", data1);
+            plot.addDataset("d2", data2);
+            plot.project("fill", "fill");
+            plot.project("x", "x", xScale).project("y", "y", yScale);
+            var ds1PlotMetadata = plot._key2PlotDatasetKey.get("d1").plotMetadata;
+            var ds2PlotMetadata = plot._key2PlotDatasetKey.get("d2").plotMetadata;
+            assert.isFalse(isNaN(ds1PlotMetadata.offsets.get("A")), "ds1 offset should be a number");
+            assert.isFalse(isNaN(ds2PlotMetadata.offsets.get("A")), "ds2 offset should be a number");
         });
     });
     describe("scale extent updates", function () {
