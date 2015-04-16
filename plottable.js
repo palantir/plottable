@@ -2443,10 +2443,14 @@ var Plottable;
             };
             Color._getPlottableColors = function () {
                 var plottableDefaultColors = [];
-                var colorTester = d3.select("body").append("div");
+                var colorTester = d3.select("body").append("plottable-color-tester");
+                var defaultColorHex = Plottable._Util.Methods.colorTest(colorTester, "");
                 var i = 0;
                 var colorHex;
-                while ((colorHex = Plottable._Util.Methods.colorTest(colorTester, "plottable-colors-" + i)) !== null) {
+                while ((colorHex = Plottable._Util.Methods.colorTest(colorTester, "plottable-colors-" + i)) !== null && i < this.MAXIMUM_COLORS_FROM_CSS) {
+                    if (colorHex === defaultColorHex && colorHex === plottableDefaultColors[plottableDefaultColors.length - 1]) {
+                        break;
+                    }
                     plottableDefaultColors.push(colorHex);
                     i++;
                 }
@@ -2464,6 +2468,8 @@ var Plottable;
             };
             Color.HEX_SCALE_FACTOR = 20;
             Color.LOOP_LIGHTEN_FACTOR = 1.6;
+            //The maximum number of colors we are getting from CSS stylesheets
+            Color.MAXIMUM_COLORS_FROM_CSS = 256;
             return Color;
         })(Scale.AbstractScale);
         Scale.Color = Color;
