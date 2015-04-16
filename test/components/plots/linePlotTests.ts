@@ -20,14 +20,14 @@ describe("Plots", () => {
 
       var linePlot = new Plottable.Plot.Line(xScale, yScale);
       linePlot.addDataset(dataWithNaN);
-      linePlot.project("x", (d: any) => d.foo, xScale)
+      linePlot.project("x", (d: any) => d.foo, xScale);
       linePlot.project("y", (d: any) => d.bar, yScale);
       linePlot.renderTo(svg);
 
       var apd = linePlot.getAllPlotData();
 
-      var expectedLength = dataWithNaN.length - 1
-      assert.strictEqual(apd.data.length, expectedLength, "NaN data was not returned")
+      var expectedLength = dataWithNaN.length - 1;
+      assert.strictEqual(apd.data.length, expectedLength, "NaN data was not returned");
       assert.strictEqual(apd.pixelPoints.length, expectedLength, "NaN data doesn't appear in pixelPoints");
 
       svg.remove();
