@@ -4757,12 +4757,10 @@ var Plottable;
                 var isOutsideBBox = function (tickBox) {
                     return (Math.floor(boundingBox.bottom) < Math.ceil(tickBox.top) || Math.floor(tickBox.bottom) < Math.ceil(boundingBox.top));
                 };
-                //TODO: rename, also don't use body
-                var visibleTickMarks = this._element.selectAll(".time-axis-tier").filter(function (d, i) {
+                var visibleAxisTiers = this._element.selectAll(".time-axis-tier").filter(function (d, i) {
                     return d3.select(this).style("visibility") === "visible";
                 });
-                var visibleTickMarkRects = visibleTickMarks[0].map(function (mark) { return mark.getBoundingClientRect(); });
-                visibleTickMarks.each(function () {
+                visibleAxisTiers.each(function () {
                     var clientRect = this.getBoundingClientRect();
                     if (isOutsideBBox(clientRect)) {
                         var axisTier = d3.select(this);

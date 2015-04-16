@@ -472,8 +472,6 @@ export module Axis {
       this._renderLabellessTickMarks(labelLessTicks);
 
       this._hideOverflowingTiers();
-      // return this;
-
       for (i = 0; i < tierConfigs.length; ++i) {
         this._renderTickMarks(tierTicks[i], i);
         this._hideOverlappingAndCutOffLabels(i);
@@ -492,17 +490,13 @@ export module Axis {
         );
       };
 
-
-      //TODO: rename, also don't use body
-      var visibleTickMarks = this._element
+      var visibleAxisTiers = this._element
         .selectAll(".time-axis-tier")
         .filter(function(d: Element, i: number) {
           return d3.select(this).style("visibility") === "visible";
         });
 
-      var visibleTickMarkRects = visibleTickMarks[0].map((mark: Element) => mark.getBoundingClientRect() );
-
-      visibleTickMarks.each(function() {
+      visibleAxisTiers.each(function() {
         var clientRect = this.getBoundingClientRect();
         if (isOutsideBBox(clientRect)) {
           var axisTier = d3.select(this);
@@ -510,7 +504,6 @@ export module Axis {
           axisTier.selectAll(".baseline").style("visibility", "inherit");
         }
       });
-
     }
 
     private _hideOverlappingAndCutOffLabels(index: number) {
