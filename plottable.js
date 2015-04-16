@@ -7989,8 +7989,12 @@ var Plottable;
                     }
                     var drawer = plotDatasetKey.drawer;
                     plotDatasetKey.dataset.data().forEach(function (datum, index) {
+                        var pixelPoint = drawer._getPixelPoint(datum, index);
+                        if (pixelPoint.x !== pixelPoint.x || pixelPoint.y !== pixelPoint.y) {
+                            return;
+                        }
                         data.push(datum);
-                        pixelPoints.push(drawer._getPixelPoint(datum, index));
+                        pixelPoints.push(pixelPoint);
                     });
                     if (plotDatasetKey.dataset.data().length > 0) {
                         allElements.push(drawer._getSelection(0).node());

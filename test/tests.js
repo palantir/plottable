@@ -2687,6 +2687,31 @@ describe("Plots", function () {
 ///<reference path="../../testReference.ts" />
 var assert = chai.assert;
 describe("Plots", function () {
+    // HACKHACK #1798: beforeEach being used below
+    describe("LinePlot", function () {
+        it("getAllPlotData with NaNs", function () {
+            var svg = generateSVG(500, 500);
+            var dataWithNaN = [
+                { foo: 0.0, bar: 0.0 },
+                { foo: 0.2, bar: 0.2 },
+                { foo: 0.4, bar: NaN },
+                { foo: 0.6, bar: 0.6 },
+                { foo: 0.8, bar: 0.8 }
+            ];
+            var xScale = new Plottable.Scale.Linear().domain([0, 1]);
+            var yScale = new Plottable.Scale.Linear().domain([0, 1]);
+            var linePlot = new Plottable.Plot.Line(xScale, yScale);
+            linePlot.addDataset(dataWithNaN);
+            linePlot.project("x", function (d) { return d.foo; }, xScale);
+            linePlot.project("y", function (d) { return d.bar; }, yScale);
+            linePlot.renderTo(svg);
+            var apd = linePlot.getAllPlotData();
+            var expectedLength = dataWithNaN.length - 1;
+            assert.strictEqual(apd.data.length, expectedLength, "NaN data was not returned");
+            assert.strictEqual(apd.pixelPoints.length, expectedLength, "NaN data doesn't appear in pixelPoints");
+            svg.remove();
+        });
+    });
     describe("LinePlot", function () {
         var svg;
         var xScale;
