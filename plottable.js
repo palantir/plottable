@@ -4753,16 +4753,15 @@ var Plottable;
                 return this;
             };
             Time.prototype._hideOverflowingTiers = function () {
-                var boundingBox = this._element.select(".bounding-box")[0][0].getBoundingClientRect();
-                var isOutsideBBox = function (tickBox) {
-                    return (Math.floor(boundingBox.bottom) < Math.ceil(tickBox.top) || Math.floor(tickBox.bottom) < Math.ceil(boundingBox.top));
-                };
                 var visibleAxisTiers = this._element.selectAll(".time-axis-tier").filter(function (d, i) {
                     return d3.select(this).style("visibility") === "visible";
                 });
-                visibleAxisTiers.each(function () {
-                    var clientRect = this.getBoundingClientRect();
-                    if (isOutsideBBox(clientRect)) {
+                var _this = this;
+                var availableHeight = this.height();
+                var usedHeight = 0;
+                visibleAxisTiers.each(function (d, i) {
+                    usedHeight += _this._tierHeights[i];
+                    if (usedHeight > availableHeight) {
                         var axisTier = d3.select(this);
                         axisTier.style("visibility", "hidden");
                         axisTier.selectAll(".baseline").style("visibility", "inherit");
