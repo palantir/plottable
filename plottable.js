@@ -7835,7 +7835,7 @@ var Plottable;
                 var barAlignmentFactor = this._barAlignmentFactor;
                 plotData.selection.each(function (datum, index) {
                     var bar = d3.select(this);
-                    if (isVertical && +bar.attr("y") + +bar.attr("height") > scaledBaseline) {
+                    if (isVertical && +bar.attr("y") >= scaledBaseline) {
                         plotData.pixelPoints[index].y += +bar.attr("height");
                     }
                     else if (!isVertical && +bar.attr("x") < scaledBaseline) {
