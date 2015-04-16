@@ -23,6 +23,43 @@ export module Component {
       components.forEach((c: AbstractComponent) => this._addComponent(c));
     }
 
+    /**
+     * Retrieves closest PlotData to queryPoint across all plots in this group.
+     * Plots define their own notion of closeness; this function compares results across
+     * plots and picks the closest to queryPoint using the Euclidean norm. Ties are
+     * broken by favoring the plots higher in the group.
+     *
+     * @param {Point} queryPoint The point to which plot data should be compared
+     *
+     * @returns {PlotData} The PlotData closest to queryPoint
+     */
+    public getClosestPlotData(queryPoint: Point): Plot.PlotData {
+      var minDistSquared = Infinity;
+      var closestPlotData: Plot.PlotData = {
+        data: [],
+        pixelPoints: [],
+        plot: null,
+        selection: d3.selectAll([])
+      };
+
+      this.components().forEach((c) => {
+        // consider only components implementing this function
+        if ((<any>c).getClosestPlotData !== undefined) {
+          var cpd = (<any>c).getClosestPlotData(queryPoint);
+          if (cpd.data.length > 0) {
+            // we tie-break multiple closest within a single plot by taking the first
+            var distanceSquared = _Util.Methods.distanceSquared(cpd.pixelPoints[0], queryPoint);
+            if (distanceSquared <= minDistSquared) {
+              minDistSquared = distanceSquared;
+              closestPlotData = cpd;
+            }
+          }
+        }
+      });
+
+      return closestPlotData;
+    }
+
     public _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
       var requests = this.components().map((c: AbstractComponent) => c._requestedSpace(offeredWidth, offeredHeight));
       return {

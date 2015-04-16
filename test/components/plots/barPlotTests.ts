@@ -10,6 +10,7 @@ describe("Plots", () => {
       assert.closeTo(expected.pixelPoints[0].x, actual.pixelPoints[0].x, 0.01, msg);
       assert.closeTo(expected.pixelPoints[0].y, actual.pixelPoints[0].y, 0.01, msg);
       assert.deepEqual(expected.selection, actual.selection, msg);
+      assert.deepEqual(expected.plot, actual.plot, msg);
     }
 
     describe("Vertical Bar Plot", () => {
@@ -185,6 +186,7 @@ describe("Plots", () => {
           var expected = {
             data: [d0],
             pixelPoints: [d0Px],
+            plot: barPlot,
             selection: d3.selectAll([bars[0][0]])
           };
 
@@ -203,6 +205,7 @@ describe("Plots", () => {
           expected = {
             data: [d1],
             pixelPoints: [d1Px],
+            plot: barPlot,
             selection: d3.selectAll([bars[0][1]])
           };
 
@@ -225,6 +228,7 @@ describe("Plots", () => {
               x: xScale.scale(d1.x),
               y: yScale.scale(d1.y)
             }],
+            plot: barPlot,
             selection: d3.selectAll([bars[0][1]])
           };
 
@@ -549,6 +553,7 @@ describe("Plots", () => {
           var expected = {
             data: [d0],
             pixelPoints: [d0Px],
+            plot: barPlot,
             selection: d3.selectAll([bars[0][0]])
           };
 
@@ -567,6 +572,7 @@ describe("Plots", () => {
           expected = {
             data: [d1],
             pixelPoints: [d1Px],
+            plot: barPlot,
             selection: d3.selectAll([bars[0][1]])
           };
 
@@ -589,6 +595,7 @@ describe("Plots", () => {
               x: xScale.scale(d1.x),
               y: yScale.scale(d1.y)
             }],
+            plot: barPlot,
             selection: d3.selectAll([bars[0][1]])
           };
 

@@ -151,7 +151,7 @@ export module Plot {
         }
       });
 
-      return { data: data, pixelPoints: pixelPoints, selection: d3.selectAll(allElements) };
+      return { data: data, pixelPoints: pixelPoints, plot: this, selection: d3.selectAll(allElements) };
     }
 
     /**
@@ -202,6 +202,7 @@ export module Plot {
       return {
         data: closestData,
         pixelPoints: closestPixelPoints,
+        plot: this,
         selection: d3.selectAll(closestElements)
       };
     }

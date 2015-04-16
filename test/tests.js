@@ -2854,6 +2854,7 @@ describe("Plots", function () {
                 assert.closeTo(expected.pixelPoints[0].x, actual.pixelPoints[0].x, 0.01, msg);
                 assert.closeTo(expected.pixelPoints[0].y, actual.pixelPoints[0].y, 0.01, msg);
                 assert.deepEqual(expected.selection, actual.selection, msg);
+                assert.deepEqual(expected.plot, actual.plot, msg);
             }
             beforeEach(function () {
                 dataset3 = [
@@ -2877,6 +2878,7 @@ describe("Plots", function () {
                 var expected = {
                     data: [d0],
                     pixelPoints: [d0Px],
+                    plot: linePlot,
                     selection: d3.selectAll([lines[0][2]])
                 };
                 var closest = linePlot.getClosestPlotData({ x: d0Px.x, y: d0Px.y - 1 });
@@ -2888,6 +2890,7 @@ describe("Plots", function () {
                 expected = {
                     data: [d1],
                     pixelPoints: [d1Px],
+                    plot: linePlot,
                     selection: d3.selectAll([lines[0][2]])
                 };
                 closest = linePlot.getClosestPlotData({ x: d1Px.x - 1, y: d1Px.y });
@@ -2902,6 +2905,7 @@ describe("Plots", function () {
                         x: xScale.scale(xAccessor(d1)),
                         y: yScale.scale(yAccessor(d1))
                     }],
+                    plot: linePlot,
                     selection: d3.selectAll([lines[0][2]])
                 };
                 var closest = linePlot.getClosestPlotData({ x: xScale.scale(0.25), y: d1Px.y });
@@ -3079,6 +3083,7 @@ describe("Plots", function () {
             assert.closeTo(expected.pixelPoints[0].x, actual.pixelPoints[0].x, 0.01, msg);
             assert.closeTo(expected.pixelPoints[0].y, actual.pixelPoints[0].y, 0.01, msg);
             assert.deepEqual(expected.selection, actual.selection, msg);
+            assert.deepEqual(expected.plot, actual.plot, msg);
         }
         describe("Vertical Bar Plot", function () {
             var svg;
@@ -3231,6 +3236,7 @@ describe("Plots", function () {
                     var expected = {
                         data: [d0],
                         pixelPoints: [d0Px],
+                        plot: barPlot,
                         selection: d3.selectAll([bars[0][0]])
                     };
                     var closest = barPlot.getClosestPlotData({ x: d0Px.x, y: d0Px.y + 1 });
@@ -3244,6 +3250,7 @@ describe("Plots", function () {
                     expected = {
                         data: [d1],
                         pixelPoints: [d1Px],
+                        plot: barPlot,
                         selection: d3.selectAll([bars[0][1]])
                     };
                     closest = barPlot.getClosestPlotData({ x: d1Px.x, y: d1Px.y - 1 });
@@ -3261,6 +3268,7 @@ describe("Plots", function () {
                             x: xScale.scale(d1.x),
                             y: yScale.scale(d1.y)
                         }],
+                        plot: barPlot,
                         selection: d3.selectAll([bars[0][1]])
                     };
                     var closest = barPlot.getClosestPlotData({ x: d0Px.x, y: zeroY + 1 });
@@ -3540,6 +3548,7 @@ describe("Plots", function () {
                     var expected = {
                         data: [d0],
                         pixelPoints: [d0Px],
+                        plot: barPlot,
                         selection: d3.selectAll([bars[0][0]])
                     };
                     var closest = barPlot.getClosestPlotData({ x: d0Px.x - 1, y: d0Px.y });
@@ -3553,6 +3562,7 @@ describe("Plots", function () {
                     expected = {
                         data: [d1],
                         pixelPoints: [d1Px],
+                        plot: barPlot,
                         selection: d3.selectAll([bars[0][1]])
                     };
                     closest = barPlot.getClosestPlotData({ x: d1Px.x + 1, y: d1Px.y });
@@ -3570,6 +3580,7 @@ describe("Plots", function () {
                             x: xScale.scale(d1.x),
                             y: yScale.scale(d1.y)
                         }],
+                        plot: barPlot,
                         selection: d3.selectAll([bars[0][1]])
                     };
                     var closest = barPlot.getClosestPlotData({ x: zeroX - 1, y: d0Px.y });
@@ -5696,6 +5707,58 @@ describe("ComponentGroups", function () {
                 assert.equal(components[1], c2, "components are inside");
                 assert.equal(components[2], cg2, "componentGroup2 inside componentGroup1");
             });
+        });
+    });
+    describe("getClosestPlotData()", function () {
+        it("handles empty groups gracefully", function () {
+            var cg = new Plottable.Component.Group();
+            var closest = cg.getClosestPlotData({ x: 0, y: 0 });
+            assert.lengthOf(closest.data, 0, "returns empty data");
+            assert.lengthOf(closest.pixelPoints, 0, "returns empty pixelPoints");
+            assert.isTrue(closest.selection.empty(), "returns empty selection");
+            assert.isNull(closest.plot, "returns null plot");
+        });
+        it("returns correct closest plot data", function () {
+            function assertPlotDataEqual(expected, actual, msg) {
+                assert.deepEqual(expected.data, actual.data, msg);
+                assert.closeTo(expected.pixelPoints[0].x, actual.pixelPoints[0].x, 0.01, msg);
+                assert.closeTo(expected.pixelPoints[0].y, actual.pixelPoints[0].y, 0.01, msg);
+                assert.deepEqual(expected.selection, actual.selection, msg);
+                assert.deepEqual(expected.plot, actual.plot, msg);
+            }
+            var c1d0 = { x: "A", y: 1 };
+            var c1Plot = new Plottable.Plot.AbstractPlot();
+            var c1Px = { x: 0, y: 0 };
+            var c1Selection = d3.select();
+            var c1PlotData = {
+                data: [c1d0],
+                pixelPoints: [c1Px],
+                plot: c1Plot,
+                selection: c1Selection
+            };
+            var c2d0 = { x: "B", y: 2 };
+            var c2Plot = new Plottable.Plot.AbstractPlot();
+            var c2Px = { x: 1, y: 1 };
+            var c2Selection = d3.select();
+            var c2PlotData = {
+                data: [c2d0],
+                pixelPoints: [c2Px],
+                plot: c2Plot,
+                selection: c2Selection
+            };
+            var c1 = new Plottable.Component.AbstractComponent();
+            c1.getClosestPlotData = function (p) {
+                return c1PlotData;
+            };
+            var c2 = new Plottable.Component.AbstractComponent();
+            c2.getClosestPlotData = function (p) {
+                return c2PlotData;
+            };
+            var cg = new Plottable.Component.Group([c1, c2]);
+            var closest = cg.getClosestPlotData({ x: 0.25, y: 0.25 });
+            assertPlotDataEqual(c1PlotData, closest, "picks c1 plot data when L2 closest to it");
+            closest = cg.getClosestPlotData({ x: 0.75, y: 0.75 });
+            assertPlotDataEqual(c2PlotData, closest, "picks c2 plot data when L2 closest to it");
         });
     });
 });

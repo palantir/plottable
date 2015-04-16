@@ -284,4 +284,67 @@ describe("ComponentGroups", () => {
       });
 
     });
+
+  describe("getClosestPlotData()", () => {
+    it("handles empty groups gracefully", () => {
+      var cg = new Plottable.Component.Group();
+      var closest = cg.getClosestPlotData({ x: 0, y: 0 });
+
+      assert.lengthOf(closest.data, 0, "returns empty data");
+      assert.lengthOf(closest.pixelPoints, 0, "returns empty pixelPoints");
+      assert.isTrue(closest.selection.empty(), "returns empty selection");
+      assert.isNull(closest.plot, "returns null plot");
+    });
+
+    it("returns correct closest plot data", () => {
+      function assertPlotDataEqual(expected: Plottable.Plot.PlotData, actual: Plottable.Plot.PlotData,
+        msg: string) {
+        assert.deepEqual(expected.data, actual.data, msg);
+        assert.closeTo(expected.pixelPoints[0].x, actual.pixelPoints[0].x, 0.01, msg);
+        assert.closeTo(expected.pixelPoints[0].y, actual.pixelPoints[0].y, 0.01, msg);
+        assert.deepEqual(expected.selection, actual.selection, msg);
+        assert.deepEqual(expected.plot, actual.plot, msg);
+      }
+
+      var c1d0 = { x: "A", y: 1 };
+      var c1Plot = new Plottable.Plot.AbstractPlot();
+      var c1Px = { x: 0, y: 0 };
+      var c1Selection = d3.select();
+      var c1PlotData = {
+        data: [c1d0],
+        pixelPoints: [c1Px],
+        plot: c1Plot,
+        selection: c1Selection
+      };
+
+      var c2d0 = { x: "B", y: 2 };
+      var c2Plot = new Plottable.Plot.AbstractPlot();
+      var c2Px = { x: 1, y: 1 };
+      var c2Selection = d3.select();
+      var c2PlotData = {
+        data: [c2d0],
+        pixelPoints: [c2Px],
+        plot: c2Plot,
+        selection: c2Selection
+      };
+
+      var c1 = new Plottable.Component.AbstractComponent();
+      (<any>c1).getClosestPlotData = (p: Plottable.Point) => {
+        return c1PlotData;
+      };
+
+      var c2 = new Plottable.Component.AbstractComponent();
+      (<any>c2).getClosestPlotData = (p: Plottable.Point) => {
+        return c2PlotData;
+      };
+
+      var cg = new Plottable.Component.Group([c1, c2]);
+
+      var closest = cg.getClosestPlotData({ x: 0.25, y: 0.25 });
+      assertPlotDataEqual(c1PlotData, closest, "picks c1 plot data when L2 closest to it");
+
+      closest = cg.getClosestPlotData({ x: 0.75, y: 0.75 });
+      assertPlotDataEqual(c2PlotData, closest, "picks c2 plot data when L2 closest to it");
+    });
+  });
 });

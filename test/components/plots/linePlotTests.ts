@@ -252,6 +252,7 @@ describe("Plots", () => {
         assert.closeTo(expected.pixelPoints[0].x, actual.pixelPoints[0].x, 0.01, msg);
         assert.closeTo(expected.pixelPoints[0].y, actual.pixelPoints[0].y, 0.01, msg);
         assert.deepEqual(expected.selection, actual.selection, msg);
+        assert.deepEqual(expected.plot, actual.plot, msg);
       }
 
       beforeEach(() => {
@@ -280,6 +281,7 @@ describe("Plots", () => {
         var expected = {
           data: [d0],
           pixelPoints: [d0Px],
+          plot: linePlot,
           selection: d3.selectAll([lines[0][2]])
         };
 
@@ -295,6 +297,7 @@ describe("Plots", () => {
         expected = {
           data: [d1],
           pixelPoints: [d1Px],
+          plot: linePlot,
           selection: d3.selectAll([lines[0][2]])
         };
 
@@ -313,6 +316,7 @@ describe("Plots", () => {
             x: xScale.scale(xAccessor(d1)),
             y: yScale.scale(yAccessor(d1))
           }],
+          plot: linePlot,
           selection: d3.selectAll([lines[0][2]])
         };
 

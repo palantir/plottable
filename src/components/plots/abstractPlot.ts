@@ -19,6 +19,7 @@ export module Plot {
   export type PlotData = {
     data: any[];
     pixelPoints: Point[];
+    plot: Plot.AbstractPlot;
     selection: D3.Selection;
   }
 
@@ -512,11 +513,11 @@ export module Plot {
         });
       });
 
-      return { data: data, pixelPoints: pixelPoints, selection: d3.selectAll(allElements) };
+      return { data: data, pixelPoints: pixelPoints, plot: this, selection: d3.selectAll(allElements) };
     }
 
     /**
-     * Retrieves PlotData with the lowest distance, where distance is defined
+     * Retrieves closest PlotData to queryPoint, where distance is defined
      * to be the Euclidiean norm.
      *
      * @param {Point} queryPoint The point to which plot data should be compared
@@ -536,11 +537,12 @@ export module Plot {
       });
 
       if (closestIndex == null) {
-        return {data: [], pixelPoints: [], selection: d3.select()};
+        return {data: [], pixelPoints: [], plot: this, selection: d3.select()};
       }
 
       return {data: [plotData.data[closestIndex]],
               pixelPoints: [plotData.pixelPoints[closestIndex]],
+              plot: this,
               selection: d3.select(plotData.selection[0][closestIndex])};
     }
   }

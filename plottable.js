@@ -4094,6 +4094,40 @@ var Plottable;
                 this.classed("component-group", true);
                 components.forEach(function (c) { return _this._addComponent(c); });
             }
+            /**
+             * Retrieves closest PlotData to queryPoint across all plots in this group.
+             * Plots define their own notion of closeness; this function compares results across
+             * plots and picks the closest to queryPoint using the Euclidean norm. Ties are
+             * broken by favoring the plots higher in the group.
+             *
+             * @param {Point} queryPoint The point to which plot data should be compared
+             *
+             * @returns {PlotData} The PlotData closest to queryPoint
+             */
+            Group.prototype.getClosestPlotData = function (queryPoint) {
+                var minDistSquared = Infinity;
+                var closestPlotData = {
+                    data: [],
+                    pixelPoints: [],
+                    plot: null,
+                    selection: d3.selectAll([])
+                };
+                this.components().forEach(function (c) {
+                    // consider only components implementing this function
+                    if (c.getClosestPlotData !== undefined) {
+                        var cpd = c.getClosestPlotData(queryPoint);
+                        if (cpd.data.length > 0) {
+                            // we tie-break multiple closest within a single plot by taking the first
+                            var distanceSquared = Plottable._Util.Methods.distanceSquared(cpd.pixelPoints[0], queryPoint);
+                            if (distanceSquared <= minDistSquared) {
+                                minDistSquared = distanceSquared;
+                                closestPlotData = cpd;
+                            }
+                        }
+                    }
+                });
+                return closestPlotData;
+            };
             Group.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
                 var requests = this.components().map(function (c) { return c._requestedSpace(offeredWidth, offeredHeight); });
                 return {
@@ -6862,10 +6896,10 @@ var Plottable;
                         allElements.push(drawer._getSelection(index).node());
                     });
                 });
-                return { data: data, pixelPoints: pixelPoints, selection: d3.selectAll(allElements) };
+                return { data: data, pixelPoints: pixelPoints, plot: this, selection: d3.selectAll(allElements) };
             };
             /**
-             * Retrieves PlotData with the lowest distance, where distance is defined
+             * Retrieves closest PlotData to queryPoint, where distance is defined
              * to be the Euclidiean norm.
              *
              * @param {Point} queryPoint The point to which plot data should be compared
@@ -6884,9 +6918,9 @@ var Plottable;
                     }
                 });
                 if (closestIndex == null) {
-                    return { data: [], pixelPoints: [], selection: d3.select() };
+                    return { data: [], pixelPoints: [], plot: this, selection: d3.select() };
                 }
-                return { data: [plotData.data[closestIndex]], pixelPoints: [plotData.pixelPoints[closestIndex]], selection: d3.select(plotData.selection[0][closestIndex]) };
+                return { data: [plotData.data[closestIndex]], pixelPoints: [plotData.pixelPoints[closestIndex]], plot: this, selection: d3.select(plotData.selection[0][closestIndex]) };
             };
             return AbstractPlot;
         })(Plottable.Component.AbstractComponent);
@@ -7622,6 +7656,7 @@ var Plottable;
                 return {
                     data: closestData,
                     pixelPoints: closestPixelPoints,
+                    plot: this,
                     selection: d3.selectAll(closestElements)
                 };
             };
@@ -8062,7 +8097,7 @@ var Plottable;
                         allElements.push(drawer._getSelection(0).node());
                     }
                 });
-                return { data: data, pixelPoints: pixelPoints, selection: d3.selectAll(allElements) };
+                return { data: data, pixelPoints: pixelPoints, plot: this, selection: d3.selectAll(allElements) };
             };
             /**
              * Retrieves the closest PlotData to queryPoint.
@@ -8106,6 +8141,7 @@ var Plottable;
                 return {
                     data: closestData,
                     pixelPoints: closestPixelPoints,
+                    plot: this,
                     selection: d3.selectAll(closestElements)
                 };
             };
