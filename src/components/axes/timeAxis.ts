@@ -481,19 +481,17 @@ export module Axis {
     }
 
     private _hideOverflowingTiers() {
+      var availableHeight = this.height();
+      var usedHeight = 0;
+
       var visibleAxisTiers = this._element
         .selectAll(".time-axis-tier")
         .filter(function(d: Element, i: number) {
           return d3.select(this).style("visibility") === "visible";
+        }).attr("visibility", (d: any, i: number) => {
+          usedHeight += this._tierHeights[i];
+          return usedHeight <= availableHeight ? "visible" : "hidden";
         });
-
-      var availableHeight = this.height();
-      var usedHeight = 0;
-
-      visibleAxisTiers.attr("visibility", (d: any, i: number) => {
-        usedHeight += this._tierHeights[i];
-        return usedHeight <= availableHeight ? "visible" : "hidden";
-      });
     }
 
     private _hideOverlappingAndCutOffLabels(index: number) {

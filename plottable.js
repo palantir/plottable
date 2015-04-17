@@ -4754,12 +4754,11 @@ var Plottable;
             };
             Time.prototype._hideOverflowingTiers = function () {
                 var _this = this;
-                var visibleAxisTiers = this._element.selectAll(".time-axis-tier").filter(function (d, i) {
-                    return d3.select(this).style("visibility") === "visible";
-                });
                 var availableHeight = this.height();
                 var usedHeight = 0;
-                visibleAxisTiers.attr("visibility", function (d, i) {
+                var visibleAxisTiers = this._element.selectAll(".time-axis-tier").filter(function (d, i) {
+                    return d3.select(this).style("visibility") === "visible";
+                }).attr("visibility", function (d, i) {
                     usedHeight += _this._tierHeights[i];
                     return usedHeight <= availableHeight ? "visible" : "hidden";
                 });
