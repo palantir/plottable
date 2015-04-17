@@ -9624,6 +9624,10 @@ var Plottable;
                 this._scrollInteraction._anchor(component, hitBox);
             };
             PanZoom.prototype._setupInteractions = function () {
+                this._setupDragInteraction();
+                this._setupScrollInteraction();
+            };
+            PanZoom.prototype._setupDragInteraction = function () {
                 var _this = this;
                 var lastDragPoint;
                 this._dragInteraction.drag(function (startPoint, endPoint) {
@@ -9638,6 +9642,9 @@ var Plottable;
                     lastDragPoint = endPoint;
                 });
                 this._dragInteraction.dragend(function () { return lastDragPoint = null; });
+            };
+            PanZoom.prototype._setupScrollInteraction = function () {
+                var _this = this;
                 var magnifyAmount = 1;
                 this._scrollInteraction.onScroll(function (point, deltaAmount) {
                     var oldMagnifyAmount = magnifyAmount;

@@ -41,6 +41,11 @@ export module Interaction {
     }
 
     private _setupInteractions() {
+      this._setupDragInteraction();
+      this._setupScrollInteraction();
+    }
+
+    private _setupDragInteraction() {
       var lastDragPoint: Point;
       this._dragInteraction.drag((startPoint, endPoint) => {
         var dragAmountX = endPoint.x - (lastDragPoint == null ? startPoint.x : lastDragPoint.x);
@@ -54,7 +59,9 @@ export module Interaction {
         lastDragPoint = endPoint;
       });
       this._dragInteraction.dragend(() => lastDragPoint = null);
+    }
 
+    private _setupScrollInteraction() {
       var magnifyAmount = 1;
       this._scrollInteraction.onScroll((point: Point, deltaAmount: number) => {
         var oldMagnifyAmount = magnifyAmount;
