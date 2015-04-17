@@ -2143,6 +2143,38 @@ describe("Plots", function () {
             assert.includeMembers(oneElementPlotData.pixelPoints, data2.map(data2PointConverter), "includes data2 points");
             svg.remove();
         });
+        it("getAllPlotData() with NaN pixel points", function () {
+            var svg = generateSVG(400, 400);
+            var plot = new Plottable.Plot.AbstractPlot();
+            var data = [{ value: NaN }, { value: 1 }, { value: 2 }];
+            var dataPoints = data.map(function (datum) {
+                return { x: datum.value, y: 10 };
+            });
+            var dataPointConverter = function (datum, index) { return dataPoints[index]; };
+            // Create mock drawer with already drawn items
+            var mockDrawer = new Plottable._Drawer.AbstractDrawer("ds");
+            var renderArea = svg.append("g");
+            var circles = renderArea.selectAll("circles").data(data);
+            circles.enter().append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
+            circles.exit().remove();
+            mockDrawer.setup = function () { return mockDrawer._renderArea = renderArea; };
+            mockDrawer._getSelector = function () { return "circle"; };
+            mockDrawer._getPixelPoint = dataPointConverter;
+            // Mock _getDrawer to return the mock drawer
+            plot._getDrawer = function () { return mockDrawer; };
+            plot.addDataset("ds", data);
+            plot.renderTo(svg);
+            var oneElementPlotData = plot.getAllPlotData();
+            var oneElementSelection = oneElementPlotData.selection;
+            assert.strictEqual(oneElementSelection.size(), 2, "finds all selections that do not have NaN pixelPoint");
+            assert.lengthOf(oneElementPlotData.pixelPoints, 2, "returns pixelPoints except ones with NaN");
+            assert.lengthOf(oneElementPlotData.data, 2, "finds data that do not have NaN pixelPoint");
+            oneElementPlotData.pixelPoints.forEach(function (pixelPoint) {
+                assert.isNumber(pixelPoint.x, "pixelPoint X cannot be NaN");
+                assert.isNumber(pixelPoint.y, "pixelPoint Y cannot be NaN");
+            });
+            svg.remove();
+        });
         it("getClosestPlotData", function () {
             var svg = generateSVG(400, 400);
             var plot = new Plottable.Plot.AbstractPlot();
@@ -2655,6 +2687,31 @@ describe("Plots", function () {
 ///<reference path="../../testReference.ts" />
 var assert = chai.assert;
 describe("Plots", function () {
+    // HACKHACK #1798: beforeEach being used below
+    describe("LinePlot", function () {
+        it("getAllPlotData with NaNs", function () {
+            var svg = generateSVG(500, 500);
+            var dataWithNaN = [
+                { foo: 0.0, bar: 0.0 },
+                { foo: 0.2, bar: 0.2 },
+                { foo: 0.4, bar: NaN },
+                { foo: 0.6, bar: 0.6 },
+                { foo: 0.8, bar: 0.8 }
+            ];
+            var xScale = new Plottable.Scale.Linear().domain([0, 1]);
+            var yScale = new Plottable.Scale.Linear().domain([0, 1]);
+            var linePlot = new Plottable.Plot.Line(xScale, yScale);
+            linePlot.addDataset(dataWithNaN);
+            linePlot.project("x", function (d) { return d.foo; }, xScale);
+            linePlot.project("y", function (d) { return d.bar; }, yScale);
+            linePlot.renderTo(svg);
+            var apd = linePlot.getAllPlotData();
+            var expectedLength = dataWithNaN.length - 1;
+            assert.strictEqual(apd.data.length, expectedLength, "NaN data was not returned");
+            assert.strictEqual(apd.pixelPoints.length, expectedLength, "NaN data doesn't appear in pixelPoints");
+            svg.remove();
+        });
+    });
     describe("LinePlot", function () {
         var svg;
         var xScale;
