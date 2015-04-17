@@ -870,6 +870,19 @@ describe("TimeAxis", function () {
         assert.strictEqual(threeTierAxisHeight * 2, twoTierAxisHeight * 3, "two-tier axis is twice as tall as one-tier axis");
         svg.remove();
     });
+    it("many tier Axis.Time should not exceed the drawing area", function () {
+        var svg = generateSVG(400, 50);
+        var xScale = new Plottable.Scale.Time();
+        xScale.domain([new Date("2013-03-23 12:00"), new Date("2013-04-03 0:00")]);
+        var xAxis = new Plottable.Axis.Time(xScale, "bottom");
+        var configuration = Array.apply(null, Array(15)).map(function () {
+            return { interval: d3.time.day, step: 2, formatter: Plottable.Formatters.time("%a %e") };
+        });
+        xAxis.axisConfigurations([configuration]);
+        xAxis.renderTo(svg);
+        assert.isTrue(false);
+        // svg.remove();
+    });
 });
 
 ///<reference path="../testReference.ts" />
