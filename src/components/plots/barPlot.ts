@@ -93,17 +93,6 @@ export module Plot {
       return this;
     }
 
-
-    private _parseExtent(input: any): Extent {
-      if (typeof(input) === "number") {
-        return {min: input, max: input};
-      } else if (input instanceof Object && "min" in input && "max" in input) {
-        return <Extent> input;
-      } else {
-        throw new Error("input '" + input + "' can't be parsed as an Extent");
-      }
-    }
-
     /**
      * Get whether bar labels are enabled.
      *
@@ -151,6 +140,95 @@ export module Plot {
     }
 
     /**
+     * Retrieves the closest PlotData to queryPoint.
+     *
+     * Bars containing the queryPoint are considered closest. If queryPoint lies outside
+     * of all bars, we return the closest in the dominant axis (x for horizontal
+     * charts, y for vertical) and break ties using the secondary axis.
+     *
+     * @param {Point} queryPoint The point to which plot data should be compared
+     *
+     * @returns {PlotData} The PlotData closest to queryPoint
+     */
+    public getClosestPlotData(queryPoint: Point): PlotData {
+      var chartXExtent = { min: 0, max: this.width() };
+      var chartYExtent = { min: 0, max: this.height() };
+
+      var minPrimaryDist = Infinity;
+      var minSecondaryDist = Infinity;
+
+      var closestData: any[] = [];
+      var closestPixelPoints: Point[] = [];
+      var closestElements: Element[] = [];
+
+      var queryPtPrimary = this._isVertical ? queryPoint.x : queryPoint.y;
+      var queryPtSecondary = this._isVertical ? queryPoint.y : queryPoint.x;
+
+      // SVGRects are positioned with sub-pixel accuracy (the default unit
+      // for the x, y, height & width attributes), but user selections (e.g. via
+      // mouse events) usually have pixel accuracy. We add a tolerance of 0.5 pixels.
+      var tolerance = 0.5;
+
+      this.datasetOrder().forEach((key) => {
+        var plotData = this.getAllPlotData(key);
+        plotData.pixelPoints.forEach((plotPt, i) => {
+          var bar = plotData.selection[0][i];
+          var barBBox = bar.getBBox();
+
+          if (!_Util.Methods.intersectsBBox(chartXExtent, chartYExtent, barBBox, tolerance)) {
+            // bar isn't visible on plot; ignore it
+            return;
+          }
+
+          var primaryDist = 0;
+          var secondaryDist = 0;
+
+          // if we're inside a bar, distance in both directions should stay 0
+          if (!_Util.Methods.intersectsBBox(queryPoint.x, queryPoint.y, barBBox, tolerance)) {
+            var plotPtPrimary = this._isVertical ? plotPt.x : plotPt.y;
+            primaryDist = Math.abs(queryPtPrimary - plotPtPrimary);
+
+            // compute this bar's min and max along the secondary axis
+            var barMinSecondary = this._isVertical ? barBBox.y : barBBox.x;
+            var barMaxSecondary = barMinSecondary + (this._isVertical ? barBBox.height : barBBox.width);
+
+            if (queryPtSecondary >= barMinSecondary - tolerance && queryPtSecondary <= barMaxSecondary + tolerance) {
+              // if we're within a bar's secondary axis span, it is closest in that direction
+              secondaryDist = 0;
+            } else {
+              var plotPtSecondary = this._isVertical ? plotPt.y : plotPt.x;
+              secondaryDist = Math.abs(queryPtSecondary - plotPtSecondary);
+            }
+          }
+
+          // if we find a closer bar, record its distance and start new closest lists
+          if (primaryDist < minPrimaryDist
+              || primaryDist === minPrimaryDist && secondaryDist < minSecondaryDist) {
+            closestData = [];
+            closestPixelPoints = [];
+            closestElements = [];
+
+            minPrimaryDist = primaryDist;
+            minSecondaryDist = secondaryDist;
+          }
+
+          // bars minPrimaryDist away are part of the closest set
+          if (primaryDist === minPrimaryDist && secondaryDist === minSecondaryDist) {
+            closestData.push(plotData.data[i]);
+            closestPixelPoints.push(plotPt);
+            closestElements.push(bar);
+          }
+        });
+      });
+
+      return {
+        data: closestData,
+        pixelPoints: closestPixelPoints,
+        selection: d3.selectAll(closestElements)
+      };
+    }
+
+    /**
      * Gets the bar under the given pixel position (if [xValOrExtent]
      * and [yValOrExtent] are {number}s), under a given line (if only one
      * of [xValOrExtent] or [yValOrExtent] are {Extent}s) or are under a
@@ -165,30 +243,20 @@ export module Plot {
         return d3.select();
       }
 
-      var xExtent: Extent = this._parseExtent(xValOrExtent);
-      var yExtent: Extent = this._parseExtent(yValOrExtent);
-
       // currently, linear scan the bars. If inversion is implemented on non-numeric scales we might be able to do better.
       var bars = this._datasetKeysInOrder.reduce((bars: any[], key: string) =>
-        bars.concat(this._getBarsFromDataset(key, xExtent, yExtent))
+        bars.concat(this._getBarsFromDataset(key, xValOrExtent, yValOrExtent))
       , []);
 
       return d3.selectAll(bars);
     }
 
-    private _getBarsFromDataset(key: string, xExtent: Extent, yExtent: Extent): any[] {
-      // the SVGRects are positioned with sub-pixel accuracy (the default unit
-      // for the x, y, height & width attributes), but user selections (e.g. via
-      // mouse events) usually have pixel accuracy. A tolerance of half-a-pixel
-      // seems appropriate:
-      var tolerance: number = 0.5;
+    private _getBarsFromDataset(key: string, xValOrExtent: number | Extent, yValOrExtent: number | Extent): any[] {
       var bars: any[] = [];
 
       var drawer = <_Drawer.Element>this._key2PlotDatasetKey.get(key).drawer;
       drawer._getRenderArea().selectAll("rect").each(function(d) {
-        var bbox = this.getBBox();
-        if (bbox.x + bbox.width >= xExtent.min - tolerance && bbox.x <= xExtent.max + tolerance &&
-            bbox.y + bbox.height >= yExtent.min - tolerance && bbox.y <= yExtent.max + tolerance) {
+        if (_Util.Methods.intersectsBBox(xValOrExtent, yValOrExtent, this.getBBox())) {
           bars.push(this);
         }
       });
@@ -435,8 +503,8 @@ export module Plot {
         }
       }
 
-      var xExtent: Extent = this._parseExtent(xPositionOrExtent);
-      var yExtent: Extent = this._parseExtent(yPositionOrExtent);
+      var xExtent: Extent = _Util.Methods.parseExtent(xPositionOrExtent);
+      var yExtent: Extent = _Util.Methods.parseExtent(yPositionOrExtent);
 
       var bars: any[] = [];
       var points: Point[] = [];
@@ -489,6 +557,34 @@ export module Plot {
       };
     }
     //===== /Hover logic =====
+
+    protected _getAllPlotData(datasetKeys: string[]): PlotData {
+      var plotData = super._getAllPlotData(datasetKeys);
+
+      var valueScale = this._isVertical ? this._yScale : this._xScale;
+      var scaledBaseline = (<Scale.AbstractScale<any, any>> (this._isVertical ? this._yScale : this._xScale)).scale(this.baseline());
+      var isVertical = this._isVertical;
+      var barAlignmentFactor = this._barAlignmentFactor;
+
+      plotData.selection.each(function (datum, index) {
+        var bar = d3.select(this);
+
+        // Using floored pixel values to account for pixel accuracy inconsistencies across browsers
+        if (isVertical && Math.floor(+bar.attr("y")) >= Math.floor(scaledBaseline)) {
+          plotData.pixelPoints[index].y += +bar.attr("height");
+        } else if (!isVertical && Math.floor(+bar.attr("x")) < Math.floor(scaledBaseline)) {
+          plotData.pixelPoints[index].x -= +bar.attr("width");
+        }
+
+        if (isVertical) {
+          plotData.pixelPoints[index].x = +bar.attr("x") + +bar.attr("width") * barAlignmentFactor;
+        } else {
+          plotData.pixelPoints[index].y = +bar.attr("y") + +bar.attr("height") * barAlignmentFactor;
+        }
+      });
+
+      return plotData;
+    }
   }
 }
 }
