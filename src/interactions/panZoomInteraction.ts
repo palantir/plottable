@@ -48,12 +48,12 @@ export module Interaction {
     private _setupDragInteraction() {
       var lastDragPoint: Point;
       this._dragInteraction.drag((startPoint, endPoint) => {
-        var dragAmountX = endPoint.x - (lastDragPoint == null ? startPoint.x : lastDragPoint.x);
-        var dragAmountY = endPoint.y - (lastDragPoint == null ? startPoint.y : lastDragPoint.y);
         if (this._xScale != null) {
+          var dragAmountX = endPoint.x - (lastDragPoint == null ? startPoint.x : lastDragPoint.x);
           this._xScale.domain(ScaleDomainTransformers.translate(this._xScale, -dragAmountX));
         }
         if (this._yScale != null) {
+          var dragAmountY = endPoint.y - (lastDragPoint == null ? startPoint.y : lastDragPoint.y);
           this._yScale.domain(ScaleDomainTransformers.translate(this._yScale, -dragAmountY));
         }
         lastDragPoint = endPoint;
@@ -62,15 +62,13 @@ export module Interaction {
     }
 
     private _setupScrollInteraction() {
-      var magnifyAmount = 1;
       this._scrollInteraction.onScroll((point: Point, deltaAmount: number) => {
-        var oldMagnifyAmount = magnifyAmount;
-        magnifyAmount = Math.pow(2, -deltaAmount * .002) * magnifyAmount;
+        var zoomAmount = Math.pow(2, -deltaAmount * .002);
         if (this._xScale != null) {
-          this._xScale.domain(ScaleDomainTransformers.magnify(this._xScale, magnifyAmount / oldMagnifyAmount, point.x));
+          this._xScale.domain(ScaleDomainTransformers.magnify(this._xScale, zoomAmount, point.x));
         }
         if (this._yScale != null) {
-          this._yScale.domain(ScaleDomainTransformers.magnify(this._yScale, magnifyAmount / oldMagnifyAmount, point.y));
+          this._yScale.domain(ScaleDomainTransformers.magnify(this._yScale, zoomAmount, point.y));
         }
       });
     }

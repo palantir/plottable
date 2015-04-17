@@ -9631,12 +9631,12 @@ var Plottable;
                 var _this = this;
                 var lastDragPoint;
                 this._dragInteraction.drag(function (startPoint, endPoint) {
-                    var dragAmountX = endPoint.x - (lastDragPoint == null ? startPoint.x : lastDragPoint.x);
-                    var dragAmountY = endPoint.y - (lastDragPoint == null ? startPoint.y : lastDragPoint.y);
                     if (_this._xScale != null) {
+                        var dragAmountX = endPoint.x - (lastDragPoint == null ? startPoint.x : lastDragPoint.x);
                         _this._xScale.domain(Plottable.ScaleDomainTransformers.translate(_this._xScale, -dragAmountX));
                     }
                     if (_this._yScale != null) {
+                        var dragAmountY = endPoint.y - (lastDragPoint == null ? startPoint.y : lastDragPoint.y);
                         _this._yScale.domain(Plottable.ScaleDomainTransformers.translate(_this._yScale, -dragAmountY));
                     }
                     lastDragPoint = endPoint;
@@ -9645,15 +9645,13 @@ var Plottable;
             };
             PanZoom.prototype._setupScrollInteraction = function () {
                 var _this = this;
-                var magnifyAmount = 1;
                 this._scrollInteraction.onScroll(function (point, deltaAmount) {
-                    var oldMagnifyAmount = magnifyAmount;
-                    magnifyAmount = Math.pow(2, -deltaAmount * .002) * magnifyAmount;
+                    var zoomAmount = Math.pow(2, -deltaAmount * .002);
                     if (_this._xScale != null) {
-                        _this._xScale.domain(Plottable.ScaleDomainTransformers.magnify(_this._xScale, magnifyAmount / oldMagnifyAmount, point.x));
+                        _this._xScale.domain(Plottable.ScaleDomainTransformers.magnify(_this._xScale, zoomAmount, point.x));
                     }
                     if (_this._yScale != null) {
-                        _this._yScale.domain(Plottable.ScaleDomainTransformers.magnify(_this._yScale, magnifyAmount / oldMagnifyAmount, point.y));
+                        _this._yScale.domain(Plottable.ScaleDomainTransformers.magnify(_this._yScale, zoomAmount, point.y));
                     }
                 });
             };
