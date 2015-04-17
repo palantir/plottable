@@ -875,13 +875,17 @@ describe("TimeAxis", function () {
         var xScale = new Plottable.Scale.Time();
         xScale.domain([new Date("2013-03-23 12:00"), new Date("2013-04-03 0:00")]);
         var xAxis = new Plottable.Axis.Time(xScale, "bottom");
-        var configuration = Array.apply(null, Array(15)).map(function () {
+        var tiersToCreate = 15;
+        var configuration = Array.apply(null, Array(tiersToCreate)).map(function () {
             return { interval: d3.time.day, step: 2, formatter: Plottable.Formatters.time("%a %e") };
         });
         xAxis.axisConfigurations([configuration]);
         xAxis.renderTo(svg);
-        assert.isTrue(false);
-        // svg.remove();
+        var numberOfVisibleTiers = xAxis._element.selectAll('.time-axis-tier').filter(function () {
+            return d3.select(this).style('visibility') === 'visible';
+        })[0].length;
+        assert.notStrictEqual(numberOfVisibleTiers, tiersToCreate, "there should be less than " + tiersToCreate + " visible tiers");
+        svg.remove();
     });
 });
 
