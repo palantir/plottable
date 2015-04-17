@@ -168,10 +168,8 @@ export module Plot {
         var plotData = this.getAllPlotData(key);
         plotData.pixelPoints.forEach((plotPt, i) => {
           var bar = plotData.selection[0][i];
-          var barBBox = bar.getBBox();
 
-          if (!_Util.Methods.intersectsBBox(chartXExtent, chartYExtent, barBBox)) {
-            // bar isn't visible on plot; ignore it
+          if (!this._isVisibleOnPlot(plotPt, bar)) {
             return;
           }
 
@@ -179,7 +177,7 @@ export module Plot {
           var secondaryDist = 0;
 
           // if we're inside a bar, distance in both directions should stay 0
-          if (!_Util.Methods.intersectsBBox(queryPoint.x, queryPoint.y, barBBox)) {
+          if (!_Util.Methods.intersectsBBox(queryPoint.x, queryPoint.y, bar.getBBox())) {
             var plotPtPrimary = this._isVertical ? plotPt.x : plotPt.y;
             var plotPtSecondary = this._isVertical ? plotPt.y : plotPt.x;
 

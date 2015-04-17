@@ -175,7 +175,7 @@ export module Plot {
       this.datasetOrder().forEach((key: string) => {
         var plotData = this.getAllPlotData(key);
         plotData.pixelPoints.forEach((pxPt: Point, index: number) => {
-          if (pxPt.x < 0 || pxPt.y < 0 || pxPt.x > this.width() || pxPt.y > this.height()) {
+          if (!this._isVisibleOnPlot(pxPt, plotData.selection[0][index])) {
             return;
           }
 
@@ -204,6 +204,11 @@ export module Plot {
         pixelPoints: closestPixelPoints,
         selection: d3.selectAll(closestElements)
       };
+    }
+
+    protected _isVisibleOnPlot(pixelPoint: Point, element: Element): boolean {
+      return !(pixelPoint.x < 0 || pixelPoint.y < 0 ||
+          pixelPoint.x > this.width() || pixelPoint.y > this.height());
     }
 
     //===== Hover logic =====

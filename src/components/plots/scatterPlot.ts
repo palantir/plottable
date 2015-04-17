@@ -115,6 +115,18 @@ export module Plot {
       };
     }
 
+    protected _isVisibleOnPlot(pixelPoint: Point, element: Element): boolean {
+      var chartXExtent = { min: 0, max: this.width() };
+      var chartYExtent = { min: 0, max: this.height() };
+
+      var translation = d3.transform(d3.select(element).attr("transform")).translate;
+      var bbox = element.getBBox();
+      bbox.x += translation[0];
+      bbox.y += translation[1];
+
+      return _Util.Methods.intersectsBBox(chartXExtent, chartYExtent, bbox);
+    }
+
     //===== Hover logic =====
     public _hoverOverComponent(p: Point) {
       // no-op

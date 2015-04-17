@@ -524,22 +524,13 @@ export module Plot {
      * @returns {PlotData} The PlotData closest to queryPoint
      */
     public getClosestPlotData(queryPoint: Point): PlotData {
-      var chartXExtent = { min: 0, max: this.width() };
-      var chartYExtent = { min: 0, max: this.height() };
       var closestDistanceSquared = Infinity;
       var closestIndex: number;
       var plotData = this.getAllPlotData();
       plotData.pixelPoints.forEach((pixelPoint: Point, index: number) => {
         var element = plotData.selection[0][index];
 
-        // we need to translate this element so it is relative to the plot
-        var translation = d3.transform(d3.select(element).attr("transform")).translate;
-        var bbox = element.getBBox();
-        bbox.x += translation[0];
-        bbox.y += translation[1];
-
-        if (!_Util.Methods.intersectsBBox(chartXExtent, chartYExtent, bbox)) {
-          // element isn't visible on plot; ignore it
+        if (!this._isVisibleOnPlot(pixelPoint, element)) {
           return;
         }
 
@@ -557,6 +548,11 @@ export module Plot {
       return {data: [plotData.data[closestIndex]],
               pixelPoints: [plotData.pixelPoints[closestIndex]],
               selection: d3.select(plotData.selection[0][closestIndex])};
+    }
+
+    protected _isVisibleOnPlot(pixelPoint: Point, element: Element): boolean {
+      return _Util.Methods.intersectsBBox({ min: 0, max: this.width() },
+          { min: 0, max: this.height() }, element.getBBox());
     }
   }
 }
