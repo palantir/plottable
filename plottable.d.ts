@@ -2469,6 +2469,10 @@ declare module Plottable {
              */
             static LEGEND_LABEL_CLASS: string;
             /**
+             * Prefix for the CSS id on <linearGradient>
+             */
+            static LINEARGRADIENT_PREFIX_ID: string;
+            /**
              * Creates an InterpolatedColorLegend.
              *
              * The InterpolatedColorLegend consists of a sequence of swatches, showing the
@@ -2477,10 +2481,10 @@ declare module Plottable {
              *
              * @constructor
              * @param {Scale.InterpolatedColor} interpolatedColorScale
-             * @param {string} orientation (horizontal/left/right).
+             * @param {string} orientation (top/bottom/left/right).
              * @param {Formatter} The labels are formatted using this function.
              */
-            constructor(interpolatedColorScale: Scale.InterpolatedColor, orientation?: string, formatter?: (d: any) => string);
+            constructor(interpolatedColorScale: Scale.InterpolatedColor, orientation: string, formatter?: (d: any) => string);
             remove(): void;
             /**
              * Gets the current formatter on the InterpolatedColorLegend.
@@ -2509,6 +2513,22 @@ declare module Plottable {
              * @returns {InterpolatedColorLegend} The calling InterpolatedColorLegend.
              */
             orient(newOrientation: string): InterpolatedColorLegend;
+            /**
+             * Apply a gradient to the InterpolatedColorLegend.
+             *
+             * @param {boolean} isGradient Whether there should be a gradient or not.
+             *
+             * @returns {InterpolatedColorLegend} The calling InterpolatedColorLegend.
+             */
+            gradient(isGradient: boolean): InterpolatedColorLegend;
+            /**
+             * Expand the InterpolatedColorLegend to the full length/height of the chart.
+             *
+             * @param {boolean} isExpanded Whether the legend is expanded or not.
+             *
+             * @returns {InterpolatedColorLegend} The calling InterpolatedColorLegend.
+             */
+            expand(isExpanded: boolean): InterpolatedColorLegend;
             protected _setup(): void;
             _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
             _doRender(): void;

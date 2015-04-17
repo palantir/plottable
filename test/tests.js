@@ -1813,8 +1813,8 @@ describe("InterpolatedColorLegend", function () {
         var labelTexts = labels[0].map(function (textNode) { return textNode.textContent; });
         assert.deepEqual(labelTexts, formattedDomainValues, "formatter is used to format label text");
     }
-    it("renders correctly (orientation: horizontal)", function () {
-        var legend = new Plottable.Component.InterpolatedColorLegend(colorScale, "horizontal");
+    it("renders correctly (orientation: top)", function () {
+        var legend = new Plottable.Component.InterpolatedColorLegend(colorScale, "top");
         legend.renderTo(svg);
         assertBasicRendering(legend);
         var legendElement = legend._element;
@@ -1823,8 +1823,8 @@ describe("InterpolatedColorLegend", function () {
         var swatchContainerBCR = swatchContainer.node().getBoundingClientRect();
         var lowerLabelBCR = labels[0][0].getBoundingClientRect();
         var upperLabelBCR = labels[0][1].getBoundingClientRect();
-        assert.operator(lowerLabelBCR.right, "<=", swatchContainerBCR.left, "first label to left of swatches");
-        assert.operator(swatchContainerBCR.right, "<=", upperLabelBCR.left, "second label to right of swatches");
+        assert.equal(lowerLabelBCR.left, swatchContainerBCR.left, "first label aligned to left of swatches");
+        assert.equal(swatchContainerBCR.right, upperLabelBCR.right, "second label aligned to right of swatches");
         svg.remove();
     });
     it("renders correctly (orientation: right)", function () {
@@ -1858,22 +1858,23 @@ describe("InterpolatedColorLegend", function () {
         svg.remove();
     });
     it("re-renders when scale domain updates", function () {
-        var legend = new Plottable.Component.InterpolatedColorLegend(colorScale, "horizontal");
+        var legend = new Plottable.Component.InterpolatedColorLegend(colorScale, "top");
         legend.renderTo(svg);
         colorScale.domain([0, 85]);
         assertBasicRendering(legend);
         svg.remove();
     });
     it("orient() input-checking", function () {
-        var legend = new Plottable.Component.InterpolatedColorLegend(colorScale, "horizontal");
-        legend.orient("horizontal"); // should work
+        var legend = new Plottable.Component.InterpolatedColorLegend(colorScale, "top");
+        legend.orient("top"); // should work
+        legend.orient("bottom"); // should work
         legend.orient("right"); // should work
         legend.orient("left"); // should work
         assert.throws(function () { return legend.orient("blargh"); }, "not a valid orientation");
         svg.remove();
     });
     it("orient() triggers layout computation", function () {
-        var legend = new Plottable.Component.InterpolatedColorLegend(colorScale, "horizontal");
+        var legend = new Plottable.Component.InterpolatedColorLegend(colorScale, "top");
         legend.renderTo(svg);
         var widthBefore = legend.width();
         var heightBefore = legend.height();
@@ -1882,16 +1883,16 @@ describe("InterpolatedColorLegend", function () {
         assert.notEqual(legend.height(), heightBefore, "proportions changed (height)");
         svg.remove();
     });
-    it("renders correctly when width is constrained (orientation: horizontal)", function () {
+    it("renders correctly when width is constrained (orientation: top)", function () {
         svg.attr("width", 100);
-        var legend = new Plottable.Component.InterpolatedColorLegend(colorScale, "horizontal");
+        var legend = new Plottable.Component.InterpolatedColorLegend(colorScale, "top");
         legend.renderTo(svg);
         assertBasicRendering(legend);
         svg.remove();
     });
-    it("renders correctly when height is constrained (orientation: horizontal)", function () {
+    it("renders correctly when height is constrained (orientation: top)", function () {
         svg.attr("height", 20);
-        var legend = new Plottable.Component.InterpolatedColorLegend(colorScale, "horizontal");
+        var legend = new Plottable.Component.InterpolatedColorLegend(colorScale, "top");
         legend.renderTo(svg);
         assertBasicRendering(legend);
         svg.remove();
