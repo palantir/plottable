@@ -4590,11 +4590,9 @@ var Plottable;
                 var worstWidth = this._maxWidthForInterval(config) + 2 * this.tickLabelPadding();
                 return Math.min(this._getIntervalLength(config), this.width()) >= worstWidth;
             };
-            /**
-             * Makes sure that the size it requires is a multiple of tier sizes, such that
-             * we have no leftover tiers
-             */
             Time.prototype._getSize = function (availableWidth, availableHeight) {
+                // Makes sure that the size it requires is a multiple of tier sizes, such that
+                // we have no leftover tiers
                 var size = _super.prototype._getSize.call(this, availableWidth, availableHeight);
                 var adjustedHeight = 0;
                 for (var i = 0; i < this._tierHeights.length; i++) {
@@ -4611,14 +4609,14 @@ var Plottable;
                 this._setupDomElements();
             };
             Time.prototype._setupDomElements = function () {
-                d3.selectAll(".time-axis-tier").remove();
+                d3.selectAll("." + Time.TIME_AXIS_TIER_CLASS).remove();
                 this._tierLabelContainers = [];
                 this._tierMarkContainers = [];
                 this._tierBaselines = [];
                 this._tickLabelContainer.remove();
                 this._baseline.remove();
                 for (var i = 0; i < this._numTiers; ++i) {
-                    var tierContainer = this._content.append("g").classed("time-axis-tier", true);
+                    var tierContainer = this._content.append("g").classed(Time.TIME_AXIS_TIER_CLASS, true);
                     this._tierLabelContainers.push(tierContainer.append("g").classed(Axis.AbstractAxis.TICK_LABEL_CLASS + "-container", true));
                     this._tierMarkContainers.push(tierContainer.append("g").classed(Axis.AbstractAxis.TICK_MARK_CLASS + "-container", true));
                     this._tierBaselines.push(tierContainer.append("line").classed("baseline", true));
@@ -4756,8 +4754,9 @@ var Plottable;
                 var _this = this;
                 var availableHeight = this.height();
                 var usedHeight = 0;
-                var visibleAxisTiers = this._element.selectAll(".time-axis-tier").filter(function (d, i) {
-                    return d3.select(this).style("visibility") === "visible";
+                var visibleAxisTiers = this._element.selectAll("." + Time.TIME_AXIS_TIER_CLASS).filter(function (d, i) {
+                    var visibility = d3.select(this).style("visibility");
+                    return visibility === "visible" || visibility === "inherit";
                 }).attr("visibility", function (d, i) {
                     usedHeight += _this._tierHeights[i];
                     return usedHeight <= availableHeight ? "visible" : "hidden";
@@ -4792,6 +4791,10 @@ var Plottable;
                     }
                 });
             };
+            /**
+             * The css class applied to each time axis tier
+             */
+            Time.TIME_AXIS_TIER_CLASS = "time-axis-tier";
             /*
              * Default possible axis configurations.
              */

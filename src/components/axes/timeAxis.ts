@@ -23,6 +23,10 @@ export module Axis {
   export type TimeAxisConfiguration = TimeAxisTierConfiguration[];
 
   export class Time extends AbstractAxis {
+    /**
+     * The css class applied to each time axis tier
+     */
+    public static TIME_AXIS_TIER_CLASS = "time-axis-tier";
 
     /*
      * Default possible axis configurations.
@@ -285,11 +289,10 @@ export module Axis {
       return Math.min(this._getIntervalLength(config), this.width()) >= worstWidth;
     }
 
-    /**
-     * Makes sure that the size it requires is a multiple of tier sizes, such that
-     * we have no leftover tiers
-     */
     protected _getSize(availableWidth: number, availableHeight: number) {
+      // Makes sure that the size it requires is a multiple of tier sizes, such that
+      // we have no leftover tiers
+
       var size = super._getSize(availableWidth, availableHeight);
 
       var adjustedHeight = 0;
@@ -310,7 +313,7 @@ export module Axis {
     }
 
     private _setupDomElements() {
-      d3.selectAll(".time-axis-tier").remove();
+      d3.selectAll("." + Time.TIME_AXIS_TIER_CLASS).remove();
 
       this._tierLabelContainers = [];
       this._tierMarkContainers = [];
@@ -319,7 +322,7 @@ export module Axis {
       this._baseline.remove();
 
       for (var i = 0; i < this._numTiers; ++i) {
-        var tierContainer = this._content.append("g").classed("time-axis-tier", true);
+        var tierContainer = this._content.append("g").classed(Time.TIME_AXIS_TIER_CLASS, true);
         this._tierLabelContainers.push(tierContainer.append("g").classed(AbstractAxis.TICK_LABEL_CLASS + "-container", true));
         this._tierMarkContainers.push(tierContainer.append("g").classed(AbstractAxis.TICK_MARK_CLASS + "-container", true));
         this._tierBaselines.push(tierContainer.append("line").classed("baseline", true));
@@ -485,9 +488,10 @@ export module Axis {
       var usedHeight = 0;
 
       var visibleAxisTiers = this._element
-        .selectAll(".time-axis-tier")
+        .selectAll("." + Time.TIME_AXIS_TIER_CLASS)
         .filter(function(d: Element, i: number) {
-          return d3.select(this).style("visibility") === "visible";
+          var visibility = d3.select(this).style("visibility");
+          return visibility === "visible" || visibility === "inherit";
         }).attr("visibility", (d: any, i: number) => {
           usedHeight += this._tierHeights[i];
           return usedHeight <= availableHeight ? "visible" : "hidden";

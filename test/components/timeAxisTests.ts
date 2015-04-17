@@ -189,7 +189,7 @@ describe("TimeAxis", () => {
     var initialTierSize: number = xAxis.height();
 
     assert.strictEqual(initialTierSize, oneTierSize,
-                      "2-tier time axis should shrink when prezented new configuration with 1 tier");
+                      "2-tier time axis should shrink when presented new configuration with 1 tier");
 
     svg.remove();
   });
@@ -223,7 +223,8 @@ describe("TimeAxis", () => {
 
     var threeTierAxisHeight: number = xAxis.height();
 
-    assert.strictEqual(threeTierAxisHeight * 2, twoTierAxisHeight * 3, "two-tier axis is twice as tall as one-tier axis");
+    assert.strictEqual(threeTierAxisHeight, twoTierAxisHeight * 3 / 2,
+      "three tier height is 3/2 bigger than the two tier height");
 
     svg.remove();
 
@@ -243,9 +244,11 @@ describe("TimeAxis", () => {
 
     xAxis.renderTo(svg);
 
-    var numberOfVisibleTiers = (<any> xAxis)._element.selectAll(".time-axis-tier").filter(function() {
-      return d3.select(this).style("visibility") === "visible";
-    })[0].length;
+    var numberOfVisibleTiers = (<any> xAxis)._element
+      .selectAll("." + Plottable.Axis.Time.TIME_AXIS_TIER_CLASS)
+      .filter(function() {
+        return d3.select(this).style("visibility") === "visible";
+      })[0].length;
 
     assert.notStrictEqual(numberOfVisibleTiers, tiersToCreate,
       "there should be less than " + tiersToCreate + " visible tiers");
