@@ -89,6 +89,50 @@ describe("Plots", () => {
       assert.deepEqual(dataset2.data(), originalData2, "underlying data is not modified");
       svg.remove();
     });
+
+    it("considers lying within a bar's y-range to mean it is closest", () => {
+      function assertPlotDataEqual(expected: Plottable.Plot.PlotData, actual: Plottable.Plot.PlotData,
+        msg: string) {
+        assert.deepEqual(expected.data, actual.data, msg);
+        assert.closeTo(expected.pixelPoints[0].x, actual.pixelPoints[0].x, 0.01, msg);
+        assert.closeTo(expected.pixelPoints[0].y, actual.pixelPoints[0].y, 0.01, msg);
+        assert.deepEqual(expected.selection, actual.selection, msg);
+      }
+
+      var bars = (<any> renderer)._renderArea.selectAll("rect");
+
+      var d0 = dataset1.data()[0];
+      var d0Px = {
+        x: xScale.scale(d0.x),
+        y: yScale.scale(d0.y)
+      };
+
+      var d1 = dataset2.data()[0];
+      var d1Px = {
+        x: xScale.scale(d1.x),
+        y: 0 // d1 is stacked above d0
+      };
+
+      var expected = {
+        data: [d0],
+        pixelPoints: [d0Px],
+        selection: d3.selectAll([bars[0][0]])
+      };
+
+      var closest = renderer.getClosestPlotData({ x: 0, y: d0Px.y + 1 });
+      assertPlotDataEqual(expected, closest, "bottom bar is closest when within its range");
+
+      expected = {
+        data: [d1],
+        pixelPoints: [d1Px],
+        selection: d3.selectAll([bars[0][2]])
+      };
+
+      closest = renderer.getClosestPlotData({ x: 0, y: d0Px.y - 1 });
+      assertPlotDataEqual(expected, closest, "top bar is closest when within its range");
+
+      svg.remove();
+    });
   });
 
   describe("Stacked Bar Plot Negative Values", () => {

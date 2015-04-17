@@ -149,13 +149,13 @@ export module Plot {
      *
      * Here's a common use case:
      * ```typescript
-     * plot.attr("r", function(d) { return d.foo; });
+     * plot.attr("x", function(d) { return d.foo; }, xScale);
      * ```
-     * This will set the radius of each datum `d` to be `d.foo`.
+     * This will set the x accessor of each datum `d` to be `d.foo`,
+     * scaled in accordance with `xScale`
      *
      * @param {string} attrToSet The attribute to set across each data
-     * point. Popular examples include "x", "y", "r". Scales that inherit from
-     * Plot define their meaning.
+     * point. Popular examples include "x", "y".
      *
      * @param {Function|string|any} accessor Function to apply to each element
      * of the dataSource. If a Function, use `accessor(d, i)`. If a string,
@@ -506,8 +506,12 @@ export module Plot {
         if (plotDatasetKey == null) { return; }
         var drawer = plotDatasetKey.drawer;
         plotDatasetKey.dataset.data().forEach((datum: any, index: number) => {
+          var pixelPoint = drawer._getPixelPoint(datum, index);
+          if (pixelPoint.x !== pixelPoint.x || pixelPoint.y !== pixelPoint.y) {
+            return;
+          }
           data.push(datum);
-          pixelPoints.push(drawer._getPixelPoint(datum, index));
+          pixelPoints.push(pixelPoint);
           allElements.push(drawer._getSelection(index).node());
         });
       });
@@ -516,31 +520,25 @@ export module Plot {
     }
 
     /**
-     * Retrieves the closest PlotData for the specified dataset(s)
+     * Retrieves PlotData with the lowest distance, where distance is defined
+     * to be the Euclidiean norm.
      *
-     * @param {Point} queryPoint The point to query from
-     * @param {number} withinValue Will only return plot data that is of a distance below withinValue
-     *                             (default = Infinity)
-     * @param {string | string[]} datasetKeys The dataset(s) to retrieve the plot data from.
-     *                                        (default = this.datasetOrder())
-     * @returns {PlotData} The retrieved PlotData.
+     * @param {Point} queryPoint The point to which plot data should be compared
+     *
+     * @returns {PlotData} The PlotData closest to queryPoint
      */
-    public getClosestPlotData(queryPoint: Point, withinValue = Infinity, datasetKeys: string | string[] = this.datasetOrder()) {
-      var datasetKeyArray: string[] = [];
-      if (typeof(datasetKeys) === "string") {
-        datasetKeyArray = [<string> datasetKeys];
-      } else {
-        datasetKeyArray = <string[]> datasetKeys;
-      }
-
-      return this._getClosestPlotData(queryPoint, datasetKeyArray, withinValue);
-    }
-
-    protected _getClosestPlotData(queryPoint: Point, datasetKeys: string[], withinValue = Infinity) {
-      var closestDistanceSquared = Math.pow(withinValue, 2);
+    public getClosestPlotData(queryPoint: Point): PlotData {
+      var closestDistanceSquared = Infinity;
       var closestIndex: number;
-      var plotData = this.getAllPlotData(datasetKeys);
+      var plotData = this.getAllPlotData();
       plotData.pixelPoints.forEach((pixelPoint: Point, index: number) => {
+        var datum = plotData.data[index];
+        var selection = d3.select(plotData.selection[0][index]);
+
+        if (!this._isVisibleOnPlot(datum, pixelPoint, selection)) {
+          return;
+        }
+
         var distance = _Util.Methods.distanceSquared(pixelPoint, queryPoint);
         if (distance < closestDistanceSquared) {
           closestDistanceSquared = distance;
@@ -555,6 +553,11 @@ export module Plot {
       return {data: [plotData.data[closestIndex]],
               pixelPoints: [plotData.pixelPoints[closestIndex]],
               selection: d3.select(plotData.selection[0][closestIndex])};
+    }
+
+    protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean {
+      return !(pixelPoint.x < 0 || pixelPoint.y < 0 ||
+        pixelPoint.x > this.width() || pixelPoint.y > this.height());
     }
   }
 }

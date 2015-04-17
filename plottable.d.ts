@@ -130,6 +130,27 @@ declare module Plottable {
             function darkenColor(color: string, factor: number, darkenAmount: number): string;
             function distanceSquared(p1: Point, p2: Point): number;
             function isIE(): boolean;
+            /**
+             * Returns true if the supplied coordinates or Extents intersect or are contained by bbox.
+             *
+             * @param {number | Extent} xValOrExtent The x coordinate or Extent to test
+             * @param {number | Extent} yValOrExtent The y coordinate or Extent to test
+             * @param {SVGRect} bbox The bbox
+             * @param {number} tolerance Amount by which to expand bbox, in each dimension, before
+             * testing intersection
+             *
+             * @returns {boolean} True if the supplied coordinates or Extents intersect or are
+             * contained by bbox, false otherwise.
+             */
+            function intersectsBBox(xValOrExtent: number | Extent, yValOrExtent: number | Extent, bbox: SVGRect, tolerance?: number): boolean;
+            /**
+             * Create an Extent from a number or an object with "min" and "max" defined.
+             *
+             * @param {any} input The object to parse
+             *
+             * @returns {Extent} The generated Extent
+             */
+            function parseExtent(input: any): Extent;
         }
     }
 }
@@ -2682,13 +2703,13 @@ declare module Plottable {
              *
              * Here's a common use case:
              * ```typescript
-             * plot.attr("r", function(d) { return d.foo; });
+             * plot.attr("x", function(d) { return d.foo; }, xScale);
              * ```
-             * This will set the radius of each datum `d` to be `d.foo`.
+             * This will set the x accessor of each datum `d` to be `d.foo`,
+             * scaled in accordance with `xScale`
              *
              * @param {string} attrToSet The attribute to set across each data
-             * point. Popular examples include "x", "y", "r". Scales that inherit from
-             * Plot define their meaning.
+             * point. Popular examples include "x", "y".
              *
              * @param {Function|string|any} accessor Function to apply to each element
              * of the dataSource. If a Function, use `accessor(d, i)`. If a string,
@@ -2801,31 +2822,15 @@ declare module Plottable {
             getAllPlotData(datasetKeys?: string | string[]): PlotData;
             protected _getAllPlotData(datasetKeys: string[]): PlotData;
             /**
-             * Retrieves the closest PlotData for the specified dataset(s)
+             * Retrieves PlotData with the lowest distance, where distance is defined
+             * to be the Euclidiean norm.
              *
-             * @param {Point} queryPoint The point to query from
-             * @param {number} withinValue Will only return plot data that is of a distance below withinValue
-             *                             (default = Infinity)
-             * @param {string | string[]} datasetKeys The dataset(s) to retrieve the plot data from.
-             *                                        (default = this.datasetOrder())
-             * @returns {PlotData} The retrieved PlotData.
+             * @param {Point} queryPoint The point to which plot data should be compared
+             *
+             * @returns {PlotData} The PlotData closest to queryPoint
              */
-            getClosestPlotData(queryPoint: Point, withinValue?: number, datasetKeys?: string | string[]): {
-                data: any[];
-                pixelPoints: {
-                    x: number;
-                    y: number;
-                }[];
-                selection: D3.Selection;
-            };
-            protected _getClosestPlotData(queryPoint: Point, datasetKeys: string[], withinValue?: number): {
-                data: any[];
-                pixelPoints: {
-                    x: number;
-                    y: number;
-                }[];
-                selection: D3.Selection;
-            };
+            getClosestPlotData(queryPoint: Point): PlotData;
+            protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean;
         }
     }
 }
@@ -2957,6 +2962,7 @@ declare module Plottable {
             };
             protected _generateDrawSteps(): _Drawer.DrawStep[];
             protected _getClosestStruckPoint(p: Point, range: number): Interaction.HoverData;
+            protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean;
             _hoverOverComponent(p: Point): void;
             _hoverOutComponent(p: Point): void;
             _doHover(p: Point): Interaction.HoverData;
@@ -3066,6 +3072,19 @@ declare module Plottable {
              */
             barLabelFormatter(formatter: Formatter): Bar<X, Y>;
             /**
+             * Retrieves the closest PlotData to queryPoint.
+             *
+             * Bars containing the queryPoint are considered closest. If queryPoint lies outside
+             * of all bars, we return the closest in the dominant axis (x for horizontal
+             * charts, y for vertical) and break ties using the secondary axis.
+             *
+             * @param {Point} queryPoint The point to which plot data should be compared
+             *
+             * @returns {PlotData} The PlotData closest to queryPoint
+             */
+            getClosestPlotData(queryPoint: Point): PlotData;
+            protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean;
+            /**
              * Gets the bar under the given pixel position (if [xValOrExtent]
              * and [yValOrExtent] are {number}s), under a given line (if only one
              * of [xValOrExtent] or [yValOrExtent] are {Extent}s) or are under a
@@ -3109,6 +3128,7 @@ declare module Plottable {
             _hoverOverComponent(p: Point): void;
             _hoverOutComponent(p: Point): void;
             _doHover(p: Point): Interaction.HoverData;
+            protected _getAllPlotData(datasetKeys: string[]): PlotData;
         }
     }
 }
@@ -3135,14 +3155,6 @@ declare module Plottable {
                 [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
             };
             protected _wholeDatumAttributes(): string[];
-            protected _getClosestPlotData(queryPoint: Point, datasetKeys: string[], withinValue?: number): {
-                data: any[];
-                pixelPoints: {
-                    x: number;
-                    y: number;
-                }[];
-                selection: D3.Selection;
-            };
             protected _getClosestWithinRange(p: Point, range: number): {
                 closestValue: any;
                 closestPoint: {
@@ -3151,6 +3163,17 @@ declare module Plottable {
                 };
             };
             protected _getAllPlotData(datasetKeys: string[]): PlotData;
+            /**
+             * Retrieves the closest PlotData to queryPoint.
+             *
+             * Lines implement an x-dominant notion of distance; points closest in x are
+             * tie-broken by y distance.
+             *
+             * @param {Point} queryPoint The point to which plot data should be compared
+             *
+             * @returns {PlotData} The PlotData closest to queryPoint
+             */
+            getClosestPlotData(queryPoint: Point): PlotData;
             _hoverOverComponent(p: Point): void;
             _hoverOutComponent(p: Point): void;
             _doHover(p: Point): Interaction.HoverData;

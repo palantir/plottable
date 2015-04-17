@@ -32,7 +32,5 @@ function run(svg, data, Plottable) {
     dataset.data(d);
   };
 
-  hBarRenderer.registerInteraction(
-    new Plottable.Interaction.Click(hBarRenderer).callback(cb)
-  );
+  hBarRenderer.registerInteraction(new Plottable.Interaction.Click().onClick(cb));
 }

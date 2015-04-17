@@ -61,17 +61,9 @@ function run(svg, data, Plottable) {
     yScale.domain([0, 8]);
   }
 
-  autoXLabel.registerInteraction(
-    new Plottable.Interaction.Click().callback(xAuto)
-  );
-  autoYLabel.registerInteraction(
-    new Plottable.Interaction.Click().callback(yAuto)
-  );
-  focusXLabel.registerInteraction(
-    new Plottable.Interaction.Click().callback(xFocus)
-  );
-  focusYLabel.registerInteraction(
-    new Plottable.Interaction.Click().callback(yFocus)
-  );
+  autoXLabel.registerInteraction(new Plottable.Interaction.Click().onClick(xAuto));
+  autoYLabel.registerInteraction(new Plottable.Interaction.Click().onClick(yAuto));
+  focusXLabel.registerInteraction(new Plottable.Interaction.Click().onClick(xFocus));
+  focusYLabel.registerInteraction(new Plottable.Interaction.Click().onClick(yFocus));
 
 }
