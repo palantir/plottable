@@ -149,13 +149,13 @@ export module Plot {
      *
      * Here's a common use case:
      * ```typescript
-     * plot.attr("r", function(d) { return d.foo; });
+     * plot.attr("x", function(d) { return d.foo; }, xScale);
      * ```
-     * This will set the radius of each datum `d` to be `d.foo`.
+     * This will set the x accessor of each datum `d` to be `d.foo`,
+     * scaled in accordance with `xScale`
      *
      * @param {string} attrToSet The attribute to set across each data
-     * point. Popular examples include "x", "y", "r". Scales that inherit from
-     * Plot define their meaning.
+     * point. Popular examples include "x", "y".
      *
      * @param {Function|string|any} accessor Function to apply to each element
      * of the dataSource. If a Function, use `accessor(d, i)`. If a string,
@@ -506,8 +506,12 @@ export module Plot {
         if (plotDatasetKey == null) { return; }
         var drawer = plotDatasetKey.drawer;
         plotDatasetKey.dataset.data().forEach((datum: any, index: number) => {
+          var pixelPoint = drawer._getPixelPoint(datum, index);
+          if (pixelPoint.x !== pixelPoint.x || pixelPoint.y !== pixelPoint.y) {
+            return;
+          }
           data.push(datum);
-          pixelPoints.push(drawer._getPixelPoint(datum, index));
+          pixelPoints.push(pixelPoint);
           allElements.push(drawer._getSelection(index).node());
         });
       });

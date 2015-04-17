@@ -2485,10 +2485,14 @@ var Plottable;
             };
             Color._getPlottableColors = function () {
                 var plottableDefaultColors = [];
-                var colorTester = d3.select("body").append("div");
+                var colorTester = d3.select("body").append("plottable-color-tester");
+                var defaultColorHex = Plottable._Util.Methods.colorTest(colorTester, "");
                 var i = 0;
                 var colorHex;
-                while ((colorHex = Plottable._Util.Methods.colorTest(colorTester, "plottable-colors-" + i)) !== null) {
+                while ((colorHex = Plottable._Util.Methods.colorTest(colorTester, "plottable-colors-" + i)) !== null && i < this.MAXIMUM_COLORS_FROM_CSS) {
+                    if (colorHex === defaultColorHex && colorHex === plottableDefaultColors[plottableDefaultColors.length - 1]) {
+                        break;
+                    }
                     plottableDefaultColors.push(colorHex);
                     i++;
                 }
@@ -2506,6 +2510,8 @@ var Plottable;
             };
             Color.HEX_SCALE_FACTOR = 20;
             Color.LOOP_LIGHTEN_FACTOR = 1.6;
+            //The maximum number of colors we are getting from CSS stylesheets
+            Color.MAXIMUM_COLORS_FROM_CSS = 256;
             return Color;
         })(Scale.AbstractScale);
         Scale.Color = Color;
@@ -6548,13 +6554,13 @@ var Plottable;
              *
              * Here's a common use case:
              * ```typescript
-             * plot.attr("r", function(d) { return d.foo; });
+             * plot.attr("x", function(d) { return d.foo; }, xScale);
              * ```
-             * This will set the radius of each datum `d` to be `d.foo`.
+             * This will set the x accessor of each datum `d` to be `d.foo`,
+             * scaled in accordance with `xScale`
              *
              * @param {string} attrToSet The attribute to set across each data
-             * point. Popular examples include "x", "y", "r". Scales that inherit from
-             * Plot define their meaning.
+             * point. Popular examples include "x", "y".
              *
              * @param {Function|string|any} accessor Function to apply to each element
              * of the dataSource. If a Function, use `accessor(d, i)`. If a string,
@@ -6857,8 +6863,12 @@ var Plottable;
                     }
                     var drawer = plotDatasetKey.drawer;
                     plotDatasetKey.dataset.data().forEach(function (datum, index) {
+                        var pixelPoint = drawer._getPixelPoint(datum, index);
+                        if (pixelPoint.x !== pixelPoint.x || pixelPoint.y !== pixelPoint.y) {
+                            return;
+                        }
                         data.push(datum);
-                        pixelPoints.push(drawer._getPixelPoint(datum, index));
+                        pixelPoints.push(pixelPoint);
                         allElements.push(drawer._getSelection(index).node());
                     });
                 });
@@ -7607,6 +7617,10 @@ var Plottable;
                 var closestElements = [];
                 var queryPtPrimary = this._isVertical ? queryPoint.x : queryPoint.y;
                 var queryPtSecondary = this._isVertical ? queryPoint.y : queryPoint.x;
+                // SVGRects are positioned with sub-pixel accuracy (the default unit
+                // for the x, y, height & width attributes), but user selections (e.g. via
+                // mouse events) usually have pixel accuracy. We add a tolerance of 0.5 pixels.
+                var tolerance = 0.5;
                 this.datasetOrder().forEach(function (key) {
                     var plotData = _this.getAllPlotData(key);
                     plotData.pixelPoints.forEach(function (plotPt, index) {
@@ -7618,11 +7632,21 @@ var Plottable;
                         var primaryDist = 0;
                         var secondaryDist = 0;
                         // if we're inside a bar, distance in both directions should stay 0
-                        if (!Plottable._Util.Methods.intersectsBBox(queryPoint.x, queryPoint.y, bar.getBBox())) {
+                        var barBBox = bar.getBBox();
+                        if (!Plottable._Util.Methods.intersectsBBox(queryPoint.x, queryPoint.y, barBBox, tolerance)) {
                             var plotPtPrimary = _this._isVertical ? plotPt.x : plotPt.y;
-                            var plotPtSecondary = _this._isVertical ? plotPt.y : plotPt.x;
                             primaryDist = Math.abs(queryPtPrimary - plotPtPrimary);
-                            secondaryDist = Math.abs(queryPtSecondary - plotPtSecondary);
+                            // compute this bar's min and max along the secondary axis
+                            var barMinSecondary = _this._isVertical ? barBBox.y : barBBox.x;
+                            var barMaxSecondary = barMinSecondary + (_this._isVertical ? barBBox.height : barBBox.width);
+                            if (queryPtSecondary >= barMinSecondary - tolerance && queryPtSecondary <= barMaxSecondary + tolerance) {
+                                // if we're within a bar's secondary axis span, it is closest in that direction
+                                secondaryDist = 0;
+                            }
+                            else {
+                                var plotPtSecondary = _this._isVertical ? plotPt.y : plotPt.x;
+                                secondaryDist = Math.abs(queryPtSecondary - plotPtSecondary);
+                            }
                         }
                         // if we find a closer bar, record its distance and start new closest lists
                         if (primaryDist < minPrimaryDist || primaryDist === minPrimaryDist && secondaryDist < minSecondaryDist) {
@@ -7932,10 +7956,11 @@ var Plottable;
                 var barAlignmentFactor = this._barAlignmentFactor;
                 plotData.selection.each(function (datum, index) {
                     var bar = d3.select(this);
-                    if (isVertical && +bar.attr("y") + +bar.attr("height") > scaledBaseline) {
+                    // Using floored pixel values to account for pixel accuracy inconsistencies across browsers
+                    if (isVertical && Math.floor(+bar.attr("y")) >= Math.floor(scaledBaseline)) {
                         plotData.pixelPoints[index].y += +bar.attr("height");
                     }
-                    else if (!isVertical && +bar.attr("x") < scaledBaseline) {
+                    else if (!isVertical && Math.floor(+bar.attr("x")) < Math.floor(scaledBaseline)) {
                         plotData.pixelPoints[index].x -= +bar.attr("width");
                     }
                     if (isVertical) {
@@ -8082,8 +8107,12 @@ var Plottable;
                     }
                     var drawer = plotDatasetKey.drawer;
                     plotDatasetKey.dataset.data().forEach(function (datum, index) {
+                        var pixelPoint = drawer._getPixelPoint(datum, index);
+                        if (pixelPoint.x !== pixelPoint.x || pixelPoint.y !== pixelPoint.y) {
+                            return;
+                        }
                         data.push(datum);
-                        pixelPoints.push(drawer._getPixelPoint(datum, index));
+                        pixelPoints.push(pixelPoint);
                     });
                     if (plotDatasetKey.dataset.data().length > 0) {
                         allElements.push(drawer._getSelection(0).node());
