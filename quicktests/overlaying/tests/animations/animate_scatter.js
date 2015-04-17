@@ -34,7 +34,5 @@ function run(svg, data, Plottable) {
     d2.data(tmp);
   };
 
-  circleRenderer.registerInteraction(
-    new Plottable.Interaction.Click(circleRenderer).callback(cb)
-  );
+  circleRenderer.registerInteraction(new Plottable.Interaction.Click().onClick(cb));
 }

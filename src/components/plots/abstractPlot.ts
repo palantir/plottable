@@ -149,13 +149,13 @@ export module Plot {
      *
      * Here's a common use case:
      * ```typescript
-     * plot.attr("r", function(d) { return d.foo; });
+     * plot.attr("x", function(d) { return d.foo; }, xScale);
      * ```
-     * This will set the radius of each datum `d` to be `d.foo`.
+     * This will set the x accessor of each datum `d` to be `d.foo`,
+     * scaled in accordance with `xScale`
      *
      * @param {string} attrToSet The attribute to set across each data
-     * point. Popular examples include "x", "y", "r". Scales that inherit from
-     * Plot define their meaning.
+     * point. Popular examples include "x", "y".
      *
      * @param {Function|string|any} accessor Function to apply to each element
      * of the dataSource. If a Function, use `accessor(d, i)`. If a string,
@@ -525,7 +525,7 @@ export module Plot {
      *                                        (default = this.datasetOrder())
      * @returns {PlotData} The retrieved PlotData.
      */
-    public getClosestPlotData(queryPoint: Point, withinValue = Infinity, datasetKeys: string | string[] = this.datasetOrder()) {
+    public getClosestPlotData(queryPoint: Point, withinValue = Infinity, datasetKeys: string | string[] = this.datasetOrder()): PlotData {
       var datasetKeyArray: string[] = [];
       if (typeof(datasetKeys) === "string") {
         datasetKeyArray = [<string> datasetKeys];
@@ -536,7 +536,7 @@ export module Plot {
       return this._getClosestPlotData(queryPoint, datasetKeyArray, withinValue);
     }
 
-    protected _getClosestPlotData(queryPoint: Point, datasetKeys: string[], withinValue = Infinity) {
+    protected _getClosestPlotData(queryPoint: Point, datasetKeys: string[], withinValue = Infinity): PlotData {
       var closestDistanceSquared = Math.pow(withinValue, 2);
       var closestIndex: number;
       var plotData = this.getAllPlotData(datasetKeys);

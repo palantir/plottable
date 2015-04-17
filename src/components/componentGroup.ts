@@ -49,12 +49,19 @@ export module Component {
       return this;
     }
 
+    protected _getSize(availableWidth: number, availableHeight: number) {
+      return {
+        width: availableWidth,
+        height: availableHeight
+      };
+    }
+
     public _isFixedWidth(): boolean {
-      return false;
+      return this.components().every((c) => c._isFixedWidth());
     }
 
     public _isFixedHeight(): boolean {
-      return false;
+      return this.components().every((c) => c._isFixedHeight());
     }
   }
 }

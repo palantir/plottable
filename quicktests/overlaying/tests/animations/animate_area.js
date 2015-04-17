@@ -36,7 +36,5 @@ function run(svg, data, Plottable) {
     dataset.data(d);
   };
 
-  areaRenderer.registerInteraction(
-    new Plottable.Interaction.Click(areaRenderer).callback(cb)
-  );
+  areaRenderer.registerInteraction(new Plottable.Interaction.Click().onClick(cb));
 }
