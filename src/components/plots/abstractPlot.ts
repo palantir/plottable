@@ -532,6 +532,13 @@ export module Plot {
       var closestIndex: number;
       var plotData = this.getAllPlotData();
       plotData.pixelPoints.forEach((pixelPoint: Point, index: number) => {
+        var datum = plotData.data[index];
+        var selection = d3.select(plotData.selection[0][index]);
+
+        if (!this._isVisibleOnPlot(datum, pixelPoint, selection)) {
+          return;
+        }
+
         var distance = _Util.Methods.distanceSquared(pixelPoint, queryPoint);
         if (distance < closestDistanceSquared) {
           closestDistanceSquared = distance;
@@ -546,6 +553,11 @@ export module Plot {
       return {data: [plotData.data[closestIndex]],
               pixelPoints: [plotData.pixelPoints[closestIndex]],
               selection: d3.select(plotData.selection[0][closestIndex])};
+    }
+
+    protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean {
+      return !(pixelPoint.x < 0 || pixelPoint.y < 0 ||
+        pixelPoint.x > this.width() || pixelPoint.y > this.height());
     }
   }
 }
