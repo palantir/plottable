@@ -881,8 +881,8 @@ describe("TimeAxis", function () {
         });
         xAxis.axisConfigurations([configuration]);
         xAxis.renderTo(svg);
-        var numberOfVisibleTiers = xAxis._element.selectAll('.time-axis-tier').filter(function () {
-            return d3.select(this).style('visibility') === 'visible';
+        var numberOfVisibleTiers = xAxis._element.selectAll(".time-axis-tier").filter(function () {
+            return d3.select(this).style("visibility") === "visible";
         })[0].length;
         assert.notStrictEqual(numberOfVisibleTiers, tiersToCreate, "there should be less than " + tiersToCreate + " visible tiers");
         svg.remove();

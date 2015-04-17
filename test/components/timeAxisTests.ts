@@ -243,8 +243,8 @@ describe("TimeAxis", () => {
 
     xAxis.renderTo(svg);
 
-    var numberOfVisibleTiers = (<any> xAxis)._element.selectAll('.time-axis-tier').filter(function() {
-      return d3.select(this).style('visibility') === 'visible'
+    var numberOfVisibleTiers = (<any> xAxis)._element.selectAll(".time-axis-tier").filter(function() {
+      return d3.select(this).style("visibility") === "visible";
     })[0].length;
 
     assert.notStrictEqual(numberOfVisibleTiers, tiersToCreate,
