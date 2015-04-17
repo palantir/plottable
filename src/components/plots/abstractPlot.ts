@@ -520,30 +520,17 @@ export module Plot {
     }
 
     /**
-     * Retrieves the closest PlotData for the specified dataset(s)
+     * Retrieves PlotData with the lowest distance, where distance is defined
+     * to be the Euclidiean norm.
      *
-     * @param {Point} queryPoint The point to query from
-     * @param {number} withinValue Will only return plot data that is of a distance below withinValue
-     *                             (default = Infinity)
-     * @param {string | string[]} datasetKeys The dataset(s) to retrieve the plot data from.
-     *                                        (default = this.datasetOrder())
-     * @returns {PlotData} The retrieved PlotData.
+     * @param {Point} queryPoint The point to which plot data should be compared
+     *
+     * @returns {PlotData} The PlotData closest to queryPoint
      */
-    public getClosestPlotData(queryPoint: Point, withinValue = Infinity, datasetKeys: string | string[] = this.datasetOrder()): PlotData {
-      var datasetKeyArray: string[] = [];
-      if (typeof(datasetKeys) === "string") {
-        datasetKeyArray = [<string> datasetKeys];
-      } else {
-        datasetKeyArray = <string[]> datasetKeys;
-      }
-
-      return this._getClosestPlotData(queryPoint, datasetKeyArray, withinValue);
-    }
-
-    protected _getClosestPlotData(queryPoint: Point, datasetKeys: string[], withinValue = Infinity): PlotData {
-      var closestDistanceSquared = Math.pow(withinValue, 2);
+    public getClosestPlotData(queryPoint: Point): PlotData {
+      var closestDistanceSquared = Infinity;
       var closestIndex: number;
-      var plotData = this.getAllPlotData(datasetKeys);
+      var plotData = this.getAllPlotData();
       plotData.pixelPoints.forEach((pixelPoint: Point, index: number) => {
         var distance = _Util.Methods.distanceSquared(pixelPoint, queryPoint);
         if (distance < closestDistanceSquared) {
