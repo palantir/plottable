@@ -569,9 +569,10 @@ export module Plot {
       plotData.selection.each(function (datum, index) {
         var bar = d3.select(this);
 
-        if (isVertical && +bar.attr("y") + +bar.attr("height") > scaledBaseline) {
+        // Using floored pixel values to account for pixel accuracy inconsistencies across browsers
+        if (isVertical && Math.floor(+bar.attr("y")) >= Math.floor(scaledBaseline)) {
           plotData.pixelPoints[index].y += +bar.attr("height");
-        } else if (!isVertical && +bar.attr("x") < scaledBaseline) {
+        } else if (!isVertical && Math.floor(+bar.attr("x")) < Math.floor(scaledBaseline)) {
           plotData.pixelPoints[index].x -= +bar.attr("width");
         }
 

@@ -123,40 +123,50 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("getAllPlotData() pixel points corrected for negative-valued bars", () => {
-        var plotData = barPlot.getAllPlotData();
-        plotData.data.forEach((datum, i) => {
-          var barSelection = d3.select(plotData.selection[0][i]);
-          var pixelPointY = plotData.pixelPoints[i].y;
-          if (datum.y < 0) {
-            assert.strictEqual(pixelPointY, +barSelection.attr("y") + +barSelection.attr("height"), "negative on bottom");
-          } else {
-            assert.strictEqual(pixelPointY, +barSelection.attr("y"), "positive on top");
-          }
-        });
-        svg.remove();
-      });
+      describe("getAllPlotData()", () => {
 
-      it("getAllPlotData() pixel points corrected for barAlignment left", () => {
-        barPlot.barAlignment("left");
-        var plotData = barPlot.getAllPlotData();
-        plotData.data.forEach((datum, i) => {
-          var barSelection = d3.select(plotData.selection[0][i]);
-          var pixelPointX = plotData.pixelPoints[i].x;
-          assert.strictEqual(pixelPointX, +barSelection.attr("x"), "barAlignment left x correct");
-        });
-        svg.remove();
-      });
+        describe("pixelPoints", () => {
 
-      it("getAllPlotData() pixel points corrected for barAlignment right", () => {
-        barPlot.barAlignment("right");
-        var plotData = barPlot.getAllPlotData();
-        plotData.data.forEach((datum, i) => {
-          var barSelection = d3.select(plotData.selection[0][i]);
-          var pixelPointX = plotData.pixelPoints[i].x;
-          assert.strictEqual(pixelPointX, +barSelection.attr("x") + +barSelection.attr("width"), "barAlignment right x correct");
+          it("getAllPlotData() pixel points corrected for negative-valued bars",() => {
+            var plotData = barPlot.getAllPlotData();
+            plotData.data.forEach((datum, i) => {
+              var barSelection = d3.select(plotData.selection[0][i]);
+              var pixelPointY = plotData.pixelPoints[i].y;
+              if (datum.y < 0) {
+                assert.strictEqual(pixelPointY, +barSelection.attr("y") + +barSelection.attr("height"), "negative on bottom");
+              } else {
+                assert.strictEqual(pixelPointY, +barSelection.attr("y"), "positive on top");
+              }
+            });
+            svg.remove();
+          });
+
+          describe("barAlignment", () => {
+            it("getAllPlotData() pixel points corrected for barAlignment left",() => {
+              barPlot.barAlignment("left");
+              var plotData = barPlot.getAllPlotData();
+              plotData.data.forEach((datum, i) => {
+                var barSelection = d3.select(plotData.selection[0][i]);
+                var pixelPointX = plotData.pixelPoints[i].x;
+                assert.strictEqual(pixelPointX, +barSelection.attr("x"), "barAlignment left x correct");
+              });
+              svg.remove();
+            });
+
+            it("getAllPlotData() pixel points corrected for barAlignment right",() => {
+              barPlot.barAlignment("right");
+              var plotData = barPlot.getAllPlotData();
+              plotData.data.forEach((datum, i) => {
+                var barSelection = d3.select(plotData.selection[0][i]);
+                var pixelPointX = plotData.pixelPoints[i].x;
+                assert.strictEqual(pixelPointX, +barSelection.attr("x") + +barSelection.attr("width"), "barAlignment right x correct");
+              });
+              svg.remove();
+            });
+          });
+
         });
-        svg.remove();
+
       });
 
       describe("getClosestPlotData()", () => {
@@ -487,40 +497,50 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("getAllPlotData() pixel points corrected for negative-valued bars", () => {
-        var plotData = barPlot.getAllPlotData();
-        plotData.data.forEach((datum, i) => {
-          var barSelection = d3.select(plotData.selection[0][i]);
-          var pixelPointX = plotData.pixelPoints[i].x;
-          if (datum.x < 0) {
-            assert.strictEqual(pixelPointX, +barSelection.attr("x"), "negative on left");
-          } else {
-            assert.strictEqual(pixelPointX, +barSelection.attr("x") + +barSelection.attr("width"), "positive on right");
-          }
-        });
-        svg.remove();
-      });
+      describe("getAllPlotData()", () => {
 
-      it("getAllPlotData() pixel points corrected for barAlignment left", () => {
-        barPlot.barAlignment("left");
-        var plotData = barPlot.getAllPlotData();
-        plotData.data.forEach((datum, i) => {
-          var barSelection = d3.select(plotData.selection[0][i]);
-          var pixelPointY = plotData.pixelPoints[i].y;
-          assert.strictEqual(pixelPointY, +barSelection.attr("y"), "barAlignment left y correct");
-        });
-        svg.remove();
-      });
+        describe("pixelPoints", () => {
 
-      it("getAllPlotData() pixel points corrected for barAlignment right", () => {
-        barPlot.barAlignment("right");
-        var plotData = barPlot.getAllPlotData();
-        plotData.data.forEach((datum, i) => {
-          var barSelection = d3.select(plotData.selection[0][i]);
-          var pixelPointY = plotData.pixelPoints[i].y;
-          assert.strictEqual(pixelPointY, +barSelection.attr("y") + +barSelection.attr("height"), "barAlignment right y correct");
+          it("getAllPlotData() pixel points corrected for negative-valued bars",() => {
+            var plotData = barPlot.getAllPlotData();
+            plotData.data.forEach((datum, i) => {
+              var barSelection = d3.select(plotData.selection[0][i]);
+              var pixelPointX = plotData.pixelPoints[i].x;
+              if (datum.x < 0) {
+                assert.strictEqual(pixelPointX, +barSelection.attr("x"), "negative on left");
+              } else {
+                assert.strictEqual(pixelPointX, +barSelection.attr("x") + +barSelection.attr("width"), "positive on right");
+              }
+            });
+            svg.remove();
+          });
+
+          describe("accounting for barAlignment", () => {
+            it("getAllPlotData() pixel points corrected for barAlignment left",() => {
+              barPlot.barAlignment("left");
+              var plotData = barPlot.getAllPlotData();
+              plotData.data.forEach((datum, i) => {
+                var barSelection = d3.select(plotData.selection[0][i]);
+                var pixelPointY = plotData.pixelPoints[i].y;
+                assert.strictEqual(pixelPointY, +barSelection.attr("y"), "barAlignment left y correct");
+              });
+              svg.remove();
+            });
+
+            it("getAllPlotData() pixel points corrected for barAlignment right",() => {
+              barPlot.barAlignment("right");
+              var plotData = barPlot.getAllPlotData();
+              plotData.data.forEach((datum, i) => {
+                var barSelection = d3.select(plotData.selection[0][i]);
+                var pixelPointY = plotData.pixelPoints[i].y;
+                assert.strictEqual(pixelPointY, +barSelection.attr("y") + +barSelection.attr("height"), "barAlignment right y correct");
+              });
+              svg.remove();
+            });
+          });
+
         });
-        svg.remove();
+
       });
 
       describe("getClosestPlotData()", () => {
