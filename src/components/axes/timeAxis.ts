@@ -458,7 +458,7 @@ export module Axis {
         var attr = this._generateBaselineAttrHash();
         attr["y1"] += (this.orient() === "bottom") ? baselineOffset : -baselineOffset;
         attr["y2"] = attr["y1"];
-        this._tierBaselines[i].attr(attr).style("visibility", "visible");
+        this._tierBaselines[i].attr(attr).style("visibility", "inherit");
         baselineOffset += this._tierHeights[i];
       }
 
@@ -487,17 +487,12 @@ export module Axis {
           return d3.select(this).style("visibility") === "visible";
         });
 
-      var _this = this;
       var availableHeight = this.height();
       var usedHeight = 0;
 
-      visibleAxisTiers.each(function(d, i) {
-        usedHeight += _this._tierHeights[i];
-        if (usedHeight > availableHeight) {
-          var axisTier = d3.select(this);
-          axisTier.style("visibility", "hidden");
-          axisTier.selectAll(".baseline").style("visibility", "inherit");
-        }
+      visibleAxisTiers.attr("visibility", (d: any, i: number) => {
+        usedHeight += this._tierHeights[i];
+        return usedHeight <= availableHeight ? "visible" : "hidden";
       });
     }
 

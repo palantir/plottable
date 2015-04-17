@@ -4735,7 +4735,7 @@ var Plottable;
                     var attr = this._generateBaselineAttrHash();
                     attr["y1"] += (this.orient() === "bottom") ? baselineOffset : -baselineOffset;
                     attr["y2"] = attr["y1"];
-                    this._tierBaselines[i].attr(attr).style("visibility", "visible");
+                    this._tierBaselines[i].attr(attr).style("visibility", "inherit");
                     baselineOffset += this._tierHeights[i];
                 }
                 var labelLessTicks = [];
@@ -4753,19 +4753,15 @@ var Plottable;
                 return this;
             };
             Time.prototype._hideOverflowingTiers = function () {
+                var _this = this;
                 var visibleAxisTiers = this._element.selectAll(".time-axis-tier").filter(function (d, i) {
                     return d3.select(this).style("visibility") === "visible";
                 });
-                var _this = this;
                 var availableHeight = this.height();
                 var usedHeight = 0;
-                visibleAxisTiers.each(function (d, i) {
+                visibleAxisTiers.attr("visibility", function (d, i) {
                     usedHeight += _this._tierHeights[i];
-                    if (usedHeight > availableHeight) {
-                        var axisTier = d3.select(this);
-                        axisTier.style("visibility", "hidden");
-                        axisTier.selectAll(".baseline").style("visibility", "inherit");
-                    }
+                    return usedHeight <= availableHeight ? "visible" : "hidden";
                 });
             };
             Time.prototype._hideOverlappingAndCutOffLabels = function (index) {
