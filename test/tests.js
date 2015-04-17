@@ -881,10 +881,19 @@ describe("TimeAxis", function () {
         });
         xAxis.axisConfigurations([configuration]);
         xAxis.renderTo(svg);
-        var numberOfVisibleTiers = xAxis._element.selectAll("." + Plottable.Axis.Time.TIME_AXIS_TIER_CLASS).filter(function () {
-            return d3.select(this).style("visibility") === "visible";
-        })[0].length;
-        assert.notStrictEqual(numberOfVisibleTiers, tiersToCreate, "there should be less than " + tiersToCreate + " visible tiers");
+        var axisBoundingRect = xAxis._element.select(".bounding-box")[0][0].getBoundingClientRect();
+        var isInsideAxisBoundingRect = function (innerRect) {
+            return innerRect.bottom <= axisBoundingRect.bottom && axisBoundingRect.top <= innerRect.top;
+        };
+        var numberOfVisibleTiers = xAxis._element.selectAll("." + Plottable.Axis.Time.TIME_AXIS_TIER_CLASS).each(function (e, i) {
+            var sel = d3.select(this);
+            if (isInsideAxisBoundingRect(sel[0][0].getBoundingClientRect())) {
+                assert.strictEqual(sel.style("visibility"), "visible", "time axis tiers inside the axis should be visible. Tier #" + (i + 1));
+            }
+            else {
+                assert.strictEqual(sel.style("visibility"), "hidden", "time axis tiers inside the axis should not be visible. Tier #" + (i + 1));
+            }
+        });
         svg.remove();
     });
 });

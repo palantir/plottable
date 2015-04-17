@@ -244,14 +244,25 @@ describe("TimeAxis", () => {
 
     xAxis.renderTo(svg);
 
+    var axisBoundingRect: ClientRect = (<any> xAxis)._element.select(".bounding-box")[0][0].getBoundingClientRect();
+
+    var isInsideAxisBoundingRect = function(innerRect: ClientRect) {
+      return innerRect.bottom     <= axisBoundingRect.bottom &&
+             axisBoundingRect.top <= innerRect.top;
+    }
+
     var numberOfVisibleTiers = (<any> xAxis)._element
       .selectAll("." + Plottable.Axis.Time.TIME_AXIS_TIER_CLASS)
-      .filter(function() {
-        return d3.select(this).style("visibility") === "visible";
-      })[0].length;
-
-    assert.notStrictEqual(numberOfVisibleTiers, tiersToCreate,
-      "there should be less than " + tiersToCreate + " visible tiers");
+      .each(function(e: any, i: number) {
+        var sel = d3.select(this);
+        if (isInsideAxisBoundingRect(sel[0][0].getBoundingClientRect())) {
+          assert.strictEqual(sel.style("visibility"), "visible",
+            "time axis tiers inside the axis should be visible. Tier #" + (i + 1));
+        } else {
+          assert.strictEqual(sel.style("visibility"), "hidden",
+            "time axis tiers inside the axis should not be visible. Tier #" + (i + 1));
+        }
+      });
 
     svg.remove();
 
