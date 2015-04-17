@@ -174,13 +174,16 @@ export module Plot {
 
       this.datasetOrder().forEach((key: string) => {
         var plotData = this.getAllPlotData(key);
-        plotData.pixelPoints.forEach((pxPt: Point, index: number) => {
-          if (!this._isVisibleOnPlot(pxPt, plotData.selection[0][index])) {
+        plotData.pixelPoints.forEach((pixelPoint: Point, index: number) => {
+          var datum = plotData.data[index];
+          var selection = d3.select(plotData.selection[0][index]);
+
+          if (!this._isVisibleOnPlot(datum, pixelPoint, selection)) {
             return;
           }
 
-          var xDist = Math.abs(queryPoint.x - pxPt.x);
-          var yDist = Math.abs(queryPoint.y - pxPt.y);
+          var xDist = Math.abs(queryPoint.x - pixelPoint.x);
+          var yDist = Math.abs(queryPoint.y - pixelPoint.y);
 
           if (xDist < minXDist || xDist === minXDist && yDist < minYDist) {
             closestData = [];
@@ -193,7 +196,7 @@ export module Plot {
 
           if (xDist === minXDist && yDist === minYDist) {
             closestData.push(plotData.data[index]);
-            closestPixelPoints.push(pxPt);
+            closestPixelPoints.push(pixelPoint);
             closestElements.push(plotData.selection[0][0]);
           }
         });
@@ -204,11 +207,6 @@ export module Plot {
         pixelPoints: closestPixelPoints,
         selection: d3.selectAll(closestElements)
       };
-    }
-
-    protected _isVisibleOnPlot(pixelPoint: Point, element: Element): boolean {
-      return !(pixelPoint.x < 0 || pixelPoint.y < 0 ||
-          pixelPoint.x > this.width() || pixelPoint.y > this.height());
     }
 
     //===== Hover logic =====

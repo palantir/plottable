@@ -115,16 +115,20 @@ export module Plot {
       };
     }
 
-    protected _isVisibleOnPlot(pixelPoint: Point, element: Element): boolean {
+    protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean {
       var chartXExtent = { min: 0, max: this.width() };
       var chartYExtent = { min: 0, max: this.height() };
 
-      var translation = d3.transform(d3.select(element).attr("transform")).translate;
-      var bbox = element.getBBox();
-      bbox.x += translation[0];
-      bbox.y += translation[1];
+      var translation = d3.transform(selection.attr("transform")).translate;
+      var bbox = selection[0][0].getBBox();
+      var translatedBbox: SVGRect = {
+        x: bbox.x + translation[0],
+        y: bbox.y + translation[1],
+        width: bbox.width,
+        height: bbox.height
+      };
 
-      return _Util.Methods.intersectsBBox(chartXExtent, chartYExtent, bbox);
+      return Plottable._Util.Methods.intersectsBBox(chartXExtent, chartYExtent, translatedBbox);
     }
 
     //===== Hover logic =====

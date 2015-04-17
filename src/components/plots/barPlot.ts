@@ -166,10 +166,11 @@ export module Plot {
 
       this.datasetOrder().forEach((key) => {
         var plotData = this.getAllPlotData(key);
-        plotData.pixelPoints.forEach((plotPt, i) => {
-          var bar = plotData.selection[0][i];
+        plotData.pixelPoints.forEach((plotPt, index) => {
+          var datum = plotData.data[index];
+          var bar = plotData.selection[0][index];
 
-          if (!this._isVisibleOnPlot(plotPt, bar)) {
+          if (!this._isVisibleOnPlot(datum, plotPt, d3.select(bar))) {
             return;
           }
 
@@ -198,7 +199,7 @@ export module Plot {
 
           // bars minPrimaryDist away are part of the closest set
           if (primaryDist === minPrimaryDist && secondaryDist === minSecondaryDist) {
-            closestData.push(plotData.data[i]);
+            closestData.push(datum);
             closestPixelPoints.push(plotPt);
             closestElements.push(bar);
           }
@@ -210,6 +211,14 @@ export module Plot {
         pixelPoints: closestPixelPoints,
         selection: d3.selectAll(closestElements)
       };
+    }
+
+    protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean {
+      var chartXExtent = { min: 0, max: this.width() };
+      var chartYExtent = { min: 0, max: this.height() };
+      var barBBox = selection[0][0].getBBox();
+
+      return Plottable._Util.Methods.intersectsBBox(chartXExtent, chartYExtent, barBBox);
     }
 
     /**

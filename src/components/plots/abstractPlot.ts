@@ -528,9 +528,10 @@ export module Plot {
       var closestIndex: number;
       var plotData = this.getAllPlotData();
       plotData.pixelPoints.forEach((pixelPoint: Point, index: number) => {
-        var element = plotData.selection[0][index];
+        var datum = plotData.data[index];
+        var selection = d3.select(plotData.selection[0][index]);
 
-        if (!this._isVisibleOnPlot(pixelPoint, element)) {
+        if (!this._isVisibleOnPlot(datum, pixelPoint, selection)) {
           return;
         }
 
@@ -550,9 +551,9 @@ export module Plot {
               selection: d3.select(plotData.selection[0][closestIndex])};
     }
 
-    protected _isVisibleOnPlot(pixelPoint: Point, element: Element): boolean {
-      return _Util.Methods.intersectsBBox({ min: 0, max: this.width() },
-          { min: 0, max: this.height() }, element.getBBox());
+    protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean {
+      return !(pixelPoint.x < 0 || pixelPoint.y < 0 ||
+        pixelPoint.x > this.width() || pixelPoint.y > this.height());
     }
   }
 }

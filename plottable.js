@@ -6878,8 +6878,9 @@ var Plottable;
                 var closestIndex;
                 var plotData = this.getAllPlotData();
                 plotData.pixelPoints.forEach(function (pixelPoint, index) {
-                    var element = plotData.selection[0][index];
-                    if (!_this._isVisibleOnPlot(pixelPoint, element)) {
+                    var datum = plotData.data[index];
+                    var selection = d3.select(plotData.selection[0][index]);
+                    if (!_this._isVisibleOnPlot(datum, pixelPoint, selection)) {
                         return;
                     }
                     var distance = Plottable._Util.Methods.distanceSquared(pixelPoint, queryPoint);
@@ -6893,8 +6894,8 @@ var Plottable;
                 }
                 return { data: [plotData.data[closestIndex]], pixelPoints: [plotData.pixelPoints[closestIndex]], selection: d3.select(plotData.selection[0][closestIndex]) };
             };
-            AbstractPlot.prototype._isVisibleOnPlot = function (pixelPoint, element) {
-                return Plottable._Util.Methods.intersectsBBox({ min: 0, max: this.width() }, { min: 0, max: this.height() }, element.getBBox());
+            AbstractPlot.prototype._isVisibleOnPlot = function (datum, pixelPoint, selection) {
+                return !(pixelPoint.x < 0 || pixelPoint.y < 0 || pixelPoint.x > this.width() || pixelPoint.y > this.height());
             };
             return AbstractPlot;
         })(Plottable.Component.AbstractComponent);
@@ -7363,14 +7364,18 @@ var Plottable;
                     data: closestData
                 };
             };
-            Scatter.prototype._isVisibleOnPlot = function (pixelPoint, element) {
+            Scatter.prototype._isVisibleOnPlot = function (datum, pixelPoint, selection) {
                 var chartXExtent = { min: 0, max: this.width() };
                 var chartYExtent = { min: 0, max: this.height() };
-                var translation = d3.transform(d3.select(element).attr("transform")).translate;
-                var bbox = element.getBBox();
-                bbox.x += translation[0];
-                bbox.y += translation[1];
-                return Plottable._Util.Methods.intersectsBBox(chartXExtent, chartYExtent, bbox);
+                var translation = d3.transform(selection.attr("transform")).translate;
+                var bbox = selection[0][0].getBBox();
+                var translatedBbox = {
+                    x: bbox.x + translation[0],
+                    y: bbox.y + translation[1],
+                    width: bbox.width,
+                    height: bbox.height
+                };
+                return Plottable._Util.Methods.intersectsBBox(chartXExtent, chartYExtent, translatedBbox);
             };
             //===== Hover logic =====
             Scatter.prototype._hoverOverComponent = function (p) {
@@ -7604,9 +7609,10 @@ var Plottable;
                 var queryPtSecondary = this._isVertical ? queryPoint.y : queryPoint.x;
                 this.datasetOrder().forEach(function (key) {
                     var plotData = _this.getAllPlotData(key);
-                    plotData.pixelPoints.forEach(function (plotPt, i) {
-                        var bar = plotData.selection[0][i];
-                        if (!_this._isVisibleOnPlot(plotPt, bar)) {
+                    plotData.pixelPoints.forEach(function (plotPt, index) {
+                        var datum = plotData.data[index];
+                        var bar = plotData.selection[0][index];
+                        if (!_this._isVisibleOnPlot(datum, plotPt, d3.select(bar))) {
                             return;
                         }
                         var primaryDist = 0;
@@ -7628,7 +7634,7 @@ var Plottable;
                         }
                         // bars minPrimaryDist away are part of the closest set
                         if (primaryDist === minPrimaryDist && secondaryDist === minSecondaryDist) {
-                            closestData.push(plotData.data[i]);
+                            closestData.push(datum);
                             closestPixelPoints.push(plotPt);
                             closestElements.push(bar);
                         }
@@ -7639,6 +7645,12 @@ var Plottable;
                     pixelPoints: closestPixelPoints,
                     selection: d3.selectAll(closestElements)
                 };
+            };
+            Bar.prototype._isVisibleOnPlot = function (datum, pixelPoint, selection) {
+                var chartXExtent = { min: 0, max: this.width() };
+                var chartYExtent = { min: 0, max: this.height() };
+                var barBBox = selection[0][0].getBBox();
+                return Plottable._Util.Methods.intersectsBBox(chartXExtent, chartYExtent, barBBox);
             };
             /**
              * Gets the bar under the given pixel position (if [xValOrExtent]
@@ -8098,12 +8110,14 @@ var Plottable;
                 var closestElements = [];
                 this.datasetOrder().forEach(function (key) {
                     var plotData = _this.getAllPlotData(key);
-                    plotData.pixelPoints.forEach(function (pxPt, index) {
-                        if (!_this._isVisibleOnPlot(pxPt, plotData.selection[0][index])) {
+                    plotData.pixelPoints.forEach(function (pixelPoint, index) {
+                        var datum = plotData.data[index];
+                        var selection = d3.select(plotData.selection[0][index]);
+                        if (!_this._isVisibleOnPlot(datum, pixelPoint, selection)) {
                             return;
                         }
-                        var xDist = Math.abs(queryPoint.x - pxPt.x);
-                        var yDist = Math.abs(queryPoint.y - pxPt.y);
+                        var xDist = Math.abs(queryPoint.x - pixelPoint.x);
+                        var yDist = Math.abs(queryPoint.y - pixelPoint.y);
                         if (xDist < minXDist || xDist === minXDist && yDist < minYDist) {
                             closestData = [];
                             closestPixelPoints = [];
@@ -8113,7 +8127,7 @@ var Plottable;
                         }
                         if (xDist === minXDist && yDist === minYDist) {
                             closestData.push(plotData.data[index]);
-                            closestPixelPoints.push(pxPt);
+                            closestPixelPoints.push(pixelPoint);
                             closestElements.push(plotData.selection[0][0]);
                         }
                     });
@@ -8123,9 +8137,6 @@ var Plottable;
                     pixelPoints: closestPixelPoints,
                     selection: d3.selectAll(closestElements)
                 };
-            };
-            Line.prototype._isVisibleOnPlot = function (pixelPoint, element) {
-                return !(pixelPoint.x < 0 || pixelPoint.y < 0 || pixelPoint.x > this.width() || pixelPoint.y > this.height());
             };
             //===== Hover logic =====
             Line.prototype._hoverOverComponent = function (p) {
