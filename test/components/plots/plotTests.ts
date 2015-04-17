@@ -250,54 +250,6 @@ describe("Plots", () => {
       svg.remove();
     });
 
-    it("getClosestPlotData", () => {
-      var svg = generateSVG(400, 400);
-      var plot = new Plottable.Plot.AbstractPlot();
-
-      var data1 = [{value: 0}, {value: 1}, {value: 2}];
-      var data2 = [{value: 0}, {value: 1}, {value: 2}];
-
-      var data1Points = data1.map((datum: any) => { return {x: datum.value, y: 100}; });
-      var data2Points = data2.map((datum: any) => { return {x: datum.value, y: 10}; });
-
-      var data1PointConverter = (datum: any, index: number) => data1Points[index];
-      var data2PointConverter = (datum: any, index: number) => data2Points[index];
-
-      // Create mock drawers with already drawn items
-      var mockDrawer1 = new Plottable._Drawer.AbstractDrawer("ds1");
-      var renderArea1 = svg.append("g");
-      renderArea1.append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
-      (<any> mockDrawer1).setup = () => (<any> mockDrawer1)._renderArea = renderArea1;
-      (<any> mockDrawer1)._getSelector = () => "circle";
-      (<any> mockDrawer1)._getPixelPoint = data1PointConverter;
-
-      var renderArea2 = svg.append("g");
-      renderArea2.append("circle").attr("cx", 10).attr("cy", 10).attr("r", 10);
-      var mockDrawer2 = new Plottable._Drawer.AbstractDrawer("ds2");
-      (<any> mockDrawer2).setup = () => (<any> mockDrawer2)._renderArea = renderArea2;
-      (<any> mockDrawer2)._getSelector = () => "circle";
-      (<any> mockDrawer2)._getPixelPoint = data2PointConverter;
-
-      // Mock _getDrawer to return the mock drawers
-      (<any> plot)._getDrawer = (key: string) => {
-        if (key === "ds1") {
-          return mockDrawer1;
-        } else {
-          return mockDrawer2;
-        }
-      };
-
-      plot.addDataset("ds1", data1);
-      plot.addDataset("ds2", data2);
-      plot.renderTo(svg);
-
-      var queryPoint = {x: 1, y: 11};
-      var closestPlotData = plot.getClosestPlotData(queryPoint);
-      assert.deepEqual(closestPlotData.pixelPoints, [{x: 1, y: 10}], "retrieves the closest point across datasets");
-
-      svg.remove();
-    });
-
     describe("Dataset removal", () => {
       var plot: Plottable.Plot.AbstractPlot;
       var d1: Plottable.Dataset;

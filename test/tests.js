@@ -2143,49 +2143,6 @@ describe("Plots", function () {
             assert.includeMembers(oneElementPlotData.pixelPoints, data2.map(data2PointConverter), "includes data2 points");
             svg.remove();
         });
-        it("getClosestPlotData", function () {
-            var svg = generateSVG(400, 400);
-            var plot = new Plottable.Plot.AbstractPlot();
-            var data1 = [{ value: 0 }, { value: 1 }, { value: 2 }];
-            var data2 = [{ value: 0 }, { value: 1 }, { value: 2 }];
-            var data1Points = data1.map(function (datum) {
-                return { x: datum.value, y: 100 };
-            });
-            var data2Points = data2.map(function (datum) {
-                return { x: datum.value, y: 10 };
-            });
-            var data1PointConverter = function (datum, index) { return data1Points[index]; };
-            var data2PointConverter = function (datum, index) { return data2Points[index]; };
-            // Create mock drawers with already drawn items
-            var mockDrawer1 = new Plottable._Drawer.AbstractDrawer("ds1");
-            var renderArea1 = svg.append("g");
-            renderArea1.append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
-            mockDrawer1.setup = function () { return mockDrawer1._renderArea = renderArea1; };
-            mockDrawer1._getSelector = function () { return "circle"; };
-            mockDrawer1._getPixelPoint = data1PointConverter;
-            var renderArea2 = svg.append("g");
-            renderArea2.append("circle").attr("cx", 10).attr("cy", 10).attr("r", 10);
-            var mockDrawer2 = new Plottable._Drawer.AbstractDrawer("ds2");
-            mockDrawer2.setup = function () { return mockDrawer2._renderArea = renderArea2; };
-            mockDrawer2._getSelector = function () { return "circle"; };
-            mockDrawer2._getPixelPoint = data2PointConverter;
-            // Mock _getDrawer to return the mock drawers
-            plot._getDrawer = function (key) {
-                if (key === "ds1") {
-                    return mockDrawer1;
-                }
-                else {
-                    return mockDrawer2;
-                }
-            };
-            plot.addDataset("ds1", data1);
-            plot.addDataset("ds2", data2);
-            plot.renderTo(svg);
-            var queryPoint = { x: 1, y: 11 };
-            var closestPlotData = plot.getClosestPlotData(queryPoint);
-            assert.deepEqual(closestPlotData.pixelPoints, [{ x: 1, y: 10 }], "retrieves the closest point across datasets");
-            svg.remove();
-        });
         describe("Dataset removal", function () {
             var plot;
             var d1;
@@ -3987,6 +3944,48 @@ describe("Plots", function () {
             var selectionData = allCircles.data();
             assert.includeMembers(selectionData, data, "first dataset data in selection data");
             assert.includeMembers(selectionData, data2, "second dataset data in selection data");
+            svg.remove();
+        });
+        it("getClosestPlotData()", function () {
+            function assertPlotDataEqual(expected, actual, msg) {
+                assert.deepEqual(expected.data, actual.data, msg);
+                assert.closeTo(expected.pixelPoints[0].x, actual.pixelPoints[0].x, 0.01, msg);
+                assert.closeTo(expected.pixelPoints[0].y, actual.pixelPoints[0].y, 0.01, msg);
+                assert.deepEqual(expected.selection, actual.selection, msg);
+            }
+            var svg = generateSVG(400, 400);
+            var xScale = new Plottable.Scale.Linear();
+            var yScale = new Plottable.Scale.Linear();
+            var data = [{ x: 0, y: 0 }, { x: 1, y: 1 }];
+            var data2 = [{ x: 1, y: 2 }, { x: 3, y: 4 }];
+            var plot = new Plottable.Plot.Scatter(xScale, yScale).project("x", "x", xScale).project("y", "y", yScale).addDataset(data).addDataset(data2);
+            plot.renderTo(svg);
+            var points = d3.selectAll(".scatter-plot path");
+            var d0 = data[0];
+            var d0Px = {
+                x: xScale.scale(d0.x),
+                y: yScale.scale(d0.y)
+            };
+            var expected = {
+                data: [d0],
+                pixelPoints: [d0Px],
+                selection: d3.select(points[0][0])
+            };
+            var closest = plot.getClosestPlotData({ x: d0Px.x + 1, y: d0Px.y + 1 });
+            assertPlotDataEqual(expected, closest, "it selects the closest data point");
+            yScale.domain([0, 1.9]);
+            var d1 = data[1];
+            var d1Px = {
+                x: xScale.scale(d1.x),
+                y: yScale.scale(d1.y)
+            };
+            expected = {
+                data: [d1],
+                pixelPoints: [d1Px],
+                selection: d3.select(points[0][1])
+            };
+            closest = plot.getClosestPlotData({ x: d1Px.x, y: 0 });
+            assertPlotDataEqual(expected, closest, "it ignores off-plot data points");
             svg.remove();
         });
         it("_getClosestStruckPoint()", function () {

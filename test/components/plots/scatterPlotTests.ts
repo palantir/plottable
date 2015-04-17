@@ -73,6 +73,63 @@ describe("Plots", () => {
       svg.remove();
     });
 
+    it("getClosestPlotData()", () => {
+      function assertPlotDataEqual(expected: Plottable.Plot.PlotData, actual: Plottable.Plot.PlotData,
+        msg: string) {
+        assert.deepEqual(expected.data, actual.data, msg);
+        assert.closeTo(expected.pixelPoints[0].x, actual.pixelPoints[0].x, 0.01, msg);
+        assert.closeTo(expected.pixelPoints[0].y, actual.pixelPoints[0].y, 0.01, msg);
+        assert.deepEqual(expected.selection, actual.selection, msg);
+      }
+
+      var svg = generateSVG(400, 400);
+      var xScale = new Plottable.Scale.Linear();
+      var yScale = new Plottable.Scale.Linear();
+      var data = [{x: 0, y: 0}, {x: 1, y: 1}];
+      var data2 = [{x: 1, y: 2}, {x: 3, y: 4}];
+      var plot = new Plottable.Plot.Scatter(xScale, yScale)
+                                   .project("x", "x", xScale)
+                                   .project("y", "y", yScale)
+                                   .addDataset(data)
+                                   .addDataset(data2);
+      plot.renderTo(svg);
+
+      var points = d3.selectAll(".scatter-plot path");
+      var d0 = data[0];
+      var d0Px = {
+        x: xScale.scale(d0.x),
+        y: yScale.scale(d0.y)
+      };
+
+      var expected = {
+        data: [d0],
+        pixelPoints: [d0Px],
+        selection: d3.select(points[0][0])
+      };
+
+      var closest = plot.getClosestPlotData({ x: d0Px.x + 1, y: d0Px.y + 1 });
+      assertPlotDataEqual(expected, closest, "it selects the closest data point");
+
+      yScale.domain([0, 1.9]);
+
+      var d1 = data[1];
+      var d1Px = {
+        x: xScale.scale(d1.x),
+        y: yScale.scale(d1.y)
+      };
+
+      expected = {
+        data: [d1],
+        pixelPoints: [d1Px],
+        selection: d3.select(points[0][1])
+      };
+
+      closest = plot.getClosestPlotData({ x: d1Px.x, y: 0 });
+      assertPlotDataEqual(expected, closest, "it ignores off-plot data points");
+
+      svg.remove();
+    });
+
     it("_getClosestStruckPoint()", () => {
       var svg = generateSVG(400, 400);
       var xScale = new Plottable.Scale.Linear();
