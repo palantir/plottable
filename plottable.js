@@ -2485,10 +2485,14 @@ var Plottable;
             };
             Color._getPlottableColors = function () {
                 var plottableDefaultColors = [];
-                var colorTester = d3.select("body").append("div");
+                var colorTester = d3.select("body").append("plottable-color-tester");
+                var defaultColorHex = Plottable._Util.Methods.colorTest(colorTester, "");
                 var i = 0;
                 var colorHex;
-                while ((colorHex = Plottable._Util.Methods.colorTest(colorTester, "plottable-colors-" + i)) !== null) {
+                while ((colorHex = Plottable._Util.Methods.colorTest(colorTester, "plottable-colors-" + i)) !== null && i < this.MAXIMUM_COLORS_FROM_CSS) {
+                    if (colorHex === defaultColorHex && colorHex === plottableDefaultColors[plottableDefaultColors.length - 1]) {
+                        break;
+                    }
                     plottableDefaultColors.push(colorHex);
                     i++;
                 }
@@ -2506,6 +2510,8 @@ var Plottable;
             };
             Color.HEX_SCALE_FACTOR = 20;
             Color.LOOP_LIGHTEN_FACTOR = 1.6;
+            //The maximum number of colors we are getting from CSS stylesheets
+            Color.MAXIMUM_COLORS_FROM_CSS = 256;
             return Color;
         })(Scale.AbstractScale);
         Scale.Color = Color;
@@ -6548,13 +6554,13 @@ var Plottable;
              *
              * Here's a common use case:
              * ```typescript
-             * plot.attr("r", function(d) { return d.foo; });
+             * plot.attr("x", function(d) { return d.foo; }, xScale);
              * ```
-             * This will set the radius of each datum `d` to be `d.foo`.
+             * This will set the x accessor of each datum `d` to be `d.foo`,
+             * scaled in accordance with `xScale`
              *
              * @param {string} attrToSet The attribute to set across each data
-             * point. Popular examples include "x", "y", "r". Scales that inherit from
-             * Plot define their meaning.
+             * point. Popular examples include "x", "y".
              *
              * @param {Function|string|any} accessor Function to apply to each element
              * of the dataSource. If a Function, use `accessor(d, i)`. If a string,
@@ -6857,8 +6863,12 @@ var Plottable;
                     }
                     var drawer = plotDatasetKey.drawer;
                     plotDatasetKey.dataset.data().forEach(function (datum, index) {
+                        var pixelPoint = drawer._getPixelPoint(datum, index);
+                        if (pixelPoint.x !== pixelPoint.x || pixelPoint.y !== pixelPoint.y) {
+                            return;
+                        }
                         data.push(datum);
-                        pixelPoints.push(drawer._getPixelPoint(datum, index));
+                        pixelPoints.push(pixelPoint);
                         allElements.push(drawer._getSelection(index).node());
                     });
                 });
@@ -8069,8 +8079,12 @@ var Plottable;
                     }
                     var drawer = plotDatasetKey.drawer;
                     plotDatasetKey.dataset.data().forEach(function (datum, index) {
+                        var pixelPoint = drawer._getPixelPoint(datum, index);
+                        if (pixelPoint.x !== pixelPoint.x || pixelPoint.y !== pixelPoint.y) {
+                            return;
+                        }
                         data.push(datum);
-                        pixelPoints.push(drawer._getPixelPoint(datum, index));
+                        pixelPoints.push(pixelPoint);
                     });
                     if (plotDatasetKey.dataset.data().length > 0) {
                         allElements.push(drawer._getSelection(0).node());

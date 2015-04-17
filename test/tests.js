@@ -2143,6 +2143,38 @@ describe("Plots", function () {
             assert.includeMembers(oneElementPlotData.pixelPoints, data2.map(data2PointConverter), "includes data2 points");
             svg.remove();
         });
+        it("getAllPlotData() with NaN pixel points", function () {
+            var svg = generateSVG(400, 400);
+            var plot = new Plottable.Plot.AbstractPlot();
+            var data = [{ value: NaN }, { value: 1 }, { value: 2 }];
+            var dataPoints = data.map(function (datum) {
+                return { x: datum.value, y: 10 };
+            });
+            var dataPointConverter = function (datum, index) { return dataPoints[index]; };
+            // Create mock drawer with already drawn items
+            var mockDrawer = new Plottable._Drawer.AbstractDrawer("ds");
+            var renderArea = svg.append("g");
+            var circles = renderArea.selectAll("circles").data(data);
+            circles.enter().append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
+            circles.exit().remove();
+            mockDrawer.setup = function () { return mockDrawer._renderArea = renderArea; };
+            mockDrawer._getSelector = function () { return "circle"; };
+            mockDrawer._getPixelPoint = dataPointConverter;
+            // Mock _getDrawer to return the mock drawer
+            plot._getDrawer = function () { return mockDrawer; };
+            plot.addDataset("ds", data);
+            plot.renderTo(svg);
+            var oneElementPlotData = plot.getAllPlotData();
+            var oneElementSelection = oneElementPlotData.selection;
+            assert.strictEqual(oneElementSelection.size(), 2, "finds all selections that do not have NaN pixelPoint");
+            assert.lengthOf(oneElementPlotData.pixelPoints, 2, "returns pixelPoints except ones with NaN");
+            assert.lengthOf(oneElementPlotData.data, 2, "finds data that do not have NaN pixelPoint");
+            oneElementPlotData.pixelPoints.forEach(function (pixelPoint) {
+                assert.isNumber(pixelPoint.x, "pixelPoint X cannot be NaN");
+                assert.isNumber(pixelPoint.y, "pixelPoint Y cannot be NaN");
+            });
+            svg.remove();
+        });
         it("getClosestPlotData", function () {
             var svg = generateSVG(400, 400);
             var plot = new Plottable.Plot.AbstractPlot();
@@ -2650,6 +2682,31 @@ describe("Plots", function () {
 ///<reference path="../../testReference.ts" />
 var assert = chai.assert;
 describe("Plots", function () {
+    // HACKHACK #1798: beforeEach being used below
+    describe("LinePlot", function () {
+        it("getAllPlotData with NaNs", function () {
+            var svg = generateSVG(500, 500);
+            var dataWithNaN = [
+                { foo: 0.0, bar: 0.0 },
+                { foo: 0.2, bar: 0.2 },
+                { foo: 0.4, bar: NaN },
+                { foo: 0.6, bar: 0.6 },
+                { foo: 0.8, bar: 0.8 }
+            ];
+            var xScale = new Plottable.Scale.Linear().domain([0, 1]);
+            var yScale = new Plottable.Scale.Linear().domain([0, 1]);
+            var linePlot = new Plottable.Plot.Line(xScale, yScale);
+            linePlot.addDataset(dataWithNaN);
+            linePlot.project("x", function (d) { return d.foo; }, xScale);
+            linePlot.project("y", function (d) { return d.bar; }, yScale);
+            linePlot.renderTo(svg);
+            var apd = linePlot.getAllPlotData();
+            var expectedLength = dataWithNaN.length - 1;
+            assert.strictEqual(apd.data.length, expectedLength, "NaN data was not returned");
+            assert.strictEqual(apd.pixelPoints.length, expectedLength, "NaN data doesn't appear in pixelPoints");
+            svg.remove();
+        });
+    });
     describe("LinePlot", function () {
         var svg;
         var xScale;
@@ -6990,6 +7047,40 @@ describe("Scales", function () {
             scale.domain(["a", "b"]);
             assert.equal(scale.scale("a"), "#ff0000");
             assert.equal(scale.scale("b"), "#0000ff");
+        });
+        it("accepts CSS specified colors", function () {
+            var style = d3.select("body").append("style");
+            style.html(".plottable-colors-0 {background-color: #ff0000 !important; }");
+            var scale = new Plottable.Scale.Color();
+            style.remove();
+            assert.strictEqual(scale.range()[0], "#ff0000", "User has specified red color for first color scale color");
+            assert.strictEqual(scale.range()[1], "#fd373e", "The second color of the color scale should be the same");
+            var defaultScale = new Plottable.Scale.Color();
+            assert.strictEqual(scale.range()[0], "#ff0000", "Unloading the CSS should not modify the first scale color (this will not be the case if we support dynamic CSS");
+            assert.strictEqual(defaultScale.range()[0], "#5279c7", "Unloading the CSS should cause color scales fallback to default colors");
+        });
+        it("should try to recover from malicious CSS styleseets", function () {
+            var defaultNumberOfColors = 10;
+            var initialScale = new Plottable.Scale.Color();
+            assert.strictEqual(initialScale.range().length, defaultNumberOfColors, "there should initially be " + defaultNumberOfColors + " default colors");
+            var maliciousStyle = d3.select("body").append("style");
+            maliciousStyle.html("* {background-color: #fff000;}");
+            var affectedScale = new Plottable.Scale.Color();
+            maliciousStyle.remove();
+            var colorRange = affectedScale.range();
+            assert.strictEqual(colorRange.length, defaultNumberOfColors + 1, "it should detect the end of the given colors and the fallback to the * selector, " + "but should still include the last occurance of the * selector color");
+            assert.strictEqual(colorRange[colorRange.length - 1], "#fff000", "the * selector background color should be added at least once at the end");
+            assert.notStrictEqual(colorRange[colorRange.length - 2], "#fff000", "the * selector background color should be added at most once at the end");
+        });
+        it("does not crash by malicious CSS stylesheets", function () {
+            var initialScale = new Plottable.Scale.Color();
+            assert.strictEqual(initialScale.range().length, 10, "there should initially be 10 default colors");
+            var maliciousStyle = d3.select("body").append("style");
+            maliciousStyle.html("[class^='plottable-'] {background-color: pink;}");
+            var affectedScale = new Plottable.Scale.Color();
+            maliciousStyle.remove();
+            var maximumColorsFromCss = Plottable.Scale.Color.MAXIMUM_COLORS_FROM_CSS;
+            assert.strictEqual(affectedScale.range().length, maximumColorsFromCss, "current malicious CSS countermeasure is to cap maximum number of colors to 256");
         });
     });
     describe("Interpolated Color Scales", function () {
