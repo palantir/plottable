@@ -6873,12 +6873,20 @@ var Plottable;
              * @returns {PlotData} The PlotData closest to queryPoint
              */
             AbstractPlot.prototype.getClosestPlotData = function (queryPoint) {
-                var _this = this;
+                var chartXExtent = { min: 0, max: this.width() };
+                var chartYExtent = { min: 0, max: this.height() };
                 var closestDistanceSquared = Infinity;
                 var closestIndex;
                 var plotData = this.getAllPlotData();
                 plotData.pixelPoints.forEach(function (pixelPoint, index) {
-                    if (pixelPoint.x < 0 || pixelPoint.y < 0 || pixelPoint.x > _this.width() || pixelPoint.y > _this.height()) {
+                    var element = plotData.selection[0][index];
+                    // we need to translate this element so it is relative to the plot
+                    var translation = d3.transform(d3.select(element).attr("transform")).translate;
+                    var bbox = element.getBBox();
+                    bbox.x += translation[0];
+                    bbox.y += translation[1];
+                    if (!Plottable._Util.Methods.intersectsBBox(chartXExtent, chartYExtent, bbox)) {
+                        // element isn't visible on plot; ignore it
                         return;
                     }
                     var distance = Plottable._Util.Methods.distanceSquared(pixelPoint, queryPoint);
