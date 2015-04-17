@@ -883,7 +883,7 @@ describe("TimeAxis", function () {
         xAxis.renderTo(svg);
         var axisBoundingRect = xAxis._element.select(".bounding-box")[0][0].getBoundingClientRect();
         var isInsideAxisBoundingRect = function (innerRect) {
-            return innerRect.bottom <= axisBoundingRect.bottom && axisBoundingRect.top <= innerRect.top;
+            return Math.floor(innerRect.bottom) <= Math.ceil(axisBoundingRect.bottom) + window.Pixel_CloseTo_Requirement && Math.floor(axisBoundingRect.top) <= Math.ceil(innerRect.top) + window.Pixel_CloseTo_Requirement;
         };
         var numberOfVisibleTiers = xAxis._element.selectAll("." + Plottable.Axis.Time.TIME_AXIS_TIER_CLASS).each(function (e, i) {
             var sel = d3.select(this);

@@ -247,8 +247,8 @@ describe("TimeAxis", () => {
     var axisBoundingRect: ClientRect = (<any> xAxis)._element.select(".bounding-box")[0][0].getBoundingClientRect();
 
     var isInsideAxisBoundingRect = function(innerRect: ClientRect) {
-      return innerRect.bottom     <= axisBoundingRect.bottom &&
-             axisBoundingRect.top <= innerRect.top;
+      return Math.floor(innerRect.bottom)     <= Math.ceil(axisBoundingRect.bottom) + window.Pixel_CloseTo_Requirement &&
+             Math.floor(axisBoundingRect.top) <= Math.ceil(innerRect.top) + window.Pixel_CloseTo_Requirement;
     };
 
     var numberOfVisibleTiers = (<any> xAxis)._element
