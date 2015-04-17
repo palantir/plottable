@@ -328,13 +328,14 @@ describe("ComponentGroups", () => {
         selection: c2Selection
       };
 
+      // FIXME: These need to be AbstractPlot and Group!
       var c1 = new Plottable.Component.AbstractComponent();
-      (<any>c1).getClosestPlotData = (p: Plottable.Point) => {
+      (<any> c1).getClosestPlotData = (p: Plottable.Point) => {
         return c1PlotData;
       };
 
       var c2 = new Plottable.Component.AbstractComponent();
-      (<any>c2).getClosestPlotData = (p: Plottable.Point) => {
+      (<any> c2).getClosestPlotData = (p: Plottable.Point) => {
         return c2PlotData;
       };
 

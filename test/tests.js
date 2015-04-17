@@ -5746,6 +5746,7 @@ describe("ComponentGroups", function () {
                 plot: c2Plot,
                 selection: c2Selection
             };
+            // FIXME: These need to be AbstractPlot and Group!
             var c1 = new Plottable.Component.AbstractComponent();
             c1.getClosestPlotData = function (p) {
                 return c1PlotData;

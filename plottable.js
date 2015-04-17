@@ -4110,20 +4110,21 @@ var Plottable;
                     data: [],
                     pixelPoints: [],
                     plot: null,
-                    selection: d3.selectAll([])
+                    selection: d3.select()
                 };
                 this.components().forEach(function (c) {
                     // consider only components implementing this function
-                    if (c.getClosestPlotData !== undefined) {
+                    if (c instanceof Plottable.Plot.AbstractPlot || c instanceof Group) {
                         var cpd = c.getClosestPlotData(queryPoint);
-                        if (cpd.data.length > 0) {
+                        var closestPixelPoint = cpd.pixelPoints[0];
+                        if (closestPixelPoint != null) {
                             // we tie-break multiple closest within a single plot by taking the first
-                            var distanceSquared = Plottable._Util.Methods.distanceSquared(cpd.pixelPoints[0], queryPoint);
+                            var distanceSquared = Plottable._Util.Methods.distanceSquared(closestPixelPoint, queryPoint);
                             if (distanceSquared <= minDistSquared) {
                                 minDistSquared = distanceSquared;
                                 closestPlotData = {
                                     data: [cpd.data[0]],
-                                    pixelPoints: [cpd.pixelPoints[0]],
+                                    pixelPoints: [closestPixelPoint],
                                     plot: cpd.plot,
                                     selection: d3.select(cpd.selection[0][0])
                                 };

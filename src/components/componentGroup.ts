@@ -39,21 +39,22 @@ export module Component {
         data: [],
         pixelPoints: [],
         plot: null,
-        selection: d3.selectAll([])
+        selection: d3.select()
       };
 
       this.components().forEach((c) => {
         // consider only components implementing this function
-        if ((<any>c).getClosestPlotData !== undefined) {
-          var cpd = (<any>c).getClosestPlotData(queryPoint);
-          if (cpd.data.length > 0) {
+        if (c instanceof Plot.AbstractPlot || c instanceof Group) {
+          var cpd = (<Plot.AbstractPlot | Group> c).getClosestPlotData(queryPoint);
+          var closestPixelPoint = cpd.pixelPoints[0];
+          if (closestPixelPoint != null) {
             // we tie-break multiple closest within a single plot by taking the first
-            var distanceSquared = _Util.Methods.distanceSquared(cpd.pixelPoints[0], queryPoint);
+            var distanceSquared = _Util.Methods.distanceSquared(closestPixelPoint, queryPoint);
             if (distanceSquared <= minDistSquared) {
               minDistSquared = distanceSquared;
               closestPlotData = {
                 data: [cpd.data[0]],
-                pixelPoints: [cpd.pixelPoints[0]],
+                pixelPoints: [closestPixelPoint],
                 plot: cpd.plot,
                 selection: d3.select(cpd.selection[0][0])
               };
