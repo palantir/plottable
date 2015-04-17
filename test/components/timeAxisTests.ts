@@ -249,7 +249,7 @@ describe("TimeAxis", () => {
     var isInsideAxisBoundingRect = function(innerRect: ClientRect) {
       return innerRect.bottom     <= axisBoundingRect.bottom &&
              axisBoundingRect.top <= innerRect.top;
-    }
+    };
 
     var numberOfVisibleTiers = (<any> xAxis)._element
       .selectAll("." + Plottable.Axis.Time.TIME_AXIS_TIER_CLASS)
