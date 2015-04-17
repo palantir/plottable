@@ -176,9 +176,9 @@ export module Plot {
         var plotData = this.getAllPlotData(key);
         plotData.pixelPoints.forEach((pixelPoint: Point, index: number) => {
           var datum = plotData.data[index];
-          var selection = d3.select(plotData.selection[0][index]);
+          var line = plotData.selection[0][0];
 
-          if (!this._isVisibleOnPlot(datum, pixelPoint, selection)) {
+          if (!this._isVisibleOnPlot(datum, pixelPoint, d3.select(line))) {
             return;
           }
 
@@ -195,9 +195,9 @@ export module Plot {
           }
 
           if (xDist === minXDist && yDist === minYDist) {
-            closestData.push(plotData.data[index]);
+            closestData.push(datum);
             closestPixelPoints.push(pixelPoint);
-            closestElements.push(plotData.selection[0][0]);
+            closestElements.push(line);
           }
         });
       });

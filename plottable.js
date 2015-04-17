@@ -7365,8 +7365,8 @@ var Plottable;
                 };
             };
             Scatter.prototype._isVisibleOnPlot = function (datum, pixelPoint, selection) {
-                var chartXExtent = { min: 0, max: this.width() };
-                var chartYExtent = { min: 0, max: this.height() };
+                var xRange = { min: 0, max: this.width() };
+                var yRange = { min: 0, max: this.height() };
                 var translation = d3.transform(selection.attr("transform")).translate;
                 var bbox = selection[0][0].getBBox();
                 var translatedBbox = {
@@ -7375,7 +7375,7 @@ var Plottable;
                     width: bbox.width,
                     height: bbox.height
                 };
-                return Plottable._Util.Methods.intersectsBBox(chartXExtent, chartYExtent, translatedBbox);
+                return Plottable._Util.Methods.intersectsBBox(xRange, yRange, translatedBbox);
             };
             //===== Hover logic =====
             Scatter.prototype._hoverOverComponent = function (p) {
@@ -7647,10 +7647,10 @@ var Plottable;
                 };
             };
             Bar.prototype._isVisibleOnPlot = function (datum, pixelPoint, selection) {
-                var chartXExtent = { min: 0, max: this.width() };
-                var chartYExtent = { min: 0, max: this.height() };
+                var xRange = { min: 0, max: this.width() };
+                var yRange = { min: 0, max: this.height() };
                 var barBBox = selection[0][0].getBBox();
-                return Plottable._Util.Methods.intersectsBBox(chartXExtent, chartYExtent, barBBox);
+                return Plottable._Util.Methods.intersectsBBox(xRange, yRange, barBBox);
             };
             /**
              * Gets the bar under the given pixel position (if [xValOrExtent]
@@ -8112,8 +8112,8 @@ var Plottable;
                     var plotData = _this.getAllPlotData(key);
                     plotData.pixelPoints.forEach(function (pixelPoint, index) {
                         var datum = plotData.data[index];
-                        var selection = d3.select(plotData.selection[0][index]);
-                        if (!_this._isVisibleOnPlot(datum, pixelPoint, selection)) {
+                        var line = plotData.selection[0][0];
+                        if (!_this._isVisibleOnPlot(datum, pixelPoint, d3.select(line))) {
                             return;
                         }
                         var xDist = Math.abs(queryPoint.x - pixelPoint.x);
@@ -8126,9 +8126,9 @@ var Plottable;
                             minYDist = yDist;
                         }
                         if (xDist === minXDist && yDist === minYDist) {
-                            closestData.push(plotData.data[index]);
+                            closestData.push(datum);
                             closestPixelPoints.push(pixelPoint);
-                            closestElements.push(plotData.selection[0][0]);
+                            closestElements.push(line);
                         }
                     });
                 });

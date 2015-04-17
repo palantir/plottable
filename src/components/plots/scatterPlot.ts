@@ -116,8 +116,8 @@ export module Plot {
     }
 
     protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean {
-      var chartXExtent = { min: 0, max: this.width() };
-      var chartYExtent = { min: 0, max: this.height() };
+      var xRange = { min: 0, max: this.width() };
+      var yRange = { min: 0, max: this.height() };
 
       var translation = d3.transform(selection.attr("transform")).translate;
       var bbox = selection[0][0].getBBox();
@@ -128,7 +128,7 @@ export module Plot {
         height: bbox.height
       };
 
-      return Plottable._Util.Methods.intersectsBBox(chartXExtent, chartYExtent, translatedBbox);
+      return Plottable._Util.Methods.intersectsBBox(xRange, yRange, translatedBbox);
     }
 
     //===== Hover logic =====
