@@ -1234,6 +1234,21 @@ describe("Category Axes", function () {
         assert.deepEqual(texts, ["null", "undefined", "true", "2", "foo"]);
         svg.remove();
     });
+    it("uses the formatter if supplied", function () {
+        var svg = generateSVG(400, 400);
+        var domain = ["Air", "Bi", "Sea"];
+        var scale = new Plottable.Scale.Category().domain(domain);
+        var axis = new Plottable.Axis.Category(scale, "bottom");
+        var addPlane = function (l) { return l + "plane"; };
+        axis.formatter(addPlane);
+        axis.renderTo(svg);
+        var expectedTexts = domain.map(addPlane);
+        svg.selectAll("text").each(function (d, i) {
+            var actualText = d3.select(this).text();
+            assert.strictEqual(actualText, expectedTexts[i], "formatter was applied");
+        });
+        svg.remove();
+    });
     it("width accounts for gutter. ticklength, and padding on vertical axes", function () {
         var svg = generateSVG(400, 400);
         var xScale = new Plottable.Scale.Category().domain(["foo", "bar", "baz"]).range([400, 0]);
@@ -2496,6 +2511,18 @@ describe("Plots", function () {
 var assert = chai.assert;
 describe("Plots", function () {
     describe("PiePlot", function () {
+        // HACKHACK #1798: beforeEach being used below
+        it("renders correctly with no data", function () {
+            var svg = generateSVG(400, 400);
+            var plot = new Plottable.Plot.Pie();
+            plot.project("value", function (d) { return d.value; });
+            assert.doesNotThrow(function () { return plot.renderTo(svg); }, Error);
+            assert.strictEqual(plot.width(), 400, "was allocated width");
+            assert.strictEqual(plot.height(), 400, "was allocated height");
+            svg.remove();
+        });
+    });
+    describe("PiePlot", function () {
         var svg;
         var simpleDataset;
         var simpleData;
@@ -2757,6 +2784,21 @@ describe("Plots", function () {
             var expectedLength = dataWithNaN.length - 1;
             assert.strictEqual(apd.data.length, expectedLength, "NaN data was not returned");
             assert.strictEqual(apd.pixelPoints.length, expectedLength, "NaN data doesn't appear in pixelPoints");
+            svg.remove();
+        });
+    });
+    describe("LinePlot", function () {
+        // HACKHACK #1798: beforeEach being used below
+        it("renders correctly with no data", function () {
+            var svg = generateSVG(400, 400);
+            var xScale = new Plottable.Scale.Linear();
+            var yScale = new Plottable.Scale.Linear();
+            var plot = new Plottable.Plot.Line(xScale, yScale);
+            plot.project("x", function (d) { return d.x; }, xScale);
+            plot.project("y", function (d) { return d.y; }, yScale);
+            assert.doesNotThrow(function () { return plot.renderTo(svg); }, Error);
+            assert.strictEqual(plot.width(), 400, "was allocated width");
+            assert.strictEqual(plot.height(), 400, "was allocated height");
             svg.remove();
         });
     });
@@ -3043,6 +3085,21 @@ describe("Plots", function () {
 var assert = chai.assert;
 describe("Plots", function () {
     describe("AreaPlot", function () {
+        // HACKHACK #1798: beforeEach being used below
+        it("renders correctly with no data", function () {
+            var svg = generateSVG(400, 400);
+            var xScale = new Plottable.Scale.Linear();
+            var yScale = new Plottable.Scale.Linear();
+            var plot = new Plottable.Plot.Area(xScale, yScale);
+            plot.project("x", function (d) { return d.x; }, xScale);
+            plot.project("y", function (d) { return d.y; }, yScale);
+            assert.doesNotThrow(function () { return plot.renderTo(svg); }, Error);
+            assert.strictEqual(plot.width(), 400, "was allocated width");
+            assert.strictEqual(plot.height(), 400, "was allocated height");
+            svg.remove();
+        });
+    });
+    describe("AreaPlot", function () {
         var svg;
         var xScale;
         var yScale;
@@ -3184,6 +3241,19 @@ describe("Plots", function () {
 var assert = chai.assert;
 describe("Plots", function () {
     describe("Bar Plot", function () {
+        // HACKHACK #1798: beforeEach being used below
+        it("renders correctly with no data", function () {
+            var svg = generateSVG(400, 400);
+            var xScale = new Plottable.Scale.Linear();
+            var yScale = new Plottable.Scale.Linear();
+            var plot = new Plottable.Plot.Bar(xScale, yScale);
+            plot.project("x", function (d) { return d.x; }, xScale);
+            plot.project("y", function (d) { return d.y; }, yScale);
+            assert.doesNotThrow(function () { return plot.renderTo(svg); }, Error);
+            assert.strictEqual(plot.width(), 400, "was allocated width");
+            assert.strictEqual(plot.height(), 400, "was allocated height");
+            svg.remove();
+        });
         function assertPlotDataEqual(expected, actual, msg) {
             assert.deepEqual(expected.data, actual.data, msg);
             assert.closeTo(expected.pixelPoints[0].x, actual.pixelPoints[0].x, 0.01, msg);
@@ -3915,6 +3985,34 @@ describe("Plots", function () {
             VERIFY_CELLS(gridPlot._renderArea.selectAll("rect")[0]);
             svg.remove();
         });
+        it("renders correctly when there isn't data for every spot", function () {
+            var CELL_HEIGHT = 50;
+            var CELL_WIDTH = 100;
+            var xScale = new Plottable.Scale.Category();
+            var yScale = new Plottable.Scale.Category();
+            var colorScale = new Plottable.Scale.InterpolatedColor(["black", "white"]);
+            var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var dataset = new Plottable.Dataset();
+            var gridPlot = new Plottable.Plot.Grid(xScale, yScale, colorScale);
+            gridPlot.addDataset(dataset).project("fill", "magnitude", colorScale).project("x", "x", xScale).project("y", "y", yScale).renderTo(svg);
+            var data = [
+                { x: "A", y: "W", magnitude: 0 },
+                { x: "B", y: "X", magnitude: 8 },
+                { x: "C", y: "Y", magnitude: 16 },
+                { x: "D", y: "Z", magnitude: 24 }
+            ];
+            dataset.data(data);
+            var cells = gridPlot._renderArea.selectAll("rect")[0];
+            assert.equal(cells.length, data.length);
+            for (var i = 0; i < cells.length; i++) {
+                var cell = d3.select(cells[i]);
+                assert.equal(cell.attr("x"), i * CELL_WIDTH, "Cell x coord is correct");
+                assert.equal(cell.attr("y"), i * CELL_HEIGHT, "Cell y coord is correct");
+                assert.equal(cell.attr("width"), CELL_WIDTH, "Cell width is correct");
+                assert.equal(cell.attr("height"), CELL_HEIGHT, "Cell height is correct");
+            }
+            svg.remove();
+        });
         it("can invert y axis correctly", function () {
             var xScale = new Plottable.Scale.Category();
             var yScale = new Plottable.Scale.Category();
@@ -4043,6 +4141,18 @@ describe("Plots", function () {
 var assert = chai.assert;
 describe("Plots", function () {
     describe("ScatterPlot", function () {
+        it("renders correctly with no data", function () {
+            var svg = generateSVG(400, 400);
+            var xScale = new Plottable.Scale.Linear();
+            var yScale = new Plottable.Scale.Linear();
+            var plot = new Plottable.Plot.Scatter(xScale, yScale);
+            plot.project("x", function (d) { return d.x; }, xScale);
+            plot.project("y", function (d) { return d.y; }, yScale);
+            assert.doesNotThrow(function () { return plot.renderTo(svg); }, Error);
+            assert.strictEqual(plot.width(), 400, "was allocated width");
+            assert.strictEqual(plot.height(), 400, "was allocated height");
+            svg.remove();
+        });
         it("the accessors properly access data, index, and metadata", function () {
             var svg = generateSVG(400, 400);
             var xScale = new Plottable.Scale.Linear();
@@ -5147,6 +5257,54 @@ describe("Plots", function () {
             svg.remove();
         });
     });
+    describe("Horizontal Stacked Bar Plot Non-Overlapping Datasets", function () {
+        var svg;
+        var plot;
+        var SVG_WIDTH = 600;
+        var SVG_HEIGHT = 400;
+        var numAttr = function (s, a) { return parseFloat(s.attr(a)); };
+        beforeEach(function () {
+            svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var xScale = new Plottable.Scale.Linear();
+            var yScale = new Plottable.Scale.Category();
+            var data1 = [
+                { y: "A", x: 1, type: "a" },
+                { y: "B", x: 2, type: "a" },
+                { y: "C", x: 1, type: "a" }
+            ];
+            var data2 = [
+                { y: "A", x: 2, type: "b" },
+                { y: "B", x: 3, type: "b" }
+            ];
+            var data3 = [
+                { y: "B", x: 1, type: "c" },
+                { y: "C", x: 7, type: "c" }
+            ];
+            plot = new Plottable.Plot.StackedBar(xScale, yScale, false);
+            plot.addDataset(data1);
+            plot.addDataset(data2);
+            plot.addDataset(data3);
+            plot.project("x", "x", xScale);
+            plot.project("y", "y", yScale);
+            plot.renderTo(svg);
+        });
+        it("renders correctly", function () {
+            var bars = plot.getAllSelections();
+            assert.strictEqual(bars.size(), 7, "draws a bar for each datum");
+            var aBars = [d3.select(bars[0][0]), d3.select(bars[0][3])];
+            var bBars = [d3.select(bars[0][1]), d3.select(bars[0][4]), d3.select(bars[0][5])];
+            var cBars = [d3.select(bars[0][2]), d3.select(bars[0][6])];
+            assert.closeTo(numAttr(aBars[0], "y"), numAttr(aBars[1], "y"), 0.01, "A bars at same y position");
+            assert.operator(numAttr(aBars[0], "x"), "<", numAttr(aBars[1], "x"), "first dataset A bar under second");
+            assert.closeTo(numAttr(bBars[0], "y"), numAttr(bBars[1], "y"), 0.01, "B bars at same y position");
+            assert.closeTo(numAttr(bBars[1], "y"), numAttr(bBars[2], "y"), 0.01, "B bars at same y position");
+            assert.operator(numAttr(bBars[0], "x"), "<", numAttr(bBars[1], "x"), "first dataset B bar under second");
+            assert.operator(numAttr(bBars[1], "x"), "<", numAttr(bBars[2], "x"), "second dataset B bar under third");
+            assert.closeTo(numAttr(cBars[0], "y"), numAttr(cBars[1], "y"), 0.01, "C bars at same y position");
+            assert.operator(numAttr(cBars[0], "x"), "<", numAttr(cBars[1], "x"), "first dataset C bar under second");
+            svg.remove();
+        });
+    });
 });
 
 ///<reference path="../../testReference.ts" />
@@ -5339,6 +5497,49 @@ describe("Plots", function () {
             assert.operator(numAttr(bBar0, "x"), "<", numAttr(bBar1, "x"), "B bars clustered in dataset order");
             assert.operator(numAttr(bBar1, "x"), "<", numAttr(bBar2, "x"), "B bars clustered in dataset order");
             assert.operator(numAttr(cBar0, "x"), "<", numAttr(cBar1, "x"), "C bars clustered in dataset order");
+            svg.remove();
+        });
+    });
+    describe("Horizontal Clustered Bar Plot Missing Values", function () {
+        var svg;
+        var plot;
+        beforeEach(function () {
+            var SVG_WIDTH = 600;
+            var SVG_HEIGHT = 400;
+            svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var xScale = new Plottable.Scale.Linear();
+            var yScale = new Plottable.Scale.Category();
+            var data1 = [{ y: "A", x: 1 }, { y: "B", x: 2 }, { y: "C", x: 1 }];
+            var data2 = [{ y: "A", x: 2 }, { y: "B", x: 4 }];
+            var data3 = [{ y: "B", x: 15 }, { y: "C", x: 15 }];
+            plot = new Plottable.Plot.ClusteredBar(xScale, yScale, false);
+            plot.addDataset(data1);
+            plot.addDataset(data2);
+            plot.addDataset(data3);
+            plot.project("x", "x", xScale);
+            plot.project("y", "y", yScale);
+            plot.renderTo(svg);
+        });
+        it("renders correctly", function () {
+            var bars = plot.getAllSelections();
+            assert.strictEqual(bars.size(), 7, "Number of bars should be equivalent to number of datum");
+            var aBar0 = d3.select(bars[0][0]);
+            var aBar1 = d3.select(bars[0][3]);
+            var bBar0 = d3.select(bars[0][1]);
+            var bBar1 = d3.select(bars[0][4]);
+            var bBar2 = d3.select(bars[0][5]);
+            var cBar0 = d3.select(bars[0][2]);
+            var cBar1 = d3.select(bars[0][6]);
+            // check bars are in domain order
+            assert.operator(numAttr(aBar0, "y"), "<", numAttr(bBar0, "y"), "first dataset bars ordered correctly");
+            assert.operator(numAttr(bBar0, "y"), "<", numAttr(cBar0, "y"), "first dataset bars ordered correctly");
+            assert.operator(numAttr(aBar1, "y"), "<", numAttr(bBar1, "y"), "second dataset bars ordered correctly");
+            assert.operator(numAttr(bBar2, "y"), "<", numAttr(cBar1, "y"), "third dataset bars ordered correctly");
+            // check that clustering is correct
+            assert.operator(numAttr(aBar0, "y"), "<", numAttr(aBar1, "y"), "A bars clustered in dataset order");
+            assert.operator(numAttr(bBar0, "y"), "<", numAttr(bBar1, "y"), "B bars clustered in dataset order");
+            assert.operator(numAttr(bBar1, "y"), "<", numAttr(bBar2, "y"), "B bars clustered in dataset order");
+            assert.operator(numAttr(cBar0, "y"), "<", numAttr(cBar1, "y"), "C bars clustered in dataset order");
             svg.remove();
         });
     });
