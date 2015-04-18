@@ -8555,7 +8555,8 @@ var Plottable;
                         var negativeOffset = negativeDataMap.get(key).offset;
                         var value = valueAccessor(datum, datumIndex, dataset.metadata(), plotMetadata);
                         var offset;
-                        if (value === 0) {
+                        // We are accepting strings as possible candidates for numbers, hence double equals
+                        if (value == 0) {
                             offset = isAllNegativeValues ? negativeOffset : positiveOffset;
                         }
                         else {
