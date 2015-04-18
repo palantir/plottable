@@ -3361,6 +3361,34 @@ declare module Plottable {
 
 
 declare module Plottable {
+    module Plot {
+        class Waterfall extends Rectangle<any, any> {
+            /**
+             * Constructs a WaterfallPlot.
+             *
+             * A WaterfallPlot is used to display the deltas between certain bar values that are marked as base values.
+             *
+             * @constructor
+             * @param {Scale.AbstractScale} xScale The x scale to use.
+             * @param {Scale.AbstractQuantitative} yScale The y scale to use.
+             * @param {Scale.Color|Scale.InterpolatedColor} colorScale The color scale
+             * to use for each grid cell.
+             */
+            constructor(xScale: Scale.AbstractScale<any, any>, yScale: Scale.AbstractQuantitative<any>, colorScale: Scale.AbstractScale<any, string>);
+            addDataset(keyOrDataset: any, dataset?: any): Waterfall;
+            protected _getDrawer(key: string): _Drawer.Rect;
+            /**
+             * @param {string} attrToSet One of ["x", "y", "x2", "y2", "fill"]. If "fill" is used,
+             * the data should return a valid CSS color.
+             */
+            project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>): Waterfall;
+            protected _generateDrawSteps(): _Drawer.DrawStep[];
+        }
+    }
+}
+
+
+declare module Plottable {
     module Animator {
         interface PlotAnimator {
             /**
