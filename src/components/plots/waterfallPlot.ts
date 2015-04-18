@@ -65,7 +65,7 @@ module Plottable {
           if (scale instanceof Scale.AbstractQuantitative) {
             this.project("y1", (d: any, i: number, u: any, m: Plot.PlotMetadata) => {
               var data = this.datasets()[0].data();
-              if (i == 0 || data[i].y == data[i-1].y) {
+              if (i === 0 || data[i].y === data[i-1].y) {
                 return scale.scale(scale.domain()[0]);
               }
               if (data[i].y > data[i-1].y) {
@@ -76,7 +76,7 @@ module Plottable {
             });
             this.project("y2", (d: any, i: number, u: any, m: Plot.PlotMetadata) => {
               var data = this.datasets()[0].data();
-              if (i == 0 || data[i].y == data[i - 1].y) {
+              if (i === 0 || data[i].y === data[i - 1].y) {
                 return scale.scale(this._projections["y"].accessor(d, i, u, m));
               }
               if (data[i].y > data[i - 1].y) {
@@ -87,7 +87,7 @@ module Plottable {
             });
             this.project("class", (d: any, i: number, u: any, m: Plot.PlotMetadata) => {
               var data = this.datasets()[0].data();
-              if (i == 0 || data[i].y == data[i - 1].y) {
+              if (i === 0 || data[i].y === data[i - 1].y) {
                 return "waterfall-base";
               }
               if (data[i].y > data[i - 1].y) {
