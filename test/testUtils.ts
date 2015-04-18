@@ -32,25 +32,6 @@ function makeFakeEvent(x: number, y: number): D3.D3Event {
     };
 }
 
-function fakeDragSequence(anyedInteraction: any, startX: number, startY: number, endX: number, endY: number) {
-  var originalD3Mouse = d3.mouse;
-  d3.mouse = function() {
-    return [startX, startY];
-  };
-  anyedInteraction._dragstart();
-  d3.mouse = originalD3Mouse;
-  d3.event = makeFakeEvent(startX, startY);
-  anyedInteraction._drag();
-  d3.event = makeFakeEvent(endX, endY);
-  anyedInteraction._drag();
-  d3.mouse = function() {
-    return [endX, endY];
-  };
-  anyedInteraction._dragend();
-  d3.event = null;
-  d3.mouse = originalD3Mouse;
-}
-
 function verifySpaceRequest(sr: Plottable._SpaceRequest, w: number, h: number, ww: boolean, wh: boolean, message: string) {
   assert.equal(sr.width,  w, message + " (space request: width)");
   assert.equal(sr.height, h, message + " (space request: height)");
@@ -165,7 +146,7 @@ function triggerFakeUIEvent(type: string, target: D3.Selection) {
   target.node().dispatchEvent(e);
 }
 
-function triggerFakeMouseEvent(type: string, target: D3.Selection, relativeX: number, relativeY: number) {
+function triggerFakeMouseEvent(type: string, target: D3.Selection, relativeX: number, relativeY: number, button = 0) {
   var clientRect = target.node().getBoundingClientRect();
   var xPos = clientRect.left + relativeX;
   var yPos = clientRect.top + relativeY;
@@ -174,8 +155,14 @@ function triggerFakeMouseEvent(type: string, target: D3.Selection, relativeX: nu
                     xPos, yPos,
                     xPos, yPos,
                     false, false, false, false,
-                    1, null);
+                    button, null);
   target.node().dispatchEvent(e);
+}
+
+function triggerFakeDragSequence(target: D3.Selection, start: Plottable.Point, end: Plottable.Point) {
+  triggerFakeMouseEvent("mousedown", target, start.x , start.y);
+  triggerFakeMouseEvent("mousemove", target, end.x, end.y);
+  triggerFakeMouseEvent("mouseup", target, end.x, end.y);
 }
 
 function triggerFakeWheelEvent(type: string, target: D3.Selection, relativeX: number, relativeY: number, deltaY: number) {

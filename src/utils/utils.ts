@@ -16,6 +16,18 @@ export module _Util {
       return (Math.min(a,b) <= x && x <= Math.max(a,b));
     }
 
+    /**
+     * Clamps x to the range [min, max].
+     *
+     * @param {number} x The value to be clamped.
+     * @param {number} min The minimum value.
+     * @param {number} max The maximum value.
+     * @return {number} A clamped value in the range [min, max].
+     */
+    export function clamp(x: number, min: number, max: number) {
+      return Math.min(Math.max(min, x), max);
+    }
+
     /** Print a warning message to the console, if it is available.
      *
      * @param {string} The warnings to print

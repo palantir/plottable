@@ -23,6 +23,8 @@
 ///<reference path="components/labelTests.ts" />
 ///<reference path="components/legendTests.ts" />
 ///<reference path="components/interpolatedColorLegendTests.ts" />
+///<reference path="components/selectionBoxLayerTests.ts" />
+
 ///<reference path="components/plots/plotTests.ts" />
 ///<reference path="components/plots/piePlotTests.ts" />
 ///<reference path="components/plots/newStylePlotTests.ts" />
@@ -60,11 +62,15 @@
 
 ///<reference path="interactions/interactionTests.ts" />
 ///<reference path="interactions/pointerInteractionTests.ts" />
-///<reference path="interactions/dragBoxTests.ts" />
 ///<reference path="interactions/hoverInteractionTests.ts" />
 ///<reference path="interactions/clickInteractionTests.ts" />
+///<reference path="interactions/dragInteractionTests.ts" />
 
 ///<reference path="dispatchers/dispatcherTests.ts" />
 ///<reference path="dispatchers/mouseDispatcherTests.ts" />
 ///<reference path="dispatchers/touchDispatcherTests.ts" />
 ///<reference path="dispatchers/keyDispatcherTests.ts" />
+
+///<reference path="components/interactive/dragBoxLayerTests.ts" />
+///<reference path="components/interactive/xDragBoxLayerTests.ts" />
+///<reference path="components/interactive/yDragBoxLayerTests.ts" />

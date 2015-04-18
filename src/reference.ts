@@ -58,6 +58,7 @@
 /// <reference path="components/interpolatedColorLegend.ts" />
 /// <reference path="components/gridlines.ts" />
 /// <reference path="components/table.ts" />
+/// <reference path="components/selectionBoxLayer.ts" />
 
 /// <reference path="components/plots/abstractPlot.ts" />
 /// <reference path="components/plots/piePlot.ts" />
@@ -90,9 +91,9 @@
 /// <reference path="interactions/keyInteraction.ts" />
 /// <reference path="interactions/pointerInteraction.ts" />
 /// <reference path="interactions/panZoomInteraction.ts" />
-/// <reference path="interactions/drag/dragInteraction.ts" />
-/// <reference path="interactions/drag/dragBoxInteraction.ts" />
-/// <reference path="interactions/drag/xDragBoxInteraction.ts" />
-/// <reference path="interactions/drag/xyDragBoxInteraction.ts" />
-/// <reference path="interactions/drag/yDragBoxInteraction.ts" />
+/// <reference path="interactions/dragInteraction.ts" />
 /// <reference path="interactions/hoverInteraction.ts" />
+
+/// <reference path="components/interactive/dragBoxLayer.ts" />
+/// <reference path="components/interactive/xDragBoxLayer.ts" />
+/// <reference path="components/interactive/yDragBoxLayer.ts" />
