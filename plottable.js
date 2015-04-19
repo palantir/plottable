@@ -425,38 +425,6 @@ var Plottable;
 (function (Plottable) {
     var _Util;
     (function (_Util) {
-        var IDCounter = (function () {
-            function IDCounter() {
-                this._counter = {};
-            }
-            IDCounter.prototype._setDefault = function (id) {
-                if (this._counter[id] == null) {
-                    this._counter[id] = 0;
-                }
-            };
-            IDCounter.prototype.increment = function (id) {
-                this._setDefault(id);
-                return ++this._counter[id];
-            };
-            IDCounter.prototype.decrement = function (id) {
-                this._setDefault(id);
-                return --this._counter[id];
-            };
-            IDCounter.prototype.get = function (id) {
-                this._setDefault(id);
-                return this._counter[id];
-            };
-            return IDCounter;
-        })();
-        _Util.IDCounter = IDCounter;
-    })(_Util = Plottable._Util || (Plottable._Util = {}));
-})(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var Plottable;
-(function (Plottable) {
-    var _Util;
-    (function (_Util) {
         /**
          * An associative array that can be keyed by anything (inc objects).
          * Uses pointer equality checks which is why this works.
