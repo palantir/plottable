@@ -503,7 +503,8 @@ export module Axis {
       var visibleTickMarks = this._tierMarkContainers[index]
                                     .selectAll("." + AbstractAxis.TICK_MARK_CLASS)
                                     .filter(function(d: Element, i: number) {
-                                      return d3.select(this).style("visibility") === "visible";
+                                      var visibility = d3.select(this).style("visibility");
+                                      return visibility === "visible" || visibility === "inherit";
                                     });
 
       // We use the ClientRects because x1/x2 attributes are not comparable to ClientRects of labels
@@ -512,7 +513,8 @@ export module Axis {
       var visibleTickLabels = this._tierLabelContainers[index]
                                     .selectAll("." + AbstractAxis.TICK_LABEL_CLASS)
                                     .filter(function(d: Element, i: number) {
-                                      return d3.select(this).style("visibility") === "visible";
+                                      var visibility = d3.select(this).style("visibility");
+                                      return visibility === "visible" || visibility === "inherit";
                                     });
       var lastLabelClientRect: ClientRect;
 
@@ -526,7 +528,7 @@ export module Axis {
           tickLabel.style("visibility", "hidden");
         } else {
           lastLabelClientRect = clientRect;
-          tickLabel.style("visibility", "visible");
+          tickLabel.style("visibility", "inherit");
         }
       });
     }

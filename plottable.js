@@ -4761,12 +4761,14 @@ var Plottable;
                     return (Math.floor(boundingBox.left) <= Math.ceil(tickBox.left) && Math.floor(boundingBox.top) <= Math.ceil(tickBox.top) && Math.floor(tickBox.right) <= Math.ceil(boundingBox.left + _this.width()) && Math.floor(tickBox.bottom) <= Math.ceil(boundingBox.top + _this.height()));
                 };
                 var visibleTickMarks = this._tierMarkContainers[index].selectAll("." + Axis.AbstractAxis.TICK_MARK_CLASS).filter(function (d, i) {
-                    return d3.select(this).style("visibility") === "visible";
+                    var visibility = d3.select(this).style("visibility");
+                    return visibility === "visible" || visibility === "inherit";
                 });
                 // We use the ClientRects because x1/x2 attributes are not comparable to ClientRects of labels
                 var visibleTickMarkRects = visibleTickMarks[0].map(function (mark) { return mark.getBoundingClientRect(); });
                 var visibleTickLabels = this._tierLabelContainers[index].selectAll("." + Axis.AbstractAxis.TICK_LABEL_CLASS).filter(function (d, i) {
-                    return d3.select(this).style("visibility") === "visible";
+                    var visibility = d3.select(this).style("visibility");
+                    return visibility === "visible" || visibility === "inherit";
                 });
                 var lastLabelClientRect;
                 visibleTickLabels.each(function (d, i) {
@@ -4779,7 +4781,7 @@ var Plottable;
                     }
                     else {
                         lastLabelClientRect = clientRect;
-                        tickLabel.style("visibility", "visible");
+                        tickLabel.style("visibility", "inherit");
                     }
                 });
             };
