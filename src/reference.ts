@@ -2,7 +2,6 @@
 
 /// <reference path="utils/utils.ts" />
 /// <reference path="utils/osUtils.ts" />
-/// <reference path="utils/idCounter.ts" />
 /// <reference path="utils/strictEqualityAssociativeArray.ts" />
 /// <reference path="utils/domUtils.ts" />
 /// <reference path="utils/color.ts" />

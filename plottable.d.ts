@@ -213,17 +213,6 @@ declare module Plottable {
 
 declare module Plottable {
     module _Util {
-        class IDCounter {
-            increment(id: any): number;
-            decrement(id: any): number;
-            get(id: any): number;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module _Util {
         /**
          * An associative array that can be keyed by anything (inc objects).
          * Uses pointer equality checks which is why this works.

@@ -7909,22 +7909,6 @@ describe("Formatters", function () {
 
 ///<reference path="../testReference.ts" />
 var assert = chai.assert;
-describe("IDCounter", function () {
-    it("IDCounter works as expected", function () {
-        var i = new Plottable._Util.IDCounter();
-        assert.equal(i.get("f"), 0);
-        assert.equal(i.increment("f"), 1);
-        assert.equal(i.increment("g"), 1);
-        assert.equal(i.increment("f"), 2);
-        assert.equal(i.decrement("f"), 1);
-        assert.equal(i.get("f"), 1);
-        assert.equal(i.get("f"), 1);
-        assert.equal(i.decrement(2), -1);
-    });
-});
-
-///<reference path="../testReference.ts" />
-var assert = chai.assert;
 describe("StrictEqualityAssociativeArray", function () {
     it("StrictEqualityAssociativeArray works as expected", function () {
         var s = new Plottable._Util.StrictEqualityAssociativeArray();
