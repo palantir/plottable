@@ -294,16 +294,9 @@ export module Axis {
       // we have no leftover tiers
 
       var size = super._getSize(availableWidth, availableHeight);
-
-      var adjustedHeight = 0;
-      for (var i = 0; i < this._tierHeights.length; i++) {
-        if (adjustedHeight + this._tierHeights[i] > size.height) {
-          break;
-        }
-        adjustedHeight += this._tierHeights[i];
-      }
-
-      size.height = adjustedHeight;
+      size.height = this._tierHeights.reduce(function(prevValue, currValue, index, arr) {
+        return (prevValue + currValue > size.height) ? prevValue : (prevValue + currValue);
+      });
       return size;
     }
 
@@ -491,10 +484,10 @@ export module Axis {
         .selectAll("." + Time.TIME_AXIS_TIER_CLASS)
         .filter(function(d: Element, i: number) {
           var visibility = d3.select(this).style("visibility");
-          return visibility === "visible" || visibility === "inherit";
+          return visibility === "visible";
         }).attr("visibility", (d: any, i: number) => {
           usedHeight += this._tierHeights[i];
-          return usedHeight <= availableHeight ? "visible" : "hidden";
+          return usedHeight <= availableHeight ? "inherit" : "hidden";
         });
     }
 

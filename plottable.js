@@ -4594,14 +4594,9 @@ var Plottable;
                 // Makes sure that the size it requires is a multiple of tier sizes, such that
                 // we have no leftover tiers
                 var size = _super.prototype._getSize.call(this, availableWidth, availableHeight);
-                var adjustedHeight = 0;
-                for (var i = 0; i < this._tierHeights.length; i++) {
-                    if (adjustedHeight + this._tierHeights[i] > size.height) {
-                        break;
-                    }
-                    adjustedHeight += this._tierHeights[i];
-                }
-                size.height = adjustedHeight;
+                size.height = this._tierHeights.reduce(function (prevValue, currValue, index, arr) {
+                    return (prevValue + currValue > size.height) ? prevValue : (prevValue + currValue);
+                });
                 return size;
             };
             Time.prototype._setup = function () {
@@ -4756,10 +4751,10 @@ var Plottable;
                 var usedHeight = 0;
                 var visibleAxisTiers = this._element.selectAll("." + Time.TIME_AXIS_TIER_CLASS).filter(function (d, i) {
                     var visibility = d3.select(this).style("visibility");
-                    return visibility === "visible" || visibility === "inherit";
+                    return visibility === "visible";
                 }).attr("visibility", function (d, i) {
                     usedHeight += _this._tierHeights[i];
-                    return usedHeight <= availableHeight ? "visible" : "hidden";
+                    return usedHeight <= availableHeight ? "inherit" : "hidden";
                 });
             };
             Time.prototype._hideOverlappingAndCutOffLabels = function (index) {
