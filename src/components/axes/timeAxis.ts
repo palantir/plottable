@@ -480,12 +480,9 @@ export module Axis {
       var availableHeight = this.height();
       var usedHeight = 0;
 
-      var visibleAxisTiers = this._element
+      this._element
         .selectAll("." + Time.TIME_AXIS_TIER_CLASS)
-        .filter(function(d: Element, i: number) {
-          var visibility = d3.select(this).style("visibility");
-          return visibility === "visible";
-        }).attr("visibility", (d: any, i: number) => {
+        .attr("visibility", (d: any, i: number) => {
           usedHeight += this._tierHeights[i];
           return usedHeight <= availableHeight ? "inherit" : "hidden";
         });

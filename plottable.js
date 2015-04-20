@@ -4749,10 +4749,7 @@ var Plottable;
                 var _this = this;
                 var availableHeight = this.height();
                 var usedHeight = 0;
-                var visibleAxisTiers = this._element.selectAll("." + Time.TIME_AXIS_TIER_CLASS).filter(function (d, i) {
-                    var visibility = d3.select(this).style("visibility");
-                    return visibility === "visible";
-                }).attr("visibility", function (d, i) {
+                this._element.selectAll("." + Time.TIME_AXIS_TIER_CLASS).attr("visibility", function (d, i) {
                     usedHeight += _this._tierHeights[i];
                     return usedHeight <= availableHeight ? "inherit" : "hidden";
                 });
