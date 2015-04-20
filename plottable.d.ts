@@ -4183,3 +4183,49 @@ declare module Plottable {
         }
     }
 }
+
+
+declare module Plottable {
+    module Interaction {
+        module Pan {
+            class AbstractPan extends AbstractInteraction {
+                protected _xScale: Scale.AbstractQuantitative<any>;
+                protected _yScale: Scale.AbstractQuantitative<any>;
+                /**
+                 * Creates a PanZoomInteraction.
+                 *
+                 * The allows you to move around and zoom in on a plot, interactively. It
+                 * does so by changing the xScale and yScales' domains repeatedly.
+                 *
+                 * @constructor
+                 * @param {QuantitativeScale} [xScale] The X scale to update on panning/zooming.
+                 * @param {QuantitativeScale} [yScale] The Y scale to update on panning/zooming.
+                 */
+                constructor(xScale?: Scale.AbstractQuantitative<any>, yScale?: Scale.AbstractQuantitative<any>);
+            }
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Interaction {
+        module Pan {
+            class Drag extends AbstractPan {
+                /**
+                 * Creates a PanInteraction.
+                 *
+                 * The allows you to move around a plot interactively.
+                 * It does so by translating the xScale and yScales' domains repeatedly.
+                 *
+                 * @constructor
+                 * @param {QuantitativeScale} [xScale] The X scale to update on panning/zooming.
+                 * @param {QuantitativeScale} [yScale] The Y scale to update on panning/zooming.
+                 */
+                constructor(xScale?: Scale.AbstractQuantitative<any>, yScale?: Scale.AbstractQuantitative<any>);
+                _requiresHitbox(): boolean;
+                _anchor(component: Component.AbstractComponent, hitBox: D3.Selection): void;
+            }
+        }
+    }
+}

@@ -98,3 +98,5 @@
 /// <reference path="interactions/drag/yDragBoxInteraction.ts" />
 /// <reference path="interactions/hoverInteraction.ts" />
 /// <reference path="interactions/scrollInteraction.ts" />
+/// <reference path="interactions/panInteraction.ts" />
+/// <reference path="interactions/dragPanInteraction.ts" />

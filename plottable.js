@@ -10344,6 +10344,103 @@ var Plottable;
     })(Interaction = Plottable.Interaction || (Plottable.Interaction = {}));
 })(Plottable || (Plottable = {}));
 
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    var Interaction;
+    (function (Interaction) {
+        var Pan;
+        (function (Pan) {
+            var AbstractPan = (function (_super) {
+                __extends(AbstractPan, _super);
+                /**
+                 * Creates a PanZoomInteraction.
+                 *
+                 * The allows you to move around and zoom in on a plot, interactively. It
+                 * does so by changing the xScale and yScales' domains repeatedly.
+                 *
+                 * @constructor
+                 * @param {QuantitativeScale} [xScale] The X scale to update on panning/zooming.
+                 * @param {QuantitativeScale} [yScale] The Y scale to update on panning/zooming.
+                 */
+                function AbstractPan(xScale, yScale) {
+                    _super.call(this);
+                    this._xScale = xScale;
+                    this._yScale = yScale;
+                }
+                return AbstractPan;
+            })(Interaction.AbstractInteraction);
+            Pan.AbstractPan = AbstractPan;
+        })(Pan = Interaction.Pan || (Interaction.Pan = {}));
+    })(Interaction = Plottable.Interaction || (Plottable.Interaction = {}));
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    var Interaction;
+    (function (Interaction) {
+        var Pan;
+        (function (Pan) {
+            var Drag = (function (_super) {
+                __extends(Drag, _super);
+                /**
+                 * Creates a PanInteraction.
+                 *
+                 * The allows you to move around a plot interactively.
+                 * It does so by translating the xScale and yScales' domains repeatedly.
+                 *
+                 * @constructor
+                 * @param {QuantitativeScale} [xScale] The X scale to update on panning/zooming.
+                 * @param {QuantitativeScale} [yScale] The Y scale to update on panning/zooming.
+                 */
+                function Drag(xScale, yScale) {
+                    _super.call(this, xScale, yScale);
+                    this._dragInteraction = new Interaction.Drag();
+                    this._setupDragInteraction();
+                }
+                Drag.prototype._requiresHitbox = function () {
+                    return true;
+                };
+                Drag.prototype._anchor = function (component, hitBox) {
+                    _super.prototype._anchor.call(this, component, hitBox);
+                    this._dragInteraction._anchor(component, hitBox);
+                };
+                Drag.prototype._setupDragInteraction = function () {
+                    var _this = this;
+                    var lastDragPoint;
+                    this._dragInteraction.drag(function (startPoint, endPoint) {
+                        if (_this._xScale != null) {
+                            var dragAmountX = endPoint.x - (lastDragPoint == null ? startPoint.x : lastDragPoint.x);
+                            _this._xScale.domain(Plottable.ScaleDomainTransformers.translate(_this._xScale, -dragAmountX));
+                        }
+                        if (_this._yScale != null) {
+                            var dragAmountY = endPoint.y - (lastDragPoint == null ? startPoint.y : lastDragPoint.y);
+                            _this._yScale.domain(Plottable.ScaleDomainTransformers.translate(_this._yScale, -dragAmountY));
+                        }
+                        lastDragPoint = endPoint;
+                    });
+                    this._dragInteraction.dragend(function () { return lastDragPoint = null; });
+                };
+                return Drag;
+            })(Pan.AbstractPan);
+            Pan.Drag = Drag;
+        })(Pan = Interaction.Pan || (Interaction.Pan = {}));
+    })(Interaction = Plottable.Interaction || (Plottable.Interaction = {}));
+})(Plottable || (Plottable = {}));
+
 /*!
 SVG Typewriter 0.1.11 (https://github.com/palantir/svg-typewriter)
 Copyright 2014 Palantir Technologies
