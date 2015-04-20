@@ -154,15 +154,14 @@ function triggerFakeWheelEvent(type, target, relativeX, relativeY, deltaY) {
     var xPos = clientRect.left + relativeX;
     var yPos = clientRect.top + relativeY;
     var event;
-    // Use the WheelEvent Constructor semantics if possible
-    if (typeof WheelEvent === "function") {
+    if (Plottable._Util.Methods.isIE()) {
+        event = document.createEvent("WheelEvent");
+        event.initWheelEvent("wheel", true, true, window, 1, xPos, yPos, xPos, yPos, 0, null, null, 0, deltaY, 0, 0);
+    }
+    else {
         // HACKHACK anycasting constructor to allow for the dictionary argument
         // https://github.com/Microsoft/TypeScript/issues/2416
         event = new WheelEvent("wheel", { bubbles: true, clientX: xPos, clientY: yPos, deltaY: deltaY });
-    }
-    else {
-        event = document.createEvent("WheelEvent");
-        event.initWheelEvent("wheel", true, true, window, 1, xPos, yPos, xPos, yPos, 0, null, null, 0, deltaY, 0, 0);
     }
     target.node().dispatchEvent(event);
 }
