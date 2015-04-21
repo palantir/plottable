@@ -1009,6 +1009,41 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
+    var ScaleDomainTransformers;
+    (function (ScaleDomainTransformers) {
+        /**
+         * Returns a translated domain of the input scale with a translation of the input translateAmount
+         * in range space
+         *
+         * @param {Scale.AbstractQuantitative<D>} scale The input scale whose domain is being translated
+         * @param {number} translateAmount The amount to translate
+         * @returns {D[]} The translated domain
+         */
+        function translate(scale, translateAmount) {
+            var translateTransform = function (rangeValue) { return scale.invert(rangeValue + translateAmount); };
+            return scale.range().map(translateTransform);
+        }
+        ScaleDomainTransformers.translate = translate;
+        /**
+         * Returns a magnified domain of the input scale with a magnification of the input magnifyAmount
+         * in range space with the center point as the input centerValue, also in range space
+         *
+         * @param {Scale.AbstractQuantitative<D> scale The input scale whose domain is being magnified
+         * @param {number} magnifyAmount The amount to magnify
+         * @param {number} centerValue The center point of the magnification
+         * @returns {D[]} The magnified domain
+         */
+        function magnify(scale, magnifyAmount, centerValue) {
+            var magnifyTransform = function (rangeValue) { return scale.invert(centerValue - (centerValue - rangeValue) * magnifyAmount); };
+            return scale.range().map(magnifyTransform);
+        }
+        ScaleDomainTransformers.magnify = magnify;
+    })(ScaleDomainTransformers = Plottable.ScaleDomainTransformers || (Plottable.ScaleDomainTransformers = {}));
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var Plottable;
+(function (Plottable) {
     var SymbolFactories;
     (function (SymbolFactories) {
         function circle() {
@@ -9837,53 +9872,49 @@ var Plottable;
              * @param {QuantitativeScale} [yScale] The Y scale to update on panning/zooming.
              */
             function PanZoom(xScale, yScale) {
-                var _this = this;
                 _super.call(this);
-                if (xScale) {
-                    this._xScale = xScale;
-                    // HACKHACK #1388: self-register for resetZoom()
-                    this._xScale.broadcaster.registerListener("pziX" + this.getID(), function () { return _this.resetZoom(); });
-                }
-                if (yScale) {
-                    this._yScale = yScale;
-                    // HACKHACK #1388: self-register for resetZoom()
-                    this._yScale.broadcaster.registerListener("pziY" + this.getID(), function () { return _this.resetZoom(); });
-                }
+                this._xScale = xScale;
+                this._yScale = yScale;
+                this._dragInteraction = new Interaction.Drag();
+                this._scrollInteraction = new Interaction.Scroll();
+                this._setupInteractions();
             }
-            /**
-             * Sets the scales back to their original domains.
-             */
-            PanZoom.prototype.resetZoom = function () {
-                var _this = this;
-                // HACKHACK #254
-                this._zoom = d3.behavior.zoom();
-                if (this._xScale) {
-                    this._zoom.x(this._xScale._d3Scale);
-                }
-                if (this._yScale) {
-                    this._zoom.y(this._yScale._d3Scale);
-                }
-                this._zoom.on("zoom", function () { return _this._rerenderZoomed(); });
-                this._zoom(this._hitBox);
-            };
             PanZoom.prototype._anchor = function (component, hitBox) {
                 _super.prototype._anchor.call(this, component, hitBox);
-                this.resetZoom();
+                this._dragInteraction._anchor(component, hitBox);
+                this._scrollInteraction._anchor(component, hitBox);
             };
-            PanZoom.prototype._requiresHitbox = function () {
-                return true;
+            PanZoom.prototype._setupInteractions = function () {
+                this._setupDragInteraction();
+                this._setupScrollInteraction();
             };
-            PanZoom.prototype._rerenderZoomed = function () {
-                // HACKHACK since the d3.zoom.x modifies d3 scales and not our TS scales, and the TS scales have the
-                // event listener machinery, let's grab the domain out of the d3 scale and pipe it back into the TS scale
-                if (this._xScale) {
-                    var xDomain = this._xScale._d3Scale.domain();
-                    this._xScale.domain(xDomain);
-                }
-                if (this._yScale) {
-                    var yDomain = this._yScale._d3Scale.domain();
-                    this._yScale.domain(yDomain);
-                }
+            PanZoom.prototype._setupDragInteraction = function () {
+                var _this = this;
+                var lastDragPoint;
+                this._dragInteraction.onDragStart(function () { return lastDragPoint = null; });
+                this._dragInteraction.onDrag(function (startPoint, endPoint) {
+                    if (_this._xScale != null) {
+                        var dragAmountX = endPoint.x - (lastDragPoint == null ? startPoint.x : lastDragPoint.x);
+                        _this._xScale.domain(Plottable.ScaleDomainTransformers.translate(_this._xScale, -dragAmountX));
+                    }
+                    if (_this._yScale != null) {
+                        var dragAmountY = endPoint.y - (lastDragPoint == null ? startPoint.y : lastDragPoint.y);
+                        _this._yScale.domain(Plottable.ScaleDomainTransformers.translate(_this._yScale, -dragAmountY));
+                    }
+                    lastDragPoint = endPoint;
+                });
+            };
+            PanZoom.prototype._setupScrollInteraction = function () {
+                var _this = this;
+                this._scrollInteraction.onScroll(function (point, deltaAmount) {
+                    var zoomAmount = Math.pow(2, -deltaAmount * .002);
+                    if (_this._xScale != null) {
+                        _this._xScale.domain(Plottable.ScaleDomainTransformers.magnify(_this._xScale, zoomAmount, point.x));
+                    }
+                    if (_this._yScale != null) {
+                        _this._yScale.domain(Plottable.ScaleDomainTransformers.magnify(_this._yScale, zoomAmount, point.y));
+                    }
+                });
             };
             return PanZoom;
         })(Interaction.AbstractInteraction);
@@ -10143,6 +10174,55 @@ var Plottable;
             return Hover;
         })(Interaction.AbstractInteraction);
         Interaction.Hover = Hover;
+    })(Interaction = Plottable.Interaction || (Plottable.Interaction = {}));
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    var Interaction;
+    (function (Interaction) {
+        var Scroll = (function (_super) {
+            __extends(Scroll, _super);
+            function Scroll() {
+                _super.apply(this, arguments);
+            }
+            Scroll.prototype._anchor = function (component, hitBox) {
+                var _this = this;
+                _super.prototype._anchor.call(this, component, hitBox);
+                this._mouseDispatcher = Plottable.Dispatcher.Mouse.getDispatcher(this._componentToListenTo.content().node());
+                this._mouseDispatcher.onWheel("Interaction.Scroll" + this.getID(), function (p, e) { return _this._handleScrollEvent(p, e); });
+            };
+            Scroll.prototype._handleScrollEvent = function (p, e) {
+                var translatedP = this._translateToComponentSpace(p);
+                if (this._isInsideComponent(translatedP)) {
+                    if (this._scrollCallback) {
+                        e.preventDefault();
+                        var deltaPixelAmount = e.deltaY * (e.deltaMode ? Scroll.PIXELS_PER_LINE : 1);
+                        this._scrollCallback(translatedP, deltaPixelAmount);
+                    }
+                }
+            };
+            Scroll.prototype.onScroll = function (callback) {
+                if (callback === undefined) {
+                    return this._scrollCallback;
+                }
+                this._scrollCallback = callback;
+                return this;
+            };
+            /**
+             * The number of pixels occupied in a line.
+             */
+            Scroll.PIXELS_PER_LINE = 120;
+            return Scroll;
+        })(Interaction.AbstractInteraction);
+        Interaction.Scroll = Scroll;
     })(Interaction = Plottable.Interaction || (Plottable.Interaction = {}));
 })(Plottable || (Plottable = {}));
 

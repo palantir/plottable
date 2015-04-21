@@ -430,6 +430,31 @@ declare module Plottable {
 
 
 declare module Plottable {
+    module ScaleDomainTransformers {
+        /**
+         * Returns a translated domain of the input scale with a translation of the input translateAmount
+         * in range space
+         *
+         * @param {Scale.AbstractQuantitative<D>} scale The input scale whose domain is being translated
+         * @param {number} translateAmount The amount to translate
+         * @returns {D[]} The translated domain
+         */
+        function translate<D>(scale: Scale.AbstractQuantitative<D>, translateAmount: number): D[];
+        /**
+         * Returns a magnified domain of the input scale with a magnification of the input magnifyAmount
+         * in range space with the center point as the input centerValue, also in range space
+         *
+         * @param {Scale.AbstractQuantitative<D> scale The input scale whose domain is being magnified
+         * @param {number} magnifyAmount The amount to magnify
+         * @param {number} centerValue The center point of the magnification
+         * @returns {D[]} The magnified domain
+         */
+        function magnify<D>(scale: Scale.AbstractQuantitative<D>, magnifyAmount: number, centerValue: number): D[];
+    }
+}
+
+
+declare module Plottable {
     /**
      * A SymbolFactory is a function that takes in a symbolSize which is the edge length of the render area
      * and returns a string representing the 'd' attribute of the resultant 'path' element
@@ -3967,12 +3992,7 @@ declare module Plottable {
              * @param {QuantitativeScale} [yScale] The Y scale to update on panning/zooming.
              */
             constructor(xScale?: Scale.AbstractQuantitative<any>, yScale?: Scale.AbstractQuantitative<any>);
-            /**
-             * Sets the scales back to their original domains.
-             */
-            resetZoom(): void;
             _anchor(component: Component.AbstractComponent, hitBox: D3.Selection): void;
-            _requiresHitbox(): boolean;
         }
     }
 }
@@ -4105,6 +4125,33 @@ declare module Plottable {
              *                     the user is currently hovering over.
              */
             getCurrentHoverData(): HoverData;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Interaction {
+        type ScrollCallback = (p: Point, deltaAmount: number) => any;
+        class Scroll extends Interaction.AbstractInteraction {
+            /**
+             * The number of pixels occupied in a line.
+             */
+            static PIXELS_PER_LINE: number;
+            _anchor(component: Component.AbstractComponent, hitBox: D3.Selection): void;
+            /**
+             * Gets the callback called when a scroll occurs
+             *
+             * @return {ScrollCallback} The current callback.
+             */
+            onScroll(): ScrollCallback;
+            /**
+             * Sets the callback called when a scroll occurs
+             *
+             * @param {ScrollCallback} callback The callback to set.
+             * @return {Interaction.Scroll} The calling Interaction.Scroll.
+             */
+            onScroll(callback: ScrollCallback): Interaction.Scroll;
         }
     }
 }
