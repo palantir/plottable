@@ -3,9 +3,10 @@
 ///<reference path="../typings/d3/d3.d.ts" />
 ///<reference path="../typings/jquery/jquery.d.ts" />
 ///<reference path="../typings/jquery.simulate/jquery.simulate.d.ts" />
-///<reference path="testUtils.ts" />
 ///<reference path="../build/plottable.d.ts" />
 ///<reference path="../bower_components/svg-typewriter/svgtypewriter.d.ts" />
+///<reference path="testUtils.ts" />
+///<reference path="mocks.ts" />
 
 ///<reference path="globalInitialization.ts" />
 
@@ -22,6 +23,8 @@
 ///<reference path="components/labelTests.ts" />
 ///<reference path="components/legendTests.ts" />
 ///<reference path="components/interpolatedColorLegendTests.ts" />
+///<reference path="components/selectionBoxLayerTests.ts" />
+
 ///<reference path="components/plots/plotTests.ts" />
 ///<reference path="components/plots/piePlotTests.ts" />
 ///<reference path="components/plots/newStylePlotTests.ts" />
@@ -52,7 +55,6 @@
 
 ///<reference path="utils/domUtilsTests.ts" />
 ///<reference path="utils/formattersTests.ts" />
-///<reference path="utils/idCounterTests.ts" />
 ///<reference path="utils/strictEqualityAssociativeArrayTests.ts" />
 ///<reference path="utils/clientToSVGTranslatorTests.ts" />
 ///<reference path="utils/utilsTests.ts" />
@@ -60,12 +62,16 @@
 
 ///<reference path="interactions/interactionTests.ts" />
 ///<reference path="interactions/pointerInteractionTests.ts" />
-///<reference path="interactions/dragBoxTests.ts" />
 ///<reference path="interactions/hoverInteractionTests.ts" />
 ///<reference path="interactions/scrollInteractionTests.ts" />
 ///<reference path="interactions/clickInteractionTests.ts" />
+///<reference path="interactions/dragInteractionTests.ts" />
 
 ///<reference path="dispatchers/dispatcherTests.ts" />
 ///<reference path="dispatchers/mouseDispatcherTests.ts" />
 ///<reference path="dispatchers/touchDispatcherTests.ts" />
 ///<reference path="dispatchers/keyDispatcherTests.ts" />
+
+///<reference path="components/interactive/dragBoxLayerTests.ts" />
+///<reference path="components/interactive/xDragBoxLayerTests.ts" />
+///<reference path="components/interactive/yDragBoxLayerTests.ts" />

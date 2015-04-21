@@ -30,10 +30,6 @@ export module Interaction {
       this._setupInteractions();
     }
 
-    public _requiresHitbox() {
-      return true;
-    }
-
     public _anchor(component: Component.AbstractComponent, hitBox: D3.Selection) {
       super._anchor(component, hitBox);
       this._dragInteraction._anchor(component, hitBox);
@@ -47,7 +43,8 @@ export module Interaction {
 
     private _setupDragInteraction() {
       var lastDragPoint: Point;
-      this._dragInteraction.drag((startPoint, endPoint) => {
+      this._dragInteraction.onDragStart(() => lastDragPoint = null);
+      this._dragInteraction.onDrag((startPoint, endPoint) => {
         if (this._xScale != null) {
           var dragAmountX = endPoint.x - (lastDragPoint == null ? startPoint.x : lastDragPoint.x);
           this._xScale.domain(ScaleDomainTransformers.translate(this._xScale, -dragAmountX));
@@ -58,7 +55,6 @@ export module Interaction {
         }
         lastDragPoint = endPoint;
       });
-      this._dragInteraction.dragend(() => lastDragPoint = null);
     }
 
     private _setupScrollInteraction() {

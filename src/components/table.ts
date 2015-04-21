@@ -57,7 +57,12 @@ export module Component {
     }
 
     /**
-     * Adds a Component in the specified cell. The cell must be unoccupied.
+     * Adds a Component in the specified cell. 
+     * 
+     * If the cell is already occupied, there are 3 cases
+     *  - Component + Component => Group containing both components
+     *  - Component + Group => Component is added to the group
+     *  - Group + Component => Component is added to the group
      *
      * For example, instead of calling `new Table([[a, b], [null, c]])`, you
      * could call
@@ -74,15 +79,18 @@ export module Component {
      * @returns {Table} The calling Table.
      */
     public addComponent(row: number, col: number, component: AbstractComponent): Table {
+
+      var currentComponent = this._rows[row] && this._rows[row][col];
+
+      if (currentComponent) {
+        currentComponent.detach();
+        component = component.above(currentComponent);
+      }
+
       if (this._addComponent(component)) {
         this._nRows = Math.max(row + 1, this._nRows);
         this._nCols = Math.max(col + 1, this._nCols);
         this._padTableToSize(this._nRows, this._nCols);
-
-        var currentComponent = this._rows[row][col];
-        if (currentComponent) {
-          throw new Error("Table.addComponent cannot be called on a cell where a component already exists (for the moment)");
-        }
 
         this._rows[row][col] = component;
       }
