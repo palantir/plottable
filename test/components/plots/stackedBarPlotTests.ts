@@ -407,4 +407,66 @@ describe("Plots", () => {
       svg.remove();
     });
   });
+
+
+  describe("fail safe tests", () => {
+
+    var svg: D3.Selection;
+    var xScale: Plottable.Scale.Category;
+    var yScale: Plottable.Scale.Linear;
+    var plot: Plottable.Plot.StackedBar<string, number>;
+    var data1: Object[];
+    var data2: Object[];
+
+    beforeEach(() => {
+      svg = generateSVG(600, 400);
+
+      data1 = [
+          { x: "A", y: "s", fill: "blue" },
+      ];
+      data2 = [
+          { x: "A", y: 1, fill: "red"},
+      ];
+      xScale = new Plottable.Scale.Category();
+      yScale = new Plottable.Scale.Linear();
+
+      plot = new Plottable.Plot.StackedBar(xScale, yScale);
+      plot.addDataset("d1", data1);
+      plot.addDataset("d2", data2);
+      plot.project("fill", "fill");
+      plot.project("x", "x", xScale).project("y", "y", yScale);
+    });
+
+    afterEach(() => {
+      svg.remove();
+    });
+
+    it("conversion fails should be silent in Plot.StackedBar", () => {
+      var ds1PlotMetadata = <Plottable.Plot.StackedPlotMetadata>(<any> plot)._key2PlotDatasetKey.get("d1").plotMetadata;
+      var ds2PlotMetadata = <Plottable.Plot.StackedPlotMetadata>(<any> plot)._key2PlotDatasetKey.get("d2").plotMetadata;
+      var ds1FirstColumnOffset = ds1PlotMetadata.offsets.get("A");
+      var ds2FirstColumnOffset = ds2PlotMetadata.offsets.get("A");
+
+      assert.strictEqual(typeof ds1FirstColumnOffset, "number", "ds1 offset should be a number");
+      assert.strictEqual(typeof ds2FirstColumnOffset, "number", "ds2 offset should be a number");
+
+      assert.isFalse(Plottable._Util.Methods.isNaN(ds1PlotMetadata.offsets.get("A")), "ds1 offset should not be NaN");
+      assert.isFalse(Plottable._Util.Methods.isNaN(ds2PlotMetadata.offsets.get("A")), "ds2 offset should not be NaN");
+    });
+
+    it("bad values on the primary axis default to 0", () => {
+      var ds1PlotMetadata = <Plottable.Plot.StackedPlotMetadata>(<any> plot)._key2PlotDatasetKey.get("d1").plotMetadata;
+      var ds2PlotMetadata = <Plottable.Plot.StackedPlotMetadata>(<any> plot)._key2PlotDatasetKey.get("d2").plotMetadata;
+      var ds1FirstColumnOffset = ds1PlotMetadata.offsets.get("A");
+      var ds2FirstColumnOffset = ds2PlotMetadata.offsets.get("A");
+
+      assert.strictEqual(ds1FirstColumnOffset, 0,
+        "Plot columns should start from offset 0 (at the very bottom)");
+      assert.strictEqual(ds1FirstColumnOffset, 0,
+        "Second bar should have offset 0 (be at the very bottom) because first bar was not rendered");
+    });
+
+  });
+
+
 });
