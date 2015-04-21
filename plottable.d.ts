@@ -3669,7 +3669,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Dispatcher {
-        type TouchCallback = (p: Point, e: TouchEvent) => any;
+        type TouchCallback = (points: Point[], ids: number[], e: TouchEvent) => any;
         class Touch extends AbstractDispatcher {
             /**
              * Get a Dispatcher.Touch for the <svg> containing elem. If one already exists
@@ -3728,10 +3728,10 @@ declare module Plottable {
              *
              * @return {Point} The last known Touch position in <svg> coordinate space.
              */
-            getLastTouchPosition(): {
+            getLastTouchPositions(): {
                 x: number;
                 y: number;
-            };
+            }[];
         }
     }
 }

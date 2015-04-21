@@ -17,8 +17,11 @@ export module Interaction {
       this._mouseDispatcher.onMouseUp("Interaction.Click" + this.getID(), (p: Point) => this._handleClickUp(p));
 
       this._touchDispatcher = Dispatcher.Touch.getDispatcher(<SVGElement> component.content().node());
-      this._touchDispatcher.onTouchStart("Interaction.Click" + this.getID(), (p: Point) => this._handleClickDown(p));
-      this._touchDispatcher.onTouchEnd("Interaction.Click" + this.getID(), (p: Point) => this._handleClickUp(p));
+      //TODO Deal with no point case
+      this._touchDispatcher.onTouchStart("Interaction.Click" + this.getID(), (points: Point[], ids: number[]) =>
+                                                                               this._handleClickDown(points[ids[0]] || {x: -1, y: -1}));
+      this._touchDispatcher.onTouchEnd("Interaction.Click" + this.getID(), (points: Point[], ids: number[]) =>
+                                                                               this._handleClickUp(points[ids[0]] || {x: -1, y: -1}));
     }
 
     private _handleClickDown(p: Point) {
