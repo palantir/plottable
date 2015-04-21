@@ -7319,11 +7319,11 @@ var Plottable;
                 var x2Attr = attrToProjector["x2"];
                 var y2Attr = attrToProjector["y2"];
                 // Generate width based on difference, then adjust for the correct x origin
-                attrToProjector["width"] = function (d, i, u, m) { return Math.abs(x2Attr(d, i, u, m) - x1Attr(d, i, u, m)); };
-                attrToProjector["x"] = function (d, i, u, m) { return Math.min(x1Attr(d, i, u, m), x2Attr(d, i, u, m)); };
+                attrToProjector["width"] = function (d, i, u, m) { return Math.abs(x2Attr(d, i, u, m) - x1Attr(d, i, u, m)) || 0; };
+                attrToProjector["x"] = function (d, i, u, m) { return Math.min(x1Attr(d, i, u, m), x2Attr(d, i, u, m)) || 0; };
                 // Generate height based on difference, then adjust for the correct y origin
-                attrToProjector["height"] = function (d, i, u, m) { return Math.abs(y2Attr(d, i, u, m) - y1Attr(d, i, u, m)); };
-                attrToProjector["y"] = function (d, i, u, m) { return Math.max(y1Attr(d, i, u, m), y2Attr(d, i, u, m)) - attrToProjector["height"](d, i, u, m); };
+                attrToProjector["height"] = function (d, i, u, m) { return Math.abs(y2Attr(d, i, u, m) - y1Attr(d, i, u, m)) || 0; };
+                attrToProjector["y"] = function (d, i, u, m) { return (Math.max(y1Attr(d, i, u, m), y2Attr(d, i, u, m)) || 0) - attrToProjector["height"](d, i, u, m); };
                 // Clean up the attributes projected onto the SVG elements
                 delete attrToProjector["x1"];
                 delete attrToProjector["y1"];
