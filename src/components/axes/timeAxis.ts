@@ -294,7 +294,7 @@ export module Axis {
       // we have no leftover tiers
 
       var size = super._getSize(availableWidth, availableHeight);
-      size.height = this._tierHeights.reduce(function(prevValue, currValue, index, arr) {
+      size.height = this._tierHeights.reduce((prevValue, currValue, index, arr) => {
         return (prevValue + currValue > size.height) ? prevValue : (prevValue + currValue);
       });
       return size;
