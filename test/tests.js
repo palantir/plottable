@@ -5324,8 +5324,8 @@ describe("Plots", function () {
             var ds2FirstColumnOffset = plot._key2PlotDatasetKey.get("d2").plotMetadata.offsets.get("A");
             assert.strictEqual(typeof ds1FirstColumnOffset, "number", "ds1 offset should be a number");
             assert.strictEqual(typeof ds2FirstColumnOffset, "number", "ds2 offset should be a number");
-            assert.isFalse(Plottable._Util.Methods.isNaN(ds1FirstColumnOffset, "ds1 offset should not be NaN"));
-            assert.isFalse(Plottable._Util.Methods.isNaN(ds1FirstColumnOffset, "ds2 offset should not be NaN"));
+            assert.isFalse(Plottable._Util.Methods.isNaN(ds1FirstColumnOffset), "ds1 offset should not be NaN");
+            assert.isFalse(Plottable._Util.Methods.isNaN(ds1FirstColumnOffset), "ds2 offset should not be NaN");
         });
         it("bad values on the primary axis should default to 0 (be ignored)", function () {
             var data1 = [
