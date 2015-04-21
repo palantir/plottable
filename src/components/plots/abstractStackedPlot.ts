@@ -122,8 +122,7 @@ export module Plot {
 
           var value = valueAccessor(datum, datumIndex, dataset.metadata(), plotMetadata);
           var offset: number;
-          // We are accepting strings as possible candidates for numbers, hence double equals
-          if (value == 0) {
+          if (value === 0 || value === "0") {
             offset = isAllNegativeValues ? negativeOffset : positiveOffset;
           } else {
             offset = value > 0 ? positiveOffset : negativeOffset;
