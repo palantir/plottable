@@ -3328,6 +3328,7 @@ var Plottable;
             Arc.prototype.draw = function (data, drawSteps, userMetadata, plotMetadata) {
                 // HACKHACK Applying metadata should be done in base class
                 var valueAccessor = function (d, i) { return drawSteps[0].attrToProjector["value"](d, i, userMetadata, plotMetadata); };
+                var data = data.filter(function (e) { return +valueAccessor(e); });
                 var pie = d3.layout.pie().sort(null).value(valueAccessor)(data);
                 drawSteps.forEach(function (s) { return delete s.attrToProjector["value"]; });
                 pie.forEach(function (slice) {
