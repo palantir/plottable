@@ -464,7 +464,7 @@ export module Axis {
       if (!_Util.DOM.boxIsInside(firstTickLabel.getBoundingClientRect(), boundingBox)) {
         d3.select(firstTickLabel).style("visibility", "hidden");
       }
-      var lastTickLabel = tickLabels[0][tickLabels[0].length-1];
+      var lastTickLabel = tickLabels[0][tickLabels[0].length - 1];
       if (!_Util.DOM.boxIsInside(lastTickLabel.getBoundingClientRect(), boundingBox)) {
         d3.select(lastTickLabel).style("visibility", "hidden");
       }

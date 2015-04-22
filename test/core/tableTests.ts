@@ -8,8 +8,8 @@ function generateBasicTable(nRows: number, nCols: number) {
   var table = new Plottable.Component.Table();
   var rows: Plottable.Component.AbstractComponent[][] = [];
   var components: Plottable.Component.AbstractComponent[] = [];
-  for(var i = 0; i<nRows; i++) {
-    for(var j = 0; j<nCols; j++) {
+  for(var i = 0; i < nRows; i++) {
+    for(var j = 0; j < nCols; j++) {
       var r = new Plottable.Component.AbstractComponent();
       table.addComponent(i, j, r);
       components.push(r);

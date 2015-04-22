@@ -153,7 +153,7 @@ export module _Util {
      */
     export function createFilledArray<T>(value: T | ((index?: number) => T), count: number) {
       var out: T[] = [];
-      for (var i = 0; i<count; i++) {
+      for (var i = 0; i < count; i++) {
         out[i] = typeof(value) === "function" ? (<(index?: number) => T> value)(i) : <T> value;
       }
       return out;

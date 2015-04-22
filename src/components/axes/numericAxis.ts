@@ -57,7 +57,7 @@ export module Axis {
       if (this._tickLabelPositioning === "center") {
         this._computedHeight = this._maxLabelTickLength() + this.tickLabelPadding() + textHeight;
       } else {
-        this._computedHeight = Math.max(this._maxLabelTickLength(), this.tickLabelPadding()+ textHeight);
+        this._computedHeight = Math.max(this._maxLabelTickLength(), this.tickLabelPadding() + textHeight);
       }
 
       return this._computedHeight;

@@ -477,7 +477,7 @@ export module Axis {
         var clientRect = this.getBoundingClientRect();
         var tickLabel = d3.select(this);
         var leadingTickMark = visibleTickMarkRects[i];
-        var trailingTickMark = visibleTickMarkRects[i+1];
+        var trailingTickMark = visibleTickMarkRects[i + 1];
         if (!isInsideBBox(clientRect) || (lastLabelClientRect != null && _Util.DOM.boxesOverlap(clientRect, lastLabelClientRect))
             || (leadingTickMark.right > clientRect.left || trailingTickMark.left < clientRect.right)) {
           tickLabel.style("visibility", "hidden");
