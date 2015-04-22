@@ -411,6 +411,4 @@ describe("Plots", () => {
         "dataset3 (green) should have this offset because the red dataset (ds2) has no height in this point");
     });
   });
-
-
 });
