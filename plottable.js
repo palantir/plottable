@@ -5860,14 +5860,10 @@ var Plottable;
                 this._isGradient = isGradient;
                 return this;
             };
-            /**
-             * Expand the InterpolatedColorLegend to the full length/height of the component space.
-             *
-             * @param {boolean} isExpanded Whether the legend is expanded or not.
-             *
-             * @returns {InterpolatedColorLegend} The calling InterpolatedColorLegend.
-             */
             InterpolatedColorLegend.prototype.expand = function (isExpanded) {
+                if (isExpanded == null) {
+                    return this._isExpanded;
+                }
                 this._isExpanded = isExpanded;
                 return this;
             };

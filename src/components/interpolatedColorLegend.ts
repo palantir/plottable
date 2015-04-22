@@ -145,14 +145,24 @@ export module Component {
       return this;
     }
 
-     /**
-      * Expand the InterpolatedColorLegend to the full length/height of the component space.
-      *
-      * @param {boolean} isExpanded Whether the legend is expanded or not.
-      *
-      * @returns {InterpolatedColorLegend} The calling InterpolatedColorLegend.
-      */
-    public expand(isExpanded: boolean): InterpolatedColorLegend {
+    /**
+     * Gets whether the InterpolatedColorLegend is expanded to the full length/height of the commponent space or not.
+     *
+     * @returns {boolean} Whether the legend is expanded or not.
+     */
+    public expand(): boolean;
+    /**
+     * Expand the InterpolatedColorLegend to the full length/height of the component space.
+     *
+     * @param {boolean} isExpanded Whether the legend is expanded or not.
+     *
+     * @returns {InterpolatedColorLegend} The calling InterpolatedColorLegend.
+     */
+    public expand(isExpanded: boolean): InterpolatedColorLegend;
+    public expand(isExpanded?: boolean): any {
+      if (isExpanded == null) {
+        return this._isExpanded;
+      }
       this._isExpanded = isExpanded;
       return this;
     }

@@ -2528,6 +2528,12 @@ declare module Plottable {
              */
             gradient(isGradient: boolean): InterpolatedColorLegend;
             /**
+             * Gets whether the InterpolatedColorLegend is expanded to the full length/height of the commponent space or not.
+             *
+             * @returns {boolean} Whether the legend is expanded or not.
+             */
+            expand(): boolean;
+            /**
              * Expand the InterpolatedColorLegend to the full length/height of the component space.
              *
              * @param {boolean} isExpanded Whether the legend is expanded or not.
