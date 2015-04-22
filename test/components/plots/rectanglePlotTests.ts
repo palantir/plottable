@@ -42,4 +42,51 @@ describe("Plots", () => {
       svg.remove();
     });
   });
+
+  describe("fail safe tests", () => {
+    it("illegal rectangles don't get displayed", () => {
+      var svg = generateSVG();
+
+      var data1 = [
+        { x: "A", y1: 1, y2: 2, v: 1 },
+        { x: "B", y1: 2, y2: 3, v: 2 },
+        { x: "C", y1: 3, y2: NaN, v: 3 },
+        { x: "D", y1: 4, y2: 5, v: 4 },
+        { x: "E", y1: 5, y2: 6, v: 5 },
+        { x: "F", y1: 6, y2: 7, v: 6 }
+      ];
+
+      var xScale = new Plottable.Scale.Category();
+      var yScale = new Plottable.Scale.Linear();
+
+      var plot = new Plottable.Plot.Grid(xScale, yScale);
+      plot
+        .project("x", "x", xScale)
+        .project("y", "y1", yScale)
+        .project("y2", "y2", yScale);
+      plot.addDataset(data1);
+
+      plot.renderTo(svg);
+
+      plot._element.selectAll(".bar-area rect").each(function(d: any, i: number) {
+        var sel = d3.select(this);
+        assert.isFalse(Plottable._Util.Methods.isNaN(sel.attr("x")),
+          "x attribute should be valid for rectangle # " + i);
+        assert.isFalse(Plottable._Util.Methods.isNaN(sel.attr("y")),
+          "y attribute should be valid for rectangle # " + i);
+        assert.isFalse(Plottable._Util.Methods.isNaN(sel.attr("height")),
+          "height attribute should be valid for rectangle # " + i);
+        assert.isFalse(Plottable._Util.Methods.isNaN(sel.attr("width")),
+          "width attribute should be valid for rectangle # " + i);
+      });
+
+      var brokenRectHeight = d3.select(plot._element.selectAll(".bar-area rect")[0][2]).attr("height");
+
+      assert.strictEqual(brokenRectHeight, "0",
+        "the broken rectangle (third one) should have no height, hence not displayed");
+
+      svg.remove();
+    });
+  });
+
 });
