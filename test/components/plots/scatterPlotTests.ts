@@ -219,14 +219,14 @@ describe("Plots", () => {
       var svg: D3.Selection;
       var xScale: Plottable.Scale.Linear;
       var yScale: Plottable.Scale.Linear;
-      var circlePlot: Plottable.Plot.Scatter<number,number>;
+      var circlePlot: Plottable.Plot.Scatter<number, number>;
       var SVG_WIDTH = 600;
       var SVG_HEIGHT = 300;
       var pixelAreaFull = {xMin: 0, xMax: SVG_WIDTH, yMin: 0, yMax: SVG_HEIGHT};
       var pixelAreaPart = {xMin: 200, xMax: 600, yMin: 100, yMax: 200};
       var dataAreaFull = {xMin: 0, xMax: 9, yMin: 81, yMax: 0};
       var dataAreaPart = {xMin: 3, xMax: 9, yMin: 54, yMax: 27};
-      var colorAccessor = (d: any, i: number, m: any) => d3.rgb(d.x, d.y ,i).toString();
+      var colorAccessor = (d: any, i: number, m: any) => d3.rgb(d.x, d.y, i).toString();
       var circlesInArea: number;
       var quadraticDataset = makeQuadraticSeries(10);
 

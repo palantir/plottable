@@ -74,7 +74,7 @@ export module Axis {
       ],
       [
         {interval: d3.time.hour, step: 3, formatter: Formatters.time("%I %p")},
-        {interval: d3.time.day, step: 1,formatter: Formatters.time("%B %e, %Y")}
+        {interval: d3.time.day, step: 1, formatter: Formatters.time("%B %e, %Y")}
       ],
       [
         {interval: d3.time.hour, step: 6, formatter: Formatters.time("%I %p")},

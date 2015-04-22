@@ -117,14 +117,14 @@ function assertWidthHeight(el: D3.Selection, widthExpected: number, heightExpect
 }
 
 
-function makeLinearSeries(n: number): {x: number; y: number;}[] {
+function makeLinearSeries(n: number): {x: number; y: number}[] {
   function makePoint(x: number) {
     return {x: x, y: x};
   }
   return d3.range(n).map(makePoint);
 }
 
-function makeQuadraticSeries(n: number): {x: number; y: number;}[] {
+function makeQuadraticSeries(n: number): {x: number; y: number}[] {
   function makeQuadraticPoint(x: number) {
     return {x: x, y: x*x};
   }

@@ -3693,7 +3693,6 @@ var Plottable;
                 if (className != null) {
                     box.classed(className, true);
                 }
-                ;
                 this._boxes.push(box);
                 if (this.width() != null && this.height() != null) {
                     box.attr("width", this.width()).attr("height", this.height());

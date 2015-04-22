@@ -10,7 +10,7 @@ describe("_Util.Methods", () => {
   });
 
   it("sortedIndex works properly", () => {
-    var a = [1,2,3,4,5];
+    var a = [1, 2, 3, 4, 5];
     var si = Plottable._Util.OpenSource.sortedIndex;
     assert.equal(si(0, a), 0, "return 0 when val is <= arr[0]");
     assert.equal(si(6, a), a.length, "returns a.length when val >= arr[arr.length-1]");
@@ -49,7 +49,7 @@ describe("_Util.Methods", () => {
     var today = new Date();
 
     it("max/min work as expected", () => {
-      var alist = [1,2,3,4,5];
+      var alist = [1, 2, 3, 4, 5];
       var dbl = (x: number) => x * 2;
       var dblIndexOffset = (x: number, i: number) => x * 2 - i;
       var numToDate = (x: number) => {

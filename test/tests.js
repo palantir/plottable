@@ -4535,7 +4535,6 @@ describe("Plots", function () {
         beforeEach(function () {
             svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
             xScale = new Plottable.Scale.Linear().domain([1, 2]);
-            ;
             yScale = new Plottable.Scale.Linear();
             data1 = [
                 { x: 1, y: 1 },
@@ -4574,7 +4573,6 @@ describe("Plots", function () {
         beforeEach(function () {
             svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
             xScale = new Plottable.Scale.Category().domain(["a", "b"]);
-            ;
             yScale = new Plottable.Scale.Linear();
             data1 = [
                 { x: "a", y: 1 },
