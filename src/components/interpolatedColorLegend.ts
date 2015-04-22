@@ -269,9 +269,7 @@ export module Component {
                 textRotation: 0
             };
 
-      // Width of each individual swatch box
       var swatchWidth: number;
-      // Height of each individual swatch box
       var swatchHeight: number;
       var swatchX: (d: any, i: number) => number;
       var swatchY: (d: any, i: number) => number;

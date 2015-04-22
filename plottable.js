@@ -5956,9 +5956,7 @@ var Plottable;
                     yAlign: "center",
                     textRotation: 0
                 };
-                // Width of each individual swatch box
                 var swatchWidth;
-                // Height of each individual swatch box
                 var swatchHeight;
                 var swatchX;
                 var swatchY;
