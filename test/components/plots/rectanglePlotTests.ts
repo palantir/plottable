@@ -58,8 +58,9 @@ describe("Plots", () => {
 
       var xScale = new Plottable.Scale.Category();
       var yScale = new Plottable.Scale.Linear();
+      var cScale = new Plottable.Scale.Color();
 
-      var plot = new Plottable.Plot.Grid(xScale, yScale);
+      var plot = new Plottable.Plot.Grid(xScale, yScale, cScale);
       plot
         .project("x", "x", xScale)
         .project("y", "y1", yScale)
@@ -68,7 +69,7 @@ describe("Plots", () => {
 
       plot.renderTo(svg);
 
-      plot._element.selectAll(".bar-area rect").each(function(d: any, i: number) {
+      (<any> plot)._element.selectAll(".bar-area rect").each(function(d: any, i: number) {
         var sel = d3.select(this);
         assert.isFalse(Plottable._Util.Methods.isNaN(sel.attr("x")),
           "x attribute should be valid for rectangle # " + i);
@@ -80,7 +81,7 @@ describe("Plots", () => {
           "width attribute should be valid for rectangle # " + i);
       });
 
-      var brokenRectHeight = d3.select(plot._element.selectAll(".bar-area rect")[0][2]).attr("height");
+      var brokenRectHeight = d3.select((<any> plot)._element.selectAll(".bar-area rect")[0][2]).attr("height");
 
       assert.strictEqual(brokenRectHeight, "0",
         "the broken rectangle (third one) should have no height, hence not displayed");

@@ -4170,7 +4170,8 @@ describe("Plots", function () {
             ];
             var xScale = new Plottable.Scale.Category();
             var yScale = new Plottable.Scale.Linear();
-            var plot = new Plottable.Plot.Grid(xScale, yScale);
+            var cScale = new Plottable.Scale.Color();
+            var plot = new Plottable.Plot.Grid(xScale, yScale, cScale);
             plot.project("x", "x", xScale).project("y", "y1", yScale).project("y2", "y2", yScale);
             plot.addDataset(data1);
             plot.renderTo(svg);
