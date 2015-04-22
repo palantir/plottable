@@ -52,7 +52,7 @@ describe("Component behavior", () => {
       assert.equal((<any> c)._xOrigin, 0 , "xOrigin defaulted to 0");
       assert.equal((<any> c)._yOrigin, 0 , "yOrigin defaulted to 0");
 
-      svg.attr("width", 2*SVG_WIDTH).attr("height", 2*SVG_HEIGHT);
+      svg.attr("width", 2 * SVG_WIDTH).attr("height", 2 * SVG_HEIGHT);
       c._computeLayout();
       assert.equal(c.width() , 2 * SVG_WIDTH, "computeLayout updated width to new svg width");
       assert.equal(c.height(), 2 * SVG_HEIGHT, "computeLayout updated height to new svg height");
@@ -207,7 +207,7 @@ describe("Component behavior", () => {
     c._render();
     var expectedPrefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
     expectedPrefix = expectedPrefix.replace(/#.*/g, "");
-    var expectedClipPathURL = "url(" + expectedPrefix + "#clipPath" + expectedClipPathID+ ")";
+    var expectedClipPathURL = "url(" + expectedPrefix + "#clipPath" + expectedClipPathID + ")";
     // IE 9 has clipPath like 'url("#clipPath")', must accomodate
     var normalizeClipPath = (s: string) => s.replace(/"/g, "");
     assert.isTrue(normalizeClipPath((<any> c)._element.attr("clip-path")) === expectedClipPathURL,
@@ -223,7 +223,7 @@ describe("Component behavior", () => {
     var c1 = new Plottable.Component.AbstractComponent();
     assert.equal(c1.getID(), expectedID, "component id on next component was as expected");
     var c2 = new Plottable.Component.AbstractComponent();
-    assert.equal(c2.getID(), expectedID+1, "future components increment appropriately");
+    assert.equal(c2.getID(), expectedID + 1, "future components increment appropriately");
     svg.remove();
   });
 
@@ -417,8 +417,8 @@ describe("Component behavior", () => {
 
       c.xAlign("center").yAlign("center");
       origin = c.origin();
-      assert.strictEqual(origin.x, (SVG_WIDTH - cWidth)/2, "returns correct value (xAlign center)");
-      assert.strictEqual(origin.y, (SVG_HEIGHT - cHeight)/2, "returns correct value (yAlign center)");
+      assert.strictEqual(origin.x, (SVG_WIDTH - cWidth) / 2, "returns correct value (xAlign center)");
+      assert.strictEqual(origin.y, (SVG_HEIGHT - cHeight) / 2, "returns correct value (yAlign center)");
 
       c.xAlign("right").yAlign("bottom");
       origin = c.origin();
@@ -456,8 +456,8 @@ describe("Component behavior", () => {
 
       c.xAlign("center").yAlign("center");
       origin = c.origin();
-      assert.strictEqual(origin.x, (groupWidth - cWidth)/2, "returns correct value (xAlign center)");
-      assert.strictEqual(origin.y, (groupHeight - cHeight)/2, "returns correct value (yAlign center)");
+      assert.strictEqual(origin.x, (groupWidth - cWidth) / 2, "returns correct value (xAlign center)");
+      assert.strictEqual(origin.y, (groupHeight - cHeight) / 2, "returns correct value (yAlign center)");
 
       c.xAlign("right").yAlign("bottom");
       origin = c.origin();
@@ -478,8 +478,8 @@ describe("Component behavior", () => {
 
       c.xAlign("center").yAlign("center");
       origin = c.originToSVG();
-      assert.strictEqual(origin.x, (SVG_WIDTH - cWidth)/2, "returns correct value (xAlign center)");
-      assert.strictEqual(origin.y, (SVG_HEIGHT - cHeight)/2, "returns correct value (yAlign center)");
+      assert.strictEqual(origin.x, (SVG_WIDTH - cWidth) / 2, "returns correct value (xAlign center)");
+      assert.strictEqual(origin.y, (SVG_HEIGHT - cHeight) / 2, "returns correct value (yAlign center)");
 
       c.xAlign("right").yAlign("bottom");
       origin = c.originToSVG();
@@ -517,8 +517,8 @@ describe("Component behavior", () => {
 
       c.xAlign("center").yAlign("center");
       origin = c.originToSVG();
-      assert.strictEqual(origin.x, (groupWidth - cWidth)/2 + groupXOffset, "returns correct value (xAlign center)");
-      assert.strictEqual(origin.y, (groupHeight - cHeight)/2 + groupYOffset, "returns correct value (yAlign center)");
+      assert.strictEqual(origin.x, (groupWidth - cWidth) / 2 + groupXOffset, "returns correct value (xAlign center)");
+      assert.strictEqual(origin.y, (groupHeight - cHeight) / 2 + groupYOffset, "returns correct value (yAlign center)");
 
       c.xAlign("right").yAlign("bottom");
       origin = c.originToSVG();

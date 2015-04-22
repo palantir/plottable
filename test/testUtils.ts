@@ -126,7 +126,7 @@ function makeLinearSeries(n: number): {x: number; y: number}[] {
 
 function makeQuadraticSeries(n: number): {x: number; y: number}[] {
   function makeQuadraticPoint(x: number) {
-    return {x: x, y: x*x};
+    return {x: x, y: x * x};
   }
   return d3.range(n).map(makeQuadraticPoint);
 }
