@@ -135,7 +135,7 @@ describe("Dispatchers", () => {
       var td = Plottable.Dispatcher.Touch.getDispatcher(<SVGElement> target.node());
 
       var callbackWasCalled = false;
-      var callback = function (p: Plottable.Point, e: TouchEvent) {
+      var callback = function(p: Plottable.Point, e: TouchEvent) {
         callbackWasCalled = true;
         assert.isNotNull(e, "TouchEvent was passed to the Dispatcher");
       };
