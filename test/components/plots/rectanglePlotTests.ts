@@ -71,14 +71,14 @@ describe("Plots", () => {
 
       (<any> plot)._element.selectAll(".bar-area rect").each(function(d: any, i: number) {
         var sel = d3.select(this);
-        assert.isFalse(Plottable._Util.Methods.isNaN(sel.attr("x")),
-          "x attribute should be valid for rectangle # " + i);
-        assert.isFalse(Plottable._Util.Methods.isNaN(sel.attr("y")),
-          "y attribute should be valid for rectangle # " + i);
-        assert.isFalse(Plottable._Util.Methods.isNaN(sel.attr("height")),
-          "height attribute should be valid for rectangle # " + i);
-        assert.isFalse(Plottable._Util.Methods.isNaN(sel.attr("width")),
-          "width attribute should be valid for rectangle # " + i);
+        assert.isFalse(Plottable._Util.Methods.isNaN(+sel.attr("x")),
+          "x attribute should be valid for rectangle # " + i + ". Currently " + sel.attr("x"));
+        assert.isFalse(Plottable._Util.Methods.isNaN(+sel.attr("y")),
+          "y attribute should be valid for rectangle # " + i + ". Currently " + sel.attr("y"));
+        assert.isFalse(Plottable._Util.Methods.isNaN(+sel.attr("height")),
+          "height attribute should be valid for rectangle # " + i + ". Currently " + sel.attr("height"));
+        assert.isFalse(Plottable._Util.Methods.isNaN(+sel.attr("width")),
+          "width attribute should be valid for rectangle # " + i + ". Currently " + sel.attr("width"));
       });
 
       var brokenRectHeight = d3.select((<any> plot)._element.selectAll(".bar-area rect")[0][2]).attr("height");
