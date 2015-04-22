@@ -2514,6 +2514,12 @@ declare module Plottable {
              */
             orient(newOrientation: string): InterpolatedColorLegend;
             /**
+             * Gets whether the InterpolatedColorLegend is a gradient or not.
+             *
+             * @returns {boolean} The gradient state of the ICL.
+             */
+            gradient(): boolean;
+            /**
              * Apply a gradient to the InterpolatedColorLegend.
              *
              * @param {boolean} isGradient Whether there should be a gradient or not.
@@ -2522,7 +2528,7 @@ declare module Plottable {
              */
             gradient(isGradient: boolean): InterpolatedColorLegend;
             /**
-             * Expand the InterpolatedColorLegend to the full length/height of the chart.
+             * Expand the InterpolatedColorLegend to the full length/height of the component space.
              *
              * @param {boolean} isExpanded Whether the legend is expanded or not.
              *

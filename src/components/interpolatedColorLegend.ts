@@ -124,19 +124,29 @@ export module Component {
     }
 
     /**
+     * Gets whether the InterpolatedColorLegend is a gradient or not.
+     *
+     * @returns {boolean} The gradient state of the ICL.
+     */
+    public gradient(): boolean;
+    /**
      * Apply a gradient to the InterpolatedColorLegend.
      *
      * @param {boolean} isGradient Whether there should be a gradient or not.
      *
      * @returns {InterpolatedColorLegend} The calling InterpolatedColorLegend.
      */
-     public gradient(isGradient: boolean): InterpolatedColorLegend {
-       this._isGradient = isGradient;
-       return this;
-     }
+    public gradient(isGradient: boolean): InterpolatedColorLegend;
+    public gradient(isGradient?: boolean): any {
+      if (isGradient == null) {
+        return this._isGradient;
+      }
+      this._isGradient = isGradient;
+      return this;
+    }
 
      /**
-      * Expand the InterpolatedColorLegend to the full length/height of the chart.
+      * Expand the InterpolatedColorLegend to the full length/height of the component space.
       *
       * @param {boolean} isExpanded Whether the legend is expanded or not.
       *
@@ -200,10 +210,10 @@ export module Component {
       if (this._isVertical()) {
         var longestWidth = _Util.Methods.max(labelWidths, 0);
         desiredWidth = this._padding + textHeight + this._padding + longestWidth + this._padding;
-        desiredHeight = offeredHeight;
+        desiredHeight = this._isExpanded ? offeredHeight : numSwatches * textHeight;
       } else {
         desiredHeight = textHeight * 2 + this._padding * 3;
-        desiredWidth = offeredWidth;
+        desiredWidth = this._isExpanded ? offeredWidth : numSwatches * textHeight;
       }
 
       return {
@@ -265,8 +275,8 @@ export module Component {
 
       if (this._isVertical()) {
         var longestTextWidth = Math.max(lowerTextWidth, upperTextWidth);
-        swatchWidth = Math.max(textHeight, 0);
-        swatchHeight = this._isExpanded ? this.height() / numSwatches : swatchWidth;
+        swatchWidth = Math.max(this.width() - 3 * padding - longestTextWidth, 0);
+        swatchHeight = this._isExpanded ? this.height() / numSwatches : Math.max(this.height() / numSwatches, 0);
         swatchY = (d: any, i: number) => (numSwatches - (i + 1)) * swatchHeight;
 
         upperWriteOptions.yAlign = "top";
@@ -289,12 +299,12 @@ export module Component {
         boundingBoxAttr.width = swatchWidth;
         boundingBoxAttr.height = numSwatches * swatchHeight;
       } else { // horizontal
-        swatchHeight = Math.max(textHeight, 0);
-        swatchWidth = this._isExpanded ? this.width() / numSwatches : swatchHeight;
+        swatchHeight = Math.max(this.height() - 3 * padding - textHeight, 0);
+        swatchWidth = this.width() / numSwatches;
         var swatchCenter = this.width() / 2;
         swatchX = (d: any, i: number) => this._isExpanded ? i * swatchWidth :
                                          swatchCenter - (numSwatches / 2 * swatchWidth) + i * swatchWidth;
-        swatchY = (d: any, i: number) => this._orientation === "top" ? this.height() - padding - textHeight : padding;
+        swatchY = (d: any, i: number) => this._orientation === "top" ? this.height() - swatchHeight - padding : padding;
 
         upperWriteOptions.xAlign = "right";
         upperLabelShift.x = -(swatchCenter - numSwatches / 2 * swatchWidth);
@@ -302,7 +312,7 @@ export module Component {
         lowerLabelShift.x = swatchCenter - numSwatches / 2 * swatchWidth;
 
         if (this._orientation === "top") { // place labels above color scale
-          boundingBoxAttr.y = this.height() - padding - textHeight;
+          boundingBoxAttr.y = this.height() - padding - swatchHeight;
           lowerLabelShift.y = -padding;
           upperLabelShift.y = -padding;
         } else { // place labels below color scale
