@@ -164,14 +164,18 @@ export module Plot {
       var queryPtPrimary = this._isVertical ? queryPoint.x : queryPoint.y;
       var queryPtSecondary = this._isVertical ? queryPoint.y : queryPoint.x;
 
+      // SVGRects are positioned with sub-pixel accuracy (the default unit
+      // for the x, y, height & width attributes), but user selections (e.g. via
+      // mouse events) usually have pixel accuracy. We add a tolerance of 0.5 pixels.
+      var tolerance = 0.5;
+
       this.datasetOrder().forEach((key) => {
         var plotData = this.getAllPlotData(key);
-        plotData.pixelPoints.forEach((plotPt, i) => {
-          var bar = plotData.selection[0][i];
-          var barBBox = bar.getBBox();
+        plotData.pixelPoints.forEach((plotPt, index) => {
+          var datum = plotData.data[index];
+          var bar = plotData.selection[0][index];
 
-          if (!_Util.Methods.intersectsBBox(chartXExtent, chartYExtent, barBBox)) {
-            // bar isn't visible on plot; ignore it
+          if (!this._isVisibleOnPlot(datum, plotPt, d3.select(bar))) {
             return;
           }
 
@@ -179,12 +183,22 @@ export module Plot {
           var secondaryDist = 0;
 
           // if we're inside a bar, distance in both directions should stay 0
-          if (!_Util.Methods.intersectsBBox(queryPoint.x, queryPoint.y, barBBox)) {
+          var barBBox = bar.getBBox();
+          if (!_Util.Methods.intersectsBBox(queryPoint.x, queryPoint.y, barBBox, tolerance)) {
             var plotPtPrimary = this._isVertical ? plotPt.x : plotPt.y;
-            var plotPtSecondary = this._isVertical ? plotPt.y : plotPt.x;
-
             primaryDist = Math.abs(queryPtPrimary - plotPtPrimary);
-            secondaryDist = Math.abs(queryPtSecondary - plotPtSecondary);
+
+            // compute this bar's min and max along the secondary axis
+            var barMinSecondary = this._isVertical ? barBBox.y : barBBox.x;
+            var barMaxSecondary = barMinSecondary + (this._isVertical ? barBBox.height : barBBox.width);
+
+            if (queryPtSecondary >= barMinSecondary - tolerance && queryPtSecondary <= barMaxSecondary + tolerance) {
+              // if we're within a bar's secondary axis span, it is closest in that direction
+              secondaryDist = 0;
+            } else {
+              var plotPtSecondary = this._isVertical ? plotPt.y : plotPt.x;
+              secondaryDist = Math.abs(queryPtSecondary - plotPtSecondary);
+            }
           }
 
           // if we find a closer bar, record its distance and start new closest lists
@@ -200,7 +214,7 @@ export module Plot {
 
           // bars minPrimaryDist away are part of the closest set
           if (primaryDist === minPrimaryDist && secondaryDist === minSecondaryDist) {
-            closestData.push(plotData.data[i]);
+            closestData.push(datum);
             closestPixelPoints.push(plotPt);
             closestElements.push(bar);
           }
@@ -213,6 +227,14 @@ export module Plot {
         plot: this,
         selection: d3.selectAll(closestElements)
       };
+    }
+
+    protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean {
+      var xRange = { min: 0, max: this.width() };
+      var yRange = { min: 0, max: this.height() };
+      var barBBox = selection[0][0].getBBox();
+
+      return Plottable._Util.Methods.intersectsBBox(xRange, yRange, barBBox);
     }
 
     /**
@@ -556,9 +578,10 @@ export module Plot {
       plotData.selection.each(function (datum, index) {
         var bar = d3.select(this);
 
-        if (isVertical && +bar.attr("y") + +bar.attr("height") > scaledBaseline) {
+        // Using floored pixel values to account for pixel accuracy inconsistencies across browsers
+        if (isVertical && Math.floor(+bar.attr("y")) >= Math.floor(scaledBaseline)) {
           plotData.pixelPoints[index].y += +bar.attr("height");
-        } else if (!isVertical && +bar.attr("x") < scaledBaseline) {
+        } else if (!isVertical && Math.floor(+bar.attr("x")) < Math.floor(scaledBaseline)) {
           plotData.pixelPoints[index].x -= +bar.attr("width");
         }
 

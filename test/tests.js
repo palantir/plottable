@@ -31,24 +31,6 @@ function makeFakeEvent(x, y) {
         altKey: false
     };
 }
-function fakeDragSequence(anyedInteraction, startX, startY, endX, endY) {
-    var originalD3Mouse = d3.mouse;
-    d3.mouse = function () {
-        return [startX, startY];
-    };
-    anyedInteraction._dragstart();
-    d3.mouse = originalD3Mouse;
-    d3.event = makeFakeEvent(startX, startY);
-    anyedInteraction._drag();
-    d3.event = makeFakeEvent(endX, endY);
-    anyedInteraction._drag();
-    d3.mouse = function () {
-        return [endX, endY];
-    };
-    anyedInteraction._dragend();
-    d3.event = null;
-    d3.mouse = originalD3Mouse;
-}
 function verifySpaceRequest(sr, w, h, ww, wh, message) {
     assert.equal(sr.width, w, message + " (space request: width)");
     assert.equal(sr.height, h, message + " (space request: height)");
@@ -141,28 +123,33 @@ function triggerFakeUIEvent(type, target) {
     e.initUIEvent(type, true, true, window, 1);
     target.node().dispatchEvent(e);
 }
-function triggerFakeMouseEvent(type, target, relativeX, relativeY) {
+function triggerFakeMouseEvent(type, target, relativeX, relativeY, button) {
+    if (button === void 0) { button = 0; }
     var clientRect = target.node().getBoundingClientRect();
     var xPos = clientRect.left + relativeX;
     var yPos = clientRect.top + relativeY;
     var e = document.createEvent("MouseEvents");
-    e.initMouseEvent(type, true, true, window, 1, xPos, yPos, xPos, yPos, false, false, false, false, 1, null);
+    e.initMouseEvent(type, true, true, window, 1, xPos, yPos, xPos, yPos, false, false, false, false, button, null);
     target.node().dispatchEvent(e);
+}
+function triggerFakeDragSequence(target, start, end) {
+    triggerFakeMouseEvent("mousedown", target, start.x, start.y);
+    triggerFakeMouseEvent("mousemove", target, end.x, end.y);
+    triggerFakeMouseEvent("mouseup", target, end.x, end.y);
 }
 function triggerFakeWheelEvent(type, target, relativeX, relativeY, deltaY) {
     var clientRect = target.node().getBoundingClientRect();
     var xPos = clientRect.left + relativeX;
     var yPos = clientRect.top + relativeY;
     var event;
-    // Use the WheelEvent Constructor semantics if possible
-    if (typeof WheelEvent === "function") {
+    if (Plottable._Util.Methods.isIE()) {
+        event = document.createEvent("WheelEvent");
+        event.initWheelEvent("wheel", true, true, window, 1, xPos, yPos, xPos, yPos, 0, null, null, 0, deltaY, 0, 0);
+    }
+    else {
         // HACKHACK anycasting constructor to allow for the dictionary argument
         // https://github.com/Microsoft/TypeScript/issues/2416
         event = new WheelEvent("wheel", { bubbles: true, clientX: xPos, clientY: yPos, deltaY: deltaY });
-    }
-    else {
-        event = document.createEvent("WheelEvent");
-        event.initWheelEvent("wheel", true, true, window, 1, xPos, yPos, xPos, yPos, 0, null, null, 0, deltaY, 0, 0);
     }
     target.node().dispatchEvent(event);
 }
@@ -1246,6 +1233,21 @@ describe("Category Axes", function () {
         assert.deepEqual(texts, ["null", "undefined", "true", "2", "foo"]);
         svg.remove();
     });
+    it("uses the formatter if supplied", function () {
+        var svg = generateSVG(400, 400);
+        var domain = ["Air", "Bi", "Sea"];
+        var scale = new Plottable.Scale.Category().domain(domain);
+        var axis = new Plottable.Axis.Category(scale, "bottom");
+        var addPlane = function (l) { return l + "plane"; };
+        axis.formatter(addPlane);
+        axis.renderTo(svg);
+        var expectedTexts = domain.map(addPlane);
+        svg.selectAll("text").each(function (d, i) {
+            var actualText = d3.select(this).text();
+            assert.strictEqual(actualText, expectedTexts[i], "formatter was applied");
+        });
+        svg.remove();
+    });
     it("width accounts for gutter. ticklength, and padding on vertical axes", function () {
         var svg = generateSVG(400, 400);
         var xScale = new Plottable.Scale.Category().domain(["foo", "bar", "baz"]).range([400, 0]);
@@ -1926,6 +1928,71 @@ describe("InterpolatedColorLegend", function () {
     });
 });
 
+///<reference path="../testReference.ts" />
+var assert = chai.assert;
+describe("SelectionBoxLayer", function () {
+    it("boxVisible()", function () {
+        var svg = generateSVG();
+        var sbl = new Plottable.Component.SelectionBoxLayer();
+        sbl.renderTo(svg);
+        var selectionBox = svg.select(".selection-box");
+        assert.isTrue(selectionBox.empty(), "initilizes without box in DOM");
+        sbl.boxVisible(true);
+        selectionBox = svg.select(".selection-box");
+        assert.isFalse(selectionBox.empty(), "box is inserted in DOM when showing");
+        sbl.boxVisible(false);
+        selectionBox = svg.select(".selection-box");
+        assert.isTrue(selectionBox.empty(), "box is removed from DOM when not showing");
+        svg.remove();
+    });
+    it("bounds()", function () {
+        var svg = generateSVG();
+        var sbl = new Plottable.Component.SelectionBoxLayer();
+        var topLeft = {
+            x: 100,
+            y: 100
+        };
+        var bottomRight = {
+            x: 300,
+            y: 300
+        };
+        assert.doesNotThrow(function () { return sbl.bounds({
+            topLeft: topLeft,
+            bottomRight: bottomRight
+        }); }, Error, "can set bounds before anchoring");
+        sbl.boxVisible(true);
+        sbl.renderTo(svg);
+        function assertCorrectRendering(expectedTL, expectedBR, msg) {
+            var selectionBox = svg.select(".selection-box");
+            var bbox = Plottable._Util.DOM.getBBox(selectionBox);
+            assert.strictEqual(bbox.x, expectedTL.x, msg + " (x-origin)");
+            assert.strictEqual(bbox.x, expectedTL.y, msg + " (y-origin)");
+            assert.strictEqual(bbox.width, expectedBR.x - expectedTL.x, msg + " (width)");
+            assert.strictEqual(bbox.height, expectedBR.y - expectedTL.y, msg + " (height)");
+        }
+        assertCorrectRendering(topLeft, bottomRight, "rendered correctly");
+        var queriedBounds = sbl.bounds();
+        assert.deepEqual(queriedBounds.topLeft, topLeft, "returns correct top-left position");
+        assert.deepEqual(queriedBounds.bottomRight, bottomRight, "returns correct bottom-right position");
+        sbl.bounds({
+            topLeft: bottomRight,
+            bottomRight: topLeft
+        });
+        assertCorrectRendering(topLeft, bottomRight, "rendered correctly with reversed bounds");
+        queriedBounds = sbl.bounds();
+        assert.deepEqual(queriedBounds.topLeft, topLeft, "returns correct top-left position");
+        assert.deepEqual(queriedBounds.bottomRight, bottomRight, "returns correct bottom-right position");
+        svg.remove();
+    });
+    it("has an effective size of 0, but will occupy all offered space", function () {
+        var sbl = new Plottable.Component.SelectionBoxLayer();
+        var request = sbl._requestedSpace(400, 400);
+        verifySpaceRequest(request, 0, 0, false, false, "occupies and asks for no space");
+        assert.isTrue(sbl._isFixedWidth(), "fixed width");
+        assert.isTrue(sbl._isFixedHeight(), "fixed height");
+    });
+});
+
 ///<reference path="../../testReference.ts" />
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -2141,6 +2208,38 @@ describe("Plots", function () {
             assert.strictEqual(numAttr(oneElementSelection, "cy"), 10, "retreieved selection in renderArea2");
             assert.includeMembers(oneElementPlotData.data, data2, "includes data2 members");
             assert.includeMembers(oneElementPlotData.pixelPoints, data2.map(data2PointConverter), "includes data2 points");
+            svg.remove();
+        });
+        it("getAllPlotData() with NaN pixel points", function () {
+            var svg = generateSVG(400, 400);
+            var plot = new Plottable.Plot.AbstractPlot();
+            var data = [{ value: NaN }, { value: 1 }, { value: 2 }];
+            var dataPoints = data.map(function (datum) {
+                return { x: datum.value, y: 10 };
+            });
+            var dataPointConverter = function (datum, index) { return dataPoints[index]; };
+            // Create mock drawer with already drawn items
+            var mockDrawer = new Plottable._Drawer.AbstractDrawer("ds");
+            var renderArea = svg.append("g");
+            var circles = renderArea.selectAll("circles").data(data);
+            circles.enter().append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
+            circles.exit().remove();
+            mockDrawer.setup = function () { return mockDrawer._renderArea = renderArea; };
+            mockDrawer._getSelector = function () { return "circle"; };
+            mockDrawer._getPixelPoint = dataPointConverter;
+            // Mock _getDrawer to return the mock drawer
+            plot._getDrawer = function () { return mockDrawer; };
+            plot.addDataset("ds", data);
+            plot.renderTo(svg);
+            var oneElementPlotData = plot.getAllPlotData();
+            var oneElementSelection = oneElementPlotData.selection;
+            assert.strictEqual(oneElementSelection.size(), 2, "finds all selections that do not have NaN pixelPoint");
+            assert.lengthOf(oneElementPlotData.pixelPoints, 2, "returns pixelPoints except ones with NaN");
+            assert.lengthOf(oneElementPlotData.data, 2, "finds data that do not have NaN pixelPoint");
+            oneElementPlotData.pixelPoints.forEach(function (pixelPoint) {
+                assert.isNumber(pixelPoint.x, "pixelPoint X cannot be NaN");
+                assert.isNumber(pixelPoint.y, "pixelPoint Y cannot be NaN");
+            });
             svg.remove();
         });
         it("getClosestPlotData", function () {
@@ -2411,6 +2510,18 @@ describe("Plots", function () {
 var assert = chai.assert;
 describe("Plots", function () {
     describe("PiePlot", function () {
+        // HACKHACK #1798: beforeEach being used below
+        it("renders correctly with no data", function () {
+            var svg = generateSVG(400, 400);
+            var plot = new Plottable.Plot.Pie();
+            plot.project("value", function (d) { return d.value; });
+            assert.doesNotThrow(function () { return plot.renderTo(svg); }, Error);
+            assert.strictEqual(plot.width(), 400, "was allocated width");
+            assert.strictEqual(plot.height(), 400, "was allocated height");
+            svg.remove();
+        });
+    });
+    describe("PiePlot", function () {
         var svg;
         var simpleDataset;
         var simpleData;
@@ -2650,6 +2761,46 @@ describe("Plots", function () {
 ///<reference path="../../testReference.ts" />
 var assert = chai.assert;
 describe("Plots", function () {
+    // HACKHACK #1798: beforeEach being used below
+    describe("LinePlot", function () {
+        it("getAllPlotData with NaNs", function () {
+            var svg = generateSVG(500, 500);
+            var dataWithNaN = [
+                { foo: 0.0, bar: 0.0 },
+                { foo: 0.2, bar: 0.2 },
+                { foo: 0.4, bar: NaN },
+                { foo: 0.6, bar: 0.6 },
+                { foo: 0.8, bar: 0.8 }
+            ];
+            var xScale = new Plottable.Scale.Linear().domain([0, 1]);
+            var yScale = new Plottable.Scale.Linear().domain([0, 1]);
+            var linePlot = new Plottable.Plot.Line(xScale, yScale);
+            linePlot.addDataset(dataWithNaN);
+            linePlot.project("x", function (d) { return d.foo; }, xScale);
+            linePlot.project("y", function (d) { return d.bar; }, yScale);
+            linePlot.renderTo(svg);
+            var apd = linePlot.getAllPlotData();
+            var expectedLength = dataWithNaN.length - 1;
+            assert.strictEqual(apd.data.length, expectedLength, "NaN data was not returned");
+            assert.strictEqual(apd.pixelPoints.length, expectedLength, "NaN data doesn't appear in pixelPoints");
+            svg.remove();
+        });
+    });
+    describe("LinePlot", function () {
+        // HACKHACK #1798: beforeEach being used below
+        it("renders correctly with no data", function () {
+            var svg = generateSVG(400, 400);
+            var xScale = new Plottable.Scale.Linear();
+            var yScale = new Plottable.Scale.Linear();
+            var plot = new Plottable.Plot.Line(xScale, yScale);
+            plot.project("x", function (d) { return d.x; }, xScale);
+            plot.project("y", function (d) { return d.y; }, yScale);
+            assert.doesNotThrow(function () { return plot.renderTo(svg); }, Error);
+            assert.strictEqual(plot.width(), 400, "was allocated width");
+            assert.strictEqual(plot.height(), 400, "was allocated height");
+            svg.remove();
+        });
+    });
     describe("LinePlot", function () {
         var svg;
         var xScale;
@@ -2937,6 +3088,21 @@ describe("Plots", function () {
 var assert = chai.assert;
 describe("Plots", function () {
     describe("AreaPlot", function () {
+        // HACKHACK #1798: beforeEach being used below
+        it("renders correctly with no data", function () {
+            var svg = generateSVG(400, 400);
+            var xScale = new Plottable.Scale.Linear();
+            var yScale = new Plottable.Scale.Linear();
+            var plot = new Plottable.Plot.Area(xScale, yScale);
+            plot.project("x", function (d) { return d.x; }, xScale);
+            plot.project("y", function (d) { return d.y; }, yScale);
+            assert.doesNotThrow(function () { return plot.renderTo(svg); }, Error);
+            assert.strictEqual(plot.width(), 400, "was allocated width");
+            assert.strictEqual(plot.height(), 400, "was allocated height");
+            svg.remove();
+        });
+    });
+    describe("AreaPlot", function () {
         var svg;
         var xScale;
         var yScale;
@@ -3078,6 +3244,19 @@ describe("Plots", function () {
 var assert = chai.assert;
 describe("Plots", function () {
     describe("Bar Plot", function () {
+        // HACKHACK #1798: beforeEach being used below
+        it("renders correctly with no data", function () {
+            var svg = generateSVG(400, 400);
+            var xScale = new Plottable.Scale.Linear();
+            var yScale = new Plottable.Scale.Linear();
+            var plot = new Plottable.Plot.Bar(xScale, yScale);
+            plot.project("x", function (d) { return d.x; }, xScale);
+            plot.project("y", function (d) { return d.y; }, yScale);
+            assert.doesNotThrow(function () { return plot.renderTo(svg); }, Error);
+            assert.strictEqual(plot.width(), 400, "was allocated width");
+            assert.strictEqual(plot.height(), 400, "was allocated height");
+            svg.remove();
+        });
         function assertPlotDataEqual(expected, actual, msg) {
             assert.deepEqual(expected.data, actual.data, msg);
             assert.closeTo(expected.pixelPoints[0].x, actual.pixelPoints[0].x, 0.01, msg);
@@ -3179,39 +3358,45 @@ describe("Plots", function () {
                 assert.lengthOf(bars[0], 0, "no bars have been rendered");
                 svg.remove();
             });
-            it("getAllPlotData() pixel points corrected for negative-valued bars", function () {
-                var plotData = barPlot.getAllPlotData();
-                plotData.data.forEach(function (datum, i) {
-                    var barSelection = d3.select(plotData.selection[0][i]);
-                    var pixelPointY = plotData.pixelPoints[i].y;
-                    if (datum.y < 0) {
-                        assert.strictEqual(pixelPointY, +barSelection.attr("y") + +barSelection.attr("height"), "negative on bottom");
-                    }
-                    else {
-                        assert.strictEqual(pixelPointY, +barSelection.attr("y"), "positive on top");
-                    }
+            describe("getAllPlotData()", function () {
+                describe("pixelPoints", function () {
+                    it("getAllPlotData() pixel points corrected for negative-valued bars", function () {
+                        var plotData = barPlot.getAllPlotData();
+                        plotData.data.forEach(function (datum, i) {
+                            var barSelection = d3.select(plotData.selection[0][i]);
+                            var pixelPointY = plotData.pixelPoints[i].y;
+                            if (datum.y < 0) {
+                                assert.strictEqual(pixelPointY, +barSelection.attr("y") + +barSelection.attr("height"), "negative on bottom");
+                            }
+                            else {
+                                assert.strictEqual(pixelPointY, +barSelection.attr("y"), "positive on top");
+                            }
+                        });
+                        svg.remove();
+                    });
+                    describe("barAlignment", function () {
+                        it("getAllPlotData() pixel points corrected for barAlignment left", function () {
+                            barPlot.barAlignment("left");
+                            var plotData = barPlot.getAllPlotData();
+                            plotData.data.forEach(function (datum, i) {
+                                var barSelection = d3.select(plotData.selection[0][i]);
+                                var pixelPointX = plotData.pixelPoints[i].x;
+                                assert.strictEqual(pixelPointX, +barSelection.attr("x"), "barAlignment left x correct");
+                            });
+                            svg.remove();
+                        });
+                        it("getAllPlotData() pixel points corrected for barAlignment right", function () {
+                            barPlot.barAlignment("right");
+                            var plotData = barPlot.getAllPlotData();
+                            plotData.data.forEach(function (datum, i) {
+                                var barSelection = d3.select(plotData.selection[0][i]);
+                                var pixelPointX = plotData.pixelPoints[i].x;
+                                assert.strictEqual(pixelPointX, +barSelection.attr("x") + +barSelection.attr("width"), "barAlignment right x correct");
+                            });
+                            svg.remove();
+                        });
+                    });
                 });
-                svg.remove();
-            });
-            it("getAllPlotData() pixel points corrected for barAlignment left", function () {
-                barPlot.barAlignment("left");
-                var plotData = barPlot.getAllPlotData();
-                plotData.data.forEach(function (datum, i) {
-                    var barSelection = d3.select(plotData.selection[0][i]);
-                    var pixelPointX = plotData.pixelPoints[i].x;
-                    assert.strictEqual(pixelPointX, +barSelection.attr("x"), "barAlignment left x correct");
-                });
-                svg.remove();
-            });
-            it("getAllPlotData() pixel points corrected for barAlignment right", function () {
-                barPlot.barAlignment("right");
-                var plotData = barPlot.getAllPlotData();
-                plotData.data.forEach(function (datum, i) {
-                    var barSelection = d3.select(plotData.selection[0][i]);
-                    var pixelPointX = plotData.pixelPoints[i].x;
-                    assert.strictEqual(pixelPointX, +barSelection.attr("x") + +barSelection.attr("width"), "barAlignment right x correct");
-                });
-                svg.remove();
             });
             describe("getClosestPlotData()", function () {
                 var bars;
@@ -3491,39 +3676,45 @@ describe("Plots", function () {
                 assert.closeTo(numAttr(bar1, "y"), yScale.scale(bar1y) - numAttr(bar1, "height") / 2, 0.01, "bar1 ypos");
                 svg.remove();
             });
-            it("getAllPlotData() pixel points corrected for negative-valued bars", function () {
-                var plotData = barPlot.getAllPlotData();
-                plotData.data.forEach(function (datum, i) {
-                    var barSelection = d3.select(plotData.selection[0][i]);
-                    var pixelPointX = plotData.pixelPoints[i].x;
-                    if (datum.x < 0) {
-                        assert.strictEqual(pixelPointX, +barSelection.attr("x"), "negative on left");
-                    }
-                    else {
-                        assert.strictEqual(pixelPointX, +barSelection.attr("x") + +barSelection.attr("width"), "positive on right");
-                    }
+            describe("getAllPlotData()", function () {
+                describe("pixelPoints", function () {
+                    it("getAllPlotData() pixel points corrected for negative-valued bars", function () {
+                        var plotData = barPlot.getAllPlotData();
+                        plotData.data.forEach(function (datum, i) {
+                            var barSelection = d3.select(plotData.selection[0][i]);
+                            var pixelPointX = plotData.pixelPoints[i].x;
+                            if (datum.x < 0) {
+                                assert.strictEqual(pixelPointX, +barSelection.attr("x"), "negative on left");
+                            }
+                            else {
+                                assert.strictEqual(pixelPointX, +barSelection.attr("x") + +barSelection.attr("width"), "positive on right");
+                            }
+                        });
+                        svg.remove();
+                    });
+                    describe("accounting for barAlignment", function () {
+                        it("getAllPlotData() pixel points corrected for barAlignment left", function () {
+                            barPlot.barAlignment("left");
+                            var plotData = barPlot.getAllPlotData();
+                            plotData.data.forEach(function (datum, i) {
+                                var barSelection = d3.select(plotData.selection[0][i]);
+                                var pixelPointY = plotData.pixelPoints[i].y;
+                                assert.strictEqual(pixelPointY, +barSelection.attr("y"), "barAlignment left y correct");
+                            });
+                            svg.remove();
+                        });
+                        it("getAllPlotData() pixel points corrected for barAlignment right", function () {
+                            barPlot.barAlignment("right");
+                            var plotData = barPlot.getAllPlotData();
+                            plotData.data.forEach(function (datum, i) {
+                                var barSelection = d3.select(plotData.selection[0][i]);
+                                var pixelPointY = plotData.pixelPoints[i].y;
+                                assert.strictEqual(pixelPointY, +barSelection.attr("y") + +barSelection.attr("height"), "barAlignment right y correct");
+                            });
+                            svg.remove();
+                        });
+                    });
                 });
-                svg.remove();
-            });
-            it("getAllPlotData() pixel points corrected for barAlignment left", function () {
-                barPlot.barAlignment("left");
-                var plotData = barPlot.getAllPlotData();
-                plotData.data.forEach(function (datum, i) {
-                    var barSelection = d3.select(plotData.selection[0][i]);
-                    var pixelPointY = plotData.pixelPoints[i].y;
-                    assert.strictEqual(pixelPointY, +barSelection.attr("y"), "barAlignment left y correct");
-                });
-                svg.remove();
-            });
-            it("getAllPlotData() pixel points corrected for barAlignment right", function () {
-                barPlot.barAlignment("right");
-                var plotData = barPlot.getAllPlotData();
-                plotData.data.forEach(function (datum, i) {
-                    var barSelection = d3.select(plotData.selection[0][i]);
-                    var pixelPointY = plotData.pixelPoints[i].y;
-                    assert.strictEqual(pixelPointY, +barSelection.attr("y") + +barSelection.attr("height"), "barAlignment right y correct");
-                });
-                svg.remove();
             });
             describe("getClosestPlotData()", function () {
                 var bars;
@@ -3804,6 +3995,34 @@ describe("Plots", function () {
             VERIFY_CELLS(gridPlot._renderArea.selectAll("rect")[0]);
             svg.remove();
         });
+        it("renders correctly when there isn't data for every spot", function () {
+            var CELL_HEIGHT = 50;
+            var CELL_WIDTH = 100;
+            var xScale = new Plottable.Scale.Category();
+            var yScale = new Plottable.Scale.Category();
+            var colorScale = new Plottable.Scale.InterpolatedColor(["black", "white"]);
+            var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var dataset = new Plottable.Dataset();
+            var gridPlot = new Plottable.Plot.Grid(xScale, yScale, colorScale);
+            gridPlot.addDataset(dataset).project("fill", "magnitude", colorScale).project("x", "x", xScale).project("y", "y", yScale).renderTo(svg);
+            var data = [
+                { x: "A", y: "W", magnitude: 0 },
+                { x: "B", y: "X", magnitude: 8 },
+                { x: "C", y: "Y", magnitude: 16 },
+                { x: "D", y: "Z", magnitude: 24 }
+            ];
+            dataset.data(data);
+            var cells = gridPlot._renderArea.selectAll("rect")[0];
+            assert.equal(cells.length, data.length);
+            for (var i = 0; i < cells.length; i++) {
+                var cell = d3.select(cells[i]);
+                assert.equal(cell.attr("x"), i * CELL_WIDTH, "Cell x coord is correct");
+                assert.equal(cell.attr("y"), i * CELL_HEIGHT, "Cell y coord is correct");
+                assert.equal(cell.attr("width"), CELL_WIDTH, "Cell width is correct");
+                assert.equal(cell.attr("height"), CELL_HEIGHT, "Cell height is correct");
+            }
+            svg.remove();
+        });
         it("can invert y axis correctly", function () {
             var xScale = new Plottable.Scale.Category();
             var yScale = new Plottable.Scale.Category();
@@ -3932,6 +4151,18 @@ describe("Plots", function () {
 var assert = chai.assert;
 describe("Plots", function () {
     describe("ScatterPlot", function () {
+        it("renders correctly with no data", function () {
+            var svg = generateSVG(400, 400);
+            var xScale = new Plottable.Scale.Linear();
+            var yScale = new Plottable.Scale.Linear();
+            var plot = new Plottable.Plot.Scatter(xScale, yScale);
+            plot.project("x", function (d) { return d.x; }, xScale);
+            plot.project("y", function (d) { return d.y; }, yScale);
+            assert.doesNotThrow(function () { return plot.renderTo(svg); }, Error);
+            assert.strictEqual(plot.width(), 400, "was allocated width");
+            assert.strictEqual(plot.height(), 400, "was allocated height");
+            svg.remove();
+        });
         it("the accessors properly access data, index, and metadata", function () {
             var svg = generateSVG(400, 400);
             var xScale = new Plottable.Scale.Linear();
@@ -3986,6 +4217,48 @@ describe("Plots", function () {
             var selectionData = allCircles.data();
             assert.includeMembers(selectionData, data, "first dataset data in selection data");
             assert.includeMembers(selectionData, data2, "second dataset data in selection data");
+            svg.remove();
+        });
+        it("getClosestPlotData()", function () {
+            function assertPlotDataEqual(expected, actual, msg) {
+                assert.deepEqual(expected.data, actual.data, msg);
+                assert.closeTo(expected.pixelPoints[0].x, actual.pixelPoints[0].x, 0.01, msg);
+                assert.closeTo(expected.pixelPoints[0].y, actual.pixelPoints[0].y, 0.01, msg);
+                assert.deepEqual(expected.selection, actual.selection, msg);
+            }
+            var svg = generateSVG(400, 400);
+            var xScale = new Plottable.Scale.Linear();
+            var yScale = new Plottable.Scale.Linear();
+            var data = [{ x: 0, y: 0 }, { x: 1, y: 1 }];
+            var data2 = [{ x: 1, y: 2 }, { x: 3, y: 4 }];
+            var plot = new Plottable.Plot.Scatter(xScale, yScale).project("x", "x", xScale).project("y", "y", yScale).addDataset(data).addDataset(data2);
+            plot.renderTo(svg);
+            var points = d3.selectAll(".scatter-plot path");
+            var d0 = data[0];
+            var d0Px = {
+                x: xScale.scale(d0.x),
+                y: yScale.scale(d0.y)
+            };
+            var expected = {
+                data: [d0],
+                pixelPoints: [d0Px],
+                selection: d3.select(points[0][0])
+            };
+            var closest = plot.getClosestPlotData({ x: d0Px.x + 1, y: d0Px.y + 1 });
+            assertPlotDataEqual(expected, closest, "it selects the closest data point");
+            yScale.domain([0, 1.9]);
+            var d1 = data[1];
+            var d1Px = {
+                x: xScale.scale(d1.x),
+                y: yScale.scale(d1.y)
+            };
+            expected = {
+                data: [d1],
+                pixelPoints: [d1Px],
+                selection: d3.select(points[0][1])
+            };
+            closest = plot.getClosestPlotData({ x: d1Px.x, y: 0 });
+            assertPlotDataEqual(expected, closest, "it ignores off-plot data points");
             svg.remove();
         });
         it("_getClosestStruckPoint()", function () {
@@ -4777,6 +5050,40 @@ describe("Plots", function () {
             assert.deepEqual(dataset2.data(), originalData2, "underlying data is not modified");
             svg.remove();
         });
+        it("considers lying within a bar's y-range to mean it is closest", function () {
+            function assertPlotDataEqual(expected, actual, msg) {
+                assert.deepEqual(expected.data, actual.data, msg);
+                assert.closeTo(expected.pixelPoints[0].x, actual.pixelPoints[0].x, 0.01, msg);
+                assert.closeTo(expected.pixelPoints[0].y, actual.pixelPoints[0].y, 0.01, msg);
+                assert.deepEqual(expected.selection, actual.selection, msg);
+            }
+            var bars = renderer._renderArea.selectAll("rect");
+            var d0 = dataset1.data()[0];
+            var d0Px = {
+                x: xScale.scale(d0.x),
+                y: yScale.scale(d0.y)
+            };
+            var d1 = dataset2.data()[0];
+            var d1Px = {
+                x: xScale.scale(d1.x),
+                y: 0 // d1 is stacked above d0
+            };
+            var expected = {
+                data: [d0],
+                pixelPoints: [d0Px],
+                selection: d3.selectAll([bars[0][0]])
+            };
+            var closest = renderer.getClosestPlotData({ x: 0, y: d0Px.y + 1 });
+            assertPlotDataEqual(expected, closest, "bottom bar is closest when within its range");
+            expected = {
+                data: [d1],
+                pixelPoints: [d1Px],
+                selection: d3.selectAll([bars[0][2]])
+            };
+            closest = renderer.getClosestPlotData({ x: 0, y: d0Px.y - 1 });
+            assertPlotDataEqual(expected, closest, "top bar is closest when within its range");
+            svg.remove();
+        });
     });
     describe("Stacked Bar Plot Negative Values", function () {
         var svg;
@@ -4958,6 +5265,110 @@ describe("Plots", function () {
             assert.closeTo(numAttr(cBars[0], "x"), numAttr(cBars[1], "x"), 0.01, "C bars at same x position");
             assert.operator(numAttr(cBars[0], "y"), ">", numAttr(cBars[1], "y"), "first dataset C bar under second");
             svg.remove();
+        });
+    });
+    describe("Horizontal Stacked Bar Plot Non-Overlapping Datasets", function () {
+        var svg;
+        var plot;
+        var SVG_WIDTH = 600;
+        var SVG_HEIGHT = 400;
+        var numAttr = function (s, a) { return parseFloat(s.attr(a)); };
+        beforeEach(function () {
+            svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var xScale = new Plottable.Scale.Linear();
+            var yScale = new Plottable.Scale.Category();
+            var data1 = [
+                { y: "A", x: 1, type: "a" },
+                { y: "B", x: 2, type: "a" },
+                { y: "C", x: 1, type: "a" }
+            ];
+            var data2 = [
+                { y: "A", x: 2, type: "b" },
+                { y: "B", x: 3, type: "b" }
+            ];
+            var data3 = [
+                { y: "B", x: 1, type: "c" },
+                { y: "C", x: 7, type: "c" }
+            ];
+            plot = new Plottable.Plot.StackedBar(xScale, yScale, false);
+            plot.addDataset(data1);
+            plot.addDataset(data2);
+            plot.addDataset(data3);
+            plot.project("x", "x", xScale);
+            plot.project("y", "y", yScale);
+            plot.renderTo(svg);
+        });
+        it("renders correctly", function () {
+            var bars = plot.getAllSelections();
+            assert.strictEqual(bars.size(), 7, "draws a bar for each datum");
+            var aBars = [d3.select(bars[0][0]), d3.select(bars[0][3])];
+            var bBars = [d3.select(bars[0][1]), d3.select(bars[0][4]), d3.select(bars[0][5])];
+            var cBars = [d3.select(bars[0][2]), d3.select(bars[0][6])];
+            assert.closeTo(numAttr(aBars[0], "y"), numAttr(aBars[1], "y"), 0.01, "A bars at same y position");
+            assert.operator(numAttr(aBars[0], "x"), "<", numAttr(aBars[1], "x"), "first dataset A bar under second");
+            assert.closeTo(numAttr(bBars[0], "y"), numAttr(bBars[1], "y"), 0.01, "B bars at same y position");
+            assert.closeTo(numAttr(bBars[1], "y"), numAttr(bBars[2], "y"), 0.01, "B bars at same y position");
+            assert.operator(numAttr(bBars[0], "x"), "<", numAttr(bBars[1], "x"), "first dataset B bar under second");
+            assert.operator(numAttr(bBars[1], "x"), "<", numAttr(bBars[2], "x"), "second dataset B bar under third");
+            assert.closeTo(numAttr(cBars[0], "y"), numAttr(cBars[1], "y"), 0.01, "C bars at same y position");
+            assert.operator(numAttr(cBars[0], "x"), "<", numAttr(cBars[1], "x"), "first dataset C bar under second");
+            svg.remove();
+        });
+    });
+    describe("fail safe tests", function () {
+        it("conversion fails should be silent in Plot.StackedBar", function () {
+            var data1 = [
+                { x: "A", y: "s", fill: "blue" },
+            ];
+            var data2 = [
+                { x: "A", y: 1, fill: "red" },
+            ];
+            var xScale = new Plottable.Scale.Category();
+            var yScale = new Plottable.Scale.Linear();
+            var plot = new Plottable.Plot.StackedBar(xScale, yScale);
+            plot.addDataset("d1", data1);
+            plot.addDataset("d2", data2);
+            plot.project("fill", "fill");
+            plot.project("x", "x", xScale).project("y", "y", yScale);
+            var ds1FirstColumnOffset = plot._key2PlotDatasetKey.get("d1").plotMetadata.offsets.get("A");
+            var ds2FirstColumnOffset = plot._key2PlotDatasetKey.get("d2").plotMetadata.offsets.get("A");
+            assert.strictEqual(typeof ds1FirstColumnOffset, "number", "ds1 offset should be a number");
+            assert.strictEqual(typeof ds2FirstColumnOffset, "number", "ds2 offset should be a number");
+            assert.isFalse(Plottable._Util.Methods.isNaN(ds1FirstColumnOffset), "ds1 offset should not be NaN");
+            assert.isFalse(Plottable._Util.Methods.isNaN(ds1FirstColumnOffset), "ds2 offset should not be NaN");
+        });
+        it("bad values on the primary axis should default to 0 (be ignored)", function () {
+            var data1 = [
+                { x: "A", y: 1, fill: "blue" },
+            ];
+            var data2 = [
+                { x: "A", y: "s", fill: "red" },
+            ];
+            var data3 = [
+                { x: "A", y: 2, fill: "green" },
+            ];
+            var data4 = [
+                { x: "A", y: "0", fill: "purple" },
+            ];
+            var data5 = [
+                { x: "A", y: 3, fill: "pink" },
+            ];
+            var xScale = new Plottable.Scale.Category();
+            var yScale = new Plottable.Scale.Linear();
+            var plot = new Plottable.Plot.StackedBar(xScale, yScale);
+            plot.addDataset("d1", data1);
+            plot.addDataset("d2", data2);
+            plot.addDataset("d3", data3);
+            plot.addDataset("d4", data4);
+            plot.addDataset("d5", data5);
+            plot.project("fill", "fill");
+            plot.project("x", "x", xScale).project("y", "y", yScale);
+            var offset1 = plot._key2PlotDatasetKey.get("d1").plotMetadata.offsets.get("A");
+            var offset3 = plot._key2PlotDatasetKey.get("d3").plotMetadata.offsets.get("A");
+            var offset5 = plot._key2PlotDatasetKey.get("d5").plotMetadata.offsets.get("A");
+            assert.strictEqual(offset1, 0, "Plot columns should start from offset 0 (at the very bottom)");
+            assert.strictEqual(offset3, 1, "Bar 3 should have offset 1, because bar 2 was not rendered");
+            assert.strictEqual(offset5, 3, "Bar 5 should have offset 3, because bar 4 was not rendered");
         });
     });
 });
@@ -5152,6 +5563,49 @@ describe("Plots", function () {
             assert.operator(numAttr(bBar0, "x"), "<", numAttr(bBar1, "x"), "B bars clustered in dataset order");
             assert.operator(numAttr(bBar1, "x"), "<", numAttr(bBar2, "x"), "B bars clustered in dataset order");
             assert.operator(numAttr(cBar0, "x"), "<", numAttr(cBar1, "x"), "C bars clustered in dataset order");
+            svg.remove();
+        });
+    });
+    describe("Horizontal Clustered Bar Plot Missing Values", function () {
+        var svg;
+        var plot;
+        beforeEach(function () {
+            var SVG_WIDTH = 600;
+            var SVG_HEIGHT = 400;
+            svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var xScale = new Plottable.Scale.Linear();
+            var yScale = new Plottable.Scale.Category();
+            var data1 = [{ y: "A", x: 1 }, { y: "B", x: 2 }, { y: "C", x: 1 }];
+            var data2 = [{ y: "A", x: 2 }, { y: "B", x: 4 }];
+            var data3 = [{ y: "B", x: 15 }, { y: "C", x: 15 }];
+            plot = new Plottable.Plot.ClusteredBar(xScale, yScale, false);
+            plot.addDataset(data1);
+            plot.addDataset(data2);
+            plot.addDataset(data3);
+            plot.project("x", "x", xScale);
+            plot.project("y", "y", yScale);
+            plot.renderTo(svg);
+        });
+        it("renders correctly", function () {
+            var bars = plot.getAllSelections();
+            assert.strictEqual(bars.size(), 7, "Number of bars should be equivalent to number of datum");
+            var aBar0 = d3.select(bars[0][0]);
+            var aBar1 = d3.select(bars[0][3]);
+            var bBar0 = d3.select(bars[0][1]);
+            var bBar1 = d3.select(bars[0][4]);
+            var bBar2 = d3.select(bars[0][5]);
+            var cBar0 = d3.select(bars[0][2]);
+            var cBar1 = d3.select(bars[0][6]);
+            // check bars are in domain order
+            assert.operator(numAttr(aBar0, "y"), "<", numAttr(bBar0, "y"), "first dataset bars ordered correctly");
+            assert.operator(numAttr(bBar0, "y"), "<", numAttr(cBar0, "y"), "first dataset bars ordered correctly");
+            assert.operator(numAttr(aBar1, "y"), "<", numAttr(bBar1, "y"), "second dataset bars ordered correctly");
+            assert.operator(numAttr(bBar2, "y"), "<", numAttr(cBar1, "y"), "third dataset bars ordered correctly");
+            // check that clustering is correct
+            assert.operator(numAttr(aBar0, "y"), "<", numAttr(aBar1, "y"), "A bars clustered in dataset order");
+            assert.operator(numAttr(bBar0, "y"), "<", numAttr(bBar1, "y"), "B bars clustered in dataset order");
+            assert.operator(numAttr(bBar1, "y"), "<", numAttr(bBar2, "y"), "B bars clustered in dataset order");
+            assert.operator(numAttr(cBar0, "y"), "<", numAttr(cBar1, "y"), "C bars clustered in dataset order");
             svg.remove();
         });
     });
@@ -7009,6 +7463,40 @@ describe("Scales", function () {
             assert.equal(scale.scale("a"), "#ff0000");
             assert.equal(scale.scale("b"), "#0000ff");
         });
+        it("accepts CSS specified colors", function () {
+            var style = d3.select("body").append("style");
+            style.html(".plottable-colors-0 {background-color: #ff0000 !important; }");
+            var scale = new Plottable.Scale.Color();
+            style.remove();
+            assert.strictEqual(scale.range()[0], "#ff0000", "User has specified red color for first color scale color");
+            assert.strictEqual(scale.range()[1], "#fd373e", "The second color of the color scale should be the same");
+            var defaultScale = new Plottable.Scale.Color();
+            assert.strictEqual(scale.range()[0], "#ff0000", "Unloading the CSS should not modify the first scale color (this will not be the case if we support dynamic CSS");
+            assert.strictEqual(defaultScale.range()[0], "#5279c7", "Unloading the CSS should cause color scales fallback to default colors");
+        });
+        it("should try to recover from malicious CSS styleseets", function () {
+            var defaultNumberOfColors = 10;
+            var initialScale = new Plottable.Scale.Color();
+            assert.strictEqual(initialScale.range().length, defaultNumberOfColors, "there should initially be " + defaultNumberOfColors + " default colors");
+            var maliciousStyle = d3.select("body").append("style");
+            maliciousStyle.html("* {background-color: #fff000;}");
+            var affectedScale = new Plottable.Scale.Color();
+            maliciousStyle.remove();
+            var colorRange = affectedScale.range();
+            assert.strictEqual(colorRange.length, defaultNumberOfColors + 1, "it should detect the end of the given colors and the fallback to the * selector, " + "but should still include the last occurance of the * selector color");
+            assert.strictEqual(colorRange[colorRange.length - 1], "#fff000", "the * selector background color should be added at least once at the end");
+            assert.notStrictEqual(colorRange[colorRange.length - 2], "#fff000", "the * selector background color should be added at most once at the end");
+        });
+        it("does not crash by malicious CSS stylesheets", function () {
+            var initialScale = new Plottable.Scale.Color();
+            assert.strictEqual(initialScale.range().length, 10, "there should initially be 10 default colors");
+            var maliciousStyle = d3.select("body").append("style");
+            maliciousStyle.html("[class^='plottable-'] {background-color: pink;}");
+            var affectedScale = new Plottable.Scale.Color();
+            maliciousStyle.remove();
+            var maximumColorsFromCss = Plottable.Scale.Color.MAXIMUM_COLORS_FROM_CSS;
+            assert.strictEqual(affectedScale.range().length, maximumColorsFromCss, "current malicious CSS countermeasure is to cap maximum number of colors to 256");
+        });
     });
     describe("Interpolated Color Scales", function () {
         it("default scale uses reds and a linear scale type", function () {
@@ -7540,22 +8028,6 @@ describe("Formatters", function () {
 
 ///<reference path="../testReference.ts" />
 var assert = chai.assert;
-describe("IDCounter", function () {
-    it("IDCounter works as expected", function () {
-        var i = new Plottable._Util.IDCounter();
-        assert.equal(i.get("f"), 0);
-        assert.equal(i.increment("f"), 1);
-        assert.equal(i.increment("g"), 1);
-        assert.equal(i.increment("f"), 2);
-        assert.equal(i.decrement("f"), 1);
-        assert.equal(i.get("f"), 1);
-        assert.equal(i.get("f"), 1);
-        assert.equal(i.decrement(2), -1);
-    });
-});
-
-///<reference path="../testReference.ts" />
-var assert = chai.assert;
 describe("StrictEqualityAssociativeArray", function () {
     it("StrictEqualityAssociativeArray works as expected", function () {
         var s = new Plottable._Util.StrictEqualityAssociativeArray();
@@ -7698,6 +8170,18 @@ describe("_Util.Methods", function () {
             assert.deepEqual(max([null], today), undefined, "returns undefined from array of null values");
             assert.deepEqual(max([], today), today, "correct default non-numeric value returned");
         });
+    });
+    it("isNaN works as expected", function () {
+        var isNaN = Plottable._Util.Methods.isNaN;
+        assert.isTrue(isNaN(NaN), "Only NaN should pass the isNaN check");
+        assert.isFalse(isNaN(undefined), "undefined should fail the isNaN check");
+        assert.isFalse(isNaN(null), "null should fail the isNaN check");
+        assert.isFalse(isNaN(Infinity), "Infinity should fail the isNaN check");
+        assert.isFalse(isNaN(1), "numbers should fail the isNaN check");
+        assert.isFalse(isNaN(0), "0 should fail the isNaN check");
+        assert.isFalse(isNaN("foo"), "strings should fail the isNaN check");
+        assert.isFalse(isNaN(""), "empty strings should fail the isNaN check");
+        assert.isFalse(isNaN({}), "empty Objects should fail the isNaN check");
     });
     it("objEq works as expected", function () {
         assert.isTrue(Plottable._Util.Methods.objEq({}, {}));
@@ -7863,8 +8347,8 @@ describe("Interactions", function () {
             ki.on(aCode, aCallback);
             ki.on(bCode, bCallback);
             component.registerInteraction(ki);
-            var $target = $(component.content().node());
-            triggerFakeMouseEvent("mouseover", component.content(), 100, 100);
+            var $target = $(component.background().node());
+            triggerFakeMouseEvent("mouseover", component.background(), 100, 100);
             $target.simulate("keydown", { keyCode: aCode });
             assert.isTrue(aCallbackCalled, "callback for \"a\" was called when \"a\" key was pressed");
             assert.isFalse(bCallbackCalled, "callback for \"b\" was not called when \"a\" key was pressed");
@@ -7872,7 +8356,7 @@ describe("Interactions", function () {
             $target.simulate("keydown", { keyCode: bCode });
             assert.isFalse(aCallbackCalled, "callback for \"a\" was not called when \"b\" key was pressed");
             assert.isTrue(bCallbackCalled, "callback for \"b\" was called when \"b\" key was pressed");
-            triggerFakeMouseEvent("mouseout", component.content(), -100, -100);
+            triggerFakeMouseEvent("mouseout", component.background(), -100, -100);
             aCallbackCalled = false;
             $target.simulate("keydown", { keyCode: aCode });
             assert.isFalse(aCallbackCalled, "callback for \"a\" was not called when not moused over the Component");
@@ -7901,26 +8385,27 @@ describe("Interactions", function () {
             };
             pointerInteraction.onPointerEnter(callback);
             assert.strictEqual(pointerInteraction.onPointerEnter(), callback, "callback can be retrieved");
-            triggerFakeMouseEvent("mousemove", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+            var target = c.background();
+            triggerFakeMouseEvent("mousemove", target, SVG_WIDTH / 2, SVG_HEIGHT / 2);
             assert.isTrue(callbackCalled, "callback called on entering Component (mouse)");
             assert.deepEqual(lastPoint, { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 }, "was passed correct point (mouse)");
             callbackCalled = false;
-            triggerFakeMouseEvent("mousemove", c.content(), SVG_WIDTH / 4, SVG_HEIGHT / 4);
+            triggerFakeMouseEvent("mousemove", target, SVG_WIDTH / 4, SVG_HEIGHT / 4);
             assert.isFalse(callbackCalled, "callback not called again if already in Component (mouse)");
-            triggerFakeMouseEvent("mousemove", c.content(), 2 * SVG_WIDTH, 2 * SVG_HEIGHT);
+            triggerFakeMouseEvent("mousemove", target, 2 * SVG_WIDTH, 2 * SVG_HEIGHT);
             assert.isFalse(callbackCalled, "not called when moving outside of the Component (mouse)");
             callbackCalled = false;
             lastPoint = null;
-            triggerFakeTouchEvent("touchstart", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+            triggerFakeTouchEvent("touchstart", target, SVG_WIDTH / 2, SVG_HEIGHT / 2);
             assert.isTrue(callbackCalled, "callback called on entering Component (touch)");
             assert.deepEqual(lastPoint, { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 }, "was passed correct point (touch)");
             callbackCalled = false;
-            triggerFakeTouchEvent("touchstart", c.content(), SVG_WIDTH / 4, SVG_HEIGHT / 4);
+            triggerFakeTouchEvent("touchstart", target, SVG_WIDTH / 4, SVG_HEIGHT / 4);
             assert.isFalse(callbackCalled, "callback not called again if already in Component (touch)");
-            triggerFakeTouchEvent("touchstart", c.content(), 2 * SVG_WIDTH, 2 * SVG_HEIGHT);
+            triggerFakeTouchEvent("touchstart", target, 2 * SVG_WIDTH, 2 * SVG_HEIGHT);
             assert.isFalse(callbackCalled, "not called when moving outside of the Component (touch)");
             pointerInteraction.onPointerEnter(null);
-            triggerFakeMouseEvent("mousemove", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+            triggerFakeMouseEvent("mousemove", target, SVG_WIDTH / 2, SVG_HEIGHT / 2);
             assert.isFalse(callbackCalled, "callback removed by passing null");
             svg.remove();
         });
@@ -7938,29 +8423,30 @@ describe("Interactions", function () {
             };
             pointerInteraction.onPointerMove(callback);
             assert.strictEqual(pointerInteraction.onPointerMove(), callback, "callback can be retrieved");
-            triggerFakeMouseEvent("mousemove", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+            var target = c.background();
+            triggerFakeMouseEvent("mousemove", target, SVG_WIDTH / 2, SVG_HEIGHT / 2);
             assert.isTrue(callbackCalled, "callback called on entering Component (mouse)");
             assert.deepEqual(lastPoint, { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 }, "was passed correct point (mouse)");
             callbackCalled = false;
-            triggerFakeMouseEvent("mousemove", c.content(), SVG_WIDTH / 4, SVG_HEIGHT / 4);
+            triggerFakeMouseEvent("mousemove", target, SVG_WIDTH / 4, SVG_HEIGHT / 4);
             assert.isTrue(callbackCalled, "callback on moving inside Component (mouse)");
             assert.deepEqual(lastPoint, { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 }, "was passed correct point (mouse)");
             callbackCalled = false;
-            triggerFakeMouseEvent("mousemove", c.content(), 2 * SVG_WIDTH, 2 * SVG_HEIGHT);
+            triggerFakeMouseEvent("mousemove", target, 2 * SVG_WIDTH, 2 * SVG_HEIGHT);
             assert.isFalse(callbackCalled, "not called when moving outside of the Component (mouse)");
             callbackCalled = false;
-            triggerFakeTouchEvent("touchstart", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+            triggerFakeTouchEvent("touchstart", target, SVG_WIDTH / 2, SVG_HEIGHT / 2);
             assert.isTrue(callbackCalled, "callback called on entering Component (touch)");
             assert.deepEqual(lastPoint, { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 }, "was passed correct point (touch)");
             callbackCalled = false;
-            triggerFakeTouchEvent("touchstart", c.content(), SVG_WIDTH / 4, SVG_HEIGHT / 4);
+            triggerFakeTouchEvent("touchstart", target, SVG_WIDTH / 4, SVG_HEIGHT / 4);
             assert.isTrue(callbackCalled, "callback on moving inside Component (touch)");
             assert.deepEqual(lastPoint, { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 }, "was passed correct point (touch)");
             callbackCalled = false;
-            triggerFakeTouchEvent("touchstart", c.content(), 2 * SVG_WIDTH, 2 * SVG_HEIGHT);
+            triggerFakeTouchEvent("touchstart", target, 2 * SVG_WIDTH, 2 * SVG_HEIGHT);
             assert.isFalse(callbackCalled, "not called when moving outside of the Component (touch)");
             pointerInteraction.onPointerMove(null);
-            triggerFakeMouseEvent("mousemove", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+            triggerFakeMouseEvent("mousemove", target, SVG_WIDTH / 2, SVG_HEIGHT / 2);
             assert.isFalse(callbackCalled, "callback removed by passing null");
             svg.remove();
         });
@@ -7978,307 +8464,31 @@ describe("Interactions", function () {
             };
             pointerInteraction.onPointerExit(callback);
             assert.strictEqual(pointerInteraction.onPointerExit(), callback, "callback can be retrieved");
-            triggerFakeMouseEvent("mousemove", c.content(), 2 * SVG_WIDTH, 2 * SVG_HEIGHT);
+            var target = c.background();
+            triggerFakeMouseEvent("mousemove", target, 2 * SVG_WIDTH, 2 * SVG_HEIGHT);
             assert.isFalse(callbackCalled, "not called when moving outside of the Component (mouse)");
-            triggerFakeMouseEvent("mousemove", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
-            triggerFakeMouseEvent("mousemove", c.content(), 2 * SVG_WIDTH, 2 * SVG_HEIGHT);
+            triggerFakeMouseEvent("mousemove", target, SVG_WIDTH / 2, SVG_HEIGHT / 2);
+            triggerFakeMouseEvent("mousemove", target, 2 * SVG_WIDTH, 2 * SVG_HEIGHT);
             assert.isTrue(callbackCalled, "callback called on exiting Component (mouse)");
             assert.deepEqual(lastPoint, { x: 2 * SVG_WIDTH, y: 2 * SVG_HEIGHT }, "was passed correct point (mouse)");
             callbackCalled = false;
-            triggerFakeMouseEvent("mousemove", c.content(), 3 * SVG_WIDTH, 3 * SVG_HEIGHT);
+            triggerFakeMouseEvent("mousemove", target, 3 * SVG_WIDTH, 3 * SVG_HEIGHT);
             assert.isFalse(callbackCalled, "callback not called again if already outside of Component (mouse)");
             callbackCalled = false;
             lastPoint = null;
-            triggerFakeTouchEvent("touchstart", c.content(), 2 * SVG_WIDTH, 2 * SVG_HEIGHT);
+            triggerFakeTouchEvent("touchstart", target, 2 * SVG_WIDTH, 2 * SVG_HEIGHT);
             assert.isFalse(callbackCalled, "not called when moving outside of the Component (touch)");
-            triggerFakeTouchEvent("touchstart", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
-            triggerFakeTouchEvent("touchstart", c.content(), 2 * SVG_WIDTH, 2 * SVG_HEIGHT);
+            triggerFakeTouchEvent("touchstart", target, SVG_WIDTH / 2, SVG_HEIGHT / 2);
+            triggerFakeTouchEvent("touchstart", target, 2 * SVG_WIDTH, 2 * SVG_HEIGHT);
             assert.isTrue(callbackCalled, "callback called on exiting Component (touch)");
             assert.deepEqual(lastPoint, { x: 2 * SVG_WIDTH, y: 2 * SVG_HEIGHT }, "was passed correct point (touch)");
             callbackCalled = false;
-            triggerFakeTouchEvent("touchstart", c.content(), 3 * SVG_WIDTH, 3 * SVG_HEIGHT);
+            triggerFakeTouchEvent("touchstart", target, 3 * SVG_WIDTH, 3 * SVG_HEIGHT);
             assert.isFalse(callbackCalled, "callback not called again if already outside of Component (touch)");
             pointerInteraction.onPointerExit(null);
-            triggerFakeMouseEvent("mousemove", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
-            triggerFakeMouseEvent("mousemove", c.content(), 2 * SVG_WIDTH, 2 * SVG_HEIGHT);
+            triggerFakeMouseEvent("mousemove", target, SVG_WIDTH / 2, SVG_HEIGHT / 2);
+            triggerFakeMouseEvent("mousemove", target, 2 * SVG_WIDTH, 2 * SVG_HEIGHT);
             assert.isFalse(callbackCalled, "callback removed by passing null");
-            svg.remove();
-        });
-    });
-});
-
-///<reference path="../testReference.ts" />
-var assert = chai.assert;
-describe("DragBoxInteractions", function () {
-    var svgWidth = 400;
-    var svgHeight = 400;
-    var svg;
-    var dataset;
-    var xScale;
-    var yScale;
-    var plot;
-    var interaction;
-    var dragstartX = 20;
-    var dragstartY = svgHeight - 100;
-    var dragendX = 100;
-    var dragendY = svgHeight - 20;
-    var draghalfwidth = Math.round((dragendX - dragstartX) / 2);
-    var draghalfheight = Math.round((dragendY - dragstartY) / 2);
-    var dragwidth = dragendX - dragstartX;
-    var dragheight = dragendY - dragstartY;
-    var dragmidX = dragstartX + draghalfwidth;
-    var dragmidY = dragstartY + draghalfheight;
-    function testResize(resizeXStart, resizeYStart, expectedSelection) {
-        var timesCalled = 0;
-        fakeDragSequence(interaction, dragstartX, dragstartY, dragendX, dragendY); // initial dragbox to resize from
-        interaction.dragend(function (start, end) {
-            timesCalled++;
-            var interactionSelection = {
-                xMin: +interaction.dragBox.attr("x"),
-                yMin: +interaction.dragBox.attr("y"),
-                xMax: +interaction.dragBox.attr("x") + (+interaction.dragBox.attr("width")),
-                yMax: +interaction.dragBox.attr("y") + (+interaction.dragBox.attr("height"))
-            };
-            assert.deepEqual(interactionSelection, expectedSelection, "selection updated correctly");
-        });
-        // fake another drag event to resize the box.
-        interaction.resizeEnabled(true);
-        fakeDragSequence(interaction, resizeXStart, resizeYStart, dragmidX, dragmidY);
-        assert.equal(timesCalled, 1, "drag callback not called once");
-    }
-    describe("XYDragBoxInteraction", function () {
-        before(function () {
-            svg = generateSVG(svgWidth, svgHeight);
-            dataset = new Plottable.Dataset(makeLinearSeries(10));
-            xScale = new Plottable.Scale.Linear();
-            yScale = new Plottable.Scale.Linear();
-            plot = new Plottable.Plot.Scatter(xScale, yScale);
-            plot.addDataset(dataset);
-            plot.project("x", "x", xScale);
-            plot.project("y", "y", yScale);
-            plot.renderTo(svg);
-            interaction = new Plottable.Interaction.DragBox();
-            plot.registerInteraction(interaction);
-        });
-        afterEach(function () {
-            interaction.dragstart(null);
-            interaction.drag(null);
-            interaction.dragend(null);
-            interaction.clearBox();
-        });
-        it("All callbacks are notified with appropriate data on drag", function () {
-            var dragStartCalled = 0, dragEndCalled = 0;
-            interaction.dragstart(function (a) {
-                dragStartCalled++;
-                var expectedStartLocation = { x: dragstartX, y: dragstartY };
-                assert.deepEqual(a, expectedStartLocation, "areaCallback called with null arg on dragstart");
-            });
-            interaction.dragend(function (a, b) {
-                dragEndCalled++;
-                var expectedStart = {
-                    x: dragstartX,
-                    y: dragstartY
-                };
-                var expectedEnd = {
-                    x: dragendX,
-                    y: dragendY
-                };
-                assert.deepEqual(a, expectedStart, "areaCallback was passed the correct starting point");
-                assert.deepEqual(b, expectedEnd, "areaCallback was passed the correct ending point");
-            });
-            // fake a drag event
-            fakeDragSequence(interaction, dragstartX, dragstartY, dragendX, dragendY);
-            assert.equal(dragStartCalled, 1, "dragstart callback is called once");
-            assert.equal(dragEndCalled, 1, "dragend callback is called once");
-        });
-        it("Highlights and un-highlights areas appropriately", function () {
-            fakeDragSequence(interaction, dragstartX, dragstartY, dragendX, dragendY);
-            var dragBoxClass = "." + Plottable.Interaction.XYDragBox._CLASS_DRAG_BOX;
-            var dragBox = plot.background().select(dragBoxClass);
-            assert.isNotNull(dragBox, "the dragbox was created");
-            var actualStartPosition = { x: parseFloat(dragBox.attr("x")), y: parseFloat(dragBox.attr("y")) };
-            var expectedStartPosition = { x: Math.min(dragstartX, dragendX), y: Math.min(dragstartY, dragendY) };
-            assert.deepEqual(actualStartPosition, expectedStartPosition, "highlighted box is positioned correctly");
-            assert.equal(parseFloat(dragBox.attr("width")), Math.abs(dragstartX - dragendX), "highlighted box has correct width");
-            assert.equal(parseFloat(dragBox.attr("height")), Math.abs(dragstartY - dragendY), "highlighted box has correct height");
-            interaction.clearBox();
-            var boxGone = dragBox.attr("width") === "0" && dragBox.attr("height") === "0";
-            assert.isTrue(boxGone, "highlighted box disappears when clearBox is called");
-        });
-        describe("resize enabled", function () {
-            it("from the top left", function () {
-                testResize(dragstartX, dragendY, {
-                    xMin: dragmidX,
-                    yMin: dragstartY,
-                    xMax: dragendX,
-                    yMax: dragmidY
-                });
-            });
-            it("from the top", function () {
-                testResize(dragmidX, dragendY, {
-                    xMin: dragstartX,
-                    yMin: dragstartY,
-                    xMax: dragendX,
-                    yMax: dragmidY
-                });
-            });
-            it("from the top right", function () {
-                testResize(dragendX, dragendY, {
-                    xMin: dragstartX,
-                    yMin: dragstartY,
-                    xMax: dragmidX,
-                    yMax: dragmidY
-                });
-            });
-            it("from the right", function () {
-                testResize(dragendX, dragmidY, {
-                    xMin: dragstartX,
-                    yMin: dragstartY,
-                    xMax: dragmidX,
-                    yMax: dragendY
-                });
-            });
-            it("from the bottom right", function () {
-                testResize(dragendX, dragstartY, {
-                    xMin: dragstartX,
-                    yMin: dragmidY,
-                    xMax: dragmidX,
-                    yMax: dragendY
-                });
-            });
-            it("from the bottom", function () {
-                testResize(dragmidX, dragstartY, {
-                    xMin: dragstartX,
-                    yMin: dragmidY,
-                    xMax: dragendX,
-                    yMax: dragendY
-                });
-            });
-            it("from the bottom left", function () {
-                testResize(dragstartX, dragstartY, {
-                    xMin: dragmidX,
-                    yMin: dragmidY,
-                    xMax: dragendX,
-                    yMax: dragendY
-                });
-            });
-            it("from the left", function () {
-                testResize(dragstartX, dragmidY, {
-                    xMin: dragmidX,
-                    yMin: dragstartY,
-                    xMax: dragendX,
-                    yMax: dragendY
-                });
-            });
-        });
-        after(function () {
-            svg.remove();
-        });
-    });
-    describe("YDragBoxInteraction", function () {
-        before(function () {
-            svg = generateSVG(svgWidth, svgHeight);
-            dataset = new Plottable.Dataset(makeLinearSeries(10));
-            xScale = new Plottable.Scale.Linear();
-            yScale = new Plottable.Scale.Linear();
-            plot = new Plottable.Plot.Scatter(xScale, yScale);
-            plot.addDataset(dataset);
-            plot.project("x", "x", xScale);
-            plot.project("y", "y", yScale);
-            plot.renderTo(svg);
-            interaction = new Plottable.Interaction.YDragBox();
-            plot.registerInteraction(interaction);
-        });
-        afterEach(function () {
-            interaction.dragstart(null);
-            interaction.drag(null);
-            interaction.dragend(null);
-            interaction.clearBox();
-        });
-        it("All callbacks are notified with appropriate data when a drag finishes", function () {
-            var dragStartCalled = 0, dragEndCalled = 0;
-            interaction.dragstart(function (a) {
-                dragStartCalled++;
-                var expectedY = dragstartY;
-                assert.deepEqual(a.y, expectedY, "areaCallback called with null arg on dragstart");
-            });
-            interaction.dragend(function (a, b) {
-                dragEndCalled++;
-                var expectedStartY = dragstartY;
-                var expectedEndY = dragendY;
-                assert.deepEqual(a.y, expectedStartY);
-                assert.deepEqual(b.y, expectedEndY);
-            });
-            // fake a drag event
-            fakeDragSequence(interaction, dragstartX, dragstartY, dragendX, dragendY);
-            assert.equal(dragStartCalled, 1, "dragstart callback is called once");
-            assert.equal(dragEndCalled, 1, "dragend callback is called once");
-        });
-        it("Highlights and un-highlights areas appropriately", function () {
-            fakeDragSequence(interaction, dragstartX, dragstartY, dragendX, dragendY);
-            var dragBoxClass = "." + Plottable.Interaction.XYDragBox._CLASS_DRAG_BOX;
-            var dragBox = plot.background().select(dragBoxClass);
-            assert.isNotNull(dragBox, "the dragbox was created");
-            var actualStartPosition = { x: parseFloat(dragBox.attr("x")), y: parseFloat(dragBox.attr("y")) };
-            var expectedStartPosition = { x: 0, y: Math.min(dragstartY, dragendY) };
-            assert.deepEqual(actualStartPosition, expectedStartPosition, "highlighted box is positioned correctly");
-            assert.equal(parseFloat(dragBox.attr("width")), svgWidth, "highlighted box has correct width");
-            assert.equal(parseFloat(dragBox.attr("height")), Math.abs(dragstartY - dragendY), "highlighted box has correct height");
-            interaction.clearBox();
-            var boxGone = dragBox.attr("width") === "0" && dragBox.attr("height") === "0";
-            assert.isTrue(boxGone, "highlighted box disappears when clearBox is called");
-        });
-        describe("resize enabled", function () {
-            it("from the top left", function () {
-                testResize(dragstartX, dragendY, {
-                    xMin: 0,
-                    yMin: dragstartY,
-                    xMax: svgWidth,
-                    yMax: dragmidY
-                });
-            });
-            it("from the top", function () {
-                testResize(dragmidX, dragendY, {
-                    xMin: 0,
-                    yMin: dragstartY,
-                    xMax: svgWidth,
-                    yMax: dragmidY
-                });
-            });
-            it("from the top right", function () {
-                testResize(dragendX, dragendY, {
-                    xMin: 0,
-                    yMin: dragstartY,
-                    xMax: svgWidth,
-                    yMax: dragmidY
-                });
-            });
-            it("from the bottom right", function () {
-                testResize(dragendX, dragstartY, {
-                    xMin: 0,
-                    yMin: dragmidY,
-                    xMax: svgWidth,
-                    yMax: dragendY
-                });
-            });
-            it("from the bottom", function () {
-                testResize(dragmidX, dragstartY, {
-                    xMin: 0,
-                    yMin: dragmidY,
-                    xMax: svgWidth,
-                    yMax: dragendY
-                });
-            });
-            it("from the bottom left", function () {
-                testResize(dragstartX, dragstartY, {
-                    xMin: 0,
-                    yMin: dragmidY,
-                    xMax: svgWidth,
-                    yMax: dragendY
-                });
-            });
-        });
-        after(function () {
             svg.remove();
         });
     });
@@ -8351,7 +8561,7 @@ describe("Interactions", function () {
                 outData = hd;
             });
             testTarget.registerInteraction(hoverInteraction);
-            target = testTarget.content();
+            target = testTarget.background();
         });
         it("correctly triggers onHoverOver() callbacks (mouse events)", function () {
             overCallbackCalled = false;
@@ -8521,6 +8731,222 @@ describe("Interactions", function () {
             triggerFakeTouchEvent("touchmove", c.content(), SVG_WIDTH * 2, SVG_HEIGHT * 2);
             triggerFakeTouchEvent("touchend", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
             assert.isTrue(callbackCalled, "callback called even if moved outside component (touch)");
+            svg.remove();
+        });
+    });
+});
+
+///<reference path="../testReference.ts" />
+var assert = chai.assert;
+describe("Interactions", function () {
+    describe("Drag", function () {
+        var SVG_WIDTH = 400;
+        var SVG_HEIGHT = 400;
+        var startPoint = {
+            x: SVG_WIDTH / 4,
+            y: SVG_HEIGHT / 4
+        };
+        var endPoint = {
+            x: SVG_WIDTH / 2,
+            y: SVG_HEIGHT / 2
+        };
+        var outsidePointPos = {
+            x: SVG_WIDTH * 1.5,
+            y: SVG_HEIGHT * 1.5
+        };
+        var constrainedPos = {
+            x: SVG_WIDTH,
+            y: SVG_HEIGHT
+        };
+        var outsidePointNeg = {
+            x: -SVG_WIDTH / 2,
+            y: -SVG_HEIGHT / 2
+        };
+        var constrainedNeg = {
+            x: 0,
+            y: 0
+        };
+        it("onDragStart()", function () {
+            var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var c = new Plottable.Component.AbstractComponent();
+            c.renderTo(svg);
+            var drag = new Plottable.Interaction.Drag();
+            var startCallbackCalled = false;
+            var receivedStart;
+            var startCallback = function (p) {
+                startCallbackCalled = true;
+                receivedStart = p;
+            };
+            drag.onDragStart(startCallback);
+            c.registerInteraction(drag);
+            var target = c.background();
+            triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
+            assert.isTrue(startCallbackCalled, "callback was called on beginning drag (mousedown)");
+            assert.deepEqual(receivedStart, startPoint, "was passed the correct point");
+            startCallbackCalled = false;
+            receivedStart = null;
+            triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y, 2);
+            assert.isFalse(startCallbackCalled, "callback is not called on right-click");
+            startCallbackCalled = false;
+            receivedStart = null;
+            triggerFakeTouchEvent("touchstart", target, startPoint.x, startPoint.y);
+            assert.isTrue(startCallbackCalled, "callback was called on beginning drag (touchstart)");
+            assert.deepEqual(receivedStart, startPoint, "was passed the correct point");
+            startCallbackCalled = false;
+            triggerFakeMouseEvent("mousedown", target, outsidePointPos.x, outsidePointPos.y);
+            assert.isFalse(startCallbackCalled, "does not trigger callback if drag starts outside the Component (positive) (mousedown)");
+            triggerFakeMouseEvent("mousedown", target, outsidePointNeg.x, outsidePointNeg.y);
+            assert.isFalse(startCallbackCalled, "does not trigger callback if drag starts outside the Component (negative) (mousedown)");
+            triggerFakeTouchEvent("touchstart", target, outsidePointPos.x, outsidePointPos.y);
+            assert.isFalse(startCallbackCalled, "does not trigger callback if drag starts outside the Component (positive) (touchstart)");
+            triggerFakeTouchEvent("touchstart", target, outsidePointNeg.x, outsidePointNeg.y);
+            assert.isFalse(startCallbackCalled, "does not trigger callback if drag starts outside the Component (negative) (touchstart)");
+            assert.strictEqual(drag.onDragStart(), startCallback, "retrieves the callback if called with no arguments");
+            drag.onDragStart(null);
+            assert.isNull(drag.onDragStart(), "removes the callback if called with null");
+            svg.remove();
+        });
+        it("onDrag()", function () {
+            var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var c = new Plottable.Component.AbstractComponent();
+            c.renderTo(svg);
+            var drag = new Plottable.Interaction.Drag();
+            var moveCallbackCalled = false;
+            var receivedStart;
+            var receivedEnd;
+            var moveCallback = function (start, end) {
+                moveCallbackCalled = true;
+                receivedStart = start;
+                receivedEnd = end;
+            };
+            drag.onDrag(moveCallback);
+            c.registerInteraction(drag);
+            var target = c.background();
+            triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
+            triggerFakeMouseEvent("mousemove", target, endPoint.x, endPoint.y);
+            assert.isTrue(moveCallbackCalled, "callback was called on dragging (mousemove)");
+            assert.deepEqual(receivedStart, startPoint, "was passed the correct starting point");
+            assert.deepEqual(receivedEnd, endPoint, "was passed the correct current point");
+            receivedStart = null;
+            receivedEnd = null;
+            triggerFakeTouchEvent("touchstart", target, startPoint.x, startPoint.y);
+            triggerFakeTouchEvent("touchmove", target, endPoint.x, endPoint.y);
+            assert.isTrue(moveCallbackCalled, "callback was called on dragging (touchmove)");
+            assert.deepEqual(receivedStart, startPoint, "was passed the correct starting point");
+            assert.deepEqual(receivedEnd, endPoint, "was passed the correct current point");
+            assert.strictEqual(drag.onDrag(), moveCallback, "retrieves the callback if called with no arguments");
+            drag.onDrag(null);
+            assert.isNull(drag.onDrag(), "removes the callback if called with null");
+            svg.remove();
+        });
+        it("onDragEnd()", function () {
+            var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var c = new Plottable.Component.AbstractComponent();
+            c.renderTo(svg);
+            var drag = new Plottable.Interaction.Drag();
+            var endCallbackCalled = false;
+            var receivedStart;
+            var receivedEnd;
+            var endCallback = function (start, end) {
+                endCallbackCalled = true;
+                receivedStart = start;
+                receivedEnd = end;
+            };
+            drag.onDragEnd(endCallback);
+            c.registerInteraction(drag);
+            var target = c.background();
+            triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
+            triggerFakeMouseEvent("mouseup", target, endPoint.x, endPoint.y);
+            assert.isTrue(endCallbackCalled, "callback was called on drag ending (mouseup)");
+            assert.deepEqual(receivedStart, startPoint, "was passed the correct starting point");
+            assert.deepEqual(receivedEnd, endPoint, "was passed the correct current point");
+            receivedStart = null;
+            receivedEnd = null;
+            triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
+            triggerFakeMouseEvent("mouseup", target, endPoint.x, endPoint.y, 2);
+            assert.isTrue(endCallbackCalled, "callback was not called on mouseup from the right-click button");
+            triggerFakeMouseEvent("mouseup", target, endPoint.x, endPoint.y); // end the drag
+            receivedStart = null;
+            receivedEnd = null;
+            triggerFakeTouchEvent("touchstart", target, startPoint.x, startPoint.y);
+            triggerFakeTouchEvent("touchend", target, endPoint.x, endPoint.y);
+            assert.isTrue(endCallbackCalled, "callback was called on drag ending (touchend)");
+            assert.deepEqual(receivedStart, startPoint, "was passed the correct starting point");
+            assert.deepEqual(receivedEnd, endPoint, "was passed the correct current point");
+            assert.strictEqual(drag.onDragEnd(), endCallback, "retrieves the callback if called with no arguments");
+            drag.onDragEnd(null);
+            assert.isNull(drag.onDragEnd(), "removes the callback if called with null");
+            svg.remove();
+        });
+        it("constrain()", function () {
+            var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var c = new Plottable.Component.AbstractComponent();
+            c.renderTo(svg);
+            var drag = new Plottable.Interaction.Drag();
+            assert.isTrue(drag.constrain(), "constrains by default");
+            var receivedStart;
+            var receivedEnd;
+            var moveCallback = function (start, end) {
+                receivedStart = start;
+                receivedEnd = end;
+            };
+            drag.onDrag(moveCallback);
+            var endCallback = function (start, end) {
+                receivedStart = start;
+                receivedEnd = end;
+            };
+            drag.onDragEnd(endCallback);
+            c.registerInteraction(drag);
+            var target = c.content();
+            triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
+            triggerFakeMouseEvent("mousemove", target, outsidePointPos.x, outsidePointPos.y);
+            assert.deepEqual(receivedEnd, constrainedPos, "dragging outside the Component is constrained (positive) (mousemove)");
+            triggerFakeMouseEvent("mousemove", target, outsidePointNeg.x, outsidePointNeg.y);
+            assert.deepEqual(receivedEnd, constrainedNeg, "dragging outside the Component is constrained (negative) (mousemove)");
+            receivedEnd = null;
+            triggerFakeTouchEvent("touchmove", target, outsidePointPos.x, outsidePointPos.y);
+            assert.deepEqual(receivedEnd, constrainedPos, "dragging outside the Component is constrained (positive) (touchmove)");
+            triggerFakeTouchEvent("touchmove", target, outsidePointNeg.x, outsidePointNeg.y);
+            assert.deepEqual(receivedEnd, constrainedNeg, "dragging outside the Component is constrained (negative) (touchmove)");
+            receivedEnd = null;
+            triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
+            triggerFakeMouseEvent("mouseup", target, outsidePointPos.x, outsidePointPos.y);
+            assert.deepEqual(receivedEnd, constrainedPos, "dragging outside the Component is constrained (positive) (mouseup)");
+            triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
+            triggerFakeMouseEvent("mouseup", target, outsidePointNeg.x, outsidePointNeg.y);
+            assert.deepEqual(receivedEnd, constrainedNeg, "dragging outside the Component is constrained (negative) (mouseup)");
+            receivedEnd = null;
+            triggerFakeTouchEvent("touchstart", target, startPoint.x, startPoint.y);
+            triggerFakeTouchEvent("touchend", target, outsidePointPos.x, outsidePointPos.y);
+            assert.deepEqual(receivedEnd, constrainedPos, "dragging outside the Component is constrained (positive) (touchend)");
+            triggerFakeTouchEvent("touchstart", target, startPoint.x, startPoint.y);
+            triggerFakeTouchEvent("touchend", target, outsidePointNeg.x, outsidePointNeg.y);
+            assert.deepEqual(receivedEnd, constrainedNeg, "dragging outside the Component is constrained (negative) (touchend)");
+            drag.constrain(false);
+            triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
+            triggerFakeMouseEvent("mousemove", target, outsidePointPos.x, outsidePointPos.y);
+            assert.deepEqual(receivedEnd, outsidePointPos, "dragging outside the Component is no longer constrained (positive) (mousemove)");
+            triggerFakeMouseEvent("mousemove", target, outsidePointNeg.x, outsidePointNeg.y);
+            assert.deepEqual(receivedEnd, outsidePointNeg, "dragging outside the Component is no longer constrained (negative) (mousemove)");
+            receivedEnd = null;
+            triggerFakeTouchEvent("touchmove", target, outsidePointPos.x, outsidePointPos.y);
+            assert.deepEqual(receivedEnd, outsidePointPos, "dragging outside the Component is no longer constrained (positive) (touchmove)");
+            triggerFakeTouchEvent("touchmove", target, outsidePointNeg.x, outsidePointNeg.y);
+            assert.deepEqual(receivedEnd, outsidePointNeg, "dragging outside the Component is no longer constrained (negative) (touchmove)");
+            receivedEnd = null;
+            triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
+            triggerFakeMouseEvent("mouseup", target, outsidePointPos.x, outsidePointPos.y);
+            assert.deepEqual(receivedEnd, outsidePointPos, "dragging outside the Component is no longer constrained (positive) (mouseup)");
+            triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
+            triggerFakeMouseEvent("mouseup", target, outsidePointNeg.x, outsidePointNeg.y);
+            assert.deepEqual(receivedEnd, outsidePointNeg, "dragging outside the Component is no longer constrained (negative) (mouseup)");
+            receivedEnd = null;
+            triggerFakeTouchEvent("touchstart", target, startPoint.x, startPoint.y);
+            triggerFakeTouchEvent("touchend", target, outsidePointPos.x, outsidePointPos.y);
+            assert.deepEqual(receivedEnd, outsidePointPos, "dragging outside the Component is no longer constrained (positive) (touchend)");
+            triggerFakeTouchEvent("touchstart", target, startPoint.x, startPoint.y);
+            triggerFakeTouchEvent("touchend", target, outsidePointNeg.x, outsidePointNeg.y);
+            assert.deepEqual(receivedEnd, outsidePointNeg, "dragging outside the Component is no longer constrained (negative) (touchend)");
             svg.remove();
         });
     });
@@ -8937,6 +9363,457 @@ describe("Dispatchers", function () {
             $("body").simulate("keydown", { keyCode: keyCodeToSend });
             assert.isTrue(keyDowned, "callback when a key was pressed");
             ked.onKeyDown(keyString, null); // clean up
+        });
+    });
+});
+
+///<reference path="../../testReference.ts" />
+var assert = chai.assert;
+describe("Interactive Components", function () {
+    describe("DragBoxLayer", function () {
+        var SVG_WIDTH = 400;
+        var SVG_HEIGHT = 400;
+        it("correctly draws box on drag", function () {
+            var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var dbl = new Plottable.Component.Interactive.DragBoxLayer();
+            dbl.renderTo(svg);
+            assert.isFalse(dbl.boxVisible(), "box is hidden initially");
+            var startPoint = {
+                x: SVG_WIDTH / 4,
+                y: SVG_HEIGHT / 4
+            };
+            var endPoint = {
+                x: SVG_WIDTH / 2,
+                y: SVG_HEIGHT / 2
+            };
+            var target = dbl.background();
+            triggerFakeDragSequence(target, startPoint, endPoint);
+            assert.isTrue(dbl.boxVisible(), "box is drawn on drag");
+            var bounds = dbl.bounds();
+            assert.deepEqual(bounds.topLeft, startPoint, "top-left point was set correctly");
+            assert.deepEqual(bounds.bottomRight, endPoint, "bottom-right point was set correctly");
+            svg.remove();
+        });
+        it("dismisses on click", function () {
+            var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var dbl = new Plottable.Component.Interactive.DragBoxLayer();
+            dbl.renderTo(svg);
+            var targetPoint = {
+                x: SVG_WIDTH / 2,
+                y: SVG_HEIGHT / 2
+            };
+            var target = dbl.background();
+            triggerFakeDragSequence(target, targetPoint, targetPoint);
+            assert.isFalse(dbl.boxVisible(), "box is hidden on click");
+            svg.remove();
+        });
+        it("clipPath enabled", function () {
+            var dbl = new Plottable.Component.Interactive.DragBoxLayer();
+            assert.isTrue(dbl.clipPathEnabled, "uses clipPath (to hide detection edges)");
+        });
+        it("detectionRadius()", function () {
+            var dbl = new Plottable.Component.Interactive.DragBoxLayer();
+            assert.doesNotThrow(function () { return dbl.detectionRadius(3); }, Error, "can set detection radius before anchoring");
+            var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            dbl.renderTo("svg");
+            var radius = 5;
+            dbl.detectionRadius(radius);
+            assert.strictEqual(dbl.detectionRadius(), radius, "can retrieve the detection radius");
+            var edges = dbl.content().selectAll("line");
+            edges.each(function () {
+                var edge = d3.select(this);
+                assert.strictEqual(edge.style("stroke-width"), 2 * radius, "edge width was set correctly");
+            });
+            var corners = dbl.content().selectAll("circle");
+            corners.each(function () {
+                var corner = d3.select(this);
+                assert.strictEqual(corner.attr("r"), radius, "corner radius was set correctly");
+            });
+            // HACKHACK: chai-assert.d.ts has the wrong signature
+            assert.throws(function () { return dbl.detectionRadius(-1); }, Error, "", "rejects negative values");
+            svg.remove();
+        });
+        it("onDragStart()", function () {
+            var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var dbl = new Plottable.Component.Interactive.DragBoxLayer();
+            dbl.renderTo(svg);
+            var startPoint = {
+                x: SVG_WIDTH / 4,
+                y: SVG_HEIGHT / 4
+            };
+            var endPoint = {
+                x: SVG_WIDTH / 2,
+                y: SVG_HEIGHT / 2
+            };
+            var receivedBounds;
+            var callback = function (b) {
+                receivedBounds = b;
+            };
+            dbl.onDragStart(callback);
+            var target = dbl.background();
+            triggerFakeDragSequence(target, startPoint, endPoint);
+            assert.deepEqual(receivedBounds.topLeft, startPoint, "top-left point was set correctly");
+            assert.deepEqual(receivedBounds.bottomRight, startPoint, "bottom-right point was set correctly");
+            assert.strictEqual(dbl.onDragStart(), callback, "can retrieve callback by calling with no args");
+            dbl.onDragStart(null);
+            assert.isNull(dbl.onDragStart(), "can blank callback by passing null");
+            svg.remove();
+        });
+        it("onDrag()", function () {
+            var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var dbl = new Plottable.Component.Interactive.DragBoxLayer();
+            dbl.renderTo(svg);
+            var startPoint = {
+                x: SVG_WIDTH / 4,
+                y: SVG_HEIGHT / 4
+            };
+            var endPoint = {
+                x: SVG_WIDTH / 2,
+                y: SVG_HEIGHT / 2
+            };
+            var receivedBounds;
+            var callback = function (b) {
+                receivedBounds = b;
+            };
+            dbl.onDrag(callback);
+            var target = dbl.background();
+            triggerFakeDragSequence(target, startPoint, endPoint);
+            assert.deepEqual(receivedBounds.topLeft, startPoint, "top-left point was set correctly");
+            assert.deepEqual(receivedBounds.bottomRight, endPoint, "bottom-right point was set correctly");
+            assert.strictEqual(dbl.onDrag(), callback, "can retrieve callback by calling with no args");
+            dbl.onDrag(null);
+            assert.isNull(dbl.onDrag(), "can blank callback by passing null");
+            svg.remove();
+        });
+        it("onDragEnd()", function () {
+            var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var dbl = new Plottable.Component.Interactive.DragBoxLayer();
+            dbl.renderTo(svg);
+            var startPoint = {
+                x: SVG_WIDTH / 4,
+                y: SVG_HEIGHT / 4
+            };
+            var endPoint = {
+                x: SVG_WIDTH / 2,
+                y: SVG_HEIGHT / 2
+            };
+            var receivedBounds;
+            var callback = function (b) {
+                receivedBounds = b;
+            };
+            dbl.onDragEnd(callback);
+            var target = dbl.background();
+            triggerFakeDragSequence(target, startPoint, endPoint);
+            assert.deepEqual(receivedBounds.topLeft, startPoint, "top-left point was set correctly");
+            assert.deepEqual(receivedBounds.bottomRight, endPoint, "bottom-right point was set correctly");
+            assert.strictEqual(dbl.onDragEnd(), callback, "can retrieve callback by calling with no args");
+            dbl.onDragEnd(null);
+            assert.isNull(dbl.onDragEnd(), "can blank callback by passing null");
+            svg.remove();
+        });
+        describe("resizing", function () {
+            var svg;
+            var dbl;
+            var target;
+            var midPoint = {
+                x: SVG_WIDTH / 2,
+                y: SVG_HEIGHT / 2
+            };
+            var initialBounds;
+            function resetBox() {
+                dbl.bounds({
+                    topLeft: { x: 0, y: 0 },
+                    bottomRight: { x: 0, y: 0 }
+                });
+                triggerFakeDragSequence(target, { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 }, { x: SVG_WIDTH * 3 / 4, y: SVG_HEIGHT * 3 / 4 });
+                initialBounds = dbl.bounds();
+            }
+            beforeEach(function () {
+                svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+                dbl = new Plottable.Component.Interactive.DragBoxLayer();
+                dbl.renderTo(svg);
+                target = dbl.background();
+                resetBox();
+            });
+            it("resizable() defaults to false", function () {
+                assert.isFalse(dbl.resizable(), "defaults to false");
+                svg.remove();
+            });
+            it("resize from top edge", function () {
+                dbl.resizable(true);
+                triggerFakeDragSequence(target, { x: midPoint.x, y: initialBounds.topLeft.y }, { x: midPoint.x, y: 0 });
+                var bounds = dbl.bounds();
+                assert.strictEqual(bounds.topLeft.y, 0, "top edge was repositioned");
+                assert.strictEqual(bounds.bottomRight.y, initialBounds.bottomRight.y, "bottom edge was not moved");
+                assert.strictEqual(bounds.topLeft.x, initialBounds.topLeft.x, "left edge was not moved");
+                assert.strictEqual(bounds.bottomRight.x, initialBounds.bottomRight.x, "right edge was not moved");
+                resetBox();
+                triggerFakeDragSequence(target, { x: midPoint.x, y: initialBounds.topLeft.y }, { x: midPoint.x, y: SVG_HEIGHT });
+                bounds = dbl.bounds();
+                assert.strictEqual(bounds.bottomRight.y, SVG_HEIGHT, "can drag through to other side");
+                svg.remove();
+            });
+            it("resize from bottom edge", function () {
+                dbl.resizable(true);
+                triggerFakeDragSequence(target, { x: midPoint.x, y: initialBounds.bottomRight.y }, { x: midPoint.x, y: SVG_HEIGHT });
+                var bounds = dbl.bounds();
+                assert.strictEqual(bounds.topLeft.y, initialBounds.topLeft.y, "top edge was not moved");
+                assert.strictEqual(bounds.bottomRight.y, SVG_HEIGHT, "bottom edge was repositioned");
+                assert.strictEqual(bounds.topLeft.x, initialBounds.topLeft.x, "left edge was not moved");
+                assert.strictEqual(bounds.bottomRight.x, initialBounds.bottomRight.x, "right edge was not moved");
+                resetBox();
+                triggerFakeDragSequence(target, { x: midPoint.x, y: initialBounds.bottomRight.y }, { x: midPoint.x, y: 0 });
+                bounds = dbl.bounds();
+                assert.strictEqual(bounds.topLeft.y, 0, "can drag through to other side");
+                svg.remove();
+            });
+            it("resize from left edge", function () {
+                dbl.resizable(true);
+                triggerFakeDragSequence(target, { x: initialBounds.topLeft.x, y: midPoint.y }, { x: 0, y: midPoint.y });
+                var bounds = dbl.bounds();
+                assert.strictEqual(bounds.topLeft.y, initialBounds.topLeft.y, "top edge was not moved");
+                assert.strictEqual(bounds.bottomRight.y, initialBounds.bottomRight.y, "bottom edge was not moved");
+                assert.strictEqual(bounds.topLeft.x, 0, "left edge was repositioned");
+                assert.strictEqual(bounds.bottomRight.x, initialBounds.bottomRight.x, "right edge was not moved");
+                resetBox();
+                triggerFakeDragSequence(target, { x: initialBounds.topLeft.x, y: midPoint.y }, { x: SVG_WIDTH, y: midPoint.y });
+                bounds = dbl.bounds();
+                assert.strictEqual(bounds.bottomRight.x, SVG_WIDTH, "can drag through to other side");
+                svg.remove();
+            });
+            it("resize from right edge", function () {
+                dbl.resizable(true);
+                triggerFakeDragSequence(target, { x: initialBounds.bottomRight.x, y: midPoint.y }, { x: SVG_WIDTH, y: midPoint.y });
+                var bounds = dbl.bounds();
+                assert.strictEqual(bounds.topLeft.y, initialBounds.topLeft.y, "top edge was not moved");
+                assert.strictEqual(bounds.bottomRight.y, initialBounds.bottomRight.y, "bottom edge was not moved");
+                assert.strictEqual(bounds.topLeft.x, initialBounds.topLeft.x, "left edge was not moved");
+                assert.strictEqual(bounds.bottomRight.x, SVG_WIDTH, "right edge was repositioned");
+                resetBox();
+                triggerFakeDragSequence(target, { x: initialBounds.bottomRight.x, y: midPoint.y }, { x: 0, y: midPoint.y });
+                bounds = dbl.bounds();
+                assert.strictEqual(bounds.topLeft.x, 0, "can drag through to other side");
+                svg.remove();
+            });
+            it("resizes if grabbed within detectionRadius()", function () {
+                dbl.resizable(true);
+                var detectionRadius = dbl.detectionRadius();
+                triggerFakeDragSequence(target, { x: midPoint.x, y: initialBounds.bottomRight.y + detectionRadius - 1 }, { x: midPoint.x, y: SVG_HEIGHT });
+                var bounds = dbl.bounds();
+                assert.strictEqual(bounds.topLeft.y, initialBounds.topLeft.y, "top edge was not moved");
+                assert.strictEqual(bounds.bottomRight.y, SVG_HEIGHT, "bottom edge was repositioned");
+                assert.strictEqual(bounds.topLeft.x, initialBounds.topLeft.x, "left edge was not moved");
+                assert.strictEqual(bounds.bottomRight.x, initialBounds.bottomRight.x, "right edge was not moved");
+                resetBox();
+                var startYOutside = initialBounds.bottomRight.y + detectionRadius + 1;
+                triggerFakeDragSequence(target, { x: midPoint.x, y: startYOutside }, { x: midPoint.x, y: SVG_HEIGHT });
+                bounds = dbl.bounds();
+                assert.strictEqual(bounds.topLeft.y, startYOutside, "new box was started at the drag start position");
+                svg.remove();
+            });
+            it("doesn't dismiss on no-op resize", function () {
+                dbl.resizable(true);
+                triggerFakeDragSequence(target, { x: midPoint.x, y: initialBounds.topLeft.y }, { x: midPoint.x, y: initialBounds.topLeft.y });
+                var bounds = dbl.bounds();
+                assert.isTrue(dbl.boxVisible(), "box was not dismissed");
+                svg.remove();
+            });
+            it("can't resize if hidden", function () {
+                dbl.resizable(true);
+                dbl.boxVisible(false);
+                triggerFakeDragSequence(target, { x: midPoint.x, y: initialBounds.bottomRight.y }, { x: midPoint.x, y: SVG_HEIGHT });
+                var bounds = dbl.bounds();
+                assert.strictEqual(bounds.topLeft.y, initialBounds.bottomRight.y, "new box was started at the drag start position");
+                svg.remove();
+            });
+        });
+    });
+});
+
+///<reference path="../../testReference.ts" />
+var assert = chai.assert;
+describe("Interactive Components", function () {
+    describe("XDragBoxLayer", function () {
+        var SVG_WIDTH = 400;
+        var SVG_HEIGHT = 400;
+        it("bounds()", function () {
+            var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var dbl = new Plottable.Component.Interactive.XDragBoxLayer();
+            dbl.boxVisible(true);
+            dbl.renderTo(svg);
+            var topLeft = {
+                x: SVG_WIDTH / 4,
+                y: SVG_HEIGHT / 4
+            };
+            var bottomRight = {
+                x: SVG_WIDTH / 2,
+                y: SVG_HEIGHT / 2
+            };
+            dbl.bounds({
+                topLeft: topLeft,
+                bottomRight: bottomRight
+            });
+            var actualBounds = dbl.bounds();
+            assert.strictEqual(actualBounds.topLeft.y, 0, "box starts at top");
+            assert.strictEqual(actualBounds.topLeft.x, topLeft.x, "left edge set correctly");
+            assert.strictEqual(actualBounds.bottomRight.y, dbl.height(), "box ends at bottom");
+            assert.strictEqual(actualBounds.bottomRight.x, bottomRight.x, "right edge set correctly");
+            svg.remove();
+        });
+        it("resizes only in x", function () {
+            var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var dbl = new Plottable.Component.Interactive.XDragBoxLayer();
+            dbl.boxVisible(true);
+            dbl.resizable(true);
+            dbl.renderTo(svg);
+            var topLeft = {
+                x: SVG_WIDTH / 4,
+                y: SVG_HEIGHT / 4
+            };
+            var bottomRight = {
+                x: SVG_WIDTH / 2,
+                y: SVG_HEIGHT / 2
+            };
+            dbl.bounds({
+                topLeft: topLeft,
+                bottomRight: bottomRight
+            });
+            var actualBounds = dbl.bounds();
+            var dragTo = {
+                x: SVG_WIDTH * 3 / 4,
+                y: SVG_HEIGHT / 2
+            };
+            var target = dbl.background();
+            triggerFakeDragSequence(target, actualBounds.bottomRight, dragTo);
+            actualBounds = dbl.bounds();
+            assert.strictEqual(actualBounds.bottomRight.x, dragTo.x, "resized in x");
+            assert.strictEqual(actualBounds.topLeft.y, 0, "box still starts at top");
+            assert.strictEqual(actualBounds.bottomRight.y, dbl.height(), "box still ends at bottom");
+            svg.remove();
+        });
+        it("stays full height after resizing", function () {
+            var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var dbl = new Plottable.Component.Interactive.XDragBoxLayer();
+            dbl.boxVisible(true);
+            dbl.resizable(true);
+            dbl.renderTo(svg);
+            var topLeft = {
+                x: SVG_WIDTH / 4,
+                y: SVG_HEIGHT / 4
+            };
+            var bottomRight = {
+                x: SVG_WIDTH / 2,
+                y: SVG_HEIGHT / 2
+            };
+            dbl.bounds({
+                topLeft: topLeft,
+                bottomRight: bottomRight
+            });
+            var heightBefore = dbl.height();
+            var boundsBefore = dbl.bounds();
+            svg.attr("height", 2 * SVG_HEIGHT);
+            dbl.redraw();
+            assert.notStrictEqual(dbl.height(), heightBefore, "component changed size");
+            var boundsAfter = dbl.bounds();
+            assert.strictEqual(boundsAfter.topLeft.x, boundsBefore.topLeft.x, "box keeps same left edge");
+            assert.strictEqual(boundsAfter.topLeft.y, 0, "box still starts at top");
+            assert.strictEqual(boundsAfter.bottomRight.x, boundsBefore.bottomRight.x, "box keeps same right edge");
+            assert.strictEqual(boundsAfter.bottomRight.y, dbl.height(), "box still ends at bottom");
+            svg.remove();
+        });
+    });
+});
+
+///<reference path="../../testReference.ts" />
+var assert = chai.assert;
+describe("Interactive Components", function () {
+    describe("YDragBoxLayer", function () {
+        var SVG_WIDTH = 400;
+        var SVG_HEIGHT = 400;
+        it("bounds()", function () {
+            var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var dbl = new Plottable.Component.Interactive.YDragBoxLayer();
+            dbl.boxVisible(true);
+            dbl.renderTo(svg);
+            var topLeft = {
+                x: SVG_WIDTH / 4,
+                y: SVG_HEIGHT / 4
+            };
+            var bottomRight = {
+                x: SVG_WIDTH / 2,
+                y: SVG_HEIGHT / 2
+            };
+            dbl.bounds({
+                topLeft: topLeft,
+                bottomRight: bottomRight
+            });
+            var actualBounds = dbl.bounds();
+            assert.strictEqual(actualBounds.topLeft.x, 0, "box starts at left");
+            assert.strictEqual(actualBounds.topLeft.y, topLeft.y, "top edge set correctly");
+            assert.strictEqual(actualBounds.bottomRight.x, dbl.width(), "box ends at right");
+            assert.strictEqual(actualBounds.bottomRight.y, bottomRight.y, "bottom edge set correctly");
+            svg.remove();
+        });
+        it("resizes only in y", function () {
+            var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var dbl = new Plottable.Component.Interactive.YDragBoxLayer();
+            dbl.boxVisible(true);
+            dbl.resizable(true);
+            dbl.renderTo(svg);
+            var topLeft = {
+                x: SVG_WIDTH / 4,
+                y: SVG_HEIGHT / 4
+            };
+            var bottomRight = {
+                x: SVG_WIDTH / 2,
+                y: SVG_HEIGHT / 2
+            };
+            dbl.bounds({
+                topLeft: topLeft,
+                bottomRight: bottomRight
+            });
+            var actualBounds = dbl.bounds();
+            var dragTo = {
+                x: SVG_WIDTH / 2,
+                y: SVG_HEIGHT * 3 / 4
+            };
+            var target = dbl.background();
+            triggerFakeDragSequence(target, actualBounds.bottomRight, dragTo);
+            actualBounds = dbl.bounds();
+            assert.strictEqual(actualBounds.topLeft.x, 0, "box still starts at left");
+            assert.strictEqual(actualBounds.bottomRight.x, dbl.width(), "box still ends at right");
+            assert.strictEqual(actualBounds.bottomRight.y, dragTo.y, "resized in y");
+            svg.remove();
+        });
+        it("stays full width after resizing", function () {
+            var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var dbl = new Plottable.Component.Interactive.YDragBoxLayer();
+            dbl.boxVisible(true);
+            dbl.resizable(true);
+            dbl.renderTo(svg);
+            var topLeft = {
+                x: SVG_WIDTH / 4,
+                y: SVG_HEIGHT / 4
+            };
+            var bottomRight = {
+                x: SVG_WIDTH / 2,
+                y: SVG_HEIGHT / 2
+            };
+            dbl.bounds({
+                topLeft: topLeft,
+                bottomRight: bottomRight
+            });
+            var widthBefore = dbl.width();
+            var boundsBefore = dbl.bounds();
+            svg.attr("width", 2 * SVG_WIDTH);
+            dbl.redraw();
+            assert.notStrictEqual(dbl.width(), widthBefore, "component changed size");
+            var boundsAfter = dbl.bounds();
+            assert.strictEqual(boundsAfter.topLeft.x, 0, "box still starts at left");
+            assert.strictEqual(boundsAfter.topLeft.y, boundsBefore.topLeft.y, "box keeps same top edge");
+            assert.strictEqual(boundsAfter.bottomRight.x, dbl.width(), "box still ends at right");
+            assert.strictEqual(boundsAfter.bottomRight.y, boundsBefore.bottomRight.y, "box keeps same bottom edge");
+            svg.remove();
         });
     });
 });

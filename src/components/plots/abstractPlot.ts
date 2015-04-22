@@ -150,13 +150,13 @@ export module Plot {
      *
      * Here's a common use case:
      * ```typescript
-     * plot.attr("r", function(d) { return d.foo; });
+     * plot.attr("x", function(d) { return d.foo; }, xScale);
      * ```
-     * This will set the radius of each datum `d` to be `d.foo`.
+     * This will set the x accessor of each datum `d` to be `d.foo`,
+     * scaled in accordance with `xScale`
      *
      * @param {string} attrToSet The attribute to set across each data
-     * point. Popular examples include "x", "y", "r". Scales that inherit from
-     * Plot define their meaning.
+     * point. Popular examples include "x", "y".
      *
      * @param {Function|string|any} accessor Function to apply to each element
      * of the dataSource. If a Function, use `accessor(d, i)`. If a string,
@@ -507,8 +507,12 @@ export module Plot {
         if (plotDatasetKey == null) { return; }
         var drawer = plotDatasetKey.drawer;
         plotDatasetKey.dataset.data().forEach((datum: any, index: number) => {
+          var pixelPoint = drawer._getPixelPoint(datum, index);
+          if (pixelPoint.x !== pixelPoint.x || pixelPoint.y !== pixelPoint.y) {
+            return;
+          }
           data.push(datum);
-          pixelPoints.push(drawer._getPixelPoint(datum, index));
+          pixelPoints.push(pixelPoint);
           allElements.push(drawer._getSelection(index).node());
         });
       });
@@ -529,6 +533,13 @@ export module Plot {
       var closestIndex: number;
       var plotData = this.getAllPlotData();
       plotData.pixelPoints.forEach((pixelPoint: Point, index: number) => {
+        var datum = plotData.data[index];
+        var selection = d3.select(plotData.selection[0][index]);
+
+        if (!this._isVisibleOnPlot(datum, pixelPoint, selection)) {
+          return;
+        }
+
         var distance = _Util.Methods.distanceSquared(pixelPoint, queryPoint);
         if (distance < closestDistanceSquared) {
           closestDistanceSquared = distance;
@@ -544,6 +555,11 @@ export module Plot {
               pixelPoints: [plotData.pixelPoints[closestIndex]],
               plot: this,
               selection: d3.select(plotData.selection[0][closestIndex])};
+    }
+
+    protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean {
+      return !(pixelPoint.x < 0 || pixelPoint.y < 0 ||
+        pixelPoint.x > this.width() || pixelPoint.y > this.height());
     }
   }
 }

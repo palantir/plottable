@@ -6,6 +6,8 @@ export module Scale {
 
     private static HEX_SCALE_FACTOR = 20;
     private static LOOP_LIGHTEN_FACTOR = 1.6;
+    //The maximum number of colors we are getting from CSS stylesheets
+    private static MAXIMUM_COLORS_FROM_CSS = 256;
 
     /**
      * Constructs a ColorScale.
@@ -60,10 +62,16 @@ export module Scale {
 
     private static _getPlottableColors(): string[] {
       var plottableDefaultColors: string[] = [];
-      var colorTester = d3.select("body").append("div");
+      var colorTester = d3.select("body").append("plottable-color-tester");
+
+      var defaultColorHex: string = _Util.Methods.colorTest(colorTester, "");
       var i = 0;
       var colorHex: string;
-      while ((colorHex = _Util.Methods.colorTest(colorTester, "plottable-colors-" + i)) !== null) {
+      while ((colorHex = _Util.Methods.colorTest(colorTester, "plottable-colors-" + i)) !== null &&
+              i < this.MAXIMUM_COLORS_FROM_CSS) {
+        if (colorHex === defaultColorHex && colorHex === plottableDefaultColors[plottableDefaultColors.length - 1]) {
+          break;
+        }
         plottableDefaultColors.push(colorHex);
         i++;
       }
