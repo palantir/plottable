@@ -173,7 +173,7 @@ export module Plot {
 
     public _updateScaleExtents() {
       super._updateScaleExtents();
-      var primaryScale: Scale.AbstractScale<any,number> = this._isVertical ? this._yScale : this._xScale;
+      var primaryScale: Scale.AbstractScale<any, number> = this._isVertical ? this._yScale : this._xScale;
       if (!primaryScale) {
         return;
       }
@@ -184,7 +184,7 @@ export module Plot {
       }
     }
 
-    public _normalizeDatasets<A,B>(fromX: boolean): {a: A; b: B;}[] {
+    public _normalizeDatasets<A, B>(fromX: boolean): {a: A; b: B}[] {
       var aAccessor = this._projections[fromX ? "x" : "y"].accessor;
       var bAccessor = this._projections[fromX ? "y" : "x"].accessor;
       var aStackedAccessor = (d: any, i: number, u: any, m: StackedPlotMetadata) => {

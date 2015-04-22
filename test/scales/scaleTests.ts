@@ -211,10 +211,10 @@ describe("Scales", () => {
       var scale = new Plottable.Scale.Category();
       scale.range([0, 2679]);
 
-      scale.domain(["1","2","3","4"]);
+      scale.domain(["1", "2", "3", "4"]);
       assert.closeTo(scale.rangeBand(), 399, 1);
 
-      scale.domain(["1","2","3","4","5"]);
+      scale.domain(["1", "2", "3", "4", "5"]);
       assert.closeTo(scale.rangeBand(), 329, 1);
     });
 
@@ -222,7 +222,7 @@ describe("Scales", () => {
       var scale = new Plottable.Scale.Category();
       scale.range([0, 3000]);
 
-      scale.domain(["1","2","3","4"]);
+      scale.domain(["1", "2", "3", "4"]);
       var widthSum = scale.rangeBand() * (1 + scale.innerPadding());
       assert.strictEqual(scale.stepWidth(), widthSum, "step width is the sum of innerPadding width and band width");
     });

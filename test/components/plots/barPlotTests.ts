@@ -142,7 +142,7 @@ describe("Plots", () => {
 
         describe("pixelPoints", () => {
 
-          it("getAllPlotData() pixel points corrected for negative-valued bars",() => {
+          it("getAllPlotData() pixel points corrected for negative-valued bars", () => {
             var plotData = barPlot.getAllPlotData();
             plotData.data.forEach((datum, i) => {
               var barSelection = d3.select(plotData.selection[0][i]);
@@ -157,7 +157,7 @@ describe("Plots", () => {
           });
 
           describe("barAlignment", () => {
-            it("getAllPlotData() pixel points corrected for barAlignment left",() => {
+            it("getAllPlotData() pixel points corrected for barAlignment left", () => {
               barPlot.barAlignment("left");
               var plotData = barPlot.getAllPlotData();
               plotData.data.forEach((datum, i) => {
@@ -168,7 +168,7 @@ describe("Plots", () => {
               svg.remove();
             });
 
-            it("getAllPlotData() pixel points corrected for barAlignment right",() => {
+            it("getAllPlotData() pixel points corrected for barAlignment right", () => {
               barPlot.barAlignment("right");
               var plotData = barPlot.getAllPlotData();
               plotData.data.forEach((datum, i) => {
@@ -516,7 +516,7 @@ describe("Plots", () => {
 
         describe("pixelPoints", () => {
 
-          it("getAllPlotData() pixel points corrected for negative-valued bars",() => {
+          it("getAllPlotData() pixel points corrected for negative-valued bars", () => {
             var plotData = barPlot.getAllPlotData();
             plotData.data.forEach((datum, i) => {
               var barSelection = d3.select(plotData.selection[0][i]);
@@ -531,7 +531,7 @@ describe("Plots", () => {
           });
 
           describe("accounting for barAlignment", () => {
-            it("getAllPlotData() pixel points corrected for barAlignment left",() => {
+            it("getAllPlotData() pixel points corrected for barAlignment left", () => {
               barPlot.barAlignment("left");
               var plotData = barPlot.getAllPlotData();
               plotData.data.forEach((datum, i) => {
@@ -542,7 +542,7 @@ describe("Plots", () => {
               svg.remove();
             });
 
-            it("getAllPlotData() pixel points corrected for barAlignment right",() => {
+            it("getAllPlotData() pixel points corrected for barAlignment right", () => {
               barPlot.barAlignment("right");
               var plotData = barPlot.getAllPlotData();
               plotData.data.forEach((datum, i) => {

@@ -210,7 +210,7 @@ describe("Plots", () => {
       svg.remove();
     });
 
-    describe("getAllSelections()",() => {
+    describe("getAllSelections()", () => {
 
       it("retrieves all dataset selections with no args", () => {
         var dataset3 = [
@@ -256,7 +256,7 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("skips invalid keys",() => {
+      it("skips invalid keys", () => {
         var dataset3 = [
           { foo: 0, bar: 1 },
           { foo: 1, bar: 0.95 }

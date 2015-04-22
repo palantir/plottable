@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Plot {
-  export class StackedBar<X,Y> extends Bar<X, Y> {
+  export class StackedBar<X, Y> extends Bar<X, Y> {
 
     /**
      * Constructs a StackedBar plot.
@@ -13,7 +13,7 @@ export module Plot {
      * @param {Scale} yScale the y scale of the plot.
      * @param {boolean} isVertical if the plot if vertical.
      */
-    constructor(xScale?: Scale.AbstractScale<X,number>, yScale?: Scale.AbstractScale<Y,number>, isVertical = true) {
+    constructor(xScale?: Scale.AbstractScale<X, number>, yScale?: Scale.AbstractScale<Y, number>, isVertical = true) {
       super(xScale, yScale, isVertical);
     }
 
@@ -22,7 +22,7 @@ export module Plot {
         if (this.animator(key)) {
           return this.animator(key);
         } else if (key === "stacked-bar") {
-          var primaryScale: Scale.AbstractScale<any,number> = this._isVertical ? this._yScale : this._xScale;
+          var primaryScale: Scale.AbstractScale<any, number> = this._isVertical ? this._yScale : this._xScale;
           var scaledBaseline = primaryScale.scale(this.baseline());
           return new Animator.MovingRect(scaledBaseline, this._isVertical);
         }
@@ -36,7 +36,7 @@ export module Plot {
 
       var valueAttr = this._isVertical ? "y" : "x";
       var keyAttr = this._isVertical ? "x" : "y";
-      var primaryScale: Scale.AbstractScale<any,number> = this._isVertical ? this._yScale : this._xScale;
+      var primaryScale: Scale.AbstractScale<any, number> = this._isVertical ? this._yScale : this._xScale;
       var primaryAccessor = this._projections[valueAttr].accessor;
       var keyAccessor = this._projections[keyAttr].accessor;
       var getStart = (d: any, i: number, u: any, m: StackedPlotMetadata) =>
@@ -75,7 +75,7 @@ export module Plot {
       return AbstractStacked.prototype._getPlotMetadataForDataset.call(this, key);
     }
 
-    protected _normalizeDatasets<A,B>(fromX: boolean): {a: A; b: B;}[] {
+    protected _normalizeDatasets<A, B>(fromX: boolean): {a: A; b: B}[] {
       return AbstractStacked.prototype._normalizeDatasets.call(this, fromX);
     }
 

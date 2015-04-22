@@ -316,7 +316,7 @@ export module Component {
       }
       parentElement = parentElement == null ? this._boxContainer : parentElement;
       var box = parentElement.append("rect");
-      if (className != null) {box.classed(className, true);};
+      if (className != null) { box.classed(className, true); }
 
       this._boxes.push(box);
       if (this.width() != null && this.height() != null) {
