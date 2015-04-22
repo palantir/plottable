@@ -9997,7 +9997,7 @@ var Plottable;
                     }
                 }
             };
-            Drag.prototype.constrain = function (doConstrain) {
+            Drag.prototype.constrainPoints = function (doConstrain) {
                 if (doConstrain == null) {
                     return this._constrain;
                 }

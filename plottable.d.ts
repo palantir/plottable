@@ -4003,7 +4003,7 @@ declare module Plottable {
              *
              * @return {boolean} Whether or not the Interaction.Drag constrains.
              */
-            constrain(): boolean;
+            constrainPoints(): boolean;
             /**
              * Sets whether or not this Interaction constrains Points passed to its
              * callbacks to lie inside its Component.
@@ -4015,7 +4015,7 @@ declare module Plottable {
              * @param {boolean} doConstrain Whether or not to constrain Points.
              * @return {Interaction.Drag} The calling Interaction.Drag.
              */
-            constrain(doConstrain: boolean): Drag;
+            constrainPoints(doConstrain: boolean): Drag;
             /**
              * Gets the callback that is called when dragging starts.
              *

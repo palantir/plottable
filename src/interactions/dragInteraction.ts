@@ -90,7 +90,7 @@ export module Interaction {
      *
      * @return {boolean} Whether or not the Interaction.Drag constrains.
      */
-    public constrain(): boolean;
+    public constrainPoints(): boolean;
     /**
      * Sets whether or not this Interaction constrains Points passed to its
      * callbacks to lie inside its Component.
@@ -102,8 +102,8 @@ export module Interaction {
      * @param {boolean} doConstrain Whether or not to constrain Points.
      * @return {Interaction.Drag} The calling Interaction.Drag.
      */
-    public constrain(doConstrain: boolean): Drag;
-    public constrain(doConstrain?: boolean): any {
+    public constrainPoints(doConstrain: boolean): Drag;
+    public constrainPoints(doConstrain?: boolean): any {
       if (doConstrain == null) {
         return this._constrain;
       }
