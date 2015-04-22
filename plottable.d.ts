@@ -115,6 +115,10 @@ declare module Plottable {
             function min<C>(arr: C[], default_val: C): C;
             function min<T, C>(arr: T[], acc: (x?: T, i?: number) => C, default_val: C): C;
             /**
+             * Returns true **only** if x is NaN
+             */
+            function isNaN(n: any): boolean;
+            /**
              * Creates shallow copy of map.
              * @param {{ [key: string]: any }} oldMap Map to copy
              *

@@ -5304,6 +5304,62 @@ describe("Plots", function () {
             svg.remove();
         });
     });
+    describe("fail safe tests", function () {
+        it("conversion fails should be silent in Plot.StackedBar", function () {
+            var data1 = [
+                { x: "A", y: "s", fill: "blue" },
+            ];
+            var data2 = [
+                { x: "A", y: 1, fill: "red" },
+            ];
+            var xScale = new Plottable.Scale.Category();
+            var yScale = new Plottable.Scale.Linear();
+            var plot = new Plottable.Plot.StackedBar(xScale, yScale);
+            plot.addDataset("d1", data1);
+            plot.addDataset("d2", data2);
+            plot.project("fill", "fill");
+            plot.project("x", "x", xScale).project("y", "y", yScale);
+            var ds1FirstColumnOffset = plot._key2PlotDatasetKey.get("d1").plotMetadata.offsets.get("A");
+            var ds2FirstColumnOffset = plot._key2PlotDatasetKey.get("d2").plotMetadata.offsets.get("A");
+            assert.strictEqual(typeof ds1FirstColumnOffset, "number", "ds1 offset should be a number");
+            assert.strictEqual(typeof ds2FirstColumnOffset, "number", "ds2 offset should be a number");
+            assert.isFalse(Plottable._Util.Methods.isNaN(ds1FirstColumnOffset), "ds1 offset should not be NaN");
+            assert.isFalse(Plottable._Util.Methods.isNaN(ds1FirstColumnOffset), "ds2 offset should not be NaN");
+        });
+        it("bad values on the primary axis should default to 0 (be ignored)", function () {
+            var data1 = [
+                { x: "A", y: 1, fill: "blue" },
+            ];
+            var data2 = [
+                { x: "A", y: "s", fill: "red" },
+            ];
+            var data3 = [
+                { x: "A", y: 2, fill: "green" },
+            ];
+            var data4 = [
+                { x: "A", y: "0", fill: "purple" },
+            ];
+            var data5 = [
+                { x: "A", y: 3, fill: "pink" },
+            ];
+            var xScale = new Plottable.Scale.Category();
+            var yScale = new Plottable.Scale.Linear();
+            var plot = new Plottable.Plot.StackedBar(xScale, yScale);
+            plot.addDataset("d1", data1);
+            plot.addDataset("d2", data2);
+            plot.addDataset("d3", data3);
+            plot.addDataset("d4", data4);
+            plot.addDataset("d5", data5);
+            plot.project("fill", "fill");
+            plot.project("x", "x", xScale).project("y", "y", yScale);
+            var offset1 = plot._key2PlotDatasetKey.get("d1").plotMetadata.offsets.get("A");
+            var offset3 = plot._key2PlotDatasetKey.get("d3").plotMetadata.offsets.get("A");
+            var offset5 = plot._key2PlotDatasetKey.get("d5").plotMetadata.offsets.get("A");
+            assert.strictEqual(offset1, 0, "Plot columns should start from offset 0 (at the very bottom)");
+            assert.strictEqual(offset3, 1, "Bar 3 should have offset 1, because bar 2 was not rendered");
+            assert.strictEqual(offset5, 3, "Bar 5 should have offset 3, because bar 4 was not rendered");
+        });
+    });
 });
 
 ///<reference path="../../testReference.ts" />
@@ -8050,6 +8106,18 @@ describe("_Util.Methods", function () {
             assert.deepEqual(max([null], today), undefined, "returns undefined from array of null values");
             assert.deepEqual(max([], today), today, "correct default non-numeric value returned");
         });
+    });
+    it("isNaN works as expected", function () {
+        var isNaN = Plottable._Util.Methods.isNaN;
+        assert.isTrue(isNaN(NaN), "Only NaN should pass the isNaN check");
+        assert.isFalse(isNaN(undefined), "undefined should fail the isNaN check");
+        assert.isFalse(isNaN(null), "null should fail the isNaN check");
+        assert.isFalse(isNaN(Infinity), "Infinity should fail the isNaN check");
+        assert.isFalse(isNaN(1), "numbers should fail the isNaN check");
+        assert.isFalse(isNaN(0), "0 should fail the isNaN check");
+        assert.isFalse(isNaN("foo"), "strings should fail the isNaN check");
+        assert.isFalse(isNaN(""), "empty strings should fail the isNaN check");
+        assert.isFalse(isNaN({}), "empty Objects should fail the isNaN check");
     });
     it("objEq works as expected", function () {
         assert.isTrue(Plottable._Util.Methods.objEq({}, {}));
