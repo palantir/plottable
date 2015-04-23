@@ -5,7 +5,7 @@ export module Scale {
   export class Color extends AbstractScale<string, string> {
 
     private static LOOP_LIGHTEN_FACTOR = 1.6;
-    //The maximum number of colors we are getting from CSS stylesheets
+    // The maximum number of colors we are getting from CSS stylesheets
     private static MAXIMUM_COLORS_FROM_CSS = 256;
 
     /**

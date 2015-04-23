@@ -140,7 +140,6 @@ declare module Plottable {
             function setTimeout(f: Function, time: number, ...args: any[]): number;
             function colorTest(colorTester: D3.Selection, className: string): string;
             function lightenColor(color: string, factor: number): string;
-            function darkenColor(color: string, factor: number, darkenAmount: number): string;
             function distanceSquared(p1: Point, p2: Point): number;
             function isIE(): boolean;
             /**
@@ -313,32 +312,6 @@ declare module Plottable {
              * see http://www.w3.org/TR/2008/REC-WCAG20-20081211/#contrast-ratiodef
              */
             function contrast(a: string, b: string): number;
-            /**
-             * Converts an RGB color value to HSL. Conversion formula
-             * adapted from http://en.wikipedia.org/wiki/HSL_color_space.
-             * Assumes r, g, and b are contained in the set [0, 255] and
-             * returns h, s, and l in the set [0, 1].
-             * Source: https://stackoverflow.com/questions/2353211/hsl-to-rgb-color-conversion
-             *
-             * @param   Number  r       The red color value
-             * @param   Number  g       The green color value
-             * @param   Number  b       The blue color value
-             * @return  Array           The HSL representation
-             */
-            function rgbToHsl(r: number, g: number, b: number): number[];
-            /**
-             * Converts an HSL color value to RGB. Conversion formula
-             * adapted from http://en.wikipedia.org/wiki/HSL_color_space.
-             * Assumes h, s, and l are contained in the set [0, 1] and
-             * returns r, g, and b in the set [0, 255].
-             * Source: https://stackoverflow.com/questions/2353211/hsl-to-rgb-color-conversion
-             *
-             * @param   Number  h       The hue
-             * @param   Number  s       The saturation
-             * @param   Number  l       The lightness
-             * @return  Array           The RGB representation
-             */
-            function hslToRgb(h: number, s: number, l: number): number[];
         }
     }
 }
@@ -2170,6 +2143,7 @@ declare module Plottable {
         }
     }
 }
+
 
 declare module Plottable {
     module Axis {

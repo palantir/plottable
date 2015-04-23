@@ -27,7 +27,6 @@ describe("Scales", () => {
     scale.domain([0, 10]);
     assert.isTrue(callbackWasCalled, "The registered callback was called");
 
-
     (<any> scale)._autoDomainAutomatically = true;
     scale._updateExtent("1", "x", [0.08, 9.92]);
     callbackWasCalled = false;

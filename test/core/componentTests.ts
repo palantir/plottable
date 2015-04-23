@@ -2,7 +2,6 @@
 
 var assert = chai.assert;
 
-
 function assertComponentXY(component: Plottable.Component.AbstractComponent, x: number, y: number, message: string) {
   // use <any> to examine the private variables
   var translate = d3.transform((<any> component)._element.attr("transform")).translate;
@@ -76,7 +75,6 @@ describe("Component behavior", () => {
       assert.equal(c.height(), 200, "defaults to height of parent if width is not specified on <svg>");
       assert.equal((<any> c)._xOrigin, 0, "xOrigin defaulted to 0");
       assert.equal((<any> c)._yOrigin, 0, "yOrigin defaulted to 0");
-
 
       svg.style("width", "50%").style("height", "50%");
       c._computeLayout();

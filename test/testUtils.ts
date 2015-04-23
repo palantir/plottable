@@ -118,7 +118,6 @@ function assertWidthHeight(el: D3.Selection, widthExpected: number, heightExpect
   assert.equal(height, heightExpected, "height: " + message);
 }
 
-
 function makeLinearSeries(n: number): {x: number; y: number}[] {
   function makePoint(x: number) {
     return {x: x, y: x};

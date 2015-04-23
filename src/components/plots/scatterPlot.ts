@@ -129,7 +129,7 @@ export module Plot {
       return Plottable._Util.Methods.intersectsBBox(xRange, yRange, translatedBbox);
     }
 
-    //===== Hover logic =====
+    // ===== Hover logic =====
     public _hoverOverComponent(p: Point) {
       // no-op
     }
@@ -141,7 +141,7 @@ export module Plot {
     public _doHover(p: Point): Interaction.HoverData {
       return this._getClosestStruckPoint(p, this._closeDetectionRadius);
     }
-    //===== /Hover logic =====
+    // ===== /Hover logic =====
   }
 }
 }

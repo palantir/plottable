@@ -1,4 +1,6 @@
 ///<reference path="testReference.ts" />
+// HACKHACK: These functions are indeed used but it is not known they are used?
+/* tslint:disable:no-unused-variable */
 function generateSVG(width, height) {
     if (width === void 0) { width = 400; }
     if (height === void 0) { height = 400; }
@@ -1370,12 +1372,6 @@ describe("Gridlines", function () {
             assert.closeTo(yTickMarkRect.top, yGridlineRect.top, 1, "y tick and gridline align");
         }
         svg.remove();
-    });
-    it("Unanchored Gridlines don't throw an error when scale updates", function () {
-        var xScale = new Plottable.Scale.Linear();
-        new Plottable.Component.Gridlines(xScale, null);
-        xScale.domain([0, 1]);
-        // test passes if error is not thrown.
     });
 });
 
@@ -6716,7 +6712,7 @@ describe("Tables", function () {
         var svg = generateSVG();
         t.addComponent(1, 0, new Plottable.Component.AbstractComponent());
         t.addComponent(0, 2, new Plottable.Component.AbstractComponent());
-        t.renderTo(svg); //would throw an error without the fix (tested);
+        t.renderTo(svg); // would throw an error without the fix (tested);
         svg.remove();
     });
     it("basic table with 2 rows 2 cols lays out properly", function () {
@@ -7104,6 +7100,9 @@ describe("Coordinators", function () {
             var s1 = new Plottable.Scale.Linear();
             var s2 = new Plottable.Scale.Linear();
             var s3 = new Plottable.Scale.Linear();
+            var coordinator = new Plottable._Util.ScaleDomainCoordinator([s1, s2, s3]);
+            // HACKHACK: #1893 ScaleDomainCoordinator should not do so much magic on construction
+            assert.isNotNull(coordinator, "proper coordination is set up");
             s1.domain([0, 100]);
             assert.deepEqual(s1.domain(), [0, 100]);
             assert.deepEqual(s1.domain(), s2.domain());
@@ -7167,7 +7166,7 @@ describe("Scales", function () {
         });
         it("scale autorange works as expected with single dataset", function () {
             var svg = generateSVG(100, 100);
-            var renderer = new Plottable.Plot.AbstractPlot().addDataset(dataset).project("x", "foo", scale).renderTo(svg);
+            new Plottable.Plot.AbstractPlot().addDataset(dataset).project("x", "foo", scale).renderTo(svg);
             assert.deepEqual(scale.domain(), [0, 5], "scale domain was autoranged properly");
             data.push({ foo: 100, bar: 200 });
             dataset.data(data);
@@ -7215,8 +7214,6 @@ describe("Scales", function () {
             var xScale = new Plottable.Scale.Linear();
             var yScale = new Plottable.Scale.Linear();
             xScale.domainer(new Plottable.Domainer());
-            var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
-            var yAxis = new Plottable.Axis.Numeric(yScale, "left");
             var renderAreaD1 = new Plottable.Plot.Line(xScale, yScale);
             renderAreaD1.addDataset(ds1);
             renderAreaD1.project("x", "x", xScale);
@@ -7640,7 +7637,6 @@ describe("Tick generators", function () {
             assert.deepEqual(ticks, [0.5, 10.01], "no middle ticks were added");
         });
         it("passing non positive interval", function () {
-            var scale = new Plottable.Scale.Linear().domain([0, 1]);
             assert.throws(function () { return Plottable.Scale.TickGenerators.intervalTickGenerator(0); }, "interval must be positive number");
             assert.throws(function () { return Plottable.Scale.TickGenerators.intervalTickGenerator(-2); }, "interval must be positive number");
         });
@@ -7792,12 +7788,10 @@ describe("Formatters", function () {
         });
         it("throws an error on strange precision", function () {
             assert.throws(function () {
-                var general = Plottable.Formatters.general(-1);
-                var result = general(5);
+                Plottable.Formatters.general(-1);
             });
             assert.throws(function () {
-                var general = Plottable.Formatters.general(100);
-                var result = general(5);
+                Plottable.Formatters.general(100);
             });
         });
     });
@@ -8161,18 +8155,10 @@ describe("_Util.Methods", function () {
         colorTester.remove();
     });
     it("lightenColor()", function () {
-        var color = "#12fced";
-        var lightenedColor = Plottable._Util.Methods.lightenColor(color, 1);
-        var lColor = Plottable._Util.Color.rgbToHsl(parseInt("12", 16), parseInt("fc", 16), parseInt("ed", 16))[2];
-        var lLightenedColor = Plottable._Util.Color.rgbToHsl(parseInt(lightenedColor.substring(1, 3), 16), parseInt(lightenedColor.substring(3, 5), 16), parseInt(lightenedColor.substring(5, 7), 16))[2];
-        assert.operator(lLightenedColor, ">", lColor, "color got lighter");
-    });
-    it("darkenColor()", function () {
-        var color = "#12fced";
-        var darkenedColor = Plottable._Util.Methods.darkenColor(color, 1, 0.1);
-        var lColor = Plottable._Util.Color.rgbToHsl(parseInt("12", 16), parseInt("fc", 16), parseInt("ed", 16))[2];
-        var lDarkenedColor = Plottable._Util.Color.rgbToHsl(parseInt(darkenedColor.substring(1, 3), 16), parseInt(darkenedColor.substring(3, 5), 16), parseInt(darkenedColor.substring(5, 7), 16))[2];
-        assert.operator(lDarkenedColor, "<", lColor, "color got darker");
+        var colorHex = "#12fced";
+        var oldColor = d3.hsl(colorHex);
+        var lightenedColor = Plottable._Util.Methods.lightenColor(colorHex, 1);
+        assert.operator(d3.hsl(lightenedColor).l, ">", oldColor.l, "color got lighter");
     });
 });
 

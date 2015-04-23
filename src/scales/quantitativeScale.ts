@@ -10,7 +10,6 @@ export module Scale {
     public _typeCoercer = (d: any) => +d;
     private _tickGenerator: TickGenerators.TickGenerator<D> = (scale: Plottable.Scale.AbstractQuantitative<D>) => scale.getDefaultTicks();
 
-
     /**
      * Constructs a new QuantitativeScale.
      *
