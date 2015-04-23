@@ -181,7 +181,6 @@ describe("NumericAxis", () => {
     svg.remove();
   });
 
-
   it("tick labels don't overlap in a constrained space", () => {
     var SVG_WIDTH = 100;
     var SVG_HEIGHT = 100;
@@ -269,7 +268,6 @@ describe("NumericAxis", () => {
       labelBox = label.getBoundingClientRect();
       assertBoxInside(labelBox, boundingBox, 0, "long tick " + label.textContent + " is inside the bounding box");
     });
-
 
     svg.remove();
   });

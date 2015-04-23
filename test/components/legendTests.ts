@@ -2,7 +2,6 @@
 
 var assert = chai.assert;
 
-
 describe("Legend", () => {
   var svg: D3.Selection;
   var color: Plottable.Scale.Color;
@@ -114,7 +113,6 @@ describe("Legend", () => {
     var newColorScale = new Plottable.Scale.Color("20");
     newColorScale.domain(newDomain);
     legend.scale(newColorScale);
-
 
     (<any> legend)._content.selectAll(entrySelector).each(function(d: any, i: number) {
       assert.equal(d, newDomain[i], "the data is set correctly");

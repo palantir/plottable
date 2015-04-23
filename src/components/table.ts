@@ -249,7 +249,6 @@ export module Component {
               wantsHeightArr   : layoutWantsHeight};
     }
 
-
     public _requestedSpace(offeredWidth : number, offeredHeight: number): _SpaceRequest {
       this._calculatedLayout = this._iterateLayout(offeredWidth , offeredHeight);
       return {width : d3.sum(this._calculatedLayout.guaranteedWidths ),
