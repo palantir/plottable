@@ -11,7 +11,7 @@ describe("Legend", () => {
   var rowSelector = "." + Plottable.Component.Legend.LEGEND_ROW_CLASS;
 
   beforeEach(() => {
-    svg = generateSVG(400, 400);
+    svg = TestMethods.generateSVG(400, 400);
     color = new Plottable.Scale.Color();
     legend = new Plottable.Component.Legend(color);
   });
@@ -208,7 +208,7 @@ describe("Legend", () => {
     legend.detach();
     svg.remove();
 
-    svg = generateSVG(100, 100);
+    svg = TestMethods.generateSVG(100, 100);
     legend.renderTo(svg);
     rows = (<any> legend)._element.selectAll(rowSelector);
     assert.lengthOf(rows[0], 3, "Wrapped text on to three rows when further constrained");
@@ -257,24 +257,24 @@ describe("Legend", () => {
 
  it("truncates and hides entries if space is constrained for a horizontal legend", () => {
     svg.remove();
-    svg = generateSVG(70, 400);
+    svg = TestMethods.generateSVG(70, 400);
     legend.maxEntriesPerRow(Infinity);
     legend.renderTo(svg);
 
     var textEls = (<any> legend)._element.selectAll("text");
     textEls.each(function(d: any) {
       var textEl = d3.select(this);
-      assertBBoxInclusion((<any> legend)._element, textEl);
+      TestMethods.assertBBoxInclusion((<any> legend)._element, textEl);
     });
 
     legend.detach();
     svg.remove();
-    svg = generateSVG(100, 50);
+    svg = TestMethods.generateSVG(100, 50);
     legend.renderTo(svg);
     textEls = (<any> legend)._element.selectAll("text");
     textEls.each(function(d: any) {
       var textEl = d3.select(this);
-      assertBBoxInclusion((<any> legend)._element, textEl);
+      TestMethods.assertBBoxInclusion((<any> legend)._element, textEl);
     });
 
     svg.remove();

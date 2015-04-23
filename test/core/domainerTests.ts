@@ -167,7 +167,7 @@ describe("Domainer", () => {
     var dataset = new Plottable.Dataset(data);
     var r = new Plottable.Plot.Area(xScale, yScale);
     r.addDataset(dataset);
-    var svg = generateSVG();
+    var svg = TestMethods.generateSVG();
     r.project("x", "x", xScale);
     r.project("y", "y", yScale);
     r.renderTo(svg);

@@ -3,7 +3,7 @@
 describe("Drawers", () => {
   describe("Rect Drawer", () => {
     it("getPixelPoint vertical", () => {
-      var svg = generateSVG(300, 300);
+      var svg = TestMethods.generateSVG(300, 300);
       var data = [{a: "foo", b: 10}, {a: "bar", b: 24}];
       var xScale = new Plottable.Scale.Category();
       var yScale = new Plottable.Scale.Linear();
@@ -28,7 +28,7 @@ describe("Drawers", () => {
     });
 
     it("getPixelPoint horizontal", () => {
-      var svg = generateSVG(300, 300);
+      var svg = TestMethods.generateSVG(300, 300);
       var data = [{ a: "foo", b: 10 }, { a: "bar", b: 24 }];
       var xScale = new Plottable.Scale.Linear();
       var yScale = new Plottable.Scale.Category();

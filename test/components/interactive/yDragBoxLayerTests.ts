@@ -8,7 +8,7 @@ describe("Interactive Components", () => {
     var SVG_HEIGHT = 400;
 
     it("bounds()", () => {
-      var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       var dbl = new Plottable.Component.Interactive.YDragBoxLayer();
       dbl.boxVisible(true);
       dbl.renderTo(svg);
@@ -37,7 +37,7 @@ describe("Interactive Components", () => {
     });
 
     it("resizes only in y", () => {
-      var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       var dbl = new Plottable.Component.Interactive.YDragBoxLayer();
       dbl.boxVisible(true);
       dbl.resizable(true);
@@ -63,7 +63,7 @@ describe("Interactive Components", () => {
         y: SVG_HEIGHT * 3 / 4
       };
       var target = dbl.background();
-      triggerFakeDragSequence(target, actualBounds.bottomRight, dragTo);
+      TestMethods.triggerFakeDragSequence(target, actualBounds.bottomRight, dragTo);
       actualBounds = dbl.bounds();
       assert.strictEqual(actualBounds.topLeft.x, 0, "box still starts at left");
       assert.strictEqual(actualBounds.bottomRight.x, dbl.width(), "box still ends at right");
@@ -72,7 +72,7 @@ describe("Interactive Components", () => {
     });
 
     it("stays full width after resizing", () => {
-      var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       var dbl = new Plottable.Component.Interactive.YDragBoxLayer();
       dbl.boxVisible(true);
       dbl.resizable(true);

@@ -8,7 +8,7 @@ describe("Interactive Components", () => {
     var SVG_HEIGHT = 400;
 
     it("correctly draws box on drag", () => {
-      var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       var dbl = new Plottable.Component.Interactive.DragBoxLayer();
       dbl.renderTo(svg);
       assert.isFalse(dbl.boxVisible(), "box is hidden initially");
@@ -23,7 +23,7 @@ describe("Interactive Components", () => {
       };
 
       var target = dbl.background();
-      triggerFakeDragSequence(target, startPoint, endPoint);
+      TestMethods.triggerFakeDragSequence(target, startPoint, endPoint);
       assert.isTrue(dbl.boxVisible(), "box is drawn on drag");
       var bounds = dbl.bounds();
       assert.deepEqual(bounds.topLeft, startPoint, "top-left point was set correctly");
@@ -33,7 +33,7 @@ describe("Interactive Components", () => {
     });
 
     it("dismisses on click", () => {
-      var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       var dbl = new Plottable.Component.Interactive.DragBoxLayer();
       dbl.renderTo(svg);
 
@@ -43,7 +43,7 @@ describe("Interactive Components", () => {
       };
 
       var target = dbl.background();
-      triggerFakeDragSequence(target, targetPoint, targetPoint);
+      TestMethods.triggerFakeDragSequence(target, targetPoint, targetPoint);
 
       assert.isFalse(dbl.boxVisible(), "box is hidden on click");
 
@@ -60,7 +60,7 @@ describe("Interactive Components", () => {
 
       assert.doesNotThrow(() => dbl.detectionRadius(3), Error, "can set detection radius before anchoring");
 
-      var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       dbl.renderTo("svg");
 
       var radius = 5;
@@ -84,7 +84,7 @@ describe("Interactive Components", () => {
     });
 
     it("onDragStart()", () => {
-      var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       var dbl = new Plottable.Component.Interactive.DragBoxLayer();
       dbl.renderTo(svg);
 
@@ -104,7 +104,7 @@ describe("Interactive Components", () => {
       dbl.onDragStart(callback);
 
       var target = dbl.background();
-      triggerFakeDragSequence(target, startPoint, endPoint);
+      TestMethods.triggerFakeDragSequence(target, startPoint, endPoint);
 
       assert.deepEqual(receivedBounds.topLeft, startPoint, "top-left point was set correctly");
       assert.deepEqual(receivedBounds.bottomRight, startPoint, "bottom-right point was set correctly");
@@ -116,7 +116,7 @@ describe("Interactive Components", () => {
     });
 
     it("onDrag()", () => {
-      var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       var dbl = new Plottable.Component.Interactive.DragBoxLayer();
       dbl.renderTo(svg);
 
@@ -136,7 +136,7 @@ describe("Interactive Components", () => {
       dbl.onDrag(callback);
 
       var target = dbl.background();
-      triggerFakeDragSequence(target, startPoint, endPoint);
+      TestMethods.triggerFakeDragSequence(target, startPoint, endPoint);
 
       assert.deepEqual(receivedBounds.topLeft, startPoint, "top-left point was set correctly");
       assert.deepEqual(receivedBounds.bottomRight, endPoint, "bottom-right point was set correctly");
@@ -148,7 +148,7 @@ describe("Interactive Components", () => {
     });
 
     it("onDragEnd()", () => {
-      var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       var dbl = new Plottable.Component.Interactive.DragBoxLayer();
       dbl.renderTo(svg);
 
@@ -168,7 +168,7 @@ describe("Interactive Components", () => {
       dbl.onDragEnd(callback);
 
       var target = dbl.background();
-      triggerFakeDragSequence(target, startPoint, endPoint);
+      TestMethods.triggerFakeDragSequence(target, startPoint, endPoint);
 
       assert.deepEqual(receivedBounds.topLeft, startPoint, "top-left point was set correctly");
       assert.deepEqual(receivedBounds.bottomRight, endPoint, "bottom-right point was set correctly");
@@ -193,7 +193,7 @@ describe("Interactive Components", () => {
           topLeft: { x: 0, y: 0 },
           bottomRight: { x: 0, y: 0}
         });
-        triggerFakeDragSequence(target,
+        TestMethods.triggerFakeDragSequence(target,
                                 { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4},
                                 { x: SVG_WIDTH * 3 / 4, y: SVG_HEIGHT * 3 / 4}
                                );
@@ -201,7 +201,7 @@ describe("Interactive Components", () => {
       }
 
       beforeEach(() => {
-        svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
         dbl = new Plottable.Component.Interactive.DragBoxLayer();
         dbl.renderTo(svg);
 
@@ -216,7 +216,7 @@ describe("Interactive Components", () => {
 
       it("resize from top edge", () => {
         dbl.resizable(true);
-        triggerFakeDragSequence(target,
+        TestMethods.triggerFakeDragSequence(target,
                                 { x: midPoint.x, y: initialBounds.topLeft.y },
                                 { x: midPoint.x, y: 0 }
                                );
@@ -227,7 +227,7 @@ describe("Interactive Components", () => {
         assert.strictEqual(bounds.bottomRight.x, initialBounds.bottomRight.x, "right edge was not moved");
 
         resetBox();
-        triggerFakeDragSequence(target,
+        TestMethods.triggerFakeDragSequence(target,
                                 { x: midPoint.x, y: initialBounds.topLeft.y },
                                 { x: midPoint.x, y: SVG_HEIGHT }
                                );
@@ -238,7 +238,7 @@ describe("Interactive Components", () => {
 
       it("resize from bottom edge", () => {
         dbl.resizable(true);
-        triggerFakeDragSequence(target,
+        TestMethods.triggerFakeDragSequence(target,
                                 { x: midPoint.x, y: initialBounds.bottomRight.y },
                                 { x: midPoint.x, y: SVG_HEIGHT }
                                );
@@ -249,7 +249,7 @@ describe("Interactive Components", () => {
         assert.strictEqual(bounds.bottomRight.x, initialBounds.bottomRight.x, "right edge was not moved");
 
         resetBox();
-        triggerFakeDragSequence(target,
+        TestMethods.triggerFakeDragSequence(target,
                                 { x: midPoint.x, y: initialBounds.bottomRight.y },
                                 { x: midPoint.x, y: 0 }
                                );
@@ -260,7 +260,7 @@ describe("Interactive Components", () => {
 
       it("resize from left edge", () => {
         dbl.resizable(true);
-        triggerFakeDragSequence(target,
+        TestMethods.triggerFakeDragSequence(target,
                                 { x: initialBounds.topLeft.x, y: midPoint.y },
                                 { x: 0, y: midPoint.y }
                                );
@@ -271,7 +271,7 @@ describe("Interactive Components", () => {
         assert.strictEqual(bounds.bottomRight.x, initialBounds.bottomRight.x, "right edge was not moved");
 
         resetBox();
-        triggerFakeDragSequence(target,
+        TestMethods.triggerFakeDragSequence(target,
                                 { x: initialBounds.topLeft.x, y: midPoint.y },
                                 { x: SVG_WIDTH, y: midPoint.y }
                                );
@@ -282,7 +282,7 @@ describe("Interactive Components", () => {
 
       it("resize from right edge", () => {
         dbl.resizable(true);
-        triggerFakeDragSequence(target,
+        TestMethods.triggerFakeDragSequence(target,
                                 { x: initialBounds.bottomRight.x, y: midPoint.y },
                                 { x: SVG_WIDTH, y: midPoint.y }
                                );
@@ -293,7 +293,7 @@ describe("Interactive Components", () => {
         assert.strictEqual(bounds.bottomRight.x, SVG_WIDTH, "right edge was repositioned");
 
         resetBox();
-        triggerFakeDragSequence(target,
+        TestMethods.triggerFakeDragSequence(target,
                                 { x: initialBounds.bottomRight.x, y: midPoint.y },
                                 { x: 0, y: midPoint.y }
                                );
@@ -305,7 +305,7 @@ describe("Interactive Components", () => {
       it("resizes if grabbed within detectionRadius()", () => {
         dbl.resizable(true);
         var detectionRadius = dbl.detectionRadius();
-        triggerFakeDragSequence(target,
+        TestMethods.triggerFakeDragSequence(target,
                                 { x: midPoint.x, y: initialBounds.bottomRight.y + detectionRadius - 1 },
                                 { x: midPoint.x, y: SVG_HEIGHT }
                                );
@@ -317,7 +317,7 @@ describe("Interactive Components", () => {
 
         resetBox();
         var startYOutside = initialBounds.bottomRight.y + detectionRadius + 1;
-        triggerFakeDragSequence(target,
+        TestMethods.triggerFakeDragSequence(target,
                                 { x: midPoint.x, y: startYOutside },
                                 { x: midPoint.x, y: SVG_HEIGHT }
                                );
@@ -329,7 +329,7 @@ describe("Interactive Components", () => {
 
       it("doesn't dismiss on no-op resize", () => {
         dbl.resizable(true);
-        triggerFakeDragSequence(target,
+        TestMethods.triggerFakeDragSequence(target,
                                 { x: midPoint.x, y: initialBounds.topLeft.y },
                                 { x: midPoint.x, y: initialBounds.topLeft.y }
                                );
@@ -340,7 +340,7 @@ describe("Interactive Components", () => {
       it("can't resize if hidden", () => {
         dbl.resizable(true);
         dbl.boxVisible(false);
-        triggerFakeDragSequence(target,
+        TestMethods.triggerFakeDragSequence(target,
                                 { x: midPoint.x, y: initialBounds.bottomRight.y },
                                 { x: midPoint.x, y: SVG_HEIGHT }
                                );

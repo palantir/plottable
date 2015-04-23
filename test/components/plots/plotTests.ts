@@ -19,7 +19,7 @@ describe("Plots", () => {
     });
 
     it("Base Plot functionality works", () => {
-      var svg = generateSVG(400, 300);
+      var svg = TestMethods.generateSVG(400, 300);
       var r = new Plottable.Plot.AbstractPlot();
       r._anchor(svg);
       r._computeLayout();
@@ -121,8 +121,8 @@ describe("Plots", () => {
       var ds1 = new Plottable.Dataset([0, 1, 2]);
       var ds2 = new Plottable.Dataset([1, 2, 3]);
       var s = new Plottable.Scale.Linear();
-      var svg1 = generateSVG(100, 100);
-      var svg2 = generateSVG(100, 100);
+      var svg1 = TestMethods.generateSVG(100, 100);
+      var svg2 = TestMethods.generateSVG(100, 100);
       new Plottable.Plot.AbstractPlot()
         .addDataset(ds1)
         .project("x", (x: number) => x, s)
@@ -139,7 +139,7 @@ describe("Plots", () => {
     });
 
     it("getAllSelections() with dataset retrieval", () => {
-      var svg = generateSVG(400, 400);
+      var svg = TestMethods.generateSVG(400, 400);
       var plot = new Plottable.Plot.AbstractPlot();
 
       // Create mock drawers with already drawn items
@@ -173,20 +173,20 @@ describe("Plots", () => {
 
       var oneSelection = plot.getAllSelections("ds1");
       assert.strictEqual(oneSelection.size(), 1);
-      assert.strictEqual(numAttr(oneSelection, "cx"), 100, "retrieved selection in renderArea1");
+      assert.strictEqual(TestMethods.numAttr(oneSelection, "cx"), 100, "retrieved selection in renderArea1");
 
       var oneElementSelection = plot.getAllSelections(["ds2"]);
       assert.strictEqual(oneElementSelection.size(), 1);
-      assert.strictEqual(numAttr(oneElementSelection, "cy"), 10, "retreived selection in renderArea2");
+      assert.strictEqual(TestMethods.numAttr(oneElementSelection, "cy"), 10, "retreived selection in renderArea2");
 
       var nonExcludedSelection = plot.getAllSelections(["ds1"], true);
       assert.strictEqual(nonExcludedSelection.size(), 1);
-      assert.strictEqual(numAttr(nonExcludedSelection, "cy"), 10, "retreived non-excluded selection in renderArea2");
+      assert.strictEqual(TestMethods.numAttr(nonExcludedSelection, "cy"), 10, "retreived non-excluded selection in renderArea2");
       svg.remove();
     });
 
     it("getAllPlotData() with dataset retrieval", () => {
-      var svg = generateSVG(400, 400);
+      var svg = TestMethods.generateSVG(400, 400);
       var plot = new Plottable.Plot.AbstractPlot();
 
       var data1 = [{value: 0}, {value: 1}, {value: 2}];
@@ -236,21 +236,21 @@ describe("Plots", () => {
       var singlePlotData = plot.getAllPlotData("ds1");
       var oneSelection = singlePlotData.selection;
       assert.strictEqual(oneSelection.size(), 1);
-      assert.strictEqual(numAttr(oneSelection, "cx"), 100, "retrieved selection in renderArea1");
+      assert.strictEqual(TestMethods.numAttr(oneSelection, "cx"), 100, "retrieved selection in renderArea1");
       assert.includeMembers(singlePlotData.data, data1, "includes data1 members");
       assert.includeMembers(singlePlotData.pixelPoints, data1.map(data1PointConverter), "includes data1 points");
 
       var oneElementPlotData = plot.getAllPlotData(["ds2"]);
       var oneElementSelection = oneElementPlotData.selection;
       assert.strictEqual(oneElementSelection.size(), 1);
-      assert.strictEqual(numAttr(oneElementSelection, "cy"), 10, "retreieved selection in renderArea2");
+      assert.strictEqual(TestMethods.numAttr(oneElementSelection, "cy"), 10, "retreieved selection in renderArea2");
       assert.includeMembers(oneElementPlotData.data, data2, "includes data2 members");
       assert.includeMembers(oneElementPlotData.pixelPoints, data2.map(data2PointConverter), "includes data2 points");
       svg.remove();
     });
 
     it("getAllPlotData() with NaN pixel points", () => {
-      var svg = generateSVG(400, 400);
+      var svg = TestMethods.generateSVG(400, 400);
       var plot = new Plottable.Plot.AbstractPlot();
 
       var data = [{value: NaN}, {value: 1}, {value: 2}];
@@ -289,7 +289,7 @@ describe("Plots", () => {
     });
 
     it("getClosestPlotData", () => {
-      var svg = generateSVG(400, 400);
+      var svg = TestMethods.generateSVG(400, 400);
       var plot = new Plottable.Plot.AbstractPlot();
 
       var data1 = [{value: 0}, {value: 1}, {value: 2}];
@@ -419,7 +419,7 @@ describe("Plots", () => {
       var id = (d: number) => d;
       var plot1 = new Plottable.Plot.AbstractPlot();
       var plot2 = new Plottable.Plot.AbstractPlot();
-      var svg = generateSVG(400, 400);
+      var svg = TestMethods.generateSVG(400, 400);
       plot1.attr("null", id, scale1);
       plot2.attr("null", id, scale1);
       plot1.renderTo(svg);
@@ -460,7 +460,7 @@ describe("Plots", () => {
       };
       (<any> plot)._additionalPaint = additionalPaint;
       plot.animator("bars", animator);
-      var svg = generateSVG();
+      var svg = TestMethods.generateSVG();
       plot.project("x", "x", x);
       plot.project("y", "y", y);
       plot.renderTo(svg);
@@ -479,7 +479,7 @@ describe("Plots", () => {
 
       plot.datasetOrder(["a", "b"]);
 
-      var svg = generateSVG();
+      var svg = TestMethods.generateSVG();
       plot.renderTo(svg);
 
       assert.deepEqual(CategoryScale.domain(), ["A", "B"], "extent is in the right order");
@@ -502,7 +502,7 @@ describe("Plots", () => {
     });
 
     beforeEach(() => {
-      svg = generateSVG(500, 500);
+      svg = TestMethods.generateSVG(500, 500);
       simpleDataset = new Plottable.Dataset([{a: -5, b: 6}, {a: -2, b: 2}, {a: 2, b: -2}, {a: 5, b: -6}], {foo: 0});
       xScale = new Plottable.Scale.Linear();
       yScale = new Plottable.Scale.Linear();

@@ -4,7 +4,7 @@ var assert = chai.assert;
 
 describe("Gridlines", () => {
   it("Gridlines and axis tick marks align", () => {
-    var svg = generateSVG(640, 480);
+    var svg = TestMethods.generateSVG(640, 480);
     var xScale = new Plottable.Scale.Linear();
     xScale.domain([0, 10]); // manually set domain since we won't have a renderer
     var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");

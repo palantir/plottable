@@ -3,7 +3,7 @@
 describe("Drawers", () => {
   describe("Arc Drawer", () => {
     it("getPixelPoint", () => {
-      var svg = generateSVG(300, 300);
+      var svg = TestMethods.generateSVG(300, 300);
       var data = [{value: 10}, {value: 10}, {value: 10}, {value: 10}];
       var piePlot = new Plottable.Plot.Pie();
 

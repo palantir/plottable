@@ -22,7 +22,7 @@ describe("TimeAxis", () => {
   });
 
   it("Computing the default ticks doesn't error out for edge cases", () => {
-    var svg = generateSVG(400, 100);
+    var svg = TestMethods.generateSVG(400, 100);
     scale.range([0, 400]);
 
     // very large time span
@@ -37,7 +37,7 @@ describe("TimeAxis", () => {
   });
 
   it("Tick labels don't overlap", () => {
-    var svg = generateSVG(400, 100);
+    var svg = TestMethods.generateSVG(400, 100);
     scale.range([0, 400]);
 
     function checkDomain(domain: any[]) {
@@ -84,7 +84,7 @@ describe("TimeAxis", () => {
   });
 
   it("custom possible axis configurations", () => {
-    var svg = generateSVG(800, 100);
+    var svg = TestMethods.generateSVG(800, 100);
     var scale = new Plottable.Scale.Time();
     var axis = new Plottable.Axis.Time(scale, "bottom");
     var configurations = axis.axisConfigurations();
@@ -108,7 +108,7 @@ describe("TimeAxis", () => {
 
   it("renders end ticks on either side", () => {
     var width = 500;
-    var svg = generateSVG(width, 100);
+    var svg = TestMethods.generateSVG(width, 100);
     scale.domain(["2010", "2014"]);
     axis.renderTo(svg);
     var firstTick = d3.select(".tick-mark");
@@ -122,7 +122,7 @@ describe("TimeAxis", () => {
 
   it("adds a class corresponding to the end-tick for the first and last ticks", () => {
     var width = 500;
-    var svg = generateSVG(width, 100);
+    var svg = TestMethods.generateSVG(width, 100);
     scale.domain(["2010", "2014"]);
     axis.renderTo(svg);
     var firstTick = d3.select("." + Plottable.Axis.AbstractAxis.TICK_MARK_CLASS);
@@ -133,7 +133,7 @@ describe("TimeAxis", () => {
   });
 
   it("tick labels do not overlap with tick marks", () => {
-    var svg = generateSVG(400, 100);
+    var svg = TestMethods.generateSVG(400, 100);
     scale = new Plottable.Scale.Time();
     scale.domain([new Date("2009-12-20"), new Date("2011-01-01")]);
     axis = new Plottable.Axis.Time(scale, "bottom");
@@ -152,7 +152,7 @@ describe("TimeAxis", () => {
   });
 
   it("if the time only uses one tier, there should be no space left for the second tier", () => {
-    var svg = generateSVG();
+    var svg = TestMethods.generateSVG();
     var xScale = new Plottable.Scale.Time();
     xScale.domain([new Date("2013-03-23 12:00"), new Date("2013-04-03 0:00")]);
     var xAxis = new Plottable.Axis.Time(xScale, "bottom");

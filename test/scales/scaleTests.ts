@@ -58,7 +58,7 @@ describe("Scales", () => {
     });
 
     it("scale autorange works as expected with single dataset", () => {
-      var svg = generateSVG(100, 100);
+      var svg = TestMethods.generateSVG(100, 100);
       new Plottable.Plot.AbstractPlot()
         .addDataset(dataset)
         .project("x", "foo", scale)
@@ -71,8 +71,8 @@ describe("Scales", () => {
     });
 
     it("scale reference counting works as expected", () => {
-      var svg1 = generateSVG(100, 100);
-      var svg2 = generateSVG(100, 100);
+      var svg1 = TestMethods.generateSVG(100, 100);
+      var svg2 = TestMethods.generateSVG(100, 100);
       var renderer1 = new Plottable.Plot.AbstractPlot()
                           .addDataset(dataset)
                           .project("x", "foo", scale);
@@ -111,7 +111,7 @@ describe("Scales", () => {
     });
 
     it("should resize when a plot is removed", () => {
-      var svg = generateSVG(400, 400);
+      var svg = TestMethods.generateSVG(400, 400);
       var ds1 = [{x: 0, y: 0}, {x: 1, y: 1}];
       var ds2 = [{x: 1, y: 1}, {x: 2, y: 2}];
       var xScale = new Plottable.Scale.Linear();
@@ -184,7 +184,7 @@ describe("Scales", () => {
       xScale.domainer(new Plottable.Domainer()); // to disable padding, etc
       plot.project("x", id, xScale);
       plot.project("y", id, yScale);
-      var svg = generateSVG();
+      var svg = TestMethods.generateSVG();
       plot.renderTo(svg);
       assert.deepEqual(xScale.domain(), [2, 1000], "the domain was calculated appropriately");
       svg.remove();
@@ -236,7 +236,7 @@ describe("Scales", () => {
     var barPlot = new Plottable.Plot.Bar(xScale, yScale).addDataset(dataset);
     barPlot.project("x", "x", xScale);
     barPlot.project("y", "y", yScale);
-    var svg = generateSVG();
+    var svg = TestMethods.generateSVG();
     assert.deepEqual(xScale.domain(), [], "before anchoring, the bar plot doesn't proxy data to the scale");
     barPlot.renderTo(svg);
     assert.deepEqual(xScale.domain(), ["A", "B"], "after anchoring, the bar plot's data is on the scale");

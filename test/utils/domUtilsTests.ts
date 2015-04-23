@@ -5,7 +5,7 @@ var assert = chai.assert;
 describe("_Util.DOM", () => {
 
   it("getBBox works properly", () => {
-    var svg = generateSVG();
+    var svg = TestMethods.generateSVG();
     var expectedBox = {
       x: 0,
       y: 0,
@@ -26,11 +26,11 @@ describe("_Util.DOM", () => {
       height: 20
     };
 
-    var removedSVG = generateSVG().remove();
+    var removedSVG = TestMethods.generateSVG().remove();
     var rect = removedSVG.append("rect").attr(expectedBox);
     Plottable._Util.DOM.getBBox(rect); // could throw NS_ERROR on FF
 
-    var noneSVG = generateSVG().style("display", "none");
+    var noneSVG = TestMethods.generateSVG().style("display", "none");
     rect = noneSVG.append("rect").attr(expectedBox);
     Plottable._Util.DOM.getBBox(rect); // could throw NS_ERROR on FF
 
@@ -39,7 +39,7 @@ describe("_Util.DOM", () => {
 
   describe("getElementWidth, getElementHeight", () => {
     it("can get a plain element's size", () => {
-      var parent = getSVGParent();
+      var parent = TestMethods.getSVGParent();
       parent.style("width", "300px");
       parent.style("height", "200px");
       var parentElem = parent[0][0];
@@ -51,7 +51,7 @@ describe("_Util.DOM", () => {
     });
 
     it("can get the svg's size", () => {
-      var svg = generateSVG(450, 120);
+      var svg = TestMethods.generateSVG(450, 120);
       var svgElem = svg[0][0];
 
       var width = Plottable._Util.DOM.getElementWidth(svgElem);
@@ -62,7 +62,7 @@ describe("_Util.DOM", () => {
     });
 
     it("can accept multiple units and convert to pixels", () => {
-      var parent     = getSVGParent();
+      var parent     = TestMethods.getSVGParent();
       var parentElem = parent[0][0];
       var child      = parent.append("div");
       var childElem  = child[0][0];

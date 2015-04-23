@@ -17,7 +17,7 @@ describe("Component behavior", () => {
   var SVG_WIDTH = 400;
   var SVG_HEIGHT = 300;
   beforeEach(() => {
-    svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+    svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
     c = new Plottable.Component.AbstractComponent();
   });
 
@@ -32,7 +32,7 @@ describe("Component behavior", () => {
     it("can re-anchor to a different element", () => {
       c._anchor(svg);
 
-      var svg2 = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      var svg2 = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       c._anchor(svg2);
       assert.equal((<any> c)._element.node(), svg2.select("g").node(), "the component re-achored under the second <svg>");
       assert.isTrue(svg2.classed("plottable"), "second <svg> was given \"plottable\" CSS class");
@@ -118,7 +118,7 @@ describe("Component behavior", () => {
       var height = 200;
       c._anchor(svg);
       c._computeLayout(xOff, yOff, width, height);
-      var translate = getTranslate((<any> c)._element);
+      var translate = TestMethods.getTranslate((<any> c)._element);
       assert.deepEqual(translate, [xOff, yOff], "the element translated appropriately");
       assert.equal(c.width() , width, "the width set properly");
       assert.equal(c.height(), height, "the height set propery");
@@ -141,7 +141,7 @@ describe("Component behavior", () => {
   });
 
   it("fixed-width component will align to the right spot", () => {
-    fixComponentSize(c, 100, 100);
+    TestMethods.fixComponentSize(c, 100, 100);
     c._anchor(svg);
     c._computeLayout();
     assertComponentXY(c, 0, 0, "top-left component aligns correctly");
@@ -157,7 +157,7 @@ describe("Component behavior", () => {
   });
 
   it("components can be offset relative to their alignment, and throw errors if there is insufficient space", () => {
-    fixComponentSize(c, 100, 100);
+    TestMethods.fixComponentSize(c, 100, 100);
     c._anchor(svg);
     c.xOffset(20).yOffset(20);
     c._computeLayout();
@@ -255,7 +255,7 @@ describe("Component behavior", () => {
     c._anchor(svg);
     assert.isUndefined((<any> c)._hitBox, "no hitBox was created when there were no registered interactions");
     svg.remove();
-    svg = generateSVG();
+    svg = TestMethods.generateSVG();
 
     // registration before anchoring
     c = new Plottable.Component.AbstractComponent();
@@ -265,7 +265,7 @@ describe("Component behavior", () => {
     c._anchor(svg);
     verifyHitbox(c);
     svg.remove();
-    svg = generateSVG();
+    svg = TestMethods.generateSVG();
 
     // registration after anchoring
     c = new Plottable.Component.AbstractComponent();
@@ -327,12 +327,12 @@ describe("Component behavior", () => {
 
   it("_invalidateLayout works as expected", () => {
     var cg = new Plottable.Component.Group();
-    var c = makeFixedSizeComponent(10, 10);
+    var c = TestMethods.makeFixedSizeComponent(10, 10);
     cg._addComponent(c);
     cg.renderTo(svg);
     assert.equal(cg.height(), 300, "height() is the entire available height");
     assert.equal(cg.width(), 400, "width() is the entire available width");
-    fixComponentSize(c, 50, 50);
+    TestMethods.fixComponentSize(c, 50, 50);
     c._invalidateLayout();
     assert.equal(cg.height(), 300, "height() after resizing is the entire available height");
     assert.equal(cg.width(), 400, "width() after resizing is the entire available width");
@@ -357,9 +357,10 @@ describe("Component behavior", () => {
     horizontalComponent.xAlign("center");
     verticalComponent.yAlign("bottom");
 
-    assertBBoxNonIntersection((<any> verticalComponent)._element.select(".bounding-box"),
+    TestMethods.assertBBoxNonIntersection((<any> verticalComponent)._element.select(".bounding-box"),
                               (<any> placeHolder)._element.select(".bounding-box"));
-    assertBBoxInclusion((<any> t)._boxContainer.select(".bounding-box"), (<any> horizontalComponent)._element.select(".bounding-box"));
+    TestMethods.assertBBoxInclusion((<any> t)._boxContainer.select(".bounding-box"),
+                                    (<any> horizontalComponent)._element.select(".bounding-box"));
 
     svg.remove();
   });
@@ -404,7 +405,7 @@ describe("Component behavior", () => {
     var cWidth = 100;
     var cHeight = 100;
     it("origin() (top-level component)", () => {
-      fixComponentSize(c, cWidth, cHeight);
+      TestMethods.fixComponentSize(c, cWidth, cHeight);
       c.renderTo(svg);
 
       c.xAlign("left").yAlign("top");
@@ -435,7 +436,7 @@ describe("Component behavior", () => {
     });
 
     it("origin() (nested)", () => {
-      fixComponentSize(c, cWidth, cHeight);
+      TestMethods.fixComponentSize(c, cWidth, cHeight);
       var group = new Plottable.Component.Group([c]);
       var groupXOffset = 40;
       var groupYOffset = 30;
@@ -465,7 +466,7 @@ describe("Component behavior", () => {
     });
 
     it("originToSVG() (top-level component)", () => {
-      fixComponentSize(c, cWidth, cHeight);
+      TestMethods.fixComponentSize(c, cWidth, cHeight);
       c.renderTo(svg);
 
       c.xAlign("left").yAlign("top");
@@ -496,7 +497,7 @@ describe("Component behavior", () => {
     });
 
     it("originToSVG() (nested)", () => {
-      fixComponentSize(c, cWidth, cHeight);
+      TestMethods.fixComponentSize(c, cWidth, cHeight);
       var group = new Plottable.Component.Group([c]);
       var groupXOffset = 40;
       var groupYOffset = 30;

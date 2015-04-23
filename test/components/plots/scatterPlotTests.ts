@@ -5,7 +5,7 @@ var assert = chai.assert;
 describe("Plots", () => {
   describe("ScatterPlot", () => {
     it("renders correctly with no data", () => {
-      var svg = generateSVG(400, 400);
+      var svg = TestMethods.generateSVG(400, 400);
       var xScale = new Plottable.Scale.Linear();
       var yScale = new Plottable.Scale.Linear();
       var plot = new Plottable.Plot.Scatter(xScale, yScale);
@@ -18,7 +18,7 @@ describe("Plots", () => {
     });
 
     it("the accessors properly access data, index, and metadata", () => {
-      var svg = generateSVG(400, 400);
+      var svg = TestMethods.generateSVG(400, 400);
       var xScale = new Plottable.Scale.Linear();
       var yScale = new Plottable.Scale.Linear();
       xScale.domain([0, 400]);
@@ -66,7 +66,7 @@ describe("Plots", () => {
     });
 
     it("getAllSelections()", () => {
-      var svg = generateSVG(400, 400);
+      var svg = TestMethods.generateSVG(400, 400);
       var xScale = new Plottable.Scale.Linear();
       var yScale = new Plottable.Scale.Linear();
       var data = [{x: 0, y: 0}, {x: 1, y: 1}];
@@ -95,7 +95,7 @@ describe("Plots", () => {
         assert.deepEqual(expected.selection, actual.selection, msg);
       }
 
-      var svg = generateSVG(400, 400);
+      var svg = TestMethods.generateSVG(400, 400);
       var xScale = new Plottable.Scale.Linear();
       var yScale = new Plottable.Scale.Linear();
       var data = [{x: 0, y: 0}, {x: 1, y: 1}];
@@ -144,7 +144,7 @@ describe("Plots", () => {
     });
 
     it("_getClosestStruckPoint()", () => {
-      var svg = generateSVG(400, 400);
+      var svg = TestMethods.generateSVG(400, 400);
       var xScale = new Plottable.Scale.Linear();
       var yScale = new Plottable.Scale.Linear();
       xScale.domain([0, 400]);
@@ -182,7 +182,7 @@ describe("Plots", () => {
     });
 
     it("correctly handles NaN and undefined x and y values", () => {
-      var svg = generateSVG(400, 400);
+      var svg = TestMethods.generateSVG(400, 400);
       var data = [
         { foo: 0.0, bar: 0.0 },
         { foo: 0.2, bar: 0.2 },
@@ -226,7 +226,7 @@ describe("Plots", () => {
       var dataAreaPart = {xMin: 3, xMax: 9, yMin: 54, yMax: 27};
       var colorAccessor = (d: any, i: number, m: any) => d3.rgb(d.x, d.y, i).toString();
       var circlesInArea: number;
-      var quadraticDataset = makeQuadraticSeries(10);
+      var quadraticDataset = TestMethods.makeQuadraticSeries(10);
 
       function getCirclePlotVerifier() {
         // creates a function that verifies that circles are drawn properly after accounting for svg transform
@@ -254,7 +254,7 @@ describe("Plots", () => {
       };
 
       beforeEach(() => {
-        svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
         xScale = new Plottable.Scale.Linear().domain([0, 9]);
         yScale = new Plottable.Scale.Linear().domain([0, 81]);
         circlePlot = new Plottable.Plot.Scatter(xScale, yScale);

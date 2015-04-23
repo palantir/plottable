@@ -4,12 +4,12 @@ var assert = chai.assert;
 
 describe("ComponentGroups", () => {
   it("components in componentGroups overlap", () => {
-    var c1 = makeFixedSizeComponent(10, 10);
+    var c1 = TestMethods.makeFixedSizeComponent(10, 10);
     var c2 = new Plottable.Component.AbstractComponent();
     var c3 = new Plottable.Component.AbstractComponent();
 
     var cg = new Plottable.Component.Group([c1, c2, c3]);
-    var svg = generateSVG(400, 400);
+    var svg = TestMethods.generateSVG(400, 400);
     cg._anchor(svg);
     (<any> c1)._addBox("test-box1");
     (<any> c2)._addBox("test-box2");
@@ -18,32 +18,32 @@ describe("ComponentGroups", () => {
     var t1 = svg.select(".test-box1");
     var t2 = svg.select(".test-box2");
     var t3 = svg.select(".test-box3");
-    assertWidthHeight(t1, 10, 10, "rect1 sized correctly");
-    assertWidthHeight(t2, 400, 400, "rect2 sized correctly");
-    assertWidthHeight(t3, 400, 400, "rect3 sized correctly");
+    TestMethods.assertWidthHeight(t1, 10, 10, "rect1 sized correctly");
+    TestMethods.assertWidthHeight(t2, 400, 400, "rect2 sized correctly");
+    TestMethods.assertWidthHeight(t3, 400, 400, "rect3 sized correctly");
     svg.remove();
   });
 
   it("components can be added before and after anchoring", () => {
-    var c1 = makeFixedSizeComponent(10, 10);
-    var c2 = makeFixedSizeComponent(20, 20);
+    var c1 = TestMethods.makeFixedSizeComponent(10, 10);
+    var c2 = TestMethods.makeFixedSizeComponent(20, 20);
     var c3 = new Plottable.Component.AbstractComponent();
 
     var cg = new Plottable.Component.Group([c1]);
-    var svg = generateSVG(400, 400);
+    var svg = TestMethods.generateSVG(400, 400);
     cg.below(c2)._anchor(svg);
     (<any> c1)._addBox("test-box1");
     (<any> c2)._addBox("test-box2");
     cg._computeLayout()._render();
     var t1 = svg.select(".test-box1");
     var t2 = svg.select(".test-box2");
-    assertWidthHeight(t1, 10, 10, "rect1 sized correctly");
-    assertWidthHeight(t2, 20, 20, "rect2 sized correctly");
+    TestMethods.assertWidthHeight(t1, 10, 10, "rect1 sized correctly");
+    TestMethods.assertWidthHeight(t2, 20, 20, "rect2 sized correctly");
     cg.below(c3);
     (<any> c3)._addBox("test-box3");
     cg._computeLayout()._render();
     var t3 = svg.select(".test-box3");
-    assertWidthHeight(t3, 400, 400, "rect3 sized correctly");
+    TestMethods.assertWidthHeight(t3, 400, 400, "rect3 sized correctly");
     svg.remove();
   });
 
@@ -53,7 +53,7 @@ describe("ComponentGroups", () => {
     var c2 = new Plottable.Component.AbstractComponent();
     cg.below(c1).below(c2);
 
-    var svg = generateSVG();
+    var svg = TestMethods.generateSVG();
     cg._anchor(svg);
     cg._computeLayout(50, 50, 350, 350);
 
@@ -74,7 +74,7 @@ describe("ComponentGroups", () => {
     var c2 = new Plottable.Component.AbstractComponent().classed("component-2", true);
     var cg = new Plottable.Component.Group([c1, c2]);
 
-    var svg = generateSVG(200, 200);
+    var svg = TestMethods.generateSVG(200, 200);
     cg.renderTo(svg);
 
     var c1Node = svg.select(".component-1").node();
@@ -130,11 +130,11 @@ describe("ComponentGroups", () => {
     var SVG_HEIGHT = 400;
 
     it("with no Components", () => {
-      var svg = generateSVG();
+      var svg = TestMethods.generateSVG();
       var cg = new Plottable.Component.Group([]);
 
       var request = cg._requestedSpace(SVG_WIDTH, SVG_HEIGHT);
-      verifySpaceRequest(request, 0, 0, false, false, "empty Group doesn't request any space");
+      TestMethods.verifySpaceRequest(request, 0, 0, false, false, "empty Group doesn't request any space");
 
       cg.renderTo(svg);
       assert.strictEqual(cg.width(), SVG_WIDTH, "occupies all offered width");
@@ -143,7 +143,7 @@ describe("ComponentGroups", () => {
     });
 
     it("with a non-fixed-size Component", () => {
-      var svg = generateSVG();
+      var svg = TestMethods.generateSVG();
       var c1 = new Plottable.Component.AbstractComponent();
       var c2 = new Plottable.Component.AbstractComponent();
       var cg = new Plottable.Component.Group([c1, c2]);
@@ -161,7 +161,7 @@ describe("ComponentGroups", () => {
     });
 
     it("with fixed-size Components", () => {
-      var svg = generateSVG();
+      var svg = TestMethods.generateSVG();
       var tall = new Mocks.FixedSizeComponent(SVG_WIDTH / 4, SVG_WIDTH / 2);
       var wide = new Mocks.FixedSizeComponent(SVG_WIDTH / 2, SVG_WIDTH / 4);
 
