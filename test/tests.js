@@ -8903,12 +8903,12 @@ describe("Interactions", function () {
             assert.isNull(drag.onDragEnd(), "removes the callback if called with null");
             svg.remove();
         });
-        it("constrain()", function () {
+        it("constrainToComponent()", function () {
             var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
             var c = new Plottable.Component.AbstractComponent();
             c.renderTo(svg);
             var drag = new Plottable.Interaction.Drag();
-            assert.isTrue(drag.constrain(), "constrains by default");
+            assert.isTrue(drag.constrainToComponent(), "constrains by default");
             var receivedStart;
             var receivedEnd;
             var moveCallback = function (start, end) {
@@ -8947,7 +8947,7 @@ describe("Interactions", function () {
             triggerFakeTouchEvent("touchstart", target, startPoint.x, startPoint.y);
             triggerFakeTouchEvent("touchend", target, outsidePointNeg.x, outsidePointNeg.y);
             assert.deepEqual(receivedEnd, constrainedNeg, "dragging outside the Component is constrained (negative) (touchend)");
-            drag.constrain(false);
+            drag.constrainToComponent(false);
             triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
             triggerFakeMouseEvent("mousemove", target, outsidePointPos.x, outsidePointPos.y);
             assert.deepEqual(receivedEnd, outsidePointPos, "dragging outside the Component is no longer constrained (positive) (mousemove)");
