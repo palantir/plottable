@@ -7,6 +7,7 @@
 /// <reference path="utils/color.ts" />
 
 /// <reference path="utils/formatters.ts" />
+/// <reference path="utils/scaleDomainTransformers.ts" />
 /// <reference path="utils/symbolFactories.ts" />
 
 /// <reference path="utils/clientToSVGTranslator.ts" />
