@@ -9997,11 +9997,11 @@ var Plottable;
                     }
                 }
             };
-            Drag.prototype.constrainPoints = function (doConstrain) {
-                if (doConstrain == null) {
+            Drag.prototype.constrainToComponent = function (constrain) {
+                if (constrain == null) {
                     return this._constrain;
                 }
-                this._constrain = doConstrain;
+                this._constrain = constrain;
                 return this;
             };
             Drag.prototype.onDragStart = function (cb) {
