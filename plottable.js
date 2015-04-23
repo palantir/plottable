@@ -4472,9 +4472,9 @@ var Plottable;
              */
             function Time(scale, orientation) {
                 _super.call(this, scale, orientation);
+                this._tierLabelPositions = [];
                 this.classed("time-axis", true);
                 this.tickLabelPadding(5);
-                this.tierLabelPositions(["between", "between"]);
                 this.axisConfigurations(Time._DEFAULT_TIME_AXIS_CONFIGURATIONS);
             }
             Time.prototype.tierLabelPositions = function (newPositions) {
@@ -4495,6 +4495,16 @@ var Plottable;
                     return this._possibleTimeAxisConfigurations;
                 }
                 this._possibleTimeAxisConfigurations = configurations;
+                this._numTiers = Plottable._Util.Methods.max(this._possibleTimeAxisConfigurations.map(function (config) { return config.length; }), 0);
+                if (this._isAnchored) {
+                    this._setupDomElements();
+                }
+                var oldLabelPositions = this.tierLabelPositions();
+                var newLabelPositions = [];
+                for (var i = 0; i < this._numTiers; i++) {
+                    newLabelPositions.push(oldLabelPositions[i] || "between");
+                }
+                this.tierLabelPositions(newLabelPositions);
                 this._invalidateLayout();
                 return this;
             };
@@ -4523,9 +4533,8 @@ var Plottable;
             };
             Time.prototype._computeHeight = function () {
                 var textHeight = this._measurer.measure().height;
-                var maximumTiers = Plottable._Util.Methods.max(this._possibleTimeAxisConfigurations.map(function (config) { return config.length; }), 0);
                 this._tierHeights = [];
-                for (var i = 0; i < maximumTiers; i++) {
+                for (var i = 0; i < this._numTiers; i++) {
                     this._tierHeights.push(textHeight + this.tickLabelPadding() + ((this._tierLabelPositions[i]) === "between" ? 0 : this._maxLabelTickLength()));
                 }
                 this._computedHeight = d3.sum(this._tierHeights);
@@ -4552,15 +4561,28 @@ var Plottable;
                 var worstWidth = this._maxWidthForInterval(config) + 2 * this.tickLabelPadding();
                 return Math.min(this._getIntervalLength(config), this.width()) >= worstWidth;
             };
+            Time.prototype._getSize = function (availableWidth, availableHeight) {
+                // Makes sure that the size it requires is a multiple of tier sizes, such that
+                // we have no leftover tiers
+                var size = _super.prototype._getSize.call(this, availableWidth, availableHeight);
+                size.height = this._tierHeights.reduce(function (prevValue, currValue, index, arr) {
+                    return (prevValue + currValue > size.height) ? prevValue : (prevValue + currValue);
+                });
+                return size;
+            };
             Time.prototype._setup = function () {
                 _super.prototype._setup.call(this);
+                this._setupDomElements();
+            };
+            Time.prototype._setupDomElements = function () {
+                d3.selectAll("." + Time.TIME_AXIS_TIER_CLASS).remove();
                 this._tierLabelContainers = [];
                 this._tierMarkContainers = [];
                 this._tierBaselines = [];
                 this._tickLabelContainer.remove();
                 this._baseline.remove();
-                for (var i = 0; i < Time._NUM_TIERS; ++i) {
-                    var tierContainer = this._content.append("g").classed("time-axis-tier", true);
+                for (var i = 0; i < this._numTiers; ++i) {
+                    var tierContainer = this._content.append("g").classed(Time.TIME_AXIS_TIER_CLASS, true);
                     this._tierLabelContainers.push(tierContainer.append("g").classed(Axis.AbstractAxis.TICK_LABEL_CLASS + "-container", true));
                     this._tierMarkContainers.push(tierContainer.append("g").classed(Axis.AbstractAxis.TICK_MARK_CLASS + "-container", true));
                     this._tierBaselines.push(tierContainer.append("line").classed("baseline", true));
@@ -4574,10 +4596,12 @@ var Plottable;
                 var _this = this;
                 return this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex].reduce(function (ticks, config) { return ticks.concat(_this._getTickIntervalValues(config)); }, []);
             };
-            Time.prototype._cleanTier = function (index) {
-                this._tierLabelContainers[index].selectAll("." + Axis.AbstractAxis.TICK_LABEL_CLASS).remove();
-                this._tierMarkContainers[index].selectAll("." + Axis.AbstractAxis.TICK_MARK_CLASS).remove();
-                this._tierBaselines[index].style("visibility", "hidden");
+            Time.prototype._cleanTiers = function () {
+                for (var index = 0; index < this._tierLabelContainers.length; index++) {
+                    this._tierLabelContainers[index].selectAll("." + Axis.AbstractAxis.TICK_LABEL_CLASS).remove();
+                    this._tierMarkContainers[index].selectAll("." + Axis.AbstractAxis.TICK_MARK_CLASS).remove();
+                    this._tierBaselines[index].style("visibility", "hidden");
+                }
             };
             Time.prototype._getTickValuesForConfiguration = function (config) {
                 var tickPos = this._scale.tickInterval(config.interval, config.step);
@@ -4667,17 +4691,15 @@ var Plottable;
                 var _this = this;
                 this._mostPreciseConfigIndex = this._getMostPreciseConfigurationIndex();
                 var tierConfigs = this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex];
-                for (var i = 0; i < Time._NUM_TIERS; ++i) {
-                    this._cleanTier(i);
-                }
+                this._cleanTiers();
                 tierConfigs.forEach(function (config, i) { return _this._renderTierLabels(_this._tierLabelContainers[i], config, i); });
                 var tierTicks = tierConfigs.map(function (config, i) { return _this._getTickValuesForConfiguration(config); });
                 var baselineOffset = 0;
-                for (i = 0; i < Math.max(tierConfigs.length, 1); ++i) {
+                for (var i = 0; i < Math.max(tierConfigs.length, 1); ++i) {
                     var attr = this._generateBaselineAttrHash();
                     attr["y1"] += (this.orient() === "bottom") ? baselineOffset : -baselineOffset;
                     attr["y2"] = attr["y1"];
-                    this._tierBaselines[i].attr(attr).style("visibility", "visible");
+                    this._tierBaselines[i].attr(attr).style("visibility", "inherit");
                     baselineOffset += this._tierHeights[i];
                 }
                 var labelLessTicks = [];
@@ -4687,11 +4709,21 @@ var Plottable;
                     labelLessTicks = this._generateLabellessTicks();
                 }
                 this._renderLabellessTickMarks(labelLessTicks);
+                this._hideOverflowingTiers();
                 for (i = 0; i < tierConfigs.length; ++i) {
                     this._renderTickMarks(tierTicks[i], i);
                     this._hideOverlappingAndCutOffLabels(i);
                 }
                 return this;
+            };
+            Time.prototype._hideOverflowingTiers = function () {
+                var _this = this;
+                var availableHeight = this.height();
+                var usedHeight = 0;
+                this._element.selectAll("." + Time.TIME_AXIS_TIER_CLASS).attr("visibility", function (d, i) {
+                    usedHeight += _this._tierHeights[i];
+                    return usedHeight <= availableHeight ? "inherit" : "hidden";
+                });
             };
             Time.prototype._hideOverlappingAndCutOffLabels = function (index) {
                 var _this = this;
@@ -4700,12 +4732,14 @@ var Plottable;
                     return (Math.floor(boundingBox.left) <= Math.ceil(tickBox.left) && Math.floor(boundingBox.top) <= Math.ceil(tickBox.top) && Math.floor(tickBox.right) <= Math.ceil(boundingBox.left + _this.width()) && Math.floor(tickBox.bottom) <= Math.ceil(boundingBox.top + _this.height()));
                 };
                 var visibleTickMarks = this._tierMarkContainers[index].selectAll("." + Axis.AbstractAxis.TICK_MARK_CLASS).filter(function (d, i) {
-                    return d3.select(this).style("visibility") === "visible";
+                    var visibility = d3.select(this).style("visibility");
+                    return visibility === "visible" || visibility === "inherit";
                 });
                 // We use the ClientRects because x1/x2 attributes are not comparable to ClientRects of labels
                 var visibleTickMarkRects = visibleTickMarks[0].map(function (mark) { return mark.getBoundingClientRect(); });
                 var visibleTickLabels = this._tierLabelContainers[index].selectAll("." + Axis.AbstractAxis.TICK_LABEL_CLASS).filter(function (d, i) {
-                    return d3.select(this).style("visibility") === "visible";
+                    var visibility = d3.select(this).style("visibility");
+                    return visibility === "visible" || visibility === "inherit";
                 });
                 var lastLabelClientRect;
                 visibleTickLabels.each(function (d, i) {
@@ -4718,10 +4752,14 @@ var Plottable;
                     }
                     else {
                         lastLabelClientRect = clientRect;
-                        tickLabel.style("visibility", "visible");
+                        tickLabel.style("visibility", "inherit");
                     }
                 });
             };
+            /**
+             * The css class applied to each time axis tier
+             */
+            Time.TIME_AXIS_TIER_CLASS = "time-axis-tier";
             /*
              * Default possible axis configurations.
              */
@@ -4835,10 +4873,6 @@ var Plottable;
                 ]
             ];
             Time._LONG_DATE = new Date(9999, 8, 29, 12, 59, 9999);
-            /**
-             * Number of possible tiers.
-             */
-            Time._NUM_TIERS = 2;
             return Time;
         })(Axis.AbstractAxis);
         Axis.Time = Time;

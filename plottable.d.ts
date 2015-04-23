@@ -2132,6 +2132,10 @@ declare module Plottable {
         type TimeAxisConfiguration = TimeAxisTierConfiguration[];
         class Time extends AbstractAxis {
             /**
+             * The css class applied to each time axis tier
+             */
+            static TIME_AXIS_TIER_CLASS: string;
+            /**
              * Constructs a TimeAxis.
              *
              * A TimeAxis is used for rendering a TimeScale.
@@ -2161,6 +2165,10 @@ declare module Plottable {
             orient(): string;
             orient(orientation: string): Time;
             _computeHeight(): number;
+            protected _getSize(availableWidth: number, availableHeight: number): {
+                width: number;
+                height: number;
+            };
             protected _setup(): void;
             protected _getTickValues(): any[];
             _doRender(): Time;

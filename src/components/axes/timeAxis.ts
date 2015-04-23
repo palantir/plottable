@@ -23,6 +23,10 @@ export module Axis {
   export type TimeAxisConfiguration = TimeAxisTierConfiguration[];
 
   export class Time extends AbstractAxis {
+    /**
+     * The css class applied to each time axis tier
+     */
+    public static TIME_AXIS_TIER_CLASS = "time-axis-tier";
 
     /*
      * Default possible axis configurations.
@@ -142,18 +146,14 @@ export module Axis {
     private _tierBaselines: D3.Selection[];
     private _tierHeights: number[];
     private _possibleTimeAxisConfigurations: TimeAxisConfiguration[];
+    private _numTiers: number;
     private _measurer: SVGTypewriter.Measurers.Measurer;
 
     private _mostPreciseConfigIndex: number;
 
-    private _tierLabelPositions: string[];
+    private _tierLabelPositions: string[] = [];
 
     private static _LONG_DATE = new Date(9999, 8, 29, 12, 59, 9999);
-
-    /**
-     * Number of possible tiers.
-     */
-    private static _NUM_TIERS = 2;
 
     /**
      * Constructs a TimeAxis.
@@ -168,7 +168,6 @@ export module Axis {
       super(scale, orientation);
       this.classed("time-axis", true);
       this.tickLabelPadding(5);
-      this.tierLabelPositions(["between", "between"]);
       this.axisConfigurations(Time._DEFAULT_TIME_AXIS_CONFIGURATIONS);
     }
 
@@ -207,6 +206,19 @@ export module Axis {
         return this._possibleTimeAxisConfigurations;
       }
       this._possibleTimeAxisConfigurations = configurations;
+      this._numTiers = _Util.Methods.max(this._possibleTimeAxisConfigurations.map((config: TimeAxisConfiguration) => config.length), 0);
+
+      if (this._isAnchored) {
+        this._setupDomElements();
+      }
+
+      var oldLabelPositions: string[] = this.tierLabelPositions();
+      var newLabelPositions: string[] = [];
+      for (var i = 0; i < this._numTiers; i++) {
+        newLabelPositions.push(oldLabelPositions[i] || "between");
+      }
+      this.tierLabelPositions(newLabelPositions);
+
       this._invalidateLayout();
       return this;
     }
@@ -242,10 +254,9 @@ export module Axis {
 
     public _computeHeight() {
       var textHeight = this._measurer.measure().height;
-      var maximumTiers = _Util.Methods.max(this._possibleTimeAxisConfigurations.map((config: TimeAxisConfiguration) => config.length), 0);
 
       this._tierHeights = [];
-      for (var i = 0; i < maximumTiers; i++) {
+      for (var i = 0; i < this._numTiers; i++) {
         this._tierHeights.push(textHeight + this.tickLabelPadding() +
                               ((this._tierLabelPositions[i]) === "between" ? 0 : this._maxLabelTickLength()));
       }
@@ -278,15 +289,33 @@ export module Axis {
       return Math.min(this._getIntervalLength(config), this.width()) >= worstWidth;
     }
 
+    protected _getSize(availableWidth: number, availableHeight: number) {
+      // Makes sure that the size it requires is a multiple of tier sizes, such that
+      // we have no leftover tiers
+
+      var size = super._getSize(availableWidth, availableHeight);
+      size.height = this._tierHeights.reduce((prevValue, currValue, index, arr) => {
+        return (prevValue + currValue > size.height) ? prevValue : (prevValue + currValue);
+      });
+      return size;
+    }
+
     protected _setup() {
       super._setup();
+      this._setupDomElements();
+    }
+
+    private _setupDomElements() {
+      d3.selectAll("." + Time.TIME_AXIS_TIER_CLASS).remove();
+
       this._tierLabelContainers = [];
       this._tierMarkContainers = [];
       this._tierBaselines = [];
       this._tickLabelContainer.remove();
       this._baseline.remove();
-      for (var i = 0; i < Time._NUM_TIERS; ++i) {
-        var tierContainer = this._content.append("g").classed("time-axis-tier", true);
+
+      for (var i = 0; i < this._numTiers; ++i) {
+        var tierContainer = this._content.append("g").classed(Time.TIME_AXIS_TIER_CLASS, true);
         this._tierLabelContainers.push(tierContainer.append("g").classed(AbstractAxis.TICK_LABEL_CLASS + "-container", true));
         this._tierMarkContainers.push(tierContainer.append("g").classed(AbstractAxis.TICK_MARK_CLASS + "-container", true));
         this._tierBaselines.push(tierContainer.append("line").classed("baseline", true));
@@ -306,10 +335,12 @@ export module Axis {
         );
     }
 
-    private _cleanTier(index: number) {
-      this._tierLabelContainers[index].selectAll("." + AbstractAxis.TICK_LABEL_CLASS).remove();
-      this._tierMarkContainers[index].selectAll("." + AbstractAxis.TICK_MARK_CLASS).remove();
-      this._tierBaselines[index].style("visibility", "hidden");
+    private _cleanTiers() {
+      for (var index = 0; index < this._tierLabelContainers.length; index++) {
+        this._tierLabelContainers[index].selectAll("." + AbstractAxis.TICK_LABEL_CLASS).remove();
+        this._tierMarkContainers[index].selectAll("." + AbstractAxis.TICK_MARK_CLASS).remove();
+        this._tierBaselines[index].style("visibility", "hidden");
+      }
     }
 
     private _getTickValuesForConfiguration(config: TimeAxisTierConfiguration) {
@@ -408,9 +439,8 @@ export module Axis {
     public _doRender() {
       this._mostPreciseConfigIndex = this._getMostPreciseConfigurationIndex();
       var tierConfigs = this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex];
-      for (var i = 0; i < Time._NUM_TIERS; ++i) {
-        this._cleanTier(i);
-      }
+
+      this._cleanTiers();
 
       tierConfigs.forEach((config: TimeAxisTierConfiguration, i: number) =>
         this._renderTierLabels(this._tierLabelContainers[i], config, i)
@@ -420,11 +450,11 @@ export module Axis {
       );
 
       var baselineOffset = 0;
-      for (i = 0; i < Math.max(tierConfigs.length, 1); ++i) {
+      for (var i = 0; i < Math.max(tierConfigs.length, 1); ++i) {
         var attr = this._generateBaselineAttrHash();
         attr["y1"] += (this.orient() === "bottom") ? baselineOffset : -baselineOffset;
         attr["y2"] = attr["y1"];
-        this._tierBaselines[i].attr(attr).style("visibility", "visible");
+        this._tierBaselines[i].attr(attr).style("visibility", "inherit");
         baselineOffset += this._tierHeights[i];
       }
 
@@ -437,12 +467,25 @@ export module Axis {
 
       this._renderLabellessTickMarks(labelLessTicks);
 
+      this._hideOverflowingTiers();
       for (i = 0; i < tierConfigs.length; ++i) {
         this._renderTickMarks(tierTicks[i], i);
         this._hideOverlappingAndCutOffLabels(i);
       }
 
       return this;
+    }
+
+    private _hideOverflowingTiers() {
+      var availableHeight = this.height();
+      var usedHeight = 0;
+
+      this._element
+        .selectAll("." + Time.TIME_AXIS_TIER_CLASS)
+        .attr("visibility", (d: any, i: number) => {
+          usedHeight += this._tierHeights[i];
+          return usedHeight <= availableHeight ? "inherit" : "hidden";
+        });
     }
 
     private _hideOverlappingAndCutOffLabels(index: number) {
@@ -460,7 +503,8 @@ export module Axis {
       var visibleTickMarks = this._tierMarkContainers[index]
                                     .selectAll("." + AbstractAxis.TICK_MARK_CLASS)
                                     .filter(function(d: Element, i: number) {
-                                      return d3.select(this).style("visibility") === "visible";
+                                      var visibility = d3.select(this).style("visibility");
+                                      return visibility === "visible" || visibility === "inherit";
                                     });
 
       // We use the ClientRects because x1/x2 attributes are not comparable to ClientRects of labels
@@ -469,7 +513,8 @@ export module Axis {
       var visibleTickLabels = this._tierLabelContainers[index]
                                     .selectAll("." + AbstractAxis.TICK_LABEL_CLASS)
                                     .filter(function(d: Element, i: number) {
-                                      return d3.select(this).style("visibility") === "visible";
+                                      var visibility = d3.select(this).style("visibility");
+                                      return visibility === "visible" || visibility === "inherit";
                                     });
       var lastLabelClientRect: ClientRect;
 
@@ -483,7 +528,7 @@ export module Axis {
           tickLabel.style("visibility", "hidden");
         } else {
           lastLabelClientRect = clientRect;
-          tickLabel.style("visibility", "visible");
+          tickLabel.style("visibility", "inherit");
         }
       });
     }
