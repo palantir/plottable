@@ -2105,9 +2105,6 @@ declare module Plottable {
              * @returns {Axis} The calling Axis.
              */
             showEndTickLabels(show: boolean): AbstractAxis;
-            protected _hideEndTickLabels(): void;
-            protected _hideOverflowingTickLabels(): void;
-            protected _hideOverlappingTickLabels(): void;
         }
     }
 }
