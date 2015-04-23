@@ -10,7 +10,7 @@
     "max-line-length": [true, 140],
     "no-arg": true,
     "no-bitwise": true,
-    "no-construct": true,
+    "no-consecutive-blank-lines": true,
     "no-console": [true,
         "log",
         "debug",
@@ -20,7 +20,7 @@
         "trace",
         "warn"
     ],
-    "no-consecutive-blank-lines": true,
+    "no-construct": true,
     "no-duplicate-key": true,
     "no-duplicate-variable": true,
     "no-empty": true,
