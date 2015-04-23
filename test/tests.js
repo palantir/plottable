@@ -1,5 +1,5 @@
 ///<reference path="testReference.ts" />
-// HACKHACK: These functions are indeed used but it is not known they are used?
+// HACKHACK: The below functions are well used inside our tests, but typescript does not allow exporting of below functions
 /* tslint:disable:no-unused-variable */
 function generateSVG(width, height) {
     if (width === void 0) { width = 400; }
