@@ -61,7 +61,6 @@ describe("Plots", () => {
       svg.remove();
     });
 
-
     it("renders correctly when data is set after construction", () => {
       var xScale: Plottable.Scale.Category = new Plottable.Scale.Category();
       var yScale: Plottable.Scale.Category = new Plottable.Scale.Category();

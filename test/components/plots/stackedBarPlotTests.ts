@@ -408,7 +408,6 @@ describe("Plots", () => {
     });
   });
 
-
   describe("fail safe tests", () => {
 
     it("conversion fails should be silent in Plot.StackedBar", () => {

@@ -44,7 +44,6 @@ describe("Interactions", () => {
     var outData: Plottable.Interaction.HoverData;
     var outCallbackCalled = false;
 
-
     beforeEach(() => {
       svg = generateSVG();
       testTarget = new TestHoverable();
