@@ -34,7 +34,7 @@ describe("StrictEqualityAssociativeArray", () => {
     s.set(3, "bar");
     s.set(4, "baz");
     assert.deepEqual(s.values(), ["foo", "bar", "baz"]);
-    assert.deepEqual(s.keys(), [2,3,4]);
+    assert.deepEqual(s.keys(), [2, 3, 4]);
     assert.deepEqual(s.map((k, v, i) => [k, v, i]), [[2, "foo", 0], [3, "bar", 1], [4, "baz", 2]]);
   });
 });

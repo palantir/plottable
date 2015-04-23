@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Plot {
-  export class Scatter<X,Y> extends AbstractXYPlot<X,Y> implements Interaction.Hoverable {
+  export class Scatter<X, Y> extends AbstractXYPlot<X, Y> implements Interaction.Hoverable {
     private _closeDetectionRadius = 5;
     private _defaultFillColor: string;
 
@@ -113,6 +113,22 @@ export module Plot {
         pixelPositions: [closestPoint],
         data: closestData
       };
+    }
+
+    protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean {
+      var xRange = { min: 0, max: this.width() };
+      var yRange = { min: 0, max: this.height() };
+
+      var translation = d3.transform(selection.attr("transform")).translate;
+      var bbox = selection[0][0].getBBox();
+      var translatedBbox: SVGRect = {
+        x: bbox.x + translation[0],
+        y: bbox.y + translation[1],
+        width: bbox.width,
+        height: bbox.height
+      };
+
+      return Plottable._Util.Methods.intersectsBBox(xRange, yRange, translatedBbox);
     }
 
     //===== Hover logic =====

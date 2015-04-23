@@ -27,7 +27,7 @@ export module Axis {
     /*
      * Default possible axis configurations.
      */
-    private _possibleTimeAxisConfigurations: TimeAxisConfiguration[] = [
+    private static _DEFAULT_TIME_AXIS_CONFIGURATIONS: TimeAxisConfiguration[] = [
       [
         {interval: d3.time.second, step: 1, formatter: Formatters.time("%I:%M:%S %p")},
         {interval: d3.time.day, step: 1, formatter: Formatters.time("%B %e, %Y")}
@@ -74,7 +74,7 @@ export module Axis {
       ],
       [
         {interval: d3.time.hour, step: 3, formatter: Formatters.time("%I %p")},
-        {interval: d3.time.day, step: 1,formatter: Formatters.time("%B %e, %Y")}
+        {interval: d3.time.day, step: 1, formatter: Formatters.time("%B %e, %Y")}
       ],
       [
         {interval: d3.time.hour, step: 6, formatter: Formatters.time("%I %p")},
@@ -141,6 +141,7 @@ export module Axis {
     private _tierMarkContainers: D3.Selection[];
     private _tierBaselines: D3.Selection[];
     private _tierHeights: number[];
+    private _possibleTimeAxisConfigurations: TimeAxisConfiguration[];
     private _measurer: SVGTypewriter.Measurers.Measurer;
 
     private _mostPreciseConfigIndex: number;
@@ -168,6 +169,7 @@ export module Axis {
       this.classed("time-axis", true);
       this.tickLabelPadding(5);
       this.tierLabelPositions(["between", "between"]);
+      this.axisConfigurations(Time._DEFAULT_TIME_AXIS_CONFIGURATIONS);
     }
 
     public tierLabelPositions(): string[];
@@ -240,8 +242,14 @@ export module Axis {
 
     public _computeHeight() {
       var textHeight = this._measurer.measure().height;
-      this._tierHeights = this._tierLabelPositions.map((pos: string) =>
-        textHeight + this.tickLabelPadding() + ((pos === "between") ? 0 : this._maxLabelTickLength()));
+      var maximumTiers = _Util.Methods.max(this._possibleTimeAxisConfigurations.map((config: TimeAxisConfiguration) => config.length), 0);
+
+      this._tierHeights = [];
+      for (var i = 0; i < maximumTiers; i++) {
+        this._tierHeights.push(textHeight + this.tickLabelPadding() +
+                              ((this._tierLabelPositions[i]) === "between" ? 0 : this._maxLabelTickLength()));
+      }
+
       this._computedHeight = d3.sum(this._tierHeights);
       return this._computedHeight;
     }
@@ -469,7 +477,7 @@ export module Axis {
         var clientRect = this.getBoundingClientRect();
         var tickLabel = d3.select(this);
         var leadingTickMark = visibleTickMarkRects[i];
-        var trailingTickMark = visibleTickMarkRects[i+1];
+        var trailingTickMark = visibleTickMarkRects[i + 1];
         if (!isInsideBBox(clientRect) || (lastLabelClientRect != null && _Util.DOM.boxesOverlap(clientRect, lastLabelClientRect))
             || (leadingTickMark.right > clientRect.left || trailingTickMark.left < clientRect.right)) {
           tickLabel.style("visibility", "hidden");

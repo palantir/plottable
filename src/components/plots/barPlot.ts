@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Plot {
-  export class Bar<X,Y> extends AbstractXYPlot<X,Y> implements Interaction.Hoverable {
+  export class Bar<X, Y> extends AbstractXYPlot<X, Y> implements Interaction.Hoverable {
     protected static _BarAlignmentToFactor: {[alignment: string]: number} = {"left": 0, "center": 0.5, "right": 1};
     protected static _DEFAULT_WIDTH = 10;
     private static _BAR_WIDTH_RATIO = 0.95;
@@ -93,17 +93,6 @@ export module Plot {
       return this;
     }
 
-
-    private _parseExtent(input: any): Extent {
-      if (typeof(input) === "number") {
-        return {min: input, max: input};
-      } else if (input instanceof Object && "min" in input && "max" in input) {
-        return <Extent> input;
-      } else {
-        throw new Error("input '" + input + "' can't be parsed as an Extent");
-      }
-    }
-
     /**
      * Get whether bar labels are enabled.
      *
@@ -116,7 +105,7 @@ export module Plot {
      *
      * @returns {Bar} The calling plot.
      */
-    public barLabelsEnabled(enabled: boolean): Bar<X,Y>;
+    public barLabelsEnabled(enabled: boolean): Bar<X, Y>;
     public barLabelsEnabled(enabled?: boolean): any {
       if (enabled === undefined) {
         return this._barLabelsEnabled;
@@ -139,7 +128,7 @@ export module Plot {
      *
      * @returns {Bar} The calling plot.
      */
-    public barLabelFormatter(formatter: Formatter): Bar<X,Y>;
+    public barLabelFormatter(formatter: Formatter): Bar<X, Y>;
     public barLabelFormatter(formatter?: Formatter): any {
       if (formatter == null) {
         return this._barLabelFormatter;
@@ -148,6 +137,103 @@ export module Plot {
         this._render();
         return this;
       }
+    }
+
+    /**
+     * Retrieves the closest PlotData to queryPoint.
+     *
+     * Bars containing the queryPoint are considered closest. If queryPoint lies outside
+     * of all bars, we return the closest in the dominant axis (x for horizontal
+     * charts, y for vertical) and break ties using the secondary axis.
+     *
+     * @param {Point} queryPoint The point to which plot data should be compared
+     *
+     * @returns {PlotData} The PlotData closest to queryPoint
+     */
+    public getClosestPlotData(queryPoint: Point): PlotData {
+      var chartXExtent = { min: 0, max: this.width() };
+      var chartYExtent = { min: 0, max: this.height() };
+
+      var minPrimaryDist = Infinity;
+      var minSecondaryDist = Infinity;
+
+      var closestData: any[] = [];
+      var closestPixelPoints: Point[] = [];
+      var closestElements: Element[] = [];
+
+      var queryPtPrimary = this._isVertical ? queryPoint.x : queryPoint.y;
+      var queryPtSecondary = this._isVertical ? queryPoint.y : queryPoint.x;
+
+      // SVGRects are positioned with sub-pixel accuracy (the default unit
+      // for the x, y, height & width attributes), but user selections (e.g. via
+      // mouse events) usually have pixel accuracy. We add a tolerance of 0.5 pixels.
+      var tolerance = 0.5;
+
+      this.datasetOrder().forEach((key) => {
+        var plotData = this.getAllPlotData(key);
+        plotData.pixelPoints.forEach((plotPt, index) => {
+          var datum = plotData.data[index];
+          var bar = plotData.selection[0][index];
+
+          if (!this._isVisibleOnPlot(datum, plotPt, d3.select(bar))) {
+            return;
+          }
+
+          var primaryDist = 0;
+          var secondaryDist = 0;
+
+          // if we're inside a bar, distance in both directions should stay 0
+          var barBBox = bar.getBBox();
+          if (!_Util.Methods.intersectsBBox(queryPoint.x, queryPoint.y, barBBox, tolerance)) {
+            var plotPtPrimary = this._isVertical ? plotPt.x : plotPt.y;
+            primaryDist = Math.abs(queryPtPrimary - plotPtPrimary);
+
+            // compute this bar's min and max along the secondary axis
+            var barMinSecondary = this._isVertical ? barBBox.y : barBBox.x;
+            var barMaxSecondary = barMinSecondary + (this._isVertical ? barBBox.height : barBBox.width);
+
+            if (queryPtSecondary >= barMinSecondary - tolerance && queryPtSecondary <= barMaxSecondary + tolerance) {
+              // if we're within a bar's secondary axis span, it is closest in that direction
+              secondaryDist = 0;
+            } else {
+              var plotPtSecondary = this._isVertical ? plotPt.y : plotPt.x;
+              secondaryDist = Math.abs(queryPtSecondary - plotPtSecondary);
+            }
+          }
+
+          // if we find a closer bar, record its distance and start new closest lists
+          if (primaryDist < minPrimaryDist
+              || primaryDist === minPrimaryDist && secondaryDist < minSecondaryDist) {
+            closestData = [];
+            closestPixelPoints = [];
+            closestElements = [];
+
+            minPrimaryDist = primaryDist;
+            minSecondaryDist = secondaryDist;
+          }
+
+          // bars minPrimaryDist away are part of the closest set
+          if (primaryDist === minPrimaryDist && secondaryDist === minSecondaryDist) {
+            closestData.push(datum);
+            closestPixelPoints.push(plotPt);
+            closestElements.push(bar);
+          }
+        });
+      });
+
+      return {
+        data: closestData,
+        pixelPoints: closestPixelPoints,
+        selection: d3.selectAll(closestElements)
+      };
+    }
+
+    protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean {
+      var xRange = { min: 0, max: this.width() };
+      var yRange = { min: 0, max: this.height() };
+      var barBBox = selection[0][0].getBBox();
+
+      return Plottable._Util.Methods.intersectsBBox(xRange, yRange, barBBox);
     }
 
     /**
@@ -165,30 +251,20 @@ export module Plot {
         return d3.select();
       }
 
-      var xExtent: Extent = this._parseExtent(xValOrExtent);
-      var yExtent: Extent = this._parseExtent(yValOrExtent);
-
       // currently, linear scan the bars. If inversion is implemented on non-numeric scales we might be able to do better.
       var bars = this._datasetKeysInOrder.reduce((bars: any[], key: string) =>
-        bars.concat(this._getBarsFromDataset(key, xExtent, yExtent))
+        bars.concat(this._getBarsFromDataset(key, xValOrExtent, yValOrExtent))
       , []);
 
       return d3.selectAll(bars);
     }
 
-    private _getBarsFromDataset(key: string, xExtent: Extent, yExtent: Extent): any[] {
-      // the SVGRects are positioned with sub-pixel accuracy (the default unit
-      // for the x, y, height & width attributes), but user selections (e.g. via
-      // mouse events) usually have pixel accuracy. A tolerance of half-a-pixel
-      // seems appropriate:
-      var tolerance: number = 0.5;
+    private _getBarsFromDataset(key: string, xValOrExtent: number | Extent, yValOrExtent: number | Extent): any[] {
       var bars: any[] = [];
 
       var drawer = <_Drawer.Element>this._key2PlotDatasetKey.get(key).drawer;
       drawer._getRenderArea().selectAll("rect").each(function(d) {
-        var bbox = this.getBBox();
-        if (bbox.x + bbox.width >= xExtent.min - tolerance && bbox.x <= xExtent.max + tolerance &&
-            bbox.y + bbox.height >= yExtent.min - tolerance && bbox.y <= yExtent.max + tolerance) {
+        if (_Util.Methods.intersectsBBox(xValOrExtent, yValOrExtent, this.getBBox())) {
           bars.push(this);
         }
       });
@@ -232,7 +308,7 @@ export module Plot {
     }
 
     protected _additionalPaint(time: number) {
-      var primaryScale: Scale.AbstractScale<any,number> = this._isVertical ? this._yScale : this._xScale;
+      var primaryScale: Scale.AbstractScale<any, number> = this._isVertical ? this._yScale : this._xScale;
       var scaledBaseline = primaryScale.scale(this._baselineValue);
 
       var baselineAttr: any = {
@@ -269,7 +345,7 @@ export module Plot {
       var drawSteps: _Drawer.DrawStep[] = [];
       if (this._dataChanged && this._animate) {
         var resetAttrToProjector = this._generateAttrToProjector();
-        var primaryScale: Scale.AbstractScale<any,number> = this._isVertical ? this._yScale : this._xScale;
+        var primaryScale: Scale.AbstractScale<any, number> = this._isVertical ? this._yScale : this._xScale;
         var scaledBaseline = primaryScale.scale(this._baselineValue);
         var positionAttr = this._isVertical ? "y" : "x";
         var dimensionAttr = this._isVertical ? "height" : "width";
@@ -285,8 +361,8 @@ export module Plot {
       // Primary scale/direction: the "length" of the bars
       // Secondary scale/direction: the "width" of the bars
       var attrToProjector = super._generateAttrToProjector();
-      var primaryScale: Scale.AbstractScale<any,number>    = this._isVertical ? this._yScale : this._xScale;
-      var secondaryScale: Scale.AbstractScale<any,number>  = this._isVertical ? this._xScale : this._yScale;
+      var primaryScale: Scale.AbstractScale<any, number>    = this._isVertical ? this._yScale : this._xScale;
+      var secondaryScale: Scale.AbstractScale<any, number>  = this._isVertical ? this._xScale : this._yScale;
       var primaryAttr     = this._isVertical ? "y" : "x";
       var secondaryAttr   = this._isVertical ? "x" : "y";
       var scaledBaseline = primaryScale.scale(this._baselineValue);
@@ -342,7 +418,7 @@ export module Plot {
      */
     protected _getBarPixelWidth(): number {
       var barPixelWidth: number;
-      var barScale: Scale.AbstractScale<any,number>  = this._isVertical ? this._xScale : this._yScale;
+      var barScale: Scale.AbstractScale<any, number>  = this._isVertical ? this._xScale : this._yScale;
       if (barScale instanceof Plottable.Scale.Category) {
         barPixelWidth = (<Plottable.Scale.Category> barScale).rangeBand();
       } else {
@@ -435,8 +511,8 @@ export module Plot {
         }
       }
 
-      var xExtent: Extent = this._parseExtent(xPositionOrExtent);
-      var yExtent: Extent = this._parseExtent(yPositionOrExtent);
+      var xExtent: Extent = _Util.Methods.parseExtent(xPositionOrExtent);
+      var yExtent: Extent = _Util.Methods.parseExtent(yPositionOrExtent);
 
       var bars: any[] = [];
       var points: Point[] = [];
@@ -489,6 +565,34 @@ export module Plot {
       };
     }
     //===== /Hover logic =====
+
+    protected _getAllPlotData(datasetKeys: string[]): PlotData {
+      var plotData = super._getAllPlotData(datasetKeys);
+
+      var valueScale = this._isVertical ? this._yScale : this._xScale;
+      var scaledBaseline = (<Scale.AbstractScale<any, any>> (this._isVertical ? this._yScale : this._xScale)).scale(this.baseline());
+      var isVertical = this._isVertical;
+      var barAlignmentFactor = this._barAlignmentFactor;
+
+      plotData.selection.each(function (datum, index) {
+        var bar = d3.select(this);
+
+        // Using floored pixel values to account for pixel accuracy inconsistencies across browsers
+        if (isVertical && Math.floor(+bar.attr("y")) >= Math.floor(scaledBaseline)) {
+          plotData.pixelPoints[index].y += +bar.attr("height");
+        } else if (!isVertical && Math.floor(+bar.attr("x")) < Math.floor(scaledBaseline)) {
+          plotData.pixelPoints[index].x -= +bar.attr("width");
+        }
+
+        if (isVertical) {
+          plotData.pixelPoints[index].x = +bar.attr("x") + +bar.attr("width") * barAlignmentFactor;
+        } else {
+          plotData.pixelPoints[index].y = +bar.attr("y") + +bar.attr("height") * barAlignmentFactor;
+        }
+      });
+
+      return plotData;
+    }
   }
 }
 }

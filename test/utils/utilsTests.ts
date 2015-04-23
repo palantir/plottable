@@ -10,7 +10,7 @@ describe("_Util.Methods", () => {
   });
 
   it("sortedIndex works properly", () => {
-    var a = [1,2,3,4,5];
+    var a = [1, 2, 3, 4, 5];
     var si = Plottable._Util.OpenSource.sortedIndex;
     assert.equal(si(0, a), 0, "return 0 when val is <= arr[0]");
     assert.equal(si(6, a), a.length, "returns a.length when val >= arr[arr.length-1]");
@@ -49,7 +49,7 @@ describe("_Util.Methods", () => {
     var today = new Date();
 
     it("max/min work as expected", () => {
-      var alist = [1,2,3,4,5];
+      var alist = [1, 2, 3, 4, 5];
       var dbl = (x: number) => x * 2;
       var dblIndexOffset = (x: number, i: number) => x * 2 - i;
       var numToDate = (x: number) => {
@@ -91,6 +91,21 @@ describe("_Util.Methods", () => {
       assert.deepEqual(max<Date>([null], today), undefined, "returns undefined from array of null values");
       assert.deepEqual(max<Date>([], today), today, "correct default non-numeric value returned");
     });
+  });
+
+  it("isNaN works as expected", () => {
+    var isNaN = Plottable._Util.Methods.isNaN;
+
+    assert.isTrue(isNaN(NaN), "Only NaN should pass the isNaN check");
+
+    assert.isFalse(isNaN(undefined), "undefined should fail the isNaN check");
+    assert.isFalse(isNaN(null), "null should fail the isNaN check");
+    assert.isFalse(isNaN(Infinity), "Infinity should fail the isNaN check");
+    assert.isFalse(isNaN(1), "numbers should fail the isNaN check");
+    assert.isFalse(isNaN(0), "0 should fail the isNaN check");
+    assert.isFalse(isNaN("foo"), "strings should fail the isNaN check");
+    assert.isFalse(isNaN(""), "empty strings should fail the isNaN check");
+    assert.isFalse(isNaN({}), "empty Objects should fail the isNaN check");
   });
 
   it("objEq works as expected", () => {

@@ -14,14 +14,14 @@ function run(svg, data, Plottable) {
     var yScale = new Plottable.Scale.Linear();
     var colorScale = new Plottable.Scale.Color();
 
-        
+
     var yAxis = new Plottable.Axis.Numeric(yScale, "left");
     var xAxis = new Plottable.Axis.Category(xScale, "bottom");
     var animator = new Plottable.Animator.Base();
         animator.duration(1000);
         animator.maxTotalDuration(2000);
         animator.maxIterativeDelay(100);
-        
+
 
     var vbar = new Plottable.Plot.Bar(xScale, yScale)
       .project("x", "x", xScale)
@@ -32,20 +32,20 @@ function run(svg, data, Plottable) {
       .addDataset(data)
       .animator( "bars", animator)
       .animate(true);
-       
-      
+
+
     var chart = new Plottable.Component.Table([
                     [yAxis, vbar],
                     [null,  xAxis]
                   ]);
-    
+
 
     var cb = function(){
       vbar.datasets()[0].data(data);
     };
-    var click = new Plottable.Interaction.Click().callback(cb);
+    var click = new Plottable.Interaction.Click().onClick(cb);
 
     vbar.registerInteraction(click);
-        
+
     chart.renderTo(svg);
 }

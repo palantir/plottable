@@ -374,7 +374,7 @@ describe("NumericAxis", () => {
     var visibleTickLabelRects = visibleTickLabels[0].map((label: HTMLScriptElement) => label.getBoundingClientRect());
     var interval = getClientRectCenter(visibleTickLabelRects[1]) - getClientRectCenter(visibleTickLabelRects[0]);
     for (var i = 0; i < visibleTickLabelRects.length - 1; i++) {
-      assert.closeTo(getClientRectCenter(visibleTickLabelRects[i+1]) - getClientRectCenter(visibleTickLabelRects[i]),
+      assert.closeTo(getClientRectCenter(visibleTickLabelRects[i + 1]) - getClientRectCenter(visibleTickLabelRects[i]),
         interval, 0.5, "intervals are all spaced the same");
     }
 

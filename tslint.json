@@ -1,6 +1,6 @@
 {
   "rules": {
-    "class-name": false,
+    "class-name": true,
     "curly": true,
     "eofline": true,
     "forin": true,
@@ -39,7 +39,7 @@
     "semicolon": true,
     "triple-equals": [true, "allow-null-check"],
     "variable-name": false,
-    "whitespace": ["check-branch", "check-decl", "check-type"],
+    "whitespace": ["check-branch", "check-decl", "check-operator", "check-separator", "check-type"],
     "ban": [true, ["d3", "max"], ["d3", "min"]]
   }
 }

@@ -13,7 +13,19 @@ export module _Util {
      * @return {boolean} Whether x is in [a, b]
      */
     export function inRange(x: number, a: number, b: number) {
-      return (Math.min(a,b) <= x && x <= Math.max(a,b));
+      return (Math.min(a, b) <= x && x <= Math.max(a, b));
+    }
+
+    /**
+     * Clamps x to the range [min, max].
+     *
+     * @param {number} x The value to be clamped.
+     * @param {number} min The minimum value.
+     * @param {number} max The maximum value.
+     * @return {number} A clamped value in the range [min, max].
+     */
+    export function clamp(x: number, min: number, max: number) {
+      return Math.min(Math.max(min, x), max);
     }
 
     /** Print a warning message to the console, if it is available.
@@ -141,7 +153,7 @@ export module _Util {
      */
     export function createFilledArray<T>(value: T | ((index?: number) => T), count: number) {
       var out: T[] = [];
-      for (var i = 0; i<count; i++) {
+      for (var i = 0; i < count; i++) {
         out[i] = typeof(value) === "function" ? (<(index?: number) => T> value)(i) : <T> value;
       }
       return out;
@@ -199,7 +211,7 @@ export module _Util {
      * If type is not comparable then t will be converted to a comparable before computing max.
      */
     export function max<C>(arr: C[], default_val: C): C;
-    export function max<T,C>(arr: T[], acc: (x?: T, i?: number) => C, default_val: C): C;
+    export function max<T, C>(arr: T[], acc: (x?: T, i?: number) => C, default_val: C): C;
     export function max(arr: any[], one: any, two?: any): any {
       if (arr.length === 0) {
         if (typeof(one) !== "function") {
@@ -220,7 +232,7 @@ export module _Util {
      * If type is not comparable then t will be converted to a comparable before computing min.
      */
     export function min<C>(arr: C[], default_val: C): C;
-    export function min<T,C>(arr: T[], acc: (x?: T, i?: number) => C, default_val: C): C;
+    export function min<T, C>(arr: T[], acc: (x?: T, i?: number) => C, default_val: C): C;
     export function min(arr: any[], one: any, two?: any): any {
       if (arr.length === 0) {
         if (typeof(one) !== "function") {
@@ -233,6 +245,13 @@ export module _Util {
       var acc = typeof(one) === "function" ? one : typeof(two) === "function" ? two : undefined;
       return acc === undefined ? d3.min(arr) : d3.min(arr, acc);
       /* tslint:enable:ban */
+    }
+
+    /**
+     * Returns true **only** if x is NaN
+     */
+    export function isNaN(n: any) {
+      return n !== n;
     }
 
     /**
@@ -333,6 +352,48 @@ export module _Util {
     export function isIE() {
       var userAgent = window.navigator.userAgent;
       return userAgent.indexOf("MSIE ") > -1 || userAgent.indexOf("Trident/") > -1;
+    }
+
+    /**
+     * Returns true if the supplied coordinates or Extents intersect or are contained by bbox.
+     *
+     * @param {number | Extent} xValOrExtent The x coordinate or Extent to test
+     * @param {number | Extent} yValOrExtent The y coordinate or Extent to test
+     * @param {SVGRect} bbox The bbox
+     * @param {number} tolerance Amount by which to expand bbox, in each dimension, before
+     * testing intersection
+     *
+     * @returns {boolean} True if the supplied coordinates or Extents intersect or are
+     * contained by bbox, false otherwise.
+     */
+    export function intersectsBBox(xValOrExtent: number | Extent, yValOrExtent: number | Extent,
+      bbox: SVGRect, tolerance = 0.5): boolean {
+      var xExtent: Extent = parseExtent(xValOrExtent);
+      var yExtent: Extent = parseExtent(yValOrExtent);
+
+      // SVGRects are positioned with sub-pixel accuracy (the default unit
+      // for the x, y, height & width attributes), but user selections (e.g. via
+      // mouse events) usually have pixel accuracy. A tolerance of half-a-pixel
+      // seems appropriate.
+      return bbox.x + bbox.width >= xExtent.min - tolerance && bbox.x <= xExtent.max + tolerance &&
+        bbox.y + bbox.height >= yExtent.min - tolerance && bbox.y <= yExtent.max + tolerance;
+    }
+
+    /**
+     * Create an Extent from a number or an object with "min" and "max" defined.
+     *
+     * @param {any} input The object to parse
+     *
+     * @returns {Extent} The generated Extent
+     */
+    export function parseExtent(input: any): Extent {
+      if (typeof (input) === "number") {
+        return { min: input, max: input };
+      } else if (input instanceof Object && "min" in input && "max" in input) {
+        return <Extent> input;
+      } else {
+        throw new Error("input '" + input + "' can't be parsed as an Extent");
+      }
     }
   }
 }

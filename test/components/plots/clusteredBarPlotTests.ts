@@ -43,7 +43,7 @@ describe("Plots", () => {
       dataset1 = new Plottable.Dataset(data1);
       dataset2 = new Plottable.Dataset(data2);
 
-      renderer = new Plottable.Plot.ClusteredBar<string,number>(xScale, yScale);
+      renderer = new Plottable.Plot.ClusteredBar<string, number>(xScale, yScale);
       renderer.addDataset(dataset1);
       renderer.addDataset(dataset2);
       renderer.baseline(0);
@@ -124,7 +124,7 @@ describe("Plots", () => {
       dataset1 = new Plottable.Dataset(data1);
       dataset2 = new Plottable.Dataset(data2);
 
-      renderer = new Plottable.Plot.ClusteredBar<number,string>(xScale, yScale, false);
+      renderer = new Plottable.Plot.ClusteredBar<number, string>(xScale, yScale, false);
       renderer.addDataset(data1);
       renderer.addDataset(data2);
       renderer.baseline(0);
@@ -192,7 +192,7 @@ describe("Plots", () => {
       var data2 = [{x: "A", y: 2}, {x: "B", y: 4}];
       var data3 = [{x: "B", y: 15}, {x: "C", y: 15}];
 
-      plot = new Plottable.Plot.ClusteredBar<string,number>(xScale, yScale);
+      plot = new Plottable.Plot.ClusteredBar<string, number>(xScale, yScale);
       plot.addDataset(data1);
       plot.addDataset(data2);
       plot.addDataset(data3);
@@ -233,6 +233,65 @@ describe("Plots", () => {
       assert.operator(numAttr(bBar1, "x"), "<", numAttr(bBar2, "x"), "B bars clustered in dataset order");
 
       assert.operator(numAttr(cBar0, "x"), "<", numAttr(cBar1, "x"), "C bars clustered in dataset order");
+
+      svg.remove();
+    });
+  });
+
+  describe("Horizontal Clustered Bar Plot Missing Values", () => {
+    var svg: D3.Selection;
+    var plot: Plottable.Plot.ClusteredBar<number, string>;
+
+    beforeEach(() => {
+      var SVG_WIDTH = 600;
+      var SVG_HEIGHT = 400;
+      svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      var xScale = new Plottable.Scale.Linear();
+      var yScale = new Plottable.Scale.Category();
+
+      var data1 = [{y: "A", x: 1}, {y: "B", x: 2}, {y: "C", x: 1}];
+      var data2 = [{y: "A", x: 2}, {y: "B", x: 4}];
+      var data3 = [{y: "B", x: 15}, {y: "C", x: 15}];
+
+      plot = new Plottable.Plot.ClusteredBar(xScale, yScale, false);
+      plot.addDataset(data1);
+      plot.addDataset(data2);
+      plot.addDataset(data3);
+      plot.project("x", "x", xScale);
+      plot.project("y", "y", yScale);
+      plot.renderTo(svg);
+    });
+
+    it("renders correctly", () => {
+      var bars = plot.getAllSelections();
+
+      assert.strictEqual(bars.size(), 7, "Number of bars should be equivalent to number of datum");
+
+      var aBar0 = d3.select(bars[0][0]);
+      var aBar1 = d3.select(bars[0][3]);
+
+      var bBar0 = d3.select(bars[0][1]);
+      var bBar1 = d3.select(bars[0][4]);
+      var bBar2 = d3.select(bars[0][5]);
+
+      var cBar0 = d3.select(bars[0][2]);
+      var cBar1 = d3.select(bars[0][6]);
+
+      // check bars are in domain order
+      assert.operator(numAttr(aBar0, "y"), "<", numAttr(bBar0, "y"), "first dataset bars ordered correctly");
+      assert.operator(numAttr(bBar0, "y"), "<", numAttr(cBar0, "y"), "first dataset bars ordered correctly");
+
+      assert.operator(numAttr(aBar1, "y"), "<", numAttr(bBar1, "y"), "second dataset bars ordered correctly");
+
+      assert.operator(numAttr(bBar2, "y"), "<", numAttr(cBar1, "y"), "third dataset bars ordered correctly");
+
+      // check that clustering is correct
+      assert.operator(numAttr(aBar0, "y"), "<", numAttr(aBar1, "y"), "A bars clustered in dataset order");
+
+      assert.operator(numAttr(bBar0, "y"), "<", numAttr(bBar1, "y"), "B bars clustered in dataset order");
+      assert.operator(numAttr(bBar1, "y"), "<", numAttr(bBar2, "y"), "B bars clustered in dataset order");
+
+      assert.operator(numAttr(cBar0, "y"), "<", numAttr(cBar1, "y"), "C bars clustered in dataset order");
 
       svg.remove();
     });

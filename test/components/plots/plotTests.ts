@@ -250,6 +250,45 @@ describe("Plots", () => {
       svg.remove();
     });
 
+    it("getAllPlotData() with NaN pixel points", () => {
+      var svg = generateSVG(400, 400);
+      var plot = new Plottable.Plot.AbstractPlot();
+
+      var data = [{value: NaN}, {value: 1}, {value: 2}];
+
+      var dataPoints = data.map((datum: any) => { return {x: datum.value, y: 10}; });
+
+      var dataPointConverter = (datum: any, index: number) => dataPoints[index];
+
+      // Create mock drawer with already drawn items
+      var mockDrawer = new Plottable._Drawer.AbstractDrawer("ds");
+      var renderArea = svg.append("g");
+      var circles = renderArea.selectAll("circles").data(data);
+      circles.enter().append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
+      circles.exit().remove();
+      (<any> mockDrawer).setup = () => (<any> mockDrawer)._renderArea = renderArea;
+      (<any> mockDrawer)._getSelector = () => "circle";
+      (<any> mockDrawer)._getPixelPoint = dataPointConverter;
+
+      // Mock _getDrawer to return the mock drawer
+      (<any> plot)._getDrawer = () => mockDrawer;
+
+      plot.addDataset("ds", data);
+      plot.renderTo(svg);
+
+      var oneElementPlotData = plot.getAllPlotData();
+      var oneElementSelection = oneElementPlotData.selection;
+      assert.strictEqual(oneElementSelection.size(), 2, "finds all selections that do not have NaN pixelPoint");
+      assert.lengthOf(oneElementPlotData.pixelPoints, 2, "returns pixelPoints except ones with NaN");
+      assert.lengthOf(oneElementPlotData.data, 2, "finds data that do not have NaN pixelPoint");
+
+      oneElementPlotData.pixelPoints.forEach((pixelPoint) => {
+        assert.isNumber(pixelPoint.x, "pixelPoint X cannot be NaN");
+        assert.isNumber(pixelPoint.y, "pixelPoint Y cannot be NaN");
+      });
+      svg.remove();
+    });
+
     it("getClosestPlotData", () => {
       var svg = generateSVG(400, 400);
       var plot = new Plottable.Plot.AbstractPlot();
@@ -295,12 +334,6 @@ describe("Plots", () => {
       var closestPlotData = plot.getClosestPlotData(queryPoint);
       assert.deepEqual(closestPlotData.pixelPoints, [{x: 1, y: 10}], "retrieves the closest point across datasets");
 
-      closestPlotData = plot.getClosestPlotData(queryPoint, Infinity, "ds1");
-      assert.deepEqual(closestPlotData.pixelPoints, [{x: 1, y: 100}], "retrieves the closest point for a certain dataset");
-
-      queryPoint = {x: 1, y: 500};
-      closestPlotData = plot.getClosestPlotData(queryPoint, 100);
-      assert.deepEqual(closestPlotData.pixelPoints, [], "retrieves no points if points are outside within value");
       svg.remove();
     });
 
@@ -341,7 +374,7 @@ describe("Plots", () => {
 
       it("removeDataset functions on inputs that are data arrays, not datasets", () => {
         var a1 = ["foo", "bar"];
-        var a2 = [1,2,3];
+        var a2 = [1, 2, 3];
         plot.addDataset(a1);
         plot.addDataset(a2);
         assert.lengthOf(plot.datasets(), 4, "there are four datasets");
@@ -353,14 +386,14 @@ describe("Plots", () => {
       });
 
       it("removeDataset behaves appropriately when the key 'undefined' is used", () => {
-        var a = [1,2,3];
+        var a = [1, 2, 3];
         plot.addDataset("undefined", a);
         assert.lengthOf(plot.datasets(), 3, "there are three datasets initially");
         plot.removeDataset("foofoofoofoofoofoofoofoo");
         assert.lengthOf(plot.datasets(), 3, "there are three datasets after bad key removal");
         plot.removeDataset(undefined);
         assert.lengthOf(plot.datasets(), 3, "there are three datasets after removing `undefined`");
-        plot.removeDataset([94,93,92]);
+        plot.removeDataset([94, 93, 92]);
         assert.lengthOf(plot.datasets(), 3, "there are three datasets after removing random dataset");
         plot.removeDataset("undefined");
         assert.lengthOf(plot.datasets(), 2, "the dataset called 'undefined' could be removed");
@@ -380,8 +413,8 @@ describe("Plots", () => {
       var scale1 = new Plottable.Scale.Linear();
       var scale2 = new Plottable.Scale.Linear();
 
-      var d1 = new Plottable.Dataset([1,2,3]);
-      var d2 = new Plottable.Dataset([4,99,999]);
+      var d1 = new Plottable.Dataset([1, 2, 3]);
+      var d2 = new Plottable.Dataset([4, 99, 999]);
       var d3 = new Plottable.Dataset([-1, -2, -3]);
 
       var id = (d: number) => d;

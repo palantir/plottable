@@ -4,6 +4,19 @@ var assert = chai.assert;
 
 describe("Plots", () => {
   describe("ScatterPlot", () => {
+    it("renders correctly with no data", () => {
+      var svg = generateSVG(400, 400);
+      var xScale = new Plottable.Scale.Linear();
+      var yScale = new Plottable.Scale.Linear();
+      var plot = new Plottable.Plot.Scatter(xScale, yScale);
+      plot.project("x", (d: any) => d.x, xScale);
+      plot.project("y", (d: any) => d.y, yScale);
+      assert.doesNotThrow(() => plot.renderTo(svg), Error);
+      assert.strictEqual(plot.width(), 400, "was allocated width");
+      assert.strictEqual(plot.height(), 400, "was allocated height");
+      svg.remove();
+    });
+
     it("the accessors properly access data, index, and metadata", () => {
       var svg = generateSVG(400, 400);
       var xScale = new Plottable.Scale.Linear();
@@ -69,6 +82,63 @@ describe("Plots", () => {
       var selectionData = allCircles.data();
       assert.includeMembers(selectionData, data, "first dataset data in selection data");
       assert.includeMembers(selectionData, data2, "second dataset data in selection data");
+
+      svg.remove();
+    });
+
+    it("getClosestPlotData()", () => {
+      function assertPlotDataEqual(expected: Plottable.Plot.PlotData, actual: Plottable.Plot.PlotData,
+        msg: string) {
+        assert.deepEqual(expected.data, actual.data, msg);
+        assert.closeTo(expected.pixelPoints[0].x, actual.pixelPoints[0].x, 0.01, msg);
+        assert.closeTo(expected.pixelPoints[0].y, actual.pixelPoints[0].y, 0.01, msg);
+        assert.deepEqual(expected.selection, actual.selection, msg);
+      }
+
+      var svg = generateSVG(400, 400);
+      var xScale = new Plottable.Scale.Linear();
+      var yScale = new Plottable.Scale.Linear();
+      var data = [{x: 0, y: 0}, {x: 1, y: 1}];
+      var data2 = [{x: 1, y: 2}, {x: 3, y: 4}];
+      var plot = new Plottable.Plot.Scatter(xScale, yScale)
+                                   .project("x", "x", xScale)
+                                   .project("y", "y", yScale)
+                                   .addDataset(data)
+                                   .addDataset(data2);
+      plot.renderTo(svg);
+
+      var points = d3.selectAll(".scatter-plot path");
+      var d0 = data[0];
+      var d0Px = {
+        x: xScale.scale(d0.x),
+        y: yScale.scale(d0.y)
+      };
+
+      var expected = {
+        data: [d0],
+        pixelPoints: [d0Px],
+        selection: d3.select(points[0][0])
+      };
+
+      var closest = plot.getClosestPlotData({ x: d0Px.x + 1, y: d0Px.y + 1 });
+      assertPlotDataEqual(expected, closest, "it selects the closest data point");
+
+      yScale.domain([0, 1.9]);
+
+      var d1 = data[1];
+      var d1Px = {
+        x: xScale.scale(d1.x),
+        y: yScale.scale(d1.y)
+      };
+
+      expected = {
+        data: [d1],
+        pixelPoints: [d1Px],
+        selection: d3.select(points[0][1])
+      };
+
+      closest = plot.getClosestPlotData({ x: d1Px.x, y: 0 });
+      assertPlotDataEqual(expected, closest, "it ignores off-plot data points");
 
       svg.remove();
     });
@@ -149,14 +219,14 @@ describe("Plots", () => {
       var svg: D3.Selection;
       var xScale: Plottable.Scale.Linear;
       var yScale: Plottable.Scale.Linear;
-      var circlePlot: Plottable.Plot.Scatter<number,number>;
+      var circlePlot: Plottable.Plot.Scatter<number, number>;
       var SVG_WIDTH = 600;
       var SVG_HEIGHT = 300;
       var pixelAreaFull = {xMin: 0, xMax: SVG_WIDTH, yMin: 0, yMax: SVG_HEIGHT};
       var pixelAreaPart = {xMin: 200, xMax: 600, yMin: 100, yMax: 200};
       var dataAreaFull = {xMin: 0, xMax: 9, yMin: 81, yMax: 0};
       var dataAreaPart = {xMin: 3, xMax: 9, yMin: 54, yMax: 27};
-      var colorAccessor = (d: any, i: number, m: any) => d3.rgb(d.x, d.y ,i).toString();
+      var colorAccessor = (d: any, i: number, m: any) => d3.rgb(d.x, d.y, i).toString();
       var circlesInArea: number;
       var quadraticDataset = makeQuadraticSeries(10);
 

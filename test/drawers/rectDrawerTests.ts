@@ -27,7 +27,7 @@ describe("Drawers", () => {
       svg.remove();
     });
 
-    it("getPixelPoint horizontal",() => {
+    it("getPixelPoint horizontal", () => {
       var svg = generateSVG(300, 300);
       var data = [{ a: "foo", b: 10 }, { a: "bar", b: 24 }];
       var xScale = new Plottable.Scale.Linear();

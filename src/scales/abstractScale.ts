@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Scale {
-  export class AbstractScale<D,R> extends Core.PlottableObject {
+  export class AbstractScale<D, R> extends Core.PlottableObject {
     protected _d3Scale: D3.Scale.Scale;
     private _autoDomainAutomatically = true;
     public broadcaster: Core.Broadcaster<AbstractScale<D, R>>;
@@ -86,7 +86,7 @@ export module Scale {
      * input values.
      * @returns {Scale} The calling Scale.
      */
-    public domain(values: D[]): AbstractScale<D,R>;
+    public domain(values: D[]): AbstractScale<D, R>;
     public domain(values?: D[]): any {
       if (values == null) {
         return this._getDomain();
@@ -130,7 +130,7 @@ export module Scale {
      * @param {R[]} values If provided, the new values for the range.
      * @returns {Scale} The calling Scale.
      */
-    public range(values: R[]): AbstractScale<D,R>;
+    public range(values: R[]): AbstractScale<D, R>;
     public range(values?: R[]): any {
       if (values == null) {
         return this._d3Scale.range();
@@ -146,8 +146,8 @@ export module Scale {
      *
      * @returns {Scale} A copy of the calling Scale.
      */
-    public copy(): AbstractScale<D,R> {
-      return new AbstractScale<D,R>(this._d3Scale.copy());
+    public copy(): AbstractScale<D, R> {
+      return new AbstractScale<D, R>(this._d3Scale.copy());
     }
 
     /**
