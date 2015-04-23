@@ -3461,6 +3461,10 @@ describe("Plots", function () {
                     svg.remove();
                 });
             });
+            it("vertical() returns true", function () {
+                assert.isTrue(barPlot.vertical());
+                svg.remove();
+            });
         });
         describe("Vertical Bar Plot modified log scale", function () {
             var svg;
@@ -3767,6 +3771,10 @@ describe("Plots", function () {
                     assertPlotDataEqual(expected, closest, "closest plot data is on-plot data");
                     svg.remove();
                 });
+            });
+            it("vertical() returns false", function () {
+                assert.isFalse(barPlot.vertical());
+                svg.remove();
             });
         });
         describe("Vertical Bar Plot With Bar Labels", function () {

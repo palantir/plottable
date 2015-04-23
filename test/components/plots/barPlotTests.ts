@@ -270,6 +270,11 @@ describe("Plots", () => {
           svg.remove();
         });
       });
+
+      it("vertical() returns true", () => {
+        assert.isTrue(barPlot.vertical());
+        svg.remove();
+      });
     });
 
     describe("Vertical Bar Plot modified log scale", () => {
@@ -633,6 +638,11 @@ describe("Plots", () => {
           svg.remove();
         });
 
+      });
+
+      it("vertical() returns false", () => {
+        assert.isFalse(barPlot.vertical());
+        svg.remove();
       });
     });
 

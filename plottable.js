@@ -7633,6 +7633,14 @@ var Plottable;
                 return this;
             };
             /**
+             * Returns true if the plot is vertical.
+             *
+             * @returns {boolean} true if the plot is vertical
+             */
+            Bar.prototype.vertical = function () {
+                return this._isVertical;
+            };
+            /**
              * Sets the bar alignment relative to the independent axis.
              * VerticalBarPlot supports "left", "center", "right"
              * HorizontalBarPlot supports "top", "center", "bottom"

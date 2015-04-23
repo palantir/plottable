@@ -3083,6 +3083,12 @@ declare module Plottable {
              */
             baseline(value: number): Bar<X, Y>;
             /**
+             * Returns true if the plot is vertical.
+             *
+             * @returns {boolean} true if the plot is vertical
+             */
+            vertical(): boolean;
+            /**
              * Sets the bar alignment relative to the independent axis.
              * VerticalBarPlot supports "left", "center", "right"
              * HorizontalBarPlot supports "top", "center", "bottom"
