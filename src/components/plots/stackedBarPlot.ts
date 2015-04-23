@@ -79,7 +79,7 @@ export module Plot {
       return AbstractStacked.prototype._normalizeDatasets.call(this, fromX);
     }
 
-    //===== Stack logic from AbstractStackedPlot =====
+    // ===== Stack logic from AbstractStackedPlot =====
     public _updateStackOffsets() {
       AbstractStacked.prototype._updateStackOffsets.call(this);
     }
@@ -115,7 +115,7 @@ export module Plot {
     public _valueAccessor(): _Accessor {
       return AbstractStacked.prototype._valueAccessor.call(this);
     }
-    //===== /Stack logic =====
+    // ===== /Stack logic =====
   }
 }
 }

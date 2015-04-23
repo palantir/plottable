@@ -90,7 +90,7 @@ export module Plot {
       return ["x", "y", "defined"];
     }
 
-    //===== Stack logic from AbstractStackedPlot =====
+    // ===== Stack logic from AbstractStackedPlot =====
     public _updateStackOffsets() {
       if (!this._projectorsReady()) { return; }
       var domainKeys = this._getDomainKeys();
@@ -146,7 +146,7 @@ export module Plot {
     protected _normalizeDatasets<A, B>(fromX: boolean): {a: A; b: B}[] {
       return AbstractStacked.prototype._normalizeDatasets.call(this, fromX);
     }
-    //===== /Stack logic =====
+    // ===== /Stack logic =====
   }
 }
 }

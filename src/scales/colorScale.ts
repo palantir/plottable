@@ -6,7 +6,7 @@ export module Scale {
 
     private static HEX_SCALE_FACTOR = 20;
     private static LOOP_LIGHTEN_FACTOR = 1.6;
-    //The maximum number of colors we are getting from CSS stylesheets
+    // The maximum number of colors we are getting from CSS stylesheets
     private static MAXIMUM_COLORS_FROM_CSS = 256;
 
     /**

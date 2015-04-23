@@ -490,7 +490,7 @@ export module Plot {
       });
     }
 
-    //===== Hover logic =====
+    // ===== Hover logic =====
     public _hoverOverComponent(p: Point) {
       // no-op
     }
@@ -564,7 +564,7 @@ export module Plot {
         selection: barsSelection
       };
     }
-    //===== /Hover logic =====
+    // ===== /Hover logic =====
 
     protected _getAllPlotData(datasetKeys: string[]): PlotData {
       var plotData = super._getAllPlotData(datasetKeys);
