@@ -2399,7 +2399,7 @@ var Plottable;
                 return new Category(this._d3Scale.copy());
             };
             Category.prototype.scale = function (value) {
-                //scale it to the middle
+                // scale it to the middle
                 return _super.prototype.scale.call(this, value) + this.rangeBand() / 2;
             };
             return Category;
@@ -2497,7 +2497,7 @@ var Plottable;
             };
             Color.HEX_SCALE_FACTOR = 20;
             Color.LOOP_LIGHTEN_FACTOR = 1.6;
-            //The maximum number of colors we are getting from CSS stylesheets
+            // The maximum number of colors we are getting from CSS stylesheets
             Color.MAXIMUM_COLORS_FROM_CSS = 256;
             return Color;
         })(Scale.AbstractScale);
@@ -4908,7 +4908,7 @@ var Plottable;
     })(Axis = Plottable.Axis || (Plottable.Axis = {}));
 })(Plottable || (Plottable = {}));
 
-//<reference path="../../reference.ts" />
+///<reference path="../../reference.ts" />
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -7462,7 +7462,7 @@ var Plottable;
                 };
                 return Plottable._Util.Methods.intersectsBBox(xRange, yRange, translatedBbox);
             };
-            //===== Hover logic =====
+            // ===== Hover logic =====
             Scatter.prototype._hoverOverComponent = function (p) {
                 // no-op
             };
@@ -7956,7 +7956,7 @@ var Plottable;
                     d._getRenderArea().selectAll("rect").classed("not-hovered hovered", false);
                 });
             };
-            //===== Hover logic =====
+            // ===== Hover logic =====
             Bar.prototype._hoverOverComponent = function (p) {
                 // no-op
             };
@@ -8022,7 +8022,7 @@ var Plottable;
                     selection: barsSelection
                 };
             };
-            //===== /Hover logic =====
+            // ===== /Hover logic =====
             Bar.prototype._getAllPlotData = function (datasetKeys) {
                 var plotData = _super.prototype._getAllPlotData.call(this, datasetKeys);
                 var valueScale = this._isVertical ? this._yScale : this._xScale;
@@ -8242,7 +8242,7 @@ var Plottable;
                     selection: d3.selectAll(closestElements)
                 };
             };
-            //===== Hover logic =====
+            // ===== Hover logic =====
             Line.prototype._hoverOverComponent = function (p) {
                 // no-op
             };
@@ -8732,7 +8732,7 @@ var Plottable;
             StackedArea.prototype._wholeDatumAttributes = function () {
                 return ["x", "y", "defined"];
             };
-            //===== Stack logic from AbstractStackedPlot =====
+            // ===== Stack logic from AbstractStackedPlot =====
             StackedArea.prototype._updateStackOffsets = function () {
                 var _this = this;
                 if (!this._projectorsReady()) {
@@ -8859,7 +8859,7 @@ var Plottable;
             StackedBar.prototype._normalizeDatasets = function (fromX) {
                 return Plot.AbstractStacked.prototype._normalizeDatasets.call(this, fromX);
             };
-            //===== Stack logic from AbstractStackedPlot =====
+            // ===== Stack logic from AbstractStackedPlot =====
             StackedBar.prototype._updateStackOffsets = function () {
                 Plot.AbstractStacked.prototype._updateStackOffsets.call(this);
             };
