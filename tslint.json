@@ -21,6 +21,7 @@
         "warn"
     ],
     "no-construct": true,
+    "no-constructor-vars": true,
     "no-duplicate-key": true,
     "no-duplicate-variable": true,
     "no-empty": true,
