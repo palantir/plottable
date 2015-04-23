@@ -6,7 +6,7 @@ export module Plot {
     position: number;
   }
 
-  export class ClusteredBar<X,Y> extends Bar<X,Y> {
+  export class ClusteredBar<X, Y> extends Bar<X, Y> {
 
     /**
      * Creates a ClusteredBarPlot.

@@ -52,10 +52,10 @@ describe("Interactions", () => {
 
       callbackCalled = false;
       lastPoint = null;
-      triggerFakeTouchEvent("touchstart", c.content(), SVG_WIDTH/2, SVG_HEIGHT/2);
-      triggerFakeTouchEvent("touchend", c.content(), SVG_WIDTH/2, SVG_HEIGHT/2);
+      triggerFakeTouchEvent("touchstart", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+      triggerFakeTouchEvent("touchend", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
       assert.isTrue(callbackCalled, "callback called on entering Component (touch)");
-      assert.deepEqual(lastPoint, { x: SVG_WIDTH/2, y: SVG_HEIGHT/2 }, "was passed correct point (touch)");
+      assert.deepEqual(lastPoint, { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 }, "was passed correct point (touch)");
 
       callbackCalled = false;
       lastPoint = null;

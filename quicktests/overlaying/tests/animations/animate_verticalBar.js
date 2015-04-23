@@ -34,7 +34,5 @@ function run(svg, data, Plottable) {
     dataset.data(d);
   };
 
-  verticalBarPlot.registerInteraction(
-    new Plottable.Interaction.Click(verticalBarPlot).callback(cb)
-  );
+  verticalBarPlot.registerInteraction(new Plottable.Interaction.Click().onClick(cb));
 }

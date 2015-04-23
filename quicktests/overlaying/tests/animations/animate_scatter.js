@@ -7,8 +7,6 @@ function makeData() {
 function run(svg, data, Plottable) {
   "use strict";
 
-  var doAnimate = true;
-  var circleRenderer;
   var xScale = new Plottable.Scale.Linear();
   var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
 
@@ -18,14 +16,13 @@ function run(svg, data, Plottable) {
   var d1 = new Plottable.Dataset(data[0]);
   var d2 = new Plottable.Dataset(data[1]);
 
-  circleRenderer = new Plottable.Plot.Scatter(xScale, yScale)
-                .addDataset(d1)
-                .addDataset(d2)
-                .attr("r", 8)
-                .project("x", "x", xScale)
-                .project("y", "y", yScale)
-                .attr("opacity", 0.75)
-                .animate(doAnimate);
+  var circleRenderer = new Plottable.Plot.Scatter(xScale, yScale).addDataset(d1)
+                                                                 .addDataset(d2)
+                                                                 .attr("size", 16)
+                                                                 .project("x", "x", xScale)
+                                                                 .project("y", "y", yScale)
+                                                                 .attr("opacity", 0.75)
+                                                                 .animate(true);
 
   var circleChart = new Plottable.Component.Table([[yAxis, circleRenderer],
    [null,  xAxis]]);
@@ -37,7 +34,5 @@ function run(svg, data, Plottable) {
     d2.data(tmp);
   };
 
-  circleRenderer.registerInteraction(
-    new Plottable.Interaction.Click(circleRenderer).callback(cb)
-  );
+  circleRenderer.registerInteraction(new Plottable.Interaction.Click().onClick(cb));
 }

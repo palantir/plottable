@@ -8,8 +8,8 @@ function generateBasicTable(nRows: number, nCols: number) {
   var table = new Plottable.Component.Table();
   var rows: Plottable.Component.AbstractComponent[][] = [];
   var components: Plottable.Component.AbstractComponent[] = [];
-  for(var i = 0; i<nRows; i++) {
-    for(var j = 0; j<nCols; j++) {
+  for(var i = 0; i < nRows; i++) {
+    for(var j = 0; j < nCols; j++) {
       var r = new Plottable.Component.AbstractComponent();
       table.addComponent(i, j, r);
       components.push(r);
@@ -27,7 +27,7 @@ describe("Tables", () => {
   it("padTableToSize works properly", () => {
     var t = new Plottable.Component.Table();
     assert.deepEqual((<any> t)._rows, [], "the table rows is an empty list");
-    (<any> t)._padTableToSize(1,1);
+    (<any> t)._padTableToSize(1, 1);
     var rows = (<any> t)._rows;
     var row = rows[0];
     var firstComponent = row[0];
@@ -35,7 +35,7 @@ describe("Tables", () => {
     assert.lengthOf(row, 1, "the row has one element");
     assert.isNull(firstComponent, "the row only has a null component");
 
-    (<any> t)._padTableToSize(5,2);
+    (<any> t)._padTableToSize(5, 2);
     assert.lengthOf(rows, 5, "there are five rows");
     rows.forEach((r: Plottable.Component.AbstractComponent[]) => assert.lengthOf(r, 2, "there are two columsn per row"));
     assert.equal(rows[0][0], firstComponent, "the first component is unchanged");
@@ -68,14 +68,42 @@ describe("Tables", () => {
     assert.isNull(rows[1][0], "component at (1, 0) is null");
   });
 
-  it("can't add a component where one already exists", () => {
+  it("Add a component where one already exists creates a new group", () => {
     var c1 = new Plottable.Component.AbstractComponent();
     var c2 = new Plottable.Component.AbstractComponent();
     var c3 = new Plottable.Component.AbstractComponent();
     var t = new Plottable.Component.Table();
+
     t.addComponent(0, 2, c1);
     t.addComponent(0, 0, c2);
-    assert.throws(() => t.addComponent(0, 2, c3), Error, "component already exists");
+    t.addComponent(0, 2, c3);
+
+    assert.isTrue(Plottable.Component.Group.prototype.isPrototypeOf((<any> t)._rows[0][2]), "A group was created");
+
+    var components: Plottable.Component.AbstractComponent[] = (<any> t)._rows[0][2].components();
+    assert.lengthOf(components, 2, "The group created should have 2 components");
+    assert.equal(components[0], c1, "First element in the group at (0, 2) should be c1");
+    assert.equal(components[1], c3, "Second element in the group at (0, 2) should be c3");
+  });
+
+  it("Add a component where a group already exists adds the component to the group", () => {
+    var c1 = new Plottable.Component.AbstractComponent();
+    var c2 = new Plottable.Component.AbstractComponent();
+    var grp = new Plottable.Component.Group([c1, c2]);
+
+    var c3 = new Plottable.Component.AbstractComponent();
+
+    var t = new Plottable.Component.Table();
+
+    t.addComponent(0, 2, grp);
+    t.addComponent(0, 2, c3);
+    assert.isTrue(Plottable.Component.Group.prototype.isPrototypeOf((<any> t)._rows[0][2]), "The cell still contains a group");
+
+    var components: Plottable.Component.AbstractComponent[] = (<any> t)._rows[0][2].components();
+    assert.lengthOf(components, 3, "The group created should have 3 components");
+    assert.equal(components[0], c1, "First element in the group at (0, 2) should still be c1");
+    assert.equal(components[1], c2, "Second element in the group at (0, 2) should still be c2");
+    assert.equal(components[2], c3, "The Component was added to the existing Group");
   });
 
   it("addComponent works even if a component is added with a high column and low row index", () => {
@@ -89,7 +117,7 @@ describe("Tables", () => {
   });
 
   it("basic table with 2 rows 2 cols lays out properly", () => {
-    var tableAndcomponents = generateBasicTable(2,2);
+    var tableAndcomponents = generateBasicTable(2, 2);
     var table = tableAndcomponents.table;
     var components = tableAndcomponents.components;
 
@@ -111,10 +139,10 @@ describe("Tables", () => {
   });
 
   it("table with 2 rows 2 cols and margin/padding lays out properly", () => {
-    var tableAndcomponents = generateBasicTable(2,2);
+    var tableAndcomponents = generateBasicTable(2, 2);
     var table = tableAndcomponents.table;
     var components = tableAndcomponents.components;
-    table.padding(5,5);
+    table.padding(5, 5);
 
     var svg = generateSVG(415, 415);
     table.renderTo(svg);
@@ -171,7 +199,7 @@ describe("Tables", () => {
   });
 
   it("table space fixity calculates properly", () => {
-    var tableAndcomponents = generateBasicTable(3,3);
+    var tableAndcomponents = generateBasicTable(3, 3);
     var table = tableAndcomponents.table;
     var components = tableAndcomponents.components;
     components.forEach((c) => fixComponentSize(c, 10, 10));

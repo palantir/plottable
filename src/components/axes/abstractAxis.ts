@@ -42,7 +42,7 @@ export module Axis {
      */
     constructor(scale: Scale.AbstractScale<any, number>, orientation: string, formatter = Formatters.identity()) {
       super();
-      if (scale == null || orientation == null) {throw new Error("Axis requires a scale and orientation");}
+      if (scale == null || orientation == null) { throw new Error("Axis requires a scale and orientation"); }
       this._scale = scale;
       this.orient(orientation);
       this._setDefaultAlignment();
@@ -464,7 +464,7 @@ export module Axis {
       if (!_Util.DOM.boxIsInside(firstTickLabel.getBoundingClientRect(), boundingBox)) {
         d3.select(firstTickLabel).style("visibility", "hidden");
       }
-      var lastTickLabel = tickLabels[0][tickLabels[0].length-1];
+      var lastTickLabel = tickLabels[0][tickLabels[0].length - 1];
       if (!_Util.DOM.boxIsInside(lastTickLabel.getBoundingClientRect(), boundingBox)) {
         d3.select(lastTickLabel).style("visibility", "hidden");
       }

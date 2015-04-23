@@ -49,15 +49,15 @@ describe("Component behavior", () => {
       c._computeLayout();
       assert.equal(c.width() , SVG_WIDTH, "computeLayout defaulted width to svg width");
       assert.equal(c.height(), SVG_HEIGHT, "computeLayout defaulted height to svg height");
-      assert.equal((<any> c)._xOrigin, 0 ,"xOrigin defaulted to 0");
-      assert.equal((<any> c)._yOrigin, 0 ,"yOrigin defaulted to 0");
+      assert.equal((<any> c)._xOrigin, 0 , "xOrigin defaulted to 0");
+      assert.equal((<any> c)._yOrigin, 0 , "yOrigin defaulted to 0");
 
-      svg.attr("width", 2*SVG_WIDTH).attr("height", 2*SVG_HEIGHT);
+      svg.attr("width", 2 * SVG_WIDTH).attr("height", 2 * SVG_HEIGHT);
       c._computeLayout();
       assert.equal(c.width() , 2 * SVG_WIDTH, "computeLayout updated width to new svg width");
       assert.equal(c.height(), 2 * SVG_HEIGHT, "computeLayout updated height to new svg height");
-      assert.equal((<any> c)._xOrigin, 0 ,"xOrigin is still 0");
-      assert.equal((<any> c)._yOrigin, 0 ,"yOrigin is still 0");
+      assert.equal((<any> c)._xOrigin, 0 , "xOrigin is still 0");
+      assert.equal((<any> c)._yOrigin, 0 , "yOrigin is still 0");
 
       svg.remove();
     });
@@ -74,8 +74,8 @@ describe("Component behavior", () => {
       c._computeLayout();
       assert.equal(c.width(), 400, "defaults to width of parent if width is not specified on <svg>");
       assert.equal(c.height(), 200, "defaults to height of parent if width is not specified on <svg>");
-      assert.equal((<any> c)._xOrigin, 0 ,"xOrigin defaulted to 0");
-      assert.equal((<any> c)._yOrigin, 0 ,"yOrigin defaulted to 0");
+      assert.equal((<any> c)._xOrigin, 0, "xOrigin defaulted to 0");
+      assert.equal((<any> c)._yOrigin, 0, "yOrigin defaulted to 0");
 
 
       svg.style("width", "50%").style("height", "50%");
@@ -83,8 +83,8 @@ describe("Component behavior", () => {
 
       assert.equal(c.width(), 200, "computeLayout defaulted width to svg width");
       assert.equal(c.height(), 100, "computeLayout defaulted height to svg height");
-      assert.equal((<any> c)._xOrigin, 0 ,"xOrigin defaulted to 0");
-      assert.equal((<any> c)._yOrigin, 0 ,"yOrigin defaulted to 0");
+      assert.equal((<any> c)._xOrigin, 0, "xOrigin defaulted to 0");
+      assert.equal((<any> c)._yOrigin, 0, "yOrigin defaulted to 0");
 
       svg.style("width", "25%").style("height", "25%");
 
@@ -92,8 +92,8 @@ describe("Component behavior", () => {
 
       assert.equal(c.width(), 100, "computeLayout updated width to new svg width");
       assert.equal(c.height(), 50, "computeLayout updated height to new svg height");
-      assert.equal((<any> c)._xOrigin, 0 ,"xOrigin is still 0");
-      assert.equal((<any> c)._yOrigin, 0 ,"yOrigin is still 0");
+      assert.equal((<any> c)._xOrigin, 0, "xOrigin is still 0");
+      assert.equal((<any> c)._yOrigin, 0, "yOrigin is still 0");
 
       // reset test page DOM
       parent.style("width", "auto");
@@ -206,7 +206,8 @@ describe("Component behavior", () => {
     c._computeLayout(0, 0, 100, 100);
     c._render();
     var expectedPrefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
-    var expectedClipPathURL = "url(" + expectedPrefix + "#clipPath" + expectedClipPathID+ ")";
+    expectedPrefix = expectedPrefix.replace(/#.*/g, "");
+    var expectedClipPathURL = "url(" + expectedPrefix + "#clipPath" + expectedClipPathID + ")";
     // IE 9 has clipPath like 'url("#clipPath")', must accomodate
     var normalizeClipPath = (s: string) => s.replace(/"/g, "");
     assert.isTrue(normalizeClipPath((<any> c)._element.attr("clip-path")) === expectedClipPathURL,
@@ -222,7 +223,7 @@ describe("Component behavior", () => {
     var c1 = new Plottable.Component.AbstractComponent();
     assert.equal(c1.getID(), expectedID, "component id on next component was as expected");
     var c2 = new Plottable.Component.AbstractComponent();
-    assert.equal(c2.getID(), expectedID+1, "future components increment appropriately");
+    assert.equal(c2.getID(), expectedID + 1, "future components increment appropriately");
     svg.remove();
   });
 
@@ -369,7 +370,7 @@ describe("Component behavior", () => {
   it("Components will not translate if they are fixed width/height and request more space than offered", () => {
     // catches #1188
     var c: any = new Plottable.Component.AbstractComponent();
-    c._requestedSpace = () => {return {width: 500, height: 500, wantsWidth: true, wantsHeight: true};};
+    c._requestedSpace = () => { return {width: 500, height: 500, wantsWidth: true, wantsHeight: true}; };
     c._fixedWidthFlag = true;
     c._fixedHeightFlag = true;
     c.xAlign("left");
@@ -416,8 +417,8 @@ describe("Component behavior", () => {
 
       c.xAlign("center").yAlign("center");
       origin = c.origin();
-      assert.strictEqual(origin.x, (SVG_WIDTH - cWidth)/2, "returns correct value (xAlign center)");
-      assert.strictEqual(origin.y, (SVG_HEIGHT - cHeight)/2, "returns correct value (yAlign center)");
+      assert.strictEqual(origin.x, (SVG_WIDTH - cWidth) / 2, "returns correct value (xAlign center)");
+      assert.strictEqual(origin.y, (SVG_HEIGHT - cHeight) / 2, "returns correct value (yAlign center)");
 
       c.xAlign("right").yAlign("bottom");
       origin = c.origin();
@@ -455,8 +456,8 @@ describe("Component behavior", () => {
 
       c.xAlign("center").yAlign("center");
       origin = c.origin();
-      assert.strictEqual(origin.x, (groupWidth - cWidth)/2, "returns correct value (xAlign center)");
-      assert.strictEqual(origin.y, (groupHeight - cHeight)/2, "returns correct value (yAlign center)");
+      assert.strictEqual(origin.x, (groupWidth - cWidth) / 2, "returns correct value (xAlign center)");
+      assert.strictEqual(origin.y, (groupHeight - cHeight) / 2, "returns correct value (yAlign center)");
 
       c.xAlign("right").yAlign("bottom");
       origin = c.origin();
@@ -477,8 +478,8 @@ describe("Component behavior", () => {
 
       c.xAlign("center").yAlign("center");
       origin = c.originToSVG();
-      assert.strictEqual(origin.x, (SVG_WIDTH - cWidth)/2, "returns correct value (xAlign center)");
-      assert.strictEqual(origin.y, (SVG_HEIGHT - cHeight)/2, "returns correct value (yAlign center)");
+      assert.strictEqual(origin.x, (SVG_WIDTH - cWidth) / 2, "returns correct value (xAlign center)");
+      assert.strictEqual(origin.y, (SVG_HEIGHT - cHeight) / 2, "returns correct value (yAlign center)");
 
       c.xAlign("right").yAlign("bottom");
       origin = c.originToSVG();
@@ -516,8 +517,8 @@ describe("Component behavior", () => {
 
       c.xAlign("center").yAlign("center");
       origin = c.originToSVG();
-      assert.strictEqual(origin.x, (groupWidth - cWidth)/2 + groupXOffset, "returns correct value (xAlign center)");
-      assert.strictEqual(origin.y, (groupHeight - cHeight)/2 + groupYOffset, "returns correct value (yAlign center)");
+      assert.strictEqual(origin.x, (groupWidth - cWidth) / 2 + groupXOffset, "returns correct value (xAlign center)");
+      assert.strictEqual(origin.y, (groupHeight - cHeight) / 2 + groupYOffset, "returns correct value (yAlign center)");
 
       c.xAlign("right").yAlign("bottom");
       origin = c.originToSVG();

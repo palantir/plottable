@@ -4,6 +4,22 @@ var assert = chai.assert;
 
 describe("Plots", () => {
   describe("AreaPlot", () => {
+    // HACKHACK #1798: beforeEach being used below
+    it("renders correctly with no data", () => {
+      var svg = generateSVG(400, 400);
+      var xScale = new Plottable.Scale.Linear();
+      var yScale = new Plottable.Scale.Linear();
+      var plot = new Plottable.Plot.Area(xScale, yScale);
+      plot.project("x", (d: any) => d.x, xScale);
+      plot.project("y", (d: any) => d.y, yScale);
+      assert.doesNotThrow(() => plot.renderTo(svg), Error);
+      assert.strictEqual(plot.width(), 400, "was allocated width");
+      assert.strictEqual(plot.height(), 400, "was allocated height");
+      svg.remove();
+    });
+  });
+
+  describe("AreaPlot", () => {
     var svg: D3.Selection;
     var xScale: Plottable.Scale.Linear;
     var yScale: Plottable.Scale.Linear;
@@ -57,7 +73,7 @@ describe("Plots", () => {
     });
 
     it("area fill works for non-zero floor values appropriately, e.g. half the height of the line", () => {
-      areaPlot.project("y0", (d: any) => d.bar/2, yScale);
+      areaPlot.project("y0", (d: any) => d.bar / 2, yScale);
       areaPlot.renderTo(svg);
       renderArea = (<any> areaPlot)._renderArea;
       var areaPath = renderArea.select(".area");

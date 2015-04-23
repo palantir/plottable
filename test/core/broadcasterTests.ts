@@ -11,7 +11,7 @@ describe("Broadcasters", () => {
   beforeEach(() => {
     b = new Plottable.Core.Broadcaster(listenable);
     called = false;
-    cb = () => {called = true;};
+    cb = () => { called = true; };
   });
   it("listeners are called by the broadcast method", () => {
     b.registerListener(null, cb);
@@ -21,7 +21,7 @@ describe("Broadcasters", () => {
 
   it("same listener can only be associated with one callback", () => {
     var called2 = false;
-    var cb2 = () => {called2 = true;};
+    var cb2 = () => { called2 = true; };
     var listener = {};
     b.registerListener(listener, cb);
     b.registerListener(listener, cb2);

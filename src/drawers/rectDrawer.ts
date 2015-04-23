@@ -52,7 +52,7 @@ export module _Drawer {
         var tooWide = secondaryAttrTextSpace + 2 * LABEL_HORIZONTAL_PADDING > secondaryAttrAvailableSpace;
         if (measurement.height <= h && measurement.width <= w) {
           var offset = Math.min((primary - primarySpace) / 2, LABEL_VERTICAL_PADDING);
-          if (!positive) {offset = offset * -1;}
+          if (!positive) { offset = offset * -1; }
           if (this._isVertical) {
             y += offset;
           } else {

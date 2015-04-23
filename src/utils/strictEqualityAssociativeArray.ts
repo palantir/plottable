@@ -38,7 +38,7 @@ export module _Util {
      * @return {any} Value if found, undefined otherwise
      */
     public get(key: any): any {
-      for (var i = 0; i<this._keyValuePairs.length; i++) {
+      for (var i = 0; i < this._keyValuePairs.length; i++) {
         if (this._keyValuePairs[i][0] === key) {
           return this._keyValuePairs[i][1];
         }
@@ -56,7 +56,7 @@ export module _Util {
      * @return {boolean} Whether there was a matching entry for that key
      */
     public has(key: any): boolean {
-      for (var i = 0; i<this._keyValuePairs.length; i++) {
+      for (var i = 0; i < this._keyValuePairs.length; i++) {
         if (this._keyValuePairs[i][0] === key) {
           return true;
         }

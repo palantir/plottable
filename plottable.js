@@ -1,5 +1,5 @@
 /*!
-Plottable 0.50.0 (https://github.com/palantir/plottable)
+Plottable 0.53.0 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -23,6 +23,18 @@ var Plottable;
                 return (Math.min(a, b) <= x && x <= Math.max(a, b));
             }
             Methods.inRange = inRange;
+            /**
+             * Clamps x to the range [min, max].
+             *
+             * @param {number} x The value to be clamped.
+             * @param {number} min The minimum value.
+             * @param {number} max The maximum value.
+             * @return {number} A clamped value in the range [min, max].
+             */
+            function clamp(x, min, max) {
+                return Math.min(Math.max(min, x), max);
+            }
+            Methods.clamp = clamp;
             /** Print a warning message to the console, if it is available.
              *
              * @param {string} The warnings to print
@@ -235,6 +247,13 @@ var Plottable;
             }
             Methods.min = min;
             /**
+             * Returns true **only** if x is NaN
+             */
+            function isNaN(n) {
+                return n !== n;
+            }
+            Methods.isNaN = isNaN;
+            /**
              * Creates shallow copy of map.
              * @param {{ [key: string]: any }} oldMap Map to copy
              *
@@ -331,6 +350,48 @@ var Plottable;
                 return userAgent.indexOf("MSIE ") > -1 || userAgent.indexOf("Trident/") > -1;
             }
             Methods.isIE = isIE;
+            /**
+             * Returns true if the supplied coordinates or Extents intersect or are contained by bbox.
+             *
+             * @param {number | Extent} xValOrExtent The x coordinate or Extent to test
+             * @param {number | Extent} yValOrExtent The y coordinate or Extent to test
+             * @param {SVGRect} bbox The bbox
+             * @param {number} tolerance Amount by which to expand bbox, in each dimension, before
+             * testing intersection
+             *
+             * @returns {boolean} True if the supplied coordinates or Extents intersect or are
+             * contained by bbox, false otherwise.
+             */
+            function intersectsBBox(xValOrExtent, yValOrExtent, bbox, tolerance) {
+                if (tolerance === void 0) { tolerance = 0.5; }
+                var xExtent = parseExtent(xValOrExtent);
+                var yExtent = parseExtent(yValOrExtent);
+                // SVGRects are positioned with sub-pixel accuracy (the default unit
+                // for the x, y, height & width attributes), but user selections (e.g. via
+                // mouse events) usually have pixel accuracy. A tolerance of half-a-pixel
+                // seems appropriate.
+                return bbox.x + bbox.width >= xExtent.min - tolerance && bbox.x <= xExtent.max + tolerance && bbox.y + bbox.height >= yExtent.min - tolerance && bbox.y <= yExtent.max + tolerance;
+            }
+            Methods.intersectsBBox = intersectsBBox;
+            /**
+             * Create an Extent from a number or an object with "min" and "max" defined.
+             *
+             * @param {any} input The object to parse
+             *
+             * @returns {Extent} The generated Extent
+             */
+            function parseExtent(input) {
+                if (typeof (input) === "number") {
+                    return { min: input, max: input };
+                }
+                else if (input instanceof Object && "min" in input && "max" in input) {
+                    return input;
+                }
+                else {
+                    throw new Error("input '" + input + "' can't be parsed as an Extent");
+                }
+            }
+            Methods.parseExtent = parseExtent;
         })(Methods = _Util.Methods || (_Util.Methods = {}));
     })(_Util = Plottable._Util || (Plottable._Util = {}));
 })(Plottable || (Plottable = {}));
@@ -363,38 +424,6 @@ var Plottable;
             OpenSource.sortedIndex = sortedIndex;
             ;
         })(OpenSource = _Util.OpenSource || (_Util.OpenSource = {}));
-    })(_Util = Plottable._Util || (Plottable._Util = {}));
-})(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var Plottable;
-(function (Plottable) {
-    var _Util;
-    (function (_Util) {
-        var IDCounter = (function () {
-            function IDCounter() {
-                this._counter = {};
-            }
-            IDCounter.prototype._setDefault = function (id) {
-                if (this._counter[id] == null) {
-                    this._counter[id] = 0;
-                }
-            };
-            IDCounter.prototype.increment = function (id) {
-                this._setDefault(id);
-                return ++this._counter[id];
-            };
-            IDCounter.prototype.decrement = function (id) {
-                this._setDefault(id);
-                return --this._counter[id];
-            };
-            IDCounter.prototype.get = function (id) {
-                this._setDefault(id);
-                return this._counter[id];
-            };
-            return IDCounter;
-        })();
-        _Util.IDCounter = IDCounter;
     })(_Util = Plottable._Util || (Plottable._Util = {}));
 })(Plottable || (Plottable = {}));
 
@@ -987,61 +1016,33 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    var SymbolGenerators;
-    (function (SymbolGenerators) {
-        /**
-         * The radius that symbol generators will be assumed to have for their symbols.
-         */
-        SymbolGenerators.SYMBOL_GENERATOR_RADIUS = 50;
-        /**
-         * A wrapper for D3's symbol generator as documented here:
-         * https://github.com/mbostock/d3/wiki/SVG-Shapes#symbol
-         *
-         * Note that since D3 symbols compute the path strings by knowing how much area it can take up instead of
-         * knowing its dimensions, the total area expected may be off by some constant factor.
-         *
-         * @param {string | ((datum: any, index: number) => string)} symbolType Accessor for the d3 symbol type
-         * @returns {SymbolGenerator} the symbol generator for a D3 symbol
-         */
-        function d3Symbol(symbolType) {
-            // Since D3 symbols use a size concept, we have to convert our radius value to the corresponding area value
-            // This is done by inspecting the symbol size calculation in d3.js and solving how sizes are calculated from a given radius
-            var typeToSize = function (symbolTypeString) {
-                var sizeFactor;
-                switch (symbolTypeString) {
-                    case "circle":
-                        sizeFactor = Math.PI;
-                        break;
-                    case "square":
-                        sizeFactor = 4;
-                        break;
-                    case "cross":
-                        sizeFactor = 20 / 9;
-                        break;
-                    case "diamond":
-                        sizeFactor = 2 * Math.tan(Math.PI / 6);
-                        break;
-                    case "triangle-up":
-                    case "triangle-down":
-                        sizeFactor = Math.sqrt(3);
-                        break;
-                    default:
-                        sizeFactor = 1;
-                        break;
-                }
-                return sizeFactor * Math.pow(SymbolGenerators.SYMBOL_GENERATOR_RADIUS, 2);
-            };
-            function ensureSymbolType(symTypeString) {
-                if (d3.svg.symbolTypes.indexOf(symTypeString) === -1) {
-                    throw new Error(symTypeString + " is an invalid D3 symbol type.  d3.svg.symbolTypes can retrieve the valid symbol types.");
-                }
-                return symTypeString;
-            }
-            var symbolSize = typeof (symbolType) === "string" ? typeToSize(ensureSymbolType(symbolType)) : function (datum, index) { return typeToSize(ensureSymbolType(symbolType(datum, index))); };
-            return d3.svg.symbol().type(symbolType).size(symbolSize);
+    var SymbolFactories;
+    (function (SymbolFactories) {
+        function circle() {
+            return function (symbolSize) { return d3.svg.symbol().type("circle").size(Math.PI * Math.pow(symbolSize / 2, 2))(); };
         }
-        SymbolGenerators.d3Symbol = d3Symbol;
-    })(SymbolGenerators = Plottable.SymbolGenerators || (Plottable.SymbolGenerators = {}));
+        SymbolFactories.circle = circle;
+        function square() {
+            return function (symbolSize) { return d3.svg.symbol().type("square").size(Math.pow(symbolSize, 2))(); };
+        }
+        SymbolFactories.square = square;
+        function cross() {
+            return function (symbolSize) { return d3.svg.symbol().type("cross").size((5 / 9) * Math.pow(symbolSize, 2))(); };
+        }
+        SymbolFactories.cross = cross;
+        function diamond() {
+            return function (symbolSize) { return d3.svg.symbol().type("diamond").size(Math.tan(Math.PI / 6) * Math.pow(symbolSize, 2) / 2)(); };
+        }
+        SymbolFactories.diamond = diamond;
+        function triangleUp() {
+            return function (symbolSize) { return d3.svg.symbol().type("triangle-up").size(Math.sqrt(3) * Math.pow(symbolSize / 2, 2))(); };
+        }
+        SymbolFactories.triangleUp = triangleUp;
+        function triangleDown() {
+            return function (symbolSize) { return d3.svg.symbol().type("triangle-down").size(Math.sqrt(3) * Math.pow(symbolSize / 2, 2))(); };
+        }
+        SymbolFactories.triangleDown = triangleDown;
+    })(SymbolFactories = Plottable.SymbolFactories || (Plottable.SymbolFactories = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -1122,7 +1123,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "0.50.0";
+    Plottable.version = "0.53.0";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -2471,10 +2472,14 @@ var Plottable;
             };
             Color._getPlottableColors = function () {
                 var plottableDefaultColors = [];
-                var colorTester = d3.select("body").append("div");
+                var colorTester = d3.select("body").append("plottable-color-tester");
+                var defaultColorHex = Plottable._Util.Methods.colorTest(colorTester, "");
                 var i = 0;
                 var colorHex;
-                while ((colorHex = Plottable._Util.Methods.colorTest(colorTester, "plottable-colors-" + i)) !== null) {
+                while ((colorHex = Plottable._Util.Methods.colorTest(colorTester, "plottable-colors-" + i)) !== null && i < this.MAXIMUM_COLORS_FROM_CSS) {
+                    if (colorHex === defaultColorHex && colorHex === plottableDefaultColors[plottableDefaultColors.length - 1]) {
+                        break;
+                    }
                     plottableDefaultColors.push(colorHex);
                     i++;
                 }
@@ -2492,6 +2497,8 @@ var Plottable;
             };
             Color.HEX_SCALE_FACTOR = 20;
             Color.LOOP_LIGHTEN_FACTOR = 1.6;
+            //The maximum number of colors we are getting from CSS stylesheets
+            Color.MAXIMUM_COLORS_FROM_CSS = 256;
             return Color;
         })(Scale.AbstractScale);
         Scale.Color = Color;
@@ -3370,12 +3377,12 @@ var Plottable;
                 var yProjector = attrToProjector["y"];
                 delete attrToProjector["x"];
                 delete attrToProjector["y"];
-                var rProjector = attrToProjector["r"];
-                delete attrToProjector["r"];
-                attrToProjector["transform"] = function (datum, index) { return "translate(" + xProjector(datum, index) + "," + yProjector(datum, index) + ") " + "scale(" + rProjector(datum, index) / 50 + ")"; };
+                var rProjector = attrToProjector["size"];
+                delete attrToProjector["size"];
+                attrToProjector["transform"] = function (datum, index) { return "translate(" + xProjector(datum, index) + "," + yProjector(datum, index) + ")"; };
                 var symbolProjector = attrToProjector["symbol"];
                 delete attrToProjector["symbol"];
-                attrToProjector["d"] = symbolProjector;
+                attrToProjector["d"] = attrToProjector["d"] || (function (datum, index) { return symbolProjector(datum, index)(rProjector(datum, index)); });
                 _super.prototype._drawStep.call(this, step);
             };
             Symbol.prototype._getPixelPoint = function (datum, index) {
@@ -3513,14 +3520,20 @@ var Plottable;
                         throw new Error("null arguments cannot be passed to _computeLayout() on a non-root node");
                     }
                 }
-                var requestedSpace = this._requestedSpace(availableWidth, availableHeight);
-                this._width = this._isFixedWidth() ? Math.min(availableWidth, requestedSpace.width) : availableWidth;
-                this._height = this._isFixedHeight() ? Math.min(availableHeight, requestedSpace.height) : availableHeight;
+                var size = this._getSize(availableWidth, availableHeight);
+                this._width = size.width;
+                this._height = size.height;
                 this._xOrigin = offeredXOrigin + this._xOffset + (availableWidth - this.width()) * this._xAlignProportion;
                 this._yOrigin = offeredYOrigin + this._yOffset + (availableHeight - this.height()) * this._yAlignProportion;
-                ;
                 this._element.attr("transform", "translate(" + this._xOrigin + "," + this._yOrigin + ")");
                 this._boxes.forEach(function (b) { return b.attr("width", _this.width()).attr("height", _this.height()); });
+            };
+            AbstractComponent.prototype._getSize = function (availableWidth, availableHeight) {
+                var requestedSpace = this._requestedSpace(availableWidth, availableHeight);
+                return {
+                    width: this._isFixedWidth() ? Math.min(availableWidth, requestedSpace.width) : availableWidth,
+                    height: this._isFixedHeight() ? Math.min(availableHeight, requestedSpace.height) : availableHeight
+                };
             };
             AbstractComponent.prototype._render = function () {
                 if (this._isAnchored && this._isSetup && this.width() >= 0 && this.height() >= 0) {
@@ -3687,7 +3700,6 @@ var Plottable;
                 if (className != null) {
                     box.classed(className, true);
                 }
-                ;
                 this._boxes.push(box);
                 if (this.width() != null && this.height() != null) {
                     box.attr("width", this.width()).attr("height", this.height());
@@ -4095,11 +4107,17 @@ var Plottable;
                 });
                 return this;
             };
+            Group.prototype._getSize = function (availableWidth, availableHeight) {
+                return {
+                    width: availableWidth,
+                    height: availableHeight
+                };
+            };
             Group.prototype._isFixedWidth = function () {
-                return false;
+                return this.components().every(function (c) { return c._isFixedWidth(); });
             };
             Group.prototype._isFixedHeight = function () {
-                return false;
+                return this.components().every(function (c) { return c._isFixedHeight(); });
             };
             return Group;
         })(Component.AbstractComponentContainer);
@@ -4517,121 +4535,10 @@ var Plottable;
              */
             function Time(scale, orientation) {
                 _super.call(this, scale, orientation);
-                /*
-                 * Default possible axis configurations.
-                 */
-                this._possibleTimeAxisConfigurations = [
-                    [
-                        { interval: d3.time.second, step: 1, formatter: Plottable.Formatters.time("%I:%M:%S %p") },
-                        { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
-                    ],
-                    [
-                        { interval: d3.time.second, step: 5, formatter: Plottable.Formatters.time("%I:%M:%S %p") },
-                        { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
-                    ],
-                    [
-                        { interval: d3.time.second, step: 10, formatter: Plottable.Formatters.time("%I:%M:%S %p") },
-                        { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
-                    ],
-                    [
-                        { interval: d3.time.second, step: 15, formatter: Plottable.Formatters.time("%I:%M:%S %p") },
-                        { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
-                    ],
-                    [
-                        { interval: d3.time.second, step: 30, formatter: Plottable.Formatters.time("%I:%M:%S %p") },
-                        { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
-                    ],
-                    [
-                        { interval: d3.time.minute, step: 1, formatter: Plottable.Formatters.time("%I:%M %p") },
-                        { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
-                    ],
-                    [
-                        { interval: d3.time.minute, step: 5, formatter: Plottable.Formatters.time("%I:%M %p") },
-                        { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
-                    ],
-                    [
-                        { interval: d3.time.minute, step: 10, formatter: Plottable.Formatters.time("%I:%M %p") },
-                        { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
-                    ],
-                    [
-                        { interval: d3.time.minute, step: 15, formatter: Plottable.Formatters.time("%I:%M %p") },
-                        { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
-                    ],
-                    [
-                        { interval: d3.time.minute, step: 30, formatter: Plottable.Formatters.time("%I:%M %p") },
-                        { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
-                    ],
-                    [
-                        { interval: d3.time.hour, step: 1, formatter: Plottable.Formatters.time("%I %p") },
-                        { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
-                    ],
-                    [
-                        { interval: d3.time.hour, step: 3, formatter: Plottable.Formatters.time("%I %p") },
-                        { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
-                    ],
-                    [
-                        { interval: d3.time.hour, step: 6, formatter: Plottable.Formatters.time("%I %p") },
-                        { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
-                    ],
-                    [
-                        { interval: d3.time.hour, step: 12, formatter: Plottable.Formatters.time("%I %p") },
-                        { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
-                    ],
-                    [
-                        { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%a %e") },
-                        { interval: d3.time.month, step: 1, formatter: Plottable.Formatters.time("%B %Y") }
-                    ],
-                    [
-                        { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%e") },
-                        { interval: d3.time.month, step: 1, formatter: Plottable.Formatters.time("%B %Y") }
-                    ],
-                    [
-                        { interval: d3.time.month, step: 1, formatter: Plottable.Formatters.time("%B") },
-                        { interval: d3.time.year, step: 1, formatter: Plottable.Formatters.time("%Y") }
-                    ],
-                    [
-                        { interval: d3.time.month, step: 1, formatter: Plottable.Formatters.time("%b") },
-                        { interval: d3.time.year, step: 1, formatter: Plottable.Formatters.time("%Y") }
-                    ],
-                    [
-                        { interval: d3.time.month, step: 3, formatter: Plottable.Formatters.time("%b") },
-                        { interval: d3.time.year, step: 1, formatter: Plottable.Formatters.time("%Y") }
-                    ],
-                    [
-                        { interval: d3.time.month, step: 6, formatter: Plottable.Formatters.time("%b") },
-                        { interval: d3.time.year, step: 1, formatter: Plottable.Formatters.time("%Y") }
-                    ],
-                    [
-                        { interval: d3.time.year, step: 1, formatter: Plottable.Formatters.time("%Y") }
-                    ],
-                    [
-                        { interval: d3.time.year, step: 1, formatter: Plottable.Formatters.time("%y") }
-                    ],
-                    [
-                        { interval: d3.time.year, step: 5, formatter: Plottable.Formatters.time("%Y") }
-                    ],
-                    [
-                        { interval: d3.time.year, step: 25, formatter: Plottable.Formatters.time("%Y") }
-                    ],
-                    [
-                        { interval: d3.time.year, step: 50, formatter: Plottable.Formatters.time("%Y") }
-                    ],
-                    [
-                        { interval: d3.time.year, step: 100, formatter: Plottable.Formatters.time("%Y") }
-                    ],
-                    [
-                        { interval: d3.time.year, step: 200, formatter: Plottable.Formatters.time("%Y") }
-                    ],
-                    [
-                        { interval: d3.time.year, step: 500, formatter: Plottable.Formatters.time("%Y") }
-                    ],
-                    [
-                        { interval: d3.time.year, step: 1000, formatter: Plottable.Formatters.time("%Y") }
-                    ]
-                ];
                 this.classed("time-axis", true);
                 this.tickLabelPadding(5);
                 this.tierLabelPositions(["between", "between"]);
+                this.axisConfigurations(Time._DEFAULT_TIME_AXIS_CONFIGURATIONS);
             }
             Time.prototype.tierLabelPositions = function (newPositions) {
                 if (newPositions == null) {
@@ -4678,9 +4585,12 @@ var Plottable;
                 return _super.prototype.orient.call(this, orientation); // maintains getter-setter functionality
             };
             Time.prototype._computeHeight = function () {
-                var _this = this;
                 var textHeight = this._measurer.measure().height;
-                this._tierHeights = this._tierLabelPositions.map(function (pos) { return textHeight + _this.tickLabelPadding() + ((pos === "between") ? 0 : _this._maxLabelTickLength()); });
+                var maximumTiers = Plottable._Util.Methods.max(this._possibleTimeAxisConfigurations.map(function (config) { return config.length; }), 0);
+                this._tierHeights = [];
+                for (var i = 0; i < maximumTiers; i++) {
+                    this._tierHeights.push(textHeight + this.tickLabelPadding() + ((this._tierLabelPositions[i]) === "between" ? 0 : this._maxLabelTickLength()));
+                }
                 this._computedHeight = d3.sum(this._tierHeights);
                 return this._computedHeight;
             };
@@ -4875,6 +4785,118 @@ var Plottable;
                     }
                 });
             };
+            /*
+             * Default possible axis configurations.
+             */
+            Time._DEFAULT_TIME_AXIS_CONFIGURATIONS = [
+                [
+                    { interval: d3.time.second, step: 1, formatter: Plottable.Formatters.time("%I:%M:%S %p") },
+                    { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
+                ],
+                [
+                    { interval: d3.time.second, step: 5, formatter: Plottable.Formatters.time("%I:%M:%S %p") },
+                    { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
+                ],
+                [
+                    { interval: d3.time.second, step: 10, formatter: Plottable.Formatters.time("%I:%M:%S %p") },
+                    { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
+                ],
+                [
+                    { interval: d3.time.second, step: 15, formatter: Plottable.Formatters.time("%I:%M:%S %p") },
+                    { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
+                ],
+                [
+                    { interval: d3.time.second, step: 30, formatter: Plottable.Formatters.time("%I:%M:%S %p") },
+                    { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
+                ],
+                [
+                    { interval: d3.time.minute, step: 1, formatter: Plottable.Formatters.time("%I:%M %p") },
+                    { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
+                ],
+                [
+                    { interval: d3.time.minute, step: 5, formatter: Plottable.Formatters.time("%I:%M %p") },
+                    { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
+                ],
+                [
+                    { interval: d3.time.minute, step: 10, formatter: Plottable.Formatters.time("%I:%M %p") },
+                    { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
+                ],
+                [
+                    { interval: d3.time.minute, step: 15, formatter: Plottable.Formatters.time("%I:%M %p") },
+                    { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
+                ],
+                [
+                    { interval: d3.time.minute, step: 30, formatter: Plottable.Formatters.time("%I:%M %p") },
+                    { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
+                ],
+                [
+                    { interval: d3.time.hour, step: 1, formatter: Plottable.Formatters.time("%I %p") },
+                    { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
+                ],
+                [
+                    { interval: d3.time.hour, step: 3, formatter: Plottable.Formatters.time("%I %p") },
+                    { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
+                ],
+                [
+                    { interval: d3.time.hour, step: 6, formatter: Plottable.Formatters.time("%I %p") },
+                    { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
+                ],
+                [
+                    { interval: d3.time.hour, step: 12, formatter: Plottable.Formatters.time("%I %p") },
+                    { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
+                ],
+                [
+                    { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%a %e") },
+                    { interval: d3.time.month, step: 1, formatter: Plottable.Formatters.time("%B %Y") }
+                ],
+                [
+                    { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%e") },
+                    { interval: d3.time.month, step: 1, formatter: Plottable.Formatters.time("%B %Y") }
+                ],
+                [
+                    { interval: d3.time.month, step: 1, formatter: Plottable.Formatters.time("%B") },
+                    { interval: d3.time.year, step: 1, formatter: Plottable.Formatters.time("%Y") }
+                ],
+                [
+                    { interval: d3.time.month, step: 1, formatter: Plottable.Formatters.time("%b") },
+                    { interval: d3.time.year, step: 1, formatter: Plottable.Formatters.time("%Y") }
+                ],
+                [
+                    { interval: d3.time.month, step: 3, formatter: Plottable.Formatters.time("%b") },
+                    { interval: d3.time.year, step: 1, formatter: Plottable.Formatters.time("%Y") }
+                ],
+                [
+                    { interval: d3.time.month, step: 6, formatter: Plottable.Formatters.time("%b") },
+                    { interval: d3.time.year, step: 1, formatter: Plottable.Formatters.time("%Y") }
+                ],
+                [
+                    { interval: d3.time.year, step: 1, formatter: Plottable.Formatters.time("%Y") }
+                ],
+                [
+                    { interval: d3.time.year, step: 1, formatter: Plottable.Formatters.time("%y") }
+                ],
+                [
+                    { interval: d3.time.year, step: 5, formatter: Plottable.Formatters.time("%Y") }
+                ],
+                [
+                    { interval: d3.time.year, step: 25, formatter: Plottable.Formatters.time("%Y") }
+                ],
+                [
+                    { interval: d3.time.year, step: 50, formatter: Plottable.Formatters.time("%Y") }
+                ],
+                [
+                    { interval: d3.time.year, step: 100, formatter: Plottable.Formatters.time("%Y") }
+                ],
+                [
+                    { interval: d3.time.year, step: 200, formatter: Plottable.Formatters.time("%Y") }
+                ],
+                [
+                    { interval: d3.time.year, step: 500, formatter: Plottable.Formatters.time("%Y") }
+                ],
+                [
+                    { interval: d3.time.year, step: 1000, formatter: Plottable.Formatters.time("%Y") }
+                ]
+            ];
             Time._LONG_DATE = new Date(9999, 8, 29, 12, 59, 9999);
             /**
              * Number of possible tiers.
@@ -5531,7 +5553,7 @@ var Plottable;
                 this._fixedWidthFlag = true;
                 this._fixedHeightFlag = true;
                 this._sortFn = function (a, b) { return _this._scale.domain().indexOf(a) - _this._scale.domain().indexOf(b); };
-                this._symbolGenerator = Plottable.SymbolGenerators.d3Symbol("circle");
+                this._symbolFactoryAccessor = function () { return Plottable.SymbolFactories.circle(); };
             }
             Legend.prototype._setup = function () {
                 _super.prototype._setup.call(this);
@@ -5695,7 +5717,7 @@ var Plottable;
                         return translateString;
                     });
                 });
-                entries.select("path").attr("d", this.symbolGenerator()).attr("transform", "translate(" + (layout.textHeight / 2) + "," + layout.textHeight / 2 + ") " + "scale(" + (layout.textHeight * 0.3 / Plottable.SymbolGenerators.SYMBOL_GENERATOR_RADIUS) + ")").attr("fill", function (value) { return _this._scale.scale(value); }).attr("vector-effect", "non-scaling-stroke").classed(Legend.LEGEND_SYMBOL_CLASS, true);
+                entries.select("path").attr("d", function (d, i) { return _this.symbolFactoryAccessor()(d, i)(layout.textHeight * 0.6); }).attr("transform", "translate(" + (layout.textHeight / 2) + "," + layout.textHeight / 2 + ")").attr("fill", function (value) { return _this._scale.scale(value); }).classed(Legend.LEGEND_SYMBOL_CLASS, true);
                 var padding = this._padding;
                 var textContainers = entries.select("g.text-container");
                 textContainers.text(""); // clear out previous results
@@ -5713,12 +5735,12 @@ var Plottable;
                     self._writer.write(value, maxTextLength, self.height(), writeOptions);
                 });
             };
-            Legend.prototype.symbolGenerator = function (symbolGenerator) {
-                if (symbolGenerator == null) {
-                    return this._symbolGenerator;
+            Legend.prototype.symbolFactoryAccessor = function (symbolFactoryAccessor) {
+                if (symbolFactoryAccessor == null) {
+                    return this._symbolFactoryAccessor;
                 }
                 else {
-                    this._symbolGenerator = symbolGenerator;
+                    this._symbolFactoryAccessor = symbolFactoryAccessor;
                     this._render();
                     return this;
                 }
@@ -6101,7 +6123,12 @@ var Plottable;
                 });
             }
             /**
-             * Adds a Component in the specified cell. The cell must be unoccupied.
+             * Adds a Component in the specified cell.
+             *
+             * If the cell is already occupied, there are 3 cases
+             *  - Component + Component => Group containing both components
+             *  - Component + Group => Component is added to the group
+             *  - Group + Component => Component is added to the group
              *
              * For example, instead of calling `new Table([[a, b], [null, c]])`, you
              * could call
@@ -6118,14 +6145,15 @@ var Plottable;
              * @returns {Table} The calling Table.
              */
             Table.prototype.addComponent = function (row, col, component) {
+                var currentComponent = this._rows[row] && this._rows[row][col];
+                if (currentComponent) {
+                    currentComponent.detach();
+                    component = component.above(currentComponent);
+                }
                 if (this._addComponent(component)) {
                     this._nRows = Math.max(row + 1, this._nRows);
                     this._nCols = Math.max(col + 1, this._nCols);
                     this._padTableToSize(this._nRows, this._nCols);
-                    var currentComponent = this._rows[row][col];
-                    if (currentComponent) {
-                        throw new Error("Table.addComponent cannot be called on a cell where a component already exists (for the moment)");
-                    }
                     this._rows[row][col] = component;
                 }
                 return this;
@@ -6397,6 +6425,95 @@ var Plottable;
     })(Component = Plottable.Component || (Plottable.Component = {}));
 })(Plottable || (Plottable = {}));
 
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    var Component;
+    (function (Component) {
+        var SelectionBoxLayer = (function (_super) {
+            __extends(SelectionBoxLayer, _super);
+            function SelectionBoxLayer() {
+                _super.call(this);
+                this._boxVisible = false;
+                this._boxBounds = {
+                    topLeft: { x: 0, y: 0 },
+                    bottomRight: { x: 0, y: 0 }
+                };
+                this.classed("selection-box-layer", true);
+                this._fixedWidthFlag = true;
+                this._fixedHeightFlag = true;
+            }
+            SelectionBoxLayer.prototype._setup = function () {
+                _super.prototype._setup.call(this);
+                this._box = this._content.append("g").classed("selection-box", true).remove();
+                this._boxArea = this._box.append("rect").classed("selection-area", true);
+            };
+            SelectionBoxLayer.prototype._getSize = function (availableWidth, availableHeight) {
+                return {
+                    width: availableWidth,
+                    height: availableHeight
+                };
+            };
+            SelectionBoxLayer.prototype.bounds = function (newBounds) {
+                if (newBounds == null) {
+                    return this._boxBounds;
+                }
+                this._setBounds(newBounds);
+                this._render();
+                return this;
+            };
+            SelectionBoxLayer.prototype._setBounds = function (newBounds) {
+                var topLeft = {
+                    x: Math.min(newBounds.topLeft.x, newBounds.bottomRight.x),
+                    y: Math.min(newBounds.topLeft.y, newBounds.bottomRight.y)
+                };
+                var bottomRight = {
+                    x: Math.max(newBounds.topLeft.x, newBounds.bottomRight.x),
+                    y: Math.max(newBounds.topLeft.y, newBounds.bottomRight.y)
+                };
+                this._boxBounds = {
+                    topLeft: topLeft,
+                    bottomRight: bottomRight
+                };
+            };
+            SelectionBoxLayer.prototype._doRender = function () {
+                if (this._boxVisible) {
+                    var t = this._boxBounds.topLeft.y;
+                    var b = this._boxBounds.bottomRight.y;
+                    var l = this._boxBounds.topLeft.x;
+                    var r = this._boxBounds.bottomRight.x;
+                    this._boxArea.attr({
+                        x: l,
+                        y: t,
+                        width: r - l,
+                        height: b - t
+                    });
+                    this._content.node().appendChild(this._box.node());
+                }
+                else {
+                    this._box.remove();
+                }
+            };
+            SelectionBoxLayer.prototype.boxVisible = function (show) {
+                if (show == null) {
+                    return this._boxVisible;
+                }
+                this._boxVisible = show;
+                this._render();
+                return this;
+            };
+            return SelectionBoxLayer;
+        })(Component.AbstractComponent);
+        Component.SelectionBoxLayer = SelectionBoxLayer;
+    })(Component = Plottable.Component || (Plottable.Component = {}));
+})(Plottable || (Plottable = {}));
+
 ///<reference path="../../reference.ts" />
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -6512,13 +6629,13 @@ var Plottable;
              *
              * Here's a common use case:
              * ```typescript
-             * plot.attr("r", function(d) { return d.foo; });
+             * plot.attr("x", function(d) { return d.foo; }, xScale);
              * ```
-             * This will set the radius of each datum `d` to be `d.foo`.
+             * This will set the x accessor of each datum `d` to be `d.foo`,
+             * scaled in accordance with `xScale`
              *
              * @param {string} attrToSet The attribute to set across each data
-             * point. Popular examples include "x", "y", "r". Scales that inherit from
-             * Plot define their meaning.
+             * point. Popular examples include "x", "y".
              *
              * @param {Function|string|any} accessor Function to apply to each element
              * of the dataSource. If a Function, use `accessor(d, i)`. If a string,
@@ -6821,41 +6938,36 @@ var Plottable;
                     }
                     var drawer = plotDatasetKey.drawer;
                     plotDatasetKey.dataset.data().forEach(function (datum, index) {
+                        var pixelPoint = drawer._getPixelPoint(datum, index);
+                        if (pixelPoint.x !== pixelPoint.x || pixelPoint.y !== pixelPoint.y) {
+                            return;
+                        }
                         data.push(datum);
-                        pixelPoints.push(drawer._getPixelPoint(datum, index));
+                        pixelPoints.push(pixelPoint);
                         allElements.push(drawer._getSelection(index).node());
                     });
                 });
                 return { data: data, pixelPoints: pixelPoints, selection: d3.selectAll(allElements) };
             };
             /**
-             * Retrieves the closest PlotData for the specified dataset(s)
+             * Retrieves PlotData with the lowest distance, where distance is defined
+             * to be the Euclidiean norm.
              *
-             * @param {Point} queryPoint The point to query from
-             * @param {number} withinValue Will only return plot data that is of a distance below withinValue
-             *                             (default = Infinity)
-             * @param {string | string[]} datasetKeys The dataset(s) to retrieve the plot data from.
-             *                                        (default = this.datasetOrder())
-             * @returns {PlotData} The retrieved PlotData.
+             * @param {Point} queryPoint The point to which plot data should be compared
+             *
+             * @returns {PlotData} The PlotData closest to queryPoint
              */
-            AbstractPlot.prototype.getClosestPlotData = function (queryPoint, withinValue, datasetKeys) {
-                if (withinValue === void 0) { withinValue = Infinity; }
-                if (datasetKeys === void 0) { datasetKeys = this.datasetOrder(); }
-                var datasetKeyArray = [];
-                if (typeof (datasetKeys) === "string") {
-                    datasetKeyArray = [datasetKeys];
-                }
-                else {
-                    datasetKeyArray = datasetKeys;
-                }
-                return this._getClosestPlotData(queryPoint, datasetKeyArray, withinValue);
-            };
-            AbstractPlot.prototype._getClosestPlotData = function (queryPoint, datasetKeys, withinValue) {
-                if (withinValue === void 0) { withinValue = Infinity; }
-                var closestDistanceSquared = Math.pow(withinValue, 2);
+            AbstractPlot.prototype.getClosestPlotData = function (queryPoint) {
+                var _this = this;
+                var closestDistanceSquared = Infinity;
                 var closestIndex;
-                var plotData = this.getAllPlotData(datasetKeys);
+                var plotData = this.getAllPlotData();
                 plotData.pixelPoints.forEach(function (pixelPoint, index) {
+                    var datum = plotData.data[index];
+                    var selection = d3.select(plotData.selection[0][index]);
+                    if (!_this._isVisibleOnPlot(datum, pixelPoint, selection)) {
+                        return;
+                    }
                     var distance = Plottable._Util.Methods.distanceSquared(pixelPoint, queryPoint);
                     if (distance < closestDistanceSquared) {
                         closestDistanceSquared = distance;
@@ -6866,6 +6978,9 @@ var Plottable;
                     return { data: [], pixelPoints: [], selection: d3.select() };
                 }
                 return { data: [plotData.data[closestIndex]], pixelPoints: [plotData.pixelPoints[closestIndex]], selection: d3.select(plotData.selection[0][closestIndex]) };
+            };
+            AbstractPlot.prototype._isVisibleOnPlot = function (datum, pixelPoint, selection) {
+                return !(pixelPoint.x < 0 || pixelPoint.y < 0 || pixelPoint.x > this.width() || pixelPoint.y > this.height());
             };
             return AbstractPlot;
         })(Plottable.Component.AbstractComponent);
@@ -7257,32 +7372,17 @@ var Plottable;
             };
             Scatter.prototype._generateAttrToProjector = function () {
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
-                attrToProjector["r"] = attrToProjector["r"] || d3.functor(3);
+                attrToProjector["size"] = attrToProjector["size"] || d3.functor(6);
                 attrToProjector["opacity"] = attrToProjector["opacity"] || d3.functor(0.6);
                 attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this._defaultFillColor);
-                attrToProjector["symbol"] = attrToProjector["symbol"] || Plottable.SymbolGenerators.d3Symbol("circle");
-                attrToProjector["vector-effect"] = attrToProjector["vector-effect"] || d3.functor("non-scaling-stroke");
-                // HACKHACK vector-effect non-scaling-stroke has no effect in IE
-                // https://connect.microsoft.com/IE/feedback/details/788819/svg-non-scaling-stroke
-                if (Plottable._Util.Methods.isIE() && attrToProjector["stroke-width"] != null) {
-                    var strokeWidthProjector = attrToProjector["stroke-width"];
-                    attrToProjector["stroke-width"] = function (d, i, u, m) {
-                        var strokeWidth = strokeWidthProjector(d, i, u, m);
-                        if (attrToProjector["vector-effect"](d, i, u, m) === "non-scaling-stroke") {
-                            return strokeWidth * Plottable.SymbolGenerators.SYMBOL_GENERATOR_RADIUS / attrToProjector["r"](d, i, u, m);
-                        }
-                        else {
-                            return strokeWidth;
-                        }
-                    };
-                }
+                attrToProjector["symbol"] = attrToProjector["symbol"] || (function () { return Plottable.SymbolFactories.circle(); });
                 return attrToProjector;
             };
             Scatter.prototype._generateDrawSteps = function () {
                 var drawSteps = [];
                 if (this._dataChanged && this._animate) {
                     var resetAttrToProjector = this._generateAttrToProjector();
-                    resetAttrToProjector["r"] = function () { return 0; };
+                    resetAttrToProjector["size"] = function () { return 0; };
                     drawSteps.push({ attrToProjector: resetAttrToProjector, animator: this._getAnimator("symbols-reset") });
                 }
                 drawSteps.push({ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("symbols") });
@@ -7310,7 +7410,7 @@ var Plottable;
                     var drawer = _this._key2PlotDatasetKey.get(key).drawer;
                     drawer._getRenderArea().selectAll("path").each(function (d, i) {
                         var distSq = getDistSq(d, i, dataset.metadata(), plotMetadata);
-                        var r = attrToProjector["r"](d, i, dataset.metadata(), plotMetadata);
+                        var r = attrToProjector["size"](d, i, dataset.metadata(), plotMetadata) / 2;
                         if (distSq < r * r) {
                             if (!overAPoint || distSq < minDistSq) {
                                 closestElement = this;
@@ -7348,6 +7448,19 @@ var Plottable;
                     pixelPositions: [closestPoint],
                     data: closestData
                 };
+            };
+            Scatter.prototype._isVisibleOnPlot = function (datum, pixelPoint, selection) {
+                var xRange = { min: 0, max: this.width() };
+                var yRange = { min: 0, max: this.height() };
+                var translation = d3.transform(selection.attr("transform")).translate;
+                var bbox = selection[0][0].getBBox();
+                var translatedBbox = {
+                    x: bbox.x + translation[0],
+                    y: bbox.y + translation[1],
+                    width: bbox.width,
+                    height: bbox.height
+                };
+                return Plottable._Util.Methods.intersectsBBox(xRange, yRange, translatedBbox);
             };
             //===== Hover logic =====
             Scatter.prototype._hoverOverComponent = function (p) {
@@ -7537,17 +7650,6 @@ var Plottable;
                 this._render();
                 return this;
             };
-            Bar.prototype._parseExtent = function (input) {
-                if (typeof (input) === "number") {
-                    return { min: input, max: input };
-                }
-                else if (input instanceof Object && "min" in input && "max" in input) {
-                    return input;
-                }
-                else {
-                    throw new Error("input '" + input + "' can't be parsed as an Extent");
-                }
-            };
             Bar.prototype.barLabelsEnabled = function (enabled) {
                 if (enabled === undefined) {
                     return this._barLabelsEnabled;
@@ -7569,6 +7671,87 @@ var Plottable;
                 }
             };
             /**
+             * Retrieves the closest PlotData to queryPoint.
+             *
+             * Bars containing the queryPoint are considered closest. If queryPoint lies outside
+             * of all bars, we return the closest in the dominant axis (x for horizontal
+             * charts, y for vertical) and break ties using the secondary axis.
+             *
+             * @param {Point} queryPoint The point to which plot data should be compared
+             *
+             * @returns {PlotData} The PlotData closest to queryPoint
+             */
+            Bar.prototype.getClosestPlotData = function (queryPoint) {
+                var _this = this;
+                var chartXExtent = { min: 0, max: this.width() };
+                var chartYExtent = { min: 0, max: this.height() };
+                var minPrimaryDist = Infinity;
+                var minSecondaryDist = Infinity;
+                var closestData = [];
+                var closestPixelPoints = [];
+                var closestElements = [];
+                var queryPtPrimary = this._isVertical ? queryPoint.x : queryPoint.y;
+                var queryPtSecondary = this._isVertical ? queryPoint.y : queryPoint.x;
+                // SVGRects are positioned with sub-pixel accuracy (the default unit
+                // for the x, y, height & width attributes), but user selections (e.g. via
+                // mouse events) usually have pixel accuracy. We add a tolerance of 0.5 pixels.
+                var tolerance = 0.5;
+                this.datasetOrder().forEach(function (key) {
+                    var plotData = _this.getAllPlotData(key);
+                    plotData.pixelPoints.forEach(function (plotPt, index) {
+                        var datum = plotData.data[index];
+                        var bar = plotData.selection[0][index];
+                        if (!_this._isVisibleOnPlot(datum, plotPt, d3.select(bar))) {
+                            return;
+                        }
+                        var primaryDist = 0;
+                        var secondaryDist = 0;
+                        // if we're inside a bar, distance in both directions should stay 0
+                        var barBBox = bar.getBBox();
+                        if (!Plottable._Util.Methods.intersectsBBox(queryPoint.x, queryPoint.y, barBBox, tolerance)) {
+                            var plotPtPrimary = _this._isVertical ? plotPt.x : plotPt.y;
+                            primaryDist = Math.abs(queryPtPrimary - plotPtPrimary);
+                            // compute this bar's min and max along the secondary axis
+                            var barMinSecondary = _this._isVertical ? barBBox.y : barBBox.x;
+                            var barMaxSecondary = barMinSecondary + (_this._isVertical ? barBBox.height : barBBox.width);
+                            if (queryPtSecondary >= barMinSecondary - tolerance && queryPtSecondary <= barMaxSecondary + tolerance) {
+                                // if we're within a bar's secondary axis span, it is closest in that direction
+                                secondaryDist = 0;
+                            }
+                            else {
+                                var plotPtSecondary = _this._isVertical ? plotPt.y : plotPt.x;
+                                secondaryDist = Math.abs(queryPtSecondary - plotPtSecondary);
+                            }
+                        }
+                        // if we find a closer bar, record its distance and start new closest lists
+                        if (primaryDist < minPrimaryDist || primaryDist === minPrimaryDist && secondaryDist < minSecondaryDist) {
+                            closestData = [];
+                            closestPixelPoints = [];
+                            closestElements = [];
+                            minPrimaryDist = primaryDist;
+                            minSecondaryDist = secondaryDist;
+                        }
+                        // bars minPrimaryDist away are part of the closest set
+                        if (primaryDist === minPrimaryDist && secondaryDist === minSecondaryDist) {
+                            closestData.push(datum);
+                            closestPixelPoints.push(plotPt);
+                            closestElements.push(bar);
+                        }
+                    });
+                });
+                return {
+                    data: closestData,
+                    pixelPoints: closestPixelPoints,
+                    selection: d3.selectAll(closestElements)
+                };
+            };
+            Bar.prototype._isVisibleOnPlot = function (datum, pixelPoint, selection) {
+                var xRange = { min: 0, max: this.width() };
+                var yRange = { min: 0, max: this.height() };
+                var barBBox = selection[0][0].getBBox();
+                return Plottable._Util.Methods.intersectsBBox(xRange, yRange, barBBox);
+            };
+            /**
              * Gets the bar under the given pixel position (if [xValOrExtent]
              * and [yValOrExtent] are {number}s), under a given line (if only one
              * of [xValOrExtent] or [yValOrExtent] are {Extent}s) or are under a
@@ -7583,23 +7766,15 @@ var Plottable;
                 if (!this._isSetup) {
                     return d3.select();
                 }
-                var xExtent = this._parseExtent(xValOrExtent);
-                var yExtent = this._parseExtent(yValOrExtent);
                 // currently, linear scan the bars. If inversion is implemented on non-numeric scales we might be able to do better.
-                var bars = this._datasetKeysInOrder.reduce(function (bars, key) { return bars.concat(_this._getBarsFromDataset(key, xExtent, yExtent)); }, []);
+                var bars = this._datasetKeysInOrder.reduce(function (bars, key) { return bars.concat(_this._getBarsFromDataset(key, xValOrExtent, yValOrExtent)); }, []);
                 return d3.selectAll(bars);
             };
-            Bar.prototype._getBarsFromDataset = function (key, xExtent, yExtent) {
-                // the SVGRects are positioned with sub-pixel accuracy (the default unit
-                // for the x, y, height & width attributes), but user selections (e.g. via
-                // mouse events) usually have pixel accuracy. A tolerance of half-a-pixel
-                // seems appropriate:
-                var tolerance = 0.5;
+            Bar.prototype._getBarsFromDataset = function (key, xValOrExtent, yValOrExtent) {
                 var bars = [];
                 var drawer = this._key2PlotDatasetKey.get(key).drawer;
                 drawer._getRenderArea().selectAll("rect").each(function (d) {
-                    var bbox = this.getBBox();
-                    if (bbox.x + bbox.width >= xExtent.min - tolerance && bbox.x <= xExtent.max + tolerance && bbox.y + bbox.height >= yExtent.min - tolerance && bbox.y <= yExtent.max + tolerance) {
+                    if (Plottable._Util.Methods.intersectsBBox(xValOrExtent, yValOrExtent, this.getBBox())) {
                         bars.push(this);
                     }
                 });
@@ -7801,8 +7976,8 @@ var Plottable;
                         xPositionOrExtent = maxExtent;
                     }
                 }
-                var xExtent = this._parseExtent(xPositionOrExtent);
-                var yExtent = this._parseExtent(yPositionOrExtent);
+                var xExtent = Plottable._Util.Methods.parseExtent(xPositionOrExtent);
+                var yExtent = Plottable._Util.Methods.parseExtent(yPositionOrExtent);
                 var bars = [];
                 var points = [];
                 var projectors = this._generateAttrToProjector();
@@ -7846,6 +8021,31 @@ var Plottable;
                     pixelPositions: points,
                     selection: barsSelection
                 };
+            };
+            //===== /Hover logic =====
+            Bar.prototype._getAllPlotData = function (datasetKeys) {
+                var plotData = _super.prototype._getAllPlotData.call(this, datasetKeys);
+                var valueScale = this._isVertical ? this._yScale : this._xScale;
+                var scaledBaseline = (this._isVertical ? this._yScale : this._xScale).scale(this.baseline());
+                var isVertical = this._isVertical;
+                var barAlignmentFactor = this._barAlignmentFactor;
+                plotData.selection.each(function (datum, index) {
+                    var bar = d3.select(this);
+                    // Using floored pixel values to account for pixel accuracy inconsistencies across browsers
+                    if (isVertical && Math.floor(+bar.attr("y")) >= Math.floor(scaledBaseline)) {
+                        plotData.pixelPoints[index].y += +bar.attr("height");
+                    }
+                    else if (!isVertical && Math.floor(+bar.attr("x")) < Math.floor(scaledBaseline)) {
+                        plotData.pixelPoints[index].x -= +bar.attr("width");
+                    }
+                    if (isVertical) {
+                        plotData.pixelPoints[index].x = +bar.attr("x") + +bar.attr("width") * barAlignmentFactor;
+                    }
+                    else {
+                        plotData.pixelPoints[index].y = +bar.attr("y") + +bar.attr("height") * barAlignmentFactor;
+                    }
+                });
+                return plotData;
             };
             Bar._BarAlignmentToFactor = { "left": 0, "center": 0.5, "right": 1 };
             Bar._DEFAULT_WIDTH = 10;
@@ -7937,30 +8137,6 @@ var Plottable;
             Line.prototype._wholeDatumAttributes = function () {
                 return ["x", "y"];
             };
-            Line.prototype._getClosestPlotData = function (queryPoint, datasetKeys, withinValue) {
-                var _this = this;
-                if (withinValue === void 0) { withinValue = Infinity; }
-                var closestDistanceSquared = withinValue;
-                var closestDatum;
-                var closestSelection;
-                var closestPoint;
-                datasetKeys.forEach(function (datasetKey) {
-                    var plotData = _this.getAllPlotData(datasetKey);
-                    plotData.pixelPoints.forEach(function (pixelPoint, index) {
-                        var pixelPointDist = Plottable._Util.Methods.distanceSquared(queryPoint, pixelPoint);
-                        if (pixelPointDist < closestDistanceSquared) {
-                            closestDistanceSquared = pixelPointDist;
-                            closestDatum = plotData.data[index];
-                            closestPoint = pixelPoint;
-                            closestSelection = plotData.selection;
-                        }
-                    });
-                });
-                if (closestDatum == null) {
-                    return { data: [], pixelPoints: [], selection: d3.select() };
-                }
-                return { data: [closestDatum], pixelPoints: [closestPoint], selection: closestSelection };
-            };
             Line.prototype._getClosestWithinRange = function (p, range) {
                 var _this = this;
                 var attrToProjector = this._generateAttrToProjector();
@@ -8006,14 +8182,65 @@ var Plottable;
                     }
                     var drawer = plotDatasetKey.drawer;
                     plotDatasetKey.dataset.data().forEach(function (datum, index) {
+                        var pixelPoint = drawer._getPixelPoint(datum, index);
+                        if (pixelPoint.x !== pixelPoint.x || pixelPoint.y !== pixelPoint.y) {
+                            return;
+                        }
                         data.push(datum);
-                        pixelPoints.push(drawer._getPixelPoint(datum, index));
+                        pixelPoints.push(pixelPoint);
                     });
                     if (plotDatasetKey.dataset.data().length > 0) {
                         allElements.push(drawer._getSelection(0).node());
                     }
                 });
                 return { data: data, pixelPoints: pixelPoints, selection: d3.selectAll(allElements) };
+            };
+            /**
+             * Retrieves the closest PlotData to queryPoint.
+             *
+             * Lines implement an x-dominant notion of distance; points closest in x are
+             * tie-broken by y distance.
+             *
+             * @param {Point} queryPoint The point to which plot data should be compared
+             *
+             * @returns {PlotData} The PlotData closest to queryPoint
+             */
+            Line.prototype.getClosestPlotData = function (queryPoint) {
+                var _this = this;
+                var minXDist = Infinity;
+                var minYDist = Infinity;
+                var closestData = [];
+                var closestPixelPoints = [];
+                var closestElements = [];
+                this.datasetOrder().forEach(function (key) {
+                    var plotData = _this.getAllPlotData(key);
+                    plotData.pixelPoints.forEach(function (pixelPoint, index) {
+                        var datum = plotData.data[index];
+                        var line = plotData.selection[0][0];
+                        if (!_this._isVisibleOnPlot(datum, pixelPoint, d3.select(line))) {
+                            return;
+                        }
+                        var xDist = Math.abs(queryPoint.x - pixelPoint.x);
+                        var yDist = Math.abs(queryPoint.y - pixelPoint.y);
+                        if (xDist < minXDist || xDist === minXDist && yDist < minYDist) {
+                            closestData = [];
+                            closestPixelPoints = [];
+                            closestElements = [];
+                            minXDist = xDist;
+                            minYDist = yDist;
+                        }
+                        if (xDist === minXDist && yDist === minYDist) {
+                            closestData.push(datum);
+                            closestPixelPoints.push(pixelPoint);
+                            closestElements.push(line);
+                        }
+                    });
+                });
+                return {
+                    data: closestData,
+                    pixelPoints: closestPixelPoints,
+                    selection: d3.selectAll(closestElements)
+                };
             };
             //===== Hover logic =====
             Line.prototype._hoverOverComponent = function (p) {
@@ -8263,12 +8490,12 @@ var Plottable;
                 var domainKeys = this._getDomainKeys();
                 var positiveDataMapArray = dataMapArray.map(function (dataMap) {
                     return Plottable._Util.Methods.populateMap(domainKeys, function (domainKey) {
-                        return { key: domainKey, value: Math.max(0, dataMap.get(domainKey).value) };
+                        return { key: domainKey, value: Math.max(0, dataMap.get(domainKey).value) || 0 };
                     });
                 });
                 var negativeDataMapArray = dataMapArray.map(function (dataMap) {
                     return Plottable._Util.Methods.populateMap(domainKeys, function (domainKey) {
-                        return { key: domainKey, value: Math.min(dataMap.get(domainKey).value, 0) };
+                        return { key: domainKey, value: Math.min(dataMap.get(domainKey).value, 0) || 0 };
                     });
                 });
                 this._setDatasetStackOffsets(this._stack(positiveDataMapArray), this._stack(negativeDataMapArray));
@@ -9703,7 +9930,7 @@ var Plottable;
     })(Interaction = Plottable.Interaction || (Plottable.Interaction = {}));
 })(Plottable || (Plottable = {}));
 
-///<reference path="../../reference.ts" />
+///<reference path="../reference.ts" />
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -9716,483 +9943,104 @@ var Plottable;
     (function (Interaction) {
         var Drag = (function (_super) {
             __extends(Drag, _super);
-            /**
-             * Constructs a Drag. A Drag will signal its callbacks on mouse drag.
-             */
             function Drag() {
-                var _this = this;
-                _super.call(this);
-                this._origin = [0, 0];
-                this._location = [0, 0];
-                this._isDragging = false;
-                this._dragBehavior = d3.behavior.drag();
-                this._dragBehavior.on("dragstart", function () { return _this._dragstart(); });
-                this._dragBehavior.on("drag", function () { return _this._drag(); });
-                this._dragBehavior.on("dragend", function () { return _this._dragend(); });
+                _super.apply(this, arguments);
+                this._dragging = false;
+                this._constrain = true;
             }
-            Drag.prototype.dragstart = function (cb) {
-                if (cb === undefined) {
-                    return this._ondragstart;
-                }
-                else {
-                    this._ondragstart = cb;
-                    return this;
-                }
-            };
-            // we access origin and location through setOrigin and setLocation so that on XDragBox and YDragBox we can overwrite so that
-            // we always have the uncontrolled dimension of the box extending across the entire component
-            // this ensures that the callback values are synchronized with the actual box being drawn
-            Drag.prototype._setOrigin = function (x, y) {
-                this._origin = [x, y];
-            };
-            Drag.prototype._getOrigin = function () {
-                return this._origin.slice();
-            };
-            Drag.prototype._setLocation = function (x, y) {
-                this._location = [x, y];
-            };
-            Drag.prototype._getLocation = function () {
-                return this._location.slice();
-            };
-            Drag.prototype.drag = function (cb) {
-                if (cb === undefined) {
-                    return this._ondrag;
-                }
-                else {
-                    this._ondrag = cb;
-                    return this;
-                }
-            };
-            Drag.prototype.dragend = function (cb) {
-                if (cb === undefined) {
-                    return this._ondragend;
-                }
-                else {
-                    this._ondragend = cb;
-                    return this;
-                }
-            };
-            Drag.prototype._dragstart = function () {
-                this._isDragging = true;
-                var width = this._componentToListenTo.width();
-                var height = this._componentToListenTo.height();
-                // the constraint functions ensure that the selection rectangle will not exceed the hit box
-                var constraintFunction = function (min, max) { return function (x) { return Math.min(Math.max(x, min), max); }; };
-                this._constrainX = constraintFunction(0, width);
-                this._constrainY = constraintFunction(0, height);
-                var origin = d3.mouse(this._hitBox[0][0].parentNode);
-                this._setOrigin(origin[0], origin[1]);
-                this._doDragstart();
-            };
-            Drag.prototype._doDragstart = function () {
-                if (this._ondragstart != null) {
-                    this._ondragstart({ x: this._getOrigin()[0], y: this._getOrigin()[1] });
-                }
-            };
-            Drag.prototype._drag = function () {
-                this._setLocation(this._constrainX(d3.event.x), this._constrainY(d3.event.y));
-                this._doDrag();
-            };
-            Drag.prototype._doDrag = function () {
-                if (this._ondrag != null) {
-                    var start = { x: this._getOrigin()[0], y: this._getOrigin()[1] };
-                    var end = { x: this._getLocation()[0], y: this._getLocation()[1] };
-                    this._ondrag(start, end);
-                }
-            };
-            Drag.prototype._dragend = function () {
-                var location = d3.mouse(this._hitBox[0][0].parentNode);
-                this._setLocation(this._constrainX(location[0]), this._constrainY(location[1]));
-                this._isDragging = false;
-                this._doDragend();
-            };
-            Drag.prototype._doDragend = function () {
-                if (this._ondragend != null) {
-                    var start = { x: this._getOrigin()[0], y: this._getOrigin()[1] };
-                    var end = { x: this._getLocation()[0], y: this._getLocation()[1] };
-                    this._ondragend(start, end);
-                }
-            };
             Drag.prototype._anchor = function (component, hitBox) {
+                var _this = this;
                 _super.prototype._anchor.call(this, component, hitBox);
-                hitBox.call(this._dragBehavior);
-                return this;
+                this._mouseDispatcher = Plottable.Dispatcher.Mouse.getDispatcher(this._componentToListenTo.content().node());
+                this._mouseDispatcher.onMouseDown("Interaction.Drag" + this.getID(), function (p, e) { return _this._startDrag(p, e); });
+                this._mouseDispatcher.onMouseMove("Interaction.Drag" + this.getID(), function (p, e) { return _this._doDrag(p, e); });
+                this._mouseDispatcher.onMouseUp("Interaction.Drag" + this.getID(), function (p, e) { return _this._endDrag(p, e); });
+                this._touchDispatcher = Plottable.Dispatcher.Touch.getDispatcher(this._componentToListenTo.content().node());
+                this._touchDispatcher.onTouchStart("Interaction.Drag" + this.getID(), function (p, e) { return _this._startDrag(p, e); });
+                this._touchDispatcher.onTouchMove("Interaction.Drag" + this.getID(), function (p, e) { return _this._doDrag(p, e); });
+                this._touchDispatcher.onTouchEnd("Interaction.Drag" + this.getID(), function (p, e) { return _this._endDrag(p, e); });
             };
-            Drag.prototype._requiresHitbox = function () {
-                return true;
+            Drag.prototype._translateAndConstrain = function (p) {
+                var translatedP = this._translateToComponentSpace(p);
+                if (!this._constrain) {
+                    return translatedP;
+                }
+                return {
+                    x: Plottable._Util.Methods.clamp(translatedP.x, 0, this._componentToListenTo.width()),
+                    y: Plottable._Util.Methods.clamp(translatedP.y, 0, this._componentToListenTo.height())
+                };
             };
-            /**
-             * Sets up so that the xScale and yScale that are passed have their
-             * domains automatically changed as you zoom.
-             *
-             * @param {QuantitativeScale} xScale The scale along the x-axis.
-             * @param {QuantitativeScale} yScale The scale along the y-axis.
-             * @returns {Drag} The calling Drag.
-             */
-            Drag.prototype.setupZoomCallback = function (xScale, yScale) {
-                var xDomainOriginal = xScale != null ? xScale.domain() : null;
-                var yDomainOriginal = yScale != null ? yScale.domain() : null;
-                var resetOnNextClick = false;
-                function callback(upperLeft, lowerRight) {
-                    if (upperLeft == null || lowerRight == null) {
-                        if (resetOnNextClick) {
-                            if (xScale != null) {
-                                xScale.domain(xDomainOriginal);
-                            }
-                            if (yScale != null) {
-                                yScale.domain(yDomainOriginal);
-                            }
-                        }
-                        resetOnNextClick = !resetOnNextClick;
-                        return;
-                    }
-                    resetOnNextClick = false;
-                    if (xScale != null) {
-                        xScale.domain([xScale.invert(upperLeft.x), xScale.invert(lowerRight.x)]);
-                    }
-                    if (yScale != null) {
-                        yScale.domain([yScale.invert(lowerRight.y), yScale.invert(upperLeft.y)]);
-                    }
-                    this.clearBox();
+            Drag.prototype._startDrag = function (p, e) {
+                if (e instanceof MouseEvent && e.button !== 0) {
                     return;
                 }
-                this.drag(callback);
-                this.dragend(callback);
+                var translatedP = this._translateToComponentSpace(p);
+                if (this._isInsideComponent(translatedP)) {
+                    e.preventDefault();
+                    this._dragging = true;
+                    this._dragOrigin = translatedP;
+                    if (this._dragStartCallback) {
+                        this._dragStartCallback(this._dragOrigin);
+                    }
+                }
+            };
+            Drag.prototype._doDrag = function (p, e) {
+                if (this._dragging) {
+                    if (this._dragCallback) {
+                        var constrainedP = this._translateAndConstrain(p);
+                        this._dragCallback(this._dragOrigin, constrainedP);
+                    }
+                }
+            };
+            Drag.prototype._endDrag = function (p, e) {
+                if (e instanceof MouseEvent && e.button !== 0) {
+                    return;
+                }
+                if (this._dragging) {
+                    this._dragging = false;
+                    if (this._dragEndCallback) {
+                        var constrainedP = this._translateAndConstrain(p);
+                        this._dragEndCallback(this._dragOrigin, constrainedP);
+                    }
+                }
+            };
+            Drag.prototype.constrain = function (doConstrain) {
+                if (doConstrain == null) {
+                    return this._constrain;
+                }
+                this._constrain = doConstrain;
                 return this;
+            };
+            Drag.prototype.onDragStart = function (cb) {
+                if (cb === undefined) {
+                    return this._dragStartCallback;
+                }
+                else {
+                    this._dragStartCallback = cb;
+                    return this;
+                }
+            };
+            Drag.prototype.onDrag = function (cb) {
+                if (cb === undefined) {
+                    return this._dragCallback;
+                }
+                else {
+                    this._dragCallback = cb;
+                    return this;
+                }
+            };
+            Drag.prototype.onDragEnd = function (cb) {
+                if (cb === undefined) {
+                    return this._dragEndCallback;
+                }
+                else {
+                    this._dragEndCallback = cb;
+                    return this;
+                }
             };
             return Drag;
         })(Interaction.AbstractInteraction);
         Interaction.Drag = Drag;
-    })(Interaction = Plottable.Interaction || (Plottable.Interaction = {}));
-})(Plottable || (Plottable = {}));
-
-///<reference path="../../reference.ts" />
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    var Interaction;
-    (function (Interaction) {
-        var DragBox = (function (_super) {
-            __extends(DragBox, _super);
-            function DragBox() {
-                _super.apply(this, arguments);
-                this._boxIsDrawn = false;
-                this._resizeXEnabled = false;
-                this._resizeYEnabled = false;
-                this._cursorStyle = "";
-            }
-            DragBox.prototype.resizeEnabled = function (enabled) {
-                if (enabled == null) {
-                    return this._resizeXEnabled || this._resizeYEnabled;
-                }
-                else {
-                    this._resizeXEnabled = enabled && this.canResizeX();
-                    this._resizeYEnabled = enabled && this.canResizeY();
-                    return this;
-                }
-            };
-            /**
-             * Return true if box is resizing on the X dimension.
-             *
-             * @returns {boolean}
-             */
-            DragBox.prototype.isResizingX = function () {
-                return !!this._xResizing;
-            };
-            /**
-             * Return true if box is resizing on the Y dimension.
-             *
-             * @returns {boolean}
-             */
-            DragBox.prototype.isResizingY = function () {
-                return !!this._yResizing;
-            };
-            /**
-             * Whether or not dragBox has been rendered in a visible area.
-             *
-             * @returns {boolean}
-             */
-            DragBox.prototype.boxIsDrawn = function () {
-                return this._boxIsDrawn;
-            };
-            /**
-             * Return true if box is resizing.
-             *
-             * @returns {boolean}
-             */
-            DragBox.prototype.isResizing = function () {
-                return this.isResizingX() || this.isResizingY();
-            };
-            DragBox.prototype._dragstart = function () {
-                var mouse = d3.mouse(this._hitBox[0][0].parentNode);
-                if (this.boxIsDrawn()) {
-                    var resizeInfo = this._getResizeInfo(mouse[0], mouse[1]);
-                    this._xResizing = resizeInfo.xResizing;
-                    this._yResizing = resizeInfo.yResizing;
-                    if (this.isResizing()) {
-                        // we are resizing; don't clear the box, don't call the dragstart callback
-                        return;
-                    }
-                }
-                _super.prototype._dragstart.call(this);
-                this.clearBox();
-            };
-            DragBox.prototype._getResizeInfo = function (xPosition, yPosition) {
-                var xResizing = null;
-                var yResizing = null;
-                var xStart = this._getOrigin()[0];
-                var yStart = this._getOrigin()[1];
-                var xEnd = this._getLocation()[0];
-                var yEnd = this._getLocation()[1];
-                function inPaddedRange(position, start, end, padding) {
-                    return Math.min(start, end) - padding <= position && position <= Math.max(start, end) + padding;
-                }
-                function getResizeDimension(origin, destination, position, padding) {
-                    // origin: where the drag began
-                    // destination: where the drag ended
-                    // position: where the cursor currently is (possibly the start of a resize)
-                    var min = Math.min(origin, destination);
-                    var max = Math.max(origin, destination);
-                    var interiorPadding = Math.min(padding, (max - min) / 2);
-                    if (min - padding < position && position < min + interiorPadding) {
-                        return { offset: position - min, positive: false, origin: origin === min };
-                    }
-                    if (max - interiorPadding < position && position < max + padding) {
-                        return { offset: position - max, positive: true, origin: origin === max };
-                    }
-                    return null;
-                }
-                if (this._resizeXEnabled && inPaddedRange(yPosition, yStart, yEnd, DragBox.RESIZE_PADDING)) {
-                    xResizing = getResizeDimension(xStart, xEnd, xPosition, DragBox.RESIZE_PADDING);
-                }
-                if (this._resizeYEnabled && inPaddedRange(xPosition, xStart, xEnd, DragBox.RESIZE_PADDING)) {
-                    yResizing = getResizeDimension(yStart, yEnd, yPosition, DragBox.RESIZE_PADDING);
-                }
-                return { xResizing: xResizing, yResizing: yResizing };
-            };
-            DragBox.prototype._drag = function () {
-                if (this.isResizing()) {
-                    // Eases the mouse into the center of the dragging line, in case dragging started with the mouse
-                    // away from the center due to `DragBox.RESIZE_PADDING`.
-                    if (this.isResizingX()) {
-                        var diffX = this._xResizing.offset;
-                        var x = d3.event.x;
-                        if (diffX !== 0) {
-                            x += diffX;
-                            this._xResizing.offset += diffX > 0 ? -1 : 1;
-                        }
-                        if (this._xResizing.origin) {
-                            this._setOrigin(this._constrainX(x), this._getOrigin()[1]);
-                        }
-                        else {
-                            this._setLocation(this._constrainX(x), this._getLocation()[1]);
-                        }
-                    }
-                    if (this.isResizingY()) {
-                        var diffY = this._yResizing.offset;
-                        var y = d3.event.y;
-                        if (diffY !== 0) {
-                            y += diffY;
-                            this._yResizing.offset += diffY > 0 ? -1 : 1;
-                        }
-                        if (this._yResizing.origin) {
-                            this._setOrigin(this._getOrigin()[0], this._constrainY(y));
-                        }
-                        else {
-                            this._setLocation(this._getLocation()[0], this._constrainY(y));
-                        }
-                    }
-                    this._doDrag();
-                }
-                else {
-                    _super.prototype._drag.call(this);
-                }
-                this.setBox(this._getOrigin()[0], this._getLocation()[0], this._getOrigin()[1], this._getLocation()[1]);
-            };
-            DragBox.prototype._dragend = function () {
-                this._xResizing = null;
-                this._yResizing = null;
-                _super.prototype._dragend.call(this);
-            };
-            /**
-             * Clears the highlighted drag-selection box drawn by the DragBox.
-             *
-             * @returns {DragBox} The calling DragBox.
-             */
-            DragBox.prototype.clearBox = function () {
-                if (this.dragBox == null) {
-                    return;
-                } // HACKHACK #593
-                this.dragBox.attr("height", 0).attr("width", 0);
-                this._boxIsDrawn = false;
-                return this;
-            };
-            /**
-             * Set where the box is draw explicitly.
-             *
-             * @param {number} x0 Left.
-             * @param {number} x1 Right.
-             * @param {number} y0 Top.
-             * @param {number} y1 Bottom.
-             *
-             * @returns {DragBox} The calling DragBox.
-             */
-            DragBox.prototype.setBox = function (x0, x1, y0, y1) {
-                if (this.dragBox == null) {
-                    return;
-                } // HACKHACK #593
-                var w = Math.abs(x0 - x1);
-                var h = Math.abs(y0 - y1);
-                var xo = Math.min(x0, x1);
-                var yo = Math.min(y0, y1);
-                this.dragBox.attr({ x: xo, y: yo, width: w, height: h });
-                this._boxIsDrawn = (w > 0 && h > 0);
-                return this;
-            };
-            DragBox.prototype._anchor = function (component, hitBox) {
-                var _this = this;
-                _super.prototype._anchor.call(this, component, hitBox);
-                var cname = DragBox._CLASS_DRAG_BOX;
-                var background = this._componentToListenTo.background();
-                this.dragBox = background.append("rect").classed(cname, true).attr("x", 0).attr("y", 0);
-                hitBox.on("mousemove", function () { return _this._hover(); });
-                return this;
-            };
-            DragBox.prototype._hover = function () {
-                if (this.resizeEnabled() && !this._isDragging && this._boxIsDrawn) {
-                    var position = d3.mouse(this._hitBox[0][0].parentNode);
-                    this._cursorStyle = this._getCursorStyle(position[0], position[1]);
-                }
-                else if (!this._boxIsDrawn) {
-                    this._cursorStyle = "";
-                }
-                this._hitBox.style("cursor", this._cursorStyle);
-            };
-            DragBox.prototype._getCursorStyle = function (xOrigin, yOrigin) {
-                var resizeInfo = this._getResizeInfo(xOrigin, yOrigin);
-                var left = resizeInfo.xResizing && !resizeInfo.xResizing.positive;
-                var right = resizeInfo.xResizing && resizeInfo.xResizing.positive;
-                var top = resizeInfo.yResizing && !resizeInfo.yResizing.positive;
-                var bottom = resizeInfo.yResizing && resizeInfo.yResizing.positive;
-                if (left && top || bottom && right) {
-                    return "nwse-resize";
-                }
-                else if (top && right || bottom && left) {
-                    return "nesw-resize";
-                }
-                else if (left || right) {
-                    return "ew-resize";
-                }
-                else if (top || bottom) {
-                    return "ns-resize";
-                }
-                else {
-                    return "";
-                }
-            };
-            DragBox.prototype.canResizeX = function () {
-                return true;
-            };
-            DragBox.prototype.canResizeY = function () {
-                return true;
-            };
-            DragBox._CLASS_DRAG_BOX = "drag-box";
-            DragBox.RESIZE_PADDING = 10;
-            DragBox._CAN_RESIZE_X = true;
-            DragBox._CAN_RESIZE_Y = true;
-            return DragBox;
-        })(Interaction.Drag);
-        Interaction.DragBox = DragBox;
-    })(Interaction = Plottable.Interaction || (Plottable.Interaction = {}));
-})(Plottable || (Plottable = {}));
-
-///<reference path="../../reference.ts" />
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    var Interaction;
-    (function (Interaction) {
-        var XDragBox = (function (_super) {
-            __extends(XDragBox, _super);
-            function XDragBox() {
-                _super.apply(this, arguments);
-            }
-            XDragBox.prototype._setOrigin = function (x, y) {
-                _super.prototype._setOrigin.call(this, x, 0);
-            };
-            XDragBox.prototype._setLocation = function (x, y) {
-                _super.prototype._setLocation.call(this, x, this._componentToListenTo.height());
-            };
-            XDragBox.prototype.canResizeY = function () {
-                return false;
-            };
-            return XDragBox;
-        })(Interaction.DragBox);
-        Interaction.XDragBox = XDragBox;
-    })(Interaction = Plottable.Interaction || (Plottable.Interaction = {}));
-})(Plottable || (Plottable = {}));
-
-///<reference path="../../reference.ts" />
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    var Interaction;
-    (function (Interaction) {
-        var XYDragBox = (function (_super) {
-            __extends(XYDragBox, _super);
-            function XYDragBox() {
-                Plottable._Util.Methods.warn("XYDragBox is deprecated; use DragBox instead");
-                _super.call(this);
-            }
-            return XYDragBox;
-        })(Interaction.DragBox);
-        Interaction.XYDragBox = XYDragBox;
-    })(Interaction = Plottable.Interaction || (Plottable.Interaction = {}));
-})(Plottable || (Plottable = {}));
-
-///<reference path="../../reference.ts" />
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    var Interaction;
-    (function (Interaction) {
-        var YDragBox = (function (_super) {
-            __extends(YDragBox, _super);
-            function YDragBox() {
-                _super.apply(this, arguments);
-            }
-            YDragBox.prototype._setOrigin = function (x, y) {
-                _super.prototype._setOrigin.call(this, 0, y);
-            };
-            YDragBox.prototype._setLocation = function (x, y) {
-                _super.prototype._setLocation.call(this, this._componentToListenTo.width(), y);
-            };
-            YDragBox.prototype.canResizeX = function () {
-                return false;
-            };
-            return YDragBox;
-        })(Interaction.DragBox);
-        Interaction.YDragBox = YDragBox;
     })(Interaction = Plottable.Interaction || (Plottable.Interaction = {}));
 })(Plottable || (Plottable = {}));
 
@@ -10335,6 +10183,331 @@ var Plottable;
         })(Interaction.AbstractInteraction);
         Interaction.Hover = Hover;
     })(Interaction = Plottable.Interaction || (Plottable.Interaction = {}));
+})(Plottable || (Plottable = {}));
+
+///<reference path="../../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    var Component;
+    (function (Component) {
+        var Interactive;
+        (function (Interactive) {
+            var DragBoxLayer = (function (_super) {
+                __extends(DragBoxLayer, _super);
+                function DragBoxLayer() {
+                    _super.call(this);
+                    this._detectionRadius = 3;
+                    this._resizable = false;
+                    this._hasCorners = true;
+                    /*
+                     * Enable clipPath to hide _detectionEdge s and _detectionCorner s
+                     * that overlap with the edge of the DragBoxLayer. This prevents the
+                     * user's cursor from changing outside the DragBoxLayer, where they
+                     * wouldn't be able to grab the edges or corners for resizing.
+                     */
+                    this.clipPathEnabled = true;
+                    this.classed("drag-box-layer", true);
+                    this._dragInteraction = new Plottable.Interaction.Drag();
+                    this._setUpCallbacks();
+                    this.registerInteraction(this._dragInteraction);
+                }
+                DragBoxLayer.prototype._setUpCallbacks = function () {
+                    var _this = this;
+                    var resizingEdges;
+                    var topLeft;
+                    var bottomRight;
+                    var startedNewBox;
+                    this._dragInteraction.onDragStart(function (s) {
+                        resizingEdges = _this._getResizingEdges(s);
+                        if (!_this.boxVisible() || (!resizingEdges.top && !resizingEdges.bottom && !resizingEdges.left && !resizingEdges.right)) {
+                            _this.bounds({
+                                topLeft: s,
+                                bottomRight: s
+                            });
+                            startedNewBox = true;
+                        }
+                        else {
+                            startedNewBox = false;
+                        }
+                        _this.boxVisible(true);
+                        var bounds = _this.bounds();
+                        // copy points so changes to topLeft and bottomRight don't mutate bounds
+                        topLeft = { x: bounds.topLeft.x, y: bounds.topLeft.y };
+                        bottomRight = { x: bounds.bottomRight.x, y: bounds.bottomRight.y };
+                        if (_this._dragStartCallback) {
+                            _this._dragStartCallback(bounds);
+                        }
+                    });
+                    this._dragInteraction.onDrag(function (s, e) {
+                        if (startedNewBox) {
+                            bottomRight.x = e.x;
+                            bottomRight.y = e.y;
+                        }
+                        else {
+                            if (resizingEdges.bottom) {
+                                bottomRight.y = e.y;
+                            }
+                            else if (resizingEdges.top) {
+                                topLeft.y = e.y;
+                            }
+                            if (resizingEdges.right) {
+                                bottomRight.x = e.x;
+                            }
+                            else if (resizingEdges.left) {
+                                topLeft.x = e.x;
+                            }
+                        }
+                        _this.bounds({
+                            topLeft: topLeft,
+                            bottomRight: bottomRight
+                        });
+                        if (_this._dragCallback) {
+                            _this._dragCallback(_this.bounds());
+                        }
+                    });
+                    this._dragInteraction.onDragEnd(function (s, e) {
+                        if (startedNewBox && s.x === e.x && s.y === e.y) {
+                            _this.boxVisible(false);
+                        }
+                        if (_this._dragEndCallback) {
+                            _this._dragEndCallback(_this.bounds());
+                        }
+                    });
+                };
+                DragBoxLayer.prototype._setup = function () {
+                    var _this = this;
+                    _super.prototype._setup.call(this);
+                    var createLine = function () { return _this._box.append("line").style({
+                        "opacity": 0,
+                        "stroke": "pink"
+                    }); };
+                    this._detectionEdgeT = createLine().classed("drag-edge-tb", true);
+                    this._detectionEdgeB = createLine().classed("drag-edge-tb", true);
+                    this._detectionEdgeL = createLine().classed("drag-edge-lr", true);
+                    this._detectionEdgeR = createLine().classed("drag-edge-lr", true);
+                    if (this._hasCorners) {
+                        var createCorner = function () { return _this._box.append("circle").style({
+                            "opacity": 0,
+                            "fill": "pink"
+                        }); };
+                        this._detectionCornerTL = createCorner().classed("drag-corner-tl", true);
+                        this._detectionCornerTR = createCorner().classed("drag-corner-tr", true);
+                        this._detectionCornerBL = createCorner().classed("drag-corner-bl", true);
+                        this._detectionCornerBR = createCorner().classed("drag-corner-br", true);
+                    }
+                };
+                DragBoxLayer.prototype._getResizingEdges = function (p) {
+                    var edges = {
+                        top: false,
+                        bottom: false,
+                        left: false,
+                        right: false
+                    };
+                    if (!this.resizable()) {
+                        return edges;
+                    }
+                    var bounds = this.bounds();
+                    var t = bounds.topLeft.y;
+                    var b = bounds.bottomRight.y;
+                    var l = bounds.topLeft.x;
+                    var r = bounds.bottomRight.x;
+                    var rad = this._detectionRadius;
+                    if (l - rad <= p.x && p.x <= r + rad) {
+                        edges.top = (t - rad <= p.y && p.y <= t + rad);
+                        edges.bottom = (b - rad <= p.y && p.y <= b + rad);
+                    }
+                    if (t - rad <= p.y && p.y <= b + rad) {
+                        edges.left = (l - rad <= p.x && p.x <= l + rad);
+                        edges.right = (r - rad <= p.x && p.x <= r + rad);
+                    }
+                    return edges;
+                };
+                DragBoxLayer.prototype._doRender = function () {
+                    _super.prototype._doRender.call(this);
+                    if (this.boxVisible()) {
+                        var bounds = this.bounds();
+                        var t = bounds.topLeft.y;
+                        var b = bounds.bottomRight.y;
+                        var l = bounds.topLeft.x;
+                        var r = bounds.bottomRight.x;
+                        this._detectionEdgeT.attr({
+                            x1: l,
+                            y1: t,
+                            x2: r,
+                            y2: t,
+                            "stroke-width": this._detectionRadius * 2
+                        });
+                        this._detectionEdgeB.attr({
+                            x1: l,
+                            y1: b,
+                            x2: r,
+                            y2: b,
+                            "stroke-width": this._detectionRadius * 2
+                        });
+                        this._detectionEdgeL.attr({
+                            x1: l,
+                            y1: t,
+                            x2: l,
+                            y2: b,
+                            "stroke-width": this._detectionRadius * 2
+                        });
+                        this._detectionEdgeR.attr({
+                            x1: r,
+                            y1: t,
+                            x2: r,
+                            y2: b,
+                            "stroke-width": this._detectionRadius * 2
+                        });
+                        if (this._hasCorners) {
+                            this._detectionCornerTL.attr({ cx: l, cy: t, r: this._detectionRadius });
+                            this._detectionCornerTR.attr({ cx: r, cy: t, r: this._detectionRadius });
+                            this._detectionCornerBL.attr({ cx: l, cy: b, r: this._detectionRadius });
+                            this._detectionCornerBR.attr({ cx: r, cy: b, r: this._detectionRadius });
+                        }
+                    }
+                };
+                DragBoxLayer.prototype.detectionRadius = function (r) {
+                    if (r == null) {
+                        return this._detectionRadius;
+                    }
+                    if (r < 0) {
+                        throw new Error("detection radius cannot be negative.");
+                    }
+                    this._detectionRadius = r;
+                    this._render();
+                    return this;
+                };
+                DragBoxLayer.prototype.resizable = function (canResize) {
+                    if (canResize == null) {
+                        return this._resizable;
+                    }
+                    this._resizable = canResize;
+                    this._setResizableClasses(canResize);
+                    return this;
+                };
+                // Sets resizable classes. Overridden by subclasses that only resize in one dimension.
+                DragBoxLayer.prototype._setResizableClasses = function (canResize) {
+                    this.classed("x-resizable", canResize);
+                    this.classed("y-resizable", canResize);
+                };
+                DragBoxLayer.prototype.onDragStart = function (cb) {
+                    if (cb === undefined) {
+                        return this._dragStartCallback;
+                    }
+                    else {
+                        this._dragStartCallback = cb;
+                        return this;
+                    }
+                };
+                DragBoxLayer.prototype.onDrag = function (cb) {
+                    if (cb === undefined) {
+                        return this._dragCallback;
+                    }
+                    else {
+                        this._dragCallback = cb;
+                        return this;
+                    }
+                };
+                DragBoxLayer.prototype.onDragEnd = function (cb) {
+                    if (cb === undefined) {
+                        return this._dragEndCallback;
+                    }
+                    else {
+                        this._dragEndCallback = cb;
+                        return this;
+                    }
+                };
+                return DragBoxLayer;
+            })(Component.SelectionBoxLayer);
+            Interactive.DragBoxLayer = DragBoxLayer;
+        })(Interactive = Component.Interactive || (Component.Interactive = {}));
+    })(Component = Plottable.Component || (Plottable.Component = {}));
+})(Plottable || (Plottable = {}));
+
+///<reference path="../../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    var Component;
+    (function (Component) {
+        var Interactive;
+        (function (Interactive) {
+            var XDragBoxLayer = (function (_super) {
+                __extends(XDragBoxLayer, _super);
+                function XDragBoxLayer() {
+                    _super.call(this);
+                    this.classed("x-drag-box-layer", true);
+                    this._hasCorners = false;
+                }
+                XDragBoxLayer.prototype._computeLayout = function (offeredXOrigin, offeredYOrigin, availableWidth, availableHeight) {
+                    _super.prototype._computeLayout.call(this, offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
+                    this.bounds(this.bounds()); // set correct bounds when width/height changes
+                };
+                XDragBoxLayer.prototype._setBounds = function (newBounds) {
+                    _super.prototype._setBounds.call(this, {
+                        topLeft: { x: newBounds.topLeft.x, y: 0 },
+                        bottomRight: { x: newBounds.bottomRight.x, y: this.height() }
+                    });
+                };
+                XDragBoxLayer.prototype._setResizableClasses = function (canResize) {
+                    this.classed("x-resizable", canResize);
+                };
+                return XDragBoxLayer;
+            })(Interactive.DragBoxLayer);
+            Interactive.XDragBoxLayer = XDragBoxLayer;
+        })(Interactive = Component.Interactive || (Component.Interactive = {}));
+    })(Component = Plottable.Component || (Plottable.Component = {}));
+})(Plottable || (Plottable = {}));
+
+///<reference path="../../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    var Component;
+    (function (Component) {
+        var Interactive;
+        (function (Interactive) {
+            var YDragBoxLayer = (function (_super) {
+                __extends(YDragBoxLayer, _super);
+                function YDragBoxLayer() {
+                    _super.call(this);
+                    this.classed("y-drag-box-layer", true);
+                    this._hasCorners = false;
+                }
+                YDragBoxLayer.prototype._computeLayout = function (offeredXOrigin, offeredYOrigin, availableWidth, availableHeight) {
+                    _super.prototype._computeLayout.call(this, offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
+                    this.bounds(this.bounds()); // set correct bounds when width/height changes
+                };
+                YDragBoxLayer.prototype._setBounds = function (newBounds) {
+                    _super.prototype._setBounds.call(this, {
+                        topLeft: { x: 0, y: newBounds.topLeft.y },
+                        bottomRight: { x: this.width(), y: newBounds.bottomRight.y }
+                    });
+                };
+                YDragBoxLayer.prototype._setResizableClasses = function (canResize) {
+                    this.classed("y-resizable", canResize);
+                };
+                return YDragBoxLayer;
+            })(Interactive.DragBoxLayer);
+            Interactive.YDragBoxLayer = YDragBoxLayer;
+        })(Interactive = Component.Interactive || (Component.Interactive = {}));
+    })(Component = Plottable.Component || (Plottable.Component = {}));
 })(Plottable || (Plottable = {}));
 
 /*!

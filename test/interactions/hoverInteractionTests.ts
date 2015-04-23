@@ -65,7 +65,7 @@ describe("Interactions", () => {
       });
 
       testTarget.registerInteraction(hoverInteraction);
-      target = testTarget.content();
+      target = testTarget.background();
     });
 
     it("correctly triggers onHoverOver() callbacks (mouse events)", () => {

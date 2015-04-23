@@ -37,6 +37,22 @@ describe("Category Axes", () => {
     svg.remove();
   });
 
+  it("uses the formatter if supplied", () => {
+    var svg = generateSVG(400, 400);
+    var domain = ["Air", "Bi", "Sea"];
+    var scale = new Plottable.Scale.Category().domain(domain);
+    var axis = new Plottable.Axis.Category(scale, "bottom");
+    var addPlane = (l: string) => l + "plane";
+    axis.formatter(addPlane);
+    axis.renderTo(svg);
+    var expectedTexts = domain.map(addPlane);
+    svg.selectAll("text").each(function(d, i) {
+      var actualText = d3.select(this).text();
+      assert.strictEqual(actualText, expectedTexts[i], "formatter was applied");
+    });
+    svg.remove();
+  });
+
   it("width accounts for gutter. ticklength, and padding on vertical axes", () => {
     var svg = generateSVG(400, 400);
     var xScale = new Plottable.Scale.Category().domain(["foo", "bar", "baz"]).range([400, 0]);
