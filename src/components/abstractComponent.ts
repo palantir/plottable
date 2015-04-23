@@ -194,6 +194,7 @@ export module Component {
      * @returns {Component} The calling component.
      */
     public renderTo(element: String | D3.Selection): AbstractComponent {
+      this.detach();
       if (element != null) {
         var selection: D3.Selection;
         if (typeof(element) === "string") {
@@ -210,6 +211,7 @@ export module Component {
         throw new Error("If a component has never been rendered before, then renderTo must be given a node to render to, \
           or a D3.Selection, or a selector string");
       }
+
       this._computeLayout();
       this._render();
       // flush so that consumers can immediately attach to stuff we create in the DOM

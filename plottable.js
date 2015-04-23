@@ -3574,6 +3574,7 @@ var Plottable;
              * @returns {Component} The calling component.
              */
             AbstractComponent.prototype.renderTo = function (element) {
+                this.detach();
                 if (element != null) {
                     var selection;
                     if (typeof (element) === "string") {
