@@ -155,7 +155,7 @@ export module Plot {
         }
       });
 
-      return { data: data, pixelPoints: pixelPoints, selection: d3.selectAll(allElements) };
+      return { data: data, pixelPoints: pixelPoints, plot: this, selection: d3.selectAll(allElements) };
     }
 
     /**
@@ -178,13 +178,16 @@ export module Plot {
 
       this.datasetOrder().forEach((key: string) => {
         var plotData = this.getAllPlotData(key);
-        plotData.pixelPoints.forEach((pxPt: Point, index: number) => {
-          if (pxPt.x < 0 || pxPt.y < 0 || pxPt.x > this.width() || pxPt.y > this.height()) {
+        plotData.pixelPoints.forEach((pixelPoint: Point, index: number) => {
+          var datum = plotData.data[index];
+          var line = plotData.selection[0][0];
+
+          if (!this._isVisibleOnPlot(datum, pixelPoint, d3.select(line))) {
             return;
           }
 
-          var xDist = Math.abs(queryPoint.x - pxPt.x);
-          var yDist = Math.abs(queryPoint.y - pxPt.y);
+          var xDist = Math.abs(queryPoint.x - pixelPoint.x);
+          var yDist = Math.abs(queryPoint.y - pixelPoint.y);
 
           if (xDist < minXDist || xDist === minXDist && yDist < minYDist) {
             closestData = [];
@@ -196,9 +199,9 @@ export module Plot {
           }
 
           if (xDist === minXDist && yDist === minYDist) {
-            closestData.push(plotData.data[index]);
-            closestPixelPoints.push(pxPt);
-            closestElements.push(plotData.selection[0][0]);
+            closestData.push(datum);
+            closestPixelPoints.push(pixelPoint);
+            closestElements.push(line);
           }
         });
       });
@@ -206,6 +209,7 @@ export module Plot {
       return {
         data: closestData,
         pixelPoints: closestPixelPoints,
+        plot: this,
         selection: d3.selectAll(closestElements)
       };
     }

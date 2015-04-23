@@ -19,6 +19,7 @@ export module Plot {
   export type PlotData = {
     data: any[];
     pixelPoints: Point[];
+    plot: Plot.AbstractPlot;
     selection: D3.Selection;
   }
 
@@ -516,11 +517,11 @@ export module Plot {
         });
       });
 
-      return { data: data, pixelPoints: pixelPoints, selection: d3.selectAll(allElements) };
+      return { data: data, pixelPoints: pixelPoints, plot: this, selection: d3.selectAll(allElements) };
     }
 
     /**
-     * Retrieves PlotData with the lowest distance, where distance is defined
+     * Retrieves closest PlotData to queryPoint, where distance is defined
      * to be the Euclidiean norm.
      *
      * @param {Point} queryPoint The point to which plot data should be compared
@@ -532,6 +533,13 @@ export module Plot {
       var closestIndex: number;
       var plotData = this.getAllPlotData();
       plotData.pixelPoints.forEach((pixelPoint: Point, index: number) => {
+        var datum = plotData.data[index];
+        var selection = d3.select(plotData.selection[0][index]);
+
+        if (!this._isVisibleOnPlot(datum, pixelPoint, selection)) {
+          return;
+        }
+
         var distance = _Util.Methods.distanceSquared(pixelPoint, queryPoint);
         if (distance < closestDistanceSquared) {
           closestDistanceSquared = distance;
@@ -540,12 +548,18 @@ export module Plot {
       });
 
       if (closestIndex == null) {
-        return {data: [], pixelPoints: [], selection: d3.select()};
+        return {data: [], pixelPoints: [], plot: this, selection: d3.select()};
       }
 
       return {data: [plotData.data[closestIndex]],
               pixelPoints: [plotData.pixelPoints[closestIndex]],
+              plot: this,
               selection: d3.select(plotData.selection[0][closestIndex])};
+    }
+
+    protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean {
+      return !(pixelPoint.x < 0 || pixelPoint.y < 0 ||
+        pixelPoint.x > this.width() || pixelPoint.y > this.height());
     }
   }
 }

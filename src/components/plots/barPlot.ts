@@ -171,12 +171,11 @@ export module Plot {
 
       this.datasetOrder().forEach((key) => {
         var plotData = this.getAllPlotData(key);
-        plotData.pixelPoints.forEach((plotPt, i) => {
-          var bar = plotData.selection[0][i];
-          var barBBox = bar.getBBox();
+        plotData.pixelPoints.forEach((plotPt, index) => {
+          var datum = plotData.data[index];
+          var bar = plotData.selection[0][index];
 
-          if (!_Util.Methods.intersectsBBox(chartXExtent, chartYExtent, barBBox, tolerance)) {
-            // bar isn't visible on plot; ignore it
+          if (!this._isVisibleOnPlot(datum, plotPt, d3.select(bar))) {
             return;
           }
 
@@ -184,6 +183,7 @@ export module Plot {
           var secondaryDist = 0;
 
           // if we're inside a bar, distance in both directions should stay 0
+          var barBBox = bar.getBBox();
           if (!_Util.Methods.intersectsBBox(queryPoint.x, queryPoint.y, barBBox, tolerance)) {
             var plotPtPrimary = this._isVertical ? plotPt.x : plotPt.y;
             primaryDist = Math.abs(queryPtPrimary - plotPtPrimary);
@@ -214,7 +214,7 @@ export module Plot {
 
           // bars minPrimaryDist away are part of the closest set
           if (primaryDist === minPrimaryDist && secondaryDist === minSecondaryDist) {
-            closestData.push(plotData.data[i]);
+            closestData.push(datum);
             closestPixelPoints.push(plotPt);
             closestElements.push(bar);
           }
@@ -224,8 +224,17 @@ export module Plot {
       return {
         data: closestData,
         pixelPoints: closestPixelPoints,
+        plot: this,
         selection: d3.selectAll(closestElements)
       };
+    }
+
+    protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean {
+      var xRange = { min: 0, max: this.width() };
+      var yRange = { min: 0, max: this.height() };
+      var barBBox = selection[0][0].getBBox();
+
+      return Plottable._Util.Methods.intersectsBBox(xRange, yRange, barBBox);
     }
 
     /**

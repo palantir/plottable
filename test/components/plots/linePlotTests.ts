@@ -35,6 +35,22 @@ describe("Plots", () => {
   });
 
   describe("LinePlot", () => {
+    // HACKHACK #1798: beforeEach being used below
+    it("renders correctly with no data", () => {
+      var svg = generateSVG(400, 400);
+      var xScale = new Plottable.Scale.Linear();
+      var yScale = new Plottable.Scale.Linear();
+      var plot = new Plottable.Plot.Line(xScale, yScale);
+      plot.project("x", (d: any) => d.x, xScale);
+      plot.project("y", (d: any) => d.y, yScale);
+      assert.doesNotThrow(() => plot.renderTo(svg), Error);
+      assert.strictEqual(plot.width(), 400, "was allocated width");
+      assert.strictEqual(plot.height(), 400, "was allocated height");
+      svg.remove();
+    });
+  });
+
+  describe("LinePlot", () => {
     var svg: D3.Selection;
     var xScale: Plottable.Scale.Linear;
     var yScale: Plottable.Scale.Linear;
@@ -283,6 +299,7 @@ describe("Plots", () => {
         assert.closeTo(expected.pixelPoints[0].x, actual.pixelPoints[0].x, 0.01, msg);
         assert.closeTo(expected.pixelPoints[0].y, actual.pixelPoints[0].y, 0.01, msg);
         assert.deepEqual(expected.selection, actual.selection, msg);
+        assert.deepEqual(expected.plot, actual.plot, msg);
       }
 
       beforeEach(() => {
@@ -311,6 +328,7 @@ describe("Plots", () => {
         var expected = {
           data: [d0],
           pixelPoints: [d0Px],
+          plot: linePlot,
           selection: d3.selectAll([lines[0][2]])
         };
 
@@ -326,6 +344,7 @@ describe("Plots", () => {
         expected = {
           data: [d1],
           pixelPoints: [d1Px],
+          plot: linePlot,
           selection: d3.selectAll([lines[0][2]])
         };
 
@@ -344,6 +363,7 @@ describe("Plots", () => {
             x: xScale.scale(xAccessor(d1)),
             y: yScale.scale(yAccessor(d1))
           }],
+          plot: linePlot,
           selection: d3.selectAll([lines[0][2]])
         };
 

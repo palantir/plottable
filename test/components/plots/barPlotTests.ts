@@ -4,12 +4,28 @@ var assert = chai.assert;
 
 describe("Plots", () => {
   describe("Bar Plot", () => {
+
+    // HACKHACK #1798: beforeEach being used below
+    it("renders correctly with no data", () => {
+      var svg = generateSVG(400, 400);
+      var xScale = new Plottable.Scale.Linear();
+      var yScale = new Plottable.Scale.Linear();
+      var plot = new Plottable.Plot.Bar(xScale, yScale);
+      plot.project("x", (d: any) => d.x, xScale);
+      plot.project("y", (d: any) => d.y, yScale);
+      assert.doesNotThrow(() => plot.renderTo(svg), Error);
+      assert.strictEqual(plot.width(), 400, "was allocated width");
+      assert.strictEqual(plot.height(), 400, "was allocated height");
+      svg.remove();
+    });
+
     function assertPlotDataEqual(expected: Plottable.Plot.PlotData, actual: Plottable.Plot.PlotData,
         msg: string) {
       assert.deepEqual(expected.data, actual.data, msg);
       assert.closeTo(expected.pixelPoints[0].x, actual.pixelPoints[0].x, 0.01, msg);
       assert.closeTo(expected.pixelPoints[0].y, actual.pixelPoints[0].y, 0.01, msg);
       assert.deepEqual(expected.selection, actual.selection, msg);
+      assert.deepEqual(expected.plot, actual.plot, msg);
     }
 
     describe("Vertical Bar Plot", () => {
@@ -195,6 +211,7 @@ describe("Plots", () => {
           var expected = {
             data: [d0],
             pixelPoints: [d0Px],
+            plot: barPlot,
             selection: d3.selectAll([bars[0][0]])
           };
 
@@ -213,6 +230,7 @@ describe("Plots", () => {
           expected = {
             data: [d1],
             pixelPoints: [d1Px],
+            plot: barPlot,
             selection: d3.selectAll([bars[0][1]])
           };
 
@@ -235,6 +253,7 @@ describe("Plots", () => {
               x: xScale.scale(d1.x),
               y: yScale.scale(d1.y)
             }],
+            plot: barPlot,
             selection: d3.selectAll([bars[0][1]])
           };
 
@@ -569,6 +588,7 @@ describe("Plots", () => {
           var expected = {
             data: [d0],
             pixelPoints: [d0Px],
+            plot: barPlot,
             selection: d3.selectAll([bars[0][0]])
           };
 
@@ -587,6 +607,7 @@ describe("Plots", () => {
           expected = {
             data: [d1],
             pixelPoints: [d1Px],
+            plot: barPlot,
             selection: d3.selectAll([bars[0][1]])
           };
 
@@ -609,6 +630,7 @@ describe("Plots", () => {
               x: xScale.scale(d1.x),
               y: yScale.scale(d1.y)
             }],
+            plot: barPlot,
             selection: d3.selectAll([bars[0][1]])
           };
 

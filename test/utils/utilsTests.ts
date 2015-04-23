@@ -93,6 +93,21 @@ describe("_Util.Methods", () => {
     });
   });
 
+  it("isNaN works as expected", () => {
+    var isNaN = Plottable._Util.Methods.isNaN;
+
+    assert.isTrue(isNaN(NaN), "Only NaN should pass the isNaN check");
+
+    assert.isFalse(isNaN(undefined), "undefined should fail the isNaN check");
+    assert.isFalse(isNaN(null), "null should fail the isNaN check");
+    assert.isFalse(isNaN(Infinity), "Infinity should fail the isNaN check");
+    assert.isFalse(isNaN(1), "numbers should fail the isNaN check");
+    assert.isFalse(isNaN(0), "0 should fail the isNaN check");
+    assert.isFalse(isNaN("foo"), "strings should fail the isNaN check");
+    assert.isFalse(isNaN(""), "empty strings should fail the isNaN check");
+    assert.isFalse(isNaN({}), "empty Objects should fail the isNaN check");
+  });
+
   it("objEq works as expected", () => {
     assert.isTrue(Plottable._Util.Methods.objEq({}, {}));
     assert.isTrue(Plottable._Util.Methods.objEq({a: 5}, {a: 5}));
