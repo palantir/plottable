@@ -1930,13 +1930,14 @@ declare module Plottable {
             constructor(components?: AbstractComponent[]);
             /**
              * Retrieves closest PlotData to queryPoint across all plots in this group.
-             * Plots define their own notion of closeness; this function compares results across
-             * plots and picks the closest to queryPoint using the Euclidean norm. Ties are
-             * broken by favoring the plots higher in the group.
+             *
+             * Each plot is queried using getClosestPlotData(queryPoint) and the closest
+             * to queryPoint by Euclidean norm is returned. Ties are in Euclidean norm
+             * broken by favoring the plot ordered highest in the group.
              *
              * @param {Point} queryPoint The point to which plot data should be compared
              *
-             * @returns {PlotData} The PlotData closest to queryPoint
+             * @returns {PlotData} The PlotData closest to queryPoint in this group
              */
             getClosestPlotData(queryPoint: Point): Plot.PlotData;
             _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;

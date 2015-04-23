@@ -4089,13 +4089,14 @@ var Plottable;
             }
             /**
              * Retrieves closest PlotData to queryPoint across all plots in this group.
-             * Plots define their own notion of closeness; this function compares results across
-             * plots and picks the closest to queryPoint using the Euclidean norm. Ties are
-             * broken by favoring the plots higher in the group.
+             *
+             * Each plot is queried using getClosestPlotData(queryPoint) and the closest
+             * to queryPoint by Euclidean norm is returned. Ties are in Euclidean norm
+             * broken by favoring the plot ordered highest in the group.
              *
              * @param {Point} queryPoint The point to which plot data should be compared
              *
-             * @returns {PlotData} The PlotData closest to queryPoint
+             * @returns {PlotData} The PlotData closest to queryPoint in this group
              */
             Group.prototype.getClosestPlotData = function (queryPoint) {
                 var minDistSquared = Infinity;
@@ -4106,23 +4107,24 @@ var Plottable;
                     selection: d3.select()
                 };
                 this.components().forEach(function (c) {
-                    // consider only components implementing this function
                     if (c instanceof Plottable.Plot.AbstractPlot || c instanceof Group) {
                         var cpd = c.getClosestPlotData(queryPoint);
-                        var closestPixelPoint = cpd.pixelPoints[0];
-                        if (closestPixelPoint != null) {
-                            // we tie-break multiple closest within a single plot by taking the first
-                            var distanceSquared = Plottable._Util.Methods.distanceSquared(closestPixelPoint, queryPoint);
+                        // it is possible for multiple data to be considered "closest" by a plot (e.g., overlapping bars)
+                        cpd.pixelPoints.forEach(function (pixelPoint, index) {
+                            var distanceSquared = Plottable._Util.Methods.distanceSquared(pixelPoint, queryPoint);
                             if (distanceSquared <= minDistSquared) {
                                 minDistSquared = distanceSquared;
+                                // some PlotData results, i.e., line, have only one element in their selection
+                                var selection = cpd.selection[0];
+                                var selectionIndex = Math.min(selection.length - 1, index);
                                 closestPlotData = {
-                                    data: [cpd.data[0]],
-                                    pixelPoints: [closestPixelPoint],
+                                    data: [cpd.data[index]],
+                                    pixelPoints: [pixelPoint],
                                     plot: cpd.plot,
-                                    selection: d3.select(cpd.selection[0][0])
+                                    selection: d3.select(selection[selectionIndex])
                                 };
                             }
-                        }
+                        });
                     }
                 });
                 return closestPlotData;

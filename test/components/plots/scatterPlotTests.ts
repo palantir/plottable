@@ -117,6 +117,7 @@ describe("Plots", () => {
       var expected = {
         data: [d0],
         pixelPoints: [d0Px],
+        plot: plot,
         selection: d3.select(points[0][0])
       };
 
@@ -134,6 +135,7 @@ describe("Plots", () => {
       expected = {
         data: [d1],
         pixelPoints: [d1Px],
+        plot: plot,
         selection: d3.select(points[0][1])
       };
 
