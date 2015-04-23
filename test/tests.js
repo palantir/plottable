@@ -6517,6 +6517,26 @@ describe("Component behavior", function () {
         assert.isTrue(renderFlag, "render occurs if width and height are positive");
         svg.remove();
     });
+    it("rendering to a new svg detaches the component", function () {
+        var SVG_HEIGHT_1 = 300;
+        var SVG_HEIGHT_2 = 50;
+        var svg1 = generateSVG(300, SVG_HEIGHT_1);
+        var svg2 = generateSVG(300, SVG_HEIGHT_2);
+        var xScale = new Plottable.Scale.Linear();
+        var yScale = new Plottable.Scale.Linear();
+        var plot = new Plottable.Plot.Line(xScale, yScale);
+        var group = new Plottable.Component.Group;
+        group.renderTo(svg1);
+        group._addComponent(plot);
+        assert.deepEqual(plot._parent(), group, "the plot should be inside the group");
+        assert.strictEqual(plot.height(), SVG_HEIGHT_1, "the plot should occupy the entire space of the first svg");
+        plot.renderTo(svg2);
+        assert.equal(plot._parent(), null, "the plot should be outside the group");
+        assert.strictEqual(plot.height(), SVG_HEIGHT_2, "the plot should occupy the entire space of the second svg");
+        svg1.remove();
+        svg2.remove();
+        svg.remove();
+    });
     describe("origin methods", function () {
         var cWidth = 100;
         var cHeight = 100;
