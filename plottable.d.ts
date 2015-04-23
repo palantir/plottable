@@ -2144,6 +2144,7 @@ declare module Plottable {
     }
 }
 
+
 declare module Plottable {
     module Axis {
         class Numeric extends AbstractAxis {

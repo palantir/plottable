@@ -6742,7 +6742,7 @@ describe("Tables", function () {
         var svg = generateSVG();
         t.addComponent(1, 0, new Plottable.Component.AbstractComponent());
         t.addComponent(0, 2, new Plottable.Component.AbstractComponent());
-        t.renderTo(svg); //would throw an error without the fix (tested);
+        t.renderTo(svg); // would throw an error without the fix (tested);
         svg.remove();
     });
     it("basic table with 2 rows 2 cols lays out properly", function () {
