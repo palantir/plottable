@@ -20,6 +20,7 @@
         "trace",
         "warn"
     ],
+    "no-debugger": true,
     "no-duplicate-key": true,
     "no-duplicate-variable": true,
     "no-empty": true,
