@@ -42,7 +42,6 @@ describe("_Util.Methods", () => {
     assert.deepEqual(Plottable._Util.Methods.uniq(strings), ["foo", "bar", "baz", "bam"]);
   });
 
-
   describe("min/max", () => {
     var max = Plottable._Util.Methods.max;
     var min = Plottable._Util.Methods.min;

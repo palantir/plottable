@@ -663,7 +663,6 @@ describe("Plots", () => {
         svg.remove();
       });
 
-
       it("bar labels render properly", () => {
         plot.renderTo(svg);
         plot.barLabelsEnabled(true);

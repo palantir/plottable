@@ -39,7 +39,6 @@ describe("Plots", () => {
       dFoo.broadcaster.broadcast();
       assert.equal(2, r.renders, "we re-render when our dataset changes");
 
-
       r.addDataset("bar", dBar);
       assert.equal(3, r.renders, "we should redraw when we add a dataset");
 

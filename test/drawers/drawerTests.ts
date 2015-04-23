@@ -11,7 +11,6 @@ class MockAnimator implements Plottable.Animator.PlotAnimator {
     return this.time;
   }
 
-
   public animate(selection: any, attrToProjector: Plottable.AttributeToProjector): any {
     if (this.callback) {
       this.callback();
