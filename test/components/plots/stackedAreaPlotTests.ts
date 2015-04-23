@@ -410,5 +410,44 @@ describe("Plots", () => {
       assert.strictEqual(ds3Point2Offset, 2,
         "dataset3 (green) should have this offset because the red dataset (ds2) has no height in this point");
     });
+
+    it("null defaults to 0", () => {
+      var data1 = [
+        { x: 1, y: 1, fill: "blue" },
+        { x: 2, y: 2, fill: "blue" },
+        { x: 3, y: 3, fill: "blue" },
+      ];
+      var data2 = [
+        { x: 1, y: 1, fill: "red" },
+        { x: 2, y: "0", fill: "red" },
+        { x: 3, y: 3, fill: "red" },
+      ];
+      var data3 = [
+        { x: 1, y: 1, fill: "green" },
+        { x: 2, y: 2, fill: "green" },
+        { x: 3, y: 3, fill: "green" },
+      ];
+      var xScale = new Plottable.Scale.Linear();
+      var yScale = new Plottable.Scale.Linear();
+
+      var plot = new Plottable.Plot.StackedArea(xScale, yScale);
+      plot.addDataset("d1", data1);
+      plot.addDataset("d2", data2);
+      plot.addDataset("d3", data3);
+      plot.project("fill", "fill");
+      plot.project("x", "x", xScale).project("y", "y", yScale);
+
+      var ds1Point2Offset = (<any> plot)._key2PlotDatasetKey.get("d1").plotMetadata.offsets.get(2);
+      var ds2Point2Offset = (<any> plot)._key2PlotDatasetKey.get("d2").plotMetadata.offsets.get(2);
+      var ds3Point2Offset = (<any> plot)._key2PlotDatasetKey.get("d3").plotMetadata.offsets.get(2);
+
+      assert.strictEqual(ds1Point2Offset, 0,
+        "dataset1 (blue) should have no offset on middle point");
+      assert.strictEqual(ds2Point2Offset, 2,
+        "dataset2 (red) should have this offset and be on top of blue dataset");
+      assert.strictEqual(ds3Point2Offset, 2,
+        "dataset3 (green) should have this offset because the red dataset (ds2) has no height in this point");
+    });
+
   });
 });
