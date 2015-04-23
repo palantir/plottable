@@ -6,8 +6,6 @@ describe("Plots", () => {
 
   describe("Stacked Plot Stacking", () => {
     var stackedPlot: Plottable.Plot.AbstractStacked<number, number>;
-    var SVG_WIDTH = 600;
-    var SVG_HEIGHT = 400;
 
     beforeEach(() => {
       var xScale = new Plottable.Scale.Linear();

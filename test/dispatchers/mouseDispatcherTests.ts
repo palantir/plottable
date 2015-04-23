@@ -240,10 +240,6 @@ describe("Dispatchers", () => {
 
       var targetX = 17;
       var targetY = 76;
-      var expectedPoint = {
-        x: targetX,
-        y: targetY
-      };
 
       var md = Plottable.Dispatcher.Mouse.getDispatcher(<SVGElement> target.node());
 

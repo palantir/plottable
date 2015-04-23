@@ -1,5 +1,7 @@
 ///<reference path="testReference.ts" />
 
+// HACKHACK: These functions are indeed used but it is not known they are used?
+/* tslint:disable:no-unused-variable */
 function generateSVG(width = 400, height = 400): D3.Selection {
   var parent: D3.Selection = getSVGParent();
   return parent.append("svg").attr("width", width).attr("height", height).attr("class", "svg");

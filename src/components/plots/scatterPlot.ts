@@ -52,8 +52,6 @@ export module Plot {
 
     protected _getClosestStruckPoint(p: Point, range: number): Interaction.HoverData {
       var attrToProjector = this._generateAttrToProjector();
-      var xProjector = attrToProjector["x"];
-      var yProjector = attrToProjector["y"];
       var getDistSq = (d: any, i: number, userMetdata: any, plotMetadata: PlotMetadata) => {
         var dx = attrToProjector["x"](d, i, userMetdata, plotMetadata) - p.x;
         var dy = attrToProjector["y"](d, i, userMetdata, plotMetadata) - p.y;

@@ -60,10 +60,10 @@ describe("Scales", () => {
 
     it("scale autorange works as expected with single dataset", () => {
       var svg = generateSVG(100, 100);
-      var renderer = new Plottable.Plot.AbstractPlot()
-                        .addDataset(dataset)
-                        .project("x", "foo", scale)
-                        .renderTo(svg);
+      new Plottable.Plot.AbstractPlot()
+        .addDataset(dataset)
+        .project("x", "foo", scale)
+        .renderTo(svg);
       assert.deepEqual(scale.domain(), [0, 5], "scale domain was autoranged properly");
       data.push({foo: 100, bar: 200});
       dataset.data(data);
@@ -118,8 +118,6 @@ describe("Scales", () => {
       var xScale = new Plottable.Scale.Linear();
       var yScale = new Plottable.Scale.Linear();
       xScale.domainer(new Plottable.Domainer());
-      var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
-      var yAxis = new Plottable.Axis.Numeric(yScale, "left");
       var renderAreaD1 = new Plottable.Plot.Line(xScale, yScale);
       renderAreaD1.addDataset(ds1);
       renderAreaD1.project("x", "x", xScale);

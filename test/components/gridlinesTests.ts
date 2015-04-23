@@ -47,7 +47,7 @@ describe("Gridlines", () => {
 
   it("Unanchored Gridlines don't throw an error when scale updates", () => {
     var xScale = new Plottable.Scale.Linear();
-    var gridlines = new Plottable.Component.Gridlines(xScale, null);
+    new Plottable.Component.Gridlines(xScale, null);
     xScale.domain([0, 1]);
     // test passes if error is not thrown.
   });

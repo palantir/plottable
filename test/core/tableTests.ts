@@ -6,7 +6,6 @@ function generateBasicTable(nRows: number, nCols: number) {
   // makes a table with exactly nRows * nCols children in a regular grid, with each
   // child being a basic component
   var table = new Plottable.Component.Table();
-  var rows: Plottable.Component.AbstractComponent[][] = [];
   var components: Plottable.Component.AbstractComponent[] = [];
   for(var i = 0; i < nRows; i++) {
     for(var j = 0; j < nCols; j++) {

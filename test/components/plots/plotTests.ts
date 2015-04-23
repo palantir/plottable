@@ -124,14 +124,14 @@ describe("Plots", () => {
       var s = new Plottable.Scale.Linear();
       var svg1 = generateSVG(100, 100);
       var svg2 = generateSVG(100, 100);
-      var r1 = new Plottable.Plot.AbstractPlot()
-                    .addDataset(ds1)
-                    .project("x", (x: number) => x, s)
-                    .renderTo(svg1);
-      var r2 = new Plottable.Plot.AbstractPlot()
-                    .addDataset(ds2)
-                    .project("x", (x: number) => x, s)
-                    .renderTo(svg2);
+      new Plottable.Plot.AbstractPlot()
+        .addDataset(ds1)
+        .project("x", (x: number) => x, s)
+        .renderTo(svg1);
+      new Plottable.Plot.AbstractPlot()
+        .addDataset(ds2)
+        .project("x", (x: number) => x, s)
+        .renderTo(svg2);
       assert.deepEqual(s.domain(), [0, 3], "Simple domain combining");
       ds1.data([]);
       assert.deepEqual(s.domain(), [1, 3], "Contracting domain due to projection becoming empty");
@@ -470,7 +470,6 @@ describe("Plots", () => {
     });
 
     it("extent calculation done in correct dataset order", () => {
-      var animator = new Plottable.Animator.Base().delay(10).duration(10).maxIterativeDelay(0);
       var CategoryScale = new Plottable.Scale.Category();
       var dataset1 = [{key: "A"}];
       var dataset2 = [{key: "B"}];

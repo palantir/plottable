@@ -50,7 +50,7 @@ describe("Plots", () => {
       renderer.project("x", "x", xScale);
       renderer.project("y", "y", yScale);
       var xAxis = new Plottable.Axis.Category(xScale, "bottom");
-      var table = new Plottable.Component.Table([[renderer], [xAxis]]).renderTo(svg);
+      new Plottable.Component.Table([[renderer], [xAxis]]).renderTo(svg);
       axisHeight = xAxis.height();
       bandWidth = xScale.rangeBand();
     });
@@ -131,7 +131,7 @@ describe("Plots", () => {
       renderer.project("x", "x", xScale);
       renderer.project("y", "y", yScale);
       var yAxis = new Plottable.Axis.Category(yScale, "left");
-      var table = new Plottable.Component.Table([[yAxis, renderer]]).renderTo(svg);
+      new Plottable.Component.Table([[yAxis, renderer]]).renderTo(svg);
       rendererWidth = renderer.width();
       bandWidth = yScale.rangeBand();
     });

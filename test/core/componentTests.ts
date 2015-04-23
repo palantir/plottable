@@ -114,7 +114,6 @@ describe("Component behavior", () => {
     });
 
     it("computeLayout uses its arguments apropriately", () => {
-      var g = svg.append("g");
       var xOff = 10;
       var yOff = 20;
       var width = 100;

@@ -139,7 +139,7 @@ describe("Plots", () => {
         var firstSegmentContained = d_original.indexOf(pathSegements[0]) >= 0;
         assert.isTrue(firstSegmentContained, "first path segment is a subpath of the original path");
         var secondSegmentContained = d_original.indexOf(pathSegements[1]) >= 0;
-        assert.isTrue(firstSegmentContained, "second path segment is a subpath of the original path");
+        assert.isTrue(secondSegmentContained, "second path segment is a subpath of the original path");
       }
 
       var dataWithNaN = lineData.slice();

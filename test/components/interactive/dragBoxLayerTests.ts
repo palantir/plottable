@@ -333,7 +333,6 @@ describe("Interactive Components", () => {
                                 { x: midPoint.x, y: initialBounds.topLeft.y },
                                 { x: midPoint.x, y: initialBounds.topLeft.y }
                                );
-        var bounds = dbl.bounds();
         assert.isTrue(dbl.boxVisible(), "box was not dismissed");
         svg.remove();
       });

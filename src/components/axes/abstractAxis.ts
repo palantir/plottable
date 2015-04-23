@@ -491,7 +491,6 @@ export module Axis {
                                       var visibility = d3.select(this).style("visibility");
                                       return (visibility === "inherit") || (visibility === "visible");
                                     });
-      var lastLabelClientRect: ClientRect;
 
       var visibleTickLabelRects = visibleTickLabels[0].map((label: HTMLScriptElement) => label.getBoundingClientRect());
       var interval = 1;

@@ -15,7 +15,6 @@ describe("Drawers", () => {
       piePlot.renderTo(svg);
 
       piePlot.getAllSelections().each(function (datum: any, index: number) {
-        var selection = d3.select(this);
         var pixelPoint = drawer._getPixelPoint(datum, index);
         var radius = 75;
         var angle = Math.PI / 4 + ((Math.PI * index) / 2);

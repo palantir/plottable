@@ -3,14 +3,6 @@
 var assert = chai.assert;
 
 describe("NumericAxis", () => {
-  function boxesOverlap(boxA: ClientRect, boxB: ClientRect) {
-    if (boxA.right < boxB.left) { return false; }
-    if (boxA.left > boxB.right) { return false; }
-    if (boxA.bottom < boxB.top) { return false; }
-    if (boxA.top > boxB.bottom) { return false; }
-    return true;
-  }
-
   function boxIsInside(inner: ClientRect, outer: ClientRect, epsilon = 0) {
     if (inner.left < outer.left - epsilon) { return false; }
     if (inner.right > outer.right + epsilon) { return false; }

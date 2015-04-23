@@ -252,7 +252,6 @@ before(function () {
     }
 });
 after(function () {
-    var parent = getSVGParent();
     var mocha = d3.select("#mocha-report");
     if (mocha.node() != null) {
         var suites = mocha.selectAll(".suite");
@@ -389,7 +388,6 @@ describe("Drawers", function () {
             piePlot.project("value", "value");
             piePlot.renderTo(svg);
             piePlot.getAllSelections().each(function (datum, index) {
-                var selection = d3.select(this);
                 var pixelPoint = drawer._getPixelPoint(datum, index);
                 var radius = 75;
                 var angle = Math.PI / 4 + ((Math.PI * index) / 2);
@@ -830,21 +828,6 @@ describe("TimeAxis", function () {
 ///<reference path="../testReference.ts" />
 var assert = chai.assert;
 describe("NumericAxis", function () {
-    function boxesOverlap(boxA, boxB) {
-        if (boxA.right < boxB.left) {
-            return false;
-        }
-        if (boxA.left > boxB.right) {
-            return false;
-        }
-        if (boxA.bottom < boxB.top) {
-            return false;
-        }
-        if (boxA.top > boxB.bottom) {
-            return false;
-        }
-        return true;
-    }
     function boxIsInside(inner, outer, epsilon) {
         if (epsilon === void 0) { epsilon = 0; }
         if (inner.left < outer.left - epsilon) {
@@ -1390,7 +1373,7 @@ describe("Gridlines", function () {
     });
     it("Unanchored Gridlines don't throw an error when scale updates", function () {
         var xScale = new Plottable.Scale.Linear();
-        var gridlines = new Plottable.Component.Gridlines(xScale, null);
+        new Plottable.Component.Gridlines(xScale, null);
         xScale.domain([0, 1]);
         // test passes if error is not thrown.
     });
@@ -2105,8 +2088,8 @@ describe("Plots", function () {
             var s = new Plottable.Scale.Linear();
             var svg1 = generateSVG(100, 100);
             var svg2 = generateSVG(100, 100);
-            var r1 = new Plottable.Plot.AbstractPlot().addDataset(ds1).project("x", function (x) { return x; }, s).renderTo(svg1);
-            var r2 = new Plottable.Plot.AbstractPlot().addDataset(ds2).project("x", function (x) { return x; }, s).renderTo(svg2);
+            new Plottable.Plot.AbstractPlot().addDataset(ds1).project("x", function (x) { return x; }, s).renderTo(svg1);
+            new Plottable.Plot.AbstractPlot().addDataset(ds2).project("x", function (x) { return x; }, s).renderTo(svg2);
             assert.deepEqual(s.domain(), [0, 3], "Simple domain combining");
             ds1.data([]);
             assert.deepEqual(s.domain(), [1, 3], "Contracting domain due to projection becoming empty");
@@ -2399,7 +2382,6 @@ describe("Plots", function () {
             assert.equal(recordedTime, 20, "additionalPaint passed appropriate time argument");
         });
         it("extent calculation done in correct dataset order", function () {
-            var animator = new Plottable.Animator.Base().delay(10).duration(10).maxIterativeDelay(0);
             var CategoryScale = new Plottable.Scale.Category();
             var dataset1 = [{ key: "A" }];
             var dataset2 = [{ key: "B" }];
@@ -2878,7 +2860,7 @@ describe("Plots", function () {
                 var firstSegmentContained = d_original.indexOf(pathSegements[0]) >= 0;
                 assert.isTrue(firstSegmentContained, "first path segment is a subpath of the original path");
                 var secondSegmentContained = d_original.indexOf(pathSegements[1]) >= 0;
-                assert.isTrue(firstSegmentContained, "second path segment is a subpath of the original path");
+                assert.isTrue(secondSegmentContained, "second path segment is a subpath of the original path");
             }
             var dataWithNaN = lineData.slice();
             dataWithNaN[2] = { foo: 0.4, bar: NaN };
@@ -4311,8 +4293,6 @@ describe("Plots", function () {
             var circlePlot;
             var SVG_WIDTH = 600;
             var SVG_HEIGHT = 300;
-            var pixelAreaFull = { xMin: 0, xMax: SVG_WIDTH, yMin: 0, yMax: SVG_HEIGHT };
-            var pixelAreaPart = { xMin: 200, xMax: 600, yMin: 100, yMax: 200 };
             var dataAreaFull = { xMin: 0, xMax: 9, yMin: 81, yMax: 0 };
             var dataAreaPart = { xMin: 3, xMax: 9, yMin: 54, yMax: 27 };
             var colorAccessor = function (d, i, m) { return d3.rgb(d.x, d.y, i).toString(); };
@@ -4391,8 +4371,6 @@ var assert = chai.assert;
 describe("Plots", function () {
     describe("Stacked Plot Stacking", function () {
         var stackedPlot;
-        var SVG_WIDTH = 600;
-        var SVG_HEIGHT = 400;
         beforeEach(function () {
             var xScale = new Plottable.Scale.Linear();
             var yScale = new Plottable.Scale.Linear();
@@ -4676,7 +4654,7 @@ describe("Plots", function () {
             renderer.project("y", "y", yScale);
             renderer.project("fill", "type", colorScale);
             var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
-            var table = new Plottable.Component.Table([[renderer], [xAxis]]).renderTo(svg);
+            new Plottable.Component.Table([[renderer], [xAxis]]).renderTo(svg);
         });
         it("renders correctly", function () {
             var areas = renderer._renderArea.selectAll(".area");
@@ -4925,7 +4903,7 @@ describe("Plots", function () {
             renderer.addDataset(data2);
             renderer.project("fill", "type", colorScale);
             var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
-            var table = new Plottable.Component.Table([[renderer], [xAxis]]).renderTo(svg);
+            new Plottable.Component.Table([[renderer], [xAxis]]).renderTo(svg);
         });
         it("renders correctly", function () {
             var areas = renderer._renderArea.selectAll(".area");
@@ -4999,7 +4977,7 @@ describe("Plots", function () {
             renderer.project("y", "y", yScale);
             renderer.baseline(0);
             var xAxis = new Plottable.Axis.Category(xScale, "bottom");
-            var table = new Plottable.Component.Table([[renderer], [xAxis]]).renderTo(svg);
+            new Plottable.Component.Table([[renderer], [xAxis]]).renderTo(svg);
             axisHeight = xAxis.height();
             bandWidth = xScale.rangeBand();
         });
@@ -5080,7 +5058,6 @@ describe("Plots", function () {
         var SVG_WIDTH = 600;
         var SVG_HEIGHT = 400;
         var axisHeight = 0;
-        var bandWidth = 0;
         beforeEach(function () {
             svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
             xScale = new Plottable.Scale.Category();
@@ -5110,7 +5087,7 @@ describe("Plots", function () {
             plot.project("y", "y", yScale);
             plot.baseline(0);
             var xAxis = new Plottable.Axis.Category(xScale, "bottom");
-            var table = new Plottable.Component.Table([[plot], [xAxis]]).renderTo(svg);
+            new Plottable.Component.Table([[plot], [xAxis]]).renderTo(svg);
             axisHeight = xAxis.height();
         });
         it("stacking done correctly for negative values", function () {
@@ -5168,7 +5145,7 @@ describe("Plots", function () {
             renderer.addDataset(data2);
             renderer.baseline(0);
             var yAxis = new Plottable.Axis.Category(yScale, "left");
-            var table = new Plottable.Component.Table([[yAxis, renderer]]).renderTo(svg);
+            new Plottable.Component.Table([[yAxis, renderer]]).renderTo(svg);
             rendererWidth = renderer.width();
             bandWidth = yScale.rangeBand();
         });
@@ -5235,7 +5212,7 @@ describe("Plots", function () {
             plot.project("x", "x", xScale);
             plot.project("y", "y", yScale);
             var xAxis = new Plottable.Axis.Category(xScale, "bottom");
-            var table = new Plottable.Component.Table([[plot], [xAxis]]).renderTo(svg);
+            new Plottable.Component.Table([[plot], [xAxis]]).renderTo(svg);
         });
         it("renders correctly", function () {
             var bars = plot._renderArea.selectAll("rect");
@@ -5405,7 +5382,7 @@ describe("Plots", function () {
             renderer.project("x", "x", xScale);
             renderer.project("y", "y", yScale);
             var xAxis = new Plottable.Axis.Category(xScale, "bottom");
-            var table = new Plottable.Component.Table([[renderer], [xAxis]]).renderTo(svg);
+            new Plottable.Component.Table([[renderer], [xAxis]]).renderTo(svg);
             axisHeight = xAxis.height();
             bandWidth = xScale.rangeBand();
         });
@@ -5473,7 +5450,7 @@ describe("Plots", function () {
             renderer.project("x", "x", xScale);
             renderer.project("y", "y", yScale);
             var yAxis = new Plottable.Axis.Category(yScale, "left");
-            var table = new Plottable.Component.Table([[yAxis, renderer]]).renderTo(svg);
+            new Plottable.Component.Table([[yAxis, renderer]]).renderTo(svg);
             rendererWidth = renderer.width();
             bandWidth = yScale.rangeBand();
         });
@@ -6245,7 +6222,6 @@ describe("Component behavior", function () {
             svg.remove();
         });
         it("computeLayout uses its arguments apropriately", function () {
-            var g = svg.append("g");
             var xOff = 10;
             var yOff = 20;
             var width = 100;
@@ -6630,7 +6606,6 @@ describe("Dataset", function () {
         var metadata = { foo: 11 };
         var id = function (d) { return d; };
         var dataset = new Plottable.Dataset(data, metadata);
-        var plot = new Plottable.Plot.AbstractPlot().addDataset(dataset);
         var a1 = function (d, i, m) { return d + i - 2; };
         assert.deepEqual(dataset._getExtent(a1, id), [-1, 5], "extent for numerical data works properly");
         var a2 = function (d, i, m) { return d + m.foo; };
@@ -6651,7 +6626,6 @@ function generateBasicTable(nRows, nCols) {
     // makes a table with exactly nRows * nCols children in a regular grid, with each
     // child being a basic component
     var table = new Plottable.Component.Table();
-    var rows = [];
     var components = [];
     for (var i = 0; i < nRows; i++) {
         for (var j = 0; j < nCols; j++) {
@@ -7074,20 +7048,18 @@ describe("Domainer", function () {
         assert.deepEqual(domain, [-100, 5], "unregistered includedValues can be removed with addOrRemove argument");
     });
     it("include(n) works on dates", function () {
-        var a = new Date(2000, 5, 4);
-        var b = new Date(2000, 5, 5);
-        var c = new Date(2000, 5, 6);
-        var d = new Date(2003, 0, 1);
-        domainer.addIncludedValue(b);
+        var a = new Date(2000, 5, 5);
+        var b = new Date(2000, 5, 6);
+        var c = new Date(2003, 0, 1);
+        domainer.addIncludedValue(a);
         var timeScale = new Plottable.Scale.Time();
-        timeScale._updateExtent("1", "x", [c, d]);
+        timeScale._updateExtent("1", "x", [b, c]);
         timeScale.domainer(domainer);
-        assert.deepEqual(timeScale.domain(), [b, d]);
+        assert.deepEqual(timeScale.domain(), [a, c]);
     });
     it("exceptions are setup properly on an area plot", function () {
         var xScale = new Plottable.Scale.Linear();
         var yScale = new Plottable.Scale.Linear();
-        var domainer = yScale.domainer();
         var data = [{ x: 0, y: 0, y0: 0 }, { x: 5, y: 5, y0: 5 }];
         var dataset = new Plottable.Dataset(data);
         var r = new Plottable.Plot.Area(xScale, yScale);
@@ -7132,7 +7104,6 @@ describe("Coordinators", function () {
             var s1 = new Plottable.Scale.Linear();
             var s2 = new Plottable.Scale.Linear();
             var s3 = new Plottable.Scale.Linear();
-            var dc = new Plottable._Util.ScaleDomainCoordinator([s1, s2, s3]);
             s1.domain([0, 100]);
             assert.deepEqual(s1.domain(), [0, 100]);
             assert.deepEqual(s1.domain(), s2.domain());
@@ -9137,10 +9108,6 @@ describe("Dispatchers", function () {
             target.append("rect").attr("width", targetWidth).attr("height", targetHeight);
             var targetX = 17;
             var targetY = 76;
-            var expectedPoint = {
-                x: targetX,
-                y: targetY
-            };
             var md = Plottable.Dispatcher.Mouse.getDispatcher(target.node());
             var callbackWasCalled = false;
             var callback = function (p, e) {
@@ -9548,7 +9515,6 @@ describe("Interactive Components", function () {
             it("doesn't dismiss on no-op resize", function () {
                 dbl.resizable(true);
                 triggerFakeDragSequence(target, { x: midPoint.x, y: initialBounds.topLeft.y }, { x: midPoint.x, y: initialBounds.topLeft.y });
-                var bounds = dbl.bounds();
                 assert.isTrue(dbl.boxVisible(), "box was not dismissed");
                 svg.remove();
             });
