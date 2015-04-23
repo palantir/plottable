@@ -8161,13 +8161,13 @@ describe("Interactions", function () {
                 component.renderTo(svg);
                 dblClickInteraction = new Plottable.Interaction.DoubleClick();
                 component.registerInteraction(dblClickInteraction);
-                dblClickInteraction.onDblClick(dblClickCallback);
+                dblClickInteraction.onDoubleClick(dblClickCallback);
             });
             afterEach(function () {
                 doubleClickedPoint = null;
             });
             it("onDblClick callback can be retrieved", function () {
-                assert.strictEqual(dblClickInteraction.onDblClick(), dblClickCallback, "callback can be retrieved");
+                assert.strictEqual(dblClickInteraction.onDoubleClick(), dblClickCallback, "callback can be retrieved");
                 svg.remove();
             });
             it("callback sets correct point on normal case", function () {

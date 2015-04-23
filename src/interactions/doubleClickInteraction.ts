@@ -9,7 +9,7 @@ export module Interaction {
 
     private _mouseDispatcher: Plottable.Dispatcher.Mouse;
     private _touchDispatcher: Plottable.Dispatcher.Touch;
-    private _dblClickCallback: (p: Point) => any;
+    private _doubleClickCallback: (p: Point) => any;
     private _clickState = ClickState.NotClicked;
     private _clickedDown = false;
     private _clickedPoint: Point;
@@ -50,8 +50,8 @@ export module Interaction {
 
     private _handleDblClick() {
       if (this._clickState === ClickState.DoubleClicked) {
-        if (this._dblClickCallback) {
-          this._dblClickCallback(this._clickedPoint);
+        if (this._doubleClickCallback) {
+          this._doubleClickCallback(this._clickedPoint);
         }
         this._clickState = ClickState.NotClicked;
       }
@@ -66,19 +66,19 @@ export module Interaction {
      *
      * @return {(p: Point) => any} The current callback.
      */
-    public onDblClick(): (p: Point) => any;
+    public onDoubleClick(): (p: Point) => any;
     /**
      * Sets the callback called when the Component is double-clicked.
      *
      * @param {(p: Point) => any} callback The callback to set.
      * @return {Interaction.DoubleClick} The calling Interaction.DoubleClick.
      */
-    public onDblClick(callback: (p: Point) => any): Interaction.DoubleClick;
-    public onDblClick(callback?: (p: Point) => any): any {
+    public onDoubleClick(callback: (p: Point) => any): Interaction.DoubleClick;
+    public onDoubleClick(callback?: (p: Point) => any): any {
       if (callback === undefined) {
-        return this._dblClickCallback;
+        return this._doubleClickCallback;
       }
-      this._dblClickCallback = callback;
+      this._doubleClickCallback = callback;
       return this;
     }
 

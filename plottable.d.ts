@@ -3806,14 +3806,14 @@ declare module Plottable {
              *
              * @return {(p: Point) => any} The current callback.
              */
-            onDblClick(): (p: Point) => any;
+            onDoubleClick(): (p: Point) => any;
             /**
              * Sets the callback called when the Component is double-clicked.
              *
              * @param {(p: Point) => any} callback The callback to set.
              * @return {Interaction.DoubleClick} The calling Interaction.DoubleClick.
              */
-            onDblClick(callback: (p: Point) => any): Interaction.DoubleClick;
+            onDoubleClick(callback: (p: Point) => any): Interaction.DoubleClick;
         }
     }
 }

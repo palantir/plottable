@@ -9483,8 +9483,8 @@ var Plottable;
             };
             DoubleClick.prototype._handleDblClick = function () {
                 if (this._clickState === 2 /* DoubleClicked */) {
-                    if (this._dblClickCallback) {
-                        this._dblClickCallback(this._clickedPoint);
+                    if (this._doubleClickCallback) {
+                        this._doubleClickCallback(this._clickedPoint);
                     }
                     this._clickState = 0 /* NotClicked */;
                 }
@@ -9492,11 +9492,11 @@ var Plottable;
             DoubleClick.pointsEqual = function (p1, p2) {
                 return p1.x === p2.x && p1.y === p2.y;
             };
-            DoubleClick.prototype.onDblClick = function (callback) {
+            DoubleClick.prototype.onDoubleClick = function (callback) {
                 if (callback === undefined) {
-                    return this._dblClickCallback;
+                    return this._doubleClickCallback;
                 }
-                this._dblClickCallback = callback;
+                this._doubleClickCallback = callback;
                 return this;
             };
             return DoubleClick;
