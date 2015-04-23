@@ -1901,6 +1901,18 @@ declare module Plottable {
              * @param {Component[]} components The Components in the resultant Component.Group (default = []).
              */
             constructor(components?: AbstractComponent[]);
+            /**
+             * Retrieves closest PlotData to queryPoint across all plots in this group.
+             *
+             * Each plot is queried using getClosestPlotData(queryPoint) and the closest
+             * to queryPoint by Euclidean norm is returned. Ties are in Euclidean norm
+             * broken by favoring the plot ordered highest in the group.
+             *
+             * @param {Point} queryPoint The point to which plot data should be compared
+             *
+             * @returns {PlotData} The PlotData closest to queryPoint in this group
+             */
+            getClosestPlotData(queryPoint: Point): Plot.PlotData;
             _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
             _merge(c: AbstractComponent, below: boolean): Group;
             _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): Group;
@@ -2681,6 +2693,7 @@ declare module Plottable {
         type PlotData = {
             data: any[];
             pixelPoints: Point[];
+            plot: Plot.AbstractPlot;
             selection: D3.Selection;
         };
         class AbstractPlot extends Component.AbstractComponent {
@@ -2846,7 +2859,7 @@ declare module Plottable {
             getAllPlotData(datasetKeys?: string | string[]): PlotData;
             protected _getAllPlotData(datasetKeys: string[]): PlotData;
             /**
-             * Retrieves PlotData with the lowest distance, where distance is defined
+             * Retrieves closest PlotData to queryPoint, where distance is defined
              * to be the Euclidiean norm.
              *
              * @param {Point} queryPoint The point to which plot data should be compared

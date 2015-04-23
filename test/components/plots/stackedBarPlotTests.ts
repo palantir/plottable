@@ -116,6 +116,7 @@ describe("Plots", () => {
       var expected = {
         data: [d0],
         pixelPoints: [d0Px],
+        plot: renderer,
         selection: d3.selectAll([bars[0][0]])
       };
 
@@ -125,6 +126,7 @@ describe("Plots", () => {
       expected = {
         data: [d1],
         pixelPoints: [d1Px],
+        plot: renderer,
         selection: d3.selectAll([bars[0][2]])
       };
 

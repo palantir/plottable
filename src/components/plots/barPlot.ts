@@ -224,6 +224,7 @@ export module Plot {
       return {
         data: closestData,
         pixelPoints: closestPixelPoints,
+        plot: this,
         selection: d3.selectAll(closestElements)
       };
     }

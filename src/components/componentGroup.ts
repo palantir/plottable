@@ -23,6 +23,54 @@ export module Component {
       components.forEach((c: AbstractComponent) => this._addComponent(c));
     }
 
+    /**
+     * Retrieves closest PlotData to queryPoint across all plots in this group.
+     *
+     * Each plot is queried using getClosestPlotData(queryPoint) and the closest
+     * to queryPoint by Euclidean norm is returned. Ties are in Euclidean norm
+     * broken by favoring the plot ordered highest in the group.
+     *
+     * @param {Point} queryPoint The point to which plot data should be compared
+     *
+     * @returns {PlotData} The PlotData closest to queryPoint in this group
+     */
+    public getClosestPlotData(queryPoint: Point): Plot.PlotData {
+      var minDistSquared = Infinity;
+      var closestPlotData: Plot.PlotData = {
+        data: [],
+        pixelPoints: [],
+        plot: null,
+        selection: d3.select()
+      };
+
+      this.components().forEach((c) => {
+        if (c instanceof Plot.AbstractPlot || c instanceof Group) {
+          var cpd = (<Plot.AbstractPlot | Group> c).getClosestPlotData(queryPoint);
+
+          // it is possible for multiple data to be considered "closest" by a plot (e.g., overlapping bars)
+          cpd.pixelPoints.forEach((pixelPoint, index) => {
+            var distanceSquared = _Util.Methods.distanceSquared(pixelPoint, queryPoint);
+            if (distanceSquared <= minDistSquared) {
+              minDistSquared = distanceSquared;
+
+              // some PlotData results, i.e., line, have only one element in their selection
+              var selection = cpd.selection[0];
+              var selectionIndex = Math.min(selection.length - 1, index);
+
+              closestPlotData = {
+                data: [cpd.data[index]],
+                pixelPoints: [pixelPoint],
+                plot: cpd.plot,
+                selection: d3.select(selection[selectionIndex])
+              };
+            }
+          });
+        }
+      });
+
+      return closestPlotData;
+    }
+
     public _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
       var requests = this.components().map((c: AbstractComponent) => c._requestedSpace(offeredWidth, offeredHeight));
       return {

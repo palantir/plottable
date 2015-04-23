@@ -284,4 +284,125 @@ describe("ComponentGroups", () => {
       });
 
     });
+
+  describe("getClosestPlotData()", () => {
+    it("handles empty groups gracefully", () => {
+      var cg = new Plottable.Component.Group();
+      var closest = cg.getClosestPlotData({ x: 0, y: 0 });
+
+      assert.lengthOf(closest.data, 0, "returns empty data");
+      assert.lengthOf(closest.pixelPoints, 0, "returns empty pixelPoints");
+      assert.isTrue(closest.selection.empty(), "returns empty selection");
+      assert.isNull(closest.plot, "returns null plot");
+    });
+
+    describe("non-empty group", () => {
+      var svg: D3.Selection;
+      var xScale: Plottable.Scale.Linear;
+      var yScale: Plottable.Scale.Linear;
+      var data: any[];
+      var data2: any[];
+      var scatterPlot: Plottable.Plot.Scatter<number, number>;
+      var barPlot: Plottable.Plot.Bar<number, number>;
+      var group: Plottable.Component.Group;
+      var bars: D3.Selection;
+      var points: D3.Selection;
+
+      function assertPlotDataEqual(expected: Plottable.Plot.PlotData, actual: Plottable.Plot.PlotData,
+          msg: string) {
+        assert.deepEqual(expected.data, actual.data, msg);
+        assert.closeTo(expected.pixelPoints[0].x, actual.pixelPoints[0].x, 0.01, msg);
+        assert.closeTo(expected.pixelPoints[0].y, actual.pixelPoints[0].y, 0.01, msg);
+        assert.deepEqual(expected.selection, actual.selection, msg);
+        assert.deepEqual(expected.plot, actual.plot, msg);
+      }
+
+      beforeEach(() => {
+        // setup two plots and add them to a group
+        svg = generateSVG(400, 400);
+        xScale = new Plottable.Scale.Linear();
+        yScale = new Plottable.Scale.Linear();
+        data = [{ x: 0, y: 0 }, { x: 1, y: 1 }];
+        data2 = [{ x: 1, y: 2 }, { x: 3, y: 4 }];
+
+        scatterPlot = new Plottable.Plot.Scatter(xScale, yScale)
+            .project("x", "x", xScale)
+            .project("y", "y", yScale)
+            .addDataset(data);
+
+        barPlot = new Plottable.Plot.Bar(xScale, yScale)
+            .project("x", "x", xScale)
+            .project("y", "y", yScale)
+            .addDataset(data2);
+
+        group = new Plottable.Component.Group([scatterPlot, barPlot]);
+        group.renderTo(svg);
+
+        // setup expected PlotData
+        bars = d3.selectAll(".bar-area rect");
+        points = d3.selectAll(".scatter-plot path");
+      });
+
+      it("returns scatter PlotData when closest to it", () => {
+        var d0 = data[0];
+        var d0Px = {
+          x: xScale.scale(d0.x),
+          y: yScale.scale(d0.y)
+        };
+
+        var expected = {
+          data: [d0],
+          pixelPoints: [d0Px],
+          plot: scatterPlot,
+          selection: d3.select(points[0][0])
+        };
+
+        var closest = group.getClosestPlotData({ x: d0Px.x, y: d0Px.y });
+        assertPlotDataEqual(expected, closest);
+
+        svg.remove();
+      });
+
+      it("returns scatter PlotData when closest to it but overlapping a bar", () => {
+        var d1 = data[1];
+        var d1Px = {
+          x: xScale.scale(d1.x),
+          y: yScale.scale(d1.y)
+        };
+
+        var expected = {
+          data: [d1],
+          pixelPoints: [d1Px],
+          plot: scatterPlot,
+          selection: d3.select(points[0][1])
+        };
+
+        closest = group.getClosestPlotData({ x: d1Px.x, y: d1Px.y });
+        assertPlotDataEqual(expected, closest);
+
+        svg.remove();
+      });
+
+      it("returns bar PlotData when closest to it", () => {
+        var d2 = data2[0];
+        var d2Px = {
+          x: xScale.scale(d2.x),
+          y: yScale.scale(d2.y)
+        };
+
+
+        var expected = {
+          data: [d2],
+          pixelPoints: [d2Px],
+          plot: barPlot,
+          selection: d3.select(bars[0][0])
+        };
+
+        closest = group.getClosestPlotData({ x: d2Px.x, y: d2Px.y - 1 });
+        assertPlotDataEqual(expected, closest);
+
+        svg.remove();
+      });
+    });
+  });
 });
