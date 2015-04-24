@@ -29,7 +29,7 @@ describe("Plots", () => {
       var xScale        = new Plottable.Scale.Linear();
       var yScale        = new Plottable.Scale.Linear();
       var svg           = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var rectanglePlot = new Plottable.Plot.Rectangle(xScale, yScale);
+      var rectanglePlot = new Plottable.Plots.Rectangle(xScale, yScale);
       rectanglePlot.addDataset(DATA)
               .project("x", "x", xScale)
               .project("y", "y", yScale)

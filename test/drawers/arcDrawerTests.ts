@@ -5,7 +5,7 @@ describe("Drawers", () => {
     it("getPixelPoint", () => {
       var svg = generateSVG(300, 300);
       var data = [{value: 10}, {value: 10}, {value: 10}, {value: 10}];
-      var piePlot = new Plottable.Plot.Pie();
+      var piePlot = new Plottable.Plots.Pie();
 
       var drawer = new Plottable._Drawer.Arc("one");
       (<any> piePlot)._getDrawer = () => drawer;

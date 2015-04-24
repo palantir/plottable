@@ -12,7 +12,7 @@ describe("Interactions", () => {
 
       var svg = generateSVG();
       var dataset = makeLinearSeries(11);
-      var plot = new Plottable.Plot.Scatter(xScale, yScale).addDataset(dataset);
+      var plot = new Plottable.Plots.Scatter(xScale, yScale).addDataset(dataset);
       plot.project("x", "x", xScale);
       plot.project("y", "y", yScale);
       plot.renderTo(svg);

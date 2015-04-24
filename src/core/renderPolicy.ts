@@ -2,9 +2,9 @@
 
 module Plottable {
 export module Core {
-export module RenderController {
+export module RenderControllers {
 
-  export module RenderPolicy {
+  export module RenderPolicies {
     /**
      * A policy to render components.
      */
@@ -18,7 +18,7 @@ export module RenderController {
      */
     export class Immediate implements RenderPolicy {
       public render() {
-        RenderController.flush();
+        RenderControllers.flush();
       }
     }
 
@@ -28,7 +28,7 @@ export module RenderController {
      */
     export class AnimationFrame implements RenderPolicy {
       public render() {
-        _Util.DOM.requestAnimationFramePolyfill(RenderController.flush);
+        _Util.DOM.requestAnimationFramePolyfill(RenderControllers.flush);
       }
     }
 
@@ -41,7 +41,7 @@ export module RenderController {
       public _timeoutMsec: number = _Util.DOM.POLYFILL_TIMEOUT_MSEC;
 
       public render() {
-        setTimeout(RenderController.flush, this._timeoutMsec);
+        setTimeout(RenderControllers.flush, this._timeoutMsec);
       }
     }
   }

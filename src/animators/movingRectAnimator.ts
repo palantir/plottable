@@ -1,7 +1,7 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Animator {
+export module Animators {
 
   /**
    * A child class of RectAnimator that will move the rectangle

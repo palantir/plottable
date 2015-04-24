@@ -1,7 +1,7 @@
 ///<reference path="../../reference.ts" />
 
 module Plottable {
-export module Axis {
+export module Axes {
   export class Category extends AbstractAxis {
     private _tickLabelAngle = 0;
     private _measurer: SVGTypewriter.Measurers.CacheCharacterMeasurer;

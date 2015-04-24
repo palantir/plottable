@@ -9,7 +9,7 @@ describe("Plots", () => {
       var svg = generateSVG(400, 400);
       var xScale = new Plottable.Scale.Linear();
       var yScale = new Plottable.Scale.Linear();
-      var plot = new Plottable.Plot.Area(xScale, yScale);
+      var plot = new Plottable.Plots.Area(xScale, yScale);
       plot.project("x", (d: any) => d.x, xScale);
       plot.project("y", (d: any) => d.y, yScale);
       assert.doesNotThrow(() => plot.renderTo(svg), Error);
@@ -30,7 +30,7 @@ describe("Plots", () => {
     var fillAccessor: any;
     var twoPointData = [{foo: 0, bar: 0}, {foo: 1, bar: 1}];
     var simpleDataset: Plottable.Dataset;
-    var areaPlot: Plottable.Plot.Area<number>;
+    var areaPlot: Plottable.Plots.Area<number>;
     var renderArea: D3.Selection;
 
     before(() => {
@@ -46,7 +46,7 @@ describe("Plots", () => {
     beforeEach(() => {
       svg = generateSVG(500, 500);
       simpleDataset = new Plottable.Dataset(twoPointData);
-      areaPlot = new Plottable.Plot.Area(xScale, yScale);
+      areaPlot = new Plottable.Plots.Area(xScale, yScale);
       areaPlot.addDataset("sd", simpleDataset)
               .project("x", xAccessor, xScale)
               .project("y", yAccessor, yScale)

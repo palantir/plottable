@@ -9,7 +9,7 @@ describe("Plots", () => {
     var dataset2: Plottable.Dataset;
     var xScale: Plottable.Scale.Category;
     var yScale: Plottable.Scale.Linear;
-    var renderer: Plottable.Plot.StackedBar<string, number>;
+    var renderer: Plottable.Plots.StackedBar<string, number>;
     var SVG_WIDTH = 600;
     var SVG_HEIGHT = 400;
     var axisHeight = 0;
@@ -42,13 +42,13 @@ describe("Plots", () => {
       dataset1 = new Plottable.Dataset(data1);
       dataset2 = new Plottable.Dataset(data2);
 
-      renderer = new Plottable.Plot.StackedBar(xScale, yScale);
+      renderer = new Plottable.Plots.StackedBar(xScale, yScale);
       renderer.addDataset(dataset1);
       renderer.addDataset(dataset2);
       renderer.project("x", "x", xScale);
       renderer.project("y", "y", yScale);
       renderer.baseline(0);
-      var xAxis = new Plottable.Axis.Category(xScale, "bottom");
+      var xAxis = new Plottable.Axes.Category(xScale, "bottom");
       var table = new Plottable.Component.Table([[renderer], [xAxis]]).renderTo(svg);
       axisHeight = xAxis.height();
       bandWidth = xScale.rangeBand();
@@ -91,7 +91,7 @@ describe("Plots", () => {
     });
 
     it("considers lying within a bar's y-range to mean it is closest", () => {
-      function assertPlotDataEqual(expected: Plottable.Plot.PlotData, actual: Plottable.Plot.PlotData,
+      function assertPlotDataEqual(expected: Plottable.Plots.PlotData, actual: Plottable.Plots.PlotData,
         msg: string) {
         assert.deepEqual(expected.data, actual.data, msg);
         assert.closeTo(expected.pixelPoints[0].x, actual.pixelPoints[0].x, 0.01, msg);
@@ -139,7 +139,7 @@ describe("Plots", () => {
     var svg: D3.Selection;
     var xScale: Plottable.Scale.Category;
     var yScale: Plottable.Scale.Linear;
-    var plot: Plottable.Plot.StackedBar<string, number>;
+    var plot: Plottable.Plots.StackedBar<string, number>;
     var SVG_WIDTH = 600;
     var SVG_HEIGHT = 400;
     var axisHeight = 0;
@@ -167,7 +167,7 @@ describe("Plots", () => {
         {x: "B", y: 4}
       ];
 
-      plot = new Plottable.Plot.StackedBar(xScale, yScale);
+      plot = new Plottable.Plots.StackedBar(xScale, yScale);
       plot.addDataset(data1);
       plot.addDataset(data2);
       plot.addDataset(data3);
@@ -175,7 +175,7 @@ describe("Plots", () => {
       plot.project("x", "x", xScale);
       plot.project("y", "y", yScale);
       plot.baseline(0);
-      var xAxis = new Plottable.Axis.Category(xScale, "bottom");
+      var xAxis = new Plottable.Axes.Category(xScale, "bottom");
       var table = new Plottable.Component.Table([[plot], [xAxis]]).renderTo(svg);
       axisHeight = xAxis.height();
     });
@@ -213,7 +213,7 @@ describe("Plots", () => {
     var dataset2: Plottable.Dataset;
     var xScale: Plottable.Scale.Linear;
     var yScale: Plottable.Scale.Category;
-    var renderer: Plottable.Plot.StackedBar<number, string>;
+    var renderer: Plottable.Plots.StackedBar<number, string>;
     var SVG_WIDTH = 600;
     var SVG_HEIGHT = 400;
     var rendererWidth: number;
@@ -235,13 +235,13 @@ describe("Plots", () => {
       dataset1 = new Plottable.Dataset(data1);
       dataset2 = new Plottable.Dataset(data2);
 
-      renderer = new Plottable.Plot.StackedBar(xScale, yScale, false);
+      renderer = new Plottable.Plots.StackedBar(xScale, yScale, false);
       renderer.project("y", "name", yScale);
       renderer.project("x", "y", xScale);
       renderer.addDataset(data1);
       renderer.addDataset(data2);
       renderer.baseline(0);
-      var yAxis = new Plottable.Axis.Category(yScale, "left");
+      var yAxis = new Plottable.Axes.Category(yScale, "left");
       var table = new Plottable.Component.Table([[yAxis, renderer]]).renderTo(svg);
       rendererWidth = renderer.width();
       bandWidth = yScale.rangeBand();
@@ -285,7 +285,7 @@ describe("Plots", () => {
 
   describe("Stacked Bar Plot Weird Values", () => {
     var svg: D3.Selection;
-    var plot: Plottable.Plot.StackedBar<string, number>;
+    var plot: Plottable.Plots.StackedBar<string, number>;
     var SVG_WIDTH = 600;
     var SVG_HEIGHT = 400;
 
@@ -310,13 +310,13 @@ describe("Plots", () => {
         {x: "C", y: 7, type: "c"}
       ];
 
-      plot = new Plottable.Plot.StackedBar(xScale, yScale);
+      plot = new Plottable.Plots.StackedBar(xScale, yScale);
       plot.addDataset(data1);
       plot.addDataset(data2);
       plot.addDataset(data3);
       plot.project("x", "x", xScale);
       plot.project("y", "y", yScale);
-      var xAxis = new Plottable.Axis.Category(xScale, "bottom");
+      var xAxis = new Plottable.Axes.Category(xScale, "bottom");
       var table = new Plottable.Component.Table([[plot], [xAxis]]).renderTo(svg);
     });
 
@@ -348,7 +348,7 @@ describe("Plots", () => {
 
   describe("Horizontal Stacked Bar Plot Non-Overlapping Datasets", () => {
     var svg: D3.Selection;
-    var plot: Plottable.Plot.StackedBar<number, string>;
+    var plot: Plottable.Plots.StackedBar<number, string>;
     var SVG_WIDTH = 600;
     var SVG_HEIGHT = 400;
 
@@ -373,7 +373,7 @@ describe("Plots", () => {
         {y: "C", x: 7, type: "c"}
       ];
 
-      plot = new Plottable.Plot.StackedBar(xScale, yScale, false);
+      plot = new Plottable.Plots.StackedBar(xScale, yScale, false);
       plot.addDataset(data1);
       plot.addDataset(data2);
       plot.addDataset(data3);
@@ -421,7 +421,7 @@ describe("Plots", () => {
       var xScale = new Plottable.Scale.Category();
       var yScale = new Plottable.Scale.Linear();
 
-      var plot = new Plottable.Plot.StackedBar(xScale, yScale);
+      var plot = new Plottable.Plots.StackedBar(xScale, yScale);
       plot.addDataset("d1", data1);
       plot.addDataset("d2", data2);
       plot.project("fill", "fill");
@@ -457,7 +457,7 @@ describe("Plots", () => {
       var xScale = new Plottable.Scale.Category();
       var yScale = new Plottable.Scale.Linear();
 
-      var plot = new Plottable.Plot.StackedBar(xScale, yScale);
+      var plot = new Plottable.Plots.StackedBar(xScale, yScale);
       plot.addDataset("d1", data1);
       plot.addDataset("d2", data2);
       plot.addDataset("d3", data3);

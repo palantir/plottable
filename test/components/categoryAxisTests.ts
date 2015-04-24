@@ -5,7 +5,7 @@ describe("Category Axes", () => {
   it("re-renders appropriately when data is changed", () => {
     var svg = generateSVG(400, 400);
     var xScale = new Plottable.Scale.Category().domain(["foo", "bar", "baz"]).range([400, 0]);
-    var ca = new Plottable.Axis.Category(xScale, "left");
+    var ca = new Plottable.Axes.Category(xScale, "left");
     ca.renderTo(svg);
     assert.deepEqual((<any> ca)._tickLabelContainer.selectAll(".tick-label").data(), xScale.domain(), "tick labels render domain");
     assert.doesNotThrow(() => xScale.domain(["bar", "baz", "bam"]));
@@ -16,7 +16,7 @@ describe("Category Axes", () => {
   it("requests appropriate space when the scale has no domain", () => {
     var svg = generateSVG(400, 400);
     var scale = new Plottable.Scale.Category();
-    var ca = new Plottable.Axis.Category(scale);
+    var ca = new Plottable.Axes.Category(scale);
     ca._anchor(svg);
     var s = ca._requestedSpace(400, 400);
     assert.operator(s.width, ">=", 0, "it requested 0 or more width");
@@ -30,7 +30,7 @@ describe("Category Axes", () => {
     var svg = generateSVG(1000, 400);
     var domain: any[] = [null, undefined, true, 2, "foo"];
     var scale = new Plottable.Scale.Category().domain(domain);
-    var axis = new Plottable.Axis.Category(scale);
+    var axis = new Plottable.Axes.Category(scale);
     axis.renderTo(svg);
     var texts = svg.selectAll("text")[0].map((s: any) => d3.select(s).text());
     assert.deepEqual(texts, ["null", "undefined", "true", "2", "foo"]);
@@ -41,7 +41,7 @@ describe("Category Axes", () => {
     var svg = generateSVG(400, 400);
     var domain = ["Air", "Bi", "Sea"];
     var scale = new Plottable.Scale.Category().domain(domain);
-    var axis = new Plottable.Axis.Category(scale, "bottom");
+    var axis = new Plottable.Axes.Category(scale, "bottom");
     var addPlane = (l: string) => l + "plane";
     axis.formatter(addPlane);
     axis.renderTo(svg);
@@ -56,7 +56,7 @@ describe("Category Axes", () => {
   it("width accounts for gutter. ticklength, and padding on vertical axes", () => {
     var svg = generateSVG(400, 400);
     var xScale = new Plottable.Scale.Category().domain(["foo", "bar", "baz"]).range([400, 0]);
-    var ca = new Plottable.Axis.Category(xScale, "left");
+    var ca = new Plottable.Axes.Category(xScale, "left");
     ca.renderTo(svg);
 
     var axisWidth = ca.width();
@@ -77,7 +77,7 @@ describe("Category Axes", () => {
   it("height accounts for gutter. ticklength, and padding on horizontal axes", () => {
     var svg = generateSVG(400, 400);
     var xScale = new Plottable.Scale.Category().domain(["foo", "bar", "baz"]).range([400, 0]);
-    var ca = new Plottable.Axis.Category(xScale, "bottom");
+    var ca = new Plottable.Axes.Category(xScale, "bottom");
     ca.renderTo(svg);
 
     var axisHeight = ca.height();
@@ -100,7 +100,7 @@ describe("Category Axes", () => {
     var svg = generateSVG(SVG_WIDTH, 100);
     var years = ["2000", "2001", "2002", "2003"];
     var scale = new Plottable.Scale.Category().domain(years).range([0, SVG_WIDTH]);
-    var axis = new Plottable.Axis.Category(scale, "bottom");
+    var axis = new Plottable.Axes.Category(scale, "bottom");
     axis.renderTo(svg);
 
     var ticks = (<any> axis)._content.selectAll("text");
@@ -129,7 +129,7 @@ describe("Category Axes", () => {
     var svg = generateSVG(300, 300);
     var years = ["2000", "2001", "2002", "2003"];
     var scale = new Plottable.Scale.Category().domain(years);
-    var axis = new Plottable.Axis.Category(scale, "bottom");
+    var axis = new Plottable.Axes.Category(scale, "bottom");
     axis.renderTo(svg);
     var requestedSpace = axis._requestedSpace(300, 10);
     assert.isTrue(requestedSpace.wantsHeight, "axis should ask for more space (horizontal orientation)");
@@ -152,7 +152,7 @@ describe("Category Axes", () => {
 
     var svg = generateSVG(400, 300);
     var yScale = new Plottable.Scale.Category();
-    var axis = new Plottable.Axis.Category(yScale, "left");
+    var axis = new Plottable.Axes.Category(yScale, "left");
     yScale.domain(["A", "B", "C"]);
     axis.renderTo(svg);
 
@@ -168,7 +168,7 @@ describe("Category Axes", () => {
     var svg = generateSVG(300, 300);
     var labels = ["label1", "label2", "label100"];
     var scale = new Plottable.Scale.Category().domain(labels);
-    var axis = new Plottable.Axis.Category(scale, "bottom");
+    var axis = new Plottable.Axes.Category(scale, "bottom");
     axis.renderTo(svg);
 
     var requestedSpace = axis._requestedSpace(300, 50);

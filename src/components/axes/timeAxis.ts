@@ -1,7 +1,7 @@
 ///<reference path="../../reference.ts" />
 
 module Plottable {
-export module Axis {
+export module Axes {
   /**
    * Defines a configuration for a time axis tier.
    * For details on how ticks are generated see: https://github.com/mbostock/d3/wiki/Time-Scales#ticks

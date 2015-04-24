@@ -18,7 +18,7 @@ describe("Plots", () => {
       var xScale = new Plottable.Scale.Linear().domain([0, 1]);
       var yScale = new Plottable.Scale.Linear().domain([0, 1]);
 
-      var linePlot = new Plottable.Plot.Line(xScale, yScale);
+      var linePlot = new Plottable.Plots.Line(xScale, yScale);
       linePlot.addDataset(dataWithNaN);
       linePlot.project("x", (d: any) => d.foo, xScale);
       linePlot.project("y", (d: any) => d.bar, yScale);
@@ -40,7 +40,7 @@ describe("Plots", () => {
       var svg = generateSVG(400, 400);
       var xScale = new Plottable.Scale.Linear();
       var yScale = new Plottable.Scale.Linear();
-      var plot = new Plottable.Plot.Line(xScale, yScale);
+      var plot = new Plottable.Plots.Line(xScale, yScale);
       plot.project("x", (d: any) => d.x, xScale);
       plot.project("y", (d: any) => d.y, yScale);
       assert.doesNotThrow(() => plot.renderTo(svg), Error);
@@ -59,7 +59,7 @@ describe("Plots", () => {
     var colorAccessor: any;
     var twoPointData = [{foo: 0, bar: 0}, {foo: 1, bar: 1}];
     var simpleDataset: Plottable.Dataset;
-    var linePlot: Plottable.Plot.Line<number>;
+    var linePlot: Plottable.Plots.Line<number>;
     var renderArea: D3.Selection;
 
     before(() => {
@@ -73,7 +73,7 @@ describe("Plots", () => {
     beforeEach(() => {
       svg = generateSVG(500, 500);
       simpleDataset = new Plottable.Dataset(twoPointData);
-      linePlot = new Plottable.Plot.Line(xScale, yScale);
+      linePlot = new Plottable.Plots.Line(xScale, yScale);
       linePlot.addDataset("s1", simpleDataset)
               .project("x", xAccessor, xScale)
               .project("y", yAccessor, yScale)
@@ -294,7 +294,7 @@ describe("Plots", () => {
       var d0Px: Plottable.Point, d1Px: Plottable.Point;
       var dataset3: any[];
 
-      function assertPlotDataEqual(expected: Plottable.Plot.PlotData, actual: Plottable.Plot.PlotData, msg: string) {
+      function assertPlotDataEqual(expected: Plottable.Plots.PlotData, actual: Plottable.Plots.PlotData, msg: string) {
         assert.deepEqual(expected.data, actual.data, msg);
         assert.closeTo(expected.pixelPoints[0].x, actual.pixelPoints[0].x, 0.01, msg);
         assert.closeTo(expected.pixelPoints[0].y, actual.pixelPoints[0].y, 0.01, msg);
@@ -370,7 +370,7 @@ describe("Plots", () => {
       });
 
       it("handles empty plots gracefully", () => {
-        linePlot = new Plottable.Plot.Line(xScale, yScale);
+        linePlot = new Plottable.Plots.Line(xScale, yScale);
 
         var closest = linePlot.getClosestPlotData({ x: d0Px.x, y: d0Px.y });
         assert.lengthOf(closest.data, 0);

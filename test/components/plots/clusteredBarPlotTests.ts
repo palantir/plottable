@@ -9,7 +9,7 @@ describe("Plots", () => {
     var dataset2: Plottable.Dataset;
     var xScale: Plottable.Scale.Category;
     var yScale: Plottable.Scale.Linear;
-    var renderer: Plottable.Plot.ClusteredBar<string, number>;
+    var renderer: Plottable.Plots.ClusteredBar<string, number>;
     var SVG_WIDTH = 600;
     var SVG_HEIGHT = 400;
     var axisHeight = 0;
@@ -43,13 +43,13 @@ describe("Plots", () => {
       dataset1 = new Plottable.Dataset(data1);
       dataset2 = new Plottable.Dataset(data2);
 
-      renderer = new Plottable.Plot.ClusteredBar<string, number>(xScale, yScale);
+      renderer = new Plottable.Plots.ClusteredBar<string, number>(xScale, yScale);
       renderer.addDataset(dataset1);
       renderer.addDataset(dataset2);
       renderer.baseline(0);
       renderer.project("x", "x", xScale);
       renderer.project("y", "y", yScale);
-      var xAxis = new Plottable.Axis.Category(xScale, "bottom");
+      var xAxis = new Plottable.Axes.Category(xScale, "bottom");
       var table = new Plottable.Component.Table([[renderer], [xAxis]]).renderTo(svg);
       axisHeight = xAxis.height();
       bandWidth = xScale.rangeBand();
@@ -102,7 +102,7 @@ describe("Plots", () => {
     var dataset2: Plottable.Dataset;
     var yScale: Plottable.Scale.Category;
     var xScale: Plottable.Scale.Linear;
-    var renderer: Plottable.Plot.ClusteredBar<number, string>;
+    var renderer: Plottable.Plots.ClusteredBar<number, string>;
     var SVG_WIDTH = 600;
     var SVG_HEIGHT = 400;
     var rendererWidth: number;
@@ -124,13 +124,13 @@ describe("Plots", () => {
       dataset1 = new Plottable.Dataset(data1);
       dataset2 = new Plottable.Dataset(data2);
 
-      renderer = new Plottable.Plot.ClusteredBar<number, string>(xScale, yScale, false);
+      renderer = new Plottable.Plots.ClusteredBar<number, string>(xScale, yScale, false);
       renderer.addDataset(data1);
       renderer.addDataset(data2);
       renderer.baseline(0);
       renderer.project("x", "x", xScale);
       renderer.project("y", "y", yScale);
-      var yAxis = new Plottable.Axis.Category(yScale, "left");
+      var yAxis = new Plottable.Axes.Category(yScale, "left");
       var table = new Plottable.Component.Table([[yAxis, renderer]]).renderTo(svg);
       rendererWidth = renderer.width();
       bandWidth = yScale.rangeBand();
@@ -177,7 +177,7 @@ describe("Plots", () => {
 
   describe("Clustered Bar Plot Missing Values", () => {
     var svg: D3.Selection;
-    var plot: Plottable.Plot.ClusteredBar<string, number>;
+    var plot: Plottable.Plots.ClusteredBar<string, number>;
 
     var numAttr = (s: D3.Selection, a: string) => parseFloat(s.attr(a));
 
@@ -192,14 +192,14 @@ describe("Plots", () => {
       var data2 = [{x: "A", y: 2}, {x: "B", y: 4}];
       var data3 = [{x: "B", y: 15}, {x: "C", y: 15}];
 
-      plot = new Plottable.Plot.ClusteredBar<string, number>(xScale, yScale);
+      plot = new Plottable.Plots.ClusteredBar<string, number>(xScale, yScale);
       plot.addDataset(data1);
       plot.addDataset(data2);
       plot.addDataset(data3);
       plot.baseline(0);
       plot.project("x", "x", xScale);
       plot.project("y", "y", yScale);
-      var xAxis = new Plottable.Axis.Category(xScale, "bottom");
+      var xAxis = new Plottable.Axes.Category(xScale, "bottom");
       new Plottable.Component.Table([[plot], [xAxis]]).renderTo(svg);
     });
 
@@ -240,7 +240,7 @@ describe("Plots", () => {
 
   describe("Horizontal Clustered Bar Plot Missing Values", () => {
     var svg: D3.Selection;
-    var plot: Plottable.Plot.ClusteredBar<number, string>;
+    var plot: Plottable.Plots.ClusteredBar<number, string>;
 
     beforeEach(() => {
       var SVG_WIDTH = 600;
@@ -253,7 +253,7 @@ describe("Plots", () => {
       var data2 = [{y: "A", x: 2}, {y: "B", x: 4}];
       var data3 = [{y: "B", x: 15}, {y: "C", x: 15}];
 
-      plot = new Plottable.Plot.ClusteredBar(xScale, yScale, false);
+      plot = new Plottable.Plots.ClusteredBar(xScale, yScale, false);
       plot.addDataset(data1);
       plot.addDataset(data2);
       plot.addDataset(data3);

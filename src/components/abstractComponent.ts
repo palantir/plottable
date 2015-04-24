@@ -153,13 +153,13 @@ export module Component {
 
     public _render() {
       if (this._isAnchored && this._isSetup && this.width() >= 0 && this.height() >= 0) {
-        Core.RenderController.registerToRender(this);
+        Core.RenderControllers.registerToRender(this);
       }
     }
 
     private _scheduleComputeLayout() {
       if (this._isAnchored && this._isSetup) {
-        Core.RenderController.registerToComputeLayout(this);
+        Core.RenderControllers.registerToComputeLayout(this);
       }
     }
 
@@ -214,7 +214,7 @@ export module Component {
       this._computeLayout();
       this._render();
       // flush so that consumers can immediately attach to stuff we create in the DOM
-      Core.RenderController.flush();
+      Core.RenderControllers.flush();
       return this;
     }
 
