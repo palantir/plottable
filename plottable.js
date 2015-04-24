@@ -9828,6 +9828,7 @@ var Plottable;
                 this._yScale = yScale;
                 this._dragInteraction = new Interaction.Drag();
                 this._setupDragInteraction();
+                this._touchIds = d3.map();
             }
             PanZoom.prototype._anchor = function (component, hitBox) {
                 var _this = this;
@@ -9835,6 +9836,49 @@ var Plottable;
                 this._dragInteraction._anchor(component, hitBox);
                 var mouseDispatcher = Plottable.Dispatcher.Mouse.getDispatcher(this._componentToListenTo.content().node());
                 mouseDispatcher.onWheel("Interaction.PanZoom" + this.getID(), function (p, e) { return _this._handleWheelEvent(p, e); });
+                this._touchDispatcher = Plottable.Dispatcher.Touch.getDispatcher(this._componentToListenTo.content().node());
+                this._touchDispatcher.onTouchStart("Interaction.PanZoom" + this.getID(), function (ids, idToPoint, e) { return _this._handleTouchStart(ids, idToPoint, e); });
+                this._touchDispatcher.onTouchMove("Interaction.PanZoom" + this.getID(), function (ids, idToPoint, e) { return _this._handleTouchMove(ids, idToPoint, e); });
+                this._touchDispatcher.onTouchEnd("Interaction.PanZoom" + this.getID(), function (ids, idToPoint, e) { return _this._handleTouchEnd(ids, idToPoint, e); });
+            };
+            PanZoom.prototype._handleTouchStart = function (ids, idToPoint, e) {
+                var _this = this;
+                ids.forEach(function (id) {
+                    if (_this._touchIds.size() === 2) {
+                        return;
+                    }
+                    _this._touchIds.set(id.toString(), _this._translateToComponentSpace(idToPoint[id]));
+                });
+            };
+            PanZoom.prototype._handleTouchMove = function (ids, idToPoint, e) {
+                var _this = this;
+                if (this._touchIds.size() !== 2) {
+                    return;
+                }
+                var oldAvgX = (this._touchIds.values()[1].x + this._touchIds.values()[0].x) / 2;
+                var oldAvgY = (this._touchIds.values()[1].y + this._touchIds.values()[0].y) / 2;
+                var oldDiffX = Math.abs(this._touchIds.values()[1].x - this._touchIds.values()[0].x);
+                var oldDiffY = Math.abs(this._touchIds.values()[1].y - this._touchIds.values()[0].y);
+                ids.forEach(function (id) {
+                    _this._touchIds.set(id.toString(), _this._translateToComponentSpace(idToPoint[id]));
+                });
+                var newAvgX = (this._touchIds.values()[1].x + this._touchIds.values()[0].x) / 2;
+                var newAvgY = (this._touchIds.values()[1].y + this._touchIds.values()[0].y) / 2;
+                var newDiffX = Math.abs(this._touchIds.values()[1].x - this._touchIds.values()[0].x);
+                var newDiffY = Math.abs(this._touchIds.values()[1].y - this._touchIds.values()[0].y);
+                if (this._xScale != null) {
+                    this._xScale.domain(PanZoom.magnify(this._xScale, oldDiffX / newDiffX, oldAvgX / 2));
+                }
+                if (this._yScale != null) {
+                    this._yScale.domain(PanZoom.magnify(this._yScale, oldDiffY / newDiffY, (oldAvgY + newAvgY) / 2));
+                }
+                console.log(oldDiffX / newDiffX);
+            };
+            PanZoom.prototype._handleTouchEnd = function (ids, idToPoint, e) {
+                var _this = this;
+                ids.forEach(function (id) {
+                    _this._touchIds.remove(id.toString());
+                });
             };
             PanZoom.magnify = function (scale, magnifyAmount, centerValue) {
                 var magnifyTransform = function (rangeValue) { return scale.invert(centerValue - (centerValue - rangeValue) * magnifyAmount); };
@@ -9859,20 +9903,19 @@ var Plottable;
                 }
             };
             PanZoom.prototype._setupDragInteraction = function () {
-                var _this = this;
-                var lastDragPoint;
-                this._dragInteraction.onDragStart(function () { return lastDragPoint = null; });
-                this._dragInteraction.onDrag(function (startPoint, endPoint) {
-                    if (_this._xScale != null) {
-                        var dragAmountX = endPoint.x - (lastDragPoint == null ? startPoint.x : lastDragPoint.x);
-                        _this._xScale.domain(PanZoom.translate(_this._xScale, -dragAmountX));
-                    }
-                    if (_this._yScale != null) {
-                        var dragAmountY = endPoint.y - (lastDragPoint == null ? startPoint.y : lastDragPoint.y);
-                        _this._yScale.domain(PanZoom.translate(_this._yScale, -dragAmountY));
-                    }
-                    lastDragPoint = endPoint;
-                });
+                //      var lastDragPoint: Point;
+                //      this._dragInteraction.onDragStart(() => lastDragPoint = null);
+                //      this._dragInteraction.onDrag((startPoint, endPoint) => {
+                //        if (this._xScale != null) {
+                //          var dragAmountX = endPoint.x - (lastDragPoint == null ? startPoint.x : lastDragPoint.x);
+                //          this._xScale.domain(PanZoom.translate(this._xScale, -dragAmountX));
+                //        }
+                //        if (this._yScale != null) {
+                //          var dragAmountY = endPoint.y - (lastDragPoint == null ? startPoint.y : lastDragPoint.y);
+                //          this._yScale.domain(PanZoom.translate(this._yScale, -dragAmountY));
+                //        }
+                //        lastDragPoint = endPoint;
+                //      });
             };
             /**
              * The number of pixels occupied in a line.
