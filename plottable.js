@@ -9298,9 +9298,9 @@ var Plottable;
             function Touch(svg) {
                 var _this = this;
                 _super.call(this);
-                this._lastTouchPositions = [];
                 this.translator = Plottable._Util.ClientToSVGTranslator.getTranslator(svg);
-                this._lastTouchPositions;
+                this._lastTouchPositions = [];
+                this._lastTouchIdentifiers = [];
                 this._startBroadcaster = new Plottable.Core.Broadcaster(this);
                 this._event2Callback["touchstart"] = function (e) { return _this._measureAndBroadcast(e, _this._startBroadcaster); };
                 this._moveBroadcaster = new Plottable.Core.Broadcaster(this);
@@ -9380,26 +9380,36 @@ var Plottable;
             Touch.prototype._measureAndBroadcast = function (e, b) {
                 var touches = e.changedTouches;
                 this._lastTouchPositions = [];
-                var ids = [];
+                this._lastTouchIdentifiers = [];
                 for (var i = 0; i < touches.length; i++) {
                     var touch = touches[i];
                     var touchID = touch.identifier;
                     var newTouchPosition = this.translator.computePosition(touch.clientX, touch.clientY);
                     if (newTouchPosition != null) {
-                        ids.push(touchID);
+                        this._lastTouchIdentifiers.push(touchID);
                         this._lastTouchPositions[touchID] = newTouchPosition;
                     }
                 }
                 ;
-                b.broadcast(this.getLastTouchPositions(), ids, e);
+                if (this.getLastTouchPositions().length > 0) {
+                    b.broadcast(this.getLastTouchPositions(), this.getLastTouchIdentifiers(), e);
+                }
             };
             /**
-             * Returns the last computed Touch position.
+             * Returns the last computed Touch positions.
              *
              * @return {Point} The last known Touch position in <svg> coordinate space.
              */
             Touch.prototype.getLastTouchPositions = function () {
                 return this._lastTouchPositions;
+            };
+            /**
+             * Returns the last computed Touch identifiers.
+             *
+             * @return {Point} The last known Touch position in <svg> coordinate space.
+             */
+            Touch.prototype.getLastTouchIdentifiers = function () {
+                return this._lastTouchIdentifiers;
             };
             /**
              * Dispatcher.Touch calls callbacks when touch events occur.
@@ -9558,8 +9568,8 @@ var Plottable;
                 this._mouseDispatcher.onMouseUp("Interaction.Click" + this.getID(), function (p) { return _this._handleClickUp(p); });
                 this._touchDispatcher = Plottable.Dispatcher.Touch.getDispatcher(component.content().node());
                 //TODO Deal with no point case
-                this._touchDispatcher.onTouchStart("Interaction.Click" + this.getID(), function (points, ids) { return _this._handleClickDown(points[ids[0]] || { x: -1, y: -1 }); });
-                this._touchDispatcher.onTouchEnd("Interaction.Click" + this.getID(), function (points, ids) { return _this._handleClickUp(points[ids[0]] || { x: -1, y: -1 }); });
+                this._touchDispatcher.onTouchStart("Interaction.Click" + this.getID(), function (points, ids) { return _this._handleClickDown(points[ids[0]]); });
+                this._touchDispatcher.onTouchEnd("Interaction.Click" + this.getID(), function (points, ids) { return _this._handleClickUp(points[ids[0]]); });
             };
             Click.prototype._handleClickDown = function (p) {
                 var translatedPoint = this._translateToComponentSpace(p);
@@ -9707,7 +9717,7 @@ var Plottable;
                 this._mouseDispatcher.onMouseMove("Interaction.Pointer" + this.getID(), function (p) { return _this._handlePointerEvent(p); });
                 this._touchDispatcher = Plottable.Dispatcher.Touch.getDispatcher(this._componentToListenTo.content().node());
                 //TODO Deal with no point case
-                this._touchDispatcher.onTouchStart("Interaction.Pointer" + this.getID(), function (points, ids) { return _this._handlePointerEvent(points[ids[0]] || { x: -1, y: -1 }); });
+                this._touchDispatcher.onTouchStart("Interaction.Pointer" + this.getID(), function (points, ids) { return _this._handlePointerEvent(points[ids[0]]); });
             };
             Pointer.prototype._handlePointerEvent = function (p) {
                 var translatedP = this._translateToComponentSpace(p);
@@ -10359,7 +10369,7 @@ var Plottable;
                 this._mouseDispatcher.onMouseMove("hover" + this.getID(), function (p) { return _this._handlePointerEvent(p); });
                 this._touchDispatcher = Plottable.Dispatcher.Touch.getDispatcher(this._componentToListenTo._element.node());
                 //TODO Deal with no point case
-                this._touchDispatcher.onTouchStart("hover" + this.getID(), function (points, ids) { return _this._handlePointerEvent(points[ids[0]] || { x: -1, y: -1 }); });
+                this._touchDispatcher.onTouchStart("hover" + this.getID(), function (points, ids) { return _this._handlePointerEvent(points[ids[0]]); });
             };
             Hover.prototype._handlePointerEvent = function (p) {
                 p = this._translateToComponentSpace(p);

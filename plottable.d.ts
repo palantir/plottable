@@ -3724,7 +3724,7 @@ declare module Plottable {
              */
             onTouchEnd(key: any, callback: TouchCallback): Dispatcher.Touch;
             /**
-             * Returns the last computed Touch position.
+             * Returns the last computed Touch positions.
              *
              * @return {Point} The last known Touch position in <svg> coordinate space.
              */
@@ -3732,6 +3732,12 @@ declare module Plottable {
                 x: number;
                 y: number;
             }[];
+            /**
+             * Returns the last computed Touch identifiers.
+             *
+             * @return {Point} The last known Touch position in <svg> coordinate space.
+             */
+            getLastTouchIdentifiers(): number[];
         }
     }
 }

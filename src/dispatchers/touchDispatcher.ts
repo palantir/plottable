@@ -13,7 +13,8 @@ export module Dispatcher {
 
     private static _DISPATCHER_KEY = "__Plottable_Dispatcher_Touch";
     private translator: _Util.ClientToSVGTranslator;
-    private _lastTouchPositions: Point[] = [];
+    private _lastTouchPositions: Point[];
+    private _lastTouchIdentifiers: number[];
     private _startBroadcaster: Core.Broadcaster<Dispatcher.Touch>;
     private _moveBroadcaster: Core.Broadcaster<Dispatcher.Touch>;
     private _endBroadcaster: Core.Broadcaster<Dispatcher.Touch>;
@@ -47,7 +48,8 @@ export module Dispatcher {
 
       this.translator = _Util.ClientToSVGTranslator.getTranslator(svg);
 
-      this._lastTouchPositions;
+      this._lastTouchPositions = [];
+      this._lastTouchIdentifiers = [];
 
       this._startBroadcaster = new Core.Broadcaster(this);
       this._event2Callback["touchstart"] = (e: TouchEvent) => this._measureAndBroadcast(e, this._startBroadcaster);
@@ -120,26 +122,37 @@ export module Dispatcher {
     private _measureAndBroadcast(e: TouchEvent, b: Core.Broadcaster<Dispatcher.Touch>) {
       var touches = e.changedTouches;
       this._lastTouchPositions = [];
-      var ids: number[] = [];
+      this._lastTouchIdentifiers = [];
       for (var i = 0; i < touches.length; i++) {
         var touch = touches[i];
         var touchID = touch.identifier;
         var newTouchPosition = this.translator.computePosition(touch.clientX, touch.clientY);
         if (newTouchPosition != null) {
-          ids.push(touchID);
+          this._lastTouchIdentifiers.push(touchID);
           this._lastTouchPositions[touchID] = newTouchPosition;
         }
       };
-      b.broadcast(this.getLastTouchPositions(), ids, e);
+      if (this.getLastTouchPositions().length > 0) {
+        b.broadcast(this.getLastTouchPositions(), this.getLastTouchIdentifiers(), e);
+      }
     }
 
     /**
-     * Returns the last computed Touch position.
+     * Returns the last computed Touch positions.
      *
      * @return {Point} The last known Touch position in <svg> coordinate space.
      */
     public getLastTouchPositions() {
       return this._lastTouchPositions;
+    }
+
+    /**
+     * Returns the last computed Touch identifiers.
+     *
+     * @return {Point} The last known Touch position in <svg> coordinate space.
+     */
+    public getLastTouchIdentifiers() {
+      return this._lastTouchIdentifiers;
     }
   }
 }

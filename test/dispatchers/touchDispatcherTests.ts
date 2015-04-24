@@ -15,15 +15,12 @@ describe("Dispatchers", () => {
       svg.remove();
     });
 
-    //TODO: fix test
-    it.skip("getLastTouchPosition() defaults to a non-null value", () => {
+    it("getLastTouchPositions() defaults to have no positions", () => {
       var svg = generateSVG();
 
       var td = Plottable.Dispatcher.Touch.getDispatcher(<SVGElement> svg.node());
       var p = td.getLastTouchPositions();
-      assert.isNotNull(p, "returns a value after initialization");
-      assert.isNotNull(p[0].x, "x value is set");
-      assert.isNotNull(p[0].y, "y value is set");
+      assert.deepEqual(p, [], "returns a value after initialization");
 
       svg.remove();
     });

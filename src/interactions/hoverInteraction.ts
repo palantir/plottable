@@ -65,7 +65,7 @@ export module Interaction {
 
       //TODO Deal with no point case
       this._touchDispatcher.onTouchStart("hover" + this.getID(), (points: Point[], ids: number[]) =>
-                                                                   this._handlePointerEvent(points[ids[0]]  || {x: -1, y: -1}));
+                                                                   this._handlePointerEvent(points[ids[0]]));
     }
 
     private _handlePointerEvent(p: Point) {

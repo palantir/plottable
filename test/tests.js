@@ -8924,14 +8924,11 @@ describe("Dispatchers", function () {
             assert.strictEqual(td1, td2, "returned the existing Dispatcher if called again with same <svg>");
             svg.remove();
         });
-        //TODO: fix test
-        it.skip("getLastTouchPosition() defaults to a non-null value", function () {
+        it("getLastTouchPositions() defaults to have no positions", function () {
             var svg = generateSVG();
             var td = Plottable.Dispatcher.Touch.getDispatcher(svg.node());
             var p = td.getLastTouchPositions();
-            assert.isNotNull(p, "returns a value after initialization");
-            assert.isNotNull(p[0].x, "x value is set");
-            assert.isNotNull(p[0].y, "y value is set");
+            assert.deepEqual(p, [], "returns a value after initialization");
             svg.remove();
         });
         it("onTouchStart()", function () {
