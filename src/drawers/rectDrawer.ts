@@ -93,7 +93,18 @@ export module Drawers {
       var y = this._isVertical ? rectY : rectY + rectHeight / 2;
       return { x: x, y: y };
     }
-  }
 
+    public draw(data: any[], drawSteps: DrawStep[], userMetadata: any, plotMetadata: Plots.PlotMetadata) {
+      var attrToProjector = drawSteps[0].attrToProjector;
+      var isValidNumber = Plottable.Utils.Methods.isValidNumber;
+      data = data.filter(function(e: any, i: number) {
+        return isValidNumber(attrToProjector["x"](e, null, userMetadata, plotMetadata)) &&
+               isValidNumber(attrToProjector["y"](e, null, userMetadata, plotMetadata)) &&
+               isValidNumber(attrToProjector["width"](e, null, userMetadata, plotMetadata)) &&
+               isValidNumber(attrToProjector["height"](e, null, userMetadata, plotMetadata));
+      });
+      return super.draw(data, drawSteps, userMetadata, plotMetadata);
+    }
+  }
 }
 }

@@ -119,6 +119,11 @@ declare module Plottable {
              */
             function isNaN(n: any): boolean;
             /**
+             * Returns true if the argument is a number, which is not NaN
+             * Numbers represented as strings do not pass this function
+             */
+            function isValidNumber(n: any): boolean;
+            /**
              * Creates shallow copy of map.
              * @param {{ [key: string]: any }} oldMap Map to copy
              *
@@ -1529,6 +1534,7 @@ declare module Plottable {
             _getIfLabelsTooWide(): boolean;
             drawText(data: any[], attrToProjector: AttributeToProjector, userMetadata: any, plotMetadata: Plots.PlotMetadata): void;
             _getPixelPoint(datum: any, index: number): Point;
+            draw(data: any[], drawSteps: DrawStep[], userMetadata: any, plotMetadata: Plots.PlotMetadata): number;
         }
     }
 }
@@ -3804,14 +3810,19 @@ declare module Plottable {
     module Interactions {
         class DoubleClick extends AbstractInteraction {
             _anchor(component: Components.AbstractComponent, hitBox: D3.Selection): void;
-            _requiresHitbox(): boolean;
-            protected _listenTo(): string;
             /**
-             * Sets a callback to be called when a click is received.
+             * Gets the callback called when the Component is double-clicked.
              *
-             * @param {(p: Point) => any} cb Callback that takes the pixel position of the click event.
+             * @return {(p: Point) => any} The current callback.
              */
-            callback(cb: (p: Point) => any): DoubleClick;
+            onDoubleClick(): (p: Point) => any;
+            /**
+             * Sets the callback called when the Component is double-clicked.
+             *
+             * @param {(p: Point) => any} callback The callback to set.
+             * @return {Interaction.DoubleClick} The calling Interaction.DoubleClick.
+             */
+            onDoubleClick(callback: (p: Point) => any): Interactions.DoubleClick;
         }
     }
 }
@@ -4042,79 +4053,77 @@ declare module Plottable {
 
 declare module Plottable {
     module Components {
-        module Interactive {
-            class DragBoxLayer extends Components.SelectionBoxLayer {
-                protected _hasCorners: boolean;
-                constructor();
-                protected _setup(): void;
-                _doRender(): void;
-                /**
-                 * Gets the detection radius of the drag box.
-                 *
-                 * @return {number} The detection radius of the drag box.
-                 */
-                detectionRadius(): number;
-                /**
-                 * Sets the detection radius of the drag box.
-                 *
-                 * @param {number} r The desired detection radius.
-                 * @return {DragBoxLayer} The calling DragBoxLayer.
-                 */
-                detectionRadius(r: number): DragBoxLayer;
-                /**
-                 * Gets whether or not the drag box is resizable.
-                 *
-                 * @return {boolean} Whether or not the drag box is resizable.
-                 */
-                resizable(): boolean;
-                /**
-                 * Sets whether or not the drag box is resizable.
-                 *
-                 * @param {boolean} canResize Whether or not the drag box should be resizable.
-                 * @return {DragBoxLayer} The calling DragBoxLayer.
-                 */
-                resizable(canResize: boolean): DragBoxLayer;
-                protected _setResizableClasses(canResize: boolean): void;
-                /**
-                 * Gets the callback that is called when dragging starts.
-                 *
-                 * @returns {(b: Bounds) => any} The callback called when dragging starts.
-                 */
-                onDragStart(): (b: Bounds) => any;
-                /**
-                 * Sets the callback to be called when dragging starts.
-                 *
-                 * @param {(b: Bounds) => any} cb The callback to be called. Passed the current Bounds in pixels.
-                 * @returns {DragBoxLayer} The calling DragBoxLayer.
-                 */
-                onDragStart(cb: (b: Bounds) => any): DragBoxLayer;
-                /**
-                 * Gets the callback that is called during dragging.
-                 *
-                 * @returns {(b: Bounds) => any} The callback called during dragging.
-                 */
-                onDrag(): (b: Bounds) => any;
-                /**
-                 * Sets a callback to be called during dragging.
-                 *
-                 * @param {(b: Bounds) => any} cb The callback to be called. Passed the current Bounds in pixels.
-                 * @returns {DragBoxLayer} The calling DragBoxLayer.
-                 */
-                onDrag(cb: (b: Bounds) => any): DragBoxLayer;
-                /**
-                 * Gets the callback that is called when dragging ends.
-                 *
-                 * @returns {(b: Bounds) => any} The callback called when dragging ends.
-                 */
-                onDragEnd(): (b: Bounds) => any;
-                /**
-                 * Sets a callback to be called when the dragging ends.
-                 *
-                 * @param {(b: Bounds) => any} cb The callback to be called. Passed the current Bounds in pixels.
-                 * @returns {DragBoxLayer} The calling DragBoxLayer.
-                 */
-                onDragEnd(cb: (b: Bounds) => any): DragBoxLayer;
-            }
+        class DragBoxLayer extends Components.SelectionBoxLayer {
+            protected _hasCorners: boolean;
+            constructor();
+            protected _setup(): void;
+            _doRender(): void;
+            /**
+             * Gets the detection radius of the drag box.
+             *
+             * @return {number} The detection radius of the drag box.
+             */
+            detectionRadius(): number;
+            /**
+             * Sets the detection radius of the drag box.
+             *
+             * @param {number} r The desired detection radius.
+             * @return {DragBoxLayer} The calling DragBoxLayer.
+             */
+            detectionRadius(r: number): DragBoxLayer;
+            /**
+             * Gets whether or not the drag box is resizable.
+             *
+             * @return {boolean} Whether or not the drag box is resizable.
+             */
+            resizable(): boolean;
+            /**
+             * Sets whether or not the drag box is resizable.
+             *
+             * @param {boolean} canResize Whether or not the drag box should be resizable.
+             * @return {DragBoxLayer} The calling DragBoxLayer.
+             */
+            resizable(canResize: boolean): DragBoxLayer;
+            protected _setResizableClasses(canResize: boolean): void;
+            /**
+             * Gets the callback that is called when dragging starts.
+             *
+             * @returns {(b: Bounds) => any} The callback called when dragging starts.
+             */
+            onDragStart(): (b: Bounds) => any;
+            /**
+             * Sets the callback to be called when dragging starts.
+             *
+             * @param {(b: Bounds) => any} cb The callback to be called. Passed the current Bounds in pixels.
+             * @returns {DragBoxLayer} The calling DragBoxLayer.
+             */
+            onDragStart(cb: (b: Bounds) => any): DragBoxLayer;
+            /**
+             * Gets the callback that is called during dragging.
+             *
+             * @returns {(b: Bounds) => any} The callback called during dragging.
+             */
+            onDrag(): (b: Bounds) => any;
+            /**
+             * Sets a callback to be called during dragging.
+             *
+             * @param {(b: Bounds) => any} cb The callback to be called. Passed the current Bounds in pixels.
+             * @returns {DragBoxLayer} The calling DragBoxLayer.
+             */
+            onDrag(cb: (b: Bounds) => any): DragBoxLayer;
+            /**
+             * Gets the callback that is called when dragging ends.
+             *
+             * @returns {(b: Bounds) => any} The callback called when dragging ends.
+             */
+            onDragEnd(): (b: Bounds) => any;
+            /**
+             * Sets a callback to be called when the dragging ends.
+             *
+             * @param {(b: Bounds) => any} cb The callback to be called. Passed the current Bounds in pixels.
+             * @returns {DragBoxLayer} The calling DragBoxLayer.
+             */
+            onDragEnd(cb: (b: Bounds) => any): DragBoxLayer;
         }
     }
 }
@@ -4122,13 +4131,11 @@ declare module Plottable {
 
 declare module Plottable {
     module Components {
-        module Interactive {
-            class XDragBoxLayer extends DragBoxLayer {
-                constructor();
-                _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;
-                protected _setBounds(newBounds: Bounds): void;
-                protected _setResizableClasses(canResize: boolean): void;
-            }
+        class XDragBoxLayer extends DragBoxLayer {
+            constructor();
+            _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;
+            protected _setBounds(newBounds: Bounds): void;
+            protected _setResizableClasses(canResize: boolean): void;
         }
     }
 }
@@ -4136,13 +4143,11 @@ declare module Plottable {
 
 declare module Plottable {
     module Components {
-        module Interactive {
-            class YDragBoxLayer extends DragBoxLayer {
-                constructor();
-                _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;
-                protected _setBounds(newBounds: Bounds): void;
-                protected _setResizableClasses(canResize: boolean): void;
-            }
+        class YDragBoxLayer extends DragBoxLayer {
+            constructor();
+            _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;
+            protected _setBounds(newBounds: Bounds): void;
+            protected _setResizableClasses(canResize: boolean): void;
         }
     }
 }

@@ -63,6 +63,7 @@
 ///<reference path="interactions/pointerInteractionTests.ts" />
 ///<reference path="interactions/hoverInteractionTests.ts" />
 ///<reference path="interactions/clickInteractionTests.ts" />
+///<reference path="interactions/doubleClickInteractionTests.ts" />
 ///<reference path="interactions/dragInteractionTests.ts" />
 
 ///<reference path="dispatchers/dispatcherTests.ts" />
@@ -70,6 +71,6 @@
 ///<reference path="dispatchers/touchDispatcherTests.ts" />
 ///<reference path="dispatchers/keyDispatcherTests.ts" />
 
-///<reference path="components/interactive/dragBoxLayerTests.ts" />
-///<reference path="components/interactive/xDragBoxLayerTests.ts" />
-///<reference path="components/interactive/yDragBoxLayerTests.ts" />
+///<reference path="components/dragBoxLayerTests.ts" />
+///<reference path="components/xDragBoxLayerTests.ts" />
+///<reference path="components/yDragBoxLayerTests.ts" />
