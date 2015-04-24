@@ -63,8 +63,8 @@ export module Interaction {
 
       this._touchDispatcher = Dispatcher.Touch.getDispatcher(<SVGElement> (<any> this._componentToListenTo)._element.node());
 
-      this._touchDispatcher.onTouchStart("hover" + this.getID(), (points: Point[], ids: number[]) =>
-                                                                   this._handlePointerEvent(points[ids[0]]));
+      this._touchDispatcher.onTouchStart("hover" + this.getID(), (ids: number[], idToPoint: Dispatcher.IdToPoint) =>
+                                                                   this._handlePointerEvent(idToPoint[ids[0]]));
     }
 
     private _handlePointerEvent(p: Point) {

@@ -9273,7 +9273,7 @@ describe("Dispatchers", function () {
             };
             var td = Plottable.Dispatcher.Touch.getDispatcher(target.node());
             var callbackWasCalled = false;
-            var callback = function (points, ids, e) {
+            var callback = function (ids, points, e) {
                 callbackWasCalled = true;
                 assertPointsClose(points[ids[0]], expectedPoint, 0.5, "touch position is correct");
                 assert.isNotNull(e, "TouchEvent was passed to the Dispatcher");
@@ -9298,7 +9298,7 @@ describe("Dispatchers", function () {
             };
             var td = Plottable.Dispatcher.Touch.getDispatcher(target.node());
             var callbackWasCalled = false;
-            var callback = function (points, ids, e) {
+            var callback = function (ids, points, e) {
                 callbackWasCalled = true;
                 assertPointsClose(points[ids[0]], expectedPoint, 0.5, "touch position is correct");
                 assert.isNotNull(e, "TouchEvent was passed to the Dispatcher");
@@ -9323,7 +9323,7 @@ describe("Dispatchers", function () {
             };
             var td = Plottable.Dispatcher.Touch.getDispatcher(target.node());
             var callbackWasCalled = false;
-            var callback = function (points, ids, e) {
+            var callback = function (ids, points, e) {
                 callbackWasCalled = true;
                 assertPointsClose(points[ids[0]], expectedPoint, 0.5, "touch position is correct");
                 assert.isNotNull(e, "TouchEvent was passed to the Dispatcher");
@@ -9344,7 +9344,7 @@ describe("Dispatchers", function () {
             var targetY = 76;
             var td = Plottable.Dispatcher.Touch.getDispatcher(target.node());
             var callbackWasCalled = false;
-            var callback = function (points, ids, e) {
+            var callback = function (ids, points, e) {
                 callbackWasCalled = true;
                 assert.isNotNull(e, "TouchEvent was passed to the Dispatcher");
             };

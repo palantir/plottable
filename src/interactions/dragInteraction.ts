@@ -24,11 +24,11 @@ export module Interaction {
 
       this._touchDispatcher = Dispatcher.Touch.getDispatcher(<SVGElement> this._componentToListenTo.content().node());
       this._touchDispatcher.onTouchStart("Interaction.Drag" + this.getID(),
-        (points: Point[], ids: number[], e: TouchEvent) => this._startDrag(points[ids[0]], e));
+        (ids: number[], idToPoint: Dispatcher.IdToPoint, e: TouchEvent) => this._startDrag(idToPoint[ids[0]], e));
       this._touchDispatcher.onTouchMove("Interaction.Drag" + this.getID(),
-        (points: Point[], ids: number[], e: TouchEvent) => this._doDrag(points[ids[0]], e));
+        (ids: number[], idToPoint: Dispatcher.IdToPoint, e: TouchEvent) => this._doDrag(idToPoint[ids[0]], e));
       this._touchDispatcher.onTouchEnd("Interaction.Drag" + this.getID(),
-        (points: Point[], ids: number[], e: TouchEvent) => this._endDrag(points[ids[0]], e));
+        (ids: number[], idToPoint: Dispatcher.IdToPoint, e: TouchEvent) => this._endDrag(idToPoint[ids[0]], e));
     }
 
     private _translateAndConstrain(p: Point) {
