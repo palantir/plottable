@@ -8872,6 +8872,123 @@ var Plottable;
     })(Plot = Plottable.Plot || (Plottable.Plot = {}));
 })(Plottable || (Plottable = {}));
 
+///<reference path="../../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    var Plot;
+    (function (Plot) {
+        var Waterfall = (function (_super) {
+            __extends(Waterfall, _super);
+            /**
+             * Constructs a WaterfallPlot.
+             *
+             * A WaterfallPlot is used to display the deltas between certain bar values that are marked as base values.
+             *
+             * @constructor
+             * @param {Scale.AbstractScale} xScale The x scale to use.
+             * @param {Scale.AbstractQuantitative} yScale The y scale to use.
+             * @param {Scale.Color|Scale.InterpolatedColor} colorScale The color scale
+             * to use for each grid cell.
+             */
+            function Waterfall(xScale, yScale, colorScale) {
+                _super.call(this, xScale, yScale);
+                this.classed("waterfall-plot", true);
+                this._colorScale = colorScale;
+                this.animator("cells", new Plottable.Animator.Null());
+            }
+            Waterfall.prototype.addDataset = function (keyOrDataset, dataset) {
+                if (this._datasetKeysInOrder.length === 1) {
+                    Plottable._Util.Methods.warn("Only one dataset is supported in Waterfall plots");
+                    return this;
+                }
+                _super.prototype.addDataset.call(this, keyOrDataset, dataset);
+                return this;
+            };
+            Waterfall.prototype._getDrawer = function (key) {
+                return new Plottable._Drawer.Rect(key, true);
+            };
+            /**
+             * @param {string} attrToSet One of ["x", "y", "x2", "y2", "fill"]. If "fill" is used,
+             * the data should return a valid CSS color.
+             */
+            Waterfall.prototype.project = function (attrToSet, accessor, scale) {
+                var _this = this;
+                _super.prototype.project.call(this, attrToSet, accessor, scale);
+                if (attrToSet === "x") {
+                    if (scale instanceof Plottable.Scale.Category) {
+                        this.project("x1", function (d, i, u, m) {
+                            return scale.scale(_this._projections["x"].accessor(d, i, u, m)) - scale.rangeBand() / 2;
+                        });
+                        this.project("x2", function (d, i, u, m) {
+                            return scale.scale(_this._projections["x"].accessor(d, i, u, m)) + scale.rangeBand() / 2;
+                        });
+                    }
+                    if (scale instanceof Plottable.Scale.AbstractQuantitative) {
+                        this.project("x1", function (d, i, u, m) {
+                            return scale.scale(_this._projections["x"].accessor(d, i, u, m));
+                        });
+                    }
+                }
+                if (attrToSet === "y") {
+                    if (scale instanceof Plottable.Scale.AbstractQuantitative) {
+                        this.project("y1", function (d, i, u, m) {
+                            var data = _this.datasets()[0].data();
+                            if (i === 0 || data[i].y === data[i - 1].y) {
+                                return scale.scale(scale.domain()[0]);
+                            }
+                            if (data[i].y > data[i - 1].y) {
+                                return scale.scale(_this._projections["y"].accessor(d, i, u, m));
+                            }
+                            else {
+                                return scale.scale(data[i - 1].y);
+                            }
+                        });
+                        this.project("y2", function (d, i, u, m) {
+                            var data = _this.datasets()[0].data();
+                            if (i === 0 || data[i].y === data[i - 1].y) {
+                                return scale.scale(_this._projections["y"].accessor(d, i, u, m));
+                            }
+                            if (data[i].y > data[i - 1].y) {
+                                return scale.scale(data[i - 1].y);
+                            }
+                            else {
+                                return scale.scale(_this._projections["y"].accessor(d, i, u, m));
+                            }
+                        });
+                        this.project("class", function (d, i, u, m) {
+                            var data = _this.datasets()[0].data();
+                            if (i === 0 || data[i].y === data[i - 1].y) {
+                                return "waterfall-base";
+                            }
+                            if (data[i].y > data[i - 1].y) {
+                                return "waterfall-growth";
+                            }
+                            else {
+                                return "waterfall-decline";
+                            }
+                        });
+                    }
+                }
+                if (attrToSet === "fill") {
+                    this._colorScale = this._projections["fill"].scale;
+                }
+                return this;
+            };
+            Waterfall.prototype._generateDrawSteps = function () {
+                return [{ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("cells") }];
+            };
+            return Waterfall;
+        })(Plot.Rectangle);
+        Plot.Waterfall = Waterfall;
+    })(Plot = Plottable.Plot || (Plottable.Plot = {}));
+})(Plottable || (Plottable = {}));
+
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
