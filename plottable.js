@@ -6591,10 +6591,10 @@ var Plottable;
             };
             AbstractPlot.prototype._getAnimator = function (key) {
                 if (this._animate && this._animateOnNextRender) {
-                    return this._animators[key] || new Plottable.Animator.Null();
+                    return this._animators[key] || new Plottable.Animators.Null();
                 }
                 else {
-                    return new Plottable.Animator.Null();
+                    return new Plottable.Animators.Null();
                 }
             };
             AbstractPlot.prototype._onDatasetUpdate = function () {
@@ -6817,7 +6817,7 @@ var Plottable;
                 return this._datasetKeysInOrder.map(function (k) { return _this._key2PlotDatasetKey.get(k).drawer; });
             };
             AbstractPlot.prototype._generateDrawSteps = function () {
-                return [{ attrToProjector: this._generateAttrToProjector(), animator: new Plottable.Animator.Null() }];
+                return [{ attrToProjector: this._generateAttrToProjector(), animator: new Plottable.Animators.Null() }];
             };
             AbstractPlot.prototype._additionalPaint = function (time) {
                 // no-op
@@ -7343,8 +7343,8 @@ var Plottable;
                 this._closeDetectionRadius = 5;
                 this.classed("scatter-plot", true);
                 this._defaultFillColor = new Plottable.Scale.Color().range()[0];
-                this.animator("symbols-reset", new Plottable.Animator.Null());
-                this.animator("symbols", new Plottable.Animator.Base().duration(250).delay(5));
+                this.animator("symbols-reset", new Plottable.Animators.Null());
+                this.animator("symbols", new Plottable.Animators.Base().duration(250).delay(5));
             }
             Scatter.prototype._getDrawer = function (key) {
                 return new Plottable._Drawer.Symbol(key);
@@ -7493,7 +7493,7 @@ var Plottable;
                     yScale.innerPadding(0).outerPadding(0);
                 }
                 this._colorScale = colorScale;
-                this.animator("cells", new Plottable.Animator.Null());
+                this.animator("cells", new Plottable.Animators.Null());
             }
             Grid.prototype.addDataset = function (keyOrDataset, dataset) {
                 if (this._datasetKeysInOrder.length === 1) {
@@ -7588,9 +7588,9 @@ var Plottable;
                 this._hideBarsIfAnyAreTooWide = true;
                 this.classed("bar-plot", true);
                 this._defaultFillColor = new Plottable.Scale.Color().range()[0];
-                this.animator("bars-reset", new Plottable.Animator.Null());
-                this.animator("bars", new Plottable.Animator.Base());
-                this.animator("baseline", new Plottable.Animator.Null());
+                this.animator("bars-reset", new Plottable.Animators.Null());
+                this.animator("bars", new Plottable.Animators.Base());
+                this.animator("baseline", new Plottable.Animators.Null());
                 this._isVertical = isVertical;
                 this.baseline(0);
             }
@@ -8060,8 +8060,8 @@ var Plottable;
                 _super.call(this, xScale, yScale);
                 this._hoverDetectionRadius = 15;
                 this.classed("line-plot", true);
-                this.animator("reset", new Plottable.Animator.Null());
-                this.animator("main", new Plottable.Animator.Base().duration(600).easing("exp-in-out"));
+                this.animator("reset", new Plottable.Animators.Null());
+                this.animator("main", new Plottable.Animators.Base().duration(600).easing("exp-in-out"));
                 this._defaultStrokeColor = new Plottable.Scale.Color().range()[0];
             }
             Line.prototype._setup = function () {
@@ -8282,8 +8282,8 @@ var Plottable;
                 _super.call(this, xScale, yScale);
                 this.classed("area-plot", true);
                 this.project("y0", 0, yScale); // default
-                this.animator("reset", new Plottable.Animator.Null());
-                this.animator("main", new Plottable.Animator.Base().duration(600).easing("exp-in-out"));
+                this.animator("reset", new Plottable.Animators.Null());
+                this.animator("main", new Plottable.Animators.Base().duration(600).easing("exp-in-out"));
                 this._defaultFillColor = new Plottable.Scale.Color().range()[0];
             }
             Area.prototype._onDatasetUpdate = function () {
@@ -8661,7 +8661,7 @@ var Plottable;
                 return new Plottable._Drawer.Area(key).drawLine(false);
             };
             StackedArea.prototype._getAnimator = function (key) {
-                return new Plottable.Animator.Null();
+                return new Plottable.Animators.Null();
             };
             StackedArea.prototype._setup = function () {
                 _super.prototype._setup.call(this);
@@ -8799,10 +8799,10 @@ var Plottable;
                     else if (key === "stacked-bar") {
                         var primaryScale = this._isVertical ? this._yScale : this._xScale;
                         var scaledBaseline = primaryScale.scale(this.baseline());
-                        return new Plottable.Animator.MovingRect(scaledBaseline, this._isVertical);
+                        return new Plottable.Animators.MovingRect(scaledBaseline, this._isVertical);
                     }
                 }
-                return new Plottable.Animator.Null();
+                return new Plottable.Animators.Null();
             };
             StackedBar.prototype._generateAttrToProjector = function () {
                 var _this = this;
@@ -8875,16 +8875,16 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    var Animator;
-    (function (Animator) {
-    })(Animator = Plottable.Animator || (Plottable.Animator = {}));
+    var Animators;
+    (function (Animators) {
+    })(Animators = Plottable.Animators || (Plottable.Animators = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    var Animator;
-    (function (Animator) {
+    var Animators;
+    (function (Animators) {
         /**
          * An animator implementation with no animation. The attributes are
          * immediately set on the selection.
@@ -8900,15 +8900,15 @@ var Plottable;
             };
             return Null;
         })();
-        Animator.Null = Null;
-    })(Animator = Plottable.Animator || (Plottable.Animator = {}));
+        Animators.Null = Null;
+    })(Animators = Plottable.Animators || (Plottable.Animators = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    var Animator;
-    (function (Animator) {
+    var Animators;
+    (function (Animators) {
         /**
          * The base animator implementation with easing, duration, and delay.
          *
@@ -9014,8 +9014,8 @@ var Plottable;
             Base.DEFAULT_EASING = "exp-out";
             return Base;
         })();
-        Animator.Base = Base;
-    })(Animator = Plottable.Animator || (Plottable.Animator = {}));
+        Animators.Base = Base;
+    })(Animators = Plottable.Animators || (Plottable.Animators = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -9027,8 +9027,8 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
-    var Animator;
-    (function (Animator) {
+    var Animators;
+    (function (Animators) {
         /**
          * The default animator implementation with easing, duration, and delay.
          */
@@ -9065,9 +9065,9 @@ var Plottable;
             };
             Rect.ANIMATED_ATTRIBUTES = ["height", "width", "x", "y", "fill"];
             return Rect;
-        })(Animator.Base);
-        Animator.Rect = Rect;
-    })(Animator = Plottable.Animator || (Plottable.Animator = {}));
+        })(Animators.Base);
+        Animators.Rect = Rect;
+    })(Animators = Plottable.Animators || (Plottable.Animators = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -9079,8 +9079,8 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
-    var Animator;
-    (function (Animator) {
+    var Animators;
+    (function (Animators) {
         /**
          * A child class of RectAnimator that will move the rectangle
          * as well as animate its growth.
@@ -9102,9 +9102,9 @@ var Plottable;
                 return d3.functor(this.startPixelValue);
             };
             return MovingRect;
-        })(Animator.Rect);
-        Animator.MovingRect = MovingRect;
-    })(Animator = Plottable.Animator || (Plottable.Animator = {}));
+        })(Animators.Rect);
+        Animators.MovingRect = MovingRect;
+    })(Animators = Plottable.Animators || (Plottable.Animators = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />

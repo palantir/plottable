@@ -1,7 +1,7 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Animator {
+export module Animators {
 
   /**
    * The default animator implementation with easing, duration, and delay.

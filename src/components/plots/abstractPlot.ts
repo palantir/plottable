@@ -31,7 +31,7 @@ export module Plot {
     protected _projections: { [attrToSet: string]: _Projection; } = {};
 
     protected _animate: boolean = false;
-    private _animators: Animator.PlotAnimatorMap = {};
+    private _animators: Animators.PlotAnimatorMap = {};
     protected _animateOnNextRender = true;
     private _nextSeriesIndex: number;
 
@@ -129,11 +129,11 @@ export module Plot {
       return new _Drawer.AbstractDrawer(key);
     }
 
-    protected _getAnimator(key: string): Animator.PlotAnimator {
+    protected _getAnimator(key: string): Animators.PlotAnimator {
       if (this._animate && this._animateOnNextRender) {
-        return this._animators[key] || new Animator.Null();
+        return this._animators[key] || new Animators.Null();
       } else {
-        return new Animator.Null();
+        return new Animators.Null();
       }
     }
 
@@ -285,7 +285,7 @@ export module Plot {
      *
      * @return {PlotAnimator} The Animator for the specified key.
      */
-    public animator(animatorKey: string): Animator.PlotAnimator;
+    public animator(animatorKey: string): Animators.PlotAnimator;
     /**
      * Set the animator associated with the specified Animator key.
      *
@@ -294,8 +294,8 @@ export module Plot {
      * the specified key.
      * @returns {Plot} The calling Plot.
      */
-    public animator(animatorKey: string, animator: Animator.PlotAnimator): AbstractPlot;
-    public animator(animatorKey: string, animator?: Animator.PlotAnimator): any {
+    public animator(animatorKey: string, animator: Animators.PlotAnimator): AbstractPlot;
+    public animator(animatorKey: string, animator?: Animators.PlotAnimator): any {
       if (animator === undefined){
         return this._animators[animatorKey];
       } else {
@@ -399,7 +399,7 @@ export module Plot {
     }
 
     protected _generateDrawSteps(): _Drawer.DrawStep[] {
-      return [{attrToProjector: this._generateAttrToProjector(), animator: new Animator.Null()}];
+      return [{attrToProjector: this._generateAttrToProjector(), animator: new Animators.Null()}];
     }
 
     protected _additionalPaint(time: number) {

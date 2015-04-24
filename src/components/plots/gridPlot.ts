@@ -31,7 +31,7 @@ export module Plot {
       }
 
       this._colorScale = colorScale;
-      this.animator("cells", new Animator.Null());
+      this.animator("cells", new Animators.Null());
     }
 
     public addDataset(keyOrDataset: any, dataset?: any) {

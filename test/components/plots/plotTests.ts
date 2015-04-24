@@ -451,7 +451,7 @@ describe("Plots", () => {
     });
 
     it("additionalPaint timing works properly", () => {
-      var animator = new Plottable.Animator.Base().delay(10).duration(10).maxIterativeDelay(0);
+      var animator = new Plottable.Animators.Base().delay(10).duration(10).maxIterativeDelay(0);
       var x = new Plottable.Scale.Linear();
       var y = new Plottable.Scale.Linear();
       var plot = new Plottable.Plot.Bar(x, y).addDataset([]).animate(true);
@@ -470,7 +470,7 @@ describe("Plots", () => {
     });
 
     it("extent calculation done in correct dataset order", () => {
-      var animator = new Plottable.Animator.Base().delay(10).duration(10).maxIterativeDelay(0);
+      var animator = new Plottable.Animators.Base().delay(10).duration(10).maxIterativeDelay(0);
       var CategoryScale = new Plottable.Scale.Category();
       var dataset1 = [{key: "A"}];
       var dataset2 = [{key: "B"}];

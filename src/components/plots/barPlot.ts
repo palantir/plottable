@@ -29,9 +29,9 @@ export module Plot {
       super(xScale, yScale);
       this.classed("bar-plot", true);
       this._defaultFillColor = new Scale.Color().range()[0];
-      this.animator("bars-reset", new Animator.Null());
-      this.animator("bars", new Animator.Base());
-      this.animator("baseline", new Animator.Null());
+      this.animator("bars-reset", new Animators.Null());
+      this.animator("bars", new Animators.Base());
+      this.animator("baseline", new Animators.Null());
       this._isVertical = isVertical;
       this.baseline(0);
     }

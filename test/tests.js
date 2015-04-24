@@ -333,8 +333,8 @@ describe("Drawers", function () {
             svg.remove(); // no point keeping it around since we don't draw anything in it anyway
         });
         it("drawer timing works as expected for null animators", function () {
-            var a1 = new Plottable.Animator.Null();
-            var a2 = new Plottable.Animator.Null();
+            var a1 = new Plottable.Animators.Null();
+            var a2 = new Plottable.Animators.Null();
             var ds1 = { attrToProjector: {}, animator: a1 };
             var ds2 = { attrToProjector: {}, animator: a2 };
             var steps = [ds1, ds2];
@@ -2484,7 +2484,7 @@ describe("Plots", function () {
             svg.remove();
         });
         it("additionalPaint timing works properly", function () {
-            var animator = new Plottable.Animator.Base().delay(10).duration(10).maxIterativeDelay(0);
+            var animator = new Plottable.Animators.Base().delay(10).duration(10).maxIterativeDelay(0);
             var x = new Plottable.Scale.Linear();
             var y = new Plottable.Scale.Linear();
             var plot = new Plottable.Plot.Bar(x, y).addDataset([]).animate(true);
@@ -2502,7 +2502,7 @@ describe("Plots", function () {
             assert.equal(recordedTime, 20, "additionalPaint passed appropriate time argument");
         });
         it("extent calculation done in correct dataset order", function () {
-            var animator = new Plottable.Animator.Base().delay(10).duration(10).maxIterativeDelay(0);
+            var animator = new Plottable.Animators.Base().delay(10).duration(10).maxIterativeDelay(0);
             var CategoryScale = new Plottable.Scale.Category();
             var dataset1 = [{ key: "A" }];
             var dataset2 = [{ key: "B" }];

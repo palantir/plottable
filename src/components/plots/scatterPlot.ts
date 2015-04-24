@@ -18,8 +18,8 @@ export module Plot {
       this.classed("scatter-plot", true);
       this._defaultFillColor = new Scale.Color().range()[0];
 
-      this.animator("symbols-reset", new Animator.Null());
-      this.animator("symbols", new Animator.Base()
+      this.animator("symbols-reset", new Animators.Null());
+      this.animator("symbols", new Animators.Base()
                                            .duration(250)
                                            .delay(5));
     }

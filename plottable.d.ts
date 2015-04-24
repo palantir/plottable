@@ -1445,11 +1445,11 @@ declare module Plottable {
          */
         type DrawStep = {
             attrToProjector: AttributeToProjector;
-            animator: Animator.PlotAnimator;
+            animator: Animators.PlotAnimator;
         };
         type AppliedDrawStep = {
             attrToProjector: AttributeToAppliedProjector;
-            animator: Animator.PlotAnimator;
+            animator: Animators.PlotAnimator;
         };
         class AbstractDrawer {
             protected _className: string;
@@ -2721,7 +2721,7 @@ declare module Plottable {
             addDataset(dataset: Dataset | any[]): AbstractPlot;
             addDataset(key: string, dataset: Dataset | any[]): AbstractPlot;
             protected _getDrawer(key: string): _Drawer.AbstractDrawer;
-            protected _getAnimator(key: string): Animator.PlotAnimator;
+            protected _getAnimator(key: string): Animators.PlotAnimator;
             protected _onDatasetUpdate(): void;
             /**
              * Sets an attribute of every data point.
@@ -2781,7 +2781,7 @@ declare module Plottable {
              *
              * @return {PlotAnimator} The Animator for the specified key.
              */
-            animator(animatorKey: string): Animator.PlotAnimator;
+            animator(animatorKey: string): Animators.PlotAnimator;
             /**
              * Set the animator associated with the specified Animator key.
              *
@@ -2790,7 +2790,7 @@ declare module Plottable {
              * the specified key.
              * @returns {Plot} The calling Plot.
              */
-            animator(animatorKey: string, animator: Animator.PlotAnimator): AbstractPlot;
+            animator(animatorKey: string, animator: Animators.PlotAnimator): AbstractPlot;
             /**
              * Gets the dataset order by key
              *
@@ -3317,7 +3317,7 @@ declare module Plottable {
              */
             constructor(xScale: Scale.AbstractQuantitative<X>, yScale: Scale.AbstractQuantitative<number>);
             protected _getDrawer(key: string): _Drawer.Area;
-            _getAnimator(key: string): Animator.PlotAnimator;
+            _getAnimator(key: string): Animators.PlotAnimator;
             protected _setup(): void;
             protected _additionalPaint(): void;
             protected _updateYDomainer(): void;
@@ -3359,7 +3359,7 @@ declare module Plottable {
              * @param {boolean} isVertical if the plot if vertical.
              */
             constructor(xScale?: Scale.AbstractScale<X, number>, yScale?: Scale.AbstractScale<Y, number>, isVertical?: boolean);
-            protected _getAnimator(key: string): Animator.PlotAnimator;
+            protected _getAnimator(key: string): Animators.PlotAnimator;
             protected _generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
             };
@@ -3386,7 +3386,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Animator {
+    module Animators {
         interface PlotAnimator {
             /**
              * Applies the supplied attributes to a D3.Selection with some animation.
@@ -3414,7 +3414,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Animator {
+    module Animators {
         /**
          * An animator implementation with no animation. The attributes are
          * immediately set on the selection.
@@ -3428,7 +3428,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Animator {
+    module Animators {
         /**
          * The base animator implementation with easing, duration, and delay.
          *
@@ -3541,7 +3541,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Animator {
+    module Animators {
         /**
          * The default animator implementation with easing, duration, and delay.
          */
@@ -3558,7 +3558,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Animator {
+    module Animators {
         /**
          * A child class of RectAnimator that will move the rectangle
          * as well as animate its growth.

@@ -21,8 +21,8 @@ export module Plot {
       this.classed("area-plot", true);
       this.project("y0", 0, yScale); // default
 
-      this.animator("reset", new Animator.Null());
-      this.animator("main", new Animator.Base()
+      this.animator("reset", new Animators.Null());
+      this.animator("main", new Animators.Base()
                                         .duration(600)
                                         .easing("exp-in-out"));
       this._defaultFillColor = new Scale.Color().range()[0];
