@@ -5,11 +5,11 @@ var assert = chai.assert;
 describe("Gridlines", () => {
   it("Gridlines and axis tick marks align", () => {
     var svg = generateSVG(640, 480);
-    var xScale = new Plottable.Scale.Linear();
+    var xScale = new Plottable.Scales.Linear();
     xScale.domain([0, 10]); // manually set domain since we won't have a renderer
     var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
 
-    var yScale = new Plottable.Scale.Linear();
+    var yScale = new Plottable.Scales.Linear();
     yScale.domain([0, 10]);
     var yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
@@ -46,7 +46,7 @@ describe("Gridlines", () => {
   });
 
   it("Unanchored Gridlines don't throw an error when scale updates", () => {
-    var xScale = new Plottable.Scale.Linear();
+    var xScale = new Plottable.Scales.Linear();
     var gridlines = new Plottable.Component.Gridlines(xScale, null);
     xScale.domain([0, 1]);
     // test passes if error is not thrown.

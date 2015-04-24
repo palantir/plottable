@@ -28,7 +28,7 @@ export module RenderController {
      */
     export class AnimationFrame implements RenderPolicy {
       public render() {
-        _Util.DOM.requestAnimationFramePolyfill(RenderController.flush);
+        Utils.DOM.requestAnimationFramePolyfill(RenderController.flush);
       }
     }
 
@@ -38,7 +38,7 @@ export module RenderController {
      * it.
      */
     export class Timeout implements RenderPolicy {
-      public _timeoutMsec: number = _Util.DOM.POLYFILL_TIMEOUT_MSEC;
+      public _timeoutMsec: number = Utils.DOM.POLYFILL_TIMEOUT_MSEC;
 
       public render() {
         setTimeout(RenderController.flush, this._timeoutMsec);

@@ -20,7 +20,7 @@ export module Axis {
      * @param {string} orientation The orientation of the Axis (top/bottom/left/right) (default = "bottom").
      * @param {Formatter} formatter The Formatter for the Axis (default Formatters.identity())
      */
-    constructor(scale: Scale.Category, orientation = "bottom", formatter = Formatters.identity()) {
+    constructor(scale: Scales.Category, orientation = "bottom", formatter = Formatters.identity()) {
       super(scale, orientation, formatter);
       this.classed("category-axis", true);
     }
@@ -44,7 +44,7 @@ export module Axis {
         return {width: 0, height: 0, wantsWidth: false, wantsHeight: false };
       }
 
-      var categoryScale: Scale.Category = <Scale.Category> this._scale;
+      var categoryScale: Scales.Category = <Scales.Category> this._scale;
       var fakeScale = categoryScale.copy();
       if (this._isHorizontal()) {
         fakeScale.range([0, offeredWidth]);
@@ -97,7 +97,7 @@ export module Axis {
      * Measures the size of the ticks while also writing them to the DOM.
      * @param {D3.Selection} ticks The tick elements to be written to.
      */
-    private _drawTicks(axisWidth: number, axisHeight: number, scale: Scale.Category, ticks: D3.Selection) {
+    private _drawTicks(axisWidth: number, axisHeight: number, scale: Scales.Category, ticks: D3.Selection) {
       var self = this;
       var xAlign: {[s: string]: string};
       var yAlign: {[s: string]: string};
@@ -135,7 +135,7 @@ export module Axis {
      *
      * @param {string[]} ticks The strings that will be printed on the ticks.
      */
-    private _measureTicks(axisWidth: number, axisHeight: number, scale: Scale.Category, ticks: string[]) {
+    private _measureTicks(axisWidth: number, axisHeight: number, scale: Scales.Category, ticks: string[]) {
       var wrappingResults = ticks.map((s: string) => {
         var bandWidth = scale.stepWidth();
 
@@ -165,8 +165,8 @@ export module Axis {
       });
 
       // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
-      var widthFn = (this._isHorizontal() && this._tickLabelAngle === 0) ? d3.sum : _Util.Methods.max;
-      var heightFn = (this._isHorizontal() && this._tickLabelAngle === 0) ? _Util.Methods.max : d3.sum;
+      var widthFn = (this._isHorizontal() && this._tickLabelAngle === 0) ? d3.sum : Utils.Methods.max;
+      var heightFn = (this._isHorizontal() && this._tickLabelAngle === 0) ? Utils.Methods.max : d3.sum;
 
       var textFits = wrappingResults.every((t: SVGTypewriter.Wrappers.WrappingResult) =>
                     !SVGTypewriter.Utils.StringMethods.isNotEmptyString(t.truncatedText) && t.noLines === 1);
@@ -192,7 +192,7 @@ export module Axis {
 
     public _doRender() {
       super._doRender();
-      var catScale = <Scale.Category> this._scale;
+      var catScale = <Scales.Category> this._scale;
       var tickLabels = this._tickLabelContainer.selectAll("." + AbstractAxis.TICK_LABEL_CLASS).data(this._scale.domain(), (d) => d);
 
       var getTickLabelTransform = (d: string, i: number) => {
@@ -212,7 +212,7 @@ export module Axis {
 
       var xTranslate = this.orient() === "right" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
       var yTranslate = this.orient() === "bottom" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
-      _Util.DOM.translate(this._tickLabelContainer, xTranslate, yTranslate);
+      Utils.DOM.translate(this._tickLabelContainer, xTranslate, yTranslate);
       return this;
     }
 

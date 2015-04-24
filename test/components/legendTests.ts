@@ -5,7 +5,7 @@ var assert = chai.assert;
 
 describe("Legend", () => {
   var svg: D3.Selection;
-  var color: Plottable.Scale.Color;
+  var color: Plottable.Scales.Color;
   var legend: Plottable.Component.Legend;
 
   var entrySelector = "." + Plottable.Component.Legend.LEGEND_ENTRY_CLASS;
@@ -13,7 +13,7 @@ describe("Legend", () => {
 
   beforeEach(() => {
     svg = generateSVG(400, 400);
-    color = new Plottable.Scale.Color();
+    color = new Plottable.Scales.Color();
     legend = new Plottable.Component.Legend(color);
   });
 
@@ -55,9 +55,9 @@ describe("Legend", () => {
     color.domain(["alpha", "beta", "gamma", "delta", "omega", "omicron", "persei", "eight"]);
     legend.renderTo(svg);
 
-    var contentBBox = Plottable._Util.DOM.getBBox((<any> legend)._content);
+    var contentBBox = Plottable.Utils.DOM.getBBox((<any> legend)._content);
     var contentBottomEdge = contentBBox.y + contentBBox.height;
-    var bboxBBox = Plottable._Util.DOM.getBBox((<any> legend)._element.select(".bounding-box"));
+    var bboxBBox = Plottable.Utils.DOM.getBBox((<any> legend)._element.select(".bounding-box"));
     var bboxBottomEdge = bboxBBox.y + bboxBBox.height;
 
     assert.operator(contentBottomEdge, "<=", bboxBottomEdge, "content does not extend past bounding box");
@@ -111,7 +111,7 @@ describe("Legend", () => {
     legend.renderTo(svg);
 
     var newDomain = ["a", "b", "c"];
-    var newColorScale = new Plottable.Scale.Color("20");
+    var newColorScale = new Plottable.Scales.Color("20");
     newColorScale.domain(newDomain);
     legend.scale(newColorScale);
 
@@ -132,7 +132,7 @@ describe("Legend", () => {
     legend.renderTo(svg);
 
     var tempDomain = ["a", "b", "c"];
-    var newColorScale = new Plottable.Scale.Color("20");
+    var newColorScale = new Plottable.Scales.Color("20");
     newColorScale.domain(tempDomain);
     legend.scale(newColorScale);
 
@@ -157,7 +157,7 @@ describe("Legend", () => {
     function verifySymbolHeight() {
       var text = (<any> legend)._content.select("text");
       var icon = (<any> legend)._content.select("." + Plottable.Component.Legend.LEGEND_SYMBOL_CLASS);
-      var textHeight = Plottable._Util.DOM.getBBox(text).height;
+      var textHeight = Plottable.Utils.DOM.getBBox(text).height;
       var symbolHeight = icon.node().getBoundingClientRect().height;
       assert.operator(symbolHeight, "<", textHeight, "icons too small: symbolHeight < textHeight");
       assert.operator(symbolHeight, ">", textHeight / 2, "icons too big: textHeight / 2 > symbolHeight");

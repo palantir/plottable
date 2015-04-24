@@ -1,7 +1,7 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Dispatcher {
+export module Dispatchers {
   export class AbstractDispatcher extends Core.PlottableObject {
     protected _event2Callback: { [eventName: string]: (e: Event) => any; } = {};
     protected _broadcasters: Core.Broadcaster<AbstractDispatcher>[] = [];

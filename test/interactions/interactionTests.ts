@@ -7,8 +7,8 @@ describe("Interactions", () => {
     it("Pans properly", () => {
       // The only difference between pan and zoom is internal to d3
       // Simulating zoom events is painful, so panning will suffice here
-      var xScale = new Plottable.Scale.Linear().domain([0, 11]);
-      var yScale = new Plottable.Scale.Linear().domain([11, 0]);
+      var xScale = new Plottable.Scales.Linear().domain([0, 11]);
+      var yScale = new Plottable.Scales.Linear().domain([11, 0]);
 
       var svg = generateSVG();
       var dataset = makeLinearSeries(11);
@@ -20,7 +20,7 @@ describe("Interactions", () => {
       var xDomainBefore = xScale.domain();
       var yDomainBefore = yScale.domain();
 
-      var interaction = new Plottable.Interaction.PanZoom(xScale, yScale);
+      var interaction = new Plottable.Interactions.PanZoom(xScale, yScale);
       plot.registerInteraction(interaction);
 
       var hb = plot.hitBox().node();
@@ -37,7 +37,7 @@ describe("Interactions", () => {
       assert.notDeepEqual(xDomainAfter, xDomainBefore, "x domain was changed by panning");
       assert.notDeepEqual(yDomainAfter, yDomainBefore, "y domain was changed by panning");
 
-      function getSlope(scale: Plottable.Scale.Linear) {
+      function getSlope(scale: Plottable.Scales.Linear) {
         var range = scale.range();
         var domain = scale.domain();
         return (domain[1] - domain[0]) / (range[1] - range[0]);
@@ -53,14 +53,14 @@ describe("Interactions", () => {
     });
 
     it("Resets zoom when the scale domain changes", () => {
-      var xScale = new Plottable.Scale.Linear();
-      var yScale = new Plottable.Scale.Linear();
+      var xScale = new Plottable.Scales.Linear();
+      var yScale = new Plottable.Scales.Linear();
 
       var svg = generateSVG();
       var c = new Plottable.Component.AbstractComponent();
       c.renderTo(svg);
 
-      var pzi = new Plottable.Interaction.PanZoom(xScale, yScale);
+      var pzi = new Plottable.Interactions.PanZoom(xScale, yScale);
       c.registerInteraction(pzi);
 
       var zoomBeforeX = (<any> pzi)._zoom;
@@ -83,7 +83,7 @@ describe("Interactions", () => {
       var component = new Plottable.Component.AbstractComponent();
       component.renderTo(svg);
 
-      var ki = new Plottable.Interaction.Key();
+      var ki = new Plottable.Interactions.Key();
 
       var aCode = 65; // "a" key
       var bCode = 66; // "b" key

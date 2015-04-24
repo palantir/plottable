@@ -38,7 +38,7 @@ describe("Interactions", () => {
       var c = new Plottable.Component.AbstractComponent();
       c.renderTo(svg);
 
-      var drag = new Plottable.Interaction.Drag();
+      var drag = new Plottable.Interactions.Drag();
       var startCallbackCalled = false;
       var receivedStart: Plottable.Point;
       var startCallback = (p: Plottable.Point) => {
@@ -86,7 +86,7 @@ describe("Interactions", () => {
       var c = new Plottable.Component.AbstractComponent();
       c.renderTo(svg);
 
-      var drag = new Plottable.Interaction.Drag();
+      var drag = new Plottable.Interactions.Drag();
       var moveCallbackCalled = false;
       var receivedStart: Plottable.Point;
       var receivedEnd: Plottable.Point;
@@ -124,7 +124,7 @@ describe("Interactions", () => {
       var c = new Plottable.Component.AbstractComponent();
       c.renderTo(svg);
 
-      var drag = new Plottable.Interaction.Drag();
+      var drag = new Plottable.Interactions.Drag();
       var endCallbackCalled = false;
       var receivedStart: Plottable.Point;
       var receivedEnd: Plottable.Point;
@@ -169,7 +169,7 @@ describe("Interactions", () => {
       var c = new Plottable.Component.AbstractComponent();
       c.renderTo(svg);
 
-      var drag = new Plottable.Interaction.Drag();
+      var drag = new Plottable.Interactions.Drag();
       assert.isTrue(drag.constrainToComponent(), "constrains by default");
 
       var receivedStart: Plottable.Point;

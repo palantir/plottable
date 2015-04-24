@@ -15,14 +15,14 @@ export module Plot {
      * @param {QuantitativeScale} xScale The x scale to use.
      * @param {QuantitativeScale} yScale The y scale to use.
      */
-    constructor(xScale: Scale.AbstractQuantitative<X>, yScale: Scale.AbstractQuantitative<number>) {
+    constructor(xScale: Scales.AbstractQuantitative<X>, yScale: Scales.AbstractQuantitative<number>) {
       super(xScale, yScale);
       this.classed("area-plot", true);
       this._isVertical = true;
     }
 
     protected _getDrawer(key: string) {
-      return new Plottable._Drawer.Area(key).drawLine(false);
+      return new Plottable.Drawers.Area(key).drawLine(false);
     }
 
     public _getAnimator(key: string): Animator.PlotAnimator {
@@ -48,7 +48,7 @@ export module Plot {
 
     protected _updateYDomainer() {
       super._updateYDomainer();
-      var scale = <Scale.AbstractQuantitative<any>> this._yScale;
+      var scale = <Scales.AbstractQuantitative<any>> this._yScale;
       if (!scale._userSetDomainer) {
         scale.domainer().addPaddingException(0, "STACKED_AREA_PLOT+" + this.getID())
                         .addIncludedValue(0, "STACKED_AREA_PLOT+" + this.getID());
@@ -57,7 +57,7 @@ export module Plot {
       }
     }
 
-    public project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>) {
+    public project(attrToSet: string, accessor: any, scale?: Scales.AbstractScale<any, any>) {
       super.project(attrToSet, accessor, scale);
       AbstractStacked.prototype.project.apply(this, [attrToSet, accessor, scale]);
       return this;
@@ -102,7 +102,7 @@ export module Plot {
       });
 
       if (keySets.some((keySet) => keySet.length !== domainKeys.length)) {
-        _Util.Methods.warn("the domains across the datasets are not the same.  Plot may produce unintended behavior.");
+        Utils.Methods.warn("the domains across the datasets are not the same.  Plot may produce unintended behavior.");
       }
       AbstractStacked.prototype._updateStackOffsets.call(this);
     }

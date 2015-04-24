@@ -238,7 +238,7 @@ describe("Component behavior", () => {
     boxStrings.forEach((s) => {
       var box = boxContainer.select(s);
       assert.isNotNull(box.node(), s + " box was created and placed inside boxContainer");
-      var bb = Plottable._Util.DOM.getBBox(box);
+      var bb = Plottable.Utils.DOM.getBBox(box);
       assert.equal(bb.width, SVG_WIDTH, s + " width as expected");
       assert.equal(bb.height, SVG_HEIGHT, s + " height as expected");
     });
@@ -262,7 +262,7 @@ describe("Component behavior", () => {
 
     // registration before anchoring
     c = new Plottable.Component.AbstractComponent();
-    var i = new Plottable.Interaction.AbstractInteraction();
+    var i = new Plottable.Interactions.AbstractInteraction();
     i._requiresHitbox = () => true;
     c.registerInteraction(i);
     c._anchor(svg);
@@ -273,7 +273,7 @@ describe("Component behavior", () => {
     // registration after anchoring
     c = new Plottable.Component.AbstractComponent();
     c._anchor(svg);
-    i = new Plottable.Interaction.AbstractInteraction();
+    i = new Plottable.Interactions.AbstractInteraction();
     i._requiresHitbox = () => true;
     c.registerInteraction(i);
     verifyHitbox(c);
@@ -409,8 +409,8 @@ describe("Component behavior", () => {
     var svg1 = generateSVG(300, SVG_HEIGHT_1);
     var svg2 = generateSVG(300, SVG_HEIGHT_2);
 
-    var xScale = new Plottable.Scale.Linear();
-    var yScale = new Plottable.Scale.Linear();
+    var xScale = new Plottable.Scales.Linear();
+    var yScale = new Plottable.Scales.Linear();
     var plot = new Plottable.Plot.Line(xScale, yScale);
     var group = new Plottable.Component.Group;
     group.renderTo(svg1);

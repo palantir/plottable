@@ -7,9 +7,9 @@ describe("Dispatchers", () => {
     it("getDispatcher() creates only one Dispatcher.Touch per <svg>", () => {
       var svg = generateSVG();
 
-      var td1 = Plottable.Dispatcher.Touch.getDispatcher(<SVGElement> svg.node());
+      var td1 = Plottable.Dispatchers.Touch.getDispatcher(<SVGElement> svg.node());
       assert.isNotNull(td1, "created a new Dispatcher on an SVG");
-      var td2 = Plottable.Dispatcher.Touch.getDispatcher(<SVGElement> svg.node());
+      var td2 = Plottable.Dispatchers.Touch.getDispatcher(<SVGElement> svg.node());
       assert.strictEqual(td1, td2, "returned the existing Dispatcher if called again with same <svg>");
 
       svg.remove();
@@ -31,7 +31,7 @@ describe("Dispatchers", () => {
       });
       var ids = targetXs.map((targetX, i) => i);
 
-      var td = Plottable.Dispatcher.Touch.getDispatcher(<SVGElement> target.node());
+      var td = Plottable.Dispatchers.Touch.getDispatcher(<SVGElement> target.node());
 
       var callbackWasCalled = false;
       var callback = function(ids: number[], points: { [id: number]: Plottable.Point; }, e: TouchEvent) {
@@ -68,7 +68,7 @@ describe("Dispatchers", () => {
       });
       var ids = targetXs.map((targetX, i) => i);
 
-      var td = Plottable.Dispatcher.Touch.getDispatcher(<SVGElement> target.node());
+      var td = Plottable.Dispatchers.Touch.getDispatcher(<SVGElement> target.node());
 
       var callbackWasCalled = false;
       var callback = function(ids: number[], points: { [id: number]: Plottable.Point; }, e: TouchEvent) {
@@ -105,7 +105,7 @@ describe("Dispatchers", () => {
       });
       var ids = targetXs.map((targetX, i) => i);
 
-      var td = Plottable.Dispatcher.Touch.getDispatcher(<SVGElement> target.node());
+      var td = Plottable.Dispatchers.Touch.getDispatcher(<SVGElement> target.node());
 
       var callbackWasCalled = false;
       var callback = function(ids: number[], points: { [id: number]: Plottable.Point; }, e: TouchEvent) {
@@ -142,7 +142,7 @@ describe("Dispatchers", () => {
       });
       var ids = targetXs.map((targetX, i) => i);
 
-      var td = Plottable.Dispatcher.Touch.getDispatcher(<SVGElement> target.node());
+      var td = Plottable.Dispatchers.Touch.getDispatcher(<SVGElement> target.node());
 
       var callbackWasCalled = false;
       var callback = function(ids: number[], points: { [id: number]: Plottable.Point; }, e: TouchEvent) {

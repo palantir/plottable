@@ -164,7 +164,7 @@ export module Axis {
      * @param {TimeScale} scale The scale to base the Axis on.
      * @param {string} orientation The orientation of the Axis (top/bottom)
      */
-    constructor(scale: Scale.Time, orientation: string) {
+    constructor(scale: Scales.Time, orientation: string) {
       super(scale, orientation);
       this.classed("time-axis", true);
       this.tickLabelPadding(5);
@@ -206,7 +206,7 @@ export module Axis {
         return this._possibleTimeAxisConfigurations;
       }
       this._possibleTimeAxisConfigurations = configurations;
-      this._numTiers = _Util.Methods.max(this._possibleTimeAxisConfigurations.map((config: TimeAxisConfiguration) => config.length), 0);
+      this._numTiers = Utils.Methods.max(this._possibleTimeAxisConfigurations.map((config: TimeAxisConfiguration) => config.length), 0);
 
       if (this._isAnchored) {
         this._setupDomElements();
@@ -236,7 +236,7 @@ export module Axis {
       });
 
       if (mostPreciseIndex === this._possibleTimeAxisConfigurations.length) {
-        _Util.Methods.warn("zoomed out too far: could not find suitable interval to display labels");
+        Utils.Methods.warn("zoomed out too far: could not find suitable interval to display labels");
         --mostPreciseIndex;
       }
 
@@ -325,7 +325,7 @@ export module Axis {
     }
 
     private _getTickIntervalValues(config: TimeAxisTierConfiguration): any[] {
-      return (<Scale.Time> this._scale).tickInterval(config.interval, config.step);
+      return (<Scales.Time> this._scale).tickInterval(config.interval, config.step);
     }
 
     protected _getTickValues(): any[] {
@@ -344,7 +344,7 @@ export module Axis {
     }
 
     private _getTickValuesForConfiguration(config: TimeAxisTierConfiguration) {
-      var tickPos = (<Scale.Time> this._scale).tickInterval(config.interval, config.step);
+      var tickPos = (<Scales.Time> this._scale).tickInterval(config.interval, config.step);
       var domain = this._scale.domain();
       var tickPosValues = tickPos.map((d: Date) => d.valueOf()); // can't indexOf with objects
       if (tickPosValues.indexOf(domain[0].valueOf()) === -1) {
@@ -381,7 +381,7 @@ export module Axis {
 
       var textSelection = tickLabels.selectAll("text");
       if (textSelection.size() > 0) {
-        _Util.DOM.translate(textSelection, xTranslate, yTranslate);
+        Utils.DOM.translate(textSelection, xTranslate, yTranslate);
       }
       tickLabels.exit().remove();
       tickLabels.attr("transform", (d: any) => "translate(" + this._scale.scale(d) + ",0)");
@@ -523,7 +523,7 @@ export module Axis {
         var tickLabel = d3.select(this);
         var leadingTickMark = visibleTickMarkRects[i];
         var trailingTickMark = visibleTickMarkRects[i + 1];
-        if (!isInsideBBox(clientRect) || (lastLabelClientRect != null && _Util.DOM.boxesOverlap(clientRect, lastLabelClientRect))
+        if (!isInsideBBox(clientRect) || (lastLabelClientRect != null && Utils.DOM.boxesOverlap(clientRect, lastLabelClientRect))
             || (leadingTickMark.right > clientRect.left || trailingTickMark.left < clientRect.right)) {
           tickLabel.style("visibility", "hidden");
         } else {

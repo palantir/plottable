@@ -5,7 +5,7 @@ var assert = chai.assert;
 describe("Dispatchers", () => {
   describe("AbstractDispatcher", () => {
     it("_connect() and _disconnect()", () => {
-      var dispatcher = new Plottable.Dispatcher.AbstractDispatcher();
+      var dispatcher = new Plottable.Dispatchers.AbstractDispatcher();
 
       var callbackCalls = 0;
       (<any> dispatcher)._event2Callback["click"] = () => callbackCalls++;
@@ -27,12 +27,12 @@ describe("Dispatchers", () => {
     });
 
     it("won't _disconnect() if broadcasters still have listeners", () => {
-      var dispatcher = new Plottable.Dispatcher.AbstractDispatcher();
+      var dispatcher = new Plottable.Dispatchers.AbstractDispatcher();
 
       var callbackWasCalled = false;
       (<any> dispatcher)._event2Callback["click"] = () => callbackWasCalled = true;
 
-      var b = new Plottable.Core.Broadcaster<Plottable.Dispatcher.AbstractDispatcher>(dispatcher);
+      var b = new Plottable.Core.Broadcaster<Plottable.Dispatchers.AbstractDispatcher>(dispatcher);
       var key = "unit test";
       b.registerListener(key, () => null);
       (<any> dispatcher)._broadcasters = [b];
@@ -56,8 +56,8 @@ describe("Dispatchers", () => {
     });
 
     it("_setCallback()", () => {
-      var dispatcher = new Plottable.Dispatcher.AbstractDispatcher();
-      var b = new Plottable.Core.Broadcaster<Plottable.Dispatcher.AbstractDispatcher>(dispatcher);
+      var dispatcher = new Plottable.Dispatchers.AbstractDispatcher();
+      var b = new Plottable.Core.Broadcaster<Plottable.Dispatchers.AbstractDispatcher>(dispatcher);
 
       var key = "unit test";
       var callbackWasCalled = false;

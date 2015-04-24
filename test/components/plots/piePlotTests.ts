@@ -193,7 +193,7 @@ describe("Plots", () => {
       });
 
       it("project fill", () => {
-        piePlot.project("fill", (d: any, i: number) => String(i), new Plottable.Scale.Color("10"));
+        piePlot.project("fill", (d: any, i: number) => String(i), new Plottable.Scales.Color("10"));
 
         var arcPaths = renderArea.selectAll(".arc");
 
@@ -203,7 +203,7 @@ describe("Plots", () => {
         var arcPath1 = d3.select(arcPaths[0][1]);
         assert.strictEqual(arcPath1.attr("fill"), "#ff7f0e", "second sector filled appropriately");
 
-        piePlot.project("fill", "type", new Plottable.Scale.Color("20"));
+        piePlot.project("fill", "type", new Plottable.Scales.Color("20"));
 
         arcPaths = renderArea.selectAll(".arc");
 
@@ -219,13 +219,13 @@ describe("Plots", () => {
 
     it("throws warnings on negative data", () => {
       var message: String;
-      var oldWarn = Plottable._Util.Methods.warn;
-      Plottable._Util.Methods.warn = (warn) => message = warn;
+      var oldWarn = Plottable.Utils.Methods.warn;
+      Plottable.Utils.Methods.warn = (warn) => message = warn;
       piePlot.removeDataset("simpleDataset");
       var negativeDataset = new Plottable.Dataset([{value: -5}, {value: 15}]);
       piePlot.addDataset("negativeDataset", negativeDataset);
       assert.equal(message, "Negative values will not render correctly in a pie chart.");
-      Plottable._Util.Methods.warn = oldWarn;
+      Plottable.Utils.Methods.warn = oldWarn;
       svg.remove();
     });
   });

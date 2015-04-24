@@ -1,7 +1,7 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module _Drawer {
+export module Drawers {
   export class Element extends AbstractDrawer {
     protected _svgElement: string;
 

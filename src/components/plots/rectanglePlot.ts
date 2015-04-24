@@ -16,14 +16,14 @@ export module Plot {
      * @param {Scale.AbstractScale} xScale The x scale to use.
      * @param {Scale.AbstractScale} yScale The y scale to use.
      */
-    constructor(xScale: Scale.AbstractScale<X, any>, yScale: Scale.AbstractScale<Y, any>) {
+    constructor(xScale: Scales.AbstractScale<X, any>, yScale: Scales.AbstractScale<Y, any>) {
       super(xScale, yScale);
-      this._defaultFillColor = new Scale.Color().range()[0];
+      this._defaultFillColor = new Scales.Color().range()[0];
       this.classed("rectangle-plot", true);
     }
 
     protected _getDrawer(key: string) {
-      return new _Drawer.Rect(key, true);
+      return new Drawers.Rect(key, true);
     }
 
     protected _generateAttrToProjector() {
@@ -54,7 +54,7 @@ export module Plot {
       return attrToProjector;
     }
 
-    protected _generateDrawSteps(): _Drawer.DrawStep[] {
+    protected _generateDrawSteps(): Drawers.DrawStep[] {
       return [{attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("rectangles")}];
     }
   }

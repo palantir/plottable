@@ -2,50 +2,42 @@
 
 var assert = chai.assert;
 
-describe("_Util.Methods", () => {
+describe("Utils.Methods", () => {
   it("inRange works correct", () => {
-    assert.isTrue(Plottable._Util.Methods.inRange(0, -1, 1), "basic functionality works");
-    assert.isTrue(Plottable._Util.Methods.inRange(0, 0, 1), "it is a closed interval");
-    assert.isTrue(!Plottable._Util.Methods.inRange(0, 1, 2), "returns false when false");
-  });
-
-  it("sortedIndex works properly", () => {
-    var a = [1, 2, 3, 4, 5];
-    var si = Plottable._Util.OpenSource.sortedIndex;
-    assert.equal(si(0, a), 0, "return 0 when val is <= arr[0]");
-    assert.equal(si(6, a), a.length, "returns a.length when val >= arr[arr.length-1]");
-    assert.equal(si(1.5, a), 1, "returns 1 when val is between the first and second elements");
+    assert.isTrue(Plottable.Utils.Methods.inRange(0, -1, 1), "basic functionality works");
+    assert.isTrue(Plottable.Utils.Methods.inRange(0, 0, 1), "it is a closed interval");
+    assert.isTrue(!Plottable.Utils.Methods.inRange(0, 1, 2), "returns false when false");
   });
 
   it("accessorize works properly", () => {
     var datum = {"foo": 2, "bar": 3, "key": 4};
 
     var f = (d: any, i: number, m: any) => d + i;
-    var a1 = Plottable._Util.Methods.accessorize(f);
+    var a1 = Plottable.Utils.Methods.accessorize(f);
     assert.equal(f, a1, "function passes through accessorize unchanged");
 
-    var a2 = Plottable._Util.Methods.accessorize("key");
+    var a2 = Plottable.Utils.Methods.accessorize("key");
     assert.equal(a2(datum, 0, null), 4, "key accessor works appropriately");
 
-    var a3 = Plottable._Util.Methods.accessorize("#aaaa");
+    var a3 = Plottable.Utils.Methods.accessorize("#aaaa");
     assert.equal(a3(datum, 0, null), "#aaaa", "strings beginning with # are returned as final value");
 
-    var a4 = Plottable._Util.Methods.accessorize(33);
+    var a4 = Plottable.Utils.Methods.accessorize(33);
     assert.equal(a4(datum, 0, null), 33, "numbers are return as final value");
 
-    var a5 = Plottable._Util.Methods.accessorize(datum);
+    var a5 = Plottable.Utils.Methods.accessorize(datum);
     assert.equal(a5(datum, 0, null), datum, "objects are return as final value");
   });
 
   it("uniq works as expected", () => {
     var strings = ["foo", "bar", "foo", "foo", "baz", "bam"];
-    assert.deepEqual(Plottable._Util.Methods.uniq(strings), ["foo", "bar", "baz", "bam"]);
+    assert.deepEqual(Plottable.Utils.Methods.uniq(strings), ["foo", "bar", "baz", "bam"]);
   });
 
 
   describe("min/max", () => {
-    var max = Plottable._Util.Methods.max;
-    var min = Plottable._Util.Methods.min;
+    var max = Plottable.Utils.Methods.max;
+    var min = Plottable.Utils.Methods.min;
     var today = new Date();
 
     it("max/min work as expected", () => {
@@ -94,7 +86,7 @@ describe("_Util.Methods", () => {
   });
 
   it("isNaN works as expected", () => {
-    var isNaN = Plottable._Util.Methods.isNaN;
+    var isNaN = Plottable.Utils.Methods.isNaN;
 
     assert.isTrue(isNaN(NaN), "Only NaN should pass the isNaN check");
 
@@ -109,31 +101,31 @@ describe("_Util.Methods", () => {
   });
 
   it("objEq works as expected", () => {
-    assert.isTrue(Plottable._Util.Methods.objEq({}, {}));
-    assert.isTrue(Plottable._Util.Methods.objEq({a: 5}, {a: 5}));
-    assert.isFalse(Plottable._Util.Methods.objEq({a: 5, b: 6}, {a: 5}));
-    assert.isFalse(Plottable._Util.Methods.objEq({a: 5}, {a: 5, b: 6}));
-    assert.isTrue(Plottable._Util.Methods.objEq({a: "hello"}, {a: "hello"}));
-    assert.isFalse(Plottable._Util.Methods.objEq({constructor: {}.constructor}, {}),
+    assert.isTrue(Plottable.Utils.Methods.objEq({}, {}));
+    assert.isTrue(Plottable.Utils.Methods.objEq({a: 5}, {a: 5}));
+    assert.isFalse(Plottable.Utils.Methods.objEq({a: 5, b: 6}, {a: 5}));
+    assert.isFalse(Plottable.Utils.Methods.objEq({a: 5}, {a: 5, b: 6}));
+    assert.isTrue(Plottable.Utils.Methods.objEq({a: "hello"}, {a: "hello"}));
+    assert.isFalse(Plottable.Utils.Methods.objEq({constructor: {}.constructor}, {}),
                   "using \"constructor\" isn't hidden");
   });
 
   it("populateMap works as expected", () => {
     var keys = ["a", "b", "c"];
-    var map = Plottable._Util.Methods.populateMap(keys, (key) => key + "Value");
+    var map = Plottable.Utils.Methods.populateMap(keys, (key) => key + "Value");
 
     assert.strictEqual(map.get("a"), "aValue", "key properly goes through map function");
     assert.strictEqual(map.get("b"), "bValue", "key properly goes through map function");
     assert.strictEqual(map.get("c"), "cValue", "key properly goes through map function");
 
-    var indexMap = Plottable._Util.Methods.populateMap(keys, (key, i) => key + i + "Value");
+    var indexMap = Plottable.Utils.Methods.populateMap(keys, (key, i) => key + i + "Value");
 
     assert.strictEqual(indexMap.get("a"), "a0Value", "key and index properly goes through map function");
     assert.strictEqual(indexMap.get("b"), "b1Value", "key and index properly goes through map function");
     assert.strictEqual(indexMap.get("c"), "c2Value", "key and index properly goes through map function");
 
     var emptyKeys: string[] = [];
-    var emptyMap = Plottable._Util.Methods.populateMap(emptyKeys, (key) => key + "Value");
+    var emptyMap = Plottable.Utils.Methods.populateMap(emptyKeys, (key) => key + "Value");
 
     assert.isTrue(emptyMap.empty(), "no entries in map if no keys in input array");
 
@@ -150,11 +142,11 @@ describe("_Util.Methods", () => {
     oldMap["NaN"] = 0 / 0;
     oldMap["inf"] = 1 / 0;
 
-    var map = Plottable._Util.Methods.copyMap(oldMap);
+    var map = Plottable.Utils.Methods.copyMap(oldMap);
 
     assert.deepEqual(map, oldMap, "All values were copied.");
 
-    map = Plottable._Util.Methods.copyMap({});
+    map = Plottable.Utils.Methods.copyMap({});
 
     assert.deepEqual(map, {}, "No values were added.");
   });
@@ -162,30 +154,30 @@ describe("_Util.Methods", () => {
   it("range works as expected", () => {
     var start = 0;
     var end = 6;
-    var range = Plottable._Util.Methods.range(start, end);
+    var range = Plottable.Utils.Methods.range(start, end);
     assert.deepEqual(range, [0, 1, 2, 3, 4, 5], "all entries has been generated");
 
-    range = Plottable._Util.Methods.range(start, end, 2);
+    range = Plottable.Utils.Methods.range(start, end, 2);
     assert.deepEqual(range, [0, 2, 4], "all entries has been generated");
 
-    range = Plottable._Util.Methods.range(start, end, 11);
+    range = Plottable.Utils.Methods.range(start, end, 11);
     assert.deepEqual(range, [0], "all entries has been generated");
 
-    assert.throws(() => Plottable._Util.Methods.range(start, end, 0), "step cannot be 0");
+    assert.throws(() => Plottable.Utils.Methods.range(start, end, 0), "step cannot be 0");
 
-    range = Plottable._Util.Methods.range(start, end, -1);
+    range = Plottable.Utils.Methods.range(start, end, -1);
     assert.lengthOf(range, 0, "no entries because of invalid step");
 
-    range = Plottable._Util.Methods.range(end, start, -1);
+    range = Plottable.Utils.Methods.range(end, start, -1);
     assert.deepEqual(range, [6, 5, 4, 3, 2, 1], "all entries has been generated");
 
-    range = Plottable._Util.Methods.range(-2, 2);
+    range = Plottable.Utils.Methods.range(-2, 2);
     assert.deepEqual(range, [-2, -1, 0, 1], "all entries has been generated range crossing 0");
 
-    range = Plottable._Util.Methods.range(0.2, 4);
+    range = Plottable.Utils.Methods.range(0.2, 4);
     assert.deepEqual(range, [0.2, 1.2, 2.2, 3.2], "all entries has been generated with float start");
 
-    range = Plottable._Util.Methods.range(0.6, 2.2, 0.5);
+    range = Plottable.Utils.Methods.range(0.6, 2.2, 0.5);
     assert.deepEqual(range, [0.6, 1.1, 1.6, 2.1], "all entries has been generated with float step");
   });
 
@@ -195,14 +187,14 @@ describe("_Util.Methods", () => {
     style.attr("type", "text/css");
 
     style.text(".plottable-colors-0 { background-color: blue; }");
-    var blueHexcode = Plottable._Util.Methods.colorTest(colorTester, "plottable-colors-0");
+    var blueHexcode = Plottable.Utils.Methods.colorTest(colorTester, "plottable-colors-0");
     assert.strictEqual(blueHexcode, "#0000ff", "hexcode for blue returned");
 
     style.text(".plottable-colors-2 { background-color: #13EADF; }");
-    var hexcode = Plottable._Util.Methods.colorTest(colorTester, "plottable-colors-2");
+    var hexcode = Plottable.Utils.Methods.colorTest(colorTester, "plottable-colors-2");
     assert.strictEqual(hexcode, "#13eadf", "hexcode for blue returned");
 
-    var nullHexcode = Plottable._Util.Methods.colorTest(colorTester, "plottable-colors-11");
+    var nullHexcode = Plottable.Utils.Methods.colorTest(colorTester, "plottable-colors-11");
     assert.strictEqual(nullHexcode, null, "null hexcode returned");
     colorTester.remove();
   });
@@ -210,7 +202,7 @@ describe("_Util.Methods", () => {
   it("lightenColor()", () => {
     var colorHex = "#12fced";
     var oldColor = d3.hsl(colorHex);
-    var lightenedColor = Plottable._Util.Methods.lightenColor(colorHex, 1);
+    var lightenedColor = Plottable.Utils.Methods.lightenColor(colorHex, 1);
     assert.operator(d3.hsl(lightenedColor).l, ">", oldColor.l, "color got lighter");
   });
 });

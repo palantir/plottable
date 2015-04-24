@@ -7,8 +7,8 @@ describe("Plots", () => {
     var svg: D3.Selection;
     var dataset1: Plottable.Dataset;
     var dataset2: Plottable.Dataset;
-    var xScale: Plottable.Scale.Category;
-    var yScale: Plottable.Scale.Linear;
+    var xScale: Plottable.Scales.Category;
+    var yScale: Plottable.Scales.Linear;
     var renderer: Plottable.Plot.StackedBar<string, number>;
     var SVG_WIDTH = 600;
     var SVG_HEIGHT = 400;
@@ -19,8 +19,8 @@ describe("Plots", () => {
 
     beforeEach(() => {
       svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      xScale = new Plottable.Scale.Category();
-      yScale = new Plottable.Scale.Linear().domain([0, 3]);
+      xScale = new Plottable.Scales.Category();
+      yScale = new Plottable.Scales.Linear().domain([0, 3]);
 
       originalData1 = [
         {x: "A", y: 1},
@@ -137,8 +137,8 @@ describe("Plots", () => {
 
   describe("Stacked Bar Plot Negative Values", () => {
     var svg: D3.Selection;
-    var xScale: Plottable.Scale.Category;
-    var yScale: Plottable.Scale.Linear;
+    var xScale: Plottable.Scales.Category;
+    var yScale: Plottable.Scales.Linear;
     var plot: Plottable.Plot.StackedBar<string, number>;
     var SVG_WIDTH = 600;
     var SVG_HEIGHT = 400;
@@ -147,8 +147,8 @@ describe("Plots", () => {
 
     beforeEach(() => {
       svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      xScale = new Plottable.Scale.Category();
-      yScale = new Plottable.Scale.Linear();
+      xScale = new Plottable.Scales.Category();
+      yScale = new Plottable.Scales.Linear();
 
       var data1 = [
         {x: "A", y: -1},
@@ -211,8 +211,8 @@ describe("Plots", () => {
     var svg: D3.Selection;
     var dataset1: Plottable.Dataset;
     var dataset2: Plottable.Dataset;
-    var xScale: Plottable.Scale.Linear;
-    var yScale: Plottable.Scale.Category;
+    var xScale: Plottable.Scales.Linear;
+    var yScale: Plottable.Scales.Category;
     var renderer: Plottable.Plot.StackedBar<number, string>;
     var SVG_WIDTH = 600;
     var SVG_HEIGHT = 400;
@@ -221,8 +221,8 @@ describe("Plots", () => {
 
     beforeEach(() => {
       svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      xScale = new Plottable.Scale.Linear().domain([0, 6]);
-      yScale = new Plottable.Scale.Category();
+      xScale = new Plottable.Scales.Linear().domain([0, 6]);
+      yScale = new Plottable.Scales.Category();
 
       var data1 = [
         {name: "jon", y: 0, type: "q1"},
@@ -293,8 +293,8 @@ describe("Plots", () => {
 
     beforeEach(() => {
       svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var xScale = new Plottable.Scale.Category();
-      var yScale = new Plottable.Scale.Linear();
+      var xScale = new Plottable.Scales.Category();
+      var yScale = new Plottable.Scales.Linear();
 
       var data1 = [
         {x: "A", y: 1, type: "a"},
@@ -356,8 +356,8 @@ describe("Plots", () => {
 
     beforeEach(() => {
       svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var xScale = new Plottable.Scale.Linear();
-      var yScale = new Plottable.Scale.Category();
+      var xScale = new Plottable.Scales.Linear();
+      var yScale = new Plottable.Scales.Category();
 
       var data1 = [
         {y: "A", x: 1, type: "a"},
@@ -418,8 +418,8 @@ describe("Plots", () => {
       var data2 = [
           { x: "A", y: 1, fill: "red"},
       ];
-      var xScale = new Plottable.Scale.Category();
-      var yScale = new Plottable.Scale.Linear();
+      var xScale = new Plottable.Scales.Category();
+      var yScale = new Plottable.Scales.Linear();
 
       var plot = new Plottable.Plot.StackedBar(xScale, yScale);
       plot.addDataset("d1", data1);
@@ -433,8 +433,8 @@ describe("Plots", () => {
       assert.strictEqual(typeof ds1FirstColumnOffset, "number", "ds1 offset should be a number");
       assert.strictEqual(typeof ds2FirstColumnOffset, "number", "ds2 offset should be a number");
 
-      assert.isFalse(Plottable._Util.Methods.isNaN(ds1FirstColumnOffset), "ds1 offset should not be NaN");
-      assert.isFalse(Plottable._Util.Methods.isNaN(ds1FirstColumnOffset), "ds2 offset should not be NaN");
+      assert.isFalse(Plottable.Utils.Methods.isNaN(ds1FirstColumnOffset), "ds1 offset should not be NaN");
+      assert.isFalse(Plottable.Utils.Methods.isNaN(ds1FirstColumnOffset), "ds2 offset should not be NaN");
     });
 
     it("bad values on the primary axis should default to 0 (be ignored)", () => {
@@ -454,8 +454,8 @@ describe("Plots", () => {
           { x: "A", y: 3, fill: "pink"},
       ];
 
-      var xScale = new Plottable.Scale.Category();
-      var yScale = new Plottable.Scale.Linear();
+      var xScale = new Plottable.Scales.Category();
+      var yScale = new Plottable.Scales.Linear();
 
       var plot = new Plottable.Plot.StackedBar(xScale, yScale);
       plot.addDataset("d1", data1);

@@ -63,17 +63,17 @@ describe("Plots", () => {
 
       var xScaleCalls: number = 0;
       var yScaleCalls: number = 0;
-      var xScale = new Plottable.Scale.Linear();
-      var yScale = new Plottable.Scale.Linear();
+      var xScale = new Plottable.Scales.Linear();
+      var yScale = new Plottable.Scales.Linear();
       var metadataProjector = (d: any, i: number, m: any) => m.cssClass;
       r.project("x", "x", xScale);
       r.project("y", "y", yScale);
       r.project("meta", metadataProjector);
-      xScale.broadcaster.registerListener("unitTest", (listenable: Plottable.Scale.Linear) => {
+      xScale.broadcaster.registerListener("unitTest", (listenable: Plottable.Scales.Linear) => {
         assert.equal(listenable, xScale, "Callback received the calling scale as the first argument");
         ++xScaleCalls;
       });
-      yScale.broadcaster.registerListener("unitTest", (listenable: Plottable.Scale.Linear) => {
+      yScale.broadcaster.registerListener("unitTest", (listenable: Plottable.Scales.Linear) => {
         assert.equal(listenable, yScale, "Callback received the calling scale as the first argument");
         ++yScaleCalls;
       });
@@ -111,7 +111,7 @@ describe("Plots", () => {
 
     it("Plot.project works as intended", () => {
       var r = new Plottable.Plot.AbstractPlot();
-      var s = new Plottable.Scale.Linear().domain([0, 1]).range([0, 10]);
+      var s = new Plottable.Scales.Linear().domain([0, 1]).range([0, 10]);
       r.project("attr", "a", s);
       var attrToProjector = (<any> r)._generateAttrToProjector();
       var projector = attrToProjector["attr"];
@@ -121,7 +121,7 @@ describe("Plots", () => {
     it("Changing Plot.dataset().data to [] causes scale to contract", () => {
       var ds1 = new Plottable.Dataset([0, 1, 2]);
       var ds2 = new Plottable.Dataset([1, 2, 3]);
-      var s = new Plottable.Scale.Linear();
+      var s = new Plottable.Scales.Linear();
       var svg1 = generateSVG(100, 100);
       var svg2 = generateSVG(100, 100);
       var r1 = new Plottable.Plot.AbstractPlot()
@@ -144,7 +144,7 @@ describe("Plots", () => {
       var plot = new Plottable.Plot.AbstractPlot();
 
       // Create mock drawers with already drawn items
-      var mockDrawer1 = new Plottable._Drawer.AbstractDrawer("ds1");
+      var mockDrawer1 = new Plottable.Drawers.AbstractDrawer("ds1");
       var renderArea1 = svg.append("g");
       renderArea1.append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
       (<any> mockDrawer1).setup = () => (<any> mockDrawer1)._renderArea = renderArea1;
@@ -152,7 +152,7 @@ describe("Plots", () => {
 
       var renderArea2 = svg.append("g");
       renderArea2.append("circle").attr("cx", 10).attr("cy", 10).attr("r", 10);
-      var mockDrawer2 = new Plottable._Drawer.AbstractDrawer("ds2");
+      var mockDrawer2 = new Plottable.Drawers.AbstractDrawer("ds2");
       (<any> mockDrawer2).setup = () => (<any> mockDrawer2)._renderArea = renderArea2;
       (<any> mockDrawer2)._getSelector = () => "circle";
 
@@ -200,7 +200,7 @@ describe("Plots", () => {
       var data2PointConverter = (datum: any, index: number) => data2Points[index];
 
       // Create mock drawers with already drawn items
-      var mockDrawer1 = new Plottable._Drawer.AbstractDrawer("ds1");
+      var mockDrawer1 = new Plottable.Drawers.AbstractDrawer("ds1");
       var renderArea1 = svg.append("g");
       renderArea1.append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
       (<any> mockDrawer1).setup = () => (<any> mockDrawer1)._renderArea = renderArea1;
@@ -209,7 +209,7 @@ describe("Plots", () => {
 
       var renderArea2 = svg.append("g");
       renderArea2.append("circle").attr("cx", 10).attr("cy", 10).attr("r", 10);
-      var mockDrawer2 = new Plottable._Drawer.AbstractDrawer("ds2");
+      var mockDrawer2 = new Plottable.Drawers.AbstractDrawer("ds2");
       (<any> mockDrawer2).setup = () => (<any> mockDrawer2)._renderArea = renderArea2;
       (<any> mockDrawer2)._getSelector = () => "circle";
       (<any> mockDrawer2)._getPixelPoint = data2PointConverter;
@@ -261,7 +261,7 @@ describe("Plots", () => {
       var dataPointConverter = (datum: any, index: number) => dataPoints[index];
 
       // Create mock drawer with already drawn items
-      var mockDrawer = new Plottable._Drawer.AbstractDrawer("ds");
+      var mockDrawer = new Plottable.Drawers.AbstractDrawer("ds");
       var renderArea = svg.append("g");
       var circles = renderArea.selectAll("circles").data(data);
       circles.enter().append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
@@ -303,7 +303,7 @@ describe("Plots", () => {
       var data2PointConverter = (datum: any, index: number) => data2Points[index];
 
       // Create mock drawers with already drawn items
-      var mockDrawer1 = new Plottable._Drawer.AbstractDrawer("ds1");
+      var mockDrawer1 = new Plottable.Drawers.AbstractDrawer("ds1");
       var renderArea1 = svg.append("g");
       renderArea1.append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
       (<any> mockDrawer1).setup = () => (<any> mockDrawer1)._renderArea = renderArea1;
@@ -312,7 +312,7 @@ describe("Plots", () => {
 
       var renderArea2 = svg.append("g");
       renderArea2.append("circle").attr("cx", 10).attr("cy", 10).attr("r", 10);
-      var mockDrawer2 = new Plottable._Drawer.AbstractDrawer("ds2");
+      var mockDrawer2 = new Plottable.Drawers.AbstractDrawer("ds2");
       (<any> mockDrawer2).setup = () => (<any> mockDrawer2)._renderArea = renderArea2;
       (<any> mockDrawer2)._getSelector = () => "circle";
       (<any> mockDrawer2)._getPixelPoint = data2PointConverter;
@@ -402,7 +402,7 @@ describe("Plots", () => {
 
     it("remove() disconnects plots from its scales", () => {
       var r = new Plottable.Plot.AbstractPlot();
-      var s = new Plottable.Scale.Linear();
+      var s = new Plottable.Scales.Linear();
       r.project("attr", "a", s);
       r.remove();
       var key2callback = (<any> s).broadcaster._key2callback;
@@ -410,8 +410,8 @@ describe("Plots", () => {
     });
 
     it("extent registration works as intended", () => {
-      var scale1 = new Plottable.Scale.Linear();
-      var scale2 = new Plottable.Scale.Linear();
+      var scale1 = new Plottable.Scales.Linear();
+      var scale2 = new Plottable.Scales.Linear();
 
       var d1 = new Plottable.Dataset([1, 2, 3]);
       var d2 = new Plottable.Dataset([4, 99, 999]);
@@ -452,8 +452,8 @@ describe("Plots", () => {
 
     it("additionalPaint timing works properly", () => {
       var animator = new Plottable.Animator.Base().delay(10).duration(10).maxIterativeDelay(0);
-      var x = new Plottable.Scale.Linear();
-      var y = new Plottable.Scale.Linear();
+      var x = new Plottable.Scales.Linear();
+      var y = new Plottable.Scales.Linear();
       var plot = new Plottable.Plot.Bar(x, y).addDataset([]).animate(true);
       var recordedTime: number = -1;
       var additionalPaint = (x: number) => {
@@ -471,7 +471,7 @@ describe("Plots", () => {
 
     it("extent calculation done in correct dataset order", () => {
       var animator = new Plottable.Animator.Base().delay(10).duration(10).maxIterativeDelay(0);
-      var CategoryScale = new Plottable.Scale.Category();
+      var CategoryScale = new Plottable.Scales.Category();
       var dataset1 = [{key: "A"}];
       var dataset2 = [{key: "B"}];
       var plot = new Plottable.Plot.AbstractPlot()
@@ -491,8 +491,8 @@ describe("Plots", () => {
 
   describe("Abstract XY Plot", () => {
     var svg: D3.Selection;
-    var xScale: Plottable.Scale.Linear;
-    var yScale: Plottable.Scale.Linear;
+    var xScale: Plottable.Scales.Linear;
+    var yScale: Plottable.Scales.Linear;
     var xAccessor: any;
     var yAccessor: any;
     var simpleDataset: Plottable.Dataset;
@@ -506,8 +506,8 @@ describe("Plots", () => {
     beforeEach(() => {
       svg = generateSVG(500, 500);
       simpleDataset = new Plottable.Dataset([{a: -5, b: 6}, {a: -2, b: 2}, {a: 2, b: -2}, {a: 5, b: -6}], {foo: 0});
-      xScale = new Plottable.Scale.Linear();
-      yScale = new Plottable.Scale.Linear();
+      xScale = new Plottable.Scales.Linear();
+      yScale = new Plottable.Scales.Linear();
       plot = new Plottable.Plot.AbstractXYPlot(xScale, yScale);
       plot.addDataset(simpleDataset)
           .project("x", xAccessor, xScale)
@@ -562,7 +562,7 @@ describe("Plots", () => {
     });
 
     it("no cycle in auto domain on plot", () => {
-      var zScale = new Plottable.Scale.Linear().domain([-10, 10]);
+      var zScale = new Plottable.Scales.Linear().domain([-10, 10]);
       plot.automaticallyAdjustYScaleOverVisiblePoints(true);
       var plot2 = new Plottable.Plot.AbstractXYPlot(zScale, yScale)
                                     .automaticallyAdjustXScaleOverVisiblePoints(true)
@@ -597,7 +597,7 @@ describe("Plots", () => {
 
     it("listeners are deregistered for changed scale", () => {
       plot.automaticallyAdjustYScaleOverVisiblePoints(true);
-      var newScale = new Plottable.Scale.Linear().domain([-10, 10]);
+      var newScale = new Plottable.Scales.Linear().domain([-10, 10]);
       plot.project("x", xAccessor, newScale);
       xScale.domain([-2, 2]);
       assert.deepEqual(yScale.domain(), [-7, 7], "replaced xScale didn't adjust yScale");
