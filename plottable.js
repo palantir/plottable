@@ -3298,6 +3298,76 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    var _Drawer;
+    (function (_Drawer) {
+        var ErrorBar = (function (_super) {
+            __extends(ErrorBar, _super);
+            function ErrorBar(key, isVertical) {
+                _super.call(this, key);
+                this.svgElement("g");
+                this._isVertical = isVertical;
+            }
+            ErrorBar.prototype.tickLength = function (tickLength) {
+                this._tickLength = tickLength;
+                return this;
+            };
+            ErrorBar.prototype._enterData = function (data) {
+                var errorBars = this._getRenderArea().selectAll(this._svgElement).data(data);
+                errorBars.enter().append("g").classed(ErrorBar.ERROR_BAR_CLASS, true).each(function (d) {
+                    d3.select(this).append("line").classed(ErrorBar.ERROR_BAR_LOWER_CLASS, true);
+                    d3.select(this).append("line").classed(ErrorBar.ERROR_BAR_MIDDLE_CLASS, true);
+                    d3.select(this).append("line").classed(ErrorBar.ERROR_BAR_UPPER_CLASS, true);
+                });
+                errorBars.exit().remove();
+            };
+            ErrorBar.prototype._drawStep = function (step) {
+                _super.prototype._drawStep.call(this, step);
+                var attrToProjector = Plottable._Util.Methods.copyMap(step.attrToProjector);
+                var xProjector = attrToProjector["x"];
+                var yProjector = attrToProjector["y"];
+                var lowerProjector = attrToProjector["lower"];
+                var upperProjector = attrToProjector["upper"];
+                var halfTickLength = this._tickLength / 2;
+                var minProjector = this._isVertical ? function (d, i) { return xProjector(d, i) - halfTickLength; } : function (d, i) { return yProjector(d, i) - halfTickLength; };
+                var maxProjector = this._isVertical ? function (d, i) { return xProjector(d, i) + halfTickLength; } : function (d, i) { return yProjector(d, i) + halfTickLength; };
+                if (this._isVertical) {
+                    this.setProjectorsForLine(ErrorBar.ERROR_BAR_LOWER_CLASS, minProjector, lowerProjector, maxProjector, lowerProjector);
+                    this.setProjectorsForLine(ErrorBar.ERROR_BAR_MIDDLE_CLASS, xProjector, lowerProjector, xProjector, upperProjector);
+                    this.setProjectorsForLine(ErrorBar.ERROR_BAR_UPPER_CLASS, minProjector, upperProjector, maxProjector, upperProjector);
+                }
+                else {
+                    this.setProjectorsForLine(ErrorBar.ERROR_BAR_LOWER_CLASS, lowerProjector, minProjector, lowerProjector, maxProjector);
+                    this.setProjectorsForLine(ErrorBar.ERROR_BAR_MIDDLE_CLASS, lowerProjector, yProjector, upperProjector, yProjector);
+                    this.setProjectorsForLine(ErrorBar.ERROR_BAR_UPPER_CLASS, upperProjector, minProjector, upperProjector, maxProjector);
+                }
+                delete attrToProjector["x"];
+                delete attrToProjector["y"];
+                delete attrToProjector["lower"];
+                delete attrToProjector["upper"];
+                return _super.prototype._drawStep.call(this, { attrToProjector: attrToProjector, animator: step.animator });
+            };
+            ErrorBar.prototype.setProjectorsForLine = function (selector, x1Projector, y1Projector, x2Projector, y2Projector) {
+                this._getRenderArea().selectAll("line." + selector).attr("x1", x1Projector).attr("x2", x2Projector).attr("y1", y1Projector).attr("y2", y2Projector);
+            };
+            ErrorBar.ERROR_BAR_CLASS = "error-bar";
+            ErrorBar.ERROR_BAR_MIDDLE_CLASS = "error-bar-middle";
+            ErrorBar.ERROR_BAR_LOWER_CLASS = "error-bar-lower";
+            ErrorBar.ERROR_BAR_UPPER_CLASS = "error-bar-upper";
+            return ErrorBar;
+        })(_Drawer.Element);
+        _Drawer.ErrorBar = ErrorBar;
+    })(_Drawer = Plottable._Drawer || (Plottable._Drawer = {}));
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
     var Component;
     (function (Component) {
         var AbstractComponent = (function (_super) {
@@ -8869,6 +8939,59 @@ var Plottable;
             return StackedBar;
         })(Plot.Bar);
         Plot.StackedBar = StackedBar;
+    })(Plot = Plottable.Plot || (Plottable.Plot = {}));
+})(Plottable || (Plottable = {}));
+
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    var Plot;
+    (function (Plot) {
+        var ErrorBar = (function (_super) {
+            __extends(ErrorBar, _super);
+            /**
+             * Constructs an ErrorBarPlot.
+             *
+             * Error bar plots are used to show variability in a reported measurement on a plot.
+             * They are intended to be merged on top of other sorts of plots.
+             *
+             * @constructor
+             * @param {AbstractScale} xScale The x scale to use.
+             * @param {AbstractScale} yScale The y scale to use.
+             * @param {boolean} isVertical Whether the plot is vertical or not. Defaults to true.
+             */
+            function ErrorBar(xScale, yScale, isVertical) {
+                if (isVertical === void 0) { isVertical = true; }
+                _super.call(this, xScale, yScale);
+                this._tickLength = 20;
+                this.classed("error-plot", true);
+                this._defaultStrokeColor = new Plottable.Scale.Color().range()[1];
+                this._isVertical = isVertical;
+            }
+            ErrorBar.prototype.tickLength = function (length) {
+                if (length == null) {
+                    return this._tickLength;
+                }
+                this._tickLength = length;
+                return this;
+            };
+            ErrorBar.prototype._getDrawer = function (key) {
+                return new Plottable._Drawer.ErrorBar(key, this._isVertical).tickLength(this._tickLength);
+            };
+            ErrorBar.prototype._generateAttrToProjector = function () {
+                var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
+                attrToProjector["stroke"] = attrToProjector["stroke"] || d3.functor(this._defaultStrokeColor);
+                attrToProjector["stroke-width"] = attrToProjector["stroke-width"] || d3.functor("2px");
+                return attrToProjector;
+            };
+            return ErrorBar;
+        })(Plot.AbstractXYPlot);
+        Plot.ErrorBar = ErrorBar;
     })(Plot = Plottable.Plot || (Plottable.Plot = {}));
 })(Plottable || (Plottable = {}));
 

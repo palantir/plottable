@@ -1604,6 +1604,22 @@ declare module Plottable {
 
 
 declare module Plottable {
+    module _Drawer {
+        class ErrorBar extends Element {
+            static ERROR_BAR_CLASS: string;
+            static ERROR_BAR_MIDDLE_CLASS: string;
+            static ERROR_BAR_LOWER_CLASS: string;
+            static ERROR_BAR_UPPER_CLASS: string;
+            constructor(key: string, isVertical: boolean);
+            tickLength(tickLength: number): ErrorBar;
+            protected _enterData(data: any[]): void;
+            protected _drawStep(step: AppliedDrawStep): void;
+        }
+    }
+}
+
+
+declare module Plottable {
     module Component {
         class AbstractComponent extends Core.PlottableObject {
             protected _element: D3.Selection;
@@ -3380,6 +3396,42 @@ declare module Plottable {
             _updateScaleExtents(): void;
             _keyAccessor(): _Accessor;
             _valueAccessor(): _Accessor;
+        }
+    }
+}
+
+declare module Plottable {
+    module Plot {
+        class ErrorBar<X, Y> extends AbstractXYPlot<X, Y> {
+            /**
+             * Constructs an ErrorBarPlot.
+             *
+             * Error bar plots are used to show variability in a reported measurement on a plot.
+             * They are intended to be merged on top of other sorts of plots.
+             *
+             * @constructor
+             * @param {AbstractScale} xScale The x scale to use.
+             * @param {AbstractScale} yScale The y scale to use.
+             * @param {boolean} isVertical Whether the plot is vertical or not. Defaults to true.
+             */
+            constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<Y, number>, isVertical?: boolean);
+            /**
+             * Retrieves the length of error bar ticks in pixels. Defaults to 20px in length.
+             *
+             * @return {number} Length of error bar ticks
+             */
+            tickLength(): number;
+            /**
+             * Sets the length of error bar ticks.
+             *
+             * @param {number} length Length of error bar ticks in pixels.
+             * @return {Plot.ErrorBar} The calling Plot.ErrorBar
+             */
+            tickLength(length: number): ErrorBar<X, Y>;
+            protected _getDrawer(key: string): _Drawer.ErrorBar;
+            protected _generateAttrToProjector(): {
+                [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
+            };
         }
     }
 }
