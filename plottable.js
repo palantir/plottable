@@ -3458,7 +3458,7 @@ var Plottable;
                         this._scheduleComputeLayout();
                     }
                     else {
-                        this._parent._invalidateLayout();
+                        this._parent()._invalidateLayout();
                     }
                 }
             };
@@ -3469,6 +3469,7 @@ var Plottable;
              * @returns {Component} The calling component.
              */
             AbstractComponent.prototype.renderTo = function (element) {
+                this.detach();
                 if (element != null) {
                     var selection;
                     if (typeof (element) === "string") {
@@ -3684,9 +3685,6 @@ var Plottable;
             };
             AbstractComponent.prototype._merge = function (c, below) {
                 var cg;
-                if (this._isSetup || this._isAnchored) {
-                    throw new Error("Can't presently merge a component that's already been anchored");
-                }
                 if (Plottable.Component.Group.prototype.isPrototypeOf(c)) {
                     cg = c;
                     cg._addComponent(this, below);
@@ -3742,12 +3740,20 @@ var Plottable;
                 if (this._isAnchored) {
                     this._element.remove();
                 }
-                if (this._parent != null) {
-                    this._parent._removeComponent(this);
+                var parent = this._parent();
+                if (parent != null) {
+                    parent._removeComponent(this);
                 }
                 this._isAnchored = false;
-                this._parent = null;
+                this._parentElement = null;
                 return this;
+            };
+            AbstractComponent.prototype._parent = function (parentElement) {
+                if (parentElement === undefined) {
+                    return this._parentElement;
+                }
+                this.detach();
+                this._parentElement = parentElement;
             };
             /**
              * Removes a Component from the DOM and disconnects it from everything it's
@@ -3791,12 +3797,12 @@ var Plottable;
              */
             AbstractComponent.prototype.originToSVG = function () {
                 var origin = this.origin();
-                var ancestor = this._parent;
+                var ancestor = this._parent();
                 while (ancestor != null) {
                     var ancestorOrigin = ancestor.origin();
                     origin.x += ancestorOrigin.x;
                     origin.y += ancestorOrigin.y;
-                    ancestor = ancestor._parent;
+                    ancestor = ancestor._parent();
                 }
                 return origin;
             };
@@ -3897,7 +3903,7 @@ var Plottable;
                 else {
                     this.components().push(c);
                 }
-                c._parent = this;
+                c._parent(this);
                 if (this._isAnchored) {
                     c._anchor(this._content);
                 }
@@ -6087,7 +6093,9 @@ var Plottable;
                 this.classed("table", true);
                 rows.forEach(function (row, rowIndex) {
                     row.forEach(function (component, colIndex) {
-                        _this.addComponent(rowIndex, colIndex, component);
+                        if (component != null) {
+                            _this.addComponent(rowIndex, colIndex, component);
+                        }
                     });
                 });
             }
@@ -6114,9 +6122,11 @@ var Plottable;
              * @returns {Table} The calling Table.
              */
             Table.prototype.addComponent = function (row, col, component) {
+                if (component == null) {
+                    throw Error("Cannot add null to a table cell");
+                }
                 var currentComponent = this._rows[row] && this._rows[row][col];
                 if (currentComponent) {
-                    currentComponent.detach();
                     component = component.above(currentComponent);
                 }
                 if (this._addComponent(component)) {

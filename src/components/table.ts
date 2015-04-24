@@ -51,7 +51,9 @@ export module Component {
       this.classed("table", true);
       rows.forEach((row, rowIndex) => {
         row.forEach((component, colIndex) => {
-          this.addComponent(rowIndex, colIndex, component);
+          if (component != null) {
+            this.addComponent(rowIndex, colIndex, component);
+          }
         });
       });
     }
@@ -80,10 +82,13 @@ export module Component {
      */
     public addComponent(row: number, col: number, component: AbstractComponent): Table {
 
+      if (component == null) {
+        throw Error("Cannot add null to a table cell");
+      }
+
       var currentComponent = this._rows[row] && this._rows[row][col];
 
       if (currentComponent) {
-        currentComponent.detach();
         component = component.above(currentComponent);
       }
 

@@ -1610,7 +1610,6 @@ declare module Plottable {
             protected _content: D3.Selection;
             protected _boundingBox: D3.Selection;
             clipPathEnabled: boolean;
-            _parent: AbstractComponentContainer;
             protected _fixedHeightFlag: boolean;
             protected _fixedWidthFlag: boolean;
             protected _isSetup: boolean;
@@ -1780,6 +1779,8 @@ declare module Plottable {
              * @returns The calling Component.
              */
             detach(): AbstractComponent;
+            _parent(): AbstractComponentContainer;
+            _parent(parentElement: AbstractComponentContainer): any;
             /**
              * Removes a Component from the DOM and disconnects it from everything it's
              * listening to (effectively destroying it).
