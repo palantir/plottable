@@ -9913,9 +9913,9 @@ var Plottable;
                 this._mouseDispatcher.onMouseMove("Interaction.Drag" + this.getID(), function (p, e) { return _this._doDrag(p, e); });
                 this._mouseDispatcher.onMouseUp("Interaction.Drag" + this.getID(), function (p, e) { return _this._endDrag(p, e); });
                 this._touchDispatcher = Plottable.Dispatcher.Touch.getDispatcher(this._componentToListenTo.content().node());
-                this._touchDispatcher.onTouchStart("Interaction.Drag" + this.getID(), function (p, e) { return _this._startDrag(p, e); });
-                this._touchDispatcher.onTouchMove("Interaction.Drag" + this.getID(), function (p, e) { return _this._doDrag(p, e); });
-                this._touchDispatcher.onTouchEnd("Interaction.Drag" + this.getID(), function (p, e) { return _this._endDrag(p, e); });
+                this._touchDispatcher.onTouchStart("Interaction.Drag" + this.getID(), function (points, ids, e) { return _this._startDrag(points[ids[0]], e); });
+                this._touchDispatcher.onTouchMove("Interaction.Drag" + this.getID(), function (points, ids, e) { return _this._doDrag(points[ids[0]], e); });
+                this._touchDispatcher.onTouchEnd("Interaction.Drag" + this.getID(), function (points, ids, e) { return _this._endDrag(points[ids[0]], e); });
             };
             Drag.prototype._translateAndConstrain = function (p) {
                 var translatedP = this._translateToComponentSpace(p);
