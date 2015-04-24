@@ -5,14 +5,14 @@ var assert = chai.assert;
 describe("Plots", () => {
 
   describe("Stacked Plot Stacking", () => {
-    var stackedPlot: Plottable.Plot.AbstractStacked<number, number>;
+    var stackedPlot: Plottable.Plots.AbstractStacked<number, number>;
     var SVG_WIDTH = 600;
     var SVG_HEIGHT = 400;
 
     beforeEach(() => {
       var xScale = new Plottable.Scales.Linear();
       var yScale = new Plottable.Scales.Linear();
-      stackedPlot = new Plottable.Plot.AbstractStacked(xScale, yScale);
+      stackedPlot = new Plottable.Plots.AbstractStacked(xScale, yScale);
       stackedPlot.project("x", "x", xScale);
       stackedPlot.project("y", "y", yScale);
 
@@ -48,8 +48,8 @@ describe("Plots", () => {
       stackedPlot.addDataset("d4", data4);
       stackedPlot.addDataset("d5", data5);
 
-      var ds2PlotMetadata = <Plottable.Plot.StackedPlotMetadata>(<any> stackedPlot)._key2PlotDatasetKey.get("d2").plotMetadata;
-      var ds5PlotMetadata = <Plottable.Plot.StackedPlotMetadata>(<any> stackedPlot)._key2PlotDatasetKey.get("d5").plotMetadata;
+      var ds2PlotMetadata = <Plottable.Plots.StackedPlotMetadata>(<any> stackedPlot)._key2PlotDatasetKey.get("d2").plotMetadata;
+      var ds5PlotMetadata = <Plottable.Plots.StackedPlotMetadata>(<any> stackedPlot)._key2PlotDatasetKey.get("d5").plotMetadata;
       assert.strictEqual(ds2PlotMetadata.offsets.get("1"), 1, "positive offset was used");
       assert.strictEqual(ds5PlotMetadata.offsets.get("1"), 2, "positive offset was used");
     });
@@ -73,8 +73,8 @@ describe("Plots", () => {
       stackedPlot.addDataset("d3", data3);
       stackedPlot.addDataset("d4", data4);
 
-      var ds2PlotMetadata = <Plottable.Plot.StackedPlotMetadata>(<any> stackedPlot)._key2PlotDatasetKey.get("d2").plotMetadata;
-      var ds4PlotMetadata = <Plottable.Plot.StackedPlotMetadata>(<any> stackedPlot)._key2PlotDatasetKey.get("d4").plotMetadata;
+      var ds2PlotMetadata = <Plottable.Plots.StackedPlotMetadata>(<any> stackedPlot)._key2PlotDatasetKey.get("d2").plotMetadata;
+      var ds4PlotMetadata = <Plottable.Plots.StackedPlotMetadata>(<any> stackedPlot)._key2PlotDatasetKey.get("d4").plotMetadata;
       assert.strictEqual(ds2PlotMetadata.offsets.get("1"), -2, "positive offset was used");
       assert.strictEqual(ds4PlotMetadata.offsets.get("1"), -3, "positive offset was used");
     });
@@ -89,8 +89,8 @@ describe("Plots", () => {
 
       stackedPlot.addDataset("d1", data1);
       stackedPlot.addDataset("d2", data2);
-      var ds1PlotMetadata = <Plottable.Plot.StackedPlotMetadata>(<any> stackedPlot)._key2PlotDatasetKey.get("d1").plotMetadata;
-      var ds2PlotMetadata = <Plottable.Plot.StackedPlotMetadata>(<any> stackedPlot)._key2PlotDatasetKey.get("d2").plotMetadata;
+      var ds1PlotMetadata = <Plottable.Plots.StackedPlotMetadata>(<any> stackedPlot)._key2PlotDatasetKey.get("d1").plotMetadata;
+      var ds2PlotMetadata = <Plottable.Plots.StackedPlotMetadata>(<any> stackedPlot)._key2PlotDatasetKey.get("d2").plotMetadata;
 
       assert.isTrue(isNaN(ds1PlotMetadata.offsets.get("1")), "stacking is initially incorrect");
 
@@ -127,10 +127,10 @@ describe("Plots", () => {
       stackedPlot.addDataset("d5", data5);
       stackedPlot.addDataset("d6", data6);
 
-      var ds3PlotMetadata = <Plottable.Plot.StackedPlotMetadata>(<any> stackedPlot)._key2PlotDatasetKey.get("d3").plotMetadata;
-      var ds4PlotMetadata = <Plottable.Plot.StackedPlotMetadata>(<any> stackedPlot)._key2PlotDatasetKey.get("d4").plotMetadata;
-      var ds5PlotMetadata = <Plottable.Plot.StackedPlotMetadata>(<any> stackedPlot)._key2PlotDatasetKey.get("d5").plotMetadata;
-      var ds6PlotMetadata = <Plottable.Plot.StackedPlotMetadata>(<any> stackedPlot)._key2PlotDatasetKey.get("d6").plotMetadata;
+      var ds3PlotMetadata = <Plottable.Plots.StackedPlotMetadata>(<any> stackedPlot)._key2PlotDatasetKey.get("d3").plotMetadata;
+      var ds4PlotMetadata = <Plottable.Plots.StackedPlotMetadata>(<any> stackedPlot)._key2PlotDatasetKey.get("d4").plotMetadata;
+      var ds5PlotMetadata = <Plottable.Plots.StackedPlotMetadata>(<any> stackedPlot)._key2PlotDatasetKey.get("d5").plotMetadata;
+      var ds6PlotMetadata = <Plottable.Plots.StackedPlotMetadata>(<any> stackedPlot)._key2PlotDatasetKey.get("d6").plotMetadata;
 
       assert.strictEqual(ds3PlotMetadata.offsets.get("1"), -2, "stacking on data1 numerical y value");
       assert.strictEqual(ds4PlotMetadata.offsets.get("1"), 3, "stacking on data2 numerical y value");
@@ -191,7 +191,7 @@ describe("Plots", () => {
     });
 
     it("auto scales correctly on stacked area", () => {
-      var plot = new Plottable.Plot.StackedArea(xScale, yScale)
+      var plot = new Plottable.Plots.StackedArea(xScale, yScale)
                                .addDataset(data1)
                                .addDataset(data2)
                                .project("x", "x", xScale)
@@ -203,7 +203,7 @@ describe("Plots", () => {
     });
 
     it("auto scales correctly on stacked bar", () => {
-      var plot = new Plottable.Plot.StackedBar(xScale, yScale)
+      var plot = new Plottable.Plots.StackedBar(xScale, yScale)
                                .addDataset(data1)
                                .addDataset(data2)
                                .project("x", "x", xScale)
@@ -243,7 +243,7 @@ describe("Plots", () => {
     });
 
     it("auto scales correctly on stacked area", () => {
-      var plot = new Plottable.Plot.StackedArea(yScale, yScale)
+      var plot = new Plottable.Plots.StackedArea(yScale, yScale)
                                .addDataset(data1)
                                .addDataset(data2)
                                .project("x", "x", xScale)
@@ -255,7 +255,7 @@ describe("Plots", () => {
     });
 
     it("auto scales correctly on stacked bar", () => {
-      var plot = new Plottable.Plot.StackedBar(xScale, yScale)
+      var plot = new Plottable.Plots.StackedBar(xScale, yScale)
                                .addDataset(data1)
                                .addDataset(data2)
                                .project("x", "x", xScale)
@@ -271,7 +271,7 @@ describe("Plots", () => {
     var svg: D3.Selection;
     var xScale: Plottable.Scales.Category;
     var yScale: Plottable.Scales.Linear;
-    var stackedBarPlot: Plottable.Plot.StackedBar<string, number>;
+    var stackedBarPlot: Plottable.Plots.StackedBar<string, number>;
 
     beforeEach(() => {
       svg = generateSVG(600, 400);
@@ -279,7 +279,7 @@ describe("Plots", () => {
       xScale = new Plottable.Scales.Category();
       yScale = new Plottable.Scales.Linear();
 
-      stackedBarPlot = new Plottable.Plot.StackedBar(xScale, yScale);
+      stackedBarPlot = new Plottable.Plots.StackedBar(xScale, yScale);
       stackedBarPlot.project("x", "key", xScale);
       stackedBarPlot.project("y", "value", yScale);
 

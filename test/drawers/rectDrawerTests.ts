@@ -7,7 +7,7 @@ describe("Drawers", () => {
       var data = [{a: "foo", b: 10}, {a: "bar", b: 24}];
       var xScale = new Plottable.Scales.Category();
       var yScale = new Plottable.Scales.Linear();
-      var barPlot = new Plottable.Plot.Bar(xScale, yScale);
+      var barPlot = new Plottable.Plots.Bar(xScale, yScale);
 
       var drawer = new Plottable.Drawers.Rect("one", true);
       (<any> barPlot)._getDrawer = () => drawer;
@@ -32,7 +32,7 @@ describe("Drawers", () => {
       var data = [{ a: "foo", b: 10 }, { a: "bar", b: 24 }];
       var xScale = new Plottable.Scales.Linear();
       var yScale = new Plottable.Scales.Category();
-      var barPlot = new Plottable.Plot.Bar(xScale, yScale, false);
+      var barPlot = new Plottable.Plots.Bar(xScale, yScale, false);
 
       var drawer = new Plottable.Drawers.Rect("one", false);
       (<any> barPlot)._getDrawer = () => drawer;

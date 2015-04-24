@@ -9,7 +9,7 @@ describe("Interactive Components", () => {
 
     it("bounds()", () => {
       var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var dbl = new Plottable.Component.Interactive.YDragBoxLayer();
+      var dbl = new Plottable.Components.Interactive.YDragBoxLayer();
       dbl.boxVisible(true);
       dbl.renderTo(svg);
 
@@ -38,7 +38,7 @@ describe("Interactive Components", () => {
 
     it("resizes only in y", () => {
       var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var dbl = new Plottable.Component.Interactive.YDragBoxLayer();
+      var dbl = new Plottable.Components.Interactive.YDragBoxLayer();
       dbl.boxVisible(true);
       dbl.resizable(true);
       dbl.renderTo(svg);
@@ -73,7 +73,7 @@ describe("Interactive Components", () => {
 
     it("stays full width after resizing", () => {
       var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var dbl = new Plottable.Component.Interactive.YDragBoxLayer();
+      var dbl = new Plottable.Components.Interactive.YDragBoxLayer();
       dbl.boxVisible(true);
       dbl.resizable(true);
       dbl.renderTo(svg);

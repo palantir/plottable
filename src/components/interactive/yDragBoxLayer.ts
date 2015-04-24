@@ -1,7 +1,7 @@
 ///<reference path="../../reference.ts" />
 
 module Plottable {
-export module Component {
+export module Components {
   export module Interactive {
     export class YDragBoxLayer extends DragBoxLayer {
       constructor() {

@@ -1,7 +1,7 @@
 ///<reference path="../../reference.ts" />
 
 module Plottable {
-export module Plot {
+export module Plots {
   export class Rectangle<X, Y> extends AbstractXYPlot<X, Y> {
     private _defaultFillColor: string;
 

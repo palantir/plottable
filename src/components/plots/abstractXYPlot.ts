@@ -1,7 +1,7 @@
 ///<reference path="../../reference.ts" />
 
 module Plottable {
-export module Plot {
+export module Plots {
   export class AbstractXYPlot<X, Y> extends AbstractPlot {
     protected _xScale: Scales.AbstractScale<X, number>;
     protected _yScale: Scales.AbstractScale<Y, number>;

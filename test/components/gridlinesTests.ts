@@ -7,14 +7,14 @@ describe("Gridlines", () => {
     var svg = generateSVG(640, 480);
     var xScale = new Plottable.Scales.Linear();
     xScale.domain([0, 10]); // manually set domain since we won't have a renderer
-    var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
+    var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
 
     var yScale = new Plottable.Scales.Linear();
     yScale.domain([0, 10]);
-    var yAxis = new Plottable.Axis.Numeric(yScale, "left");
+    var yAxis = new Plottable.Axes.Numeric(yScale, "left");
 
-    var gridlines = new Plottable.Component.Gridlines(xScale, yScale);
-    var basicTable = new Plottable.Component.Table().addComponent(0, 0, yAxis)
+    var gridlines = new Plottable.Components.Gridlines(xScale, yScale);
+    var basicTable = new Plottable.Components.Table().addComponent(0, 0, yAxis)
                                           .addComponent(0, 1, gridlines)
                                           .addComponent(1, 1, xAxis);
 
@@ -24,7 +24,7 @@ describe("Gridlines", () => {
     yScale.range([yAxis.height(), 0]);
     basicTable._render();
 
-    var xAxisTickMarks = (<any> xAxis)._element.selectAll("." + Plottable.Axis.AbstractAxis.TICK_MARK_CLASS)[0];
+    var xAxisTickMarks = (<any> xAxis)._element.selectAll("." + Plottable.Axes.AbstractAxis.TICK_MARK_CLASS)[0];
     var xGridlines = (<any> gridlines)._element.select(".x-gridlines").selectAll("line")[0];
     assert.equal(xAxisTickMarks.length, xGridlines.length, "There is an x gridline for each x tick");
     for (var i = 0; i < xAxisTickMarks.length; i++) {
@@ -33,7 +33,7 @@ describe("Gridlines", () => {
       assert.closeTo(xTickMarkRect.left, xGridlineRect.left, 1, "x tick and gridline align");
     }
 
-    var yAxisTickMarks = (<any> yAxis)._element.selectAll("." + Plottable.Axis.AbstractAxis.TICK_MARK_CLASS)[0];
+    var yAxisTickMarks = (<any> yAxis)._element.selectAll("." + Plottable.Axes.AbstractAxis.TICK_MARK_CLASS)[0];
     var yGridlines = (<any> gridlines)._element.select(".y-gridlines").selectAll("line")[0];
     assert.equal(yAxisTickMarks.length, yGridlines.length, "There is an x gridline for each x tick");
     for (var j = 0; j < yAxisTickMarks.length; j++) {
@@ -47,7 +47,7 @@ describe("Gridlines", () => {
 
   it("Unanchored Gridlines don't throw an error when scale updates", () => {
     var xScale = new Plottable.Scales.Linear();
-    var gridlines = new Plottable.Component.Gridlines(xScale, null);
+    var gridlines = new Plottable.Components.Gridlines(xScale, null);
     xScale.domain([0, 1]);
     // test passes if error is not thrown.
   });

@@ -1,7 +1,7 @@
 ///<reference path="../../reference.ts" />
 
 module Plottable {
-export module Plot {
+export module Plots {
   export class Scatter<X, Y> extends AbstractXYPlot<X, Y> implements Interactions.Hoverable {
     private _closeDetectionRadius = 5;
     private _defaultFillColor: string;
@@ -18,8 +18,8 @@ export module Plot {
       this.classed("scatter-plot", true);
       this._defaultFillColor = new Scales.Color().range()[0];
 
-      this.animator("symbols-reset", new Animator.Null());
-      this.animator("symbols", new Animator.Base()
+      this.animator("symbols-reset", new Animators.Null());
+      this.animator("symbols", new Animators.Base()
                                            .duration(250)
                                            .delay(5));
     }

@@ -9,7 +9,7 @@ describe("Interactions", () => {
 
     it("onPointerEnter", () => {
       var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var c = new Plottable.Component.AbstractComponent();
+      var c = new Plottable.Components.AbstractComponent();
       c.renderTo(svg);
 
       var pointerInteraction = new Plottable.Interactions.Pointer();
@@ -58,7 +58,7 @@ describe("Interactions", () => {
 
     it("onPointerMove", () => {
       var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var c = new Plottable.Component.AbstractComponent();
+      var c = new Plottable.Components.AbstractComponent();
       c.renderTo(svg);
 
       var pointerInteraction = new Plottable.Interactions.Pointer();
@@ -110,7 +110,7 @@ describe("Interactions", () => {
 
     it("onPointerExit", () => {
       var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var c = new Plottable.Component.AbstractComponent();
+      var c = new Plottable.Components.AbstractComponent();
       c.renderTo(svg);
 
       var pointerInteraction = new Plottable.Interactions.Pointer();

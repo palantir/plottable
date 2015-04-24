@@ -9,12 +9,12 @@ export module Drawers {
    */
   export type DrawStep = {
     attrToProjector: AttributeToProjector;
-    animator: Animator.PlotAnimator;
+    animator: Animators.PlotAnimator;
   }
 
   export type AppliedDrawStep = {
     attrToProjector: AttributeToAppliedProjector;
-    animator: Animator.PlotAnimator;
+    animator: Animators.PlotAnimator;
   }
 
   export class AbstractDrawer {
@@ -80,7 +80,7 @@ export module Drawers {
 
     private _applyMetadata(attrToProjector: AttributeToProjector,
                           userMetadata: any,
-                          plotMetadata: Plot.PlotMetadata): AttributeToAppliedProjector {
+                          plotMetadata: Plots.PlotMetadata): AttributeToAppliedProjector {
       var modifiedAttrToProjector: AttributeToAppliedProjector = {};
       d3.keys(attrToProjector).forEach((attr: string) => {
         modifiedAttrToProjector[attr] =
@@ -106,7 +106,7 @@ export module Drawers {
      * @param{any} userMetadata The metadata provided by user
      * @param{any} plotMetadata The metadata provided by plot
      */
-    public draw(data: any[], drawSteps: DrawStep[], userMetadata: any, plotMetadata: Plot.PlotMetadata) {
+    public draw(data: any[], drawSteps: DrawStep[], userMetadata: any, plotMetadata: Plots.PlotMetadata) {
       var appliedDrawSteps: AppliedDrawStep[] = drawSteps.map((dr: DrawStep) => {
         var appliedAttrToProjector = this._applyMetadata(dr.attrToProjector, userMetadata, plotMetadata);
         this._attrToProjector = <AttributeToAppliedProjector>Utils.Methods.copyMap(appliedAttrToProjector);

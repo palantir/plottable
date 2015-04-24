@@ -1,7 +1,7 @@
 ///<reference path="../../reference.ts" />
 
 module Plottable {
-export module Plot {
+export module Plots {
   export class StackedBar<X, Y> extends Bar<X, Y> {
 
     /**
@@ -17,18 +17,18 @@ export module Plot {
       super(xScale, yScale, isVertical);
     }
 
-    protected _getAnimator(key: string): Animator.PlotAnimator {
+    protected _getAnimator(key: string): Animators.PlotAnimator {
       if (this._animate && this._animateOnNextRender) {
         if (this.animator(key)) {
           return this.animator(key);
         } else if (key === "stacked-bar") {
           var primaryScale: Scales.AbstractScale<any, number> = this._isVertical ? this._yScale : this._xScale;
           var scaledBaseline = primaryScale.scale(this.baseline());
-          return new Animator.MovingRect(scaledBaseline, this._isVertical);
+          return new Animators.MovingRect(scaledBaseline, this._isVertical);
         }
       }
 
-      return new Animator.Null();
+      return new Animators.Null();
     }
 
     protected _generateAttrToProjector() {

@@ -9,7 +9,7 @@ describe("Plots", () => {
     var dataset2: Plottable.Dataset;
     var xScale: Plottable.Scales.Linear;
     var yScale: Plottable.Scales.Linear;
-    var renderer: Plottable.Plot.StackedArea<number>;
+    var renderer: Plottable.Plots.StackedArea<number>;
     var SVG_WIDTH = 600;
     var SVG_HEIGHT = 400;
 
@@ -30,14 +30,14 @@ describe("Plots", () => {
       dataset1 = new Plottable.Dataset(data1);
       dataset2 = new Plottable.Dataset(data2);
 
-      renderer = new Plottable.Plot.StackedArea(xScale, yScale);
+      renderer = new Plottable.Plots.StackedArea(xScale, yScale);
       renderer.addDataset(data1);
       renderer.addDataset(data2);
       renderer.project("x", "x", xScale);
       renderer.project("y", "y", yScale);
       renderer.project("fill", "type", colorScale);
-      var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
-      var table = new Plottable.Component.Table([[renderer], [xAxis]]).renderTo(svg);
+      var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
+      var table = new Plottable.Components.Table([[renderer], [xAxis]]).renderTo(svg);
     });
 
     it("renders correctly", () => {
@@ -62,7 +62,7 @@ describe("Plots", () => {
 
   describe("Stacked Area Plot no data", () => {
     var svg: D3.Selection;
-    var renderer: Plottable.Plot.StackedArea<number>;
+    var renderer: Plottable.Plots.StackedArea<number>;
     var SVG_WIDTH = 600;
     var SVG_HEIGHT = 400;
 
@@ -79,13 +79,13 @@ describe("Plots", () => {
         {x: 3, y: 1, type: "b"}
       ];
 
-      renderer = new Plottable.Plot.StackedArea(xScale, yScale);
+      renderer = new Plottable.Plots.StackedArea(xScale, yScale);
       renderer.addDataset(data1);
       renderer.addDataset(data2);
       renderer.project("fill", "type", colorScale);
       renderer.project("x", "x", xScale);
       renderer.project("y", "y", yScale);
-      new Plottable.Component.Table([[renderer]]).renderTo(svg);
+      new Plottable.Components.Table([[renderer]]).renderTo(svg);
     });
 
     it("path elements rendered correctly", () => {
@@ -106,7 +106,7 @@ describe("Plots", () => {
     var svg: D3.Selection;
     var xScale: Plottable.Scales.Linear;
     var yScale: Plottable.Scales.Linear;
-    var renderer: Plottable.Plot.StackedArea<number>;
+    var renderer: Plottable.Plots.StackedArea<number>;
     var SVG_WIDTH = 600;
     var SVG_HEIGHT = 400;
 
@@ -125,7 +125,7 @@ describe("Plots", () => {
         {x: 3, y: 1, type: "b"}
       ];
 
-      renderer = new Plottable.Plot.StackedArea(xScale, yScale);
+      renderer = new Plottable.Plots.StackedArea(xScale, yScale);
       renderer.addDataset(data1);
       renderer.addDataset(data2);
       renderer.project("fill", "type", colorScale);
@@ -312,7 +312,7 @@ describe("Plots", () => {
     var svg: D3.Selection;
     var xScale: Plottable.Scales.Linear;
     var yScale: Plottable.Scales.Linear;
-    var renderer: Plottable.Plot.StackedArea<number>;
+    var renderer: Plottable.Plots.StackedArea<number>;
     var SVG_WIDTH = 600;
     var SVG_HEIGHT = 400;
 
@@ -331,14 +331,14 @@ describe("Plots", () => {
         {x: 3, yTest: 1, type: "b"}
       ];
 
-      renderer = new Plottable.Plot.StackedArea(xScale, yScale);
+      renderer = new Plottable.Plots.StackedArea(xScale, yScale);
       renderer.project("y", "yTest", yScale);
       renderer.project("x", "x", xScale);
       renderer.addDataset(data1);
       renderer.addDataset(data2);
       renderer.project("fill", "type", colorScale);
-      var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
-      var table = new Plottable.Component.Table([[renderer], [xAxis]]).renderTo(svg);
+      var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
+      var table = new Plottable.Components.Table([[renderer], [xAxis]]).renderTo(svg);
     });
 
     it("renders correctly", () => {

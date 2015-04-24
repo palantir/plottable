@@ -33,7 +33,7 @@ export module Utils {
      * @param {string} The warnings to print
      */
     export function warn(warning: string) {
-      if (!Config.SHOW_WARNINGS) {
+      if (!Configs.SHOW_WARNINGS) {
         return;
       }
       /* tslint:disable:no-console */

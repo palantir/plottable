@@ -33,7 +33,7 @@ export module Drawers {
       return this._labelsTooWide;
     }
 
-    public drawText(data: any[], attrToProjector: AttributeToProjector, userMetadata: any, plotMetadata: Plot.PlotMetadata) {
+    public drawText(data: any[], attrToProjector: AttributeToProjector, userMetadata: any, plotMetadata: Plots.PlotMetadata) {
       var labelTooWide: boolean[] = data.map((d, i) => {
         var text = attrToProjector["label"](d, i, userMetadata, plotMetadata).toString();
         var w = attrToProjector["width"](d, i, userMetadata, plotMetadata);

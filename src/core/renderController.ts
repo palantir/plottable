@@ -21,31 +21,31 @@ export module Core {
    * );
    * ```
    */
-  export module RenderController {
-    var _componentsNeedingRender: {[key: string]: Component.AbstractComponent} = {};
-    var _componentsNeedingComputeLayout: {[key: string]: Component.AbstractComponent} = {};
+  export module RenderControllers {
+    var _componentsNeedingRender: {[key: string]: Components.AbstractComponent} = {};
+    var _componentsNeedingComputeLayout: {[key: string]: Components.AbstractComponent} = {};
     var _animationRequested: boolean = false;
     var _isCurrentlyFlushing: boolean = false;
-    export var _renderPolicy: RenderPolicy.RenderPolicy = new RenderPolicy.AnimationFrame();
+    export var _renderPolicy: RenderPolicies.RenderPolicy = new RenderPolicies.AnimationFrame();
 
-    export function setRenderPolicy(policy: string | RenderPolicy.RenderPolicy): void {
+    export function setRenderPolicy(policy: string | RenderPolicies.RenderPolicy): void {
       if (typeof(policy) === "string") {
         switch ((<string> policy).toLowerCase()) {
           case "immediate":
-          policy = new RenderPolicy.Immediate();
+          policy = new RenderPolicies.Immediate();
           break;
           case "animationframe":
-          policy = new RenderPolicy.AnimationFrame();
+          policy = new RenderPolicies.AnimationFrame();
           break;
           case "timeout":
-          policy = new RenderPolicy.Timeout();
+          policy = new RenderPolicies.Timeout();
           break;
           default:
           Utils.Methods.warn("Unrecognized renderPolicy: " + policy);
           return;
         }
       }
-      _renderPolicy = <RenderPolicy.RenderPolicy> policy;
+      _renderPolicy = <RenderPolicies.RenderPolicy> policy;
     }
 
     /**
@@ -54,7 +54,7 @@ export module Core {
      *
      * @param {AbstractComponent} component Any Plottable component.
      */
-    export function registerToRender(c: Component.AbstractComponent) {
+    export function registerToRender(c: Components.AbstractComponent) {
       if (_isCurrentlyFlushing) {
         Utils.Methods.warn("Registered to render while other components are flushing: request may be ignored");
       }
@@ -68,7 +68,7 @@ export module Core {
      *
      * @param {AbstractComponent} component Any Plottable component.
      */
-    export function registerToComputeLayout(c: Component.AbstractComponent) {
+    export function registerToComputeLayout(c: Components.AbstractComponent) {
       _componentsNeedingComputeLayout[c.getID()] = c;
       _componentsNeedingRender[c.getID()] = c;
       requestRender();
@@ -103,7 +103,7 @@ export module Core {
         _isCurrentlyFlushing = true;
 
         // Finally, perform render of all components
-        var failed: {[key: string]: Component.AbstractComponent} = {};
+        var failed: {[key: string]: Components.AbstractComponent} = {};
         Object.keys(_componentsNeedingRender).forEach((k) => {
           try {
             _componentsNeedingRender[k]._doRender();

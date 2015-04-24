@@ -1,7 +1,7 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Component {
+export module Components {
   export class SelectionBoxLayer extends AbstractComponent {
     protected _box: D3.Selection;
     private _boxArea: D3.Selection;

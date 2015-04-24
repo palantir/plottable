@@ -1,7 +1,7 @@
 ///<reference path="../../reference.ts" />
 
 module Plottable {
-export module Plot {
+export module Plots {
   /*
    * A PiePlot is a plot meant to show how much out of a total an attribute's value is.
    * One usecase is to show how much funding departments are given out of a total budget.

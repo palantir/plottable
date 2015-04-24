@@ -35,7 +35,7 @@ describe("Interactions", () => {
 
     it("onDragStart()", () => {
       var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var c = new Plottable.Component.AbstractComponent();
+      var c = new Plottable.Components.AbstractComponent();
       c.renderTo(svg);
 
       var drag = new Plottable.Interactions.Drag();
@@ -83,7 +83,7 @@ describe("Interactions", () => {
 
     it("onDrag()", () => {
       var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var c = new Plottable.Component.AbstractComponent();
+      var c = new Plottable.Components.AbstractComponent();
       c.renderTo(svg);
 
       var drag = new Plottable.Interactions.Drag();
@@ -121,7 +121,7 @@ describe("Interactions", () => {
 
     it("onDragEnd()", () => {
       var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var c = new Plottable.Component.AbstractComponent();
+      var c = new Plottable.Components.AbstractComponent();
       c.renderTo(svg);
 
       var drag = new Plottable.Interactions.Drag();
@@ -166,7 +166,7 @@ describe("Interactions", () => {
 
     it("constrainToComponent()", () => {
       var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var c = new Plottable.Component.AbstractComponent();
+      var c = new Plottable.Components.AbstractComponent();
       c.renderTo(svg);
 
       var drag = new Plottable.Interactions.Drag();

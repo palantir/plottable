@@ -1,7 +1,7 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Component {
+export module Components {
   export class AbstractComponent extends Core.PlottableObject {
     protected _element: D3.Selection;
     protected _content: D3.Selection;
@@ -153,13 +153,13 @@ export module Component {
 
     public _render() {
       if (this._isAnchored && this._isSetup && this.width() >= 0 && this.height() >= 0) {
-        Core.RenderController.registerToRender(this);
+        Core.RenderControllers.registerToRender(this);
       }
     }
 
     private _scheduleComputeLayout() {
       if (this._isAnchored && this._isSetup) {
-        Core.RenderController.registerToComputeLayout(this);
+        Core.RenderControllers.registerToComputeLayout(this);
       }
     }
 
@@ -214,7 +214,7 @@ export module Component {
       this._computeLayout();
       this._render();
       // flush so that consumers can immediately attach to stuff we create in the DOM
-      Core.RenderController.flush();
+      Core.RenderControllers.flush();
       return this;
     }
 
@@ -422,15 +422,15 @@ export module Component {
       return this._fixedHeightFlag;
     }
 
-    public _merge(c: AbstractComponent, below: boolean): Component.Group {
-      var cg: Component.Group;
-      if (Plottable.Component.Group.prototype.isPrototypeOf(c)) {
-        cg = (<Plottable.Component.Group> c);
+    public _merge(c: AbstractComponent, below: boolean): Components.Group {
+      var cg: Components.Group;
+      if (Plottable.Components.Group.prototype.isPrototypeOf(c)) {
+        cg = (<Plottable.Components.Group> c);
         cg._addComponent(this, below);
         return cg;
       } else {
         var mergedComponents = below ? [this, c] : [c, this];
-        cg = new Plottable.Component.Group(mergedComponents);
+        cg = new Plottable.Components.Group(mergedComponents);
         return cg;
       }
     }
@@ -448,7 +448,7 @@ export module Component {
      * @param {Component} c The component to merge in.
      * @returns {ComponentGroup} The relevant ComponentGroup out of the above four cases.
      */
-    public above(c: AbstractComponent): Component.Group {
+    public above(c: AbstractComponent): Components.Group {
       return this._merge(c, false);
     }
 
@@ -465,7 +465,7 @@ export module Component {
      * @param {Component} c The component to merge in.
      * @returns {ComponentGroup} The relevant ComponentGroup out of the above four cases.
      */
-    public below(c: AbstractComponent): Component.Group {
+    public below(c: AbstractComponent): Components.Group {
       return this._merge(c, true);
     }
 

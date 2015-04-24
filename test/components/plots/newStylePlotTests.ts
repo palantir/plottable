@@ -3,11 +3,11 @@
 var assert = chai.assert;
 describe("Plots", () => {
   describe("New Style Plots", () => {
-    var p: Plottable.Plot.AbstractPlot;
+    var p: Plottable.Plots.AbstractPlot;
     var oldWarn = Plottable.Utils.Methods.warn;
 
     beforeEach(() => {
-      p = new Plottable.Plot.AbstractPlot();
+      p = new Plottable.Plots.AbstractPlot();
       (<any> p)._getDrawer = (k: string) => new Plottable.Drawers.Element(k).svgElement("rect");
     });
 

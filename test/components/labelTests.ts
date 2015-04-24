@@ -7,7 +7,7 @@ describe("Labels", () => {
 
   it("Standard text title label generates properly", () => {
     var svg = generateSVG(400, 80);
-    var label = new Plottable.Component.TitleLabel("A CHART TITLE");
+    var label = new Plottable.Components.TitleLabel("A CHART TITLE");
     label.renderTo(svg);
 
     var content = (<any> label)._content;
@@ -26,7 +26,7 @@ describe("Labels", () => {
   // Skipping due to FF odd client bounding rect computation - #1470.
   it.skip("Left-rotated text is handled properly", () => {
     var svg = generateSVG(100, 400);
-    var label = new Plottable.Component.AxisLabel("LEFT-ROTATED LABEL", "left");
+    var label = new Plottable.Components.AxisLabel("LEFT-ROTATED LABEL", "left");
     label.renderTo(svg);
     var content = (<any> label)._content;
     var text = content.select("text");
@@ -39,7 +39,7 @@ describe("Labels", () => {
   // Skipping due to FF odd client bounding rect computation - #1470.
   it.skip("Right-rotated text is handled properly", () => {
     var svg = generateSVG(100, 400);
-    var label = new Plottable.Component.AxisLabel("RIGHT-ROTATED LABEL", "right");
+    var label = new Plottable.Components.AxisLabel("RIGHT-ROTATED LABEL", "right");
     label.renderTo(svg);
     var content = (<any> label)._content;
     var text = content.select("text");
@@ -51,7 +51,7 @@ describe("Labels", () => {
 
   it("Label text can be changed after label is created", () => {
     var svg = generateSVG(400, 80);
-    var label = new Plottable.Component.TitleLabel("a");
+    var label = new Plottable.Components.TitleLabel("a");
     label.renderTo(svg);
     assert.equal((<any> label)._content.select("text").text(), "a", "the text starts at the specified string");
     assert.operator(label.height(), ">", 0, "rowMin is > 0 for non-empty string");
@@ -66,7 +66,7 @@ describe("Labels", () => {
   it.skip("Superlong text is handled in a sane fashion", () => {
     var svgWidth = 400;
     var svg = generateSVG(svgWidth, 80);
-    var label = new Plottable.Component.TitleLabel("THIS LABEL IS SO LONG WHOEVER WROTE IT WAS PROBABLY DERANGED");
+    var label = new Plottable.Components.TitleLabel("THIS LABEL IS SO LONG WHOEVER WROTE IT WAS PROBABLY DERANGED");
     label.renderTo(svg);
     var content = (<any> label)._content;
     var text = content.select("text");
@@ -78,7 +78,7 @@ describe("Labels", () => {
 
   it("text in a tiny box is truncated to empty string", () => {
     var svg = generateSVG(10, 10);
-    var label = new Plottable.Component.TitleLabel("Yeah, not gonna fit...");
+    var label = new Plottable.Components.TitleLabel("Yeah, not gonna fit...");
     label.renderTo(svg);
     var text = (<any> label)._content.select("text");
     assert.equal(text.text(), "", "text was truncated to empty string");
@@ -87,9 +87,9 @@ describe("Labels", () => {
 
   it("centered text in a table is positioned properly", () => {
     var svg = generateSVG(400, 400);
-    var label = new Plottable.Component.TitleLabel("X");
-    var t = new Plottable.Component.Table().addComponent(0, 0, label)
-                                 .addComponent(1, 0, new Plottable.Component.AbstractComponent());
+    var label = new Plottable.Components.TitleLabel("X");
+    var t = new Plottable.Components.Table().addComponent(0, 0, label)
+                                 .addComponent(1, 0, new Plottable.Components.AbstractComponent());
     t.renderTo(svg);
     var textTranslate = d3.transform((<any> label)._content.select("g").attr("transform")).translate;
     var eleTranslate  = d3.transform((<any> label)._element.attr("transform")).translate;
@@ -100,7 +100,7 @@ describe("Labels", () => {
 
   it("if a label text is changed to empty string, width updates to 0", () => {
     var svg = generateSVG(400, 400);
-    var label = new Plottable.Component.TitleLabel("foo");
+    var label = new Plottable.Components.TitleLabel("foo");
     label.renderTo(svg);
     label.text("");
     assert.equal(label.width(), 0, "width updated to 0");
@@ -108,13 +108,13 @@ describe("Labels", () => {
   });
 
   it("unsupported alignments and orientations are unsupported", () => {
-    assert.throws(() => new Plottable.Component.Label("foo", "bar"), Error, "not a valid orientation");
+    assert.throws(() => new Plottable.Components.Label("foo", "bar"), Error, "not a valid orientation");
   });
 
   // Skipping due to FF odd client bounding rect computation - #1470.
   it.skip("Label orientation can be changed after label is created", () => {
     var svg = generateSVG(400, 400);
-    var label = new Plottable.Component.AxisLabel("CHANGING ORIENTATION");
+    var label = new Plottable.Components.AxisLabel("CHANGING ORIENTATION");
     label.renderTo(svg);
 
     var content = (<any> label)._content;
@@ -133,10 +133,10 @@ describe("Labels", () => {
 
   it("padding reacts well under align", () => {
     var svg = generateSVG(400, 200);
-    var testLabel = new Plottable.Component.Label("testing label").padding(30).xAlign("left");
-    var longLabel = new Plottable.Component.Label("LONG LABELLLLLLLLLLLLLLLLL").xAlign("left");
-    var topLabel = new Plottable.Component.Label("label").yAlign("bottom");
-    new Plottable.Component.Table([[topLabel], [testLabel], [longLabel]]).renderTo(svg);
+    var testLabel = new Plottable.Components.Label("testing label").padding(30).xAlign("left");
+    var longLabel = new Plottable.Components.Label("LONG LABELLLLLLLLLLLLLLLLL").xAlign("left");
+    var topLabel = new Plottable.Components.Label("label").yAlign("bottom");
+    new Plottable.Components.Table([[topLabel], [testLabel], [longLabel]]).renderTo(svg);
 
     var testTextRect = (<any> testLabel)._element.select("text").node().getBoundingClientRect();
     var longTextRect = (<any> longLabel)._element.select("text").node().getBoundingClientRect();
@@ -168,7 +168,7 @@ describe("Labels", () => {
 
   it("padding puts space around the label", () => {
     var svg = generateSVG(400, 200);
-    var testLabel = new Plottable.Component.Label("testing label").padding(30);
+    var testLabel = new Plottable.Components.Label("testing label").padding(30);
     testLabel.renderTo(svg);
 
     var measurer = new SVGTypewriter.Measurers.Measurer(svg);
@@ -181,7 +181,7 @@ describe("Labels", () => {
   });
 
   it("negative padding throws an error", () => {
-    var testLabel = new Plottable.Component.Label("testing label");
+    var testLabel = new Plottable.Components.Label("testing label");
     assert.throws(() => testLabel.padding(-10), Error, "Cannot be less than 0");
   });
 });

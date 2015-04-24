@@ -1,6 +1,6 @@
 ///<reference path="../testReference.ts" />
 
-class MockAnimator implements Plottable.Animator.PlotAnimator {
+class MockAnimator implements Plottable.Animators.PlotAnimator {
   private time: number;
   private callback: Function;
   constructor(time: number, callback?: Function) {
@@ -56,8 +56,8 @@ describe("Drawers", () => {
     });
 
     it("drawer timing works as expected for null animators", () => {
-      var a1 = new Plottable.Animator.Null();
-      var a2 = new Plottable.Animator.Null();
+      var a1 = new Plottable.Animators.Null();
+      var a2 = new Plottable.Animators.Null();
       var ds1: Plottable.Drawers.DrawStep = {attrToProjector: {}, animator: a1};
       var ds2: Plottable.Drawers.DrawStep = {attrToProjector: {}, animator: a2};
       var steps = [ds1, ds2];

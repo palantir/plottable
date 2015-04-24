@@ -1,7 +1,7 @@
 ///<reference path="../../reference.ts" />
 
 module Plottable {
-export module Plot {
+export module Plots {
   export class StackedArea<X> extends Area<X> {
 
     private _isVertical: boolean;
@@ -25,8 +25,8 @@ export module Plot {
       return new Plottable.Drawers.Area(key).drawLine(false);
     }
 
-    public _getAnimator(key: string): Animator.PlotAnimator {
-      return new Animator.Null();
+    public _getAnimator(key: string): Animators.PlotAnimator {
+      return new Animators.Null();
     }
 
     protected _setup() {

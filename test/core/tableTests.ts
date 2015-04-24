@@ -5,12 +5,12 @@ var assert = chai.assert;
 function generateBasicTable(nRows: number, nCols: number) {
   // makes a table with exactly nRows * nCols children in a regular grid, with each
   // child being a basic component
-  var table = new Plottable.Component.Table();
-  var rows: Plottable.Component.AbstractComponent[][] = [];
-  var components: Plottable.Component.AbstractComponent[] = [];
+  var table = new Plottable.Components.Table();
+  var rows: Plottable.Components.AbstractComponent[][] = [];
+  var components: Plottable.Components.AbstractComponent[] = [];
   for(var i = 0; i < nRows; i++) {
     for(var j = 0; j < nCols; j++) {
-      var r = new Plottable.Component.AbstractComponent();
+      var r = new Plottable.Components.AbstractComponent();
       table.addComponent(i, j, r);
       components.push(r);
     }
@@ -20,12 +20,12 @@ function generateBasicTable(nRows: number, nCols: number) {
 
 describe("Tables", () => {
   it("tables are classed properly", () => {
-    var table = new Plottable.Component.Table();
+    var table = new Plottable.Components.Table();
     assert.isTrue(table.classed("table"));
   });
 
   it("padTableToSize works properly", () => {
-    var t = new Plottable.Component.Table();
+    var t = new Plottable.Components.Table();
     assert.deepEqual((<any> t)._rows, [], "the table rows is an empty list");
     (<any> t)._padTableToSize(1, 1);
     var rows = (<any> t)._rows;
@@ -37,25 +37,25 @@ describe("Tables", () => {
 
     (<any> t)._padTableToSize(5, 2);
     assert.lengthOf(rows, 5, "there are five rows");
-    rows.forEach((r: Plottable.Component.AbstractComponent[]) => assert.lengthOf(r, 2, "there are two columsn per row"));
+    rows.forEach((r: Plottable.Components.AbstractComponent[]) => assert.lengthOf(r, 2, "there are two columsn per row"));
     assert.equal(rows[0][0], firstComponent, "the first component is unchanged");
   });
 
   it("table constructor can take a list of lists of components", () => {
-    var c0 = new Plottable.Component.AbstractComponent();
+    var c0 = new Plottable.Components.AbstractComponent();
     var row1 = [null, c0];
-    var row2 = [new Plottable.Component.AbstractComponent(), null];
-    var table = new Plottable.Component.Table([row1, row2]);
+    var row2 = [new Plottable.Components.AbstractComponent(), null];
+    var table = new Plottable.Components.Table([row1, row2]);
     assert.equal((<any> table)._rows[0][1], c0, "the component is in the right spot");
-    var c1 = new Plottable.Component.AbstractComponent();
+    var c1 = new Plottable.Components.AbstractComponent();
     table.addComponent(2, 2, c1);
     assert.equal((<any> table)._rows[2][2], c1, "the inserted component went to the right spot");
   });
 
   it("tables can be constructed by adding components in matrix style", () => {
-    var table = new Plottable.Component.Table();
-    var c1 = new Plottable.Component.AbstractComponent();
-    var c2 = new Plottable.Component.AbstractComponent();
+    var table = new Plottable.Components.Table();
+    var c1 = new Plottable.Components.AbstractComponent();
+    var c2 = new Plottable.Components.AbstractComponent();
     table.addComponent(0, 0, c1);
     table.addComponent(1, 1, c2);
     var rows = (<any> table)._rows;
@@ -69,37 +69,37 @@ describe("Tables", () => {
   });
 
   it("add a component where one already exists creates a new group", () => {
-    var c1 = new Plottable.Component.AbstractComponent();
-    var c2 = new Plottable.Component.AbstractComponent();
-    var c3 = new Plottable.Component.AbstractComponent();
-    var t = new Plottable.Component.Table();
+    var c1 = new Plottable.Components.AbstractComponent();
+    var c2 = new Plottable.Components.AbstractComponent();
+    var c3 = new Plottable.Components.AbstractComponent();
+    var t = new Plottable.Components.Table();
 
     t.addComponent(0, 2, c1);
     t.addComponent(0, 0, c2);
     t.addComponent(0, 2, c3);
 
-    assert.isTrue(Plottable.Component.Group.prototype.isPrototypeOf((<any> t)._rows[0][2]), "A group was created");
+    assert.isTrue(Plottable.Components.Group.prototype.isPrototypeOf((<any> t)._rows[0][2]), "A group was created");
 
-    var components: Plottable.Component.AbstractComponent[] = (<any> t)._rows[0][2].components();
+    var components: Plottable.Components.AbstractComponent[] = (<any> t)._rows[0][2].components();
     assert.lengthOf(components, 2, "The group created should have 2 components");
     assert.equal(components[0], c1, "First element in the group at (0, 2) should be c1");
     assert.equal(components[1], c3, "Second element in the group at (0, 2) should be c3");
   });
 
   it("add a component where a group already exists adds the component to the group", () => {
-    var c1 = new Plottable.Component.AbstractComponent();
-    var c2 = new Plottable.Component.AbstractComponent();
-    var grp = new Plottable.Component.Group([c1, c2]);
+    var c1 = new Plottable.Components.AbstractComponent();
+    var c2 = new Plottable.Components.AbstractComponent();
+    var grp = new Plottable.Components.Group([c1, c2]);
 
-    var c3 = new Plottable.Component.AbstractComponent();
+    var c3 = new Plottable.Components.AbstractComponent();
 
-    var t = new Plottable.Component.Table();
+    var t = new Plottable.Components.Table();
 
     t.addComponent(0, 2, grp);
     t.addComponent(0, 2, c3);
-    assert.isTrue(Plottable.Component.Group.prototype.isPrototypeOf((<any> t)._rows[0][2]), "The cell still contains a group");
+    assert.isTrue(Plottable.Components.Group.prototype.isPrototypeOf((<any> t)._rows[0][2]), "The cell still contains a group");
 
-    var components: Plottable.Component.AbstractComponent[] = (<any> t)._rows[0][2].components();
+    var components: Plottable.Components.AbstractComponent[] = (<any> t)._rows[0][2].components();
     assert.lengthOf(components, 3, "The group created should have 3 components");
     assert.equal(components[0], c1, "First element in the group at (0, 2) should still be c1");
     assert.equal(components[1], c2, "Second element in the group at (0, 2) should still be c2");
@@ -107,18 +107,18 @@ describe("Tables", () => {
   });
 
   it("adding null to a table cell should throw an error", () => {
-    var c1 = new Plottable.Component.AbstractComponent();
-    var t = new Plottable.Component.Table([[c1]]);
+    var c1 = new Plottable.Components.AbstractComponent();
+    var t = new Plottable.Components.Table([[c1]]);
 
     assert.throw(() => t.addComponent(0, 0, null), "Cannot add null to a table cell");
   });
 
   it("addComponent works even if a component is added with a high column and low row index", () => {
     // Solves #180, a weird bug
-    var t = new Plottable.Component.Table();
+    var t = new Plottable.Components.Table();
     var svg = generateSVG();
-    t.addComponent(1, 0, new Plottable.Component.AbstractComponent());
-    t.addComponent(0, 2, new Plottable.Component.AbstractComponent());
+    t.addComponent(1, 0, new Plottable.Components.AbstractComponent());
+    t.addComponent(0, 2, new Plottable.Components.AbstractComponent());
     t.renderTo(svg); //would throw an error without the fix (tested);
     svg.remove();
   });
@@ -170,7 +170,7 @@ describe("Tables", () => {
 
   it("table with fixed-size objects on every side lays out properly", () => {
     var svg = generateSVG();
-    var c4 = new Plottable.Component.AbstractComponent();
+    var c4 = new Plottable.Components.AbstractComponent();
     // [0 1 2] \\
     // [3 4 5] \\
     // [6 7 8] \\
@@ -179,7 +179,7 @@ describe("Tables", () => {
     var c7 = makeFixedSizeComponent(null, 30);
     var c3 = makeFixedSizeComponent(50, null);
     var c5 = makeFixedSizeComponent(50, null);
-    var table = new Plottable.Component.Table([[null, c1, null],
+    var table = new Plottable.Components.Table([[null, c1, null],
                                      [c3  , c4, c5  ],
                                      [null, c7, null]]);
 
@@ -224,12 +224,12 @@ describe("Tables", () => {
   it.skip("table._requestedSpace works properly", () => {
     // [0 1]
     // [2 3]
-    var c0 = new Plottable.Component.AbstractComponent();
+    var c0 = new Plottable.Components.AbstractComponent();
     var c1 = makeFixedSizeComponent(50, 50);
     var c2 = makeFixedSizeComponent(20, 50);
     var c3 = makeFixedSizeComponent(20, 20);
 
-    var table = new Plottable.Component.Table([[c0, c1], [c2, c3]]);
+    var table = new Plottable.Components.Table([[c0, c1], [c2, c3]]);
 
     var spaceRequest = table._requestedSpace(30, 30);
     verifySpaceRequest(spaceRequest, 30, 30, true, true, "1");
@@ -246,7 +246,7 @@ describe("Tables", () => {
 
   describe("table._iterateLayout works properly", () => {
     // This test battery would have caught #405
-    function verifyLayoutResult(result: Plottable.Component._IterateLayoutResult,
+    function verifyLayoutResult(result: Plottable.Components._IterateLayoutResult,
                                 cPS: number[], rPS: number[], gW: number[], gH: number[],
                                 wW: boolean, wH: boolean, id: string) {
       assert.deepEqual(result.colProportionalSpace, cPS, "colProportionalSpace:" + id);
@@ -257,11 +257,11 @@ describe("Tables", () => {
       assert.deepEqual(result.wantsHeight, wH, "wantsHeight:" + id);
     }
 
-    var c1 = new Plottable.Component.AbstractComponent();
-    var c2 = new Plottable.Component.AbstractComponent();
-    var c3 = new Plottable.Component.AbstractComponent();
-    var c4 = new Plottable.Component.AbstractComponent();
-    var table = new Plottable.Component.Table([
+    var c1 = new Plottable.Components.AbstractComponent();
+    var c2 = new Plottable.Components.AbstractComponent();
+    var c3 = new Plottable.Components.AbstractComponent();
+    var c4 = new Plottable.Components.AbstractComponent();
+    var table = new Plottable.Components.Table([
       [c1, c2],
       [c3, c4]]);
 
@@ -295,7 +295,7 @@ describe("Tables", () => {
     });
 
     it.skip("iterateLayout works in the tricky case when components can be unsatisfied but request little space", () => {
-      table = new Plottable.Component.Table([[c1, c2]]);
+      table = new Plottable.Components.Table([[c1, c2]]);
       fixComponentSize(c1, null, null);
       c2._requestedSpace = (w: number, h: number) => {
         return {
@@ -313,28 +313,28 @@ describe("Tables", () => {
   });
 
   describe("table._removeComponent works properly", () => {
-    var c1 = new Plottable.Component.AbstractComponent();
-    var c2 = new Plottable.Component.AbstractComponent();
-    var c3 = new Plottable.Component.AbstractComponent();
-    var c4 = new Plottable.Component.AbstractComponent();
-    var c5 = new Plottable.Component.AbstractComponent();
-    var c6 = new Plottable.Component.AbstractComponent();
-    var table: Plottable.Component.Table;
+    var c1 = new Plottable.Components.AbstractComponent();
+    var c2 = new Plottable.Components.AbstractComponent();
+    var c3 = new Plottable.Components.AbstractComponent();
+    var c4 = new Plottable.Components.AbstractComponent();
+    var c5 = new Plottable.Components.AbstractComponent();
+    var c6 = new Plottable.Components.AbstractComponent();
+    var table: Plottable.Components.Table;
     it("table._removeComponent works in basic case", () => {
-      table = new Plottable.Component.Table([[c1, c2], [c3, c4], [c5, c6]]);
+      table = new Plottable.Components.Table([[c1, c2], [c3, c4], [c5, c6]]);
       table._removeComponent(c4);
       assert.deepEqual((<any> table)._rows, [[c1, c2], [c3, null], [c5, c6]], "remove one element");
     });
 
     it("table._removeComponent does nothing when component is not found", () =>  {
-      table = new Plottable.Component.Table([[c1, c2], [c3, c4]]);
+      table = new Plottable.Components.Table([[c1, c2], [c3, c4]]);
       table._removeComponent (c5);
 
       assert.deepEqual((<any> table)._rows, [[c1, c2], [c3, c4]], "remove nonexistent component");
     });
 
     it("table._removeComponent removing component twice should have same effect as removing it once", () =>  {
-      table = new Plottable.Component.Table([[c1, c2, c3], [c4, c5, c6]]);
+      table = new Plottable.Components.Table([[c1, c2, c3], [c4, c5, c6]]);
 
       table._removeComponent(c1);
       assert.deepEqual((<any> table)._rows, [[null, c2, c3], [c4, c5, c6]], "item twice");
@@ -344,7 +344,7 @@ describe("Tables", () => {
     });
 
     it("table._removeComponent doesn't do anything weird when called with null", () => {
-      table = new Plottable.Component.Table([[c1, null], [c2, c3]]);
+      table = new Plottable.Components.Table([[c1, null], [c2, c3]]);
 
       table._removeComponent(null);
       assert.deepEqual((<any> table)._rows, [[c1, null], [c2, c3]]);

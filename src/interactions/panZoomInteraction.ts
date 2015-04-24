@@ -48,7 +48,7 @@ export module Interactions {
       this._zoom(this._hitBox);
     }
 
-    public _anchor(component: Component.AbstractComponent, hitBox: D3.Selection) {
+    public _anchor(component: Components.AbstractComponent, hitBox: D3.Selection) {
       super._anchor(component, hitBox);
       this.resetZoom();
     }

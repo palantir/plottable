@@ -1,7 +1,7 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Component {
+export module Components {
   /*
    * An abstract ComponentContainer class to encapsulate Table and ComponentGroup's shared functionality.
    * It will not do anything if instantiated directly.

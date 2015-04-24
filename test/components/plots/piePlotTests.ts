@@ -7,7 +7,7 @@ describe("Plots", () => {
     // HACKHACK #1798: beforeEach being used below
     it("renders correctly with no data", () => {
       var svg = generateSVG(400, 400);
-      var plot = new Plottable.Plot.Pie();
+      var plot = new Plottable.Plots.Pie();
       plot.project("value", (d: any) => d.value);
       assert.doesNotThrow(() => plot.renderTo(svg), Error);
       assert.strictEqual(plot.width(), 400, "was allocated width");
@@ -20,14 +20,14 @@ describe("Plots", () => {
     var svg: D3.Selection;
     var simpleDataset: Plottable.Dataset;
     var simpleData: any[];
-    var piePlot: Plottable.Plot.Pie;
+    var piePlot: Plottable.Plots.Pie;
     var renderArea: D3.Selection;
 
     beforeEach(() => {
       svg = generateSVG(500, 500);
       simpleData = [{value: 5, value2: 10, type: "A"}, {value: 15, value2: 10, type: "B"}];
       simpleDataset = new Plottable.Dataset(simpleData);
-      piePlot = new Plottable.Plot.Pie();
+      piePlot = new Plottable.Plots.Pie();
       piePlot.addDataset("simpleDataset", simpleDataset);
       piePlot.project("value", "value");
       piePlot.renderTo(svg);
