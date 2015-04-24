@@ -3,8 +3,8 @@
 module Plottable {
 export module Plot {
   export class AbstractXYPlot<X, Y> extends AbstractPlot {
-    protected _xScale: Scale.AbstractScale<X, number>;
-    protected _yScale: Scale.AbstractScale<Y, number>;
+    protected _xScale: Scales.AbstractScale<X, number>;
+    protected _yScale: Scales.AbstractScale<Y, number>;
     private _autoAdjustXScaleDomain = false;
     private _autoAdjustYScaleDomain = false;
 
@@ -19,7 +19,7 @@ export module Plot {
      * @param {Scale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
      */
-    constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<Y, number>) {
+    constructor(xScale: Scales.AbstractScale<X, number>, yScale: Scales.AbstractScale<Y, number>) {
       super();
       if (xScale == null || yScale == null) {
         throw new Error("XYPlots require an xScale and yScale");
@@ -38,7 +38,7 @@ export module Plot {
      * @param {string} attrToSet One of ["x", "y"] which determines the point's
      * x and y position in the Plot.
      */
-    public project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>) {
+    public project(attrToSet: string, accessor: any, scale?: Scales.AbstractScale<any, any>) {
       // We only want padding and nice-ing on scales that will correspond to axes / pixel layout.
       // So when we get an "x" or "y" scale, enable autoNiceing and autoPadding.
       if (attrToSet === "x" && scale) {
@@ -119,7 +119,7 @@ export module Plot {
     public _computeLayout(offeredXOrigin?: number, offeredYOffset?: number, availableWidth?: number, availableHeight?: number) {
       super._computeLayout(offeredXOrigin, offeredYOffset, availableWidth, availableHeight);
       this._xScale.range([0, this.width()]);
-      if (this._yScale instanceof Scale.Category) {
+      if (this._yScale instanceof Scales.Category) {
         this._yScale.range([0, this.height()]);
       } else {
         this._yScale.range([this.height(), 0]);
@@ -127,8 +127,8 @@ export module Plot {
     }
 
     protected _updateXDomainer() {
-      if (this._xScale instanceof Scale.AbstractQuantitative) {
-        var scale = <Scale.AbstractQuantitative<any>> this._xScale;
+      if (this._xScale instanceof Scales.AbstractQuantitative) {
+        var scale = <Scales.AbstractQuantitative<any>> this._xScale;
         if (!scale._userSetDomainer) {
           scale.domainer().pad().nice();
         }
@@ -136,8 +136,8 @@ export module Plot {
     }
 
     protected _updateYDomainer() {
-      if (this._yScale instanceof Scale.AbstractQuantitative) {
-        var scale = <Scale.AbstractQuantitative<any>> this._yScale;
+      if (this._yScale instanceof Scales.AbstractQuantitative) {
+        var scale = <Scales.AbstractQuantitative<any>> this._yScale;
         if (!scale._userSetDomainer) {
           scale.domainer().pad().nice();
         }
@@ -169,15 +169,15 @@ export module Plot {
       }
     }
 
-    private _adjustDomainToVisiblePoints<A, B>(fromScale: Scale.AbstractScale<A, number>,
-                                             toScale: Scale.AbstractScale<B, number>,
+    private _adjustDomainToVisiblePoints<A, B>(fromScale: Scales.AbstractScale<A, number>,
+                                             toScale: Scales.AbstractScale<B, number>,
                                              fromX: boolean) {
-      if (toScale instanceof Scale.AbstractQuantitative) {
-        var toScaleQ = <Scale.AbstractQuantitative<B>> toScale;
+      if (toScale instanceof Scales.AbstractQuantitative) {
+        var toScaleQ = <Scales.AbstractQuantitative<B>> toScale;
         var normalizedData = this._normalizeDatasets<A, B>(fromX);
 
         var filterFn: (v: A) => boolean;
-        if (fromScale instanceof Scale.AbstractQuantitative) {
+        if (fromScale instanceof Scales.AbstractQuantitative) {
           var fromDomain = fromScale.domain();
           filterFn = (a: A) => fromDomain[0] <= a && fromDomain[1] >= a;
         } else {
@@ -197,7 +197,7 @@ export module Plot {
     protected _normalizeDatasets<A, B>(fromX: boolean): {a: A; b: B}[] {
       var aAccessor: (d: any, i: number, u: any, m: PlotMetadata) => A = this._projections[fromX ? "x" : "y"].accessor;
       var bAccessor: (d: any, i: number, u: any, m: PlotMetadata) => B = this._projections[fromX ? "y" : "x"].accessor;
-      return _Util.Methods.flatten(this._datasetKeysInOrder.map((key: string) => {
+      return Utils.Methods.flatten(this._datasetKeysInOrder.map((key: string) => {
         var dataset = this._key2PlotDatasetKey.get(key).dataset;
         var plotMetadata = this._key2PlotDatasetKey.get(key).plotMetadata;
         return dataset.data().map((d, i) => {
@@ -210,7 +210,7 @@ export module Plot {
       var bVals = values.filter(v => filterFn(v.a)).map(v => v.b);
       var retVal: B[] = [];
       if (bVals.length !== 0) {
-        retVal = [_Util.Methods.min<B>(bVals, null), _Util.Methods.max<B>(bVals, null)];
+        retVal = [Utils.Methods.min<B>(bVals, null), Utils.Methods.max<B>(bVals, null)];
       }
       return retVal;
     }

@@ -12,7 +12,7 @@ describe("Interactions", () => {
       var c = new Plottable.Component.AbstractComponent();
       c.renderTo(svg);
 
-      var pointerInteraction = new Plottable.Interaction.Pointer();
+      var pointerInteraction = new Plottable.Interactions.Pointer();
       c.registerInteraction(pointerInteraction);
 
       var callbackCalled = false;
@@ -61,7 +61,7 @@ describe("Interactions", () => {
       var c = new Plottable.Component.AbstractComponent();
       c.renderTo(svg);
 
-      var pointerInteraction = new Plottable.Interaction.Pointer();
+      var pointerInteraction = new Plottable.Interactions.Pointer();
       c.registerInteraction(pointerInteraction);
 
       var callbackCalled = false;
@@ -113,7 +113,7 @@ describe("Interactions", () => {
       var c = new Plottable.Component.AbstractComponent();
       c.renderTo(svg);
 
-      var pointerInteraction = new Plottable.Interaction.Pointer();
+      var pointerInteraction = new Plottable.Interactions.Pointer();
       c.registerInteraction(pointerInteraction);
 
       var callbackCalled = false;

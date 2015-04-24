@@ -1,7 +1,7 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Scale {
+export module Scales {
   export class Category extends AbstractScale<string, number> {
     protected _d3Scale: D3.Scale.OrdinalScale;
     private _range = [0, 1];
@@ -28,7 +28,7 @@ export module Scale {
 
     protected _getExtent(): string[] {
       var extents: string[][] = this._getAllExtents();
-      return _Util.Methods.uniq(_Util.Methods.flatten(extents));
+      return Utils.Methods.uniq(Utils.Methods.flatten(extents));
     }
 
     public domain(): string[];

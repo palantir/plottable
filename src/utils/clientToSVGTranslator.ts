@@ -1,14 +1,14 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module _Util {
+export module Utils {
   export class ClientToSVGTranslator {
     private static _TRANSLATOR_KEY = "__Plottable_ClientToSVGTranslator"
     private _svg: SVGElement;
     private _measureRect: SVGElement;
 
     public static getTranslator(elem: SVGElement): ClientToSVGTranslator {
-      var svg = _Util.DOM.getBoundingSVG(elem);
+      var svg = Utils.DOM.getBoundingSVG(elem);
 
       var translator: ClientToSVGTranslator = (<any> svg)[ClientToSVGTranslator._TRANSLATOR_KEY];
       if (translator == null) {

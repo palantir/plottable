@@ -1,12 +1,12 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Dispatcher {
+export module Dispatchers {
   export type KeyCallback = (keyCode: number, e: KeyboardEvent) => any;
 
   export class Key extends AbstractDispatcher {
     private static _DISPATCHER_KEY = "__Plottable_Dispatcher_Key";
-    private _keydownBroadcaster: Core.Broadcaster<Dispatcher.Key>;
+    private _keydownBroadcaster: Core.Broadcaster<Dispatchers.Key>;
 
     /**
      * Get a Dispatcher.Key. If one already exists it will be returned;
@@ -14,7 +14,7 @@ export module Dispatcher {
      *
      * @return {Dispatcher.Key} A Dispatcher.Key
      */
-    public static getDispatcher(): Dispatcher.Key {
+    public static getDispatcher(): Dispatchers.Key {
       var dispatcher: Key = (<any> document)[Key._DISPATCHER_KEY];
       if (dispatcher == null) {
         dispatcher = new Key();
@@ -38,8 +38,8 @@ export module Dispatcher {
       this._broadcasters = [this._keydownBroadcaster];
     }
 
-    protected _getWrappedCallback(callback: Function): Core.BroadcasterCallback<Dispatcher.Key> {
-      return (d: Dispatcher.Key, e: KeyboardEvent) => callback(e.keyCode, e);
+    protected _getWrappedCallback(callback: Function): Core.BroadcasterCallback<Dispatchers.Key> {
+      return (d: Dispatchers.Key, e: KeyboardEvent) => callback(e.keyCode, e);
     }
 
     /**

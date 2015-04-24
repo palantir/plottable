@@ -22,7 +22,7 @@ export module Plot {
       return metadata;
     }
 
-    public project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>) {
+    public project(attrToSet: string, accessor: any, scale?: Scales.AbstractScale<any, any>) {
       super.project(attrToSet, accessor, scale);
       if (this._projections["x"] && this._projections["y"] && (attrToSet === "x" || attrToSet === "y")) {
         this._updateStackOffsets();
@@ -42,13 +42,13 @@ export module Plot {
       var domainKeys = this._getDomainKeys();
 
       var positiveDataMapArray: D3.Map<StackedDatum>[] = dataMapArray.map((dataMap) => {
-        return _Util.Methods.populateMap(domainKeys, (domainKey) => {
+        return Utils.Methods.populateMap(domainKeys, (domainKey) => {
           return { key: domainKey, value: Math.max(0, dataMap.get(domainKey).value) || 0 };
         });
       });
 
       var negativeDataMapArray: D3.Map<StackedDatum>[] = dataMapArray.map((dataMap) => {
-        return _Util.Methods.populateMap(domainKeys, (domainKey) => {
+        return Utils.Methods.populateMap(domainKeys, (domainKey) => {
           return { key: domainKey, value: Math.min(dataMap.get(domainKey).value, 0) || 0 };
         });
       });
@@ -61,19 +61,19 @@ export module Plot {
       var datasets = this.datasets();
       var valueAccessor = this._valueAccessor();
       var keyAccessor = this._keyAccessor();
-      var maxStackExtent = _Util.Methods.max<string, number>(this._datasetKeysInOrder, (k: string) => {
+      var maxStackExtent = Utils.Methods.max<string, number>(this._datasetKeysInOrder, (k: string) => {
         var dataset = this._key2PlotDatasetKey.get(k).dataset;
         var plotMetadata = <StackedPlotMetadata>this._key2PlotDatasetKey.get(k).plotMetadata;
-        return _Util.Methods.max<any, number>(dataset.data(), (datum: any, i: number) => {
+        return Utils.Methods.max<any, number>(dataset.data(), (datum: any, i: number) => {
           return +valueAccessor(datum, i, dataset.metadata(), plotMetadata) +
             plotMetadata.offsets.get(keyAccessor(datum, i, dataset.metadata(), plotMetadata));
         }, 0);
       }, 0);
 
-      var minStackExtent = _Util.Methods.min<string, number>(this._datasetKeysInOrder, (k: string) => {
+      var minStackExtent = Utils.Methods.min<string, number>(this._datasetKeysInOrder, (k: string) => {
         var dataset = this._key2PlotDatasetKey.get(k).dataset;
         var plotMetadata = <StackedPlotMetadata>this._key2PlotDatasetKey.get(k).plotMetadata;
-        return _Util.Methods.min<any, number>(dataset.data(), (datum: any, i: number) => {
+        return Utils.Methods.min<any, number>(dataset.data(), (datum: any, i: number) => {
           return +valueAccessor(datum, i, dataset.metadata(), plotMetadata) +
             plotMetadata.offsets.get(keyAccessor(datum, i, dataset.metadata(), plotMetadata));
         }, 0);
@@ -153,7 +153,7 @@ export module Plot {
       var domainKeys = this._getDomainKeys();
 
       var dataMapArray = this._datasetKeysInOrder.map(() => {
-        return _Util.Methods.populateMap(domainKeys, (domainKey) => {
+        return Utils.Methods.populateMap(domainKeys, (domainKey) => {
           return {key: domainKey, value: 0};
         });
       });
@@ -173,7 +173,7 @@ export module Plot {
 
     public _updateScaleExtents() {
       super._updateScaleExtents();
-      var primaryScale: Scale.AbstractScale<any, number> = this._isVertical ? this._yScale : this._xScale;
+      var primaryScale: Scales.AbstractScale<any, number> = this._isVertical ? this._yScale : this._xScale;
       if (!primaryScale) {
         return;
       }
@@ -203,7 +203,7 @@ export module Plot {
         return value;
       };
 
-      return _Util.Methods.flatten(this._datasetKeysInOrder.map((key: string) => {
+      return Utils.Methods.flatten(this._datasetKeysInOrder.map((key: string) => {
         var dataset = this._key2PlotDatasetKey.get(key).dataset;
         var plotMetadata = <StackedPlotMetadata>this._key2PlotDatasetKey.get(key).plotMetadata;
         return dataset.data().map((d, i) => {

@@ -1,7 +1,7 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Scale {
+export module Scales {
   export class AbstractQuantitative<D> extends AbstractScale<D, number> {
     protected _d3Scale: D3.Scale.QuantitativeScale;
     private _numTicks = 10;
@@ -9,7 +9,7 @@ export module Scale {
     public _userSetDomainer: boolean = false;
     private _domainer: Domainer = new Domainer();
     public _typeCoercer = (d: any) => +d;
-    private _tickGenerator: TickGenerators.TickGenerator<D> = (scale: Plottable.Scale.AbstractQuantitative<D>) => scale.getDefaultTicks();
+    private _tickGenerator: TickGenerators.TickGenerator<D> = (scale: Plottable.Scales.AbstractQuantitative<D>) => scale.getDefaultTicks();
 
 
     /**
@@ -58,7 +58,7 @@ export module Scale {
     protected _setDomain(values: D[]) {
         var isNaNOrInfinity = (x: any) => x !== x || x === Infinity || x === -Infinity;
         if (isNaNOrInfinity(values[0]) || isNaNOrInfinity(values[1])) {
-            _Util.Methods.warn("Warning: QuantitativeScales cannot take NaN or Infinity as a domain value. Ignoring.");
+            Utils.Methods.warn("Warning: QuantitativeScales cannot take NaN or Infinity as a domain value. Ignoring.");
             return;
         }
         super._setDomain(values);

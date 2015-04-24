@@ -1,7 +1,7 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Scale {
+export module Scales {
   export class Time extends AbstractQuantitative<any> {
     public _typeCoercer = (d: any) => d && d._isAMomentObject || d instanceof Date ? d : new Date(d);
 

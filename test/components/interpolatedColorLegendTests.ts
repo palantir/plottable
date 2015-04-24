@@ -4,11 +4,11 @@ var assert = chai.assert;
 
 describe("InterpolatedColorLegend", () => {
   var svg: D3.Selection;
-  var colorScale: Plottable.Scale.InterpolatedColor;
+  var colorScale: Plottable.Scales.InterpolatedColor;
 
   beforeEach(() => {
     svg = generateSVG(400, 400);
-    colorScale = new Plottable.Scale.InterpolatedColor();
+    colorScale = new Plottable.Scales.InterpolatedColor();
   });
 
   function assertBasicRendering(legend: Plottable.Component.InterpolatedColorLegend) {
@@ -27,11 +27,11 @@ describe("InterpolatedColorLegend", () => {
     var swatchContainerBCR = swatchContainer.node().getBoundingClientRect();
     var swatchBoundingBox = legendElement.select(".swatch-bounding-box");
     var boundingBoxBCR = swatchBoundingBox.node().getBoundingClientRect();
-    assert.isTrue(Plottable._Util.DOM.boxIsInside(swatchContainerBCR, boundingBoxBCR),
+    assert.isTrue(Plottable.Utils.DOM.boxIsInside(swatchContainerBCR, boundingBoxBCR),
                   "bounding box contains all swatches");
 
     var elementBCR = legendElement.node().getBoundingClientRect();
-    assert.isTrue(Plottable._Util.DOM.boxIsInside(swatchContainerBCR, elementBCR),
+    assert.isTrue(Plottable.Utils.DOM.boxIsInside(swatchContainerBCR, elementBCR),
                   "swatches are drawn within the legend's element");
 
     var formattedDomainValues = scaleDomain.map((<any> legend)._formatter);

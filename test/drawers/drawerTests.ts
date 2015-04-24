@@ -20,8 +20,8 @@ class MockAnimator implements Plottable.Animator.PlotAnimator {
   }
 }
 
-class MockDrawer extends Plottable._Drawer.AbstractDrawer {
-  public _drawStep(step: Plottable._Drawer.DrawStep) {
+class MockDrawer extends Plottable.Drawers.AbstractDrawer {
+  public _drawStep(step: Plottable.Drawers.DrawStep) {
     step.animator.animate(this._getRenderArea(), step.attrToProjector);
   }
 }
@@ -33,15 +33,15 @@ describe("Drawers", () => {
     var svg: D3.Selection;
     var drawer: MockDrawer;
     before(() => {
-      oldTimeout = Plottable._Util.Methods.setTimeout;
-      Plottable._Util.Methods.setTimeout = function(f: Function, time: number, ...args: any[]) {
+      oldTimeout = Plottable.Utils.Methods.setTimeout;
+      Plottable.Utils.Methods.setTimeout = function(f: Function, time: number, ...args: any[]) {
         timings.push(time);
         return oldTimeout(f, time, args);
       };
     });
 
     after(() => {
-      Plottable._Util.Methods.setTimeout = oldTimeout;
+      Plottable.Utils.Methods.setTimeout = oldTimeout;
     });
 
     beforeEach(() => {
@@ -58,8 +58,8 @@ describe("Drawers", () => {
     it("drawer timing works as expected for null animators", () => {
       var a1 = new Plottable.Animator.Null();
       var a2 = new Plottable.Animator.Null();
-      var ds1: Plottable._Drawer.DrawStep = {attrToProjector: {}, animator: a1};
-      var ds2: Plottable._Drawer.DrawStep = {attrToProjector: {}, animator: a2};
+      var ds1: Plottable.Drawers.DrawStep = {attrToProjector: {}, animator: a1};
+      var ds2: Plottable.Drawers.DrawStep = {attrToProjector: {}, animator: a2};
       var steps = [ds1, ds2];
       drawer.draw([], steps, null, null);
       assert.deepEqual(timings, [0, 0], "setTimeout called twice with 0 time both times");
@@ -82,9 +82,9 @@ describe("Drawers", () => {
       var a1 = new MockAnimator(20, callback1);
       var a2 = new MockAnimator(10, callback2);
       var a3 = new MockAnimator(0, callback3);
-      var ds1: Plottable._Drawer.DrawStep = {attrToProjector: {}, animator: a1};
-      var ds2: Plottable._Drawer.DrawStep = {attrToProjector: {}, animator: a2};
-      var ds3: Plottable._Drawer.DrawStep = {attrToProjector: {}, animator: a3};
+      var ds1: Plottable.Drawers.DrawStep = {attrToProjector: {}, animator: a1};
+      var ds2: Plottable.Drawers.DrawStep = {attrToProjector: {}, animator: a2};
+      var ds3: Plottable.Drawers.DrawStep = {attrToProjector: {}, animator: a3};
       var steps = [ds1, ds2, ds3];
       drawer.draw([], steps, null, null);
       assert.deepEqual(timings, [0, 20, 30], "setTimeout called with appropriate times");
@@ -92,7 +92,7 @@ describe("Drawers", () => {
 
     it("_getSelection", () => {
       var svg = generateSVG(300, 300);
-      var drawer = new Plottable._Drawer.AbstractDrawer("test");
+      var drawer = new Plottable.Drawers.AbstractDrawer("test");
       drawer.setup(svg.append("g"));
       (<any> drawer)._getSelector = () => "circle";
       var data = [{one: 2, two: 1}, {one: 33, two: 21}, {one: 11, two: 10}];

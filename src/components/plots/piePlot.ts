@@ -14,7 +14,7 @@ export module Plot {
    */
   export class Pie extends AbstractPlot {
 
-    private _colorScale: Scale.Color;
+    private _colorScale: Scales.Color;
 
     /**
      * Constructs a PiePlot.
@@ -23,7 +23,7 @@ export module Plot {
      */
     constructor() {
       super();
-      this._colorScale = new Scale.Color();
+      this._colorScale = new Scales.Color();
       this.classed("pie-plot", true);
     }
 
@@ -34,7 +34,7 @@ export module Plot {
 
     public addDataset(keyOrDataset: any, dataset?: any) {
       if (this._datasetKeysInOrder.length === 1) {
-        _Util.Methods.warn("Only one dataset is supported in Pie plots");
+        Utils.Methods.warn("Only one dataset is supported in Pie plots");
         return this;
       }
       super.addDataset(keyOrDataset, dataset);
@@ -52,8 +52,8 @@ export module Plot {
       return attrToProjector;
     }
 
-    protected _getDrawer(key: string): _Drawer.AbstractDrawer {
-      return new Plottable._Drawer.Arc(key).setClass("arc");
+    protected _getDrawer(key: string): Drawers.AbstractDrawer {
+      return new Plottable.Drawers.Arc(key).setClass("arc");
     }
 
     public getAllPlotData(datasetKeys?: string | string[]): PlotData {

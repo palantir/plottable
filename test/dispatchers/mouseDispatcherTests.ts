@@ -12,9 +12,9 @@ describe("Dispatchers", () => {
     it("getDispatcher() creates only one Dispatcher.Mouse per <svg>", () => {
       var svg = generateSVG();
 
-      var md1 = Plottable.Dispatcher.Mouse.getDispatcher(<SVGElement> svg.node());
+      var md1 = Plottable.Dispatchers.Mouse.getDispatcher(<SVGElement> svg.node());
       assert.isNotNull(md1, "created a new Dispatcher on an SVG");
-      var md2 = Plottable.Dispatcher.Mouse.getDispatcher(<SVGElement> svg.node());
+      var md2 = Plottable.Dispatchers.Mouse.getDispatcher(<SVGElement> svg.node());
       assert.strictEqual(md1, md2, "returned the existing Dispatcher if called again with same <svg>");
 
       svg.remove();
@@ -23,7 +23,7 @@ describe("Dispatchers", () => {
     it("getLastMousePosition() defaults to a non-null value", () => {
       var svg = generateSVG();
 
-      var md = Plottable.Dispatcher.Mouse.getDispatcher(<SVGElement> svg.node());
+      var md = Plottable.Dispatchers.Mouse.getDispatcher(<SVGElement> svg.node());
       var p = md.getLastMousePosition();
       assert.isNotNull(p, "returns a value after initialization");
       assert.isNotNull(p.x, "x value is set");
@@ -41,7 +41,7 @@ describe("Dispatchers", () => {
       var targetX = 17;
       var targetY = 76;
 
-      var md = Plottable.Dispatcher.Mouse.getDispatcher(<SVGElement> target.node());
+      var md = Plottable.Dispatchers.Mouse.getDispatcher(<SVGElement> target.node());
 
       var cb1Called = false;
       var cb1 = (p: Plottable.Point, e: MouseEvent) => cb1Called = true;
@@ -73,7 +73,7 @@ describe("Dispatchers", () => {
       var targetX = 17;
       var targetY = 76;
 
-      var md = Plottable.Dispatcher.Mouse.getDispatcher(<SVGElement> target.node());
+      var md = Plottable.Dispatchers.Mouse.getDispatcher(<SVGElement> target.node());
 
       var callbackWasCalled = false;
       var callback = (p: Plottable.Point, e: MouseEvent) => callbackWasCalled = true;
@@ -104,7 +104,7 @@ describe("Dispatchers", () => {
         y: targetY
       };
 
-      var md = Plottable.Dispatcher.Mouse.getDispatcher(<SVGElement> target.node());
+      var md = Plottable.Dispatchers.Mouse.getDispatcher(<SVGElement> target.node());
 
       var callbackWasCalled = false;
       var callback = (p: Plottable.Point, e: MouseEvent) => {
@@ -142,7 +142,7 @@ describe("Dispatchers", () => {
         y: targetY
       };
 
-      var md = Plottable.Dispatcher.Mouse.getDispatcher(<SVGElement> target.node());
+      var md = Plottable.Dispatchers.Mouse.getDispatcher(<SVGElement> target.node());
 
       var callbackWasCalled = false;
       var callback = (p: Plottable.Point, e: MouseEvent) => {
@@ -174,7 +174,7 @@ describe("Dispatchers", () => {
         y: targetY
       };
 
-      var md = Plottable.Dispatcher.Mouse.getDispatcher(<SVGElement> target.node());
+      var md = Plottable.Dispatchers.Mouse.getDispatcher(<SVGElement> target.node());
 
       var callbackWasCalled = false;
       var callback = (p: Plottable.Point, e: MouseEvent) => {
@@ -212,7 +212,7 @@ describe("Dispatchers", () => {
       };
       var targetDeltaY = 10;
 
-      var md = Plottable.Dispatcher.Mouse.getDispatcher(<SVGElement> svg.node());
+      var md = Plottable.Dispatchers.Mouse.getDispatcher(<SVGElement> svg.node());
 
       var callbackWasCalled = false;
       var callback = (p: Plottable.Point, e: WheelEvent) => {
@@ -245,7 +245,7 @@ describe("Dispatchers", () => {
         y: targetY
       };
 
-      var md = Plottable.Dispatcher.Mouse.getDispatcher(<SVGElement> target.node());
+      var md = Plottable.Dispatchers.Mouse.getDispatcher(<SVGElement> target.node());
 
       var callbackWasCalled = false;
       var callback = (p: Plottable.Point, e: MouseEvent) => {

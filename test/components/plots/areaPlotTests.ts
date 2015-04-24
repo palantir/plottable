@@ -7,8 +7,8 @@ describe("Plots", () => {
     // HACKHACK #1798: beforeEach being used below
     it("renders correctly with no data", () => {
       var svg = generateSVG(400, 400);
-      var xScale = new Plottable.Scale.Linear();
-      var yScale = new Plottable.Scale.Linear();
+      var xScale = new Plottable.Scales.Linear();
+      var yScale = new Plottable.Scales.Linear();
       var plot = new Plottable.Plot.Area(xScale, yScale);
       plot.project("x", (d: any) => d.x, xScale);
       plot.project("y", (d: any) => d.y, yScale);
@@ -21,8 +21,8 @@ describe("Plots", () => {
 
   describe("AreaPlot", () => {
     var svg: D3.Selection;
-    var xScale: Plottable.Scale.Linear;
-    var yScale: Plottable.Scale.Linear;
+    var xScale: Plottable.Scales.Linear;
+    var yScale: Plottable.Scales.Linear;
     var xAccessor: any;
     var yAccessor: any;
     var y0Accessor: any;
@@ -34,8 +34,8 @@ describe("Plots", () => {
     var renderArea: D3.Selection;
 
     before(() => {
-      xScale = new Plottable.Scale.Linear().domain([0, 1]);
-      yScale = new Plottable.Scale.Linear().domain([0, 1]);
+      xScale = new Plottable.Scales.Linear().domain([0, 1]);
+      yScale = new Plottable.Scales.Linear().domain([0, 1]);
       xAccessor = (d: any) => d.foo;
       yAccessor = (d: any) => d.bar;
       y0Accessor = () => 0;
@@ -182,9 +182,9 @@ describe("Plots", () => {
       var newClassProjector = () => "pink";
       areaPlot.project("class", newClassProjector);
       areaPlot.renderTo(svg);
-      var areaPath = renderArea.select("." + Plottable._Drawer.Area.AREA_CLASS);
+      var areaPath = renderArea.select("." + Plottable.Drawers.Area.AREA_CLASS);
       assert.isTrue(areaPath.classed("pink"));
-      assert.isTrue(areaPath.classed(Plottable._Drawer.Area.AREA_CLASS));
+      assert.isTrue(areaPath.classed(Plottable.Drawers.Area.AREA_CLASS));
       svg.remove();
     });
   });

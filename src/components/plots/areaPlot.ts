@@ -16,7 +16,7 @@ export module Plot {
      * @param {QuantitativeScale} xScale The x scale to use.
      * @param {QuantitativeScale} yScale The y scale to use.
      */
-    constructor(xScale: Scale.AbstractQuantitative<X>, yScale: Scale.AbstractQuantitative<number>) {
+    constructor(xScale: Scales.AbstractQuantitative<X>, yScale: Scales.AbstractQuantitative<number>) {
       super(xScale, yScale);
       this.classed("area-plot", true);
       this.project("y0", 0, yScale); // default
@@ -25,7 +25,7 @@ export module Plot {
       this.animator("main", new Animator.Base()
                                         .duration(600)
                                         .easing("exp-in-out"));
-      this._defaultFillColor = new Scale.Color().range()[0];
+      this._defaultFillColor = new Scales.Color().range()[0];
     }
 
     protected _onDatasetUpdate() {
@@ -36,7 +36,7 @@ export module Plot {
     }
 
     protected _getDrawer(key: string) {
-      return new Plottable._Drawer.Area(key);
+      return new Plottable.Drawers.Area(key);
     }
 
     protected _updateYDomainer() {
@@ -47,8 +47,8 @@ export module Plot {
       var y0Accessor = y0Projector && y0Projector.accessor;
       if (y0Accessor != null) {
         var extents = this.datasets().map((d) => d._getExtent(y0Accessor, this._yScale._typeCoercer));
-        var extent = _Util.Methods.flatten(extents);
-        var uniqExtentVals = _Util.Methods.uniq(extent);
+        var extent = Utils.Methods.flatten(extents);
+        var uniqExtentVals = Utils.Methods.uniq(extent);
         if (uniqExtentVals.length === 1) {
           constantBaseline = uniqExtentVals[0];
         }
@@ -65,7 +65,7 @@ export module Plot {
       }
     }
 
-    public project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>) {
+    public project(attrToSet: string, accessor: any, scale?: Scales.AbstractScale<any, any>) {
       super.project(attrToSet, accessor, scale);
       if (attrToSet === "y0") {
         this._updateYDomainer();

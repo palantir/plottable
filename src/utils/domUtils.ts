@@ -1,6 +1,6 @@
 
 module Plottable {
-export module _Util {
+export module Utils {
   export module DOM {
     /**
      * Gets the bounding box of an element.

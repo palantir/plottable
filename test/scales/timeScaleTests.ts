@@ -4,7 +4,7 @@ var assert = chai.assert;
 
 describe("TimeScale tests", () => {
   it("parses reasonable formats for dates", () => {
-    var scale = new Plottable.Scale.Time();
+    var scale = new Plottable.Scales.Time();
     var firstDate = new Date(2014, 9, 1, 0, 0, 0, 0).valueOf();
     var secondDate = new Date(2014, 10, 1, 0, 0, 0).valueOf();
 
@@ -21,12 +21,12 @@ describe("TimeScale tests", () => {
   });
 
   it("can't set reversed domain", () => {
-    var scale = new Plottable.Scale.Time();
+    var scale = new Plottable.Scales.Time();
     assert.throws(() => scale.domain(["1985-10-26", "1955-11-05"]), "chronological");
   });
 
   it("time coercer works as intended", () => {
-    var tc = new Plottable.Scale.Time()._typeCoercer;
+    var tc = new Plottable.Scales.Time()._typeCoercer;
     assert.equal(tc(null).getMilliseconds(), 0, "null converted to Date(0)");
     // converting null to Date(0) is the correct behavior as it mirror's d3's semantics
     assert.equal(tc("Wed Dec 31 1969 16:00:00 GMT-0800 (PST)").getMilliseconds(), 0, "string parsed to date");
@@ -36,7 +36,7 @@ describe("TimeScale tests", () => {
   });
 
   it("tickInterval produces correct number of ticks", () => {
-    var scale = new Plottable.Scale.Time();
+    var scale = new Plottable.Scales.Time();
     // 100 year span
     scale.domain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2100, 0, 1, 0, 0, 0, 0)]);
     var ticks = scale.tickInterval(d3.time.year);

@@ -7,7 +7,7 @@ describe("Scales", () => {
     var testCallback = (listenable: any) => {
       return true; // doesn't do anything
     };
-    var scale = new Plottable.Scale.Linear();
+    var scale = new Plottable.Scales.Linear();
     scale.broadcaster.registerListener(null, testCallback);
     var scaleCopy = scale.copy();
     assert.deepEqual(scale.domain(), scaleCopy.domain(), "Copied scale has the same domain as the original.");
@@ -17,9 +17,9 @@ describe("Scales", () => {
   });
 
   it("Scale alerts listeners when its domain is updated", () => {
-    var scale = new Plottable.Scale.Linear();
+    var scale = new Plottable.Scales.Linear();
     var callbackWasCalled = false;
-    var testCallback = (listenable: Plottable.Scale.Linear) => {
+    var testCallback = (listenable: Plottable.Scales.Linear) => {
       assert.equal(listenable, scale, "Callback received the calling scale as the first argument");
       callbackWasCalled = true;
     };
@@ -42,11 +42,11 @@ describe("Scales", () => {
   describe("autoranging behavior", () => {
     var data: any[];
     var dataset: Plottable.Dataset;
-    var scale: Plottable.Scale.Linear;
+    var scale: Plottable.Scales.Linear;
     beforeEach(() => {
       data = [{foo: 2, bar: 1}, {foo: 5, bar: -20}, {foo: 0, bar: 0}];
       dataset = new Plottable.Dataset(data);
-      scale = new Plottable.Scale.Linear();
+      scale = new Plottable.Scales.Linear();
     });
 
     it("scale autoDomain flag is not overwritten without explicitly setting the domain", () => {
@@ -82,7 +82,7 @@ describe("Scales", () => {
                           .addDataset(dataset)
                           .project("x", "foo", scale);
       renderer2.renderTo(svg2);
-      var otherScale = new Plottable.Scale.Linear();
+      var otherScale = new Plottable.Scales.Linear();
       renderer1.project("x", "foo", otherScale);
       dataset.data([{foo: 10}, {foo: 11}]);
       assert.deepEqual(scale.domain(), [10, 11], "scale was still listening to dataset after one perspective deregistered");
@@ -115,8 +115,8 @@ describe("Scales", () => {
       var svg = generateSVG(400, 400);
       var ds1 = [{x: 0, y: 0}, {x: 1, y: 1}];
       var ds2 = [{x: 1, y: 1}, {x: 2, y: 2}];
-      var xScale = new Plottable.Scale.Linear();
-      var yScale = new Plottable.Scale.Linear();
+      var xScale = new Plottable.Scales.Linear();
+      var yScale = new Plottable.Scales.Linear();
       xScale.domainer(new Plottable.Domainer());
       var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
       var yAxis = new Plottable.Axis.Numeric(yScale, "left");
@@ -141,7 +141,7 @@ describe("Scales", () => {
 
   describe("Quantitative Scales", () => {
     it("autorange defaults to [0, 1] if no perspectives set", () => {
-      var scale = new Plottable.Scale.Linear();
+      var scale = new Plottable.Scales.Linear();
       scale.autoDomain();
       var d = scale.domain();
       assert.equal(d[0], 0);
@@ -149,7 +149,7 @@ describe("Scales", () => {
     });
 
     it("can change the number of ticks generated", () => {
-      var scale = new Plottable.Scale.Linear();
+      var scale = new Plottable.Scales.Linear();
       var ticks10 = scale.ticks();
       assert.closeTo(ticks10.length, 10, 1, "defaults to (about) 10 ticks");
 
@@ -159,13 +159,13 @@ describe("Scales", () => {
     });
 
     it("autorange defaults to [1, 10] on log scale", () => {
-      var scale = new Plottable.Scale.Log();
+      var scale = new Plottable.Scales.Log();
       scale.autoDomain();
       assert.deepEqual(scale.domain(), [1, 10]);
     });
 
     it("domain can't include NaN or Infinity", () => {
-      var scale = new Plottable.Scale.Linear();
+      var scale = new Plottable.Scales.Linear();
       scale.domain([0, 1]);
       scale.domain([5, Infinity]);
       assert.deepEqual(scale.domain(), [0, 1], "Infinity containing domain was ignored");
@@ -179,8 +179,8 @@ describe("Scales", () => {
 
     it("autoranges appropriately even if stringy numbers are projected", () => {
       var sadTimesData = ["999", "10", "100", "1000", "2", "999"];
-      var xScale = new Plottable.Scale.Linear();
-      var yScale = new Plottable.Scale.Linear();
+      var xScale = new Plottable.Scales.Linear();
+      var yScale = new Plottable.Scales.Linear();
       var plot = new Plottable.Plot.Scatter(xScale, yScale);
       plot.addDataset(sadTimesData);
       var id = (d: any) => d;
@@ -194,7 +194,7 @@ describe("Scales", () => {
     });
 
     it("custom tick generator", () => {
-      var scale = new Plottable.Scale.Linear();
+      var scale = new Plottable.Scales.Linear();
       scale.domain([0, 10]);
       var ticks = scale.ticks();
       assert.closeTo(ticks.length, 10, 1, "ticks were generated correctly with default generator");
@@ -208,7 +208,7 @@ describe("Scales", () => {
   describe("Category Scales", () => {
 
     it("rangeBand is updated when domain changes", () => {
-      var scale = new Plottable.Scale.Category();
+      var scale = new Plottable.Scales.Category();
       scale.range([0, 2679]);
 
       scale.domain(["1", "2", "3", "4"]);
@@ -219,7 +219,7 @@ describe("Scales", () => {
     });
 
     it("stepWidth operates normally", () => {
-      var scale = new Plottable.Scale.Category();
+      var scale = new Plottable.Scales.Category();
       scale.range([0, 3000]);
 
       scale.domain(["1", "2", "3", "4"]);
@@ -230,8 +230,8 @@ describe("Scales", () => {
 
   it("CategoryScale + BarPlot combo works as expected when the data is swapped", () => {
     // This unit test taken from SLATE, see SLATE-163 a fix for SLATE-102
-    var xScale = new Plottable.Scale.Category();
-    var yScale = new Plottable.Scale.Linear();
+    var xScale = new Plottable.Scales.Category();
+    var yScale = new Plottable.Scales.Linear();
     var dA = {x: "A", y: 2};
     var dB = {x: "B", y: 2};
     var dC = {x: "C", y: 2};
@@ -262,7 +262,7 @@ describe("Scales", () => {
 
   describe("Color Scales", () => {
     it("accepts categorical string types and Category domain", () => {
-      var scale = new Plottable.Scale.Color("10");
+      var scale = new Plottable.Scales.Color("10");
       scale.domain(["yes", "no", "maybe"]);
       assert.equal("#1f77b4", scale.scale("yes"));
       assert.equal("#ff7f0e", scale.scale("no"));
@@ -270,7 +270,7 @@ describe("Scales", () => {
     });
 
     it("default colors are generated", () => {
-      var scale = new Plottable.Scale.Color();
+      var scale = new Plottable.Scales.Color();
       var colorArray = ["#5279c7", "#fd373e", "#63c261",
                         "#fad419", "#2c2b6f", "#ff7939",
                         "#db2e65", "#99ce50", "#962565", "#06cccc"];
@@ -278,14 +278,14 @@ describe("Scales", () => {
     });
 
     it("uses altered colors if size of domain exceeds size of range", () => {
-      var scale = new Plottable.Scale.Color();
+      var scale = new Plottable.Scales.Color();
       scale.range(["#5279c7", "#fd373e"]);
       scale.domain(["a", "b", "c"]);
       assert.notEqual(scale.scale("c"), "#5279c7");
     });
 
     it("interprets named color values correctly", () => {
-      var scale = new Plottable.Scale.Color();
+      var scale = new Plottable.Scales.Color();
       scale.range(["red", "blue"]);
       scale.domain(["a", "b"]);
       assert.equal(scale.scale("a"), "#ff0000");
@@ -295,12 +295,12 @@ describe("Scales", () => {
     it("accepts CSS specified colors", () => {
       var style = d3.select("body").append("style");
       style.html(".plottable-colors-0 {background-color: #ff0000 !important; }");
-      var scale = new Plottable.Scale.Color();
+      var scale = new Plottable.Scales.Color();
       style.remove();
       assert.strictEqual(scale.range()[0], "#ff0000", "User has specified red color for first color scale color");
       assert.strictEqual(scale.range()[1], "#fd373e", "The second color of the color scale should be the same");
 
-      var defaultScale = new Plottable.Scale.Color();
+      var defaultScale = new Plottable.Scales.Color();
       assert.strictEqual(scale.range()[0], "#ff0000",
         "Unloading the CSS should not modify the first scale color (this will not be the case if we support dynamic CSS");
       assert.strictEqual(defaultScale.range()[0], "#5279c7",
@@ -310,13 +310,13 @@ describe("Scales", () => {
     it("should try to recover from malicious CSS styleseets", () => {
       var defaultNumberOfColors = 10;
 
-      var initialScale = new Plottable.Scale.Color();
+      var initialScale = new Plottable.Scales.Color();
       assert.strictEqual(initialScale.range().length, defaultNumberOfColors,
         "there should initially be " + defaultNumberOfColors + " default colors");
 
       var maliciousStyle = d3.select("body").append("style");
       maliciousStyle.html("* {background-color: #fff000;}");
-      var affectedScale = new Plottable.Scale.Color();
+      var affectedScale = new Plottable.Scales.Color();
       maliciousStyle.remove();
       var colorRange = affectedScale.range();
       assert.strictEqual(colorRange.length, defaultNumberOfColors + 1,
@@ -331,14 +331,14 @@ describe("Scales", () => {
     });
 
     it("does not crash by malicious CSS stylesheets", () => {
-      var initialScale = new Plottable.Scale.Color();
+      var initialScale = new Plottable.Scales.Color();
       assert.strictEqual(initialScale.range().length, 10, "there should initially be 10 default colors");
 
       var maliciousStyle = d3.select("body").append("style");
       maliciousStyle.html("[class^='plottable-'] {background-color: pink;}");
-      var affectedScale = new Plottable.Scale.Color();
+      var affectedScale = new Plottable.Scales.Color();
       maliciousStyle.remove();
-      var maximumColorsFromCss = (<any> Plottable.Scale.Color).MAXIMUM_COLORS_FROM_CSS;
+      var maximumColorsFromCss = (<any> Plottable.Scales.Color).MAXIMUM_COLORS_FROM_CSS;
       assert.strictEqual(affectedScale.range().length, maximumColorsFromCss,
         "current malicious CSS countermeasure is to cap maximum number of colors to 256");
     });
@@ -347,7 +347,7 @@ describe("Scales", () => {
 
   describe("Interpolated Color Scales", () => {
     it("default scale uses reds and a linear scale type", () => {
-      var scale = new Plottable.Scale.InterpolatedColor();
+      var scale = new Plottable.Scales.InterpolatedColor();
       scale.domain([0, 16]);
       assert.equal("#ffffff", scale.scale(0));
       assert.equal("#feb24c", scale.scale(8));
@@ -355,14 +355,14 @@ describe("Scales", () => {
     });
 
     it("linearly interpolates colors in L*a*b color space", () => {
-      var scale = new Plottable.Scale.InterpolatedColor("reds");
+      var scale = new Plottable.Scales.InterpolatedColor("reds");
       scale.domain([0, 1]);
       assert.equal("#b10026", scale.scale(1));
       assert.equal("#d9151f", scale.scale(0.9));
     });
 
     it("accepts array types with color hex values", () => {
-      var scale = new Plottable.Scale.InterpolatedColor(["#000", "#FFF"]);
+      var scale = new Plottable.Scales.InterpolatedColor(["#000", "#FFF"]);
       scale.domain([0, 16]);
       assert.equal("#000000", scale.scale(0));
       assert.equal("#ffffff", scale.scale(16));
@@ -370,7 +370,7 @@ describe("Scales", () => {
     });
 
     it("accepts array types with color names", () => {
-      var scale = new Plottable.Scale.InterpolatedColor(["black", "white"]);
+      var scale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
       scale.domain([0, 16]);
       assert.equal("#000000", scale.scale(0));
       assert.equal("#ffffff", scale.scale(16));
@@ -378,7 +378,7 @@ describe("Scales", () => {
     });
 
     it("overflow scale values clamp to range", () => {
-      var scale = new Plottable.Scale.InterpolatedColor(["black", "white"]);
+      var scale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
       scale.domain([0, 16]);
       assert.equal("#000000", scale.scale(0));
       assert.equal("#ffffff", scale.scale(16));
@@ -387,7 +387,7 @@ describe("Scales", () => {
     });
 
     it("can be converted to a different range", () => {
-      var scale = new Plottable.Scale.InterpolatedColor(["black", "white"]);
+      var scale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
       scale.domain([0, 16]);
       assert.equal("#000000", scale.scale(0));
       assert.equal("#ffffff", scale.scale(16));
@@ -396,7 +396,7 @@ describe("Scales", () => {
     });
 
     it("can be converted to a different scale type", () => {
-      var scale = new Plottable.Scale.InterpolatedColor(["black", "white"]);
+      var scale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
       scale.domain([0, 16]);
       assert.equal("#000000", scale.scale(0));
       assert.equal("#ffffff", scale.scale(16));
@@ -409,11 +409,11 @@ describe("Scales", () => {
     });
   });
   describe("Modified Log Scale", () => {
-    var scale: Plottable.Scale.ModifiedLog;
+    var scale: Plottable.Scales.ModifiedLog;
     var base = 10;
     var epsilon = 0.00001;
     beforeEach(() => {
-      scale = new Plottable.Scale.ModifiedLog(base);
+      scale = new Plottable.Scales.ModifiedLog(base);
     });
 
     it("is an increasing, continuous function that can go negative", () => {
@@ -442,7 +442,7 @@ describe("Scales", () => {
     });
 
     it("domain defaults to [0, 1]", () => {
-      scale = new Plottable.Scale.ModifiedLog(base);
+      scale = new Plottable.Scales.ModifiedLog(base);
       assert.deepEqual(scale.domain(), [0, 1]);
     });
 
@@ -457,7 +457,7 @@ describe("Scales", () => {
       assert.operator(scale.domain()[0], "<=", domain[0]);
       assert.operator(domain[1], "<=", scale.domain()[1]);
 
-      scale = new Plottable.Scale.ModifiedLog(base);
+      scale = new Plottable.Scales.ModifiedLog(base);
       scale.domainer(new Plottable.Domainer());
       assert.deepEqual(scale.domain(), [0, 1]);
     });
@@ -489,7 +489,7 @@ describe("Scales", () => {
 
       var ticks = scale.ticks();
       assert.deepEqual(ticks, ticks.slice().sort((x, y) => x - y), "ticks should be sorted");
-      assert.deepEqual(ticks, Plottable._Util.Methods.uniq(ticks), "ticks should not be repeated");
+      assert.deepEqual(ticks, Plottable.Utils.Methods.uniq(ticks), "ticks should not be repeated");
       var beforePivot = ticks.filter((x) => x <= -base);
       var afterPivot = ticks.filter((x) => base <= x);
       var betweenPivots = ticks.filter((x) => -base < x && x < base);

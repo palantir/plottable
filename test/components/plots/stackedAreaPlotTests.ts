@@ -7,17 +7,17 @@ describe("Plots", () => {
     var svg: D3.Selection;
     var dataset1: Plottable.Dataset;
     var dataset2: Plottable.Dataset;
-    var xScale: Plottable.Scale.Linear;
-    var yScale: Plottable.Scale.Linear;
+    var xScale: Plottable.Scales.Linear;
+    var yScale: Plottable.Scales.Linear;
     var renderer: Plottable.Plot.StackedArea<number>;
     var SVG_WIDTH = 600;
     var SVG_HEIGHT = 400;
 
     beforeEach(() => {
       svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      xScale = new Plottable.Scale.Linear().domain([1, 3]);
-      yScale = new Plottable.Scale.Linear().domain([0, 4]);
-      var colorScale = new Plottable.Scale.Color("10").domain(["a", "b"]);
+      xScale = new Plottable.Scales.Linear().domain([1, 3]);
+      yScale = new Plottable.Scales.Linear().domain([0, 4]);
+      var colorScale = new Plottable.Scales.Color("10").domain(["a", "b"]);
 
       var data1 = [
         {x: 1, y: 1, type: "a"},
@@ -68,9 +68,9 @@ describe("Plots", () => {
 
     beforeEach(() => {
       svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var xScale = new Plottable.Scale.Linear().domain([1, 3]);
-      var yScale = new Plottable.Scale.Linear().domain([0, 4]);
-      var colorScale = new Plottable.Scale.Color("10");
+      var xScale = new Plottable.Scales.Linear().domain([1, 3]);
+      var yScale = new Plottable.Scales.Linear().domain([0, 4]);
+      var colorScale = new Plottable.Scales.Color("10");
 
       var data1: any[] = [
       ];
@@ -104,17 +104,17 @@ describe("Plots", () => {
 
   describe("Stacked Area Plot Stacking", () => {
     var svg: D3.Selection;
-    var xScale: Plottable.Scale.Linear;
-    var yScale: Plottable.Scale.Linear;
+    var xScale: Plottable.Scales.Linear;
+    var yScale: Plottable.Scales.Linear;
     var renderer: Plottable.Plot.StackedArea<number>;
     var SVG_WIDTH = 600;
     var SVG_HEIGHT = 400;
 
     beforeEach(() => {
       svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      xScale = new Plottable.Scale.Linear().domain([1, 3]);
-      yScale = new Plottable.Scale.Linear();
-      var colorScale = new Plottable.Scale.Color("10").domain(["a", "b"]);
+      xScale = new Plottable.Scales.Linear().domain([1, 3]);
+      yScale = new Plottable.Scales.Linear();
+      var colorScale = new Plottable.Scales.Color("10").domain(["a", "b"]);
 
       var data1 = [
         {x: 1, y: 1, type: "a"},
@@ -290,8 +290,8 @@ describe("Plots", () => {
 
     it("warning is thrown when datasets are updated with different domains", () => {
       var flag = false;
-      var oldWarn = Plottable._Util.Methods.warn;
-      (<any> Plottable._Util.Methods).warn = (msg: string) => {
+      var oldWarn = Plottable.Utils.Methods.warn;
+      (<any> Plottable.Utils.Methods).warn = (msg: string) => {
         if (msg.indexOf("domain") > -1) { flag = true; }
       };
 
@@ -301,7 +301,7 @@ describe("Plots", () => {
       var dataset = new Plottable.Dataset(missingDomainData);
       renderer.addDataset(dataset);
 
-      (<any> Plottable._Util.Methods).warn = oldWarn;
+      (<any> Plottable.Utils.Methods).warn = oldWarn;
       assert.isTrue(flag, "warning has been issued about differing domains");
 
       svg.remove();
@@ -310,17 +310,17 @@ describe("Plots", () => {
 
   describe("Stacked Area Plot Project", () => {
     var svg: D3.Selection;
-    var xScale: Plottable.Scale.Linear;
-    var yScale: Plottable.Scale.Linear;
+    var xScale: Plottable.Scales.Linear;
+    var yScale: Plottable.Scales.Linear;
     var renderer: Plottable.Plot.StackedArea<number>;
     var SVG_WIDTH = 600;
     var SVG_HEIGHT = 400;
 
     beforeEach(() => {
       svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      xScale = new Plottable.Scale.Linear().domain([1, 3]);
-      yScale = new Plottable.Scale.Linear().domain([0, 4]);
-      var colorScale = new Plottable.Scale.Color("10").domain(["a", "b"]);
+      xScale = new Plottable.Scales.Linear().domain([1, 3]);
+      yScale = new Plottable.Scales.Linear().domain([0, 4]);
+      var colorScale = new Plottable.Scales.Color("10").domain(["a", "b"]);
 
       var data1 = [
         {x: 1, yTest: 1, type: "a"},

@@ -23,7 +23,7 @@ export module Axis {
      * @param {string} orientation The orientation of the QuantitativeScale (top/bottom/left/right)
      * @param {Formatter} formatter A function to format tick labels (default Formatters.general()).
      */
-    constructor(scale: Scale.AbstractQuantitative<number>, orientation: string, formatter = Formatters.general()) {
+    constructor(scale: Scales.AbstractQuantitative<number>, orientation: string, formatter = Formatters.general()) {
       super(scale, orientation, formatter);
     }
 
@@ -40,7 +40,7 @@ export module Axis {
         return this._measurer.measure(formattedValue).width;
       });
 
-      var maxTextLength = _Util.Methods.max(textLengths, 0);
+      var maxTextLength = Utils.Methods.max(textLengths, 0);
 
       if (this._tickLabelPositioning === "center") {
         this._computedWidth = this._maxLabelTickLength() + this.tickLabelPadding() + maxTextLength;
@@ -64,7 +64,7 @@ export module Axis {
     }
 
     protected _getTickValues(): any[] {
-      var scale = (<Scale.AbstractQuantitative<number>> this._scale);
+      var scale = (<Scales.AbstractQuantitative<number>> this._scale);
       var domain = scale.domain();
       var min = domain[0] <= domain[1] ? domain[0] : domain[1];
       var max = domain[0] >= domain[1] ? domain[0] : domain[1];
@@ -334,11 +334,11 @@ export module Axis {
         return;
       }
       var firstTickLabel = tickLabels[0][0];
-      if (!_Util.DOM.boxIsInside(firstTickLabel.getBoundingClientRect(), boundingBox)) {
+      if (!Utils.DOM.boxIsInside(firstTickLabel.getBoundingClientRect(), boundingBox)) {
         d3.select(firstTickLabel).style("visibility", "hidden");
       }
       var lastTickLabel = tickLabels[0][tickLabels[0].length - 1];
-      if (!_Util.DOM.boxIsInside(lastTickLabel.getBoundingClientRect(), boundingBox)) {
+      if (!Utils.DOM.boxIsInside(lastTickLabel.getBoundingClientRect(), boundingBox)) {
         d3.select(lastTickLabel).style("visibility", "hidden");
       }
     }
@@ -351,7 +351,7 @@ export module Axis {
         return;
       }
       tickLabels.each(function(d: any, i: number) {
-        if (!_Util.DOM.boxIsInside(this.getBoundingClientRect(), boundingBox)) {
+        if (!Utils.DOM.boxIsInside(this.getBoundingClientRect(), boundingBox)) {
           d3.select(this).style("visibility", "hidden");
         }
       });

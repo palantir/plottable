@@ -1,18 +1,18 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Dispatcher {
+export module Dispatchers {
   export type MouseCallback = (p: Point, e: MouseEvent) => any;
 
   export class Mouse extends AbstractDispatcher {
     private static _DISPATCHER_KEY = "__Plottable_Dispatcher_Mouse";
-    private translator: _Util.ClientToSVGTranslator;
+    private translator: Utils.ClientToSVGTranslator;
     private _lastMousePosition: Point;
-    private _moveBroadcaster: Core.Broadcaster<Dispatcher.Mouse>;
-    private _downBroadcaster: Core.Broadcaster<Dispatcher.Mouse>;
-    private _upBroadcaster: Core.Broadcaster<Dispatcher.Mouse>;
-    private _wheelBroadcaster: Core.Broadcaster<Dispatcher.Mouse>;
-    private _dblClickBroadcaster: Core.Broadcaster<Dispatcher.Mouse>;
+    private _moveBroadcaster: Core.Broadcaster<Dispatchers.Mouse>;
+    private _downBroadcaster: Core.Broadcaster<Dispatchers.Mouse>;
+    private _upBroadcaster: Core.Broadcaster<Dispatchers.Mouse>;
+    private _wheelBroadcaster: Core.Broadcaster<Dispatchers.Mouse>;
+    private _dblClickBroadcaster: Core.Broadcaster<Dispatchers.Mouse>;
 
     /**
      * Get a Dispatcher.Mouse for the <svg> containing elem. If one already exists
@@ -21,8 +21,8 @@ export module Dispatcher {
      * @param {SVGElement} elem A svg DOM element.
      * @return {Dispatcher.Mouse} A Dispatcher.Mouse
      */
-    public static getDispatcher(elem: SVGElement): Dispatcher.Mouse {
-      var svg = _Util.DOM.getBoundingSVG(elem);
+    public static getDispatcher(elem: SVGElement): Dispatchers.Mouse {
+      var svg = Utils.DOM.getBoundingSVG(elem);
 
       var dispatcher: Mouse = (<any> svg)[Mouse._DISPATCHER_KEY];
       if (dispatcher == null) {
@@ -41,7 +41,7 @@ export module Dispatcher {
     constructor(svg: SVGElement) {
       super();
 
-      this.translator = _Util.ClientToSVGTranslator.getTranslator(svg);
+      this.translator = Utils.ClientToSVGTranslator.getTranslator(svg);
 
       this._lastMousePosition = { x: -1, y: -1 };
 
@@ -67,8 +67,8 @@ export module Dispatcher {
                             this._dblClickBroadcaster];
     }
 
-    protected _getWrappedCallback(callback: Function): Core.BroadcasterCallback<Dispatcher.Mouse> {
-      return (md: Dispatcher.Mouse, p: Point, e: MouseEvent) => callback(p, e);
+    protected _getWrappedCallback(callback: Function): Core.BroadcasterCallback<Dispatchers.Mouse> {
+      return (md: Dispatchers.Mouse, p: Point, e: MouseEvent) => callback(p, e);
     }
 
     /**
@@ -82,7 +82,7 @@ export module Dispatcher {
      *                                     to remove a callback.
      * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
      */
-    public onMouseMove(key: any, callback: MouseCallback): Dispatcher.Mouse {
+    public onMouseMove(key: any, callback: MouseCallback): Dispatchers.Mouse {
       this._setCallback(this._moveBroadcaster, key, callback);
       return this;
     }
@@ -98,7 +98,7 @@ export module Dispatcher {
      *                                     to remove a callback.
      * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
      */
-    public onMouseDown(key: any, callback: MouseCallback): Dispatcher.Mouse {
+    public onMouseDown(key: any, callback: MouseCallback): Dispatchers.Mouse {
       this._setCallback(this._downBroadcaster, key, callback);
       return this;
     }
@@ -114,7 +114,7 @@ export module Dispatcher {
      *                                     to remove a callback.
      * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
      */
-    public onMouseUp(key: any, callback: MouseCallback): Dispatcher.Mouse {
+    public onMouseUp(key: any, callback: MouseCallback): Dispatchers.Mouse {
       this._setCallback(this._upBroadcaster, key, callback);
       return this;
     }
@@ -130,7 +130,7 @@ export module Dispatcher {
      *                                     Pass `null` to remove a callback.
      * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
      */
-    public onWheel(key: any, callback: MouseCallback): Dispatcher.Mouse {
+    public onWheel(key: any, callback: MouseCallback): Dispatchers.Mouse {
       this._setCallback(this._wheelBroadcaster, key, callback);
       return this;
     }
@@ -146,7 +146,7 @@ export module Dispatcher {
      *                                     Pass `null` to remove a callback.
      * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
      */
-    public onDblClick(key: any, callback: MouseCallback): Dispatcher.Mouse {
+    public onDblClick(key: any, callback: MouseCallback): Dispatchers.Mouse {
       this._setCallback(this._dblClickBroadcaster, key, callback);
       return this;
     }
@@ -155,7 +155,7 @@ export module Dispatcher {
      * Computes the mouse position from the given event, and if successful
      * calls broadcast() on the supplied Broadcaster.
      */
-    private _measureAndBroadcast(e: MouseEvent, b: Core.Broadcaster<Dispatcher.Mouse>) {
+    private _measureAndBroadcast(e: MouseEvent, b: Core.Broadcaster<Dispatchers.Mouse>) {
       var newMousePosition = this.translator.computePosition(e.clientX, e.clientY);
       if (newMousePosition != null) {
         this._lastMousePosition = newMousePosition;
