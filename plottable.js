@@ -9682,8 +9682,8 @@ var Plottable;
                 this._mouseDispatcher.onMouseUp("Interaction.DoubleClick" + this.getID(), function (p) { return _this._handleClickUp(p); });
                 this._mouseDispatcher.onDblClick("Interaction.DoubleClick" + this.getID(), function (p) { return _this._handleDblClick(); });
                 this._touchDispatcher = Plottable.Dispatcher.Touch.getDispatcher(component.content().node());
-                this._touchDispatcher.onTouchStart("Interaction.DoubleClick" + this.getID(), function (p) { return _this._handleClickDown(p); });
-                this._touchDispatcher.onTouchEnd("Interaction.DoubleClick" + this.getID(), function (p) { return _this._handleClickUp(p); });
+                this._touchDispatcher.onTouchStart("Interaction.DoubleClick" + this.getID(), function (ids, idToPoint) { return _this._handleClickDown(idToPoint[ids[0]]); });
+                this._touchDispatcher.onTouchEnd("Interaction.DoubleClick" + this.getID(), function (ids, idToPoint) { return _this._handleClickUp(idToPoint[ids[0]]); });
             };
             DoubleClick.prototype._handleClickDown = function (p) {
                 var translatedP = this._translateToComponentSpace(p);

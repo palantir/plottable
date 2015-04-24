@@ -23,8 +23,10 @@ export module Interaction {
       this._mouseDispatcher.onDblClick("Interaction.DoubleClick" + this.getID(), (p: Point) => this._handleDblClick());
 
       this._touchDispatcher = Dispatcher.Touch.getDispatcher(<SVGElement> component.content().node());
-      this._touchDispatcher.onTouchStart("Interaction.DoubleClick" + this.getID(), (p: Point) => this._handleClickDown(p));
-      this._touchDispatcher.onTouchEnd("Interaction.DoubleClick" + this.getID(), (p: Point) => this._handleClickUp(p));
+      this._touchDispatcher.onTouchStart("Interaction.DoubleClick" + this.getID(), (ids, idToPoint) =>
+                                                                                     this._handleClickDown(idToPoint[ids[0]]));
+      this._touchDispatcher.onTouchEnd("Interaction.DoubleClick" + this.getID(), (ids, idToPoint) =>
+                                                                                     this._handleClickUp(idToPoint[ids[0]]));
     }
 
     private _handleClickDown(p: Point) {
