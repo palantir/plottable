@@ -258,7 +258,7 @@ var Plottable;
              * Numbers represented as strings do not pass this function
              */
             function isValidNumber(n) {
-                return typeof n === "number" && !Plottable._Util.Methods.isNaN(n);
+                return typeof n === "number" && !Plottable._Util.Methods.isNaN(n) && isFinite(n);
             }
             Methods.isValidNumber = isValidNumber;
             /**

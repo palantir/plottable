@@ -259,7 +259,7 @@ export module _Util {
      * Numbers represented as strings do not pass this function
      */
     export function isValidNumber(n: any) {
-      return typeof n === "number" && !Plottable._Util.Methods.isNaN(n);
+      return typeof n === "number" && !Plottable._Util.Methods.isNaN(n) && isFinite(n);
     }
 
     /**
