@@ -21,7 +21,7 @@ export module Core {
    * );
    * ```
    */
-  export module RenderController {
+  export module RenderControllers {
     var _componentsNeedingRender: {[key: string]: Component.AbstractComponent} = {};
     var _componentsNeedingComputeLayout: {[key: string]: Component.AbstractComponent} = {};
     var _animationRequested: boolean = false;

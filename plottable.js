@@ -1271,8 +1271,8 @@ var Plottable;
 (function (Plottable) {
     var Core;
     (function (Core) {
-        var RenderController;
-        (function (RenderController) {
+        var RenderControllers;
+        (function (RenderControllers) {
             var RenderPolicy;
             (function (RenderPolicy) {
                 /**
@@ -1283,7 +1283,7 @@ var Plottable;
                     function Immediate() {
                     }
                     Immediate.prototype.render = function () {
-                        RenderController.flush();
+                        RenderControllers.flush();
                     };
                     return Immediate;
                 })();
@@ -1296,7 +1296,7 @@ var Plottable;
                     function AnimationFrame() {
                     }
                     AnimationFrame.prototype.render = function () {
-                        Plottable._Util.DOM.requestAnimationFramePolyfill(RenderController.flush);
+                        Plottable._Util.DOM.requestAnimationFramePolyfill(RenderControllers.flush);
                     };
                     return AnimationFrame;
                 })();
@@ -1311,13 +1311,13 @@ var Plottable;
                         this._timeoutMsec = Plottable._Util.DOM.POLYFILL_TIMEOUT_MSEC;
                     }
                     Timeout.prototype.render = function () {
-                        setTimeout(RenderController.flush, this._timeoutMsec);
+                        setTimeout(RenderControllers.flush, this._timeoutMsec);
                     };
                     return Timeout;
                 })();
                 RenderPolicy.Timeout = Timeout;
-            })(RenderPolicy = RenderController.RenderPolicy || (RenderController.RenderPolicy = {}));
-        })(RenderController = Core.RenderController || (Core.RenderController = {}));
+            })(RenderPolicy = RenderControllers.RenderPolicy || (RenderControllers.RenderPolicy = {}));
+        })(RenderControllers = Core.RenderControllers || (Core.RenderControllers = {}));
     })(Core = Plottable.Core || (Plottable.Core = {}));
 })(Plottable || (Plottable = {}));
 
@@ -1344,33 +1344,33 @@ var Plottable;
          * );
          * ```
          */
-        var RenderController;
-        (function (RenderController) {
+        var RenderControllers;
+        (function (RenderControllers) {
             var _componentsNeedingRender = {};
             var _componentsNeedingComputeLayout = {};
             var _animationRequested = false;
             var _isCurrentlyFlushing = false;
-            RenderController._renderPolicy = new RenderController.RenderPolicy.AnimationFrame();
+            RenderControllers._renderPolicy = new RenderControllers.RenderPolicy.AnimationFrame();
             function setRenderPolicy(policy) {
                 if (typeof (policy) === "string") {
                     switch (policy.toLowerCase()) {
                         case "immediate":
-                            policy = new RenderController.RenderPolicy.Immediate();
+                            policy = new RenderControllers.RenderPolicy.Immediate();
                             break;
                         case "animationframe":
-                            policy = new RenderController.RenderPolicy.AnimationFrame();
+                            policy = new RenderControllers.RenderPolicy.AnimationFrame();
                             break;
                         case "timeout":
-                            policy = new RenderController.RenderPolicy.Timeout();
+                            policy = new RenderControllers.RenderPolicy.Timeout();
                             break;
                         default:
                             Plottable._Util.Methods.warn("Unrecognized renderPolicy: " + policy);
                             return;
                     }
                 }
-                RenderController._renderPolicy = policy;
+                RenderControllers._renderPolicy = policy;
             }
-            RenderController.setRenderPolicy = setRenderPolicy;
+            RenderControllers.setRenderPolicy = setRenderPolicy;
             /**
              * If the RenderController is enabled, we enqueue the component for
              * render. Otherwise, it is rendered immediately.
@@ -1384,7 +1384,7 @@ var Plottable;
                 _componentsNeedingRender[c.getID()] = c;
                 requestRender();
             }
-            RenderController.registerToRender = registerToRender;
+            RenderControllers.registerToRender = registerToRender;
             /**
              * If the RenderController is enabled, we enqueue the component for
              * layout and render. Otherwise, it is rendered immediately.
@@ -1396,12 +1396,12 @@ var Plottable;
                 _componentsNeedingRender[c.getID()] = c;
                 requestRender();
             }
-            RenderController.registerToComputeLayout = registerToComputeLayout;
+            RenderControllers.registerToComputeLayout = registerToComputeLayout;
             function requestRender() {
                 // Only run or enqueue flush on first request.
                 if (!_animationRequested) {
                     _animationRequested = true;
-                    RenderController._renderPolicy.render();
+                    RenderControllers._renderPolicy.render();
                 }
             }
             /**
@@ -1443,8 +1443,8 @@ var Plottable;
                     _isCurrentlyFlushing = false;
                 }
             }
-            RenderController.flush = flush;
-        })(RenderController = Core.RenderController || (Core.RenderController = {}));
+            RenderControllers.flush = flush;
+        })(RenderControllers = Core.RenderControllers || (Core.RenderControllers = {}));
     })(Core = Plottable.Core || (Plottable.Core = {}));
 })(Plottable || (Plottable = {}));
 
@@ -3432,12 +3432,12 @@ var Plottable;
             };
             AbstractComponent.prototype._render = function () {
                 if (this._isAnchored && this._isSetup && this.width() >= 0 && this.height() >= 0) {
-                    Plottable.Core.RenderController.registerToRender(this);
+                    Plottable.Core.RenderControllers.registerToRender(this);
                 }
             };
             AbstractComponent.prototype._scheduleComputeLayout = function () {
                 if (this._isAnchored && this._isSetup) {
-                    Plottable.Core.RenderController.registerToComputeLayout(this);
+                    Plottable.Core.RenderControllers.registerToComputeLayout(this);
                 }
             };
             AbstractComponent.prototype._doRender = function () {
@@ -3490,7 +3490,7 @@ var Plottable;
                 this._computeLayout();
                 this._render();
                 // flush so that consumers can immediately attach to stuff we create in the DOM
-                Plottable.Core.RenderController.flush();
+                Plottable.Core.RenderControllers.flush();
                 return this;
             };
             /**

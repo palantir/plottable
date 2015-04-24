@@ -605,7 +605,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Core {
-        module RenderController {
+        module RenderControllers {
             module RenderPolicy {
                 /**
                  * A policy to render components.
@@ -662,7 +662,7 @@ declare module Plottable {
          * );
          * ```
          */
-        module RenderController {
+        module RenderControllers {
             var _renderPolicy: RenderPolicy.RenderPolicy;
             function setRenderPolicy(policy: string | RenderPolicy.RenderPolicy): void;
             /**
