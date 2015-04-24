@@ -439,7 +439,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Config {
+    module Configs {
         /**
          * Specifies if Plottable should show warnings.
          */
