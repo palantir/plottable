@@ -31,7 +31,7 @@ describe("Dispatchers", () => {
       var td = Plottable.Dispatcher.Touch.getDispatcher(<SVGElement> target.node());
 
       var callbackWasCalled = false;
-      var callback = function(ids: number[], points: { [id: number]: Point; }, e: TouchEvent) {
+      var callback = function(ids: number[], points: { [id: number]: Plottable.Point; }, e: TouchEvent) {
         callbackWasCalled = true;
         assertPointsClose(points[ids[0]], expectedPoint, 0.5, "touch position is correct");
         assert.isNotNull(e, "TouchEvent was passed to the Dispatcher");
@@ -40,7 +40,7 @@ describe("Dispatchers", () => {
       var keyString = "unit test";
       td.onTouchStart(keyString, callback);
 
-      triggerFakeTouchEvent("touchstart", target, targetX, targetY);
+      triggerFakeTouchEvent("touchstart", target, [{x: targetX, y: targetY}]);
       assert.isTrue(callbackWasCalled, "callback was called on touchstart");
 
       td.onTouchStart(keyString, null);
@@ -63,7 +63,7 @@ describe("Dispatchers", () => {
       var td = Plottable.Dispatcher.Touch.getDispatcher(<SVGElement> target.node());
 
       var callbackWasCalled = false;
-      var callback = function(ids: number[], points: { [id: number]: Point; }, e: TouchEvent) {
+      var callback = function(ids: number[], points: { [id: number]: Plottable.Point; }, e: TouchEvent) {
         callbackWasCalled = true;
         assertPointsClose(points[ids[0]], expectedPoint, 0.5, "touch position is correct");
         assert.isNotNull(e, "TouchEvent was passed to the Dispatcher");
@@ -72,7 +72,7 @@ describe("Dispatchers", () => {
       var keyString = "unit test";
       td.onTouchMove(keyString, callback);
 
-      triggerFakeTouchEvent("touchmove", target, targetX, targetY);
+      triggerFakeTouchEvent("touchmove", target, [{x: targetX, y: targetY}]);
       assert.isTrue(callbackWasCalled, "callback was called on touchmove");
 
       td.onTouchMove(keyString, null);
@@ -95,7 +95,7 @@ describe("Dispatchers", () => {
       var td = Plottable.Dispatcher.Touch.getDispatcher(<SVGElement> target.node());
 
       var callbackWasCalled = false;
-      var callback = function(ids: number[], points: { [id: number]: Point; }, e: TouchEvent) {
+      var callback = function(ids: number[], points: { [id: number]: Plottable.Point; }, e: TouchEvent) {
         callbackWasCalled = true;
         assertPointsClose(points[ids[0]], expectedPoint, 0.5, "touch position is correct");
         assert.isNotNull(e, "TouchEvent was passed to the Dispatcher");
@@ -104,7 +104,7 @@ describe("Dispatchers", () => {
       var keyString = "unit test";
       td.onTouchEnd(keyString, callback);
 
-      triggerFakeTouchEvent("touchend", target, targetX, targetY);
+      triggerFakeTouchEvent("touchend", target, [{x: targetX, y: targetY}]);
       assert.isTrue(callbackWasCalled, "callback was called on touchend");
 
       td.onTouchEnd(keyString, null);
@@ -123,19 +123,19 @@ describe("Dispatchers", () => {
       var td = Plottable.Dispatcher.Touch.getDispatcher(<SVGElement> target.node());
 
       var callbackWasCalled = false;
-      var callback = function(ids: number[], points: { [id: number]: Point; }, e: TouchEvent) {
+      var callback = function(ids: number[], points: { [id: number]: Plottable.Point; }, e: TouchEvent) {
         callbackWasCalled = true;
         assert.isNotNull(e, "TouchEvent was passed to the Dispatcher");
       };
 
       var keyString = "notInDomTest";
       td.onTouchMove(keyString, callback);
-      triggerFakeTouchEvent("touchmove", target, targetX, targetY);
+      triggerFakeTouchEvent("touchmove", target, [{x: targetX, y: targetY}]);
       assert.isTrue(callbackWasCalled, "callback was called on touchmove");
 
       target.remove();
       callbackWasCalled = false;
-      triggerFakeTouchEvent("touchmove", target, targetX, targetY);
+      triggerFakeTouchEvent("touchmove", target, [{x: targetX, y: targetY}]);
       assert.isFalse(callbackWasCalled, "callback was not called after <svg> was removed from DOM");
 
       td.onTouchMove(keyString, null);
