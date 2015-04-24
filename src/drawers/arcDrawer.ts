@@ -39,6 +39,9 @@ export module _Drawer {
     public draw(data: any[], drawSteps: DrawStep[], userMetadata: any, plotMetadata: Plot.PlotMetadata) {
       // HACKHACK Applying metadata should be done in base class
       var valueAccessor = (d: any, i: number) => drawSteps[0].attrToProjector["value"](d, i, userMetadata, plotMetadata);
+
+      data = data.filter(e => Plottable._Util.Methods.isValidNumber(+valueAccessor(e, null)));
+
       var pie = d3.layout.pie()
                           .sort(null)
                           .value(valueAccessor)(data);
