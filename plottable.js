@@ -2749,8 +2749,9 @@ var Plottable;
                 this._className = className;
                 return this;
             };
-            AbstractDrawer.prototype.setup = function (area) {
-                this._renderArea = area;
+            AbstractDrawer.prototype.setup = function (renderArea, boundingBox) {
+                this._renderArea = renderArea;
+                this._boundingBox = boundingBox;
             };
             /**
              * Removes the Drawer and its renderArea
@@ -2865,12 +2866,12 @@ var Plottable;
                 _super.prototype._enterData.call(this, data);
                 this._pathSelection.datum(data);
             };
-            Line.prototype.setup = function (area) {
-                this._pathSelection = area.append("path").classed(Line.LINE_CLASS, true).style({
+            Line.prototype.setup = function (renderArea, boundingBox) {
+                this._pathSelection = renderArea.append("path").classed(Line.LINE_CLASS, true).style({
                     "fill": "none",
                     "vector-effect": "non-scaling-stroke"
                 });
-                _super.prototype.setup.call(this, area);
+                _super.prototype.setup.call(this, renderArea, boundingBox);
             };
             Line.prototype._createLine = function (xFunction, yFunction, definedFunction) {
                 if (!definedFunction) {
@@ -2955,13 +2956,13 @@ var Plottable;
                 this._drawLine = draw;
                 return this;
             };
-            Area.prototype.setup = function (area) {
-                this._areaSelection = area.append("path").classed(Area.AREA_CLASS, true).style({ "stroke": "none" });
+            Area.prototype.setup = function (renderArea, boundingBox) {
+                this._areaSelection = renderArea.append("path").classed(Area.AREA_CLASS, true).style({ "stroke": "none" });
                 if (this._drawLine) {
-                    _super.prototype.setup.call(this, area);
+                    _super.prototype.setup.call(this, renderArea, boundingBox);
                 }
                 else {
-                    _Drawer.AbstractDrawer.prototype.setup.call(this, area);
+                    _Drawer.AbstractDrawer.prototype.setup.call(this, renderArea, boundingBox);
                 }
             };
             Area.prototype._createArea = function (xFunction, y0Function, y1Function, definedFunction) {
@@ -3101,10 +3102,10 @@ var Plottable;
                 this.svgElement("rect");
                 this._isVertical = isVertical;
             }
-            Rect.prototype.setup = function (area) {
+            Rect.prototype.setup = function (renderArea, boundingBox) {
                 // need to put the bars in a seperate container so we can ensure that they don't cover labels
-                _super.prototype.setup.call(this, area.append("g").classed("bar-area", true));
-                this._textArea = area.append("g").classed("bar-label-text-area", true);
+                _super.prototype.setup.call(this, renderArea.append("g").classed("bar-area", true), boundingBox);
+                this._textArea = renderArea.append("g").classed("bar-label-text-area", true);
                 this._measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(this._textArea);
                 this._writer = new SVGTypewriter.Writers.Writer(this._measurer);
             };
@@ -3142,9 +3143,11 @@ var Plottable;
                         else {
                             x += offset;
                         }
+                        var isHidden = (x < 0 || x + w / 2 >= _this._boundingBox.attr("width"));
                         var g = _this._textArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
                         var className = dark ? "dark-label" : "light-label";
                         g.classed(className, true);
+                        g.attr("display", isHidden ? "none" : "inline");
                         var xAlign;
                         var yAlign;
                         if (_this._isVertical) {
@@ -6541,7 +6544,7 @@ var Plottable;
                 _super.prototype._setup.call(this);
                 this._renderArea = this._content.append("g").classed("render-area", true);
                 // HACKHACK on 591
-                this._getDrawersInOrder().forEach(function (d) { return d.setup(_this._renderArea.append("g")); });
+                this._getDrawersInOrder().forEach(function (d) { return d.setup(_this._renderArea.append("g"), _this._boundingBox); });
             };
             AbstractPlot.prototype.remove = function () {
                 var _this = this;
@@ -6581,7 +6584,7 @@ var Plottable;
                 this._datasetKeysInOrder.push(key);
                 this._key2PlotDatasetKey.set(key, pdk);
                 if (this._isSetup) {
-                    drawer.setup(this._renderArea.append("g"));
+                    drawer.setup(this._renderArea.append("g"), this._boundingBox);
                 }
                 dataset.broadcaster.registerListener(this, function () { return _this._onDatasetUpdate(); });
                 this._onDatasetUpdate();

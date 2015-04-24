@@ -1452,6 +1452,7 @@ declare module Plottable {
             animator: Animator.PlotAnimator;
         };
         class AbstractDrawer {
+            protected _boundingBox: D3.Selection;
             protected _className: string;
             key: string;
             protected _attrToProjector: AttributeToAppliedProjector;
@@ -1468,7 +1469,7 @@ declare module Plottable {
              * @param{string} key The key associated with this Drawer
              */
             constructor(key: string);
-            setup(area: D3.Selection): void;
+            setup(renderArea: D3.Selection, boundingBox: D3.Selection): void;
             /**
              * Removes the Drawer and its renderArea
              */
@@ -1516,7 +1517,7 @@ declare module Plottable {
         class Line extends AbstractDrawer {
             static LINE_CLASS: string;
             protected _enterData(data: any[]): void;
-            setup(area: D3.Selection): void;
+            setup(renderArea: D3.Selection, boundingBox: D3.Selection): void;
             protected _numberOfAnimationIterations(data: any[]): number;
             protected _drawStep(step: AppliedDrawStep): void;
             _getSelector(): string;
@@ -1538,7 +1539,7 @@ declare module Plottable {
              * @param{boolean} draw The value determing if line should be drawn.
              */
             drawLine(draw: boolean): Area;
-            setup(area: D3.Selection): void;
+            setup(renderArea: D3.Selection, boundingBox: D3.Selection): void;
             protected _drawStep(step: AppliedDrawStep): void;
             _getSelector(): string;
         }
@@ -1570,7 +1571,7 @@ declare module Plottable {
     module _Drawer {
         class Rect extends Element {
             constructor(key: string, isVertical: boolean);
-            setup(area: D3.Selection): void;
+            setup(renderArea: D3.Selection, boundingBox: D3.Selection): void;
             removeLabels(): void;
             _getIfLabelsTooWide(): boolean;
             drawText(data: any[], attrToProjector: AttributeToProjector, userMetadata: any, plotMetadata: Plot.PlotMetadata): void;

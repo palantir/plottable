@@ -327,7 +327,7 @@ describe("Drawers", function () {
             timings = [];
             svg = generateSVG();
             drawer = new MockDrawer("foo");
-            drawer.setup(svg);
+            drawer.setup(svg, svg);
         });
         afterEach(function () {
             svg.remove(); // no point keeping it around since we don't draw anything in it anyway
@@ -368,7 +368,7 @@ describe("Drawers", function () {
         it("_getSelection", function () {
             var svg = generateSVG(300, 300);
             var drawer = new Plottable._Drawer.AbstractDrawer("test");
-            drawer.setup(svg.append("g"));
+            drawer.setup(svg.append("g"), svg);
             drawer._getSelector = function () { return "circle"; };
             var data = [{ one: 2, two: 1 }, { one: 33, two: 21 }, { one: 11, two: 10 }];
             var circles = drawer._getRenderArea().selectAll("circle").data(data);

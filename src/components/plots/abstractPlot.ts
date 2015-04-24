@@ -66,7 +66,7 @@ export module Plot {
       super._setup();
       this._renderArea = this._content.append("g").classed("render-area", true);
       // HACKHACK on 591
-      this._getDrawersInOrder().forEach((d) => d.setup(this._renderArea.append("g")));
+      this._getDrawersInOrder().forEach((d) => d.setup(this._renderArea.append("g"), this._boundingBox));
     }
 
     public remove() {
@@ -119,7 +119,7 @@ export module Plot {
       this._key2PlotDatasetKey.set(key, pdk);
 
       if (this._isSetup) {
-        drawer.setup(this._renderArea.append("g"));
+        drawer.setup(this._renderArea.append("g"), this._boundingBox);
       }
       dataset.broadcaster.registerListener(this, () => this._onDatasetUpdate());
       this._onDatasetUpdate();

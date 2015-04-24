@@ -17,10 +17,10 @@ export module _Drawer {
       this._isVertical = isVertical;
     }
 
-    public setup(area: D3.Selection) {
+    public setup(renderArea: D3.Selection, boundingBox: D3.Selection) {
       // need to put the bars in a seperate container so we can ensure that they don't cover labels
-      super.setup(area.append("g").classed("bar-area", true));
-      this._textArea = area.append("g").classed("bar-label-text-area", true);
+      super.setup(renderArea.append("g").classed("bar-area", true), boundingBox);
+      this._textArea = renderArea.append("g").classed("bar-label-text-area", true);
       this._measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(this._textArea);
       this._writer = new SVGTypewriter.Writers.Writer(this._measurer);
     }
@@ -59,9 +59,12 @@ export module _Drawer {
             x += offset;
           }
 
+          var isHidden = (x < 0 || x + w / 2 >= this._boundingBox.attr("width"));
+
           var g = this._textArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
           var className = dark ? "dark-label" : "light-label";
           g.classed(className, true);
+          g.attr("display", isHidden ? "none" : "inline");
           var xAlign: string;
           var yAlign: string;
           if (this._isVertical) {

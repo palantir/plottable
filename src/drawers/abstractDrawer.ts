@@ -19,6 +19,7 @@ export module _Drawer {
 
   export class AbstractDrawer {
     private _renderArea: D3.Selection;
+    protected _boundingBox: D3.Selection;
     protected _className: string;
     public key: string;
     protected _attrToProjector: AttributeToAppliedProjector;
@@ -43,8 +44,9 @@ export module _Drawer {
         this.key = key;
     }
 
-    public setup(area: D3.Selection) {
-      this._renderArea = area;
+    public setup(renderArea: D3.Selection, boundingBox: D3.Selection) {
+      this._renderArea = renderArea;
+      this._boundingBox = boundingBox;
     }
 
     /**
