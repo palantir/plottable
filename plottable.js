@@ -5760,16 +5760,17 @@ var Plottable;
              *
              * @constructor
              * @param {Scale.InterpolatedColor} interpolatedColorScale
-             * @param {string} orientation (horizontal/left/right).
+             * @param {string} orientation (top/bottom/left/right).
              * @param {Formatter} The labels are formatted using this function.
              */
             function InterpolatedColorLegend(interpolatedColorScale, orientation, formatter) {
                 var _this = this;
-                if (orientation === void 0) { orientation = "horizontal"; }
                 if (formatter === void 0) { formatter = Plottable.Formatters.general(); }
                 _super.call(this);
-                this._padding = 5;
+                this._isExpanded = false;
+                this._isGradient = false;
                 this._numSwatches = 10;
+                this._padding = 5;
                 if (interpolatedColorScale == null) {
                     throw new Error("InterpolatedColorLegend requires a interpolatedColorScale");
                 }
@@ -5777,6 +5778,7 @@ var Plottable;
                 this._scale.broadcaster.registerListener(this, function () { return _this._invalidateLayout(); });
                 this._formatter = formatter;
                 this._orientation = InterpolatedColorLegend._ensureOrientation(orientation);
+                this._linearGradientIdentifier = InterpolatedColorLegend.LINEARGRADIENT_PREFIX_ID + this.getID();
                 this._fixedWidthFlag = true;
                 this._fixedHeightFlag = true;
                 this.classed("legend", true).classed("interpolated-color-legend", true);
@@ -5795,7 +5797,7 @@ var Plottable;
             };
             InterpolatedColorLegend._ensureOrientation = function (orientation) {
                 orientation = orientation.toLowerCase();
-                if (orientation === "horizontal" || orientation === "left" || orientation === "right") {
+                if (orientation === "top" || orientation === "bottom" || orientation === "left" || orientation === "right") {
                     return orientation;
                 }
                 else {
@@ -5812,6 +5814,20 @@ var Plottable;
                     return this;
                 }
             };
+            InterpolatedColorLegend.prototype.gradient = function (isGradient) {
+                if (isGradient == null) {
+                    return this._isGradient;
+                }
+                this._isGradient = isGradient;
+                return this;
+            };
+            InterpolatedColorLegend.prototype.expand = function (isExpanded) {
+                if (isExpanded == null) {
+                    return this._isExpanded;
+                }
+                this._isExpanded = isExpanded;
+                return this;
+            };
             InterpolatedColorLegend.prototype._generateTicks = function () {
                 var domain = this._scale.domain();
                 var slope = (domain[1] - domain[0]) / this._numSwatches;
@@ -5822,7 +5838,23 @@ var Plottable;
                 return ticks;
             };
             InterpolatedColorLegend.prototype._setup = function () {
+                var _this = this;
                 _super.prototype._setup.call(this);
+                this._ticks = this._generateTicks();
+                // Uses SVG <linearGradient> to establish a gradient that can be used as a fill for SVG elements
+                if (this._isGradient) {
+                    this._linearGradient = this._content.append("linearGradient").attr("id", this._linearGradientIdentifier);
+                    if (this._isVertical()) {
+                        this._linearGradient.attr("x1", "0%").attr("x2", "0%").attr("y1", "100%").attr("y2", "0%");
+                    }
+                    else {
+                        this._linearGradient.attr("x1", "0%").attr("x2", "100%").attr("y1", "0%").attr("y2", "0%");
+                    }
+                    this._linearGradient.selectAll("stop").data(this._ticks).enter().append("stop").attr({
+                        "offset": function (d, i) { return i * (100 / _this._numSwatches) + "%"; },
+                        "stop-color": function (d, i) { return _this._scale.scale(d); }
+                    });
+                }
                 this._swatchContainer = this._content.append("g").classed("swatch-container", true);
                 this._swatchBoundingBox = this._content.append("rect").classed("swatch-bounding-box", true);
                 this._lowerLabel = this._content.append("g").classed(InterpolatedColorLegend.LEGEND_LABEL_CLASS, true);
@@ -5843,11 +5875,11 @@ var Plottable;
                 if (this._isVertical()) {
                     var longestWidth = Plottable._Util.Methods.max(labelWidths, 0);
                     desiredWidth = this._padding + textHeight + this._padding + longestWidth + this._padding;
-                    desiredHeight = this._padding + numSwatches * textHeight + this._padding;
+                    desiredHeight = this._isExpanded ? offeredHeight : numSwatches * textHeight;
                 }
                 else {
-                    desiredHeight = this._padding + textHeight + this._padding;
-                    desiredWidth = this._padding + labelWidths[0] + this._padding + numSwatches * textHeight + this._padding + labelWidths[1] + this._padding;
+                    desiredHeight = textHeight * 2 + this._padding * 3;
+                    desiredWidth = this._isExpanded ? offeredWidth : numSwatches * textHeight;
                 }
                 return {
                     width: desiredWidth,
@@ -5857,17 +5889,17 @@ var Plottable;
                 };
             };
             InterpolatedColorLegend.prototype._isVertical = function () {
-                return this._orientation !== "horizontal";
+                return this._orientation === "left" || this._orientation === "right";
             };
             InterpolatedColorLegend.prototype._doRender = function () {
                 var _this = this;
                 _super.prototype._doRender.call(this);
                 var domain = this._scale.domain();
                 var textHeight = this._measurer.measure().height;
-                var text0 = this._formatter(domain[0]);
-                var text0Width = this._measurer.measure(text0).width;
-                var text1 = this._formatter(domain[1]);
-                var text1Width = this._measurer.measure(text1).width;
+                var lowerText = this._formatter(domain[0]);
+                var lowerTextWidth = this._measurer.measure(lowerText).width;
+                var upperText = this._formatter(domain[1]);
+                var upperTextWidth = this._measurer.measure(upperText).width;
                 var ticks = this._generateTicks();
                 var numSwatches = ticks.length;
                 var padding = this._padding;
@@ -5891,19 +5923,18 @@ var Plottable;
                 var swatchY;
                 var boundingBoxAttr = {
                     x: 0,
-                    y: padding,
+                    y: 0,
                     width: 0,
                     height: 0
                 };
                 if (this._isVertical()) {
-                    var longestTextWidth = Math.max(text0Width, text1Width);
-                    swatchWidth = Math.max((this.width() - 3 * padding - longestTextWidth), 0);
-                    swatchHeight = Math.max(((this.height() - 2 * padding) / numSwatches), 0);
-                    swatchY = function (d, i) { return padding + (numSwatches - (i + 1)) * swatchHeight; };
+                    var longestTextWidth = Math.max(lowerTextWidth, upperTextWidth);
+                    swatchWidth = Math.max(this.width() - 3 * padding - longestTextWidth, 0);
+                    swatchHeight = this._isExpanded ? this.height() / numSwatches : Math.max(this.height() / numSwatches, 0);
+                    swatchY = function (d, i) { return (numSwatches - (i + 1)) * swatchHeight; };
                     upperWriteOptions.yAlign = "top";
-                    upperLabelShift.y = padding;
                     lowerWriteOptions.yAlign = "bottom";
-                    lowerLabelShift.y = -padding;
+                    lowerLabelShift.y = -(this.height() - numSwatches * swatchHeight);
                     if (this._orientation === "left") {
                         swatchX = function (d, i) { return padding + longestTextWidth + padding; };
                         upperWriteOptions.xAlign = "right";
@@ -5922,42 +5953,78 @@ var Plottable;
                     boundingBoxAttr.height = numSwatches * swatchHeight;
                 }
                 else {
-                    swatchWidth = Math.max(((this.width() - 4 * padding - text0Width - text1Width) / numSwatches), 0);
-                    swatchHeight = Math.max((this.height() - 2 * padding), 0);
-                    swatchX = function (d, i) { return (padding + text0Width + padding) + i * swatchWidth; };
-                    swatchY = function (d, i) { return padding; };
+                    swatchHeight = Math.max(this.height() - 3 * padding - textHeight, 0);
+                    swatchWidth = this.width() / numSwatches;
+                    var swatchCenter = this.width() / 2;
+                    swatchX = function (d, i) { return _this._isExpanded ? i * swatchWidth : swatchCenter - (numSwatches / 2 * swatchWidth) + i * swatchWidth; };
+                    swatchY = function (d, i) { return _this._orientation === "top" ? _this.height() - swatchHeight - padding : padding; };
                     upperWriteOptions.xAlign = "right";
-                    upperLabelShift.x = -padding;
+                    upperLabelShift.x = -(swatchCenter - numSwatches / 2 * swatchWidth);
                     lowerWriteOptions.xAlign = "left";
-                    lowerLabelShift.x = padding;
+                    lowerLabelShift.x = swatchCenter - numSwatches / 2 * swatchWidth;
+                    if (this._orientation === "top") {
+                        boundingBoxAttr.y = this.height() - padding - swatchHeight;
+                        lowerLabelShift.y = -padding;
+                        upperLabelShift.y = -padding;
+                    }
+                    else {
+                        boundingBoxAttr.y = padding;
+                        lowerLabelShift.y = padding;
+                        upperLabelShift.y = padding;
+                    }
                     boundingBoxAttr.width = numSwatches * swatchWidth;
                     boundingBoxAttr.height = swatchHeight;
                 }
                 boundingBoxAttr.x = swatchX(null, 0); // position of the first swatch
+                if (this._isExpanded) {
+                    if (this._isVertical()) {
+                        lowerLabelShift.y = 0;
+                        boundingBoxAttr.height = this.height();
+                    }
+                    else {
+                        lowerLabelShift.x = 0;
+                        upperLabelShift.x = 0;
+                        boundingBoxAttr.width = this.width();
+                        boundingBoxAttr.height = swatchHeight;
+                    }
+                }
                 this._upperLabel.text(""); // clear the upper label
-                this._writer.write(text1, this.width(), this.height(), upperWriteOptions);
+                this._writer.write(upperText, this.width(), this.height(), upperWriteOptions);
                 var upperTranslateString = "translate(" + upperLabelShift.x + ", " + upperLabelShift.y + ")";
                 this._upperLabel.attr("transform", upperTranslateString);
                 this._lowerLabel.text(""); // clear the lower label
-                this._writer.write(text0, this.width(), this.height(), lowerWriteOptions);
+                this._writer.write(lowerText, this.width(), this.height(), lowerWriteOptions);
                 var lowerTranslateString = "translate(" + lowerLabelShift.x + ", " + lowerLabelShift.y + ")";
                 this._lowerLabel.attr("transform", lowerTranslateString);
                 this._swatchBoundingBox.attr(boundingBoxAttr);
-                var swatches = this._swatchContainer.selectAll("rect.swatch").data(ticks);
-                swatches.enter().append("rect").classed("swatch", true);
-                swatches.exit().remove();
-                swatches.attr({
-                    "fill": function (d, i) { return _this._scale.scale(d); },
-                    "width": swatchWidth,
-                    "height": swatchHeight,
-                    "x": swatchX,
-                    "y": swatchY
-                });
+                if (this._isGradient) {
+                    var swatch = this._swatchContainer.selectAll("rect.swatch").data([0]);
+                    var swatchAttr = boundingBoxAttr;
+                    swatchAttr.fill = "url(#" + this._linearGradientIdentifier + ")";
+                    swatch.enter().append("rect").classed("swatch", true).attr(swatchAttr);
+                    swatch.exit().remove();
+                }
+                else {
+                    var swatches = this._swatchContainer.selectAll("rect.swatch").data(ticks);
+                    swatches.enter().append("rect").classed("swatch", true);
+                    swatches.exit().remove();
+                    swatches.attr({
+                        "fill": function (d, i) { return _this._scale.scale(d); },
+                        "width": swatchWidth,
+                        "height": swatchHeight,
+                        "x": swatchX,
+                        "y": swatchY
+                    });
+                }
             };
             /**
              * The css class applied to the legend labels.
              */
             InterpolatedColorLegend.LEGEND_LABEL_CLASS = "legend-label";
+            /**
+             * Prefix for the CSS id on <linearGradient>
+             */
+            InterpolatedColorLegend.LINEARGRADIENT_PREFIX_ID = "legend-lineargradient-";
             return InterpolatedColorLegend;
         })(Component.AbstractComponent);
         Component.InterpolatedColorLegend = InterpolatedColorLegend;
