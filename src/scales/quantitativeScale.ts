@@ -5,7 +5,6 @@ export module Scale {
   export class AbstractQuantitative<D> extends AbstractScale<D, number> {
     protected _d3Scale: D3.Scale.QuantitativeScale;
     private _numTicks = 10;
-    private _PADDING_FOR_IDENTICAL_DOMAIN = 1;
     public _userSetDomainer: boolean = false;
     private _domainer: Domainer = new Domainer();
     public _typeCoercer = (d: any) => +d;

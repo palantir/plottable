@@ -6,7 +6,7 @@ describe("Plots", () => {
   // HACKHACK #1798: beforeEach being used below
   describe("LinePlot", () => {
     it("getAllPlotData with NaNs", () => {
-      var svg = generateSVG(500, 500);
+      var svg = TestMethods.generateSVG(500, 500);
       var dataWithNaN = [
         { foo: 0.0, bar: 0.0 },
         { foo: 0.2, bar: 0.2 },
@@ -37,7 +37,7 @@ describe("Plots", () => {
   describe("LinePlot", () => {
     // HACKHACK #1798: beforeEach being used below
     it("renders correctly with no data", () => {
-      var svg = generateSVG(400, 400);
+      var svg = TestMethods.generateSVG(400, 400);
       var xScale = new Plottable.Scale.Linear();
       var yScale = new Plottable.Scale.Linear();
       var plot = new Plottable.Plot.Line(xScale, yScale);
@@ -71,7 +71,7 @@ describe("Plots", () => {
     });
 
     beforeEach(() => {
-      svg = generateSVG(500, 500);
+      svg = TestMethods.generateSVG(500, 500);
       simpleDataset = new Plottable.Dataset(twoPointData);
       linePlot = new Plottable.Plot.Line(xScale, yScale);
       linePlot.addDataset("s1", simpleDataset)
@@ -85,7 +85,7 @@ describe("Plots", () => {
 
     it("draws a line correctly", () => {
       var linePath = renderArea.select(".line");
-      assert.strictEqual(normalizePath(linePath.attr("d")), "M0,500L500,0", "line d was set correctly");
+      assert.strictEqual(TestMethods.normalizePath(linePath.attr("d")), "M0,500L500,0", "line d was set correctly");
       var lineComputedStyle = window.getComputedStyle(linePath.node());
       assert.strictEqual(lineComputedStyle.fill, "none", "line fill renders as \"none\"");
       svg.remove();
@@ -130,16 +130,16 @@ describe("Plots", () => {
       ];
       simpleDataset.data(lineData);
       var linePath = renderArea.select(".line");
-      var d_original = normalizePath(linePath.attr("d"));
+      var d_original = TestMethods.normalizePath(linePath.attr("d"));
 
       function assertCorrectPathSplitting(msgPrefix: string) {
-        var d = normalizePath(linePath.attr("d"));
+        var d = TestMethods.normalizePath(linePath.attr("d"));
         var pathSegements = d.split("M").filter((segment) => segment !== "");
         assert.lengthOf(pathSegements, 2, msgPrefix + " split path into two segments");
         var firstSegmentContained = d_original.indexOf(pathSegements[0]) >= 0;
         assert.isTrue(firstSegmentContained, "first path segment is a subpath of the original path");
         var secondSegmentContained = d_original.indexOf(pathSegements[1]) >= 0;
-        assert.isTrue(firstSegmentContained, "second path segment is a subpath of the original path");
+        assert.isTrue(secondSegmentContained, "second path segment is a subpath of the original path");
       }
 
       var dataWithNaN = lineData.slice();

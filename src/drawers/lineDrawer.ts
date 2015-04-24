@@ -38,7 +38,6 @@ export module _Drawer {
     }
 
     protected _drawStep(step: AppliedDrawStep) {
-      var baseTime = super._drawStep(step);
       var attrToProjector = <AttributeToAppliedProjector>_Util.Methods.copyMap(step.attrToProjector);
       var definedFunction = attrToProjector["defined"];
 

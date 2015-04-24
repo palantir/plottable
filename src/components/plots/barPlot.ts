@@ -151,9 +151,6 @@ export module Plot {
      * @returns {PlotData} The PlotData closest to queryPoint
      */
     public getClosestPlotData(queryPoint: Point): PlotData {
-      var chartXExtent = { min: 0, max: this.width() };
-      var chartYExtent = { min: 0, max: this.height() };
-
       var minPrimaryDist = Infinity;
       var minSecondaryDist = Infinity;
 
@@ -569,7 +566,6 @@ export module Plot {
     protected _getAllPlotData(datasetKeys: string[]): PlotData {
       var plotData = super._getAllPlotData(datasetKeys);
 
-      var valueScale = this._isVertical ? this._yScale : this._xScale;
       var scaledBaseline = (<Scale.AbstractScale<any, any>> (this._isVertical ? this._yScale : this._xScale)).scale(this.baseline());
       var isVertical = this._isVertical;
       var barAlignmentFactor = this._barAlignmentFactor;
