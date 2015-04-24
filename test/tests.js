@@ -2699,8 +2699,8 @@ describe("Plots", function () {
             plot.addDataset(data1);
             plot.project("value", "v");
             plot.renderTo(svg);
-            var elementsDrawn = plot._element.selectAll(".arc").size();
-            assert.strictEqual(elementsDrawn, 4, "There should be exactly 4 slices in the pie chart, representing the valid values");
+            var elementsDrawnSel = plot._element.selectAll(".arc");
+            assert.strictEqual(elementsDrawnSel.size(), 4, "There should be exactly 4 slices in the pie chart, representing the valid values");
             svg.remove();
         });
         it("nulls and 0s should be represented in a Pie Chart as DOM elements, but have radius 0", function () {
@@ -2715,8 +2715,10 @@ describe("Plots", function () {
             plot.addDataset(data1);
             plot.project("value", "v");
             plot.renderTo(svg);
-            var elementsDrawn = plot._element.selectAll(".arc").size();
-            assert.strictEqual(elementsDrawn, 4, "There should be exactly 4 slices in the pie chart, representing the valid values");
+            var elementsDrawnSel = plot._element.selectAll(".arc");
+            assert.strictEqual(elementsDrawnSel.size(), 4, "All 4 elements of the pie chart should have a DOM node");
+            assert.closeTo(elementsDrawnSel[0][1].getBBox().width, 0, 0.001, "0 as a value should not be visible");
+            assert.closeTo(elementsDrawnSel[0][2].getBBox().width, 0, 0.001, "null as a value should not be visible");
             svg.remove();
         });
     });
