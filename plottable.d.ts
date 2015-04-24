@@ -606,7 +606,7 @@ declare module Plottable {
 declare module Plottable {
     module Core {
         module RenderControllers {
-            module RenderPolicy {
+            module RenderPolicies {
                 /**
                  * A policy to render components.
                  */
@@ -663,8 +663,8 @@ declare module Plottable {
          * ```
          */
         module RenderControllers {
-            var _renderPolicy: RenderPolicy.RenderPolicy;
-            function setRenderPolicy(policy: string | RenderPolicy.RenderPolicy): void;
+            var _renderPolicy: RenderPolicies.RenderPolicy;
+            function setRenderPolicy(policy: string | RenderPolicies.RenderPolicy): void;
             /**
              * If the RenderController is enabled, we enqueue the component for
              * render. Otherwise, it is rendered immediately.

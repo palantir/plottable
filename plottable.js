@@ -1273,8 +1273,8 @@ var Plottable;
     (function (Core) {
         var RenderControllers;
         (function (RenderControllers) {
-            var RenderPolicy;
-            (function (RenderPolicy) {
+            var RenderPolicies;
+            (function (RenderPolicies) {
                 /**
                  * Never queue anything, render everything immediately. Useful for
                  * debugging, horrible for performance.
@@ -1287,7 +1287,7 @@ var Plottable;
                     };
                     return Immediate;
                 })();
-                RenderPolicy.Immediate = Immediate;
+                RenderPolicies.Immediate = Immediate;
                 /**
                  * The default way to render, which only tries to render every frame
                  * (usually, 1/60th of a second).
@@ -1300,7 +1300,7 @@ var Plottable;
                     };
                     return AnimationFrame;
                 })();
-                RenderPolicy.AnimationFrame = AnimationFrame;
+                RenderPolicies.AnimationFrame = AnimationFrame;
                 /**
                  * Renders with `setTimeout`. This is generally an inferior way to render
                  * compared to `requestAnimationFrame`, but it's still there if you want
@@ -1315,8 +1315,8 @@ var Plottable;
                     };
                     return Timeout;
                 })();
-                RenderPolicy.Timeout = Timeout;
-            })(RenderPolicy = RenderControllers.RenderPolicy || (RenderControllers.RenderPolicy = {}));
+                RenderPolicies.Timeout = Timeout;
+            })(RenderPolicies = RenderControllers.RenderPolicies || (RenderControllers.RenderPolicies = {}));
         })(RenderControllers = Core.RenderControllers || (Core.RenderControllers = {}));
     })(Core = Plottable.Core || (Plottable.Core = {}));
 })(Plottable || (Plottable = {}));
@@ -1350,18 +1350,18 @@ var Plottable;
             var _componentsNeedingComputeLayout = {};
             var _animationRequested = false;
             var _isCurrentlyFlushing = false;
-            RenderControllers._renderPolicy = new RenderControllers.RenderPolicy.AnimationFrame();
+            RenderControllers._renderPolicy = new RenderControllers.RenderPolicies.AnimationFrame();
             function setRenderPolicy(policy) {
                 if (typeof (policy) === "string") {
                     switch (policy.toLowerCase()) {
                         case "immediate":
-                            policy = new RenderControllers.RenderPolicy.Immediate();
+                            policy = new RenderControllers.RenderPolicies.Immediate();
                             break;
                         case "animationframe":
-                            policy = new RenderControllers.RenderPolicy.AnimationFrame();
+                            policy = new RenderControllers.RenderPolicies.AnimationFrame();
                             break;
                         case "timeout":
-                            policy = new RenderControllers.RenderPolicy.Timeout();
+                            policy = new RenderControllers.RenderPolicies.Timeout();
                             break;
                         default:
                             Plottable._Util.Methods.warn("Unrecognized renderPolicy: " + policy);

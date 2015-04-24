@@ -4,7 +4,7 @@ module Plottable {
 export module Core {
 export module RenderControllers {
 
-  export module RenderPolicy {
+  export module RenderPolicies {
     /**
      * A policy to render components.
      */

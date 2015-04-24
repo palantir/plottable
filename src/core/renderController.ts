@@ -26,26 +26,26 @@ export module Core {
     var _componentsNeedingComputeLayout: {[key: string]: Component.AbstractComponent} = {};
     var _animationRequested: boolean = false;
     var _isCurrentlyFlushing: boolean = false;
-    export var _renderPolicy: RenderPolicy.RenderPolicy = new RenderPolicy.AnimationFrame();
+    export var _renderPolicy: RenderPolicies.RenderPolicy = new RenderPolicies.AnimationFrame();
 
-    export function setRenderPolicy(policy: string | RenderPolicy.RenderPolicy): void {
+    export function setRenderPolicy(policy: string | RenderPolicies.RenderPolicy): void {
       if (typeof(policy) === "string") {
         switch ((<string> policy).toLowerCase()) {
           case "immediate":
-          policy = new RenderPolicy.Immediate();
+          policy = new RenderPolicies.Immediate();
           break;
           case "animationframe":
-          policy = new RenderPolicy.AnimationFrame();
+          policy = new RenderPolicies.AnimationFrame();
           break;
           case "timeout":
-          policy = new RenderPolicy.Timeout();
+          policy = new RenderPolicies.Timeout();
           break;
           default:
           _Util.Methods.warn("Unrecognized renderPolicy: " + policy);
           return;
         }
       }
-      _renderPolicy = <RenderPolicy.RenderPolicy> policy;
+      _renderPolicy = <RenderPolicies.RenderPolicy> policy;
     }
 
     /**
