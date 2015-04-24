@@ -2684,13 +2684,11 @@ describe("Plots", function () {
         });
     });
     describe("fail safe tests", function () {
-        it("null, undefined, NaN and non-numeric strings default to 0 in a Pie Chart", function () {
+        it("undefined, NaN and non-numeric strings not be represented in a Pie Chart", function () {
             var svg = generateSVG();
             var data1 = [
                 { v: 1 },
                 { v: undefined },
-                { v: 1 },
-                { v: null },
                 { v: 1 },
                 { v: NaN },
                 { v: 1 },
@@ -2702,7 +2700,23 @@ describe("Plots", function () {
             plot.project("value", "v");
             plot.renderTo(svg);
             var elementsDrawn = plot._element.selectAll(".arc").size();
-            assert.strictEqual(elementsDrawn, 5, "There should be exactly 5 slices in the pie chart, representing the valid values");
+            assert.strictEqual(elementsDrawn, 4, "There should be exactly 4 slices in the pie chart, representing the valid values");
+            svg.remove();
+        });
+        it("nulls and 0s should be represented in a Pie Chart as DOM elements, but have radius 0", function () {
+            var svg = generateSVG();
+            var data1 = [
+                { v: 1 },
+                { v: 0 },
+                { v: null },
+                { v: 1 },
+            ];
+            var plot = new Plottable.Plot.Pie();
+            plot.addDataset(data1);
+            plot.project("value", "v");
+            plot.renderTo(svg);
+            var elementsDrawn = plot._element.selectAll(".arc").size();
+            assert.strictEqual(elementsDrawn, 4, "There should be exactly 4 slices in the pie chart, representing the valid values");
             svg.remove();
         });
     });

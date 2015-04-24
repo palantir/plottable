@@ -254,6 +254,14 @@ var Plottable;
             }
             Methods.isNaN = isNaN;
             /**
+             * Returns true if the argument is a number, which is not NaN
+             * Numbers represented as strings do not pass this function
+             */
+            function isValidNumber(n) {
+                return typeof n === "number" && !Plottable._Util.Methods.isNaN(n);
+            }
+            Methods.isValidNumber = isValidNumber;
+            /**
              * Creates shallow copy of map.
              * @param {{ [key: string]: any }} oldMap Map to copy
              *
@@ -3328,7 +3336,7 @@ var Plottable;
             Arc.prototype.draw = function (data, drawSteps, userMetadata, plotMetadata) {
                 // HACKHACK Applying metadata should be done in base class
                 var valueAccessor = function (d, i) { return drawSteps[0].attrToProjector["value"](d, i, userMetadata, plotMetadata); };
-                data = data.filter(function (e) { return !!+valueAccessor(e, null); });
+                data = data.filter(function (e) { return Plottable._Util.Methods.isValidNumber(+valueAccessor(e, null)); });
                 var pie = d3.layout.pie().sort(null).value(valueAccessor)(data);
                 drawSteps.forEach(function (s) { return delete s.attrToProjector["value"]; });
                 pie.forEach(function (slice) {
