@@ -1,7 +1,7 @@
 ///<reference path="../../reference.ts" />
 
 module Plottable {
-export module Plot {
+export module Plots {
   export interface StackedPlotMetadata extends PlotMetadata {
     offsets: D3.Map<number>;
   }

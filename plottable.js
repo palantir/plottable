@@ -6502,8 +6502,8 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
-    var Plot;
-    (function (Plot) {
+    var Plots;
+    (function (Plots) {
         var AbstractPlot = (function (_super) {
             __extends(AbstractPlot, _super);
             /**
@@ -6963,8 +6963,8 @@ var Plottable;
             };
             return AbstractPlot;
         })(Plottable.Component.AbstractComponent);
-        Plot.AbstractPlot = AbstractPlot;
-    })(Plot = Plottable.Plot || (Plottable.Plot = {}));
+        Plots.AbstractPlot = AbstractPlot;
+    })(Plots = Plottable.Plots || (Plottable.Plots = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../../reference.ts" />
@@ -6976,8 +6976,8 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
-    var Plot;
-    (function (Plot) {
+    var Plots;
+    (function (Plots) {
         /*
          * A PiePlot is a plot meant to show how much out of a total an attribute's value is.
          * One usecase is to show how much funding departments are given out of a total budget.
@@ -7034,9 +7034,9 @@ var Plottable;
                 return allPlotData;
             };
             return Pie;
-        })(Plot.AbstractPlot);
-        Plot.Pie = Pie;
-    })(Plot = Plottable.Plot || (Plottable.Plot = {}));
+        })(Plots.AbstractPlot);
+        Plots.Pie = Pie;
+    })(Plots = Plottable.Plots || (Plottable.Plots = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../../reference.ts" />
@@ -7048,8 +7048,8 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
-    var Plot;
-    (function (Plot) {
+    var Plots;
+    (function (Plots) {
         var AbstractXYPlot = (function (_super) {
             __extends(AbstractXYPlot, _super);
             /**
@@ -7251,9 +7251,9 @@ var Plottable;
                 return this._projections["x"] && this._projections["y"];
             };
             return AbstractXYPlot;
-        })(Plot.AbstractPlot);
-        Plot.AbstractXYPlot = AbstractXYPlot;
-    })(Plot = Plottable.Plot || (Plottable.Plot = {}));
+        })(Plots.AbstractPlot);
+        Plots.AbstractXYPlot = AbstractXYPlot;
+    })(Plots = Plottable.Plots || (Plottable.Plots = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../../reference.ts" />
@@ -7265,8 +7265,8 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
-    var Plot;
-    (function (Plot) {
+    var Plots;
+    (function (Plots) {
         var Rectangle = (function (_super) {
             __extends(Rectangle, _super);
             /**
@@ -7313,9 +7313,9 @@ var Plottable;
                 return [{ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("rectangles") }];
             };
             return Rectangle;
-        })(Plot.AbstractXYPlot);
-        Plot.Rectangle = Rectangle;
-    })(Plot = Plottable.Plot || (Plottable.Plot = {}));
+        })(Plots.AbstractXYPlot);
+        Plots.Rectangle = Rectangle;
+    })(Plots = Plottable.Plots || (Plottable.Plots = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../../reference.ts" />
@@ -7327,8 +7327,8 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
-    var Plot;
-    (function (Plot) {
+    var Plots;
+    (function (Plots) {
         var Scatter = (function (_super) {
             __extends(Scatter, _super);
             /**
@@ -7452,9 +7452,9 @@ var Plottable;
                 return this._getClosestStruckPoint(p, this._closeDetectionRadius);
             };
             return Scatter;
-        })(Plot.AbstractXYPlot);
-        Plot.Scatter = Scatter;
-    })(Plot = Plottable.Plot || (Plottable.Plot = {}));
+        })(Plots.AbstractXYPlot);
+        Plots.Scatter = Scatter;
+    })(Plots = Plottable.Plots || (Plottable.Plots = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../../reference.ts" />
@@ -7466,8 +7466,8 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
-    var Plot;
-    (function (Plot) {
+    var Plots;
+    (function (Plots) {
         var Grid = (function (_super) {
             __extends(Grid, _super);
             /**
@@ -7552,9 +7552,9 @@ var Plottable;
                 return [{ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("cells") }];
             };
             return Grid;
-        })(Plot.Rectangle);
-        Plot.Grid = Grid;
-    })(Plot = Plottable.Plot || (Plottable.Plot = {}));
+        })(Plots.Rectangle);
+        Plots.Grid = Grid;
+    })(Plots = Plottable.Plots || (Plottable.Plots = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../../reference.ts" />
@@ -7566,8 +7566,8 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
-    var Plot;
-    (function (Plot) {
+    var Plots;
+    (function (Plots) {
         var Bar = (function (_super) {
             __extends(Bar, _super);
             /**
@@ -8031,9 +8031,9 @@ var Plottable;
             Bar._BAR_WIDTH_RATIO = 0.95;
             Bar._SINGLE_BAR_DIMENSION_RATIO = 0.4;
             return Bar;
-        })(Plot.AbstractXYPlot);
-        Plot.Bar = Bar;
-    })(Plot = Plottable.Plot || (Plottable.Plot = {}));
+        })(Plots.AbstractXYPlot);
+        Plots.Bar = Bar;
+    })(Plots = Plottable.Plots || (Plottable.Plots = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../../reference.ts" />
@@ -8045,8 +8045,8 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
-    var Plot;
-    (function (Plot) {
+    var Plots;
+    (function (Plots) {
         var Line = (function (_super) {
             __extends(Line, _super);
             /**
@@ -8250,9 +8250,9 @@ var Plottable;
                 };
             };
             return Line;
-        })(Plot.AbstractXYPlot);
-        Plot.Line = Line;
-    })(Plot = Plottable.Plot || (Plottable.Plot = {}));
+        })(Plots.AbstractXYPlot);
+        Plots.Line = Line;
+    })(Plots = Plottable.Plots || (Plottable.Plots = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../../reference.ts" />
@@ -8264,8 +8264,8 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
-    var Plot;
-    (function (Plot) {
+    var Plots;
+    (function (Plots) {
         /**
          * An AreaPlot draws a filled region (area) between the plot's projected "y" and projected "y0" values.
          */
@@ -8343,9 +8343,9 @@ var Plottable;
                 return attrToProjector;
             };
             return Area;
-        })(Plot.Line);
-        Plot.Area = Area;
-    })(Plot = Plottable.Plot || (Plottable.Plot = {}));
+        })(Plots.Line);
+        Plots.Area = Area;
+    })(Plots = Plottable.Plots || (Plottable.Plots = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../../reference.ts" />
@@ -8357,8 +8357,8 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
-    var Plot;
-    (function (Plot) {
+    var Plots;
+    (function (Plots) {
         var ClusteredBar = (function (_super) {
             __extends(ClusteredBar, _super);
             /**
@@ -8424,9 +8424,9 @@ var Plottable;
                 return metadata;
             };
             return ClusteredBar;
-        })(Plot.Bar);
-        Plot.ClusteredBar = ClusteredBar;
-    })(Plot = Plottable.Plot || (Plottable.Plot = {}));
+        })(Plots.Bar);
+        Plots.ClusteredBar = ClusteredBar;
+    })(Plots = Plottable.Plots || (Plottable.Plots = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../../reference.ts" />
@@ -8438,8 +8438,8 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
-    var Plot;
-    (function (Plot) {
+    var Plots;
+    (function (Plots) {
         var AbstractStacked = (function (_super) {
             __extends(AbstractStacked, _super);
             function AbstractStacked() {
@@ -8626,9 +8626,9 @@ var Plottable;
                 return this._isVertical ? this._projections["y"].accessor : this._projections["x"].accessor;
             };
             return AbstractStacked;
-        })(Plot.AbstractXYPlot);
-        Plot.AbstractStacked = AbstractStacked;
-    })(Plot = Plottable.Plot || (Plottable.Plot = {}));
+        })(Plots.AbstractXYPlot);
+        Plots.AbstractStacked = AbstractStacked;
+    })(Plots = Plottable.Plots || (Plottable.Plots = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../../reference.ts" />
@@ -8640,8 +8640,8 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
-    var Plot;
-    (function (Plot) {
+    var Plots;
+    (function (Plots) {
         var StackedArea = (function (_super) {
             __extends(StackedArea, _super);
             /**
@@ -8688,12 +8688,12 @@ var Plottable;
             };
             StackedArea.prototype.project = function (attrToSet, accessor, scale) {
                 _super.prototype.project.call(this, attrToSet, accessor, scale);
-                Plot.AbstractStacked.prototype.project.apply(this, [attrToSet, accessor, scale]);
+                Plots.AbstractStacked.prototype.project.apply(this, [attrToSet, accessor, scale]);
                 return this;
             };
             StackedArea.prototype._onDatasetUpdate = function () {
                 _super.prototype._onDatasetUpdate.call(this);
-                Plot.AbstractStacked.prototype._onDatasetUpdate.apply(this);
+                Plots.AbstractStacked.prototype._onDatasetUpdate.apply(this);
                 return this;
             };
             StackedArea.prototype._generateAttrToProjector = function () {
@@ -8727,42 +8727,42 @@ var Plottable;
                 if (keySets.some(function (keySet) { return keySet.length !== domainKeys.length; })) {
                     Plottable._Util.Methods.warn("the domains across the datasets are not the same.  Plot may produce unintended behavior.");
                 }
-                Plot.AbstractStacked.prototype._updateStackOffsets.call(this);
+                Plots.AbstractStacked.prototype._updateStackOffsets.call(this);
             };
             StackedArea.prototype._updateStackExtents = function () {
-                Plot.AbstractStacked.prototype._updateStackExtents.call(this);
+                Plots.AbstractStacked.prototype._updateStackExtents.call(this);
             };
             StackedArea.prototype._stack = function (dataArray) {
-                return Plot.AbstractStacked.prototype._stack.call(this, dataArray);
+                return Plots.AbstractStacked.prototype._stack.call(this, dataArray);
             };
             StackedArea.prototype._setDatasetStackOffsets = function (positiveDataMapArray, negativeDataMapArray) {
-                Plot.AbstractStacked.prototype._setDatasetStackOffsets.call(this, positiveDataMapArray, negativeDataMapArray);
+                Plots.AbstractStacked.prototype._setDatasetStackOffsets.call(this, positiveDataMapArray, negativeDataMapArray);
             };
             StackedArea.prototype._getDomainKeys = function () {
-                return Plot.AbstractStacked.prototype._getDomainKeys.call(this);
+                return Plots.AbstractStacked.prototype._getDomainKeys.call(this);
             };
             StackedArea.prototype._generateDefaultMapArray = function () {
-                return Plot.AbstractStacked.prototype._generateDefaultMapArray.call(this);
+                return Plots.AbstractStacked.prototype._generateDefaultMapArray.call(this);
             };
             StackedArea.prototype._updateScaleExtents = function () {
-                Plot.AbstractStacked.prototype._updateScaleExtents.call(this);
+                Plots.AbstractStacked.prototype._updateScaleExtents.call(this);
             };
             StackedArea.prototype._keyAccessor = function () {
-                return Plot.AbstractStacked.prototype._keyAccessor.call(this);
+                return Plots.AbstractStacked.prototype._keyAccessor.call(this);
             };
             StackedArea.prototype._valueAccessor = function () {
-                return Plot.AbstractStacked.prototype._valueAccessor.call(this);
+                return Plots.AbstractStacked.prototype._valueAccessor.call(this);
             };
             StackedArea.prototype._getPlotMetadataForDataset = function (key) {
-                return Plot.AbstractStacked.prototype._getPlotMetadataForDataset.call(this, key);
+                return Plots.AbstractStacked.prototype._getPlotMetadataForDataset.call(this, key);
             };
             StackedArea.prototype._normalizeDatasets = function (fromX) {
-                return Plot.AbstractStacked.prototype._normalizeDatasets.call(this, fromX);
+                return Plots.AbstractStacked.prototype._normalizeDatasets.call(this, fromX);
             };
             return StackedArea;
-        })(Plot.Area);
-        Plot.StackedArea = StackedArea;
-    })(Plot = Plottable.Plot || (Plottable.Plot = {}));
+        })(Plots.Area);
+        Plots.StackedArea = StackedArea;
+    })(Plots = Plottable.Plots || (Plottable.Plots = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../../reference.ts" />
@@ -8774,8 +8774,8 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
-    var Plot;
-    (function (Plot) {
+    var Plots;
+    (function (Plots) {
         var StackedBar = (function (_super) {
             __extends(StackedBar, _super);
             /**
@@ -8824,52 +8824,52 @@ var Plottable;
             };
             StackedBar.prototype.project = function (attrToSet, accessor, scale) {
                 _super.prototype.project.call(this, attrToSet, accessor, scale);
-                Plot.AbstractStacked.prototype.project.apply(this, [attrToSet, accessor, scale]);
+                Plots.AbstractStacked.prototype.project.apply(this, [attrToSet, accessor, scale]);
                 return this;
             };
             StackedBar.prototype._onDatasetUpdate = function () {
                 _super.prototype._onDatasetUpdate.call(this);
-                Plot.AbstractStacked.prototype._onDatasetUpdate.apply(this);
+                Plots.AbstractStacked.prototype._onDatasetUpdate.apply(this);
                 return this;
             };
             StackedBar.prototype._getPlotMetadataForDataset = function (key) {
-                return Plot.AbstractStacked.prototype._getPlotMetadataForDataset.call(this, key);
+                return Plots.AbstractStacked.prototype._getPlotMetadataForDataset.call(this, key);
             };
             StackedBar.prototype._normalizeDatasets = function (fromX) {
-                return Plot.AbstractStacked.prototype._normalizeDatasets.call(this, fromX);
+                return Plots.AbstractStacked.prototype._normalizeDatasets.call(this, fromX);
             };
             //===== Stack logic from AbstractStackedPlot =====
             StackedBar.prototype._updateStackOffsets = function () {
-                Plot.AbstractStacked.prototype._updateStackOffsets.call(this);
+                Plots.AbstractStacked.prototype._updateStackOffsets.call(this);
             };
             StackedBar.prototype._updateStackExtents = function () {
-                Plot.AbstractStacked.prototype._updateStackExtents.call(this);
+                Plots.AbstractStacked.prototype._updateStackExtents.call(this);
             };
             StackedBar.prototype._stack = function (dataArray) {
-                return Plot.AbstractStacked.prototype._stack.call(this, dataArray);
+                return Plots.AbstractStacked.prototype._stack.call(this, dataArray);
             };
             StackedBar.prototype._setDatasetStackOffsets = function (positiveDataMapArray, negativeDataMapArray) {
-                Plot.AbstractStacked.prototype._setDatasetStackOffsets.call(this, positiveDataMapArray, negativeDataMapArray);
+                Plots.AbstractStacked.prototype._setDatasetStackOffsets.call(this, positiveDataMapArray, negativeDataMapArray);
             };
             StackedBar.prototype._getDomainKeys = function () {
-                return Plot.AbstractStacked.prototype._getDomainKeys.call(this);
+                return Plots.AbstractStacked.prototype._getDomainKeys.call(this);
             };
             StackedBar.prototype._generateDefaultMapArray = function () {
-                return Plot.AbstractStacked.prototype._generateDefaultMapArray.call(this);
+                return Plots.AbstractStacked.prototype._generateDefaultMapArray.call(this);
             };
             StackedBar.prototype._updateScaleExtents = function () {
-                Plot.AbstractStacked.prototype._updateScaleExtents.call(this);
+                Plots.AbstractStacked.prototype._updateScaleExtents.call(this);
             };
             StackedBar.prototype._keyAccessor = function () {
-                return Plot.AbstractStacked.prototype._keyAccessor.call(this);
+                return Plots.AbstractStacked.prototype._keyAccessor.call(this);
             };
             StackedBar.prototype._valueAccessor = function () {
-                return Plot.AbstractStacked.prototype._valueAccessor.call(this);
+                return Plots.AbstractStacked.prototype._valueAccessor.call(this);
             };
             return StackedBar;
-        })(Plot.Bar);
-        Plot.StackedBar = StackedBar;
-    })(Plot = Plottable.Plot || (Plottable.Plot = {}));
+        })(Plots.Bar);
+        Plots.StackedBar = StackedBar;
+    })(Plots = Plottable.Plots || (Plottable.Plots = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />

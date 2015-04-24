@@ -1,7 +1,7 @@
 ///<reference path="../../reference.ts" />
 
 module Plottable {
-export module Plot {
+export module Plots {
   export class StackedBar<X, Y> extends Bar<X, Y> {
 
     /**

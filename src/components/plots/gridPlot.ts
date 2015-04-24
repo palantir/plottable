@@ -1,7 +1,7 @@
 ///<reference path="../../reference.ts" />
 
 module Plottable {
-export module Plot {
+export module Plots {
   export class Grid extends Rectangle<any, any> {
     private _colorScale: Scale.AbstractScale<any, string>;
 
@@ -56,15 +56,15 @@ export module Plot {
 
       if (attrToSet === "x") {
         if (scale instanceof Scale.Category) {
-          this.project("x1", (d: any, i: number, u: any, m: Plot.PlotMetadata) => {
+          this.project("x1", (d: any, i: number, u: any, m: Plots.PlotMetadata) => {
             return scale.scale(this._projections["x"].accessor(d, i, u, m)) - scale.rangeBand() / 2;
           });
-          this.project("x2", (d: any, i: number, u: any, m: Plot.PlotMetadata) => {
+          this.project("x2", (d: any, i: number, u: any, m: Plots.PlotMetadata) => {
             return scale.scale(this._projections["x"].accessor(d, i, u, m)) + scale.rangeBand() / 2;
           });
         }
         if (scale instanceof Scale.AbstractQuantitative) {
-          this.project("x1", (d: any, i: number, u: any, m: Plot.PlotMetadata) => {
+          this.project("x1", (d: any, i: number, u: any, m: Plots.PlotMetadata) => {
             return scale.scale(this._projections["x"].accessor(d, i, u, m));
           });
         }
@@ -72,15 +72,15 @@ export module Plot {
 
       if (attrToSet === "y") {
         if (scale instanceof Scale.Category) {
-          this.project("y1", (d: any, i: number, u: any, m: Plot.PlotMetadata) => {
+          this.project("y1", (d: any, i: number, u: any, m: Plots.PlotMetadata) => {
             return scale.scale(this._projections["y"].accessor(d, i, u, m)) - scale.rangeBand() / 2;
           });
-          this.project("y2", (d: any, i: number, u: any, m: Plot.PlotMetadata) => {
+          this.project("y2", (d: any, i: number, u: any, m: Plots.PlotMetadata) => {
             return scale.scale(this._projections["y"].accessor(d, i, u, m)) + scale.rangeBand() / 2;
           });
         }
         if (scale instanceof Scale.AbstractQuantitative) {
-          this.project("y1", (d: any, i: number, u: any, m: Plot.PlotMetadata) => {
+          this.project("y1", (d: any, i: number, u: any, m: Plots.PlotMetadata) => {
             return scale.scale(this._projections["y"].accessor(d, i, u, m));
           });
         }

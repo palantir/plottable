@@ -1,7 +1,7 @@
 ///<reference path="../../reference.ts" />
 
 module Plottable {
-export module Plot {
+export module Plots {
   /**
    * An AreaPlot draws a filled region (area) between the plot's projected "y" and projected "y0" values.
    */

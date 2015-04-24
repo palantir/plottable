@@ -1,7 +1,7 @@
 ///<reference path="../../reference.ts" />
 
 module Plottable {
-export module Plot {
+export module Plots {
   /**
    * A key that is also coupled with a dataset, a drawer and a metadata in Plot.
    */

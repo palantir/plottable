@@ -1,7 +1,7 @@
 ///<reference path="../../reference.ts" />
 
 module Plottable {
-export module Plot {
+export module Plots {
   export class Line<X> extends AbstractXYPlot<X, number> implements Interaction.Hoverable {
     private _hoverDetectionRadius = 15;
     private _hoverTarget: D3.Selection;

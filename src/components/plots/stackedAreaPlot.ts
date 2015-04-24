@@ -1,7 +1,7 @@
 ///<reference path="../../reference.ts" />
 
 module Plottable {
-export module Plot {
+export module Plots {
   export class StackedArea<X> extends Area<X> {
 
     private _isVertical: boolean;

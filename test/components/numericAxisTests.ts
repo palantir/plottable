@@ -315,7 +315,7 @@ describe("NumericAxis", () => {
     var yScale = new Plottable.Scale.Linear();
     var yAxis = new Plottable.Axes.Numeric(yScale, "left");
     var yLabel = new Plottable.Component.AxisLabel("LABEL", "left");
-    var barPlot = new Plottable.Plot.Bar(xScale, yScale);
+    var barPlot = new Plottable.Plots.Bar(xScale, yScale);
     barPlot.project("x", "x", xScale);
     barPlot.project("y", "y", yScale);
     barPlot.addDataset(data);

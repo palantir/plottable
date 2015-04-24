@@ -694,11 +694,11 @@ declare module Plottable {
     /**
      * Access specific datum property.
      */
-    type _Accessor = (datum: any, index?: number, userMetadata?: any, plotMetadata?: Plot.PlotMetadata) => any;
+    type _Accessor = (datum: any, index?: number, userMetadata?: any, plotMetadata?: Plots.PlotMetadata) => any;
     /**
      * Retrieves scaled datum property.
      */
-    type _Projector = (datum: any, index: number, userMetadata: any, plotMetadata: Plot.PlotMetadata) => any;
+    type _Projector = (datum: any, index: number, userMetadata: any, plotMetadata: Plots.PlotMetadata) => any;
     /**
      * Projector with applied user and plot metadata
      */
@@ -1496,7 +1496,7 @@ declare module Plottable {
              * @param{any} userMetadata The metadata provided by user
              * @param{any} plotMetadata The metadata provided by plot
              */
-            draw(data: any[], drawSteps: DrawStep[], userMetadata: any, plotMetadata: Plot.PlotMetadata): number;
+            draw(data: any[], drawSteps: DrawStep[], userMetadata: any, plotMetadata: Plots.PlotMetadata): number;
             /**
              * Retrieves the renderArea selection for the drawer
              *
@@ -1573,7 +1573,7 @@ declare module Plottable {
             setup(area: D3.Selection): void;
             removeLabels(): void;
             _getIfLabelsTooWide(): boolean;
-            drawText(data: any[], attrToProjector: AttributeToProjector, userMetadata: any, plotMetadata: Plot.PlotMetadata): void;
+            drawText(data: any[], attrToProjector: AttributeToProjector, userMetadata: any, plotMetadata: Plots.PlotMetadata): void;
             _getPixelPoint(datum: any, index: number): Point;
         }
     }
@@ -1585,7 +1585,7 @@ declare module Plottable {
         class Arc extends Element {
             constructor(key: string);
             _drawStep(step: AppliedDrawStep): void;
-            draw(data: any[], drawSteps: DrawStep[], userMetadata: any, plotMetadata: Plot.PlotMetadata): number;
+            draw(data: any[], drawSteps: DrawStep[], userMetadata: any, plotMetadata: Plots.PlotMetadata): number;
             _getPixelPoint(datum: any, index: number): Point;
         }
     }
@@ -2666,7 +2666,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Plot {
+    module Plots {
         /**
          * A key that is also coupled with a dataset, a drawer and a metadata in Plot.
          */
@@ -2862,7 +2862,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Plot {
+    module Plots {
         class Pie extends AbstractPlot {
             /**
              * Constructs a PiePlot.
@@ -2881,7 +2881,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Plot {
+    module Plots {
         class AbstractXYPlot<X, Y> extends AbstractPlot {
             protected _xScale: Scale.AbstractScale<X, number>;
             protected _yScale: Scale.AbstractScale<Y, number>;
@@ -2946,7 +2946,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Plot {
+    module Plots {
         class Rectangle<X, Y> extends AbstractXYPlot<X, Y> {
             /**
              * Constructs a RectanglePlot.
@@ -2971,7 +2971,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Plot {
+    module Plots {
         class Scatter<X, Y> extends AbstractXYPlot<X, Y> implements Interaction.Hoverable {
             /**
              * Constructs a ScatterPlot.
@@ -2997,7 +2997,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Plot {
+    module Plots {
         class Grid extends Rectangle<any, any> {
             /**
              * Constructs a GridPlot.
@@ -3026,7 +3026,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Plot {
+    module Plots {
         class Bar<X, Y> extends AbstractXYPlot<X, Y> implements Interaction.Hoverable {
             protected static _BarAlignmentToFactor: {
                 [alignment: string]: number;
@@ -3160,7 +3160,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Plot {
+    module Plots {
         class Line<X> extends AbstractXYPlot<X, number> implements Interaction.Hoverable {
             protected _yScale: Scale.AbstractQuantitative<number>;
             /**
@@ -3208,7 +3208,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Plot {
+    module Plots {
         /**
          * An AreaPlot draws a filled region (area) between the plot's projected "y" and projected "y0" values.
          */
@@ -3236,7 +3236,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Plot {
+    module Plots {
         interface ClusteredPlotMetadata extends PlotMetadata {
             position: number;
         }
@@ -3265,7 +3265,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Plot {
+    module Plots {
         interface StackedPlotMetadata extends PlotMetadata {
             offsets: D3.Map<number>;
         }
@@ -3306,7 +3306,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Plot {
+    module Plots {
         class StackedArea<X> extends Area<X> {
             /**
              * Constructs a StackedArea plot.
@@ -3347,7 +3347,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Plot {
+    module Plots {
         class StackedBar<X, Y> extends Bar<X, Y> {
             /**
              * Constructs a StackedBar plot.
@@ -3551,7 +3551,7 @@ declare module Plottable {
             isReverse: boolean;
             constructor(isVertical?: boolean, isReverse?: boolean);
             animate(selection: any, attrToProjector: AttributeToProjector): D3.Transition.Transition;
-            protected _startMovingProjector(attrToProjector: AttributeToProjector): (datum: any, index: number, userMetadata: any, plotMetadata: Plot.PlotMetadata) => any;
+            protected _startMovingProjector(attrToProjector: AttributeToProjector): (datum: any, index: number, userMetadata: any, plotMetadata: Plots.PlotMetadata) => any;
         }
     }
 }

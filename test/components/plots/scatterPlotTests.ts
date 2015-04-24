@@ -8,7 +8,7 @@ describe("Plots", () => {
       var svg = generateSVG(400, 400);
       var xScale = new Plottable.Scale.Linear();
       var yScale = new Plottable.Scale.Linear();
-      var plot = new Plottable.Plot.Scatter(xScale, yScale);
+      var plot = new Plottable.Plots.Scatter(xScale, yScale);
       plot.project("x", (d: any) => d.x, xScale);
       plot.project("y", (d: any) => d.y, yScale);
       assert.doesNotThrow(() => plot.renderTo(svg), Error);
@@ -28,7 +28,7 @@ describe("Plots", () => {
       var xAccessor = (d: any, i?: number, m?: any) => d.x + i * m.foo;
       var yAccessor = (d: any, i?: number, m?: any) => m.bar;
       var dataset = new Plottable.Dataset(data, metadata);
-      var plot = new Plottable.Plot.Scatter(xScale, yScale)
+      var plot = new Plottable.Plots.Scatter(xScale, yScale)
                                   .project("x", xAccessor)
                                   .project("y", yAccessor);
       plot.addDataset(dataset);
@@ -71,7 +71,7 @@ describe("Plots", () => {
       var yScale = new Plottable.Scale.Linear();
       var data = [{x: 0, y: 0}, {x: 1, y: 1}];
       var data2 = [{x: 1, y: 2}, {x: 3, y: 4}];
-      var plot = new Plottable.Plot.Scatter(xScale, yScale)
+      var plot = new Plottable.Plots.Scatter(xScale, yScale)
                                    .project("x", "x", xScale)
                                    .project("y", "y", yScale)
                                    .addDataset(data)
@@ -87,7 +87,7 @@ describe("Plots", () => {
     });
 
     it("getClosestPlotData()", () => {
-      function assertPlotDataEqual(expected: Plottable.Plot.PlotData, actual: Plottable.Plot.PlotData,
+      function assertPlotDataEqual(expected: Plottable.Plots.PlotData, actual: Plottable.Plots.PlotData,
         msg: string) {
         assert.deepEqual(expected.data, actual.data, msg);
         assert.closeTo(expected.pixelPoints[0].x, actual.pixelPoints[0].x, 0.01, msg);
@@ -100,7 +100,7 @@ describe("Plots", () => {
       var yScale = new Plottable.Scale.Linear();
       var data = [{x: 0, y: 0}, {x: 1, y: 1}];
       var data2 = [{x: 1, y: 2}, {x: 3, y: 4}];
-      var plot = new Plottable.Plot.Scatter(xScale, yScale)
+      var plot = new Plottable.Plots.Scatter(xScale, yScale)
                                    .project("x", "x", xScale)
                                    .project("y", "y", yScale)
                                    .addDataset(data)
@@ -157,7 +157,7 @@ describe("Plots", () => {
         { x: 138, y: 200, size: 10 }
       ];
 
-      var plot = new Plottable.Plot.Scatter(xScale, yScale);
+      var plot = new Plottable.Plots.Scatter(xScale, yScale);
       plot.addDataset(data1);
       plot.project("x", "x").project("y", "y").project("size", "size");
       plot.renderTo(svg);
@@ -193,7 +193,7 @@ describe("Plots", () => {
       var dataset = new Plottable.Dataset(data);
       var xScale = new Plottable.Scale.Linear();
       var yScale = new Plottable.Scale.Linear();
-      var plot = new Plottable.Plot.Scatter(xScale, yScale);
+      var plot = new Plottable.Plots.Scatter(xScale, yScale);
       plot.addDataset(dataset)
           .project("x", "foo", xScale)
           .project("y", "bar", yScale);
@@ -219,7 +219,7 @@ describe("Plots", () => {
       var svg: D3.Selection;
       var xScale: Plottable.Scale.Linear;
       var yScale: Plottable.Scale.Linear;
-      var circlePlot: Plottable.Plot.Scatter<number, number>;
+      var circlePlot: Plottable.Plots.Scatter<number, number>;
       var SVG_WIDTH = 600;
       var SVG_HEIGHT = 300;
       var pixelAreaFull = {xMin: 0, xMax: SVG_WIDTH, yMin: 0, yMax: SVG_HEIGHT};
@@ -259,7 +259,7 @@ describe("Plots", () => {
         svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
         xScale = new Plottable.Scale.Linear().domain([0, 9]);
         yScale = new Plottable.Scale.Linear().domain([0, 81]);
-        circlePlot = new Plottable.Plot.Scatter(xScale, yScale);
+        circlePlot = new Plottable.Plots.Scatter(xScale, yScale);
         circlePlot.addDataset(quadraticDataset);
         circlePlot.project("fill", colorAccessor);
         circlePlot.project("x", "x", xScale);
