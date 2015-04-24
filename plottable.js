@@ -4493,7 +4493,7 @@ var Plottable;
                 this._setupDomElements();
             };
             Time.prototype._setupDomElements = function () {
-                d3.selectAll("." + Time.TIME_AXIS_TIER_CLASS).remove();
+                this._element.selectAll("." + Time.TIME_AXIS_TIER_CLASS).remove();
                 this._tierLabelContainers = [];
                 this._tierMarkContainers = [];
                 this._tierBaselines = [];
