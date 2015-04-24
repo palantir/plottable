@@ -9368,7 +9368,7 @@ var Plottable;
                 return dispatcher;
             };
             Touch.prototype._getWrappedCallback = function (callback) {
-                return function (td, idToPoint, ids, e) { return callback(ids, idToPoint, e); };
+                return function (td, ids, idToPoint, e) { return callback(ids, idToPoint, e); };
             };
             /**
              * Registers a callback to be called whenever a touch starts,
@@ -9434,7 +9434,7 @@ var Plottable;
                 }
                 ;
                 if (touchIdentifiers.length > 0) {
-                    b.broadcast(touchPositions, touchIdentifiers, e);
+                    b.broadcast(touchIdentifiers, touchPositions, e);
                 }
             };
             /**

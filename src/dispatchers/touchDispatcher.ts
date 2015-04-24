@@ -59,7 +59,7 @@ export module Dispatcher {
     }
 
     protected _getWrappedCallback(callback: Function): Core.BroadcasterCallback<Dispatcher.Touch> {
-      return (td: Dispatcher.Touch, idToPoint: { [id: number]: Point; }, ids: number[], e: MouseEvent) => callback(ids, idToPoint, e);
+      return (td: Dispatcher.Touch, ids: number[], idToPoint: { [id: number]: Point; }, e: MouseEvent) => callback(ids, idToPoint, e);
     }
 
     /**
@@ -128,7 +128,7 @@ export module Dispatcher {
         }
       };
       if (touchIdentifiers.length > 0) {
-        b.broadcast(touchPositions, touchIdentifiers, e);
+        b.broadcast(touchIdentifiers, touchPositions, e);
       }
     }
   }
