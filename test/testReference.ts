@@ -58,6 +58,7 @@
 ///<reference path="utils/strictEqualityAssociativeArrayTests.ts" />
 ///<reference path="utils/clientToSVGTranslatorTests.ts" />
 ///<reference path="utils/utilsTests.ts" />
+///<reference path="utils/callbackSetTests.ts" />
 
 ///<reference path="interactions/interactionTests.ts" />
 ///<reference path="interactions/pointerInteractionTests.ts" />

@@ -345,6 +345,27 @@ declare module Plottable {
 
 
 declare module Plottable {
+    module Utils {
+        class Set<T> {
+            constructor();
+            add(value: T): Set<T>;
+            remove(value: T): Set<T>;
+            values(): T[];
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Utils {
+        class CallbackSet extends Set<Function> {
+            callCallbacks(...args: any[]): CallbackSet;
+        }
+    }
+}
+
+
+declare module Plottable {
     type Formatter = (d: any) => string;
     var MILLISECONDS_IN_ONE_DAY: number;
     module Formatters {
