@@ -9620,7 +9620,7 @@ describe("Interactive Components", function () {
         var SVG_HEIGHT = 400;
         it("correctly draws box on drag", function () {
             var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-            var dbl = new Plottable.Component.Interactive.DragBoxLayer();
+            var dbl = new Plottable.Component.DragBoxLayer();
             dbl.renderTo(svg);
             assert.isFalse(dbl.boxVisible(), "box is hidden initially");
             var startPoint = {
@@ -9641,7 +9641,7 @@ describe("Interactive Components", function () {
         });
         it("dismisses on click", function () {
             var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-            var dbl = new Plottable.Component.Interactive.DragBoxLayer();
+            var dbl = new Plottable.Component.DragBoxLayer();
             dbl.renderTo(svg);
             var targetPoint = {
                 x: SVG_WIDTH / 2,
@@ -9653,11 +9653,11 @@ describe("Interactive Components", function () {
             svg.remove();
         });
         it("clipPath enabled", function () {
-            var dbl = new Plottable.Component.Interactive.DragBoxLayer();
+            var dbl = new Plottable.Component.DragBoxLayer();
             assert.isTrue(dbl.clipPathEnabled, "uses clipPath (to hide detection edges)");
         });
         it("detectionRadius()", function () {
-            var dbl = new Plottable.Component.Interactive.DragBoxLayer();
+            var dbl = new Plottable.Component.DragBoxLayer();
             assert.doesNotThrow(function () { return dbl.detectionRadius(3); }, Error, "can set detection radius before anchoring");
             var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
             dbl.renderTo("svg");
@@ -9680,7 +9680,7 @@ describe("Interactive Components", function () {
         });
         it("onDragStart()", function () {
             var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-            var dbl = new Plottable.Component.Interactive.DragBoxLayer();
+            var dbl = new Plottable.Component.DragBoxLayer();
             dbl.renderTo(svg);
             var startPoint = {
                 x: SVG_WIDTH / 4,
@@ -9706,7 +9706,7 @@ describe("Interactive Components", function () {
         });
         it("onDrag()", function () {
             var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-            var dbl = new Plottable.Component.Interactive.DragBoxLayer();
+            var dbl = new Plottable.Component.DragBoxLayer();
             dbl.renderTo(svg);
             var startPoint = {
                 x: SVG_WIDTH / 4,
@@ -9732,7 +9732,7 @@ describe("Interactive Components", function () {
         });
         it("onDragEnd()", function () {
             var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-            var dbl = new Plottable.Component.Interactive.DragBoxLayer();
+            var dbl = new Plottable.Component.DragBoxLayer();
             dbl.renderTo(svg);
             var startPoint = {
                 x: SVG_WIDTH / 4,
@@ -9775,7 +9775,7 @@ describe("Interactive Components", function () {
             }
             beforeEach(function () {
                 svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-                dbl = new Plottable.Component.Interactive.DragBoxLayer();
+                dbl = new Plottable.Component.DragBoxLayer();
                 dbl.renderTo(svg);
                 target = dbl.background();
                 resetBox();
@@ -9883,7 +9883,7 @@ describe("Interactive Components", function () {
         var SVG_HEIGHT = 400;
         it("bounds()", function () {
             var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-            var dbl = new Plottable.Component.Interactive.XDragBoxLayer();
+            var dbl = new Plottable.Component.XDragBoxLayer();
             dbl.boxVisible(true);
             dbl.renderTo(svg);
             var topLeft = {
@@ -9907,7 +9907,7 @@ describe("Interactive Components", function () {
         });
         it("resizes only in x", function () {
             var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-            var dbl = new Plottable.Component.Interactive.XDragBoxLayer();
+            var dbl = new Plottable.Component.XDragBoxLayer();
             dbl.boxVisible(true);
             dbl.resizable(true);
             dbl.renderTo(svg);
@@ -9938,7 +9938,7 @@ describe("Interactive Components", function () {
         });
         it("stays full height after resizing", function () {
             var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-            var dbl = new Plottable.Component.Interactive.XDragBoxLayer();
+            var dbl = new Plottable.Component.XDragBoxLayer();
             dbl.boxVisible(true);
             dbl.resizable(true);
             dbl.renderTo(svg);
@@ -9977,7 +9977,7 @@ describe("Interactive Components", function () {
         var SVG_HEIGHT = 400;
         it("bounds()", function () {
             var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-            var dbl = new Plottable.Component.Interactive.YDragBoxLayer();
+            var dbl = new Plottable.Component.YDragBoxLayer();
             dbl.boxVisible(true);
             dbl.renderTo(svg);
             var topLeft = {
@@ -10001,7 +10001,7 @@ describe("Interactive Components", function () {
         });
         it("resizes only in y", function () {
             var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-            var dbl = new Plottable.Component.Interactive.YDragBoxLayer();
+            var dbl = new Plottable.Component.YDragBoxLayer();
             dbl.boxVisible(true);
             dbl.resizable(true);
             dbl.renderTo(svg);
@@ -10032,7 +10032,7 @@ describe("Interactive Components", function () {
         });
         it("stays full width after resizing", function () {
             var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-            var dbl = new Plottable.Component.Interactive.YDragBoxLayer();
+            var dbl = new Plottable.Component.YDragBoxLayer();
             dbl.boxVisible(true);
             dbl.resizable(true);
             dbl.renderTo(svg);
