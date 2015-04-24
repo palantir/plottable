@@ -43,13 +43,13 @@ export module Plot {
 
       var positiveDataMapArray: D3.Map<StackedDatum>[] = dataMapArray.map((dataMap) => {
         return _Util.Methods.populateMap(domainKeys, (domainKey) => {
-          return { key: domainKey, value: Math.max(0, dataMap.get(domainKey).value) };
+          return { key: domainKey, value: Math.max(0, dataMap.get(domainKey).value) || 0 };
         });
       });
 
       var negativeDataMapArray: D3.Map<StackedDatum>[] = dataMapArray.map((dataMap) => {
         return _Util.Methods.populateMap(domainKeys, (domainKey) => {
-          return { key: domainKey, value: Math.min(dataMap.get(domainKey).value, 0) };
+          return { key: domainKey, value: Math.min(dataMap.get(domainKey).value, 0) || 0 };
         });
       });
 
@@ -122,7 +122,7 @@ export module Plot {
 
           var value = valueAccessor(datum, datumIndex, dataset.metadata(), plotMetadata);
           var offset: number;
-          if (value === 0) {
+          if (!+value) {
             offset = isAllNegativeValues ? negativeOffset : positiveOffset;
           } else {
             offset = value > 0 ? positiveOffset : negativeOffset;
@@ -173,7 +173,7 @@ export module Plot {
 
     public _updateScaleExtents() {
       super._updateScaleExtents();
-      var primaryScale: Scale.AbstractScale<any,number> = this._isVertical ? this._yScale : this._xScale;
+      var primaryScale: Scale.AbstractScale<any, number> = this._isVertical ? this._yScale : this._xScale;
       if (!primaryScale) {
         return;
       }
@@ -184,7 +184,7 @@ export module Plot {
       }
     }
 
-    public _normalizeDatasets<A,B>(fromX: boolean): {a: A; b: B;}[] {
+    public _normalizeDatasets<A, B>(fromX: boolean): {a: A; b: B}[] {
       var aAccessor = this._projections[fromX ? "x" : "y"].accessor;
       var bAccessor = this._projections[fromX ? "y" : "x"].accessor;
       var aStackedAccessor = (d: any, i: number, u: any, m: StackedPlotMetadata) => {

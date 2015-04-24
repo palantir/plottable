@@ -54,8 +54,8 @@ export module _Util {
       var scaleY = (testPoint.y - origin.y) / sampleDistance;
 
       // get the true cursor position
-      this._measureRect.setAttribute("x", String((clientX - origin.x)/scaleX) );
-      this._measureRect.setAttribute("y", String((clientY - origin.y)/scaleY) );
+      this._measureRect.setAttribute("x", String((clientX - origin.x) / scaleX));
+      this._measureRect.setAttribute("y", String((clientY - origin.y) / scaleY));
       mrBCR = this._measureRect.getBoundingClientRect();
       var trueCursorPosition = { x: mrBCR.left, y: mrBCR.top };
 

@@ -52,13 +52,6 @@ module Plottable {
     wantsHeight: boolean;
   }
 
-  export type _PixelArea = {
-    xMin: number;
-    xMax: number;
-    yMin: number;
-    yMax: number;
-  }
-
   /**
    * The range of your current data. For example, [1, 2, 6, -5] has the Extent
    * `{min: -5, max: 6}`.
@@ -77,5 +70,13 @@ module Plottable {
   export type Point = {
     x: number;
     y: number;
+  }
+
+  /**
+   * The corners of a box.
+   */
+  export type Bounds = {
+    topLeft: Point;
+    bottomRight: Point;
   }
 }

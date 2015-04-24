@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Plot {
-  export class Scatter<X,Y> extends AbstractXYPlot<X,Y> implements Interaction.Hoverable {
+  export class Scatter<X, Y> extends AbstractXYPlot<X, Y> implements Interaction.Hoverable {
     private _closeDetectionRadius = 5;
     private _defaultFillColor: string;
 

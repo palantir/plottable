@@ -11,6 +11,15 @@ declare module Plottable {
              * @return {boolean} Whether x is in [a, b]
              */
             function inRange(x: number, a: number, b: number): boolean;
+            /**
+             * Clamps x to the range [min, max].
+             *
+             * @param {number} x The value to be clamped.
+             * @param {number} min The minimum value.
+             * @param {number} max The maximum value.
+             * @return {number} A clamped value in the range [min, max].
+             */
+            function clamp(x: number, min: number, max: number): number;
             /** Print a warning message to the console, if it is available.
              *
              * @param {string} The warnings to print
@@ -106,6 +115,15 @@ declare module Plottable {
             function min<C>(arr: C[], default_val: C): C;
             function min<T, C>(arr: T[], acc: (x?: T, i?: number) => C, default_val: C): C;
             /**
+             * Returns true **only** if x is NaN
+             */
+            function isNaN(n: any): boolean;
+            /**
+             * Returns true if the argument is a number, which is not NaN
+             * Numbers represented as strings do not pass this function
+             */
+            function isValidNumber(n: any): boolean;
+            /**
              * Creates shallow copy of map.
              * @param {{ [key: string]: any }} oldMap Map to copy
              *
@@ -127,7 +145,6 @@ declare module Plottable {
             function setTimeout(f: Function, time: number, ...args: any[]): number;
             function colorTest(colorTester: D3.Selection, className: string): string;
             function lightenColor(color: string, factor: number): string;
-            function darkenColor(color: string, factor: number, darkenAmount: number): string;
             function distanceSquared(p1: Point, p2: Point): number;
             function isIE(): boolean;
             /**
@@ -197,17 +214,6 @@ declare module Plottable {
              */
             function sortedIndex(val: number, arr: number[]): number;
             function sortedIndex(val: number, arr: any[], accessor: _Accessor): number;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module _Util {
-        class IDCounter {
-            increment(id: any): number;
-            decrement(id: any): number;
-            get(id: any): number;
         }
     }
 }
@@ -311,32 +317,6 @@ declare module Plottable {
              * see http://www.w3.org/TR/2008/REC-WCAG20-20081211/#contrast-ratiodef
              */
             function contrast(a: string, b: string): number;
-            /**
-             * Converts an RGB color value to HSL. Conversion formula
-             * adapted from http://en.wikipedia.org/wiki/HSL_color_space.
-             * Assumes r, g, and b are contained in the set [0, 255] and
-             * returns h, s, and l in the set [0, 1].
-             * Source: https://stackoverflow.com/questions/2353211/hsl-to-rgb-color-conversion
-             *
-             * @param   Number  r       The red color value
-             * @param   Number  g       The green color value
-             * @param   Number  b       The blue color value
-             * @return  Array           The HSL representation
-             */
-            function rgbToHsl(r: number, g: number, b: number): number[];
-            /**
-             * Converts an HSL color value to RGB. Conversion formula
-             * adapted from http://en.wikipedia.org/wiki/HSL_color_space.
-             * Assumes h, s, and l are contained in the set [0, 1] and
-             * returns r, g, and b in the set [0, 255].
-             * Source: https://stackoverflow.com/questions/2353211/hsl-to-rgb-color-conversion
-             *
-             * @param   Number  h       The hue
-             * @param   Number  s       The saturation
-             * @param   Number  l       The lightness
-             * @return  Array           The RGB representation
-             */
-            function hslToRgb(h: number, s: number, l: number): number[];
         }
     }
 }
@@ -765,12 +745,6 @@ declare module Plottable {
         wantsWidth: boolean;
         wantsHeight: boolean;
     };
-    type _PixelArea = {
-        xMin: number;
-        xMax: number;
-        yMin: number;
-        yMax: number;
-    };
     /**
      * The range of your current data. For example, [1, 2, 6, -5] has the Extent
      * `{min: -5, max: 6}`.
@@ -788,6 +762,13 @@ declare module Plottable {
     type Point = {
         x: number;
         y: number;
+    };
+    /**
+     * The corners of a box.
+     */
+    type Bounds = {
+        topLeft: Point;
+        bottomRight: Point;
     };
 }
 
@@ -1599,6 +1580,7 @@ declare module Plottable {
             _getIfLabelsTooWide(): boolean;
             drawText(data: any[], attrToProjector: AttributeToProjector, userMetadata: any, plotMetadata: Plot.PlotMetadata): void;
             _getPixelPoint(datum: any, index: number): Point;
+            draw(data: any[], drawSteps: DrawStep[], userMetadata: any, plotMetadata: Plot.PlotMetadata): number;
         }
     }
 }
@@ -1634,7 +1616,6 @@ declare module Plottable {
             protected _content: D3.Selection;
             protected _boundingBox: D3.Selection;
             clipPathEnabled: boolean;
-            _parent: AbstractComponentContainer;
             protected _fixedHeightFlag: boolean;
             protected _fixedWidthFlag: boolean;
             protected _isSetup: boolean;
@@ -1804,6 +1785,8 @@ declare module Plottable {
              * @returns The calling Component.
              */
             detach(): AbstractComponent;
+            _parent(): AbstractComponentContainer;
+            _parent(parentElement: AbstractComponentContainer): any;
             /**
              * Removes a Component from the DOM and disconnects it from everything it's
              * listening to (effectively destroying it).
@@ -2102,9 +2085,6 @@ declare module Plottable {
              * @returns {Axis} The calling Axis.
              */
             showEndTickLabels(show: boolean): AbstractAxis;
-            protected _hideEndTickLabels(): void;
-            protected _hideOverflowingTickLabels(): void;
-            protected _hideOverlappingTickLabels(): void;
         }
     }
 }
@@ -2131,6 +2111,10 @@ declare module Plottable {
          */
         type TimeAxisConfiguration = TimeAxisTierConfiguration[];
         class Time extends AbstractAxis {
+            /**
+             * The css class applied to each time axis tier
+             */
+            static TIME_AXIS_TIER_CLASS: string;
             /**
              * Constructs a TimeAxis.
              *
@@ -2161,6 +2145,10 @@ declare module Plottable {
             orient(): string;
             orient(orientation: string): Time;
             _computeHeight(): number;
+            protected _getSize(availableWidth: number, availableHeight: number): {
+                width: number;
+                height: number;
+            };
             protected _setup(): void;
             protected _getTickValues(): any[];
             _doRender(): Time;
@@ -2635,6 +2623,49 @@ declare module Plottable {
             colWeight(index: number, weight: number): Table;
             _isFixedWidth(): boolean;
             _isFixedHeight(): boolean;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Component {
+        class SelectionBoxLayer extends AbstractComponent {
+            protected _box: D3.Selection;
+            constructor();
+            protected _setup(): void;
+            protected _getSize(availableWidth: number, availableHeight: number): {
+                width: number;
+                height: number;
+            };
+            /**
+             * Gets the bounds of the box.
+             *
+             * @return {Bounds} The current bounds of the box.
+             */
+            bounds(): Bounds;
+            /**
+             * Sets the bounds of the box, and draws the box.
+             *
+             * @param {Bounds} newBounds The desired bounds of the box.
+             * @return {SelectionBoxLayer} The calling SelectionBoxLayer.
+             */
+            bounds(newBounds: Bounds): SelectionBoxLayer;
+            protected _setBounds(newBounds: Bounds): void;
+            _doRender(): void;
+            /**
+             * Gets whether the box is being shown.
+             *
+             * @return {boolean} Whether the box is showing.
+             */
+            boxVisible(): boolean;
+            /**
+             * Shows or hides the selection box.
+             *
+             * @param {boolean} show Whether or not to show the box.
+             * @return {SelectionBoxLayer} The calling SelectionBoxLayer.
+             */
+            boxVisible(show: boolean): SelectionBoxLayer;
         }
     }
 }
@@ -3669,7 +3700,9 @@ declare module Plottable {
 
 declare module Plottable {
     module Dispatcher {
-        type TouchCallback = (p: Point, e: TouchEvent) => any;
+        type TouchCallback = (ids: number[], idToPoint: {
+            [id: number]: Point;
+        }, e: TouchEvent) => any;
         class Touch extends AbstractDispatcher {
             /**
              * Get a Dispatcher.Touch for the <svg> containing elem. If one already exists
@@ -3723,15 +3756,6 @@ declare module Plottable {
              * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
              */
             onTouchEnd(key: any, callback: TouchCallback): Dispatcher.Touch;
-            /**
-             * Returns the last computed Touch position.
-             *
-             * @return {Point} The last known Touch position in <svg> coordinate space.
-             */
-            getLastTouchPosition(): {
-                x: number;
-                y: number;
-            };
         }
     }
 }
@@ -3832,14 +3856,19 @@ declare module Plottable {
     module Interaction {
         class DoubleClick extends AbstractInteraction {
             _anchor(component: Component.AbstractComponent, hitBox: D3.Selection): void;
-            _requiresHitbox(): boolean;
-            protected _listenTo(): string;
             /**
-             * Sets a callback to be called when a click is received.
+             * Gets the callback called when the Component is double-clicked.
              *
-             * @param {(p: Point) => any} cb Callback that takes the pixel position of the click event.
+             * @return {(p: Point) => any} The current callback.
              */
-            callback(cb: (p: Point) => any): DoubleClick;
+            onDoubleClick(): (p: Point) => any;
+            /**
+             * Sets the callback called when the Component is double-clicked.
+             *
+             * @param {(p: Point) => any} callback The callback to set.
+             * @return {Interaction.DoubleClick} The calling Interaction.DoubleClick.
+             */
+            onDoubleClick(callback: (p: Point) => any): Interaction.DoubleClick;
         }
     }
 }
@@ -3939,180 +3968,69 @@ declare module Plottable {
 declare module Plottable {
     module Interaction {
         class Drag extends AbstractInteraction {
-            protected _isDragging: boolean;
-            protected _constrainX: (n: number) => number;
-            protected _constrainY: (n: number) => number;
+            _anchor(component: Component.AbstractComponent, hitBox: D3.Selection): void;
             /**
-             * Constructs a Drag. A Drag will signal its callbacks on mouse drag.
+             * Returns whether or not this Interaction constrains Points passed to its
+             * callbacks to lie inside its Component.
+             *
+             * If true, when the user drags outside of the Component, the closest Point
+             * inside the Component will be passed to the callback instead of the actual
+             * cursor position.
+             *
+             * @return {boolean} Whether or not the Interaction.Drag constrains.
              */
-            constructor();
+            constrainToComponent(): boolean;
+            /**
+             * Sets whether or not this Interaction constrains Points passed to its
+             * callbacks to lie inside its Component.
+             *
+             * If true, when the user drags outside of the Component, the closest Point
+             * inside the Component will be passed to the callback instead of the actual
+             * cursor position.
+             *
+             * @param {boolean} constrain Whether or not to constrain Points.
+             * @return {Interaction.Drag} The calling Interaction.Drag.
+             */
+            constrainToComponent(constrain: boolean): Drag;
             /**
              * Gets the callback that is called when dragging starts.
              *
-             * @returns {(start: Point) => void} The callback called when dragging starts.
+             * @returns {(start: Point) => any} The callback called when dragging starts.
              */
-            dragstart(): (start: Point) => void;
+            onDragStart(): (start: Point) => any;
             /**
              * Sets the callback to be called when dragging starts.
              *
-             * @param {(start: Point) => any} cb If provided, the function to be called. Takes in a Point in pixels.
-             * @returns {Drag} The calling Drag.
+             * @param {(start: Point) => any} cb The callback to be called. Takes in a Point in pixels.
+             * @returns {Drag} The calling Interaction.Drag.
              */
-            dragstart(cb: (start: Point) => any): Drag;
-            protected _setOrigin(x: number, y: number): void;
-            protected _getOrigin(): number[];
-            protected _setLocation(x: number, y: number): void;
-            protected _getLocation(): number[];
+            onDragStart(cb: (start: Point) => any): Drag;
             /**
              * Gets the callback that is called during dragging.
              *
-             * @returns {(start: Point, end: Point) => void} The callback called during dragging.
+             * @returns {(start: Point, end: Point) => any} The callback called during dragging.
              */
-            drag(): (start: Point, end: Point) => void;
+            onDrag(): (start: Point, end: Point) => any;
             /**
              * Adds a callback to be called during dragging.
              *
-             * @param {(start: Point, end: Point) => any} cb If provided, the function to be called. Takes in Points in pixels.
-             * @returns {Drag} The calling Drag.
+             * @param {(start: Point, end: Point) => any} cb The callback to be called. Takes in Points in pixels.
+             * @returns {Drag} The calling Interaction.Drag.
              */
-            drag(cb: (start: Point, end: Point) => any): Drag;
+            onDrag(cb: (start: Point, end: Point) => any): Drag;
             /**
              * Gets the callback that is called when dragging ends.
              *
-             * @returns {(start: Point, end: Point) => void} The callback called when dragging ends.
+             * @returns {(start: Point, end: Point) => any} The callback called when dragging ends.
              */
-            dragend(): (start: Point, end: Point) => void;
+            onDragEnd(): (start: Point, end: Point) => any;
             /**
              * Adds a callback to be called when the dragging ends.
              *
-             * @param {(start: Point, end: Point) => any} cb If provided, the function to be called. Takes in points in pixels.
-             * @returns {Drag} The calling Drag.
+             * @param {(start: Point, end: Point) => any} cb The callback to be called. Takes in Points in pixels.
+             * @returns {Drag} The calling Interaction.Drag.
              */
-            dragend(cb: (start: Point, end: Point) => any): Drag;
-            protected _dragstart(): void;
-            protected _doDragstart(): void;
-            protected _drag(): void;
-            protected _doDrag(): void;
-            protected _dragend(): void;
-            protected _doDragend(): void;
-            _anchor(component: Component.AbstractComponent, hitBox: D3.Selection): Drag;
-            _requiresHitbox(): boolean;
-            /**
-             * Sets up so that the xScale and yScale that are passed have their
-             * domains automatically changed as you zoom.
-             *
-             * @param {QuantitativeScale} xScale The scale along the x-axis.
-             * @param {QuantitativeScale} yScale The scale along the y-axis.
-             * @returns {Drag} The calling Drag.
-             */
-            setupZoomCallback(xScale?: Scale.AbstractQuantitative<any>, yScale?: Scale.AbstractQuantitative<any>): Drag;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Interaction {
-        class DragBox extends Drag {
-            static RESIZE_PADDING: number;
-            static _CAN_RESIZE_X: boolean;
-            static _CAN_RESIZE_Y: boolean;
-            /**
-             * The DOM element of the box that is drawn. When no box is drawn, it is
-             * null.
-             */
-            dragBox: D3.Selection;
-            /**
-             * Gets whether resizing is enabled or not.
-             *
-             * @returns {boolean}
-             */
-            resizeEnabled(): boolean;
-            /**
-             * Enables or disables resizing.
-             *
-             * @param {boolean} enabled
-             */
-            resizeEnabled(enabled: boolean): DragBox;
-            /**
-             * Return true if box is resizing on the X dimension.
-             *
-             * @returns {boolean}
-             */
-            isResizingX(): boolean;
-            /**
-             * Return true if box is resizing on the Y dimension.
-             *
-             * @returns {boolean}
-             */
-            isResizingY(): boolean;
-            /**
-             * Whether or not dragBox has been rendered in a visible area.
-             *
-             * @returns {boolean}
-             */
-            boxIsDrawn(): boolean;
-            /**
-             * Return true if box is resizing.
-             *
-             * @returns {boolean}
-             */
-            isResizing(): boolean;
-            protected _dragstart(): void;
-            protected _drag(): void;
-            protected _dragend(): void;
-            /**
-             * Clears the highlighted drag-selection box drawn by the DragBox.
-             *
-             * @returns {DragBox} The calling DragBox.
-             */
-            clearBox(): DragBox;
-            /**
-             * Set where the box is draw explicitly.
-             *
-             * @param {number} x0 Left.
-             * @param {number} x1 Right.
-             * @param {number} y0 Top.
-             * @param {number} y1 Bottom.
-             *
-             * @returns {DragBox} The calling DragBox.
-             */
-            setBox(x0: number, x1: number, y0: number, y1: number): DragBox;
-            _anchor(component: Component.AbstractComponent, hitBox: D3.Selection): DragBox;
-            protected _hover(): void;
-            protected canResizeX(): boolean;
-            protected canResizeY(): boolean;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Interaction {
-        class XDragBox extends DragBox {
-            protected _setOrigin(x: number, y: number): void;
-            protected _setLocation(x: number, y: number): void;
-            protected canResizeY(): boolean;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Interaction {
-        class XYDragBox extends DragBox {
-            constructor();
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Interaction {
-        class YDragBox extends DragBox {
-            protected _setOrigin(x: number, y: number): void;
-            protected _setLocation(x: number, y: number): void;
-            protected canResizeX(): boolean;
+            onDragEnd(cb: (start: Point, end: Point) => any): Drag;
         }
     }
 }
@@ -4174,6 +4092,108 @@ declare module Plottable {
              *                     the user is currently hovering over.
              */
             getCurrentHoverData(): HoverData;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Component {
+        class DragBoxLayer extends Component.SelectionBoxLayer {
+            protected _hasCorners: boolean;
+            constructor();
+            protected _setup(): void;
+            _doRender(): void;
+            /**
+             * Gets the detection radius of the drag box.
+             *
+             * @return {number} The detection radius of the drag box.
+             */
+            detectionRadius(): number;
+            /**
+             * Sets the detection radius of the drag box.
+             *
+             * @param {number} r The desired detection radius.
+             * @return {DragBoxLayer} The calling DragBoxLayer.
+             */
+            detectionRadius(r: number): DragBoxLayer;
+            /**
+             * Gets whether or not the drag box is resizable.
+             *
+             * @return {boolean} Whether or not the drag box is resizable.
+             */
+            resizable(): boolean;
+            /**
+             * Sets whether or not the drag box is resizable.
+             *
+             * @param {boolean} canResize Whether or not the drag box should be resizable.
+             * @return {DragBoxLayer} The calling DragBoxLayer.
+             */
+            resizable(canResize: boolean): DragBoxLayer;
+            protected _setResizableClasses(canResize: boolean): void;
+            /**
+             * Gets the callback that is called when dragging starts.
+             *
+             * @returns {(b: Bounds) => any} The callback called when dragging starts.
+             */
+            onDragStart(): (b: Bounds) => any;
+            /**
+             * Sets the callback to be called when dragging starts.
+             *
+             * @param {(b: Bounds) => any} cb The callback to be called. Passed the current Bounds in pixels.
+             * @returns {DragBoxLayer} The calling DragBoxLayer.
+             */
+            onDragStart(cb: (b: Bounds) => any): DragBoxLayer;
+            /**
+             * Gets the callback that is called during dragging.
+             *
+             * @returns {(b: Bounds) => any} The callback called during dragging.
+             */
+            onDrag(): (b: Bounds) => any;
+            /**
+             * Sets a callback to be called during dragging.
+             *
+             * @param {(b: Bounds) => any} cb The callback to be called. Passed the current Bounds in pixels.
+             * @returns {DragBoxLayer} The calling DragBoxLayer.
+             */
+            onDrag(cb: (b: Bounds) => any): DragBoxLayer;
+            /**
+             * Gets the callback that is called when dragging ends.
+             *
+             * @returns {(b: Bounds) => any} The callback called when dragging ends.
+             */
+            onDragEnd(): (b: Bounds) => any;
+            /**
+             * Sets a callback to be called when the dragging ends.
+             *
+             * @param {(b: Bounds) => any} cb The callback to be called. Passed the current Bounds in pixels.
+             * @returns {DragBoxLayer} The calling DragBoxLayer.
+             */
+            onDragEnd(cb: (b: Bounds) => any): DragBoxLayer;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Component {
+        class XDragBoxLayer extends DragBoxLayer {
+            constructor();
+            _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;
+            protected _setBounds(newBounds: Bounds): void;
+            protected _setResizableClasses(canResize: boolean): void;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Component {
+        class YDragBoxLayer extends DragBoxLayer {
+            constructor();
+            _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;
+            protected _setBounds(newBounds: Bounds): void;
+            protected _setResizableClasses(canResize: boolean): void;
         }
     }
 }

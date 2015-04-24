@@ -16,7 +16,9 @@ export module Interaction {
       this._mouseDispatcher.onMouseMove("Interaction.Pointer" + this.getID(), (p: Point) => this._handlePointerEvent(p));
 
       this._touchDispatcher = Dispatcher.Touch.getDispatcher(<SVGElement> this._componentToListenTo.content().node());
-      this._touchDispatcher.onTouchStart("Interaction.Pointer" + this.getID(), (p: Point) => this._handlePointerEvent(p));
+
+      this._touchDispatcher.onTouchStart("Interaction.Pointer" + this.getID(), (ids, idToPoint) =>
+                                                                                this._handlePointerEvent(idToPoint[ids[0]]));
     }
 
     private _handlePointerEvent(p: Point) {

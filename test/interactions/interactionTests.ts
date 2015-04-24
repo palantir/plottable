@@ -40,14 +40,14 @@ describe("Interactions", () => {
       function getSlope(scale: Plottable.Scale.Linear) {
         var range = scale.range();
         var domain = scale.domain();
-        return (domain[1]-domain[0])/(range[1]-range[0]);
+        return (domain[1] - domain[0]) / (range[1] - range[0]);
       };
 
       var expectedXDragChange = -dragDistancePixelX * getSlope(xScale);
       var expectedYDragChange = -dragDistancePixelY * getSlope(yScale);
 
-      assert.closeTo(xDomainAfter[0]-xDomainBefore[0], expectedXDragChange, 1, "x domain changed by the correct amount");
-      assert.closeTo(yDomainAfter[0]-yDomainBefore[0], expectedYDragChange, 1, "y domain changed by the correct amount");
+      assert.closeTo(xDomainAfter[0] - xDomainBefore[0], expectedXDragChange, 1, "x domain changed by the correct amount");
+      assert.closeTo(yDomainAfter[0] - yDomainBefore[0], expectedYDragChange, 1, "y domain changed by the correct amount");
 
       svg.remove();
     });
@@ -97,9 +97,9 @@ describe("Interactions", () => {
       ki.on(bCode, bCallback);
       component.registerInteraction(ki);
 
-      var $target = $(component.content().node());
+      var $target = $(component.background().node());
 
-      triggerFakeMouseEvent("mouseover", component.content(), 100, 100);
+      triggerFakeMouseEvent("mouseover", component.background(), 100, 100);
       $target.simulate("keydown", { keyCode: aCode });
       assert.isTrue(aCallbackCalled, "callback for \"a\" was called when \"a\" key was pressed");
       assert.isFalse(bCallbackCalled, "callback for \"b\" was not called when \"a\" key was pressed");
@@ -109,7 +109,7 @@ describe("Interactions", () => {
       assert.isFalse(aCallbackCalled, "callback for \"a\" was not called when \"b\" key was pressed");
       assert.isTrue(bCallbackCalled, "callback for \"b\" was called when \"b\" key was pressed");
 
-      triggerFakeMouseEvent("mouseout", component.content(), -100, -100);
+      triggerFakeMouseEvent("mouseout", component.background(), -100, -100);
       aCallbackCalled = false;
       $target.simulate("keydown", { keyCode: aCode });
       assert.isFalse(aCallbackCalled, "callback for \"a\" was not called when not moused over the Component");

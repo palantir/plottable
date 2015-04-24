@@ -345,4 +345,137 @@ describe("Plots", () => {
       svg.remove();
     });
   });
+
+  describe("Horizontal Stacked Bar Plot Non-Overlapping Datasets", () => {
+    var svg: D3.Selection;
+    var plot: Plottable.Plot.StackedBar<number, string>;
+    var SVG_WIDTH = 600;
+    var SVG_HEIGHT = 400;
+
+    var numAttr = (s: D3.Selection, a: string) => parseFloat(s.attr(a));
+
+    beforeEach(() => {
+      svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      var xScale = new Plottable.Scale.Linear();
+      var yScale = new Plottable.Scale.Category();
+
+      var data1 = [
+        {y: "A", x: 1, type: "a"},
+        {y: "B", x: 2, type: "a"},
+        {y: "C", x: 1, type: "a"}
+      ];
+      var data2 = [
+        {y: "A", x: 2, type: "b"},
+        {y: "B", x: 3, type: "b"}
+      ];
+      var data3 = [
+        {y: "B", x: 1, type: "c"},
+        {y: "C", x: 7, type: "c"}
+      ];
+
+      plot = new Plottable.Plot.StackedBar(xScale, yScale, false);
+      plot.addDataset(data1);
+      plot.addDataset(data2);
+      plot.addDataset(data3);
+      plot.project("x", "x", xScale);
+      plot.project("y", "y", yScale);
+      plot.renderTo(svg);
+    });
+
+    it("renders correctly", () => {
+      var bars = plot.getAllSelections();
+
+      assert.strictEqual(bars.size(), 7, "draws a bar for each datum");
+
+      var aBars = [d3.select(bars[0][0]), d3.select(bars[0][3])];
+
+      var bBars = [d3.select(bars[0][1]), d3.select(bars[0][4]), d3.select(bars[0][5])];
+
+      var cBars = [d3.select(bars[0][2]), d3.select(bars[0][6])];
+
+      assert.closeTo(numAttr(aBars[0], "y"), numAttr(aBars[1], "y"), 0.01, "A bars at same y position");
+      assert.operator(numAttr(aBars[0], "x"), "<", numAttr(aBars[1], "x"), "first dataset A bar under second");
+
+      assert.closeTo(numAttr(bBars[0], "y"), numAttr(bBars[1], "y"), 0.01, "B bars at same y position");
+      assert.closeTo(numAttr(bBars[1], "y"), numAttr(bBars[2], "y"), 0.01, "B bars at same y position");
+      assert.operator(numAttr(bBars[0], "x"), "<", numAttr(bBars[1], "x"), "first dataset B bar under second");
+      assert.operator(numAttr(bBars[1], "x"), "<", numAttr(bBars[2], "x"), "second dataset B bar under third");
+
+      assert.closeTo(numAttr(cBars[0], "y"), numAttr(cBars[1], "y"), 0.01, "C bars at same y position");
+      assert.operator(numAttr(cBars[0], "x"), "<", numAttr(cBars[1], "x"), "first dataset C bar under second");
+
+      svg.remove();
+    });
+  });
+
+
+  describe("fail safe tests", () => {
+
+    it("conversion fails should be silent in Plot.StackedBar", () => {
+      var data1 = [
+          { x: "A", y: "s", fill: "blue" },
+      ];
+      var data2 = [
+          { x: "A", y: 1, fill: "red"},
+      ];
+      var xScale = new Plottable.Scale.Category();
+      var yScale = new Plottable.Scale.Linear();
+
+      var plot = new Plottable.Plot.StackedBar(xScale, yScale);
+      plot.addDataset("d1", data1);
+      plot.addDataset("d2", data2);
+      plot.project("fill", "fill");
+      plot.project("x", "x", xScale).project("y", "y", yScale);
+
+      var ds1FirstColumnOffset = (<any> plot)._key2PlotDatasetKey.get("d1").plotMetadata.offsets.get("A");
+      var ds2FirstColumnOffset = (<any> plot)._key2PlotDatasetKey.get("d2").plotMetadata.offsets.get("A");
+
+      assert.strictEqual(typeof ds1FirstColumnOffset, "number", "ds1 offset should be a number");
+      assert.strictEqual(typeof ds2FirstColumnOffset, "number", "ds2 offset should be a number");
+
+      assert.isFalse(Plottable._Util.Methods.isNaN(ds1FirstColumnOffset), "ds1 offset should not be NaN");
+      assert.isFalse(Plottable._Util.Methods.isNaN(ds1FirstColumnOffset), "ds2 offset should not be NaN");
+    });
+
+    it("bad values on the primary axis should default to 0 (be ignored)", () => {
+      var data1 = [
+          { x: "A", y: 1, fill: "blue" },
+      ];
+      var data2 = [
+          { x: "A", y: "s", fill: "red"},
+      ];
+      var data3 = [
+          { x: "A", y: 2, fill: "green"},
+      ];
+      var data4 = [
+          { x: "A", y: "0", fill: "purple"},
+      ];
+      var data5 = [
+          { x: "A", y: 3, fill: "pink"},
+      ];
+
+      var xScale = new Plottable.Scale.Category();
+      var yScale = new Plottable.Scale.Linear();
+
+      var plot = new Plottable.Plot.StackedBar(xScale, yScale);
+      plot.addDataset("d1", data1);
+      plot.addDataset("d2", data2);
+      plot.addDataset("d3", data3);
+      plot.addDataset("d4", data4);
+      plot.addDataset("d5", data5);
+      plot.project("fill", "fill");
+      plot.project("x", "x", xScale).project("y", "y", yScale);
+
+      var offset1 = (<any> plot)._key2PlotDatasetKey.get("d1").plotMetadata.offsets.get("A");
+      var offset3 = (<any> plot)._key2PlotDatasetKey.get("d3").plotMetadata.offsets.get("A");
+      var offset5 = (<any> plot)._key2PlotDatasetKey.get("d5").plotMetadata.offsets.get("A");
+
+      assert.strictEqual(offset1, 0,
+        "Plot columns should start from offset 0 (at the very bottom)");
+      assert.strictEqual(offset3, 1,
+        "Bar 3 should have offset 1, because bar 2 was not rendered");
+      assert.strictEqual(offset5, 3,
+        "Bar 5 should have offset 3, because bar 4 was not rendered");
+    });
+  });
 });

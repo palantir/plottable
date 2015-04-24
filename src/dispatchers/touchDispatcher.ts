@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Dispatcher {
-  export type TouchCallback = (p: Point, e: TouchEvent) => any;
+  export type TouchCallback = (ids: number[], idToPoint: { [id: number]: Point; }, e: TouchEvent) => any;
 
   export class Touch extends AbstractDispatcher {
     /**
@@ -13,7 +13,6 @@ export module Dispatcher {
 
     private static _DISPATCHER_KEY = "__Plottable_Dispatcher_Touch";
     private translator: _Util.ClientToSVGTranslator;
-    private _lastTouchPosition: Point;
     private _startBroadcaster: Core.Broadcaster<Dispatcher.Touch>;
     private _moveBroadcaster: Core.Broadcaster<Dispatcher.Touch>;
     private _endBroadcaster: Core.Broadcaster<Dispatcher.Touch>;
@@ -47,8 +46,6 @@ export module Dispatcher {
 
       this.translator = _Util.ClientToSVGTranslator.getTranslator(svg);
 
-      this._lastTouchPosition = { x: -1, y: -1 };
-
       this._startBroadcaster = new Core.Broadcaster(this);
       this._event2Callback["touchstart"] = (e: TouchEvent) => this._measureAndBroadcast(e, this._startBroadcaster);
 
@@ -62,7 +59,7 @@ export module Dispatcher {
     }
 
     protected _getWrappedCallback(callback: Function): Core.BroadcasterCallback<Dispatcher.Touch> {
-      return (td: Dispatcher.Touch, p: Point, e: MouseEvent) => callback(p, e);
+      return (td: Dispatcher.Touch, ids: number[], idToPoint: { [id: number]: Point; }, e: MouseEvent) => callback(ids, idToPoint, e);
     }
 
     /**
@@ -118,21 +115,21 @@ export module Dispatcher {
      * calls broadcast() on the supplied Broadcaster.
      */
     private _measureAndBroadcast(e: TouchEvent, b: Core.Broadcaster<Dispatcher.Touch>) {
-      var touch = e.changedTouches[0];
-      var newTouchPosition = this.translator.computePosition(touch.clientX, touch.clientY);
-      if (newTouchPosition != null) {
-        this._lastTouchPosition = newTouchPosition;
-        b.broadcast(this.getLastTouchPosition(), e);
+      var touches = e.changedTouches;
+      var touchPositions: { [id: number]: Point; } = {};
+      var touchIdentifiers: number[] = [];
+      for (var i = 0; i < touches.length; i++) {
+        var touch = touches[i];
+        var touchID = touch.identifier;
+        var newTouchPosition = this.translator.computePosition(touch.clientX, touch.clientY);
+        if (newTouchPosition != null) {
+          touchPositions[touchID] = newTouchPosition;
+          touchIdentifiers.push(touchID);
+        }
+      };
+      if (touchIdentifiers.length > 0) {
+        b.broadcast(touchIdentifiers, touchPositions, e);
       }
-    }
-
-    /**
-     * Returns the last computed Touch position.
-     *
-     * @return {Point} The last known Touch position in <svg> coordinate space.
-     */
-    public getLastTouchPosition() {
-      return this._lastTouchPosition;
     }
   }
 }

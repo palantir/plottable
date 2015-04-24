@@ -163,27 +163,81 @@ describe("ComponentGroups", () => {
 
     it("with fixed-size Components", () => {
       var svg = generateSVG();
-      var tall = new Mocks.FixedSizeComponent(SVG_WIDTH/4, SVG_WIDTH/2);
-      var wide = new Mocks.FixedSizeComponent(SVG_WIDTH/2, SVG_WIDTH/4);
+      var tall = new Mocks.FixedSizeComponent(SVG_WIDTH / 4, SVG_WIDTH / 2);
+      var wide = new Mocks.FixedSizeComponent(SVG_WIDTH / 2, SVG_WIDTH / 4);
 
       var cg = new Plottable.Component.Group([tall, wide]);
 
       var request = cg._requestedSpace(SVG_WIDTH, SVG_HEIGHT);
-      assert.strictEqual(request.width, SVG_WIDTH/2,"requested enough space for widest Component");
+      assert.strictEqual(request.width, SVG_WIDTH / 2, "requested enough space for widest Component");
       assert.isFalse(request.wantsWidth, "does not request more width if enough was supplied for widest Component");
-      assert.strictEqual(request.height, SVG_HEIGHT/2, "requested enough space for tallest Component");
+      assert.strictEqual(request.height, SVG_HEIGHT / 2, "requested enough space for tallest Component");
       assert.isFalse(request.wantsHeight, "does not request more height if enough was supplied for tallest Component");
 
-      var constrainedRequest = cg._requestedSpace(SVG_WIDTH/10, SVG_HEIGHT/10);
-      assert.strictEqual(constrainedRequest.width, SVG_WIDTH/2, "requested enough space for widest Component");
+      var constrainedRequest = cg._requestedSpace(SVG_WIDTH / 10, SVG_HEIGHT / 10);
+      assert.strictEqual(constrainedRequest.width, SVG_WIDTH / 2, "requested enough space for widest Component");
       assert.isTrue(constrainedRequest.wantsWidth, "requests more width if not enough was supplied for widest Component");
-      assert.strictEqual(constrainedRequest.height, SVG_HEIGHT/2, "requested enough space for tallest Component");
+      assert.strictEqual(constrainedRequest.height, SVG_HEIGHT / 2, "requested enough space for tallest Component");
       assert.isTrue(constrainedRequest.wantsHeight, "requests more height if not enough was supplied for tallest Component");
 
       cg.renderTo(svg);
       assert.strictEqual(cg.width(), SVG_WIDTH, "occupies all offered width");
       assert.strictEqual(cg.height(), SVG_HEIGHT, "occupies all offered height");
       svg.remove();
+    });
+
+    it("can move components to other groups after anchoring", () => {
+      var svg = generateSVG();
+
+      var cg1 = new Plottable.Component.AbstractComponentContainer();
+      var cg2 = new Plottable.Component.AbstractComponentContainer();
+      var c = new Plottable.Component.AbstractComponent();
+
+      cg1._addComponent(c);
+
+      cg1.renderTo(svg);
+      cg2.renderTo(svg);
+
+      assert.strictEqual(cg2.components().length, 0,
+        "second group should have no component before movement");
+
+      assert.strictEqual(cg1.components().length, 1,
+        "first group should have 1 component before movement");
+
+      assert.strictEqual(c._parent(), cg1,
+        "component's parent before moving should be the group 1"
+      );
+
+      assert.doesNotThrow(() => cg2._addComponent(c), Error,
+        "should be able to move components between groups after anchoring"
+      );
+
+      assert.strictEqual(cg2.components().length, 1,
+        "second group should have 1 component after movement");
+
+      assert.strictEqual(cg1.components().length, 0,
+        "first group should have no components after movement");
+
+      assert.strictEqual(c._parent(), cg2,
+        "component's parent after movement should be the group 2"
+      );
+
+      svg.remove();
+    });
+
+    it("can add null to a component without failing", () => {
+      var cg1 = new Plottable.Component.AbstractComponentContainer();
+      var c = new Plottable.Component.AbstractComponent;
+
+      cg1._addComponent(c);
+
+      assert.strictEqual(cg1.components().length, 1,
+        "there should first be 1 element in the group");
+
+      assert.doesNotThrow(() => cg1._addComponent(null));
+
+      assert.strictEqual(cg1.components().length, 1,
+        "adding null to a group should have no effect on the group");
     });
   });
 
@@ -195,7 +249,7 @@ describe("ComponentGroups", () => {
 
       describe("above()", () => {
 
-        it("Component.above works as expected (Component.above Component)",() => {
+        it("Component.above works as expected (Component.above Component)", () => {
           var cg: Plottable.Component.Group = c2.above(c1);
           var innerComponents: Plottable.Component.AbstractComponent[] = cg.components();
           assert.lengthOf(innerComponents, 2, "There are two components");
@@ -203,7 +257,7 @@ describe("ComponentGroups", () => {
           assert.equal(innerComponents[1], c2, "second component correct");
         });
 
-        it("Component.above works as expected (Component.above ComponentGroup)",() => {
+        it("Component.above works as expected (Component.above ComponentGroup)", () => {
           var cg = new Plottable.Component.Group([c1, c2, c3]);
           var cg2 = c4.above(cg);
           assert.equal(cg, cg2, "c4.above(cg) returns cg");
@@ -213,7 +267,7 @@ describe("ComponentGroups", () => {
           assert.equal(components[3], c4, "fourth component is last");
         });
 
-        it("Component.above works as expected (ComponentGroup.above Component)",() => {
+        it("Component.above works as expected (ComponentGroup.above Component)", () => {
           var cg = new Plottable.Component.Group([c2, c3, c4]);
           var cg2 = cg.above(c1);
           assert.equal(cg, cg2, "cg.merge(c1) returns cg");
@@ -223,7 +277,7 @@ describe("ComponentGroups", () => {
           assert.equal(components[3], c4, "fourth is fourth");
         });
 
-        it("Component.above works as expected (ComponentGroup.above ComponentGroup)",() => {
+        it("Component.above works as expected (ComponentGroup.above ComponentGroup)", () => {
           var cg1 = new Plottable.Component.Group([c1, c2]);
           var cg2 = new Plottable.Component.Group([c3, c4]);
           var cg = cg1.above(cg2);
@@ -238,9 +292,9 @@ describe("ComponentGroups", () => {
 
       });
 
-      describe("below()",() => {
+      describe("below()", () => {
 
-        it("Component.below works as expected (Component.below Component)",() => {
+        it("Component.below works as expected (Component.below Component)", () => {
           var cg: Plottable.Component.Group = c1.below(c2);
           var innerComponents: Plottable.Component.AbstractComponent[] = cg.components();
           assert.lengthOf(innerComponents, 2, "There are two components");
@@ -248,7 +302,7 @@ describe("ComponentGroups", () => {
           assert.equal(innerComponents[1], c2, "second component correct");
         });
 
-        it("Component.below works as expected (Component.below ComponentGroup)",() => {
+        it("Component.below works as expected (Component.below ComponentGroup)", () => {
           var cg = new Plottable.Component.Group([c2, c3, c4]);
           var cg2 = c1.below(cg);
           assert.equal(cg, cg2, "c1.below(cg) returns cg");
@@ -258,7 +312,7 @@ describe("ComponentGroups", () => {
           assert.equal(components[1], c2, "second component is second");
         });
 
-        it("Component.below works as expected (ComponentGroup.below Component)",() => {
+        it("Component.below works as expected (ComponentGroup.below Component)", () => {
           var cg = new Plottable.Component.Group([c1, c2, c3]);
           var cg2 = cg.below(c4);
           assert.equal(cg, cg2, "cg.merge(c4) returns cg");
@@ -268,7 +322,7 @@ describe("ComponentGroups", () => {
           assert.equal(components[3], c4, "fourth is fourth");
         });
 
-        it("Component.below works as expected (ComponentGroup.below ComponentGroup)",() => {
+        it("Component.below works as expected (ComponentGroup.below ComponentGroup)", () => {
           var cg1 = new Plottable.Component.Group([c1, c2]);
           var cg2 = new Plottable.Component.Group([c3, c4]);
           var cg = cg1.below(cg2);

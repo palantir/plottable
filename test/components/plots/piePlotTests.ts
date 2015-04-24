@@ -4,6 +4,19 @@ var assert = chai.assert;
 
 describe("Plots", () => {
   describe("PiePlot", () => {
+    // HACKHACK #1798: beforeEach being used below
+    it("renders correctly with no data", () => {
+      var svg = generateSVG(400, 400);
+      var plot = new Plottable.Plot.Pie();
+      plot.project("value", (d: any) => d.value);
+      assert.doesNotThrow(() => plot.renderTo(svg), Error);
+      assert.strictEqual(plot.width(), 400, "was allocated width");
+      assert.strictEqual(plot.height(), 400, "was allocated height");
+      svg.remove();
+    });
+  });
+
+  describe("PiePlot", () => {
     var svg: D3.Selection;
     var simpleDataset: Plottable.Dataset;
     var simpleData: any[];
@@ -131,7 +144,7 @@ describe("Plots", () => {
 
     describe("getAllSelections", () => {
 
-      it("retrieves all dataset selections with no args",() => {
+      it("retrieves all dataset selections with no args", () => {
         var allSectors = piePlot.getAllSelections();
         var allSectors2 = piePlot.getAllSelections((<any> piePlot)._datasetKeysInOrder);
         assert.deepEqual(allSectors, allSectors2, "all sectors retrieved");
@@ -139,7 +152,7 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("retrieves correct selections (array arg)",() => {
+      it("retrieves correct selections (array arg)", () => {
         var allSectors = piePlot.getAllSelections(["simpleDataset"]);
         assert.strictEqual(allSectors.size(), 2, "all sectors retrieved");
         var selectionData = allSectors.data();
@@ -148,7 +161,7 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("retrieves correct selections (string arg)",() => {
+      it("retrieves correct selections (string arg)", () => {
         var allSectors = piePlot.getAllSelections("simpleDataset");
         assert.strictEqual(allSectors.size(), 2, "all sectors retrieved");
         var selectionData = allSectors.data();
@@ -157,7 +170,7 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("skips invalid keys",() => {
+      it("skips invalid keys", () => {
         var allSectors = piePlot.getAllSelections(["whoo"]);
         assert.strictEqual(allSectors.size(), 0, "all sectors retrieved");
 
@@ -213,6 +226,66 @@ describe("Plots", () => {
       piePlot.addDataset("negativeDataset", negativeDataset);
       assert.equal(message, "Negative values will not render correctly in a pie chart.");
       Plottable._Util.Methods.warn = oldWarn;
+      svg.remove();
+    });
+  });
+
+  describe("fail safe tests", () => {
+    it("undefined, NaN and non-numeric strings not be represented in a Pie Chart", () => {
+      var svg = generateSVG();
+
+      var data1 = [
+        { v: 1 },
+        { v: undefined },
+        { v: 1 },
+        { v: NaN },
+        { v: 1 },
+        { v: "Bad String" },
+        { v: 1 },
+      ];
+
+      var plot = new Plottable.Plot.Pie();
+      plot.addDataset(data1);
+      plot.project("value", "v");
+
+      plot.renderTo(svg);
+
+      var elementsDrawnSel = (<any> plot)._element.selectAll(".arc");
+
+      assert.strictEqual(elementsDrawnSel.size(), 4,
+        "There should be exactly 4 slices in the pie chart, representing the valid values");
+
+      svg.remove();
+
+    });
+
+    it("nulls and 0s should be represented in a Pie Chart as DOM elements, but have radius 0", () => {
+      var svg = generateSVG();
+
+      var data1 = [
+        { v: 1 },
+        { v: 0 },
+        { v: null },
+        { v: 1 },
+      ];
+
+      var plot = new Plottable.Plot.Pie();
+      plot.addDataset(data1);
+      plot.project("value", "v");
+
+      plot.renderTo(svg);
+
+      var elementsDrawnSel = (<any> plot)._element.selectAll(".arc");
+
+      assert.strictEqual(elementsDrawnSel.size(), 4,
+        "All 4 elements of the pie chart should have a DOM node");
+
+      assert.closeTo(elementsDrawnSel[0][1].getBBox().width, 0, 0.001,
+        "0 as a value should not be visible");
+
+      assert.closeTo(elementsDrawnSel[0][2].getBBox().width, 0, 0.001,
+        "null as a value should not be visible");
+
       svg.remove();
     });
   });

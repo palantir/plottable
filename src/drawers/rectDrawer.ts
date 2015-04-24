@@ -52,7 +52,7 @@ export module _Drawer {
         var tooWide = secondaryAttrTextSpace + 2 * LABEL_HORIZONTAL_PADDING > secondaryAttrAvailableSpace;
         if (measurement.height <= h && measurement.width <= w) {
           var offset = Math.min((primary - primarySpace) / 2, LABEL_VERTICAL_PADDING);
-          if (!positive) {offset = offset * -1;}
+          if (!positive) { offset = offset * -1; }
           if (this._isVertical) {
             y += offset;
           } else {
@@ -93,7 +93,18 @@ export module _Drawer {
       var y = this._isVertical ? rectY : rectY + rectHeight / 2;
       return { x: x, y: y };
     }
-  }
 
+    public draw(data: any[], drawSteps: DrawStep[], userMetadata: any, plotMetadata: Plot.PlotMetadata) {
+      var attrToProjector = drawSteps[0].attrToProjector;
+      var isValidNumber = Plottable._Util.Methods.isValidNumber;
+      data = data.filter(function(e: any, i: number) {
+        return isValidNumber(attrToProjector["x"](e, null, userMetadata, plotMetadata)) &&
+               isValidNumber(attrToProjector["y"](e, null, userMetadata, plotMetadata)) &&
+               isValidNumber(attrToProjector["width"](e, null, userMetadata, plotMetadata)) &&
+               isValidNumber(attrToProjector["height"](e, null, userMetadata, plotMetadata));
+      });
+      return super.draw(data, drawSteps, userMetadata, plotMetadata);
+    }
+  }
 }
 }

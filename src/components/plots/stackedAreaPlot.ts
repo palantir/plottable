@@ -143,7 +143,7 @@ export module Plot {
       return AbstractStacked.prototype._getPlotMetadataForDataset.call(this, key);
     }
 
-    protected _normalizeDatasets<A,B>(fromX: boolean): {a: A; b: B;}[] {
+    protected _normalizeDatasets<A, B>(fromX: boolean): {a: A; b: B}[] {
       return AbstractStacked.prototype._normalizeDatasets.call(this, fromX);
     }
     //===== /Stack logic =====

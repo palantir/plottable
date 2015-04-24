@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Plot {
-  export class AbstractXYPlot<X,Y> extends AbstractPlot {
+  export class AbstractXYPlot<X, Y> extends AbstractPlot {
     protected _xScale: Scale.AbstractScale<X, number>;
     protected _yScale: Scale.AbstractScale<Y, number>;
     private _autoAdjustXScaleDomain = false;
@@ -83,7 +83,7 @@ export module Plot {
      * @param {boolean} autoAdjustment The new value for the automatic adjustment domain for y scale.
      * @returns {AbstractXYPlot} The calling AbstractXYPlot.
      */
-    public automaticallyAdjustYScaleOverVisiblePoints(autoAdjustment: boolean): AbstractXYPlot<X,Y> {
+    public automaticallyAdjustYScaleOverVisiblePoints(autoAdjustment: boolean): AbstractXYPlot<X, Y> {
       this._autoAdjustYScaleDomain = autoAdjustment;
       this._adjustYDomainOnChangeFromX();
       return this;
@@ -97,7 +97,7 @@ export module Plot {
      * @param {boolean} autoAdjustment The new value for the automatic adjustment domain for x scale.
      * @returns {AbstractXYPlot} The calling AbstractXYPlot.
      */
-    public automaticallyAdjustXScaleOverVisiblePoints(autoAdjustment: boolean): AbstractXYPlot<X,Y>  {
+    public automaticallyAdjustXScaleOverVisiblePoints(autoAdjustment: boolean): AbstractXYPlot<X, Y>  {
       this._autoAdjustXScaleDomain = autoAdjustment;
       this._adjustXDomainOnChangeFromY();
       return this;
@@ -159,22 +159,22 @@ export module Plot {
     private _adjustYDomainOnChangeFromX() {
       if (!this._projectorsReady()) { return; }
       if(this._autoAdjustYScaleDomain) {
-        this._adjustDomainToVisiblePoints<X,Y>(this._xScale, this._yScale, true);
+        this._adjustDomainToVisiblePoints<X, Y>(this._xScale, this._yScale, true);
       }
     }
     private _adjustXDomainOnChangeFromY() {
       if (!this._projectorsReady()) { return; }
       if(this._autoAdjustXScaleDomain) {
-        this._adjustDomainToVisiblePoints<Y,X>(this._yScale, this._xScale, false);
+        this._adjustDomainToVisiblePoints<Y, X>(this._yScale, this._xScale, false);
       }
     }
 
-    private _adjustDomainToVisiblePoints<A,B>(fromScale: Scale.AbstractScale<A, number>,
+    private _adjustDomainToVisiblePoints<A, B>(fromScale: Scale.AbstractScale<A, number>,
                                              toScale: Scale.AbstractScale<B, number>,
                                              fromX: boolean) {
       if (toScale instanceof Scale.AbstractQuantitative) {
         var toScaleQ = <Scale.AbstractQuantitative<B>> toScale;
-        var normalizedData = this._normalizeDatasets<A,B>(fromX);
+        var normalizedData = this._normalizeDatasets<A, B>(fromX);
 
         var filterFn: (v: A) => boolean;
         if (fromScale instanceof Scale.AbstractQuantitative) {
@@ -185,7 +185,7 @@ export module Plot {
           filterFn = (a: A) => fromDomainSet.has(a);
         }
 
-        var adjustedDomain = this._adjustDomainOverVisiblePoints<A,B>(normalizedData, filterFn);
+        var adjustedDomain = this._adjustDomainOverVisiblePoints<A, B>(normalizedData, filterFn);
         if(adjustedDomain.length === 0) {
           return;
         }
@@ -194,7 +194,7 @@ export module Plot {
       }
     }
 
-    protected _normalizeDatasets<A,B>(fromX: boolean): {a: A; b: B;}[] {
+    protected _normalizeDatasets<A, B>(fromX: boolean): {a: A; b: B}[] {
       var aAccessor: (d: any, i: number, u: any, m: PlotMetadata) => A = this._projections[fromX ? "x" : "y"].accessor;
       var bAccessor: (d: any, i: number, u: any, m: PlotMetadata) => B = this._projections[fromX ? "y" : "x"].accessor;
       return _Util.Methods.flatten(this._datasetKeysInOrder.map((key: string) => {
@@ -206,7 +206,7 @@ export module Plot {
       }));
     }
 
-    private _adjustDomainOverVisiblePoints<A,B>(values: {a: A; b: B}[], filterFn: (v: any) => boolean): B[] {
+    private _adjustDomainOverVisiblePoints<A, B>(values: {a: A; b: B}[], filterFn: (v: any) => boolean): B[] {
       var bVals = values.filter(v => filterFn(v.a)).map(v => v.b);
       var retVal: B[] = [];
       if (bVals.length !== 0) {

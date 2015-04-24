@@ -174,7 +174,7 @@ describe("Plots", () => {
 
     beforeEach(() => {
       svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      xScale = new Plottable.Scale.Linear().domain([1, 2]);;
+      xScale = new Plottable.Scale.Linear().domain([1, 2]);
       yScale = new Plottable.Scale.Linear();
 
       data1 = [
@@ -226,7 +226,7 @@ describe("Plots", () => {
 
     beforeEach(() => {
       svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      xScale = new Plottable.Scale.Category().domain(["a", "b"]);;
+      xScale = new Plottable.Scale.Category().domain(["a", "b"]);
       yScale = new Plottable.Scale.Linear();
 
       data1 = [

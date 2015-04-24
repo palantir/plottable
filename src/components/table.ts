@@ -51,14 +51,16 @@ export module Component {
       this.classed("table", true);
       rows.forEach((row, rowIndex) => {
         row.forEach((component, colIndex) => {
-          this.addComponent(rowIndex, colIndex, component);
+          if (component != null) {
+            this.addComponent(rowIndex, colIndex, component);
+          }
         });
       });
     }
 
     /**
-     * Adds a Component in the specified cell. 
-     * 
+     * Adds a Component in the specified cell.
+     *
      * If the cell is already occupied, there are 3 cases
      *  - Component + Component => Group containing both components
      *  - Component + Group => Component is added to the group
@@ -80,10 +82,13 @@ export module Component {
      */
     public addComponent(row: number, col: number, component: AbstractComponent): Table {
 
+      if (component == null) {
+        throw Error("Cannot add null to a table cell");
+      }
+
       var currentComponent = this._rows[row] && this._rows[row][col];
 
       if (currentComponent) {
-        currentComponent.detach();
         component = component.above(currentComponent);
       }
 
@@ -351,18 +356,18 @@ export module Component {
     }
 
     private _padTableToSize(nRows: number, nCols: number) {
-      for (var i = 0; i<nRows; i++) {
+      for (var i = 0; i < nRows; i++) {
         if (this._rows[i] === undefined) {
           this._rows[i] = [];
           this._rowWeights[i] = null;
         }
-        for (var j = 0; j<nCols; j++) {
+        for (var j = 0; j < nCols; j++) {
           if (this._rows[i][j] === undefined) {
             this._rows[i][j] = null;
           }
         }
       }
-      for (j = 0; j<nCols; j++) {
+      for (j = 0; j < nCols; j++) {
         if (this._colWeights[j] === undefined) {
           this._colWeights[j] = null;
         }
