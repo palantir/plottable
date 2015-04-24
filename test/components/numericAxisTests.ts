@@ -314,13 +314,13 @@ describe("NumericAxis", () => {
     var xScale = new Plottable.Scale.Category();
     var yScale = new Plottable.Scale.Linear();
     var yAxis = new Plottable.Axes.Numeric(yScale, "left");
-    var yLabel = new Plottable.Component.AxisLabel("LABEL", "left");
+    var yLabel = new Plottable.Components.AxisLabel("LABEL", "left");
     var barPlot = new Plottable.Plots.Bar(xScale, yScale);
     barPlot.project("x", "x", xScale);
     barPlot.project("y", "y", yScale);
     barPlot.addDataset(data);
 
-    var chart = new Plottable.Component.Table([
+    var chart = new Plottable.Components.Table([
         [ yLabel, yAxis, barPlot ]
     ]);
     chart.renderTo(svg);
@@ -438,7 +438,7 @@ describe("NumericAxis", () => {
                                   .tickLabelPosition("top")
                                   .tickLength(50);
 
-    var chartTable = new Plottable.Component.Table([
+    var chartTable = new Plottable.Components.Table([
       [yAxis],
     ]);
 

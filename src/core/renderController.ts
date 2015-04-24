@@ -22,8 +22,8 @@ export module Core {
    * ```
    */
   export module RenderControllers {
-    var _componentsNeedingRender: {[key: string]: Component.AbstractComponent} = {};
-    var _componentsNeedingComputeLayout: {[key: string]: Component.AbstractComponent} = {};
+    var _componentsNeedingRender: {[key: string]: Components.AbstractComponent} = {};
+    var _componentsNeedingComputeLayout: {[key: string]: Components.AbstractComponent} = {};
     var _animationRequested: boolean = false;
     var _isCurrentlyFlushing: boolean = false;
     export var _renderPolicy: RenderPolicies.RenderPolicy = new RenderPolicies.AnimationFrame();
@@ -54,7 +54,7 @@ export module Core {
      *
      * @param {AbstractComponent} component Any Plottable component.
      */
-    export function registerToRender(c: Component.AbstractComponent) {
+    export function registerToRender(c: Components.AbstractComponent) {
       if (_isCurrentlyFlushing) {
         _Util.Methods.warn("Registered to render while other components are flushing: request may be ignored");
       }
@@ -68,7 +68,7 @@ export module Core {
      *
      * @param {AbstractComponent} component Any Plottable component.
      */
-    export function registerToComputeLayout(c: Component.AbstractComponent) {
+    export function registerToComputeLayout(c: Components.AbstractComponent) {
       _componentsNeedingComputeLayout[c.getID()] = c;
       _componentsNeedingRender[c.getID()] = c;
       requestRender();
@@ -103,7 +103,7 @@ export module Core {
         _isCurrentlyFlushing = true;
 
         // Finally, perform render of all components
-        var failed: {[key: string]: Component.AbstractComponent} = {};
+        var failed: {[key: string]: Components.AbstractComponent} = {};
         Object.keys(_componentsNeedingRender).forEach((k) => {
           try {
             _componentsNeedingRender[k]._doRender();

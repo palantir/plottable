@@ -37,7 +37,7 @@ describe("Plots", () => {
       renderer.project("y", "y", yScale);
       renderer.project("fill", "type", colorScale);
       var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
-      var table = new Plottable.Component.Table([[renderer], [xAxis]]).renderTo(svg);
+      var table = new Plottable.Components.Table([[renderer], [xAxis]]).renderTo(svg);
     });
 
     it("renders correctly", () => {
@@ -85,7 +85,7 @@ describe("Plots", () => {
       renderer.project("fill", "type", colorScale);
       renderer.project("x", "x", xScale);
       renderer.project("y", "y", yScale);
-      new Plottable.Component.Table([[renderer]]).renderTo(svg);
+      new Plottable.Components.Table([[renderer]]).renderTo(svg);
     });
 
     it("path elements rendered correctly", () => {
@@ -338,7 +338,7 @@ describe("Plots", () => {
       renderer.addDataset(data2);
       renderer.project("fill", "type", colorScale);
       var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
-      var table = new Plottable.Component.Table([[renderer], [xAxis]]).renderTo(svg);
+      var table = new Plottable.Components.Table([[renderer], [xAxis]]).renderTo(svg);
     });
 
     it("renders correctly", () => {

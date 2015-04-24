@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Axes {
-  export class AbstractAxis extends Component.AbstractComponent {
+  export class AbstractAxis extends Components.AbstractComponent {
     /**
      * The css class applied to each end tick mark (the line on the end tick).
      */

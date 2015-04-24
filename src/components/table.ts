@@ -1,7 +1,7 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Component {
+export module Components {
   type _LayoutAllocation = {
     guaranteedWidths : number[];
     guaranteedHeights: number[];

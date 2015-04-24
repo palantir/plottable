@@ -1,7 +1,7 @@
 ///<reference path="../../reference.ts" />
 
 module Plottable {
-export module Component {
+export module Components {
   export module Interactive {
     type _EdgeIndicator = {
       top: boolean;
@@ -10,7 +10,7 @@ export module Component {
       right: boolean;
     }
 
-    export class DragBoxLayer extends Component.SelectionBoxLayer {
+    export class DragBoxLayer extends Components.SelectionBoxLayer {
       private _dragInteraction: Interaction.Drag;
       private _detectionEdgeT: D3.Selection;
       private _detectionEdgeB: D3.Selection;

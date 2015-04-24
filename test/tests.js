@@ -51,7 +51,7 @@ function fixComponentSize(c, fixedWidth, fixedHeight) {
     return c;
 }
 function makeFixedSizeComponent(fixedWidth, fixedHeight) {
-    return fixComponentSize(new Plottable.Component.AbstractComponent(), fixedWidth, fixedHeight);
+    return fixComponentSize(new Plottable.Components.AbstractComponent(), fixedWidth, fixedHeight);
 }
 function getTranslate(element) {
     return d3.transform(element.attr("transform")).translate;
@@ -235,7 +235,7 @@ var Mocks;
             };
         };
         return FixedSizeComponent;
-    })(Plottable.Component.AbstractComponent);
+    })(Plottable.Components.AbstractComponent);
     Mocks.FixedSizeComponent = FixedSizeComponent;
 })(Mocks || (Mocks = {}));
 
@@ -1180,12 +1180,12 @@ describe("NumericAxis", function () {
         var xScale = new Plottable.Scale.Category();
         var yScale = new Plottable.Scale.Linear();
         var yAxis = new Plottable.Axes.Numeric(yScale, "left");
-        var yLabel = new Plottable.Component.AxisLabel("LABEL", "left");
+        var yLabel = new Plottable.Components.AxisLabel("LABEL", "left");
         var barPlot = new Plottable.Plots.Bar(xScale, yScale);
         barPlot.project("x", "x", xScale);
         barPlot.project("y", "y", yScale);
         barPlot.addDataset(data);
-        var chart = new Plottable.Component.Table([
+        var chart = new Plottable.Components.Table([
             [yLabel, yAxis, barPlot]
         ]);
         chart.renderTo(svg);
@@ -1278,7 +1278,7 @@ describe("NumericAxis", function () {
         var yScale = new Plottable.Scale.Linear().numTicks(100);
         yScale.domain([175, 185]);
         var yAxis = new Plottable.Axes.Numeric(yScale, "left").tickLabelPosition("top").tickLength(50);
-        var chartTable = new Plottable.Component.Table([
+        var chartTable = new Plottable.Components.Table([
             [yAxis],
         ]);
         chartTable.renderTo(svg);
@@ -1466,8 +1466,8 @@ describe("Gridlines", function () {
         var yScale = new Plottable.Scale.Linear();
         yScale.domain([0, 10]);
         var yAxis = new Plottable.Axes.Numeric(yScale, "left");
-        var gridlines = new Plottable.Component.Gridlines(xScale, yScale);
-        var basicTable = new Plottable.Component.Table().addComponent(0, 0, yAxis).addComponent(0, 1, gridlines).addComponent(1, 1, xAxis);
+        var gridlines = new Plottable.Components.Gridlines(xScale, yScale);
+        var basicTable = new Plottable.Components.Table().addComponent(0, 0, yAxis).addComponent(0, 1, gridlines).addComponent(1, 1, xAxis);
         basicTable._anchor(svg);
         basicTable._computeLayout();
         xScale.range([0, xAxis.width()]); // manually set range since we don't have a renderer
@@ -1493,7 +1493,7 @@ describe("Gridlines", function () {
     });
     it("Unanchored Gridlines don't throw an error when scale updates", function () {
         var xScale = new Plottable.Scale.Linear();
-        var gridlines = new Plottable.Component.Gridlines(xScale, null);
+        var gridlines = new Plottable.Components.Gridlines(xScale, null);
         xScale.domain([0, 1]);
         // test passes if error is not thrown.
     });
@@ -1504,7 +1504,7 @@ var assert = chai.assert;
 describe("Labels", function () {
     it("Standard text title label generates properly", function () {
         var svg = generateSVG(400, 80);
-        var label = new Plottable.Component.TitleLabel("A CHART TITLE");
+        var label = new Plottable.Components.TitleLabel("A CHART TITLE");
         label.renderTo(svg);
         var content = label._content;
         assert.isTrue(label._element.classed("label"), "title element has label css class");
@@ -1520,7 +1520,7 @@ describe("Labels", function () {
     // Skipping due to FF odd client bounding rect computation - #1470.
     it.skip("Left-rotated text is handled properly", function () {
         var svg = generateSVG(100, 400);
-        var label = new Plottable.Component.AxisLabel("LEFT-ROTATED LABEL", "left");
+        var label = new Plottable.Components.AxisLabel("LEFT-ROTATED LABEL", "left");
         label.renderTo(svg);
         var content = label._content;
         var text = content.select("text");
@@ -1532,7 +1532,7 @@ describe("Labels", function () {
     // Skipping due to FF odd client bounding rect computation - #1470.
     it.skip("Right-rotated text is handled properly", function () {
         var svg = generateSVG(100, 400);
-        var label = new Plottable.Component.AxisLabel("RIGHT-ROTATED LABEL", "right");
+        var label = new Plottable.Components.AxisLabel("RIGHT-ROTATED LABEL", "right");
         label.renderTo(svg);
         var content = label._content;
         var text = content.select("text");
@@ -1543,7 +1543,7 @@ describe("Labels", function () {
     });
     it("Label text can be changed after label is created", function () {
         var svg = generateSVG(400, 80);
-        var label = new Plottable.Component.TitleLabel("a");
+        var label = new Plottable.Components.TitleLabel("a");
         label.renderTo(svg);
         assert.equal(label._content.select("text").text(), "a", "the text starts at the specified string");
         assert.operator(label.height(), ">", 0, "rowMin is > 0 for non-empty string");
@@ -1557,7 +1557,7 @@ describe("Labels", function () {
     it.skip("Superlong text is handled in a sane fashion", function () {
         var svgWidth = 400;
         var svg = generateSVG(svgWidth, 80);
-        var label = new Plottable.Component.TitleLabel("THIS LABEL IS SO LONG WHOEVER WROTE IT WAS PROBABLY DERANGED");
+        var label = new Plottable.Components.TitleLabel("THIS LABEL IS SO LONG WHOEVER WROTE IT WAS PROBABLY DERANGED");
         label.renderTo(svg);
         var content = label._content;
         var text = content.select("text");
@@ -1568,7 +1568,7 @@ describe("Labels", function () {
     });
     it("text in a tiny box is truncated to empty string", function () {
         var svg = generateSVG(10, 10);
-        var label = new Plottable.Component.TitleLabel("Yeah, not gonna fit...");
+        var label = new Plottable.Components.TitleLabel("Yeah, not gonna fit...");
         label.renderTo(svg);
         var text = label._content.select("text");
         assert.equal(text.text(), "", "text was truncated to empty string");
@@ -1576,8 +1576,8 @@ describe("Labels", function () {
     });
     it("centered text in a table is positioned properly", function () {
         var svg = generateSVG(400, 400);
-        var label = new Plottable.Component.TitleLabel("X");
-        var t = new Plottable.Component.Table().addComponent(0, 0, label).addComponent(1, 0, new Plottable.Component.AbstractComponent());
+        var label = new Plottable.Components.TitleLabel("X");
+        var t = new Plottable.Components.Table().addComponent(0, 0, label).addComponent(1, 0, new Plottable.Components.AbstractComponent());
         t.renderTo(svg);
         var textTranslate = d3.transform(label._content.select("g").attr("transform")).translate;
         var eleTranslate = d3.transform(label._element.attr("transform")).translate;
@@ -1587,19 +1587,19 @@ describe("Labels", function () {
     });
     it("if a label text is changed to empty string, width updates to 0", function () {
         var svg = generateSVG(400, 400);
-        var label = new Plottable.Component.TitleLabel("foo");
+        var label = new Plottable.Components.TitleLabel("foo");
         label.renderTo(svg);
         label.text("");
         assert.equal(label.width(), 0, "width updated to 0");
         svg.remove();
     });
     it("unsupported alignments and orientations are unsupported", function () {
-        assert.throws(function () { return new Plottable.Component.Label("foo", "bar"); }, Error, "not a valid orientation");
+        assert.throws(function () { return new Plottable.Components.Label("foo", "bar"); }, Error, "not a valid orientation");
     });
     // Skipping due to FF odd client bounding rect computation - #1470.
     it.skip("Label orientation can be changed after label is created", function () {
         var svg = generateSVG(400, 400);
-        var label = new Plottable.Component.AxisLabel("CHANGING ORIENTATION");
+        var label = new Plottable.Components.AxisLabel("CHANGING ORIENTATION");
         label.renderTo(svg);
         var content = label._content;
         var text = content.select("text");
@@ -1614,10 +1614,10 @@ describe("Labels", function () {
     });
     it("padding reacts well under align", function () {
         var svg = generateSVG(400, 200);
-        var testLabel = new Plottable.Component.Label("testing label").padding(30).xAlign("left");
-        var longLabel = new Plottable.Component.Label("LONG LABELLLLLLLLLLLLLLLLL").xAlign("left");
-        var topLabel = new Plottable.Component.Label("label").yAlign("bottom");
-        new Plottable.Component.Table([[topLabel], [testLabel], [longLabel]]).renderTo(svg);
+        var testLabel = new Plottable.Components.Label("testing label").padding(30).xAlign("left");
+        var longLabel = new Plottable.Components.Label("LONG LABELLLLLLLLLLLLLLLLL").xAlign("left");
+        var topLabel = new Plottable.Components.Label("label").yAlign("bottom");
+        new Plottable.Components.Table([[topLabel], [testLabel], [longLabel]]).renderTo(svg);
         var testTextRect = testLabel._element.select("text").node().getBoundingClientRect();
         var longTextRect = longLabel._element.select("text").node().getBoundingClientRect();
         assert.closeTo(testTextRect.left, longTextRect.left + 30, 2, "left difference by padding amount");
@@ -1637,7 +1637,7 @@ describe("Labels", function () {
     });
     it("padding puts space around the label", function () {
         var svg = generateSVG(400, 200);
-        var testLabel = new Plottable.Component.Label("testing label").padding(30);
+        var testLabel = new Plottable.Components.Label("testing label").padding(30);
         testLabel.renderTo(svg);
         var measurer = new SVGTypewriter.Measurers.Measurer(svg);
         var measure = measurer.measure("testing label");
@@ -1648,7 +1648,7 @@ describe("Labels", function () {
         svg.remove();
     });
     it("negative padding throws an error", function () {
-        var testLabel = new Plottable.Component.Label("testing label");
+        var testLabel = new Plottable.Components.Label("testing label");
         assert.throws(function () { return testLabel.padding(-10); }, Error, "Cannot be less than 0");
     });
 });
@@ -1659,12 +1659,12 @@ describe("Legend", function () {
     var svg;
     var color;
     var legend;
-    var entrySelector = "." + Plottable.Component.Legend.LEGEND_ENTRY_CLASS;
-    var rowSelector = "." + Plottable.Component.Legend.LEGEND_ROW_CLASS;
+    var entrySelector = "." + Plottable.Components.Legend.LEGEND_ENTRY_CLASS;
+    var rowSelector = "." + Plottable.Components.Legend.LEGEND_ROW_CLASS;
     beforeEach(function () {
         svg = generateSVG(400, 400);
         color = new Plottable.Scale.Color();
-        legend = new Plottable.Component.Legend(color);
+        legend = new Plottable.Components.Legend(color);
     });
     it("a basic legend renders", function () {
         color.domain(["foo", "bar", "baz"]);
@@ -1676,7 +1676,7 @@ describe("Legend", function () {
             var d3this = d3.select(this);
             var text = d3this.select("text").text();
             assert.equal(text, d, "the text node has correct text");
-            var symbol = d3this.select("." + Plottable.Component.Legend.LEGEND_SYMBOL_CLASS);
+            var symbol = d3this.select("." + Plottable.Components.Legend.LEGEND_SYMBOL_CLASS);
             assert.equal(symbol.attr("fill"), color.scale(d), "the symbol's fill is set properly");
         });
         svg.remove();
@@ -1739,7 +1739,7 @@ describe("Legend", function () {
             assert.equal(d, newDomain[i], "the data is set correctly");
             var text = d3.select(this).select("text").text();
             assert.equal(text, d, "the text was set properly");
-            var fill = d3.select(this).select("." + Plottable.Component.Legend.LEGEND_SYMBOL_CLASS).attr("fill");
+            var fill = d3.select(this).select("." + Plottable.Components.Legend.LEGEND_SYMBOL_CLASS).attr("fill");
             assert.equal(fill, color.scale(d), "the fill was set properly");
         });
         assert.lengthOf(legend._content.selectAll(rowSelector)[0], 5, "there are the right number of legend elements");
@@ -1756,7 +1756,7 @@ describe("Legend", function () {
             assert.equal(d, newDomain[i], "the data is set correctly");
             var text = d3.select(this).select("text").text();
             assert.equal(text, d, "the text was set properly");
-            var fill = d3.select(this).select("." + Plottable.Component.Legend.LEGEND_SYMBOL_CLASS).attr("fill");
+            var fill = d3.select(this).select("." + Plottable.Components.Legend.LEGEND_SYMBOL_CLASS).attr("fill");
             assert.equal(fill, newColorScale.scale(d), "the fill was set properly");
         });
         svg.remove();
@@ -1774,7 +1774,7 @@ describe("Legend", function () {
             assert.equal(d, newDomain[i], "the data is set correctly");
             var text = d3.select(this).select("text").text();
             assert.equal(text, d, "the text was set properly");
-            var fill = d3.select(this).select("." + Plottable.Component.Legend.LEGEND_SYMBOL_CLASS).attr("fill");
+            var fill = d3.select(this).select("." + Plottable.Components.Legend.LEGEND_SYMBOL_CLASS).attr("fill");
             assert.equal(fill, newColorScale.scale(d), "the fill was set properly");
         });
         svg.remove();
@@ -1786,7 +1786,7 @@ describe("Legend", function () {
         style.attr("type", "text/css");
         function verifySymbolHeight() {
             var text = legend._content.select("text");
-            var icon = legend._content.select("." + Plottable.Component.Legend.LEGEND_SYMBOL_CLASS);
+            var icon = legend._content.select("." + Plottable.Components.Legend.LEGEND_SYMBOL_CLASS);
             var textHeight = Plottable._Util.DOM.getBBox(text).height;
             var symbolHeight = icon.node().getBoundingClientRect().height;
             assert.operator(symbolHeight, "<", textHeight, "icons too small: symbolHeight < textHeight");
@@ -1919,7 +1919,7 @@ describe("InterpolatedColorLegend", function () {
         assert.deepEqual(labelTexts, formattedDomainValues, "formatter is used to format label text");
     }
     it("renders correctly (orientation: horizontal)", function () {
-        var legend = new Plottable.Component.InterpolatedColorLegend(colorScale, "horizontal");
+        var legend = new Plottable.Components.InterpolatedColorLegend(colorScale, "horizontal");
         legend.renderTo(svg);
         assertBasicRendering(legend);
         var legendElement = legend._element;
@@ -1933,7 +1933,7 @@ describe("InterpolatedColorLegend", function () {
         svg.remove();
     });
     it("renders correctly (orientation: right)", function () {
-        var legend = new Plottable.Component.InterpolatedColorLegend(colorScale, "right");
+        var legend = new Plottable.Components.InterpolatedColorLegend(colorScale, "right");
         legend.renderTo(svg);
         assertBasicRendering(legend);
         var legendElement = legend._element;
@@ -1948,7 +1948,7 @@ describe("InterpolatedColorLegend", function () {
         svg.remove();
     });
     it("renders correctly (orientation: left)", function () {
-        var legend = new Plottable.Component.InterpolatedColorLegend(colorScale, "left");
+        var legend = new Plottable.Components.InterpolatedColorLegend(colorScale, "left");
         legend.renderTo(svg);
         assertBasicRendering(legend);
         var legendElement = legend._element;
@@ -1963,14 +1963,14 @@ describe("InterpolatedColorLegend", function () {
         svg.remove();
     });
     it("re-renders when scale domain updates", function () {
-        var legend = new Plottable.Component.InterpolatedColorLegend(colorScale, "horizontal");
+        var legend = new Plottable.Components.InterpolatedColorLegend(colorScale, "horizontal");
         legend.renderTo(svg);
         colorScale.domain([0, 85]);
         assertBasicRendering(legend);
         svg.remove();
     });
     it("orient() input-checking", function () {
-        var legend = new Plottable.Component.InterpolatedColorLegend(colorScale, "horizontal");
+        var legend = new Plottable.Components.InterpolatedColorLegend(colorScale, "horizontal");
         legend.orient("horizontal"); // should work
         legend.orient("right"); // should work
         legend.orient("left"); // should work
@@ -1978,7 +1978,7 @@ describe("InterpolatedColorLegend", function () {
         svg.remove();
     });
     it("orient() triggers layout computation", function () {
-        var legend = new Plottable.Component.InterpolatedColorLegend(colorScale, "horizontal");
+        var legend = new Plottable.Components.InterpolatedColorLegend(colorScale, "horizontal");
         legend.renderTo(svg);
         var widthBefore = legend.width();
         var heightBefore = legend.height();
@@ -1989,42 +1989,42 @@ describe("InterpolatedColorLegend", function () {
     });
     it("renders correctly when width is constrained (orientation: horizontal)", function () {
         svg.attr("width", 100);
-        var legend = new Plottable.Component.InterpolatedColorLegend(colorScale, "horizontal");
+        var legend = new Plottable.Components.InterpolatedColorLegend(colorScale, "horizontal");
         legend.renderTo(svg);
         assertBasicRendering(legend);
         svg.remove();
     });
     it("renders correctly when height is constrained (orientation: horizontal)", function () {
         svg.attr("height", 20);
-        var legend = new Plottable.Component.InterpolatedColorLegend(colorScale, "horizontal");
+        var legend = new Plottable.Components.InterpolatedColorLegend(colorScale, "horizontal");
         legend.renderTo(svg);
         assertBasicRendering(legend);
         svg.remove();
     });
     it("renders correctly when width is constrained (orientation: right)", function () {
         svg.attr("width", 30);
-        var legend = new Plottable.Component.InterpolatedColorLegend(colorScale, "right");
+        var legend = new Plottable.Components.InterpolatedColorLegend(colorScale, "right");
         legend.renderTo(svg);
         assertBasicRendering(legend);
         svg.remove();
     });
     it("renders correctly when height is constrained (orientation: right)", function () {
         svg.attr("height", 100);
-        var legend = new Plottable.Component.InterpolatedColorLegend(colorScale, "right");
+        var legend = new Plottable.Components.InterpolatedColorLegend(colorScale, "right");
         legend.renderTo(svg);
         assertBasicRendering(legend);
         svg.remove();
     });
     it("renders correctly when width is constrained (orientation: left)", function () {
         svg.attr("width", 30);
-        var legend = new Plottable.Component.InterpolatedColorLegend(colorScale, "left");
+        var legend = new Plottable.Components.InterpolatedColorLegend(colorScale, "left");
         legend.renderTo(svg);
         assertBasicRendering(legend);
         svg.remove();
     });
     it("renders correctly when height is constrained (orientation: left)", function () {
         svg.attr("height", 100);
-        var legend = new Plottable.Component.InterpolatedColorLegend(colorScale, "left");
+        var legend = new Plottable.Components.InterpolatedColorLegend(colorScale, "left");
         legend.renderTo(svg);
         assertBasicRendering(legend);
         svg.remove();
@@ -2036,7 +2036,7 @@ var assert = chai.assert;
 describe("SelectionBoxLayer", function () {
     it("boxVisible()", function () {
         var svg = generateSVG();
-        var sbl = new Plottable.Component.SelectionBoxLayer();
+        var sbl = new Plottable.Components.SelectionBoxLayer();
         sbl.renderTo(svg);
         var selectionBox = svg.select(".selection-box");
         assert.isTrue(selectionBox.empty(), "initilizes without box in DOM");
@@ -2050,7 +2050,7 @@ describe("SelectionBoxLayer", function () {
     });
     it("bounds()", function () {
         var svg = generateSVG();
-        var sbl = new Plottable.Component.SelectionBoxLayer();
+        var sbl = new Plottable.Components.SelectionBoxLayer();
         var topLeft = {
             x: 100,
             y: 100
@@ -2088,7 +2088,7 @@ describe("SelectionBoxLayer", function () {
         svg.remove();
     });
     it("has an effective size of 0, but will occupy all offered space", function () {
-        var sbl = new Plottable.Component.SelectionBoxLayer();
+        var sbl = new Plottable.Components.SelectionBoxLayer();
         var request = sbl._requestedSpace(400, 400);
         verifySpaceRequest(request, 0, 0, false, false, "occupies and asks for no space");
         assert.isTrue(sbl._isFixedWidth(), "fixed width");
@@ -4779,7 +4779,7 @@ describe("Plots", function () {
             renderer.project("y", "y", yScale);
             renderer.project("fill", "type", colorScale);
             var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
-            var table = new Plottable.Component.Table([[renderer], [xAxis]]).renderTo(svg);
+            var table = new Plottable.Components.Table([[renderer], [xAxis]]).renderTo(svg);
         });
         it("renders correctly", function () {
             var areas = renderer._renderArea.selectAll(".area");
@@ -4819,7 +4819,7 @@ describe("Plots", function () {
             renderer.project("fill", "type", colorScale);
             renderer.project("x", "x", xScale);
             renderer.project("y", "y", yScale);
-            new Plottable.Component.Table([[renderer]]).renderTo(svg);
+            new Plottable.Components.Table([[renderer]]).renderTo(svg);
         });
         it("path elements rendered correctly", function () {
             var areas = renderer._renderArea.selectAll(".area");
@@ -5028,7 +5028,7 @@ describe("Plots", function () {
             renderer.addDataset(data2);
             renderer.project("fill", "type", colorScale);
             var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
-            var table = new Plottable.Component.Table([[renderer], [xAxis]]).renderTo(svg);
+            var table = new Plottable.Components.Table([[renderer], [xAxis]]).renderTo(svg);
         });
         it("renders correctly", function () {
             var areas = renderer._renderArea.selectAll(".area");
@@ -5102,7 +5102,7 @@ describe("Plots", function () {
             renderer.project("y", "y", yScale);
             renderer.baseline(0);
             var xAxis = new Plottable.Axes.Category(xScale, "bottom");
-            var table = new Plottable.Component.Table([[renderer], [xAxis]]).renderTo(svg);
+            var table = new Plottable.Components.Table([[renderer], [xAxis]]).renderTo(svg);
             axisHeight = xAxis.height();
             bandWidth = xScale.rangeBand();
         });
@@ -5213,7 +5213,7 @@ describe("Plots", function () {
             plot.project("y", "y", yScale);
             plot.baseline(0);
             var xAxis = new Plottable.Axes.Category(xScale, "bottom");
-            var table = new Plottable.Component.Table([[plot], [xAxis]]).renderTo(svg);
+            var table = new Plottable.Components.Table([[plot], [xAxis]]).renderTo(svg);
             axisHeight = xAxis.height();
         });
         it("stacking done correctly for negative values", function () {
@@ -5271,7 +5271,7 @@ describe("Plots", function () {
             renderer.addDataset(data2);
             renderer.baseline(0);
             var yAxis = new Plottable.Axes.Category(yScale, "left");
-            var table = new Plottable.Component.Table([[yAxis, renderer]]).renderTo(svg);
+            var table = new Plottable.Components.Table([[yAxis, renderer]]).renderTo(svg);
             rendererWidth = renderer.width();
             bandWidth = yScale.rangeBand();
         });
@@ -5338,7 +5338,7 @@ describe("Plots", function () {
             plot.project("x", "x", xScale);
             plot.project("y", "y", yScale);
             var xAxis = new Plottable.Axes.Category(xScale, "bottom");
-            var table = new Plottable.Component.Table([[plot], [xAxis]]).renderTo(svg);
+            var table = new Plottable.Components.Table([[plot], [xAxis]]).renderTo(svg);
         });
         it("renders correctly", function () {
             var bars = plot._renderArea.selectAll("rect");
@@ -5508,7 +5508,7 @@ describe("Plots", function () {
             renderer.project("x", "x", xScale);
             renderer.project("y", "y", yScale);
             var xAxis = new Plottable.Axes.Category(xScale, "bottom");
-            var table = new Plottable.Component.Table([[renderer], [xAxis]]).renderTo(svg);
+            var table = new Plottable.Components.Table([[renderer], [xAxis]]).renderTo(svg);
             axisHeight = xAxis.height();
             bandWidth = xScale.rangeBand();
         });
@@ -5576,7 +5576,7 @@ describe("Plots", function () {
             renderer.project("x", "x", xScale);
             renderer.project("y", "y", yScale);
             var yAxis = new Plottable.Axes.Category(yScale, "left");
-            var table = new Plottable.Component.Table([[yAxis, renderer]]).renderTo(svg);
+            var table = new Plottable.Components.Table([[yAxis, renderer]]).renderTo(svg);
             rendererWidth = renderer.width();
             bandWidth = yScale.rangeBand();
         });
@@ -5631,7 +5631,7 @@ describe("Plots", function () {
             plot.project("x", "x", xScale);
             plot.project("y", "y", yScale);
             var xAxis = new Plottable.Axes.Category(xScale, "bottom");
-            new Plottable.Component.Table([[plot], [xAxis]]).renderTo(svg);
+            new Plottable.Components.Table([[plot], [xAxis]]).renderTo(svg);
         });
         it("renders correctly", function () {
             var bars = plot._renderArea.selectAll("rect");
@@ -5972,10 +5972,10 @@ describe("Metadata", function () {
 var assert = chai.assert;
 describe("ComponentContainer", function () {
     it("_addComponent()", function () {
-        var container = new Plottable.Component.AbstractComponentContainer();
-        var c1 = new Plottable.Component.AbstractComponent();
-        var c2 = new Plottable.Component.AbstractComponent();
-        var c3 = new Plottable.Component.AbstractComponent();
+        var container = new Plottable.Components.AbstractComponentContainer();
+        var c1 = new Plottable.Components.AbstractComponent();
+        var c2 = new Plottable.Components.AbstractComponent();
+        var c3 = new Plottable.Components.AbstractComponent();
         assert.isTrue(container._addComponent(c1), "returns true on successful adding");
         assert.deepEqual(container.components(), [c1], "component was added");
         container._addComponent(c2);
@@ -5988,9 +5988,9 @@ describe("ComponentContainer", function () {
         assert.deepEqual(container.components(), [c3, c1, c2], "component list was unchanged");
     });
     it("_removeComponent()", function () {
-        var container = new Plottable.Component.AbstractComponentContainer();
-        var c1 = new Plottable.Component.AbstractComponent();
-        var c2 = new Plottable.Component.AbstractComponent();
+        var container = new Plottable.Components.AbstractComponentContainer();
+        var c1 = new Plottable.Components.AbstractComponent();
+        var c2 = new Plottable.Components.AbstractComponent();
         container._addComponent(c1);
         container._addComponent(c2);
         container._removeComponent(c2);
@@ -5999,16 +5999,16 @@ describe("ComponentContainer", function () {
         assert.deepEqual(container.components(), [c1], "there are no side effects from removing already-removed components");
     });
     it("empty()", function () {
-        var container = new Plottable.Component.AbstractComponentContainer();
+        var container = new Plottable.Components.AbstractComponentContainer();
         assert.isTrue(container.empty());
-        var c1 = new Plottable.Component.AbstractComponent();
+        var c1 = new Plottable.Components.AbstractComponent();
         container._addComponent(c1);
         assert.isFalse(container.empty());
     });
     it("detachAll()", function () {
-        var container = new Plottable.Component.AbstractComponentContainer();
-        var c1 = new Plottable.Component.AbstractComponent();
-        var c2 = new Plottable.Component.AbstractComponent();
+        var container = new Plottable.Components.AbstractComponentContainer();
+        var c1 = new Plottable.Components.AbstractComponent();
+        var c2 = new Plottable.Components.AbstractComponent();
         container._addComponent(c1);
         container._addComponent(c2);
         container.detachAll();
@@ -6021,9 +6021,9 @@ var assert = chai.assert;
 describe("ComponentGroups", function () {
     it("components in componentGroups overlap", function () {
         var c1 = makeFixedSizeComponent(10, 10);
-        var c2 = new Plottable.Component.AbstractComponent();
-        var c3 = new Plottable.Component.AbstractComponent();
-        var cg = new Plottable.Component.Group([c1, c2, c3]);
+        var c2 = new Plottable.Components.AbstractComponent();
+        var c3 = new Plottable.Components.AbstractComponent();
+        var cg = new Plottable.Components.Group([c1, c2, c3]);
         var svg = generateSVG(400, 400);
         cg._anchor(svg);
         c1._addBox("test-box1");
@@ -6041,8 +6041,8 @@ describe("ComponentGroups", function () {
     it("components can be added before and after anchoring", function () {
         var c1 = makeFixedSizeComponent(10, 10);
         var c2 = makeFixedSizeComponent(20, 20);
-        var c3 = new Plottable.Component.AbstractComponent();
-        var cg = new Plottable.Component.Group([c1]);
+        var c3 = new Plottable.Components.AbstractComponent();
+        var cg = new Plottable.Components.Group([c1]);
         var svg = generateSVG(400, 400);
         cg.below(c2)._anchor(svg);
         c1._addBox("test-box1");
@@ -6060,9 +6060,9 @@ describe("ComponentGroups", function () {
         svg.remove();
     });
     it("componentGroup subcomponents have xOffset, yOffset of 0", function () {
-        var cg = new Plottable.Component.Group();
-        var c1 = new Plottable.Component.AbstractComponent();
-        var c2 = new Plottable.Component.AbstractComponent();
+        var cg = new Plottable.Components.Group();
+        var c1 = new Plottable.Components.AbstractComponent();
+        var c2 = new Plottable.Components.AbstractComponent();
         cg.below(c1).below(c2);
         var svg = generateSVG();
         cg._anchor(svg);
@@ -6079,9 +6079,9 @@ describe("ComponentGroups", function () {
         svg.remove();
     });
     it("detach() and _removeComponent work correctly for componentGroup", function () {
-        var c1 = new Plottable.Component.AbstractComponent().classed("component-1", true);
-        var c2 = new Plottable.Component.AbstractComponent().classed("component-2", true);
-        var cg = new Plottable.Component.Group([c1, c2]);
+        var c1 = new Plottable.Components.AbstractComponent().classed("component-1", true);
+        var c2 = new Plottable.Components.AbstractComponent().classed("component-2", true);
+        var cg = new Plottable.Components.Group([c1, c2]);
         var svg = generateSVG(200, 200);
         cg.renderTo(svg);
         var c1Node = svg.select(".component-1").node();
@@ -6106,10 +6106,10 @@ describe("ComponentGroups", function () {
         svg.remove();
     });
     it("detachAll() works as expected", function () {
-        var cg = new Plottable.Component.Group();
-        var c1 = new Plottable.Component.AbstractComponent();
-        var c2 = new Plottable.Component.AbstractComponent();
-        var c3 = new Plottable.Component.AbstractComponent();
+        var cg = new Plottable.Components.Group();
+        var c1 = new Plottable.Components.AbstractComponent();
+        var c2 = new Plottable.Components.AbstractComponent();
+        var c3 = new Plottable.Components.AbstractComponent();
         assert.isTrue(cg.empty(), "cg initially empty");
         cg.below(c1).below(c2).below(c3);
         assert.isFalse(cg.empty(), "cg not empty after merging components");
@@ -6125,7 +6125,7 @@ describe("ComponentGroups", function () {
         var SVG_HEIGHT = 400;
         it("with no Components", function () {
             var svg = generateSVG();
-            var cg = new Plottable.Component.Group([]);
+            var cg = new Plottable.Components.Group([]);
             var request = cg._requestedSpace(SVG_WIDTH, SVG_HEIGHT);
             verifySpaceRequest(request, 0, 0, false, false, "empty Group doesn't request any space");
             cg.renderTo(svg);
@@ -6135,9 +6135,9 @@ describe("ComponentGroups", function () {
         });
         it("with a non-fixed-size Component", function () {
             var svg = generateSVG();
-            var c1 = new Plottable.Component.AbstractComponent();
-            var c2 = new Plottable.Component.AbstractComponent();
-            var cg = new Plottable.Component.Group([c1, c2]);
+            var c1 = new Plottable.Components.AbstractComponent();
+            var c2 = new Plottable.Components.AbstractComponent();
+            var cg = new Plottable.Components.Group([c1, c2]);
             var groupRequest = cg._requestedSpace(SVG_WIDTH, SVG_HEIGHT);
             var c1Request = c1._requestedSpace(SVG_WIDTH, SVG_HEIGHT);
             assert.deepEqual(groupRequest, c1Request, "request reflects request of sub-component");
@@ -6152,7 +6152,7 @@ describe("ComponentGroups", function () {
             var svg = generateSVG();
             var tall = new Mocks.FixedSizeComponent(SVG_WIDTH / 4, SVG_WIDTH / 2);
             var wide = new Mocks.FixedSizeComponent(SVG_WIDTH / 2, SVG_WIDTH / 4);
-            var cg = new Plottable.Component.Group([tall, wide]);
+            var cg = new Plottable.Components.Group([tall, wide]);
             var request = cg._requestedSpace(SVG_WIDTH, SVG_HEIGHT);
             assert.strictEqual(request.width, SVG_WIDTH / 2, "requested enough space for widest Component");
             assert.isFalse(request.wantsWidth, "does not request more width if enough was supplied for widest Component");
@@ -6170,9 +6170,9 @@ describe("ComponentGroups", function () {
         });
         it("can move components to other groups after anchoring", function () {
             var svg = generateSVG();
-            var cg1 = new Plottable.Component.AbstractComponentContainer();
-            var cg2 = new Plottable.Component.AbstractComponentContainer();
-            var c = new Plottable.Component.AbstractComponent();
+            var cg1 = new Plottable.Components.AbstractComponentContainer();
+            var cg2 = new Plottable.Components.AbstractComponentContainer();
+            var c = new Plottable.Components.AbstractComponent();
             cg1._addComponent(c);
             cg1.renderTo(svg);
             cg2.renderTo(svg);
@@ -6186,8 +6186,8 @@ describe("ComponentGroups", function () {
             svg.remove();
         });
         it("can add null to a component without failing", function () {
-            var cg1 = new Plottable.Component.AbstractComponentContainer();
-            var c = new Plottable.Component.AbstractComponent;
+            var cg1 = new Plottable.Components.AbstractComponentContainer();
+            var c = new Plottable.Components.AbstractComponent;
             cg1._addComponent(c);
             assert.strictEqual(cg1.components().length, 1, "there should first be 1 element in the group");
             assert.doesNotThrow(function () { return cg1._addComponent(null); });
@@ -6195,10 +6195,10 @@ describe("ComponentGroups", function () {
         });
     });
     describe("Merging components works as expected", function () {
-        var c1 = new Plottable.Component.AbstractComponent();
-        var c2 = new Plottable.Component.AbstractComponent();
-        var c3 = new Plottable.Component.AbstractComponent();
-        var c4 = new Plottable.Component.AbstractComponent();
+        var c1 = new Plottable.Components.AbstractComponent();
+        var c2 = new Plottable.Components.AbstractComponent();
+        var c3 = new Plottable.Components.AbstractComponent();
+        var c4 = new Plottable.Components.AbstractComponent();
         describe("above()", function () {
             it("Component.above works as expected (Component.above Component)", function () {
                 var cg = c2.above(c1);
@@ -6208,7 +6208,7 @@ describe("ComponentGroups", function () {
                 assert.equal(innerComponents[1], c2, "second component correct");
             });
             it("Component.above works as expected (Component.above ComponentGroup)", function () {
-                var cg = new Plottable.Component.Group([c1, c2, c3]);
+                var cg = new Plottable.Components.Group([c1, c2, c3]);
                 var cg2 = c4.above(cg);
                 assert.equal(cg, cg2, "c4.above(cg) returns cg");
                 var components = cg.components();
@@ -6217,7 +6217,7 @@ describe("ComponentGroups", function () {
                 assert.equal(components[3], c4, "fourth component is last");
             });
             it("Component.above works as expected (ComponentGroup.above Component)", function () {
-                var cg = new Plottable.Component.Group([c2, c3, c4]);
+                var cg = new Plottable.Components.Group([c2, c3, c4]);
                 var cg2 = cg.above(c1);
                 assert.equal(cg, cg2, "cg.merge(c1) returns cg");
                 var components = cg.components();
@@ -6226,8 +6226,8 @@ describe("ComponentGroups", function () {
                 assert.equal(components[3], c4, "fourth is fourth");
             });
             it("Component.above works as expected (ComponentGroup.above ComponentGroup)", function () {
-                var cg1 = new Plottable.Component.Group([c1, c2]);
-                var cg2 = new Plottable.Component.Group([c3, c4]);
+                var cg1 = new Plottable.Components.Group([c1, c2]);
+                var cg2 = new Plottable.Components.Group([c3, c4]);
                 var cg = cg1.above(cg2);
                 assert.equal(cg, cg1, "merged == cg1");
                 assert.notEqual(cg, cg2, "merged != cg2");
@@ -6247,7 +6247,7 @@ describe("ComponentGroups", function () {
                 assert.equal(innerComponents[1], c2, "second component correct");
             });
             it("Component.below works as expected (Component.below ComponentGroup)", function () {
-                var cg = new Plottable.Component.Group([c2, c3, c4]);
+                var cg = new Plottable.Components.Group([c2, c3, c4]);
                 var cg2 = c1.below(cg);
                 assert.equal(cg, cg2, "c1.below(cg) returns cg");
                 var components = cg.components();
@@ -6256,7 +6256,7 @@ describe("ComponentGroups", function () {
                 assert.equal(components[1], c2, "second component is second");
             });
             it("Component.below works as expected (ComponentGroup.below Component)", function () {
-                var cg = new Plottable.Component.Group([c1, c2, c3]);
+                var cg = new Plottable.Components.Group([c1, c2, c3]);
                 var cg2 = cg.below(c4);
                 assert.equal(cg, cg2, "cg.merge(c4) returns cg");
                 var components = cg.components();
@@ -6265,8 +6265,8 @@ describe("ComponentGroups", function () {
                 assert.equal(components[3], c4, "fourth is fourth");
             });
             it("Component.below works as expected (ComponentGroup.below ComponentGroup)", function () {
-                var cg1 = new Plottable.Component.Group([c1, c2]);
-                var cg2 = new Plottable.Component.Group([c3, c4]);
+                var cg1 = new Plottable.Components.Group([c1, c2]);
+                var cg2 = new Plottable.Components.Group([c3, c4]);
                 var cg = cg1.below(cg2);
                 assert.equal(cg, cg1, "merged group == cg1");
                 assert.notEqual(cg, cg2, "merged group != cg2");
@@ -6297,7 +6297,7 @@ describe("Component behavior", function () {
     var SVG_HEIGHT = 300;
     beforeEach(function () {
         svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        c = new Plottable.Component.AbstractComponent();
+        c = new Plottable.Components.AbstractComponent();
     });
     describe("anchor", function () {
         it("anchoring works as expected", function () {
@@ -6465,9 +6465,9 @@ describe("Component behavior", function () {
     });
     it("componentID works as expected", function () {
         var expectedID = Plottable.Core.PlottableObject._nextID;
-        var c1 = new Plottable.Component.AbstractComponent();
+        var c1 = new Plottable.Components.AbstractComponent();
         assert.equal(c1.getID(), expectedID, "component id on next component was as expected");
-        var c2 = new Plottable.Component.AbstractComponent();
+        var c2 = new Plottable.Components.AbstractComponent();
         assert.equal(c2.getID(), expectedID + 1, "future components increment appropriately");
         svg.remove();
     });
@@ -6501,7 +6501,7 @@ describe("Component behavior", function () {
         svg.remove();
         svg = generateSVG();
         // registration before anchoring
-        c = new Plottable.Component.AbstractComponent();
+        c = new Plottable.Components.AbstractComponent();
         var i = new Plottable.Interaction.AbstractInteraction();
         i._requiresHitbox = function () { return true; };
         c.registerInteraction(i);
@@ -6510,7 +6510,7 @@ describe("Component behavior", function () {
         svg.remove();
         svg = generateSVG();
         // registration after anchoring
-        c = new Plottable.Component.AbstractComponent();
+        c = new Plottable.Components.AbstractComponent();
         c._anchor(svg);
         i = new Plottable.Interaction.AbstractInteraction();
         i._requiresHitbox = function () { return true; };
@@ -6544,7 +6544,7 @@ describe("Component behavior", function () {
         svg.remove();
     });
     it("detach() works as expected", function () {
-        var c1 = new Plottable.Component.AbstractComponent();
+        var c1 = new Plottable.Components.AbstractComponent();
         c1.renderTo(svg);
         assert.isTrue(svg.node().hasChildNodes(), "the svg has children");
         c1.detach();
@@ -6552,14 +6552,14 @@ describe("Component behavior", function () {
         svg.remove();
     });
     it("can't reuse component if it's been remove()-ed", function () {
-        var c1 = new Plottable.Component.AbstractComponent();
+        var c1 = new Plottable.Components.AbstractComponent();
         c1.renderTo(svg);
         c1.remove();
         assert.throws(function () { return c1.renderTo(svg); }, "reuse");
         svg.remove();
     });
     it("_invalidateLayout works as expected", function () {
-        var cg = new Plottable.Component.Group();
+        var cg = new Plottable.Components.Group();
         var c = makeFixedSizeComponent(10, 10);
         cg._addComponent(c);
         cg.renderTo(svg);
@@ -6572,15 +6572,15 @@ describe("Component behavior", function () {
         svg.remove();
     });
     it("components can be detached even if not anchored", function () {
-        var c = new Plottable.Component.AbstractComponent();
+        var c = new Plottable.Components.AbstractComponent();
         c.detach(); // no error thrown
         svg.remove();
     });
     it("component remains in own cell", function () {
-        var horizontalComponent = new Plottable.Component.AbstractComponent();
-        var verticalComponent = new Plottable.Component.AbstractComponent();
-        var placeHolder = new Plottable.Component.AbstractComponent();
-        var t = new Plottable.Component.Table().addComponent(0, 0, verticalComponent).addComponent(0, 1, new Plottable.Component.AbstractComponent()).addComponent(1, 0, placeHolder).addComponent(1, 1, horizontalComponent);
+        var horizontalComponent = new Plottable.Components.AbstractComponent();
+        var verticalComponent = new Plottable.Components.AbstractComponent();
+        var placeHolder = new Plottable.Components.AbstractComponent();
+        var t = new Plottable.Components.Table().addComponent(0, 0, verticalComponent).addComponent(0, 1, new Plottable.Components.AbstractComponent()).addComponent(1, 0, placeHolder).addComponent(1, 1, horizontalComponent);
         t.renderTo(svg);
         horizontalComponent.xAlign("center");
         verticalComponent.yAlign("bottom");
@@ -6590,14 +6590,14 @@ describe("Component behavior", function () {
     });
     it("Components will not translate if they are fixed width/height and request more space than offered", function () {
         // catches #1188
-        var c = new Plottable.Component.AbstractComponent();
+        var c = new Plottable.Components.AbstractComponent();
         c._requestedSpace = function () {
             return { width: 500, height: 500, wantsWidth: true, wantsHeight: true };
         };
         c._fixedWidthFlag = true;
         c._fixedHeightFlag = true;
         c.xAlign("left");
-        var t = new Plottable.Component.Table([[c]]);
+        var t = new Plottable.Components.Table([[c]]);
         t.renderTo(svg);
         var transform = d3.transform(c._element.attr("transform"));
         assert.deepEqual(transform.translate, [0, 0], "the element was not translated");
@@ -6605,7 +6605,7 @@ describe("Component behavior", function () {
     });
     it("components do not render unless allocated space", function () {
         var renderFlag = false;
-        var c = new Plottable.Component.AbstractComponent();
+        var c = new Plottable.Components.AbstractComponent();
         c._doRender = function () { return renderFlag = true; };
         c._anchor(svg);
         c._setup();
@@ -6628,7 +6628,7 @@ describe("Component behavior", function () {
         var xScale = new Plottable.Scale.Linear();
         var yScale = new Plottable.Scale.Linear();
         var plot = new Plottable.Plots.Line(xScale, yScale);
-        var group = new Plottable.Component.Group;
+        var group = new Plottable.Components.Group;
         group.renderTo(svg1);
         group._addComponent(plot);
         assert.deepEqual(plot._parent(), group, "the plot should be inside the group");
@@ -6670,7 +6670,7 @@ describe("Component behavior", function () {
         });
         it("origin() (nested)", function () {
             fixComponentSize(c, cWidth, cHeight);
-            var group = new Plottable.Component.Group([c]);
+            var group = new Plottable.Components.Group([c]);
             var groupXOffset = 40;
             var groupYOffset = 30;
             group.xOffset(groupXOffset);
@@ -6719,7 +6719,7 @@ describe("Component behavior", function () {
         });
         it("originToSVG() (nested)", function () {
             fixComponentSize(c, cWidth, cHeight);
-            var group = new Plottable.Component.Group([c]);
+            var group = new Plottable.Components.Group([c]);
             var groupXOffset = 40;
             var groupYOffset = 30;
             group.xOffset(groupXOffset);
@@ -6798,12 +6798,12 @@ var assert = chai.assert;
 function generateBasicTable(nRows, nCols) {
     // makes a table with exactly nRows * nCols children in a regular grid, with each
     // child being a basic component
-    var table = new Plottable.Component.Table();
+    var table = new Plottable.Components.Table();
     var rows = [];
     var components = [];
     for (var i = 0; i < nRows; i++) {
         for (var j = 0; j < nCols; j++) {
-            var r = new Plottable.Component.AbstractComponent();
+            var r = new Plottable.Components.AbstractComponent();
             table.addComponent(i, j, r);
             components.push(r);
         }
@@ -6812,11 +6812,11 @@ function generateBasicTable(nRows, nCols) {
 }
 describe("Tables", function () {
     it("tables are classed properly", function () {
-        var table = new Plottable.Component.Table();
+        var table = new Plottable.Components.Table();
         assert.isTrue(table.classed("table"));
     });
     it("padTableToSize works properly", function () {
-        var t = new Plottable.Component.Table();
+        var t = new Plottable.Components.Table();
         assert.deepEqual(t._rows, [], "the table rows is an empty list");
         t._padTableToSize(1, 1);
         var rows = t._rows;
@@ -6831,19 +6831,19 @@ describe("Tables", function () {
         assert.equal(rows[0][0], firstComponent, "the first component is unchanged");
     });
     it("table constructor can take a list of lists of components", function () {
-        var c0 = new Plottable.Component.AbstractComponent();
+        var c0 = new Plottable.Components.AbstractComponent();
         var row1 = [null, c0];
-        var row2 = [new Plottable.Component.AbstractComponent(), null];
-        var table = new Plottable.Component.Table([row1, row2]);
+        var row2 = [new Plottable.Components.AbstractComponent(), null];
+        var table = new Plottable.Components.Table([row1, row2]);
         assert.equal(table._rows[0][1], c0, "the component is in the right spot");
-        var c1 = new Plottable.Component.AbstractComponent();
+        var c1 = new Plottable.Components.AbstractComponent();
         table.addComponent(2, 2, c1);
         assert.equal(table._rows[2][2], c1, "the inserted component went to the right spot");
     });
     it("tables can be constructed by adding components in matrix style", function () {
-        var table = new Plottable.Component.Table();
-        var c1 = new Plottable.Component.AbstractComponent();
-        var c2 = new Plottable.Component.AbstractComponent();
+        var table = new Plottable.Components.Table();
+        var c1 = new Plottable.Components.AbstractComponent();
+        var c2 = new Plottable.Components.AbstractComponent();
         table.addComponent(0, 0, c1);
         table.addComponent(1, 1, c2);
         var rows = table._rows;
@@ -6856,28 +6856,28 @@ describe("Tables", function () {
         assert.isNull(rows[1][0], "component at (1, 0) is null");
     });
     it("add a component where one already exists creates a new group", function () {
-        var c1 = new Plottable.Component.AbstractComponent();
-        var c2 = new Plottable.Component.AbstractComponent();
-        var c3 = new Plottable.Component.AbstractComponent();
-        var t = new Plottable.Component.Table();
+        var c1 = new Plottable.Components.AbstractComponent();
+        var c2 = new Plottable.Components.AbstractComponent();
+        var c3 = new Plottable.Components.AbstractComponent();
+        var t = new Plottable.Components.Table();
         t.addComponent(0, 2, c1);
         t.addComponent(0, 0, c2);
         t.addComponent(0, 2, c3);
-        assert.isTrue(Plottable.Component.Group.prototype.isPrototypeOf(t._rows[0][2]), "A group was created");
+        assert.isTrue(Plottable.Components.Group.prototype.isPrototypeOf(t._rows[0][2]), "A group was created");
         var components = t._rows[0][2].components();
         assert.lengthOf(components, 2, "The group created should have 2 components");
         assert.equal(components[0], c1, "First element in the group at (0, 2) should be c1");
         assert.equal(components[1], c3, "Second element in the group at (0, 2) should be c3");
     });
     it("add a component where a group already exists adds the component to the group", function () {
-        var c1 = new Plottable.Component.AbstractComponent();
-        var c2 = new Plottable.Component.AbstractComponent();
-        var grp = new Plottable.Component.Group([c1, c2]);
-        var c3 = new Plottable.Component.AbstractComponent();
-        var t = new Plottable.Component.Table();
+        var c1 = new Plottable.Components.AbstractComponent();
+        var c2 = new Plottable.Components.AbstractComponent();
+        var grp = new Plottable.Components.Group([c1, c2]);
+        var c3 = new Plottable.Components.AbstractComponent();
+        var t = new Plottable.Components.Table();
         t.addComponent(0, 2, grp);
         t.addComponent(0, 2, c3);
-        assert.isTrue(Plottable.Component.Group.prototype.isPrototypeOf(t._rows[0][2]), "The cell still contains a group");
+        assert.isTrue(Plottable.Components.Group.prototype.isPrototypeOf(t._rows[0][2]), "The cell still contains a group");
         var components = t._rows[0][2].components();
         assert.lengthOf(components, 3, "The group created should have 3 components");
         assert.equal(components[0], c1, "First element in the group at (0, 2) should still be c1");
@@ -6885,16 +6885,16 @@ describe("Tables", function () {
         assert.equal(components[2], c3, "The Component was added to the existing Group");
     });
     it("adding null to a table cell should throw an error", function () {
-        var c1 = new Plottable.Component.AbstractComponent();
-        var t = new Plottable.Component.Table([[c1]]);
+        var c1 = new Plottable.Components.AbstractComponent();
+        var t = new Plottable.Components.Table([[c1]]);
         assert.throw(function () { return t.addComponent(0, 0, null); }, "Cannot add null to a table cell");
     });
     it("addComponent works even if a component is added with a high column and low row index", function () {
         // Solves #180, a weird bug
-        var t = new Plottable.Component.Table();
+        var t = new Plottable.Components.Table();
         var svg = generateSVG();
-        t.addComponent(1, 0, new Plottable.Component.AbstractComponent());
-        t.addComponent(0, 2, new Plottable.Component.AbstractComponent());
+        t.addComponent(1, 0, new Plottable.Components.AbstractComponent());
+        t.addComponent(0, 2, new Plottable.Components.AbstractComponent());
         t.renderTo(svg); //would throw an error without the fix (tested);
         svg.remove();
     });
@@ -6939,7 +6939,7 @@ describe("Tables", function () {
     });
     it("table with fixed-size objects on every side lays out properly", function () {
         var svg = generateSVG();
-        var c4 = new Plottable.Component.AbstractComponent();
+        var c4 = new Plottable.Components.AbstractComponent();
         // [0 1 2] \\
         // [3 4 5] \\
         // [6 7 8] \\
@@ -6948,7 +6948,7 @@ describe("Tables", function () {
         var c7 = makeFixedSizeComponent(null, 30);
         var c3 = makeFixedSizeComponent(50, null);
         var c5 = makeFixedSizeComponent(50, null);
-        var table = new Plottable.Component.Table([[null, c1, null], [c3, c4, c5], [null, c7, null]]);
+        var table = new Plottable.Components.Table([[null, c1, null], [c3, c4, c5], [null, c7, null]]);
         var components = [c1, c3, c4, c5, c7];
         table.renderTo(svg);
         var elements = components.map(function (r) { return r._element; });
@@ -6986,11 +6986,11 @@ describe("Tables", function () {
     it.skip("table._requestedSpace works properly", function () {
         // [0 1]
         // [2 3]
-        var c0 = new Plottable.Component.AbstractComponent();
+        var c0 = new Plottable.Components.AbstractComponent();
         var c1 = makeFixedSizeComponent(50, 50);
         var c2 = makeFixedSizeComponent(20, 50);
         var c3 = makeFixedSizeComponent(20, 20);
-        var table = new Plottable.Component.Table([[c0, c1], [c2, c3]]);
+        var table = new Plottable.Components.Table([[c0, c1], [c2, c3]]);
         var spaceRequest = table._requestedSpace(30, 30);
         verifySpaceRequest(spaceRequest, 30, 30, true, true, "1");
         spaceRequest = table._requestedSpace(50, 50);
@@ -7010,11 +7010,11 @@ describe("Tables", function () {
             assert.deepEqual(result.wantsWidth, wW, "wantsWidth:" + id);
             assert.deepEqual(result.wantsHeight, wH, "wantsHeight:" + id);
         }
-        var c1 = new Plottable.Component.AbstractComponent();
-        var c2 = new Plottable.Component.AbstractComponent();
-        var c3 = new Plottable.Component.AbstractComponent();
-        var c4 = new Plottable.Component.AbstractComponent();
-        var table = new Plottable.Component.Table([
+        var c1 = new Plottable.Components.AbstractComponent();
+        var c2 = new Plottable.Components.AbstractComponent();
+        var c3 = new Plottable.Components.AbstractComponent();
+        var c4 = new Plottable.Components.AbstractComponent();
+        var table = new Plottable.Components.Table([
             [c1, c2],
             [c3, c4]
         ]);
@@ -7043,7 +7043,7 @@ describe("Tables", function () {
             verifyLayoutResult(result, [0, 0], [0, 0], [50, 50], [50, 50], false, false, "..when there's extra space");
         });
         it.skip("iterateLayout works in the tricky case when components can be unsatisfied but request little space", function () {
-            table = new Plottable.Component.Table([[c1, c2]]);
+            table = new Plottable.Components.Table([[c1, c2]]);
             fixComponentSize(c1, null, null);
             c2._requestedSpace = function (w, h) {
                 return {
@@ -7060,32 +7060,32 @@ describe("Tables", function () {
         });
     });
     describe("table._removeComponent works properly", function () {
-        var c1 = new Plottable.Component.AbstractComponent();
-        var c2 = new Plottable.Component.AbstractComponent();
-        var c3 = new Plottable.Component.AbstractComponent();
-        var c4 = new Plottable.Component.AbstractComponent();
-        var c5 = new Plottable.Component.AbstractComponent();
-        var c6 = new Plottable.Component.AbstractComponent();
+        var c1 = new Plottable.Components.AbstractComponent();
+        var c2 = new Plottable.Components.AbstractComponent();
+        var c3 = new Plottable.Components.AbstractComponent();
+        var c4 = new Plottable.Components.AbstractComponent();
+        var c5 = new Plottable.Components.AbstractComponent();
+        var c6 = new Plottable.Components.AbstractComponent();
         var table;
         it("table._removeComponent works in basic case", function () {
-            table = new Plottable.Component.Table([[c1, c2], [c3, c4], [c5, c6]]);
+            table = new Plottable.Components.Table([[c1, c2], [c3, c4], [c5, c6]]);
             table._removeComponent(c4);
             assert.deepEqual(table._rows, [[c1, c2], [c3, null], [c5, c6]], "remove one element");
         });
         it("table._removeComponent does nothing when component is not found", function () {
-            table = new Plottable.Component.Table([[c1, c2], [c3, c4]]);
+            table = new Plottable.Components.Table([[c1, c2], [c3, c4]]);
             table._removeComponent(c5);
             assert.deepEqual(table._rows, [[c1, c2], [c3, c4]], "remove nonexistent component");
         });
         it("table._removeComponent removing component twice should have same effect as removing it once", function () {
-            table = new Plottable.Component.Table([[c1, c2, c3], [c4, c5, c6]]);
+            table = new Plottable.Components.Table([[c1, c2, c3], [c4, c5, c6]]);
             table._removeComponent(c1);
             assert.deepEqual(table._rows, [[null, c2, c3], [c4, c5, c6]], "item twice");
             table._removeComponent(c1);
             assert.deepEqual(table._rows, [[null, c2, c3], [c4, c5, c6]], "item twice");
         });
         it("table._removeComponent doesn't do anything weird when called with null", function () {
-            table = new Plottable.Component.Table([[c1, null], [c2, c3]]);
+            table = new Plottable.Components.Table([[c1, null], [c2, c3]]);
             table._removeComponent(null);
             assert.deepEqual(table._rows, [[c1, null], [c2, c3]]);
         });
@@ -8396,7 +8396,7 @@ describe("Interactions", function () {
             var xScale = new Plottable.Scale.Linear();
             var yScale = new Plottable.Scale.Linear();
             var svg = generateSVG();
-            var c = new Plottable.Component.AbstractComponent();
+            var c = new Plottable.Components.AbstractComponent();
             c.renderTo(svg);
             var pzi = new Plottable.Interaction.PanZoom(xScale, yScale);
             c.registerInteraction(pzi);
@@ -8414,7 +8414,7 @@ describe("Interactions", function () {
     describe("KeyInteraction", function () {
         it("Triggers appropriate callback for the key pressed", function () {
             var svg = generateSVG(400, 400);
-            var component = new Plottable.Component.AbstractComponent();
+            var component = new Plottable.Components.AbstractComponent();
             component.renderTo(svg);
             var ki = new Plottable.Interaction.Key();
             var aCode = 65; // "a" key
@@ -8452,7 +8452,7 @@ describe("Interactions", function () {
         var SVG_HEIGHT = 400;
         it("onPointerEnter", function () {
             var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-            var c = new Plottable.Component.AbstractComponent();
+            var c = new Plottable.Components.AbstractComponent();
             c.renderTo(svg);
             var pointerInteraction = new Plottable.Interaction.Pointer();
             c.registerInteraction(pointerInteraction);
@@ -8490,7 +8490,7 @@ describe("Interactions", function () {
         });
         it("onPointerMove", function () {
             var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-            var c = new Plottable.Component.AbstractComponent();
+            var c = new Plottable.Components.AbstractComponent();
             c.renderTo(svg);
             var pointerInteraction = new Plottable.Interaction.Pointer();
             c.registerInteraction(pointerInteraction);
@@ -8531,7 +8531,7 @@ describe("Interactions", function () {
         });
         it("onPointerExit", function () {
             var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-            var c = new Plottable.Component.AbstractComponent();
+            var c = new Plottable.Components.AbstractComponent();
             c.renderTo(svg);
             var pointerInteraction = new Plottable.Interaction.Pointer();
             c.registerInteraction(pointerInteraction);
@@ -8612,7 +8612,7 @@ var TestHoverable = (function (_super) {
         };
     };
     return TestHoverable;
-})(Plottable.Component.AbstractComponent);
+})(Plottable.Components.AbstractComponent);
 describe("Interactions", function () {
     describe("Hover", function () {
         var svg;
@@ -8753,7 +8753,7 @@ describe("Interactions", function () {
         var SVG_HEIGHT = 400;
         it("onClick", function () {
             var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-            var c = new Plottable.Component.AbstractComponent();
+            var c = new Plottable.Components.AbstractComponent();
             c.renderTo(svg);
             var clickInteraction = new Plottable.Interaction.Click();
             c.registerInteraction(clickInteraction);
@@ -8847,7 +8847,7 @@ describe("Interactions", function () {
         };
         it("onDragStart()", function () {
             var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-            var c = new Plottable.Component.AbstractComponent();
+            var c = new Plottable.Components.AbstractComponent();
             c.renderTo(svg);
             var drag = new Plottable.Interaction.Drag();
             var startCallbackCalled = false;
@@ -8887,7 +8887,7 @@ describe("Interactions", function () {
         });
         it("onDrag()", function () {
             var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-            var c = new Plottable.Component.AbstractComponent();
+            var c = new Plottable.Components.AbstractComponent();
             c.renderTo(svg);
             var drag = new Plottable.Interaction.Drag();
             var moveCallbackCalled = false;
@@ -8920,7 +8920,7 @@ describe("Interactions", function () {
         });
         it("onDragEnd()", function () {
             var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-            var c = new Plottable.Component.AbstractComponent();
+            var c = new Plottable.Components.AbstractComponent();
             c.renderTo(svg);
             var drag = new Plottable.Interaction.Drag();
             var endCallbackCalled = false;
@@ -8959,7 +8959,7 @@ describe("Interactions", function () {
         });
         it("constrainToComponent()", function () {
             var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-            var c = new Plottable.Component.AbstractComponent();
+            var c = new Plottable.Components.AbstractComponent();
             c.renderTo(svg);
             var drag = new Plottable.Interaction.Drag();
             assert.isTrue(drag.constrainToComponent(), "constrains by default");
@@ -9467,7 +9467,7 @@ describe("Interactive Components", function () {
         var SVG_HEIGHT = 400;
         it("correctly draws box on drag", function () {
             var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-            var dbl = new Plottable.Component.Interactive.DragBoxLayer();
+            var dbl = new Plottable.Components.Interactive.DragBoxLayer();
             dbl.renderTo(svg);
             assert.isFalse(dbl.boxVisible(), "box is hidden initially");
             var startPoint = {
@@ -9488,7 +9488,7 @@ describe("Interactive Components", function () {
         });
         it("dismisses on click", function () {
             var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-            var dbl = new Plottable.Component.Interactive.DragBoxLayer();
+            var dbl = new Plottable.Components.Interactive.DragBoxLayer();
             dbl.renderTo(svg);
             var targetPoint = {
                 x: SVG_WIDTH / 2,
@@ -9500,11 +9500,11 @@ describe("Interactive Components", function () {
             svg.remove();
         });
         it("clipPath enabled", function () {
-            var dbl = new Plottable.Component.Interactive.DragBoxLayer();
+            var dbl = new Plottable.Components.Interactive.DragBoxLayer();
             assert.isTrue(dbl.clipPathEnabled, "uses clipPath (to hide detection edges)");
         });
         it("detectionRadius()", function () {
-            var dbl = new Plottable.Component.Interactive.DragBoxLayer();
+            var dbl = new Plottable.Components.Interactive.DragBoxLayer();
             assert.doesNotThrow(function () { return dbl.detectionRadius(3); }, Error, "can set detection radius before anchoring");
             var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
             dbl.renderTo("svg");
@@ -9527,7 +9527,7 @@ describe("Interactive Components", function () {
         });
         it("onDragStart()", function () {
             var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-            var dbl = new Plottable.Component.Interactive.DragBoxLayer();
+            var dbl = new Plottable.Components.Interactive.DragBoxLayer();
             dbl.renderTo(svg);
             var startPoint = {
                 x: SVG_WIDTH / 4,
@@ -9553,7 +9553,7 @@ describe("Interactive Components", function () {
         });
         it("onDrag()", function () {
             var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-            var dbl = new Plottable.Component.Interactive.DragBoxLayer();
+            var dbl = new Plottable.Components.Interactive.DragBoxLayer();
             dbl.renderTo(svg);
             var startPoint = {
                 x: SVG_WIDTH / 4,
@@ -9579,7 +9579,7 @@ describe("Interactive Components", function () {
         });
         it("onDragEnd()", function () {
             var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-            var dbl = new Plottable.Component.Interactive.DragBoxLayer();
+            var dbl = new Plottable.Components.Interactive.DragBoxLayer();
             dbl.renderTo(svg);
             var startPoint = {
                 x: SVG_WIDTH / 4,
@@ -9622,7 +9622,7 @@ describe("Interactive Components", function () {
             }
             beforeEach(function () {
                 svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-                dbl = new Plottable.Component.Interactive.DragBoxLayer();
+                dbl = new Plottable.Components.Interactive.DragBoxLayer();
                 dbl.renderTo(svg);
                 target = dbl.background();
                 resetBox();
@@ -9730,7 +9730,7 @@ describe("Interactive Components", function () {
         var SVG_HEIGHT = 400;
         it("bounds()", function () {
             var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-            var dbl = new Plottable.Component.Interactive.XDragBoxLayer();
+            var dbl = new Plottable.Components.Interactive.XDragBoxLayer();
             dbl.boxVisible(true);
             dbl.renderTo(svg);
             var topLeft = {
@@ -9754,7 +9754,7 @@ describe("Interactive Components", function () {
         });
         it("resizes only in x", function () {
             var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-            var dbl = new Plottable.Component.Interactive.XDragBoxLayer();
+            var dbl = new Plottable.Components.Interactive.XDragBoxLayer();
             dbl.boxVisible(true);
             dbl.resizable(true);
             dbl.renderTo(svg);
@@ -9785,7 +9785,7 @@ describe("Interactive Components", function () {
         });
         it("stays full height after resizing", function () {
             var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-            var dbl = new Plottable.Component.Interactive.XDragBoxLayer();
+            var dbl = new Plottable.Components.Interactive.XDragBoxLayer();
             dbl.boxVisible(true);
             dbl.resizable(true);
             dbl.renderTo(svg);
@@ -9824,7 +9824,7 @@ describe("Interactive Components", function () {
         var SVG_HEIGHT = 400;
         it("bounds()", function () {
             var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-            var dbl = new Plottable.Component.Interactive.YDragBoxLayer();
+            var dbl = new Plottable.Components.Interactive.YDragBoxLayer();
             dbl.boxVisible(true);
             dbl.renderTo(svg);
             var topLeft = {
@@ -9848,7 +9848,7 @@ describe("Interactive Components", function () {
         });
         it("resizes only in y", function () {
             var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-            var dbl = new Plottable.Component.Interactive.YDragBoxLayer();
+            var dbl = new Plottable.Components.Interactive.YDragBoxLayer();
             dbl.boxVisible(true);
             dbl.resizable(true);
             dbl.renderTo(svg);
@@ -9879,7 +9879,7 @@ describe("Interactive Components", function () {
         });
         it("stays full width after resizing", function () {
             var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-            var dbl = new Plottable.Component.Interactive.YDragBoxLayer();
+            var dbl = new Plottable.Components.Interactive.YDragBoxLayer();
             dbl.boxVisible(true);
             dbl.resizable(true);
             dbl.renderTo(svg);

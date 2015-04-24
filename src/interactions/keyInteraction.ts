@@ -11,7 +11,7 @@ export module Interaction {
     private _keyDispatcher: Plottable.Dispatcher.Key;
     private _keyCode2Callback: { [keyCode: string]: () => void; } = {};
 
-    public _anchor(component: Component.AbstractComponent, hitBox: D3.Selection) {
+    public _anchor(component: Components.AbstractComponent, hitBox: D3.Selection) {
       super._anchor(component, hitBox);
 
       this._positionDispatcher = Dispatcher.Mouse.getDispatcher(

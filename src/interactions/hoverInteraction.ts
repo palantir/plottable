@@ -8,7 +8,7 @@ export module Interaction {
     selection: D3.Selection;
   }
 
-  export interface Hoverable extends Component.AbstractComponent {
+  export interface Hoverable extends Components.AbstractComponent {
     /**
      * Called when the user first mouses over the Component.
      *

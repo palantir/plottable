@@ -13,8 +13,8 @@ describe("Gridlines", () => {
     yScale.domain([0, 10]);
     var yAxis = new Plottable.Axes.Numeric(yScale, "left");
 
-    var gridlines = new Plottable.Component.Gridlines(xScale, yScale);
-    var basicTable = new Plottable.Component.Table().addComponent(0, 0, yAxis)
+    var gridlines = new Plottable.Components.Gridlines(xScale, yScale);
+    var basicTable = new Plottable.Components.Table().addComponent(0, 0, yAxis)
                                           .addComponent(0, 1, gridlines)
                                           .addComponent(1, 1, xAxis);
 
@@ -47,7 +47,7 @@ describe("Gridlines", () => {
 
   it("Unanchored Gridlines don't throw an error when scale updates", () => {
     var xScale = new Plottable.Scale.Linear();
-    var gridlines = new Plottable.Component.Gridlines(xScale, null);
+    var gridlines = new Plottable.Components.Gridlines(xScale, null);
     xScale.domain([0, 1]);
     // test passes if error is not thrown.
   });

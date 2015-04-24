@@ -1,7 +1,7 @@
 ///<reference path="testReference.ts" />
 
 module Mocks {
-  export class FixedSizeComponent extends Plottable.Component.AbstractComponent {
+  export class FixedSizeComponent extends Plottable.Components.AbstractComponent {
     public fixedWidth: number;
     public fixedHeight: number;
 
