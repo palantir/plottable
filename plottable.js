@@ -3289,6 +3289,14 @@ var Plottable;
                 var y = this._isVertical ? rectY : rectY + rectHeight / 2;
                 return { x: x, y: y };
             };
+            Rect.prototype.draw = function (data, drawSteps, userMetadata, plotMetadata) {
+                var attrToProjector = drawSteps[0].attrToProjector;
+                var isValidNumber = Plottable._Util.Methods.isValidNumber;
+                data = data.filter(function (e, i) {
+                    return isValidNumber(attrToProjector["x"](e, null, userMetadata, plotMetadata)) && isValidNumber(attrToProjector["y"](e, null, userMetadata, plotMetadata)) && isValidNumber(attrToProjector["width"](e, null, userMetadata, plotMetadata)) && isValidNumber(attrToProjector["height"](e, null, userMetadata, plotMetadata));
+                });
+                return _super.prototype.draw.call(this, data, drawSteps, userMetadata, plotMetadata);
+            };
             return Rect;
         })(_Drawer.Element);
         _Drawer.Rect = Rect;
@@ -7327,11 +7335,11 @@ var Plottable;
                 var x2Attr = attrToProjector["x2"];
                 var y2Attr = attrToProjector["y2"];
                 // Generate width based on difference, then adjust for the correct x origin
-                attrToProjector["width"] = function (d, i, u, m) { return Math.abs(x2Attr(d, i, u, m) - x1Attr(d, i, u, m)) || 0; };
-                attrToProjector["x"] = function (d, i, u, m) { return Math.min(x1Attr(d, i, u, m), x2Attr(d, i, u, m)) || 0; };
+                attrToProjector["width"] = function (d, i, u, m) { return Math.abs(x2Attr(d, i, u, m) - x1Attr(d, i, u, m)); };
+                attrToProjector["x"] = function (d, i, u, m) { return Math.min(x1Attr(d, i, u, m), x2Attr(d, i, u, m)); };
                 // Generate height based on difference, then adjust for the correct y origin
-                attrToProjector["height"] = function (d, i, u, m) { return Math.abs(y2Attr(d, i, u, m) - y1Attr(d, i, u, m)) || 0; };
-                attrToProjector["y"] = function (d, i, u, m) { return (Math.max(y1Attr(d, i, u, m), y2Attr(d, i, u, m)) || 0) - attrToProjector["height"](d, i, u, m); };
+                attrToProjector["height"] = function (d, i, u, m) { return Math.abs(y2Attr(d, i, u, m) - y1Attr(d, i, u, m)); };
+                attrToProjector["y"] = function (d, i, u, m) { return Math.max(y1Attr(d, i, u, m), y2Attr(d, i, u, m)) - attrToProjector["height"](d, i, u, m); };
                 // Clean up the attributes projected onto the SVG elements
                 delete attrToProjector["x1"];
                 delete attrToProjector["y1"];

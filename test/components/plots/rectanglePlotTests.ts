@@ -69,7 +69,12 @@ describe("Plots", () => {
 
       plot.renderTo(svg);
 
-      (<any> plot)._element.selectAll(".bar-area rect").each(function(d: any, i: number) {
+      var rectanglesSelection = (<any> plot)._element.selectAll(".bar-area rect");
+
+      assert.strictEqual(rectanglesSelection.size(), 5,
+        "only 5 rectangles should be displayed");
+
+      rectanglesSelection.each(function(d: any, i: number) {
         var sel = d3.select(this);
         assert.isFalse(Plottable._Util.Methods.isNaN(+sel.attr("x")),
           "x attribute should be valid for rectangle # " + i + ". Currently " + sel.attr("x"));
@@ -81,13 +86,7 @@ describe("Plots", () => {
           "width attribute should be valid for rectangle # " + i + ". Currently " + sel.attr("width"));
       });
 
-      var brokenRectHeight = d3.select((<any> plot)._element.selectAll(".bar-area rect")[0][2]).attr("height");
-
-      assert.strictEqual(brokenRectHeight, "0",
-        "the broken rectangle (third one) should have no height, hence not displayed");
-
       svg.remove();
     });
   });
-
 });

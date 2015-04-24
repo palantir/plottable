@@ -1607,6 +1607,7 @@ declare module Plottable {
             _getIfLabelsTooWide(): boolean;
             drawText(data: any[], attrToProjector: AttributeToProjector, userMetadata: any, plotMetadata: Plot.PlotMetadata): void;
             _getPixelPoint(datum: any, index: number): Point;
+            draw(data: any[], drawSteps: DrawStep[], userMetadata: any, plotMetadata: Plot.PlotMetadata): number;
         }
     }
 }
