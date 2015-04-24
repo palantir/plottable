@@ -1917,7 +1917,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Axis {
+    module Axes {
         class AbstractAxis extends Component.AbstractComponent {
             /**
              * The css class applied to each end tick mark (the line on the end tick).
@@ -2085,7 +2085,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Axis {
+    module Axes {
         /**
          * Defines a configuration for a time axis tier.
          * For details on how ticks are generated see: https://github.com/mbostock/d3/wiki/Time-Scales#ticks
@@ -2151,7 +2151,7 @@ declare module Plottable {
 }
 
 declare module Plottable {
-    module Axis {
+    module Axes {
         class Numeric extends AbstractAxis {
             /**
              * Constructs a NumericAxis.
@@ -2217,7 +2217,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Axis {
+    module Axes {
         class Category extends AbstractAxis {
             /**
              * Constructs a CategoryAxis.

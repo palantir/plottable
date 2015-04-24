@@ -36,7 +36,7 @@ describe("Plots", () => {
       renderer.project("x", "x", xScale);
       renderer.project("y", "y", yScale);
       renderer.project("fill", "type", colorScale);
-      var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
+      var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
       var table = new Plottable.Component.Table([[renderer], [xAxis]]).renderTo(svg);
     });
 
@@ -337,7 +337,7 @@ describe("Plots", () => {
       renderer.addDataset(data1);
       renderer.addDataset(data2);
       renderer.project("fill", "type", colorScale);
-      var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
+      var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
       var table = new Plottable.Component.Table([[renderer], [xAxis]]).renderTo(svg);
     });
 

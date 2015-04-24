@@ -1,7 +1,7 @@
 ///<reference path="../../reference.ts" />
 
 module Plottable {
-export module Axis {
+export module Axes {
   export class AbstractAxis extends Component.AbstractComponent {
     /**
      * The css class applied to each end tick mark (the line on the end tick).

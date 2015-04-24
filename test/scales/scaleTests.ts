@@ -118,8 +118,8 @@ describe("Scales", () => {
       var xScale = new Plottable.Scale.Linear();
       var yScale = new Plottable.Scale.Linear();
       xScale.domainer(new Plottable.Domainer());
-      var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
-      var yAxis = new Plottable.Axis.Numeric(yScale, "left");
+      var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
+      var yAxis = new Plottable.Axes.Numeric(yScale, "left");
       var renderAreaD1 = new Plottable.Plot.Line(xScale, yScale);
       renderAreaD1.addDataset(ds1);
       renderAreaD1.project("x", "x", xScale);
