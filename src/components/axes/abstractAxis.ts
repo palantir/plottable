@@ -18,7 +18,7 @@ export module Axes {
     protected _tickMarkContainer: D3.Selection;
     protected _tickLabelContainer: D3.Selection;
     protected _baseline: D3.Selection;
-    protected _scale: Scale.AbstractScale<any, number>;
+    protected _scale: Scales.AbstractScale<any, number>;
     private _formatter: Formatter;
     private _orientation: string;
     protected _computedWidth: number;
@@ -40,7 +40,7 @@ export module Axes {
      * @param {Formatter} Data is passed through this formatter before being
      * displayed.
      */
-    constructor(scale: Scale.AbstractScale<any, number>, orientation: string, formatter = Formatters.identity()) {
+    constructor(scale: Scales.AbstractScale<any, number>, orientation: string, formatter = Formatters.identity()) {
       super();
       if (scale == null || orientation == null) { throw new Error("Axis requires a scale and orientation"); }
       this._scale = scale;

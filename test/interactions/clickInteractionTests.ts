@@ -12,7 +12,7 @@ describe("Interactions", () => {
       var c = new Plottable.Components.AbstractComponent();
       c.renderTo(svg);
 
-      var clickInteraction = new Plottable.Interaction.Click();
+      var clickInteraction = new Plottable.Interactions.Click();
       c.registerInteraction(clickInteraction);
 
       var callbackCalled = false;

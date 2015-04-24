@@ -19,7 +19,7 @@ module Plottable {
    */
   export type _Projection = {
     accessor: _Accessor;
-    scale?: Scale.AbstractScale<any, any>;
+    scale?: Scales.AbstractScale<any, any>;
     attribute: string;
   }
 

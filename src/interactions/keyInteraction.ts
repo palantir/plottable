@@ -1,25 +1,25 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Interaction {
+export module Interactions {
   export class Key extends AbstractInteraction {
     /**
      * KeyInteraction listens to key events that occur while the Component is
      * moused over.
      */
-    private _positionDispatcher: Plottable.Dispatcher.Mouse;
-    private _keyDispatcher: Plottable.Dispatcher.Key;
+    private _positionDispatcher: Plottable.Dispatchers.Mouse;
+    private _keyDispatcher: Plottable.Dispatchers.Key;
     private _keyCode2Callback: { [keyCode: string]: () => void; } = {};
 
     public _anchor(component: Components.AbstractComponent, hitBox: D3.Selection) {
       super._anchor(component, hitBox);
 
-      this._positionDispatcher = Dispatcher.Mouse.getDispatcher(
+      this._positionDispatcher = Dispatchers.Mouse.getDispatcher(
                                    <SVGElement> (<any> this._componentToListenTo)._element.node()
                                  );
       this._positionDispatcher.onMouseMove("Interaction.Key" + this.getID(), (p: Point) => null); // HACKHACK: registering a listener
 
-      this._keyDispatcher = Dispatcher.Key.getDispatcher();
+      this._keyDispatcher = Dispatchers.Key.getDispatcher();
       this._keyDispatcher.onKeyDown("Interaction.Key" + this.getID(), (keyCode: number) => this._handleKeyEvent(keyCode));
     }
 

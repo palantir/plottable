@@ -10,13 +10,13 @@ describe("Plots", () => {
     var SVG_HEIGHT = 400;
 
     beforeEach(() => {
-      var xScale = new Plottable.Scale.Linear();
-      var yScale = new Plottable.Scale.Linear();
+      var xScale = new Plottable.Scales.Linear();
+      var yScale = new Plottable.Scales.Linear();
       stackedPlot = new Plottable.Plots.AbstractStacked(xScale, yScale);
       stackedPlot.project("x", "x", xScale);
       stackedPlot.project("y", "y", yScale);
 
-      (<any> stackedPlot)._getDrawer = (key: string) => new Plottable._Drawer.AbstractDrawer(key);
+      (<any> stackedPlot)._getDrawer = (key: string) => new Plottable.Drawers.AbstractDrawer(key);
       (<any> stackedPlot)._isVertical = true;
     });
 
@@ -167,15 +167,15 @@ describe("Plots", () => {
     var svg: D3.Selection;
     var SVG_WIDTH = 600;
     var SVG_HEIGHT = 400;
-    var yScale: Plottable.Scale.Linear;
-    var xScale: Plottable.Scale.Linear;
+    var yScale: Plottable.Scales.Linear;
+    var xScale: Plottable.Scales.Linear;
     var data1: any[];
     var data2: any[];
 
     beforeEach(() => {
       svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      xScale = new Plottable.Scale.Linear().domain([1, 2]);
-      yScale = new Plottable.Scale.Linear();
+      xScale = new Plottable.Scales.Linear().domain([1, 2]);
+      yScale = new Plottable.Scales.Linear();
 
       data1 = [
         {x: 1, y: 1},
@@ -219,15 +219,15 @@ describe("Plots", () => {
     var svg: D3.Selection;
     var SVG_WIDTH = 600;
     var SVG_HEIGHT = 400;
-    var yScale: Plottable.Scale.Linear;
-    var xScale: Plottable.Scale.Category;
+    var yScale: Plottable.Scales.Linear;
+    var xScale: Plottable.Scales.Category;
     var data1: any[];
     var data2: any[];
 
     beforeEach(() => {
       svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      xScale = new Plottable.Scale.Category().domain(["a", "b"]);
-      yScale = new Plottable.Scale.Linear();
+      xScale = new Plottable.Scales.Category().domain(["a", "b"]);
+      yScale = new Plottable.Scales.Linear();
 
       data1 = [
         {x: "a", y: 1},
@@ -269,15 +269,15 @@ describe("Plots", () => {
 
   describe("scale extent updates", () => {
     var svg: D3.Selection;
-    var xScale: Plottable.Scale.Category;
-    var yScale: Plottable.Scale.Linear;
+    var xScale: Plottable.Scales.Category;
+    var yScale: Plottable.Scales.Linear;
     var stackedBarPlot: Plottable.Plots.StackedBar<string, number>;
 
     beforeEach(() => {
       svg = generateSVG(600, 400);
 
-      xScale = new Plottable.Scale.Category();
-      yScale = new Plottable.Scale.Linear();
+      xScale = new Plottable.Scales.Category();
+      yScale = new Plottable.Scales.Linear();
 
       stackedBarPlot = new Plottable.Plots.StackedBar(xScale, yScale);
       stackedBarPlot.project("x", "key", xScale);

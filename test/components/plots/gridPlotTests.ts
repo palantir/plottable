@@ -47,9 +47,9 @@ describe("Plots", () => {
     };
 
     it("renders correctly", () => {
-      var xScale: Plottable.Scale.Category = new Plottable.Scale.Category();
-      var yScale: Plottable.Scale.Category = new Plottable.Scale.Category();
-      var colorScale: Plottable.Scale.InterpolatedColor = new Plottable.Scale.InterpolatedColor(["black", "white"]);
+      var xScale: Plottable.Scales.Category = new Plottable.Scales.Category();
+      var yScale: Plottable.Scales.Category = new Plottable.Scales.Category();
+      var colorScale: Plottable.Scales.InterpolatedColor = new Plottable.Scales.InterpolatedColor(["black", "white"]);
       var svg: D3.Selection = generateSVG(SVG_WIDTH, SVG_HEIGHT);
       var gridPlot: Plottable.Plots.Grid = new Plottable.Plots.Grid(xScale, yScale, colorScale);
       gridPlot.addDataset(DATA)
@@ -63,9 +63,9 @@ describe("Plots", () => {
 
 
     it("renders correctly when data is set after construction", () => {
-      var xScale: Plottable.Scale.Category = new Plottable.Scale.Category();
-      var yScale: Plottable.Scale.Category = new Plottable.Scale.Category();
-      var colorScale: Plottable.Scale.InterpolatedColor = new Plottable.Scale.InterpolatedColor(["black", "white"]);
+      var xScale: Plottable.Scales.Category = new Plottable.Scales.Category();
+      var yScale: Plottable.Scales.Category = new Plottable.Scales.Category();
+      var colorScale: Plottable.Scales.InterpolatedColor = new Plottable.Scales.InterpolatedColor(["black", "white"]);
       var svg: D3.Selection = generateSVG(SVG_WIDTH, SVG_HEIGHT);
       var dataset = new Plottable.Dataset();
       var gridPlot: Plottable.Plots.Grid = new Plottable.Plots.Grid(xScale, yScale, colorScale);
@@ -82,9 +82,9 @@ describe("Plots", () => {
     it("renders correctly when there isn't data for every spot", () => {
       var CELL_HEIGHT = 50;
       var CELL_WIDTH = 100;
-      var xScale: Plottable.Scale.Category = new Plottable.Scale.Category();
-      var yScale: Plottable.Scale.Category = new Plottable.Scale.Category();
-      var colorScale: Plottable.Scale.InterpolatedColor = new Plottable.Scale.InterpolatedColor(["black", "white"]);
+      var xScale: Plottable.Scales.Category = new Plottable.Scales.Category();
+      var yScale: Plottable.Scales.Category = new Plottable.Scales.Category();
+      var colorScale: Plottable.Scales.InterpolatedColor = new Plottable.Scales.InterpolatedColor(["black", "white"]);
       var svg: D3.Selection = generateSVG(SVG_WIDTH, SVG_HEIGHT);
       var dataset = new Plottable.Dataset();
       var gridPlot: Plottable.Plots.Grid = new Plottable.Plots.Grid(xScale, yScale, colorScale);
@@ -113,9 +113,9 @@ describe("Plots", () => {
     });
 
     it("can invert y axis correctly", () => {
-      var xScale: Plottable.Scale.Category = new Plottable.Scale.Category();
-      var yScale: Plottable.Scale.Category = new Plottable.Scale.Category();
-      var colorScale: Plottable.Scale.InterpolatedColor = new Plottable.Scale.InterpolatedColor(["black", "white"]);
+      var xScale: Plottable.Scales.Category = new Plottable.Scales.Category();
+      var yScale: Plottable.Scales.Category = new Plottable.Scales.Category();
+      var colorScale: Plottable.Scales.InterpolatedColor = new Plottable.Scales.InterpolatedColor(["black", "white"]);
       var svg: D3.Selection = generateSVG(SVG_WIDTH, SVG_HEIGHT);
       var gridPlot: Plottable.Plots.Grid = new Plottable.Plots.Grid(xScale, yScale, colorScale);
       gridPlot.addDataset(DATA)
@@ -155,9 +155,9 @@ describe("Plots", () => {
     describe("getAllSelections()", () => {
 
       it("retrieves all selections with no args", () => {
-        var xScale: Plottable.Scale.Category = new Plottable.Scale.Category();
-        var yScale: Plottable.Scale.Category = new Plottable.Scale.Category();
-        var colorScale: Plottable.Scale.InterpolatedColor = new Plottable.Scale.InterpolatedColor(["black", "white"]);
+        var xScale: Plottable.Scales.Category = new Plottable.Scales.Category();
+        var yScale: Plottable.Scales.Category = new Plottable.Scales.Category();
+        var colorScale: Plottable.Scales.InterpolatedColor = new Plottable.Scales.InterpolatedColor(["black", "white"]);
         var svg: D3.Selection = generateSVG(SVG_WIDTH, SVG_HEIGHT);
         var gridPlot: Plottable.Plots.Grid = new Plottable.Plots.Grid(xScale, yScale, colorScale);
         gridPlot.addDataset("a", DATA)
@@ -174,9 +174,9 @@ describe("Plots", () => {
       });
 
       it("retrieves correct selections (string arg)", () => {
-        var xScale: Plottable.Scale.Category = new Plottable.Scale.Category();
-        var yScale: Plottable.Scale.Category = new Plottable.Scale.Category();
-        var colorScale: Plottable.Scale.InterpolatedColor = new Plottable.Scale.InterpolatedColor(["black", "white"]);
+        var xScale: Plottable.Scales.Category = new Plottable.Scales.Category();
+        var yScale: Plottable.Scales.Category = new Plottable.Scales.Category();
+        var colorScale: Plottable.Scales.InterpolatedColor = new Plottable.Scales.InterpolatedColor(["black", "white"]);
         var svg: D3.Selection = generateSVG(SVG_WIDTH, SVG_HEIGHT);
         var gridPlot: Plottable.Plots.Grid = new Plottable.Plots.Grid(xScale, yScale, colorScale);
         gridPlot.addDataset("a", DATA)
@@ -194,9 +194,9 @@ describe("Plots", () => {
       });
 
       it("retrieves correct selections (array arg)", () => {
-        var xScale: Plottable.Scale.Category = new Plottable.Scale.Category();
-        var yScale: Plottable.Scale.Category = new Plottable.Scale.Category();
-        var colorScale: Plottable.Scale.InterpolatedColor = new Plottable.Scale.InterpolatedColor(["black", "white"]);
+        var xScale: Plottable.Scales.Category = new Plottable.Scales.Category();
+        var yScale: Plottable.Scales.Category = new Plottable.Scales.Category();
+        var colorScale: Plottable.Scales.InterpolatedColor = new Plottable.Scales.InterpolatedColor(["black", "white"]);
         var svg: D3.Selection = generateSVG(SVG_WIDTH, SVG_HEIGHT);
         var gridPlot: Plottable.Plots.Grid = new Plottable.Plots.Grid(xScale, yScale, colorScale);
         gridPlot.addDataset("a", DATA)
@@ -214,9 +214,9 @@ describe("Plots", () => {
       });
 
       it("skips invalid keys", () => {
-        var xScale: Plottable.Scale.Category = new Plottable.Scale.Category();
-        var yScale: Plottable.Scale.Category = new Plottable.Scale.Category();
-        var colorScale: Plottable.Scale.InterpolatedColor = new Plottable.Scale.InterpolatedColor(["black", "white"]);
+        var xScale: Plottable.Scales.Category = new Plottable.Scales.Category();
+        var yScale: Plottable.Scales.Category = new Plottable.Scales.Category();
+        var colorScale: Plottable.Scales.InterpolatedColor = new Plottable.Scales.InterpolatedColor(["black", "white"]);
         var svg: D3.Selection = generateSVG(SVG_WIDTH, SVG_HEIGHT);
         var gridPlot: Plottable.Plots.Grid = new Plottable.Plots.Grid(xScale, yScale, colorScale);
         gridPlot.addDataset("a", DATA)

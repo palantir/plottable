@@ -11,7 +11,7 @@ export module Components {
     }
 
     export class DragBoxLayer extends Components.SelectionBoxLayer {
-      private _dragInteraction: Interaction.Drag;
+      private _dragInteraction: Interactions.Drag;
       private _detectionEdgeT: D3.Selection;
       private _detectionEdgeB: D3.Selection;
       private _detectionEdgeL: D3.Selection;
@@ -40,7 +40,7 @@ export module Components {
         this.clipPathEnabled = true;
         this.classed("drag-box-layer", true);
 
-        this._dragInteraction = new Interaction.Drag();
+        this._dragInteraction = new Interactions.Drag();
         this._setUpCallbacks();
         this.registerInteraction(this._dragInteraction);
       }

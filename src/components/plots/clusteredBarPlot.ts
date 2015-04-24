@@ -20,7 +20,7 @@ export module Plots {
      * @param {Scale} yScale The y scale to use.
      * @param {boolean} isVertical if the plot if vertical.
      */
-    constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<Y, number>, isVertical = true) {
+    constructor(xScale: Scales.AbstractScale<X, number>, yScale: Scales.AbstractScale<Y, number>, isVertical = true) {
       super(xScale, yScale, isVertical);
     }
 
@@ -51,7 +51,7 @@ export module Plots {
     }
 
     private _makeInnerScale(){
-      var innerScale = new Scale.Category();
+      var innerScale = new Scales.Category();
       innerScale.domain(this._datasetKeysInOrder);
       if (!this._projections["width"]) {
         innerScale.range([0, this._getBarPixelWidth()]);

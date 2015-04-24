@@ -159,16 +159,16 @@ export module Components {
       var colProportionalSpace = Table._calcProportionalSpace(heuristicColWeights, availableWidthAfterPadding );
       var rowProportionalSpace = Table._calcProportionalSpace(heuristicRowWeights, availableHeightAfterPadding);
 
-      var guaranteedWidths  = _Util.Methods.createFilledArray(0, this._nCols);
-      var guaranteedHeights = _Util.Methods.createFilledArray(0, this._nRows);
+      var guaranteedWidths  = Utils.Methods.createFilledArray(0, this._nCols);
+      var guaranteedHeights = Utils.Methods.createFilledArray(0, this._nRows);
 
       var freeWidth : number;
       var freeHeight: number;
 
       var nIterations = 0;
       while (true) {
-        var offeredHeights = _Util.Methods.addArrays(guaranteedHeights, rowProportionalSpace);
-        var offeredWidths  = _Util.Methods.addArrays(guaranteedWidths,  colProportionalSpace);
+        var offeredHeights = Utils.Methods.addArrays(guaranteedHeights, rowProportionalSpace);
+        var offeredWidths  = Utils.Methods.addArrays(guaranteedWidths,  colProportionalSpace);
         var guarantees = this._determineGuarantees(offeredWidths, offeredHeights);
         guaranteedWidths = guarantees.guaranteedWidths;
         guaranteedHeights = guarantees.guaranteedHeights;
@@ -182,7 +182,7 @@ export module Components {
         var xWeights: number[];
         if (wantsWidth) { // If something wants width, divide free space between components that want more width
           xWeights = guarantees.wantsWidthArr.map((x) => x ? 0.1 : 0);
-          xWeights = _Util.Methods.addArrays(xWeights, colWeights);
+          xWeights = Utils.Methods.addArrays(xWeights, colWeights);
         } else { // Otherwise, divide free space according to the weights
           xWeights = colWeights;
         }
@@ -190,7 +190,7 @@ export module Components {
         var yWeights: number[];
         if (wantsHeight) {
           yWeights = guarantees.wantsHeightArr.map((x) => x ? 0.1 : 0);
-          yWeights = _Util.Methods.addArrays(yWeights, rowWeights);
+          yWeights = Utils.Methods.addArrays(yWeights, rowWeights);
         } else {
           yWeights = rowWeights;
         }
@@ -226,10 +226,10 @@ export module Components {
     }
 
     private _determineGuarantees(offeredWidths: number[], offeredHeights: number[]): _LayoutAllocation {
-      var requestedWidths  = _Util.Methods.createFilledArray(0, this._nCols);
-      var requestedHeights = _Util.Methods.createFilledArray(0, this._nRows);
-      var layoutWantsWidth  = _Util.Methods.createFilledArray(false, this._nCols);
-      var layoutWantsHeight = _Util.Methods.createFilledArray(false, this._nRows);
+      var requestedWidths  = Utils.Methods.createFilledArray(0, this._nCols);
+      var requestedHeights = Utils.Methods.createFilledArray(0, this._nRows);
+      var layoutWantsWidth  = Utils.Methods.createFilledArray(false, this._nCols);
+      var layoutWantsHeight = Utils.Methods.createFilledArray(false, this._nRows);
       this._rows.forEach((row: AbstractComponent[], rowIndex: number) => {
         row.forEach((component: AbstractComponent, colIndex: number) => {
           var spaceRequest: _SpaceRequest;
@@ -270,8 +270,8 @@ export module Components {
       this._useLastCalculatedLayout(true);
 
       var childYOrigin = 0;
-      var rowHeights = _Util.Methods.addArrays(layout.rowProportionalSpace, layout.guaranteedHeights);
-      var colWidths  = _Util.Methods.addArrays(layout.colProportionalSpace, layout.guaranteedWidths );
+      var rowHeights = Utils.Methods.addArrays(layout.rowProportionalSpace, layout.guaranteedHeights);
+      var colWidths  = Utils.Methods.addArrays(layout.colProportionalSpace, layout.guaranteedWidths );
       this._rows.forEach((row: AbstractComponent[], rowIndex: number) => {
         var childXOrigin = 0;
         row.forEach((component: AbstractComponent, colIndex: number) => {
@@ -393,7 +393,7 @@ export module Components {
     private static _calcProportionalSpace(weights: number[], freeSpace: number): number[] {
       var weightSum = d3.sum(weights);
       if (weightSum === 0) {
-        return _Util.Methods.createFilledArray(0, weights.length);
+        return Utils.Methods.createFilledArray(0, weights.length);
       } else {
         return weights.map((w) => freeSpace * w / weightSum);
       }

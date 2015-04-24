@@ -4,15 +4,15 @@ var assert = chai.assert;
 describe("Plots", () => {
   describe("New Style Plots", () => {
     var p: Plottable.Plots.AbstractPlot;
-    var oldWarn = Plottable._Util.Methods.warn;
+    var oldWarn = Plottable.Utils.Methods.warn;
 
     beforeEach(() => {
       p = new Plottable.Plots.AbstractPlot();
-      (<any> p)._getDrawer = (k: string) => new Plottable._Drawer.Element(k).svgElement("rect");
+      (<any> p)._getDrawer = (k: string) => new Plottable.Drawers.Element(k).svgElement("rect");
     });
 
     afterEach(() => {
-      Plottable._Util.Methods.warn = oldWarn;
+      Plottable.Utils.Methods.warn = oldWarn;
     });
 
     it("Datasets can be added and removed as expected", () => {
@@ -58,7 +58,7 @@ describe("Plots", () => {
       p.datasetOrder(["bar", "baz", "foo"]);
       assert.deepEqual(p.datasetOrder(), ["bar", "baz", "foo"]);
       var warned = 0;
-      Plottable._Util.Methods.warn = () => warned++; // suppress expected warnings
+      Plottable.Utils.Methods.warn = () => warned++; // suppress expected warnings
       p.datasetOrder(["blah", "blee", "bar", "baz", "foo"]);
       assert.equal(warned, 1);
       assert.deepEqual(p.datasetOrder(), ["bar", "baz", "foo"]);
@@ -66,7 +66,7 @@ describe("Plots", () => {
 
     it("Has proper warnings", () => {
       var warned = 0;
-      Plottable._Util.Methods.warn = () => warned++;
+      Plottable.Utils.Methods.warn = () => warned++;
       p.addDataset("_foo", []);
       assert.equal(warned, 1);
       p.addDataset("2", []);

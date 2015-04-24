@@ -44,7 +44,7 @@ describe("SelectionBoxLayer", () => {
 
     function assertCorrectRendering(expectedTL: Plottable.Point, expectedBR: Plottable.Point, msg: string) {
       var selectionBox = svg.select(".selection-box");
-      var bbox = Plottable._Util.DOM.getBBox(selectionBox);
+      var bbox = Plottable.Utils.DOM.getBBox(selectionBox);
       assert.strictEqual(bbox.x, expectedTL.x, msg + " (x-origin)");
       assert.strictEqual(bbox.x, expectedTL.y, msg + " (y-origin)");
       assert.strictEqual(bbox.width, expectedBR.x - expectedTL.x, msg + " (width)");

@@ -7,7 +7,7 @@ export module Plots {
    */
   export type PlotDatasetKey = {
     dataset: Dataset;
-    drawer: _Drawer.AbstractDrawer;
+    drawer: Drawers.AbstractDrawer;
     plotMetadata: PlotMetadata;
     key: string;
   }
@@ -98,7 +98,7 @@ export module Plots {
         throw new Error("invalid input to addDataset");
       }
       if (typeof(keyOrDataset) === "string" && keyOrDataset[0] === "_") {
-        _Util.Methods.warn("Warning: Using _named series keys may produce collisions with unlabeled data sources");
+        Utils.Methods.warn("Warning: Using _named series keys may produce collisions with unlabeled data sources");
       }
       var key  = typeof(keyOrDataset) === "string" ? keyOrDataset : "_" + this._nextSeriesIndex++;
       var data = typeof(keyOrDataset) !== "string" ? keyOrDataset : dataset;
@@ -125,8 +125,8 @@ export module Plots {
       this._onDatasetUpdate();
     }
 
-    protected _getDrawer(key: string): _Drawer.AbstractDrawer {
-      return new _Drawer.AbstractDrawer(key);
+    protected _getDrawer(key: string): Drawers.AbstractDrawer {
+      return new Drawers.AbstractDrawer(key);
     }
 
     protected _getAnimator(key: string): Animators.PlotAnimator {
@@ -167,14 +167,14 @@ export module Plots {
      *
      * @returns {Plot} The calling Plot.
      */
-    public attr(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>) {
+    public attr(attrToSet: string, accessor: any, scale?: Scales.AbstractScale<any, any>) {
       return this.project(attrToSet, accessor, scale);
     }
 
     /**
      * Identical to plot.attr
      */
-    public project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>) {
+    public project(attrToSet: string, accessor: any, scale?: Scales.AbstractScale<any, any>) {
       attrToSet = attrToSet.toLowerCase();
       var currentProjection = this._projections[attrToSet];
       var existingScale = currentProjection && currentProjection.scale;
@@ -189,7 +189,7 @@ export module Plots {
       if (scale) {
         scale.broadcaster.registerListener(this, () => this._render());
       }
-      accessor = _Util.Methods.accessorize(accessor);
+      accessor = Utils.Methods.accessorize(accessor);
       this._projections[attrToSet] = {accessor: accessor, scale: scale, attribute: attrToSet};
       this._updateScaleExtent(attrToSet);
       this._render(); // queue a re-render upon changing projector
@@ -324,7 +324,7 @@ export module Plots {
         return this._datasetKeysInOrder;
       }
       function isPermutation(l1: string[], l2: string[]) {
-        var intersection = _Util.Methods.intersection(d3.set(l1), d3.set(l2));
+        var intersection = Utils.Methods.intersection(d3.set(l1), d3.set(l2));
         var size = (<any> intersection).size(); // HACKHACK pending on borisyankov/definitelytyped/ pr #2653
         return size === l1.length && size === l2.length;
       }
@@ -332,7 +332,7 @@ export module Plots {
         this._datasetKeysInOrder = order;
         this._onDatasetUpdate();
       } else {
-        _Util.Methods.warn("Attempted to change datasetOrder, but new order is not permutation of old. Ignoring.");
+        Utils.Methods.warn("Attempted to change datasetOrder, but new order is not permutation of old. Ignoring.");
       }
       return this;
     }
@@ -394,11 +394,11 @@ export module Plots {
       return this._datasetKeysInOrder.map((k) => this._key2PlotDatasetKey.get(k).dataset);
     }
 
-    protected _getDrawersInOrder(): _Drawer.AbstractDrawer[] {
+    protected _getDrawersInOrder(): Drawers.AbstractDrawer[] {
       return this._datasetKeysInOrder.map((k) => this._key2PlotDatasetKey.get(k).drawer);
     }
 
-    protected _generateDrawSteps(): _Drawer.DrawStep[] {
+    protected _generateDrawSteps(): Drawers.DrawStep[] {
       return [{attrToProjector: this._generateAttrToProjector(), animator: new Animators.Null()}];
     }
 
@@ -438,7 +438,7 @@ export module Plots {
           this._key2PlotDatasetKey.get(k).dataset.metadata(),
           this._key2PlotDatasetKey.get(k).plotMetadata
         ));
-      var maxTime = _Util.Methods.max(times, 0);
+      var maxTime = Utils.Methods.max(times, 0);
       this._additionalPaint(maxTime);
     }
 
@@ -539,7 +539,7 @@ export module Plots {
           return;
         }
 
-        var distance = _Util.Methods.distanceSquared(pixelPoint, queryPoint);
+        var distance = Utils.Methods.distanceSquared(pixelPoint, queryPoint);
         if (distance < closestDistanceSquared) {
           closestDistanceSquared = distance;
           closestIndex = index;

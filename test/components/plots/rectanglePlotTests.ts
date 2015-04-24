@@ -26,8 +26,8 @@ describe("Plots", () => {
     };
 
     it("renders correctly", () => {
-      var xScale        = new Plottable.Scale.Linear();
-      var yScale        = new Plottable.Scale.Linear();
+      var xScale        = new Plottable.Scales.Linear();
+      var yScale        = new Plottable.Scales.Linear();
       var svg           = generateSVG(SVG_WIDTH, SVG_HEIGHT);
       var rectanglePlot = new Plottable.Plots.Rectangle(xScale, yScale);
       rectanglePlot.addDataset(DATA)

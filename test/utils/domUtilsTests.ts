@@ -2,7 +2,7 @@
 
 var assert = chai.assert;
 
-describe("_Util.DOM", () => {
+describe("Utils.DOM", () => {
 
   it("getBBox works properly", () => {
     var svg = generateSVG();
@@ -13,7 +13,7 @@ describe("_Util.DOM", () => {
       height: 20
     };
     var rect = svg.append("rect").attr(expectedBox);
-    var measuredBox = Plottable._Util.DOM.getBBox(rect);
+    var measuredBox = Plottable.Utils.DOM.getBBox(rect);
     assert.deepEqual(measuredBox, expectedBox, "getBBox measures correctly");
     svg.remove();
   });
@@ -28,11 +28,11 @@ describe("_Util.DOM", () => {
 
     var removedSVG = generateSVG().remove();
     var rect = removedSVG.append("rect").attr(expectedBox);
-    Plottable._Util.DOM.getBBox(rect); // could throw NS_ERROR on FF
+    Plottable.Utils.DOM.getBBox(rect); // could throw NS_ERROR on FF
 
     var noneSVG = generateSVG().style("display", "none");
     rect = noneSVG.append("rect").attr(expectedBox);
-    Plottable._Util.DOM.getBBox(rect); // could throw NS_ERROR on FF
+    Plottable.Utils.DOM.getBBox(rect); // could throw NS_ERROR on FF
 
     noneSVG.remove();
   });
@@ -44,9 +44,9 @@ describe("_Util.DOM", () => {
       parent.style("height", "200px");
       var parentElem = parent[0][0];
 
-      var width = Plottable._Util.DOM.getElementWidth(parentElem);
+      var width = Plottable.Utils.DOM.getElementWidth(parentElem);
       assert.equal(width, 300, "measured width matches set width");
-      var height = Plottable._Util.DOM.getElementHeight(parentElem);
+      var height = Plottable.Utils.DOM.getElementHeight(parentElem);
       assert.equal(height, 200, "measured height matches set height");
     });
 
@@ -54,9 +54,9 @@ describe("_Util.DOM", () => {
       var svg = generateSVG(450, 120);
       var svgElem = svg[0][0];
 
-      var width = Plottable._Util.DOM.getElementWidth(svgElem);
+      var width = Plottable.Utils.DOM.getElementWidth(svgElem);
       assert.equal(width, 450, "measured width matches set width");
-      var height = Plottable._Util.DOM.getElementHeight(svgElem);
+      var height = Plottable.Utils.DOM.getElementHeight(svgElem);
       assert.equal(height, 120, "measured height matches set height");
       svg.remove();
     });
@@ -69,23 +69,23 @@ describe("_Util.DOM", () => {
 
       parent.style("width", "200px");
       parent.style("height", "50px");
-      assert.equal(Plottable._Util.DOM.getElementWidth(parentElem), 200, "width is correct");
-      assert.equal(Plottable._Util.DOM.getElementHeight(parentElem), 50, "height is correct");
+      assert.equal(Plottable.Utils.DOM.getElementWidth(parentElem), 200, "width is correct");
+      assert.equal(Plottable.Utils.DOM.getElementHeight(parentElem), 50, "height is correct");
 
       child.style("width", "20px");
       child.style("height", "10px");
-      assert.equal(Plottable._Util.DOM.getElementWidth(childElem), 20, "width is correct");
-      assert.equal(Plottable._Util.DOM.getElementHeight(childElem), 10, "height is correct");
+      assert.equal(Plottable.Utils.DOM.getElementWidth(childElem), 20, "width is correct");
+      assert.equal(Plottable.Utils.DOM.getElementHeight(childElem), 10, "height is correct");
 
       child.style("width", "100%");
       child.style("height", "100%");
-      assert.equal(Plottable._Util.DOM.getElementWidth(childElem), 200, "width is correct");
-      assert.equal(Plottable._Util.DOM.getElementHeight(childElem), 50, "height is correct");
+      assert.equal(Plottable.Utils.DOM.getElementWidth(childElem), 200, "width is correct");
+      assert.equal(Plottable.Utils.DOM.getElementHeight(childElem), 50, "height is correct");
 
       child.style("width", "50%");
       child.style("height", "50%");
-      assert.equal(Plottable._Util.DOM.getElementWidth(childElem), 100, "width is correct");
-      assert.equal(Plottable._Util.DOM.getElementHeight(childElem), 25, "height is correct");
+      assert.equal(Plottable.Utils.DOM.getElementWidth(childElem), 100, "width is correct");
+      assert.equal(Plottable.Utils.DOM.getElementHeight(childElem), 25, "height is correct");
 
       // reset test page DOM
       parent.style("width", "auto");

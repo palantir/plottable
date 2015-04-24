@@ -6,8 +6,8 @@ describe("Plots", () => {
   describe("ScatterPlot", () => {
     it("renders correctly with no data", () => {
       var svg = generateSVG(400, 400);
-      var xScale = new Plottable.Scale.Linear();
-      var yScale = new Plottable.Scale.Linear();
+      var xScale = new Plottable.Scales.Linear();
+      var yScale = new Plottable.Scales.Linear();
       var plot = new Plottable.Plots.Scatter(xScale, yScale);
       plot.project("x", (d: any) => d.x, xScale);
       plot.project("y", (d: any) => d.y, yScale);
@@ -19,8 +19,8 @@ describe("Plots", () => {
 
     it("the accessors properly access data, index, and metadata", () => {
       var svg = generateSVG(400, 400);
-      var xScale = new Plottable.Scale.Linear();
-      var yScale = new Plottable.Scale.Linear();
+      var xScale = new Plottable.Scales.Linear();
+      var yScale = new Plottable.Scales.Linear();
       xScale.domain([0, 400]);
       yScale.domain([400, 0]);
       var data = [{x: 0, y: 0}, {x: 1, y: 1}];
@@ -67,8 +67,8 @@ describe("Plots", () => {
 
     it("getAllSelections()", () => {
       var svg = generateSVG(400, 400);
-      var xScale = new Plottable.Scale.Linear();
-      var yScale = new Plottable.Scale.Linear();
+      var xScale = new Plottable.Scales.Linear();
+      var yScale = new Plottable.Scales.Linear();
       var data = [{x: 0, y: 0}, {x: 1, y: 1}];
       var data2 = [{x: 1, y: 2}, {x: 3, y: 4}];
       var plot = new Plottable.Plots.Scatter(xScale, yScale)
@@ -96,8 +96,8 @@ describe("Plots", () => {
       }
 
       var svg = generateSVG(400, 400);
-      var xScale = new Plottable.Scale.Linear();
-      var yScale = new Plottable.Scale.Linear();
+      var xScale = new Plottable.Scales.Linear();
+      var yScale = new Plottable.Scales.Linear();
       var data = [{x: 0, y: 0}, {x: 1, y: 1}];
       var data2 = [{x: 1, y: 2}, {x: 3, y: 4}];
       var plot = new Plottable.Plots.Scatter(xScale, yScale)
@@ -145,8 +145,8 @@ describe("Plots", () => {
 
     it("_getClosestStruckPoint()", () => {
       var svg = generateSVG(400, 400);
-      var xScale = new Plottable.Scale.Linear();
-      var yScale = new Plottable.Scale.Linear();
+      var xScale = new Plottable.Scales.Linear();
+      var yScale = new Plottable.Scales.Linear();
       xScale.domain([0, 400]);
       yScale.domain([400, 0]);
 
@@ -191,8 +191,8 @@ describe("Plots", () => {
         { foo: 0.8, bar: 0.8 }
       ];
       var dataset = new Plottable.Dataset(data);
-      var xScale = new Plottable.Scale.Linear();
-      var yScale = new Plottable.Scale.Linear();
+      var xScale = new Plottable.Scales.Linear();
+      var yScale = new Plottable.Scales.Linear();
       var plot = new Plottable.Plots.Scatter(xScale, yScale);
       plot.addDataset(dataset)
           .project("x", "foo", xScale)
@@ -217,8 +217,8 @@ describe("Plots", () => {
 
     describe("Example ScatterPlot with quadratic series", () => {
       var svg: D3.Selection;
-      var xScale: Plottable.Scale.Linear;
-      var yScale: Plottable.Scale.Linear;
+      var xScale: Plottable.Scales.Linear;
+      var yScale: Plottable.Scales.Linear;
       var circlePlot: Plottable.Plots.Scatter<number, number>;
       var SVG_WIDTH = 600;
       var SVG_HEIGHT = 300;
@@ -257,8 +257,8 @@ describe("Plots", () => {
 
       beforeEach(() => {
         svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        xScale = new Plottable.Scale.Linear().domain([0, 9]);
-        yScale = new Plottable.Scale.Linear().domain([0, 81]);
+        xScale = new Plottable.Scales.Linear().domain([0, 9]);
+        yScale = new Plottable.Scales.Linear().domain([0, 81]);
         circlePlot = new Plottable.Plots.Scatter(xScale, yScale);
         circlePlot.addDataset(quadraticDataset);
         circlePlot.project("fill", colorAccessor);

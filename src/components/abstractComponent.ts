@@ -21,7 +21,7 @@ export module Components {
     protected _isAnchored = false;
 
     private _hitBox: D3.Selection;
-    private _interactionsToRegister: Interaction.AbstractInteraction[] = [];
+    private _interactionsToRegister: Interactions.AbstractInteraction[] = [];
     private _boxes: D3.Selection[] = [];
     private _boxContainer: D3.Selection;
     private _rootSVG: D3.Selection;
@@ -128,8 +128,8 @@ export module Components {
           }
 
           var elem: HTMLScriptElement = (<HTMLScriptElement> this._rootSVG.node());
-          availableWidth  = _Util.DOM.getElementWidth(elem);
-          availableHeight = _Util.DOM.getElementHeight(elem);
+          availableWidth  = Utils.DOM.getElementWidth(elem);
+          availableHeight = Utils.DOM.getElementHeight(elem);
         } else {
           throw new Error("null arguments cannot be passed to _computeLayout() on a non-root node");
         }
@@ -344,7 +344,7 @@ export module Components {
      * @param {Interaction} interaction The Interaction to attach to the Component.
      * @returns {Component} The calling Component.
      */
-    public registerInteraction(interaction: Interaction.AbstractInteraction) {
+    public registerInteraction(interaction: Interactions.AbstractInteraction) {
       // Interactions can be registered before or after anchoring. If registered before, they are
       // pushed to this._interactionsToRegister and registered during anchoring. If after, they are
       // registered immediately

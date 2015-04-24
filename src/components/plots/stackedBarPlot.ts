@@ -13,7 +13,7 @@ export module Plots {
      * @param {Scale} yScale the y scale of the plot.
      * @param {boolean} isVertical if the plot if vertical.
      */
-    constructor(xScale?: Scale.AbstractScale<X, number>, yScale?: Scale.AbstractScale<Y, number>, isVertical = true) {
+    constructor(xScale?: Scales.AbstractScale<X, number>, yScale?: Scales.AbstractScale<Y, number>, isVertical = true) {
       super(xScale, yScale, isVertical);
     }
 
@@ -22,7 +22,7 @@ export module Plots {
         if (this.animator(key)) {
           return this.animator(key);
         } else if (key === "stacked-bar") {
-          var primaryScale: Scale.AbstractScale<any, number> = this._isVertical ? this._yScale : this._xScale;
+          var primaryScale: Scales.AbstractScale<any, number> = this._isVertical ? this._yScale : this._xScale;
           var scaledBaseline = primaryScale.scale(this.baseline());
           return new Animators.MovingRect(scaledBaseline, this._isVertical);
         }
@@ -36,7 +36,7 @@ export module Plots {
 
       var valueAttr = this._isVertical ? "y" : "x";
       var keyAttr = this._isVertical ? "x" : "y";
-      var primaryScale: Scale.AbstractScale<any, number> = this._isVertical ? this._yScale : this._xScale;
+      var primaryScale: Scales.AbstractScale<any, number> = this._isVertical ? this._yScale : this._xScale;
       var primaryAccessor = this._projections[valueAttr].accessor;
       var keyAccessor = this._projections[keyAttr].accessor;
       var getStart = (d: any, i: number, u: any, m: StackedPlotMetadata) =>
@@ -55,11 +55,11 @@ export module Plots {
       return attrToProjector;
     }
 
-    protected _generateDrawSteps(): _Drawer.DrawStep[] {
+    protected _generateDrawSteps(): Drawers.DrawStep[] {
       return [{attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("stacked-bar")}];
     }
 
-    public project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>) {
+    public project(attrToSet: string, accessor: any, scale?: Scales.AbstractScale<any, any>) {
       super.project(attrToSet, accessor, scale);
       AbstractStacked.prototype.project.apply(this, [attrToSet, accessor, scale]);
       return this;

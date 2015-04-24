@@ -3,10 +3,10 @@
 var assert = chai.assert;
 
 describe("Domainer", () => {
-  var scale: Plottable.Scale.Linear;
+  var scale: Plottable.Scales.Linear;
   var domainer: Plottable.Domainer;
   beforeEach(() => {
-    scale = new Plottable.Scale.Linear();
+    scale = new Plottable.Scales.Linear();
     domainer = new Plottable.Domainer();
   });
 
@@ -18,7 +18,7 @@ describe("Domainer", () => {
   });
 
   it("pad() works for date scales", () => {
-    var timeScale = new Plottable.Scale.Time();
+    var timeScale = new Plottable.Scales.Time();
     var f = d3.time.format("%x");
     var d1 = f.parse("06/02/2014");
     var d2 = f.parse("06/03/2014");
@@ -35,7 +35,7 @@ describe("Domainer", () => {
   });
 
   it("pad() works on log scales", () => {
-    var logScale = new Plottable.Scale.Log();
+    var logScale = new Plottable.Scales.Log();
     logScale._updateExtent("1", "x", [10, 100]);
     logScale.range([0, 1]);
     logScale.domainer(domainer.pad(2.0));
@@ -62,7 +62,7 @@ describe("Domainer", () => {
     var d2 = new Date(2000, 5, 5);
     var dayBefore = new Date(2000, 5, 4);
     var dayAfter = new Date(2000, 5, 6);
-    var timeScale = new Plottable.Scale.Time();
+    var timeScale = new Plottable.Scales.Time();
     // the result of computeDomain() will be number[], but when it
     // gets fed back into timeScale, it will be adjusted back to a Date.
     // That's why I'm using _updateExtent() instead of domainer.computeDomain()
@@ -112,7 +112,7 @@ describe("Domainer", () => {
     var a = new Date(2000, 5, 5);
     var b = new Date(2003, 0, 1);
     domainer.pad().addPaddingException(a);
-    var timeScale = new Plottable.Scale.Time();
+    var timeScale = new Plottable.Scales.Time();
     timeScale._updateExtent("1", "x", [a, b]);
     timeScale.domainer(domainer);
     var domain = timeScale.domain();
@@ -155,15 +155,15 @@ describe("Domainer", () => {
     var c = new Date(2000, 5, 6);
     var d = new Date(2003, 0, 1);
     domainer.addIncludedValue(b);
-    var timeScale = new Plottable.Scale.Time();
+    var timeScale = new Plottable.Scales.Time();
     timeScale._updateExtent("1", "x", [c, d]);
     timeScale.domainer(domainer);
     assert.deepEqual(timeScale.domain(), [b, d]);
   });
 
   it("exceptions are setup properly on an area plot", () => {
-    var xScale = new Plottable.Scale.Linear();
-    var yScale = new Plottable.Scale.Linear();
+    var xScale = new Plottable.Scales.Linear();
+    var yScale = new Plottable.Scales.Linear();
     var domainer = yScale.domainer();
     var data = [{x: 0, y: 0, y0: 0}, {x: 5, y: 5, y0: 5}];
     var dataset = new Plottable.Dataset(data);

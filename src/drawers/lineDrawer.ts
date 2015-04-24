@@ -1,7 +1,7 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module _Drawer {
+export module Drawers {
   export class Line extends AbstractDrawer {
     public static LINE_CLASS = "line";
 
@@ -39,7 +39,7 @@ export module _Drawer {
 
     protected _drawStep(step: AppliedDrawStep) {
       var baseTime = super._drawStep(step);
-      var attrToProjector = <AttributeToAppliedProjector>_Util.Methods.copyMap(step.attrToProjector);
+      var attrToProjector = <AttributeToAppliedProjector>Utils.Methods.copyMap(step.attrToProjector);
       var definedFunction = attrToProjector["defined"];
 
       var xProjector = attrToProjector["x"];

@@ -15,8 +15,8 @@ describe("Plots", () => {
         { foo: 0.8, bar: 0.8 }
       ];
 
-      var xScale = new Plottable.Scale.Linear().domain([0, 1]);
-      var yScale = new Plottable.Scale.Linear().domain([0, 1]);
+      var xScale = new Plottable.Scales.Linear().domain([0, 1]);
+      var yScale = new Plottable.Scales.Linear().domain([0, 1]);
 
       var linePlot = new Plottable.Plots.Line(xScale, yScale);
       linePlot.addDataset(dataWithNaN);
@@ -38,8 +38,8 @@ describe("Plots", () => {
     // HACKHACK #1798: beforeEach being used below
     it("renders correctly with no data", () => {
       var svg = generateSVG(400, 400);
-      var xScale = new Plottable.Scale.Linear();
-      var yScale = new Plottable.Scale.Linear();
+      var xScale = new Plottable.Scales.Linear();
+      var yScale = new Plottable.Scales.Linear();
       var plot = new Plottable.Plots.Line(xScale, yScale);
       plot.project("x", (d: any) => d.x, xScale);
       plot.project("y", (d: any) => d.y, yScale);
@@ -52,8 +52,8 @@ describe("Plots", () => {
 
   describe("LinePlot", () => {
     var svg: D3.Selection;
-    var xScale: Plottable.Scale.Linear;
-    var yScale: Plottable.Scale.Linear;
+    var xScale: Plottable.Scales.Linear;
+    var yScale: Plottable.Scales.Linear;
     var xAccessor: any;
     var yAccessor: any;
     var colorAccessor: any;
@@ -63,8 +63,8 @@ describe("Plots", () => {
     var renderArea: D3.Selection;
 
     before(() => {
-      xScale = new Plottable.Scale.Linear().domain([0, 1]);
-      yScale = new Plottable.Scale.Linear().domain([0, 1]);
+      xScale = new Plottable.Scales.Linear().domain([0, 1]);
+      yScale = new Plottable.Scales.Linear().domain([0, 1]);
       xAccessor = (d: any) => d.foo;
       yAccessor = (d: any) => d.bar;
       colorAccessor = (d: any, i: number, m: any) => d3.rgb(d.foo, d.bar, i).toString();
@@ -385,9 +385,9 @@ describe("Plots", () => {
       var newClassProjector = () => "pink";
       linePlot.project("class", newClassProjector);
       linePlot.renderTo(svg);
-      var linePath = renderArea.select("." + Plottable._Drawer.Line.LINE_CLASS);
+      var linePath = renderArea.select("." + Plottable.Drawers.Line.LINE_CLASS);
       assert.isTrue(linePath.classed("pink"));
-      assert.isTrue(linePath.classed(Plottable._Drawer.Line.LINE_CLASS));
+      assert.isTrue(linePath.classed(Plottable.Drawers.Line.LINE_CLASS));
       svg.remove();
     });
   });

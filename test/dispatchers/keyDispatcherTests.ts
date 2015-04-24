@@ -5,7 +5,7 @@ var assert = chai.assert;
 describe("Dispatchers", () => {
   describe("Key Dispatcher", () => {
     it("triggers callback on mousedown", () => {
-      var ked = Plottable.Dispatcher.Key.getDispatcher();
+      var ked = Plottable.Dispatchers.Key.getDispatcher();
 
       var keyCodeToSend = 65;
 

@@ -7,7 +7,7 @@ describe("Drawers", () => {
       var data = [{value: 10}, {value: 10}, {value: 10}, {value: 10}];
       var piePlot = new Plottable.Plots.Pie();
 
-      var drawer = new Plottable._Drawer.Arc("one");
+      var drawer = new Plottable.Drawers.Arc("one");
       (<any> piePlot)._getDrawer = () => drawer;
 
       piePlot.addDataset("one", data);

@@ -1,7 +1,6 @@
 /// <reference path="../bower_components/svg-typewriter/svgtypewriter.d.ts" />
 
 /// <reference path="utils/utils.ts" />
-/// <reference path="utils/osUtils.ts" />
 /// <reference path="utils/strictEqualityAssociativeArray.ts" />
 /// <reference path="utils/domUtils.ts" />
 /// <reference path="utils/color.ts" />
@@ -10,6 +9,7 @@
 /// <reference path="utils/symbolFactories.ts" />
 
 /// <reference path="utils/clientToSVGTranslator.ts" />
+/// <reference path="utils/scaleDomainCoordinator.ts" />
 
 /// <reference path="core/config.ts" />
 /// <reference path="core/version.ts" />
@@ -32,7 +32,6 @@
 /// <reference path="scales/colorScale.ts" />
 /// <reference path="scales/timeScale.ts" />
 /// <reference path="scales/interpolatedColorScale.ts" />
-/// <reference path="scales/scaleDomainCoordinator.ts" />
 /// <reference path="scales/tickGenerators.ts" />
 
 /// <reference path="drawers/abstractDrawer.ts" />

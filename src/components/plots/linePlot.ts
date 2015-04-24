@@ -2,12 +2,12 @@
 
 module Plottable {
 export module Plots {
-  export class Line<X> extends AbstractXYPlot<X, number> implements Interaction.Hoverable {
+  export class Line<X> extends AbstractXYPlot<X, number> implements Interactions.Hoverable {
     private _hoverDetectionRadius = 15;
     private _hoverTarget: D3.Selection;
     private _defaultStrokeColor: string;
 
-    protected _yScale: Scale.AbstractQuantitative<number>;
+    protected _yScale: Scales.AbstractQuantitative<number>;
 
     /**
      * Constructs a LinePlot.
@@ -16,7 +16,7 @@ export module Plots {
      * @param {QuantitativeScale} xScale The x scale to use.
      * @param {QuantitativeScale} yScale The y scale to use.
      */
-    constructor(xScale: Scale.AbstractQuantitative<X>, yScale: Scale.AbstractQuantitative<number>) {
+    constructor(xScale: Scales.AbstractQuantitative<X>, yScale: Scales.AbstractQuantitative<number>) {
       super(xScale, yScale);
       this.classed("line-plot", true);
       this.animator("reset", new Animators.Null());
@@ -24,7 +24,7 @@ export module Plots {
                                          .duration(600)
                                          .easing("exp-in-out"));
 
-      this._defaultStrokeColor = new Scale.Color().range()[0];
+      this._defaultStrokeColor = new Scales.Color().range()[0];
     }
 
     protected _setup() {
@@ -41,7 +41,7 @@ export module Plots {
     }
 
     protected _getDrawer(key: string) {
-      return new Plottable._Drawer.Line(key);
+      return new Plottable.Drawers.Line(key);
     }
 
     protected _getResetYFunction() {
@@ -56,8 +56,8 @@ export module Plots {
       return (d: any, i: number, u: any, m: PlotMetadata) => scaledStartValue;
     }
 
-    protected _generateDrawSteps(): _Drawer.DrawStep[] {
-      var drawSteps: _Drawer.DrawStep[] = [];
+    protected _generateDrawSteps(): Drawers.DrawStep[] {
+      var drawSteps: Drawers.DrawStep[] = [];
       if (this._dataChanged && this._animate) {
         var attrToProjector = this._generateAttrToProjector();
         attrToProjector["y"] = this._getResetYFunction();
@@ -80,8 +80,8 @@ export module Plots {
           data.length > 0 ? projector(data[0], i, u, m) : null;
       });
 
-      var xFunction       = attrToProjector["x"];
-      var yFunction       = attrToProjector["y"];
+      var xFunction = attrToProjector["x"];
+      var yFunction = attrToProjector["y"];
 
       attrToProjector["defined"] = (d: any, i: number, u: any, m: any) =>
           this._rejectNullsAndNaNs(d, i, u, m, xFunction) && this._rejectNullsAndNaNs(d, i, u, m, yFunction);
@@ -222,7 +222,7 @@ export module Plots {
       // no-op
     }
 
-    public _doHover(p: Point): Interaction.HoverData {
+    public _doHover(p: Point): Interactions.HoverData {
       var closestInfo = this._getClosestWithinRange(p, this._hoverDetectionRadius);
       var closestValue = closestInfo.closestValue;
       if (closestValue === undefined) {

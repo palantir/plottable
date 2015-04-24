@@ -1,7 +1,7 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module _Drawer {
+export module Drawers {
   /**
    * A step for the drawer to draw.
    *
@@ -109,7 +109,7 @@ export module _Drawer {
     public draw(data: any[], drawSteps: DrawStep[], userMetadata: any, plotMetadata: Plots.PlotMetadata) {
       var appliedDrawSteps: AppliedDrawStep[] = drawSteps.map((dr: DrawStep) => {
         var appliedAttrToProjector = this._applyMetadata(dr.attrToProjector, userMetadata, plotMetadata);
-        this._attrToProjector = <AttributeToAppliedProjector>_Util.Methods.copyMap(appliedAttrToProjector);
+        this._attrToProjector = <AttributeToAppliedProjector>Utils.Methods.copyMap(appliedAttrToProjector);
         return {
           attrToProjector: appliedAttrToProjector,
           animator: dr.animator
@@ -125,7 +125,7 @@ export module _Drawer {
 
       var delay = 0;
       appliedDrawSteps.forEach((drawStep, i) => {
-        _Util.Methods.setTimeout(() => this._drawStep(drawStep), delay);
+        Utils.Methods.setTimeout(() => this._drawStep(drawStep), delay);
         delay += drawStep.animator.getTiming(numberOfIterations);
       });
 

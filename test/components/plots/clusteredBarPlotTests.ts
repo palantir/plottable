@@ -7,8 +7,8 @@ describe("Plots", () => {
     var svg: D3.Selection;
     var dataset1: Plottable.Dataset;
     var dataset2: Plottable.Dataset;
-    var xScale: Plottable.Scale.Category;
-    var yScale: Plottable.Scale.Linear;
+    var xScale: Plottable.Scales.Category;
+    var yScale: Plottable.Scales.Linear;
     var renderer: Plottable.Plots.ClusteredBar<string, number>;
     var SVG_WIDTH = 600;
     var SVG_HEIGHT = 400;
@@ -19,8 +19,8 @@ describe("Plots", () => {
 
     beforeEach(() => {
       svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      xScale = new Plottable.Scale.Category();
-      yScale = new Plottable.Scale.Linear().domain([0, 2]);
+      xScale = new Plottable.Scales.Category();
+      yScale = new Plottable.Scales.Linear().domain([0, 2]);
 
       originalData1 = [
         {x: "A", y: 1},
@@ -100,8 +100,8 @@ describe("Plots", () => {
     var svg: D3.Selection;
     var dataset1: Plottable.Dataset;
     var dataset2: Plottable.Dataset;
-    var yScale: Plottable.Scale.Category;
-    var xScale: Plottable.Scale.Linear;
+    var yScale: Plottable.Scales.Category;
+    var xScale: Plottable.Scales.Linear;
     var renderer: Plottable.Plots.ClusteredBar<number, string>;
     var SVG_WIDTH = 600;
     var SVG_HEIGHT = 400;
@@ -110,8 +110,8 @@ describe("Plots", () => {
 
     beforeEach(() => {
       svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      yScale = new Plottable.Scale.Category();
-      xScale = new Plottable.Scale.Linear().domain([0, 2]);
+      yScale = new Plottable.Scales.Category();
+      xScale = new Plottable.Scales.Linear().domain([0, 2]);
 
       var data1 = [
         {y: "A", x: 1},
@@ -185,8 +185,8 @@ describe("Plots", () => {
       var SVG_WIDTH = 600;
       var SVG_HEIGHT = 400;
       svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var xScale = new Plottable.Scale.Category();
-      var yScale = new Plottable.Scale.Linear();
+      var xScale = new Plottable.Scales.Category();
+      var yScale = new Plottable.Scales.Linear();
 
       var data1 = [{x: "A", y: 1}, {x: "B", y: 2}, {x: "C", y: 1}];
       var data2 = [{x: "A", y: 2}, {x: "B", y: 4}];
@@ -246,8 +246,8 @@ describe("Plots", () => {
       var SVG_WIDTH = 600;
       var SVG_HEIGHT = 400;
       svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var xScale = new Plottable.Scale.Linear();
-      var yScale = new Plottable.Scale.Category();
+      var xScale = new Plottable.Scales.Linear();
+      var yScale = new Plottable.Scales.Category();
 
       var data1 = [{y: "A", x: 1}, {y: "B", x: 2}, {y: "C", x: 1}];
       var data2 = [{y: "A", x: 2}, {y: "B", x: 4}];

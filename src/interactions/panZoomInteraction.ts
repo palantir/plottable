@@ -1,12 +1,12 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Interaction {
+export module Interactions {
   export class PanZoom extends AbstractInteraction {
 
     private _zoom: D3.Behavior.Zoom;
-    private _xScale: Scale.AbstractQuantitative<any>;
-    private _yScale: Scale.AbstractQuantitative<any>;
+    private _xScale: Scales.AbstractQuantitative<any>;
+    private _yScale: Scales.AbstractQuantitative<any>;
 
     /**
      * Creates a PanZoomInteraction.
@@ -18,7 +18,7 @@ export module Interaction {
      * @param {QuantitativeScale} [xScale] The X scale to update on panning/zooming.
      * @param {QuantitativeScale} [yScale] The Y scale to update on panning/zooming.
      */
-    constructor(xScale?: Scale.AbstractQuantitative<any>, yScale?: Scale.AbstractQuantitative<any>) {
+    constructor(xScale?: Scales.AbstractQuantitative<any>, yScale?: Scales.AbstractQuantitative<any>) {
       super();
       if (xScale) {
         this._xScale = xScale;

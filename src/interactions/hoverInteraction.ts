@@ -1,7 +1,7 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Interaction {
+export module Interactions {
   export type HoverData = {
     data: any[];
     pixelPositions: Point[];
@@ -31,13 +31,13 @@ export module Interaction {
     _doHover(p: Point): HoverData;
   }
 
-  export class Hover extends Interaction.AbstractInteraction {
+  export class Hover extends Interactions.AbstractInteraction {
 
     private static warned = false;
 
     public _componentToListenTo: Hoverable;
-    private _mouseDispatcher: Dispatcher.Mouse;
-    private _touchDispatcher: Dispatcher.Touch;
+    private _mouseDispatcher: Dispatchers.Mouse;
+    private _touchDispatcher: Dispatchers.Touch;
     private _hoverOverCallback: (hoverData: HoverData) => any;
     private _hoverOutCallback: (hoverData: HoverData) => any;
     private _overComponent = false;
@@ -46,7 +46,7 @@ export module Interaction {
       super();
       if (!Hover.warned) {
         Hover.warned = true;
-        _Util.Methods.warn("Interaction.Hover is deprecated; use Interaction.Pointer in conjunction with getClosestPlotData() instead.");
+        Utils.Methods.warn("Interaction.Hover is deprecated; use Interaction.Pointer in conjunction with getClosestPlotData() instead.");
       }
     }
 
@@ -58,10 +58,10 @@ export module Interaction {
 
     public _anchor(component: Hoverable, hitBox: D3.Selection) {
       super._anchor(component, hitBox);
-      this._mouseDispatcher = Dispatcher.Mouse.getDispatcher(<SVGElement> (<any> this._componentToListenTo)._element.node());
+      this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(<SVGElement> (<any> this._componentToListenTo)._element.node());
       this._mouseDispatcher.onMouseMove("hover" + this.getID(), (p: Point) => this._handlePointerEvent(p));
 
-      this._touchDispatcher = Dispatcher.Touch.getDispatcher(<SVGElement> (<any> this._componentToListenTo)._element.node());
+      this._touchDispatcher = Dispatchers.Touch.getDispatcher(<SVGElement> (<any> this._componentToListenTo)._element.node());
 
       this._touchDispatcher.onTouchStart("hover" + this.getID(), (ids, idToPoint) =>
                                                                    this._handlePointerEvent(idToPoint[ids[0]]));

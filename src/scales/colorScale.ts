@@ -1,7 +1,7 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Scale {
+export module Scales {
   export class Color extends AbstractScale<string, string> {
 
     private static HEX_SCALE_FACTOR = 20;
@@ -57,17 +57,17 @@ export module Scale {
       extents.forEach((e) => {
         concatenatedExtents = concatenatedExtents.concat(e);
       });
-      return _Util.Methods.uniq(concatenatedExtents);
+      return Utils.Methods.uniq(concatenatedExtents);
     }
 
     private static _getPlottableColors(): string[] {
       var plottableDefaultColors: string[] = [];
       var colorTester = d3.select("body").append("plottable-color-tester");
 
-      var defaultColorHex: string = _Util.Methods.colorTest(colorTester, "");
+      var defaultColorHex: string = Utils.Methods.colorTest(colorTester, "");
       var i = 0;
       var colorHex: string;
-      while ((colorHex = _Util.Methods.colorTest(colorTester, "plottable-colors-" + i)) !== null &&
+      while ((colorHex = Utils.Methods.colorTest(colorTester, "plottable-colors-" + i)) !== null &&
               i < this.MAXIMUM_COLORS_FROM_CSS) {
         if (colorHex === defaultColorHex && colorHex === plottableDefaultColors[plottableDefaultColors.length - 1]) {
           break;
@@ -86,7 +86,7 @@ export module Scale {
       var index = this.domain().indexOf(value);
       var numLooped = Math.floor(index / this.range().length);
       var modifyFactor = Math.log(numLooped * Color.LOOP_LIGHTEN_FACTOR + 1);
-      return _Util.Methods.lightenColor(color, modifyFactor);
+      return Utils.Methods.lightenColor(color, modifyFactor);
     }
   }
 }

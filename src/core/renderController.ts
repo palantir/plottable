@@ -41,7 +41,7 @@ export module Core {
           policy = new RenderPolicies.Timeout();
           break;
           default:
-          _Util.Methods.warn("Unrecognized renderPolicy: " + policy);
+          Utils.Methods.warn("Unrecognized renderPolicy: " + policy);
           return;
         }
       }
@@ -56,7 +56,7 @@ export module Core {
      */
     export function registerToRender(c: Components.AbstractComponent) {
       if (_isCurrentlyFlushing) {
-        _Util.Methods.warn("Registered to render while other components are flushing: request may be ignored");
+        Utils.Methods.warn("Registered to render while other components are flushing: request may be ignored");
       }
       _componentsNeedingRender[c.getID()] = c;
       requestRender();

@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Plots {
-  export class Scatter<X, Y> extends AbstractXYPlot<X, Y> implements Interaction.Hoverable {
+  export class Scatter<X, Y> extends AbstractXYPlot<X, Y> implements Interactions.Hoverable {
     private _closeDetectionRadius = 5;
     private _defaultFillColor: string;
 
@@ -13,10 +13,10 @@ export module Plots {
      * @param {Scale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
      */
-    constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<Y, number>) {
+    constructor(xScale: Scales.AbstractScale<X, number>, yScale: Scales.AbstractScale<Y, number>) {
       super(xScale, yScale);
       this.classed("scatter-plot", true);
-      this._defaultFillColor = new Scale.Color().range()[0];
+      this._defaultFillColor = new Scales.Color().range()[0];
 
       this.animator("symbols-reset", new Animators.Null());
       this.animator("symbols", new Animators.Base()
@@ -25,7 +25,7 @@ export module Plots {
     }
 
     protected _getDrawer(key: string) {
-      return new Plottable._Drawer.Symbol(key);
+      return new Plottable.Drawers.Symbol(key);
     }
 
     protected _generateAttrToProjector() {
@@ -38,8 +38,8 @@ export module Plots {
       return attrToProjector;
     }
 
-    protected _generateDrawSteps(): _Drawer.DrawStep[] {
-      var drawSteps: _Drawer.DrawStep[] = [];
+    protected _generateDrawSteps(): Drawers.DrawStep[] {
+      var drawSteps: Drawers.DrawStep[] = [];
       if (this._dataChanged && this._animate) {
         var resetAttrToProjector = this._generateAttrToProjector();
         resetAttrToProjector["size"] = () => 0;
@@ -50,7 +50,7 @@ export module Plots {
       return drawSteps;
     }
 
-    protected _getClosestStruckPoint(p: Point, range: number): Interaction.HoverData {
+    protected _getClosestStruckPoint(p: Point, range: number): Interactions.HoverData {
       var attrToProjector = this._generateAttrToProjector();
       var xProjector = attrToProjector["x"];
       var yProjector = attrToProjector["y"];
@@ -70,7 +70,7 @@ export module Plots {
       this._datasetKeysInOrder.forEach((key: string) => {
         var dataset = this._key2PlotDatasetKey.get(key).dataset;
         var plotMetadata = this._key2PlotDatasetKey.get(key).plotMetadata;
-        var drawer = <_Drawer.Symbol>this._key2PlotDatasetKey.get(key).drawer;
+        var drawer = <Drawers.Symbol>this._key2PlotDatasetKey.get(key).drawer;
         drawer._getRenderArea().selectAll("path").each(function(d, i) {
           var distSq = getDistSq(d, i, dataset.metadata(), plotMetadata);
           var r = attrToProjector["size"](d, i, dataset.metadata(), plotMetadata) / 2;
@@ -128,7 +128,7 @@ export module Plots {
         height: bbox.height
       };
 
-      return Plottable._Util.Methods.intersectsBBox(xRange, yRange, translatedBbox);
+      return Plottable.Utils.Methods.intersectsBBox(xRange, yRange, translatedBbox);
     }
 
     //===== Hover logic =====
@@ -140,7 +140,7 @@ export module Plots {
       // no-op
     }
 
-    public _doHover(p: Point): Interaction.HoverData {
+    public _doHover(p: Point): Interactions.HoverData {
       return this._getClosestStruckPoint(p, this._closeDetectionRadius);
     }
     //===== /Hover logic =====

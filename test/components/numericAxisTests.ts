@@ -27,7 +27,7 @@ describe("NumericAxis", () => {
   }
 
   it("tickLabelPosition() input validation", () => {
-    var scale = new Plottable.Scale.Linear();
+    var scale = new Plottable.Scales.Linear();
     var horizontalAxis = new Plottable.Axes.Numeric(scale, "bottom");
     assert.throws(() => horizontalAxis.tickLabelPosition("top"), "horizontal");
     assert.throws(() => horizontalAxis.tickLabelPosition("bottom"), "horizontal");
@@ -41,7 +41,7 @@ describe("NumericAxis", () => {
     var SVG_WIDTH = 500;
     var SVG_HEIGHT = 100;
     var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-    var scale = new Plottable.Scale.Linear();
+    var scale = new Plottable.Scales.Linear();
     scale.range([0, SVG_WIDTH]);
     var numericAxis = new Plottable.Axes.Numeric(scale, "bottom");
     numericAxis.renderTo(svg);
@@ -89,7 +89,7 @@ describe("NumericAxis", () => {
     var SVG_WIDTH = 100;
     var SVG_HEIGHT = 500;
     var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-    var scale = new Plottable.Scale.Linear();
+    var scale = new Plottable.Scales.Linear();
     scale.range([0, SVG_HEIGHT]);
     var numericAxis = new Plottable.Axes.Numeric(scale, "left");
     numericAxis.renderTo(svg);
@@ -137,7 +137,7 @@ describe("NumericAxis", () => {
     var SVG_WIDTH = 100;
     var SVG_HEIGHT = 500;
     var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-    var scale = new Plottable.Scale.Linear();
+    var scale = new Plottable.Scales.Linear();
     scale.range([0, SVG_HEIGHT]);
 
     var formatter = Plottable.Formatters.fixed(2);
@@ -159,7 +159,7 @@ describe("NumericAxis", () => {
     var SVG_WIDTH = 500;
     var SVG_HEIGHT = 100;
     var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-    var scale = new Plottable.Scale.Linear();
+    var scale = new Plottable.Scales.Linear();
     scale.range([0, SVG_WIDTH]);
     var numericAxis = new Plottable.Axes.Numeric(scale, "bottom");
 
@@ -186,7 +186,7 @@ describe("NumericAxis", () => {
     var SVG_WIDTH = 100;
     var SVG_HEIGHT = 100;
     var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-    var scale = new Plottable.Scale.Linear();
+    var scale = new Plottable.Scales.Linear();
     scale.range([0, SVG_WIDTH]);
     var numericAxis = new Plottable.Axes.Numeric(scale, "bottom");
     numericAxis.showEndTickLabel("left", false).showEndTickLabel("right", false);
@@ -205,7 +205,7 @@ describe("NumericAxis", () => {
         box1 = visibleTickLabels[0][i].getBoundingClientRect();
         box2 = visibleTickLabels[0][j].getBoundingClientRect();
 
-        assert.isFalse(Plottable._Util.DOM.boxesOverlap(box1, box2), "tick labels don't overlap");
+        assert.isFalse(Plottable.Utils.DOM.boxesOverlap(box1, box2), "tick labels don't overlap");
       }
     }
 
@@ -221,7 +221,7 @@ describe("NumericAxis", () => {
         box1 = visibleTickLabels[0][i].getBoundingClientRect();
         box2 = visibleTickLabels[0][j].getBoundingClientRect();
 
-        assert.isFalse(Plottable._Util.DOM.boxesOverlap(box1, box2), "tick labels don't overlap");
+        assert.isFalse(Plottable.Utils.DOM.boxesOverlap(box1, box2), "tick labels don't overlap");
       }
     }
 
@@ -232,7 +232,7 @@ describe("NumericAxis", () => {
     var SVG_WIDTH = 150;
     var SVG_HEIGHT = 500;
     var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-    var scale = new Plottable.Scale.Linear();
+    var scale = new Plottable.Scales.Linear();
     scale.domain([5, -5]);
     scale.range([0, SVG_HEIGHT]);
 
@@ -278,7 +278,7 @@ describe("NumericAxis", () => {
     var SVG_WIDTH = 500;
     var SVG_HEIGHT = 100;
     var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-    var scale = new Plottable.Scale.Linear();
+    var scale = new Plottable.Scales.Linear();
     scale.domain([5, -5]);
     scale.range([0, SVG_WIDTH]);
 
@@ -311,8 +311,8 @@ describe("NumericAxis", () => {
     var SVG_HEIGHT = 300;
     var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
 
-    var xScale = new Plottable.Scale.Category();
-    var yScale = new Plottable.Scale.Linear();
+    var xScale = new Plottable.Scales.Category();
+    var yScale = new Plottable.Scales.Linear();
     var yAxis = new Plottable.Axes.Numeric(yScale, "left");
     var yLabel = new Plottable.Components.AxisLabel("LABEL", "left");
     var barPlot = new Plottable.Plots.Bar(xScale, yScale);
@@ -336,7 +336,7 @@ describe("NumericAxis", () => {
     var SVG_WIDTH = 500;
     var SVG_HEIGHT = 100;
     var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-    var scale = new Plottable.Scale.Linear();
+    var scale = new Plottable.Scales.Linear();
     var axis = new Plottable.Axes.Numeric(scale, "bottom");
     axis.formatter((d: any) => "longstringsareverylong");
     axis.renderTo(svg);
@@ -359,7 +359,7 @@ describe("NumericAxis", () => {
     var SVG_HEIGHT = 100;
     var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
 
-    var scale = new Plottable.Scale.Linear();
+    var scale = new Plottable.Scales.Linear();
     scale.domain([-2500000, 2500000]);
 
     var baseAxis = new Plottable.Axes.Numeric(scale, "bottom");
@@ -385,7 +385,7 @@ describe("NumericAxis", () => {
     var SVG_WIDTH = 300;
     var SVG_HEIGHT = 100;
     var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-    var scale = new Plottable.Scale.Linear();
+    var scale = new Plottable.Scales.Linear();
     scale.domain([0, 3]);
     scale.tickGenerator(function(s) {
       return [0, 1, 2, 3, 4];
@@ -406,7 +406,7 @@ describe("NumericAxis", () => {
     var SVG_HEIGHT = 100;
     var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
 
-    var scale = new Plottable.Scale.Linear();
+    var scale = new Plottable.Scales.Linear();
     scale.domain([3, 0]);
 
     var baseAxis = new Plottable.Axes.Numeric(scale, "bottom");
@@ -432,7 +432,7 @@ describe("NumericAxis", () => {
 
     var svg = generateSVG(300, 400);
 
-    var yScale = new Plottable.Scale.Linear().numTicks(100);
+    var yScale = new Plottable.Scales.Linear().numTicks(100);
     yScale.domain([175, 185]);
     var yAxis = new Plottable.Axes.Numeric(yScale, "left")
                                   .tickLabelPosition("top")
@@ -462,7 +462,7 @@ describe("NumericAxis", () => {
 
       tickMarks.each(function() {
         var tickMarkBox = this.getBoundingClientRect();
-          assert.isFalse(Plottable._Util.DOM.boxesOverlap(tickLabelBox, tickMarkBox),
+          assert.isFalse(Plottable.Utils.DOM.boxesOverlap(tickLabelBox, tickMarkBox),
             "tickMarks and tickLabels should not overlap when top/bottom/left/right position is used for the tickLabel");
       });
     });

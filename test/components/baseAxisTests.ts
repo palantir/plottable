@@ -4,19 +4,19 @@ var assert = chai.assert;
 
 describe("BaseAxis", () => {
   it("orientation", () => {
-    var scale = new Plottable.Scale.Linear();
+    var scale = new Plottable.Scales.Linear();
     assert.throws(() => new Plottable.Axes.AbstractAxis(scale, "blargh"), "unsupported");
   });
 
   it("tickLabelPadding() rejects negative values", () => {
-    var scale = new Plottable.Scale.Linear();
+    var scale = new Plottable.Scales.Linear();
     var baseAxis = new Plottable.Axes.AbstractAxis(scale, "bottom");
 
     assert.throws(() => baseAxis.tickLabelPadding(-1), "must be positive");
   });
 
   it("gutter() rejects negative values", () => {
-    var scale = new Plottable.Scale.Linear();
+    var scale = new Plottable.Scales.Linear();
     var axis = new Plottable.Axes.AbstractAxis(scale, "right");
 
     assert.throws(() => axis.gutter(-1), "must be positive");
@@ -26,7 +26,7 @@ describe("BaseAxis", () => {
     var SVG_WIDTH = 100;
     var SVG_HEIGHT = 500;
     var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-    var scale = new Plottable.Scale.Linear();
+    var scale = new Plottable.Scales.Linear();
     var verticalAxis = new Plottable.Axes.AbstractAxis(scale, "right");
     verticalAxis.renderTo(svg);
 
@@ -44,7 +44,7 @@ describe("BaseAxis", () => {
     var SVG_WIDTH = 500;
     var SVG_HEIGHT = 100;
     var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-    var scale = new Plottable.Scale.Linear();
+    var scale = new Plottable.Scales.Linear();
     var horizontalAxis = new Plottable.Axes.AbstractAxis(scale, "bottom");
     horizontalAxis.renderTo(svg);
 
@@ -62,7 +62,7 @@ describe("BaseAxis", () => {
     var SVG_WIDTH = 500;
     var SVG_HEIGHT = 100;
     var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-    var scale = new Plottable.Scale.Linear();
+    var scale = new Plottable.Scales.Linear();
     scale.domain([0, 10]);
     scale.range([0, SVG_WIDTH]);
     var baseAxis = new Plottable.Axes.AbstractAxis(scale, "bottom");
@@ -94,7 +94,7 @@ describe("BaseAxis", () => {
     var SVG_WIDTH = 100;
     var SVG_HEIGHT = 500;
     var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-    var scale = new Plottable.Scale.Linear();
+    var scale = new Plottable.Scales.Linear();
     scale.domain([0, 10]);
     scale.range([0, SVG_HEIGHT]);
     var baseAxis = new Plottable.Axes.AbstractAxis(scale, "left");
@@ -126,7 +126,7 @@ describe("BaseAxis", () => {
     var SVG_WIDTH = 500;
     var SVG_HEIGHT = 100;
     var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-    var scale = new Plottable.Scale.Linear();
+    var scale = new Plottable.Scales.Linear();
     scale.domain([0, 10]);
     scale.range([0, SVG_WIDTH]);
     var baseAxis = new Plottable.Axes.AbstractAxis(scale, "bottom");
@@ -151,7 +151,7 @@ describe("BaseAxis", () => {
     var SVG_WIDTH = 500;
     var SVG_HEIGHT = 100;
     var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-    var scale = new Plottable.Scale.Linear();
+    var scale = new Plottable.Scales.Linear();
     scale.domain([0, 10]);
     scale.range([0, SVG_WIDTH]);
     var baseAxis = new Plottable.Axes.AbstractAxis(scale, "bottom");
@@ -177,7 +177,7 @@ describe("BaseAxis", () => {
     var SVG_WIDTH = 500;
     var SVG_HEIGHT = 100;
     var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-    var scale = new Plottable.Scale.Linear();
+    var scale = new Plottable.Scales.Linear();
     var baseAxis = new Plottable.Axes.AbstractAxis(scale, "bottom");
     baseAxis.showEndTickLabels(true);
     baseAxis.renderTo(svg);
@@ -198,7 +198,7 @@ describe("BaseAxis", () => {
   });
 
   it("default alignment based on orientation", () => {
-    var scale = new Plottable.Scale.Linear();
+    var scale = new Plottable.Scales.Linear();
     var baseAxis = new Plottable.Axes.AbstractAxis(scale, "bottom");
     assert.equal((<any> baseAxis)._yAlignProportion, 0, "yAlignProportion defaults to 0 for bottom axis");
     baseAxis = new Plottable.Axes.AbstractAxis(scale, "top");

@@ -170,7 +170,7 @@ function triggerFakeWheelEvent(type: string, target: D3.Selection, relativeX: nu
   var xPos = clientRect.left + relativeX;
   var yPos = clientRect.top + relativeY;
   var event: WheelEvent;
-  if (Plottable._Util.Methods.isIE()) {
+  if (Plottable.Utils.Methods.isIE()) {
     event = document.createEvent("WheelEvent");
     event.initWheelEvent("wheel", true, true, window, 1, xPos, yPos, xPos, yPos, 0, null, null, 0, deltaY, 0, 0);
   } else {

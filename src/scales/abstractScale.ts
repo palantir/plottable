@@ -1,7 +1,7 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Scale {
+export module Scales {
   export class AbstractScale<D, R> extends Core.PlottableObject {
     protected _d3Scale: D3.Scale.Scale;
     private _autoDomainAutomatically = true;

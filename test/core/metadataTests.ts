@@ -3,13 +3,13 @@
 var assert = chai.assert;
 
 describe("Metadata", () => {
-  var xScale: Plottable.Scale.Linear;
-  var yScale: Plottable.Scale.Linear;
+  var xScale: Plottable.Scales.Linear;
+  var yScale: Plottable.Scales.Linear;
   var data1 = [{x: 0, y: 0}, {x: 1, y: 1}];
   var data2 = [{x: 2, y: 2}, {x: 3, y: 3}];
   before(() => {
-    xScale = new Plottable.Scale.Linear();
-    yScale = new Plottable.Scale.Linear();
+    xScale = new Plottable.Scales.Linear();
+    yScale = new Plottable.Scales.Linear();
     xScale.domain([0, 400]);
     yScale.domain([400, 0]);
   });

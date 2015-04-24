@@ -2,7 +2,7 @@
 
 var assert = chai.assert;
 
-class TestHoverable extends Plottable.Components.AbstractComponent implements Plottable.Interaction.Hoverable {
+class TestHoverable extends Plottable.Components.AbstractComponent implements Plottable.Interactions.Hoverable {
   public leftPoint = { x: 100, y: 200 };
   public rightPoint = { x: 300, y: 200 };
 
@@ -14,7 +14,7 @@ class TestHoverable extends Plottable.Components.AbstractComponent implements Pl
     // cast-override
   }
 
-  public _doHover(p: Plottable.Point): Plottable.Interaction.HoverData {
+  public _doHover(p: Plottable.Point): Plottable.Interactions.HoverData {
     var data: string[] = [];
     var points: Plottable.Point[] = [];
     if (p.x < 250) {
@@ -38,10 +38,10 @@ describe("Interactions", () => {
     var svg: D3.Selection;
     var testTarget: TestHoverable;
     var target: D3.Selection;
-    var hoverInteraction: Plottable.Interaction.Hover;
-    var overData: Plottable.Interaction.HoverData;
+    var hoverInteraction: Plottable.Interactions.Hover;
+    var overData: Plottable.Interactions.HoverData;
     var overCallbackCalled = false;
-    var outData: Plottable.Interaction.HoverData;
+    var outData: Plottable.Interactions.HoverData;
     var outCallbackCalled = false;
 
 
@@ -51,15 +51,15 @@ describe("Interactions", () => {
       testTarget.classed("test-hoverable", true);
       testTarget.renderTo(svg);
 
-      hoverInteraction = new Plottable.Interaction.Hover();
+      hoverInteraction = new Plottable.Interactions.Hover();
       overCallbackCalled = false;
-      hoverInteraction.onHoverOver((hd: Plottable.Interaction.HoverData) => {
+      hoverInteraction.onHoverOver((hd: Plottable.Interactions.HoverData) => {
         overCallbackCalled = true;
         overData = hd;
       });
 
       outCallbackCalled = false;
-      hoverInteraction.onHoverOut((hd: Plottable.Interaction.HoverData) => {
+      hoverInteraction.onHoverOut((hd: Plottable.Interactions.HoverData) => {
         outCallbackCalled = true;
         outData = hd;
       });

@@ -3,10 +3,10 @@
 var assert = chai.assert;
 
 describe("TimeAxis", () => {
-  var scale: Plottable.Scale.Time;
+  var scale: Plottable.Scales.Time;
   var axis: Plottable.Axes.Time;
   beforeEach(() => {
-    scale = new Plottable.Scale.Time();
+    scale = new Plottable.Scales.Time();
     axis = new Plottable.Axes.Time(scale, "bottom");
   });
 
@@ -58,7 +58,7 @@ describe("TimeAxis", () => {
             box1 = visibleTickLabels[0][i].getBoundingClientRect();
             box2 = visibleTickLabels[0][j].getBoundingClientRect();
 
-            assert.isFalse(Plottable._Util.DOM.boxesOverlap(box1, box2), "tick labels don't overlap");
+            assert.isFalse(Plottable.Utils.DOM.boxesOverlap(box1, box2), "tick labels don't overlap");
           }
         }
       }
@@ -85,7 +85,7 @@ describe("TimeAxis", () => {
 
   it("custom possible axis configurations", () => {
     var svg = generateSVG(800, 100);
-    var scale = new Plottable.Scale.Time();
+    var scale = new Plottable.Scales.Time();
     var axis = new Plottable.Axes.Time(scale, "bottom");
     var configurations = axis.axisConfigurations();
     var newPossibleConfigurations = configurations.slice(0, 3);
@@ -134,7 +134,7 @@ describe("TimeAxis", () => {
 
   it("tick labels do not overlap with tick marks", () => {
     var svg = generateSVG(400, 100);
-    scale = new Plottable.Scale.Time();
+    scale = new Plottable.Scales.Time();
     scale.domain([new Date("2009-12-20"), new Date("2011-01-01")]);
     axis = new Plottable.Axes.Time(scale, "bottom");
     axis.renderTo(svg);
@@ -145,7 +145,7 @@ describe("TimeAxis", () => {
         })[0].map((label: Element) => label.getBoundingClientRect());
     labelRects.forEach(function(labelRect: ClientRect) {
       tickRects.forEach(function(tickRect: ClientRect) {
-        assert.isFalse(Plottable._Util.DOM.boxesOverlap(labelRect, tickRect), "visible label does not overlap with a tick");
+        assert.isFalse(Plottable.Utils.DOM.boxesOverlap(labelRect, tickRect), "visible label does not overlap with a tick");
       });
     });
     svg.remove();
@@ -153,7 +153,7 @@ describe("TimeAxis", () => {
 
   it("if the time only uses one tier, there should be no space left for the second tier", () => {
     var svg = generateSVG();
-    var xScale = new Plottable.Scale.Time();
+    var xScale = new Plottable.Scales.Time();
     xScale.domain([new Date("2013-03-23 12:00"), new Date("2013-04-03 0:00")]);
     var xAxis = new Plottable.Axes.Time(xScale, "bottom");
     xAxis.gutter(0);
@@ -197,7 +197,7 @@ describe("TimeAxis", () => {
   it("three tier time axis should be possible", () => {
 
     var svg = generateSVG();
-    var xScale = new Plottable.Scale.Time();
+    var xScale = new Plottable.Scales.Time();
     xScale.domain([new Date("2013-03-23 12:00"), new Date("2013-04-03 0:00")]);
     var xAxis = new Plottable.Axes.Time(xScale, "bottom");
     xAxis.gutter(0);
@@ -232,7 +232,7 @@ describe("TimeAxis", () => {
 
   it("many tier Axis.Time should not exceed the drawing area", () => {
     var svg = generateSVG(400, 50);
-    var xScale = new Plottable.Scale.Time();
+    var xScale = new Plottable.Scales.Time();
     xScale.domain([new Date("2013-03-23 12:00"), new Date("2013-04-03 0:00")]);
     var xAxis = new Plottable.Axes.Time(xScale, "bottom");
 
