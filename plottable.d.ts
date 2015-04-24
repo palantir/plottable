@@ -115,6 +115,10 @@ declare module Plottable {
             function min<C>(arr: C[], default_val: C): C;
             function min<T, C>(arr: T[], acc: (x?: T, i?: number) => C, default_val: C): C;
             /**
+             * Returns true **only** if x is NaN
+             */
+            function isNaN(n: any): boolean;
+            /**
              * Creates shallow copy of map.
              * @param {{ [key: string]: any }} oldMap Map to copy
              *
@@ -136,7 +140,6 @@ declare module Plottable {
             function setTimeout(f: Function, time: number, ...args: any[]): number;
             function colorTest(colorTester: D3.Selection, className: string): string;
             function lightenColor(color: string, factor: number): string;
-            function darkenColor(color: string, factor: number, darkenAmount: number): string;
             function distanceSquared(p1: Point, p2: Point): number;
             function isIE(): boolean;
             /**
@@ -309,32 +312,6 @@ declare module Plottable {
              * see http://www.w3.org/TR/2008/REC-WCAG20-20081211/#contrast-ratiodef
              */
             function contrast(a: string, b: string): number;
-            /**
-             * Converts an RGB color value to HSL. Conversion formula
-             * adapted from http://en.wikipedia.org/wiki/HSL_color_space.
-             * Assumes r, g, and b are contained in the set [0, 255] and
-             * returns h, s, and l in the set [0, 1].
-             * Source: https://stackoverflow.com/questions/2353211/hsl-to-rgb-color-conversion
-             *
-             * @param   Number  r       The red color value
-             * @param   Number  g       The green color value
-             * @param   Number  b       The blue color value
-             * @return  Array           The HSL representation
-             */
-            function rgbToHsl(r: number, g: number, b: number): number[];
-            /**
-             * Converts an HSL color value to RGB. Conversion formula
-             * adapted from http://en.wikipedia.org/wiki/HSL_color_space.
-             * Assumes h, s, and l are contained in the set [0, 1] and
-             * returns r, g, and b in the set [0, 255].
-             * Source: https://stackoverflow.com/questions/2353211/hsl-to-rgb-color-conversion
-             *
-             * @param   Number  h       The hue
-             * @param   Number  s       The saturation
-             * @param   Number  l       The lightness
-             * @return  Array           The RGB representation
-             */
-            function hslToRgb(h: number, s: number, l: number): number[];
         }
     }
 }
@@ -1633,7 +1610,6 @@ declare module Plottable {
             protected _content: D3.Selection;
             protected _boundingBox: D3.Selection;
             clipPathEnabled: boolean;
-            _parent: AbstractComponentContainer;
             protected _fixedHeightFlag: boolean;
             protected _fixedWidthFlag: boolean;
             protected _isSetup: boolean;
@@ -1803,6 +1779,8 @@ declare module Plottable {
              * @returns The calling Component.
              */
             detach(): AbstractComponent;
+            _parent(): AbstractComponentContainer;
+            _parent(parentElement: AbstractComponentContainer): any;
             /**
              * Removes a Component from the DOM and disconnects it from everything it's
              * listening to (effectively destroying it).
@@ -2101,9 +2079,6 @@ declare module Plottable {
              * @returns {Axis} The calling Axis.
              */
             showEndTickLabels(show: boolean): AbstractAxis;
-            protected _hideEndTickLabels(): void;
-            protected _hideOverflowingTickLabels(): void;
-            protected _hideOverlappingTickLabels(): void;
         }
     }
 }
@@ -2130,6 +2105,10 @@ declare module Plottable {
          */
         type TimeAxisConfiguration = TimeAxisTierConfiguration[];
         class Time extends AbstractAxis {
+            /**
+             * The css class applied to each time axis tier
+             */
+            static TIME_AXIS_TIER_CLASS: string;
             /**
              * Constructs a TimeAxis.
              *
@@ -2160,6 +2139,10 @@ declare module Plottable {
             orient(): string;
             orient(orientation: string): Time;
             _computeHeight(): number;
+            protected _getSize(availableWidth: number, availableHeight: number): {
+                width: number;
+                height: number;
+            };
             protected _setup(): void;
             protected _getTickValues(): any[];
             _doRender(): Time;
@@ -3711,7 +3694,9 @@ declare module Plottable {
 
 declare module Plottable {
     module Dispatcher {
-        type TouchCallback = (p: Point, e: TouchEvent) => any;
+        type TouchCallback = (ids: number[], idToPoint: {
+            [id: number]: Point;
+        }, e: TouchEvent) => any;
         class Touch extends AbstractDispatcher {
             /**
              * Get a Dispatcher.Touch for the <svg> containing elem. If one already exists
@@ -3765,15 +3750,6 @@ declare module Plottable {
              * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
              */
             onTouchEnd(key: any, callback: TouchCallback): Dispatcher.Touch;
-            /**
-             * Returns the last computed Touch position.
-             *
-             * @return {Point} The last known Touch position in <svg> coordinate space.
-             */
-            getLastTouchPosition(): {
-                x: number;
-                y: number;
-            };
         }
     }
 }
@@ -3991,7 +3967,7 @@ declare module Plottable {
              *
              * @return {boolean} Whether or not the Interaction.Drag constrains.
              */
-            constrain(): boolean;
+            constrainToComponent(): boolean;
             /**
              * Sets whether or not this Interaction constrains Points passed to its
              * callbacks to lie inside its Component.
@@ -4000,10 +3976,10 @@ declare module Plottable {
              * inside the Component will be passed to the callback instead of the actual
              * cursor position.
              *
-             * @param {boolean} doConstrain Whether or not to constrain Points.
+             * @param {boolean} constrain Whether or not to constrain Points.
              * @return {Interaction.Drag} The calling Interaction.Drag.
              */
-            constrain(doConstrain: boolean): Drag;
+            constrainToComponent(constrain: boolean): Drag;
             /**
              * Gets the callback that is called when dragging starts.
              *

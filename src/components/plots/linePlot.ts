@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Plot {
-  export class Line<X> extends AbstractXYPlot<X,number> implements Interaction.Hoverable {
+  export class Line<X> extends AbstractXYPlot<X, number> implements Interaction.Hoverable {
     private _hoverDetectionRadius = 15;
     private _hoverTarget: D3.Selection;
     private _defaultStrokeColor: string;

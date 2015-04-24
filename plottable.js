@@ -247,6 +247,13 @@ var Plottable;
             }
             Methods.min = min;
             /**
+             * Returns true **only** if x is NaN
+             */
+            function isNaN(n) {
+                return n !== n;
+            }
+            Methods.isNaN = isNaN;
+            /**
              * Creates shallow copy of map.
              * @param {{ [key: string]: any }} oldMap Map to copy
              *
@@ -317,23 +324,6 @@ var Plottable;
                 return hsl.rgb().toString();
             }
             Methods.lightenColor = lightenColor;
-            // Code adapted from https://stackoverflow.com/questions/5560248/programmatically-lighten-or-darken-a-hex-color-or-rgb-and-blend-colors
-            function darkenColor(color, factor, darkenAmount) {
-                var r = parseInt(color.substring(1, 3), 16);
-                var g = parseInt(color.substring(3, 5), 16);
-                var b = parseInt(color.substring(5, 7), 16);
-                var hsl = _Util.Color.rgbToHsl(r, g, b);
-                var newL = Math.max(hsl[2] - darkenAmount * factor, 0);
-                var newRgb = _Util.Color.hslToRgb(hsl[0], hsl[1], newL);
-                var rHex = newRgb[0].toString(16);
-                var gHex = newRgb[1].toString(16);
-                var bHex = newRgb[2].toString(16);
-                rHex = rHex.length < 2 ? "0" + rHex : rHex;
-                gHex = gHex.length < 2 ? "0" + gHex : gHex;
-                bHex = bHex.length < 2 ? "0" + bHex : bHex;
-                return "#" + rHex + gHex + bHex;
-            }
-            Methods.darkenColor = darkenColor;
             function distanceSquared(p1, p2) {
                 return Math.pow(p2.y - p1.y, 2) + Math.pow(p2.x - p1.x, 2);
             }
@@ -703,94 +693,6 @@ var Plottable;
                 return l1 > l2 ? l1 / l2 : l2 / l1;
             }
             Color.contrast = contrast;
-            /**
-             * Converts an RGB color value to HSL. Conversion formula
-             * adapted from http://en.wikipedia.org/wiki/HSL_color_space.
-             * Assumes r, g, and b are contained in the set [0, 255] and
-             * returns h, s, and l in the set [0, 1].
-             * Source: https://stackoverflow.com/questions/2353211/hsl-to-rgb-color-conversion
-             *
-             * @param   Number  r       The red color value
-             * @param   Number  g       The green color value
-             * @param   Number  b       The blue color value
-             * @return  Array           The HSL representation
-             */
-            function rgbToHsl(r, g, b) {
-                r /= 255, g /= 255, b /= 255;
-                var max = Math.max(r, g, b);
-                var min = Math.min(r, g, b);
-                var h;
-                var s;
-                var l = (max + min) / 2;
-                if (max === min) {
-                    h = s = 0; // achromatic
-                }
-                else {
-                    var d = max - min;
-                    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-                    switch (max) {
-                        case r:
-                            h = (g - b) / d + (g < b ? 6 : 0);
-                            break;
-                        case g:
-                            h = (b - r) / d + 2;
-                            break;
-                        case b:
-                            h = (r - g) / d + 4;
-                            break;
-                    }
-                    h /= 6;
-                }
-                return [h, s, l];
-            }
-            Color.rgbToHsl = rgbToHsl;
-            /**
-             * Converts an HSL color value to RGB. Conversion formula
-             * adapted from http://en.wikipedia.org/wiki/HSL_color_space.
-             * Assumes h, s, and l are contained in the set [0, 1] and
-             * returns r, g, and b in the set [0, 255].
-             * Source: https://stackoverflow.com/questions/2353211/hsl-to-rgb-color-conversion
-             *
-             * @param   Number  h       The hue
-             * @param   Number  s       The saturation
-             * @param   Number  l       The lightness
-             * @return  Array           The RGB representation
-             */
-            function hslToRgb(h, s, l) {
-                var r;
-                var g;
-                var b;
-                if (s === 0) {
-                    r = g = b = l; // achromatic
-                }
-                else {
-                    function hue2rgb(p, q, t) {
-                        if (t < 0) {
-                            t += 1;
-                        }
-                        if (t > 1) {
-                            t -= 1;
-                        }
-                        if (t < 1 / 6) {
-                            return p + (q - p) * 6 * t;
-                        }
-                        if (t < 1 / 2) {
-                            return q;
-                        }
-                        if (t < 2 / 3) {
-                            return p + (q - p) * (2 / 3 - t) * 6;
-                        }
-                        return p;
-                    }
-                    var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
-                    var p = 2 * l - q;
-                    r = hue2rgb(p, q, h + 1 / 3);
-                    g = hue2rgb(p, q, h);
-                    b = hue2rgb(p, q, h - 1 / 3);
-                }
-                return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
-            }
-            Color.hslToRgb = hslToRgb;
         })(Color = _Util.Color || (_Util.Color = {}));
     })(_Util = Plottable._Util || (Plottable._Util = {}));
 })(Plottable || (Plottable = {}));
@@ -3556,7 +3458,7 @@ var Plottable;
                         this._scheduleComputeLayout();
                     }
                     else {
-                        this._parent._invalidateLayout();
+                        this._parent()._invalidateLayout();
                     }
                 }
             };
@@ -3567,6 +3469,7 @@ var Plottable;
              * @returns {Component} The calling component.
              */
             AbstractComponent.prototype.renderTo = function (element) {
+                this.detach();
                 if (element != null) {
                     var selection;
                     if (typeof (element) === "string") {
@@ -3693,7 +3596,6 @@ var Plottable;
                 if (className != null) {
                     box.classed(className, true);
                 }
-                ;
                 this._boxes.push(box);
                 if (this.width() != null && this.height() != null) {
                     box.attr("width", this.width()).attr("height", this.height());
@@ -3783,9 +3685,6 @@ var Plottable;
             };
             AbstractComponent.prototype._merge = function (c, below) {
                 var cg;
-                if (this._isSetup || this._isAnchored) {
-                    throw new Error("Can't presently merge a component that's already been anchored");
-                }
                 if (Plottable.Component.Group.prototype.isPrototypeOf(c)) {
                     cg = c;
                     cg._addComponent(this, below);
@@ -3841,12 +3740,20 @@ var Plottable;
                 if (this._isAnchored) {
                     this._element.remove();
                 }
-                if (this._parent != null) {
-                    this._parent._removeComponent(this);
+                var parent = this._parent();
+                if (parent != null) {
+                    parent._removeComponent(this);
                 }
                 this._isAnchored = false;
-                this._parent = null;
+                this._parentElement = null;
                 return this;
+            };
+            AbstractComponent.prototype._parent = function (parentElement) {
+                if (parentElement === undefined) {
+                    return this._parentElement;
+                }
+                this.detach();
+                this._parentElement = parentElement;
             };
             /**
              * Removes a Component from the DOM and disconnects it from everything it's
@@ -3890,12 +3797,12 @@ var Plottable;
              */
             AbstractComponent.prototype.originToSVG = function () {
                 var origin = this.origin();
-                var ancestor = this._parent;
+                var ancestor = this._parent();
                 while (ancestor != null) {
                     var ancestorOrigin = ancestor.origin();
                     origin.x += ancestorOrigin.x;
                     origin.y += ancestorOrigin.y;
-                    ancestor = ancestor._parent;
+                    ancestor = ancestor._parent();
                 }
                 return origin;
             };
@@ -3996,7 +3903,7 @@ var Plottable;
                 else {
                     this.components().push(c);
                 }
-                c._parent = this;
+                c._parent(this);
                 if (this._isAnchored) {
                     c._anchor(this._content);
                 }
@@ -4424,69 +4331,6 @@ var Plottable;
                 this._render();
                 return this;
             };
-            AbstractAxis.prototype._hideEndTickLabels = function () {
-                var boundingBox = this._boundingBox.node().getBoundingClientRect();
-                var tickLabels = this._tickLabelContainer.selectAll("." + AbstractAxis.TICK_LABEL_CLASS);
-                if (tickLabels[0].length === 0) {
-                    return;
-                }
-                var firstTickLabel = tickLabels[0][0];
-                if (!Plottable._Util.DOM.boxIsInside(firstTickLabel.getBoundingClientRect(), boundingBox)) {
-                    d3.select(firstTickLabel).style("visibility", "hidden");
-                }
-                var lastTickLabel = tickLabels[0][tickLabels[0].length - 1];
-                if (!Plottable._Util.DOM.boxIsInside(lastTickLabel.getBoundingClientRect(), boundingBox)) {
-                    d3.select(lastTickLabel).style("visibility", "hidden");
-                }
-            };
-            // Responsible for hiding any tick labels that break out of the bounding container
-            AbstractAxis.prototype._hideOverflowingTickLabels = function () {
-                var boundingBox = this._boundingBox.node().getBoundingClientRect();
-                var tickLabels = this._tickLabelContainer.selectAll("." + AbstractAxis.TICK_LABEL_CLASS);
-                if (tickLabels.empty()) {
-                    return;
-                }
-                tickLabels.each(function (d, i) {
-                    if (!Plottable._Util.DOM.boxIsInside(this.getBoundingClientRect(), boundingBox)) {
-                        d3.select(this).style("visibility", "hidden");
-                    }
-                });
-            };
-            AbstractAxis.prototype._hideOverlappingTickLabels = function () {
-                var visibleTickLabels = this._tickLabelContainer.selectAll("." + AbstractAxis.TICK_LABEL_CLASS).filter(function (d, i) {
-                    var visibility = d3.select(this).style("visibility");
-                    return (visibility === "inherit") || (visibility === "visible");
-                });
-                var lastLabelClientRect;
-                var visibleTickLabelRects = visibleTickLabels[0].map(function (label) { return label.getBoundingClientRect(); });
-                var interval = 1;
-                while (!this._hasOverlapWithInterval(interval, visibleTickLabelRects) && interval < visibleTickLabelRects.length) {
-                    interval += 1;
-                }
-                visibleTickLabels.each(function (d, i) {
-                    var tickLabel = d3.select(this);
-                    if (i % interval !== 0) {
-                        tickLabel.style("visibility", "hidden");
-                    }
-                });
-            };
-            AbstractAxis.prototype._hasOverlapWithInterval = function (interval, rects) {
-                for (var i = 0; i < rects.length - (interval); i += interval) {
-                    var currRect = rects[i];
-                    var nextRect = rects[i + interval];
-                    if (this._isHorizontal()) {
-                        if (currRect.right + this._tickLabelPadding >= nextRect.left) {
-                            return false;
-                        }
-                    }
-                    else {
-                        if (currRect.top - this._tickLabelPadding <= nextRect.bottom) {
-                            return false;
-                        }
-                    }
-                }
-                return true;
-            };
             /**
              * The css class applied to each end tick mark (the line on the end tick).
              */
@@ -4529,9 +4373,9 @@ var Plottable;
              */
             function Time(scale, orientation) {
                 _super.call(this, scale, orientation);
+                this._tierLabelPositions = [];
                 this.classed("time-axis", true);
                 this.tickLabelPadding(5);
-                this.tierLabelPositions(["between", "between"]);
                 this.axisConfigurations(Time._DEFAULT_TIME_AXIS_CONFIGURATIONS);
             }
             Time.prototype.tierLabelPositions = function (newPositions) {
@@ -4552,6 +4396,16 @@ var Plottable;
                     return this._possibleTimeAxisConfigurations;
                 }
                 this._possibleTimeAxisConfigurations = configurations;
+                this._numTiers = Plottable._Util.Methods.max(this._possibleTimeAxisConfigurations.map(function (config) { return config.length; }), 0);
+                if (this._isAnchored) {
+                    this._setupDomElements();
+                }
+                var oldLabelPositions = this.tierLabelPositions();
+                var newLabelPositions = [];
+                for (var i = 0; i < this._numTiers; i++) {
+                    newLabelPositions.push(oldLabelPositions[i] || "between");
+                }
+                this.tierLabelPositions(newLabelPositions);
                 this._invalidateLayout();
                 return this;
             };
@@ -4580,9 +4434,8 @@ var Plottable;
             };
             Time.prototype._computeHeight = function () {
                 var textHeight = this._measurer.measure().height;
-                var maximumTiers = Plottable._Util.Methods.max(this._possibleTimeAxisConfigurations.map(function (config) { return config.length; }), 0);
                 this._tierHeights = [];
-                for (var i = 0; i < maximumTiers; i++) {
+                for (var i = 0; i < this._numTiers; i++) {
                     this._tierHeights.push(textHeight + this.tickLabelPadding() + ((this._tierLabelPositions[i]) === "between" ? 0 : this._maxLabelTickLength()));
                 }
                 this._computedHeight = d3.sum(this._tierHeights);
@@ -4609,15 +4462,28 @@ var Plottable;
                 var worstWidth = this._maxWidthForInterval(config) + 2 * this.tickLabelPadding();
                 return Math.min(this._getIntervalLength(config), this.width()) >= worstWidth;
             };
+            Time.prototype._getSize = function (availableWidth, availableHeight) {
+                // Makes sure that the size it requires is a multiple of tier sizes, such that
+                // we have no leftover tiers
+                var size = _super.prototype._getSize.call(this, availableWidth, availableHeight);
+                size.height = this._tierHeights.reduce(function (prevValue, currValue, index, arr) {
+                    return (prevValue + currValue > size.height) ? prevValue : (prevValue + currValue);
+                });
+                return size;
+            };
             Time.prototype._setup = function () {
                 _super.prototype._setup.call(this);
+                this._setupDomElements();
+            };
+            Time.prototype._setupDomElements = function () {
+                d3.selectAll("." + Time.TIME_AXIS_TIER_CLASS).remove();
                 this._tierLabelContainers = [];
                 this._tierMarkContainers = [];
                 this._tierBaselines = [];
                 this._tickLabelContainer.remove();
                 this._baseline.remove();
-                for (var i = 0; i < Time._NUM_TIERS; ++i) {
-                    var tierContainer = this._content.append("g").classed("time-axis-tier", true);
+                for (var i = 0; i < this._numTiers; ++i) {
+                    var tierContainer = this._content.append("g").classed(Time.TIME_AXIS_TIER_CLASS, true);
                     this._tierLabelContainers.push(tierContainer.append("g").classed(Axis.AbstractAxis.TICK_LABEL_CLASS + "-container", true));
                     this._tierMarkContainers.push(tierContainer.append("g").classed(Axis.AbstractAxis.TICK_MARK_CLASS + "-container", true));
                     this._tierBaselines.push(tierContainer.append("line").classed("baseline", true));
@@ -4631,10 +4497,12 @@ var Plottable;
                 var _this = this;
                 return this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex].reduce(function (ticks, config) { return ticks.concat(_this._getTickIntervalValues(config)); }, []);
             };
-            Time.prototype._cleanTier = function (index) {
-                this._tierLabelContainers[index].selectAll("." + Axis.AbstractAxis.TICK_LABEL_CLASS).remove();
-                this._tierMarkContainers[index].selectAll("." + Axis.AbstractAxis.TICK_MARK_CLASS).remove();
-                this._tierBaselines[index].style("visibility", "hidden");
+            Time.prototype._cleanTiers = function () {
+                for (var index = 0; index < this._tierLabelContainers.length; index++) {
+                    this._tierLabelContainers[index].selectAll("." + Axis.AbstractAxis.TICK_LABEL_CLASS).remove();
+                    this._tierMarkContainers[index].selectAll("." + Axis.AbstractAxis.TICK_MARK_CLASS).remove();
+                    this._tierBaselines[index].style("visibility", "hidden");
+                }
             };
             Time.prototype._getTickValuesForConfiguration = function (config) {
                 var tickPos = this._scale.tickInterval(config.interval, config.step);
@@ -4724,17 +4592,15 @@ var Plottable;
                 var _this = this;
                 this._mostPreciseConfigIndex = this._getMostPreciseConfigurationIndex();
                 var tierConfigs = this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex];
-                for (var i = 0; i < Time._NUM_TIERS; ++i) {
-                    this._cleanTier(i);
-                }
+                this._cleanTiers();
                 tierConfigs.forEach(function (config, i) { return _this._renderTierLabels(_this._tierLabelContainers[i], config, i); });
                 var tierTicks = tierConfigs.map(function (config, i) { return _this._getTickValuesForConfiguration(config); });
                 var baselineOffset = 0;
-                for (i = 0; i < Math.max(tierConfigs.length, 1); ++i) {
+                for (var i = 0; i < Math.max(tierConfigs.length, 1); ++i) {
                     var attr = this._generateBaselineAttrHash();
                     attr["y1"] += (this.orient() === "bottom") ? baselineOffset : -baselineOffset;
                     attr["y2"] = attr["y1"];
-                    this._tierBaselines[i].attr(attr).style("visibility", "visible");
+                    this._tierBaselines[i].attr(attr).style("visibility", "inherit");
                     baselineOffset += this._tierHeights[i];
                 }
                 var labelLessTicks = [];
@@ -4744,11 +4610,21 @@ var Plottable;
                     labelLessTicks = this._generateLabellessTicks();
                 }
                 this._renderLabellessTickMarks(labelLessTicks);
+                this._hideOverflowingTiers();
                 for (i = 0; i < tierConfigs.length; ++i) {
                     this._renderTickMarks(tierTicks[i], i);
                     this._hideOverlappingAndCutOffLabels(i);
                 }
                 return this;
+            };
+            Time.prototype._hideOverflowingTiers = function () {
+                var _this = this;
+                var availableHeight = this.height();
+                var usedHeight = 0;
+                this._element.selectAll("." + Time.TIME_AXIS_TIER_CLASS).attr("visibility", function (d, i) {
+                    usedHeight += _this._tierHeights[i];
+                    return usedHeight <= availableHeight ? "inherit" : "hidden";
+                });
             };
             Time.prototype._hideOverlappingAndCutOffLabels = function (index) {
                 var _this = this;
@@ -4757,12 +4633,14 @@ var Plottable;
                     return (Math.floor(boundingBox.left) <= Math.ceil(tickBox.left) && Math.floor(boundingBox.top) <= Math.ceil(tickBox.top) && Math.floor(tickBox.right) <= Math.ceil(boundingBox.left + _this.width()) && Math.floor(tickBox.bottom) <= Math.ceil(boundingBox.top + _this.height()));
                 };
                 var visibleTickMarks = this._tierMarkContainers[index].selectAll("." + Axis.AbstractAxis.TICK_MARK_CLASS).filter(function (d, i) {
-                    return d3.select(this).style("visibility") === "visible";
+                    var visibility = d3.select(this).style("visibility");
+                    return visibility === "visible" || visibility === "inherit";
                 });
                 // We use the ClientRects because x1/x2 attributes are not comparable to ClientRects of labels
                 var visibleTickMarkRects = visibleTickMarks[0].map(function (mark) { return mark.getBoundingClientRect(); });
                 var visibleTickLabels = this._tierLabelContainers[index].selectAll("." + Axis.AbstractAxis.TICK_LABEL_CLASS).filter(function (d, i) {
-                    return d3.select(this).style("visibility") === "visible";
+                    var visibility = d3.select(this).style("visibility");
+                    return visibility === "visible" || visibility === "inherit";
                 });
                 var lastLabelClientRect;
                 visibleTickLabels.each(function (d, i) {
@@ -4775,10 +4653,14 @@ var Plottable;
                     }
                     else {
                         lastLabelClientRect = clientRect;
-                        tickLabel.style("visibility", "visible");
+                        tickLabel.style("visibility", "inherit");
                     }
                 });
             };
+            /**
+             * The css class applied to each time axis tier
+             */
+            Time.TIME_AXIS_TIER_CLASS = "time-axis-tier";
             /*
              * Default possible axis configurations.
              */
@@ -4892,10 +4774,6 @@ var Plottable;
                 ]
             ];
             Time._LONG_DATE = new Date(9999, 8, 29, 12, 59, 9999);
-            /**
-             * Number of possible tiers.
-             */
-            Time._NUM_TIERS = 2;
             return Time;
         })(Axis.AbstractAxis);
         Axis.Time = Time;
@@ -5079,11 +4957,37 @@ var Plottable;
                 });
                 var labelGroupTransform = "translate(" + labelGroupTransformX + ", " + labelGroupTransformY + ")";
                 this._tickLabelContainer.attr("transform", labelGroupTransform);
+                this._showAllTickMarks();
                 if (!this.showEndTickLabels()) {
                     this._hideEndTickLabels();
                 }
                 this._hideOverflowingTickLabels();
                 this._hideOverlappingTickLabels();
+                if (this._tickLabelPositioning === "bottom" || this._tickLabelPositioning === "top" || this._tickLabelPositioning === "left" || this._tickLabelPositioning === "right") {
+                    this._hideTickMarksWithoutLabel();
+                }
+            };
+            Numeric.prototype._showAllTickMarks = function () {
+                var visibleTickMarks = this._tickMarkContainer.selectAll("." + Axis.AbstractAxis.TICK_MARK_CLASS).each(function () {
+                    d3.select(this).style("visibility", "inherit");
+                });
+            };
+            /**
+             * Hides the Tick Marks which have no corresponding Tick Labels
+             */
+            Numeric.prototype._hideTickMarksWithoutLabel = function () {
+                var visibleTickMarks = this._tickMarkContainer.selectAll("." + Axis.AbstractAxis.TICK_MARK_CLASS);
+                var visibleTickLabels = this._tickLabelContainer.selectAll("." + Axis.AbstractAxis.TICK_LABEL_CLASS).filter(function (d, i) {
+                    var visibility = d3.select(this).style("visibility");
+                    return (visibility === "inherit") || (visibility === "visible");
+                });
+                var labelNumbersShown = [];
+                visibleTickLabels.each(function (labelNumber) { return labelNumbersShown.push(labelNumber); });
+                visibleTickMarks.each(function (e, i) {
+                    if (labelNumbersShown.indexOf(e) === -1) {
+                        d3.select(this).style("visibility", "hidden");
+                    }
+                });
             };
             Numeric.prototype.tickLabelPosition = function (position) {
                 if (position == null) {
@@ -5130,6 +5034,83 @@ var Plottable;
                 else {
                     throw new Error("Attempt to show " + orientation + " tick label on a " + (this._isHorizontal() ? "horizontal" : "vertical") + " axis");
                 }
+            };
+            Numeric.prototype._hideEndTickLabels = function () {
+                var boundingBox = this._boundingBox.node().getBoundingClientRect();
+                var tickLabels = this._tickLabelContainer.selectAll("." + Axis.AbstractAxis.TICK_LABEL_CLASS);
+                if (tickLabels[0].length === 0) {
+                    return;
+                }
+                var firstTickLabel = tickLabels[0][0];
+                if (!Plottable._Util.DOM.boxIsInside(firstTickLabel.getBoundingClientRect(), boundingBox)) {
+                    d3.select(firstTickLabel).style("visibility", "hidden");
+                }
+                var lastTickLabel = tickLabels[0][tickLabels[0].length - 1];
+                if (!Plottable._Util.DOM.boxIsInside(lastTickLabel.getBoundingClientRect(), boundingBox)) {
+                    d3.select(lastTickLabel).style("visibility", "hidden");
+                }
+            };
+            // Responsible for hiding any tick labels that break out of the bounding container
+            Numeric.prototype._hideOverflowingTickLabels = function () {
+                var boundingBox = this._boundingBox.node().getBoundingClientRect();
+                var tickLabels = this._tickLabelContainer.selectAll("." + Axis.AbstractAxis.TICK_LABEL_CLASS);
+                if (tickLabels.empty()) {
+                    return;
+                }
+                tickLabels.each(function (d, i) {
+                    if (!Plottable._Util.DOM.boxIsInside(this.getBoundingClientRect(), boundingBox)) {
+                        d3.select(this).style("visibility", "hidden");
+                    }
+                });
+            };
+            Numeric.prototype._hideOverlappingTickLabels = function () {
+                var visibleTickLabels = this._tickLabelContainer.selectAll("." + Axis.AbstractAxis.TICK_LABEL_CLASS).filter(function (d, i) {
+                    var visibility = d3.select(this).style("visibility");
+                    return (visibility === "inherit") || (visibility === "visible");
+                });
+                var lastLabelClientRect;
+                var visibleTickLabelRects = visibleTickLabels[0].map(function (label) { return label.getBoundingClientRect(); });
+                var interval = 1;
+                while (!this._hasOverlapWithInterval(interval, visibleTickLabelRects) && interval < visibleTickLabelRects.length) {
+                    interval += 1;
+                }
+                visibleTickLabels.each(function (d, i) {
+                    var tickLabel = d3.select(this);
+                    if (i % interval !== 0) {
+                        tickLabel.style("visibility", "hidden");
+                    }
+                });
+            };
+            /**
+             * The method is responsible for evenly spacing the labels on the axis.
+             * @return test to see if taking every `interval` recrangle from `rects`
+             *         will result in labels not overlapping
+             *
+             * For top, bottom, left, right positioning of the thicks, we want the padding
+             * between the labels to be 3x, such that the label will be  `padding` distance
+             * from the tick and 2 * `padding` distance (or more) from the next tick
+             *
+             */
+            Numeric.prototype._hasOverlapWithInterval = function (interval, rects) {
+                var padding = this.tickLabelPadding();
+                if (this._tickLabelPositioning === "bottom" || this._tickLabelPositioning === "top" || this._tickLabelPositioning === "left" || this._tickLabelPositioning === "right") {
+                    padding *= 3;
+                }
+                for (var i = 0; i < rects.length - (interval); i += interval) {
+                    var currRect = rects[i];
+                    var nextRect = rects[i + interval];
+                    if (this._isHorizontal()) {
+                        if (currRect.right + padding >= nextRect.left) {
+                            return false;
+                        }
+                    }
+                    else {
+                        if (currRect.top - padding <= nextRect.bottom) {
+                            return false;
+                        }
+                    }
+                }
+                return true;
             };
             return Numeric;
         })(Axis.AbstractAxis);
@@ -6112,7 +6093,9 @@ var Plottable;
                 this.classed("table", true);
                 rows.forEach(function (row, rowIndex) {
                     row.forEach(function (component, colIndex) {
-                        _this.addComponent(rowIndex, colIndex, component);
+                        if (component != null) {
+                            _this.addComponent(rowIndex, colIndex, component);
+                        }
                     });
                 });
             }
@@ -6139,9 +6122,11 @@ var Plottable;
              * @returns {Table} The calling Table.
              */
             Table.prototype.addComponent = function (row, col, component) {
+                if (component == null) {
+                    throw Error("Cannot add null to a table cell");
+                }
                 var currentComponent = this._rows[row] && this._rows[row][col];
                 if (currentComponent) {
-                    currentComponent.detach();
                     component = component.above(currentComponent);
                 }
                 if (this._addComponent(component)) {
@@ -8484,12 +8469,12 @@ var Plottable;
                 var domainKeys = this._getDomainKeys();
                 var positiveDataMapArray = dataMapArray.map(function (dataMap) {
                     return Plottable._Util.Methods.populateMap(domainKeys, function (domainKey) {
-                        return { key: domainKey, value: Math.max(0, dataMap.get(domainKey).value) };
+                        return { key: domainKey, value: Math.max(0, dataMap.get(domainKey).value) || 0 };
                     });
                 });
                 var negativeDataMapArray = dataMapArray.map(function (dataMap) {
                     return Plottable._Util.Methods.populateMap(domainKeys, function (domainKey) {
-                        return { key: domainKey, value: Math.min(dataMap.get(domainKey).value, 0) };
+                        return { key: domainKey, value: Math.min(dataMap.get(domainKey).value, 0) || 0 };
                     });
                 });
                 this._setDatasetStackOffsets(this._stack(positiveDataMapArray), this._stack(negativeDataMapArray));
@@ -9368,7 +9353,6 @@ var Plottable;
                 var _this = this;
                 _super.call(this);
                 this.translator = Plottable._Util.ClientToSVGTranslator.getTranslator(svg);
-                this._lastTouchPosition = { x: -1, y: -1 };
                 this._startBroadcaster = new Plottable.Core.Broadcaster(this);
                 this._event2Callback["touchstart"] = function (e) { return _this._measureAndBroadcast(e, _this._startBroadcaster); };
                 this._moveBroadcaster = new Plottable.Core.Broadcaster(this);
@@ -9394,7 +9378,7 @@ var Plottable;
                 return dispatcher;
             };
             Touch.prototype._getWrappedCallback = function (callback) {
-                return function (td, p, e) { return callback(p, e); };
+                return function (td, ids, idToPoint, e) { return callback(ids, idToPoint, e); };
             };
             /**
              * Registers a callback to be called whenever a touch starts,
@@ -9446,20 +9430,22 @@ var Plottable;
              * calls broadcast() on the supplied Broadcaster.
              */
             Touch.prototype._measureAndBroadcast = function (e, b) {
-                var touch = e.changedTouches[0];
-                var newTouchPosition = this.translator.computePosition(touch.clientX, touch.clientY);
-                if (newTouchPosition != null) {
-                    this._lastTouchPosition = newTouchPosition;
-                    b.broadcast(this.getLastTouchPosition(), e);
+                var touches = e.changedTouches;
+                var touchPositions = {};
+                var touchIdentifiers = [];
+                for (var i = 0; i < touches.length; i++) {
+                    var touch = touches[i];
+                    var touchID = touch.identifier;
+                    var newTouchPosition = this.translator.computePosition(touch.clientX, touch.clientY);
+                    if (newTouchPosition != null) {
+                        touchPositions[touchID] = newTouchPosition;
+                        touchIdentifiers.push(touchID);
+                    }
                 }
-            };
-            /**
-             * Returns the last computed Touch position.
-             *
-             * @return {Point} The last known Touch position in <svg> coordinate space.
-             */
-            Touch.prototype.getLastTouchPosition = function () {
-                return this._lastTouchPosition;
+                ;
+                if (touchIdentifiers.length > 0) {
+                    b.broadcast(touchIdentifiers, touchPositions, e);
+                }
             };
             /**
              * Dispatcher.Touch calls callbacks when touch events occur.
@@ -9617,8 +9603,8 @@ var Plottable;
                 this._mouseDispatcher.onMouseDown("Interaction.Click" + this.getID(), function (p) { return _this._handleClickDown(p); });
                 this._mouseDispatcher.onMouseUp("Interaction.Click" + this.getID(), function (p) { return _this._handleClickUp(p); });
                 this._touchDispatcher = Plottable.Dispatcher.Touch.getDispatcher(component.content().node());
-                this._touchDispatcher.onTouchStart("Interaction.Click" + this.getID(), function (p) { return _this._handleClickDown(p); });
-                this._touchDispatcher.onTouchEnd("Interaction.Click" + this.getID(), function (p) { return _this._handleClickUp(p); });
+                this._touchDispatcher.onTouchStart("Interaction.Click" + this.getID(), function (ids, idToPoint) { return _this._handleClickDown(idToPoint[ids[0]]); });
+                this._touchDispatcher.onTouchEnd("Interaction.Click" + this.getID(), function (ids, idToPoint) { return _this._handleClickUp(idToPoint[ids[0]]); });
             };
             Click.prototype._handleClickDown = function (p) {
                 var translatedPoint = this._translateToComponentSpace(p);
@@ -9765,7 +9751,7 @@ var Plottable;
                 this._mouseDispatcher = Plottable.Dispatcher.Mouse.getDispatcher(this._componentToListenTo.content().node());
                 this._mouseDispatcher.onMouseMove("Interaction.Pointer" + this.getID(), function (p) { return _this._handlePointerEvent(p); });
                 this._touchDispatcher = Plottable.Dispatcher.Touch.getDispatcher(this._componentToListenTo.content().node());
-                this._touchDispatcher.onTouchStart("Interaction.Pointer" + this.getID(), function (p) { return _this._handlePointerEvent(p); });
+                this._touchDispatcher.onTouchStart("Interaction.Pointer" + this.getID(), function (ids, idToPoint) { return _this._handlePointerEvent(idToPoint[ids[0]]); });
             };
             Pointer.prototype._handlePointerEvent = function (p) {
                 var translatedP = this._translateToComponentSpace(p);
@@ -9924,9 +9910,9 @@ var Plottable;
                 this._mouseDispatcher.onMouseMove("Interaction.Drag" + this.getID(), function (p, e) { return _this._doDrag(p, e); });
                 this._mouseDispatcher.onMouseUp("Interaction.Drag" + this.getID(), function (p, e) { return _this._endDrag(p, e); });
                 this._touchDispatcher = Plottable.Dispatcher.Touch.getDispatcher(this._componentToListenTo.content().node());
-                this._touchDispatcher.onTouchStart("Interaction.Drag" + this.getID(), function (p, e) { return _this._startDrag(p, e); });
-                this._touchDispatcher.onTouchMove("Interaction.Drag" + this.getID(), function (p, e) { return _this._doDrag(p, e); });
-                this._touchDispatcher.onTouchEnd("Interaction.Drag" + this.getID(), function (p, e) { return _this._endDrag(p, e); });
+                this._touchDispatcher.onTouchStart("Interaction.Drag" + this.getID(), function (ids, idToPoint, e) { return _this._startDrag(idToPoint[ids[0]], e); });
+                this._touchDispatcher.onTouchMove("Interaction.Drag" + this.getID(), function (ids, idToPoint, e) { return _this._doDrag(idToPoint[ids[0]], e); });
+                this._touchDispatcher.onTouchEnd("Interaction.Drag" + this.getID(), function (ids, idToPoint, e) { return _this._endDrag(idToPoint[ids[0]], e); });
             };
             Drag.prototype._translateAndConstrain = function (p) {
                 var translatedP = this._translateToComponentSpace(p);
@@ -9972,11 +9958,11 @@ var Plottable;
                     }
                 }
             };
-            Drag.prototype.constrain = function (doConstrain) {
-                if (doConstrain == null) {
+            Drag.prototype.constrainToComponent = function (constrain) {
+                if (constrain == null) {
                     return this._constrain;
                 }
-                this._constrain = doConstrain;
+                this._constrain = constrain;
                 return this;
             };
             Drag.prototype.onDragStart = function (cb) {
@@ -10044,7 +10030,7 @@ var Plottable;
                 this._mouseDispatcher = Plottable.Dispatcher.Mouse.getDispatcher(this._componentToListenTo._element.node());
                 this._mouseDispatcher.onMouseMove("hover" + this.getID(), function (p) { return _this._handlePointerEvent(p); });
                 this._touchDispatcher = Plottable.Dispatcher.Touch.getDispatcher(this._componentToListenTo._element.node());
-                this._touchDispatcher.onTouchStart("hover" + this.getID(), function (p, e) { return _this._handlePointerEvent(p); });
+                this._touchDispatcher.onTouchStart("hover" + this.getID(), function (ids, idToPoint) { return _this._handlePointerEvent(idToPoint[ids[0]]); });
             };
             Hover.prototype._handlePointerEvent = function (p) {
                 p = this._translateToComponentSpace(p);

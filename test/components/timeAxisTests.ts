@@ -179,7 +179,110 @@ describe("TimeAxis", () => {
 
     assert.strictEqual(twoTierSize, oneTierSize * 2, "two-tier axis is twice as tall as one-tier axis");
 
+
+    xAxis.axisConfigurations([
+        [
+           {interval: d3.time.day, step: 2, formatter: Plottable.Formatters.time("%a %e")}
+        ],
+    ]);
+
+    var initialTierSize: number = xAxis.height();
+
+    assert.strictEqual(initialTierSize, oneTierSize,
+                      "2-tier time axis should shrink when presented new configuration with 1 tier");
+
     svg.remove();
+  });
+
+  it("three tier time axis should be possible", () => {
+
+    var svg = generateSVG();
+    var xScale = new Plottable.Scale.Time();
+    xScale.domain([new Date("2013-03-23 12:00"), new Date("2013-04-03 0:00")]);
+    var xAxis = new Plottable.Axis.Time(xScale, "bottom");
+    xAxis.gutter(0);
+
+    xAxis.renderTo(svg);
+
+    xAxis.axisConfigurations([
+        [
+           {interval: d3.time.day, step: 2, formatter: Plottable.Formatters.time("%a %e")},
+           {interval: d3.time.day, step: 2, formatter: Plottable.Formatters.time("%a %e")},
+        ],
+    ]);
+
+    var twoTierAxisHeight: number = xAxis.height();
+
+    xAxis.axisConfigurations([
+        [
+           {interval: d3.time.day, step: 2, formatter: Plottable.Formatters.time("%a %e")},
+           {interval: d3.time.day, step: 2, formatter: Plottable.Formatters.time("%a %e")},
+           {interval: d3.time.day, step: 2, formatter: Plottable.Formatters.time("%a %e")},
+        ],
+    ]);
+
+    var threeTierAxisHeight: number = xAxis.height();
+
+    assert.strictEqual(threeTierAxisHeight, twoTierAxisHeight * 3 / 2,
+      "three tier height is 3/2 bigger than the two tier height");
+
+    svg.remove();
+
+  });
+
+  it("many tier Axis.Time should not exceed the drawing area", () => {
+    var svg = generateSVG(400, 50);
+    var xScale = new Plottable.Scale.Time();
+    xScale.domain([new Date("2013-03-23 12:00"), new Date("2013-04-03 0:00")]);
+    var xAxis = new Plottable.Axis.Time(xScale, "bottom");
+
+    var tiersToCreate = 15;
+    var configuration = Array.apply(null, Array(tiersToCreate)).map(() => {
+      return {interval: d3.time.day, step: 2, formatter: Plottable.Formatters.time("%a %e") };
+    });
+    xAxis.axisConfigurations([configuration]);
+
+    xAxis.renderTo(svg);
+
+    var axisBoundingRect: ClientRect = (<any> xAxis)._element.select(".bounding-box")[0][0].getBoundingClientRect();
+
+    var isInsideAxisBoundingRect = function(innerRect: ClientRect) {
+      return Math.floor(innerRect.bottom)     <= Math.ceil(axisBoundingRect.bottom) + window.Pixel_CloseTo_Requirement &&
+             Math.floor(axisBoundingRect.top) <= Math.ceil(innerRect.top) + window.Pixel_CloseTo_Requirement;
+    };
+
+    var numberOfVisibleTiers = (<any> xAxis)._element
+      .selectAll("." + Plottable.Axis.Time.TIME_AXIS_TIER_CLASS)
+      .each(function(e: any, i: number) {
+        var sel = d3.select(this);
+        var visibility = sel.style("visibility");
+
+        //HACKHACK window.getComputedStyle() is behaving weirdly in IE9. Further investigation required
+        if (visibility === "inherit") {
+          visibility = getStyleInIE9(sel[0][0]);
+        }
+        if (isInsideAxisBoundingRect(sel[0][0].getBoundingClientRect())) {
+          assert.strictEqual(visibility, "visible",
+            "time axis tiers inside the axis should be visible. Tier #" + (i + 1));
+        } else {
+          assert.strictEqual(visibility, "hidden",
+            "time axis tiers inside the axis should not be visible. Tier #" + (i + 1));
+        }
+      });
+
+    svg.remove();
+
+    function getStyleInIE9(element: any) {
+      while (element) {
+        var visibility = window.getComputedStyle(element).visibility;
+        if (visibility !== "inherit") {
+          return visibility;
+        }
+        element = element.parentNode;
+      }
+      return "visible";
+    }
+
   });
 
 });

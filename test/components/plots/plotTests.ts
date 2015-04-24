@@ -374,7 +374,7 @@ describe("Plots", () => {
 
       it("removeDataset functions on inputs that are data arrays, not datasets", () => {
         var a1 = ["foo", "bar"];
-        var a2 = [1,2,3];
+        var a2 = [1, 2, 3];
         plot.addDataset(a1);
         plot.addDataset(a2);
         assert.lengthOf(plot.datasets(), 4, "there are four datasets");
@@ -386,14 +386,14 @@ describe("Plots", () => {
       });
 
       it("removeDataset behaves appropriately when the key 'undefined' is used", () => {
-        var a = [1,2,3];
+        var a = [1, 2, 3];
         plot.addDataset("undefined", a);
         assert.lengthOf(plot.datasets(), 3, "there are three datasets initially");
         plot.removeDataset("foofoofoofoofoofoofoofoo");
         assert.lengthOf(plot.datasets(), 3, "there are three datasets after bad key removal");
         plot.removeDataset(undefined);
         assert.lengthOf(plot.datasets(), 3, "there are three datasets after removing `undefined`");
-        plot.removeDataset([94,93,92]);
+        plot.removeDataset([94, 93, 92]);
         assert.lengthOf(plot.datasets(), 3, "there are three datasets after removing random dataset");
         plot.removeDataset("undefined");
         assert.lengthOf(plot.datasets(), 2, "the dataset called 'undefined' could be removed");
@@ -413,8 +413,8 @@ describe("Plots", () => {
       var scale1 = new Plottable.Scale.Linear();
       var scale2 = new Plottable.Scale.Linear();
 
-      var d1 = new Plottable.Dataset([1,2,3]);
-      var d2 = new Plottable.Dataset([4,99,999]);
+      var d1 = new Plottable.Dataset([1, 2, 3]);
+      var d2 = new Plottable.Dataset([4, 99, 999]);
       var d3 = new Plottable.Dataset([-1, -2, -3]);
 
       var id = (d: number) => d;

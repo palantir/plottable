@@ -8,8 +8,8 @@ function generateBasicTable(nRows: number, nCols: number) {
   var table = new Plottable.Component.Table();
   var rows: Plottable.Component.AbstractComponent[][] = [];
   var components: Plottable.Component.AbstractComponent[] = [];
-  for(var i = 0; i<nRows; i++) {
-    for(var j = 0; j<nCols; j++) {
+  for(var i = 0; i < nRows; i++) {
+    for(var j = 0; j < nCols; j++) {
       var r = new Plottable.Component.AbstractComponent();
       table.addComponent(i, j, r);
       components.push(r);
@@ -27,7 +27,7 @@ describe("Tables", () => {
   it("padTableToSize works properly", () => {
     var t = new Plottable.Component.Table();
     assert.deepEqual((<any> t)._rows, [], "the table rows is an empty list");
-    (<any> t)._padTableToSize(1,1);
+    (<any> t)._padTableToSize(1, 1);
     var rows = (<any> t)._rows;
     var row = rows[0];
     var firstComponent = row[0];
@@ -35,7 +35,7 @@ describe("Tables", () => {
     assert.lengthOf(row, 1, "the row has one element");
     assert.isNull(firstComponent, "the row only has a null component");
 
-    (<any> t)._padTableToSize(5,2);
+    (<any> t)._padTableToSize(5, 2);
     assert.lengthOf(rows, 5, "there are five rows");
     rows.forEach((r: Plottable.Component.AbstractComponent[]) => assert.lengthOf(r, 2, "there are two columsn per row"));
     assert.equal(rows[0][0], firstComponent, "the first component is unchanged");
@@ -68,7 +68,7 @@ describe("Tables", () => {
     assert.isNull(rows[1][0], "component at (1, 0) is null");
   });
 
-  it("Add a component where one already exists creates a new group", () => {
+  it("add a component where one already exists creates a new group", () => {
     var c1 = new Plottable.Component.AbstractComponent();
     var c2 = new Plottable.Component.AbstractComponent();
     var c3 = new Plottable.Component.AbstractComponent();
@@ -86,7 +86,7 @@ describe("Tables", () => {
     assert.equal(components[1], c3, "Second element in the group at (0, 2) should be c3");
   });
 
-  it("Add a component where a group already exists adds the component to the group", () => {
+  it("add a component where a group already exists adds the component to the group", () => {
     var c1 = new Plottable.Component.AbstractComponent();
     var c2 = new Plottable.Component.AbstractComponent();
     var grp = new Plottable.Component.Group([c1, c2]);
@@ -106,6 +106,13 @@ describe("Tables", () => {
     assert.equal(components[2], c3, "The Component was added to the existing Group");
   });
 
+  it("adding null to a table cell should throw an error", () => {
+    var c1 = new Plottable.Component.AbstractComponent();
+    var t = new Plottable.Component.Table([[c1]]);
+
+    assert.throw(() => t.addComponent(0, 0, null), "Cannot add null to a table cell");
+  });
+
   it("addComponent works even if a component is added with a high column and low row index", () => {
     // Solves #180, a weird bug
     var t = new Plottable.Component.Table();
@@ -117,7 +124,7 @@ describe("Tables", () => {
   });
 
   it("basic table with 2 rows 2 cols lays out properly", () => {
-    var tableAndcomponents = generateBasicTable(2,2);
+    var tableAndcomponents = generateBasicTable(2, 2);
     var table = tableAndcomponents.table;
     var components = tableAndcomponents.components;
 
@@ -139,10 +146,10 @@ describe("Tables", () => {
   });
 
   it("table with 2 rows 2 cols and margin/padding lays out properly", () => {
-    var tableAndcomponents = generateBasicTable(2,2);
+    var tableAndcomponents = generateBasicTable(2, 2);
     var table = tableAndcomponents.table;
     var components = tableAndcomponents.components;
-    table.padding(5,5);
+    table.padding(5, 5);
 
     var svg = generateSVG(415, 415);
     table.renderTo(svg);
@@ -199,7 +206,7 @@ describe("Tables", () => {
   });
 
   it("table space fixity calculates properly", () => {
-    var tableAndcomponents = generateBasicTable(3,3);
+    var tableAndcomponents = generateBasicTable(3, 3);
     var table = tableAndcomponents.table;
     var components = tableAndcomponents.components;
     components.forEach((c) => fixComponentSize(c, 10, 10));

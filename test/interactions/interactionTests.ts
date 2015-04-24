@@ -41,14 +41,14 @@ describe("Interactions", () => {
       function getSlope(scale: Plottable.Scale.Linear) {
         var range = scale.range();
         var domain = scale.domain();
-        return (domain[1]-domain[0])/(range[1]-range[0]);
+        return (domain[1] - domain[0]) / (range[1] - range[0]);
       };
 
       var expectedXDragChange = -dragDistancePixelX * getSlope(xScale);
       var expectedYDragChange = -dragDistancePixelY * getSlope(yScale);
 
-      assert.closeTo(xDomainAfter[0]-xDomainBefore[0], expectedXDragChange, 1, "x domain changed by the correct amount");
-      assert.closeTo(yDomainAfter[0]-yDomainBefore[0], expectedYDragChange, 1, "y domain changed by the correct amount");
+      assert.closeTo(xDomainAfter[0] - xDomainBefore[0], expectedXDragChange, 1, "x domain changed by the correct amount");
+      assert.closeTo(yDomainAfter[0] - yDomainBefore[0], expectedYDragChange, 1, "y domain changed by the correct amount");
 
       svg.remove();
     });

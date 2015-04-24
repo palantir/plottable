@@ -43,7 +43,7 @@ describe("Plots", () => {
       dataset1 = new Plottable.Dataset(data1);
       dataset2 = new Plottable.Dataset(data2);
 
-      renderer = new Plottable.Plot.ClusteredBar<string,number>(xScale, yScale);
+      renderer = new Plottable.Plot.ClusteredBar<string, number>(xScale, yScale);
       renderer.addDataset(dataset1);
       renderer.addDataset(dataset2);
       renderer.baseline(0);
@@ -124,7 +124,7 @@ describe("Plots", () => {
       dataset1 = new Plottable.Dataset(data1);
       dataset2 = new Plottable.Dataset(data2);
 
-      renderer = new Plottable.Plot.ClusteredBar<number,string>(xScale, yScale, false);
+      renderer = new Plottable.Plot.ClusteredBar<number, string>(xScale, yScale, false);
       renderer.addDataset(data1);
       renderer.addDataset(data2);
       renderer.baseline(0);
@@ -192,7 +192,7 @@ describe("Plots", () => {
       var data2 = [{x: "A", y: 2}, {x: "B", y: 4}];
       var data3 = [{x: "B", y: 15}, {x: "C", y: 15}];
 
-      plot = new Plottable.Plot.ClusteredBar<string,number>(xScale, yScale);
+      plot = new Plottable.Plot.ClusteredBar<string, number>(xScale, yScale);
       plot.addDataset(data1);
       plot.addDataset(data2);
       plot.addDataset(data3);

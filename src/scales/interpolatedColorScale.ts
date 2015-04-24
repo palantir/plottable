@@ -108,7 +108,7 @@ export module Scale {
           t = Math.max(0, Math.min(1, t));
 
           // Determine indices for colors
-          var tScaled = t*(colors.length - 1);
+          var tScaled = t * (colors.length - 1);
           var i0      = Math.floor(tScaled);
           var i1      = Math.ceil(tScaled);
           var frac    = (tScaled - i0);

@@ -117,16 +117,16 @@ function assertWidthHeight(el: D3.Selection, widthExpected: number, heightExpect
 }
 
 
-function makeLinearSeries(n: number): {x: number; y: number;}[] {
+function makeLinearSeries(n: number): {x: number; y: number}[] {
   function makePoint(x: number) {
     return {x: x, y: x};
   }
   return d3.range(n).map(makePoint);
 }
 
-function makeQuadraticSeries(n: number): {x: number; y: number;}[] {
+function makeQuadraticSeries(n: number): {x: number; y: number}[] {
   function makeQuadraticPoint(x: number) {
-    return {x: x, y: x*x};
+    return {x: x, y: x * x};
   }
   return d3.range(n).map(makeQuadraticPoint);
 }
@@ -182,25 +182,28 @@ function triggerFakeWheelEvent(type: string, target: D3.Selection, relativeX: nu
   target.node().dispatchEvent(event);
 }
 
-function triggerFakeTouchEvent(type: string, target: D3.Selection, relativeX: number, relativeY: number) {
+function triggerFakeTouchEvent(type: string, target: D3.Selection, touchPoints: Plottable.Point[], ids: number[] = []) {
   var targetNode = target.node();
   var clientRect = targetNode.getBoundingClientRect();
-  var xPos = clientRect.left + relativeX;
-  var yPos = clientRect.top + relativeY;
   var e = <TouchEvent> document.createEvent("UIEvent");
   e.initUIEvent(type, true, true, window, 1);
-  var fakeTouch: Touch = {
-    identifier: 0,
-    target: targetNode,
-    screenX: xPos,
-    screenY: yPos,
-    clientX: xPos,
-    clientY: yPos,
-    pageX: xPos,
-    pageY: yPos
-  };
+  var fakeTouchList: any = [];
 
-  var fakeTouchList: any = [fakeTouch];
+  touchPoints.forEach((touchPoint, i) => {
+    var xPos = clientRect.left + touchPoint.x;
+    var yPos = clientRect.top + touchPoint.y;
+    var identifier = ids[i] == null ? 0 : ids[i];
+    fakeTouchList.push( {
+      identifier: identifier,
+      target: targetNode,
+      screenX: xPos,
+      screenY: yPos,
+      clientX: xPos,
+      clientY: yPos,
+      pageX: xPos,
+      pageY: yPos
+    });
+  });
   fakeTouchList.item = (index: number) => fakeTouchList[index];
   e.touches = <TouchList> fakeTouchList;
   e.targetTouches = <TouchList> fakeTouchList;

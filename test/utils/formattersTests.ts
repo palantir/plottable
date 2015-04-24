@@ -88,7 +88,7 @@ describe("Formatters", () => {
     it("can change the type and position of the currency symbol", () => {
       var centsFormatter = Plottable.Formatters.currency(0, "c", false);
       var result = centsFormatter(1);
-      assert.strictEqual(result.charAt(result.length-1), "c", "The specified currency symbol was appended");
+      assert.strictEqual(result.charAt(result.length - 1), "c", "The specified currency symbol was appended");
     });
   });
 
@@ -114,14 +114,14 @@ describe("Formatters", () => {
   });
 
   describe("percentage", () => {
-    it("uses reasonable defaults", ()=> {
+    it("uses reasonable defaults", () => {
       var percentFormatter = Plottable.Formatters.percentage();
       var result = percentFormatter(1);
       assert.strictEqual(result, "100%",
         "the value was multiplied by 100, a percent sign was appended, and no decimal places are shown by default");
     });
 
-    it("can handle float imprecision", ()=> {
+    it("can handle float imprecision", () => {
       var percentFormatter = Plottable.Formatters.percentage();
       var result = percentFormatter(0.07);
       assert.strictEqual(result, "7%", "does not have trailing zeros and is not empty string");
@@ -130,7 +130,7 @@ describe("Formatters", () => {
       assert.strictEqual(result2, "0.35%", "works even if multiplying by 100 does not make it an integer");
     });
 
-    it("onlyShowUnchanged set to false", ()=> {
+    it("onlyShowUnchanged set to false", () => {
       var percentFormatter = Plottable.Formatters.percentage(0);
       var result = percentFormatter(0.075);
       assert.strictEqual(result, "8%", "shows formatter changed value");

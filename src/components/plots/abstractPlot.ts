@@ -167,7 +167,7 @@ export module Plot {
      *
      * @returns {Plot} The calling Plot.
      */
-    public attr(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any,any>) {
+    public attr(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>) {
       return this.project(attrToSet, accessor, scale);
     }
 
