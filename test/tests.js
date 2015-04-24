@@ -9260,13 +9260,6 @@ describe("Dispatchers", function () {
             assert.strictEqual(td1, td2, "returned the existing Dispatcher if called again with same <svg>");
             svg.remove();
         });
-        it("getLastTouchPositions() defaults to have no positions", function () {
-            var svg = generateSVG();
-            var td = Plottable.Dispatcher.Touch.getDispatcher(svg.node());
-            var p = td.getLastTouchPositions();
-            assert.deepEqual(p, [], "returns a value after initialization");
-            svg.remove();
-        });
         it("onTouchStart()", function () {
             var targetWidth = 400, targetHeight = 400;
             var target = generateSVG(targetWidth, targetHeight);

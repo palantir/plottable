@@ -9343,8 +9343,6 @@ var Plottable;
                 var _this = this;
                 _super.call(this);
                 this.translator = Plottable._Util.ClientToSVGTranslator.getTranslator(svg);
-                this._lastTouchPositions = [];
-                this._lastTouchIdentifiers = [];
                 this._startBroadcaster = new Plottable.Core.Broadcaster(this);
                 this._event2Callback["touchstart"] = function (e) { return _this._measureAndBroadcast(e, _this._startBroadcaster); };
                 this._moveBroadcaster = new Plottable.Core.Broadcaster(this);
@@ -9423,37 +9421,21 @@ var Plottable;
              */
             Touch.prototype._measureAndBroadcast = function (e, b) {
                 var touches = e.changedTouches;
-                this._lastTouchPositions = [];
-                this._lastTouchIdentifiers = [];
+                var touchPositions = [];
+                var touchIdentifiers = [];
                 for (var i = 0; i < touches.length; i++) {
                     var touch = touches[i];
                     var touchID = touch.identifier;
                     var newTouchPosition = this.translator.computePosition(touch.clientX, touch.clientY);
                     if (newTouchPosition != null) {
-                        this._lastTouchIdentifiers.push(touchID);
-                        this._lastTouchPositions[touchID] = newTouchPosition;
+                        touchPositions[touchID] = newTouchPosition;
+                        touchIdentifiers.push(touchID);
                     }
                 }
                 ;
-                if (this.getLastTouchPositions().length > 0) {
-                    b.broadcast(this.getLastTouchPositions(), this.getLastTouchIdentifiers(), e);
+                if (touchPositions.length > 0) {
+                    b.broadcast(touchPositions, touchIdentifiers, e);
                 }
-            };
-            /**
-             * Returns the last computed Touch positions.
-             *
-             * @return {Point} The last known Touch position in <svg> coordinate space.
-             */
-            Touch.prototype.getLastTouchPositions = function () {
-                return this._lastTouchPositions;
-            };
-            /**
-             * Returns the last computed Touch identifiers.
-             *
-             * @return {Point} The last known Touch position in <svg> coordinate space.
-             */
-            Touch.prototype.getLastTouchIdentifiers = function () {
-                return this._lastTouchIdentifiers;
             };
             /**
              * Dispatcher.Touch calls callbacks when touch events occur.
@@ -9760,7 +9742,6 @@ var Plottable;
                 this._mouseDispatcher = Plottable.Dispatcher.Mouse.getDispatcher(this._componentToListenTo.content().node());
                 this._mouseDispatcher.onMouseMove("Interaction.Pointer" + this.getID(), function (p) { return _this._handlePointerEvent(p); });
                 this._touchDispatcher = Plottable.Dispatcher.Touch.getDispatcher(this._componentToListenTo.content().node());
-                //TODO Deal with no point case
                 this._touchDispatcher.onTouchStart("Interaction.Pointer" + this.getID(), function (points, ids) { return _this._handlePointerEvent(points[ids[0]]); });
             };
             Pointer.prototype._handlePointerEvent = function (p) {
@@ -10033,7 +10014,6 @@ var Plottable;
                 this._mouseDispatcher = Plottable.Dispatcher.Mouse.getDispatcher(this._componentToListenTo._element.node());
                 this._mouseDispatcher.onMouseMove("hover" + this.getID(), function (p) { return _this._handlePointerEvent(p); });
                 this._touchDispatcher = Plottable.Dispatcher.Touch.getDispatcher(this._componentToListenTo._element.node());
-                //TODO Deal with no point case
                 this._touchDispatcher.onTouchStart("hover" + this.getID(), function (points, ids) { return _this._handlePointerEvent(points[ids[0]]); });
             };
             Hover.prototype._handlePointerEvent = function (p) {

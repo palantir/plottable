@@ -15,16 +15,6 @@ describe("Dispatchers", () => {
       svg.remove();
     });
 
-    it("getLastTouchPositions() defaults to have no positions", () => {
-      var svg = generateSVG();
-
-      var td = Plottable.Dispatcher.Touch.getDispatcher(<SVGElement> svg.node());
-      var p = td.getLastTouchPositions();
-      assert.deepEqual(p, [], "returns a value after initialization");
-
-      svg.remove();
-    });
-
     it("onTouchStart()", () => {
       var targetWidth = 400, targetHeight = 400;
       var target = generateSVG(targetWidth, targetHeight);
