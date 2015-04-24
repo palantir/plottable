@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Plot {
-  export class Bar<X,Y> extends AbstractXYPlot<X,Y> implements Interaction.Hoverable {
+  export class Bar<X, Y> extends AbstractXYPlot<X, Y> implements Interaction.Hoverable {
     protected static _BarAlignmentToFactor: {[alignment: string]: number} = {"left": 0, "center": 0.5, "right": 1};
     protected static _DEFAULT_WIDTH = 10;
     private static _BAR_WIDTH_RATIO = 0.95;
@@ -105,7 +105,7 @@ export module Plot {
      *
      * @returns {Bar} The calling plot.
      */
-    public barLabelsEnabled(enabled: boolean): Bar<X,Y>;
+    public barLabelsEnabled(enabled: boolean): Bar<X, Y>;
     public barLabelsEnabled(enabled?: boolean): any {
       if (enabled === undefined) {
         return this._barLabelsEnabled;
@@ -128,7 +128,7 @@ export module Plot {
      *
      * @returns {Bar} The calling plot.
      */
-    public barLabelFormatter(formatter: Formatter): Bar<X,Y>;
+    public barLabelFormatter(formatter: Formatter): Bar<X, Y>;
     public barLabelFormatter(formatter?: Formatter): any {
       if (formatter == null) {
         return this._barLabelFormatter;
@@ -308,7 +308,7 @@ export module Plot {
     }
 
     protected _additionalPaint(time: number) {
-      var primaryScale: Scale.AbstractScale<any,number> = this._isVertical ? this._yScale : this._xScale;
+      var primaryScale: Scale.AbstractScale<any, number> = this._isVertical ? this._yScale : this._xScale;
       var scaledBaseline = primaryScale.scale(this._baselineValue);
 
       var baselineAttr: any = {
@@ -345,7 +345,7 @@ export module Plot {
       var drawSteps: _Drawer.DrawStep[] = [];
       if (this._dataChanged && this._animate) {
         var resetAttrToProjector = this._generateAttrToProjector();
-        var primaryScale: Scale.AbstractScale<any,number> = this._isVertical ? this._yScale : this._xScale;
+        var primaryScale: Scale.AbstractScale<any, number> = this._isVertical ? this._yScale : this._xScale;
         var scaledBaseline = primaryScale.scale(this._baselineValue);
         var positionAttr = this._isVertical ? "y" : "x";
         var dimensionAttr = this._isVertical ? "height" : "width";
@@ -361,8 +361,8 @@ export module Plot {
       // Primary scale/direction: the "length" of the bars
       // Secondary scale/direction: the "width" of the bars
       var attrToProjector = super._generateAttrToProjector();
-      var primaryScale: Scale.AbstractScale<any,number>    = this._isVertical ? this._yScale : this._xScale;
-      var secondaryScale: Scale.AbstractScale<any,number>  = this._isVertical ? this._xScale : this._yScale;
+      var primaryScale: Scale.AbstractScale<any, number>    = this._isVertical ? this._yScale : this._xScale;
+      var secondaryScale: Scale.AbstractScale<any, number>  = this._isVertical ? this._xScale : this._yScale;
       var primaryAttr     = this._isVertical ? "y" : "x";
       var secondaryAttr   = this._isVertical ? "x" : "y";
       var scaledBaseline = primaryScale.scale(this._baselineValue);
@@ -418,7 +418,7 @@ export module Plot {
      */
     protected _getBarPixelWidth(): number {
       var barPixelWidth: number;
-      var barScale: Scale.AbstractScale<any,number>  = this._isVertical ? this._xScale : this._yScale;
+      var barScale: Scale.AbstractScale<any, number>  = this._isVertical ? this._xScale : this._yScale;
       if (barScale instanceof Plottable.Scale.Category) {
         barPixelWidth = (<Plottable.Scale.Category> barScale).rangeBand();
       } else {

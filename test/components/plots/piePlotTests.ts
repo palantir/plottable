@@ -4,6 +4,19 @@ var assert = chai.assert;
 
 describe("Plots", () => {
   describe("PiePlot", () => {
+    // HACKHACK #1798: beforeEach being used below
+    it("renders correctly with no data", () => {
+      var svg = generateSVG(400, 400);
+      var plot = new Plottable.Plot.Pie();
+      plot.project("value", (d: any) => d.value);
+      assert.doesNotThrow(() => plot.renderTo(svg), Error);
+      assert.strictEqual(plot.width(), 400, "was allocated width");
+      assert.strictEqual(plot.height(), 400, "was allocated height");
+      svg.remove();
+    });
+  });
+
+  describe("PiePlot", () => {
     var svg: D3.Selection;
     var simpleDataset: Plottable.Dataset;
     var simpleData: any[];
@@ -131,7 +144,7 @@ describe("Plots", () => {
 
     describe("getAllSelections", () => {
 
-      it("retrieves all dataset selections with no args",() => {
+      it("retrieves all dataset selections with no args", () => {
         var allSectors = piePlot.getAllSelections();
         var allSectors2 = piePlot.getAllSelections((<any> piePlot)._datasetKeysInOrder);
         assert.deepEqual(allSectors, allSectors2, "all sectors retrieved");
@@ -139,7 +152,7 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("retrieves correct selections (array arg)",() => {
+      it("retrieves correct selections (array arg)", () => {
         var allSectors = piePlot.getAllSelections(["simpleDataset"]);
         assert.strictEqual(allSectors.size(), 2, "all sectors retrieved");
         var selectionData = allSectors.data();
@@ -148,7 +161,7 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("retrieves correct selections (string arg)",() => {
+      it("retrieves correct selections (string arg)", () => {
         var allSectors = piePlot.getAllSelections("simpleDataset");
         assert.strictEqual(allSectors.size(), 2, "all sectors retrieved");
         var selectionData = allSectors.data();
@@ -157,7 +170,7 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("skips invalid keys",() => {
+      it("skips invalid keys", () => {
         var allSectors = piePlot.getAllSelections(["whoo"]);
         assert.strictEqual(allSectors.size(), 0, "all sectors retrieved");
 

@@ -35,6 +35,22 @@ describe("Plots", () => {
   });
 
   describe("LinePlot", () => {
+    // HACKHACK #1798: beforeEach being used below
+    it("renders correctly with no data", () => {
+      var svg = generateSVG(400, 400);
+      var xScale = new Plottable.Scale.Linear();
+      var yScale = new Plottable.Scale.Linear();
+      var plot = new Plottable.Plot.Line(xScale, yScale);
+      plot.project("x", (d: any) => d.x, xScale);
+      plot.project("y", (d: any) => d.y, yScale);
+      assert.doesNotThrow(() => plot.renderTo(svg), Error);
+      assert.strictEqual(plot.width(), 400, "was allocated width");
+      assert.strictEqual(plot.height(), 400, "was allocated height");
+      svg.remove();
+    });
+  });
+
+  describe("LinePlot", () => {
     var svg: D3.Selection;
     var xScale: Plottable.Scale.Linear;
     var yScale: Plottable.Scale.Linear;
@@ -194,7 +210,7 @@ describe("Plots", () => {
       svg.remove();
     });
 
-    describe("getAllSelections()",() => {
+    describe("getAllSelections()", () => {
 
       it("retrieves all dataset selections with no args", () => {
         var dataset3 = [
@@ -240,7 +256,7 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("skips invalid keys",() => {
+      it("skips invalid keys", () => {
         var dataset3 = [
           { foo: 0, bar: 1 },
           { foo: 1, bar: 0.95 }

@@ -135,8 +135,8 @@ describe("Dispatchers", () => {
       var callbackWasCalled = false;
       var callback = function(points: Plottable.Point[], ids: number[], e: TouchEvent) {
         callbackWasCalled = true;
-        assert.isNotNull(e, "TouchEvent was passed to the Dispatcher");}
-      ;
+        assert.isNotNull(e, "TouchEvent was passed to the Dispatcher");
+      };
 
       var keyString = "notInDomTest";
       td.onTouchMove(keyString, callback);

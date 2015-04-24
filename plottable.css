@@ -120,12 +120,32 @@ svg.plottable {
   stroke-width: 1px;
 }
 
-.plottable .drag-box {
-  fill: aliceblue;
-  opacity: .7;
-  stroke: #C0C8FF;
-
+.plottable .selection-box-layer .selection-area {
+  fill: black;
+  fill-opacity: 0.03;
+  stroke: #CCC;
 }
+/* DragBoxLayer */
+.plottable .drag-box-layer.x-resizable .drag-edge-lr {
+  cursor: ew-resize;
+}
+.plottable .drag-box-layer.y-resizable .drag-edge-tb {
+  cursor: ns-resize;
+}
+
+.plottable .drag-box-layer.x-resizable.y-resizable .drag-corner-tl {
+  cursor: nwse-resize;
+}
+.plottable .drag-box-layer.x-resizable.y-resizable .drag-corner-tr {
+  cursor: nesw-resize;
+}
+.plottable .drag-box-layer.x-resizable.y-resizable .drag-corner-bl {
+  cursor: nesw-resize;
+}
+.plottable .drag-box-layer.x-resizable.y-resizable .drag-corner-br {
+  cursor: nwse-resize;
+}
+/* /DragBoxLayer */
 
 .plottable .legend text {
   fill: #32313F;
