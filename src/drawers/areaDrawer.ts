@@ -51,7 +51,8 @@ export module _Drawer {
                    .x(xFunction)
                    .y0(y0Function)
                    .y1(y1Function)
-                   .defined(definedFunction);
+                   .defined(definedFunction)
+                   .interpolate(this._interpolationMode);
     }
 
     protected _drawStep(step: AppliedDrawStep) {

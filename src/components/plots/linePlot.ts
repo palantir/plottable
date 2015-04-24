@@ -6,7 +6,7 @@ export module Plot {
     private _hoverDetectionRadius = 15;
     private _hoverTarget: D3.Selection;
     private _defaultStrokeColor: string;
-
+    protected _interpolationMode: string | ((points: number[][]) => string) = "linear";
     protected _yScale: Scale.AbstractQuantitative<number>;
 
     /**
@@ -27,6 +27,29 @@ export module Plot {
       this._defaultStrokeColor = new Scale.Color().range()[0];
     }
 
+    /**
+     * Gets the interpolation mode for the plot.
+     *
+     * @return {string | ((points: number[][]) => string)} The current interpolation named mode or function.
+     */
+    public interpolate(): string | ((points: number[][]) => string);
+    /**
+     * Sets the interpolation mode for the plot.
+     * 
+     * The interpolation mode can either be a named D3 mode (see https://github.com/mbostock/d3/wiki/SVG-Shapes#line_interpolate)
+     * or a function that converts an array of points into an SVG path data string used to display the line.
+     * 
+     * @param {string | ((points: number[][]) => string)} interpolationMode interpolation named mode or function.
+     */
+    public interpolate(interpolationMode: string | ((points: number[][]) => string)): Line<X>;
+    public interpolate(interpolationMode?: any): any {
+      if (interpolationMode === null) {
+        return this._interpolationMode;
+      }
+      this._interpolationMode = interpolationMode;
+      return this;
+    }
+
     protected _setup() {
       super._setup();
       this._hoverTarget = this.foreground().append("circle")
@@ -41,7 +64,7 @@ export module Plot {
     }
 
     protected _getDrawer(key: string) {
-      return new Plottable._Drawer.Line(key);
+      return new Plottable._Drawer.Line(key).interpolationMode(this._interpolationMode);
     }
 
     protected _getResetYFunction() {
