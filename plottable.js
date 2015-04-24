@@ -708,6 +708,70 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
+    var Utils;
+    (function (Utils) {
+        var Set = (function () {
+            function Set() {
+                this._values = [];
+            }
+            Set.prototype.add = function (value) {
+                if (this._values.indexOf(value) === -1) {
+                    this._values.push(value);
+                }
+                return this;
+            };
+            Set.prototype.remove = function (value) {
+                var index = this._values.indexOf(value);
+                if (index !== -1) {
+                    this._values.splice(index, 1);
+                }
+                return this;
+            };
+            Set.prototype.values = function () {
+                return this._values;
+            };
+            return Set;
+        })();
+        Utils.Set = Set;
+    })(Utils = Plottable.Utils || (Plottable.Utils = {}));
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    var Utils;
+    (function (Utils) {
+        var CallbackSet = (function (_super) {
+            __extends(CallbackSet, _super);
+            function CallbackSet() {
+                _super.apply(this, arguments);
+            }
+            CallbackSet.prototype.callCallbacks = function () {
+                var args = [];
+                for (var _i = 0; _i < arguments.length; _i++) {
+                    args[_i - 0] = arguments[_i];
+                }
+                // no fat-arrow notation to set "this" to current "this" context
+                this.values().forEach(function (callback) {
+                    callback.apply(this, args);
+                });
+                return this;
+            };
+            return CallbackSet;
+        })(Utils.Set);
+        Utils.CallbackSet = CallbackSet;
+    })(Utils = Plottable.Utils || (Plottable.Utils = {}));
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var Plottable;
+(function (Plottable) {
     Plottable.MILLISECONDS_IN_ONE_DAY = 24 * 60 * 60 * 1000;
     var Formatters;
     (function (Formatters) {
