@@ -153,24 +153,28 @@ function triggerFakeWheelEvent(type, target, relativeX, relativeY, deltaY) {
     }
     target.node().dispatchEvent(event);
 }
-function triggerFakeTouchEvent(type, target, relativeX, relativeY) {
+function triggerFakeTouchEvent(type, target, touchPoints, ids) {
+    if (ids === void 0) { ids = []; }
     var targetNode = target.node();
     var clientRect = targetNode.getBoundingClientRect();
-    var xPos = clientRect.left + relativeX;
-    var yPos = clientRect.top + relativeY;
     var e = document.createEvent("UIEvent");
     e.initUIEvent(type, true, true, window, 1);
-    var fakeTouch = {
-        identifier: 0,
-        target: targetNode,
-        screenX: xPos,
-        screenY: yPos,
-        clientX: xPos,
-        clientY: yPos,
-        pageX: xPos,
-        pageY: yPos
-    };
-    var fakeTouchList = [fakeTouch];
+    var fakeTouchList = [];
+    touchPoints.forEach(function (touchPoint, i) {
+        var xPos = clientRect.left + touchPoint.x;
+        var yPos = clientRect.top + touchPoint.y;
+        var identifier = ids[i] == null ? 0 : ids[i];
+        fakeTouchList.push({
+            identifier: identifier,
+            target: targetNode,
+            screenX: xPos,
+            screenY: yPos,
+            clientX: xPos,
+            clientY: yPos,
+            pageX: xPos,
+            pageY: yPos
+        });
+    });
     fakeTouchList.item = function (index) { return fakeTouchList[index]; };
     e.touches = fakeTouchList;
     e.targetTouches = fakeTouchList;
@@ -8471,13 +8475,13 @@ describe("Interactions", function () {
             assert.isFalse(callbackCalled, "not called when moving outside of the Component (mouse)");
             callbackCalled = false;
             lastPoint = null;
-            triggerFakeTouchEvent("touchstart", target, SVG_WIDTH / 2, SVG_HEIGHT / 2);
+            triggerFakeTouchEvent("touchstart", target, [{ x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 }]);
             assert.isTrue(callbackCalled, "callback called on entering Component (touch)");
             assert.deepEqual(lastPoint, { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 }, "was passed correct point (touch)");
             callbackCalled = false;
-            triggerFakeTouchEvent("touchstart", target, SVG_WIDTH / 4, SVG_HEIGHT / 4);
+            triggerFakeTouchEvent("touchstart", target, [{ x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 }]);
             assert.isFalse(callbackCalled, "callback not called again if already in Component (touch)");
-            triggerFakeTouchEvent("touchstart", target, 2 * SVG_WIDTH, 2 * SVG_HEIGHT);
+            triggerFakeTouchEvent("touchstart", target, [{ x: 2 * SVG_WIDTH, y: 2 * SVG_HEIGHT }]);
             assert.isFalse(callbackCalled, "not called when moving outside of the Component (touch)");
             pointerInteraction.onPointerEnter(null);
             triggerFakeMouseEvent("mousemove", target, SVG_WIDTH / 2, SVG_HEIGHT / 2);
@@ -8510,15 +8514,15 @@ describe("Interactions", function () {
             triggerFakeMouseEvent("mousemove", target, 2 * SVG_WIDTH, 2 * SVG_HEIGHT);
             assert.isFalse(callbackCalled, "not called when moving outside of the Component (mouse)");
             callbackCalled = false;
-            triggerFakeTouchEvent("touchstart", target, SVG_WIDTH / 2, SVG_HEIGHT / 2);
+            triggerFakeTouchEvent("touchstart", target, [{ x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 }]);
             assert.isTrue(callbackCalled, "callback called on entering Component (touch)");
             assert.deepEqual(lastPoint, { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 }, "was passed correct point (touch)");
             callbackCalled = false;
-            triggerFakeTouchEvent("touchstart", target, SVG_WIDTH / 4, SVG_HEIGHT / 4);
+            triggerFakeTouchEvent("touchstart", target, [{ x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 }]);
             assert.isTrue(callbackCalled, "callback on moving inside Component (touch)");
             assert.deepEqual(lastPoint, { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 }, "was passed correct point (touch)");
             callbackCalled = false;
-            triggerFakeTouchEvent("touchstart", target, 2 * SVG_WIDTH, 2 * SVG_HEIGHT);
+            triggerFakeTouchEvent("touchstart", target, [{ x: 2 * SVG_WIDTH, y: 2 * SVG_HEIGHT }]);
             assert.isFalse(callbackCalled, "not called when moving outside of the Component (touch)");
             pointerInteraction.onPointerMove(null);
             triggerFakeMouseEvent("mousemove", target, SVG_WIDTH / 2, SVG_HEIGHT / 2);
@@ -8551,14 +8555,14 @@ describe("Interactions", function () {
             assert.isFalse(callbackCalled, "callback not called again if already outside of Component (mouse)");
             callbackCalled = false;
             lastPoint = null;
-            triggerFakeTouchEvent("touchstart", target, 2 * SVG_WIDTH, 2 * SVG_HEIGHT);
+            triggerFakeTouchEvent("touchstart", target, [{ x: 2 * SVG_WIDTH, y: 2 * SVG_HEIGHT }]);
             assert.isFalse(callbackCalled, "not called when moving outside of the Component (touch)");
-            triggerFakeTouchEvent("touchstart", target, SVG_WIDTH / 2, SVG_HEIGHT / 2);
-            triggerFakeTouchEvent("touchstart", target, 2 * SVG_WIDTH, 2 * SVG_HEIGHT);
+            triggerFakeTouchEvent("touchstart", target, [{ x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 }]);
+            triggerFakeTouchEvent("touchstart", target, [{ x: 2 * SVG_WIDTH, y: 2 * SVG_HEIGHT }]);
             assert.isTrue(callbackCalled, "callback called on exiting Component (touch)");
             assert.deepEqual(lastPoint, { x: 2 * SVG_WIDTH, y: 2 * SVG_HEIGHT }, "was passed correct point (touch)");
             callbackCalled = false;
-            triggerFakeTouchEvent("touchstart", target, 3 * SVG_WIDTH, 3 * SVG_HEIGHT);
+            triggerFakeTouchEvent("touchstart", target, [{ x: 3 * SVG_WIDTH, y: 3 * SVG_HEIGHT }]);
             assert.isFalse(callbackCalled, "callback not called again if already outside of Component (touch)");
             pointerInteraction.onPointerExit(null);
             triggerFakeMouseEvent("mousemove", target, SVG_WIDTH / 2, SVG_HEIGHT / 2);
@@ -8661,21 +8665,21 @@ describe("Interactions", function () {
         });
         it("correctly triggers onHoverOver() callbacks (touch events)", function () {
             overCallbackCalled = false;
-            triggerFakeTouchEvent("touchstart", target, 100, 200);
+            triggerFakeTouchEvent("touchstart", target, [{ x: 100, y: 200 }]);
             assert.isTrue(overCallbackCalled, "onHoverOver was called on touching a target area");
             assert.deepEqual(overData.pixelPositions, [testTarget.leftPoint], "onHoverOver was called with the correct pixel position (mouse onto left)");
             assert.deepEqual(overData.data, ["left"], "onHoverOver was called with the correct data (mouse onto left)");
             overCallbackCalled = false;
-            triggerFakeTouchEvent("touchstart", target, 100, 200);
+            triggerFakeTouchEvent("touchstart", target, [{ x: 100, y: 200 }]);
             assert.isFalse(overCallbackCalled, "onHoverOver isn't called if the hover data didn't change");
             overCallbackCalled = false;
-            triggerFakeTouchEvent("touchstart", target, 200, 200);
+            triggerFakeTouchEvent("touchstart", target, [{ x: 200, y: 200 }]);
             assert.isTrue(overCallbackCalled, "onHoverOver was called when touch moves into a new region");
             assert.deepEqual(overData.pixelPositions, [testTarget.rightPoint], "onHoverOver was called with the correct pixel position (left --> center)");
             assert.deepEqual(overData.data, ["right"], "onHoverOver was called with the new data only (left --> center)");
-            triggerFakeTouchEvent("touchstart", target, 401, 200);
+            triggerFakeTouchEvent("touchstart", target, [{ x: 401, y: 200 }]);
             overCallbackCalled = false;
-            triggerFakeTouchEvent("touchstart", target, 200, 200);
+            triggerFakeTouchEvent("touchstart", target, [{ x: 200, y: 200 }]);
             assert.deepEqual(overData.pixelPositions, [testTarget.leftPoint, testTarget.rightPoint], "onHoverOver was called with the correct pixel positions");
             assert.deepEqual(overData.data, ["left", "right"], "onHoverOver is called with the correct data");
             svg.remove();
@@ -8703,23 +8707,23 @@ describe("Interactions", function () {
             svg.remove();
         });
         it("correctly triggers onHoverOut() callbacks (touch events)", function () {
-            triggerFakeTouchEvent("touchstart", target, 100, 200);
+            triggerFakeTouchEvent("touchstart", target, [{ x: 100, y: 200 }]);
             outCallbackCalled = false;
-            triggerFakeTouchEvent("touchstart", target, 200, 200);
+            triggerFakeTouchEvent("touchstart", target, [{ x: 200, y: 200 }]);
             assert.isFalse(outCallbackCalled, "onHoverOut isn't called when mousing into a new region without leaving the old one");
             outCallbackCalled = false;
-            triggerFakeTouchEvent("touchstart", target, 300, 200);
+            triggerFakeTouchEvent("touchstart", target, [{ x: 300, y: 200 }]);
             assert.isTrue(outCallbackCalled, "onHoverOut was called when the hover data changes");
             assert.deepEqual(outData.pixelPositions, [testTarget.leftPoint], "onHoverOut was called with the correct pixel position (center --> right)");
             assert.deepEqual(outData.data, ["left"], "onHoverOut was called with the correct data (center --> right)");
             outCallbackCalled = false;
-            triggerFakeTouchEvent("touchstart", target, 401, 200);
+            triggerFakeTouchEvent("touchstart", target, [{ x: 401, y: 200 }]);
             assert.isTrue(outCallbackCalled, "onHoverOut is called on mousing out of the Component");
             assert.deepEqual(outData.pixelPositions, [testTarget.rightPoint], "onHoverOut was called with the correct pixel position");
             assert.deepEqual(outData.data, ["right"], "onHoverOut was called with the correct data");
             outCallbackCalled = false;
-            triggerFakeTouchEvent("touchstart", target, 200, 200);
-            triggerFakeTouchEvent("touchstart", target, 200, 401);
+            triggerFakeTouchEvent("touchstart", target, [{ x: 200, y: 200 }]);
+            triggerFakeTouchEvent("touchstart", target, [{ x: 200, y: 401 }]);
             assert.deepEqual(outData.pixelPositions, [testTarget.leftPoint, testTarget.rightPoint], "onHoverOut was called with the correct pixel positions");
             assert.deepEqual(outData.data, ["left", "right"], "onHoverOut is called with the correct data");
             svg.remove();
@@ -8784,27 +8788,27 @@ describe("Interactions", function () {
             assert.isTrue(callbackCalled, "callback called even if moved outside component (mouse)");
             callbackCalled = false;
             lastPoint = null;
-            triggerFakeTouchEvent("touchstart", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
-            triggerFakeTouchEvent("touchend", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+            triggerFakeTouchEvent("touchstart", c.content(), [{ x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 }]);
+            triggerFakeTouchEvent("touchend", c.content(), [{ x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 }]);
             assert.isTrue(callbackCalled, "callback called on entering Component (touch)");
             assert.deepEqual(lastPoint, { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 }, "was passed correct point (touch)");
             callbackCalled = false;
             lastPoint = null;
-            triggerFakeTouchEvent("touchstart", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
-            triggerFakeTouchEvent("touchend", c.content(), SVG_WIDTH / 4, SVG_HEIGHT / 4);
+            triggerFakeTouchEvent("touchstart", c.content(), [{ x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 }]);
+            triggerFakeTouchEvent("touchend", c.content(), [{ x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 }]);
             assert.isTrue(callbackCalled, "callback called on clicking Component (mouse)");
             assert.deepEqual(lastPoint, { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 }, "was passed mouseup point (touch)");
             callbackCalled = false;
-            triggerFakeTouchEvent("touchstart", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
-            triggerFakeTouchEvent("touchend", c.content(), SVG_WIDTH * 2, SVG_HEIGHT * 2);
+            triggerFakeTouchEvent("touchstart", c.content(), [{ x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 }]);
+            triggerFakeTouchEvent("touchend", c.content(), [{ x: SVG_WIDTH * 2, y: SVG_HEIGHT * 2 }]);
             assert.isFalse(callbackCalled, "callback not called if released outside component (touch)");
             callbackCalled = false;
-            triggerFakeTouchEvent("touchstart", c.content(), SVG_WIDTH * 2, SVG_HEIGHT * 2);
-            triggerFakeTouchEvent("touchend", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+            triggerFakeTouchEvent("touchstart", c.content(), [{ x: SVG_WIDTH * 2, y: SVG_HEIGHT * 2 }]);
+            triggerFakeTouchEvent("touchend", c.content(), [{ x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 }]);
             assert.isFalse(callbackCalled, "callback not called if started outside component (touch)");
-            triggerFakeTouchEvent("touchstart", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
-            triggerFakeTouchEvent("touchmove", c.content(), SVG_WIDTH * 2, SVG_HEIGHT * 2);
-            triggerFakeTouchEvent("touchend", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+            triggerFakeTouchEvent("touchstart", c.content(), [{ x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 }]);
+            triggerFakeTouchEvent("touchmove", c.content(), [{ x: SVG_WIDTH * 2, y: SVG_HEIGHT * 2 }]);
+            triggerFakeTouchEvent("touchend", c.content(), [{ x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 }]);
             assert.isTrue(callbackCalled, "callback called even if moved outside component (touch)");
             svg.remove();
         });
@@ -8864,7 +8868,7 @@ describe("Interactions", function () {
             assert.isFalse(startCallbackCalled, "callback is not called on right-click");
             startCallbackCalled = false;
             receivedStart = null;
-            triggerFakeTouchEvent("touchstart", target, startPoint.x, startPoint.y);
+            triggerFakeTouchEvent("touchstart", target, [{ x: startPoint.x, y: startPoint.y }]);
             assert.isTrue(startCallbackCalled, "callback was called on beginning drag (touchstart)");
             assert.deepEqual(receivedStart, startPoint, "was passed the correct point");
             startCallbackCalled = false;
@@ -8872,9 +8876,9 @@ describe("Interactions", function () {
             assert.isFalse(startCallbackCalled, "does not trigger callback if drag starts outside the Component (positive) (mousedown)");
             triggerFakeMouseEvent("mousedown", target, outsidePointNeg.x, outsidePointNeg.y);
             assert.isFalse(startCallbackCalled, "does not trigger callback if drag starts outside the Component (negative) (mousedown)");
-            triggerFakeTouchEvent("touchstart", target, outsidePointPos.x, outsidePointPos.y);
+            triggerFakeTouchEvent("touchstart", target, [{ x: outsidePointPos.x, y: outsidePointPos.y }]);
             assert.isFalse(startCallbackCalled, "does not trigger callback if drag starts outside the Component (positive) (touchstart)");
-            triggerFakeTouchEvent("touchstart", target, outsidePointNeg.x, outsidePointNeg.y);
+            triggerFakeTouchEvent("touchstart", target, [{ x: outsidePointNeg.x, y: outsidePointNeg.y }]);
             assert.isFalse(startCallbackCalled, "does not trigger callback if drag starts outside the Component (negative) (touchstart)");
             assert.strictEqual(drag.onDragStart(), startCallback, "retrieves the callback if called with no arguments");
             drag.onDragStart(null);
@@ -8904,8 +8908,8 @@ describe("Interactions", function () {
             assert.deepEqual(receivedEnd, endPoint, "was passed the correct current point");
             receivedStart = null;
             receivedEnd = null;
-            triggerFakeTouchEvent("touchstart", target, startPoint.x, startPoint.y);
-            triggerFakeTouchEvent("touchmove", target, endPoint.x, endPoint.y);
+            triggerFakeTouchEvent("touchstart", target, [{ x: startPoint.x, y: startPoint.y }]);
+            triggerFakeTouchEvent("touchmove", target, [{ x: endPoint.x, y: endPoint.y }]);
             assert.isTrue(moveCallbackCalled, "callback was called on dragging (touchmove)");
             assert.deepEqual(receivedStart, startPoint, "was passed the correct starting point");
             assert.deepEqual(receivedEnd, endPoint, "was passed the correct current point");
@@ -8943,8 +8947,8 @@ describe("Interactions", function () {
             triggerFakeMouseEvent("mouseup", target, endPoint.x, endPoint.y); // end the drag
             receivedStart = null;
             receivedEnd = null;
-            triggerFakeTouchEvent("touchstart", target, startPoint.x, startPoint.y);
-            triggerFakeTouchEvent("touchend", target, endPoint.x, endPoint.y);
+            triggerFakeTouchEvent("touchstart", target, [{ x: startPoint.x, y: startPoint.y }]);
+            triggerFakeTouchEvent("touchend", target, [{ x: endPoint.x, y: endPoint.y }]);
             assert.isTrue(endCallbackCalled, "callback was called on drag ending (touchend)");
             assert.deepEqual(receivedStart, startPoint, "was passed the correct starting point");
             assert.deepEqual(receivedEnd, endPoint, "was passed the correct current point");
@@ -8979,9 +8983,9 @@ describe("Interactions", function () {
             triggerFakeMouseEvent("mousemove", target, outsidePointNeg.x, outsidePointNeg.y);
             assert.deepEqual(receivedEnd, constrainedNeg, "dragging outside the Component is constrained (negative) (mousemove)");
             receivedEnd = null;
-            triggerFakeTouchEvent("touchmove", target, outsidePointPos.x, outsidePointPos.y);
+            triggerFakeTouchEvent("touchmove", target, [{ x: outsidePointPos.x, y: outsidePointPos.y }]);
             assert.deepEqual(receivedEnd, constrainedPos, "dragging outside the Component is constrained (positive) (touchmove)");
-            triggerFakeTouchEvent("touchmove", target, outsidePointNeg.x, outsidePointNeg.y);
+            triggerFakeTouchEvent("touchmove", target, [{ x: outsidePointNeg.x, y: outsidePointNeg.y }]);
             assert.deepEqual(receivedEnd, constrainedNeg, "dragging outside the Component is constrained (negative) (touchmove)");
             receivedEnd = null;
             triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
@@ -8991,11 +8995,11 @@ describe("Interactions", function () {
             triggerFakeMouseEvent("mouseup", target, outsidePointNeg.x, outsidePointNeg.y);
             assert.deepEqual(receivedEnd, constrainedNeg, "dragging outside the Component is constrained (negative) (mouseup)");
             receivedEnd = null;
-            triggerFakeTouchEvent("touchstart", target, startPoint.x, startPoint.y);
-            triggerFakeTouchEvent("touchend", target, outsidePointPos.x, outsidePointPos.y);
+            triggerFakeTouchEvent("touchstart", target, [{ x: startPoint.x, y: startPoint.y }]);
+            triggerFakeTouchEvent("touchend", target, [{ x: outsidePointPos.x, y: outsidePointPos.y }]);
             assert.deepEqual(receivedEnd, constrainedPos, "dragging outside the Component is constrained (positive) (touchend)");
-            triggerFakeTouchEvent("touchstart", target, startPoint.x, startPoint.y);
-            triggerFakeTouchEvent("touchend", target, outsidePointNeg.x, outsidePointNeg.y);
+            triggerFakeTouchEvent("touchstart", target, [{ x: startPoint.x, y: startPoint.y }]);
+            triggerFakeTouchEvent("touchend", target, [{ x: outsidePointNeg.x, y: outsidePointNeg.y }]);
             assert.deepEqual(receivedEnd, constrainedNeg, "dragging outside the Component is constrained (negative) (touchend)");
             drag.constrainToComponent(false);
             triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
@@ -9004,9 +9008,9 @@ describe("Interactions", function () {
             triggerFakeMouseEvent("mousemove", target, outsidePointNeg.x, outsidePointNeg.y);
             assert.deepEqual(receivedEnd, outsidePointNeg, "dragging outside the Component is no longer constrained (negative) (mousemove)");
             receivedEnd = null;
-            triggerFakeTouchEvent("touchmove", target, outsidePointPos.x, outsidePointPos.y);
+            triggerFakeTouchEvent("touchmove", target, [{ x: outsidePointPos.x, y: outsidePointPos.y }]);
             assert.deepEqual(receivedEnd, outsidePointPos, "dragging outside the Component is no longer constrained (positive) (touchmove)");
-            triggerFakeTouchEvent("touchmove", target, outsidePointNeg.x, outsidePointNeg.y);
+            triggerFakeTouchEvent("touchmove", target, [{ x: outsidePointNeg.x, y: outsidePointNeg.y }]);
             assert.deepEqual(receivedEnd, outsidePointNeg, "dragging outside the Component is no longer constrained (negative) (touchmove)");
             receivedEnd = null;
             triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
@@ -9016,11 +9020,11 @@ describe("Interactions", function () {
             triggerFakeMouseEvent("mouseup", target, outsidePointNeg.x, outsidePointNeg.y);
             assert.deepEqual(receivedEnd, outsidePointNeg, "dragging outside the Component is no longer constrained (negative) (mouseup)");
             receivedEnd = null;
-            triggerFakeTouchEvent("touchstart", target, startPoint.x, startPoint.y);
-            triggerFakeTouchEvent("touchend", target, outsidePointPos.x, outsidePointPos.y);
+            triggerFakeTouchEvent("touchstart", target, [{ x: startPoint.x, y: startPoint.y }]);
+            triggerFakeTouchEvent("touchend", target, [{ x: outsidePointPos.x, y: outsidePointPos.y }]);
             assert.deepEqual(receivedEnd, outsidePointPos, "dragging outside the Component is no longer constrained (positive) (touchend)");
-            triggerFakeTouchEvent("touchstart", target, startPoint.x, startPoint.y);
-            triggerFakeTouchEvent("touchend", target, outsidePointNeg.x, outsidePointNeg.y);
+            triggerFakeTouchEvent("touchstart", target, [{ x: startPoint.x, y: startPoint.y }]);
+            triggerFakeTouchEvent("touchend", target, [{ x: outsidePointNeg.x, y: outsidePointNeg.y }]);
             assert.deepEqual(receivedEnd, outsidePointNeg, "dragging outside the Component is no longer constrained (negative) (touchend)");
             svg.remove();
         });
@@ -9310,36 +9314,32 @@ describe("Dispatchers", function () {
             assert.strictEqual(td1, td2, "returned the existing Dispatcher if called again with same <svg>");
             svg.remove();
         });
-        it("getLastTouchPosition() defaults to a non-null value", function () {
-            var svg = generateSVG();
-            var td = Plottable.Dispatcher.Touch.getDispatcher(svg.node());
-            var p = td.getLastTouchPosition();
-            assert.isNotNull(p, "returns a value after initialization");
-            assert.isNotNull(p.x, "x value is set");
-            assert.isNotNull(p.y, "y value is set");
-            svg.remove();
-        });
         it("onTouchStart()", function () {
             var targetWidth = 400, targetHeight = 400;
             var target = generateSVG(targetWidth, targetHeight);
             // HACKHACK: PhantomJS can't measure SVGs unless they have something in them occupying space
             target.append("rect").attr("width", targetWidth).attr("height", targetHeight);
-            var targetX = 17;
-            var targetY = 76;
-            var expectedPoint = {
-                x: targetX,
-                y: targetY
-            };
+            var targetXs = [17, 18, 12, 23, 44];
+            var targetYs = [77, 78, 52, 43, 14];
+            var expectedPoints = targetXs.map(function (targetX, i) {
+                return {
+                    x: targetX,
+                    y: targetYs[i]
+                };
+            });
+            var ids = targetXs.map(function (targetX, i) { return i; });
             var td = Plottable.Dispatcher.Touch.getDispatcher(target.node());
             var callbackWasCalled = false;
-            var callback = function (p, e) {
+            var callback = function (ids, points, e) {
                 callbackWasCalled = true;
-                assertPointsClose(p, expectedPoint, 0.5, "touch position is correct");
+                ids.forEach(function (id) {
+                    assertPointsClose(points[id], expectedPoints[id], 0.5, "touch position is correct");
+                });
                 assert.isNotNull(e, "TouchEvent was passed to the Dispatcher");
             };
             var keyString = "unit test";
             td.onTouchStart(keyString, callback);
-            triggerFakeTouchEvent("touchstart", target, targetX, targetY);
+            triggerFakeTouchEvent("touchstart", target, expectedPoints, ids);
             assert.isTrue(callbackWasCalled, "callback was called on touchstart");
             td.onTouchStart(keyString, null);
             target.remove();
@@ -9349,22 +9349,27 @@ describe("Dispatchers", function () {
             var target = generateSVG(targetWidth, targetHeight);
             // HACKHACK: PhantomJS can't measure SVGs unless they have something in them occupying space
             target.append("rect").attr("width", targetWidth).attr("height", targetHeight);
-            var targetX = 17;
-            var targetY = 76;
-            var expectedPoint = {
-                x: targetX,
-                y: targetY
-            };
+            var targetXs = [17, 18, 12, 23, 44];
+            var targetYs = [77, 78, 52, 43, 14];
+            var expectedPoints = targetXs.map(function (targetX, i) {
+                return {
+                    x: targetX,
+                    y: targetYs[i]
+                };
+            });
+            var ids = targetXs.map(function (targetX, i) { return i; });
             var td = Plottable.Dispatcher.Touch.getDispatcher(target.node());
             var callbackWasCalled = false;
-            var callback = function (p, e) {
+            var callback = function (ids, points, e) {
                 callbackWasCalled = true;
-                assertPointsClose(p, expectedPoint, 0.5, "touch position is correct");
+                ids.forEach(function (id) {
+                    assertPointsClose(points[id], expectedPoints[id], 0.5, "touch position is correct");
+                });
                 assert.isNotNull(e, "TouchEvent was passed to the Dispatcher");
             };
             var keyString = "unit test";
             td.onTouchMove(keyString, callback);
-            triggerFakeTouchEvent("touchmove", target, targetX, targetY);
+            triggerFakeTouchEvent("touchmove", target, expectedPoints, ids);
             assert.isTrue(callbackWasCalled, "callback was called on touchmove");
             td.onTouchMove(keyString, null);
             target.remove();
@@ -9374,22 +9379,27 @@ describe("Dispatchers", function () {
             var target = generateSVG(targetWidth, targetHeight);
             // HACKHACK: PhantomJS can't measure SVGs unless they have something in them occupying space
             target.append("rect").attr("width", targetWidth).attr("height", targetHeight);
-            var targetX = 17;
-            var targetY = 76;
-            var expectedPoint = {
-                x: targetX,
-                y: targetY
-            };
+            var targetXs = [17, 18, 12, 23, 44];
+            var targetYs = [77, 78, 52, 43, 14];
+            var expectedPoints = targetXs.map(function (targetX, i) {
+                return {
+                    x: targetX,
+                    y: targetYs[i]
+                };
+            });
+            var ids = targetXs.map(function (targetX, i) { return i; });
             var td = Plottable.Dispatcher.Touch.getDispatcher(target.node());
             var callbackWasCalled = false;
-            var callback = function (p, e) {
+            var callback = function (ids, points, e) {
                 callbackWasCalled = true;
-                assertPointsClose(p, expectedPoint, 0.5, "touch position is correct");
+                ids.forEach(function (id) {
+                    assertPointsClose(points[id], expectedPoints[id], 0.5, "touch position is correct");
+                });
                 assert.isNotNull(e, "TouchEvent was passed to the Dispatcher");
             };
             var keyString = "unit test";
             td.onTouchEnd(keyString, callback);
-            triggerFakeTouchEvent("touchend", target, targetX, targetY);
+            triggerFakeTouchEvent("touchend", target, expectedPoints, ids);
             assert.isTrue(callbackWasCalled, "callback was called on touchend");
             td.onTouchEnd(keyString, null);
             target.remove();
@@ -9399,21 +9409,28 @@ describe("Dispatchers", function () {
             var target = generateSVG(targetWidth, targetHeight);
             // HACKHACK: PhantomJS can't measure SVGs unless they have something in them occupying space
             target.append("rect").attr("width", targetWidth).attr("height", targetHeight);
-            var targetX = 17;
-            var targetY = 76;
+            var targetXs = [17, 18, 12, 23, 44];
+            var targetYs = [77, 78, 52, 43, 14];
+            var expectedPoints = targetXs.map(function (targetX, i) {
+                return {
+                    x: targetX,
+                    y: targetYs[i]
+                };
+            });
+            var ids = targetXs.map(function (targetX, i) { return i; });
             var td = Plottable.Dispatcher.Touch.getDispatcher(target.node());
             var callbackWasCalled = false;
-            var callback = function (p, e) {
+            var callback = function (ids, points, e) {
                 callbackWasCalled = true;
                 assert.isNotNull(e, "TouchEvent was passed to the Dispatcher");
             };
             var keyString = "notInDomTest";
             td.onTouchMove(keyString, callback);
-            triggerFakeTouchEvent("touchmove", target, targetX, targetY);
+            triggerFakeTouchEvent("touchmove", target, expectedPoints, ids);
             assert.isTrue(callbackWasCalled, "callback was called on touchmove");
             target.remove();
             callbackWasCalled = false;
-            triggerFakeTouchEvent("touchmove", target, targetX, targetY);
+            triggerFakeTouchEvent("touchmove", target, expectedPoints, ids);
             assert.isFalse(callbackWasCalled, "callback was not called after <svg> was removed from DOM");
             td.onTouchMove(keyString, null);
         });
