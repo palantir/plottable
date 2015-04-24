@@ -182,7 +182,7 @@ function triggerFakeWheelEvent(type: string, target: D3.Selection, relativeX: nu
   target.node().dispatchEvent(event);
 }
 
-function triggerFakeTouchEvent(type: string, target: D3.Selection, touchPoints: Plottable.Point[], ids = [0]) {
+function triggerFakeTouchEvent(type: string, target: D3.Selection, touchPoints: Plottable.Point[], ids: number[] = []) {
   var targetNode = target.node();
   var clientRect = targetNode.getBoundingClientRect();
   var e = <TouchEvent> document.createEvent("UIEvent");
@@ -192,8 +192,9 @@ function triggerFakeTouchEvent(type: string, target: D3.Selection, touchPoints: 
   touchPoints.forEach((touchPoint, i) => {
     var xPos = clientRect.left + touchPoint.x;
     var yPos = clientRect.top + touchPoint.y;
+    var identifier = ids[i] == null ? 0 : ids[i];
     fakeTouchList.push( {
-      identifier: 0,
+      identifier: identifier,
       target: targetNode,
       screenX: xPos,
       screenY: yPos,
