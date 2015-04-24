@@ -3693,10 +3693,9 @@ declare module Plottable {
 
 declare module Plottable {
     module Dispatcher {
-        type IdToPoint = {
+        type TouchCallback = (ids: number[], idToPoint: {
             [id: number]: Point;
-        };
-        type TouchCallback = (ids: number[], idToPoint: IdToPoint, e: TouchEvent) => any;
+        }, e: TouchEvent) => any;
         class Touch extends AbstractDispatcher {
             /**
              * Get a Dispatcher.Touch for the <svg> containing elem. If one already exists

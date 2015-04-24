@@ -2,8 +2,7 @@
 
 module Plottable {
 export module Dispatcher {
-  export type IdToPoint = { [id: number]: Point; };
-  export type TouchCallback = (ids: number[], idToPoint: IdToPoint, e: TouchEvent) => any;
+  export type TouchCallback = (ids: number[], idToPoint: { [id: number]: Point; }, e: TouchEvent) => any;
 
   export class Touch extends AbstractDispatcher {
     /**
@@ -60,7 +59,7 @@ export module Dispatcher {
     }
 
     protected _getWrappedCallback(callback: Function): Core.BroadcasterCallback<Dispatcher.Touch> {
-      return (td: Dispatcher.Touch, idToPoint: IdToPoint, ids: number[], e: MouseEvent) => callback(ids, idToPoint, e);
+      return (td: Dispatcher.Touch, idToPoint: { [id: number]: Point; }, ids: number[], e: MouseEvent) => callback(ids, idToPoint, e);
     }
 
     /**
@@ -117,7 +116,7 @@ export module Dispatcher {
      */
     private _measureAndBroadcast(e: TouchEvent, b: Core.Broadcaster<Dispatcher.Touch>) {
       var touches = e.changedTouches;
-      var touchPositions: IdToPoint = {};
+      var touchPositions: { [id: number]: Point; } = {};
       var touchIdentifiers: number[] = [];
       for (var i = 0; i < touches.length; i++) {
         var touch = touches[i];
