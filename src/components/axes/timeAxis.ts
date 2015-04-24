@@ -306,7 +306,7 @@ export module Axis {
     }
 
     private _setupDomElements() {
-      d3.selectAll("." + Time.TIME_AXIS_TIER_CLASS).remove();
+      this._element.selectAll("." + Time.TIME_AXIS_TIER_CLASS).remove();
 
       this._tierLabelContainers = [];
       this._tierMarkContainers = [];
