@@ -67,27 +67,28 @@ export module Interaction {
       if (this._touchIds.size() !== 2) {
         return;
       }
-      var oldAvgX = (this._touchIds.values()[1].x + this._touchIds.values()[0].x) / 2;
-      var oldAvgY = (this._touchIds.values()[1].y + this._touchIds.values()[0].y) / 2;
-      var oldDiffX = Math.abs(this._touchIds.values()[1].x - this._touchIds.values()[0].x);
-      var oldDiffY = Math.abs(this._touchIds.values()[1].y - this._touchIds.values()[0].y);
+      var points = this._touchIds.values();
+      var oldAvgX = (points[1].x + points[0].x) / 2;
+      var oldAvgY = (points[1].y + points[0].y) / 2;
+      var oldDiffX = Math.abs(points[1].x - points[0].x);
+      var oldDiffY = Math.abs(points[1].y - points[0].y);
 
       ids.forEach((id) => {
         this._touchIds.set(id.toString(), this._translateToComponentSpace(idToPoint[id]));
       });
 
-      var newAvgX = (this._touchIds.values()[1].x + this._touchIds.values()[0].x) / 2;
-      var newAvgY = (this._touchIds.values()[1].y + this._touchIds.values()[0].y) / 2;
-      var newDiffX = Math.abs(this._touchIds.values()[1].x - this._touchIds.values()[0].x);
-      var newDiffY = Math.abs(this._touchIds.values()[1].y - this._touchIds.values()[0].y);
+      var newPoints = this._touchIds.values();
+      var newAvgX = (newPoints[1].x + newPoints[0].x) / 2;
+      var newAvgY = (newPoints[1].y + newPoints[0].y) / 2;
+      var newDiffX = Math.abs(newPoints[1].x - newPoints[0].x);
+      var newDiffY = Math.abs(newPoints[1].y - newPoints[0].y);
 
       if (this._xScale != null) {
-        this._xScale.domain(PanZoom.magnify(this._xScale, oldDiffX / newDiffX, oldAvgX / 2));
+        this._xScale.domain(PanZoom.magnify(this._xScale, oldDiffX / newDiffX, (this._xScale.range()[1] + this._xScale.range()[0]) / 2));
       }
       if (this._yScale != null) {
         this._yScale.domain(PanZoom.magnify(this._yScale, oldDiffY / newDiffY, (oldAvgY + newAvgY) / 2));
       }
-      console.log(oldDiffX / newDiffX);
     }
 
     private _handleTouchEnd(ids: number[], idToPoint: { [id: number]: Point; }, e: TouchEvent) {
@@ -97,6 +98,7 @@ export module Interaction {
     }
 
     private static magnify<D>(scale: Scale.AbstractQuantitative<D>, magnifyAmount: number, centerValue: number) {
+      centerValue = (scale.range()[1] + scale.range()[0]) / 2;
       var magnifyTransform = (rangeValue: number) => scale.invert(centerValue - (centerValue - rangeValue) * magnifyAmount);
       return scale.range().map(magnifyTransform);
     }
@@ -114,10 +116,10 @@ export module Interaction {
         var deltaPixelAmount = e.deltaY * (e.deltaMode ? PanZoom.PIXELS_PER_LINE : 1);
         var zoomAmount = Math.pow(2, -deltaPixelAmount * .002);
         if (this._xScale != null) {
-          this._xScale.domain(PanZoom.magnify(this._xScale, zoomAmount, p.x));
+          this._xScale.domain(PanZoom.magnify(this._xScale, zoomAmount, translatedP.x));
         }
         if (this._yScale != null) {
-          this._yScale.domain(PanZoom.magnify(this._yScale, zoomAmount, p.y));
+          this._yScale.domain(PanZoom.magnify(this._yScale, zoomAmount, translatedP.y));
         }
       }
     }
