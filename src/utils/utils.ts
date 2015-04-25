@@ -255,6 +255,14 @@ export module Utils {
     }
 
     /**
+     * Returns true if the argument is a number, which is not NaN
+     * Numbers represented as strings do not pass this function
+     */
+    export function isValidNumber(n: any) {
+      return typeof n === "number" && !Plottable.Utils.Methods.isNaN(n) && isFinite(n);
+    }
+
+    /**
      * Creates shallow copy of map.
      * @param {{ [key: string]: any }} oldMap Map to copy
      *

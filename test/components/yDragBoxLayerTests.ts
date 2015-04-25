@@ -1,15 +1,15 @@
-///<reference path="../../testReference.ts" />
+///<reference path="../testReference.ts" />
 
 var assert = chai.assert;
 
 describe("Interactive Components", () => {
-  describe("XDragBoxLayer", () => {
+  describe("YDragBoxLayer", () => {
     var SVG_WIDTH = 400;
     var SVG_HEIGHT = 400;
 
     it("bounds()", () => {
       var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var dbl = new Plottable.Components.Interactive.XDragBoxLayer();
+      var dbl = new Plottable.Components.YDragBoxLayer();
       dbl.boxVisible(true);
       dbl.renderTo(svg);
 
@@ -28,17 +28,17 @@ describe("Interactive Components", () => {
       });
 
       var actualBounds = dbl.bounds();
-      assert.strictEqual(actualBounds.topLeft.y, 0, "box starts at top");
-      assert.strictEqual(actualBounds.topLeft.x, topLeft.x, "left edge set correctly");
-      assert.strictEqual(actualBounds.bottomRight.y, dbl.height(), "box ends at bottom");
-      assert.strictEqual(actualBounds.bottomRight.x, bottomRight.x, "right edge set correctly");
+      assert.strictEqual(actualBounds.topLeft.x, 0, "box starts at left");
+      assert.strictEqual(actualBounds.topLeft.y, topLeft.y, "top edge set correctly");
+      assert.strictEqual(actualBounds.bottomRight.x, dbl.width(), "box ends at right");
+      assert.strictEqual(actualBounds.bottomRight.y, bottomRight.y, "bottom edge set correctly");
 
       svg.remove();
     });
 
-    it("resizes only in x", () => {
+    it("resizes only in y", () => {
       var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var dbl = new Plottable.Components.Interactive.XDragBoxLayer();
+      var dbl = new Plottable.Components.YDragBoxLayer();
       dbl.boxVisible(true);
       dbl.resizable(true);
       dbl.renderTo(svg);
@@ -59,21 +59,21 @@ describe("Interactive Components", () => {
 
       var actualBounds = dbl.bounds();
       var dragTo = {
-        x: SVG_WIDTH * 3 / 4,
-        y: SVG_HEIGHT / 2
+        x: SVG_WIDTH / 2,
+        y: SVG_HEIGHT * 3 / 4
       };
       var target = dbl.background();
       triggerFakeDragSequence(target, actualBounds.bottomRight, dragTo);
       actualBounds = dbl.bounds();
-      assert.strictEqual(actualBounds.bottomRight.x, dragTo.x, "resized in x");
-      assert.strictEqual(actualBounds.topLeft.y, 0, "box still starts at top");
-      assert.strictEqual(actualBounds.bottomRight.y, dbl.height(), "box still ends at bottom");
+      assert.strictEqual(actualBounds.topLeft.x, 0, "box still starts at left");
+      assert.strictEqual(actualBounds.bottomRight.x, dbl.width(), "box still ends at right");
+      assert.strictEqual(actualBounds.bottomRight.y, dragTo.y, "resized in y");
       svg.remove();
     });
 
-    it("stays full height after resizing", () => {
+    it("stays full width after resizing", () => {
       var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var dbl = new Plottable.Components.Interactive.XDragBoxLayer();
+      var dbl = new Plottable.Components.YDragBoxLayer();
       dbl.boxVisible(true);
       dbl.resizable(true);
       dbl.renderTo(svg);
@@ -92,17 +92,17 @@ describe("Interactive Components", () => {
         bottomRight: bottomRight
       });
 
-      var heightBefore = dbl.height();
+      var widthBefore = dbl.width();
       var boundsBefore = dbl.bounds();
-      svg.attr("height", 2 * SVG_HEIGHT);
+      svg.attr("width", 2 * SVG_WIDTH);
       dbl.redraw();
-      assert.notStrictEqual(dbl.height(), heightBefore, "component changed size");
+      assert.notStrictEqual(dbl.width(), widthBefore, "component changed size");
 
       var boundsAfter = dbl.bounds();
-      assert.strictEqual(boundsAfter.topLeft.x, boundsBefore.topLeft.x, "box keeps same left edge");
-      assert.strictEqual(boundsAfter.topLeft.y, 0, "box still starts at top");
-      assert.strictEqual(boundsAfter.bottomRight.x, boundsBefore.bottomRight.x, "box keeps same right edge");
-      assert.strictEqual(boundsAfter.bottomRight.y, dbl.height(), "box still ends at bottom");
+      assert.strictEqual(boundsAfter.topLeft.x, 0, "box still starts at left");
+      assert.strictEqual(boundsAfter.topLeft.y, boundsBefore.topLeft.y, "box keeps same top edge");
+      assert.strictEqual(boundsAfter.bottomRight.x, dbl.width(), "box still ends at right");
+      assert.strictEqual(boundsAfter.bottomRight.y, boundsBefore.bottomRight.y, "box keeps same bottom edge");
       svg.remove();
     });
   });

@@ -124,7 +124,7 @@ module Plottable {
 
           var value = valueAccessor(datum, datumIndex, dataset.metadata(), plotMetadata);
           var offset: number;
-          if (value === 0) {
+          if (!+value) {
             offset = isAllNegativeValues ? negativeOffset : positiveOffset;
           } else {
             offset = value > 0 ? positiveOffset : negativeOffset;

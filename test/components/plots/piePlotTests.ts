@@ -229,4 +229,64 @@ describe("Plots", () => {
       svg.remove();
     });
   });
+
+  describe("fail safe tests", () => {
+    it("undefined, NaN and non-numeric strings not be represented in a Pie Chart", () => {
+      var svg = generateSVG();
+
+      var data1 = [
+        { v: 1 },
+        { v: undefined },
+        { v: 1 },
+        { v: NaN },
+        { v: 1 },
+        { v: "Bad String" },
+        { v: 1 },
+      ];
+
+      var plot = new Plottable.Plots.Pie();
+      plot.addDataset(data1);
+      plot.project("value", "v");
+
+      plot.renderTo(svg);
+
+      var elementsDrawnSel = (<any> plot)._element.selectAll(".arc");
+
+      assert.strictEqual(elementsDrawnSel.size(), 4,
+        "There should be exactly 4 slices in the pie chart, representing the valid values");
+
+      svg.remove();
+
+    });
+
+    it("nulls and 0s should be represented in a Pie Chart as DOM elements, but have radius 0", () => {
+      var svg = generateSVG();
+
+      var data1 = [
+        { v: 1 },
+        { v: 0 },
+        { v: null },
+        { v: 1 },
+      ];
+
+      var plot = new Plottable.Plots.Pie();
+      plot.addDataset(data1);
+      plot.project("value", "v");
+
+      plot.renderTo(svg);
+
+      var elementsDrawnSel = (<any> plot)._element.selectAll(".arc");
+
+      assert.strictEqual(elementsDrawnSel.size(), 4,
+        "All 4 elements of the pie chart should have a DOM node");
+
+      assert.closeTo(elementsDrawnSel[0][1].getBBox().width, 0, 0.001,
+        "0 as a value should not be visible");
+
+      assert.closeTo(elementsDrawnSel[0][2].getBBox().width, 0, 0.001,
+        "null as a value should not be visible");
+
+      svg.remove();
+    });
+  });
 });
