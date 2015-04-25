@@ -1,8 +1,7 @@
 ///<reference path="../../reference.ts" />
 
 module Plottable {
-export module Axes {
-  export class AbstractAxis extends Component {
+  export class Axis extends Component {
     /**
      * The css class applied to each end tick mark (the line on the end tick).
      */
@@ -128,9 +127,9 @@ export module Axes {
     protected _setup() {
       super._setup();
       this._tickMarkContainer = this._content.append("g")
-                                            .classed(AbstractAxis.TICK_MARK_CLASS + "-container", true);
+                                            .classed(Axis.TICK_MARK_CLASS + "-container", true);
       this._tickLabelContainer = this._content.append("g")
-                                             .classed(AbstractAxis.TICK_LABEL_CLASS + "-container", true);
+                                             .classed(Axis.TICK_LABEL_CLASS + "-container", true);
       this._baseline = this._content.append("line").classed("baseline", true);
     }
 
@@ -144,12 +143,12 @@ export module Axes {
 
     public _doRender() {
       var tickMarkValues = this._getTickValues();
-      var tickMarks = this._tickMarkContainer.selectAll("." + AbstractAxis.TICK_MARK_CLASS).data(tickMarkValues);
-      tickMarks.enter().append("line").classed(AbstractAxis.TICK_MARK_CLASS, true);
+      var tickMarks = this._tickMarkContainer.selectAll("." + Axis.TICK_MARK_CLASS).data(tickMarkValues);
+      tickMarks.enter().append("line").classed(Axis.TICK_MARK_CLASS, true);
       tickMarks.attr(this._generateTickMarkAttrHash());
-      d3.select(tickMarks[0][0]).classed(AbstractAxis.END_TICK_MARK_CLASS, true)
+      d3.select(tickMarks[0][0]).classed(Axis.END_TICK_MARK_CLASS, true)
                                 .attr(this._generateTickMarkAttrHash(true));
-      d3.select(tickMarks[0][tickMarkValues.length - 1]).classed(AbstractAxis.END_TICK_MARK_CLASS, true)
+      d3.select(tickMarks[0][tickMarkValues.length - 1]).classed(Axis.END_TICK_MARK_CLASS, true)
                                                       .attr(this._generateTickMarkAttrHash(true));
       tickMarks.exit().remove();
       this._baseline.attr(this._generateBaselineAttrHash());
@@ -271,7 +270,7 @@ export module Axes {
      * @param {Formatter} formatter If provided, data will be passed though `formatter(data)`.
      * @returns {Axis} The calling Axis.
      */
-    public formatter(formatter: Formatter): AbstractAxis;
+    public formatter(formatter: Formatter): Axis;
     public formatter(formatter?: Formatter): any {
       if (formatter === undefined) {
         return this._formatter;
@@ -293,7 +292,7 @@ export module Axes {
      * @param {number} length If provided, length of each tick.
      * @returns {Axis} The calling Axis.
      */
-    public tickLength(length: number): AbstractAxis;
+    public tickLength(length: number): Axis;
     public tickLength(length?: number): any {
       if (length == null) {
         return this._tickLength;
@@ -319,7 +318,7 @@ export module Axes {
      * @param {number} length If provided, the length of the end ticks.
      * @returns {BaseAxis} The calling Axis.
      */
-    public endTickLength(length: number): AbstractAxis;
+    public endTickLength(length: number): Axis;
     public endTickLength(length?: number): any {
       if (length == null) {
         return this._endTickLength;
@@ -354,7 +353,7 @@ export module Axes {
      * @param {number} padding If provided, the desired padding.
      * @returns {Axis} The calling Axis.
      */
-    public tickLabelPadding(padding: number): AbstractAxis;
+    public tickLabelPadding(padding: number): Axis;
     public tickLabelPadding(padding?: number): any {
       if (padding == null) {
         return this._tickLabelPadding;
@@ -383,7 +382,7 @@ export module Axes {
      * @param {number} size If provided, the desired gutter.
      * @returns {Axis} The calling Axis.
      */
-    public gutter(size: number): AbstractAxis;
+    public gutter(size: number): Axis;
     public gutter(size?: number): any {
       if (size == null) {
         return this._gutter;
@@ -410,7 +409,7 @@ export module Axes {
      * (top/bottom/left/right).
      * @returns {Axis} The calling Axis.
      */
-    public orient(newOrientation: string): AbstractAxis;
+    public orient(newOrientation: string): Axis;
     public orient(newOrientation?: string): any {
       if (newOrientation == null) {
         return this._orientation;
@@ -444,7 +443,7 @@ export module Axes {
      * labels.
      * @returns {Axis} The calling Axis.
      */
-    public showEndTickLabels(show: boolean): AbstractAxis;
+    public showEndTickLabels(show: boolean): Axis;
     public showEndTickLabels(show?: boolean): any {
       if (show == null) {
         return this._showEndTickLabels;
@@ -454,5 +453,4 @@ export module Axes {
       return this;
     }
   }
-}
 }

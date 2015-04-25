@@ -46,7 +46,7 @@ describe("TimeAxis", () => {
 
       function checkLabelsForContainer(container: D3.Selection) {
         var visibleTickLabels = container
-                .selectAll("." + Plottable.Axes.AbstractAxis.TICK_LABEL_CLASS)
+                .selectAll("." + Plottable.Axis.TICK_LABEL_CLASS)
                 .filter(function(d: any, i: number) {
                   return d3.select(this).style("visibility") === "visible";
                 });
@@ -125,10 +125,10 @@ describe("TimeAxis", () => {
     var svg = generateSVG(width, 100);
     scale.domain(["2010", "2014"]);
     axis.renderTo(svg);
-    var firstTick = d3.select("." + Plottable.Axes.AbstractAxis.TICK_MARK_CLASS);
-    assert.isTrue(firstTick.classed(Plottable.Axes.AbstractAxis.END_TICK_MARK_CLASS), "first end tick has the end-tick-mark class");
-    var lastTick = d3.select(d3.selectAll("." + Plottable.Axes.AbstractAxis.TICK_MARK_CLASS)[0].pop());
-    assert.isTrue(lastTick.classed(Plottable.Axes.AbstractAxis.END_TICK_MARK_CLASS), "last end tick has the end-tick-mark class");
+    var firstTick = d3.select("." + Plottable.Axis.TICK_MARK_CLASS);
+    assert.isTrue(firstTick.classed(Plottable.Axis.END_TICK_MARK_CLASS), "first end tick has the end-tick-mark class");
+    var lastTick = d3.select(d3.selectAll("." + Plottable.Axis.TICK_MARK_CLASS)[0].pop());
+    assert.isTrue(lastTick.classed(Plottable.Axis.END_TICK_MARK_CLASS), "last end tick has the end-tick-mark class");
     svg.remove();
   });
 
@@ -138,8 +138,8 @@ describe("TimeAxis", () => {
     scale.domain([new Date("2009-12-20"), new Date("2011-01-01")]);
     axis = new Plottable.Axes.Time(scale, "bottom");
     axis.renderTo(svg);
-    var tickRects = d3.selectAll("." + Plottable.Axes.AbstractAxis.TICK_MARK_CLASS)[0].map((mark: Element) => mark.getBoundingClientRect());
-    var labelRects = d3.selectAll("." + Plottable.Axes.AbstractAxis.TICK_LABEL_CLASS)
+    var tickRects = d3.selectAll("." + Plottable.Axis.TICK_MARK_CLASS)[0].map((mark: Element) => mark.getBoundingClientRect());
+    var labelRects = d3.selectAll("." + Plottable.Axis.TICK_LABEL_CLASS)
         .filter(function(d: Element, i: number) {
           return d3.select(this).style("visibility") === "visible";
         })[0].map((label: Element) => label.getBoundingClientRect());

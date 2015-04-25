@@ -3998,318 +3998,315 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
-    var Axes;
-    (function (Axes) {
-        var AbstractAxis = (function (_super) {
-            __extends(AbstractAxis, _super);
-            /**
-             * Constructs an axis. An axis is a wrapper around a scale for rendering.
-             *
-             * @constructor
-             * @param {Scale} scale The scale for this axis to render.
-             * @param {string} orientation One of ["top", "left", "bottom", "right"];
-             * on which side the axis will appear. On most axes, this is either "left"
-             * or "bottom".
-             * @param {Formatter} Data is passed through this formatter before being
-             * displayed.
-             */
-            function AbstractAxis(scale, orientation, formatter) {
-                var _this = this;
-                if (formatter === void 0) { formatter = Plottable.Formatters.identity(); }
-                _super.call(this);
-                this._endTickLength = 5;
-                this._tickLength = 5;
-                this._tickLabelPadding = 10;
-                this._gutter = 15;
-                this._showEndTickLabels = false;
-                if (scale == null || orientation == null) {
-                    throw new Error("Axis requires a scale and orientation");
-                }
-                this._scale = scale;
-                this.orient(orientation);
-                this._setDefaultAlignment();
-                this.classed("axis", true);
-                if (this._isHorizontal()) {
-                    this.classed("x-axis", true);
-                }
-                else {
-                    this.classed("y-axis", true);
-                }
-                this.formatter(formatter);
-                this._scale.broadcaster.registerListener(this, function () { return _this._rescale(); });
+    var Axis = (function (_super) {
+        __extends(Axis, _super);
+        /**
+         * Constructs an axis. An axis is a wrapper around a scale for rendering.
+         *
+         * @constructor
+         * @param {Scale} scale The scale for this axis to render.
+         * @param {string} orientation One of ["top", "left", "bottom", "right"];
+         * on which side the axis will appear. On most axes, this is either "left"
+         * or "bottom".
+         * @param {Formatter} Data is passed through this formatter before being
+         * displayed.
+         */
+        function Axis(scale, orientation, formatter) {
+            var _this = this;
+            if (formatter === void 0) { formatter = Plottable.Formatters.identity(); }
+            _super.call(this);
+            this._endTickLength = 5;
+            this._tickLength = 5;
+            this._tickLabelPadding = 10;
+            this._gutter = 15;
+            this._showEndTickLabels = false;
+            if (scale == null || orientation == null) {
+                throw new Error("Axis requires a scale and orientation");
             }
-            AbstractAxis.prototype.remove = function () {
-                _super.prototype.remove.call(this);
-                this._scale.broadcaster.deregisterListener(this);
-            };
-            AbstractAxis.prototype._isHorizontal = function () {
-                return this._orientation === "top" || this._orientation === "bottom";
-            };
-            AbstractAxis.prototype._computeWidth = function () {
-                // to be overridden by subclass logic
-                this._computedWidth = this._maxLabelTickLength();
-                return this._computedWidth;
-            };
-            AbstractAxis.prototype._computeHeight = function () {
-                // to be overridden by subclass logic
-                this._computedHeight = this._maxLabelTickLength();
-                return this._computedHeight;
-            };
-            AbstractAxis.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
-                var requestedWidth = 0;
-                var requestedHeight = 0;
-                if (this._isHorizontal()) {
-                    if (this._computedHeight == null) {
-                        this._computeHeight();
-                    }
-                    requestedHeight = this._computedHeight + this._gutter;
+            this._scale = scale;
+            this.orient(orientation);
+            this._setDefaultAlignment();
+            this.classed("axis", true);
+            if (this._isHorizontal()) {
+                this.classed("x-axis", true);
+            }
+            else {
+                this.classed("y-axis", true);
+            }
+            this.formatter(formatter);
+            this._scale.broadcaster.registerListener(this, function () { return _this._rescale(); });
+        }
+        Axis.prototype.remove = function () {
+            _super.prototype.remove.call(this);
+            this._scale.broadcaster.deregisterListener(this);
+        };
+        Axis.prototype._isHorizontal = function () {
+            return this._orientation === "top" || this._orientation === "bottom";
+        };
+        Axis.prototype._computeWidth = function () {
+            // to be overridden by subclass logic
+            this._computedWidth = this._maxLabelTickLength();
+            return this._computedWidth;
+        };
+        Axis.prototype._computeHeight = function () {
+            // to be overridden by subclass logic
+            this._computedHeight = this._maxLabelTickLength();
+            return this._computedHeight;
+        };
+        Axis.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
+            var requestedWidth = 0;
+            var requestedHeight = 0;
+            if (this._isHorizontal()) {
+                if (this._computedHeight == null) {
+                    this._computeHeight();
                 }
-                else {
-                    if (this._computedWidth == null) {
-                        this._computeWidth();
-                    }
-                    requestedWidth = this._computedWidth + this._gutter;
+                requestedHeight = this._computedHeight + this._gutter;
+            }
+            else {
+                if (this._computedWidth == null) {
+                    this._computeWidth();
                 }
-                return {
-                    width: requestedWidth,
-                    height: requestedHeight,
-                    wantsWidth: !this._isHorizontal() && offeredWidth < requestedWidth,
-                    wantsHeight: this._isHorizontal() && offeredHeight < requestedHeight
-                };
+                requestedWidth = this._computedWidth + this._gutter;
+            }
+            return {
+                width: requestedWidth,
+                height: requestedHeight,
+                wantsWidth: !this._isHorizontal() && offeredWidth < requestedWidth,
+                wantsHeight: this._isHorizontal() && offeredHeight < requestedHeight
             };
-            AbstractAxis.prototype._isFixedHeight = function () {
-                return this._isHorizontal();
+        };
+        Axis.prototype._isFixedHeight = function () {
+            return this._isHorizontal();
+        };
+        Axis.prototype._isFixedWidth = function () {
+            return !this._isHorizontal();
+        };
+        Axis.prototype._rescale = function () {
+            // default implementation; subclasses may call _invalidateLayout() here
+            this._render();
+        };
+        Axis.prototype._computeLayout = function (offeredXOrigin, offeredYOrigin, availableWidth, availableHeight) {
+            _super.prototype._computeLayout.call(this, offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
+            if (this._isHorizontal()) {
+                this._scale.range([0, this.width()]);
+            }
+            else {
+                this._scale.range([this.height(), 0]);
+            }
+        };
+        Axis.prototype._setup = function () {
+            _super.prototype._setup.call(this);
+            this._tickMarkContainer = this._content.append("g").classed(Axis.TICK_MARK_CLASS + "-container", true);
+            this._tickLabelContainer = this._content.append("g").classed(Axis.TICK_LABEL_CLASS + "-container", true);
+            this._baseline = this._content.append("line").classed("baseline", true);
+        };
+        /*
+         * Function for generating tick values in data-space (as opposed to pixel values).
+         * To be implemented by subclasses.
+         */
+        Axis.prototype._getTickValues = function () {
+            return [];
+        };
+        Axis.prototype._doRender = function () {
+            var tickMarkValues = this._getTickValues();
+            var tickMarks = this._tickMarkContainer.selectAll("." + Axis.TICK_MARK_CLASS).data(tickMarkValues);
+            tickMarks.enter().append("line").classed(Axis.TICK_MARK_CLASS, true);
+            tickMarks.attr(this._generateTickMarkAttrHash());
+            d3.select(tickMarks[0][0]).classed(Axis.END_TICK_MARK_CLASS, true).attr(this._generateTickMarkAttrHash(true));
+            d3.select(tickMarks[0][tickMarkValues.length - 1]).classed(Axis.END_TICK_MARK_CLASS, true).attr(this._generateTickMarkAttrHash(true));
+            tickMarks.exit().remove();
+            this._baseline.attr(this._generateBaselineAttrHash());
+        };
+        Axis.prototype._generateBaselineAttrHash = function () {
+            var baselineAttrHash = {
+                x1: 0,
+                y1: 0,
+                x2: 0,
+                y2: 0
             };
-            AbstractAxis.prototype._isFixedWidth = function () {
-                return !this._isHorizontal();
+            switch (this._orientation) {
+                case "bottom":
+                    baselineAttrHash.x2 = this.width();
+                    break;
+                case "top":
+                    baselineAttrHash.x2 = this.width();
+                    baselineAttrHash.y1 = this.height();
+                    baselineAttrHash.y2 = this.height();
+                    break;
+                case "left":
+                    baselineAttrHash.x1 = this.width();
+                    baselineAttrHash.x2 = this.width();
+                    baselineAttrHash.y2 = this.height();
+                    break;
+                case "right":
+                    baselineAttrHash.y2 = this.height();
+                    break;
+            }
+            return baselineAttrHash;
+        };
+        Axis.prototype._generateTickMarkAttrHash = function (isEndTickMark) {
+            var _this = this;
+            if (isEndTickMark === void 0) { isEndTickMark = false; }
+            var tickMarkAttrHash = {
+                x1: 0,
+                y1: 0,
+                x2: 0,
+                y2: 0
             };
-            AbstractAxis.prototype._rescale = function () {
-                // default implementation; subclasses may call _invalidateLayout() here
-                this._render();
-            };
-            AbstractAxis.prototype._computeLayout = function (offeredXOrigin, offeredYOrigin, availableWidth, availableHeight) {
-                _super.prototype._computeLayout.call(this, offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
-                if (this._isHorizontal()) {
-                    this._scale.range([0, this.width()]);
+            var scalingFunction = function (d) { return _this._scale.scale(d); };
+            if (this._isHorizontal()) {
+                tickMarkAttrHash["x1"] = scalingFunction;
+                tickMarkAttrHash["x2"] = scalingFunction;
+            }
+            else {
+                tickMarkAttrHash["y1"] = scalingFunction;
+                tickMarkAttrHash["y2"] = scalingFunction;
+            }
+            var tickLength = isEndTickMark ? this._endTickLength : this._tickLength;
+            switch (this._orientation) {
+                case "bottom":
+                    tickMarkAttrHash["y2"] = tickLength;
+                    break;
+                case "top":
+                    tickMarkAttrHash["y1"] = this.height();
+                    tickMarkAttrHash["y2"] = this.height() - tickLength;
+                    break;
+                case "left":
+                    tickMarkAttrHash["x1"] = this.width();
+                    tickMarkAttrHash["x2"] = this.width() - tickLength;
+                    break;
+                case "right":
+                    tickMarkAttrHash["x2"] = tickLength;
+                    break;
+            }
+            return tickMarkAttrHash;
+        };
+        Axis.prototype._invalidateLayout = function () {
+            this._computedWidth = null;
+            this._computedHeight = null;
+            _super.prototype._invalidateLayout.call(this);
+        };
+        Axis.prototype._setDefaultAlignment = function () {
+            switch (this._orientation) {
+                case "bottom":
+                    this.yAlign("top");
+                    break;
+                case "top":
+                    this.yAlign("bottom");
+                    break;
+                case "left":
+                    this.xAlign("right");
+                    break;
+                case "right":
+                    this.xAlign("left");
+                    break;
+            }
+        };
+        Axis.prototype.formatter = function (formatter) {
+            if (formatter === undefined) {
+                return this._formatter;
+            }
+            this._formatter = formatter;
+            this._invalidateLayout();
+            return this;
+        };
+        Axis.prototype.tickLength = function (length) {
+            if (length == null) {
+                return this._tickLength;
+            }
+            else {
+                if (length < 0) {
+                    throw new Error("tick length must be positive");
                 }
-                else {
-                    this._scale.range([this.height(), 0]);
-                }
-            };
-            AbstractAxis.prototype._setup = function () {
-                _super.prototype._setup.call(this);
-                this._tickMarkContainer = this._content.append("g").classed(AbstractAxis.TICK_MARK_CLASS + "-container", true);
-                this._tickLabelContainer = this._content.append("g").classed(AbstractAxis.TICK_LABEL_CLASS + "-container", true);
-                this._baseline = this._content.append("line").classed("baseline", true);
-            };
-            /*
-             * Function for generating tick values in data-space (as opposed to pixel values).
-             * To be implemented by subclasses.
-             */
-            AbstractAxis.prototype._getTickValues = function () {
-                return [];
-            };
-            AbstractAxis.prototype._doRender = function () {
-                var tickMarkValues = this._getTickValues();
-                var tickMarks = this._tickMarkContainer.selectAll("." + AbstractAxis.TICK_MARK_CLASS).data(tickMarkValues);
-                tickMarks.enter().append("line").classed(AbstractAxis.TICK_MARK_CLASS, true);
-                tickMarks.attr(this._generateTickMarkAttrHash());
-                d3.select(tickMarks[0][0]).classed(AbstractAxis.END_TICK_MARK_CLASS, true).attr(this._generateTickMarkAttrHash(true));
-                d3.select(tickMarks[0][tickMarkValues.length - 1]).classed(AbstractAxis.END_TICK_MARK_CLASS, true).attr(this._generateTickMarkAttrHash(true));
-                tickMarks.exit().remove();
-                this._baseline.attr(this._generateBaselineAttrHash());
-            };
-            AbstractAxis.prototype._generateBaselineAttrHash = function () {
-                var baselineAttrHash = {
-                    x1: 0,
-                    y1: 0,
-                    x2: 0,
-                    y2: 0
-                };
-                switch (this._orientation) {
-                    case "bottom":
-                        baselineAttrHash.x2 = this.width();
-                        break;
-                    case "top":
-                        baselineAttrHash.x2 = this.width();
-                        baselineAttrHash.y1 = this.height();
-                        baselineAttrHash.y2 = this.height();
-                        break;
-                    case "left":
-                        baselineAttrHash.x1 = this.width();
-                        baselineAttrHash.x2 = this.width();
-                        baselineAttrHash.y2 = this.height();
-                        break;
-                    case "right":
-                        baselineAttrHash.y2 = this.height();
-                        break;
-                }
-                return baselineAttrHash;
-            };
-            AbstractAxis.prototype._generateTickMarkAttrHash = function (isEndTickMark) {
-                var _this = this;
-                if (isEndTickMark === void 0) { isEndTickMark = false; }
-                var tickMarkAttrHash = {
-                    x1: 0,
-                    y1: 0,
-                    x2: 0,
-                    y2: 0
-                };
-                var scalingFunction = function (d) { return _this._scale.scale(d); };
-                if (this._isHorizontal()) {
-                    tickMarkAttrHash["x1"] = scalingFunction;
-                    tickMarkAttrHash["x2"] = scalingFunction;
-                }
-                else {
-                    tickMarkAttrHash["y1"] = scalingFunction;
-                    tickMarkAttrHash["y2"] = scalingFunction;
-                }
-                var tickLength = isEndTickMark ? this._endTickLength : this._tickLength;
-                switch (this._orientation) {
-                    case "bottom":
-                        tickMarkAttrHash["y2"] = tickLength;
-                        break;
-                    case "top":
-                        tickMarkAttrHash["y1"] = this.height();
-                        tickMarkAttrHash["y2"] = this.height() - tickLength;
-                        break;
-                    case "left":
-                        tickMarkAttrHash["x1"] = this.width();
-                        tickMarkAttrHash["x2"] = this.width() - tickLength;
-                        break;
-                    case "right":
-                        tickMarkAttrHash["x2"] = tickLength;
-                        break;
-                }
-                return tickMarkAttrHash;
-            };
-            AbstractAxis.prototype._invalidateLayout = function () {
-                this._computedWidth = null;
-                this._computedHeight = null;
-                _super.prototype._invalidateLayout.call(this);
-            };
-            AbstractAxis.prototype._setDefaultAlignment = function () {
-                switch (this._orientation) {
-                    case "bottom":
-                        this.yAlign("top");
-                        break;
-                    case "top":
-                        this.yAlign("bottom");
-                        break;
-                    case "left":
-                        this.xAlign("right");
-                        break;
-                    case "right":
-                        this.xAlign("left");
-                        break;
-                }
-            };
-            AbstractAxis.prototype.formatter = function (formatter) {
-                if (formatter === undefined) {
-                    return this._formatter;
-                }
-                this._formatter = formatter;
+                this._tickLength = length;
                 this._invalidateLayout();
                 return this;
-            };
-            AbstractAxis.prototype.tickLength = function (length) {
-                if (length == null) {
-                    return this._tickLength;
+            }
+        };
+        Axis.prototype.endTickLength = function (length) {
+            if (length == null) {
+                return this._endTickLength;
+            }
+            else {
+                if (length < 0) {
+                    throw new Error("end tick length must be positive");
                 }
-                else {
-                    if (length < 0) {
-                        throw new Error("tick length must be positive");
-                    }
-                    this._tickLength = length;
-                    this._invalidateLayout();
-                    return this;
-                }
-            };
-            AbstractAxis.prototype.endTickLength = function (length) {
-                if (length == null) {
-                    return this._endTickLength;
-                }
-                else {
-                    if (length < 0) {
-                        throw new Error("end tick length must be positive");
-                    }
-                    this._endTickLength = length;
-                    this._invalidateLayout();
-                    return this;
-                }
-            };
-            AbstractAxis.prototype._maxLabelTickLength = function () {
-                if (this.showEndTickLabels()) {
-                    return Math.max(this.tickLength(), this.endTickLength());
-                }
-                else {
-                    return this.tickLength();
-                }
-            };
-            AbstractAxis.prototype.tickLabelPadding = function (padding) {
-                if (padding == null) {
-                    return this._tickLabelPadding;
-                }
-                else {
-                    if (padding < 0) {
-                        throw new Error("tick label padding must be positive");
-                    }
-                    this._tickLabelPadding = padding;
-                    this._invalidateLayout();
-                    return this;
-                }
-            };
-            AbstractAxis.prototype.gutter = function (size) {
-                if (size == null) {
-                    return this._gutter;
-                }
-                else {
-                    if (size < 0) {
-                        throw new Error("gutter size must be positive");
-                    }
-                    this._gutter = size;
-                    this._invalidateLayout();
-                    return this;
-                }
-            };
-            AbstractAxis.prototype.orient = function (newOrientation) {
-                if (newOrientation == null) {
-                    return this._orientation;
-                }
-                else {
-                    var newOrientationLC = newOrientation.toLowerCase();
-                    if (newOrientationLC !== "top" && newOrientationLC !== "bottom" && newOrientationLC !== "left" && newOrientationLC !== "right") {
-                        throw new Error("unsupported orientation");
-                    }
-                    this._orientation = newOrientationLC;
-                    this._invalidateLayout();
-                    return this;
-                }
-            };
-            AbstractAxis.prototype.showEndTickLabels = function (show) {
-                if (show == null) {
-                    return this._showEndTickLabels;
-                }
-                this._showEndTickLabels = show;
-                this._render();
+                this._endTickLength = length;
+                this._invalidateLayout();
                 return this;
-            };
-            /**
-             * The css class applied to each end tick mark (the line on the end tick).
-             */
-            AbstractAxis.END_TICK_MARK_CLASS = "end-tick-mark";
-            /**
-             * The css class applied to each tick mark (the line on the tick).
-             */
-            AbstractAxis.TICK_MARK_CLASS = "tick-mark";
-            /**
-             * The css class applied to each tick label (the text associated with the tick).
-             */
-            AbstractAxis.TICK_LABEL_CLASS = "tick-label";
-            return AbstractAxis;
-        })(Plottable.Component);
-        Axes.AbstractAxis = AbstractAxis;
-    })(Axes = Plottable.Axes || (Plottable.Axes = {}));
+            }
+        };
+        Axis.prototype._maxLabelTickLength = function () {
+            if (this.showEndTickLabels()) {
+                return Math.max(this.tickLength(), this.endTickLength());
+            }
+            else {
+                return this.tickLength();
+            }
+        };
+        Axis.prototype.tickLabelPadding = function (padding) {
+            if (padding == null) {
+                return this._tickLabelPadding;
+            }
+            else {
+                if (padding < 0) {
+                    throw new Error("tick label padding must be positive");
+                }
+                this._tickLabelPadding = padding;
+                this._invalidateLayout();
+                return this;
+            }
+        };
+        Axis.prototype.gutter = function (size) {
+            if (size == null) {
+                return this._gutter;
+            }
+            else {
+                if (size < 0) {
+                    throw new Error("gutter size must be positive");
+                }
+                this._gutter = size;
+                this._invalidateLayout();
+                return this;
+            }
+        };
+        Axis.prototype.orient = function (newOrientation) {
+            if (newOrientation == null) {
+                return this._orientation;
+            }
+            else {
+                var newOrientationLC = newOrientation.toLowerCase();
+                if (newOrientationLC !== "top" && newOrientationLC !== "bottom" && newOrientationLC !== "left" && newOrientationLC !== "right") {
+                    throw new Error("unsupported orientation");
+                }
+                this._orientation = newOrientationLC;
+                this._invalidateLayout();
+                return this;
+            }
+        };
+        Axis.prototype.showEndTickLabels = function (show) {
+            if (show == null) {
+                return this._showEndTickLabels;
+            }
+            this._showEndTickLabels = show;
+            this._render();
+            return this;
+        };
+        /**
+         * The css class applied to each end tick mark (the line on the end tick).
+         */
+        Axis.END_TICK_MARK_CLASS = "end-tick-mark";
+        /**
+         * The css class applied to each tick mark (the line on the tick).
+         */
+        Axis.TICK_MARK_CLASS = "tick-mark";
+        /**
+         * The css class applied to each tick label (the text associated with the tick).
+         */
+        Axis.TICK_LABEL_CLASS = "tick-label";
+        return Axis;
+    })(Plottable.Component);
+    Plottable.Axis = Axis;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../../reference.ts" />
@@ -4447,8 +4444,8 @@ var Plottable;
                 this._baseline.remove();
                 for (var i = 0; i < this._numTiers; ++i) {
                     var tierContainer = this._content.append("g").classed(Time.TIME_AXIS_TIER_CLASS, true);
-                    this._tierLabelContainers.push(tierContainer.append("g").classed(Axes.AbstractAxis.TICK_LABEL_CLASS + "-container", true));
-                    this._tierMarkContainers.push(tierContainer.append("g").classed(Axes.AbstractAxis.TICK_MARK_CLASS + "-container", true));
+                    this._tierLabelContainers.push(tierContainer.append("g").classed(Plottable.Axis.TICK_LABEL_CLASS + "-container", true));
+                    this._tierMarkContainers.push(tierContainer.append("g").classed(Plottable.Axis.TICK_MARK_CLASS + "-container", true));
                     this._tierBaselines.push(tierContainer.append("line").classed("baseline", true));
                 }
                 this._measurer = new SVGTypewriter.Measurers.Measurer(this._tierLabelContainers[0]);
@@ -4462,8 +4459,8 @@ var Plottable;
             };
             Time.prototype._cleanTiers = function () {
                 for (var index = 0; index < this._tierLabelContainers.length; index++) {
-                    this._tierLabelContainers[index].selectAll("." + Axes.AbstractAxis.TICK_LABEL_CLASS).remove();
-                    this._tierMarkContainers[index].selectAll("." + Axes.AbstractAxis.TICK_MARK_CLASS).remove();
+                    this._tierLabelContainers[index].selectAll("." + Plottable.Axis.TICK_LABEL_CLASS).remove();
+                    this._tierMarkContainers[index].selectAll("." + Plottable.Axis.TICK_MARK_CLASS).remove();
                     this._tierBaselines[index].style("visibility", "hidden");
                 }
             };
@@ -4494,8 +4491,8 @@ var Plottable;
                 else {
                     labelPos = tickPos;
                 }
-                var tickLabels = container.selectAll("." + Axes.AbstractAxis.TICK_LABEL_CLASS).data(labelPos, function (d) { return d.valueOf(); });
-                var tickLabelsEnter = tickLabels.enter().append("g").classed(Axes.AbstractAxis.TICK_LABEL_CLASS, true);
+                var tickLabels = container.selectAll("." + Plottable.Axis.TICK_LABEL_CLASS).data(labelPos, function (d) { return d.valueOf(); });
+                var tickLabelsEnter = tickLabels.enter().append("g").classed(Plottable.Axis.TICK_LABEL_CLASS, true);
                 tickLabelsEnter.append("text");
                 var xTranslate = (this._tierLabelPositions[index] === "center" || config.step === 1) ? 0 : this.tickLabelPadding();
                 var markLength = this._measurer.measure().height;
@@ -4510,8 +4507,8 @@ var Plottable;
                 tickLabels.selectAll("text").text(config.formatter).style("text-anchor", anchor);
             };
             Time.prototype._renderTickMarks = function (tickValues, index) {
-                var tickMarks = this._tierMarkContainers[index].selectAll("." + Axes.AbstractAxis.TICK_MARK_CLASS).data(tickValues);
-                tickMarks.enter().append("line").classed(Axes.AbstractAxis.TICK_MARK_CLASS, true);
+                var tickMarks = this._tierMarkContainers[index].selectAll("." + Plottable.Axis.TICK_MARK_CLASS).data(tickValues);
+                tickMarks.enter().append("line").classed(Plottable.Axis.TICK_MARK_CLASS, true);
                 var attr = this._generateTickMarkAttrHash();
                 var offset = this._tierHeights.slice(0, index).reduce(function (translate, height) { return translate + height; }, 0);
                 if (this.orient() === "bottom") {
@@ -4533,13 +4530,13 @@ var Plottable;
                 }
                 d3.select(tickMarks[0][0]).attr(attr);
                 // Add end-tick classes to first and last tick for CSS customization purposes
-                d3.select(tickMarks[0][0]).classed(Axes.AbstractAxis.END_TICK_MARK_CLASS, true);
-                d3.select(tickMarks[0][tickMarks.size() - 1]).classed(Axes.AbstractAxis.END_TICK_MARK_CLASS, true);
+                d3.select(tickMarks[0][0]).classed(Plottable.Axis.END_TICK_MARK_CLASS, true);
+                d3.select(tickMarks[0][tickMarks.size() - 1]).classed(Plottable.Axis.END_TICK_MARK_CLASS, true);
                 tickMarks.exit().remove();
             };
             Time.prototype._renderLabellessTickMarks = function (tickValues) {
-                var tickMarks = this._tickMarkContainer.selectAll("." + Axes.AbstractAxis.TICK_MARK_CLASS).data(tickValues);
-                tickMarks.enter().append("line").classed(Axes.AbstractAxis.TICK_MARK_CLASS, true);
+                var tickMarks = this._tickMarkContainer.selectAll("." + Plottable.Axis.TICK_MARK_CLASS).data(tickValues);
+                tickMarks.enter().append("line").classed(Plottable.Axis.TICK_MARK_CLASS, true);
                 var attr = this._generateTickMarkAttrHash();
                 attr["y2"] = (this.orient() === "bottom") ? this.tickLabelPadding() : this.height() - this.tickLabelPadding();
                 tickMarks.attr(attr);
@@ -4595,13 +4592,13 @@ var Plottable;
                 var isInsideBBox = function (tickBox) {
                     return (Math.floor(boundingBox.left) <= Math.ceil(tickBox.left) && Math.floor(boundingBox.top) <= Math.ceil(tickBox.top) && Math.floor(tickBox.right) <= Math.ceil(boundingBox.left + _this.width()) && Math.floor(tickBox.bottom) <= Math.ceil(boundingBox.top + _this.height()));
                 };
-                var visibleTickMarks = this._tierMarkContainers[index].selectAll("." + Axes.AbstractAxis.TICK_MARK_CLASS).filter(function (d, i) {
+                var visibleTickMarks = this._tierMarkContainers[index].selectAll("." + Plottable.Axis.TICK_MARK_CLASS).filter(function (d, i) {
                     var visibility = d3.select(this).style("visibility");
                     return visibility === "visible" || visibility === "inherit";
                 });
                 // We use the ClientRects because x1/x2 attributes are not comparable to ClientRects of labels
                 var visibleTickMarkRects = visibleTickMarks[0].map(function (mark) { return mark.getBoundingClientRect(); });
-                var visibleTickLabels = this._tierLabelContainers[index].selectAll("." + Axes.AbstractAxis.TICK_LABEL_CLASS).filter(function (d, i) {
+                var visibleTickLabels = this._tierLabelContainers[index].selectAll("." + Plottable.Axis.TICK_LABEL_CLASS).filter(function (d, i) {
                     var visibility = d3.select(this).style("visibility");
                     return visibility === "visible" || visibility === "inherit";
                 });
@@ -4738,7 +4735,7 @@ var Plottable;
             ];
             Time._LONG_DATE = new Date(9999, 8, 29, 12, 59, 9999);
             return Time;
-        })(Axes.AbstractAxis);
+        })(Plottable.Axis);
         Axes.Time = Time;
     })(Axes = Plottable.Axes || (Plottable.Axes = {}));
 })(Plottable || (Plottable = {}));
@@ -4778,7 +4775,7 @@ var Plottable;
             }
             Numeric.prototype._setup = function () {
                 _super.prototype._setup.call(this);
-                this._measurer = new SVGTypewriter.Measurers.Measurer(this._tickLabelContainer, Axes.AbstractAxis.TICK_LABEL_CLASS);
+                this._measurer = new SVGTypewriter.Measurers.Measurer(this._tickLabelContainer, Plottable.Axis.TICK_LABEL_CLASS);
                 this._wrapper = new SVGTypewriter.Wrappers.Wrapper().maxLines(1);
             };
             Numeric.prototype._computeWidth = function () {
@@ -4906,8 +4903,8 @@ var Plottable;
                         break;
                 }
                 var tickLabelValues = this._getTickValues();
-                var tickLabels = this._tickLabelContainer.selectAll("." + Axes.AbstractAxis.TICK_LABEL_CLASS).data(tickLabelValues);
-                tickLabels.enter().append("text").classed(Axes.AbstractAxis.TICK_LABEL_CLASS, true);
+                var tickLabels = this._tickLabelContainer.selectAll("." + Plottable.Axis.TICK_LABEL_CLASS).data(tickLabelValues);
+                tickLabels.enter().append("text").classed(Plottable.Axis.TICK_LABEL_CLASS, true);
                 tickLabels.exit().remove();
                 tickLabels.style("text-anchor", tickLabelTextAnchor).style("visibility", "inherit").attr(tickLabelAttrHash).text(function (s) {
                     var formattedText = _this.formatter()(s);
@@ -4931,7 +4928,7 @@ var Plottable;
                 }
             };
             Numeric.prototype._showAllTickMarks = function () {
-                var visibleTickMarks = this._tickMarkContainer.selectAll("." + Axes.AbstractAxis.TICK_MARK_CLASS).each(function () {
+                var visibleTickMarks = this._tickMarkContainer.selectAll("." + Plottable.Axis.TICK_MARK_CLASS).each(function () {
                     d3.select(this).style("visibility", "inherit");
                 });
             };
@@ -4939,8 +4936,8 @@ var Plottable;
              * Hides the Tick Marks which have no corresponding Tick Labels
              */
             Numeric.prototype._hideTickMarksWithoutLabel = function () {
-                var visibleTickMarks = this._tickMarkContainer.selectAll("." + Axes.AbstractAxis.TICK_MARK_CLASS);
-                var visibleTickLabels = this._tickLabelContainer.selectAll("." + Axes.AbstractAxis.TICK_LABEL_CLASS).filter(function (d, i) {
+                var visibleTickMarks = this._tickMarkContainer.selectAll("." + Plottable.Axis.TICK_MARK_CLASS);
+                var visibleTickLabels = this._tickLabelContainer.selectAll("." + Plottable.Axis.TICK_LABEL_CLASS).filter(function (d, i) {
                     var visibility = d3.select(this).style("visibility");
                     return (visibility === "inherit") || (visibility === "visible");
                 });
@@ -5000,7 +4997,7 @@ var Plottable;
             };
             Numeric.prototype._hideEndTickLabels = function () {
                 var boundingBox = this._boundingBox.node().getBoundingClientRect();
-                var tickLabels = this._tickLabelContainer.selectAll("." + Axes.AbstractAxis.TICK_LABEL_CLASS);
+                var tickLabels = this._tickLabelContainer.selectAll("." + Plottable.Axis.TICK_LABEL_CLASS);
                 if (tickLabels[0].length === 0) {
                     return;
                 }
@@ -5016,7 +5013,7 @@ var Plottable;
             // Responsible for hiding any tick labels that break out of the bounding container
             Numeric.prototype._hideOverflowingTickLabels = function () {
                 var boundingBox = this._boundingBox.node().getBoundingClientRect();
-                var tickLabels = this._tickLabelContainer.selectAll("." + Axes.AbstractAxis.TICK_LABEL_CLASS);
+                var tickLabels = this._tickLabelContainer.selectAll("." + Plottable.Axis.TICK_LABEL_CLASS);
                 if (tickLabels.empty()) {
                     return;
                 }
@@ -5027,7 +5024,7 @@ var Plottable;
                 });
             };
             Numeric.prototype._hideOverlappingTickLabels = function () {
-                var visibleTickLabels = this._tickLabelContainer.selectAll("." + Axes.AbstractAxis.TICK_LABEL_CLASS).filter(function (d, i) {
+                var visibleTickLabels = this._tickLabelContainer.selectAll("." + Plottable.Axis.TICK_LABEL_CLASS).filter(function (d, i) {
                     var visibility = d3.select(this).style("visibility");
                     return (visibility === "inherit") || (visibility === "visible");
                 });
@@ -5076,7 +5073,7 @@ var Plottable;
                 return true;
             };
             return Numeric;
-        })(Axes.AbstractAxis);
+        })(Plottable.Axis);
         Axes.Numeric = Numeric;
     })(Axes = Plottable.Axes || (Plottable.Axes = {}));
 })(Plottable || (Plottable = {}));
@@ -5248,7 +5245,7 @@ var Plottable;
                 var _this = this;
                 _super.prototype._doRender.call(this);
                 var catScale = this._scale;
-                var tickLabels = this._tickLabelContainer.selectAll("." + Axes.AbstractAxis.TICK_LABEL_CLASS).data(this._scale.domain(), function (d) { return d; });
+                var tickLabels = this._tickLabelContainer.selectAll("." + Plottable.Axis.TICK_LABEL_CLASS).data(this._scale.domain(), function (d) { return d; });
                 var getTickLabelTransform = function (d, i) {
                     var innerPaddingWidth = catScale.stepWidth() - catScale.rangeBand();
                     var scaledValue = catScale.scale(d) - catScale.rangeBand() / 2 - innerPaddingWidth / 2;
@@ -5256,7 +5253,7 @@ var Plottable;
                     var y = _this._isHorizontal() ? 0 : scaledValue;
                     return "translate(" + x + "," + y + ")";
                 };
-                tickLabels.enter().append("g").classed(Axes.AbstractAxis.TICK_LABEL_CLASS, true);
+                tickLabels.enter().append("g").classed(Plottable.Axis.TICK_LABEL_CLASS, true);
                 tickLabels.exit().remove();
                 tickLabels.attr("transform", getTickLabelTransform);
                 // erase all text first, then rewrite
@@ -5276,7 +5273,7 @@ var Plottable;
                 return _super.prototype._computeLayout.call(this, offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
             };
             return Category;
-        })(Axes.AbstractAxis);
+        })(Plottable.Axis);
         Axes.Category = Category;
     })(Axes = Plottable.Axes || (Plottable.Axes = {}));
 })(Plottable || (Plottable = {}));

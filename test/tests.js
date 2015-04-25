@@ -502,16 +502,16 @@ var assert = chai.assert;
 describe("BaseAxis", function () {
     it("orientation", function () {
         var scale = new Plottable.Scales.Linear();
-        assert.throws(function () { return new Plottable.Axes.AbstractAxis(scale, "blargh"); }, "unsupported");
+        assert.throws(function () { return new Plottable.Axis(scale, "blargh"); }, "unsupported");
     });
     it("tickLabelPadding() rejects negative values", function () {
         var scale = new Plottable.Scales.Linear();
-        var baseAxis = new Plottable.Axes.AbstractAxis(scale, "bottom");
+        var baseAxis = new Plottable.Axis(scale, "bottom");
         assert.throws(function () { return baseAxis.tickLabelPadding(-1); }, "must be positive");
     });
     it("gutter() rejects negative values", function () {
         var scale = new Plottable.Scales.Linear();
-        var axis = new Plottable.Axes.AbstractAxis(scale, "right");
+        var axis = new Plottable.Axis(scale, "right");
         assert.throws(function () { return axis.gutter(-1); }, "must be positive");
     });
     it("width() + gutter()", function () {
@@ -519,7 +519,7 @@ describe("BaseAxis", function () {
         var SVG_HEIGHT = 500;
         var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
         var scale = new Plottable.Scales.Linear();
-        var verticalAxis = new Plottable.Axes.AbstractAxis(scale, "right");
+        var verticalAxis = new Plottable.Axis(scale, "right");
         verticalAxis.renderTo(svg);
         var expectedWidth = verticalAxis.tickLength() + verticalAxis.gutter(); // tick length and gutter by default
         assert.strictEqual(verticalAxis.width(), expectedWidth, "calling width() with no arguments returns currently used width");
@@ -533,7 +533,7 @@ describe("BaseAxis", function () {
         var SVG_HEIGHT = 100;
         var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
         var scale = new Plottable.Scales.Linear();
-        var horizontalAxis = new Plottable.Axes.AbstractAxis(scale, "bottom");
+        var horizontalAxis = new Plottable.Axis(scale, "bottom");
         horizontalAxis.renderTo(svg);
         var expectedHeight = horizontalAxis.tickLength() + horizontalAxis.gutter(); // tick length and gutter by default
         assert.strictEqual(horizontalAxis.height(), expectedHeight, "calling height() with no arguments returns currently used height");
@@ -549,13 +549,13 @@ describe("BaseAxis", function () {
         var scale = new Plottable.Scales.Linear();
         scale.domain([0, 10]);
         scale.range([0, SVG_WIDTH]);
-        var baseAxis = new Plottable.Axes.AbstractAxis(scale, "bottom");
+        var baseAxis = new Plottable.Axis(scale, "bottom");
         var tickValues = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
         baseAxis._getTickValues = function () {
             return tickValues;
         };
         baseAxis.renderTo(svg);
-        var tickMarks = svg.selectAll("." + Plottable.Axes.AbstractAxis.TICK_MARK_CLASS);
+        var tickMarks = svg.selectAll("." + Plottable.Axis.TICK_MARK_CLASS);
         assert.strictEqual(tickMarks[0].length, tickValues.length, "A tick mark was created for each value");
         var baseline = svg.select(".baseline");
         assert.isNotNull(baseline.node(), "baseline was drawn");
@@ -578,13 +578,13 @@ describe("BaseAxis", function () {
         var scale = new Plottable.Scales.Linear();
         scale.domain([0, 10]);
         scale.range([0, SVG_HEIGHT]);
-        var baseAxis = new Plottable.Axes.AbstractAxis(scale, "left");
+        var baseAxis = new Plottable.Axis(scale, "left");
         var tickValues = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
         baseAxis._getTickValues = function () {
             return tickValues;
         };
         baseAxis.renderTo(svg);
-        var tickMarks = svg.selectAll("." + Plottable.Axes.AbstractAxis.TICK_MARK_CLASS);
+        var tickMarks = svg.selectAll("." + Plottable.Axis.TICK_MARK_CLASS);
         assert.strictEqual(tickMarks[0].length, tickValues.length, "A tick mark was created for each value");
         var baseline = svg.select(".baseline");
         assert.isNotNull(baseline.node(), "baseline was drawn");
@@ -607,13 +607,13 @@ describe("BaseAxis", function () {
         var scale = new Plottable.Scales.Linear();
         scale.domain([0, 10]);
         scale.range([0, SVG_WIDTH]);
-        var baseAxis = new Plottable.Axes.AbstractAxis(scale, "bottom");
+        var baseAxis = new Plottable.Axis(scale, "bottom");
         var tickValues = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
         baseAxis._getTickValues = function () {
             return tickValues;
         };
         baseAxis.renderTo(svg);
-        var secondTickMark = svg.selectAll("." + Plottable.Axes.AbstractAxis.TICK_MARK_CLASS + ":nth-child(2)");
+        var secondTickMark = svg.selectAll("." + Plottable.Axis.TICK_MARK_CLASS + ":nth-child(2)");
         assert.strictEqual(secondTickMark.attr("x1"), "50");
         assert.strictEqual(secondTickMark.attr("x2"), "50");
         assert.strictEqual(secondTickMark.attr("y1"), "0");
@@ -630,11 +630,11 @@ describe("BaseAxis", function () {
         var scale = new Plottable.Scales.Linear();
         scale.domain([0, 10]);
         scale.range([0, SVG_WIDTH]);
-        var baseAxis = new Plottable.Axes.AbstractAxis(scale, "bottom");
+        var baseAxis = new Plottable.Axis(scale, "bottom");
         var tickValues = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
         baseAxis._getTickValues = function () { return tickValues; };
         baseAxis.renderTo(svg);
-        var firstTickMark = svg.selectAll("." + Plottable.Axes.AbstractAxis.END_TICK_MARK_CLASS);
+        var firstTickMark = svg.selectAll("." + Plottable.Axis.END_TICK_MARK_CLASS);
         assert.strictEqual(firstTickMark.attr("x1"), "0");
         assert.strictEqual(firstTickMark.attr("x2"), "0");
         assert.strictEqual(firstTickMark.attr("y1"), "0");
@@ -649,7 +649,7 @@ describe("BaseAxis", function () {
         var SVG_HEIGHT = 100;
         var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
         var scale = new Plottable.Scales.Linear();
-        var baseAxis = new Plottable.Axes.AbstractAxis(scale, "bottom");
+        var baseAxis = new Plottable.Axis(scale, "bottom");
         baseAxis.showEndTickLabels(true);
         baseAxis.renderTo(svg);
         var expectedHeight = Math.max(baseAxis.tickLength(), baseAxis.endTickLength()) + baseAxis.gutter();
@@ -664,13 +664,13 @@ describe("BaseAxis", function () {
     });
     it("default alignment based on orientation", function () {
         var scale = new Plottable.Scales.Linear();
-        var baseAxis = new Plottable.Axes.AbstractAxis(scale, "bottom");
+        var baseAxis = new Plottable.Axis(scale, "bottom");
         assert.equal(baseAxis._yAlignProportion, 0, "yAlignProportion defaults to 0 for bottom axis");
-        baseAxis = new Plottable.Axes.AbstractAxis(scale, "top");
+        baseAxis = new Plottable.Axis(scale, "top");
         assert.equal(baseAxis._yAlignProportion, 1, "yAlignProportion defaults to 1 for top axis");
-        baseAxis = new Plottable.Axes.AbstractAxis(scale, "left");
+        baseAxis = new Plottable.Axis(scale, "left");
         assert.equal(baseAxis._xAlignProportion, 1, "xAlignProportion defaults to 1 for left axis");
-        baseAxis = new Plottable.Axes.AbstractAxis(scale, "right");
+        baseAxis = new Plottable.Axis(scale, "right");
         assert.equal(baseAxis._xAlignProportion, 0, "xAlignProportion defaults to 0 for right axis");
     });
 });
@@ -711,7 +711,7 @@ describe("TimeAxis", function () {
             scale.domain(domain);
             axis.renderTo(svg);
             function checkLabelsForContainer(container) {
-                var visibleTickLabels = container.selectAll("." + Plottable.Axes.AbstractAxis.TICK_LABEL_CLASS).filter(function (d, i) {
+                var visibleTickLabels = container.selectAll("." + Plottable.Axis.TICK_LABEL_CLASS).filter(function (d, i) {
                     return d3.select(this).style("visibility") === "visible";
                 });
                 var numLabels = visibleTickLabels[0].length;
@@ -783,10 +783,10 @@ describe("TimeAxis", function () {
         var svg = generateSVG(width, 100);
         scale.domain(["2010", "2014"]);
         axis.renderTo(svg);
-        var firstTick = d3.select("." + Plottable.Axes.AbstractAxis.TICK_MARK_CLASS);
-        assert.isTrue(firstTick.classed(Plottable.Axes.AbstractAxis.END_TICK_MARK_CLASS), "first end tick has the end-tick-mark class");
-        var lastTick = d3.select(d3.selectAll("." + Plottable.Axes.AbstractAxis.TICK_MARK_CLASS)[0].pop());
-        assert.isTrue(lastTick.classed(Plottable.Axes.AbstractAxis.END_TICK_MARK_CLASS), "last end tick has the end-tick-mark class");
+        var firstTick = d3.select("." + Plottable.Axis.TICK_MARK_CLASS);
+        assert.isTrue(firstTick.classed(Plottable.Axis.END_TICK_MARK_CLASS), "first end tick has the end-tick-mark class");
+        var lastTick = d3.select(d3.selectAll("." + Plottable.Axis.TICK_MARK_CLASS)[0].pop());
+        assert.isTrue(lastTick.classed(Plottable.Axis.END_TICK_MARK_CLASS), "last end tick has the end-tick-mark class");
         svg.remove();
     });
     it("tick labels do not overlap with tick marks", function () {
@@ -795,8 +795,8 @@ describe("TimeAxis", function () {
         scale.domain([new Date("2009-12-20"), new Date("2011-01-01")]);
         axis = new Plottable.Axes.Time(scale, "bottom");
         axis.renderTo(svg);
-        var tickRects = d3.selectAll("." + Plottable.Axes.AbstractAxis.TICK_MARK_CLASS)[0].map(function (mark) { return mark.getBoundingClientRect(); });
-        var labelRects = d3.selectAll("." + Plottable.Axes.AbstractAxis.TICK_LABEL_CLASS).filter(function (d, i) {
+        var tickRects = d3.selectAll("." + Plottable.Axis.TICK_MARK_CLASS)[0].map(function (mark) { return mark.getBoundingClientRect(); });
+        var labelRects = d3.selectAll("." + Plottable.Axis.TICK_LABEL_CLASS).filter(function (d, i) {
             return d3.select(this).style("visibility") === "visible";
         })[0].map(function (label) { return label.getBoundingClientRect(); });
         labelRects.forEach(function (labelRect) {
@@ -963,9 +963,9 @@ describe("NumericAxis", function () {
         scale.range([0, SVG_WIDTH]);
         var numericAxis = new Plottable.Axes.Numeric(scale, "bottom");
         numericAxis.renderTo(svg);
-        var tickLabels = numericAxis._element.selectAll("." + Plottable.Axes.AbstractAxis.TICK_LABEL_CLASS);
+        var tickLabels = numericAxis._element.selectAll("." + Plottable.Axis.TICK_LABEL_CLASS);
         assert.operator(tickLabels[0].length, ">=", 2, "at least two tick labels were drawn");
-        var tickMarks = numericAxis._element.selectAll("." + Plottable.Axes.AbstractAxis.TICK_MARK_CLASS);
+        var tickMarks = numericAxis._element.selectAll("." + Plottable.Axis.TICK_MARK_CLASS);
         assert.strictEqual(tickLabels[0].length, tickMarks[0].length, "there is one label per mark");
         var i;
         var markBB;
@@ -979,8 +979,8 @@ describe("NumericAxis", function () {
         }
         // labels to left
         numericAxis.tickLabelPosition("left");
-        tickLabels = numericAxis._element.selectAll("." + Plottable.Axes.AbstractAxis.TICK_LABEL_CLASS);
-        tickMarks = numericAxis._element.selectAll("." + Plottable.Axes.AbstractAxis.TICK_MARK_CLASS);
+        tickLabels = numericAxis._element.selectAll("." + Plottable.Axis.TICK_LABEL_CLASS);
+        tickMarks = numericAxis._element.selectAll("." + Plottable.Axis.TICK_MARK_CLASS);
         for (i = 0; i < tickLabels[0].length; i++) {
             markBB = tickMarks[0][i].getBoundingClientRect();
             labelBB = tickLabels[0][i].getBoundingClientRect();
@@ -988,8 +988,8 @@ describe("NumericAxis", function () {
         }
         // labels to right
         numericAxis.tickLabelPosition("right");
-        tickLabels = numericAxis._element.selectAll("." + Plottable.Axes.AbstractAxis.TICK_LABEL_CLASS);
-        tickMarks = numericAxis._element.selectAll("." + Plottable.Axes.AbstractAxis.TICK_MARK_CLASS);
+        tickLabels = numericAxis._element.selectAll("." + Plottable.Axis.TICK_LABEL_CLASS);
+        tickMarks = numericAxis._element.selectAll("." + Plottable.Axis.TICK_MARK_CLASS);
         for (i = 0; i < tickLabels[0].length; i++) {
             markBB = tickMarks[0][i].getBoundingClientRect();
             labelBB = tickLabels[0][i].getBoundingClientRect();
@@ -1005,9 +1005,9 @@ describe("NumericAxis", function () {
         scale.range([0, SVG_HEIGHT]);
         var numericAxis = new Plottable.Axes.Numeric(scale, "left");
         numericAxis.renderTo(svg);
-        var tickLabels = numericAxis._element.selectAll("." + Plottable.Axes.AbstractAxis.TICK_LABEL_CLASS);
+        var tickLabels = numericAxis._element.selectAll("." + Plottable.Axis.TICK_LABEL_CLASS);
         assert.operator(tickLabels[0].length, ">=", 2, "at least two tick labels were drawn");
-        var tickMarks = numericAxis._element.selectAll("." + Plottable.Axes.AbstractAxis.TICK_MARK_CLASS);
+        var tickMarks = numericAxis._element.selectAll("." + Plottable.Axis.TICK_MARK_CLASS);
         assert.strictEqual(tickLabels[0].length, tickMarks[0].length, "there is one label per mark");
         var i;
         var markBB;
@@ -1021,8 +1021,8 @@ describe("NumericAxis", function () {
         }
         // labels to top
         numericAxis.tickLabelPosition("top");
-        tickLabels = numericAxis._element.selectAll("." + Plottable.Axes.AbstractAxis.TICK_LABEL_CLASS);
-        tickMarks = numericAxis._element.selectAll("." + Plottable.Axes.AbstractAxis.TICK_MARK_CLASS);
+        tickLabels = numericAxis._element.selectAll("." + Plottable.Axis.TICK_LABEL_CLASS);
+        tickMarks = numericAxis._element.selectAll("." + Plottable.Axis.TICK_MARK_CLASS);
         for (i = 0; i < tickLabels[0].length; i++) {
             markBB = tickMarks[0][i].getBoundingClientRect();
             labelBB = tickLabels[0][i].getBoundingClientRect();
@@ -1030,8 +1030,8 @@ describe("NumericAxis", function () {
         }
         // labels to bottom
         numericAxis.tickLabelPosition("bottom");
-        tickLabels = numericAxis._element.selectAll("." + Plottable.Axes.AbstractAxis.TICK_LABEL_CLASS);
-        tickMarks = numericAxis._element.selectAll("." + Plottable.Axes.AbstractAxis.TICK_MARK_CLASS);
+        tickLabels = numericAxis._element.selectAll("." + Plottable.Axis.TICK_LABEL_CLASS);
+        tickMarks = numericAxis._element.selectAll("." + Plottable.Axis.TICK_MARK_CLASS);
         for (i = 0; i < tickLabels[0].length; i++) {
             markBB = tickMarks[0][i].getBoundingClientRect();
             labelBB = tickLabels[0][i].getBoundingClientRect();
@@ -1048,7 +1048,7 @@ describe("NumericAxis", function () {
         var formatter = Plottable.Formatters.fixed(2);
         var numericAxis = new Plottable.Axes.Numeric(scale, "left", formatter);
         numericAxis.renderTo(svg);
-        var tickLabels = numericAxis._element.selectAll("." + Plottable.Axes.AbstractAxis.TICK_LABEL_CLASS);
+        var tickLabels = numericAxis._element.selectAll("." + Plottable.Axis.TICK_LABEL_CLASS);
         tickLabels.each(function (d, i) {
             var labelText = d3.select(this).text();
             var formattedValue = formatter(d);
@@ -1070,7 +1070,7 @@ describe("NumericAxis", function () {
         assert.throws(function () { return numericAxis.showEndTickLabel("top", true); }, Error);
         assert.throws(function () { return numericAxis.showEndTickLabel("bottom", true); }, Error);
         numericAxis.renderTo(svg);
-        var tickLabels = numericAxis._element.selectAll("." + Plottable.Axes.AbstractAxis.TICK_LABEL_CLASS);
+        var tickLabels = numericAxis._element.selectAll("." + Plottable.Axis.TICK_LABEL_CLASS);
         var firstLabel = d3.select(tickLabels[0][0]);
         assert.strictEqual(firstLabel.style("visibility"), "hidden", "first label is hidden");
         var lastLabel = d3.select(tickLabels[0][tickLabels[0].length - 1]);
@@ -1086,7 +1086,7 @@ describe("NumericAxis", function () {
         var numericAxis = new Plottable.Axes.Numeric(scale, "bottom");
         numericAxis.showEndTickLabel("left", false).showEndTickLabel("right", false);
         numericAxis.renderTo(svg);
-        var visibleTickLabels = numericAxis._element.selectAll("." + Plottable.Axes.AbstractAxis.TICK_LABEL_CLASS).filter(function (d, i) {
+        var visibleTickLabels = numericAxis._element.selectAll("." + Plottable.Axis.TICK_LABEL_CLASS).filter(function (d, i) {
             return d3.select(this).style("visibility") === "visible";
         });
         var numLabels = visibleTickLabels[0].length;
@@ -1100,7 +1100,7 @@ describe("NumericAxis", function () {
             }
         }
         numericAxis.orient("bottom");
-        visibleTickLabels = numericAxis._element.selectAll("." + Plottable.Axes.AbstractAxis.TICK_LABEL_CLASS).filter(function (d, i) {
+        visibleTickLabels = numericAxis._element.selectAll("." + Plottable.Axis.TICK_LABEL_CLASS).filter(function (d, i) {
             return d3.select(this).style("visibility") === "visible";
         });
         numLabels = visibleTickLabels[0].length;
@@ -1128,7 +1128,7 @@ describe("NumericAxis", function () {
         };
         var numericAxis = new Plottable.Axes.Numeric(scale, "left", formatter);
         numericAxis.renderTo(svg);
-        var visibleTickLabels = numericAxis._element.selectAll("." + Plottable.Axes.AbstractAxis.TICK_LABEL_CLASS).filter(function (d, i) {
+        var visibleTickLabels = numericAxis._element.selectAll("." + Plottable.Axis.TICK_LABEL_CLASS).filter(function (d, i) {
             return d3.select(this).style("visibility") === "visible";
         });
         var boundingBox = numericAxis._element.select(".bounding-box").node().getBoundingClientRect();
@@ -1138,7 +1138,7 @@ describe("NumericAxis", function () {
             assert.isTrue(boxIsInside(labelBox, boundingBox), "tick labels don't extend outside the bounding box");
         });
         scale.domain([50000000000, -50000000000]);
-        visibleTickLabels = numericAxis._element.selectAll("." + Plottable.Axes.AbstractAxis.TICK_LABEL_CLASS).filter(function (d, i) {
+        visibleTickLabels = numericAxis._element.selectAll("." + Plottable.Axis.TICK_LABEL_CLASS).filter(function (d, i) {
             return d3.select(this).style("visibility") === "visible";
         });
         boundingBox = numericAxis._element.select(".bounding-box").node().getBoundingClientRect();
@@ -1158,7 +1158,7 @@ describe("NumericAxis", function () {
         var formatter = Plottable.Formatters.fixed(2);
         var numericAxis = new Plottable.Axes.Numeric(scale, "bottom", formatter);
         numericAxis.renderTo(svg);
-        var visibleTickLabels = numericAxis._element.selectAll("." + Plottable.Axes.AbstractAxis.TICK_LABEL_CLASS).filter(function (d, i) {
+        var visibleTickLabels = numericAxis._element.selectAll("." + Plottable.Axis.TICK_LABEL_CLASS).filter(function (d, i) {
             return d3.select(this).style("visibility") === "visible";
         });
         var boundingBox = numericAxis._element.select(".bounding-box").node().getBoundingClientRect();
@@ -1282,11 +1282,11 @@ describe("NumericAxis", function () {
             [yAxis],
         ]);
         chartTable.renderTo(svg);
-        var tickLabels = yAxis._element.selectAll("." + Plottable.Axes.AbstractAxis.TICK_LABEL_CLASS).filter(function (d, i) {
+        var tickLabels = yAxis._element.selectAll("." + Plottable.Axis.TICK_LABEL_CLASS).filter(function (d, i) {
             var visibility = d3.select(this).style("visibility");
             return (visibility === "visible") || (visibility === "inherit");
         });
-        var tickMarks = yAxis._element.selectAll("." + Plottable.Axes.AbstractAxis.TICK_MARK_CLASS).filter(function (d, i) {
+        var tickMarks = yAxis._element.selectAll("." + Plottable.Axis.TICK_MARK_CLASS).filter(function (d, i) {
             var visibility = d3.select(this).style("visibility");
             return (visibility === "visible") || (visibility === "inherit");
         });
@@ -1473,7 +1473,7 @@ describe("Gridlines", function () {
         xScale.range([0, xAxis.width()]); // manually set range since we don't have a renderer
         yScale.range([yAxis.height(), 0]);
         basicTable._render();
-        var xAxisTickMarks = xAxis._element.selectAll("." + Plottable.Axes.AbstractAxis.TICK_MARK_CLASS)[0];
+        var xAxisTickMarks = xAxis._element.selectAll("." + Plottable.Axis.TICK_MARK_CLASS)[0];
         var xGridlines = gridlines._element.select(".x-gridlines").selectAll("line")[0];
         assert.equal(xAxisTickMarks.length, xGridlines.length, "There is an x gridline for each x tick");
         for (var i = 0; i < xAxisTickMarks.length; i++) {
@@ -1481,7 +1481,7 @@ describe("Gridlines", function () {
             var xGridlineRect = xGridlines[i].getBoundingClientRect();
             assert.closeTo(xTickMarkRect.left, xGridlineRect.left, 1, "x tick and gridline align");
         }
-        var yAxisTickMarks = yAxis._element.selectAll("." + Plottable.Axes.AbstractAxis.TICK_MARK_CLASS)[0];
+        var yAxisTickMarks = yAxis._element.selectAll("." + Plottable.Axis.TICK_MARK_CLASS)[0];
         var yGridlines = gridlines._element.select(".y-gridlines").selectAll("line")[0];
         assert.equal(yAxisTickMarks.length, yGridlines.length, "There is an x gridline for each x tick");
         for (var j = 0; j < yAxisTickMarks.length; j++) {

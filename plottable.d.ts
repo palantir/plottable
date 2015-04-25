@@ -1867,169 +1867,167 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Axes {
-        class AbstractAxis extends Component {
-            /**
-             * The css class applied to each end tick mark (the line on the end tick).
-             */
-            static END_TICK_MARK_CLASS: string;
-            /**
-             * The css class applied to each tick mark (the line on the tick).
-             */
-            static TICK_MARK_CLASS: string;
-            /**
-             * The css class applied to each tick label (the text associated with the tick).
-             */
-            static TICK_LABEL_CLASS: string;
-            protected _tickMarkContainer: D3.Selection;
-            protected _tickLabelContainer: D3.Selection;
-            protected _baseline: D3.Selection;
-            protected _scale: Scale<any, number>;
-            protected _computedWidth: number;
-            protected _computedHeight: number;
-            /**
-             * Constructs an axis. An axis is a wrapper around a scale for rendering.
-             *
-             * @constructor
-             * @param {Scale} scale The scale for this axis to render.
-             * @param {string} orientation One of ["top", "left", "bottom", "right"];
-             * on which side the axis will appear. On most axes, this is either "left"
-             * or "bottom".
-             * @param {Formatter} Data is passed through this formatter before being
-             * displayed.
-             */
-            constructor(scale: Scale<any, number>, orientation: string, formatter?: (d: any) => string);
-            remove(): void;
-            protected _isHorizontal(): boolean;
-            protected _computeWidth(): number;
-            protected _computeHeight(): number;
-            _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
-            _isFixedHeight(): boolean;
-            _isFixedWidth(): boolean;
-            protected _rescale(): void;
-            _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;
-            protected _setup(): void;
-            protected _getTickValues(): any[];
-            _doRender(): void;
-            protected _generateBaselineAttrHash(): {
-                x1: number;
-                y1: number;
-                x2: number;
-                y2: number;
-            };
-            protected _generateTickMarkAttrHash(isEndTickMark?: boolean): {
-                x1: any;
-                y1: any;
-                x2: any;
-                y2: any;
-            };
-            _invalidateLayout(): void;
-            protected _setDefaultAlignment(): void;
-            /**
-             * Gets the current formatter on the axis. Data is passed through the
-             * formatter before being displayed.
-             *
-             * @returns {Formatter} The calling Axis, or the current
-             * Formatter.
-             */
-            formatter(): Formatter;
-            /**
-             * Sets the current formatter on the axis. Data is passed through the
-             * formatter before being displayed.
-             *
-             * @param {Formatter} formatter If provided, data will be passed though `formatter(data)`.
-             * @returns {Axis} The calling Axis.
-             */
-            formatter(formatter: Formatter): AbstractAxis;
-            /**
-             * Gets the current tick mark length.
-             *
-             * @returns {number} the current tick mark length.
-             */
-            tickLength(): number;
-            /**
-             * Sets the current tick mark length.
-             *
-             * @param {number} length If provided, length of each tick.
-             * @returns {Axis} The calling Axis.
-             */
-            tickLength(length: number): AbstractAxis;
-            /**
-             * Gets the current end tick mark length.
-             *
-             * @returns {number} The current end tick mark length.
-             */
-            endTickLength(): number;
-            /**
-             * Sets the end tick mark length.
-             *
-             * @param {number} length If provided, the length of the end ticks.
-             * @returns {BaseAxis} The calling Axis.
-             */
-            endTickLength(length: number): AbstractAxis;
-            protected _maxLabelTickLength(): number;
-            /**
-             * Gets the padding between each tick mark and its associated label.
-             *
-             * @returns {number} the current padding.
-             * length.
-             */
-            tickLabelPadding(): number;
-            /**
-             * Sets the padding between each tick mark and its associated label.
-             *
-             * @param {number} padding If provided, the desired padding.
-             * @returns {Axis} The calling Axis.
-             */
-            tickLabelPadding(padding: number): AbstractAxis;
-            /**
-             * Gets the size of the gutter (the extra space between the tick
-             * labels and the outer edge of the axis).
-             *
-             * @returns {number} the current gutter.
-             * length.
-             */
-            gutter(): number;
-            /**
-             * Sets the size of the gutter (the extra space between the tick
-             * labels and the outer edge of the axis).
-             *
-             * @param {number} size If provided, the desired gutter.
-             * @returns {Axis} The calling Axis.
-             */
-            gutter(size: number): AbstractAxis;
-            /**
-             * Gets the orientation of the Axis.
-             *
-             * @returns {number} the current orientation.
-             */
-            orient(): string;
-            /**
-             * Sets the orientation of the Axis.
-             *
-             * @param {number} newOrientation If provided, the desired orientation
-             * (top/bottom/left/right).
-             * @returns {Axis} The calling Axis.
-             */
-            orient(newOrientation: string): AbstractAxis;
-            /**
-             * Gets whether the Axis is currently set to show the first and last
-             * tick labels.
-             *
-             * @returns {boolean} whether or not the last
-             * tick labels are showing.
-             */
-            showEndTickLabels(): boolean;
-            /**
-             * Sets whether the Axis is currently set to show the first and last tick
-             * labels.
-             *
-             * @param {boolean} show Whether or not to show the first and last
-             * labels.
-             * @returns {Axis} The calling Axis.
-             */
-            showEndTickLabels(show: boolean): AbstractAxis;
-        }
+    class Axis extends Component {
+        /**
+         * The css class applied to each end tick mark (the line on the end tick).
+         */
+        static END_TICK_MARK_CLASS: string;
+        /**
+         * The css class applied to each tick mark (the line on the tick).
+         */
+        static TICK_MARK_CLASS: string;
+        /**
+         * The css class applied to each tick label (the text associated with the tick).
+         */
+        static TICK_LABEL_CLASS: string;
+        protected _tickMarkContainer: D3.Selection;
+        protected _tickLabelContainer: D3.Selection;
+        protected _baseline: D3.Selection;
+        protected _scale: Scale<any, number>;
+        protected _computedWidth: number;
+        protected _computedHeight: number;
+        /**
+         * Constructs an axis. An axis is a wrapper around a scale for rendering.
+         *
+         * @constructor
+         * @param {Scale} scale The scale for this axis to render.
+         * @param {string} orientation One of ["top", "left", "bottom", "right"];
+         * on which side the axis will appear. On most axes, this is either "left"
+         * or "bottom".
+         * @param {Formatter} Data is passed through this formatter before being
+         * displayed.
+         */
+        constructor(scale: Scale<any, number>, orientation: string, formatter?: (d: any) => string);
+        remove(): void;
+        protected _isHorizontal(): boolean;
+        protected _computeWidth(): number;
+        protected _computeHeight(): number;
+        _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
+        _isFixedHeight(): boolean;
+        _isFixedWidth(): boolean;
+        protected _rescale(): void;
+        _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;
+        protected _setup(): void;
+        protected _getTickValues(): any[];
+        _doRender(): void;
+        protected _generateBaselineAttrHash(): {
+            x1: number;
+            y1: number;
+            x2: number;
+            y2: number;
+        };
+        protected _generateTickMarkAttrHash(isEndTickMark?: boolean): {
+            x1: any;
+            y1: any;
+            x2: any;
+            y2: any;
+        };
+        _invalidateLayout(): void;
+        protected _setDefaultAlignment(): void;
+        /**
+         * Gets the current formatter on the axis. Data is passed through the
+         * formatter before being displayed.
+         *
+         * @returns {Formatter} The calling Axis, or the current
+         * Formatter.
+         */
+        formatter(): Formatter;
+        /**
+         * Sets the current formatter on the axis. Data is passed through the
+         * formatter before being displayed.
+         *
+         * @param {Formatter} formatter If provided, data will be passed though `formatter(data)`.
+         * @returns {Axis} The calling Axis.
+         */
+        formatter(formatter: Formatter): Axis;
+        /**
+         * Gets the current tick mark length.
+         *
+         * @returns {number} the current tick mark length.
+         */
+        tickLength(): number;
+        /**
+         * Sets the current tick mark length.
+         *
+         * @param {number} length If provided, length of each tick.
+         * @returns {Axis} The calling Axis.
+         */
+        tickLength(length: number): Axis;
+        /**
+         * Gets the current end tick mark length.
+         *
+         * @returns {number} The current end tick mark length.
+         */
+        endTickLength(): number;
+        /**
+         * Sets the end tick mark length.
+         *
+         * @param {number} length If provided, the length of the end ticks.
+         * @returns {BaseAxis} The calling Axis.
+         */
+        endTickLength(length: number): Axis;
+        protected _maxLabelTickLength(): number;
+        /**
+         * Gets the padding between each tick mark and its associated label.
+         *
+         * @returns {number} the current padding.
+         * length.
+         */
+        tickLabelPadding(): number;
+        /**
+         * Sets the padding between each tick mark and its associated label.
+         *
+         * @param {number} padding If provided, the desired padding.
+         * @returns {Axis} The calling Axis.
+         */
+        tickLabelPadding(padding: number): Axis;
+        /**
+         * Gets the size of the gutter (the extra space between the tick
+         * labels and the outer edge of the axis).
+         *
+         * @returns {number} the current gutter.
+         * length.
+         */
+        gutter(): number;
+        /**
+         * Sets the size of the gutter (the extra space between the tick
+         * labels and the outer edge of the axis).
+         *
+         * @param {number} size If provided, the desired gutter.
+         * @returns {Axis} The calling Axis.
+         */
+        gutter(size: number): Axis;
+        /**
+         * Gets the orientation of the Axis.
+         *
+         * @returns {number} the current orientation.
+         */
+        orient(): string;
+        /**
+         * Sets the orientation of the Axis.
+         *
+         * @param {number} newOrientation If provided, the desired orientation
+         * (top/bottom/left/right).
+         * @returns {Axis} The calling Axis.
+         */
+        orient(newOrientation: string): Axis;
+        /**
+         * Gets whether the Axis is currently set to show the first and last
+         * tick labels.
+         *
+         * @returns {boolean} whether or not the last
+         * tick labels are showing.
+         */
+        showEndTickLabels(): boolean;
+        /**
+         * Sets whether the Axis is currently set to show the first and last tick
+         * labels.
+         *
+         * @param {boolean} show Whether or not to show the first and last
+         * labels.
+         * @returns {Axis} The calling Axis.
+         */
+        showEndTickLabels(show: boolean): Axis;
     }
 }
 
@@ -2054,7 +2052,7 @@ declare module Plottable {
          * Currently, up to two tiers are supported.
          */
         type TimeAxisConfiguration = TimeAxisTierConfiguration[];
-        class Time extends AbstractAxis {
+        class Time extends Axis {
             /**
              * The css class applied to each time axis tier
              */
@@ -2102,7 +2100,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Axes {
-        class Numeric extends AbstractAxis {
+        class Numeric extends Axis {
             /**
              * Constructs a NumericAxis.
              *
@@ -2168,7 +2166,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Axes {
-        class Category extends AbstractAxis {
+        class Category extends Axis {
             /**
              * Constructs a CategoryAxis.
              *
