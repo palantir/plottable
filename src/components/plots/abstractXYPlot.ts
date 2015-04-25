@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Plots {
-  export class AbstractXYPlot<X, Y> extends AbstractPlot {
+  export class AbstractXYPlot<X, Y> extends Plot {
     protected _xScale: Scale<X, number>;
     protected _yScale: Scale<Y, number>;
     private _autoAdjustXScaleDomain = false;

@@ -12,7 +12,7 @@ export module Plots {
    *   "outer-radius" - Accessor determining the distance from the center to the outer edge of the sector
    *   "value" - Accessor to extract the value determining the proportion of each slice to the total
    */
-  export class Pie extends AbstractPlot {
+  export class Pie extends Plot {
 
     private _colorScale: Scales.Color;
 

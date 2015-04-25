@@ -2115,16 +2115,16 @@ var CountingPlot = (function (_super) {
         return _super.prototype._render.call(this);
     };
     return CountingPlot;
-})(Plottable.Plots.AbstractPlot);
+})(Plottable.Plot);
 describe("Plots", function () {
     describe("Abstract Plot", function () {
         it("Plots default correctly", function () {
-            var r = new Plottable.Plots.AbstractPlot();
+            var r = new Plottable.Plot();
             assert.isTrue(r.clipPathEnabled, "clipPathEnabled defaults to true");
         });
         it("Base Plot functionality works", function () {
             var svg = generateSVG(400, 300);
-            var r = new Plottable.Plots.AbstractPlot();
+            var r = new Plottable.Plot();
             r._anchor(svg);
             r._computeLayout();
             var renderArea = r._content.select(".render-area");
@@ -2152,7 +2152,7 @@ describe("Plots", function () {
         });
         it("Updates its projectors when the Dataset is changed", function () {
             var d1 = new Plottable.Dataset([{ x: 5, y: 6 }], { cssClass: "bar" });
-            var r = new Plottable.Plots.AbstractPlot();
+            var r = new Plottable.Plot();
             r.addDataset("d1", d1);
             var xScaleCalls = 0;
             var yScaleCalls = 0;
@@ -2189,13 +2189,13 @@ describe("Plots", function () {
         });
         it("Plot automatically generates a Dataset if only data is provided", function () {
             var data = ["foo", "bar"];
-            var r = new Plottable.Plots.AbstractPlot().addDataset("foo", data);
+            var r = new Plottable.Plot().addDataset("foo", data);
             var dataset = r.datasets()[0];
             assert.isNotNull(dataset, "A Dataset was automatically generated");
             assert.deepEqual(dataset.data(), data, "The generated Dataset has the correct data");
         });
         it("Plot.project works as intended", function () {
-            var r = new Plottable.Plots.AbstractPlot();
+            var r = new Plottable.Plot();
             var s = new Plottable.Scales.Linear().domain([0, 1]).range([0, 10]);
             r.project("attr", "a", s);
             var attrToProjector = r._generateAttrToProjector();
@@ -2208,8 +2208,8 @@ describe("Plots", function () {
             var s = new Plottable.Scales.Linear();
             var svg1 = generateSVG(100, 100);
             var svg2 = generateSVG(100, 100);
-            var r1 = new Plottable.Plots.AbstractPlot().addDataset(ds1).project("x", function (x) { return x; }, s).renderTo(svg1);
-            var r2 = new Plottable.Plots.AbstractPlot().addDataset(ds2).project("x", function (x) { return x; }, s).renderTo(svg2);
+            var r1 = new Plottable.Plot().addDataset(ds1).project("x", function (x) { return x; }, s).renderTo(svg1);
+            var r2 = new Plottable.Plot().addDataset(ds2).project("x", function (x) { return x; }, s).renderTo(svg2);
             assert.deepEqual(s.domain(), [0, 3], "Simple domain combining");
             ds1.data([]);
             assert.deepEqual(s.domain(), [1, 3], "Contracting domain due to projection becoming empty");
@@ -2218,7 +2218,7 @@ describe("Plots", function () {
         });
         it("getAllSelections() with dataset retrieval", function () {
             var svg = generateSVG(400, 400);
-            var plot = new Plottable.Plots.AbstractPlot();
+            var plot = new Plottable.Plot();
             // Create mock drawers with already drawn items
             var mockDrawer1 = new Plottable.Drawers.AbstractDrawer("ds1");
             var renderArea1 = svg.append("g");
@@ -2257,7 +2257,7 @@ describe("Plots", function () {
         });
         it("getAllPlotData() with dataset retrieval", function () {
             var svg = generateSVG(400, 400);
-            var plot = new Plottable.Plots.AbstractPlot();
+            var plot = new Plottable.Plot();
             var data1 = [{ value: 0 }, { value: 1 }, { value: 2 }];
             var data2 = [{ value: 0 }, { value: 1 }, { value: 2 }];
             var data1Points = data1.map(function (datum) {
@@ -2315,7 +2315,7 @@ describe("Plots", function () {
         });
         it("getAllPlotData() with NaN pixel points", function () {
             var svg = generateSVG(400, 400);
-            var plot = new Plottable.Plots.AbstractPlot();
+            var plot = new Plottable.Plot();
             var data = [{ value: NaN }, { value: 1 }, { value: 2 }];
             var dataPoints = data.map(function (datum) {
                 return { x: datum.value, y: 10 };
@@ -2347,7 +2347,7 @@ describe("Plots", function () {
         });
         it("getClosestPlotData", function () {
             var svg = generateSVG(400, 400);
-            var plot = new Plottable.Plots.AbstractPlot();
+            var plot = new Plottable.Plot();
             var data1 = [{ value: 0 }, { value: 1 }, { value: 2 }];
             var data2 = [{ value: 0 }, { value: 1 }, { value: 2 }];
             var data1Points = data1.map(function (datum) {
@@ -2393,7 +2393,7 @@ describe("Plots", function () {
             var d1;
             var d2;
             beforeEach(function () {
-                plot = new Plottable.Plots.AbstractPlot();
+                plot = new Plottable.Plot();
                 d1 = new Plottable.Dataset();
                 d2 = new Plottable.Dataset();
                 plot.addDataset("foo", d1);
@@ -2445,7 +2445,7 @@ describe("Plots", function () {
             });
         });
         it("remove() disconnects plots from its scales", function () {
-            var r = new Plottable.Plots.AbstractPlot();
+            var r = new Plottable.Plot();
             var s = new Plottable.Scales.Linear();
             r.project("attr", "a", s);
             r.remove();
@@ -2459,8 +2459,8 @@ describe("Plots", function () {
             var d2 = new Plottable.Dataset([4, 99, 999]);
             var d3 = new Plottable.Dataset([-1, -2, -3]);
             var id = function (d) { return d; };
-            var plot1 = new Plottable.Plots.AbstractPlot();
-            var plot2 = new Plottable.Plots.AbstractPlot();
+            var plot1 = new Plottable.Plot();
+            var plot2 = new Plottable.Plot();
             var svg = generateSVG(400, 400);
             plot1.attr("null", id, scale1);
             plot2.attr("null", id, scale1);
@@ -2506,7 +2506,7 @@ describe("Plots", function () {
             var CategoryScale = new Plottable.Scales.Category();
             var dataset1 = [{ key: "A" }];
             var dataset2 = [{ key: "B" }];
-            var plot = new Plottable.Plots.AbstractPlot().addDataset("b", dataset2).addDataset("a", dataset1);
+            var plot = new Plottable.Plot().addDataset("b", dataset2).addDataset("a", dataset1);
             plot.project("key", "key", CategoryScale);
             plot.datasetOrder(["a", "b"]);
             var svg = generateSVG();
@@ -2795,7 +2795,7 @@ describe("Plots", function () {
         var p;
         var oldWarn = Plottable.Utils.Methods.warn;
         beforeEach(function () {
-            p = new Plottable.Plots.AbstractPlot();
+            p = new Plottable.Plot();
             p._getDrawer = function (k) { return new Plottable.Drawers.Element(k).svgElement("rect"); };
         });
         afterEach(function () {
@@ -5782,7 +5782,7 @@ describe("Metadata", function () {
     });
     it("plot metadata is set properly", function () {
         var d1 = new Plottable.Dataset();
-        var r = new Plottable.Plots.AbstractPlot().addDataset("d1", d1).addDataset(d1).addDataset("d2", []).addDataset([]);
+        var r = new Plottable.Plot().addDataset("d1", d1).addDataset(d1).addDataset("d2", []).addDataset([]);
         r._datasetKeysInOrder.forEach(function (key) {
             var plotMetadata = r._key2PlotDatasetKey.get(key).plotMetadata;
             assert.propertyVal(plotMetadata, "datasetKey", key, "metadata has correct dataset key");
@@ -5930,7 +5930,7 @@ describe("Metadata", function () {
         var id = function (d) { return d; };
         var dataset = new Plottable.Dataset(data1, metadata);
         var a = function (d, i, u, m) { return d.x + u.foo + m.foo; };
-        var plot = new Plottable.Plots.AbstractPlot().project("a", a, xScale);
+        var plot = new Plottable.Plot().project("a", a, xScale);
         plot._getPlotMetadataForDataset = function (key) {
             return {
                 datasetKey: key,
@@ -6778,7 +6778,7 @@ describe("Dataset", function () {
         var metadata = { foo: 11 };
         var id = function (d) { return d; };
         var dataset = new Plottable.Dataset(data, metadata);
-        var plot = new Plottable.Plots.AbstractPlot().addDataset(dataset);
+        var plot = new Plottable.Plot().addDataset(dataset);
         var a1 = function (d, i, m) { return d + i - 2; };
         assert.deepEqual(dataset._getExtent(a1, id), [-1, 5], "extent for numerical data works properly");
         var a2 = function (d, i, m) { return d + m.foo; };
@@ -7349,7 +7349,7 @@ describe("Scales", function () {
         });
         it("scale autorange works as expected with single dataset", function () {
             var svg = generateSVG(100, 100);
-            var renderer = new Plottable.Plots.AbstractPlot().addDataset(dataset).project("x", "foo", scale).renderTo(svg);
+            var renderer = new Plottable.Plot().addDataset(dataset).project("x", "foo", scale).renderTo(svg);
             assert.deepEqual(scale.domain(), [0, 5], "scale domain was autoranged properly");
             data.push({ foo: 100, bar: 200 });
             dataset.data(data);
@@ -7359,9 +7359,9 @@ describe("Scales", function () {
         it("scale reference counting works as expected", function () {
             var svg1 = generateSVG(100, 100);
             var svg2 = generateSVG(100, 100);
-            var renderer1 = new Plottable.Plots.AbstractPlot().addDataset(dataset).project("x", "foo", scale);
+            var renderer1 = new Plottable.Plot().addDataset(dataset).project("x", "foo", scale);
             renderer1.renderTo(svg1);
-            var renderer2 = new Plottable.Plots.AbstractPlot().addDataset(dataset).project("x", "foo", scale);
+            var renderer2 = new Plottable.Plot().addDataset(dataset).project("x", "foo", scale);
             renderer2.renderTo(svg2);
             var otherScale = new Plottable.Scales.Linear();
             renderer1.project("x", "foo", otherScale);

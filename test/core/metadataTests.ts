@@ -16,7 +16,7 @@ describe("Metadata", () => {
 
   it("plot metadata is set properly", () => {
     var d1 = new Plottable.Dataset();
-    var r = new Plottable.Plots.AbstractPlot()
+    var r = new Plottable.Plot()
                               .addDataset("d1", d1)
                               .addDataset( d1)
                               .addDataset("d2", [])
@@ -194,7 +194,7 @@ describe("Metadata", () => {
     var id = (d: any) => d;
     var dataset = new Plottable.Dataset(data1, metadata);
     var a = (d: any, i: number, u: any, m: any) => d.x + u.foo + m.foo;
-    var plot = new Plottable.Plots.AbstractPlot().project("a", a, xScale);
+    var plot = new Plottable.Plot().project("a", a, xScale);
     (<any> plot)._getPlotMetadataForDataset = (key: string) => {
       return {
         datasetKey: key,
@@ -215,7 +215,7 @@ describe("Metadata", () => {
     var dataset1 = new Plottable.Dataset(data1, metadata);
     var dataset2 = new Plottable.Dataset(data2, metadata);
 
-    var checkPlot = (plot: Plottable.Plots.AbstractPlot) => {
+    var checkPlot = (plot: Plottable.Plot) => {
       plot.addDataset("ds1", dataset1)
           .addDataset("ds2", dataset2)
           .project("x", (d: any, i: number, u: any, m: Plottable.Plots.PlotMetadata) => d.x + u.foo + m.datasetKey.length)

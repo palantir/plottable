@@ -6464,467 +6464,467 @@ var Plottable;
 (function (Plottable) {
     var Plots;
     (function (Plots) {
-        var AbstractPlot = (function (_super) {
-            __extends(AbstractPlot, _super);
-            /**
-             * Constructs a Plot.
-             *
-             * Plots render data. Common example include Plot.Scatter, Plot.Bar, and Plot.Line.
-             *
-             * A bare Plot has a DataSource and any number of projectors, which take
-             * data and "project" it onto the Plot, such as "x", "y", "fill", "r".
-             *
-             * @constructor
-             * @param {any[]|Dataset} [dataset] If provided, the data or Dataset to be associated with this Plot.
-             */
-            function AbstractPlot() {
-                _super.call(this);
-                this._dataChanged = false;
-                this._projections = {};
-                this._animate = false;
-                this._animators = {};
-                this._animateOnNextRender = true;
-                this.clipPathEnabled = true;
-                this.classed("plot", true);
-                this._key2PlotDatasetKey = d3.map();
-                this._datasetKeysInOrder = [];
-                this._nextSeriesIndex = 0;
-            }
-            AbstractPlot.prototype._anchor = function (element) {
-                _super.prototype._anchor.call(this, element);
-                this._animateOnNextRender = true;
-                this._dataChanged = true;
-                this._updateScaleExtents();
-            };
-            AbstractPlot.prototype._setup = function () {
-                var _this = this;
-                _super.prototype._setup.call(this);
-                this._renderArea = this._content.append("g").classed("render-area", true);
-                // HACKHACK on 591
-                this._getDrawersInOrder().forEach(function (d) { return d.setup(_this._renderArea.append("g")); });
-            };
-            AbstractPlot.prototype.remove = function () {
-                var _this = this;
-                _super.prototype.remove.call(this);
-                this._datasetKeysInOrder.forEach(function (k) { return _this.removeDataset(k); });
-                // deregister from all scales
-                var properties = Object.keys(this._projections);
-                properties.forEach(function (property) {
-                    var projector = _this._projections[property];
-                    if (projector.scale) {
-                        projector.scale.broadcaster.deregisterListener(_this);
-                    }
-                });
-            };
-            AbstractPlot.prototype.addDataset = function (keyOrDataset, dataset) {
-                if (typeof (keyOrDataset) !== "string" && dataset !== undefined) {
-                    throw new Error("invalid input to addDataset");
-                }
-                if (typeof (keyOrDataset) === "string" && keyOrDataset[0] === "_") {
-                    Plottable.Utils.Methods.warn("Warning: Using _named series keys may produce collisions with unlabeled data sources");
-                }
-                var key = typeof (keyOrDataset) === "string" ? keyOrDataset : "_" + this._nextSeriesIndex++;
-                var data = typeof (keyOrDataset) !== "string" ? keyOrDataset : dataset;
-                dataset = (data instanceof Plottable.Dataset) ? data : new Plottable.Dataset(data);
-                this._addDataset(key, dataset);
-                return this;
-            };
-            AbstractPlot.prototype._addDataset = function (key, dataset) {
-                var _this = this;
-                if (this._key2PlotDatasetKey.has(key)) {
-                    this.removeDataset(key);
-                }
-                ;
-                var drawer = this._getDrawer(key);
-                var metadata = this._getPlotMetadataForDataset(key);
-                var pdk = { drawer: drawer, dataset: dataset, key: key, plotMetadata: metadata };
-                this._datasetKeysInOrder.push(key);
-                this._key2PlotDatasetKey.set(key, pdk);
-                if (this._isSetup) {
-                    drawer.setup(this._renderArea.append("g"));
-                }
-                dataset.broadcaster.registerListener(this, function () { return _this._onDatasetUpdate(); });
-                this._onDatasetUpdate();
-            };
-            AbstractPlot.prototype._getDrawer = function (key) {
-                return new Plottable.Drawers.AbstractDrawer(key);
-            };
-            AbstractPlot.prototype._getAnimator = function (key) {
-                if (this._animate && this._animateOnNextRender) {
-                    return this._animators[key] || new Plottable.Animators.Null();
-                }
-                else {
-                    return new Plottable.Animators.Null();
-                }
-            };
-            AbstractPlot.prototype._onDatasetUpdate = function () {
-                this._updateScaleExtents();
-                this._animateOnNextRender = true;
-                this._dataChanged = true;
-                this._render();
-            };
-            /**
-             * Sets an attribute of every data point.
-             *
-             * Here's a common use case:
-             * ```typescript
-             * plot.attr("x", function(d) { return d.foo; }, xScale);
-             * ```
-             * This will set the x accessor of each datum `d` to be `d.foo`,
-             * scaled in accordance with `xScale`
-             *
-             * @param {string} attrToSet The attribute to set across each data
-             * point. Popular examples include "x", "y".
-             *
-             * @param {Function|string|any} accessor Function to apply to each element
-             * of the dataSource. If a Function, use `accessor(d, i)`. If a string,
-             * `d[accessor]` is used. If anything else, use `accessor` as a constant
-             * across all data points.
-             *
-             * @param {Scale.Scale} scale If provided, the result of the accessor
-             * is passed through the scale, such as `scale.scale(accessor(d, i))`.
-             *
-             * @returns {Plot} The calling Plot.
-             */
-            AbstractPlot.prototype.attr = function (attrToSet, accessor, scale) {
-                return this.project(attrToSet, accessor, scale);
-            };
-            /**
-             * Identical to plot.attr
-             */
-            AbstractPlot.prototype.project = function (attrToSet, accessor, scale) {
-                var _this = this;
-                attrToSet = attrToSet.toLowerCase();
-                var currentProjection = this._projections[attrToSet];
-                var existingScale = currentProjection && currentProjection.scale;
-                if (existingScale) {
-                    this._datasetKeysInOrder.forEach(function (key) {
-                        existingScale._removeExtent(_this.getID().toString() + "_" + key, attrToSet);
-                        existingScale.broadcaster.deregisterListener(_this);
-                    });
-                }
-                if (scale) {
-                    scale.broadcaster.registerListener(this, function () { return _this._render(); });
-                }
-                accessor = Plottable.Utils.Methods.accessorize(accessor);
-                this._projections[attrToSet] = { accessor: accessor, scale: scale, attribute: attrToSet };
-                this._updateScaleExtent(attrToSet);
-                this._render(); // queue a re-render upon changing projector
-                return this;
-            };
-            AbstractPlot.prototype._generateAttrToProjector = function () {
-                var _this = this;
-                var h = {};
-                d3.keys(this._projections).forEach(function (a) {
-                    var projection = _this._projections[a];
-                    var accessor = projection.accessor;
-                    var scale = projection.scale;
-                    var fn = scale ? function (d, i, u, m) { return scale.scale(accessor(d, i, u, m)); } : accessor;
-                    h[a] = fn;
-                });
-                return h;
-            };
-            /**
-             * Generates a dictionary mapping an attribute to a function that calculate that attribute's value
-             * in accordance with the given datasetKey.
-             *
-             * Note that this will return all of the data attributes, which may not perfectly align to svg attributes
-             *
-             * @param {datasetKey} the key of the dataset to generate the dictionary for
-             * @returns {AttributeToAppliedProjector} A dictionary mapping attributes to functions
-             */
-            AbstractPlot.prototype.generateProjectors = function (datasetKey) {
-                var attrToProjector = this._generateAttrToProjector();
-                var plotDatasetKey = this._key2PlotDatasetKey.get(datasetKey);
-                var plotMetadata = plotDatasetKey.plotMetadata;
-                var userMetadata = plotDatasetKey.dataset.metadata();
-                var attrToAppliedProjector = {};
-                d3.entries(attrToProjector).forEach(function (keyValue) {
-                    attrToAppliedProjector[keyValue.key] = function (datum, index) { return keyValue.value(datum, index, userMetadata, plotMetadata); };
-                });
-                return attrToAppliedProjector;
-            };
-            AbstractPlot.prototype._doRender = function () {
-                if (this._isAnchored) {
-                    this._paint();
-                    this._dataChanged = false;
-                    this._animateOnNextRender = false;
-                }
-            };
-            /**
-             * Enables or disables animation.
-             *
-             * @param {boolean} enabled Whether or not to animate.
-             */
-            AbstractPlot.prototype.animate = function (enabled) {
-                this._animate = enabled;
-                return this;
-            };
-            AbstractPlot.prototype.detach = function () {
-                _super.prototype.detach.call(this);
-                // make the domain resize
-                this._updateScaleExtents();
-                return this;
-            };
-            /**
-             * This function makes sure that all of the scales in this._projections
-             * have an extent that includes all the data that is projected onto them.
-             */
-            AbstractPlot.prototype._updateScaleExtents = function () {
-                var _this = this;
-                d3.keys(this._projections).forEach(function (attr) { return _this._updateScaleExtent(attr); });
-            };
-            AbstractPlot.prototype._updateScaleExtent = function (attr) {
-                var _this = this;
-                var projector = this._projections[attr];
-                if (projector.scale) {
-                    this._datasetKeysInOrder.forEach(function (key) {
-                        var plotDatasetKey = _this._key2PlotDatasetKey.get(key);
-                        var dataset = plotDatasetKey.dataset;
-                        var plotMetadata = plotDatasetKey.plotMetadata;
-                        var extent = dataset._getExtent(projector.accessor, projector.scale._typeCoercer, plotMetadata);
-                        var scaleKey = _this.getID().toString() + "_" + key;
-                        if (extent.length === 0 || !_this._isAnchored) {
-                            projector.scale._removeExtent(scaleKey, attr);
-                        }
-                        else {
-                            projector.scale._updateExtent(scaleKey, attr, extent);
-                        }
-                    });
-                }
-            };
-            AbstractPlot.prototype.animator = function (animatorKey, animator) {
-                if (animator === undefined) {
-                    return this._animators[animatorKey];
-                }
-                else {
-                    this._animators[animatorKey] = animator;
-                    return this;
-                }
-            };
-            AbstractPlot.prototype.datasetOrder = function (order) {
-                if (order === undefined) {
-                    return this._datasetKeysInOrder;
-                }
-                function isPermutation(l1, l2) {
-                    var intersection = Plottable.Utils.Methods.intersection(d3.set(l1), d3.set(l2));
-                    var size = intersection.size(); // HACKHACK pending on borisyankov/definitelytyped/ pr #2653
-                    return size === l1.length && size === l2.length;
-                }
-                if (isPermutation(order, this._datasetKeysInOrder)) {
-                    this._datasetKeysInOrder = order;
-                    this._onDatasetUpdate();
-                }
-                else {
-                    Plottable.Utils.Methods.warn("Attempted to change datasetOrder, but new order is not permutation of old. Ignoring.");
-                }
-                return this;
-            };
-            /**
-             * Removes a dataset by the given identifier
-             *
-             * @param {string | Dataset | any[]} datasetIdentifer The identifier as the key of the Dataset to remove
-             * If string is inputted, it is interpreted as the dataset key to remove.
-             * If Dataset is inputted, the first Dataset in the plot that is the same will be removed.
-             * If any[] is inputted, the first data array in the plot that is the same will be removed.
-             * @returns {AbstractPlot} The calling AbstractPlot.
-             */
-            AbstractPlot.prototype.removeDataset = function (datasetIdentifier) {
-                var key;
-                if (typeof datasetIdentifier === "string") {
-                    key = datasetIdentifier;
-                }
-                else if (typeof datasetIdentifier === "object") {
-                    var index = -1;
-                    if (datasetIdentifier instanceof Plottable.Dataset) {
-                        var datasetArray = this.datasets();
-                        index = datasetArray.indexOf(datasetIdentifier);
-                    }
-                    else if (datasetIdentifier instanceof Array) {
-                        var dataArray = this.datasets().map(function (d) { return d.data(); });
-                        index = dataArray.indexOf(datasetIdentifier);
-                    }
-                    if (index !== -1) {
-                        key = this._datasetKeysInOrder[index];
-                    }
-                }
-                return this._removeDataset(key);
-            };
-            AbstractPlot.prototype._removeDataset = function (key) {
-                if (key != null && this._key2PlotDatasetKey.has(key)) {
-                    var pdk = this._key2PlotDatasetKey.get(key);
-                    pdk.drawer.remove();
-                    var projectors = d3.values(this._projections);
-                    var scaleKey = this.getID().toString() + "_" + key;
-                    projectors.forEach(function (p) {
-                        if (p.scale != null) {
-                            p.scale._removeExtent(scaleKey, p.attribute);
-                        }
-                    });
-                    pdk.dataset.broadcaster.deregisterListener(this);
-                    this._datasetKeysInOrder.splice(this._datasetKeysInOrder.indexOf(key), 1);
-                    this._key2PlotDatasetKey.remove(key);
-                    this._onDatasetUpdate();
-                }
-                return this;
-            };
-            AbstractPlot.prototype.datasets = function () {
-                var _this = this;
-                return this._datasetKeysInOrder.map(function (k) { return _this._key2PlotDatasetKey.get(k).dataset; });
-            };
-            AbstractPlot.prototype._getDrawersInOrder = function () {
-                var _this = this;
-                return this._datasetKeysInOrder.map(function (k) { return _this._key2PlotDatasetKey.get(k).drawer; });
-            };
-            AbstractPlot.prototype._generateDrawSteps = function () {
-                return [{ attrToProjector: this._generateAttrToProjector(), animator: new Plottable.Animators.Null() }];
-            };
-            AbstractPlot.prototype._additionalPaint = function (time) {
-                // no-op
-            };
-            AbstractPlot.prototype._getDataToDraw = function () {
-                var _this = this;
-                var datasets = d3.map();
-                this._datasetKeysInOrder.forEach(function (key) {
-                    datasets.set(key, _this._key2PlotDatasetKey.get(key).dataset.data());
-                });
-                return datasets;
-            };
-            /**
-             * Gets the new plot metadata for new dataset with provided key
-             *
-             * @param {string} key The key of new dataset
-             */
-            AbstractPlot.prototype._getPlotMetadataForDataset = function (key) {
-                return {
-                    datasetKey: key
-                };
-            };
-            AbstractPlot.prototype._paint = function () {
-                var _this = this;
-                var drawSteps = this._generateDrawSteps();
-                var dataToDraw = this._getDataToDraw();
-                var drawers = this._getDrawersInOrder();
-                // TODO: Use metadata instead of dataToDraw #1297.
-                var times = this._datasetKeysInOrder.map(function (k, i) { return drawers[i].draw(dataToDraw.get(k), drawSteps, _this._key2PlotDatasetKey.get(k).dataset.metadata(), _this._key2PlotDatasetKey.get(k).plotMetadata); });
-                var maxTime = Plottable.Utils.Methods.max(times, 0);
-                this._additionalPaint(maxTime);
-            };
-            /**
-             * Retrieves all of the selections of this plot for the specified dataset(s)
-             *
-             * @param {string | string[]} datasetKeys The dataset(s) to retrieve the selections from.
-             * If not provided, all selections will be retrieved.
-             * @param {boolean} exclude If set to true, all datasets will be queried excluding the keys referenced
-             * in the previous datasetKeys argument (default = false).
-             * @returns {D3.Selection} The retrieved selections.
-             */
-            AbstractPlot.prototype.getAllSelections = function (datasetKeys, exclude) {
-                var _this = this;
-                if (datasetKeys === void 0) { datasetKeys = this.datasetOrder(); }
-                if (exclude === void 0) { exclude = false; }
-                var datasetKeyArray = [];
-                if (typeof (datasetKeys) === "string") {
-                    datasetKeyArray = [datasetKeys];
-                }
-                else {
-                    datasetKeyArray = datasetKeys;
-                }
-                if (exclude) {
-                    var excludedDatasetKeys = d3.set(datasetKeyArray);
-                    datasetKeyArray = this.datasetOrder().filter(function (datasetKey) { return !excludedDatasetKeys.has(datasetKey); });
-                }
-                var allSelections = [];
-                datasetKeyArray.forEach(function (datasetKey) {
-                    var plotDatasetKey = _this._key2PlotDatasetKey.get(datasetKey);
-                    if (plotDatasetKey == null) {
-                        return;
-                    }
-                    var drawer = plotDatasetKey.drawer;
-                    drawer._getRenderArea().selectAll(drawer._getSelector()).each(function () {
-                        allSelections.push(this);
-                    });
-                });
-                return d3.selectAll(allSelections);
-            };
-            /**
-             * Retrieves all of the PlotData of this plot for the specified dataset(s)
-             *
-             * @param {string | string[]} datasetKeys The dataset(s) to retrieve the selections from.
-             * If not provided, all selections will be retrieved.
-             * @returns {PlotData} The retrieved PlotData.
-             */
-            AbstractPlot.prototype.getAllPlotData = function (datasetKeys) {
-                if (datasetKeys === void 0) { datasetKeys = this.datasetOrder(); }
-                var datasetKeyArray = [];
-                if (typeof (datasetKeys) === "string") {
-                    datasetKeyArray = [datasetKeys];
-                }
-                else {
-                    datasetKeyArray = datasetKeys;
-                }
-                return this._getAllPlotData(datasetKeyArray);
-            };
-            AbstractPlot.prototype._getAllPlotData = function (datasetKeys) {
-                var _this = this;
-                var data = [];
-                var pixelPoints = [];
-                var allElements = [];
-                datasetKeys.forEach(function (datasetKey) {
-                    var plotDatasetKey = _this._key2PlotDatasetKey.get(datasetKey);
-                    if (plotDatasetKey == null) {
-                        return;
-                    }
-                    var drawer = plotDatasetKey.drawer;
-                    plotDatasetKey.dataset.data().forEach(function (datum, index) {
-                        var pixelPoint = drawer._getPixelPoint(datum, index);
-                        if (pixelPoint.x !== pixelPoint.x || pixelPoint.y !== pixelPoint.y) {
-                            return;
-                        }
-                        data.push(datum);
-                        pixelPoints.push(pixelPoint);
-                        allElements.push(drawer._getSelection(index).node());
-                    });
-                });
-                return { data: data, pixelPoints: pixelPoints, selection: d3.selectAll(allElements) };
-            };
-            /**
-             * Retrieves PlotData with the lowest distance, where distance is defined
-             * to be the Euclidiean norm.
-             *
-             * @param {Point} queryPoint The point to which plot data should be compared
-             *
-             * @returns {PlotData} The PlotData closest to queryPoint
-             */
-            AbstractPlot.prototype.getClosestPlotData = function (queryPoint) {
-                var _this = this;
-                var closestDistanceSquared = Infinity;
-                var closestIndex;
-                var plotData = this.getAllPlotData();
-                plotData.pixelPoints.forEach(function (pixelPoint, index) {
-                    var datum = plotData.data[index];
-                    var selection = d3.select(plotData.selection[0][index]);
-                    if (!_this._isVisibleOnPlot(datum, pixelPoint, selection)) {
-                        return;
-                    }
-                    var distance = Plottable.Utils.Methods.distanceSquared(pixelPoint, queryPoint);
-                    if (distance < closestDistanceSquared) {
-                        closestDistanceSquared = distance;
-                        closestIndex = index;
-                    }
-                });
-                if (closestIndex == null) {
-                    return { data: [], pixelPoints: [], selection: d3.select() };
-                }
-                return { data: [plotData.data[closestIndex]], pixelPoints: [plotData.pixelPoints[closestIndex]], selection: d3.select(plotData.selection[0][closestIndex]) };
-            };
-            AbstractPlot.prototype._isVisibleOnPlot = function (datum, pixelPoint, selection) {
-                return !(pixelPoint.x < 0 || pixelPoint.y < 0 || pixelPoint.x > this.width() || pixelPoint.y > this.height());
-            };
-            return AbstractPlot;
-        })(Plottable.Component);
-        Plots.AbstractPlot = AbstractPlot;
     })(Plots = Plottable.Plots || (Plottable.Plots = {}));
+    var Plot = (function (_super) {
+        __extends(Plot, _super);
+        /**
+         * Constructs a Plot.
+         *
+         * Plots render data. Common example include Plot.Scatter, Plot.Bar, and Plot.Line.
+         *
+         * A bare Plot has a DataSource and any number of projectors, which take
+         * data and "project" it onto the Plot, such as "x", "y", "fill", "r".
+         *
+         * @constructor
+         * @param {any[]|Dataset} [dataset] If provided, the data or Dataset to be associated with this Plot.
+         */
+        function Plot() {
+            _super.call(this);
+            this._dataChanged = false;
+            this._projections = {};
+            this._animate = false;
+            this._animators = {};
+            this._animateOnNextRender = true;
+            this.clipPathEnabled = true;
+            this.classed("plot", true);
+            this._key2PlotDatasetKey = d3.map();
+            this._datasetKeysInOrder = [];
+            this._nextSeriesIndex = 0;
+        }
+        Plot.prototype._anchor = function (element) {
+            _super.prototype._anchor.call(this, element);
+            this._animateOnNextRender = true;
+            this._dataChanged = true;
+            this._updateScaleExtents();
+        };
+        Plot.prototype._setup = function () {
+            var _this = this;
+            _super.prototype._setup.call(this);
+            this._renderArea = this._content.append("g").classed("render-area", true);
+            // HACKHACK on 591
+            this._getDrawersInOrder().forEach(function (d) { return d.setup(_this._renderArea.append("g")); });
+        };
+        Plot.prototype.remove = function () {
+            var _this = this;
+            _super.prototype.remove.call(this);
+            this._datasetKeysInOrder.forEach(function (k) { return _this.removeDataset(k); });
+            // deregister from all scales
+            var properties = Object.keys(this._projections);
+            properties.forEach(function (property) {
+                var projector = _this._projections[property];
+                if (projector.scale) {
+                    projector.scale.broadcaster.deregisterListener(_this);
+                }
+            });
+        };
+        Plot.prototype.addDataset = function (keyOrDataset, dataset) {
+            if (typeof (keyOrDataset) !== "string" && dataset !== undefined) {
+                throw new Error("invalid input to addDataset");
+            }
+            if (typeof (keyOrDataset) === "string" && keyOrDataset[0] === "_") {
+                Plottable.Utils.Methods.warn("Warning: Using _named series keys may produce collisions with unlabeled data sources");
+            }
+            var key = typeof (keyOrDataset) === "string" ? keyOrDataset : "_" + this._nextSeriesIndex++;
+            var data = typeof (keyOrDataset) !== "string" ? keyOrDataset : dataset;
+            dataset = (data instanceof Plottable.Dataset) ? data : new Plottable.Dataset(data);
+            this._addDataset(key, dataset);
+            return this;
+        };
+        Plot.prototype._addDataset = function (key, dataset) {
+            var _this = this;
+            if (this._key2PlotDatasetKey.has(key)) {
+                this.removeDataset(key);
+            }
+            ;
+            var drawer = this._getDrawer(key);
+            var metadata = this._getPlotMetadataForDataset(key);
+            var pdk = { drawer: drawer, dataset: dataset, key: key, plotMetadata: metadata };
+            this._datasetKeysInOrder.push(key);
+            this._key2PlotDatasetKey.set(key, pdk);
+            if (this._isSetup) {
+                drawer.setup(this._renderArea.append("g"));
+            }
+            dataset.broadcaster.registerListener(this, function () { return _this._onDatasetUpdate(); });
+            this._onDatasetUpdate();
+        };
+        Plot.prototype._getDrawer = function (key) {
+            return new Plottable.Drawers.AbstractDrawer(key);
+        };
+        Plot.prototype._getAnimator = function (key) {
+            if (this._animate && this._animateOnNextRender) {
+                return this._animators[key] || new Plottable.Animators.Null();
+            }
+            else {
+                return new Plottable.Animators.Null();
+            }
+        };
+        Plot.prototype._onDatasetUpdate = function () {
+            this._updateScaleExtents();
+            this._animateOnNextRender = true;
+            this._dataChanged = true;
+            this._render();
+        };
+        /**
+         * Sets an attribute of every data point.
+         *
+         * Here's a common use case:
+         * ```typescript
+         * plot.attr("x", function(d) { return d.foo; }, xScale);
+         * ```
+         * This will set the x accessor of each datum `d` to be `d.foo`,
+         * scaled in accordance with `xScale`
+         *
+         * @param {string} attrToSet The attribute to set across each data
+         * point. Popular examples include "x", "y".
+         *
+         * @param {Function|string|any} accessor Function to apply to each element
+         * of the dataSource. If a Function, use `accessor(d, i)`. If a string,
+         * `d[accessor]` is used. If anything else, use `accessor` as a constant
+         * across all data points.
+         *
+         * @param {Scale.Scale} scale If provided, the result of the accessor
+         * is passed through the scale, such as `scale.scale(accessor(d, i))`.
+         *
+         * @returns {Plot} The calling Plot.
+         */
+        Plot.prototype.attr = function (attrToSet, accessor, scale) {
+            return this.project(attrToSet, accessor, scale);
+        };
+        /**
+         * Identical to plot.attr
+         */
+        Plot.prototype.project = function (attrToSet, accessor, scale) {
+            var _this = this;
+            attrToSet = attrToSet.toLowerCase();
+            var currentProjection = this._projections[attrToSet];
+            var existingScale = currentProjection && currentProjection.scale;
+            if (existingScale) {
+                this._datasetKeysInOrder.forEach(function (key) {
+                    existingScale._removeExtent(_this.getID().toString() + "_" + key, attrToSet);
+                    existingScale.broadcaster.deregisterListener(_this);
+                });
+            }
+            if (scale) {
+                scale.broadcaster.registerListener(this, function () { return _this._render(); });
+            }
+            accessor = Plottable.Utils.Methods.accessorize(accessor);
+            this._projections[attrToSet] = { accessor: accessor, scale: scale, attribute: attrToSet };
+            this._updateScaleExtent(attrToSet);
+            this._render(); // queue a re-render upon changing projector
+            return this;
+        };
+        Plot.prototype._generateAttrToProjector = function () {
+            var _this = this;
+            var h = {};
+            d3.keys(this._projections).forEach(function (a) {
+                var projection = _this._projections[a];
+                var accessor = projection.accessor;
+                var scale = projection.scale;
+                var fn = scale ? function (d, i, u, m) { return scale.scale(accessor(d, i, u, m)); } : accessor;
+                h[a] = fn;
+            });
+            return h;
+        };
+        /**
+         * Generates a dictionary mapping an attribute to a function that calculate that attribute's value
+         * in accordance with the given datasetKey.
+         *
+         * Note that this will return all of the data attributes, which may not perfectly align to svg attributes
+         *
+         * @param {datasetKey} the key of the dataset to generate the dictionary for
+         * @returns {AttributeToAppliedProjector} A dictionary mapping attributes to functions
+         */
+        Plot.prototype.generateProjectors = function (datasetKey) {
+            var attrToProjector = this._generateAttrToProjector();
+            var plotDatasetKey = this._key2PlotDatasetKey.get(datasetKey);
+            var plotMetadata = plotDatasetKey.plotMetadata;
+            var userMetadata = plotDatasetKey.dataset.metadata();
+            var attrToAppliedProjector = {};
+            d3.entries(attrToProjector).forEach(function (keyValue) {
+                attrToAppliedProjector[keyValue.key] = function (datum, index) { return keyValue.value(datum, index, userMetadata, plotMetadata); };
+            });
+            return attrToAppliedProjector;
+        };
+        Plot.prototype._doRender = function () {
+            if (this._isAnchored) {
+                this._paint();
+                this._dataChanged = false;
+                this._animateOnNextRender = false;
+            }
+        };
+        /**
+         * Enables or disables animation.
+         *
+         * @param {boolean} enabled Whether or not to animate.
+         */
+        Plot.prototype.animate = function (enabled) {
+            this._animate = enabled;
+            return this;
+        };
+        Plot.prototype.detach = function () {
+            _super.prototype.detach.call(this);
+            // make the domain resize
+            this._updateScaleExtents();
+            return this;
+        };
+        /**
+         * This function makes sure that all of the scales in this._projections
+         * have an extent that includes all the data that is projected onto them.
+         */
+        Plot.prototype._updateScaleExtents = function () {
+            var _this = this;
+            d3.keys(this._projections).forEach(function (attr) { return _this._updateScaleExtent(attr); });
+        };
+        Plot.prototype._updateScaleExtent = function (attr) {
+            var _this = this;
+            var projector = this._projections[attr];
+            if (projector.scale) {
+                this._datasetKeysInOrder.forEach(function (key) {
+                    var plotDatasetKey = _this._key2PlotDatasetKey.get(key);
+                    var dataset = plotDatasetKey.dataset;
+                    var plotMetadata = plotDatasetKey.plotMetadata;
+                    var extent = dataset._getExtent(projector.accessor, projector.scale._typeCoercer, plotMetadata);
+                    var scaleKey = _this.getID().toString() + "_" + key;
+                    if (extent.length === 0 || !_this._isAnchored) {
+                        projector.scale._removeExtent(scaleKey, attr);
+                    }
+                    else {
+                        projector.scale._updateExtent(scaleKey, attr, extent);
+                    }
+                });
+            }
+        };
+        Plot.prototype.animator = function (animatorKey, animator) {
+            if (animator === undefined) {
+                return this._animators[animatorKey];
+            }
+            else {
+                this._animators[animatorKey] = animator;
+                return this;
+            }
+        };
+        Plot.prototype.datasetOrder = function (order) {
+            if (order === undefined) {
+                return this._datasetKeysInOrder;
+            }
+            function isPermutation(l1, l2) {
+                var intersection = Plottable.Utils.Methods.intersection(d3.set(l1), d3.set(l2));
+                var size = intersection.size(); // HACKHACK pending on borisyankov/definitelytyped/ pr #2653
+                return size === l1.length && size === l2.length;
+            }
+            if (isPermutation(order, this._datasetKeysInOrder)) {
+                this._datasetKeysInOrder = order;
+                this._onDatasetUpdate();
+            }
+            else {
+                Plottable.Utils.Methods.warn("Attempted to change datasetOrder, but new order is not permutation of old. Ignoring.");
+            }
+            return this;
+        };
+        /**
+         * Removes a dataset by the given identifier
+         *
+         * @param {string | Dataset | any[]} datasetIdentifer The identifier as the key of the Dataset to remove
+         * If string is inputted, it is interpreted as the dataset key to remove.
+         * If Dataset is inputted, the first Dataset in the plot that is the same will be removed.
+         * If any[] is inputted, the first data array in the plot that is the same will be removed.
+         * @returns {Plot} The calling Plot.
+         */
+        Plot.prototype.removeDataset = function (datasetIdentifier) {
+            var key;
+            if (typeof datasetIdentifier === "string") {
+                key = datasetIdentifier;
+            }
+            else if (typeof datasetIdentifier === "object") {
+                var index = -1;
+                if (datasetIdentifier instanceof Plottable.Dataset) {
+                    var datasetArray = this.datasets();
+                    index = datasetArray.indexOf(datasetIdentifier);
+                }
+                else if (datasetIdentifier instanceof Array) {
+                    var dataArray = this.datasets().map(function (d) { return d.data(); });
+                    index = dataArray.indexOf(datasetIdentifier);
+                }
+                if (index !== -1) {
+                    key = this._datasetKeysInOrder[index];
+                }
+            }
+            return this._removeDataset(key);
+        };
+        Plot.prototype._removeDataset = function (key) {
+            if (key != null && this._key2PlotDatasetKey.has(key)) {
+                var pdk = this._key2PlotDatasetKey.get(key);
+                pdk.drawer.remove();
+                var projectors = d3.values(this._projections);
+                var scaleKey = this.getID().toString() + "_" + key;
+                projectors.forEach(function (p) {
+                    if (p.scale != null) {
+                        p.scale._removeExtent(scaleKey, p.attribute);
+                    }
+                });
+                pdk.dataset.broadcaster.deregisterListener(this);
+                this._datasetKeysInOrder.splice(this._datasetKeysInOrder.indexOf(key), 1);
+                this._key2PlotDatasetKey.remove(key);
+                this._onDatasetUpdate();
+            }
+            return this;
+        };
+        Plot.prototype.datasets = function () {
+            var _this = this;
+            return this._datasetKeysInOrder.map(function (k) { return _this._key2PlotDatasetKey.get(k).dataset; });
+        };
+        Plot.prototype._getDrawersInOrder = function () {
+            var _this = this;
+            return this._datasetKeysInOrder.map(function (k) { return _this._key2PlotDatasetKey.get(k).drawer; });
+        };
+        Plot.prototype._generateDrawSteps = function () {
+            return [{ attrToProjector: this._generateAttrToProjector(), animator: new Plottable.Animators.Null() }];
+        };
+        Plot.prototype._additionalPaint = function (time) {
+            // no-op
+        };
+        Plot.prototype._getDataToDraw = function () {
+            var _this = this;
+            var datasets = d3.map();
+            this._datasetKeysInOrder.forEach(function (key) {
+                datasets.set(key, _this._key2PlotDatasetKey.get(key).dataset.data());
+            });
+            return datasets;
+        };
+        /**
+         * Gets the new plot metadata for new dataset with provided key
+         *
+         * @param {string} key The key of new dataset
+         */
+        Plot.prototype._getPlotMetadataForDataset = function (key) {
+            return {
+                datasetKey: key
+            };
+        };
+        Plot.prototype._paint = function () {
+            var _this = this;
+            var drawSteps = this._generateDrawSteps();
+            var dataToDraw = this._getDataToDraw();
+            var drawers = this._getDrawersInOrder();
+            // TODO: Use metadata instead of dataToDraw #1297.
+            var times = this._datasetKeysInOrder.map(function (k, i) { return drawers[i].draw(dataToDraw.get(k), drawSteps, _this._key2PlotDatasetKey.get(k).dataset.metadata(), _this._key2PlotDatasetKey.get(k).plotMetadata); });
+            var maxTime = Plottable.Utils.Methods.max(times, 0);
+            this._additionalPaint(maxTime);
+        };
+        /**
+         * Retrieves all of the selections of this plot for the specified dataset(s)
+         *
+         * @param {string | string[]} datasetKeys The dataset(s) to retrieve the selections from.
+         * If not provided, all selections will be retrieved.
+         * @param {boolean} exclude If set to true, all datasets will be queried excluding the keys referenced
+         * in the previous datasetKeys argument (default = false).
+         * @returns {D3.Selection} The retrieved selections.
+         */
+        Plot.prototype.getAllSelections = function (datasetKeys, exclude) {
+            var _this = this;
+            if (datasetKeys === void 0) { datasetKeys = this.datasetOrder(); }
+            if (exclude === void 0) { exclude = false; }
+            var datasetKeyArray = [];
+            if (typeof (datasetKeys) === "string") {
+                datasetKeyArray = [datasetKeys];
+            }
+            else {
+                datasetKeyArray = datasetKeys;
+            }
+            if (exclude) {
+                var excludedDatasetKeys = d3.set(datasetKeyArray);
+                datasetKeyArray = this.datasetOrder().filter(function (datasetKey) { return !excludedDatasetKeys.has(datasetKey); });
+            }
+            var allSelections = [];
+            datasetKeyArray.forEach(function (datasetKey) {
+                var plotDatasetKey = _this._key2PlotDatasetKey.get(datasetKey);
+                if (plotDatasetKey == null) {
+                    return;
+                }
+                var drawer = plotDatasetKey.drawer;
+                drawer._getRenderArea().selectAll(drawer._getSelector()).each(function () {
+                    allSelections.push(this);
+                });
+            });
+            return d3.selectAll(allSelections);
+        };
+        /**
+         * Retrieves all of the PlotData of this plot for the specified dataset(s)
+         *
+         * @param {string | string[]} datasetKeys The dataset(s) to retrieve the selections from.
+         * If not provided, all selections will be retrieved.
+         * @returns {PlotData} The retrieved PlotData.
+         */
+        Plot.prototype.getAllPlotData = function (datasetKeys) {
+            if (datasetKeys === void 0) { datasetKeys = this.datasetOrder(); }
+            var datasetKeyArray = [];
+            if (typeof (datasetKeys) === "string") {
+                datasetKeyArray = [datasetKeys];
+            }
+            else {
+                datasetKeyArray = datasetKeys;
+            }
+            return this._getAllPlotData(datasetKeyArray);
+        };
+        Plot.prototype._getAllPlotData = function (datasetKeys) {
+            var _this = this;
+            var data = [];
+            var pixelPoints = [];
+            var allElements = [];
+            datasetKeys.forEach(function (datasetKey) {
+                var plotDatasetKey = _this._key2PlotDatasetKey.get(datasetKey);
+                if (plotDatasetKey == null) {
+                    return;
+                }
+                var drawer = plotDatasetKey.drawer;
+                plotDatasetKey.dataset.data().forEach(function (datum, index) {
+                    var pixelPoint = drawer._getPixelPoint(datum, index);
+                    if (pixelPoint.x !== pixelPoint.x || pixelPoint.y !== pixelPoint.y) {
+                        return;
+                    }
+                    data.push(datum);
+                    pixelPoints.push(pixelPoint);
+                    allElements.push(drawer._getSelection(index).node());
+                });
+            });
+            return { data: data, pixelPoints: pixelPoints, selection: d3.selectAll(allElements) };
+        };
+        /**
+         * Retrieves PlotData with the lowest distance, where distance is defined
+         * to be the Euclidiean norm.
+         *
+         * @param {Point} queryPoint The point to which plot data should be compared
+         *
+         * @returns {PlotData} The PlotData closest to queryPoint
+         */
+        Plot.prototype.getClosestPlotData = function (queryPoint) {
+            var _this = this;
+            var closestDistanceSquared = Infinity;
+            var closestIndex;
+            var plotData = this.getAllPlotData();
+            plotData.pixelPoints.forEach(function (pixelPoint, index) {
+                var datum = plotData.data[index];
+                var selection = d3.select(plotData.selection[0][index]);
+                if (!_this._isVisibleOnPlot(datum, pixelPoint, selection)) {
+                    return;
+                }
+                var distance = Plottable.Utils.Methods.distanceSquared(pixelPoint, queryPoint);
+                if (distance < closestDistanceSquared) {
+                    closestDistanceSquared = distance;
+                    closestIndex = index;
+                }
+            });
+            if (closestIndex == null) {
+                return { data: [], pixelPoints: [], selection: d3.select() };
+            }
+            return { data: [plotData.data[closestIndex]], pixelPoints: [plotData.pixelPoints[closestIndex]], selection: d3.select(plotData.selection[0][closestIndex]) };
+        };
+        Plot.prototype._isVisibleOnPlot = function (datum, pixelPoint, selection) {
+            return !(pixelPoint.x < 0 || pixelPoint.y < 0 || pixelPoint.x > this.width() || pixelPoint.y > this.height());
+        };
+        return Plot;
+    })(Plottable.Component);
+    Plottable.Plot = Plot;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../../reference.ts" />
@@ -6994,7 +6994,7 @@ var Plottable;
                 return allPlotData;
             };
             return Pie;
-        })(Plots.AbstractPlot);
+        })(Plottable.Plot);
         Plots.Pie = Pie;
     })(Plots = Plottable.Plots || (Plottable.Plots = {}));
 })(Plottable || (Plottable = {}));
@@ -7211,7 +7211,7 @@ var Plottable;
                 return this._projections["x"] && this._projections["y"];
             };
             return AbstractXYPlot;
-        })(Plots.AbstractPlot);
+        })(Plottable.Plot);
         Plots.AbstractXYPlot = AbstractXYPlot;
     })(Plots = Plottable.Plots || (Plottable.Plots = {}));
 })(Plottable || (Plottable = {}));

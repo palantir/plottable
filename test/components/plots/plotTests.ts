@@ -1,7 +1,7 @@
 ///<reference path="../../testReference.ts" />
 
 var assert = chai.assert;
-class CountingPlot extends Plottable.Plots.AbstractPlot {
+class CountingPlot extends Plottable.Plot {
   public renders: number = 0;
 
   public _render() {
@@ -14,13 +14,13 @@ describe("Plots", () => {
   describe("Abstract Plot", () => {
 
     it("Plots default correctly", () => {
-      var r = new Plottable.Plots.AbstractPlot();
+      var r = new Plottable.Plot();
       assert.isTrue(r.clipPathEnabled, "clipPathEnabled defaults to true");
     });
 
     it("Base Plot functionality works", () => {
       var svg = generateSVG(400, 300);
-      var r = new Plottable.Plots.AbstractPlot();
+      var r = new Plottable.Plot();
       r._anchor(svg);
       r._computeLayout();
       var renderArea = (<any> r)._content.select(".render-area");
@@ -58,7 +58,7 @@ describe("Plots", () => {
 
     it("Updates its projectors when the Dataset is changed", () => {
       var d1 = new Plottable.Dataset([{x: 5, y: 6}], {cssClass: "bar"});
-      var r = new Plottable.Plots.AbstractPlot();
+      var r = new Plottable.Plot();
       r.addDataset("d1", d1);
 
       var xScaleCalls: number = 0;
@@ -103,14 +103,14 @@ describe("Plots", () => {
 
     it("Plot automatically generates a Dataset if only data is provided", () => {
       var data = ["foo", "bar"];
-      var r = new Plottable.Plots.AbstractPlot().addDataset("foo", data);
+      var r = new Plottable.Plot().addDataset("foo", data);
       var dataset = r.datasets()[0];
       assert.isNotNull(dataset, "A Dataset was automatically generated");
       assert.deepEqual(dataset.data(), data, "The generated Dataset has the correct data");
     });
 
     it("Plot.project works as intended", () => {
-      var r = new Plottable.Plots.AbstractPlot();
+      var r = new Plottable.Plot();
       var s = new Plottable.Scales.Linear().domain([0, 1]).range([0, 10]);
       r.project("attr", "a", s);
       var attrToProjector = (<any> r)._generateAttrToProjector();
@@ -124,11 +124,11 @@ describe("Plots", () => {
       var s = new Plottable.Scales.Linear();
       var svg1 = generateSVG(100, 100);
       var svg2 = generateSVG(100, 100);
-      var r1 = new Plottable.Plots.AbstractPlot()
+      var r1 = new Plottable.Plot()
                     .addDataset(ds1)
                     .project("x", (x: number) => x, s)
                     .renderTo(svg1);
-      var r2 = new Plottable.Plots.AbstractPlot()
+      var r2 = new Plottable.Plot()
                     .addDataset(ds2)
                     .project("x", (x: number) => x, s)
                     .renderTo(svg2);
@@ -141,7 +141,7 @@ describe("Plots", () => {
 
     it("getAllSelections() with dataset retrieval", () => {
       var svg = generateSVG(400, 400);
-      var plot = new Plottable.Plots.AbstractPlot();
+      var plot = new Plottable.Plot();
 
       // Create mock drawers with already drawn items
       var mockDrawer1 = new Plottable.Drawers.AbstractDrawer("ds1");
@@ -188,7 +188,7 @@ describe("Plots", () => {
 
     it("getAllPlotData() with dataset retrieval", () => {
       var svg = generateSVG(400, 400);
-      var plot = new Plottable.Plots.AbstractPlot();
+      var plot = new Plottable.Plot();
 
       var data1 = [{value: 0}, {value: 1}, {value: 2}];
       var data2 = [{value: 0}, {value: 1}, {value: 2}];
@@ -252,7 +252,7 @@ describe("Plots", () => {
 
     it("getAllPlotData() with NaN pixel points", () => {
       var svg = generateSVG(400, 400);
-      var plot = new Plottable.Plots.AbstractPlot();
+      var plot = new Plottable.Plot();
 
       var data = [{value: NaN}, {value: 1}, {value: 2}];
 
@@ -291,7 +291,7 @@ describe("Plots", () => {
 
     it("getClosestPlotData", () => {
       var svg = generateSVG(400, 400);
-      var plot = new Plottable.Plots.AbstractPlot();
+      var plot = new Plottable.Plot();
 
       var data1 = [{value: 0}, {value: 1}, {value: 2}];
       var data2 = [{value: 0}, {value: 1}, {value: 2}];
@@ -338,12 +338,12 @@ describe("Plots", () => {
     });
 
     describe("Dataset removal", () => {
-      var plot: Plottable.Plots.AbstractPlot;
+      var plot: Plottable.Plot;
       var d1: Plottable.Dataset;
       var d2: Plottable.Dataset;
 
       beforeEach(() => {
-        plot = new Plottable.Plots.AbstractPlot();
+        plot = new Plottable.Plot();
         d1 = new Plottable.Dataset();
         d2 = new Plottable.Dataset();
         plot.addDataset("foo", d1);
@@ -401,7 +401,7 @@ describe("Plots", () => {
     });
 
     it("remove() disconnects plots from its scales", () => {
-      var r = new Plottable.Plots.AbstractPlot();
+      var r = new Plottable.Plot();
       var s = new Plottable.Scales.Linear();
       r.project("attr", "a", s);
       r.remove();
@@ -418,8 +418,8 @@ describe("Plots", () => {
       var d3 = new Plottable.Dataset([-1, -2, -3]);
 
       var id = (d: number) => d;
-      var plot1 = new Plottable.Plots.AbstractPlot();
-      var plot2 = new Plottable.Plots.AbstractPlot();
+      var plot1 = new Plottable.Plot();
+      var plot2 = new Plottable.Plot();
       var svg = generateSVG(400, 400);
       plot1.attr("null", id, scale1);
       plot2.attr("null", id, scale1);
@@ -474,7 +474,7 @@ describe("Plots", () => {
       var CategoryScale = new Plottable.Scales.Category();
       var dataset1 = [{key: "A"}];
       var dataset2 = [{key: "B"}];
-      var plot = new Plottable.Plots.AbstractPlot()
+      var plot = new Plottable.Plot()
                                    .addDataset("b", dataset2)
                                    .addDataset("a", dataset1);
       plot.project("key", "key", CategoryScale);

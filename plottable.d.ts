@@ -2632,186 +2632,186 @@ declare module Plottable {
             pixelPoints: Point[];
             selection: D3.Selection;
         };
-        class AbstractPlot extends Component {
-            protected _dataChanged: boolean;
-            protected _key2PlotDatasetKey: D3.Map<PlotDatasetKey>;
-            protected _datasetKeysInOrder: string[];
-            protected _renderArea: D3.Selection;
-            protected _projections: {
-                [attrToSet: string]: _Projection;
-            };
-            protected _animate: boolean;
-            protected _animateOnNextRender: boolean;
-            /**
-             * Constructs a Plot.
-             *
-             * Plots render data. Common example include Plot.Scatter, Plot.Bar, and Plot.Line.
-             *
-             * A bare Plot has a DataSource and any number of projectors, which take
-             * data and "project" it onto the Plot, such as "x", "y", "fill", "r".
-             *
-             * @constructor
-             * @param {any[]|Dataset} [dataset] If provided, the data or Dataset to be associated with this Plot.
-             */
-            constructor();
-            _anchor(element: D3.Selection): void;
-            protected _setup(): void;
-            remove(): void;
-            /**
-             * Adds a dataset to this plot. Identify this dataset with a key.
-             *
-             * A key is automatically generated if not supplied.
-             *
-             * @param {string} [key] The key of the dataset.
-             * @param {Dataset | any[]} dataset dataset to add.
-             * @returns {Plot} The calling Plot.
-             */
-            addDataset(dataset: Dataset | any[]): AbstractPlot;
-            addDataset(key: string, dataset: Dataset | any[]): AbstractPlot;
-            protected _getDrawer(key: string): Drawers.AbstractDrawer;
-            protected _getAnimator(key: string): Animators.PlotAnimator;
-            protected _onDatasetUpdate(): void;
-            /**
-             * Sets an attribute of every data point.
-             *
-             * Here's a common use case:
-             * ```typescript
-             * plot.attr("x", function(d) { return d.foo; }, xScale);
-             * ```
-             * This will set the x accessor of each datum `d` to be `d.foo`,
-             * scaled in accordance with `xScale`
-             *
-             * @param {string} attrToSet The attribute to set across each data
-             * point. Popular examples include "x", "y".
-             *
-             * @param {Function|string|any} accessor Function to apply to each element
-             * of the dataSource. If a Function, use `accessor(d, i)`. If a string,
-             * `d[accessor]` is used. If anything else, use `accessor` as a constant
-             * across all data points.
-             *
-             * @param {Scale.Scale} scale If provided, the result of the accessor
-             * is passed through the scale, such as `scale.scale(accessor(d, i))`.
-             *
-             * @returns {Plot} The calling Plot.
-             */
-            attr(attrToSet: string, accessor: any, scale?: Scale<any, any>): AbstractPlot;
-            /**
-             * Identical to plot.attr
-             */
-            project(attrToSet: string, accessor: any, scale?: Scale<any, any>): AbstractPlot;
-            protected _generateAttrToProjector(): AttributeToProjector;
-            /**
-             * Generates a dictionary mapping an attribute to a function that calculate that attribute's value
-             * in accordance with the given datasetKey.
-             *
-             * Note that this will return all of the data attributes, which may not perfectly align to svg attributes
-             *
-             * @param {datasetKey} the key of the dataset to generate the dictionary for
-             * @returns {AttributeToAppliedProjector} A dictionary mapping attributes to functions
-             */
-            generateProjectors(datasetKey: string): AttributeToAppliedProjector;
-            _doRender(): void;
-            /**
-             * Enables or disables animation.
-             *
-             * @param {boolean} enabled Whether or not to animate.
-             */
-            animate(enabled: boolean): AbstractPlot;
-            detach(): AbstractPlot;
-            /**
-             * This function makes sure that all of the scales in this._projections
-             * have an extent that includes all the data that is projected onto them.
-             */
-            protected _updateScaleExtents(): void;
-            _updateScaleExtent(attr: string): void;
-            /**
-             * Get the animator associated with the specified Animator key.
-             *
-             * @return {PlotAnimator} The Animator for the specified key.
-             */
-            animator(animatorKey: string): Animators.PlotAnimator;
-            /**
-             * Set the animator associated with the specified Animator key.
-             *
-             * @param {string} animatorKey The key for the Animator.
-             * @param {PlotAnimator} animator An Animator to be assigned to
-             * the specified key.
-             * @returns {Plot} The calling Plot.
-             */
-            animator(animatorKey: string, animator: Animators.PlotAnimator): AbstractPlot;
-            /**
-             * Gets the dataset order by key
-             *
-             * @returns {string[]} A string array of the keys in order
-             */
-            datasetOrder(): string[];
-            /**
-             * Sets the dataset order by key
-             *
-             * @param {string[]} order If provided, a string array which represents the order of the keys.
-             * This must be a permutation of existing keys.
-             *
-             * @returns {Plot} The calling Plot.
-             */
-            datasetOrder(order: string[]): AbstractPlot;
-            /**
-             * Removes a dataset by the given identifier
-             *
-             * @param {string | Dataset | any[]} datasetIdentifer The identifier as the key of the Dataset to remove
-             * If string is inputted, it is interpreted as the dataset key to remove.
-             * If Dataset is inputted, the first Dataset in the plot that is the same will be removed.
-             * If any[] is inputted, the first data array in the plot that is the same will be removed.
-             * @returns {AbstractPlot} The calling AbstractPlot.
-             */
-            removeDataset(datasetIdentifier: string | Dataset | any[]): AbstractPlot;
-            datasets(): Dataset[];
-            protected _getDrawersInOrder(): Drawers.AbstractDrawer[];
-            protected _generateDrawSteps(): Drawers.DrawStep[];
-            protected _additionalPaint(time: number): void;
-            protected _getDataToDraw(): D3.Map<any[]>;
-            /**
-             * Gets the new plot metadata for new dataset with provided key
-             *
-             * @param {string} key The key of new dataset
-             */
-            protected _getPlotMetadataForDataset(key: string): PlotMetadata;
-            /**
-             * Retrieves all of the selections of this plot for the specified dataset(s)
-             *
-             * @param {string | string[]} datasetKeys The dataset(s) to retrieve the selections from.
-             * If not provided, all selections will be retrieved.
-             * @param {boolean} exclude If set to true, all datasets will be queried excluding the keys referenced
-             * in the previous datasetKeys argument (default = false).
-             * @returns {D3.Selection} The retrieved selections.
-             */
-            getAllSelections(datasetKeys?: string | string[], exclude?: boolean): D3.Selection;
-            /**
-             * Retrieves all of the PlotData of this plot for the specified dataset(s)
-             *
-             * @param {string | string[]} datasetKeys The dataset(s) to retrieve the selections from.
-             * If not provided, all selections will be retrieved.
-             * @returns {PlotData} The retrieved PlotData.
-             */
-            getAllPlotData(datasetKeys?: string | string[]): PlotData;
-            protected _getAllPlotData(datasetKeys: string[]): PlotData;
-            /**
-             * Retrieves PlotData with the lowest distance, where distance is defined
-             * to be the Euclidiean norm.
-             *
-             * @param {Point} queryPoint The point to which plot data should be compared
-             *
-             * @returns {PlotData} The PlotData closest to queryPoint
-             */
-            getClosestPlotData(queryPoint: Point): PlotData;
-            protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean;
-        }
+    }
+    class Plot extends Component {
+        protected _dataChanged: boolean;
+        protected _key2PlotDatasetKey: D3.Map<Plots.PlotDatasetKey>;
+        protected _datasetKeysInOrder: string[];
+        protected _renderArea: D3.Selection;
+        protected _projections: {
+            [attrToSet: string]: _Projection;
+        };
+        protected _animate: boolean;
+        protected _animateOnNextRender: boolean;
+        /**
+         * Constructs a Plot.
+         *
+         * Plots render data. Common example include Plot.Scatter, Plot.Bar, and Plot.Line.
+         *
+         * A bare Plot has a DataSource and any number of projectors, which take
+         * data and "project" it onto the Plot, such as "x", "y", "fill", "r".
+         *
+         * @constructor
+         * @param {any[]|Dataset} [dataset] If provided, the data or Dataset to be associated with this Plot.
+         */
+        constructor();
+        _anchor(element: D3.Selection): void;
+        protected _setup(): void;
+        remove(): void;
+        /**
+         * Adds a dataset to this plot. Identify this dataset with a key.
+         *
+         * A key is automatically generated if not supplied.
+         *
+         * @param {string} [key] The key of the dataset.
+         * @param {Dataset | any[]} dataset dataset to add.
+         * @returns {Plot} The calling Plot.
+         */
+        addDataset(dataset: Dataset | any[]): Plot;
+        addDataset(key: string, dataset: Dataset | any[]): Plot;
+        protected _getDrawer(key: string): Drawers.AbstractDrawer;
+        protected _getAnimator(key: string): Animators.PlotAnimator;
+        protected _onDatasetUpdate(): void;
+        /**
+         * Sets an attribute of every data point.
+         *
+         * Here's a common use case:
+         * ```typescript
+         * plot.attr("x", function(d) { return d.foo; }, xScale);
+         * ```
+         * This will set the x accessor of each datum `d` to be `d.foo`,
+         * scaled in accordance with `xScale`
+         *
+         * @param {string} attrToSet The attribute to set across each data
+         * point. Popular examples include "x", "y".
+         *
+         * @param {Function|string|any} accessor Function to apply to each element
+         * of the dataSource. If a Function, use `accessor(d, i)`. If a string,
+         * `d[accessor]` is used. If anything else, use `accessor` as a constant
+         * across all data points.
+         *
+         * @param {Scale.Scale} scale If provided, the result of the accessor
+         * is passed through the scale, such as `scale.scale(accessor(d, i))`.
+         *
+         * @returns {Plot} The calling Plot.
+         */
+        attr(attrToSet: string, accessor: any, scale?: Scale<any, any>): Plot;
+        /**
+         * Identical to plot.attr
+         */
+        project(attrToSet: string, accessor: any, scale?: Scale<any, any>): Plot;
+        protected _generateAttrToProjector(): AttributeToProjector;
+        /**
+         * Generates a dictionary mapping an attribute to a function that calculate that attribute's value
+         * in accordance with the given datasetKey.
+         *
+         * Note that this will return all of the data attributes, which may not perfectly align to svg attributes
+         *
+         * @param {datasetKey} the key of the dataset to generate the dictionary for
+         * @returns {AttributeToAppliedProjector} A dictionary mapping attributes to functions
+         */
+        generateProjectors(datasetKey: string): AttributeToAppliedProjector;
+        _doRender(): void;
+        /**
+         * Enables or disables animation.
+         *
+         * @param {boolean} enabled Whether or not to animate.
+         */
+        animate(enabled: boolean): Plot;
+        detach(): Plot;
+        /**
+         * This function makes sure that all of the scales in this._projections
+         * have an extent that includes all the data that is projected onto them.
+         */
+        protected _updateScaleExtents(): void;
+        _updateScaleExtent(attr: string): void;
+        /**
+         * Get the animator associated with the specified Animator key.
+         *
+         * @return {PlotAnimator} The Animator for the specified key.
+         */
+        animator(animatorKey: string): Animators.PlotAnimator;
+        /**
+         * Set the animator associated with the specified Animator key.
+         *
+         * @param {string} animatorKey The key for the Animator.
+         * @param {PlotAnimator} animator An Animator to be assigned to
+         * the specified key.
+         * @returns {Plot} The calling Plot.
+         */
+        animator(animatorKey: string, animator: Animators.PlotAnimator): Plot;
+        /**
+         * Gets the dataset order by key
+         *
+         * @returns {string[]} A string array of the keys in order
+         */
+        datasetOrder(): string[];
+        /**
+         * Sets the dataset order by key
+         *
+         * @param {string[]} order If provided, a string array which represents the order of the keys.
+         * This must be a permutation of existing keys.
+         *
+         * @returns {Plot} The calling Plot.
+         */
+        datasetOrder(order: string[]): Plot;
+        /**
+         * Removes a dataset by the given identifier
+         *
+         * @param {string | Dataset | any[]} datasetIdentifer The identifier as the key of the Dataset to remove
+         * If string is inputted, it is interpreted as the dataset key to remove.
+         * If Dataset is inputted, the first Dataset in the plot that is the same will be removed.
+         * If any[] is inputted, the first data array in the plot that is the same will be removed.
+         * @returns {Plot} The calling Plot.
+         */
+        removeDataset(datasetIdentifier: string | Dataset | any[]): Plot;
+        datasets(): Dataset[];
+        protected _getDrawersInOrder(): Drawers.AbstractDrawer[];
+        protected _generateDrawSteps(): Drawers.DrawStep[];
+        protected _additionalPaint(time: number): void;
+        protected _getDataToDraw(): D3.Map<any[]>;
+        /**
+         * Gets the new plot metadata for new dataset with provided key
+         *
+         * @param {string} key The key of new dataset
+         */
+        protected _getPlotMetadataForDataset(key: string): Plots.PlotMetadata;
+        /**
+         * Retrieves all of the selections of this plot for the specified dataset(s)
+         *
+         * @param {string | string[]} datasetKeys The dataset(s) to retrieve the selections from.
+         * If not provided, all selections will be retrieved.
+         * @param {boolean} exclude If set to true, all datasets will be queried excluding the keys referenced
+         * in the previous datasetKeys argument (default = false).
+         * @returns {D3.Selection} The retrieved selections.
+         */
+        getAllSelections(datasetKeys?: string | string[], exclude?: boolean): D3.Selection;
+        /**
+         * Retrieves all of the PlotData of this plot for the specified dataset(s)
+         *
+         * @param {string | string[]} datasetKeys The dataset(s) to retrieve the selections from.
+         * If not provided, all selections will be retrieved.
+         * @returns {PlotData} The retrieved PlotData.
+         */
+        getAllPlotData(datasetKeys?: string | string[]): Plots.PlotData;
+        protected _getAllPlotData(datasetKeys: string[]): Plots.PlotData;
+        /**
+         * Retrieves PlotData with the lowest distance, where distance is defined
+         * to be the Euclidiean norm.
+         *
+         * @param {Point} queryPoint The point to which plot data should be compared
+         *
+         * @returns {PlotData} The PlotData closest to queryPoint
+         */
+        getClosestPlotData(queryPoint: Point): Plots.PlotData;
+        protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean;
     }
 }
 
 
 declare module Plottable {
     module Plots {
-        class Pie extends AbstractPlot {
+        class Pie extends Plot {
             /**
              * Constructs a PiePlot.
              *
@@ -2830,7 +2830,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Plots {
-        class AbstractXYPlot<X, Y> extends AbstractPlot {
+        class AbstractXYPlot<X, Y> extends Plot {
             protected _xScale: Scale<X, number>;
             protected _yScale: Scale<Y, number>;
             /**
