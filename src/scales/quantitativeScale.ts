@@ -1,15 +1,14 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Scales {
-  export class AbstractQuantitative<D> extends Scale<D, number> {
+  export class Quantitative<D> extends Scale<D, number> {
     protected _d3Scale: D3.Scale.QuantitativeScale;
     private _numTicks = 10;
     private _PADDING_FOR_IDENTICAL_DOMAIN = 1;
     public _userSetDomainer: boolean = false;
     private _domainer: Domainer = new Domainer();
     public _typeCoercer = (d: any) => +d;
-    private _tickGenerator: TickGenerators.TickGenerator<D> = (scale: Plottable.Scales.AbstractQuantitative<D>) => scale.getDefaultTicks();
+    private _tickGenerator: Scales.TickGenerators.TickGenerator<D> = (scale: Plottable.Quantitative<D>) => scale.getDefaultTicks();
 
 
     /**
@@ -43,14 +42,14 @@ export module Scales {
     /**
      * Creates a copy of the QuantitativeScale with the same domain and range but without any registered list.
      *
-     * @returns {AbstractQuantitative} A copy of the calling QuantitativeScale.
+     * @returns {Quantitative} A copy of the calling QuantitativeScale.
      */
-    public copy(): AbstractQuantitative<D> {
-      return new AbstractQuantitative<D>(this._d3Scale.copy());
+    public copy(): Quantitative<D> {
+      return new Quantitative<D>(this._d3Scale.copy());
     }
 
     public domain(): D[];
-    public domain(values: D[]): AbstractQuantitative<D>;
+    public domain(values: D[]): Quantitative<D>;
     public domain(values?: D[]): any {
       return super.domain(values); // need to override type sig to enable method chaining :/
     }
@@ -68,10 +67,10 @@ export module Scales {
      * Sets or gets the QuantitativeScale's output interpolator
      *
      * @param {D3.Transition.Interpolate} [factory] The output interpolator to use.
-     * @returns {D3.Transition.Interpolate|AbstractQuantitative} The current output interpolator, or the calling QuantitativeScale.
+     * @returns {D3.Transition.Interpolate|Quantitative} The current output interpolator, or the calling QuantitativeScale.
      */
     public interpolate(): D3.Transition.Interpolate;
-    public interpolate(factory: D3.Transition.Interpolate): AbstractQuantitative<D>;
+    public interpolate(factory: D3.Transition.Interpolate): Quantitative<D>;
     public interpolate(factory?: D3.Transition.Interpolate): any {
       if (factory == null) {
         return this._d3Scale.interpolate();
@@ -107,9 +106,9 @@ export module Scales {
      * Sets the clamp status of the QuantitativeScale (whether to cut off values outside the ouput range).
      *
      * @param {boolean} clamp Whether or not to clamp the QuantitativeScale.
-     * @returns {AbstractQuantitative} The calling QuantitativeScale.
+     * @returns {Quantitative} The calling QuantitativeScale.
      */
-    public clamp(clamp: boolean): AbstractQuantitative<D>;
+    public clamp(clamp: boolean): Quantitative<D>;
     public clamp(clamp?: boolean): any {
       if (clamp == null) {
         return this._d3Scale.clamp();
@@ -139,7 +138,7 @@ export module Scales {
      * @param {number} count The new default number of ticks.
      * @returns {Quantitative} The calling QuantitativeScale.
      */
-    public numTicks(count: number): AbstractQuantitative<D>;
+    public numTicks(count: number): Quantitative<D>;
     public numTicks(count?: number): any {
       if (count == null) {
         return this._numTicks;
@@ -172,9 +171,9 @@ export module Scales {
      * includes 0, etc., will be the responsability of the new domainer.
      *
      * @param {Domainer} domainer If provided, the new domainer.
-     * @return {AbstractQuantitative} The calling QuantitativeScale.
+     * @return {Quantitative} The calling QuantitativeScale.
      */
-    public domainer(domainer: Domainer): AbstractQuantitative<D>;
+    public domainer(domainer: Domainer): Quantitative<D>;
     public domainer(domainer?: Domainer): any {
       if (domainer == null) {
         return this._domainer;
@@ -191,19 +190,19 @@ export module Scales {
     }
 
     /**
-     * Gets the tick generator of the AbstractQuantitative.
+     * Gets the tick generator of the Quantitative.
      *
      * @returns {TickGenerator} The current tick generator.
      */
-    public tickGenerator(): TickGenerators.TickGenerator<D>;
+    public tickGenerator(): Scales.TickGenerators.TickGenerator<D>;
     /**
      * Sets a tick generator
      *
      * @param {TickGenerator} generator, the new tick generator.
-     * @return {AbstractQuantitative} The calling AbstractQuantitative.
+     * @return {Quantitative} The calling Quantitative.
      */
-    public tickGenerator(generator: TickGenerators.TickGenerator<D>): AbstractQuantitative<D>;
-    public tickGenerator(generator?: TickGenerators.TickGenerator<D>): any {
+    public tickGenerator(generator: Scales.TickGenerators.TickGenerator<D>): Quantitative<D>;
+    public tickGenerator(generator?: Scales.TickGenerators.TickGenerator<D>): any {
       if(generator == null) {
         return this._tickGenerator;
       } else {
@@ -212,5 +211,4 @@ export module Scales {
       }
     }
   }
-}
 }

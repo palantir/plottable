@@ -15,7 +15,7 @@ export module Plots {
      * @param {QuantitativeScale} xScale The x scale to use.
      * @param {QuantitativeScale} yScale The y scale to use.
      */
-    constructor(xScale: Scales.AbstractQuantitative<X>, yScale: Scales.AbstractQuantitative<number>) {
+    constructor(xScale: Quantitative<X>, yScale: Quantitative<number>) {
       super(xScale, yScale);
       this.classed("area-plot", true);
       this._isVertical = true;
@@ -48,7 +48,7 @@ export module Plots {
 
     protected _updateYDomainer() {
       super._updateYDomainer();
-      var scale = <Scales.AbstractQuantitative<any>> this._yScale;
+      var scale = <Quantitative<any>> this._yScale;
       if (!scale._userSetDomainer) {
         scale.domainer().addPaddingException(0, "STACKED_AREA_PLOT+" + this.getID())
                         .addIncludedValue(0, "STACKED_AREA_PLOT+" + this.getID());

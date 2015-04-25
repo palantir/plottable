@@ -23,7 +23,7 @@ export module Axes {
      * @param {string} orientation The orientation of the QuantitativeScale (top/bottom/left/right)
      * @param {Formatter} formatter A function to format tick labels (default Formatters.general()).
      */
-    constructor(scale: Scales.AbstractQuantitative<number>, orientation: string, formatter = Formatters.general()) {
+    constructor(scale: Quantitative<number>, orientation: string, formatter = Formatters.general()) {
       super(scale, orientation, formatter);
     }
 
@@ -64,7 +64,7 @@ export module Axes {
     }
 
     protected _getTickValues(): any[] {
-      var scale = (<Scales.AbstractQuantitative<number>> this._scale);
+      var scale = (<Quantitative<number>> this._scale);
       var domain = scale.domain();
       var min = domain[0] <= domain[1] ? domain[0] : domain[1];
       var max = domain[0] >= domain[1] ? domain[0] : domain[1];

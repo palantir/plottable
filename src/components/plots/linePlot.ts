@@ -7,7 +7,7 @@ export module Plots {
     private _hoverTarget: D3.Selection;
     private _defaultStrokeColor: string;
 
-    protected _yScale: Scales.AbstractQuantitative<number>;
+    protected _yScale: Quantitative<number>;
 
     /**
      * Constructs a LinePlot.
@@ -16,7 +16,7 @@ export module Plots {
      * @param {QuantitativeScale} xScale The x scale to use.
      * @param {QuantitativeScale} yScale The y scale to use.
      */
-    constructor(xScale: Scales.AbstractQuantitative<X>, yScale: Scales.AbstractQuantitative<number>) {
+    constructor(xScale: Quantitative<X>, yScale: Quantitative<number>) {
       super(xScale, yScale);
       this.classed("line-plot", true);
       this.animator("reset", new Animators.Null());

@@ -1815,138 +1815,135 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
-    var Scales;
-    (function (Scales) {
-        var AbstractQuantitative = (function (_super) {
-            __extends(AbstractQuantitative, _super);
-            /**
-             * Constructs a new QuantitativeScale.
-             *
-             * A QuantitativeScale is a Scale that maps anys to numbers. It
-             * is invertible and continuous.
-             *
-             * @constructor
-             * @param {D3.Scale.QuantitativeScale} scale The D3 QuantitativeScale
-             * backing the QuantitativeScale.
-             */
-            function AbstractQuantitative(scale) {
-                _super.call(this, scale);
-                this._numTicks = 10;
-                this._PADDING_FOR_IDENTICAL_DOMAIN = 1;
-                this._userSetDomainer = false;
-                this._domainer = new Plottable.Domainer();
-                this._typeCoercer = function (d) { return +d; };
-                this._tickGenerator = function (scale) { return scale.getDefaultTicks(); };
+    var Quantitative = (function (_super) {
+        __extends(Quantitative, _super);
+        /**
+         * Constructs a new QuantitativeScale.
+         *
+         * A QuantitativeScale is a Scale that maps anys to numbers. It
+         * is invertible and continuous.
+         *
+         * @constructor
+         * @param {D3.Scale.QuantitativeScale} scale The D3 QuantitativeScale
+         * backing the QuantitativeScale.
+         */
+        function Quantitative(scale) {
+            _super.call(this, scale);
+            this._numTicks = 10;
+            this._PADDING_FOR_IDENTICAL_DOMAIN = 1;
+            this._userSetDomainer = false;
+            this._domainer = new Plottable.Domainer();
+            this._typeCoercer = function (d) { return +d; };
+            this._tickGenerator = function (scale) { return scale.getDefaultTicks(); };
+        }
+        Quantitative.prototype._getExtent = function () {
+            return this._domainer.computeDomain(this._getAllExtents(), this);
+        };
+        /**
+         * Retrieves the domain value corresponding to a supplied range value.
+         *
+         * @param {number} value: A value from the Scale's range.
+         * @returns {D} The domain value corresponding to the supplied range value.
+         */
+        Quantitative.prototype.invert = function (value) {
+            return this._d3Scale.invert(value);
+        };
+        /**
+         * Creates a copy of the QuantitativeScale with the same domain and range but without any registered list.
+         *
+         * @returns {Quantitative} A copy of the calling QuantitativeScale.
+         */
+        Quantitative.prototype.copy = function () {
+            return new Quantitative(this._d3Scale.copy());
+        };
+        Quantitative.prototype.domain = function (values) {
+            return _super.prototype.domain.call(this, values); // need to override type sig to enable method chaining :/
+        };
+        Quantitative.prototype._setDomain = function (values) {
+            var isNaNOrInfinity = function (x) { return x !== x || x === Infinity || x === -Infinity; };
+            if (isNaNOrInfinity(values[0]) || isNaNOrInfinity(values[1])) {
+                Plottable.Utils.Methods.warn("Warning: QuantitativeScales cannot take NaN or Infinity as a domain value. Ignoring.");
+                return;
             }
-            AbstractQuantitative.prototype._getExtent = function () {
-                return this._domainer.computeDomain(this._getAllExtents(), this);
-            };
-            /**
-             * Retrieves the domain value corresponding to a supplied range value.
-             *
-             * @param {number} value: A value from the Scale's range.
-             * @returns {D} The domain value corresponding to the supplied range value.
-             */
-            AbstractQuantitative.prototype.invert = function (value) {
-                return this._d3Scale.invert(value);
-            };
-            /**
-             * Creates a copy of the QuantitativeScale with the same domain and range but without any registered list.
-             *
-             * @returns {AbstractQuantitative} A copy of the calling QuantitativeScale.
-             */
-            AbstractQuantitative.prototype.copy = function () {
-                return new AbstractQuantitative(this._d3Scale.copy());
-            };
-            AbstractQuantitative.prototype.domain = function (values) {
-                return _super.prototype.domain.call(this, values); // need to override type sig to enable method chaining :/
-            };
-            AbstractQuantitative.prototype._setDomain = function (values) {
-                var isNaNOrInfinity = function (x) { return x !== x || x === Infinity || x === -Infinity; };
-                if (isNaNOrInfinity(values[0]) || isNaNOrInfinity(values[1])) {
-                    Plottable.Utils.Methods.warn("Warning: QuantitativeScales cannot take NaN or Infinity as a domain value. Ignoring.");
-                    return;
-                }
-                _super.prototype._setDomain.call(this, values);
-            };
-            AbstractQuantitative.prototype.interpolate = function (factory) {
-                if (factory == null) {
-                    return this._d3Scale.interpolate();
-                }
-                this._d3Scale.interpolate(factory);
+            _super.prototype._setDomain.call(this, values);
+        };
+        Quantitative.prototype.interpolate = function (factory) {
+            if (factory == null) {
+                return this._d3Scale.interpolate();
+            }
+            this._d3Scale.interpolate(factory);
+            return this;
+        };
+        /**
+         * Sets the range of the QuantitativeScale and sets the interpolator to d3.interpolateRound.
+         *
+         * @param {number[]} values The new range value for the range.
+         */
+        Quantitative.prototype.rangeRound = function (values) {
+            this._d3Scale.rangeRound(values);
+            return this;
+        };
+        /**
+         * Gets ticks generated by the default algorithm.
+         */
+        Quantitative.prototype.getDefaultTicks = function () {
+            return this._d3Scale.ticks(this.numTicks());
+        };
+        Quantitative.prototype.clamp = function (clamp) {
+            if (clamp == null) {
+                return this._d3Scale.clamp();
+            }
+            this._d3Scale.clamp(clamp);
+            return this;
+        };
+        /**
+         * Gets a set of tick values spanning the domain.
+         *
+         * @returns {any[]} The generated ticks.
+         */
+        Quantitative.prototype.ticks = function () {
+            return this._tickGenerator(this);
+        };
+        Quantitative.prototype.numTicks = function (count) {
+            if (count == null) {
+                return this._numTicks;
+            }
+            this._numTicks = count;
+            return this;
+        };
+        /**
+         * Given a domain, expands its domain onto "nice" values, e.g. whole
+         * numbers.
+         */
+        Quantitative.prototype._niceDomain = function (domain, count) {
+            return this._d3Scale.copy().domain(domain).nice(count).domain();
+        };
+        Quantitative.prototype.domainer = function (domainer) {
+            if (domainer == null) {
+                return this._domainer;
+            }
+            else {
+                this._domainer = domainer;
+                this._userSetDomainer = true;
+                this._autoDomainIfAutomaticMode();
                 return this;
-            };
-            /**
-             * Sets the range of the QuantitativeScale and sets the interpolator to d3.interpolateRound.
-             *
-             * @param {number[]} values The new range value for the range.
-             */
-            AbstractQuantitative.prototype.rangeRound = function (values) {
-                this._d3Scale.rangeRound(values);
+            }
+        };
+        Quantitative.prototype._defaultExtent = function () {
+            return [0, 1];
+        };
+        Quantitative.prototype.tickGenerator = function (generator) {
+            if (generator == null) {
+                return this._tickGenerator;
+            }
+            else {
+                this._tickGenerator = generator;
                 return this;
-            };
-            /**
-             * Gets ticks generated by the default algorithm.
-             */
-            AbstractQuantitative.prototype.getDefaultTicks = function () {
-                return this._d3Scale.ticks(this.numTicks());
-            };
-            AbstractQuantitative.prototype.clamp = function (clamp) {
-                if (clamp == null) {
-                    return this._d3Scale.clamp();
-                }
-                this._d3Scale.clamp(clamp);
-                return this;
-            };
-            /**
-             * Gets a set of tick values spanning the domain.
-             *
-             * @returns {any[]} The generated ticks.
-             */
-            AbstractQuantitative.prototype.ticks = function () {
-                return this._tickGenerator(this);
-            };
-            AbstractQuantitative.prototype.numTicks = function (count) {
-                if (count == null) {
-                    return this._numTicks;
-                }
-                this._numTicks = count;
-                return this;
-            };
-            /**
-             * Given a domain, expands its domain onto "nice" values, e.g. whole
-             * numbers.
-             */
-            AbstractQuantitative.prototype._niceDomain = function (domain, count) {
-                return this._d3Scale.copy().domain(domain).nice(count).domain();
-            };
-            AbstractQuantitative.prototype.domainer = function (domainer) {
-                if (domainer == null) {
-                    return this._domainer;
-                }
-                else {
-                    this._domainer = domainer;
-                    this._userSetDomainer = true;
-                    this._autoDomainIfAutomaticMode();
-                    return this;
-                }
-            };
-            AbstractQuantitative.prototype._defaultExtent = function () {
-                return [0, 1];
-            };
-            AbstractQuantitative.prototype.tickGenerator = function (generator) {
-                if (generator == null) {
-                    return this._tickGenerator;
-                }
-                else {
-                    this._tickGenerator = generator;
-                    return this;
-                }
-            };
-            return AbstractQuantitative;
-        })(Plottable.Scale);
-        Scales.AbstractQuantitative = AbstractQuantitative;
-    })(Scales = Plottable.Scales || (Plottable.Scales = {}));
+            }
+        };
+        return Quantitative;
+    })(Plottable.Scale);
+    Plottable.Quantitative = Quantitative;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -1975,7 +1972,7 @@ var Plottable;
                 return new Linear(this._d3Scale.copy());
             };
             return Linear;
-        })(Scales.AbstractQuantitative);
+        })(Plottable.Quantitative);
         Scales.Linear = Linear;
     })(Scales = Plottable.Scales || (Plottable.Scales = {}));
 })(Plottable || (Plottable = {}));
@@ -2013,7 +2010,7 @@ var Plottable;
             };
             Log.warned = false;
             return Log;
-        })(Scales.AbstractQuantitative);
+        })(Plottable.Quantitative);
         Scales.Log = Log;
     })(Scales = Plottable.Scales || (Plottable.Scales = {}));
 })(Plottable || (Plottable = {}));
@@ -2195,7 +2192,7 @@ var Plottable;
                 }
             };
             return ModifiedLog;
-        })(Scales.AbstractQuantitative);
+        })(Plottable.Quantitative);
         Scales.ModifiedLog = ModifiedLog;
     })(Scales = Plottable.Scales || (Plottable.Scales = {}));
 })(Plottable || (Plottable = {}));
@@ -2448,7 +2445,7 @@ var Plottable;
                 return [startTime, endTime];
             };
             return Time;
-        })(Scales.AbstractQuantitative);
+        })(Plottable.Quantitative);
         Scales.Time = Time;
     })(Scales = Plottable.Scales || (Plottable.Scales = {}));
 })(Plottable || (Plottable = {}));
@@ -5943,11 +5940,11 @@ var Plottable;
              */
             function Gridlines(xScale, yScale) {
                 var _this = this;
-                if (xScale != null && !(Plottable.Scales.AbstractQuantitative.prototype.isPrototypeOf(xScale))) {
-                    throw new Error("xScale needs to inherit from Scale.AbstractQuantitative");
+                if (xScale != null && !(Plottable.Quantitative.prototype.isPrototypeOf(xScale))) {
+                    throw new Error("xScale needs to inherit from Scale.Quantitative");
                 }
-                if (yScale != null && !(Plottable.Scales.AbstractQuantitative.prototype.isPrototypeOf(yScale))) {
-                    throw new Error("yScale needs to inherit from Scale.AbstractQuantitative");
+                if (yScale != null && !(Plottable.Quantitative.prototype.isPrototypeOf(yScale))) {
+                    throw new Error("yScale needs to inherit from Scale.Quantitative");
                 }
                 _super.call(this);
                 this.classed("gridlines", true);
@@ -7119,7 +7116,7 @@ var Plottable;
             }
         };
         XYPlot.prototype._updateXDomainer = function () {
-            if (this._xScale instanceof Plottable.Scales.AbstractQuantitative) {
+            if (this._xScale instanceof Plottable.Quantitative) {
                 var scale = this._xScale;
                 if (!scale._userSetDomainer) {
                     scale.domainer().pad().nice();
@@ -7127,7 +7124,7 @@ var Plottable;
             }
         };
         XYPlot.prototype._updateYDomainer = function () {
-            if (this._yScale instanceof Plottable.Scales.AbstractQuantitative) {
+            if (this._yScale instanceof Plottable.Quantitative) {
                 var scale = this._yScale;
                 if (!scale._userSetDomainer) {
                     scale.domainer().pad().nice();
@@ -7162,11 +7159,11 @@ var Plottable;
             }
         };
         XYPlot.prototype._adjustDomainToVisiblePoints = function (fromScale, toScale, fromX) {
-            if (toScale instanceof Plottable.Scales.AbstractQuantitative) {
+            if (toScale instanceof Plottable.Quantitative) {
                 var toScaleQ = toScale;
                 var normalizedData = this._normalizeDatasets(fromX);
                 var filterFn;
-                if (fromScale instanceof Plottable.Scales.AbstractQuantitative) {
+                if (fromScale instanceof Plottable.Quantitative) {
                     var fromDomain = fromScale.domain();
                     filterFn = function (a) { return fromDomain[0] <= a && fromDomain[1] >= a; };
                 }
@@ -7476,7 +7473,7 @@ var Plottable;
                             return scale.scale(_this._projections["x"].accessor(d, i, u, m)) + scale.rangeBand() / 2;
                         });
                     }
-                    if (scale instanceof Plottable.Scales.AbstractQuantitative) {
+                    if (scale instanceof Plottable.Quantitative) {
                         this.project("x1", function (d, i, u, m) {
                             return scale.scale(_this._projections["x"].accessor(d, i, u, m));
                         });
@@ -7491,7 +7488,7 @@ var Plottable;
                             return scale.scale(_this._projections["y"].accessor(d, i, u, m)) + scale.rangeBand() / 2;
                         });
                     }
-                    if (scale instanceof Plottable.Scales.AbstractQuantitative) {
+                    if (scale instanceof Plottable.Quantitative) {
                         this.project("y1", function (d, i, u, m) {
                             return scale.scale(_this._projections["y"].accessor(d, i, u, m));
                         });
@@ -7714,7 +7711,7 @@ var Plottable;
                 return bars;
             };
             Bar.prototype._updateDomainer = function (scale) {
-                if (scale instanceof Plottable.Scales.AbstractQuantitative) {
+                if (scale instanceof Plottable.Quantitative) {
                     var qscale = scale;
                     if (!qscale._userSetDomainer) {
                         if (this._baselineValue != null) {

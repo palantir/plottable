@@ -42,7 +42,7 @@ module Plottable {
      * @returns {any[]} The domain, as a merging of all exents, as a [min, max]
      *                 pair.
      */
-    public computeDomain(extents: any[][], scale: Scales.AbstractQuantitative<any>): any[] {
+    public computeDomain(extents: any[][], scale: Quantitative<any>): any[] {
       var domain: any[];
       if (this._combineExtents != null) {
         domain = this._combineExtents(extents);
@@ -165,7 +165,7 @@ module Plottable {
       return this;
     }
 
-    private _padDomain(scale: Scales.AbstractQuantitative<any>, domain: any[]): any[] {
+    private _padDomain(scale: Quantitative<any>, domain: any[]): any[] {
       var min = domain[0];
       var max = domain[1];
       // valueOf accounts for dates properly
@@ -201,7 +201,7 @@ module Plottable {
       return [newMin, newMax];
     }
 
-    private _niceDomain(scale: Scales.AbstractQuantitative<any>, domain: any[]): any[] {
+    private _niceDomain(scale: Quantitative<any>, domain: any[]): any[] {
       if (this._doNice) {
         return scale._niceDomain(domain, this._niceCount);
       } else {
