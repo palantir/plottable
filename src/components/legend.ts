@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Components {
-  export class Legend extends AbstractComponent {
+  export class Legend extends Component {
     /**
      * The css class applied to each legend row
      */

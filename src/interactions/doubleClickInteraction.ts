@@ -6,7 +6,7 @@ export module Interactions {
 
     private _callback: (p: Point) => any;
 
-    public _anchor(component: Components.AbstractComponent, hitBox: D3.Selection) {
+    public _anchor(component: Component, hitBox: D3.Selection) {
       super._anchor(component, hitBox);
       hitBox.on(this._listenTo(), () => {
         var xy = d3.mouse(hitBox.node());

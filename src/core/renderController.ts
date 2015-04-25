@@ -22,8 +22,8 @@ export module Core {
    * ```
    */
   export module RenderControllers {
-    var _componentsNeedingRender: {[key: string]: Components.AbstractComponent} = {};
-    var _componentsNeedingComputeLayout: {[key: string]: Components.AbstractComponent} = {};
+    var _componentsNeedingRender: {[key: string]: Component} = {};
+    var _componentsNeedingComputeLayout: {[key: string]: Component} = {};
     var _animationRequested: boolean = false;
     var _isCurrentlyFlushing: boolean = false;
     export var _renderPolicy: RenderPolicies.RenderPolicy = new RenderPolicies.AnimationFrame();
@@ -52,9 +52,9 @@ export module Core {
      * If the RenderController is enabled, we enqueue the component for
      * render. Otherwise, it is rendered immediately.
      *
-     * @param {AbstractComponent} component Any Plottable component.
+     * @param {Component} component Any Plottable component.
      */
-    export function registerToRender(c: Components.AbstractComponent) {
+    export function registerToRender(c: Component) {
       if (_isCurrentlyFlushing) {
         Utils.Methods.warn("Registered to render while other components are flushing: request may be ignored");
       }
@@ -66,9 +66,9 @@ export module Core {
      * If the RenderController is enabled, we enqueue the component for
      * layout and render. Otherwise, it is rendered immediately.
      *
-     * @param {AbstractComponent} component Any Plottable component.
+     * @param {Component} component Any Plottable component.
      */
-    export function registerToComputeLayout(c: Components.AbstractComponent) {
+    export function registerToComputeLayout(c: Component) {
       _componentsNeedingComputeLayout[c.getID()] = c;
       _componentsNeedingRender[c.getID()] = c;
       requestRender();
@@ -103,7 +103,7 @@ export module Core {
         _isCurrentlyFlushing = true;
 
         // Finally, perform render of all components
-        var failed: {[key: string]: Components.AbstractComponent} = {};
+        var failed: {[key: string]: Component} = {};
         Object.keys(_componentsNeedingRender).forEach((k) => {
           try {
             _componentsNeedingRender[k]._doRender();

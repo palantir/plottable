@@ -639,16 +639,16 @@ declare module Plottable {
              * If the RenderController is enabled, we enqueue the component for
              * render. Otherwise, it is rendered immediately.
              *
-             * @param {AbstractComponent} component Any Plottable component.
+             * @param {Component} component Any Plottable component.
              */
-            function registerToRender(c: Components.AbstractComponent): void;
+            function registerToRender(c: Component): void;
             /**
              * If the RenderController is enabled, we enqueue the component for
              * layout and render. Otherwise, it is rendered immediately.
              *
-             * @param {AbstractComponent} component Any Plottable component.
+             * @param {Component} component Any Plottable component.
              */
-            function registerToComputeLayout(c: Components.AbstractComponent): void;
+            function registerToComputeLayout(c: Component): void;
             /**
              * Render everything that is waiting to be rendered right now, instead of
              * waiting until the next frame.
@@ -1558,266 +1558,264 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Components {
-        class AbstractComponent extends Core.PlottableObject {
-            protected _element: D3.Selection;
-            protected _content: D3.Selection;
-            protected _boundingBox: D3.Selection;
-            clipPathEnabled: boolean;
-            protected _fixedHeightFlag: boolean;
-            protected _fixedWidthFlag: boolean;
-            protected _isSetup: boolean;
-            protected _isAnchored: boolean;
-            /**
-             * Attaches the Component as a child of a given a DOM element. Usually only directly invoked on root-level Components.
-             *
-             * @param {D3.Selection} element A D3 selection consisting of the element to anchor under.
-             */
-            _anchor(element: D3.Selection): void;
-            /**
-             * Creates additional elements as necessary for the Component to function.
-             * Called during _anchor() if the Component's element has not been created yet.
-             * Override in subclasses to provide additional functionality.
-             */
-            protected _setup(): void;
-            _requestedSpace(availableWidth: number, availableHeight: number): _SpaceRequest;
-            /**
-             * Computes the size, position, and alignment from the specified values.
-             * If no parameters are supplied and the Component is a root node,
-             * they are inferred from the size of the Component's element.
-             *
-             * @param {number} offeredXOrigin x-coordinate of the origin of the space offered the Component
-             * @param {number} offeredYOrigin y-coordinate of the origin of the space offered the Component
-             * @param {number} availableWidth available width for the Component to render in
-             * @param {number} availableHeight available height for the Component to render in
-             */
-            _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;
-            protected _getSize(availableWidth: number, availableHeight: number): {
-                width: number;
-                height: number;
-            };
-            _render(): void;
-            _doRender(): void;
-            _useLastCalculatedLayout(): boolean;
-            _useLastCalculatedLayout(useLast: boolean): AbstractComponent;
-            _invalidateLayout(): void;
-            /**
-             * Renders the Component into a given DOM element. The element must be as <svg>.
-             *
-             * @param {String|D3.Selection} element A D3 selection or a selector for getting the element to render into.
-             * @returns {Component} The calling component.
-             */
-            renderTo(element: String | D3.Selection): AbstractComponent;
-            /**
-             * Causes the Component to recompute layout and redraw.
-             *
-             * This function should be called when CSS changes could influence the size
-             * of the components, e.g. changing the font size.
-             *
-             * @returns {Component} The calling component.
-             */
-            redraw(): AbstractComponent;
-            /**
-             * Sets the x alignment of the Component. This will be used if the
-             * Component is given more space than it needs.
-             *
-             * For example, you may want to make a Legend postition itself it the top
-             * right, so you would call `legend.xAlign("right")` and
-             * `legend.yAlign("top")`.
-             *
-             * @param {string} alignment The x alignment of the Component (one of ["left", "center", "right"]).
-             * @returns {Component} The calling Component.
-             */
-            xAlign(alignment: string): AbstractComponent;
-            /**
-             * Sets the y alignment of the Component. This will be used if the
-             * Component is given more space than it needs.
-             *
-             * For example, you may want to make a Legend postition itself it the top
-             * right, so you would call `legend.xAlign("right")` and
-             * `legend.yAlign("top")`.
-             *
-             * @param {string} alignment The x alignment of the Component (one of ["top", "center", "bottom"]).
-             * @returns {Component} The calling Component.
-             */
-            yAlign(alignment: string): AbstractComponent;
-            /**
-             * Sets the x offset of the Component. This will be used if the Component
-             * is given more space than it needs.
-             *
-             * @param {number} offset The desired x offset, in pixels, from the left
-             * side of the container.
-             * @returns {Component} The calling Component.
-             */
-            xOffset(offset: number): AbstractComponent;
-            /**
-             * Sets the y offset of the Component. This will be used if the Component
-             * is given more space than it needs.
-             *
-             * @param {number} offset The desired y offset, in pixels, from the top
-             * side of the container.
-             * @returns {Component} The calling Component.
-             */
-            yOffset(offset: number): AbstractComponent;
-            /**
-             * Attaches an Interaction to the Component, so that the Interaction will listen for events on the Component.
-             *
-             * @param {Interaction} interaction The Interaction to attach to the Component.
-             * @returns {Component} The calling Component.
-             */
-            registerInteraction(interaction: Interactions.AbstractInteraction): AbstractComponent;
-            /**
-             * Checks if the Component has a given CSS class.
-             *
-             * @param {string} cssClass The CSS class to check for.
-             * @returns {boolean} Whether the Component has the given CSS class.
-             */
-            classed(cssClass: string): boolean;
-            /**
-             * Adds/removes a given CSS class to/from the Component.
-             *
-             * @param {string} cssClass The CSS class to add or remove.
-             * @param {boolean} addClass If true, adds the provided CSS class; otherwise, removes it.
-             * @returns {AbstractComponent} The calling Component.
-             */
-            classed(cssClass: string, addClass: boolean): AbstractComponent;
-            /**
-             * Checks if the Component has a fixed width or false if it grows to fill available space.
-             * Returns false by default on the base Component class.
-             *
-             * @returns {boolean} Whether the component has a fixed width.
-             */
-            _isFixedWidth(): boolean;
-            /**
-             * Checks if the Component has a fixed height or false if it grows to fill available space.
-             * Returns false by default on the base Component class.
-             *
-             * @returns {boolean} Whether the component has a fixed height.
-             */
-            _isFixedHeight(): boolean;
-            _merge(c: AbstractComponent, below: boolean): Components.Group;
-            /**
-             * Merges this Component above another Component, returning a
-             * ComponentGroup. This is used to layer Components on top of each other.
-             *
-             * There are four cases:
-             * Component + Component: Returns a ComponentGroup with the first component after the second component.
-             * ComponentGroup + Component: Returns the ComponentGroup with the Component prepended.
-             * Component + ComponentGroup: Returns the ComponentGroup with the Component appended.
-             * ComponentGroup + ComponentGroup: Returns a new ComponentGroup with the first group after the second group.
-             *
-             * @param {Component} c The component to merge in.
-             * @returns {ComponentGroup} The relevant ComponentGroup out of the above four cases.
-             */
-            above(c: AbstractComponent): Components.Group;
-            /**
-             * Merges this Component below another Component, returning a
-             * ComponentGroup. This is used to layer Components on top of each other.
-             *
-             * There are four cases:
-             * Component + Component: Returns a ComponentGroup with the first component before the second component.
-             * ComponentGroup + Component: Returns the ComponentGroup with the Component appended.
-             * Component + ComponentGroup: Returns the ComponentGroup with the Component prepended.
-             * ComponentGroup + ComponentGroup: Returns a new ComponentGroup with the first group before the second group.
-             *
-             * @param {Component} c The component to merge in.
-             * @returns {ComponentGroup} The relevant ComponentGroup out of the above four cases.
-             */
-            below(c: AbstractComponent): Components.Group;
-            /**
-             * Detaches a Component from the DOM. The component can be reused.
-             *
-             * This should only be used if you plan on reusing the calling
-             * Components. Otherwise, use remove().
-             *
-             * @returns The calling Component.
-             */
-            detach(): AbstractComponent;
-            _parent(): AbstractComponentContainer;
-            _parent(parentElement: AbstractComponentContainer): any;
-            /**
-             * Removes a Component from the DOM and disconnects it from everything it's
-             * listening to (effectively destroying it).
-             */
-            remove(): void;
-            /**
-             * Return the width of the component
-             *
-             * @return {number} width of the component
-             */
-            width(): number;
-            /**
-             * Return the height of the component
-             *
-             * @return {number} height of the component
-             */
-            height(): number;
-            /**
-             * Gets the origin of the Component relative to its parent.
-             *
-             * @return {Point} The x-y position of the Component relative to its parent.
-             */
-            origin(): Point;
-            /**
-             * Gets the origin of the Component relative to the root <svg>.
-             *
-             * @return {Point} The x-y position of the Component relative to the root <svg>
-             */
-            originToSVG(): Point;
-            /**
-             * Returns the foreground selection for the Component
-             * (A selection covering the front of the Component)
-             *
-             * Will return undefined if the Component has not been anchored.
-             *
-             * @return {D3.Selection} foreground selection for the Component
-             */
-            foreground(): D3.Selection;
-            /**
-             * Returns the content selection for the Component
-             * (A selection containing the visual elements of the Component)
-             *
-             * Will return undefined if the Component has not been anchored.
-             *
-             * @return {D3.Selection} content selection for the Component
-             */
-            content(): D3.Selection;
-            /**
-             * Returns the background selection for the Component
-             * (A selection appearing behind of the Component)
-             *
-             * Will return undefined if the Component has not been anchored.
-             *
-             * @return {D3.Selection} background selection for the Component
-             */
-            background(): D3.Selection;
-            /**
-             * Returns the hitbox selection for the component
-             * (A selection in front of the foreground used mainly for interactions)
-             *
-             * Will return undefined if the component has not been anchored
-             *
-             * @return {D3.Selection} hitbox selection for the component
-             */
-            hitBox(): D3.Selection;
-        }
+    class Component extends Core.PlottableObject {
+        protected _element: D3.Selection;
+        protected _content: D3.Selection;
+        protected _boundingBox: D3.Selection;
+        clipPathEnabled: boolean;
+        protected _fixedHeightFlag: boolean;
+        protected _fixedWidthFlag: boolean;
+        protected _isSetup: boolean;
+        protected _isAnchored: boolean;
+        /**
+         * Attaches the Component as a child of a given a DOM element. Usually only directly invoked on root-level Components.
+         *
+         * @param {D3.Selection} element A D3 selection consisting of the element to anchor under.
+         */
+        _anchor(element: D3.Selection): void;
+        /**
+         * Creates additional elements as necessary for the Component to function.
+         * Called during _anchor() if the Component's element has not been created yet.
+         * Override in subclasses to provide additional functionality.
+         */
+        protected _setup(): void;
+        _requestedSpace(availableWidth: number, availableHeight: number): _SpaceRequest;
+        /**
+         * Computes the size, position, and alignment from the specified values.
+         * If no parameters are supplied and the Component is a root node,
+         * they are inferred from the size of the Component's element.
+         *
+         * @param {number} offeredXOrigin x-coordinate of the origin of the space offered the Component
+         * @param {number} offeredYOrigin y-coordinate of the origin of the space offered the Component
+         * @param {number} availableWidth available width for the Component to render in
+         * @param {number} availableHeight available height for the Component to render in
+         */
+        _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;
+        protected _getSize(availableWidth: number, availableHeight: number): {
+            width: number;
+            height: number;
+        };
+        _render(): void;
+        _doRender(): void;
+        _useLastCalculatedLayout(): boolean;
+        _useLastCalculatedLayout(useLast: boolean): Component;
+        _invalidateLayout(): void;
+        /**
+         * Renders the Component into a given DOM element. The element must be as <svg>.
+         *
+         * @param {String|D3.Selection} element A D3 selection or a selector for getting the element to render into.
+         * @returns {Component} The calling component.
+         */
+        renderTo(element: String | D3.Selection): Component;
+        /**
+         * Causes the Component to recompute layout and redraw.
+         *
+         * This function should be called when CSS changes could influence the size
+         * of the components, e.g. changing the font size.
+         *
+         * @returns {Component} The calling component.
+         */
+        redraw(): Component;
+        /**
+         * Sets the x alignment of the Component. This will be used if the
+         * Component is given more space than it needs.
+         *
+         * For example, you may want to make a Legend postition itself it the top
+         * right, so you would call `legend.xAlign("right")` and
+         * `legend.yAlign("top")`.
+         *
+         * @param {string} alignment The x alignment of the Component (one of ["left", "center", "right"]).
+         * @returns {Component} The calling Component.
+         */
+        xAlign(alignment: string): Component;
+        /**
+         * Sets the y alignment of the Component. This will be used if the
+         * Component is given more space than it needs.
+         *
+         * For example, you may want to make a Legend postition itself it the top
+         * right, so you would call `legend.xAlign("right")` and
+         * `legend.yAlign("top")`.
+         *
+         * @param {string} alignment The x alignment of the Component (one of ["top", "center", "bottom"]).
+         * @returns {Component} The calling Component.
+         */
+        yAlign(alignment: string): Component;
+        /**
+         * Sets the x offset of the Component. This will be used if the Component
+         * is given more space than it needs.
+         *
+         * @param {number} offset The desired x offset, in pixels, from the left
+         * side of the container.
+         * @returns {Component} The calling Component.
+         */
+        xOffset(offset: number): Component;
+        /**
+         * Sets the y offset of the Component. This will be used if the Component
+         * is given more space than it needs.
+         *
+         * @param {number} offset The desired y offset, in pixels, from the top
+         * side of the container.
+         * @returns {Component} The calling Component.
+         */
+        yOffset(offset: number): Component;
+        /**
+         * Attaches an Interaction to the Component, so that the Interaction will listen for events on the Component.
+         *
+         * @param {Interaction} interaction The Interaction to attach to the Component.
+         * @returns {Component} The calling Component.
+         */
+        registerInteraction(interaction: Interactions.AbstractInteraction): Component;
+        /**
+         * Checks if the Component has a given CSS class.
+         *
+         * @param {string} cssClass The CSS class to check for.
+         * @returns {boolean} Whether the Component has the given CSS class.
+         */
+        classed(cssClass: string): boolean;
+        /**
+         * Adds/removes a given CSS class to/from the Component.
+         *
+         * @param {string} cssClass The CSS class to add or remove.
+         * @param {boolean} addClass If true, adds the provided CSS class; otherwise, removes it.
+         * @returns {Component} The calling Component.
+         */
+        classed(cssClass: string, addClass: boolean): Component;
+        /**
+         * Checks if the Component has a fixed width or false if it grows to fill available space.
+         * Returns false by default on the base Component class.
+         *
+         * @returns {boolean} Whether the component has a fixed width.
+         */
+        _isFixedWidth(): boolean;
+        /**
+         * Checks if the Component has a fixed height or false if it grows to fill available space.
+         * Returns false by default on the base Component class.
+         *
+         * @returns {boolean} Whether the component has a fixed height.
+         */
+        _isFixedHeight(): boolean;
+        _merge(c: Component, below: boolean): Components.Group;
+        /**
+         * Merges this Component above another Component, returning a
+         * ComponentGroup. This is used to layer Components on top of each other.
+         *
+         * There are four cases:
+         * Component + Component: Returns a ComponentGroup with the first component after the second component.
+         * ComponentGroup + Component: Returns the ComponentGroup with the Component prepended.
+         * Component + ComponentGroup: Returns the ComponentGroup with the Component appended.
+         * ComponentGroup + ComponentGroup: Returns a new ComponentGroup with the first group after the second group.
+         *
+         * @param {Component} c The component to merge in.
+         * @returns {ComponentGroup} The relevant ComponentGroup out of the above four cases.
+         */
+        above(c: Component): Components.Group;
+        /**
+         * Merges this Component below another Component, returning a
+         * ComponentGroup. This is used to layer Components on top of each other.
+         *
+         * There are four cases:
+         * Component + Component: Returns a ComponentGroup with the first component before the second component.
+         * ComponentGroup + Component: Returns the ComponentGroup with the Component appended.
+         * Component + ComponentGroup: Returns the ComponentGroup with the Component prepended.
+         * ComponentGroup + ComponentGroup: Returns a new ComponentGroup with the first group before the second group.
+         *
+         * @param {Component} c The component to merge in.
+         * @returns {ComponentGroup} The relevant ComponentGroup out of the above four cases.
+         */
+        below(c: Component): Components.Group;
+        /**
+         * Detaches a Component from the DOM. The component can be reused.
+         *
+         * This should only be used if you plan on reusing the calling
+         * Components. Otherwise, use remove().
+         *
+         * @returns The calling Component.
+         */
+        detach(): Component;
+        _parent(): Components.AbstractComponentContainer;
+        _parent(parentElement: Components.AbstractComponentContainer): any;
+        /**
+         * Removes a Component from the DOM and disconnects it from everything it's
+         * listening to (effectively destroying it).
+         */
+        remove(): void;
+        /**
+         * Return the width of the component
+         *
+         * @return {number} width of the component
+         */
+        width(): number;
+        /**
+         * Return the height of the component
+         *
+         * @return {number} height of the component
+         */
+        height(): number;
+        /**
+         * Gets the origin of the Component relative to its parent.
+         *
+         * @return {Point} The x-y position of the Component relative to its parent.
+         */
+        origin(): Point;
+        /**
+         * Gets the origin of the Component relative to the root <svg>.
+         *
+         * @return {Point} The x-y position of the Component relative to the root <svg>
+         */
+        originToSVG(): Point;
+        /**
+         * Returns the foreground selection for the Component
+         * (A selection covering the front of the Component)
+         *
+         * Will return undefined if the Component has not been anchored.
+         *
+         * @return {D3.Selection} foreground selection for the Component
+         */
+        foreground(): D3.Selection;
+        /**
+         * Returns the content selection for the Component
+         * (A selection containing the visual elements of the Component)
+         *
+         * Will return undefined if the Component has not been anchored.
+         *
+         * @return {D3.Selection} content selection for the Component
+         */
+        content(): D3.Selection;
+        /**
+         * Returns the background selection for the Component
+         * (A selection appearing behind of the Component)
+         *
+         * Will return undefined if the Component has not been anchored.
+         *
+         * @return {D3.Selection} background selection for the Component
+         */
+        background(): D3.Selection;
+        /**
+         * Returns the hitbox selection for the component
+         * (A selection in front of the foreground used mainly for interactions)
+         *
+         * Will return undefined if the component has not been anchored
+         *
+         * @return {D3.Selection} hitbox selection for the component
+         */
+        hitBox(): D3.Selection;
     }
 }
 
 
 declare module Plottable {
     module Components {
-        class AbstractComponentContainer extends AbstractComponent {
+        class AbstractComponentContainer extends Component {
             _anchor(element: D3.Selection): void;
             _render(): void;
-            _removeComponent(c: AbstractComponent): void;
-            _addComponent(c: AbstractComponent, prepend?: boolean): boolean;
+            _removeComponent(c: Component): void;
+            _addComponent(c: Component, prepend?: boolean): boolean;
             /**
              * Returns a list of components in the ComponentContainer.
              *
              * @returns {Component[]} the contained Components
              */
-            components(): AbstractComponent[];
+            components(): Component[];
             /**
              * Returns true iff the ComponentContainer is empty.
              *
@@ -1833,7 +1831,7 @@ declare module Plottable {
             detachAll(): AbstractComponentContainer;
             remove(): void;
             _useLastCalculatedLayout(): boolean;
-            _useLastCalculatedLayout(calculated: boolean): AbstractComponent;
+            _useLastCalculatedLayout(calculated: boolean): Component;
         }
     }
 }
@@ -1855,9 +1853,9 @@ declare module Plottable {
              * @constructor
              * @param {Component[]} components The Components in the resultant Component.Group (default = []).
              */
-            constructor(components?: AbstractComponent[]);
+            constructor(components?: Component[]);
             _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
-            _merge(c: AbstractComponent, below: boolean): Group;
+            _merge(c: Component, below: boolean): Group;
             _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): Group;
             protected _getSize(availableWidth: number, availableHeight: number): {
                 width: number;
@@ -1872,7 +1870,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Axes {
-        class AbstractAxis extends Components.AbstractComponent {
+        class AbstractAxis extends Component {
             /**
              * The css class applied to each end tick mark (the line on the end tick).
              */
@@ -2213,7 +2211,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Components {
-        class Label extends AbstractComponent {
+        class Label extends Component {
             /**
              * Creates a Label.
              *
@@ -2307,7 +2305,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Components {
-        class Legend extends AbstractComponent {
+        class Legend extends Component {
             /**
              * The css class applied to each legend row
              */
@@ -2399,7 +2397,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Components {
-        class InterpolatedColorLegend extends AbstractComponent {
+        class InterpolatedColorLegend extends Component {
             /**
              * The css class applied to the legend labels.
              */
@@ -2455,7 +2453,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Components {
-        class Gridlines extends AbstractComponent {
+        class Gridlines extends Component {
             /**
              * Creates a set of Gridlines.
              * @constructor
@@ -2497,7 +2495,7 @@ declare module Plottable {
              * @param {Component[][]} [rows] A 2-D array of the Components to place in the table.
              * null can be used if a cell is empty. (default = [])
              */
-            constructor(rows?: AbstractComponent[][]);
+            constructor(rows?: Component[][]);
             /**
              * Adds a Component in the specified cell.
              *
@@ -2520,8 +2518,8 @@ declare module Plottable {
              * @param {Component} component The Component to be added.
              * @returns {Table} The calling Table.
              */
-            addComponent(row: number, col: number, component: AbstractComponent): Table;
-            _removeComponent(component: AbstractComponent): void;
+            addComponent(row: number, col: number, component: Component): Table;
+            _removeComponent(component: Component): void;
             _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
             _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;
             /**
@@ -2578,7 +2576,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Components {
-        class SelectionBoxLayer extends AbstractComponent {
+        class SelectionBoxLayer extends Component {
             protected _box: D3.Selection;
             constructor();
             protected _setup(): void;
@@ -2638,7 +2636,7 @@ declare module Plottable {
             pixelPoints: Point[];
             selection: D3.Selection;
         };
-        class AbstractPlot extends Components.AbstractComponent {
+        class AbstractPlot extends Component {
             protected _dataChanged: boolean;
             protected _key2PlotDatasetKey: D3.Map<PlotDatasetKey>;
             protected _datasetKeysInOrder: string[];
@@ -3754,8 +3752,8 @@ declare module Plottable {
              * e.g. crosshairs.
              */
             protected _hitBox: D3.Selection;
-            protected _componentToListenTo: Components.AbstractComponent;
-            _anchor(component: Components.AbstractComponent, hitBox: D3.Selection): void;
+            protected _componentToListenTo: Component;
+            _anchor(component: Component, hitBox: D3.Selection): void;
             _requiresHitbox(): boolean;
             /**
              * Translates an <svg>-coordinate-space point to Component-space coordinates.
@@ -3781,7 +3779,7 @@ declare module Plottable {
 declare module Plottable {
     module Interactions {
         class Click extends AbstractInteraction {
-            _anchor(component: Components.AbstractComponent, hitBox: D3.Selection): void;
+            _anchor(component: Component, hitBox: D3.Selection): void;
             /**
              * Gets the callback called when the Component is clicked.
              *
@@ -3803,7 +3801,7 @@ declare module Plottable {
 declare module Plottable {
     module Interactions {
         class DoubleClick extends AbstractInteraction {
-            _anchor(component: Components.AbstractComponent, hitBox: D3.Selection): void;
+            _anchor(component: Component, hitBox: D3.Selection): void;
             _requiresHitbox(): boolean;
             protected _listenTo(): string;
             /**
@@ -3820,7 +3818,7 @@ declare module Plottable {
 declare module Plottable {
     module Interactions {
         class Key extends AbstractInteraction {
-            _anchor(component: Components.AbstractComponent, hitBox: D3.Selection): void;
+            _anchor(component: Component, hitBox: D3.Selection): void;
             /**
              * Sets a callback to be called when the key with the given keyCode is
              * pressed and the user is moused over the Component.
@@ -3838,7 +3836,7 @@ declare module Plottable {
 declare module Plottable {
     module Interactions {
         class Pointer extends Interactions.AbstractInteraction {
-            _anchor(component: Components.AbstractComponent, hitBox: D3.Selection): void;
+            _anchor(component: Component, hitBox: D3.Selection): void;
             /**
              * Gets the callback called when the pointer enters the Component.
              *
@@ -3901,7 +3899,7 @@ declare module Plottable {
              * Sets the scales back to their original domains.
              */
             resetZoom(): void;
-            _anchor(component: Components.AbstractComponent, hitBox: D3.Selection): void;
+            _anchor(component: Component, hitBox: D3.Selection): void;
             _requiresHitbox(): boolean;
         }
     }
@@ -3911,7 +3909,7 @@ declare module Plottable {
 declare module Plottable {
     module Interactions {
         class Drag extends AbstractInteraction {
-            _anchor(component: Components.AbstractComponent, hitBox: D3.Selection): void;
+            _anchor(component: Component, hitBox: D3.Selection): void;
             /**
              * Returns whether or not this Interactions constrains Points passed to its
              * callbacks to lie inside its Component.
@@ -3986,7 +3984,7 @@ declare module Plottable {
             pixelPositions: Point[];
             selection: D3.Selection;
         };
-        interface Hoverable extends Components.AbstractComponent {
+        interface Hoverable extends Component {
             /**
              * Called when the user first mouses over the Component.
              *

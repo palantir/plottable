@@ -22,7 +22,7 @@ export module Plots {
     selection: D3.Selection;
   }
 
-  export class AbstractPlot extends Components.AbstractComponent {
+  export class AbstractPlot extends Component {
     protected _dataChanged = false;
     protected _key2PlotDatasetKey: D3.Map<PlotDatasetKey>;
     protected _datasetKeysInOrder: string[];

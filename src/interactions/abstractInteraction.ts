@@ -11,9 +11,9 @@ export module Interactions {
      * e.g. crosshairs.
      */
     protected _hitBox: D3.Selection;
-    protected _componentToListenTo: Components.AbstractComponent;
+    protected _componentToListenTo: Component;
 
-    public _anchor(component: Components.AbstractComponent, hitBox: D3.Selection) {
+    public _anchor(component: Component, hitBox: D3.Selection) {
       this._componentToListenTo = component;
       this._hitBox = hitBox;
     }

@@ -51,7 +51,7 @@ function fixComponentSize(c, fixedWidth, fixedHeight) {
     return c;
 }
 function makeFixedSizeComponent(fixedWidth, fixedHeight) {
-    return fixComponentSize(new Plottable.Components.AbstractComponent(), fixedWidth, fixedHeight);
+    return fixComponentSize(new Plottable.Component(), fixedWidth, fixedHeight);
 }
 function getTranslate(element) {
     return d3.transform(element.attr("transform")).translate;
@@ -235,7 +235,7 @@ var Mocks;
             };
         };
         return FixedSizeComponent;
-    })(Plottable.Components.AbstractComponent);
+    })(Plottable.Component);
     Mocks.FixedSizeComponent = FixedSizeComponent;
 })(Mocks || (Mocks = {}));
 
@@ -1577,7 +1577,7 @@ describe("Labels", function () {
     it("centered text in a table is positioned properly", function () {
         var svg = generateSVG(400, 400);
         var label = new Plottable.Components.TitleLabel("X");
-        var t = new Plottable.Components.Table().addComponent(0, 0, label).addComponent(1, 0, new Plottable.Components.AbstractComponent());
+        var t = new Plottable.Components.Table().addComponent(0, 0, label).addComponent(1, 0, new Plottable.Component());
         t.renderTo(svg);
         var textTranslate = d3.transform(label._content.select("g").attr("transform")).translate;
         var eleTranslate = d3.transform(label._element.attr("transform")).translate;
@@ -5973,9 +5973,9 @@ var assert = chai.assert;
 describe("ComponentContainer", function () {
     it("_addComponent()", function () {
         var container = new Plottable.Components.AbstractComponentContainer();
-        var c1 = new Plottable.Components.AbstractComponent();
-        var c2 = new Plottable.Components.AbstractComponent();
-        var c3 = new Plottable.Components.AbstractComponent();
+        var c1 = new Plottable.Component();
+        var c2 = new Plottable.Component();
+        var c3 = new Plottable.Component();
         assert.isTrue(container._addComponent(c1), "returns true on successful adding");
         assert.deepEqual(container.components(), [c1], "component was added");
         container._addComponent(c2);
@@ -5989,8 +5989,8 @@ describe("ComponentContainer", function () {
     });
     it("_removeComponent()", function () {
         var container = new Plottable.Components.AbstractComponentContainer();
-        var c1 = new Plottable.Components.AbstractComponent();
-        var c2 = new Plottable.Components.AbstractComponent();
+        var c1 = new Plottable.Component();
+        var c2 = new Plottable.Component();
         container._addComponent(c1);
         container._addComponent(c2);
         container._removeComponent(c2);
@@ -6001,14 +6001,14 @@ describe("ComponentContainer", function () {
     it("empty()", function () {
         var container = new Plottable.Components.AbstractComponentContainer();
         assert.isTrue(container.empty());
-        var c1 = new Plottable.Components.AbstractComponent();
+        var c1 = new Plottable.Component();
         container._addComponent(c1);
         assert.isFalse(container.empty());
     });
     it("detachAll()", function () {
         var container = new Plottable.Components.AbstractComponentContainer();
-        var c1 = new Plottable.Components.AbstractComponent();
-        var c2 = new Plottable.Components.AbstractComponent();
+        var c1 = new Plottable.Component();
+        var c2 = new Plottable.Component();
         container._addComponent(c1);
         container._addComponent(c2);
         container.detachAll();
@@ -6021,8 +6021,8 @@ var assert = chai.assert;
 describe("ComponentGroups", function () {
     it("components in componentGroups overlap", function () {
         var c1 = makeFixedSizeComponent(10, 10);
-        var c2 = new Plottable.Components.AbstractComponent();
-        var c3 = new Plottable.Components.AbstractComponent();
+        var c2 = new Plottable.Component();
+        var c3 = new Plottable.Component();
         var cg = new Plottable.Components.Group([c1, c2, c3]);
         var svg = generateSVG(400, 400);
         cg._anchor(svg);
@@ -6041,7 +6041,7 @@ describe("ComponentGroups", function () {
     it("components can be added before and after anchoring", function () {
         var c1 = makeFixedSizeComponent(10, 10);
         var c2 = makeFixedSizeComponent(20, 20);
-        var c3 = new Plottable.Components.AbstractComponent();
+        var c3 = new Plottable.Component();
         var cg = new Plottable.Components.Group([c1]);
         var svg = generateSVG(400, 400);
         cg.below(c2)._anchor(svg);
@@ -6061,8 +6061,8 @@ describe("ComponentGroups", function () {
     });
     it("componentGroup subcomponents have xOffset, yOffset of 0", function () {
         var cg = new Plottable.Components.Group();
-        var c1 = new Plottable.Components.AbstractComponent();
-        var c2 = new Plottable.Components.AbstractComponent();
+        var c1 = new Plottable.Component();
+        var c2 = new Plottable.Component();
         cg.below(c1).below(c2);
         var svg = generateSVG();
         cg._anchor(svg);
@@ -6079,8 +6079,8 @@ describe("ComponentGroups", function () {
         svg.remove();
     });
     it("detach() and _removeComponent work correctly for componentGroup", function () {
-        var c1 = new Plottable.Components.AbstractComponent().classed("component-1", true);
-        var c2 = new Plottable.Components.AbstractComponent().classed("component-2", true);
+        var c1 = new Plottable.Component().classed("component-1", true);
+        var c2 = new Plottable.Component().classed("component-2", true);
         var cg = new Plottable.Components.Group([c1, c2]);
         var svg = generateSVG(200, 200);
         cg.renderTo(svg);
@@ -6107,9 +6107,9 @@ describe("ComponentGroups", function () {
     });
     it("detachAll() works as expected", function () {
         var cg = new Plottable.Components.Group();
-        var c1 = new Plottable.Components.AbstractComponent();
-        var c2 = new Plottable.Components.AbstractComponent();
-        var c3 = new Plottable.Components.AbstractComponent();
+        var c1 = new Plottable.Component();
+        var c2 = new Plottable.Component();
+        var c3 = new Plottable.Component();
         assert.isTrue(cg.empty(), "cg initially empty");
         cg.below(c1).below(c2).below(c3);
         assert.isFalse(cg.empty(), "cg not empty after merging components");
@@ -6135,8 +6135,8 @@ describe("ComponentGroups", function () {
         });
         it("with a non-fixed-size Component", function () {
             var svg = generateSVG();
-            var c1 = new Plottable.Components.AbstractComponent();
-            var c2 = new Plottable.Components.AbstractComponent();
+            var c1 = new Plottable.Component();
+            var c2 = new Plottable.Component();
             var cg = new Plottable.Components.Group([c1, c2]);
             var groupRequest = cg._requestedSpace(SVG_WIDTH, SVG_HEIGHT);
             var c1Request = c1._requestedSpace(SVG_WIDTH, SVG_HEIGHT);
@@ -6172,7 +6172,7 @@ describe("ComponentGroups", function () {
             var svg = generateSVG();
             var cg1 = new Plottable.Components.AbstractComponentContainer();
             var cg2 = new Plottable.Components.AbstractComponentContainer();
-            var c = new Plottable.Components.AbstractComponent();
+            var c = new Plottable.Component();
             cg1._addComponent(c);
             cg1.renderTo(svg);
             cg2.renderTo(svg);
@@ -6187,7 +6187,7 @@ describe("ComponentGroups", function () {
         });
         it("can add null to a component without failing", function () {
             var cg1 = new Plottable.Components.AbstractComponentContainer();
-            var c = new Plottable.Components.AbstractComponent;
+            var c = new Plottable.Component;
             cg1._addComponent(c);
             assert.strictEqual(cg1.components().length, 1, "there should first be 1 element in the group");
             assert.doesNotThrow(function () { return cg1._addComponent(null); });
@@ -6195,10 +6195,10 @@ describe("ComponentGroups", function () {
         });
     });
     describe("Merging components works as expected", function () {
-        var c1 = new Plottable.Components.AbstractComponent();
-        var c2 = new Plottable.Components.AbstractComponent();
-        var c3 = new Plottable.Components.AbstractComponent();
-        var c4 = new Plottable.Components.AbstractComponent();
+        var c1 = new Plottable.Component();
+        var c2 = new Plottable.Component();
+        var c3 = new Plottable.Component();
+        var c4 = new Plottable.Component();
         describe("above()", function () {
             it("Component.above works as expected (Component.above Component)", function () {
                 var cg = c2.above(c1);
@@ -6297,7 +6297,7 @@ describe("Component behavior", function () {
     var SVG_HEIGHT = 300;
     beforeEach(function () {
         svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        c = new Plottable.Components.AbstractComponent();
+        c = new Plottable.Component();
     });
     describe("anchor", function () {
         it("anchoring works as expected", function () {
@@ -6465,9 +6465,9 @@ describe("Component behavior", function () {
     });
     it("componentID works as expected", function () {
         var expectedID = Plottable.Core.PlottableObject._nextID;
-        var c1 = new Plottable.Components.AbstractComponent();
+        var c1 = new Plottable.Component();
         assert.equal(c1.getID(), expectedID, "component id on next component was as expected");
-        var c2 = new Plottable.Components.AbstractComponent();
+        var c2 = new Plottable.Component();
         assert.equal(c2.getID(), expectedID + 1, "future components increment appropriately");
         svg.remove();
     });
@@ -6501,7 +6501,7 @@ describe("Component behavior", function () {
         svg.remove();
         svg = generateSVG();
         // registration before anchoring
-        c = new Plottable.Components.AbstractComponent();
+        c = new Plottable.Component();
         var i = new Plottable.Interactions.AbstractInteraction();
         i._requiresHitbox = function () { return true; };
         c.registerInteraction(i);
@@ -6510,7 +6510,7 @@ describe("Component behavior", function () {
         svg.remove();
         svg = generateSVG();
         // registration after anchoring
-        c = new Plottable.Components.AbstractComponent();
+        c = new Plottable.Component();
         c._anchor(svg);
         i = new Plottable.Interactions.AbstractInteraction();
         i._requiresHitbox = function () { return true; };
@@ -6544,7 +6544,7 @@ describe("Component behavior", function () {
         svg.remove();
     });
     it("detach() works as expected", function () {
-        var c1 = new Plottable.Components.AbstractComponent();
+        var c1 = new Plottable.Component();
         c1.renderTo(svg);
         assert.isTrue(svg.node().hasChildNodes(), "the svg has children");
         c1.detach();
@@ -6552,7 +6552,7 @@ describe("Component behavior", function () {
         svg.remove();
     });
     it("can't reuse component if it's been remove()-ed", function () {
-        var c1 = new Plottable.Components.AbstractComponent();
+        var c1 = new Plottable.Component();
         c1.renderTo(svg);
         c1.remove();
         assert.throws(function () { return c1.renderTo(svg); }, "reuse");
@@ -6572,15 +6572,15 @@ describe("Component behavior", function () {
         svg.remove();
     });
     it("components can be detached even if not anchored", function () {
-        var c = new Plottable.Components.AbstractComponent();
+        var c = new Plottable.Component();
         c.detach(); // no error thrown
         svg.remove();
     });
     it("component remains in own cell", function () {
-        var horizontalComponent = new Plottable.Components.AbstractComponent();
-        var verticalComponent = new Plottable.Components.AbstractComponent();
-        var placeHolder = new Plottable.Components.AbstractComponent();
-        var t = new Plottable.Components.Table().addComponent(0, 0, verticalComponent).addComponent(0, 1, new Plottable.Components.AbstractComponent()).addComponent(1, 0, placeHolder).addComponent(1, 1, horizontalComponent);
+        var horizontalComponent = new Plottable.Component();
+        var verticalComponent = new Plottable.Component();
+        var placeHolder = new Plottable.Component();
+        var t = new Plottable.Components.Table().addComponent(0, 0, verticalComponent).addComponent(0, 1, new Plottable.Component()).addComponent(1, 0, placeHolder).addComponent(1, 1, horizontalComponent);
         t.renderTo(svg);
         horizontalComponent.xAlign("center");
         verticalComponent.yAlign("bottom");
@@ -6590,7 +6590,7 @@ describe("Component behavior", function () {
     });
     it("Components will not translate if they are fixed width/height and request more space than offered", function () {
         // catches #1188
-        var c = new Plottable.Components.AbstractComponent();
+        var c = new Plottable.Component();
         c._requestedSpace = function () {
             return { width: 500, height: 500, wantsWidth: true, wantsHeight: true };
         };
@@ -6605,7 +6605,7 @@ describe("Component behavior", function () {
     });
     it("components do not render unless allocated space", function () {
         var renderFlag = false;
-        var c = new Plottable.Components.AbstractComponent();
+        var c = new Plottable.Component();
         c._doRender = function () { return renderFlag = true; };
         c._anchor(svg);
         c._setup();
@@ -6803,7 +6803,7 @@ function generateBasicTable(nRows, nCols) {
     var components = [];
     for (var i = 0; i < nRows; i++) {
         for (var j = 0; j < nCols; j++) {
-            var r = new Plottable.Components.AbstractComponent();
+            var r = new Plottable.Component();
             table.addComponent(i, j, r);
             components.push(r);
         }
@@ -6831,19 +6831,19 @@ describe("Tables", function () {
         assert.equal(rows[0][0], firstComponent, "the first component is unchanged");
     });
     it("table constructor can take a list of lists of components", function () {
-        var c0 = new Plottable.Components.AbstractComponent();
+        var c0 = new Plottable.Component();
         var row1 = [null, c0];
-        var row2 = [new Plottable.Components.AbstractComponent(), null];
+        var row2 = [new Plottable.Component(), null];
         var table = new Plottable.Components.Table([row1, row2]);
         assert.equal(table._rows[0][1], c0, "the component is in the right spot");
-        var c1 = new Plottable.Components.AbstractComponent();
+        var c1 = new Plottable.Component();
         table.addComponent(2, 2, c1);
         assert.equal(table._rows[2][2], c1, "the inserted component went to the right spot");
     });
     it("tables can be constructed by adding components in matrix style", function () {
         var table = new Plottable.Components.Table();
-        var c1 = new Plottable.Components.AbstractComponent();
-        var c2 = new Plottable.Components.AbstractComponent();
+        var c1 = new Plottable.Component();
+        var c2 = new Plottable.Component();
         table.addComponent(0, 0, c1);
         table.addComponent(1, 1, c2);
         var rows = table._rows;
@@ -6856,9 +6856,9 @@ describe("Tables", function () {
         assert.isNull(rows[1][0], "component at (1, 0) is null");
     });
     it("add a component where one already exists creates a new group", function () {
-        var c1 = new Plottable.Components.AbstractComponent();
-        var c2 = new Plottable.Components.AbstractComponent();
-        var c3 = new Plottable.Components.AbstractComponent();
+        var c1 = new Plottable.Component();
+        var c2 = new Plottable.Component();
+        var c3 = new Plottable.Component();
         var t = new Plottable.Components.Table();
         t.addComponent(0, 2, c1);
         t.addComponent(0, 0, c2);
@@ -6870,10 +6870,10 @@ describe("Tables", function () {
         assert.equal(components[1], c3, "Second element in the group at (0, 2) should be c3");
     });
     it("add a component where a group already exists adds the component to the group", function () {
-        var c1 = new Plottable.Components.AbstractComponent();
-        var c2 = new Plottable.Components.AbstractComponent();
+        var c1 = new Plottable.Component();
+        var c2 = new Plottable.Component();
         var grp = new Plottable.Components.Group([c1, c2]);
-        var c3 = new Plottable.Components.AbstractComponent();
+        var c3 = new Plottable.Component();
         var t = new Plottable.Components.Table();
         t.addComponent(0, 2, grp);
         t.addComponent(0, 2, c3);
@@ -6885,7 +6885,7 @@ describe("Tables", function () {
         assert.equal(components[2], c3, "The Component was added to the existing Group");
     });
     it("adding null to a table cell should throw an error", function () {
-        var c1 = new Plottable.Components.AbstractComponent();
+        var c1 = new Plottable.Component();
         var t = new Plottable.Components.Table([[c1]]);
         assert.throw(function () { return t.addComponent(0, 0, null); }, "Cannot add null to a table cell");
     });
@@ -6893,8 +6893,8 @@ describe("Tables", function () {
         // Solves #180, a weird bug
         var t = new Plottable.Components.Table();
         var svg = generateSVG();
-        t.addComponent(1, 0, new Plottable.Components.AbstractComponent());
-        t.addComponent(0, 2, new Plottable.Components.AbstractComponent());
+        t.addComponent(1, 0, new Plottable.Component());
+        t.addComponent(0, 2, new Plottable.Component());
         t.renderTo(svg); //would throw an error without the fix (tested);
         svg.remove();
     });
@@ -6939,7 +6939,7 @@ describe("Tables", function () {
     });
     it("table with fixed-size objects on every side lays out properly", function () {
         var svg = generateSVG();
-        var c4 = new Plottable.Components.AbstractComponent();
+        var c4 = new Plottable.Component();
         // [0 1 2] \\
         // [3 4 5] \\
         // [6 7 8] \\
@@ -6986,7 +6986,7 @@ describe("Tables", function () {
     it.skip("table._requestedSpace works properly", function () {
         // [0 1]
         // [2 3]
-        var c0 = new Plottable.Components.AbstractComponent();
+        var c0 = new Plottable.Component();
         var c1 = makeFixedSizeComponent(50, 50);
         var c2 = makeFixedSizeComponent(20, 50);
         var c3 = makeFixedSizeComponent(20, 20);
@@ -7010,10 +7010,10 @@ describe("Tables", function () {
             assert.deepEqual(result.wantsWidth, wW, "wantsWidth:" + id);
             assert.deepEqual(result.wantsHeight, wH, "wantsHeight:" + id);
         }
-        var c1 = new Plottable.Components.AbstractComponent();
-        var c2 = new Plottable.Components.AbstractComponent();
-        var c3 = new Plottable.Components.AbstractComponent();
-        var c4 = new Plottable.Components.AbstractComponent();
+        var c1 = new Plottable.Component();
+        var c2 = new Plottable.Component();
+        var c3 = new Plottable.Component();
+        var c4 = new Plottable.Component();
         var table = new Plottable.Components.Table([
             [c1, c2],
             [c3, c4]
@@ -7060,12 +7060,12 @@ describe("Tables", function () {
         });
     });
     describe("table._removeComponent works properly", function () {
-        var c1 = new Plottable.Components.AbstractComponent();
-        var c2 = new Plottable.Components.AbstractComponent();
-        var c3 = new Plottable.Components.AbstractComponent();
-        var c4 = new Plottable.Components.AbstractComponent();
-        var c5 = new Plottable.Components.AbstractComponent();
-        var c6 = new Plottable.Components.AbstractComponent();
+        var c1 = new Plottable.Component();
+        var c2 = new Plottable.Component();
+        var c3 = new Plottable.Component();
+        var c4 = new Plottable.Component();
+        var c5 = new Plottable.Component();
+        var c6 = new Plottable.Component();
         var table;
         it("table._removeComponent works in basic case", function () {
             table = new Plottable.Components.Table([[c1, c2], [c3, c4], [c5, c6]]);
@@ -8389,7 +8389,7 @@ describe("Interactions", function () {
             var xScale = new Plottable.Scales.Linear();
             var yScale = new Plottable.Scales.Linear();
             var svg = generateSVG();
-            var c = new Plottable.Components.AbstractComponent();
+            var c = new Plottable.Component();
             c.renderTo(svg);
             var pzi = new Plottable.Interactions.PanZoom(xScale, yScale);
             c.registerInteraction(pzi);
@@ -8407,7 +8407,7 @@ describe("Interactions", function () {
     describe("KeyInteraction", function () {
         it("Triggers appropriate callback for the key pressed", function () {
             var svg = generateSVG(400, 400);
-            var component = new Plottable.Components.AbstractComponent();
+            var component = new Plottable.Component();
             component.renderTo(svg);
             var ki = new Plottable.Interactions.Key();
             var aCode = 65; // "a" key
@@ -8445,7 +8445,7 @@ describe("Interactions", function () {
         var SVG_HEIGHT = 400;
         it("onPointerEnter", function () {
             var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-            var c = new Plottable.Components.AbstractComponent();
+            var c = new Plottable.Component();
             c.renderTo(svg);
             var pointerInteraction = new Plottable.Interactions.Pointer();
             c.registerInteraction(pointerInteraction);
@@ -8483,7 +8483,7 @@ describe("Interactions", function () {
         });
         it("onPointerMove", function () {
             var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-            var c = new Plottable.Components.AbstractComponent();
+            var c = new Plottable.Component();
             c.renderTo(svg);
             var pointerInteraction = new Plottable.Interactions.Pointer();
             c.registerInteraction(pointerInteraction);
@@ -8524,7 +8524,7 @@ describe("Interactions", function () {
         });
         it("onPointerExit", function () {
             var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-            var c = new Plottable.Components.AbstractComponent();
+            var c = new Plottable.Component();
             c.renderTo(svg);
             var pointerInteraction = new Plottable.Interactions.Pointer();
             c.registerInteraction(pointerInteraction);
@@ -8605,7 +8605,7 @@ var TestHoverable = (function (_super) {
         };
     };
     return TestHoverable;
-})(Plottable.Components.AbstractComponent);
+})(Plottable.Component);
 describe("Interactions", function () {
     describe("Hover", function () {
         var svg;
@@ -8746,7 +8746,7 @@ describe("Interactions", function () {
         var SVG_HEIGHT = 400;
         it("onClick", function () {
             var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-            var c = new Plottable.Components.AbstractComponent();
+            var c = new Plottable.Component();
             c.renderTo(svg);
             var clickInteraction = new Plottable.Interactions.Click();
             c.registerInteraction(clickInteraction);
@@ -8840,7 +8840,7 @@ describe("Interactions", function () {
         };
         it("onDragStart()", function () {
             var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-            var c = new Plottable.Components.AbstractComponent();
+            var c = new Plottable.Component();
             c.renderTo(svg);
             var drag = new Plottable.Interactions.Drag();
             var startCallbackCalled = false;
@@ -8880,7 +8880,7 @@ describe("Interactions", function () {
         });
         it("onDrag()", function () {
             var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-            var c = new Plottable.Components.AbstractComponent();
+            var c = new Plottable.Component();
             c.renderTo(svg);
             var drag = new Plottable.Interactions.Drag();
             var moveCallbackCalled = false;
@@ -8913,7 +8913,7 @@ describe("Interactions", function () {
         });
         it("onDragEnd()", function () {
             var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-            var c = new Plottable.Components.AbstractComponent();
+            var c = new Plottable.Component();
             c.renderTo(svg);
             var drag = new Plottable.Interactions.Drag();
             var endCallbackCalled = false;
@@ -8952,7 +8952,7 @@ describe("Interactions", function () {
         });
         it("constrainToComponent()", function () {
             var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-            var c = new Plottable.Components.AbstractComponent();
+            var c = new Plottable.Component();
             c.renderTo(svg);
             var drag = new Plottable.Interactions.Drag();
             assert.isTrue(drag.constrainToComponent(), "constrains by default");

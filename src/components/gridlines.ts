@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Components {
-  export class Gridlines extends AbstractComponent {
+  export class Gridlines extends Component {
     private _xScale: Scales.AbstractQuantitative<any>;
     private _yScale: Scales.AbstractQuantitative<any>;
     private _xLinesContainer: D3.Selection;

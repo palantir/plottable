@@ -9,7 +9,7 @@ describe("Interactions", () => {
 
     it("onClick", () => {
       var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var c = new Plottable.Components.AbstractComponent();
+      var c = new Plottable.Component();
       c.renderTo(svg);
 
       var clickInteraction = new Plottable.Interactions.Click();

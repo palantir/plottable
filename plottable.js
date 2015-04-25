@@ -1384,7 +1384,7 @@ var Plottable;
              * If the RenderController is enabled, we enqueue the component for
              * render. Otherwise, it is rendered immediately.
              *
-             * @param {AbstractComponent} component Any Plottable component.
+             * @param {Component} component Any Plottable component.
              */
             function registerToRender(c) {
                 if (_isCurrentlyFlushing) {
@@ -1398,7 +1398,7 @@ var Plottable;
              * If the RenderController is enabled, we enqueue the component for
              * layout and render. Otherwise, it is rendered immediately.
              *
-             * @param {AbstractComponent} component Any Plottable component.
+             * @param {Component} component Any Plottable component.
              */
             function registerToComputeLayout(c) {
                 _componentsNeedingComputeLayout[c.getID()] = c;
@@ -3267,562 +3267,559 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
-    var Components;
-    (function (Components) {
-        var AbstractComponent = (function (_super) {
-            __extends(AbstractComponent, _super);
-            function AbstractComponent() {
-                _super.apply(this, arguments);
-                this.clipPathEnabled = false;
-                this._xAlignProportion = 0; // What % along the free space do we want to position (0 = left, .5 = center, 1 = right)
-                this._yAlignProportion = 0;
-                this._fixedHeightFlag = false;
-                this._fixedWidthFlag = false;
-                this._isSetup = false;
-                this._isAnchored = false;
-                this._interactionsToRegister = [];
-                this._boxes = [];
-                this._isTopLevelComponent = false;
-                this._xOffset = 0; // Offset from Origin, used for alignment and floating positioning
-                this._yOffset = 0;
-                this._cssClasses = ["component"];
-                this._removed = false;
-                this._usedLastLayout = false;
+    var Component = (function (_super) {
+        __extends(Component, _super);
+        function Component() {
+            _super.apply(this, arguments);
+            this.clipPathEnabled = false;
+            this._xAlignProportion = 0; // What % along the free space do we want to position (0 = left, .5 = center, 1 = right)
+            this._yAlignProportion = 0;
+            this._fixedHeightFlag = false;
+            this._fixedWidthFlag = false;
+            this._isSetup = false;
+            this._isAnchored = false;
+            this._interactionsToRegister = [];
+            this._boxes = [];
+            this._isTopLevelComponent = false;
+            this._xOffset = 0; // Offset from Origin, used for alignment and floating positioning
+            this._yOffset = 0;
+            this._cssClasses = ["component"];
+            this._removed = false;
+            this._usedLastLayout = false;
+        }
+        /**
+         * Attaches the Component as a child of a given a DOM element. Usually only directly invoked on root-level Components.
+         *
+         * @param {D3.Selection} element A D3 selection consisting of the element to anchor under.
+         */
+        Component.prototype._anchor = function (element) {
+            if (this._removed) {
+                throw new Error("Can't reuse remove()-ed components!");
             }
-            /**
-             * Attaches the Component as a child of a given a DOM element. Usually only directly invoked on root-level Components.
-             *
-             * @param {D3.Selection} element A D3 selection consisting of the element to anchor under.
-             */
-            AbstractComponent.prototype._anchor = function (element) {
-                if (this._removed) {
-                    throw new Error("Can't reuse remove()-ed components!");
-                }
-                if (element.node().nodeName.toLowerCase() === "svg") {
-                    // svg node gets the "plottable" CSS class
-                    this._rootSVG = element;
-                    this._rootSVG.classed("plottable", true);
-                    // visible overflow for firefox https://stackoverflow.com/questions/5926986/why-does-firefox-appear-to-truncate-embedded-svgs
-                    this._rootSVG.style("overflow", "visible");
-                    this._isTopLevelComponent = true;
-                }
-                if (this._element != null) {
-                    // reattach existing element
-                    element.node().appendChild(this._element.node());
-                }
-                else {
-                    this._element = element.append("g");
-                    this._setup();
-                }
-                this._isAnchored = true;
-            };
-            /**
-             * Creates additional elements as necessary for the Component to function.
-             * Called during _anchor() if the Component's element has not been created yet.
-             * Override in subclasses to provide additional functionality.
-             */
-            AbstractComponent.prototype._setup = function () {
-                var _this = this;
-                if (this._isSetup) {
-                    return;
-                }
-                this._cssClasses.forEach(function (cssClass) {
-                    _this._element.classed(cssClass, true);
-                });
-                this._cssClasses = null;
-                this._backgroundContainer = this._element.append("g").classed("background-container", true);
-                this._addBox("background-fill", this._backgroundContainer);
-                this._content = this._element.append("g").classed("content", true);
-                this._foregroundContainer = this._element.append("g").classed("foreground-container", true);
-                this._boxContainer = this._element.append("g").classed("box-container", true);
-                if (this.clipPathEnabled) {
-                    this._generateClipPath();
-                }
-                ;
-                this._boundingBox = this._addBox("bounding-box");
-                this._interactionsToRegister.forEach(function (r) { return _this.registerInteraction(r); });
-                this._interactionsToRegister = null;
-                this._isSetup = true;
-            };
-            AbstractComponent.prototype._requestedSpace = function (availableWidth, availableHeight) {
-                return { width: 0, height: 0, wantsWidth: false, wantsHeight: false };
-            };
-            /**
-             * Computes the size, position, and alignment from the specified values.
-             * If no parameters are supplied and the Component is a root node,
-             * they are inferred from the size of the Component's element.
-             *
-             * @param {number} offeredXOrigin x-coordinate of the origin of the space offered the Component
-             * @param {number} offeredYOrigin y-coordinate of the origin of the space offered the Component
-             * @param {number} availableWidth available width for the Component to render in
-             * @param {number} availableHeight available height for the Component to render in
-             */
-            AbstractComponent.prototype._computeLayout = function (offeredXOrigin, offeredYOrigin, availableWidth, availableHeight) {
-                var _this = this;
-                if (offeredXOrigin == null || offeredYOrigin == null || availableWidth == null || availableHeight == null) {
-                    if (this._element == null) {
-                        throw new Error("anchor must be called before computeLayout");
-                    }
-                    else if (this._isTopLevelComponent) {
-                        // we are the root node, retrieve height/width from root SVG
-                        offeredXOrigin = 0;
-                        offeredYOrigin = 0;
-                        // Set width/height to 100% if not specified, to allow accurate size calculation
-                        // see http://www.w3.org/TR/CSS21/visudet.html#block-replaced-width
-                        // and http://www.w3.org/TR/CSS21/visudet.html#inline-replaced-height
-                        if (this._rootSVG.attr("width") == null) {
-                            this._rootSVG.attr("width", "100%");
-                        }
-                        if (this._rootSVG.attr("height") == null) {
-                            this._rootSVG.attr("height", "100%");
-                        }
-                        var elem = this._rootSVG.node();
-                        availableWidth = Plottable.Utils.DOM.getElementWidth(elem);
-                        availableHeight = Plottable.Utils.DOM.getElementHeight(elem);
-                    }
-                    else {
-                        throw new Error("null arguments cannot be passed to _computeLayout() on a non-root node");
-                    }
-                }
-                var size = this._getSize(availableWidth, availableHeight);
-                this._width = size.width;
-                this._height = size.height;
-                this._xOrigin = offeredXOrigin + this._xOffset + (availableWidth - this.width()) * this._xAlignProportion;
-                this._yOrigin = offeredYOrigin + this._yOffset + (availableHeight - this.height()) * this._yAlignProportion;
-                this._element.attr("transform", "translate(" + this._xOrigin + "," + this._yOrigin + ")");
-                this._boxes.forEach(function (b) { return b.attr("width", _this.width()).attr("height", _this.height()); });
-            };
-            AbstractComponent.prototype._getSize = function (availableWidth, availableHeight) {
-                var requestedSpace = this._requestedSpace(availableWidth, availableHeight);
-                return {
-                    width: this._isFixedWidth() ? Math.min(availableWidth, requestedSpace.width) : availableWidth,
-                    height: this._isFixedHeight() ? Math.min(availableHeight, requestedSpace.height) : availableHeight
-                };
-            };
-            AbstractComponent.prototype._render = function () {
-                if (this._isAnchored && this._isSetup && this.width() >= 0 && this.height() >= 0) {
-                    Plottable.Core.RenderControllers.registerToRender(this);
-                }
-            };
-            AbstractComponent.prototype._scheduleComputeLayout = function () {
-                if (this._isAnchored && this._isSetup) {
-                    Plottable.Core.RenderControllers.registerToComputeLayout(this);
-                }
-            };
-            AbstractComponent.prototype._doRender = function () {
-            };
-            AbstractComponent.prototype._useLastCalculatedLayout = function (useLast) {
-                if (useLast == null) {
-                    return this._usedLastLayout;
-                }
-                else {
-                    this._usedLastLayout = useLast;
-                    return this;
-                }
-            };
-            AbstractComponent.prototype._invalidateLayout = function () {
-                this._useLastCalculatedLayout(false);
-                if (this._isAnchored && this._isSetup) {
-                    if (this._isTopLevelComponent) {
-                        this._scheduleComputeLayout();
-                    }
-                    else {
-                        this._parent()._invalidateLayout();
-                    }
-                }
-            };
-            /**
-             * Renders the Component into a given DOM element. The element must be as <svg>.
-             *
-             * @param {String|D3.Selection} element A D3 selection or a selector for getting the element to render into.
-             * @returns {Component} The calling component.
-             */
-            AbstractComponent.prototype.renderTo = function (element) {
-                this.detach();
-                if (element != null) {
-                    var selection;
-                    if (typeof (element) === "string") {
-                        selection = d3.select(element);
-                    }
-                    else {
-                        selection = element;
-                    }
-                    if (!selection.node() || selection.node().nodeName.toLowerCase() !== "svg") {
-                        throw new Error("Plottable requires a valid SVG to renderTo");
-                    }
-                    this._anchor(selection);
-                }
+            if (element.node().nodeName.toLowerCase() === "svg") {
+                // svg node gets the "plottable" CSS class
+                this._rootSVG = element;
+                this._rootSVG.classed("plottable", true);
+                // visible overflow for firefox https://stackoverflow.com/questions/5926986/why-does-firefox-appear-to-truncate-embedded-svgs
+                this._rootSVG.style("overflow", "visible");
+                this._isTopLevelComponent = true;
+            }
+            if (this._element != null) {
+                // reattach existing element
+                element.node().appendChild(this._element.node());
+            }
+            else {
+                this._element = element.append("g");
+                this._setup();
+            }
+            this._isAnchored = true;
+        };
+        /**
+         * Creates additional elements as necessary for the Component to function.
+         * Called during _anchor() if the Component's element has not been created yet.
+         * Override in subclasses to provide additional functionality.
+         */
+        Component.prototype._setup = function () {
+            var _this = this;
+            if (this._isSetup) {
+                return;
+            }
+            this._cssClasses.forEach(function (cssClass) {
+                _this._element.classed(cssClass, true);
+            });
+            this._cssClasses = null;
+            this._backgroundContainer = this._element.append("g").classed("background-container", true);
+            this._addBox("background-fill", this._backgroundContainer);
+            this._content = this._element.append("g").classed("content", true);
+            this._foregroundContainer = this._element.append("g").classed("foreground-container", true);
+            this._boxContainer = this._element.append("g").classed("box-container", true);
+            if (this.clipPathEnabled) {
+                this._generateClipPath();
+            }
+            ;
+            this._boundingBox = this._addBox("bounding-box");
+            this._interactionsToRegister.forEach(function (r) { return _this.registerInteraction(r); });
+            this._interactionsToRegister = null;
+            this._isSetup = true;
+        };
+        Component.prototype._requestedSpace = function (availableWidth, availableHeight) {
+            return { width: 0, height: 0, wantsWidth: false, wantsHeight: false };
+        };
+        /**
+         * Computes the size, position, and alignment from the specified values.
+         * If no parameters are supplied and the Component is a root node,
+         * they are inferred from the size of the Component's element.
+         *
+         * @param {number} offeredXOrigin x-coordinate of the origin of the space offered the Component
+         * @param {number} offeredYOrigin y-coordinate of the origin of the space offered the Component
+         * @param {number} availableWidth available width for the Component to render in
+         * @param {number} availableHeight available height for the Component to render in
+         */
+        Component.prototype._computeLayout = function (offeredXOrigin, offeredYOrigin, availableWidth, availableHeight) {
+            var _this = this;
+            if (offeredXOrigin == null || offeredYOrigin == null || availableWidth == null || availableHeight == null) {
                 if (this._element == null) {
-                    throw new Error("If a component has never been rendered before, then renderTo must be given a node to render to, \
+                    throw new Error("anchor must be called before computeLayout");
+                }
+                else if (this._isTopLevelComponent) {
+                    // we are the root node, retrieve height/width from root SVG
+                    offeredXOrigin = 0;
+                    offeredYOrigin = 0;
+                    // Set width/height to 100% if not specified, to allow accurate size calculation
+                    // see http://www.w3.org/TR/CSS21/visudet.html#block-replaced-width
+                    // and http://www.w3.org/TR/CSS21/visudet.html#inline-replaced-height
+                    if (this._rootSVG.attr("width") == null) {
+                        this._rootSVG.attr("width", "100%");
+                    }
+                    if (this._rootSVG.attr("height") == null) {
+                        this._rootSVG.attr("height", "100%");
+                    }
+                    var elem = this._rootSVG.node();
+                    availableWidth = Plottable.Utils.DOM.getElementWidth(elem);
+                    availableHeight = Plottable.Utils.DOM.getElementHeight(elem);
+                }
+                else {
+                    throw new Error("null arguments cannot be passed to _computeLayout() on a non-root node");
+                }
+            }
+            var size = this._getSize(availableWidth, availableHeight);
+            this._width = size.width;
+            this._height = size.height;
+            this._xOrigin = offeredXOrigin + this._xOffset + (availableWidth - this.width()) * this._xAlignProportion;
+            this._yOrigin = offeredYOrigin + this._yOffset + (availableHeight - this.height()) * this._yAlignProportion;
+            this._element.attr("transform", "translate(" + this._xOrigin + "," + this._yOrigin + ")");
+            this._boxes.forEach(function (b) { return b.attr("width", _this.width()).attr("height", _this.height()); });
+        };
+        Component.prototype._getSize = function (availableWidth, availableHeight) {
+            var requestedSpace = this._requestedSpace(availableWidth, availableHeight);
+            return {
+                width: this._isFixedWidth() ? Math.min(availableWidth, requestedSpace.width) : availableWidth,
+                height: this._isFixedHeight() ? Math.min(availableHeight, requestedSpace.height) : availableHeight
+            };
+        };
+        Component.prototype._render = function () {
+            if (this._isAnchored && this._isSetup && this.width() >= 0 && this.height() >= 0) {
+                Plottable.Core.RenderControllers.registerToRender(this);
+            }
+        };
+        Component.prototype._scheduleComputeLayout = function () {
+            if (this._isAnchored && this._isSetup) {
+                Plottable.Core.RenderControllers.registerToComputeLayout(this);
+            }
+        };
+        Component.prototype._doRender = function () {
+        };
+        Component.prototype._useLastCalculatedLayout = function (useLast) {
+            if (useLast == null) {
+                return this._usedLastLayout;
+            }
+            else {
+                this._usedLastLayout = useLast;
+                return this;
+            }
+        };
+        Component.prototype._invalidateLayout = function () {
+            this._useLastCalculatedLayout(false);
+            if (this._isAnchored && this._isSetup) {
+                if (this._isTopLevelComponent) {
+                    this._scheduleComputeLayout();
+                }
+                else {
+                    this._parent()._invalidateLayout();
+                }
+            }
+        };
+        /**
+         * Renders the Component into a given DOM element. The element must be as <svg>.
+         *
+         * @param {String|D3.Selection} element A D3 selection or a selector for getting the element to render into.
+         * @returns {Component} The calling component.
+         */
+        Component.prototype.renderTo = function (element) {
+            this.detach();
+            if (element != null) {
+                var selection;
+                if (typeof (element) === "string") {
+                    selection = d3.select(element);
+                }
+                else {
+                    selection = element;
+                }
+                if (!selection.node() || selection.node().nodeName.toLowerCase() !== "svg") {
+                    throw new Error("Plottable requires a valid SVG to renderTo");
+                }
+                this._anchor(selection);
+            }
+            if (this._element == null) {
+                throw new Error("If a component has never been rendered before, then renderTo must be given a node to render to, \
           or a D3.Selection, or a selector string");
+            }
+            this._computeLayout();
+            this._render();
+            // flush so that consumers can immediately attach to stuff we create in the DOM
+            Plottable.Core.RenderControllers.flush();
+            return this;
+        };
+        /**
+         * Causes the Component to recompute layout and redraw.
+         *
+         * This function should be called when CSS changes could influence the size
+         * of the components, e.g. changing the font size.
+         *
+         * @returns {Component} The calling component.
+         */
+        Component.prototype.redraw = function () {
+            this._invalidateLayout();
+            return this;
+        };
+        /**
+         * Sets the x alignment of the Component. This will be used if the
+         * Component is given more space than it needs.
+         *
+         * For example, you may want to make a Legend postition itself it the top
+         * right, so you would call `legend.xAlign("right")` and
+         * `legend.yAlign("top")`.
+         *
+         * @param {string} alignment The x alignment of the Component (one of ["left", "center", "right"]).
+         * @returns {Component} The calling Component.
+         */
+        Component.prototype.xAlign = function (alignment) {
+            alignment = alignment.toLowerCase();
+            if (alignment === "left") {
+                this._xAlignProportion = 0;
+            }
+            else if (alignment === "center") {
+                this._xAlignProportion = 0.5;
+            }
+            else if (alignment === "right") {
+                this._xAlignProportion = 1;
+            }
+            else {
+                throw new Error("Unsupported alignment");
+            }
+            this._invalidateLayout();
+            return this;
+        };
+        /**
+         * Sets the y alignment of the Component. This will be used if the
+         * Component is given more space than it needs.
+         *
+         * For example, you may want to make a Legend postition itself it the top
+         * right, so you would call `legend.xAlign("right")` and
+         * `legend.yAlign("top")`.
+         *
+         * @param {string} alignment The x alignment of the Component (one of ["top", "center", "bottom"]).
+         * @returns {Component} The calling Component.
+         */
+        Component.prototype.yAlign = function (alignment) {
+            alignment = alignment.toLowerCase();
+            if (alignment === "top") {
+                this._yAlignProportion = 0;
+            }
+            else if (alignment === "center") {
+                this._yAlignProportion = 0.5;
+            }
+            else if (alignment === "bottom") {
+                this._yAlignProportion = 1;
+            }
+            else {
+                throw new Error("Unsupported alignment");
+            }
+            this._invalidateLayout();
+            return this;
+        };
+        /**
+         * Sets the x offset of the Component. This will be used if the Component
+         * is given more space than it needs.
+         *
+         * @param {number} offset The desired x offset, in pixels, from the left
+         * side of the container.
+         * @returns {Component} The calling Component.
+         */
+        Component.prototype.xOffset = function (offset) {
+            this._xOffset = offset;
+            this._invalidateLayout();
+            return this;
+        };
+        /**
+         * Sets the y offset of the Component. This will be used if the Component
+         * is given more space than it needs.
+         *
+         * @param {number} offset The desired y offset, in pixels, from the top
+         * side of the container.
+         * @returns {Component} The calling Component.
+         */
+        Component.prototype.yOffset = function (offset) {
+            this._yOffset = offset;
+            this._invalidateLayout();
+            return this;
+        };
+        Component.prototype._addBox = function (className, parentElement) {
+            if (this._element == null) {
+                throw new Error("Adding boxes before anchoring is currently disallowed");
+            }
+            parentElement = parentElement == null ? this._boxContainer : parentElement;
+            var box = parentElement.append("rect");
+            if (className != null) {
+                box.classed(className, true);
+            }
+            this._boxes.push(box);
+            if (this.width() != null && this.height() != null) {
+                box.attr("width", this.width()).attr("height", this.height());
+            }
+            return box;
+        };
+        Component.prototype._generateClipPath = function () {
+            // The clip path will prevent content from overflowing its component space.
+            // HACKHACK: IE <=9 does not respect the HTML base element in SVG.
+            // They don't need the current URL in the clip path reference.
+            var prefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
+            prefix = prefix.split("#")[0]; // To fix cases where an anchor tag was used
+            this._element.attr("clip-path", "url(\"" + prefix + "#clipPath" + this.getID() + "\")");
+            var clipPathParent = this._boxContainer.append("clipPath").attr("id", "clipPath" + this.getID());
+            this._addBox("clip-rect", clipPathParent);
+        };
+        /**
+         * Attaches an Interaction to the Component, so that the Interaction will listen for events on the Component.
+         *
+         * @param {Interaction} interaction The Interaction to attach to the Component.
+         * @returns {Component} The calling Component.
+         */
+        Component.prototype.registerInteraction = function (interaction) {
+            // Interactions can be registered before or after anchoring. If registered before, they are
+            // pushed to this._interactionsToRegister and registered during anchoring. If after, they are
+            // registered immediately
+            if (this._element) {
+                if (!this._hitBox && interaction._requiresHitbox()) {
+                    this._hitBox = this._addBox("hit-box");
+                    this._hitBox.style("fill", "#ffffff").style("opacity", 0); // We need to set these so Chrome will register events
                 }
-                this._computeLayout();
-                this._render();
-                // flush so that consumers can immediately attach to stuff we create in the DOM
-                Plottable.Core.RenderControllers.flush();
-                return this;
-            };
-            /**
-             * Causes the Component to recompute layout and redraw.
-             *
-             * This function should be called when CSS changes could influence the size
-             * of the components, e.g. changing the font size.
-             *
-             * @returns {Component} The calling component.
-             */
-            AbstractComponent.prototype.redraw = function () {
-                this._invalidateLayout();
-                return this;
-            };
-            /**
-             * Sets the x alignment of the Component. This will be used if the
-             * Component is given more space than it needs.
-             *
-             * For example, you may want to make a Legend postition itself it the top
-             * right, so you would call `legend.xAlign("right")` and
-             * `legend.yAlign("top")`.
-             *
-             * @param {string} alignment The x alignment of the Component (one of ["left", "center", "right"]).
-             * @returns {Component} The calling Component.
-             */
-            AbstractComponent.prototype.xAlign = function (alignment) {
-                alignment = alignment.toLowerCase();
-                if (alignment === "left") {
-                    this._xAlignProportion = 0;
+                interaction._anchor(this, this._hitBox);
+            }
+            else {
+                this._interactionsToRegister.push(interaction);
+            }
+            return this;
+        };
+        Component.prototype.classed = function (cssClass, addClass) {
+            if (addClass == null) {
+                if (cssClass == null) {
+                    return false;
                 }
-                else if (alignment === "center") {
-                    this._xAlignProportion = 0.5;
-                }
-                else if (alignment === "right") {
-                    this._xAlignProportion = 1;
-                }
-                else {
-                    throw new Error("Unsupported alignment");
-                }
-                this._invalidateLayout();
-                return this;
-            };
-            /**
-             * Sets the y alignment of the Component. This will be used if the
-             * Component is given more space than it needs.
-             *
-             * For example, you may want to make a Legend postition itself it the top
-             * right, so you would call `legend.xAlign("right")` and
-             * `legend.yAlign("top")`.
-             *
-             * @param {string} alignment The x alignment of the Component (one of ["top", "center", "bottom"]).
-             * @returns {Component} The calling Component.
-             */
-            AbstractComponent.prototype.yAlign = function (alignment) {
-                alignment = alignment.toLowerCase();
-                if (alignment === "top") {
-                    this._yAlignProportion = 0;
-                }
-                else if (alignment === "center") {
-                    this._yAlignProportion = 0.5;
-                }
-                else if (alignment === "bottom") {
-                    this._yAlignProportion = 1;
-                }
-                else {
-                    throw new Error("Unsupported alignment");
-                }
-                this._invalidateLayout();
-                return this;
-            };
-            /**
-             * Sets the x offset of the Component. This will be used if the Component
-             * is given more space than it needs.
-             *
-             * @param {number} offset The desired x offset, in pixels, from the left
-             * side of the container.
-             * @returns {Component} The calling Component.
-             */
-            AbstractComponent.prototype.xOffset = function (offset) {
-                this._xOffset = offset;
-                this._invalidateLayout();
-                return this;
-            };
-            /**
-             * Sets the y offset of the Component. This will be used if the Component
-             * is given more space than it needs.
-             *
-             * @param {number} offset The desired y offset, in pixels, from the top
-             * side of the container.
-             * @returns {Component} The calling Component.
-             */
-            AbstractComponent.prototype.yOffset = function (offset) {
-                this._yOffset = offset;
-                this._invalidateLayout();
-                return this;
-            };
-            AbstractComponent.prototype._addBox = function (className, parentElement) {
-                if (this._element == null) {
-                    throw new Error("Adding boxes before anchoring is currently disallowed");
-                }
-                parentElement = parentElement == null ? this._boxContainer : parentElement;
-                var box = parentElement.append("rect");
-                if (className != null) {
-                    box.classed(className, true);
-                }
-                this._boxes.push(box);
-                if (this.width() != null && this.height() != null) {
-                    box.attr("width", this.width()).attr("height", this.height());
-                }
-                return box;
-            };
-            AbstractComponent.prototype._generateClipPath = function () {
-                // The clip path will prevent content from overflowing its component space.
-                // HACKHACK: IE <=9 does not respect the HTML base element in SVG.
-                // They don't need the current URL in the clip path reference.
-                var prefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
-                prefix = prefix.split("#")[0]; // To fix cases where an anchor tag was used
-                this._element.attr("clip-path", "url(\"" + prefix + "#clipPath" + this.getID() + "\")");
-                var clipPathParent = this._boxContainer.append("clipPath").attr("id", "clipPath" + this.getID());
-                this._addBox("clip-rect", clipPathParent);
-            };
-            /**
-             * Attaches an Interaction to the Component, so that the Interaction will listen for events on the Component.
-             *
-             * @param {Interaction} interaction The Interaction to attach to the Component.
-             * @returns {Component} The calling Component.
-             */
-            AbstractComponent.prototype.registerInteraction = function (interaction) {
-                // Interactions can be registered before or after anchoring. If registered before, they are
-                // pushed to this._interactionsToRegister and registered during anchoring. If after, they are
-                // registered immediately
-                if (this._element) {
-                    if (!this._hitBox && interaction._requiresHitbox()) {
-                        this._hitBox = this._addBox("hit-box");
-                        this._hitBox.style("fill", "#ffffff").style("opacity", 0); // We need to set these so Chrome will register events
-                    }
-                    interaction._anchor(this, this._hitBox);
-                }
-                else {
-                    this._interactionsToRegister.push(interaction);
-                }
-                return this;
-            };
-            AbstractComponent.prototype.classed = function (cssClass, addClass) {
-                if (addClass == null) {
-                    if (cssClass == null) {
-                        return false;
-                    }
-                    else if (this._element == null) {
-                        return (this._cssClasses.indexOf(cssClass) !== -1);
-                    }
-                    else {
-                        return this._element.classed(cssClass);
-                    }
+                else if (this._element == null) {
+                    return (this._cssClasses.indexOf(cssClass) !== -1);
                 }
                 else {
-                    if (cssClass == null) {
-                        return this;
-                    }
-                    if (this._element == null) {
-                        var classIndex = this._cssClasses.indexOf(cssClass);
-                        if (addClass && classIndex === -1) {
-                            this._cssClasses.push(cssClass);
-                        }
-                        else if (!addClass && classIndex !== -1) {
-                            this._cssClasses.splice(classIndex, 1);
-                        }
-                    }
-                    else {
-                        this._element.classed(cssClass, addClass);
-                    }
+                    return this._element.classed(cssClass);
+                }
+            }
+            else {
+                if (cssClass == null) {
                     return this;
                 }
-            };
-            /**
-             * Checks if the Component has a fixed width or false if it grows to fill available space.
-             * Returns false by default on the base Component class.
-             *
-             * @returns {boolean} Whether the component has a fixed width.
-             */
-            AbstractComponent.prototype._isFixedWidth = function () {
-                return this._fixedWidthFlag;
-            };
-            /**
-             * Checks if the Component has a fixed height or false if it grows to fill available space.
-             * Returns false by default on the base Component class.
-             *
-             * @returns {boolean} Whether the component has a fixed height.
-             */
-            AbstractComponent.prototype._isFixedHeight = function () {
-                return this._fixedHeightFlag;
-            };
-            AbstractComponent.prototype._merge = function (c, below) {
-                var cg;
-                if (Plottable.Components.Group.prototype.isPrototypeOf(c)) {
-                    cg = c;
-                    cg._addComponent(this, below);
-                    return cg;
+                if (this._element == null) {
+                    var classIndex = this._cssClasses.indexOf(cssClass);
+                    if (addClass && classIndex === -1) {
+                        this._cssClasses.push(cssClass);
+                    }
+                    else if (!addClass && classIndex !== -1) {
+                        this._cssClasses.splice(classIndex, 1);
+                    }
                 }
                 else {
-                    var mergedComponents = below ? [this, c] : [c, this];
-                    cg = new Plottable.Components.Group(mergedComponents);
-                    return cg;
+                    this._element.classed(cssClass, addClass);
                 }
-            };
-            /**
-             * Merges this Component above another Component, returning a
-             * ComponentGroup. This is used to layer Components on top of each other.
-             *
-             * There are four cases:
-             * Component + Component: Returns a ComponentGroup with the first component after the second component.
-             * ComponentGroup + Component: Returns the ComponentGroup with the Component prepended.
-             * Component + ComponentGroup: Returns the ComponentGroup with the Component appended.
-             * ComponentGroup + ComponentGroup: Returns a new ComponentGroup with the first group after the second group.
-             *
-             * @param {Component} c The component to merge in.
-             * @returns {ComponentGroup} The relevant ComponentGroup out of the above four cases.
-             */
-            AbstractComponent.prototype.above = function (c) {
-                return this._merge(c, false);
-            };
-            /**
-             * Merges this Component below another Component, returning a
-             * ComponentGroup. This is used to layer Components on top of each other.
-             *
-             * There are four cases:
-             * Component + Component: Returns a ComponentGroup with the first component before the second component.
-             * ComponentGroup + Component: Returns the ComponentGroup with the Component appended.
-             * Component + ComponentGroup: Returns the ComponentGroup with the Component prepended.
-             * ComponentGroup + ComponentGroup: Returns a new ComponentGroup with the first group before the second group.
-             *
-             * @param {Component} c The component to merge in.
-             * @returns {ComponentGroup} The relevant ComponentGroup out of the above four cases.
-             */
-            AbstractComponent.prototype.below = function (c) {
-                return this._merge(c, true);
-            };
-            /**
-             * Detaches a Component from the DOM. The component can be reused.
-             *
-             * This should only be used if you plan on reusing the calling
-             * Components. Otherwise, use remove().
-             *
-             * @returns The calling Component.
-             */
-            AbstractComponent.prototype.detach = function () {
-                if (this._isAnchored) {
-                    this._element.remove();
-                }
-                var parent = this._parent();
-                if (parent != null) {
-                    parent._removeComponent(this);
-                }
-                this._isAnchored = false;
-                this._parentElement = null;
                 return this;
+            }
+        };
+        /**
+         * Checks if the Component has a fixed width or false if it grows to fill available space.
+         * Returns false by default on the base Component class.
+         *
+         * @returns {boolean} Whether the component has a fixed width.
+         */
+        Component.prototype._isFixedWidth = function () {
+            return this._fixedWidthFlag;
+        };
+        /**
+         * Checks if the Component has a fixed height or false if it grows to fill available space.
+         * Returns false by default on the base Component class.
+         *
+         * @returns {boolean} Whether the component has a fixed height.
+         */
+        Component.prototype._isFixedHeight = function () {
+            return this._fixedHeightFlag;
+        };
+        Component.prototype._merge = function (c, below) {
+            var cg;
+            if (Plottable.Components.Group.prototype.isPrototypeOf(c)) {
+                cg = c;
+                cg._addComponent(this, below);
+                return cg;
+            }
+            else {
+                var mergedComponents = below ? [this, c] : [c, this];
+                cg = new Plottable.Components.Group(mergedComponents);
+                return cg;
+            }
+        };
+        /**
+         * Merges this Component above another Component, returning a
+         * ComponentGroup. This is used to layer Components on top of each other.
+         *
+         * There are four cases:
+         * Component + Component: Returns a ComponentGroup with the first component after the second component.
+         * ComponentGroup + Component: Returns the ComponentGroup with the Component prepended.
+         * Component + ComponentGroup: Returns the ComponentGroup with the Component appended.
+         * ComponentGroup + ComponentGroup: Returns a new ComponentGroup with the first group after the second group.
+         *
+         * @param {Component} c The component to merge in.
+         * @returns {ComponentGroup} The relevant ComponentGroup out of the above four cases.
+         */
+        Component.prototype.above = function (c) {
+            return this._merge(c, false);
+        };
+        /**
+         * Merges this Component below another Component, returning a
+         * ComponentGroup. This is used to layer Components on top of each other.
+         *
+         * There are four cases:
+         * Component + Component: Returns a ComponentGroup with the first component before the second component.
+         * ComponentGroup + Component: Returns the ComponentGroup with the Component appended.
+         * Component + ComponentGroup: Returns the ComponentGroup with the Component prepended.
+         * ComponentGroup + ComponentGroup: Returns a new ComponentGroup with the first group before the second group.
+         *
+         * @param {Component} c The component to merge in.
+         * @returns {ComponentGroup} The relevant ComponentGroup out of the above four cases.
+         */
+        Component.prototype.below = function (c) {
+            return this._merge(c, true);
+        };
+        /**
+         * Detaches a Component from the DOM. The component can be reused.
+         *
+         * This should only be used if you plan on reusing the calling
+         * Components. Otherwise, use remove().
+         *
+         * @returns The calling Component.
+         */
+        Component.prototype.detach = function () {
+            if (this._isAnchored) {
+                this._element.remove();
+            }
+            var parent = this._parent();
+            if (parent != null) {
+                parent._removeComponent(this);
+            }
+            this._isAnchored = false;
+            this._parentElement = null;
+            return this;
+        };
+        Component.prototype._parent = function (parentElement) {
+            if (parentElement === undefined) {
+                return this._parentElement;
+            }
+            this.detach();
+            this._parentElement = parentElement;
+        };
+        /**
+         * Removes a Component from the DOM and disconnects it from everything it's
+         * listening to (effectively destroying it).
+         */
+        Component.prototype.remove = function () {
+            this._removed = true;
+            this.detach();
+        };
+        /**
+         * Return the width of the component
+         *
+         * @return {number} width of the component
+         */
+        Component.prototype.width = function () {
+            return this._width;
+        };
+        /**
+         * Return the height of the component
+         *
+         * @return {number} height of the component
+         */
+        Component.prototype.height = function () {
+            return this._height;
+        };
+        /**
+         * Gets the origin of the Component relative to its parent.
+         *
+         * @return {Point} The x-y position of the Component relative to its parent.
+         */
+        Component.prototype.origin = function () {
+            return {
+                x: this._xOrigin,
+                y: this._yOrigin
             };
-            AbstractComponent.prototype._parent = function (parentElement) {
-                if (parentElement === undefined) {
-                    return this._parentElement;
-                }
-                this.detach();
-                this._parentElement = parentElement;
-            };
-            /**
-             * Removes a Component from the DOM and disconnects it from everything it's
-             * listening to (effectively destroying it).
-             */
-            AbstractComponent.prototype.remove = function () {
-                this._removed = true;
-                this.detach();
-            };
-            /**
-             * Return the width of the component
-             *
-             * @return {number} width of the component
-             */
-            AbstractComponent.prototype.width = function () {
-                return this._width;
-            };
-            /**
-             * Return the height of the component
-             *
-             * @return {number} height of the component
-             */
-            AbstractComponent.prototype.height = function () {
-                return this._height;
-            };
-            /**
-             * Gets the origin of the Component relative to its parent.
-             *
-             * @return {Point} The x-y position of the Component relative to its parent.
-             */
-            AbstractComponent.prototype.origin = function () {
-                return {
-                    x: this._xOrigin,
-                    y: this._yOrigin
-                };
-            };
-            /**
-             * Gets the origin of the Component relative to the root <svg>.
-             *
-             * @return {Point} The x-y position of the Component relative to the root <svg>
-             */
-            AbstractComponent.prototype.originToSVG = function () {
-                var origin = this.origin();
-                var ancestor = this._parent();
-                while (ancestor != null) {
-                    var ancestorOrigin = ancestor.origin();
-                    origin.x += ancestorOrigin.x;
-                    origin.y += ancestorOrigin.y;
-                    ancestor = ancestor._parent();
-                }
-                return origin;
-            };
-            /**
-             * Returns the foreground selection for the Component
-             * (A selection covering the front of the Component)
-             *
-             * Will return undefined if the Component has not been anchored.
-             *
-             * @return {D3.Selection} foreground selection for the Component
-             */
-            AbstractComponent.prototype.foreground = function () {
-                return this._foregroundContainer;
-            };
-            /**
-             * Returns the content selection for the Component
-             * (A selection containing the visual elements of the Component)
-             *
-             * Will return undefined if the Component has not been anchored.
-             *
-             * @return {D3.Selection} content selection for the Component
-             */
-            AbstractComponent.prototype.content = function () {
-                return this._content;
-            };
-            /**
-             * Returns the background selection for the Component
-             * (A selection appearing behind of the Component)
-             *
-             * Will return undefined if the Component has not been anchored.
-             *
-             * @return {D3.Selection} background selection for the Component
-             */
-            AbstractComponent.prototype.background = function () {
-                return this._backgroundContainer;
-            };
-            /**
-             * Returns the hitbox selection for the component
-             * (A selection in front of the foreground used mainly for interactions)
-             *
-             * Will return undefined if the component has not been anchored
-             *
-             * @return {D3.Selection} hitbox selection for the component
-             */
-            AbstractComponent.prototype.hitBox = function () {
-                return this._hitBox;
-            };
-            return AbstractComponent;
-        })(Plottable.Core.PlottableObject);
-        Components.AbstractComponent = AbstractComponent;
-    })(Components = Plottable.Components || (Plottable.Components = {}));
+        };
+        /**
+         * Gets the origin of the Component relative to the root <svg>.
+         *
+         * @return {Point} The x-y position of the Component relative to the root <svg>
+         */
+        Component.prototype.originToSVG = function () {
+            var origin = this.origin();
+            var ancestor = this._parent();
+            while (ancestor != null) {
+                var ancestorOrigin = ancestor.origin();
+                origin.x += ancestorOrigin.x;
+                origin.y += ancestorOrigin.y;
+                ancestor = ancestor._parent();
+            }
+            return origin;
+        };
+        /**
+         * Returns the foreground selection for the Component
+         * (A selection covering the front of the Component)
+         *
+         * Will return undefined if the Component has not been anchored.
+         *
+         * @return {D3.Selection} foreground selection for the Component
+         */
+        Component.prototype.foreground = function () {
+            return this._foregroundContainer;
+        };
+        /**
+         * Returns the content selection for the Component
+         * (A selection containing the visual elements of the Component)
+         *
+         * Will return undefined if the Component has not been anchored.
+         *
+         * @return {D3.Selection} content selection for the Component
+         */
+        Component.prototype.content = function () {
+            return this._content;
+        };
+        /**
+         * Returns the background selection for the Component
+         * (A selection appearing behind of the Component)
+         *
+         * Will return undefined if the Component has not been anchored.
+         *
+         * @return {D3.Selection} background selection for the Component
+         */
+        Component.prototype.background = function () {
+            return this._backgroundContainer;
+        };
+        /**
+         * Returns the hitbox selection for the component
+         * (A selection in front of the foreground used mainly for interactions)
+         *
+         * Will return undefined if the component has not been anchored
+         *
+         * @return {D3.Selection} hitbox selection for the component
+         */
+        Component.prototype.hitBox = function () {
+            return this._hitBox;
+        };
+        return Component;
+    })(Plottable.Core.PlottableObject);
+    Plottable.Component = Component;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -3918,7 +3915,7 @@ var Plottable;
                 return _super.prototype._useLastCalculatedLayout.call(this, calculated);
             };
             return AbstractComponentContainer;
-        })(Components.AbstractComponent);
+        })(Plottable.Component);
         Components.AbstractComponentContainer = AbstractComponentContainer;
     })(Components = Plottable.Components || (Plottable.Components = {}));
 })(Plottable || (Plottable = {}));
@@ -4313,7 +4310,7 @@ var Plottable;
              */
             AbstractAxis.TICK_LABEL_CLASS = "tick-label";
             return AbstractAxis;
-        })(Plottable.Components.AbstractComponent);
+        })(Plottable.Component);
         Axes.AbstractAxis = AbstractAxis;
     })(Axes = Plottable.Axes || (Plottable.Axes = {}));
 })(Plottable || (Plottable = {}));
@@ -5427,7 +5424,7 @@ var Plottable;
                 this._writer.write(this._text, writeWidth, writeHeight, writeOptions);
             };
             return Label;
-        })(Components.AbstractComponent);
+        })(Plottable.Component);
         Components.Label = Label;
         var TitleLabel = (function (_super) {
             __extends(TitleLabel, _super);
@@ -5702,7 +5699,7 @@ var Plottable;
              */
             Legend.LEGEND_SYMBOL_CLASS = "legend-symbol";
             return Legend;
-        })(Components.AbstractComponent);
+        })(Plottable.Component);
         Components.Legend = Legend;
     })(Components = Plottable.Components || (Plottable.Components = {}));
 })(Plottable || (Plottable = {}));
@@ -5928,7 +5925,7 @@ var Plottable;
              */
             InterpolatedColorLegend.LEGEND_LABEL_CLASS = "legend-label";
             return InterpolatedColorLegend;
-        })(Components.AbstractComponent);
+        })(Plottable.Component);
         Components.InterpolatedColorLegend = InterpolatedColorLegend;
     })(Components = Plottable.Components || (Plottable.Components = {}));
 })(Plottable || (Plottable = {}));
@@ -6015,7 +6012,7 @@ var Plottable;
                 }
             };
             return Gridlines;
-        })(Components.AbstractComponent);
+        })(Plottable.Component);
         Components.Gridlines = Gridlines;
     })(Components = Plottable.Components || (Plottable.Components = {}));
 })(Plottable || (Plottable = {}));
@@ -6457,7 +6454,7 @@ var Plottable;
                 return this;
             };
             return SelectionBoxLayer;
-        })(Components.AbstractComponent);
+        })(Plottable.Component);
         Components.SelectionBoxLayer = SelectionBoxLayer;
     })(Components = Plottable.Components || (Plottable.Components = {}));
 })(Plottable || (Plottable = {}));
@@ -6931,7 +6928,7 @@ var Plottable;
                 return !(pixelPoint.x < 0 || pixelPoint.y < 0 || pixelPoint.x > this.width() || pixelPoint.y > this.height());
             };
             return AbstractPlot;
-        })(Plottable.Components.AbstractComponent);
+        })(Plottable.Component);
         Plots.AbstractPlot = AbstractPlot;
     })(Plots = Plottable.Plots || (Plottable.Plots = {}));
 })(Plottable || (Plottable = {}));
