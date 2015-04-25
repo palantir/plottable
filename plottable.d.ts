@@ -3218,33 +3218,33 @@ declare module Plottable {
             value: number;
             offset?: number;
         };
-        class AbstractStacked<X, Y> extends XYPlot<X, Y> {
-            protected _isVertical: boolean;
-            _getPlotMetadataForDataset(key: string): StackedPlotMetadata;
-            project(attrToSet: string, accessor: any, scale?: Scale<any, any>): AbstractStacked<X, Y>;
-            _onDatasetUpdate(): void;
-            _updateStackOffsets(): void;
-            _updateStackExtents(): void;
-            /**
-             * Feeds the data through d3's stack layout function which will calculate
-             * the stack offsets and use the the function declared in .out to set the offsets on the data.
-             */
-            _stack(dataArray: D3.Map<StackedDatum>[]): D3.Map<StackedDatum>[];
-            /**
-             * After the stack offsets have been determined on each separate dataset, the offsets need
-             * to be determined correctly on the overall datasets
-             */
-            _setDatasetStackOffsets(positiveDataMapArray: D3.Map<StackedDatum>[], negativeDataMapArray: D3.Map<StackedDatum>[]): void;
-            _getDomainKeys(): string[];
-            _generateDefaultMapArray(): D3.Map<StackedDatum>[];
-            _updateScaleExtents(): void;
-            _normalizeDatasets<A, B>(fromX: boolean): {
-                a: A;
-                b: B;
-            }[];
-            _keyAccessor(): _Accessor;
-            _valueAccessor(): _Accessor;
-        }
+    }
+    class AbstractStacked<X, Y> extends XYPlot<X, Y> {
+        protected _isVertical: boolean;
+        _getPlotMetadataForDataset(key: string): Plots.StackedPlotMetadata;
+        project(attrToSet: string, accessor: any, scale?: Scale<any, any>): AbstractStacked<X, Y>;
+        _onDatasetUpdate(): void;
+        _updateStackOffsets(): void;
+        _updateStackExtents(): void;
+        /**
+         * Feeds the data through d3's stack layout function which will calculate
+         * the stack offsets and use the the function declared in .out to set the offsets on the data.
+         */
+        _stack(dataArray: D3.Map<Plots.StackedDatum>[]): D3.Map<Plots.StackedDatum>[];
+        /**
+         * After the stack offsets have been determined on each separate dataset, the offsets need
+         * to be determined correctly on the overall datasets
+         */
+        _setDatasetStackOffsets(positiveDataMapArray: D3.Map<Plots.StackedDatum>[], negativeDataMapArray: D3.Map<Plots.StackedDatum>[]): void;
+        _getDomainKeys(): string[];
+        _generateDefaultMapArray(): D3.Map<Plots.StackedDatum>[];
+        _updateScaleExtents(): void;
+        _normalizeDatasets<A, B>(fromX: boolean): {
+            a: A;
+            b: B;
+        }[];
+        _keyAccessor(): _Accessor;
+        _valueAccessor(): _Accessor;
     }
 }
 

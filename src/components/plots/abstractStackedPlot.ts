@@ -1,23 +1,25 @@
 ///<reference path="../../reference.ts" />
 
 module Plottable {
-export module Plots {
-  export interface StackedPlotMetadata extends PlotMetadata {
-    offsets: D3.Map<number>;
-  }
 
-  export type StackedDatum = {
-    key: any;
-    value: number;
-    offset?: number;
+  export module Plots {
+    export interface StackedPlotMetadata extends PlotMetadata {
+      offsets: D3.Map<number>;
+    }
+
+    export type StackedDatum = {
+      key: any;
+      value: number;
+      offset?: number;
+    }
   }
 
   export class AbstractStacked<X, Y> extends XYPlot<X, Y> {
     private _stackedExtent = [0, 0];
     protected _isVertical: boolean;
 
-    public _getPlotMetadataForDataset(key: string): StackedPlotMetadata {
-      var metadata = <StackedPlotMetadata> super._getPlotMetadataForDataset(key);
+    public _getPlotMetadataForDataset(key: string): Plots.StackedPlotMetadata {
+      var metadata = <Plots.StackedPlotMetadata> super._getPlotMetadataForDataset(key);
       metadata.offsets = d3.map();
       return metadata;
     }
@@ -41,13 +43,13 @@ export module Plots {
       var dataMapArray = this._generateDefaultMapArray();
       var domainKeys = this._getDomainKeys();
 
-      var positiveDataMapArray: D3.Map<StackedDatum>[] = dataMapArray.map((dataMap) => {
+      var positiveDataMapArray: D3.Map<Plots.StackedDatum>[] = dataMapArray.map((dataMap) => {
         return Utils.Methods.populateMap(domainKeys, (domainKey) => {
           return { key: domainKey, value: Math.max(0, dataMap.get(domainKey).value) || 0 };
         });
       });
 
-      var negativeDataMapArray: D3.Map<StackedDatum>[] = dataMapArray.map((dataMap) => {
+      var negativeDataMapArray: D3.Map<Plots.StackedDatum>[] = dataMapArray.map((dataMap) => {
         return Utils.Methods.populateMap(domainKeys, (domainKey) => {
           return { key: domainKey, value: Math.min(dataMap.get(domainKey).value, 0) || 0 };
         });
@@ -63,7 +65,7 @@ export module Plots {
       var keyAccessor = this._keyAccessor();
       var maxStackExtent = Utils.Methods.max<string, number>(this._datasetKeysInOrder, (k: string) => {
         var dataset = this._key2PlotDatasetKey.get(k).dataset;
-        var plotMetadata = <StackedPlotMetadata>this._key2PlotDatasetKey.get(k).plotMetadata;
+        var plotMetadata = <Plots.StackedPlotMetadata>this._key2PlotDatasetKey.get(k).plotMetadata;
         return Utils.Methods.max<any, number>(dataset.data(), (datum: any, i: number) => {
           return +valueAccessor(datum, i, dataset.metadata(), plotMetadata) +
             plotMetadata.offsets.get(keyAccessor(datum, i, dataset.metadata(), plotMetadata));
@@ -72,7 +74,7 @@ export module Plots {
 
       var minStackExtent = Utils.Methods.min<string, number>(this._datasetKeysInOrder, (k: string) => {
         var dataset = this._key2PlotDatasetKey.get(k).dataset;
-        var plotMetadata = <StackedPlotMetadata>this._key2PlotDatasetKey.get(k).plotMetadata;
+        var plotMetadata = <Plots.StackedPlotMetadata>this._key2PlotDatasetKey.get(k).plotMetadata;
         return Utils.Methods.min<any, number>(dataset.data(), (datum: any, i: number) => {
           return +valueAccessor(datum, i, dataset.metadata(), plotMetadata) +
             plotMetadata.offsets.get(keyAccessor(datum, i, dataset.metadata(), plotMetadata));
@@ -86,8 +88,8 @@ export module Plots {
      * Feeds the data through d3's stack layout function which will calculate
      * the stack offsets and use the the function declared in .out to set the offsets on the data.
      */
-    public _stack(dataArray: D3.Map<StackedDatum>[]): D3.Map<StackedDatum>[] {
-      var outFunction = (d: StackedDatum, y0: number, y: number) => {
+    public _stack(dataArray: D3.Map<Plots.StackedDatum>[]): D3.Map<Plots.StackedDatum>[] {
+      var outFunction = (d: Plots.StackedDatum, y0: number, y: number) => {
         d.offset = y0;
       };
 
@@ -104,13 +106,13 @@ export module Plots {
      * After the stack offsets have been determined on each separate dataset, the offsets need
      * to be determined correctly on the overall datasets
      */
-    public _setDatasetStackOffsets(positiveDataMapArray: D3.Map<StackedDatum>[], negativeDataMapArray: D3.Map<StackedDatum>[]) {
+    public _setDatasetStackOffsets(positiveDataMapArray: D3.Map<Plots.StackedDatum>[], negativeDataMapArray: D3.Map<Plots.StackedDatum>[]) {
       var keyAccessor = this._keyAccessor();
       var valueAccessor = this._valueAccessor();
 
       this._datasetKeysInOrder.forEach((k, index) => {
         var dataset = this._key2PlotDatasetKey.get(k).dataset;
-        var plotMetadata = <StackedPlotMetadata>this._key2PlotDatasetKey.get(k).plotMetadata;
+        var plotMetadata = <Plots.StackedPlotMetadata>this._key2PlotDatasetKey.get(k).plotMetadata;
         var positiveDataMap = positiveDataMapArray[index];
         var negativeDataMap = negativeDataMapArray[index];
         var isAllNegativeValues = dataset.data().every((datum, i) => valueAccessor(datum, i, dataset.metadata(), plotMetadata) <= 0);
@@ -147,7 +149,7 @@ export module Plots {
       return domainKeys.values();
     }
 
-    public _generateDefaultMapArray(): D3.Map<StackedDatum>[] {
+    public _generateDefaultMapArray(): D3.Map<Plots.StackedDatum>[] {
       var keyAccessor = this._keyAccessor();
       var valueAccessor = this._valueAccessor();
       var domainKeys = this._getDomainKeys();
@@ -187,7 +189,7 @@ export module Plots {
     public _normalizeDatasets<A, B>(fromX: boolean): {a: A; b: B}[] {
       var aAccessor = this._projections[fromX ? "x" : "y"].accessor;
       var bAccessor = this._projections[fromX ? "y" : "x"].accessor;
-      var aStackedAccessor = (d: any, i: number, u: any, m: StackedPlotMetadata) => {
+      var aStackedAccessor = (d: any, i: number, u: any, m: Plots.StackedPlotMetadata) => {
         var value = aAccessor(d, i, u, m);
         if (this._isVertical ? !fromX : fromX) {
           value += m.offsets.get(bAccessor(d, i, u, m));
@@ -195,7 +197,7 @@ export module Plots {
         return value;
       };
 
-      var bStackedAccessor = (d: any, i: number, u: any, m: StackedPlotMetadata) => {
+      var bStackedAccessor = (d: any, i: number, u: any, m: Plots.StackedPlotMetadata) => {
         var value = bAccessor(d, i, u, m);
         if (this._isVertical ? fromX : !fromX) {
           value += m.offsets.get(aAccessor(d, i, u, m));
@@ -205,7 +207,7 @@ export module Plots {
 
       return Utils.Methods.flatten(this._datasetKeysInOrder.map((key: string) => {
         var dataset = this._key2PlotDatasetKey.get(key).dataset;
-        var plotMetadata = <StackedPlotMetadata>this._key2PlotDatasetKey.get(key).plotMetadata;
+        var plotMetadata = <Plots.StackedPlotMetadata>this._key2PlotDatasetKey.get(key).plotMetadata;
         return dataset.data().map((d, i) => {
           return {
             a: aStackedAccessor(d, i, dataset.metadata(), plotMetadata),
@@ -223,5 +225,4 @@ export module Plots {
        return this._isVertical ? this._projections["y"].accessor : this._projections["x"].accessor;
     }
   }
-}
 }

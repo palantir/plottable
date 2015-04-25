@@ -8394,195 +8394,195 @@ var Plottable;
 (function (Plottable) {
     var Plots;
     (function (Plots) {
-        var AbstractStacked = (function (_super) {
-            __extends(AbstractStacked, _super);
-            function AbstractStacked() {
-                _super.apply(this, arguments);
-                this._stackedExtent = [0, 0];
-            }
-            AbstractStacked.prototype._getPlotMetadataForDataset = function (key) {
-                var metadata = _super.prototype._getPlotMetadataForDataset.call(this, key);
-                metadata.offsets = d3.map();
-                return metadata;
-            };
-            AbstractStacked.prototype.project = function (attrToSet, accessor, scale) {
-                _super.prototype.project.call(this, attrToSet, accessor, scale);
-                if (this._projections["x"] && this._projections["y"] && (attrToSet === "x" || attrToSet === "y")) {
-                    this._updateStackOffsets();
-                }
-                return this;
-            };
-            AbstractStacked.prototype._onDatasetUpdate = function () {
-                if (this._projectorsReady()) {
-                    this._updateStackOffsets();
-                }
-                _super.prototype._onDatasetUpdate.call(this);
-            };
-            AbstractStacked.prototype._updateStackOffsets = function () {
-                var dataMapArray = this._generateDefaultMapArray();
-                var domainKeys = this._getDomainKeys();
-                var positiveDataMapArray = dataMapArray.map(function (dataMap) {
-                    return Plottable.Utils.Methods.populateMap(domainKeys, function (domainKey) {
-                        return { key: domainKey, value: Math.max(0, dataMap.get(domainKey).value) || 0 };
-                    });
-                });
-                var negativeDataMapArray = dataMapArray.map(function (dataMap) {
-                    return Plottable.Utils.Methods.populateMap(domainKeys, function (domainKey) {
-                        return { key: domainKey, value: Math.min(dataMap.get(domainKey).value, 0) || 0 };
-                    });
-                });
-                this._setDatasetStackOffsets(this._stack(positiveDataMapArray), this._stack(negativeDataMapArray));
-                this._updateStackExtents();
-            };
-            AbstractStacked.prototype._updateStackExtents = function () {
-                var _this = this;
-                var datasets = this.datasets();
-                var valueAccessor = this._valueAccessor();
-                var keyAccessor = this._keyAccessor();
-                var maxStackExtent = Plottable.Utils.Methods.max(this._datasetKeysInOrder, function (k) {
-                    var dataset = _this._key2PlotDatasetKey.get(k).dataset;
-                    var plotMetadata = _this._key2PlotDatasetKey.get(k).plotMetadata;
-                    return Plottable.Utils.Methods.max(dataset.data(), function (datum, i) {
-                        return +valueAccessor(datum, i, dataset.metadata(), plotMetadata) + plotMetadata.offsets.get(keyAccessor(datum, i, dataset.metadata(), plotMetadata));
-                    }, 0);
-                }, 0);
-                var minStackExtent = Plottable.Utils.Methods.min(this._datasetKeysInOrder, function (k) {
-                    var dataset = _this._key2PlotDatasetKey.get(k).dataset;
-                    var plotMetadata = _this._key2PlotDatasetKey.get(k).plotMetadata;
-                    return Plottable.Utils.Methods.min(dataset.data(), function (datum, i) {
-                        return +valueAccessor(datum, i, dataset.metadata(), plotMetadata) + plotMetadata.offsets.get(keyAccessor(datum, i, dataset.metadata(), plotMetadata));
-                    }, 0);
-                }, 0);
-                this._stackedExtent = [Math.min(minStackExtent, 0), Math.max(0, maxStackExtent)];
-            };
-            /**
-             * Feeds the data through d3's stack layout function which will calculate
-             * the stack offsets and use the the function declared in .out to set the offsets on the data.
-             */
-            AbstractStacked.prototype._stack = function (dataArray) {
-                var _this = this;
-                var outFunction = function (d, y0, y) {
-                    d.offset = y0;
-                };
-                d3.layout.stack().x(function (d) { return d.key; }).y(function (d) { return +d.value; }).values(function (d) { return _this._getDomainKeys().map(function (domainKey) { return d.get(domainKey); }); }).out(outFunction)(dataArray);
-                return dataArray;
-            };
-            /**
-             * After the stack offsets have been determined on each separate dataset, the offsets need
-             * to be determined correctly on the overall datasets
-             */
-            AbstractStacked.prototype._setDatasetStackOffsets = function (positiveDataMapArray, negativeDataMapArray) {
-                var _this = this;
-                var keyAccessor = this._keyAccessor();
-                var valueAccessor = this._valueAccessor();
-                this._datasetKeysInOrder.forEach(function (k, index) {
-                    var dataset = _this._key2PlotDatasetKey.get(k).dataset;
-                    var plotMetadata = _this._key2PlotDatasetKey.get(k).plotMetadata;
-                    var positiveDataMap = positiveDataMapArray[index];
-                    var negativeDataMap = negativeDataMapArray[index];
-                    var isAllNegativeValues = dataset.data().every(function (datum, i) { return valueAccessor(datum, i, dataset.metadata(), plotMetadata) <= 0; });
-                    dataset.data().forEach(function (datum, datumIndex) {
-                        var key = keyAccessor(datum, datumIndex, dataset.metadata(), plotMetadata);
-                        var positiveOffset = positiveDataMap.get(key).offset;
-                        var negativeOffset = negativeDataMap.get(key).offset;
-                        var value = valueAccessor(datum, datumIndex, dataset.metadata(), plotMetadata);
-                        var offset;
-                        if (value === 0) {
-                            offset = isAllNegativeValues ? negativeOffset : positiveOffset;
-                        }
-                        else {
-                            offset = value > 0 ? positiveOffset : negativeOffset;
-                        }
-                        plotMetadata.offsets.set(key, offset);
-                    });
-                });
-            };
-            AbstractStacked.prototype._getDomainKeys = function () {
-                var _this = this;
-                var keyAccessor = this._keyAccessor();
-                var domainKeys = d3.set();
-                this._datasetKeysInOrder.forEach(function (k) {
-                    var dataset = _this._key2PlotDatasetKey.get(k).dataset;
-                    var plotMetadata = _this._key2PlotDatasetKey.get(k).plotMetadata;
-                    dataset.data().forEach(function (datum, index) {
-                        domainKeys.add(keyAccessor(datum, index, dataset.metadata(), plotMetadata));
-                    });
-                });
-                return domainKeys.values();
-            };
-            AbstractStacked.prototype._generateDefaultMapArray = function () {
-                var _this = this;
-                var keyAccessor = this._keyAccessor();
-                var valueAccessor = this._valueAccessor();
-                var domainKeys = this._getDomainKeys();
-                var dataMapArray = this._datasetKeysInOrder.map(function () {
-                    return Plottable.Utils.Methods.populateMap(domainKeys, function (domainKey) {
-                        return { key: domainKey, value: 0 };
-                    });
-                });
-                this._datasetKeysInOrder.forEach(function (k, datasetIndex) {
-                    var dataset = _this._key2PlotDatasetKey.get(k).dataset;
-                    var plotMetadata = _this._key2PlotDatasetKey.get(k).plotMetadata;
-                    dataset.data().forEach(function (datum, index) {
-                        var key = keyAccessor(datum, index, dataset.metadata(), plotMetadata);
-                        var value = valueAccessor(datum, index, dataset.metadata(), plotMetadata);
-                        dataMapArray[datasetIndex].set(key, { key: key, value: value });
-                    });
-                });
-                return dataMapArray;
-            };
-            AbstractStacked.prototype._updateScaleExtents = function () {
-                _super.prototype._updateScaleExtents.call(this);
-                var primaryScale = this._isVertical ? this._yScale : this._xScale;
-                if (!primaryScale) {
-                    return;
-                }
-                if (this._isAnchored && this._stackedExtent.length > 0) {
-                    primaryScale._updateExtent(this.getID().toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT", this._stackedExtent);
-                }
-                else {
-                    primaryScale._removeExtent(this.getID().toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT");
-                }
-            };
-            AbstractStacked.prototype._normalizeDatasets = function (fromX) {
-                var _this = this;
-                var aAccessor = this._projections[fromX ? "x" : "y"].accessor;
-                var bAccessor = this._projections[fromX ? "y" : "x"].accessor;
-                var aStackedAccessor = function (d, i, u, m) {
-                    var value = aAccessor(d, i, u, m);
-                    if (_this._isVertical ? !fromX : fromX) {
-                        value += m.offsets.get(bAccessor(d, i, u, m));
-                    }
-                    return value;
-                };
-                var bStackedAccessor = function (d, i, u, m) {
-                    var value = bAccessor(d, i, u, m);
-                    if (_this._isVertical ? fromX : !fromX) {
-                        value += m.offsets.get(aAccessor(d, i, u, m));
-                    }
-                    return value;
-                };
-                return Plottable.Utils.Methods.flatten(this._datasetKeysInOrder.map(function (key) {
-                    var dataset = _this._key2PlotDatasetKey.get(key).dataset;
-                    var plotMetadata = _this._key2PlotDatasetKey.get(key).plotMetadata;
-                    return dataset.data().map(function (d, i) {
-                        return {
-                            a: aStackedAccessor(d, i, dataset.metadata(), plotMetadata),
-                            b: bStackedAccessor(d, i, dataset.metadata(), plotMetadata)
-                        };
-                    });
-                }));
-            };
-            AbstractStacked.prototype._keyAccessor = function () {
-                return this._isVertical ? this._projections["x"].accessor : this._projections["y"].accessor;
-            };
-            AbstractStacked.prototype._valueAccessor = function () {
-                return this._isVertical ? this._projections["y"].accessor : this._projections["x"].accessor;
-            };
-            return AbstractStacked;
-        })(Plottable.XYPlot);
-        Plots.AbstractStacked = AbstractStacked;
     })(Plots = Plottable.Plots || (Plottable.Plots = {}));
+    var AbstractStacked = (function (_super) {
+        __extends(AbstractStacked, _super);
+        function AbstractStacked() {
+            _super.apply(this, arguments);
+            this._stackedExtent = [0, 0];
+        }
+        AbstractStacked.prototype._getPlotMetadataForDataset = function (key) {
+            var metadata = _super.prototype._getPlotMetadataForDataset.call(this, key);
+            metadata.offsets = d3.map();
+            return metadata;
+        };
+        AbstractStacked.prototype.project = function (attrToSet, accessor, scale) {
+            _super.prototype.project.call(this, attrToSet, accessor, scale);
+            if (this._projections["x"] && this._projections["y"] && (attrToSet === "x" || attrToSet === "y")) {
+                this._updateStackOffsets();
+            }
+            return this;
+        };
+        AbstractStacked.prototype._onDatasetUpdate = function () {
+            if (this._projectorsReady()) {
+                this._updateStackOffsets();
+            }
+            _super.prototype._onDatasetUpdate.call(this);
+        };
+        AbstractStacked.prototype._updateStackOffsets = function () {
+            var dataMapArray = this._generateDefaultMapArray();
+            var domainKeys = this._getDomainKeys();
+            var positiveDataMapArray = dataMapArray.map(function (dataMap) {
+                return Plottable.Utils.Methods.populateMap(domainKeys, function (domainKey) {
+                    return { key: domainKey, value: Math.max(0, dataMap.get(domainKey).value) || 0 };
+                });
+            });
+            var negativeDataMapArray = dataMapArray.map(function (dataMap) {
+                return Plottable.Utils.Methods.populateMap(domainKeys, function (domainKey) {
+                    return { key: domainKey, value: Math.min(dataMap.get(domainKey).value, 0) || 0 };
+                });
+            });
+            this._setDatasetStackOffsets(this._stack(positiveDataMapArray), this._stack(negativeDataMapArray));
+            this._updateStackExtents();
+        };
+        AbstractStacked.prototype._updateStackExtents = function () {
+            var _this = this;
+            var datasets = this.datasets();
+            var valueAccessor = this._valueAccessor();
+            var keyAccessor = this._keyAccessor();
+            var maxStackExtent = Plottable.Utils.Methods.max(this._datasetKeysInOrder, function (k) {
+                var dataset = _this._key2PlotDatasetKey.get(k).dataset;
+                var plotMetadata = _this._key2PlotDatasetKey.get(k).plotMetadata;
+                return Plottable.Utils.Methods.max(dataset.data(), function (datum, i) {
+                    return +valueAccessor(datum, i, dataset.metadata(), plotMetadata) + plotMetadata.offsets.get(keyAccessor(datum, i, dataset.metadata(), plotMetadata));
+                }, 0);
+            }, 0);
+            var minStackExtent = Plottable.Utils.Methods.min(this._datasetKeysInOrder, function (k) {
+                var dataset = _this._key2PlotDatasetKey.get(k).dataset;
+                var plotMetadata = _this._key2PlotDatasetKey.get(k).plotMetadata;
+                return Plottable.Utils.Methods.min(dataset.data(), function (datum, i) {
+                    return +valueAccessor(datum, i, dataset.metadata(), plotMetadata) + plotMetadata.offsets.get(keyAccessor(datum, i, dataset.metadata(), plotMetadata));
+                }, 0);
+            }, 0);
+            this._stackedExtent = [Math.min(minStackExtent, 0), Math.max(0, maxStackExtent)];
+        };
+        /**
+         * Feeds the data through d3's stack layout function which will calculate
+         * the stack offsets and use the the function declared in .out to set the offsets on the data.
+         */
+        AbstractStacked.prototype._stack = function (dataArray) {
+            var _this = this;
+            var outFunction = function (d, y0, y) {
+                d.offset = y0;
+            };
+            d3.layout.stack().x(function (d) { return d.key; }).y(function (d) { return +d.value; }).values(function (d) { return _this._getDomainKeys().map(function (domainKey) { return d.get(domainKey); }); }).out(outFunction)(dataArray);
+            return dataArray;
+        };
+        /**
+         * After the stack offsets have been determined on each separate dataset, the offsets need
+         * to be determined correctly on the overall datasets
+         */
+        AbstractStacked.prototype._setDatasetStackOffsets = function (positiveDataMapArray, negativeDataMapArray) {
+            var _this = this;
+            var keyAccessor = this._keyAccessor();
+            var valueAccessor = this._valueAccessor();
+            this._datasetKeysInOrder.forEach(function (k, index) {
+                var dataset = _this._key2PlotDatasetKey.get(k).dataset;
+                var plotMetadata = _this._key2PlotDatasetKey.get(k).plotMetadata;
+                var positiveDataMap = positiveDataMapArray[index];
+                var negativeDataMap = negativeDataMapArray[index];
+                var isAllNegativeValues = dataset.data().every(function (datum, i) { return valueAccessor(datum, i, dataset.metadata(), plotMetadata) <= 0; });
+                dataset.data().forEach(function (datum, datumIndex) {
+                    var key = keyAccessor(datum, datumIndex, dataset.metadata(), plotMetadata);
+                    var positiveOffset = positiveDataMap.get(key).offset;
+                    var negativeOffset = negativeDataMap.get(key).offset;
+                    var value = valueAccessor(datum, datumIndex, dataset.metadata(), plotMetadata);
+                    var offset;
+                    if (value === 0) {
+                        offset = isAllNegativeValues ? negativeOffset : positiveOffset;
+                    }
+                    else {
+                        offset = value > 0 ? positiveOffset : negativeOffset;
+                    }
+                    plotMetadata.offsets.set(key, offset);
+                });
+            });
+        };
+        AbstractStacked.prototype._getDomainKeys = function () {
+            var _this = this;
+            var keyAccessor = this._keyAccessor();
+            var domainKeys = d3.set();
+            this._datasetKeysInOrder.forEach(function (k) {
+                var dataset = _this._key2PlotDatasetKey.get(k).dataset;
+                var plotMetadata = _this._key2PlotDatasetKey.get(k).plotMetadata;
+                dataset.data().forEach(function (datum, index) {
+                    domainKeys.add(keyAccessor(datum, index, dataset.metadata(), plotMetadata));
+                });
+            });
+            return domainKeys.values();
+        };
+        AbstractStacked.prototype._generateDefaultMapArray = function () {
+            var _this = this;
+            var keyAccessor = this._keyAccessor();
+            var valueAccessor = this._valueAccessor();
+            var domainKeys = this._getDomainKeys();
+            var dataMapArray = this._datasetKeysInOrder.map(function () {
+                return Plottable.Utils.Methods.populateMap(domainKeys, function (domainKey) {
+                    return { key: domainKey, value: 0 };
+                });
+            });
+            this._datasetKeysInOrder.forEach(function (k, datasetIndex) {
+                var dataset = _this._key2PlotDatasetKey.get(k).dataset;
+                var plotMetadata = _this._key2PlotDatasetKey.get(k).plotMetadata;
+                dataset.data().forEach(function (datum, index) {
+                    var key = keyAccessor(datum, index, dataset.metadata(), plotMetadata);
+                    var value = valueAccessor(datum, index, dataset.metadata(), plotMetadata);
+                    dataMapArray[datasetIndex].set(key, { key: key, value: value });
+                });
+            });
+            return dataMapArray;
+        };
+        AbstractStacked.prototype._updateScaleExtents = function () {
+            _super.prototype._updateScaleExtents.call(this);
+            var primaryScale = this._isVertical ? this._yScale : this._xScale;
+            if (!primaryScale) {
+                return;
+            }
+            if (this._isAnchored && this._stackedExtent.length > 0) {
+                primaryScale._updateExtent(this.getID().toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT", this._stackedExtent);
+            }
+            else {
+                primaryScale._removeExtent(this.getID().toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT");
+            }
+        };
+        AbstractStacked.prototype._normalizeDatasets = function (fromX) {
+            var _this = this;
+            var aAccessor = this._projections[fromX ? "x" : "y"].accessor;
+            var bAccessor = this._projections[fromX ? "y" : "x"].accessor;
+            var aStackedAccessor = function (d, i, u, m) {
+                var value = aAccessor(d, i, u, m);
+                if (_this._isVertical ? !fromX : fromX) {
+                    value += m.offsets.get(bAccessor(d, i, u, m));
+                }
+                return value;
+            };
+            var bStackedAccessor = function (d, i, u, m) {
+                var value = bAccessor(d, i, u, m);
+                if (_this._isVertical ? fromX : !fromX) {
+                    value += m.offsets.get(aAccessor(d, i, u, m));
+                }
+                return value;
+            };
+            return Plottable.Utils.Methods.flatten(this._datasetKeysInOrder.map(function (key) {
+                var dataset = _this._key2PlotDatasetKey.get(key).dataset;
+                var plotMetadata = _this._key2PlotDatasetKey.get(key).plotMetadata;
+                return dataset.data().map(function (d, i) {
+                    return {
+                        a: aStackedAccessor(d, i, dataset.metadata(), plotMetadata),
+                        b: bStackedAccessor(d, i, dataset.metadata(), plotMetadata)
+                    };
+                });
+            }));
+        };
+        AbstractStacked.prototype._keyAccessor = function () {
+            return this._isVertical ? this._projections["x"].accessor : this._projections["y"].accessor;
+        };
+        AbstractStacked.prototype._valueAccessor = function () {
+            return this._isVertical ? this._projections["y"].accessor : this._projections["x"].accessor;
+        };
+        return AbstractStacked;
+    })(Plottable.XYPlot);
+    Plottable.AbstractStacked = AbstractStacked;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../../reference.ts" />
@@ -8642,12 +8642,12 @@ var Plottable;
             };
             StackedArea.prototype.project = function (attrToSet, accessor, scale) {
                 _super.prototype.project.call(this, attrToSet, accessor, scale);
-                Plots.AbstractStacked.prototype.project.apply(this, [attrToSet, accessor, scale]);
+                Plottable.AbstractStacked.prototype.project.apply(this, [attrToSet, accessor, scale]);
                 return this;
             };
             StackedArea.prototype._onDatasetUpdate = function () {
                 _super.prototype._onDatasetUpdate.call(this);
-                Plots.AbstractStacked.prototype._onDatasetUpdate.apply(this);
+                Plottable.AbstractStacked.prototype._onDatasetUpdate.apply(this);
                 return this;
             };
             StackedArea.prototype._generateAttrToProjector = function () {
@@ -8681,37 +8681,37 @@ var Plottable;
                 if (keySets.some(function (keySet) { return keySet.length !== domainKeys.length; })) {
                     Plottable.Utils.Methods.warn("the domains across the datasets are not the same.  Plot may produce unintended behavior.");
                 }
-                Plots.AbstractStacked.prototype._updateStackOffsets.call(this);
+                Plottable.AbstractStacked.prototype._updateStackOffsets.call(this);
             };
             StackedArea.prototype._updateStackExtents = function () {
-                Plots.AbstractStacked.prototype._updateStackExtents.call(this);
+                Plottable.AbstractStacked.prototype._updateStackExtents.call(this);
             };
             StackedArea.prototype._stack = function (dataArray) {
-                return Plots.AbstractStacked.prototype._stack.call(this, dataArray);
+                return Plottable.AbstractStacked.prototype._stack.call(this, dataArray);
             };
             StackedArea.prototype._setDatasetStackOffsets = function (positiveDataMapArray, negativeDataMapArray) {
-                Plots.AbstractStacked.prototype._setDatasetStackOffsets.call(this, positiveDataMapArray, negativeDataMapArray);
+                Plottable.AbstractStacked.prototype._setDatasetStackOffsets.call(this, positiveDataMapArray, negativeDataMapArray);
             };
             StackedArea.prototype._getDomainKeys = function () {
-                return Plots.AbstractStacked.prototype._getDomainKeys.call(this);
+                return Plottable.AbstractStacked.prototype._getDomainKeys.call(this);
             };
             StackedArea.prototype._generateDefaultMapArray = function () {
-                return Plots.AbstractStacked.prototype._generateDefaultMapArray.call(this);
+                return Plottable.AbstractStacked.prototype._generateDefaultMapArray.call(this);
             };
             StackedArea.prototype._updateScaleExtents = function () {
-                Plots.AbstractStacked.prototype._updateScaleExtents.call(this);
+                Plottable.AbstractStacked.prototype._updateScaleExtents.call(this);
             };
             StackedArea.prototype._keyAccessor = function () {
-                return Plots.AbstractStacked.prototype._keyAccessor.call(this);
+                return Plottable.AbstractStacked.prototype._keyAccessor.call(this);
             };
             StackedArea.prototype._valueAccessor = function () {
-                return Plots.AbstractStacked.prototype._valueAccessor.call(this);
+                return Plottable.AbstractStacked.prototype._valueAccessor.call(this);
             };
             StackedArea.prototype._getPlotMetadataForDataset = function (key) {
-                return Plots.AbstractStacked.prototype._getPlotMetadataForDataset.call(this, key);
+                return Plottable.AbstractStacked.prototype._getPlotMetadataForDataset.call(this, key);
             };
             StackedArea.prototype._normalizeDatasets = function (fromX) {
-                return Plots.AbstractStacked.prototype._normalizeDatasets.call(this, fromX);
+                return Plottable.AbstractStacked.prototype._normalizeDatasets.call(this, fromX);
             };
             return StackedArea;
         })(Plots.Area);
@@ -8778,47 +8778,47 @@ var Plottable;
             };
             StackedBar.prototype.project = function (attrToSet, accessor, scale) {
                 _super.prototype.project.call(this, attrToSet, accessor, scale);
-                Plots.AbstractStacked.prototype.project.apply(this, [attrToSet, accessor, scale]);
+                Plottable.AbstractStacked.prototype.project.apply(this, [attrToSet, accessor, scale]);
                 return this;
             };
             StackedBar.prototype._onDatasetUpdate = function () {
                 _super.prototype._onDatasetUpdate.call(this);
-                Plots.AbstractStacked.prototype._onDatasetUpdate.apply(this);
+                Plottable.AbstractStacked.prototype._onDatasetUpdate.apply(this);
                 return this;
             };
             StackedBar.prototype._getPlotMetadataForDataset = function (key) {
-                return Plots.AbstractStacked.prototype._getPlotMetadataForDataset.call(this, key);
+                return Plottable.AbstractStacked.prototype._getPlotMetadataForDataset.call(this, key);
             };
             StackedBar.prototype._normalizeDatasets = function (fromX) {
-                return Plots.AbstractStacked.prototype._normalizeDatasets.call(this, fromX);
+                return Plottable.AbstractStacked.prototype._normalizeDatasets.call(this, fromX);
             };
             //===== Stack logic from AbstractStackedPlot =====
             StackedBar.prototype._updateStackOffsets = function () {
-                Plots.AbstractStacked.prototype._updateStackOffsets.call(this);
+                Plottable.AbstractStacked.prototype._updateStackOffsets.call(this);
             };
             StackedBar.prototype._updateStackExtents = function () {
-                Plots.AbstractStacked.prototype._updateStackExtents.call(this);
+                Plottable.AbstractStacked.prototype._updateStackExtents.call(this);
             };
             StackedBar.prototype._stack = function (dataArray) {
-                return Plots.AbstractStacked.prototype._stack.call(this, dataArray);
+                return Plottable.AbstractStacked.prototype._stack.call(this, dataArray);
             };
             StackedBar.prototype._setDatasetStackOffsets = function (positiveDataMapArray, negativeDataMapArray) {
-                Plots.AbstractStacked.prototype._setDatasetStackOffsets.call(this, positiveDataMapArray, negativeDataMapArray);
+                Plottable.AbstractStacked.prototype._setDatasetStackOffsets.call(this, positiveDataMapArray, negativeDataMapArray);
             };
             StackedBar.prototype._getDomainKeys = function () {
-                return Plots.AbstractStacked.prototype._getDomainKeys.call(this);
+                return Plottable.AbstractStacked.prototype._getDomainKeys.call(this);
             };
             StackedBar.prototype._generateDefaultMapArray = function () {
-                return Plots.AbstractStacked.prototype._generateDefaultMapArray.call(this);
+                return Plottable.AbstractStacked.prototype._generateDefaultMapArray.call(this);
             };
             StackedBar.prototype._updateScaleExtents = function () {
-                Plots.AbstractStacked.prototype._updateScaleExtents.call(this);
+                Plottable.AbstractStacked.prototype._updateScaleExtents.call(this);
             };
             StackedBar.prototype._keyAccessor = function () {
-                return Plots.AbstractStacked.prototype._keyAccessor.call(this);
+                return Plottable.AbstractStacked.prototype._keyAccessor.call(this);
             };
             StackedBar.prototype._valueAccessor = function () {
-                return Plots.AbstractStacked.prototype._valueAccessor.call(this);
+                return Plottable.AbstractStacked.prototype._valueAccessor.call(this);
             };
             return StackedBar;
         })(Plots.Bar);
