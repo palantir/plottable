@@ -126,8 +126,8 @@ module Plottable {
     }
 
     protected _updateXDomainer() {
-      if (this._xScale instanceof Quantitative) {
-        var scale = <Quantitative<any>> this._xScale;
+      if (this._xScale instanceof QuantitativeScale) {
+        var scale = <QuantitativeScale<any>> this._xScale;
         if (!scale._userSetDomainer) {
           scale.domainer().pad().nice();
         }
@@ -135,8 +135,8 @@ module Plottable {
     }
 
     protected _updateYDomainer() {
-      if (this._yScale instanceof Quantitative) {
-        var scale = <Quantitative<any>> this._yScale;
+      if (this._yScale instanceof QuantitativeScale) {
+        var scale = <QuantitativeScale<any>> this._yScale;
         if (!scale._userSetDomainer) {
           scale.domainer().pad().nice();
         }
@@ -171,12 +171,12 @@ module Plottable {
     private _adjustDomainToVisiblePoints<A, B>(fromScale: Scale<A, number>,
                                              toScale: Scale<B, number>,
                                              fromX: boolean) {
-      if (toScale instanceof Quantitative) {
-        var toScaleQ = <Quantitative<B>> toScale;
+      if (toScale instanceof QuantitativeScale) {
+        var toScaleQ = <QuantitativeScale<B>> toScale;
         var normalizedData = this._normalizeDatasets<A, B>(fromX);
 
         var filterFn: (v: A) => boolean;
-        if (fromScale instanceof Quantitative) {
+        if (fromScale instanceof QuantitativeScale) {
           var fromDomain = fromScale.domain();
           filterFn = (a: A) => fromDomain[0] <= a && fromDomain[1] >= a;
         } else {

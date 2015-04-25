@@ -1500,7 +1500,7 @@ var Plottable;
         /**
          * @param {any[][]} extents The list of extents to be reduced to a single
          *        extent.
-         * @param {QuantitativeScale} scale
+         * @param {QuantitativeScaleScale} scale
          *        Since nice() must do different things depending on Linear, Log,
          *        or Time scale, the scale must be passed in for nice() to work.
          * @returns {any[]} The domain, as a merging of all exents, as a [min, max]
@@ -1722,7 +1722,7 @@ var Plottable;
          * call this function if you want the domain to neccessarily include all
          * the data.
          *
-         * Extent: The [min, max] pair for a Scale.Quantitative, all covered
+         * Extent: The [min, max] pair for a Scale.QuantitativeScale, all covered
          * strings for a Scale.Category.
          *
          * Perspective: A combination of a Dataset and an Accessor that
@@ -1823,19 +1823,19 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
-    var Quantitative = (function (_super) {
-        __extends(Quantitative, _super);
+    var QuantitativeScale = (function (_super) {
+        __extends(QuantitativeScale, _super);
         /**
-         * Constructs a new QuantitativeScale.
+         * Constructs a new QuantitativeScaleScale.
          *
-         * A QuantitativeScale is a Scale that maps anys to numbers. It
+         * A QuantitativeScaleScale is a Scale that maps anys to numbers. It
          * is invertible and continuous.
          *
          * @constructor
-         * @param {D3.Scale.QuantitativeScale} scale The D3 QuantitativeScale
-         * backing the QuantitativeScale.
+         * @param {D3.Scale.QuantitativeScaleScale} scale The D3 QuantitativeScaleScale
+         * backing the QuantitativeScaleScale.
          */
-        function Quantitative(scale) {
+        function QuantitativeScale(scale) {
             _super.call(this, scale);
             this._numTicks = 10;
             this._PADDING_FOR_IDENTICAL_DOMAIN = 1;
@@ -1844,7 +1844,7 @@ var Plottable;
             this._typeCoercer = function (d) { return +d; };
             this._tickGenerator = function (scale) { return scale.getDefaultTicks(); };
         }
-        Quantitative.prototype._getExtent = function () {
+        QuantitativeScale.prototype._getExtent = function () {
             return this._domainer.computeDomain(this._getAllExtents(), this);
         };
         /**
@@ -1853,29 +1853,29 @@ var Plottable;
          * @param {number} value: A value from the Scale's range.
          * @returns {D} The domain value corresponding to the supplied range value.
          */
-        Quantitative.prototype.invert = function (value) {
+        QuantitativeScale.prototype.invert = function (value) {
             return this._d3Scale.invert(value);
         };
         /**
-         * Creates a copy of the QuantitativeScale with the same domain and range but without any registered list.
+         * Creates a copy of the QuantitativeScaleScale with the same domain and range but without any registered list.
          *
-         * @returns {Quantitative} A copy of the calling QuantitativeScale.
+         * @returns {QuantitativeScale} A copy of the calling QuantitativeScaleScale.
          */
-        Quantitative.prototype.copy = function () {
-            return new Quantitative(this._d3Scale.copy());
+        QuantitativeScale.prototype.copy = function () {
+            return new QuantitativeScale(this._d3Scale.copy());
         };
-        Quantitative.prototype.domain = function (values) {
+        QuantitativeScale.prototype.domain = function (values) {
             return _super.prototype.domain.call(this, values); // need to override type sig to enable method chaining :/
         };
-        Quantitative.prototype._setDomain = function (values) {
+        QuantitativeScale.prototype._setDomain = function (values) {
             var isNaNOrInfinity = function (x) { return x !== x || x === Infinity || x === -Infinity; };
             if (isNaNOrInfinity(values[0]) || isNaNOrInfinity(values[1])) {
-                Plottable.Utils.Methods.warn("Warning: QuantitativeScales cannot take NaN or Infinity as a domain value. Ignoring.");
+                Plottable.Utils.Methods.warn("Warning: QuantitativeScaleScales cannot take NaN or Infinity as a domain value. Ignoring.");
                 return;
             }
             _super.prototype._setDomain.call(this, values);
         };
-        Quantitative.prototype.interpolate = function (factory) {
+        QuantitativeScale.prototype.interpolate = function (factory) {
             if (factory == null) {
                 return this._d3Scale.interpolate();
             }
@@ -1883,21 +1883,21 @@ var Plottable;
             return this;
         };
         /**
-         * Sets the range of the QuantitativeScale and sets the interpolator to d3.interpolateRound.
+         * Sets the range of the QuantitativeScaleScale and sets the interpolator to d3.interpolateRound.
          *
          * @param {number[]} values The new range value for the range.
          */
-        Quantitative.prototype.rangeRound = function (values) {
+        QuantitativeScale.prototype.rangeRound = function (values) {
             this._d3Scale.rangeRound(values);
             return this;
         };
         /**
          * Gets ticks generated by the default algorithm.
          */
-        Quantitative.prototype.getDefaultTicks = function () {
+        QuantitativeScale.prototype.getDefaultTicks = function () {
             return this._d3Scale.ticks(this.numTicks());
         };
-        Quantitative.prototype.clamp = function (clamp) {
+        QuantitativeScale.prototype.clamp = function (clamp) {
             if (clamp == null) {
                 return this._d3Scale.clamp();
             }
@@ -1909,10 +1909,10 @@ var Plottable;
          *
          * @returns {any[]} The generated ticks.
          */
-        Quantitative.prototype.ticks = function () {
+        QuantitativeScale.prototype.ticks = function () {
             return this._tickGenerator(this);
         };
-        Quantitative.prototype.numTicks = function (count) {
+        QuantitativeScale.prototype.numTicks = function (count) {
             if (count == null) {
                 return this._numTicks;
             }
@@ -1923,10 +1923,10 @@ var Plottable;
          * Given a domain, expands its domain onto "nice" values, e.g. whole
          * numbers.
          */
-        Quantitative.prototype._niceDomain = function (domain, count) {
+        QuantitativeScale.prototype._niceDomain = function (domain, count) {
             return this._d3Scale.copy().domain(domain).nice(count).domain();
         };
-        Quantitative.prototype.domainer = function (domainer) {
+        QuantitativeScale.prototype.domainer = function (domainer) {
             if (domainer == null) {
                 return this._domainer;
             }
@@ -1937,10 +1937,10 @@ var Plottable;
                 return this;
             }
         };
-        Quantitative.prototype._defaultExtent = function () {
+        QuantitativeScale.prototype._defaultExtent = function () {
             return [0, 1];
         };
-        Quantitative.prototype.tickGenerator = function (generator) {
+        QuantitativeScale.prototype.tickGenerator = function (generator) {
             if (generator == null) {
                 return this._tickGenerator;
             }
@@ -1949,9 +1949,9 @@ var Plottable;
                 return this;
             }
         };
-        return Quantitative;
+        return QuantitativeScale;
     })(Plottable.Scale);
-    Plottable.Quantitative = Quantitative;
+    Plottable.QuantitativeScale = QuantitativeScale;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -1980,7 +1980,7 @@ var Plottable;
                 return new Linear(this._d3Scale.copy());
             };
             return Linear;
-        })(Plottable.Quantitative);
+        })(Plottable.QuantitativeScale);
         Scales.Linear = Linear;
     })(Scales = Plottable.Scales || (Plottable.Scales = {}));
 })(Plottable || (Plottable = {}));
@@ -2018,7 +2018,7 @@ var Plottable;
             };
             Log.warned = false;
             return Log;
-        })(Plottable.Quantitative);
+        })(Plottable.QuantitativeScale);
         Scales.Log = Log;
     })(Scales = Plottable.Scales || (Plottable.Scales = {}));
 })(Plottable || (Plottable = {}));
@@ -2200,7 +2200,7 @@ var Plottable;
                 }
             };
             return ModifiedLog;
-        })(Plottable.Quantitative);
+        })(Plottable.QuantitativeScale);
         Scales.ModifiedLog = ModifiedLog;
     })(Scales = Plottable.Scales || (Plottable.Scales = {}));
 })(Plottable || (Plottable = {}));
@@ -2425,7 +2425,7 @@ var Plottable;
         var Time = (function (_super) {
             __extends(Time, _super);
             function Time(scale) {
-                // need to cast since d3 time scales do not descend from Quantitative scales
+                // need to cast since d3 time scales do not descend from QuantitativeScale scales
                 _super.call(this, scale == null ? d3.time.scale() : scale);
                 this._typeCoercer = function (d) { return d && d._isAMomentObject || d instanceof Date ? d : new Date(d); };
             }
@@ -2453,7 +2453,7 @@ var Plottable;
                 return [startTime, endTime];
             };
             return Time;
-        })(Plottable.Quantitative);
+        })(Plottable.QuantitativeScale);
         Scales.Time = Time;
     })(Scales = Plottable.Scales || (Plottable.Scales = {}));
 })(Plottable || (Plottable = {}));
@@ -2505,7 +2505,7 @@ var Plottable;
              *     values in hex ("#FFFFFF") or keywords ("white").
              * @param {string} scaleType a string representing the underlying scale
              *     type ("linear"/"log"/"sqrt"/"pow")
-             * @returns {D3.Scale.QuantitativeScale} The converted Quantitative d3 scale.
+             * @returns {D3.Scale.QuantitativeScaleScale} The converted QuantitativeScale d3 scale.
              */
             InterpolatedColor._getD3InterpolatedScale = function (colors, scaleType) {
                 var scale;
@@ -2524,7 +2524,7 @@ var Plottable;
                         break;
                 }
                 if (scale == null) {
-                    throw new Error("unknown Quantitative scale type " + scaleType);
+                    throw new Error("unknown QuantitativeScale scale type " + scaleType);
                 }
                 return scale.range([0, 1]).interpolate(InterpolatedColor._interpolateColors(colors));
             };
@@ -2589,7 +2589,7 @@ var Plottable;
                 }
             };
             InterpolatedColor.prototype.autoDomain = function () {
-                // unlike other QuantitativeScales, interpolatedColorScale ignores its domainer
+                // unlike other QuantitativeScaleScales, interpolatedColorScale ignores its domainer
                 var extents = this._getAllExtents();
                 if (extents.length > 0) {
                     this._setDomain([Plottable.Utils.Methods.min(extents, function (x) { return x[0]; }, 0), Plottable.Utils.Methods.max(extents, function (x) { return x[1]; }, 0)]);
@@ -4768,11 +4768,11 @@ var Plottable;
              * Constructs a NumericAxis.
              *
              * Just as an CategoryAxis is for rendering an OrdinalScale, a NumericAxis
-             * is for rendering a QuantitativeScale.
+             * is for rendering a QuantitativeScaleScale.
              *
              * @constructor
-             * @param {QuantitativeScale} scale The QuantitativeScale to base the axis on.
-             * @param {string} orientation The orientation of the QuantitativeScale (top/bottom/left/right)
+             * @param {QuantitativeScaleScale} scale The QuantitativeScaleScale to base the axis on.
+             * @param {string} orientation The orientation of the QuantitativeScaleScale (top/bottom/left/right)
              * @param {Formatter} formatter A function to format tick labels (default Formatters.general()).
              */
             function Numeric(scale, orientation, formatter) {
@@ -5952,16 +5952,16 @@ var Plottable;
              * Creates a set of Gridlines.
              * @constructor
              *
-             * @param {QuantitativeScale} xScale The scale to base the x gridlines on. Pass null if no gridlines are desired.
-             * @param {QuantitativeScale} yScale The scale to base the y gridlines on. Pass null if no gridlines are desired.
+             * @param {QuantitativeScaleScale} xScale The scale to base the x gridlines on. Pass null if no gridlines are desired.
+             * @param {QuantitativeScaleScale} yScale The scale to base the y gridlines on. Pass null if no gridlines are desired.
              */
             function Gridlines(xScale, yScale) {
                 var _this = this;
-                if (xScale != null && !(Plottable.Quantitative.prototype.isPrototypeOf(xScale))) {
-                    throw new Error("xScale needs to inherit from Scale.Quantitative");
+                if (xScale != null && !(Plottable.QuantitativeScale.prototype.isPrototypeOf(xScale))) {
+                    throw new Error("xScale needs to inherit from Scale.QuantitativeScale");
                 }
-                if (yScale != null && !(Plottable.Quantitative.prototype.isPrototypeOf(yScale))) {
-                    throw new Error("yScale needs to inherit from Scale.Quantitative");
+                if (yScale != null && !(Plottable.QuantitativeScale.prototype.isPrototypeOf(yScale))) {
+                    throw new Error("yScale needs to inherit from Scale.QuantitativeScale");
                 }
                 _super.call(this);
                 this.classed("gridlines", true);
@@ -7133,7 +7133,7 @@ var Plottable;
             }
         };
         XYPlot.prototype._updateXDomainer = function () {
-            if (this._xScale instanceof Plottable.Quantitative) {
+            if (this._xScale instanceof Plottable.QuantitativeScale) {
                 var scale = this._xScale;
                 if (!scale._userSetDomainer) {
                     scale.domainer().pad().nice();
@@ -7141,7 +7141,7 @@ var Plottable;
             }
         };
         XYPlot.prototype._updateYDomainer = function () {
-            if (this._yScale instanceof Plottable.Quantitative) {
+            if (this._yScale instanceof Plottable.QuantitativeScale) {
                 var scale = this._yScale;
                 if (!scale._userSetDomainer) {
                     scale.domainer().pad().nice();
@@ -7176,11 +7176,11 @@ var Plottable;
             }
         };
         XYPlot.prototype._adjustDomainToVisiblePoints = function (fromScale, toScale, fromX) {
-            if (toScale instanceof Plottable.Quantitative) {
+            if (toScale instanceof Plottable.QuantitativeScale) {
                 var toScaleQ = toScale;
                 var normalizedData = this._normalizeDatasets(fromX);
                 var filterFn;
-                if (fromScale instanceof Plottable.Quantitative) {
+                if (fromScale instanceof Plottable.QuantitativeScale) {
                     var fromDomain = fromScale.domain();
                     filterFn = function (a) { return fromDomain[0] <= a && fromDomain[1] >= a; };
                 }
@@ -7490,7 +7490,7 @@ var Plottable;
                             return scale.scale(_this._projections["x"].accessor(d, i, u, m)) + scale.rangeBand() / 2;
                         });
                     }
-                    if (scale instanceof Plottable.Quantitative) {
+                    if (scale instanceof Plottable.QuantitativeScale) {
                         this.project("x1", function (d, i, u, m) {
                             return scale.scale(_this._projections["x"].accessor(d, i, u, m));
                         });
@@ -7505,7 +7505,7 @@ var Plottable;
                             return scale.scale(_this._projections["y"].accessor(d, i, u, m)) + scale.rangeBand() / 2;
                         });
                     }
-                    if (scale instanceof Plottable.Quantitative) {
+                    if (scale instanceof Plottable.QuantitativeScale) {
                         this.project("y1", function (d, i, u, m) {
                             return scale.scale(_this._projections["y"].accessor(d, i, u, m));
                         });
@@ -7728,7 +7728,7 @@ var Plottable;
                 return bars;
             };
             Bar.prototype._updateDomainer = function (scale) {
-                if (scale instanceof Plottable.Quantitative) {
+                if (scale instanceof Plottable.QuantitativeScale) {
                     var qscale = scale;
                     if (!qscale._userSetDomainer) {
                         if (this._baselineValue != null) {
@@ -7851,7 +7851,7 @@ var Plottable;
              * If the position scale of the plot is a CategoryScale and in bands mode, then the rangeBands function will be used.
              * If the position scale of the plot is a CategoryScale and in points mode, then
              *   from https://github.com/mbostock/d3/wiki/Ordinal-Scales#ordinal_rangePoints, the max barPixelWidth is step * padding
-             * If the position scale of the plot is a QuantitativeScale, then _getMinimumDataWidth is scaled to compute the barPixelWidth
+             * If the position scale of the plot is a QuantitativeScaleScale, then _getMinimumDataWidth is scaled to compute the barPixelWidth
              */
             Bar.prototype._getBarPixelWidth = function () {
                 var _this = this;
@@ -8021,8 +8021,8 @@ var Plottable;
              * Constructs a LinePlot.
              *
              * @constructor
-             * @param {QuantitativeScale} xScale The x scale to use.
-             * @param {QuantitativeScale} yScale The y scale to use.
+             * @param {QuantitativeScaleScale} xScale The x scale to use.
+             * @param {QuantitativeScaleScale} yScale The y scale to use.
              */
             function Line(xScale, yScale) {
                 _super.call(this, xScale, yScale);
@@ -8243,8 +8243,8 @@ var Plottable;
              * Constructs an AreaPlot.
              *
              * @constructor
-             * @param {QuantitativeScale} xScale The x scale to use.
-             * @param {QuantitativeScale} yScale The y scale to use.
+             * @param {QuantitativeScaleScale} xScale The x scale to use.
+             * @param {QuantitativeScaleScale} yScale The y scale to use.
              */
             function Area(xScale, yScale) {
                 _super.call(this, xScale, yScale);
@@ -8616,8 +8616,8 @@ var Plottable;
              * Constructs a StackedArea plot.
              *
              * @constructor
-             * @param {QuantitativeScale} xScale The x scale to use.
-             * @param {QuantitativeScale} yScale The y scale to use.
+             * @param {QuantitativeScaleScale} xScale The x scale to use.
+             * @param {QuantitativeScaleScale} yScale The y scale to use.
              */
             function StackedArea(xScale, yScale) {
                 _super.call(this, xScale, yScale);
@@ -9814,8 +9814,8 @@ var Plottable;
              * does so by changing the xScale and yScales' domains repeatedly.
              *
              * @constructor
-             * @param {QuantitativeScale} [xScale] The X scale to update on panning/zooming.
-             * @param {QuantitativeScale} [yScale] The Y scale to update on panning/zooming.
+             * @param {QuantitativeScaleScale} [xScale] The X scale to update on panning/zooming.
+             * @param {QuantitativeScaleScale} [yScale] The Y scale to update on panning/zooming.
              */
             function PanZoom(xScale, yScale) {
                 var _this = this;

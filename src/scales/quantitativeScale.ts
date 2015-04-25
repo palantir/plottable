@@ -1,25 +1,25 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-  export class Quantitative<D> extends Scale<D, number> {
+  export class QuantitativeScale<D> extends Scale<D, number> {
     protected _d3Scale: D3.Scale.QuantitativeScale;
     private _numTicks = 10;
     private _PADDING_FOR_IDENTICAL_DOMAIN = 1;
     public _userSetDomainer: boolean = false;
     private _domainer: Domainer = new Domainer();
     public _typeCoercer = (d: any) => +d;
-    private _tickGenerator: Scales.TickGenerators.TickGenerator<D> = (scale: Plottable.Quantitative<D>) => scale.getDefaultTicks();
+    private _tickGenerator: Scales.TickGenerators.TickGenerator<D> = (scale: Plottable.QuantitativeScale<D>) => scale.getDefaultTicks();
 
 
     /**
-     * Constructs a new QuantitativeScale.
+     * Constructs a new QuantitativeScaleScale.
      *
-     * A QuantitativeScale is a Scale that maps anys to numbers. It
+     * A QuantitativeScaleScale is a Scale that maps anys to numbers. It
      * is invertible and continuous.
      *
      * @constructor
-     * @param {D3.Scale.QuantitativeScale} scale The D3 QuantitativeScale
-     * backing the QuantitativeScale.
+     * @param {D3.Scale.QuantitativeScaleScale} scale The D3 QuantitativeScaleScale
+     * backing the QuantitativeScaleScale.
      */
     constructor(scale: D3.Scale.QuantitativeScale) {
       super(scale);
@@ -40,16 +40,16 @@ module Plottable {
     }
 
     /**
-     * Creates a copy of the QuantitativeScale with the same domain and range but without any registered list.
+     * Creates a copy of the QuantitativeScaleScale with the same domain and range but without any registered list.
      *
-     * @returns {Quantitative} A copy of the calling QuantitativeScale.
+     * @returns {QuantitativeScale} A copy of the calling QuantitativeScaleScale.
      */
-    public copy(): Quantitative<D> {
-      return new Quantitative<D>(this._d3Scale.copy());
+    public copy(): QuantitativeScale<D> {
+      return new QuantitativeScale<D>(this._d3Scale.copy());
     }
 
     public domain(): D[];
-    public domain(values: D[]): Quantitative<D>;
+    public domain(values: D[]): QuantitativeScale<D>;
     public domain(values?: D[]): any {
       return super.domain(values); // need to override type sig to enable method chaining :/
     }
@@ -57,20 +57,20 @@ module Plottable {
     protected _setDomain(values: D[]) {
         var isNaNOrInfinity = (x: any) => x !== x || x === Infinity || x === -Infinity;
         if (isNaNOrInfinity(values[0]) || isNaNOrInfinity(values[1])) {
-            Utils.Methods.warn("Warning: QuantitativeScales cannot take NaN or Infinity as a domain value. Ignoring.");
+            Utils.Methods.warn("Warning: QuantitativeScaleScales cannot take NaN or Infinity as a domain value. Ignoring.");
             return;
         }
         super._setDomain(values);
     }
 
     /**
-     * Sets or gets the QuantitativeScale's output interpolator
+     * Sets or gets the QuantitativeScaleScale's output interpolator
      *
      * @param {D3.Transition.Interpolate} [factory] The output interpolator to use.
-     * @returns {D3.Transition.Interpolate|Quantitative} The current output interpolator, or the calling QuantitativeScale.
+     * @returns {D3.Transition.Interpolate|QuantitativeScale} The current output interpolator, or the calling QuantitativeScaleScale.
      */
     public interpolate(): D3.Transition.Interpolate;
-    public interpolate(factory: D3.Transition.Interpolate): Quantitative<D>;
+    public interpolate(factory: D3.Transition.Interpolate): QuantitativeScale<D>;
     public interpolate(factory?: D3.Transition.Interpolate): any {
       if (factory == null) {
         return this._d3Scale.interpolate();
@@ -80,7 +80,7 @@ module Plottable {
     }
 
     /**
-     * Sets the range of the QuantitativeScale and sets the interpolator to d3.interpolateRound.
+     * Sets the range of the QuantitativeScaleScale and sets the interpolator to d3.interpolateRound.
      *
      * @param {number[]} values The new range value for the range.
      */
@@ -97,18 +97,18 @@ module Plottable {
     }
 
     /**
-     * Gets the clamp status of the QuantitativeScale (whether to cut off values outside the ouput range).
+     * Gets the clamp status of the QuantitativeScaleScale (whether to cut off values outside the ouput range).
      *
      * @returns {boolean} The current clamp status.
      */
     public clamp(): boolean;
     /**
-     * Sets the clamp status of the QuantitativeScale (whether to cut off values outside the ouput range).
+     * Sets the clamp status of the QuantitativeScaleScale (whether to cut off values outside the ouput range).
      *
-     * @param {boolean} clamp Whether or not to clamp the QuantitativeScale.
-     * @returns {Quantitative} The calling QuantitativeScale.
+     * @param {boolean} clamp Whether or not to clamp the QuantitativeScaleScale.
+     * @returns {QuantitativeScale} The calling QuantitativeScaleScale.
      */
-    public clamp(clamp: boolean): Quantitative<D>;
+    public clamp(clamp: boolean): QuantitativeScale<D>;
     public clamp(clamp?: boolean): any {
       if (clamp == null) {
         return this._d3Scale.clamp();
@@ -136,9 +136,9 @@ module Plottable {
      * Sets the default number of ticks to generate.
      *
      * @param {number} count The new default number of ticks.
-     * @returns {Quantitative} The calling QuantitativeScale.
+     * @returns {QuantitativeScale} The calling QuantitativeScaleScale.
      */
-    public numTicks(count: number): Quantitative<D>;
+    public numTicks(count: number): QuantitativeScale<D>;
     public numTicks(count?: number): any {
       if (count == null) {
         return this._numTicks;
@@ -171,9 +171,9 @@ module Plottable {
      * includes 0, etc., will be the responsability of the new domainer.
      *
      * @param {Domainer} domainer If provided, the new domainer.
-     * @return {Quantitative} The calling QuantitativeScale.
+     * @return {QuantitativeScale} The calling QuantitativeScaleScale.
      */
-    public domainer(domainer: Domainer): Quantitative<D>;
+    public domainer(domainer: Domainer): QuantitativeScale<D>;
     public domainer(domainer?: Domainer): any {
       if (domainer == null) {
         return this._domainer;
@@ -190,7 +190,7 @@ module Plottable {
     }
 
     /**
-     * Gets the tick generator of the Quantitative.
+     * Gets the tick generator of the QuantitativeScale.
      *
      * @returns {TickGenerator} The current tick generator.
      */
@@ -199,9 +199,9 @@ module Plottable {
      * Sets a tick generator
      *
      * @param {TickGenerator} generator, the new tick generator.
-     * @return {Quantitative} The calling Quantitative.
+     * @return {QuantitativeScale} The calling QuantitativeScale.
      */
-    public tickGenerator(generator: Scales.TickGenerators.TickGenerator<D>): Quantitative<D>;
+    public tickGenerator(generator: Scales.TickGenerators.TickGenerator<D>): QuantitativeScale<D>;
     public tickGenerator(generator?: Scales.TickGenerators.TickGenerator<D>): any {
       if(generator == null) {
         return this._tickGenerator;

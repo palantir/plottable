@@ -39,7 +39,7 @@ module Plottable {
      * call this function if you want the domain to neccessarily include all
      * the data.
      *
-     * Extent: The [min, max] pair for a Scale.Quantitative, all covered
+     * Extent: The [min, max] pair for a Scale.QuantitativeScale, all covered
      * strings for a Scale.Category.
      *
      * Perspective: A combination of a Dataset and an Accessor that
@@ -80,7 +80,7 @@ module Plottable {
      * Sets the domain.
      *
      * @param {D[]} values If provided, the new value for the domain. On
-     * a QuantitativeScale, this is a [min, max] pair, or a [max, min] pair to
+     * a QuantitativeScaleScale, this is a [min, max] pair, or a [max, min] pair to
      * make the function decreasing. On Scale.Ordinal, this is an array of all
      * input values.
      * @returns {Scale} The calling Scale.

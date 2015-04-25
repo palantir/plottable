@@ -7550,7 +7550,7 @@ describe("Scales", function () {
             svg.remove();
         });
     });
-    describe("Quantitative Scales", function () {
+    describe("QuantitativeScale Scales", function () {
         it("autorange defaults to [0, 1] if no perspectives set", function () {
             var scale = new Plottable.Scales.Linear();
             scale.autoDomain();

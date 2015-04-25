@@ -16,14 +16,14 @@ export module Axes {
      * Constructs a NumericAxis.
      *
      * Just as an CategoryAxis is for rendering an OrdinalScale, a NumericAxis
-     * is for rendering a QuantitativeScale.
+     * is for rendering a QuantitativeScaleScale.
      *
      * @constructor
-     * @param {QuantitativeScale} scale The QuantitativeScale to base the axis on.
-     * @param {string} orientation The orientation of the QuantitativeScale (top/bottom/left/right)
+     * @param {QuantitativeScaleScale} scale The QuantitativeScaleScale to base the axis on.
+     * @param {string} orientation The orientation of the QuantitativeScaleScale (top/bottom/left/right)
      * @param {Formatter} formatter A function to format tick labels (default Formatters.general()).
      */
-    constructor(scale: Quantitative<number>, orientation: string, formatter = Formatters.general()) {
+    constructor(scale: QuantitativeScale<number>, orientation: string, formatter = Formatters.general()) {
       super(scale, orientation, formatter);
     }
 
@@ -64,7 +64,7 @@ export module Axes {
     }
 
     protected _getTickValues(): any[] {
-      var scale = (<Quantitative<number>> this._scale);
+      var scale = (<QuantitativeScale<number>> this._scale);
       var domain = scale.domain();
       var min = domain[0] <= domain[1] ? domain[0] : domain[1];
       var max = domain[0] >= domain[1] ? domain[0] : domain[1];

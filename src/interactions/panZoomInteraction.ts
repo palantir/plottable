@@ -5,8 +5,8 @@ export module Interactions {
   export class PanZoom extends Interaction {
 
     private _zoom: D3.Behavior.Zoom;
-    private _xScale: Quantitative<any>;
-    private _yScale: Quantitative<any>;
+    private _xScale: QuantitativeScale<any>;
+    private _yScale: QuantitativeScale<any>;
 
     /**
      * Creates a PanZoomInteraction.
@@ -15,10 +15,10 @@ export module Interactions {
      * does so by changing the xScale and yScales' domains repeatedly.
      *
      * @constructor
-     * @param {QuantitativeScale} [xScale] The X scale to update on panning/zooming.
-     * @param {QuantitativeScale} [yScale] The Y scale to update on panning/zooming.
+     * @param {QuantitativeScaleScale} [xScale] The X scale to update on panning/zooming.
+     * @param {QuantitativeScaleScale} [yScale] The Y scale to update on panning/zooming.
      */
-    constructor(xScale?: Quantitative<any>, yScale?: Quantitative<any>) {
+    constructor(xScale?: QuantitativeScale<any>, yScale?: QuantitativeScale<any>) {
       super();
       if (xScale) {
         this._xScale = xScale;

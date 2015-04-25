@@ -63,7 +63,7 @@ export module Plots {
             return scale.scale(this._projections["x"].accessor(d, i, u, m)) + scale.rangeBand() / 2;
           });
         }
-        if (scale instanceof Quantitative) {
+        if (scale instanceof QuantitativeScale) {
           this.project("x1", (d: any, i: number, u: any, m: Plots.PlotMetadata) => {
             return scale.scale(this._projections["x"].accessor(d, i, u, m));
           });
@@ -79,7 +79,7 @@ export module Plots {
             return scale.scale(this._projections["y"].accessor(d, i, u, m)) + scale.rangeBand() / 2;
           });
         }
-        if (scale instanceof Quantitative) {
+        if (scale instanceof QuantitativeScale) {
           this.project("y1", (d: any, i: number, u: any, m: Plots.PlotMetadata) => {
             return scale.scale(this._projections["y"].accessor(d, i, u, m));
           });

@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Scales {
-  export class Log extends Quantitative<number> {
+  export class Log extends QuantitativeScale<number> {
 
     private static warned = false;
 

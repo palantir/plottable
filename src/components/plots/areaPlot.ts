@@ -13,10 +13,10 @@ export module Plots {
      * Constructs an AreaPlot.
      *
      * @constructor
-     * @param {QuantitativeScale} xScale The x scale to use.
-     * @param {QuantitativeScale} yScale The y scale to use.
+     * @param {QuantitativeScaleScale} xScale The x scale to use.
+     * @param {QuantitativeScaleScale} yScale The y scale to use.
      */
-    constructor(xScale: Quantitative<X>, yScale: Quantitative<number>) {
+    constructor(xScale: QuantitativeScale<X>, yScale: QuantitativeScale<number>) {
       super(xScale, yScale);
       this.classed("area-plot", true);
       this.project("y0", 0, yScale); // default
