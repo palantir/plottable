@@ -61,6 +61,9 @@ export module Interaction {
 
         this._touchIds.set(id.toString(), this._translateToComponentSpace(idToPoint[id]));
       });
+      if (this._touchIds.size() === 2) {
+        this._dragInteraction.onDrag(null);
+      }
     }
 
     private _handleTouchMove(ids: number[], idToPoint: { [id: number]: Point; }, e: TouchEvent) {
@@ -68,26 +71,47 @@ export module Interaction {
         return;
       }
       var points = this._touchIds.values();
-      var oldAvgX = (points[1].x + points[0].x) / 2;
-      var oldAvgY = (points[1].y + points[0].y) / 2;
-      var oldDiffX = Math.abs(points[1].x - points[0].x);
-      var oldDiffY = Math.abs(points[1].y - points[0].y);
+      var firstTouchPoint = points[0];
+      var secondTouchPoint = points[1];
+
+      var leftX = Math.min(firstTouchPoint.x, secondTouchPoint.x);
+      var rightX = Math.max(firstTouchPoint.x, secondTouchPoint.x);
+      var topY = Math.min(firstTouchPoint.y, secondTouchPoint.y);
+      var bottomY = Math.max(firstTouchPoint.y, secondTouchPoint.y);
+
+      var oldAvgX = (leftX + rightX) / 2;
+      var oldAvgY = (bottomY + topY) / 2;
+      var oldDiffX = rightX - leftX;
+      var oldDiffY = bottomY - topY;
 
       ids.forEach((id) => {
-        this._touchIds.set(id.toString(), this._translateToComponentSpace(idToPoint[id]));
+        var translatedP = this._translateToComponentSpace(idToPoint[id]);
+        if (this._isInsideComponent(translatedP)) {
+          this._touchIds.set(id.toString(), translatedP);
+        }
       });
 
       var newPoints = this._touchIds.values();
-      var newAvgX = (newPoints[1].x + newPoints[0].x) / 2;
-      var newAvgY = (newPoints[1].y + newPoints[0].y) / 2;
-      var newDiffX = Math.abs(newPoints[1].x - newPoints[0].x);
-      var newDiffY = Math.abs(newPoints[1].y - newPoints[0].y);
+      var newFirstTouchPoint = newPoints[0];
+      var newSecondTouchPoint = newPoints[1];
 
-      if (this._xScale != null) {
-        this._xScale.domain(PanZoom.magnify(this._xScale, oldDiffX / newDiffX, (this._xScale.range()[1] + this._xScale.range()[0]) / 2));
+      var newLeftX = Math.min(newFirstTouchPoint.x, newSecondTouchPoint.x);
+      var newRightX = Math.max(newFirstTouchPoint.x, newSecondTouchPoint.x);
+      var newTopY = Math.min(newFirstTouchPoint.y, newSecondTouchPoint.y);
+      var newBottomY = Math.max(newFirstTouchPoint.y, newSecondTouchPoint.y);
+
+      var newAvgX = (newLeftX + newRightX) / 2;
+      var newAvgY = (newBottomY + newTopY) / 2;
+      var newDiffX = newRightX - newLeftX;
+      var newDiffY = newBottomY - newTopY;
+
+      if (this._xScale != null && newDiffX !== 0 && oldDiffX !== 0) {
+        this._xScale.domain(PanZoom.magnify(this._xScale, oldDiffX / newDiffX, oldAvgX));
+        this._xScale.domain(PanZoom.translate(this._xScale, oldAvgX - newAvgX));
       }
-      if (this._yScale != null) {
-        this._yScale.domain(PanZoom.magnify(this._yScale, oldDiffY / newDiffY, (oldAvgY + newAvgY) / 2));
+      if (this._yScale != null && newDiffY !== 0 && oldDiffY !== 0) {
+        this._yScale.domain(PanZoom.magnify(this._yScale, oldDiffY / newDiffY, oldAvgY));
+        this._yScale.domain(PanZoom.translate(this._yScale, oldAvgY - newAvgY));
       }
     }
 
@@ -95,10 +119,12 @@ export module Interaction {
       ids.forEach((id) => {
         this._touchIds.remove(id.toString());
       });
+      if (this._touchIds.size() < 2) {
+        this._setupDragInteraction();
+      }
     }
 
     private static magnify<D>(scale: Scale.AbstractQuantitative<D>, magnifyAmount: number, centerValue: number) {
-      centerValue = (scale.range()[1] + scale.range()[0]) / 2;
       var magnifyTransform = (rangeValue: number) => scale.invert(centerValue - (centerValue - rangeValue) * magnifyAmount);
       return scale.range().map(magnifyTransform);
     }
@@ -125,19 +151,19 @@ export module Interaction {
     }
 
     private _setupDragInteraction() {
-//      var lastDragPoint: Point;
-//      this._dragInteraction.onDragStart(() => lastDragPoint = null);
-//      this._dragInteraction.onDrag((startPoint, endPoint) => {
-//        if (this._xScale != null) {
-//          var dragAmountX = endPoint.x - (lastDragPoint == null ? startPoint.x : lastDragPoint.x);
-//          this._xScale.domain(PanZoom.translate(this._xScale, -dragAmountX));
-//        }
-//        if (this._yScale != null) {
-//          var dragAmountY = endPoint.y - (lastDragPoint == null ? startPoint.y : lastDragPoint.y);
-//          this._yScale.domain(PanZoom.translate(this._yScale, -dragAmountY));
-//        }
-//        lastDragPoint = endPoint;
-//      });
+      var lastDragPoint: Point;
+      this._dragInteraction.onDragStart(() => lastDragPoint = null);
+      this._dragInteraction.onDrag((startPoint, endPoint) => {
+        if (this._xScale != null) {
+          var dragAmountX = endPoint.x - (lastDragPoint == null ? startPoint.x : lastDragPoint.x);
+          this._xScale.domain(PanZoom.translate(this._xScale, -dragAmountX));
+        }
+        if (this._yScale != null) {
+          var dragAmountY = endPoint.y - (lastDragPoint == null ? startPoint.y : lastDragPoint.y);
+          this._yScale.domain(PanZoom.translate(this._yScale, -dragAmountY));
+        }
+        lastDragPoint = endPoint;
+      });
     }
 
   }
