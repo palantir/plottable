@@ -61,59 +61,59 @@ export module Plots {
 
     public project(attrToSet: string, accessor: any, scale?: Scale<any, any>) {
       super.project(attrToSet, accessor, scale);
-      AbstractStacked.prototype.project.apply(this, [attrToSet, accessor, scale]);
+      Stacked.prototype.project.apply(this, [attrToSet, accessor, scale]);
       return this;
     }
 
     protected _onDatasetUpdate() {
       super._onDatasetUpdate();
-      AbstractStacked.prototype._onDatasetUpdate.apply(this);
+      Stacked.prototype._onDatasetUpdate.apply(this);
       return this;
     }
 
     protected _getPlotMetadataForDataset(key: string): StackedPlotMetadata {
-      return AbstractStacked.prototype._getPlotMetadataForDataset.call(this, key);
+      return Stacked.prototype._getPlotMetadataForDataset.call(this, key);
     }
 
     protected _normalizeDatasets<A, B>(fromX: boolean): {a: A; b: B}[] {
-      return AbstractStacked.prototype._normalizeDatasets.call(this, fromX);
+      return Stacked.prototype._normalizeDatasets.call(this, fromX);
     }
 
-    //===== Stack logic from AbstractStackedPlot =====
+    //===== Stack logic from StackedPlot =====
     public _updateStackOffsets() {
-      AbstractStacked.prototype._updateStackOffsets.call(this);
+      Stacked.prototype._updateStackOffsets.call(this);
     }
 
     public _updateStackExtents() {
-      AbstractStacked.prototype._updateStackExtents.call(this);
+      Stacked.prototype._updateStackExtents.call(this);
     }
 
     public _stack(dataArray: D3.Map<StackedDatum>[]): D3.Map<StackedDatum>[] {
-      return AbstractStacked.prototype._stack.call(this, dataArray);
+      return Stacked.prototype._stack.call(this, dataArray);
     }
 
     public _setDatasetStackOffsets(positiveDataMapArray: D3.Map<StackedDatum>[], negativeDataMapArray: D3.Map<StackedDatum>[]) {
-      AbstractStacked.prototype._setDatasetStackOffsets.call(this, positiveDataMapArray, negativeDataMapArray);
+      Stacked.prototype._setDatasetStackOffsets.call(this, positiveDataMapArray, negativeDataMapArray);
     }
 
     public _getDomainKeys() {
-      return AbstractStacked.prototype._getDomainKeys.call(this);
+      return Stacked.prototype._getDomainKeys.call(this);
     }
 
     public _generateDefaultMapArray(): D3.Map<StackedDatum>[] {
-      return AbstractStacked.prototype._generateDefaultMapArray.call(this);
+      return Stacked.prototype._generateDefaultMapArray.call(this);
     }
 
     public _updateScaleExtents() {
-      AbstractStacked.prototype._updateScaleExtents.call(this);
+      Stacked.prototype._updateScaleExtents.call(this);
     }
 
     public _keyAccessor(): _Accessor {
-      return AbstractStacked.prototype._keyAccessor.call(this);
+      return Stacked.prototype._keyAccessor.call(this);
     }
 
     public _valueAccessor(): _Accessor {
-      return AbstractStacked.prototype._valueAccessor.call(this);
+      return Stacked.prototype._valueAccessor.call(this);
     }
     //===== /Stack logic =====
   }

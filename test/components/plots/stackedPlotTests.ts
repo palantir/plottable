@@ -5,14 +5,14 @@ var assert = chai.assert;
 describe("Plots", () => {
 
   describe("Stacked Plot Stacking", () => {
-    var stackedPlot: Plottable.AbstractStacked<number, number>;
+    var stackedPlot: Plottable.Stacked<number, number>;
     var SVG_WIDTH = 600;
     var SVG_HEIGHT = 400;
 
     beforeEach(() => {
       var xScale = new Plottable.Scales.Linear();
       var yScale = new Plottable.Scales.Linear();
-      stackedPlot = new Plottable.AbstractStacked(xScale, yScale);
+      stackedPlot = new Plottable.Stacked(xScale, yScale);
       stackedPlot.project("x", "x", xScale);
       stackedPlot.project("y", "y", yScale);
 

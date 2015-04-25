@@ -14,7 +14,7 @@ module Plottable {
     }
   }
 
-  export class AbstractStacked<X, Y> extends XYPlot<X, Y> {
+  export class Stacked<X, Y> extends XYPlot<X, Y> {
     private _stackedExtent = [0, 0];
     protected _isVertical: boolean;
 

@@ -3219,10 +3219,10 @@ declare module Plottable {
             offset?: number;
         };
     }
-    class AbstractStacked<X, Y> extends XYPlot<X, Y> {
+    class Stacked<X, Y> extends XYPlot<X, Y> {
         protected _isVertical: boolean;
         _getPlotMetadataForDataset(key: string): Plots.StackedPlotMetadata;
-        project(attrToSet: string, accessor: any, scale?: Scale<any, any>): AbstractStacked<X, Y>;
+        project(attrToSet: string, accessor: any, scale?: Scale<any, any>): Stacked<X, Y>;
         _onDatasetUpdate(): void;
         _updateStackOffsets(): void;
         _updateStackExtents(): void;

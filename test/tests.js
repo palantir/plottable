@@ -4499,7 +4499,7 @@ describe("Plots", function () {
         beforeEach(function () {
             var xScale = new Plottable.Scales.Linear();
             var yScale = new Plottable.Scales.Linear();
-            stackedPlot = new Plottable.AbstractStacked(xScale, yScale);
+            stackedPlot = new Plottable.Stacked(xScale, yScale);
             stackedPlot.project("x", "x", xScale);
             stackedPlot.project("y", "y", yScale);
             stackedPlot._getDrawer = function (key) { return new Plottable.Drawers.AbstractDrawer(key); };
