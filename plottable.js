@@ -3826,7 +3826,7 @@ var __extends = this.__extends || function (d, b) {
 var Plottable;
 (function (Plottable) {
     /*
-     * An abstract ComponentContainer class to encapsulate Table and ComponentGroup's shared functionality.
+     * ComponentContainer class encapsulates Table and ComponentGroup's shared functionality.
      * It will not do anything if instantiated directly.
      */
     var ComponentContainer = (function (_super) {

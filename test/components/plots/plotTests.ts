@@ -11,7 +11,7 @@ class CountingPlot extends Plottable.Plot {
 }
 
 describe("Plots", () => {
-  describe("Abstract Plot", () => {
+  describe("Plot", () => {
 
     it("Plots default correctly", () => {
       var r = new Plottable.Plot();
@@ -489,7 +489,7 @@ describe("Plots", () => {
     });
   });
 
-  describe("Abstract XY Plot", () => {
+  describe("XY Plot", () => {
     var svg: D3.Selection;
     var xScale: Plottable.Scales.Linear;
     var yScale: Plottable.Scales.Linear;

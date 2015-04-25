@@ -2117,7 +2117,7 @@ var CountingPlot = (function (_super) {
     return CountingPlot;
 })(Plottable.Plot);
 describe("Plots", function () {
-    describe("Abstract Plot", function () {
+    describe("Plot", function () {
         it("Plots default correctly", function () {
             var r = new Plottable.Plot();
             assert.isTrue(r.clipPathEnabled, "clipPathEnabled defaults to true");
@@ -2515,7 +2515,7 @@ describe("Plots", function () {
             svg.remove();
         });
     });
-    describe("Abstract XY Plot", function () {
+    describe("XY Plot", function () {
         var svg;
         var xScale;
         var yScale;
