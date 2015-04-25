@@ -31,7 +31,7 @@ export module Interactions {
     _doHover(p: Point): HoverData;
   }
 
-  export class Hover extends Interactions.AbstractInteraction {
+  export class Hover extends Interaction {
 
     private static warned = false;
 

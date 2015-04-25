@@ -6502,7 +6502,7 @@ describe("Component behavior", function () {
         svg = generateSVG();
         // registration before anchoring
         c = new Plottable.Component();
-        var i = new Plottable.Interactions.AbstractInteraction();
+        var i = new Plottable.Interaction();
         i._requiresHitbox = function () { return true; };
         c.registerInteraction(i);
         c._anchor(svg);
@@ -6512,7 +6512,7 @@ describe("Component behavior", function () {
         // registration after anchoring
         c = new Plottable.Component();
         c._anchor(svg);
-        i = new Plottable.Interactions.AbstractInteraction();
+        i = new Plottable.Interaction();
         i._requiresHitbox = function () { return true; };
         c.registerInteraction(i);
         verifyHitbox(c);

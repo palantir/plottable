@@ -1664,7 +1664,7 @@ declare module Plottable {
          * @param {Interaction} interaction The Interaction to attach to the Component.
          * @returns {Component} The calling Component.
          */
-        registerInteraction(interaction: Interactions.AbstractInteraction): Component;
+        registerInteraction(interaction: Interaction): Component;
         /**
          * Checks if the Component has a given CSS class.
          *
@@ -3740,43 +3740,41 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Interactions {
-        class AbstractInteraction extends Core.PlottableObject {
-            /**
-             * It maintains a 'hitBox' which is where all event listeners are
-             * attached. Due to cross- browser weirdness, the hitbox needs to be an
-             * opaque but invisible rectangle.  TODO: We should give the interaction
-             * "foreground" and "background" elements where it can draw things,
-             * e.g. crosshairs.
-             */
-            protected _hitBox: D3.Selection;
-            protected _componentToListenTo: Component;
-            _anchor(component: Component, hitBox: D3.Selection): void;
-            _requiresHitbox(): boolean;
-            /**
-             * Translates an <svg>-coordinate-space point to Component-space coordinates.
-             *
-             * @param {Point} p A Point in <svg>-space coordinates.
-             *
-             * @return {Point} The same location in Component-space coordinates.
-             */
-            protected _translateToComponentSpace(p: Point): Point;
-            /**
-             * Checks whether a Component-coordinate-space Point is inside the Component.
-             *
-             * @param {Point} p A Point in Coordinate-space coordinates.
-             *
-             * @return {boolean} Whether or not the point is inside the Component.
-             */
-            protected _isInsideComponent(p: Point): boolean;
-        }
+    class Interaction extends Core.PlottableObject {
+        /**
+         * It maintains a 'hitBox' which is where all event listeners are
+         * attached. Due to cross- browser weirdness, the hitbox needs to be an
+         * opaque but invisible rectangle.  TODO: We should give the interaction
+         * "foreground" and "background" elements where it can draw things,
+         * e.g. crosshairs.
+         */
+        protected _hitBox: D3.Selection;
+        protected _componentToListenTo: Component;
+        _anchor(component: Component, hitBox: D3.Selection): void;
+        _requiresHitbox(): boolean;
+        /**
+         * Translates an <svg>-coordinate-space point to Component-space coordinates.
+         *
+         * @param {Point} p A Point in <svg>-space coordinates.
+         *
+         * @return {Point} The same location in Component-space coordinates.
+         */
+        protected _translateToComponentSpace(p: Point): Point;
+        /**
+         * Checks whether a Component-coordinate-space Point is inside the Component.
+         *
+         * @param {Point} p A Point in Coordinate-space coordinates.
+         *
+         * @return {boolean} Whether or not the point is inside the Component.
+         */
+        protected _isInsideComponent(p: Point): boolean;
     }
 }
 
 
 declare module Plottable {
     module Interactions {
-        class Click extends AbstractInteraction {
+        class Click extends Interaction {
             _anchor(component: Component, hitBox: D3.Selection): void;
             /**
              * Gets the callback called when the Component is clicked.
@@ -3798,7 +3796,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Interactions {
-        class DoubleClick extends AbstractInteraction {
+        class DoubleClick extends Interaction {
             _anchor(component: Component, hitBox: D3.Selection): void;
             _requiresHitbox(): boolean;
             protected _listenTo(): string;
@@ -3815,7 +3813,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Interactions {
-        class Key extends AbstractInteraction {
+        class Key extends Interaction {
             _anchor(component: Component, hitBox: D3.Selection): void;
             /**
              * Sets a callback to be called when the key with the given keyCode is
@@ -3833,7 +3831,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Interactions {
-        class Pointer extends Interactions.AbstractInteraction {
+        class Pointer extends Interaction {
             _anchor(component: Component, hitBox: D3.Selection): void;
             /**
              * Gets the callback called when the pointer enters the Component.
@@ -3881,7 +3879,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Interactions {
-        class PanZoom extends AbstractInteraction {
+        class PanZoom extends Interaction {
             /**
              * Creates a PanZoomInteraction.
              *
@@ -3906,7 +3904,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Interactions {
-        class Drag extends AbstractInteraction {
+        class Drag extends Interaction {
             _anchor(component: Component, hitBox: D3.Selection): void;
             /**
              * Returns whether or not this Interactions constrains Points passed to its
@@ -4004,7 +4002,7 @@ declare module Plottable {
              */
             _doHover(p: Point): HoverData;
         }
-        class Hover extends Interactions.AbstractInteraction {
+        class Hover extends Interaction {
             _componentToListenTo: Hoverable;
             constructor();
             _anchor(component: Hoverable, hitBox: D3.Selection): void;

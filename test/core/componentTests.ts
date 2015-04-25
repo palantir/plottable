@@ -262,7 +262,7 @@ describe("Component behavior", () => {
 
     // registration before anchoring
     c = new Plottable.Component();
-    var i = new Plottable.Interactions.AbstractInteraction();
+    var i = new Plottable.Interaction();
     i._requiresHitbox = () => true;
     c.registerInteraction(i);
     c._anchor(svg);
@@ -273,7 +273,7 @@ describe("Component behavior", () => {
     // registration after anchoring
     c = new Plottable.Component();
     c._anchor(svg);
-    i = new Plottable.Interactions.AbstractInteraction();
+    i = new Plottable.Interaction();
     i._requiresHitbox = () => true;
     c.registerInteraction(i);
     verifyHitbox(c);

@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Interactions {
-  export class Drag extends AbstractInteraction {
+  export class Drag extends Interaction {
     private _dragging = false;
     private _constrain = true;
     private _mouseDispatchers: Plottable.Dispatchers.Mouse;

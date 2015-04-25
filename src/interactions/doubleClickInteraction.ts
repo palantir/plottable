@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Interactions {
-  export class DoubleClick extends AbstractInteraction {
+  export class DoubleClick extends Interaction {
 
     private _callback: (p: Point) => any;
 

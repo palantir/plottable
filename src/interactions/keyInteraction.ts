@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Interactions {
-  export class Key extends AbstractInteraction {
+  export class Key extends Interaction {
     /**
      * KeyInteraction listens to key events that occur while the Component is
      * moused over.

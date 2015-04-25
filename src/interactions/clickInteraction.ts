@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Interactions {
-  export class Click extends AbstractInteraction {
+  export class Click extends Interaction {
 
     private _mouseDispatcher: Plottable.Dispatchers.Mouse;
     private _touchDispatcher: Plottable.Dispatchers.Touch;

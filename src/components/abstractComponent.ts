@@ -20,7 +20,7 @@ module Plottable {
     protected _isAnchored = false;
 
     private _hitBox: D3.Selection;
-    private _interactionsToRegister: Interactions.AbstractInteraction[] = [];
+    private _interactionsToRegister: Interaction[] = [];
     private _boxes: D3.Selection[] = [];
     private _boxContainer: D3.Selection;
     private _rootSVG: D3.Selection;
@@ -343,7 +343,7 @@ module Plottable {
      * @param {Interaction} interaction The Interaction to attach to the Component.
      * @returns {Component} The calling Component.
      */
-    public registerInteraction(interaction: Interactions.AbstractInteraction) {
+    public registerInteraction(interaction: Interaction) {
       // Interactions can be registered before or after anchoring. If registered before, they are
       // pushed to this._interactionsToRegister and registered during anchoring. If after, they are
       // registered immediately

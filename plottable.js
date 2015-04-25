@@ -9497,49 +9497,46 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
-    var Interactions;
-    (function (Interactions) {
-        var AbstractInteraction = (function (_super) {
-            __extends(AbstractInteraction, _super);
-            function AbstractInteraction() {
-                _super.apply(this, arguments);
-            }
-            AbstractInteraction.prototype._anchor = function (component, hitBox) {
-                this._componentToListenTo = component;
-                this._hitBox = hitBox;
+    var Interaction = (function (_super) {
+        __extends(Interaction, _super);
+        function Interaction() {
+            _super.apply(this, arguments);
+        }
+        Interaction.prototype._anchor = function (component, hitBox) {
+            this._componentToListenTo = component;
+            this._hitBox = hitBox;
+        };
+        // HACKHACK: After all Interactions use Dispatchers, we won't need hitboxes at all (#1757)
+        Interaction.prototype._requiresHitbox = function () {
+            return false;
+        };
+        /**
+         * Translates an <svg>-coordinate-space point to Component-space coordinates.
+         *
+         * @param {Point} p A Point in <svg>-space coordinates.
+         *
+         * @return {Point} The same location in Component-space coordinates.
+         */
+        Interaction.prototype._translateToComponentSpace = function (p) {
+            var origin = this._componentToListenTo.originToSVG();
+            return {
+                x: p.x - origin.x,
+                y: p.y - origin.y
             };
-            // HACKHACK: After all Interactions use Dispatchers, we won't need hitboxes at all (#1757)
-            AbstractInteraction.prototype._requiresHitbox = function () {
-                return false;
-            };
-            /**
-             * Translates an <svg>-coordinate-space point to Component-space coordinates.
-             *
-             * @param {Point} p A Point in <svg>-space coordinates.
-             *
-             * @return {Point} The same location in Component-space coordinates.
-             */
-            AbstractInteraction.prototype._translateToComponentSpace = function (p) {
-                var origin = this._componentToListenTo.originToSVG();
-                return {
-                    x: p.x - origin.x,
-                    y: p.y - origin.y
-                };
-            };
-            /**
-             * Checks whether a Component-coordinate-space Point is inside the Component.
-             *
-             * @param {Point} p A Point in Coordinate-space coordinates.
-             *
-             * @return {boolean} Whether or not the point is inside the Component.
-             */
-            AbstractInteraction.prototype._isInsideComponent = function (p) {
-                return 0 <= p.x && 0 <= p.y && p.x <= this._componentToListenTo.width() && p.y <= this._componentToListenTo.height();
-            };
-            return AbstractInteraction;
-        })(Plottable.Core.PlottableObject);
-        Interactions.AbstractInteraction = AbstractInteraction;
-    })(Interactions = Plottable.Interactions || (Plottable.Interactions = {}));
+        };
+        /**
+         * Checks whether a Component-coordinate-space Point is inside the Component.
+         *
+         * @param {Point} p A Point in Coordinate-space coordinates.
+         *
+         * @return {boolean} Whether or not the point is inside the Component.
+         */
+        Interaction.prototype._isInsideComponent = function (p) {
+            return 0 <= p.x && 0 <= p.y && p.x <= this._componentToListenTo.width() && p.y <= this._componentToListenTo.height();
+        };
+        return Interaction;
+    })(Plottable.Core.PlottableObject);
+    Plottable.Interaction = Interaction;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -9590,7 +9587,7 @@ var Plottable;
                 return this;
             };
             return Click;
-        })(Interactions.AbstractInteraction);
+        })(Plottable.Interaction);
         Interactions.Click = Click;
     })(Interactions = Plottable.Interactions || (Plottable.Interactions = {}));
 })(Plottable || (Plottable = {}));
@@ -9637,7 +9634,7 @@ var Plottable;
                 return this;
             };
             return DoubleClick;
-        })(Interactions.AbstractInteraction);
+        })(Plottable.Interaction);
         Interactions.DoubleClick = DoubleClick;
     })(Interactions = Plottable.Interactions || (Plottable.Interactions = {}));
 })(Plottable || (Plottable = {}));
@@ -9686,7 +9683,7 @@ var Plottable;
                 return this;
             };
             return Key;
-        })(Interactions.AbstractInteraction);
+        })(Plottable.Interaction);
         Interactions.Key = Key;
     })(Interactions = Plottable.Interactions || (Plottable.Interactions = {}));
 })(Plottable || (Plottable = {}));
@@ -9757,7 +9754,7 @@ var Plottable;
                 return this;
             };
             return Pointer;
-        })(Interactions.AbstractInteraction);
+        })(Plottable.Interaction);
         Interactions.Pointer = Pointer;
     })(Interactions = Plottable.Interactions || (Plottable.Interactions = {}));
 })(Plottable || (Plottable = {}));
@@ -9835,7 +9832,7 @@ var Plottable;
                 }
             };
             return PanZoom;
-        })(Interactions.AbstractInteraction);
+        })(Plottable.Interaction);
         Interactions.PanZoom = PanZoom;
     })(Interactions = Plottable.Interactions || (Plottable.Interactions = {}));
 })(Plottable || (Plottable = {}));
@@ -9949,7 +9946,7 @@ var Plottable;
                 }
             };
             return Drag;
-        })(Interactions.AbstractInteraction);
+        })(Plottable.Interaction);
         Interactions.Drag = Drag;
     })(Interactions = Plottable.Interactions || (Plottable.Interactions = {}));
 })(Plottable || (Plottable = {}));
@@ -10090,7 +10087,7 @@ var Plottable;
             };
             Hover.warned = false;
             return Hover;
-        })(Interactions.AbstractInteraction);
+        })(Plottable.Interaction);
         Interactions.Hover = Hover;
     })(Interactions = Plottable.Interactions || (Plottable.Interactions = {}));
 })(Plottable || (Plottable = {}));

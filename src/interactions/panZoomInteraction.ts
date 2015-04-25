@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Interactions {
-  export class PanZoom extends AbstractInteraction {
+  export class PanZoom extends Interaction {
 
     private _zoom: D3.Behavior.Zoom;
     private _xScale: Scales.AbstractQuantitative<any>;
