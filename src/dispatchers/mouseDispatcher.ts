@@ -4,7 +4,7 @@ module Plottable {
 export module Dispatchers {
   export type MouseCallback = (p: Point, e: MouseEvent) => any;
 
-  export class Mouse extends AbstractDispatcher {
+  export class Mouse extends Dispatcher {
     private static _DISPATCHER_KEY = "__Plottable_Dispatcher_Mouse";
     private translator: Utils.ClientToSVGTranslator;
     private _lastMousePosition: Point;

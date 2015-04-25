@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Scales {
-  export class Category extends AbstractScale<string, number> {
+  export class Category extends Scale<string, number> {
     protected _d3Scale: D3.Scale.OrdinalScale;
     private _range = [0, 1];
 

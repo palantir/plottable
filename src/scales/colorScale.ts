@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Scales {
-  export class Color extends AbstractScale<string, string> {
+  export class Color extends Scale<string, string> {
 
     private static HEX_SCALE_FACTOR = 20;
     private static LOOP_LIGHTEN_FACTOR = 1.6;

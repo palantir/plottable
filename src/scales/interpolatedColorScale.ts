@@ -11,7 +11,7 @@ export module Scales {
    *
    * By default it generates a linear scale internally.
    */
-  export class InterpolatedColor extends AbstractScale<number, string> {
+  export class InterpolatedColor extends Scale<number, string> {
     private static _COLOR_SCALES: ColorGroups = {
       reds : [
         "#FFFFFF", // white
@@ -63,7 +63,7 @@ export module Scales {
      *     values in hex ("#FFFFFF") or keywords ("white").
      * @param {string} scaleType a string representing the underlying scale
      *     type ("linear"/"log"/"sqrt"/"pow")
-     * @returns {D3.Scale.QuantitativeScale} The converted Quantitative d3 scale.
+     * @returns {D3.Scale.QuantitativeScaleScale} The converted QuantitativeScale d3 scale.
      */
     private static _getD3InterpolatedScale(colors: string[], scaleType: string): D3.Scale.QuantitativeScale {
       var scale: D3.Scale.QuantitativeScale;
@@ -82,7 +82,7 @@ export module Scales {
           break;
       }
       if (scale == null){
-        throw new Error("unknown Quantitative scale type " + scaleType);
+        throw new Error("unknown QuantitativeScale scale type " + scaleType);
       }
       return scale
                   .range([0, 1])
@@ -206,7 +206,7 @@ export module Scales {
     }
 
     public autoDomain() {
-      // unlike other QuantitativeScales, interpolatedColorScale ignores its domainer
+      // unlike other QuantitativeScaleScales, interpolatedColorScale ignores its domainer
       var extents = this._getAllExtents();
       if (extents.length > 0) {
         this._setDomain([Utils.Methods.min(extents, (x) => x[0], 0), Utils.Methods.max(extents, (x) => x[1], 0)]);

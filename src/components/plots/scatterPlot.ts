@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Plots {
-  export class Scatter<X, Y> extends AbstractXYPlot<X, Y> implements Interactions.Hoverable {
+  export class Scatter<X, Y> extends XYPlot<X, Y> implements Interactions.Hoverable {
     private _closeDetectionRadius = 5;
     private _defaultFillColor: string;
 
@@ -13,7 +13,7 @@ export module Plots {
      * @param {Scale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
      */
-    constructor(xScale: Scales.AbstractScale<X, number>, yScale: Scales.AbstractScale<Y, number>) {
+    constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>) {
       super(xScale, yScale);
       this.classed("scatter-plot", true);
       this._defaultFillColor = new Scales.Color().range()[0];

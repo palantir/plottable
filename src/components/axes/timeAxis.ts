@@ -22,7 +22,7 @@ export module Axes {
    */
   export type TimeAxisConfiguration = TimeAxisTierConfiguration[];
 
-  export class Time extends AbstractAxis {
+  export class Time extends Axis {
     /**
      * The css class applied to each time axis tier
      */
@@ -316,8 +316,8 @@ export module Axes {
 
       for (var i = 0; i < this._numTiers; ++i) {
         var tierContainer = this._content.append("g").classed(Time.TIME_AXIS_TIER_CLASS, true);
-        this._tierLabelContainers.push(tierContainer.append("g").classed(AbstractAxis.TICK_LABEL_CLASS + "-container", true));
-        this._tierMarkContainers.push(tierContainer.append("g").classed(AbstractAxis.TICK_MARK_CLASS + "-container", true));
+        this._tierLabelContainers.push(tierContainer.append("g").classed(Axis.TICK_LABEL_CLASS + "-container", true));
+        this._tierMarkContainers.push(tierContainer.append("g").classed(Axis.TICK_MARK_CLASS + "-container", true));
         this._tierBaselines.push(tierContainer.append("line").classed("baseline", true));
       }
 
@@ -337,8 +337,8 @@ export module Axes {
 
     private _cleanTiers() {
       for (var index = 0; index < this._tierLabelContainers.length; index++) {
-        this._tierLabelContainers[index].selectAll("." + AbstractAxis.TICK_LABEL_CLASS).remove();
-        this._tierMarkContainers[index].selectAll("." + AbstractAxis.TICK_MARK_CLASS).remove();
+        this._tierLabelContainers[index].selectAll("." + Axis.TICK_LABEL_CLASS).remove();
+        this._tierMarkContainers[index].selectAll("." + Axis.TICK_MARK_CLASS).remove();
         this._tierBaselines[index].style("visibility", "hidden");
       }
     }
@@ -370,8 +370,8 @@ export module Axes {
         labelPos = tickPos;
       }
 
-      var tickLabels = container.selectAll("." + AbstractAxis.TICK_LABEL_CLASS).data(labelPos, (d) => d.valueOf());
-      var tickLabelsEnter = tickLabels.enter().append("g").classed(AbstractAxis.TICK_LABEL_CLASS, true);
+      var tickLabels = container.selectAll("." + Axis.TICK_LABEL_CLASS).data(labelPos, (d) => d.valueOf());
+      var tickLabelsEnter = tickLabels.enter().append("g").classed(Axis.TICK_LABEL_CLASS, true);
       tickLabelsEnter.append("text");
       var xTranslate = (this._tierLabelPositions[index] === "center" || config.step === 1) ? 0 : this.tickLabelPadding();
       var markLength = this._measurer.measure().height;
@@ -390,8 +390,8 @@ export module Axes {
     }
 
     private _renderTickMarks(tickValues: Date[], index: number) {
-      var tickMarks = this._tierMarkContainers[index].selectAll("." + AbstractAxis.TICK_MARK_CLASS).data(tickValues);
-      tickMarks.enter().append("line").classed(AbstractAxis.TICK_MARK_CLASS, true);
+      var tickMarks = this._tierMarkContainers[index].selectAll("." + Axis.TICK_MARK_CLASS).data(tickValues);
+      tickMarks.enter().append("line").classed(Axis.TICK_MARK_CLASS, true);
       var attr = this._generateTickMarkAttrHash();
       var offset = this._tierHeights.slice(0, index).reduce((translate: number, height: number) => translate + height, 0);
       if (this.orient() === "bottom") {
@@ -413,15 +413,15 @@ export module Axes {
       d3.select(tickMarks[0][0]).attr(attr);
 
       // Add end-tick classes to first and last tick for CSS customization purposes
-      d3.select(tickMarks[0][0]).classed(AbstractAxis.END_TICK_MARK_CLASS, true);
-      d3.select(tickMarks[0][tickMarks.size() - 1]).classed(AbstractAxis.END_TICK_MARK_CLASS, true);
+      d3.select(tickMarks[0][0]).classed(Axis.END_TICK_MARK_CLASS, true);
+      d3.select(tickMarks[0][tickMarks.size() - 1]).classed(Axis.END_TICK_MARK_CLASS, true);
 
       tickMarks.exit().remove();
     }
 
     private _renderLabellessTickMarks(tickValues: Date[]) {
-      var tickMarks = this._tickMarkContainer.selectAll("." + AbstractAxis.TICK_MARK_CLASS).data(tickValues);
-      tickMarks.enter().append("line").classed(AbstractAxis.TICK_MARK_CLASS, true);
+      var tickMarks = this._tickMarkContainer.selectAll("." + Axis.TICK_MARK_CLASS).data(tickValues);
+      tickMarks.enter().append("line").classed(Axis.TICK_MARK_CLASS, true);
       var attr = this._generateTickMarkAttrHash();
       attr["y2"] = (this.orient() === "bottom") ? this.tickLabelPadding() : this.height() - this.tickLabelPadding();
       tickMarks.attr(attr);
@@ -501,7 +501,7 @@ export module Axes {
       };
 
       var visibleTickMarks = this._tierMarkContainers[index]
-                                    .selectAll("." + AbstractAxis.TICK_MARK_CLASS)
+                                    .selectAll("." + Axis.TICK_MARK_CLASS)
                                     .filter(function(d: Element, i: number) {
                                       var visibility = d3.select(this).style("visibility");
                                       return visibility === "visible" || visibility === "inherit";
@@ -511,7 +511,7 @@ export module Axes {
       var visibleTickMarkRects = visibleTickMarks[0].map((mark: Element) => mark.getBoundingClientRect() );
 
       var visibleTickLabels = this._tierLabelContainers[index]
-                                    .selectAll("." + AbstractAxis.TICK_LABEL_CLASS)
+                                    .selectAll("." + Axis.TICK_LABEL_CLASS)
                                     .filter(function(d: Element, i: number) {
                                       var visibility = d3.select(this).style("visibility");
                                       return visibility === "visible" || visibility === "inherit";

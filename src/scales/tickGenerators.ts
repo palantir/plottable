@@ -6,7 +6,7 @@ module Plottable {
       // HACKHACK: Generic types in type definition fails compilation
       // https://github.com/Microsoft/TypeScript/issues/1616
       export interface TickGenerator<D> {
-        (scale: Plottable.Scales.AbstractQuantitative<D>): D[]
+        (scale: Plottable.QuantitativeScale<D>): D[]
       }
       /**
        * Creates a tick generator using the specified interval.
@@ -22,7 +22,7 @@ module Plottable {
            throw new Error("interval must be positive number");
         }
 
-        return function(s: Scales.AbstractQuantitative<number>) {
+        return function(s: QuantitativeScale<number>) {
           var domain = s.domain();
           var low = Math.min(domain[0], domain[1]);
           var high = Math.max(domain[0], domain[1]);
@@ -45,7 +45,7 @@ module Plottable {
        * @returns {TickGenerator} A tick generator returning only integer ticks.
        */
       export function integerTickGenerator(): TickGenerator<number> {
-        return function(s: Scales.AbstractQuantitative<number>) {
+        return function(s: QuantitativeScale<number>) {
           var defaultTicks = s.getDefaultTicks();
           return defaultTicks.filter((tick, i) => (tick % 1 === 0) || (i === 0) || (i === defaultTicks.length - 1));
         };

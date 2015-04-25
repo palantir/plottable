@@ -1,8 +1,7 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Components {
-  export class AbstractComponent extends Core.PlottableObject {
+  export class Component extends Core.PlottableObject {
     protected _element: D3.Selection;
     protected _content: D3.Selection;
     protected _boundingBox: D3.Selection;
@@ -12,7 +11,7 @@ export module Components {
     private _xOrigin: number; // Origin of the coordinate space for the component. Passed down from parent
     private _yOrigin: number;
 
-    private _parentElement: AbstractComponentContainer;
+    private _parentElement: ComponentContainer;
     private _xAlignProportion = 0; // What % along the free space do we want to position (0 = left, .5 = center, 1 = right)
     private _yAlignProportion = 0;
     protected _fixedHeightFlag = false;
@@ -21,7 +20,7 @@ export module Components {
     protected _isAnchored = false;
 
     private _hitBox: D3.Selection;
-    private _interactionsToRegister: Interactions.AbstractInteraction[] = [];
+    private _interactionsToRegister: Interaction[] = [];
     private _boxes: D3.Selection[] = [];
     private _boxContainer: D3.Selection;
     private _rootSVG: D3.Selection;
@@ -166,7 +165,7 @@ export module Components {
     public _doRender() {/* overwrite */}
 
     public _useLastCalculatedLayout(): boolean;
-    public _useLastCalculatedLayout(useLast: boolean) : AbstractComponent;
+    public _useLastCalculatedLayout(useLast: boolean) : Component;
     public _useLastCalculatedLayout(useLast?: boolean) : any {
       if (useLast == null) {
         return this._usedLastLayout;
@@ -193,7 +192,7 @@ export module Components {
      * @param {String|D3.Selection} element A D3 selection or a selector for getting the element to render into.
      * @returns {Component} The calling component.
      */
-    public renderTo(element: String | D3.Selection): AbstractComponent {
+    public renderTo(element: String | D3.Selection): Component {
       this.detach();
       if (element != null) {
         var selection: D3.Selection;
@@ -226,7 +225,7 @@ export module Components {
      *
      * @returns {Component} The calling component.
      */
-    public redraw(): AbstractComponent {
+    public redraw(): Component {
       this._invalidateLayout();
       return this;
     }
@@ -242,7 +241,7 @@ export module Components {
      * @param {string} alignment The x alignment of the Component (one of ["left", "center", "right"]).
      * @returns {Component} The calling Component.
      */
-    public xAlign(alignment: string): AbstractComponent {
+    public xAlign(alignment: string): Component {
       alignment = alignment.toLowerCase();
       if (alignment === "left") {
         this._xAlignProportion = 0;
@@ -268,7 +267,7 @@ export module Components {
      * @param {string} alignment The x alignment of the Component (one of ["top", "center", "bottom"]).
      * @returns {Component} The calling Component.
      */
-    public yAlign(alignment: string): AbstractComponent {
+    public yAlign(alignment: string): Component {
       alignment = alignment.toLowerCase();
       if (alignment === "top") {
         this._yAlignProportion = 0;
@@ -291,7 +290,7 @@ export module Components {
      * side of the container.
      * @returns {Component} The calling Component.
      */
-    public xOffset(offset: number): AbstractComponent {
+    public xOffset(offset: number): Component {
       this._xOffset = offset;
       this._invalidateLayout();
       return this;
@@ -305,7 +304,7 @@ export module Components {
      * side of the container.
      * @returns {Component} The calling Component.
      */
-    public yOffset(offset: number): AbstractComponent {
+    public yOffset(offset: number): Component {
       this._yOffset = offset;
       this._invalidateLayout();
       return this;
@@ -344,7 +343,7 @@ export module Components {
      * @param {Interaction} interaction The Interaction to attach to the Component.
      * @returns {Component} The calling Component.
      */
-    public registerInteraction(interaction: Interactions.AbstractInteraction) {
+    public registerInteraction(interaction: Interaction) {
       // Interactions can be registered before or after anchoring. If registered before, they are
       // pushed to this._interactionsToRegister and registered during anchoring. If after, they are
       // registered immediately
@@ -372,9 +371,9 @@ export module Components {
      *
      * @param {string} cssClass The CSS class to add or remove.
      * @param {boolean} addClass If true, adds the provided CSS class; otherwise, removes it.
-     * @returns {AbstractComponent} The calling Component.
+     * @returns {Component} The calling Component.
      */
-    public classed(cssClass: string, addClass: boolean): AbstractComponent;
+    public classed(cssClass: string, addClass: boolean): Component;
     public classed(cssClass: string, addClass?: boolean): any {
       if (addClass == null) {
         if (cssClass == null) {
@@ -422,7 +421,7 @@ export module Components {
       return this._fixedHeightFlag;
     }
 
-    public _merge(c: AbstractComponent, below: boolean): Components.Group {
+    public _merge(c: Component, below: boolean): Components.Group {
       var cg: Components.Group;
       if (Plottable.Components.Group.prototype.isPrototypeOf(c)) {
         cg = (<Plottable.Components.Group> c);
@@ -448,7 +447,7 @@ export module Components {
      * @param {Component} c The component to merge in.
      * @returns {ComponentGroup} The relevant ComponentGroup out of the above four cases.
      */
-    public above(c: AbstractComponent): Components.Group {
+    public above(c: Component): Components.Group {
       return this._merge(c, false);
     }
 
@@ -465,7 +464,7 @@ export module Components {
      * @param {Component} c The component to merge in.
      * @returns {ComponentGroup} The relevant ComponentGroup out of the above four cases.
      */
-    public below(c: AbstractComponent): Components.Group {
+    public below(c: Component): Components.Group {
       return this._merge(c, true);
     }
 
@@ -482,7 +481,7 @@ export module Components {
         this._element.remove();
       }
 
-      var parent: AbstractComponentContainer = this._parent();
+      var parent: ComponentContainer = this._parent();
 
       if (parent != null) {
         parent._removeComponent(this);
@@ -492,9 +491,9 @@ export module Components {
       return this;
     }
 
-    public _parent(): AbstractComponentContainer;
-    public _parent(parentElement: AbstractComponentContainer): any;
-    public _parent(parentElement?: AbstractComponentContainer): any {
+    public _parent(): ComponentContainer;
+    public _parent(parentElement: ComponentContainer): any;
+    public _parent(parentElement?: ComponentContainer): any {
       if (parentElement === undefined) {
         return this._parentElement;
       }
@@ -607,5 +606,4 @@ export module Components {
       return this._hitBox;
     }
   }
-}
 }

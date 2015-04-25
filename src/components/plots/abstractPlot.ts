@@ -1,30 +1,33 @@
 ///<reference path="../../reference.ts" />
 
 module Plottable {
-export module Plots {
-  /**
-   * A key that is also coupled with a dataset, a drawer and a metadata in Plot.
-   */
-  export type PlotDatasetKey = {
-    dataset: Dataset;
-    drawer: Drawers.AbstractDrawer;
-    plotMetadata: PlotMetadata;
-    key: string;
+
+  export module Plots {
+
+    /**
+     * A key that is also coupled with a dataset, a drawer and a metadata in Plot.
+     */
+    export type PlotDatasetKey = {
+      dataset: Dataset;
+      drawer: Drawers.AbstractDrawer;
+      plotMetadata: PlotMetadata;
+      key: string;
+    }
+
+    export interface PlotMetadata {
+      datasetKey: string
+    }
+
+    export type PlotData = {
+      data: any[];
+      pixelPoints: Point[];
+      selection: D3.Selection;
+    }
   }
 
-  export interface PlotMetadata {
-    datasetKey: string
-  }
-
-  export type PlotData = {
-    data: any[];
-    pixelPoints: Point[];
-    selection: D3.Selection;
-  }
-
-  export class AbstractPlot extends Components.AbstractComponent {
+  export class Plot extends Component {
     protected _dataChanged = false;
-    protected _key2PlotDatasetKey: D3.Map<PlotDatasetKey>;
+    protected _key2PlotDatasetKey: D3.Map<Plots.PlotDatasetKey>;
     protected _datasetKeysInOrder: string[];
 
     protected _renderArea: D3.Selection;
@@ -91,9 +94,9 @@ export module Plots {
      * @param {Dataset | any[]} dataset dataset to add.
      * @returns {Plot} The calling Plot.
      */
-    public addDataset(dataset: Dataset | any[]): AbstractPlot;
-    public addDataset(key: string, dataset: Dataset | any[]): AbstractPlot;
-    public addDataset(keyOrDataset: any, dataset?: any): AbstractPlot {
+    public addDataset(dataset: Dataset | any[]): Plot;
+    public addDataset(key: string, dataset: Dataset | any[]): Plot;
+    public addDataset(keyOrDataset: any, dataset?: any): Plot {
       if (typeof(keyOrDataset) !== "string" && dataset !== undefined) {
         throw new Error("invalid input to addDataset");
       }
@@ -162,19 +165,19 @@ export module Plots {
      * `d[accessor]` is used. If anything else, use `accessor` as a constant
      * across all data points.
      *
-     * @param {Scale.AbstractScale} scale If provided, the result of the accessor
+     * @param {Scale.Scale} scale If provided, the result of the accessor
      * is passed through the scale, such as `scale.scale(accessor(d, i))`.
      *
      * @returns {Plot} The calling Plot.
      */
-    public attr(attrToSet: string, accessor: any, scale?: Scales.AbstractScale<any, any>) {
+    public attr(attrToSet: string, accessor: any, scale?: Scale<any, any>) {
       return this.project(attrToSet, accessor, scale);
     }
 
     /**
      * Identical to plot.attr
      */
-    public project(attrToSet: string, accessor: any, scale?: Scales.AbstractScale<any, any>) {
+    public project(attrToSet: string, accessor: any, scale?: Scale<any, any>) {
       attrToSet = attrToSet.toLowerCase();
       var currentProjection = this._projections[attrToSet];
       var existingScale = currentProjection && currentProjection.scale;
@@ -202,7 +205,7 @@ export module Plots {
         var projection = this._projections[a];
         var accessor = projection.accessor;
         var scale = projection.scale;
-        var fn = scale ? (d: any, i: number, u: any, m: PlotMetadata) => scale.scale(accessor(d, i, u, m)) : accessor;
+        var fn = scale ? (d: any, i: number, u: any, m: Plots.PlotMetadata) => scale.scale(accessor(d, i, u, m)) : accessor;
         h[a] = fn;
       });
       return h;
@@ -294,7 +297,7 @@ export module Plots {
      * the specified key.
      * @returns {Plot} The calling Plot.
      */
-    public animator(animatorKey: string, animator: Animators.PlotAnimator): AbstractPlot;
+    public animator(animatorKey: string, animator: Animators.PlotAnimator): Plot;
     public animator(animatorKey: string, animator?: Animators.PlotAnimator): any {
       if (animator === undefined){
         return this._animators[animatorKey];
@@ -318,7 +321,7 @@ export module Plots {
      *
      * @returns {Plot} The calling Plot.
      */
-    public datasetOrder(order: string[]): AbstractPlot;
+    public datasetOrder(order: string[]): Plot;
     public datasetOrder(order?: string[]): any {
       if (order === undefined) {
         return this._datasetKeysInOrder;
@@ -344,9 +347,9 @@ export module Plots {
      * If string is inputted, it is interpreted as the dataset key to remove.
      * If Dataset is inputted, the first Dataset in the plot that is the same will be removed.
      * If any[] is inputted, the first data array in the plot that is the same will be removed.
-     * @returns {AbstractPlot} The calling AbstractPlot.
+     * @returns {Plot} The calling Plot.
      */
-    public removeDataset(datasetIdentifier: string | Dataset | any[]): AbstractPlot {
+    public removeDataset(datasetIdentifier: string | Dataset | any[]): Plot {
       var key: string;
       if (typeof datasetIdentifier === "string") {
         key = <string> datasetIdentifier;
@@ -369,7 +372,7 @@ export module Plots {
       return this._removeDataset(key);
     }
 
-    private _removeDataset(key: string): AbstractPlot {
+    private _removeDataset(key: string): Plot {
       if (key != null && this._key2PlotDatasetKey.has(key)) {
         var pdk = this._key2PlotDatasetKey.get(key);
         pdk.drawer.remove();
@@ -419,7 +422,7 @@ export module Plots {
      *
      * @param {string} key The key of new dataset
      */
-    protected _getPlotMetadataForDataset(key: string): PlotMetadata {
+    protected _getPlotMetadataForDataset(key: string): Plots.PlotMetadata {
       return {
         datasetKey: key
       };
@@ -485,7 +488,7 @@ export module Plots {
      * If not provided, all selections will be retrieved.
      * @returns {PlotData} The retrieved PlotData.
      */
-    public getAllPlotData(datasetKeys: string | string[] = this.datasetOrder()): PlotData {
+    public getAllPlotData(datasetKeys: string | string[] = this.datasetOrder()): Plots.PlotData {
       var datasetKeyArray: string[] = [];
       if (typeof(datasetKeys) === "string") {
         datasetKeyArray = [<string> datasetKeys];
@@ -496,7 +499,7 @@ export module Plots {
       return this._getAllPlotData(datasetKeyArray);
     }
 
-    protected _getAllPlotData(datasetKeys: string[]): PlotData {
+    protected _getAllPlotData(datasetKeys: string[]): Plots.PlotData {
       var data: any[] = [];
       var pixelPoints: Point[] = [];
       var allElements: EventTarget[] = [];
@@ -527,7 +530,7 @@ export module Plots {
      *
      * @returns {PlotData} The PlotData closest to queryPoint
      */
-    public getClosestPlotData(queryPoint: Point): PlotData {
+    public getClosestPlotData(queryPoint: Point): Plots.PlotData {
       var closestDistanceSquared = Infinity;
       var closestIndex: number;
       var plotData = this.getAllPlotData();
@@ -560,5 +563,4 @@ export module Plots {
         pixelPoint.x > this.width() || pixelPoint.y > this.height());
     }
   }
-}
 }

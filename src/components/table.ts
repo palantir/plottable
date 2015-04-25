@@ -18,11 +18,11 @@ export module Components {
     wantsHeight         : boolean;
   };
 
-  export class Table extends AbstractComponentContainer {
+  export class Table extends ComponentContainer {
     private _rowPadding = 0;
     private _colPadding = 0;
 
-    private _rows: AbstractComponent[][] = [];
+    private _rows: Component[][] = [];
 
     private _rowWeights: number[] = [];
     private _colWeights: number[] = [];
@@ -46,7 +46,7 @@ export module Components {
      * @param {Component[][]} [rows] A 2-D array of the Components to place in the table.
      * null can be used if a cell is empty. (default = [])
      */
-    constructor(rows: AbstractComponent[][] = []) {
+    constructor(rows: Component[][] = []) {
       super();
       this.classed("table", true);
       rows.forEach((row, rowIndex) => {
@@ -80,7 +80,7 @@ export module Components {
      * @param {Component} component The Component to be added.
      * @returns {Table} The calling Table.
      */
-    public addComponent(row: number, col: number, component: AbstractComponent): Table {
+    public addComponent(row: number, col: number, component: Component): Table {
 
       if (component == null) {
         throw Error("Cannot add null to a table cell");
@@ -102,7 +102,7 @@ export module Components {
       return this;
     }
 
-    public _removeComponent(component: AbstractComponent) {
+    public _removeComponent(component: Component) {
       super._removeComponent(component);
       var rowpos: number;
       var colpos: number;
@@ -148,8 +148,8 @@ export module Components {
       var availableWidthAfterPadding  = availableWidth  - this._colPadding * (this._nCols - 1);
       var availableHeightAfterPadding = availableHeight - this._rowPadding * (this._nRows - 1);
 
-      var rowWeights = Table._calcComponentWeights(this._rowWeights, rows, (c: AbstractComponent) => (c == null) || c._isFixedHeight());
-      var colWeights = Table._calcComponentWeights(this._colWeights,  cols, (c: AbstractComponent) => (c == null) || c._isFixedWidth());
+      var rowWeights = Table._calcComponentWeights(this._rowWeights, rows, (c: Component) => (c == null) || c._isFixedHeight());
+      var colWeights = Table._calcComponentWeights(this._colWeights,  cols, (c: Component) => (c == null) || c._isFixedWidth());
 
       // To give the table a good starting position to iterate from, we give the fixed-width components half-weight
       // so that they will get some initial space allocated to work with
@@ -230,8 +230,8 @@ export module Components {
       var requestedHeights = Utils.Methods.createFilledArray(0, this._nRows);
       var layoutWantsWidth  = Utils.Methods.createFilledArray(false, this._nCols);
       var layoutWantsHeight = Utils.Methods.createFilledArray(false, this._nRows);
-      this._rows.forEach((row: AbstractComponent[], rowIndex: number) => {
-        row.forEach((component: AbstractComponent, colIndex: number) => {
+      this._rows.forEach((row: Component[], rowIndex: number) => {
+        row.forEach((component: Component, colIndex: number) => {
           var spaceRequest: _SpaceRequest;
           if (component != null) {
             spaceRequest = component._requestedSpace(offeredWidths[colIndex], offeredHeights[rowIndex]);
@@ -272,9 +272,9 @@ export module Components {
       var childYOrigin = 0;
       var rowHeights = Utils.Methods.addArrays(layout.rowProportionalSpace, layout.guaranteedHeights);
       var colWidths  = Utils.Methods.addArrays(layout.colProportionalSpace, layout.guaranteedWidths );
-      this._rows.forEach((row: AbstractComponent[], rowIndex: number) => {
+      this._rows.forEach((row: Component[], rowIndex: number) => {
         var childXOrigin = 0;
-        row.forEach((component: AbstractComponent, colIndex: number) => {
+        row.forEach((component: Component, colIndex: number) => {
           // recursively compute layout
           if (component != null) {
             component._computeLayout(childXOrigin, childYOrigin, colWidths[colIndex], rowHeights[rowIndex]);
@@ -348,11 +348,11 @@ export module Components {
 
     public _isFixedWidth(): boolean {
       var cols = d3.transpose(this._rows);
-      return Table._fixedSpace(cols, (c: AbstractComponent) => (c == null) || c._isFixedWidth());
+      return Table._fixedSpace(cols, (c: Component) => (c == null) || c._isFixedWidth());
     }
 
     public _isFixedHeight(): boolean {
-      return Table._fixedSpace(this._rows, (c: AbstractComponent) => (c == null) || c._isFixedHeight());
+      return Table._fixedSpace(this._rows, (c: Component) => (c == null) || c._isFixedHeight());
     }
 
     private _padTableToSize(nRows: number, nCols: number) {
@@ -375,8 +375,8 @@ export module Components {
     }
 
     private static _calcComponentWeights(setWeights: number[],
-                                        componentGroups: AbstractComponent[][],
-                                        fixityAccessor: (c: AbstractComponent) => boolean) {
+                                        componentGroups: Component[][],
+                                        fixityAccessor: (c: Component) => boolean) {
       // If the row/col weight was explicitly set, then return it outright
       // If the weight was not explicitly set, then guess it using the heuristic that if all components are fixed-space
       // then weight is 0, otherwise weight is 1
@@ -399,9 +399,9 @@ export module Components {
       }
     }
 
-    private static _fixedSpace(componentGroup: AbstractComponent[][], fixityAccessor: (c: AbstractComponent) => boolean) {
+    private static _fixedSpace(componentGroup: Component[][], fixityAccessor: (c: Component) => boolean) {
       var all = (bools: boolean[]) => bools.reduce((a, b) => a && b, true);
-      var group_isFixed = (components: AbstractComponent[]) => all(components.map(fixityAccessor));
+      var group_isFixed = (components: Component[]) => all(components.map(fixityAccessor));
       return all(componentGroup.map(group_isFixed));
     }
   }

@@ -3,7 +3,7 @@
 module Plottable {
 export module Interactions {
   enum ClickState {NotClicked, SingleClicked, DoubleClicked};
-  export class DoubleClick extends AbstractInteraction {
+  export class DoubleClick extends Interaction {
 
     private _mouseDispatcher: Plottable.Dispatchers.Mouse;
     private _touchDispatcher: Plottable.Dispatchers.Touch;
@@ -12,7 +12,7 @@ export module Interactions {
     private _clickedDown = false;
     private _clickedPoint: Point;
 
-    public _anchor(component: Components.AbstractComponent, hitBox: D3.Selection) {
+    public _anchor(component: Component, hitBox: D3.Selection) {
       super._anchor(component, hitBox);
 
       this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(<SVGElement> component.content().node());

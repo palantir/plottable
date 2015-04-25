@@ -8,7 +8,7 @@ export module Interactions {
     selection: D3.Selection;
   }
 
-  export interface Hoverable extends Components.AbstractComponent {
+  export interface Hoverable extends Component {
     /**
      * Called when the user first mouses over the Component.
      *
@@ -31,7 +31,7 @@ export module Interactions {
     _doHover(p: Point): HoverData;
   }
 
-  export class Hover extends Interactions.AbstractInteraction {
+  export class Hover extends Interaction {
 
     private static warned = false;
 

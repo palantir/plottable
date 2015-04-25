@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Plots {
-  export class Bar<X, Y> extends AbstractXYPlot<X, Y> implements Interactions.Hoverable {
+  export class Bar<X, Y> extends XYPlot<X, Y> implements Interactions.Hoverable {
     protected static _BarAlignmentToFactor: {[alignment: string]: number} = {"left": 0, "center": 0.5, "right": 1};
     protected static _DEFAULT_WIDTH = 10;
     private static _BAR_WIDTH_RATIO = 0.95;
@@ -25,7 +25,7 @@ export module Plots {
      * @param {Scale} yScale The y scale to use.
      * @param {boolean} isVertical if the plot if vertical.
      */
-    constructor(xScale: Scales.AbstractScale<X, number>, yScale: Scales.AbstractScale<Y, number>, isVertical = true) {
+    constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>, isVertical = true) {
       super(xScale, yScale);
       this.classed("bar-plot", true);
       this._defaultFillColor = new Scales.Color().range()[0];
@@ -271,9 +271,9 @@ export module Plots {
       return bars;
     }
 
-    protected _updateDomainer(scale: Scales.AbstractScale<any, number>) {
-      if (scale instanceof Scales.AbstractQuantitative) {
-        var qscale = <Scales.AbstractQuantitative<any>> scale;
+    protected _updateDomainer(scale: Scale<any, number>) {
+      if (scale instanceof QuantitativeScale) {
+        var qscale = <QuantitativeScale<any>> scale;
         if (!qscale._userSetDomainer) {
           if (this._baselineValue != null) {
             qscale.domainer()
@@ -308,7 +308,7 @@ export module Plots {
     }
 
     protected _additionalPaint(time: number) {
-      var primaryScale: Scales.AbstractScale<any, number> = this._isVertical ? this._yScale : this._xScale;
+      var primaryScale: Scale<any, number> = this._isVertical ? this._yScale : this._xScale;
       var scaledBaseline = primaryScale.scale(this._baselineValue);
 
       var baselineAttr: any = {
@@ -345,7 +345,7 @@ export module Plots {
       var drawSteps: Drawers.DrawStep[] = [];
       if (this._dataChanged && this._animate) {
         var resetAttrToProjector = this._generateAttrToProjector();
-        var primaryScale: Scales.AbstractScale<any, number> = this._isVertical ? this._yScale : this._xScale;
+        var primaryScale: Scale<any, number> = this._isVertical ? this._yScale : this._xScale;
         var scaledBaseline = primaryScale.scale(this._baselineValue);
         var positionAttr = this._isVertical ? "y" : "x";
         var dimensionAttr = this._isVertical ? "height" : "width";
@@ -361,8 +361,8 @@ export module Plots {
       // Primary scale/direction: the "length" of the bars
       // Secondary scale/direction: the "width" of the bars
       var attrToProjector = super._generateAttrToProjector();
-      var primaryScale: Scales.AbstractScale<any, number>    = this._isVertical ? this._yScale : this._xScale;
-      var secondaryScale: Scales.AbstractScale<any, number>  = this._isVertical ? this._xScale : this._yScale;
+      var primaryScale: Scale<any, number>    = this._isVertical ? this._yScale : this._xScale;
+      var secondaryScale: Scale<any, number>  = this._isVertical ? this._xScale : this._yScale;
       var primaryAttr     = this._isVertical ? "y" : "x";
       var secondaryAttr   = this._isVertical ? "x" : "y";
       var scaledBaseline = primaryScale.scale(this._baselineValue);
@@ -414,11 +414,11 @@ export module Plots {
      * If the position scale of the plot is a CategoryScale and in bands mode, then the rangeBands function will be used.
      * If the position scale of the plot is a CategoryScale and in points mode, then
      *   from https://github.com/mbostock/d3/wiki/Ordinal-Scales#ordinal_rangePoints, the max barPixelWidth is step * padding
-     * If the position scale of the plot is a QuantitativeScale, then _getMinimumDataWidth is scaled to compute the barPixelWidth
+     * If the position scale of the plot is a QuantitativeScaleScale, then _getMinimumDataWidth is scaled to compute the barPixelWidth
      */
     protected _getBarPixelWidth(): number {
       var barPixelWidth: number;
-      var barScale: Scales.AbstractScale<any, number>  = this._isVertical ? this._xScale : this._yScale;
+      var barScale: Scale<any, number>  = this._isVertical ? this._xScale : this._yScale;
       if (barScale instanceof Plottable.Scales.Category) {
         barPixelWidth = (<Plottable.Scales.Category> barScale).rangeBand();
       } else {
@@ -570,7 +570,7 @@ export module Plots {
       var plotData = super._getAllPlotData(datasetKeys);
 
       var valueScale = this._isVertical ? this._yScale : this._xScale;
-      var scaledBaseline = (<Scales.AbstractScale<any, any>> (this._isVertical ? this._yScale : this._xScale)).scale(this.baseline());
+      var scaledBaseline = (<Scale<any, any>> (this._isVertical ? this._yScale : this._xScale)).scale(this.baseline());
       var isVertical = this._isVertical;
       var barAlignmentFactor = this._barAlignmentFactor;
 

@@ -10,13 +10,13 @@ describe("Interactions", () => {
     describe("onDblClick generic callback", () => {
       var svg: D3.Selection;
       var dblClickInteraction: Plottable.Interactions.DoubleClick;
-      var component: Plottable.Components.AbstractComponent;
+      var component: Plottable.Component;
       var doubleClickedPoint: Plottable.Point = null;
       var dblClickCallback = (p: Plottable.Point) => doubleClickedPoint = p;
 
       beforeEach(() => {
         svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        component = new Plottable.Components.AbstractComponent();
+        component = new Plottable.Component();
         component.renderTo(svg);
 
         dblClickInteraction = new Plottable.Interactions.DoubleClick();

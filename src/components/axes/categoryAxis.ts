@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Axes {
-  export class Category extends AbstractAxis {
+  export class Category extends Axis {
     private _tickLabelAngle = 0;
     private _measurer: SVGTypewriter.Measurers.CacheCharacterMeasurer;
     private _wrapper: SVGTypewriter.Wrappers.SingleLineWrapper;
@@ -193,7 +193,7 @@ export module Axes {
     public _doRender() {
       super._doRender();
       var catScale = <Scales.Category> this._scale;
-      var tickLabels = this._tickLabelContainer.selectAll("." + AbstractAxis.TICK_LABEL_CLASS).data(this._scale.domain(), (d) => d);
+      var tickLabels = this._tickLabelContainer.selectAll("." + Axis.TICK_LABEL_CLASS).data(this._scale.domain(), (d) => d);
 
       var getTickLabelTransform = (d: string, i: number) => {
         var innerPaddingWidth = catScale.stepWidth() - catScale.rangeBand();
@@ -202,7 +202,7 @@ export module Axes {
         var y = this._isHorizontal() ? 0 : scaledValue;
         return "translate(" + x + "," + y + ")";
       };
-      tickLabels.enter().append("g").classed(AbstractAxis.TICK_LABEL_CLASS, true);
+      tickLabels.enter().append("g").classed(Axis.TICK_LABEL_CLASS, true);
       tickLabels.exit().remove();
       tickLabels.attr("transform", getTickLabelTransform);
       // erase all text first, then rewrite

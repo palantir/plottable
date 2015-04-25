@@ -1,11 +1,10 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Scales {
-  export class AbstractScale<D, R> extends Core.PlottableObject {
+  export class Scale<D, R> extends Core.PlottableObject {
     protected _d3Scale: D3.Scale.Scale;
     private _autoDomainAutomatically = true;
-    public broadcaster: Core.Broadcaster<AbstractScale<D, R>>;
+    public broadcaster: Core.Broadcaster<Scale<D, R>>;
     private _rendererAttrID2Extent: {[rendererAttrID: string]: D[]} = {};
     public _typeCoercer: (d: any) => any = (d: any) => d;
     private _domainModificationInProgress: boolean = false;
@@ -40,7 +39,7 @@ export module Scales {
      * call this function if you want the domain to neccessarily include all
      * the data.
      *
-     * Extent: The [min, max] pair for a Scale.Quantitative, all covered
+     * Extent: The [min, max] pair for a Scale.QuantitativeScale, all covered
      * strings for a Scale.Category.
      *
      * Perspective: A combination of a Dataset and an Accessor that
@@ -81,12 +80,12 @@ export module Scales {
      * Sets the domain.
      *
      * @param {D[]} values If provided, the new value for the domain. On
-     * a QuantitativeScale, this is a [min, max] pair, or a [max, min] pair to
+     * a QuantitativeScaleScale, this is a [min, max] pair, or a [max, min] pair to
      * make the function decreasing. On Scale.Ordinal, this is an array of all
      * input values.
      * @returns {Scale} The calling Scale.
      */
-    public domain(values: D[]): AbstractScale<D, R>;
+    public domain(values: D[]): Scale<D, R>;
     public domain(values?: D[]): any {
       if (values == null) {
         return this._getDomain();
@@ -130,7 +129,7 @@ export module Scales {
      * @param {R[]} values If provided, the new values for the range.
      * @returns {Scale} The calling Scale.
      */
-    public range(values: R[]): AbstractScale<D, R>;
+    public range(values: R[]): Scale<D, R>;
     public range(values?: R[]): any {
       if (values == null) {
         return this._d3Scale.range();
@@ -146,8 +145,8 @@ export module Scales {
      *
      * @returns {Scale} A copy of the calling Scale.
      */
-    public copy(): AbstractScale<D, R> {
-      return new AbstractScale<D, R>(this._d3Scale.copy());
+    public copy(): Scale<D, R> {
+      return new Scale<D, R>(this._d3Scale.copy());
     }
 
     /**
@@ -172,5 +171,4 @@ export module Scales {
       return this;
     }
   }
-}
 }

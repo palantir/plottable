@@ -3,7 +3,7 @@
 var assert = chai.assert;
 
 
-function assertComponentXY(component: Plottable.Components.AbstractComponent, x: number, y: number, message: string) {
+function assertComponentXY(component: Plottable.Component, x: number, y: number, message: string) {
   // use <any> to examine the private variables
   var translate = d3.transform((<any> component)._element.attr("transform")).translate;
   var xActual = translate[0];
@@ -14,12 +14,12 @@ function assertComponentXY(component: Plottable.Components.AbstractComponent, x:
 
 describe("Component behavior", () => {
   var svg: D3.Selection;
-  var c: Plottable.Components.AbstractComponent;
+  var c: Plottable.Component;
   var SVG_WIDTH = 400;
   var SVG_HEIGHT = 300;
   beforeEach(() => {
     svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-    c = new Plottable.Components.AbstractComponent();
+    c = new Plottable.Component();
   });
 
   describe("anchor", () => {
@@ -220,9 +220,9 @@ describe("Component behavior", () => {
 
   it("componentID works as expected", () => {
     var expectedID = (<any> Plottable.Core.PlottableObject)._nextID;
-    var c1 = new Plottable.Components.AbstractComponent();
+    var c1 = new Plottable.Component();
     assert.equal(c1.getID(), expectedID, "component id on next component was as expected");
-    var c2 = new Plottable.Components.AbstractComponent();
+    var c2 = new Plottable.Component();
     assert.equal(c2.getID(), expectedID + 1, "future components increment appropriately");
     svg.remove();
   });
@@ -246,7 +246,7 @@ describe("Component behavior", () => {
   });
 
   it("hitboxes are created iff there are registered interactions that require hitboxes", () => {
-    function verifyHitbox(component: Plottable.Components.AbstractComponent) {
+    function verifyHitbox(component: Plottable.Component) {
       var hitBox = (<any> component)._hitBox;
       assert.isNotNull(hitBox, "the hitbox was created");
       var hitBoxFill = hitBox.style("fill");
@@ -261,8 +261,8 @@ describe("Component behavior", () => {
     svg = generateSVG();
 
     // registration before anchoring
-    c = new Plottable.Components.AbstractComponent();
-    var i = new Plottable.Interactions.AbstractInteraction();
+    c = new Plottable.Component();
+    var i = new Plottable.Interaction();
     i._requiresHitbox = () => true;
     c.registerInteraction(i);
     c._anchor(svg);
@@ -271,9 +271,9 @@ describe("Component behavior", () => {
     svg = generateSVG();
 
     // registration after anchoring
-    c = new Plottable.Components.AbstractComponent();
+    c = new Plottable.Component();
     c._anchor(svg);
-    i = new Plottable.Interactions.AbstractInteraction();
+    i = new Plottable.Interaction();
     i._requiresHitbox = () => true;
     c.registerInteraction(i);
     verifyHitbox(c);
@@ -309,7 +309,7 @@ describe("Component behavior", () => {
   });
 
   it("detach() works as expected", () => {
-    var c1 = new Plottable.Components.AbstractComponent();
+    var c1 = new Plottable.Component();
 
     c1.renderTo(svg);
     assert.isTrue(svg.node().hasChildNodes(), "the svg has children");
@@ -320,7 +320,7 @@ describe("Component behavior", () => {
   });
 
   it("can't reuse component if it's been remove()-ed", () => {
-    var c1 = new Plottable.Components.AbstractComponent();
+    var c1 = new Plottable.Component();
     c1.renderTo(svg);
     c1.remove();
 
@@ -343,17 +343,17 @@ describe("Component behavior", () => {
   });
 
   it("components can be detached even if not anchored", () => {
-    var c = new Plottable.Components.AbstractComponent();
+    var c = new Plottable.Component();
     c.detach(); // no error thrown
     svg.remove();
   });
 
   it("component remains in own cell", () => {
-    var horizontalComponent = new Plottable.Components.AbstractComponent();
-    var verticalComponent = new Plottable.Components.AbstractComponent();
-    var placeHolder = new Plottable.Components.AbstractComponent();
+    var horizontalComponent = new Plottable.Component();
+    var verticalComponent = new Plottable.Component();
+    var placeHolder = new Plottable.Component();
     var t = new Plottable.Components.Table().addComponent(0, 0, verticalComponent)
-                                 .addComponent(0, 1, new Plottable.Components.AbstractComponent())
+                                 .addComponent(0, 1, new Plottable.Component())
                                  .addComponent(1, 0, placeHolder)
                                  .addComponent(1, 1, horizontalComponent);
     t.renderTo(svg);
@@ -369,7 +369,7 @@ describe("Component behavior", () => {
 
   it("Components will not translate if they are fixed width/height and request more space than offered", () => {
     // catches #1188
-    var c: any = new Plottable.Components.AbstractComponent();
+    var c: any = new Plottable.Component();
     c._requestedSpace = () => { return {width: 500, height: 500, wantsWidth: true, wantsHeight: true}; };
     c._fixedWidthFlag = true;
     c._fixedHeightFlag = true;
@@ -384,7 +384,7 @@ describe("Component behavior", () => {
 
   it("components do not render unless allocated space", () => {
     var renderFlag = false;
-    var c: any = new Plottable.Components.AbstractComponent();
+    var c: any = new Plottable.Component();
     c._doRender = () => renderFlag = true;
     c._anchor(svg);
     c._setup();

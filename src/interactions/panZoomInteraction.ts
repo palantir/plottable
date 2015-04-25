@@ -2,11 +2,11 @@
 
 module Plottable {
 export module Interactions {
-  export class PanZoom extends AbstractInteraction {
+  export class PanZoom extends Interaction {
 
     private _zoom: D3.Behavior.Zoom;
-    private _xScale: Scales.AbstractQuantitative<any>;
-    private _yScale: Scales.AbstractQuantitative<any>;
+    private _xScale: QuantitativeScale<any>;
+    private _yScale: QuantitativeScale<any>;
 
     /**
      * Creates a PanZoomInteraction.
@@ -15,10 +15,10 @@ export module Interactions {
      * does so by changing the xScale and yScales' domains repeatedly.
      *
      * @constructor
-     * @param {QuantitativeScale} [xScale] The X scale to update on panning/zooming.
-     * @param {QuantitativeScale} [yScale] The Y scale to update on panning/zooming.
+     * @param {QuantitativeScaleScale} [xScale] The X scale to update on panning/zooming.
+     * @param {QuantitativeScaleScale} [yScale] The Y scale to update on panning/zooming.
      */
-    constructor(xScale?: Scales.AbstractQuantitative<any>, yScale?: Scales.AbstractQuantitative<any>) {
+    constructor(xScale?: QuantitativeScale<any>, yScale?: QuantitativeScale<any>) {
       super();
       if (xScale) {
         this._xScale = xScale;
@@ -48,7 +48,7 @@ export module Interactions {
       this._zoom(this._hitBox);
     }
 
-    public _anchor(component: Components.AbstractComponent, hitBox: D3.Selection) {
+    public _anchor(component: Component, hitBox: D3.Selection) {
       super._anchor(component, hitBox);
       this.resetZoom();
     }

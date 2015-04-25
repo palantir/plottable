@@ -57,7 +57,7 @@ describe("Interactions", () => {
       var yScale = new Plottable.Scales.Linear();
 
       var svg = generateSVG();
-      var c = new Plottable.Components.AbstractComponent();
+      var c = new Plottable.Component();
       c.renderTo(svg);
 
       var pzi = new Plottable.Interactions.PanZoom(xScale, yScale);
@@ -80,7 +80,7 @@ describe("Interactions", () => {
   describe("KeyInteraction", () => {
     it("Triggers appropriate callback for the key pressed", () => {
       var svg = generateSVG(400, 400);
-      var component = new Plottable.Components.AbstractComponent();
+      var component = new Plottable.Component();
       component.renderTo(svg);
 
       var ki = new Plottable.Interactions.Key();

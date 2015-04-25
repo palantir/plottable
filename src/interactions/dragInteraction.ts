@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Interactions {
-  export class Drag extends AbstractInteraction {
+  export class Drag extends Interaction {
     private _dragging = false;
     private _constrain = true;
     private _mouseDispatchers: Plottable.Dispatchers.Mouse;
@@ -12,7 +12,7 @@ export module Interactions {
     private _dragCallback: (start: Point, end: Point) => any;
     private _dragEndCallback: (start: Point, end: Point) => any;
 
-    public _anchor(component: Components.AbstractComponent, hitBox: D3.Selection) {
+    public _anchor(component: Component, hitBox: D3.Selection) {
       super._anchor(component, hitBox);
       this._mouseDispatchers = Dispatchers.Mouse.getDispatcher(<SVGElement> this._componentToListenTo.content().node());
       this._mouseDispatchers.onMouseDown("Interactions.Drag" + this.getID(),

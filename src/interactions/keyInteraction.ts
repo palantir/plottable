@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Interactions {
-  export class Key extends AbstractInteraction {
+  export class Key extends Interaction {
     /**
      * KeyInteraction listens to key events that occur while the Component is
      * moused over.
@@ -11,7 +11,7 @@ export module Interactions {
     private _keyDispatcher: Plottable.Dispatchers.Key;
     private _keyCode2Callback: { [keyCode: string]: () => void; } = {};
 
-    public _anchor(component: Components.AbstractComponent, hitBox: D3.Selection) {
+    public _anchor(component: Component, hitBox: D3.Selection) {
       super._anchor(component, hitBox);
 
       this._positionDispatcher = Dispatchers.Mouse.getDispatcher(

@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Components {
-  export class InterpolatedColorLegend extends AbstractComponent {
+  export class InterpolatedColorLegend extends Component {
     private _measurer: SVGTypewriter.Measurers.Measurer;
     private _wrapper: SVGTypewriter.Wrappers.Wrapper;
     private _writer: SVGTypewriter.Writers.Writer;

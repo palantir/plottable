@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Interactions {
-  export class Pointer extends Interactions.AbstractInteraction {
+  export class Pointer extends Interaction {
     private _mouseDispatcher: Dispatchers.Mouse;
     private _touchDispatcher: Dispatchers.Touch;
     private _overComponent = false;
@@ -10,7 +10,7 @@ export module Interactions {
     private _pointerMoveCallback: (p: Point) => any;
     private _pointerExitCallback: (p: Point) => any;
 
-    public _anchor(component: Components.AbstractComponent, hitBox: D3.Selection) {
+    public _anchor(component: Component, hitBox: D3.Selection) {
       super._anchor(component, hitBox);
       this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(<SVGElement> this._componentToListenTo.content().node());
       this._mouseDispatcher.onMouseMove("Interaction.Pointer" + this.getID(), (p: Point) => this._handlePointerEvent(p));

@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Components {
-  export class Label extends AbstractComponent {
+  export class Label extends Component {
     private _textContainer: D3.Selection;
     private _text: string; // text assigned to the Label; may not be the actual text displayed due to truncation
     private _orientation: string;
