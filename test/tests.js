@@ -9027,9 +9027,9 @@ describe("Interactions", function () {
 ///<reference path="../testReference.ts" />
 var assert = chai.assert;
 describe("Dispatchers", function () {
-    describe("AbstractDispatcher", function () {
+    describe("Dispatcher", function () {
         it("_connect() and _disconnect()", function () {
-            var dispatcher = new Plottable.Dispatchers.AbstractDispatcher();
+            var dispatcher = new Plottable.Dispatcher();
             var callbackCalls = 0;
             dispatcher._event2Callback["click"] = function () { return callbackCalls++; };
             var d3document = d3.select(document);
@@ -9046,7 +9046,7 @@ describe("Dispatchers", function () {
             assert.strictEqual(callbackCalls, 0, "disconnected correctly (callback not called)");
         });
         it("won't _disconnect() if broadcasters still have listeners", function () {
-            var dispatcher = new Plottable.Dispatchers.AbstractDispatcher();
+            var dispatcher = new Plottable.Dispatcher();
             var callbackWasCalled = false;
             dispatcher._event2Callback["click"] = function () { return callbackWasCalled = true; };
             var b = new Plottable.Core.Broadcaster(dispatcher);
@@ -9068,7 +9068,7 @@ describe("Dispatchers", function () {
             assert.isFalse(callbackWasCalled, "disconnected when broadcaster had no listeners");
         });
         it("_setCallback()", function () {
-            var dispatcher = new Plottable.Dispatchers.AbstractDispatcher();
+            var dispatcher = new Plottable.Dispatcher();
             var b = new Plottable.Core.Broadcaster(dispatcher);
             var key = "unit test";
             var callbackWasCalled = false;

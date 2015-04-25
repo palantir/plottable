@@ -3534,18 +3534,16 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Dispatchers {
-        class AbstractDispatcher extends Core.PlottableObject {
-            protected _event2Callback: {
-                [eventName: string]: (e: Event) => any;
-            };
-            protected _broadcasters: Core.Broadcaster<AbstractDispatcher>[];
-            /**
-             * Creates a wrapped version of the callback that can be registered to a Broadcaster
-             */
-            protected _getWrappedCallback(callback: Function): Core.BroadcasterCallback<AbstractDispatcher>;
-            protected _setCallback(b: Core.Broadcaster<AbstractDispatcher>, key: any, callback: Function): void;
-        }
+    class Dispatcher extends Core.PlottableObject {
+        protected _event2Callback: {
+            [eventName: string]: (e: Event) => any;
+        };
+        protected _broadcasters: Core.Broadcaster<Dispatcher>[];
+        /**
+         * Creates a wrapped version of the callback that can be registered to a Broadcaster
+         */
+        protected _getWrappedCallback(callback: Function): Core.BroadcasterCallback<Dispatcher>;
+        protected _setCallback(b: Core.Broadcaster<Dispatcher>, key: any, callback: Function): void;
     }
 }
 
@@ -3553,7 +3551,7 @@ declare module Plottable {
 declare module Plottable {
     module Dispatchers {
         type MouseCallback = (p: Point, e: MouseEvent) => any;
-        class Mouse extends AbstractDispatcher {
+        class Mouse extends Dispatcher {
             /**
              * Get a Dispatcher.Mouse for the <svg> containing elem. If one already exists
              * on that <svg>, it will be returned; otherwise, a new one will be created.
@@ -3649,7 +3647,7 @@ declare module Plottable {
         type TouchCallback = (ids: number[], idToPoint: {
             [id: number]: Point;
         }, e: TouchEvent) => any;
-        class Touch extends AbstractDispatcher {
+        class Touch extends Dispatcher {
             /**
              * Get a Dispatcher.Touch for the <svg> containing elem. If one already exists
              * on that <svg>, it will be returned; otherwise, a new one will be created.
@@ -3710,7 +3708,7 @@ declare module Plottable {
 declare module Plottable {
     module Dispatchers {
         type KeyCallback = (keyCode: number, e: KeyboardEvent) => any;
-        class Key extends AbstractDispatcher {
+        class Key extends Dispatcher {
             /**
              * Get a Dispatcher.Key. If one already exists it will be returned;
              * otherwise, a new one will be created.

@@ -4,7 +4,7 @@ module Plottable {
 export module Dispatchers {
   export type TouchCallback = (ids: number[], idToPoint: { [id: number]: Point; }, e: TouchEvent) => any;
 
-  export class Touch extends AbstractDispatcher {
+  export class Touch extends Dispatcher {
     /**
      * Dispatcher.Touch calls callbacks when touch events occur.
      * It reports the (x, y) position of the first Touch relative to the

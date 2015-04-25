@@ -9082,59 +9082,56 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
-    var Dispatchers;
-    (function (Dispatchers) {
-        var AbstractDispatcher = (function (_super) {
-            __extends(AbstractDispatcher, _super);
-            function AbstractDispatcher() {
-                _super.apply(this, arguments);
-                this._event2Callback = {};
-                this._broadcasters = [];
+    var Dispatcher = (function (_super) {
+        __extends(Dispatcher, _super);
+        function Dispatcher() {
+            _super.apply(this, arguments);
+            this._event2Callback = {};
+            this._broadcasters = [];
+            this._connected = false;
+        }
+        Dispatcher.prototype._hasNoListeners = function () {
+            return this._broadcasters.every(function (b) { return b.getListenerKeys().length === 0; });
+        };
+        Dispatcher.prototype._connect = function () {
+            var _this = this;
+            if (!this._connected) {
+                Object.keys(this._event2Callback).forEach(function (event) {
+                    var callback = _this._event2Callback[event];
+                    document.addEventListener(event, callback);
+                });
+                this._connected = true;
+            }
+        };
+        Dispatcher.prototype._disconnect = function () {
+            var _this = this;
+            if (this._connected && this._hasNoListeners()) {
+                Object.keys(this._event2Callback).forEach(function (event) {
+                    var callback = _this._event2Callback[event];
+                    document.removeEventListener(event, callback);
+                });
                 this._connected = false;
             }
-            AbstractDispatcher.prototype._hasNoListeners = function () {
-                return this._broadcasters.every(function (b) { return b.getListenerKeys().length === 0; });
-            };
-            AbstractDispatcher.prototype._connect = function () {
-                var _this = this;
-                if (!this._connected) {
-                    Object.keys(this._event2Callback).forEach(function (event) {
-                        var callback = _this._event2Callback[event];
-                        document.addEventListener(event, callback);
-                    });
-                    this._connected = true;
-                }
-            };
-            AbstractDispatcher.prototype._disconnect = function () {
-                var _this = this;
-                if (this._connected && this._hasNoListeners()) {
-                    Object.keys(this._event2Callback).forEach(function (event) {
-                        var callback = _this._event2Callback[event];
-                        document.removeEventListener(event, callback);
-                    });
-                    this._connected = false;
-                }
-            };
-            /**
-             * Creates a wrapped version of the callback that can be registered to a Broadcaster
-             */
-            AbstractDispatcher.prototype._getWrappedCallback = function (callback) {
-                return function () { return callback(); };
-            };
-            AbstractDispatcher.prototype._setCallback = function (b, key, callback) {
-                if (callback === null) {
-                    b.deregisterListener(key);
-                    this._disconnect();
-                }
-                else {
-                    this._connect();
-                    b.registerListener(key, this._getWrappedCallback(callback));
-                }
-            };
-            return AbstractDispatcher;
-        })(Plottable.Core.PlottableObject);
-        Dispatchers.AbstractDispatcher = AbstractDispatcher;
-    })(Dispatchers = Plottable.Dispatchers || (Plottable.Dispatchers = {}));
+        };
+        /**
+         * Creates a wrapped version of the callback that can be registered to a Broadcaster
+         */
+        Dispatcher.prototype._getWrappedCallback = function (callback) {
+            return function () { return callback(); };
+        };
+        Dispatcher.prototype._setCallback = function (b, key, callback) {
+            if (callback === null) {
+                b.deregisterListener(key);
+                this._disconnect();
+            }
+            else {
+                this._connect();
+                b.registerListener(key, this._getWrappedCallback(callback));
+            }
+        };
+        return Dispatcher;
+    })(Plottable.Core.PlottableObject);
+    Plottable.Dispatcher = Dispatcher;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -9291,7 +9288,7 @@ var Plottable;
             };
             Mouse._DISPATCHER_KEY = "__Plottable_Dispatcher_Mouse";
             return Mouse;
-        })(Dispatchers.AbstractDispatcher);
+        })(Plottable.Dispatcher);
         Dispatchers.Mouse = Mouse;
     })(Dispatchers = Plottable.Dispatchers || (Plottable.Dispatchers = {}));
 })(Plottable || (Plottable = {}));
@@ -9420,7 +9417,7 @@ var Plottable;
              */
             Touch._DISPATCHER_KEY = "__Plottable_Dispatcher_Touch";
             return Touch;
-        })(Dispatchers.AbstractDispatcher);
+        })(Plottable.Dispatcher);
         Dispatchers.Touch = Touch;
     })(Dispatchers = Plottable.Dispatchers || (Plottable.Dispatchers = {}));
 })(Plottable || (Plottable = {}));
@@ -9486,7 +9483,7 @@ var Plottable;
             };
             Key._DISPATCHER_KEY = "__Plottable_Dispatcher_Key";
             return Key;
-        })(Dispatchers.AbstractDispatcher);
+        })(Plottable.Dispatcher);
         Dispatchers.Key = Key;
     })(Dispatchers = Plottable.Dispatchers || (Plottable.Dispatchers = {}));
 })(Plottable || (Plottable = {}));

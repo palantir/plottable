@@ -1,10 +1,9 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Dispatchers {
-  export class AbstractDispatcher extends Core.PlottableObject {
+  export class Dispatcher extends Core.PlottableObject {
     protected _event2Callback: { [eventName: string]: (e: Event) => any; } = {};
-    protected _broadcasters: Core.Broadcaster<AbstractDispatcher>[] = [];
+    protected _broadcasters: Core.Broadcaster<Dispatcher>[] = [];
     private _connected = false;
 
     private _hasNoListeners() {
@@ -34,11 +33,11 @@ export module Dispatchers {
     /**
      * Creates a wrapped version of the callback that can be registered to a Broadcaster
      */
-    protected _getWrappedCallback(callback: Function): Core.BroadcasterCallback<AbstractDispatcher> {
+    protected _getWrappedCallback(callback: Function): Core.BroadcasterCallback<Dispatcher> {
       return () => callback();
     }
 
-    protected _setCallback(b: Core.Broadcaster<AbstractDispatcher>, key: any, callback: Function) {
+    protected _setCallback(b: Core.Broadcaster<Dispatcher>, key: any, callback: Function) {
       if (callback === null) { // remove listener if callback is null
         b.deregisterListener(key);
         this._disconnect();
@@ -48,5 +47,4 @@ export module Dispatchers {
       }
     }
   }
-}
 }

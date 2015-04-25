@@ -4,7 +4,7 @@ module Plottable {
 export module Dispatchers {
   export type KeyCallback = (keyCode: number, e: KeyboardEvent) => any;
 
-  export class Key extends AbstractDispatcher {
+  export class Key extends Dispatcher {
     private static _DISPATCHER_KEY = "__Plottable_Dispatcher_Key";
     private _keydownBroadcaster: Core.Broadcaster<Dispatchers.Key>;
 
