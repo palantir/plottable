@@ -1,12 +1,11 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Components {
   /*
    * An abstract ComponentContainer class to encapsulate Table and ComponentGroup's shared functionality.
    * It will not do anything if instantiated directly.
    */
-  export class AbstractComponentContainer extends Component {
+  export class ComponentContainer extends Component {
     private _components: Component[] = [];
 
     public _anchor(element: D3.Selection) {
@@ -89,5 +88,4 @@ export module Components {
       return super._useLastCalculatedLayout(calculated);
     }
   }
-}
 }

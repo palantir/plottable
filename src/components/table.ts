@@ -18,7 +18,7 @@ export module Components {
     wantsHeight         : boolean;
   };
 
-  export class Table extends AbstractComponentContainer {
+  export class Table extends ComponentContainer {
     private _rowPadding = 0;
     private _colPadding = 0;
 

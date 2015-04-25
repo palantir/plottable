@@ -5972,7 +5972,7 @@ describe("Metadata", function () {
 var assert = chai.assert;
 describe("ComponentContainer", function () {
     it("_addComponent()", function () {
-        var container = new Plottable.Components.AbstractComponentContainer();
+        var container = new Plottable.ComponentContainer();
         var c1 = new Plottable.Component();
         var c2 = new Plottable.Component();
         var c3 = new Plottable.Component();
@@ -5988,7 +5988,7 @@ describe("ComponentContainer", function () {
         assert.deepEqual(container.components(), [c3, c1, c2], "component list was unchanged");
     });
     it("_removeComponent()", function () {
-        var container = new Plottable.Components.AbstractComponentContainer();
+        var container = new Plottable.ComponentContainer();
         var c1 = new Plottable.Component();
         var c2 = new Plottable.Component();
         container._addComponent(c1);
@@ -5999,14 +5999,14 @@ describe("ComponentContainer", function () {
         assert.deepEqual(container.components(), [c1], "there are no side effects from removing already-removed components");
     });
     it("empty()", function () {
-        var container = new Plottable.Components.AbstractComponentContainer();
+        var container = new Plottable.ComponentContainer();
         assert.isTrue(container.empty());
         var c1 = new Plottable.Component();
         container._addComponent(c1);
         assert.isFalse(container.empty());
     });
     it("detachAll()", function () {
-        var container = new Plottable.Components.AbstractComponentContainer();
+        var container = new Plottable.ComponentContainer();
         var c1 = new Plottable.Component();
         var c2 = new Plottable.Component();
         container._addComponent(c1);
@@ -6170,8 +6170,8 @@ describe("ComponentGroups", function () {
         });
         it("can move components to other groups after anchoring", function () {
             var svg = generateSVG();
-            var cg1 = new Plottable.Components.AbstractComponentContainer();
-            var cg2 = new Plottable.Components.AbstractComponentContainer();
+            var cg1 = new Plottable.ComponentContainer();
+            var cg2 = new Plottable.ComponentContainer();
             var c = new Plottable.Component();
             cg1._addComponent(c);
             cg1.renderTo(svg);
@@ -6186,7 +6186,7 @@ describe("ComponentGroups", function () {
             svg.remove();
         });
         it("can add null to a component without failing", function () {
-            var cg1 = new Plottable.Components.AbstractComponentContainer();
+            var cg1 = new Plottable.ComponentContainer();
             var c = new Plottable.Component;
             cg1._addComponent(c);
             assert.strictEqual(cg1.components().length, 1, "there should first be 1 element in the group");

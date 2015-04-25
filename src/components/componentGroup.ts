@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Components {
-  export class Group extends AbstractComponentContainer {
+  export class Group extends ComponentContainer {
 
     /**
      * Constructs a Component.Group.

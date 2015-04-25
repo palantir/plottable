@@ -1730,8 +1730,8 @@ declare module Plottable {
          * @returns The calling Component.
          */
         detach(): Component;
-        _parent(): Components.AbstractComponentContainer;
-        _parent(parentElement: Components.AbstractComponentContainer): any;
+        _parent(): ComponentContainer;
+        _parent(parentElement: ComponentContainer): any;
         /**
          * Removes a Component from the DOM and disconnects it from everything it's
          * listening to (effectively destroying it).
@@ -1802,42 +1802,40 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Components {
-        class AbstractComponentContainer extends Component {
-            _anchor(element: D3.Selection): void;
-            _render(): void;
-            _removeComponent(c: Component): void;
-            _addComponent(c: Component, prepend?: boolean): boolean;
-            /**
-             * Returns a list of components in the ComponentContainer.
-             *
-             * @returns {Component[]} the contained Components
-             */
-            components(): Component[];
-            /**
-             * Returns true iff the ComponentContainer is empty.
-             *
-             * @returns {boolean} Whether the calling ComponentContainer is empty.
-             */
-            empty(): boolean;
-            /**
-             * Detaches all components contained in the ComponentContainer, and
-             * empties the ComponentContainer.
-             *
-             * @returns {ComponentContainer} The calling ComponentContainer
-             */
-            detachAll(): AbstractComponentContainer;
-            remove(): void;
-            _useLastCalculatedLayout(): boolean;
-            _useLastCalculatedLayout(calculated: boolean): Component;
-        }
+    class ComponentContainer extends Component {
+        _anchor(element: D3.Selection): void;
+        _render(): void;
+        _removeComponent(c: Component): void;
+        _addComponent(c: Component, prepend?: boolean): boolean;
+        /**
+         * Returns a list of components in the ComponentContainer.
+         *
+         * @returns {Component[]} the contained Components
+         */
+        components(): Component[];
+        /**
+         * Returns true iff the ComponentContainer is empty.
+         *
+         * @returns {boolean} Whether the calling ComponentContainer is empty.
+         */
+        empty(): boolean;
+        /**
+         * Detaches all components contained in the ComponentContainer, and
+         * empties the ComponentContainer.
+         *
+         * @returns {ComponentContainer} The calling ComponentContainer
+         */
+        detachAll(): ComponentContainer;
+        remove(): void;
+        _useLastCalculatedLayout(): boolean;
+        _useLastCalculatedLayout(calculated: boolean): Component;
     }
 }
 
 
 declare module Plottable {
     module Components {
-        class Group extends AbstractComponentContainer {
+        class Group extends ComponentContainer {
             /**
              * Constructs a Component.Group.
              *
@@ -2476,7 +2474,7 @@ declare module Plottable {
             wantsWidth: boolean;
             wantsHeight: boolean;
         };
-        class Table extends AbstractComponentContainer {
+        class Table extends ComponentContainer {
             /**
              * Constructs a Table.
              *

@@ -189,8 +189,8 @@ describe("ComponentGroups", () => {
     it("can move components to other groups after anchoring", () => {
       var svg = generateSVG();
 
-      var cg1 = new Plottable.Components.AbstractComponentContainer();
-      var cg2 = new Plottable.Components.AbstractComponentContainer();
+      var cg1 = new Plottable.ComponentContainer();
+      var cg2 = new Plottable.ComponentContainer();
       var c = new Plottable.Component();
 
       cg1._addComponent(c);
@@ -226,7 +226,7 @@ describe("ComponentGroups", () => {
     });
 
     it("can add null to a component without failing", () => {
-      var cg1 = new Plottable.Components.AbstractComponentContainer();
+      var cg1 = new Plottable.ComponentContainer();
       var c = new Plottable.Component;
 
       cg1._addComponent(c);

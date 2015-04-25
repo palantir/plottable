@@ -6,7 +6,7 @@ var assert = chai.assert;
 describe("ComponentContainer", () => {
 
   it("_addComponent()", () => {
-    var container = new Plottable.Components.AbstractComponentContainer();
+    var container = new Plottable.ComponentContainer();
     var c1 = new Plottable.Component();
     var c2 = new Plottable.Component();
     var c3 = new Plottable.Component();
@@ -28,7 +28,7 @@ describe("ComponentContainer", () => {
   });
 
   it("_removeComponent()", () => {
-    var container = new Plottable.Components.AbstractComponentContainer();
+    var container = new Plottable.ComponentContainer();
     var c1 = new Plottable.Component();
     var c2 = new Plottable.Component();
     container._addComponent(c1);
@@ -43,7 +43,7 @@ describe("ComponentContainer", () => {
   });
 
   it("empty()", () => {
-    var container = new Plottable.Components.AbstractComponentContainer();
+    var container = new Plottable.ComponentContainer();
     assert.isTrue(container.empty());
     var c1 = new Plottable.Component();
     container._addComponent(c1);
@@ -51,7 +51,7 @@ describe("ComponentContainer", () => {
   });
 
   it("detachAll()", () => {
-    var container = new Plottable.Components.AbstractComponentContainer();
+    var container = new Plottable.ComponentContainer();
     var c1 = new Plottable.Component();
     var c2 = new Plottable.Component();
     container._addComponent(c1);

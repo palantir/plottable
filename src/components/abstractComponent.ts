@@ -11,7 +11,7 @@ module Plottable {
     private _xOrigin: number; // Origin of the coordinate space for the component. Passed down from parent
     private _yOrigin: number;
 
-    private _parentElement: Components.AbstractComponentContainer;
+    private _parentElement: ComponentContainer;
     private _xAlignProportion = 0; // What % along the free space do we want to position (0 = left, .5 = center, 1 = right)
     private _yAlignProportion = 0;
     protected _fixedHeightFlag = false;
@@ -481,7 +481,7 @@ module Plottable {
         this._element.remove();
       }
 
-      var parent: Components.AbstractComponentContainer = this._parent();
+      var parent: ComponentContainer = this._parent();
 
       if (parent != null) {
         parent._removeComponent(this);
@@ -491,9 +491,9 @@ module Plottable {
       return this;
     }
 
-    public _parent(): Components.AbstractComponentContainer;
-    public _parent(parentElement: Components.AbstractComponentContainer): any;
-    public _parent(parentElement?: Components.AbstractComponentContainer): any {
+    public _parent(): ComponentContainer;
+    public _parent(parentElement: ComponentContainer): any;
+    public _parent(parentElement?: ComponentContainer): any {
       if (parentElement === undefined) {
         return this._parentElement;
       }
