@@ -1,8 +1,7 @@
 ///<reference path="../../reference.ts" />
 
 module Plottable {
-export module Plots {
-  export class AbstractXYPlot<X, Y> extends Plot {
+  export class XYPlot<X, Y> extends Plot {
     protected _xScale: Scale<X, number>;
     protected _yScale: Scale<Y, number>;
     private _autoAdjustXScaleDomain = false;
@@ -81,9 +80,9 @@ export module Plots {
      * If autoAdjustment is true adjustment is immediately performend.
      *
      * @param {boolean} autoAdjustment The new value for the automatic adjustment domain for y scale.
-     * @returns {AbstractXYPlot} The calling AbstractXYPlot.
+     * @returns {XYPlot} The calling XYPlot.
      */
-    public automaticallyAdjustYScaleOverVisiblePoints(autoAdjustment: boolean): AbstractXYPlot<X, Y> {
+    public automaticallyAdjustYScaleOverVisiblePoints(autoAdjustment: boolean): XYPlot<X, Y> {
       this._autoAdjustYScaleDomain = autoAdjustment;
       this._adjustYDomainOnChangeFromX();
       return this;
@@ -95,9 +94,9 @@ export module Plots {
      * If autoAdjustment is true adjustment is immediately performend.
      *
      * @param {boolean} autoAdjustment The new value for the automatic adjustment domain for x scale.
-     * @returns {AbstractXYPlot} The calling AbstractXYPlot.
+     * @returns {XYPlot} The calling XYPlot.
      */
-    public automaticallyAdjustXScaleOverVisiblePoints(autoAdjustment: boolean): AbstractXYPlot<X, Y>  {
+    public automaticallyAdjustXScaleOverVisiblePoints(autoAdjustment: boolean): XYPlot<X, Y>  {
       this._autoAdjustXScaleDomain = autoAdjustment;
       this._adjustXDomainOnChangeFromY();
       return this;
@@ -107,7 +106,7 @@ export module Plots {
       var attrToProjector: AttributeToProjector = super._generateAttrToProjector();
       var positionXFn = attrToProjector["x"];
       var positionYFn = attrToProjector["y"];
-      attrToProjector["defined"] = (d: any, i: number, u: any, m: PlotMetadata) => {
+      attrToProjector["defined"] = (d: any, i: number, u: any, m: Plots.PlotMetadata) => {
         var positionX = positionXFn(d, i, u, m);
         var positionY = positionYFn(d, i, u, m);
         return positionX != null && positionX === positionX &&
@@ -195,8 +194,8 @@ export module Plots {
     }
 
     protected _normalizeDatasets<A, B>(fromX: boolean): {a: A; b: B}[] {
-      var aAccessor: (d: any, i: number, u: any, m: PlotMetadata) => A = this._projections[fromX ? "x" : "y"].accessor;
-      var bAccessor: (d: any, i: number, u: any, m: PlotMetadata) => B = this._projections[fromX ? "y" : "x"].accessor;
+      var aAccessor: (d: any, i: number, u: any, m: Plots.PlotMetadata) => A = this._projections[fromX ? "x" : "y"].accessor;
+      var bAccessor: (d: any, i: number, u: any, m: Plots.PlotMetadata) => B = this._projections[fromX ? "y" : "x"].accessor;
       return Utils.Methods.flatten(this._datasetKeysInOrder.map((key: string) => {
         var dataset = this._key2PlotDatasetKey.get(key).dataset;
         var plotMetadata = this._key2PlotDatasetKey.get(key).plotMetadata;
@@ -219,5 +218,4 @@ export module Plots {
       return this._projections["x"] && this._projections["y"];
     }
   }
-}
 }

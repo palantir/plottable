@@ -496,7 +496,7 @@ describe("Plots", () => {
     var xAccessor: any;
     var yAccessor: any;
     var simpleDataset: Plottable.Dataset;
-    var plot: Plottable.Plots.AbstractXYPlot<number, number>;
+    var plot: Plottable.XYPlot<number, number>;
 
     before(() => {
       xAccessor = (d: any, i: number, u: any) => d.a + u.foo;
@@ -508,7 +508,7 @@ describe("Plots", () => {
       simpleDataset = new Plottable.Dataset([{a: -5, b: 6}, {a: -2, b: 2}, {a: 2, b: -2}, {a: 5, b: -6}], {foo: 0});
       xScale = new Plottable.Scales.Linear();
       yScale = new Plottable.Scales.Linear();
-      plot = new Plottable.Plots.AbstractXYPlot(xScale, yScale);
+      plot = new Plottable.XYPlot(xScale, yScale);
       plot.addDataset(simpleDataset)
           .project("x", xAccessor, xScale)
           .project("y", yAccessor, yScale)
@@ -564,12 +564,12 @@ describe("Plots", () => {
     it("no cycle in auto domain on plot", () => {
       var zScale = new Plottable.Scales.Linear().domain([-10, 10]);
       plot.automaticallyAdjustYScaleOverVisiblePoints(true);
-      var plot2 = new Plottable.Plots.AbstractXYPlot(zScale, yScale)
+      var plot2 = new Plottable.XYPlot(zScale, yScale)
                                     .automaticallyAdjustXScaleOverVisiblePoints(true)
                                     .project("x", xAccessor, zScale)
                                     .project("y", yAccessor, yScale)
                                     .addDataset(simpleDataset);
-      var plot3 = new Plottable.Plots.AbstractXYPlot(zScale, xScale)
+      var plot3 = new Plottable.XYPlot(zScale, xScale)
                                     .automaticallyAdjustYScaleOverVisiblePoints(true)
                                     .project("x", xAccessor, zScale)
                                     .project("y", yAccessor, xScale)

@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Plots {
-  export class Bar<X, Y> extends AbstractXYPlot<X, Y> implements Interactions.Hoverable {
+  export class Bar<X, Y> extends XYPlot<X, Y> implements Interactions.Hoverable {
     protected static _BarAlignmentToFactor: {[alignment: string]: number} = {"left": 0, "center": 0.5, "right": 1};
     protected static _DEFAULT_WIDTH = 10;
     private static _BAR_WIDTH_RATIO = 0.95;

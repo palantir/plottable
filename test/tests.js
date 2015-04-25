@@ -2532,7 +2532,7 @@ describe("Plots", function () {
             simpleDataset = new Plottable.Dataset([{ a: -5, b: 6 }, { a: -2, b: 2 }, { a: 2, b: -2 }, { a: 5, b: -6 }], { foo: 0 });
             xScale = new Plottable.Scales.Linear();
             yScale = new Plottable.Scales.Linear();
-            plot = new Plottable.Plots.AbstractXYPlot(xScale, yScale);
+            plot = new Plottable.XYPlot(xScale, yScale);
             plot.addDataset(simpleDataset).project("x", xAccessor, xScale).project("y", yAccessor, yScale).renderTo(svg);
         });
         it("plot auto domain scale to visible points", function () {
@@ -2579,8 +2579,8 @@ describe("Plots", function () {
         it("no cycle in auto domain on plot", function () {
             var zScale = new Plottable.Scales.Linear().domain([-10, 10]);
             plot.automaticallyAdjustYScaleOverVisiblePoints(true);
-            var plot2 = new Plottable.Plots.AbstractXYPlot(zScale, yScale).automaticallyAdjustXScaleOverVisiblePoints(true).project("x", xAccessor, zScale).project("y", yAccessor, yScale).addDataset(simpleDataset);
-            var plot3 = new Plottable.Plots.AbstractXYPlot(zScale, xScale).automaticallyAdjustYScaleOverVisiblePoints(true).project("x", xAccessor, zScale).project("y", yAccessor, xScale).addDataset(simpleDataset);
+            var plot2 = new Plottable.XYPlot(zScale, yScale).automaticallyAdjustXScaleOverVisiblePoints(true).project("x", xAccessor, zScale).project("y", yAccessor, yScale).addDataset(simpleDataset);
+            var plot3 = new Plottable.XYPlot(zScale, xScale).automaticallyAdjustYScaleOverVisiblePoints(true).project("x", xAccessor, zScale).project("y", yAccessor, xScale).addDataset(simpleDataset);
             plot2.renderTo(svg);
             plot3.renderTo(svg);
             xScale.domain([-2, 2]);

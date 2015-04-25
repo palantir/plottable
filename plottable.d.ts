@@ -2829,73 +2829,71 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Plots {
-        class AbstractXYPlot<X, Y> extends Plot {
-            protected _xScale: Scale<X, number>;
-            protected _yScale: Scale<Y, number>;
-            /**
-             * Constructs an XYPlot.
-             *
-             * An XYPlot is a plot from drawing 2-dimensional data. Common examples
-             * include Scale.Line and Scale.Bar.
-             *
-             * @constructor
-             * @param {any[]|Dataset} [dataset] The data or Dataset to be associated with this Renderer.
-             * @param {Scale} xScale The x scale to use.
-             * @param {Scale} yScale The y scale to use.
-             */
-            constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>);
-            /**
-             * @param {string} attrToSet One of ["x", "y"] which determines the point's
-             * x and y position in the Plot.
-             */
-            project(attrToSet: string, accessor: any, scale?: Scale<any, any>): AbstractXYPlot<X, Y>;
-            remove(): AbstractXYPlot<X, Y>;
-            /**
-             * Sets the automatic domain adjustment over visible points for y scale.
-             *
-             * If autoAdjustment is true adjustment is immediately performend.
-             *
-             * @param {boolean} autoAdjustment The new value for the automatic adjustment domain for y scale.
-             * @returns {AbstractXYPlot} The calling AbstractXYPlot.
-             */
-            automaticallyAdjustYScaleOverVisiblePoints(autoAdjustment: boolean): AbstractXYPlot<X, Y>;
-            /**
-             * Sets the automatic domain adjustment over visible points for x scale.
-             *
-             * If autoAdjustment is true adjustment is immediately performend.
-             *
-             * @param {boolean} autoAdjustment The new value for the automatic adjustment domain for x scale.
-             * @returns {AbstractXYPlot} The calling AbstractXYPlot.
-             */
-            automaticallyAdjustXScaleOverVisiblePoints(autoAdjustment: boolean): AbstractXYPlot<X, Y>;
-            protected _generateAttrToProjector(): AttributeToProjector;
-            _computeLayout(offeredXOrigin?: number, offeredYOffset?: number, availableWidth?: number, availableHeight?: number): void;
-            protected _updateXDomainer(): void;
-            protected _updateYDomainer(): void;
-            /**
-             * Adjusts both domains' extents to show all datasets.
-             *
-             * This call does not override auto domain adjustment behavior over visible points.
-             */
-            showAllData(): void;
-            protected _normalizeDatasets<A, B>(fromX: boolean): {
-                a: A;
-                b: B;
-            }[];
-            protected _projectorsReady(): {
-                accessor: (datum: any, index?: number, userMetadata?: any, plotMetadata?: PlotMetadata) => any;
-                scale?: Scale<any, any>;
-                attribute: string;
-            };
-        }
+    class XYPlot<X, Y> extends Plot {
+        protected _xScale: Scale<X, number>;
+        protected _yScale: Scale<Y, number>;
+        /**
+         * Constructs an XYPlot.
+         *
+         * An XYPlot is a plot from drawing 2-dimensional data. Common examples
+         * include Scale.Line and Scale.Bar.
+         *
+         * @constructor
+         * @param {any[]|Dataset} [dataset] The data or Dataset to be associated with this Renderer.
+         * @param {Scale} xScale The x scale to use.
+         * @param {Scale} yScale The y scale to use.
+         */
+        constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>);
+        /**
+         * @param {string} attrToSet One of ["x", "y"] which determines the point's
+         * x and y position in the Plot.
+         */
+        project(attrToSet: string, accessor: any, scale?: Scale<any, any>): XYPlot<X, Y>;
+        remove(): XYPlot<X, Y>;
+        /**
+         * Sets the automatic domain adjustment over visible points for y scale.
+         *
+         * If autoAdjustment is true adjustment is immediately performend.
+         *
+         * @param {boolean} autoAdjustment The new value for the automatic adjustment domain for y scale.
+         * @returns {XYPlot} The calling XYPlot.
+         */
+        automaticallyAdjustYScaleOverVisiblePoints(autoAdjustment: boolean): XYPlot<X, Y>;
+        /**
+         * Sets the automatic domain adjustment over visible points for x scale.
+         *
+         * If autoAdjustment is true adjustment is immediately performend.
+         *
+         * @param {boolean} autoAdjustment The new value for the automatic adjustment domain for x scale.
+         * @returns {XYPlot} The calling XYPlot.
+         */
+        automaticallyAdjustXScaleOverVisiblePoints(autoAdjustment: boolean): XYPlot<X, Y>;
+        protected _generateAttrToProjector(): AttributeToProjector;
+        _computeLayout(offeredXOrigin?: number, offeredYOffset?: number, availableWidth?: number, availableHeight?: number): void;
+        protected _updateXDomainer(): void;
+        protected _updateYDomainer(): void;
+        /**
+         * Adjusts both domains' extents to show all datasets.
+         *
+         * This call does not override auto domain adjustment behavior over visible points.
+         */
+        showAllData(): void;
+        protected _normalizeDatasets<A, B>(fromX: boolean): {
+            a: A;
+            b: B;
+        }[];
+        protected _projectorsReady(): {
+            accessor: (datum: any, index?: number, userMetadata?: any, plotMetadata?: Plots.PlotMetadata) => any;
+            scale?: Scale<any, any>;
+            attribute: string;
+        };
     }
 }
 
 
 declare module Plottable {
     module Plots {
-        class Rectangle<X, Y> extends AbstractXYPlot<X, Y> {
+        class Rectangle<X, Y> extends XYPlot<X, Y> {
             /**
              * Constructs a RectanglePlot.
              *
@@ -2920,7 +2918,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Plots {
-        class Scatter<X, Y> extends AbstractXYPlot<X, Y> implements Interactions.Hoverable {
+        class Scatter<X, Y> extends XYPlot<X, Y> implements Interactions.Hoverable {
             /**
              * Constructs a ScatterPlot.
              *
@@ -2975,7 +2973,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Plots {
-        class Bar<X, Y> extends AbstractXYPlot<X, Y> implements Interactions.Hoverable {
+        class Bar<X, Y> extends XYPlot<X, Y> implements Interactions.Hoverable {
             protected static _BarAlignmentToFactor: {
                 [alignment: string]: number;
             };
@@ -3109,7 +3107,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Plots {
-        class Line<X> extends AbstractXYPlot<X, number> implements Interactions.Hoverable {
+        class Line<X> extends XYPlot<X, number> implements Interactions.Hoverable {
             protected _yScale: Scales.AbstractQuantitative<number>;
             /**
              * Constructs a LinePlot.
@@ -3222,7 +3220,7 @@ declare module Plottable {
             value: number;
             offset?: number;
         };
-        class AbstractStacked<X, Y> extends AbstractXYPlot<X, Y> {
+        class AbstractStacked<X, Y> extends XYPlot<X, Y> {
             protected _isVertical: boolean;
             _getPlotMetadataForDataset(key: string): StackedPlotMetadata;
             project(attrToSet: string, accessor: any, scale?: Scale<any, any>): AbstractStacked<X, Y>;

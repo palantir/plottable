@@ -12,7 +12,7 @@ export module Plots {
     offset?: number;
   }
 
-  export class AbstractStacked<X, Y> extends AbstractXYPlot<X, Y> {
+  export class AbstractStacked<X, Y> extends XYPlot<X, Y> {
     private _stackedExtent = [0, 0];
     protected _isVertical: boolean;
 

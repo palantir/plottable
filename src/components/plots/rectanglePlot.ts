@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Plots {
-  export class Rectangle<X, Y> extends AbstractXYPlot<X, Y> {
+  export class Rectangle<X, Y> extends XYPlot<X, Y> {
     private _defaultFillColor: string;
 
     /**
