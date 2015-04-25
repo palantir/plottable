@@ -401,8 +401,8 @@ declare module Plottable {
              * @constructor
              * @param {Scale[]} scales A list of scales whose domains should be linked.
              */
-            constructor(scales: Scales.AbstractScale<D, any>[]);
-            rescale(scale: Scales.AbstractScale<D, any>): void;
+            constructor(scales: Scale<D, any>[]);
+            rescale(scale: Scale<D, any>): void;
         }
     }
 }
@@ -678,7 +678,7 @@ declare module Plottable {
      */
     type _Projection = {
         accessor: _Accessor;
-        scale?: Scales.AbstractScale<any, any>;
+        scale?: Scale<any, any>;
         attribute: string;
     };
     /**
@@ -836,115 +836,113 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Scales {
-        class AbstractScale<D, R> extends Core.PlottableObject {
-            protected _d3Scale: D3.Scale.Scale;
-            broadcaster: Core.Broadcaster<AbstractScale<D, R>>;
-            _typeCoercer: (d: any) => any;
-            /**
-             * Constructs a new Scale.
-             *
-             * A Scale is a wrapper around a D3.Scale.Scale. A Scale is really just a
-             * function. Scales have a domain (input), a range (output), and a function
-             * from domain to range.
-             *
-             * @constructor
-             * @param {D3.Scale.Scale} scale The D3 scale backing the Scale.
-             */
-            constructor(scale: D3.Scale.Scale);
-            protected _getAllExtents(): D[][];
-            protected _getExtent(): D[];
-            /**
-             * Modifies the domain on the scale so that it includes the extent of all
-             * perspectives it depends on. This will normally happen automatically, but
-             * if you set domain explicitly with `plot.domain(x)`, you will need to
-             * call this function if you want the domain to neccessarily include all
-             * the data.
-             *
-             * Extent: The [min, max] pair for a Scale.Quantitative, all covered
-             * strings for a Scale.Category.
-             *
-             * Perspective: A combination of a Dataset and an Accessor that
-             * represents a view in to the data.
-             *
-             * @returns {Scale} The calling Scale.
-             */
-            autoDomain(): AbstractScale<D, R>;
-            _autoDomainIfAutomaticMode(): void;
-            /**
-             * Computes the range value corresponding to a given domain value. In other
-             * words, apply the function to value.
-             *
-             * @param {R} value A domain value to be scaled.
-             * @returns {R} The range value corresponding to the supplied domain value.
-             */
-            scale(value: D): R;
-            /**
-             * Gets the domain.
-             *
-             * @returns {D[]} The current domain.
-             */
-            domain(): D[];
-            /**
-             * Sets the domain.
-             *
-             * @param {D[]} values If provided, the new value for the domain. On
-             * a QuantitativeScale, this is a [min, max] pair, or a [max, min] pair to
-             * make the function decreasing. On Scale.Ordinal, this is an array of all
-             * input values.
-             * @returns {Scale} The calling Scale.
-             */
-            domain(values: D[]): AbstractScale<D, R>;
-            protected _getDomain(): any[];
-            protected _setDomain(values: D[]): void;
-            /**
-             * Gets the range.
-             *
-             * In the case of having a numeric range, it will be a [min, max] pair. In
-             * the case of string range (e.g. Scale.InterpolatedColor), it will be a
-             * list of all possible outputs.
-             *
-             * @returns {R[]} The current range.
-             */
-            range(): R[];
-            /**
-             * Sets the range.
-             *
-             * In the case of having a numeric range, it will be a [min, max] pair. In
-             * the case of string range (e.g. Scale.InterpolatedColor), it will be a
-             * list of all possible outputs.
-             *
-             * @param {R[]} values If provided, the new values for the range.
-             * @returns {Scale} The calling Scale.
-             */
-            range(values: R[]): AbstractScale<D, R>;
-            /**
-             * Constructs a copy of the Scale with the same domain and range but without
-             * any registered listeners.
-             *
-             * @returns {Scale} A copy of the calling Scale.
-             */
-            copy(): AbstractScale<D, R>;
-            /**
-             * When a renderer determines that the extent of a projector has changed,
-             * it will call this function. This function should ensure that
-             * the scale has a domain at least large enough to include extent.
-             *
-             * @param {number} rendererID A unique indentifier of the renderer sending
-             *                 the new extent.
-             * @param {string} attr The attribute being projected, e.g. "x", "y0", "r"
-             * @param {D[]} extent The new extent to be included in the scale.
-             */
-            _updateExtent(plotProvidedKey: string, attr: string, extent: D[]): AbstractScale<D, R>;
-            _removeExtent(plotProvidedKey: string, attr: string): AbstractScale<D, R>;
-        }
+    class Scale<D, R> extends Core.PlottableObject {
+        protected _d3Scale: D3.Scale.Scale;
+        broadcaster: Core.Broadcaster<Scale<D, R>>;
+        _typeCoercer: (d: any) => any;
+        /**
+         * Constructs a new Scale.
+         *
+         * A Scale is a wrapper around a D3.Scale.Scale. A Scale is really just a
+         * function. Scales have a domain (input), a range (output), and a function
+         * from domain to range.
+         *
+         * @constructor
+         * @param {D3.Scale.Scale} scale The D3 scale backing the Scale.
+         */
+        constructor(scale: D3.Scale.Scale);
+        protected _getAllExtents(): D[][];
+        protected _getExtent(): D[];
+        /**
+         * Modifies the domain on the scale so that it includes the extent of all
+         * perspectives it depends on. This will normally happen automatically, but
+         * if you set domain explicitly with `plot.domain(x)`, you will need to
+         * call this function if you want the domain to neccessarily include all
+         * the data.
+         *
+         * Extent: The [min, max] pair for a Scale.Quantitative, all covered
+         * strings for a Scale.Category.
+         *
+         * Perspective: A combination of a Dataset and an Accessor that
+         * represents a view in to the data.
+         *
+         * @returns {Scale} The calling Scale.
+         */
+        autoDomain(): Scale<D, R>;
+        _autoDomainIfAutomaticMode(): void;
+        /**
+         * Computes the range value corresponding to a given domain value. In other
+         * words, apply the function to value.
+         *
+         * @param {R} value A domain value to be scaled.
+         * @returns {R} The range value corresponding to the supplied domain value.
+         */
+        scale(value: D): R;
+        /**
+         * Gets the domain.
+         *
+         * @returns {D[]} The current domain.
+         */
+        domain(): D[];
+        /**
+         * Sets the domain.
+         *
+         * @param {D[]} values If provided, the new value for the domain. On
+         * a QuantitativeScale, this is a [min, max] pair, or a [max, min] pair to
+         * make the function decreasing. On Scale.Ordinal, this is an array of all
+         * input values.
+         * @returns {Scale} The calling Scale.
+         */
+        domain(values: D[]): Scale<D, R>;
+        protected _getDomain(): any[];
+        protected _setDomain(values: D[]): void;
+        /**
+         * Gets the range.
+         *
+         * In the case of having a numeric range, it will be a [min, max] pair. In
+         * the case of string range (e.g. Scale.InterpolatedColor), it will be a
+         * list of all possible outputs.
+         *
+         * @returns {R[]} The current range.
+         */
+        range(): R[];
+        /**
+         * Sets the range.
+         *
+         * In the case of having a numeric range, it will be a [min, max] pair. In
+         * the case of string range (e.g. Scale.InterpolatedColor), it will be a
+         * list of all possible outputs.
+         *
+         * @param {R[]} values If provided, the new values for the range.
+         * @returns {Scale} The calling Scale.
+         */
+        range(values: R[]): Scale<D, R>;
+        /**
+         * Constructs a copy of the Scale with the same domain and range but without
+         * any registered listeners.
+         *
+         * @returns {Scale} A copy of the calling Scale.
+         */
+        copy(): Scale<D, R>;
+        /**
+         * When a renderer determines that the extent of a projector has changed,
+         * it will call this function. This function should ensure that
+         * the scale has a domain at least large enough to include extent.
+         *
+         * @param {number} rendererID A unique indentifier of the renderer sending
+         *                 the new extent.
+         * @param {string} attr The attribute being projected, e.g. "x", "y0", "r"
+         * @param {D[]} extent The new extent to be included in the scale.
+         */
+        _updateExtent(plotProvidedKey: string, attr: string, extent: D[]): Scale<D, R>;
+        _removeExtent(plotProvidedKey: string, attr: string): Scale<D, R>;
     }
 }
 
 
 declare module Plottable {
     module Scales {
-        class AbstractQuantitative<D> extends AbstractScale<D, number> {
+        class AbstractQuantitative<D> extends Scale<D, number> {
             protected _d3Scale: D3.Scale.QuantitativeScale;
             _userSetDomainer: boolean;
             _typeCoercer: (d: any) => number;
@@ -1183,7 +1181,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Scales {
-        class Category extends AbstractScale<string, number> {
+        class Category extends Scale<string, number> {
             protected _d3Scale: D3.Scale.OrdinalScale;
             _typeCoercer: (d: any) => any;
             /**
@@ -1261,7 +1259,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Scales {
-        class Color extends AbstractScale<string, string> {
+        class Color extends Scale<string, string> {
             /**
              * Constructs a ColorScale.
              *
@@ -1310,7 +1308,7 @@ declare module Plottable {
          *
          * By default it generates a linear scale internally.
          */
-        class InterpolatedColor extends AbstractScale<number, string> {
+        class InterpolatedColor extends Scale<number, string> {
             /**
              * Constructs an InterpolatedColorScale.
              *
@@ -1886,7 +1884,7 @@ declare module Plottable {
             protected _tickMarkContainer: D3.Selection;
             protected _tickLabelContainer: D3.Selection;
             protected _baseline: D3.Selection;
-            protected _scale: Scales.AbstractScale<any, number>;
+            protected _scale: Scale<any, number>;
             protected _computedWidth: number;
             protected _computedHeight: number;
             /**
@@ -1900,7 +1898,7 @@ declare module Plottable {
              * @param {Formatter} Data is passed through this formatter before being
              * displayed.
              */
-            constructor(scale: Scales.AbstractScale<any, number>, orientation: string, formatter?: (d: any) => string);
+            constructor(scale: Scale<any, number>, orientation: string, formatter?: (d: any) => string);
             remove(): void;
             protected _isHorizontal(): boolean;
             protected _computeWidth(): number;
@@ -2693,16 +2691,16 @@ declare module Plottable {
              * `d[accessor]` is used. If anything else, use `accessor` as a constant
              * across all data points.
              *
-             * @param {Scale.AbstractScale} scale If provided, the result of the accessor
+             * @param {Scale.Scale} scale If provided, the result of the accessor
              * is passed through the scale, such as `scale.scale(accessor(d, i))`.
              *
              * @returns {Plot} The calling Plot.
              */
-            attr(attrToSet: string, accessor: any, scale?: Scales.AbstractScale<any, any>): AbstractPlot;
+            attr(attrToSet: string, accessor: any, scale?: Scale<any, any>): AbstractPlot;
             /**
              * Identical to plot.attr
              */
-            project(attrToSet: string, accessor: any, scale?: Scales.AbstractScale<any, any>): AbstractPlot;
+            project(attrToSet: string, accessor: any, scale?: Scale<any, any>): AbstractPlot;
             protected _generateAttrToProjector(): AttributeToProjector;
             /**
              * Generates a dictionary mapping an attribute to a function that calculate that attribute's value
@@ -2835,8 +2833,8 @@ declare module Plottable {
 declare module Plottable {
     module Plots {
         class AbstractXYPlot<X, Y> extends AbstractPlot {
-            protected _xScale: Scales.AbstractScale<X, number>;
-            protected _yScale: Scales.AbstractScale<Y, number>;
+            protected _xScale: Scale<X, number>;
+            protected _yScale: Scale<Y, number>;
             /**
              * Constructs an XYPlot.
              *
@@ -2848,12 +2846,12 @@ declare module Plottable {
              * @param {Scale} xScale The x scale to use.
              * @param {Scale} yScale The y scale to use.
              */
-            constructor(xScale: Scales.AbstractScale<X, number>, yScale: Scales.AbstractScale<Y, number>);
+            constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>);
             /**
              * @param {string} attrToSet One of ["x", "y"] which determines the point's
              * x and y position in the Plot.
              */
-            project(attrToSet: string, accessor: any, scale?: Scales.AbstractScale<any, any>): AbstractXYPlot<X, Y>;
+            project(attrToSet: string, accessor: any, scale?: Scale<any, any>): AbstractXYPlot<X, Y>;
             remove(): AbstractXYPlot<X, Y>;
             /**
              * Sets the automatic domain adjustment over visible points for y scale.
@@ -2889,7 +2887,7 @@ declare module Plottable {
             }[];
             protected _projectorsReady(): {
                 accessor: (datum: any, index?: number, userMetadata?: any, plotMetadata?: PlotMetadata) => any;
-                scale?: Scales.AbstractScale<any, any>;
+                scale?: Scale<any, any>;
                 attribute: string;
             };
         }
@@ -2908,10 +2906,10 @@ declare module Plottable {
              * as well as the bottom and top bounds (y1 and y2 respectively)
              *
              * @constructor
-             * @param {Scale.AbstractScale} xScale The x scale to use.
-             * @param {Scale.AbstractScale} yScale The y scale to use.
+             * @param {Scale.Scale} xScale The x scale to use.
+             * @param {Scale.Scale} yScale The y scale to use.
              */
-            constructor(xScale: Scales.AbstractScale<X, any>, yScale: Scales.AbstractScale<Y, any>);
+            constructor(xScale: Scale<X, any>, yScale: Scale<Y, any>);
             protected _getDrawer(key: string): Drawers.Rect;
             protected _generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
@@ -2932,7 +2930,7 @@ declare module Plottable {
              * @param {Scale} xScale The x scale to use.
              * @param {Scale} yScale The y scale to use.
              */
-            constructor(xScale: Scales.AbstractScale<X, number>, yScale: Scales.AbstractScale<Y, number>);
+            constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>);
             protected _getDrawer(key: string): Drawers.Symbol;
             protected _generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
@@ -2958,19 +2956,19 @@ declare module Plottable {
              * grid, and the datum can control what color it is.
              *
              * @constructor
-             * @param {Scale.AbstractScale} xScale The x scale to use.
-             * @param {Scale.AbstractScale} yScale The y scale to use.
+             * @param {Scale.Scale} xScale The x scale to use.
+             * @param {Scale.Scale} yScale The y scale to use.
              * @param {Scale.Color|Scale.InterpolatedColor} colorScale The color scale
              * to use for each grid cell.
              */
-            constructor(xScale: Scales.AbstractScale<any, any>, yScale: Scales.AbstractScale<any, any>, colorScale: Scales.AbstractScale<any, string>);
+            constructor(xScale: Scale<any, any>, yScale: Scale<any, any>, colorScale: Scale<any, string>);
             addDataset(keyOrDataset: any, dataset?: any): Grid;
             protected _getDrawer(key: string): Drawers.Rect;
             /**
              * @param {string} attrToSet One of ["x", "y", "x2", "y2", "fill"]. If "fill" is used,
              * the data should return a valid CSS color.
              */
-            project(attrToSet: string, accessor: any, scale?: Scales.AbstractScale<any, any>): Grid;
+            project(attrToSet: string, accessor: any, scale?: Scale<any, any>): Grid;
             protected _generateDrawSteps(): Drawers.DrawStep[];
         }
     }
@@ -2993,7 +2991,7 @@ declare module Plottable {
              * @param {Scale} yScale The y scale to use.
              * @param {boolean} isVertical if the plot if vertical.
              */
-            constructor(xScale: Scales.AbstractScale<X, number>, yScale: Scales.AbstractScale<Y, number>, isVertical?: boolean);
+            constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>, isVertical?: boolean);
             protected _getDrawer(key: string): Drawers.Rect;
             protected _setup(): void;
             /**
@@ -3072,7 +3070,7 @@ declare module Plottable {
              * @returns {D3.Selection} The selected bar, or null if no bar was selected.
              */
             getBars(xValOrExtent: number | Extent, yValOrExtent: number | Extent): D3.Selection;
-            protected _updateDomainer(scale: Scales.AbstractScale<any, number>): void;
+            protected _updateDomainer(scale: Scale<any, number>): void;
             protected _updateYDomainer(): void;
             protected _updateXDomainer(): void;
             protected _additionalPaint(time: number): void;
@@ -3176,7 +3174,7 @@ declare module Plottable {
             protected _onDatasetUpdate(): void;
             protected _getDrawer(key: string): Drawers.Area;
             protected _updateYDomainer(): void;
-            project(attrToSet: string, accessor: any, scale?: Scales.AbstractScale<any, any>): Area<X>;
+            project(attrToSet: string, accessor: any, scale?: Scale<any, any>): Area<X>;
             protected _getResetYFunction(): (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
             protected _wholeDatumAttributes(): string[];
             protected _generateAttrToProjector(): {
@@ -3205,7 +3203,7 @@ declare module Plottable {
              * @param {Scale} yScale The y scale to use.
              * @param {boolean} isVertical if the plot if vertical.
              */
-            constructor(xScale: Scales.AbstractScale<X, number>, yScale: Scales.AbstractScale<Y, number>, isVertical?: boolean);
+            constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>, isVertical?: boolean);
             protected _generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
             };
@@ -3229,7 +3227,7 @@ declare module Plottable {
         class AbstractStacked<X, Y> extends AbstractXYPlot<X, Y> {
             protected _isVertical: boolean;
             _getPlotMetadataForDataset(key: string): StackedPlotMetadata;
-            project(attrToSet: string, accessor: any, scale?: Scales.AbstractScale<any, any>): AbstractStacked<X, Y>;
+            project(attrToSet: string, accessor: any, scale?: Scale<any, any>): AbstractStacked<X, Y>;
             _onDatasetUpdate(): void;
             _updateStackOffsets(): void;
             _updateStackExtents(): void;
@@ -3273,7 +3271,7 @@ declare module Plottable {
             protected _setup(): void;
             protected _additionalPaint(): void;
             protected _updateYDomainer(): void;
-            project(attrToSet: string, accessor: any, scale?: Scales.AbstractScale<any, any>): StackedArea<X>;
+            project(attrToSet: string, accessor: any, scale?: Scale<any, any>): StackedArea<X>;
             protected _onDatasetUpdate(): StackedArea<X>;
             protected _generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
@@ -3310,13 +3308,13 @@ declare module Plottable {
              * @param {Scale} yScale the y scale of the plot.
              * @param {boolean} isVertical if the plot if vertical.
              */
-            constructor(xScale?: Scales.AbstractScale<X, number>, yScale?: Scales.AbstractScale<Y, number>, isVertical?: boolean);
+            constructor(xScale?: Scale<X, number>, yScale?: Scale<Y, number>, isVertical?: boolean);
             protected _getAnimator(key: string): Animators.PlotAnimator;
             protected _generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
             };
             protected _generateDrawSteps(): Drawers.DrawStep[];
-            project(attrToSet: string, accessor: any, scale?: Scales.AbstractScale<any, any>): StackedBar<X, Y>;
+            project(attrToSet: string, accessor: any, scale?: Scale<any, any>): StackedBar<X, Y>;
             protected _onDatasetUpdate(): StackedBar<X, Y>;
             protected _getPlotMetadataForDataset(key: string): StackedPlotMetadata;
             protected _normalizeDatasets<A, B>(fromX: boolean): {

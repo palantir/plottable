@@ -1680,133 +1680,130 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
-    var Scales;
-    (function (Scales) {
-        var AbstractScale = (function (_super) {
-            __extends(AbstractScale, _super);
-            /**
-             * Constructs a new Scale.
-             *
-             * A Scale is a wrapper around a D3.Scale.Scale. A Scale is really just a
-             * function. Scales have a domain (input), a range (output), and a function
-             * from domain to range.
-             *
-             * @constructor
-             * @param {D3.Scale.Scale} scale The D3 scale backing the Scale.
-             */
-            function AbstractScale(scale) {
-                _super.call(this);
-                this._autoDomainAutomatically = true;
-                this._rendererAttrID2Extent = {};
-                this._typeCoercer = function (d) { return d; };
-                this._domainModificationInProgress = false;
-                this._d3Scale = scale;
-                this.broadcaster = new Plottable.Core.Broadcaster(this);
+    var Scale = (function (_super) {
+        __extends(Scale, _super);
+        /**
+         * Constructs a new Scale.
+         *
+         * A Scale is a wrapper around a D3.Scale.Scale. A Scale is really just a
+         * function. Scales have a domain (input), a range (output), and a function
+         * from domain to range.
+         *
+         * @constructor
+         * @param {D3.Scale.Scale} scale The D3 scale backing the Scale.
+         */
+        function Scale(scale) {
+            _super.call(this);
+            this._autoDomainAutomatically = true;
+            this._rendererAttrID2Extent = {};
+            this._typeCoercer = function (d) { return d; };
+            this._domainModificationInProgress = false;
+            this._d3Scale = scale;
+            this.broadcaster = new Plottable.Core.Broadcaster(this);
+        }
+        Scale.prototype._getAllExtents = function () {
+            return d3.values(this._rendererAttrID2Extent);
+        };
+        Scale.prototype._getExtent = function () {
+            return []; // this should be overwritten
+        };
+        /**
+         * Modifies the domain on the scale so that it includes the extent of all
+         * perspectives it depends on. This will normally happen automatically, but
+         * if you set domain explicitly with `plot.domain(x)`, you will need to
+         * call this function if you want the domain to neccessarily include all
+         * the data.
+         *
+         * Extent: The [min, max] pair for a Scale.Quantitative, all covered
+         * strings for a Scale.Category.
+         *
+         * Perspective: A combination of a Dataset and an Accessor that
+         * represents a view in to the data.
+         *
+         * @returns {Scale} The calling Scale.
+         */
+        Scale.prototype.autoDomain = function () {
+            this._autoDomainAutomatically = true;
+            this._setDomain(this._getExtent());
+            return this;
+        };
+        Scale.prototype._autoDomainIfAutomaticMode = function () {
+            if (this._autoDomainAutomatically) {
+                this.autoDomain();
             }
-            AbstractScale.prototype._getAllExtents = function () {
-                return d3.values(this._rendererAttrID2Extent);
-            };
-            AbstractScale.prototype._getExtent = function () {
-                return []; // this should be overwritten
-            };
-            /**
-             * Modifies the domain on the scale so that it includes the extent of all
-             * perspectives it depends on. This will normally happen automatically, but
-             * if you set domain explicitly with `plot.domain(x)`, you will need to
-             * call this function if you want the domain to neccessarily include all
-             * the data.
-             *
-             * Extent: The [min, max] pair for a Scale.Quantitative, all covered
-             * strings for a Scale.Category.
-             *
-             * Perspective: A combination of a Dataset and an Accessor that
-             * represents a view in to the data.
-             *
-             * @returns {Scale} The calling Scale.
-             */
-            AbstractScale.prototype.autoDomain = function () {
-                this._autoDomainAutomatically = true;
-                this._setDomain(this._getExtent());
+        };
+        /**
+         * Computes the range value corresponding to a given domain value. In other
+         * words, apply the function to value.
+         *
+         * @param {R} value A domain value to be scaled.
+         * @returns {R} The range value corresponding to the supplied domain value.
+         */
+        Scale.prototype.scale = function (value) {
+            return this._d3Scale(value);
+        };
+        Scale.prototype.domain = function (values) {
+            if (values == null) {
+                return this._getDomain();
+            }
+            else {
+                this._autoDomainAutomatically = false;
+                this._setDomain(values);
                 return this;
-            };
-            AbstractScale.prototype._autoDomainIfAutomaticMode = function () {
-                if (this._autoDomainAutomatically) {
-                    this.autoDomain();
-                }
-            };
-            /**
-             * Computes the range value corresponding to a given domain value. In other
-             * words, apply the function to value.
-             *
-             * @param {R} value A domain value to be scaled.
-             * @returns {R} The range value corresponding to the supplied domain value.
-             */
-            AbstractScale.prototype.scale = function (value) {
-                return this._d3Scale(value);
-            };
-            AbstractScale.prototype.domain = function (values) {
-                if (values == null) {
-                    return this._getDomain();
-                }
-                else {
-                    this._autoDomainAutomatically = false;
-                    this._setDomain(values);
-                    return this;
-                }
-            };
-            AbstractScale.prototype._getDomain = function () {
-                return this._d3Scale.domain();
-            };
-            AbstractScale.prototype._setDomain = function (values) {
-                if (!this._domainModificationInProgress) {
-                    this._domainModificationInProgress = true;
-                    this._d3Scale.domain(values);
-                    this.broadcaster.broadcast();
-                    this._domainModificationInProgress = false;
-                }
-            };
-            AbstractScale.prototype.range = function (values) {
-                if (values == null) {
-                    return this._d3Scale.range();
-                }
-                else {
-                    this._d3Scale.range(values);
-                    return this;
-                }
-            };
-            /**
-             * Constructs a copy of the Scale with the same domain and range but without
-             * any registered listeners.
-             *
-             * @returns {Scale} A copy of the calling Scale.
-             */
-            AbstractScale.prototype.copy = function () {
-                return new AbstractScale(this._d3Scale.copy());
-            };
-            /**
-             * When a renderer determines that the extent of a projector has changed,
-             * it will call this function. This function should ensure that
-             * the scale has a domain at least large enough to include extent.
-             *
-             * @param {number} rendererID A unique indentifier of the renderer sending
-             *                 the new extent.
-             * @param {string} attr The attribute being projected, e.g. "x", "y0", "r"
-             * @param {D[]} extent The new extent to be included in the scale.
-             */
-            AbstractScale.prototype._updateExtent = function (plotProvidedKey, attr, extent) {
-                this._rendererAttrID2Extent[plotProvidedKey + attr] = extent;
-                this._autoDomainIfAutomaticMode();
+            }
+        };
+        Scale.prototype._getDomain = function () {
+            return this._d3Scale.domain();
+        };
+        Scale.prototype._setDomain = function (values) {
+            if (!this._domainModificationInProgress) {
+                this._domainModificationInProgress = true;
+                this._d3Scale.domain(values);
+                this.broadcaster.broadcast();
+                this._domainModificationInProgress = false;
+            }
+        };
+        Scale.prototype.range = function (values) {
+            if (values == null) {
+                return this._d3Scale.range();
+            }
+            else {
+                this._d3Scale.range(values);
                 return this;
-            };
-            AbstractScale.prototype._removeExtent = function (plotProvidedKey, attr) {
-                delete this._rendererAttrID2Extent[plotProvidedKey + attr];
-                this._autoDomainIfAutomaticMode();
-                return this;
-            };
-            return AbstractScale;
-        })(Plottable.Core.PlottableObject);
-        Scales.AbstractScale = AbstractScale;
-    })(Scales = Plottable.Scales || (Plottable.Scales = {}));
+            }
+        };
+        /**
+         * Constructs a copy of the Scale with the same domain and range but without
+         * any registered listeners.
+         *
+         * @returns {Scale} A copy of the calling Scale.
+         */
+        Scale.prototype.copy = function () {
+            return new Scale(this._d3Scale.copy());
+        };
+        /**
+         * When a renderer determines that the extent of a projector has changed,
+         * it will call this function. This function should ensure that
+         * the scale has a domain at least large enough to include extent.
+         *
+         * @param {number} rendererID A unique indentifier of the renderer sending
+         *                 the new extent.
+         * @param {string} attr The attribute being projected, e.g. "x", "y0", "r"
+         * @param {D[]} extent The new extent to be included in the scale.
+         */
+        Scale.prototype._updateExtent = function (plotProvidedKey, attr, extent) {
+            this._rendererAttrID2Extent[plotProvidedKey + attr] = extent;
+            this._autoDomainIfAutomaticMode();
+            return this;
+        };
+        Scale.prototype._removeExtent = function (plotProvidedKey, attr) {
+            delete this._rendererAttrID2Extent[plotProvidedKey + attr];
+            this._autoDomainIfAutomaticMode();
+            return this;
+        };
+        return Scale;
+    })(Plottable.Core.PlottableObject);
+    Plottable.Scale = Scale;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -1947,7 +1944,7 @@ var Plottable;
                 }
             };
             return AbstractQuantitative;
-        })(Scales.AbstractScale);
+        })(Plottable.Scale);
         Scales.AbstractQuantitative = AbstractQuantitative;
     })(Scales = Plottable.Scales || (Plottable.Scales = {}));
 })(Plottable || (Plottable = {}));
@@ -2307,7 +2304,7 @@ var Plottable;
                 return _super.prototype.scale.call(this, value) + this.rangeBand() / 2;
             };
             return Category;
-        })(Scales.AbstractScale);
+        })(Plottable.Scale);
         Scales.Category = Category;
     })(Scales = Plottable.Scales || (Plottable.Scales = {}));
 })(Plottable || (Plottable = {}));
@@ -2404,7 +2401,7 @@ var Plottable;
             //The maximum number of colors we are getting from CSS stylesheets
             Color.MAXIMUM_COLORS_FROM_CSS = 256;
             return Color;
-        })(Scales.AbstractScale);
+        })(Plottable.Scale);
         Scales.Color = Color;
     })(Scales = Plottable.Scales || (Plottable.Scales = {}));
 })(Plottable || (Plottable = {}));
@@ -2638,7 +2635,7 @@ var Plottable;
                 ]
             };
             return InterpolatedColor;
-        })(Scales.AbstractScale);
+        })(Plottable.Scale);
         Scales.InterpolatedColor = InterpolatedColor;
     })(Scales = Plottable.Scales || (Plottable.Scales = {}));
 })(Plottable || (Plottable = {}));
@@ -6587,7 +6584,7 @@ var Plottable;
              * `d[accessor]` is used. If anything else, use `accessor` as a constant
              * across all data points.
              *
-             * @param {Scale.AbstractScale} scale If provided, the result of the accessor
+             * @param {Scale.Scale} scale If provided, the result of the accessor
              * is passed through the scale, such as `scale.scale(accessor(d, i))`.
              *
              * @returns {Plot} The calling Plot.
@@ -7243,8 +7240,8 @@ var Plottable;
              * as well as the bottom and top bounds (y1 and y2 respectively)
              *
              * @constructor
-             * @param {Scale.AbstractScale} xScale The x scale to use.
-             * @param {Scale.AbstractScale} yScale The y scale to use.
+             * @param {Scale.Scale} xScale The x scale to use.
+             * @param {Scale.Scale} yScale The y scale to use.
              */
             function Rectangle(xScale, yScale) {
                 _super.call(this, xScale, yScale);
@@ -7443,8 +7440,8 @@ var Plottable;
              * grid, and the datum can control what color it is.
              *
              * @constructor
-             * @param {Scale.AbstractScale} xScale The x scale to use.
-             * @param {Scale.AbstractScale} yScale The y scale to use.
+             * @param {Scale.Scale} xScale The x scale to use.
+             * @param {Scale.Scale} yScale The y scale to use.
              * @param {Scale.Color|Scale.InterpolatedColor} colorScale The color scale
              * to use for each grid cell.
              */

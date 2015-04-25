@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Scales {
-  export class AbstractQuantitative<D> extends AbstractScale<D, number> {
+  export class AbstractQuantitative<D> extends Scale<D, number> {
     protected _d3Scale: D3.Scale.QuantitativeScale;
     private _numTicks = 10;
     private _PADDING_FOR_IDENTICAL_DOMAIN = 1;

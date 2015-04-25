@@ -22,7 +22,7 @@ export module Plots {
       return metadata;
     }
 
-    public project(attrToSet: string, accessor: any, scale?: Scales.AbstractScale<any, any>) {
+    public project(attrToSet: string, accessor: any, scale?: Scale<any, any>) {
       super.project(attrToSet, accessor, scale);
       if (this._projections["x"] && this._projections["y"] && (attrToSet === "x" || attrToSet === "y")) {
         this._updateStackOffsets();
@@ -173,7 +173,7 @@ export module Plots {
 
     public _updateScaleExtents() {
       super._updateScaleExtents();
-      var primaryScale: Scales.AbstractScale<any, number> = this._isVertical ? this._yScale : this._xScale;
+      var primaryScale: Scale<any, number> = this._isVertical ? this._yScale : this._xScale;
       if (!primaryScale) {
         return;
       }

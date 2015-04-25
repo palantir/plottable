@@ -3,7 +3,7 @@
 module Plottable {
 export module Plots {
   export class Grid extends Rectangle<any, any> {
-    private _colorScale: Scales.AbstractScale<any, string>;
+    private _colorScale: Scale<any, string>;
 
     /**
      * Constructs a GridPlot.
@@ -12,13 +12,13 @@ export module Plots {
      * grid, and the datum can control what color it is.
      *
      * @constructor
-     * @param {Scale.AbstractScale} xScale The x scale to use.
-     * @param {Scale.AbstractScale} yScale The y scale to use.
+     * @param {Scale.Scale} xScale The x scale to use.
+     * @param {Scale.Scale} yScale The y scale to use.
      * @param {Scale.Color|Scale.InterpolatedColor} colorScale The color scale
      * to use for each grid cell.
      */
-    constructor(xScale: Scales.AbstractScale<any, any>, yScale: Scales.AbstractScale<any, any>,
-      colorScale: Scales.AbstractScale<any, string>) {
+    constructor(xScale: Scale<any, any>, yScale: Scale<any, any>,
+      colorScale: Scale<any, string>) {
       super(xScale, yScale);
       this.classed("grid-plot", true);
 
@@ -51,7 +51,7 @@ export module Plots {
      * @param {string} attrToSet One of ["x", "y", "x2", "y2", "fill"]. If "fill" is used,
      * the data should return a valid CSS color.
      */
-    public project(attrToSet: string, accessor: any, scale?: Scales.AbstractScale<any, any>) {
+    public project(attrToSet: string, accessor: any, scale?: Scale<any, any>) {
       super.project(attrToSet, accessor, scale);
 
       if (attrToSet === "x") {

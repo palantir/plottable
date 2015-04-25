@@ -3,8 +3,8 @@
 module Plottable {
 export module Plots {
   export class AbstractXYPlot<X, Y> extends AbstractPlot {
-    protected _xScale: Scales.AbstractScale<X, number>;
-    protected _yScale: Scales.AbstractScale<Y, number>;
+    protected _xScale: Scale<X, number>;
+    protected _yScale: Scale<Y, number>;
     private _autoAdjustXScaleDomain = false;
     private _autoAdjustYScaleDomain = false;
 
@@ -19,7 +19,7 @@ export module Plots {
      * @param {Scale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
      */
-    constructor(xScale: Scales.AbstractScale<X, number>, yScale: Scales.AbstractScale<Y, number>) {
+    constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>) {
       super();
       if (xScale == null || yScale == null) {
         throw new Error("XYPlots require an xScale and yScale");
@@ -38,7 +38,7 @@ export module Plots {
      * @param {string} attrToSet One of ["x", "y"] which determines the point's
      * x and y position in the Plot.
      */
-    public project(attrToSet: string, accessor: any, scale?: Scales.AbstractScale<any, any>) {
+    public project(attrToSet: string, accessor: any, scale?: Scale<any, any>) {
       // We only want padding and nice-ing on scales that will correspond to axes / pixel layout.
       // So when we get an "x" or "y" scale, enable autoNiceing and autoPadding.
       if (attrToSet === "x" && scale) {
@@ -169,8 +169,8 @@ export module Plots {
       }
     }
 
-    private _adjustDomainToVisiblePoints<A, B>(fromScale: Scales.AbstractScale<A, number>,
-                                             toScale: Scales.AbstractScale<B, number>,
+    private _adjustDomainToVisiblePoints<A, B>(fromScale: Scale<A, number>,
+                                             toScale: Scale<B, number>,
                                              fromX: boolean) {
       if (toScale instanceof Scales.AbstractQuantitative) {
         var toScaleQ = <Scales.AbstractQuantitative<B>> toScale;

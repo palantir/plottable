@@ -13,10 +13,10 @@ export module Plots {
      * as well as the bottom and top bounds (y1 and y2 respectively)
      *
      * @constructor
-     * @param {Scale.AbstractScale} xScale The x scale to use.
-     * @param {Scale.AbstractScale} yScale The y scale to use.
+     * @param {Scale.Scale} xScale The x scale to use.
+     * @param {Scale.Scale} yScale The y scale to use.
      */
-    constructor(xScale: Scales.AbstractScale<X, any>, yScale: Scales.AbstractScale<Y, any>) {
+    constructor(xScale: Scale<X, any>, yScale: Scale<Y, any>) {
       super(xScale, yScale);
       this._defaultFillColor = new Scales.Color().range()[0];
       this.classed("rectangle-plot", true);

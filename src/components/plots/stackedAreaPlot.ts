@@ -57,7 +57,7 @@ export module Plots {
       }
     }
 
-    public project(attrToSet: string, accessor: any, scale?: Scales.AbstractScale<any, any>) {
+    public project(attrToSet: string, accessor: any, scale?: Scale<any, any>) {
       super.project(attrToSet, accessor, scale);
       AbstractStacked.prototype.project.apply(this, [attrToSet, accessor, scale]);
       return this;

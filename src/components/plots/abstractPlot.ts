@@ -162,19 +162,19 @@ export module Plots {
      * `d[accessor]` is used. If anything else, use `accessor` as a constant
      * across all data points.
      *
-     * @param {Scale.AbstractScale} scale If provided, the result of the accessor
+     * @param {Scale.Scale} scale If provided, the result of the accessor
      * is passed through the scale, such as `scale.scale(accessor(d, i))`.
      *
      * @returns {Plot} The calling Plot.
      */
-    public attr(attrToSet: string, accessor: any, scale?: Scales.AbstractScale<any, any>) {
+    public attr(attrToSet: string, accessor: any, scale?: Scale<any, any>) {
       return this.project(attrToSet, accessor, scale);
     }
 
     /**
      * Identical to plot.attr
      */
-    public project(attrToSet: string, accessor: any, scale?: Scales.AbstractScale<any, any>) {
+    public project(attrToSet: string, accessor: any, scale?: Scale<any, any>) {
       attrToSet = attrToSet.toLowerCase();
       var currentProjection = this._projections[attrToSet];
       var existingScale = currentProjection && currentProjection.scale;

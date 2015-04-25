@@ -65,7 +65,7 @@ export module Plots {
       }
     }
 
-    public project(attrToSet: string, accessor: any, scale?: Scales.AbstractScale<any, any>) {
+    public project(attrToSet: string, accessor: any, scale?: Scale<any, any>) {
       super.project(attrToSet, accessor, scale);
       if (attrToSet === "y0") {
         this._updateYDomainer();
