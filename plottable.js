@@ -1,5 +1,5 @@
 /*!
-Plottable 0.53.0 (https://github.com/palantir/plottable)
+Plottable 0.54.0 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -1035,7 +1035,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "0.53.0";
+    Plottable.version = "0.54.0";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -4447,7 +4447,7 @@ var Plottable;
                 this._setupDomElements();
             };
             Time.prototype._setupDomElements = function () {
-                d3.selectAll("." + Time.TIME_AXIS_TIER_CLASS).remove();
+                this._element.selectAll("." + Time.TIME_AXIS_TIER_CLASS).remove();
                 this._tierLabelContainers = [];
                 this._tierMarkContainers = [];
                 this._tierBaselines = [];
