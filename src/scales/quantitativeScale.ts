@@ -180,7 +180,7 @@ module Plottable {
       } else {
         this._domainer = domainer;
         this._userSetDomainer = true;
-        this._autoDomainIfAutomaticMode();
+        this.autoDomainIfAutomaticMode();
         return this;
       }
     }

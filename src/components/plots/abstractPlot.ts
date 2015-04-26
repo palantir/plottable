@@ -277,7 +277,7 @@ module Plottable {
           if (extent.length === 0 || !this._isAnchored) {
             projector.scale._removeExtent(scaleKey, attr);
           } else {
-            projector.scale._updateExtent(scaleKey, attr, extent);
+            projector.scale.updateExtent(scaleKey, attr, extent);
           }
         });
       }

@@ -2,39 +2,23 @@
 
 module Plottable {
   export class Interaction extends Core.PlottableObject {
+    protected component: Component;
     /**
-     * It maintains a 'hitBox' which is where all event listeners are
-     * attached. Due to cross- browser weirdness, the hitbox needs to be an
-     * opaque but invisible rectangle.  TODO: We should give the interaction
-     * "foreground" and "background" elements where it can draw things,
-     * e.g. crosshairs.
+     * All event listeners are attached to the hitBox. In order to maintain cross-browser
+     * compatibility, the hitbox needs to be an opaque but invisible rectangle.
+     *
+     * TODO: Give the interaction "foreground" and "background" elements for drawing things
      */
-    protected _hitBox: D3.Selection;
-    protected _componentToListenTo: Component;
+    protected hitBox: D3.Selection;
 
-    public _anchor(component: Component, hitBox: D3.Selection) {
-      this._componentToListenTo = component;
-      this._hitBox = hitBox;
+    public anchor(component: Component, hitBox: D3.Selection) {
+      this.component = component;
+      this.hitBox = hitBox;
     }
 
     // HACKHACK: After all Interactions use Dispatchers, we won't need hitboxes at all (#1757)
-    public _requiresHitbox() {
+    public requiresHitbox() {
       return false;
-    }
-
-    /**
-     * Translates an <svg>-coordinate-space point to Component-space coordinates.
-     *
-     * @param {Point} p A Point in <svg>-space coordinates.
-     *
-     * @return {Point} The same location in Component-space coordinates.
-     */
-    protected _translateToComponentSpace(p: Point): Point {
-      var origin = this._componentToListenTo.originToSVG();
-      return {
-        x: p.x - origin.x,
-        y: p.y - origin.y
-      };
     }
 
     /**
@@ -44,10 +28,25 @@ module Plottable {
      *
      * @return {boolean} Whether or not the point is inside the Component.
      */
-    protected _isInsideComponent(p: Point) {
+    protected isInsideComponent(p: Point) {
       return 0 <= p.x && 0 <= p.y
-             && p.x <= this._componentToListenTo.width()
-             && p.y <= this._componentToListenTo.height();
+             && p.x <= this.component.width()
+             && p.y <= this.component.height();
+    }
+
+    /**
+     * Translates an <svg>-coordinate-space point to Component-space coordinates.
+     *
+     * @param {Point} p A Point in <svg>-space coordinates.
+     *
+     * @return {Point} The same location in Component-space coordinates.
+     */
+    protected translateToComponentSpace(p: Point): Point {
+      var origin = this.component.originToSVG();
+      return {
+        x: p.x - origin.x,
+        y: p.y - origin.y
+      };
     }
   }
 }

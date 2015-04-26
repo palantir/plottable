@@ -61,7 +61,7 @@ export module Plots {
           this._yScale.domainer().removePaddingException("AREA_PLOT+" + this.getID());
         }
         // prepending "AREA_PLOT" is unnecessary but reduces likely of user accidentally creating collisions
-        this._yScale._autoDomainIfAutomaticMode();
+        this._yScale.autoDomainIfAutomaticMode();
       }
     }
 

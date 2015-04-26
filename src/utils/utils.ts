@@ -381,6 +381,18 @@ export module Utils {
         throw new Error("input '" + input + "' can't be parsed as an Extent");
       }
     }
+
+    /**
+     * Returns true if two Points are equal.
+     *
+     * @param {Point} p1 First Point
+     * @param {Point} p2 Second Point
+     *
+     * @returns {boolean} True if the Points are in equal location
+     */
+    export function pointsEqual(p1: Point, p2: Point): boolean {
+      return p1.x === p2.x && p1.y === p2.y;
+    }
   }
 }
 }

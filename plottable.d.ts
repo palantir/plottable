@@ -168,6 +168,15 @@ declare module Plottable {
              * @returns {Extent} The generated Extent
              */
             function parseExtent(input: any): Extent;
+            /**
+             * Returns true if two Points are equal.
+             *
+             * @param {Point} p1 First Point
+             * @param {Point} p2 Second Point
+             *
+             * @returns {boolean} True if the Points are in equal location
+             */
+            function pointsEqual(p1: Point, p2: Point): boolean;
         }
     }
 }
@@ -842,9 +851,9 @@ declare module Plottable {
 
 declare module Plottable {
     class Scale<D, R> extends Core.PlottableObject {
-        protected _d3Scale: D3.Scale.Scale;
-        broadcaster: Core.Broadcaster<Scale<D, R>>;
         _typeCoercer: (d: any) => any;
+        broadcaster: Core.Broadcaster<Scale<D, R>>;
+        protected _d3Scale: D3.Scale.Scale;
         /**
          * Constructs a new Scale.
          *
@@ -874,15 +883,14 @@ declare module Plottable {
          * @returns {Scale} The calling Scale.
          */
         autoDomain(): Scale<D, R>;
-        _autoDomainIfAutomaticMode(): void;
+        autoDomainIfAutomaticMode(): void;
         /**
-         * Computes the range value corresponding to a given domain value. In other
-         * words, apply the function to value.
+         * Constructs a copy of the Scale with the same domain and range but without
+         * any registered listeners.
          *
-         * @param {R} value A domain value to be scaled.
-         * @returns {R} The range value corresponding to the supplied domain value.
+         * @returns {Scale} A copy of the calling Scale.
          */
-        scale(value: D): R;
+        copy(): Scale<D, R>;
         /**
          * Gets the domain.
          *
@@ -899,8 +907,6 @@ declare module Plottable {
          * @returns {Scale} The calling Scale.
          */
         domain(values: D[]): Scale<D, R>;
-        protected _getDomain(): any[];
-        protected _setDomain(values: D[]): void;
         /**
          * Gets the range.
          *
@@ -922,13 +928,15 @@ declare module Plottable {
          * @returns {Scale} The calling Scale.
          */
         range(values: R[]): Scale<D, R>;
+        _removeExtent(plotProvidedKey: string, attr: string): Scale<D, R>;
         /**
-         * Constructs a copy of the Scale with the same domain and range but without
-         * any registered listeners.
+         * Computes the range value corresponding to a given domain value. In other
+         * words, apply the function to value.
          *
-         * @returns {Scale} A copy of the calling Scale.
+         * @param {R} value A domain value to be scaled.
+         * @returns {R} The range value corresponding to the supplied domain value.
          */
-        copy(): Scale<D, R>;
+        scale(value: D): R;
         /**
          * When a renderer determines that the extent of a projector has changed,
          * it will call this function. This function should ensure that
@@ -939,8 +947,9 @@ declare module Plottable {
          * @param {string} attr The attribute being projected, e.g. "x", "y0", "r"
          * @param {D[]} extent The new extent to be included in the scale.
          */
-        _updateExtent(plotProvidedKey: string, attr: string, extent: D[]): Scale<D, R>;
-        _removeExtent(plotProvidedKey: string, attr: string): Scale<D, R>;
+        updateExtent(plotProvidedKey: string, attr: string, extent: D[]): Scale<D, R>;
+        protected _getDomain(): any[];
+        protected _setDomain(values: D[]): void;
     }
 }
 
@@ -3746,25 +3755,16 @@ declare module Plottable {
 
 declare module Plottable {
     class Interaction extends Core.PlottableObject {
+        protected component: Component;
         /**
-         * It maintains a 'hitBox' which is where all event listeners are
-         * attached. Due to cross- browser weirdness, the hitbox needs to be an
-         * opaque but invisible rectangle.  TODO: We should give the interaction
-         * "foreground" and "background" elements where it can draw things,
-         * e.g. crosshairs.
-         */
-        protected _hitBox: D3.Selection;
-        protected _componentToListenTo: Component;
-        _anchor(component: Component, hitBox: D3.Selection): void;
-        _requiresHitbox(): boolean;
-        /**
-         * Translates an <svg>-coordinate-space point to Component-space coordinates.
+         * All event listeners are attached to the hitBox. In order to maintain cross-browser
+         * compatibility, the hitbox needs to be an opaque but invisible rectangle.
          *
-         * @param {Point} p A Point in <svg>-space coordinates.
-         *
-         * @return {Point} The same location in Component-space coordinates.
+         * TODO: Give the interaction "foreground" and "background" elements for drawing things
          */
-        protected _translateToComponentSpace(p: Point): Point;
+        protected hitBox: D3.Selection;
+        anchor(component: Component, hitBox: D3.Selection): void;
+        requiresHitbox(): boolean;
         /**
          * Checks whether a Component-coordinate-space Point is inside the Component.
          *
@@ -3772,7 +3772,15 @@ declare module Plottable {
          *
          * @return {boolean} Whether or not the point is inside the Component.
          */
-        protected _isInsideComponent(p: Point): boolean;
+        protected isInsideComponent(p: Point): boolean;
+        /**
+         * Translates an <svg>-coordinate-space point to Component-space coordinates.
+         *
+         * @param {Point} p A Point in <svg>-space coordinates.
+         *
+         * @return {Point} The same location in Component-space coordinates.
+         */
+        protected translateToComponentSpace(p: Point): Point;
     }
 }
 
@@ -3780,7 +3788,7 @@ declare module Plottable {
 declare module Plottable {
     module Interactions {
         class Click extends Interaction {
-            _anchor(component: Component, hitBox: D3.Selection): void;
+            anchor(component: Component, hitBox: D3.Selection): void;
             /**
              * Gets the callback called when the Component is clicked.
              *
@@ -3802,7 +3810,7 @@ declare module Plottable {
 declare module Plottable {
     module Interactions {
         class DoubleClick extends Interaction {
-            _anchor(component: Component, hitBox: D3.Selection): void;
+            anchor(component: Component, hitBox: D3.Selection): void;
             /**
              * Gets the callback called when the Component is double-clicked.
              *
@@ -3824,7 +3832,7 @@ declare module Plottable {
 declare module Plottable {
     module Interactions {
         class Key extends Interaction {
-            _anchor(component: Component, hitBox: D3.Selection): void;
+            anchor(component: Component, hitBox: D3.Selection): void;
             /**
              * Sets a callback to be called when the key with the given keyCode is
              * pressed and the user is moused over the Component.
@@ -3842,7 +3850,7 @@ declare module Plottable {
 declare module Plottable {
     module Interactions {
         class Pointer extends Interaction {
-            _anchor(component: Component, hitBox: D3.Selection): void;
+            anchor(component: Component, hitBox: D3.Selection): void;
             /**
              * Gets the callback called when the pointer enters the Component.
              *
@@ -3905,8 +3913,8 @@ declare module Plottable {
              * Sets the scales back to their original domains.
              */
             resetZoom(): void;
-            _anchor(component: Component, hitBox: D3.Selection): void;
-            _requiresHitbox(): boolean;
+            anchor(component: Component, hitBox: D3.Selection): void;
+            requiresHitbox(): boolean;
         }
     }
 }
@@ -3915,7 +3923,7 @@ declare module Plottable {
 declare module Plottable {
     module Interactions {
         class Drag extends Interaction {
-            _anchor(component: Component, hitBox: D3.Selection): void;
+            anchor(component: Component, hitBox: D3.Selection): void;
             /**
              * Returns whether or not this Interactions constrains Points passed to its
              * callbacks to lie inside its Component.
@@ -3939,19 +3947,6 @@ declare module Plottable {
              * @return {Interactions.Drag} The calling Interactions.Drag.
              */
             constrainToComponent(constrain: boolean): Drag;
-            /**
-             * Gets the callback that is called when dragging starts.
-             *
-             * @returns {(start: Point) => any} The callback called when dragging starts.
-             */
-            onDragStart(): (start: Point) => any;
-            /**
-             * Sets the callback to be called when dragging starts.
-             *
-             * @param {(start: Point) => any} cb The callback to be called. Takes in a Point in pixels.
-             * @returns {Drag} The calling Interactions.Drag.
-             */
-            onDragStart(cb: (start: Point) => any): Drag;
             /**
              * Gets the callback that is called during dragging.
              *
@@ -3978,6 +3973,19 @@ declare module Plottable {
              * @returns {Drag} The calling Interactions.Drag.
              */
             onDragEnd(cb: (start: Point, end: Point) => any): Drag;
+            /**
+             * Gets the callback that is called when dragging starts.
+             *
+             * @returns {(start: Point) => any} The callback called when dragging starts.
+             */
+            onDragStart(): (start: Point) => any;
+            /**
+             * Sets the callback to be called when dragging starts.
+             *
+             * @param {(start: Point) => any} cb The callback to be called. Takes in a Point in pixels.
+             * @returns {Drag} The calling Interactions.Drag.
+             */
+            onDragStart(cb: (start: Point) => any): Drag;
         }
     }
 }
@@ -4013,9 +4021,9 @@ declare module Plottable {
             _doHover(p: Point): HoverData;
         }
         class Hover extends Interaction {
-            _componentToListenTo: Hoverable;
+            component: Hoverable;
             constructor();
-            _anchor(component: Hoverable, hitBox: D3.Selection): void;
+            anchor(component: Hoverable, hitBox: D3.Selection): void;
             /**
              * Attaches an callback to be called when the user mouses over an element.
              *

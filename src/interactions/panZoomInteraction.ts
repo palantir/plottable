@@ -45,15 +45,15 @@ export module Interactions {
         this._zoom.y((<any> this._yScale)._d3Scale);
       }
       this._zoom.on("zoom", () => this._rerenderZoomed());
-      this._zoom(this._hitBox);
+      this._zoom(this.hitBox);
     }
 
-    public _anchor(component: Component, hitBox: D3.Selection) {
-      super._anchor(component, hitBox);
+    public anchor(component: Component, hitBox: D3.Selection) {
+      super.anchor(component, hitBox);
       this.resetZoom();
     }
 
-    public _requiresHitbox() {
+    public requiresHitbox() {
       return true;
     }
 

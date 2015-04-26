@@ -384,11 +384,11 @@ module Plottable {
       // pushed to this._interactionsToRegister and registered during anchoring. If after, they are
       // registered immediately
       if (this.element) {
-        if (!this._hitBox && interaction._requiresHitbox()) {
+        if (!this._hitBox && interaction.requiresHitbox()) {
             this._hitBox = this.addBox("hit-box");
             this._hitBox.style("fill", "#ffffff").style("opacity", 0); // We need to set these so Chrome will register events
         }
-        interaction._anchor(this, this._hitBox);
+        interaction.anchor(this, this._hitBox);
       } else {
         this.interactionsToRegister.push(interaction);
       }

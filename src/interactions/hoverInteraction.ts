@@ -35,7 +35,7 @@ export module Interactions {
 
     private static warned = false;
 
-    public _componentToListenTo: Hoverable;
+    public component: Hoverable;
     private _mouseDispatcher: Dispatchers.Mouse;
     private _touchDispatcher: Dispatchers.Touch;
     private _hoverOverCallback: (hoverData: HoverData) => any;
@@ -56,27 +56,27 @@ export module Interactions {
       selection: null
     };
 
-    public _anchor(component: Hoverable, hitBox: D3.Selection) {
-      super._anchor(component, hitBox);
-      this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(<SVGElement> (<any> this._componentToListenTo).element.node());
+    public anchor(component: Hoverable, hitBox: D3.Selection) {
+      super.anchor(component, hitBox);
+      this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(<SVGElement> (<any> this.component).element.node());
       this._mouseDispatcher.onMouseMove("hover" + this.getID(), (p: Point) => this._handlePointerEvent(p));
 
-      this._touchDispatcher = Dispatchers.Touch.getDispatcher(<SVGElement> (<any> this._componentToListenTo).element.node());
+      this._touchDispatcher = Dispatchers.Touch.getDispatcher(<SVGElement> (<any> this.component).element.node());
 
       this._touchDispatcher.onTouchStart("hover" + this.getID(), (ids, idToPoint) =>
                                                                    this._handlePointerEvent(idToPoint[ids[0]]));
     }
 
     private _handlePointerEvent(p: Point) {
-      p = this._translateToComponentSpace(p);
-      if (this._isInsideComponent(p)) {
+      p = this.translateToComponentSpace(p);
+      if (this.isInsideComponent(p)) {
         if (!this._overComponent) {
-          this._componentToListenTo._hoverOverComponent(p);
+          this.component._hoverOverComponent(p);
         }
         this.handleHoverOver(p);
         this._overComponent = true;
       } else {
-        this._componentToListenTo._hoverOutComponent(p);
+        this.component._hoverOutComponent(p);
         this.safeHoverOut(this._currentHoverData);
         this._currentHoverData = {
           data: null,
@@ -123,7 +123,7 @@ export module Interactions {
 
     private handleHoverOver(p: Point) {
       var lastHoverData = this._currentHoverData;
-      var newHoverData = this._componentToListenTo._doHover(p);
+      var newHoverData = this.component._doHover(p);
 
       this._currentHoverData = newHoverData;
 

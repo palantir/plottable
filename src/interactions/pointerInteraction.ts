@@ -10,20 +10,20 @@ export module Interactions {
     private _pointerMoveCallback: (p: Point) => any;
     private _pointerExitCallback: (p: Point) => any;
 
-    public _anchor(component: Component, hitBox: D3.Selection) {
-      super._anchor(component, hitBox);
-      this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(<SVGElement> this._componentToListenTo.content().node());
+    public anchor(component: Component, hitBox: D3.Selection) {
+      super.anchor(component, hitBox);
+      this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(<SVGElement> this.component.content().node());
       this._mouseDispatcher.onMouseMove("Interaction.Pointer" + this.getID(), (p: Point) => this._handlePointerEvent(p));
 
-      this._touchDispatcher = Dispatchers.Touch.getDispatcher(<SVGElement> this._componentToListenTo.content().node());
+      this._touchDispatcher = Dispatchers.Touch.getDispatcher(<SVGElement> this.component.content().node());
 
       this._touchDispatcher.onTouchStart("Interaction.Pointer" + this.getID(), (ids, idToPoint) =>
                                                                                 this._handlePointerEvent(idToPoint[ids[0]]));
     }
 
     private _handlePointerEvent(p: Point) {
-      var translatedP = this._translateToComponentSpace(p);
-      if (this._isInsideComponent(translatedP)) {
+      var translatedP = this.translateToComponentSpace(p);
+      if (this.isInsideComponent(translatedP)) {
         var wasOverComponent = this._overComponent;
         this._overComponent = true;
         if (!wasOverComponent && this._pointerEnterCallback) {
