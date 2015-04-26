@@ -32,13 +32,13 @@ export module Dispatchers {
     constructor() {
       super();
 
-      this._event2Callback["keydown"] = (e: KeyboardEvent) => this._processKeydown(e);
+      this.eventCallbacks["keydown"] = (e: KeyboardEvent) => this._processKeydown(e);
 
       this._keydownBroadcaster = new Core.Broadcaster(this);
-      this._broadcasters = [this._keydownBroadcaster];
+      this.broadcasters = [this._keydownBroadcaster];
     }
 
-    protected _getWrappedCallback(callback: Function): Core.BroadcasterCallback<Dispatchers.Key> {
+    protected getWrappedCallback(callback: Function): Core.BroadcasterCallback<Dispatchers.Key> {
       return (d: Dispatchers.Key, e: KeyboardEvent) => callback(e.keyCode, e);
     }
 
@@ -52,7 +52,7 @@ export module Dispatchers {
      * @return {Dispatcher.Key} The calling Dispatcher.Key.
      */
     public onKeyDown(key: any, callback: KeyCallback): Key {
-      this._setCallback(this._keydownBroadcaster, key, callback);
+      this.setCallback(this._keydownBroadcaster, key, callback);
       return this;
     }
 

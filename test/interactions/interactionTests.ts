@@ -63,14 +63,14 @@ describe("Interactions", () => {
       var pzi = new Plottable.Interactions.PanZoom(xScale, yScale);
       c.registerInteraction(pzi);
 
-      var zoomBeforeX = (<any> pzi)._zoom;
+      var zoomBeforeX = (<any> pzi).zoom;
       xScale.domain([10, 1000]);
-      var zoomAfterX = (<any> pzi)._zoom;
+      var zoomAfterX = (<any> pzi).zoom;
       assert.notStrictEqual(zoomBeforeX, zoomAfterX, "D3 Zoom was regenerated after x scale domain changed");
 
-      var zoomBeforeY = (<any> pzi)._zoom;
+      var zoomBeforeY = (<any> pzi).zoom;
       yScale.domain([10, 1000]);
-      var zoomAfterY = (<any> pzi)._zoom;
+      var zoomAfterY = (<any> pzi).zoom;
       assert.notStrictEqual(zoomBeforeY, zoomAfterY, "D3 Zoom was regenerated after y scale domain changed");
 
       svg.remove();

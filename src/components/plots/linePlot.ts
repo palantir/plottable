@@ -214,15 +214,15 @@ export module Plots {
     }
 
     //===== Hover logic =====
-    public _hoverOverComponent(p: Point) {
+    public hoverOverComponent(p: Point) {
       // no-op
     }
 
-    public _hoverOutComponent(p: Point) {
+    public hoverOutComponent(p: Point) {
       // no-op
     }
 
-    public _doHover(p: Point): Interactions.HoverData {
+    public doHover(p: Point): Interactions.HoverData {
       var closestInfo = this._getClosestWithinRange(p, this._hoverDetectionRadius);
       var closestValue = closestInfo.closestValue;
       if (closestValue === undefined) {

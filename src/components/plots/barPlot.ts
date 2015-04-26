@@ -491,15 +491,15 @@ export module Plots {
     }
 
     //===== Hover logic =====
-    public _hoverOverComponent(p: Point) {
+    public hoverOverComponent(p: Point) {
       // no-op
     }
 
-    public _hoverOutComponent(p: Point) {
+    public hoverOutComponent(p: Point) {
       this._clearHoverSelection();
     }
 
-    public _doHover(p: Point): Interactions.HoverData {
+    public doHover(p: Point): Interactions.HoverData {
       var xPositionOrExtent: any = p.x;
       var yPositionOrExtent: any = p.y;
       if (this._hoverMode === "line") {

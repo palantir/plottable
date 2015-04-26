@@ -7433,13 +7433,13 @@ var Plottable;
                 return Plottable.Utils.Methods.intersectsBBox(xRange, yRange, translatedBbox);
             };
             //===== Hover logic =====
-            Scatter.prototype._hoverOverComponent = function (p) {
+            Scatter.prototype.hoverOverComponent = function (p) {
                 // no-op
             };
-            Scatter.prototype._hoverOutComponent = function (p) {
+            Scatter.prototype.hoverOutComponent = function (p) {
                 // no-op
             };
-            Scatter.prototype._doHover = function (p) {
+            Scatter.prototype.doHover = function (p) {
                 return this._getClosestStruckPoint(p, this._closeDetectionRadius);
             };
             return Scatter;
@@ -7927,13 +7927,13 @@ var Plottable;
                 });
             };
             //===== Hover logic =====
-            Bar.prototype._hoverOverComponent = function (p) {
+            Bar.prototype.hoverOverComponent = function (p) {
                 // no-op
             };
-            Bar.prototype._hoverOutComponent = function (p) {
+            Bar.prototype.hoverOutComponent = function (p) {
                 this._clearHoverSelection();
             };
-            Bar.prototype._doHover = function (p) {
+            Bar.prototype.doHover = function (p) {
                 var _this = this;
                 var xPositionOrExtent = p.x;
                 var yPositionOrExtent = p.y;
@@ -8213,13 +8213,13 @@ var Plottable;
                 };
             };
             //===== Hover logic =====
-            Line.prototype._hoverOverComponent = function (p) {
+            Line.prototype.hoverOverComponent = function (p) {
                 // no-op
             };
-            Line.prototype._hoverOutComponent = function (p) {
+            Line.prototype.hoverOutComponent = function (p) {
                 // no-op
             };
-            Line.prototype._doHover = function (p) {
+            Line.prototype.doHover = function (p) {
                 var closestInfo = this._getClosestWithinRange(p, this._hoverDetectionRadius);
                 var closestValue = closestInfo.closestValue;
                 if (closestValue === undefined) {
@@ -9111,48 +9111,48 @@ var Plottable;
         __extends(Dispatcher, _super);
         function Dispatcher() {
             _super.apply(this, arguments);
-            this._event2Callback = {};
-            this._broadcasters = [];
-            this._connected = false;
+            this.eventCallbacks = {};
+            this.broadcasters = [];
+            this.connected = false;
         }
-        Dispatcher.prototype._hasNoListeners = function () {
-            return this._broadcasters.every(function (b) { return b.getListenerKeys().length === 0; });
-        };
-        Dispatcher.prototype._connect = function () {
-            var _this = this;
-            if (!this._connected) {
-                Object.keys(this._event2Callback).forEach(function (event) {
-                    var callback = _this._event2Callback[event];
-                    document.addEventListener(event, callback);
-                });
-                this._connected = true;
-            }
-        };
-        Dispatcher.prototype._disconnect = function () {
-            var _this = this;
-            if (this._connected && this._hasNoListeners()) {
-                Object.keys(this._event2Callback).forEach(function (event) {
-                    var callback = _this._event2Callback[event];
-                    document.removeEventListener(event, callback);
-                });
-                this._connected = false;
-            }
-        };
         /**
          * Creates a wrapped version of the callback that can be registered to a Broadcaster
          */
-        Dispatcher.prototype._getWrappedCallback = function (callback) {
+        Dispatcher.prototype.getWrappedCallback = function (callback) {
             return function () { return callback(); };
         };
-        Dispatcher.prototype._setCallback = function (b, key, callback) {
+        Dispatcher.prototype.setCallback = function (b, key, callback) {
             if (callback === null) {
                 b.deregisterListener(key);
-                this._disconnect();
+                this.disconnect();
             }
             else {
-                this._connect();
-                b.registerListener(key, this._getWrappedCallback(callback));
+                this.connect();
+                b.registerListener(key, this.getWrappedCallback(callback));
             }
+        };
+        Dispatcher.prototype.connect = function () {
+            var _this = this;
+            if (!this.connected) {
+                Object.keys(this.eventCallbacks).forEach(function (event) {
+                    var callback = _this.eventCallbacks[event];
+                    document.addEventListener(event, callback);
+                });
+                this.connected = true;
+            }
+        };
+        Dispatcher.prototype.disconnect = function () {
+            var _this = this;
+            if (this.connected && this.hasNoListeners()) {
+                Object.keys(this.eventCallbacks).forEach(function (event) {
+                    var callback = _this.eventCallbacks[event];
+                    document.removeEventListener(event, callback);
+                });
+                this.connected = false;
+            }
+        };
+        Dispatcher.prototype.hasNoListeners = function () {
+            return this.broadcasters.every(function (b) { return b.getListenerKeys().length === 0; });
         };
         return Dispatcher;
     })(Plottable.Core.PlottableObject);
@@ -9185,18 +9185,18 @@ var Plottable;
                 this._lastMousePosition = { x: -1, y: -1 };
                 this._moveBroadcaster = new Plottable.Core.Broadcaster(this);
                 var processMoveCallback = function (e) { return _this._measureAndBroadcast(e, _this._moveBroadcaster); };
-                this._event2Callback["mouseover"] = processMoveCallback;
-                this._event2Callback["mousemove"] = processMoveCallback;
-                this._event2Callback["mouseout"] = processMoveCallback;
+                this.eventCallbacks["mouseover"] = processMoveCallback;
+                this.eventCallbacks["mousemove"] = processMoveCallback;
+                this.eventCallbacks["mouseout"] = processMoveCallback;
                 this._downBroadcaster = new Plottable.Core.Broadcaster(this);
-                this._event2Callback["mousedown"] = function (e) { return _this._measureAndBroadcast(e, _this._downBroadcaster); };
+                this.eventCallbacks["mousedown"] = function (e) { return _this._measureAndBroadcast(e, _this._downBroadcaster); };
                 this._upBroadcaster = new Plottable.Core.Broadcaster(this);
-                this._event2Callback["mouseup"] = function (e) { return _this._measureAndBroadcast(e, _this._upBroadcaster); };
+                this.eventCallbacks["mouseup"] = function (e) { return _this._measureAndBroadcast(e, _this._upBroadcaster); };
                 this._wheelBroadcaster = new Plottable.Core.Broadcaster(this);
-                this._event2Callback["wheel"] = function (e) { return _this._measureAndBroadcast(e, _this._wheelBroadcaster); };
+                this.eventCallbacks["wheel"] = function (e) { return _this._measureAndBroadcast(e, _this._wheelBroadcaster); };
                 this._dblClickBroadcaster = new Plottable.Core.Broadcaster(this);
-                this._event2Callback["dblclick"] = function (e) { return _this._measureAndBroadcast(e, _this._dblClickBroadcaster); };
-                this._broadcasters = [this._moveBroadcaster, this._downBroadcaster, this._upBroadcaster, this._wheelBroadcaster, this._dblClickBroadcaster];
+                this.eventCallbacks["dblclick"] = function (e) { return _this._measureAndBroadcast(e, _this._dblClickBroadcaster); };
+                this.broadcasters = [this._moveBroadcaster, this._downBroadcaster, this._upBroadcaster, this._wheelBroadcaster, this._dblClickBroadcaster];
             }
             /**
              * Get a Dispatcher.Mouse for the <svg> containing elem. If one already exists
@@ -9214,7 +9214,7 @@ var Plottable;
                 }
                 return dispatcher;
             };
-            Mouse.prototype._getWrappedCallback = function (callback) {
+            Mouse.prototype.getWrappedCallback = function (callback) {
                 return function (md, p, e) { return callback(p, e); };
             };
             /**
@@ -9229,7 +9229,7 @@ var Plottable;
              * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
              */
             Mouse.prototype.onMouseMove = function (key, callback) {
-                this._setCallback(this._moveBroadcaster, key, callback);
+                this.setCallback(this._moveBroadcaster, key, callback);
                 return this;
             };
             /**
@@ -9244,7 +9244,7 @@ var Plottable;
              * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
              */
             Mouse.prototype.onMouseDown = function (key, callback) {
-                this._setCallback(this._downBroadcaster, key, callback);
+                this.setCallback(this._downBroadcaster, key, callback);
                 return this;
             };
             /**
@@ -9259,7 +9259,7 @@ var Plottable;
              * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
              */
             Mouse.prototype.onMouseUp = function (key, callback) {
-                this._setCallback(this._upBroadcaster, key, callback);
+                this.setCallback(this._upBroadcaster, key, callback);
                 return this;
             };
             /**
@@ -9274,7 +9274,7 @@ var Plottable;
              * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
              */
             Mouse.prototype.onWheel = function (key, callback) {
-                this._setCallback(this._wheelBroadcaster, key, callback);
+                this.setCallback(this._wheelBroadcaster, key, callback);
                 return this;
             };
             /**
@@ -9289,7 +9289,7 @@ var Plottable;
              * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
              */
             Mouse.prototype.onDblClick = function (key, callback) {
-                this._setCallback(this._dblClickBroadcaster, key, callback);
+                this.setCallback(this._dblClickBroadcaster, key, callback);
                 return this;
             };
             /**
@@ -9329,6 +9329,11 @@ var Plottable;
 (function (Plottable) {
     var Dispatchers;
     (function (Dispatchers) {
+        /**
+         * Dispatcher.Touch calls callbacks when touch events occur.
+         * It reports the (x, y) position of the first Touch relative to the
+         * <svg> it is attached to.
+         */
         var Touch = (function (_super) {
             __extends(Touch, _super);
             /**
@@ -9341,13 +9346,13 @@ var Plottable;
                 var _this = this;
                 _super.call(this);
                 this.translator = Plottable.Utils.ClientToSVGTranslator.getTranslator(svg);
-                this._startBroadcaster = new Plottable.Core.Broadcaster(this);
-                this._event2Callback["touchstart"] = function (e) { return _this._measureAndBroadcast(e, _this._startBroadcaster); };
-                this._moveBroadcaster = new Plottable.Core.Broadcaster(this);
-                this._event2Callback["touchmove"] = function (e) { return _this._measureAndBroadcast(e, _this._moveBroadcaster); };
-                this._endBroadcaster = new Plottable.Core.Broadcaster(this);
-                this._event2Callback["touchend"] = function (e) { return _this._measureAndBroadcast(e, _this._endBroadcaster); };
-                this._broadcasters = [this._moveBroadcaster, this._startBroadcaster, this._endBroadcaster];
+                this.startBroadcaster = new Plottable.Core.Broadcaster(this);
+                this.eventCallbacks["touchstart"] = function (e) { return _this.measureAndBroadcast(e, _this.startBroadcaster); };
+                this.moveBroadcaster = new Plottable.Core.Broadcaster(this);
+                this.eventCallbacks["touchmove"] = function (e) { return _this.measureAndBroadcast(e, _this.moveBroadcaster); };
+                this.endBroadcaster = new Plottable.Core.Broadcaster(this);
+                this.eventCallbacks["touchend"] = function (e) { return _this.measureAndBroadcast(e, _this.endBroadcaster); };
+                this.broadcasters = [this.moveBroadcaster, this.startBroadcaster, this.endBroadcaster];
             }
             /**
              * Get a Dispatcher.Touch for the <svg> containing elem. If one already exists
@@ -9358,18 +9363,15 @@ var Plottable;
              */
             Touch.getDispatcher = function (elem) {
                 var svg = Plottable.Utils.DOM.getBoundingSVG(elem);
-                var dispatcher = svg[Touch._DISPATCHER_KEY];
+                var dispatcher = svg[Touch.DISPATCHER_KEY];
                 if (dispatcher == null) {
                     dispatcher = new Touch(svg);
-                    svg[Touch._DISPATCHER_KEY] = dispatcher;
+                    svg[Touch.DISPATCHER_KEY] = dispatcher;
                 }
                 return dispatcher;
             };
-            Touch.prototype._getWrappedCallback = function (callback) {
-                return function (td, ids, idToPoint, e) { return callback(ids, idToPoint, e); };
-            };
             /**
-             * Registers a callback to be called whenever a touch starts,
+             * Registers a callback to be called whenever a touch ends,
              * or removes the callback if `null` is passed as the callback.
              *
              * @param {any} key The key associated with the callback.
@@ -9379,8 +9381,8 @@ var Plottable;
              *                                     to remove a callback.
              * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
              */
-            Touch.prototype.onTouchStart = function (key, callback) {
-                this._setCallback(this._startBroadcaster, key, callback);
+            Touch.prototype.onTouchEnd = function (key, callback) {
+                this.setCallback(this.endBroadcaster, key, callback);
                 return this;
             };
             /**
@@ -9395,11 +9397,11 @@ var Plottable;
              * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
              */
             Touch.prototype.onTouchMove = function (key, callback) {
-                this._setCallback(this._moveBroadcaster, key, callback);
+                this.setCallback(this.moveBroadcaster, key, callback);
                 return this;
             };
             /**
-             * Registers a callback to be called whenever a touch ends,
+             * Registers a callback to be called whenever a touch starts,
              * or removes the callback if `null` is passed as the callback.
              *
              * @param {any} key The key associated with the callback.
@@ -9409,15 +9411,18 @@ var Plottable;
              *                                     to remove a callback.
              * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
              */
-            Touch.prototype.onTouchEnd = function (key, callback) {
-                this._setCallback(this._endBroadcaster, key, callback);
+            Touch.prototype.onTouchStart = function (key, callback) {
+                this.setCallback(this.startBroadcaster, key, callback);
                 return this;
+            };
+            Touch.prototype.getWrappedCallback = function (callback) {
+                return function (td, ids, idToPoint, e) { return callback(ids, idToPoint, e); };
             };
             /**
              * Computes the Touch position from the given event, and if successful
              * calls broadcast() on the supplied Broadcaster.
              */
-            Touch.prototype._measureAndBroadcast = function (e, b) {
+            Touch.prototype.measureAndBroadcast = function (e, b) {
                 var touches = e.changedTouches;
                 var touchPositions = {};
                 var touchIdentifiers = [];
@@ -9435,12 +9440,7 @@ var Plottable;
                     b.broadcast(touchIdentifiers, touchPositions, e);
                 }
             };
-            /**
-             * Dispatcher.Touch calls callbacks when touch events occur.
-             * It reports the (x, y) position of the first Touch relative to the
-             * <svg> it is attached to.
-             */
-            Touch._DISPATCHER_KEY = "__Plottable_Dispatcher_Touch";
+            Touch.DISPATCHER_KEY = "__Plottable_Dispatcher_Touch";
             return Touch;
         })(Plottable.Dispatcher);
         Dispatchers.Touch = Touch;
@@ -9469,9 +9469,9 @@ var Plottable;
             function Key() {
                 var _this = this;
                 _super.call(this);
-                this._event2Callback["keydown"] = function (e) { return _this._processKeydown(e); };
+                this.eventCallbacks["keydown"] = function (e) { return _this._processKeydown(e); };
                 this._keydownBroadcaster = new Plottable.Core.Broadcaster(this);
-                this._broadcasters = [this._keydownBroadcaster];
+                this.broadcasters = [this._keydownBroadcaster];
             }
             /**
              * Get a Dispatcher.Key. If one already exists it will be returned;
@@ -9487,7 +9487,7 @@ var Plottable;
                 }
                 return dispatcher;
             };
-            Key.prototype._getWrappedCallback = function (callback) {
+            Key.prototype.getWrappedCallback = function (callback) {
                 return function (d, e) { return callback(e.keyCode, e); };
             };
             /**
@@ -9500,7 +9500,7 @@ var Plottable;
              * @return {Dispatcher.Key} The calling Dispatcher.Key.
              */
             Key.prototype.onKeyDown = function (key, callback) {
-                this._setCallback(this._keydownBroadcaster, key, callback);
+                this.setCallback(this._keydownBroadcaster, key, callback);
                 return this;
             };
             Key.prototype._processKeydown = function (e) {
@@ -9709,21 +9709,19 @@ var Plottable;
             __extends(Key, _super);
             function Key() {
                 _super.apply(this, arguments);
-                this._keyCode2Callback = {};
+                /**
+                 * KeyInteraction listens to key events that occur while the Component is
+                 * moused over.
+                 */
+                this.keyCallbacks = {};
             }
             Key.prototype.anchor = function (component, hitBox) {
                 var _this = this;
                 _super.prototype.anchor.call(this, component, hitBox);
-                this._positionDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(this.component.element.node());
-                this._positionDispatcher.onMouseMove("Interaction.Key" + this.getID(), function (p) { return null; }); // HACKHACK: registering a listener
-                this._keyDispatcher = Plottable.Dispatchers.Key.getDispatcher();
-                this._keyDispatcher.onKeyDown("Interaction.Key" + this.getID(), function (keyCode) { return _this._handleKeyEvent(keyCode); });
-            };
-            Key.prototype._handleKeyEvent = function (keyCode) {
-                var p = this.translateToComponentSpace(this._positionDispatcher.getLastMousePosition());
-                if (this.isInsideComponent(p) && this._keyCode2Callback[keyCode]) {
-                    this._keyCode2Callback[keyCode]();
-                }
+                this.positionDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(this.component.element.node());
+                this.positionDispatcher.onMouseMove("Interaction.Key" + this.getID(), function (p) { return null; }); // HACKHACK: registering a listener
+                this.keyDispatcher = Plottable.Dispatchers.Key.getDispatcher();
+                this.keyDispatcher.onKeyDown("Interaction.Key" + this.getID(), function (keyCode) { return _this.handleKeyEvent(keyCode); });
             };
             /**
              * Sets a callback to be called when the key with the given keyCode is
@@ -9734,8 +9732,14 @@ var Plottable;
              * @returns The calling Interaction.Key.
              */
             Key.prototype.on = function (keyCode, callback) {
-                this._keyCode2Callback[keyCode] = callback;
+                this.keyCallbacks[keyCode] = callback;
                 return this;
+            };
+            Key.prototype.handleKeyEvent = function (keyCode) {
+                var p = this.translateToComponentSpace(this.positionDispatcher.getLastMousePosition());
+                if (this.isInsideComponent(p) && this.keyCallbacks[keyCode]) {
+                    this.keyCallbacks[keyCode]();
+                }
             };
             return Key;
         })(Plottable.Interaction);
@@ -9758,55 +9762,55 @@ var Plottable;
             __extends(Pointer, _super);
             function Pointer() {
                 _super.apply(this, arguments);
-                this._overComponent = false;
+                this.overComponent = false;
             }
             Pointer.prototype.anchor = function (component, hitBox) {
                 var _this = this;
                 _super.prototype.anchor.call(this, component, hitBox);
-                this._mouseDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(this.component.content().node());
-                this._mouseDispatcher.onMouseMove("Interaction.Pointer" + this.getID(), function (p) { return _this._handlePointerEvent(p); });
-                this._touchDispatcher = Plottable.Dispatchers.Touch.getDispatcher(this.component.content().node());
-                this._touchDispatcher.onTouchStart("Interaction.Pointer" + this.getID(), function (ids, idToPoint) { return _this._handlePointerEvent(idToPoint[ids[0]]); });
-            };
-            Pointer.prototype._handlePointerEvent = function (p) {
-                var translatedP = this.translateToComponentSpace(p);
-                if (this.isInsideComponent(translatedP)) {
-                    var wasOverComponent = this._overComponent;
-                    this._overComponent = true;
-                    if (!wasOverComponent && this._pointerEnterCallback) {
-                        this._pointerEnterCallback(translatedP);
-                    }
-                    if (this._pointerMoveCallback) {
-                        this._pointerMoveCallback(translatedP);
-                    }
-                }
-                else if (this._overComponent) {
-                    this._overComponent = false;
-                    if (this._pointerExitCallback) {
-                        this._pointerExitCallback(translatedP);
-                    }
-                }
+                this.mouseDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(this.component.content().node());
+                this.mouseDispatcher.onMouseMove("Interaction.Pointer" + this.getID(), function (p) { return _this.handlePointerEvent(p); });
+                this.touchDispatcher = Plottable.Dispatchers.Touch.getDispatcher(this.component.content().node());
+                this.touchDispatcher.onTouchStart("Interaction.Pointer" + this.getID(), function (ids, idToPoint) { return _this.handlePointerEvent(idToPoint[ids[0]]); });
             };
             Pointer.prototype.onPointerEnter = function (callback) {
                 if (callback === undefined) {
-                    return this._pointerEnterCallback;
+                    return this.pointerEnterCallback;
                 }
-                this._pointerEnterCallback = callback;
-                return this;
-            };
-            Pointer.prototype.onPointerMove = function (callback) {
-                if (callback === undefined) {
-                    return this._pointerMoveCallback;
-                }
-                this._pointerMoveCallback = callback;
+                this.pointerEnterCallback = callback;
                 return this;
             };
             Pointer.prototype.onPointerExit = function (callback) {
                 if (callback === undefined) {
-                    return this._pointerExitCallback;
+                    return this.pointerExitCallback;
                 }
-                this._pointerExitCallback = callback;
+                this.pointerExitCallback = callback;
                 return this;
+            };
+            Pointer.prototype.onPointerMove = function (callback) {
+                if (callback === undefined) {
+                    return this.pointerMoveCallback;
+                }
+                this.pointerMoveCallback = callback;
+                return this;
+            };
+            Pointer.prototype.handlePointerEvent = function (p) {
+                var translatedP = this.translateToComponentSpace(p);
+                if (this.isInsideComponent(translatedP)) {
+                    var wasOverComponent = this.overComponent;
+                    this.overComponent = true;
+                    if (!wasOverComponent && this.pointerEnterCallback) {
+                        this.pointerEnterCallback(translatedP);
+                    }
+                    if (this.pointerMoveCallback) {
+                        this.pointerMoveCallback(translatedP);
+                    }
+                }
+                else if (this.overComponent) {
+                    this.overComponent = false;
+                    if (this.pointerExitCallback) {
+                        this.pointerExitCallback(translatedP);
+                    }
+                }
             };
             return Pointer;
         })(Plottable.Interaction);
@@ -9841,49 +9845,49 @@ var Plottable;
                 var _this = this;
                 _super.call(this);
                 if (xScale) {
-                    this._xScale = xScale;
+                    this.xScale = xScale;
                     // HACKHACK #1388: self-register for resetZoom()
-                    this._xScale.broadcaster.registerListener("pziX" + this.getID(), function () { return _this.resetZoom(); });
+                    this.xScale.broadcaster.registerListener("pziX" + this.getID(), function () { return _this.resetZoom(); });
                 }
                 if (yScale) {
-                    this._yScale = yScale;
+                    this.yScale = yScale;
                     // HACKHACK #1388: self-register for resetZoom()
-                    this._yScale.broadcaster.registerListener("pziY" + this.getID(), function () { return _this.resetZoom(); });
+                    this.yScale.broadcaster.registerListener("pziY" + this.getID(), function () { return _this.resetZoom(); });
                 }
             }
+            PanZoom.prototype.anchor = function (component, hitBox) {
+                _super.prototype.anchor.call(this, component, hitBox);
+                this.resetZoom();
+            };
             /**
              * Sets the scales back to their original domains.
              */
             PanZoom.prototype.resetZoom = function () {
                 var _this = this;
                 // HACKHACK #254
-                this._zoom = d3.behavior.zoom();
-                if (this._xScale) {
-                    this._zoom.x(this._xScale._d3Scale);
+                this.zoom = d3.behavior.zoom();
+                if (this.xScale) {
+                    this.zoom.x(this.xScale._d3Scale);
                 }
-                if (this._yScale) {
-                    this._zoom.y(this._yScale._d3Scale);
+                if (this.yScale) {
+                    this.zoom.y(this.yScale._d3Scale);
                 }
-                this._zoom.on("zoom", function () { return _this._rerenderZoomed(); });
-                this._zoom(this.hitBox);
-            };
-            PanZoom.prototype.anchor = function (component, hitBox) {
-                _super.prototype.anchor.call(this, component, hitBox);
-                this.resetZoom();
+                this.zoom.on("zoom", function () { return _this.rerenderZoomed(); });
+                this.zoom(this.hitBox);
             };
             PanZoom.prototype.requiresHitbox = function () {
                 return true;
             };
-            PanZoom.prototype._rerenderZoomed = function () {
+            PanZoom.prototype.rerenderZoomed = function () {
                 // HACKHACK since the d3.zoom.x modifies d3 scales and not our TS scales, and the TS scales have the
                 // event listener machinery, let's grab the domain out of the d3 scale and pipe it back into the TS scale
-                if (this._xScale) {
-                    var xDomain = this._xScale._d3Scale.domain();
-                    this._xScale.domain(xDomain);
+                if (this.xScale) {
+                    var xDomain = this.xScale._d3Scale.domain();
+                    this.xScale.domain(xDomain);
                 }
-                if (this._yScale) {
-                    var yDomain = this._yScale._d3Scale.domain();
-                    this._yScale.domain(yDomain);
+                if (this.yScale) {
+                    var yDomain = this.yScale._d3Scale.domain();
+                    this.yScale.domain(yDomain);
                 }
             };
             return PanZoom;
@@ -10021,8 +10025,8 @@ var Plottable;
             __extends(Hover, _super);
             function Hover() {
                 _super.call(this);
-                this._overComponent = false;
-                this._currentHoverData = {
+                this.overComponent = false;
+                this.currentHoverData = {
                     data: null,
                     pixelPositions: null,
                     selection: null
@@ -10035,30 +10039,41 @@ var Plottable;
             Hover.prototype.anchor = function (component, hitBox) {
                 var _this = this;
                 _super.prototype.anchor.call(this, component, hitBox);
-                this._mouseDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(this.component.element.node());
-                this._mouseDispatcher.onMouseMove("hover" + this.getID(), function (p) { return _this._handlePointerEvent(p); });
-                this._touchDispatcher = Plottable.Dispatchers.Touch.getDispatcher(this.component.element.node());
-                this._touchDispatcher.onTouchStart("hover" + this.getID(), function (ids, idToPoint) { return _this._handlePointerEvent(idToPoint[ids[0]]); });
+                this.mouseDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(this.component.element.node());
+                this.mouseDispatcher.onMouseMove("hover" + this.getID(), function (p) { return _this.handlePointerEvent(p); });
+                this.touchDispatcher = Plottable.Dispatchers.Touch.getDispatcher(this.component.element.node());
+                this.touchDispatcher.onTouchStart("hover" + this.getID(), function (ids, idToPoint) { return _this.handlePointerEvent(idToPoint[ids[0]]); });
             };
-            Hover.prototype._handlePointerEvent = function (p) {
-                p = this.translateToComponentSpace(p);
-                if (this.isInsideComponent(p)) {
-                    if (!this._overComponent) {
-                        this.component._hoverOverComponent(p);
-                    }
-                    this.handleHoverOver(p);
-                    this._overComponent = true;
-                }
-                else {
-                    this.component._hoverOutComponent(p);
-                    this.safeHoverOut(this._currentHoverData);
-                    this._currentHoverData = {
-                        data: null,
-                        pixelPositions: null,
-                        selection: null
-                    };
-                    this._overComponent = false;
-                }
+            /**
+             * Retrieves the HoverData associated with the elements the user is currently hovering over.
+             *
+             * @return {HoverData} The data and selection corresponding to the elements
+             *                     the user is currently hovering over.
+             */
+            Hover.prototype.getCurrentHoverData = function () {
+                return this.currentHoverData;
+            };
+            /**
+             * Attaches an callback to be called when the user mouses over an element.
+             *
+             * @param {(hoverData: HoverData) => any} callback The callback to be called.
+             *      The callback will be passed data for newly hovered-over elements.
+             * @return {Interaction.Hover} The calling Interaction.Hover.
+             */
+            Hover.prototype.onHoverOver = function (callback) {
+                this.hoverOverCallback = callback;
+                return this;
+            };
+            /**
+             * Attaches a callback to be called when the user mouses off of an element.
+             *
+             * @param {(hoverData: HoverData) => any} callback The callback to be called.
+             *      The callback will be passed data from the hovered-out elements.
+             * @return {Interaction.Hover} The calling Interaction.Hover.
+             */
+            Hover.prototype.onHoverOut = function (callback) {
+                this.hoverOutCallback = callback;
+                return this;
             };
             /**
              * Returns a HoverData consisting of all data and selections in a but not in b.
@@ -10091,54 +10106,43 @@ var Plottable;
                 };
             };
             Hover.prototype.handleHoverOver = function (p) {
-                var lastHoverData = this._currentHoverData;
-                var newHoverData = this.component._doHover(p);
-                this._currentHoverData = newHoverData;
+                var lastHoverData = this.currentHoverData;
+                var newHoverData = this.component.doHover(p);
+                this.currentHoverData = newHoverData;
                 var outData = Hover.diffHoverData(lastHoverData, newHoverData);
                 this.safeHoverOut(outData);
                 var overData = Hover.diffHoverData(newHoverData, lastHoverData);
                 this.safeHoverOver(overData);
             };
+            Hover.prototype.handlePointerEvent = function (p) {
+                p = this.translateToComponentSpace(p);
+                if (this.isInsideComponent(p)) {
+                    if (!this.overComponent) {
+                        this.component.hoverOverComponent(p);
+                    }
+                    this.handleHoverOver(p);
+                    this.overComponent = true;
+                }
+                else {
+                    this.component.hoverOutComponent(p);
+                    this.safeHoverOut(this.currentHoverData);
+                    this.currentHoverData = {
+                        data: null,
+                        pixelPositions: null,
+                        selection: null
+                    };
+                    this.overComponent = false;
+                }
+            };
             Hover.prototype.safeHoverOut = function (outData) {
-                if (this._hoverOutCallback && outData.data) {
-                    this._hoverOutCallback(outData);
+                if (this.hoverOutCallback && outData.data) {
+                    this.hoverOutCallback(outData);
                 }
             };
             Hover.prototype.safeHoverOver = function (overData) {
-                if (this._hoverOverCallback && overData.data) {
-                    this._hoverOverCallback(overData);
+                if (this.hoverOverCallback && overData.data) {
+                    this.hoverOverCallback(overData);
                 }
-            };
-            /**
-             * Attaches an callback to be called when the user mouses over an element.
-             *
-             * @param {(hoverData: HoverData) => any} callback The callback to be called.
-             *      The callback will be passed data for newly hovered-over elements.
-             * @return {Interaction.Hover} The calling Interaction.Hover.
-             */
-            Hover.prototype.onHoverOver = function (callback) {
-                this._hoverOverCallback = callback;
-                return this;
-            };
-            /**
-             * Attaches a callback to be called when the user mouses off of an element.
-             *
-             * @param {(hoverData: HoverData) => any} callback The callback to be called.
-             *      The callback will be passed data from the hovered-out elements.
-             * @return {Interaction.Hover} The calling Interaction.Hover.
-             */
-            Hover.prototype.onHoverOut = function (callback) {
-                this._hoverOutCallback = callback;
-                return this;
-            };
-            /**
-             * Retrieves the HoverData associated with the elements the user is currently hovering over.
-             *
-             * @return {HoverData} The data and selection corresponding to the elements
-             *                     the user is currently hovering over.
-             */
-            Hover.prototype.getCurrentHoverData = function () {
-                return this._currentHoverData;
             };
             Hover.warned = false;
             return Hover;

@@ -3,37 +3,18 @@
 module Plottable {
 export module Dispatchers {
   export type TouchCallback = (ids: number[], idToPoint: { [id: number]: Point; }, e: TouchEvent) => any;
-
+  /**
+   * Dispatcher.Touch calls callbacks when touch events occur.
+   * It reports the (x, y) position of the first Touch relative to the
+   * <svg> it is attached to.
+   */
   export class Touch extends Dispatcher {
-    /**
-     * Dispatcher.Touch calls callbacks when touch events occur.
-     * It reports the (x, y) position of the first Touch relative to the
-     * <svg> it is attached to.
-     */
+    private static DISPATCHER_KEY = "__Plottable_Dispatcher_Touch";
 
-    private static _DISPATCHER_KEY = "__Plottable_Dispatcher_Touch";
+    private endBroadcaster: Core.Broadcaster<Dispatchers.Touch>;
+    private moveBroadcaster: Core.Broadcaster<Dispatchers.Touch>;
+    private startBroadcaster: Core.Broadcaster<Dispatchers.Touch>;
     private translator: Utils.ClientToSVGTranslator;
-    private _startBroadcaster: Core.Broadcaster<Dispatchers.Touch>;
-    private _moveBroadcaster: Core.Broadcaster<Dispatchers.Touch>;
-    private _endBroadcaster: Core.Broadcaster<Dispatchers.Touch>;
-
-    /**
-     * Get a Dispatcher.Touch for the <svg> containing elem. If one already exists
-     * on that <svg>, it will be returned; otherwise, a new one will be created.
-     *
-     * @param {SVGElement} elem A svg DOM element.
-     * @return {Dispatcher.Touch} A Dispatcher.Touch
-     */
-    public static getDispatcher(elem: SVGElement): Dispatchers.Touch {
-      var svg = Utils.DOM.getBoundingSVG(elem);
-
-      var dispatcher: Touch = (<any> svg)[Touch._DISPATCHER_KEY];
-      if (dispatcher == null) {
-        dispatcher = new Touch(svg);
-        (<any> svg)[Touch._DISPATCHER_KEY] = dispatcher;
-      }
-      return dispatcher;
-    }
 
     /**
      * Creates a Dispatcher.Touch.
@@ -46,24 +27,38 @@ export module Dispatchers {
 
       this.translator = Utils.ClientToSVGTranslator.getTranslator(svg);
 
-      this._startBroadcaster = new Core.Broadcaster(this);
-      this._event2Callback["touchstart"] = (e: TouchEvent) => this._measureAndBroadcast(e, this._startBroadcaster);
+      this.startBroadcaster = new Core.Broadcaster(this);
+      this.eventCallbacks["touchstart"] = (e: TouchEvent) => this.measureAndBroadcast(e, this.startBroadcaster);
 
-      this._moveBroadcaster = new Core.Broadcaster(this);
-      this._event2Callback["touchmove"] = (e: TouchEvent) => this._measureAndBroadcast(e, this._moveBroadcaster);
+      this.moveBroadcaster = new Core.Broadcaster(this);
+      this.eventCallbacks["touchmove"] = (e: TouchEvent) => this.measureAndBroadcast(e, this.moveBroadcaster);
 
-      this._endBroadcaster = new Core.Broadcaster(this);
-      this._event2Callback["touchend"] = (e: TouchEvent) => this._measureAndBroadcast(e, this._endBroadcaster);
+      this.endBroadcaster = new Core.Broadcaster(this);
+      this.eventCallbacks["touchend"] = (e: TouchEvent) => this.measureAndBroadcast(e, this.endBroadcaster);
 
-      this._broadcasters = [this._moveBroadcaster, this._startBroadcaster, this._endBroadcaster];
-    }
-
-    protected _getWrappedCallback(callback: Function): Core.BroadcasterCallback<Dispatchers.Touch> {
-      return (td: Dispatchers.Touch, ids: number[], idToPoint: { [id: number]: Point; }, e: MouseEvent) => callback(ids, idToPoint, e);
+      this.broadcasters = [this.moveBroadcaster, this.startBroadcaster, this.endBroadcaster];
     }
 
     /**
-     * Registers a callback to be called whenever a touch starts,
+     * Get a Dispatcher.Touch for the <svg> containing elem. If one already exists
+     * on that <svg>, it will be returned; otherwise, a new one will be created.
+     *
+     * @param {SVGElement} elem A svg DOM element.
+     * @return {Dispatcher.Touch} A Dispatcher.Touch
+     */
+    public static getDispatcher(elem: SVGElement): Dispatchers.Touch {
+      var svg = Utils.DOM.getBoundingSVG(elem);
+
+      var dispatcher: Touch = (<any> svg)[Touch.DISPATCHER_KEY];
+      if (dispatcher == null) {
+        dispatcher = new Touch(svg);
+        (<any> svg)[Touch.DISPATCHER_KEY] = dispatcher;
+      }
+      return dispatcher;
+    }
+
+    /**
+     * Registers a callback to be called whenever a touch ends,
      * or removes the callback if `null` is passed as the callback.
      *
      * @param {any} key The key associated with the callback.
@@ -73,8 +68,8 @@ export module Dispatchers {
      *                                     to remove a callback.
      * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
      */
-    public onTouchStart(key: any, callback: TouchCallback): Dispatchers.Touch {
-      this._setCallback(this._startBroadcaster, key, callback);
+    public onTouchEnd(key: any, callback: TouchCallback): Dispatchers.Touch {
+      this.setCallback(this.endBroadcaster, key, callback);
       return this;
     }
 
@@ -90,12 +85,12 @@ export module Dispatchers {
      * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
      */
     public onTouchMove(key: any, callback: TouchCallback): Dispatchers.Touch {
-      this._setCallback(this._moveBroadcaster, key, callback);
+      this.setCallback(this.moveBroadcaster, key, callback);
       return this;
     }
 
     /**
-     * Registers a callback to be called whenever a touch ends,
+     * Registers a callback to be called whenever a touch starts,
      * or removes the callback if `null` is passed as the callback.
      *
      * @param {any} key The key associated with the callback.
@@ -105,16 +100,20 @@ export module Dispatchers {
      *                                     to remove a callback.
      * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
      */
-    public onTouchEnd(key: any, callback: TouchCallback): Dispatchers.Touch {
-      this._setCallback(this._endBroadcaster, key, callback);
+    public onTouchStart(key: any, callback: TouchCallback): Dispatchers.Touch {
+      this.setCallback(this.startBroadcaster, key, callback);
       return this;
+    }
+
+    protected getWrappedCallback(callback: Function): Core.BroadcasterCallback<Dispatchers.Touch> {
+      return (td: Dispatchers.Touch, ids: number[], idToPoint: { [id: number]: Point; }, e: MouseEvent) => callback(ids, idToPoint, e);
     }
 
     /**
      * Computes the Touch position from the given event, and if successful
      * calls broadcast() on the supplied Broadcaster.
      */
-    private _measureAndBroadcast(e: TouchEvent, b: Core.Broadcaster<Dispatchers.Touch>) {
+    private measureAndBroadcast(e: TouchEvent, b: Core.Broadcaster<Dispatchers.Touch>) {
       var touches = e.changedTouches;
       var touchPositions: { [id: number]: Point; } = {};
       var touchIdentifiers: number[] = [];

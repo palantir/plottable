@@ -193,14 +193,14 @@ describe("Plots", () => {
       ];
       linePlot.addDataset(dataset2);
 
-      var hoverData = linePlot._doHover({ x: 495, y: 0 });
+      var hoverData = linePlot.doHover({ x: 495, y: 0 });
       var expectedDatum = twoPointData[1];
       assert.strictEqual(hoverData.data[0], expectedDatum, "returned the closest point within range");
       var hoverTarget = hoverData.selection;
       assert.strictEqual(parseFloat(hoverTarget.attr("cx")), xScale.scale(expectedDatum.foo), "hover target was positioned correctly (x)");
       assert.strictEqual(parseFloat(hoverTarget.attr("cy")), yScale.scale(expectedDatum.bar), "hover target was positioned correctly (y)");
 
-      hoverData = linePlot._doHover({ x: 0, y: 0 });
+      hoverData = linePlot.doHover({ x: 0, y: 0 });
       expectedDatum = dataset2[0];
       assert.strictEqual(hoverData.data[0], expectedDatum, "returned the closest point within range");
       hoverTarget = hoverData.selection;

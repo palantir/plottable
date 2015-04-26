@@ -3062,13 +3062,13 @@ describe("Plots", function () {
                 { foo: 1, bar: 0.95 }
             ];
             linePlot.addDataset(dataset2);
-            var hoverData = linePlot._doHover({ x: 495, y: 0 });
+            var hoverData = linePlot.doHover({ x: 495, y: 0 });
             var expectedDatum = twoPointData[1];
             assert.strictEqual(hoverData.data[0], expectedDatum, "returned the closest point within range");
             var hoverTarget = hoverData.selection;
             assert.strictEqual(parseFloat(hoverTarget.attr("cx")), xScale.scale(expectedDatum.foo), "hover target was positioned correctly (x)");
             assert.strictEqual(parseFloat(hoverTarget.attr("cy")), yScale.scale(expectedDatum.bar), "hover target was positioned correctly (y)");
-            hoverData = linePlot._doHover({ x: 0, y: 0 });
+            hoverData = linePlot.doHover({ x: 0, y: 0 });
             expectedDatum = dataset2[0];
             assert.strictEqual(hoverData.data[0], expectedDatum, "returned the closest point within range");
             hoverTarget = hoverData.selection;
@@ -8546,13 +8546,13 @@ describe("Interactions", function () {
             c.renderTo(svg);
             var pzi = new Plottable.Interactions.PanZoom(xScale, yScale);
             c.registerInteraction(pzi);
-            var zoomBeforeX = pzi._zoom;
+            var zoomBeforeX = pzi.zoom;
             xScale.domain([10, 1000]);
-            var zoomAfterX = pzi._zoom;
+            var zoomAfterX = pzi.zoom;
             assert.notStrictEqual(zoomBeforeX, zoomAfterX, "D3 Zoom was regenerated after x scale domain changed");
-            var zoomBeforeY = pzi._zoom;
+            var zoomBeforeY = pzi.zoom;
             yScale.domain([10, 1000]);
-            var zoomAfterY = pzi._zoom;
+            var zoomAfterY = pzi.zoom;
             assert.notStrictEqual(zoomBeforeY, zoomAfterY, "D3 Zoom was regenerated after y scale domain changed");
             svg.remove();
         });
@@ -8734,13 +8734,13 @@ var TestHoverable = (function (_super) {
         this.leftPoint = { x: 100, y: 200 };
         this.rightPoint = { x: 300, y: 200 };
     }
-    TestHoverable.prototype._hoverOverComponent = function (p) {
+    TestHoverable.prototype.hoverOverComponent = function (p) {
         // cast-override
     };
-    TestHoverable.prototype._hoverOutComponent = function (p) {
+    TestHoverable.prototype.hoverOutComponent = function (p) {
         // cast-override
     };
-    TestHoverable.prototype._doHover = function (p) {
+    TestHoverable.prototype.doHover = function (p) {
         var data = [];
         var points = [];
         if (p.x < 250) {
@@ -9241,58 +9241,58 @@ describe("Interactions", function () {
 var assert = chai.assert;
 describe("Dispatchers", function () {
     describe("Dispatcher", function () {
-        it("_connect() and _disconnect()", function () {
+        it("connect() and disconnect()", function () {
             var dispatcher = new Plottable.Dispatcher();
             var callbackCalls = 0;
-            dispatcher._event2Callback["click"] = function () { return callbackCalls++; };
+            dispatcher.eventCallbacks["click"] = function () { return callbackCalls++; };
             var d3document = d3.select(document);
-            dispatcher._connect();
+            dispatcher.connect();
             triggerFakeUIEvent("click", d3document);
             assert.strictEqual(callbackCalls, 1, "connected correctly (callback was called)");
-            dispatcher._connect();
+            dispatcher.connect();
             callbackCalls = 0;
             triggerFakeUIEvent("click", d3document);
             assert.strictEqual(callbackCalls, 1, "can't double-connect (callback only called once)");
-            dispatcher._disconnect();
+            dispatcher.disconnect();
             callbackCalls = 0;
             triggerFakeUIEvent("click", d3document);
             assert.strictEqual(callbackCalls, 0, "disconnected correctly (callback not called)");
         });
-        it("won't _disconnect() if broadcasters still have listeners", function () {
+        it("won't disconnect() if broadcasters still have listeners", function () {
             var dispatcher = new Plottable.Dispatcher();
             var callbackWasCalled = false;
-            dispatcher._event2Callback["click"] = function () { return callbackWasCalled = true; };
+            dispatcher.eventCallbacks["click"] = function () { return callbackWasCalled = true; };
             var b = new Plottable.Core.Broadcaster(dispatcher);
             var key = "unit test";
             b.registerListener(key, function () { return null; });
-            dispatcher._broadcasters = [b];
+            dispatcher.broadcasters = [b];
             var d3document = d3.select(document);
-            dispatcher._connect();
+            dispatcher.connect();
             triggerFakeUIEvent("click", d3document);
             assert.isTrue(callbackWasCalled, "connected correctly (callback was called)");
-            dispatcher._disconnect();
+            dispatcher.disconnect();
             callbackWasCalled = false;
             triggerFakeUIEvent("click", d3document);
             assert.isTrue(callbackWasCalled, "didn't disconnect while broadcaster had listener");
             b.deregisterListener(key);
-            dispatcher._disconnect();
+            dispatcher.disconnect();
             callbackWasCalled = false;
             triggerFakeUIEvent("click", d3document);
             assert.isFalse(callbackWasCalled, "disconnected when broadcaster had no listeners");
         });
-        it("_setCallback()", function () {
+        it("setCallback()", function () {
             var dispatcher = new Plottable.Dispatcher();
             var b = new Plottable.Core.Broadcaster(dispatcher);
             var key = "unit test";
             var callbackWasCalled = false;
             var callback = function () { return callbackWasCalled = true; };
-            dispatcher._setCallback(b, key, callback);
+            dispatcher.setCallback(b, key, callback);
             b.broadcast();
-            assert.isTrue(callbackWasCalled, "callback was called after setting with _setCallback()");
-            dispatcher._setCallback(b, key, null);
+            assert.isTrue(callbackWasCalled, "callback was called after setting with setCallback()");
+            dispatcher.setCallback(b, key, null);
             callbackWasCalled = false;
             b.broadcast();
-            assert.isFalse(callbackWasCalled, "callback was removed by calling _setCallback() with null");
+            assert.isFalse(callbackWasCalled, "callback was removed by calling setCallback() with null");
         });
     });
 });

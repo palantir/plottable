@@ -2954,9 +2954,9 @@ declare module Plottable {
             protected _generateDrawSteps(): Drawers.DrawStep[];
             protected _getClosestStruckPoint(p: Point, range: number): Interactions.HoverData;
             protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean;
-            _hoverOverComponent(p: Point): void;
-            _hoverOutComponent(p: Point): void;
-            _doHover(p: Point): Interactions.HoverData;
+            hoverOverComponent(p: Point): void;
+            hoverOutComponent(p: Point): void;
+            doHover(p: Point): Interactions.HoverData;
         }
     }
 }
@@ -3116,9 +3116,9 @@ declare module Plottable {
              * @return {Bar} The calling Bar Plot.
              */
             hoverMode(mode: String): Bar<X, Y>;
-            _hoverOverComponent(p: Point): void;
-            _hoverOutComponent(p: Point): void;
-            _doHover(p: Point): Interactions.HoverData;
+            hoverOverComponent(p: Point): void;
+            hoverOutComponent(p: Point): void;
+            doHover(p: Point): Interactions.HoverData;
             protected _getAllPlotData(datasetKeys: string[]): PlotData;
         }
     }
@@ -3165,9 +3165,9 @@ declare module Plottable {
              * @returns {PlotData} The PlotData closest to queryPoint
              */
             getClosestPlotData(queryPoint: Point): PlotData;
-            _hoverOverComponent(p: Point): void;
-            _hoverOutComponent(p: Point): void;
-            _doHover(p: Point): Interactions.HoverData;
+            hoverOverComponent(p: Point): void;
+            hoverOutComponent(p: Point): void;
+            doHover(p: Point): Interactions.HoverData;
         }
     }
 }
@@ -3549,15 +3549,15 @@ declare module Plottable {
 
 declare module Plottable {
     class Dispatcher extends Core.PlottableObject {
-        protected _event2Callback: {
+        protected eventCallbacks: {
             [eventName: string]: (e: Event) => any;
         };
-        protected _broadcasters: Core.Broadcaster<Dispatcher>[];
+        protected broadcasters: Core.Broadcaster<Dispatcher>[];
         /**
          * Creates a wrapped version of the callback that can be registered to a Broadcaster
          */
-        protected _getWrappedCallback(callback: Function): Core.BroadcasterCallback<Dispatcher>;
-        protected _setCallback(b: Core.Broadcaster<Dispatcher>, key: any, callback: Function): void;
+        protected getWrappedCallback(callback: Function): Core.BroadcasterCallback<Dispatcher>;
+        protected setCallback(b: Core.Broadcaster<Dispatcher>, key: any, callback: Function): void;
     }
 }
 
@@ -3581,7 +3581,7 @@ declare module Plottable {
              * @param {SVGElement} svg The root <svg> element to attach to.
              */
             constructor(svg: SVGElement);
-            protected _getWrappedCallback(callback: Function): Core.BroadcasterCallback<Dispatchers.Mouse>;
+            protected getWrappedCallback(callback: Function): Core.BroadcasterCallback<Dispatchers.Mouse>;
             /**
              * Registers a callback to be called whenever the mouse position changes,
              * or removes the callback if `null` is passed as the callback.
@@ -3661,7 +3661,19 @@ declare module Plottable {
         type TouchCallback = (ids: number[], idToPoint: {
             [id: number]: Point;
         }, e: TouchEvent) => any;
+        /**
+         * Dispatcher.Touch calls callbacks when touch events occur.
+         * It reports the (x, y) position of the first Touch relative to the
+         * <svg> it is attached to.
+         */
         class Touch extends Dispatcher {
+            /**
+             * Creates a Dispatcher.Touch.
+             * This constructor should not be invoked directly under most circumstances.
+             *
+             * @param {SVGElement} svg The root <svg> element to attach to.
+             */
+            constructor(svg: SVGElement);
             /**
              * Get a Dispatcher.Touch for the <svg> containing elem. If one already exists
              * on that <svg>, it will be returned; otherwise, a new one will be created.
@@ -3671,15 +3683,7 @@ declare module Plottable {
              */
             static getDispatcher(elem: SVGElement): Dispatchers.Touch;
             /**
-             * Creates a Dispatcher.Touch.
-             * This constructor should not be invoked directly under most circumstances.
-             *
-             * @param {SVGElement} svg The root <svg> element to attach to.
-             */
-            constructor(svg: SVGElement);
-            protected _getWrappedCallback(callback: Function): Core.BroadcasterCallback<Dispatchers.Touch>;
-            /**
-             * Registers a callback to be called whenever a touch starts,
+             * Registers a callback to be called whenever a touch ends,
              * or removes the callback if `null` is passed as the callback.
              *
              * @param {any} key The key associated with the callback.
@@ -3689,7 +3693,7 @@ declare module Plottable {
              *                                     to remove a callback.
              * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
              */
-            onTouchStart(key: any, callback: TouchCallback): Dispatchers.Touch;
+            onTouchEnd(key: any, callback: TouchCallback): Dispatchers.Touch;
             /**
              * Registers a callback to be called whenever the touch position changes,
              * or removes the callback if `null` is passed as the callback.
@@ -3703,7 +3707,7 @@ declare module Plottable {
              */
             onTouchMove(key: any, callback: TouchCallback): Dispatchers.Touch;
             /**
-             * Registers a callback to be called whenever a touch ends,
+             * Registers a callback to be called whenever a touch starts,
              * or removes the callback if `null` is passed as the callback.
              *
              * @param {any} key The key associated with the callback.
@@ -3713,7 +3717,8 @@ declare module Plottable {
              *                                     to remove a callback.
              * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
              */
-            onTouchEnd(key: any, callback: TouchCallback): Dispatchers.Touch;
+            onTouchStart(key: any, callback: TouchCallback): Dispatchers.Touch;
+            protected getWrappedCallback(callback: Function): Core.BroadcasterCallback<Dispatchers.Touch>;
         }
     }
 }
@@ -3737,7 +3742,7 @@ declare module Plottable {
              * @param {SVGElement} svg The root <svg> element to attach to.
              */
             constructor();
-            protected _getWrappedCallback(callback: Function): Core.BroadcasterCallback<Dispatchers.Key>;
+            protected getWrappedCallback(callback: Function): Core.BroadcasterCallback<Dispatchers.Key>;
             /**
              * Registers a callback to be called whenever a key is pressed,
              * or removes the callback if `null` is passed as the callback.
@@ -3865,19 +3870,6 @@ declare module Plottable {
              */
             onPointerEnter(callback: (p: Point) => any): Interactions.Pointer;
             /**
-             * Gets the callback called when the pointer moves.
-             *
-             * @return {(p: Point) => any} The current callback.
-             */
-            onPointerMove(): (p: Point) => any;
-            /**
-             * Sets the callback called when the pointer moves.
-             *
-             * @param {(p: Point) => any} callback The callback to set.
-             * @return {Interaction.Pointer} The calling Interaction.Pointer.
-             */
-            onPointerMove(callback: (p: Point) => any): Interactions.Pointer;
-            /**
              * Gets the callback called when the pointer exits the Component.
              *
              * @return {(p: Point) => any} The current callback.
@@ -3890,6 +3882,19 @@ declare module Plottable {
              * @return {Interaction.Pointer} The calling Interaction.Pointer.
              */
             onPointerExit(callback: (p: Point) => any): Interactions.Pointer;
+            /**
+             * Gets the callback called when the pointer moves.
+             *
+             * @return {(p: Point) => any} The current callback.
+             */
+            onPointerMove(): (p: Point) => any;
+            /**
+             * Sets the callback called when the pointer moves.
+             *
+             * @param {(p: Point) => any} callback The callback to set.
+             * @return {Interaction.Pointer} The calling Interaction.Pointer.
+             */
+            onPointerMove(callback: (p: Point) => any): Interactions.Pointer;
         }
     }
 }
@@ -3909,11 +3914,11 @@ declare module Plottable {
              * @param {QuantitativeScaleScale} [yScale] The Y scale to update on panning/zooming.
              */
             constructor(xScale?: QuantitativeScale<any>, yScale?: QuantitativeScale<any>);
+            anchor(component: Component, hitBox: D3.Selection): void;
             /**
              * Sets the scales back to their original domains.
              */
             resetZoom(): void;
-            anchor(component: Component, hitBox: D3.Selection): void;
             requiresHitbox(): boolean;
         }
     }
@@ -4004,13 +4009,13 @@ declare module Plottable {
              *
              * @param {Point} The cursor's position relative to the Component's origin.
              */
-            _hoverOverComponent(p: Point): void;
+            hoverOverComponent(p: Point): void;
             /**
              * Called when the user mouses out of the Component.
              *
              * @param {Point} The cursor's position relative to the Component's origin.
              */
-            _hoverOutComponent(p: Point): void;
+            hoverOutComponent(p: Point): void;
             /**
              * Returns the HoverData associated with the given position, and performs
              * any visual changes associated with hovering inside a Component.
@@ -4018,12 +4023,19 @@ declare module Plottable {
              * @param {Point} The cursor's position relative to the Component's origin.
              * @return {HoverData} The HoverData associated with the given position.
              */
-            _doHover(p: Point): HoverData;
+            doHover(p: Point): HoverData;
         }
         class Hover extends Interaction {
             component: Hoverable;
             constructor();
             anchor(component: Hoverable, hitBox: D3.Selection): void;
+            /**
+             * Retrieves the HoverData associated with the elements the user is currently hovering over.
+             *
+             * @return {HoverData} The data and selection corresponding to the elements
+             *                     the user is currently hovering over.
+             */
+            getCurrentHoverData(): HoverData;
             /**
              * Attaches an callback to be called when the user mouses over an element.
              *
@@ -4040,13 +4052,6 @@ declare module Plottable {
              * @return {Interaction.Hover} The calling Interaction.Hover.
              */
             onHoverOut(callback: (hoverData: HoverData) => any): Hover;
-            /**
-             * Retrieves the HoverData associated with the elements the user is currently hovering over.
-             *
-             * @return {HoverData} The data and selection corresponding to the elements
-             *                     the user is currently hovering over.
-             */
-            getCurrentHoverData(): HoverData;
         }
     }
 }

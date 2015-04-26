@@ -6,15 +6,15 @@ class TestHoverable extends Plottable.Component implements Plottable.Interaction
   public leftPoint = { x: 100, y: 200 };
   public rightPoint = { x: 300, y: 200 };
 
-  public _hoverOverComponent(p: Plottable.Point) {
+  public hoverOverComponent(p: Plottable.Point) {
     // cast-override
   }
 
-  public _hoverOutComponent(p: Plottable.Point) {
+  public hoverOutComponent(p: Plottable.Point) {
     // cast-override
   }
 
-  public _doHover(p: Plottable.Point): Plottable.Interactions.HoverData {
+  public doHover(p: Plottable.Point): Plottable.Interactions.HoverData {
     var data: string[] = [];
     var points: Plottable.Point[] = [];
     if (p.x < 250) {
