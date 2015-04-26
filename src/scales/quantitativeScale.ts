@@ -51,7 +51,7 @@ module Plottable {
     public domain(): D[];
     public domain(values: D[]): QuantitativeScale<D>;
     public domain(values?: D[]): any {
-      return super.domain(values); // need to override type sig to enable method chaining :/
+      return super.domain(values); // need to override type sig to enable method chaining:/
     }
 
     protected _setDomain(values: D[]) {

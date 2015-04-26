@@ -183,7 +183,7 @@ export module Components {
       var desiredNumRows = Math.max(Math.ceil(this._scale.domain().length / this._maxEntriesPerRow), 1);
       var wantsFitMoreEntriesInRow = estimatedLayout.rows.length > desiredNumRows;
       return {
-        width : this._padding + longestRowLength,
+        width: this._padding + longestRowLength,
         height: acceptableHeight,
         wantsWidth: offeredWidth < desiredWidth || wantsFitMoreEntriesInRow,
         wantsHeight: offeredHeight < desiredHeight

@@ -93,7 +93,7 @@ module Plottable {
       this._isSetup = true;
     }
 
-    public _requestedSpace(availableWidth : number, availableHeight: number): _SpaceRequest {
+    public _requestedSpace(availableWidth: number, availableHeight: number): _SpaceRequest {
       return {width: 0, height: 0, wantsWidth: false, wantsHeight: false};
     }
 
@@ -165,8 +165,8 @@ module Plottable {
     public _doRender() {/* overwrite */}
 
     public _useLastCalculatedLayout(): boolean;
-    public _useLastCalculatedLayout(useLast: boolean) : Component;
-    public _useLastCalculatedLayout(useLast?: boolean) : any {
+    public _useLastCalculatedLayout(useLast: boolean): Component;
+    public _useLastCalculatedLayout(useLast?: boolean): any {
       if (useLast == null) {
         return this._usedLastLayout;
       } else {

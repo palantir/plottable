@@ -3,19 +3,19 @@
 module Plottable {
 export module Components {
   type _LayoutAllocation = {
-    guaranteedWidths : number[];
+    guaranteedWidths: number[];
     guaranteedHeights: number[];
-    wantsWidthArr : boolean[];
+    wantsWidthArr: boolean[];
     wantsHeightArr: boolean[];
   }
 
   export type _IterateLayoutResult = {
     colProportionalSpace: number[];
     rowProportionalSpace: number[];
-    guaranteedWidths    : number[];
-    guaranteedHeights   : number[];
-    wantsWidth          : boolean;
-    wantsHeight         : boolean;
+    guaranteedWidths: number[];
+    guaranteedHeights: number[];
+    wantsWidth: boolean;
+    wantsHeight: boolean;
   };
 
   export class Table extends ComponentContainer {
@@ -106,7 +106,7 @@ export module Components {
       super._removeComponent(component);
       var rowpos: number;
       var colpos: number;
-      outer : for (var i = 0; i < this._nRows; i++) {
+      outer: for (var i = 0; i < this._nRows; i++) {
         for (var j = 0; j < this._nCols; j++) {
           if (this._rows[i][j] === component) {
             rowpos = i;
@@ -121,7 +121,7 @@ export module Components {
       }
     }
 
-    private _iterateLayout(availableWidth : number, availableHeight: number): _IterateLayoutResult {
+    private _iterateLayout(availableWidth: number, availableHeight: number): _IterateLayoutResult {
     /*
      * Given availableWidth and availableHeight, figure out how to allocate it between rows and columns using an iterative algorithm.
      *
@@ -162,7 +162,7 @@ export module Components {
       var guaranteedWidths  = Utils.Methods.createFilledArray(0, this._nCols);
       var guaranteedHeights = Utils.Methods.createFilledArray(0, this._nRows);
 
-      var freeWidth : number;
+      var freeWidth: number;
       var freeHeight: number;
 
       var nIterations = 0;
@@ -219,10 +219,10 @@ export module Components {
 
       return {colProportionalSpace: colProportionalSpace        ,
               rowProportionalSpace: rowProportionalSpace        ,
-              guaranteedWidths    : guarantees.guaranteedWidths ,
-              guaranteedHeights   : guarantees.guaranteedHeights,
-              wantsWidth          : wantsWidth                  ,
-              wantsHeight         : wantsHeight                 };
+              guaranteedWidths   : guarantees.guaranteedWidths ,
+              guaranteedHeights  : guarantees.guaranteedHeights,
+              wantsWidth         : wantsWidth                  ,
+              wantsHeight        : wantsHeight                 };
     }
 
     private _determineGuarantees(offeredWidths: number[], offeredHeights: number[]): _LayoutAllocation {
@@ -248,16 +248,16 @@ export module Components {
           layoutWantsHeight[rowIndex] = layoutWantsHeight[rowIndex] || spaceRequest.wantsHeight;
         });
       });
-      return {guaranteedWidths : requestedWidths  ,
+      return {guaranteedWidths: requestedWidths  ,
               guaranteedHeights: requestedHeights ,
-              wantsWidthArr    : layoutWantsWidth ,
-              wantsHeightArr   : layoutWantsHeight};
+              wantsWidthArr   : layoutWantsWidth ,
+              wantsHeightArr  : layoutWantsHeight};
     }
 
 
-    public _requestedSpace(offeredWidth : number, offeredHeight: number): _SpaceRequest {
+    public _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
       this._calculatedLayout = this._iterateLayout(offeredWidth , offeredHeight);
-      return {width : d3.sum(this._calculatedLayout.guaranteedWidths ),
+      return {width: d3.sum(this._calculatedLayout.guaranteedWidths ),
               height: d3.sum(this._calculatedLayout.guaranteedHeights),
               wantsWidth: this._calculatedLayout.wantsWidth,
               wantsHeight: this._calculatedLayout.wantsHeight};

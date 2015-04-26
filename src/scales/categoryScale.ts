@@ -69,7 +69,7 @@ export module Scales {
      *
      * @returns {number} The range band width
      */
-    public rangeBand() : number {
+    public rangeBand(): number {
       return this._d3Scale.rangeBand();
     }
 
