@@ -34,12 +34,22 @@
         "check-catch",
         "check-else"
     ],
-    "quotemark": [true, "double"],
+    "quotemark": [true,
+        "double"
+    ],
     "radix": true,
     "semicolon": true,
-    "triple-equals": [true, "allow-null-check"],
+    "triple-equals": [true,
+        "allow-null-check"
+    ],
     "variable-name": false,
-    "whitespace": ["check-branch", "check-decl", "check-operator", "check-separator", "check-type"],
+    "whitespace": [true,
+        "check-branch",
+        "check-decl",
+        "check-operator",
+        "check-separator",
+        "check-type"
+    ],
     "ban": [true, ["d3", "max"], ["d3", "min"]]
   }
 }

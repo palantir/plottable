@@ -101,7 +101,7 @@ export module Axes {
       var self = this;
       var xAlign: {[s: string]: string};
       var yAlign: {[s: string]: string};
-      switch(this.tickLabelAngle()) {
+      switch (this.tickLabelAngle()) {
         case 0:
           xAlign = {left: "right",  right: "left", top: "center", bottom: "center"};
           yAlign = {left: "center",  right: "center", top: "bottom", bottom: "top"};

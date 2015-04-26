@@ -205,7 +205,7 @@ export module Components {
         spaceLeft -= entryLength;
       });
 
-      if(currentRow.length !== 0) {
+      if (currentRow.length !== 0) {
         rows.push(currentRow);
       }
       return rows;
