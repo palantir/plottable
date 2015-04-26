@@ -4,6 +4,7 @@
 /// <reference path="utils/strictEqualityAssociativeArray.ts" />
 /// <reference path="utils/domUtils.ts" />
 /// <reference path="utils/color.ts" />
+/// <reference path="utils/callbackSet.ts" />
 
 /// <reference path="utils/formatters.ts" />
 /// <reference path="utils/symbolFactories.ts" />

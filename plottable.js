@@ -677,6 +677,48 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
+    var Utils;
+    (function (Utils) {
+        var CallbackSet = (function () {
+            function CallbackSet() {
+                this._values = [];
+            }
+            CallbackSet.prototype.add = function (value) {
+                if (this._values.indexOf(value) === -1) {
+                    this._values.push(value);
+                }
+                return this;
+            };
+            CallbackSet.prototype.remove = function (value) {
+                var index = this._values.indexOf(value);
+                if (index !== -1) {
+                    this._values.splice(index, 1);
+                }
+                return this;
+            };
+            CallbackSet.prototype.values = function () {
+                return this._values;
+            };
+            CallbackSet.prototype.callCallbacks = function () {
+                var args = [];
+                for (var _i = 0; _i < arguments.length; _i++) {
+                    args[_i - 0] = arguments[_i];
+                }
+                // no fat-arrow notation to set "this" to current "this" context
+                this.values().forEach(function (callback) {
+                    callback.apply(this, args);
+                });
+                return this;
+            };
+            return CallbackSet;
+        })();
+        Utils.CallbackSet = CallbackSet;
+    })(Utils = Plottable.Utils || (Plottable.Utils = {}));
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var Plottable;
+(function (Plottable) {
     Plottable.MILLISECONDS_IN_ONE_DAY = 24 * 60 * 60 * 1000;
     var Formatters;
     (function (Formatters) {

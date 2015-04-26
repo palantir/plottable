@@ -277,6 +277,19 @@ declare module Plottable {
 
 
 declare module Plottable {
+    module Utils {
+        class CallbackSet<CB extends Function> {
+            constructor();
+            add(value: CB): CallbackSet<CB>;
+            remove(value: CB): CallbackSet<CB>;
+            values(): CB[];
+            callCallbacks(...args: any[]): CallbackSet<CB>;
+        }
+    }
+}
+
+
+declare module Plottable {
     type Formatter = (d: any) => string;
     var MILLISECONDS_IN_ONE_DAY: number;
     module Formatters {
