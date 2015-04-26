@@ -27,10 +27,10 @@ export module Components {
       this._xScale = xScale;
       this._yScale = yScale;
       if (this._xScale) {
-        this._xScale.broadcaster.registerListener(this, () => this._render());
+        this._xScale.broadcaster.registerListener(this, () => this.render());
       }
       if (this._yScale) {
-        this._yScale.broadcaster.registerListener(this, () => this._render());
+        this._yScale.broadcaster.registerListener(this, () => this.render());
       }
     }
 
@@ -45,14 +45,14 @@ export module Components {
       return this;
     }
 
-    protected _setup() {
-      super._setup();
+    protected setup() {
+      super.setup();
       this._xLinesContainer = this._content.append("g").classed("x-gridlines", true);
       this._yLinesContainer = this._content.append("g").classed("y-gridlines", true);
     }
 
-    public _doRender() {
-      super._doRender();
+    public doRender() {
+      super.doRender();
       this._redrawXLines();
       this._redrawYLines();
     }

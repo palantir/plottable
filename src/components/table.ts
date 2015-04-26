@@ -148,8 +148,8 @@ export module Components {
       var availableWidthAfterPadding  = availableWidth  - this._colPadding * (this._nCols - 1);
       var availableHeightAfterPadding = availableHeight - this._rowPadding * (this._nRows - 1);
 
-      var rowWeights = Table._calcComponentWeights(this._rowWeights, rows, (c: Component) => (c == null) || c._isFixedHeight());
-      var colWeights = Table._calcComponentWeights(this._colWeights,  cols, (c: Component) => (c == null) || c._isFixedWidth());
+      var rowWeights = Table._calcComponentWeights(this._rowWeights, rows, (c: Component) => (c == null) || c.isFixedHeight());
+      var colWeights = Table._calcComponentWeights(this._colWeights,  cols, (c: Component) => (c == null) || c.isFixedWidth());
 
       // To give the table a good starting position to iterate from, we give the fixed-width components half-weight
       // so that they will get some initial space allocated to work with
@@ -234,7 +234,7 @@ export module Components {
         row.forEach((component: Component, colIndex: number) => {
           var spaceRequest: _SpaceRequest;
           if (component != null) {
-            spaceRequest = component._requestedSpace(offeredWidths[colIndex], offeredHeights[rowIndex]);
+            spaceRequest = component.requestedSpace(offeredWidths[colIndex], offeredHeights[rowIndex]);
           } else {
             spaceRequest = {width: 0, height: 0, wantsWidth: false, wantsHeight: false};
           }
@@ -255,7 +255,7 @@ export module Components {
     }
 
 
-    public _requestedSpace(offeredWidth : number, offeredHeight: number): _SpaceRequest {
+    public requestedSpace(offeredWidth : number, offeredHeight: number): _SpaceRequest {
       this._calculatedLayout = this._iterateLayout(offeredWidth , offeredHeight);
       return {width : d3.sum(this._calculatedLayout.guaranteedWidths ),
               height: d3.sum(this._calculatedLayout.guaranteedHeights),
@@ -263,11 +263,11 @@ export module Components {
               wantsHeight: this._calculatedLayout.wantsHeight};
     }
 
-    public _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number) {
-      super._computeLayout(offeredXOrigin, offeredYOrigin, availableWidth , availableHeight);
-      var layout = this._useLastCalculatedLayout() ? this._calculatedLayout : this._iterateLayout(this.width(), this.height());
+    public computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number) {
+      super.computeLayout(offeredXOrigin, offeredYOrigin, availableWidth , availableHeight);
+      var layout = this.useLastCalculatedLayout() ? this._calculatedLayout : this._iterateLayout(this.width(), this.height());
 
-      this._useLastCalculatedLayout(true);
+      this.useLastCalculatedLayout(true);
 
       var childYOrigin = 0;
       var rowHeights = Utils.Methods.addArrays(layout.rowProportionalSpace, layout.guaranteedHeights);
@@ -277,7 +277,7 @@ export module Components {
         row.forEach((component: Component, colIndex: number) => {
           // recursively compute layout
           if (component != null) {
-            component._computeLayout(childXOrigin, childYOrigin, colWidths[colIndex], rowHeights[rowIndex]);
+            component.computeLayout(childXOrigin, childYOrigin, colWidths[colIndex], rowHeights[rowIndex]);
           }
           childXOrigin += colWidths[colIndex] + this._colPadding;
         });
@@ -295,7 +295,7 @@ export module Components {
     public padding(rowPadding: number, colPadding: number) {
       this._rowPadding = rowPadding;
       this._colPadding = colPadding;
-      this._invalidateLayout();
+      this.invalidateLayout();
       return this;
     }
 
@@ -326,7 +326,7 @@ export module Components {
      */
     public rowWeight(index: number, weight: number) {
       this._rowWeights[index] = weight;
-      this._invalidateLayout();
+      this.invalidateLayout();
       return this;
     }
 
@@ -342,17 +342,17 @@ export module Components {
      */
     public colWeight(index: number, weight: number) {
       this._colWeights[index] = weight;
-      this._invalidateLayout();
+      this.invalidateLayout();
       return this;
     }
 
-    public _isFixedWidth(): boolean {
+    public isFixedWidth(): boolean {
       var cols = d3.transpose(this._rows);
-      return Table._fixedSpace(cols, (c: Component) => (c == null) || c._isFixedWidth());
+      return Table._fixedSpace(cols, (c: Component) => (c == null) || c.isFixedWidth());
     }
 
-    public _isFixedHeight(): boolean {
-      return Table._fixedSpace(this._rows, (c: Component) => (c == null) || c._isFixedHeight());
+    public isFixedHeight(): boolean {
+      return Table._fixedSpace(this._rows, (c: Component) => (c == null) || c.isFixedHeight());
     }
 
     private _padTableToSize(nRows: number, nCols: number) {

@@ -69,7 +69,7 @@ describe("Plots", () => {
 
       plot.renderTo(svg);
 
-      var rectanglesSelection = (<any> plot)._element.selectAll(".bar-area rect");
+      var rectanglesSelection = (<any> plot).element.selectAll(".bar-area rect");
 
       assert.strictEqual(rectanglesSelection.size(), 5,
         "only 5 rectangles should be displayed");

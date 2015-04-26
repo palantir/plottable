@@ -92,12 +92,12 @@ export module Core {
       if (_animationRequested) {
         // Layout
         var toCompute = d3.values(_componentsNeedingComputeLayout);
-        toCompute.forEach((c) => c._computeLayout());
+        toCompute.forEach((c) => c.computeLayout());
 
         // Top level render.
         // Containers will put their children in the toRender queue
         var toRender = d3.values(_componentsNeedingRender);
-        toRender.forEach((c) => c._render());
+        toRender.forEach((c) => c.render());
 
         // now we are flushing
         _isCurrentlyFlushing = true;
@@ -106,7 +106,7 @@ export module Core {
         var failed: {[key: string]: Component} = {};
         Object.keys(_componentsNeedingRender).forEach((k) => {
           try {
-            _componentsNeedingRender[k]._doRender();
+            _componentsNeedingRender[k].doRender();
           } catch (err) {
             // using setTimeout instead of console.log, we get the familiar red
             // stack trace

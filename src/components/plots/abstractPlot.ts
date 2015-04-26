@@ -58,15 +58,15 @@ module Plottable {
       this._nextSeriesIndex = 0;
     }
 
-    public _anchor(element: D3.Selection) {
-      super._anchor(element);
+    public anchor(element: D3.Selection) {
+      super.anchor(element);
       this._animateOnNextRender = true;
       this._dataChanged = true;
       this._updateScaleExtents();
     }
 
-    protected _setup() {
-      super._setup();
+    protected setup() {
+      super.setup();
       this._renderArea = this._content.append("g").classed("render-area", true);
       // HACKHACK on 591
       this._getDrawersInOrder().forEach((d) => d.setup(this._renderArea.append("g")));
@@ -121,7 +121,7 @@ module Plottable {
       this._datasetKeysInOrder.push(key);
       this._key2PlotDatasetKey.set(key, pdk);
 
-      if (this._isSetup) {
+      if (this.isSetup) {
         drawer.setup(this._renderArea.append("g"));
       }
       dataset.broadcaster.registerListener(this, () => this._onDatasetUpdate());
@@ -144,7 +144,7 @@ module Plottable {
       this._updateScaleExtents();
       this._animateOnNextRender = true;
       this._dataChanged = true;
-      this._render();
+      this.render();
     }
 
     /**
@@ -190,12 +190,12 @@ module Plottable {
       }
 
       if (scale) {
-        scale.broadcaster.registerListener(this, () => this._render());
+        scale.broadcaster.registerListener(this, () => this.render());
       }
       accessor = Utils.Methods.accessorize(accessor);
       this._projections[attrToSet] = {accessor: accessor, scale: scale, attribute: attrToSet};
       this._updateScaleExtent(attrToSet);
-      this._render(); // queue a re-render upon changing projector
+      this.render(); // queue a re-render upon changing projector
       return this;
     }
 
@@ -232,7 +232,7 @@ module Plottable {
       return attrToAppliedProjector;
     }
 
-    public _doRender() {
+    public doRender() {
       if (this._isAnchored) {
         this._paint();
         this._dataChanged = false;

@@ -8,20 +8,20 @@ module Plottable {
   export class ComponentContainer extends Component {
     private _components: Component[] = [];
 
-    public _anchor(element: D3.Selection) {
-      super._anchor(element);
-      this.components().forEach((c) => c._anchor(this._content));
+    public anchor(element: D3.Selection) {
+      super.anchor(element);
+      this.components().forEach((c) => c.anchor(this._content));
     }
 
-    public _render() {
-      this._components.forEach((c) => c._render());
+    public render() {
+      this._components.forEach((c) => c.render());
     }
 
     public _removeComponent(c: Component) {
       var removeIndex = this._components.indexOf(c);
       if (removeIndex >= 0) {
         this.components().splice(removeIndex, 1);
-        this._invalidateLayout();
+        this.invalidateLayout();
       }
     }
 
@@ -35,11 +35,11 @@ module Plottable {
       } else {
         this.components().push(c);
       }
-      c._parent(this);
+      c.parent(this);
       if (this._isAnchored) {
-        c._anchor(this._content);
+        c.anchor(this._content);
       }
-      this._invalidateLayout();
+      this.invalidateLayout();
       return true;
     }
 
@@ -79,13 +79,13 @@ module Plottable {
       this.components().slice().forEach((c: Component) => c.remove());
     }
 
-    public _useLastCalculatedLayout(): boolean;
-    public _useLastCalculatedLayout(calculated: boolean) : Component;
-    public _useLastCalculatedLayout(calculated?: boolean) : any {
+    public useLastCalculatedLayout(): boolean;
+    public useLastCalculatedLayout(calculated: boolean) : Component;
+    public useLastCalculatedLayout(calculated?: boolean) : any {
       if (calculated != null) {
-        this.components().slice().forEach((c: Component) => c._useLastCalculatedLayout(calculated));
+        this.components().slice().forEach((c: Component) => c.useLastCalculatedLayout(calculated));
       }
-      return super._useLastCalculatedLayout(calculated);
+      return super.useLastCalculatedLayout(calculated);
     }
   }
 }

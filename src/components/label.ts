@@ -27,10 +27,10 @@ export module Components {
       super();
       this.classed("label", true);
       this.text(displayText);
-      this.orient(orientation);
+      this.orientation(orientation);
       this.xAlign("center").yAlign("center");
-      this._fixedHeightFlag = true;
-      this._fixedWidthFlag = true;
+      this._isFixedHeight = true;
+      this._isFixedWidth = true;
       this._padding = 0;
     }
 
@@ -62,10 +62,10 @@ export module Components {
       return this;
     }
 
-    public _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
+    public requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
       var desiredWH = this._measurer.measure(this._text);
-      var desiredWidth  = (this.orient() === "horizontal" ? desiredWH.width : desiredWH.height) + 2 * this.padding();
-      var desiredHeight = (this.orient() === "horizontal" ? desiredWH.height : desiredWH.width) + 2 * this.padding();
+      var desiredWidth  = (this.orientation() === "horizontal" ? desiredWH.width : desiredWH.height) + 2 * this.padding();
+      var desiredHeight = (this.orientation() === "horizontal" ? desiredWH.height : desiredWH.width) + 2 * this.padding();
 
       return {
         width : desiredWidth,
@@ -75,8 +75,8 @@ export module Components {
       };
     }
 
-    protected _setup() {
-      super._setup();
+    protected setup() {
+      super.setup();
       this._textContainer = this._content.append("g");
       this._measurer = new SVGTypewriter.Measurers.Measurer(this._textContainer);
       this._wrapper = new SVGTypewriter.Wrappers.Wrapper();
@@ -102,7 +102,7 @@ export module Components {
         return this._text;
       } else {
         this._text = displayText;
-        this._invalidateLayout();
+        this.invalidateLayout();
         return this;
       }
     }
@@ -112,7 +112,7 @@ export module Components {
      *
      * @returns {string} the current orientation.
      */
-    public orient(): string;
+    public orientation(): string;
     /**
      * Sets the orientation of the Label.
      *
@@ -120,8 +120,8 @@ export module Components {
      * (horizontal/left/right).
      * @returns {Label} The calling Label.
      */
-    public orient(newOrientation: string): Label;
-    public orient(newOrientation?: string): any {
+    public orientation(newOrientation: string): Label;
+    public orientation(newOrientation?: string): any {
       if (newOrientation == null) {
         return this._orientation;
       } else {
@@ -131,7 +131,7 @@ export module Components {
         } else {
           throw new Error(newOrientation + " is not a valid orientation for LabelComponent");
         }
-        this._invalidateLayout();
+        this.invalidateLayout();
         return this;
       }
     }
@@ -158,13 +158,13 @@ export module Components {
           throw new Error(padAmount + " is not a valid padding value.  Cannot be less than 0.");
         }
         this._padding = padAmount;
-        this._invalidateLayout();
+        this.invalidateLayout();
         return this;
       }
     }
 
-    public _doRender() {
-      super._doRender();
+    public doRender() {
+      super.doRender();
       // HACKHACK SVGTypewriter should remove existing content - #21 on SVGTypewriter.
       this._textContainer.selectAll("g").remove();
       var textMeasurement = this._measurer.measure(this._text);
@@ -178,7 +178,7 @@ export module Components {
                         selection: this._textContainer,
                         xAlign: this._xAlignment,
                         yAlign: this._yAlignment,
-                        textRotation: textRotation[this.orient()]
+                        textRotation: textRotation[this.orientation()]
                     };
       this._writer.write(this._text, writeWidth, writeHeight, writeOptions);
     }

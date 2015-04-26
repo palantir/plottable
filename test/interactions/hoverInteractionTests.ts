@@ -28,7 +28,7 @@ class TestHoverable extends Plottable.Component implements Plottable.Interaction
     return {
       data: data,
       pixelPositions: points,
-      selection: this._element
+      selection: this.element
     };
   }
 }

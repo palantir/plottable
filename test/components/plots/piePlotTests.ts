@@ -250,7 +250,7 @@ describe("Plots", () => {
 
       plot.renderTo(svg);
 
-      var elementsDrawnSel = (<any> plot)._element.selectAll(".arc");
+      var elementsDrawnSel = (<any> plot).element.selectAll(".arc");
 
       assert.strictEqual(elementsDrawnSel.size(), 4,
         "There should be exactly 4 slices in the pie chart, representing the valid values");
@@ -275,7 +275,7 @@ describe("Plots", () => {
 
       plot.renderTo(svg);
 
-      var elementsDrawnSel = (<any> plot)._element.selectAll(".arc");
+      var elementsDrawnSel = (<any> plot).element.selectAll(".arc");
 
       assert.strictEqual(elementsDrawnSel.size(), 4,
         "All 4 elements of the pie chart should have a DOM node");

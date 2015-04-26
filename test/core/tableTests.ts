@@ -131,7 +131,7 @@ describe("Tables", () => {
     var svg = generateSVG();
     table.renderTo(svg);
 
-    var elements = components.map((r) => (<any> r)._element);
+    var elements = components.map((r) => (<any> r).element);
     var translates = elements.map((e) => getTranslate(e));
     assert.deepEqual(translates[0], [0, 0], "first element is centered at origin");
     assert.deepEqual(translates[1], [200, 0], "second element is located properly");
@@ -154,7 +154,7 @@ describe("Tables", () => {
     var svg = generateSVG(415, 415);
     table.renderTo(svg);
 
-    var elements = components.map((r) => (<any> r)._element);
+    var elements = components.map((r) => (<any> r).element);
     var translates = elements.map((e) => getTranslate(e));
     var bboxes = elements.map((e) => Plottable.Utils.DOM.getBBox(e));
     assert.deepEqual(translates[0], [0, 0], "first element is centered properly");
@@ -187,7 +187,7 @@ describe("Tables", () => {
 
     table.renderTo(svg);
 
-    var elements = components.map((r) => (<any> r)._element);
+    var elements = components.map((r) => (<any> r).element);
     var translates = elements.map((e) => getTranslate(e));
     var bboxes = elements.map((e) => Plottable.Utils.DOM.getBBox(e));
     // test the translates
@@ -210,15 +210,15 @@ describe("Tables", () => {
     var table = tableAndcomponents.table;
     var components = tableAndcomponents.components;
     components.forEach((c) => fixComponentSize(c, 10, 10));
-    assert.isTrue(table._isFixedWidth(), "fixed width when all subcomponents fixed width");
-    assert.isTrue(table._isFixedHeight(), "fixedHeight when all subcomponents fixed height");
+    assert.isTrue(table.isFixedWidth(), "fixed width when all subcomponents fixed width");
+    assert.isTrue(table.isFixedHeight(), "fixedHeight when all subcomponents fixed height");
     fixComponentSize(components[0], null, 10);
-    assert.isFalse(table._isFixedWidth(), "width not fixed when some subcomponent width not fixed");
-    assert.isTrue(table._isFixedHeight(), "the height is still fixed when some subcomponent width not fixed");
+    assert.isFalse(table.isFixedWidth(), "width not fixed when some subcomponent width not fixed");
+    assert.isTrue(table.isFixedHeight(), "the height is still fixed when some subcomponent width not fixed");
     fixComponentSize(components[8], 10, null);
     fixComponentSize(components[0], 10, 10);
-    assert.isTrue(table._isFixedWidth(), "width fixed again once no subcomponent width not fixed");
-    assert.isFalse(table._isFixedHeight(), "height unfixed now that a subcomponent has unfixed height");
+    assert.isTrue(table.isFixedWidth(), "width fixed again once no subcomponent width not fixed");
+    assert.isFalse(table.isFixedHeight(), "height unfixed now that a subcomponent has unfixed height");
   });
 
   it.skip("table._requestedSpace works properly", () => {
@@ -231,16 +231,16 @@ describe("Tables", () => {
 
     var table = new Plottable.Components.Table([[c0, c1], [c2, c3]]);
 
-    var spaceRequest = table._requestedSpace(30, 30);
+    var spaceRequest = table.requestedSpace(30, 30);
     verifySpaceRequest(spaceRequest, 30, 30, true, true, "1");
 
-    spaceRequest = table._requestedSpace(50, 50);
+    spaceRequest = table.requestedSpace(50, 50);
     verifySpaceRequest(spaceRequest, 50, 50, true, true, "2");
 
-    spaceRequest = table._requestedSpace(90, 90);
+    spaceRequest = table.requestedSpace(90, 90);
     verifySpaceRequest(spaceRequest, 70, 90, false, true, "3");
 
-    spaceRequest = table._requestedSpace(200, 200);
+    spaceRequest = table.requestedSpace(200, 200);
     verifySpaceRequest(spaceRequest, 70, 100, false, false, "4");
   });
 
@@ -297,7 +297,7 @@ describe("Tables", () => {
     it.skip("iterateLayout works in the tricky case when components can be unsatisfied but request little space", () => {
       table = new Plottable.Components.Table([[c1, c2]]);
       fixComponentSize(c1, null, null);
-      c2._requestedSpace = (w: number, h: number) => {
+      c2.requestedSpace = (w: number, h: number) => {
         return {
           width: w >= 200 ? 200 : 0,
           height: h >= 200 ? 200 : 0,

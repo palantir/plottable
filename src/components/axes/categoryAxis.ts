@@ -25,26 +25,26 @@ export module Axes {
       this.classed("category-axis", true);
     }
 
-    protected _setup() {
-      super._setup();
-      this._measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(this._tickLabelContainer);
+    protected setup() {
+      super.setup();
+      this._measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(this.tickLabelContainer);
       this._wrapper = new SVGTypewriter.Wrappers.SingleLineWrapper();
       this._writer = new SVGTypewriter.Writers.Writer(this._measurer, this._wrapper);
     }
 
     protected _rescale() {
-      return this._invalidateLayout();
+      return this.invalidateLayout();
     }
 
-    public _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
+    public requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
       var widthRequiredByTicks = this._isHorizontal() ? 0 : this._maxLabelTickLength() + this.tickLabelPadding() + this.gutter();
       var heightRequiredByTicks = this._isHorizontal() ? this._maxLabelTickLength() + this.tickLabelPadding() + this.gutter() : 0;
 
-      if (this._scale.domain().length === 0) {
+      if (this.scale.domain().length === 0) {
         return {width: 0, height: 0, wantsWidth: false, wantsHeight: false };
       }
 
-      var categoryScale: Scales.Category = <Scales.Category> this._scale;
+      var categoryScale: Scales.Category = <Scales.Category> this.scale;
       var fakeScale = categoryScale.copy();
       if (this._isHorizontal()) {
         fakeScale.range([0, offeredWidth]);
@@ -64,7 +64,7 @@ export module Axes {
     }
 
     protected _getTickValues(): string[] {
-      return this._scale.domain();
+      return this.scale.domain();
     }
 
     /**
@@ -89,7 +89,7 @@ export module Axes {
         throw new Error("Angle " + angle + " not supported; only 0, 90, and -90 are valid values");
       }
       this._tickLabelAngle = angle;
-      this._invalidateLayout();
+      this.invalidateLayout();
       return this;
     }
 
@@ -121,8 +121,8 @@ export module Axes {
         var height = self._isHorizontal() ? axisHeight - self._maxLabelTickLength() - self.tickLabelPadding() : bandWidth;
         var writeOptions = {
           selection: d3.select(this),
-          xAlign: xAlign[self.orient()],
-          yAlign: yAlign[self.orient()],
+          xAlign: xAlign[self.orientation()],
+          yAlign: yAlign[self.orientation()],
           textRotation: self.tickLabelAngle()
         };
         self._writer.write(self.formatter()(d), width, height, writeOptions);
@@ -190,10 +190,10 @@ export module Axes {
       };
     }
 
-    public _doRender() {
-      super._doRender();
-      var catScale = <Scales.Category> this._scale;
-      var tickLabels = this._tickLabelContainer.selectAll("." + Axis.TICK_LABEL_CLASS).data(this._scale.domain(), (d) => d);
+    public doRender() {
+      super.doRender();
+      var catScale = <Scales.Category> this.scale;
+      var tickLabels = this.tickLabelContainer.selectAll("." + Axis.TICK_LABEL_CLASS).data(this.scale.domain(), (d) => d);
 
       var getTickLabelTransform = (d: string, i: number) => {
         var innerPaddingWidth = catScale.stepWidth() - catScale.rangeBand();
@@ -210,18 +210,18 @@ export module Axes {
       this._drawTicks(this.width(), this.height(), catScale, tickLabels);
       var translate = this._isHorizontal() ? [catScale.rangeBand() / 2, 0] : [0, catScale.rangeBand() / 2];
 
-      var xTranslate = this.orient() === "right" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
-      var yTranslate = this.orient() === "bottom" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
-      Utils.DOM.translate(this._tickLabelContainer, xTranslate, yTranslate);
+      var xTranslate = this.orientation() === "right" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
+      var yTranslate = this.orientation() === "bottom" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
+      Utils.DOM.translate(this.tickLabelContainer, xTranslate, yTranslate);
       return this;
     }
 
-    public _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number) {
-      // When anyone calls _invalidateLayout, _computeLayout will be called
+    public computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number) {
+      // When anyone calls _invalidateLayout, computeLayout will be called
       // on everyone, including this. Since CSS or something might have
       // affected the size of the characters, clear the cache.
       this._measurer.reset();
-      return super._computeLayout(offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
+      return super.computeLayout(offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
     }
   }
 }

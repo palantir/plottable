@@ -58,10 +58,10 @@ export module Interactions {
 
     public _anchor(component: Hoverable, hitBox: D3.Selection) {
       super._anchor(component, hitBox);
-      this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(<SVGElement> (<any> this._componentToListenTo)._element.node());
+      this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(<SVGElement> (<any> this._componentToListenTo).element.node());
       this._mouseDispatcher.onMouseMove("hover" + this.getID(), (p: Point) => this._handlePointerEvent(p));
 
-      this._touchDispatcher = Dispatchers.Touch.getDispatcher(<SVGElement> (<any> this._componentToListenTo)._element.node());
+      this._touchDispatcher = Dispatchers.Touch.getDispatcher(<SVGElement> (<any> this._componentToListenTo).element.node());
 
       this._touchDispatcher.onTouchStart("hover" + this.getID(), (ids, idToPoint) =>
                                                                    this._handlePointerEvent(idToPoint[ids[0]]));

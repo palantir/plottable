@@ -15,7 +15,7 @@ export module Interactions {
       super._anchor(component, hitBox);
 
       this._positionDispatcher = Dispatchers.Mouse.getDispatcher(
-                                   <SVGElement> (<any> this._componentToListenTo)._element.node()
+                                   <SVGElement> (<any> this._componentToListenTo).element.node()
                                  );
       this._positionDispatcher.onMouseMove("Interaction.Key" + this.getID(), (p: Point) => null); // HACKHACK: registering a listener
 

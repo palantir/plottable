@@ -4,9 +4,9 @@ var assert = chai.assert;
 class CountingPlot extends Plottable.Plot {
   public renders: number = 0;
 
-  public _render() {
+  public render() {
     ++this.renders;
-    return super._render();
+    return super.render();
   }
 }
 
@@ -21,8 +21,8 @@ describe("Plots", () => {
     it("Base Plot functionality works", () => {
       var svg = generateSVG(400, 300);
       var r = new Plottable.Plot();
-      r._anchor(svg);
-      r._computeLayout();
+      r.anchor(svg);
+      r.computeLayout();
       var renderArea = (<any> r)._content.select(".render-area");
       assert.isNotNull(renderArea.node(), "there is a render-area");
       svg.remove();

@@ -40,8 +40,8 @@ export module Plots {
       return new Plottable.Drawers.Rect(key, this._isVertical);
     }
 
-    protected _setup() {
-      super._setup();
+    protected setup() {
+      super.setup();
       this._baseline = this._renderArea.append("line").classed("baseline", true);
     }
 
@@ -69,7 +69,7 @@ export module Plots {
       this._baselineValue = value;
       this._updateXDomainer();
       this._updateYDomainer();
-      this._render();
+      this.render();
       return this;
     }
 
@@ -89,7 +89,7 @@ export module Plots {
       }
       this._barAlignmentFactor = align2factor[alignmentLC];
 
-      this._render();
+      this.render();
       return this;
     }
 
@@ -111,7 +111,7 @@ export module Plots {
         return this._barLabelsEnabled;
       } else {
         this._barLabelsEnabled = enabled;
-        this._render();
+        this.render();
         return this;
       }
     }
@@ -134,7 +134,7 @@ export module Plots {
         return this._barLabelFormatter;
       } else {
         this._barLabelFormatter = formatter;
-        this._render();
+        this.render();
         return this;
       }
     }
@@ -247,7 +247,7 @@ export module Plots {
      * @returns {D3.Selection} The selected bar, or null if no bar was selected.
      */
     public getBars(xValOrExtent: number | Extent, yValOrExtent: number | Extent): D3.Selection {
-      if (!this._isSetup) {
+      if (!this.isSetup) {
         return d3.select();
       }
 

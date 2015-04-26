@@ -29,8 +29,8 @@ export module Plots {
       return new Animators.Null();
     }
 
-    protected _setup() {
-      super._setup();
+    protected setup() {
+      super.setup();
       this._baseline = this._renderArea.append("line").classed("baseline", true);
     }
 

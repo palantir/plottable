@@ -1561,112 +1561,57 @@ declare module Plottable {
 
 declare module Plottable {
     class Component extends Core.PlottableObject {
-        protected _element: D3.Selection;
-        protected _content: D3.Selection;
-        protected _boundingBox: D3.Selection;
         clipPathEnabled: boolean;
-        protected _fixedHeightFlag: boolean;
-        protected _fixedWidthFlag: boolean;
-        protected _isSetup: boolean;
+        protected _content: D3.Selection;
         protected _isAnchored: boolean;
+        protected _isFixedHeight: boolean;
+        protected _isFixedWidth: boolean;
+        protected boundingBox: D3.Selection;
+        protected element: D3.Selection;
+        protected isSetup: boolean;
+        /**
+         * Merges this Component above another Component, returning a
+         * ComponentGroup. This is used to layer Components on top of each other.
+         *
+         * There are four cases:
+         * Component + Component: Returns a ComponentGroup with the first component after the second component.
+         * ComponentGroup + Component: Returns the ComponentGroup with the Component prepended.
+         * Component + ComponentGroup: Returns the ComponentGroup with the Component appended.
+         * ComponentGroup + ComponentGroup: Returns a new ComponentGroup with the first group after the second group.
+         *
+         * @param {Component} c The component to merge in.
+         * @returns {ComponentGroup} The relevant ComponentGroup out of the above four cases.
+         */
+        above(c: Component): Components.Group;
         /**
          * Attaches the Component as a child of a given a DOM element. Usually only directly invoked on root-level Components.
          *
          * @param {D3.Selection} element A D3 selection consisting of the element to anchor under.
          */
-        _anchor(element: D3.Selection): void;
+        anchor(element: D3.Selection): void;
         /**
-         * Creates additional elements as necessary for the Component to function.
-         * Called during _anchor() if the Component's element has not been created yet.
-         * Override in subclasses to provide additional functionality.
+         * Returns the background selection for the Component
+         * (A selection appearing behind of the Component)
+         *
+         * Will return undefined if the Component has not been anchored.
+         *
+         * @return {D3.Selection} background selection for the Component
          */
-        protected _setup(): void;
-        _requestedSpace(availableWidth: number, availableHeight: number): _SpaceRequest;
+        background(): D3.Selection;
         /**
-         * Computes the size, position, and alignment from the specified values.
-         * If no parameters are supplied and the Component is a root node,
-         * they are inferred from the size of the Component's element.
+         * Merges this Component below another Component, returning a
+         * ComponentGroup. This is used to layer Components on top of each other.
          *
-         * @param {number} offeredXOrigin x-coordinate of the origin of the space offered the Component
-         * @param {number} offeredYOrigin y-coordinate of the origin of the space offered the Component
-         * @param {number} availableWidth available width for the Component to render in
-         * @param {number} availableHeight available height for the Component to render in
+         * There are four cases:
+         * Component + Component: Returns a ComponentGroup with the first component before the second component.
+         * ComponentGroup + Component: Returns the ComponentGroup with the Component appended.
+         * Component + ComponentGroup: Returns the ComponentGroup with the Component prepended.
+         * ComponentGroup + ComponentGroup: Returns a new ComponentGroup with the first group before the second group.
+         *
+         * @param {Component} c The component to merge in.
+         * @returns {ComponentGroup} The relevant ComponentGroup out of the above four cases.
          */
-        _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;
-        protected _getSize(availableWidth: number, availableHeight: number): {
-            width: number;
-            height: number;
-        };
-        _render(): void;
-        _doRender(): void;
-        _useLastCalculatedLayout(): boolean;
-        _useLastCalculatedLayout(useLast: boolean): Component;
-        _invalidateLayout(): void;
-        /**
-         * Renders the Component into a given DOM element. The element must be as <svg>.
-         *
-         * @param {String|D3.Selection} element A D3 selection or a selector for getting the element to render into.
-         * @returns {Component} The calling component.
-         */
-        renderTo(element: String | D3.Selection): Component;
-        /**
-         * Causes the Component to recompute layout and redraw.
-         *
-         * This function should be called when CSS changes could influence the size
-         * of the components, e.g. changing the font size.
-         *
-         * @returns {Component} The calling component.
-         */
-        redraw(): Component;
-        /**
-         * Sets the x alignment of the Component. This will be used if the
-         * Component is given more space than it needs.
-         *
-         * For example, you may want to make a Legend postition itself it the top
-         * right, so you would call `legend.xAlign("right")` and
-         * `legend.yAlign("top")`.
-         *
-         * @param {string} alignment The x alignment of the Component (one of ["left", "center", "right"]).
-         * @returns {Component} The calling Component.
-         */
-        xAlign(alignment: string): Component;
-        /**
-         * Sets the y alignment of the Component. This will be used if the
-         * Component is given more space than it needs.
-         *
-         * For example, you may want to make a Legend postition itself it the top
-         * right, so you would call `legend.xAlign("right")` and
-         * `legend.yAlign("top")`.
-         *
-         * @param {string} alignment The x alignment of the Component (one of ["top", "center", "bottom"]).
-         * @returns {Component} The calling Component.
-         */
-        yAlign(alignment: string): Component;
-        /**
-         * Sets the x offset of the Component. This will be used if the Component
-         * is given more space than it needs.
-         *
-         * @param {number} offset The desired x offset, in pixels, from the left
-         * side of the container.
-         * @returns {Component} The calling Component.
-         */
-        xOffset(offset: number): Component;
-        /**
-         * Sets the y offset of the Component. This will be used if the Component
-         * is given more space than it needs.
-         *
-         * @param {number} offset The desired y offset, in pixels, from the top
-         * side of the container.
-         * @returns {Component} The calling Component.
-         */
-        yOffset(offset: number): Component;
-        /**
-         * Attaches an Interaction to the Component, so that the Interaction will listen for events on the Component.
-         *
-         * @param {Interaction} interaction The Interaction to attach to the Component.
-         * @returns {Component} The calling Component.
-         */
-        registerInteraction(interaction: Interaction): Component;
+        below(c: Component): Components.Group;
         /**
          * Checks if the Component has a given CSS class.
          *
@@ -1683,48 +1628,25 @@ declare module Plottable {
          */
         classed(cssClass: string, addClass: boolean): Component;
         /**
-         * Checks if the Component has a fixed width or false if it grows to fill available space.
-         * Returns false by default on the base Component class.
+         * Computes the size, position, and alignment from the specified values.
+         * If no parameters are supplied and the Component is a root node,
+         * they are inferred from the size of the Component's element.
          *
-         * @returns {boolean} Whether the component has a fixed width.
+         * @param {number} offeredXOrigin x-coordinate of the origin of the space offered the Component
+         * @param {number} offeredYOrigin y-coordinate of the origin of the space offered the Component
+         * @param {number} availableWidth available width for the Component to render in
+         * @param {number} availableHeight available height for the Component to render in
          */
-        _isFixedWidth(): boolean;
+        computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;
         /**
-         * Checks if the Component has a fixed height or false if it grows to fill available space.
-         * Returns false by default on the base Component class.
+         * Returns the content selection for the Component
+         * (A selection containing the visual elements of the Component)
          *
-         * @returns {boolean} Whether the component has a fixed height.
+         * Will return undefined if the Component has not been anchored.
+         *
+         * @return {D3.Selection} content selection for the Component
          */
-        _isFixedHeight(): boolean;
-        _merge(c: Component, below: boolean): Components.Group;
-        /**
-         * Merges this Component above another Component, returning a
-         * ComponentGroup. This is used to layer Components on top of each other.
-         *
-         * There are four cases:
-         * Component + Component: Returns a ComponentGroup with the first component after the second component.
-         * ComponentGroup + Component: Returns the ComponentGroup with the Component prepended.
-         * Component + ComponentGroup: Returns the ComponentGroup with the Component appended.
-         * ComponentGroup + ComponentGroup: Returns a new ComponentGroup with the first group after the second group.
-         *
-         * @param {Component} c The component to merge in.
-         * @returns {ComponentGroup} The relevant ComponentGroup out of the above four cases.
-         */
-        above(c: Component): Components.Group;
-        /**
-         * Merges this Component below another Component, returning a
-         * ComponentGroup. This is used to layer Components on top of each other.
-         *
-         * There are four cases:
-         * Component + Component: Returns a ComponentGroup with the first component before the second component.
-         * ComponentGroup + Component: Returns the ComponentGroup with the Component appended.
-         * Component + ComponentGroup: Returns the ComponentGroup with the Component prepended.
-         * ComponentGroup + ComponentGroup: Returns a new ComponentGroup with the first group before the second group.
-         *
-         * @param {Component} c The component to merge in.
-         * @returns {ComponentGroup} The relevant ComponentGroup out of the above four cases.
-         */
-        below(c: Component): Components.Group;
+        content(): D3.Selection;
         /**
          * Detaches a Component from the DOM. The component can be reused.
          *
@@ -1734,25 +1656,53 @@ declare module Plottable {
          * @returns The calling Component.
          */
         detach(): Component;
-        _parent(): ComponentContainer;
-        _parent(parentElement: ComponentContainer): any;
+        doRender(): void;
         /**
-         * Removes a Component from the DOM and disconnects it from everything it's
-         * listening to (effectively destroying it).
-         */
-        remove(): void;
-        /**
-         * Return the width of the component
+         * Returns the foreground selection for the Component
+         * (A selection covering the front of the Component)
          *
-         * @return {number} width of the component
+         * Will return undefined if the Component has not been anchored.
+         *
+         * @return {D3.Selection} foreground selection for the Component
          */
-        width(): number;
+        foreground(): D3.Selection;
         /**
          * Return the height of the component
          *
          * @return {number} height of the component
          */
         height(): number;
+        /**
+         * Returns the hitbox selection for the component
+         * (A selection in front of the foreground used mainly for interactions)
+         *
+         * Will return undefined if the component has not been anchored
+         *
+         * @return {D3.Selection} hitbox selection for the component
+         */
+        hitBox(): D3.Selection;
+        invalidateLayout(): void;
+        /**
+         * Checks if the Component has a fixed height or false if it grows to fill available space.
+         * Returns false by default on the base Component class.
+         *
+         * @returns {boolean} Whether the component has a fixed height.
+         */
+        isFixedHeight(): boolean;
+        /**
+         * Checks if the Component has a fixed width or false if it grows to fill available space.
+         * Returns false by default on the base Component class.
+         *
+         * @returns {boolean} Whether the component has a fixed width.
+         */
+        isFixedWidth(): boolean;
+        /**
+         * Merges a Component into the same space as a specified component.
+         *
+         * @param {Component} c The component to merge with.
+         * @param {boolean} below Whether the parent component is below the parametrized component.
+         */
+        merge(c: Component, below: boolean): Components.Group;
         /**
          * Gets the origin of the Component relative to its parent.
          *
@@ -1765,50 +1715,109 @@ declare module Plottable {
          * @return {Point} The x-y position of the Component relative to the root <svg>
          */
         originToSVG(): Point;
+        parent(): ComponentContainer;
+        parent(parentElement: ComponentContainer): any;
+        requestedSpace(availableWidth: number, availableHeight: number): _SpaceRequest;
         /**
-         * Returns the foreground selection for the Component
-         * (A selection covering the front of the Component)
+         * Causes the Component to recompute layout and redraw.
          *
-         * Will return undefined if the Component has not been anchored.
+         * This function should be called when CSS changes could influence the size
+         * of the components, e.g. changing the font size.
          *
-         * @return {D3.Selection} foreground selection for the Component
+         * @returns {Component} The calling component.
          */
-        foreground(): D3.Selection;
+        redraw(): Component;
         /**
-         * Returns the content selection for the Component
-         * (A selection containing the visual elements of the Component)
+         * Attaches an Interaction to the Component, so that the Interaction will listen for events on the Component.
          *
-         * Will return undefined if the Component has not been anchored.
-         *
-         * @return {D3.Selection} content selection for the Component
+         * @param {Interaction} interaction The Interaction to attach to the Component.
+         * @returns {Component} The calling Component.
          */
-        content(): D3.Selection;
+        registerInteraction(interaction: Interaction): Component;
         /**
-         * Returns the background selection for the Component
-         * (A selection appearing behind of the Component)
-         *
-         * Will return undefined if the Component has not been anchored.
-         *
-         * @return {D3.Selection} background selection for the Component
+         * Removes a Component from the DOM and disconnects it from everything it's
+         * listening to (effectively destroying it).
          */
-        background(): D3.Selection;
+        remove(): void;
         /**
-         * Returns the hitbox selection for the component
-         * (A selection in front of the foreground used mainly for interactions)
-         *
-         * Will return undefined if the component has not been anchored
-         *
-         * @return {D3.Selection} hitbox selection for the component
+         * Renders a component to the DOM
          */
-        hitBox(): D3.Selection;
+        render(): void;
+        /**
+         * Renders the Component into a given DOM element. The element must be as <svg>.
+         *
+         * @param {String|D3.Selection} element A D3 selection or a selector for getting the element to render into.
+         * @returns {Component} The calling component.
+         */
+        renderTo(element: String | D3.Selection): Component;
+        useLastCalculatedLayout(): boolean;
+        useLastCalculatedLayout(useLast: boolean): Component;
+        /**
+         * Return the width of the component
+         *
+         * @return {number} width of the component
+         */
+        width(): number;
+        /**
+         * Sets the x alignment of the Component. This will be used if the
+         * Component is given more space than it needs.
+         *
+         * For example, you may want to make a Legend postition itself it the top
+         * right, so you would call `legend.xAlign("right")` and
+         * `legend.yAlign("top")`.
+         *
+         * @param {string} alignment The x alignment of the Component (one of ["left", "center", "right"]).
+         * @returns {Component} The calling Component.
+         */
+        xAlign(alignment: string): Component;
+        /**
+         * Sets the x offset of the Component. This will be used if the Component
+         * is given more space than it needs.
+         *
+         * @param {number} offset The desired x offset, in pixels, from the left
+         * side of the container.
+         * @returns {Component} The calling Component.
+         */
+        xOffset(offset: number): Component;
+        /**
+         * Sets the y alignment of the Component. This will be used if the
+         * Component is given more space than it needs.
+         *
+         * For example, you may want to make a Legend postition itself it the top
+         * right, so you would call `legend.xAlign("right")` and
+         * `legend.yAlign("top")`.
+         *
+         * @param {string} alignment The x alignment of the Component (one of ["top", "center", "bottom"]).
+         * @returns {Component} The calling Component.
+         */
+        yAlign(alignment: string): Component;
+        /**
+         * Sets the y offset of the Component. This will be used if the Component
+         * is given more space than it needs.
+         *
+         * @param {number} offset The desired y offset, in pixels, from the top
+         * side of the container.
+         * @returns {Component} The calling Component.
+         */
+        yOffset(offset: number): Component;
+        protected getSize(availableWidth: number, availableHeight: number): {
+            width: number;
+            height: number;
+        };
+        /**
+         * Creates additional elements as necessary for the Component to function.
+         * Called during _anchor() if the Component's element has not been created yet.
+         * Override in subclasses to provide additional functionality.
+         */
+        protected setup(): void;
     }
 }
 
 
 declare module Plottable {
     class ComponentContainer extends Component {
-        _anchor(element: D3.Selection): void;
-        _render(): void;
+        anchor(element: D3.Selection): void;
+        render(): void;
         _removeComponent(c: Component): void;
         _addComponent(c: Component, prepend?: boolean): boolean;
         /**
@@ -1831,8 +1840,8 @@ declare module Plottable {
          */
         detachAll(): ComponentContainer;
         remove(): void;
-        _useLastCalculatedLayout(): boolean;
-        _useLastCalculatedLayout(calculated: boolean): Component;
+        useLastCalculatedLayout(): boolean;
+        useLastCalculatedLayout(calculated: boolean): Component;
     }
 }
 
@@ -1854,15 +1863,15 @@ declare module Plottable {
              * @param {Component[]} components The Components in the resultant Component.Group (default = []).
              */
             constructor(components?: Component[]);
-            _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
-            _merge(c: Component, below: boolean): Group;
-            _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): Group;
-            protected _getSize(availableWidth: number, availableHeight: number): {
+            requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
+            merge(c: Component, below: boolean): Group;
+            computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): Group;
+            protected getSize(availableWidth: number, availableHeight: number): {
                 width: number;
                 height: number;
             };
-            _isFixedWidth(): boolean;
-            _isFixedHeight(): boolean;
+            isFixedWidth(): boolean;
+            isFixedHeight(): boolean;
         }
     }
 }
@@ -1882,12 +1891,12 @@ declare module Plottable {
          * The css class applied to each tick label (the text associated with the tick).
          */
         static TICK_LABEL_CLASS: string;
-        protected _tickMarkContainer: D3.Selection;
-        protected _tickLabelContainer: D3.Selection;
-        protected _baseline: D3.Selection;
-        protected _scale: Scale<any, number>;
-        protected _computedWidth: number;
-        protected _computedHeight: number;
+        protected baseline: D3.Selection;
+        protected computedHeight: number;
+        protected computedWidth: number;
+        protected tickLabelContainer: D3.Selection;
+        protected tickMarkContainer: D3.Selection;
+        protected scale: Scale<any, number>;
         /**
          * Constructs an axis. An axis is a wrapper around a scale for rendering.
          *
@@ -1900,32 +1909,21 @@ declare module Plottable {
          * displayed.
          */
         constructor(scale: Scale<any, number>, orientation: string, formatter?: (d: any) => string);
-        remove(): void;
-        protected _isHorizontal(): boolean;
-        protected _computeWidth(): number;
-        protected _computeHeight(): number;
-        _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
-        _isFixedHeight(): boolean;
-        _isFixedWidth(): boolean;
-        protected _rescale(): void;
-        _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;
-        protected _setup(): void;
-        protected _getTickValues(): any[];
-        _doRender(): void;
-        protected _generateBaselineAttrHash(): {
-            x1: number;
-            y1: number;
-            x2: number;
-            y2: number;
-        };
-        protected _generateTickMarkAttrHash(isEndTickMark?: boolean): {
-            x1: any;
-            y1: any;
-            x2: any;
-            y2: any;
-        };
-        _invalidateLayout(): void;
-        protected _setDefaultAlignment(): void;
+        computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;
+        doRender(): void;
+        /**
+         * Gets the current end tick mark length.
+         *
+         * @returns {number} The current end tick mark length.
+         */
+        endTickLength(): number;
+        /**
+         * Sets the end tick mark length.
+         *
+         * @param {number} length If provided, the length of the end ticks.
+         * @returns {BaseAxis} The calling Axis.
+         */
+        endTickLength(length: number): Axis;
         /**
          * Gets the current formatter on the axis. Data is passed through the
          * formatter before being displayed.
@@ -1943,47 +1941,6 @@ declare module Plottable {
          */
         formatter(formatter: Formatter): Axis;
         /**
-         * Gets the current tick mark length.
-         *
-         * @returns {number} the current tick mark length.
-         */
-        tickLength(): number;
-        /**
-         * Sets the current tick mark length.
-         *
-         * @param {number} length If provided, length of each tick.
-         * @returns {Axis} The calling Axis.
-         */
-        tickLength(length: number): Axis;
-        /**
-         * Gets the current end tick mark length.
-         *
-         * @returns {number} The current end tick mark length.
-         */
-        endTickLength(): number;
-        /**
-         * Sets the end tick mark length.
-         *
-         * @param {number} length If provided, the length of the end ticks.
-         * @returns {BaseAxis} The calling Axis.
-         */
-        endTickLength(length: number): Axis;
-        protected _maxLabelTickLength(): number;
-        /**
-         * Gets the padding between each tick mark and its associated label.
-         *
-         * @returns {number} the current padding.
-         * length.
-         */
-        tickLabelPadding(): number;
-        /**
-         * Sets the padding between each tick mark and its associated label.
-         *
-         * @param {number} padding If provided, the desired padding.
-         * @returns {Axis} The calling Axis.
-         */
-        tickLabelPadding(padding: number): Axis;
-        /**
          * Gets the size of the gutter (the extra space between the tick
          * labels and the outer edge of the axis).
          *
@@ -1999,12 +1956,15 @@ declare module Plottable {
          * @returns {Axis} The calling Axis.
          */
         gutter(size: number): Axis;
+        invalidateLayout(): void;
+        isFixedHeight(): boolean;
+        isFixedWidth(): boolean;
         /**
          * Gets the orientation of the Axis.
          *
          * @returns {number} the current orientation.
          */
-        orient(): string;
+        orientation(): string;
         /**
          * Sets the orientation of the Axis.
          *
@@ -2012,7 +1972,9 @@ declare module Plottable {
          * (top/bottom/left/right).
          * @returns {Axis} The calling Axis.
          */
-        orient(newOrientation: string): Axis;
+        orientation(newOrientation: string): Axis;
+        remove(): void;
+        requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
         /**
          * Gets whether the Axis is currently set to show the first and last
          * tick labels.
@@ -2030,6 +1992,53 @@ declare module Plottable {
          * @returns {Axis} The calling Axis.
          */
         showEndTickLabels(show: boolean): Axis;
+        /**
+         * Gets the padding between each tick mark and its associated label.
+         *
+         * @returns {number} the current padding.
+         * length.
+         */
+        tickLabelPadding(): number;
+        /**
+         * Sets the padding between each tick mark and its associated label.
+         *
+         * @param {number} padding If provided, the desired padding.
+         * @returns {Axis} The calling Axis.
+         */
+        tickLabelPadding(padding: number): Axis;
+        /**
+         * Gets the current tick mark length.
+         *
+         * @returns {number} the current tick mark length.
+         */
+        tickLength(): number;
+        /**
+         * Sets the current tick mark length.
+         *
+         * @param {number} length If provided, length of each tick.
+         * @returns {Axis} The calling Axis.
+         */
+        tickLength(length: number): Axis;
+        protected _computeHeight(): number;
+        protected _computeWidth(): number;
+        protected _generateBaselineAttrHash(): {
+            x1: number;
+            y1: number;
+            x2: number;
+            y2: number;
+        };
+        protected _generateTickMarkAttrHash(isEndTickMark?: boolean): {
+            x1: any;
+            y1: any;
+            x2: any;
+            y2: any;
+        };
+        protected _getTickValues(): any[];
+        protected _isHorizontal(): boolean;
+        protected _maxLabelTickLength(): number;
+        protected _rescale(): void;
+        protected setup(): void;
+        protected _setDefaultAlignment(): void;
     }
 }
 
@@ -2086,16 +2095,16 @@ declare module Plottable {
              * @returns {Axis.Time} The calling Axis.Time.
              */
             axisConfigurations(configurations: TimeAxisConfiguration[]): Time;
-            orient(): string;
-            orient(orientation: string): Time;
+            orientation(): string;
+            orientation(orientation: string): Time;
             _computeHeight(): number;
-            protected _getSize(availableWidth: number, availableHeight: number): {
+            protected getSize(availableWidth: number, availableHeight: number): {
                 width: number;
                 height: number;
             };
-            protected _setup(): void;
+            protected setup(): void;
             protected _getTickValues(): any[];
-            _doRender(): Time;
+            doRender(): Time;
         }
     }
 }
@@ -2115,12 +2124,12 @@ declare module Plottable {
              * @param {Formatter} formatter A function to format tick labels (default Formatters.general()).
              */
             constructor(scale: QuantitativeScale<number>, orientation: string, formatter?: (d: any) => string);
-            protected _setup(): void;
+            protected setup(): void;
             _computeWidth(): number;
             _computeHeight(): number;
             protected _getTickValues(): any[];
             protected _rescale(): void;
-            _doRender(): void;
+            doRender(): void;
             /**
              * Gets the tick label position relative to the tick marks.
              *
@@ -2182,9 +2191,9 @@ declare module Plottable {
              * @param {Formatter} formatter The Formatter for the Axis (default Formatters.identity())
              */
             constructor(scale: Scales.Category, orientation?: string, formatter?: (d: any) => string);
-            protected _setup(): void;
+            protected setup(): void;
             protected _rescale(): void;
-            _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
+            requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
             protected _getTickValues(): string[];
             /**
              * Sets the angle for the tick labels. Right now vertical-left (-90), horizontal (0), and vertical-right (90) are the only options.
@@ -2200,8 +2209,8 @@ declare module Plottable {
              * @returns {number} the tick label angle
              */
             tickLabelAngle(): number;
-            _doRender(): Category;
-            _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;
+            doRender(): Category;
+            computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;
         }
     }
 }
@@ -2237,8 +2246,8 @@ declare module Plottable {
              * @returns {Label} The calling Label.
              */
             yAlign(alignment: string): Label;
-            _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
-            protected _setup(): void;
+            requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
+            protected setup(): void;
             /**
              * Gets the current text on the Label.
              *
@@ -2257,7 +2266,7 @@ declare module Plottable {
              *
              * @returns {string} the current orientation.
              */
-            orient(): string;
+            orientation(): string;
             /**
              * Sets the orientation of the Label.
              *
@@ -2265,7 +2274,7 @@ declare module Plottable {
              * (horizontal/left/right).
              * @returns {Label} The calling Label.
              */
-            orient(newOrientation: string): Label;
+            orientation(newOrientation: string): Label;
             /**
              * Gets the amount of padding in pixels around the Label.
              *
@@ -2279,7 +2288,7 @@ declare module Plottable {
              * @returns {Label} The calling Label.
              */
             padding(padAmount: number): Label;
-            _doRender(): void;
+            doRender(): void;
         }
         class TitleLabel extends Label {
             /**
@@ -2326,7 +2335,7 @@ declare module Plottable {
              * @param {Scale.Color} colorScale
              */
             constructor(colorScale: Scales.Color);
-            protected _setup(): void;
+            protected setup(): void;
             /**
              * Gets the current max number of entries in Legend row.
              * @returns {number} The current max number of entries in row.
@@ -2365,7 +2374,7 @@ declare module Plottable {
              */
             scale(scale: Scales.Color): Legend;
             remove(): void;
-            _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
+            requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
             /**
              * Gets the legend entry under the given pixel position.
              *
@@ -2373,7 +2382,7 @@ declare module Plottable {
              * @returns {D3.Selection} The selected entry, or null selection if no entry was selected.
              */
             getEntry(position: Point): D3.Selection;
-            _doRender(): void;
+            doRender(): void;
             /**
              * Gets the symbolFactoryAccessor of the legend, which dictates how
              * the symbol in each entry is drawn.
@@ -2432,7 +2441,7 @@ declare module Plottable {
              *
              * @returns {string} The current orientation.
              */
-            orient(): string;
+            orientation(): string;
             /**
              * Sets the orientation of the InterpolatedColorLegend.
              *
@@ -2440,10 +2449,10 @@ declare module Plottable {
              *
              * @returns {InterpolatedColorLegend} The calling InterpolatedColorLegend.
              */
-            orient(newOrientation: string): InterpolatedColorLegend;
-            protected _setup(): void;
-            _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
-            _doRender(): void;
+            orientation(newOrientation: string): InterpolatedColorLegend;
+            protected setup(): void;
+            requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
+            doRender(): void;
         }
     }
 }
@@ -2461,8 +2470,8 @@ declare module Plottable {
              */
             constructor(xScale: QuantitativeScale<any>, yScale: QuantitativeScale<any>);
             remove(): Gridlines;
-            protected _setup(): void;
-            _doRender(): void;
+            protected setup(): void;
+            doRender(): void;
         }
     }
 }
@@ -2518,8 +2527,8 @@ declare module Plottable {
              */
             addComponent(row: number, col: number, component: Component): Table;
             _removeComponent(component: Component): void;
-            _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
-            _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;
+            requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
+            computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;
             /**
              * Sets the row and column padding on the Table.
              *
@@ -2565,8 +2574,8 @@ declare module Plottable {
              * @returns {Table} The calling Table.
              */
             colWeight(index: number, weight: number): Table;
-            _isFixedWidth(): boolean;
-            _isFixedHeight(): boolean;
+            isFixedWidth(): boolean;
+            isFixedHeight(): boolean;
         }
     }
 }
@@ -2577,8 +2586,8 @@ declare module Plottable {
         class SelectionBoxLayer extends Component {
             protected _box: D3.Selection;
             constructor();
-            protected _setup(): void;
-            protected _getSize(availableWidth: number, availableHeight: number): {
+            protected setup(): void;
+            protected getSize(availableWidth: number, availableHeight: number): {
                 width: number;
                 height: number;
             };
@@ -2596,7 +2605,7 @@ declare module Plottable {
              */
             bounds(newBounds: Bounds): SelectionBoxLayer;
             protected _setBounds(newBounds: Bounds): void;
-            _doRender(): void;
+            doRender(): void;
             /**
              * Gets whether the box is being shown.
              *
@@ -2657,8 +2666,8 @@ declare module Plottable {
          * @param {any[]|Dataset} [dataset] If provided, the data or Dataset to be associated with this Plot.
          */
         constructor();
-        _anchor(element: D3.Selection): void;
-        protected _setup(): void;
+        anchor(element: D3.Selection): void;
+        protected setup(): void;
         remove(): void;
         /**
          * Adds a dataset to this plot. Identify this dataset with a key.
@@ -2713,7 +2722,7 @@ declare module Plottable {
          * @returns {AttributeToAppliedProjector} A dictionary mapping attributes to functions
          */
         generateProjectors(datasetKey: string): AttributeToAppliedProjector;
-        _doRender(): void;
+        doRender(): void;
         /**
          * Enables or disables animation.
          *
@@ -2820,7 +2829,7 @@ declare module Plottable {
              * @constructor
              */
             constructor();
-            _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;
+            computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;
             addDataset(keyOrDataset: any, dataset?: any): Pie;
             protected _generateAttrToProjector(): AttributeToProjector;
             protected _getDrawer(key: string): Drawers.AbstractDrawer;
@@ -2871,7 +2880,7 @@ declare module Plottable {
          */
         automaticallyAdjustXScaleOverVisiblePoints(autoAdjustment: boolean): XYPlot<X, Y>;
         protected _generateAttrToProjector(): AttributeToProjector;
-        _computeLayout(offeredXOrigin?: number, offeredYOffset?: number, availableWidth?: number, availableHeight?: number): void;
+        computeLayout(offeredXOrigin?: number, offeredYOffset?: number, availableWidth?: number, availableHeight?: number): void;
         protected _updateXDomainer(): void;
         protected _updateYDomainer(): void;
         /**
@@ -2991,7 +3000,7 @@ declare module Plottable {
              */
             constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>, isVertical?: boolean);
             protected _getDrawer(key: string): Drawers.Rect;
-            protected _setup(): void;
+            protected setup(): void;
             /**
              * Gets the baseline value for the bars
              *
@@ -3119,7 +3128,7 @@ declare module Plottable {
              * @param {QuantitativeScaleScale} yScale The y scale to use.
              */
             constructor(xScale: QuantitativeScale<X>, yScale: QuantitativeScale<number>);
-            protected _setup(): void;
+            protected setup(): void;
             protected _rejectNullsAndNaNs(d: any, i: number, userMetdata: any, plotMetadata: any, accessor: _Accessor): boolean;
             protected _getDrawer(key: string): Drawers.Line;
             protected _getResetYFunction(): (d: any, i: number, u: any, m: PlotMetadata) => number;
@@ -3266,7 +3275,7 @@ declare module Plottable {
             constructor(xScale: QuantitativeScale<X>, yScale: QuantitativeScale<number>);
             protected _getDrawer(key: string): Drawers.Area;
             _getAnimator(key: string): Animators.PlotAnimator;
-            protected _setup(): void;
+            protected setup(): void;
             protected _additionalPaint(): void;
             protected _updateYDomainer(): void;
             project(attrToSet: string, accessor: any, scale?: Scale<any, any>): StackedArea<X>;
@@ -4040,8 +4049,8 @@ declare module Plottable {
         class DragBoxLayer extends Components.SelectionBoxLayer {
             protected _hasCorners: boolean;
             constructor();
-            protected _setup(): void;
-            _doRender(): void;
+            protected setup(): void;
+            doRender(): void;
             /**
              * Gets the detection radius of the drag box.
              *
@@ -4117,7 +4126,7 @@ declare module Plottable {
     module Components {
         class XDragBoxLayer extends DragBoxLayer {
             constructor();
-            _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;
+            computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;
             protected _setBounds(newBounds: Bounds): void;
             protected _setResizableClasses(canResize: boolean): void;
         }
@@ -4129,7 +4138,7 @@ declare module Plottable {
     module Components {
         class YDragBoxLayer extends DragBoxLayer {
             constructor();
-            _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;
+            computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;
             protected _setBounds(newBounds: Bounds): void;
             protected _setResizableClasses(canResize: boolean): void;
         }

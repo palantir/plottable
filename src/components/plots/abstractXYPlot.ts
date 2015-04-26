@@ -115,8 +115,8 @@ module Plottable {
       return attrToProjector;
     }
 
-    public _computeLayout(offeredXOrigin?: number, offeredYOffset?: number, availableWidth?: number, availableHeight?: number) {
-      super._computeLayout(offeredXOrigin, offeredYOffset, availableWidth, availableHeight);
+    public computeLayout(offeredXOrigin?: number, offeredYOffset?: number, availableWidth?: number, availableHeight?: number) {
+      super.computeLayout(offeredXOrigin, offeredYOffset, availableWidth, availableHeight);
       this._xScale.range([0, this.width()]);
       if (this._yScale instanceof Scales.Category) {
         this._yScale.range([0, this.height()]);

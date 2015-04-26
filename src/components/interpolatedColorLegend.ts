@@ -40,12 +40,12 @@ export module Components {
         throw new Error("InterpolatedColorLegend requires a interpolatedColorScale");
       }
       this._scale = interpolatedColorScale;
-      this._scale.broadcaster.registerListener(this, () => this._invalidateLayout());
+      this._scale.broadcaster.registerListener(this, () => this.invalidateLayout());
       this._formatter = formatter;
       this._orientation = InterpolatedColorLegend._ensureOrientation(orientation);
 
-      this._fixedWidthFlag = true;
-      this._fixedHeightFlag = true;
+      this._isFixedWidth = true;
+      this._isFixedHeight = true;
       this.classed("legend", true).classed("interpolated-color-legend", true);
     }
 
@@ -72,7 +72,7 @@ export module Components {
         return this._formatter;
       }
       this._formatter = formatter;
-      this._invalidateLayout();
+      this.invalidateLayout();
       return this;
     }
 
@@ -90,7 +90,7 @@ export module Components {
      *
      * @returns {string} The current orientation.
      */
-    public orient(): string;
+    public orientation(): string;
     /**
      * Sets the orientation of the InterpolatedColorLegend.
      *
@@ -98,13 +98,13 @@ export module Components {
      *
      * @returns {InterpolatedColorLegend} The calling InterpolatedColorLegend.
      */
-    public orient(newOrientation: string): InterpolatedColorLegend;
-    public orient(newOrientation?: string): any {
+    public orientation(newOrientation: string): InterpolatedColorLegend;
+    public orientation(newOrientation?: string): any {
       if (newOrientation == null) {
         return this._orientation;
       } else {
         this._orientation = InterpolatedColorLegend._ensureOrientation(newOrientation);
-        this._invalidateLayout();
+        this.invalidateLayout();
         return this;
       }
     }
@@ -119,8 +119,8 @@ export module Components {
       return ticks;
     }
 
-    protected _setup() {
-      super._setup();
+    protected setup() {
+      super.setup();
 
       this._swatchContainer = this._content.append("g").classed("swatch-container", true);
       this._swatchBoundingBox = this._content.append("rect").classed("swatch-bounding-box", true);
@@ -132,7 +132,7 @@ export module Components {
       this._writer = new SVGTypewriter.Writers.Writer(this._measurer, this._wrapper);
     }
 
-    public _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
+    public requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
       var textHeight = this._measurer.measure().height;
 
       var ticks = this._generateTicks();
@@ -166,8 +166,8 @@ export module Components {
       return this._orientation !== "horizontal";
     }
 
-    public _doRender() {
-      super._doRender();
+    public doRender() {
+      super.doRender();
 
       var domain = this._scale.domain();
 

@@ -14,18 +14,18 @@ export module Components {
     constructor() {
       super();
       this.classed("selection-box-layer", true);
-      this._fixedWidthFlag = true;
-      this._fixedHeightFlag = true;
+      this._isFixedWidth = true;
+      this._isFixedHeight = true;
     }
 
-    protected _setup() {
-      super._setup();
+    protected setup() {
+      super.setup();
 
       this._box = this._content.append("g").classed("selection-box", true).remove();
       this._boxArea = this._box.append("rect").classed("selection-area", true);
     }
 
-    protected _getSize(availableWidth: number, availableHeight: number) {
+    protected getSize(availableWidth: number, availableHeight: number) {
       return {
         width: availableWidth,
         height: availableHeight
@@ -51,7 +51,7 @@ export module Components {
       }
 
       this._setBounds(newBounds);
-      this._render();
+      this.render();
       return this;
     }
 
@@ -70,7 +70,7 @@ export module Components {
       };
     }
 
-    public _doRender() {
+    public doRender() {
       if (this._boxVisible) {
         var t = this._boxBounds.topLeft.y;
         var b = this._boxBounds.bottomRight.y;
@@ -105,7 +105,7 @@ export module Components {
       }
 
       this._boxVisible = show;
-      this._render();
+      this.render();
       return this;
     }
   }
