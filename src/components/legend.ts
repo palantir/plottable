@@ -184,9 +184,7 @@ export module Component {
       var wantsFitMoreEntriesInRow = estimatedLayout.rows.length > desiredNumRows;
       return {
         width : this._padding + longestRowLength,
-        height: acceptableHeight,
-        wantsWidth: offeredWidth < desiredWidth || wantsFitMoreEntriesInRow,
-        wantsHeight: offeredHeight < desiredHeight
+        height: acceptableHeight
       };
     }
 

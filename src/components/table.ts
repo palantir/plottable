@@ -228,39 +228,42 @@ export module Component {
     private _determineGuarantees(offeredWidths: number[], offeredHeights: number[]): _LayoutAllocation {
       var requestedWidths  = _Util.Methods.createFilledArray(0, this._nCols);
       var requestedHeights = _Util.Methods.createFilledArray(0, this._nRows);
-      var layoutWantsWidth  = _Util.Methods.createFilledArray(false, this._nCols);
-      var layoutWantsHeight = _Util.Methods.createFilledArray(false, this._nRows);
+      var columnNeedsWidth  = _Util.Methods.createFilledArray(false, this._nCols);
+      var rowNeedsHeight = _Util.Methods.createFilledArray(false, this._nRows);
       this._rows.forEach((row: AbstractComponent[], rowIndex: number) => {
         row.forEach((component: AbstractComponent, colIndex: number) => {
           var spaceRequest: _SpaceRequest;
           if (component != null) {
             spaceRequest = component._requestedSpace(offeredWidths[colIndex], offeredHeights[rowIndex]);
           } else {
-            spaceRequest = {width: 0, height: 0, wantsWidth: false, wantsHeight: false};
+            spaceRequest = {width: 0, height: 0};
           }
+
 
           var allocatedWidth = Math.min(spaceRequest.width, offeredWidths[colIndex]);
           var allocatedHeight = Math.min(spaceRequest.height, offeredHeights[rowIndex]);
+          var componentNeedsWidth = spaceRequest.width > offeredWidths[colIndex];
+          var componentNeedsHeight = spaceRequest.height > offeredHeights[rowIndex];
 
-          requestedWidths [colIndex] = Math.max(requestedWidths [colIndex], allocatedWidth );
+          requestedWidths[colIndex] = Math.max(requestedWidths[colIndex], allocatedWidth);
           requestedHeights[rowIndex] = Math.max(requestedHeights[rowIndex], allocatedHeight);
-          layoutWantsWidth [colIndex] = layoutWantsWidth [colIndex] || spaceRequest.wantsWidth;
-          layoutWantsHeight[rowIndex] = layoutWantsHeight[rowIndex] || spaceRequest.wantsHeight;
+
+          columnNeedsWidth[colIndex] = columnNeedsWidth[colIndex] || componentNeedsWidth;
+          rowNeedsHeight[rowIndex] = rowNeedsHeight[rowIndex] || componentNeedsHeight;
         });
       });
       return {guaranteedWidths : requestedWidths  ,
               guaranteedHeights: requestedHeights ,
-              wantsWidthArr    : layoutWantsWidth ,
-              wantsHeightArr   : layoutWantsHeight};
+              wantsWidthArr    : columnNeedsWidth ,
+              wantsHeightArr   : rowNeedsHeight};
     }
-
 
     public _requestedSpace(offeredWidth : number, offeredHeight: number): _SpaceRequest {
       this._calculatedLayout = this._iterateLayout(offeredWidth , offeredHeight);
-      return {width : d3.sum(this._calculatedLayout.guaranteedWidths ),
-              height: d3.sum(this._calculatedLayout.guaranteedHeights),
-              wantsWidth: this._calculatedLayout.wantsWidth,
-              wantsHeight: this._calculatedLayout.wantsHeight};
+      return {
+        width: d3.sum(this._calculatedLayout.guaranteedWidths),
+        height: d3.sum(this._calculatedLayout.guaranteedHeights)
+      };
     }
 
     public _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number) {

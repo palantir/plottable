@@ -95,7 +95,10 @@ export module Component {
     }
 
     public _requestedSpace(availableWidth : number, availableHeight: number): _SpaceRequest {
-      return {width: 0, height: 0, wantsWidth: false, wantsHeight: false};
+      return {
+        width: 0,
+        height: 0
+      };
     }
 
     /**

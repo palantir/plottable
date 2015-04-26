@@ -41,7 +41,7 @@ export module Axis {
       var heightRequiredByTicks = this._isHorizontal() ? this._maxLabelTickLength() + this.tickLabelPadding() + this.gutter() : 0;
 
       if (this._scale.domain().length === 0) {
-        return {width: 0, height: 0, wantsWidth: false, wantsHeight: false };
+        return { width: 0, height: 0 };
       }
 
       var categoryScale: Scale.Category = <Scale.Category> this._scale;
@@ -55,11 +55,12 @@ export module Axis {
                                           offeredHeight,
                                           fakeScale,
                                           categoryScale.domain());
+
+      var desiredWidth = textResult.usedWidth + widthRequiredByTicks;
+      var desiredHeight = textResult.usedHeight + heightRequiredByTicks;
       return {
-        width : textResult.usedWidth  + widthRequiredByTicks,
-        height: textResult.usedHeight + heightRequiredByTicks,
-        wantsWidth : !textResult.textFits,
-        wantsHeight: !textResult.textFits
+        width: desiredWidth,
+        height: desiredHeight
       };
     }
 

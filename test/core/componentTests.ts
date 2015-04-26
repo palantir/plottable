@@ -189,8 +189,6 @@ describe("Component behavior", () => {
     var layout = c._requestedSpace(1, 1);
     assert.equal(layout.width, 0, "requested width defaults to 0");
     assert.equal(layout.height, 0, "requested height defaults to 0");
-    assert.equal(layout.wantsWidth , false, "_requestedSpace().wantsWidth  defaults to false");
-    assert.equal(layout.wantsHeight, false, "_requestedSpace().wantsHeight defaults to false");
     assert.equal((<any> c)._xAlignProportion, 0, "_xAlignProportion defaults to 0");
     assert.equal((<any> c)._yAlignProportion, 0, "_yAlignProportion defaults to 0");
     assert.equal((<any> c)._xOffset, 0, "xOffset defaults to 0");
