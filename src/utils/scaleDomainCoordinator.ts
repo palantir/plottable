@@ -7,8 +7,8 @@ export module Utils {
     It registers event listeners for when one of its scales changes its domain. When the scale
     does change its domain, it re-propogates the change to every linked scale.
     */
-    private _rescaleInProgress = false;
-    private _scales: Scale<D, any>[];
+    private rescaleInProgress = false;
+    private scales: Scale<D, any>[];
 
     /**
      * Constructs a ScaleDomainCoordinator.
@@ -18,18 +18,18 @@ export module Utils {
      */
     constructor(scales: Scale<D, any>[]) {
       if (scales == null) { throw new Error("ScaleDomainCoordinator requires scales to coordinate"); }
-      this._scales = scales;
-      this._scales.forEach((s) => s.broadcaster.registerListener(this, (sx: Scale<D, any>) => this.rescale(sx)));
+      this.scales = scales;
+      this.scales.forEach((s) => s.broadcaster.registerListener(this, (sx: Scale<D, any>) => this.rescale(sx)));
     }
 
     public rescale(scale: Scale<D, any>) {
-      if (this._rescaleInProgress) {
+      if (this.rescaleInProgress) {
         return;
       }
-      this._rescaleInProgress = true;
+      this.rescaleInProgress = true;
       var newDomain = scale.domain();
-      this._scales.forEach((s) => s.domain(newDomain));
-      this._rescaleInProgress = false;
+      this.scales.forEach((s) => s.domain(newDomain));
+      this.rescaleInProgress = false;
     }
   }
 }

@@ -55,7 +55,7 @@ describe("Plots", () => {
     });
 
     it("renders correctly", () => {
-      var bars = (<any> renderer)._renderArea.selectAll("rect");
+      var bars = (<any> renderer).renderArea.selectAll("rect");
       var bar0 = d3.select(bars[0][0]);
       var bar1 = d3.select(bars[0][1]);
       var bar2 = d3.select(bars[0][2]);
@@ -99,7 +99,7 @@ describe("Plots", () => {
         assert.deepEqual(expected.selection, actual.selection, msg);
       }
 
-      var bars = (<any> renderer)._renderArea.selectAll("rect");
+      var bars = (<any> renderer).renderArea.selectAll("rect");
 
       var d0 = dataset1.data()[0];
       var d0Px = {
@@ -181,7 +181,7 @@ describe("Plots", () => {
     });
 
     it("stacking done correctly for negative values", () => {
-      var bars = (<any> plot)._renderArea.selectAll("rect");
+      var bars = (<any> plot).renderArea.selectAll("rect");
       var bar0 = d3.select(bars[0][0]);
       var bar1 = d3.select(bars[0][1]);
       var bar2 = d3.select(bars[0][2]);
@@ -248,7 +248,7 @@ describe("Plots", () => {
     });
 
     it("renders correctly", () => {
-      var bars = (<any> renderer)._renderArea.selectAll("rect");
+      var bars = (<any> renderer).renderArea.selectAll("rect");
       var bar0 = d3.select(bars[0][0]);
       var bar1 = d3.select(bars[0][1]);
       var bar2 = d3.select(bars[0][2]);
@@ -321,7 +321,7 @@ describe("Plots", () => {
     });
 
     it("renders correctly", () => {
-      var bars = (<any> plot)._renderArea.selectAll("rect");
+      var bars = (<any> plot).renderArea.selectAll("rect");
 
       assert.lengthOf(bars[0], 7, "draws a bar for each datum");
 

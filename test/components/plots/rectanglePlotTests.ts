@@ -38,7 +38,7 @@ describe("Plots", () => {
               .project("x2", "x2", xScale)
               .project("y2", "y2", yScale)
               .renderTo(svg);
-      VERIFY_CELLS((<any> rectanglePlot)._renderArea.selectAll("rect"));
+      VERIFY_CELLS((<any> rectanglePlot).renderArea.selectAll("rect"));
       svg.remove();
     });
   });

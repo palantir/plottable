@@ -2223,12 +2223,12 @@ describe("Plots", function () {
             var mockDrawer1 = new Plottable.Drawers.AbstractDrawer("ds1");
             var renderArea1 = svg.append("g");
             renderArea1.append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
-            mockDrawer1.setup = function () { return mockDrawer1._renderArea = renderArea1; };
+            mockDrawer1.setup = function () { return mockDrawer1.renderArea = renderArea1; };
             mockDrawer1._getSelector = function () { return "circle"; };
             var renderArea2 = svg.append("g");
             renderArea2.append("circle").attr("cx", 10).attr("cy", 10).attr("r", 10);
             var mockDrawer2 = new Plottable.Drawers.AbstractDrawer("ds2");
-            mockDrawer2.setup = function () { return mockDrawer2._renderArea = renderArea2; };
+            mockDrawer2.setup = function () { return mockDrawer2.renderArea = renderArea2; };
             mockDrawer2._getSelector = function () { return "circle"; };
             // Mock _getDrawer to return the mock drawers
             plot._getDrawer = function (key) {
@@ -2272,13 +2272,13 @@ describe("Plots", function () {
             var mockDrawer1 = new Plottable.Drawers.AbstractDrawer("ds1");
             var renderArea1 = svg.append("g");
             renderArea1.append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
-            mockDrawer1.setup = function () { return mockDrawer1._renderArea = renderArea1; };
+            mockDrawer1.setup = function () { return mockDrawer1.renderArea = renderArea1; };
             mockDrawer1._getSelector = function () { return "circle"; };
             mockDrawer1._getPixelPoint = data1PointConverter;
             var renderArea2 = svg.append("g");
             renderArea2.append("circle").attr("cx", 10).attr("cy", 10).attr("r", 10);
             var mockDrawer2 = new Plottable.Drawers.AbstractDrawer("ds2");
-            mockDrawer2.setup = function () { return mockDrawer2._renderArea = renderArea2; };
+            mockDrawer2.setup = function () { return mockDrawer2.renderArea = renderArea2; };
             mockDrawer2._getSelector = function () { return "circle"; };
             mockDrawer2._getPixelPoint = data2PointConverter;
             // Mock _getDrawer to return the mock drawers
@@ -2327,7 +2327,7 @@ describe("Plots", function () {
             var circles = renderArea.selectAll("circles").data(data);
             circles.enter().append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
             circles.exit().remove();
-            mockDrawer.setup = function () { return mockDrawer._renderArea = renderArea; };
+            mockDrawer.setup = function () { return mockDrawer.renderArea = renderArea; };
             mockDrawer._getSelector = function () { return "circle"; };
             mockDrawer._getPixelPoint = dataPointConverter;
             // Mock _getDrawer to return the mock drawer
@@ -2362,13 +2362,13 @@ describe("Plots", function () {
             var mockDrawer1 = new Plottable.Drawers.AbstractDrawer("ds1");
             var renderArea1 = svg.append("g");
             renderArea1.append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
-            mockDrawer1.setup = function () { return mockDrawer1._renderArea = renderArea1; };
+            mockDrawer1.setup = function () { return mockDrawer1.renderArea = renderArea1; };
             mockDrawer1._getSelector = function () { return "circle"; };
             mockDrawer1._getPixelPoint = data1PointConverter;
             var renderArea2 = svg.append("g");
             renderArea2.append("circle").attr("cx", 10).attr("cy", 10).attr("r", 10);
             var mockDrawer2 = new Plottable.Drawers.AbstractDrawer("ds2");
-            mockDrawer2.setup = function () { return mockDrawer2._renderArea = renderArea2; };
+            mockDrawer2.setup = function () { return mockDrawer2.renderArea = renderArea2; };
             mockDrawer2._getSelector = function () { return "circle"; };
             mockDrawer2._getPixelPoint = data2PointConverter;
             // Mock _getDrawer to return the mock drawers
@@ -2638,7 +2638,7 @@ describe("Plots", function () {
             piePlot.addDataset("simpleDataset", simpleDataset);
             piePlot.project("value", "value");
             piePlot.renderTo(svg);
-            renderArea = piePlot._renderArea;
+            renderArea = piePlot.renderArea;
         });
         it("sectors divided evenly", function () {
             var arcPaths = renderArea.selectAll(".arc");
@@ -2966,7 +2966,7 @@ describe("Plots", function () {
             simpleDataset = new Plottable.Dataset(twoPointData);
             linePlot = new Plottable.Plots.Line(xScale, yScale);
             linePlot.addDataset("s1", simpleDataset).project("x", xAccessor, xScale).project("y", yAccessor, yScale).project("stroke", colorAccessor).addDataset("s2", simpleDataset).renderTo(svg);
-            renderArea = linePlot._renderArea;
+            renderArea = linePlot.renderArea;
         });
         it("draws a line correctly", function () {
             var linePath = renderArea.select(".line");
@@ -3267,7 +3267,7 @@ describe("Plots", function () {
             simpleDataset = new Plottable.Dataset(twoPointData);
             areaPlot = new Plottable.Plots.Area(xScale, yScale);
             areaPlot.addDataset("sd", simpleDataset).project("x", xAccessor, xScale).project("y", yAccessor, yScale).project("y0", y0Accessor, yScale).project("fill", fillAccessor).project("stroke", colorAccessor).renderTo(svg);
-            renderArea = areaPlot._renderArea;
+            renderArea = areaPlot.renderArea;
         });
         it("draws area and line correctly", function () {
             var areaPath = renderArea.select(".area");
@@ -3285,7 +3285,7 @@ describe("Plots", function () {
         it("area fill works for non-zero floor values appropriately, e.g. half the height of the line", function () {
             areaPlot.project("y0", function (d) { return d.bar / 2; }, yScale);
             areaPlot.renderTo(svg);
-            renderArea = areaPlot._renderArea;
+            renderArea = areaPlot.renderArea;
             var areaPath = renderArea.select(".area");
             assert.equal(normalizePath(areaPath.attr("d")), "M0,500L500,0L500,250L0,500Z");
             svg.remove();
@@ -3429,7 +3429,7 @@ describe("Plots", function () {
                 barPlot.renderTo(svg);
             });
             it("renders correctly", function () {
-                var renderArea = barPlot._renderArea;
+                var renderArea = barPlot.renderArea;
                 var bars = renderArea.selectAll("rect");
                 assert.lengthOf(bars[0], 3, "One bar was created per data point");
                 var bar0 = d3.select(bars[0][0]);
@@ -3451,7 +3451,7 @@ describe("Plots", function () {
             });
             it("baseline value can be changed; barPlot updates appropriately", function () {
                 barPlot.baseline(-1);
-                var renderArea = barPlot._renderArea;
+                var renderArea = barPlot.renderArea;
                 var bars = renderArea.selectAll("rect");
                 var bar0 = d3.select(bars[0][0]);
                 var bar1 = d3.select(bars[0][1]);
@@ -3491,7 +3491,7 @@ describe("Plots", function () {
             });
             it("don't show points from outside of domain", function () {
                 xScale.domain(["C"]);
-                var bars = barPlot._renderArea.selectAll("rect");
+                var bars = barPlot.renderArea.selectAll("rect");
                 assert.lengthOf(bars[0], 0, "no bars have been rendered");
                 svg.remove();
             });
@@ -3636,7 +3636,7 @@ describe("Plots", function () {
                 svg.remove();
             });
             it("bar widths are equal to barPixelWidth", function () {
-                var renderArea = barPlot._renderArea;
+                var renderArea = barPlot.renderArea;
                 var bars = renderArea.selectAll("rect");
                 assert.lengthOf(bars[0], 3, "One bar was created per data point");
                 var barPixelWidth = barPlot._getBarPixelWidth();
@@ -3679,7 +3679,7 @@ describe("Plots", function () {
                 svg.remove();
             });
             it("bar widths are equal to barPixelWidth", function () {
-                var renderArea = barPlot._renderArea;
+                var renderArea = barPlot.renderArea;
                 var bars = renderArea.selectAll("rect");
                 assert.lengthOf(bars[0], 3, "One bar was created per data point");
                 var barPixelWidth = barPlot._getBarPixelWidth();
@@ -3758,7 +3758,7 @@ describe("Plots", function () {
                 barPlot.renderTo(svg);
             });
             it("renders correctly", function () {
-                var renderArea = barPlot._renderArea;
+                var renderArea = barPlot.renderArea;
                 var bars = renderArea.selectAll("rect");
                 assert.lengthOf(bars[0], 3, "One bar was created per data point");
                 var bar0 = d3.select(bars[0][0]);
@@ -3780,7 +3780,7 @@ describe("Plots", function () {
             });
             it("baseline value can be changed; barPlot updates appropriately", function () {
                 barPlot.baseline(-1);
-                var renderArea = barPlot._renderArea;
+                var renderArea = barPlot.renderArea;
                 var bars = renderArea.selectAll("rect");
                 var bar0 = d3.select(bars[0][0]);
                 var bar1 = d3.select(bars[0][1]);
@@ -3796,7 +3796,7 @@ describe("Plots", function () {
                 svg.remove();
             });
             it("width projector may be overwritten, and calling project queues rerender", function () {
-                var bars = barPlot._renderArea.selectAll("rect");
+                var bars = barPlot.renderArea.selectAll("rect");
                 var bar0 = d3.select(bars[0][0]);
                 var bar1 = d3.select(bars[0][1]);
                 var bar0y = bar0.data()[0].y;
@@ -4111,7 +4111,7 @@ describe("Plots", function () {
             var gridPlot = new Plottable.Plots.Grid(xScale, yScale, colorScale);
             gridPlot.addDataset(DATA).project("fill", "magnitude", colorScale).project("x", "x", xScale).project("y", "y", yScale);
             gridPlot.renderTo(svg);
-            VERIFY_CELLS(gridPlot._renderArea.selectAll("rect")[0]);
+            VERIFY_CELLS(gridPlot.renderArea.selectAll("rect")[0]);
             svg.remove();
         });
         it("renders correctly when data is set after construction", function () {
@@ -4123,7 +4123,7 @@ describe("Plots", function () {
             var gridPlot = new Plottable.Plots.Grid(xScale, yScale, colorScale);
             gridPlot.addDataset(dataset).project("fill", "magnitude", colorScale).project("x", "x", xScale).project("y", "y", yScale).renderTo(svg);
             dataset.data(DATA);
-            VERIFY_CELLS(gridPlot._renderArea.selectAll("rect")[0]);
+            VERIFY_CELLS(gridPlot.renderArea.selectAll("rect")[0]);
             svg.remove();
         });
         it("renders correctly when there isn't data for every spot", function () {
@@ -4143,7 +4143,7 @@ describe("Plots", function () {
                 { x: "D", y: "Z", magnitude: 24 }
             ];
             dataset.data(data);
-            var cells = gridPlot._renderArea.selectAll("rect")[0];
+            var cells = gridPlot.renderArea.selectAll("rect")[0];
             assert.equal(cells.length, data.length);
             for (var i = 0; i < cells.length; i++) {
                 var cell = d3.select(cells[i]);
@@ -4162,7 +4162,7 @@ describe("Plots", function () {
             var gridPlot = new Plottable.Plots.Grid(xScale, yScale, colorScale);
             gridPlot.addDataset(DATA).project("fill", "magnitude").project("x", "x", xScale).project("y", "y", yScale).renderTo(svg);
             yScale.domain(["U", "V"]);
-            var cells = gridPlot._renderArea.selectAll("rect")[0];
+            var cells = gridPlot.renderArea.selectAll("rect")[0];
             var cellAU = d3.select(cells[0]);
             var cellAV = d3.select(cells[2]);
             cellAU.attr("fill", "#000000");
@@ -4172,7 +4172,7 @@ describe("Plots", function () {
             cellAV.attr("x", "0");
             cellAV.attr("y", "0");
             yScale.domain(["V", "U"]);
-            cells = gridPlot._renderArea.selectAll("rect")[0];
+            cells = gridPlot.renderArea.selectAll("rect")[0];
             cellAU = d3.select(cells[0]);
             cellAV = d3.select(cells[2]);
             cellAU.attr("fill", "#000000");
@@ -4272,7 +4272,7 @@ describe("Plots", function () {
             var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
             var rectanglePlot = new Plottable.Plots.Rectangle(xScale, yScale);
             rectanglePlot.addDataset(DATA).project("x", "x", xScale).project("y", "y", yScale).project("x1", "x", xScale).project("y1", "y", yScale).project("x2", "x2", xScale).project("y2", "y2", yScale).renderTo(svg);
-            VERIFY_CELLS(rectanglePlot._renderArea.selectAll("rect"));
+            VERIFY_CELLS(rectanglePlot.renderArea.selectAll("rect"));
             svg.remove();
         });
     });
@@ -4494,7 +4494,7 @@ describe("Plots", function () {
                 // creates a function that verifies that circles are drawn properly after accounting for svg transform
                 // and then modifies circlesInArea to contain the number of circles that were discovered in the plot area
                 circlesInArea = 0;
-                var renderArea = circlePlot._renderArea;
+                var renderArea = circlePlot.renderArea;
                 var renderAreaTransform = d3.transform(renderArea.attr("transform"));
                 var translate = renderAreaTransform.translate;
                 var scale = renderAreaTransform.scale;
@@ -4851,7 +4851,7 @@ describe("Plots", function () {
             var table = new Plottable.Components.Table([[renderer], [xAxis]]).renderTo(svg);
         });
         it("renders correctly", function () {
-            var areas = renderer._renderArea.selectAll(".area");
+            var areas = renderer.renderArea.selectAll(".area");
             var area0 = d3.select(areas[0][0]);
             var d0 = normalizePath(area0.attr("d")).split(/[a-zA-Z]/);
             var d0Ys = d0.slice(1, d0.length - 1).map(function (s) { return parseFloat(s.split(",")[1]); });
@@ -4891,7 +4891,7 @@ describe("Plots", function () {
             new Plottable.Components.Table([[renderer]]).renderTo(svg);
         });
         it("path elements rendered correctly", function () {
-            var areas = renderer._renderArea.selectAll(".area");
+            var areas = renderer.renderArea.selectAll(".area");
             var area0 = d3.select(areas[0][0]);
             assert.strictEqual(area0.attr("d"), null, "no path string on an empty dataset");
             var area1 = d3.select(areas[0][1]);
@@ -5100,7 +5100,7 @@ describe("Plots", function () {
             var table = new Plottable.Components.Table([[renderer], [xAxis]]).renderTo(svg);
         });
         it("renders correctly", function () {
-            var areas = renderer._renderArea.selectAll(".area");
+            var areas = renderer.renderArea.selectAll(".area");
             var area0 = d3.select(areas[0][0]);
             var d0 = normalizePath(area0.attr("d")).split(/[a-zA-Z]/);
             var d0Ys = d0.slice(1, d0.length - 1).map(function (s) { return parseFloat(s.split(",")[1]); });
@@ -5116,7 +5116,7 @@ describe("Plots", function () {
         });
         it("project works correctly", function () {
             renderer.project("check", "type");
-            var areas = renderer._renderArea.selectAll(".area");
+            var areas = renderer.renderArea.selectAll(".area");
             var area0 = d3.select(areas[0][0]);
             assert.strictEqual(area0.attr("check"), "a", "projector has been applied to first area");
             var area1 = d3.select(areas[0][1]);
@@ -5240,7 +5240,7 @@ describe("Plots", function () {
             bandWidth = xScale.rangeBand();
         });
         it("renders correctly", function () {
-            var bars = renderer._renderArea.selectAll("rect");
+            var bars = renderer.renderArea.selectAll("rect");
             var bar0 = d3.select(bars[0][0]);
             var bar1 = d3.select(bars[0][1]);
             var bar2 = d3.select(bars[0][2]);
@@ -5280,7 +5280,7 @@ describe("Plots", function () {
                 assert.closeTo(expected.pixelPoints[0].y, actual.pixelPoints[0].y, 0.01, msg);
                 assert.deepEqual(expected.selection, actual.selection, msg);
             }
-            var bars = renderer._renderArea.selectAll("rect");
+            var bars = renderer.renderArea.selectAll("rect");
             var d0 = dataset1.data()[0];
             var d0Px = {
                 x: xScale.scale(d0.x),
@@ -5350,7 +5350,7 @@ describe("Plots", function () {
             axisHeight = xAxis.height();
         });
         it("stacking done correctly for negative values", function () {
-            var bars = plot._renderArea.selectAll("rect");
+            var bars = plot.renderArea.selectAll("rect");
             var bar0 = d3.select(bars[0][0]);
             var bar1 = d3.select(bars[0][1]);
             var bar2 = d3.select(bars[0][2]);
@@ -5409,7 +5409,7 @@ describe("Plots", function () {
             bandWidth = yScale.rangeBand();
         });
         it("renders correctly", function () {
-            var bars = renderer._renderArea.selectAll("rect");
+            var bars = renderer.renderArea.selectAll("rect");
             var bar0 = d3.select(bars[0][0]);
             var bar1 = d3.select(bars[0][1]);
             var bar2 = d3.select(bars[0][2]);
@@ -5474,7 +5474,7 @@ describe("Plots", function () {
             var table = new Plottable.Components.Table([[plot], [xAxis]]).renderTo(svg);
         });
         it("renders correctly", function () {
-            var bars = plot._renderArea.selectAll("rect");
+            var bars = plot.renderArea.selectAll("rect");
             assert.lengthOf(bars[0], 7, "draws a bar for each datum");
             var aBars = [d3.select(bars[0][0]), d3.select(bars[0][3])];
             var bBars = [d3.select(bars[0][1]), d3.select(bars[0][4]), d3.select(bars[0][5])];
@@ -5646,7 +5646,7 @@ describe("Plots", function () {
             bandWidth = xScale.rangeBand();
         });
         it("renders correctly", function () {
-            var bars = renderer._renderArea.selectAll("rect");
+            var bars = renderer.renderArea.selectAll("rect");
             var bar0 = d3.select(bars[0][0]);
             var bar1 = d3.select(bars[0][1]);
             var bar2 = d3.select(bars[0][2]);
@@ -5714,7 +5714,7 @@ describe("Plots", function () {
             bandWidth = yScale.rangeBand();
         });
         it("renders correctly", function () {
-            var bars = renderer._renderArea.selectAll("rect");
+            var bars = renderer.renderArea.selectAll("rect");
             var bar0 = d3.select(bars[0][0]);
             var bar1 = d3.select(bars[0][1]);
             var bar2 = d3.select(bars[0][2]);
@@ -5767,7 +5767,7 @@ describe("Plots", function () {
             new Plottable.Components.Table([[plot], [xAxis]]).renderTo(svg);
         });
         it("renders correctly", function () {
-            var bars = plot._renderArea.selectAll("rect");
+            var bars = plot.renderArea.selectAll("rect");
             assert.lengthOf(bars[0], 7, "Number of bars should be equivalent to number of datum");
             var aBar0 = d3.select(bars[0][0]);
             var aBar1 = d3.select(bars[0][3]);
@@ -6126,9 +6126,9 @@ describe("ComponentContainer", function () {
         var c2 = new Plottable.Component();
         container._addComponent(c1);
         container._addComponent(c2);
-        container._removeComponent(c2);
+        container.removeComponent(c2);
         assert.deepEqual(container.components(), [c1], "component 2 was removed");
-        container._removeComponent(c2);
+        container.removeComponent(c2);
         assert.deepEqual(container.components(), [c1], "there are no side effects from removing already-removed components");
     });
     it("empty()", function () {
@@ -6950,15 +6950,15 @@ describe("Tables", function () {
     });
     it("padTableToSize works properly", function () {
         var t = new Plottable.Components.Table();
-        assert.deepEqual(t._rows, [], "the table rows is an empty list");
-        t._padTableToSize(1, 1);
-        var rows = t._rows;
+        assert.deepEqual(t.rows, [], "the table rows is an empty list");
+        t.padTableToSize(1, 1);
+        var rows = t.rows;
         var row = rows[0];
         var firstComponent = row[0];
         assert.lengthOf(rows, 1, "there is one row");
         assert.lengthOf(row, 1, "the row has one element");
         assert.isNull(firstComponent, "the row only has a null component");
-        t._padTableToSize(5, 2);
+        t.padTableToSize(5, 2);
         assert.lengthOf(rows, 5, "there are five rows");
         rows.forEach(function (r) { return assert.lengthOf(r, 2, "there are two columsn per row"); });
         assert.equal(rows[0][0], firstComponent, "the first component is unchanged");
@@ -6968,10 +6968,10 @@ describe("Tables", function () {
         var row1 = [null, c0];
         var row2 = [new Plottable.Component(), null];
         var table = new Plottable.Components.Table([row1, row2]);
-        assert.equal(table._rows[0][1], c0, "the component is in the right spot");
+        assert.equal(table.rows[0][1], c0, "the component is in the right spot");
         var c1 = new Plottable.Component();
         table.addComponent(2, 2, c1);
-        assert.equal(table._rows[2][2], c1, "the inserted component went to the right spot");
+        assert.equal(table.rows[2][2], c1, "the inserted component went to the right spot");
     });
     it("tables can be constructed by adding components in matrix style", function () {
         var table = new Plottable.Components.Table();
@@ -6979,7 +6979,7 @@ describe("Tables", function () {
         var c2 = new Plottable.Component();
         table.addComponent(0, 0, c1);
         table.addComponent(1, 1, c2);
-        var rows = table._rows;
+        var rows = table.rows;
         assert.lengthOf(rows, 2, "there are two rows");
         assert.lengthOf(rows[0], 2, "two cols in first row");
         assert.lengthOf(rows[1], 2, "two cols in second row");
@@ -6996,8 +6996,8 @@ describe("Tables", function () {
         t.addComponent(0, 2, c1);
         t.addComponent(0, 0, c2);
         t.addComponent(0, 2, c3);
-        assert.isTrue(Plottable.Components.Group.prototype.isPrototypeOf(t._rows[0][2]), "A group was created");
-        var components = t._rows[0][2].components();
+        assert.isTrue(Plottable.Components.Group.prototype.isPrototypeOf(t.rows[0][2]), "A group was created");
+        var components = t.rows[0][2].components();
         assert.lengthOf(components, 2, "The group created should have 2 components");
         assert.equal(components[0], c1, "First element in the group at (0, 2) should be c1");
         assert.equal(components[1], c3, "Second element in the group at (0, 2) should be c3");
@@ -7010,8 +7010,8 @@ describe("Tables", function () {
         var t = new Plottable.Components.Table();
         t.addComponent(0, 2, grp);
         t.addComponent(0, 2, c3);
-        assert.isTrue(Plottable.Components.Group.prototype.isPrototypeOf(t._rows[0][2]), "The cell still contains a group");
-        var components = t._rows[0][2].components();
+        assert.isTrue(Plottable.Components.Group.prototype.isPrototypeOf(t.rows[0][2]), "The cell still contains a group");
+        var components = t.rows[0][2].components();
         assert.lengthOf(components, 3, "The group created should have 3 components");
         assert.equal(components[0], c1, "First element in the group at (0, 2) should still be c1");
         assert.equal(components[1], c2, "Second element in the group at (0, 2) should still be c2");
@@ -7154,12 +7154,12 @@ describe("Tables", function () {
         it("iterateLayout works in the easy case where there is plenty of space and everything is satisfied on first go", function () {
             fixComponentSize(c1, 50, 50);
             fixComponentSize(c4, 20, 10);
-            var result = table._iterateLayout(500, 500);
+            var result = table.iterateLayout(500, 500);
             verifyLayoutResult(result, [215, 215], [220, 220], [50, 20], [50, 10], false, false, "");
         });
         it.skip("iterateLayout works in the difficult case where there is a shortage of space and layout requires iterations", function () {
             fixComponentSize(c1, 490, 50);
-            var result = table._iterateLayout(500, 500);
+            var result = table.iterateLayout(500, 500);
             verifyLayoutResult(result, [0, 0], [220, 220], [480, 20], [50, 10], true, false, "");
         });
         it("iterateLayout works in the case where all components are fixed-size", function () {
@@ -7167,11 +7167,11 @@ describe("Tables", function () {
             fixComponentSize(c2, 50, 50);
             fixComponentSize(c3, 50, 50);
             fixComponentSize(c4, 50, 50);
-            var result = table._iterateLayout(100, 100);
+            var result = table.iterateLayout(100, 100);
             verifyLayoutResult(result, [0, 0], [0, 0], [50, 50], [50, 50], false, false, "..when there's exactly enough space");
-            result = table._iterateLayout(80, 80);
+            result = table.iterateLayout(80, 80);
             verifyLayoutResult(result, [0, 0], [0, 0], [40, 40], [40, 40], true, true, "..when there's not enough space");
-            result = table._iterateLayout(120, 120);
+            result = table.iterateLayout(120, 120);
             // If there is extra space in a fixed-size table, the extra space should not be allocated to proportional space
             verifyLayoutResult(result, [0, 0], [0, 0], [50, 50], [50, 50], false, false, "..when there's extra space");
         });
@@ -7186,13 +7186,13 @@ describe("Tables", function () {
                     wantsHeight: h < 200
                 };
             };
-            var result = table._iterateLayout(200, 200);
+            var result = table.iterateLayout(200, 200);
             verifyLayoutResult(result, [0, 0], [0], [0, 200], [200], false, false, "when there's sufficient space");
-            result = table._iterateLayout(150, 200);
+            result = table.iterateLayout(150, 200);
             verifyLayoutResult(result, [150, 0], [0], [0, 0], [200], true, false, "when there's insufficient space");
         });
     });
-    describe("table._removeComponent works properly", function () {
+    describe("table.removeComponent works properly", function () {
         var c1 = new Plottable.Component();
         var c2 = new Plottable.Component();
         var c3 = new Plottable.Component();
@@ -7200,27 +7200,27 @@ describe("Tables", function () {
         var c5 = new Plottable.Component();
         var c6 = new Plottable.Component();
         var table;
-        it("table._removeComponent works in basic case", function () {
+        it("table.removeComponent works in basic case", function () {
             table = new Plottable.Components.Table([[c1, c2], [c3, c4], [c5, c6]]);
-            table._removeComponent(c4);
-            assert.deepEqual(table._rows, [[c1, c2], [c3, null], [c5, c6]], "remove one element");
+            table.removeComponent(c4);
+            assert.deepEqual(table.rows, [[c1, c2], [c3, null], [c5, c6]], "remove one element");
         });
-        it("table._removeComponent does nothing when component is not found", function () {
+        it("table.removeComponent does nothing when component is not found", function () {
             table = new Plottable.Components.Table([[c1, c2], [c3, c4]]);
-            table._removeComponent(c5);
-            assert.deepEqual(table._rows, [[c1, c2], [c3, c4]], "remove nonexistent component");
+            table.removeComponent(c5);
+            assert.deepEqual(table.rows, [[c1, c2], [c3, c4]], "remove nonexistent component");
         });
-        it("table._removeComponent removing component twice should have same effect as removing it once", function () {
+        it("table.removeComponent removing component twice should have same effect as removing it once", function () {
             table = new Plottable.Components.Table([[c1, c2, c3], [c4, c5, c6]]);
-            table._removeComponent(c1);
-            assert.deepEqual(table._rows, [[null, c2, c3], [c4, c5, c6]], "item twice");
-            table._removeComponent(c1);
-            assert.deepEqual(table._rows, [[null, c2, c3], [c4, c5, c6]], "item twice");
+            table.removeComponent(c1);
+            assert.deepEqual(table.rows, [[null, c2, c3], [c4, c5, c6]], "item twice");
+            table.removeComponent(c1);
+            assert.deepEqual(table.rows, [[null, c2, c3], [c4, c5, c6]], "item twice");
         });
         it("table._removeComponent doesn't do anything weird when called with null", function () {
             table = new Plottable.Components.Table([[c1, null], [c2, c3]]);
-            table._removeComponent(null);
-            assert.deepEqual(table._rows, [[c1, null], [c2, c3]]);
+            table.removeComponent(null);
+            assert.deepEqual(table.rows, [[c1, null], [c2, c3]]);
         });
     });
 });

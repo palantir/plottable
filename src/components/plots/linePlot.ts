@@ -58,7 +58,7 @@ export module Plots {
 
     protected _generateDrawSteps(): Drawers.DrawStep[] {
       var drawSteps: Drawers.DrawStep[] = [];
-      if (this._dataChanged && this._animate) {
+      if (this._dataChanged && this.animated) {
         var attrToProjector = this._generateAttrToProjector();
         attrToProjector["y"] = this._getResetYFunction();
         drawSteps.push({attrToProjector: attrToProjector, animator: this._getAnimator("reset")});

@@ -1,13 +1,12 @@
 ///<reference path="../../reference.ts" />
-
 module Plottable {
 export module Plots {
   /**
    * An AreaPlot draws a filled region (area) between the plot's projected "y" and projected "y0" values.
    */
   export class Area<X> extends Line<X> {
-    private _areaPath: D3.Selection;
-    private _defaultFillColor: string;
+    private areaPath: D3.Selection;
+    private defaultFillColor: string;
 
     /**
      * Constructs an AreaPlot.
@@ -25,7 +24,31 @@ export module Plots {
       this.animator("main", new Animators.Base()
                                         .duration(600)
                                         .easing("exp-in-out"));
-      this._defaultFillColor = new Scales.Color().range()[0];
+      this.defaultFillColor = new Scales.Color().range()[0];
+    }
+
+    public project(attrToSet: string, accessor: any, scale?: Scale<any, any>) {
+      super.project(attrToSet, accessor, scale);
+      if (attrToSet === "y0") {
+        this._updateYDomainer();
+      }
+      return this;
+    }
+
+    protected _generateAttrToProjector() {
+      var attrToProjector = super._generateAttrToProjector();
+      attrToProjector["fill-opacity"] = attrToProjector["fill-opacity"] || d3.functor(0.25);
+      attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this.defaultFillColor);
+      attrToProjector["stroke"] = attrToProjector["stroke"] || d3.functor(this.defaultFillColor);
+      return attrToProjector;
+    }
+
+    protected _getDrawer(key: string) {
+      return new Plottable.Drawers.Area(key);
+    }
+
+    protected _getResetYFunction() {
+      return this._generateAttrToProjector()["y0"];
     }
 
     protected _onDatasetUpdate() {
@@ -35,15 +58,11 @@ export module Plots {
       }
     }
 
-    protected _getDrawer(key: string) {
-      return new Plottable.Drawers.Area(key);
-    }
-
     protected _updateYDomainer() {
       super._updateYDomainer();
 
       var constantBaseline: number;
-      var y0Projector = this._projections["y0"];
+      var y0Projector = this.projections["y0"];
       var y0Accessor = y0Projector && y0Projector.accessor;
       if (y0Accessor != null) {
         var extents = this.datasets().map((d) => d._getExtent(y0Accessor, this._yScale._typeCoercer));
@@ -65,30 +84,10 @@ export module Plots {
       }
     }
 
-    public project(attrToSet: string, accessor: any, scale?: Scale<any, any>) {
-      super.project(attrToSet, accessor, scale);
-      if (attrToSet === "y0") {
-        this._updateYDomainer();
-      }
-      return this;
-    }
-
-    protected _getResetYFunction() {
-      return this._generateAttrToProjector()["y0"];
-    }
-
     protected _wholeDatumAttributes() {
       var wholeDatumAttributes = super._wholeDatumAttributes();
       wholeDatumAttributes.push("y0");
       return wholeDatumAttributes;
-    }
-
-    protected _generateAttrToProjector() {
-      var attrToProjector = super._generateAttrToProjector();
-      attrToProjector["fill-opacity"] = attrToProjector["fill-opacity"] || d3.functor(0.25);
-      attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this._defaultFillColor);
-      attrToProjector["stroke"] = attrToProjector["stroke"] || d3.functor(this._defaultFillColor);
-      return attrToProjector;
     }
   }
 }

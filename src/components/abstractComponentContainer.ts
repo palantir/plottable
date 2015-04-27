@@ -17,7 +17,7 @@ module Plottable {
       this._components.forEach((c) => c.render());
     }
 
-    public _removeComponent(c: Component) {
+    public removeComponent(c: Component) {
       var removeIndex = this._components.indexOf(c);
       if (removeIndex >= 0) {
         this.components().splice(removeIndex, 1);

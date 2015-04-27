@@ -3,14 +3,22 @@ declare module Plottable {
     module Utils {
         module Methods {
             /**
-             * Checks if x is between a and b.
-             *
-             * @param {number} x The value to test if in range
-             * @param {number} a The beginning of the (inclusive) range
-             * @param {number} b The ending of the (inclusive) range
-             * @return {boolean} Whether x is in [a, b]
+             * Take an accessor object (may be a string to be made into a key, or a value, or a color code)
+             * and "activate" it by turning it into a function in (datum, index, metadata)
              */
-            function inRange(x: number, a: number, b: number): boolean;
+            function accessorize(accessor: any): _Accessor;
+            /**
+             * Takes two arrays of numbers and adds them together
+             *
+             * @param {number[]} alist The first array of numbers
+             * @param {number[]} blist The second array of numbers
+             * @return {number[]} An array of numbers where x[i] = alist[i] + blist[i]
+             */
+            function addArrays(alist: number[], blist: number[]): number[];
+            /**
+             * Check if two arrays are equal by strict equality.
+             */
+            function arrayEq<T>(a: T[], b: T[]): boolean;
             /**
              * Clamps x to the range [min, max].
              *
@@ -20,19 +28,41 @@ declare module Plottable {
              * @return {number} A clamped value in the range [min, max].
              */
             function clamp(x: number, min: number, max: number): number;
-            /** Print a warning message to the console, if it is available.
-             *
-             * @param {string} The warnings to print
-             */
-            function warn(warning: string): void;
+            function colorTest(colorTester: D3.Selection, className: string): string;
             /**
-             * Takes two arrays of numbers and adds them together
+             * Creates shallow copy of map.
+             * @param {{ [key: string]: any }} oldMap Map to copy
              *
-             * @param {number[]} alist The first array of numbers
-             * @param {number[]} blist The second array of numbers
-             * @return {number[]} An array of numbers where x[i] = alist[i] + blist[i]
+             * @returns {[{ [key: string]: any }} coppied map.
              */
-            function addArrays(alist: number[], blist: number[]): number[];
+            function copyMap<T>(oldMap: {
+                [key: string]: T;
+            }): {
+                [key: string]: T;
+            };
+            /**
+             * Creates an array of length `count`, filled with value or (if value is a function), value()
+             *
+             * @param {T | ((index?: number) => T)} value The value to fill the array with or a value generator (called with index as arg)
+             * @param {number} count The length of the array to generate
+             * @return {any[]}
+             */
+            function createFilledArray<T>(value: T | ((index?: number) => T), count: number): T[];
+            function distanceSquared(p1: Point, p2: Point): number;
+            /**
+             * @param {T[][]} a The 2D array that will have its elements joined together.
+             * @return {T[]} Every array in a, concatenated together in the order they appear.
+             */
+            function flatten<T>(a: T[][]): T[];
+            /**
+             * Checks if x is between a and b.
+             *
+             * @param {number} x The value to test if in range
+             * @param {number} a The beginning of the (inclusive) range
+             * @param {number} b The ending of the (inclusive) range
+             * @return {boolean} Whether x is in [a, b]
+             */
+            function inRange(x: number, a: number, b: number): boolean;
             /**
              * Takes two sets and returns the intersection
              *
@@ -44,62 +74,29 @@ declare module Plottable {
              */
             function intersection<T>(set1: D3.Set<T>, set2: D3.Set<T>): D3.Set<string>;
             /**
-             * Take an accessor object (may be a string to be made into a key, or a value, or a color code)
-             * and "activate" it by turning it into a function in (datum, index, metadata)
-             */
-            function accessorize(accessor: any): _Accessor;
-            /**
-             * Takes two sets and returns the union
+             * Returns true if the supplied coordinates or Extents intersect or are contained by bbox.
              *
-             * Due to the fact that D3.Sets store strings internally, return type is always a string set
+             * @param {number | Extent} xValOrExtent The x coordinate or Extent to test
+             * @param {number | Extent} yValOrExtent The y coordinate or Extent to test
+             * @param {SVGRect} bbox The bbox
+             * @param {number} tolerance Amount by which to expand bbox, in each dimension, before
+             * testing intersection
              *
-             * @param {D3.Set<T>} set1 The first set
-             * @param {D3.Set<T>} set2 The second set
-             * @return {D3.Set<string>} A set that contains elements that appear in either set1 or set2
+             * @returns {boolean} True if the supplied coordinates or Extents intersect or are
+             * contained by bbox, false otherwise.
              */
-            function union<T>(set1: D3.Set<T>, set2: D3.Set<T>): D3.Set<string>;
+            function intersectsBBox(xValOrExtent: number | Extent, yValOrExtent: number | Extent, bbox: SVGRect, tolerance?: number): boolean;
+            function isIE(): boolean;
             /**
-             * Populates a map from an array of keys and a transformation function.
-             *
-             * @param {string[]} keys The array of keys.
-             * @param {(string, number) => T} transform A transformation function to apply to the keys.
-             * @return {D3.Map<T>} A map mapping keys to their transformed values.
+             * Returns true **only** if x is NaN
              */
-            function populateMap<T>(keys: string[], transform: (key: string, index: number) => T): D3.Map<T>;
+            function isNaN(n: any): boolean;
             /**
-             * Take an array of values, and return the unique values.
-             * Will work iff ∀ a, b, a.toString() == b.toString() => a == b; will break on Object inputs
-             *
-             * @param {T[]} values The values to find uniqueness for
-             * @return {T[]} The unique values
+             * Returns true if the argument is a number, which is not NaN
+             * Numbers represented as strings do not pass this function
              */
-            function uniq<T>(arr: T[]): T[];
-            /**
-             * Creates an array of length `count`, filled with value or (if value is a function), value()
-             *
-             * @param {T | ((index?: number) => T)} value The value to fill the array with or a value generator (called with index as arg)
-             * @param {number} count The length of the array to generate
-             * @return {any[]}
-             */
-            function createFilledArray<T>(value: T | ((index?: number) => T), count: number): T[];
-            /**
-             * @param {T[][]} a The 2D array that will have its elements joined together.
-             * @return {T[]} Every array in a, concatenated together in the order they appear.
-             */
-            function flatten<T>(a: T[][]): T[];
-            /**
-             * Check if two arrays are equal by strict equality.
-             */
-            function arrayEq<T>(a: T[], b: T[]): boolean;
-            /**
-             * @param {any} a Object to check against b for equality.
-             * @param {any} b Object to check against a for equality.
-             *
-             * @returns {boolean} whether or not two objects share the same keys, and
-             *          values associated with those keys. Values will be compared
-             *          with ===.
-             */
-            function objEq(a: any, b: any): boolean;
+            function isValidNumber(n: any): boolean;
+            function lightenColor(color: string, factor: number): string;
             /**
              * Computes the max value from the array.
              *
@@ -115,51 +112,14 @@ declare module Plottable {
             function min<C>(arr: C[], default_val: C): C;
             function min<T, C>(arr: T[], acc: (x?: T, i?: number) => C, default_val: C): C;
             /**
-             * Returns true **only** if x is NaN
-             */
-            function isNaN(n: any): boolean;
-            /**
-             * Returns true if the argument is a number, which is not NaN
-             * Numbers represented as strings do not pass this function
-             */
-            function isValidNumber(n: any): boolean;
-            /**
-             * Creates shallow copy of map.
-             * @param {{ [key: string]: any }} oldMap Map to copy
+             * @param {any} a Object to check against b for equality.
+             * @param {any} b Object to check against a for equality.
              *
-             * @returns {[{ [key: string]: any }} coppied map.
+             * @returns {boolean} whether or not two objects share the same keys, and
+             *          values associated with those keys. Values will be compared
+             *          with ===.
              */
-            function copyMap<T>(oldMap: {
-                [key: string]: T;
-            }): {
-                [key: string]: T;
-            };
-            function range(start: number, stop: number, step?: number): number[];
-            /** Is like setTimeout, but activates synchronously if time=0
-             * We special case 0 because of an observed issue where calling setTimeout causes visible flickering.
-             * We believe this is because when requestAnimationFrame calls into the paint function, as soon as that function finishes
-             * evaluating, the results are painted to the screen. As a result, if we want something to occur immediately but call setTimeout
-             * with time=0, then it is pushed to the call stack and rendered in the next frame, so the component that was rendered via
-             * setTimeout appears out-of-sync with the rest of the plot.
-             */
-            function setTimeout(f: Function, time: number, ...args: any[]): number;
-            function colorTest(colorTester: D3.Selection, className: string): string;
-            function lightenColor(color: string, factor: number): string;
-            function distanceSquared(p1: Point, p2: Point): number;
-            function isIE(): boolean;
-            /**
-             * Returns true if the supplied coordinates or Extents intersect or are contained by bbox.
-             *
-             * @param {number | Extent} xValOrExtent The x coordinate or Extent to test
-             * @param {number | Extent} yValOrExtent The y coordinate or Extent to test
-             * @param {SVGRect} bbox The bbox
-             * @param {number} tolerance Amount by which to expand bbox, in each dimension, before
-             * testing intersection
-             *
-             * @returns {boolean} True if the supplied coordinates or Extents intersect or are
-             * contained by bbox, false otherwise.
-             */
-            function intersectsBBox(xValOrExtent: number | Extent, yValOrExtent: number | Extent, bbox: SVGRect, tolerance?: number): boolean;
+            function objEq(a: any, b: any): boolean;
             /**
              * Create an Extent from a number or an object with "min" and "max" defined.
              *
@@ -177,6 +137,46 @@ declare module Plottable {
              * @returns {boolean} True if the Points are in equal location
              */
             function pointsEqual(p1: Point, p2: Point): boolean;
+            /**
+             * Populates a map from an array of keys and a transformation function.
+             *
+             * @param {string[]} keys The array of keys.
+             * @param {(string, number) => T} transform A transformation function to apply to the keys.
+             * @return {D3.Map<T>} A map mapping keys to their transformed values.
+             */
+            function populateMap<T>(keys: string[], transform: (key: string, index: number) => T): D3.Map<T>;
+            function range(start: number, stop: number, step?: number): number[];
+            /** Is like setTimeout, but activates synchronously if time=0
+             * We special case 0 because of an observed issue where calling setTimeout causes visible flickering.
+             * We believe this is because when requestAnimationFrame calls into the paint function, as soon as that function finishes
+             * evaluating, the results are painted to the screen. As a result, if we want something to occur immediately but call setTimeout
+             * with time=0, then it is pushed to the call stack and rendered in the next frame, so the component that was rendered via
+             * setTimeout appears out-of-sync with the rest of the plot.
+             */
+            function setTimeout(f: Function, time: number, ...args: any[]): number;
+            /**
+             * Takes two sets and returns the union
+             *
+             * Due to the fact that D3.Sets store strings internally, return type is always a string set
+             *
+             * @param {D3.Set<T>} set1 The first set
+             * @param {D3.Set<T>} set2 The second set
+             * @return {D3.Set<string>} A set that contains elements that appear in either set1 or set2
+             */
+            function union<T>(set1: D3.Set<T>, set2: D3.Set<T>): D3.Set<string>;
+            /**
+             * Take an array of values, and return the unique values.
+             * Will work iff ∀ a, b, a.toString() == b.toString() => a == b; will break on Object inputs
+             *
+             * @param {T[]} values The values to find uniqueness for
+             * @return {T[]} The unique values
+             */
+            function uniq<T>(arr: T[]): T[];
+            /** Print a warning message to the console, if it is available.
+             *
+             * @param {string} The warnings to print
+             */
+            function warn(warning: string): void;
         }
     }
 }
@@ -1827,7 +1827,7 @@ declare module Plottable {
     class ComponentContainer extends Component {
         anchor(element: D3.Selection): void;
         render(): void;
-        _removeComponent(c: Component): void;
+        removeComponent(c: Component): void;
         _addComponent(c: Component, prepend?: boolean): boolean;
         /**
          * Returns a list of components in the ComponentContainer.
@@ -2239,37 +2239,7 @@ declare module Plottable {
              * @param {string} orientation The orientation of the Label (horizontal/left/right) (default = "horizontal").
              */
             constructor(displayText?: string, orientation?: string);
-            /**
-             * Sets the horizontal side the label will go to given the label is given more space that it needs
-             *
-             * @param {string} alignment The new setting, one of `["left", "center",
-             * "right"]`. Defaults to `"center"`.
-             * @returns {Label} The calling Label.
-             */
-            xAlign(alignment: string): Label;
-            /**
-             * Sets the vertical side the label will go to given the label is given more space that it needs
-             *
-             * @param {string} alignment The new setting, one of `["top", "center",
-             * "bottom"]`. Defaults to `"center"`.
-             * @returns {Label} The calling Label.
-             */
-            yAlign(alignment: string): Label;
-            requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
-            protected setup(): void;
-            /**
-             * Gets the current text on the Label.
-             *
-             * @returns {string} the text on the label.
-             */
-            text(): string;
-            /**
-             * Sets the current text on the Label.
-             *
-             * @param {string} displayText If provided, the new text for the Label.
-             * @returns {Label} The calling Label.
-             */
-            text(displayText: string): Label;
+            doRender(): void;
             /**
              * Gets the orientation of the Label.
              *
@@ -2297,19 +2267,49 @@ declare module Plottable {
              * @returns {Label} The calling Label.
              */
             padding(padAmount: number): Label;
-            doRender(): void;
-        }
-        class TitleLabel extends Label {
+            requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
             /**
-             * Creates a TitleLabel, a type of label made for rendering titles.
+             * Gets the current text on the Label.
+             *
+             * @returns {string} the text on the label.
+             */
+            text(): string;
+            /**
+             * Sets the current text on the Label.
+             *
+             * @param {string} displayText If provided, the new text for the Label.
+             * @returns {Label} The calling Label.
+             */
+            text(displayText: string): Label;
+            /**
+             * Sets the horizontal side the label will go to given the label is given more space that it needs
+             *
+             * @param {string} alignment The new setting, one of `["left", "center",
+             * "right"]`. Defaults to `"center"`.
+             * @returns {Label} The calling Label.
+             */
+            xAlign(alignment: string): Label;
+            /**
+             * Sets the vertical side the label will go to given the label is given more space that it needs
+             *
+             * @param {string} alignment The new setting, one of `["top", "center",
+             * "bottom"]`. Defaults to `"center"`.
+             * @returns {Label} The calling Label.
+             */
+            yAlign(alignment: string): Label;
+            protected setup(): void;
+        }
+        class AxisLabel extends Label {
+            /**
+             * Creates a AxisLabel, a type of label made for rendering axis labels.
              *
              * @constructor
              */
             constructor(text?: string, orientation?: string);
         }
-        class AxisLabel extends Label {
+        class TitleLabel extends Label {
             /**
-             * Creates a AxisLabel, a type of label made for rendering axis labels.
+             * Creates a TitleLabel, a type of label made for rendering titles.
              *
              * @constructor
              */
@@ -2478,9 +2478,9 @@ declare module Plottable {
              * @param {QuantitativeScaleScale} yScale The scale to base the y gridlines on. Pass null if no gridlines are desired.
              */
             constructor(xScale: QuantitativeScale<any>, yScale: QuantitativeScale<any>);
+            doRender(): void;
             remove(): Gridlines;
             protected setup(): void;
-            doRender(): void;
         }
     }
 }
@@ -2490,11 +2490,11 @@ declare module Plottable {
     module Components {
         type _IterateLayoutResult = {
             colProportionalSpace: number[];
-            rowProportionalSpace: number[];
-            guaranteedWidths: number[];
             guaranteedHeights: number[];
-            wantsWidth: boolean;
+            guaranteedWidths: number[];
+            rowProportionalSpace: number[];
             wantsHeight: boolean;
+            wantsWidth: boolean;
         };
         class Table extends ComponentContainer {
             /**
@@ -2535,9 +2535,20 @@ declare module Plottable {
              * @returns {Table} The calling Table.
              */
             addComponent(row: number, col: number, component: Component): Table;
-            _removeComponent(component: Component): void;
-            requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
+            /**
+             * Sets the layout weight of a particular column.
+             * Space is allocated to columns based on their weight. Columns with higher weights receive proportionally more space.
+             *
+             * Please see `rowWeight` docs for an example.
+             *
+             * @param {number} index The index of the column.
+             * @param {number} weight The weight to be set on the column.
+             * @returns {Table} The calling Table.
+             */
+            colWeight(index: number, weight: number): Table;
             computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;
+            isFixedWidth(): boolean;
+            isFixedHeight(): boolean;
             /**
              * Sets the row and column padding on the Table.
              *
@@ -2546,6 +2557,8 @@ declare module Plottable {
              * @returns {Table} The calling Table.
              */
             padding(rowPadding: number, colPadding: number): Table;
+            removeComponent(component: Component): void;
+            requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
             /**
              * Sets the layout weight of a particular row.
              * Space is allocated to rows based on their weight. Rows with higher weights receive proportionally more space.
@@ -2572,19 +2585,6 @@ declare module Plottable {
              * @returns {Table} The calling Table.
              */
             rowWeight(index: number, weight: number): Table;
-            /**
-             * Sets the layout weight of a particular column.
-             * Space is allocated to columns based on their weight. Columns with higher weights receive proportionally more space.
-             *
-             * Please see `rowWeight` docs for an example.
-             *
-             * @param {number} index The index of the column.
-             * @param {number} weight The weight to be set on the column.
-             * @returns {Table} The calling Table.
-             */
-            colWeight(index: number, weight: number): Table;
-            isFixedWidth(): boolean;
-            isFixedHeight(): boolean;
         }
     }
 }
@@ -2657,12 +2657,12 @@ declare module Plottable {
         protected _dataChanged: boolean;
         protected _key2PlotDatasetKey: D3.Map<Plots.PlotDatasetKey>;
         protected _datasetKeysInOrder: string[];
-        protected _renderArea: D3.Selection;
-        protected _projections: {
+        protected renderArea: D3.Selection;
+        protected animated: boolean;
+        protected animateOnNextRender: boolean;
+        protected projections: {
             [attrToSet: string]: _Projection;
         };
-        protected _animate: boolean;
-        protected _animateOnNextRender: boolean;
         /**
          * Constructs a Plot.
          *
@@ -2676,8 +2676,6 @@ declare module Plottable {
          */
         constructor();
         anchor(element: D3.Selection): void;
-        protected setup(): void;
-        remove(): void;
         /**
          * Adds a dataset to this plot. Identify this dataset with a key.
          *
@@ -2689,9 +2687,27 @@ declare module Plottable {
          */
         addDataset(dataset: Dataset | any[]): Plot;
         addDataset(key: string, dataset: Dataset | any[]): Plot;
-        protected _getDrawer(key: string): Drawers.AbstractDrawer;
-        protected _getAnimator(key: string): Animators.PlotAnimator;
-        protected _onDatasetUpdate(): void;
+        /**
+         * Enables or disables animation.
+         *
+         * @param {boolean} enabled Whether or not to animate.
+         */
+        animate(enabled: boolean): Plot;
+        /**
+         * Get the animator associated with the specified Animator key.
+         *
+         * @return {PlotAnimator} The Animator for the specified key.
+         */
+        animator(animatorKey: string): Animators.PlotAnimator;
+        /**
+         * Set the animator associated with the specified Animator key.
+         *
+         * @param {string} animatorKey The key for the Animator.
+         * @param {PlotAnimator} animator An Animator to be assigned to
+         * the specified key.
+         * @returns {Plot} The calling Plot.
+         */
+        animator(animatorKey: string, animator: Animators.PlotAnimator): Plot;
         /**
          * Sets an attribute of every data point.
          *
@@ -2717,50 +2733,6 @@ declare module Plottable {
          */
         attr(attrToSet: string, accessor: any, scale?: Scale<any, any>): Plot;
         /**
-         * Identical to plot.attr
-         */
-        project(attrToSet: string, accessor: any, scale?: Scale<any, any>): Plot;
-        protected _generateAttrToProjector(): AttributeToProjector;
-        /**
-         * Generates a dictionary mapping an attribute to a function that calculate that attribute's value
-         * in accordance with the given datasetKey.
-         *
-         * Note that this will return all of the data attributes, which may not perfectly align to svg attributes
-         *
-         * @param {datasetKey} the key of the dataset to generate the dictionary for
-         * @returns {AttributeToAppliedProjector} A dictionary mapping attributes to functions
-         */
-        generateProjectors(datasetKey: string): AttributeToAppliedProjector;
-        doRender(): void;
-        /**
-         * Enables or disables animation.
-         *
-         * @param {boolean} enabled Whether or not to animate.
-         */
-        animate(enabled: boolean): Plot;
-        detach(): Plot;
-        /**
-         * This function makes sure that all of the scales in this._projections
-         * have an extent that includes all the data that is projected onto them.
-         */
-        protected _updateScaleExtents(): void;
-        _updateScaleExtent(attr: string): void;
-        /**
-         * Get the animator associated with the specified Animator key.
-         *
-         * @return {PlotAnimator} The Animator for the specified key.
-         */
-        animator(animatorKey: string): Animators.PlotAnimator;
-        /**
-         * Set the animator associated with the specified Animator key.
-         *
-         * @param {string} animatorKey The key for the Animator.
-         * @param {PlotAnimator} animator An Animator to be assigned to
-         * the specified key.
-         * @returns {Plot} The calling Plot.
-         */
-        animator(animatorKey: string, animator: Animators.PlotAnimator): Plot;
-        /**
          * Gets the dataset order by key
          *
          * @returns {string[]} A string array of the keys in order
@@ -2775,27 +2747,27 @@ declare module Plottable {
          * @returns {Plot} The calling Plot.
          */
         datasetOrder(order: string[]): Plot;
-        /**
-         * Removes a dataset by the given identifier
-         *
-         * @param {string | Dataset | any[]} datasetIdentifer The identifier as the key of the Dataset to remove
-         * If string is inputted, it is interpreted as the dataset key to remove.
-         * If Dataset is inputted, the first Dataset in the plot that is the same will be removed.
-         * If any[] is inputted, the first data array in the plot that is the same will be removed.
-         * @returns {Plot} The calling Plot.
-         */
-        removeDataset(datasetIdentifier: string | Dataset | any[]): Plot;
         datasets(): Dataset[];
-        protected _getDrawersInOrder(): Drawers.AbstractDrawer[];
-        protected _generateDrawSteps(): Drawers.DrawStep[];
-        protected _additionalPaint(time: number): void;
-        protected _getDataToDraw(): D3.Map<any[]>;
+        detach(): Plot;
+        doRender(): void;
         /**
-         * Gets the new plot metadata for new dataset with provided key
+         * Generates a dictionary mapping an attribute to a function that calculate that attribute's value
+         * in accordance with the given datasetKey.
          *
-         * @param {string} key The key of new dataset
+         * Note that this will return all of the data attributes, which may not perfectly align to svg attributes
+         *
+         * @param {datasetKey} the key of the dataset to generate the dictionary for
+         * @returns {AttributeToAppliedProjector} A dictionary mapping attributes to functions
          */
-        protected _getPlotMetadataForDataset(key: string): Plots.PlotMetadata;
+        generateProjectors(datasetKey: string): AttributeToAppliedProjector;
+        /**
+         * Retrieves all of the PlotData of this plot for the specified dataset(s)
+         *
+         * @param {string | string[]} datasetKeys The dataset(s) to retrieve the selections from.
+         * If not provided, all selections will be retrieved.
+         * @returns {PlotData} The retrieved PlotData.
+         */
+        getAllPlotData(datasetKeys?: string | string[]): Plots.PlotData;
         /**
          * Retrieves all of the selections of this plot for the specified dataset(s)
          *
@@ -2807,15 +2779,6 @@ declare module Plottable {
          */
         getAllSelections(datasetKeys?: string | string[], exclude?: boolean): D3.Selection;
         /**
-         * Retrieves all of the PlotData of this plot for the specified dataset(s)
-         *
-         * @param {string | string[]} datasetKeys The dataset(s) to retrieve the selections from.
-         * If not provided, all selections will be retrieved.
-         * @returns {PlotData} The retrieved PlotData.
-         */
-        getAllPlotData(datasetKeys?: string | string[]): Plots.PlotData;
-        protected _getAllPlotData(datasetKeys: string[]): Plots.PlotData;
-        /**
          * Retrieves PlotData with the lowest distance, where distance is defined
          * to be the Euclidiean norm.
          *
@@ -2824,7 +2787,44 @@ declare module Plottable {
          * @returns {PlotData} The PlotData closest to queryPoint
          */
         getClosestPlotData(queryPoint: Point): Plots.PlotData;
+        /**
+         * Identical to plot.attr
+         */
+        project(attrToSet: string, accessor: any, scale?: Scale<any, any>): Plot;
+        remove(): void;
+        /**
+         * Removes a dataset by the given identifier
+         *
+         * @param {string | Dataset | any[]} datasetIdentifer The identifier as the key of the Dataset to remove
+         * If string is inputted, it is interpreted as the dataset key to remove.
+         * If Dataset is inputted, the first Dataset in the plot that is the same will be removed.
+         * If any[] is inputted, the first data array in the plot that is the same will be removed.
+         * @returns {Plot} The calling Plot.
+         */
+        removeDataset(datasetIdentifier: string | Dataset | any[]): Plot;
+        _updateScaleExtent(attr: string): void;
+        protected _getDrawersInOrder(): Drawers.AbstractDrawer[];
+        protected _generateDrawSteps(): Drawers.DrawStep[];
+        protected _additionalPaint(time: number): void;
+        protected _generateAttrToProjector(): AttributeToProjector;
+        protected _getAllPlotData(datasetKeys: string[]): Plots.PlotData;
+        protected _getAnimator(key: string): Animators.PlotAnimator;
+        protected _getDataToDraw(): D3.Map<any[]>;
+        protected _getDrawer(key: string): Drawers.AbstractDrawer;
+        /**
+         * Gets the new plot metadata for new dataset with provided key
+         *
+         * @param {string} key The key of new dataset
+         */
+        protected _getPlotMetadataForDataset(key: string): Plots.PlotMetadata;
         protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean;
+        protected _onDatasetUpdate(): void;
+        protected setup(): void;
+        /**
+         * This function makes sure that all of the scales in this._projections
+         * have an extent that includes all the data that is projected onto them.
+         */
+        protected _updateScaleExtents(): void;
     }
 }
 
@@ -3187,15 +3187,15 @@ declare module Plottable {
              * @param {QuantitativeScaleScale} yScale The y scale to use.
              */
             constructor(xScale: QuantitativeScale<X>, yScale: QuantitativeScale<number>);
-            protected _onDatasetUpdate(): void;
-            protected _getDrawer(key: string): Drawers.Area;
-            protected _updateYDomainer(): void;
             project(attrToSet: string, accessor: any, scale?: Scale<any, any>): Area<X>;
-            protected _getResetYFunction(): (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
-            protected _wholeDatumAttributes(): string[];
             protected _generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
             };
+            protected _getDrawer(key: string): Drawers.Area;
+            protected _getResetYFunction(): (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
+            protected _onDatasetUpdate(): void;
+            protected _updateYDomainer(): void;
+            protected _wholeDatumAttributes(): string[];
         }
     }
 }

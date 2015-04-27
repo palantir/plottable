@@ -42,7 +42,7 @@ export module Plots {
 
     protected setup() {
       super.setup();
-      this._baseline = this._renderArea.append("line").classed("baseline", true);
+      this._baseline = this.renderArea.append("line").classed("baseline", true);
     }
 
     /**
@@ -343,7 +343,7 @@ export module Plots {
 
     protected _generateDrawSteps(): Drawers.DrawStep[] {
       var drawSteps: Drawers.DrawStep[] = [];
-      if (this._dataChanged && this._animate) {
+      if (this._dataChanged && this.animated) {
         var resetAttrToProjector = this._generateAttrToProjector();
         var primaryScale: Scale<any, number> = this._isVertical ? this._yScale : this._xScale;
         var scaledBaseline = primaryScale.scale(this._baselineValue);
@@ -394,7 +394,7 @@ export module Plots {
         return (originalPos > scaledBaseline) ? scaledBaseline : originalPos;
       };
 
-      var primaryAccessor = this._projections[primaryAttr].accessor;
+      var primaryAccessor = this.projections[primaryAttr].accessor;
       if (this.barLabelsEnabled && this.barLabelFormatter) {
         attrToProjector["label"] = (d: any, i: number, u: any, m: PlotMetadata) => {
           return this._barLabelFormatter(primaryAccessor(d, i, u, m));
@@ -422,7 +422,7 @@ export module Plots {
       if (barScale instanceof Plottable.Scales.Category) {
         barPixelWidth = (<Plottable.Scales.Category> barScale).rangeBand();
       } else {
-        var barAccessor = this._isVertical ? this._projections["x"].accessor : this._projections["y"].accessor;
+        var barAccessor = this._isVertical ? this.projections["x"].accessor : this.projections["y"].accessor;
 
         var numberBarAccessorData = d3.set(Utils.Methods.flatten(this._datasetKeysInOrder.map((k) => {
           var dataset = this._key2PlotDatasetKey.get(k).dataset;

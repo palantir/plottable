@@ -54,7 +54,7 @@ describe("Plots", () => {
               .project("fill", fillAccessor)
               .project("stroke", colorAccessor)
               .renderTo(svg);
-      renderArea = (<any> areaPlot)._renderArea;
+      renderArea = (<any> areaPlot).renderArea;
     });
 
     it("draws area and line correctly", () => {
@@ -75,7 +75,7 @@ describe("Plots", () => {
     it("area fill works for non-zero floor values appropriately, e.g. half the height of the line", () => {
       areaPlot.project("y0", (d: any) => d.bar / 2, yScale);
       areaPlot.renderTo(svg);
-      renderArea = (<any> areaPlot)._renderArea;
+      renderArea = (<any> areaPlot).renderArea;
       var areaPath = renderArea.select(".area");
       assert.equal(normalizePath(areaPath.attr("d")), "M0,500L500,0L500,250L0,500Z");
       svg.remove();

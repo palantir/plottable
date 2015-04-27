@@ -80,7 +80,7 @@ describe("Plots", () => {
               .project("stroke", colorAccessor)
               .addDataset("s2", simpleDataset)
               .renderTo(svg);
-      renderArea = (<any> linePlot)._renderArea;
+      renderArea = (<any> linePlot).renderArea;
     });
 
     it("draws a line correctly", () => {

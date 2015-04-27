@@ -30,13 +30,13 @@ module Plottable {
     protected _key2PlotDatasetKey: D3.Map<Plots.PlotDatasetKey>;
     protected _datasetKeysInOrder: string[];
 
-    protected _renderArea: D3.Selection;
-    protected _projections: { [attrToSet: string]: _Projection; } = {};
+    protected renderArea: D3.Selection;
+    protected animated: boolean = false;
+    protected animateOnNextRender = true;
+    protected projections: { [attrToSet: string]: _Projection; } = {};
 
-    protected _animate: boolean = false;
-    private _animators: Animators.PlotAnimatorMap = {};
-    protected _animateOnNextRender = true;
-    private _nextSeriesIndex: number;
+    private animators: Animators.PlotAnimatorMap = {};
+    private nextSeriesIndex: number;
 
     /**
      * Constructs a Plot.
@@ -55,34 +55,14 @@ module Plottable {
       this.classed("plot", true);
       this._key2PlotDatasetKey = d3.map();
       this._datasetKeysInOrder = [];
-      this._nextSeriesIndex = 0;
+      this.nextSeriesIndex = 0;
     }
 
     public anchor(element: D3.Selection) {
       super.anchor(element);
-      this._animateOnNextRender = true;
+      this.animateOnNextRender = true;
       this._dataChanged = true;
       this._updateScaleExtents();
-    }
-
-    protected setup() {
-      super.setup();
-      this._renderArea = this._content.append("g").classed("render-area", true);
-      // HACKHACK on 591
-      this._getDrawersInOrder().forEach((d) => d.setup(this._renderArea.append("g")));
-    }
-
-    public remove() {
-      super.remove();
-      this._datasetKeysInOrder.forEach((k) => this.removeDataset(k));
-      // deregister from all scales
-      var properties = Object.keys(this._projections);
-      properties.forEach((property) => {
-        var projector = this._projections[property];
-        if (projector.scale) {
-          projector.scale.broadcaster.deregisterListener(this);
-        }
-      });
     }
 
     /**
@@ -103,7 +83,7 @@ module Plottable {
       if (typeof(keyOrDataset) === "string" && keyOrDataset[0] === "_") {
         Utils.Methods.warn("Warning: Using _named series keys may produce collisions with unlabeled data sources");
       }
-      var key  = typeof(keyOrDataset) === "string" ? keyOrDataset : "_" + this._nextSeriesIndex++;
+      var key  = typeof(keyOrDataset) === "string" ? keyOrDataset : "_" + this.nextSeriesIndex++;
       var data = typeof(keyOrDataset) !== "string" ? keyOrDataset : dataset;
       dataset = (data instanceof Dataset) ? data : new Dataset(data);
 
@@ -111,40 +91,38 @@ module Plottable {
       return this;
     }
 
-    private _addDataset(key: string, dataset: Dataset) {
-      if (this._key2PlotDatasetKey.has(key)) {
-        this.removeDataset(key);
-      };
-      var drawer = this._getDrawer(key);
-      var metadata = this._getPlotMetadataForDataset(key);
-      var pdk = {drawer: drawer, dataset: dataset, key: key, plotMetadata: metadata};
-      this._datasetKeysInOrder.push(key);
-      this._key2PlotDatasetKey.set(key, pdk);
-
-      if (this.isSetup) {
-        drawer.setup(this._renderArea.append("g"));
-      }
-      dataset.broadcaster.registerListener(this, () => this._onDatasetUpdate());
-      this._onDatasetUpdate();
+    /**
+     * Enables or disables animation.
+     *
+     * @param {boolean} enabled Whether or not to animate.
+     */
+    public animate(enabled: boolean) {
+      this.animated = enabled;
+      return this;
     }
 
-    protected _getDrawer(key: string): Drawers.AbstractDrawer {
-      return new Drawers.AbstractDrawer(key);
-    }
-
-    protected _getAnimator(key: string): Animators.PlotAnimator {
-      if (this._animate && this._animateOnNextRender) {
-        return this._animators[key] || new Animators.Null();
+    /**
+     * Get the animator associated with the specified Animator key.
+     *
+     * @return {PlotAnimator} The Animator for the specified key.
+     */
+    public animator(animatorKey: string): Animators.PlotAnimator;
+    /**
+     * Set the animator associated with the specified Animator key.
+     *
+     * @param {string} animatorKey The key for the Animator.
+     * @param {PlotAnimator} animator An Animator to be assigned to
+     * the specified key.
+     * @returns {Plot} The calling Plot.
+     */
+    public animator(animatorKey: string, animator: Animators.PlotAnimator): Plot;
+    public animator(animatorKey: string, animator?: Animators.PlotAnimator): any {
+      if (animator === undefined){
+        return this.animators[animatorKey];
       } else {
-        return new Animators.Null();
+        this.animators[animatorKey] = animator;
+        return this;
       }
-    }
-
-    protected _onDatasetUpdate() {
-      this._updateScaleExtents();
-      this._animateOnNextRender = true;
-      this._dataChanged = true;
-      this.render();
     }
 
     /**
@@ -172,139 +150,6 @@ module Plottable {
      */
     public attr(attrToSet: string, accessor: any, scale?: Scale<any, any>) {
       return this.project(attrToSet, accessor, scale);
-    }
-
-    /**
-     * Identical to plot.attr
-     */
-    public project(attrToSet: string, accessor: any, scale?: Scale<any, any>) {
-      attrToSet = attrToSet.toLowerCase();
-      var currentProjection = this._projections[attrToSet];
-      var existingScale = currentProjection && currentProjection.scale;
-
-      if (existingScale) {
-        this._datasetKeysInOrder.forEach((key) => {
-          existingScale._removeExtent(this.getID().toString() + "_" + key, attrToSet);
-          existingScale.broadcaster.deregisterListener(this);
-        });
-      }
-
-      if (scale) {
-        scale.broadcaster.registerListener(this, () => this.render());
-      }
-      accessor = Utils.Methods.accessorize(accessor);
-      this._projections[attrToSet] = {accessor: accessor, scale: scale, attribute: attrToSet};
-      this._updateScaleExtent(attrToSet);
-      this.render(); // queue a re-render upon changing projector
-      return this;
-    }
-
-    protected _generateAttrToProjector(): AttributeToProjector {
-      var h: AttributeToProjector = {};
-      d3.keys(this._projections).forEach((a) => {
-        var projection = this._projections[a];
-        var accessor = projection.accessor;
-        var scale = projection.scale;
-        var fn = scale ? (d: any, i: number, u: any, m: Plots.PlotMetadata) => scale.scale(accessor(d, i, u, m)) : accessor;
-        h[a] = fn;
-      });
-      return h;
-    }
-
-    /**
-     * Generates a dictionary mapping an attribute to a function that calculate that attribute's value
-     * in accordance with the given datasetKey.
-     *
-     * Note that this will return all of the data attributes, which may not perfectly align to svg attributes
-     *
-     * @param {datasetKey} the key of the dataset to generate the dictionary for
-     * @returns {AttributeToAppliedProjector} A dictionary mapping attributes to functions
-     */
-    public generateProjectors(datasetKey: string): AttributeToAppliedProjector {
-      var attrToProjector = this._generateAttrToProjector();
-      var plotDatasetKey = this._key2PlotDatasetKey.get(datasetKey);
-      var plotMetadata = plotDatasetKey.plotMetadata;
-      var userMetadata = plotDatasetKey.dataset.metadata();
-      var attrToAppliedProjector: AttributeToAppliedProjector = {};
-      d3.entries(attrToProjector).forEach((keyValue: any) => {
-        attrToAppliedProjector[keyValue.key] = (datum: any, index: number) => keyValue.value(datum, index, userMetadata, plotMetadata);
-      });
-      return attrToAppliedProjector;
-    }
-
-    public doRender() {
-      if (this._isAnchored) {
-        this._paint();
-        this._dataChanged = false;
-        this._animateOnNextRender = false;
-      }
-    }
-
-    /**
-     * Enables or disables animation.
-     *
-     * @param {boolean} enabled Whether or not to animate.
-     */
-    public animate(enabled: boolean) {
-      this._animate = enabled;
-      return this;
-    }
-
-    public detach() {
-      super.detach();
-      // make the domain resize
-      this._updateScaleExtents();
-      return this;
-    }
-
-    /**
-     * This function makes sure that all of the scales in this._projections
-     * have an extent that includes all the data that is projected onto them.
-     */
-    protected _updateScaleExtents() {
-      d3.keys(this._projections).forEach((attr: string) => this._updateScaleExtent(attr));
-    }
-
-    public _updateScaleExtent(attr: string) {
-      var projector = this._projections[attr];
-      if (projector.scale) {
-        this._datasetKeysInOrder.forEach((key) => {
-          var plotDatasetKey = this._key2PlotDatasetKey.get(key);
-          var dataset = plotDatasetKey.dataset;
-          var plotMetadata = plotDatasetKey.plotMetadata;
-          var extent = dataset._getExtent(projector.accessor, projector.scale._typeCoercer, plotMetadata);
-          var scaleKey = this.getID().toString() + "_" + key;
-          if (extent.length === 0 || !this._isAnchored) {
-            projector.scale._removeExtent(scaleKey, attr);
-          } else {
-            projector.scale.updateExtent(scaleKey, attr, extent);
-          }
-        });
-      }
-    }
-
-    /**
-     * Get the animator associated with the specified Animator key.
-     *
-     * @return {PlotAnimator} The Animator for the specified key.
-     */
-    public animator(animatorKey: string): Animators.PlotAnimator;
-    /**
-     * Set the animator associated with the specified Animator key.
-     *
-     * @param {string} animatorKey The key for the Animator.
-     * @param {PlotAnimator} animator An Animator to be assigned to
-     * the specified key.
-     * @returns {Plot} The calling Plot.
-     */
-    public animator(animatorKey: string, animator: Animators.PlotAnimator): Plot;
-    public animator(animatorKey: string, animator?: Animators.PlotAnimator): any {
-      if (animator === undefined){
-        return this._animators[animatorKey];
-      } else {
-        this._animators[animatorKey] = animator;
-        return this;
-      }
     }
 
     /**
@@ -340,109 +185,62 @@ module Plottable {
       return this;
     }
 
-    /**
-     * Removes a dataset by the given identifier
-     *
-     * @param {string | Dataset | any[]} datasetIdentifer The identifier as the key of the Dataset to remove
-     * If string is inputted, it is interpreted as the dataset key to remove.
-     * If Dataset is inputted, the first Dataset in the plot that is the same will be removed.
-     * If any[] is inputted, the first data array in the plot that is the same will be removed.
-     * @returns {Plot} The calling Plot.
-     */
-    public removeDataset(datasetIdentifier: string | Dataset | any[]): Plot {
-      var key: string;
-      if (typeof datasetIdentifier === "string") {
-        key = <string> datasetIdentifier;
-      } else if (typeof datasetIdentifier === "object") {
-
-        var index = -1;
-        if (datasetIdentifier instanceof Dataset) {
-          var datasetArray = this.datasets();
-          index = datasetArray.indexOf(<Dataset> datasetIdentifier);
-        } else if (datasetIdentifier instanceof Array) {
-          var dataArray = this.datasets().map(d => d.data());
-          index = dataArray.indexOf(<any[]> datasetIdentifier);
-        }
-        if (index !== -1) {
-          key = this._datasetKeysInOrder[index];
-        }
-
-      }
-
-      return this._removeDataset(key);
-    }
-
-    private _removeDataset(key: string): Plot {
-      if (key != null && this._key2PlotDatasetKey.has(key)) {
-        var pdk = this._key2PlotDatasetKey.get(key);
-        pdk.drawer.remove();
-
-        var projectors = d3.values(this._projections);
-        var scaleKey = this.getID().toString() + "_" + key;
-        projectors.forEach((p) => {
-          if (p.scale != null) {
-            p.scale._removeExtent(scaleKey, p.attribute);
-          }
-        });
-
-        pdk.dataset.broadcaster.deregisterListener(this);
-        this._datasetKeysInOrder.splice(this._datasetKeysInOrder.indexOf(key), 1);
-        this._key2PlotDatasetKey.remove(key);
-        this._onDatasetUpdate();
-      }
-      return this;
-    }
-
     public datasets(): Dataset[] {
       return this._datasetKeysInOrder.map((k) => this._key2PlotDatasetKey.get(k).dataset);
     }
 
-    protected _getDrawersInOrder(): Drawers.AbstractDrawer[] {
-      return this._datasetKeysInOrder.map((k) => this._key2PlotDatasetKey.get(k).drawer);
+    public detach() {
+      super.detach();
+      // make the domain resize
+      this._updateScaleExtents();
+      return this;
     }
 
-    protected _generateDrawSteps(): Drawers.DrawStep[] {
-      return [{attrToProjector: this._generateAttrToProjector(), animator: new Animators.Null()}];
-    }
-
-    protected _additionalPaint(time: number) {
-      // no-op
-    }
-
-    protected _getDataToDraw() {
-      var datasets: D3.Map<any[]> = d3.map();
-      this._datasetKeysInOrder.forEach((key: string) => {
-        datasets.set(key, this._key2PlotDatasetKey.get(key).dataset.data());
-      });
-      return datasets;
+    public doRender() {
+      if (this._isAnchored) {
+        this._paint();
+        this._dataChanged = false;
+        this.animateOnNextRender = false;
+      }
     }
 
     /**
-     * Gets the new plot metadata for new dataset with provided key
+     * Generates a dictionary mapping an attribute to a function that calculate that attribute's value
+     * in accordance with the given datasetKey.
      *
-     * @param {string} key The key of new dataset
+     * Note that this will return all of the data attributes, which may not perfectly align to svg attributes
+     *
+     * @param {datasetKey} the key of the dataset to generate the dictionary for
+     * @returns {AttributeToAppliedProjector} A dictionary mapping attributes to functions
      */
-    protected _getPlotMetadataForDataset(key: string): Plots.PlotMetadata {
-      return {
-        datasetKey: key
-      };
+    public generateProjectors(datasetKey: string): AttributeToAppliedProjector {
+      var attrToProjector = this._generateAttrToProjector();
+      var plotDatasetKey = this._key2PlotDatasetKey.get(datasetKey);
+      var plotMetadata = plotDatasetKey.plotMetadata;
+      var userMetadata = plotDatasetKey.dataset.metadata();
+      var attrToAppliedProjector: AttributeToAppliedProjector = {};
+      d3.entries(attrToProjector).forEach((keyValue: any) => {
+        attrToAppliedProjector[keyValue.key] = (datum: any, index: number) => keyValue.value(datum, index, userMetadata, plotMetadata);
+      });
+      return attrToAppliedProjector;
     }
 
-    private _paint() {
-      var drawSteps = this._generateDrawSteps();
-      var dataToDraw = this._getDataToDraw();
-      var drawers = this._getDrawersInOrder();
+    /**
+     * Retrieves all of the PlotData of this plot for the specified dataset(s)
+     *
+     * @param {string | string[]} datasetKeys The dataset(s) to retrieve the selections from.
+     * If not provided, all selections will be retrieved.
+     * @returns {PlotData} The retrieved PlotData.
+     */
+    public getAllPlotData(datasetKeys: string | string[] = this.datasetOrder()): Plots.PlotData {
+      var datasetKeyArray: string[] = [];
+      if (typeof(datasetKeys) === "string") {
+        datasetKeyArray = [<string> datasetKeys];
+      } else {
+        datasetKeyArray = <string[]> datasetKeys;
+      }
 
-      // TODO: Use metadata instead of dataToDraw #1297.
-      var times = this._datasetKeysInOrder.map((k, i) =>
-        drawers[i].draw(
-          dataToDraw.get(k),
-          drawSteps,
-          this._key2PlotDatasetKey.get(k).dataset.metadata(),
-          this._key2PlotDatasetKey.get(k).plotMetadata
-        ));
-      var maxTime = Utils.Methods.max(times, 0);
-      this._additionalPaint(maxTime);
+      return this._getAllPlotData(datasetKeyArray);
     }
 
     /**
@@ -482,47 +280,6 @@ module Plottable {
     }
 
     /**
-     * Retrieves all of the PlotData of this plot for the specified dataset(s)
-     *
-     * @param {string | string[]} datasetKeys The dataset(s) to retrieve the selections from.
-     * If not provided, all selections will be retrieved.
-     * @returns {PlotData} The retrieved PlotData.
-     */
-    public getAllPlotData(datasetKeys: string | string[] = this.datasetOrder()): Plots.PlotData {
-      var datasetKeyArray: string[] = [];
-      if (typeof(datasetKeys) === "string") {
-        datasetKeyArray = [<string> datasetKeys];
-      } else {
-        datasetKeyArray = <string[]> datasetKeys;
-      }
-
-      return this._getAllPlotData(datasetKeyArray);
-    }
-
-    protected _getAllPlotData(datasetKeys: string[]): Plots.PlotData {
-      var data: any[] = [];
-      var pixelPoints: Point[] = [];
-      var allElements: EventTarget[] = [];
-
-      datasetKeys.forEach((datasetKey) => {
-        var plotDatasetKey = this._key2PlotDatasetKey.get(datasetKey);
-        if (plotDatasetKey == null) { return; }
-        var drawer = plotDatasetKey.drawer;
-        plotDatasetKey.dataset.data().forEach((datum: any, index: number) => {
-          var pixelPoint = drawer._getPixelPoint(datum, index);
-          if (pixelPoint.x !== pixelPoint.x || pixelPoint.y !== pixelPoint.y) {
-            return;
-          }
-          data.push(datum);
-          pixelPoints.push(pixelPoint);
-          allElements.push(drawer._getSelection(index).node());
-        });
-      });
-
-      return { data: data, pixelPoints: pixelPoints, selection: d3.selectAll(allElements) };
-    }
-
-    /**
      * Retrieves PlotData with the lowest distance, where distance is defined
      * to be the Euclidiean norm.
      *
@@ -558,9 +315,254 @@ module Plottable {
               selection: d3.select(plotData.selection[0][closestIndex])};
     }
 
+    /**
+     * Identical to plot.attr
+     */
+    public project(attrToSet: string, accessor: any, scale?: Scale<any, any>) {
+      attrToSet = attrToSet.toLowerCase();
+      var currentProjection = this.projections[attrToSet];
+      var existingScale = currentProjection && currentProjection.scale;
+
+      if (existingScale) {
+        this._datasetKeysInOrder.forEach((key) => {
+          existingScale._removeExtent(this.getID().toString() + "_" + key, attrToSet);
+          existingScale.broadcaster.deregisterListener(this);
+        });
+      }
+
+      if (scale) {
+        scale.broadcaster.registerListener(this, () => this.render());
+      }
+      accessor = Utils.Methods.accessorize(accessor);
+      this.projections[attrToSet] = {accessor: accessor, scale: scale, attribute: attrToSet};
+      this._updateScaleExtent(attrToSet);
+      this.render(); // queue a re-render upon changing projector
+      return this;
+    }
+
+    public remove() {
+      super.remove();
+      this._datasetKeysInOrder.forEach((k) => this.removeDataset(k));
+      // deregister from all scales
+      var properties = Object.keys(this.projections);
+      properties.forEach((property) => {
+        var projector = this.projections[property];
+        if (projector.scale) {
+          projector.scale.broadcaster.deregisterListener(this);
+        }
+      });
+    }
+
+    /**
+     * Removes a dataset by the given identifier
+     *
+     * @param {string | Dataset | any[]} datasetIdentifer The identifier as the key of the Dataset to remove
+     * If string is inputted, it is interpreted as the dataset key to remove.
+     * If Dataset is inputted, the first Dataset in the plot that is the same will be removed.
+     * If any[] is inputted, the first data array in the plot that is the same will be removed.
+     * @returns {Plot} The calling Plot.
+     */
+    public removeDataset(datasetIdentifier: string | Dataset | any[]): Plot {
+      var key: string;
+      if (typeof datasetIdentifier === "string") {
+        key = <string> datasetIdentifier;
+      } else if (typeof datasetIdentifier === "object") {
+
+        var index = -1;
+        if (datasetIdentifier instanceof Dataset) {
+          var datasetArray = this.datasets();
+          index = datasetArray.indexOf(<Dataset> datasetIdentifier);
+        } else if (datasetIdentifier instanceof Array) {
+          var dataArray = this.datasets().map(d => d.data());
+          index = dataArray.indexOf(<any[]> datasetIdentifier);
+        }
+        if (index !== -1) {
+          key = this._datasetKeysInOrder[index];
+        }
+
+      }
+
+      return this._removeDataset(key);
+    }
+
+    public _updateScaleExtent(attr: string) {
+      var projector = this.projections[attr];
+      if (projector.scale) {
+        this._datasetKeysInOrder.forEach((key) => {
+          var plotDatasetKey = this._key2PlotDatasetKey.get(key);
+          var dataset = plotDatasetKey.dataset;
+          var plotMetadata = plotDatasetKey.plotMetadata;
+          var extent = dataset._getExtent(projector.accessor, projector.scale._typeCoercer, plotMetadata);
+          var scaleKey = this.getID().toString() + "_" + key;
+          if (extent.length === 0 || !this._isAnchored) {
+            projector.scale._removeExtent(scaleKey, attr);
+          } else {
+            projector.scale.updateExtent(scaleKey, attr, extent);
+          }
+        });
+      }
+    }
+
+    protected _getDrawersInOrder(): Drawers.AbstractDrawer[] {
+      return this._datasetKeysInOrder.map((k) => this._key2PlotDatasetKey.get(k).drawer);
+    }
+
+    protected _generateDrawSteps(): Drawers.DrawStep[] {
+      return [{attrToProjector: this._generateAttrToProjector(), animator: new Animators.Null()}];
+    }
+
+    protected _additionalPaint(time: number) {
+      // no-op
+    }
+
+    protected _generateAttrToProjector(): AttributeToProjector {
+      var h: AttributeToProjector = {};
+      d3.keys(this.projections).forEach((a) => {
+        var projection = this.projections[a];
+        var accessor = projection.accessor;
+        var scale = projection.scale;
+        var fn = scale ? (d: any, i: number, u: any, m: Plots.PlotMetadata) => scale.scale(accessor(d, i, u, m)) : accessor;
+        h[a] = fn;
+      });
+      return h;
+    }
+
+    protected _getAllPlotData(datasetKeys: string[]): Plots.PlotData {
+      var data: any[] = [];
+      var pixelPoints: Point[] = [];
+      var allElements: EventTarget[] = [];
+
+      datasetKeys.forEach((datasetKey) => {
+        var plotDatasetKey = this._key2PlotDatasetKey.get(datasetKey);
+        if (plotDatasetKey == null) { return; }
+        var drawer = plotDatasetKey.drawer;
+        plotDatasetKey.dataset.data().forEach((datum: any, index: number) => {
+          var pixelPoint = drawer._getPixelPoint(datum, index);
+          if (pixelPoint.x !== pixelPoint.x || pixelPoint.y !== pixelPoint.y) {
+            return;
+          }
+          data.push(datum);
+          pixelPoints.push(pixelPoint);
+          allElements.push(drawer._getSelection(index).node());
+        });
+      });
+
+      return { data: data, pixelPoints: pixelPoints, selection: d3.selectAll(allElements) };
+    }
+
+    protected _getAnimator(key: string): Animators.PlotAnimator {
+      if (this.animated && this.animateOnNextRender) {
+        return this.animators[key] || new Animators.Null();
+      } else {
+        return new Animators.Null();
+      }
+    }
+
+    protected _getDataToDraw() {
+      var datasets: D3.Map<any[]> = d3.map();
+      this._datasetKeysInOrder.forEach((key: string) => {
+        datasets.set(key, this._key2PlotDatasetKey.get(key).dataset.data());
+      });
+      return datasets;
+    }
+
+    protected _getDrawer(key: string): Drawers.AbstractDrawer {
+      return new Drawers.AbstractDrawer(key);
+    }
+
+    /**
+     * Gets the new plot metadata for new dataset with provided key
+     *
+     * @param {string} key The key of new dataset
+     */
+    protected _getPlotMetadataForDataset(key: string): Plots.PlotMetadata {
+      return {
+        datasetKey: key
+      };
+    }
+
+
+
     protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean {
       return !(pixelPoint.x < 0 || pixelPoint.y < 0 ||
         pixelPoint.x > this.width() || pixelPoint.y > this.height());
+    }
+
+    protected _onDatasetUpdate() {
+      this._updateScaleExtents();
+      this.animateOnNextRender = true;
+      this._dataChanged = true;
+      this.render();
+    }
+
+    protected setup() {
+      super.setup();
+      this.renderArea = this._content.append("g").classed("render-area", true);
+      // HACKHACK on 591
+      this._getDrawersInOrder().forEach((d) => d.setup(this.renderArea.append("g")));
+    }
+
+    /**
+     * This function makes sure that all of the scales in this._projections
+     * have an extent that includes all the data that is projected onto them.
+     */
+    protected _updateScaleExtents() {
+      d3.keys(this.projections).forEach((attr: string) => this._updateScaleExtent(attr));
+    }
+
+    private _addDataset(key: string, dataset: Dataset) {
+      if (this._key2PlotDatasetKey.has(key)) {
+        this.removeDataset(key);
+      };
+      var drawer = this._getDrawer(key);
+      var metadata = this._getPlotMetadataForDataset(key);
+      var pdk = {drawer: drawer, dataset: dataset, key: key, plotMetadata: metadata};
+      this._datasetKeysInOrder.push(key);
+      this._key2PlotDatasetKey.set(key, pdk);
+
+      if (this.isSetup) {
+        drawer.setup(this.renderArea.append("g"));
+      }
+      dataset.broadcaster.registerListener(this, () => this._onDatasetUpdate());
+      this._onDatasetUpdate();
+    }
+
+    private _paint() {
+      var drawSteps = this._generateDrawSteps();
+      var dataToDraw = this._getDataToDraw();
+      var drawers = this._getDrawersInOrder();
+
+      // TODO: Use metadata instead of dataToDraw #1297.
+      var times = this._datasetKeysInOrder.map((k, i) =>
+        drawers[i].draw(
+          dataToDraw.get(k),
+          drawSteps,
+          this._key2PlotDatasetKey.get(k).dataset.metadata(),
+          this._key2PlotDatasetKey.get(k).plotMetadata
+        ));
+      var maxTime = Utils.Methods.max(times, 0);
+      this._additionalPaint(maxTime);
+    }
+
+    private _removeDataset(key: string): Plot {
+      if (key != null && this._key2PlotDatasetKey.has(key)) {
+        var pdk = this._key2PlotDatasetKey.get(key);
+        pdk.drawer.remove();
+
+        var projectors = d3.values(this.projections);
+        var scaleKey = this.getID().toString() + "_" + key;
+        projectors.forEach((p) => {
+          if (p.scale != null) {
+            p.scale._removeExtent(scaleKey, p.attribute);
+          }
+        });
+
+        pdk.dataset.broadcaster.deregisterListener(this);
+        this._datasetKeysInOrder.splice(this._datasetKeysInOrder.indexOf(key), 1);
+        this._key2PlotDatasetKey.remove(key);
+        this._onDatasetUpdate();
+      }
+      return this;
     }
   }
 }
