@@ -255,5 +255,34 @@ describe("Interactions", () => {
                        "dragging outside the Component is no longer constrained (negative) (touchend)");
       svg.remove();
     });
+
+    it("touchcancel cancels the current drag", () => {
+      var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      var c = new Plottable.Component.AbstractComponent();
+      c.renderTo(svg);
+
+      var drag = new Plottable.Interaction.Drag();
+      var moveCallbackCalled = false;
+      var receivedStart: Plottable.Point;
+      var receivedEnd: Plottable.Point;
+      var moveCallback = (start: Plottable.Point, end: Plottable.Point) => {
+        moveCallbackCalled = true;
+        receivedStart = start;
+        receivedEnd = end;
+      };
+      drag.onDrag(moveCallback);
+      c.registerInteraction(drag);
+
+      var target = c.background();
+      receivedStart = null;
+      receivedEnd = null;
+      triggerFakeTouchEvent("touchstart", target, [{x: startPoint.x, y: startPoint.y}]);
+      triggerFakeTouchEvent("touchmove", target, [{x: endPoint.x - 10, y: endPoint.y - 10}]);
+      triggerFakeTouchEvent("touchcancel", target, [{x: endPoint.x - 10, y: endPoint.y - 10}]);
+      triggerFakeTouchEvent("touchmove", target, [{x: endPoint.x, y: endPoint.y}]);
+      assert.notEqual(receivedEnd, endPoint, "was not passed touch point after cancelled");
+
+      svg.remove();
+    });
   });
 });

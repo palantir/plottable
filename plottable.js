@@ -9639,6 +9639,7 @@ var Plottable;
                 this._touchDispatcher = Plottable.Dispatcher.Touch.getDispatcher(component.content().node());
                 this._touchDispatcher.onTouchStart("Interaction.Click" + this.getID(), function (ids, idToPoint) { return _this._handleClickDown(idToPoint[ids[0]]); });
                 this._touchDispatcher.onTouchEnd("Interaction.Click" + this.getID(), function (ids, idToPoint) { return _this._handleClickUp(idToPoint[ids[0]]); });
+                this._touchDispatcher.onTouchCancel("Interaction.Click" + this.getID(), function (ids, idToPoint) { return _this._clickedDown = false; });
             };
             Click.prototype._handleClickDown = function (p) {
                 var translatedPoint = this._translateToComponentSpace(p);
@@ -9701,6 +9702,7 @@ var Plottable;
                 this._touchDispatcher = Plottable.Dispatcher.Touch.getDispatcher(component.content().node());
                 this._touchDispatcher.onTouchStart("Interaction.DoubleClick" + this.getID(), function (ids, idToPoint) { return _this._handleClickDown(idToPoint[ids[0]]); });
                 this._touchDispatcher.onTouchEnd("Interaction.DoubleClick" + this.getID(), function (ids, idToPoint) { return _this._handleClickUp(idToPoint[ids[0]]); });
+                this._touchDispatcher.onTouchCancel("Interaction.DoubleClick" + this.getID(), function (ids, idToPoint) { return _this._handleClickCancel(); });
             };
             DoubleClick.prototype._handleClickDown = function (p) {
                 var translatedP = this._translateToComponentSpace(p);
@@ -9729,6 +9731,10 @@ var Plottable;
                     }
                     this._clickState = 0 /* NotClicked */;
                 }
+            };
+            DoubleClick.prototype._handleClickCancel = function () {
+                this._clickState = 0 /* NotClicked */;
+                this._clickedDown = false;
             };
             DoubleClick.pointsEqual = function (p1, p2) {
                 return p1.x === p2.x && p1.y === p2.y;
@@ -9973,6 +9979,7 @@ var Plottable;
                 this._touchDispatcher.onTouchStart("Interaction.Drag" + this.getID(), function (ids, idToPoint, e) { return _this._startDrag(idToPoint[ids[0]], e); });
                 this._touchDispatcher.onTouchMove("Interaction.Drag" + this.getID(), function (ids, idToPoint, e) { return _this._doDrag(idToPoint[ids[0]], e); });
                 this._touchDispatcher.onTouchEnd("Interaction.Drag" + this.getID(), function (ids, idToPoint, e) { return _this._endDrag(idToPoint[ids[0]], e); });
+                this._touchDispatcher.onTouchCancel("Interaction.Drag" + this.getID(), function (ids, idToPoint, e) { return _this._dragging = false; });
             };
             Drag.prototype._translateAndConstrain = function (p) {
                 var translatedP = this._translateToComponentSpace(p);
