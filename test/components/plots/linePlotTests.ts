@@ -80,7 +80,7 @@ describe("Plots", () => {
               .project("stroke", colorAccessor)
               .addDataset("s2", simpleDataset)
               .renderTo(svg);
-      renderArea = (<any> linePlot)._renderArea;
+      renderArea = (<any> linePlot).renderArea;
     });
 
     it("draws a line correctly", () => {
@@ -161,26 +161,26 @@ describe("Plots", () => {
       svg.remove();
     });
 
-    it("_getClosestWithinRange", () => {
+    it("getClosestWithinRange", () => {
       var dataset2 = [
         { foo: 0, bar: 1 },
         { foo: 1, bar: 0.95 }
       ];
       linePlot.addDataset(dataset2);
 
-      var closestData = (<any> linePlot)._getClosestWithinRange({ x: 500, y: 0 }, 5);
+      var closestData = (<any> linePlot).getClosestWithinRange({ x: 500, y: 0 }, 5);
       assert.strictEqual(closestData.closestValue, twoPointData[1], "got closest point from first dataset");
 
-      closestData = (<any> linePlot)._getClosestWithinRange({ x: 500, y: 25 }, 5);
+      closestData = (<any> linePlot).getClosestWithinRange({ x: 500, y: 25 }, 5);
       assert.strictEqual(closestData.closestValue, dataset2[1], "got closest point from second dataset");
 
-      closestData = (<any> linePlot)._getClosestWithinRange({ x: 500, y: 10 }, 5);
+      closestData = (<any> linePlot).getClosestWithinRange({ x: 500, y: 10 }, 5);
       assert.isUndefined(closestData.closestValue, "returns nothing if no points are within range");
 
-      closestData = (<any> linePlot)._getClosestWithinRange({ x: 500, y: 10 }, 25);
+      closestData = (<any> linePlot).getClosestWithinRange({ x: 500, y: 10 }, 25);
       assert.strictEqual(closestData.closestValue, twoPointData[1], "returns the closest point within range");
 
-      closestData = (<any> linePlot)._getClosestWithinRange({ x: 500, y: 20 }, 25);
+      closestData = (<any> linePlot).getClosestWithinRange({ x: 500, y: 20 }, 25);
       assert.strictEqual(closestData.closestValue, dataset2[1], "returns the closest point within range");
 
       svg.remove();
@@ -193,14 +193,14 @@ describe("Plots", () => {
       ];
       linePlot.addDataset(dataset2);
 
-      var hoverData = linePlot._doHover({ x: 495, y: 0 });
+      var hoverData = linePlot.doHover({ x: 495, y: 0 });
       var expectedDatum = twoPointData[1];
       assert.strictEqual(hoverData.data[0], expectedDatum, "returned the closest point within range");
       var hoverTarget = hoverData.selection;
       assert.strictEqual(parseFloat(hoverTarget.attr("cx")), xScale.scale(expectedDatum.foo), "hover target was positioned correctly (x)");
       assert.strictEqual(parseFloat(hoverTarget.attr("cy")), yScale.scale(expectedDatum.bar), "hover target was positioned correctly (y)");
 
-      hoverData = linePlot._doHover({ x: 0, y: 0 });
+      hoverData = linePlot.doHover({ x: 0, y: 0 });
       expectedDatum = dataset2[0];
       assert.strictEqual(hoverData.data[0], expectedDatum, "returned the closest point within range");
       hoverTarget = hoverData.selection;
@@ -220,7 +220,7 @@ describe("Plots", () => {
         linePlot.addDataset("d3", dataset3);
 
         var allLines = linePlot.getAllSelections();
-        var allLines2 = linePlot.getAllSelections((<any> linePlot)._datasetKeysInOrder);
+        var allLines2 = linePlot.getAllSelections((<any> linePlot).datasetKeysInOrder);
         assert.deepEqual(allLines, allLines2, "all lines retrieved");
 
         svg.remove();

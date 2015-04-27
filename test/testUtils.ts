@@ -40,7 +40,7 @@ function verifySpaceRequest(sr: Plottable._SpaceRequest, w: number, h: number, w
 }
 
 function fixComponentSize(c: Plottable.Component, fixedWidth?: number, fixedHeight?: number) {
-  c._requestedSpace = function(w, h) {
+  c.requestedSpace = function(w, h) {
     return {
       width:  fixedWidth  == null ? 0 : fixedWidth,
       height: fixedHeight == null ? 0 : fixedHeight,
@@ -48,8 +48,8 @@ function fixComponentSize(c: Plottable.Component, fixedWidth?: number, fixedHeig
       wantsHeight: fixedHeight == null ? false : h < fixedHeight
     };
   };
-  (<any> c)._fixedWidthFlag  = fixedWidth  == null ? false : true;
-  (<any> c)._fixedHeightFlag = fixedHeight == null ? false : true;
+  (<any> c)._isFixedWidth  = fixedWidth  == null ? false : true;
+  (<any> c)._isFixedHeight = fixedHeight == null ? false : true;
   return c;
 }
 

@@ -9,11 +9,11 @@ module Mocks {
       super();
       this.fixedWidth = width;
       this.fixedHeight = height;
-      this._fixedWidthFlag = true;
-      this._fixedHeightFlag = true;
+      this._isFixedWidth = true;
+      this._isFixedHeight = true;
     }
 
-    public _requestedSpace(availableWidth: number, availableHeight: number): Plottable._SpaceRequest {
+    public requestedSpace(availableWidth: number, availableHeight: number): Plottable._SpaceRequest {
       return {
         width:  this.fixedWidth,
         height: this.fixedHeight,

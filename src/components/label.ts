@@ -3,15 +3,15 @@
 module Plottable {
 export module Components {
   export class Label extends Component {
-    private _textContainer: D3.Selection;
-    private _text: string; // text assigned to the Label; may not be the actual text displayed due to truncation
     private _orientation: string;
-    private _measurer: SVGTypewriter.Measurers.Measurer;
-    private _wrapper: SVGTypewriter.Wrappers.Wrapper;
-    private _writer: SVGTypewriter.Writers.Writer;
-    private _xAlignment: string;
-    private _yAlignment: string;
     private _padding: number;
+    private _text: string; // text assigned to the Label; may not be the actual text displayed due to truncation
+    private measurer: SVGTypewriter.Measurers.Measurer;
+    private textContainer: D3.Selection;
+    private wrapper: SVGTypewriter.Wrappers.Wrapper;
+    private writer: SVGTypewriter.Writers.Writer;
+    private xAlignment: string;
+    private yAlignment: string;
 
     /**
      * Creates a Label.
@@ -27,84 +27,31 @@ export module Components {
       super();
       this.classed("label", true);
       this.text(displayText);
-      this.orient(orientation);
+      this.orientation(orientation);
       this.xAlign("center").yAlign("center");
-      this._fixedHeightFlag = true;
-      this._fixedWidthFlag = true;
+      this._isFixedHeight = true;
+      this._isFixedWidth = true;
       this._padding = 0;
     }
 
-    /**
-     * Sets the horizontal side the label will go to given the label is given more space that it needs
-     *
-     * @param {string} alignment The new setting, one of `["left", "center",
-     * "right"]`. Defaults to `"center"`.
-     * @returns {Label} The calling Label.
-     */
-    public xAlign(alignment: string): Label {
-      var alignmentLC = alignment.toLowerCase();
-      super.xAlign(alignmentLC);
-      this._xAlignment = alignmentLC;
-      return this;
-    }
-
-    /**
-     * Sets the vertical side the label will go to given the label is given more space that it needs
-     *
-     * @param {string} alignment The new setting, one of `["top", "center",
-     * "bottom"]`. Defaults to `"center"`.
-     * @returns {Label} The calling Label.
-     */
-    public yAlign(alignment: string): Label {
-      var alignmentLC = alignment.toLowerCase();
-      super.yAlign(alignmentLC);
-      this._yAlignment = alignmentLC;
-      return this;
-    }
-
-    public _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
-      var desiredWH = this._measurer.measure(this._text);
-      var desiredWidth  = (this.orient() === "horizontal" ? desiredWH.width : desiredWH.height) + 2 * this.padding();
-      var desiredHeight = (this.orient() === "horizontal" ? desiredWH.height : desiredWH.width) + 2 * this.padding();
-
-      return {
-        width: desiredWidth,
-        height: desiredHeight,
-        wantsWidth: desiredWidth  > offeredWidth,
-        wantsHeight: desiredHeight > offeredHeight
-      };
-    }
-
-    protected _setup() {
-      super._setup();
-      this._textContainer = this._content.append("g");
-      this._measurer = new SVGTypewriter.Measurers.Measurer(this._textContainer);
-      this._wrapper = new SVGTypewriter.Wrappers.Wrapper();
-      this._writer = new SVGTypewriter.Writers.Writer(this._measurer, this._wrapper);
-      this.text(this._text);
-    }
-
-    /**
-     * Gets the current text on the Label.
-     *
-     * @returns {string} the text on the label.
-     */
-    public text(): string;
-    /**
-     * Sets the current text on the Label.
-     *
-     * @param {string} displayText If provided, the new text for the Label.
-     * @returns {Label} The calling Label.
-     */
-    public text(displayText: string): Label;
-    public text(displayText?: string): any {
-      if (displayText === undefined) {
-        return this._text;
-      } else {
-        this._text = displayText;
-        this._invalidateLayout();
-        return this;
-      }
+    public doRender() {
+      super.doRender();
+      // HACKHACK SVGTypewriter should remove existing content - #21 on SVGTypewriter.
+      this.textContainer.selectAll("g").remove();
+      var textMeasurement = this.measurer.measure(this._text);
+      var heightPadding = Math.max(Math.min((this.height() - textMeasurement.height) / 2, this.padding()), 0);
+      var widthPadding = Math.max(Math.min((this.width() - textMeasurement.width) / 2, this.padding()), 0);
+      this.textContainer.attr("transform", "translate(" + widthPadding + "," + heightPadding + ")");
+      var writeWidth = this.width() - 2 * widthPadding;
+      var writeHeight = this.height() - 2 * heightPadding;
+      var textRotation: {[s: string]: number} = {horizontal: 0, right: 90, left: -90};
+      var writeOptions = {
+                        selection: this.textContainer,
+                        xAlign: this.xAlignment,
+                        yAlign: this.yAlignment,
+                        textRotation: textRotation[this.orientation()]
+                    };
+      this.writer.write(this._text, writeWidth, writeHeight, writeOptions);
     }
 
     /**
@@ -112,7 +59,7 @@ export module Components {
      *
      * @returns {string} the current orientation.
      */
-    public orient(): string;
+    public orientation(): string;
     /**
      * Sets the orientation of the Label.
      *
@@ -120,8 +67,8 @@ export module Components {
      * (horizontal/left/right).
      * @returns {Label} The calling Label.
      */
-    public orient(newOrientation: string): Label;
-    public orient(newOrientation?: string): any {
+    public orientation(newOrientation: string): Label;
+    public orientation(newOrientation?: string): any {
       if (newOrientation == null) {
         return this._orientation;
       } else {
@@ -131,7 +78,7 @@ export module Components {
         } else {
           throw new Error(newOrientation + " is not a valid orientation for LabelComponent");
         }
-        this._invalidateLayout();
+        this.invalidateLayout();
         return this;
       }
     }
@@ -158,41 +105,82 @@ export module Components {
           throw new Error(padAmount + " is not a valid padding value.  Cannot be less than 0.");
         }
         this._padding = padAmount;
-        this._invalidateLayout();
+        this.invalidateLayout();
         return this;
       }
     }
 
-    public _doRender() {
-      super._doRender();
-      // HACKHACK SVGTypewriter should remove existing content - #21 on SVGTypewriter.
-      this._textContainer.selectAll("g").remove();
-      var textMeasurement = this._measurer.measure(this._text);
-      var heightPadding = Math.max(Math.min((this.height() - textMeasurement.height) / 2, this.padding()), 0);
-      var widthPadding = Math.max(Math.min((this.width() - textMeasurement.width) / 2, this.padding()), 0);
-      this._textContainer.attr("transform", "translate(" + widthPadding + "," + heightPadding + ")");
-      var writeWidth = this.width() - 2 * widthPadding;
-      var writeHeight = this.height() - 2 * heightPadding;
-      var textRotation: {[s: string]: number} = {horizontal: 0, right: 90, left: -90};
-      var writeOptions = {
-                        selection: this._textContainer,
-                        xAlign: this._xAlignment,
-                        yAlign: this._yAlignment,
-                        textRotation: textRotation[this.orient()]
-                    };
-      this._writer.write(this._text, writeWidth, writeHeight, writeOptions);
-    }
-  }
+    public requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
+      var desiredWH = this.measurer.measure(this._text);
+      var desiredWidth  = (this.orientation() === "horizontal" ? desiredWH.width : desiredWH.height) + 2 * this.padding();
+      var desiredHeight = (this.orientation() === "horizontal" ? desiredWH.height : desiredWH.width) + 2 * this.padding();
 
-  export class TitleLabel extends Label {
+      return {
+        width: desiredWidth,
+        height: desiredHeight,
+        wantsWidth: desiredWidth  > offeredWidth,
+        wantsHeight: desiredHeight > offeredHeight
+      };
+    }
+
     /**
-     * Creates a TitleLabel, a type of label made for rendering titles.
+     * Gets the current text on the Label.
      *
-     * @constructor
+     * @returns {string} the text on the label.
      */
-    constructor(text?: string, orientation?: string) {
-      super(text, orientation);
-      this.classed("title-label", true);
+    public text(): string;
+    /**
+     * Sets the current text on the Label.
+     *
+     * @param {string} displayText If provided, the new text for the Label.
+     * @returns {Label} The calling Label.
+     */
+    public text(displayText: string): Label;
+    public text(displayText?: string): any {
+      if (displayText === undefined) {
+        return this._text;
+      } else {
+        this._text = displayText;
+        this.invalidateLayout();
+        return this;
+      }
+    }
+
+    /**
+     * Sets the horizontal side the label will go to given the label is given more space that it needs
+     *
+     * @param {string} alignment The new setting, one of `["left", "center",
+     * "right"]`. Defaults to `"center"`.
+     * @returns {Label} The calling Label.
+     */
+    public xAlign(alignment: string): Label {
+      var alignmentLC = alignment.toLowerCase();
+      super.xAlign(alignmentLC);
+      this.xAlignment = alignmentLC;
+      return this;
+    }
+
+    /**
+     * Sets the vertical side the label will go to given the label is given more space that it needs
+     *
+     * @param {string} alignment The new setting, one of `["top", "center",
+     * "bottom"]`. Defaults to `"center"`.
+     * @returns {Label} The calling Label.
+     */
+    public yAlign(alignment: string): Label {
+      var alignmentLC = alignment.toLowerCase();
+      super.yAlign(alignmentLC);
+      this.yAlignment = alignmentLC;
+      return this;
+    }
+
+    protected setup() {
+      super.setup();
+      this.textContainer = this._content.append("g");
+      this.measurer = new SVGTypewriter.Measurers.Measurer(this.textContainer);
+      this.wrapper = new SVGTypewriter.Wrappers.Wrapper();
+      this.writer = new SVGTypewriter.Writers.Writer(this.measurer, this.wrapper);
+      this.text(this._text);
     }
   }
 
@@ -205,6 +193,18 @@ export module Components {
     constructor(text?: string, orientation?: string) {
       super(text, orientation);
       this.classed("axis-label", true);
+    }
+  }
+
+  export class TitleLabel extends Label {
+    /**
+     * Creates a TitleLabel, a type of label made for rendering titles.
+     *
+     * @constructor
+     */
+    constructor(text?: string, orientation?: string) {
+      super(text, orientation);
+      this.classed("title-label", true);
     }
   }
 }

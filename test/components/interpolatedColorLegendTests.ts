@@ -13,7 +13,7 @@ describe("InterpolatedColorLegend", () => {
 
   function assertBasicRendering(legend: Plottable.Components.InterpolatedColorLegend) {
     var scaleDomain = colorScale.domain();
-    var legendElement: D3.Selection = (<any> legend)._element;
+    var legendElement: D3.Selection = (<any> legend).element;
 
     var swatches = legendElement.selectAll(".swatch");
     assert.strictEqual(d3.select(swatches[0][0]).attr("fill"),
@@ -46,7 +46,7 @@ describe("InterpolatedColorLegend", () => {
 
     assertBasicRendering(legend);
 
-    var legendElement: D3.Selection = (<any> legend)._element;
+    var legendElement: D3.Selection = (<any> legend).element;
     var labels = legendElement.selectAll("text");
     var swatchContainer = legendElement.select(".swatch-container");
     var swatchContainerBCR = swatchContainer.node().getBoundingClientRect();
@@ -65,7 +65,7 @@ describe("InterpolatedColorLegend", () => {
 
     assertBasicRendering(legend);
 
-    var legendElement: D3.Selection = (<any> legend)._element;
+    var legendElement: D3.Selection = (<any> legend).element;
     var labels = legendElement.selectAll("text");
     var swatchContainer = legendElement.select(".swatch-container");
     var swatchContainerBCR = swatchContainer.node().getBoundingClientRect();
@@ -85,7 +85,7 @@ describe("InterpolatedColorLegend", () => {
 
     assertBasicRendering(legend);
 
-    var legendElement: D3.Selection = (<any> legend)._element;
+    var legendElement: D3.Selection = (<any> legend).element;
     var labels = legendElement.selectAll("text");
     var swatchContainer = legendElement.select(".swatch-container");
     var swatchContainerBCR = swatchContainer.node().getBoundingClientRect();
@@ -112,11 +112,11 @@ describe("InterpolatedColorLegend", () => {
   it("orient() input-checking", () => {
     var legend = new Plottable.Components.InterpolatedColorLegend(colorScale, "horizontal");
 
-    legend.orient("horizontal"); // should work
-    legend.orient("right"); // should work
-    legend.orient("left"); // should work
+    legend.orientation("horizontal"); // should work
+    legend.orientation("right"); // should work
+    legend.orientation("left"); // should work
 
-    assert.throws(() => legend.orient("blargh"), "not a valid orientation");
+    assert.throws(() => legend.orientation("blargh"), "not a valid orientation");
     svg.remove();
   });
 
@@ -127,7 +127,7 @@ describe("InterpolatedColorLegend", () => {
     var widthBefore = legend.width();
     var heightBefore = legend.height();
 
-    legend.orient("right");
+    legend.orientation("right");
     assert.notEqual(legend.width(), widthBefore, "proportions changed (width)");
     assert.notEqual(legend.height(), heightBefore, "proportions changed (height)");
     svg.remove();

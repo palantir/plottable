@@ -3,7 +3,7 @@
 module Plottable {
 export module Plots {
   export class Grid extends Rectangle<any, any> {
-    private _colorScale: Scale<any, string>;
+    private colorScale: Scale<any, string>;
 
     /**
      * Constructs a GridPlot.
@@ -30,12 +30,12 @@ export module Plots {
         yScale.innerPadding(0).outerPadding(0);
       }
 
-      this._colorScale = colorScale;
+      this.colorScale = colorScale;
       this.animator("cells", new Animators.Null());
     }
 
     public addDataset(keyOrDataset: any, dataset?: any) {
-      if (this._datasetKeysInOrder.length === 1) {
+      if (this.datasetKeysInOrder.length === 1) {
         Utils.Methods.warn("Only one dataset is supported in Grid plots");
         return this;
       }
@@ -43,7 +43,7 @@ export module Plots {
       return this;
     }
 
-    protected _getDrawer(key: string) {
+    protected getDrawer(key: string) {
       return new Drawers.Rect(key, true);
     }
 
@@ -57,15 +57,15 @@ export module Plots {
       if (attrToSet === "x") {
         if (scale instanceof Scales.Category) {
           this.project("x1", (d: any, i: number, u: any, m: Plots.PlotMetadata) => {
-            return scale.scale(this._projections["x"].accessor(d, i, u, m)) - scale.rangeBand() / 2;
+            return scale.scale(this.projections["x"].accessor(d, i, u, m)) - scale.rangeBand() / 2;
           });
           this.project("x2", (d: any, i: number, u: any, m: Plots.PlotMetadata) => {
-            return scale.scale(this._projections["x"].accessor(d, i, u, m)) + scale.rangeBand() / 2;
+            return scale.scale(this.projections["x"].accessor(d, i, u, m)) + scale.rangeBand() / 2;
           });
         }
         if (scale instanceof QuantitativeScale) {
           this.project("x1", (d: any, i: number, u: any, m: Plots.PlotMetadata) => {
-            return scale.scale(this._projections["x"].accessor(d, i, u, m));
+            return scale.scale(this.projections["x"].accessor(d, i, u, m));
           });
         }
       }
@@ -73,28 +73,28 @@ export module Plots {
       if (attrToSet === "y") {
         if (scale instanceof Scales.Category) {
           this.project("y1", (d: any, i: number, u: any, m: Plots.PlotMetadata) => {
-            return scale.scale(this._projections["y"].accessor(d, i, u, m)) - scale.rangeBand() / 2;
+            return scale.scale(this.projections["y"].accessor(d, i, u, m)) - scale.rangeBand() / 2;
           });
           this.project("y2", (d: any, i: number, u: any, m: Plots.PlotMetadata) => {
-            return scale.scale(this._projections["y"].accessor(d, i, u, m)) + scale.rangeBand() / 2;
+            return scale.scale(this.projections["y"].accessor(d, i, u, m)) + scale.rangeBand() / 2;
           });
         }
         if (scale instanceof QuantitativeScale) {
           this.project("y1", (d: any, i: number, u: any, m: Plots.PlotMetadata) => {
-            return scale.scale(this._projections["y"].accessor(d, i, u, m));
+            return scale.scale(this.projections["y"].accessor(d, i, u, m));
           });
         }
       }
 
       if (attrToSet === "fill") {
-        this._colorScale = this._projections["fill"].scale;
+        this.colorScale = this.projections["fill"].scale;
       }
 
       return this;
     }
 
-    protected _generateDrawSteps(): Drawers.DrawStep[] {
-      return [{attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("cells")}];
+    protected generateDrawSteps(): Drawers.DrawStep[] {
+      return [{attrToProjector: this.generateAttrToProjector(), animator: this.getAnimator("cells")}];
     }
   }
 }

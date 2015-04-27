@@ -7,27 +7,20 @@ export module Interactions {
      * KeyInteraction listens to key events that occur while the Component is
      * moused over.
      */
-    private _positionDispatcher: Plottable.Dispatchers.Mouse;
-    private _keyDispatcher: Plottable.Dispatchers.Key;
-    private _keyCode2Callback: { [keyCode: string]: () => void; } = {};
+    private keyCallbacks: { [keyCode: string]: () => void; } = {};
+    private keyDispatcher: Plottable.Dispatchers.Key;
+    private positionDispatcher: Plottable.Dispatchers.Mouse;
 
-    public _anchor(component: Component, hitBox: D3.Selection) {
-      super._anchor(component, hitBox);
+    public anchor(component: Component, hitBox: D3.Selection) {
+      super.anchor(component, hitBox);
 
-      this._positionDispatcher = Dispatchers.Mouse.getDispatcher(
-                                   <SVGElement> (<any> this._componentToListenTo)._element.node()
+      this.positionDispatcher = Dispatchers.Mouse.getDispatcher(
+                                   <SVGElement> (<any> this.component).element.node()
                                  );
-      this._positionDispatcher.onMouseMove("Interaction.Key" + this.getID(), (p: Point) => null); // HACKHACK: registering a listener
+      this.positionDispatcher.onMouseMove("Interaction.Key" + this.getID(), (p: Point) => null); // HACKHACK: registering a listener
 
-      this._keyDispatcher = Dispatchers.Key.getDispatcher();
-      this._keyDispatcher.onKeyDown("Interaction.Key" + this.getID(), (keyCode: number) => this._handleKeyEvent(keyCode));
-    }
-
-    private _handleKeyEvent(keyCode: number) {
-      var p = this._translateToComponentSpace(this._positionDispatcher.getLastMousePosition());
-      if (this._isInsideComponent(p) && this._keyCode2Callback[keyCode]) {
-        this._keyCode2Callback[keyCode]();
-      }
+      this.keyDispatcher = Dispatchers.Key.getDispatcher();
+      this.keyDispatcher.onKeyDown("Interaction.Key" + this.getID(), (keyCode: number) => this.handleKeyEvent(keyCode));
     }
 
     /**
@@ -39,8 +32,15 @@ export module Interactions {
      * @returns The calling Interaction.Key.
      */
     public on(keyCode: number, callback: () => void): Key {
-      this._keyCode2Callback[keyCode] = callback;
+      this.keyCallbacks[keyCode] = callback;
       return this;
+    }
+
+    private handleKeyEvent(keyCode: number) {
+      var p = this.translateToComponentSpace(this.positionDispatcher.getLastMousePosition());
+      if (this.isInsideComponent(p) && this.keyCallbacks[keyCode]) {
+        this.keyCallbacks[keyCode]();
+      }
     }
   }
 }

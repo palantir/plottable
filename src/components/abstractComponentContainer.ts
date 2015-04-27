@@ -8,23 +8,6 @@ module Plottable {
   export class ComponentContainer extends Component {
     private _components: Component[] = [];
 
-    public _anchor(element: D3.Selection) {
-      super._anchor(element);
-      this.components().forEach((c) => c._anchor(this._content));
-    }
-
-    public _render() {
-      this._components.forEach((c) => c._render());
-    }
-
-    public _removeComponent(c: Component) {
-      var removeIndex = this._components.indexOf(c);
-      if (removeIndex >= 0) {
-        this.components().splice(removeIndex, 1);
-        this._invalidateLayout();
-      }
-    }
-
     public _addComponent(c: Component, prepend = false): boolean {
       if (!c || this._components.indexOf(c) >= 0) {
         return false;
@@ -35,12 +18,17 @@ module Plottable {
       } else {
         this.components().push(c);
       }
-      c._parent(this);
+      c.parent(this);
       if (this._isAnchored) {
-        c._anchor(this._content);
+        c.anchor(this._content);
       }
-      this._invalidateLayout();
+      this.invalidateLayout();
       return true;
+    }
+
+    public anchor(element: D3.Selection) {
+      super.anchor(element);
+      this.components().forEach((c) => c.anchor(this._content));
     }
 
     /**
@@ -50,15 +38,6 @@ module Plottable {
      */
     public components(): Component[] {
       return this._components;
-    }
-
-    /**
-     * Returns true iff the ComponentContainer is empty.
-     *
-     * @returns {boolean} Whether the calling ComponentContainer is empty.
-     */
-    public empty() {
-      return this._components.length === 0;
     }
 
     /**
@@ -74,18 +53,39 @@ module Plottable {
       return this;
     }
 
+    /**
+     * Returns true iff the ComponentContainer is empty.
+     *
+     * @returns {boolean} Whether the calling ComponentContainer is empty.
+     */
+    public empty() {
+      return this._components.length === 0;
+    }
+
     public remove() {
       super.remove();
       this.components().slice().forEach((c: Component) => c.remove());
     }
 
-    public _useLastCalculatedLayout(): boolean;
-    public _useLastCalculatedLayout(calculated: boolean): Component;
-    public _useLastCalculatedLayout(calculated?: boolean): any {
-      if (calculated != null) {
-        this.components().slice().forEach((c: Component) => c._useLastCalculatedLayout(calculated));
+    public removeComponent(c: Component) {
+      var removeIndex = this._components.indexOf(c);
+      if (removeIndex >= 0) {
+        this.components().splice(removeIndex, 1);
+        this.invalidateLayout();
       }
-      return super._useLastCalculatedLayout(calculated);
+    }
+
+    public render() {
+      this._components.forEach((c) => c.render());
+    }
+
+    public useLastCalculatedLayout(): boolean;
+    public useLastCalculatedLayout(calculated: boolean): Component;
+    public useLastCalculatedLayout(calculated?: boolean): any {
+      if (calculated != null) {
+        this.components().slice().forEach((c: Component) => c.useLastCalculatedLayout(calculated));
+      }
+      return super.useLastCalculatedLayout(calculated);
     }
   }
 }

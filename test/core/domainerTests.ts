@@ -11,7 +11,7 @@ describe("Domainer", () => {
   });
 
   it("pad() works in general case", () => {
-    scale._updateExtent("1", "x", [100, 200]);
+    scale.updateExtent("1", "x", [100, 200]);
     scale.domainer(new Plottable.Domainer().pad(0.2));
     assert.closeTo(scale.domain()[0], 90, 0.1, "lower bound of domain correct");
     assert.closeTo(scale.domain()[1], 210, 0.1, "upper bound of domain correct");
@@ -22,7 +22,7 @@ describe("Domainer", () => {
     var f = d3.time.format("%x");
     var d1 = f.parse("06/02/2014");
     var d2 = f.parse("06/03/2014");
-    timeScale._updateExtent("1", "x", [d1, d2]);
+    timeScale.updateExtent("1", "x", [d1, d2]);
     timeScale.domainer(new Plottable.Domainer().pad());
     var dd1 = timeScale.domain()[0];
     var dd2 = timeScale.domain()[1];
@@ -36,7 +36,7 @@ describe("Domainer", () => {
 
   it("pad() works on log scales", () => {
     var logScale = new Plottable.Scales.Log();
-    logScale._updateExtent("1", "x", [10, 100]);
+    logScale.updateExtent("1", "x", [10, 100]);
     logScale.range([0, 1]);
     logScale.domainer(domainer.pad(2.0));
     assert.closeTo(logScale.domain()[0], 1, 0.001);
@@ -65,8 +65,8 @@ describe("Domainer", () => {
     var timeScale = new Plottable.Scales.Time();
     // the result of computeDomain() will be number[], but when it
     // gets fed back into timeScale, it will be adjusted back to a Date.
-    // That's why I'm using _updateExtent() instead of domainer.computeDomain()
-    timeScale._updateExtent("1", "x", [d, d2]);
+    // That's why I'm using updateExtent() instead of domainer.computeDomain()
+    timeScale.updateExtent("1", "x", [d, d2]);
     timeScale.domainer(new Plottable.Domainer().pad());
     assert.deepEqual(timeScale.domain(), [dayBefore, dayAfter]);
   });
@@ -113,7 +113,7 @@ describe("Domainer", () => {
     var b = new Date(2003, 0, 1);
     domainer.pad().addPaddingException(a);
     var timeScale = new Plottable.Scales.Time();
-    timeScale._updateExtent("1", "x", [a, b]);
+    timeScale.updateExtent("1", "x", [a, b]);
     timeScale.domainer(domainer);
     var domain = timeScale.domain();
     assert.deepEqual(domain[0], a);
@@ -156,7 +156,7 @@ describe("Domainer", () => {
     var d = new Date(2003, 0, 1);
     domainer.addIncludedValue(b);
     var timeScale = new Plottable.Scales.Time();
-    timeScale._updateExtent("1", "x", [c, d]);
+    timeScale.updateExtent("1", "x", [c, d]);
     timeScale.domainer(domainer);
     assert.deepEqual(timeScale.domain(), [b, d]);
   });

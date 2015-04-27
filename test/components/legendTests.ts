@@ -37,13 +37,13 @@ describe("Legend", () => {
   it("legend domain can be updated after initialization, and height updates as well", () => {
     legend.renderTo(svg);
     legend.scale(color);
-    assert.equal(legend._requestedSpace(200, 200).height, 10, "there is a padding requested height when domain is empty");
+    assert.equal(legend.requestedSpace(200, 200).height, 10, "there is a padding requested height when domain is empty");
     color.domain(["foo", "bar"]);
-    var height1 = legend._requestedSpace(400, 400).height;
+    var height1 = legend.requestedSpace(400, 400).height;
     var actualHeight1 = legend.height();
     assert.operator(height1, ">", 0, "changing the domain gives a positive height");
     color.domain(["foo", "bar", "baz"]);
-    assert.operator(legend._requestedSpace(400, 400).height, ">", height1, "adding to the domain increases the height requested");
+    assert.operator(legend.requestedSpace(400, 400).height, ">", height1, "adding to the domain increases the height requested");
     var actualHeight2 = legend.height();
     assert.operator(actualHeight1, "<", actualHeight2, "Changing the domain caused the legend to re-layout with more height");
     var numRows = (<any> legend)._content.selectAll(rowSelector)[0].length;
@@ -57,7 +57,7 @@ describe("Legend", () => {
 
     var contentBBox = Plottable.Utils.DOM.getBBox((<any> legend)._content);
     var contentBottomEdge = contentBBox.y + contentBBox.height;
-    var bboxBBox = Plottable.Utils.DOM.getBBox((<any> legend)._element.select(".bounding-box"));
+    var bboxBBox = Plottable.Utils.DOM.getBBox((<any> legend).element.select(".bounding-box"));
     var bboxBottomEdge = bboxBBox.y + bboxBBox.height;
 
     assert.operator(contentBottomEdge, "<=", bboxBottomEdge, "content does not extend past bounding box");
@@ -72,7 +72,7 @@ describe("Legend", () => {
     var text = (<any> legend)._content.select("text").text();
     assert.notEqual(text, "foooboooloonoogoorooboopoo", "the text was truncated");
     var rightEdge = (<any> legend)._content.select("text").node().getBoundingClientRect().right;
-    var bbox = (<any> legend)._element.select(".bounding-box");
+    var bbox = (<any> legend).element.select(".bounding-box");
     var rightEdgeBBox = bbox.node().getBoundingClientRect().right;
     assert.operator(rightEdge, "<=", rightEdgeBBox, "the long text did not overflow the legend");
     svg.remove();
@@ -83,7 +83,7 @@ describe("Legend", () => {
     legend.renderTo(svg);
     var numRows = (<any> legend)._content.selectAll(rowSelector)[0].length;
     assert.equal(numRows, 3, "there are 3 legend rows initially");
-    legend._render();
+    legend.render();
     numRows = (<any> legend)._content.selectAll(rowSelector)[0].length;
     assert.equal(numRows, 3, "there are 3 legend rows after second render");
     svg.remove();
@@ -151,7 +151,7 @@ describe("Legend", () => {
   it("scales icon sizes properly with font size (textHeight / 2 < symbolHeight < textHeight)", () => {
     color.domain(["foo"]);
     legend.renderTo(svg);
-    var style = (<any> legend)._element.append("style");
+    var style = (<any> legend).element.append("style");
     style.attr("type", "text/css");
 
     function verifySymbolHeight() {
@@ -166,13 +166,13 @@ describe("Legend", () => {
     verifySymbolHeight();
 
     style.text(".plottable .legend text { font-size: 60px; }");
-    legend._computeLayout();
-    legend._render();
+    legend.computeLayout();
+    legend.render();
     verifySymbolHeight();
 
     style.text(".plottable .legend text { font-size: 10px; }");
-    legend._computeLayout();
-    legend._render();
+    legend.computeLayout();
+    legend.render();
     verifySymbolHeight();
 
     svg.remove();
@@ -184,7 +184,7 @@ describe("Legend", () => {
 
     var verifyMaxEntriesInRow = (n: number) => {
       legend.maxEntriesPerRow(n);
-      var rows = (<any> legend)._element.selectAll(rowSelector);
+      var rows = (<any> legend).element.selectAll(rowSelector);
       assert.lengthOf(rows[0], (6 / n), "number of rows is correct");
       rows.each(function(d: any) {
         var entries = d3.select(this).selectAll(entrySelector);
@@ -205,14 +205,14 @@ describe("Legend", () => {
     legend.maxEntriesPerRow(Infinity);
 
     legend.renderTo(svg);
-    var rows = (<any> legend)._element.selectAll(rowSelector);
+    var rows = (<any> legend).element.selectAll(rowSelector);
     assert.lengthOf(rows[0], 2, "Wrapped text on to two rows when space is constrained");
     legend.detach();
     svg.remove();
 
     svg = generateSVG(100, 100);
     legend.renderTo(svg);
-    rows = (<any> legend)._element.selectAll(rowSelector);
+    rows = (<any> legend).element.selectAll(rowSelector);
     assert.lengthOf(rows[0], 3, "Wrapped text on to three rows when further constrained");
     svg.remove();
   });
@@ -243,13 +243,13 @@ describe("Legend", () => {
     var newDomain = ["F", "E", "D", "C", "B", "A"];
     color.domain(newDomain);
     legend.renderTo(svg);
-    var entries = (<any> legend)._element.selectAll(entrySelector);
+    var entries = (<any> legend).element.selectAll(entrySelector);
     var elementTexts = entries.select("text")[0].map((node: Element) => d3.select(node).text());
     assert.deepEqual(elementTexts, newDomain, "entry has not been sorted");
 
     var sortFn = (a: string, b: string) => a.localeCompare(b);
     legend.sortFunction(sortFn);
-    entries = (<any> legend)._element.selectAll(entrySelector);
+    entries = (<any> legend).element.selectAll(entrySelector);
     elementTexts = entries.select("text")[0].map((node: Element) => d3.select(node).text());
     newDomain.sort(sortFn);
     assert.deepEqual(elementTexts, newDomain, "entry has been sorted alphabetically");
@@ -263,20 +263,20 @@ describe("Legend", () => {
     legend.maxEntriesPerRow(Infinity);
     legend.renderTo(svg);
 
-    var textEls = (<any> legend)._element.selectAll("text");
+    var textEls = (<any> legend).element.selectAll("text");
     textEls.each(function(d: any) {
       var textEl = d3.select(this);
-      assertBBoxInclusion((<any> legend)._element, textEl);
+      assertBBoxInclusion((<any> legend).element, textEl);
     });
 
     legend.detach();
     svg.remove();
     svg = generateSVG(100, 50);
     legend.renderTo(svg);
-    textEls = (<any> legend)._element.selectAll("text");
+    textEls = (<any> legend).element.selectAll("text");
     textEls.each(function(d: any) {
       var textEl = d3.select(this);
-      assertBBoxInclusion((<any> legend)._element, textEl);
+      assertBBoxInclusion((<any> legend).element, textEl);
     });
 
     svg.remove();

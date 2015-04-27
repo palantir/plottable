@@ -12,8 +12,10 @@ export module Scales {
    * By default it generates a linear scale internally.
    */
   export class InterpolatedColor extends Scale<number, string> {
-    private static _COLOR_SCALES: ColorGroups = {
-      reds: [
+    private _colorRange: string[];
+    private _scaleType: string;
+    private static COLOR_SCALES: ColorGroups = {
+      reds : [
         "#FFFFFF", // white
         "#FFF6E1",
         "#FEF4C0",
@@ -57,72 +59,6 @@ export module Scales {
     };
 
     /**
-     * Converts the string array into a d3 scale.
-     *
-     * @param {string[]} colors an array of strings representing color
-     *     values in hex ("#FFFFFF") or keywords ("white").
-     * @param {string} scaleType a string representing the underlying scale
-     *     type ("linear"/"log"/"sqrt"/"pow")
-     * @returns {D3.Scale.QuantitativeScaleScale} The converted QuantitativeScale d3 scale.
-     */
-    private static _getD3InterpolatedScale(colors: string[], scaleType: string): D3.Scale.QuantitativeScale {
-      var scale: D3.Scale.QuantitativeScale;
-      switch (scaleType){
-        case "linear":
-          scale = d3.scale.linear();
-          break;
-        case "log":
-          scale = d3.scale.log();
-          break;
-        case "sqrt":
-          scale = d3.scale.sqrt();
-          break;
-        case "pow":
-          scale = d3.scale.pow();
-          break;
-      }
-      if (scale == null){
-        throw new Error("unknown QuantitativeScale scale type " + scaleType);
-      }
-      return scale
-                  .range([0, 1])
-                  .interpolate(InterpolatedColor._interpolateColors(colors));
-    }
-
-    /**
-     * Creates a d3 interpolator given the color array.
-     *
-     * This class implements a scale that maps numbers to strings.
-     *
-     * @param {string[]} colors an array of strings representing color
-     *     values in hex ("#FFFFFF") or keywords ("white").
-     * @returns {D3.Transition.Interpolate} The d3 interpolator for colors.
-     */
-    private static _interpolateColors(colors: string[]): D3.Transition.Interpolate {
-      if (colors.length < 2) {
-        throw new Error("Color scale arrays must have at least two elements.");
-      };
-      return (ignored: any): any => {
-        return (t: any): any => {
-          // Clamp t parameter to [0,1]
-          t = Math.max(0, Math.min(1, t));
-
-          // Determine indices for colors
-          var tScaled = t * (colors.length - 1);
-          var i0      = Math.floor(tScaled);
-          var i1      = Math.ceil(tScaled);
-          var frac    = (tScaled - i0);
-
-          // Interpolate in the L*a*b color space
-          return d3.interpolateLab(colors[i0], colors[i1])(frac);
-        };
-      };
-    }
-
-    private _colorRange: string[];
-    private _scaleType: string;
-
-    /**
      * Constructs an InterpolatedColorScale.
      *
      * An InterpolatedColorScale maps numbers evenly to color strings.
@@ -136,9 +72,18 @@ export module Scales {
      *     for further options.
      */
     constructor(colorRange: any = "reds", scaleType: string = "linear") {
-      this._colorRange = this._resolveColorValues(colorRange);
+      this._colorRange = this.resolveColorValues(colorRange);
       this._scaleType = scaleType;
-      super(InterpolatedColor._getD3InterpolatedScale(this._colorRange, this._scaleType));
+      super(InterpolatedColor.getD3InterpolatedScale(this._colorRange, this._scaleType));
+    }
+
+    public autoDomain() {
+      // unlike other QuantitativeScaleScales, interpolatedColorScale ignores its domainer
+      var extents = this.getAllExtents();
+      if (extents.length > 0) {
+        this.setDomain([Utils.Methods.min(extents, (x) => x[0], 0), Utils.Methods.max(extents, (x) => x[1], 0)]);
+      }
+      return this;
     }
 
     /**
@@ -162,8 +107,8 @@ export module Scales {
       if (colorRange == null) {
         return this._colorRange;
       }
-      this._colorRange = this._resolveColorValues(colorRange);
-      this._resetScale();
+      this._colorRange = this.resolveColorValues(colorRange);
+      this.resetScale();
       return this;
     }
 
@@ -185,33 +130,87 @@ export module Scales {
         return this._scaleType;
       }
       this._scaleType = scaleType;
-      this._resetScale();
+      this.resetScale();
       return this;
     }
 
-    private _resetScale(): any {
-      this._d3Scale = InterpolatedColor._getD3InterpolatedScale(this._colorRange, this._scaleType);
-      this._autoDomainIfAutomaticMode();
+    private resetScale(): any {
+      this.d3Scale = InterpolatedColor.getD3InterpolatedScale(this._colorRange, this._scaleType);
+      this.autoDomainIfAutomaticMode();
       this.broadcaster.broadcast();
     }
 
-    private _resolveColorValues(colorRange: string | string[]): string[] {
+    private resolveColorValues(colorRange: string | string[]): string[] {
       if (typeof(colorRange) === "object") {
         return <string[]> colorRange;
-      } else if (InterpolatedColor._COLOR_SCALES[<string> colorRange] != null) {
-        return InterpolatedColor._COLOR_SCALES[<string> colorRange];
+      } else if (InterpolatedColor.COLOR_SCALES[<string> colorRange] != null) {
+        return InterpolatedColor.COLOR_SCALES[<string> colorRange];
       } else {
-        return InterpolatedColor._COLOR_SCALES["reds"];
+        return InterpolatedColor.COLOR_SCALES["reds"];
       }
     }
 
-    public autoDomain() {
-      // unlike other QuantitativeScaleScales, interpolatedColorScale ignores its domainer
-      var extents = this._getAllExtents();
-      if (extents.length > 0) {
-        this._setDomain([Utils.Methods.min(extents, (x) => x[0], 0), Utils.Methods.max(extents, (x) => x[1], 0)]);
+    /**
+     * Converts the string array into a d3 scale.
+     *
+     * @param {string[]} colors an array of strings representing color
+     *     values in hex ("#FFFFFF") or keywords ("white").
+     * @param {string} scaleType a string representing the underlying scale
+     *     type ("linear"/"log"/"sqrt"/"pow")
+     * @returns {D3.Scale.QuantitativeScaleScale} The converted QuantitativeScale d3 scale.
+     */
+    private static getD3InterpolatedScale(colors: string[], scaleType: string): D3.Scale.QuantitativeScale {
+      var scale: D3.Scale.QuantitativeScale;
+      switch (scaleType){
+        case "linear":
+          scale = d3.scale.linear();
+          break;
+        case "log":
+          scale = d3.scale.log();
+          break;
+        case "sqrt":
+          scale = d3.scale.sqrt();
+          break;
+        case "pow":
+          scale = d3.scale.pow();
+          break;
       }
-      return this;
+      if (scale == null){
+        throw new Error("unknown QuantitativeScale scale type " + scaleType);
+      }
+      return scale
+                  .range([0, 1])
+                  .interpolate(InterpolatedColor.interpolateColors(colors));
+    }
+
+    /**
+     * Creates a d3 interpolator given the color array.
+     *
+     * This class implements a scale that maps numbers to strings.
+     *
+     * @param {string[]} colors an array of strings representing color
+     *     values in hex ("#FFFFFF") or keywords ("white").
+     * @returns {D3.Transition.Interpolate} The d3 interpolator for colors.
+     */
+    private static interpolateColors(colors: string[]): D3.Transition.Interpolate {
+      if (colors.length < 2) {
+        throw new Error("Color scale arrays must have at least two elements.");
+      };
+      return (ignored: any): any => {
+        return (t: any): any => {
+          // Clamp t parameter to [0,1]
+          t = Math.max(0, Math.min(1, t));
+
+          // Determine indices for colors
+          var tScaled = t * (colors.length - 1);
+          var i0      = Math.floor(tScaled);
+          var i1      = Math.ceil(tScaled);
+          var frac    = (tScaled - i0);
+
+          // Interpolate in the L*a*b color space
+          return d3.interpolateLab(colors[i0], colors[i1])(frac);
+        };
+      };
     }
   }
 }

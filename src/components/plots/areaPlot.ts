@@ -1,13 +1,12 @@
 ///<reference path="../../reference.ts" />
-
 module Plottable {
 export module Plots {
   /**
    * An AreaPlot draws a filled region (area) between the plot's projected "y" and projected "y0" values.
    */
   export class Area<X> extends Line<X> {
-    private _areaPath: D3.Selection;
-    private _defaultFillColor: string;
+    private areaPath: D3.Selection;
+    private defaultFillColor: string;
 
     /**
      * Constructs an AreaPlot.
@@ -25,28 +24,48 @@ export module Plots {
       this.animator("main", new Animators.Base()
                                         .duration(600)
                                         .easing("exp-in-out"));
-      this._defaultFillColor = new Scales.Color().range()[0];
+      this.defaultFillColor = new Scales.Color().range()[0];
     }
 
-    protected _onDatasetUpdate() {
-      super._onDatasetUpdate();
-      if (this._yScale != null) {
-        this._updateYDomainer();
+    public project(attrToSet: string, accessor: any, scale?: Scale<any, any>) {
+      super.project(attrToSet, accessor, scale);
+      if (attrToSet === "y0") {
+        this.updateYDomainer();
       }
+      return this;
     }
 
-    protected _getDrawer(key: string) {
+    protected generateAttrToProjector() {
+      var attrToProjector = super.generateAttrToProjector();
+      attrToProjector["fill-opacity"] = attrToProjector["fill-opacity"] || d3.functor(0.25);
+      attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this.defaultFillColor);
+      attrToProjector["stroke"] = attrToProjector["stroke"] || d3.functor(this.defaultFillColor);
+      return attrToProjector;
+    }
+
+    protected getDrawer(key: string) {
       return new Plottable.Drawers.Area(key);
     }
 
-    protected _updateYDomainer() {
-      super._updateYDomainer();
+    protected _getResetYFunction() {
+      return this.generateAttrToProjector()["y0"];
+    }
+
+    protected onDatasetUpdate() {
+      super.onDatasetUpdate();
+      if (this._yScale != null) {
+        this.updateYDomainer();
+      }
+    }
+
+    protected updateYDomainer() {
+      super.updateYDomainer();
 
       var constantBaseline: number;
-      var y0Projector = this._projections["y0"];
+      var y0Projector = this.projections["y0"];
       var y0Accessor = y0Projector && y0Projector.accessor;
       if (y0Accessor != null) {
-        var extents = this.datasets().map((d) => d._getExtent(y0Accessor, this._yScale._typeCoercer));
+        var extents = this.datasets().map((d) => d._getExtent(y0Accessor, this._yScale.typeCoercer));
         var extent = Utils.Methods.flatten(extents);
         var uniqExtentVals = Utils.Methods.uniq(extent);
         if (uniqExtentVals.length === 1) {
@@ -54,41 +73,21 @@ export module Plots {
         }
       }
 
-      if (!this._yScale._userSetDomainer) {
+      if (!this._yScale.setByUser) {
         if (constantBaseline != null) {
           this._yScale.domainer().addPaddingException(constantBaseline, "AREA_PLOT+" + this.getID());
         } else {
           this._yScale.domainer().removePaddingException("AREA_PLOT+" + this.getID());
         }
         // prepending "AREA_PLOT" is unnecessary but reduces likely of user accidentally creating collisions
-        this._yScale._autoDomainIfAutomaticMode();
+        this._yScale.autoDomainIfAutomaticMode();
       }
     }
 
-    public project(attrToSet: string, accessor: any, scale?: Scale<any, any>) {
-      super.project(attrToSet, accessor, scale);
-      if (attrToSet === "y0") {
-        this._updateYDomainer();
-      }
-      return this;
-    }
-
-    protected _getResetYFunction() {
-      return this._generateAttrToProjector()["y0"];
-    }
-
-    protected _wholeDatumAttributes() {
-      var wholeDatumAttributes = super._wholeDatumAttributes();
+    protected wholeDatumAttributes() {
+      var wholeDatumAttributes = super.wholeDatumAttributes();
       wholeDatumAttributes.push("y0");
       return wholeDatumAttributes;
-    }
-
-    protected _generateAttrToProjector() {
-      var attrToProjector = super._generateAttrToProjector();
-      attrToProjector["fill-opacity"] = attrToProjector["fill-opacity"] || d3.functor(0.25);
-      attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this._defaultFillColor);
-      attrToProjector["stroke"] = attrToProjector["stroke"] || d3.functor(this._defaultFillColor);
-      return attrToProjector;
     }
   }
 }

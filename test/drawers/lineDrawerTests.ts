@@ -10,7 +10,7 @@ describe("Drawers", () => {
       var linePlot = new Plottable.Plots.Line(xScale, yScale);
 
       var drawer = new Plottable.Drawers.Line("one");
-      (<any> linePlot)._getDrawer = () => drawer;
+      (<any> linePlot).getDrawer = () => drawer;
 
       linePlot.addDataset("one", data);
       linePlot.project("x", "a", xScale);
@@ -34,7 +34,7 @@ describe("Drawers", () => {
       var linePlot = new Plottable.Plots.Line(xScale, yScale);
 
       var drawer = new Plottable.Drawers.Line("one");
-      (<any> linePlot)._getDrawer = () => drawer;
+      (<any> linePlot).getDrawer = () => drawer;
 
       linePlot.addDataset("one", data);
       linePlot.project("x", "a", xScale);

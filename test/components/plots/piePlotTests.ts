@@ -31,7 +31,7 @@ describe("Plots", () => {
       piePlot.addDataset("simpleDataset", simpleDataset);
       piePlot.project("value", "value");
       piePlot.renderTo(svg);
-      renderArea = (<any> piePlot)._renderArea;
+      renderArea = (<any> piePlot).renderArea;
     });
 
     it("sectors divided evenly", () => {
@@ -146,7 +146,7 @@ describe("Plots", () => {
 
       it("retrieves all dataset selections with no args", () => {
         var allSectors = piePlot.getAllSelections();
-        var allSectors2 = piePlot.getAllSelections((<any> piePlot)._datasetKeysInOrder);
+        var allSectors2 = piePlot.getAllSelections((<any> piePlot).datasetKeysInOrder);
         assert.deepEqual(allSectors, allSectors2, "all sectors retrieved");
 
         svg.remove();
@@ -250,7 +250,7 @@ describe("Plots", () => {
 
       plot.renderTo(svg);
 
-      var elementsDrawnSel = (<any> plot)._element.selectAll(".arc");
+      var elementsDrawnSel = (<any> plot).element.selectAll(".arc");
 
       assert.strictEqual(elementsDrawnSel.size(), 4,
         "There should be exactly 4 slices in the pie chart, representing the valid values");
@@ -275,7 +275,7 @@ describe("Plots", () => {
 
       plot.renderTo(svg);
 
-      var elementsDrawnSel = (<any> plot)._element.selectAll(".arc");
+      var elementsDrawnSel = (<any> plot).element.selectAll(".arc");
 
       assert.strictEqual(elementsDrawnSel.size(), 4,
         "All 4 elements of the pie chart should have a DOM node");

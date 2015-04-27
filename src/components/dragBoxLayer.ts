@@ -115,8 +115,8 @@ export module Components {
       });
     }
 
-    protected _setup() {
-      super._setup();
+    protected setup() {
+      super.setup();
 
       var createLine = () => this._box.append("line").style({
                                "opacity": 0,
@@ -172,8 +172,8 @@ export module Components {
       return edges;
     }
 
-    public _doRender() {
-      super._doRender();
+    public doRender() {
+      super.doRender();
       if (this.boxVisible()) {
         var bounds = this.bounds();
         var t = bounds.topLeft.y;
@@ -228,7 +228,7 @@ export module Components {
         throw new Error("detection radius cannot be negative.");
       }
       this._detectionRadius = r;
-      this._render();
+      this.render();
       return this;
     }
 
@@ -250,12 +250,12 @@ export module Components {
         return this._resizable;
       }
       this._resizable = canResize;
-      this._setResizableClasses(canResize);
+      this.setResizableClasses(canResize);
       return this;
     }
 
     // Sets resizable classes. Overridden by subclasses that only resize in one dimension.
-    protected _setResizableClasses(canResize: boolean) {
+    protected setResizableClasses(canResize: boolean) {
       this.classed("x-resizable", canResize);
       this.classed("y-resizable", canResize);
     }

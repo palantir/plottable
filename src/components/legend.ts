@@ -44,17 +44,17 @@ export module Components {
       }
 
       this._scale = colorScale;
-      this._scale.broadcaster.registerListener(this, () => this._invalidateLayout());
+      this._scale.broadcaster.registerListener(this, () => this.invalidateLayout());
 
       this.xAlign("right").yAlign("top");
-      this._fixedWidthFlag = true;
-      this._fixedHeightFlag = true;
+      this._isFixedWidth = true;
+      this._isFixedHeight = true;
       this._sortFn = (a: string, b: string) => this._scale.domain().indexOf(a) - this._scale.domain().indexOf(b);
       this._symbolFactoryAccessor = () => SymbolFactories.circle();
     }
 
-    protected _setup() {
-      super._setup();
+    protected setup() {
+      super.setup();
       var fakeLegendRow = this._content.append("g").classed(Legend.LEGEND_ROW_CLASS, true);
       var fakeLegendEntry = fakeLegendRow.append("g").classed(Legend.LEGEND_ENTRY_CLASS, true);
       fakeLegendEntry.append("text");
@@ -80,7 +80,7 @@ export module Components {
         return this._maxEntriesPerRow;
       } else {
         this._maxEntriesPerRow = numEntries;
-        this._invalidateLayout();
+        this.invalidateLayout();
         return this;
       }
     }
@@ -102,7 +102,7 @@ export module Components {
         return this._sortFn;
       } else {
         this._sortFn = newFn;
-        this._invalidateLayout();
+        this.invalidateLayout();
         return this;
       }
     }
@@ -124,8 +124,8 @@ export module Components {
       if (scale != null) {
         this._scale.broadcaster.deregisterListener(this);
         this._scale = scale;
-        this._scale.broadcaster.registerListener(this, () => this._invalidateLayout());
-        this._invalidateLayout();
+        this._scale.broadcaster.registerListener(this, () => this.invalidateLayout());
+        this.invalidateLayout();
         return this;
       } else {
         return this._scale;
@@ -165,7 +165,7 @@ export module Components {
       };
     }
 
-    public _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
+    public requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
       var estimatedLayout = this._calculateLayoutInfo(offeredWidth, offeredHeight);
       var rowLengths = estimatedLayout.rows.map((row: string[]) => {
         return d3.sum(row, (entry: string) => estimatedLayout.entryLengths.get(entry));
@@ -218,7 +218,7 @@ export module Components {
      * @returns {D3.Selection} The selected entry, or null selection if no entry was selected.
      */
     public getEntry(position: Point): D3.Selection {
-      if (!this._isSetup) {
+      if (!this.isSetup) {
         return d3.select();
       }
 
@@ -243,8 +243,8 @@ export module Components {
       return entry;
     }
 
-    public _doRender() {
-      super._doRender();
+    public doRender() {
+      super.doRender();
 
       var layout = this._calculateLayoutInfo(this.width(), this.height());
 
@@ -316,7 +316,7 @@ export module Components {
         return this._symbolFactoryAccessor;
       } else {
         this._symbolFactoryAccessor = symbolFactoryAccessor;
-        this._render();
+        this.render();
         return this;
       }
     }

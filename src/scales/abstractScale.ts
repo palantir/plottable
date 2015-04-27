@@ -2,12 +2,14 @@
 
 module Plottable {
   export class Scale<D, R> extends Core.PlottableObject {
-    protected _d3Scale: D3.Scale.Scale;
-    private _autoDomainAutomatically = true;
     public broadcaster: Core.Broadcaster<Scale<D, R>>;
-    private _rendererAttrID2Extent: {[rendererAttrID: string]: D[]} = {};
-    public _typeCoercer: (d: any) => any = (d: any) => d;
-    private _domainModificationInProgress: boolean = false;
+    public typeCoercer: (d: any) => any = (d: any) => d;
+
+    protected d3Scale: D3.Scale.Scale;
+
+    private autoDomainAutomatically = true;
+    private domainModificationInProgress: boolean = false;
+    private rendererExtents: {[rendererAttrID: string]: D[]} = {};
     /**
      * Constructs a new Scale.
      *
@@ -20,16 +22,8 @@ module Plottable {
      */
     constructor(scale: D3.Scale.Scale) {
       super();
-      this._d3Scale = scale;
       this.broadcaster = new Core.Broadcaster(this);
-    }
-
-    protected _getAllExtents(): D[][] {
-      return d3.values(this._rendererAttrID2Extent);
-    }
-
-    protected _getExtent(): D[] {
-      return []; // this should be overwritten
+      this.d3Scale = scale;
     }
 
     /**
@@ -48,26 +42,25 @@ module Plottable {
      * @returns {Scale} The calling Scale.
      */
     public autoDomain() {
-      this._autoDomainAutomatically = true;
-      this._setDomain(this._getExtent());
+      this.autoDomainAutomatically = true;
+      this.setDomain(this.getExtent());
       return this;
     }
 
-    public _autoDomainIfAutomaticMode() {
-      if (this._autoDomainAutomatically) {
+    public autoDomainIfAutomaticMode() {
+      if (this.autoDomainAutomatically) {
         this.autoDomain();
       }
     }
 
     /**
-     * Computes the range value corresponding to a given domain value. In other
-     * words, apply the function to value.
+     * Constructs a copy of the Scale with the same domain and range but without
+     * any registered listeners.
      *
-     * @param {R} value A domain value to be scaled.
-     * @returns {R} The range value corresponding to the supplied domain value.
+     * @returns {Scale} A copy of the calling Scale.
      */
-    public scale(value: D): R {
-      return this._d3Scale(value);
+    public copy(): Scale<D, R> {
+      return new Scale<D, R>(this.d3Scale.copy());
     }
 
     /**
@@ -88,24 +81,11 @@ module Plottable {
     public domain(values: D[]): Scale<D, R>;
     public domain(values?: D[]): any {
       if (values == null) {
-        return this._getDomain();
+        return this.getDomain();
       } else {
-        this._autoDomainAutomatically = false;
-        this._setDomain(values);
+        this.autoDomainAutomatically = false;
+        this.setDomain(values);
         return this;
-      }
-    }
-
-    protected _getDomain() {
-      return this._d3Scale.domain();
-    }
-
-    protected _setDomain(values: D[]) {
-      if (!this._domainModificationInProgress) {
-        this._domainModificationInProgress = true;
-        this._d3Scale.domain(values);
-        this.broadcaster.broadcast();
-        this._domainModificationInProgress = false;
       }
     }
 
@@ -132,21 +112,28 @@ module Plottable {
     public range(values: R[]): Scale<D, R>;
     public range(values?: R[]): any {
       if (values == null) {
-        return this._d3Scale.range();
+        return this.d3Scale.range();
       } else {
-        this._d3Scale.range(values);
+        this.d3Scale.range(values);
         return this;
       }
     }
 
+    public _removeExtent(plotProvidedKey: string, attr: string) {
+      delete this.rendererExtents[plotProvidedKey + attr];
+      this.autoDomainIfAutomaticMode();
+      return this;
+    }
+
     /**
-     * Constructs a copy of the Scale with the same domain and range but without
-     * any registered listeners.
+     * Computes the range value corresponding to a given domain value. In other
+     * words, apply the function to value.
      *
-     * @returns {Scale} A copy of the calling Scale.
+     * @param {R} value A domain value to be scaled.
+     * @returns {R} The range value corresponding to the supplied domain value.
      */
-    public copy(): Scale<D, R> {
-      return new Scale<D, R>(this._d3Scale.copy());
+    public scale(value: D): R {
+      return this.d3Scale(value);
     }
 
     /**
@@ -159,16 +146,31 @@ module Plottable {
      * @param {string} attr The attribute being projected, e.g. "x", "y0", "r"
      * @param {D[]} extent The new extent to be included in the scale.
      */
-    public _updateExtent(plotProvidedKey: string, attr: string, extent: D[]) {
-      this._rendererAttrID2Extent[plotProvidedKey + attr] = extent;
-      this._autoDomainIfAutomaticMode();
+    public updateExtent(plotProvidedKey: string, attr: string, extent: D[]) {
+      this.rendererExtents[plotProvidedKey + attr] = extent;
+      this.autoDomainIfAutomaticMode();
       return this;
     }
 
-    public _removeExtent(plotProvidedKey: string, attr: string) {
-      delete this._rendererAttrID2Extent[plotProvidedKey + attr];
-      this._autoDomainIfAutomaticMode();
-      return this;
+    protected getAllExtents(): D[][] {
+      return d3.values(this.rendererExtents);
+    }
+
+    protected getDomain() {
+      return this.d3Scale.domain();
+    }
+
+    protected getExtent(): D[] {
+      return []; // this should be overwritten
+    }
+
+    protected setDomain(values: D[]) {
+      if (!this.domainModificationInProgress) {
+        this.domainModificationInProgress = true;
+        this.d3Scale.domain(values);
+        this.broadcaster.broadcast();
+        this.domainModificationInProgress = false;
+      }
     }
   }
 }

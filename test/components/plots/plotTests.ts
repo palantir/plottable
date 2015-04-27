@@ -4,9 +4,9 @@ var assert = chai.assert;
 class CountingPlot extends Plottable.Plot {
   public renders: number = 0;
 
-  public _render() {
+  public render() {
     ++this.renders;
-    return super._render();
+    return super.render();
   }
 }
 
@@ -21,8 +21,8 @@ describe("Plots", () => {
     it("Base Plot functionality works", () => {
       var svg = generateSVG(400, 300);
       var r = new Plottable.Plot();
-      r._anchor(svg);
-      r._computeLayout();
+      r.anchor(svg);
+      r.computeLayout();
       var renderArea = (<any> r)._content.select(".render-area");
       assert.isNotNull(renderArea.node(), "there is a render-area");
       svg.remove();
@@ -113,7 +113,7 @@ describe("Plots", () => {
       var r = new Plottable.Plot();
       var s = new Plottable.Scales.Linear().domain([0, 1]).range([0, 10]);
       r.project("attr", "a", s);
-      var attrToProjector = (<any> r)._generateAttrToProjector();
+      var attrToProjector = (<any> r).generateAttrToProjector();
       var projector = attrToProjector["attr"];
       assert.equal(projector({"a": 0.5}, 0, null, null), 5, "projector works as intended");
     });
@@ -147,17 +147,17 @@ describe("Plots", () => {
       var mockDrawer1 = new Plottable.Drawers.AbstractDrawer("ds1");
       var renderArea1 = svg.append("g");
       renderArea1.append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
-      (<any> mockDrawer1).setup = () => (<any> mockDrawer1)._renderArea = renderArea1;
+      (<any> mockDrawer1).setup = () => (<any> mockDrawer1).renderArea = renderArea1;
       (<any> mockDrawer1)._getSelector = () => "circle";
 
       var renderArea2 = svg.append("g");
       renderArea2.append("circle").attr("cx", 10).attr("cy", 10).attr("r", 10);
       var mockDrawer2 = new Plottable.Drawers.AbstractDrawer("ds2");
-      (<any> mockDrawer2).setup = () => (<any> mockDrawer2)._renderArea = renderArea2;
+      (<any> mockDrawer2).setup = () => (<any> mockDrawer2).renderArea = renderArea2;
       (<any> mockDrawer2)._getSelector = () => "circle";
 
-      // Mock _getDrawer to return the mock drawers
-      (<any> plot)._getDrawer = (key: string) => {
+      // Mock getDrawer to return the mock drawers
+      (<any> plot).getDrawer = (key: string) => {
         if (key === "ds1") {
           return mockDrawer1;
         } else {
@@ -203,19 +203,19 @@ describe("Plots", () => {
       var mockDrawer1 = new Plottable.Drawers.AbstractDrawer("ds1");
       var renderArea1 = svg.append("g");
       renderArea1.append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
-      (<any> mockDrawer1).setup = () => (<any> mockDrawer1)._renderArea = renderArea1;
+      (<any> mockDrawer1).setup = () => (<any> mockDrawer1).renderArea = renderArea1;
       (<any> mockDrawer1)._getSelector = () => "circle";
       (<any> mockDrawer1)._getPixelPoint = data1PointConverter;
 
       var renderArea2 = svg.append("g");
       renderArea2.append("circle").attr("cx", 10).attr("cy", 10).attr("r", 10);
       var mockDrawer2 = new Plottable.Drawers.AbstractDrawer("ds2");
-      (<any> mockDrawer2).setup = () => (<any> mockDrawer2)._renderArea = renderArea2;
+      (<any> mockDrawer2).setup = () => (<any> mockDrawer2).renderArea = renderArea2;
       (<any> mockDrawer2)._getSelector = () => "circle";
       (<any> mockDrawer2)._getPixelPoint = data2PointConverter;
 
-      // Mock _getDrawer to return the mock drawers
-      (<any> plot)._getDrawer = (key: string) => {
+      // Mock getDrawer to return the mock drawers
+      (<any> plot).getDrawer = (key: string) => {
         if (key === "ds1") {
           return mockDrawer1;
         } else {
@@ -266,12 +266,12 @@ describe("Plots", () => {
       var circles = renderArea.selectAll("circles").data(data);
       circles.enter().append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
       circles.exit().remove();
-      (<any> mockDrawer).setup = () => (<any> mockDrawer)._renderArea = renderArea;
+      (<any> mockDrawer).setup = () => (<any> mockDrawer).renderArea = renderArea;
       (<any> mockDrawer)._getSelector = () => "circle";
       (<any> mockDrawer)._getPixelPoint = dataPointConverter;
 
-      // Mock _getDrawer to return the mock drawer
-      (<any> plot)._getDrawer = () => mockDrawer;
+      // Mock getDrawer to return the mock drawer
+      (<any> plot).getDrawer = () => mockDrawer;
 
       plot.addDataset("ds", data);
       plot.renderTo(svg);
@@ -306,19 +306,19 @@ describe("Plots", () => {
       var mockDrawer1 = new Plottable.Drawers.AbstractDrawer("ds1");
       var renderArea1 = svg.append("g");
       renderArea1.append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
-      (<any> mockDrawer1).setup = () => (<any> mockDrawer1)._renderArea = renderArea1;
+      (<any> mockDrawer1).setup = () => (<any> mockDrawer1).renderArea = renderArea1;
       (<any> mockDrawer1)._getSelector = () => "circle";
       (<any> mockDrawer1)._getPixelPoint = data1PointConverter;
 
       var renderArea2 = svg.append("g");
       renderArea2.append("circle").attr("cx", 10).attr("cy", 10).attr("r", 10);
       var mockDrawer2 = new Plottable.Drawers.AbstractDrawer("ds2");
-      (<any> mockDrawer2).setup = () => (<any> mockDrawer2)._renderArea = renderArea2;
+      (<any> mockDrawer2).setup = () => (<any> mockDrawer2).renderArea = renderArea2;
       (<any> mockDrawer2)._getSelector = () => "circle";
       (<any> mockDrawer2)._getPixelPoint = data2PointConverter;
 
-      // Mock _getDrawer to return the mock drawers
-      (<any> plot)._getDrawer = (key: string) => {
+      // Mock getDrawer to return the mock drawers
+      (<any> plot).getDrawer = (key: string) => {
         if (key === "ds1") {
           return mockDrawer1;
         } else {
@@ -459,7 +459,7 @@ describe("Plots", () => {
       var additionalPaint = (x: number) => {
         recordedTime = Math.max(x, recordedTime);
       };
-      (<any> plot)._additionalPaint = additionalPaint;
+      (<any> plot).additionalPaint = additionalPaint;
       plot.animator("bars", animator);
       var svg = generateSVG();
       plot.project("x", "x", x);

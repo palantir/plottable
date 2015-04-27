@@ -14,13 +14,13 @@ export module Interactions {
      *
      * @param {Point} The cursor's position relative to the Component's origin.
      */
-    _hoverOverComponent(p: Point): void;
+    hoverOverComponent(p: Point): void;
     /**
      * Called when the user mouses out of the Component.
      *
      * @param {Point} The cursor's position relative to the Component's origin.
      */
-    _hoverOutComponent(p: Point): void;
+    hoverOutComponent(p: Point): void;
     /**
      * Returns the HoverData associated with the given position, and performs
      * any visual changes associated with hovering inside a Component.
@@ -28,19 +28,20 @@ export module Interactions {
      * @param {Point} The cursor's position relative to the Component's origin.
      * @return {HoverData} The HoverData associated with the given position.
      */
-    _doHover(p: Point): HoverData;
+    doHover(p: Point): HoverData;
   }
 
   export class Hover extends Interaction {
 
     private static warned = false;
 
-    public _componentToListenTo: Hoverable;
-    private _mouseDispatcher: Dispatchers.Mouse;
-    private _touchDispatcher: Dispatchers.Touch;
-    private _hoverOverCallback: (hoverData: HoverData) => any;
-    private _hoverOutCallback: (hoverData: HoverData) => any;
-    private _overComponent = false;
+    public component: Hoverable;
+
+    private hoverOutCallback: (hoverData: HoverData) => any;
+    private hoverOverCallback: (hoverData: HoverData) => any;
+    private mouseDispatcher: Dispatchers.Mouse;
+    private overComponent = false;
+    private touchDispatcher: Dispatchers.Touch;
 
     constructor() {
       super();
@@ -50,41 +51,49 @@ export module Interactions {
       }
     }
 
-    private _currentHoverData: HoverData = {
-      data: null,
-      pixelPositions: null,
-      selection: null
-    };
+    public anchor(component: Hoverable, hitBox: D3.Selection) {
+      super.anchor(component, hitBox);
+      this.mouseDispatcher = Dispatchers.Mouse.getDispatcher(<SVGElement> (<any> this.component).element.node());
+      this.mouseDispatcher.onMouseMove("hover" + this.getID(), (p: Point) => this.handlePointerEvent(p));
 
-    public _anchor(component: Hoverable, hitBox: D3.Selection) {
-      super._anchor(component, hitBox);
-      this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(<SVGElement> (<any> this._componentToListenTo)._element.node());
-      this._mouseDispatcher.onMouseMove("hover" + this.getID(), (p: Point) => this._handlePointerEvent(p));
+      this.touchDispatcher = Dispatchers.Touch.getDispatcher(<SVGElement> (<any> this.component).element.node());
 
-      this._touchDispatcher = Dispatchers.Touch.getDispatcher(<SVGElement> (<any> this._componentToListenTo)._element.node());
-
-      this._touchDispatcher.onTouchStart("hover" + this.getID(), (ids, idToPoint) =>
-                                                                   this._handlePointerEvent(idToPoint[ids[0]]));
+      this.touchDispatcher.onTouchStart("hover" + this.getID(), (ids, idToPoint) =>
+                                                                   this.handlePointerEvent(idToPoint[ids[0]]));
     }
 
-    private _handlePointerEvent(p: Point) {
-      p = this._translateToComponentSpace(p);
-      if (this._isInsideComponent(p)) {
-        if (!this._overComponent) {
-          this._componentToListenTo._hoverOverComponent(p);
-        }
-        this.handleHoverOver(p);
-        this._overComponent = true;
-      } else {
-        this._componentToListenTo._hoverOutComponent(p);
-        this.safeHoverOut(this._currentHoverData);
-        this._currentHoverData = {
-          data: null,
-          pixelPositions: null,
-          selection: null
-        };
-        this._overComponent = false;
-      }
+    /**
+     * Retrieves the HoverData associated with the elements the user is currently hovering over.
+     *
+     * @return {HoverData} The data and selection corresponding to the elements
+     *                     the user is currently hovering over.
+     */
+    public getCurrentHoverData(): HoverData {
+      return this.currentHoverData;
+    }
+
+    /**
+     * Attaches an callback to be called when the user mouses over an element.
+     *
+     * @param {(hoverData: HoverData) => any} callback The callback to be called.
+     *      The callback will be passed data for newly hovered-over elements.
+     * @return {Interaction.Hover} The calling Interaction.Hover.
+     */
+    public onHoverOver(callback: (hoverData: HoverData) => any) {
+      this.hoverOverCallback = callback;
+      return this;
+    }
+
+    /**
+     * Attaches a callback to be called when the user mouses off of an element.
+     *
+     * @param {(hoverData: HoverData) => any} callback The callback to be called.
+     *      The callback will be passed data from the hovered-out elements.
+     * @return {Interaction.Hover} The calling Interaction.Hover.
+     */
+    public onHoverOut(callback: (hoverData: HoverData) => any) {
+      this.hoverOutCallback = callback;
+      return this;
     }
 
     /**
@@ -121,11 +130,17 @@ export module Interactions {
       };
     }
 
-    private handleHoverOver(p: Point) {
-      var lastHoverData = this._currentHoverData;
-      var newHoverData = this._componentToListenTo._doHover(p);
+    private currentHoverData: HoverData = {
+      data: null,
+      pixelPositions: null,
+      selection: null
+    };
 
-      this._currentHoverData = newHoverData;
+    private handleHoverOver(p: Point) {
+      var lastHoverData = this.currentHoverData;
+      var newHoverData = this.component.doHover(p);
+
+      this.currentHoverData = newHoverData;
 
       var outData = Hover.diffHoverData(lastHoverData, newHoverData);
       this.safeHoverOut(outData);
@@ -134,50 +149,36 @@ export module Interactions {
       this.safeHoverOver(overData);
     }
 
+    private handlePointerEvent(p: Point) {
+      p = this.translateToComponentSpace(p);
+      if (this.isInsideComponent(p)) {
+        if (!this.overComponent) {
+          this.component.hoverOverComponent(p);
+        }
+        this.handleHoverOver(p);
+        this.overComponent = true;
+      } else {
+        this.component.hoverOutComponent(p);
+        this.safeHoverOut(this.currentHoverData);
+        this.currentHoverData = {
+          data: null,
+          pixelPositions: null,
+          selection: null
+        };
+        this.overComponent = false;
+      }
+    }
+
     private safeHoverOut(outData: HoverData) {
-      if (this._hoverOutCallback && outData.data) {
-        this._hoverOutCallback(outData);
+      if (this.hoverOutCallback && outData.data) {
+        this.hoverOutCallback(outData);
       }
     }
 
     private safeHoverOver(overData: HoverData) {
-      if (this._hoverOverCallback && overData.data) {
-        this._hoverOverCallback(overData);
+      if (this.hoverOverCallback && overData.data) {
+        this.hoverOverCallback(overData);
       }
-    }
-
-    /**
-     * Attaches an callback to be called when the user mouses over an element.
-     *
-     * @param {(hoverData: HoverData) => any} callback The callback to be called.
-     *      The callback will be passed data for newly hovered-over elements.
-     * @return {Interaction.Hover} The calling Interaction.Hover.
-     */
-    public onHoverOver(callback: (hoverData: HoverData) => any) {
-      this._hoverOverCallback = callback;
-      return this;
-    }
-
-    /**
-     * Attaches a callback to be called when the user mouses off of an element.
-     *
-     * @param {(hoverData: HoverData) => any} callback The callback to be called.
-     *      The callback will be passed data from the hovered-out elements.
-     * @return {Interaction.Hover} The calling Interaction.Hover.
-     */
-    public onHoverOut(callback: (hoverData: HoverData) => any) {
-      this._hoverOutCallback = callback;
-      return this;
-    }
-
-    /**
-     * Retrieves the HoverData associated with the elements the user is currently hovering over.
-     *
-     * @return {HoverData} The data and selection corresponding to the elements
-     *                     the user is currently hovering over.
-     */
-    public getCurrentHoverData(): HoverData {
-      return this._currentHoverData;
     }
   }
 }

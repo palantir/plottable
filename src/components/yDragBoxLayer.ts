@@ -9,20 +9,20 @@ export module Components {
       this._hasCorners = false;
     }
 
-    public _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number,
+    public computeLayout(offeredXOrigin?: number, offeredYOrigin?: number,
                           availableWidth?: number, availableHeight?: number) {
-      super._computeLayout(offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
+      super.computeLayout(offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
       this.bounds(this.bounds()); // set correct bounds when width/height changes
     }
 
-    protected _setBounds(newBounds: Bounds) {
-      super._setBounds({
+    protected setBounds(newBounds: Bounds) {
+      super.setBounds({
         topLeft: { x: 0, y: newBounds.topLeft.y },
         bottomRight: { x: this.width(), y: newBounds.bottomRight.y }
       });
     }
 
-    protected _setResizableClasses(canResize: boolean) {
+    protected setResizableClasses(canResize: boolean) {
       this.classed("y-resizable", canResize);
     }
   }

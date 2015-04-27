@@ -18,14 +18,14 @@ describe("Gridlines", () => {
                                           .addComponent(0, 1, gridlines)
                                           .addComponent(1, 1, xAxis);
 
-    basicTable._anchor(svg);
-    basicTable._computeLayout();
+    basicTable.anchor(svg);
+    basicTable.computeLayout();
     xScale.range([0, xAxis.width() ]); // manually set range since we don't have a renderer
     yScale.range([yAxis.height(), 0]);
-    basicTable._render();
+    basicTable.render();
 
-    var xAxisTickMarks = (<any> xAxis)._element.selectAll("." + Plottable.Axis.TICK_MARK_CLASS)[0];
-    var xGridlines = (<any> gridlines)._element.select(".x-gridlines").selectAll("line")[0];
+    var xAxisTickMarks = (<any> xAxis).element.selectAll("." + Plottable.Axis.TICK_MARK_CLASS)[0];
+    var xGridlines = (<any> gridlines).element.select(".x-gridlines").selectAll("line")[0];
     assert.equal(xAxisTickMarks.length, xGridlines.length, "There is an x gridline for each x tick");
     for (var i = 0; i < xAxisTickMarks.length; i++) {
       var xTickMarkRect = xAxisTickMarks[i].getBoundingClientRect();
@@ -33,8 +33,8 @@ describe("Gridlines", () => {
       assert.closeTo(xTickMarkRect.left, xGridlineRect.left, 1, "x tick and gridline align");
     }
 
-    var yAxisTickMarks = (<any> yAxis)._element.selectAll("." + Plottable.Axis.TICK_MARK_CLASS)[0];
-    var yGridlines = (<any> gridlines)._element.select(".y-gridlines").selectAll("line")[0];
+    var yAxisTickMarks = (<any> yAxis).element.selectAll("." + Plottable.Axis.TICK_MARK_CLASS)[0];
+    var yGridlines = (<any> gridlines).element.select(".y-gridlines").selectAll("line")[0];
     assert.equal(yAxisTickMarks.length, yGridlines.length, "There is an x gridline for each x tick");
     for (var j = 0; j < yAxisTickMarks.length; j++) {
       var yTickMarkRect = yAxisTickMarks[j].getBoundingClientRect();

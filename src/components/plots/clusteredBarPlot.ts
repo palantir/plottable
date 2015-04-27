@@ -24,10 +24,10 @@ export module Plots {
       super(xScale, yScale, isVertical);
     }
 
-    protected _generateAttrToProjector() {
-      var attrToProjector = super._generateAttrToProjector();
+    protected generateAttrToProjector() {
+      var attrToProjector = super.generateAttrToProjector();
       // the width is constant, so set the inner scale range to that
-      var innerScale = this._makeInnerScale();
+      var innerScale = this.makeInnerScale();
       var innerWidthF = (d: any, i: number) => innerScale.rangeBand();
       attrToProjector["width"] = this._isVertical ? innerWidthF : attrToProjector["width"];
       attrToProjector["height"] = !this._isVertical ? innerWidthF : attrToProjector["height"];
@@ -42,21 +42,24 @@ export module Plots {
       return attrToProjector;
     }
 
-    private _updateClusterPosition() {
-      var innerScale = this._makeInnerScale();
-      this._datasetKeysInOrder.forEach((key: string) => {
-        var plotMetadata = <ClusteredPlotMetadata>this._key2PlotDatasetKey.get(key).plotMetadata;
-        plotMetadata.position = innerScale.scale(key) - innerScale.rangeBand() / 2;
-      });
+    protected getDataToDraw() {
+      this.updateClusterPosition();
+      return super.getDataToDraw();
     }
 
-    private _makeInnerScale(){
+    protected getPlotMetadataForDataset(key: string): ClusteredPlotMetadata {
+      var metadata = <ClusteredPlotMetadata>super.getPlotMetadataForDataset(key);
+      metadata.position = 0;
+      return metadata;
+    }
+
+    private makeInnerScale(){
       var innerScale = new Scales.Category();
-      innerScale.domain(this._datasetKeysInOrder);
-      if (!this._projections["width"]) {
-        innerScale.range([0, this._getBarPixelWidth()]);
+      innerScale.domain(this.datasetKeysInOrder);
+      if (!this.projections["width"]) {
+        innerScale.range([0, this.getBarPixelWidth()]);
       } else {
-        var projection = this._projections["width"];
+        var projection = this.projections["width"];
         var accessor = projection.accessor;
         var scale = projection.scale;
         var fn = scale ? (d: any, i: number, u: any, m: PlotMetadata) => scale.scale(accessor(d, i, u, m)) : accessor;
@@ -65,15 +68,12 @@ export module Plots {
       return innerScale;
     }
 
-    protected _getDataToDraw() {
-      this._updateClusterPosition();
-      return super._getDataToDraw();
-    }
-
-    protected _getPlotMetadataForDataset(key: string): ClusteredPlotMetadata {
-      var metadata = <ClusteredPlotMetadata>super._getPlotMetadataForDataset(key);
-      metadata.position = 0;
-      return metadata;
+    private updateClusterPosition() {
+      var innerScale = this.makeInnerScale();
+      this.datasetKeysInOrder.forEach((key: string) => {
+        var plotMetadata = <ClusteredPlotMetadata>this.datasetKeys.get(key).plotMetadata;
+        plotMetadata.position = innerScale.scale(key) - innerScale.rangeBand() / 2;
+      });
     }
   }
 }

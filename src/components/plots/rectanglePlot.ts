@@ -3,7 +3,7 @@
 module Plottable {
 export module Plots {
   export class Rectangle<X, Y> extends XYPlot<X, Y> {
-    private _defaultFillColor: string;
+    private defaultFillColor: string;
 
     /**
      * Constructs a RectanglePlot.
@@ -18,16 +18,12 @@ export module Plots {
      */
     constructor(xScale: Scale<X, any>, yScale: Scale<Y, any>) {
       super(xScale, yScale);
-      this._defaultFillColor = new Scales.Color().range()[0];
+      this.defaultFillColor = new Scales.Color().range()[0];
       this.classed("rectangle-plot", true);
     }
 
-    protected _getDrawer(key: string) {
-      return new Drawers.Rect(key, true);
-    }
-
-    protected _generateAttrToProjector() {
-      var attrToProjector = super._generateAttrToProjector();
+    protected generateAttrToProjector() {
+      var attrToProjector = super.generateAttrToProjector();
 
       // Copy each of the different projectors.
       var x1Attr = attrToProjector["x1"];
@@ -50,12 +46,16 @@ export module Plots {
       delete attrToProjector["y2"];
 
 
-      attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this._defaultFillColor);
+      attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this.defaultFillColor);
       return attrToProjector;
     }
 
-    protected _generateDrawSteps(): Drawers.DrawStep[] {
-      return [{attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("rectangles")}];
+    protected generateDrawSteps(): Drawers.DrawStep[] {
+      return [{attrToProjector: this.generateAttrToProjector(), animator: this.getAnimator("rectangles")}];
+    }
+
+    protected getDrawer(key: string) {
+      return new Drawers.Rect(key, true);
     }
   }
 }

@@ -8,7 +8,7 @@ export module Utils {
    * This power has a price: everything is linear time since it is actually backed by an array...
    */
   export class StrictEqualityAssociativeArray {
-    private _keyValuePairs: any[][] = [];
+    private keyValuePairs: any[][] = [];
 
     /**
      * Set a new key/value pair in the store.
@@ -21,13 +21,13 @@ export module Utils {
       if (key !== key) {
         throw new Error("NaN may not be used as a key to the StrictEqualityAssociativeArray");
       }
-      for (var i = 0; i < this._keyValuePairs.length; i++) {
-        if (this._keyValuePairs[i][0] === key) {
-          this._keyValuePairs[i][1] = value;
+      for (var i = 0; i < this.keyValuePairs.length; i++) {
+        if (this.keyValuePairs[i][0] === key) {
+          this.keyValuePairs[i][1] = value;
           return true;
         }
       }
-      this._keyValuePairs.push([key, value]);
+      this.keyValuePairs.push([key, value]);
       return false;
     }
 
@@ -38,9 +38,9 @@ export module Utils {
      * @return {any} Value if found, undefined otherwise
      */
     public get(key: any): any {
-      for (var i = 0; i < this._keyValuePairs.length; i++) {
-        if (this._keyValuePairs[i][0] === key) {
-          return this._keyValuePairs[i][1];
+      for (var i = 0; i < this.keyValuePairs.length; i++) {
+        if (this.keyValuePairs[i][0] === key) {
+          return this.keyValuePairs[i][1];
         }
       }
       return undefined;
@@ -56,8 +56,8 @@ export module Utils {
      * @return {boolean} Whether there was a matching entry for that key
      */
     public has(key: any): boolean {
-      for (var i = 0; i < this._keyValuePairs.length; i++) {
-        if (this._keyValuePairs[i][0] === key) {
+      for (var i = 0; i < this.keyValuePairs.length; i++) {
+        if (this.keyValuePairs[i][0] === key) {
           return true;
         }
       }
@@ -70,7 +70,7 @@ export module Utils {
      * @return {any[]} The values in the store
      */
     public values(): any[] {
-      return this._keyValuePairs.map((x) => x[1]);
+      return this.keyValuePairs.map((x) => x[1]);
     }
 
     /**
@@ -79,7 +79,7 @@ export module Utils {
      * @return {any[]} The keys in the store
      */
     public keys(): any[] {
-      return this._keyValuePairs.map((x) => x[0]);
+      return this.keyValuePairs.map((x) => x[0]);
     }
 
     /**
@@ -89,7 +89,7 @@ export module Utils {
      * @return {any[]} The results of mapping the callback over the entries
      */
      public map(cb: (key?: any, val?: any, index?: number) => any) {
-      return this._keyValuePairs.map((kv: any[], index: number) => {
+      return this.keyValuePairs.map((kv: any[], index: number) => {
         return cb(kv[0], kv[1], index);
       });
      }
@@ -101,9 +101,9 @@ export module Utils {
      * @return {boolean} Whether a matching entry was found and removed
      */
     public delete(key: any): boolean {
-      for (var i = 0; i < this._keyValuePairs.length; i++) {
-        if (this._keyValuePairs[i][0] === key) {
-          this._keyValuePairs.splice(i, 1);
+      for (var i = 0; i < this.keyValuePairs.length; i++) {
+        if (this.keyValuePairs[i][0] === key) {
+          this.keyValuePairs.splice(i, 1);
           return true;
         }
       }

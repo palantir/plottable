@@ -10,7 +10,7 @@ describe("Drawers", () => {
       var barPlot = new Plottable.Plots.Bar(xScale, yScale);
 
       var drawer = new Plottable.Drawers.Rect("one", true);
-      (<any> barPlot)._getDrawer = () => drawer;
+      (<any> barPlot).getDrawer = () => drawer;
 
       barPlot.addDataset("one", data);
       barPlot.project("x", "a", xScale);
@@ -35,7 +35,7 @@ describe("Drawers", () => {
       var barPlot = new Plottable.Plots.Bar(xScale, yScale, false);
 
       var drawer = new Plottable.Drawers.Rect("one", false);
-      (<any> barPlot)._getDrawer = () => drawer;
+      (<any> barPlot).getDrawer = () => drawer;
 
       barPlot.addDataset("one", data);
       barPlot.project("x", "b", xScale);

@@ -11,11 +11,11 @@ describe("ComponentGroups", () => {
 
     var cg = new Plottable.Components.Group([c1, c2, c3]);
     var svg = generateSVG(400, 400);
-    cg._anchor(svg);
-    (<any> c1)._addBox("test-box1");
-    (<any> c2)._addBox("test-box2");
-    (<any> c3)._addBox("test-box3");
-    cg._computeLayout()._render();
+    cg.anchor(svg);
+    (<any> c1).addBox("test-box1");
+    (<any> c2).addBox("test-box2");
+    (<any> c3).addBox("test-box3");
+    cg.computeLayout().render();
     var t1 = svg.select(".test-box1");
     var t2 = svg.select(".test-box2");
     var t3 = svg.select(".test-box3");
@@ -32,17 +32,17 @@ describe("ComponentGroups", () => {
 
     var cg = new Plottable.Components.Group([c1]);
     var svg = generateSVG(400, 400);
-    cg.below(c2)._anchor(svg);
-    (<any> c1)._addBox("test-box1");
-    (<any> c2)._addBox("test-box2");
-    cg._computeLayout()._render();
+    cg.below(c2).anchor(svg);
+    (<any> c1).addBox("test-box1");
+    (<any> c2).addBox("test-box2");
+    cg.computeLayout().render();
     var t1 = svg.select(".test-box1");
     var t2 = svg.select(".test-box2");
     assertWidthHeight(t1, 10, 10, "rect1 sized correctly");
     assertWidthHeight(t2, 20, 20, "rect2 sized correctly");
     cg.below(c3);
-    (<any> c3)._addBox("test-box3");
-    cg._computeLayout()._render();
+    (<any> c3).addBox("test-box3");
+    cg.computeLayout().render();
     var t3 = svg.select(".test-box3");
     assertWidthHeight(t3, 400, 400, "rect3 sized correctly");
     svg.remove();
@@ -55,12 +55,12 @@ describe("ComponentGroups", () => {
     cg.below(c1).below(c2);
 
     var svg = generateSVG();
-    cg._anchor(svg);
-    cg._computeLayout(50, 50, 350, 350);
+    cg.anchor(svg);
+    cg.computeLayout(50, 50, 350, 350);
 
-    var cgTranslate = d3.transform((<any> cg)._element.attr("transform")).translate;
-    var c1Translate = d3.transform((<any> c1)._element.attr("transform")).translate;
-    var c2Translate = d3.transform((<any> c2)._element.attr("transform")).translate;
+    var cgTranslate = d3.transform((<any> cg).element.attr("transform")).translate;
+    var c1Translate = d3.transform((<any> c1).element.attr("transform")).translate;
+    var c2Translate = d3.transform((<any> c2).element.attr("transform")).translate;
     assert.equal(cgTranslate[0], 50, "componentGroup has 50 xOffset");
     assert.equal(cgTranslate[1], 50, "componentGroup has 50 yOffset");
     assert.equal(c1Translate[0], 0, "componentGroup has 0 xOffset");
@@ -134,7 +134,7 @@ describe("ComponentGroups", () => {
       var svg = generateSVG();
       var cg = new Plottable.Components.Group([]);
 
-      var request = cg._requestedSpace(SVG_WIDTH, SVG_HEIGHT);
+      var request = cg.requestedSpace(SVG_WIDTH, SVG_HEIGHT);
       verifySpaceRequest(request, 0, 0, false, false, "empty Group doesn't request any space");
 
       cg.renderTo(svg);
@@ -149,11 +149,11 @@ describe("ComponentGroups", () => {
       var c2 = new Plottable.Component();
       var cg = new Plottable.Components.Group([c1, c2]);
 
-      var groupRequest = cg._requestedSpace(SVG_WIDTH, SVG_HEIGHT);
-      var c1Request = c1._requestedSpace(SVG_WIDTH, SVG_HEIGHT);
+      var groupRequest = cg.requestedSpace(SVG_WIDTH, SVG_HEIGHT);
+      var c1Request = c1.requestedSpace(SVG_WIDTH, SVG_HEIGHT);
       assert.deepEqual(groupRequest, c1Request, "request reflects request of sub-component");
-      assert.isFalse(cg._isFixedWidth(), "width is not fixed if subcomponents are not fixed width");
-      assert.isFalse(cg._isFixedHeight(), "height is not fixed if subcomponents are not fixed height");
+      assert.isFalse(cg.isFixedWidth(), "width is not fixed if subcomponents are not fixed width");
+      assert.isFalse(cg.isFixedHeight(), "height is not fixed if subcomponents are not fixed height");
 
       cg.renderTo(svg);
       assert.strictEqual(cg.width(), SVG_WIDTH, "occupies all offered width");
@@ -168,13 +168,13 @@ describe("ComponentGroups", () => {
 
       var cg = new Plottable.Components.Group([tall, wide]);
 
-      var request = cg._requestedSpace(SVG_WIDTH, SVG_HEIGHT);
+      var request = cg.requestedSpace(SVG_WIDTH, SVG_HEIGHT);
       assert.strictEqual(request.width, SVG_WIDTH / 2, "requested enough space for widest Component");
       assert.isFalse(request.wantsWidth, "does not request more width if enough was supplied for widest Component");
       assert.strictEqual(request.height, SVG_HEIGHT / 2, "requested enough space for tallest Component");
       assert.isFalse(request.wantsHeight, "does not request more height if enough was supplied for tallest Component");
 
-      var constrainedRequest = cg._requestedSpace(SVG_WIDTH / 10, SVG_HEIGHT / 10);
+      var constrainedRequest = cg.requestedSpace(SVG_WIDTH / 10, SVG_HEIGHT / 10);
       assert.strictEqual(constrainedRequest.width, SVG_WIDTH / 2, "requested enough space for widest Component");
       assert.isTrue(constrainedRequest.wantsWidth, "requests more width if not enough was supplied for widest Component");
       assert.strictEqual(constrainedRequest.height, SVG_HEIGHT / 2, "requested enough space for tallest Component");
@@ -204,7 +204,7 @@ describe("ComponentGroups", () => {
       assert.strictEqual(cg1.components().length, 1,
         "first group should have 1 component before movement");
 
-      assert.strictEqual(c._parent(), cg1,
+      assert.strictEqual(c.parent(), cg1,
         "component's parent before moving should be the group 1"
       );
 
@@ -218,7 +218,7 @@ describe("ComponentGroups", () => {
       assert.strictEqual(cg1.components().length, 0,
         "first group should have no components after movement");
 
-      assert.strictEqual(c._parent(), cg2,
+      assert.strictEqual(c.parent(), cg2,
         "component's parent after movement should be the group 2"
       );
 

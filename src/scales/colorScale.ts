@@ -22,7 +22,7 @@ export module Scales {
       switch (scaleType) {
         case null:
         case undefined:
-          scale = d3.scale.ordinal().range(Color._getPlottableColors());
+          scale = d3.scale.ordinal().range(Color.getPlottableColors());
           break;
         case "Category10":
         case "category10":
@@ -50,9 +50,19 @@ export module Scales {
       super(scale);
     }
 
+    // Modifying the original scale method so that colors that are looped are lightened according
+    // to how many times they are looped.
+    public scale(value: string): string {
+      var color = super.scale(value);
+      var index = this.domain().indexOf(value);
+      var numLooped = Math.floor(index / this.range().length);
+      var modifyFactor = Math.log(numLooped * Color.LOOP_LIGHTEN_FACTOR + 1);
+      return Utils.Methods.lightenColor(color, modifyFactor);
+    }
+
     // Duplicated from OrdinalScale._getExtent - should be removed in #388
-    protected _getExtent(): string[] {
-      var extents = this._getAllExtents();
+    protected getExtent(): string[] {
+      var extents = this.getAllExtents();
       var concatenatedExtents: string[] = [];
       extents.forEach((e) => {
         concatenatedExtents = concatenatedExtents.concat(e);
@@ -60,7 +70,7 @@ export module Scales {
       return Utils.Methods.uniq(concatenatedExtents);
     }
 
-    private static _getPlottableColors(): string[] {
+    private static getPlottableColors(): string[] {
       var plottableDefaultColors: string[] = [];
       var colorTester = d3.select("body").append("plottable-color-tester");
 
@@ -77,16 +87,6 @@ export module Scales {
       }
       colorTester.remove();
       return plottableDefaultColors;
-    }
-
-    // Modifying the original scale method so that colors that are looped are lightened according
-    // to how many times they are looped.
-    public scale(value: string): string {
-      var color = super.scale(value);
-      var index = this.domain().indexOf(value);
-      var numLooped = Math.floor(index / this.range().length);
-      var modifyFactor = Math.log(numLooped * Color.LOOP_LIGHTEN_FACTOR + 1);
-      return Utils.Methods.lightenColor(color, modifyFactor);
     }
   }
 }
