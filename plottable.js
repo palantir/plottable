@@ -1865,7 +1865,7 @@ var Plottable;
             return new QuantitativeScale(this._d3Scale.copy());
         };
         QuantitativeScale.prototype.domain = function (values) {
-            return _super.prototype.domain.call(this, values); // need to override type sig to enable method chaining :/
+            return _super.prototype.domain.call(this, values); // need to override type sig to enable method chaining:/
         };
         QuantitativeScale.prototype._setDomain = function (values) {
             var isNaNOrInfinity = function (x) { return x !== x || x === Infinity || x === -Infinity; };

@@ -23,7 +23,7 @@ export module Drawers {
     }
 
     private _createLine(xFunction: AppliedProjector, yFunction: AppliedProjector, definedFunction: AppliedProjector) {
-      if(!definedFunction) {
+      if (!definedFunction) {
         definedFunction = (d, i) => true;
       }
 
