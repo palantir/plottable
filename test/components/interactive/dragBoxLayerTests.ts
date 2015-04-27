@@ -9,7 +9,7 @@ describe("Interactive Components", () => {
 
     it("correctly draws box on drag", () => {
       var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var dbl = new Plottable.Component.Interactive.DragBoxLayer();
+      var dbl = new Plottable.Component.DragBoxLayer();
       dbl.renderTo(svg);
       assert.isFalse(dbl.boxVisible(), "box is hidden initially");
 
@@ -34,7 +34,7 @@ describe("Interactive Components", () => {
 
     it("dismisses on click", () => {
       var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var dbl = new Plottable.Component.Interactive.DragBoxLayer();
+      var dbl = new Plottable.Component.DragBoxLayer();
       dbl.renderTo(svg);
 
       var targetPoint = {
@@ -51,12 +51,12 @@ describe("Interactive Components", () => {
     });
 
     it("clipPath enabled", () => {
-      var dbl = new Plottable.Component.Interactive.DragBoxLayer();
+      var dbl = new Plottable.Component.DragBoxLayer();
       assert.isTrue(dbl.clipPathEnabled, "uses clipPath (to hide detection edges)");
     });
 
     it("detectionRadius()", () => {
-      var dbl = new Plottable.Component.Interactive.DragBoxLayer();
+      var dbl = new Plottable.Component.DragBoxLayer();
 
       assert.doesNotThrow(() => dbl.detectionRadius(3), Error, "can set detection radius before anchoring");
 
@@ -85,7 +85,7 @@ describe("Interactive Components", () => {
 
     it("onDragStart()", () => {
       var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var dbl = new Plottable.Component.Interactive.DragBoxLayer();
+      var dbl = new Plottable.Component.DragBoxLayer();
       dbl.renderTo(svg);
 
       var startPoint = {
@@ -117,7 +117,7 @@ describe("Interactive Components", () => {
 
     it("onDrag()", () => {
       var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var dbl = new Plottable.Component.Interactive.DragBoxLayer();
+      var dbl = new Plottable.Component.DragBoxLayer();
       dbl.renderTo(svg);
 
       var startPoint = {
@@ -149,7 +149,7 @@ describe("Interactive Components", () => {
 
     it("onDragEnd()", () => {
       var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var dbl = new Plottable.Component.Interactive.DragBoxLayer();
+      var dbl = new Plottable.Component.DragBoxLayer();
       dbl.renderTo(svg);
 
       var startPoint = {
@@ -180,7 +180,7 @@ describe("Interactive Components", () => {
     });
     describe("resizing", () => {
       var svg: D3.Selection;
-      var dbl: Plottable.Component.Interactive.DragBoxLayer;
+      var dbl: Plottable.Component.DragBoxLayer;
       var target: D3.Selection;
       var midPoint = {
         x: SVG_WIDTH / 2,
@@ -202,7 +202,7 @@ describe("Interactive Components", () => {
 
       beforeEach(() => {
         svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        dbl = new Plottable.Component.Interactive.DragBoxLayer();
+        dbl = new Plottable.Component.DragBoxLayer();
         dbl.renderTo(svg);
 
         target = dbl.background();

@@ -16,6 +16,7 @@ export module Dispatcher {
     private _startBroadcaster: Core.Broadcaster<Dispatcher.Touch>;
     private _moveBroadcaster: Core.Broadcaster<Dispatcher.Touch>;
     private _endBroadcaster: Core.Broadcaster<Dispatcher.Touch>;
+    private _cancelBroadcaster: Core.Broadcaster<Dispatcher.Touch>;
 
     /**
      * Get a Dispatcher.Touch for the <svg> containing elem. If one already exists
@@ -55,7 +56,10 @@ export module Dispatcher {
       this._endBroadcaster = new Core.Broadcaster(this);
       this._event2Callback["touchend"] = (e: TouchEvent) => this._measureAndBroadcast(e, this._endBroadcaster);
 
-      this._broadcasters = [this._moveBroadcaster, this._startBroadcaster, this._endBroadcaster];
+      this._cancelBroadcaster = new Core.Broadcaster(this);
+      this._event2Callback["touchcancel"] = (e: TouchEvent) => this._measureAndBroadcast(e, this._cancelBroadcaster);
+
+      this._broadcasters = [this._moveBroadcaster, this._startBroadcaster, this._endBroadcaster, this._cancelBroadcaster];
     }
 
     protected _getWrappedCallback(callback: Function): Core.BroadcasterCallback<Dispatcher.Touch> {
@@ -107,6 +111,22 @@ export module Dispatcher {
      */
     public onTouchEnd(key: any, callback: TouchCallback): Dispatcher.Touch {
       this._setCallback(this._endBroadcaster, key, callback);
+      return this;
+    }
+
+    /**
+     * Registers a callback to be called whenever a touch is cancelled,
+     * or removes the callback if `null` is passed as the callback.
+     *
+     * @param {any} key The key associated with the callback.
+     *                  Key uniqueness is determined by deep equality.
+     * @param {TouchCallback} callback A callback that takes the pixel position
+     *                                     in svg-coordinate-space. Pass `null`
+     *                                     to remove a callback.
+     * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
+     */
+    public onTouchCancel(key: any, callback: TouchCallback): Dispatcher.Touch {
+      this._setCallback(this._cancelBroadcaster, key, callback);
       return this;
     }
 
