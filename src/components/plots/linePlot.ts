@@ -71,7 +71,7 @@ export module Plots {
 
     protected generateAttrToProjector() {
       var attrToProjector = super.generateAttrToProjector();
-      var wholeDatumAttributes = this._wholeDatumAttributes();
+      var wholeDatumAttributes = this.wholeDatumAttributes();
       var isSingleDatumAttr = (attr: string) => wholeDatumAttributes.indexOf(attr) === -1;
       var singleDatumAttributes = d3.keys(attrToProjector).filter(isSingleDatumAttr);
       singleDatumAttributes.forEach((attribute: string) => {
@@ -91,7 +91,7 @@ export module Plots {
       return attrToProjector;
     }
 
-    protected _wholeDatumAttributes() {
+    protected wholeDatumAttributes() {
       return ["x", "y"];
     }
 

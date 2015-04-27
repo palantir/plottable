@@ -30,7 +30,7 @@ export module Plots {
     public project(attrToSet: string, accessor: any, scale?: Scale<any, any>) {
       super.project(attrToSet, accessor, scale);
       if (attrToSet === "y0") {
-        this._updateYDomainer();
+        this.updateYDomainer();
       }
       return this;
     }
@@ -54,12 +54,12 @@ export module Plots {
     protected onDatasetUpdate() {
       super.onDatasetUpdate();
       if (this._yScale != null) {
-        this._updateYDomainer();
+        this.updateYDomainer();
       }
     }
 
-    protected _updateYDomainer() {
-      super._updateYDomainer();
+    protected updateYDomainer() {
+      super.updateYDomainer();
 
       var constantBaseline: number;
       var y0Projector = this.projections["y0"];
@@ -84,8 +84,8 @@ export module Plots {
       }
     }
 
-    protected _wholeDatumAttributes() {
-      var wholeDatumAttributes = super._wholeDatumAttributes();
+    protected wholeDatumAttributes() {
+      var wholeDatumAttributes = super.wholeDatumAttributes();
       wholeDatumAttributes.push("y0");
       return wholeDatumAttributes;
     }

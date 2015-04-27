@@ -3,10 +3,9 @@
 module Plottable {
 export module Plots {
   export class StackedArea<X> extends Area<X> {
-
     private _isVertical: boolean;
-    private _baseline: D3.Selection;
-    private _baselineValue = 0;
+    private baseline: D3.Selection;
+    private baselineValue = 0;
 
     /**
      * Constructs a StackedArea plot.
@@ -21,40 +20,8 @@ export module Plots {
       this._isVertical = true;
     }
 
-    protected getDrawer(key: string) {
-      return new Plottable.Drawers.Area(key).drawLine(false);
-    }
-
     public getAnimator(key: string): Animators.PlotAnimator {
       return new Animators.Null();
-    }
-
-    protected setup() {
-      super.setup();
-      this._baseline = this.renderArea.append("line").classed("baseline", true);
-    }
-
-    protected additionalPaint() {
-      var scaledBaseline = this._yScale.scale(this._baselineValue);
-      var baselineAttr: any = {
-        "x1": 0,
-        "y1": scaledBaseline,
-        "x2": this.width(),
-        "y2": scaledBaseline
-      };
-
-      this.getAnimator("baseline").animate(this._baseline, baselineAttr);
-    }
-
-    protected _updateYDomainer() {
-      super._updateYDomainer();
-      var scale = <QuantitativeScale<any>> this._yScale;
-      if (!scale.setByUser) {
-        scale.domainer().addPaddingException(0, "STACKED_AREA_PLOT+" + this.getID())
-                        .addIncludedValue(0, "STACKED_AREA_PLOT+" + this.getID());
-        // prepending "AREA_PLOT" is unnecessary but reduces likely of user accidentally creating collisions
-        scale.autoDomainIfAutomaticMode();
-      }
     }
 
     public project(attrToSet: string, accessor: any, scale?: Scale<any, any>) {
@@ -63,10 +30,74 @@ export module Plots {
       return this;
     }
 
-    protected onDatasetUpdate() {
-      super.onDatasetUpdate();
-      Stacked.prototype.onDatasetUpdate.apply(this);
-      return this;
+    //===== Stack logic from StackedPlot =====
+    public generateDefaultMapArray(): D3.Map<StackedDatum>[] {
+      return Stacked.prototype.generateDefaultMapArray.call(this);
+    }
+
+    public getDomainKeys() {
+      return Stacked.prototype.getDomainKeys.call(this);
+    }
+
+    public getPlotMetadataForDataset(key: string): StackedPlotMetadata {
+      return Stacked.prototype.getPlotMetadataForDataset.call(this, key);
+    }
+
+    public keyAccessor(): _Accessor {
+      return Stacked.prototype.keyAccessor.call(this);
+    }
+
+    protected normalizeDatasets<A, B>(fromX: boolean): {a: A; b: B}[] {
+      return Stacked.prototype.normalizeDatasets.call(this, fromX);
+    }
+
+    public setDatasetStackOffsets(positiveDataMapArray: D3.Map<StackedDatum>[], negativeDataMapArray: D3.Map<StackedDatum>[]) {
+      Stacked.prototype.setDatasetStackOffsets.call(this, positiveDataMapArray, negativeDataMapArray);
+    }
+
+    public stack(dataArray: D3.Map<StackedDatum>[]): D3.Map<StackedDatum>[] {
+      return Stacked.prototype.stack.call(this, dataArray);
+    }
+
+    public updateScaleExtents() {
+      Stacked.prototype.updateScaleExtents.call(this);
+    }
+
+    public updateStackExtents() {
+      Stacked.prototype.updateStackExtents.call(this);
+    }
+
+    public updateStackOffsets() {
+      if (!this._projectorsReady()) { return; }
+      var domainKeys = this.getDomainKeys();
+      var keyAccessor = this._isVertical ? this.projections["x"].accessor : this.projections["y"].accessor;
+      var keySets = this.datasetKeysInOrder.map((k) => {
+        var dataset = this.datasetKeys.get(k).dataset;
+        var plotMetadata = this.datasetKeys.get(k).plotMetadata;
+        return d3.set(dataset.data().map((datum, i) => keyAccessor(datum, i, dataset.metadata(), plotMetadata).toString())).values();
+      });
+
+      if (keySets.some((keySet) => keySet.length !== domainKeys.length)) {
+        Utils.Methods.warn("the domains across the datasets are not the same.  Plot may produce unintended behavior.");
+      }
+      Stacked.prototype.updateStackOffsets.call(this);
+    }
+
+    public _valueAccessor(): _Accessor {
+      return Stacked.prototype._valueAccessor.call(this);
+    }
+    //===== /Stack logic =====
+
+    protected additionalPaint() {
+      var scaledBaseline = this._yScale.scale(this.baselineValue);
+      var baselineAttr: any = {
+        "x1": 0,
+        "y1": scaledBaseline,
+        "x2": this.width(),
+        "y2": scaledBaseline
+      };
+
+      this.getAnimator("baseline").animate(this.baseline, baselineAttr);
     }
 
     protected generateAttrToProjector() {
@@ -86,67 +117,35 @@ export module Plots {
       return attrToProjector;
     }
 
-    protected _wholeDatumAttributes() {
+    protected getDrawer(key: string) {
+      return new Plottable.Drawers.Area(key).drawLine(false);
+    }
+
+    protected onDatasetUpdate() {
+      super.onDatasetUpdate();
+      Stacked.prototype.onDatasetUpdate.apply(this);
+      return this;
+    }
+
+    protected setup() {
+      super.setup();
+      this.baseline = this.renderArea.append("line").classed("baseline", true);
+    }
+
+    protected updateYDomainer() {
+      super.updateYDomainer();
+      var scale = <QuantitativeScale<any>> this._yScale;
+      if (!scale.setByUser) {
+        scale.domainer().addPaddingException(0, "STACKED_AREA_PLOT+" + this.getID())
+                        .addIncludedValue(0, "STACKED_AREA_PLOT+" + this.getID());
+        // prepending "AREA_PLOT" is unnecessary but reduces likely of user accidentally creating collisions
+        scale.autoDomainIfAutomaticMode();
+      }
+    }
+
+    protected wholeDatumAttributes() {
       return ["x", "y", "defined"];
     }
-
-    //===== Stack logic from StackedPlot =====
-    public _updateStackOffsets() {
-      if (!this._projectorsReady()) { return; }
-      var domainKeys = this._getDomainKeys();
-      var keyAccessor = this._isVertical ? this.projections["x"].accessor : this.projections["y"].accessor;
-      var keySets = this.datasetKeysInOrder.map((k) => {
-        var dataset = this.datasetKeys.get(k).dataset;
-        var plotMetadata = this.datasetKeys.get(k).plotMetadata;
-        return d3.set(dataset.data().map((datum, i) => keyAccessor(datum, i, dataset.metadata(), plotMetadata).toString())).values();
-      });
-
-      if (keySets.some((keySet) => keySet.length !== domainKeys.length)) {
-        Utils.Methods.warn("the domains across the datasets are not the same.  Plot may produce unintended behavior.");
-      }
-      Stacked.prototype._updateStackOffsets.call(this);
-    }
-
-    public _updateStackExtents() {
-      Stacked.prototype._updateStackExtents.call(this);
-    }
-
-    public _stack(dataArray: D3.Map<StackedDatum>[]): D3.Map<StackedDatum>[] {
-      return Stacked.prototype._stack.call(this, dataArray);
-    }
-
-    public _setDatasetStackOffsets(positiveDataMapArray: D3.Map<StackedDatum>[], negativeDataMapArray: D3.Map<StackedDatum>[]) {
-      Stacked.prototype._setDatasetStackOffsets.call(this, positiveDataMapArray, negativeDataMapArray);
-    }
-
-    public _getDomainKeys() {
-      return Stacked.prototype._getDomainKeys.call(this);
-    }
-
-    public _generateDefaultMapArray(): D3.Map<StackedDatum>[] {
-      return Stacked.prototype._generateDefaultMapArray.call(this);
-    }
-
-    public updateScaleExtents() {
-      Stacked.prototype.updateScaleExtents.call(this);
-    }
-
-    public _keyAccessor(): _Accessor {
-      return Stacked.prototype._keyAccessor.call(this);
-    }
-
-    public _valueAccessor(): _Accessor {
-      return Stacked.prototype._valueAccessor.call(this);
-    }
-
-    public getPlotMetadataForDataset(key: string): StackedPlotMetadata {
-      return Stacked.prototype.getPlotMetadataForDataset.call(this, key);
-    }
-
-    protected _normalizeDatasets<A, B>(fromX: boolean): {a: A; b: B}[] {
-      return Stacked.prototype._normalizeDatasets.call(this, fromX);
-    }
-    //===== /Stack logic =====
   }
 }
 }

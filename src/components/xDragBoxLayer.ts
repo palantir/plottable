@@ -15,14 +15,14 @@ export module Components {
       this.bounds(this.bounds()); // set correct bounds when width/height changes
     }
 
-    protected _setBounds(newBounds: Bounds) {
-      super._setBounds({
+    protected setBounds(newBounds: Bounds) {
+      super.setBounds({
         topLeft: { x: newBounds.topLeft.x, y: 0 },
         bottomRight: { x: newBounds.bottomRight.x, y: this.height() }
       });
     }
 
-    protected _setResizableClasses(canResize: boolean) {
+    protected setResizableClasses(canResize: boolean) {
       this.classed("x-resizable", canResize);
     }
   }

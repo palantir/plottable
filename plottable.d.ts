@@ -2614,7 +2614,7 @@ declare module Plottable {
              * @return {SelectionBoxLayer} The calling SelectionBoxLayer.
              */
             bounds(newBounds: Bounds): SelectionBoxLayer;
-            protected _setBounds(newBounds: Bounds): void;
+            protected setBounds(newBounds: Bounds): void;
             doRender(): void;
             /**
              * Gets whether the box is being shown.
@@ -2892,14 +2892,14 @@ declare module Plottable {
         protected generateAttrToProjector(): AttributeToProjector;
         computeLayout(offeredXOrigin?: number, offeredYOffset?: number, availableWidth?: number, availableHeight?: number): void;
         protected _updateXDomainer(): void;
-        protected _updateYDomainer(): void;
+        protected updateYDomainer(): void;
         /**
          * Adjusts both domains' extents to show all datasets.
          *
          * This call does not override auto domain adjustment behavior over visible points.
          */
         showAllData(): void;
-        protected _normalizeDatasets<A, B>(fromX: boolean): {
+        protected normalizeDatasets<A, B>(fromX: boolean): {
             a: A;
             b: B;
         }[];
@@ -3146,7 +3146,7 @@ declare module Plottable {
             protected generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
             };
-            protected _wholeDatumAttributes(): string[];
+            protected wholeDatumAttributes(): string[];
             protected _getClosestWithinRange(p: Point, range: number): {
                 closestValue: any;
                 closestPoint: {
@@ -3195,8 +3195,8 @@ declare module Plottable {
             protected getDrawer(key: string): Drawers.Area;
             protected _getResetYFunction(): (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
             protected onDatasetUpdate(): void;
-            protected _updateYDomainer(): void;
-            protected _wholeDatumAttributes(): string[];
+            protected updateYDomainer(): void;
+            protected wholeDatumAttributes(): string[];
         }
     }
 }
@@ -3247,26 +3247,26 @@ declare module Plottable {
         getPlotMetadataForDataset(key: string): Plots.StackedPlotMetadata;
         project(attrToSet: string, accessor: any, scale?: Scale<any, any>): Stacked<X, Y>;
         onDatasetUpdate(): void;
-        _updateStackOffsets(): void;
-        _updateStackExtents(): void;
+        updateStackOffsets(): void;
+        updateStackExtents(): void;
         /**
          * Feeds the data through d3's stack layout function which will calculate
          * the stack offsets and use the the function declared in .out to set the offsets on the data.
          */
-        _stack(dataArray: D3.Map<Plots.StackedDatum>[]): D3.Map<Plots.StackedDatum>[];
+        stack(dataArray: D3.Map<Plots.StackedDatum>[]): D3.Map<Plots.StackedDatum>[];
         /**
          * After the stack offsets have been determined on each separate dataset, the offsets need
          * to be determined correctly on the overall datasets
          */
-        _setDatasetStackOffsets(positiveDataMapArray: D3.Map<Plots.StackedDatum>[], negativeDataMapArray: D3.Map<Plots.StackedDatum>[]): void;
-        _getDomainKeys(): string[];
-        _generateDefaultMapArray(): D3.Map<Plots.StackedDatum>[];
+        setDatasetStackOffsets(positiveDataMapArray: D3.Map<Plots.StackedDatum>[], negativeDataMapArray: D3.Map<Plots.StackedDatum>[]): void;
+        getDomainKeys(): string[];
+        generateDefaultMapArray(): D3.Map<Plots.StackedDatum>[];
         updateScaleExtents(): void;
-        _normalizeDatasets<A, B>(fromX: boolean): {
+        normalizeDatasets<A, B>(fromX: boolean): {
             a: A;
             b: B;
         }[];
-        _keyAccessor(): _Accessor;
+        keyAccessor(): _Accessor;
         _valueAccessor(): _Accessor;
     }
 }
@@ -3283,31 +3283,31 @@ declare module Plottable {
              * @param {QuantitativeScaleScale} yScale The y scale to use.
              */
             constructor(xScale: QuantitativeScale<X>, yScale: QuantitativeScale<number>);
-            protected getDrawer(key: string): Drawers.Area;
             getAnimator(key: string): Animators.PlotAnimator;
-            protected setup(): void;
-            protected additionalPaint(): void;
-            protected _updateYDomainer(): void;
             project(attrToSet: string, accessor: any, scale?: Scale<any, any>): StackedArea<X>;
-            protected onDatasetUpdate(): StackedArea<X>;
-            protected generateAttrToProjector(): {
-                [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
-            };
-            protected _wholeDatumAttributes(): string[];
-            _updateStackOffsets(): void;
-            _updateStackExtents(): void;
-            _stack(dataArray: D3.Map<StackedDatum>[]): D3.Map<StackedDatum>[];
-            _setDatasetStackOffsets(positiveDataMapArray: D3.Map<StackedDatum>[], negativeDataMapArray: D3.Map<StackedDatum>[]): void;
-            _getDomainKeys(): any;
-            _generateDefaultMapArray(): D3.Map<StackedDatum>[];
-            updateScaleExtents(): void;
-            _keyAccessor(): _Accessor;
-            _valueAccessor(): _Accessor;
+            generateDefaultMapArray(): D3.Map<StackedDatum>[];
+            getDomainKeys(): any;
             getPlotMetadataForDataset(key: string): StackedPlotMetadata;
-            protected _normalizeDatasets<A, B>(fromX: boolean): {
+            keyAccessor(): _Accessor;
+            protected normalizeDatasets<A, B>(fromX: boolean): {
                 a: A;
                 b: B;
             }[];
+            setDatasetStackOffsets(positiveDataMapArray: D3.Map<StackedDatum>[], negativeDataMapArray: D3.Map<StackedDatum>[]): void;
+            stack(dataArray: D3.Map<StackedDatum>[]): D3.Map<StackedDatum>[];
+            updateScaleExtents(): void;
+            updateStackExtents(): void;
+            updateStackOffsets(): void;
+            _valueAccessor(): _Accessor;
+            protected additionalPaint(): void;
+            protected generateAttrToProjector(): {
+                [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
+            };
+            protected getDrawer(key: string): Drawers.Area;
+            protected onDatasetUpdate(): StackedArea<X>;
+            protected setup(): void;
+            protected updateYDomainer(): void;
+            protected wholeDatumAttributes(): string[];
         }
     }
 }
@@ -3334,18 +3334,18 @@ declare module Plottable {
             project(attrToSet: string, accessor: any, scale?: Scale<any, any>): StackedBar<X, Y>;
             protected onDatasetUpdate(): StackedBar<X, Y>;
             protected getPlotMetadataForDataset(key: string): StackedPlotMetadata;
-            protected _normalizeDatasets<A, B>(fromX: boolean): {
+            protected normalizeDatasets<A, B>(fromX: boolean): {
                 a: A;
                 b: B;
             }[];
-            _updateStackOffsets(): void;
-            _updateStackExtents(): void;
-            _stack(dataArray: D3.Map<StackedDatum>[]): D3.Map<StackedDatum>[];
-            _setDatasetStackOffsets(positiveDataMapArray: D3.Map<StackedDatum>[], negativeDataMapArray: D3.Map<StackedDatum>[]): void;
-            _getDomainKeys(): any;
-            _generateDefaultMapArray(): D3.Map<StackedDatum>[];
+            updateStackOffsets(): void;
+            updateStackExtents(): void;
+            stack(dataArray: D3.Map<StackedDatum>[]): D3.Map<StackedDatum>[];
+            setDatasetStackOffsets(positiveDataMapArray: D3.Map<StackedDatum>[], negativeDataMapArray: D3.Map<StackedDatum>[]): void;
+            getDomainKeys(): any;
+            generateDefaultMapArray(): D3.Map<StackedDatum>[];
             updateScaleExtents(): void;
-            _keyAccessor(): _Accessor;
+            keyAccessor(): _Accessor;
             _valueAccessor(): _Accessor;
         }
     }
@@ -4091,7 +4091,7 @@ declare module Plottable {
              * @return {DragBoxLayer} The calling DragBoxLayer.
              */
             resizable(canResize: boolean): DragBoxLayer;
-            protected _setResizableClasses(canResize: boolean): void;
+            protected setResizableClasses(canResize: boolean): void;
             /**
              * Gets the callback that is called when dragging starts.
              *
@@ -4141,8 +4141,8 @@ declare module Plottable {
         class XDragBoxLayer extends DragBoxLayer {
             constructor();
             computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;
-            protected _setBounds(newBounds: Bounds): void;
-            protected _setResizableClasses(canResize: boolean): void;
+            protected setBounds(newBounds: Bounds): void;
+            protected setResizableClasses(canResize: boolean): void;
         }
     }
 }
@@ -4153,8 +4153,8 @@ declare module Plottable {
         class YDragBoxLayer extends DragBoxLayer {
             constructor();
             computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;
-            protected _setBounds(newBounds: Bounds): void;
-            protected _setResizableClasses(canResize: boolean): void;
+            protected setBounds(newBounds: Bounds): void;
+            protected setResizableClasses(canResize: boolean): void;
         }
     }
 }

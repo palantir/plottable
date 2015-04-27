@@ -250,12 +250,12 @@ export module Components {
         return this._resizable;
       }
       this._resizable = canResize;
-      this._setResizableClasses(canResize);
+      this.setResizableClasses(canResize);
       return this;
     }
 
     // Sets resizable classes. Overridden by subclasses that only resize in one dimension.
-    protected _setResizableClasses(canResize: boolean) {
+    protected setResizableClasses(canResize: boolean) {
       this.classed("x-resizable", canResize);
       this.classed("y-resizable", canResize);
     }
