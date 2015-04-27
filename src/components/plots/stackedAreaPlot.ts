@@ -68,7 +68,7 @@ export module Plots {
     }
 
     public updateStackOffsets() {
-      if (!this._projectorsReady()) { return; }
+      if (!this.projectorsReady()) { return; }
       var domainKeys = this.getDomainKeys();
       var keyAccessor = this._isVertical ? this.projections["x"].accessor : this.projections["y"].accessor;
       var keySets = this.datasetKeysInOrder.map((k) => {

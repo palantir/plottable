@@ -2866,11 +2866,14 @@ declare module Plottable {
          */
         constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>);
         /**
-         * @param {string} attrToSet One of ["x", "y"] which determines the point's
-         * x and y position in the Plot.
+         * Sets the automatic domain adjustment over visible points for x scale.
+         *
+         * If autoAdjustment is true adjustment is immediately performend.
+         *
+         * @param {boolean} autoAdjustment The new value for the automatic adjustment domain for x scale.
+         * @returns {XYPlot} The calling XYPlot.
          */
-        project(attrToSet: string, accessor: any, scale?: Scale<any, any>): XYPlot<X, Y>;
-        remove(): XYPlot<X, Y>;
+        automaticallyAdjustXScaleOverVisiblePoints(autoAdjustment: boolean): XYPlot<X, Y>;
         /**
          * Sets the automatic domain adjustment over visible points for y scale.
          *
@@ -2880,34 +2883,31 @@ declare module Plottable {
          * @returns {XYPlot} The calling XYPlot.
          */
         automaticallyAdjustYScaleOverVisiblePoints(autoAdjustment: boolean): XYPlot<X, Y>;
-        /**
-         * Sets the automatic domain adjustment over visible points for x scale.
-         *
-         * If autoAdjustment is true adjustment is immediately performend.
-         *
-         * @param {boolean} autoAdjustment The new value for the automatic adjustment domain for x scale.
-         * @returns {XYPlot} The calling XYPlot.
-         */
-        automaticallyAdjustXScaleOverVisiblePoints(autoAdjustment: boolean): XYPlot<X, Y>;
-        protected generateAttrToProjector(): AttributeToProjector;
         computeLayout(offeredXOrigin?: number, offeredYOffset?: number, availableWidth?: number, availableHeight?: number): void;
-        protected _updateXDomainer(): void;
-        protected updateYDomainer(): void;
+        /**
+         * @param {string} attrToSet One of ["x", "y"] which determines the point's
+         * x and y position in the Plot.
+         */
+        project(attrToSet: string, accessor: any, scale?: Scale<any, any>): XYPlot<X, Y>;
+        remove(): XYPlot<X, Y>;
         /**
          * Adjusts both domains' extents to show all datasets.
          *
          * This call does not override auto domain adjustment behavior over visible points.
          */
         showAllData(): void;
+        protected generateAttrToProjector(): AttributeToProjector;
         protected normalizeDatasets<A, B>(fromX: boolean): {
             a: A;
             b: B;
         }[];
-        protected _projectorsReady(): {
+        protected projectorsReady(): {
             accessor: (datum: any, index?: number, userMetadata?: any, plotMetadata?: Plots.PlotMetadata) => any;
             scale?: Scale<any, any>;
             attribute: string;
         };
+        protected updateXDomainer(): void;
+        protected updateYDomainer(): void;
     }
 }
 
@@ -3138,23 +3138,6 @@ declare module Plottable {
              * @param {QuantitativeScaleScale} yScale The y scale to use.
              */
             constructor(xScale: QuantitativeScale<X>, yScale: QuantitativeScale<number>);
-            protected setup(): void;
-            protected _rejectNullsAndNaNs(d: any, i: number, userMetdata: any, plotMetadata: any, accessor: _Accessor): boolean;
-            protected getDrawer(key: string): Drawers.Line;
-            protected _getResetYFunction(): (d: any, i: number, u: any, m: PlotMetadata) => number;
-            protected generateDrawSteps(): Drawers.DrawStep[];
-            protected generateAttrToProjector(): {
-                [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
-            };
-            protected wholeDatumAttributes(): string[];
-            protected _getClosestWithinRange(p: Point, range: number): {
-                closestValue: any;
-                closestPoint: {
-                    x: number;
-                    y: number;
-                };
-            };
-            protected _getAllPlotData(datasetKeys: string[]): PlotData;
             /**
              * Retrieves the closest PlotData to queryPoint.
              *
@@ -3169,6 +3152,23 @@ declare module Plottable {
             hoverOverComponent(p: Point): void;
             hoverOutComponent(p: Point): void;
             doHover(p: Point): Interactions.HoverData;
+            protected generateDrawSteps(): Drawers.DrawStep[];
+            protected generateAttrToProjector(): {
+                [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
+            };
+            protected _getAllPlotData(datasetKeys: string[]): PlotData;
+            protected getClosestWithinRange(p: Point, range: number): {
+                closestValue: any;
+                closestPoint: {
+                    x: number;
+                    y: number;
+                };
+            };
+            protected getDrawer(key: string): Drawers.Line;
+            protected getResetYFunction(): (d: any, i: number, u: any, m: PlotMetadata) => number;
+            protected rejectNullsAndNaNs(d: any, i: number, userMetdata: any, plotMetadata: any, accessor: _Accessor): boolean;
+            protected setup(): void;
+            protected wholeDatumAttributes(): string[];
         }
     }
 }

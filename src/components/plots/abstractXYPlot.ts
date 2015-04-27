@@ -27,10 +27,48 @@ module Plottable {
 
       this._xScale = xScale;
       this._yScale = yScale;
-      this._updateXDomainer();
-      xScale.broadcaster.registerListener("yDomainAdjustment" + this.getID(), () => this._adjustYDomainOnChangeFromX());
+      this.updateXDomainer();
+      xScale.broadcaster.registerListener("yDomainAdjustment" + this.getID(), () => this.adjustYDomainOnChangeFromX());
       this.updateYDomainer();
-      yScale.broadcaster.registerListener("xDomainAdjustment" + this.getID(), () => this._adjustXDomainOnChangeFromY());
+      yScale.broadcaster.registerListener("xDomainAdjustment" + this.getID(), () => this.adjustXDomainOnChangeFromY());
+    }
+
+    /**
+     * Sets the automatic domain adjustment over visible points for x scale.
+     *
+     * If autoAdjustment is true adjustment is immediately performend.
+     *
+     * @param {boolean} autoAdjustment The new value for the automatic adjustment domain for x scale.
+     * @returns {XYPlot} The calling XYPlot.
+     */
+    public automaticallyAdjustXScaleOverVisiblePoints(autoAdjustment: boolean): XYPlot<X, Y>  {
+      this._autoAdjustXScaleDomain = autoAdjustment;
+      this.adjustXDomainOnChangeFromY();
+      return this;
+    }
+
+    /**
+     * Sets the automatic domain adjustment over visible points for y scale.
+     *
+     * If autoAdjustment is true adjustment is immediately performend.
+     *
+     * @param {boolean} autoAdjustment The new value for the automatic adjustment domain for y scale.
+     * @returns {XYPlot} The calling XYPlot.
+     */
+    public automaticallyAdjustYScaleOverVisiblePoints(autoAdjustment: boolean): XYPlot<X, Y> {
+      this._autoAdjustYScaleDomain = autoAdjustment;
+      this.adjustYDomainOnChangeFromX();
+      return this;
+    }
+
+    public computeLayout(offeredXOrigin?: number, offeredYOffset?: number, availableWidth?: number, availableHeight?: number) {
+      super.computeLayout(offeredXOrigin, offeredYOffset, availableWidth, availableHeight);
+      this._xScale.range([0, this.width()]);
+      if (this._yScale instanceof Scales.Category) {
+        this._yScale.range([0, this.height()]);
+      } else {
+        this._yScale.range([this.height(), 0]);
+      }
     }
 
     /**
@@ -45,8 +83,8 @@ module Plottable {
           this._xScale.broadcaster.deregisterListener("yDomainAdjustment" + this.getID());
         }
         this._xScale = scale;
-        this._updateXDomainer();
-        scale.broadcaster.registerListener("yDomainAdjustment" + this.getID(), () => this._adjustYDomainOnChangeFromX());
+        this.updateXDomainer();
+        scale.broadcaster.registerListener("yDomainAdjustment" + this.getID(), () => this.adjustYDomainOnChangeFromX());
       }
 
       if (attrToSet === "y" && scale) {
@@ -55,7 +93,7 @@ module Plottable {
         }
         this._yScale = scale;
         this.updateYDomainer();
-        scale.broadcaster.registerListener("xDomainAdjustment" + this.getID(), () => this._adjustXDomainOnChangeFromY());
+        scale.broadcaster.registerListener("xDomainAdjustment" + this.getID(), () => this.adjustXDomainOnChangeFromY());
       }
 
       super.project(attrToSet, accessor, scale);
@@ -75,31 +113,15 @@ module Plottable {
     }
 
     /**
-     * Sets the automatic domain adjustment over visible points for y scale.
+     * Adjusts both domains' extents to show all datasets.
      *
-     * If autoAdjustment is true adjustment is immediately performend.
-     *
-     * @param {boolean} autoAdjustment The new value for the automatic adjustment domain for y scale.
-     * @returns {XYPlot} The calling XYPlot.
+     * This call does not override auto domain adjustment behavior over visible points.
      */
-    public automaticallyAdjustYScaleOverVisiblePoints(autoAdjustment: boolean): XYPlot<X, Y> {
-      this._autoAdjustYScaleDomain = autoAdjustment;
-      this._adjustYDomainOnChangeFromX();
-      return this;
-    }
-
-    /**
-     * Sets the automatic domain adjustment over visible points for x scale.
-     *
-     * If autoAdjustment is true adjustment is immediately performend.
-     *
-     * @param {boolean} autoAdjustment The new value for the automatic adjustment domain for x scale.
-     * @returns {XYPlot} The calling XYPlot.
-     */
-    public automaticallyAdjustXScaleOverVisiblePoints(autoAdjustment: boolean): XYPlot<X, Y>  {
-      this._autoAdjustXScaleDomain = autoAdjustment;
-      this._adjustXDomainOnChangeFromY();
-      return this;
+    public showAllData() {
+      this._xScale.autoDomain();
+      if (!this._autoAdjustYScaleDomain) {
+        this._yScale.autoDomain();
+      }
     }
 
     protected generateAttrToProjector(): AttributeToProjector {
@@ -115,17 +137,23 @@ module Plottable {
       return attrToProjector;
     }
 
-    public computeLayout(offeredXOrigin?: number, offeredYOffset?: number, availableWidth?: number, availableHeight?: number) {
-      super.computeLayout(offeredXOrigin, offeredYOffset, availableWidth, availableHeight);
-      this._xScale.range([0, this.width()]);
-      if (this._yScale instanceof Scales.Category) {
-        this._yScale.range([0, this.height()]);
-      } else {
-        this._yScale.range([this.height(), 0]);
-      }
+    protected normalizeDatasets<A, B>(fromX: boolean): {a: A; b: B}[] {
+      var aAccessor: (d: any, i: number, u: any, m: Plots.PlotMetadata) => A = this.projections[fromX ? "x" : "y"].accessor;
+      var bAccessor: (d: any, i: number, u: any, m: Plots.PlotMetadata) => B = this.projections[fromX ? "y" : "x"].accessor;
+      return Utils.Methods.flatten(this.datasetKeysInOrder.map((key: string) => {
+        var dataset = this.datasetKeys.get(key).dataset;
+        var plotMetadata = this.datasetKeys.get(key).plotMetadata;
+        return dataset.data().map((d, i) => {
+          return { a: aAccessor(d, i, dataset.metadata(), plotMetadata), b: bAccessor(d, i, dataset.metadata(), plotMetadata) };
+        });
+      }));
     }
 
-    protected _updateXDomainer() {
+    protected projectorsReady() {
+      return this.projections["x"] && this.projections["y"];
+    }
+
+    protected updateXDomainer() {
       if (this._xScale instanceof QuantitativeScale) {
         var scale = <QuantitativeScale<any>> this._xScale;
         if (!scale.setByUser) {
@@ -143,32 +171,16 @@ module Plottable {
       }
     }
 
-    /**
-     * Adjusts both domains' extents to show all datasets.
-     *
-     * This call does not override auto domain adjustment behavior over visible points.
-     */
-    public showAllData() {
-      this._xScale.autoDomain();
-      if (!this._autoAdjustYScaleDomain) {
-        this._yScale.autoDomain();
+    private adjustDomainOverVisiblePoints<A, B>(values: {a: A; b: B}[], filterFn: (v: any) => boolean): B[] {
+      var bVals = values.filter(v => filterFn(v.a)).map(v => v.b);
+      var retVal: B[] = [];
+      if (bVals.length !== 0) {
+        retVal = [Utils.Methods.min<B>(bVals, null), Utils.Methods.max<B>(bVals, null)];
       }
+      return retVal;
     }
 
-    private _adjustYDomainOnChangeFromX() {
-      if (!this._projectorsReady()) { return; }
-      if (this._autoAdjustYScaleDomain) {
-        this._adjustDomainToVisiblePoints<X, Y>(this._xScale, this._yScale, true);
-      }
-    }
-    private _adjustXDomainOnChangeFromY() {
-      if (!this._projectorsReady()) { return; }
-      if (this._autoAdjustXScaleDomain) {
-        this._adjustDomainToVisiblePoints<Y, X>(this._yScale, this._xScale, false);
-      }
-    }
-
-    private _adjustDomainToVisiblePoints<A, B>(fromScale: Scale<A, number>,
+    private adjustDomainToVisiblePoints<A, B>(fromScale: Scale<A, number>,
                                              toScale: Scale<B, number>,
                                              fromX: boolean) {
       if (toScale instanceof QuantitativeScale) {
@@ -184,7 +196,7 @@ module Plottable {
           filterFn = (a: A) => fromDomainSet.has(a);
         }
 
-        var adjustedDomain = this._adjustDomainOverVisiblePoints<A, B>(normalizedData, filterFn);
+        var adjustedDomain = this.adjustDomainOverVisiblePoints<A, B>(normalizedData, filterFn);
         if (adjustedDomain.length === 0) {
           return;
         }
@@ -193,29 +205,18 @@ module Plottable {
       }
     }
 
-    protected normalizeDatasets<A, B>(fromX: boolean): {a: A; b: B}[] {
-      var aAccessor: (d: any, i: number, u: any, m: Plots.PlotMetadata) => A = this.projections[fromX ? "x" : "y"].accessor;
-      var bAccessor: (d: any, i: number, u: any, m: Plots.PlotMetadata) => B = this.projections[fromX ? "y" : "x"].accessor;
-      return Utils.Methods.flatten(this.datasetKeysInOrder.map((key: string) => {
-        var dataset = this.datasetKeys.get(key).dataset;
-        var plotMetadata = this.datasetKeys.get(key).plotMetadata;
-        return dataset.data().map((d, i) => {
-          return { a: aAccessor(d, i, dataset.metadata(), plotMetadata), b: bAccessor(d, i, dataset.metadata(), plotMetadata) };
-        });
-      }));
-    }
-
-    private _adjustDomainOverVisiblePoints<A, B>(values: {a: A; b: B}[], filterFn: (v: any) => boolean): B[] {
-      var bVals = values.filter(v => filterFn(v.a)).map(v => v.b);
-      var retVal: B[] = [];
-      if (bVals.length !== 0) {
-        retVal = [Utils.Methods.min<B>(bVals, null), Utils.Methods.max<B>(bVals, null)];
+    private adjustXDomainOnChangeFromY() {
+      if (!this.projectorsReady()) { return; }
+      if (this._autoAdjustXScaleDomain) {
+        this.adjustDomainToVisiblePoints<Y, X>(this._yScale, this._xScale, false);
       }
-      return retVal;
     }
 
-    protected _projectorsReady() {
-      return this.projections["x"] && this.projections["y"];
+    private adjustYDomainOnChangeFromX() {
+      if (!this.projectorsReady()) { return; }
+      if (this._autoAdjustYScaleDomain) {
+        this.adjustDomainToVisiblePoints<X, Y>(this._xScale, this._yScale, true);
+      }
     }
   }
 }

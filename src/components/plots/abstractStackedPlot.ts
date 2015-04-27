@@ -33,7 +33,7 @@ module Plottable {
     }
 
     public onDatasetUpdate() {
-      if (this._projectorsReady()) {
+      if (this.projectorsReady()) {
         this.updateStackOffsets();
       }
       super.onDatasetUpdate();

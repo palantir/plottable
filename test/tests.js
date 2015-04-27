@@ -3038,21 +3038,21 @@ describe("Plots", function () {
             assertCorrectPathSplitting("x=undefined");
             svg.remove();
         });
-        it("_getClosestWithinRange", function () {
+        it("getClosestWithinRange", function () {
             var dataset2 = [
                 { foo: 0, bar: 1 },
                 { foo: 1, bar: 0.95 }
             ];
             linePlot.addDataset(dataset2);
-            var closestData = linePlot._getClosestWithinRange({ x: 500, y: 0 }, 5);
+            var closestData = linePlot.getClosestWithinRange({ x: 500, y: 0 }, 5);
             assert.strictEqual(closestData.closestValue, twoPointData[1], "got closest point from first dataset");
-            closestData = linePlot._getClosestWithinRange({ x: 500, y: 25 }, 5);
+            closestData = linePlot.getClosestWithinRange({ x: 500, y: 25 }, 5);
             assert.strictEqual(closestData.closestValue, dataset2[1], "got closest point from second dataset");
-            closestData = linePlot._getClosestWithinRange({ x: 500, y: 10 }, 5);
+            closestData = linePlot.getClosestWithinRange({ x: 500, y: 10 }, 5);
             assert.isUndefined(closestData.closestValue, "returns nothing if no points are within range");
-            closestData = linePlot._getClosestWithinRange({ x: 500, y: 10 }, 25);
+            closestData = linePlot.getClosestWithinRange({ x: 500, y: 10 }, 25);
             assert.strictEqual(closestData.closestValue, twoPointData[1], "returns the closest point within range");
-            closestData = linePlot._getClosestWithinRange({ x: 500, y: 20 }, 25);
+            closestData = linePlot.getClosestWithinRange({ x: 500, y: 20 }, 25);
             assert.strictEqual(closestData.closestValue, dataset2[1], "returns the closest point within range");
             svg.remove();
         });

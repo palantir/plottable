@@ -6993,7 +6993,7 @@ var Plottable;
              */
             function Pie() {
                 _super.call(this);
-                this._colorScale = new Plottable.Scales.Color();
+                this.colorScale = new Plottable.Scales.Color();
                 this.classed("pie-plot", true);
             }
             Pie.prototype.addDataset = function (keyOrDataset, dataset) {
@@ -7022,7 +7022,7 @@ var Plottable;
                 var attrToProjector = _super.prototype.generateAttrToProjector.call(this);
                 attrToProjector["inner-radius"] = attrToProjector["inner-radius"] || d3.functor(0);
                 attrToProjector["outer-radius"] = attrToProjector["outer-radius"] || d3.functor(Math.min(this.width(), this.height()) / 2);
-                var defaultFillFunction = function (d, i) { return _this._colorScale.scale(String(i)); };
+                var defaultFillFunction = function (d, i) { return _this.colorScale.scale(String(i)); };
                 attrToProjector["fill"] = attrToProjector["fill"] || defaultFillFunction;
                 return attrToProjector;
             };
@@ -7068,11 +7068,47 @@ var Plottable;
             this.classed("xy-plot", true);
             this._xScale = xScale;
             this._yScale = yScale;
-            this._updateXDomainer();
-            xScale.broadcaster.registerListener("yDomainAdjustment" + this.getID(), function () { return _this._adjustYDomainOnChangeFromX(); });
+            this.updateXDomainer();
+            xScale.broadcaster.registerListener("yDomainAdjustment" + this.getID(), function () { return _this.adjustYDomainOnChangeFromX(); });
             this.updateYDomainer();
-            yScale.broadcaster.registerListener("xDomainAdjustment" + this.getID(), function () { return _this._adjustXDomainOnChangeFromY(); });
+            yScale.broadcaster.registerListener("xDomainAdjustment" + this.getID(), function () { return _this.adjustXDomainOnChangeFromY(); });
         }
+        /**
+         * Sets the automatic domain adjustment over visible points for x scale.
+         *
+         * If autoAdjustment is true adjustment is immediately performend.
+         *
+         * @param {boolean} autoAdjustment The new value for the automatic adjustment domain for x scale.
+         * @returns {XYPlot} The calling XYPlot.
+         */
+        XYPlot.prototype.automaticallyAdjustXScaleOverVisiblePoints = function (autoAdjustment) {
+            this._autoAdjustXScaleDomain = autoAdjustment;
+            this.adjustXDomainOnChangeFromY();
+            return this;
+        };
+        /**
+         * Sets the automatic domain adjustment over visible points for y scale.
+         *
+         * If autoAdjustment is true adjustment is immediately performend.
+         *
+         * @param {boolean} autoAdjustment The new value for the automatic adjustment domain for y scale.
+         * @returns {XYPlot} The calling XYPlot.
+         */
+        XYPlot.prototype.automaticallyAdjustYScaleOverVisiblePoints = function (autoAdjustment) {
+            this._autoAdjustYScaleDomain = autoAdjustment;
+            this.adjustYDomainOnChangeFromX();
+            return this;
+        };
+        XYPlot.prototype.computeLayout = function (offeredXOrigin, offeredYOffset, availableWidth, availableHeight) {
+            _super.prototype.computeLayout.call(this, offeredXOrigin, offeredYOffset, availableWidth, availableHeight);
+            this._xScale.range([0, this.width()]);
+            if (this._yScale instanceof Plottable.Scales.Category) {
+                this._yScale.range([0, this.height()]);
+            }
+            else {
+                this._yScale.range([this.height(), 0]);
+            }
+        };
         /**
          * @param {string} attrToSet One of ["x", "y"] which determines the point's
          * x and y position in the Plot.
@@ -7086,8 +7122,8 @@ var Plottable;
                     this._xScale.broadcaster.deregisterListener("yDomainAdjustment" + this.getID());
                 }
                 this._xScale = scale;
-                this._updateXDomainer();
-                scale.broadcaster.registerListener("yDomainAdjustment" + this.getID(), function () { return _this._adjustYDomainOnChangeFromX(); });
+                this.updateXDomainer();
+                scale.broadcaster.registerListener("yDomainAdjustment" + this.getID(), function () { return _this.adjustYDomainOnChangeFromX(); });
             }
             if (attrToSet === "y" && scale) {
                 if (this._yScale) {
@@ -7095,7 +7131,7 @@ var Plottable;
                 }
                 this._yScale = scale;
                 this.updateYDomainer();
-                scale.broadcaster.registerListener("xDomainAdjustment" + this.getID(), function () { return _this._adjustXDomainOnChangeFromY(); });
+                scale.broadcaster.registerListener("xDomainAdjustment" + this.getID(), function () { return _this.adjustXDomainOnChangeFromY(); });
             }
             _super.prototype.project.call(this, attrToSet, accessor, scale);
             return this;
@@ -7111,30 +7147,15 @@ var Plottable;
             return this;
         };
         /**
-         * Sets the automatic domain adjustment over visible points for y scale.
+         * Adjusts both domains' extents to show all datasets.
          *
-         * If autoAdjustment is true adjustment is immediately performend.
-         *
-         * @param {boolean} autoAdjustment The new value for the automatic adjustment domain for y scale.
-         * @returns {XYPlot} The calling XYPlot.
+         * This call does not override auto domain adjustment behavior over visible points.
          */
-        XYPlot.prototype.automaticallyAdjustYScaleOverVisiblePoints = function (autoAdjustment) {
-            this._autoAdjustYScaleDomain = autoAdjustment;
-            this._adjustYDomainOnChangeFromX();
-            return this;
-        };
-        /**
-         * Sets the automatic domain adjustment over visible points for x scale.
-         *
-         * If autoAdjustment is true adjustment is immediately performend.
-         *
-         * @param {boolean} autoAdjustment The new value for the automatic adjustment domain for x scale.
-         * @returns {XYPlot} The calling XYPlot.
-         */
-        XYPlot.prototype.automaticallyAdjustXScaleOverVisiblePoints = function (autoAdjustment) {
-            this._autoAdjustXScaleDomain = autoAdjustment;
-            this._adjustXDomainOnChangeFromY();
-            return this;
+        XYPlot.prototype.showAllData = function () {
+            this._xScale.autoDomain();
+            if (!this._autoAdjustYScaleDomain) {
+                this._yScale.autoDomain();
+            }
         };
         XYPlot.prototype.generateAttrToProjector = function () {
             var attrToProjector = _super.prototype.generateAttrToProjector.call(this);
@@ -7147,17 +7168,22 @@ var Plottable;
             };
             return attrToProjector;
         };
-        XYPlot.prototype.computeLayout = function (offeredXOrigin, offeredYOffset, availableWidth, availableHeight) {
-            _super.prototype.computeLayout.call(this, offeredXOrigin, offeredYOffset, availableWidth, availableHeight);
-            this._xScale.range([0, this.width()]);
-            if (this._yScale instanceof Plottable.Scales.Category) {
-                this._yScale.range([0, this.height()]);
-            }
-            else {
-                this._yScale.range([this.height(), 0]);
-            }
+        XYPlot.prototype.normalizeDatasets = function (fromX) {
+            var _this = this;
+            var aAccessor = this.projections[fromX ? "x" : "y"].accessor;
+            var bAccessor = this.projections[fromX ? "y" : "x"].accessor;
+            return Plottable.Utils.Methods.flatten(this.datasetKeysInOrder.map(function (key) {
+                var dataset = _this.datasetKeys.get(key).dataset;
+                var plotMetadata = _this.datasetKeys.get(key).plotMetadata;
+                return dataset.data().map(function (d, i) {
+                    return { a: aAccessor(d, i, dataset.metadata(), plotMetadata), b: bAccessor(d, i, dataset.metadata(), plotMetadata) };
+                });
+            }));
         };
-        XYPlot.prototype._updateXDomainer = function () {
+        XYPlot.prototype.projectorsReady = function () {
+            return this.projections["x"] && this.projections["y"];
+        };
+        XYPlot.prototype.updateXDomainer = function () {
             if (this._xScale instanceof Plottable.QuantitativeScale) {
                 var scale = this._xScale;
                 if (!scale.setByUser) {
@@ -7173,34 +7199,15 @@ var Plottable;
                 }
             }
         };
-        /**
-         * Adjusts both domains' extents to show all datasets.
-         *
-         * This call does not override auto domain adjustment behavior over visible points.
-         */
-        XYPlot.prototype.showAllData = function () {
-            this._xScale.autoDomain();
-            if (!this._autoAdjustYScaleDomain) {
-                this._yScale.autoDomain();
+        XYPlot.prototype.adjustDomainOverVisiblePoints = function (values, filterFn) {
+            var bVals = values.filter(function (v) { return filterFn(v.a); }).map(function (v) { return v.b; });
+            var retVal = [];
+            if (bVals.length !== 0) {
+                retVal = [Plottable.Utils.Methods.min(bVals, null), Plottable.Utils.Methods.max(bVals, null)];
             }
+            return retVal;
         };
-        XYPlot.prototype._adjustYDomainOnChangeFromX = function () {
-            if (!this._projectorsReady()) {
-                return;
-            }
-            if (this._autoAdjustYScaleDomain) {
-                this._adjustDomainToVisiblePoints(this._xScale, this._yScale, true);
-            }
-        };
-        XYPlot.prototype._adjustXDomainOnChangeFromY = function () {
-            if (!this._projectorsReady()) {
-                return;
-            }
-            if (this._autoAdjustXScaleDomain) {
-                this._adjustDomainToVisiblePoints(this._yScale, this._xScale, false);
-            }
-        };
-        XYPlot.prototype._adjustDomainToVisiblePoints = function (fromScale, toScale, fromX) {
+        XYPlot.prototype.adjustDomainToVisiblePoints = function (fromScale, toScale, fromX) {
             if (toScale instanceof Plottable.QuantitativeScale) {
                 var toScaleQ = toScale;
                 var normalizedData = this.normalizeDatasets(fromX);
@@ -7213,7 +7220,7 @@ var Plottable;
                     var fromDomainSet = d3.set(fromScale.domain());
                     filterFn = function (a) { return fromDomainSet.has(a); };
                 }
-                var adjustedDomain = this._adjustDomainOverVisiblePoints(normalizedData, filterFn);
+                var adjustedDomain = this.adjustDomainOverVisiblePoints(normalizedData, filterFn);
                 if (adjustedDomain.length === 0) {
                     return;
                 }
@@ -7221,28 +7228,21 @@ var Plottable;
                 toScaleQ.domain(adjustedDomain);
             }
         };
-        XYPlot.prototype.normalizeDatasets = function (fromX) {
-            var _this = this;
-            var aAccessor = this.projections[fromX ? "x" : "y"].accessor;
-            var bAccessor = this.projections[fromX ? "y" : "x"].accessor;
-            return Plottable.Utils.Methods.flatten(this.datasetKeysInOrder.map(function (key) {
-                var dataset = _this.datasetKeys.get(key).dataset;
-                var plotMetadata = _this.datasetKeys.get(key).plotMetadata;
-                return dataset.data().map(function (d, i) {
-                    return { a: aAccessor(d, i, dataset.metadata(), plotMetadata), b: bAccessor(d, i, dataset.metadata(), plotMetadata) };
-                });
-            }));
-        };
-        XYPlot.prototype._adjustDomainOverVisiblePoints = function (values, filterFn) {
-            var bVals = values.filter(function (v) { return filterFn(v.a); }).map(function (v) { return v.b; });
-            var retVal = [];
-            if (bVals.length !== 0) {
-                retVal = [Plottable.Utils.Methods.min(bVals, null), Plottable.Utils.Methods.max(bVals, null)];
+        XYPlot.prototype.adjustXDomainOnChangeFromY = function () {
+            if (!this.projectorsReady()) {
+                return;
             }
-            return retVal;
+            if (this._autoAdjustXScaleDomain) {
+                this.adjustDomainToVisiblePoints(this._yScale, this._xScale, false);
+            }
         };
-        XYPlot.prototype._projectorsReady = function () {
-            return this.projections["x"] && this.projections["y"];
+        XYPlot.prototype.adjustYDomainOnChangeFromX = function () {
+            if (!this.projectorsReady()) {
+                return;
+            }
+            if (this._autoAdjustYScaleDomain) {
+                this.adjustDomainToVisiblePoints(this._xScale, this._yScale, true);
+            }
         };
         return XYPlot;
     })(Plottable.Plot);
@@ -7782,7 +7782,7 @@ var Plottable;
                     this._updateDomainer(this._xScale);
                 }
                 else {
-                    _super.prototype._updateXDomainer.call(this);
+                    _super.prototype.updateXDomainer.call(this);
                 }
             };
             Bar.prototype.additionalPaint = function (time) {
@@ -8052,122 +8052,12 @@ var Plottable;
              */
             function Line(xScale, yScale) {
                 _super.call(this, xScale, yScale);
-                this._hoverDetectionRadius = 15;
+                this.hoverDetectionRadius = 15;
                 this.classed("line-plot", true);
                 this.animator("reset", new Plottable.Animators.Null());
                 this.animator("main", new Plottable.Animators.Base().duration(600).easing("exp-in-out"));
-                this._defaultStrokeColor = new Plottable.Scales.Color().range()[0];
+                this.defaultStrokeColor = new Plottable.Scales.Color().range()[0];
             }
-            Line.prototype.setup = function () {
-                _super.prototype.setup.call(this);
-                this._hoverTarget = this.foreground().append("circle").classed("hover-target", true).attr("r", this._hoverDetectionRadius).style("visibility", "hidden");
-            };
-            Line.prototype._rejectNullsAndNaNs = function (d, i, userMetdata, plotMetadata, accessor) {
-                var value = accessor(d, i, userMetdata, plotMetadata);
-                return value != null && value === value;
-            };
-            Line.prototype.getDrawer = function (key) {
-                return new Plottable.Drawers.Line(key);
-            };
-            Line.prototype._getResetYFunction = function () {
-                // gets the y-value generator for the animation start point
-                var yDomain = this._yScale.domain();
-                var domainMax = Math.max(yDomain[0], yDomain[1]);
-                var domainMin = Math.min(yDomain[0], yDomain[1]);
-                // start from zero, or the closest domain value to zero
-                // avoids lines zooming on from offscreen.
-                var startValue = (domainMax < 0 && domainMax) || (domainMin > 0 && domainMin) || 0;
-                var scaledStartValue = this._yScale.scale(startValue);
-                return function (d, i, u, m) { return scaledStartValue; };
-            };
-            Line.prototype.generateDrawSteps = function () {
-                var drawSteps = [];
-                if (this.dataChanged && this.animated) {
-                    var attrToProjector = this.generateAttrToProjector();
-                    attrToProjector["y"] = this._getResetYFunction();
-                    drawSteps.push({ attrToProjector: attrToProjector, animator: this.getAnimator("reset") });
-                }
-                drawSteps.push({ attrToProjector: this.generateAttrToProjector(), animator: this.getAnimator("main") });
-                return drawSteps;
-            };
-            Line.prototype.generateAttrToProjector = function () {
-                var _this = this;
-                var attrToProjector = _super.prototype.generateAttrToProjector.call(this);
-                var wholeDatumAttributes = this.wholeDatumAttributes();
-                var isSingleDatumAttr = function (attr) { return wholeDatumAttributes.indexOf(attr) === -1; };
-                var singleDatumAttributes = d3.keys(attrToProjector).filter(isSingleDatumAttr);
-                singleDatumAttributes.forEach(function (attribute) {
-                    var projector = attrToProjector[attribute];
-                    attrToProjector[attribute] = function (data, i, u, m) { return data.length > 0 ? projector(data[0], i, u, m) : null; };
-                });
-                var xFunction = attrToProjector["x"];
-                var yFunction = attrToProjector["y"];
-                attrToProjector["defined"] = function (d, i, u, m) { return _this._rejectNullsAndNaNs(d, i, u, m, xFunction) && _this._rejectNullsAndNaNs(d, i, u, m, yFunction); };
-                attrToProjector["stroke"] = attrToProjector["stroke"] || d3.functor(this._defaultStrokeColor);
-                attrToProjector["stroke-width"] = attrToProjector["stroke-width"] || d3.functor("2px");
-                return attrToProjector;
-            };
-            Line.prototype.wholeDatumAttributes = function () {
-                return ["x", "y"];
-            };
-            Line.prototype._getClosestWithinRange = function (p, range) {
-                var _this = this;
-                var attrToProjector = this.generateAttrToProjector();
-                var xProjector = attrToProjector["x"];
-                var yProjector = attrToProjector["y"];
-                var getDistSq = function (d, i, userMetdata, plotMetadata) {
-                    var dx = +xProjector(d, i, userMetdata, plotMetadata) - p.x;
-                    var dy = +yProjector(d, i, userMetdata, plotMetadata) - p.y;
-                    return (dx * dx + dy * dy);
-                };
-                var closestOverall;
-                var closestPoint;
-                var closestDistSq = range * range;
-                this.datasetKeysInOrder.forEach(function (key) {
-                    var dataset = _this.datasetKeys.get(key).dataset;
-                    var plotMetadata = _this.datasetKeys.get(key).plotMetadata;
-                    dataset.data().forEach(function (d, i) {
-                        var distSq = getDistSq(d, i, dataset.metadata(), plotMetadata);
-                        if (distSq < closestDistSq) {
-                            closestOverall = d;
-                            closestPoint = {
-                                x: xProjector(d, i, dataset.metadata(), plotMetadata),
-                                y: yProjector(d, i, dataset.metadata(), plotMetadata)
-                            };
-                            closestDistSq = distSq;
-                        }
-                    });
-                });
-                return {
-                    closestValue: closestOverall,
-                    closestPoint: closestPoint
-                };
-            };
-            Line.prototype._getAllPlotData = function (datasetKeys) {
-                var _this = this;
-                var data = [];
-                var pixelPoints = [];
-                var allElements = [];
-                datasetKeys.forEach(function (datasetKey) {
-                    var plotDatasetKey = _this.datasetKeys.get(datasetKey);
-                    if (plotDatasetKey == null) {
-                        return;
-                    }
-                    var drawer = plotDatasetKey.drawer;
-                    plotDatasetKey.dataset.data().forEach(function (datum, index) {
-                        var pixelPoint = drawer._getPixelPoint(datum, index);
-                        if (pixelPoint.x !== pixelPoint.x || pixelPoint.y !== pixelPoint.y) {
-                            return;
-                        }
-                        data.push(datum);
-                        pixelPoints.push(pixelPoint);
-                    });
-                    if (plotDatasetKey.dataset.data().length > 0) {
-                        allElements.push(drawer._getSelection(0).node());
-                    }
-                });
-                return { data: data, pixelPoints: pixelPoints, selection: d3.selectAll(allElements) };
-            };
             /**
              * Retrieves the closest PlotData to queryPoint.
              *
@@ -8223,7 +8113,7 @@ var Plottable;
                 // no-op
             };
             Line.prototype.doHover = function (p) {
-                var closestInfo = this._getClosestWithinRange(p, this._hoverDetectionRadius);
+                var closestInfo = this.getClosestWithinRange(p, this.hoverDetectionRadius);
                 var closestValue = closestInfo.closestValue;
                 if (closestValue === undefined) {
                     return {
@@ -8233,15 +8123,126 @@ var Plottable;
                     };
                 }
                 var closestPoint = closestInfo.closestPoint;
-                this._hoverTarget.attr({
+                this.hoverTarget.attr({
                     "cx": closestInfo.closestPoint.x,
                     "cy": closestInfo.closestPoint.y
                 });
                 return {
                     data: [closestValue],
                     pixelPositions: [closestPoint],
-                    selection: this._hoverTarget
+                    selection: this.hoverTarget
                 };
+            };
+            //===== /Hover logic =====
+            Line.prototype.generateDrawSteps = function () {
+                var drawSteps = [];
+                if (this.dataChanged && this.animated) {
+                    var attrToProjector = this.generateAttrToProjector();
+                    attrToProjector["y"] = this.getResetYFunction();
+                    drawSteps.push({ attrToProjector: attrToProjector, animator: this.getAnimator("reset") });
+                }
+                drawSteps.push({ attrToProjector: this.generateAttrToProjector(), animator: this.getAnimator("main") });
+                return drawSteps;
+            };
+            Line.prototype.generateAttrToProjector = function () {
+                var _this = this;
+                var attrToProjector = _super.prototype.generateAttrToProjector.call(this);
+                var wholeDatumAttributes = this.wholeDatumAttributes();
+                var isSingleDatumAttr = function (attr) { return wholeDatumAttributes.indexOf(attr) === -1; };
+                var singleDatumAttributes = d3.keys(attrToProjector).filter(isSingleDatumAttr);
+                singleDatumAttributes.forEach(function (attribute) {
+                    var projector = attrToProjector[attribute];
+                    attrToProjector[attribute] = function (data, i, u, m) { return data.length > 0 ? projector(data[0], i, u, m) : null; };
+                });
+                var xFunction = attrToProjector["x"];
+                var yFunction = attrToProjector["y"];
+                attrToProjector["defined"] = function (d, i, u, m) { return _this.rejectNullsAndNaNs(d, i, u, m, xFunction) && _this.rejectNullsAndNaNs(d, i, u, m, yFunction); };
+                attrToProjector["stroke"] = attrToProjector["stroke"] || d3.functor(this.defaultStrokeColor);
+                attrToProjector["stroke-width"] = attrToProjector["stroke-width"] || d3.functor("2px");
+                return attrToProjector;
+            };
+            Line.prototype._getAllPlotData = function (datasetKeys) {
+                var _this = this;
+                var data = [];
+                var pixelPoints = [];
+                var allElements = [];
+                datasetKeys.forEach(function (datasetKey) {
+                    var plotDatasetKey = _this.datasetKeys.get(datasetKey);
+                    if (plotDatasetKey == null) {
+                        return;
+                    }
+                    var drawer = plotDatasetKey.drawer;
+                    plotDatasetKey.dataset.data().forEach(function (datum, index) {
+                        var pixelPoint = drawer._getPixelPoint(datum, index);
+                        if (pixelPoint.x !== pixelPoint.x || pixelPoint.y !== pixelPoint.y) {
+                            return;
+                        }
+                        data.push(datum);
+                        pixelPoints.push(pixelPoint);
+                    });
+                    if (plotDatasetKey.dataset.data().length > 0) {
+                        allElements.push(drawer._getSelection(0).node());
+                    }
+                });
+                return { data: data, pixelPoints: pixelPoints, selection: d3.selectAll(allElements) };
+            };
+            Line.prototype.getClosestWithinRange = function (p, range) {
+                var _this = this;
+                var attrToProjector = this.generateAttrToProjector();
+                var xProjector = attrToProjector["x"];
+                var yProjector = attrToProjector["y"];
+                var getDistSq = function (d, i, userMetdata, plotMetadata) {
+                    var dx = +xProjector(d, i, userMetdata, plotMetadata) - p.x;
+                    var dy = +yProjector(d, i, userMetdata, plotMetadata) - p.y;
+                    return (dx * dx + dy * dy);
+                };
+                var closestOverall;
+                var closestPoint;
+                var closestDistSq = range * range;
+                this.datasetKeysInOrder.forEach(function (key) {
+                    var dataset = _this.datasetKeys.get(key).dataset;
+                    var plotMetadata = _this.datasetKeys.get(key).plotMetadata;
+                    dataset.data().forEach(function (d, i) {
+                        var distSq = getDistSq(d, i, dataset.metadata(), plotMetadata);
+                        if (distSq < closestDistSq) {
+                            closestOverall = d;
+                            closestPoint = {
+                                x: xProjector(d, i, dataset.metadata(), plotMetadata),
+                                y: yProjector(d, i, dataset.metadata(), plotMetadata)
+                            };
+                            closestDistSq = distSq;
+                        }
+                    });
+                });
+                return {
+                    closestValue: closestOverall,
+                    closestPoint: closestPoint
+                };
+            };
+            Line.prototype.getDrawer = function (key) {
+                return new Plottable.Drawers.Line(key);
+            };
+            Line.prototype.getResetYFunction = function () {
+                // gets the y-value generator for the animation start point
+                var yDomain = this._yScale.domain();
+                var domainMax = Math.max(yDomain[0], yDomain[1]);
+                var domainMin = Math.min(yDomain[0], yDomain[1]);
+                // start from zero, or the closest domain value to zero
+                // avoids lines zooming on from offscreen.
+                var startValue = (domainMax < 0 && domainMax) || (domainMin > 0 && domainMin) || 0;
+                var scaledStartValue = this._yScale.scale(startValue);
+                return function (d, i, u, m) { return scaledStartValue; };
+            };
+            Line.prototype.rejectNullsAndNaNs = function (d, i, userMetdata, plotMetadata, accessor) {
+                var value = accessor(d, i, userMetdata, plotMetadata);
+                return value != null && value === value;
+            };
+            Line.prototype.setup = function () {
+                _super.prototype.setup.call(this);
+                this.hoverTarget = this.foreground().append("circle").classed("hover-target", true).attr("r", this.hoverDetectionRadius).style("visibility", "hidden");
+            };
+            Line.prototype.wholeDatumAttributes = function () {
+                return ["x", "y"];
             };
             return Line;
         })(Plottable.XYPlot);
@@ -8454,7 +8455,7 @@ var Plottable;
             return this;
         };
         Stacked.prototype.onDatasetUpdate = function () {
-            if (this._projectorsReady()) {
+            if (this.projectorsReady()) {
                 this.updateStackOffsets();
             }
             _super.prototype.onDatasetUpdate.call(this);
@@ -8689,7 +8690,7 @@ var Plottable;
             };
             StackedArea.prototype.updateStackOffsets = function () {
                 var _this = this;
-                if (!this._projectorsReady()) {
+                if (!this.projectorsReady()) {
                     return;
                 }
                 var domainKeys = this.getDomainKeys();

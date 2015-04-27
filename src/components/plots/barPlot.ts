@@ -303,7 +303,7 @@ export module Plots {
       if (!this._isVertical) {
         this._updateDomainer(this._xScale);
       } else {
-        super._updateXDomainer();
+        super.updateXDomainer();
       }
     }
 
