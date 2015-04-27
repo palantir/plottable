@@ -203,7 +203,7 @@ module Plottable {
      */
     public tickGenerator(generator: Scales.TickGenerators.TickGenerator<D>): QuantitativeScale<D>;
     public tickGenerator(generator?: Scales.TickGenerators.TickGenerator<D>): any {
-      if(generator == null) {
+      if (generator == null) {
         return this._tickGenerator;
       } else {
         this._tickGenerator = generator;

@@ -162,7 +162,7 @@ module Plottable {
         y2: 0
       };
 
-      switch(this._orientation) {
+      switch (this._orientation) {
         case "bottom":
           baselineAttrHash.x2 = this.width();
           break;
@@ -206,7 +206,7 @@ module Plottable {
 
       var tickLength = isEndTickMark ? this._endTickLength : this._tickLength;
 
-      switch(this._orientation) {
+      switch (this._orientation) {
         case "bottom":
           tickMarkAttrHash["y2"] = tickLength;
           break;
@@ -236,7 +236,7 @@ module Plottable {
     }
 
     protected _setDefaultAlignment() {
-      switch(this._orientation) {
+      switch (this._orientation) {
         case "bottom":
           this.yAlign("top");
           break;

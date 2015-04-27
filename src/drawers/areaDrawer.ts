@@ -43,7 +43,7 @@ export module Drawers {
                        y0Function: AppliedProjector,
                        y1Function: AppliedProjector,
                        definedFunction: AppliedProjector) {
-      if(!definedFunction) {
+      if (!definedFunction) {
         definedFunction = () => true;
       }
 
