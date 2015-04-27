@@ -1759,6 +1759,7 @@ declare module Plottable {
          * @returns {Component} The calling component.
          */
         renderTo(element: String | D3.Selection): Component;
+        _requestedSpace(availableWidth: number, availableHeight: number): _SpaceRequest;
         useLastCalculatedLayout(): boolean;
         useLastCalculatedLayout(useLast: boolean): Component;
         /**
