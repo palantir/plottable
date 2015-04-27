@@ -551,7 +551,7 @@ describe("BaseAxis", function () {
         scale.range([0, SVG_WIDTH]);
         var baseAxis = new Plottable.Axis(scale, "bottom");
         var tickValues = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-        baseAxis._getTickValues = function () {
+        baseAxis.getTickValues = function () {
             return tickValues;
         };
         baseAxis.renderTo(svg);
@@ -580,7 +580,7 @@ describe("BaseAxis", function () {
         scale.range([0, SVG_HEIGHT]);
         var baseAxis = new Plottable.Axis(scale, "left");
         var tickValues = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-        baseAxis._getTickValues = function () {
+        baseAxis.getTickValues = function () {
             return tickValues;
         };
         baseAxis.renderTo(svg);
@@ -609,7 +609,7 @@ describe("BaseAxis", function () {
         scale.range([0, SVG_WIDTH]);
         var baseAxis = new Plottable.Axis(scale, "bottom");
         var tickValues = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-        baseAxis._getTickValues = function () {
+        baseAxis.getTickValues = function () {
             return tickValues;
         };
         baseAxis.renderTo(svg);
@@ -632,7 +632,7 @@ describe("BaseAxis", function () {
         scale.range([0, SVG_WIDTH]);
         var baseAxis = new Plottable.Axis(scale, "bottom");
         var tickValues = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-        baseAxis._getTickValues = function () { return tickValues; };
+        baseAxis.getTickValues = function () { return tickValues; };
         baseAxis.renderTo(svg);
         var firstTickMark = svg.selectAll("." + Plottable.Axis.END_TICK_MARK_CLASS);
         assert.strictEqual(firstTickMark.attr("x1"), "0");
@@ -725,7 +725,7 @@ describe("TimeAxis", function () {
                     }
                 }
             }
-            axis._tierLabelContainers.forEach(checkLabelsForContainer);
+            axis.tierLabelContainers.forEach(checkLabelsForContainer);
         }
         // 100 year span
         checkDomain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2100, 0, 1, 0, 0, 0, 0)]);
@@ -760,7 +760,7 @@ describe("TimeAxis", function () {
         scale.domain([twoMinutesBefore, now]);
         scale.range([0, 800]);
         axis.renderTo(svg);
-        var configs = newPossibleConfigurations[axis._mostPreciseConfigIndex];
+        var configs = newPossibleConfigurations[axis.mostPreciseConfigIndex];
         assert.deepEqual(configs[0].interval, d3.time.minute, "axis used new time unit");
         assert.deepEqual(configs[0].step, 4, "axis used new step");
         svg.remove();

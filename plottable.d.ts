@@ -2028,8 +2028,8 @@ declare module Plottable {
          * @returns {Axis} The calling Axis.
          */
         tickLength(length: number): Axis;
-        protected _computeHeight(): number;
-        protected _computeWidth(): number;
+        protected computeHeight(): number;
+        protected computeWidth(): number;
         protected _generateBaselineAttrHash(): {
             x1: number;
             y1: number;
@@ -2042,10 +2042,10 @@ declare module Plottable {
             x2: any;
             y2: any;
         };
-        protected _getTickValues(): any[];
+        protected getTickValues(): any[];
         protected _isHorizontal(): boolean;
         protected _maxLabelTickLength(): number;
-        protected _rescale(): void;
+        protected rescale(): void;
         protected setup(): void;
         protected _setDefaultAlignment(): void;
     }
@@ -2087,8 +2087,6 @@ declare module Plottable {
              * @param {string} orientation The orientation of the Axis (top/bottom)
              */
             constructor(scale: Scales.Time, orientation: string);
-            tierLabelPositions(): string[];
-            tierLabelPositions(newPositions: string[]): Time;
             /**
              * Gets the possible Axis configurations.
              *
@@ -2104,16 +2102,18 @@ declare module Plottable {
              * @returns {Axis.Time} The calling Axis.Time.
              */
             axisConfigurations(configurations: TimeAxisConfiguration[]): Time;
+            computeHeight(): number;
+            doRender(): Time;
             orientation(): string;
             orientation(orientation: string): Time;
-            _computeHeight(): number;
+            tierLabelPositions(): string[];
+            tierLabelPositions(newPositions: string[]): Time;
             protected getSize(availableWidth: number, availableHeight: number): {
                 width: number;
                 height: number;
             };
             protected setup(): void;
-            protected _getTickValues(): any[];
-            doRender(): Time;
+            protected getTickValues(): any[];
         }
     }
 }
@@ -2133,28 +2133,9 @@ declare module Plottable {
              * @param {Formatter} formatter A function to format tick labels (default Formatters.general()).
              */
             constructor(scale: QuantitativeScale<number>, orientation: string, formatter?: (d: any) => string);
-            protected setup(): void;
-            _computeWidth(): number;
-            _computeHeight(): number;
-            protected _getTickValues(): any[];
-            protected _rescale(): void;
+            computeWidth(): number;
+            computeHeight(): number;
             doRender(): void;
-            /**
-             * Gets the tick label position relative to the tick marks.
-             *
-             * @returns {string} The current tick label position.
-             */
-            tickLabelPosition(): string;
-            /**
-             * Sets the tick label position relative to the tick marks.
-             *
-             * @param {string} position If provided, the relative position of the tick label.
-             *                          [top/center/bottom] for a vertical NumericAxis,
-             *                          [left/center/right] for a horizontal NumericAxis.
-             *                          Defaults to center.
-             * @returns {Numeric} The calling Axis.Numeric.
-             */
-            tickLabelPosition(position: string): Numeric;
             /**
              * Gets whether or not the tick labels at the end of the graph are
              * displayed when partially cut off.
@@ -2179,6 +2160,25 @@ declare module Plottable {
              * @returns {Numeric} The calling NumericAxis.
              */
             showEndTickLabel(orientation: string, show: boolean): Numeric;
+            /**
+             * Gets the tick label position relative to the tick marks.
+             *
+             * @returns {string} The current tick label position.
+             */
+            tickLabelPosition(): string;
+            /**
+             * Sets the tick label position relative to the tick marks.
+             *
+             * @param {string} position If provided, the relative position of the tick label.
+             *                          [top/center/bottom] for a vertical NumericAxis,
+             *                          [left/center/right] for a horizontal NumericAxis.
+             *                          Defaults to center.
+             * @returns {Numeric} The calling Axis.Numeric.
+             */
+            tickLabelPosition(position: string): Numeric;
+            protected getTickValues(): any[];
+            protected rescale(): void;
+            protected setup(): void;
         }
     }
 }
@@ -2200,10 +2200,9 @@ declare module Plottable {
              * @param {Formatter} formatter The Formatter for the Axis (default Formatters.identity())
              */
             constructor(scale: Scales.Category, orientation?: string, formatter?: (d: any) => string);
-            protected setup(): void;
-            protected _rescale(): void;
+            computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;
+            doRender(): Category;
             requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
-            protected _getTickValues(): string[];
             /**
              * Sets the angle for the tick labels. Right now vertical-left (-90), horizontal (0), and vertical-right (90) are the only options.
              * @param {number} angle The angle for the ticks
@@ -2218,8 +2217,9 @@ declare module Plottable {
              * @returns {number} the tick label angle
              */
             tickLabelAngle(): number;
-            doRender(): Category;
-            computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;
+            protected getTickValues(): string[];
+            protected rescale(): void;
+            protected setup(): void;
         }
     }
 }

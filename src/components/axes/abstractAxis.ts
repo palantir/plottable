@@ -56,7 +56,7 @@ module Plottable {
 
       this.formatter(formatter);
 
-      this.scale.broadcaster.registerListener(this, () => this._rescale());
+      this.scale.broadcaster.registerListener(this, () => this.rescale());
     }
 
     public computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number) {
@@ -69,7 +69,7 @@ module Plottable {
     }
 
     public doRender() {
-      var tickMarkValues = this._getTickValues();
+      var tickMarkValues = this.getTickValues();
       var tickMarks = this.tickMarkContainer.selectAll("." + Axis.TICK_MARK_CLASS).data(tickMarkValues);
       tickMarks.enter().append("line").classed(Axis.TICK_MARK_CLASS, true);
       tickMarks.attr(this._generateTickMarkAttrHash());
@@ -217,12 +217,12 @@ module Plottable {
 
       if (this._isHorizontal()) {
         if (this.computedHeight == null) {
-          this._computeHeight();
+          this.computeHeight();
         }
         requestedHeight = this.computedHeight + this._gutter;
       } else { // vertical
         if (this.computedWidth == null) {
-          this._computeWidth();
+          this.computeWidth();
         }
         requestedWidth = this.computedWidth + this._gutter;
       }
@@ -319,13 +319,13 @@ module Plottable {
 
 
 
-    protected _computeHeight() {
+    protected computeHeight() {
       // to be overridden by subclass logic
       this.computedHeight = this._maxLabelTickLength();
       return this.computedHeight;
     }
 
-    protected _computeWidth() {
+    protected computeWidth() {
       // to be overridden by subclass logic
       this.computedWidth = this._maxLabelTickLength();
       return this.computedWidth;
@@ -412,7 +412,7 @@ module Plottable {
      * Function for generating tick values in data-space (as opposed to pixel values).
      * To be implemented by subclasses.
      */
-    protected _getTickValues(): any[] {
+    protected getTickValues(): any[] {
       return [];
     }
 
@@ -428,7 +428,7 @@ module Plottable {
       }
     }
 
-    protected _rescale() {
+    protected rescale() {
       // default implementation; subclasses may call _invalidateLayout() here
       this.render();
     }
