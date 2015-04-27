@@ -4422,7 +4422,7 @@ describe("Plots", function () {
             assertPlotDataEqual(expected, closest, "it ignores off-plot data points");
             svg.remove();
         });
-        it("_getClosestStruckPoint()", function () {
+        it("getClosestStruckPoint()", function () {
             var svg = generateSVG(400, 400);
             var xScale = new Plottable.Scales.Linear();
             var yScale = new Plottable.Scales.Linear();
@@ -4438,13 +4438,13 @@ describe("Plots", function () {
             plot.addDataset(data1);
             plot.project("x", "x").project("y", "y").project("size", "size");
             plot.renderTo(svg);
-            var twoOverlappingCirclesResult = plot._getClosestStruckPoint({ x: 85, y: 200 }, 10);
+            var twoOverlappingCirclesResult = plot.getClosestStruckPoint({ x: 85, y: 200 }, 10);
             assert.strictEqual(twoOverlappingCirclesResult.data[0], data1[0], "returns closest circle among circles that the test point touches");
-            var overlapAndCloseToPointResult = plot._getClosestStruckPoint({ x: 118, y: 200 }, 10);
+            var overlapAndCloseToPointResult = plot.getClosestStruckPoint({ x: 118, y: 200 }, 10);
             assert.strictEqual(overlapAndCloseToPointResult.data[0], data1[1], "returns closest circle that test point touches, even if non-touched circles are closer");
-            var twoPointsInRangeResult = plot._getClosestStruckPoint({ x: 130, y: 200 }, 10);
+            var twoPointsInRangeResult = plot.getClosestStruckPoint({ x: 130, y: 200 }, 10);
             assert.strictEqual(twoPointsInRangeResult.data[0], data1[2], "returns closest circle within range if test point does not touch any circles");
-            var farFromAnyPointsResult = plot._getClosestStruckPoint({ x: 400, y: 400 }, 10);
+            var farFromAnyPointsResult = plot.getClosestStruckPoint({ x: 400, y: 400 }, 10);
             assert.isNull(farFromAnyPointsResult.data, "returns no data if no circle were within range and test point does not touch any circles");
             svg.remove();
         });

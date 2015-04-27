@@ -3,8 +3,8 @@
 module Plottable {
 export module Plots {
   export class Scatter<X, Y> extends XYPlot<X, Y> implements Interactions.Hoverable {
-    private _closeDetectionRadius = 5;
-    private _defaultFillColor: string;
+    private closeDetectionRadius = 5;
+    private defaultFillColor: string;
 
     /**
      * Constructs a ScatterPlot.
@@ -16,7 +16,7 @@ export module Plots {
     constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>) {
       super(xScale, yScale);
       this.classed("scatter-plot", true);
-      this._defaultFillColor = new Scales.Color().range()[0];
+      this.defaultFillColor = new Scales.Color().range()[0];
 
       this.animator("symbols-reset", new Animators.Null());
       this.animator("symbols", new Animators.Base()
@@ -24,15 +24,25 @@ export module Plots {
                                            .delay(5));
     }
 
-    protected getDrawer(key: string) {
-      return new Plottable.Drawers.Symbol(key);
+    //===== Hover logic =====
+    public doHover(p: Point): Interactions.HoverData {
+      return this.getClosestStruckPoint(p, this.closeDetectionRadius);
     }
+
+    public hoverOutComponent(p: Point) {
+      // no-op
+    }
+ 
+    public hoverOverComponent(p: Point) {
+      // no-op
+    }
+    //===== /Hover logic =====
 
     protected generateAttrToProjector() {
       var attrToProjector = super.generateAttrToProjector();
       attrToProjector["size"] = attrToProjector["size"] || d3.functor(6);
       attrToProjector["opacity"] = attrToProjector["opacity"] || d3.functor(0.6);
-      attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this._defaultFillColor);
+      attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this.defaultFillColor);
       attrToProjector["symbol"] = attrToProjector["symbol"] || (() => SymbolFactories.circle());
 
       return attrToProjector;
@@ -50,7 +60,7 @@ export module Plots {
       return drawSteps;
     }
 
-    protected _getClosestStruckPoint(p: Point, range: number): Interactions.HoverData {
+    protected getClosestStruckPoint(p: Point, range: number): Interactions.HoverData {
       var attrToProjector = this.generateAttrToProjector();
       var xProjector = attrToProjector["x"];
       var yProjector = attrToProjector["y"];
@@ -115,6 +125,10 @@ export module Plots {
       };
     }
 
+    protected getDrawer(key: string) {
+      return new Plottable.Drawers.Symbol(key);
+    }
+
     protected isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean {
       var xRange = { min: 0, max: this.width() };
       var yRange = { min: 0, max: this.height() };
@@ -130,20 +144,6 @@ export module Plots {
 
       return Plottable.Utils.Methods.intersectsBBox(xRange, yRange, translatedBbox);
     }
-
-    //===== Hover logic =====
-    public hoverOverComponent(p: Point) {
-      // no-op
-    }
-
-    public hoverOutComponent(p: Point) {
-      // no-op
-    }
-
-    public doHover(p: Point): Interactions.HoverData {
-      return this._getClosestStruckPoint(p, this._closeDetectionRadius);
-    }
-    //===== /Hover logic =====
   }
 }
 }

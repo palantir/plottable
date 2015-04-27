@@ -7333,20 +7333,28 @@ var Plottable;
              */
             function Scatter(xScale, yScale) {
                 _super.call(this, xScale, yScale);
-                this._closeDetectionRadius = 5;
+                this.closeDetectionRadius = 5;
                 this.classed("scatter-plot", true);
-                this._defaultFillColor = new Plottable.Scales.Color().range()[0];
+                this.defaultFillColor = new Plottable.Scales.Color().range()[0];
                 this.animator("symbols-reset", new Plottable.Animators.Null());
                 this.animator("symbols", new Plottable.Animators.Base().duration(250).delay(5));
             }
-            Scatter.prototype.getDrawer = function (key) {
-                return new Plottable.Drawers.Symbol(key);
+            //===== Hover logic =====
+            Scatter.prototype.doHover = function (p) {
+                return this.getClosestStruckPoint(p, this.closeDetectionRadius);
             };
+            Scatter.prototype.hoverOutComponent = function (p) {
+                // no-op
+            };
+            Scatter.prototype.hoverOverComponent = function (p) {
+                // no-op
+            };
+            //===== /Hover logic =====
             Scatter.prototype.generateAttrToProjector = function () {
                 var attrToProjector = _super.prototype.generateAttrToProjector.call(this);
                 attrToProjector["size"] = attrToProjector["size"] || d3.functor(6);
                 attrToProjector["opacity"] = attrToProjector["opacity"] || d3.functor(0.6);
-                attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this._defaultFillColor);
+                attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this.defaultFillColor);
                 attrToProjector["symbol"] = attrToProjector["symbol"] || (function () { return Plottable.SymbolFactories.circle(); });
                 return attrToProjector;
             };
@@ -7360,7 +7368,7 @@ var Plottable;
                 drawSteps.push({ attrToProjector: this.generateAttrToProjector(), animator: this.getAnimator("symbols") });
                 return drawSteps;
             };
-            Scatter.prototype._getClosestStruckPoint = function (p, range) {
+            Scatter.prototype.getClosestStruckPoint = function (p, range) {
                 var _this = this;
                 var attrToProjector = this.generateAttrToProjector();
                 var xProjector = attrToProjector["x"];
@@ -7421,6 +7429,9 @@ var Plottable;
                     data: closestData
                 };
             };
+            Scatter.prototype.getDrawer = function (key) {
+                return new Plottable.Drawers.Symbol(key);
+            };
             Scatter.prototype.isVisibleOnPlot = function (datum, pixelPoint, selection) {
                 var xRange = { min: 0, max: this.width() };
                 var yRange = { min: 0, max: this.height() };
@@ -7433,16 +7444,6 @@ var Plottable;
                     height: bbox.height
                 };
                 return Plottable.Utils.Methods.intersectsBBox(xRange, yRange, translatedBbox);
-            };
-            //===== Hover logic =====
-            Scatter.prototype.hoverOverComponent = function (p) {
-                // no-op
-            };
-            Scatter.prototype.hoverOutComponent = function (p) {
-                // no-op
-            };
-            Scatter.prototype.doHover = function (p) {
-                return this._getClosestStruckPoint(p, this._closeDetectionRadius);
             };
             return Scatter;
         })(Plottable.XYPlot);

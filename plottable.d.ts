@@ -2948,16 +2948,16 @@ declare module Plottable {
              * @param {Scale} yScale The y scale to use.
              */
             constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>);
-            protected getDrawer(key: string): Drawers.Symbol;
+            doHover(p: Point): Interactions.HoverData;
+            hoverOutComponent(p: Point): void;
+            hoverOverComponent(p: Point): void;
             protected generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
             };
             protected generateDrawSteps(): Drawers.DrawStep[];
-            protected _getClosestStruckPoint(p: Point, range: number): Interactions.HoverData;
+            protected getClosestStruckPoint(p: Point, range: number): Interactions.HoverData;
+            protected getDrawer(key: string): Drawers.Symbol;
             protected isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean;
-            hoverOverComponent(p: Point): void;
-            hoverOutComponent(p: Point): void;
-            doHover(p: Point): Interactions.HoverData;
         }
     }
 }
