@@ -90,7 +90,6 @@
 /// <reference path="interactions/pointerInteraction.ts" />
 /// <reference path="interactions/panZoomInteraction.ts" />
 /// <reference path="interactions/dragInteraction.ts" />
-/// <reference path="interactions/hoverInteraction.ts" />
 
 /// <reference path="components/dragBoxLayer.ts" />
 /// <reference path="components/xDragBoxLayer.ts" />

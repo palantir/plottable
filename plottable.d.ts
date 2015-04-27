@@ -2920,7 +2920,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Plots {
-        class Scatter<X, Y> extends XYPlot<X, Y> implements Interactions.Hoverable {
+        class Scatter<X, Y> extends XYPlot<X, Y> {
             /**
              * Constructs a ScatterPlot.
              *
@@ -2934,11 +2934,7 @@ declare module Plottable {
                 [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
             };
             protected _generateDrawSteps(): Drawers.DrawStep[];
-            protected _getClosestStruckPoint(p: Point, range: number): Interactions.HoverData;
             protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean;
-            _hoverOverComponent(p: Point): void;
-            _hoverOutComponent(p: Point): void;
-            _doHover(p: Point): Interactions.HoverData;
         }
     }
 }
@@ -2975,7 +2971,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Plots {
-        class Bar<X, Y> extends XYPlot<X, Y> implements Interactions.Hoverable {
+        class Bar<X, Y> extends XYPlot<X, Y> {
             protected static _BarAlignmentToFactor: {
                 [alignment: string]: number;
             };
@@ -3086,21 +3082,6 @@ declare module Plottable {
              * If the position scale of the plot is a QuantitativeScaleScale, then _getMinimumDataWidth is scaled to compute the barPixelWidth
              */
             protected _getBarPixelWidth(): number;
-            hoverMode(): string;
-            /**
-             * Sets the hover mode for hover interactions. There are two modes:
-             *     - "point": Selects the bar under the mouse cursor (default).
-             *     - "line": Selects any bar that would be hit by a line extending
-             *                in the same direction as the bar and passing through
-             *                the cursor.
-             *
-             * @param {string} mode The desired hover mode.
-             * @return {Bar} The calling Bar Plot.
-             */
-            hoverMode(mode: String): Bar<X, Y>;
-            _hoverOverComponent(p: Point): void;
-            _hoverOutComponent(p: Point): void;
-            _doHover(p: Point): Interactions.HoverData;
             protected _getAllPlotData(datasetKeys: string[]): PlotData;
         }
     }
@@ -3109,7 +3090,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Plots {
-        class Line<X> extends XYPlot<X, number> implements Interactions.Hoverable {
+        class Line<X> extends XYPlot<X, number> {
             protected _yScale: QuantitativeScale<number>;
             /**
              * Constructs a LinePlot.
@@ -3119,7 +3100,6 @@ declare module Plottable {
              * @param {QuantitativeScaleScale} yScale The y scale to use.
              */
             constructor(xScale: QuantitativeScale<X>, yScale: QuantitativeScale<number>);
-            protected _setup(): void;
             protected _rejectNullsAndNaNs(d: any, i: number, userMetdata: any, plotMetadata: any, accessor: _Accessor): boolean;
             protected _getDrawer(key: string): Drawers.Line;
             protected _getResetYFunction(): (d: any, i: number, u: any, m: PlotMetadata) => number;
@@ -3128,13 +3108,6 @@ declare module Plottable {
                 [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
             };
             protected _wholeDatumAttributes(): string[];
-            protected _getClosestWithinRange(p: Point, range: number): {
-                closestValue: any;
-                closestPoint: {
-                    x: number;
-                    y: number;
-                };
-            };
             protected _getAllPlotData(datasetKeys: string[]): PlotData;
             /**
              * Retrieves the closest PlotData to queryPoint.
@@ -3147,9 +3120,6 @@ declare module Plottable {
              * @returns {PlotData} The PlotData closest to queryPoint
              */
             getClosestPlotData(queryPoint: Point): PlotData;
-            _hoverOverComponent(p: Point): void;
-            _hoverOutComponent(p: Point): void;
-            _doHover(p: Point): Interactions.HoverData;
         }
     }
 }
@@ -3969,67 +3939,6 @@ declare module Plottable {
              * @returns {Drag} The calling Interactions.Drag.
              */
             onDragEnd(cb: (start: Point, end: Point) => any): Drag;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Interactions {
-        type HoverData = {
-            data: any[];
-            pixelPositions: Point[];
-            selection: D3.Selection;
-        };
-        interface Hoverable extends Component {
-            /**
-             * Called when the user first mouses over the Component.
-             *
-             * @param {Point} The cursor's position relative to the Component's origin.
-             */
-            _hoverOverComponent(p: Point): void;
-            /**
-             * Called when the user mouses out of the Component.
-             *
-             * @param {Point} The cursor's position relative to the Component's origin.
-             */
-            _hoverOutComponent(p: Point): void;
-            /**
-             * Returns the HoverData associated with the given position, and performs
-             * any visual changes associated with hovering inside a Component.
-             *
-             * @param {Point} The cursor's position relative to the Component's origin.
-             * @return {HoverData} The HoverData associated with the given position.
-             */
-            _doHover(p: Point): HoverData;
-        }
-        class Hover extends Interaction {
-            _componentToListenTo: Hoverable;
-            constructor();
-            _anchor(component: Hoverable, hitBox: D3.Selection): void;
-            /**
-             * Attaches an callback to be called when the user mouses over an element.
-             *
-             * @param {(hoverData: HoverData) => any} callback The callback to be called.
-             *      The callback will be passed data for newly hovered-over elements.
-             * @return {Interaction.Hover} The calling Interaction.Hover.
-             */
-            onHoverOver(callback: (hoverData: HoverData) => any): Hover;
-            /**
-             * Attaches a callback to be called when the user mouses off of an element.
-             *
-             * @param {(hoverData: HoverData) => any} callback The callback to be called.
-             *      The callback will be passed data from the hovered-out elements.
-             * @return {Interaction.Hover} The calling Interaction.Hover.
-             */
-            onHoverOut(callback: (hoverData: HoverData) => any): Hover;
-            /**
-             * Retrieves the HoverData associated with the elements the user is currently hovering over.
-             *
-             * @return {HoverData} The data and selection corresponding to the elements
-             *                     the user is currently hovering over.
-             */
-            getCurrentHoverData(): HoverData;
         }
     }
 }

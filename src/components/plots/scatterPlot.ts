@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Plots {
-  export class Scatter<X, Y> extends XYPlot<X, Y> implements Interactions.Hoverable {
+  export class Scatter<X, Y> extends XYPlot<X, Y> {
     private _closeDetectionRadius = 5;
     private _defaultFillColor: string;
 
@@ -50,71 +50,6 @@ export module Plots {
       return drawSteps;
     }
 
-    protected _getClosestStruckPoint(p: Point, range: number): Interactions.HoverData {
-      var attrToProjector = this._generateAttrToProjector();
-      var xProjector = attrToProjector["x"];
-      var yProjector = attrToProjector["y"];
-      var getDistSq = (d: any, i: number, userMetdata: any, plotMetadata: PlotMetadata) => {
-        var dx = attrToProjector["x"](d, i, userMetdata, plotMetadata) - p.x;
-        var dy = attrToProjector["y"](d, i, userMetdata, plotMetadata) - p.y;
-        return (dx * dx + dy * dy);
-      };
-
-      var overAPoint = false;
-      var closestElement: Element;
-      var closestElementUserMetadata: any;
-      var closestElementPlotMetadata: any;
-      var closestIndex: number;
-      var minDistSq = range * range;
-
-      this._datasetKeysInOrder.forEach((key: string) => {
-        var dataset = this._key2PlotDatasetKey.get(key).dataset;
-        var plotMetadata = this._key2PlotDatasetKey.get(key).plotMetadata;
-        var drawer = <Drawers.Symbol>this._key2PlotDatasetKey.get(key).drawer;
-        drawer._getRenderArea().selectAll("path").each(function(d, i) {
-          var distSq = getDistSq(d, i, dataset.metadata(), plotMetadata);
-          var r = attrToProjector["size"](d, i, dataset.metadata(), plotMetadata) / 2;
-
-          if (distSq < r * r) { // cursor is over this point
-            if (!overAPoint || distSq < minDistSq) {
-              closestElement = this;
-              closestIndex = i;
-              minDistSq = distSq;
-              closestElementUserMetadata = dataset.metadata();
-              closestElementPlotMetadata = plotMetadata;
-            }
-            overAPoint = true;
-          } else if (!overAPoint && distSq < minDistSq) {
-            closestElement = this;
-            closestIndex = i;
-            minDistSq = distSq;
-            closestElementUserMetadata = dataset.metadata();
-            closestElementPlotMetadata = plotMetadata;
-          }
-        });
-      });
-
-      if (!closestElement) {
-        return {
-          selection: null,
-          pixelPositions: null,
-          data: null
-        };
-      }
-
-      var closestSelection = d3.select(closestElement);
-      var closestData = closestSelection.data();
-      var closestPoint = {
-        x: attrToProjector["x"](closestData[0], closestIndex, closestElementUserMetadata, closestElementPlotMetadata),
-        y: attrToProjector["y"](closestData[0], closestIndex, closestElementUserMetadata, closestElementPlotMetadata)
-      };
-      return {
-        selection: closestSelection,
-        pixelPositions: [closestPoint],
-        data: closestData
-      };
-    }
-
     protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean {
       var xRange = { min: 0, max: this.width() };
       var yRange = { min: 0, max: this.height() };
@@ -130,20 +65,6 @@ export module Plots {
 
       return Plottable.Utils.Methods.intersectsBBox(xRange, yRange, translatedBbox);
     }
-
-    //===== Hover logic =====
-    public _hoverOverComponent(p: Point) {
-      // no-op
-    }
-
-    public _hoverOutComponent(p: Point) {
-      // no-op
-    }
-
-    public _doHover(p: Point): Interactions.HoverData {
-      return this._getClosestStruckPoint(p, this._closeDetectionRadius);
-    }
-    //===== /Hover logic =====
   }
 }
 }

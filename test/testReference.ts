@@ -61,7 +61,6 @@
 
 ///<reference path="interactions/interactionTests.ts" />
 ///<reference path="interactions/pointerInteractionTests.ts" />
-///<reference path="interactions/hoverInteractionTests.ts" />
 ///<reference path="interactions/clickInteractionTests.ts" />
 ///<reference path="interactions/doubleClickInteractionTests.ts" />
 ///<reference path="interactions/dragInteractionTests.ts" />
