@@ -8967,6 +8967,21 @@ describe("Interactions", function () {
             assert.isTrue(callbackCalled, "callback called even if moved outside component (touch)");
             svg.remove();
         });
+        it("cancelling touches cancels any ongoing clicks", function () {
+            var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var c = new Plottable.Component.AbstractComponent();
+            c.renderTo(svg);
+            var clickInteraction = new Plottable.Interaction.Click();
+            c.registerInteraction(clickInteraction);
+            var callbackCalled = false;
+            var callback = function () { return callbackCalled = true; };
+            clickInteraction.onClick(callback);
+            triggerFakeTouchEvent("touchstart", c.content(), [{ x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 }]);
+            triggerFakeTouchEvent("touchcancel", c.content(), [{ x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 }]);
+            triggerFakeTouchEvent("touchend", c.content(), [{ x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 }]);
+            assert.isFalse(callbackCalled, "callback not called since click was interrupted");
+            svg.remove();
+        });
     });
 });
 
@@ -9023,6 +9038,17 @@ describe("Interactions", function () {
                 triggerFakeMouseEvent("mouseup", component.content(), userClickPoint.x, userClickPoint.y);
                 triggerFakeMouseEvent("mousedown", component.content(), userClickPoint.x, userClickPoint.y);
                 triggerFakeMouseEvent("mouseup", component.content(), userClickPoint.x, userClickPoint.y);
+                assert.deepEqual(doubleClickedPoint, null, "point never set");
+                svg.remove();
+            });
+            it("callback not called does not receive dblclick confirmation", function () {
+                var userClickPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
+                triggerFakeTouchEvent("touchstart", component.content(), [{ x: userClickPoint.x, y: userClickPoint.y }]);
+                triggerFakeTouchEvent("touchend", component.content(), [{ x: userClickPoint.x, y: userClickPoint.y }]);
+                triggerFakeTouchEvent("touchstart", component.content(), [{ x: userClickPoint.x, y: userClickPoint.y }]);
+                triggerFakeTouchEvent("touchend", component.content(), [{ x: userClickPoint.x, y: userClickPoint.y }]);
+                triggerFakeTouchEvent("touchcancel", component.content(), [{ x: userClickPoint.x, y: userClickPoint.y }]);
+                triggerFakeMouseEvent("dblclick", component.content(), userClickPoint.x, userClickPoint.y);
                 assert.deepEqual(doubleClickedPoint, null, "point never set");
                 svg.remove();
             });
@@ -9241,6 +9267,31 @@ describe("Interactions", function () {
             triggerFakeTouchEvent("touchstart", target, [{ x: startPoint.x, y: startPoint.y }]);
             triggerFakeTouchEvent("touchend", target, [{ x: outsidePointNeg.x, y: outsidePointNeg.y }]);
             assert.deepEqual(receivedEnd, outsidePointNeg, "dragging outside the Component is no longer constrained (negative) (touchend)");
+            svg.remove();
+        });
+        it("touchcancel cancels the current drag", function () {
+            var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var c = new Plottable.Component.AbstractComponent();
+            c.renderTo(svg);
+            var drag = new Plottable.Interaction.Drag();
+            var moveCallbackCalled = false;
+            var receivedStart;
+            var receivedEnd;
+            var moveCallback = function (start, end) {
+                moveCallbackCalled = true;
+                receivedStart = start;
+                receivedEnd = end;
+            };
+            drag.onDrag(moveCallback);
+            c.registerInteraction(drag);
+            var target = c.background();
+            receivedStart = null;
+            receivedEnd = null;
+            triggerFakeTouchEvent("touchstart", target, [{ x: startPoint.x, y: startPoint.y }]);
+            triggerFakeTouchEvent("touchmove", target, [{ x: endPoint.x - 10, y: endPoint.y - 10 }]);
+            triggerFakeTouchEvent("touchcancel", target, [{ x: endPoint.x - 10, y: endPoint.y - 10 }]);
+            triggerFakeTouchEvent("touchmove", target, [{ x: endPoint.x, y: endPoint.y }]);
+            assert.notEqual(receivedEnd, endPoint, "was not passed touch point after cancelled");
             svg.remove();
         });
     });

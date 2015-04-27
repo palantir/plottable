@@ -27,6 +27,8 @@ export module Interaction {
                                                                                      this._handleClickDown(idToPoint[ids[0]]));
       this._touchDispatcher.onTouchEnd("Interaction.DoubleClick" + this.getID(), (ids, idToPoint) =>
                                                                                      this._handleClickUp(idToPoint[ids[0]]));
+      this._touchDispatcher.onTouchCancel("Interaction.DoubleClick" + this.getID(), (ids, idToPoint) =>
+                                                                                     this._handleClickCancel());
     }
 
     private _handleClickDown(p: Point) {
@@ -57,6 +59,11 @@ export module Interaction {
         }
         this._clickState = ClickState.NotClicked;
       }
+    }
+
+    private _handleClickCancel() {
+      this._clickState = ClickState.NotClicked;
+      this._clickedDown = false;
     }
 
     private static pointsEqual(p1: Point, p2: Point) {
