@@ -26,7 +26,7 @@ export module Scales {
         "#E31A1C",
         "#B10026"  // red
       ],
-      blues : [
+      blues: [
         "#FFFFFF", // white
         "#CCFFFF",
         "#A5FFFD",
@@ -37,7 +37,7 @@ export module Scales {
         "#2545D3",
         "#0B02E1"  // blue
       ],
-      posneg : [
+      posneg: [
         "#0B02E1", // blue
         "#2545D3",
         "#417FD0",

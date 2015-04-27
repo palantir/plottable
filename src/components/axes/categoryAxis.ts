@@ -79,9 +79,9 @@ export module Axes {
                                           fakeScale,
                                           categoryScale.domain());
       return {
-        width : textResult.usedWidth  + widthRequiredByTicks,
+        width: textResult.usedWidth  + widthRequiredByTicks,
         height: textResult.usedHeight + heightRequiredByTicks,
-        wantsWidth : !textResult.textFits,
+        wantsWidth: !textResult.textFits,
         wantsHeight: !textResult.textFits
       };
     }

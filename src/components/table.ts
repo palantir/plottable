@@ -277,7 +277,6 @@ export module Components {
               wantsHeightArr   : layoutWantsHeight};
     }
 
-    private iterateLayout(availableWidth : number, availableHeight: number): _IterateLayoutResult {
     /*
      * Given availableWidth and availableHeight, figure out how to allocate it between rows and columns using an iterative algorithm.
      *
@@ -299,6 +298,7 @@ export module Components {
      * circumstances this will happen or if it will happen at all. A message will be printed to the console if this occurs.
      *
      */
+    private iterateLayout(availableWidth : number, availableHeight: number): _IterateLayoutResult {
       var rows = this.rows;
       var cols = d3.transpose(this.rows);
       var availableWidthAfterPadding  = availableWidth  - this.colPadding * (this.numCols - 1);
@@ -318,7 +318,7 @@ export module Components {
       var guaranteedWidths  = Utils.Methods.createFilledArray(0, this.numCols);
       var guaranteedHeights = Utils.Methods.createFilledArray(0, this.numRows);
 
-      var freeWidth : number;
+      var freeWidth: number;
       var freeHeight: number;
 
       var nIterations = 0;
@@ -373,12 +373,12 @@ export module Components {
       colProportionalSpace = Table.calcProportionalSpace(colWeights, freeWidth );
       rowProportionalSpace = Table.calcProportionalSpace(rowWeights, freeHeight);
 
-      return {colProportionalSpace: colProportionalSpace        ,
-              rowProportionalSpace: rowProportionalSpace        ,
-              guaranteedWidths    : guarantees.guaranteedWidths ,
-              guaranteedHeights   : guarantees.guaranteedHeights,
-              wantsWidth          : wantsWidth                  ,
-              wantsHeight         : wantsHeight                 };
+      return {colProportionalSpace: colProportionalSpace,
+              rowProportionalSpace: rowProportionalSpace,
+              guaranteedWidths: guarantees.guaranteedWidths,
+              guaranteedHeights: guarantees.guaranteedHeights,
+              wantsWidth: wantsWidth,
+              wantsHeight: wantsHeight};
     }
 
     private padTableToSize(nRows: number, nCols: number) {

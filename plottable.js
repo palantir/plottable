@@ -1874,7 +1874,7 @@ var Plottable;
             return [0, 1];
         };
         QuantitativeScale.prototype.domain = function (values) {
-            return _super.prototype.domain.call(this, values); // need to override type sig to enable method chaining :/
+            return _super.prototype.domain.call(this, values); // need to override type sig to enable method chaining:/
         };
         QuantitativeScale.prototype.domainer = function (domainer) {
             if (domainer == null) {

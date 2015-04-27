@@ -427,7 +427,7 @@ describe("Plots", () => {
       plot2.renderTo(svg);
 
       function assertDomainIsClose(actualDomain: number[], expectedDomain: number[], msg: string) {
-        // to avoid floating point issues :/
+        // to avoid floating point issues:/
         assert.closeTo(actualDomain[0], expectedDomain[0], 0.01, msg);
         assert.closeTo(actualDomain[1], expectedDomain[1], 0.01, msg);
       }

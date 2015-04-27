@@ -444,6 +444,10 @@ module Plottable {
       return this;
     }
 
+    public _requestedSpace(availableWidth: number, availableHeight: number): _SpaceRequest {
+      return {width: 0, height: 0, wantsWidth: false, wantsHeight: false};
+    }
+
     public useLastCalculatedLayout(): boolean;
     public useLastCalculatedLayout(useLast: boolean) : Component;
     public useLastCalculatedLayout(useLast?: boolean) : any {

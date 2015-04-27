@@ -116,9 +116,9 @@ export module Components {
       var desiredHeight = (this.orientation() === "horizontal" ? desiredWH.height : desiredWH.width) + 2 * this.padding();
 
       return {
-        width : desiredWidth,
+        width: desiredWidth,
         height: desiredHeight,
-        wantsWidth : desiredWidth  > offeredWidth,
+        wantsWidth: desiredWidth  > offeredWidth,
         wantsHeight: desiredHeight > offeredHeight
       };
     }

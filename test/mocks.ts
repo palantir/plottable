@@ -17,7 +17,7 @@ module Mocks {
       return {
         width:  this.fixedWidth,
         height: this.fixedHeight,
-        wantsWidth : availableWidth < this.fixedWidth,
+        wantsWidth: availableWidth < this.fixedWidth,
         wantsHeight: availableHeight < this.fixedHeight
       };
     }

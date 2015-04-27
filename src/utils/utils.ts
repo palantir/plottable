@@ -312,7 +312,7 @@ export module Utils {
     }
 
     export function range(start: number, stop: number, step = 1): number[] {
-      if(step === 0) {
+      if (step === 0) {
         throw new Error("step cannot be 0");
       }
       var length = Math.max(Math.ceil((stop - start) / step), 0);

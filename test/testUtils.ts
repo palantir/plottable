@@ -44,7 +44,7 @@ function fixComponentSize(c: Plottable.Component, fixedWidth?: number, fixedHeig
     return {
       width:  fixedWidth  == null ? 0 : fixedWidth,
       height: fixedHeight == null ? 0 : fixedHeight,
-      wantsWidth : fixedWidth  == null ? false : w < fixedWidth ,
+      wantsWidth: fixedWidth  == null ? false : w < fixedWidth ,
       wantsHeight: fixedHeight == null ? false : h < fixedHeight
     };
   };

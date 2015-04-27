@@ -3108,7 +3108,7 @@ declare module Plottable {
             /**
              * Sets the hover mode for hover interactions. There are two modes:
              *     - "point": Selects the bar under the mouse cursor (default).
-             *     - "line" : Selects any bar that would be hit by a line extending
+             *     - "line": Selects any bar that would be hit by a line extending
              *                in the same direction as the bar and passing through
              *                the cursor.
              *

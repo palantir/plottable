@@ -150,20 +150,20 @@ module Plottable {
      */
     public showAllData() {
       this._xScale.autoDomain();
-      if(!this._autoAdjustYScaleDomain) {
+      if (!this._autoAdjustYScaleDomain) {
         this._yScale.autoDomain();
       }
     }
 
     private _adjustYDomainOnChangeFromX() {
       if (!this._projectorsReady()) { return; }
-      if(this._autoAdjustYScaleDomain) {
+      if (this._autoAdjustYScaleDomain) {
         this._adjustDomainToVisiblePoints<X, Y>(this._xScale, this._yScale, true);
       }
     }
     private _adjustXDomainOnChangeFromY() {
       if (!this._projectorsReady()) { return; }
-      if(this._autoAdjustXScaleDomain) {
+      if (this._autoAdjustXScaleDomain) {
         this._adjustDomainToVisiblePoints<Y, X>(this._yScale, this._xScale, false);
       }
     }
@@ -185,7 +185,7 @@ module Plottable {
         }
 
         var adjustedDomain = this._adjustDomainOverVisiblePoints<A, B>(normalizedData, filterFn);
-        if(adjustedDomain.length === 0) {
+        if (adjustedDomain.length === 0) {
           return;
         }
         adjustedDomain = toScaleQ.domainer().computeDomain([adjustedDomain], toScaleQ);
