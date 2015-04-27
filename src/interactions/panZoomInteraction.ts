@@ -61,9 +61,6 @@ export module Interaction {
 
         this._touchIds.set(id.toString(), this._translateToComponentSpace(idToPoint[id]));
       });
-      if (this._touchIds.size() === 2) {
-        this._dragInteraction.onDrag(null);
-      }
     }
 
     private _handleTouchMove(ids: number[], idToPoint: { [id: number]: Point; }, e: TouchEvent) {
@@ -154,6 +151,9 @@ export module Interaction {
       var lastDragPoint: Point;
       this._dragInteraction.onDragStart(() => lastDragPoint = null);
       this._dragInteraction.onDrag((startPoint, endPoint) => {
+        if (this._touchIds.size() === 2) {
+          return;
+        }
         if (this._xScale != null) {
           var dragAmountX = endPoint.x - (lastDragPoint == null ? startPoint.x : lastDragPoint.x);
           this._xScale.domain(PanZoom.translate(this._xScale, -dragAmountX));

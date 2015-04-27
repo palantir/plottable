@@ -9849,9 +9849,6 @@ var Plottable;
                     }
                     _this._touchIds.set(id.toString(), _this._translateToComponentSpace(idToPoint[id]));
                 });
-                if (this._touchIds.size() === 2) {
-                    this._dragInteraction.onDrag(null);
-                }
             };
             PanZoom.prototype._handleTouchMove = function (ids, idToPoint, e) {
                 var _this = this;
@@ -9931,6 +9928,9 @@ var Plottable;
                 var lastDragPoint;
                 this._dragInteraction.onDragStart(function () { return lastDragPoint = null; });
                 this._dragInteraction.onDrag(function (startPoint, endPoint) {
+                    if (_this._touchIds.size() === 2) {
+                        return;
+                    }
                     if (_this._xScale != null) {
                         var dragAmountX = endPoint.x - (lastDragPoint == null ? startPoint.x : lastDragPoint.x);
                         _this._xScale.domain(PanZoom.translate(_this._xScale, -dragAmountX));
