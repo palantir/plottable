@@ -9376,7 +9376,9 @@ var Plottable;
                 this._event2Callback["touchmove"] = function (e) { return _this._measureAndBroadcast(e, _this._moveBroadcaster); };
                 this._endBroadcaster = new Plottable.Core.Broadcaster(this);
                 this._event2Callback["touchend"] = function (e) { return _this._measureAndBroadcast(e, _this._endBroadcaster); };
-                this._broadcasters = [this._moveBroadcaster, this._startBroadcaster, this._endBroadcaster];
+                this._cancelBroadcaster = new Plottable.Core.Broadcaster(this);
+                this._event2Callback["touchcancel"] = function (e) { return _this._measureAndBroadcast(e, _this._cancelBroadcaster); };
+                this._broadcasters = [this._moveBroadcaster, this._startBroadcaster, this._endBroadcaster, this._cancelBroadcaster];
             }
             /**
              * Get a Dispatcher.Touch for the <svg> containing elem. If one already exists
@@ -9440,6 +9442,21 @@ var Plottable;
              */
             Touch.prototype.onTouchEnd = function (key, callback) {
                 this._setCallback(this._endBroadcaster, key, callback);
+                return this;
+            };
+            /**
+             * Registers a callback to be called whenever a touch is cancelled,
+             * or removes the callback if `null` is passed as the callback.
+             *
+             * @param {any} key The key associated with the callback.
+             *                  Key uniqueness is determined by deep equality.
+             * @param {TouchCallback} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space. Pass `null`
+             *                                     to remove a callback.
+             * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
+             */
+            Touch.prototype.onTouchCancel = function (key, callback) {
+                this._setCallback(this._cancelBroadcaster, key, callback);
                 return this;
             };
             /**
