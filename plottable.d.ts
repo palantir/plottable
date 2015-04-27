@@ -2995,10 +2995,10 @@ declare module Plottable {
 declare module Plottable {
     module Plots {
         class Bar<X, Y> extends XYPlot<X, Y> implements Interactions.Hoverable {
-            protected static _BarAlignmentToFactor: {
+            protected static BarAlignmentToFactor: {
                 [alignment: string]: number;
             };
-            protected static _DEFAULT_WIDTH: number;
+            protected static DEFAULT_WIDTH: number;
             protected _isVertical: boolean;
             /**
              * Constructs a BarPlot.
@@ -3009,25 +3009,6 @@ declare module Plottable {
              * @param {boolean} isVertical if the plot if vertical.
              */
             constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>, isVertical?: boolean);
-            protected getDrawer(key: string): Drawers.Rect;
-            protected setup(): void;
-            /**
-             * Gets the baseline value for the bars
-             *
-             * The baseline is the line that the bars are drawn from, defaulting to 0.
-             *
-             * @returns {number} The baseline value.
-             */
-            baseline(): number;
-            /**
-             * Sets the baseline for the bars to the specified value.
-             *
-             * The baseline is the line that the bars are drawn from, defaulting to 0.
-             *
-             * @param {number} value The value to position the baseline at.
-             * @returns {Bar} The calling Bar.
-             */
-            baseline(value: number): Bar<X, Y>;
             /**
              * Sets the bar alignment relative to the independent axis.
              * VerticalBarPlot supports "left", "center", "right"
@@ -3064,18 +3045,22 @@ declare module Plottable {
              */
             barLabelFormatter(formatter: Formatter): Bar<X, Y>;
             /**
-             * Retrieves the closest PlotData to queryPoint.
+             * Gets the baseline value for the bars
              *
-             * Bars containing the queryPoint are considered closest. If queryPoint lies outside
-             * of all bars, we return the closest in the dominant axis (x for horizontal
-             * charts, y for vertical) and break ties using the secondary axis.
+             * The baseline is the line that the bars are drawn from, defaulting to 0.
              *
-             * @param {Point} queryPoint The point to which plot data should be compared
-             *
-             * @returns {PlotData} The PlotData closest to queryPoint
+             * @returns {number} The baseline value.
              */
-            getClosestPlotData(queryPoint: Point): PlotData;
-            protected isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean;
+            baseline(): number;
+            /**
+             * Sets the baseline for the bars to the specified value.
+             *
+             * The baseline is the line that the bars are drawn from, defaulting to 0.
+             *
+             * @param {number} value The value to position the baseline at.
+             * @returns {Bar} The calling Bar.
+             */
+            baseline(value: number): Bar<X, Y>;
             /**
              * Gets the bar under the given pixel position (if [xValOrExtent]
              * and [yValOrExtent] are {number}s), under a given line (if only one
@@ -3087,24 +3072,18 @@ declare module Plottable {
              * @returns {D3.Selection} The selected bar, or null if no bar was selected.
              */
             getBars(xValOrExtent: number | Extent, yValOrExtent: number | Extent): D3.Selection;
-            protected _updateDomainer(scale: Scale<any, number>): void;
-            protected _updateYDomainer(): void;
-            protected _updateXDomainer(): void;
-            protected additionalPaint(time: number): void;
-            protected _drawLabels(): void;
-            protected generateDrawSteps(): Drawers.DrawStep[];
-            protected generateAttrToProjector(): {
-                [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
-            };
             /**
-             * Computes the barPixelWidth of all the bars in the plot.
+             * Retrieves the closest PlotData to queryPoint.
              *
-             * If the position scale of the plot is a CategoryScale and in bands mode, then the rangeBands function will be used.
-             * If the position scale of the plot is a CategoryScale and in points mode, then
-             *   from https://github.com/mbostock/d3/wiki/Ordinal-Scales#ordinal_rangePoints, the max barPixelWidth is step * padding
-             * If the position scale of the plot is a QuantitativeScaleScale, then _getMinimumDataWidth is scaled to compute the barPixelWidth
+             * Bars containing the queryPoint are considered closest. If queryPoint lies outside
+             * of all bars, we return the closest in the dominant axis (x for horizontal
+             * charts, y for vertical) and break ties using the secondary axis.
+             *
+             * @param {Point} queryPoint The point to which plot data should be compared
+             *
+             * @returns {PlotData} The PlotData closest to queryPoint
              */
-            protected _getBarPixelWidth(): number;
+            getClosestPlotData(queryPoint: Point): PlotData;
             hoverMode(): string;
             /**
              * Sets the hover mode for hover interactions. There are two modes:
@@ -3117,10 +3096,31 @@ declare module Plottable {
              * @return {Bar} The calling Bar Plot.
              */
             hoverMode(mode: String): Bar<X, Y>;
+            doHover(p: Point): Interactions.HoverData;
             hoverOverComponent(p: Point): void;
             hoverOutComponent(p: Point): void;
-            doHover(p: Point): Interactions.HoverData;
+            protected additionalPaint(time: number): void;
+            protected drawLabels(): void;
+            protected generateDrawSteps(): Drawers.DrawStep[];
+            protected generateAttrToProjector(): {
+                [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
+            };
             protected _getAllPlotData(datasetKeys: string[]): PlotData;
+            /**
+             * Computes the barPixelWidth of all the bars in the plot.
+             *
+             * If the position scale of the plot is a CategoryScale and in bands mode, then the rangeBands function will be used.
+             * If the position scale of the plot is a CategoryScale and in points mode, then
+             *   from https://github.com/mbostock/d3/wiki/Ordinal-Scales#ordinal_rangePoints, the max barPixelWidth is step * padding
+             * If the position scale of the plot is a QuantitativeScaleScale, then _getMinimumDataWidth is scaled to compute the barPixelWidth
+             */
+            protected getBarPixelWidth(): number;
+            protected getDrawer(key: string): Drawers.Rect;
+            protected isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean;
+            protected setup(): void;
+            protected updateDomainer(scale: Scale<any, number>): void;
+            protected updateXDomainer(): void;
+            protected updateYDomainer(): void;
         }
     }
 }

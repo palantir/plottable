@@ -302,7 +302,7 @@ describe("Plots", () => {
       });
 
       it("barPixelWidth calculated appropriately", () => {
-        assert.strictEqual((<any> barPlot)._getBarPixelWidth(), xScale.scale(2) * 2 * 0.95);
+        assert.strictEqual((<any> barPlot).getBarPixelWidth(), xScale.scale(2) * 2 * 0.95);
         svg.remove();
       });
 
@@ -311,7 +311,7 @@ describe("Plots", () => {
         var bars = renderArea.selectAll("rect");
         assert.lengthOf(bars[0], 3, "One bar was created per data point");
 
-        var barPixelWidth = (<any> barPlot)._getBarPixelWidth();
+        var barPixelWidth = (<any> barPlot).getBarPixelWidth();
         var bar0 = d3.select(bars[0][0]);
         var bar1 = d3.select(bars[0][1]);
         var bar2 = d3.select(bars[0][2]);
@@ -350,7 +350,7 @@ describe("Plots", () => {
       });
 
       it("bar width takes an appropriate value", () => {
-        assert.strictEqual((<any> barPlot)._getBarPixelWidth(), (xScale.scale(10) - xScale.scale(2)) * 0.95);
+        assert.strictEqual((<any> barPlot).getBarPixelWidth(), (xScale.scale(10) - xScale.scale(2)) * 0.95);
         svg.remove();
       });
 
@@ -359,7 +359,7 @@ describe("Plots", () => {
         var bars = renderArea.selectAll("rect");
         assert.lengthOf(bars[0], 3, "One bar was created per data point");
 
-        var barPixelWidth = (<any> barPlot)._getBarPixelWidth();
+        var barPixelWidth = (<any> barPlot).getBarPixelWidth();
         var bar0 = d3.select(bars[0][0]);
         var bar1 = d3.select(bars[0][1]);
         var bar2 = d3.select(bars[0][2]);
@@ -372,14 +372,14 @@ describe("Plots", () => {
       it("sensible bar width one datum", () => {
         barPlot.removeDataset(dataset);
         barPlot.addDataset([{x: 10, y: 2}]);
-        assert.closeTo((<any> barPlot)._getBarPixelWidth(), 228, 0.1, "sensible bar width for only one datum");
+        assert.closeTo((<any> barPlot).getBarPixelWidth(), 228, 0.1, "sensible bar width for only one datum");
         svg.remove();
       });
 
       it("sensible bar width same datum", () => {
         barPlot.removeDataset(dataset);
         barPlot.addDataset([{x: 10, y: 2}, {x: 10, y: 2}]);
-        assert.closeTo((<any> barPlot)._getBarPixelWidth(), 228, 0.1, "uses the width sensible for one datum");
+        assert.closeTo((<any> barPlot).getBarPixelWidth(), 228, 0.1, "uses the width sensible for one datum");
         svg.remove();
       });
 
@@ -387,7 +387,7 @@ describe("Plots", () => {
         barPlot.removeDataset(dataset);
         barPlot.addDataset([{x: 2, y: 2}, {x: 20, y: 2}, {x: 5, y: 2}]);
         var expectedBarPixelWidth = (xScale.scale(5) - xScale.scale(2)) * 0.95;
-        assert.closeTo((<any> barPlot)._getBarPixelWidth(), expectedBarPixelWidth, 0.1, "bar width uses closest sorted x values");
+        assert.closeTo((<any> barPlot).getBarPixelWidth(), expectedBarPixelWidth, 0.1, "bar width uses closest sorted x values");
         svg.remove();
       });
     });
@@ -417,7 +417,7 @@ describe("Plots", () => {
       it("bar width takes an appropriate value", () => {
         var timeFormatter = d3.time.format("%m/%d/%y");
         var expectedBarWidth = (xScale.scale(timeFormatter.parse("12/01/94")) - xScale.scale(timeFormatter.parse("12/01/93"))) * 0.95;
-        assert.closeTo((<any> barPlot)._getBarPixelWidth(), expectedBarWidth, 0.1, "width is difference between two dates");
+        assert.closeTo((<any> barPlot).getBarPixelWidth(), expectedBarWidth, 0.1, "width is difference between two dates");
         svg.remove();
       });
 
@@ -699,9 +699,9 @@ describe("Plots", () => {
         plot.renderTo(svg);
         var texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
         assert.lengthOf(texts, 2, "both texts drawn");
-        var originalDrawLabels = (<any> plot)._drawLabels;
+        var originalDrawLabels = (<any> plot).drawLabels;
         var called = false;
-        (<any> plot)._drawLabels = () => {
+        (<any> plot).drawLabels = () => {
           if (!called) {
             originalDrawLabels.apply(plot);
             texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());

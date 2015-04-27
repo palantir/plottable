@@ -3632,14 +3632,14 @@ describe("Plots", function () {
                 barPlot.renderTo(svg);
             });
             it("barPixelWidth calculated appropriately", function () {
-                assert.strictEqual(barPlot._getBarPixelWidth(), xScale.scale(2) * 2 * 0.95);
+                assert.strictEqual(barPlot.getBarPixelWidth(), xScale.scale(2) * 2 * 0.95);
                 svg.remove();
             });
             it("bar widths are equal to barPixelWidth", function () {
                 var renderArea = barPlot.renderArea;
                 var bars = renderArea.selectAll("rect");
                 assert.lengthOf(bars[0], 3, "One bar was created per data point");
-                var barPixelWidth = barPlot._getBarPixelWidth();
+                var barPixelWidth = barPlot.getBarPixelWidth();
                 var bar0 = d3.select(bars[0][0]);
                 var bar1 = d3.select(bars[0][1]);
                 var bar2 = d3.select(bars[0][2]);
@@ -3675,14 +3675,14 @@ describe("Plots", function () {
                 barPlot.renderTo(svg);
             });
             it("bar width takes an appropriate value", function () {
-                assert.strictEqual(barPlot._getBarPixelWidth(), (xScale.scale(10) - xScale.scale(2)) * 0.95);
+                assert.strictEqual(barPlot.getBarPixelWidth(), (xScale.scale(10) - xScale.scale(2)) * 0.95);
                 svg.remove();
             });
             it("bar widths are equal to barPixelWidth", function () {
                 var renderArea = barPlot.renderArea;
                 var bars = renderArea.selectAll("rect");
                 assert.lengthOf(bars[0], 3, "One bar was created per data point");
-                var barPixelWidth = barPlot._getBarPixelWidth();
+                var barPixelWidth = barPlot.getBarPixelWidth();
                 var bar0 = d3.select(bars[0][0]);
                 var bar1 = d3.select(bars[0][1]);
                 var bar2 = d3.select(bars[0][2]);
@@ -3694,20 +3694,20 @@ describe("Plots", function () {
             it("sensible bar width one datum", function () {
                 barPlot.removeDataset(dataset);
                 barPlot.addDataset([{ x: 10, y: 2 }]);
-                assert.closeTo(barPlot._getBarPixelWidth(), 228, 0.1, "sensible bar width for only one datum");
+                assert.closeTo(barPlot.getBarPixelWidth(), 228, 0.1, "sensible bar width for only one datum");
                 svg.remove();
             });
             it("sensible bar width same datum", function () {
                 barPlot.removeDataset(dataset);
                 barPlot.addDataset([{ x: 10, y: 2 }, { x: 10, y: 2 }]);
-                assert.closeTo(barPlot._getBarPixelWidth(), 228, 0.1, "uses the width sensible for one datum");
+                assert.closeTo(barPlot.getBarPixelWidth(), 228, 0.1, "uses the width sensible for one datum");
                 svg.remove();
             });
             it("sensible bar width unsorted data", function () {
                 barPlot.removeDataset(dataset);
                 barPlot.addDataset([{ x: 2, y: 2 }, { x: 20, y: 2 }, { x: 5, y: 2 }]);
                 var expectedBarPixelWidth = (xScale.scale(5) - xScale.scale(2)) * 0.95;
-                assert.closeTo(barPlot._getBarPixelWidth(), expectedBarPixelWidth, 0.1, "bar width uses closest sorted x values");
+                assert.closeTo(barPlot.getBarPixelWidth(), expectedBarPixelWidth, 0.1, "bar width uses closest sorted x values");
                 svg.remove();
             });
         });
@@ -3726,7 +3726,7 @@ describe("Plots", function () {
             it("bar width takes an appropriate value", function () {
                 var timeFormatter = d3.time.format("%m/%d/%y");
                 var expectedBarWidth = (xScale.scale(timeFormatter.parse("12/01/94")) - xScale.scale(timeFormatter.parse("12/01/93"))) * 0.95;
-                assert.closeTo(barPlot._getBarPixelWidth(), expectedBarWidth, 0.1, "width is difference between two dates");
+                assert.closeTo(barPlot.getBarPixelWidth(), expectedBarWidth, 0.1, "width is difference between two dates");
                 svg.remove();
             });
         });
@@ -3967,9 +3967,9 @@ describe("Plots", function () {
                 plot.renderTo(svg);
                 var texts = svg.selectAll("text")[0].map(function (n) { return d3.select(n).text(); });
                 assert.lengthOf(texts, 2, "both texts drawn");
-                var originalDrawLabels = plot._drawLabels;
+                var originalDrawLabels = plot.drawLabels;
                 var called = false;
-                plot._drawLabels = function () {
+                plot.drawLabels = function () {
                     if (!called) {
                         originalDrawLabels.apply(plot);
                         texts = svg.selectAll("text")[0].map(function (n) { return d3.select(n).text(); });
@@ -5666,7 +5666,7 @@ describe("Plots", function () {
             assert.closeTo(numAttr(bar2, "height"), (400 - axisHeight), 0.01, "height is correct for bar2");
             assert.closeTo(numAttr(bar3, "height"), (400 - axisHeight) / 2, 0.01, "height is correct for bar3");
             // check that clustering is correct
-            var innerScale = renderer._makeInnerScale();
+            var innerScale = renderer.makeInnerScale();
             var off = innerScale.scale("_0");
             assert.closeTo(numAttr(bar0, "x") + numAttr(bar0, "width") / 2, xScale.scale(bar0X) - xScale.rangeBand() / 2 + off, 0.01, "x pos correct for bar0");
             assert.closeTo(numAttr(bar1, "x") + numAttr(bar1, "width") / 2, xScale.scale(bar1X) - xScale.rangeBand() / 2 + off, 0.01, "x pos correct for bar1");
@@ -5734,7 +5734,7 @@ describe("Plots", function () {
             var bar2Y = bar2.data()[0].y;
             var bar3Y = bar3.data()[0].y;
             // check that clustering is correct
-            var innerScale = renderer._makeInnerScale();
+            var innerScale = renderer.makeInnerScale();
             var off = innerScale.scale("_0");
             assert.closeTo(numAttr(bar0, "y") + numAttr(bar0, "height") / 2, yScale.scale(bar0Y) - yScale.rangeBand() / 2 + off, 0.01, "y pos correct for bar0");
             assert.closeTo(numAttr(bar1, "y") + numAttr(bar1, "height") / 2, yScale.scale(bar1Y) - yScale.rangeBand() / 2 + off, 0.01, "y pos correct for bar1");

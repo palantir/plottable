@@ -79,7 +79,7 @@ describe("Plots", () => {
       assert.closeTo(numAttr(bar3, "height"), (400 - axisHeight) / 2, 0.01, "height is correct for bar3");
 
       // check that clustering is correct
-      var innerScale = (<any>renderer)._makeInnerScale();
+      var innerScale = (<any>renderer).makeInnerScale();
       var off = innerScale.scale("_0");
       assert.closeTo(numAttr(bar0, "x") + numAttr(bar0, "width") / 2, xScale.scale(bar0X) - xScale.rangeBand() / 2 + off, 0.01
           , "x pos correct for bar0");
@@ -161,7 +161,7 @@ describe("Plots", () => {
       var bar3Y = bar3.data()[0].y;
 
       // check that clustering is correct
-      var innerScale = (<any>renderer)._makeInnerScale();
+      var innerScale = (<any>renderer).makeInnerScale();
       var off = innerScale.scale("_0");
       assert.closeTo(numAttr(bar0, "y") + numAttr(bar0, "height") / 2, yScale.scale(bar0Y) - yScale.rangeBand() / 2 + off, 0.01
             , "y pos correct for bar0");

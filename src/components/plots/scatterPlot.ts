@@ -32,7 +32,7 @@ export module Plots {
     public hoverOutComponent(p: Point) {
       // no-op
     }
- 
+
     public hoverOverComponent(p: Point) {
       // no-op
     }
