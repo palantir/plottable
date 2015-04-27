@@ -9913,7 +9913,7 @@ var Plottable;
                 this._touchDispatcher.onTouchStart("Interaction.PanZoom" + this.getID(), function (ids, idToPoint, e) { return _this._handleTouchStart(ids, idToPoint, e); });
                 this._touchDispatcher.onTouchMove("Interaction.PanZoom" + this.getID(), function (ids, idToPoint, e) { return _this._handleTouchMove(ids, idToPoint, e); });
                 this._touchDispatcher.onTouchEnd("Interaction.PanZoom" + this.getID(), function (ids, idToPoint, e) { return _this._handleTouchFinish(ids, idToPoint, e); });
-                this._touchDispatcher.onTouchEnd("Interaction.PanZoom" + this.getID(), function (ids, idToPoint, e) { return _this._handleTouchFinish(ids, idToPoint, e); });
+                this._touchDispatcher.onTouchCancel("Interaction.PanZoom" + this.getID(), function (ids, idToPoint, e) { return _this._handleTouchFinish(ids, idToPoint, e); });
             };
             PanZoom.prototype._handleTouchStart = function (ids, idToPoint, e) {
                 var _this = this;

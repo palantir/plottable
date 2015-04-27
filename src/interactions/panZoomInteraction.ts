@@ -51,7 +51,7 @@ export module Interaction {
         (ids, idToPoint, e) => this._handleTouchMove(ids, idToPoint, e));
       this._touchDispatcher.onTouchEnd("Interaction.PanZoom" + this.getID(),
         (ids, idToPoint, e) => this._handleTouchFinish(ids, idToPoint, e));
-      this._touchDispatcher.onTouchEnd("Interaction.PanZoom" + this.getID(),
+      this._touchDispatcher.onTouchCancel("Interaction.PanZoom" + this.getID(),
         (ids, idToPoint, e) => this._handleTouchFinish(ids, idToPoint, e));
     }
 
