@@ -9897,9 +9897,6 @@ var Plottable;
                 ids.forEach(function (id) {
                     _this._touchIds.remove(id.toString());
                 });
-                if (this._touchIds.size() < 2) {
-                    this._setupDragInteraction();
-                }
             };
             PanZoom.magnify = function (scale, magnifyAmount, centerValue) {
                 var magnifyTransform = function (rangeValue) { return scale.invert(centerValue - (centerValue - rangeValue) * magnifyAmount); };

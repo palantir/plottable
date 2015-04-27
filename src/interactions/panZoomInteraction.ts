@@ -116,9 +116,6 @@ export module Interaction {
       ids.forEach((id) => {
         this._touchIds.remove(id.toString());
       });
-      if (this._touchIds.size() < 2) {
-        this._setupDragInteraction();
-      }
     }
 
     private static magnify<D>(scale: Scale.AbstractQuantitative<D>, magnifyAmount: number, centerValue: number) {
