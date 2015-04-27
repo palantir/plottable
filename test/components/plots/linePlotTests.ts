@@ -161,55 +161,6 @@ describe("Plots", () => {
       svg.remove();
     });
 
-    it("_getClosestWithinRange", () => {
-      var dataset2 = [
-        { foo: 0, bar: 1 },
-        { foo: 1, bar: 0.95 }
-      ];
-      linePlot.addDataset(dataset2);
-
-      var closestData = (<any> linePlot)._getClosestWithinRange({ x: 500, y: 0 }, 5);
-      assert.strictEqual(closestData.closestValue, twoPointData[1], "got closest point from first dataset");
-
-      closestData = (<any> linePlot)._getClosestWithinRange({ x: 500, y: 25 }, 5);
-      assert.strictEqual(closestData.closestValue, dataset2[1], "got closest point from second dataset");
-
-      closestData = (<any> linePlot)._getClosestWithinRange({ x: 500, y: 10 }, 5);
-      assert.isUndefined(closestData.closestValue, "returns nothing if no points are within range");
-
-      closestData = (<any> linePlot)._getClosestWithinRange({ x: 500, y: 10 }, 25);
-      assert.strictEqual(closestData.closestValue, twoPointData[1], "returns the closest point within range");
-
-      closestData = (<any> linePlot)._getClosestWithinRange({ x: 500, y: 20 }, 25);
-      assert.strictEqual(closestData.closestValue, dataset2[1], "returns the closest point within range");
-
-      svg.remove();
-    });
-
-    it("_doHover()", () => {
-      var dataset2 = [
-        { foo: 0, bar: 1 },
-        { foo: 1, bar: 0.95 }
-      ];
-      linePlot.addDataset(dataset2);
-
-      var hoverData = linePlot._doHover({ x: 495, y: 0 });
-      var expectedDatum = twoPointData[1];
-      assert.strictEqual(hoverData.data[0], expectedDatum, "returned the closest point within range");
-      var hoverTarget = hoverData.selection;
-      assert.strictEqual(parseFloat(hoverTarget.attr("cx")), xScale.scale(expectedDatum.foo), "hover target was positioned correctly (x)");
-      assert.strictEqual(parseFloat(hoverTarget.attr("cy")), yScale.scale(expectedDatum.bar), "hover target was positioned correctly (y)");
-
-      hoverData = linePlot._doHover({ x: 0, y: 0 });
-      expectedDatum = dataset2[0];
-      assert.strictEqual(hoverData.data[0], expectedDatum, "returned the closest point within range");
-      hoverTarget = hoverData.selection;
-      assert.strictEqual(parseFloat(hoverTarget.attr("cx")), xScale.scale(expectedDatum.foo), "hover target was positioned correctly (x)");
-      assert.strictEqual(parseFloat(hoverTarget.attr("cy")), yScale.scale(expectedDatum.bar), "hover target was positioned correctly (y)");
-
-      svg.remove();
-    });
-
     describe("getAllSelections()", () => {
 
       it("retrieves all dataset selections with no args", () => {

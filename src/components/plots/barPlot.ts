@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Plots {
-  export class Bar<X, Y> extends XYPlot<X, Y> implements Interactions.Hoverable {
+  export class Bar<X, Y> extends XYPlot<X, Y> {
     protected static _BarAlignmentToFactor: {[alignment: string]: number} = {"left": 0, "center": 0.5, "right": 1};
     protected static _DEFAULT_WIDTH = 10;
     private static _BAR_WIDTH_RATIO = 0.95;
@@ -13,7 +13,6 @@ export module Plots {
     protected _isVertical: boolean;
     private _barLabelFormatter: Formatter = Formatters.identity();
     private _barLabelsEnabled = false;
-    private _hoverMode = "point";
     private _hideBarsIfAnyAreTooWide = true;
     private _defaultFillColor: string;
 
@@ -454,117 +453,6 @@ export module Plots {
       }
       return barPixelWidth;
     }
-
-    /*
-     * Gets the current hover mode.
-     *
-     * @return {string} The current hover mode.
-     */
-    public hoverMode(): string;
-    /**
-     * Sets the hover mode for hover interactions. There are two modes:
-     *     - "point": Selects the bar under the mouse cursor (default).
-     *     - "line" : Selects any bar that would be hit by a line extending
-     *                in the same direction as the bar and passing through
-     *                the cursor.
-     *
-     * @param {string} mode The desired hover mode.
-     * @return {Bar} The calling Bar Plot.
-     */
-    public hoverMode(mode: String): Bar<X, Y>;
-    public hoverMode(mode?: String): any {
-      if (mode == null) {
-        return this._hoverMode;
-      }
-      var modeLC = mode.toLowerCase();
-      if (modeLC !== "point" && modeLC !== "line") {
-        throw new Error(mode + " is not a valid hover mode");
-      }
-      this._hoverMode = modeLC;
-      return this;
-    }
-
-    private _clearHoverSelection() {
-      this._getDrawersInOrder().forEach((d, i) => {
-        d._getRenderArea().selectAll("rect").classed("not-hovered hovered", false);
-      });
-    }
-
-    //===== Hover logic =====
-    public _hoverOverComponent(p: Point) {
-      // no-op
-    }
-
-    public _hoverOutComponent(p: Point) {
-      this._clearHoverSelection();
-    }
-
-    public _doHover(p: Point): Interactions.HoverData {
-      var xPositionOrExtent: any = p.x;
-      var yPositionOrExtent: any = p.y;
-      if (this._hoverMode === "line") {
-        var maxExtent: Extent = { min: -Infinity, max: Infinity };
-        if (this._isVertical) {
-          yPositionOrExtent = maxExtent;
-        } else {
-          xPositionOrExtent = maxExtent;
-        }
-      }
-
-      var xExtent: Extent = Utils.Methods.parseExtent(xPositionOrExtent);
-      var yExtent: Extent = Utils.Methods.parseExtent(yPositionOrExtent);
-
-      var bars: any[] = [];
-      var points: Point[] = [];
-      var projectors = this._generateAttrToProjector();
-
-      this._datasetKeysInOrder.forEach((key: string) => {
-        var dataset = this._key2PlotDatasetKey.get(key).dataset;
-        var plotMetadata = this._key2PlotDatasetKey.get(key).plotMetadata;
-        var barsFromDataset = this._getBarsFromDataset(key, xExtent, yExtent);
-        d3.selectAll(barsFromDataset).each((d, i) => {
-          if (this._isVertical) {
-            points.push({
-              x: projectors["x"](d, i, dataset.metadata(), plotMetadata) + projectors["width"](d, i, dataset.metadata(), plotMetadata) / 2,
-              y: projectors["y"](d, i, dataset.metadata(), plotMetadata) +
-                (projectors["positive"](d, i, dataset.metadata(), plotMetadata) ?
-                  0 : projectors["height"](d, i, dataset.metadata(), plotMetadata))
-            });
-          } else {
-            points.push({
-              x: projectors["x"](d, i, dataset.metadata(), plotMetadata) + projectors["height"](d, i, dataset.metadata(), plotMetadata) / 2,
-              y: projectors["y"](d, i, dataset.metadata(), plotMetadata) +
-                (projectors["positive"](d, i, dataset.metadata(), plotMetadata) ?
-                  0 : projectors["width"](d, i, dataset.metadata(), plotMetadata))
-            });
-          }
-        });
-        bars = bars.concat(barsFromDataset);
-      });
-
-      var barsSelection = d3.selectAll(bars);
-
-      if (!barsSelection.empty()) {
-        this._getDrawersInOrder().forEach((d, i) => {
-          d._getRenderArea().selectAll("rect").classed({ "hovered": false, "not-hovered": true });
-        });
-        barsSelection.classed({ "hovered": true, "not-hovered": false });
-      } else {
-        this._clearHoverSelection();
-        return {
-          data: null,
-          pixelPositions: null,
-          selection: null
-        };
-      }
-
-      return {
-        data: barsSelection.data(),
-        pixelPositions: points,
-        selection: barsSelection
-      };
-    }
-    //===== /Hover logic =====
 
     protected _getAllPlotData(datasetKeys: string[]): PlotData {
       var plotData = super._getAllPlotData(datasetKeys);

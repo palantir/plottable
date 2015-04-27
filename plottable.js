@@ -7335,67 +7335,6 @@ var Plottable;
                 drawSteps.push({ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("symbols") });
                 return drawSteps;
             };
-            Scatter.prototype._getClosestStruckPoint = function (p, range) {
-                var _this = this;
-                var attrToProjector = this._generateAttrToProjector();
-                var xProjector = attrToProjector["x"];
-                var yProjector = attrToProjector["y"];
-                var getDistSq = function (d, i, userMetdata, plotMetadata) {
-                    var dx = attrToProjector["x"](d, i, userMetdata, plotMetadata) - p.x;
-                    var dy = attrToProjector["y"](d, i, userMetdata, plotMetadata) - p.y;
-                    return (dx * dx + dy * dy);
-                };
-                var overAPoint = false;
-                var closestElement;
-                var closestElementUserMetadata;
-                var closestElementPlotMetadata;
-                var closestIndex;
-                var minDistSq = range * range;
-                this._datasetKeysInOrder.forEach(function (key) {
-                    var dataset = _this._key2PlotDatasetKey.get(key).dataset;
-                    var plotMetadata = _this._key2PlotDatasetKey.get(key).plotMetadata;
-                    var drawer = _this._key2PlotDatasetKey.get(key).drawer;
-                    drawer._getRenderArea().selectAll("path").each(function (d, i) {
-                        var distSq = getDistSq(d, i, dataset.metadata(), plotMetadata);
-                        var r = attrToProjector["size"](d, i, dataset.metadata(), plotMetadata) / 2;
-                        if (distSq < r * r) {
-                            if (!overAPoint || distSq < minDistSq) {
-                                closestElement = this;
-                                closestIndex = i;
-                                minDistSq = distSq;
-                                closestElementUserMetadata = dataset.metadata();
-                                closestElementPlotMetadata = plotMetadata;
-                            }
-                            overAPoint = true;
-                        }
-                        else if (!overAPoint && distSq < minDistSq) {
-                            closestElement = this;
-                            closestIndex = i;
-                            minDistSq = distSq;
-                            closestElementUserMetadata = dataset.metadata();
-                            closestElementPlotMetadata = plotMetadata;
-                        }
-                    });
-                });
-                if (!closestElement) {
-                    return {
-                        selection: null,
-                        pixelPositions: null,
-                        data: null
-                    };
-                }
-                var closestSelection = d3.select(closestElement);
-                var closestData = closestSelection.data();
-                var closestPoint = {
-                    x: attrToProjector["x"](closestData[0], closestIndex, closestElementUserMetadata, closestElementPlotMetadata),
-                    y: attrToProjector["y"](closestData[0], closestIndex, closestElementUserMetadata, closestElementPlotMetadata)
-                };
-                return {
-                    selection: closestSelection,
-                    pixelPositions: [closestPoint],
-                    data: closestData
-                };
-            };
             Scatter.prototype._isVisibleOnPlot = function (datum, pixelPoint, selection) {
                 var xRange = { min: 0, max: this.width() };
                 var yRange = { min: 0, max: this.height() };
@@ -7408,16 +7347,6 @@ var Plottable;
                     height: bbox.height
                 };
                 return Plottable.Utils.Methods.intersectsBBox(xRange, yRange, translatedBbox);
-            };
-            //===== Hover logic =====
-            Scatter.prototype._hoverOverComponent = function (p) {
-                // no-op
-            };
-            Scatter.prototype._hoverOutComponent = function (p) {
-                // no-op
-            };
-            Scatter.prototype._doHover = function (p) {
-                return this._getClosestStruckPoint(p, this._closeDetectionRadius);
             };
             return Scatter;
         })(Plottable.XYPlot);
@@ -7552,7 +7481,6 @@ var Plottable;
                 this._barAlignmentFactor = 0.5;
                 this._barLabelFormatter = Plottable.Formatters.identity();
                 this._barLabelsEnabled = false;
-                this._hoverMode = "point";
                 this._hideBarsIfAnyAreTooWide = true;
                 this.classed("bar-plot", true);
                 this._defaultFillColor = new Plottable.Scales.Color().range()[0];
@@ -7887,89 +7815,6 @@ var Plottable;
                 }
                 return barPixelWidth;
             };
-            Bar.prototype.hoverMode = function (mode) {
-                if (mode == null) {
-                    return this._hoverMode;
-                }
-                var modeLC = mode.toLowerCase();
-                if (modeLC !== "point" && modeLC !== "line") {
-                    throw new Error(mode + " is not a valid hover mode");
-                }
-                this._hoverMode = modeLC;
-                return this;
-            };
-            Bar.prototype._clearHoverSelection = function () {
-                this._getDrawersInOrder().forEach(function (d, i) {
-                    d._getRenderArea().selectAll("rect").classed("not-hovered hovered", false);
-                });
-            };
-            //===== Hover logic =====
-            Bar.prototype._hoverOverComponent = function (p) {
-                // no-op
-            };
-            Bar.prototype._hoverOutComponent = function (p) {
-                this._clearHoverSelection();
-            };
-            Bar.prototype._doHover = function (p) {
-                var _this = this;
-                var xPositionOrExtent = p.x;
-                var yPositionOrExtent = p.y;
-                if (this._hoverMode === "line") {
-                    var maxExtent = { min: -Infinity, max: Infinity };
-                    if (this._isVertical) {
-                        yPositionOrExtent = maxExtent;
-                    }
-                    else {
-                        xPositionOrExtent = maxExtent;
-                    }
-                }
-                var xExtent = Plottable.Utils.Methods.parseExtent(xPositionOrExtent);
-                var yExtent = Plottable.Utils.Methods.parseExtent(yPositionOrExtent);
-                var bars = [];
-                var points = [];
-                var projectors = this._generateAttrToProjector();
-                this._datasetKeysInOrder.forEach(function (key) {
-                    var dataset = _this._key2PlotDatasetKey.get(key).dataset;
-                    var plotMetadata = _this._key2PlotDatasetKey.get(key).plotMetadata;
-                    var barsFromDataset = _this._getBarsFromDataset(key, xExtent, yExtent);
-                    d3.selectAll(barsFromDataset).each(function (d, i) {
-                        if (_this._isVertical) {
-                            points.push({
-                                x: projectors["x"](d, i, dataset.metadata(), plotMetadata) + projectors["width"](d, i, dataset.metadata(), plotMetadata) / 2,
-                                y: projectors["y"](d, i, dataset.metadata(), plotMetadata) + (projectors["positive"](d, i, dataset.metadata(), plotMetadata) ? 0 : projectors["height"](d, i, dataset.metadata(), plotMetadata))
-                            });
-                        }
-                        else {
-                            points.push({
-                                x: projectors["x"](d, i, dataset.metadata(), plotMetadata) + projectors["height"](d, i, dataset.metadata(), plotMetadata) / 2,
-                                y: projectors["y"](d, i, dataset.metadata(), plotMetadata) + (projectors["positive"](d, i, dataset.metadata(), plotMetadata) ? 0 : projectors["width"](d, i, dataset.metadata(), plotMetadata))
-                            });
-                        }
-                    });
-                    bars = bars.concat(barsFromDataset);
-                });
-                var barsSelection = d3.selectAll(bars);
-                if (!barsSelection.empty()) {
-                    this._getDrawersInOrder().forEach(function (d, i) {
-                        d._getRenderArea().selectAll("rect").classed({ "hovered": false, "not-hovered": true });
-                    });
-                    barsSelection.classed({ "hovered": true, "not-hovered": false });
-                }
-                else {
-                    this._clearHoverSelection();
-                    return {
-                        data: null,
-                        pixelPositions: null,
-                        selection: null
-                    };
-                }
-                return {
-                    data: barsSelection.data(),
-                    pixelPositions: points,
-                    selection: barsSelection
-                };
-            };
-            //===== /Hover logic =====
             Bar.prototype._getAllPlotData = function (datasetKeys) {
                 var plotData = _super.prototype._getAllPlotData.call(this, datasetKeys);
                 var valueScale = this._isVertical ? this._yScale : this._xScale;
@@ -8026,16 +7871,11 @@ var Plottable;
              */
             function Line(xScale, yScale) {
                 _super.call(this, xScale, yScale);
-                this._hoverDetectionRadius = 15;
                 this.classed("line-plot", true);
                 this.animator("reset", new Plottable.Animators.Null());
                 this.animator("main", new Plottable.Animators.Base().duration(600).easing("exp-in-out"));
                 this._defaultStrokeColor = new Plottable.Scales.Color().range()[0];
             }
-            Line.prototype._setup = function () {
-                _super.prototype._setup.call(this);
-                this._hoverTarget = this.foreground().append("circle").classed("hover-target", true).attr("r", this._hoverDetectionRadius).style("visibility", "hidden");
-            };
             Line.prototype._rejectNullsAndNaNs = function (d, i, userMetdata, plotMetadata, accessor) {
                 var value = accessor(d, i, userMetdata, plotMetadata);
                 return value != null && value === value;
@@ -8083,39 +7923,6 @@ var Plottable;
             };
             Line.prototype._wholeDatumAttributes = function () {
                 return ["x", "y"];
-            };
-            Line.prototype._getClosestWithinRange = function (p, range) {
-                var _this = this;
-                var attrToProjector = this._generateAttrToProjector();
-                var xProjector = attrToProjector["x"];
-                var yProjector = attrToProjector["y"];
-                var getDistSq = function (d, i, userMetdata, plotMetadata) {
-                    var dx = +xProjector(d, i, userMetdata, plotMetadata) - p.x;
-                    var dy = +yProjector(d, i, userMetdata, plotMetadata) - p.y;
-                    return (dx * dx + dy * dy);
-                };
-                var closestOverall;
-                var closestPoint;
-                var closestDistSq = range * range;
-                this._datasetKeysInOrder.forEach(function (key) {
-                    var dataset = _this._key2PlotDatasetKey.get(key).dataset;
-                    var plotMetadata = _this._key2PlotDatasetKey.get(key).plotMetadata;
-                    dataset.data().forEach(function (d, i) {
-                        var distSq = getDistSq(d, i, dataset.metadata(), plotMetadata);
-                        if (distSq < closestDistSq) {
-                            closestOverall = d;
-                            closestPoint = {
-                                x: xProjector(d, i, dataset.metadata(), plotMetadata),
-                                y: yProjector(d, i, dataset.metadata(), plotMetadata)
-                            };
-                            closestDistSq = distSq;
-                        }
-                    });
-                });
-                return {
-                    closestValue: closestOverall,
-                    closestPoint: closestPoint
-                };
             };
             Line.prototype._getAllPlotData = function (datasetKeys) {
                 var _this = this;
@@ -8187,34 +7994,6 @@ var Plottable;
                     data: closestData,
                     pixelPoints: closestPixelPoints,
                     selection: d3.selectAll(closestElements)
-                };
-            };
-            //===== Hover logic =====
-            Line.prototype._hoverOverComponent = function (p) {
-                // no-op
-            };
-            Line.prototype._hoverOutComponent = function (p) {
-                // no-op
-            };
-            Line.prototype._doHover = function (p) {
-                var closestInfo = this._getClosestWithinRange(p, this._hoverDetectionRadius);
-                var closestValue = closestInfo.closestValue;
-                if (closestValue === undefined) {
-                    return {
-                        data: null,
-                        pixelPositions: null,
-                        selection: null
-                    };
-                }
-                var closestPoint = closestInfo.closestPoint;
-                this._hoverTarget.attr({
-                    "cx": closestInfo.closestPoint.x,
-                    "cy": closestInfo.closestPoint.y
-                });
-                return {
-                    data: [closestValue],
-                    pixelPositions: [closestPoint],
-                    selection: this._hoverTarget
                 };
             };
             return Line;
@@ -9983,147 +9762,6 @@ var Plottable;
             return Drag;
         })(Plottable.Interaction);
         Interactions.Drag = Drag;
-    })(Interactions = Plottable.Interactions || (Plottable.Interactions = {}));
-})(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    var Interactions;
-    (function (Interactions) {
-        var Hover = (function (_super) {
-            __extends(Hover, _super);
-            function Hover() {
-                _super.call(this);
-                this._overComponent = false;
-                this._currentHoverData = {
-                    data: null,
-                    pixelPositions: null,
-                    selection: null
-                };
-                if (!Hover.warned) {
-                    Hover.warned = true;
-                    Plottable.Utils.Methods.warn("Interaction.Hover is deprecated; use Interaction.Pointer in conjunction with getClosestPlotData() instead.");
-                }
-            }
-            Hover.prototype._anchor = function (component, hitBox) {
-                var _this = this;
-                _super.prototype._anchor.call(this, component, hitBox);
-                this._mouseDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(this._componentToListenTo._element.node());
-                this._mouseDispatcher.onMouseMove("hover" + this.getID(), function (p) { return _this._handlePointerEvent(p); });
-                this._touchDispatcher = Plottable.Dispatchers.Touch.getDispatcher(this._componentToListenTo._element.node());
-                this._touchDispatcher.onTouchStart("hover" + this.getID(), function (ids, idToPoint) { return _this._handlePointerEvent(idToPoint[ids[0]]); });
-            };
-            Hover.prototype._handlePointerEvent = function (p) {
-                p = this._translateToComponentSpace(p);
-                if (this._isInsideComponent(p)) {
-                    if (!this._overComponent) {
-                        this._componentToListenTo._hoverOverComponent(p);
-                    }
-                    this.handleHoverOver(p);
-                    this._overComponent = true;
-                }
-                else {
-                    this._componentToListenTo._hoverOutComponent(p);
-                    this.safeHoverOut(this._currentHoverData);
-                    this._currentHoverData = {
-                        data: null,
-                        pixelPositions: null,
-                        selection: null
-                    };
-                    this._overComponent = false;
-                }
-            };
-            /**
-             * Returns a HoverData consisting of all data and selections in a but not in b.
-             */
-            Hover.diffHoverData = function (a, b) {
-                if (a.data == null || b.data == null) {
-                    return a;
-                }
-                var diffData = [];
-                var diffPoints = [];
-                var diffElements = [];
-                a.data.forEach(function (d, i) {
-                    if (b.data.indexOf(d) === -1) {
-                        diffData.push(d);
-                        diffPoints.push(a.pixelPositions[i]);
-                        diffElements.push(a.selection[0][i]);
-                    }
-                });
-                if (diffData.length === 0) {
-                    return {
-                        data: null,
-                        pixelPositions: null,
-                        selection: null
-                    };
-                }
-                return {
-                    data: diffData,
-                    pixelPositions: diffPoints,
-                    selection: d3.selectAll(diffElements)
-                };
-            };
-            Hover.prototype.handleHoverOver = function (p) {
-                var lastHoverData = this._currentHoverData;
-                var newHoverData = this._componentToListenTo._doHover(p);
-                this._currentHoverData = newHoverData;
-                var outData = Hover.diffHoverData(lastHoverData, newHoverData);
-                this.safeHoverOut(outData);
-                var overData = Hover.diffHoverData(newHoverData, lastHoverData);
-                this.safeHoverOver(overData);
-            };
-            Hover.prototype.safeHoverOut = function (outData) {
-                if (this._hoverOutCallback && outData.data) {
-                    this._hoverOutCallback(outData);
-                }
-            };
-            Hover.prototype.safeHoverOver = function (overData) {
-                if (this._hoverOverCallback && overData.data) {
-                    this._hoverOverCallback(overData);
-                }
-            };
-            /**
-             * Attaches an callback to be called when the user mouses over an element.
-             *
-             * @param {(hoverData: HoverData) => any} callback The callback to be called.
-             *      The callback will be passed data for newly hovered-over elements.
-             * @return {Interaction.Hover} The calling Interaction.Hover.
-             */
-            Hover.prototype.onHoverOver = function (callback) {
-                this._hoverOverCallback = callback;
-                return this;
-            };
-            /**
-             * Attaches a callback to be called when the user mouses off of an element.
-             *
-             * @param {(hoverData: HoverData) => any} callback The callback to be called.
-             *      The callback will be passed data from the hovered-out elements.
-             * @return {Interaction.Hover} The calling Interaction.Hover.
-             */
-            Hover.prototype.onHoverOut = function (callback) {
-                this._hoverOutCallback = callback;
-                return this;
-            };
-            /**
-             * Retrieves the HoverData associated with the elements the user is currently hovering over.
-             *
-             * @return {HoverData} The data and selection corresponding to the elements
-             *                     the user is currently hovering over.
-             */
-            Hover.prototype.getCurrentHoverData = function () {
-                return this._currentHoverData;
-            };
-            Hover.warned = false;
-            return Hover;
-        })(Plottable.Interaction);
-        Interactions.Hover = Hover;
     })(Interactions = Plottable.Interactions || (Plottable.Interactions = {}));
 })(Plottable || (Plottable = {}));
 
