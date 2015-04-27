@@ -50,7 +50,9 @@ export module Interaction {
       this._touchDispatcher.onTouchMove("Interaction.PanZoom" + this.getID(),
         (ids, idToPoint, e) => this._handleTouchMove(ids, idToPoint, e));
       this._touchDispatcher.onTouchEnd("Interaction.PanZoom" + this.getID(),
-        (ids, idToPoint, e) => this._handleTouchEnd(ids, idToPoint, e));
+        (ids, idToPoint, e) => this._handleTouchFinish(ids, idToPoint, e));
+      this._touchDispatcher.onTouchEnd("Interaction.PanZoom" + this.getID(),
+        (ids, idToPoint, e) => this._handleTouchFinish(ids, idToPoint, e));
     }
 
     private _handleTouchStart(ids: number[], idToPoint: { [id: number]: Point; }, e: TouchEvent) {
@@ -112,7 +114,7 @@ export module Interaction {
       }
     }
 
-    private _handleTouchEnd(ids: number[], idToPoint: { [id: number]: Point; }, e: TouchEvent) {
+    private _handleTouchFinish(ids: number[], idToPoint: { [id: number]: Point; }, e: TouchEvent) {
       ids.forEach((id) => {
         this._touchIds.remove(id.toString());
       });
