@@ -3,7 +3,7 @@
 module Plottable {
 export module Plots {
   export class Grid extends Rectangle<any, any> {
-    private _colorScale: Scale<any, string>;
+    private colorScale: Scale<any, string>;
 
     /**
      * Constructs a GridPlot.
@@ -30,7 +30,7 @@ export module Plots {
         yScale.innerPadding(0).outerPadding(0);
       }
 
-      this._colorScale = colorScale;
+      this.colorScale = colorScale;
       this.animator("cells", new Animators.Null());
     }
 
@@ -43,7 +43,7 @@ export module Plots {
       return this;
     }
 
-    protected _getDrawer(key: string) {
+    protected getDrawer(key: string) {
       return new Drawers.Rect(key, true);
     }
 
@@ -87,14 +87,14 @@ export module Plots {
       }
 
       if (attrToSet === "fill") {
-        this._colorScale = this.projections["fill"].scale;
+        this.colorScale = this.projections["fill"].scale;
       }
 
       return this;
     }
 
-    protected _generateDrawSteps(): Drawers.DrawStep[] {
-      return [{attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("cells")}];
+    protected generateDrawSteps(): Drawers.DrawStep[] {
+      return [{attrToProjector: this.generateAttrToProjector(), animator: this._getAnimator("cells")}];
     }
   }
 }

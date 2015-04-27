@@ -4,18 +4,18 @@ module Plottable {
 export module Components {
   type _LayoutAllocation = {
     guaranteedHeights: number[];
-    guaranteedWidths : number[];
+    guaranteedWidths: number[];
     wantsHeightArr: boolean[];
-    wantsWidthArr : boolean[];
+    wantsWidthArr: boolean[];
   }
 
   export type _IterateLayoutResult = {
     colProportionalSpace: number[];
-    guaranteedHeights   : number[];
-    guaranteedWidths    : number[];
+    guaranteedHeights: number[];
+    guaranteedWidths: number[];
     rowProportionalSpace: number[];
-    wantsHeight         : boolean;
-    wantsWidth          : boolean;
+    wantsHeight: boolean;
+    wantsWidth: boolean;
   };
 
   export class Table extends ComponentContainer {
@@ -178,7 +178,7 @@ export module Components {
       }
     }
 
-    public requestedSpace(offeredWidth : number, offeredHeight: number): _SpaceRequest {
+    public requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
       this.calculatedLayout = this.iterateLayout(offeredWidth , offeredHeight);
       return {width : d3.sum(this.calculatedLayout.guaranteedWidths ),
               height: d3.sum(this.calculatedLayout.guaranteedHeights),
@@ -298,7 +298,7 @@ export module Components {
      * circumstances this will happen or if it will happen at all. A message will be printed to the console if this occurs.
      *
      */
-    private iterateLayout(availableWidth : number, availableHeight: number): _IterateLayoutResult {
+    private iterateLayout(availableWidth: number, availableHeight: number): _IterateLayoutResult {
       var rows = this.rows;
       var cols = d3.transpose(this.rows);
       var availableWidthAfterPadding  = availableWidth  - this.colPadding * (this.numCols - 1);

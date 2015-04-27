@@ -165,7 +165,7 @@ module Plottable {
     }
 
     protected setDomain(values: D[]) {
-      if(!this.domainModificationInProgress) {
+      if (!this.domainModificationInProgress) {
         this.domainModificationInProgress = true;
         this.d3Scale.domain(values);
         this.broadcaster.broadcast();

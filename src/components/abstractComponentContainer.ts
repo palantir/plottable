@@ -8,23 +8,6 @@ module Plottable {
   export class ComponentContainer extends Component {
     private _components: Component[] = [];
 
-    public anchor(element: D3.Selection) {
-      super.anchor(element);
-      this.components().forEach((c) => c.anchor(this._content));
-    }
-
-    public render() {
-      this._components.forEach((c) => c.render());
-    }
-
-    public removeComponent(c: Component) {
-      var removeIndex = this._components.indexOf(c);
-      if (removeIndex >= 0) {
-        this.components().splice(removeIndex, 1);
-        this.invalidateLayout();
-      }
-    }
-
     public _addComponent(c: Component, prepend = false): boolean {
       if (!c || this._components.indexOf(c) >= 0) {
         return false;
@@ -43,6 +26,11 @@ module Plottable {
       return true;
     }
 
+    public anchor(element: D3.Selection) {
+      super.anchor(element);
+      this.components().forEach((c) => c.anchor(this._content));
+    }
+
     /**
      * Returns a list of components in the ComponentContainer.
      *
@@ -50,15 +38,6 @@ module Plottable {
      */
     public components(): Component[] {
       return this._components;
-    }
-
-    /**
-     * Returns true iff the ComponentContainer is empty.
-     *
-     * @returns {boolean} Whether the calling ComponentContainer is empty.
-     */
-    public empty() {
-      return this._components.length === 0;
     }
 
     /**
@@ -74,14 +53,35 @@ module Plottable {
       return this;
     }
 
+    /**
+     * Returns true iff the ComponentContainer is empty.
+     *
+     * @returns {boolean} Whether the calling ComponentContainer is empty.
+     */
+    public empty() {
+      return this._components.length === 0;
+    }
+
     public remove() {
       super.remove();
       this.components().slice().forEach((c: Component) => c.remove());
     }
 
+    public removeComponent(c: Component) {
+      var removeIndex = this._components.indexOf(c);
+      if (removeIndex >= 0) {
+        this.components().splice(removeIndex, 1);
+        this.invalidateLayout();
+      }
+    }
+
+    public render() {
+      this._components.forEach((c) => c.render());
+    }
+
     public useLastCalculatedLayout(): boolean;
-    public useLastCalculatedLayout(calculated: boolean) : Component;
-    public useLastCalculatedLayout(calculated?: boolean) : any {
+    public useLastCalculatedLayout(calculated: boolean): Component;
+    public useLastCalculatedLayout(calculated?: boolean): any {
       if (calculated != null) {
         this.components().slice().forEach((c: Component) => c.useLastCalculatedLayout(calculated));
       }

@@ -24,8 +24,8 @@ export module Plots {
       super(xScale, yScale, isVertical);
     }
 
-    protected _generateAttrToProjector() {
-      var attrToProjector = super._generateAttrToProjector();
+    protected generateAttrToProjector() {
+      var attrToProjector = super.generateAttrToProjector();
       // the width is constant, so set the inner scale range to that
       var innerScale = this._makeInnerScale();
       var innerWidthF = (d: any, i: number) => innerScale.rangeBand();

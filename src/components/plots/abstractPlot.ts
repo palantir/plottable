@@ -214,7 +214,7 @@ module Plottable {
      * @returns {AttributeToAppliedProjector} A dictionary mapping attributes to functions
      */
     public generateProjectors(datasetKey: string): AttributeToAppliedProjector {
-      var attrToProjector = this._generateAttrToProjector();
+      var attrToProjector = this.generateAttrToProjector();
       var plotDatasetKey = this._key2PlotDatasetKey.get(datasetKey);
       var plotMetadata = plotDatasetKey.plotMetadata;
       var userMetadata = plotDatasetKey.dataset.metadata();
@@ -407,15 +407,15 @@ module Plottable {
       return this._datasetKeysInOrder.map((k) => this._key2PlotDatasetKey.get(k).drawer);
     }
 
-    protected _generateDrawSteps(): Drawers.DrawStep[] {
-      return [{attrToProjector: this._generateAttrToProjector(), animator: new Animators.Null()}];
+    protected generateDrawSteps(): Drawers.DrawStep[] {
+      return [{attrToProjector: this.generateAttrToProjector(), animator: new Animators.Null()}];
     }
 
     protected _additionalPaint(time: number) {
       // no-op
     }
 
-    protected _generateAttrToProjector(): AttributeToProjector {
+    protected generateAttrToProjector(): AttributeToProjector {
       var h: AttributeToProjector = {};
       d3.keys(this.projections).forEach((a) => {
         var projection = this.projections[a];
@@ -466,7 +466,7 @@ module Plottable {
       return datasets;
     }
 
-    protected _getDrawer(key: string): Drawers.AbstractDrawer {
+    protected getDrawer(key: string): Drawers.AbstractDrawer {
       return new Drawers.AbstractDrawer(key);
     }
 
@@ -514,7 +514,7 @@ module Plottable {
       if (this._key2PlotDatasetKey.has(key)) {
         this.removeDataset(key);
       };
-      var drawer = this._getDrawer(key);
+      var drawer = this.getDrawer(key);
       var metadata = this._getPlotMetadataForDataset(key);
       var pdk = {drawer: drawer, dataset: dataset, key: key, plotMetadata: metadata};
       this._datasetKeysInOrder.push(key);
@@ -528,7 +528,7 @@ module Plottable {
     }
 
     private _paint() {
-      var drawSteps = this._generateDrawSteps();
+      var drawSteps = this.generateDrawSteps();
       var dataToDraw = this._getDataToDraw();
       var drawers = this._getDrawersInOrder();
 

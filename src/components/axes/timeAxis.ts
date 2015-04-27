@@ -185,7 +185,7 @@ export module Axes {
      */
     public axisConfigurations(configurations: TimeAxisConfiguration[]): Time;
     public axisConfigurations(configurations?: any): any {
-      if(configurations == null){
+      if (configurations == null) {
         return this.possibleTimeAxisConfigurations;
       }
       this.possibleTimeAxisConfigurations = configurations;

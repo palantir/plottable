@@ -161,7 +161,7 @@ export module Scales {
      */
     private static getD3InterpolatedScale(colors: string[], scaleType: string): D3.Scale.QuantitativeScale {
       var scale: D3.Scale.QuantitativeScale;
-      switch(scaleType){
+      switch (scaleType){
         case "linear":
           scale = d3.scale.linear();
           break;

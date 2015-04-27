@@ -36,7 +36,7 @@ export module Plots {
       this.baseline(0);
     }
 
-    protected _getDrawer(key: string) {
+    protected getDrawer(key: string) {
       return new Plottable.Drawers.Rect(key, this._isVertical);
     }
 
@@ -329,7 +329,7 @@ export module Plots {
 
     protected _drawLabels() {
       var drawers: Drawers.Rect[] = <any> this._getDrawersInOrder();
-      var attrToProjector = this._generateAttrToProjector();
+      var attrToProjector = this.generateAttrToProjector();
       var dataToDraw = this._getDataToDraw();
       this._datasetKeysInOrder.forEach((k, i) =>
         drawers[i].drawText(dataToDraw.get(k),
@@ -341,10 +341,10 @@ export module Plots {
       }
     }
 
-    protected _generateDrawSteps(): Drawers.DrawStep[] {
+    protected generateDrawSteps(): Drawers.DrawStep[] {
       var drawSteps: Drawers.DrawStep[] = [];
       if (this._dataChanged && this.animated) {
-        var resetAttrToProjector = this._generateAttrToProjector();
+        var resetAttrToProjector = this.generateAttrToProjector();
         var primaryScale: Scale<any, number> = this._isVertical ? this._yScale : this._xScale;
         var scaledBaseline = primaryScale.scale(this._baselineValue);
         var positionAttr = this._isVertical ? "y" : "x";
@@ -353,14 +353,14 @@ export module Plots {
         resetAttrToProjector[dimensionAttr] = () => 0;
         drawSteps.push({attrToProjector: resetAttrToProjector, animator: this._getAnimator("bars-reset")});
       }
-      drawSteps.push({attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("bars")});
+      drawSteps.push({attrToProjector: this.generateAttrToProjector(), animator: this._getAnimator("bars")});
       return drawSteps;
     }
 
-    protected _generateAttrToProjector() {
+    protected generateAttrToProjector() {
       // Primary scale/direction: the "length" of the bars
       // Secondary scale/direction: the "width" of the bars
-      var attrToProjector = super._generateAttrToProjector();
+      var attrToProjector = super.generateAttrToProjector();
       var primaryScale: Scale<any, number>    = this._isVertical ? this._yScale : this._xScale;
       var secondaryScale: Scale<any, number>  = this._isVertical ? this._xScale : this._yScale;
       var primaryAttr     = this._isVertical ? "y" : "x";
@@ -516,7 +516,7 @@ export module Plots {
 
       var bars: any[] = [];
       var points: Point[] = [];
-      var projectors = this._generateAttrToProjector();
+      var projectors = this.generateAttrToProjector();
 
       this._datasetKeysInOrder.forEach((key: string) => {
         var dataset = this._key2PlotDatasetKey.get(key).dataset;

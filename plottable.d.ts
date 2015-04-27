@@ -1826,10 +1826,8 @@ declare module Plottable {
 
 declare module Plottable {
     class ComponentContainer extends Component {
-        anchor(element: D3.Selection): void;
-        render(): void;
-        removeComponent(c: Component): void;
         _addComponent(c: Component, prepend?: boolean): boolean;
+        anchor(element: D3.Selection): void;
         /**
          * Returns a list of components in the ComponentContainer.
          *
@@ -1837,19 +1835,21 @@ declare module Plottable {
          */
         components(): Component[];
         /**
-         * Returns true iff the ComponentContainer is empty.
-         *
-         * @returns {boolean} Whether the calling ComponentContainer is empty.
-         */
-        empty(): boolean;
-        /**
          * Detaches all components contained in the ComponentContainer, and
          * empties the ComponentContainer.
          *
          * @returns {ComponentContainer} The calling ComponentContainer
          */
         detachAll(): ComponentContainer;
+        /**
+         * Returns true iff the ComponentContainer is empty.
+         *
+         * @returns {boolean} Whether the calling ComponentContainer is empty.
+         */
+        empty(): boolean;
         remove(): void;
+        removeComponent(c: Component): void;
+        render(): void;
         useLastCalculatedLayout(): boolean;
         useLastCalculatedLayout(calculated: boolean): Component;
     }
@@ -1873,15 +1873,15 @@ declare module Plottable {
              * @param {Component[]} components The Components in the resultant Component.Group (default = []).
              */
             constructor(components?: Component[]);
-            requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
-            merge(c: Component, below: boolean): Group;
             computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): Group;
+            isFixedHeight(): boolean;
+            isFixedWidth(): boolean;
+            merge(c: Component, below: boolean): Group;
+            requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
             protected getSize(availableWidth: number, availableHeight: number): {
                 width: number;
                 height: number;
             };
-            isFixedWidth(): boolean;
-            isFixedHeight(): boolean;
         }
     }
 }
@@ -2805,13 +2805,13 @@ declare module Plottable {
         removeDataset(datasetIdentifier: string | Dataset | any[]): Plot;
         _updateScaleExtent(attr: string): void;
         protected _getDrawersInOrder(): Drawers.AbstractDrawer[];
-        protected _generateDrawSteps(): Drawers.DrawStep[];
+        protected generateDrawSteps(): Drawers.DrawStep[];
         protected _additionalPaint(time: number): void;
-        protected _generateAttrToProjector(): AttributeToProjector;
+        protected generateAttrToProjector(): AttributeToProjector;
         protected _getAllPlotData(datasetKeys: string[]): Plots.PlotData;
         protected _getAnimator(key: string): Animators.PlotAnimator;
         protected _getDataToDraw(): D3.Map<any[]>;
-        protected _getDrawer(key: string): Drawers.AbstractDrawer;
+        protected getDrawer(key: string): Drawers.AbstractDrawer;
         /**
          * Gets the new plot metadata for new dataset with provided key
          *
@@ -2841,8 +2841,8 @@ declare module Plottable {
             constructor();
             computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;
             addDataset(keyOrDataset: any, dataset?: any): Pie;
-            protected _generateAttrToProjector(): AttributeToProjector;
-            protected _getDrawer(key: string): Drawers.AbstractDrawer;
+            protected generateAttrToProjector(): AttributeToProjector;
+            protected getDrawer(key: string): Drawers.AbstractDrawer;
             getAllPlotData(datasetKeys?: string | string[]): PlotData;
         }
     }
@@ -2889,7 +2889,7 @@ declare module Plottable {
          * @returns {XYPlot} The calling XYPlot.
          */
         automaticallyAdjustXScaleOverVisiblePoints(autoAdjustment: boolean): XYPlot<X, Y>;
-        protected _generateAttrToProjector(): AttributeToProjector;
+        protected generateAttrToProjector(): AttributeToProjector;
         computeLayout(offeredXOrigin?: number, offeredYOffset?: number, availableWidth?: number, availableHeight?: number): void;
         protected _updateXDomainer(): void;
         protected _updateYDomainer(): void;
@@ -2927,11 +2927,11 @@ declare module Plottable {
              * @param {Scale.Scale} yScale The y scale to use.
              */
             constructor(xScale: Scale<X, any>, yScale: Scale<Y, any>);
-            protected _getDrawer(key: string): Drawers.Rect;
-            protected _generateAttrToProjector(): {
+            protected generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
             };
-            protected _generateDrawSteps(): Drawers.DrawStep[];
+            protected generateDrawSteps(): Drawers.DrawStep[];
+            protected getDrawer(key: string): Drawers.Rect;
         }
     }
 }
@@ -2948,11 +2948,11 @@ declare module Plottable {
              * @param {Scale} yScale The y scale to use.
              */
             constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>);
-            protected _getDrawer(key: string): Drawers.Symbol;
-            protected _generateAttrToProjector(): {
+            protected getDrawer(key: string): Drawers.Symbol;
+            protected generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
             };
-            protected _generateDrawSteps(): Drawers.DrawStep[];
+            protected generateDrawSteps(): Drawers.DrawStep[];
             protected _getClosestStruckPoint(p: Point, range: number): Interactions.HoverData;
             protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean;
             hoverOverComponent(p: Point): void;
@@ -2980,13 +2980,13 @@ declare module Plottable {
              */
             constructor(xScale: Scale<any, any>, yScale: Scale<any, any>, colorScale: Scale<any, string>);
             addDataset(keyOrDataset: any, dataset?: any): Grid;
-            protected _getDrawer(key: string): Drawers.Rect;
+            protected getDrawer(key: string): Drawers.Rect;
             /**
              * @param {string} attrToSet One of ["x", "y", "x2", "y2", "fill"]. If "fill" is used,
              * the data should return a valid CSS color.
              */
             project(attrToSet: string, accessor: any, scale?: Scale<any, any>): Grid;
-            protected _generateDrawSteps(): Drawers.DrawStep[];
+            protected generateDrawSteps(): Drawers.DrawStep[];
         }
     }
 }
@@ -3009,7 +3009,7 @@ declare module Plottable {
              * @param {boolean} isVertical if the plot if vertical.
              */
             constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>, isVertical?: boolean);
-            protected _getDrawer(key: string): Drawers.Rect;
+            protected getDrawer(key: string): Drawers.Rect;
             protected setup(): void;
             /**
              * Gets the baseline value for the bars
@@ -3092,8 +3092,8 @@ declare module Plottable {
             protected _updateXDomainer(): void;
             protected _additionalPaint(time: number): void;
             protected _drawLabels(): void;
-            protected _generateDrawSteps(): Drawers.DrawStep[];
-            protected _generateAttrToProjector(): {
+            protected generateDrawSteps(): Drawers.DrawStep[];
+            protected generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
             };
             /**
@@ -3140,10 +3140,10 @@ declare module Plottable {
             constructor(xScale: QuantitativeScale<X>, yScale: QuantitativeScale<number>);
             protected setup(): void;
             protected _rejectNullsAndNaNs(d: any, i: number, userMetdata: any, plotMetadata: any, accessor: _Accessor): boolean;
-            protected _getDrawer(key: string): Drawers.Line;
+            protected getDrawer(key: string): Drawers.Line;
             protected _getResetYFunction(): (d: any, i: number, u: any, m: PlotMetadata) => number;
-            protected _generateDrawSteps(): Drawers.DrawStep[];
-            protected _generateAttrToProjector(): {
+            protected generateDrawSteps(): Drawers.DrawStep[];
+            protected generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
             };
             protected _wholeDatumAttributes(): string[];
@@ -3189,10 +3189,10 @@ declare module Plottable {
              */
             constructor(xScale: QuantitativeScale<X>, yScale: QuantitativeScale<number>);
             project(attrToSet: string, accessor: any, scale?: Scale<any, any>): Area<X>;
-            protected _generateAttrToProjector(): {
+            protected generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
             };
-            protected _getDrawer(key: string): Drawers.Area;
+            protected getDrawer(key: string): Drawers.Area;
             protected _getResetYFunction(): (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
             protected _onDatasetUpdate(): void;
             protected _updateYDomainer(): void;
@@ -3221,7 +3221,7 @@ declare module Plottable {
              * @param {boolean} isVertical if the plot if vertical.
              */
             constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>, isVertical?: boolean);
-            protected _generateAttrToProjector(): {
+            protected generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
             };
             protected _getDataToDraw(): D3.Map<any[]>;
@@ -3283,14 +3283,14 @@ declare module Plottable {
              * @param {QuantitativeScaleScale} yScale The y scale to use.
              */
             constructor(xScale: QuantitativeScale<X>, yScale: QuantitativeScale<number>);
-            protected _getDrawer(key: string): Drawers.Area;
+            protected getDrawer(key: string): Drawers.Area;
             _getAnimator(key: string): Animators.PlotAnimator;
             protected setup(): void;
             protected _additionalPaint(): void;
             protected _updateYDomainer(): void;
             project(attrToSet: string, accessor: any, scale?: Scale<any, any>): StackedArea<X>;
             protected _onDatasetUpdate(): StackedArea<X>;
-            protected _generateAttrToProjector(): {
+            protected generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
             };
             protected _wholeDatumAttributes(): string[];
@@ -3327,10 +3327,10 @@ declare module Plottable {
              */
             constructor(xScale?: Scale<X, number>, yScale?: Scale<Y, number>, isVertical?: boolean);
             protected _getAnimator(key: string): Animators.PlotAnimator;
-            protected _generateAttrToProjector(): {
+            protected generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
             };
-            protected _generateDrawSteps(): Drawers.DrawStep[];
+            protected generateDrawSteps(): Drawers.DrawStep[];
             project(attrToSet: string, accessor: any, scale?: Scale<any, any>): StackedBar<X, Y>;
             protected _onDatasetUpdate(): StackedBar<X, Y>;
             protected _getPlotMetadataForDataset(key: string): StackedPlotMetadata;

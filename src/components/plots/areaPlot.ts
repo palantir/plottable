@@ -35,20 +35,20 @@ export module Plots {
       return this;
     }
 
-    protected _generateAttrToProjector() {
-      var attrToProjector = super._generateAttrToProjector();
+    protected generateAttrToProjector() {
+      var attrToProjector = super.generateAttrToProjector();
       attrToProjector["fill-opacity"] = attrToProjector["fill-opacity"] || d3.functor(0.25);
       attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this.defaultFillColor);
       attrToProjector["stroke"] = attrToProjector["stroke"] || d3.functor(this.defaultFillColor);
       return attrToProjector;
     }
 
-    protected _getDrawer(key: string) {
+    protected getDrawer(key: string) {
       return new Plottable.Drawers.Area(key);
     }
 
     protected _getResetYFunction() {
-      return this._generateAttrToProjector()["y0"];
+      return this.generateAttrToProjector()["y0"];
     }
 
     protected _onDatasetUpdate() {

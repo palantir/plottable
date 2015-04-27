@@ -41,8 +41,8 @@ export module Plots {
       return this;
     }
 
-    protected _generateAttrToProjector(): AttributeToProjector {
-      var attrToProjector = super._generateAttrToProjector();
+    protected generateAttrToProjector(): AttributeToProjector {
+      var attrToProjector = super.generateAttrToProjector();
       attrToProjector["inner-radius"] = attrToProjector["inner-radius"] || d3.functor(0);
       attrToProjector["outer-radius"] = attrToProjector["outer-radius"] || d3.functor(Math.min(this.width(), this.height()) / 2);
 
@@ -52,7 +52,7 @@ export module Plots {
       return attrToProjector;
     }
 
-    protected _getDrawer(key: string): Drawers.AbstractDrawer {
+    protected getDrawer(key: string): Drawers.AbstractDrawer {
       return new Plottable.Drawers.Arc(key).setClass("arc");
     }
 

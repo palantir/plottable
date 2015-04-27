@@ -75,7 +75,7 @@ export module Axes {
       var labelGroupShiftX = 0;
       var labelGroupShiftY = 0;
       if (this._isHorizontal()) {
-        switch(this.tickLabelPositioning) {
+        switch (this.tickLabelPositioning) {
           case "left":
             tickLabelTextAnchor = "end";
             labelGroupTransformX = -tickLabelPadding;
@@ -91,7 +91,7 @@ export module Axes {
             break;
         }
       } else {
-        switch(this.tickLabelPositioning) {
+        switch (this.tickLabelPositioning) {
           case "top":
             tickLabelAttrHash["dy"] = "-0.3em";
             labelGroupShiftX = tickLabelPadding;
@@ -109,7 +109,7 @@ export module Axes {
       }
 
       var tickMarkAttrHash = this._generateTickMarkAttrHash();
-      switch(this.orientation()) {
+      switch (this.orientation()) {
         case "bottom":
           tickLabelAttrHash["x"] = tickMarkAttrHash["x1"];
           tickLabelAttrHash["dy"] = "0.95em";

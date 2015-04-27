@@ -24,12 +24,12 @@ export module Plots {
                                            .delay(5));
     }
 
-    protected _getDrawer(key: string) {
+    protected getDrawer(key: string) {
       return new Plottable.Drawers.Symbol(key);
     }
 
-    protected _generateAttrToProjector() {
-      var attrToProjector = super._generateAttrToProjector();
+    protected generateAttrToProjector() {
+      var attrToProjector = super.generateAttrToProjector();
       attrToProjector["size"] = attrToProjector["size"] || d3.functor(6);
       attrToProjector["opacity"] = attrToProjector["opacity"] || d3.functor(0.6);
       attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this._defaultFillColor);
@@ -38,20 +38,20 @@ export module Plots {
       return attrToProjector;
     }
 
-    protected _generateDrawSteps(): Drawers.DrawStep[] {
+    protected generateDrawSteps(): Drawers.DrawStep[] {
       var drawSteps: Drawers.DrawStep[] = [];
       if (this._dataChanged && this.animated) {
-        var resetAttrToProjector = this._generateAttrToProjector();
+        var resetAttrToProjector = this.generateAttrToProjector();
         resetAttrToProjector["size"] = () => 0;
         drawSteps.push({attrToProjector: resetAttrToProjector, animator: this._getAnimator("symbols-reset")});
       }
 
-      drawSteps.push({attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("symbols")});
+      drawSteps.push({attrToProjector: this.generateAttrToProjector(), animator: this._getAnimator("symbols")});
       return drawSteps;
     }
 
     protected _getClosestStruckPoint(p: Point, range: number): Interactions.HoverData {
-      var attrToProjector = this._generateAttrToProjector();
+      var attrToProjector = this.generateAttrToProjector();
       var xProjector = attrToProjector["x"];
       var yProjector = attrToProjector["y"];
       var getDistSq = (d: any, i: number, userMetdata: any, plotMetadata: PlotMetadata) => {

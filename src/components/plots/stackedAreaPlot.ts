@@ -21,7 +21,7 @@ export module Plots {
       this._isVertical = true;
     }
 
-    protected _getDrawer(key: string) {
+    protected getDrawer(key: string) {
       return new Plottable.Drawers.Area(key).drawLine(false);
     }
 
@@ -69,8 +69,8 @@ export module Plots {
       return this;
     }
 
-    protected _generateAttrToProjector() {
-      var attrToProjector = super._generateAttrToProjector();
+    protected generateAttrToProjector() {
+      var attrToProjector = super.generateAttrToProjector();
 
       if (this.projections["fill-opacity"] == null) {
         attrToProjector["fill-opacity"] = d3.functor(1);

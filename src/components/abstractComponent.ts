@@ -356,7 +356,7 @@ module Plottable {
       this.parentElement = parentElement;
     }
 
-    public requestedSpace(availableWidth : number, availableHeight: number): _SpaceRequest {
+    public requestedSpace(availableWidth: number, availableHeight: number): _SpaceRequest {
       return {width: 0, height: 0, wantsWidth: false, wantsHeight: false};
     }
 
@@ -449,8 +449,8 @@ module Plottable {
     }
 
     public useLastCalculatedLayout(): boolean;
-    public useLastCalculatedLayout(useLast: boolean) : Component;
-    public useLastCalculatedLayout(useLast?: boolean) : any {
+    public useLastCalculatedLayout(useLast: boolean): Component;
+    public useLastCalculatedLayout(useLast?: boolean): any {
       if (useLast == null) {
         return this._usedLastLayout;
       } else {
