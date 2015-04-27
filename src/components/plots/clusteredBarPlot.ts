@@ -44,15 +44,15 @@ export module Plots {
 
     private _updateClusterPosition() {
       var innerScale = this._makeInnerScale();
-      this._datasetKeysInOrder.forEach((key: string) => {
-        var plotMetadata = <ClusteredPlotMetadata>this._key2PlotDatasetKey.get(key).plotMetadata;
+      this.datasetKeysInOrder.forEach((key: string) => {
+        var plotMetadata = <ClusteredPlotMetadata>this.datasetKeys.get(key).plotMetadata;
         plotMetadata.position = innerScale.scale(key) - innerScale.rangeBand() / 2;
       });
     }
 
     private _makeInnerScale(){
       var innerScale = new Scales.Category();
-      innerScale.domain(this._datasetKeysInOrder);
+      innerScale.domain(this.datasetKeysInOrder);
       if (!this.projections["width"]) {
         innerScale.range([0, this._getBarPixelWidth()]);
       } else {
@@ -65,13 +65,13 @@ export module Plots {
       return innerScale;
     }
 
-    protected _getDataToDraw() {
+    protected getDataToDraw() {
       this._updateClusterPosition();
-      return super._getDataToDraw();
+      return super.getDataToDraw();
     }
 
-    protected _getPlotMetadataForDataset(key: string): ClusteredPlotMetadata {
-      var metadata = <ClusteredPlotMetadata>super._getPlotMetadataForDataset(key);
+    protected getPlotMetadataForDataset(key: string): ClusteredPlotMetadata {
+      var metadata = <ClusteredPlotMetadata>super.getPlotMetadataForDataset(key);
       metadata.position = 0;
       return metadata;
     }

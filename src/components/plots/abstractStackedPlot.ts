@@ -18,8 +18,8 @@ module Plottable {
     private _stackedExtent = [0, 0];
     protected _isVertical: boolean;
 
-    public _getPlotMetadataForDataset(key: string): Plots.StackedPlotMetadata {
-      var metadata = <Plots.StackedPlotMetadata> super._getPlotMetadataForDataset(key);
+    public getPlotMetadataForDataset(key: string): Plots.StackedPlotMetadata {
+      var metadata = <Plots.StackedPlotMetadata> super.getPlotMetadataForDataset(key);
       metadata.offsets = d3.map();
       return metadata;
     }
@@ -32,11 +32,11 @@ module Plottable {
       return this;
     }
 
-    public _onDatasetUpdate() {
+    public onDatasetUpdate() {
       if (this._projectorsReady()) {
         this._updateStackOffsets();
       }
-      super._onDatasetUpdate();
+      super.onDatasetUpdate();
     }
 
     public _updateStackOffsets() {
@@ -63,18 +63,18 @@ module Plottable {
       var datasets = this.datasets();
       var valueAccessor = this._valueAccessor();
       var keyAccessor = this._keyAccessor();
-      var maxStackExtent = Utils.Methods.max<string, number>(this._datasetKeysInOrder, (k: string) => {
-        var dataset = this._key2PlotDatasetKey.get(k).dataset;
-        var plotMetadata = <Plots.StackedPlotMetadata>this._key2PlotDatasetKey.get(k).plotMetadata;
+      var maxStackExtent = Utils.Methods.max<string, number>(this.datasetKeysInOrder, (k: string) => {
+        var dataset = this.datasetKeys.get(k).dataset;
+        var plotMetadata = <Plots.StackedPlotMetadata>this.datasetKeys.get(k).plotMetadata;
         return Utils.Methods.max<any, number>(dataset.data(), (datum: any, i: number) => {
           return +valueAccessor(datum, i, dataset.metadata(), plotMetadata) +
             plotMetadata.offsets.get(keyAccessor(datum, i, dataset.metadata(), plotMetadata));
         }, 0);
       }, 0);
 
-      var minStackExtent = Utils.Methods.min<string, number>(this._datasetKeysInOrder, (k: string) => {
-        var dataset = this._key2PlotDatasetKey.get(k).dataset;
-        var plotMetadata = <Plots.StackedPlotMetadata>this._key2PlotDatasetKey.get(k).plotMetadata;
+      var minStackExtent = Utils.Methods.min<string, number>(this.datasetKeysInOrder, (k: string) => {
+        var dataset = this.datasetKeys.get(k).dataset;
+        var plotMetadata = <Plots.StackedPlotMetadata>this.datasetKeys.get(k).plotMetadata;
         return Utils.Methods.min<any, number>(dataset.data(), (datum: any, i: number) => {
           return +valueAccessor(datum, i, dataset.metadata(), plotMetadata) +
             plotMetadata.offsets.get(keyAccessor(datum, i, dataset.metadata(), plotMetadata));
@@ -110,9 +110,9 @@ module Plottable {
       var keyAccessor = this._keyAccessor();
       var valueAccessor = this._valueAccessor();
 
-      this._datasetKeysInOrder.forEach((k, index) => {
-        var dataset = this._key2PlotDatasetKey.get(k).dataset;
-        var plotMetadata = <Plots.StackedPlotMetadata>this._key2PlotDatasetKey.get(k).plotMetadata;
+      this.datasetKeysInOrder.forEach((k, index) => {
+        var dataset = this.datasetKeys.get(k).dataset;
+        var plotMetadata = <Plots.StackedPlotMetadata>this.datasetKeys.get(k).plotMetadata;
         var positiveDataMap = positiveDataMapArray[index];
         var negativeDataMap = negativeDataMapArray[index];
         var isAllNegativeValues = dataset.data().every((datum, i) => valueAccessor(datum, i, dataset.metadata(), plotMetadata) <= 0);
@@ -138,9 +138,9 @@ module Plottable {
       var keyAccessor = this._keyAccessor();
       var domainKeys = d3.set();
 
-      this._datasetKeysInOrder.forEach((k) => {
-        var dataset = this._key2PlotDatasetKey.get(k).dataset;
-        var plotMetadata = this._key2PlotDatasetKey.get(k).plotMetadata;
+      this.datasetKeysInOrder.forEach((k) => {
+        var dataset = this.datasetKeys.get(k).dataset;
+        var plotMetadata = this.datasetKeys.get(k).plotMetadata;
         dataset.data().forEach((datum, index) => {
           domainKeys.add(keyAccessor(datum, index, dataset.metadata(), plotMetadata));
         });
@@ -154,15 +154,15 @@ module Plottable {
       var valueAccessor = this._valueAccessor();
       var domainKeys = this._getDomainKeys();
 
-      var dataMapArray = this._datasetKeysInOrder.map(() => {
+      var dataMapArray = this.datasetKeysInOrder.map(() => {
         return Utils.Methods.populateMap(domainKeys, (domainKey) => {
           return {key: domainKey, value: 0};
         });
       });
 
-      this._datasetKeysInOrder.forEach((k, datasetIndex) => {
-        var dataset = this._key2PlotDatasetKey.get(k).dataset;
-        var plotMetadata = this._key2PlotDatasetKey.get(k).plotMetadata;
+      this.datasetKeysInOrder.forEach((k, datasetIndex) => {
+        var dataset = this.datasetKeys.get(k).dataset;
+        var plotMetadata = this.datasetKeys.get(k).plotMetadata;
         dataset.data().forEach((datum, index) => {
           var key = keyAccessor(datum, index, dataset.metadata(), plotMetadata);
           var value = valueAccessor(datum, index, dataset.metadata(), plotMetadata);
@@ -173,8 +173,8 @@ module Plottable {
       return dataMapArray;
     }
 
-    public _updateScaleExtents() {
-      super._updateScaleExtents();
+    public updateScaleExtents() {
+      super.updateScaleExtents();
       var primaryScale: Scale<any, number> = this._isVertical ? this._yScale : this._xScale;
       if (!primaryScale) {
         return;
@@ -205,9 +205,9 @@ module Plottable {
         return value;
       };
 
-      return Utils.Methods.flatten(this._datasetKeysInOrder.map((key: string) => {
-        var dataset = this._key2PlotDatasetKey.get(key).dataset;
-        var plotMetadata = <Plots.StackedPlotMetadata>this._key2PlotDatasetKey.get(key).plotMetadata;
+      return Utils.Methods.flatten(this.datasetKeysInOrder.map((key: string) => {
+        var dataset = this.datasetKeys.get(key).dataset;
+        var plotMetadata = <Plots.StackedPlotMetadata>this.datasetKeys.get(key).plotMetadata;
         return dataset.data().map((d, i) => {
           return {
             a: aStackedAccessor(d, i, dataset.metadata(), plotMetadata),

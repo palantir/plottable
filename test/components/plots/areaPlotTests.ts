@@ -135,7 +135,7 @@ describe("Plots", () => {
         var newTwoPointData = [{ foo: 2, bar: 1 }, { foo: 3, bar: 2 }];
         areaPlot.addDataset("newTwo", new Plottable.Dataset(newTwoPointData));
         var allAreas = areaPlot.getAllSelections();
-        var allAreas2 = areaPlot.getAllSelections((<any> areaPlot)._datasetKeysInOrder);
+        var allAreas2 = areaPlot.getAllSelections((<any> areaPlot).datasetKeysInOrder);
         assert.deepEqual(allAreas, allAreas2, "all areas/lines retrieved");
 
         assert.strictEqual(allAreas.filter(".line").size(), 2, "2 lines retrieved");

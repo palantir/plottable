@@ -427,8 +427,8 @@ describe("Plots", () => {
       plot.project("fill", "fill");
       plot.project("x", "x", xScale).project("y", "y", yScale);
 
-      var ds1FirstColumnOffset = (<any> plot)._key2PlotDatasetKey.get("d1").plotMetadata.offsets.get("A");
-      var ds2FirstColumnOffset = (<any> plot)._key2PlotDatasetKey.get("d2").plotMetadata.offsets.get("A");
+      var ds1FirstColumnOffset = (<any> plot).datasetKeys.get("d1").plotMetadata.offsets.get("A");
+      var ds2FirstColumnOffset = (<any> plot).datasetKeys.get("d2").plotMetadata.offsets.get("A");
 
       assert.strictEqual(typeof ds1FirstColumnOffset, "number", "ds1 offset should be a number");
       assert.strictEqual(typeof ds2FirstColumnOffset, "number", "ds2 offset should be a number");
@@ -466,9 +466,9 @@ describe("Plots", () => {
       plot.project("fill", "fill");
       plot.project("x", "x", xScale).project("y", "y", yScale);
 
-      var offset1 = (<any> plot)._key2PlotDatasetKey.get("d1").plotMetadata.offsets.get("A");
-      var offset3 = (<any> plot)._key2PlotDatasetKey.get("d3").plotMetadata.offsets.get("A");
-      var offset5 = (<any> plot)._key2PlotDatasetKey.get("d5").plotMetadata.offsets.get("A");
+      var offset1 = (<any> plot).datasetKeys.get("d1").plotMetadata.offsets.get("A");
+      var offset3 = (<any> plot).datasetKeys.get("d3").plotMetadata.offsets.get("A");
+      var offset5 = (<any> plot).datasetKeys.get("d5").plotMetadata.offsets.get("A");
 
       assert.strictEqual(offset1, 0,
         "Plot columns should start from offset 0 (at the very bottom)");

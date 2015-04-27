@@ -17,7 +17,7 @@ export module Plots {
       super(xScale, yScale, isVertical);
     }
 
-    protected _getAnimator(key: string): Animators.PlotAnimator {
+    protected getAnimator(key: string): Animators.PlotAnimator {
       if (this.animated && this.animateOnNextRender) {
         if (this.animator(key)) {
           return this.animator(key);
@@ -56,7 +56,7 @@ export module Plots {
     }
 
     protected generateDrawSteps(): Drawers.DrawStep[] {
-      return [{attrToProjector: this.generateAttrToProjector(), animator: this._getAnimator("stacked-bar")}];
+      return [{attrToProjector: this.generateAttrToProjector(), animator: this.getAnimator("stacked-bar")}];
     }
 
     public project(attrToSet: string, accessor: any, scale?: Scale<any, any>) {
@@ -65,14 +65,14 @@ export module Plots {
       return this;
     }
 
-    protected _onDatasetUpdate() {
-      super._onDatasetUpdate();
-      Stacked.prototype._onDatasetUpdate.apply(this);
+    protected onDatasetUpdate() {
+      super.onDatasetUpdate();
+      Stacked.prototype.onDatasetUpdate.apply(this);
       return this;
     }
 
-    protected _getPlotMetadataForDataset(key: string): StackedPlotMetadata {
-      return Stacked.prototype._getPlotMetadataForDataset.call(this, key);
+    protected getPlotMetadataForDataset(key: string): StackedPlotMetadata {
+      return Stacked.prototype.getPlotMetadataForDataset.call(this, key);
     }
 
     protected _normalizeDatasets<A, B>(fromX: boolean): {a: A; b: B}[] {
@@ -104,8 +104,8 @@ export module Plots {
       return Stacked.prototype._generateDefaultMapArray.call(this);
     }
 
-    public _updateScaleExtents() {
-      Stacked.prototype._updateScaleExtents.call(this);
+    public updateScaleExtents() {
+      Stacked.prototype.updateScaleExtents.call(this);
     }
 
     public _keyAccessor(): _Accessor {

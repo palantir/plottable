@@ -25,7 +25,7 @@ export module Plots {
       return new Plottable.Drawers.Area(key).drawLine(false);
     }
 
-    public _getAnimator(key: string): Animators.PlotAnimator {
+    public getAnimator(key: string): Animators.PlotAnimator {
       return new Animators.Null();
     }
 
@@ -34,7 +34,7 @@ export module Plots {
       this._baseline = this.renderArea.append("line").classed("baseline", true);
     }
 
-    protected _additionalPaint() {
+    protected additionalPaint() {
       var scaledBaseline = this._yScale.scale(this._baselineValue);
       var baselineAttr: any = {
         "x1": 0,
@@ -43,7 +43,7 @@ export module Plots {
         "y2": scaledBaseline
       };
 
-      this._getAnimator("baseline").animate(this._baseline, baselineAttr);
+      this.getAnimator("baseline").animate(this._baseline, baselineAttr);
     }
 
     protected _updateYDomainer() {
@@ -63,9 +63,9 @@ export module Plots {
       return this;
     }
 
-    protected _onDatasetUpdate() {
-      super._onDatasetUpdate();
-      Stacked.prototype._onDatasetUpdate.apply(this);
+    protected onDatasetUpdate() {
+      super.onDatasetUpdate();
+      Stacked.prototype.onDatasetUpdate.apply(this);
       return this;
     }
 
@@ -95,9 +95,9 @@ export module Plots {
       if (!this._projectorsReady()) { return; }
       var domainKeys = this._getDomainKeys();
       var keyAccessor = this._isVertical ? this.projections["x"].accessor : this.projections["y"].accessor;
-      var keySets = this._datasetKeysInOrder.map((k) => {
-        var dataset = this._key2PlotDatasetKey.get(k).dataset;
-        var plotMetadata = this._key2PlotDatasetKey.get(k).plotMetadata;
+      var keySets = this.datasetKeysInOrder.map((k) => {
+        var dataset = this.datasetKeys.get(k).dataset;
+        var plotMetadata = this.datasetKeys.get(k).plotMetadata;
         return d3.set(dataset.data().map((datum, i) => keyAccessor(datum, i, dataset.metadata(), plotMetadata).toString())).values();
       });
 
@@ -127,8 +127,8 @@ export module Plots {
       return Stacked.prototype._generateDefaultMapArray.call(this);
     }
 
-    public _updateScaleExtents() {
-      Stacked.prototype._updateScaleExtents.call(this);
+    public updateScaleExtents() {
+      Stacked.prototype.updateScaleExtents.call(this);
     }
 
     public _keyAccessor(): _Accessor {
@@ -139,8 +139,8 @@ export module Plots {
       return Stacked.prototype._valueAccessor.call(this);
     }
 
-    public _getPlotMetadataForDataset(key: string): StackedPlotMetadata {
-      return Stacked.prototype._getPlotMetadataForDataset.call(this, key);
+    public getPlotMetadataForDataset(key: string): StackedPlotMetadata {
+      return Stacked.prototype.getPlotMetadataForDataset.call(this, key);
     }
 
     protected _normalizeDatasets<A, B>(fromX: boolean): {a: A; b: B}[] {

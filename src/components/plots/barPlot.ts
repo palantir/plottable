@@ -175,7 +175,7 @@ export module Plots {
           var datum = plotData.data[index];
           var bar = plotData.selection[0][index];
 
-          if (!this._isVisibleOnPlot(datum, plotPt, d3.select(bar))) {
+          if (!this.isVisibleOnPlot(datum, plotPt, d3.select(bar))) {
             return;
           }
 
@@ -228,7 +228,7 @@ export module Plots {
       };
     }
 
-    protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean {
+    protected isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean {
       var xRange = { min: 0, max: this.width() };
       var yRange = { min: 0, max: this.height() };
       var barBBox = selection[0][0].getBBox();
@@ -252,7 +252,7 @@ export module Plots {
       }
 
       // currently, linear scan the bars. If inversion is implemented on non-numeric scales we might be able to do better.
-      var bars = this._datasetKeysInOrder.reduce((bars: any[], key: string) =>
+      var bars = this.datasetKeysInOrder.reduce((bars: any[], key: string) =>
         bars.concat(this._getBarsFromDataset(key, xValOrExtent, yValOrExtent))
       , []);
 
@@ -262,7 +262,7 @@ export module Plots {
     private _getBarsFromDataset(key: string, xValOrExtent: number | Extent, yValOrExtent: number | Extent): any[] {
       var bars: any[] = [];
 
-      var drawer = <Drawers.Element>this._key2PlotDatasetKey.get(key).drawer;
+      var drawer = <Drawers.Element>this.datasetKeys.get(key).drawer;
       drawer._getRenderArea().selectAll("rect").each(function(d) {
         if (Utils.Methods.intersectsBBox(xValOrExtent, yValOrExtent, this.getBBox())) {
           bars.push(this);
@@ -307,7 +307,7 @@ export module Plots {
       }
     }
 
-    protected _additionalPaint(time: number) {
+    protected additionalPaint(time: number) {
       var primaryScale: Scale<any, number> = this._isVertical ? this._yScale : this._xScale;
       var scaledBaseline = primaryScale.scale(this._baselineValue);
 
@@ -318,9 +318,9 @@ export module Plots {
         "y2": this._isVertical ? scaledBaseline : this.height()
       };
 
-      this._getAnimator("baseline").animate(this._baseline, baselineAttr);
+      this.getAnimator("baseline").animate(this._baseline, baselineAttr);
 
-      var drawers: Drawers.Rect[] = <any> this._getDrawersInOrder();
+      var drawers: Drawers.Rect[] = <any> this.getDrawersInOrder();
       drawers.forEach((d: Drawers.Rect) => d.removeLabels());
       if (this._barLabelsEnabled) {
         Utils.Methods.setTimeout(() => this._drawLabels(), time);
@@ -328,14 +328,14 @@ export module Plots {
     }
 
     protected _drawLabels() {
-      var drawers: Drawers.Rect[] = <any> this._getDrawersInOrder();
+      var drawers: Drawers.Rect[] = <any> this.getDrawersInOrder();
       var attrToProjector = this.generateAttrToProjector();
-      var dataToDraw = this._getDataToDraw();
-      this._datasetKeysInOrder.forEach((k, i) =>
+      var dataToDraw = this.getDataToDraw();
+      this.datasetKeysInOrder.forEach((k, i) =>
         drawers[i].drawText(dataToDraw.get(k),
                             attrToProjector,
-                            this._key2PlotDatasetKey.get(k).dataset.metadata(),
-                            this._key2PlotDatasetKey.get(k).plotMetadata));
+                            this.datasetKeys.get(k).dataset.metadata(),
+                            this.datasetKeys.get(k).plotMetadata));
       if (this._hideBarsIfAnyAreTooWide && drawers.some((d: Drawers.Rect) => d._getIfLabelsTooWide())) {
         drawers.forEach((d: Drawers.Rect) => d.removeLabels());
       }
@@ -343,7 +343,7 @@ export module Plots {
 
     protected generateDrawSteps(): Drawers.DrawStep[] {
       var drawSteps: Drawers.DrawStep[] = [];
-      if (this._dataChanged && this.animated) {
+      if (this.dataChanged && this.animated) {
         var resetAttrToProjector = this.generateAttrToProjector();
         var primaryScale: Scale<any, number> = this._isVertical ? this._yScale : this._xScale;
         var scaledBaseline = primaryScale.scale(this._baselineValue);
@@ -351,9 +351,9 @@ export module Plots {
         var dimensionAttr = this._isVertical ? "height" : "width";
         resetAttrToProjector[positionAttr] = () => scaledBaseline;
         resetAttrToProjector[dimensionAttr] = () => 0;
-        drawSteps.push({attrToProjector: resetAttrToProjector, animator: this._getAnimator("bars-reset")});
+        drawSteps.push({attrToProjector: resetAttrToProjector, animator: this.getAnimator("bars-reset")});
       }
-      drawSteps.push({attrToProjector: this.generateAttrToProjector(), animator: this._getAnimator("bars")});
+      drawSteps.push({attrToProjector: this.generateAttrToProjector(), animator: this.getAnimator("bars")});
       return drawSteps;
     }
 
@@ -424,9 +424,9 @@ export module Plots {
       } else {
         var barAccessor = this._isVertical ? this.projections["x"].accessor : this.projections["y"].accessor;
 
-        var numberBarAccessorData = d3.set(Utils.Methods.flatten(this._datasetKeysInOrder.map((k) => {
-          var dataset = this._key2PlotDatasetKey.get(k).dataset;
-          var plotMetadata = this._key2PlotDatasetKey.get(k).plotMetadata;
+        var numberBarAccessorData = d3.set(Utils.Methods.flatten(this.datasetKeysInOrder.map((k) => {
+          var dataset = this.datasetKeys.get(k).dataset;
+          var plotMetadata = this.datasetKeys.get(k).plotMetadata;
           return dataset.data().map((d, i) => barAccessor(d, i, dataset.metadata(), plotMetadata).valueOf());
         }))).values().map((value) => +value);
 
@@ -485,7 +485,7 @@ export module Plots {
     }
 
     private _clearHoverSelection() {
-      this._getDrawersInOrder().forEach((d, i) => {
+      this.getDrawersInOrder().forEach((d, i) => {
         d._getRenderArea().selectAll("rect").classed("not-hovered hovered", false);
       });
     }
@@ -518,9 +518,9 @@ export module Plots {
       var points: Point[] = [];
       var projectors = this.generateAttrToProjector();
 
-      this._datasetKeysInOrder.forEach((key: string) => {
-        var dataset = this._key2PlotDatasetKey.get(key).dataset;
-        var plotMetadata = this._key2PlotDatasetKey.get(key).plotMetadata;
+      this.datasetKeysInOrder.forEach((key: string) => {
+        var dataset = this.datasetKeys.get(key).dataset;
+        var plotMetadata = this.datasetKeys.get(key).plotMetadata;
         var barsFromDataset = this._getBarsFromDataset(key, xExtent, yExtent);
         d3.selectAll(barsFromDataset).each((d, i) => {
           if (this._isVertical) {
@@ -545,7 +545,7 @@ export module Plots {
       var barsSelection = d3.selectAll(bars);
 
       if (!barsSelection.empty()) {
-        this._getDrawersInOrder().forEach((d, i) => {
+        this.getDrawersInOrder().forEach((d, i) => {
           d._getRenderArea().selectAll("rect").classed({ "hovered": false, "not-hovered": true });
         });
         barsSelection.classed({ "hovered": true, "not-hovered": false });

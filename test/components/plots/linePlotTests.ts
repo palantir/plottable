@@ -220,7 +220,7 @@ describe("Plots", () => {
         linePlot.addDataset("d3", dataset3);
 
         var allLines = linePlot.getAllSelections();
-        var allLines2 = linePlot.getAllSelections((<any> linePlot)._datasetKeysInOrder);
+        var allLines2 = linePlot.getAllSelections((<any> linePlot).datasetKeysInOrder);
         assert.deepEqual(allLines, allLines2, "all lines retrieved");
 
         svg.remove();

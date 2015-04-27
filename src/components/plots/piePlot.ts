@@ -33,7 +33,7 @@ export module Plots {
     }
 
     public addDataset(keyOrDataset: any, dataset?: any) {
-      if (this._datasetKeysInOrder.length === 1) {
+      if (this.datasetKeysInOrder.length === 1) {
         Utils.Methods.warn("Only one dataset is supported in Pie plots");
         return this;
       }

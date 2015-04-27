@@ -40,13 +40,13 @@ export module Plots {
 
     protected generateDrawSteps(): Drawers.DrawStep[] {
       var drawSteps: Drawers.DrawStep[] = [];
-      if (this._dataChanged && this.animated) {
+      if (this.dataChanged && this.animated) {
         var resetAttrToProjector = this.generateAttrToProjector();
         resetAttrToProjector["size"] = () => 0;
-        drawSteps.push({attrToProjector: resetAttrToProjector, animator: this._getAnimator("symbols-reset")});
+        drawSteps.push({attrToProjector: resetAttrToProjector, animator: this.getAnimator("symbols-reset")});
       }
 
-      drawSteps.push({attrToProjector: this.generateAttrToProjector(), animator: this._getAnimator("symbols")});
+      drawSteps.push({attrToProjector: this.generateAttrToProjector(), animator: this.getAnimator("symbols")});
       return drawSteps;
     }
 
@@ -67,10 +67,10 @@ export module Plots {
       var closestIndex: number;
       var minDistSq = range * range;
 
-      this._datasetKeysInOrder.forEach((key: string) => {
-        var dataset = this._key2PlotDatasetKey.get(key).dataset;
-        var plotMetadata = this._key2PlotDatasetKey.get(key).plotMetadata;
-        var drawer = <Drawers.Symbol>this._key2PlotDatasetKey.get(key).drawer;
+      this.datasetKeysInOrder.forEach((key: string) => {
+        var dataset = this.datasetKeys.get(key).dataset;
+        var plotMetadata = this.datasetKeys.get(key).plotMetadata;
+        var drawer = <Drawers.Symbol>this.datasetKeys.get(key).drawer;
         drawer._getRenderArea().selectAll("path").each(function(d, i) {
           var distSq = getDistSq(d, i, dataset.metadata(), plotMetadata);
           var r = attrToProjector["size"](d, i, dataset.metadata(), plotMetadata) / 2;
@@ -115,7 +115,7 @@ export module Plots {
       };
     }
 
-    protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean {
+    protected isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean {
       var xRange = { min: 0, max: this.width() };
       var yRange = { min: 0, max: this.height() };
 

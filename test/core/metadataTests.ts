@@ -21,8 +21,8 @@ describe("Metadata", () => {
                               .addDataset( d1)
                               .addDataset("d2", [])
                               .addDataset([]);
-    (<any> r)._datasetKeysInOrder.forEach((key: string) => {
-      var plotMetadata = (<any> r)._key2PlotDatasetKey.get(key).plotMetadata;
+    (<any> r).datasetKeysInOrder.forEach((key: string) => {
+      var plotMetadata = (<any> r).datasetKeys.get(key).plotMetadata;
       assert.propertyVal(plotMetadata, "datasetKey", key, "metadata has correct dataset key");
     });
   });
@@ -100,7 +100,7 @@ describe("Metadata", () => {
     var plot = new Plottable.Plots.Scatter(xScale, yScale)
                                 .project("x", xAccessor)
                                 .project("y", yAccessor);
-    (<any> plot)._getPlotMetadataForDataset = (key: string) => {
+    (<any> plot).getPlotMetadataForDataset = (key: string) => {
       return {
         datasetKey: key,
         foo: 10
@@ -134,7 +134,7 @@ describe("Metadata", () => {
     var plot1 = new Plottable.Plots.Scatter(xScale, yScale)
                                 .project("x", xAccessor)
                                 .project("y", yAccessor);
-    (<any> plot1)._getPlotMetadataForDataset = (key: string) => {
+    (<any> plot1).getPlotMetadataForDataset = (key: string) => {
       return {
         datasetKey: key,
         foo: 10
@@ -145,7 +145,7 @@ describe("Metadata", () => {
     var plot2 = new Plottable.Plots.Scatter(xScale, yScale)
                                 .project("x", xAccessor)
                                 .project("y", yAccessor);
-    (<any> plot2)._getPlotMetadataForDataset = (key: string) => {
+    (<any> plot2).getPlotMetadataForDataset = (key: string) => {
       return {
         datasetKey: key,
         foo: 20
@@ -195,7 +195,7 @@ describe("Metadata", () => {
     var dataset = new Plottable.Dataset(data1, metadata);
     var a = (d: any, i: number, u: any, m: any) => d.x + u.foo + m.foo;
     var plot = new Plottable.Plot().project("a", a, xScale);
-    (<any> plot)._getPlotMetadataForDataset = (key: string) => {
+    (<any> plot).getPlotMetadataForDataset = (key: string) => {
       return {
         datasetKey: key,
         foo: 5

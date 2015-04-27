@@ -399,9 +399,9 @@ describe("Plots", () => {
       plot.project("fill", "fill");
       plot.project("x", "x", xScale).project("y", "y", yScale);
 
-      var ds1Point2Offset = (<any> plot)._key2PlotDatasetKey.get("d1").plotMetadata.offsets.get(2);
-      var ds2Point2Offset = (<any> plot)._key2PlotDatasetKey.get("d2").plotMetadata.offsets.get(2);
-      var ds3Point2Offset = (<any> plot)._key2PlotDatasetKey.get("d3").plotMetadata.offsets.get(2);
+      var ds1Point2Offset = (<any> plot).datasetKeys.get("d1").plotMetadata.offsets.get(2);
+      var ds2Point2Offset = (<any> plot).datasetKeys.get("d2").plotMetadata.offsets.get(2);
+      var ds3Point2Offset = (<any> plot).datasetKeys.get("d3").plotMetadata.offsets.get(2);
 
       assert.strictEqual(ds1Point2Offset, 0,
         "dataset1 (blue) should have no offset on middle point");
@@ -437,9 +437,9 @@ describe("Plots", () => {
       plot.project("fill", "fill");
       plot.project("x", "x", xScale).project("y", "y", yScale);
 
-      var ds1Point2Offset = (<any> plot)._key2PlotDatasetKey.get("d1").plotMetadata.offsets.get(2);
-      var ds2Point2Offset = (<any> plot)._key2PlotDatasetKey.get("d2").plotMetadata.offsets.get(2);
-      var ds3Point2Offset = (<any> plot)._key2PlotDatasetKey.get("d3").plotMetadata.offsets.get(2);
+      var ds1Point2Offset = (<any> plot).datasetKeys.get("d1").plotMetadata.offsets.get(2);
+      var ds2Point2Offset = (<any> plot).datasetKeys.get("d2").plotMetadata.offsets.get(2);
+      var ds3Point2Offset = (<any> plot).datasetKeys.get("d3").plotMetadata.offsets.get(2);
 
       assert.strictEqual(ds1Point2Offset, 0,
         "dataset1 (blue) should have no offset on middle point");

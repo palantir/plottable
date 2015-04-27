@@ -51,7 +51,7 @@ export module Plots {
     }
 
     protected generateDrawSteps(): Drawers.DrawStep[] {
-      return [{attrToProjector: this.generateAttrToProjector(), animator: this._getAnimator("rectangles")}];
+      return [{attrToProjector: this.generateAttrToProjector(), animator: this.getAnimator("rectangles")}];
     }
 
     protected getDrawer(key: string) {

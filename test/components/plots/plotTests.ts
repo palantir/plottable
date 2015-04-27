@@ -459,7 +459,7 @@ describe("Plots", () => {
       var additionalPaint = (x: number) => {
         recordedTime = Math.max(x, recordedTime);
       };
-      (<any> plot)._additionalPaint = additionalPaint;
+      (<any> plot).additionalPaint = additionalPaint;
       plot.animator("bars", animator);
       var svg = generateSVG();
       plot.project("x", "x", x);

@@ -167,7 +167,7 @@ describe("Plots", () => {
         gridPlot.renderTo(svg);
 
         var allCells = gridPlot.getAllSelections();
-        var allCells2 = gridPlot.getAllSelections((<any> gridPlot)._datasetKeysInOrder);
+        var allCells2 = gridPlot.getAllSelections((<any> gridPlot).datasetKeysInOrder);
         assert.deepEqual(allCells, allCells2, "all cells retrieved");
 
         svg.remove();

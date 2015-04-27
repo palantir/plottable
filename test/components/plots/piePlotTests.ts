@@ -146,7 +146,7 @@ describe("Plots", () => {
 
       it("retrieves all dataset selections with no args", () => {
         var allSectors = piePlot.getAllSelections();
-        var allSectors2 = piePlot.getAllSelections((<any> piePlot)._datasetKeysInOrder);
+        var allSectors2 = piePlot.getAllSelections((<any> piePlot).datasetKeysInOrder);
         assert.deepEqual(allSectors, allSectors2, "all sectors retrieved");
 
         svg.remove();

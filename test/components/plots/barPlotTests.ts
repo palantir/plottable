@@ -740,7 +740,7 @@ describe("Plots", () => {
         verticalBarPlot.renderTo(svg);
 
         var allBars = verticalBarPlot.getAllSelections();
-        var allBars2 = verticalBarPlot.getAllSelections((<any> verticalBarPlot)._datasetKeysInOrder);
+        var allBars2 = verticalBarPlot.getAllSelections((<any> verticalBarPlot).datasetKeysInOrder);
         assert.deepEqual(allBars, allBars2, "both ways of getting all selections work");
 
         svg.remove();

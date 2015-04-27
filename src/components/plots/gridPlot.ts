@@ -35,7 +35,7 @@ export module Plots {
     }
 
     public addDataset(keyOrDataset: any, dataset?: any) {
-      if (this._datasetKeysInOrder.length === 1) {
+      if (this.datasetKeysInOrder.length === 1) {
         Utils.Methods.warn("Only one dataset is supported in Grid plots");
         return this;
       }
@@ -94,7 +94,7 @@ export module Plots {
     }
 
     protected generateDrawSteps(): Drawers.DrawStep[] {
-      return [{attrToProjector: this.generateAttrToProjector(), animator: this._getAnimator("cells")}];
+      return [{attrToProjector: this.generateAttrToProjector(), animator: this.getAnimator("cells")}];
     }
   }
 }

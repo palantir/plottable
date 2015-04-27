@@ -2492,7 +2492,7 @@ describe("Plots", function () {
             var additionalPaint = function (x) {
                 recordedTime = Math.max(x, recordedTime);
             };
-            plot._additionalPaint = additionalPaint;
+            plot.additionalPaint = additionalPaint;
             plot.animator("bars", animator);
             var svg = generateSVG();
             plot.project("x", "x", x);
@@ -2725,7 +2725,7 @@ describe("Plots", function () {
         describe("getAllSelections", function () {
             it("retrieves all dataset selections with no args", function () {
                 var allSectors = piePlot.getAllSelections();
-                var allSectors2 = piePlot.getAllSelections(piePlot._datasetKeysInOrder);
+                var allSectors2 = piePlot.getAllSelections(piePlot.datasetKeysInOrder);
                 assert.deepEqual(allSectors, allSectors2, "all sectors retrieved");
                 svg.remove();
             });
@@ -2847,7 +2847,7 @@ describe("Plots", function () {
             p.addDataset([7, 8, 9]);
             var d4 = new Plottable.Dataset([10, 11, 12]);
             p.addDataset(d4);
-            assert.deepEqual(p._datasetKeysInOrder, ["foo", "bar", "_0", "_1"], "dataset keys as expected");
+            assert.deepEqual(p.datasetKeysInOrder, ["foo", "bar", "_0", "_1"], "dataset keys as expected");
             var datasets = p.datasets();
             assert.deepEqual(datasets[0].data(), [1, 2, 3]);
             assert.equal(datasets[1], d2);
@@ -2855,13 +2855,13 @@ describe("Plots", function () {
             assert.equal(datasets[3], d4);
             p.removeDataset("foo");
             p.removeDataset("_0");
-            assert.deepEqual(p._datasetKeysInOrder, ["bar", "_1"]);
+            assert.deepEqual(p.datasetKeysInOrder, ["bar", "_1"]);
             assert.lengthOf(p.datasets(), 2);
         });
         it("Datasets are listened to appropriately", function () {
             var callbackCounter = 0;
             var callback = function () { return callbackCounter++; };
-            p._onDatasetUpdate = callback;
+            p.onDatasetUpdate = callback;
             var d = new Plottable.Dataset([1, 2, 3]);
             p.addDataset("foo", d);
             assert.equal(callbackCounter, 1, "adding dataset triggers listener");
@@ -3084,7 +3084,7 @@ describe("Plots", function () {
                 ];
                 linePlot.addDataset("d3", dataset3);
                 var allLines = linePlot.getAllSelections();
-                var allLines2 = linePlot.getAllSelections(linePlot._datasetKeysInOrder);
+                var allLines2 = linePlot.getAllSelections(linePlot.datasetKeysInOrder);
                 assert.deepEqual(allLines, allLines2, "all lines retrieved");
                 svg.remove();
             });
@@ -3332,7 +3332,7 @@ describe("Plots", function () {
                 var newTwoPointData = [{ foo: 2, bar: 1 }, { foo: 3, bar: 2 }];
                 areaPlot.addDataset("newTwo", new Plottable.Dataset(newTwoPointData));
                 var allAreas = areaPlot.getAllSelections();
-                var allAreas2 = areaPlot.getAllSelections(areaPlot._datasetKeysInOrder);
+                var allAreas2 = areaPlot.getAllSelections(areaPlot.datasetKeysInOrder);
                 assert.deepEqual(allAreas, allAreas2, "all areas/lines retrieved");
                 assert.strictEqual(allAreas.filter(".line").size(), 2, "2 lines retrieved");
                 assert.strictEqual(allAreas.filter(".area").size(), 2, "2 areas retrieved");
@@ -4004,7 +4004,7 @@ describe("Plots", function () {
                 verticalBarPlot.addDataset("b", barData2);
                 verticalBarPlot.renderTo(svg);
                 var allBars = verticalBarPlot.getAllSelections();
-                var allBars2 = verticalBarPlot.getAllSelections(verticalBarPlot._datasetKeysInOrder);
+                var allBars2 = verticalBarPlot.getAllSelections(verticalBarPlot.datasetKeysInOrder);
                 assert.deepEqual(allBars, allBars2, "both ways of getting all selections work");
                 svg.remove();
             });
@@ -4193,7 +4193,7 @@ describe("Plots", function () {
                 gridPlot.addDataset("a", DATA).project("fill", "magnitude", colorScale).project("x", "x", xScale).project("y", "y", yScale);
                 gridPlot.renderTo(svg);
                 var allCells = gridPlot.getAllSelections();
-                var allCells2 = gridPlot.getAllSelections(gridPlot._datasetKeysInOrder);
+                var allCells2 = gridPlot.getAllSelections(gridPlot.datasetKeysInOrder);
                 assert.deepEqual(allCells, allCells2, "all cells retrieved");
                 svg.remove();
             });
@@ -4600,8 +4600,8 @@ describe("Plots", function () {
             stackedPlot.addDataset("d3", data3);
             stackedPlot.addDataset("d4", data4);
             stackedPlot.addDataset("d5", data5);
-            var ds2PlotMetadata = stackedPlot._key2PlotDatasetKey.get("d2").plotMetadata;
-            var ds5PlotMetadata = stackedPlot._key2PlotDatasetKey.get("d5").plotMetadata;
+            var ds2PlotMetadata = stackedPlot.datasetKeys.get("d2").plotMetadata;
+            var ds5PlotMetadata = stackedPlot.datasetKeys.get("d5").plotMetadata;
             assert.strictEqual(ds2PlotMetadata.offsets.get("1"), 1, "positive offset was used");
             assert.strictEqual(ds5PlotMetadata.offsets.get("1"), 2, "positive offset was used");
         });
@@ -4622,8 +4622,8 @@ describe("Plots", function () {
             stackedPlot.addDataset("d2", data2);
             stackedPlot.addDataset("d3", data3);
             stackedPlot.addDataset("d4", data4);
-            var ds2PlotMetadata = stackedPlot._key2PlotDatasetKey.get("d2").plotMetadata;
-            var ds4PlotMetadata = stackedPlot._key2PlotDatasetKey.get("d4").plotMetadata;
+            var ds2PlotMetadata = stackedPlot.datasetKeys.get("d2").plotMetadata;
+            var ds4PlotMetadata = stackedPlot.datasetKeys.get("d4").plotMetadata;
             assert.strictEqual(ds2PlotMetadata.offsets.get("1"), -2, "positive offset was used");
             assert.strictEqual(ds4PlotMetadata.offsets.get("1"), -3, "positive offset was used");
         });
@@ -4636,8 +4636,8 @@ describe("Plots", function () {
             ];
             stackedPlot.addDataset("d1", data1);
             stackedPlot.addDataset("d2", data2);
-            var ds1PlotMetadata = stackedPlot._key2PlotDatasetKey.get("d1").plotMetadata;
-            var ds2PlotMetadata = stackedPlot._key2PlotDatasetKey.get("d2").plotMetadata;
+            var ds1PlotMetadata = stackedPlot.datasetKeys.get("d1").plotMetadata;
+            var ds2PlotMetadata = stackedPlot.datasetKeys.get("d2").plotMetadata;
             assert.isTrue(isNaN(ds1PlotMetadata.offsets.get("1")), "stacking is initially incorrect");
             stackedPlot.project("x", "a");
             stackedPlot.project("y", "b");
@@ -4668,10 +4668,10 @@ describe("Plots", function () {
             stackedPlot.addDataset("d4", data4);
             stackedPlot.addDataset("d5", data5);
             stackedPlot.addDataset("d6", data6);
-            var ds3PlotMetadata = stackedPlot._key2PlotDatasetKey.get("d3").plotMetadata;
-            var ds4PlotMetadata = stackedPlot._key2PlotDatasetKey.get("d4").plotMetadata;
-            var ds5PlotMetadata = stackedPlot._key2PlotDatasetKey.get("d5").plotMetadata;
-            var ds6PlotMetadata = stackedPlot._key2PlotDatasetKey.get("d6").plotMetadata;
+            var ds3PlotMetadata = stackedPlot.datasetKeys.get("d3").plotMetadata;
+            var ds4PlotMetadata = stackedPlot.datasetKeys.get("d4").plotMetadata;
+            var ds5PlotMetadata = stackedPlot.datasetKeys.get("d5").plotMetadata;
+            var ds6PlotMetadata = stackedPlot.datasetKeys.get("d6").plotMetadata;
             assert.strictEqual(ds3PlotMetadata.offsets.get("1"), -2, "stacking on data1 numerical y value");
             assert.strictEqual(ds4PlotMetadata.offsets.get("1"), 3, "stacking on data2 numerical y value");
             assert.strictEqual(ds5PlotMetadata.offsets.get("1"), 8, "stacking on data1 + data3 numerical y values");
@@ -5149,9 +5149,9 @@ describe("Plots", function () {
             plot.addDataset("d3", data3);
             plot.project("fill", "fill");
             plot.project("x", "x", xScale).project("y", "y", yScale);
-            var ds1Point2Offset = plot._key2PlotDatasetKey.get("d1").plotMetadata.offsets.get(2);
-            var ds2Point2Offset = plot._key2PlotDatasetKey.get("d2").plotMetadata.offsets.get(2);
-            var ds3Point2Offset = plot._key2PlotDatasetKey.get("d3").plotMetadata.offsets.get(2);
+            var ds1Point2Offset = plot.datasetKeys.get("d1").plotMetadata.offsets.get(2);
+            var ds2Point2Offset = plot.datasetKeys.get("d2").plotMetadata.offsets.get(2);
+            var ds3Point2Offset = plot.datasetKeys.get("d3").plotMetadata.offsets.get(2);
             assert.strictEqual(ds1Point2Offset, 0, "dataset1 (blue) should have no offset on middle point");
             assert.strictEqual(ds2Point2Offset, 2, "dataset2 (red) should have this offset and be on top of blue dataset");
             assert.strictEqual(ds3Point2Offset, 2, "dataset3 (green) should have this offset because the red dataset (ds2) has no height in this point");
@@ -5180,9 +5180,9 @@ describe("Plots", function () {
             plot.addDataset("d3", data3);
             plot.project("fill", "fill");
             plot.project("x", "x", xScale).project("y", "y", yScale);
-            var ds1Point2Offset = plot._key2PlotDatasetKey.get("d1").plotMetadata.offsets.get(2);
-            var ds2Point2Offset = plot._key2PlotDatasetKey.get("d2").plotMetadata.offsets.get(2);
-            var ds3Point2Offset = plot._key2PlotDatasetKey.get("d3").plotMetadata.offsets.get(2);
+            var ds1Point2Offset = plot.datasetKeys.get("d1").plotMetadata.offsets.get(2);
+            var ds2Point2Offset = plot.datasetKeys.get("d2").plotMetadata.offsets.get(2);
+            var ds3Point2Offset = plot.datasetKeys.get("d3").plotMetadata.offsets.get(2);
             assert.strictEqual(ds1Point2Offset, 0, "dataset1 (blue) should have no offset on middle point");
             assert.strictEqual(ds2Point2Offset, 2, "dataset2 (red) should have this offset and be on top of blue dataset");
             assert.strictEqual(ds3Point2Offset, 2, "dataset3 (green) should have this offset because the red dataset (ds2) has no height in this point");
@@ -5553,8 +5553,8 @@ describe("Plots", function () {
             plot.addDataset("d2", data2);
             plot.project("fill", "fill");
             plot.project("x", "x", xScale).project("y", "y", yScale);
-            var ds1FirstColumnOffset = plot._key2PlotDatasetKey.get("d1").plotMetadata.offsets.get("A");
-            var ds2FirstColumnOffset = plot._key2PlotDatasetKey.get("d2").plotMetadata.offsets.get("A");
+            var ds1FirstColumnOffset = plot.datasetKeys.get("d1").plotMetadata.offsets.get("A");
+            var ds2FirstColumnOffset = plot.datasetKeys.get("d2").plotMetadata.offsets.get("A");
             assert.strictEqual(typeof ds1FirstColumnOffset, "number", "ds1 offset should be a number");
             assert.strictEqual(typeof ds2FirstColumnOffset, "number", "ds2 offset should be a number");
             assert.isFalse(Plottable.Utils.Methods.isNaN(ds1FirstColumnOffset), "ds1 offset should not be NaN");
@@ -5586,9 +5586,9 @@ describe("Plots", function () {
             plot.addDataset("d5", data5);
             plot.project("fill", "fill");
             plot.project("x", "x", xScale).project("y", "y", yScale);
-            var offset1 = plot._key2PlotDatasetKey.get("d1").plotMetadata.offsets.get("A");
-            var offset3 = plot._key2PlotDatasetKey.get("d3").plotMetadata.offsets.get("A");
-            var offset5 = plot._key2PlotDatasetKey.get("d5").plotMetadata.offsets.get("A");
+            var offset1 = plot.datasetKeys.get("d1").plotMetadata.offsets.get("A");
+            var offset3 = plot.datasetKeys.get("d3").plotMetadata.offsets.get("A");
+            var offset5 = plot.datasetKeys.get("d5").plotMetadata.offsets.get("A");
             assert.strictEqual(offset1, 0, "Plot columns should start from offset 0 (at the very bottom)");
             assert.strictEqual(offset3, 1, "Bar 3 should have offset 1, because bar 2 was not rendered");
             assert.strictEqual(offset5, 3, "Bar 5 should have offset 3, because bar 4 was not rendered");
@@ -5916,8 +5916,8 @@ describe("Metadata", function () {
     it("plot metadata is set properly", function () {
         var d1 = new Plottable.Dataset();
         var r = new Plottable.Plot().addDataset("d1", d1).addDataset(d1).addDataset("d2", []).addDataset([]);
-        r._datasetKeysInOrder.forEach(function (key) {
-            var plotMetadata = r._key2PlotDatasetKey.get(key).plotMetadata;
+        r.datasetKeysInOrder.forEach(function (key) {
+            var plotMetadata = r.datasetKeys.get(key).plotMetadata;
             assert.propertyVal(plotMetadata, "datasetKey", key, "metadata has correct dataset key");
         });
     });
@@ -5981,7 +5981,7 @@ describe("Metadata", function () {
         var xAccessor = function (d, i, u, m) { return d.x + (i + 1) * m.foo; };
         var yAccessor = function () { return 0; };
         var plot = new Plottable.Plots.Scatter(xScale, yScale).project("x", xAccessor).project("y", yAccessor);
-        plot._getPlotMetadataForDataset = function (key) {
+        plot.getPlotMetadataForDataset = function (key) {
             return {
                 datasetKey: key,
                 foo: 10
@@ -6010,7 +6010,7 @@ describe("Metadata", function () {
         var xAccessor = function (d, i, u, m) { return d.x + (i + 1) * m.foo; };
         var yAccessor = function () { return 0; };
         var plot1 = new Plottable.Plots.Scatter(xScale, yScale).project("x", xAccessor).project("y", yAccessor);
-        plot1._getPlotMetadataForDataset = function (key) {
+        plot1.getPlotMetadataForDataset = function (key) {
             return {
                 datasetKey: key,
                 foo: 10
@@ -6019,7 +6019,7 @@ describe("Metadata", function () {
         plot1.addDataset(data1);
         plot1.addDataset(data2);
         var plot2 = new Plottable.Plots.Scatter(xScale, yScale).project("x", xAccessor).project("y", yAccessor);
-        plot2._getPlotMetadataForDataset = function (key) {
+        plot2.getPlotMetadataForDataset = function (key) {
             return {
                 datasetKey: key,
                 foo: 20
@@ -6064,7 +6064,7 @@ describe("Metadata", function () {
         var dataset = new Plottable.Dataset(data1, metadata);
         var a = function (d, i, u, m) { return d.x + u.foo + m.foo; };
         var plot = new Plottable.Plot().project("a", a, xScale);
-        plot._getPlotMetadataForDataset = function (key) {
+        plot.getPlotMetadataForDataset = function (key) {
             return {
                 datasetKey: key,
                 foo: 5

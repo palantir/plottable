@@ -2655,12 +2655,12 @@ declare module Plottable {
         };
     }
     class Plot extends Component {
-        protected _dataChanged: boolean;
-        protected _key2PlotDatasetKey: D3.Map<Plots.PlotDatasetKey>;
-        protected _datasetKeysInOrder: string[];
-        protected renderArea: D3.Selection;
         protected animated: boolean;
         protected animateOnNextRender: boolean;
+        protected datasetKeys: D3.Map<Plots.PlotDatasetKey>;
+        protected datasetKeysInOrder: string[];
+        protected dataChanged: boolean;
+        protected renderArea: D3.Selection;
         protected projections: {
             [attrToSet: string]: _Projection;
         };
@@ -2676,7 +2676,6 @@ declare module Plottable {
          * @param {any[]|Dataset} [dataset] If provided, the data or Dataset to be associated with this Plot.
          */
         constructor();
-        anchor(element: D3.Selection): void;
         /**
          * Adds a dataset to this plot. Identify this dataset with a key.
          *
@@ -2688,6 +2687,7 @@ declare module Plottable {
          */
         addDataset(dataset: Dataset | any[]): Plot;
         addDataset(key: string, dataset: Dataset | any[]): Plot;
+        anchor(element: D3.Selection): void;
         /**
          * Enables or disables animation.
          *
@@ -2803,29 +2803,29 @@ declare module Plottable {
          * @returns {Plot} The calling Plot.
          */
         removeDataset(datasetIdentifier: string | Dataset | any[]): Plot;
-        _updateScaleExtent(attr: string): void;
-        protected _getDrawersInOrder(): Drawers.AbstractDrawer[];
-        protected generateDrawSteps(): Drawers.DrawStep[];
-        protected _additionalPaint(time: number): void;
+        updateScaleExtent(attr: string): void;
+        protected additionalPaint(time: number): void;
         protected generateAttrToProjector(): AttributeToProjector;
+        protected generateDrawSteps(): Drawers.DrawStep[];
         protected _getAllPlotData(datasetKeys: string[]): Plots.PlotData;
-        protected _getAnimator(key: string): Animators.PlotAnimator;
-        protected _getDataToDraw(): D3.Map<any[]>;
+        protected getAnimator(key: string): Animators.PlotAnimator;
+        protected getDataToDraw(): D3.Map<any[]>;
         protected getDrawer(key: string): Drawers.AbstractDrawer;
+        protected getDrawersInOrder(): Drawers.AbstractDrawer[];
         /**
          * Gets the new plot metadata for new dataset with provided key
          *
          * @param {string} key The key of new dataset
          */
-        protected _getPlotMetadataForDataset(key: string): Plots.PlotMetadata;
-        protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean;
-        protected _onDatasetUpdate(): void;
+        protected getPlotMetadataForDataset(key: string): Plots.PlotMetadata;
+        protected isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean;
+        protected onDatasetUpdate(): void;
         protected setup(): void;
         /**
          * This function makes sure that all of the scales in this._projections
          * have an extent that includes all the data that is projected onto them.
          */
-        protected _updateScaleExtents(): void;
+        protected updateScaleExtents(): void;
     }
 }
 
@@ -2954,7 +2954,7 @@ declare module Plottable {
             };
             protected generateDrawSteps(): Drawers.DrawStep[];
             protected _getClosestStruckPoint(p: Point, range: number): Interactions.HoverData;
-            protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean;
+            protected isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean;
             hoverOverComponent(p: Point): void;
             hoverOutComponent(p: Point): void;
             doHover(p: Point): Interactions.HoverData;
@@ -3075,7 +3075,7 @@ declare module Plottable {
              * @returns {PlotData} The PlotData closest to queryPoint
              */
             getClosestPlotData(queryPoint: Point): PlotData;
-            protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean;
+            protected isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean;
             /**
              * Gets the bar under the given pixel position (if [xValOrExtent]
              * and [yValOrExtent] are {number}s), under a given line (if only one
@@ -3090,7 +3090,7 @@ declare module Plottable {
             protected _updateDomainer(scale: Scale<any, number>): void;
             protected _updateYDomainer(): void;
             protected _updateXDomainer(): void;
-            protected _additionalPaint(time: number): void;
+            protected additionalPaint(time: number): void;
             protected _drawLabels(): void;
             protected generateDrawSteps(): Drawers.DrawStep[];
             protected generateAttrToProjector(): {
@@ -3194,7 +3194,7 @@ declare module Plottable {
             };
             protected getDrawer(key: string): Drawers.Area;
             protected _getResetYFunction(): (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
-            protected _onDatasetUpdate(): void;
+            protected onDatasetUpdate(): void;
             protected _updateYDomainer(): void;
             protected _wholeDatumAttributes(): string[];
         }
@@ -3224,8 +3224,8 @@ declare module Plottable {
             protected generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
             };
-            protected _getDataToDraw(): D3.Map<any[]>;
-            protected _getPlotMetadataForDataset(key: string): ClusteredPlotMetadata;
+            protected getDataToDraw(): D3.Map<any[]>;
+            protected getPlotMetadataForDataset(key: string): ClusteredPlotMetadata;
         }
     }
 }
@@ -3244,9 +3244,9 @@ declare module Plottable {
     }
     class Stacked<X, Y> extends XYPlot<X, Y> {
         protected _isVertical: boolean;
-        _getPlotMetadataForDataset(key: string): Plots.StackedPlotMetadata;
+        getPlotMetadataForDataset(key: string): Plots.StackedPlotMetadata;
         project(attrToSet: string, accessor: any, scale?: Scale<any, any>): Stacked<X, Y>;
-        _onDatasetUpdate(): void;
+        onDatasetUpdate(): void;
         _updateStackOffsets(): void;
         _updateStackExtents(): void;
         /**
@@ -3261,7 +3261,7 @@ declare module Plottable {
         _setDatasetStackOffsets(positiveDataMapArray: D3.Map<Plots.StackedDatum>[], negativeDataMapArray: D3.Map<Plots.StackedDatum>[]): void;
         _getDomainKeys(): string[];
         _generateDefaultMapArray(): D3.Map<Plots.StackedDatum>[];
-        _updateScaleExtents(): void;
+        updateScaleExtents(): void;
         _normalizeDatasets<A, B>(fromX: boolean): {
             a: A;
             b: B;
@@ -3284,12 +3284,12 @@ declare module Plottable {
              */
             constructor(xScale: QuantitativeScale<X>, yScale: QuantitativeScale<number>);
             protected getDrawer(key: string): Drawers.Area;
-            _getAnimator(key: string): Animators.PlotAnimator;
+            getAnimator(key: string): Animators.PlotAnimator;
             protected setup(): void;
-            protected _additionalPaint(): void;
+            protected additionalPaint(): void;
             protected _updateYDomainer(): void;
             project(attrToSet: string, accessor: any, scale?: Scale<any, any>): StackedArea<X>;
-            protected _onDatasetUpdate(): StackedArea<X>;
+            protected onDatasetUpdate(): StackedArea<X>;
             protected generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
             };
@@ -3300,10 +3300,10 @@ declare module Plottable {
             _setDatasetStackOffsets(positiveDataMapArray: D3.Map<StackedDatum>[], negativeDataMapArray: D3.Map<StackedDatum>[]): void;
             _getDomainKeys(): any;
             _generateDefaultMapArray(): D3.Map<StackedDatum>[];
-            _updateScaleExtents(): void;
+            updateScaleExtents(): void;
             _keyAccessor(): _Accessor;
             _valueAccessor(): _Accessor;
-            _getPlotMetadataForDataset(key: string): StackedPlotMetadata;
+            getPlotMetadataForDataset(key: string): StackedPlotMetadata;
             protected _normalizeDatasets<A, B>(fromX: boolean): {
                 a: A;
                 b: B;
@@ -3326,14 +3326,14 @@ declare module Plottable {
              * @param {boolean} isVertical if the plot if vertical.
              */
             constructor(xScale?: Scale<X, number>, yScale?: Scale<Y, number>, isVertical?: boolean);
-            protected _getAnimator(key: string): Animators.PlotAnimator;
+            protected getAnimator(key: string): Animators.PlotAnimator;
             protected generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
             };
             protected generateDrawSteps(): Drawers.DrawStep[];
             project(attrToSet: string, accessor: any, scale?: Scale<any, any>): StackedBar<X, Y>;
-            protected _onDatasetUpdate(): StackedBar<X, Y>;
-            protected _getPlotMetadataForDataset(key: string): StackedPlotMetadata;
+            protected onDatasetUpdate(): StackedBar<X, Y>;
+            protected getPlotMetadataForDataset(key: string): StackedPlotMetadata;
             protected _normalizeDatasets<A, B>(fromX: boolean): {
                 a: A;
                 b: B;
@@ -3344,7 +3344,7 @@ declare module Plottable {
             _setDatasetStackOffsets(positiveDataMapArray: D3.Map<StackedDatum>[], negativeDataMapArray: D3.Map<StackedDatum>[]): void;
             _getDomainKeys(): any;
             _generateDefaultMapArray(): D3.Map<StackedDatum>[];
-            _updateScaleExtents(): void;
+            updateScaleExtents(): void;
             _keyAccessor(): _Accessor;
             _valueAccessor(): _Accessor;
         }

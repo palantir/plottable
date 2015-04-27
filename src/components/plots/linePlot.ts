@@ -58,13 +58,13 @@ export module Plots {
 
     protected generateDrawSteps(): Drawers.DrawStep[] {
       var drawSteps: Drawers.DrawStep[] = [];
-      if (this._dataChanged && this.animated) {
+      if (this.dataChanged && this.animated) {
         var attrToProjector = this.generateAttrToProjector();
         attrToProjector["y"] = this._getResetYFunction();
-        drawSteps.push({attrToProjector: attrToProjector, animator: this._getAnimator("reset")});
+        drawSteps.push({attrToProjector: attrToProjector, animator: this.getAnimator("reset")});
       }
 
-      drawSteps.push({attrToProjector: this.generateAttrToProjector(), animator: this._getAnimator("main")});
+      drawSteps.push({attrToProjector: this.generateAttrToProjector(), animator: this.getAnimator("main")});
 
       return drawSteps;
     }
@@ -110,9 +110,9 @@ export module Plots {
       var closestPoint: Point;
       var closestDistSq = range * range;
 
-       this._datasetKeysInOrder.forEach((key: string) => {
-        var dataset = this._key2PlotDatasetKey.get(key).dataset;
-        var plotMetadata = this._key2PlotDatasetKey.get(key).plotMetadata;
+       this.datasetKeysInOrder.forEach((key: string) => {
+        var dataset = this.datasetKeys.get(key).dataset;
+        var plotMetadata = this.datasetKeys.get(key).plotMetadata;
         dataset.data().forEach((d: any, i: number) => {
           var distSq = getDistSq(d, i, dataset.metadata(), plotMetadata);
           if (distSq < closestDistSq) {
@@ -138,7 +138,7 @@ export module Plots {
       var allElements: EventTarget[] = [];
 
       datasetKeys.forEach((datasetKey) => {
-        var plotDatasetKey = this._key2PlotDatasetKey.get(datasetKey);
+        var plotDatasetKey = this.datasetKeys.get(datasetKey);
         if (plotDatasetKey == null) { return; }
         var drawer = plotDatasetKey.drawer;
         plotDatasetKey.dataset.data().forEach((datum: any, index: number) => {
@@ -182,7 +182,7 @@ export module Plots {
           var datum = plotData.data[index];
           var line = plotData.selection[0][0];
 
-          if (!this._isVisibleOnPlot(datum, pixelPoint, d3.select(line))) {
+          if (!this.isVisibleOnPlot(datum, pixelPoint, d3.select(line))) {
             return;
           }
 

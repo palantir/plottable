@@ -51,8 +51,8 @@ export module Plots {
       return this.generateAttrToProjector()["y0"];
     }
 
-    protected _onDatasetUpdate() {
-      super._onDatasetUpdate();
+    protected onDatasetUpdate() {
+      super.onDatasetUpdate();
       if (this._yScale != null) {
         this._updateYDomainer();
       }
