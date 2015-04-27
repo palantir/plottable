@@ -3326,27 +3326,27 @@ declare module Plottable {
              * @param {boolean} isVertical if the plot if vertical.
              */
             constructor(xScale?: Scale<X, number>, yScale?: Scale<Y, number>, isVertical?: boolean);
-            protected getAnimator(key: string): Animators.PlotAnimator;
+            project(attrToSet: string, accessor: any, scale?: Scale<any, any>): StackedBar<X, Y>;
+            generateDefaultMapArray(): D3.Map<StackedDatum>[];
+            getDomainKeys(): any;
+            keyAccessor(): _Accessor;
+            setDatasetStackOffsets(positiveDataMapArray: D3.Map<StackedDatum>[], negativeDataMapArray: D3.Map<StackedDatum>[]): void;
+            stack(dataArray: D3.Map<StackedDatum>[]): D3.Map<StackedDatum>[];
+            updateScaleExtents(): void;
+            updateStackExtents(): void;
+            updateStackOffsets(): void;
+            _valueAccessor(): _Accessor;
             protected generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
             };
             protected generateDrawSteps(): Drawers.DrawStep[];
-            project(attrToSet: string, accessor: any, scale?: Scale<any, any>): StackedBar<X, Y>;
-            protected onDatasetUpdate(): StackedBar<X, Y>;
+            protected getAnimator(key: string): Animators.PlotAnimator;
             protected getPlotMetadataForDataset(key: string): StackedPlotMetadata;
             protected normalizeDatasets<A, B>(fromX: boolean): {
                 a: A;
                 b: B;
             }[];
-            updateStackOffsets(): void;
-            updateStackExtents(): void;
-            stack(dataArray: D3.Map<StackedDatum>[]): D3.Map<StackedDatum>[];
-            setDatasetStackOffsets(positiveDataMapArray: D3.Map<StackedDatum>[], negativeDataMapArray: D3.Map<StackedDatum>[]): void;
-            getDomainKeys(): any;
-            generateDefaultMapArray(): D3.Map<StackedDatum>[];
-            updateScaleExtents(): void;
-            keyAccessor(): _Accessor;
-            _valueAccessor(): _Accessor;
+            protected onDatasetUpdate(): StackedBar<X, Y>;
         }
     }
 }

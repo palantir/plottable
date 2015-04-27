@@ -17,19 +17,49 @@ export module Plots {
       super(xScale, yScale, isVertical);
     }
 
-    protected getAnimator(key: string): Animators.PlotAnimator {
-      if (this.animated && this.animateOnNextRender) {
-        if (this.animator(key)) {
-          return this.animator(key);
-        } else if (key === "stacked-bar") {
-          var primaryScale: Scale<any, number> = this._isVertical ? this._yScale : this._xScale;
-          var scaledBaseline = primaryScale.scale(this.baseline());
-          return new Animators.MovingRect(scaledBaseline, this._isVertical);
-        }
-      }
-
-      return new Animators.Null();
+    public project(attrToSet: string, accessor: any, scale?: Scale<any, any>) {
+      super.project(attrToSet, accessor, scale);
+      Stacked.prototype.project.apply(this, [attrToSet, accessor, scale]);
+      return this;
     }
+
+    //===== Stack logic from StackedPlot =====
+    public generateDefaultMapArray(): D3.Map<StackedDatum>[] {
+      return Stacked.prototype.generateDefaultMapArray.call(this);
+    }
+
+    public getDomainKeys() {
+      return Stacked.prototype.getDomainKeys.call(this);
+    }
+
+    public keyAccessor(): _Accessor {
+      return Stacked.prototype.keyAccessor.call(this);
+    }
+
+    public setDatasetStackOffsets(positiveDataMapArray: D3.Map<StackedDatum>[], negativeDataMapArray: D3.Map<StackedDatum>[]) {
+      Stacked.prototype.setDatasetStackOffsets.call(this, positiveDataMapArray, negativeDataMapArray);
+    }
+
+    public stack(dataArray: D3.Map<StackedDatum>[]): D3.Map<StackedDatum>[] {
+      return Stacked.prototype.stack.call(this, dataArray);
+    }
+
+    public updateScaleExtents() {
+      Stacked.prototype.updateScaleExtents.call(this);
+    }
+
+    public updateStackExtents() {
+      Stacked.prototype.updateStackExtents.call(this);
+    }
+
+    public updateStackOffsets() {
+      Stacked.prototype.updateStackOffsets.call(this);
+    }
+
+    public _valueAccessor(): _Accessor {
+      return Stacked.prototype._valueAccessor.call(this);
+    }
+    //===== /Stack logic =====
 
     protected generateAttrToProjector() {
       var attrToProjector = super.generateAttrToProjector();
@@ -59,16 +89,18 @@ export module Plots {
       return [{attrToProjector: this.generateAttrToProjector(), animator: this.getAnimator("stacked-bar")}];
     }
 
-    public project(attrToSet: string, accessor: any, scale?: Scale<any, any>) {
-      super.project(attrToSet, accessor, scale);
-      Stacked.prototype.project.apply(this, [attrToSet, accessor, scale]);
-      return this;
-    }
+    protected getAnimator(key: string): Animators.PlotAnimator {
+      if (this.animated && this.animateOnNextRender) {
+        if (this.animator(key)) {
+          return this.animator(key);
+        } else if (key === "stacked-bar") {
+          var primaryScale: Scale<any, number> = this._isVertical ? this._yScale : this._xScale;
+          var scaledBaseline = primaryScale.scale(this.baseline());
+          return new Animators.MovingRect(scaledBaseline, this._isVertical);
+        }
+      }
 
-    protected onDatasetUpdate() {
-      super.onDatasetUpdate();
-      Stacked.prototype.onDatasetUpdate.apply(this);
-      return this;
+      return new Animators.Null();
     }
 
     protected getPlotMetadataForDataset(key: string): StackedPlotMetadata {
@@ -79,43 +111,11 @@ export module Plots {
       return Stacked.prototype.normalizeDatasets.call(this, fromX);
     }
 
-    //===== Stack logic from StackedPlot =====
-    public updateStackOffsets() {
-      Stacked.prototype.updateStackOffsets.call(this);
+    protected onDatasetUpdate() {
+      super.onDatasetUpdate();
+      Stacked.prototype.onDatasetUpdate.apply(this);
+      return this;
     }
-
-    public updateStackExtents() {
-      Stacked.prototype.updateStackExtents.call(this);
-    }
-
-    public stack(dataArray: D3.Map<StackedDatum>[]): D3.Map<StackedDatum>[] {
-      return Stacked.prototype.stack.call(this, dataArray);
-    }
-
-    public setDatasetStackOffsets(positiveDataMapArray: D3.Map<StackedDatum>[], negativeDataMapArray: D3.Map<StackedDatum>[]) {
-      Stacked.prototype.setDatasetStackOffsets.call(this, positiveDataMapArray, negativeDataMapArray);
-    }
-
-    public getDomainKeys() {
-      return Stacked.prototype.getDomainKeys.call(this);
-    }
-
-    public generateDefaultMapArray(): D3.Map<StackedDatum>[] {
-      return Stacked.prototype.generateDefaultMapArray.call(this);
-    }
-
-    public updateScaleExtents() {
-      Stacked.prototype.updateScaleExtents.call(this);
-    }
-
-    public keyAccessor(): _Accessor {
-      return Stacked.prototype.keyAccessor.call(this);
-    }
-
-    public _valueAccessor(): _Accessor {
-      return Stacked.prototype._valueAccessor.call(this);
-    }
-    //===== /Stack logic =====
   }
 }
 }
