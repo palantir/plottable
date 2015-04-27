@@ -217,12 +217,12 @@ export module Components {
       colProportionalSpace = Table._calcProportionalSpace(colWeights, freeWidth );
       rowProportionalSpace = Table._calcProportionalSpace(rowWeights, freeHeight);
 
-      return {colProportionalSpace: colProportionalSpace        ,
-              rowProportionalSpace: rowProportionalSpace        ,
-              guaranteedWidths   : guarantees.guaranteedWidths ,
-              guaranteedHeights  : guarantees.guaranteedHeights,
-              wantsWidth         : wantsWidth                  ,
-              wantsHeight        : wantsHeight                 };
+      return {colProportionalSpace: colProportionalSpace,
+              rowProportionalSpace: rowProportionalSpace,
+              guaranteedWidths: guarantees.guaranteedWidths,
+              guaranteedHeights: guarantees.guaranteedHeights,
+              wantsWidth: wantsWidth,
+              wantsHeight: wantsHeight};
     }
 
     private _determineGuarantees(offeredWidths: number[], offeredHeights: number[]): _LayoutAllocation {
@@ -248,10 +248,10 @@ export module Components {
           layoutWantsHeight[rowIndex] = layoutWantsHeight[rowIndex] || spaceRequest.wantsHeight;
         });
       });
-      return {guaranteedWidths: requestedWidths  ,
-              guaranteedHeights: requestedHeights ,
-              wantsWidthArr   : layoutWantsWidth ,
-              wantsHeightArr  : layoutWantsHeight};
+      return {guaranteedWidths: requestedWidths,
+              guaranteedHeights: requestedHeights,
+              wantsWidthArr: layoutWantsWidth,
+              wantsHeightArr: layoutWantsHeight};
     }
 
 
