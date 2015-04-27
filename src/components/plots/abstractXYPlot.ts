@@ -128,7 +128,7 @@ module Plottable {
     protected _updateXDomainer() {
       if (this._xScale instanceof QuantitativeScale) {
         var scale = <QuantitativeScale<any>> this._xScale;
-        if (!scale._userSetDomainer) {
+        if (!scale.setByUser) {
           scale.domainer().pad().nice();
         }
       }
@@ -137,7 +137,7 @@ module Plottable {
     protected _updateYDomainer() {
       if (this._yScale instanceof QuantitativeScale) {
         var scale = <QuantitativeScale<any>> this._yScale;
-        if (!scale._userSetDomainer) {
+        if (!scale.setByUser) {
           scale.domainer().pad().nice();
         }
       }

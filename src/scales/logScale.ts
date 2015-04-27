@@ -3,7 +3,6 @@
 module Plottable {
 export module Scales {
   export class Log extends QuantitativeScale<number> {
-
     private static warned = false;
 
     /**
@@ -34,10 +33,10 @@ export module Scales {
      * @returns {Log} A copy of the calling Log.
      */
     public copy(): Log {
-      return new Log(this._d3Scale.copy());
+      return new Log(this.d3Scale.copy());
     }
 
-    public _defaultExtent(): number[] {
+    public defaultExtent(): number[] {
       return [1, 10];
     }
   }

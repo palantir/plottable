@@ -392,7 +392,7 @@ module Plottable {
           var plotDatasetKey = this._key2PlotDatasetKey.get(key);
           var dataset = plotDatasetKey.dataset;
           var plotMetadata = plotDatasetKey.plotMetadata;
-          var extent = dataset._getExtent(projector.accessor, projector.scale._typeCoercer, plotMetadata);
+          var extent = dataset._getExtent(projector.accessor, projector.scale.typeCoercer, plotMetadata);
           var scaleKey = this.getID().toString() + "_" + key;
           if (extent.length === 0 || !this._isAnchored) {
             projector.scale._removeExtent(scaleKey, attr);

@@ -7455,7 +7455,7 @@ describe("Scales", function () {
         scale.broadcaster.registerListener(null, testCallback);
         scale.domain([0, 10]);
         assert.isTrue(callbackWasCalled, "The registered callback was called");
-        scale._autoDomainAutomatically = true;
+        scale.autoDomainAutomatically = true;
         scale.updateExtent("1", "x", [0.08, 9.92]);
         callbackWasCalled = false;
         scale.domainer(new Plottable.Domainer().nice());
@@ -7476,9 +7476,9 @@ describe("Scales", function () {
         it("scale autoDomain flag is not overwritten without explicitly setting the domain", function () {
             scale.updateExtent("1", "x", d3.extent(data, function (e) { return e.foo; }));
             scale.domainer(new Plottable.Domainer().pad().nice());
-            assert.isTrue(scale._autoDomainAutomatically, "the autoDomain flag is still set after autoranginging and padding and nice-ing");
+            assert.isTrue(scale.autoDomainAutomatically, "the autoDomain flag is still set after autoranginging and padding and nice-ing");
             scale.domain([0, 5]);
-            assert.isFalse(scale._autoDomainAutomatically, "the autoDomain flag is false after domain explicitly set");
+            assert.isFalse(scale.autoDomainAutomatically, "the autoDomain flag is false after domain explicitly set");
         });
         it("scale autorange works as expected with single dataset", function () {
             var svg = generateSVG(100, 100);
@@ -7508,18 +7508,18 @@ describe("Scales", function () {
             svg2.remove();
         });
         it("scale perspectives can be removed appropriately", function () {
-            assert.isTrue(scale._autoDomainAutomatically, "autoDomain enabled1");
+            assert.isTrue(scale.autoDomainAutomatically, "autoDomain enabled1");
             scale.updateExtent("1", "x", d3.extent(data, function (e) { return e.foo; }));
             scale.updateExtent("2", "x", d3.extent(data, function (e) { return e.bar; }));
-            assert.isTrue(scale._autoDomainAutomatically, "autoDomain enabled2");
+            assert.isTrue(scale.autoDomainAutomatically, "autoDomain enabled2");
             assert.deepEqual(scale.domain(), [-20, 5], "scale domain includes both perspectives");
-            assert.isTrue(scale._autoDomainAutomatically, "autoDomain enabled3");
+            assert.isTrue(scale.autoDomainAutomatically, "autoDomain enabled3");
             scale._removeExtent("1", "x");
-            assert.isTrue(scale._autoDomainAutomatically, "autoDomain enabled4");
+            assert.isTrue(scale.autoDomainAutomatically, "autoDomain enabled4");
             assert.closeTo(scale.domain()[0], -20, 0.1, "only the bar accessor is active");
             assert.closeTo(scale.domain()[1], 1, 0.1, "only the bar accessor is active");
             scale.updateExtent("2", "x", d3.extent(data, function (e) { return e.foo; }));
-            assert.isTrue(scale._autoDomainAutomatically, "autoDomain enabled5");
+            assert.isTrue(scale.autoDomainAutomatically, "autoDomain enabled5");
             assert.closeTo(scale.domain()[0], 0, 0.1, "the bar accessor was overwritten");
             assert.closeTo(scale.domain()[1], 5, 0.1, "the bar accessor was overwritten");
         });
@@ -7885,7 +7885,7 @@ describe("TimeScale tests", function () {
         assert.throws(function () { return scale.domain(["1985-10-26", "1955-11-05"]); }, "chronological");
     });
     it("time coercer works as intended", function () {
-        var tc = new Plottable.Scales.Time()._typeCoercer;
+        var tc = new Plottable.Scales.Time().typeCoercer;
         assert.equal(tc(null).getMilliseconds(), 0, "null converted to Date(0)");
         // converting null to Date(0) is the correct behavior as it mirror's d3's semantics
         assert.equal(tc("Wed Dec 31 1969 16:00:00 GMT-0800 (PST)").getMilliseconds(), 0, "string parsed to date");

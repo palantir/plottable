@@ -37,66 +37,51 @@ export module Scales {
       super(d3.scale.linear());
       this.base = base;
       this.pivot = this.base;
-      this.untransformedDomain = this._defaultExtent();
+      this.untransformedDomain = this.defaultExtent();
       this.numTicks(10);
       if (base <= 1) {
         throw new Error("ModifiedLogScale: The base must be > 1");
       }
     }
 
-    /**
-     * Returns an adjusted log10 value for graphing purposes.  The first
-     * adjustment is that negative values are changed to positive during
-     * the calculations, and then the answer is negated at the end.  The
-     * second is that, for values less than 10, an increasingly large
-     * (0 to 1) scaling factor is added such that at 0 the value is
-     * adjusted to 1, resulting in a returned result of 0.
-     */
-    private adjustedLog(x: number): number {
-      var negationFactor = x < 0 ? -1 : 1;
-      x *= negationFactor;
-
-      if (x < this.pivot) {
-        x += (this.pivot - x) / this.pivot;
-      }
-
-      x = Math.log(x) / Math.log(this.base);
-
-      x *= negationFactor;
-      return x;
-    }
-
-    private invertedAdjustedLog(x: number): number {
-      var negationFactor = x < 0 ? -1 : 1;
-      x *= negationFactor;
-
-      x = Math.pow(this.base, x);
-
-      if (x < this.pivot) {
-        x = (this.pivot * (x - 1)) / (this.pivot - 1);
-      }
-
-      x *= negationFactor;
-      return x;
-    }
-
-    public scale(x: number): number {
-      return this._d3Scale(this.adjustedLog(x));
+    public copy(): ModifiedLog {
+      return new ModifiedLog(this.base);
     }
 
     public invert(x: number): number {
-      return this.invertedAdjustedLog(this._d3Scale.invert(x));
+      return this.invertedAdjustedLog(this.d3Scale.invert(x));
     }
 
-    protected _getDomain() {
-      return this.untransformedDomain;
+    public niceDomain(domain: any[], count?: number): any[] {
+      return domain;
     }
 
-    protected _setDomain(values: number[]) {
-      this.untransformedDomain = values;
-      var transformedDomain = [this.adjustedLog(values[0]), this.adjustedLog(values[1])];
-      this._d3Scale.domain(transformedDomain);
-      this.broadcaster.broadcast();
+    public scale(x: number): number {
+      return this.d3Scale(this.adjustedLog(x));
+    }
+
+    /**
+     * Gets whether or not to return tick values other than powers of base.
+     *
+     * This defaults to false, so you'll normally only see ticks like
+     * [10, 100, 1000]. If you turn it on, you might see ticks values
+     * like [10, 50, 100, 500, 1000].
+     * @returns {boolean} the current setting.
+     */
+    public showIntermediateTicks(): boolean;
+    /**
+     * Sets whether or not to return ticks values other than powers or base.
+     *
+     * @param {boolean} show If provided, the desired setting.
+     * @returns {ModifiedLog} The calling ModifiedLog.
+     */
+    public showIntermediateTicks(show: boolean): ModifiedLog;
+    public showIntermediateTicks(show?: boolean): any {
+      if (show == null) {
+        return this._showIntermediateTicks;
+      } else {
+        this._showIntermediateTicks = show;
+      }
     }
 
     public ticks(count = this.numTicks()): number[] {
@@ -124,6 +109,71 @@ export module Scales {
         ticks = d3.scale.linear().domain([min, max]).ticks(count);
       }
       return ticks;
+    }
+
+    protected getDomain() {
+      return this.untransformedDomain;
+    }
+
+    protected setDomain(values: number[]) {
+      this.untransformedDomain = values;
+      var transformedDomain = [this.adjustedLog(values[0]), this.adjustedLog(values[1])];
+      this.d3Scale.domain(transformedDomain);
+      this.broadcaster.broadcast();
+    }
+
+
+    /**
+     * Returns an adjusted log10 value for graphing purposes.  The first
+     * adjustment is that negative values are changed to positive during
+     * the calculations, and then the answer is negated at the end.  The
+     * second is that, for values less than 10, an increasingly large
+     * (0 to 1) scaling factor is added such that at 0 the value is
+     * adjusted to 1, resulting in a returned result of 0.
+     */
+    private adjustedLog(x: number): number {
+      var negationFactor = x < 0 ? -1 : 1;
+      x *= negationFactor;
+
+      if (x < this.pivot) {
+        x += (this.pivot - x) / this.pivot;
+      }
+
+      x = Math.log(x) / Math.log(this.base);
+
+      x *= negationFactor;
+      return x;
+    }
+
+    /**
+     * How many ticks does the range [lower, upper] deserve?
+     *
+     * e.g. if your domain was [10, 1000] and I asked howManyTicks(10, 100),
+     * I would get 1/2 of the ticks. The range 10, 100 takes up 1/2 of the
+     * distance when plotted.
+     */
+    private howManyTicks(lower: number, upper: number): number {
+      var adjustedMin = this.adjustedLog(Utils.Methods.min(this.untransformedDomain, 0));
+      var adjustedMax = this.adjustedLog(Utils.Methods.max(this.untransformedDomain, 0));
+      var adjustedLower = this.adjustedLog(lower);
+      var adjustedUpper = this.adjustedLog(upper);
+      var proportion = (adjustedUpper - adjustedLower) / (adjustedMax - adjustedMin);
+      var ticks = Math.ceil(proportion * this.numTicks());
+      return ticks;
+    }
+
+    private invertedAdjustedLog(x: number): number {
+      var negationFactor = x < 0 ? -1 : 1;
+      x *= negationFactor;
+
+      x = Math.pow(this.base, x);
+
+      if (x < this.pivot) {
+        x = (this.pivot * (x - 1)) / (this.pivot - 1);
+      }
+
+      x *= negationFactor;
+      return x;
     }
 
     /**
@@ -156,56 +206,6 @@ export module Scales {
       var sorted = filtered.sort((x, y) => x - y);
       return sorted;
     }
-
-    /**
-     * How many ticks does the range [lower, upper] deserve?
-     *
-     * e.g. if your domain was [10, 1000] and I asked howManyTicks(10, 100),
-     * I would get 1/2 of the ticks. The range 10, 100 takes up 1/2 of the
-     * distance when plotted.
-     */
-    private howManyTicks(lower: number, upper: number): number {
-      var adjustedMin = this.adjustedLog(Utils.Methods.min(this.untransformedDomain, 0));
-      var adjustedMax = this.adjustedLog(Utils.Methods.max(this.untransformedDomain, 0));
-      var adjustedLower = this.adjustedLog(lower);
-      var adjustedUpper = this.adjustedLog(upper);
-      var proportion = (adjustedUpper - adjustedLower) / (adjustedMax - adjustedMin);
-      var ticks = Math.ceil(proportion * this.numTicks());
-      return ticks;
-    }
-
-    public copy(): ModifiedLog {
-      return new ModifiedLog(this.base);
-    }
-
-    public _niceDomain(domain: any[], count?: number): any[] {
-      return domain;
-    }
-
-    /**
-     * Gets whether or not to return tick values other than powers of base.
-     *
-     * This defaults to false, so you'll normally only see ticks like
-     * [10, 100, 1000]. If you turn it on, you might see ticks values
-     * like [10, 50, 100, 500, 1000].
-     * @returns {boolean} the current setting.
-     */
-    public showIntermediateTicks(): boolean;
-    /**
-     * Sets whether or not to return ticks values other than powers or base.
-     *
-     * @param {boolean} show If provided, the desired setting.
-     * @returns {ModifiedLog} The calling ModifiedLog.
-     */
-    public showIntermediateTicks(show: boolean): ModifiedLog;
-    public showIntermediateTicks(show?: boolean): any {
-      if (show == null) {
-        return this._showIntermediateTicks;
-      } else {
-        this._showIntermediateTicks = show;
-      }
-    }
-
   }
 }
 }

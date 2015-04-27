@@ -3,13 +3,13 @@
 module Plottable {
 export module Scales {
   export class Category extends Scale<string, number> {
-    protected _d3Scale: D3.Scale.OrdinalScale;
-    private _range = [0, 1];
+    public typeCoercer: (d: any) => any = (d: any) => d != null && d.toString ? d.toString() : d;
+
+    protected d3Scale: D3.Scale.OrdinalScale;
 
     private _innerPadding: number;
     private _outerPadding: number;
-    public _typeCoercer: (d: any) => any = (d: any) => d != null && d.toString ? d.toString() : d;
-
+    private _range = [0, 1];
     /**
      * Creates a CategoryScale.
      *
@@ -22,67 +22,18 @@ export module Scales {
       super(scale);
 
       var d3InnerPadding = 0.3;
-      this._innerPadding = Category._convertToPlottableInnerPadding(d3InnerPadding);
-      this._outerPadding = Category._convertToPlottableOuterPadding(0.5, d3InnerPadding);
+      this._innerPadding = Category.convertToPlottableInnerPadding(d3InnerPadding);
+      this._outerPadding = Category.convertToPlottableOuterPadding(0.5, d3InnerPadding);
     }
 
-    protected _getExtent(): string[] {
-      var extents: string[][] = this._getAllExtents();
-      return Utils.Methods.uniq(Utils.Methods.flatten(extents));
+    public copy(): Category {
+      return new Category(this.d3Scale.copy());
     }
 
     public domain(): string[];
     public domain(values: string[]): Category;
     public domain(values?: string[]): any {
       return super.domain(values);
-    }
-
-    protected _setDomain(values: string[]) {
-      super._setDomain(values);
-      this.range(this.range()); // update range
-    }
-
-    public range(): number[];
-    public range(values: number[]): Category;
-    public range(values?: number[]): any {
-      if (values == null) {
-        return this._range;
-      } else {
-        this._range = values;
-        var d3InnerPadding = 1 - 1 / (1 + this.innerPadding());
-        var d3OuterPadding = this.outerPadding() / (1 + this.innerPadding());
-        this._d3Scale.rangeBands(values, d3InnerPadding, d3OuterPadding);
-        return this;
-      }
-    }
-
-    private static _convertToPlottableInnerPadding(d3InnerPadding: number): number {
-      return 1 / (1 - d3InnerPadding) - 1;
-    }
-
-    private static _convertToPlottableOuterPadding(d3OuterPadding: number, d3InnerPadding: number): number {
-      return d3OuterPadding / (1 - d3InnerPadding);
-    }
-
-    /**
-     * Returns the width of the range band.
-     *
-     * @returns {number} The range band width
-     */
-    public rangeBand() : number {
-      return this._d3Scale.rangeBand();
-    }
-
-    /**
-     * Returns the step width of the scale.
-     *
-     * The step width is defined as the entire space for a band to occupy,
-     * including the padding in between the bands.
-     *
-     * @returns {number} the full band width of the scale
-     */
-    public stepWidth(): number {
-      return this.rangeBand() * (1 + this.innerPadding());
     }
 
     /**
@@ -141,13 +92,62 @@ export module Scales {
       return this;
     }
 
-    public copy(): Category {
-      return new Category(this._d3Scale.copy());
+    public range(): number[];
+    public range(values: number[]): Category;
+    public range(values?: number[]): any {
+      if (values == null) {
+        return this._range;
+      } else {
+        this._range = values;
+        var d3InnerPadding = 1 - 1 / (1 + this.innerPadding());
+        var d3OuterPadding = this.outerPadding() / (1 + this.innerPadding());
+        this.d3Scale.rangeBands(values, d3InnerPadding, d3OuterPadding);
+        return this;
+      }
+    }
+
+    /**
+     * Returns the width of the range band.
+     *
+     * @returns {number} The range band width
+     */
+    public rangeBand() : number {
+      return this.d3Scale.rangeBand();
     }
 
     public scale(value: string): number {
       //scale it to the middle
       return super.scale(value) + this.rangeBand() / 2;
+    }
+
+    /**
+     * Returns the step width of the scale.
+     *
+     * The step width is defined as the entire space for a band to occupy,
+     * including the padding in between the bands.
+     *
+     * @returns {number} the full band width of the scale
+     */
+    public stepWidth(): number {
+      return this.rangeBand() * (1 + this.innerPadding());
+    }
+
+    protected getExtent(): string[] {
+      var extents: string[][] = this.getAllExtents();
+      return Utils.Methods.uniq(Utils.Methods.flatten(extents));
+    }
+
+    protected setDomain(values: string[]) {
+      super.setDomain(values);
+      this.range(this.range()); // update range
+    }
+
+    private static convertToPlottableInnerPadding(d3InnerPadding: number): number {
+      return 1 / (1 - d3InnerPadding) - 1;
+    }
+
+    private static convertToPlottableOuterPadding(d3OuterPadding: number, d3InnerPadding: number): number {
+      return d3OuterPadding / (1 - d3InnerPadding);
     }
   }
 }

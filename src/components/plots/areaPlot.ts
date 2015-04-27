@@ -65,7 +65,7 @@ export module Plots {
       var y0Projector = this.projections["y0"];
       var y0Accessor = y0Projector && y0Projector.accessor;
       if (y0Accessor != null) {
-        var extents = this.datasets().map((d) => d._getExtent(y0Accessor, this._yScale._typeCoercer));
+        var extents = this.datasets().map((d) => d._getExtent(y0Accessor, this._yScale.typeCoercer));
         var extent = Utils.Methods.flatten(extents);
         var uniqExtentVals = Utils.Methods.uniq(extent);
         if (uniqExtentVals.length === 1) {
@@ -73,7 +73,7 @@ export module Plots {
         }
       }
 
-      if (!this._yScale._userSetDomainer) {
+      if (!this._yScale.setByUser) {
         if (constantBaseline != null) {
           this._yScale.domainer().addPaddingException(constantBaseline, "AREA_PLOT+" + this.getID());
         } else {

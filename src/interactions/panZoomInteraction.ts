@@ -44,10 +44,10 @@ export module Interactions {
       // HACKHACK #254
       this.zoom = d3.behavior.zoom();
       if (this.xScale) {
-        this.zoom.x((<any> this.xScale)._d3Scale);
+        this.zoom.x((<any> this.xScale).d3Scale);
       }
       if (this.yScale) {
-        this.zoom.y((<any> this.yScale)._d3Scale);
+        this.zoom.y((<any> this.yScale).d3Scale);
       }
       this.zoom.on("zoom", () => this.rerenderZoomed());
       this.zoom(this.hitBox);
@@ -61,12 +61,12 @@ export module Interactions {
       // HACKHACK since the d3.zoom.x modifies d3 scales and not our TS scales, and the TS scales have the
       // event listener machinery, let's grab the domain out of the d3 scale and pipe it back into the TS scale
       if (this.xScale) {
-        var xDomain = (<any> this.xScale)._d3Scale.domain();
+        var xDomain = (<any> this.xScale).d3Scale.domain();
         this.xScale.domain(xDomain);
       }
 
       if (this.yScale) {
-        var yDomain = (<any> this.yScale)._d3Scale.domain();
+        var yDomain = (<any> this.yScale).d3Scale.domain();
         this.yScale.domain(yDomain);
       }
     }

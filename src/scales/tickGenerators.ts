@@ -8,6 +8,21 @@ module Plottable {
       export interface TickGenerator<D> {
         (scale: Plottable.QuantitativeScale<D>): D[]
       }
+
+      /**
+       * Creates a tick generator that will filter for only the integers in defaultTicks and return them.
+       *
+       * Will also include the end ticks.
+       *
+       * @returns {TickGenerator} A tick generator returning only integer ticks.
+       */
+      export function integerTickGenerator(): TickGenerator<number> {
+        return function(s: QuantitativeScale<number>) {
+          var defaultTicks = s.getDefaultTicks();
+          return defaultTicks.filter((tick, i) => (tick % 1 === 0) || (i === 0) || (i === defaultTicks.length - 1));
+        };
+      }
+
       /**
        * Creates a tick generator using the specified interval.
        *
@@ -34,20 +49,6 @@ module Plottable {
           var highTicks = high % interval === 0 ? [] : [high];
 
           return lowTicks.concat(middleTicks).concat(highTicks);
-        };
-      }
-
-      /**
-       * Creates a tick generator that will filter for only the integers in defaultTicks and return them.
-       *
-       * Will also include the end ticks.
-       *
-       * @returns {TickGenerator} A tick generator returning only integer ticks.
-       */
-      export function integerTickGenerator(): TickGenerator<number> {
-        return function(s: QuantitativeScale<number>) {
-          var defaultTicks = s.getDefaultTicks();
-          return defaultTicks.filter((tick, i) => (tick % 1 === 0) || (i === 0) || (i === defaultTicks.length - 1));
         };
       }
     }
