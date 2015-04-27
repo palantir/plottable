@@ -6996,10 +6996,6 @@ var Plottable;
                 this._colorScale = new Plottable.Scales.Color();
                 this.classed("pie-plot", true);
             }
-            Pie.prototype.computeLayout = function (offeredXOrigin, offeredYOrigin, availableWidth, availableHeight) {
-                _super.prototype.computeLayout.call(this, offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
-                this.renderArea.attr("transform", "translate(" + this.width() / 2 + "," + this.height() / 2 + ")");
-            };
             Pie.prototype.addDataset = function (keyOrDataset, dataset) {
                 if (this.datasetKeysInOrder.length === 1) {
                     Plottable.Utils.Methods.warn("Only one dataset is supported in Pie plots");
@@ -7007,6 +7003,19 @@ var Plottable;
                 }
                 _super.prototype.addDataset.call(this, keyOrDataset, dataset);
                 return this;
+            };
+            Pie.prototype.computeLayout = function (offeredXOrigin, offeredYOrigin, availableWidth, availableHeight) {
+                _super.prototype.computeLayout.call(this, offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
+                this.renderArea.attr("transform", "translate(" + this.width() / 2 + "," + this.height() / 2 + ")");
+            };
+            Pie.prototype.getAllPlotData = function (datasetKeys) {
+                var _this = this;
+                var allPlotData = _super.prototype.getAllPlotData.call(this, datasetKeys);
+                allPlotData.pixelPoints.forEach(function (pixelPoint) {
+                    pixelPoint.x = pixelPoint.x + _this.width() / 2;
+                    pixelPoint.y = pixelPoint.y + _this.height() / 2;
+                });
+                return allPlotData;
             };
             Pie.prototype.generateAttrToProjector = function () {
                 var _this = this;
@@ -7019,15 +7028,6 @@ var Plottable;
             };
             Pie.prototype.getDrawer = function (key) {
                 return new Plottable.Drawers.Arc(key).setClass("arc");
-            };
-            Pie.prototype.getAllPlotData = function (datasetKeys) {
-                var _this = this;
-                var allPlotData = _super.prototype.getAllPlotData.call(this, datasetKeys);
-                allPlotData.pixelPoints.forEach(function (pixelPoint) {
-                    pixelPoint.x = pixelPoint.x + _this.width() / 2;
-                    pixelPoint.y = pixelPoint.y + _this.height() / 2;
-                });
-                return allPlotData;
             };
             return Pie;
         })(Plottable.Plot);

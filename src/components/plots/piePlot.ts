@@ -14,7 +14,7 @@ export module Plots {
    */
   export class Pie extends Plot {
 
-    private _colorScale: Scales.Color;
+    private colorScale: Scales.Color;
 
     /**
      * Constructs a PiePlot.
@@ -23,13 +23,8 @@ export module Plots {
      */
     constructor() {
       super();
-      this._colorScale = new Scales.Color();
+      this.colorScale = new Scales.Color();
       this.classed("pie-plot", true);
-    }
-
-    public computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number) {
-      super.computeLayout(offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
-      this.renderArea.attr("transform", "translate(" + this.width() / 2 + "," + this.height() / 2 + ")");
     }
 
     public addDataset(keyOrDataset: any, dataset?: any) {
@@ -41,19 +36,9 @@ export module Plots {
       return this;
     }
 
-    protected generateAttrToProjector(): AttributeToProjector {
-      var attrToProjector = super.generateAttrToProjector();
-      attrToProjector["inner-radius"] = attrToProjector["inner-radius"] || d3.functor(0);
-      attrToProjector["outer-radius"] = attrToProjector["outer-radius"] || d3.functor(Math.min(this.width(), this.height()) / 2);
-
-      var defaultFillFunction = (d: any, i: number) => this._colorScale.scale(String(i));
-      attrToProjector["fill"] = attrToProjector["fill"] || defaultFillFunction;
-
-      return attrToProjector;
-    }
-
-    protected getDrawer(key: string): Drawers.AbstractDrawer {
-      return new Plottable.Drawers.Arc(key).setClass("arc");
+    public computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number) {
+      super.computeLayout(offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
+      this.renderArea.attr("transform", "translate(" + this.width() / 2 + "," + this.height() / 2 + ")");
     }
 
     public getAllPlotData(datasetKeys?: string | string[]): PlotData {
@@ -65,6 +50,21 @@ export module Plots {
       });
 
       return allPlotData;
+    }
+
+    protected generateAttrToProjector(): AttributeToProjector {
+      var attrToProjector = super.generateAttrToProjector();
+      attrToProjector["inner-radius"] = attrToProjector["inner-radius"] || d3.functor(0);
+      attrToProjector["outer-radius"] = attrToProjector["outer-radius"] || d3.functor(Math.min(this.width(), this.height()) / 2);
+
+      var defaultFillFunction = (d: any, i: number) => this.colorScale.scale(String(i));
+      attrToProjector["fill"] = attrToProjector["fill"] || defaultFillFunction;
+
+      return attrToProjector;
+    }
+
+    protected getDrawer(key: string): Drawers.AbstractDrawer {
+      return new Plottable.Drawers.Arc(key).setClass("arc");
     }
   }
 }

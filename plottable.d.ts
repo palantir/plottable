@@ -2839,11 +2839,11 @@ declare module Plottable {
              * @constructor
              */
             constructor();
-            computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;
             addDataset(keyOrDataset: any, dataset?: any): Pie;
+            computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;
+            getAllPlotData(datasetKeys?: string | string[]): PlotData;
             protected generateAttrToProjector(): AttributeToProjector;
             protected getDrawer(key: string): Drawers.AbstractDrawer;
-            getAllPlotData(datasetKeys?: string | string[]): PlotData;
         }
     }
 }
