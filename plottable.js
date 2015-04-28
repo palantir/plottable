@@ -9376,7 +9376,9 @@ var Plottable;
                 this._event2Callback["touchmove"] = function (e) { return _this._measureAndBroadcast(e, _this._moveBroadcaster); };
                 this._endBroadcaster = new Plottable.Core.Broadcaster(this);
                 this._event2Callback["touchend"] = function (e) { return _this._measureAndBroadcast(e, _this._endBroadcaster); };
-                this._broadcasters = [this._moveBroadcaster, this._startBroadcaster, this._endBroadcaster];
+                this._cancelBroadcaster = new Plottable.Core.Broadcaster(this);
+                this._event2Callback["touchcancel"] = function (e) { return _this._measureAndBroadcast(e, _this._cancelBroadcaster); };
+                this._broadcasters = [this._moveBroadcaster, this._startBroadcaster, this._endBroadcaster, this._cancelBroadcaster];
             }
             /**
              * Get a Dispatcher.Touch for the <svg> containing elem. If one already exists
@@ -9440,6 +9442,21 @@ var Plottable;
              */
             Touch.prototype.onTouchEnd = function (key, callback) {
                 this._setCallback(this._endBroadcaster, key, callback);
+                return this;
+            };
+            /**
+             * Registers a callback to be called whenever a touch is cancelled,
+             * or removes the callback if `null` is passed as the callback.
+             *
+             * @param {any} key The key associated with the callback.
+             *                  Key uniqueness is determined by deep equality.
+             * @param {TouchCallback} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space. Pass `null`
+             *                                     to remove a callback.
+             * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
+             */
+            Touch.prototype.onTouchCancel = function (key, callback) {
+                this._setCallback(this._cancelBroadcaster, key, callback);
                 return this;
             };
             /**
@@ -9622,6 +9639,7 @@ var Plottable;
                 this._touchDispatcher = Plottable.Dispatcher.Touch.getDispatcher(component.content().node());
                 this._touchDispatcher.onTouchStart("Interaction.Click" + this.getID(), function (ids, idToPoint) { return _this._handleClickDown(idToPoint[ids[0]]); });
                 this._touchDispatcher.onTouchEnd("Interaction.Click" + this.getID(), function (ids, idToPoint) { return _this._handleClickUp(idToPoint[ids[0]]); });
+                this._touchDispatcher.onTouchCancel("Interaction.Click" + this.getID(), function (ids, idToPoint) { return _this._clickedDown = false; });
             };
             Click.prototype._handleClickDown = function (p) {
                 var translatedPoint = this._translateToComponentSpace(p);
@@ -9684,6 +9702,7 @@ var Plottable;
                 this._touchDispatcher = Plottable.Dispatcher.Touch.getDispatcher(component.content().node());
                 this._touchDispatcher.onTouchStart("Interaction.DoubleClick" + this.getID(), function (ids, idToPoint) { return _this._handleClickDown(idToPoint[ids[0]]); });
                 this._touchDispatcher.onTouchEnd("Interaction.DoubleClick" + this.getID(), function (ids, idToPoint) { return _this._handleClickUp(idToPoint[ids[0]]); });
+                this._touchDispatcher.onTouchCancel("Interaction.DoubleClick" + this.getID(), function (ids, idToPoint) { return _this._handleClickCancel(); });
             };
             DoubleClick.prototype._handleClickDown = function (p) {
                 var translatedP = this._translateToComponentSpace(p);
@@ -9712,6 +9731,10 @@ var Plottable;
                     }
                     this._clickState = 0 /* NotClicked */;
                 }
+            };
+            DoubleClick.prototype._handleClickCancel = function () {
+                this._clickState = 0 /* NotClicked */;
+                this._clickedDown = false;
             };
             DoubleClick.pointsEqual = function (p1, p2) {
                 return p1.x === p2.x && p1.y === p2.y;
@@ -9956,6 +9979,7 @@ var Plottable;
                 this._touchDispatcher.onTouchStart("Interaction.Drag" + this.getID(), function (ids, idToPoint, e) { return _this._startDrag(idToPoint[ids[0]], e); });
                 this._touchDispatcher.onTouchMove("Interaction.Drag" + this.getID(), function (ids, idToPoint, e) { return _this._doDrag(idToPoint[ids[0]], e); });
                 this._touchDispatcher.onTouchEnd("Interaction.Drag" + this.getID(), function (ids, idToPoint, e) { return _this._endDrag(idToPoint[ids[0]], e); });
+                this._touchDispatcher.onTouchCancel("Interaction.Drag" + this.getID(), function (ids, idToPoint, e) { return _this._dragging = false; });
             };
             Drag.prototype._translateAndConstrain = function (p) {
                 var translatedP = this._translateToComponentSpace(p);

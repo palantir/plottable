@@ -29,6 +29,8 @@ export module Interaction {
         (ids, idToPoint, e) => this._doDrag(idToPoint[ids[0]], e));
       this._touchDispatcher.onTouchEnd("Interaction.Drag" + this.getID(),
         (ids, idToPoint, e) => this._endDrag(idToPoint[ids[0]], e));
+      this._touchDispatcher.onTouchCancel("Interaction.Drag" + this.getID(),
+        (ids, idToPoint, e) => this._dragging = false);
     }
 
     private _translateAndConstrain(p: Point) {

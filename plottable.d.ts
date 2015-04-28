@@ -3756,6 +3756,18 @@ declare module Plottable {
              * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
              */
             onTouchEnd(key: any, callback: TouchCallback): Dispatcher.Touch;
+            /**
+             * Registers a callback to be called whenever a touch is cancelled,
+             * or removes the callback if `null` is passed as the callback.
+             *
+             * @param {any} key The key associated with the callback.
+             *                  Key uniqueness is determined by deep equality.
+             * @param {TouchCallback} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space. Pass `null`
+             *                                     to remove a callback.
+             * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
+             */
+            onTouchCancel(key: any, callback: TouchCallback): Dispatcher.Touch;
         }
     }
 }

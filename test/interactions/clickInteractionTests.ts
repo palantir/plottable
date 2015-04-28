@@ -81,5 +81,25 @@ describe("Interactions", () => {
 
       svg.remove();
     });
+
+    it("cancelling touches cancels any ongoing clicks", () => {
+      var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      var c = new Plottable.Component.AbstractComponent();
+      c.renderTo(svg);
+
+      var clickInteraction = new Plottable.Interaction.Click();
+      c.registerInteraction(clickInteraction);
+
+      var callbackCalled = false;
+      var callback = () => callbackCalled = true;
+      clickInteraction.onClick(callback);
+
+      triggerFakeTouchEvent("touchstart", c.content(), [{x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2}]);
+      triggerFakeTouchEvent("touchcancel", c.content(), [{x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2}]);
+      triggerFakeTouchEvent("touchend", c.content(), [{x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2}]);
+      assert.isFalse(callbackCalled, "callback not called since click was interrupted");
+
+      svg.remove();
+    });
   });
 });
