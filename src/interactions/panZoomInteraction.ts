@@ -46,13 +46,13 @@ export module Interaction {
 
       this._touchDispatcher = Dispatcher.Touch.getDispatcher(<SVGElement> this._componentToListenTo.content().node());
       this._touchDispatcher.onTouchStart("Interaction.PanZoom" + this.getID(),
-        (ids, idToPoint, e) => this._handleTouchStart(ids, idToPoint, e));
+        (ids, idToPoint, e) => this._handlePinchStart(ids, idToPoint, e));
       this._touchDispatcher.onTouchMove("Interaction.PanZoom" + this.getID(),
-        (ids, idToPoint, e) => this._handleTouchMove(ids, idToPoint, e));
+        (ids, idToPoint, e) => this._handlePinchMove(ids, idToPoint, e));
       this._touchDispatcher.onTouchEnd("Interaction.PanZoom" + this.getID(),
-        (ids, idToPoint, e) => this._handleTouchFinish(ids, idToPoint, e));
+        (ids, idToPoint, e) => this._handlePinchFinish(ids, idToPoint, e));
       this._touchDispatcher.onTouchCancel("Interaction.PanZoom" + this.getID(),
-        (ids, idToPoint, e) => this._handleTouchFinish(ids, idToPoint, e));
+        (ids, idToPoint, e) => this._handlePinchFinish(ids, idToPoint, e));
     }
 
     private _handlePinchStart(ids: number[], idToPoint: { [id: number]: Point; }, e: TouchEvent) {

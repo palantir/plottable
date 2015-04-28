@@ -9910,10 +9910,10 @@ var Plottable;
                 var mouseDispatcher = Plottable.Dispatcher.Mouse.getDispatcher(this._componentToListenTo.content().node());
                 mouseDispatcher.onWheel("Interaction.PanZoom" + this.getID(), function (p, e) { return _this._handleWheelEvent(p, e); });
                 this._touchDispatcher = Plottable.Dispatcher.Touch.getDispatcher(this._componentToListenTo.content().node());
-                this._touchDispatcher.onTouchStart("Interaction.PanZoom" + this.getID(), function (ids, idToPoint, e) { return _this._handleTouchStart(ids, idToPoint, e); });
-                this._touchDispatcher.onTouchMove("Interaction.PanZoom" + this.getID(), function (ids, idToPoint, e) { return _this._handleTouchMove(ids, idToPoint, e); });
-                this._touchDispatcher.onTouchEnd("Interaction.PanZoom" + this.getID(), function (ids, idToPoint, e) { return _this._handleTouchFinish(ids, idToPoint, e); });
-                this._touchDispatcher.onTouchCancel("Interaction.PanZoom" + this.getID(), function (ids, idToPoint, e) { return _this._handleTouchFinish(ids, idToPoint, e); });
+                this._touchDispatcher.onTouchStart("Interaction.PanZoom" + this.getID(), function (ids, idToPoint, e) { return _this._handlePinchStart(ids, idToPoint, e); });
+                this._touchDispatcher.onTouchMove("Interaction.PanZoom" + this.getID(), function (ids, idToPoint, e) { return _this._handlePinchMove(ids, idToPoint, e); });
+                this._touchDispatcher.onTouchEnd("Interaction.PanZoom" + this.getID(), function (ids, idToPoint, e) { return _this._handlePinchFinish(ids, idToPoint, e); });
+                this._touchDispatcher.onTouchCancel("Interaction.PanZoom" + this.getID(), function (ids, idToPoint, e) { return _this._handlePinchFinish(ids, idToPoint, e); });
             };
             PanZoom.prototype._handlePinchStart = function (ids, idToPoint, e) {
                 var _this = this;
