@@ -80,8 +80,7 @@ export module Interaction {
 
       var oldAvgX = (leftX + rightX) / 2;
       var oldAvgY = (bottomY + topY) / 2;
-      var oldDiffX = rightX - leftX;
-      var oldDiffY = bottomY - topY;
+      var oldDiff = Math.sqrt(Math.pow(rightX - leftX, 2) + Math.pow(bottomY - topY, 2));
 
       ids.forEach((id) => {
         var translatedP = this._translateToComponentSpace(idToPoint[id]);
@@ -101,15 +100,14 @@ export module Interaction {
 
       var newAvgX = (newLeftX + newRightX) / 2;
       var newAvgY = (newBottomY + newTopY) / 2;
-      var newDiffX = newRightX - newLeftX;
-      var newDiffY = newBottomY - newTopY;
+      var newDiff = Math.sqrt(Math.pow(newRightX - newLeftX, 2) + Math.pow(newBottomY - newTopY, 2));
 
-      if (this._xScale != null && newDiffX !== 0 && oldDiffX !== 0) {
-        this._xScale.domain(PanZoom.magnify(this._xScale, oldDiffX / newDiffX, oldAvgX));
+      if (this._xScale != null && newDiff !== 0 && oldDiff !== 0) {
+        this._xScale.domain(PanZoom.magnify(this._xScale, oldDiff / newDiff, oldAvgX));
         this._xScale.domain(PanZoom.translate(this._xScale, oldAvgX - newAvgX));
       }
-      if (this._yScale != null && newDiffY !== 0 && oldDiffY !== 0) {
-        this._yScale.domain(PanZoom.magnify(this._yScale, oldDiffY / newDiffY, oldAvgY));
+      if (this._yScale != null && newDiff !== 0 && oldDiff !== 0) {
+        this._yScale.domain(PanZoom.magnify(this._yScale, oldDiff / newDiff, oldAvgY));
         this._yScale.domain(PanZoom.translate(this._yScale, oldAvgY - newAvgY));
       }
     }
@@ -136,7 +134,7 @@ export module Interaction {
         e.preventDefault();
 
         var deltaPixelAmount = e.deltaY * (e.deltaMode ? PanZoom.PIXELS_PER_LINE : 1);
-        var zoomAmount = Math.pow(2, -deltaPixelAmount * .002);
+        var zoomAmount = Math.pow(2, deltaPixelAmount * .002);
         if (this._xScale != null) {
           this._xScale.domain(PanZoom.magnify(this._xScale, zoomAmount, translatedP.x));
         }
