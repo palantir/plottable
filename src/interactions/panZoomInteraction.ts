@@ -48,7 +48,7 @@ export module Interaction {
       this._touchDispatcher.onTouchStart("Interaction.PanZoom" + this.getID(),
         (ids, idToPoint, e) => this._handlePinchStart(ids, idToPoint, e));
       this._touchDispatcher.onTouchMove("Interaction.PanZoom" + this.getID(),
-        (ids, idToPoint, e) => this._handlePinchMove(ids, idToPoint, e));
+        (ids, idToPoint, e) => this._handlePinch(ids, idToPoint, e));
       this._touchDispatcher.onTouchEnd("Interaction.PanZoom" + this.getID(),
         (ids, idToPoint, e) => this._handlePinchFinish(ids, idToPoint, e));
       this._touchDispatcher.onTouchCancel("Interaction.PanZoom" + this.getID(),
@@ -65,7 +65,7 @@ export module Interaction {
       });
     }
 
-    private _handlePinchMove(ids: number[], idToPoint: { [id: number]: Point; }, e: TouchEvent) {
+    private _handlePinch(ids: number[], idToPoint: { [id: number]: Point; }, e: TouchEvent) {
       if (this._touchIds.size() < 2) {
         return;
       }
