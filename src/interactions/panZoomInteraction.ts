@@ -55,7 +55,7 @@ export module Interaction {
         (ids, idToPoint, e) => this._handleTouchFinish(ids, idToPoint, e));
     }
 
-    private _handleTouchStart(ids: number[], idToPoint: { [id: number]: Point; }, e: TouchEvent) {
+    private _handlePinchStart(ids: number[], idToPoint: { [id: number]: Point; }, e: TouchEvent) {
       ids.forEach((id) => {
         if (this._touchIds.size() === 2) {
           return;
@@ -65,7 +65,7 @@ export module Interaction {
       });
     }
 
-    private _handleTouchMove(ids: number[], idToPoint: { [id: number]: Point; }, e: TouchEvent) {
+    private _handlePinchMove(ids: number[], idToPoint: { [id: number]: Point; }, e: TouchEvent) {
       if (this._touchIds.size() !== 2) {
         return;
       }
@@ -112,7 +112,7 @@ export module Interaction {
       }
     }
 
-    private _handleTouchFinish(ids: number[], idToPoint: { [id: number]: Point; }, e: TouchEvent) {
+    private _handlePinchFinish(ids: number[], idToPoint: { [id: number]: Point; }, e: TouchEvent) {
       ids.forEach((id) => {
         this._touchIds.remove(id.toString());
       });

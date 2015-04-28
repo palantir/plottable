@@ -9915,7 +9915,7 @@ var Plottable;
                 this._touchDispatcher.onTouchEnd("Interaction.PanZoom" + this.getID(), function (ids, idToPoint, e) { return _this._handleTouchFinish(ids, idToPoint, e); });
                 this._touchDispatcher.onTouchCancel("Interaction.PanZoom" + this.getID(), function (ids, idToPoint, e) { return _this._handleTouchFinish(ids, idToPoint, e); });
             };
-            PanZoom.prototype._handleTouchStart = function (ids, idToPoint, e) {
+            PanZoom.prototype._handlePinchStart = function (ids, idToPoint, e) {
                 var _this = this;
                 ids.forEach(function (id) {
                     if (_this._touchIds.size() === 2) {
@@ -9924,7 +9924,7 @@ var Plottable;
                     _this._touchIds.set(id.toString(), _this._translateToComponentSpace(idToPoint[id]));
                 });
             };
-            PanZoom.prototype._handleTouchMove = function (ids, idToPoint, e) {
+            PanZoom.prototype._handlePinchMove = function (ids, idToPoint, e) {
                 var _this = this;
                 if (this._touchIds.size() !== 2) {
                     return;
@@ -9964,7 +9964,7 @@ var Plottable;
                     this._yScale.domain(PanZoom.translate(this._yScale, oldAvgY - newAvgY));
                 }
             };
-            PanZoom.prototype._handleTouchFinish = function (ids, idToPoint, e) {
+            PanZoom.prototype._handlePinchFinish = function (ids, idToPoint, e) {
                 var _this = this;
                 ids.forEach(function (id) {
                     _this._touchIds.remove(id.toString());
