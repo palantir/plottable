@@ -87,12 +87,12 @@ export module Interaction {
       var newCornerDistance = this.cornerDistance();
 
       if (this._xScale != null && newCornerDistance !== 0 && oldCornerDistance !== 0) {
-        this._xScale.domain(PanZoom.magnify(this._xScale, oldCornerDistance / newCornerDistance, oldCenterPoint.x));
-        this._xScale.domain(PanZoom.translate(this._xScale, oldCenterPoint.x - newCenterPoint.y));
+        PanZoom.magnifyScale(this._xScale, oldCornerDistance / newCornerDistance, oldCenterPoint.x);
+        PanZoom.translateScale(this._xScale, oldCenterPoint.x - newCenterPoint.x);
       }
       if (this._yScale != null && newCornerDistance !== 0 && oldCornerDistance !== 0) {
-        this._yScale.domain(PanZoom.magnify(this._yScale, oldCornerDistance / newCornerDistance, oldCenterPoint.y));
-        this._yScale.domain(PanZoom.translate(this._yScale, oldCenterPoint.y - newCenterPoint.y));
+        PanZoom.magnifyScale(this._yScale, oldCornerDistance / newCornerDistance, oldCenterPoint.y);
+        PanZoom.translateScale(this._yScale, oldCenterPoint.y - newCenterPoint.y);
       }
     }
 
@@ -128,14 +128,14 @@ export module Interaction {
       });
     }
 
-    private static magnify<D>(scale: Scale.AbstractQuantitative<D>, magnifyAmount: number, centerValue: number) {
+    private static magnifyScale<D>(scale: Scale.AbstractQuantitative<D>, magnifyAmount: number, centerValue: number) {
       var magnifyTransform = (rangeValue: number) => scale.invert(centerValue - (centerValue - rangeValue) * magnifyAmount);
-      return scale.range().map(magnifyTransform);
+      scale.domain(scale.range().map(magnifyTransform));
     }
 
-    private static translate<D>(scale: Scale.AbstractQuantitative<D>, translateAmount: number) {
+    private static translateScale<D>(scale: Scale.AbstractQuantitative<D>, translateAmount: number) {
       var translateTransform = (rangeValue: number) => scale.invert(rangeValue + translateAmount);
-      return scale.range().map(translateTransform);
+      scale.domain(scale.range().map(translateTransform));
     }
 
     private _handleWheelEvent(p: Point, e: WheelEvent) {
@@ -146,10 +146,10 @@ export module Interaction {
         var deltaPixelAmount = e.deltaY * (e.deltaMode ? PanZoom.PIXELS_PER_LINE : 1);
         var zoomAmount = Math.pow(2, deltaPixelAmount * .002);
         if (this._xScale != null) {
-          this._xScale.domain(PanZoom.magnify(this._xScale, zoomAmount, translatedP.x));
+          PanZoom.magnifyScale(this._xScale, zoomAmount, translatedP.x);
         }
         if (this._yScale != null) {
-          this._yScale.domain(PanZoom.magnify(this._yScale, zoomAmount, translatedP.y));
+          PanZoom.magnifyScale(this._yScale, zoomAmount, translatedP.y);
         }
       }
     }
@@ -163,11 +163,11 @@ export module Interaction {
         }
         if (this._xScale != null) {
           var dragAmountX = endPoint.x - (lastDragPoint == null ? startPoint.x : lastDragPoint.x);
-          this._xScale.domain(PanZoom.translate(this._xScale, -dragAmountX));
+          PanZoom.translateScale(this._xScale, -dragAmountX);
         }
         if (this._yScale != null) {
           var dragAmountY = endPoint.y - (lastDragPoint == null ? startPoint.y : lastDragPoint.y);
-          this._yScale.domain(PanZoom.translate(this._yScale, -dragAmountY));
+          PanZoom.translateScale(this._yScale, -dragAmountY);
         }
         lastDragPoint = endPoint;
       });

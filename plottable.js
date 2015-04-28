@@ -9943,12 +9943,12 @@ var Plottable;
                 var newCenterPoint = this.centerPoint();
                 var newCornerDistance = this.cornerDistance();
                 if (this._xScale != null && newCornerDistance !== 0 && oldCornerDistance !== 0) {
-                    this._xScale.domain(PanZoom.magnify(this._xScale, oldCornerDistance / newCornerDistance, oldCenterPoint.x));
-                    this._xScale.domain(PanZoom.translate(this._xScale, oldCenterPoint.x - newCenterPoint.y));
+                    PanZoom.magnifyScale(this._xScale, oldCornerDistance / newCornerDistance, oldCenterPoint.x);
+                    PanZoom.translateScale(this._xScale, oldCenterPoint.x - newCenterPoint.x);
                 }
                 if (this._yScale != null && newCornerDistance !== 0 && oldCornerDistance !== 0) {
-                    this._yScale.domain(PanZoom.magnify(this._yScale, oldCornerDistance / newCornerDistance, oldCenterPoint.y));
-                    this._yScale.domain(PanZoom.translate(this._yScale, oldCenterPoint.y - newCenterPoint.y));
+                    PanZoom.magnifyScale(this._yScale, oldCornerDistance / newCornerDistance, oldCenterPoint.y);
+                    PanZoom.translateScale(this._yScale, oldCenterPoint.y - newCenterPoint.y);
                 }
             };
             PanZoom.prototype.centerPoint = function () {
@@ -9977,13 +9977,13 @@ var Plottable;
                     _this._touchIds.remove(id.toString());
                 });
             };
-            PanZoom.magnify = function (scale, magnifyAmount, centerValue) {
+            PanZoom.magnifyScale = function (scale, magnifyAmount, centerValue) {
                 var magnifyTransform = function (rangeValue) { return scale.invert(centerValue - (centerValue - rangeValue) * magnifyAmount); };
-                return scale.range().map(magnifyTransform);
+                scale.domain(scale.range().map(magnifyTransform));
             };
-            PanZoom.translate = function (scale, translateAmount) {
+            PanZoom.translateScale = function (scale, translateAmount) {
                 var translateTransform = function (rangeValue) { return scale.invert(rangeValue + translateAmount); };
-                return scale.range().map(translateTransform);
+                scale.domain(scale.range().map(translateTransform));
             };
             PanZoom.prototype._handleWheelEvent = function (p, e) {
                 var translatedP = this._translateToComponentSpace(p);
@@ -9992,10 +9992,10 @@ var Plottable;
                     var deltaPixelAmount = e.deltaY * (e.deltaMode ? PanZoom.PIXELS_PER_LINE : 1);
                     var zoomAmount = Math.pow(2, deltaPixelAmount * .002);
                     if (this._xScale != null) {
-                        this._xScale.domain(PanZoom.magnify(this._xScale, zoomAmount, translatedP.x));
+                        PanZoom.magnifyScale(this._xScale, zoomAmount, translatedP.x);
                     }
                     if (this._yScale != null) {
-                        this._yScale.domain(PanZoom.magnify(this._yScale, zoomAmount, translatedP.y));
+                        PanZoom.magnifyScale(this._yScale, zoomAmount, translatedP.y);
                     }
                 }
             };
@@ -10009,11 +10009,11 @@ var Plottable;
                     }
                     if (_this._xScale != null) {
                         var dragAmountX = endPoint.x - (lastDragPoint == null ? startPoint.x : lastDragPoint.x);
-                        _this._xScale.domain(PanZoom.translate(_this._xScale, -dragAmountX));
+                        PanZoom.translateScale(_this._xScale, -dragAmountX);
                     }
                     if (_this._yScale != null) {
                         var dragAmountY = endPoint.y - (lastDragPoint == null ? startPoint.y : lastDragPoint.y);
-                        _this._yScale.domain(PanZoom.translate(_this._yScale, -dragAmountY));
+                        PanZoom.translateScale(_this._yScale, -dragAmountY);
                     }
                     lastDragPoint = endPoint;
                 });
