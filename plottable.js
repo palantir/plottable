@@ -6110,19 +6110,13 @@ var Plottable;
             };
             Table.prototype._removeComponent = function (component) {
                 _super.prototype._removeComponent.call(this, component);
-                var rowpos;
-                var colpos;
-                outer: for (var i = 0; i < this._nRows; i++) {
-                    for (var j = 0; j < this._nCols; j++) {
-                        if (this._rows[i][j] === component) {
-                            rowpos = i;
-                            colpos = j;
-                            break outer;
+                for (var r = 0; r < this._nRows; r++) {
+                    for (var c = 0; c < this._nCols; c++) {
+                        if (this._rows[r][c] === component) {
+                            this._rows[r][c] = null;
+                            return;
                         }
                     }
-                }
-                if (rowpos !== undefined) {
-                    this._rows[rowpos][colpos] = null;
                 }
             };
             Table.prototype._iterateLayout = function (availableWidth, availableHeight) {
