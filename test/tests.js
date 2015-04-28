@@ -34,8 +34,6 @@ function makeFakeEvent(x, y) {
 function verifySpaceRequest(sr, w, h, ww, wh, message) {
     assert.equal(sr.width, w, message + " (space request: width)");
     assert.equal(sr.height, h, message + " (space request: height)");
-    assert.equal(sr.wantsWidth, ww, message + " (space request: wantsWidth)");
-    assert.equal(sr.wantsHeight, wh, message + " (space request: wantsHeight)");
 }
 function fixComponentSize(c, fixedWidth, fixedHeight) {
     c._requestedSpace = function (w, h) {
@@ -1322,8 +1320,6 @@ describe("Category Axes", function () {
         var s = ca._requestedSpace(400, 400);
         assert.operator(s.width, ">=", 0, "it requested 0 or more width");
         assert.operator(s.height, ">=", 0, "it requested 0 or more height");
-        assert.isFalse(s.wantsWidth, "it doesn't want width");
-        assert.isFalse(s.wantsHeight, "it doesn't want height");
         svg.remove();
     });
     it("doesnt blow up for non-string data", function () {
@@ -1413,11 +1409,12 @@ describe("Category Axes", function () {
         var scale = new Plottable.Scale.Category().domain(years);
         var axis = new Plottable.Axis.Category(scale, "bottom");
         axis.renderTo(svg);
-        var requestedSpace = axis._requestedSpace(300, 10);
-        assert.isTrue(requestedSpace.wantsHeight, "axis should ask for more space (horizontal orientation)");
+        var smallDimension = 10;
+        var spaceRequest = axis._requestedSpace(300, smallDimension);
+        assert.operator(spaceRequest.height, ">", smallDimension, "horizontal axis requested more height if constrained");
         axis.orient("left");
-        requestedSpace = axis._requestedSpace(10, 300);
-        assert.isTrue(requestedSpace.wantsWidth, "axis should ask for more space (vertical orientation)");
+        spaceRequest = axis._requestedSpace(smallDimension, 300);
+        assert.operator(spaceRequest.width, ">", smallDimension, "vertical axis requested more width if constrained");
         svg.remove();
     });
     it("axis labels respect tick labels", function () {
@@ -6288,14 +6285,10 @@ describe("ComponentGroups", function () {
             var cg = new Plottable.Component.Group([tall, wide]);
             var request = cg._requestedSpace(SVG_WIDTH, SVG_HEIGHT);
             assert.strictEqual(request.width, SVG_WIDTH / 2, "requested enough space for widest Component");
-            assert.isFalse(request.wantsWidth, "does not request more width if enough was supplied for widest Component");
             assert.strictEqual(request.height, SVG_HEIGHT / 2, "requested enough space for tallest Component");
-            assert.isFalse(request.wantsHeight, "does not request more height if enough was supplied for tallest Component");
             var constrainedRequest = cg._requestedSpace(SVG_WIDTH / 10, SVG_HEIGHT / 10);
             assert.strictEqual(constrainedRequest.width, SVG_WIDTH / 2, "requested enough space for widest Component");
-            assert.isTrue(constrainedRequest.wantsWidth, "requests more width if not enough was supplied for widest Component");
             assert.strictEqual(constrainedRequest.height, SVG_HEIGHT / 2, "requested enough space for tallest Component");
-            assert.isTrue(constrainedRequest.wantsHeight, "requests more height if not enough was supplied for tallest Component");
             cg.renderTo(svg);
             assert.strictEqual(cg.width(), SVG_WIDTH, "occupies all offered width");
             assert.strictEqual(cg.height(), SVG_HEIGHT, "occupies all offered height");
@@ -6570,8 +6563,6 @@ describe("Component behavior", function () {
         var layout = c._requestedSpace(1, 1);
         assert.equal(layout.width, 0, "requested width defaults to 0");
         assert.equal(layout.height, 0, "requested height defaults to 0");
-        assert.equal(layout.wantsWidth, false, "_requestedSpace().wantsWidth  defaults to false");
-        assert.equal(layout.wantsHeight, false, "_requestedSpace().wantsHeight defaults to false");
         assert.equal(c._xAlignProportion, 0, "_xAlignProportion defaults to 0");
         assert.equal(c._yAlignProportion, 0, "_yAlignProportion defaults to 0");
         assert.equal(c._xOffset, 0, "xOffset defaults to 0");
@@ -7623,6 +7614,19 @@ describe("Scales", function () {
             scale.domain(["1", "2", "3", "4"]);
             var widthSum = scale.rangeBand() * (1 + scale.innerPadding());
             assert.strictEqual(scale.stepWidth(), widthSum, "step width is the sum of innerPadding width and band width");
+        });
+        it("copy()", function () {
+            var original = new Plottable.Scale.Category();
+            original.domain(["1", "2", "3", "4"]);
+            original.range([0, 2679]);
+            // change the padding to get a different value than the default
+            original.innerPadding(0.1 + original.innerPadding());
+            original.outerPadding(0.1 + original.outerPadding());
+            var clone = original.copy();
+            assert.deepEqual(clone.domain(), original.domain(), "domain was copied");
+            assert.deepEqual(clone.range(), original.range(), "range was copied");
+            assert.strictEqual(clone.innerPadding(), original.innerPadding(), "inner padding was copied");
+            assert.strictEqual(clone.outerPadding(), original.outerPadding(), "outer padding was copied");
         });
     });
     it("CategoryScale + BarPlot combo works as expected when the data is swapped", function () {

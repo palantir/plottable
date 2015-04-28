@@ -48,8 +48,6 @@ module Plottable {
   export type _SpaceRequest = {
     width: number;
     height: number;
-    wantsWidth: boolean;
-    wantsHeight: boolean;
   }
 
   /**

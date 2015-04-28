@@ -69,9 +69,7 @@ export module Component {
 
       return {
         width : desiredWidth,
-        height: desiredHeight,
-        wantsWidth : desiredWidth  > offeredWidth,
-        wantsHeight: desiredHeight > offeredHeight
+        height: desiredHeight
       };
     }
 

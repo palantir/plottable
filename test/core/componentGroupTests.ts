@@ -170,15 +170,11 @@ describe("ComponentGroups", () => {
 
       var request = cg._requestedSpace(SVG_WIDTH, SVG_HEIGHT);
       assert.strictEqual(request.width, SVG_WIDTH / 2, "requested enough space for widest Component");
-      assert.isFalse(request.wantsWidth, "does not request more width if enough was supplied for widest Component");
       assert.strictEqual(request.height, SVG_HEIGHT / 2, "requested enough space for tallest Component");
-      assert.isFalse(request.wantsHeight, "does not request more height if enough was supplied for tallest Component");
 
       var constrainedRequest = cg._requestedSpace(SVG_WIDTH / 10, SVG_HEIGHT / 10);
       assert.strictEqual(constrainedRequest.width, SVG_WIDTH / 2, "requested enough space for widest Component");
-      assert.isTrue(constrainedRequest.wantsWidth, "requests more width if not enough was supplied for widest Component");
       assert.strictEqual(constrainedRequest.height, SVG_HEIGHT / 2, "requested enough space for tallest Component");
-      assert.isTrue(constrainedRequest.wantsHeight, "requests more height if not enough was supplied for tallest Component");
 
       cg.renderTo(svg);
       assert.strictEqual(cg.width(), SVG_WIDTH, "occupies all offered width");

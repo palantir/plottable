@@ -21,8 +21,6 @@ describe("Category Axes", () => {
     var s = ca._requestedSpace(400, 400);
     assert.operator(s.width, ">=", 0, "it requested 0 or more width");
     assert.operator(s.height, ">=", 0, "it requested 0 or more height");
-    assert.isFalse(s.wantsWidth, "it doesn't want width");
-    assert.isFalse(s.wantsHeight, "it doesn't want height");
     svg.remove();
   });
 
@@ -131,12 +129,12 @@ describe("Category Axes", () => {
     var scale = new Plottable.Scale.Category().domain(years);
     var axis = new Plottable.Axis.Category(scale, "bottom");
     axis.renderTo(svg);
-    var requestedSpace = axis._requestedSpace(300, 10);
-    assert.isTrue(requestedSpace.wantsHeight, "axis should ask for more space (horizontal orientation)");
+    var smallDimension = 10;
+    var spaceRequest = axis._requestedSpace(300, smallDimension);
+    assert.operator(spaceRequest.height, ">", smallDimension, "horizontal axis requested more height if constrained");
     axis.orient("left");
-    requestedSpace = axis._requestedSpace(10, 300);
-    assert.isTrue(requestedSpace.wantsWidth, "axis should ask for more space (vertical orientation)");
-
+    spaceRequest = axis._requestedSpace(smallDimension, 300);
+    assert.operator(spaceRequest.width, ">", smallDimension, "vertical axis requested more width if constrained");
     svg.remove();
   });
 

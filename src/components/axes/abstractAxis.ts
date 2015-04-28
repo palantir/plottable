@@ -97,9 +97,7 @@ export module Axis {
 
       return {
         width : requestedWidth,
-        height: requestedHeight,
-        wantsWidth: !this._isHorizontal() && offeredWidth < requestedWidth,
-        wantsHeight: this._isHorizontal() && offeredHeight < requestedHeight
+        height: requestedHeight
       };
     }
 

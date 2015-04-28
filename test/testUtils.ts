@@ -35,8 +35,6 @@ function makeFakeEvent(x: number, y: number): D3.D3Event {
 function verifySpaceRequest(sr: Plottable._SpaceRequest, w: number, h: number, ww: boolean, wh: boolean, message: string) {
   assert.equal(sr.width,  w, message + " (space request: width)");
   assert.equal(sr.height, h, message + " (space request: height)");
-  assert.equal(sr.wantsWidth , ww, message + " (space request: wantsWidth)");
-  assert.equal(sr.wantsHeight, wh, message + " (space request: wantsHeight)");
 }
 
 function fixComponentSize(c: Plottable.Component.AbstractComponent, fixedWidth?: number, fixedHeight?: number) {

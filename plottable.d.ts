@@ -742,8 +742,6 @@ declare module Plottable {
     type _SpaceRequest = {
         width: number;
         height: number;
-        wantsWidth: boolean;
-        wantsHeight: boolean;
     };
     /**
      * The range of your current data. For example, [1, 2, 6, -5] has the Extent
