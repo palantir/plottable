@@ -9270,6 +9270,12 @@ describe("Interactions", function () {
                 svg.remove();
             });
             it("dragging a certain amount will translate the scale correctly (touch)", function () {
+                // HACKHACK PhantomJS doesn't implement fake creation of WheelEvents
+                // https://github.com/ariya/phantomjs/issues/11289
+                if (window.PHANTOMJS) {
+                    svg.remove();
+                    return;
+                }
                 var startPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
                 var endPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT * 3 / 4 };
                 triggerFakeTouchEvent("touchstart", eventTarget, [startPoint]);
@@ -9280,32 +9286,36 @@ describe("Interactions", function () {
                 svg.remove();
             });
         });
-        describe("Zooming", function () {
-            it("mousewheeling a certain amount will magnify the scale correctly", function () {
-                // HACKHACK PhantomJS doesn't implement fake creation of WheelEvents
-                // https://github.com/ariya/phantomjs/issues/11289
-                if (window.PHANTOMJS) {
-                    svg.remove();
-                    return;
-                }
-                var scrollPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
-                var deltaY = 500;
-                triggerFakeWheelEvent("wheel", svg, scrollPoint.x, scrollPoint.y, deltaY);
-                assert.deepEqual(xScale.domain(), [-SVG_WIDTH / 8, SVG_WIDTH * 7 / 8], "xScale zooms to the correct domain via scroll");
-                assert.deepEqual(yScale.domain(), [-SVG_HEIGHT / 8, SVG_HEIGHT * 7 / 8], "yScale zooms to the correct domain via scroll");
+        it("mousewheeling a certain amount will magnify the scale correctly", function () {
+            // HACKHACK PhantomJS doesn't implement fake creation of WheelEvents
+            // https://github.com/ariya/phantomjs/issues/11289
+            if (window.PHANTOMJS) {
                 svg.remove();
-            });
-            it("pinching a certain amount will magnify the scale correctly", function () {
-                var startPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
-                var startPoint2 = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
-                triggerFakeTouchEvent("touchstart", eventTarget, [startPoint, startPoint2], [0, 1]);
-                var endPoint = { x: SVG_WIDTH * 3 / 4, y: SVG_HEIGHT * 3 / 4 };
-                triggerFakeTouchEvent("touchmove", eventTarget, [endPoint], [1]);
-                triggerFakeTouchEvent("touchend", eventTarget, [endPoint], [1]);
-                assert.deepEqual(xScale.domain(), [SVG_WIDTH / 16, SVG_WIDTH * 5 / 16], "xScale pans to the correct domain via drag (touch)");
-                assert.deepEqual(yScale.domain(), [SVG_HEIGHT / 16, SVG_HEIGHT * 5 / 16], "yScale pans to the correct domain via drag (touch)");
+                return;
+            }
+            var scrollPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
+            var deltaY = 500;
+            triggerFakeWheelEvent("wheel", svg, scrollPoint.x, scrollPoint.y, deltaY);
+            assert.deepEqual(xScale.domain(), [-SVG_WIDTH / 8, SVG_WIDTH * 7 / 8], "xScale zooms to the correct domain via scroll");
+            assert.deepEqual(yScale.domain(), [-SVG_HEIGHT / 8, SVG_HEIGHT * 7 / 8], "yScale zooms to the correct domain via scroll");
+            svg.remove();
+        });
+        it("pinching a certain amount will magnify the scale correctly", function () {
+            // HACKHACK PhantomJS doesn't implement fake creation of WheelEvents
+            // https://github.com/ariya/phantomjs/issues/11289
+            if (window.PHANTOMJS) {
                 svg.remove();
-            });
+                return;
+            }
+            var startPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
+            var startPoint2 = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
+            triggerFakeTouchEvent("touchstart", eventTarget, [startPoint, startPoint2], [0, 1]);
+            var endPoint = { x: SVG_WIDTH * 3 / 4, y: SVG_HEIGHT * 3 / 4 };
+            triggerFakeTouchEvent("touchmove", eventTarget, [endPoint], [1]);
+            triggerFakeTouchEvent("touchend", eventTarget, [endPoint], [1]);
+            assert.deepEqual(xScale.domain(), [SVG_WIDTH / 16, SVG_WIDTH * 5 / 16], "xScale pans to the correct domain via drag (touch)");
+            assert.deepEqual(yScale.domain(), [SVG_HEIGHT / 16, SVG_HEIGHT * 5 / 16], "yScale pans to the correct domain via drag (touch)");
+            svg.remove();
         });
     });
 });

@@ -66,6 +66,9 @@ export module Interaction {
     }
 
     private _handlePinchMove(ids: number[], idToPoint: { [id: number]: Point; }, e: TouchEvent) {
+      if (this._touchIds.size() < 2) {
+        return;
+      }
       var points = this._touchIds.values();
       var firstTouchPoint = points[0];
       var secondTouchPoint = points[1];

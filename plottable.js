@@ -9926,6 +9926,9 @@ var Plottable;
             };
             PanZoom.prototype._handlePinchMove = function (ids, idToPoint, e) {
                 var _this = this;
+                if (this._touchIds.size() < 2) {
+                    return;
+                }
                 var points = this._touchIds.values();
                 var firstTouchPoint = points[0];
                 var secondTouchPoint = points[1];
