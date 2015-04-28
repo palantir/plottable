@@ -65,6 +65,7 @@
 ///<reference path="interactions/clickInteractionTests.ts" />
 ///<reference path="interactions/doubleClickInteractionTests.ts" />
 ///<reference path="interactions/dragInteractionTests.ts" />
+///<reference path="interactions/panZoomInteractionTests.ts" />
 
 ///<reference path="dispatchers/dispatcherTests.ts" />
 ///<reference path="dispatchers/mouseDispatcherTests.ts" />
