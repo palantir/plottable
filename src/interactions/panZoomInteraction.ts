@@ -66,9 +66,6 @@ export module Interaction {
     }
 
     private _handlePinchMove(ids: number[], idToPoint: { [id: number]: Point; }, e: TouchEvent) {
-      if (this._touchIds.size() < 2) {
-        return;
-      }
       var points = this._touchIds.values();
       var firstTouchPoint = points[0];
       var secondTouchPoint = points[1];
@@ -83,6 +80,9 @@ export module Interaction {
       var oldDiff = Math.sqrt(Math.pow(rightX - leftX, 2) + Math.pow(bottomY - topY, 2));
 
       ids.forEach((id) => {
+        if (this._touchIds.get(id.toString()) == null) {
+          return;
+        }
         var translatedP = this._translateToComponentSpace(idToPoint[id]);
         if (this._isInsideComponent(translatedP)) {
           this._touchIds.set(id.toString(), translatedP);

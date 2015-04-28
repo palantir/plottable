@@ -9926,9 +9926,6 @@ var Plottable;
             };
             PanZoom.prototype._handlePinchMove = function (ids, idToPoint, e) {
                 var _this = this;
-                if (this._touchIds.size() < 2) {
-                    return;
-                }
                 var points = this._touchIds.values();
                 var firstTouchPoint = points[0];
                 var secondTouchPoint = points[1];
@@ -9940,6 +9937,9 @@ var Plottable;
                 var oldAvgY = (bottomY + topY) / 2;
                 var oldDiff = Math.sqrt(Math.pow(rightX - leftX, 2) + Math.pow(bottomY - topY, 2));
                 ids.forEach(function (id) {
+                    if (_this._touchIds.get(id.toString()) == null) {
+                        return;
+                    }
                     var translatedP = _this._translateToComponentSpace(idToPoint[id]);
                     if (_this._isInsideComponent(translatedP)) {
                         _this._touchIds.set(id.toString(), translatedP);
