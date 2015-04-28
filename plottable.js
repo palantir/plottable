@@ -9929,18 +9929,10 @@ var Plottable;
                 if (this._touchIds.size() < 2) {
                     return;
                 }
-                var points = this._touchIds.values();
-                var firstTouchPoint = points[0];
-                var secondTouchPoint = points[1];
-                var leftX = Math.min(firstTouchPoint.x, secondTouchPoint.x);
-                var rightX = Math.max(firstTouchPoint.x, secondTouchPoint.x);
-                var topY = Math.min(firstTouchPoint.y, secondTouchPoint.y);
-                var bottomY = Math.max(firstTouchPoint.y, secondTouchPoint.y);
-                var oldAvgX = (leftX + rightX) / 2;
-                var oldAvgY = (bottomY + topY) / 2;
-                var oldDiff = Math.sqrt(Math.pow(rightX - leftX, 2) + Math.pow(bottomY - topY, 2));
+                var oldCenterPoint = this.centerPoint();
+                var oldCornerDistance = this.cornerDistance();
                 ids.forEach(function (id) {
-                    if (_this._touchIds.get(id.toString()) == null) {
+                    if (!_this._touchIds.has(id.toString())) {
                         return;
                     }
                     var translatedP = _this._translateToComponentSpace(idToPoint[id]);
@@ -9948,24 +9940,36 @@ var Plottable;
                         _this._touchIds.set(id.toString(), translatedP);
                     }
                 });
-                var newPoints = this._touchIds.values();
-                var newFirstTouchPoint = newPoints[0];
-                var newSecondTouchPoint = newPoints[1];
-                var newLeftX = Math.min(newFirstTouchPoint.x, newSecondTouchPoint.x);
-                var newRightX = Math.max(newFirstTouchPoint.x, newSecondTouchPoint.x);
-                var newTopY = Math.min(newFirstTouchPoint.y, newSecondTouchPoint.y);
-                var newBottomY = Math.max(newFirstTouchPoint.y, newSecondTouchPoint.y);
-                var newAvgX = (newLeftX + newRightX) / 2;
-                var newAvgY = (newBottomY + newTopY) / 2;
-                var newDiff = Math.sqrt(Math.pow(newRightX - newLeftX, 2) + Math.pow(newBottomY - newTopY, 2));
-                if (this._xScale != null && newDiff !== 0 && oldDiff !== 0) {
-                    this._xScale.domain(PanZoom.magnify(this._xScale, oldDiff / newDiff, oldAvgX));
-                    this._xScale.domain(PanZoom.translate(this._xScale, oldAvgX - newAvgX));
+                var newCenterPoint = this.centerPoint();
+                var newCornerDistance = this.cornerDistance();
+                if (this._xScale != null && newCornerDistance !== 0 && oldCornerDistance !== 0) {
+                    this._xScale.domain(PanZoom.magnify(this._xScale, oldCornerDistance / newCornerDistance, oldCenterPoint.x));
+                    this._xScale.domain(PanZoom.translate(this._xScale, oldCenterPoint.x - newCenterPoint.y));
                 }
-                if (this._yScale != null && newDiff !== 0 && oldDiff !== 0) {
-                    this._yScale.domain(PanZoom.magnify(this._yScale, oldDiff / newDiff, oldAvgY));
-                    this._yScale.domain(PanZoom.translate(this._yScale, oldAvgY - newAvgY));
+                if (this._yScale != null && newCornerDistance !== 0 && oldCornerDistance !== 0) {
+                    this._yScale.domain(PanZoom.magnify(this._yScale, oldCornerDistance / newCornerDistance, oldCenterPoint.y));
+                    this._yScale.domain(PanZoom.translate(this._yScale, oldCenterPoint.y - newCenterPoint.y));
                 }
+            };
+            PanZoom.prototype.centerPoint = function () {
+                var points = this._touchIds.values();
+                var firstTouchPoint = points[0];
+                var secondTouchPoint = points[1];
+                var leftX = Math.min(firstTouchPoint.x, secondTouchPoint.x);
+                var rightX = Math.max(firstTouchPoint.x, secondTouchPoint.x);
+                var topY = Math.min(firstTouchPoint.y, secondTouchPoint.y);
+                var bottomY = Math.max(firstTouchPoint.y, secondTouchPoint.y);
+                return { x: (leftX + rightX) / 2, y: (bottomY + topY) / 2 };
+            };
+            PanZoom.prototype.cornerDistance = function () {
+                var points = this._touchIds.values();
+                var firstTouchPoint = points[0];
+                var secondTouchPoint = points[1];
+                var leftX = Math.min(firstTouchPoint.x, secondTouchPoint.x);
+                var rightX = Math.max(firstTouchPoint.x, secondTouchPoint.x);
+                var topY = Math.min(firstTouchPoint.y, secondTouchPoint.y);
+                var bottomY = Math.max(firstTouchPoint.y, secondTouchPoint.y);
+                return Math.sqrt(Math.pow(rightX - leftX, 2) + Math.pow(bottomY - topY, 2));
             };
             PanZoom.prototype._handlePinchFinish = function (ids, idToPoint, e) {
                 var _this = this;
