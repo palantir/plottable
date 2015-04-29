@@ -11,13 +11,14 @@ module Plottable {
     }
 
     private _connect() {
-      if (!this._connected) {
-        Object.keys(this._event2Callback).forEach((event: string) => {
-          var callback = this._event2Callback[event];
-          document.addEventListener(event, callback);
-        });
-        this._connected = true;
+      if (this._connected) {
+        return;
       }
+      Object.keys(this._event2Callback).forEach((event: string) => {
+        var callback = this._event2Callback[event];
+        document.addEventListener(event, callback);
+      });
+      this._connected = true;
     }
 
     private _disconnect() {
@@ -37,13 +38,13 @@ module Plottable {
       return () => callback();
     }
 
-    protected _setCallback(b: Core.Broadcaster<Dispatcher>, key: any, callback: Function) {
+    protected _setCallback(broadcaster: Core.Broadcaster<Dispatcher>, key: any, callback: Function) {
       if (callback === null) { // remove listener if callback is null
-        b.deregisterListener(key);
+        // broadcaster.deregisterListener(key);
         this._disconnect();
       } else {
         this._connect();
-        b.registerListener(key, this._getWrappedCallback(callback));
+        // broadcaster.registerListener(key, this._getWrappedCallback(callback));
       }
     }
   }

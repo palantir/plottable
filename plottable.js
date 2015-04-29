@@ -8917,13 +8917,14 @@ var Plottable;
         };
         Dispatcher.prototype._connect = function () {
             var _this = this;
-            if (!this._connected) {
-                Object.keys(this._event2Callback).forEach(function (event) {
-                    var callback = _this._event2Callback[event];
-                    document.addEventListener(event, callback);
-                });
-                this._connected = true;
+            if (this._connected) {
+                return;
             }
+            Object.keys(this._event2Callback).forEach(function (event) {
+                var callback = _this._event2Callback[event];
+                document.addEventListener(event, callback);
+            });
+            this._connected = true;
         };
         Dispatcher.prototype._disconnect = function () {
             var _this = this;
@@ -8941,14 +8942,13 @@ var Plottable;
         Dispatcher.prototype._getWrappedCallback = function (callback) {
             return function () { return callback(); };
         };
-        Dispatcher.prototype._setCallback = function (b, key, callback) {
+        Dispatcher.prototype._setCallback = function (broadcaster, key, callback) {
             if (callback === null) {
-                b.deregisterListener(key);
+                // broadcaster.deregisterListener(key);
                 this._disconnect();
             }
             else {
                 this._connect();
-                b.registerListener(key, this._getWrappedCallback(callback));
             }
         };
         return Dispatcher;
@@ -8980,19 +8980,24 @@ var Plottable;
                 _super.call(this);
                 this.translator = Plottable.Utils.ClientToSVGTranslator.getTranslator(svg);
                 this._lastMousePosition = { x: -1, y: -1 };
+                this._moveCallbackSet = new Plottable.Utils.CallbackSet();
+                this._downCallbackSet = new Plottable.Utils.CallbackSet();
+                this._upCallbackSet = new Plottable.Utils.CallbackSet();
+                this._wheelCallbackSet = new Plottable.Utils.CallbackSet();
+                this._dblClickCallbackSet = new Plottable.Utils.CallbackSet();
                 this._moveBroadcaster = new Plottable.Core.Broadcaster(this);
-                var processMoveCallback = function (e) { return _this._measureAndBroadcast(e, _this._moveBroadcaster); };
+                this._downBroadcaster = new Plottable.Core.Broadcaster(this);
+                this._upBroadcaster = new Plottable.Core.Broadcaster(this);
+                this._wheelBroadcaster = new Plottable.Core.Broadcaster(this);
+                this._dblClickBroadcaster = new Plottable.Core.Broadcaster(this);
+                var processMoveCallback = function (e) { return _this._measureAndBroadcast(e, _this._moveBroadcaster, _this._moveCallbackSet); };
                 this._event2Callback["mouseover"] = processMoveCallback;
                 this._event2Callback["mousemove"] = processMoveCallback;
                 this._event2Callback["mouseout"] = processMoveCallback;
-                this._downBroadcaster = new Plottable.Core.Broadcaster(this);
-                this._event2Callback["mousedown"] = function (e) { return _this._measureAndBroadcast(e, _this._downBroadcaster); };
-                this._upBroadcaster = new Plottable.Core.Broadcaster(this);
-                this._event2Callback["mouseup"] = function (e) { return _this._measureAndBroadcast(e, _this._upBroadcaster); };
-                this._wheelBroadcaster = new Plottable.Core.Broadcaster(this);
-                this._event2Callback["wheel"] = function (e) { return _this._measureAndBroadcast(e, _this._wheelBroadcaster); };
-                this._dblClickBroadcaster = new Plottable.Core.Broadcaster(this);
-                this._event2Callback["dblclick"] = function (e) { return _this._measureAndBroadcast(e, _this._dblClickBroadcaster); };
+                this._event2Callback["mousedown"] = function (e) { return _this._measureAndBroadcast(e, _this._downBroadcaster, _this._downCallbackSet); };
+                this._event2Callback["mouseup"] = function (e) { return _this._measureAndBroadcast(e, _this._upBroadcaster, _this._upCallbackSet); };
+                this._event2Callback["wheel"] = function (e) { return _this._measureAndBroadcast(e, _this._wheelBroadcaster, _this._wheelCallbackSet); };
+                this._event2Callback["dblclick"] = function (e) { return _this._measureAndBroadcast(e, _this._dblClickBroadcaster, _this._dblClickCallbackSet); };
                 this._broadcasters = [this._moveBroadcaster, this._downBroadcaster, this._upBroadcaster, this._wheelBroadcaster, this._dblClickBroadcaster];
             }
             /**
@@ -9027,6 +9032,7 @@ var Plottable;
              */
             Mouse.prototype.onMouseMove = function (key, callback) {
                 this._setCallback(this._moveBroadcaster, key, callback);
+                this._moveCallbackSet.add(this._getWrappedCallback(callback));
                 return this;
             };
             /**
@@ -9042,6 +9048,7 @@ var Plottable;
              */
             Mouse.prototype.onMouseDown = function (key, callback) {
                 this._setCallback(this._downBroadcaster, key, callback);
+                this._downCallbackSet.add(this._getWrappedCallback(callback));
                 return this;
             };
             /**
@@ -9057,6 +9064,7 @@ var Plottable;
              */
             Mouse.prototype.onMouseUp = function (key, callback) {
                 this._setCallback(this._upBroadcaster, key, callback);
+                this._upCallbackSet.add(this._getWrappedCallback(callback));
                 return this;
             };
             /**
@@ -9072,6 +9080,7 @@ var Plottable;
              */
             Mouse.prototype.onWheel = function (key, callback) {
                 this._setCallback(this._wheelBroadcaster, key, callback);
+                this._wheelCallbackSet.add(this._getWrappedCallback(callback));
                 return this;
             };
             /**
@@ -9087,17 +9096,20 @@ var Plottable;
              */
             Mouse.prototype.onDblClick = function (key, callback) {
                 this._setCallback(this._dblClickBroadcaster, key, callback);
+                this._dblClickCallbackSet.add(this._getWrappedCallback(callback));
                 return this;
             };
             /**
              * Computes the mouse position from the given event, and if successful
              * calls broadcast() on the supplied Broadcaster.
              */
-            Mouse.prototype._measureAndBroadcast = function (e, b) {
+            Mouse.prototype._measureAndBroadcast = function (e, b, callbackSet) {
                 var newMousePosition = this.translator.computePosition(e.clientX, e.clientY);
                 if (newMousePosition != null) {
                     this._lastMousePosition = newMousePosition;
-                    b.broadcast(this.getLastMousePosition(), e);
+                    // b.broadcast(this.getLastMousePosition(), e);
+                    var args = [this, this.getLastMousePosition(), e];
+                    callbackSet.callCallbacks(this, this.getLastMousePosition(), e);
                 }
             };
             /**
@@ -9266,8 +9278,9 @@ var Plottable;
             function Key() {
                 var _this = this;
                 _super.call(this);
-                this._event2Callback["keydown"] = function (e) { return _this._processKeydown(e); };
                 this._keydownBroadcaster = new Plottable.Core.Broadcaster(this);
+                this._keydownCallbackSet = new Plottable.Utils.CallbackSet();
+                this._event2Callback["keydown"] = function (e) { return _this._processKeydown(e); };
                 this._broadcasters = [this._keydownBroadcaster];
             }
             /**

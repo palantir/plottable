@@ -8,6 +8,13 @@ export module Dispatchers {
     private static _DISPATCHER_KEY = "__Plottable_Dispatcher_Mouse";
     private translator: Utils.ClientToSVGTranslator;
     private _lastMousePosition: Point;
+
+    private _moveCallbackSet: Utils.CallbackSet<Function>;
+    private _downCallbackSet: Utils.CallbackSet<Function>;
+    private _upCallbackSet: Utils.CallbackSet<Function>;
+    private _wheelCallbackSet: Utils.CallbackSet<Function>;
+    private _dblClickCallbackSet: Utils.CallbackSet<Function>;
+
     private _moveBroadcaster: Core.Broadcaster<Dispatchers.Mouse>;
     private _downBroadcaster: Core.Broadcaster<Dispatchers.Mouse>;
     private _upBroadcaster: Core.Broadcaster<Dispatchers.Mouse>;
@@ -45,24 +52,30 @@ export module Dispatchers {
 
       this._lastMousePosition = { x: -1, y: -1 };
 
+      this._moveCallbackSet = new Plottable.Utils.CallbackSet();
+      this._downCallbackSet = new Plottable.Utils.CallbackSet();
+      this._upCallbackSet = new Plottable.Utils.CallbackSet();
+      this._wheelCallbackSet = new Plottable.Utils.CallbackSet();
+      this._dblClickCallbackSet = new Plottable.Utils.CallbackSet();
+
       this._moveBroadcaster = new Core.Broadcaster(this);
-      var processMoveCallback = (e: MouseEvent) => this._measureAndBroadcast(e, this._moveBroadcaster);
+      this._downBroadcaster = new Core.Broadcaster(this);
+      this._upBroadcaster = new Core.Broadcaster(this);
+      this._wheelBroadcaster = new Core.Broadcaster(this);
+      this._dblClickBroadcaster = new Core.Broadcaster(this);
+
+      var processMoveCallback = (e: MouseEvent) => this._measureAndBroadcast(e, this._moveBroadcaster, this._moveCallbackSet);
       this._event2Callback["mouseover"] = processMoveCallback;
       this._event2Callback["mousemove"] = processMoveCallback;
       this._event2Callback["mouseout"] = processMoveCallback;
-
-      this._downBroadcaster = new Core.Broadcaster(this);
-      this._event2Callback["mousedown"] = (e: MouseEvent) => this._measureAndBroadcast(e, this._downBroadcaster);
-
-      this._upBroadcaster = new Core.Broadcaster(this);
-      this._event2Callback["mouseup"] = (e: MouseEvent) => this._measureAndBroadcast(e, this._upBroadcaster);
-
-      this._wheelBroadcaster = new Core.Broadcaster(this);
-      this._event2Callback["wheel"] = (e: WheelEvent) => this._measureAndBroadcast(e, this._wheelBroadcaster);
-
-      this._dblClickBroadcaster = new Core.Broadcaster(this);
-      this._event2Callback["dblclick"] = (e: MouseEvent) => this._measureAndBroadcast(e, this._dblClickBroadcaster);
-
+      this._event2Callback["mousedown"] = (e: MouseEvent) => this._measureAndBroadcast(e, this._downBroadcaster,
+        this._downCallbackSet);
+      this._event2Callback["mouseup"] = (e: MouseEvent) => this._measureAndBroadcast(e, this._upBroadcaster,
+        this._upCallbackSet);
+      this._event2Callback["wheel"] = (e: WheelEvent) => this._measureAndBroadcast(e, this._wheelBroadcaster,
+        this._wheelCallbackSet);
+      this._event2Callback["dblclick"] = (e: MouseEvent) => this._measureAndBroadcast(e, this._dblClickBroadcaster,
+        this._dblClickCallbackSet);
       this._broadcasters = [this._moveBroadcaster, this._downBroadcaster, this._upBroadcaster, this._wheelBroadcaster,
                             this._dblClickBroadcaster];
     }
@@ -84,6 +97,7 @@ export module Dispatchers {
      */
     public onMouseMove(key: any, callback: MouseCallback): Dispatchers.Mouse {
       this._setCallback(this._moveBroadcaster, key, callback);
+      this._moveCallbackSet.add(this._getWrappedCallback(callback));
       return this;
     }
 
@@ -100,6 +114,7 @@ export module Dispatchers {
      */
     public onMouseDown(key: any, callback: MouseCallback): Dispatchers.Mouse {
       this._setCallback(this._downBroadcaster, key, callback);
+      this._downCallbackSet.add(this._getWrappedCallback(callback));
       return this;
     }
 
@@ -116,6 +131,7 @@ export module Dispatchers {
      */
     public onMouseUp(key: any, callback: MouseCallback): Dispatchers.Mouse {
       this._setCallback(this._upBroadcaster, key, callback);
+      this._upCallbackSet.add(this._getWrappedCallback(callback));
       return this;
     }
 
@@ -132,6 +148,7 @@ export module Dispatchers {
      */
     public onWheel(key: any, callback: MouseCallback): Dispatchers.Mouse {
       this._setCallback(this._wheelBroadcaster, key, callback);
+      this._wheelCallbackSet.add(this._getWrappedCallback(callback));
       return this;
     }
 
@@ -148,6 +165,7 @@ export module Dispatchers {
      */
     public onDblClick(key: any, callback: MouseCallback): Dispatchers.Mouse {
       this._setCallback(this._dblClickBroadcaster, key, callback);
+      this._dblClickCallbackSet.add(this._getWrappedCallback(callback));
       return this;
     }
 
@@ -155,11 +173,14 @@ export module Dispatchers {
      * Computes the mouse position from the given event, and if successful
      * calls broadcast() on the supplied Broadcaster.
      */
-    private _measureAndBroadcast(e: MouseEvent, b: Core.Broadcaster<Dispatchers.Mouse>) {
+    private _measureAndBroadcast(e: MouseEvent, b: Core.Broadcaster<Dispatchers.Mouse>, callbackSet: Utils.CallbackSet<Function>) {
       var newMousePosition = this.translator.computePosition(e.clientX, e.clientY);
       if (newMousePosition != null) {
         this._lastMousePosition = newMousePosition;
-        b.broadcast(this.getLastMousePosition(), e);
+        // b.broadcast(this.getLastMousePosition(), e);
+
+        var args = [this, this.getLastMousePosition(), e];
+        callbackSet.callCallbacks(this, this.getLastMousePosition(), e);
       }
     }
 
