@@ -10,8 +10,8 @@ export module Interactions {
     private _pointerMoveCallback: (p: Point) => any;
     private _pointerExitCallback: (p: Point) => any;
 
-    public _anchor(component: Component, hitBox: D3.Selection) {
-      super._anchor(component, hitBox);
+    public anchor(component: Component, hitBox: D3.Selection) {
+      super.anchor(component, hitBox);
       this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(<SVGElement> this._componentToListenTo.content().node());
       this._mouseDispatcher.onMouseMove("Interaction.Pointer" + this.getID(), (p: Point) => this._handlePointerEvent(p));
 

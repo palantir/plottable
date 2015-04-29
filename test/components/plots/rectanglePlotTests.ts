@@ -38,7 +38,7 @@ describe("Plots", () => {
               .project("x2", "x2", xScale)
               .project("y2", "y2", yScale)
               .renderTo(svg);
-      VERIFY_CELLS((<any> rectanglePlot)._renderArea.selectAll("rect"));
+      VERIFY_CELLS((<any> rectanglePlot).renderArea.selectAll("rect"));
       svg.remove();
     });
   });
@@ -69,7 +69,7 @@ describe("Plots", () => {
 
       plot.renderTo(svg);
 
-      var rectanglesSelection = (<any> plot)._element.selectAll(".bar-area rect");
+      var rectanglesSelection = (<any> plot).element.selectAll(".bar-area rect");
 
       assert.strictEqual(rectanglesSelection.size(), 5,
         "only 5 rectangles should be displayed");

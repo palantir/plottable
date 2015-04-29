@@ -196,7 +196,7 @@ describe("Plots", () => {
         // creates a function that verifies that circles are drawn properly after accounting for svg transform
         // and then modifies circlesInArea to contain the number of circles that were discovered in the plot area
         circlesInArea = 0;
-        var renderArea = (<any> circlePlot)._renderArea;
+        var renderArea = (<any> circlePlot).renderArea;
         var renderAreaTransform = d3.transform(renderArea.attr("transform"));
         var translate = renderAreaTransform.translate;
         var scale     = renderAreaTransform.scale;
@@ -238,8 +238,8 @@ describe("Plots", () => {
       });
 
       it("rendering is idempotent", () => {
-        circlePlot._render();
-        circlePlot._render();
+        circlePlot.render();
+        circlePlot.render();
         circlePlot.getAllSelections().each(getCirclePlotVerifier());
         assert.equal(circlesInArea, 10, "10 circles were drawn");
         svg.remove();

@@ -3,10 +3,10 @@
 module Plottable {
 export module Components {
   export class SelectionBoxLayer extends Component {
-    protected _box: D3.Selection;
-    private _boxArea: D3.Selection;
+    protected box: D3.Selection;
+    private boxArea: D3.Selection;
     private _boxVisible = false;
-    private _boxBounds: Bounds = {
+    private boxBounds: Bounds = {
       topLeft: { x: 0, y: 0 },
       bottomRight: { x: 0, y: 0 }
     };
@@ -14,18 +14,18 @@ export module Components {
     constructor() {
       super();
       this.classed("selection-box-layer", true);
-      this._fixedWidthFlag = true;
-      this._fixedHeightFlag = true;
+      this.fixedWidthFlag = true;
+      this.fixedHeightFlag = true;
     }
 
-    protected _setup() {
-      super._setup();
+    protected setup() {
+      super.setup();
 
-      this._box = this._content.append("g").classed("selection-box", true).remove();
-      this._boxArea = this._box.append("rect").classed("selection-area", true);
+      this.box = this._content.append("g").classed("selection-box", true).remove();
+      this.boxArea = this.box.append("rect").classed("selection-area", true);
     }
 
-    protected _getSize(availableWidth: number, availableHeight: number) {
+    protected getSize(availableWidth: number, availableHeight: number) {
       return {
         width: availableWidth,
         height: availableHeight
@@ -47,15 +47,15 @@ export module Components {
     public bounds(newBounds: Bounds): SelectionBoxLayer;
     public bounds(newBounds?: Bounds): any {
       if (newBounds == null) {
-        return this._boxBounds;
+        return this.boxBounds;
       }
 
-      this._setBounds(newBounds);
-      this._render();
+      this.setBounds(newBounds);
+      this.render();
       return this;
     }
 
-    protected _setBounds(newBounds: Bounds) {
+    protected setBounds(newBounds: Bounds) {
       var topLeft: Point = {
         x: Math.min(newBounds.topLeft.x, newBounds.bottomRight.x),
         y: Math.min(newBounds.topLeft.y, newBounds.bottomRight.y)
@@ -64,25 +64,25 @@ export module Components {
         x: Math.max(newBounds.topLeft.x, newBounds.bottomRight.x),
         y: Math.max(newBounds.topLeft.y, newBounds.bottomRight.y)
       };
-      this._boxBounds = {
+      this.boxBounds = {
         topLeft: topLeft,
         bottomRight: bottomRight
       };
     }
 
-    public _doRender() {
+    public doRender() {
       if (this._boxVisible) {
-        var t = this._boxBounds.topLeft.y;
-        var b = this._boxBounds.bottomRight.y;
-        var l = this._boxBounds.topLeft.x;
-        var r = this._boxBounds.bottomRight.x;
+        var t = this.boxBounds.topLeft.y;
+        var b = this.boxBounds.bottomRight.y;
+        var l = this.boxBounds.topLeft.x;
+        var r = this.boxBounds.bottomRight.x;
 
-        this._boxArea.attr({
+        this.boxArea.attr({
           x: l, y: t, width: r - l, height: b - t
         });
-        this._content.node().appendChild(this._box.node());
+        this._content.node().appendChild(this.box.node());
       } else {
-        this._box.remove();
+        this.box.remove();
       }
     }
 
@@ -105,7 +105,7 @@ export module Components {
       }
 
       this._boxVisible = show;
-      this._render();
+      this.render();
       return this;
     }
   }

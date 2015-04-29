@@ -17,12 +17,12 @@ export module Plots {
       super(xScale, yScale, isVertical);
     }
 
-    protected _getAnimator(key: string): Animators.PlotAnimator {
-      if (this._animate && this._animateOnNextRender) {
+    protected getAnimator(key: string): Animators.PlotAnimator {
+      if (this._animate && this.animateOnNextRender) {
         if (this.animator(key)) {
           return this.animator(key);
         } else if (key === "stacked-bar") {
-          var primaryScale: Scale<any, number> = this._isVertical ? this._yScale : this._xScale;
+          var primaryScale: Scale<any, number> = this._isVertical ? this.yScale : this.xScale;
           var scaledBaseline = primaryScale.scale(this.baseline());
           return new Animators.MovingRect(scaledBaseline, this._isVertical);
         }
@@ -31,14 +31,14 @@ export module Plots {
       return new Animators.Null();
     }
 
-    protected _generateAttrToProjector() {
-      var attrToProjector = super._generateAttrToProjector();
+    protected generateAttrToProjector() {
+      var attrToProjector = super.generateAttrToProjector();
 
       var valueAttr = this._isVertical ? "y" : "x";
       var keyAttr = this._isVertical ? "x" : "y";
-      var primaryScale: Scale<any, number> = this._isVertical ? this._yScale : this._xScale;
-      var primaryAccessor = this._projections[valueAttr].accessor;
-      var keyAccessor = this._projections[keyAttr].accessor;
+      var primaryScale: Scale<any, number> = this._isVertical ? this.yScale : this.xScale;
+      var primaryAccessor = this.projections[valueAttr].accessor;
+      var keyAccessor = this.projections[keyAttr].accessor;
       var getStart = (d: any, i: number, u: any, m: StackedPlotMetadata) =>
         primaryScale.scale(m.offsets.get(keyAccessor(d, i, u, m)));
       var getEnd = (d: any, i: number, u: any, m: StackedPlotMetadata) =>
@@ -55,8 +55,8 @@ export module Plots {
       return attrToProjector;
     }
 
-    protected _generateDrawSteps(): Drawers.DrawStep[] {
-      return [{attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("stacked-bar")}];
+    protected generateDrawSteps(): Drawers.DrawStep[] {
+      return [{attrToProjector: this.generateAttrToProjector(), animator: this.getAnimator("stacked-bar")}];
     }
 
     public project(attrToSet: string, accessor: any, scale?: Scale<any, any>) {
@@ -65,55 +65,55 @@ export module Plots {
       return this;
     }
 
-    protected _onDatasetUpdate() {
-      super._onDatasetUpdate();
-      Stacked.prototype._onDatasetUpdate.apply(this);
+    protected onDatasetUpdate() {
+      super.onDatasetUpdate();
+      Stacked.prototype.onDatasetUpdate.apply(this);
       return this;
     }
 
-    protected _getPlotMetadataForDataset(key: string): StackedPlotMetadata {
-      return Stacked.prototype._getPlotMetadataForDataset.call(this, key);
+    protected getPlotMetadataForDataset(key: string): StackedPlotMetadata {
+      return Stacked.prototype.getPlotMetadataForDataset.call(this, key);
     }
 
-    protected _normalizeDatasets<A, B>(fromX: boolean): {a: A; b: B}[] {
-      return Stacked.prototype._normalizeDatasets.call(this, fromX);
+    protected normalizeDatasets<A, B>(fromX: boolean): {a: A; b: B}[] {
+      return Stacked.prototype.normalizeDatasets.call(this, fromX);
     }
 
     //===== Stack logic from StackedPlot =====
-    public _updateStackOffsets() {
-      Stacked.prototype._updateStackOffsets.call(this);
+    public updateStackOffsets() {
+      Stacked.prototype.updateStackOffsets.call(this);
     }
 
-    public _updateStackExtents() {
-      Stacked.prototype._updateStackExtents.call(this);
+    public updateStackExtents() {
+      Stacked.prototype.updateStackExtents.call(this);
     }
 
-    public _stack(dataArray: D3.Map<StackedDatum>[]): D3.Map<StackedDatum>[] {
-      return Stacked.prototype._stack.call(this, dataArray);
+    public stack(dataArray: D3.Map<StackedDatum>[]): D3.Map<StackedDatum>[] {
+      return Stacked.prototype.stack.call(this, dataArray);
     }
 
-    public _setDatasetStackOffsets(positiveDataMapArray: D3.Map<StackedDatum>[], negativeDataMapArray: D3.Map<StackedDatum>[]) {
-      Stacked.prototype._setDatasetStackOffsets.call(this, positiveDataMapArray, negativeDataMapArray);
+    public setDatasetStackOffsets(positiveDataMapArray: D3.Map<StackedDatum>[], negativeDataMapArray: D3.Map<StackedDatum>[]) {
+      Stacked.prototype.setDatasetStackOffsets.call(this, positiveDataMapArray, negativeDataMapArray);
     }
 
-    public _getDomainKeys() {
-      return Stacked.prototype._getDomainKeys.call(this);
+    public getDomainKeys() {
+      return Stacked.prototype.getDomainKeys.call(this);
     }
 
-    public _generateDefaultMapArray(): D3.Map<StackedDatum>[] {
-      return Stacked.prototype._generateDefaultMapArray.call(this);
+    public generateDefaultMapArray(): D3.Map<StackedDatum>[] {
+      return Stacked.prototype.generateDefaultMapArray.call(this);
     }
 
-    public _updateScaleExtents() {
-      Stacked.prototype._updateScaleExtents.call(this);
+    public updateScaleExtents() {
+      Stacked.prototype.updateScaleExtents.call(this);
     }
 
-    public _keyAccessor(): Accessor {
-      return Stacked.prototype._keyAccessor.call(this);
+    public keyAccessor(): Accessor {
+      return Stacked.prototype.keyAccessor.call(this);
     }
 
-    public _valueAccessor(): Accessor {
-      return Stacked.prototype._valueAccessor.call(this);
+    public valueAccessor(): Accessor {
+      return Stacked.prototype.valueAccessor.call(this);
     }
     //===== /Stack logic =====
   }

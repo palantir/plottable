@@ -26,16 +26,16 @@ describe("Tables", () => {
 
   it("padTableToSize works properly", () => {
     var t = new Plottable.Components.Table();
-    assert.deepEqual((<any> t)._rows, [], "the table rows is an empty list");
-    (<any> t)._padTableToSize(1, 1);
-    var rows = (<any> t)._rows;
+    assert.deepEqual((<any> t).rows, [], "the table rows is an empty list");
+    (<any> t).padTableToSize(1, 1);
+    var rows = (<any> t).rows;
     var row = rows[0];
     var firstComponent = row[0];
     assert.lengthOf(rows, 1, "there is one row");
     assert.lengthOf(row, 1, "the row has one element");
     assert.isNull(firstComponent, "the row only has a null component");
 
-    (<any> t)._padTableToSize(5, 2);
+    (<any> t).padTableToSize(5, 2);
     assert.lengthOf(rows, 5, "there are five rows");
     rows.forEach((r: Plottable.Component[]) => assert.lengthOf(r, 2, "there are two columsn per row"));
     assert.equal(rows[0][0], firstComponent, "the first component is unchanged");
@@ -46,10 +46,10 @@ describe("Tables", () => {
     var row1 = [null, c0];
     var row2 = [new Plottable.Component(), null];
     var table = new Plottable.Components.Table([row1, row2]);
-    assert.equal((<any> table)._rows[0][1], c0, "the component is in the right spot");
+    assert.equal((<any> table).rows[0][1], c0, "the component is in the right spot");
     var c1 = new Plottable.Component();
     table.addComponent(2, 2, c1);
-    assert.equal((<any> table)._rows[2][2], c1, "the inserted component went to the right spot");
+    assert.equal((<any> table).rows[2][2], c1, "the inserted component went to the right spot");
   });
 
   it("tables can be constructed by adding components in matrix style", () => {
@@ -58,7 +58,7 @@ describe("Tables", () => {
     var c2 = new Plottable.Component();
     table.addComponent(0, 0, c1);
     table.addComponent(1, 1, c2);
-    var rows = (<any> table)._rows;
+    var rows = (<any> table).rows;
     assert.lengthOf(rows, 2, "there are two rows");
     assert.lengthOf(rows[0], 2, "two cols in first row");
     assert.lengthOf(rows[1], 2, "two cols in second row");
@@ -78,9 +78,9 @@ describe("Tables", () => {
     t.addComponent(0, 0, c2);
     t.addComponent(0, 2, c3);
 
-    assert.isTrue(Plottable.Components.Group.prototype.isPrototypeOf((<any> t)._rows[0][2]), "A group was created");
+    assert.isTrue(Plottable.Components.Group.prototype.isPrototypeOf((<any> t).rows[0][2]), "A group was created");
 
-    var components: Plottable.Component[] = (<any> t)._rows[0][2].components();
+    var components: Plottable.Component[] = (<any> t).rows[0][2].components();
     assert.lengthOf(components, 2, "The group created should have 2 components");
     assert.equal(components[0], c1, "First element in the group at (0, 2) should be c1");
     assert.equal(components[1], c3, "Second element in the group at (0, 2) should be c3");
@@ -97,9 +97,9 @@ describe("Tables", () => {
 
     t.addComponent(0, 2, grp);
     t.addComponent(0, 2, c3);
-    assert.isTrue(Plottable.Components.Group.prototype.isPrototypeOf((<any> t)._rows[0][2]), "The cell still contains a group");
+    assert.isTrue(Plottable.Components.Group.prototype.isPrototypeOf((<any> t).rows[0][2]), "The cell still contains a group");
 
-    var components: Plottable.Component[] = (<any> t)._rows[0][2].components();
+    var components: Plottable.Component[] = (<any> t).rows[0][2].components();
     assert.lengthOf(components, 3, "The group created should have 3 components");
     assert.equal(components[0], c1, "First element in the group at (0, 2) should still be c1");
     assert.equal(components[1], c2, "Second element in the group at (0, 2) should still be c2");
@@ -131,7 +131,7 @@ describe("Tables", () => {
     var svg = generateSVG();
     table.renderTo(svg);
 
-    var elements = components.map((r) => (<any> r)._element);
+    var elements = components.map((r) => (<any> r).element);
     var translates = elements.map((e) => getTranslate(e));
     assert.deepEqual(translates[0], [0, 0], "first element is centered at origin");
     assert.deepEqual(translates[1], [200, 0], "second element is located properly");
@@ -154,7 +154,7 @@ describe("Tables", () => {
     var svg = generateSVG(415, 415);
     table.renderTo(svg);
 
-    var elements = components.map((r) => (<any> r)._element);
+    var elements = components.map((r) => (<any> r).element);
     var translates = elements.map((e) => getTranslate(e));
     var bboxes = elements.map((e) => Plottable.Utils.DOM.getBBox(e));
     assert.deepEqual(translates[0], [0, 0], "first element is centered properly");
@@ -187,7 +187,7 @@ describe("Tables", () => {
 
     table.renderTo(svg);
 
-    var elements = components.map((r) => (<any> r)._element);
+    var elements = components.map((r) => (<any> r).element);
     var translates = elements.map((e) => getTranslate(e));
     var bboxes = elements.map((e) => Plottable.Utils.DOM.getBBox(e));
     // test the translates
@@ -210,18 +210,18 @@ describe("Tables", () => {
     var table = tableAndcomponents.table;
     var components = tableAndcomponents.components;
     components.forEach((c) => fixComponentSize(c, 10, 10));
-    assert.isTrue(table._isFixedWidth(), "fixed width when all subcomponents fixed width");
-    assert.isTrue(table._isFixedHeight(), "fixedHeight when all subcomponents fixed height");
+    assert.isTrue(table.isFixedWidth(), "fixed width when all subcomponents fixed width");
+    assert.isTrue(table.isFixedHeight(), "fixedHeight when all subcomponents fixed height");
     fixComponentSize(components[0], null, 10);
-    assert.isFalse(table._isFixedWidth(), "width not fixed when some subcomponent width not fixed");
-    assert.isTrue(table._isFixedHeight(), "the height is still fixed when some subcomponent width not fixed");
+    assert.isFalse(table.isFixedWidth(), "width not fixed when some subcomponent width not fixed");
+    assert.isTrue(table.isFixedHeight(), "the height is still fixed when some subcomponent width not fixed");
     fixComponentSize(components[8], 10, null);
     fixComponentSize(components[0], 10, 10);
-    assert.isTrue(table._isFixedWidth(), "width fixed again once no subcomponent width not fixed");
-    assert.isFalse(table._isFixedHeight(), "height unfixed now that a subcomponent has unfixed height");
+    assert.isTrue(table.isFixedWidth(), "width fixed again once no subcomponent width not fixed");
+    assert.isFalse(table.isFixedHeight(), "height unfixed now that a subcomponent has unfixed height");
   });
 
-  it.skip("table._requestedSpace works properly", () => {
+  it.skip("table.requestedSpace works properly", () => {
     // [0 1]
     // [2 3]
     var c0 = new Plottable.Component();
@@ -231,22 +231,22 @@ describe("Tables", () => {
 
     var table = new Plottable.Components.Table([[c0, c1], [c2, c3]]);
 
-    var spaceRequest = table._requestedSpace(30, 30);
+    var spaceRequest = table.requestedSpace(30, 30);
     verifySpaceRequest(spaceRequest, 30, 30, true, true, "1");
 
-    spaceRequest = table._requestedSpace(50, 50);
+    spaceRequest = table.requestedSpace(50, 50);
     verifySpaceRequest(spaceRequest, 50, 50, true, true, "2");
 
-    spaceRequest = table._requestedSpace(90, 90);
+    spaceRequest = table.requestedSpace(90, 90);
     verifySpaceRequest(spaceRequest, 70, 90, false, true, "3");
 
-    spaceRequest = table._requestedSpace(200, 200);
+    spaceRequest = table.requestedSpace(200, 200);
     verifySpaceRequest(spaceRequest, 70, 100, false, false, "4");
   });
 
-  describe("table._iterateLayout works properly", () => {
+  describe("table.iterateLayout works properly", () => {
     // This test battery would have caught #405
-    function verifyLayoutResult(result: Plottable.Components._IterateLayoutResult,
+    function verifyLayoutResult(result: Plottable.Components.IterateLayoutResult,
                                 cPS: number[], rPS: number[], gW: number[], gH: number[],
                                 wW: boolean, wH: boolean, id: string) {
       assert.deepEqual(result.colProportionalSpace, cPS, "colProportionalSpace:" + id);
@@ -268,13 +268,13 @@ describe("Tables", () => {
     it("iterateLayout works in the easy case where there is plenty of space and everything is satisfied on first go", () => {
       fixComponentSize(c1, 50, 50);
       fixComponentSize(c4, 20, 10);
-      var result = (<any> table)._iterateLayout(500, 500);
+      var result = (<any> table).iterateLayout(500, 500);
       verifyLayoutResult(result, [215, 215], [220, 220], [50, 20], [50, 10], false, false, "");
     });
 
     it.skip("iterateLayout works in the difficult case where there is a shortage of space and layout requires iterations", () => {
       fixComponentSize(c1, 490, 50);
-      var result = (<any> table)._iterateLayout(500, 500);
+      var result = (<any> table).iterateLayout(500, 500);
       verifyLayoutResult(result, [0, 0], [220, 220], [480, 20], [50, 10], true, false, "");
     });
 
@@ -283,13 +283,13 @@ describe("Tables", () => {
       fixComponentSize(c2, 50, 50);
       fixComponentSize(c3, 50, 50);
       fixComponentSize(c4, 50, 50);
-      var result = (<any> table)._iterateLayout(100, 100);
+      var result = (<any> table).iterateLayout(100, 100);
       verifyLayoutResult(result, [0, 0], [0, 0], [50, 50], [50, 50], false, false, "..when there's exactly enough space");
 
-      result = (<any> table)._iterateLayout(80, 80);
+      result = (<any> table).iterateLayout(80, 80);
       verifyLayoutResult(result, [0, 0], [0, 0], [40, 40], [40, 40], true, true, "..when there's not enough space");
 
-      result = (<any> table)._iterateLayout(120, 120);
+      result = (<any> table).iterateLayout(120, 120);
       // If there is extra space in a fixed-size table, the extra space should not be allocated to proportional space
       verifyLayoutResult(result, [0, 0], [0, 0], [50, 50], [50, 50], false, false, "..when there's extra space");
     });
@@ -297,7 +297,7 @@ describe("Tables", () => {
     it.skip("iterateLayout works in the tricky case when components can be unsatisfied but request little space", () => {
       table = new Plottable.Components.Table([[c1, c2]]);
       fixComponentSize(c1, null, null);
-      c2._requestedSpace = (w: number, h: number) => {
+      c2.requestedSpace = (w: number, h: number) => {
         return {
           width: w >= 200 ? 200 : 0,
           height: h >= 200 ? 200 : 0,
@@ -305,14 +305,14 @@ describe("Tables", () => {
           wantsHeight: h < 200
         };
       };
-      var result = (<any> table)._iterateLayout(200, 200);
+      var result = (<any> table).iterateLayout(200, 200);
       verifyLayoutResult(result, [0, 0], [0], [0, 200], [200], false, false, "when there's sufficient space");
-      result = (<any> table)._iterateLayout(150, 200);
+      result = (<any> table).iterateLayout(150, 200);
       verifyLayoutResult(result, [150, 0], [0], [0, 0], [200], true, false, "when there's insufficient space");
     });
   });
 
-  describe("table._removeComponent works properly", () => {
+  describe("table.removeComponent works properly", () => {
     var c1 = new Plottable.Component();
     var c2 = new Plottable.Component();
     var c3 = new Plottable.Component();
@@ -320,34 +320,34 @@ describe("Tables", () => {
     var c5 = new Plottable.Component();
     var c6 = new Plottable.Component();
     var table: Plottable.Components.Table;
-    it("table._removeComponent works in basic case", () => {
+    it("table.removeComponent works in basic case", () => {
       table = new Plottable.Components.Table([[c1, c2], [c3, c4], [c5, c6]]);
-      table._removeComponent(c4);
-      assert.deepEqual((<any> table)._rows, [[c1, c2], [c3, null], [c5, c6]], "remove one element");
+      table.removeComponent(c4);
+      assert.deepEqual((<any> table).rows, [[c1, c2], [c3, null], [c5, c6]], "remove one element");
     });
 
-    it("table._removeComponent does nothing when component is not found", () =>  {
+    it("table.removeComponent does nothing when component is not found", () =>  {
       table = new Plottable.Components.Table([[c1, c2], [c3, c4]]);
-      table._removeComponent (c5);
+      table.removeComponent (c5);
 
-      assert.deepEqual((<any> table)._rows, [[c1, c2], [c3, c4]], "remove nonexistent component");
+      assert.deepEqual((<any> table).rows, [[c1, c2], [c3, c4]], "remove nonexistent component");
     });
 
-    it("table._removeComponent removing component twice should have same effect as removing it once", () =>  {
+    it("table.removeComponent removing component twice should have same effect as removing it once", () =>  {
       table = new Plottable.Components.Table([[c1, c2, c3], [c4, c5, c6]]);
 
-      table._removeComponent(c1);
-      assert.deepEqual((<any> table)._rows, [[null, c2, c3], [c4, c5, c6]], "item twice");
+      table.removeComponent(c1);
+      assert.deepEqual((<any> table).rows, [[null, c2, c3], [c4, c5, c6]], "item twice");
 
-      table._removeComponent(c1);
-      assert.deepEqual((<any> table)._rows, [[null, c2, c3], [c4, c5, c6]], "item twice");
+      table.removeComponent(c1);
+      assert.deepEqual((<any> table).rows, [[null, c2, c3], [c4, c5, c6]], "item twice");
     });
 
-    it("table._removeComponent doesn't do anything weird when called with null", () => {
+    it("table.removeComponent doesn't do anything weird when called with null", () => {
       table = new Plottable.Components.Table([[c1, null], [c2, c3]]);
 
-      table._removeComponent(null);
-      assert.deepEqual((<any> table)._rows, [[c1, null], [c2, c3]]);
+      table.removeComponent(null);
+      assert.deepEqual((<any> table).rows, [[c1, null], [c2, c3]]);
     });
   });
 });

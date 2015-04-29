@@ -12,7 +12,7 @@ module Plottable {
     protected _hitBox: D3.Selection;
     protected _componentToListenTo: Component;
 
-    public _anchor(component: Component, hitBox: D3.Selection) {
+    public anchor(component: Component, hitBox: D3.Selection) {
       this._componentToListenTo = component;
       this._hitBox = hitBox;
     }

@@ -63,7 +63,7 @@ describe("TimeAxis", () => {
         }
       }
 
-      (<any>axis)._tierLabelContainers.forEach(checkLabelsForContainer);
+      (<any>axis).tierLabelContainers.forEach(checkLabelsForContainer);
     }
     // 100 year span
     checkDomain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2100, 0, 1, 0, 0, 0, 0)]);
@@ -100,7 +100,7 @@ describe("TimeAxis", () => {
     scale.domain([twoMinutesBefore, now]);
     scale.range([0, 800]);
     axis.renderTo(svg);
-    var configs = newPossibleConfigurations[(<any> axis)._mostPreciseConfigIndex];
+    var configs = newPossibleConfigurations[(<any> axis).mostPreciseConfigIndex];
     assert.deepEqual(configs[0].interval, d3.time.minute, "axis used new time unit");
     assert.deepEqual(configs[0].step, 4, "axis used new step");
     svg.remove();
@@ -244,14 +244,14 @@ describe("TimeAxis", () => {
 
     xAxis.renderTo(svg);
 
-    var axisBoundingRect: ClientRect = (<any> xAxis)._element.select(".bounding-box")[0][0].getBoundingClientRect();
+    var axisBoundingRect: ClientRect = (<any> xAxis).element.select(".bounding-box")[0][0].getBoundingClientRect();
 
     var isInsideAxisBoundingRect = function(innerRect: ClientRect) {
       return Math.floor(innerRect.bottom)     <= Math.ceil(axisBoundingRect.bottom) + window.Pixel_CloseTo_Requirement &&
              Math.floor(axisBoundingRect.top) <= Math.ceil(innerRect.top) + window.Pixel_CloseTo_Requirement;
     };
 
-    var numberOfVisibleTiers = (<any> xAxis)._element
+    var numberOfVisibleTiers = (<any> xAxis).element
       .selectAll("." + Plottable.Axes.Time.TIME_AXIS_TIER_CLASS)
       .each(function(e: any, i: number) {
         var sel = d3.select(this);

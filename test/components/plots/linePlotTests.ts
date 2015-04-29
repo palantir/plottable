@@ -80,7 +80,7 @@ describe("Plots", () => {
               .project("stroke", colorAccessor)
               .addDataset("s2", simpleDataset)
               .renderTo(svg);
-      renderArea = (<any> linePlot)._renderArea;
+      renderArea = (<any> linePlot).renderArea;
     });
 
     it("draws a line correctly", () => {
@@ -171,7 +171,7 @@ describe("Plots", () => {
         linePlot.addDataset("d3", dataset3);
 
         var allLines = linePlot.getAllSelections();
-        var allLines2 = linePlot.getAllSelections((<any> linePlot)._datasetKeysInOrder);
+        var allLines2 = linePlot.getAllSelections((<any> linePlot).datasetKeysInOrder);
         assert.deepEqual(allLines, allLines2, "all lines retrieved");
 
         svg.remove();

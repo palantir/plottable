@@ -55,7 +55,7 @@ describe("Plots", () => {
     });
 
     it("renders correctly", () => {
-      var bars = (<any> renderer)._renderArea.selectAll("rect");
+      var bars = (<any> renderer).renderArea.selectAll("rect");
       var bar0 = d3.select(bars[0][0]);
       var bar1 = d3.select(bars[0][1]);
       var bar2 = d3.select(bars[0][2]);
@@ -99,7 +99,7 @@ describe("Plots", () => {
         assert.deepEqual(expected.selection, actual.selection, msg);
       }
 
-      var bars = (<any> renderer)._renderArea.selectAll("rect");
+      var bars = (<any> renderer).renderArea.selectAll("rect");
 
       var d0 = dataset1.data()[0];
       var d0Px = {
@@ -181,7 +181,7 @@ describe("Plots", () => {
     });
 
     it("stacking done correctly for negative values", () => {
-      var bars = (<any> plot)._renderArea.selectAll("rect");
+      var bars = (<any> plot).renderArea.selectAll("rect");
       var bar0 = d3.select(bars[0][0]);
       var bar1 = d3.select(bars[0][1]);
       var bar2 = d3.select(bars[0][2]);
@@ -202,7 +202,7 @@ describe("Plots", () => {
     });
 
     it("stacked extent is set correctly", () => {
-      assert.deepEqual((<any> plot)._stackedExtent, [-8, 8], "stacked extent is updated accordingly");
+      assert.deepEqual((<any> plot).stackedExtent, [-8, 8], "stacked extent is updated accordingly");
       svg.remove();
     });
   });
@@ -248,7 +248,7 @@ describe("Plots", () => {
     });
 
     it("renders correctly", () => {
-      var bars = (<any> renderer)._renderArea.selectAll("rect");
+      var bars = (<any> renderer).renderArea.selectAll("rect");
       var bar0 = d3.select(bars[0][0]);
       var bar1 = d3.select(bars[0][1]);
       var bar2 = d3.select(bars[0][2]);
@@ -321,7 +321,7 @@ describe("Plots", () => {
     });
 
     it("renders correctly", () => {
-      var bars = (<any> plot)._renderArea.selectAll("rect");
+      var bars = (<any> plot).renderArea.selectAll("rect");
 
       assert.lengthOf(bars[0], 7, "draws a bar for each datum");
 
@@ -427,8 +427,8 @@ describe("Plots", () => {
       plot.project("fill", "fill");
       plot.project("x", "x", xScale).project("y", "y", yScale);
 
-      var ds1FirstColumnOffset = (<any> plot)._key2PlotDatasetKey.get("d1").plotMetadata.offsets.get("A");
-      var ds2FirstColumnOffset = (<any> plot)._key2PlotDatasetKey.get("d2").plotMetadata.offsets.get("A");
+      var ds1FirstColumnOffset = (<any> plot).key2PlotDatasetKey.get("d1").plotMetadata.offsets.get("A");
+      var ds2FirstColumnOffset = (<any> plot).key2PlotDatasetKey.get("d2").plotMetadata.offsets.get("A");
 
       assert.strictEqual(typeof ds1FirstColumnOffset, "number", "ds1 offset should be a number");
       assert.strictEqual(typeof ds2FirstColumnOffset, "number", "ds2 offset should be a number");
@@ -466,9 +466,9 @@ describe("Plots", () => {
       plot.project("fill", "fill");
       plot.project("x", "x", xScale).project("y", "y", yScale);
 
-      var offset1 = (<any> plot)._key2PlotDatasetKey.get("d1").plotMetadata.offsets.get("A");
-      var offset3 = (<any> plot)._key2PlotDatasetKey.get("d3").plotMetadata.offsets.get("A");
-      var offset5 = (<any> plot)._key2PlotDatasetKey.get("d5").plotMetadata.offsets.get("A");
+      var offset1 = (<any> plot).key2PlotDatasetKey.get("d1").plotMetadata.offsets.get("A");
+      var offset3 = (<any> plot).key2PlotDatasetKey.get("d3").plotMetadata.offsets.get("A");
+      var offset5 = (<any> plot).key2PlotDatasetKey.get("d5").plotMetadata.offsets.get("A");
 
       assert.strictEqual(offset1, 0,
         "Plot columns should start from offset 0 (at the very bottom)");

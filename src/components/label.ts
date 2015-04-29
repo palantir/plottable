@@ -3,14 +3,14 @@
 module Plottable {
 export module Components {
   export class Label extends Component {
-    private _textContainer: D3.Selection;
+    private textContainer: D3.Selection;
     private _text: string; // text assigned to the Label; may not be the actual text displayed due to truncation
-    private _orientation: string;
-    private _measurer: SVGTypewriter.Measurers.Measurer;
-    private _wrapper: SVGTypewriter.Wrappers.Wrapper;
-    private _writer: SVGTypewriter.Writers.Writer;
-    private _xAlignment: string;
-    private _yAlignment: string;
+    private orientation: string;
+    private measurer: SVGTypewriter.Measurers.Measurer;
+    private wrapper: SVGTypewriter.Wrappers.Wrapper;
+    private writer: SVGTypewriter.Writers.Writer;
+    private xAlignment: string;
+    private yAlignment: string;
     private _padding: number;
 
     /**
@@ -29,8 +29,8 @@ export module Components {
       this.text(displayText);
       this.orient(orientation);
       this.xAlign("center").yAlign("center");
-      this._fixedHeightFlag = true;
-      this._fixedWidthFlag = true;
+      this.fixedHeightFlag = true;
+      this.fixedWidthFlag = true;
       this._padding = 0;
     }
 
@@ -44,7 +44,7 @@ export module Components {
     public xAlign(alignment: string): Label {
       var alignmentLC = alignment.toLowerCase();
       super.xAlign(alignmentLC);
-      this._xAlignment = alignmentLC;
+      this.xAlignment = alignmentLC;
       return this;
     }
 
@@ -58,12 +58,12 @@ export module Components {
     public yAlign(alignment: string): Label {
       var alignmentLC = alignment.toLowerCase();
       super.yAlign(alignmentLC);
-      this._yAlignment = alignmentLC;
+      this.yAlignment = alignmentLC;
       return this;
     }
 
-    public _requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest {
-      var desiredWH = this._measurer.measure(this._text);
+    public requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest {
+      var desiredWH = this.measurer.measure(this._text);
       var desiredWidth  = (this.orient() === "horizontal" ? desiredWH.width : desiredWH.height) + 2 * this.padding();
       var desiredHeight = (this.orient() === "horizontal" ? desiredWH.height : desiredWH.width) + 2 * this.padding();
 
@@ -75,12 +75,12 @@ export module Components {
       };
     }
 
-    protected _setup() {
-      super._setup();
-      this._textContainer = this._content.append("g");
-      this._measurer = new SVGTypewriter.Measurers.Measurer(this._textContainer);
-      this._wrapper = new SVGTypewriter.Wrappers.Wrapper();
-      this._writer = new SVGTypewriter.Writers.Writer(this._measurer, this._wrapper);
+    protected setup() {
+      super.setup();
+      this.textContainer = this._content.append("g");
+      this.measurer = new SVGTypewriter.Measurers.Measurer(this.textContainer);
+      this.wrapper = new SVGTypewriter.Wrappers.Wrapper();
+      this.writer = new SVGTypewriter.Writers.Writer(this.measurer, this.wrapper);
       this.text(this._text);
     }
 
@@ -102,7 +102,7 @@ export module Components {
         return this._text;
       } else {
         this._text = displayText;
-        this._invalidateLayout();
+        this.invalidateLayout();
         return this;
       }
     }
@@ -123,15 +123,15 @@ export module Components {
     public orient(newOrientation: string): Label;
     public orient(newOrientation?: string): any {
       if (newOrientation == null) {
-        return this._orientation;
+        return this.orientation;
       } else {
         newOrientation = newOrientation.toLowerCase();
         if (newOrientation === "horizontal" || newOrientation === "left" || newOrientation === "right") {
-          this._orientation = newOrientation;
+          this.orientation = newOrientation;
         } else {
           throw new Error(newOrientation + " is not a valid orientation for LabelComponent");
         }
-        this._invalidateLayout();
+        this.invalidateLayout();
         return this;
       }
     }
@@ -158,29 +158,29 @@ export module Components {
           throw new Error(padAmount + " is not a valid padding value.  Cannot be less than 0.");
         }
         this._padding = padAmount;
-        this._invalidateLayout();
+        this.invalidateLayout();
         return this;
       }
     }
 
-    public _doRender() {
-      super._doRender();
+    public doRender() {
+      super.doRender();
       // HACKHACK SVGTypewriter should remove existing content - #21 on SVGTypewriter.
-      this._textContainer.selectAll("g").remove();
-      var textMeasurement = this._measurer.measure(this._text);
+      this.textContainer.selectAll("g").remove();
+      var textMeasurement = this.measurer.measure(this._text);
       var heightPadding = Math.max(Math.min((this.height() - textMeasurement.height) / 2, this.padding()), 0);
       var widthPadding = Math.max(Math.min((this.width() - textMeasurement.width) / 2, this.padding()), 0);
-      this._textContainer.attr("transform", "translate(" + widthPadding + "," + heightPadding + ")");
+      this.textContainer.attr("transform", "translate(" + widthPadding + "," + heightPadding + ")");
       var writeWidth = this.width() - 2 * widthPadding;
       var writeHeight = this.height() - 2 * heightPadding;
       var textRotation: {[s: string]: number} = {horizontal: 0, right: 90, left: -90};
       var writeOptions = {
-                        selection: this._textContainer,
-                        xAlign: this._xAlignment,
-                        yAlign: this._yAlignment,
+                        selection: this.textContainer,
+                        xAlign: this.xAlignment,
+                        yAlign: this.yAlignment,
                         textRotation: textRotation[this.orient()]
                     };
-      this._writer.write(this._text, writeWidth, writeHeight, writeOptions);
+      this.writer.write(this._text, writeWidth, writeHeight, writeOptions);
     }
   }
 

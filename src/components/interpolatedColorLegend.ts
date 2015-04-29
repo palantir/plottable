@@ -3,19 +3,19 @@
 module Plottable {
 export module Components {
   export class InterpolatedColorLegend extends Component {
-    private _measurer: SVGTypewriter.Measurers.Measurer;
-    private _wrapper: SVGTypewriter.Wrappers.Wrapper;
-    private _writer: SVGTypewriter.Writers.Writer;
-    private _scale: Scales.InterpolatedColor;
-    private _orientation: String ;
-    private _padding = 5;
-    private _numSwatches = 10;
+    private measurer: SVGTypewriter.Measurers.Measurer;
+    private wrapper: SVGTypewriter.Wrappers.Wrapper;
+    private writer: SVGTypewriter.Writers.Writer;
+    private scale: Scales.InterpolatedColor;
+    private orientation: String ;
+    private padding = 5;
+    private numSwatches = 10;
     private _formatter: Formatter;
 
-    private _swatchContainer: D3.Selection;
-    private _swatchBoundingBox: D3.Selection;
-    private _lowerLabel: D3.Selection;
-    private _upperLabel: D3.Selection;
+    private swatchContainer: D3.Selection;
+    private swatchBoundingBox: D3.Selection;
+    private lowerLabel: D3.Selection;
+    private upperLabel: D3.Selection;
 
     /**
      * The css class applied to the legend labels.
@@ -39,19 +39,19 @@ export module Components {
       if (interpolatedColorScale == null ) {
         throw new Error("InterpolatedColorLegend requires a interpolatedColorScale");
       }
-      this._scale = interpolatedColorScale;
-      this._scale.broadcaster.registerListener(this, () => this._invalidateLayout());
+      this.scale = interpolatedColorScale;
+      this.scale.broadcaster.registerListener(this, () => this.invalidateLayout());
       this._formatter = formatter;
-      this._orientation = InterpolatedColorLegend._ensureOrientation(orientation);
+      this.orientation = InterpolatedColorLegend.ensureOrientation(orientation);
 
-      this._fixedWidthFlag = true;
-      this._fixedHeightFlag = true;
+      this.fixedWidthFlag = true;
+      this.fixedHeightFlag = true;
       this.classed("legend", true).classed("interpolated-color-legend", true);
     }
 
     public remove() {
       super.remove();
-      this._scale.broadcaster.deregisterListener(this);
+      this.scale.broadcaster.deregisterListener(this);
     }
 
     /**
@@ -72,11 +72,11 @@ export module Components {
         return this._formatter;
       }
       this._formatter = formatter;
-      this._invalidateLayout();
+      this.invalidateLayout();
       return this;
     }
 
-    private static _ensureOrientation(orientation: string) {
+    private static ensureOrientation(orientation: string) {
       orientation = orientation.toLowerCase();
       if (orientation === "horizontal" || orientation === "left" || orientation === "right") {
         return orientation;
@@ -101,57 +101,57 @@ export module Components {
     public orient(newOrientation: string): InterpolatedColorLegend;
     public orient(newOrientation?: string): any {
       if (newOrientation == null) {
-        return this._orientation;
+        return this.orientation;
       } else {
-        this._orientation = InterpolatedColorLegend._ensureOrientation(newOrientation);
-        this._invalidateLayout();
+        this.orientation = InterpolatedColorLegend.ensureOrientation(newOrientation);
+        this.invalidateLayout();
         return this;
       }
     }
 
-    private _generateTicks() {
-      var domain = this._scale.domain();
-      var slope = (domain[1] - domain[0]) / this._numSwatches;
+    private generateTicks() {
+      var domain = this.scale.domain();
+      var slope = (domain[1] - domain[0]) / this.numSwatches;
       var ticks: number[] = [];
-      for (var i = 0; i <= this._numSwatches; i++) {
+      for (var i = 0; i <= this.numSwatches; i++) {
         ticks.push(domain[0] + slope * i);
       }
       return ticks;
     }
 
-    protected _setup() {
-      super._setup();
+    protected setup() {
+      super.setup();
 
-      this._swatchContainer = this._content.append("g").classed("swatch-container", true);
-      this._swatchBoundingBox = this._content.append("rect").classed("swatch-bounding-box", true);
-      this._lowerLabel = this._content.append("g").classed(InterpolatedColorLegend.LEGEND_LABEL_CLASS, true);
-      this._upperLabel = this._content.append("g").classed(InterpolatedColorLegend.LEGEND_LABEL_CLASS, true);
+      this.swatchContainer = this._content.append("g").classed("swatch-container", true);
+      this.swatchBoundingBox = this._content.append("rect").classed("swatch-bounding-box", true);
+      this.lowerLabel = this._content.append("g").classed(InterpolatedColorLegend.LEGEND_LABEL_CLASS, true);
+      this.upperLabel = this._content.append("g").classed(InterpolatedColorLegend.LEGEND_LABEL_CLASS, true);
 
-      this._measurer = new SVGTypewriter.Measurers.Measurer(this._content);
-      this._wrapper = new SVGTypewriter.Wrappers.Wrapper();
-      this._writer = new SVGTypewriter.Writers.Writer(this._measurer, this._wrapper);
+      this.measurer = new SVGTypewriter.Measurers.Measurer(this._content);
+      this.wrapper = new SVGTypewriter.Wrappers.Wrapper();
+      this.writer = new SVGTypewriter.Writers.Writer(this.measurer, this.wrapper);
     }
 
-    public _requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest {
-      var textHeight = this._measurer.measure().height;
+    public requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest {
+      var textHeight = this.measurer.measure().height;
 
-      var ticks = this._generateTicks();
+      var ticks = this.generateTicks();
       var numSwatches = ticks.length;
 
-      var domain = this._scale.domain();
-      var labelWidths = domain.map((d: number) => this._measurer.measure(this._formatter(d)).width);
+      var domain = this.scale.domain();
+      var labelWidths = domain.map((d: number) => this.measurer.measure(this._formatter(d)).width);
 
       var desiredHeight: number;
       var desiredWidth: number;
-      if (this._isVertical()) {
+      if (this.isVertical()) {
         var longestWidth = Utils.Methods.max(labelWidths, 0);
-        desiredWidth = this._padding + textHeight + this._padding + longestWidth + this._padding;
-        desiredHeight = this._padding + numSwatches * textHeight + this._padding;
+        desiredWidth = this.padding + textHeight + this.padding + longestWidth + this.padding;
+        desiredHeight = this.padding + numSwatches * textHeight + this.padding;
       } else {
-        desiredHeight = this._padding + textHeight + this._padding;
-        desiredWidth = this._padding + labelWidths[0] + this._padding
+        desiredHeight = this.padding + textHeight + this.padding;
+        desiredWidth = this.padding + labelWidths[0] + this.padding
                         + numSwatches * textHeight
-                        + this._padding + labelWidths[1] + this._padding;
+                        + this.padding + labelWidths[1] + this.padding;
       }
 
       return {
@@ -162,36 +162,36 @@ export module Components {
       };
     }
 
-    private _isVertical() {
-      return this._orientation !== "horizontal";
+    private isVertical() {
+      return this.orientation !== "horizontal";
     }
 
-    public _doRender() {
-      super._doRender();
+    public doRender() {
+      super.doRender();
 
-      var domain = this._scale.domain();
+      var domain = this.scale.domain();
 
-      var textHeight = this._measurer.measure().height;
+      var textHeight = this.measurer.measure().height;
       var text0 = this._formatter(domain[0]);
-      var text0Width = this._measurer.measure(text0).width;
+      var text0Width = this.measurer.measure(text0).width;
       var text1 = this._formatter(domain[1]);
-      var text1Width = this._measurer.measure(text1).width;
+      var text1Width = this.measurer.measure(text1).width;
 
-      var ticks = this._generateTicks();
+      var ticks = this.generateTicks();
       var numSwatches = ticks.length;
 
-      var padding = this._padding;
+      var padding = this.padding;
 
       var upperLabelShift: Point = { x: 0, y: 0 };
       var lowerLabelShift: Point = { x: 0, y: 0 };
       var lowerWriteOptions = {
-                selection: this._lowerLabel,
+                selection: this.lowerLabel,
                 xAlign: "center",
                 yAlign: "center",
                 textRotation: 0
             };
       var upperWriteOptions = {
-                selection: this._upperLabel,
+                selection: this.upperLabel,
                 xAlign: "center",
                 yAlign: "center",
                 textRotation: 0
@@ -209,7 +209,7 @@ export module Components {
         height: 0
       };
 
-      if (this._isVertical()) {
+      if (this.isVertical()) {
         var longestTextWidth = Math.max(text0Width, text1Width);
         swatchWidth = Math.max( (this.width() - 3 * padding - longestTextWidth), 0);
         swatchHeight = Math.max( ((this.height() - 2 * padding) / numSwatches), 0);
@@ -220,7 +220,7 @@ export module Components {
         lowerWriteOptions.yAlign = "bottom";
         lowerLabelShift.y = -padding;
 
-        if (this._orientation === "left") {
+        if (this.orientation === "left") {
           swatchX = (d: any, i: number) => padding + longestTextWidth + padding;
           upperWriteOptions.xAlign = "right";
           upperLabelShift.x = -(padding + swatchWidth + padding);
@@ -251,23 +251,23 @@ export module Components {
       }
       boundingBoxAttr.x = swatchX(null, 0); // position of the first swatch
 
-      this._upperLabel.text(""); // clear the upper label
-      this._writer.write(text1, this.width(), this.height(), upperWriteOptions);
+      this.upperLabel.text(""); // clear the upper label
+      this.writer.write(text1, this.width(), this.height(), upperWriteOptions);
       var upperTranslateString = "translate(" + upperLabelShift.x + ", " + upperLabelShift.y + ")";
-      this._upperLabel.attr("transform", upperTranslateString);
+      this.upperLabel.attr("transform", upperTranslateString);
 
-      this._lowerLabel.text(""); // clear the lower label
-      this._writer.write(text0, this.width(), this.height(), lowerWriteOptions);
+      this.lowerLabel.text(""); // clear the lower label
+      this.writer.write(text0, this.width(), this.height(), lowerWriteOptions);
       var lowerTranslateString = "translate(" + lowerLabelShift.x + ", " + lowerLabelShift.y + ")";
-      this._lowerLabel.attr("transform", lowerTranslateString);
+      this.lowerLabel.attr("transform", lowerTranslateString);
 
-      this._swatchBoundingBox.attr(boundingBoxAttr);
+      this.swatchBoundingBox.attr(boundingBoxAttr);
 
-      var swatches = this._swatchContainer.selectAll("rect.swatch").data(ticks);
+      var swatches = this.swatchContainer.selectAll("rect.swatch").data(ticks);
       swatches.enter().append("rect").classed("swatch", true);
       swatches.exit().remove();
       swatches.attr({
-        "fill": (d: any, i: number) => this._scale.scale(d),
+        "fill": (d: any, i: number) => this.scale.scale(d),
         "width": swatchWidth,
         "height": swatchHeight,
         "x": swatchX,

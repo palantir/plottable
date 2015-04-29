@@ -2,98 +2,98 @@
 
 module Plottable {
   export class Component extends Core.PlottableObject {
-    protected _element: D3.Selection;
+    protected element: D3.Selection;
     protected _content: D3.Selection;
-    protected _boundingBox: D3.Selection;
-    private _backgroundContainer: D3.Selection;
-    private _foregroundContainer: D3.Selection;
+    protected boundingBox: D3.Selection;
+    private backgroundContainer: D3.Selection;
+    private foregroundContainer: D3.Selection;
     public clipPathEnabled = false;
-    private _xOrigin: number; // Origin of the coordinate space for the component. Passed down from parent
-    private _yOrigin: number;
+    private xOrigin: number; // Origin of the coordinate space for the component. Passed down from parent
+    private yOrigin: number;
 
-    private _parentElement: ComponentContainer;
-    private _xAlignProportion = 0; // What % along the free space do we want to position (0 = left, .5 = center, 1 = right)
-    private _yAlignProportion = 0;
-    protected _fixedHeightFlag = false;
-    protected _fixedWidthFlag = false;
-    protected _isSetup = false;
-    protected _isAnchored = false;
+    private parentElement: ComponentContainer;
+    private xAlignProportion = 0; // What % along the free space do we want to position (0 = left, .5 = center, 1 = right)
+    private yAlignProportion = 0;
+    protected fixedHeightFlag = false;
+    protected fixedWidthFlag = false;
+    protected isSetup = false;
+    protected isAnchored = false;
 
     private _hitBox: D3.Selection;
-    private _interactionsToRegister: Interaction[] = [];
-    private _boxes: D3.Selection[] = [];
-    private _boxContainer: D3.Selection;
-    private _rootSVG: D3.Selection;
-    private _isTopLevelComponent = false;
+    private interactionsToRegister: Interaction[] = [];
+    private boxes: D3.Selection[] = [];
+    private boxContainer: D3.Selection;
+    private rootSVG: D3.Selection;
+    private isTopLevelComponent = false;
     private _width: number; // Width and height of the component. Used to size the hitbox, bounding box, etc
     private _height: number;
     private _xOffset = 0; // Offset from Origin, used for alignment and floating positioning
     private _yOffset = 0;
-    private _cssClasses: string[] = ["component"];
-    private _removed = false;
-    private _usedLastLayout = false;
+    private cssClasses: string[] = ["component"];
+    private removed = false;
+    private usedLastLayout = false;
 
     /**
      * Attaches the Component as a child of a given a DOM element. Usually only directly invoked on root-level Components.
      *
      * @param {D3.Selection} element A D3 selection consisting of the element to anchor under.
      */
-    public _anchor(element: D3.Selection) {
-      if (this._removed) {
+    public anchor(element: D3.Selection) {
+      if (this.removed) {
         throw new Error("Can't reuse remove()-ed components!");
       }
 
       if (element.node().nodeName.toLowerCase() === "svg") {
         // svg node gets the "plottable" CSS class
-        this._rootSVG = element;
-        this._rootSVG.classed("plottable", true);
+        this.rootSVG = element;
+        this.rootSVG.classed("plottable", true);
         // visible overflow for firefox https://stackoverflow.com/questions/5926986/why-does-firefox-appear-to-truncate-embedded-svgs
-        this._rootSVG.style("overflow", "visible");
-        this._isTopLevelComponent = true;
+        this.rootSVG.style("overflow", "visible");
+        this.isTopLevelComponent = true;
       }
 
-      if (this._element != null) {
+      if (this.element != null) {
         // reattach existing element
-        element.node().appendChild(this._element.node());
+        element.node().appendChild(this.element.node());
       } else {
-        this._element = element.append("g");
-        this._setup();
+        this.element = element.append("g");
+        this.setup();
       }
-      this._isAnchored = true;
+      this.isAnchored = true;
     }
 
     /**
      * Creates additional elements as necessary for the Component to function.
-     * Called during _anchor() if the Component's element has not been created yet.
+     * Called during anchor() if the Component's element has not been created yet.
      * Override in subclasses to provide additional functionality.
      */
-    protected _setup() {
-      if (this._isSetup) {
+    protected setup() {
+      if (this.isSetup) {
         return;
       }
-      this._cssClasses.forEach((cssClass: string) => {
-        this._element.classed(cssClass, true);
+      this.cssClasses.forEach((cssClass: string) => {
+        this.element.classed(cssClass, true);
       });
-      this._cssClasses = null;
+      this.cssClasses = null;
 
-      this._backgroundContainer = this._element.append("g").classed("background-container", true);
-      this._addBox("background-fill", this._backgroundContainer);
-      this._content = this._element.append("g").classed("content", true);
-      this._foregroundContainer = this._element.append("g").classed("foreground-container", true);
-      this._boxContainer = this._element.append("g").classed("box-container", true);
+      this.backgroundContainer = this.element.append("g").classed("background-container", true);
+      this.addBox("background-fill", this.backgroundContainer);
+      this._content = this.element.append("g").classed("content", true);
+      this.foregroundContainer = this.element.append("g").classed("foreground-container", true);
+      this.boxContainer = this.element.append("g").classed("box-container", true);
 
       if (this.clipPathEnabled) {
-        this._generateClipPath();
+        this.generateClipPath();
       };
 
-      this._boundingBox = this._addBox("bounding-box");
+      this.boundingBox = this.addBox("bounding-box");
 
-      this._interactionsToRegister.forEach((r) => this.registerInteraction(r));
-      this._interactionsToRegister = null;
-      this._isSetup = true;
+      this.interactionsToRegister.forEach((r) => this.registerInteraction(r));
+      this.interactionsToRegister = null;
+      this.isSetup = true;
     }
 
-    public _requestedSpace(availableWidth: number, availableHeight: number): SpaceRequest {
+    public requestedSpace(availableWidth: number, availableHeight: number): SpaceRequest {
       return {width: 0, height: 0, wantsWidth: false, wantsHeight: false};
     }
 
@@ -107,11 +107,11 @@ module Plottable {
      * @param {number} availableWidth available width for the Component to render in
      * @param {number} availableHeight available height for the Component to render in
      */
-    public _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number) {
+    public computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number) {
       if (offeredXOrigin == null || offeredYOrigin == null || availableWidth == null || availableHeight == null) {
-        if (this._element == null) {
+        if (this.element == null) {
           throw new Error("anchor must be called before computeLayout");
-        } else if (this._isTopLevelComponent) {
+        } else if (this.isTopLevelComponent) {
           // we are the root node, retrieve height/width from root SVG
           offeredXOrigin = 0;
           offeredYOrigin = 0;
@@ -119,69 +119,69 @@ module Plottable {
           // Set width/height to 100% if not specified, to allow accurate size calculation
           // see http://www.w3.org/TR/CSS21/visudet.html#block-replaced-width
           // and http://www.w3.org/TR/CSS21/visudet.html#inline-replaced-height
-          if (this._rootSVG.attr("width") == null) {
-            this._rootSVG.attr("width", "100%");
+          if (this.rootSVG.attr("width") == null) {
+            this.rootSVG.attr("width", "100%");
           }
-          if (this._rootSVG.attr("height") == null) {
-            this._rootSVG.attr("height", "100%");
+          if (this.rootSVG.attr("height") == null) {
+            this.rootSVG.attr("height", "100%");
           }
 
-          var elem: HTMLScriptElement = (<HTMLScriptElement> this._rootSVG.node());
+          var elem: HTMLScriptElement = (<HTMLScriptElement> this.rootSVG.node());
           availableWidth  = Utils.DOM.getElementWidth(elem);
           availableHeight = Utils.DOM.getElementHeight(elem);
         } else {
           throw new Error("null arguments cannot be passed to _computeLayout() on a non-root node");
         }
       }
-      var size = this._getSize(availableWidth, availableHeight);
+      var size = this.getSize(availableWidth, availableHeight);
       this._width = size.width;
       this._height = size.height;
-      this._xOrigin = offeredXOrigin + this._xOffset + (availableWidth - this.width()) * this._xAlignProportion;
-      this._yOrigin = offeredYOrigin + this._yOffset + (availableHeight - this.height()) * this._yAlignProportion;
-      this._element.attr("transform", "translate(" + this._xOrigin + "," + this._yOrigin + ")");
-      this._boxes.forEach((b: D3.Selection) => b.attr("width", this.width()).attr("height", this.height()));
+      this.xOrigin = offeredXOrigin + this._xOffset + (availableWidth - this.width()) * this.xAlignProportion;
+      this.yOrigin = offeredYOrigin + this._yOffset + (availableHeight - this.height()) * this.yAlignProportion;
+      this.element.attr("transform", "translate(" + this.xOrigin + "," + this.yOrigin + ")");
+      this.boxes.forEach((b: D3.Selection) => b.attr("width", this.width()).attr("height", this.height()));
     }
 
-    protected _getSize(availableWidth: number, availableHeight: number) {
-      var requestedSpace = this._requestedSpace(availableWidth, availableHeight);
+    protected getSize(availableWidth: number, availableHeight: number) {
+      var requestedSpace = this.requestedSpace(availableWidth, availableHeight);
       return {
-        width: this._isFixedWidth()  ? Math.min(availableWidth , requestedSpace.width)  : availableWidth,
-        height: this._isFixedHeight() ? Math.min(availableHeight, requestedSpace.height) : availableHeight
+        width: this.isFixedWidth()  ? Math.min(availableWidth , requestedSpace.width)  : availableWidth,
+        height: this.isFixedHeight() ? Math.min(availableHeight, requestedSpace.height) : availableHeight
       };
     }
 
-    public _render() {
-      if (this._isAnchored && this._isSetup && this.width() >= 0 && this.height() >= 0) {
+    public render() {
+      if (this.isAnchored && this.isSetup && this.width() >= 0 && this.height() >= 0) {
         Core.RenderControllers.registerToRender(this);
       }
     }
 
-    private _scheduleComputeLayout() {
-      if (this._isAnchored && this._isSetup) {
+    private scheduleComputeLayout() {
+      if (this.isAnchored && this.isSetup) {
         Core.RenderControllers.registerToComputeLayout(this);
       }
     }
 
-    public _doRender() {/* overwrite */}
+    public doRender() {/* overwrite */}
 
-    public _useLastCalculatedLayout(): boolean;
-    public _useLastCalculatedLayout(useLast: boolean): Component;
-    public _useLastCalculatedLayout(useLast?: boolean): any {
+    public useLastCalculatedLayout(): boolean;
+    public useLastCalculatedLayout(useLast: boolean): Component;
+    public useLastCalculatedLayout(useLast?: boolean): any {
       if (useLast == null) {
-        return this._usedLastLayout;
+        return this.usedLastLayout;
       } else {
-        this._usedLastLayout = useLast;
+        this.usedLastLayout = useLast;
         return this;
       }
     }
 
-    public _invalidateLayout() {
-      this._useLastCalculatedLayout(false);
-      if (this._isAnchored && this._isSetup) {
-        if (this._isTopLevelComponent) {
-          this._scheduleComputeLayout();
+    public invalidateLayout() {
+      this.useLastCalculatedLayout(false);
+      if (this.isAnchored && this.isSetup) {
+        if (this.isTopLevelComponent) {
+          this.scheduleComputeLayout();
         } else {
-          this._parent()._invalidateLayout();
+          this.parent().invalidateLayout();
         }
       }
     }
@@ -204,14 +204,14 @@ module Plottable {
         if (!selection.node() || selection.node().nodeName.toLowerCase() !== "svg") {
           throw new Error("Plottable requires a valid SVG to renderTo");
         }
-        this._anchor(selection);
+        this.anchor(selection);
       }
-      if (this._element == null) {
+      if (this.element == null) {
         throw new Error("If a component has never been rendered before, then renderTo must be given a node to render to, \
           or a D3.Selection, or a selector string");
       }
-      this._computeLayout();
-      this._render();
+      this.computeLayout();
+      this.render();
       // flush so that consumers can immediately attach to stuff we create in the DOM
       Core.RenderControllers.flush();
       return this;
@@ -226,7 +226,7 @@ module Plottable {
      * @returns {Component} The calling component.
      */
     public redraw(): Component {
-      this._invalidateLayout();
+      this.invalidateLayout();
       return this;
     }
 
@@ -244,15 +244,15 @@ module Plottable {
     public xAlign(alignment: string): Component {
       alignment = alignment.toLowerCase();
       if (alignment === "left") {
-        this._xAlignProportion = 0;
+        this.xAlignProportion = 0;
       } else if (alignment === "center") {
-        this._xAlignProportion = 0.5;
+        this.xAlignProportion = 0.5;
       } else if (alignment === "right") {
-        this._xAlignProportion = 1;
+        this.xAlignProportion = 1;
       } else {
         throw new Error("Unsupported alignment");
       }
-      this._invalidateLayout();
+      this.invalidateLayout();
       return this;
     }
 
@@ -270,15 +270,15 @@ module Plottable {
     public yAlign(alignment: string): Component {
       alignment = alignment.toLowerCase();
       if (alignment === "top") {
-        this._yAlignProportion = 0;
+        this.yAlignProportion = 0;
       } else if (alignment === "center") {
-        this._yAlignProportion = 0.5;
+        this.yAlignProportion = 0.5;
       } else if (alignment === "bottom") {
-        this._yAlignProportion = 1;
+        this.yAlignProportion = 1;
       } else {
         throw new Error("Unsupported alignment");
       }
-      this._invalidateLayout();
+      this.invalidateLayout();
       return this;
     }
 
@@ -292,7 +292,7 @@ module Plottable {
      */
     public xOffset(offset: number): Component {
       this._xOffset = offset;
-      this._invalidateLayout();
+      this.invalidateLayout();
       return this;
     }
 
@@ -306,35 +306,35 @@ module Plottable {
      */
     public yOffset(offset: number): Component {
       this._yOffset = offset;
-      this._invalidateLayout();
+      this.invalidateLayout();
       return this;
     }
 
-    private _addBox(className?: string, parentElement?: D3.Selection) {
-      if (this._element == null) {
+    private addBox(className?: string, parentElement?: D3.Selection) {
+      if (this.element == null) {
         throw new Error("Adding boxes before anchoring is currently disallowed");
       }
-      parentElement = parentElement == null ? this._boxContainer : parentElement;
+      parentElement = parentElement == null ? this.boxContainer : parentElement;
       var box = parentElement.append("rect");
       if (className != null) { box.classed(className, true); }
 
-      this._boxes.push(box);
+      this.boxes.push(box);
       if (this.width() != null && this.height() != null) {
         box.attr("width", this.width()).attr("height", this.height());
       }
       return box;
     }
 
-    private _generateClipPath() {
+    private generateClipPath() {
       // The clip path will prevent content from overflowing its component space.
       // HACKHACK: IE <=9 does not respect the HTML base element in SVG.
       // They don't need the current URL in the clip path reference.
       var prefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
       prefix = prefix.split("#")[0]; // To fix cases where an anchor tag was used
-      this._element.attr("clip-path", "url(\"" + prefix + "#clipPath" + this.getID() + "\")");
-      var clipPathParent = this._boxContainer.append("clipPath")
+      this.element.attr("clip-path", "url(\"" + prefix + "#clipPath" + this.getID() + "\")");
+      var clipPathParent = this.boxContainer.append("clipPath")
                                       .attr("id", "clipPath" + this.getID());
-      this._addBox("clip-rect", clipPathParent);
+      this.addBox("clip-rect", clipPathParent);
     }
 
     /**
@@ -347,14 +347,14 @@ module Plottable {
       // Interactions can be registered before or after anchoring. If registered before, they are
       // pushed to this._interactionsToRegister and registered during anchoring. If after, they are
       // registered immediately
-      if (this._element) {
+      if (this.element) {
         if (!this._hitBox && interaction._requiresHitbox()) {
-            this._hitBox = this._addBox("hit-box");
+            this._hitBox = this.addBox("hit-box");
             this._hitBox.style("fill", "#ffffff").style("opacity", 0); // We need to set these so Chrome will register events
         }
-        interaction._anchor(this, this._hitBox);
+        interaction.anchor(this, this._hitBox);
       } else {
-        this._interactionsToRegister.push(interaction);
+        this.interactionsToRegister.push(interaction);
       }
       return this;
     }
@@ -378,24 +378,24 @@ module Plottable {
       if (addClass == null) {
         if (cssClass == null) {
           return false;
-        } else if (this._element == null) {
-          return (this._cssClasses.indexOf(cssClass) !== -1);
+        } else if (this.element == null) {
+          return (this.cssClasses.indexOf(cssClass) !== -1);
         } else {
-          return this._element.classed(cssClass);
+          return this.element.classed(cssClass);
         }
       } else {
         if (cssClass == null) {
           return this;
         }
-        if (this._element == null) {
-          var classIndex = this._cssClasses.indexOf(cssClass);
+        if (this.element == null) {
+          var classIndex = this.cssClasses.indexOf(cssClass);
           if (addClass && classIndex === -1) {
-            this._cssClasses.push(cssClass);
+            this.cssClasses.push(cssClass);
           } else if (!addClass && classIndex !== -1) {
-            this._cssClasses.splice(classIndex, 1);
+            this.cssClasses.splice(classIndex, 1);
           }
         } else {
-          this._element.classed(cssClass, addClass);
+          this.element.classed(cssClass, addClass);
         }
         return this;
       }
@@ -407,8 +407,8 @@ module Plottable {
      *
      * @returns {boolean} Whether the component has a fixed width.
      */
-    public _isFixedWidth(): boolean {
-      return this._fixedWidthFlag;
+    public isFixedWidth(): boolean {
+      return this.fixedWidthFlag;
     }
 
     /**
@@ -417,11 +417,11 @@ module Plottable {
      *
      * @returns {boolean} Whether the component has a fixed height.
      */
-    public _isFixedHeight(): boolean {
-      return this._fixedHeightFlag;
+    public isFixedHeight(): boolean {
+      return this.fixedHeightFlag;
     }
 
-    public _merge(c: Component, below: boolean): Components.Group {
+    public merge(c: Component, below: boolean): Components.Group {
       var cg: Components.Group;
       if (Plottable.Components.Group.prototype.isPrototypeOf(c)) {
         cg = (<Plottable.Components.Group> c);
@@ -448,7 +448,7 @@ module Plottable {
      * @returns {ComponentGroup} The relevant ComponentGroup out of the above four cases.
      */
     public above(c: Component): Components.Group {
-      return this._merge(c, false);
+      return this.merge(c, false);
     }
 
     /**
@@ -465,7 +465,7 @@ module Plottable {
      * @returns {ComponentGroup} The relevant ComponentGroup out of the above four cases.
      */
     public below(c: Component): Components.Group {
-      return this._merge(c, true);
+      return this.merge(c, true);
     }
 
     /**
@@ -477,29 +477,29 @@ module Plottable {
      * @returns The calling Component.
      */
     public detach() {
-      if (this._isAnchored) {
-        this._element.remove();
+      if (this.isAnchored) {
+        this.element.remove();
       }
 
-      var parent: ComponentContainer = this._parent();
+      var parent: ComponentContainer = this.parent();
 
       if (parent != null) {
-        parent._removeComponent(this);
+        parent.removeComponent(this);
       }
-      this._isAnchored = false;
-      this._parentElement = null;
+      this.isAnchored = false;
+      this.parentElement = null;
       return this;
     }
 
-    public _parent(): ComponentContainer;
-    public _parent(parentElement: ComponentContainer): any;
-    public _parent(parentElement?: ComponentContainer): any {
+    public parent(): ComponentContainer;
+    public parent(parentElement: ComponentContainer): any;
+    public parent(parentElement?: ComponentContainer): any {
       if (parentElement === undefined) {
-        return this._parentElement;
+        return this.parentElement;
       }
 
       this.detach();
-      this._parentElement = parentElement;
+      this.parentElement = parentElement;
     }
 
     /**
@@ -507,7 +507,7 @@ module Plottable {
      * listening to (effectively destroying it).
      */
     public remove() {
-      this._removed = true;
+      this.removed = true;
       this.detach();
     }
 
@@ -536,8 +536,8 @@ module Plottable {
      */
     public origin(): Point {
       return {
-        x: this._xOrigin,
-        y: this._yOrigin
+        x: this.xOrigin,
+        y: this.yOrigin
       };
     }
 
@@ -548,12 +548,12 @@ module Plottable {
      */
     public originToSVG(): Point {
       var origin = this.origin();
-      var ancestor = this._parent();
+      var ancestor = this.parent();
       while (ancestor != null) {
         var ancestorOrigin = ancestor.origin();
         origin.x += ancestorOrigin.x;
         origin.y += ancestorOrigin.y;
-        ancestor = ancestor._parent();
+        ancestor = ancestor.parent();
       }
       return origin;
     }
@@ -567,7 +567,7 @@ module Plottable {
      * @return {D3.Selection} foreground selection for the Component
      */
     public foreground(): D3.Selection {
-      return this._foregroundContainer;
+      return this.foregroundContainer;
     }
 
     /**
@@ -591,7 +591,7 @@ module Plottable {
      * @return {D3.Selection} background selection for the Component
      */
     public background(): D3.Selection {
-      return this._backgroundContainer;
+      return this.backgroundContainer;
     }
 
     /**

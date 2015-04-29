@@ -48,8 +48,8 @@ export module Interactions {
       this._zoom(this._hitBox);
     }
 
-    public _anchor(component: Component, hitBox: D3.Selection) {
-      super._anchor(component, hitBox);
+    public anchor(component: Component, hitBox: D3.Selection) {
+      super.anchor(component, hitBox);
       this.resetZoom();
     }
 
