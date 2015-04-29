@@ -948,7 +948,7 @@ declare module Plottable {
 declare module Plottable {
     class QuantitativeScale<D> extends Scale<D, number> {
         protected d3Scale: D3.Scale.QuantitativeScale;
-        _userSetDomainer: boolean;
+        userSetDomainer: boolean;
         typeCoercer: (d: any) => number;
         /**
          * Constructs a new QuantitativeScaleScale.
@@ -1032,7 +1032,7 @@ declare module Plottable {
          * Given a domain, expands its domain onto "nice" values, e.g. whole
          * numbers.
          */
-        _niceDomain(domain: any[], count?: number): any[];
+        niceDomain(domain: any[], count?: number): any[];
         /**
          * Gets a Domainer of a scale. A Domainer is responsible for combining
          * multiple extents into a single domain.
@@ -1052,7 +1052,7 @@ declare module Plottable {
          * @return {QuantitativeScale} The calling QuantitativeScaleScale.
          */
         domainer(domainer: Domainer): QuantitativeScale<D>;
-        _defaultExtent(): any[];
+        defaultExtent(): any[];
         /**
          * Gets the tick generator of the QuantitativeScale.
          *
@@ -1160,7 +1160,7 @@ declare module Plottable {
             protected setDomain(values: number[]): void;
             ticks(count?: number): number[];
             copy(): ModifiedLog;
-            _niceDomain(domain: any[], count?: number): any[];
+            niceDomain(domain: any[], count?: number): any[];
             /**
              * Gets whether or not to return tick values other than powers of base.
              *

@@ -47,13 +47,13 @@ module Plottable {
       if (this._combineExtents != null) {
         domain = this._combineExtents(extents);
       } else if (extents.length === 0) {
-        domain = scale._defaultExtent();
+        domain = scale.defaultExtent();
       } else {
         domain = [Utils.Methods.min(extents, (e) => e[0], 0), Utils.Methods.max(extents, (e) => e[1], 0)];
       }
       domain = this._includeDomain(domain);
       domain = this._padDomain(scale, domain);
-      domain = this._niceDomain(scale, domain);
+      domain = this.niceDomain(scale, domain);
       return domain;
     }
 
@@ -201,9 +201,9 @@ module Plottable {
       return [newMin, newMax];
     }
 
-    private _niceDomain(scale: QuantitativeScale<any>, domain: any[]): any[] {
+    private niceDomain(scale: QuantitativeScale<any>, domain: any[]): any[] {
       if (this._doNice) {
-        return scale._niceDomain(domain, this._niceCount);
+        return scale.niceDomain(domain, this._niceCount);
       } else {
         return domain;
       }

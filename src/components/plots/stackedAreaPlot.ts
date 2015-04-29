@@ -49,7 +49,7 @@ export module Plots {
     protected _updateYDomainer() {
       super._updateYDomainer();
       var scale = <QuantitativeScale<any>> this._yScale;
-      if (!scale._userSetDomainer) {
+      if (!scale.userSetDomainer) {
         scale.domainer().addPaddingException(0, "STACKED_AREA_PLOT+" + this.getID())
                         .addIncludedValue(0, "STACKED_AREA_PLOT+" + this.getID());
         // prepending "AREA_PLOT" is unnecessary but reduces likely of user accidentally creating collisions

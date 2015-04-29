@@ -54,7 +54,7 @@ export module Plots {
         }
       }
 
-      if (!this._yScale._userSetDomainer) {
+      if (!this._yScale.userSetDomainer) {
         if (constantBaseline != null) {
           this._yScale.domainer().addPaddingException(constantBaseline, "AREA_PLOT+" + this.getID());
         } else {

@@ -273,7 +273,7 @@ export module Plots {
     protected _updateDomainer(scale: Scale<any, number>) {
       if (scale instanceof QuantitativeScale) {
         var qscale = <QuantitativeScale<any>> scale;
-        if (!qscale._userSetDomainer) {
+        if (!qscale.userSetDomainer) {
           if (this._baselineValue != null) {
             qscale.domainer()
               .addPaddingException(this._baselineValue, "BAR_PLOT+" + this.getID())

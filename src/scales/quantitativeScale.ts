@@ -4,8 +4,8 @@ module Plottable {
   export class QuantitativeScale<D> extends Scale<D, number> {
     protected d3Scale: D3.Scale.QuantitativeScale;
     private _numTicks = 10;
-    private _PADDING_FOR_IDENTICAL_DOMAIN = 1;
-    public _userSetDomainer: boolean = false;
+    private PADDING_FOR_IDENTICAL_DOMAIN = 1;
+    public userSetDomainer: boolean = false;
     private _domainer: Domainer = new Domainer();
     public typeCoercer = (d: any) => +d;
     private _tickGenerator: Scales.TickGenerators.TickGenerator<D> = (scale: Plottable.QuantitativeScale<D>) => scale.getDefaultTicks();
@@ -151,7 +151,7 @@ module Plottable {
      * Given a domain, expands its domain onto "nice" values, e.g. whole
      * numbers.
      */
-    public _niceDomain(domain: any[], count?: number): any[] {
+    public niceDomain(domain: any[], count?: number): any[] {
       return this.d3Scale.copy().domain(domain).nice(count).domain();
     }
 
@@ -179,13 +179,13 @@ module Plottable {
         return this._domainer;
       } else {
         this._domainer = domainer;
-        this._userSetDomainer = true;
+        this.userSetDomainer = true;
         this.autoDomainIfAutomaticMode();
         return this;
       }
     }
 
-    public _defaultExtent(): any[] {
+    public defaultExtent(): any[] {
       return [0, 1];
     }
 

@@ -1512,14 +1512,14 @@ var Plottable;
                 domain = this._combineExtents(extents);
             }
             else if (extents.length === 0) {
-                domain = scale._defaultExtent();
+                domain = scale.defaultExtent();
             }
             else {
                 domain = [Plottable.Utils.Methods.min(extents, function (e) { return e[0]; }, 0), Plottable.Utils.Methods.max(extents, function (e) { return e[1]; }, 0)];
             }
             domain = this._includeDomain(domain);
             domain = this._padDomain(scale, domain);
-            domain = this._niceDomain(scale, domain);
+            domain = this.niceDomain(scale, domain);
             return domain;
         };
         /**
@@ -1660,9 +1660,9 @@ var Plottable;
             }
             return [newMin, newMax];
         };
-        Domainer.prototype._niceDomain = function (scale, domain) {
+        Domainer.prototype.niceDomain = function (scale, domain) {
             if (this._doNice) {
-                return scale._niceDomain(domain, this._niceCount);
+                return scale.niceDomain(domain, this._niceCount);
             }
             else {
                 return domain;
@@ -1838,8 +1838,8 @@ var Plottable;
         function QuantitativeScale(scale) {
             _super.call(this, scale);
             this._numTicks = 10;
-            this._PADDING_FOR_IDENTICAL_DOMAIN = 1;
-            this._userSetDomainer = false;
+            this.PADDING_FOR_IDENTICAL_DOMAIN = 1;
+            this.userSetDomainer = false;
             this._domainer = new Plottable.Domainer();
             this.typeCoercer = function (d) { return +d; };
             this._tickGenerator = function (scale) { return scale.getDefaultTicks(); };
@@ -1923,7 +1923,7 @@ var Plottable;
          * Given a domain, expands its domain onto "nice" values, e.g. whole
          * numbers.
          */
-        QuantitativeScale.prototype._niceDomain = function (domain, count) {
+        QuantitativeScale.prototype.niceDomain = function (domain, count) {
             return this.d3Scale.copy().domain(domain).nice(count).domain();
         };
         QuantitativeScale.prototype.domainer = function (domainer) {
@@ -1932,12 +1932,12 @@ var Plottable;
             }
             else {
                 this._domainer = domainer;
-                this._userSetDomainer = true;
+                this.userSetDomainer = true;
                 this.autoDomainIfAutomaticMode();
                 return this;
             }
         };
-        QuantitativeScale.prototype._defaultExtent = function () {
+        QuantitativeScale.prototype.defaultExtent = function () {
             return [0, 1];
         };
         QuantitativeScale.prototype.tickGenerator = function (generator) {
@@ -2067,7 +2067,7 @@ var Plottable;
                 this._showIntermediateTicks = false;
                 this.base = base;
                 this.pivot = this.base;
-                this.untransformedDomain = this._defaultExtent();
+                this.untransformedDomain = this.defaultExtent();
                 this.numTicks(10);
                 if (base <= 1) {
                     throw new Error("ModifiedLogScale: The base must be > 1");
@@ -2188,7 +2188,7 @@ var Plottable;
             ModifiedLog.prototype.copy = function () {
                 return new ModifiedLog(this.base);
             };
-            ModifiedLog.prototype._niceDomain = function (domain, count) {
+            ModifiedLog.prototype.niceDomain = function (domain, count) {
                 return domain;
             };
             ModifiedLog.prototype.showIntermediateTicks = function (show) {
@@ -2494,9 +2494,9 @@ var Plottable;
             function InterpolatedColor(colorRange, scaleType) {
                 if (colorRange === void 0) { colorRange = "reds"; }
                 if (scaleType === void 0) { scaleType = "linear"; }
-                this._colorRange = this._resolveColorValues(colorRange);
+                this._colorRange = this.resolveColorValues(colorRange);
                 this._scaleType = scaleType;
-                _super.call(this, InterpolatedColor._getD3InterpolatedScale(this._colorRange, this._scaleType));
+                _super.call(this, InterpolatedColor.getD3InterpolatedScale(this._colorRange, this._scaleType));
             }
             /**
              * Converts the string array into a d3 scale.
@@ -2507,7 +2507,7 @@ var Plottable;
              *     type ("linear"/"log"/"sqrt"/"pow")
              * @returns {D3.Scale.QuantitativeScaleScale} The converted QuantitativeScale d3 scale.
              */
-            InterpolatedColor._getD3InterpolatedScale = function (colors, scaleType) {
+            InterpolatedColor.getD3InterpolatedScale = function (colors, scaleType) {
                 var scale;
                 switch (scaleType) {
                     case "linear":
@@ -2526,7 +2526,7 @@ var Plottable;
                 if (scale == null) {
                     throw new Error("unknown QuantitativeScale scale type " + scaleType);
                 }
-                return scale.range([0, 1]).interpolate(InterpolatedColor._interpolateColors(colors));
+                return scale.range([0, 1]).interpolate(InterpolatedColor.interpolateColors(colors));
             };
             /**
              * Creates a d3 interpolator given the color array.
@@ -2537,7 +2537,7 @@ var Plottable;
              *     values in hex ("#FFFFFF") or keywords ("white").
              * @returns {D3.Transition.Interpolate} The d3 interpolator for colors.
              */
-            InterpolatedColor._interpolateColors = function (colors) {
+            InterpolatedColor.interpolateColors = function (colors) {
                 if (colors.length < 2) {
                     throw new Error("Color scale arrays must have at least two elements.");
                 }
@@ -2560,8 +2560,8 @@ var Plottable;
                 if (colorRange == null) {
                     return this._colorRange;
                 }
-                this._colorRange = this._resolveColorValues(colorRange);
-                this._resetScale();
+                this._colorRange = this.resolveColorValues(colorRange);
+                this.resetScale();
                 return this;
             };
             InterpolatedColor.prototype.scaleType = function (scaleType) {
@@ -2569,23 +2569,23 @@ var Plottable;
                     return this._scaleType;
                 }
                 this._scaleType = scaleType;
-                this._resetScale();
+                this.resetScale();
                 return this;
             };
-            InterpolatedColor.prototype._resetScale = function () {
-                this.d3Scale = InterpolatedColor._getD3InterpolatedScale(this._colorRange, this._scaleType);
+            InterpolatedColor.prototype.resetScale = function () {
+                this.d3Scale = InterpolatedColor.getD3InterpolatedScale(this._colorRange, this._scaleType);
                 this.autoDomainIfAutomaticMode();
                 this.broadcaster.broadcast();
             };
-            InterpolatedColor.prototype._resolveColorValues = function (colorRange) {
+            InterpolatedColor.prototype.resolveColorValues = function (colorRange) {
                 if (typeof (colorRange) === "object") {
                     return colorRange;
                 }
-                else if (InterpolatedColor._COLOR_SCALES[colorRange] != null) {
-                    return InterpolatedColor._COLOR_SCALES[colorRange];
+                else if (InterpolatedColor.COLOR_SCALES[colorRange] != null) {
+                    return InterpolatedColor.COLOR_SCALES[colorRange];
                 }
                 else {
-                    return InterpolatedColor._COLOR_SCALES["reds"];
+                    return InterpolatedColor.COLOR_SCALES["reds"];
                 }
             };
             InterpolatedColor.prototype.autoDomain = function () {
@@ -2596,7 +2596,7 @@ var Plottable;
                 }
                 return this;
             };
-            InterpolatedColor._COLOR_SCALES = {
+            InterpolatedColor.COLOR_SCALES = {
                 reds: [
                     "#FFFFFF",
                     "#FFF6E1",
@@ -7129,7 +7129,7 @@ var Plottable;
         XYPlot.prototype._updateXDomainer = function () {
             if (this._xScale instanceof Plottable.QuantitativeScale) {
                 var scale = this._xScale;
-                if (!scale._userSetDomainer) {
+                if (!scale.userSetDomainer) {
                     scale.domainer().pad().nice();
                 }
             }
@@ -7137,7 +7137,7 @@ var Plottable;
         XYPlot.prototype._updateYDomainer = function () {
             if (this._yScale instanceof Plottable.QuantitativeScale) {
                 var scale = this._yScale;
-                if (!scale._userSetDomainer) {
+                if (!scale.userSetDomainer) {
                     scale.domainer().pad().nice();
                 }
             }
@@ -7652,7 +7652,7 @@ var Plottable;
             Bar.prototype._updateDomainer = function (scale) {
                 if (scale instanceof Plottable.QuantitativeScale) {
                     var qscale = scale;
-                    if (!qscale._userSetDomainer) {
+                    if (!qscale.userSetDomainer) {
                         if (this._baselineValue != null) {
                             qscale.domainer().addPaddingException(this._baselineValue, "BAR_PLOT+" + this.getID()).addIncludedValue(this._baselineValue, "BAR_PLOT+" + this.getID());
                         }
@@ -8050,7 +8050,7 @@ var Plottable;
                         constantBaseline = uniqExtentVals[0];
                     }
                 }
-                if (!this._yScale._userSetDomainer) {
+                if (!this._yScale.userSetDomainer) {
                     if (constantBaseline != null) {
                         this._yScale.domainer().addPaddingException(constantBaseline, "AREA_PLOT+" + this.getID());
                     }
@@ -8421,7 +8421,7 @@ var Plottable;
             StackedArea.prototype._updateYDomainer = function () {
                 _super.prototype._updateYDomainer.call(this);
                 var scale = this._yScale;
-                if (!scale._userSetDomainer) {
+                if (!scale.userSetDomainer) {
                     scale.domainer().addPaddingException(0, "STACKED_AREA_PLOT+" + this.getID()).addIncludedValue(0, "STACKED_AREA_PLOT+" + this.getID());
                     // prepending "AREA_PLOT" is unnecessary but reduces likely of user accidentally creating collisions
                     scale.autoDomainIfAutomaticMode();
