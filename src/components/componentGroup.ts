@@ -23,13 +23,13 @@ export module Components {
       components.forEach((c: Component) => this._addComponent(c));
     }
 
-    public _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
+    public _requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest {
       var requests = this.components().map((c: Component) => c._requestedSpace(offeredWidth, offeredHeight));
       return {
-        width: Utils.Methods.max<_SpaceRequest, number>(requests, (request: _SpaceRequest) => request.width, 0),
-        height: Utils.Methods.max<_SpaceRequest, number>(requests, (request: _SpaceRequest) => request.height, 0),
-        wantsWidth: requests.map((r: _SpaceRequest) => r.wantsWidth ).some((x: boolean) => x),
-        wantsHeight: requests.map((r: _SpaceRequest) => r.wantsHeight).some((x: boolean) => x)
+        width: Utils.Methods.max<SpaceRequest, number>(requests, (request: SpaceRequest) => request.width, 0),
+        height: Utils.Methods.max<SpaceRequest, number>(requests, (request: SpaceRequest) => request.height, 0),
+        wantsWidth: requests.map((r: SpaceRequest) => r.wantsWidth ).some((x: boolean) => x),
+        wantsHeight: requests.map((r: SpaceRequest) => r.wantsHeight).some((x: boolean) => x)
       };
     }
 

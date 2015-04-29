@@ -1088,12 +1088,12 @@ var Plottable;
          */
         var PlottableObject = (function () {
             function PlottableObject() {
-                this._plottableID = PlottableObject._nextID++;
+                this.plottableID = PlottableObject.nextID++;
             }
             PlottableObject.prototype.getID = function () {
-                return this._plottableID;
+                return this.plottableID;
             };
-            PlottableObject._nextID = 0;
+            PlottableObject.nextID = 0;
             return PlottableObject;
         })();
         Core.PlottableObject = PlottableObject;
@@ -1130,8 +1130,8 @@ var Plottable;
              */
             function Broadcaster(listenable) {
                 _super.call(this);
-                this._key2callback = new Plottable.Utils.StrictEqualityAssociativeArray();
-                this._listenable = listenable;
+                this.key2callback = new Plottable.Utils.StrictEqualityAssociativeArray();
+                this.listenable = listenable;
             }
             /**
              * Registers a callback to be called when the broadcast method is called. Also takes a key which
@@ -1144,7 +1144,7 @@ var Plottable;
              * @returns {Broadcaster} The calling Broadcaster
              */
             Broadcaster.prototype.registerListener = function (key, callback) {
-                this._key2callback.set(key, callback);
+                this.key2callback.set(key, callback);
                 return this;
             };
             /**
@@ -1159,9 +1159,9 @@ var Plottable;
                 for (var _i = 0; _i < arguments.length; _i++) {
                     args[_i - 0] = arguments[_i];
                 }
-                args.unshift(this._listenable);
-                this._key2callback.values().forEach(function (callback) {
-                    callback.apply(_this._listenable, args);
+                args.unshift(this.listenable);
+                this.key2callback.values().forEach(function (callback) {
+                    callback.apply(_this.listenable, args);
                 });
                 return this;
             };
@@ -1172,7 +1172,7 @@ var Plottable;
              * @returns {Broadcaster} The calling Broadcaster
              */
             Broadcaster.prototype.deregisterListener = function (key) {
-                this._key2callback.delete(key);
+                this.key2callback.delete(key);
                 return this;
             };
             /**
@@ -1181,7 +1181,7 @@ var Plottable;
              * @returns {any[]} An array of the keys.
              */
             Broadcaster.prototype.getListenerKeys = function () {
-                return this._key2callback.keys();
+                return this.key2callback.keys();
             };
             /**
              * Deregisters all listeners and callbacks associated with the Broadcaster.
@@ -1189,7 +1189,7 @@ var Plottable;
              * @returns {Broadcaster} The calling Broadcaster
              */
             Broadcaster.prototype.deregisterAllListeners = function () {
-                this._key2callback = new Plottable.Utils.StrictEqualityAssociativeArray();
+                this.key2callback = new Plottable.Utils.StrictEqualityAssociativeArray();
             };
             return Broadcaster;
         })(Core.PlottableObject);
@@ -1224,7 +1224,7 @@ var Plottable;
             _super.call(this);
             this._data = data;
             this._metadata = metadata;
-            this._accessor2cachedExtent = new Plottable.Utils.StrictEqualityAssociativeArray();
+            this.accessor2cachedExtent = new Plottable.Utils.StrictEqualityAssociativeArray();
             this.broadcaster = new Plottable.Core.Broadcaster(this);
         }
         Dataset.prototype.data = function (data) {
@@ -1233,7 +1233,7 @@ var Plottable;
             }
             else {
                 this._data = data;
-                this._accessor2cachedExtent = new Plottable.Utils.StrictEqualityAssociativeArray();
+                this.accessor2cachedExtent = new Plottable.Utils.StrictEqualityAssociativeArray();
                 this.broadcaster.broadcast();
                 return this;
             }
@@ -1244,21 +1244,21 @@ var Plottable;
             }
             else {
                 this._metadata = metadata;
-                this._accessor2cachedExtent = new Plottable.Utils.StrictEqualityAssociativeArray();
+                this.accessor2cachedExtent = new Plottable.Utils.StrictEqualityAssociativeArray();
                 this.broadcaster.broadcast();
                 return this;
             }
         };
-        Dataset.prototype._getExtent = function (accessor, typeCoercer, plotMetadata) {
+        Dataset.prototype.getExtent = function (accessor, typeCoercer, plotMetadata) {
             if (plotMetadata === void 0) { plotMetadata = {}; }
-            var cachedExtent = this._accessor2cachedExtent.get(accessor);
+            var cachedExtent = this.accessor2cachedExtent.get(accessor);
             if (cachedExtent === undefined) {
-                cachedExtent = this._computeExtent(accessor, typeCoercer, plotMetadata);
-                this._accessor2cachedExtent.set(accessor, cachedExtent);
+                cachedExtent = this.computeExtent(accessor, typeCoercer, plotMetadata);
+                this.accessor2cachedExtent.set(accessor, cachedExtent);
             }
             return cachedExtent;
         };
-        Dataset.prototype._computeExtent = function (accessor, typeCoercer, plotMetadata) {
+        Dataset.prototype.computeExtent = function (accessor, typeCoercer, plotMetadata) {
             var _this = this;
             var appliedAccessor = function (d, i) { return accessor(d, i, _this._metadata, plotMetadata); };
             var mappedData = this._data.map(appliedAccessor).map(typeCoercer);
@@ -1325,10 +1325,10 @@ var Plottable;
                  */
                 var Timeout = (function () {
                     function Timeout() {
-                        this._timeoutMsec = Plottable.Utils.DOM.POLYFILL_TIMEOUT_MSEC;
+                        this.timeoutMsec = Plottable.Utils.DOM.POLYFILL_TIMEOUT_MSEC;
                     }
                     Timeout.prototype.render = function () {
-                        setTimeout(RenderControllers.flush, this._timeoutMsec);
+                        setTimeout(RenderControllers.flush, this.timeoutMsec);
                     };
                     return Timeout;
                 })();
@@ -1363,11 +1363,11 @@ var Plottable;
          */
         var RenderControllers;
         (function (RenderControllers) {
-            var _componentsNeedingRender = {};
-            var _componentsNeedingComputeLayout = {};
-            var _animationRequested = false;
-            var _isCurrentlyFlushing = false;
-            RenderControllers._renderPolicy = new RenderControllers.RenderPolicies.AnimationFrame();
+            var componentsNeedingRender = {};
+            var componentsNeedingComputeLayout = {};
+            var animationRequested = false;
+            var isCurrentlyFlushing = false;
+            RenderControllers.renderPolicy = new RenderControllers.RenderPolicies.AnimationFrame();
             function setRenderPolicy(policy) {
                 if (typeof (policy) === "string") {
                     switch (policy.toLowerCase()) {
@@ -1385,7 +1385,7 @@ var Plottable;
                             return;
                     }
                 }
-                RenderControllers._renderPolicy = policy;
+                RenderControllers.renderPolicy = policy;
             }
             RenderControllers.setRenderPolicy = setRenderPolicy;
             /**
@@ -1395,10 +1395,10 @@ var Plottable;
              * @param {Component} component Any Plottable component.
              */
             function registerToRender(c) {
-                if (_isCurrentlyFlushing) {
+                if (isCurrentlyFlushing) {
                     Plottable.Utils.Methods.warn("Registered to render while other components are flushing: request may be ignored");
                 }
-                _componentsNeedingRender[c.getID()] = c;
+                componentsNeedingRender[c.getID()] = c;
                 requestRender();
             }
             RenderControllers.registerToRender = registerToRender;
@@ -1409,16 +1409,16 @@ var Plottable;
              * @param {Component} component Any Plottable component.
              */
             function registerToComputeLayout(c) {
-                _componentsNeedingComputeLayout[c.getID()] = c;
-                _componentsNeedingRender[c.getID()] = c;
+                componentsNeedingComputeLayout[c.getID()] = c;
+                componentsNeedingRender[c.getID()] = c;
                 requestRender();
             }
             RenderControllers.registerToComputeLayout = registerToComputeLayout;
             function requestRender() {
                 // Only run or enqueue flush on first request.
-                if (!_animationRequested) {
-                    _animationRequested = true;
-                    RenderControllers._renderPolicy.render();
+                if (!animationRequested) {
+                    animationRequested = true;
+                    RenderControllers.renderPolicy.render();
                 }
             }
             /**
@@ -1428,21 +1428,21 @@ var Plottable;
              * Useful to call when debugging.
              */
             function flush() {
-                if (_animationRequested) {
+                if (animationRequested) {
                     // Layout
-                    var toCompute = d3.values(_componentsNeedingComputeLayout);
+                    var toCompute = d3.values(componentsNeedingComputeLayout);
                     toCompute.forEach(function (c) { return c._computeLayout(); });
                     // Top level render.
                     // Containers will put their children in the toRender queue
-                    var toRender = d3.values(_componentsNeedingRender);
+                    var toRender = d3.values(componentsNeedingRender);
                     toRender.forEach(function (c) { return c._render(); });
                     // now we are flushing
-                    _isCurrentlyFlushing = true;
+                    isCurrentlyFlushing = true;
                     // Finally, perform render of all components
                     var failed = {};
-                    Object.keys(_componentsNeedingRender).forEach(function (k) {
+                    Object.keys(componentsNeedingRender).forEach(function (k) {
                         try {
-                            _componentsNeedingRender[k]._doRender();
+                            componentsNeedingRender[k]._doRender();
                         }
                         catch (err) {
                             // using setTimeout instead of console.log, we get the familiar red
@@ -1450,14 +1450,14 @@ var Plottable;
                             setTimeout(function () {
                                 throw err;
                             }, 0);
-                            failed[k] = _componentsNeedingRender[k];
+                            failed[k] = componentsNeedingRender[k];
                         }
                     });
                     // Reset queues
-                    _componentsNeedingComputeLayout = {};
-                    _componentsNeedingRender = failed;
-                    _animationRequested = false;
-                    _isCurrentlyFlushing = false;
+                    componentsNeedingComputeLayout = {};
+                    componentsNeedingRender = failed;
+                    animationRequested = false;
+                    isCurrentlyFlushing = false;
                 }
             }
             RenderControllers.flush = flush;
@@ -1488,14 +1488,14 @@ var Plottable;
          *        the min of the first elements and the max of the second arguments.
          */
         function Domainer(combineExtents) {
-            this._doNice = false;
-            this._padProportion = 0.0;
-            this._paddingExceptions = d3.map();
-            this._unregisteredPaddingExceptions = d3.set();
-            this._includedValues = d3.map();
+            this.doNice = false;
+            this.padProportion = 0.0;
+            this.paddingExceptions = d3.map();
+            this.unregisteredPaddingExceptions = d3.set();
+            this.includedValues = d3.map();
             // _includedValues needs to be a map, even unregistered, to support getting un-stringified values back out
-            this._unregisteredIncludedValues = d3.map();
-            this._combineExtents = combineExtents;
+            this.unregisteredIncludedValues = d3.map();
+            this.combineExtents = combineExtents;
         }
         /**
          * @param {any[][]} extents The list of extents to be reduced to a single
@@ -1508,8 +1508,8 @@ var Plottable;
          */
         Domainer.prototype.computeDomain = function (extents, scale) {
             var domain;
-            if (this._combineExtents != null) {
-                domain = this._combineExtents(extents);
+            if (this.combineExtents != null) {
+                domain = this.combineExtents(extents);
             }
             else if (extents.length === 0) {
                 domain = scale.defaultExtent();
@@ -1517,8 +1517,8 @@ var Plottable;
             else {
                 domain = [Plottable.Utils.Methods.min(extents, function (e) { return e[0]; }, 0), Plottable.Utils.Methods.max(extents, function (e) { return e[1]; }, 0)];
             }
-            domain = this._includeDomain(domain);
-            domain = this._padDomain(scale, domain);
+            domain = this.includeDomain(domain);
+            domain = this.padDomain(scale, domain);
             domain = this.niceDomain(scale, domain);
             return domain;
         };
@@ -1538,7 +1538,7 @@ var Plottable;
          */
         Domainer.prototype.pad = function (padProportion) {
             if (padProportion === void 0) { padProportion = 0.05; }
-            this._padProportion = padProportion;
+            this.padProportion = padProportion;
             return this;
         };
         /**
@@ -1554,10 +1554,10 @@ var Plottable;
          */
         Domainer.prototype.addPaddingException = function (exception, key) {
             if (key != null) {
-                this._paddingExceptions.set(key, exception);
+                this.paddingExceptions.set(key, exception);
             }
             else {
-                this._unregisteredPaddingExceptions.add(exception);
+                this.unregisteredPaddingExceptions.add(exception);
             }
             return this;
         };
@@ -1572,10 +1572,10 @@ var Plottable;
          */
         Domainer.prototype.removePaddingException = function (keyOrException) {
             if (typeof (keyOrException) === "string") {
-                this._paddingExceptions.remove(keyOrException);
+                this.paddingExceptions.remove(keyOrException);
             }
             else {
-                this._unregisteredPaddingExceptions.remove(keyOrException);
+                this.unregisteredPaddingExceptions.remove(keyOrException);
             }
             return this;
         };
@@ -1592,10 +1592,10 @@ var Plottable;
          */
         Domainer.prototype.addIncludedValue = function (value, key) {
             if (key != null) {
-                this._includedValues.set(key, value);
+                this.includedValues.set(key, value);
             }
             else {
-                this._unregisteredIncludedValues.set(value, value);
+                this.unregisteredIncludedValues.set(value, value);
             }
             return this;
         };
@@ -1610,10 +1610,10 @@ var Plottable;
          */
         Domainer.prototype.removeIncludedValue = function (valueOrKey) {
             if (typeof (valueOrKey) === "string") {
-                this._includedValues.remove(valueOrKey);
+                this.includedValues.remove(valueOrKey);
             }
             else {
-                this._unregisteredIncludedValues.remove(valueOrKey);
+                this.unregisteredIncludedValues.remove(valueOrKey);
             }
             return this;
         };
@@ -1624,33 +1624,33 @@ var Plottable;
          * @return {Domainer} The calling Domainer.
          */
         Domainer.prototype.nice = function (count) {
-            this._doNice = true;
-            this._niceCount = count;
+            this.doNice = true;
+            this.niceCount = count;
             return this;
         };
-        Domainer.prototype._padDomain = function (scale, domain) {
+        Domainer.prototype.padDomain = function (scale, domain) {
             var min = domain[0];
             var max = domain[1];
             // valueOf accounts for dates properly
-            if (min.valueOf() === max.valueOf() && this._padProportion > 0.0) {
+            if (min.valueOf() === max.valueOf() && this.padProportion > 0.0) {
                 var d = min.valueOf();
                 if (min instanceof Date) {
-                    return [d - Domainer._ONE_DAY, d + Domainer._ONE_DAY];
+                    return [d - Domainer.ONE_DAY, d + Domainer.ONE_DAY];
                 }
                 else {
-                    return [d - Domainer._PADDING_FOR_IDENTICAL_DOMAIN, d + Domainer._PADDING_FOR_IDENTICAL_DOMAIN];
+                    return [d - Domainer.PADDING_FOR_IDENTICAL_DOMAIN, d + Domainer.PADDING_FOR_IDENTICAL_DOMAIN];
                 }
             }
             var scaleDomain = scale.domain();
             if (scaleDomain[0].valueOf() === scaleDomain[1].valueOf()) {
                 return domain;
             }
-            var p = this._padProportion / 2;
+            var p = this.padProportion / 2;
             // This scaling is done to account for log scales and other non-linear
             // scales. A log scale should be padded more on the max than on the min.
             var newMin = scale.invert(scale.scale(min) - (scale.scale(max) - scale.scale(min)) * p);
             var newMax = scale.invert(scale.scale(max) + (scale.scale(max) - scale.scale(min)) * p);
-            var exceptionValues = this._paddingExceptions.values().concat(this._unregisteredPaddingExceptions.values());
+            var exceptionValues = this.paddingExceptions.values().concat(this.unregisteredPaddingExceptions.values());
             var exceptionSet = d3.set(exceptionValues);
             if (exceptionSet.has(min)) {
                 newMin = min;
@@ -1661,19 +1661,19 @@ var Plottable;
             return [newMin, newMax];
         };
         Domainer.prototype.niceDomain = function (scale, domain) {
-            if (this._doNice) {
-                return scale.niceDomain(domain, this._niceCount);
+            if (this.doNice) {
+                return scale.niceDomain(domain, this.niceCount);
             }
             else {
                 return domain;
             }
         };
-        Domainer.prototype._includeDomain = function (domain) {
-            var includedValues = this._includedValues.values().concat(this._unregisteredIncludedValues.values());
+        Domainer.prototype.includeDomain = function (domain) {
+            var includedValues = this.includedValues.values().concat(this.unregisteredIncludedValues.values());
             return includedValues.reduce(function (domain, value) { return [Math.min(domain[0], value), Math.max(domain[1], value)]; }, domain);
         };
-        Domainer._PADDING_FOR_IDENTICAL_DOMAIN = 1;
-        Domainer._ONE_DAY = 1000 * 60 * 60 * 24;
+        Domainer.PADDING_FOR_IDENTICAL_DOMAIN = 1;
+        Domainer.ONE_DAY = 1000 * 60 * 60 * 24;
         return Domainer;
     })();
     Plottable.Domainer = Domainer;
@@ -2447,7 +2447,7 @@ var Plottable;
             Time.prototype.copy = function () {
                 return new Time(this.d3Scale.copy());
             };
-            Time.prototype._defaultExtent = function () {
+            Time.prototype.defaultExtent = function () {
                 var endTime = new Date().valueOf();
                 var startTime = endTime - Plottable.MILLISECONDS_IN_ONE_DAY;
                 return [startTime, endTime];
@@ -6688,7 +6688,7 @@ var Plottable;
                     var plotDatasetKey = _this._key2PlotDatasetKey.get(key);
                     var dataset = plotDatasetKey.dataset;
                     var plotMetadata = plotDatasetKey.plotMetadata;
-                    var extent = dataset._getExtent(projector.accessor, projector.scale.typeCoercer, plotMetadata);
+                    var extent = dataset.getExtent(projector.accessor, projector.scale.typeCoercer, plotMetadata);
                     var scaleKey = _this.getID().toString() + "_" + key;
                     if (extent.length === 0 || !_this._isAnchored) {
                         projector.scale.removeExtent(scaleKey, attr);
@@ -8043,7 +8043,7 @@ var Plottable;
                 var y0Projector = this._projections["y0"];
                 var y0Accessor = y0Projector && y0Projector.accessor;
                 if (y0Accessor != null) {
-                    var extents = this.datasets().map(function (d) { return d._getExtent(y0Accessor, _this._yScale.typeCoercer); });
+                    var extents = this.datasets().map(function (d) { return d.getExtent(y0Accessor, _this._yScale.typeCoercer); });
                     var extent = Plottable.Utils.Methods.flatten(extents);
                     var uniqExtentVals = Plottable.Utils.Methods.uniq(extent);
                     if (uniqExtentVals.length === 1) {

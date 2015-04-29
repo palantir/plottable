@@ -217,11 +217,11 @@ module Plottable {
       }));
     }
 
-    public _keyAccessor(): _Accessor {
+    public _keyAccessor(): Accessor {
        return this._isVertical ? this._projections["x"].accessor : this._projections["y"].accessor;
     }
 
-    public _valueAccessor(): _Accessor {
+    public _valueAccessor(): Accessor {
        return this._isVertical ? this._projections["y"].accessor : this._projections["x"].accessor;
     }
   }

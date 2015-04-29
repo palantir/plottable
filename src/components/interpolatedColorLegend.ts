@@ -132,7 +132,7 @@ export module Components {
       this._writer = new SVGTypewriter.Writers.Writer(this._measurer, this._wrapper);
     }
 
-    public _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
+    public _requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest {
       var textHeight = this._measurer.measure().height;
 
       var ticks = this._generateTicks();

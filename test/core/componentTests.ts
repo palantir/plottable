@@ -219,7 +219,7 @@ describe("Component behavior", () => {
   });
 
   it("componentID works as expected", () => {
-    var expectedID = (<any> Plottable.Core.PlottableObject)._nextID;
+    var expectedID = (<any> Plottable.Core.PlottableObject).nextID;
     var c1 = new Plottable.Component();
     assert.equal(c1.getID(), expectedID, "component id on next component was as expected");
     var c2 = new Plottable.Component();

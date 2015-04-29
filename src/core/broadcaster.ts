@@ -23,8 +23,8 @@ export module Core {
    * The listeners are called synchronously.
    */
   export class Broadcaster<L> extends Core.PlottableObject {
-    private _key2callback = new Utils.StrictEqualityAssociativeArray();
-    private _listenable: L;
+    private key2callback = new Utils.StrictEqualityAssociativeArray();
+    private listenable: L;
 
     /**
      * Constructs a broadcaster, taking a "listenable" object to broadcast about.
@@ -34,7 +34,7 @@ export module Core {
      */
     constructor(listenable: L) {
       super();
-      this._listenable = listenable;
+      this.listenable = listenable;
     }
 
     /**
@@ -48,7 +48,7 @@ export module Core {
      * @returns {Broadcaster} The calling Broadcaster
      */
     public registerListener(key: any, callback: BroadcasterCallback<L>) {
-      this._key2callback.set(key, callback);
+      this.key2callback.set(key, callback);
       return this;
     }
 
@@ -59,9 +59,9 @@ export module Core {
      * @returns {Broadcaster} The calling Broadcaster
      */
     public broadcast(...args: any[]) {
-      args.unshift(this._listenable);
-      this._key2callback.values().forEach((callback) => {
-        callback.apply(this._listenable, args);
+      args.unshift(this.listenable);
+      this.key2callback.values().forEach((callback) => {
+        callback.apply(this.listenable, args);
       });
       return this;
     }
@@ -73,7 +73,7 @@ export module Core {
      * @returns {Broadcaster} The calling Broadcaster
      */
     public deregisterListener(key: any) {
-      this._key2callback.delete(key);
+      this.key2callback.delete(key);
       return this;
     }
 
@@ -83,7 +83,7 @@ export module Core {
      * @returns {any[]} An array of the keys.
      */
     public getListenerKeys() {
-      return this._key2callback.keys();
+      return this.key2callback.keys();
     }
 
     /**
@@ -92,7 +92,7 @@ export module Core {
      * @returns {Broadcaster} The calling Broadcaster
      */
     public deregisterAllListeners() {
-      this._key2callback = new Utils.StrictEqualityAssociativeArray();
+      this.key2callback = new Utils.StrictEqualityAssociativeArray();
     }
   }
 }

@@ -2,13 +2,13 @@
 
 module Plottable {
   type CachedExtent = {
-    accessor: _Accessor;
+    accessor: Accessor;
     extent: any[];
   }
   export class Dataset extends Core.PlottableObject {
     private _data: any[];
     private _metadata: any;
-    private _accessor2cachedExtent: Utils.StrictEqualityAssociativeArray;
+    private accessor2cachedExtent: Utils.StrictEqualityAssociativeArray;
     public broadcaster: Core.Broadcaster<Dataset>;
 
     /**
@@ -25,7 +25,7 @@ module Plottable {
       super();
       this._data = data;
       this._metadata = metadata;
-      this._accessor2cachedExtent = new Utils.StrictEqualityAssociativeArray();
+      this.accessor2cachedExtent = new Utils.StrictEqualityAssociativeArray();
       this.broadcaster = new Core.Broadcaster(this);
     }
 
@@ -47,7 +47,7 @@ module Plottable {
         return this._data;
       } else {
         this._data = data;
-        this._accessor2cachedExtent = new Utils.StrictEqualityAssociativeArray();
+        this.accessor2cachedExtent = new Utils.StrictEqualityAssociativeArray();
         this.broadcaster.broadcast();
         return this;
       }
@@ -72,22 +72,22 @@ module Plottable {
         return this._metadata;
       } else {
         this._metadata = metadata;
-        this._accessor2cachedExtent = new Utils.StrictEqualityAssociativeArray();
+        this.accessor2cachedExtent = new Utils.StrictEqualityAssociativeArray();
         this.broadcaster.broadcast();
         return this;
       }
     }
 
-    public _getExtent(accessor: _Accessor, typeCoercer: (d: any) => any, plotMetadata: any = {}): any[] {
-      var cachedExtent = this._accessor2cachedExtent.get(accessor);
+    public getExtent(accessor: Accessor, typeCoercer: (d: any) => any, plotMetadata: any = {}): any[] {
+      var cachedExtent = this.accessor2cachedExtent.get(accessor);
       if (cachedExtent === undefined) {
-        cachedExtent = this._computeExtent(accessor, typeCoercer, plotMetadata);
-        this._accessor2cachedExtent.set(accessor, cachedExtent);
+        cachedExtent = this.computeExtent(accessor, typeCoercer, plotMetadata);
+        this.accessor2cachedExtent.set(accessor, cachedExtent);
       }
       return cachedExtent;
     }
 
-    private _computeExtent(accessor: _Accessor, typeCoercer: (d: any) => any, plotMetadata: any): any[] {
+    private computeExtent(accessor: Accessor, typeCoercer: (d: any) => any, plotMetadata: any): any[] {
       var appliedAccessor = (d: any, i: number) => accessor(d, i, this._metadata, plotMetadata);
       var mappedData = this._data.map(appliedAccessor).map(typeCoercer);
       if (mappedData.length === 0){
