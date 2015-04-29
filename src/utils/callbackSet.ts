@@ -34,7 +34,7 @@ module Plottable {
       }
 
       public callCallbacks(...args: any[]) {
-        this.values().forEach(function(callback) {
+        this.values().forEach((callback) => {
           callback.apply(this, args);
         });
         return this;

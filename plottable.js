@@ -705,12 +705,13 @@ var Plottable;
                 return this._values;
             };
             CallbackSet.prototype.callCallbacks = function () {
+                var _this = this;
                 var args = [];
                 for (var _i = 0; _i < arguments.length; _i++) {
                     args[_i - 0] = arguments[_i];
                 }
                 this.values().forEach(function (callback) {
-                    callback.apply(this, args);
+                    callback.apply(_this, args);
                 });
                 return this;
             };
