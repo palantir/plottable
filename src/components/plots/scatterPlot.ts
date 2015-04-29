@@ -38,7 +38,7 @@ export module Plots {
       return attrToProjector;
     }
 
-    protected _generateDrawSteps(): Drawers.DrawStep[] {
+    protected generateDrawSteps(): Drawers.DrawStep[] {
       var drawSteps: Drawers.DrawStep[] = [];
       if (this._dataChanged && this._animate) {
         var resetAttrToProjector = this.generateAttrToProjector();

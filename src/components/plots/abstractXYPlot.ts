@@ -2,8 +2,8 @@
 
 module Plottable {
   export class XYPlot<X, Y> extends Plot {
-    protected _xScale: Scale<X, number>;
-    protected _yScale: Scale<Y, number>;
+    protected xScale: Scale<X, number>;
+    protected yScale: Scale<Y, number>;
     private _autoAdjustXScaleDomain = false;
     private _autoAdjustYScaleDomain = false;
 
@@ -25,8 +25,8 @@ module Plottable {
       }
       this.classed("xy-plot", true);
 
-      this._xScale = xScale;
-      this._yScale = yScale;
+      this.xScale = xScale;
+      this.yScale = yScale;
       this._updateXDomainer();
       xScale.broadcaster.registerListener("yDomainAdjustment" + this.getID(), () => this._adjustYDomainOnChangeFromX());
       this._updateYDomainer();
@@ -41,19 +41,19 @@ module Plottable {
       // We only want padding and nice-ing on scales that will correspond to axes / pixel layout.
       // So when we get an "x" or "y" scale, enable autoNiceing and autoPadding.
       if (attrToSet === "x" && scale) {
-        if (this._xScale) {
-          this._xScale.broadcaster.deregisterListener("yDomainAdjustment" + this.getID());
+        if (this.xScale) {
+          this.xScale.broadcaster.deregisterListener("yDomainAdjustment" + this.getID());
         }
-        this._xScale = scale;
+        this.xScale = scale;
         this._updateXDomainer();
         scale.broadcaster.registerListener("yDomainAdjustment" + this.getID(), () => this._adjustYDomainOnChangeFromX());
       }
 
       if (attrToSet === "y" && scale) {
-        if (this._yScale) {
-          this._yScale.broadcaster.deregisterListener("xDomainAdjustment" + this.getID());
+        if (this.yScale) {
+          this.yScale.broadcaster.deregisterListener("xDomainAdjustment" + this.getID());
         }
-        this._yScale = scale;
+        this.yScale = scale;
         this._updateYDomainer();
         scale.broadcaster.registerListener("xDomainAdjustment" + this.getID(), () => this._adjustXDomainOnChangeFromY());
       }
@@ -65,11 +65,11 @@ module Plottable {
 
     public remove() {
       super.remove();
-      if (this._xScale) {
-        this._xScale.broadcaster.deregisterListener("yDomainAdjustment" + this.getID());
+      if (this.xScale) {
+        this.xScale.broadcaster.deregisterListener("yDomainAdjustment" + this.getID());
       }
-      if (this._yScale) {
-        this._yScale.broadcaster.deregisterListener("xDomainAdjustment" + this.getID());
+      if (this.yScale) {
+        this.yScale.broadcaster.deregisterListener("xDomainAdjustment" + this.getID());
       }
       return this;
     }
@@ -117,17 +117,17 @@ module Plottable {
 
     public computeLayout(offeredXOrigin?: number, offeredYOffset?: number, availableWidth?: number, availableHeight?: number) {
       super.computeLayout(offeredXOrigin, offeredYOffset, availableWidth, availableHeight);
-      this._xScale.range([0, this.width()]);
-      if (this._yScale instanceof Scales.Category) {
-        this._yScale.range([0, this.height()]);
+      this.xScale.range([0, this.width()]);
+      if (this.yScale instanceof Scales.Category) {
+        this.yScale.range([0, this.height()]);
       } else {
-        this._yScale.range([this.height(), 0]);
+        this.yScale.range([this.height(), 0]);
       }
     }
 
     protected _updateXDomainer() {
-      if (this._xScale instanceof QuantitativeScale) {
-        var scale = <QuantitativeScale<any>> this._xScale;
+      if (this.xScale instanceof QuantitativeScale) {
+        var scale = <QuantitativeScale<any>> this.xScale;
         if (!scale.userSetDomainer) {
           scale.domainer().pad().nice();
         }
@@ -135,8 +135,8 @@ module Plottable {
     }
 
     protected _updateYDomainer() {
-      if (this._yScale instanceof QuantitativeScale) {
-        var scale = <QuantitativeScale<any>> this._yScale;
+      if (this.yScale instanceof QuantitativeScale) {
+        var scale = <QuantitativeScale<any>> this.yScale;
         if (!scale.userSetDomainer) {
           scale.domainer().pad().nice();
         }
@@ -149,22 +149,22 @@ module Plottable {
      * This call does not override auto domain adjustment behavior over visible points.
      */
     public showAllData() {
-      this._xScale.autoDomain();
+      this.xScale.autoDomain();
       if (!this._autoAdjustYScaleDomain) {
-        this._yScale.autoDomain();
+        this.yScale.autoDomain();
       }
     }
 
     private _adjustYDomainOnChangeFromX() {
       if (!this._projectorsReady()) { return; }
       if (this._autoAdjustYScaleDomain) {
-        this._adjustDomainToVisiblePoints<X, Y>(this._xScale, this._yScale, true);
+        this._adjustDomainToVisiblePoints<X, Y>(this.xScale, this.yScale, true);
       }
     }
     private _adjustXDomainOnChangeFromY() {
       if (!this._projectorsReady()) { return; }
       if (this._autoAdjustXScaleDomain) {
-        this._adjustDomainToVisiblePoints<Y, X>(this._yScale, this._xScale, false);
+        this._adjustDomainToVisiblePoints<Y, X>(this.yScale, this.xScale, false);
       }
     }
 

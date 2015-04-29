@@ -22,7 +22,7 @@ export module Plots {
         if (this.animator(key)) {
           return this.animator(key);
         } else if (key === "stacked-bar") {
-          var primaryScale: Scale<any, number> = this._isVertical ? this._yScale : this._xScale;
+          var primaryScale: Scale<any, number> = this._isVertical ? this.yScale : this.xScale;
           var scaledBaseline = primaryScale.scale(this.baseline());
           return new Animators.MovingRect(scaledBaseline, this._isVertical);
         }
@@ -36,7 +36,7 @@ export module Plots {
 
       var valueAttr = this._isVertical ? "y" : "x";
       var keyAttr = this._isVertical ? "x" : "y";
-      var primaryScale: Scale<any, number> = this._isVertical ? this._yScale : this._xScale;
+      var primaryScale: Scale<any, number> = this._isVertical ? this.yScale : this.xScale;
       var primaryAccessor = this._projections[valueAttr].accessor;
       var keyAccessor = this._projections[keyAttr].accessor;
       var getStart = (d: any, i: number, u: any, m: StackedPlotMetadata) =>
@@ -55,7 +55,7 @@ export module Plots {
       return attrToProjector;
     }
 
-    protected _generateDrawSteps(): Drawers.DrawStep[] {
+    protected generateDrawSteps(): Drawers.DrawStep[] {
       return [{attrToProjector: this.generateAttrToProjector(), animator: this.getAnimator("stacked-bar")}];
     }
 

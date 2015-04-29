@@ -93,7 +93,7 @@ export module Plots {
       return this;
     }
 
-    protected _generateDrawSteps(): Drawers.DrawStep[] {
+    protected generateDrawSteps(): Drawers.DrawStep[] {
       return [{attrToProjector: this.generateAttrToProjector(), animator: this.getAnimator("cells")}];
     }
   }

@@ -292,7 +292,7 @@ export module Plots {
 
     protected _updateYDomainer() {
       if (this._isVertical) {
-        this._updateDomainer(this._yScale);
+        this._updateDomainer(this.yScale);
       } else {
         super._updateYDomainer();
       }
@@ -300,14 +300,14 @@ export module Plots {
 
     protected _updateXDomainer() {
       if (!this._isVertical) {
-        this._updateDomainer(this._xScale);
+        this._updateDomainer(this.xScale);
       } else {
         super._updateXDomainer();
       }
     }
 
     protected _additionalPaint(time: number) {
-      var primaryScale: Scale<any, number> = this._isVertical ? this._yScale : this._xScale;
+      var primaryScale: Scale<any, number> = this._isVertical ? this.yScale : this.xScale;
       var scaledBaseline = primaryScale.scale(this._baselineValue);
 
       var baselineAttr: any = {
@@ -340,11 +340,11 @@ export module Plots {
       }
     }
 
-    protected _generateDrawSteps(): Drawers.DrawStep[] {
+    protected generateDrawSteps(): Drawers.DrawStep[] {
       var drawSteps: Drawers.DrawStep[] = [];
       if (this._dataChanged && this._animate) {
         var resetAttrToProjector = this.generateAttrToProjector();
-        var primaryScale: Scale<any, number> = this._isVertical ? this._yScale : this._xScale;
+        var primaryScale: Scale<any, number> = this._isVertical ? this.yScale : this.xScale;
         var scaledBaseline = primaryScale.scale(this._baselineValue);
         var positionAttr = this._isVertical ? "y" : "x";
         var dimensionAttr = this._isVertical ? "height" : "width";
@@ -360,8 +360,8 @@ export module Plots {
       // Primary scale/direction: the "length" of the bars
       // Secondary scale/direction: the "width" of the bars
       var attrToProjector = super.generateAttrToProjector();
-      var primaryScale: Scale<any, number>    = this._isVertical ? this._yScale : this._xScale;
-      var secondaryScale: Scale<any, number>  = this._isVertical ? this._xScale : this._yScale;
+      var primaryScale: Scale<any, number>    = this._isVertical ? this.yScale : this.xScale;
+      var secondaryScale: Scale<any, number>  = this._isVertical ? this.xScale : this.yScale;
       var primaryAttr     = this._isVertical ? "y" : "x";
       var secondaryAttr   = this._isVertical ? "x" : "y";
       var scaledBaseline = primaryScale.scale(this._baselineValue);
@@ -417,7 +417,7 @@ export module Plots {
      */
     protected _getBarPixelWidth(): number {
       var barPixelWidth: number;
-      var barScale: Scale<any, number>  = this._isVertical ? this._xScale : this._yScale;
+      var barScale: Scale<any, number>  = this._isVertical ? this.xScale : this.yScale;
       if (barScale instanceof Plottable.Scales.Category) {
         barPixelWidth = (<Plottable.Scales.Category> barScale).rangeBand();
       } else {
@@ -457,8 +457,8 @@ export module Plots {
     protected _getAllPlotData(datasetKeys: string[]): PlotData {
       var plotData = super._getAllPlotData(datasetKeys);
 
-      var valueScale = this._isVertical ? this._yScale : this._xScale;
-      var scaledBaseline = (<Scale<any, any>> (this._isVertical ? this._yScale : this._xScale)).scale(this.baseline());
+      var valueScale = this._isVertical ? this.yScale : this.xScale;
+      var scaledBaseline = (<Scale<any, any>> (this._isVertical ? this.yScale : this.xScale)).scale(this.baseline());
       var isVertical = this._isVertical;
       var barAlignmentFactor = this._barAlignmentFactor;
 

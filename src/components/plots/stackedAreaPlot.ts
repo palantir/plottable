@@ -35,7 +35,7 @@ export module Plots {
     }
 
     protected _additionalPaint() {
-      var scaledBaseline = this._yScale.scale(this._baselineValue);
+      var scaledBaseline = this.yScale.scale(this._baselineValue);
       var baselineAttr: any = {
         "x1": 0,
         "y1": scaledBaseline,
@@ -48,7 +48,7 @@ export module Plots {
 
     protected _updateYDomainer() {
       super._updateYDomainer();
-      var scale = <QuantitativeScale<any>> this._yScale;
+      var scale = <QuantitativeScale<any>> this.yScale;
       if (!scale.userSetDomainer) {
         scale.domainer().addPaddingException(0, "STACKED_AREA_PLOT+" + this.getID())
                         .addIncludedValue(0, "STACKED_AREA_PLOT+" + this.getID());
@@ -79,9 +79,9 @@ export module Plots {
       var yAccessor = this._projections["y"].accessor;
       var xAccessor = this._projections["x"].accessor;
       attrToProjector["y"] = (d: any, i: number, u: any, m: StackedPlotMetadata) =>
-        this._yScale.scale(+yAccessor(d, i, u, m) + m.offsets.get(xAccessor(d, i, u, m)));
+        this.yScale.scale(+yAccessor(d, i, u, m) + m.offsets.get(xAccessor(d, i, u, m)));
       attrToProjector["y0"] = (d: any, i: number, u: any, m: StackedPlotMetadata) =>
-        this._yScale.scale(m.offsets.get(xAccessor(d, i, u, m)));
+        this.yScale.scale(m.offsets.get(xAccessor(d, i, u, m)));
 
       return attrToProjector;
     }

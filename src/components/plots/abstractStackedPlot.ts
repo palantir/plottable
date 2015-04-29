@@ -175,7 +175,7 @@ module Plottable {
 
     public _updateScaleExtents() {
       super._updateScaleExtents();
-      var primaryScale: Scale<any, number> = this._isVertical ? this._yScale : this._xScale;
+      var primaryScale: Scale<any, number> = this._isVertical ? this.yScale : this.xScale;
       if (!primaryScale) {
         return;
       }

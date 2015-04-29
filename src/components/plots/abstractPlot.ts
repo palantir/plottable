@@ -401,7 +401,7 @@ module Plottable {
       return this._datasetKeysInOrder.map((k) => this._key2PlotDatasetKey.get(k).drawer);
     }
 
-    protected _generateDrawSteps(): Drawers.DrawStep[] {
+    protected generateDrawSteps(): Drawers.DrawStep[] {
       return [{attrToProjector: this.generateAttrToProjector(), animator: new Animators.Null()}];
     }
 
@@ -429,7 +429,7 @@ module Plottable {
     }
 
     private _paint() {
-      var drawSteps = this._generateDrawSteps();
+      var drawSteps = this.generateDrawSteps();
       var dataToDraw = this._getDataToDraw();
       var drawers = this._getDrawersInOrder();
 

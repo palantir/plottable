@@ -2769,7 +2769,7 @@ declare module Plottable {
         removeDataset(datasetIdentifier: string | Dataset | any[]): Plot;
         datasets(): Dataset[];
         protected _getDrawersInOrder(): Drawers.AbstractDrawer[];
-        protected _generateDrawSteps(): Drawers.DrawStep[];
+        protected generateDrawSteps(): Drawers.DrawStep[];
         protected _additionalPaint(time: number): void;
         protected _getDataToDraw(): D3.Map<any[]>;
         /**
@@ -2832,8 +2832,8 @@ declare module Plottable {
 
 declare module Plottable {
     class XYPlot<X, Y> extends Plot {
-        protected _xScale: Scale<X, number>;
-        protected _yScale: Scale<Y, number>;
+        protected xScale: Scale<X, number>;
+        protected yScale: Scale<Y, number>;
         /**
          * Constructs an XYPlot.
          *
@@ -2912,7 +2912,7 @@ declare module Plottable {
             protected generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
             };
-            protected _generateDrawSteps(): Drawers.DrawStep[];
+            protected generateDrawSteps(): Drawers.DrawStep[];
         }
     }
 }
@@ -2933,7 +2933,7 @@ declare module Plottable {
             protected generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
             };
-            protected _generateDrawSteps(): Drawers.DrawStep[];
+            protected generateDrawSteps(): Drawers.DrawStep[];
             protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean;
         }
     }
@@ -2963,7 +2963,7 @@ declare module Plottable {
              * the data should return a valid CSS color.
              */
             project(attrToSet: string, accessor: any, scale?: Scale<any, any>): Grid;
-            protected _generateDrawSteps(): Drawers.DrawStep[];
+            protected generateDrawSteps(): Drawers.DrawStep[];
         }
     }
 }
@@ -3069,7 +3069,7 @@ declare module Plottable {
             protected _updateXDomainer(): void;
             protected _additionalPaint(time: number): void;
             protected _drawLabels(): void;
-            protected _generateDrawSteps(): Drawers.DrawStep[];
+            protected generateDrawSteps(): Drawers.DrawStep[];
             protected generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
             };
@@ -3091,7 +3091,7 @@ declare module Plottable {
 declare module Plottable {
     module Plots {
         class Line<X> extends XYPlot<X, number> {
-            protected _yScale: QuantitativeScale<number>;
+            protected yScale: QuantitativeScale<number>;
             /**
              * Constructs a LinePlot.
              *
@@ -3103,7 +3103,7 @@ declare module Plottable {
             protected _rejectNullsAndNaNs(d: any, i: number, userMetdata: any, plotMetadata: any, accessor: Accessor): boolean;
             protected getDrawer(key: string): Drawers.Line;
             protected _getResetYFunction(): (d: any, i: number, u: any, m: PlotMetadata) => number;
-            protected _generateDrawSteps(): Drawers.DrawStep[];
+            protected generateDrawSteps(): Drawers.DrawStep[];
             protected generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
             };
@@ -3281,7 +3281,7 @@ declare module Plottable {
             protected generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
             };
-            protected _generateDrawSteps(): Drawers.DrawStep[];
+            protected generateDrawSteps(): Drawers.DrawStep[];
             project(attrToSet: string, accessor: any, scale?: Scale<any, any>): StackedBar<X, Y>;
             protected _onDatasetUpdate(): StackedBar<X, Y>;
             protected _getPlotMetadataForDataset(key: string): StackedPlotMetadata;
