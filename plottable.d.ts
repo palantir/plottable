@@ -638,7 +638,7 @@ declare module Plottable {
          * ```
          */
         module RenderControllers {
-            var _renderPolicy: RenderPolicies.RenderPolicy;
+            var renderPolicy: RenderPolicies.RenderPolicy;
             function setRenderPolicy(policy: string | RenderPolicies.RenderPolicy): void;
             /**
              * If the RenderController is enabled, we enqueue the component for

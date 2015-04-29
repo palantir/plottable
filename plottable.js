@@ -1363,11 +1363,11 @@ var Plottable;
          */
         var RenderControllers;
         (function (RenderControllers) {
-            var _componentsNeedingRender = {};
-            var _componentsNeedingComputeLayout = {};
-            var _animationRequested = false;
-            var _isCurrentlyFlushing = false;
-            RenderControllers._renderPolicy = new RenderControllers.RenderPolicies.AnimationFrame();
+            var componentsNeedingRender = {};
+            var componentsNeedingComputeLayout = {};
+            var animationRequested = false;
+            var isCurrentlyFlushing = false;
+            RenderControllers.renderPolicy = new RenderControllers.RenderPolicies.AnimationFrame();
             function setRenderPolicy(policy) {
                 if (typeof (policy) === "string") {
                     switch (policy.toLowerCase()) {
@@ -1385,7 +1385,7 @@ var Plottable;
                             return;
                     }
                 }
-                RenderControllers._renderPolicy = policy;
+                RenderControllers.renderPolicy = policy;
             }
             RenderControllers.setRenderPolicy = setRenderPolicy;
             /**
@@ -1395,10 +1395,10 @@ var Plottable;
              * @param {Component} component Any Plottable component.
              */
             function registerToRender(c) {
-                if (_isCurrentlyFlushing) {
+                if (isCurrentlyFlushing) {
                     Plottable.Utils.Methods.warn("Registered to render while other components are flushing: request may be ignored");
                 }
-                _componentsNeedingRender[c.getID()] = c;
+                componentsNeedingRender[c.getID()] = c;
                 requestRender();
             }
             RenderControllers.registerToRender = registerToRender;
@@ -1409,16 +1409,16 @@ var Plottable;
              * @param {Component} component Any Plottable component.
              */
             function registerToComputeLayout(c) {
-                _componentsNeedingComputeLayout[c.getID()] = c;
-                _componentsNeedingRender[c.getID()] = c;
+                componentsNeedingComputeLayout[c.getID()] = c;
+                componentsNeedingRender[c.getID()] = c;
                 requestRender();
             }
             RenderControllers.registerToComputeLayout = registerToComputeLayout;
             function requestRender() {
                 // Only run or enqueue flush on first request.
-                if (!_animationRequested) {
-                    _animationRequested = true;
-                    RenderControllers._renderPolicy.render();
+                if (!animationRequested) {
+                    animationRequested = true;
+                    RenderControllers.renderPolicy.render();
                 }
             }
             /**
@@ -1428,21 +1428,21 @@ var Plottable;
              * Useful to call when debugging.
              */
             function flush() {
-                if (_animationRequested) {
+                if (animationRequested) {
                     // Layout
-                    var toCompute = d3.values(_componentsNeedingComputeLayout);
+                    var toCompute = d3.values(componentsNeedingComputeLayout);
                     toCompute.forEach(function (c) { return c._computeLayout(); });
                     // Top level render.
                     // Containers will put their children in the toRender queue
-                    var toRender = d3.values(_componentsNeedingRender);
+                    var toRender = d3.values(componentsNeedingRender);
                     toRender.forEach(function (c) { return c._render(); });
                     // now we are flushing
-                    _isCurrentlyFlushing = true;
+                    isCurrentlyFlushing = true;
                     // Finally, perform render of all components
                     var failed = {};
-                    Object.keys(_componentsNeedingRender).forEach(function (k) {
+                    Object.keys(componentsNeedingRender).forEach(function (k) {
                         try {
-                            _componentsNeedingRender[k]._doRender();
+                            componentsNeedingRender[k]._doRender();
                         }
                         catch (err) {
                             // using setTimeout instead of console.log, we get the familiar red
@@ -1450,14 +1450,14 @@ var Plottable;
                             setTimeout(function () {
                                 throw err;
                             }, 0);
-                            failed[k] = _componentsNeedingRender[k];
+                            failed[k] = componentsNeedingRender[k];
                         }
                     });
                     // Reset queues
-                    _componentsNeedingComputeLayout = {};
-                    _componentsNeedingRender = failed;
-                    _animationRequested = false;
-                    _isCurrentlyFlushing = false;
+                    componentsNeedingComputeLayout = {};
+                    componentsNeedingRender = failed;
+                    animationRequested = false;
+                    isCurrentlyFlushing = false;
                 }
             }
             RenderControllers.flush = flush;

@@ -22,11 +22,11 @@ export module Core {
    * ```
    */
   export module RenderControllers {
-    var _componentsNeedingRender: {[key: string]: Component} = {};
-    var _componentsNeedingComputeLayout: {[key: string]: Component} = {};
-    var _animationRequested: boolean = false;
-    var _isCurrentlyFlushing: boolean = false;
-    export var _renderPolicy: RenderPolicies.RenderPolicy = new RenderPolicies.AnimationFrame();
+    var componentsNeedingRender: {[key: string]: Component} = {};
+    var componentsNeedingComputeLayout: {[key: string]: Component} = {};
+    var animationRequested: boolean = false;
+    var isCurrentlyFlushing: boolean = false;
+    export var renderPolicy: RenderPolicies.RenderPolicy = new RenderPolicies.AnimationFrame();
 
     export function setRenderPolicy(policy: string | RenderPolicies.RenderPolicy): void {
       if (typeof(policy) === "string") {
@@ -45,7 +45,7 @@ export module Core {
           return;
         }
       }
-      _renderPolicy = <RenderPolicies.RenderPolicy> policy;
+      renderPolicy = <RenderPolicies.RenderPolicy> policy;
     }
 
     /**
@@ -55,10 +55,10 @@ export module Core {
      * @param {Component} component Any Plottable component.
      */
     export function registerToRender(c: Component) {
-      if (_isCurrentlyFlushing) {
+      if (isCurrentlyFlushing) {
         Utils.Methods.warn("Registered to render while other components are flushing: request may be ignored");
       }
-      _componentsNeedingRender[c.getID()] = c;
+      componentsNeedingRender[c.getID()] = c;
       requestRender();
     }
 
@@ -69,16 +69,16 @@ export module Core {
      * @param {Component} component Any Plottable component.
      */
     export function registerToComputeLayout(c: Component) {
-      _componentsNeedingComputeLayout[c.getID()] = c;
-      _componentsNeedingRender[c.getID()] = c;
+      componentsNeedingComputeLayout[c.getID()] = c;
+      componentsNeedingRender[c.getID()] = c;
       requestRender();
     }
 
     function requestRender() {
       // Only run or enqueue flush on first request.
-      if (!_animationRequested) {
-        _animationRequested = true;
-        _renderPolicy.render();
+      if (!animationRequested) {
+        animationRequested = true;
+        renderPolicy.render();
       }
     }
 
@@ -89,39 +89,39 @@ export module Core {
      * Useful to call when debugging.
      */
     export function flush() {
-      if (_animationRequested) {
+      if (animationRequested) {
         // Layout
-        var toCompute = d3.values(_componentsNeedingComputeLayout);
+        var toCompute = d3.values(componentsNeedingComputeLayout);
         toCompute.forEach((c) => c._computeLayout());
 
         // Top level render.
         // Containers will put their children in the toRender queue
-        var toRender = d3.values(_componentsNeedingRender);
+        var toRender = d3.values(componentsNeedingRender);
         toRender.forEach((c) => c._render());
 
         // now we are flushing
-        _isCurrentlyFlushing = true;
+        isCurrentlyFlushing = true;
 
         // Finally, perform render of all components
         var failed: {[key: string]: Component} = {};
-        Object.keys(_componentsNeedingRender).forEach((k) => {
+        Object.keys(componentsNeedingRender).forEach((k) => {
           try {
-            _componentsNeedingRender[k]._doRender();
+            componentsNeedingRender[k]._doRender();
           } catch (err) {
             // using setTimeout instead of console.log, we get the familiar red
             // stack trace
             setTimeout(() => {
               throw err;
             }, 0);
-            failed[k] = _componentsNeedingRender[k];
+            failed[k] = componentsNeedingRender[k];
           }
         });
 
         // Reset queues
-        _componentsNeedingComputeLayout = {};
-        _componentsNeedingRender = failed;
-        _animationRequested = false;
-        _isCurrentlyFlushing = false;
+        componentsNeedingComputeLayout = {};
+        componentsNeedingRender = failed;
+        animationRequested = false;
+        isCurrentlyFlushing = false;
       }
     }
   }
