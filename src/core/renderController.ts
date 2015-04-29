@@ -106,7 +106,7 @@ export module Core {
         var failed: {[key: string]: Component} = {};
         Object.keys(componentsNeedingRender).forEach((k) => {
           try {
-            componentsNeedingRender[k]._doRender();
+            componentsNeedingRender[k].doRender();
           } catch (err) {
             // using setTimeout instead of console.log, we get the familiar red
             // stack trace

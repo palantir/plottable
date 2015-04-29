@@ -162,7 +162,7 @@ module Plottable {
       }
     }
 
-    public _doRender() {/* overwrite */}
+    public doRender() {/* overwrite */}
 
     public _useLastCalculatedLayout(): boolean;
     public _useLastCalculatedLayout(useLast: boolean): Component;

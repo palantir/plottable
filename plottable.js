@@ -1442,7 +1442,7 @@ var Plottable;
                     var failed = {};
                     Object.keys(componentsNeedingRender).forEach(function (k) {
                         try {
-                            componentsNeedingRender[k]._doRender();
+                            componentsNeedingRender[k].doRender();
                         }
                         catch (err) {
                             // using setTimeout instead of console.log, we get the familiar red
@@ -3418,7 +3418,7 @@ var Plottable;
                 Plottable.Core.RenderControllers.registerToComputeLayout(this);
             }
         };
-        Component.prototype._doRender = function () {
+        Component.prototype.doRender = function () {
         };
         Component.prototype._useLastCalculatedLayout = function (useLast) {
             if (useLast == null) {
@@ -4118,7 +4118,7 @@ var Plottable;
         Axis.prototype._getTickValues = function () {
             return [];
         };
-        Axis.prototype._doRender = function () {
+        Axis.prototype.doRender = function () {
             var tickMarkValues = this._getTickValues();
             var tickMarks = this._tickMarkContainer.selectAll("." + Axis.TICK_MARK_CLASS).data(tickMarkValues);
             tickMarks.enter().append("line").classed(Axis.TICK_MARK_CLASS, true);
@@ -4559,7 +4559,7 @@ var Plottable;
                 }
                 return this._getTickIntervalValues(this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex - 1][0]);
             };
-            Time.prototype._doRender = function () {
+            Time.prototype.doRender = function () {
                 var _this = this;
                 this._mostPreciseConfigIndex = this._getMostPreciseConfigurationIndex();
                 var tierConfigs = this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex];
@@ -4840,9 +4840,9 @@ var Plottable;
                 }
                 this.render();
             };
-            Numeric.prototype._doRender = function () {
+            Numeric.prototype.doRender = function () {
                 var _this = this;
-                _super.prototype._doRender.call(this);
+                _super.prototype.doRender.call(this);
                 var tickLabelAttrHash = {
                     x: 0,
                     y: 0,
@@ -5252,9 +5252,9 @@ var Plottable;
                     usedHeight: usedHeight
                 };
             };
-            Category.prototype._doRender = function () {
+            Category.prototype.doRender = function () {
                 var _this = this;
-                _super.prototype._doRender.call(this);
+                _super.prototype.doRender.call(this);
                 var catScale = this._scale;
                 var tickLabels = this._tickLabelContainer.selectAll("." + Plottable.Axis.TICK_LABEL_CLASS).data(this._scale.domain(), function (d) { return d; });
                 var getTickLabelTransform = function (d, i) {
@@ -5409,8 +5409,8 @@ var Plottable;
                     return this;
                 }
             };
-            Label.prototype._doRender = function () {
-                _super.prototype._doRender.call(this);
+            Label.prototype.doRender = function () {
+                _super.prototype.doRender.call(this);
                 // HACKHACK SVGTypewriter should remove existing content - #21 on SVGTypewriter.
                 this._textContainer.selectAll("g").remove();
                 var textMeasurement = this._measurer.measure(this._text);
@@ -5639,9 +5639,9 @@ var Plottable;
                 });
                 return entry;
             };
-            Legend.prototype._doRender = function () {
+            Legend.prototype.doRender = function () {
                 var _this = this;
-                _super.prototype._doRender.call(this);
+                _super.prototype.doRender.call(this);
                 var layout = this._calculateLayoutInfo(this.width(), this.height());
                 var rowsToDraw = layout.rows.slice(0, layout.numRowsToDraw);
                 var rows = this._content.selectAll("g." + Legend.LEGEND_ROW_CLASS).data(rowsToDraw);
@@ -5830,9 +5830,9 @@ var Plottable;
             InterpolatedColorLegend.prototype._isVertical = function () {
                 return this._orientation !== "horizontal";
             };
-            InterpolatedColorLegend.prototype._doRender = function () {
+            InterpolatedColorLegend.prototype.doRender = function () {
                 var _this = this;
-                _super.prototype._doRender.call(this);
+                _super.prototype.doRender.call(this);
                 var domain = this._scale.domain();
                 var textHeight = this._measurer.measure().height;
                 var text0 = this._formatter(domain[0]);
@@ -5989,8 +5989,8 @@ var Plottable;
                 this._xLinesContainer = this._content.append("g").classed("x-gridlines", true);
                 this._yLinesContainer = this._content.append("g").classed("y-gridlines", true);
             };
-            Gridlines.prototype._doRender = function () {
-                _super.prototype._doRender.call(this);
+            Gridlines.prototype.doRender = function () {
+                _super.prototype.doRender.call(this);
                 this._redrawXLines();
                 this._redrawYLines();
             };
@@ -6426,7 +6426,7 @@ var Plottable;
                     bottomRight: bottomRight
                 };
             };
-            SelectionBoxLayer.prototype._doRender = function () {
+            SelectionBoxLayer.prototype.doRender = function () {
                 if (this._boxVisible) {
                     var t = this._boxBounds.topLeft.y;
                     var b = this._boxBounds.bottomRight.y;
@@ -6650,7 +6650,7 @@ var Plottable;
             });
             return attrToAppliedProjector;
         };
-        Plot.prototype._doRender = function () {
+        Plot.prototype.doRender = function () {
             if (this.isAnchored) {
                 this._paint();
                 this._dataChanged = false;
@@ -9776,7 +9776,7 @@ var Plottable;
                 _super.call(this);
                 this._detectionRadius = 3;
                 this._resizable = false;
-                this._hasCorners = true;
+                this.hasCorners = true;
                 /*
                  * Enable clipPath to hide _detectionEdge s and _detectionCorner s
                  * that overlap with the edge of the DragBoxLayer. This prevents the
@@ -9785,18 +9785,18 @@ var Plottable;
                  */
                 this.clipPathEnabled = true;
                 this.classed("drag-box-layer", true);
-                this._dragInteraction = new Plottable.Interactions.Drag();
-                this._setUpCallbacks();
-                this.registerInteraction(this._dragInteraction);
+                this.dragInteraction = new Plottable.Interactions.Drag();
+                this.setUpCallbacks();
+                this.registerInteraction(this.dragInteraction);
             }
-            DragBoxLayer.prototype._setUpCallbacks = function () {
+            DragBoxLayer.prototype.setUpCallbacks = function () {
                 var _this = this;
                 var resizingEdges;
                 var topLeft;
                 var bottomRight;
                 var startedNewBox;
-                this._dragInteraction.onDragStart(function (s) {
-                    resizingEdges = _this._getResizingEdges(s);
+                this.dragInteraction.onDragStart(function (s) {
+                    resizingEdges = _this.getResizingEdges(s);
                     if (!_this.boxVisible() || (!resizingEdges.top && !resizingEdges.bottom && !resizingEdges.left && !resizingEdges.right)) {
                         _this.bounds({
                             topLeft: s,
@@ -9812,11 +9812,11 @@ var Plottable;
                     // copy points so changes to topLeft and bottomRight don't mutate bounds
                     topLeft = { x: bounds.topLeft.x, y: bounds.topLeft.y };
                     bottomRight = { x: bounds.bottomRight.x, y: bounds.bottomRight.y };
-                    if (_this._dragStartCallback) {
-                        _this._dragStartCallback(bounds);
+                    if (_this.dragStartCallback) {
+                        _this.dragStartCallback(bounds);
                     }
                 });
-                this._dragInteraction.onDrag(function (s, e) {
+                this.dragInteraction.onDrag(function (s, e) {
                     if (startedNewBox) {
                         bottomRight.x = e.x;
                         bottomRight.y = e.y;
@@ -9839,16 +9839,16 @@ var Plottable;
                         topLeft: topLeft,
                         bottomRight: bottomRight
                     });
-                    if (_this._dragCallback) {
-                        _this._dragCallback(_this.bounds());
+                    if (_this.dragCallback) {
+                        _this.dragCallback(_this.bounds());
                     }
                 });
-                this._dragInteraction.onDragEnd(function (s, e) {
+                this.dragInteraction.onDragEnd(function (s, e) {
                     if (startedNewBox && s.x === e.x && s.y === e.y) {
                         _this.boxVisible(false);
                     }
-                    if (_this._dragEndCallback) {
-                        _this._dragEndCallback(_this.bounds());
+                    if (_this.dragEndCallback) {
+                        _this.dragEndCallback(_this.bounds());
                     }
                 });
             };
@@ -9859,22 +9859,22 @@ var Plottable;
                     "opacity": 0,
                     "stroke": "pink"
                 }); };
-                this._detectionEdgeT = createLine().classed("drag-edge-tb", true);
-                this._detectionEdgeB = createLine().classed("drag-edge-tb", true);
-                this._detectionEdgeL = createLine().classed("drag-edge-lr", true);
-                this._detectionEdgeR = createLine().classed("drag-edge-lr", true);
-                if (this._hasCorners) {
+                this.detectionEdgeT = createLine().classed("drag-edge-tb", true);
+                this.detectionEdgeB = createLine().classed("drag-edge-tb", true);
+                this.detectionEdgeL = createLine().classed("drag-edge-lr", true);
+                this.detectionEdgeR = createLine().classed("drag-edge-lr", true);
+                if (this.hasCorners) {
                     var createCorner = function () { return _this._box.append("circle").style({
                         "opacity": 0,
                         "fill": "pink"
                     }); };
-                    this._detectionCornerTL = createCorner().classed("drag-corner-tl", true);
-                    this._detectionCornerTR = createCorner().classed("drag-corner-tr", true);
-                    this._detectionCornerBL = createCorner().classed("drag-corner-bl", true);
-                    this._detectionCornerBR = createCorner().classed("drag-corner-br", true);
+                    this.detectionCornerTL = createCorner().classed("drag-corner-tl", true);
+                    this.detectionCornerTR = createCorner().classed("drag-corner-tr", true);
+                    this.detectionCornerBL = createCorner().classed("drag-corner-bl", true);
+                    this.detectionCornerBR = createCorner().classed("drag-corner-br", true);
                 }
             };
-            DragBoxLayer.prototype._getResizingEdges = function (p) {
+            DragBoxLayer.prototype.getResizingEdges = function (p) {
                 var edges = {
                     top: false,
                     bottom: false,
@@ -9900,47 +9900,47 @@ var Plottable;
                 }
                 return edges;
             };
-            DragBoxLayer.prototype._doRender = function () {
-                _super.prototype._doRender.call(this);
+            DragBoxLayer.prototype.doRender = function () {
+                _super.prototype.doRender.call(this);
                 if (this.boxVisible()) {
                     var bounds = this.bounds();
                     var t = bounds.topLeft.y;
                     var b = bounds.bottomRight.y;
                     var l = bounds.topLeft.x;
                     var r = bounds.bottomRight.x;
-                    this._detectionEdgeT.attr({
+                    this.detectionEdgeT.attr({
                         x1: l,
                         y1: t,
                         x2: r,
                         y2: t,
                         "stroke-width": this._detectionRadius * 2
                     });
-                    this._detectionEdgeB.attr({
+                    this.detectionEdgeB.attr({
                         x1: l,
                         y1: b,
                         x2: r,
                         y2: b,
                         "stroke-width": this._detectionRadius * 2
                     });
-                    this._detectionEdgeL.attr({
+                    this.detectionEdgeL.attr({
                         x1: l,
                         y1: t,
                         x2: l,
                         y2: b,
                         "stroke-width": this._detectionRadius * 2
                     });
-                    this._detectionEdgeR.attr({
+                    this.detectionEdgeR.attr({
                         x1: r,
                         y1: t,
                         x2: r,
                         y2: b,
                         "stroke-width": this._detectionRadius * 2
                     });
-                    if (this._hasCorners) {
-                        this._detectionCornerTL.attr({ cx: l, cy: t, r: this._detectionRadius });
-                        this._detectionCornerTR.attr({ cx: r, cy: t, r: this._detectionRadius });
-                        this._detectionCornerBL.attr({ cx: l, cy: b, r: this._detectionRadius });
-                        this._detectionCornerBR.attr({ cx: r, cy: b, r: this._detectionRadius });
+                    if (this.hasCorners) {
+                        this.detectionCornerTL.attr({ cx: l, cy: t, r: this._detectionRadius });
+                        this.detectionCornerTR.attr({ cx: r, cy: t, r: this._detectionRadius });
+                        this.detectionCornerBL.attr({ cx: l, cy: b, r: this._detectionRadius });
+                        this.detectionCornerBR.attr({ cx: r, cy: b, r: this._detectionRadius });
                     }
                 }
             };
@@ -9960,38 +9960,38 @@ var Plottable;
                     return this._resizable;
                 }
                 this._resizable = canResize;
-                this._setResizableClasses(canResize);
+                this.setResizableClasses(canResize);
                 return this;
             };
             // Sets resizable classes. Overridden by subclasses that only resize in one dimension.
-            DragBoxLayer.prototype._setResizableClasses = function (canResize) {
+            DragBoxLayer.prototype.setResizableClasses = function (canResize) {
                 this.classed("x-resizable", canResize);
                 this.classed("y-resizable", canResize);
             };
             DragBoxLayer.prototype.onDragStart = function (cb) {
                 if (cb === undefined) {
-                    return this._dragStartCallback;
+                    return this.dragStartCallback;
                 }
                 else {
-                    this._dragStartCallback = cb;
+                    this.dragStartCallback = cb;
                     return this;
                 }
             };
             DragBoxLayer.prototype.onDrag = function (cb) {
                 if (cb === undefined) {
-                    return this._dragCallback;
+                    return this.dragCallback;
                 }
                 else {
-                    this._dragCallback = cb;
+                    this.dragCallback = cb;
                     return this;
                 }
             };
             DragBoxLayer.prototype.onDragEnd = function (cb) {
                 if (cb === undefined) {
-                    return this._dragEndCallback;
+                    return this.dragEndCallback;
                 }
                 else {
-                    this._dragEndCallback = cb;
+                    this.dragEndCallback = cb;
                     return this;
                 }
             };
@@ -10017,7 +10017,7 @@ var Plottable;
             function XDragBoxLayer() {
                 _super.call(this);
                 this.classed("x-drag-box-layer", true);
-                this._hasCorners = false;
+                this.hasCorners = false;
             }
             XDragBoxLayer.prototype.computeLayout = function (offeredXOrigin, offeredYOrigin, availableWidth, availableHeight) {
                 _super.prototype.computeLayout.call(this, offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
@@ -10029,7 +10029,7 @@ var Plottable;
                     bottomRight: { x: newBounds.bottomRight.x, y: this.height() }
                 });
             };
-            XDragBoxLayer.prototype._setResizableClasses = function (canResize) {
+            XDragBoxLayer.prototype.setResizableClasses = function (canResize) {
                 this.classed("x-resizable", canResize);
             };
             return XDragBoxLayer;
@@ -10054,7 +10054,7 @@ var Plottable;
             function YDragBoxLayer() {
                 _super.call(this);
                 this.classed("y-drag-box-layer", true);
-                this._hasCorners = false;
+                this.hasCorners = false;
             }
             YDragBoxLayer.prototype.computeLayout = function (offeredXOrigin, offeredYOrigin, availableWidth, availableHeight) {
                 _super.prototype.computeLayout.call(this, offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
@@ -10066,7 +10066,7 @@ var Plottable;
                     bottomRight: { x: this.width(), y: newBounds.bottomRight.y }
                 });
             };
-            YDragBoxLayer.prototype._setResizableClasses = function (canResize) {
+            YDragBoxLayer.prototype.setResizableClasses = function (canResize) {
                 this.classed("y-resizable", canResize);
             };
             return YDragBoxLayer;

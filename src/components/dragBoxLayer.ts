@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Components {
-  type _EdgeIndicator = {
+  type EdgeIndicator = {
     top: boolean;
     bottom: boolean;
     left: boolean;
@@ -10,23 +10,23 @@ export module Components {
   }
 
   export class DragBoxLayer extends Components.SelectionBoxLayer {
-    private _dragInteraction: Interactions.Drag;
-    private _detectionEdgeT: D3.Selection;
-    private _detectionEdgeB: D3.Selection;
-    private _detectionEdgeL: D3.Selection;
-    private _detectionEdgeR: D3.Selection;
-    private _detectionCornerTL: D3.Selection;
-    private _detectionCornerTR: D3.Selection;
-    private _detectionCornerBL: D3.Selection;
-    private _detectionCornerBR: D3.Selection;
+    private dragInteraction: Interactions.Drag;
+    private detectionEdgeT: D3.Selection;
+    private detectionEdgeB: D3.Selection;
+    private detectionEdgeL: D3.Selection;
+    private detectionEdgeR: D3.Selection;
+    private detectionCornerTL: D3.Selection;
+    private detectionCornerTR: D3.Selection;
+    private detectionCornerBL: D3.Selection;
+    private detectionCornerBR: D3.Selection;
 
     private _detectionRadius = 3;
     private _resizable = false;
-    protected _hasCorners = true;
+    protected hasCorners = true;
 
-    private _dragStartCallback: (b: Bounds) => any;
-    private _dragCallback: (b: Bounds) => any;
-    private _dragEndCallback: (b: Bounds) => any;
+    private dragStartCallback: (b: Bounds) => any;
+    private dragCallback: (b: Bounds) => any;
+    private dragEndCallback: (b: Bounds) => any;
 
     constructor() {
       super();
@@ -39,19 +39,19 @@ export module Components {
       this.clipPathEnabled = true;
       this.classed("drag-box-layer", true);
 
-      this._dragInteraction = new Interactions.Drag();
-      this._setUpCallbacks();
-      this.registerInteraction(this._dragInteraction);
+      this.dragInteraction = new Interactions.Drag();
+      this.setUpCallbacks();
+      this.registerInteraction(this.dragInteraction);
     }
 
-    private _setUpCallbacks() {
-      var resizingEdges: _EdgeIndicator;
+    private setUpCallbacks() {
+      var resizingEdges: EdgeIndicator;
       var topLeft: Point;
       var bottomRight: Point;
       var startedNewBox: boolean;
 
-      this._dragInteraction.onDragStart((s: Point) => {
-        resizingEdges = this._getResizingEdges(s);
+      this.dragInteraction.onDragStart((s: Point) => {
+        resizingEdges = this.getResizingEdges(s);
 
         if (!this.boxVisible() ||
             (!resizingEdges.top && !resizingEdges.bottom &&
@@ -71,12 +71,12 @@ export module Components {
         // copy points so changes to topLeft and bottomRight don't mutate bounds
         topLeft = { x: bounds.topLeft.x, y: bounds.topLeft.y };
         bottomRight = { x: bounds.bottomRight.x, y: bounds.bottomRight.y };
-        if (this._dragStartCallback) {
-          this._dragStartCallback(bounds);
+        if (this.dragStartCallback) {
+          this.dragStartCallback(bounds);
         }
       });
 
-      this._dragInteraction.onDrag((s: Point, e: Point) => {
+      this.dragInteraction.onDrag((s: Point, e: Point) => {
         if (startedNewBox) {
           bottomRight.x = e.x;
           bottomRight.y = e.y;
@@ -99,18 +99,18 @@ export module Components {
           bottomRight: bottomRight
         });
 
-        if (this._dragCallback) {
-          this._dragCallback(this.bounds());
+        if (this.dragCallback) {
+          this.dragCallback(this.bounds());
         }
       });
 
-      this._dragInteraction.onDragEnd((s: Point, e: Point) => {
+      this.dragInteraction.onDragEnd((s: Point, e: Point) => {
         if (startedNewBox && s.x === e.x && s.y === e.y) {
           this.boxVisible(false);
         }
 
-        if (this._dragEndCallback) {
-          this._dragEndCallback(this.bounds());
+        if (this.dragEndCallback) {
+          this.dragEndCallback(this.bounds());
         }
       });
     }
@@ -122,25 +122,25 @@ export module Components {
                                "opacity": 0,
                                "stroke": "pink"
                              });
-      this._detectionEdgeT = createLine().classed("drag-edge-tb", true);
-      this._detectionEdgeB = createLine().classed("drag-edge-tb", true);
-      this._detectionEdgeL = createLine().classed("drag-edge-lr", true);
-      this._detectionEdgeR = createLine().classed("drag-edge-lr", true);
+      this.detectionEdgeT = createLine().classed("drag-edge-tb", true);
+      this.detectionEdgeB = createLine().classed("drag-edge-tb", true);
+      this.detectionEdgeL = createLine().classed("drag-edge-lr", true);
+      this.detectionEdgeR = createLine().classed("drag-edge-lr", true);
 
-      if (this._hasCorners) {
+      if (this.hasCorners) {
         var createCorner = () => this._box.append("circle")
                                      .style({
                                        "opacity": 0,
                                        "fill": "pink"
                                      });
-        this._detectionCornerTL = createCorner().classed("drag-corner-tl", true);
-        this._detectionCornerTR = createCorner().classed("drag-corner-tr", true);
-        this._detectionCornerBL = createCorner().classed("drag-corner-bl", true);
-        this._detectionCornerBR = createCorner().classed("drag-corner-br", true);
+        this.detectionCornerTL = createCorner().classed("drag-corner-tl", true);
+        this.detectionCornerTR = createCorner().classed("drag-corner-tr", true);
+        this.detectionCornerBL = createCorner().classed("drag-corner-bl", true);
+        this.detectionCornerBR = createCorner().classed("drag-corner-br", true);
       }
     }
 
-    private _getResizingEdges(p: Point) {
+    private getResizingEdges(p: Point) {
       var edges = {
         top: false,
         bottom: false,
@@ -172,8 +172,8 @@ export module Components {
       return edges;
     }
 
-    public _doRender() {
-      super._doRender();
+    public doRender() {
+      super.doRender();
       if (this.boxVisible()) {
         var bounds = this.bounds();
         var t = bounds.topLeft.y;
@@ -181,28 +181,28 @@ export module Components {
         var l = bounds.topLeft.x;
         var r = bounds.bottomRight.x;
 
-        this._detectionEdgeT.attr({
+        this.detectionEdgeT.attr({
           x1: l, y1: t, x2: r, y2: t,
           "stroke-width": this._detectionRadius * 2
         });
-        this._detectionEdgeB.attr({
+        this.detectionEdgeB.attr({
           x1: l, y1: b, x2: r, y2: b,
           "stroke-width": this._detectionRadius * 2
         });
-        this._detectionEdgeL.attr({
+        this.detectionEdgeL.attr({
           x1: l, y1: t, x2: l, y2: b,
           "stroke-width": this._detectionRadius * 2
         });
-        this._detectionEdgeR.attr({
+        this.detectionEdgeR.attr({
           x1: r, y1: t, x2: r, y2: b,
           "stroke-width": this._detectionRadius * 2
         });
 
-        if (this._hasCorners) {
-          this._detectionCornerTL.attr({ cx: l, cy: t, r: this._detectionRadius });
-          this._detectionCornerTR.attr({ cx: r, cy: t, r: this._detectionRadius });
-          this._detectionCornerBL.attr({ cx: l, cy: b, r: this._detectionRadius });
-          this._detectionCornerBR.attr({ cx: r, cy: b, r: this._detectionRadius });
+        if (this.hasCorners) {
+          this.detectionCornerTL.attr({ cx: l, cy: t, r: this._detectionRadius });
+          this.detectionCornerTR.attr({ cx: r, cy: t, r: this._detectionRadius });
+          this.detectionCornerBL.attr({ cx: l, cy: b, r: this._detectionRadius });
+          this.detectionCornerBR.attr({ cx: r, cy: b, r: this._detectionRadius });
         }
       }
     }
@@ -250,12 +250,12 @@ export module Components {
         return this._resizable;
       }
       this._resizable = canResize;
-      this._setResizableClasses(canResize);
+      this.setResizableClasses(canResize);
       return this;
     }
 
     // Sets resizable classes. Overridden by subclasses that only resize in one dimension.
-    protected _setResizableClasses(canResize: boolean) {
+    protected setResizableClasses(canResize: boolean) {
       this.classed("x-resizable", canResize);
       this.classed("y-resizable", canResize);
     }
@@ -275,9 +275,9 @@ export module Components {
     public onDragStart(cb: (b: Bounds) => any): DragBoxLayer;
     public onDragStart(cb?: (b: Bounds) => any): any {
       if (cb === undefined) {
-        return this._dragStartCallback;
+        return this.dragStartCallback;
       } else {
-        this._dragStartCallback = cb;
+        this.dragStartCallback = cb;
         return this;
       }
     }
@@ -297,9 +297,9 @@ export module Components {
     public onDrag(cb: (b: Bounds) => any): DragBoxLayer;
     public onDrag(cb?: (b: Bounds) => any): any {
       if (cb === undefined) {
-        return this._dragCallback;
+        return this.dragCallback;
       } else {
-        this._dragCallback = cb;
+        this.dragCallback = cb;
         return this;
       }
     }
@@ -319,9 +319,9 @@ export module Components {
     public onDragEnd(cb: (b: Bounds) => any): DragBoxLayer;
     public onDragEnd(cb?: (b: Bounds) => any): any {
       if (cb === undefined) {
-        return this._dragEndCallback;
+        return this.dragEndCallback;
       } else {
-        this._dragEndCallback = cb;
+        this.dragEndCallback = cb;
         return this;
       }
     }

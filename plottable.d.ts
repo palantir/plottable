@@ -1598,7 +1598,7 @@ declare module Plottable {
             height: number;
         };
         render(): void;
-        _doRender(): void;
+        doRender(): void;
         _useLastCalculatedLayout(): boolean;
         _useLastCalculatedLayout(useLast: boolean): Component;
         invalidateLayout(): void;
@@ -1911,7 +1911,7 @@ declare module Plottable {
         computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;
         protected setup(): void;
         protected _getTickValues(): any[];
-        _doRender(): void;
+        doRender(): void;
         protected _generateBaselineAttrHash(): {
             x1: number;
             y1: number;
@@ -2095,7 +2095,7 @@ declare module Plottable {
             };
             protected setup(): void;
             protected _getTickValues(): any[];
-            _doRender(): Time;
+            doRender(): Time;
         }
     }
 }
@@ -2120,7 +2120,7 @@ declare module Plottable {
             _computeHeight(): number;
             protected _getTickValues(): any[];
             protected _rescale(): void;
-            _doRender(): void;
+            doRender(): void;
             /**
              * Gets the tick label position relative to the tick marks.
              *
@@ -2200,7 +2200,7 @@ declare module Plottable {
              * @returns {number} the tick label angle
              */
             tickLabelAngle(): number;
-            _doRender(): Category;
+            doRender(): Category;
             computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;
         }
     }
@@ -2279,7 +2279,7 @@ declare module Plottable {
              * @returns {Label} The calling Label.
              */
             padding(padAmount: number): Label;
-            _doRender(): void;
+            doRender(): void;
         }
         class TitleLabel extends Label {
             /**
@@ -2373,7 +2373,7 @@ declare module Plottable {
              * @returns {D3.Selection} The selected entry, or null selection if no entry was selected.
              */
             getEntry(position: Point): D3.Selection;
-            _doRender(): void;
+            doRender(): void;
             /**
              * Gets the symbolFactoryAccessor of the legend, which dictates how
              * the symbol in each entry is drawn.
@@ -2443,7 +2443,7 @@ declare module Plottable {
             orient(newOrientation: string): InterpolatedColorLegend;
             protected setup(): void;
             requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
-            _doRender(): void;
+            doRender(): void;
         }
     }
 }
@@ -2462,7 +2462,7 @@ declare module Plottable {
             constructor(xScale: QuantitativeScale<any>, yScale: QuantitativeScale<any>);
             remove(): Gridlines;
             protected setup(): void;
-            _doRender(): void;
+            doRender(): void;
         }
     }
 }
@@ -2596,7 +2596,7 @@ declare module Plottable {
              */
             bounds(newBounds: Bounds): SelectionBoxLayer;
             protected _setBounds(newBounds: Bounds): void;
-            _doRender(): void;
+            doRender(): void;
             /**
              * Gets whether the box is being shown.
              *
@@ -2713,7 +2713,7 @@ declare module Plottable {
          * @returns {AttributeToAppliedProjector} A dictionary mapping attributes to functions
          */
         generateProjectors(datasetKey: string): AttributeToAppliedProjector;
-        _doRender(): void;
+        doRender(): void;
         /**
          * Enables or disables animation.
          *
@@ -3947,10 +3947,10 @@ declare module Plottable {
 declare module Plottable {
     module Components {
         class DragBoxLayer extends Components.SelectionBoxLayer {
-            protected _hasCorners: boolean;
+            protected hasCorners: boolean;
             constructor();
             protected setup(): void;
-            _doRender(): void;
+            doRender(): void;
             /**
              * Gets the detection radius of the drag box.
              *
@@ -3977,7 +3977,7 @@ declare module Plottable {
              * @return {DragBoxLayer} The calling DragBoxLayer.
              */
             resizable(canResize: boolean): DragBoxLayer;
-            protected _setResizableClasses(canResize: boolean): void;
+            protected setResizableClasses(canResize: boolean): void;
             /**
              * Gets the callback that is called when dragging starts.
              *
@@ -4028,7 +4028,7 @@ declare module Plottable {
             constructor();
             computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;
             protected _setBounds(newBounds: Bounds): void;
-            protected _setResizableClasses(canResize: boolean): void;
+            protected setResizableClasses(canResize: boolean): void;
         }
     }
 }
@@ -4040,7 +4040,7 @@ declare module Plottable {
             constructor();
             computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;
             protected _setBounds(newBounds: Bounds): void;
-            protected _setResizableClasses(canResize: boolean): void;
+            protected setResizableClasses(canResize: boolean): void;
         }
     }
 }

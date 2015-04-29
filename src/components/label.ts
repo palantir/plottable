@@ -163,8 +163,8 @@ export module Components {
       }
     }
 
-    public _doRender() {
-      super._doRender();
+    public doRender() {
+      super.doRender();
       // HACKHACK SVGTypewriter should remove existing content - #21 on SVGTypewriter.
       this._textContainer.selectAll("g").remove();
       var textMeasurement = this._measurer.measure(this._text);

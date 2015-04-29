@@ -51,8 +51,8 @@ export module Components {
       this._yLinesContainer = this._content.append("g").classed("y-gridlines", true);
     }
 
-    public _doRender() {
-      super._doRender();
+    public doRender() {
+      super.doRender();
       this._redrawXLines();
       this._redrawYLines();
     }

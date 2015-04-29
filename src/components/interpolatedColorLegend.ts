@@ -166,8 +166,8 @@ export module Components {
       return this._orientation !== "horizontal";
     }
 
-    public _doRender() {
-      super._doRender();
+    public doRender() {
+      super.doRender();
 
       var domain = this._scale.domain();
 

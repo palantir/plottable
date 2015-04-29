@@ -6675,7 +6675,7 @@ describe("Component behavior", function () {
     it("components do not render unless allocated space", function () {
         var renderFlag = false;
         var c = new Plottable.Component();
-        c._doRender = function () { return renderFlag = true; };
+        c.doRender = function () { return renderFlag = true; };
         c.anchor(svg);
         c.setup();
         c.render();

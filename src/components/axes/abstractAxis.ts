@@ -141,7 +141,7 @@ module Plottable {
       return [];
     }
 
-    public _doRender() {
+    public doRender() {
       var tickMarkValues = this._getTickValues();
       var tickMarks = this._tickMarkContainer.selectAll("." + Axis.TICK_MARK_CLASS).data(tickMarkValues);
       tickMarks.enter().append("line").classed(Axis.TICK_MARK_CLASS, true);

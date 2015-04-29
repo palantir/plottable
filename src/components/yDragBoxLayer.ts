@@ -6,7 +6,7 @@ export module Components {
     constructor() {
       super();
       this.classed("y-drag-box-layer", true);
-      this._hasCorners = false;
+      this.hasCorners = false;
     }
 
     public computeLayout(offeredXOrigin?: number, offeredYOrigin?: number,
@@ -22,7 +22,7 @@ export module Components {
       });
     }
 
-    protected _setResizableClasses(canResize: boolean) {
+    protected setResizableClasses(canResize: boolean) {
       this.classed("y-resizable", canResize);
     }
   }
