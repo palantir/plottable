@@ -26,7 +26,7 @@ export module Scales {
      * @returns {Linear} A copy of the calling LinearScale.
      */
     public copy(): Linear {
-      return new Linear(this._d3Scale.copy());
+      return new Linear(this.d3Scale.copy());
     }
   }
 }

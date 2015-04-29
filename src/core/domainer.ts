@@ -47,7 +47,7 @@ module Plottable {
       if (this.combineExtents != null) {
         domain = this.combineExtents(extents);
       } else if (extents.length === 0) {
-        domain = scale._defaultExtent();
+        domain = scale.defaultExtent();
       } else {
         domain = [Utils.Methods.min(extents, (e) => e[0], 0), Utils.Methods.max(extents, (e) => e[1], 0)];
       }
@@ -203,7 +203,7 @@ module Plottable {
 
     private niceDomain(scale: QuantitativeScale<any>, domain: any[]): any[] {
       if (this.doNice) {
-        return scale._niceDomain(domain, this.niceCount);
+        return scale.niceDomain(domain, this.niceCount);
       } else {
         return domain;
       }

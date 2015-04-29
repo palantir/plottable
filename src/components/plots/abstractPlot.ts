@@ -184,7 +184,7 @@ module Plottable {
 
       if (existingScale) {
         this._datasetKeysInOrder.forEach((key) => {
-          existingScale._removeExtent(this.getID().toString() + "_" + key, attrToSet);
+          existingScale.removeExtent(this.getID().toString() + "_" + key, attrToSet);
           existingScale.broadcaster.deregisterListener(this);
         });
       }
@@ -272,12 +272,12 @@ module Plottable {
           var plotDatasetKey = this._key2PlotDatasetKey.get(key);
           var dataset = plotDatasetKey.dataset;
           var plotMetadata = plotDatasetKey.plotMetadata;
-          var extent = dataset.getExtent(projector.accessor, projector.scale._typeCoercer, plotMetadata);
+          var extent = dataset.getExtent(projector.accessor, projector.scale.typeCoercer, plotMetadata);
           var scaleKey = this.getID().toString() + "_" + key;
           if (extent.length === 0 || !this._isAnchored) {
-            projector.scale._removeExtent(scaleKey, attr);
+            projector.scale.removeExtent(scaleKey, attr);
           } else {
-            projector.scale._updateExtent(scaleKey, attr, extent);
+            projector.scale.updateExtent(scaleKey, attr, extent);
           }
         });
       }
@@ -381,7 +381,7 @@ module Plottable {
         var scaleKey = this.getID().toString() + "_" + key;
         projectors.forEach((p) => {
           if (p.scale != null) {
-            p.scale._removeExtent(scaleKey, p.attribute);
+            p.scale.removeExtent(scaleKey, p.attribute);
           }
         });
 
