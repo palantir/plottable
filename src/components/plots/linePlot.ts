@@ -30,7 +30,7 @@ export module Plots {
       return value != null && value === value;
     }
 
-    protected _getDrawer(key: string) {
+    protected getDrawer(key: string) {
       return new Plottable.Drawers.Line(key);
     }
 
@@ -49,18 +49,18 @@ export module Plots {
     protected _generateDrawSteps(): Drawers.DrawStep[] {
       var drawSteps: Drawers.DrawStep[] = [];
       if (this._dataChanged && this._animate) {
-        var attrToProjector = this._generateAttrToProjector();
+        var attrToProjector = this.generateAttrToProjector();
         attrToProjector["y"] = this._getResetYFunction();
-        drawSteps.push({attrToProjector: attrToProjector, animator: this._getAnimator("reset")});
+        drawSteps.push({attrToProjector: attrToProjector, animator: this.getAnimator("reset")});
       }
 
-      drawSteps.push({attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("main")});
+      drawSteps.push({attrToProjector: this.generateAttrToProjector(), animator: this.getAnimator("main")});
 
       return drawSteps;
     }
 
-    protected _generateAttrToProjector() {
-      var attrToProjector = super._generateAttrToProjector();
+    protected generateAttrToProjector() {
+      var attrToProjector = super.generateAttrToProjector();
       var wholeDatumAttributes = this._wholeDatumAttributes();
       var isSingleDatumAttr = (attr: string) => wholeDatumAttributes.indexOf(attr) === -1;
       var singleDatumAttributes = d3.keys(attrToProjector).filter(isSingleDatumAttr);

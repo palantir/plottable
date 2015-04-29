@@ -388,7 +388,7 @@ describe("Drawers", function () {
             var data = [{ value: 10 }, { value: 10 }, { value: 10 }, { value: 10 }];
             var piePlot = new Plottable.Plots.Pie();
             var drawer = new Plottable.Drawers.Arc("one");
-            piePlot._getDrawer = function () { return drawer; };
+            piePlot.getDrawer = function () { return drawer; };
             piePlot.addDataset("one", data);
             piePlot.project("value", "value");
             piePlot.renderTo(svg);
@@ -417,7 +417,7 @@ describe("Drawers", function () {
             var yScale = new Plottable.Scales.Linear();
             var barPlot = new Plottable.Plots.Bar(xScale, yScale);
             var drawer = new Plottable.Drawers.Rect("one", true);
-            barPlot._getDrawer = function () { return drawer; };
+            barPlot.getDrawer = function () { return drawer; };
             barPlot.addDataset("one", data);
             barPlot.project("x", "a", xScale);
             barPlot.project("y", "b", yScale);
@@ -437,7 +437,7 @@ describe("Drawers", function () {
             var yScale = new Plottable.Scales.Category();
             var barPlot = new Plottable.Plots.Bar(xScale, yScale, false);
             var drawer = new Plottable.Drawers.Rect("one", false);
-            barPlot._getDrawer = function () { return drawer; };
+            barPlot.getDrawer = function () { return drawer; };
             barPlot.addDataset("one", data);
             barPlot.project("x", "b", xScale);
             barPlot.project("y", "a", yScale);
@@ -463,7 +463,7 @@ describe("Drawers", function () {
             var yScale = new Plottable.Scales.Linear();
             var linePlot = new Plottable.Plots.Line(xScale, yScale);
             var drawer = new Plottable.Drawers.Line("one");
-            linePlot._getDrawer = function () { return drawer; };
+            linePlot.getDrawer = function () { return drawer; };
             linePlot.addDataset("one", data);
             linePlot.project("x", "a", xScale);
             linePlot.project("y", "b", yScale);
@@ -482,7 +482,7 @@ describe("Drawers", function () {
             var yScale = new Plottable.Scales.Linear();
             var linePlot = new Plottable.Plots.Line(xScale, yScale);
             var drawer = new Plottable.Drawers.Line("one");
-            linePlot._getDrawer = function () { return drawer; };
+            linePlot.getDrawer = function () { return drawer; };
             linePlot.addDataset("one", data);
             linePlot.project("x", "a", xScale);
             linePlot.project("y", "b", yScale);
@@ -2198,7 +2198,7 @@ describe("Plots", function () {
             var r = new Plottable.Plot();
             var s = new Plottable.Scales.Linear().domain([0, 1]).range([0, 10]);
             r.project("attr", "a", s);
-            var attrToProjector = r._generateAttrToProjector();
+            var attrToProjector = r.generateAttrToProjector();
             var projector = attrToProjector["attr"];
             assert.equal(projector({ "a": 0.5 }, 0, null, null), 5, "projector works as intended");
         });
@@ -2230,8 +2230,8 @@ describe("Plots", function () {
             var mockDrawer2 = new Plottable.Drawers.AbstractDrawer("ds2");
             mockDrawer2.setup = function () { return mockDrawer2._renderArea = renderArea2; };
             mockDrawer2._getSelector = function () { return "circle"; };
-            // Mock _getDrawer to return the mock drawers
-            plot._getDrawer = function (key) {
+            // Mock getDrawer to return the mock drawers
+            plot.getDrawer = function (key) {
                 if (key === "ds1") {
                     return mockDrawer1;
                 }
@@ -2281,8 +2281,8 @@ describe("Plots", function () {
             mockDrawer2.setup = function () { return mockDrawer2._renderArea = renderArea2; };
             mockDrawer2._getSelector = function () { return "circle"; };
             mockDrawer2._getPixelPoint = data2PointConverter;
-            // Mock _getDrawer to return the mock drawers
-            plot._getDrawer = function (key) {
+            // Mock getDrawer to return the mock drawers
+            plot.getDrawer = function (key) {
                 if (key === "ds1") {
                     return mockDrawer1;
                 }
@@ -2330,8 +2330,8 @@ describe("Plots", function () {
             mockDrawer.setup = function () { return mockDrawer._renderArea = renderArea; };
             mockDrawer._getSelector = function () { return "circle"; };
             mockDrawer._getPixelPoint = dataPointConverter;
-            // Mock _getDrawer to return the mock drawer
-            plot._getDrawer = function () { return mockDrawer; };
+            // Mock getDrawer to return the mock drawer
+            plot.getDrawer = function () { return mockDrawer; };
             plot.addDataset("ds", data);
             plot.renderTo(svg);
             var oneElementPlotData = plot.getAllPlotData();
@@ -2371,8 +2371,8 @@ describe("Plots", function () {
             mockDrawer2.setup = function () { return mockDrawer2._renderArea = renderArea2; };
             mockDrawer2._getSelector = function () { return "circle"; };
             mockDrawer2._getPixelPoint = data2PointConverter;
-            // Mock _getDrawer to return the mock drawers
-            plot._getDrawer = function (key) {
+            // Mock getDrawer to return the mock drawers
+            plot.getDrawer = function (key) {
                 if (key === "ds1") {
                     return mockDrawer1;
                 }
@@ -2835,7 +2835,7 @@ describe("Plots", function () {
         var oldWarn = Plottable.Utils.Methods.warn;
         beforeEach(function () {
             p = new Plottable.Plot();
-            p._getDrawer = function (k) { return new Plottable.Drawers.Element(k).svgElement("rect"); };
+            p.getDrawer = function (k) { return new Plottable.Drawers.Element(k).svgElement("rect"); };
         });
         afterEach(function () {
             Plottable.Utils.Methods.warn = oldWarn;
@@ -4507,7 +4507,7 @@ describe("Plots", function () {
             stackedPlot = new Plottable.Stacked(xScale, yScale);
             stackedPlot.project("x", "x", xScale);
             stackedPlot.project("y", "y", yScale);
-            stackedPlot._getDrawer = function (key) { return new Plottable.Drawers.AbstractDrawer(key); };
+            stackedPlot.getDrawer = function (key) { return new Plottable.Drawers.AbstractDrawer(key); };
             stackedPlot._isVertical = true;
         });
         it("uses positive offset on stacking the 0 value", function () {

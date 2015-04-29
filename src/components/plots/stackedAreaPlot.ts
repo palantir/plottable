@@ -21,11 +21,11 @@ export module Plots {
       this._isVertical = true;
     }
 
-    protected _getDrawer(key: string) {
+    protected getDrawer(key: string) {
       return new Plottable.Drawers.Area(key).drawLine(false);
     }
 
-    public _getAnimator(key: string): Animators.PlotAnimator {
+    public getAnimator(key: string): Animators.PlotAnimator {
       return new Animators.Null();
     }
 
@@ -43,7 +43,7 @@ export module Plots {
         "y2": scaledBaseline
       };
 
-      this._getAnimator("baseline").animate(this._baseline, baselineAttr);
+      this.getAnimator("baseline").animate(this._baseline, baselineAttr);
     }
 
     protected _updateYDomainer() {
@@ -69,8 +69,8 @@ export module Plots {
       return this;
     }
 
-    protected _generateAttrToProjector() {
-      var attrToProjector = super._generateAttrToProjector();
+    protected generateAttrToProjector() {
+      var attrToProjector = super.generateAttrToProjector();
 
       if (this._projections["fill-opacity"] == null) {
         attrToProjector["fill-opacity"] = d3.functor(1);

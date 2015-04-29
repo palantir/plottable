@@ -22,12 +22,12 @@ export module Plots {
       this.classed("rectangle-plot", true);
     }
 
-    protected _getDrawer(key: string) {
+    protected getDrawer(key: string) {
       return new Drawers.Rect(key, true);
     }
 
-    protected _generateAttrToProjector() {
-      var attrToProjector = super._generateAttrToProjector();
+    protected generateAttrToProjector() {
+      var attrToProjector = super.generateAttrToProjector();
 
       // Copy each of the different projectors.
       var x1Attr = attrToProjector["x1"];
@@ -55,7 +55,7 @@ export module Plots {
     }
 
     protected _generateDrawSteps(): Drawers.DrawStep[] {
-      return [{attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("rectangles")}];
+      return [{attrToProjector: this.generateAttrToProjector(), animator: this.getAnimator("rectangles")}];
     }
   }
 }

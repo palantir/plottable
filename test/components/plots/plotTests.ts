@@ -113,7 +113,7 @@ describe("Plots", () => {
       var r = new Plottable.Plot();
       var s = new Plottable.Scales.Linear().domain([0, 1]).range([0, 10]);
       r.project("attr", "a", s);
-      var attrToProjector = (<any> r)._generateAttrToProjector();
+      var attrToProjector = (<any> r).generateAttrToProjector();
       var projector = attrToProjector["attr"];
       assert.equal(projector({"a": 0.5}, 0, null, null), 5, "projector works as intended");
     });
@@ -156,8 +156,8 @@ describe("Plots", () => {
       (<any> mockDrawer2).setup = () => (<any> mockDrawer2)._renderArea = renderArea2;
       (<any> mockDrawer2)._getSelector = () => "circle";
 
-      // Mock _getDrawer to return the mock drawers
-      (<any> plot)._getDrawer = (key: string) => {
+      // Mock getDrawer to return the mock drawers
+      (<any> plot).getDrawer = (key: string) => {
         if (key === "ds1") {
           return mockDrawer1;
         } else {
@@ -214,8 +214,8 @@ describe("Plots", () => {
       (<any> mockDrawer2)._getSelector = () => "circle";
       (<any> mockDrawer2)._getPixelPoint = data2PointConverter;
 
-      // Mock _getDrawer to return the mock drawers
-      (<any> plot)._getDrawer = (key: string) => {
+      // Mock getDrawer to return the mock drawers
+      (<any> plot).getDrawer = (key: string) => {
         if (key === "ds1") {
           return mockDrawer1;
         } else {
@@ -270,8 +270,8 @@ describe("Plots", () => {
       (<any> mockDrawer)._getSelector = () => "circle";
       (<any> mockDrawer)._getPixelPoint = dataPointConverter;
 
-      // Mock _getDrawer to return the mock drawer
-      (<any> plot)._getDrawer = () => mockDrawer;
+      // Mock getDrawer to return the mock drawer
+      (<any> plot).getDrawer = () => mockDrawer;
 
       plot.addDataset("ds", data);
       plot.renderTo(svg);
@@ -317,8 +317,8 @@ describe("Plots", () => {
       (<any> mockDrawer2)._getSelector = () => "circle";
       (<any> mockDrawer2)._getPixelPoint = data2PointConverter;
 
-      // Mock _getDrawer to return the mock drawers
-      (<any> plot)._getDrawer = (key: string) => {
+      // Mock getDrawer to return the mock drawers
+      (<any> plot).getDrawer = (key: string) => {
         if (key === "ds1") {
           return mockDrawer1;
         } else {

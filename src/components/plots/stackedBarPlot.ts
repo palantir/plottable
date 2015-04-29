@@ -17,7 +17,7 @@ export module Plots {
       super(xScale, yScale, isVertical);
     }
 
-    protected _getAnimator(key: string): Animators.PlotAnimator {
+    protected getAnimator(key: string): Animators.PlotAnimator {
       if (this._animate && this._animateOnNextRender) {
         if (this.animator(key)) {
           return this.animator(key);
@@ -31,8 +31,8 @@ export module Plots {
       return new Animators.Null();
     }
 
-    protected _generateAttrToProjector() {
-      var attrToProjector = super._generateAttrToProjector();
+    protected generateAttrToProjector() {
+      var attrToProjector = super.generateAttrToProjector();
 
       var valueAttr = this._isVertical ? "y" : "x";
       var keyAttr = this._isVertical ? "x" : "y";
@@ -56,7 +56,7 @@ export module Plots {
     }
 
     protected _generateDrawSteps(): Drawers.DrawStep[] {
-      return [{attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("stacked-bar")}];
+      return [{attrToProjector: this.generateAttrToProjector(), animator: this.getAnimator("stacked-bar")}];
     }
 
     public project(attrToSet: string, accessor: any, scale?: Scale<any, any>) {

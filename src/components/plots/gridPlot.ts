@@ -43,7 +43,7 @@ export module Plots {
       return this;
     }
 
-    protected _getDrawer(key: string) {
+    protected getDrawer(key: string) {
       return new Drawers.Rect(key, true);
     }
 
@@ -94,7 +94,7 @@ export module Plots {
     }
 
     protected _generateDrawSteps(): Drawers.DrawStep[] {
-      return [{attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("cells")}];
+      return [{attrToProjector: this.generateAttrToProjector(), animator: this.getAnimator("cells")}];
     }
   }
 }

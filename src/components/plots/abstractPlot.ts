@@ -115,7 +115,7 @@ module Plottable {
       if (this._key2PlotDatasetKey.has(key)) {
         this.removeDataset(key);
       };
-      var drawer = this._getDrawer(key);
+      var drawer = this.getDrawer(key);
       var metadata = this._getPlotMetadataForDataset(key);
       var pdk = {drawer: drawer, dataset: dataset, key: key, plotMetadata: metadata};
       this._datasetKeysInOrder.push(key);
@@ -128,11 +128,11 @@ module Plottable {
       this._onDatasetUpdate();
     }
 
-    protected _getDrawer(key: string): Drawers.AbstractDrawer {
+    protected getDrawer(key: string): Drawers.AbstractDrawer {
       return new Drawers.AbstractDrawer(key);
     }
 
-    protected _getAnimator(key: string): Animators.PlotAnimator {
+    protected getAnimator(key: string): Animators.PlotAnimator {
       if (this._animate && this._animateOnNextRender) {
         return this._animators[key] || new Animators.Null();
       } else {
@@ -199,7 +199,7 @@ module Plottable {
       return this;
     }
 
-    protected _generateAttrToProjector(): AttributeToProjector {
+    protected generateAttrToProjector(): AttributeToProjector {
       var h: AttributeToProjector = {};
       d3.keys(this._projections).forEach((a) => {
         var projection = this._projections[a];
@@ -221,7 +221,7 @@ module Plottable {
      * @returns {AttributeToAppliedProjector} A dictionary mapping attributes to functions
      */
     public generateProjectors(datasetKey: string): AttributeToAppliedProjector {
-      var attrToProjector = this._generateAttrToProjector();
+      var attrToProjector = this.generateAttrToProjector();
       var plotDatasetKey = this._key2PlotDatasetKey.get(datasetKey);
       var plotMetadata = plotDatasetKey.plotMetadata;
       var userMetadata = plotDatasetKey.dataset.metadata();
@@ -402,7 +402,7 @@ module Plottable {
     }
 
     protected _generateDrawSteps(): Drawers.DrawStep[] {
-      return [{attrToProjector: this._generateAttrToProjector(), animator: new Animators.Null()}];
+      return [{attrToProjector: this.generateAttrToProjector(), animator: new Animators.Null()}];
     }
 
     protected _additionalPaint(time: number) {
