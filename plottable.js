@@ -9151,11 +9151,14 @@ var Plottable;
                 _super.call(this);
                 this.translator = Plottable.Utils.ClientToSVGTranslator.getTranslator(svg);
                 this._startBroadcaster = new Plottable.Core.Broadcaster(this);
-                this._event2Callback["touchstart"] = function (e) { return _this._measureAndBroadcast(e, _this._startBroadcaster); };
                 this._moveBroadcaster = new Plottable.Core.Broadcaster(this);
-                this._event2Callback["touchmove"] = function (e) { return _this._measureAndBroadcast(e, _this._moveBroadcaster); };
                 this._endBroadcaster = new Plottable.Core.Broadcaster(this);
-                this._event2Callback["touchend"] = function (e) { return _this._measureAndBroadcast(e, _this._endBroadcaster); };
+                this._startCallbackSet = new Plottable.Utils.CallbackSet();
+                this._moveCallbackSet = new Plottable.Utils.CallbackSet();
+                this._endCallbackSet = new Plottable.Utils.CallbackSet();
+                this._event2Callback["touchstart"] = function (e) { return _this._measureAndBroadcast(e, _this._startBroadcaster, _this._startCallbackSet); };
+                this._event2Callback["touchmove"] = function (e) { return _this._measureAndBroadcast(e, _this._moveBroadcaster, _this._moveCallbackSet); };
+                this._event2Callback["touchend"] = function (e) { return _this._measureAndBroadcast(e, _this._endBroadcaster, _this._endCallbackSet); };
                 this._broadcasters = [this._moveBroadcaster, this._startBroadcaster, this._endBroadcaster];
             }
             /**
@@ -9190,6 +9193,7 @@ var Plottable;
              */
             Touch.prototype.onTouchStart = function (key, callback) {
                 this._setCallback(this._startBroadcaster, key, callback);
+                this._startCallbackSet.add(this._getWrappedCallback(callback));
                 return this;
             };
             /**
@@ -9205,6 +9209,7 @@ var Plottable;
              */
             Touch.prototype.onTouchMove = function (key, callback) {
                 this._setCallback(this._moveBroadcaster, key, callback);
+                this._moveCallbackSet.add(this._getWrappedCallback(callback));
                 return this;
             };
             /**
@@ -9220,13 +9225,14 @@ var Plottable;
              */
             Touch.prototype.onTouchEnd = function (key, callback) {
                 this._setCallback(this._endBroadcaster, key, callback);
+                this._endCallbackSet.add(this._getWrappedCallback(callback));
                 return this;
             };
             /**
              * Computes the Touch position from the given event, and if successful
              * calls broadcast() on the supplied Broadcaster.
              */
-            Touch.prototype._measureAndBroadcast = function (e, b) {
+            Touch.prototype._measureAndBroadcast = function (e, b, callbackSet) {
                 var touches = e.changedTouches;
                 var touchPositions = {};
                 var touchIdentifiers = [];
@@ -9241,7 +9247,8 @@ var Plottable;
                 }
                 ;
                 if (touchIdentifiers.length > 0) {
-                    b.broadcast(touchIdentifiers, touchPositions, e);
+                    // b.broadcast(touchIdentifiers, touchPositions, e);
+                    callbackSet.callCallbacks(this, touchIdentifiers, touchPositions, e);
                 }
             };
             /**

@@ -17,6 +17,11 @@ export module Dispatchers {
     private _moveBroadcaster: Core.Broadcaster<Dispatchers.Touch>;
     private _endBroadcaster: Core.Broadcaster<Dispatchers.Touch>;
 
+
+    private _startCallbackSet: Utils.CallbackSet<Function>;
+    private _moveCallbackSet: Utils.CallbackSet<Function>;
+    private _endCallbackSet: Utils.CallbackSet<Function>;
+
     /**
      * Get a Dispatcher.Touch for the <svg> containing elem. If one already exists
      * on that <svg>, it will be returned; otherwise, a new one will be created.
@@ -47,13 +52,21 @@ export module Dispatchers {
       this.translator = Utils.ClientToSVGTranslator.getTranslator(svg);
 
       this._startBroadcaster = new Core.Broadcaster(this);
-      this._event2Callback["touchstart"] = (e: TouchEvent) => this._measureAndBroadcast(e, this._startBroadcaster);
-
       this._moveBroadcaster = new Core.Broadcaster(this);
-      this._event2Callback["touchmove"] = (e: TouchEvent) => this._measureAndBroadcast(e, this._moveBroadcaster);
-
       this._endBroadcaster = new Core.Broadcaster(this);
-      this._event2Callback["touchend"] = (e: TouchEvent) => this._measureAndBroadcast(e, this._endBroadcaster);
+
+      this._startCallbackSet = new Utils.CallbackSet();
+      this._moveCallbackSet = new Utils.CallbackSet();
+      this._endCallbackSet = new Utils.CallbackSet();
+
+
+
+      this._event2Callback["touchstart"] = (e: TouchEvent) => this._measureAndBroadcast(e, this._startBroadcaster,
+        this._startCallbackSet);
+      this._event2Callback["touchmove"] = (e: TouchEvent) => this._measureAndBroadcast(e, this._moveBroadcaster,
+        this._moveCallbackSet);
+      this._event2Callback["touchend"] = (e: TouchEvent) => this._measureAndBroadcast(e, this._endBroadcaster,
+        this._endCallbackSet);
 
       this._broadcasters = [this._moveBroadcaster, this._startBroadcaster, this._endBroadcaster];
     }
@@ -75,6 +88,7 @@ export module Dispatchers {
      */
     public onTouchStart(key: any, callback: TouchCallback): Dispatchers.Touch {
       this._setCallback(this._startBroadcaster, key, callback);
+      this._startCallbackSet.add(this._getWrappedCallback(callback));
       return this;
     }
 
@@ -91,6 +105,7 @@ export module Dispatchers {
      */
     public onTouchMove(key: any, callback: TouchCallback): Dispatchers.Touch {
       this._setCallback(this._moveBroadcaster, key, callback);
+      this._moveCallbackSet.add(this._getWrappedCallback(callback));
       return this;
     }
 
@@ -107,6 +122,7 @@ export module Dispatchers {
      */
     public onTouchEnd(key: any, callback: TouchCallback): Dispatchers.Touch {
       this._setCallback(this._endBroadcaster, key, callback);
+      this._endCallbackSet.add(this._getWrappedCallback(callback));
       return this;
     }
 
@@ -114,7 +130,7 @@ export module Dispatchers {
      * Computes the Touch position from the given event, and if successful
      * calls broadcast() on the supplied Broadcaster.
      */
-    private _measureAndBroadcast(e: TouchEvent, b: Core.Broadcaster<Dispatchers.Touch>) {
+    private _measureAndBroadcast(e: TouchEvent, b: Core.Broadcaster<Dispatchers.Touch>, callbackSet: Utils.CallbackSet<Function>) {
       var touches = e.changedTouches;
       var touchPositions: { [id: number]: Point; } = {};
       var touchIdentifiers: number[] = [];
@@ -128,7 +144,8 @@ export module Dispatchers {
         }
       };
       if (touchIdentifiers.length > 0) {
-        b.broadcast(touchIdentifiers, touchPositions, e);
+        // b.broadcast(touchIdentifiers, touchPositions, e);
+        callbackSet.callCallbacks(this, touchIdentifiers, touchPositions, e);
       }
     }
   }
