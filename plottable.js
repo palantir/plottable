@@ -1325,10 +1325,10 @@ var Plottable;
                  */
                 var Timeout = (function () {
                     function Timeout() {
-                        this._timeoutMsec = Plottable.Utils.DOM.POLYFILL_TIMEOUT_MSEC;
+                        this.timeoutMsec = Plottable.Utils.DOM.POLYFILL_TIMEOUT_MSEC;
                     }
                     Timeout.prototype.render = function () {
-                        setTimeout(RenderControllers.flush, this._timeoutMsec);
+                        setTimeout(RenderControllers.flush, this.timeoutMsec);
                     };
                     return Timeout;
                 })();
