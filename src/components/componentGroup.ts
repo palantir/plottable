@@ -17,7 +17,7 @@ export module Component {
      * @constructor
      * @param {Component[]} components The Components in the resultant Component.Group (default = []).
      */
-    constructor(components: AbstractComponent[] = []){
+    constructor(components: AbstractComponent[] = []) {
       super();
       this.classed("component-group", true);
       components.forEach((c: AbstractComponent) => this._addComponent(c));

@@ -202,7 +202,7 @@ export module Axis {
      */
     public axisConfigurations(configurations: TimeAxisConfiguration[]): Time;
     public axisConfigurations(configurations?: any): any {
-      if(configurations == null){
+      if (configurations == null) {
         return this._possibleTimeAxisConfigurations;
       }
       this._possibleTimeAxisConfigurations = configurations;

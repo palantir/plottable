@@ -50,7 +50,7 @@ export module Plot {
       });
     }
 
-    private _makeInnerScale(){
+    private _makeInnerScale() {
       var innerScale = new Scale.Category();
       innerScale.domain(this._datasetKeysInOrder);
       if (!this._projections["width"]) {
