@@ -31,7 +31,7 @@ export module Plots {
 
     protected setup() {
       super.setup();
-      this.baseline = this._renderArea.append("line").classed("baseline", true);
+      this.baseline = this.renderArea.append("line").classed("baseline", true);
     }
 
     protected additionalPaint() {
@@ -72,12 +72,12 @@ export module Plots {
     protected generateAttrToProjector() {
       var attrToProjector = super.generateAttrToProjector();
 
-      if (this._projections["fill-opacity"] == null) {
+      if (this.projections["fill-opacity"] == null) {
         attrToProjector["fill-opacity"] = d3.functor(1);
       }
 
-      var yAccessor = this._projections["y"].accessor;
-      var xAccessor = this._projections["x"].accessor;
+      var yAccessor = this.projections["y"].accessor;
+      var xAccessor = this.projections["x"].accessor;
       attrToProjector["y"] = (d: any, i: number, u: any, m: StackedPlotMetadata) =>
         this.yScale.scale(+yAccessor(d, i, u, m) + m.offsets.get(xAccessor(d, i, u, m)));
       attrToProjector["y0"] = (d: any, i: number, u: any, m: StackedPlotMetadata) =>
@@ -94,10 +94,10 @@ export module Plots {
     public updateStackOffsets() {
       if (!this._projectorsReady()) { return; }
       var domainKeys = this.getDomainKeys();
-      var keyAccessor = this._isVertical ? this._projections["x"].accessor : this._projections["y"].accessor;
-      var keySets = this._datasetKeysInOrder.map((k) => {
-        var dataset = this._key2PlotDatasetKey.get(k).dataset;
-        var plotMetadata = this._key2PlotDatasetKey.get(k).plotMetadata;
+      var keyAccessor = this._isVertical ? this.projections["x"].accessor : this.projections["y"].accessor;
+      var keySets = this.datasetKeysInOrder.map((k) => {
+        var dataset = this.key2PlotDatasetKey.get(k).dataset;
+        var plotMetadata = this.key2PlotDatasetKey.get(k).plotMetadata;
         return d3.set(dataset.data().map((datum, i) => keyAccessor(datum, i, dataset.metadata(), plotMetadata).toString())).values();
       });
 

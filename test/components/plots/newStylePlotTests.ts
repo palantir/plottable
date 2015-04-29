@@ -23,7 +23,7 @@ describe("Plots", () => {
       var d4 = new Plottable.Dataset([10, 11, 12]);
       p.addDataset(d4);
 
-      assert.deepEqual((<any> p)._datasetKeysInOrder, ["foo", "bar", "_0", "_1"], "dataset keys as expected");
+      assert.deepEqual((<any> p).datasetKeysInOrder, ["foo", "bar", "_0", "_1"], "dataset keys as expected");
       var datasets = p.datasets();
       assert.deepEqual(datasets[0].data(), [1, 2, 3]);
       assert.equal(datasets[1], d2);
@@ -33,7 +33,7 @@ describe("Plots", () => {
       p.removeDataset("foo");
       p.removeDataset("_0");
 
-      assert.deepEqual((<any> p)._datasetKeysInOrder, ["bar", "_1"]);
+      assert.deepEqual((<any> p).datasetKeysInOrder, ["bar", "_1"]);
       assert.lengthOf(p.datasets(), 2);
     });
 

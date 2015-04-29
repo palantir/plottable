@@ -18,7 +18,7 @@ export module Drawers {
   }
 
   export class AbstractDrawer {
-    private _renderArea: D3.Selection;
+    private renderArea: D3.Selection;
     protected _className: string;
     public key: string;
     protected _attrToProjector: AttributeToAppliedProjector;
@@ -44,7 +44,7 @@ export module Drawers {
     }
 
     public setup(area: D3.Selection) {
-      this._renderArea = area;
+      this.renderArea = area;
     }
 
     /**
@@ -138,7 +138,7 @@ export module Drawers {
      * @returns {D3.Selection} the renderArea selection
      */
     public _getRenderArea(): D3.Selection {
-      return this._renderArea;
+      return this.renderArea;
     }
 
     public _getSelector(): string {

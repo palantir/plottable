@@ -26,7 +26,7 @@ module Plottable {
 
     public project(attrToSet: string, accessor: any, scale?: Scale<any, any>) {
       super.project(attrToSet, accessor, scale);
-      if (this._projections["x"] && this._projections["y"] && (attrToSet === "x" || attrToSet === "y")) {
+      if (this.projections["x"] && this.projections["y"] && (attrToSet === "x" || attrToSet === "y")) {
         this.updateStackOffsets();
       }
       return this;
@@ -63,18 +63,18 @@ module Plottable {
       var datasets = this.datasets();
       var valueAccessor = this.valueAccessor();
       var keyAccessor = this.keyAccessor();
-      var maxStackExtent = Utils.Methods.max<string, number>(this._datasetKeysInOrder, (k: string) => {
-        var dataset = this._key2PlotDatasetKey.get(k).dataset;
-        var plotMetadata = <Plots.StackedPlotMetadata>this._key2PlotDatasetKey.get(k).plotMetadata;
+      var maxStackExtent = Utils.Methods.max<string, number>(this.datasetKeysInOrder, (k: string) => {
+        var dataset = this.key2PlotDatasetKey.get(k).dataset;
+        var plotMetadata = <Plots.StackedPlotMetadata>this.key2PlotDatasetKey.get(k).plotMetadata;
         return Utils.Methods.max<any, number>(dataset.data(), (datum: any, i: number) => {
           return +valueAccessor(datum, i, dataset.metadata(), plotMetadata) +
             plotMetadata.offsets.get(keyAccessor(datum, i, dataset.metadata(), plotMetadata));
         }, 0);
       }, 0);
 
-      var minStackExtent = Utils.Methods.min<string, number>(this._datasetKeysInOrder, (k: string) => {
-        var dataset = this._key2PlotDatasetKey.get(k).dataset;
-        var plotMetadata = <Plots.StackedPlotMetadata>this._key2PlotDatasetKey.get(k).plotMetadata;
+      var minStackExtent = Utils.Methods.min<string, number>(this.datasetKeysInOrder, (k: string) => {
+        var dataset = this.key2PlotDatasetKey.get(k).dataset;
+        var plotMetadata = <Plots.StackedPlotMetadata>this.key2PlotDatasetKey.get(k).plotMetadata;
         return Utils.Methods.min<any, number>(dataset.data(), (datum: any, i: number) => {
           return +valueAccessor(datum, i, dataset.metadata(), plotMetadata) +
             plotMetadata.offsets.get(keyAccessor(datum, i, dataset.metadata(), plotMetadata));
@@ -110,9 +110,9 @@ module Plottable {
       var keyAccessor = this.keyAccessor();
       var valueAccessor = this.valueAccessor();
 
-      this._datasetKeysInOrder.forEach((k, index) => {
-        var dataset = this._key2PlotDatasetKey.get(k).dataset;
-        var plotMetadata = <Plots.StackedPlotMetadata>this._key2PlotDatasetKey.get(k).plotMetadata;
+      this.datasetKeysInOrder.forEach((k, index) => {
+        var dataset = this.key2PlotDatasetKey.get(k).dataset;
+        var plotMetadata = <Plots.StackedPlotMetadata>this.key2PlotDatasetKey.get(k).plotMetadata;
         var positiveDataMap = positiveDataMapArray[index];
         var negativeDataMap = negativeDataMapArray[index];
         var isAllNegativeValues = dataset.data().every((datum, i) => valueAccessor(datum, i, dataset.metadata(), plotMetadata) <= 0);
@@ -138,9 +138,9 @@ module Plottable {
       var keyAccessor = this.keyAccessor();
       var domainKeys = d3.set();
 
-      this._datasetKeysInOrder.forEach((k) => {
-        var dataset = this._key2PlotDatasetKey.get(k).dataset;
-        var plotMetadata = this._key2PlotDatasetKey.get(k).plotMetadata;
+      this.datasetKeysInOrder.forEach((k) => {
+        var dataset = this.key2PlotDatasetKey.get(k).dataset;
+        var plotMetadata = this.key2PlotDatasetKey.get(k).plotMetadata;
         dataset.data().forEach((datum, index) => {
           domainKeys.add(keyAccessor(datum, index, dataset.metadata(), plotMetadata));
         });
@@ -154,15 +154,15 @@ module Plottable {
       var valueAccessor = this.valueAccessor();
       var domainKeys = this.getDomainKeys();
 
-      var dataMapArray = this._datasetKeysInOrder.map(() => {
+      var dataMapArray = this.datasetKeysInOrder.map(() => {
         return Utils.Methods.populateMap(domainKeys, (domainKey) => {
           return {key: domainKey, value: 0};
         });
       });
 
-      this._datasetKeysInOrder.forEach((k, datasetIndex) => {
-        var dataset = this._key2PlotDatasetKey.get(k).dataset;
-        var plotMetadata = this._key2PlotDatasetKey.get(k).plotMetadata;
+      this.datasetKeysInOrder.forEach((k, datasetIndex) => {
+        var dataset = this.key2PlotDatasetKey.get(k).dataset;
+        var plotMetadata = this.key2PlotDatasetKey.get(k).plotMetadata;
         dataset.data().forEach((datum, index) => {
           var key = keyAccessor(datum, index, dataset.metadata(), plotMetadata);
           var value = valueAccessor(datum, index, dataset.metadata(), plotMetadata);
@@ -187,8 +187,8 @@ module Plottable {
     }
 
     public normalizeDatasets<A, B>(fromX: boolean): {a: A; b: B}[] {
-      var aAccessor = this._projections[fromX ? "x" : "y"].accessor;
-      var bAccessor = this._projections[fromX ? "y" : "x"].accessor;
+      var aAccessor = this.projections[fromX ? "x" : "y"].accessor;
+      var bAccessor = this.projections[fromX ? "y" : "x"].accessor;
       var aStackedAccessor = (d: any, i: number, u: any, m: Plots.StackedPlotMetadata) => {
         var value = aAccessor(d, i, u, m);
         if (this._isVertical ? !fromX : fromX) {
@@ -205,9 +205,9 @@ module Plottable {
         return value;
       };
 
-      return Utils.Methods.flatten(this._datasetKeysInOrder.map((key: string) => {
-        var dataset = this._key2PlotDatasetKey.get(key).dataset;
-        var plotMetadata = <Plots.StackedPlotMetadata>this._key2PlotDatasetKey.get(key).plotMetadata;
+      return Utils.Methods.flatten(this.datasetKeysInOrder.map((key: string) => {
+        var dataset = this.key2PlotDatasetKey.get(key).dataset;
+        var plotMetadata = <Plots.StackedPlotMetadata>this.key2PlotDatasetKey.get(key).plotMetadata;
         return dataset.data().map((d, i) => {
           return {
             a: aStackedAccessor(d, i, dataset.metadata(), plotMetadata),
@@ -218,11 +218,11 @@ module Plottable {
     }
 
     public keyAccessor(): Accessor {
-       return this._isVertical ? this._projections["x"].accessor : this._projections["y"].accessor;
+       return this._isVertical ? this.projections["x"].accessor : this.projections["y"].accessor;
     }
 
     public valueAccessor(): Accessor {
-       return this._isVertical ? this._projections["y"].accessor : this._projections["x"].accessor;
+       return this._isVertical ? this.projections["y"].accessor : this.projections["x"].accessor;
     }
   }
 }

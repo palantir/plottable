@@ -40,7 +40,7 @@ export module Plots {
 
     protected generateDrawSteps(): Drawers.DrawStep[] {
       var drawSteps: Drawers.DrawStep[] = [];
-      if (this._dataChanged && this._animate) {
+      if (this.dataChanged && this._animate) {
         var resetAttrToProjector = this.generateAttrToProjector();
         resetAttrToProjector["size"] = () => 0;
         drawSteps.push({attrToProjector: resetAttrToProjector, animator: this.getAnimator("symbols-reset")});

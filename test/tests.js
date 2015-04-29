@@ -2223,12 +2223,12 @@ describe("Plots", function () {
             var mockDrawer1 = new Plottable.Drawers.AbstractDrawer("ds1");
             var renderArea1 = svg.append("g");
             renderArea1.append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
-            mockDrawer1.setup = function () { return mockDrawer1._renderArea = renderArea1; };
+            mockDrawer1.setup = function () { return mockDrawer1.renderArea = renderArea1; };
             mockDrawer1._getSelector = function () { return "circle"; };
             var renderArea2 = svg.append("g");
             renderArea2.append("circle").attr("cx", 10).attr("cy", 10).attr("r", 10);
             var mockDrawer2 = new Plottable.Drawers.AbstractDrawer("ds2");
-            mockDrawer2.setup = function () { return mockDrawer2._renderArea = renderArea2; };
+            mockDrawer2.setup = function () { return mockDrawer2.renderArea = renderArea2; };
             mockDrawer2._getSelector = function () { return "circle"; };
             // Mock getDrawer to return the mock drawers
             plot.getDrawer = function (key) {
@@ -2272,13 +2272,13 @@ describe("Plots", function () {
             var mockDrawer1 = new Plottable.Drawers.AbstractDrawer("ds1");
             var renderArea1 = svg.append("g");
             renderArea1.append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
-            mockDrawer1.setup = function () { return mockDrawer1._renderArea = renderArea1; };
+            mockDrawer1.setup = function () { return mockDrawer1.renderArea = renderArea1; };
             mockDrawer1._getSelector = function () { return "circle"; };
             mockDrawer1._getPixelPoint = data1PointConverter;
             var renderArea2 = svg.append("g");
             renderArea2.append("circle").attr("cx", 10).attr("cy", 10).attr("r", 10);
             var mockDrawer2 = new Plottable.Drawers.AbstractDrawer("ds2");
-            mockDrawer2.setup = function () { return mockDrawer2._renderArea = renderArea2; };
+            mockDrawer2.setup = function () { return mockDrawer2.renderArea = renderArea2; };
             mockDrawer2._getSelector = function () { return "circle"; };
             mockDrawer2._getPixelPoint = data2PointConverter;
             // Mock getDrawer to return the mock drawers
@@ -2327,7 +2327,7 @@ describe("Plots", function () {
             var circles = renderArea.selectAll("circles").data(data);
             circles.enter().append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
             circles.exit().remove();
-            mockDrawer.setup = function () { return mockDrawer._renderArea = renderArea; };
+            mockDrawer.setup = function () { return mockDrawer.renderArea = renderArea; };
             mockDrawer._getSelector = function () { return "circle"; };
             mockDrawer._getPixelPoint = dataPointConverter;
             // Mock getDrawer to return the mock drawer
@@ -2362,13 +2362,13 @@ describe("Plots", function () {
             var mockDrawer1 = new Plottable.Drawers.AbstractDrawer("ds1");
             var renderArea1 = svg.append("g");
             renderArea1.append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
-            mockDrawer1.setup = function () { return mockDrawer1._renderArea = renderArea1; };
+            mockDrawer1.setup = function () { return mockDrawer1.renderArea = renderArea1; };
             mockDrawer1._getSelector = function () { return "circle"; };
             mockDrawer1._getPixelPoint = data1PointConverter;
             var renderArea2 = svg.append("g");
             renderArea2.append("circle").attr("cx", 10).attr("cy", 10).attr("r", 10);
             var mockDrawer2 = new Plottable.Drawers.AbstractDrawer("ds2");
-            mockDrawer2.setup = function () { return mockDrawer2._renderArea = renderArea2; };
+            mockDrawer2.setup = function () { return mockDrawer2.renderArea = renderArea2; };
             mockDrawer2._getSelector = function () { return "circle"; };
             mockDrawer2._getPixelPoint = data2PointConverter;
             // Mock getDrawer to return the mock drawers
@@ -2638,7 +2638,7 @@ describe("Plots", function () {
             piePlot.addDataset("simpleDataset", simpleDataset);
             piePlot.project("value", "value");
             piePlot.renderTo(svg);
-            renderArea = piePlot._renderArea;
+            renderArea = piePlot.renderArea;
         });
         it("sectors divided evenly", function () {
             var arcPaths = renderArea.selectAll(".arc");
@@ -2725,7 +2725,7 @@ describe("Plots", function () {
         describe("getAllSelections", function () {
             it("retrieves all dataset selections with no args", function () {
                 var allSectors = piePlot.getAllSelections();
-                var allSectors2 = piePlot.getAllSelections(piePlot._datasetKeysInOrder);
+                var allSectors2 = piePlot.getAllSelections(piePlot.datasetKeysInOrder);
                 assert.deepEqual(allSectors, allSectors2, "all sectors retrieved");
                 svg.remove();
             });
@@ -2847,7 +2847,7 @@ describe("Plots", function () {
             p.addDataset([7, 8, 9]);
             var d4 = new Plottable.Dataset([10, 11, 12]);
             p.addDataset(d4);
-            assert.deepEqual(p._datasetKeysInOrder, ["foo", "bar", "_0", "_1"], "dataset keys as expected");
+            assert.deepEqual(p.datasetKeysInOrder, ["foo", "bar", "_0", "_1"], "dataset keys as expected");
             var datasets = p.datasets();
             assert.deepEqual(datasets[0].data(), [1, 2, 3]);
             assert.equal(datasets[1], d2);
@@ -2855,7 +2855,7 @@ describe("Plots", function () {
             assert.equal(datasets[3], d4);
             p.removeDataset("foo");
             p.removeDataset("_0");
-            assert.deepEqual(p._datasetKeysInOrder, ["bar", "_1"]);
+            assert.deepEqual(p.datasetKeysInOrder, ["bar", "_1"]);
             assert.lengthOf(p.datasets(), 2);
         });
         it("Datasets are listened to appropriately", function () {
@@ -2966,7 +2966,7 @@ describe("Plots", function () {
             simpleDataset = new Plottable.Dataset(twoPointData);
             linePlot = new Plottable.Plots.Line(xScale, yScale);
             linePlot.addDataset("s1", simpleDataset).project("x", xAccessor, xScale).project("y", yAccessor, yScale).project("stroke", colorAccessor).addDataset("s2", simpleDataset).renderTo(svg);
-            renderArea = linePlot._renderArea;
+            renderArea = linePlot.renderArea;
         });
         it("draws a line correctly", function () {
             var linePath = renderArea.select(".line");
@@ -3046,7 +3046,7 @@ describe("Plots", function () {
                 ];
                 linePlot.addDataset("d3", dataset3);
                 var allLines = linePlot.getAllSelections();
-                var allLines2 = linePlot.getAllSelections(linePlot._datasetKeysInOrder);
+                var allLines2 = linePlot.getAllSelections(linePlot.datasetKeysInOrder);
                 assert.deepEqual(allLines, allLines2, "all lines retrieved");
                 svg.remove();
             });
@@ -3229,7 +3229,7 @@ describe("Plots", function () {
             simpleDataset = new Plottable.Dataset(twoPointData);
             areaPlot = new Plottable.Plots.Area(xScale, yScale);
             areaPlot.addDataset("sd", simpleDataset).project("x", xAccessor, xScale).project("y", yAccessor, yScale).project("y0", y0Accessor, yScale).project("fill", fillAccessor).project("stroke", colorAccessor).renderTo(svg);
-            renderArea = areaPlot._renderArea;
+            renderArea = areaPlot.renderArea;
         });
         it("draws area and line correctly", function () {
             var areaPath = renderArea.select(".area");
@@ -3247,7 +3247,7 @@ describe("Plots", function () {
         it("area fill works for non-zero floor values appropriately, e.g. half the height of the line", function () {
             areaPlot.project("y0", function (d) { return d.bar / 2; }, yScale);
             areaPlot.renderTo(svg);
-            renderArea = areaPlot._renderArea;
+            renderArea = areaPlot.renderArea;
             var areaPath = renderArea.select(".area");
             assert.equal(normalizePath(areaPath.attr("d")), "M0,500L500,0L500,250L0,500Z");
             svg.remove();
@@ -3294,7 +3294,7 @@ describe("Plots", function () {
                 var newTwoPointData = [{ foo: 2, bar: 1 }, { foo: 3, bar: 2 }];
                 areaPlot.addDataset("newTwo", new Plottable.Dataset(newTwoPointData));
                 var allAreas = areaPlot.getAllSelections();
-                var allAreas2 = areaPlot.getAllSelections(areaPlot._datasetKeysInOrder);
+                var allAreas2 = areaPlot.getAllSelections(areaPlot.datasetKeysInOrder);
                 assert.deepEqual(allAreas, allAreas2, "all areas/lines retrieved");
                 assert.strictEqual(allAreas.filter(".line").size(), 2, "2 lines retrieved");
                 assert.strictEqual(allAreas.filter(".area").size(), 2, "2 areas retrieved");
@@ -3391,7 +3391,7 @@ describe("Plots", function () {
                 barPlot.renderTo(svg);
             });
             it("renders correctly", function () {
-                var renderArea = barPlot._renderArea;
+                var renderArea = barPlot.renderArea;
                 var bars = renderArea.selectAll("rect");
                 assert.lengthOf(bars[0], 3, "One bar was created per data point");
                 var bar0 = d3.select(bars[0][0]);
@@ -3413,7 +3413,7 @@ describe("Plots", function () {
             });
             it("baseline value can be changed; barPlot updates appropriately", function () {
                 barPlot.baseline(-1);
-                var renderArea = barPlot._renderArea;
+                var renderArea = barPlot.renderArea;
                 var bars = renderArea.selectAll("rect");
                 var bar0 = d3.select(bars[0][0]);
                 var bar1 = d3.select(bars[0][1]);
@@ -3453,7 +3453,7 @@ describe("Plots", function () {
             });
             it("don't show points from outside of domain", function () {
                 xScale.domain(["C"]);
-                var bars = barPlot._renderArea.selectAll("rect");
+                var bars = barPlot.renderArea.selectAll("rect");
                 assert.lengthOf(bars[0], 0, "no bars have been rendered");
                 svg.remove();
             });
@@ -3598,7 +3598,7 @@ describe("Plots", function () {
                 svg.remove();
             });
             it("bar widths are equal to barPixelWidth", function () {
-                var renderArea = barPlot._renderArea;
+                var renderArea = barPlot.renderArea;
                 var bars = renderArea.selectAll("rect");
                 assert.lengthOf(bars[0], 3, "One bar was created per data point");
                 var barPixelWidth = barPlot._getBarPixelWidth();
@@ -3641,7 +3641,7 @@ describe("Plots", function () {
                 svg.remove();
             });
             it("bar widths are equal to barPixelWidth", function () {
-                var renderArea = barPlot._renderArea;
+                var renderArea = barPlot.renderArea;
                 var bars = renderArea.selectAll("rect");
                 assert.lengthOf(bars[0], 3, "One bar was created per data point");
                 var barPixelWidth = barPlot._getBarPixelWidth();
@@ -3720,7 +3720,7 @@ describe("Plots", function () {
                 barPlot.renderTo(svg);
             });
             it("renders correctly", function () {
-                var renderArea = barPlot._renderArea;
+                var renderArea = barPlot.renderArea;
                 var bars = renderArea.selectAll("rect");
                 assert.lengthOf(bars[0], 3, "One bar was created per data point");
                 var bar0 = d3.select(bars[0][0]);
@@ -3742,7 +3742,7 @@ describe("Plots", function () {
             });
             it("baseline value can be changed; barPlot updates appropriately", function () {
                 barPlot.baseline(-1);
-                var renderArea = barPlot._renderArea;
+                var renderArea = barPlot.renderArea;
                 var bars = renderArea.selectAll("rect");
                 var bar0 = d3.select(bars[0][0]);
                 var bar1 = d3.select(bars[0][1]);
@@ -3758,7 +3758,7 @@ describe("Plots", function () {
                 svg.remove();
             });
             it("width projector may be overwritten, and calling project queues rerender", function () {
-                var bars = barPlot._renderArea.selectAll("rect");
+                var bars = barPlot.renderArea.selectAll("rect");
                 var bar0 = d3.select(bars[0][0]);
                 var bar1 = d3.select(bars[0][1]);
                 var bar0y = bar0.data()[0].y;
@@ -3966,7 +3966,7 @@ describe("Plots", function () {
                 verticalBarPlot.addDataset("b", barData2);
                 verticalBarPlot.renderTo(svg);
                 var allBars = verticalBarPlot.getAllSelections();
-                var allBars2 = verticalBarPlot.getAllSelections(verticalBarPlot._datasetKeysInOrder);
+                var allBars2 = verticalBarPlot.getAllSelections(verticalBarPlot.datasetKeysInOrder);
                 assert.deepEqual(allBars, allBars2, "both ways of getting all selections work");
                 svg.remove();
             });
@@ -4073,7 +4073,7 @@ describe("Plots", function () {
             var gridPlot = new Plottable.Plots.Grid(xScale, yScale, colorScale);
             gridPlot.addDataset(DATA).project("fill", "magnitude", colorScale).project("x", "x", xScale).project("y", "y", yScale);
             gridPlot.renderTo(svg);
-            VERIFY_CELLS(gridPlot._renderArea.selectAll("rect")[0]);
+            VERIFY_CELLS(gridPlot.renderArea.selectAll("rect")[0]);
             svg.remove();
         });
         it("renders correctly when data is set after construction", function () {
@@ -4085,7 +4085,7 @@ describe("Plots", function () {
             var gridPlot = new Plottable.Plots.Grid(xScale, yScale, colorScale);
             gridPlot.addDataset(dataset).project("fill", "magnitude", colorScale).project("x", "x", xScale).project("y", "y", yScale).renderTo(svg);
             dataset.data(DATA);
-            VERIFY_CELLS(gridPlot._renderArea.selectAll("rect")[0]);
+            VERIFY_CELLS(gridPlot.renderArea.selectAll("rect")[0]);
             svg.remove();
         });
         it("renders correctly when there isn't data for every spot", function () {
@@ -4105,7 +4105,7 @@ describe("Plots", function () {
                 { x: "D", y: "Z", magnitude: 24 }
             ];
             dataset.data(data);
-            var cells = gridPlot._renderArea.selectAll("rect")[0];
+            var cells = gridPlot.renderArea.selectAll("rect")[0];
             assert.equal(cells.length, data.length);
             for (var i = 0; i < cells.length; i++) {
                 var cell = d3.select(cells[i]);
@@ -4124,7 +4124,7 @@ describe("Plots", function () {
             var gridPlot = new Plottable.Plots.Grid(xScale, yScale, colorScale);
             gridPlot.addDataset(DATA).project("fill", "magnitude").project("x", "x", xScale).project("y", "y", yScale).renderTo(svg);
             yScale.domain(["U", "V"]);
-            var cells = gridPlot._renderArea.selectAll("rect")[0];
+            var cells = gridPlot.renderArea.selectAll("rect")[0];
             var cellAU = d3.select(cells[0]);
             var cellAV = d3.select(cells[2]);
             cellAU.attr("fill", "#000000");
@@ -4134,7 +4134,7 @@ describe("Plots", function () {
             cellAV.attr("x", "0");
             cellAV.attr("y", "0");
             yScale.domain(["V", "U"]);
-            cells = gridPlot._renderArea.selectAll("rect")[0];
+            cells = gridPlot.renderArea.selectAll("rect")[0];
             cellAU = d3.select(cells[0]);
             cellAV = d3.select(cells[2]);
             cellAU.attr("fill", "#000000");
@@ -4155,7 +4155,7 @@ describe("Plots", function () {
                 gridPlot.addDataset("a", DATA).project("fill", "magnitude", colorScale).project("x", "x", xScale).project("y", "y", yScale);
                 gridPlot.renderTo(svg);
                 var allCells = gridPlot.getAllSelections();
-                var allCells2 = gridPlot.getAllSelections(gridPlot._datasetKeysInOrder);
+                var allCells2 = gridPlot.getAllSelections(gridPlot.datasetKeysInOrder);
                 assert.deepEqual(allCells, allCells2, "all cells retrieved");
                 svg.remove();
             });
@@ -4234,7 +4234,7 @@ describe("Plots", function () {
             var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
             var rectanglePlot = new Plottable.Plots.Rectangle(xScale, yScale);
             rectanglePlot.addDataset(DATA).project("x", "x", xScale).project("y", "y", yScale).project("x1", "x", xScale).project("y1", "y", yScale).project("x2", "x2", xScale).project("y2", "y2", yScale).renderTo(svg);
-            VERIFY_CELLS(rectanglePlot._renderArea.selectAll("rect"));
+            VERIFY_CELLS(rectanglePlot.renderArea.selectAll("rect"));
             svg.remove();
         });
     });
@@ -4430,7 +4430,7 @@ describe("Plots", function () {
                 // creates a function that verifies that circles are drawn properly after accounting for svg transform
                 // and then modifies circlesInArea to contain the number of circles that were discovered in the plot area
                 circlesInArea = 0;
-                var renderArea = circlePlot._renderArea;
+                var renderArea = circlePlot.renderArea;
                 var renderAreaTransform = d3.transform(renderArea.attr("transform"));
                 var translate = renderAreaTransform.translate;
                 var scale = renderAreaTransform.scale;
@@ -4536,8 +4536,8 @@ describe("Plots", function () {
             stackedPlot.addDataset("d3", data3);
             stackedPlot.addDataset("d4", data4);
             stackedPlot.addDataset("d5", data5);
-            var ds2PlotMetadata = stackedPlot._key2PlotDatasetKey.get("d2").plotMetadata;
-            var ds5PlotMetadata = stackedPlot._key2PlotDatasetKey.get("d5").plotMetadata;
+            var ds2PlotMetadata = stackedPlot.key2PlotDatasetKey.get("d2").plotMetadata;
+            var ds5PlotMetadata = stackedPlot.key2PlotDatasetKey.get("d5").plotMetadata;
             assert.strictEqual(ds2PlotMetadata.offsets.get("1"), 1, "positive offset was used");
             assert.strictEqual(ds5PlotMetadata.offsets.get("1"), 2, "positive offset was used");
         });
@@ -4558,8 +4558,8 @@ describe("Plots", function () {
             stackedPlot.addDataset("d2", data2);
             stackedPlot.addDataset("d3", data3);
             stackedPlot.addDataset("d4", data4);
-            var ds2PlotMetadata = stackedPlot._key2PlotDatasetKey.get("d2").plotMetadata;
-            var ds4PlotMetadata = stackedPlot._key2PlotDatasetKey.get("d4").plotMetadata;
+            var ds2PlotMetadata = stackedPlot.key2PlotDatasetKey.get("d2").plotMetadata;
+            var ds4PlotMetadata = stackedPlot.key2PlotDatasetKey.get("d4").plotMetadata;
             assert.strictEqual(ds2PlotMetadata.offsets.get("1"), -2, "positive offset was used");
             assert.strictEqual(ds4PlotMetadata.offsets.get("1"), -3, "positive offset was used");
         });
@@ -4572,8 +4572,8 @@ describe("Plots", function () {
             ];
             stackedPlot.addDataset("d1", data1);
             stackedPlot.addDataset("d2", data2);
-            var ds1PlotMetadata = stackedPlot._key2PlotDatasetKey.get("d1").plotMetadata;
-            var ds2PlotMetadata = stackedPlot._key2PlotDatasetKey.get("d2").plotMetadata;
+            var ds1PlotMetadata = stackedPlot.key2PlotDatasetKey.get("d1").plotMetadata;
+            var ds2PlotMetadata = stackedPlot.key2PlotDatasetKey.get("d2").plotMetadata;
             assert.isTrue(isNaN(ds1PlotMetadata.offsets.get("1")), "stacking is initially incorrect");
             stackedPlot.project("x", "a");
             stackedPlot.project("y", "b");
@@ -4604,10 +4604,10 @@ describe("Plots", function () {
             stackedPlot.addDataset("d4", data4);
             stackedPlot.addDataset("d5", data5);
             stackedPlot.addDataset("d6", data6);
-            var ds3PlotMetadata = stackedPlot._key2PlotDatasetKey.get("d3").plotMetadata;
-            var ds4PlotMetadata = stackedPlot._key2PlotDatasetKey.get("d4").plotMetadata;
-            var ds5PlotMetadata = stackedPlot._key2PlotDatasetKey.get("d5").plotMetadata;
-            var ds6PlotMetadata = stackedPlot._key2PlotDatasetKey.get("d6").plotMetadata;
+            var ds3PlotMetadata = stackedPlot.key2PlotDatasetKey.get("d3").plotMetadata;
+            var ds4PlotMetadata = stackedPlot.key2PlotDatasetKey.get("d4").plotMetadata;
+            var ds5PlotMetadata = stackedPlot.key2PlotDatasetKey.get("d5").plotMetadata;
+            var ds6PlotMetadata = stackedPlot.key2PlotDatasetKey.get("d6").plotMetadata;
             assert.strictEqual(ds3PlotMetadata.offsets.get("1"), -2, "stacking on data1 numerical y value");
             assert.strictEqual(ds4PlotMetadata.offsets.get("1"), 3, "stacking on data2 numerical y value");
             assert.strictEqual(ds5PlotMetadata.offsets.get("1"), 8, "stacking on data1 + data3 numerical y values");
@@ -4787,7 +4787,7 @@ describe("Plots", function () {
             var table = new Plottable.Components.Table([[renderer], [xAxis]]).renderTo(svg);
         });
         it("renders correctly", function () {
-            var areas = renderer._renderArea.selectAll(".area");
+            var areas = renderer.renderArea.selectAll(".area");
             var area0 = d3.select(areas[0][0]);
             var d0 = normalizePath(area0.attr("d")).split(/[a-zA-Z]/);
             var d0Ys = d0.slice(1, d0.length - 1).map(function (s) { return parseFloat(s.split(",")[1]); });
@@ -4827,7 +4827,7 @@ describe("Plots", function () {
             new Plottable.Components.Table([[renderer]]).renderTo(svg);
         });
         it("path elements rendered correctly", function () {
-            var areas = renderer._renderArea.selectAll(".area");
+            var areas = renderer.renderArea.selectAll(".area");
             var area0 = d3.select(areas[0][0]);
             assert.strictEqual(area0.attr("d"), null, "no path string on an empty dataset");
             var area1 = d3.select(areas[0][1]);
@@ -5036,7 +5036,7 @@ describe("Plots", function () {
             var table = new Plottable.Components.Table([[renderer], [xAxis]]).renderTo(svg);
         });
         it("renders correctly", function () {
-            var areas = renderer._renderArea.selectAll(".area");
+            var areas = renderer.renderArea.selectAll(".area");
             var area0 = d3.select(areas[0][0]);
             var d0 = normalizePath(area0.attr("d")).split(/[a-zA-Z]/);
             var d0Ys = d0.slice(1, d0.length - 1).map(function (s) { return parseFloat(s.split(",")[1]); });
@@ -5052,7 +5052,7 @@ describe("Plots", function () {
         });
         it("project works correctly", function () {
             renderer.project("check", "type");
-            var areas = renderer._renderArea.selectAll(".area");
+            var areas = renderer.renderArea.selectAll(".area");
             var area0 = d3.select(areas[0][0]);
             assert.strictEqual(area0.attr("check"), "a", "projector has been applied to first area");
             var area1 = d3.select(areas[0][1]);
@@ -5085,9 +5085,9 @@ describe("Plots", function () {
             plot.addDataset("d3", data3);
             plot.project("fill", "fill");
             plot.project("x", "x", xScale).project("y", "y", yScale);
-            var ds1Point2Offset = plot._key2PlotDatasetKey.get("d1").plotMetadata.offsets.get(2);
-            var ds2Point2Offset = plot._key2PlotDatasetKey.get("d2").plotMetadata.offsets.get(2);
-            var ds3Point2Offset = plot._key2PlotDatasetKey.get("d3").plotMetadata.offsets.get(2);
+            var ds1Point2Offset = plot.key2PlotDatasetKey.get("d1").plotMetadata.offsets.get(2);
+            var ds2Point2Offset = plot.key2PlotDatasetKey.get("d2").plotMetadata.offsets.get(2);
+            var ds3Point2Offset = plot.key2PlotDatasetKey.get("d3").plotMetadata.offsets.get(2);
             assert.strictEqual(ds1Point2Offset, 0, "dataset1 (blue) should have no offset on middle point");
             assert.strictEqual(ds2Point2Offset, 2, "dataset2 (red) should have this offset and be on top of blue dataset");
             assert.strictEqual(ds3Point2Offset, 2, "dataset3 (green) should have this offset because the red dataset (ds2) has no height in this point");
@@ -5116,9 +5116,9 @@ describe("Plots", function () {
             plot.addDataset("d3", data3);
             plot.project("fill", "fill");
             plot.project("x", "x", xScale).project("y", "y", yScale);
-            var ds1Point2Offset = plot._key2PlotDatasetKey.get("d1").plotMetadata.offsets.get(2);
-            var ds2Point2Offset = plot._key2PlotDatasetKey.get("d2").plotMetadata.offsets.get(2);
-            var ds3Point2Offset = plot._key2PlotDatasetKey.get("d3").plotMetadata.offsets.get(2);
+            var ds1Point2Offset = plot.key2PlotDatasetKey.get("d1").plotMetadata.offsets.get(2);
+            var ds2Point2Offset = plot.key2PlotDatasetKey.get("d2").plotMetadata.offsets.get(2);
+            var ds3Point2Offset = plot.key2PlotDatasetKey.get("d3").plotMetadata.offsets.get(2);
             assert.strictEqual(ds1Point2Offset, 0, "dataset1 (blue) should have no offset on middle point");
             assert.strictEqual(ds2Point2Offset, 2, "dataset2 (red) should have this offset and be on top of blue dataset");
             assert.strictEqual(ds3Point2Offset, 2, "dataset3 (green) should have this offset because the red dataset (ds2) has no height in this point");
@@ -5176,7 +5176,7 @@ describe("Plots", function () {
             bandWidth = xScale.rangeBand();
         });
         it("renders correctly", function () {
-            var bars = renderer._renderArea.selectAll("rect");
+            var bars = renderer.renderArea.selectAll("rect");
             var bar0 = d3.select(bars[0][0]);
             var bar1 = d3.select(bars[0][1]);
             var bar2 = d3.select(bars[0][2]);
@@ -5216,7 +5216,7 @@ describe("Plots", function () {
                 assert.closeTo(expected.pixelPoints[0].y, actual.pixelPoints[0].y, 0.01, msg);
                 assert.deepEqual(expected.selection, actual.selection, msg);
             }
-            var bars = renderer._renderArea.selectAll("rect");
+            var bars = renderer.renderArea.selectAll("rect");
             var d0 = dataset1.data()[0];
             var d0Px = {
                 x: xScale.scale(d0.x),
@@ -5286,7 +5286,7 @@ describe("Plots", function () {
             axisHeight = xAxis.height();
         });
         it("stacking done correctly for negative values", function () {
-            var bars = plot._renderArea.selectAll("rect");
+            var bars = plot.renderArea.selectAll("rect");
             var bar0 = d3.select(bars[0][0]);
             var bar1 = d3.select(bars[0][1]);
             var bar2 = d3.select(bars[0][2]);
@@ -5345,7 +5345,7 @@ describe("Plots", function () {
             bandWidth = yScale.rangeBand();
         });
         it("renders correctly", function () {
-            var bars = renderer._renderArea.selectAll("rect");
+            var bars = renderer.renderArea.selectAll("rect");
             var bar0 = d3.select(bars[0][0]);
             var bar1 = d3.select(bars[0][1]);
             var bar2 = d3.select(bars[0][2]);
@@ -5410,7 +5410,7 @@ describe("Plots", function () {
             var table = new Plottable.Components.Table([[plot], [xAxis]]).renderTo(svg);
         });
         it("renders correctly", function () {
-            var bars = plot._renderArea.selectAll("rect");
+            var bars = plot.renderArea.selectAll("rect");
             assert.lengthOf(bars[0], 7, "draws a bar for each datum");
             var aBars = [d3.select(bars[0][0]), d3.select(bars[0][3])];
             var bBars = [d3.select(bars[0][1]), d3.select(bars[0][4]), d3.select(bars[0][5])];
@@ -5489,8 +5489,8 @@ describe("Plots", function () {
             plot.addDataset("d2", data2);
             plot.project("fill", "fill");
             plot.project("x", "x", xScale).project("y", "y", yScale);
-            var ds1FirstColumnOffset = plot._key2PlotDatasetKey.get("d1").plotMetadata.offsets.get("A");
-            var ds2FirstColumnOffset = plot._key2PlotDatasetKey.get("d2").plotMetadata.offsets.get("A");
+            var ds1FirstColumnOffset = plot.key2PlotDatasetKey.get("d1").plotMetadata.offsets.get("A");
+            var ds2FirstColumnOffset = plot.key2PlotDatasetKey.get("d2").plotMetadata.offsets.get("A");
             assert.strictEqual(typeof ds1FirstColumnOffset, "number", "ds1 offset should be a number");
             assert.strictEqual(typeof ds2FirstColumnOffset, "number", "ds2 offset should be a number");
             assert.isFalse(Plottable.Utils.Methods.isNaN(ds1FirstColumnOffset), "ds1 offset should not be NaN");
@@ -5522,9 +5522,9 @@ describe("Plots", function () {
             plot.addDataset("d5", data5);
             plot.project("fill", "fill");
             plot.project("x", "x", xScale).project("y", "y", yScale);
-            var offset1 = plot._key2PlotDatasetKey.get("d1").plotMetadata.offsets.get("A");
-            var offset3 = plot._key2PlotDatasetKey.get("d3").plotMetadata.offsets.get("A");
-            var offset5 = plot._key2PlotDatasetKey.get("d5").plotMetadata.offsets.get("A");
+            var offset1 = plot.key2PlotDatasetKey.get("d1").plotMetadata.offsets.get("A");
+            var offset3 = plot.key2PlotDatasetKey.get("d3").plotMetadata.offsets.get("A");
+            var offset5 = plot.key2PlotDatasetKey.get("d5").plotMetadata.offsets.get("A");
             assert.strictEqual(offset1, 0, "Plot columns should start from offset 0 (at the very bottom)");
             assert.strictEqual(offset3, 1, "Bar 3 should have offset 1, because bar 2 was not rendered");
             assert.strictEqual(offset5, 3, "Bar 5 should have offset 3, because bar 4 was not rendered");
@@ -5582,7 +5582,7 @@ describe("Plots", function () {
             bandWidth = xScale.rangeBand();
         });
         it("renders correctly", function () {
-            var bars = renderer._renderArea.selectAll("rect");
+            var bars = renderer.renderArea.selectAll("rect");
             var bar0 = d3.select(bars[0][0]);
             var bar1 = d3.select(bars[0][1]);
             var bar2 = d3.select(bars[0][2]);
@@ -5650,7 +5650,7 @@ describe("Plots", function () {
             bandWidth = yScale.rangeBand();
         });
         it("renders correctly", function () {
-            var bars = renderer._renderArea.selectAll("rect");
+            var bars = renderer.renderArea.selectAll("rect");
             var bar0 = d3.select(bars[0][0]);
             var bar1 = d3.select(bars[0][1]);
             var bar2 = d3.select(bars[0][2]);
@@ -5703,7 +5703,7 @@ describe("Plots", function () {
             new Plottable.Components.Table([[plot], [xAxis]]).renderTo(svg);
         });
         it("renders correctly", function () {
-            var bars = plot._renderArea.selectAll("rect");
+            var bars = plot.renderArea.selectAll("rect");
             assert.lengthOf(bars[0], 7, "Number of bars should be equivalent to number of datum");
             var aBar0 = d3.select(bars[0][0]);
             var aBar1 = d3.select(bars[0][3]);
@@ -5852,8 +5852,8 @@ describe("Metadata", function () {
     it("plot metadata is set properly", function () {
         var d1 = new Plottable.Dataset();
         var r = new Plottable.Plot().addDataset("d1", d1).addDataset(d1).addDataset("d2", []).addDataset([]);
-        r._datasetKeysInOrder.forEach(function (key) {
-            var plotMetadata = r._key2PlotDatasetKey.get(key).plotMetadata;
+        r.datasetKeysInOrder.forEach(function (key) {
+            var plotMetadata = r.key2PlotDatasetKey.get(key).plotMetadata;
             assert.propertyVal(plotMetadata, "datasetKey", key, "metadata has correct dataset key");
         });
     });

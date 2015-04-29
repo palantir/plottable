@@ -56,7 +56,7 @@ describe("Plots", () => {
     });
 
     it("renders correctly", () => {
-      var bars = (<any> renderer)._renderArea.selectAll("rect");
+      var bars = (<any> renderer).renderArea.selectAll("rect");
       var bar0 = d3.select(bars[0][0]);
       var bar1 = d3.select(bars[0][1]);
       var bar2 = d3.select(bars[0][2]);
@@ -137,7 +137,7 @@ describe("Plots", () => {
     });
 
     it("renders correctly", () => {
-      var bars = (<any> renderer)._renderArea.selectAll("rect");
+      var bars = (<any> renderer).renderArea.selectAll("rect");
       var bar0 = d3.select(bars[0][0]);
       var bar1 = d3.select(bars[0][1]);
       var bar2 = d3.select(bars[0][2]);
@@ -204,7 +204,7 @@ describe("Plots", () => {
     });
 
     it("renders correctly", () => {
-      var bars = (<any> plot)._renderArea.selectAll("rect");
+      var bars = (<any> plot).renderArea.selectAll("rect");
 
       assert.lengthOf(bars[0], 7, "Number of bars should be equivalent to number of datum");
 

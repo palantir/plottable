@@ -43,7 +43,7 @@ export module Plots {
       super.updateYDomainer();
 
       var constantBaseline: number;
-      var y0Projector = this._projections["y0"];
+      var y0Projector = this.projections["y0"];
       var y0Accessor = y0Projector && y0Projector.accessor;
       if (y0Accessor != null) {
         var extents = this.datasets().map((d) => d.getExtent(y0Accessor, this.yScale.typeCoercer));

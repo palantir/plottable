@@ -44,19 +44,19 @@ export module Plots {
 
     private updateClusterPosition() {
       var innerScale = this.makeInnerScale();
-      this._datasetKeysInOrder.forEach((key: string) => {
-        var plotMetadata = <ClusteredPlotMetadata>this._key2PlotDatasetKey.get(key).plotMetadata;
+      this.datasetKeysInOrder.forEach((key: string) => {
+        var plotMetadata = <ClusteredPlotMetadata>this.key2PlotDatasetKey.get(key).plotMetadata;
         plotMetadata.position = innerScale.scale(key) - innerScale.rangeBand() / 2;
       });
     }
 
     private makeInnerScale(){
       var innerScale = new Scales.Category();
-      innerScale.domain(this._datasetKeysInOrder);
-      if (!this._projections["width"]) {
+      innerScale.domain(this.datasetKeysInOrder);
+      if (!this.projections["width"]) {
         innerScale.range([0, this._getBarPixelWidth()]);
       } else {
-        var projection = this._projections["width"];
+        var projection = this.projections["width"];
         var accessor = projection.accessor;
         var scale = projection.scale;
         var fn = scale ? (d: any, i: number, u: any, m: PlotMetadata) => scale.scale(accessor(d, i, u, m)) : accessor;

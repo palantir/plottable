@@ -2636,15 +2636,15 @@ declare module Plottable {
         };
     }
     class Plot extends Component {
-        protected _dataChanged: boolean;
-        protected _key2PlotDatasetKey: D3.Map<Plots.PlotDatasetKey>;
-        protected _datasetKeysInOrder: string[];
-        protected _renderArea: D3.Selection;
-        protected _projections: {
+        protected dataChanged: boolean;
+        protected key2PlotDatasetKey: D3.Map<Plots.PlotDatasetKey>;
+        protected datasetKeysInOrder: string[];
+        protected renderArea: D3.Selection;
+        protected projections: {
             [attrToSet: string]: Projection;
         };
         protected _animate: boolean;
-        protected _animateOnNextRender: boolean;
+        protected animateOnNextRender: boolean;
         /**
          * Constructs a Plot.
          *
@@ -2726,7 +2726,7 @@ declare module Plottable {
          * have an extent that includes all the data that is projected onto them.
          */
         protected updateScaleExtents(): void;
-        _updateScaleExtent(attr: string): void;
+        updateScaleExtent(attr: string): void;
         /**
          * Get the animator associated with the specified Animator key.
          *
@@ -2768,7 +2768,7 @@ declare module Plottable {
          */
         removeDataset(datasetIdentifier: string | Dataset | any[]): Plot;
         datasets(): Dataset[];
-        protected _getDrawersInOrder(): Drawers.AbstractDrawer[];
+        protected getDrawersInOrder(): Drawers.AbstractDrawer[];
         protected generateDrawSteps(): Drawers.DrawStep[];
         protected additionalPaint(time: number): void;
         protected getDataToDraw(): D3.Map<any[]>;

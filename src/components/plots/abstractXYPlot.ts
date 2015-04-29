@@ -194,11 +194,11 @@ module Plottable {
     }
 
     protected normalizeDatasets<A, B>(fromX: boolean): {a: A; b: B}[] {
-      var aAccessor: (d: any, i: number, u: any, m: Plots.PlotMetadata) => A = this._projections[fromX ? "x" : "y"].accessor;
-      var bAccessor: (d: any, i: number, u: any, m: Plots.PlotMetadata) => B = this._projections[fromX ? "y" : "x"].accessor;
-      return Utils.Methods.flatten(this._datasetKeysInOrder.map((key: string) => {
-        var dataset = this._key2PlotDatasetKey.get(key).dataset;
-        var plotMetadata = this._key2PlotDatasetKey.get(key).plotMetadata;
+      var aAccessor: (d: any, i: number, u: any, m: Plots.PlotMetadata) => A = this.projections[fromX ? "x" : "y"].accessor;
+      var bAccessor: (d: any, i: number, u: any, m: Plots.PlotMetadata) => B = this.projections[fromX ? "y" : "x"].accessor;
+      return Utils.Methods.flatten(this.datasetKeysInOrder.map((key: string) => {
+        var dataset = this.key2PlotDatasetKey.get(key).dataset;
+        var plotMetadata = this.key2PlotDatasetKey.get(key).plotMetadata;
         return dataset.data().map((d, i) => {
           return { a: aAccessor(d, i, dataset.metadata(), plotMetadata), b: bAccessor(d, i, dataset.metadata(), plotMetadata) };
         });
@@ -215,7 +215,7 @@ module Plottable {
     }
 
     protected _projectorsReady() {
-      return this._projections["x"] && this._projections["y"];
+      return this.projections["x"] && this.projections["y"];
     }
   }
 }

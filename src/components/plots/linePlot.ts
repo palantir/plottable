@@ -48,7 +48,7 @@ export module Plots {
 
     protected generateDrawSteps(): Drawers.DrawStep[] {
       var drawSteps: Drawers.DrawStep[] = [];
-      if (this._dataChanged && this._animate) {
+      if (this.dataChanged && this._animate) {
         var attrToProjector = this.generateAttrToProjector();
         attrToProjector["y"] = this.getResetYFunction();
         drawSteps.push({attrToProjector: attrToProjector, animator: this.getAnimator("reset")});
@@ -91,7 +91,7 @@ export module Plots {
       var allElements: EventTarget[] = [];
 
       datasetKeys.forEach((datasetKey) => {
-        var plotDatasetKey = this._key2PlotDatasetKey.get(datasetKey);
+        var plotDatasetKey = this.key2PlotDatasetKey.get(datasetKey);
         if (plotDatasetKey == null) { return; }
         var drawer = plotDatasetKey.drawer;
         plotDatasetKey.dataset.data().forEach((datum: any, index: number) => {

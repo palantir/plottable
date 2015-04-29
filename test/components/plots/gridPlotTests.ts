@@ -57,7 +57,7 @@ describe("Plots", () => {
               .project("x", "x", xScale)
               .project("y", "y", yScale);
       gridPlot.renderTo(svg);
-      VERIFY_CELLS((<any> gridPlot)._renderArea.selectAll("rect")[0]);
+      VERIFY_CELLS((<any> gridPlot).renderArea.selectAll("rect")[0]);
       svg.remove();
     });
 
@@ -75,7 +75,7 @@ describe("Plots", () => {
               .project("y", "y", yScale)
               .renderTo(svg);
       dataset.data(DATA);
-      VERIFY_CELLS((<any> gridPlot)._renderArea.selectAll("rect")[0]);
+      VERIFY_CELLS((<any> gridPlot).renderArea.selectAll("rect")[0]);
       svg.remove();
     });
 
@@ -100,7 +100,7 @@ describe("Plots", () => {
         {x: "D", y: "Z", magnitude: 24}
       ];
       dataset.data(data);
-      var cells = (<any> gridPlot)._renderArea.selectAll("rect")[0];
+      var cells = (<any> gridPlot).renderArea.selectAll("rect")[0];
       assert.equal(cells.length, data.length);
       for (var i = 0; i < cells.length; i++) {
         var cell = d3.select(cells[i]);
@@ -126,7 +126,7 @@ describe("Plots", () => {
 
       yScale.domain(["U", "V"]);
 
-      var cells = (<any> gridPlot)._renderArea.selectAll("rect")[0];
+      var cells = (<any> gridPlot).renderArea.selectAll("rect")[0];
       var cellAU = d3.select(cells[0]);
       var cellAV = d3.select(cells[2]);
       cellAU.attr("fill", "#000000");
@@ -138,7 +138,7 @@ describe("Plots", () => {
       cellAV.attr("y", "0");
 
       yScale.domain(["V", "U"]);
-      cells = (<any> gridPlot)._renderArea.selectAll("rect")[0];
+      cells = (<any> gridPlot).renderArea.selectAll("rect")[0];
       cellAU = d3.select(cells[0]);
       cellAV = d3.select(cells[2]);
       cellAU.attr("fill", "#000000");
@@ -167,7 +167,7 @@ describe("Plots", () => {
         gridPlot.renderTo(svg);
 
         var allCells = gridPlot.getAllSelections();
-        var allCells2 = gridPlot.getAllSelections((<any> gridPlot)._datasetKeysInOrder);
+        var allCells2 = gridPlot.getAllSelections((<any> gridPlot).datasetKeysInOrder);
         assert.deepEqual(allCells, allCells2, "all cells retrieved");
 
         svg.remove();

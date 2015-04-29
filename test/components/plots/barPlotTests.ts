@@ -57,7 +57,7 @@ describe("Plots", () => {
       });
 
       it("renders correctly", () => {
-        var renderArea = (<any> barPlot)._renderArea;
+        var renderArea = (<any> barPlot).renderArea;
         var bars = renderArea.selectAll("rect");
         assert.lengthOf(bars[0], 3, "One bar was created per data point");
         var bar0 = d3.select(bars[0][0]);
@@ -82,7 +82,7 @@ describe("Plots", () => {
       it("baseline value can be changed; barPlot updates appropriately", () => {
         barPlot.baseline(-1);
 
-        var renderArea = (<any> barPlot)._renderArea;
+        var renderArea = (<any> barPlot).renderArea;
         var bars = renderArea.selectAll("rect");
         var bar0 = d3.select(bars[0][0]);
         var bar1 = d3.select(bars[0][1]);
@@ -133,7 +133,7 @@ describe("Plots", () => {
 
       it("don't show points from outside of domain", () => {
         xScale.domain(["C"]);
-        var bars =  (<any> barPlot)._renderArea.selectAll("rect");
+        var bars =  (<any> barPlot).renderArea.selectAll("rect");
         assert.lengthOf(bars[0], 0, "no bars have been rendered");
         svg.remove();
       });
@@ -307,7 +307,7 @@ describe("Plots", () => {
       });
 
       it("bar widths are equal to barPixelWidth", () => {
-        var renderArea = (<any> barPlot)._renderArea;
+        var renderArea = (<any> barPlot).renderArea;
         var bars = renderArea.selectAll("rect");
         assert.lengthOf(bars[0], 3, "One bar was created per data point");
 
@@ -355,7 +355,7 @@ describe("Plots", () => {
       });
 
       it("bar widths are equal to barPixelWidth", () => {
-        var renderArea = (<any> barPlot)._renderArea;
+        var renderArea = (<any> barPlot).renderArea;
         var bars = renderArea.selectAll("rect");
         assert.lengthOf(bars[0], 3, "One bar was created per data point");
 
@@ -454,7 +454,7 @@ describe("Plots", () => {
       });
 
       it("renders correctly", () => {
-        var renderArea = (<any> barPlot)._renderArea;
+        var renderArea = (<any> barPlot).renderArea;
         var bars = renderArea.selectAll("rect");
         assert.lengthOf(bars[0], 3, "One bar was created per data point");
         var bar0 = d3.select(bars[0][0]);
@@ -479,7 +479,7 @@ describe("Plots", () => {
       it("baseline value can be changed; barPlot updates appropriately", () => {
         barPlot.baseline(-1);
 
-        var renderArea = (<any> barPlot)._renderArea;
+        var renderArea = (<any> barPlot).renderArea;
         var bars = renderArea.selectAll("rect");
         var bar0 = d3.select(bars[0][0]);
         var bar1 = d3.select(bars[0][1]);
@@ -497,7 +497,7 @@ describe("Plots", () => {
       });
 
       it("width projector may be overwritten, and calling project queues rerender", () => {
-        var bars = (<any> barPlot)._renderArea.selectAll("rect");
+        var bars = (<any> barPlot).renderArea.selectAll("rect");
         var bar0 = d3.select(bars[0][0]);
         var bar1 = d3.select(bars[0][1]);
         var bar0y = bar0.data()[0].y;
@@ -740,7 +740,7 @@ describe("Plots", () => {
         verticalBarPlot.renderTo(svg);
 
         var allBars = verticalBarPlot.getAllSelections();
-        var allBars2 = verticalBarPlot.getAllSelections((<any> verticalBarPlot)._datasetKeysInOrder);
+        var allBars2 = verticalBarPlot.getAllSelections((<any> verticalBarPlot).datasetKeysInOrder);
         assert.deepEqual(allBars, allBars2, "both ways of getting all selections work");
 
         svg.remove();

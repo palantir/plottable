@@ -41,7 +41,7 @@ export module Plots {
 
     protected setup() {
       super.setup();
-      this._baseline = this._renderArea.append("line").classed("baseline", true);
+      this._baseline = this.renderArea.append("line").classed("baseline", true);
     }
 
     /**
@@ -251,7 +251,7 @@ export module Plots {
       }
 
       // currently, linear scan the bars. If inversion is implemented on non-numeric scales we might be able to do better.
-      var bars = this._datasetKeysInOrder.reduce((bars: any[], key: string) =>
+      var bars = this.datasetKeysInOrder.reduce((bars: any[], key: string) =>
         bars.concat(this.getBarsFromDataset(key, xValOrExtent, yValOrExtent))
       , []);
 
@@ -261,7 +261,7 @@ export module Plots {
     private getBarsFromDataset(key: string, xValOrExtent: number | Extent, yValOrExtent: number | Extent): any[] {
       var bars: any[] = [];
 
-      var drawer = <Drawers.Element>this._key2PlotDatasetKey.get(key).drawer;
+      var drawer = <Drawers.Element>this.key2PlotDatasetKey.get(key).drawer;
       drawer._getRenderArea().selectAll("rect").each(function(d) {
         if (Utils.Methods.intersectsBBox(xValOrExtent, yValOrExtent, this.getBBox())) {
           bars.push(this);
@@ -319,7 +319,7 @@ export module Plots {
 
       this.getAnimator("baseline").animate(this._baseline, baselineAttr);
 
-      var drawers: Drawers.Rect[] = <any> this._getDrawersInOrder();
+      var drawers: Drawers.Rect[] = <any> this.getDrawersInOrder();
       drawers.forEach((d: Drawers.Rect) => d.removeLabels());
       if (this._barLabelsEnabled) {
         Utils.Methods.setTimeout(() => this._drawLabels(), time);
@@ -327,14 +327,14 @@ export module Plots {
     }
 
     protected _drawLabels() {
-      var drawers: Drawers.Rect[] = <any> this._getDrawersInOrder();
+      var drawers: Drawers.Rect[] = <any> this.getDrawersInOrder();
       var attrToProjector = this.generateAttrToProjector();
       var dataToDraw = this.getDataToDraw();
-      this._datasetKeysInOrder.forEach((k, i) =>
+      this.datasetKeysInOrder.forEach((k, i) =>
         drawers[i].drawText(dataToDraw.get(k),
                             attrToProjector,
-                            this._key2PlotDatasetKey.get(k).dataset.metadata(),
-                            this._key2PlotDatasetKey.get(k).plotMetadata));
+                            this.key2PlotDatasetKey.get(k).dataset.metadata(),
+                            this.key2PlotDatasetKey.get(k).plotMetadata));
       if (this._hideBarsIfAnyAreTooWide && drawers.some((d: Drawers.Rect) => d._getIfLabelsTooWide())) {
         drawers.forEach((d: Drawers.Rect) => d.removeLabels());
       }
@@ -342,7 +342,7 @@ export module Plots {
 
     protected generateDrawSteps(): Drawers.DrawStep[] {
       var drawSteps: Drawers.DrawStep[] = [];
-      if (this._dataChanged && this._animate) {
+      if (this.dataChanged && this._animate) {
         var resetAttrToProjector = this.generateAttrToProjector();
         var primaryScale: Scale<any, number> = this._isVertical ? this.yScale : this.xScale;
         var scaledBaseline = primaryScale.scale(this._baselineValue);
@@ -393,7 +393,7 @@ export module Plots {
         return (originalPos > scaledBaseline) ? scaledBaseline : originalPos;
       };
 
-      var primaryAccessor = this._projections[primaryAttr].accessor;
+      var primaryAccessor = this.projections[primaryAttr].accessor;
       if (this.barLabelsEnabled && this.barLabelFormatter) {
         attrToProjector["label"] = (d: any, i: number, u: any, m: PlotMetadata) => {
           return this._barLabelFormatter(primaryAccessor(d, i, u, m));
@@ -421,11 +421,11 @@ export module Plots {
       if (barScale instanceof Plottable.Scales.Category) {
         barPixelWidth = (<Plottable.Scales.Category> barScale).rangeBand();
       } else {
-        var barAccessor = this._isVertical ? this._projections["x"].accessor : this._projections["y"].accessor;
+        var barAccessor = this._isVertical ? this.projections["x"].accessor : this.projections["y"].accessor;
 
-        var numberBarAccessorData = d3.set(Utils.Methods.flatten(this._datasetKeysInOrder.map((k) => {
-          var dataset = this._key2PlotDatasetKey.get(k).dataset;
-          var plotMetadata = this._key2PlotDatasetKey.get(k).plotMetadata;
+        var numberBarAccessorData = d3.set(Utils.Methods.flatten(this.datasetKeysInOrder.map((k) => {
+          var dataset = this.key2PlotDatasetKey.get(k).dataset;
+          var plotMetadata = this.key2PlotDatasetKey.get(k).plotMetadata;
           return dataset.data().map((d, i) => barAccessor(d, i, dataset.metadata(), plotMetadata).valueOf());
         }))).values().map((value) => +value);
 

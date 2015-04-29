@@ -29,11 +29,11 @@ export module Plots {
 
     public computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number) {
       super.computeLayout(offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
-      this._renderArea.attr("transform", "translate(" + this.width() / 2 + "," + this.height() / 2 + ")");
+      this.renderArea.attr("transform", "translate(" + this.width() / 2 + "," + this.height() / 2 + ")");
     }
 
     public addDataset(keyOrDataset: any, dataset?: any) {
-      if (this._datasetKeysInOrder.length === 1) {
+      if (this.datasetKeysInOrder.length === 1) {
         Utils.Methods.warn("Only one dataset is supported in Pie plots");
         return this;
       }

@@ -21,8 +21,8 @@ describe("Metadata", () => {
                               .addDataset( d1)
                               .addDataset("d2", [])
                               .addDataset([]);
-    (<any> r)._datasetKeysInOrder.forEach((key: string) => {
-      var plotMetadata = (<any> r)._key2PlotDatasetKey.get(key).plotMetadata;
+    (<any> r).datasetKeysInOrder.forEach((key: string) => {
+      var plotMetadata = (<any> r).key2PlotDatasetKey.get(key).plotMetadata;
       assert.propertyVal(plotMetadata, "datasetKey", key, "metadata has correct dataset key");
     });
   });
