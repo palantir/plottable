@@ -32,11 +32,11 @@ module Plottable {
       return this;
     }
 
-    public _onDatasetUpdate() {
+    public onDatasetUpdate() {
       if (this._projectorsReady()) {
         this._updateStackOffsets();
       }
-      super._onDatasetUpdate();
+      super.onDatasetUpdate();
     }
 
     public _updateStackOffsets() {

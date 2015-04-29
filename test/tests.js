@@ -2861,7 +2861,7 @@ describe("Plots", function () {
         it("Datasets are listened to appropriately", function () {
             var callbackCounter = 0;
             var callback = function () { return callbackCounter++; };
-            p._onDatasetUpdate = callback;
+            p.onDatasetUpdate = callback;
             var d = new Plottable.Dataset([1, 2, 3]);
             p.addDataset("foo", d);
             assert.equal(callbackCounter, 1, "adding dataset triggers listener");

@@ -46,8 +46,8 @@ export module Plots {
       this.getAnimator("baseline").animate(this._baseline, baselineAttr);
     }
 
-    protected _updateYDomainer() {
-      super._updateYDomainer();
+    protected updateYDomainer() {
+      super.updateYDomainer();
       var scale = <QuantitativeScale<any>> this.yScale;
       if (!scale.userSetDomainer) {
         scale.domainer().addPaddingException(0, "STACKED_AREA_PLOT+" + this.getID())
@@ -63,9 +63,9 @@ export module Plots {
       return this;
     }
 
-    protected _onDatasetUpdate() {
-      super._onDatasetUpdate();
-      Stacked.prototype._onDatasetUpdate.apply(this);
+    protected onDatasetUpdate() {
+      super.onDatasetUpdate();
+      Stacked.prototype.onDatasetUpdate.apply(this);
       return this;
     }
 

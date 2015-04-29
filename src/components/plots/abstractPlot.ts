@@ -124,8 +124,8 @@ module Plottable {
       if (this.isSetup) {
         drawer.setup(this._renderArea.append("g"));
       }
-      dataset.broadcaster.registerListener(this, () => this._onDatasetUpdate());
-      this._onDatasetUpdate();
+      dataset.broadcaster.registerListener(this, () => this.onDatasetUpdate());
+      this.onDatasetUpdate();
     }
 
     protected getDrawer(key: string): Drawers.AbstractDrawer {
@@ -140,7 +140,7 @@ module Plottable {
       }
     }
 
-    protected _onDatasetUpdate() {
+    protected onDatasetUpdate() {
       this._updateScaleExtents();
       this._animateOnNextRender = true;
       this._dataChanged = true;
@@ -333,7 +333,7 @@ module Plottable {
       }
       if (isPermutation(order, this._datasetKeysInOrder)) {
         this._datasetKeysInOrder = order;
-        this._onDatasetUpdate();
+        this.onDatasetUpdate();
       } else {
         Utils.Methods.warn("Attempted to change datasetOrder, but new order is not permutation of old. Ignoring.");
       }
@@ -388,7 +388,7 @@ module Plottable {
         pdk.dataset.broadcaster.deregisterListener(this);
         this._datasetKeysInOrder.splice(this._datasetKeysInOrder.indexOf(key), 1);
         this._key2PlotDatasetKey.remove(key);
-        this._onDatasetUpdate();
+        this.onDatasetUpdate();
       }
       return this;
     }

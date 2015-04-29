@@ -29,7 +29,7 @@ module Plottable {
       this.yScale = yScale;
       this._updateXDomainer();
       xScale.broadcaster.registerListener("yDomainAdjustment" + this.getID(), () => this._adjustYDomainOnChangeFromX());
-      this._updateYDomainer();
+      this.updateYDomainer();
       yScale.broadcaster.registerListener("xDomainAdjustment" + this.getID(), () => this._adjustXDomainOnChangeFromY());
     }
 
@@ -54,7 +54,7 @@ module Plottable {
           this.yScale.broadcaster.deregisterListener("xDomainAdjustment" + this.getID());
         }
         this.yScale = scale;
-        this._updateYDomainer();
+        this.updateYDomainer();
         scale.broadcaster.registerListener("xDomainAdjustment" + this.getID(), () => this._adjustXDomainOnChangeFromY());
       }
 
@@ -134,7 +134,7 @@ module Plottable {
       }
     }
 
-    protected _updateYDomainer() {
+    protected updateYDomainer() {
       if (this.yScale instanceof QuantitativeScale) {
         var scale = <QuantitativeScale<any>> this.yScale;
         if (!scale.userSetDomainer) {

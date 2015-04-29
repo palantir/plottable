@@ -294,7 +294,7 @@ export module Plots {
       if (this._isVertical) {
         this._updateDomainer(this.yScale);
       } else {
-        super._updateYDomainer();
+        super.updateYDomainer();
       }
     }
 

@@ -2673,7 +2673,7 @@ declare module Plottable {
         addDataset(key: string, dataset: Dataset | any[]): Plot;
         protected getDrawer(key: string): Drawers.AbstractDrawer;
         protected getAnimator(key: string): Animators.PlotAnimator;
-        protected _onDatasetUpdate(): void;
+        protected onDatasetUpdate(): void;
         /**
          * Sets an attribute of every data point.
          *
@@ -2873,7 +2873,7 @@ declare module Plottable {
         protected generateAttrToProjector(): AttributeToProjector;
         computeLayout(offeredXOrigin?: number, offeredYOffset?: number, availableWidth?: number, availableHeight?: number): void;
         protected _updateXDomainer(): void;
-        protected _updateYDomainer(): void;
+        protected updateYDomainer(): void;
         /**
          * Adjusts both domains' extents to show all datasets.
          *
@@ -3139,11 +3139,11 @@ declare module Plottable {
              * @param {QuantitativeScaleScale} yScale The y scale to use.
              */
             constructor(xScale: QuantitativeScale<X>, yScale: QuantitativeScale<number>);
-            protected _onDatasetUpdate(): void;
+            protected onDatasetUpdate(): void;
             protected getDrawer(key: string): Drawers.Area;
-            protected _updateYDomainer(): void;
+            protected updateYDomainer(): void;
             project(attrToSet: string, accessor: any, scale?: Scale<any, any>): Area<X>;
-            protected _getResetYFunction(): (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
+            protected getResetYFunction(): (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
             protected wholeDatumAttributes(): string[];
             protected generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
@@ -3197,7 +3197,7 @@ declare module Plottable {
         protected _isVertical: boolean;
         _getPlotMetadataForDataset(key: string): Plots.StackedPlotMetadata;
         project(attrToSet: string, accessor: any, scale?: Scale<any, any>): Stacked<X, Y>;
-        _onDatasetUpdate(): void;
+        onDatasetUpdate(): void;
         _updateStackOffsets(): void;
         _updateStackExtents(): void;
         /**
@@ -3238,9 +3238,9 @@ declare module Plottable {
             getAnimator(key: string): Animators.PlotAnimator;
             protected setup(): void;
             protected _additionalPaint(): void;
-            protected _updateYDomainer(): void;
+            protected updateYDomainer(): void;
             project(attrToSet: string, accessor: any, scale?: Scale<any, any>): StackedArea<X>;
-            protected _onDatasetUpdate(): StackedArea<X>;
+            protected onDatasetUpdate(): StackedArea<X>;
             protected generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
             };
@@ -3283,7 +3283,7 @@ declare module Plottable {
             };
             protected generateDrawSteps(): Drawers.DrawStep[];
             project(attrToSet: string, accessor: any, scale?: Scale<any, any>): StackedBar<X, Y>;
-            protected _onDatasetUpdate(): StackedBar<X, Y>;
+            protected onDatasetUpdate(): StackedBar<X, Y>;
             protected _getPlotMetadataForDataset(key: string): StackedPlotMetadata;
             protected _normalizeDatasets<A, B>(fromX: boolean): {
                 a: A;

@@ -65,9 +65,9 @@ export module Plots {
       return this;
     }
 
-    protected _onDatasetUpdate() {
-      super._onDatasetUpdate();
-      Stacked.prototype._onDatasetUpdate.apply(this);
+    protected onDatasetUpdate() {
+      super.onDatasetUpdate();
+      Stacked.prototype.onDatasetUpdate.apply(this);
       return this;
     }
 

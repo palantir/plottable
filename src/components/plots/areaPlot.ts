@@ -6,8 +6,8 @@ export module Plots {
    * An AreaPlot draws a filled region (area) between the plot's projected "y" and projected "y0" values.
    */
   export class Area<X> extends Line<X> {
-    private _areaPath: D3.Selection;
-    private _defaultFillColor: string;
+    private areaPath: D3.Selection;
+    private defaultFillColor: string;
 
     /**
      * Constructs an AreaPlot.
@@ -25,13 +25,13 @@ export module Plots {
       this.animator("main", new Animators.Base()
                                         .duration(600)
                                         .easing("exp-in-out"));
-      this._defaultFillColor = new Scales.Color().range()[0];
+      this.defaultFillColor = new Scales.Color().range()[0];
     }
 
-    protected _onDatasetUpdate() {
-      super._onDatasetUpdate();
+    protected onDatasetUpdate() {
+      super.onDatasetUpdate();
       if (this.yScale != null) {
-        this._updateYDomainer();
+        this.updateYDomainer();
       }
     }
 
@@ -39,8 +39,8 @@ export module Plots {
       return new Plottable.Drawers.Area(key);
     }
 
-    protected _updateYDomainer() {
-      super._updateYDomainer();
+    protected updateYDomainer() {
+      super.updateYDomainer();
 
       var constantBaseline: number;
       var y0Projector = this._projections["y0"];
@@ -68,12 +68,12 @@ export module Plots {
     public project(attrToSet: string, accessor: any, scale?: Scale<any, any>) {
       super.project(attrToSet, accessor, scale);
       if (attrToSet === "y0") {
-        this._updateYDomainer();
+        this.updateYDomainer();
       }
       return this;
     }
 
-    protected _getResetYFunction() {
+    protected getResetYFunction() {
       return this.generateAttrToProjector()["y0"];
     }
 
@@ -86,8 +86,8 @@ export module Plots {
     protected generateAttrToProjector() {
       var attrToProjector = super.generateAttrToProjector();
       attrToProjector["fill-opacity"] = attrToProjector["fill-opacity"] || d3.functor(0.25);
-      attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this._defaultFillColor);
-      attrToProjector["stroke"] = attrToProjector["stroke"] || d3.functor(this._defaultFillColor);
+      attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this.defaultFillColor);
+      attrToProjector["stroke"] = attrToProjector["stroke"] || d3.functor(this.defaultFillColor);
       return attrToProjector;
     }
   }

@@ -6549,8 +6549,8 @@ var Plottable;
             if (this.isSetup) {
                 drawer.setup(this._renderArea.append("g"));
             }
-            dataset.broadcaster.registerListener(this, function () { return _this._onDatasetUpdate(); });
-            this._onDatasetUpdate();
+            dataset.broadcaster.registerListener(this, function () { return _this.onDatasetUpdate(); });
+            this.onDatasetUpdate();
         };
         Plot.prototype.getDrawer = function (key) {
             return new Plottable.Drawers.AbstractDrawer(key);
@@ -6563,7 +6563,7 @@ var Plottable;
                 return new Plottable.Animators.Null();
             }
         };
-        Plot.prototype._onDatasetUpdate = function () {
+        Plot.prototype.onDatasetUpdate = function () {
             this._updateScaleExtents();
             this._animateOnNextRender = true;
             this._dataChanged = true;
@@ -6719,7 +6719,7 @@ var Plottable;
             }
             if (isPermutation(order, this._datasetKeysInOrder)) {
                 this._datasetKeysInOrder = order;
-                this._onDatasetUpdate();
+                this.onDatasetUpdate();
             }
             else {
                 Plottable.Utils.Methods.warn("Attempted to change datasetOrder, but new order is not permutation of old. Ignoring.");
@@ -6770,7 +6770,7 @@ var Plottable;
                 pdk.dataset.broadcaster.deregisterListener(this);
                 this._datasetKeysInOrder.splice(this._datasetKeysInOrder.indexOf(key), 1);
                 this._key2PlotDatasetKey.remove(key);
-                this._onDatasetUpdate();
+                this.onDatasetUpdate();
             }
             return this;
         };
@@ -7039,7 +7039,7 @@ var Plottable;
             this.yScale = yScale;
             this._updateXDomainer();
             xScale.broadcaster.registerListener("yDomainAdjustment" + this.getID(), function () { return _this._adjustYDomainOnChangeFromX(); });
-            this._updateYDomainer();
+            this.updateYDomainer();
             yScale.broadcaster.registerListener("xDomainAdjustment" + this.getID(), function () { return _this._adjustXDomainOnChangeFromY(); });
         }
         /**
@@ -7063,7 +7063,7 @@ var Plottable;
                     this.yScale.broadcaster.deregisterListener("xDomainAdjustment" + this.getID());
                 }
                 this.yScale = scale;
-                this._updateYDomainer();
+                this.updateYDomainer();
                 scale.broadcaster.registerListener("xDomainAdjustment" + this.getID(), function () { return _this._adjustXDomainOnChangeFromY(); });
             }
             _super.prototype.project.call(this, attrToSet, accessor, scale);
@@ -7134,7 +7134,7 @@ var Plottable;
                 }
             }
         };
-        XYPlot.prototype._updateYDomainer = function () {
+        XYPlot.prototype.updateYDomainer = function () {
             if (this.yScale instanceof Plottable.QuantitativeScale) {
                 var scale = this.yScale;
                 if (!scale.userSetDomainer) {
@@ -7670,7 +7670,7 @@ var Plottable;
                     this._updateDomainer(this.yScale);
                 }
                 else {
-                    _super.prototype._updateYDomainer.call(this);
+                    _super.prototype.updateYDomainer.call(this);
                 }
             };
             Bar.prototype._updateXDomainer = function () {
@@ -8025,20 +8025,20 @@ var Plottable;
                 this.project("y0", 0, yScale); // default
                 this.animator("reset", new Plottable.Animators.Null());
                 this.animator("main", new Plottable.Animators.Base().duration(600).easing("exp-in-out"));
-                this._defaultFillColor = new Plottable.Scales.Color().range()[0];
+                this.defaultFillColor = new Plottable.Scales.Color().range()[0];
             }
-            Area.prototype._onDatasetUpdate = function () {
-                _super.prototype._onDatasetUpdate.call(this);
+            Area.prototype.onDatasetUpdate = function () {
+                _super.prototype.onDatasetUpdate.call(this);
                 if (this.yScale != null) {
-                    this._updateYDomainer();
+                    this.updateYDomainer();
                 }
             };
             Area.prototype.getDrawer = function (key) {
                 return new Plottable.Drawers.Area(key);
             };
-            Area.prototype._updateYDomainer = function () {
+            Area.prototype.updateYDomainer = function () {
                 var _this = this;
-                _super.prototype._updateYDomainer.call(this);
+                _super.prototype.updateYDomainer.call(this);
                 var constantBaseline;
                 var y0Projector = this._projections["y0"];
                 var y0Accessor = y0Projector && y0Projector.accessor;
@@ -8064,11 +8064,11 @@ var Plottable;
             Area.prototype.project = function (attrToSet, accessor, scale) {
                 _super.prototype.project.call(this, attrToSet, accessor, scale);
                 if (attrToSet === "y0") {
-                    this._updateYDomainer();
+                    this.updateYDomainer();
                 }
                 return this;
             };
-            Area.prototype._getResetYFunction = function () {
+            Area.prototype.getResetYFunction = function () {
                 return this.generateAttrToProjector()["y0"];
             };
             Area.prototype.wholeDatumAttributes = function () {
@@ -8079,8 +8079,8 @@ var Plottable;
             Area.prototype.generateAttrToProjector = function () {
                 var attrToProjector = _super.prototype.generateAttrToProjector.call(this);
                 attrToProjector["fill-opacity"] = attrToProjector["fill-opacity"] || d3.functor(0.25);
-                attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this._defaultFillColor);
-                attrToProjector["stroke"] = attrToProjector["stroke"] || d3.functor(this._defaultFillColor);
+                attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this.defaultFillColor);
+                attrToProjector["stroke"] = attrToProjector["stroke"] || d3.functor(this.defaultFillColor);
                 return attrToProjector;
             };
             return Area;
@@ -8200,11 +8200,11 @@ var Plottable;
             }
             return this;
         };
-        Stacked.prototype._onDatasetUpdate = function () {
+        Stacked.prototype.onDatasetUpdate = function () {
             if (this._projectorsReady()) {
                 this._updateStackOffsets();
             }
-            _super.prototype._onDatasetUpdate.call(this);
+            _super.prototype.onDatasetUpdate.call(this);
         };
         Stacked.prototype._updateStackOffsets = function () {
             var dataMapArray = this._generateDefaultMapArray();
@@ -8418,8 +8418,8 @@ var Plottable;
                 };
                 this.getAnimator("baseline").animate(this._baseline, baselineAttr);
             };
-            StackedArea.prototype._updateYDomainer = function () {
-                _super.prototype._updateYDomainer.call(this);
+            StackedArea.prototype.updateYDomainer = function () {
+                _super.prototype.updateYDomainer.call(this);
                 var scale = this.yScale;
                 if (!scale.userSetDomainer) {
                     scale.domainer().addPaddingException(0, "STACKED_AREA_PLOT+" + this.getID()).addIncludedValue(0, "STACKED_AREA_PLOT+" + this.getID());
@@ -8432,9 +8432,9 @@ var Plottable;
                 Plottable.Stacked.prototype.project.apply(this, [attrToSet, accessor, scale]);
                 return this;
             };
-            StackedArea.prototype._onDatasetUpdate = function () {
-                _super.prototype._onDatasetUpdate.call(this);
-                Plottable.Stacked.prototype._onDatasetUpdate.apply(this);
+            StackedArea.prototype.onDatasetUpdate = function () {
+                _super.prototype.onDatasetUpdate.call(this);
+                Plottable.Stacked.prototype.onDatasetUpdate.apply(this);
                 return this;
             };
             StackedArea.prototype.generateAttrToProjector = function () {
@@ -8568,9 +8568,9 @@ var Plottable;
                 Plottable.Stacked.prototype.project.apply(this, [attrToSet, accessor, scale]);
                 return this;
             };
-            StackedBar.prototype._onDatasetUpdate = function () {
-                _super.prototype._onDatasetUpdate.call(this);
-                Plottable.Stacked.prototype._onDatasetUpdate.apply(this);
+            StackedBar.prototype.onDatasetUpdate = function () {
+                _super.prototype.onDatasetUpdate.call(this);
+                Plottable.Stacked.prototype.onDatasetUpdate.apply(this);
                 return this;
             };
             StackedBar.prototype._getPlotMetadataForDataset = function (key) {
