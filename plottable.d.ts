@@ -1561,23 +1561,23 @@ declare module Plottable {
 
 declare module Plottable {
     class Component extends Core.PlottableObject {
-        protected _element: D3.Selection;
+        protected element: D3.Selection;
         protected _content: D3.Selection;
-        protected _boundingBox: D3.Selection;
+        protected boundingBox: D3.Selection;
         clipPathEnabled: boolean;
-        protected _fixedHeightFlag: boolean;
-        protected _fixedWidthFlag: boolean;
-        protected _isSetup: boolean;
-        protected _isAnchored: boolean;
+        protected fixedHeightFlag: boolean;
+        protected fixedWidthFlag: boolean;
+        protected isSetup: boolean;
+        protected isAnchored: boolean;
         /**
          * Attaches the Component as a child of a given a DOM element. Usually only directly invoked on root-level Components.
          *
          * @param {D3.Selection} element A D3 selection consisting of the element to anchor under.
          */
-        _anchor(element: D3.Selection): void;
+        anchor(element: D3.Selection): void;
         /**
          * Creates additional elements as necessary for the Component to function.
-         * Called during _anchor() if the Component's element has not been created yet.
+         * Called during anchor() if the Component's element has not been created yet.
          * Override in subclasses to provide additional functionality.
          */
         protected _setup(): void;
@@ -1688,14 +1688,14 @@ declare module Plottable {
          *
          * @returns {boolean} Whether the component has a fixed width.
          */
-        _isFixedWidth(): boolean;
+        isFixedWidth(): boolean;
         /**
          * Checks if the Component has a fixed height or false if it grows to fill available space.
          * Returns false by default on the base Component class.
          *
          * @returns {boolean} Whether the component has a fixed height.
          */
-        _isFixedHeight(): boolean;
+        isFixedHeight(): boolean;
         _merge(c: Component, below: boolean): Components.Group;
         /**
          * Merges this Component above another Component, returning a
@@ -1807,7 +1807,7 @@ declare module Plottable {
 
 declare module Plottable {
     class ComponentContainer extends Component {
-        _anchor(element: D3.Selection): void;
+        anchor(element: D3.Selection): void;
         _render(): void;
         _removeComponent(c: Component): void;
         _addComponent(c: Component, prepend?: boolean): boolean;
@@ -1861,8 +1861,8 @@ declare module Plottable {
                 width: number;
                 height: number;
             };
-            _isFixedWidth(): boolean;
-            _isFixedHeight(): boolean;
+            isFixedWidth(): boolean;
+            isFixedHeight(): boolean;
         }
     }
 }
@@ -1905,8 +1905,8 @@ declare module Plottable {
         protected _computeWidth(): number;
         protected _computeHeight(): number;
         _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
-        _isFixedHeight(): boolean;
-        _isFixedWidth(): boolean;
+        isFixedHeight(): boolean;
+        isFixedWidth(): boolean;
         protected _rescale(): void;
         _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;
         protected _setup(): void;
@@ -2565,8 +2565,8 @@ declare module Plottable {
              * @returns {Table} The calling Table.
              */
             colWeight(index: number, weight: number): Table;
-            _isFixedWidth(): boolean;
-            _isFixedHeight(): boolean;
+            isFixedWidth(): boolean;
+            isFixedHeight(): boolean;
         }
     }
 }
@@ -2657,7 +2657,7 @@ declare module Plottable {
          * @param {any[]|Dataset} [dataset] If provided, the data or Dataset to be associated with this Plot.
          */
         constructor();
-        _anchor(element: D3.Selection): void;
+        anchor(element: D3.Selection): void;
         protected _setup(): void;
         remove(): void;
         /**
@@ -3716,7 +3716,7 @@ declare module Plottable {
          */
         protected _hitBox: D3.Selection;
         protected _componentToListenTo: Component;
-        _anchor(component: Component, hitBox: D3.Selection): void;
+        anchor(component: Component, hitBox: D3.Selection): void;
         _requiresHitbox(): boolean;
         /**
          * Translates an <svg>-coordinate-space point to Component-space coordinates.
@@ -3741,7 +3741,7 @@ declare module Plottable {
 declare module Plottable {
     module Interactions {
         class Click extends Interaction {
-            _anchor(component: Component, hitBox: D3.Selection): void;
+            anchor(component: Component, hitBox: D3.Selection): void;
             /**
              * Gets the callback called when the Component is clicked.
              *
@@ -3763,7 +3763,7 @@ declare module Plottable {
 declare module Plottable {
     module Interactions {
         class DoubleClick extends Interaction {
-            _anchor(component: Component, hitBox: D3.Selection): void;
+            anchor(component: Component, hitBox: D3.Selection): void;
             /**
              * Gets the callback called when the Component is double-clicked.
              *
@@ -3785,7 +3785,7 @@ declare module Plottable {
 declare module Plottable {
     module Interactions {
         class Key extends Interaction {
-            _anchor(component: Component, hitBox: D3.Selection): void;
+            anchor(component: Component, hitBox: D3.Selection): void;
             /**
              * Sets a callback to be called when the key with the given keyCode is
              * pressed and the user is moused over the Component.
@@ -3803,7 +3803,7 @@ declare module Plottable {
 declare module Plottable {
     module Interactions {
         class Pointer extends Interaction {
-            _anchor(component: Component, hitBox: D3.Selection): void;
+            anchor(component: Component, hitBox: D3.Selection): void;
             /**
              * Gets the callback called when the pointer enters the Component.
              *
@@ -3866,7 +3866,7 @@ declare module Plottable {
              * Sets the scales back to their original domains.
              */
             resetZoom(): void;
-            _anchor(component: Component, hitBox: D3.Selection): void;
+            anchor(component: Component, hitBox: D3.Selection): void;
             _requiresHitbox(): boolean;
         }
     }
@@ -3876,7 +3876,7 @@ declare module Plottable {
 declare module Plottable {
     module Interactions {
         class Drag extends Interaction {
-            _anchor(component: Component, hitBox: D3.Selection): void;
+            anchor(component: Component, hitBox: D3.Selection): void;
             /**
              * Returns whether or not this Interactions constrains Points passed to its
              * callbacks to lie inside its Component.

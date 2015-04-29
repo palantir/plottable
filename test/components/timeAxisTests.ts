@@ -244,14 +244,14 @@ describe("TimeAxis", () => {
 
     xAxis.renderTo(svg);
 
-    var axisBoundingRect: ClientRect = (<any> xAxis)._element.select(".bounding-box")[0][0].getBoundingClientRect();
+    var axisBoundingRect: ClientRect = (<any> xAxis).element.select(".bounding-box")[0][0].getBoundingClientRect();
 
     var isInsideAxisBoundingRect = function(innerRect: ClientRect) {
       return Math.floor(innerRect.bottom)     <= Math.ceil(axisBoundingRect.bottom) + window.Pixel_CloseTo_Requirement &&
              Math.floor(axisBoundingRect.top) <= Math.ceil(innerRect.top) + window.Pixel_CloseTo_Requirement;
     };
 
-    var numberOfVisibleTiers = (<any> xAxis)._element
+    var numberOfVisibleTiers = (<any> xAxis).element
       .selectAll("." + Plottable.Axes.Time.TIME_AXIS_TIER_CLASS)
       .each(function(e: any, i: number) {
         var sel = d3.select(this);

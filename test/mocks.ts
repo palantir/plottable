@@ -9,8 +9,8 @@ module Mocks {
       super();
       this.fixedWidth = width;
       this.fixedHeight = height;
-      this._fixedWidthFlag = true;
-      this._fixedHeightFlag = true;
+      this.fixedWidthFlag = true;
+      this.fixedHeightFlag = true;
     }
 
     public _requestedSpace(availableWidth: number, availableHeight: number): Plottable._SpaceRequest {

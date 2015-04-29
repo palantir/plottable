@@ -5,7 +5,7 @@ var assert = chai.assert;
 
 function assertComponentXY(component: Plottable.Component, x: number, y: number, message: string) {
   // use <any> to examine the private variables
-  var translate = d3.transform((<any> component)._element.attr("transform")).translate;
+  var translate = d3.transform((<any> component).element.attr("transform")).translate;
   var xActual = translate[0];
   var yActual = translate[1];
   assert.equal(xActual, x, "X: " + message);
@@ -24,18 +24,18 @@ describe("Component behavior", () => {
 
   describe("anchor", () => {
     it("anchoring works as expected", () => {
-      c._anchor(svg);
-      assert.equal((<any> c)._element.node(), svg.select("g").node(), "the component anchored to a <g> beneath the <svg>");
+      c.anchor(svg);
+      assert.equal((<any> c).element.node(), svg.select("g").node(), "the component anchored to a <g> beneath the <svg>");
       assert.isTrue(svg.classed("plottable"), "<svg> was given \"plottable\" CSS class");
       svg.remove();
     });
 
     it("can re-anchor to a different element", () => {
-      c._anchor(svg);
+      c.anchor(svg);
 
       var svg2 = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      c._anchor(svg2);
-      assert.equal((<any> c)._element.node(), svg2.select("g").node(), "the component re-achored under the second <svg>");
+      c.anchor(svg2);
+      assert.equal((<any> c).element.node(), svg2.select("g").node(), "the component re-achored under the second <svg>");
       assert.isTrue(svg2.classed("plottable"), "second <svg> was given \"plottable\" CSS class");
 
       svg.remove();
@@ -45,19 +45,19 @@ describe("Component behavior", () => {
 
   describe("computeLayout", () => {
     it("computeLayout defaults and updates intelligently", () => {
-      c._anchor(svg);
+      c.anchor(svg);
       c._computeLayout();
       assert.equal(c.width() , SVG_WIDTH, "computeLayout defaulted width to svg width");
       assert.equal(c.height(), SVG_HEIGHT, "computeLayout defaulted height to svg height");
-      assert.equal((<any> c)._xOrigin, 0 , "xOrigin defaulted to 0");
-      assert.equal((<any> c)._yOrigin, 0 , "yOrigin defaulted to 0");
+      assert.equal((<any> c).xOrigin, 0 , "xOrigin defaulted to 0");
+      assert.equal((<any> c).yOrigin, 0 , "yOrigin defaulted to 0");
 
       svg.attr("width", 2 * SVG_WIDTH).attr("height", 2 * SVG_HEIGHT);
       c._computeLayout();
       assert.equal(c.width() , 2 * SVG_WIDTH, "computeLayout updated width to new svg width");
       assert.equal(c.height(), 2 * SVG_HEIGHT, "computeLayout updated height to new svg height");
-      assert.equal((<any> c)._xOrigin, 0 , "xOrigin is still 0");
-      assert.equal((<any> c)._yOrigin, 0 , "yOrigin is still 0");
+      assert.equal((<any> c).xOrigin, 0 , "xOrigin is still 0");
+      assert.equal((<any> c).yOrigin, 0 , "yOrigin is still 0");
 
       svg.remove();
     });
@@ -70,12 +70,12 @@ describe("Component behavior", () => {
 
       // Remove width/height attributes and style with CSS
       svg.attr("width", null).attr("height", null);
-      c._anchor(svg);
+      c.anchor(svg);
       c._computeLayout();
       assert.equal(c.width(), 400, "defaults to width of parent if width is not specified on <svg>");
       assert.equal(c.height(), 200, "defaults to height of parent if width is not specified on <svg>");
-      assert.equal((<any> c)._xOrigin, 0, "xOrigin defaulted to 0");
-      assert.equal((<any> c)._yOrigin, 0, "yOrigin defaulted to 0");
+      assert.equal((<any> c).xOrigin, 0, "xOrigin defaulted to 0");
+      assert.equal((<any> c).yOrigin, 0, "yOrigin defaulted to 0");
 
 
       svg.style("width", "50%").style("height", "50%");
@@ -83,8 +83,8 @@ describe("Component behavior", () => {
 
       assert.equal(c.width(), 200, "computeLayout defaulted width to svg width");
       assert.equal(c.height(), 100, "computeLayout defaulted height to svg height");
-      assert.equal((<any> c)._xOrigin, 0, "xOrigin defaulted to 0");
-      assert.equal((<any> c)._yOrigin, 0, "yOrigin defaulted to 0");
+      assert.equal((<any> c).xOrigin, 0, "xOrigin defaulted to 0");
+      assert.equal((<any> c).yOrigin, 0, "yOrigin defaulted to 0");
 
       svg.style("width", "25%").style("height", "25%");
 
@@ -92,8 +92,8 @@ describe("Component behavior", () => {
 
       assert.equal(c.width(), 100, "computeLayout updated width to new svg width");
       assert.equal(c.height(), 50, "computeLayout updated height to new svg height");
-      assert.equal((<any> c)._xOrigin, 0, "xOrigin is still 0");
-      assert.equal((<any> c)._yOrigin, 0, "yOrigin is still 0");
+      assert.equal((<any> c).xOrigin, 0, "xOrigin is still 0");
+      assert.equal((<any> c).yOrigin, 0, "yOrigin is still 0");
 
       // reset test page DOM
       parent.style("width", "auto");
@@ -103,7 +103,7 @@ describe("Component behavior", () => {
 
     it("computeLayout will not default when attached to non-root node", () => {
       var g = svg.append("g");
-      c._anchor(g);
+      c.anchor(g);
       assert.throws(() => c._computeLayout(), "null arguments");
       svg.remove();
     });
@@ -119,9 +119,9 @@ describe("Component behavior", () => {
       var yOff = 20;
       var width = 100;
       var height = 200;
-      c._anchor(svg);
+      c.anchor(svg);
       c._computeLayout(xOff, yOff, width, height);
-      var translate = getTranslate((<any> c)._element);
+      var translate = getTranslate((<any> c).element);
       assert.deepEqual(translate, [xOff, yOff], "the element translated appropriately");
       assert.equal(c.width() , width, "the width set properly");
       assert.equal(c.height(), height, "the height set propery");
@@ -131,7 +131,7 @@ describe("Component behavior", () => {
 
   it("subelement containers are ordered properly", () => {
     c.renderTo(svg);
-    var gs = (<any> c)._element.selectAll("g");
+    var gs = (<any> c).element.selectAll("g");
     var g0 = d3.select(gs[0][0]);
     var g1 = d3.select(gs[0][1]);
     var g2 = d3.select(gs[0][2]);
@@ -145,7 +145,7 @@ describe("Component behavior", () => {
 
   it("fixed-width component will align to the right spot", () => {
     fixComponentSize(c, 100, 100);
-    c._anchor(svg);
+    c.anchor(svg);
     c._computeLayout();
     assertComponentXY(c, 0, 0, "top-left component aligns correctly");
 
@@ -161,7 +161,7 @@ describe("Component behavior", () => {
 
   it("components can be offset relative to their alignment, and throw errors if there is insufficient space", () => {
     fixComponentSize(c, 100, 100);
-    c._anchor(svg);
+    c.anchor(svg);
     c.xOffset(20).yOffset(20);
     c._computeLayout();
     assertComponentXY(c, 20, 20, "top-left component offsets correctly");
@@ -191,8 +191,8 @@ describe("Component behavior", () => {
     assert.equal(layout.height, 0, "requested height defaults to 0");
     assert.equal(layout.wantsWidth , false, "_requestedSpace().wantsWidth  defaults to false");
     assert.equal(layout.wantsHeight, false, "_requestedSpace().wantsHeight defaults to false");
-    assert.equal((<any> c)._xAlignProportion, 0, "_xAlignProportion defaults to 0");
-    assert.equal((<any> c)._yAlignProportion, 0, "_yAlignProportion defaults to 0");
+    assert.equal((<any> c).xAlignProportion, 0, "xAlignProportion defaults to 0");
+    assert.equal((<any> c).yAlignProportion, 0, "yAlignProportion defaults to 0");
     assert.equal((<any> c)._xOffset, 0, "xOffset defaults to 0");
     assert.equal((<any> c)._yOffset, 0, "yOffset defaults to 0");
     svg.remove();
@@ -202,7 +202,7 @@ describe("Component behavior", () => {
     assert.isFalse(c.clipPathEnabled, "clipPathEnabled defaults to false");
     c.clipPathEnabled = true;
     var expectedClipPathID = c.getID();
-    c._anchor(svg);
+    c.anchor(svg);
     c._computeLayout(0, 0, 100, 100);
     c._render();
     var expectedPrefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
@@ -210,9 +210,9 @@ describe("Component behavior", () => {
     var expectedClipPathURL = "url(" + expectedPrefix + "#clipPath" + expectedClipPathID + ")";
     // IE 9 has clipPath like 'url("#clipPath")', must accomodate
     var normalizeClipPath = (s: string) => s.replace(/"/g, "");
-    assert.isTrue(normalizeClipPath((<any> c)._element.attr("clip-path")) === expectedClipPathURL,
+    assert.isTrue(normalizeClipPath((<any> c).element.attr("clip-path")) === expectedClipPathURL,
                   "the element has clip-path url attached");
-    var clipRect = (<any> c)._boxContainer.select(".clip-rect");
+    var clipRect = (<any> c).boxContainer.select(".clip-rect");
     assert.equal(clipRect.attr("width"), 100, "the clipRect has an appropriate width");
     assert.equal(clipRect.attr("height"), 100, "the clipRect has an appropriate height");
     svg.remove();
@@ -231,7 +231,7 @@ describe("Component behavior", () => {
     assert.throws(() => (<any> c)._addBox("pre-anchor"), Error, "Adding boxes before anchoring is currently disallowed");
     c.renderTo(svg);
     (<any> c)._addBox("post-anchor");
-    var e = (<any> c)._element;
+    var e = (<any> c).element;
     var boxContainer = e.select(".box-container");
     var boxStrings = [".bounding-box", ".post-anchor"];
 
@@ -255,7 +255,7 @@ describe("Component behavior", () => {
       assert.equal(hitBox.style("opacity"), "0", "the hitBox is transparent, otherwise it would look weird");
     }
 
-    c._anchor(svg);
+    c.anchor(svg);
     assert.isUndefined((<any> c)._hitBox, "no hitBox was created when there were no registered interactions");
     svg.remove();
     svg = generateSVG();
@@ -265,14 +265,14 @@ describe("Component behavior", () => {
     var i = new Plottable.Interaction();
     i._requiresHitbox = () => true;
     c.registerInteraction(i);
-    c._anchor(svg);
+    c.anchor(svg);
     verifyHitbox(c);
     svg.remove();
     svg = generateSVG();
 
     // registration after anchoring
     c = new Plottable.Component();
-    c._anchor(svg);
+    c.anchor(svg);
     i = new Plottable.Interaction();
     i._requiresHitbox = () => true;
     c.registerInteraction(i);
@@ -295,7 +295,7 @@ describe("Component behavior", () => {
     c.classed("CSS-PREANCHOR-REMOVE", false);
     assert.isFalse(c.classed("CSS-PREANCHOR-REMOVE"));
 
-    c._anchor(svg);
+    c.anchor(svg);
     assert.isTrue(c.classed("CSS-PREANCHOR-KEEP"));
     assert.isFalse(c.classed("CSS-PREANCHOR-REMOVE"));
     assert.isFalse(c.classed("CSS-POSTANCHOR"));
@@ -360,9 +360,9 @@ describe("Component behavior", () => {
     horizontalComponent.xAlign("center");
     verticalComponent.yAlign("bottom");
 
-    assertBBoxNonIntersection((<any> verticalComponent)._element.select(".bounding-box"),
-                              (<any> placeHolder)._element.select(".bounding-box"));
-    assertBBoxInclusion((<any> t)._boxContainer.select(".bounding-box"), (<any> horizontalComponent)._element.select(".bounding-box"));
+    assertBBoxNonIntersection((<any> verticalComponent).element.select(".bounding-box"),
+                              (<any> placeHolder).element.select(".bounding-box"));
+    assertBBoxInclusion((<any> t).boxContainer.select(".bounding-box"), (<any> horizontalComponent).element.select(".bounding-box"));
 
     svg.remove();
   });
@@ -371,13 +371,13 @@ describe("Component behavior", () => {
     // catches #1188
     var c: any = new Plottable.Component();
     c._requestedSpace = () => { return {width: 500, height: 500, wantsWidth: true, wantsHeight: true}; };
-    c._fixedWidthFlag = true;
-    c._fixedHeightFlag = true;
+    c.fixedWidthFlag = true;
+    c.fixedHeightFlag = true;
     c.xAlign("left");
     var t = new Plottable.Components.Table([[c]]);
     t.renderTo(svg);
 
-    var transform = d3.transform(c._element.attr("transform"));
+    var transform = d3.transform(c.element.attr("transform"));
     assert.deepEqual(transform.translate, [0, 0], "the element was not translated");
     svg.remove();
   });
@@ -386,7 +386,7 @@ describe("Component behavior", () => {
     var renderFlag = false;
     var c: any = new Plottable.Component();
     c._doRender = () => renderFlag = true;
-    c._anchor(svg);
+    c.anchor(svg);
     c._setup();
     c._render();
     assert.isFalse(renderFlag, "no render until width/height set to nonzero");

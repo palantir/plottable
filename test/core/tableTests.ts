@@ -131,7 +131,7 @@ describe("Tables", () => {
     var svg = generateSVG();
     table.renderTo(svg);
 
-    var elements = components.map((r) => (<any> r)._element);
+    var elements = components.map((r) => (<any> r).element);
     var translates = elements.map((e) => getTranslate(e));
     assert.deepEqual(translates[0], [0, 0], "first element is centered at origin");
     assert.deepEqual(translates[1], [200, 0], "second element is located properly");
@@ -154,7 +154,7 @@ describe("Tables", () => {
     var svg = generateSVG(415, 415);
     table.renderTo(svg);
 
-    var elements = components.map((r) => (<any> r)._element);
+    var elements = components.map((r) => (<any> r).element);
     var translates = elements.map((e) => getTranslate(e));
     var bboxes = elements.map((e) => Plottable.Utils.DOM.getBBox(e));
     assert.deepEqual(translates[0], [0, 0], "first element is centered properly");
@@ -187,7 +187,7 @@ describe("Tables", () => {
 
     table.renderTo(svg);
 
-    var elements = components.map((r) => (<any> r)._element);
+    var elements = components.map((r) => (<any> r).element);
     var translates = elements.map((e) => getTranslate(e));
     var bboxes = elements.map((e) => Plottable.Utils.DOM.getBBox(e));
     // test the translates
@@ -210,15 +210,15 @@ describe("Tables", () => {
     var table = tableAndcomponents.table;
     var components = tableAndcomponents.components;
     components.forEach((c) => fixComponentSize(c, 10, 10));
-    assert.isTrue(table._isFixedWidth(), "fixed width when all subcomponents fixed width");
-    assert.isTrue(table._isFixedHeight(), "fixedHeight when all subcomponents fixed height");
+    assert.isTrue(table.isFixedWidth(), "fixed width when all subcomponents fixed width");
+    assert.isTrue(table.isFixedHeight(), "fixedHeight when all subcomponents fixed height");
     fixComponentSize(components[0], null, 10);
-    assert.isFalse(table._isFixedWidth(), "width not fixed when some subcomponent width not fixed");
-    assert.isTrue(table._isFixedHeight(), "the height is still fixed when some subcomponent width not fixed");
+    assert.isFalse(table.isFixedWidth(), "width not fixed when some subcomponent width not fixed");
+    assert.isTrue(table.isFixedHeight(), "the height is still fixed when some subcomponent width not fixed");
     fixComponentSize(components[8], 10, null);
     fixComponentSize(components[0], 10, 10);
-    assert.isTrue(table._isFixedWidth(), "width fixed again once no subcomponent width not fixed");
-    assert.isFalse(table._isFixedHeight(), "height unfixed now that a subcomponent has unfixed height");
+    assert.isTrue(table.isFixedWidth(), "width fixed again once no subcomponent width not fixed");
+    assert.isFalse(table.isFixedHeight(), "height unfixed now that a subcomponent has unfixed height");
   });
 
   it.skip("table._requestedSpace works properly", () => {

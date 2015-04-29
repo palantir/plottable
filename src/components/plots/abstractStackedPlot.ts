@@ -179,7 +179,7 @@ module Plottable {
       if (!primaryScale) {
         return;
       }
-      if (this._isAnchored && this._stackedExtent.length > 0) {
+      if (this.isAnchored && this._stackedExtent.length > 0) {
         primaryScale._updateExtent(this.getID().toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT", this._stackedExtent);
       } else {
         primaryScale._removeExtent(this.getID().toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT");

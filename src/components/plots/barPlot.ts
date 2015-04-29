@@ -246,7 +246,7 @@ export module Plots {
      * @returns {D3.Selection} The selected bar, or null if no bar was selected.
      */
     public getBars(xValOrExtent: number | Extent, yValOrExtent: number | Extent): D3.Selection {
-      if (!this._isSetup) {
+      if (!this.isSetup) {
         return d3.select();
       }
 

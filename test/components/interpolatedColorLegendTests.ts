@@ -13,7 +13,7 @@ describe("InterpolatedColorLegend", () => {
 
   function assertBasicRendering(legend: Plottable.Components.InterpolatedColorLegend) {
     var scaleDomain = colorScale.domain();
-    var legendElement: D3.Selection = (<any> legend)._element;
+    var legendElement: D3.Selection = (<any> legend).element;
 
     var swatches = legendElement.selectAll(".swatch");
     assert.strictEqual(d3.select(swatches[0][0]).attr("fill"),
@@ -46,7 +46,7 @@ describe("InterpolatedColorLegend", () => {
 
     assertBasicRendering(legend);
 
-    var legendElement: D3.Selection = (<any> legend)._element;
+    var legendElement: D3.Selection = (<any> legend).element;
     var labels = legendElement.selectAll("text");
     var swatchContainer = legendElement.select(".swatch-container");
     var swatchContainerBCR = swatchContainer.node().getBoundingClientRect();
@@ -65,7 +65,7 @@ describe("InterpolatedColorLegend", () => {
 
     assertBasicRendering(legend);
 
-    var legendElement: D3.Selection = (<any> legend)._element;
+    var legendElement: D3.Selection = (<any> legend).element;
     var labels = legendElement.selectAll("text");
     var swatchContainer = legendElement.select(".swatch-container");
     var swatchContainerBCR = swatchContainer.node().getBoundingClientRect();
@@ -85,7 +85,7 @@ describe("InterpolatedColorLegend", () => {
 
     assertBasicRendering(legend);
 
-    var legendElement: D3.Selection = (<any> legend)._element;
+    var legendElement: D3.Selection = (<any> legend).element;
     var labels = legendElement.selectAll("text");
     var swatchContainer = legendElement.select(".swatch-container");
     var swatchContainerBCR = swatchContainer.node().getBoundingClientRect();

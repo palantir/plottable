@@ -58,8 +58,8 @@ module Plottable {
       this._nextSeriesIndex = 0;
     }
 
-    public _anchor(element: D3.Selection) {
-      super._anchor(element);
+    public anchor(element: D3.Selection) {
+      super.anchor(element);
       this._animateOnNextRender = true;
       this._dataChanged = true;
       this._updateScaleExtents();
@@ -121,7 +121,7 @@ module Plottable {
       this._datasetKeysInOrder.push(key);
       this._key2PlotDatasetKey.set(key, pdk);
 
-      if (this._isSetup) {
+      if (this.isSetup) {
         drawer.setup(this._renderArea.append("g"));
       }
       dataset.broadcaster.registerListener(this, () => this._onDatasetUpdate());
@@ -233,7 +233,7 @@ module Plottable {
     }
 
     public _doRender() {
-      if (this._isAnchored) {
+      if (this.isAnchored) {
         this._paint();
         this._dataChanged = false;
         this._animateOnNextRender = false;
@@ -274,7 +274,7 @@ module Plottable {
           var plotMetadata = plotDatasetKey.plotMetadata;
           var extent = dataset._getExtent(projector.accessor, projector.scale._typeCoercer, plotMetadata);
           var scaleKey = this.getID().toString() + "_" + key;
-          if (extent.length === 0 || !this._isAnchored) {
+          if (extent.length === 0 || !this.isAnchored) {
             projector.scale._removeExtent(scaleKey, attr);
           } else {
             projector.scale._updateExtent(scaleKey, attr, extent);

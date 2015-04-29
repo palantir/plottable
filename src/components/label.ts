@@ -29,8 +29,8 @@ export module Components {
       this.text(displayText);
       this.orient(orientation);
       this.xAlign("center").yAlign("center");
-      this._fixedHeightFlag = true;
-      this._fixedWidthFlag = true;
+      this.fixedHeightFlag = true;
+      this.fixedWidthFlag = true;
       this._padding = 0;
     }
 

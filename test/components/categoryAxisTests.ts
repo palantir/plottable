@@ -17,7 +17,7 @@ describe("Category Axes", () => {
     var svg = generateSVG(400, 400);
     var scale = new Plottable.Scales.Category();
     var ca = new Plottable.Axes.Category(scale);
-    ca._anchor(svg);
+    ca.anchor(svg);
     var s = ca._requestedSpace(400, 400);
     assert.operator(s.width, ">=", 0, "it requested 0 or more width");
     assert.operator(s.height, ">=", 0, "it requested 0 or more height");

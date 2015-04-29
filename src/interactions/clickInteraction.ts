@@ -9,8 +9,8 @@ export module Interactions {
     private _clickCallback: (p: Point) => any;
     private _clickedDown = false;
 
-    public _anchor(component: Component, hitBox: D3.Selection) {
-      super._anchor(component, hitBox);
+    public anchor(component: Component, hitBox: D3.Selection) {
+      super.anchor(component, hitBox);
 
       this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(<SVGElement> component.content().node());
       this._mouseDispatcher.onMouseDown("Interaction.Click" + this.getID(), (p: Point) => this._handleClickDown(p));

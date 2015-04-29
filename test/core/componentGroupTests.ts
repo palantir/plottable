@@ -11,7 +11,7 @@ describe("ComponentGroups", () => {
 
     var cg = new Plottable.Components.Group([c1, c2, c3]);
     var svg = generateSVG(400, 400);
-    cg._anchor(svg);
+    cg.anchor(svg);
     (<any> c1)._addBox("test-box1");
     (<any> c2)._addBox("test-box2");
     (<any> c3)._addBox("test-box3");
@@ -32,7 +32,7 @@ describe("ComponentGroups", () => {
 
     var cg = new Plottable.Components.Group([c1]);
     var svg = generateSVG(400, 400);
-    cg.below(c2)._anchor(svg);
+    cg.below(c2).anchor(svg);
     (<any> c1)._addBox("test-box1");
     (<any> c2)._addBox("test-box2");
     cg._computeLayout()._render();
@@ -55,12 +55,12 @@ describe("ComponentGroups", () => {
     cg.below(c1).below(c2);
 
     var svg = generateSVG();
-    cg._anchor(svg);
+    cg.anchor(svg);
     cg._computeLayout(50, 50, 350, 350);
 
-    var cgTranslate = d3.transform((<any> cg)._element.attr("transform")).translate;
-    var c1Translate = d3.transform((<any> c1)._element.attr("transform")).translate;
-    var c2Translate = d3.transform((<any> c2)._element.attr("transform")).translate;
+    var cgTranslate = d3.transform((<any> cg).element.attr("transform")).translate;
+    var c1Translate = d3.transform((<any> c1).element.attr("transform")).translate;
+    var c2Translate = d3.transform((<any> c2).element.attr("transform")).translate;
     assert.equal(cgTranslate[0], 50, "componentGroup has 50 xOffset");
     assert.equal(cgTranslate[1], 50, "componentGroup has 50 yOffset");
     assert.equal(c1Translate[0], 0, "componentGroup has 0 xOffset");
@@ -120,9 +120,9 @@ describe("ComponentGroups", () => {
     cg.detachAll();
     assert.isTrue(cg.empty(), "cg empty after detachAll()");
 
-    assert.isFalse((<any> c1)._isAnchored, "c1 was detached");
-    assert.isFalse((<any> c2)._isAnchored, "c2 was detached");
-    assert.isFalse((<any> c3)._isAnchored, "c3 was detached");
+    assert.isFalse((<any> c1).isAnchored, "c1 was detached");
+    assert.isFalse((<any> c2).isAnchored, "c2 was detached");
+    assert.isFalse((<any> c3).isAnchored, "c3 was detached");
     assert.lengthOf(cg.components(), 0, "cg has no components");
   });
 
@@ -152,8 +152,8 @@ describe("ComponentGroups", () => {
       var groupRequest = cg._requestedSpace(SVG_WIDTH, SVG_HEIGHT);
       var c1Request = c1._requestedSpace(SVG_WIDTH, SVG_HEIGHT);
       assert.deepEqual(groupRequest, c1Request, "request reflects request of sub-component");
-      assert.isFalse(cg._isFixedWidth(), "width is not fixed if subcomponents are not fixed width");
-      assert.isFalse(cg._isFixedHeight(), "height is not fixed if subcomponents are not fixed height");
+      assert.isFalse(cg.isFixedWidth(), "width is not fixed if subcomponents are not fixed width");
+      assert.isFalse(cg.isFixedHeight(), "height is not fixed if subcomponents are not fixed height");
 
       cg.renderTo(svg);
       assert.strictEqual(cg.width(), SVG_WIDTH, "occupies all offered width");

@@ -47,8 +47,8 @@ export module Components {
       this._scale.broadcaster.registerListener(this, () => this._invalidateLayout());
 
       this.xAlign("right").yAlign("top");
-      this._fixedWidthFlag = true;
-      this._fixedHeightFlag = true;
+      this.fixedWidthFlag = true;
+      this.fixedHeightFlag = true;
       this._sortFn = (a: string, b: string) => this._scale.domain().indexOf(a) - this._scale.domain().indexOf(b);
       this._symbolFactoryAccessor = () => SymbolFactories.circle();
     }
@@ -218,7 +218,7 @@ export module Components {
      * @returns {D3.Selection} The selected entry, or null selection if no entry was selected.
      */
     public getEntry(position: Point): D3.Selection {
-      if (!this._isSetup) {
+      if (!this.isSetup) {
         return d3.select();
       }
 
