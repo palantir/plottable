@@ -44,6 +44,9 @@
     "radix": true,
     "semicolon": true,
     "triple-equals": [true, "allow-null-check"],
+    "typedef-whitespace": [true, {
+        "call-signature": "nospace"
+    }],
     "variable-name": false,
     "whitespace": ["check-branch", "check-decl", "check-operator", "check-separator", "check-type"],
     "ban": [true, ["d3", "max"], ["d3", "min"]]

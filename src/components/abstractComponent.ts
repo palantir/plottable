@@ -166,8 +166,8 @@ export module Component {
     public _doRender() {/* overwrite */}
 
     public _useLastCalculatedLayout(): boolean;
-    public _useLastCalculatedLayout(useLast: boolean) : AbstractComponent;
-    public _useLastCalculatedLayout(useLast?: boolean) : any {
+    public _useLastCalculatedLayout(useLast: boolean): AbstractComponent;
+    public _useLastCalculatedLayout(useLast?: boolean): any {
       if (useLast == null) {
         return this._usedLastLayout;
       } else {
