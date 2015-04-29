@@ -64,18 +64,18 @@ describe("Plots", () => {
         var bar1 = d3.select(bars[0][1]);
         assert.closeTo(TestMethods.numAttr(bar0, "width"), xScale.rangeBand(), 1, "bar0 width is correct");
         assert.closeTo(TestMethods.numAttr(bar1, "width"), xScale.rangeBand(), 1, "bar1 width is correct");
-        assert.strictEqual(+bar0.attr("height"), 100, "bar0 height is correct");
-        assert.strictEqual(+bar1.attr("height"), 150, "bar1 height is correct");
+        assert.strictEqual(bar0.attr("height"), "100", "bar0 height is correct");
+        assert.strictEqual(bar1.attr("height"), "150", "bar1 height is correct");
         assert.closeTo(TestMethods.numAttr(bar0, "x"), 111, 1, "bar0 x is correct");
         assert.closeTo(TestMethods.numAttr(bar1, "x"), 333, 1, "bar1 x is correct");
-        assert.strictEqual(+bar0.attr("y"), 100, "bar0 y is correct");
-        assert.strictEqual(+bar1.attr("y"), 200, "bar1 y is correct");
+        assert.strictEqual(bar0.attr("y"), "100", "bar0 y is correct");
+        assert.strictEqual(bar1.attr("y"), "200", "bar1 y is correct");
 
         var baseline = renderArea.select(".baseline");
-        assert.strictEqual(+baseline.attr("y1"), 200, "the baseline is in the correct vertical position");
-        assert.strictEqual(+baseline.attr("y2"), 200, "the baseline is in the correct vertical position");
-        assert.strictEqual(+baseline.attr("x1"), 0, "the baseline starts at the edge of the chart");
-        assert.strictEqual(+baseline.attr("x2"), SVG_WIDTH, "the baseline ends at the edge of the chart");
+        assert.strictEqual(baseline.attr("y1"), "200", "the baseline is in the correct vertical position");
+        assert.strictEqual(baseline.attr("y2"), "200", "the baseline is in the correct vertical position");
+        assert.strictEqual(baseline.attr("x1"), "0", "the baseline starts at the edge of the chart");
+        assert.strictEqual(baseline.attr("x2"), String(SVG_WIDTH), "the baseline ends at the edge of the chart");
         svg.remove();
       });
 
@@ -86,16 +86,16 @@ describe("Plots", () => {
         var bars = renderArea.selectAll("rect");
         var bar0 = d3.select(bars[0][0]);
         var bar1 = d3.select(bars[0][1]);
-        assert.strictEqual(+bar0.attr("height"), 200, "bar0 height is correct");
-        assert.strictEqual(+bar1.attr("height"), 50, "bar1 height is correct");
-        assert.strictEqual(+bar0.attr("y"), 100, "bar0 y is correct");
-        assert.strictEqual(+bar1.attr("y"), 300, "bar1 y is correct");
+        assert.strictEqual(bar0.attr("height"), "200", "bar0 height is correct");
+        assert.strictEqual(bar1.attr("height"), "50", "bar1 height is correct");
+        assert.strictEqual(bar0.attr("y"), "100", "bar0 y is correct");
+        assert.strictEqual(bar1.attr("y"), "300", "bar1 y is correct");
 
         var baseline = renderArea.select(".baseline");
-        assert.strictEqual(+baseline.attr("y1"), 300, "the baseline is in the correct vertical position");
-        assert.strictEqual(+baseline.attr("y2"), 300, "the baseline is in the correct vertical position");
-        assert.strictEqual(+baseline.attr("x1"), 0, "the baseline starts at the edge of the chart");
-        assert.strictEqual(+baseline.attr("x2"), SVG_WIDTH, "the baseline ends at the edge of the chart");
+        assert.strictEqual(baseline.attr("y1"), "300", "the baseline is in the correct vertical position");
+        assert.strictEqual(baseline.attr("y2"), "300", "the baseline is in the correct vertical position");
+        assert.strictEqual(baseline.attr("x1"), "0", "the baseline starts at the edge of the chart");
+        assert.strictEqual(baseline.attr("x2"), String(SVG_WIDTH), "the baseline ends at the edge of the chart");
         svg.remove();
       });
 
@@ -461,18 +461,18 @@ describe("Plots", () => {
         var bar1 = d3.select(bars[0][1]);
         assert.closeTo(TestMethods.numAttr(bar0, "height"), yScale.rangeBand(), 1, "bar0 height is correct");
         assert.closeTo(TestMethods.numAttr(bar1, "height"), yScale.rangeBand(), 1, "bar1 height is correct");
-        assert.strictEqual(+bar0.attr("width"), 100, "bar0 width is correct");
-        assert.strictEqual(+bar1.attr("width"), 150, "bar1 width is correct");
+        assert.strictEqual(bar0.attr("width"), "100", "bar0 width is correct");
+        assert.strictEqual(bar1.attr("width"), "150", "bar1 width is correct");
         assert.closeTo(TestMethods.numAttr(bar0, "y"), 74, 1, "bar0 y is correct");
         assert.closeTo(TestMethods.numAttr(bar1, "y"), 222, 1, "bar1 y is correct");
-        assert.strictEqual(+bar0.attr("x"), 300, "bar0 x is correct");
-        assert.strictEqual(+bar1.attr("x"), 150, "bar1 x is correct");
+        assert.strictEqual(bar0.attr("x"), "300", "bar0 x is correct");
+        assert.strictEqual(bar1.attr("x"), "150", "bar1 x is correct");
 
         var baseline = renderArea.select(".baseline");
-        assert.strictEqual(+baseline.attr("x1"), 300, "the baseline is in the correct horizontal position");
-        assert.strictEqual(+baseline.attr("x2"), 300, "the baseline is in the correct horizontal position");
-        assert.strictEqual(+baseline.attr("y1"), 0, "the baseline starts at the top of the chart");
-        assert.strictEqual(+baseline.attr("y2"), SVG_HEIGHT, "the baseline ends at the bottom of the chart");
+        assert.strictEqual(baseline.attr("x1"), "300", "the baseline is in the correct horizontal position");
+        assert.strictEqual(baseline.attr("x2"), "300", "the baseline is in the correct horizontal position");
+        assert.strictEqual(baseline.attr("y1"), "0", "the baseline starts at the top of the chart");
+        assert.strictEqual(baseline.attr("y2"), String(SVG_HEIGHT), "the baseline ends at the bottom of the chart");
         svg.remove();
       });
 
@@ -483,16 +483,16 @@ describe("Plots", () => {
         var bars = renderArea.selectAll("rect");
         var bar0 = d3.select(bars[0][0]);
         var bar1 = d3.select(bars[0][1]);
-        assert.strictEqual(+bar0.attr("width"), 200, "bar0 width is correct");
-        assert.strictEqual(+bar1.attr("width"), 50, "bar1 width is correct");
-        assert.strictEqual(+bar0.attr("x"), 200, "bar0 x is correct");
-        assert.strictEqual(+bar1.attr("x"), 150, "bar1 x is correct");
+        assert.strictEqual(bar0.attr("width"), "200", "bar0 width is correct");
+        assert.strictEqual(bar1.attr("width"), "50", "bar1 width is correct");
+        assert.strictEqual(bar0.attr("x"), "200", "bar0 x is correct");
+        assert.strictEqual(bar1.attr("x"), "150", "bar1 x is correct");
 
         var baseline = renderArea.select(".baseline");
-        assert.strictEqual(+baseline.attr("x1"), 200, "the baseline is in the correct horizontal position");
-        assert.strictEqual(+baseline.attr("x2"), 200, "the baseline is in the correct horizontal position");
-        assert.strictEqual(+baseline.attr("y1"), 0, "the baseline starts at the top of the chart");
-        assert.strictEqual(+baseline.attr("y2"), SVG_HEIGHT, "the baseline ends at the bottom of the chart");
+        assert.strictEqual(baseline.attr("x1"), "200", "the baseline is in the correct horizontal position");
+        assert.strictEqual(baseline.attr("x2"), "200", "the baseline is in the correct horizontal position");
+        assert.strictEqual(baseline.attr("y1"), "0", "the baseline starts at the top of the chart");
+        assert.strictEqual(baseline.attr("y2"), String(SVG_HEIGHT), "the baseline ends at the bottom of the chart");
         svg.remove();
       });
 
