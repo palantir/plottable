@@ -5179,7 +5179,10 @@ var Plottable;
                 var widthRequiredByTicks = this._isHorizontal() ? 0 : this._maxLabelTickLength() + this.tickLabelPadding() + this.gutter();
                 var heightRequiredByTicks = this._isHorizontal() ? this._maxLabelTickLength() + this.tickLabelPadding() + this.gutter() : 0;
                 if (this._scale.domain().length === 0) {
-                    return { width: 0, height: 0 };
+                    return {
+                        width: 0,
+                        height: 0
+                    };
                 }
                 var categoryScale = this._scale;
                 var fakeScale = categoryScale.copy();
@@ -5189,12 +5192,10 @@ var Plottable;
                 else {
                     fakeScale.range([offeredHeight, 0]);
                 }
-                var textResult = this._measureTicks(offeredWidth, offeredHeight, fakeScale, categoryScale.domain());
-                var desiredWidth = textResult.usedWidth + widthRequiredByTicks;
-                var desiredHeight = textResult.usedHeight + heightRequiredByTicks;
+                var measureResult = this._measureTicks(offeredWidth, offeredHeight, fakeScale, categoryScale.domain());
                 return {
-                    width: desiredWidth,
-                    height: desiredHeight
+                    width: measureResult.usedWidth + widthRequiredByTicks,
+                    height: measureResult.usedHeight + heightRequiredByTicks
                 };
             };
             Category.prototype._getTickValues = function () {
@@ -6262,19 +6263,27 @@ var Plottable;
                             spaceRequest = component._requestedSpace(offeredWidths[colIndex], offeredHeights[rowIndex]);
                         }
                         else {
-                            spaceRequest = { width: 0, height: 0 };
+                            spaceRequest = {
+                                width: 0,
+                                height: 0
+                            };
                         }
                         var allocatedWidth = Math.min(spaceRequest.width, offeredWidths[colIndex]);
-                        var allocatedHeight = Math.min(spaceRequest.height, offeredHeights[rowIndex]);
-                        var componentNeedsWidth = spaceRequest.width > offeredWidths[colIndex];
-                        var componentNeedsHeight = spaceRequest.height > offeredHeights[rowIndex];
                         requestedWidths[colIndex] = Math.max(requestedWidths[colIndex], allocatedWidth);
+                        var allocatedHeight = Math.min(spaceRequest.height, offeredHeights[rowIndex]);
                         requestedHeights[rowIndex] = Math.max(requestedHeights[rowIndex], allocatedHeight);
+                        var componentNeedsWidth = spaceRequest.width > offeredWidths[colIndex];
                         columnNeedsWidth[colIndex] = columnNeedsWidth[colIndex] || componentNeedsWidth;
+                        var componentNeedsHeight = spaceRequest.height > offeredHeights[rowIndex];
                         rowNeedsHeight[rowIndex] = rowNeedsHeight[rowIndex] || componentNeedsHeight;
                     });
                 });
-                return { guaranteedWidths: requestedWidths, guaranteedHeights: requestedHeights, wantsWidthArr: columnNeedsWidth, wantsHeightArr: rowNeedsHeight };
+                return {
+                    guaranteedWidths: requestedWidths,
+                    guaranteedHeights: requestedHeights,
+                    wantsWidthArr: columnNeedsWidth,
+                    wantsHeightArr: rowNeedsHeight
+                };
             };
             Table.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
                 this._calculatedLayout = this._iterateLayout(offeredWidth, offeredHeight);

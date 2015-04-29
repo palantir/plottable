@@ -230,32 +230,39 @@ export module Component {
       var requestedHeights = _Util.Methods.createFilledArray(0, this._nRows);
       var columnNeedsWidth  = _Util.Methods.createFilledArray(false, this._nCols);
       var rowNeedsHeight = _Util.Methods.createFilledArray(false, this._nRows);
+
       this._rows.forEach((row: AbstractComponent[], rowIndex: number) => {
         row.forEach((component: AbstractComponent, colIndex: number) => {
           var spaceRequest: _SpaceRequest;
           if (component != null) {
             spaceRequest = component._requestedSpace(offeredWidths[colIndex], offeredHeights[rowIndex]);
           } else {
-            spaceRequest = {width: 0, height: 0};
+            spaceRequest = {
+              width: 0,
+              height: 0
+            };
           }
 
-
           var allocatedWidth = Math.min(spaceRequest.width, offeredWidths[colIndex]);
-          var allocatedHeight = Math.min(spaceRequest.height, offeredHeights[rowIndex]);
-          var componentNeedsWidth = spaceRequest.width > offeredWidths[colIndex];
-          var componentNeedsHeight = spaceRequest.height > offeredHeights[rowIndex];
-
           requestedWidths[colIndex] = Math.max(requestedWidths[colIndex], allocatedWidth);
+
+          var allocatedHeight = Math.min(spaceRequest.height, offeredHeights[rowIndex]);
           requestedHeights[rowIndex] = Math.max(requestedHeights[rowIndex], allocatedHeight);
 
+          var componentNeedsWidth = spaceRequest.width > offeredWidths[colIndex];
           columnNeedsWidth[colIndex] = columnNeedsWidth[colIndex] || componentNeedsWidth;
+
+          var componentNeedsHeight = spaceRequest.height > offeredHeights[rowIndex];
           rowNeedsHeight[rowIndex] = rowNeedsHeight[rowIndex] || componentNeedsHeight;
         });
       });
-      return {guaranteedWidths : requestedWidths  ,
-              guaranteedHeights: requestedHeights ,
-              wantsWidthArr    : columnNeedsWidth ,
-              wantsHeightArr   : rowNeedsHeight};
+
+      return {
+        guaranteedWidths: requestedWidths,
+        guaranteedHeights: requestedHeights,
+        wantsWidthArr: columnNeedsWidth,
+        wantsHeightArr: rowNeedsHeight
+      };
     }
 
     public _requestedSpace(offeredWidth : number, offeredHeight: number): _SpaceRequest {
