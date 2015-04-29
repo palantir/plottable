@@ -3100,14 +3100,14 @@ declare module Plottable {
              * @param {QuantitativeScaleScale} yScale The y scale to use.
              */
             constructor(xScale: QuantitativeScale<X>, yScale: QuantitativeScale<number>);
-            protected _rejectNullsAndNaNs(d: any, i: number, userMetdata: any, plotMetadata: any, accessor: Accessor): boolean;
+            protected rejectNullsAndNaNs(d: any, i: number, userMetdata: any, plotMetadata: any, accessor: Accessor): boolean;
             protected getDrawer(key: string): Drawers.Line;
-            protected _getResetYFunction(): (d: any, i: number, u: any, m: PlotMetadata) => number;
+            protected getResetYFunction(): (d: any, i: number, u: any, m: PlotMetadata) => number;
             protected generateDrawSteps(): Drawers.DrawStep[];
             protected generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
             };
-            protected _wholeDatumAttributes(): string[];
+            protected wholeDatumAttributes(): string[];
             protected _getAllPlotData(datasetKeys: string[]): PlotData;
             /**
              * Retrieves the closest PlotData to queryPoint.
@@ -3144,7 +3144,7 @@ declare module Plottable {
             protected _updateYDomainer(): void;
             project(attrToSet: string, accessor: any, scale?: Scale<any, any>): Area<X>;
             protected _getResetYFunction(): (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
-            protected _wholeDatumAttributes(): string[];
+            protected wholeDatumAttributes(): string[];
             protected generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
             };
@@ -3244,7 +3244,7 @@ declare module Plottable {
             protected generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
             };
-            protected _wholeDatumAttributes(): string[];
+            protected wholeDatumAttributes(): string[];
             _updateStackOffsets(): void;
             _updateStackExtents(): void;
             _stack(dataArray: D3.Map<StackedDatum>[]): D3.Map<StackedDatum>[];

@@ -77,8 +77,8 @@ export module Plots {
       return this.generateAttrToProjector()["y0"];
     }
 
-    protected _wholeDatumAttributes() {
-      var wholeDatumAttributes = super._wholeDatumAttributes();
+    protected wholeDatumAttributes() {
+      var wholeDatumAttributes = super.wholeDatumAttributes();
       wholeDatumAttributes.push("y0");
       return wholeDatumAttributes;
     }

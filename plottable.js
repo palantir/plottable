@@ -7870,14 +7870,14 @@ var Plottable;
                 this.animator("main", new Plottable.Animators.Base().duration(600).easing("exp-in-out"));
                 this.defaultStrokeColor = new Plottable.Scales.Color().range()[0];
             }
-            Line.prototype._rejectNullsAndNaNs = function (d, i, userMetdata, plotMetadata, accessor) {
+            Line.prototype.rejectNullsAndNaNs = function (d, i, userMetdata, plotMetadata, accessor) {
                 var value = accessor(d, i, userMetdata, plotMetadata);
                 return value != null && value === value;
             };
             Line.prototype.getDrawer = function (key) {
                 return new Plottable.Drawers.Line(key);
             };
-            Line.prototype._getResetYFunction = function () {
+            Line.prototype.getResetYFunction = function () {
                 // gets the y-value generator for the animation start point
                 var yDomain = this.yScale.domain();
                 var domainMax = Math.max(yDomain[0], yDomain[1]);
@@ -7892,7 +7892,7 @@ var Plottable;
                 var drawSteps = [];
                 if (this._dataChanged && this._animate) {
                     var attrToProjector = this.generateAttrToProjector();
-                    attrToProjector["y"] = this._getResetYFunction();
+                    attrToProjector["y"] = this.getResetYFunction();
                     drawSteps.push({ attrToProjector: attrToProjector, animator: this.getAnimator("reset") });
                 }
                 drawSteps.push({ attrToProjector: this.generateAttrToProjector(), animator: this.getAnimator("main") });
@@ -7901,7 +7901,7 @@ var Plottable;
             Line.prototype.generateAttrToProjector = function () {
                 var _this = this;
                 var attrToProjector = _super.prototype.generateAttrToProjector.call(this);
-                var wholeDatumAttributes = this._wholeDatumAttributes();
+                var wholeDatumAttributes = this.wholeDatumAttributes();
                 var isSingleDatumAttr = function (attr) { return wholeDatumAttributes.indexOf(attr) === -1; };
                 var singleDatumAttributes = d3.keys(attrToProjector).filter(isSingleDatumAttr);
                 singleDatumAttributes.forEach(function (attribute) {
@@ -7910,12 +7910,12 @@ var Plottable;
                 });
                 var xFunction = attrToProjector["x"];
                 var yFunction = attrToProjector["y"];
-                attrToProjector["defined"] = function (d, i, u, m) { return _this._rejectNullsAndNaNs(d, i, u, m, xFunction) && _this._rejectNullsAndNaNs(d, i, u, m, yFunction); };
+                attrToProjector["defined"] = function (d, i, u, m) { return _this.rejectNullsAndNaNs(d, i, u, m, xFunction) && _this.rejectNullsAndNaNs(d, i, u, m, yFunction); };
                 attrToProjector["stroke"] = attrToProjector["stroke"] || d3.functor(this.defaultStrokeColor);
                 attrToProjector["stroke-width"] = attrToProjector["stroke-width"] || d3.functor("2px");
                 return attrToProjector;
             };
-            Line.prototype._wholeDatumAttributes = function () {
+            Line.prototype.wholeDatumAttributes = function () {
                 return ["x", "y"];
             };
             Line.prototype._getAllPlotData = function (datasetKeys) {
@@ -8071,8 +8071,8 @@ var Plottable;
             Area.prototype._getResetYFunction = function () {
                 return this.generateAttrToProjector()["y0"];
             };
-            Area.prototype._wholeDatumAttributes = function () {
-                var wholeDatumAttributes = _super.prototype._wholeDatumAttributes.call(this);
+            Area.prototype.wholeDatumAttributes = function () {
+                var wholeDatumAttributes = _super.prototype.wholeDatumAttributes.call(this);
                 wholeDatumAttributes.push("y0");
                 return wholeDatumAttributes;
             };
@@ -8449,7 +8449,7 @@ var Plottable;
                 attrToProjector["y0"] = function (d, i, u, m) { return _this.yScale.scale(m.offsets.get(xAccessor(d, i, u, m))); };
                 return attrToProjector;
             };
-            StackedArea.prototype._wholeDatumAttributes = function () {
+            StackedArea.prototype.wholeDatumAttributes = function () {
                 return ["x", "y", "defined"];
             };
             //===== Stack logic from StackedPlot =====

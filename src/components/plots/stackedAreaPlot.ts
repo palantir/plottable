@@ -86,7 +86,7 @@ export module Plots {
       return attrToProjector;
     }
 
-    protected _wholeDatumAttributes() {
+    protected wholeDatumAttributes() {
       return ["x", "y", "defined"];
     }
 

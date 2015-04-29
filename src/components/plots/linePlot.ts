@@ -25,7 +25,7 @@ export module Plots {
       this.defaultStrokeColor = new Scales.Color().range()[0];
     }
 
-    protected _rejectNullsAndNaNs(d: any, i: number, userMetdata: any, plotMetadata: any, accessor: Accessor) {
+    protected rejectNullsAndNaNs(d: any, i: number, userMetdata: any, plotMetadata: any, accessor: Accessor) {
       var value = accessor(d, i, userMetdata, plotMetadata);
       return value != null && value === value;
     }
@@ -34,7 +34,7 @@ export module Plots {
       return new Plottable.Drawers.Line(key);
     }
 
-    protected _getResetYFunction() {
+    protected getResetYFunction() {
       // gets the y-value generator for the animation start point
       var yDomain = this.yScale.domain();
       var domainMax = Math.max(yDomain[0], yDomain[1]);
@@ -50,7 +50,7 @@ export module Plots {
       var drawSteps: Drawers.DrawStep[] = [];
       if (this._dataChanged && this._animate) {
         var attrToProjector = this.generateAttrToProjector();
-        attrToProjector["y"] = this._getResetYFunction();
+        attrToProjector["y"] = this.getResetYFunction();
         drawSteps.push({attrToProjector: attrToProjector, animator: this.getAnimator("reset")});
       }
 
@@ -61,7 +61,7 @@ export module Plots {
 
     protected generateAttrToProjector() {
       var attrToProjector = super.generateAttrToProjector();
-      var wholeDatumAttributes = this._wholeDatumAttributes();
+      var wholeDatumAttributes = this.wholeDatumAttributes();
       var isSingleDatumAttr = (attr: string) => wholeDatumAttributes.indexOf(attr) === -1;
       var singleDatumAttributes = d3.keys(attrToProjector).filter(isSingleDatumAttr);
       singleDatumAttributes.forEach((attribute: string) => {
@@ -74,14 +74,14 @@ export module Plots {
       var yFunction = attrToProjector["y"];
 
       attrToProjector["defined"] = (d: any, i: number, u: any, m: any) =>
-          this._rejectNullsAndNaNs(d, i, u, m, xFunction) && this._rejectNullsAndNaNs(d, i, u, m, yFunction);
+          this.rejectNullsAndNaNs(d, i, u, m, xFunction) && this.rejectNullsAndNaNs(d, i, u, m, yFunction);
       attrToProjector["stroke"] = attrToProjector["stroke"] || d3.functor(this.defaultStrokeColor);
       attrToProjector["stroke-width"] = attrToProjector["stroke-width"] || d3.functor("2px");
 
       return attrToProjector;
     }
 
-    protected _wholeDatumAttributes() {
+    protected wholeDatumAttributes() {
       return ["x", "y"];
     }
 
