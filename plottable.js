@@ -1702,17 +1702,17 @@ var Plottable;
          */
         function Scale(scale) {
             _super.call(this);
-            this._autoDomainAutomatically = true;
-            this._rendererAttrID2Extent = {};
-            this._typeCoercer = function (d) { return d; };
-            this._domainModificationInProgress = false;
-            this._d3Scale = scale;
+            this.autoDomainAutomatically = true;
+            this.rendererAttrID2Extent = {};
+            this.typeCoercer = function (d) { return d; };
+            this.domainModificationInProgress = false;
+            this.d3Scale = scale;
             this.broadcaster = new Plottable.Core.Broadcaster(this);
         }
-        Scale.prototype._getAllExtents = function () {
-            return d3.values(this._rendererAttrID2Extent);
+        Scale.prototype.getAllExtents = function () {
+            return d3.values(this.rendererAttrID2Extent);
         };
-        Scale.prototype._getExtent = function () {
+        Scale.prototype.getExtent = function () {
             return []; // this should be overwritten
         };
         /**
@@ -1731,12 +1731,12 @@ var Plottable;
          * @returns {Scale} The calling Scale.
          */
         Scale.prototype.autoDomain = function () {
-            this._autoDomainAutomatically = true;
-            this._setDomain(this._getExtent());
+            this.autoDomainAutomatically = true;
+            this.setDomain(this.getExtent());
             return this;
         };
-        Scale.prototype._autoDomainIfAutomaticMode = function () {
-            if (this._autoDomainAutomatically) {
+        Scale.prototype.autoDomainIfAutomaticMode = function () {
+            if (this.autoDomainAutomatically) {
                 this.autoDomain();
             }
         };
@@ -1748,35 +1748,35 @@ var Plottable;
          * @returns {R} The range value corresponding to the supplied domain value.
          */
         Scale.prototype.scale = function (value) {
-            return this._d3Scale(value);
+            return this.d3Scale(value);
         };
         Scale.prototype.domain = function (values) {
             if (values == null) {
-                return this._getDomain();
+                return this.getDomain();
             }
             else {
-                this._autoDomainAutomatically = false;
-                this._setDomain(values);
+                this.autoDomainAutomatically = false;
+                this.setDomain(values);
                 return this;
             }
         };
-        Scale.prototype._getDomain = function () {
-            return this._d3Scale.domain();
+        Scale.prototype.getDomain = function () {
+            return this.d3Scale.domain();
         };
-        Scale.prototype._setDomain = function (values) {
-            if (!this._domainModificationInProgress) {
-                this._domainModificationInProgress = true;
-                this._d3Scale.domain(values);
+        Scale.prototype.setDomain = function (values) {
+            if (!this.domainModificationInProgress) {
+                this.domainModificationInProgress = true;
+                this.d3Scale.domain(values);
                 this.broadcaster.broadcast();
-                this._domainModificationInProgress = false;
+                this.domainModificationInProgress = false;
             }
         };
         Scale.prototype.range = function (values) {
             if (values == null) {
-                return this._d3Scale.range();
+                return this.d3Scale.range();
             }
             else {
-                this._d3Scale.range(values);
+                this.d3Scale.range(values);
                 return this;
             }
         };
@@ -1787,7 +1787,7 @@ var Plottable;
          * @returns {Scale} A copy of the calling Scale.
          */
         Scale.prototype.copy = function () {
-            return new Scale(this._d3Scale.copy());
+            return new Scale(this.d3Scale.copy());
         };
         /**
          * When a renderer determines that the extent of a projector has changed,
@@ -1799,14 +1799,14 @@ var Plottable;
          * @param {string} attr The attribute being projected, e.g. "x", "y0", "r"
          * @param {D[]} extent The new extent to be included in the scale.
          */
-        Scale.prototype._updateExtent = function (plotProvidedKey, attr, extent) {
-            this._rendererAttrID2Extent[plotProvidedKey + attr] = extent;
-            this._autoDomainIfAutomaticMode();
+        Scale.prototype.updateExtent = function (plotProvidedKey, attr, extent) {
+            this.rendererAttrID2Extent[plotProvidedKey + attr] = extent;
+            this.autoDomainIfAutomaticMode();
             return this;
         };
-        Scale.prototype._removeExtent = function (plotProvidedKey, attr) {
-            delete this._rendererAttrID2Extent[plotProvidedKey + attr];
-            this._autoDomainIfAutomaticMode();
+        Scale.prototype.removeExtent = function (plotProvidedKey, attr) {
+            delete this.rendererAttrID2Extent[plotProvidedKey + attr];
+            this.autoDomainIfAutomaticMode();
             return this;
         };
         return Scale;
@@ -1841,11 +1841,11 @@ var Plottable;
             this._PADDING_FOR_IDENTICAL_DOMAIN = 1;
             this._userSetDomainer = false;
             this._domainer = new Plottable.Domainer();
-            this._typeCoercer = function (d) { return +d; };
+            this.typeCoercer = function (d) { return +d; };
             this._tickGenerator = function (scale) { return scale.getDefaultTicks(); };
         }
-        QuantitativeScale.prototype._getExtent = function () {
-            return this._domainer.computeDomain(this._getAllExtents(), this);
+        QuantitativeScale.prototype.getExtent = function () {
+            return this._domainer.computeDomain(this.getAllExtents(), this);
         };
         /**
          * Retrieves the domain value corresponding to a supplied range value.
@@ -1854,7 +1854,7 @@ var Plottable;
          * @returns {D} The domain value corresponding to the supplied range value.
          */
         QuantitativeScale.prototype.invert = function (value) {
-            return this._d3Scale.invert(value);
+            return this.d3Scale.invert(value);
         };
         /**
          * Creates a copy of the QuantitativeScaleScale with the same domain and range but without any registered list.
@@ -1862,24 +1862,24 @@ var Plottable;
          * @returns {QuantitativeScale} A copy of the calling QuantitativeScaleScale.
          */
         QuantitativeScale.prototype.copy = function () {
-            return new QuantitativeScale(this._d3Scale.copy());
+            return new QuantitativeScale(this.d3Scale.copy());
         };
         QuantitativeScale.prototype.domain = function (values) {
             return _super.prototype.domain.call(this, values); // need to override type sig to enable method chaining:/
         };
-        QuantitativeScale.prototype._setDomain = function (values) {
+        QuantitativeScale.prototype.setDomain = function (values) {
             var isNaNOrInfinity = function (x) { return x !== x || x === Infinity || x === -Infinity; };
             if (isNaNOrInfinity(values[0]) || isNaNOrInfinity(values[1])) {
                 Plottable.Utils.Methods.warn("Warning: QuantitativeScaleScales cannot take NaN or Infinity as a domain value. Ignoring.");
                 return;
             }
-            _super.prototype._setDomain.call(this, values);
+            _super.prototype.setDomain.call(this, values);
         };
         QuantitativeScale.prototype.interpolate = function (factory) {
             if (factory == null) {
-                return this._d3Scale.interpolate();
+                return this.d3Scale.interpolate();
             }
-            this._d3Scale.interpolate(factory);
+            this.d3Scale.interpolate(factory);
             return this;
         };
         /**
@@ -1888,20 +1888,20 @@ var Plottable;
          * @param {number[]} values The new range value for the range.
          */
         QuantitativeScale.prototype.rangeRound = function (values) {
-            this._d3Scale.rangeRound(values);
+            this.d3Scale.rangeRound(values);
             return this;
         };
         /**
          * Gets ticks generated by the default algorithm.
          */
         QuantitativeScale.prototype.getDefaultTicks = function () {
-            return this._d3Scale.ticks(this.numTicks());
+            return this.d3Scale.ticks(this.numTicks());
         };
         QuantitativeScale.prototype.clamp = function (clamp) {
             if (clamp == null) {
-                return this._d3Scale.clamp();
+                return this.d3Scale.clamp();
             }
-            this._d3Scale.clamp(clamp);
+            this.d3Scale.clamp(clamp);
             return this;
         };
         /**
@@ -1924,7 +1924,7 @@ var Plottable;
          * numbers.
          */
         QuantitativeScale.prototype._niceDomain = function (domain, count) {
-            return this._d3Scale.copy().domain(domain).nice(count).domain();
+            return this.d3Scale.copy().domain(domain).nice(count).domain();
         };
         QuantitativeScale.prototype.domainer = function (domainer) {
             if (domainer == null) {
@@ -1933,7 +1933,7 @@ var Plottable;
             else {
                 this._domainer = domainer;
                 this._userSetDomainer = true;
-                this._autoDomainIfAutomaticMode();
+                this.autoDomainIfAutomaticMode();
                 return this;
             }
         };
@@ -1977,7 +1977,7 @@ var Plottable;
              * @returns {Linear} A copy of the calling LinearScale.
              */
             Linear.prototype.copy = function () {
-                return new Linear(this._d3Scale.copy());
+                return new Linear(this.d3Scale.copy());
             };
             return Linear;
         })(Plottable.QuantitativeScale);
@@ -2011,7 +2011,7 @@ var Plottable;
              * @returns {Log} A copy of the calling Log.
              */
             Log.prototype.copy = function () {
-                return new Log(this._d3Scale.copy());
+                return new Log(this.d3Scale.copy());
             };
             Log.prototype._defaultExtent = function () {
                 return [1, 10];
@@ -2102,18 +2102,18 @@ var Plottable;
                 return x;
             };
             ModifiedLog.prototype.scale = function (x) {
-                return this._d3Scale(this.adjustedLog(x));
+                return this.d3Scale(this.adjustedLog(x));
             };
             ModifiedLog.prototype.invert = function (x) {
-                return this.invertedAdjustedLog(this._d3Scale.invert(x));
+                return this.invertedAdjustedLog(this.d3Scale.invert(x));
             };
-            ModifiedLog.prototype._getDomain = function () {
+            ModifiedLog.prototype.getDomain = function () {
                 return this.untransformedDomain;
             };
-            ModifiedLog.prototype._setDomain = function (values) {
+            ModifiedLog.prototype.setDomain = function (values) {
                 this.untransformedDomain = values;
                 var transformedDomain = [this.adjustedLog(values[0]), this.adjustedLog(values[1])];
-                this._d3Scale.domain(transformedDomain);
+                this.d3Scale.domain(transformedDomain);
                 this.broadcaster.broadcast();
             };
             ModifiedLog.prototype.ticks = function (count) {
@@ -2235,15 +2235,15 @@ var Plottable;
                 this._innerPadding = Category._convertToPlottableInnerPadding(d3InnerPadding);
                 this._outerPadding = Category._convertToPlottableOuterPadding(0.5, d3InnerPadding);
             }
-            Category.prototype._getExtent = function () {
-                var extents = this._getAllExtents();
+            Category.prototype.getExtent = function () {
+                var extents = this.getAllExtents();
                 return Plottable.Utils.Methods.uniq(Plottable.Utils.Methods.flatten(extents));
             };
             Category.prototype.domain = function (values) {
                 return _super.prototype.domain.call(this, values);
             };
             Category.prototype._setDomain = function (values) {
-                _super.prototype._setDomain.call(this, values);
+                _super.prototype.setDomain.call(this, values);
                 this.range(this.range()); // update range
             };
             Category.prototype.range = function (values) {
@@ -2254,7 +2254,7 @@ var Plottable;
                     this._range = values;
                     var d3InnerPadding = 1 - 1 / (1 + this.innerPadding());
                     var d3OuterPadding = this.outerPadding() / (1 + this.innerPadding());
-                    this._d3Scale.rangeBands(values, d3InnerPadding, d3OuterPadding);
+                    this.d3Scale.rangeBands(values, d3InnerPadding, d3OuterPadding);
                     return this;
                 }
             };
@@ -2270,7 +2270,7 @@ var Plottable;
              * @returns {number} The range band width
              */
             Category.prototype.rangeBand = function () {
-                return this._d3Scale.rangeBand();
+                return this.d3Scale.rangeBand();
             };
             /**
              * Returns the step width of the scale.
@@ -2302,7 +2302,7 @@ var Plottable;
                 return this;
             };
             Category.prototype.copy = function () {
-                return new Category(this._d3Scale.copy());
+                return new Category(this.d3Scale.copy());
             };
             Category.prototype.scale = function (value) {
                 //scale it to the middle
@@ -2368,8 +2368,8 @@ var Plottable;
                 _super.call(this, scale);
             }
             // Duplicated from OrdinalScale._getExtent - should be removed in #388
-            Color.prototype._getExtent = function () {
-                var extents = this._getAllExtents();
+            Color.prototype.getExtent = function () {
+                var extents = this.getAllExtents();
                 var concatenatedExtents = [];
                 extents.forEach(function (e) {
                     concatenatedExtents = concatenatedExtents.concat(e);
@@ -2436,16 +2436,16 @@ var Plottable;
                 tempScale.range(this.range());
                 return tempScale.ticks(interval.range, step);
             };
-            Time.prototype._setDomain = function (values) {
+            Time.prototype.setDomain = function (values) {
                 // attempt to parse dates
                 values = values.map(this._typeCoercer);
                 if (values[1] < values[0]) {
                     throw new Error("Scale.Time domain values must be in chronological order");
                 }
-                return _super.prototype._setDomain.call(this, values);
+                return _super.prototype.setDomain.call(this, values);
             };
             Time.prototype.copy = function () {
-                return new Time(this._d3Scale.copy());
+                return new Time(this.d3Scale.copy());
             };
             Time.prototype._defaultExtent = function () {
                 var endTime = new Date().valueOf();
@@ -2573,8 +2573,8 @@ var Plottable;
                 return this;
             };
             InterpolatedColor.prototype._resetScale = function () {
-                this._d3Scale = InterpolatedColor._getD3InterpolatedScale(this._colorRange, this._scaleType);
-                this._autoDomainIfAutomaticMode();
+                this.d3Scale = InterpolatedColor._getD3InterpolatedScale(this._colorRange, this._scaleType);
+                this.autoDomainIfAutomaticMode();
                 this.broadcaster.broadcast();
             };
             InterpolatedColor.prototype._resolveColorValues = function (colorRange) {
@@ -2590,9 +2590,9 @@ var Plottable;
             };
             InterpolatedColor.prototype.autoDomain = function () {
                 // unlike other QuantitativeScaleScales, interpolatedColorScale ignores its domainer
-                var extents = this._getAllExtents();
+                var extents = this.getAllExtents();
                 if (extents.length > 0) {
-                    this._setDomain([Plottable.Utils.Methods.min(extents, function (x) { return x[0]; }, 0), Plottable.Utils.Methods.max(extents, function (x) { return x[1]; }, 0)]);
+                    this.setDomain([Plottable.Utils.Methods.min(extents, function (x) { return x[0]; }, 0), Plottable.Utils.Methods.max(extents, function (x) { return x[1]; }, 0)]);
                 }
                 return this;
             };
@@ -6605,7 +6605,7 @@ var Plottable;
             var existingScale = currentProjection && currentProjection.scale;
             if (existingScale) {
                 this._datasetKeysInOrder.forEach(function (key) {
-                    existingScale._removeExtent(_this.getID().toString() + "_" + key, attrToSet);
+                    existingScale.removeExtent(_this.getID().toString() + "_" + key, attrToSet);
                     existingScale.broadcaster.deregisterListener(_this);
                 });
             }
@@ -6688,13 +6688,13 @@ var Plottable;
                     var plotDatasetKey = _this._key2PlotDatasetKey.get(key);
                     var dataset = plotDatasetKey.dataset;
                     var plotMetadata = plotDatasetKey.plotMetadata;
-                    var extent = dataset._getExtent(projector.accessor, projector.scale._typeCoercer, plotMetadata);
+                    var extent = dataset._getExtent(projector.accessor, projector.scale.typeCoercer, plotMetadata);
                     var scaleKey = _this.getID().toString() + "_" + key;
                     if (extent.length === 0 || !_this._isAnchored) {
-                        projector.scale._removeExtent(scaleKey, attr);
+                        projector.scale.removeExtent(scaleKey, attr);
                     }
                     else {
-                        projector.scale._updateExtent(scaleKey, attr, extent);
+                        projector.scale.updateExtent(scaleKey, attr, extent);
                     }
                 });
             }
@@ -6764,7 +6764,7 @@ var Plottable;
                 var scaleKey = this.getID().toString() + "_" + key;
                 projectors.forEach(function (p) {
                     if (p.scale != null) {
-                        p.scale._removeExtent(scaleKey, p.attribute);
+                        p.scale.removeExtent(scaleKey, p.attribute);
                     }
                 });
                 pdk.dataset.broadcaster.deregisterListener(this);
@@ -7662,7 +7662,7 @@ var Plottable;
                         qscale.domainer().pad().nice();
                     }
                     // prepending "BAR_PLOT" is unnecessary but reduces likely of user accidentally creating collisions
-                    qscale._autoDomainIfAutomaticMode();
+                    qscale.autoDomainIfAutomaticMode();
                 }
             };
             Bar.prototype._updateYDomainer = function () {
@@ -8043,7 +8043,7 @@ var Plottable;
                 var y0Projector = this._projections["y0"];
                 var y0Accessor = y0Projector && y0Projector.accessor;
                 if (y0Accessor != null) {
-                    var extents = this.datasets().map(function (d) { return d._getExtent(y0Accessor, _this._yScale._typeCoercer); });
+                    var extents = this.datasets().map(function (d) { return d._getExtent(y0Accessor, _this._yScale.typeCoercer); });
                     var extent = Plottable.Utils.Methods.flatten(extents);
                     var uniqExtentVals = Plottable.Utils.Methods.uniq(extent);
                     if (uniqExtentVals.length === 1) {
@@ -8058,7 +8058,7 @@ var Plottable;
                         this._yScale.domainer().removePaddingException("AREA_PLOT+" + this.getID());
                     }
                     // prepending "AREA_PLOT" is unnecessary but reduces likely of user accidentally creating collisions
-                    this._yScale._autoDomainIfAutomaticMode();
+                    this._yScale.autoDomainIfAutomaticMode();
                 }
             };
             Area.prototype.project = function (attrToSet, accessor, scale) {
@@ -8326,10 +8326,10 @@ var Plottable;
                 return;
             }
             if (this._isAnchored && this._stackedExtent.length > 0) {
-                primaryScale._updateExtent(this.getID().toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT", this._stackedExtent);
+                primaryScale.updateExtent(this.getID().toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT", this._stackedExtent);
             }
             else {
-                primaryScale._removeExtent(this.getID().toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT");
+                primaryScale.removeExtent(this.getID().toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT");
             }
         };
         Stacked.prototype._normalizeDatasets = function (fromX) {
@@ -8424,7 +8424,7 @@ var Plottable;
                 if (!scale._userSetDomainer) {
                     scale.domainer().addPaddingException(0, "STACKED_AREA_PLOT+" + this.getID()).addIncludedValue(0, "STACKED_AREA_PLOT+" + this.getID());
                     // prepending "AREA_PLOT" is unnecessary but reduces likely of user accidentally creating collisions
-                    scale._autoDomainIfAutomaticMode();
+                    scale.autoDomainIfAutomaticMode();
                 }
             };
             StackedArea.prototype.project = function (attrToSet, accessor, scale) {
@@ -9612,10 +9612,10 @@ var Plottable;
                 // HACKHACK #254
                 this._zoom = d3.behavior.zoom();
                 if (this._xScale) {
-                    this._zoom.x(this._xScale._d3Scale);
+                    this._zoom.x(this._xScale.d3Scale);
                 }
                 if (this._yScale) {
-                    this._zoom.y(this._yScale._d3Scale);
+                    this._zoom.y(this._yScale.d3Scale);
                 }
                 this._zoom.on("zoom", function () { return _this._rerenderZoomed(); });
                 this._zoom(this._hitBox);
@@ -9631,11 +9631,11 @@ var Plottable;
                 // HACKHACK since the d3.zoom.x modifies d3 scales and not our TS scales, and the TS scales have the
                 // event listener machinery, let's grab the domain out of the d3 scale and pipe it back into the TS scale
                 if (this._xScale) {
-                    var xDomain = this._xScale._d3Scale.domain();
+                    var xDomain = this._xScale.d3Scale.domain();
                     this._xScale.domain(xDomain);
                 }
                 if (this._yScale) {
-                    var yDomain = this._yScale._d3Scale.domain();
+                    var yDomain = this._yScale.d3Scale.domain();
                     this._yScale.domain(yDomain);
                 }
             };

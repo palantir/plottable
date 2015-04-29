@@ -34,7 +34,7 @@ export module Scales {
      * @returns {Log} A copy of the calling Log.
      */
     public copy(): Log {
-      return new Log(this._d3Scale.copy());
+      return new Log(this.d3Scale.copy());
     }
 
     public _defaultExtent(): number[] {

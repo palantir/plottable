@@ -190,8 +190,8 @@ export module Scales {
     }
 
     private _resetScale(): any {
-      this._d3Scale = InterpolatedColor._getD3InterpolatedScale(this._colorRange, this._scaleType);
-      this._autoDomainIfAutomaticMode();
+      this.d3Scale = InterpolatedColor._getD3InterpolatedScale(this._colorRange, this._scaleType);
+      this.autoDomainIfAutomaticMode();
       this.broadcaster.broadcast();
     }
 
@@ -207,9 +207,9 @@ export module Scales {
 
     public autoDomain() {
       // unlike other QuantitativeScaleScales, interpolatedColorScale ignores its domainer
-      var extents = this._getAllExtents();
+      var extents = this.getAllExtents();
       if (extents.length > 0) {
-        this._setDomain([Utils.Methods.min(extents, (x) => x[0], 0), Utils.Methods.max(extents, (x) => x[1], 0)]);
+        this.setDomain([Utils.Methods.min(extents, (x) => x[0], 0), Utils.Methods.max(extents, (x) => x[1], 0)]);
       }
       return this;
     }

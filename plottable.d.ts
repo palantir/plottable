@@ -842,9 +842,9 @@ declare module Plottable {
 
 declare module Plottable {
     class Scale<D, R> extends Core.PlottableObject {
-        protected _d3Scale: D3.Scale.Scale;
+        protected d3Scale: D3.Scale.Scale;
         broadcaster: Core.Broadcaster<Scale<D, R>>;
-        _typeCoercer: (d: any) => any;
+        typeCoercer: (d: any) => any;
         /**
          * Constructs a new Scale.
          *
@@ -856,8 +856,8 @@ declare module Plottable {
          * @param {D3.Scale.Scale} scale The D3 scale backing the Scale.
          */
         constructor(scale: D3.Scale.Scale);
-        protected _getAllExtents(): D[][];
-        protected _getExtent(): D[];
+        protected getAllExtents(): D[][];
+        protected getExtent(): D[];
         /**
          * Modifies the domain on the scale so that it includes the extent of all
          * perspectives it depends on. This will normally happen automatically, but
@@ -874,7 +874,7 @@ declare module Plottable {
          * @returns {Scale} The calling Scale.
          */
         autoDomain(): Scale<D, R>;
-        _autoDomainIfAutomaticMode(): void;
+        autoDomainIfAutomaticMode(): void;
         /**
          * Computes the range value corresponding to a given domain value. In other
          * words, apply the function to value.
@@ -899,8 +899,8 @@ declare module Plottable {
          * @returns {Scale} The calling Scale.
          */
         domain(values: D[]): Scale<D, R>;
-        protected _getDomain(): any[];
-        protected _setDomain(values: D[]): void;
+        protected getDomain(): any[];
+        protected setDomain(values: D[]): void;
         /**
          * Gets the range.
          *
@@ -939,17 +939,17 @@ declare module Plottable {
          * @param {string} attr The attribute being projected, e.g. "x", "y0", "r"
          * @param {D[]} extent The new extent to be included in the scale.
          */
-        _updateExtent(plotProvidedKey: string, attr: string, extent: D[]): Scale<D, R>;
-        _removeExtent(plotProvidedKey: string, attr: string): Scale<D, R>;
+        updateExtent(plotProvidedKey: string, attr: string, extent: D[]): Scale<D, R>;
+        removeExtent(plotProvidedKey: string, attr: string): Scale<D, R>;
     }
 }
 
 
 declare module Plottable {
     class QuantitativeScale<D> extends Scale<D, number> {
-        protected _d3Scale: D3.Scale.QuantitativeScale;
+        protected d3Scale: D3.Scale.QuantitativeScale;
         _userSetDomainer: boolean;
-        _typeCoercer: (d: any) => number;
+        typeCoercer: (d: any) => number;
         /**
          * Constructs a new QuantitativeScaleScale.
          *
@@ -961,7 +961,7 @@ declare module Plottable {
          * backing the QuantitativeScaleScale.
          */
         constructor(scale: D3.Scale.QuantitativeScale);
-        protected _getExtent(): D[];
+        protected getExtent(): D[];
         /**
          * Retrieves the domain value corresponding to a supplied range value.
          *
@@ -977,7 +977,7 @@ declare module Plottable {
         copy(): QuantitativeScale<D>;
         domain(): D[];
         domain(values: D[]): QuantitativeScale<D>;
-        protected _setDomain(values: D[]): void;
+        protected setDomain(values: D[]): void;
         /**
          * Sets or gets the QuantitativeScaleScale's output interpolator
          *
@@ -1156,8 +1156,8 @@ declare module Plottable {
             constructor(base?: number);
             scale(x: number): number;
             invert(x: number): number;
-            protected _getDomain(): number[];
-            protected _setDomain(values: number[]): void;
+            protected getDomain(): number[];
+            protected setDomain(values: number[]): void;
             ticks(count?: number): number[];
             copy(): ModifiedLog;
             _niceDomain(domain: any[], count?: number): any[];
@@ -1185,7 +1185,7 @@ declare module Plottable {
 declare module Plottable {
     module Scales {
         class Category extends Scale<string, number> {
-            protected _d3Scale: D3.Scale.OrdinalScale;
+            protected d3Scale: D3.Scale.OrdinalScale;
             _typeCoercer: (d: any) => any;
             /**
              * Creates a CategoryScale.
@@ -1196,7 +1196,7 @@ declare module Plottable {
              * @constructor
              */
             constructor(scale?: D3.Scale.OrdinalScale);
-            protected _getExtent(): string[];
+            protected getExtent(): string[];
             domain(): string[];
             domain(values: string[]): Category;
             protected _setDomain(values: string[]): void;
@@ -1272,7 +1272,7 @@ declare module Plottable {
              * See https://github.com/mbostock/d3/wiki/Ordinal-Scales#categorical-colors
              */
             constructor(scaleType?: string);
-            protected _getExtent(): string[];
+            protected getExtent(): string[];
             scale(value: string): string;
         }
     }
@@ -1294,7 +1294,7 @@ declare module Plottable {
             constructor();
             constructor(scale: D3.Scale.LinearScale);
             tickInterval(interval: D3.Time.Interval, step?: number): any[];
-            protected _setDomain(values: any[]): void;
+            protected setDomain(values: any[]): void;
             copy(): Time;
             _defaultExtent(): any[];
         }

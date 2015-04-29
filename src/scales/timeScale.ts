@@ -28,17 +28,17 @@ export module Scales {
       return tempScale.ticks(interval.range, step);
     }
 
-    protected _setDomain(values: any[]) {
+    protected setDomain(values: any[]) {
       // attempt to parse dates
       values = values.map(this._typeCoercer);
       if (values[1] < values[0]) {
         throw new Error("Scale.Time domain values must be in chronological order");
       }
-      return super._setDomain(values);
+      return super.setDomain(values);
     }
 
     public copy(): Time {
-      return new Time(this._d3Scale.copy());
+      return new Time(this.d3Scale.copy());
     }
 
     public _defaultExtent(): any[] {

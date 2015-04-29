@@ -81,21 +81,21 @@ export module Scales {
     }
 
     public scale(x: number): number {
-      return this._d3Scale(this.adjustedLog(x));
+      return this.d3Scale(this.adjustedLog(x));
     }
 
     public invert(x: number): number {
-      return this.invertedAdjustedLog(this._d3Scale.invert(x));
+      return this.invertedAdjustedLog(this.d3Scale.invert(x));
     }
 
-    protected _getDomain() {
+    protected getDomain() {
       return this.untransformedDomain;
     }
 
-    protected _setDomain(values: number[]) {
+    protected setDomain(values: number[]) {
       this.untransformedDomain = values;
       var transformedDomain = [this.adjustedLog(values[0]), this.adjustedLog(values[1])];
-      this._d3Scale.domain(transformedDomain);
+      this.d3Scale.domain(transformedDomain);
       this.broadcaster.broadcast();
     }
 
