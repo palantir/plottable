@@ -5739,22 +5739,22 @@ var Plottable;
                 if (orientation === void 0) { orientation = "horizontal"; }
                 if (formatter === void 0) { formatter = Plottable.Formatters.general(); }
                 _super.call(this);
-                this._padding = 5;
-                this._numSwatches = 10;
+                this.padding = 5;
+                this.numSwatches = 10;
                 if (interpolatedColorScale == null) {
                     throw new Error("InterpolatedColorLegend requires a interpolatedColorScale");
                 }
-                this._scale = interpolatedColorScale;
-                this._scale.broadcaster.registerListener(this, function () { return _this.invalidateLayout(); });
+                this.scale = interpolatedColorScale;
+                this.scale.broadcaster.registerListener(this, function () { return _this.invalidateLayout(); });
                 this._formatter = formatter;
-                this._orientation = InterpolatedColorLegend._ensureOrientation(orientation);
+                this._orientation = InterpolatedColorLegend.ensureOrientation(orientation);
                 this.fixedWidthFlag = true;
                 this.fixedHeightFlag = true;
                 this.classed("legend", true).classed("interpolated-color-legend", true);
             }
             InterpolatedColorLegend.prototype.remove = function () {
                 _super.prototype.remove.call(this);
-                this._scale.broadcaster.deregisterListener(this);
+                this.scale.broadcaster.deregisterListener(this);
             };
             InterpolatedColorLegend.prototype.formatter = function (formatter) {
                 if (formatter === undefined) {
@@ -5764,7 +5764,7 @@ var Plottable;
                 this.invalidateLayout();
                 return this;
             };
-            InterpolatedColorLegend._ensureOrientation = function (orientation) {
+            InterpolatedColorLegend.ensureOrientation = function (orientation) {
                 orientation = orientation.toLowerCase();
                 if (orientation === "horizontal" || orientation === "left" || orientation === "right") {
                     return orientation;
@@ -5778,47 +5778,47 @@ var Plottable;
                     return this._orientation;
                 }
                 else {
-                    this._orientation = InterpolatedColorLegend._ensureOrientation(newOrientation);
+                    this._orientation = InterpolatedColorLegend.ensureOrientation(newOrientation);
                     this.invalidateLayout();
                     return this;
                 }
             };
-            InterpolatedColorLegend.prototype._generateTicks = function () {
-                var domain = this._scale.domain();
-                var slope = (domain[1] - domain[0]) / this._numSwatches;
+            InterpolatedColorLegend.prototype.generateTicks = function () {
+                var domain = this.scale.domain();
+                var slope = (domain[1] - domain[0]) / this.numSwatches;
                 var ticks = [];
-                for (var i = 0; i <= this._numSwatches; i++) {
+                for (var i = 0; i <= this.numSwatches; i++) {
                     ticks.push(domain[0] + slope * i);
                 }
                 return ticks;
             };
             InterpolatedColorLegend.prototype.setup = function () {
                 _super.prototype.setup.call(this);
-                this._swatchContainer = this._content.append("g").classed("swatch-container", true);
-                this._swatchBoundingBox = this._content.append("rect").classed("swatch-bounding-box", true);
-                this._lowerLabel = this._content.append("g").classed(InterpolatedColorLegend.LEGEND_LABEL_CLASS, true);
-                this._upperLabel = this._content.append("g").classed(InterpolatedColorLegend.LEGEND_LABEL_CLASS, true);
-                this._measurer = new SVGTypewriter.Measurers.Measurer(this._content);
-                this._wrapper = new SVGTypewriter.Wrappers.Wrapper();
-                this._writer = new SVGTypewriter.Writers.Writer(this._measurer, this._wrapper);
+                this.swatchContainer = this._content.append("g").classed("swatch-container", true);
+                this.swatchBoundingBox = this._content.append("rect").classed("swatch-bounding-box", true);
+                this.lowerLabel = this._content.append("g").classed(InterpolatedColorLegend.LEGEND_LABEL_CLASS, true);
+                this.upperLabel = this._content.append("g").classed(InterpolatedColorLegend.LEGEND_LABEL_CLASS, true);
+                this.measurer = new SVGTypewriter.Measurers.Measurer(this._content);
+                this.wrapper = new SVGTypewriter.Wrappers.Wrapper();
+                this.writer = new SVGTypewriter.Writers.Writer(this.measurer, this.wrapper);
             };
             InterpolatedColorLegend.prototype.requestedSpace = function (offeredWidth, offeredHeight) {
                 var _this = this;
-                var textHeight = this._measurer.measure().height;
-                var ticks = this._generateTicks();
+                var textHeight = this.measurer.measure().height;
+                var ticks = this.generateTicks();
                 var numSwatches = ticks.length;
-                var domain = this._scale.domain();
-                var labelWidths = domain.map(function (d) { return _this._measurer.measure(_this._formatter(d)).width; });
+                var domain = this.scale.domain();
+                var labelWidths = domain.map(function (d) { return _this.measurer.measure(_this._formatter(d)).width; });
                 var desiredHeight;
                 var desiredWidth;
-                if (this._isVertical()) {
+                if (this.isVertical()) {
                     var longestWidth = Plottable.Utils.Methods.max(labelWidths, 0);
-                    desiredWidth = this._padding + textHeight + this._padding + longestWidth + this._padding;
-                    desiredHeight = this._padding + numSwatches * textHeight + this._padding;
+                    desiredWidth = this.padding + textHeight + this.padding + longestWidth + this.padding;
+                    desiredHeight = this.padding + numSwatches * textHeight + this.padding;
                 }
                 else {
-                    desiredHeight = this._padding + textHeight + this._padding;
-                    desiredWidth = this._padding + labelWidths[0] + this._padding + numSwatches * textHeight + this._padding + labelWidths[1] + this._padding;
+                    desiredHeight = this.padding + textHeight + this.padding;
+                    desiredWidth = this.padding + labelWidths[0] + this.padding + numSwatches * textHeight + this.padding + labelWidths[1] + this.padding;
                 }
                 return {
                     width: desiredWidth,
@@ -5827,31 +5827,31 @@ var Plottable;
                     wantsHeight: offeredHeight < desiredHeight
                 };
             };
-            InterpolatedColorLegend.prototype._isVertical = function () {
+            InterpolatedColorLegend.prototype.isVertical = function () {
                 return this._orientation !== "horizontal";
             };
             InterpolatedColorLegend.prototype.doRender = function () {
                 var _this = this;
                 _super.prototype.doRender.call(this);
-                var domain = this._scale.domain();
-                var textHeight = this._measurer.measure().height;
+                var domain = this.scale.domain();
+                var textHeight = this.measurer.measure().height;
                 var text0 = this._formatter(domain[0]);
-                var text0Width = this._measurer.measure(text0).width;
+                var text0Width = this.measurer.measure(text0).width;
                 var text1 = this._formatter(domain[1]);
-                var text1Width = this._measurer.measure(text1).width;
-                var ticks = this._generateTicks();
+                var text1Width = this.measurer.measure(text1).width;
+                var ticks = this.generateTicks();
                 var numSwatches = ticks.length;
-                var padding = this._padding;
+                var padding = this.padding;
                 var upperLabelShift = { x: 0, y: 0 };
                 var lowerLabelShift = { x: 0, y: 0 };
                 var lowerWriteOptions = {
-                    selection: this._lowerLabel,
+                    selection: this.lowerLabel,
                     xAlign: "center",
                     yAlign: "center",
                     textRotation: 0
                 };
                 var upperWriteOptions = {
-                    selection: this._upperLabel,
+                    selection: this.upperLabel,
                     xAlign: "center",
                     yAlign: "center",
                     textRotation: 0
@@ -5866,7 +5866,7 @@ var Plottable;
                     width: 0,
                     height: 0
                 };
-                if (this._isVertical()) {
+                if (this.isVertical()) {
                     var longestTextWidth = Math.max(text0Width, text1Width);
                     swatchWidth = Math.max((this.width() - 3 * padding - longestTextWidth), 0);
                     swatchHeight = Math.max(((this.height() - 2 * padding) / numSwatches), 0);
@@ -5905,20 +5905,20 @@ var Plottable;
                     boundingBoxAttr.height = swatchHeight;
                 }
                 boundingBoxAttr.x = swatchX(null, 0); // position of the first swatch
-                this._upperLabel.text(""); // clear the upper label
-                this._writer.write(text1, this.width(), this.height(), upperWriteOptions);
+                this.upperLabel.text(""); // clear the upper label
+                this.writer.write(text1, this.width(), this.height(), upperWriteOptions);
                 var upperTranslateString = "translate(" + upperLabelShift.x + ", " + upperLabelShift.y + ")";
-                this._upperLabel.attr("transform", upperTranslateString);
-                this._lowerLabel.text(""); // clear the lower label
-                this._writer.write(text0, this.width(), this.height(), lowerWriteOptions);
+                this.upperLabel.attr("transform", upperTranslateString);
+                this.lowerLabel.text(""); // clear the lower label
+                this.writer.write(text0, this.width(), this.height(), lowerWriteOptions);
                 var lowerTranslateString = "translate(" + lowerLabelShift.x + ", " + lowerLabelShift.y + ")";
-                this._lowerLabel.attr("transform", lowerTranslateString);
-                this._swatchBoundingBox.attr(boundingBoxAttr);
-                var swatches = this._swatchContainer.selectAll("rect.swatch").data(ticks);
+                this.lowerLabel.attr("transform", lowerTranslateString);
+                this.swatchBoundingBox.attr(boundingBoxAttr);
+                var swatches = this.swatchContainer.selectAll("rect.swatch").data(ticks);
                 swatches.enter().append("rect").classed("swatch", true);
                 swatches.exit().remove();
                 swatches.attr({
-                    "fill": function (d, i) { return _this._scale.scale(d); },
+                    "fill": function (d, i) { return _this.scale.scale(d); },
                     "width": swatchWidth,
                     "height": swatchHeight,
                     "x": swatchX,
