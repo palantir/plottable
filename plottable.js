@@ -2230,10 +2230,10 @@ var Plottable;
                 if (scale === void 0) { scale = d3.scale.ordinal(); }
                 _super.call(this, scale);
                 this._range = [0, 1];
-                this._typeCoercer = function (d) { return d != null && d.toString ? d.toString() : d; };
+                this.typeCoercer = function (d) { return d != null && d.toString ? d.toString() : d; };
                 var d3InnerPadding = 0.3;
-                this._innerPadding = Category._convertToPlottableInnerPadding(d3InnerPadding);
-                this._outerPadding = Category._convertToPlottableOuterPadding(0.5, d3InnerPadding);
+                this._innerPadding = Category.convertToPlottableInnerPadding(d3InnerPadding);
+                this._outerPadding = Category.convertToPlottableOuterPadding(0.5, d3InnerPadding);
             }
             Category.prototype.getExtent = function () {
                 var extents = this.getAllExtents();
@@ -2242,7 +2242,7 @@ var Plottable;
             Category.prototype.domain = function (values) {
                 return _super.prototype.domain.call(this, values);
             };
-            Category.prototype._setDomain = function (values) {
+            Category.prototype.setDomain = function (values) {
                 _super.prototype.setDomain.call(this, values);
                 this.range(this.range()); // update range
             };
@@ -2258,10 +2258,10 @@ var Plottable;
                     return this;
                 }
             };
-            Category._convertToPlottableInnerPadding = function (d3InnerPadding) {
+            Category.convertToPlottableInnerPadding = function (d3InnerPadding) {
                 return 1 / (1 - d3InnerPadding) - 1;
             };
-            Category._convertToPlottableOuterPadding = function (d3OuterPadding, d3InnerPadding) {
+            Category.convertToPlottableOuterPadding = function (d3OuterPadding, d3InnerPadding) {
                 return d3OuterPadding / (1 - d3InnerPadding);
             };
             /**

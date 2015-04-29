@@ -8,7 +8,7 @@ export module Scales {
 
     private _innerPadding: number;
     private _outerPadding: number;
-    public _typeCoercer: (d: any) => any = (d: any) => d != null && d.toString ? d.toString() : d;
+    public typeCoercer: (d: any) => any = (d: any) => d != null && d.toString ? d.toString() : d;
 
     /**
      * Creates a CategoryScale.
@@ -22,8 +22,8 @@ export module Scales {
       super(scale);
 
       var d3InnerPadding = 0.3;
-      this._innerPadding = Category._convertToPlottableInnerPadding(d3InnerPadding);
-      this._outerPadding = Category._convertToPlottableOuterPadding(0.5, d3InnerPadding);
+      this._innerPadding = Category.convertToPlottableInnerPadding(d3InnerPadding);
+      this._outerPadding = Category.convertToPlottableOuterPadding(0.5, d3InnerPadding);
     }
 
     protected getExtent(): string[] {
@@ -37,7 +37,7 @@ export module Scales {
       return super.domain(values);
     }
 
-    protected _setDomain(values: string[]) {
+    protected setDomain(values: string[]) {
       super.setDomain(values);
       this.range(this.range()); // update range
     }
@@ -56,11 +56,11 @@ export module Scales {
       }
     }
 
-    private static _convertToPlottableInnerPadding(d3InnerPadding: number): number {
+    private static convertToPlottableInnerPadding(d3InnerPadding: number): number {
       return 1 / (1 - d3InnerPadding) - 1;
     }
 
-    private static _convertToPlottableOuterPadding(d3OuterPadding: number, d3InnerPadding: number): number {
+    private static convertToPlottableOuterPadding(d3OuterPadding: number, d3InnerPadding: number): number {
       return d3OuterPadding / (1 - d3InnerPadding);
     }
 

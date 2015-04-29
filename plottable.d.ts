@@ -1186,7 +1186,7 @@ declare module Plottable {
     module Scales {
         class Category extends Scale<string, number> {
             protected d3Scale: D3.Scale.OrdinalScale;
-            _typeCoercer: (d: any) => any;
+            typeCoercer: (d: any) => any;
             /**
              * Creates a CategoryScale.
              *
@@ -1199,7 +1199,7 @@ declare module Plottable {
             protected getExtent(): string[];
             domain(): string[];
             domain(values: string[]): Category;
-            protected _setDomain(values: string[]): void;
+            protected setDomain(values: string[]): void;
             range(): number[];
             range(values: number[]): Category;
             /**
