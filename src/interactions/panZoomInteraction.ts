@@ -56,13 +56,10 @@ export module Interaction {
     }
 
     private _handleTouchStart(ids: number[], idToPoint: { [id: number]: Point; }, e: TouchEvent) {
-      ids.forEach((id) => {
-        if (this._touchIds.size() === 2) {
-          return;
-        }
-
+      for (var i = 0; i < ids.length && this._touchIds.size() < 2; i++) {
+        var id = ids[i];
         this._touchIds.set(id.toString(), this._translateToComponentSpace(idToPoint[id]));
-      });
+      }
     }
 
     private _handlePinch(ids: number[], idToPoint: { [id: number]: Point; }, e: TouchEvent) {

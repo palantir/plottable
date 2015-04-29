@@ -9916,13 +9916,10 @@ var Plottable;
                 this._touchDispatcher.onTouchCancel("Interaction.PanZoom" + this.getID(), function (ids, idToPoint, e) { return _this._handleTouchEnd(ids, idToPoint, e); });
             };
             PanZoom.prototype._handleTouchStart = function (ids, idToPoint, e) {
-                var _this = this;
-                ids.forEach(function (id) {
-                    if (_this._touchIds.size() === 2) {
-                        return;
-                    }
-                    _this._touchIds.set(id.toString(), _this._translateToComponentSpace(idToPoint[id]));
-                });
+                for (var i = 0; i < ids.length && this._touchIds.size() < 2; i++) {
+                    var id = ids[i];
+                    this._touchIds.set(id.toString(), this._translateToComponentSpace(idToPoint[id]));
+                }
             };
             PanZoom.prototype._handlePinch = function (ids, idToPoint, e) {
                 var _this = this;
