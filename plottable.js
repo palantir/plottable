@@ -7029,15 +7029,15 @@ var Plottable;
         function XYPlot(xScale, yScale) {
             var _this = this;
             _super.call(this);
-            this._autoAdjustXScaleDomain = false;
-            this._autoAdjustYScaleDomain = false;
+            this.autoAdjustXScaleDomain = false;
+            this.autoAdjustYScaleDomain = false;
             if (xScale == null || yScale == null) {
                 throw new Error("XYPlots require an xScale and yScale");
             }
             this.classed("xy-plot", true);
             this.xScale = xScale;
             this.yScale = yScale;
-            this._updateXDomainer();
+            this.updateXDomainer();
             xScale.broadcaster.registerListener("yDomainAdjustment" + this.getID(), function () { return _this._adjustYDomainOnChangeFromX(); });
             this.updateYDomainer();
             yScale.broadcaster.registerListener("xDomainAdjustment" + this.getID(), function () { return _this._adjustXDomainOnChangeFromY(); });
@@ -7055,7 +7055,7 @@ var Plottable;
                     this.xScale.broadcaster.deregisterListener("yDomainAdjustment" + this.getID());
                 }
                 this.xScale = scale;
-                this._updateXDomainer();
+                this.updateXDomainer();
                 scale.broadcaster.registerListener("yDomainAdjustment" + this.getID(), function () { return _this._adjustYDomainOnChangeFromX(); });
             }
             if (attrToSet === "y" && scale) {
@@ -7088,7 +7088,7 @@ var Plottable;
          * @returns {XYPlot} The calling XYPlot.
          */
         XYPlot.prototype.automaticallyAdjustYScaleOverVisiblePoints = function (autoAdjustment) {
-            this._autoAdjustYScaleDomain = autoAdjustment;
+            this.autoAdjustYScaleDomain = autoAdjustment;
             this._adjustYDomainOnChangeFromX();
             return this;
         };
@@ -7101,7 +7101,7 @@ var Plottable;
          * @returns {XYPlot} The calling XYPlot.
          */
         XYPlot.prototype.automaticallyAdjustXScaleOverVisiblePoints = function (autoAdjustment) {
-            this._autoAdjustXScaleDomain = autoAdjustment;
+            this.autoAdjustXScaleDomain = autoAdjustment;
             this._adjustXDomainOnChangeFromY();
             return this;
         };
@@ -7126,7 +7126,7 @@ var Plottable;
                 this.yScale.range([this.height(), 0]);
             }
         };
-        XYPlot.prototype._updateXDomainer = function () {
+        XYPlot.prototype.updateXDomainer = function () {
             if (this.xScale instanceof Plottable.QuantitativeScale) {
                 var scale = this.xScale;
                 if (!scale.userSetDomainer) {
@@ -7149,7 +7149,7 @@ var Plottable;
          */
         XYPlot.prototype.showAllData = function () {
             this.xScale.autoDomain();
-            if (!this._autoAdjustYScaleDomain) {
+            if (!this.autoAdjustYScaleDomain) {
                 this.yScale.autoDomain();
             }
         };
@@ -7157,7 +7157,7 @@ var Plottable;
             if (!this._projectorsReady()) {
                 return;
             }
-            if (this._autoAdjustYScaleDomain) {
+            if (this.autoAdjustYScaleDomain) {
                 this._adjustDomainToVisiblePoints(this.xScale, this.yScale, true);
             }
         };
@@ -7165,7 +7165,7 @@ var Plottable;
             if (!this._projectorsReady()) {
                 return;
             }
-            if (this._autoAdjustXScaleDomain) {
+            if (this.autoAdjustXScaleDomain) {
                 this._adjustDomainToVisiblePoints(this.yScale, this.xScale, false);
             }
         };
@@ -7472,10 +7472,10 @@ var Plottable;
             function Bar(xScale, yScale, isVertical) {
                 if (isVertical === void 0) { isVertical = true; }
                 _super.call(this, xScale, yScale);
-                this._barAlignmentFactor = 0.5;
+                this.barAlignmentFactor = 0.5;
                 this._barLabelFormatter = Plottable.Formatters.identity();
                 this._barLabelsEnabled = false;
-                this._hideBarsIfAnyAreTooWide = true;
+                this.hideBarsIfAnyAreTooWide = true;
                 this.classed("bar-plot", true);
                 this.defaultFillColor = new Plottable.Scales.Color().range()[0];
                 this.animator("bars-reset", new Plottable.Animators.Null());
@@ -7493,11 +7493,11 @@ var Plottable;
             };
             Bar.prototype.baseline = function (value) {
                 if (value == null) {
-                    return this._baselineValue;
+                    return this.baselineValue;
                 }
-                this._baselineValue = value;
-                this._updateXDomainer();
-                this._updateYDomainer();
+                this.baselineValue = value;
+                this.updateXDomainer();
+                this.updateYDomainer();
                 this.render();
                 return this;
             };
@@ -7515,7 +7515,7 @@ var Plottable;
                 if (align2factor[alignmentLC] === undefined) {
                     throw new Error("unsupported bar alignment");
                 }
-                this._barAlignmentFactor = align2factor[alignmentLC];
+                this.barAlignmentFactor = align2factor[alignmentLC];
                 this.render();
                 return this;
             };
@@ -7649,12 +7649,12 @@ var Plottable;
                 });
                 return bars;
             };
-            Bar.prototype._updateDomainer = function (scale) {
+            Bar.prototype.updateDomainer = function (scale) {
                 if (scale instanceof Plottable.QuantitativeScale) {
                     var qscale = scale;
                     if (!qscale.userSetDomainer) {
-                        if (this._baselineValue != null) {
-                            qscale.domainer().addPaddingException(this._baselineValue, "BAR_PLOT+" + this.getID()).addIncludedValue(this._baselineValue, "BAR_PLOT+" + this.getID());
+                        if (this.baselineValue != null) {
+                            qscale.domainer().addPaddingException(this.baselineValue, "BAR_PLOT+" + this.getID()).addIncludedValue(this.baselineValue, "BAR_PLOT+" + this.getID());
                         }
                         else {
                             qscale.domainer().removePaddingException("BAR_PLOT+" + this.getID()).removeIncludedValue("BAR_PLOT+" + this.getID());
@@ -7665,26 +7665,26 @@ var Plottable;
                     qscale.autoDomainIfAutomaticMode();
                 }
             };
-            Bar.prototype._updateYDomainer = function () {
+            Bar.prototype.updateYDomainer = function () {
                 if (this._isVertical) {
-                    this._updateDomainer(this.yScale);
+                    this.updateDomainer(this.yScale);
                 }
                 else {
                     _super.prototype.updateYDomainer.call(this);
                 }
             };
-            Bar.prototype._updateXDomainer = function () {
+            Bar.prototype.updateXDomainer = function () {
                 if (!this._isVertical) {
-                    this._updateDomainer(this.xScale);
+                    this.updateDomainer(this.xScale);
                 }
                 else {
-                    _super.prototype._updateXDomainer.call(this);
+                    _super.prototype.updateXDomainer.call(this);
                 }
             };
             Bar.prototype.additionalPaint = function (time) {
                 var _this = this;
                 var primaryScale = this._isVertical ? this.yScale : this.xScale;
-                var scaledBaseline = primaryScale.scale(this._baselineValue);
+                var scaledBaseline = primaryScale.scale(this.baselineValue);
                 var baselineAttr = {
                     "x1": this._isVertical ? 0 : scaledBaseline,
                     "y1": this._isVertical ? scaledBaseline : 0,
@@ -7695,16 +7695,16 @@ var Plottable;
                 var drawers = this.getDrawersInOrder();
                 drawers.forEach(function (d) { return d.removeLabels(); });
                 if (this._barLabelsEnabled) {
-                    Plottable.Utils.Methods.setTimeout(function () { return _this._drawLabels(); }, time);
+                    Plottable.Utils.Methods.setTimeout(function () { return _this.drawLabels(); }, time);
                 }
             };
-            Bar.prototype._drawLabels = function () {
+            Bar.prototype.drawLabels = function () {
                 var _this = this;
                 var drawers = this.getDrawersInOrder();
                 var attrToProjector = this.generateAttrToProjector();
                 var dataToDraw = this.getDataToDraw();
                 this.datasetKeysInOrder.forEach(function (k, i) { return drawers[i].drawText(dataToDraw.get(k), attrToProjector, _this.key2PlotDatasetKey.get(k).dataset.metadata(), _this.key2PlotDatasetKey.get(k).plotMetadata); });
-                if (this._hideBarsIfAnyAreTooWide && drawers.some(function (d) { return d._getIfLabelsTooWide(); })) {
+                if (this.hideBarsIfAnyAreTooWide && drawers.some(function (d) { return d._getIfLabelsTooWide(); })) {
                     drawers.forEach(function (d) { return d.removeLabels(); });
                 }
             };
@@ -7713,7 +7713,7 @@ var Plottable;
                 if (this.dataChanged && this._animate) {
                     var resetAttrToProjector = this.generateAttrToProjector();
                     var primaryScale = this._isVertical ? this.yScale : this.xScale;
-                    var scaledBaseline = primaryScale.scale(this._baselineValue);
+                    var scaledBaseline = primaryScale.scale(this.baselineValue);
                     var positionAttr = this._isVertical ? "y" : "x";
                     var dimensionAttr = this._isVertical ? "height" : "width";
                     resetAttrToProjector[positionAttr] = function () { return scaledBaseline; };
@@ -7732,11 +7732,11 @@ var Plottable;
                 var secondaryScale = this._isVertical ? this.xScale : this.yScale;
                 var primaryAttr = this._isVertical ? "y" : "x";
                 var secondaryAttr = this._isVertical ? "x" : "y";
-                var scaledBaseline = primaryScale.scale(this._baselineValue);
+                var scaledBaseline = primaryScale.scale(this.baselineValue);
                 var positionF = attrToProjector[secondaryAttr];
                 var widthF = attrToProjector["width"];
                 if (widthF == null) {
-                    widthF = function () { return _this._getBarPixelWidth(); };
+                    widthF = function () { return _this.getBarPixelWidth(); };
                 }
                 var originalPositionFn = attrToProjector[primaryAttr];
                 var heightF = function (d, i, u, m) {
@@ -7748,7 +7748,7 @@ var Plottable;
                     attrToProjector[secondaryAttr] = function (d, i, u, m) { return positionF(d, i, u, m) - widthF(d, i, u, m) / 2; };
                 }
                 else {
-                    attrToProjector[secondaryAttr] = function (d, i, u, m) { return positionF(d, i, u, m) - widthF(d, i, u, m) * _this._barAlignmentFactor; };
+                    attrToProjector[secondaryAttr] = function (d, i, u, m) { return positionF(d, i, u, m) - widthF(d, i, u, m) * _this.barAlignmentFactor; };
                 }
                 attrToProjector[primaryAttr] = function (d, i, u, m) {
                     var originalPos = originalPositionFn(d, i, u, m);
@@ -7775,7 +7775,7 @@ var Plottable;
              *   from https://github.com/mbostock/d3/wiki/Ordinal-Scales#ordinal_rangePoints, the max barPixelWidth is step * padding
              * If the position scale of the plot is a QuantitativeScaleScale, then _getMinimumDataWidth is scaled to compute the barPixelWidth
              */
-            Bar.prototype._getBarPixelWidth = function () {
+            Bar.prototype.getBarPixelWidth = function () {
                 var _this = this;
                 var barPixelWidth;
                 var barScale = this._isVertical ? this.xScale : this.yScale;
@@ -7797,13 +7797,13 @@ var Plottable;
                     }, barWidthDimension * Bar.SINGLE_BAR_DIMENSION_RATIO);
                     var scaledData = numberBarAccessorData.map(function (datum) { return barScale.scale(datum); });
                     var minScaledDatum = Plottable.Utils.Methods.min(scaledData, 0);
-                    if (this._barAlignmentFactor !== 0 && minScaledDatum > 0) {
-                        barPixelWidth = Math.min(barPixelWidth, minScaledDatum / this._barAlignmentFactor);
+                    if (this.barAlignmentFactor !== 0 && minScaledDatum > 0) {
+                        barPixelWidth = Math.min(barPixelWidth, minScaledDatum / this.barAlignmentFactor);
                     }
                     var maxScaledDatum = Plottable.Utils.Methods.max(scaledData, 0);
-                    if (this._barAlignmentFactor !== 1 && maxScaledDatum < barWidthDimension) {
+                    if (this.barAlignmentFactor !== 1 && maxScaledDatum < barWidthDimension) {
                         var margin = barWidthDimension - maxScaledDatum;
-                        barPixelWidth = Math.min(barPixelWidth, margin / (1 - this._barAlignmentFactor));
+                        barPixelWidth = Math.min(barPixelWidth, margin / (1 - this.barAlignmentFactor));
                     }
                     barPixelWidth *= Bar.BAR_WIDTH_RATIO;
                 }
@@ -7814,7 +7814,7 @@ var Plottable;
                 var valueScale = this._isVertical ? this.yScale : this.xScale;
                 var scaledBaseline = (this._isVertical ? this.yScale : this.xScale).scale(this.baseline());
                 var isVertical = this._isVertical;
-                var barAlignmentFactor = this._barAlignmentFactor;
+                var barAlignmentFactor = this.barAlignmentFactor;
                 plotData.selection.each(function (datum, index) {
                     var bar = d3.select(this);
                     // Using floored pixel values to account for pixel accuracy inconsistencies across browsers
@@ -8144,7 +8144,7 @@ var Plottable;
                 var innerScale = new Plottable.Scales.Category();
                 innerScale.domain(this.datasetKeysInOrder);
                 if (!this.projections["width"]) {
-                    innerScale.range([0, this._getBarPixelWidth()]);
+                    innerScale.range([0, this.getBarPixelWidth()]);
                 }
                 else {
                     var projection = this.projections["width"];

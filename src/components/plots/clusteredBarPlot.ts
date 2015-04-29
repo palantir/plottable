@@ -54,7 +54,7 @@ export module Plots {
       var innerScale = new Scales.Category();
       innerScale.domain(this.datasetKeysInOrder);
       if (!this.projections["width"]) {
-        innerScale.range([0, this._getBarPixelWidth()]);
+        innerScale.range([0, this.getBarPixelWidth()]);
       } else {
         var projection = this.projections["width"];
         var accessor = projection.accessor;

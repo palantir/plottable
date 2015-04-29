@@ -2872,7 +2872,7 @@ declare module Plottable {
         automaticallyAdjustXScaleOverVisiblePoints(autoAdjustment: boolean): XYPlot<X, Y>;
         protected generateAttrToProjector(): AttributeToProjector;
         computeLayout(offeredXOrigin?: number, offeredYOffset?: number, availableWidth?: number, availableHeight?: number): void;
-        protected _updateXDomainer(): void;
+        protected updateXDomainer(): void;
         protected updateYDomainer(): void;
         /**
          * Adjusts both domains' extents to show all datasets.
@@ -3064,11 +3064,11 @@ declare module Plottable {
              * @returns {D3.Selection} The selected bar, or null if no bar was selected.
              */
             getBars(xValOrExtent: number | Extent, yValOrExtent: number | Extent): D3.Selection;
-            protected _updateDomainer(scale: Scale<any, number>): void;
-            protected _updateYDomainer(): void;
-            protected _updateXDomainer(): void;
+            protected updateDomainer(scale: Scale<any, number>): void;
+            protected updateYDomainer(): void;
+            protected updateXDomainer(): void;
             protected additionalPaint(time: number): void;
-            protected _drawLabels(): void;
+            protected drawLabels(): void;
             protected generateDrawSteps(): Drawers.DrawStep[];
             protected generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
@@ -3081,7 +3081,7 @@ declare module Plottable {
              *   from https://github.com/mbostock/d3/wiki/Ordinal-Scales#ordinal_rangePoints, the max barPixelWidth is step * padding
              * If the position scale of the plot is a QuantitativeScaleScale, then _getMinimumDataWidth is scaled to compute the barPixelWidth
              */
-            protected _getBarPixelWidth(): number;
+            protected getBarPixelWidth(): number;
             protected _getAllPlotData(datasetKeys: string[]): PlotData;
         }
     }

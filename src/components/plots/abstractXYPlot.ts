@@ -4,8 +4,8 @@ module Plottable {
   export class XYPlot<X, Y> extends Plot {
     protected xScale: Scale<X, number>;
     protected yScale: Scale<Y, number>;
-    private _autoAdjustXScaleDomain = false;
-    private _autoAdjustYScaleDomain = false;
+    private autoAdjustXScaleDomain = false;
+    private autoAdjustYScaleDomain = false;
 
     /**
      * Constructs an XYPlot.
@@ -27,7 +27,7 @@ module Plottable {
 
       this.xScale = xScale;
       this.yScale = yScale;
-      this._updateXDomainer();
+      this.updateXDomainer();
       xScale.broadcaster.registerListener("yDomainAdjustment" + this.getID(), () => this._adjustYDomainOnChangeFromX());
       this.updateYDomainer();
       yScale.broadcaster.registerListener("xDomainAdjustment" + this.getID(), () => this._adjustXDomainOnChangeFromY());
@@ -45,7 +45,7 @@ module Plottable {
           this.xScale.broadcaster.deregisterListener("yDomainAdjustment" + this.getID());
         }
         this.xScale = scale;
-        this._updateXDomainer();
+        this.updateXDomainer();
         scale.broadcaster.registerListener("yDomainAdjustment" + this.getID(), () => this._adjustYDomainOnChangeFromX());
       }
 
@@ -83,7 +83,7 @@ module Plottable {
      * @returns {XYPlot} The calling XYPlot.
      */
     public automaticallyAdjustYScaleOverVisiblePoints(autoAdjustment: boolean): XYPlot<X, Y> {
-      this._autoAdjustYScaleDomain = autoAdjustment;
+      this.autoAdjustYScaleDomain = autoAdjustment;
       this._adjustYDomainOnChangeFromX();
       return this;
     }
@@ -97,7 +97,7 @@ module Plottable {
      * @returns {XYPlot} The calling XYPlot.
      */
     public automaticallyAdjustXScaleOverVisiblePoints(autoAdjustment: boolean): XYPlot<X, Y>  {
-      this._autoAdjustXScaleDomain = autoAdjustment;
+      this.autoAdjustXScaleDomain = autoAdjustment;
       this._adjustXDomainOnChangeFromY();
       return this;
     }
@@ -125,7 +125,7 @@ module Plottable {
       }
     }
 
-    protected _updateXDomainer() {
+    protected updateXDomainer() {
       if (this.xScale instanceof QuantitativeScale) {
         var scale = <QuantitativeScale<any>> this.xScale;
         if (!scale.userSetDomainer) {
@@ -150,20 +150,20 @@ module Plottable {
      */
     public showAllData() {
       this.xScale.autoDomain();
-      if (!this._autoAdjustYScaleDomain) {
+      if (!this.autoAdjustYScaleDomain) {
         this.yScale.autoDomain();
       }
     }
 
     private _adjustYDomainOnChangeFromX() {
       if (!this._projectorsReady()) { return; }
-      if (this._autoAdjustYScaleDomain) {
+      if (this.autoAdjustYScaleDomain) {
         this._adjustDomainToVisiblePoints<X, Y>(this.xScale, this.yScale, true);
       }
     }
     private _adjustXDomainOnChangeFromY() {
       if (!this._projectorsReady()) { return; }
-      if (this._autoAdjustXScaleDomain) {
+      if (this.autoAdjustXScaleDomain) {
         this._adjustDomainToVisiblePoints<Y, X>(this.yScale, this.xScale, false);
       }
     }
