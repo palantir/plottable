@@ -22,7 +22,7 @@ export module Scales {
       switch (scaleType) {
         case null:
         case undefined:
-          scale = d3.scale.ordinal().range(Color._getPlottableColors());
+          scale = d3.scale.ordinal().range(Color.getPlottableColors());
           break;
         case "Category10":
         case "category10":
@@ -60,7 +60,7 @@ export module Scales {
       return Utils.Methods.uniq(concatenatedExtents);
     }
 
-    private static _getPlottableColors(): string[] {
+    private static getPlottableColors(): string[] {
       var plottableDefaultColors: string[] = [];
       var colorTester = d3.select("body").append("plottable-color-tester");
 

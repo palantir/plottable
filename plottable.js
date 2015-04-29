@@ -2340,7 +2340,7 @@ var Plottable;
                 switch (scaleType) {
                     case null:
                     case undefined:
-                        scale = d3.scale.ordinal().range(Color._getPlottableColors());
+                        scale = d3.scale.ordinal().range(Color.getPlottableColors());
                         break;
                     case "Category10":
                     case "category10":
@@ -2376,7 +2376,7 @@ var Plottable;
                 });
                 return Plottable.Utils.Methods.uniq(concatenatedExtents);
             };
-            Color._getPlottableColors = function () {
+            Color.getPlottableColors = function () {
                 var plottableDefaultColors = [];
                 var colorTester = d3.select("body").append("plottable-color-tester");
                 var defaultColorHex = Plottable.Utils.Methods.colorTest(colorTester, "");
