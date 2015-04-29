@@ -36,9 +36,10 @@
     "no-unused-variable": true,
     "no-use-before-declare": true,
     "one-line": [true,
-        "check-open-brace",
         "check-catch",
-        "check-else"
+        "check-else",
+        "check-open-brace",
+        "check-whitespace"
     ],
     "quotemark": [true, "double"],
     "radix": true,
