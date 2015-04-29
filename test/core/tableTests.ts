@@ -293,23 +293,6 @@ describe("Tables", () => {
       // If there is extra space in a fixed-size table, the extra space should not be allocated to proportional space
       verifyLayoutResult(result, [0, 0], [0, 0], [50, 50], [50, 50], false, false, "..when there's extra space");
     });
-
-    it.skip("iterateLayout works in the tricky case when components can be unsatisfied but request little space", () => {
-      table = new Plottable.Component.Table([[c1, c2]]);
-      fixComponentSize(c1, null, null);
-      c2._requestedSpace = (w: number, h: number) => {
-        return {
-          width: w >= 200 ? 200 : 0,
-          height: h >= 200 ? 200 : 0,
-          wantsWidth: w < 200,
-          wantsHeight: h < 200
-        };
-      };
-      var result = (<any> table)._iterateLayout(200, 200);
-      verifyLayoutResult(result, [0, 0], [0], [0, 200], [200], false, false, "when there's sufficient space");
-      result = (<any> table)._iterateLayout(150, 200);
-      verifyLayoutResult(result, [150, 0], [0], [0, 0], [200], true, false, "when there's insufficient space");
-    });
   });
 
   describe("table._removeComponent works properly", () => {

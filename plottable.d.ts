@@ -740,8 +740,8 @@ declare module Plottable {
         yMax: number;
     };
     type _SpaceRequest = {
-        width: number;
-        height: number;
+        minWidth: number;
+        minHeight: number;
     };
     /**
      * The range of your current data. For example, [1, 2, 6, -5] has the Extent

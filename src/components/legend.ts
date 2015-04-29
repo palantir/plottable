@@ -174,8 +174,8 @@ export module Component {
       var longestEstimatedRowLength = _Util.Methods.max(estimatedRowLengths, 0);
 
       return {
-        width : this._padding + longestEstimatedRowLength,
-        height: estimatedLayout.numRowsToDraw * estimatedLayout.textHeight + 2 * this._padding
+        minWidth : this._padding + longestEstimatedRowLength,
+        minHeight: estimatedLayout.numRowsToDraw * estimatedLayout.textHeight + 2 * this._padding
       };
     }
 

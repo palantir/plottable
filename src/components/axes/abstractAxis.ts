@@ -96,8 +96,8 @@ export module Axis {
       }
 
       return {
-        width : requestedWidth,
-        height: requestedHeight
+        minWidth : requestedWidth,
+        minHeight: requestedHeight
       };
     }
 

@@ -42,8 +42,8 @@ export module Axis {
 
       if (this._scale.domain().length === 0) {
         return {
-          width: 0,
-          height: 0
+          minWidth: 0,
+          minHeight: 0
         };
       }
 
@@ -57,8 +57,8 @@ export module Axis {
       var measureResult = this._measureTicks(offeredWidth, offeredHeight, fakeScale, categoryScale.domain());
 
       return {
-        width: measureResult.usedWidth + widthRequiredByTicks,
-        height: measureResult.usedHeight + heightRequiredByTicks
+        minWidth: measureResult.usedWidth + widthRequiredByTicks,
+        minHeight: measureResult.usedHeight + heightRequiredByTicks
       };
     }
 

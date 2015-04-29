@@ -33,17 +33,15 @@ function makeFakeEvent(x: number, y: number): D3.D3Event {
 }
 
 function verifySpaceRequest(sr: Plottable._SpaceRequest, w: number, h: number, ww: boolean, wh: boolean, message: string) {
-  assert.equal(sr.width,  w, message + " (space request: width)");
-  assert.equal(sr.height, h, message + " (space request: height)");
+  assert.equal(sr.minWidth,  w, message + " (space request: minWidth)");
+  assert.equal(sr.minHeight, h, message + " (space request: minHeight)");
 }
 
 function fixComponentSize(c: Plottable.Component.AbstractComponent, fixedWidth?: number, fixedHeight?: number) {
   c._requestedSpace = function(w, h) {
     return {
-      width:  fixedWidth  == null ? 0 : fixedWidth,
-      height: fixedHeight == null ? 0 : fixedHeight,
-      wantsWidth : fixedWidth  == null ? false : w < fixedWidth ,
-      wantsHeight: fixedHeight == null ? false : h < fixedHeight
+      minWidth:  fixedWidth  == null ? 0 : fixedWidth,
+      minHeight: fixedHeight == null ? 0 : fixedHeight
     };
   };
   (<any> c)._fixedWidthFlag  = fixedWidth  == null ? false : true;

@@ -238,21 +238,21 @@ export module Component {
             spaceRequest = component._requestedSpace(offeredWidths[colIndex], offeredHeights[rowIndex]);
           } else {
             spaceRequest = {
-              width: 0,
-              height: 0
+              minWidth: 0,
+              minHeight: 0
             };
           }
 
-          var allocatedWidth = Math.min(spaceRequest.width, offeredWidths[colIndex]);
+          var allocatedWidth = Math.min(spaceRequest.minWidth, offeredWidths[colIndex]);
           requestedWidths[colIndex] = Math.max(requestedWidths[colIndex], allocatedWidth);
 
-          var allocatedHeight = Math.min(spaceRequest.height, offeredHeights[rowIndex]);
+          var allocatedHeight = Math.min(spaceRequest.minHeight, offeredHeights[rowIndex]);
           requestedHeights[rowIndex] = Math.max(requestedHeights[rowIndex], allocatedHeight);
 
-          var componentNeedsWidth = spaceRequest.width > offeredWidths[colIndex];
+          var componentNeedsWidth = spaceRequest.minWidth > offeredWidths[colIndex];
           columnNeedsWidth[colIndex] = columnNeedsWidth[colIndex] || componentNeedsWidth;
 
-          var componentNeedsHeight = spaceRequest.height > offeredHeights[rowIndex];
+          var componentNeedsHeight = spaceRequest.minHeight > offeredHeights[rowIndex];
           rowNeedsHeight[rowIndex] = rowNeedsHeight[rowIndex] || componentNeedsHeight;
         });
       });
@@ -268,8 +268,8 @@ export module Component {
     public _requestedSpace(offeredWidth : number, offeredHeight: number): _SpaceRequest {
       this._calculatedLayout = this._iterateLayout(offeredWidth , offeredHeight);
       return {
-        width: d3.sum(this._calculatedLayout.guaranteedWidths),
-        height: d3.sum(this._calculatedLayout.guaranteedHeights)
+        minWidth: d3.sum(this._calculatedLayout.guaranteedWidths),
+        minHeight: d3.sum(this._calculatedLayout.guaranteedHeights)
       };
     }
 

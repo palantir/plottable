@@ -3394,8 +3394,8 @@ var Plottable;
             };
             AbstractComponent.prototype._requestedSpace = function (availableWidth, availableHeight) {
                 return {
-                    width: 0,
-                    height: 0
+                    minWidth: 0,
+                    minHeight: 0
                 };
             };
             /**
@@ -3446,8 +3446,8 @@ var Plottable;
             AbstractComponent.prototype._getSize = function (availableWidth, availableHeight) {
                 var requestedSpace = this._requestedSpace(availableWidth, availableHeight);
                 return {
-                    width: this._isFixedWidth() ? Math.min(availableWidth, requestedSpace.width) : availableWidth,
-                    height: this._isFixedHeight() ? Math.min(availableHeight, requestedSpace.height) : availableHeight
+                    width: this._isFixedWidth() ? Math.min(availableWidth, requestedSpace.minWidth) : availableWidth,
+                    height: this._isFixedHeight() ? Math.min(availableHeight, requestedSpace.minHeight) : availableHeight
                 };
             };
             AbstractComponent.prototype._render = function () {
@@ -4010,8 +4010,8 @@ var Plottable;
             Group.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
                 var requests = this.components().map(function (c) { return c._requestedSpace(offeredWidth, offeredHeight); });
                 return {
-                    width: Plottable._Util.Methods.max(requests, function (request) { return request.width; }, 0),
-                    height: Plottable._Util.Methods.max(requests, function (request) { return request.height; }, 0)
+                    minWidth: Plottable._Util.Methods.max(requests, function (request) { return request.minWidth; }, 0),
+                    minHeight: Plottable._Util.Methods.max(requests, function (request) { return request.minHeight; }, 0)
                 };
             };
             Group.prototype._merge = function (c, below) {
@@ -4126,8 +4126,8 @@ var Plottable;
                     requestedWidth = this._computedWidth + this._gutter;
                 }
                 return {
-                    width: requestedWidth,
-                    height: requestedHeight
+                    minWidth: requestedWidth,
+                    minHeight: requestedHeight
                 };
             };
             AbstractAxis.prototype._isFixedHeight = function () {
@@ -5180,8 +5180,8 @@ var Plottable;
                 var heightRequiredByTicks = this._isHorizontal() ? this._maxLabelTickLength() + this.tickLabelPadding() + this.gutter() : 0;
                 if (this._scale.domain().length === 0) {
                     return {
-                        width: 0,
-                        height: 0
+                        minWidth: 0,
+                        minHeight: 0
                     };
                 }
                 var categoryScale = this._scale;
@@ -5194,8 +5194,8 @@ var Plottable;
                 }
                 var measureResult = this._measureTicks(offeredWidth, offeredHeight, fakeScale, categoryScale.domain());
                 return {
-                    width: measureResult.usedWidth + widthRequiredByTicks,
-                    height: measureResult.usedHeight + heightRequiredByTicks
+                    minWidth: measureResult.usedWidth + widthRequiredByTicks,
+                    minHeight: measureResult.usedHeight + heightRequiredByTicks
                 };
             };
             Category.prototype._getTickValues = function () {
@@ -5401,8 +5401,8 @@ var Plottable;
                 var desiredWidth = (this.orient() === "horizontal" ? desiredWH.width : desiredWH.height) + 2 * this.padding();
                 var desiredHeight = (this.orient() === "horizontal" ? desiredWH.height : desiredWH.width) + 2 * this.padding();
                 return {
-                    width: desiredWidth,
-                    height: desiredHeight
+                    minWidth: desiredWidth,
+                    minHeight: desiredHeight
                 };
             };
             Label.prototype._setup = function () {
@@ -5621,8 +5621,8 @@ var Plottable;
                 });
                 var longestEstimatedRowLength = Plottable._Util.Methods.max(estimatedRowLengths, 0);
                 return {
-                    width: this._padding + longestEstimatedRowLength,
-                    height: estimatedLayout.numRowsToDraw * estimatedLayout.textHeight + 2 * this._padding
+                    minWidth: this._padding + longestEstimatedRowLength,
+                    minHeight: estimatedLayout.numRowsToDraw * estimatedLayout.textHeight + 2 * this._padding
                 };
             };
             Legend.prototype._packRows = function (availableWidth, entries, entryLengths) {
@@ -5855,8 +5855,8 @@ var Plottable;
                     desiredWidth = this._padding + labelWidths[0] + this._padding + numSwatches * textHeight + this._padding + labelWidths[1] + this._padding;
                 }
                 return {
-                    width: desiredWidth,
-                    height: desiredHeight
+                    minWidth: desiredWidth,
+                    minHeight: desiredHeight
                 };
             };
             InterpolatedColorLegend.prototype._isVertical = function () {
@@ -6256,17 +6256,17 @@ var Plottable;
                         }
                         else {
                             spaceRequest = {
-                                width: 0,
-                                height: 0
+                                minWidth: 0,
+                                minHeight: 0
                             };
                         }
-                        var allocatedWidth = Math.min(spaceRequest.width, offeredWidths[colIndex]);
+                        var allocatedWidth = Math.min(spaceRequest.minWidth, offeredWidths[colIndex]);
                         requestedWidths[colIndex] = Math.max(requestedWidths[colIndex], allocatedWidth);
-                        var allocatedHeight = Math.min(spaceRequest.height, offeredHeights[rowIndex]);
+                        var allocatedHeight = Math.min(spaceRequest.minHeight, offeredHeights[rowIndex]);
                         requestedHeights[rowIndex] = Math.max(requestedHeights[rowIndex], allocatedHeight);
-                        var componentNeedsWidth = spaceRequest.width > offeredWidths[colIndex];
+                        var componentNeedsWidth = spaceRequest.minWidth > offeredWidths[colIndex];
                         columnNeedsWidth[colIndex] = columnNeedsWidth[colIndex] || componentNeedsWidth;
-                        var componentNeedsHeight = spaceRequest.height > offeredHeights[rowIndex];
+                        var componentNeedsHeight = spaceRequest.minHeight > offeredHeights[rowIndex];
                         rowNeedsHeight[rowIndex] = rowNeedsHeight[rowIndex] || componentNeedsHeight;
                     });
                 });
@@ -6280,8 +6280,8 @@ var Plottable;
             Table.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
                 this._calculatedLayout = this._iterateLayout(offeredWidth, offeredHeight);
                 return {
-                    width: d3.sum(this._calculatedLayout.guaranteedWidths),
-                    height: d3.sum(this._calculatedLayout.guaranteedHeights)
+                    minWidth: d3.sum(this._calculatedLayout.guaranteedWidths),
+                    minHeight: d3.sum(this._calculatedLayout.guaranteedHeights)
                 };
             };
             Table.prototype._computeLayout = function (offeredXOrigin, offeredYOrigin, availableWidth, availableHeight) {

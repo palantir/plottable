@@ -32,16 +32,14 @@ function makeFakeEvent(x, y) {
     };
 }
 function verifySpaceRequest(sr, w, h, ww, wh, message) {
-    assert.equal(sr.width, w, message + " (space request: width)");
-    assert.equal(sr.height, h, message + " (space request: height)");
+    assert.equal(sr.minWidth, w, message + " (space request: minWidth)");
+    assert.equal(sr.minHeight, h, message + " (space request: minHeight)");
 }
 function fixComponentSize(c, fixedWidth, fixedHeight) {
     c._requestedSpace = function (w, h) {
         return {
-            width: fixedWidth == null ? 0 : fixedWidth,
-            height: fixedHeight == null ? 0 : fixedHeight,
-            wantsWidth: fixedWidth == null ? false : w < fixedWidth,
-            wantsHeight: fixedHeight == null ? false : h < fixedHeight
+            minWidth: fixedWidth == null ? 0 : fixedWidth,
+            minHeight: fixedHeight == null ? 0 : fixedHeight
         };
     };
     c._fixedWidthFlag = fixedWidth == null ? false : true;
@@ -226,10 +224,8 @@ var Mocks;
         }
         FixedSizeComponent.prototype._requestedSpace = function (availableWidth, availableHeight) {
             return {
-                width: this.fixedWidth,
-                height: this.fixedHeight,
-                wantsWidth: availableWidth < this.fixedWidth,
-                wantsHeight: availableHeight < this.fixedHeight
+                minWidth: this.fixedWidth,
+                minHeight: this.fixedHeight
             };
         };
         return FixedSizeComponent;
@@ -1318,8 +1314,8 @@ describe("Category Axes", function () {
         var ca = new Plottable.Axis.Category(scale);
         ca._anchor(svg);
         var s = ca._requestedSpace(400, 400);
-        assert.operator(s.width, ">=", 0, "it requested 0 or more width");
-        assert.operator(s.height, ">=", 0, "it requested 0 or more height");
+        assert.operator(s.minWidth, ">=", 0, "it requested 0 or more width");
+        assert.operator(s.minHeight, ">=", 0, "it requested 0 or more height");
         svg.remove();
     });
     it("doesnt blow up for non-string data", function () {
@@ -1411,10 +1407,10 @@ describe("Category Axes", function () {
         axis.renderTo(svg);
         var smallDimension = 10;
         var spaceRequest = axis._requestedSpace(300, smallDimension);
-        assert.operator(spaceRequest.height, ">", smallDimension, "horizontal axis requested more height if constrained");
+        assert.operator(spaceRequest.minHeight, ">", smallDimension, "horizontal axis requested more height if constrained");
         axis.orient("left");
         spaceRequest = axis._requestedSpace(smallDimension, 300);
-        assert.operator(spaceRequest.width, ">", smallDimension, "vertical axis requested more width if constrained");
+        assert.operator(spaceRequest.minWidth, ">", smallDimension, "vertical axis requested more width if constrained");
         svg.remove();
     });
     it("axis labels respect tick labels", function () {
@@ -1444,10 +1440,10 @@ describe("Category Axes", function () {
         var axis = new Plottable.Axis.Category(scale, "bottom");
         axis.renderTo(svg);
         var requestedSpace = axis._requestedSpace(300, 50);
-        var flatHeight = requestedSpace.height;
+        var flatHeight = requestedSpace.minHeight;
         axis.tickLabelAngle(-90);
         requestedSpace = axis._requestedSpace(300, 50);
-        assert.isTrue(flatHeight < requestedSpace.height, "axis should request more height when tick labels are rotated");
+        assert.isTrue(flatHeight < requestedSpace.minHeight, "axis should request more height when tick labels are rotated");
         svg.remove();
     });
 });
@@ -1681,13 +1677,13 @@ describe("Legend", function () {
     it("legend domain can be updated after initialization, and height updates as well", function () {
         legend.renderTo(svg);
         legend.scale(color);
-        assert.equal(legend._requestedSpace(200, 200).height, 10, "there is a padding requested height when domain is empty");
+        assert.equal(legend._requestedSpace(200, 200).minHeight, 10, "there is a padding requested height when domain is empty");
         color.domain(["foo", "bar"]);
-        var height1 = legend._requestedSpace(400, 400).height;
+        var height1 = legend._requestedSpace(400, 400).minHeight;
         var actualHeight1 = legend.height();
         assert.operator(height1, ">", 0, "changing the domain gives a positive height");
         color.domain(["foo", "bar", "baz"]);
-        assert.operator(legend._requestedSpace(400, 400).height, ">", height1, "adding to the domain increases the height requested");
+        assert.operator(legend._requestedSpace(400, 400).minHeight, ">", height1, "adding to the domain increases the height requested");
         var actualHeight2 = legend.height();
         assert.operator(actualHeight1, "<", actualHeight2, "Changing the domain caused the legend to re-layout with more height");
         var numRows = legend._content.selectAll(rowSelector)[0].length;
@@ -6284,11 +6280,11 @@ describe("ComponentGroups", function () {
             var wide = new Mocks.FixedSizeComponent(SVG_WIDTH / 2, SVG_WIDTH / 4);
             var cg = new Plottable.Component.Group([tall, wide]);
             var request = cg._requestedSpace(SVG_WIDTH, SVG_HEIGHT);
-            assert.strictEqual(request.width, SVG_WIDTH / 2, "requested enough space for widest Component");
-            assert.strictEqual(request.height, SVG_HEIGHT / 2, "requested enough space for tallest Component");
+            assert.strictEqual(request.minWidth, SVG_WIDTH / 2, "requested enough space for widest Component");
+            assert.strictEqual(request.minHeight, SVG_HEIGHT / 2, "requested enough space for tallest Component");
             var constrainedRequest = cg._requestedSpace(SVG_WIDTH / 10, SVG_HEIGHT / 10);
-            assert.strictEqual(constrainedRequest.width, SVG_WIDTH / 2, "requested enough space for widest Component");
-            assert.strictEqual(constrainedRequest.height, SVG_HEIGHT / 2, "requested enough space for tallest Component");
+            assert.strictEqual(constrainedRequest.minWidth, SVG_WIDTH / 2, "requested enough space for widest Component");
+            assert.strictEqual(constrainedRequest.minHeight, SVG_HEIGHT / 2, "requested enough space for tallest Component");
             cg.renderTo(svg);
             assert.strictEqual(cg.width(), SVG_WIDTH, "occupies all offered width");
             assert.strictEqual(cg.height(), SVG_HEIGHT, "occupies all offered height");
@@ -6561,8 +6557,8 @@ describe("Component behavior", function () {
     });
     it("component defaults are as expected", function () {
         var layout = c._requestedSpace(1, 1);
-        assert.equal(layout.width, 0, "requested width defaults to 0");
-        assert.equal(layout.height, 0, "requested height defaults to 0");
+        assert.equal(layout.minWidth, 0, "requested width defaults to 0");
+        assert.equal(layout.minHeight, 0, "requested height defaults to 0");
         assert.equal(c._xAlignProportion, 0, "_xAlignProportion defaults to 0");
         assert.equal(c._yAlignProportion, 0, "_yAlignProportion defaults to 0");
         assert.equal(c._xOffset, 0, "xOffset defaults to 0");
@@ -6716,7 +6712,7 @@ describe("Component behavior", function () {
         // catches #1188
         var c = new Plottable.Component.AbstractComponent();
         c._requestedSpace = function () {
-            return { width: 500, height: 500, wantsWidth: true, wantsHeight: true };
+            return { minWidth: 500, minHeight: 500 };
         };
         c._fixedWidthFlag = true;
         c._fixedHeightFlag = true;
@@ -7165,22 +7161,6 @@ describe("Tables", function () {
             result = table._iterateLayout(120, 120);
             // If there is extra space in a fixed-size table, the extra space should not be allocated to proportional space
             verifyLayoutResult(result, [0, 0], [0, 0], [50, 50], [50, 50], false, false, "..when there's extra space");
-        });
-        it.skip("iterateLayout works in the tricky case when components can be unsatisfied but request little space", function () {
-            table = new Plottable.Component.Table([[c1, c2]]);
-            fixComponentSize(c1, null, null);
-            c2._requestedSpace = function (w, h) {
-                return {
-                    width: w >= 200 ? 200 : 0,
-                    height: h >= 200 ? 200 : 0,
-                    wantsWidth: w < 200,
-                    wantsHeight: h < 200
-                };
-            };
-            var result = table._iterateLayout(200, 200);
-            verifyLayoutResult(result, [0, 0], [0], [0, 200], [200], false, false, "when there's sufficient space");
-            result = table._iterateLayout(150, 200);
-            verifyLayoutResult(result, [150, 0], [0], [0, 0], [200], true, false, "when there's insufficient space");
         });
     });
     describe("table._removeComponent works properly", function () {

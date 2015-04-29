@@ -68,8 +68,8 @@ export module Component {
       var desiredHeight = (this.orient() === "horizontal" ? desiredWH.height : desiredWH.width) + 2 * this.padding();
 
       return {
-        width : desiredWidth,
-        height: desiredHeight
+        minWidth : desiredWidth,
+        minHeight: desiredHeight
       };
     }
 

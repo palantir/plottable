@@ -169,12 +169,12 @@ describe("ComponentGroups", () => {
       var cg = new Plottable.Component.Group([tall, wide]);
 
       var request = cg._requestedSpace(SVG_WIDTH, SVG_HEIGHT);
-      assert.strictEqual(request.width, SVG_WIDTH / 2, "requested enough space for widest Component");
-      assert.strictEqual(request.height, SVG_HEIGHT / 2, "requested enough space for tallest Component");
+      assert.strictEqual(request.minWidth, SVG_WIDTH / 2, "requested enough space for widest Component");
+      assert.strictEqual(request.minHeight, SVG_HEIGHT / 2, "requested enough space for tallest Component");
 
       var constrainedRequest = cg._requestedSpace(SVG_WIDTH / 10, SVG_HEIGHT / 10);
-      assert.strictEqual(constrainedRequest.width, SVG_WIDTH / 2, "requested enough space for widest Component");
-      assert.strictEqual(constrainedRequest.height, SVG_HEIGHT / 2, "requested enough space for tallest Component");
+      assert.strictEqual(constrainedRequest.minWidth, SVG_WIDTH / 2, "requested enough space for widest Component");
+      assert.strictEqual(constrainedRequest.minHeight, SVG_HEIGHT / 2, "requested enough space for tallest Component");
 
       cg.renderTo(svg);
       assert.strictEqual(cg.width(), SVG_WIDTH, "occupies all offered width");

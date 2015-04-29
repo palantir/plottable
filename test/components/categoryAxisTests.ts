@@ -19,8 +19,8 @@ describe("Category Axes", () => {
     var ca = new Plottable.Axis.Category(scale);
     ca._anchor(svg);
     var s = ca._requestedSpace(400, 400);
-    assert.operator(s.width, ">=", 0, "it requested 0 or more width");
-    assert.operator(s.height, ">=", 0, "it requested 0 or more height");
+    assert.operator(s.minWidth, ">=", 0, "it requested 0 or more width");
+    assert.operator(s.minHeight, ">=", 0, "it requested 0 or more height");
     svg.remove();
   });
 
@@ -131,10 +131,10 @@ describe("Category Axes", () => {
     axis.renderTo(svg);
     var smallDimension = 10;
     var spaceRequest = axis._requestedSpace(300, smallDimension);
-    assert.operator(spaceRequest.height, ">", smallDimension, "horizontal axis requested more height if constrained");
+    assert.operator(spaceRequest.minHeight, ">", smallDimension, "horizontal axis requested more height if constrained");
     axis.orient("left");
     spaceRequest = axis._requestedSpace(smallDimension, 300);
-    assert.operator(spaceRequest.width, ">", smallDimension, "vertical axis requested more width if constrained");
+    assert.operator(spaceRequest.minWidth, ">", smallDimension, "vertical axis requested more width if constrained");
     svg.remove();
   });
 
@@ -170,11 +170,11 @@ describe("Category Axes", () => {
     axis.renderTo(svg);
 
     var requestedSpace = axis._requestedSpace(300, 50);
-    var flatHeight = requestedSpace.height;
+    var flatHeight = requestedSpace.minHeight;
 
     axis.tickLabelAngle(-90);
     requestedSpace = axis._requestedSpace(300, 50);
-    assert.isTrue(flatHeight < requestedSpace.height, "axis should request more height when tick labels are rotated");
+    assert.isTrue(flatHeight < requestedSpace.minHeight, "axis should request more height when tick labels are rotated");
 
     svg.remove();
   });

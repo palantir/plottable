@@ -94,10 +94,10 @@ export module Component {
       this._isSetup = true;
     }
 
-    public _requestedSpace(availableWidth : number, availableHeight: number): _SpaceRequest {
+    public _requestedSpace(availableWidth: number, availableHeight: number): _SpaceRequest {
       return {
-        width: 0,
-        height: 0
+        minWidth: 0,
+        minHeight: 0
       };
     }
 
@@ -149,8 +149,8 @@ export module Component {
     protected _getSize(availableWidth: number, availableHeight: number) {
       var requestedSpace = this._requestedSpace(availableWidth, availableHeight);
       return {
-        width: this._isFixedWidth()  ? Math.min(availableWidth , requestedSpace.width)  : availableWidth,
-        height: this._isFixedHeight() ? Math.min(availableHeight, requestedSpace.height) : availableHeight
+        width: this._isFixedWidth()  ? Math.min(availableWidth , requestedSpace.minWidth)  : availableWidth,
+        height: this._isFixedHeight() ? Math.min(availableHeight, requestedSpace.minHeight) : availableHeight
       };
     }
 
