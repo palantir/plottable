@@ -3,7 +3,7 @@
 module Plottable {
 export module Scales {
   export class Time extends QuantitativeScale<any> {
-    public _typeCoercer = (d: any) => d && d._isAMomentObject || d instanceof Date ? d : new Date(d);
+    public typeCoercer = (d: any) => d && d._isAMomentObject || d instanceof Date ? d : new Date(d);
 
     /**
      * Constructs a TimeScale.
@@ -30,7 +30,7 @@ export module Scales {
 
     protected setDomain(values: any[]) {
       // attempt to parse dates
-      values = values.map(this._typeCoercer);
+      values = values.map(this.typeCoercer);
       if (values[1] < values[0]) {
         throw new Error("Scale.Time domain values must be in chronological order");
       }
@@ -41,7 +41,7 @@ export module Scales {
       return new Time(this.d3Scale.copy());
     }
 
-    public _defaultExtent(): any[] {
+    public defaultExtent(): any[] {
       var endTime = new Date().valueOf();
       var startTime = endTime - Plottable.MILLISECONDS_IN_ONE_DAY;
       return [startTime, endTime];

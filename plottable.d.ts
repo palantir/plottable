@@ -1282,7 +1282,7 @@ declare module Plottable {
 declare module Plottable {
     module Scales {
         class Time extends QuantitativeScale<any> {
-            _typeCoercer: (d: any) => any;
+            typeCoercer: (d: any) => any;
             /**
              * Constructs a TimeScale.
              *

@@ -2427,7 +2427,7 @@ var Plottable;
             function Time(scale) {
                 // need to cast since d3 time scales do not descend from QuantitativeScale scales
                 _super.call(this, scale == null ? d3.time.scale() : scale);
-                this._typeCoercer = function (d) { return d && d._isAMomentObject || d instanceof Date ? d : new Date(d); };
+                this.typeCoercer = function (d) { return d && d._isAMomentObject || d instanceof Date ? d : new Date(d); };
             }
             Time.prototype.tickInterval = function (interval, step) {
                 // temporarily creats a time scale from our linear scale into a time scale so we can get access to its api
@@ -2438,7 +2438,7 @@ var Plottable;
             };
             Time.prototype.setDomain = function (values) {
                 // attempt to parse dates
-                values = values.map(this._typeCoercer);
+                values = values.map(this.typeCoercer);
                 if (values[1] < values[0]) {
                     throw new Error("Scale.Time domain values must be in chronological order");
                 }

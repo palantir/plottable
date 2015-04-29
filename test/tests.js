@@ -7821,7 +7821,7 @@ describe("TimeScale tests", function () {
         assert.throws(function () { return scale.domain(["1985-10-26", "1955-11-05"]); }, "chronological");
     });
     it("time coercer works as intended", function () {
-        var tc = new Plottable.Scales.Time()._typeCoercer;
+        var tc = new Plottable.Scales.Time().typeCoercer;
         assert.equal(tc(null).getMilliseconds(), 0, "null converted to Date(0)");
         // converting null to Date(0) is the correct behavior as it mirror's d3's semantics
         assert.equal(tc("Wed Dec 31 1969 16:00:00 GMT-0800 (PST)").getMilliseconds(), 0, "string parsed to date");
