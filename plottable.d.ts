@@ -2771,7 +2771,7 @@ declare module Plottable {
         protected _getDrawersInOrder(): Drawers.AbstractDrawer[];
         protected generateDrawSteps(): Drawers.DrawStep[];
         protected additionalPaint(time: number): void;
-        protected _getDataToDraw(): D3.Map<any[]>;
+        protected getDataToDraw(): D3.Map<any[]>;
         /**
          * Gets the new plot metadata for new dataset with provided key
          *
@@ -2972,10 +2972,10 @@ declare module Plottable {
 declare module Plottable {
     module Plots {
         class Bar<X, Y> extends XYPlot<X, Y> {
-            protected static _BarAlignmentToFactor: {
+            protected static BarAlignmentToFactor: {
                 [alignment: string]: number;
             };
-            protected static _DEFAULT_WIDTH: number;
+            protected static DEFAULT_WIDTH: number;
             protected _isVertical: boolean;
             /**
              * Constructs a BarPlot.
@@ -3175,7 +3175,7 @@ declare module Plottable {
             protected generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
             };
-            protected _getDataToDraw(): D3.Map<any[]>;
+            protected getDataToDraw(): D3.Map<any[]>;
             protected getPlotMetadataForDataset(key: string): ClusteredPlotMetadata;
         }
     }

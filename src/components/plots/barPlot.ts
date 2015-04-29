@@ -3,10 +3,10 @@
 module Plottable {
 export module Plots {
   export class Bar<X, Y> extends XYPlot<X, Y> {
-    protected static _BarAlignmentToFactor: {[alignment: string]: number} = {"left": 0, "center": 0.5, "right": 1};
-    protected static _DEFAULT_WIDTH = 10;
-    private static _BAR_WIDTH_RATIO = 0.95;
-    private static _SINGLE_BAR_DIMENSION_RATIO = 0.4;
+    protected static BarAlignmentToFactor: {[alignment: string]: number} = {"left": 0, "center": 0.5, "right": 1};
+    protected static DEFAULT_WIDTH = 10;
+    private static BAR_WIDTH_RATIO = 0.95;
+    private static SINGLE_BAR_DIMENSION_RATIO = 0.4;
     private _baseline: D3.Selection;
     private _baselineValue: number;
     private _barAlignmentFactor = 0.5;
@@ -14,7 +14,7 @@ export module Plots {
     private _barLabelFormatter: Formatter = Formatters.identity();
     private _barLabelsEnabled = false;
     private _hideBarsIfAnyAreTooWide = true;
-    private _defaultFillColor: string;
+    private defaultFillColor: string;
 
     /**
      * Constructs a BarPlot.
@@ -27,7 +27,7 @@ export module Plots {
     constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>, isVertical = true) {
       super(xScale, yScale);
       this.classed("bar-plot", true);
-      this._defaultFillColor = new Scales.Color().range()[0];
+      this.defaultFillColor = new Scales.Color().range()[0];
       this.animator("bars-reset", new Animators.Null());
       this.animator("bars", new Animators.Base());
       this.animator("baseline", new Animators.Null());
@@ -82,7 +82,7 @@ export module Plots {
      */
     public barAlignment(alignment: string) {
       var alignmentLC = alignment.toLowerCase();
-      var align2factor = (<typeof Bar> this.constructor)._BarAlignmentToFactor;
+      var align2factor = (<typeof Bar> this.constructor).BarAlignmentToFactor;
       if (align2factor[alignmentLC] === undefined) {
         throw new Error("unsupported bar alignment");
       }
@@ -252,13 +252,13 @@ export module Plots {
 
       // currently, linear scan the bars. If inversion is implemented on non-numeric scales we might be able to do better.
       var bars = this._datasetKeysInOrder.reduce((bars: any[], key: string) =>
-        bars.concat(this._getBarsFromDataset(key, xValOrExtent, yValOrExtent))
+        bars.concat(this.getBarsFromDataset(key, xValOrExtent, yValOrExtent))
       , []);
 
       return d3.selectAll(bars);
     }
 
-    private _getBarsFromDataset(key: string, xValOrExtent: number | Extent, yValOrExtent: number | Extent): any[] {
+    private getBarsFromDataset(key: string, xValOrExtent: number | Extent, yValOrExtent: number | Extent): any[] {
       var bars: any[] = [];
 
       var drawer = <Drawers.Element>this._key2PlotDatasetKey.get(key).drawer;
@@ -329,7 +329,7 @@ export module Plots {
     protected _drawLabels() {
       var drawers: Drawers.Rect[] = <any> this._getDrawersInOrder();
       var attrToProjector = this.generateAttrToProjector();
-      var dataToDraw = this._getDataToDraw();
+      var dataToDraw = this.getDataToDraw();
       this._datasetKeysInOrder.forEach((k, i) =>
         drawers[i].drawText(dataToDraw.get(k),
                             attrToProjector,
@@ -402,7 +402,7 @@ export module Plots {
           originalPositionFn(d, i, u, m) <= scaledBaseline;
       }
 
-      attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this._defaultFillColor);
+      attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this.defaultFillColor);
 
       return attrToProjector;
     }
@@ -436,7 +436,7 @@ export module Plots {
 
         barPixelWidth = Utils.Methods.min(barAccessorDataPairs, (pair: any[], i: number) => {
           return Math.abs(barScale.scale(pair[1]) - barScale.scale(pair[0]));
-        }, barWidthDimension * Bar._SINGLE_BAR_DIMENSION_RATIO);
+        }, barWidthDimension * Bar.SINGLE_BAR_DIMENSION_RATIO);
 
         var scaledData = numberBarAccessorData.map((datum: number) => barScale.scale(datum));
         var minScaledDatum = Utils.Methods.min(scaledData, 0);
@@ -449,7 +449,7 @@ export module Plots {
           barPixelWidth = Math.min(barPixelWidth, margin / (1 - this._barAlignmentFactor));
         }
 
-        barPixelWidth *= Bar._BAR_WIDTH_RATIO;
+        barPixelWidth *= Bar.BAR_WIDTH_RATIO;
       }
       return barPixelWidth;
     }

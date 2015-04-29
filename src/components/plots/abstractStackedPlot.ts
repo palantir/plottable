@@ -15,7 +15,7 @@ module Plottable {
   }
 
   export class Stacked<X, Y> extends XYPlot<X, Y> {
-    private _stackedExtent = [0, 0];
+    private stackedExtent = [0, 0];
     protected _isVertical: boolean;
 
     public getPlotMetadataForDataset(key: string): Plots.StackedPlotMetadata {
@@ -81,7 +81,7 @@ module Plottable {
         }, 0);
       }, 0);
 
-      this._stackedExtent = [Math.min(minStackExtent, 0), Math.max(0, maxStackExtent)];
+      this.stackedExtent = [Math.min(minStackExtent, 0), Math.max(0, maxStackExtent)];
     }
 
     /**
@@ -179,8 +179,8 @@ module Plottable {
       if (!primaryScale) {
         return;
       }
-      if (this.isAnchored && this._stackedExtent.length > 0) {
-        primaryScale.updateExtent(this.getID().toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT", this._stackedExtent);
+      if (this.isAnchored && this.stackedExtent.length > 0) {
+        primaryScale.updateExtent(this.getID().toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT", this.stackedExtent);
       } else {
         primaryScale.removeExtent(this.getID().toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT");
       }

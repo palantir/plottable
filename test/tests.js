@@ -4612,7 +4612,7 @@ describe("Plots", function () {
             assert.strictEqual(ds4PlotMetadata.offsets.get("1"), 3, "stacking on data2 numerical y value");
             assert.strictEqual(ds5PlotMetadata.offsets.get("1"), 8, "stacking on data1 + data3 numerical y values");
             assert.strictEqual(ds6PlotMetadata.offsets.get("1"), -3, "stacking on data2 + data4 numerical y values");
-            assert.deepEqual(stackedPlot._stackedExtent, [-4, 9], "stacked extent is as normal");
+            assert.deepEqual(stackedPlot.stackedExtent, [-4, 9], "stacked extent is as normal");
         });
         it("stacks correctly on empty data", function () {
             var data1 = [
@@ -5304,7 +5304,7 @@ describe("Plots", function () {
             svg.remove();
         });
         it("stacked extent is set correctly", function () {
-            assert.deepEqual(plot._stackedExtent, [-8, 8], "stacked extent is updated accordingly");
+            assert.deepEqual(plot.stackedExtent, [-8, 8], "stacked extent is updated accordingly");
             svg.remove();
         });
     });
@@ -5602,7 +5602,7 @@ describe("Plots", function () {
             assert.closeTo(numAttr(bar2, "height"), (400 - axisHeight), 0.01, "height is correct for bar2");
             assert.closeTo(numAttr(bar3, "height"), (400 - axisHeight) / 2, 0.01, "height is correct for bar3");
             // check that clustering is correct
-            var innerScale = renderer._makeInnerScale();
+            var innerScale = renderer.makeInnerScale();
             var off = innerScale.scale("_0");
             assert.closeTo(numAttr(bar0, "x") + numAttr(bar0, "width") / 2, xScale.scale(bar0X) - xScale.rangeBand() / 2 + off, 0.01, "x pos correct for bar0");
             assert.closeTo(numAttr(bar1, "x") + numAttr(bar1, "width") / 2, xScale.scale(bar1X) - xScale.rangeBand() / 2 + off, 0.01, "x pos correct for bar1");
@@ -5670,7 +5670,7 @@ describe("Plots", function () {
             var bar2Y = bar2.data()[0].y;
             var bar3Y = bar3.data()[0].y;
             // check that clustering is correct
-            var innerScale = renderer._makeInnerScale();
+            var innerScale = renderer.makeInnerScale();
             var off = innerScale.scale("_0");
             assert.closeTo(numAttr(bar0, "y") + numAttr(bar0, "height") / 2, yScale.scale(bar0Y) - yScale.rangeBand() / 2 + off, 0.01, "y pos correct for bar0");
             assert.closeTo(numAttr(bar1, "y") + numAttr(bar1, "height") / 2, yScale.scale(bar1Y) - yScale.rangeBand() / 2 + off, 0.01, "y pos correct for bar1");

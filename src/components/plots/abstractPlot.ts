@@ -409,7 +409,7 @@ module Plottable {
       // no-op
     }
 
-    protected _getDataToDraw() {
+    protected getDataToDraw() {
       var datasets: D3.Map<any[]> = d3.map();
       this._datasetKeysInOrder.forEach((key: string) => {
         datasets.set(key, this._key2PlotDatasetKey.get(key).dataset.data());
@@ -430,7 +430,7 @@ module Plottable {
 
     private _paint() {
       var drawSteps = this.generateDrawSteps();
-      var dataToDraw = this._getDataToDraw();
+      var dataToDraw = this.getDataToDraw();
       var drawers = this._getDrawersInOrder();
 
       // TODO: Use metadata instead of dataToDraw #1297.
