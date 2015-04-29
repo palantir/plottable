@@ -2575,7 +2575,7 @@ declare module Plottable {
 declare module Plottable {
     module Components {
         class SelectionBoxLayer extends Component {
-            protected _box: D3.Selection;
+            protected box: D3.Selection;
             constructor();
             protected setup(): void;
             protected getSize(availableWidth: number, availableHeight: number): {

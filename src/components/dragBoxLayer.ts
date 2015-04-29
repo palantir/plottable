@@ -118,7 +118,7 @@ export module Components {
     protected setup() {
       super.setup();
 
-      var createLine = () => this._box.append("line").style({
+      var createLine = () => this.box.append("line").style({
                                "opacity": 0,
                                "stroke": "pink"
                              });
@@ -128,7 +128,7 @@ export module Components {
       this.detectionEdgeR = createLine().classed("drag-edge-lr", true);
 
       if (this.hasCorners) {
-        var createCorner = () => this._box.append("circle")
+        var createCorner = () => this.box.append("circle")
                                      .style({
                                        "opacity": 0,
                                        "fill": "pink"

@@ -6385,7 +6385,7 @@ var Plottable;
             function SelectionBoxLayer() {
                 _super.call(this);
                 this._boxVisible = false;
-                this._boxBounds = {
+                this.boxBounds = {
                     topLeft: { x: 0, y: 0 },
                     bottomRight: { x: 0, y: 0 }
                 };
@@ -6395,8 +6395,8 @@ var Plottable;
             }
             SelectionBoxLayer.prototype.setup = function () {
                 _super.prototype.setup.call(this);
-                this._box = this._content.append("g").classed("selection-box", true).remove();
-                this._boxArea = this._box.append("rect").classed("selection-area", true);
+                this.box = this._content.append("g").classed("selection-box", true).remove();
+                this.boxArea = this.box.append("rect").classed("selection-area", true);
             };
             SelectionBoxLayer.prototype.getSize = function (availableWidth, availableHeight) {
                 return {
@@ -6406,7 +6406,7 @@ var Plottable;
             };
             SelectionBoxLayer.prototype.bounds = function (newBounds) {
                 if (newBounds == null) {
-                    return this._boxBounds;
+                    return this.boxBounds;
                 }
                 this.setBounds(newBounds);
                 this.render();
@@ -6421,27 +6421,27 @@ var Plottable;
                     x: Math.max(newBounds.topLeft.x, newBounds.bottomRight.x),
                     y: Math.max(newBounds.topLeft.y, newBounds.bottomRight.y)
                 };
-                this._boxBounds = {
+                this.boxBounds = {
                     topLeft: topLeft,
                     bottomRight: bottomRight
                 };
             };
             SelectionBoxLayer.prototype.doRender = function () {
                 if (this._boxVisible) {
-                    var t = this._boxBounds.topLeft.y;
-                    var b = this._boxBounds.bottomRight.y;
-                    var l = this._boxBounds.topLeft.x;
-                    var r = this._boxBounds.bottomRight.x;
-                    this._boxArea.attr({
+                    var t = this.boxBounds.topLeft.y;
+                    var b = this.boxBounds.bottomRight.y;
+                    var l = this.boxBounds.topLeft.x;
+                    var r = this.boxBounds.bottomRight.x;
+                    this.boxArea.attr({
                         x: l,
                         y: t,
                         width: r - l,
                         height: b - t
                     });
-                    this._content.node().appendChild(this._box.node());
+                    this._content.node().appendChild(this.box.node());
                 }
                 else {
-                    this._box.remove();
+                    this.box.remove();
                 }
             };
             SelectionBoxLayer.prototype.boxVisible = function (show) {
@@ -9855,7 +9855,7 @@ var Plottable;
             DragBoxLayer.prototype.setup = function () {
                 var _this = this;
                 _super.prototype.setup.call(this);
-                var createLine = function () { return _this._box.append("line").style({
+                var createLine = function () { return _this.box.append("line").style({
                     "opacity": 0,
                     "stroke": "pink"
                 }); };
@@ -9864,7 +9864,7 @@ var Plottable;
                 this.detectionEdgeL = createLine().classed("drag-edge-lr", true);
                 this.detectionEdgeR = createLine().classed("drag-edge-lr", true);
                 if (this.hasCorners) {
-                    var createCorner = function () { return _this._box.append("circle").style({
+                    var createCorner = function () { return _this.box.append("circle").style({
                         "opacity": 0,
                         "fill": "pink"
                     }); };
