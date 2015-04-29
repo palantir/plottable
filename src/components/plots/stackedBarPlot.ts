@@ -108,11 +108,11 @@ export module Plots {
       Stacked.prototype._updateScaleExtents.call(this);
     }
 
-    public _keyAccessor(): _Accessor {
+    public _keyAccessor(): Accessor {
       return Stacked.prototype._keyAccessor.call(this);
     }
 
-    public _valueAccessor(): _Accessor {
+    public _valueAccessor(): Accessor {
       return Stacked.prototype._valueAccessor.call(this);
     }
     //===== /Stack logic =====

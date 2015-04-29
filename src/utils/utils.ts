@@ -84,9 +84,9 @@ export module Utils {
      * Take an accessor object (may be a string to be made into a key, or a value, or a color code)
      * and "activate" it by turning it into a function in (datum, index, metadata)
      */
-    export function accessorize(accessor: any): _Accessor {
+    export function accessorize(accessor: any): Accessor {
       if (typeof(accessor) === "function") {
-        return (<_Accessor> accessor);
+        return (<Accessor> accessor);
       } else if (typeof(accessor) === "string" && accessor[0] !== "#") {
         return (d: any, i: number, s: any) => d[accessor];
       } else {

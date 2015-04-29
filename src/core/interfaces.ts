@@ -2,12 +2,12 @@ module Plottable {
   /**
    * Access specific datum property.
    */
-  export type _Accessor = (datum: any, index?: number, userMetadata?: any, plotMetadata?: Plots.PlotMetadata) => any;
+  export type Accessor = (datum: any, index?: number, userMetadata?: any, plotMetadata?: Plots.PlotMetadata) => any;
 
   /**
    * Retrieves scaled datum property.
    */
-  export type _Projector = (datum: any, index: number, userMetadata: any, plotMetadata: Plots.PlotMetadata) => any;
+  export type Projector = (datum: any, index: number, userMetadata: any, plotMetadata: Plots.PlotMetadata) => any;
 
   /**
    * Projector with applied user and plot metadata
@@ -18,7 +18,7 @@ module Plottable {
    * Defines a way how specific attribute needs be retrieved before rendering.
    */
   export type _Projection = {
-    accessor: _Accessor;
+    accessor: Accessor;
     scale?: Scale<any, any>;
     attribute: string;
   }
@@ -31,7 +31,7 @@ module Plottable {
    * with both `foo` and `bar`, an entry in this type might be `{"r":
    * function(d) { return foo + bar; }`.
    */
-  export type AttributeToProjector = { [attrToSet: string]: _Projector; };
+  export type AttributeToProjector = { [attrToSet: string]: Projector; };
 
   export type AttributeToAppliedProjector = { [attrToSet: string]: AppliedProjector; };
 

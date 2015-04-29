@@ -47,7 +47,7 @@ declare module Plottable {
              * Take an accessor object (may be a string to be made into a key, or a value, or a color code)
              * and "activate" it by turning it into a function in (datum, index, metadata)
              */
-            function accessorize(accessor: any): _Accessor;
+            function accessorize(accessor: any): Accessor;
             /**
              * Takes two sets and returns the union
              *
@@ -573,7 +573,7 @@ declare module Plottable {
          * @returns {Dataset} The calling Dataset.
          */
         metadata(metadata: any): Dataset;
-        _getExtent(accessor: _Accessor, typeCoercer: (d: any) => any, plotMetadata?: any): any[];
+        getExtent(accessor: Accessor, typeCoercer: (d: any) => any, plotMetadata?: any): any[];
     }
 }
 
@@ -669,11 +669,11 @@ declare module Plottable {
     /**
      * Access specific datum property.
      */
-    type _Accessor = (datum: any, index?: number, userMetadata?: any, plotMetadata?: Plots.PlotMetadata) => any;
+    type Accessor = (datum: any, index?: number, userMetadata?: any, plotMetadata?: Plots.PlotMetadata) => any;
     /**
      * Retrieves scaled datum property.
      */
-    type _Projector = (datum: any, index: number, userMetadata: any, plotMetadata: Plots.PlotMetadata) => any;
+    type Projector = (datum: any, index: number, userMetadata: any, plotMetadata: Plots.PlotMetadata) => any;
     /**
      * Projector with applied user and plot metadata
      */
@@ -682,7 +682,7 @@ declare module Plottable {
      * Defines a way how specific attribute needs be retrieved before rendering.
      */
     type _Projection = {
-        accessor: _Accessor;
+        accessor: Accessor;
         scale?: Scale<any, any>;
         attribute: string;
     };
@@ -695,7 +695,7 @@ declare module Plottable {
      * function(d) { return foo + bar; }`.
      */
     type AttributeToProjector = {
-        [attrToSet: string]: _Projector;
+        [attrToSet: string]: Projector;
     };
     type AttributeToAppliedProjector = {
         [attrToSet: string]: AppliedProjector;
@@ -3100,7 +3100,7 @@ declare module Plottable {
              * @param {QuantitativeScaleScale} yScale The y scale to use.
              */
             constructor(xScale: QuantitativeScale<X>, yScale: QuantitativeScale<number>);
-            protected _rejectNullsAndNaNs(d: any, i: number, userMetdata: any, plotMetadata: any, accessor: _Accessor): boolean;
+            protected _rejectNullsAndNaNs(d: any, i: number, userMetdata: any, plotMetadata: any, accessor: Accessor): boolean;
             protected _getDrawer(key: string): Drawers.Line;
             protected _getResetYFunction(): (d: any, i: number, u: any, m: PlotMetadata) => number;
             protected _generateDrawSteps(): Drawers.DrawStep[];
@@ -3217,8 +3217,8 @@ declare module Plottable {
             a: A;
             b: B;
         }[];
-        _keyAccessor(): _Accessor;
-        _valueAccessor(): _Accessor;
+        _keyAccessor(): Accessor;
+        _valueAccessor(): Accessor;
     }
 }
 
@@ -3252,8 +3252,8 @@ declare module Plottable {
             _getDomainKeys(): any;
             _generateDefaultMapArray(): D3.Map<StackedDatum>[];
             _updateScaleExtents(): void;
-            _keyAccessor(): _Accessor;
-            _valueAccessor(): _Accessor;
+            _keyAccessor(): Accessor;
+            _valueAccessor(): Accessor;
             _getPlotMetadataForDataset(key: string): StackedPlotMetadata;
             protected _normalizeDatasets<A, B>(fromX: boolean): {
                 a: A;
@@ -3296,8 +3296,8 @@ declare module Plottable {
             _getDomainKeys(): any;
             _generateDefaultMapArray(): D3.Map<StackedDatum>[];
             _updateScaleExtents(): void;
-            _keyAccessor(): _Accessor;
-            _valueAccessor(): _Accessor;
+            _keyAccessor(): Accessor;
+            _valueAccessor(): Accessor;
         }
     }
 }

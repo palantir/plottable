@@ -1224,7 +1224,7 @@ var Plottable;
             _super.call(this);
             this._data = data;
             this._metadata = metadata;
-            this._accessor2cachedExtent = new Plottable.Utils.StrictEqualityAssociativeArray();
+            this.accessor2cachedExtent = new Plottable.Utils.StrictEqualityAssociativeArray();
             this.broadcaster = new Plottable.Core.Broadcaster(this);
         }
         Dataset.prototype.data = function (data) {
@@ -1233,7 +1233,7 @@ var Plottable;
             }
             else {
                 this._data = data;
-                this._accessor2cachedExtent = new Plottable.Utils.StrictEqualityAssociativeArray();
+                this.accessor2cachedExtent = new Plottable.Utils.StrictEqualityAssociativeArray();
                 this.broadcaster.broadcast();
                 return this;
             }
@@ -1244,21 +1244,21 @@ var Plottable;
             }
             else {
                 this._metadata = metadata;
-                this._accessor2cachedExtent = new Plottable.Utils.StrictEqualityAssociativeArray();
+                this.accessor2cachedExtent = new Plottable.Utils.StrictEqualityAssociativeArray();
                 this.broadcaster.broadcast();
                 return this;
             }
         };
-        Dataset.prototype._getExtent = function (accessor, typeCoercer, plotMetadata) {
+        Dataset.prototype.getExtent = function (accessor, typeCoercer, plotMetadata) {
             if (plotMetadata === void 0) { plotMetadata = {}; }
-            var cachedExtent = this._accessor2cachedExtent.get(accessor);
+            var cachedExtent = this.accessor2cachedExtent.get(accessor);
             if (cachedExtent === undefined) {
-                cachedExtent = this._computeExtent(accessor, typeCoercer, plotMetadata);
-                this._accessor2cachedExtent.set(accessor, cachedExtent);
+                cachedExtent = this.computeExtent(accessor, typeCoercer, plotMetadata);
+                this.accessor2cachedExtent.set(accessor, cachedExtent);
             }
             return cachedExtent;
         };
-        Dataset.prototype._computeExtent = function (accessor, typeCoercer, plotMetadata) {
+        Dataset.prototype.computeExtent = function (accessor, typeCoercer, plotMetadata) {
             var _this = this;
             var appliedAccessor = function (d, i) { return accessor(d, i, _this._metadata, plotMetadata); };
             var mappedData = this._data.map(appliedAccessor).map(typeCoercer);
@@ -6688,7 +6688,7 @@ var Plottable;
                     var plotDatasetKey = _this._key2PlotDatasetKey.get(key);
                     var dataset = plotDatasetKey.dataset;
                     var plotMetadata = plotDatasetKey.plotMetadata;
-                    var extent = dataset._getExtent(projector.accessor, projector.scale._typeCoercer, plotMetadata);
+                    var extent = dataset.getExtent(projector.accessor, projector.scale._typeCoercer, plotMetadata);
                     var scaleKey = _this.getID().toString() + "_" + key;
                     if (extent.length === 0 || !_this._isAnchored) {
                         projector.scale._removeExtent(scaleKey, attr);
@@ -8043,7 +8043,7 @@ var Plottable;
                 var y0Projector = this._projections["y0"];
                 var y0Accessor = y0Projector && y0Projector.accessor;
                 if (y0Accessor != null) {
-                    var extents = this.datasets().map(function (d) { return d._getExtent(y0Accessor, _this._yScale._typeCoercer); });
+                    var extents = this.datasets().map(function (d) { return d.getExtent(y0Accessor, _this._yScale._typeCoercer); });
                     var extent = Plottable.Utils.Methods.flatten(extents);
                     var uniqExtentVals = Plottable.Utils.Methods.uniq(extent);
                     if (uniqExtentVals.length === 1) {
