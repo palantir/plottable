@@ -2595,7 +2595,7 @@ declare module Plottable {
              * @return {SelectionBoxLayer} The calling SelectionBoxLayer.
              */
             bounds(newBounds: Bounds): SelectionBoxLayer;
-            protected _setBounds(newBounds: Bounds): void;
+            protected setBounds(newBounds: Bounds): void;
             doRender(): void;
             /**
              * Gets whether the box is being shown.
@@ -4027,7 +4027,7 @@ declare module Plottable {
         class XDragBoxLayer extends DragBoxLayer {
             constructor();
             computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;
-            protected _setBounds(newBounds: Bounds): void;
+            protected setBounds(newBounds: Bounds): void;
             protected setResizableClasses(canResize: boolean): void;
         }
     }
@@ -4039,7 +4039,7 @@ declare module Plottable {
         class YDragBoxLayer extends DragBoxLayer {
             constructor();
             computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;
-            protected _setBounds(newBounds: Bounds): void;
+            protected setBounds(newBounds: Bounds): void;
             protected setResizableClasses(canResize: boolean): void;
         }
     }

@@ -50,12 +50,12 @@ export module Components {
         return this._boxBounds;
       }
 
-      this._setBounds(newBounds);
+      this.setBounds(newBounds);
       this.render();
       return this;
     }
 
-    protected _setBounds(newBounds: Bounds) {
+    protected setBounds(newBounds: Bounds) {
       var topLeft: Point = {
         x: Math.min(newBounds.topLeft.x, newBounds.bottomRight.x),
         y: Math.min(newBounds.topLeft.y, newBounds.bottomRight.y)

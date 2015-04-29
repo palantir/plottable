@@ -6408,11 +6408,11 @@ var Plottable;
                 if (newBounds == null) {
                     return this._boxBounds;
                 }
-                this._setBounds(newBounds);
+                this.setBounds(newBounds);
                 this.render();
                 return this;
             };
-            SelectionBoxLayer.prototype._setBounds = function (newBounds) {
+            SelectionBoxLayer.prototype.setBounds = function (newBounds) {
                 var topLeft = {
                     x: Math.min(newBounds.topLeft.x, newBounds.bottomRight.x),
                     y: Math.min(newBounds.topLeft.y, newBounds.bottomRight.y)
@@ -10023,8 +10023,8 @@ var Plottable;
                 _super.prototype.computeLayout.call(this, offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
                 this.bounds(this.bounds()); // set correct bounds when width/height changes
             };
-            XDragBoxLayer.prototype._setBounds = function (newBounds) {
-                _super.prototype._setBounds.call(this, {
+            XDragBoxLayer.prototype.setBounds = function (newBounds) {
+                _super.prototype.setBounds.call(this, {
                     topLeft: { x: newBounds.topLeft.x, y: 0 },
                     bottomRight: { x: newBounds.bottomRight.x, y: this.height() }
                 });
@@ -10060,8 +10060,8 @@ var Plottable;
                 _super.prototype.computeLayout.call(this, offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
                 this.bounds(this.bounds()); // set correct bounds when width/height changes
             };
-            YDragBoxLayer.prototype._setBounds = function (newBounds) {
-                _super.prototype._setBounds.call(this, {
+            YDragBoxLayer.prototype.setBounds = function (newBounds) {
+                _super.prototype.setBounds.call(this, {
                     topLeft: { x: 0, y: newBounds.topLeft.y },
                     bottomRight: { x: this.width(), y: newBounds.bottomRight.y }
                 });
