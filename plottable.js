@@ -5487,7 +5487,7 @@ var Plottable;
             function Legend(colorScale) {
                 var _this = this;
                 _super.call(this);
-                this._padding = 5;
+                this.padding = 5;
                 this.classed("legend", true);
                 this.maxEntriesPerRow(1);
                 if (colorScale == null) {
@@ -5498,7 +5498,7 @@ var Plottable;
                 this.xAlign("right").yAlign("top");
                 this.fixedWidthFlag = true;
                 this.fixedHeightFlag = true;
-                this._sortFn = function (a, b) { return _this._scale.domain().indexOf(a) - _this._scale.domain().indexOf(b); };
+                this.sortFn = function (a, b) { return _this._scale.domain().indexOf(a) - _this._scale.domain().indexOf(b); };
                 this._symbolFactoryAccessor = function () { return Plottable.SymbolFactories.circle(); };
             }
             Legend.prototype.setup = function () {
@@ -5506,9 +5506,9 @@ var Plottable;
                 var fakeLegendRow = this._content.append("g").classed(Legend.LEGEND_ROW_CLASS, true);
                 var fakeLegendEntry = fakeLegendRow.append("g").classed(Legend.LEGEND_ENTRY_CLASS, true);
                 fakeLegendEntry.append("text");
-                this._measurer = new SVGTypewriter.Measurers.Measurer(fakeLegendRow);
-                this._wrapper = new SVGTypewriter.Wrappers.Wrapper().maxLines(1);
-                this._writer = new SVGTypewriter.Writers.Writer(this._measurer, this._wrapper).addTitleElement(true);
+                this.measurer = new SVGTypewriter.Measurers.Measurer(fakeLegendRow);
+                this.wrapper = new SVGTypewriter.Wrappers.Wrapper().maxLines(1);
+                this.writer = new SVGTypewriter.Writers.Writer(this.measurer, this.wrapper).addTitleElement(true);
             };
             Legend.prototype.maxEntriesPerRow = function (numEntries) {
                 if (numEntries == null) {
@@ -5522,10 +5522,10 @@ var Plottable;
             };
             Legend.prototype.sortFunction = function (newFn) {
                 if (newFn == null) {
-                    return this._sortFn;
+                    return this.sortFn;
                 }
                 else {
-                    this._sortFn = newFn;
+                    this.sortFn = newFn;
                     this.invalidateLayout();
                     return this;
                 }
@@ -5547,19 +5547,19 @@ var Plottable;
                 _super.prototype.remove.call(this);
                 this._scale.broadcaster.deregisterListener(this);
             };
-            Legend.prototype._calculateLayoutInfo = function (availableWidth, availableHeight) {
+            Legend.prototype.calculateLayoutInfo = function (availableWidth, availableHeight) {
                 var _this = this;
-                var textHeight = this._measurer.measure().height;
-                var availableWidthForEntries = Math.max(0, (availableWidth - this._padding));
+                var textHeight = this.measurer.measure().height;
+                var availableWidthForEntries = Math.max(0, (availableWidth - this.padding));
                 var measureEntry = function (entryText) {
-                    var originalEntryLength = (textHeight + _this._measurer.measure(entryText).width + _this._padding);
+                    var originalEntryLength = (textHeight + _this.measurer.measure(entryText).width + _this.padding);
                     return Math.min(originalEntryLength, availableWidthForEntries);
                 };
                 var entries = this._scale.domain().slice();
                 entries.sort(this.sortFunction());
                 var entryLengths = Plottable.Utils.Methods.populateMap(entries, measureEntry);
-                var rows = this._packRows(availableWidthForEntries, entries, entryLengths);
-                var rowsAvailable = Math.floor((availableHeight - 2 * this._padding) / textHeight);
+                var rows = this.packRows(availableWidthForEntries, entries, entryLengths);
+                var rowsAvailable = Math.floor((availableHeight - 2 * this.padding) / textHeight);
                 if (rowsAvailable !== rowsAvailable) {
                     rowsAvailable = 0;
                 }
@@ -5572,26 +5572,26 @@ var Plottable;
             };
             Legend.prototype.requestedSpace = function (offeredWidth, offeredHeight) {
                 var _this = this;
-                var estimatedLayout = this._calculateLayoutInfo(offeredWidth, offeredHeight);
+                var estimatedLayout = this.calculateLayoutInfo(offeredWidth, offeredHeight);
                 var rowLengths = estimatedLayout.rows.map(function (row) {
                     return d3.sum(row, function (entry) { return estimatedLayout.entryLengths.get(entry); });
                 });
                 var longestRowLength = Plottable.Utils.Methods.max(rowLengths, 0);
-                var longestUntruncatedEntryLength = Plottable.Utils.Methods.max(this._scale.domain(), function (d) { return _this._measurer.measure(d).width; }, 0);
-                longestUntruncatedEntryLength += estimatedLayout.textHeight + this._padding;
-                var desiredWidth = this._padding + Math.max(longestRowLength, longestUntruncatedEntryLength);
-                var acceptableHeight = estimatedLayout.numRowsToDraw * estimatedLayout.textHeight + 2 * this._padding;
-                var desiredHeight = estimatedLayout.rows.length * estimatedLayout.textHeight + 2 * this._padding;
+                var longestUntruncatedEntryLength = Plottable.Utils.Methods.max(this._scale.domain(), function (d) { return _this.measurer.measure(d).width; }, 0);
+                longestUntruncatedEntryLength += estimatedLayout.textHeight + this.padding;
+                var desiredWidth = this.padding + Math.max(longestRowLength, longestUntruncatedEntryLength);
+                var acceptableHeight = estimatedLayout.numRowsToDraw * estimatedLayout.textHeight + 2 * this.padding;
+                var desiredHeight = estimatedLayout.rows.length * estimatedLayout.textHeight + 2 * this.padding;
                 var desiredNumRows = Math.max(Math.ceil(this._scale.domain().length / this._maxEntriesPerRow), 1);
                 var wantsFitMoreEntriesInRow = estimatedLayout.rows.length > desiredNumRows;
                 return {
-                    width: this._padding + longestRowLength,
+                    width: this.padding + longestRowLength,
                     height: acceptableHeight,
                     wantsWidth: offeredWidth < desiredWidth || wantsFitMoreEntriesInRow,
                     wantsHeight: offeredHeight < desiredHeight
                 };
             };
-            Legend.prototype._packRows = function (availableWidth, entries, entryLengths) {
+            Legend.prototype.packRows = function (availableWidth, entries, entryLengths) {
                 var _this = this;
                 var rows = [];
                 var currentRow = [];
@@ -5622,8 +5622,8 @@ var Plottable;
                     return d3.select();
                 }
                 var entry = d3.select();
-                var layout = this._calculateLayoutInfo(this.width(), this.height());
-                var legendPadding = this._padding;
+                var layout = this.calculateLayoutInfo(this.width(), this.height());
+                var legendPadding = this.padding;
                 this._content.selectAll("g." + Legend.LEGEND_ROW_CLASS).each(function (d, i) {
                     var lowY = i * layout.textHeight + legendPadding;
                     var highY = (i + 1) * layout.textHeight + legendPadding;
@@ -5642,18 +5642,18 @@ var Plottable;
             Legend.prototype.doRender = function () {
                 var _this = this;
                 _super.prototype.doRender.call(this);
-                var layout = this._calculateLayoutInfo(this.width(), this.height());
+                var layout = this.calculateLayoutInfo(this.width(), this.height());
                 var rowsToDraw = layout.rows.slice(0, layout.numRowsToDraw);
                 var rows = this._content.selectAll("g." + Legend.LEGEND_ROW_CLASS).data(rowsToDraw);
                 rows.enter().append("g").classed(Legend.LEGEND_ROW_CLASS, true);
                 rows.exit().remove();
-                rows.attr("transform", function (d, i) { return "translate(0, " + (i * layout.textHeight + _this._padding) + ")"; });
+                rows.attr("transform", function (d, i) { return "translate(0, " + (i * layout.textHeight + _this.padding) + ")"; });
                 var entries = rows.selectAll("g." + Legend.LEGEND_ENTRY_CLASS).data(function (d) { return d; });
                 var entriesEnter = entries.enter().append("g").classed(Legend.LEGEND_ENTRY_CLASS, true);
                 entriesEnter.append("path");
                 entriesEnter.append("g").classed("text-container", true);
                 entries.exit().remove();
-                var legendPadding = this._padding;
+                var legendPadding = this.padding;
                 rows.each(function (values) {
                     var xShift = legendPadding;
                     var entriesInRow = d3.select(this).selectAll("g." + Legend.LEGEND_ENTRY_CLASS);
@@ -5664,7 +5664,7 @@ var Plottable;
                     });
                 });
                 entries.select("path").attr("d", function (d, i) { return _this.symbolFactoryAccessor()(d, i)(layout.textHeight * 0.6); }).attr("transform", "translate(" + (layout.textHeight / 2) + "," + layout.textHeight / 2 + ")").attr("fill", function (value) { return _this._scale.scale(value); }).classed(Legend.LEGEND_SYMBOL_CLASS, true);
-                var padding = this._padding;
+                var padding = this.padding;
                 var textContainers = entries.select("g.text-container");
                 textContainers.text(""); // clear out previous results
                 textContainers.append("title").text(function (value) { return value; });
@@ -5678,7 +5678,7 @@ var Plottable;
                         yAlign: "top",
                         textRotation: 0
                     };
-                    self._writer.write(value, maxTextLength, self.height(), writeOptions);
+                    self.writer.write(value, maxTextLength, self.height(), writeOptions);
                 });
             };
             Legend.prototype.symbolFactoryAccessor = function (symbolFactoryAccessor) {

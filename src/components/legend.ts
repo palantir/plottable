@@ -16,13 +16,13 @@ export module Components {
      */
     public static LEGEND_SYMBOL_CLASS = "legend-symbol";
 
-    private _padding = 5;
+    private padding = 5;
     private _scale: Scales.Color;
     private _maxEntriesPerRow: number;
-    private _sortFn: (a: string, b: string) => number;
-    private _measurer: SVGTypewriter.Measurers.Measurer;
-    private _wrapper: SVGTypewriter.Wrappers.Wrapper;
-    private _writer: SVGTypewriter.Writers.Writer;
+    private sortFn: (a: string, b: string) => number;
+    private measurer: SVGTypewriter.Measurers.Measurer;
+    private wrapper: SVGTypewriter.Wrappers.Wrapper;
+    private writer: SVGTypewriter.Writers.Writer;
     private _symbolFactoryAccessor: (datum: any, index: number) => SymbolFactory;
 
     /**
@@ -49,7 +49,7 @@ export module Components {
       this.xAlign("right").yAlign("top");
       this.fixedWidthFlag = true;
       this.fixedHeightFlag = true;
-      this._sortFn = (a: string, b: string) => this._scale.domain().indexOf(a) - this._scale.domain().indexOf(b);
+      this.sortFn = (a: string, b: string) => this._scale.domain().indexOf(a) - this._scale.domain().indexOf(b);
       this._symbolFactoryAccessor = () => SymbolFactories.circle();
     }
 
@@ -58,9 +58,9 @@ export module Components {
       var fakeLegendRow = this._content.append("g").classed(Legend.LEGEND_ROW_CLASS, true);
       var fakeLegendEntry = fakeLegendRow.append("g").classed(Legend.LEGEND_ENTRY_CLASS, true);
       fakeLegendEntry.append("text");
-      this._measurer = new SVGTypewriter.Measurers.Measurer(fakeLegendRow);
-      this._wrapper = new SVGTypewriter.Wrappers.Wrapper().maxLines(1);
-      this._writer = new SVGTypewriter.Writers.Writer(this._measurer, this._wrapper).addTitleElement(true);
+      this.measurer = new SVGTypewriter.Measurers.Measurer(fakeLegendRow);
+      this.wrapper = new SVGTypewriter.Wrappers.Wrapper().maxLines(1);
+      this.writer = new SVGTypewriter.Writers.Writer(this.measurer, this.wrapper).addTitleElement(true);
     }
 
     /**
@@ -99,9 +99,9 @@ export module Components {
     public sortFunction(newFn: (a: string, b: string) => number): Legend;
     public sortFunction(newFn?: (a: string, b: string) => number): any {
       if (newFn == null) {
-        return this._sortFn;
+        return this.sortFn;
       } else {
-        this._sortFn = newFn;
+        this.sortFn = newFn;
         this.invalidateLayout();
         return this;
       }
@@ -137,12 +137,12 @@ export module Components {
       this._scale.broadcaster.deregisterListener(this);
     }
 
-    private _calculateLayoutInfo(availableWidth: number, availableHeight: number) {
-      var textHeight = this._measurer.measure().height;
+    private calculateLayoutInfo(availableWidth: number, availableHeight: number) {
+      var textHeight = this.measurer.measure().height;
 
-      var availableWidthForEntries = Math.max(0, (availableWidth - this._padding));
+      var availableWidthForEntries = Math.max(0, (availableWidth - this.padding));
       var measureEntry = (entryText: string) => {
-        var originalEntryLength = (textHeight + this._measurer.measure(entryText).width + this._padding);
+        var originalEntryLength = (textHeight + this.measurer.measure(entryText).width + this.padding);
         return Math.min(originalEntryLength, availableWidthForEntries);
       };
 
@@ -150,9 +150,9 @@ export module Components {
       entries.sort(this.sortFunction());
       var entryLengths = Utils.Methods.populateMap(entries, measureEntry);
 
-      var rows = this._packRows(availableWidthForEntries, entries, entryLengths);
+      var rows = this.packRows(availableWidthForEntries, entries, entryLengths);
 
-      var rowsAvailable = Math.floor((availableHeight - 2 * this._padding) / textHeight);
+      var rowsAvailable = Math.floor((availableHeight - 2 * this.padding) / textHeight);
       if (rowsAvailable !== rowsAvailable) { // rowsAvailable can be NaN if this.textHeight = 0
         rowsAvailable = 0;
       }
@@ -166,7 +166,7 @@ export module Components {
     }
 
     public requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest {
-      var estimatedLayout = this._calculateLayoutInfo(offeredWidth, offeredHeight);
+      var estimatedLayout = this.calculateLayoutInfo(offeredWidth, offeredHeight);
       var rowLengths = estimatedLayout.rows.map((row: string[]) => {
         return d3.sum(row, (entry: string) => estimatedLayout.entryLengths.get(entry));
       });
@@ -174,23 +174,23 @@ export module Components {
       var longestRowLength = Utils.Methods.max(rowLengths, 0);
 
       var longestUntruncatedEntryLength = Utils.Methods.max<string, number>(this._scale.domain(), (d: string) =>
-                                            this._measurer.measure(d).width, 0);
-      longestUntruncatedEntryLength += estimatedLayout.textHeight + this._padding;
-      var desiredWidth = this._padding + Math.max(longestRowLength, longestUntruncatedEntryLength);
+                                            this.measurer.measure(d).width, 0);
+      longestUntruncatedEntryLength += estimatedLayout.textHeight + this.padding;
+      var desiredWidth = this.padding + Math.max(longestRowLength, longestUntruncatedEntryLength);
 
-      var acceptableHeight = estimatedLayout.numRowsToDraw * estimatedLayout.textHeight + 2 * this._padding;
-      var desiredHeight = estimatedLayout.rows.length * estimatedLayout.textHeight + 2 * this._padding;
+      var acceptableHeight = estimatedLayout.numRowsToDraw * estimatedLayout.textHeight + 2 * this.padding;
+      var desiredHeight = estimatedLayout.rows.length * estimatedLayout.textHeight + 2 * this.padding;
       var desiredNumRows = Math.max(Math.ceil(this._scale.domain().length / this._maxEntriesPerRow), 1);
       var wantsFitMoreEntriesInRow = estimatedLayout.rows.length > desiredNumRows;
       return {
-        width: this._padding + longestRowLength,
+        width: this.padding + longestRowLength,
         height: acceptableHeight,
         wantsWidth: offeredWidth < desiredWidth || wantsFitMoreEntriesInRow,
         wantsHeight: offeredHeight < desiredHeight
       };
     }
 
-    private _packRows(availableWidth: number, entries: string[], entryLengths: D3.Map<number>) {
+    private packRows(availableWidth: number, entries: string[], entryLengths: D3.Map<number>) {
       var rows: string[][] = [];
       var currentRow: string[] = [];
       var spaceLeft = availableWidth;
@@ -223,8 +223,8 @@ export module Components {
       }
 
       var entry = d3.select();
-      var layout = this._calculateLayoutInfo(this.width(), this.height());
-      var legendPadding = this._padding;
+      var layout = this.calculateLayoutInfo(this.width(), this.height());
+      var legendPadding = this.padding;
       this._content.selectAll("g." + Legend.LEGEND_ROW_CLASS).each(function(d: any, i: number) {
         var lowY = i * layout.textHeight + legendPadding;
         var highY = (i + 1) * layout.textHeight + legendPadding;
@@ -246,14 +246,14 @@ export module Components {
     public doRender() {
       super.doRender();
 
-      var layout = this._calculateLayoutInfo(this.width(), this.height());
+      var layout = this.calculateLayoutInfo(this.width(), this.height());
 
       var rowsToDraw = layout.rows.slice(0, layout.numRowsToDraw);
       var rows = this._content.selectAll("g." + Legend.LEGEND_ROW_CLASS).data(rowsToDraw);
       rows.enter().append("g").classed(Legend.LEGEND_ROW_CLASS, true);
       rows.exit().remove();
 
-      rows.attr("transform", (d: any, i: number) => "translate(0, " + (i * layout.textHeight + this._padding) + ")");
+      rows.attr("transform", (d: any, i: number) => "translate(0, " + (i * layout.textHeight + this.padding) + ")");
 
       var entries = rows.selectAll("g." + Legend.LEGEND_ENTRY_CLASS).data((d) => d);
       var entriesEnter = entries.enter().append("g").classed(Legend.LEGEND_ENTRY_CLASS, true);
@@ -261,7 +261,7 @@ export module Components {
       entriesEnter.append("g").classed("text-container", true);
       entries.exit().remove();
 
-      var legendPadding = this._padding;
+      var legendPadding = this.padding;
       rows.each(function (values: string[]) {
         var xShift = legendPadding;
         var entriesInRow = d3.select(this).selectAll("g." + Legend.LEGEND_ENTRY_CLASS);
@@ -277,7 +277,7 @@ export module Components {
                             .attr("fill", (value: string) => this._scale.scale(value) )
                             .classed(Legend.LEGEND_SYMBOL_CLASS, true);
 
-      var padding = this._padding;
+      var padding = this.padding;
       var textContainers = entries.select("g.text-container");
       textContainers.text(""); // clear out previous results
       textContainers.append("title").text((value: string) => value);
@@ -293,7 +293,7 @@ export module Components {
                         textRotation: 0
                       };
 
-                      self._writer.write(value, maxTextLength, self.height(), writeOptions);
+                      self.writer.write(value, maxTextLength, self.height(), writeOptions);
                     });
     }
 
