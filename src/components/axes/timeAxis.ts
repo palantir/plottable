@@ -312,7 +312,7 @@ export module Axes {
       this.tierMarkContainers = [];
       this.tierBaselines = [];
       this.tickLabelContainer.remove();
-      this._baseline.remove();
+      this.baseline.remove();
 
       for (var i = 0; i < this.numTiers; ++i) {
         var tierContainer = this._content.append("g").classed(Time.TIME_AXIS_TIER_CLASS, true);

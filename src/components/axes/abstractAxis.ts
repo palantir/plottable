@@ -16,7 +16,7 @@ module Plottable {
     public static TICK_LABEL_CLASS = "tick-label";
     protected tickMarkContainer: D3.Selection;
     protected tickLabelContainer: D3.Selection;
-    protected _baseline: D3.Selection;
+    protected baseline: D3.Selection;
     protected scale: Scale<any, number>;
     private _formatter: Formatter;
     private orientation: string;
@@ -130,7 +130,7 @@ module Plottable {
                                             .classed(Axis.TICK_MARK_CLASS + "-container", true);
       this.tickLabelContainer = this._content.append("g")
                                              .classed(Axis.TICK_LABEL_CLASS + "-container", true);
-      this._baseline = this._content.append("line").classed("baseline", true);
+      this.baseline = this._content.append("line").classed("baseline", true);
     }
 
     /*
@@ -151,7 +151,7 @@ module Plottable {
       d3.select(tickMarks[0][tickMarkValues.length - 1]).classed(Axis.END_TICK_MARK_CLASS, true)
                                                       .attr(this.generateTickMarkAttrHash(true));
       tickMarks.exit().remove();
-      this._baseline.attr(this.generateBaselineAttrHash());
+      this.baseline.attr(this.generateBaselineAttrHash());
     }
 
     protected generateBaselineAttrHash() {

@@ -4109,7 +4109,7 @@ var Plottable;
             _super.prototype.setup.call(this);
             this.tickMarkContainer = this._content.append("g").classed(Axis.TICK_MARK_CLASS + "-container", true);
             this.tickLabelContainer = this._content.append("g").classed(Axis.TICK_LABEL_CLASS + "-container", true);
-            this._baseline = this._content.append("line").classed("baseline", true);
+            this.baseline = this._content.append("line").classed("baseline", true);
         };
         /*
          * Function for generating tick values in data-space (as opposed to pixel values).
@@ -4126,7 +4126,7 @@ var Plottable;
             d3.select(tickMarks[0][0]).classed(Axis.END_TICK_MARK_CLASS, true).attr(this.generateTickMarkAttrHash(true));
             d3.select(tickMarks[0][tickMarkValues.length - 1]).classed(Axis.END_TICK_MARK_CLASS, true).attr(this.generateTickMarkAttrHash(true));
             tickMarks.exit().remove();
-            this._baseline.attr(this.generateBaselineAttrHash());
+            this.baseline.attr(this.generateBaselineAttrHash());
         };
         Axis.prototype.generateBaselineAttrHash = function () {
             var baselineAttrHash = {
@@ -4452,7 +4452,7 @@ var Plottable;
                 this.tierMarkContainers = [];
                 this.tierBaselines = [];
                 this.tickLabelContainer.remove();
-                this._baseline.remove();
+                this.baseline.remove();
                 for (var i = 0; i < this.numTiers; ++i) {
                     var tierContainer = this._content.append("g").classed(Time.TIME_AXIS_TIER_CLASS, true);
                     this.tierLabelContainers.push(tierContainer.append("g").classed(Plottable.Axis.TICK_LABEL_CLASS + "-container", true));

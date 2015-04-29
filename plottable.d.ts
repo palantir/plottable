@@ -1884,7 +1884,7 @@ declare module Plottable {
         static TICK_LABEL_CLASS: string;
         protected tickMarkContainer: D3.Selection;
         protected tickLabelContainer: D3.Selection;
-        protected _baseline: D3.Selection;
+        protected baseline: D3.Selection;
         protected scale: Scale<any, number>;
         protected computedWidth: number;
         protected computedHeight: number;
