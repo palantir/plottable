@@ -47,7 +47,7 @@ declare module Plottable {
              * Take an accessor object (may be a string to be made into a key, or a value, or a color code)
              * and "activate" it by turning it into a function in (datum, index, metadata)
              */
-            function accessorize(accessor: any): _Accessor;
+            function accessorize(accessor: any): Accessor;
             /**
              * Takes two sets and returns the union
              *
@@ -573,7 +573,7 @@ declare module Plottable {
          * @returns {Dataset} The calling Dataset.
          */
         metadata(metadata: any): Dataset;
-        _getExtent(accessor: _Accessor, typeCoercer: (d: any) => any, plotMetadata?: any): any[];
+        getExtent(accessor: Accessor, typeCoercer: (d: any) => any, plotMetadata?: any): any[];
     }
 }
 
@@ -608,7 +608,7 @@ declare module Plottable {
                  * it.
                  */
                 class Timeout implements RenderPolicy {
-                    _timeoutMsec: number;
+                    timeoutMsec: number;
                     render(): void;
                 }
             }
@@ -638,7 +638,7 @@ declare module Plottable {
          * ```
          */
         module RenderControllers {
-            var _renderPolicy: RenderPolicies.RenderPolicy;
+            var renderPolicy: RenderPolicies.RenderPolicy;
             function setRenderPolicy(policy: string | RenderPolicies.RenderPolicy): void;
             /**
              * If the RenderController is enabled, we enqueue the component for
@@ -669,11 +669,11 @@ declare module Plottable {
     /**
      * Access specific datum property.
      */
-    type _Accessor = (datum: any, index?: number, userMetadata?: any, plotMetadata?: Plots.PlotMetadata) => any;
+    type Accessor = (datum: any, index?: number, userMetadata?: any, plotMetadata?: Plots.PlotMetadata) => any;
     /**
      * Retrieves scaled datum property.
      */
-    type _Projector = (datum: any, index: number, userMetadata: any, plotMetadata: Plots.PlotMetadata) => any;
+    type Projector = (datum: any, index: number, userMetadata: any, plotMetadata: Plots.PlotMetadata) => any;
     /**
      * Projector with applied user and plot metadata
      */
@@ -681,8 +681,8 @@ declare module Plottable {
     /**
      * Defines a way how specific attribute needs be retrieved before rendering.
      */
-    type _Projection = {
-        accessor: _Accessor;
+    type Projection = {
+        accessor: Accessor;
         scale?: Scale<any, any>;
         attribute: string;
     };
@@ -695,7 +695,7 @@ declare module Plottable {
      * function(d) { return foo + bar; }`.
      */
     type AttributeToProjector = {
-        [attrToSet: string]: _Projector;
+        [attrToSet: string]: Projector;
     };
     type AttributeToAppliedProjector = {
         [attrToSet: string]: AppliedProjector;
@@ -709,7 +709,7 @@ declare module Plottable {
         yMin: number;
         yMax: number;
     };
-    type _SpaceRequest = {
+    type SpaceRequest = {
         width: number;
         height: number;
         wantsWidth: boolean;
@@ -1581,7 +1581,7 @@ declare module Plottable {
          * Override in subclasses to provide additional functionality.
          */
         protected setup(): void;
-        requestedSpace(availableWidth: number, availableHeight: number): _SpaceRequest;
+        requestedSpace(availableWidth: number, availableHeight: number): SpaceRequest;
         /**
          * Computes the size, position, and alignment from the specified values.
          * If no parameters are supplied and the Component is a root node,
@@ -1854,7 +1854,7 @@ declare module Plottable {
              * @param {Component[]} components The Components in the resultant Component.Group (default = []).
              */
             constructor(components?: Component[]);
-            requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
+            requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
             merge(c: Component, below: boolean): Group;
             computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): Group;
             protected getSize(availableWidth: number, availableHeight: number): {
@@ -1904,7 +1904,7 @@ declare module Plottable {
         protected _isHorizontal(): boolean;
         protected _computeWidth(): number;
         protected _computeHeight(): number;
-        requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
+        requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
         isFixedHeight(): boolean;
         isFixedWidth(): boolean;
         protected _rescale(): void;
@@ -2184,7 +2184,7 @@ declare module Plottable {
             constructor(scale: Scales.Category, orientation?: string, formatter?: (d: any) => string);
             protected setup(): void;
             protected _rescale(): void;
-            requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
+            requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
             protected _getTickValues(): string[];
             /**
              * Sets the angle for the tick labels. Right now vertical-left (-90), horizontal (0), and vertical-right (90) are the only options.
@@ -2237,7 +2237,7 @@ declare module Plottable {
              * @returns {Label} The calling Label.
              */
             yAlign(alignment: string): Label;
-            requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
+            requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
             protected setup(): void;
             /**
              * Gets the current text on the Label.
@@ -2365,7 +2365,7 @@ declare module Plottable {
              */
             scale(scale: Scales.Color): Legend;
             remove(): void;
-            requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
+            requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
             /**
              * Gets the legend entry under the given pixel position.
              *
@@ -2442,7 +2442,7 @@ declare module Plottable {
              */
             orient(newOrientation: string): InterpolatedColorLegend;
             protected setup(): void;
-            requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
+            requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
             _doRender(): void;
         }
     }
@@ -2518,7 +2518,7 @@ declare module Plottable {
              */
             addComponent(row: number, col: number, component: Component): Table;
             _removeComponent(component: Component): void;
-            requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
+            requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
             computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;
             /**
              * Sets the row and column padding on the Table.
@@ -2641,7 +2641,7 @@ declare module Plottable {
         protected _datasetKeysInOrder: string[];
         protected _renderArea: D3.Selection;
         protected _projections: {
-            [attrToSet: string]: _Projection;
+            [attrToSet: string]: Projection;
         };
         protected _animate: boolean;
         protected _animateOnNextRender: boolean;
@@ -3100,7 +3100,7 @@ declare module Plottable {
              * @param {QuantitativeScaleScale} yScale The y scale to use.
              */
             constructor(xScale: QuantitativeScale<X>, yScale: QuantitativeScale<number>);
-            protected _rejectNullsAndNaNs(d: any, i: number, userMetdata: any, plotMetadata: any, accessor: _Accessor): boolean;
+            protected _rejectNullsAndNaNs(d: any, i: number, userMetdata: any, plotMetadata: any, accessor: Accessor): boolean;
             protected _getDrawer(key: string): Drawers.Line;
             protected _getResetYFunction(): (d: any, i: number, u: any, m: PlotMetadata) => number;
             protected _generateDrawSteps(): Drawers.DrawStep[];
@@ -3217,8 +3217,8 @@ declare module Plottable {
             a: A;
             b: B;
         }[];
-        _keyAccessor(): _Accessor;
-        _valueAccessor(): _Accessor;
+        _keyAccessor(): Accessor;
+        _valueAccessor(): Accessor;
     }
 }
 
@@ -3252,8 +3252,8 @@ declare module Plottable {
             _getDomainKeys(): any;
             _generateDefaultMapArray(): D3.Map<StackedDatum>[];
             _updateScaleExtents(): void;
-            _keyAccessor(): _Accessor;
-            _valueAccessor(): _Accessor;
+            _keyAccessor(): Accessor;
+            _valueAccessor(): Accessor;
             _getPlotMetadataForDataset(key: string): StackedPlotMetadata;
             protected _normalizeDatasets<A, B>(fromX: boolean): {
                 a: A;
@@ -3296,8 +3296,8 @@ declare module Plottable {
             _getDomainKeys(): any;
             _generateDefaultMapArray(): D3.Map<StackedDatum>[];
             _updateScaleExtents(): void;
-            _keyAccessor(): _Accessor;
-            _valueAccessor(): _Accessor;
+            _keyAccessor(): Accessor;
+            _valueAccessor(): Accessor;
         }
     }
 }

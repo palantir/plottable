@@ -38,10 +38,10 @@ export module RenderControllers {
      * it.
      */
     export class Timeout implements RenderPolicy {
-      public _timeoutMsec: number = Utils.DOM.POLYFILL_TIMEOUT_MSEC;
+      public timeoutMsec: number = Utils.DOM.POLYFILL_TIMEOUT_MSEC;
 
       public render() {
-        setTimeout(RenderControllers.flush, this._timeoutMsec);
+        setTimeout(RenderControllers.flush, this.timeoutMsec);
       }
     }
   }

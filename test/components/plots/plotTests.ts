@@ -405,7 +405,7 @@ describe("Plots", () => {
       var s = new Plottable.Scales.Linear();
       r.project("attr", "a", s);
       r.remove();
-      var key2callback = (<any> s).broadcaster._key2callback;
+      var key2callback = (<any> s).broadcaster.key2callback;
       assert.isUndefined(key2callback.get(r), "the plot is no longer attached to the scale");
     });
 
@@ -588,9 +588,9 @@ describe("Plots", () => {
     it("listeners are deregistered after removal", () => {
       plot.automaticallyAdjustYScaleOverVisiblePoints(true);
       plot.remove();
-      var key2callback = (<any> xScale).broadcaster._key2callback;
+      var key2callback = (<any> xScale).broadcaster.key2callback;
       assert.isUndefined(key2callback.get("yDomainAdjustment" + plot.getID()), "the plot is no longer attached to the xScale");
-      key2callback = (<any> yScale).broadcaster._key2callback;
+      key2callback = (<any> yScale).broadcaster.key2callback;
       assert.isUndefined(key2callback.get("xDomainAdjustment" + plot.getID()), "the plot is no longer attached to the yScale");
       svg.remove();
     });
