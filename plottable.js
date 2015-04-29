@@ -5615,22 +5615,14 @@ var Plottable;
                 };
             };
             Legend.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
-                var _this = this;
                 var estimatedLayout = this._calculateLayoutInfo(offeredWidth, offeredHeight);
-                var rowLengths = estimatedLayout.rows.map(function (row) {
+                var estimatedRowLengths = estimatedLayout.rows.map(function (row) {
                     return d3.sum(row, function (entry) { return estimatedLayout.entryLengths.get(entry); });
                 });
-                var longestRowLength = Plottable._Util.Methods.max(rowLengths, 0);
-                var longestUntruncatedEntryLength = Plottable._Util.Methods.max(this._scale.domain(), function (d) { return _this._measurer.measure(d).width; }, 0);
-                longestUntruncatedEntryLength += estimatedLayout.textHeight + this._padding;
-                var desiredWidth = this._padding + Math.max(longestRowLength, longestUntruncatedEntryLength);
-                var acceptableHeight = estimatedLayout.numRowsToDraw * estimatedLayout.textHeight + 2 * this._padding;
-                var desiredHeight = estimatedLayout.rows.length * estimatedLayout.textHeight + 2 * this._padding;
-                var desiredNumRows = Math.max(Math.ceil(this._scale.domain().length / this._maxEntriesPerRow), 1);
-                var wantsFitMoreEntriesInRow = estimatedLayout.rows.length > desiredNumRows;
+                var longestEstimatedRowLength = Plottable._Util.Methods.max(estimatedRowLengths, 0);
                 return {
-                    width: this._padding + longestRowLength,
-                    height: acceptableHeight
+                    width: this._padding + longestEstimatedRowLength,
+                    height: estimatedLayout.numRowsToDraw * estimatedLayout.textHeight + 2 * this._padding
                 };
             };
             Legend.prototype._packRows = function (availableWidth, entries, entryLengths) {

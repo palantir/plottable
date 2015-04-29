@@ -167,24 +167,15 @@ export module Component {
 
     public _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
       var estimatedLayout = this._calculateLayoutInfo(offeredWidth, offeredHeight);
-      var rowLengths = estimatedLayout.rows.map((row: string[]) => {
+
+      var estimatedRowLengths = estimatedLayout.rows.map((row: string[]) => {
         return d3.sum(row, (entry: string) => estimatedLayout.entryLengths.get(entry));
       });
+      var longestEstimatedRowLength = _Util.Methods.max(estimatedRowLengths, 0);
 
-      var longestRowLength = _Util.Methods.max(rowLengths, 0);
-
-      var longestUntruncatedEntryLength = _Util.Methods.max<string, number>(this._scale.domain(), (d: string) =>
-                                            this._measurer.measure(d).width, 0);
-      longestUntruncatedEntryLength += estimatedLayout.textHeight + this._padding;
-      var desiredWidth = this._padding + Math.max(longestRowLength, longestUntruncatedEntryLength);
-
-      var acceptableHeight = estimatedLayout.numRowsToDraw * estimatedLayout.textHeight + 2 * this._padding;
-      var desiredHeight = estimatedLayout.rows.length * estimatedLayout.textHeight + 2 * this._padding;
-      var desiredNumRows = Math.max(Math.ceil(this._scale.domain().length / this._maxEntriesPerRow), 1);
-      var wantsFitMoreEntriesInRow = estimatedLayout.rows.length > desiredNumRows;
       return {
-        width : this._padding + longestRowLength,
-        height: acceptableHeight
+        width : this._padding + longestEstimatedRowLength,
+        height: estimatedLayout.numRowsToDraw * estimatedLayout.textHeight + 2 * this._padding
       };
     }
 
