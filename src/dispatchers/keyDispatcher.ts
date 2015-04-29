@@ -56,11 +56,13 @@ export module Dispatchers {
      */
     public onKeyDown(key: any, callback: KeyCallback): Key {
       this._setCallback(this._keydownBroadcaster, key, callback);
+      this._keydownCallbackSet.add(this._getWrappedCallback(callback));
       return this;
     }
 
     private _processKeydown(e: KeyboardEvent) {
-      this._keydownBroadcaster.broadcast(e);
+      this._keydownCallbackSet.callCallbacks(this, e);
+      // this._keydownBroadcaster.broadcast(e);
     }
   }
 }

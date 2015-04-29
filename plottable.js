@@ -9311,10 +9311,12 @@ var Plottable;
              */
             Key.prototype.onKeyDown = function (key, callback) {
                 this._setCallback(this._keydownBroadcaster, key, callback);
+                this._keydownCallbackSet.add(this._getWrappedCallback(callback));
                 return this;
             };
             Key.prototype._processKeydown = function (e) {
-                this._keydownBroadcaster.broadcast(e);
+                this._keydownCallbackSet.callCallbacks(this, e);
+                // this._keydownBroadcaster.broadcast(e);
             };
             Key._DISPATCHER_KEY = "__Plottable_Dispatcher_Key";
             return Key;
