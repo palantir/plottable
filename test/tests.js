@@ -9313,8 +9313,8 @@ describe("Interactions", function () {
             var endPoint = { x: SVG_WIDTH * 3 / 4, y: SVG_HEIGHT * 3 / 4 };
             triggerFakeTouchEvent("touchmove", eventTarget, [endPoint], [1]);
             triggerFakeTouchEvent("touchend", eventTarget, [endPoint], [1]);
-            assert.deepEqual(xScale.domain(), [SVG_WIDTH / 16, SVG_WIDTH * 5 / 16], "xScale pans to the correct domain via drag (touch)");
-            assert.deepEqual(yScale.domain(), [SVG_HEIGHT / 16, SVG_HEIGHT * 5 / 16], "yScale pans to the correct domain via drag (touch)");
+            assert.deepEqual(xScale.domain(), [SVG_WIDTH / 16, SVG_WIDTH * 5 / 16], "xScale transforms to the correct domain via pinch");
+            assert.deepEqual(yScale.domain(), [SVG_HEIGHT / 16, SVG_HEIGHT * 5 / 16], "yScale transforms to the correct domain via pinch");
             svg.remove();
         });
     });

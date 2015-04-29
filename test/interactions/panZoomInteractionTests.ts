@@ -74,8 +74,8 @@ describe("Interactions", () => {
 
       triggerFakeWheelEvent( "wheel", svg, scrollPoint.x, scrollPoint.y, deltaY );
 
-      assert.deepEqual( xScale.domain(), [-SVG_WIDTH / 8, SVG_WIDTH * 7 / 8], "xScale zooms to the correct domain via scroll" );
-      assert.deepEqual( yScale.domain(), [-SVG_HEIGHT / 8, SVG_HEIGHT * 7 / 8], "yScale zooms to the correct domain via scroll" );
+      assert.deepEqual(xScale.domain(), [-SVG_WIDTH / 8, SVG_WIDTH * 7 / 8], "xScale zooms to the correct domain via scroll");
+      assert.deepEqual(yScale.domain(), [-SVG_HEIGHT / 8, SVG_HEIGHT * 7 / 8], "yScale zooms to the correct domain via scroll");
       svg.remove();
     });
 
@@ -92,10 +92,10 @@ describe("Interactions", () => {
       triggerFakeTouchEvent( "touchstart", eventTarget, [startPoint, startPoint2], [0, 1] );
 
       var endPoint = { x: SVG_WIDTH * 3 / 4, y: SVG_HEIGHT * 3 / 4 };
-      triggerFakeTouchEvent( "touchmove", eventTarget, [endPoint], [1] );
-      triggerFakeTouchEvent( "touchend", eventTarget, [endPoint], [1] );
-      assert.deepEqual( xScale.domain(), [SVG_WIDTH / 16, SVG_WIDTH * 5 / 16], "xScale pans to the correct domain via drag (touch)" );
-      assert.deepEqual( yScale.domain(), [SVG_HEIGHT / 16, SVG_HEIGHT * 5 / 16], "yScale pans to the correct domain via drag (touch)" );
+      triggerFakeTouchEvent("touchmove", eventTarget, [endPoint], [1] );
+      triggerFakeTouchEvent("touchend", eventTarget, [endPoint], [1] );
+      assert.deepEqual(xScale.domain(), [SVG_WIDTH / 16, SVG_WIDTH * 5 / 16], "xScale transforms to the correct domain via pinch");
+      assert.deepEqual(yScale.domain(), [SVG_HEIGHT / 16, SVG_HEIGHT * 5 / 16], "yScale transforms to the correct domain via pinch");
       svg.remove();
     });
 

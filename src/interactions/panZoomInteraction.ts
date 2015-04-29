@@ -46,16 +46,16 @@ export module Interaction {
 
       this._touchDispatcher = Dispatcher.Touch.getDispatcher(<SVGElement> this._componentToListenTo.content().node());
       this._touchDispatcher.onTouchStart("Interaction.PanZoom" + this.getID(),
-        (ids, idToPoint, e) => this._handlePinchStart(ids, idToPoint, e));
+        (ids, idToPoint, e) => this._handleTouchStart(ids, idToPoint, e));
       this._touchDispatcher.onTouchMove("Interaction.PanZoom" + this.getID(),
         (ids, idToPoint, e) => this._handlePinch(ids, idToPoint, e));
       this._touchDispatcher.onTouchEnd("Interaction.PanZoom" + this.getID(),
-        (ids, idToPoint, e) => this._handlePinchFinish(ids, idToPoint, e));
+        (ids, idToPoint, e) => this._handleTouchEnd(ids, idToPoint, e));
       this._touchDispatcher.onTouchCancel("Interaction.PanZoom" + this.getID(),
-        (ids, idToPoint, e) => this._handlePinchFinish(ids, idToPoint, e));
+        (ids, idToPoint, e) => this._handleTouchEnd(ids, idToPoint, e));
     }
 
-    private _handlePinchStart(ids: number[], idToPoint: { [id: number]: Point; }, e: TouchEvent) {
+    private _handleTouchStart(ids: number[], idToPoint: { [id: number]: Point; }, e: TouchEvent) {
       ids.forEach((id) => {
         if (this._touchIds.size() === 2) {
           return;
@@ -122,7 +122,7 @@ export module Interaction {
       return Math.sqrt(Math.pow(rightX - leftX, 2) + Math.pow(bottomY - topY, 2));
     }
 
-    private _handlePinchFinish(ids: number[], idToPoint: { [id: number]: Point; }, e: TouchEvent) {
+    private _handleTouchEnd(ids: number[], idToPoint: { [id: number]: Point; }, e: TouchEvent) {
       ids.forEach((id) => {
         this._touchIds.remove(id.toString());
       });
@@ -158,7 +158,7 @@ export module Interaction {
       var lastDragPoint: Point;
       this._dragInteraction.onDragStart(() => lastDragPoint = null);
       this._dragInteraction.onDrag((startPoint, endPoint) => {
-        if (this._touchIds.size() === 2) {
+        if (this._touchIds.size() >= 2) {
           return;
         }
         if (this._xScale != null) {
