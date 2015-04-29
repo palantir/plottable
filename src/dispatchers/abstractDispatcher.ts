@@ -38,12 +38,14 @@ module Plottable {
       return () => callback();
     }
 
-    protected _setCallback(broadcaster: Core.Broadcaster<Dispatcher>, key: any, callback: Function) {
+    protected _setCallback(callbackSet: Utils.CallbackSet<Function>, key: any, callback: Function) {
       if (callback === null) { // remove listener if callback is null
         // broadcaster.deregisterListener(key);
+        callbackSet.remove(this._getWrappedCallback(callback));
         this._disconnect();
       } else {
         this._connect();
+        callbackSet.add(this._getWrappedCallback(callback));
         // broadcaster.registerListener(key, this._getWrappedCallback(callback));
       }
     }

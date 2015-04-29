@@ -3527,7 +3527,7 @@ declare module Plottable {
          * Creates a wrapped version of the callback that can be registered to a Broadcaster
          */
         protected _getWrappedCallback(callback: Function): Core.BroadcasterCallback<Dispatcher>;
-        protected _setCallback(broadcaster: Core.Broadcaster<Dispatcher>, key: any, callback: Function): void;
+        protected _setCallback(callbackSet: Utils.CallbackSet<Function>, key: any, callback: Function): void;
     }
 }
 

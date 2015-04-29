@@ -87,8 +87,7 @@ export module Dispatchers {
      * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
      */
     public onTouchStart(key: any, callback: TouchCallback): Dispatchers.Touch {
-      this._setCallback(this._startBroadcaster, key, callback);
-      this._startCallbackSet.add(this._getWrappedCallback(callback));
+      this._setCallback(this._startCallbackSet, key, callback);
       return this;
     }
 
@@ -104,8 +103,7 @@ export module Dispatchers {
      * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
      */
     public onTouchMove(key: any, callback: TouchCallback): Dispatchers.Touch {
-      this._setCallback(this._moveBroadcaster, key, callback);
-      this._moveCallbackSet.add(this._getWrappedCallback(callback));
+      this._setCallback(this._moveCallbackSet, key, callback);
       return this;
     }
 
@@ -121,8 +119,7 @@ export module Dispatchers {
      * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
      */
     public onTouchEnd(key: any, callback: TouchCallback): Dispatchers.Touch {
-      this._setCallback(this._endBroadcaster, key, callback);
-      this._endCallbackSet.add(this._getWrappedCallback(callback));
+      this._setCallback(this._endCallbackSet, key, callback);
       return this;
     }
 

@@ -96,8 +96,7 @@ export module Dispatchers {
      * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
      */
     public onMouseMove(key: any, callback: MouseCallback): Dispatchers.Mouse {
-      this._setCallback(this._moveBroadcaster, key, callback);
-      this._moveCallbackSet.add(this._getWrappedCallback(callback));
+      this._setCallback(this._moveCallbackSet, key, callback);
       return this;
     }
 
@@ -113,8 +112,7 @@ export module Dispatchers {
      * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
      */
     public onMouseDown(key: any, callback: MouseCallback): Dispatchers.Mouse {
-      this._setCallback(this._downBroadcaster, key, callback);
-      this._downCallbackSet.add(this._getWrappedCallback(callback));
+      this._setCallback(this._downCallbackSet, key, callback);
       return this;
     }
 
@@ -130,8 +128,7 @@ export module Dispatchers {
      * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
      */
     public onMouseUp(key: any, callback: MouseCallback): Dispatchers.Mouse {
-      this._setCallback(this._upBroadcaster, key, callback);
-      this._upCallbackSet.add(this._getWrappedCallback(callback));
+      this._setCallback(this._upCallbackSet, key, callback);
       return this;
     }
 
@@ -147,8 +144,7 @@ export module Dispatchers {
      * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
      */
     public onWheel(key: any, callback: MouseCallback): Dispatchers.Mouse {
-      this._setCallback(this._wheelBroadcaster, key, callback);
-      this._wheelCallbackSet.add(this._getWrappedCallback(callback));
+      this._setCallback(this._wheelCallbackSet, key, callback);
       return this;
     }
 
@@ -164,8 +160,7 @@ export module Dispatchers {
      * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
      */
     public onDblClick(key: any, callback: MouseCallback): Dispatchers.Mouse {
-      this._setCallback(this._dblClickBroadcaster, key, callback);
-      this._dblClickCallbackSet.add(this._getWrappedCallback(callback));
+      this._setCallback(this._dblClickCallbackSet, key, callback);
       return this;
     }
 

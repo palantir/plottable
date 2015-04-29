@@ -55,8 +55,7 @@ export module Dispatchers {
      * @return {Dispatcher.Key} The calling Dispatcher.Key.
      */
     public onKeyDown(key: any, callback: KeyCallback): Key {
-      this._setCallback(this._keydownBroadcaster, key, callback);
-      this._keydownCallbackSet.add(this._getWrappedCallback(callback));
+      this._setCallback(this._keydownCallbackSet, key, callback);
       return this;
     }
 
