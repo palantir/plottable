@@ -7,9 +7,9 @@ describe("Category Axes", () => {
     var xScale = new Plottable.Scales.Category().domain(["foo", "bar", "baz"]).range([400, 0]);
     var ca = new Plottable.Axes.Category(xScale, "left");
     ca.renderTo(svg);
-    assert.deepEqual((<any> ca)._tickLabelContainer.selectAll(".tick-label").data(), xScale.domain(), "tick labels render domain");
+    assert.deepEqual((<any> ca).tickLabelContainer.selectAll(".tick-label").data(), xScale.domain(), "tick labels render domain");
     assert.doesNotThrow(() => xScale.domain(["bar", "baz", "bam"]));
-    assert.deepEqual((<any> ca)._tickLabelContainer.selectAll(".tick-label").data(), xScale.domain(), "tick labels render domain");
+    assert.deepEqual((<any> ca).tickLabelContainer.selectAll(".tick-label").data(), xScale.domain(), "tick labels render domain");
     svg.remove();
   });
 

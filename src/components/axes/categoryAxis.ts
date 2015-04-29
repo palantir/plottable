@@ -27,26 +27,26 @@ export module Axes {
 
     protected setup() {
       super.setup();
-      this._measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(this._tickLabelContainer);
+      this._measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(this.tickLabelContainer);
       this._wrapper = new SVGTypewriter.Wrappers.SingleLineWrapper();
       this._writer = new SVGTypewriter.Writers.Writer(this._measurer, this._wrapper);
     }
 
-    protected _rescale() {
+    protected rescale() {
       return this.invalidateLayout();
     }
 
     public requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest {
-      var widthRequiredByTicks = this._isHorizontal() ? 0 : this._maxLabelTickLength() + this.tickLabelPadding() + this.gutter();
-      var heightRequiredByTicks = this._isHorizontal() ? this._maxLabelTickLength() + this.tickLabelPadding() + this.gutter() : 0;
+      var widthRequiredByTicks = this.isHorizontal() ? 0 : this.maxLabelTickLength() + this.tickLabelPadding() + this.gutter();
+      var heightRequiredByTicks = this.isHorizontal() ? this.maxLabelTickLength() + this.tickLabelPadding() + this.gutter() : 0;
 
-      if (this._scale.domain().length === 0) {
+      if (this.scale.domain().length === 0) {
         return {width: 0, height: 0, wantsWidth: false, wantsHeight: false };
       }
 
-      var categoryScale: Scales.Category = <Scales.Category> this._scale;
+      var categoryScale: Scales.Category = <Scales.Category> this.scale;
       var fakeScale = categoryScale.copy();
-      if (this._isHorizontal()) {
+      if (this.isHorizontal()) {
         fakeScale.range([0, offeredWidth]);
       } else {
         fakeScale.range([offeredHeight, 0]);
@@ -63,8 +63,8 @@ export module Axes {
       };
     }
 
-    protected _getTickValues(): string[] {
-      return this._scale.domain();
+    protected getTickValues(): string[] {
+      return this.scale.domain();
     }
 
     /**
@@ -117,8 +117,8 @@ export module Axes {
       }
       ticks.each(function (d: string) {
         var bandWidth = scale.stepWidth();
-        var width  = self._isHorizontal() ? bandWidth  : axisWidth - self._maxLabelTickLength() - self.tickLabelPadding();
-        var height = self._isHorizontal() ? axisHeight - self._maxLabelTickLength() - self.tickLabelPadding() : bandWidth;
+        var width  = self.isHorizontal() ? bandWidth  : axisWidth - self.maxLabelTickLength() - self.tickLabelPadding();
+        var height = self.isHorizontal() ? axisHeight - self.maxLabelTickLength() - self.tickLabelPadding() : bandWidth;
         var writeOptions = {
           selection: d3.select(this),
           xAlign: xAlign[self.orient()],
@@ -140,11 +140,11 @@ export module Axes {
         var bandWidth = scale.stepWidth();
 
         // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
-        var width = axisWidth - this._maxLabelTickLength() - this.tickLabelPadding(); // default for left/right
-        if (this._isHorizontal()) { // case for top/bottom
+        var width = axisWidth - this.maxLabelTickLength() - this.tickLabelPadding(); // default for left/right
+        if (this.isHorizontal()) { // case for top/bottom
           width = bandWidth; // defaults to the band width
           if (this._tickLabelAngle !== 0) { // rotated label
-            width = axisHeight - this._maxLabelTickLength() - this.tickLabelPadding(); // use the axis height
+            width = axisHeight - this.maxLabelTickLength() - this.tickLabelPadding(); // use the axis height
           }
           // HACKHACK: Wrapper fails under negative circumstances
           width = Math.max(width, 0);
@@ -152,10 +152,10 @@ export module Axes {
 
         // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
         var height = bandWidth; // default for left/right
-        if (this._isHorizontal()) { // case for top/bottom
-          height = axisHeight - this._maxLabelTickLength() - this.tickLabelPadding();
+        if (this.isHorizontal()) { // case for top/bottom
+          height = axisHeight - this.maxLabelTickLength() - this.tickLabelPadding();
           if (this._tickLabelAngle !== 0) { // rotated label
-            height = axisWidth - this._maxLabelTickLength() - this.tickLabelPadding();
+            height = axisWidth - this.maxLabelTickLength() - this.tickLabelPadding();
           }
           // HACKHACK: Wrapper fails under negative circumstances
           height = Math.max(height, 0);
@@ -165,8 +165,8 @@ export module Axes {
       });
 
       // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
-      var widthFn = (this._isHorizontal() && this._tickLabelAngle === 0) ? d3.sum : Utils.Methods.max;
-      var heightFn = (this._isHorizontal() && this._tickLabelAngle === 0) ? Utils.Methods.max : d3.sum;
+      var widthFn = (this.isHorizontal() && this._tickLabelAngle === 0) ? d3.sum : Utils.Methods.max;
+      var heightFn = (this.isHorizontal() && this._tickLabelAngle === 0) ? Utils.Methods.max : d3.sum;
 
       var textFits = wrappingResults.every((t: SVGTypewriter.Wrappers.WrappingResult) =>
                     !SVGTypewriter.Utils.StringMethods.isNotEmptyString(t.truncatedText) && t.noLines === 1);
@@ -192,14 +192,14 @@ export module Axes {
 
     public doRender() {
       super.doRender();
-      var catScale = <Scales.Category> this._scale;
-      var tickLabels = this._tickLabelContainer.selectAll("." + Axis.TICK_LABEL_CLASS).data(this._scale.domain(), (d) => d);
+      var catScale = <Scales.Category> this.scale;
+      var tickLabels = this.tickLabelContainer.selectAll("." + Axis.TICK_LABEL_CLASS).data(this.scale.domain(), (d) => d);
 
       var getTickLabelTransform = (d: string, i: number) => {
         var innerPaddingWidth = catScale.stepWidth() - catScale.rangeBand();
         var scaledValue = catScale.scale(d) - catScale.rangeBand() / 2 - innerPaddingWidth / 2;
-        var x = this._isHorizontal() ? scaledValue : 0;
-        var y = this._isHorizontal() ? 0 : scaledValue;
+        var x = this.isHorizontal() ? scaledValue : 0;
+        var y = this.isHorizontal() ? 0 : scaledValue;
         return "translate(" + x + "," + y + ")";
       };
       tickLabels.enter().append("g").classed(Axis.TICK_LABEL_CLASS, true);
@@ -208,11 +208,11 @@ export module Axes {
       // erase all text first, then rewrite
       tickLabels.text("");
       this._drawTicks(this.width(), this.height(), catScale, tickLabels);
-      var translate = this._isHorizontal() ? [catScale.rangeBand() / 2, 0] : [0, catScale.rangeBand() / 2];
+      var translate = this.isHorizontal() ? [catScale.rangeBand() / 2, 0] : [0, catScale.rangeBand() / 2];
 
-      var xTranslate = this.orient() === "right" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
-      var yTranslate = this.orient() === "bottom" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
-      Utils.DOM.translate(this._tickLabelContainer, xTranslate, yTranslate);
+      var xTranslate = this.orient() === "right" ? this.maxLabelTickLength() + this.tickLabelPadding() : 0;
+      var yTranslate = this.orient() === "bottom" ? this.maxLabelTickLength() + this.tickLabelPadding() : 0;
+      Utils.DOM.translate(this.tickLabelContainer, xTranslate, yTranslate);
       return this;
     }
 

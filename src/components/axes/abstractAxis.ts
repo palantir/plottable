@@ -14,14 +14,14 @@ module Plottable {
      * The css class applied to each tick label (the text associated with the tick).
      */
     public static TICK_LABEL_CLASS = "tick-label";
-    protected _tickMarkContainer: D3.Selection;
-    protected _tickLabelContainer: D3.Selection;
+    protected tickMarkContainer: D3.Selection;
+    protected tickLabelContainer: D3.Selection;
     protected _baseline: D3.Selection;
-    protected _scale: Scale<any, number>;
+    protected scale: Scale<any, number>;
     private _formatter: Formatter;
-    private _orientation: string;
-    protected _computedWidth: number;
-    protected _computedHeight: number;
+    private orientation: string;
+    protected computedWidth: number;
+    protected computedHeight: number;
     private _endTickLength = 5;
     private _tickLength = 5;
     private _tickLabelPadding = 10;
@@ -42,11 +42,11 @@ module Plottable {
     constructor(scale: Scale<any, number>, orientation: string, formatter = Formatters.identity()) {
       super();
       if (scale == null || orientation == null) { throw new Error("Axis requires a scale and orientation"); }
-      this._scale = scale;
+      this.scale = scale;
       this.orient(orientation);
-      this._setDefaultAlignment();
+      this.setDefaultAlignment();
       this.classed("axis", true);
-      if (this._isHorizontal()) {
+      if (this.isHorizontal()) {
         this.classed("x-axis", true);
       } else {
         this.classed("y-axis", true);
@@ -54,81 +54,81 @@ module Plottable {
 
       this.formatter(formatter);
 
-      this._scale.broadcaster.registerListener(this, () => this._rescale());
+      this.scale.broadcaster.registerListener(this, () => this.rescale());
     }
 
     public remove() {
       super.remove();
-      this._scale.broadcaster.deregisterListener(this);
+      this.scale.broadcaster.deregisterListener(this);
     }
 
-    protected _isHorizontal() {
-      return this._orientation === "top" || this._orientation === "bottom";
+    protected isHorizontal() {
+      return this.orientation === "top" || this.orientation === "bottom";
     }
 
-    protected _computeWidth() {
+    protected computeWidth() {
       // to be overridden by subclass logic
-      this._computedWidth = this._maxLabelTickLength();
-      return this._computedWidth;
+      this.computedWidth = this.maxLabelTickLength();
+      return this.computedWidth;
     }
 
-    protected _computeHeight() {
+    protected computeHeight() {
       // to be overridden by subclass logic
-      this._computedHeight = this._maxLabelTickLength();
-      return this._computedHeight;
+      this.computedHeight = this.maxLabelTickLength();
+      return this.computedHeight;
     }
 
     public requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest {
       var requestedWidth = 0;
       var requestedHeight = 0;
 
-      if (this._isHorizontal()) {
-        if (this._computedHeight == null) {
-          this._computeHeight();
+      if (this.isHorizontal()) {
+        if (this.computedHeight == null) {
+          this.computeHeight();
         }
-        requestedHeight = this._computedHeight + this._gutter;
+        requestedHeight = this.computedHeight + this._gutter;
       } else { // vertical
-        if (this._computedWidth == null) {
-          this._computeWidth();
+        if (this.computedWidth == null) {
+          this.computeWidth();
         }
-        requestedWidth = this._computedWidth + this._gutter;
+        requestedWidth = this.computedWidth + this._gutter;
       }
 
       return {
         width: requestedWidth,
         height: requestedHeight,
-        wantsWidth: !this._isHorizontal() && offeredWidth < requestedWidth,
-        wantsHeight: this._isHorizontal() && offeredHeight < requestedHeight
+        wantsWidth: !this.isHorizontal() && offeredWidth < requestedWidth,
+        wantsHeight: this.isHorizontal() && offeredHeight < requestedHeight
       };
     }
 
     public isFixedHeight() {
-      return this._isHorizontal();
+      return this.isHorizontal();
     }
 
     public isFixedWidth() {
-      return !this._isHorizontal();
+      return !this.isHorizontal();
     }
 
-    protected _rescale() {
+    protected rescale() {
       // default implementation; subclasses may call _invalidateLayout() here
       this.render();
     }
 
     public computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number) {
       super.computeLayout(offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
-      if (this._isHorizontal()) {
-        this._scale.range([0, this.width()]);
+      if (this.isHorizontal()) {
+        this.scale.range([0, this.width()]);
       } else {
-        this._scale.range([this.height(), 0]);
+        this.scale.range([this.height(), 0]);
       }
     }
 
     protected setup() {
       super.setup();
-      this._tickMarkContainer = this._content.append("g")
+      this.tickMarkContainer = this._content.append("g")
                                             .classed(Axis.TICK_MARK_CLASS + "-container", true);
-      this._tickLabelContainer = this._content.append("g")
+      this.tickLabelContainer = this._content.append("g")
                                              .classed(Axis.TICK_LABEL_CLASS + "-container", true);
       this._baseline = this._content.append("line").classed("baseline", true);
     }
@@ -137,24 +137,24 @@ module Plottable {
      * Function for generating tick values in data-space (as opposed to pixel values).
      * To be implemented by subclasses.
      */
-    protected _getTickValues(): any[] {
+    protected getTickValues(): any[] {
       return [];
     }
 
     public doRender() {
-      var tickMarkValues = this._getTickValues();
-      var tickMarks = this._tickMarkContainer.selectAll("." + Axis.TICK_MARK_CLASS).data(tickMarkValues);
+      var tickMarkValues = this.getTickValues();
+      var tickMarks = this.tickMarkContainer.selectAll("." + Axis.TICK_MARK_CLASS).data(tickMarkValues);
       tickMarks.enter().append("line").classed(Axis.TICK_MARK_CLASS, true);
-      tickMarks.attr(this._generateTickMarkAttrHash());
+      tickMarks.attr(this.generateTickMarkAttrHash());
       d3.select(tickMarks[0][0]).classed(Axis.END_TICK_MARK_CLASS, true)
-                                .attr(this._generateTickMarkAttrHash(true));
+                                .attr(this.generateTickMarkAttrHash(true));
       d3.select(tickMarks[0][tickMarkValues.length - 1]).classed(Axis.END_TICK_MARK_CLASS, true)
-                                                      .attr(this._generateTickMarkAttrHash(true));
+                                                      .attr(this.generateTickMarkAttrHash(true));
       tickMarks.exit().remove();
-      this._baseline.attr(this._generateBaselineAttrHash());
+      this._baseline.attr(this.generateBaselineAttrHash());
     }
 
-    protected _generateBaselineAttrHash() {
+    protected generateBaselineAttrHash() {
       var baselineAttrHash = {
         x1: 0,
         y1: 0,
@@ -162,7 +162,7 @@ module Plottable {
         y2: 0
       };
 
-      switch (this._orientation) {
+      switch (this.orientation) {
         case "bottom":
           baselineAttrHash.x2 = this.width();
           break;
@@ -187,7 +187,7 @@ module Plottable {
       return baselineAttrHash;
     }
 
-    protected _generateTickMarkAttrHash(isEndTickMark = false) {
+    protected generateTickMarkAttrHash(isEndTickMark = false) {
       var tickMarkAttrHash = {
         x1: <any> 0,
         y1: <any> 0,
@@ -195,8 +195,8 @@ module Plottable {
         y2: <any> 0
       };
 
-      var scalingFunction = (d: any) => this._scale.scale(d);
-      if (this._isHorizontal()) {
+      var scalingFunction = (d: any) => this.scale.scale(d);
+      if (this.isHorizontal()) {
         tickMarkAttrHash["x1"] = scalingFunction;
         tickMarkAttrHash["x2"] = scalingFunction;
       } else {
@@ -206,7 +206,7 @@ module Plottable {
 
       var tickLength = isEndTickMark ? this._endTickLength : this._tickLength;
 
-      switch (this._orientation) {
+      switch (this.orientation) {
         case "bottom":
           tickMarkAttrHash["y2"] = tickLength;
           break;
@@ -230,13 +230,13 @@ module Plottable {
     }
 
     public invalidateLayout() {
-      this._computedWidth = null;
-      this._computedHeight = null;
+      this.computedWidth = null;
+      this.computedHeight = null;
       super.invalidateLayout();
     }
 
-    protected _setDefaultAlignment() {
-      switch (this._orientation) {
+    protected setDefaultAlignment() {
+      switch (this.orientation) {
         case "bottom":
           this.yAlign("top");
           break;
@@ -332,7 +332,7 @@ module Plottable {
       }
     }
 
-    protected _maxLabelTickLength() {
+    protected maxLabelTickLength() {
       if (this.showEndTickLabels()) {
         return Math.max(this.tickLength(), this.endTickLength());
       } else {
@@ -412,7 +412,7 @@ module Plottable {
     public orient(newOrientation: string): Axis;
     public orient(newOrientation?: string): any {
       if (newOrientation == null) {
-        return this._orientation;
+        return this.orientation;
       } else {
         var newOrientationLC = newOrientation.toLowerCase();
         if (newOrientationLC !== "top" &&
@@ -421,7 +421,7 @@ module Plottable {
             newOrientationLC !== "right") {
           throw new Error("unsupported orientation");
         }
-        this._orientation = newOrientationLC;
+        this.orientation = newOrientationLC;
         this.invalidateLayout();
         return this;
       }

@@ -252,28 +252,28 @@ export module Axes {
       return super.orient(orientation); // maintains getter-setter functionality
     }
 
-    public _computeHeight() {
+    public computeHeight() {
       var textHeight = this._measurer.measure().height;
 
       this._tierHeights = [];
       for (var i = 0; i < this._numTiers; i++) {
         this._tierHeights.push(textHeight + this.tickLabelPadding() +
-                              ((this._tierLabelPositions[i]) === "between" ? 0 : this._maxLabelTickLength()));
+                              ((this._tierLabelPositions[i]) === "between" ? 0 : this.maxLabelTickLength()));
       }
 
-      this._computedHeight = d3.sum(this._tierHeights);
-      return this._computedHeight;
+      this.computedHeight = d3.sum(this._tierHeights);
+      return this.computedHeight;
     }
 
     private _getIntervalLength(config: TimeAxisTierConfiguration) {
-      var startDate = this._scale.domain()[0];
+      var startDate = this.scale.domain()[0];
       var endDate = config.interval.offset(startDate, config.step);
-      if (endDate > this._scale.domain()[1]) {
+      if (endDate > this.scale.domain()[1]) {
         // this offset is too large, so just return available width
         return this.width();
       }
       // measure how much space one date can get
-      var stepLength = Math.abs(this._scale.scale(endDate) - this._scale.scale(startDate));
+      var stepLength = Math.abs(this.scale.scale(endDate) - this.scale.scale(startDate));
       return stepLength;
     }
 
@@ -311,7 +311,7 @@ export module Axes {
       this._tierLabelContainers = [];
       this._tierMarkContainers = [];
       this._tierBaselines = [];
-      this._tickLabelContainer.remove();
+      this.tickLabelContainer.remove();
       this._baseline.remove();
 
       for (var i = 0; i < this._numTiers; ++i) {
@@ -325,10 +325,10 @@ export module Axes {
     }
 
     private _getTickIntervalValues(config: TimeAxisTierConfiguration): any[] {
-      return (<Scales.Time> this._scale).tickInterval(config.interval, config.step);
+      return (<Scales.Time> this.scale).tickInterval(config.interval, config.step);
     }
 
-    protected _getTickValues(): any[] {
+    protected getTickValues(): any[] {
       return this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex].reduce(
           (ticks: any[], config: TimeAxisTierConfiguration) => ticks.concat(this._getTickIntervalValues(config)),
           []
@@ -344,8 +344,8 @@ export module Axes {
     }
 
     private _getTickValuesForConfiguration(config: TimeAxisTierConfiguration) {
-      var tickPos = (<Scales.Time> this._scale).tickInterval(config.interval, config.step);
-      var domain = this._scale.domain();
+      var tickPos = (<Scales.Time> this.scale).tickInterval(config.interval, config.step);
+      var domain = this.scale.domain();
       var tickPosValues = tickPos.map((d: Date) => d.valueOf()); // can't indexOf with objects
       if (tickPosValues.indexOf(domain[0].valueOf()) === -1) {
         tickPos.unshift(domain[0]);
@@ -384,7 +384,7 @@ export module Axes {
         Utils.DOM.translate(textSelection, xTranslate, yTranslate);
       }
       tickLabels.exit().remove();
-      tickLabels.attr("transform", (d: any) => "translate(" + this._scale.scale(d) + ",0)");
+      tickLabels.attr("transform", (d: any) => "translate(" + this.scale.scale(d) + ",0)");
       var anchor = (this._tierLabelPositions[index] === "center" || config.step === 1) ? "middle" : "start";
       tickLabels.selectAll("text").text(config.formatter).style("text-anchor", anchor);
     }
@@ -392,7 +392,7 @@ export module Axes {
     private _renderTickMarks(tickValues: Date[], index: number) {
       var tickMarks = this._tierMarkContainers[index].selectAll("." + Axis.TICK_MARK_CLASS).data(tickValues);
       tickMarks.enter().append("line").classed(Axis.TICK_MARK_CLASS, true);
-      var attr = this._generateTickMarkAttrHash();
+      var attr = this.generateTickMarkAttrHash();
       var offset = this._tierHeights.slice(0, index).reduce((translate: number, height: number) => translate + height, 0);
       if (this.orient() === "bottom") {
         attr["y1"] = offset;
@@ -420,9 +420,9 @@ export module Axes {
     }
 
     private _renderLabellessTickMarks(tickValues: Date[]) {
-      var tickMarks = this._tickMarkContainer.selectAll("." + Axis.TICK_MARK_CLASS).data(tickValues);
+      var tickMarks = this.tickMarkContainer.selectAll("." + Axis.TICK_MARK_CLASS).data(tickValues);
       tickMarks.enter().append("line").classed(Axis.TICK_MARK_CLASS, true);
-      var attr = this._generateTickMarkAttrHash();
+      var attr = this.generateTickMarkAttrHash();
       attr["y2"] = (this.orient() === "bottom") ? this.tickLabelPadding() : this.height() - this.tickLabelPadding();
       tickMarks.attr(attr);
       tickMarks.exit().remove();
@@ -451,7 +451,7 @@ export module Axes {
 
       var baselineOffset = 0;
       for (var i = 0; i < Math.max(tierConfigs.length, 1); ++i) {
-        var attr = this._generateBaselineAttrHash();
+        var attr = this.generateBaselineAttrHash();
         attr["y1"] += (this.orient() === "bottom") ? baselineOffset : -baselineOffset;
         attr["y2"] = attr["y1"];
         this._tierBaselines[i].attr(attr).style("visibility", "inherit");
@@ -459,8 +459,8 @@ export module Axes {
       }
 
       var labelLessTicks: Date[] = [];
-      var domain = this._scale.domain();
-      var totalLength = this._scale.scale(domain[1]) - this._scale.scale(domain[0]);
+      var domain = this.scale.domain();
+      var totalLength = this.scale.scale(domain[1]) - this.scale.scale(domain[0]);
       if (this._getIntervalLength(tierConfigs[0]) * 1.5 >= totalLength) {
         labelLessTicks = this._generateLabellessTicks();
       }

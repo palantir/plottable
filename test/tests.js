@@ -551,7 +551,7 @@ describe("BaseAxis", function () {
         scale.range([0, SVG_WIDTH]);
         var baseAxis = new Plottable.Axis(scale, "bottom");
         var tickValues = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-        baseAxis._getTickValues = function () {
+        baseAxis.getTickValues = function () {
             return tickValues;
         };
         baseAxis.renderTo(svg);
@@ -580,7 +580,7 @@ describe("BaseAxis", function () {
         scale.range([0, SVG_HEIGHT]);
         var baseAxis = new Plottable.Axis(scale, "left");
         var tickValues = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-        baseAxis._getTickValues = function () {
+        baseAxis.getTickValues = function () {
             return tickValues;
         };
         baseAxis.renderTo(svg);
@@ -609,7 +609,7 @@ describe("BaseAxis", function () {
         scale.range([0, SVG_WIDTH]);
         var baseAxis = new Plottable.Axis(scale, "bottom");
         var tickValues = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-        baseAxis._getTickValues = function () {
+        baseAxis.getTickValues = function () {
             return tickValues;
         };
         baseAxis.renderTo(svg);
@@ -632,7 +632,7 @@ describe("BaseAxis", function () {
         scale.range([0, SVG_WIDTH]);
         var baseAxis = new Plottable.Axis(scale, "bottom");
         var tickValues = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-        baseAxis._getTickValues = function () { return tickValues; };
+        baseAxis.getTickValues = function () { return tickValues; };
         baseAxis.renderTo(svg);
         var firstTickMark = svg.selectAll("." + Plottable.Axis.END_TICK_MARK_CLASS);
         assert.strictEqual(firstTickMark.attr("x1"), "0");
@@ -1309,9 +1309,9 @@ describe("Category Axes", function () {
         var xScale = new Plottable.Scales.Category().domain(["foo", "bar", "baz"]).range([400, 0]);
         var ca = new Plottable.Axes.Category(xScale, "left");
         ca.renderTo(svg);
-        assert.deepEqual(ca._tickLabelContainer.selectAll(".tick-label").data(), xScale.domain(), "tick labels render domain");
+        assert.deepEqual(ca.tickLabelContainer.selectAll(".tick-label").data(), xScale.domain(), "tick labels render domain");
         assert.doesNotThrow(function () { return xScale.domain(["bar", "baz", "bam"]); });
-        assert.deepEqual(ca._tickLabelContainer.selectAll(".tick-label").data(), xScale.domain(), "tick labels render domain");
+        assert.deepEqual(ca.tickLabelContainer.selectAll(".tick-label").data(), xScale.domain(), "tick labels render domain");
         svg.remove();
     });
     it("requests appropriate space when the scale has no domain", function () {
