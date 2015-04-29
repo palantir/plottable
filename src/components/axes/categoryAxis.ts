@@ -4,9 +4,9 @@ module Plottable {
 export module Axes {
   export class Category extends Axis {
     private _tickLabelAngle = 0;
-    private _measurer: SVGTypewriter.Measurers.CacheCharacterMeasurer;
-    private _wrapper: SVGTypewriter.Wrappers.SingleLineWrapper;
-    private _writer: SVGTypewriter.Writers.Writer;
+    private measurer: SVGTypewriter.Measurers.CacheCharacterMeasurer;
+    private wrapper: SVGTypewriter.Wrappers.SingleLineWrapper;
+    private writer: SVGTypewriter.Writers.Writer;
 
     /**
      * Constructs a CategoryAxis.
@@ -27,9 +27,9 @@ export module Axes {
 
     protected setup() {
       super.setup();
-      this._measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(this.tickLabelContainer);
-      this._wrapper = new SVGTypewriter.Wrappers.SingleLineWrapper();
-      this._writer = new SVGTypewriter.Writers.Writer(this._measurer, this._wrapper);
+      this.measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(this.tickLabelContainer);
+      this.wrapper = new SVGTypewriter.Wrappers.SingleLineWrapper();
+      this.writer = new SVGTypewriter.Writers.Writer(this.measurer, this.wrapper);
     }
 
     protected rescale() {
@@ -51,7 +51,7 @@ export module Axes {
       } else {
         fakeScale.range([offeredHeight, 0]);
       }
-      var textResult = this._measureTicks(offeredWidth,
+      var textResult = this.measureTicks(offeredWidth,
                                           offeredHeight,
                                           fakeScale,
                                           categoryScale.domain());
@@ -97,7 +97,7 @@ export module Axes {
      * Measures the size of the ticks while also writing them to the DOM.
      * @param {D3.Selection} ticks The tick elements to be written to.
      */
-    private _drawTicks(axisWidth: number, axisHeight: number, scale: Scales.Category, ticks: D3.Selection) {
+    private drawTicks(axisWidth: number, axisHeight: number, scale: Scales.Category, ticks: D3.Selection) {
       var self = this;
       var xAlign: {[s: string]: string};
       var yAlign: {[s: string]: string};
@@ -125,7 +125,7 @@ export module Axes {
           yAlign: yAlign[self.orient()],
           textRotation: self.tickLabelAngle()
         };
-        self._writer.write(self.formatter()(d), width, height, writeOptions);
+        self.writer.write(self.formatter()(d), width, height, writeOptions);
       });
     }
 
@@ -135,7 +135,7 @@ export module Axes {
      *
      * @param {string[]} ticks The strings that will be printed on the ticks.
      */
-    private _measureTicks(axisWidth: number, axisHeight: number, scale: Scales.Category, ticks: string[]) {
+    private measureTicks(axisWidth: number, axisHeight: number, scale: Scales.Category, ticks: string[]) {
       var wrappingResults = ticks.map((s: string) => {
         var bandWidth = scale.stepWidth();
 
@@ -161,7 +161,7 @@ export module Axes {
           height = Math.max(height, 0);
         }
 
-        return this._wrapper.wrap(this.formatter()(s), this._measurer, width, height);
+        return this.wrapper.wrap(this.formatter()(s), this.measurer, width, height);
       });
 
       // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
@@ -171,9 +171,9 @@ export module Axes {
       var textFits = wrappingResults.every((t: SVGTypewriter.Wrappers.WrappingResult) =>
                     !SVGTypewriter.Utils.StringMethods.isNotEmptyString(t.truncatedText) && t.noLines === 1);
       var usedWidth = widthFn<SVGTypewriter.Wrappers.WrappingResult, number>(wrappingResults,
-                      (t: SVGTypewriter.Wrappers.WrappingResult) => this._measurer.measure(t.wrappedText).width, 0);
+                      (t: SVGTypewriter.Wrappers.WrappingResult) => this.measurer.measure(t.wrappedText).width, 0);
       var usedHeight = heightFn<SVGTypewriter.Wrappers.WrappingResult, number>(wrappingResults,
-                      (t: SVGTypewriter.Wrappers.WrappingResult) => this._measurer.measure(t.wrappedText).height, 0);
+                      (t: SVGTypewriter.Wrappers.WrappingResult) => this.measurer.measure(t.wrappedText).height, 0);
 
       // If the tick labels are rotated, reverse usedWidth and usedHeight
       // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
@@ -207,7 +207,7 @@ export module Axes {
       tickLabels.attr("transform", getTickLabelTransform);
       // erase all text first, then rewrite
       tickLabels.text("");
-      this._drawTicks(this.width(), this.height(), catScale, tickLabels);
+      this.drawTicks(this.width(), this.height(), catScale, tickLabels);
       var translate = this.isHorizontal() ? [catScale.rangeBand() / 2, 0] : [0, catScale.rangeBand() / 2];
 
       var xTranslate = this.orient() === "right" ? this.maxLabelTickLength() + this.tickLabelPadding() : 0;
@@ -220,7 +220,7 @@ export module Axes {
       // When anyone calls _invalidateLayout, _computeLayout will be called
       // on everyone, including this. Since CSS or something might have
       // affected the size of the characters, clear the cache.
-      this._measurer.reset();
+      this.measurer.reset();
       return super.computeLayout(offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
     }
   }

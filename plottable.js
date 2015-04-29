@@ -5123,9 +5123,9 @@ var Plottable;
             }
             Category.prototype.setup = function () {
                 _super.prototype.setup.call(this);
-                this._measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(this.tickLabelContainer);
-                this._wrapper = new SVGTypewriter.Wrappers.SingleLineWrapper();
-                this._writer = new SVGTypewriter.Writers.Writer(this._measurer, this._wrapper);
+                this.measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(this.tickLabelContainer);
+                this.wrapper = new SVGTypewriter.Wrappers.SingleLineWrapper();
+                this.writer = new SVGTypewriter.Writers.Writer(this.measurer, this.wrapper);
             };
             Category.prototype.rescale = function () {
                 return this.invalidateLayout();
@@ -5144,7 +5144,7 @@ var Plottable;
                 else {
                     fakeScale.range([offeredHeight, 0]);
                 }
-                var textResult = this._measureTicks(offeredWidth, offeredHeight, fakeScale, categoryScale.domain());
+                var textResult = this.measureTicks(offeredWidth, offeredHeight, fakeScale, categoryScale.domain());
                 return {
                     width: textResult.usedWidth + widthRequiredByTicks,
                     height: textResult.usedHeight + heightRequiredByTicks,
@@ -5170,7 +5170,7 @@ var Plottable;
              * Measures the size of the ticks while also writing them to the DOM.
              * @param {D3.Selection} ticks The tick elements to be written to.
              */
-            Category.prototype._drawTicks = function (axisWidth, axisHeight, scale, ticks) {
+            Category.prototype.drawTicks = function (axisWidth, axisHeight, scale, ticks) {
                 var self = this;
                 var xAlign;
                 var yAlign;
@@ -5198,7 +5198,7 @@ var Plottable;
                         yAlign: yAlign[self.orient()],
                         textRotation: self.tickLabelAngle()
                     };
-                    self._writer.write(self.formatter()(d), width, height, writeOptions);
+                    self.writer.write(self.formatter()(d), width, height, writeOptions);
                 });
             };
             /**
@@ -5207,7 +5207,7 @@ var Plottable;
              *
              * @param {string[]} ticks The strings that will be printed on the ticks.
              */
-            Category.prototype._measureTicks = function (axisWidth, axisHeight, scale, ticks) {
+            Category.prototype.measureTicks = function (axisWidth, axisHeight, scale, ticks) {
                 var _this = this;
                 var wrappingResults = ticks.map(function (s) {
                     var bandWidth = scale.stepWidth();
@@ -5231,14 +5231,14 @@ var Plottable;
                         // HACKHACK: Wrapper fails under negative circumstances
                         height = Math.max(height, 0);
                     }
-                    return _this._wrapper.wrap(_this.formatter()(s), _this._measurer, width, height);
+                    return _this.wrapper.wrap(_this.formatter()(s), _this.measurer, width, height);
                 });
                 // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
                 var widthFn = (this.isHorizontal() && this._tickLabelAngle === 0) ? d3.sum : Plottable.Utils.Methods.max;
                 var heightFn = (this.isHorizontal() && this._tickLabelAngle === 0) ? Plottable.Utils.Methods.max : d3.sum;
                 var textFits = wrappingResults.every(function (t) { return !SVGTypewriter.Utils.StringMethods.isNotEmptyString(t.truncatedText) && t.noLines === 1; });
-                var usedWidth = widthFn(wrappingResults, function (t) { return _this._measurer.measure(t.wrappedText).width; }, 0);
-                var usedHeight = heightFn(wrappingResults, function (t) { return _this._measurer.measure(t.wrappedText).height; }, 0);
+                var usedWidth = widthFn(wrappingResults, function (t) { return _this.measurer.measure(t.wrappedText).width; }, 0);
+                var usedHeight = heightFn(wrappingResults, function (t) { return _this.measurer.measure(t.wrappedText).height; }, 0);
                 // If the tick labels are rotated, reverse usedWidth and usedHeight
                 // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
                 if (this._tickLabelAngle !== 0) {
@@ -5269,7 +5269,7 @@ var Plottable;
                 tickLabels.attr("transform", getTickLabelTransform);
                 // erase all text first, then rewrite
                 tickLabels.text("");
-                this._drawTicks(this.width(), this.height(), catScale, tickLabels);
+                this.drawTicks(this.width(), this.height(), catScale, tickLabels);
                 var translate = this.isHorizontal() ? [catScale.rangeBand() / 2, 0] : [0, catScale.rangeBand() / 2];
                 var xTranslate = this.orient() === "right" ? this.maxLabelTickLength() + this.tickLabelPadding() : 0;
                 var yTranslate = this.orient() === "bottom" ? this.maxLabelTickLength() + this.tickLabelPadding() : 0;
@@ -5280,7 +5280,7 @@ var Plottable;
                 // When anyone calls _invalidateLayout, _computeLayout will be called
                 // on everyone, including this. Since CSS or something might have
                 // affected the size of the characters, clear the cache.
-                this._measurer.reset();
+                this.measurer.reset();
                 return _super.prototype.computeLayout.call(this, offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
             };
             return Category;
