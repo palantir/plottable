@@ -277,6 +277,24 @@ declare module Plottable {
 
 
 declare module Plottable {
+    module Utils {
+        /**
+         * A set of callbacks which can be all invoked at once.
+         * Each callback exists at most once in the set (based on reference equality).
+         * All callbacks should have the same signature.
+         */
+        class CallbackSet<CB extends Function> {
+            constructor();
+            add(value: CB): CallbackSet<CB>;
+            remove(value: CB): CallbackSet<CB>;
+            values(): CB[];
+            callCallbacks(...args: any[]): CallbackSet<CB>;
+        }
+    }
+}
+
+
+declare module Plottable {
     type Formatter = (d: any) => string;
     var MILLISECONDS_IN_ONE_DAY: number;
     module Formatters {
