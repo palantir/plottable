@@ -5334,7 +5334,7 @@ var Plottable;
             Label.prototype.xAlign = function (alignment) {
                 var alignmentLC = alignment.toLowerCase();
                 _super.prototype.xAlign.call(this, alignmentLC);
-                this._xAlignment = alignmentLC;
+                this.xAlignment = alignmentLC;
                 return this;
             };
             /**
@@ -5347,11 +5347,11 @@ var Plottable;
             Label.prototype.yAlign = function (alignment) {
                 var alignmentLC = alignment.toLowerCase();
                 _super.prototype.yAlign.call(this, alignmentLC);
-                this._yAlignment = alignmentLC;
+                this.yAlignment = alignmentLC;
                 return this;
             };
             Label.prototype.requestedSpace = function (offeredWidth, offeredHeight) {
-                var desiredWH = this._measurer.measure(this._text);
+                var desiredWH = this.measurer.measure(this._text);
                 var desiredWidth = (this.orient() === "horizontal" ? desiredWH.width : desiredWH.height) + 2 * this.padding();
                 var desiredHeight = (this.orient() === "horizontal" ? desiredWH.height : desiredWH.width) + 2 * this.padding();
                 return {
@@ -5363,10 +5363,10 @@ var Plottable;
             };
             Label.prototype.setup = function () {
                 _super.prototype.setup.call(this);
-                this._textContainer = this._content.append("g");
-                this._measurer = new SVGTypewriter.Measurers.Measurer(this._textContainer);
-                this._wrapper = new SVGTypewriter.Wrappers.Wrapper();
-                this._writer = new SVGTypewriter.Writers.Writer(this._measurer, this._wrapper);
+                this.textContainer = this._content.append("g");
+                this.measurer = new SVGTypewriter.Measurers.Measurer(this.textContainer);
+                this.wrapper = new SVGTypewriter.Wrappers.Wrapper();
+                this.writer = new SVGTypewriter.Writers.Writer(this.measurer, this.wrapper);
                 this.text(this._text);
             };
             Label.prototype.text = function (displayText) {
@@ -5381,12 +5381,12 @@ var Plottable;
             };
             Label.prototype.orient = function (newOrientation) {
                 if (newOrientation == null) {
-                    return this._orientation;
+                    return this.orientation;
                 }
                 else {
                     newOrientation = newOrientation.toLowerCase();
                     if (newOrientation === "horizontal" || newOrientation === "left" || newOrientation === "right") {
-                        this._orientation = newOrientation;
+                        this.orientation = newOrientation;
                     }
                     else {
                         throw new Error(newOrientation + " is not a valid orientation for LabelComponent");
@@ -5412,21 +5412,21 @@ var Plottable;
             Label.prototype.doRender = function () {
                 _super.prototype.doRender.call(this);
                 // HACKHACK SVGTypewriter should remove existing content - #21 on SVGTypewriter.
-                this._textContainer.selectAll("g").remove();
-                var textMeasurement = this._measurer.measure(this._text);
+                this.textContainer.selectAll("g").remove();
+                var textMeasurement = this.measurer.measure(this._text);
                 var heightPadding = Math.max(Math.min((this.height() - textMeasurement.height) / 2, this.padding()), 0);
                 var widthPadding = Math.max(Math.min((this.width() - textMeasurement.width) / 2, this.padding()), 0);
-                this._textContainer.attr("transform", "translate(" + widthPadding + "," + heightPadding + ")");
+                this.textContainer.attr("transform", "translate(" + widthPadding + "," + heightPadding + ")");
                 var writeWidth = this.width() - 2 * widthPadding;
                 var writeHeight = this.height() - 2 * heightPadding;
                 var textRotation = { horizontal: 0, right: 90, left: -90 };
                 var writeOptions = {
-                    selection: this._textContainer,
-                    xAlign: this._xAlignment,
-                    yAlign: this._yAlignment,
+                    selection: this.textContainer,
+                    xAlign: this.xAlignment,
+                    yAlign: this.yAlignment,
                     textRotation: textRotation[this.orient()]
                 };
-                this._writer.write(this._text, writeWidth, writeHeight, writeOptions);
+                this.writer.write(this._text, writeWidth, writeHeight, writeOptions);
             };
             return Label;
         })(Plottable.Component);
