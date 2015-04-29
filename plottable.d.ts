@@ -1809,7 +1809,7 @@ declare module Plottable {
     class ComponentContainer extends Component {
         anchor(element: D3.Selection): void;
         render(): void;
-        _removeComponent(c: Component): void;
+        removeComponent(c: Component): void;
         _addComponent(c: Component, prepend?: boolean): boolean;
         /**
          * Returns a list of components in the ComponentContainer.
@@ -2470,7 +2470,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Components {
-        type _IterateLayoutResult = {
+        type IterateLayoutResult = {
             colProportionalSpace: number[];
             rowProportionalSpace: number[];
             guaranteedWidths: number[];
@@ -2517,7 +2517,7 @@ declare module Plottable {
              * @returns {Table} The calling Table.
              */
             addComponent(row: number, col: number, component: Component): Table;
-            _removeComponent(component: Component): void;
+            removeComponent(component: Component): void;
             requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
             computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;
             /**

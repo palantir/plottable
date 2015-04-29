@@ -3720,7 +3720,7 @@ var Plottable;
             }
             var parent = this.parent();
             if (parent != null) {
-                parent._removeComponent(this);
+                parent.removeComponent(this);
             }
             this.isAnchored = false;
             this._parentElement = null;
@@ -3860,7 +3860,7 @@ var Plottable;
         ComponentContainer.prototype.render = function () {
             this._components.forEach(function (c) { return c.render(); });
         };
-        ComponentContainer.prototype._removeComponent = function (c) {
+        ComponentContainer.prototype.removeComponent = function (c) {
             var removeIndex = this._components.indexOf(c);
             if (removeIndex >= 0) {
                 this.components().splice(removeIndex, 1);
@@ -6053,14 +6053,14 @@ var Plottable;
                 var _this = this;
                 if (rows === void 0) { rows = []; }
                 _super.call(this);
-                this._rowPadding = 0;
-                this._colPadding = 0;
-                this._rows = [];
-                this._rowWeights = [];
-                this._colWeights = [];
-                this._nRows = 0;
-                this._nCols = 0;
-                this._calculatedLayout = null;
+                this.rowPadding = 0;
+                this.colPadding = 0;
+                this.rows = [];
+                this.rowWeights = [];
+                this.colWeights = [];
+                this.nRows = 0;
+                this.nCols = 0;
+                this.calculatedLayout = null;
                 this.classed("table", true);
                 rows.forEach(function (row, rowIndex) {
                     row.forEach(function (component, colIndex) {
@@ -6096,30 +6096,30 @@ var Plottable;
                 if (component == null) {
                     throw Error("Cannot add null to a table cell");
                 }
-                var currentComponent = this._rows[row] && this._rows[row][col];
+                var currentComponent = this.rows[row] && this.rows[row][col];
                 if (currentComponent) {
                     component = component.above(currentComponent);
                 }
                 if (this._addComponent(component)) {
-                    this._nRows = Math.max(row + 1, this._nRows);
-                    this._nCols = Math.max(col + 1, this._nCols);
-                    this._padTableToSize(this._nRows, this._nCols);
-                    this._rows[row][col] = component;
+                    this.nRows = Math.max(row + 1, this.nRows);
+                    this.nCols = Math.max(col + 1, this.nCols);
+                    this.padTableToSize(this.nRows, this.nCols);
+                    this.rows[row][col] = component;
                 }
                 return this;
             };
-            Table.prototype._removeComponent = function (component) {
-                _super.prototype._removeComponent.call(this, component);
-                for (var r = 0; r < this._nRows; r++) {
-                    for (var c = 0; c < this._nCols; c++) {
-                        if (this._rows[r][c] === component) {
-                            this._rows[r][c] = null;
+            Table.prototype.removeComponent = function (component) {
+                _super.prototype.removeComponent.call(this, component);
+                for (var r = 0; r < this.nRows; r++) {
+                    for (var c = 0; c < this.nCols; c++) {
+                        if (this.rows[r][c] === component) {
+                            this.rows[r][c] = null;
                             return;
                         }
                     }
                 }
             };
-            Table.prototype._iterateLayout = function (availableWidth, availableHeight) {
+            Table.prototype.iterateLayout = function (availableWidth, availableHeight) {
                 /*
                  * Given availableWidth and availableHeight, figure out how to allocate it between rows and columns using an iterative algorithm.
                  *
@@ -6141,27 +6141,27 @@ var Plottable;
                  * circumstances this will happen or if it will happen at all. A message will be printed to the console if this occurs.
                  *
                  */
-                var rows = this._rows;
-                var cols = d3.transpose(this._rows);
-                var availableWidthAfterPadding = availableWidth - this._colPadding * (this._nCols - 1);
-                var availableHeightAfterPadding = availableHeight - this._rowPadding * (this._nRows - 1);
-                var rowWeights = Table._calcComponentWeights(this._rowWeights, rows, function (c) { return (c == null) || c.isFixedHeight(); });
-                var colWeights = Table._calcComponentWeights(this._colWeights, cols, function (c) { return (c == null) || c.isFixedWidth(); });
+                var rows = this.rows;
+                var cols = d3.transpose(this.rows);
+                var availableWidthAfterPadding = availableWidth - this.colPadding * (this.nCols - 1);
+                var availableHeightAfterPadding = availableHeight - this.rowPadding * (this.nRows - 1);
+                var rowWeights = Table.calcComponentWeights(this.rowWeights, rows, function (c) { return (c == null) || c.isFixedHeight(); });
+                var colWeights = Table.calcComponentWeights(this.colWeights, cols, function (c) { return (c == null) || c.isFixedWidth(); });
                 // To give the table a good starting position to iterate from, we give the fixed-width components half-weight
                 // so that they will get some initial space allocated to work with
                 var heuristicColWeights = colWeights.map(function (c) { return c === 0 ? 0.5 : c; });
                 var heuristicRowWeights = rowWeights.map(function (c) { return c === 0 ? 0.5 : c; });
-                var colProportionalSpace = Table._calcProportionalSpace(heuristicColWeights, availableWidthAfterPadding);
-                var rowProportionalSpace = Table._calcProportionalSpace(heuristicRowWeights, availableHeightAfterPadding);
-                var guaranteedWidths = Plottable.Utils.Methods.createFilledArray(0, this._nCols);
-                var guaranteedHeights = Plottable.Utils.Methods.createFilledArray(0, this._nRows);
+                var colProportionalSpace = Table.calcProportionalSpace(heuristicColWeights, availableWidthAfterPadding);
+                var rowProportionalSpace = Table.calcProportionalSpace(heuristicRowWeights, availableHeightAfterPadding);
+                var guaranteedWidths = Plottable.Utils.Methods.createFilledArray(0, this.nCols);
+                var guaranteedHeights = Plottable.Utils.Methods.createFilledArray(0, this.nRows);
                 var freeWidth;
                 var freeHeight;
                 var nIterations = 0;
                 while (true) {
                     var offeredHeights = Plottable.Utils.Methods.addArrays(guaranteedHeights, rowProportionalSpace);
                     var offeredWidths = Plottable.Utils.Methods.addArrays(guaranteedWidths, colProportionalSpace);
-                    var guarantees = this._determineGuarantees(offeredWidths, offeredHeights);
+                    var guarantees = this.determineGuarantees(offeredWidths, offeredHeights);
                     guaranteedWidths = guarantees.guaranteedWidths;
                     guaranteedHeights = guarantees.guaranteedHeights;
                     var wantsWidth = guarantees.wantsWidthArr.some(function (x) { return x; });
@@ -6186,8 +6186,8 @@ var Plottable;
                     else {
                         yWeights = rowWeights;
                     }
-                    colProportionalSpace = Table._calcProportionalSpace(xWeights, freeWidth);
-                    rowProportionalSpace = Table._calcProportionalSpace(yWeights, freeHeight);
+                    colProportionalSpace = Table.calcProportionalSpace(xWeights, freeWidth);
+                    rowProportionalSpace = Table.calcProportionalSpace(yWeights, freeHeight);
                     nIterations++;
                     var canImproveWidthAllocation = freeWidth > 0 && freeWidth !== lastFreeWidth;
                     var canImproveHeightAllocation = freeHeight > 0 && freeHeight !== lastFreeHeight;
@@ -6201,16 +6201,16 @@ var Plottable;
                 // Redo the proportional space one last time, to ensure we use the real weights not the wantsWidth/Height weights
                 freeWidth = availableWidthAfterPadding - d3.sum(guarantees.guaranteedWidths);
                 freeHeight = availableHeightAfterPadding - d3.sum(guarantees.guaranteedHeights);
-                colProportionalSpace = Table._calcProportionalSpace(colWeights, freeWidth);
-                rowProportionalSpace = Table._calcProportionalSpace(rowWeights, freeHeight);
+                colProportionalSpace = Table.calcProportionalSpace(colWeights, freeWidth);
+                rowProportionalSpace = Table.calcProportionalSpace(rowWeights, freeHeight);
                 return { colProportionalSpace: colProportionalSpace, rowProportionalSpace: rowProportionalSpace, guaranteedWidths: guarantees.guaranteedWidths, guaranteedHeights: guarantees.guaranteedHeights, wantsWidth: wantsWidth, wantsHeight: wantsHeight };
             };
-            Table.prototype._determineGuarantees = function (offeredWidths, offeredHeights) {
-                var requestedWidths = Plottable.Utils.Methods.createFilledArray(0, this._nCols);
-                var requestedHeights = Plottable.Utils.Methods.createFilledArray(0, this._nRows);
-                var layoutWantsWidth = Plottable.Utils.Methods.createFilledArray(false, this._nCols);
-                var layoutWantsHeight = Plottable.Utils.Methods.createFilledArray(false, this._nRows);
-                this._rows.forEach(function (row, rowIndex) {
+            Table.prototype.determineGuarantees = function (offeredWidths, offeredHeights) {
+                var requestedWidths = Plottable.Utils.Methods.createFilledArray(0, this.nCols);
+                var requestedHeights = Plottable.Utils.Methods.createFilledArray(0, this.nRows);
+                var layoutWantsWidth = Plottable.Utils.Methods.createFilledArray(false, this.nCols);
+                var layoutWantsHeight = Plottable.Utils.Methods.createFilledArray(false, this.nRows);
+                this.rows.forEach(function (row, rowIndex) {
                     row.forEach(function (component, colIndex) {
                         var spaceRequest;
                         if (component != null) {
@@ -6230,27 +6230,27 @@ var Plottable;
                 return { guaranteedWidths: requestedWidths, guaranteedHeights: requestedHeights, wantsWidthArr: layoutWantsWidth, wantsHeightArr: layoutWantsHeight };
             };
             Table.prototype.requestedSpace = function (offeredWidth, offeredHeight) {
-                this._calculatedLayout = this._iterateLayout(offeredWidth, offeredHeight);
-                return { width: d3.sum(this._calculatedLayout.guaranteedWidths), height: d3.sum(this._calculatedLayout.guaranteedHeights), wantsWidth: this._calculatedLayout.wantsWidth, wantsHeight: this._calculatedLayout.wantsHeight };
+                this.calculatedLayout = this.iterateLayout(offeredWidth, offeredHeight);
+                return { width: d3.sum(this.calculatedLayout.guaranteedWidths), height: d3.sum(this.calculatedLayout.guaranteedHeights), wantsWidth: this.calculatedLayout.wantsWidth, wantsHeight: this.calculatedLayout.wantsHeight };
             };
             Table.prototype.computeLayout = function (offeredXOrigin, offeredYOrigin, availableWidth, availableHeight) {
                 var _this = this;
                 _super.prototype.computeLayout.call(this, offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
-                var layout = this._useLastCalculatedLayout() ? this._calculatedLayout : this._iterateLayout(this.width(), this.height());
+                var layout = this._useLastCalculatedLayout() ? this.calculatedLayout : this.iterateLayout(this.width(), this.height());
                 this._useLastCalculatedLayout(true);
                 var childYOrigin = 0;
                 var rowHeights = Plottable.Utils.Methods.addArrays(layout.rowProportionalSpace, layout.guaranteedHeights);
                 var colWidths = Plottable.Utils.Methods.addArrays(layout.colProportionalSpace, layout.guaranteedWidths);
-                this._rows.forEach(function (row, rowIndex) {
+                this.rows.forEach(function (row, rowIndex) {
                     var childXOrigin = 0;
                     row.forEach(function (component, colIndex) {
                         // recursively compute layout
                         if (component != null) {
                             component.computeLayout(childXOrigin, childYOrigin, colWidths[colIndex], rowHeights[rowIndex]);
                         }
-                        childXOrigin += colWidths[colIndex] + _this._colPadding;
+                        childXOrigin += colWidths[colIndex] + _this.colPadding;
                     });
-                    childYOrigin += rowHeights[rowIndex] + _this._rowPadding;
+                    childYOrigin += rowHeights[rowIndex] + _this.rowPadding;
                 });
             };
             /**
@@ -6261,8 +6261,8 @@ var Plottable;
              * @returns {Table} The calling Table.
              */
             Table.prototype.padding = function (rowPadding, colPadding) {
-                this._rowPadding = rowPadding;
-                this._colPadding = colPadding;
+                this.rowPadding = rowPadding;
+                this.colPadding = colPadding;
                 this.invalidateLayout();
                 return this;
             };
@@ -6292,7 +6292,7 @@ var Plottable;
              * @returns {Table} The calling Table.
              */
             Table.prototype.rowWeight = function (index, weight) {
-                this._rowWeights[index] = weight;
+                this.rowWeights[index] = weight;
                 this.invalidateLayout();
                 return this;
             };
@@ -6307,36 +6307,36 @@ var Plottable;
              * @returns {Table} The calling Table.
              */
             Table.prototype.colWeight = function (index, weight) {
-                this._colWeights[index] = weight;
+                this.colWeights[index] = weight;
                 this.invalidateLayout();
                 return this;
             };
             Table.prototype.isFixedWidth = function () {
-                var cols = d3.transpose(this._rows);
-                return Table._fixedSpace(cols, function (c) { return (c == null) || c.isFixedWidth(); });
+                var cols = d3.transpose(this.rows);
+                return Table.fixedSpace(cols, function (c) { return (c == null) || c.isFixedWidth(); });
             };
             Table.prototype.isFixedHeight = function () {
-                return Table._fixedSpace(this._rows, function (c) { return (c == null) || c.isFixedHeight(); });
+                return Table.fixedSpace(this.rows, function (c) { return (c == null) || c.isFixedHeight(); });
             };
-            Table.prototype._padTableToSize = function (nRows, nCols) {
+            Table.prototype.padTableToSize = function (nRows, nCols) {
                 for (var i = 0; i < nRows; i++) {
-                    if (this._rows[i] === undefined) {
-                        this._rows[i] = [];
-                        this._rowWeights[i] = null;
+                    if (this.rows[i] === undefined) {
+                        this.rows[i] = [];
+                        this.rowWeights[i] = null;
                     }
                     for (var j = 0; j < nCols; j++) {
-                        if (this._rows[i][j] === undefined) {
-                            this._rows[i][j] = null;
+                        if (this.rows[i][j] === undefined) {
+                            this.rows[i][j] = null;
                         }
                     }
                 }
                 for (j = 0; j < nCols; j++) {
-                    if (this._colWeights[j] === undefined) {
-                        this._colWeights[j] = null;
+                    if (this.colWeights[j] === undefined) {
+                        this.colWeights[j] = null;
                     }
                 }
             };
-            Table._calcComponentWeights = function (setWeights, componentGroups, fixityAccessor) {
+            Table.calcComponentWeights = function (setWeights, componentGroups, fixityAccessor) {
                 // If the row/col weight was explicitly set, then return it outright
                 // If the weight was not explicitly set, then guess it using the heuristic that if all components are fixed-space
                 // then weight is 0, otherwise weight is 1
@@ -6349,7 +6349,7 @@ var Plottable;
                     return allFixed ? 0 : 1;
                 });
             };
-            Table._calcProportionalSpace = function (weights, freeSpace) {
+            Table.calcProportionalSpace = function (weights, freeSpace) {
                 var weightSum = d3.sum(weights);
                 if (weightSum === 0) {
                     return Plottable.Utils.Methods.createFilledArray(0, weights.length);
@@ -6358,7 +6358,7 @@ var Plottable;
                     return weights.map(function (w) { return freeSpace * w / weightSum; });
                 }
             };
-            Table._fixedSpace = function (componentGroup, fixityAccessor) {
+            Table.fixedSpace = function (componentGroup, fixityAccessor) {
                 var all = function (bools) { return bools.reduce(function (a, b) { return a && b; }, true); };
                 var group_isFixed = function (components) { return all(components.map(fixityAccessor)); };
                 return all(componentGroup.map(group_isFixed));

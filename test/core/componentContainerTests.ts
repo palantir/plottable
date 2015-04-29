@@ -34,10 +34,10 @@ describe("ComponentContainer", () => {
     container._addComponent(c1);
     container._addComponent(c2);
 
-    container._removeComponent(c2);
+    container.removeComponent(c2);
     assert.deepEqual(container.components(), [c1], "component 2 was removed");
 
-    container._removeComponent(c2);
+    container.removeComponent(c2);
     assert.deepEqual(container.components(), [c1],
       "there are no side effects from removing already-removed components");
   });

@@ -484,7 +484,7 @@ module Plottable {
       var parent: ComponentContainer = this.parent();
 
       if (parent != null) {
-        parent._removeComponent(this);
+        parent.removeComponent(this);
       }
       this.isAnchored = false;
       this._parentElement = null;
