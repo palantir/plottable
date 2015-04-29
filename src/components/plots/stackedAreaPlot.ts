@@ -34,7 +34,7 @@ export module Plots {
       this.baseline = this._renderArea.append("line").classed("baseline", true);
     }
 
-    protected _additionalPaint() {
+    protected additionalPaint() {
       var scaledBaseline = this.yScale.scale(this.baselineValue);
       var baselineAttr: any = {
         "x1": 0,

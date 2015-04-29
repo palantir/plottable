@@ -2770,7 +2770,7 @@ declare module Plottable {
         datasets(): Dataset[];
         protected _getDrawersInOrder(): Drawers.AbstractDrawer[];
         protected generateDrawSteps(): Drawers.DrawStep[];
-        protected _additionalPaint(time: number): void;
+        protected additionalPaint(time: number): void;
         protected _getDataToDraw(): D3.Map<any[]>;
         /**
          * Gets the new plot metadata for new dataset with provided key
@@ -3067,7 +3067,7 @@ declare module Plottable {
             protected _updateDomainer(scale: Scale<any, number>): void;
             protected _updateYDomainer(): void;
             protected _updateXDomainer(): void;
-            protected _additionalPaint(time: number): void;
+            protected additionalPaint(time: number): void;
             protected _drawLabels(): void;
             protected generateDrawSteps(): Drawers.DrawStep[];
             protected generateAttrToProjector(): {
@@ -3237,7 +3237,7 @@ declare module Plottable {
             protected getDrawer(key: string): Drawers.Area;
             getAnimator(key: string): Animators.PlotAnimator;
             protected setup(): void;
-            protected _additionalPaint(): void;
+            protected additionalPaint(): void;
             protected updateYDomainer(): void;
             project(attrToSet: string, accessor: any, scale?: Scale<any, any>): StackedArea<X>;
             protected onDatasetUpdate(): StackedArea<X>;

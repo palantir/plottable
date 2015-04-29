@@ -306,7 +306,7 @@ export module Plots {
       }
     }
 
-    protected _additionalPaint(time: number) {
+    protected additionalPaint(time: number) {
       var primaryScale: Scale<any, number> = this._isVertical ? this.yScale : this.xScale;
       var scaledBaseline = primaryScale.scale(this._baselineValue);
 

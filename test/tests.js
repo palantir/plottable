@@ -2492,7 +2492,7 @@ describe("Plots", function () {
             var additionalPaint = function (x) {
                 recordedTime = Math.max(x, recordedTime);
             };
-            plot._additionalPaint = additionalPaint;
+            plot.additionalPaint = additionalPaint;
             plot.animator("bars", animator);
             var svg = generateSVG();
             plot.project("x", "x", x);

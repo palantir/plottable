@@ -6785,7 +6785,7 @@ var Plottable;
         Plot.prototype.generateDrawSteps = function () {
             return [{ attrToProjector: this.generateAttrToProjector(), animator: new Plottable.Animators.Null() }];
         };
-        Plot.prototype._additionalPaint = function (time) {
+        Plot.prototype.additionalPaint = function (time) {
             // no-op
         };
         Plot.prototype._getDataToDraw = function () {
@@ -6814,7 +6814,7 @@ var Plottable;
             // TODO: Use metadata instead of dataToDraw #1297.
             var times = this._datasetKeysInOrder.map(function (k, i) { return drawers[i].draw(dataToDraw.get(k), drawSteps, _this._key2PlotDatasetKey.get(k).dataset.metadata(), _this._key2PlotDatasetKey.get(k).plotMetadata); });
             var maxTime = Plottable.Utils.Methods.max(times, 0);
-            this._additionalPaint(maxTime);
+            this.additionalPaint(maxTime);
         };
         /**
          * Retrieves all of the selections of this plot for the specified dataset(s)
@@ -7681,7 +7681,7 @@ var Plottable;
                     _super.prototype._updateXDomainer.call(this);
                 }
             };
-            Bar.prototype._additionalPaint = function (time) {
+            Bar.prototype.additionalPaint = function (time) {
                 var _this = this;
                 var primaryScale = this._isVertical ? this.yScale : this.xScale;
                 var scaledBaseline = primaryScale.scale(this._baselineValue);
@@ -8408,7 +8408,7 @@ var Plottable;
                 _super.prototype.setup.call(this);
                 this.baseline = this._renderArea.append("line").classed("baseline", true);
             };
-            StackedArea.prototype._additionalPaint = function () {
+            StackedArea.prototype.additionalPaint = function () {
                 var scaledBaseline = this.yScale.scale(this.baselineValue);
                 var baselineAttr = {
                     "x1": 0,

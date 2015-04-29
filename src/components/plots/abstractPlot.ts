@@ -405,7 +405,7 @@ module Plottable {
       return [{attrToProjector: this.generateAttrToProjector(), animator: new Animators.Null()}];
     }
 
-    protected _additionalPaint(time: number) {
+    protected additionalPaint(time: number) {
       // no-op
     }
 
@@ -442,7 +442,7 @@ module Plottable {
           this._key2PlotDatasetKey.get(k).plotMetadata
         ));
       var maxTime = Utils.Methods.max(times, 0);
-      this._additionalPaint(maxTime);
+      this.additionalPaint(maxTime);
     }
 
     /**
