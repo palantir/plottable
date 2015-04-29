@@ -1599,8 +1599,8 @@ declare module Plottable {
         };
         render(): void;
         doRender(): void;
-        _useLastCalculatedLayout(): boolean;
-        _useLastCalculatedLayout(useLast: boolean): Component;
+        useLastCalculatedLayout(): boolean;
+        useLastCalculatedLayout(useLast: boolean): Component;
         invalidateLayout(): void;
         /**
          * Renders the Component into a given DOM element. The element must be as <svg>.
@@ -1831,8 +1831,8 @@ declare module Plottable {
          */
         detachAll(): ComponentContainer;
         remove(): void;
-        _useLastCalculatedLayout(): boolean;
-        _useLastCalculatedLayout(calculated: boolean): Component;
+        useLastCalculatedLayout(): boolean;
+        useLastCalculatedLayout(calculated: boolean): Component;
     }
 }
 

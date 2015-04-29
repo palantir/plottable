@@ -258,9 +258,9 @@ export module Components {
 
     public computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number) {
       super.computeLayout(offeredXOrigin, offeredYOrigin, availableWidth , availableHeight);
-      var layout = this._useLastCalculatedLayout() ? this.calculatedLayout : this.iterateLayout(this.width(), this.height());
+      var layout = this.useLastCalculatedLayout() ? this.calculatedLayout : this.iterateLayout(this.width(), this.height());
 
-      this._useLastCalculatedLayout(true);
+      this.useLastCalculatedLayout(true);
 
       var childYOrigin = 0;
       var rowHeights = Utils.Methods.addArrays(layout.rowProportionalSpace, layout.guaranteedHeights);

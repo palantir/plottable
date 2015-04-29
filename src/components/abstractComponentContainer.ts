@@ -79,13 +79,13 @@ module Plottable {
       this.components().slice().forEach((c: Component) => c.remove());
     }
 
-    public _useLastCalculatedLayout(): boolean;
-    public _useLastCalculatedLayout(calculated: boolean): Component;
-    public _useLastCalculatedLayout(calculated?: boolean): any {
+    public useLastCalculatedLayout(): boolean;
+    public useLastCalculatedLayout(calculated: boolean): Component;
+    public useLastCalculatedLayout(calculated?: boolean): any {
       if (calculated != null) {
-        this.components().slice().forEach((c: Component) => c._useLastCalculatedLayout(calculated));
+        this.components().slice().forEach((c: Component) => c.useLastCalculatedLayout(calculated));
       }
-      return super._useLastCalculatedLayout(calculated);
+      return super.useLastCalculatedLayout(calculated);
     }
   }
 }

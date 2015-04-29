@@ -11,7 +11,7 @@ module Plottable {
     private xOrigin: number; // Origin of the coordinate space for the component. Passed down from parent
     private yOrigin: number;
 
-    private _parentElement: ComponentContainer;
+    private parentElement: ComponentContainer;
     private xAlignProportion = 0; // What % along the free space do we want to position (0 = left, .5 = center, 1 = right)
     private yAlignProportion = 0;
     protected fixedHeightFlag = false;
@@ -164,9 +164,9 @@ module Plottable {
 
     public doRender() {/* overwrite */}
 
-    public _useLastCalculatedLayout(): boolean;
-    public _useLastCalculatedLayout(useLast: boolean): Component;
-    public _useLastCalculatedLayout(useLast?: boolean): any {
+    public useLastCalculatedLayout(): boolean;
+    public useLastCalculatedLayout(useLast: boolean): Component;
+    public useLastCalculatedLayout(useLast?: boolean): any {
       if (useLast == null) {
         return this.usedLastLayout;
       } else {
@@ -176,7 +176,7 @@ module Plottable {
     }
 
     public invalidateLayout() {
-      this._useLastCalculatedLayout(false);
+      this.useLastCalculatedLayout(false);
       if (this.isAnchored && this.isSetup) {
         if (this.isTopLevelComponent) {
           this.scheduleComputeLayout();
@@ -487,7 +487,7 @@ module Plottable {
         parent.removeComponent(this);
       }
       this.isAnchored = false;
-      this._parentElement = null;
+      this.parentElement = null;
       return this;
     }
 
@@ -495,11 +495,11 @@ module Plottable {
     public parent(parentElement: ComponentContainer): any;
     public parent(parentElement?: ComponentContainer): any {
       if (parentElement === undefined) {
-        return this._parentElement;
+        return this.parentElement;
       }
 
       this.detach();
-      this._parentElement = parentElement;
+      this.parentElement = parentElement;
     }
 
     /**

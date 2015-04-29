@@ -3420,7 +3420,7 @@ var Plottable;
         };
         Component.prototype.doRender = function () {
         };
-        Component.prototype._useLastCalculatedLayout = function (useLast) {
+        Component.prototype.useLastCalculatedLayout = function (useLast) {
             if (useLast == null) {
                 return this.usedLastLayout;
             }
@@ -3430,7 +3430,7 @@ var Plottable;
             }
         };
         Component.prototype.invalidateLayout = function () {
-            this._useLastCalculatedLayout(false);
+            this.useLastCalculatedLayout(false);
             if (this.isAnchored && this.isSetup) {
                 if (this.isTopLevelComponent) {
                     this.scheduleComputeLayout();
@@ -3723,15 +3723,15 @@ var Plottable;
                 parent.removeComponent(this);
             }
             this.isAnchored = false;
-            this._parentElement = null;
+            this.parentElement = null;
             return this;
         };
         Component.prototype.parent = function (parentElement) {
             if (parentElement === undefined) {
-                return this._parentElement;
+                return this.parentElement;
             }
             this.detach();
-            this._parentElement = parentElement;
+            this.parentElement = parentElement;
         };
         /**
          * Removes a Component from the DOM and disconnects it from everything it's
@@ -3917,11 +3917,11 @@ var Plottable;
             _super.prototype.remove.call(this);
             this.components().slice().forEach(function (c) { return c.remove(); });
         };
-        ComponentContainer.prototype._useLastCalculatedLayout = function (calculated) {
+        ComponentContainer.prototype.useLastCalculatedLayout = function (calculated) {
             if (calculated != null) {
-                this.components().slice().forEach(function (c) { return c._useLastCalculatedLayout(calculated); });
+                this.components().slice().forEach(function (c) { return c.useLastCalculatedLayout(calculated); });
             }
-            return _super.prototype._useLastCalculatedLayout.call(this, calculated);
+            return _super.prototype.useLastCalculatedLayout.call(this, calculated);
         };
         return ComponentContainer;
     })(Plottable.Component);
@@ -6236,8 +6236,8 @@ var Plottable;
             Table.prototype.computeLayout = function (offeredXOrigin, offeredYOrigin, availableWidth, availableHeight) {
                 var _this = this;
                 _super.prototype.computeLayout.call(this, offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
-                var layout = this._useLastCalculatedLayout() ? this.calculatedLayout : this.iterateLayout(this.width(), this.height());
-                this._useLastCalculatedLayout(true);
+                var layout = this.useLastCalculatedLayout() ? this.calculatedLayout : this.iterateLayout(this.width(), this.height());
+                this.useLastCalculatedLayout(true);
                 var childYOrigin = 0;
                 var rowHeights = Plottable.Utils.Methods.addArrays(layout.rowProportionalSpace, layout.guaranteedHeights);
                 var colWidths = Plottable.Utils.Methods.addArrays(layout.colProportionalSpace, layout.guaranteedWidths);
