@@ -4,11 +4,11 @@ module Plottable {
 export module Axes {
   export class Numeric extends Axis {
 
-    private _tickLabelPositioning = "center";
+    private tickLabelPositioning = "center";
     // Whether or not first/last tick label will still be displayed even if
     // the label is cut off.
-    private _showFirstTickLabel = false;
-    private _showLastTickLabel = false;
+    private showFirstTickLabel = false;
+    private showLastTickLabel = false;
     private measurer: SVGTypewriter.Measurers.Measurer;
     private wrapper: SVGTypewriter.Wrappers.Wrapper;
 
@@ -42,7 +42,7 @@ export module Axes {
 
       var maxTextLength = Utils.Methods.max(textLengths, 0);
 
-      if (this._tickLabelPositioning === "center") {
+      if (this.tickLabelPositioning === "center") {
         this.computedWidth = this.maxLabelTickLength() + this.tickLabelPadding() + maxTextLength;
       } else {
         this.computedWidth = Math.max(this.maxLabelTickLength(), this.tickLabelPadding() + maxTextLength);
@@ -54,7 +54,7 @@ export module Axes {
     public computeHeight() {
       var textHeight = this.measurer.measure().height;
 
-      if (this._tickLabelPositioning === "center") {
+      if (this.tickLabelPositioning === "center") {
         this.computedHeight = this.maxLabelTickLength() + this.tickLabelPadding() + textHeight;
       } else {
         this.computedHeight = Math.max(this.maxLabelTickLength(), this.tickLabelPadding() + textHeight);
@@ -111,7 +111,7 @@ export module Axes {
       var labelGroupShiftX = 0;
       var labelGroupShiftY = 0;
       if (this.isHorizontal()) {
-        switch (this._tickLabelPositioning) {
+        switch (this.tickLabelPositioning) {
           case "left":
             tickLabelTextAnchor = "end";
             labelGroupTransformX = -tickLabelPadding;
@@ -127,7 +127,7 @@ export module Axes {
             break;
         }
       } else {
-        switch (this._tickLabelPositioning) {
+        switch (this.tickLabelPositioning) {
           case "top":
             tickLabelAttrHash["dy"] = "-0.3em";
             labelGroupShiftX = tickLabelPadding;
@@ -185,7 +185,7 @@ export module Axes {
                   var formattedText = this.formatter()(s);
                   if (!this.isHorizontal()) {
                     var availableTextSpace = this.width() - this.tickLabelPadding();
-                    availableTextSpace -= this._tickLabelPositioning === "center" ? this.maxLabelTickLength() : 0;
+                    availableTextSpace -= this.tickLabelPositioning === "center" ? this.maxLabelTickLength() : 0;
                     formattedText = this.wrapper.wrap(formattedText, this.measurer, availableTextSpace).wrappedText;
                   }
                   return formattedText;
@@ -194,24 +194,24 @@ export module Axes {
       var labelGroupTransform = "translate(" + labelGroupTransformX + ", " + labelGroupTransformY + ")";
       this.tickLabelContainer.attr("transform", labelGroupTransform);
 
-      this._showAllTickMarks();
+      this.showAllTickMarks();
 
       if (!this.showEndTickLabels()) {
-        this._hideEndTickLabels();
+        this.hideEndTickLabels();
       }
 
-      this._hideOverflowingTickLabels();
-      this._hideOverlappingTickLabels();
+      this.hideOverflowingTickLabels();
+      this.hideOverlappingTickLabels();
 
-      if (this._tickLabelPositioning === "bottom" ||
-          this._tickLabelPositioning === "top"    ||
-          this._tickLabelPositioning === "left"   ||
-          this._tickLabelPositioning === "right") {
-        this._hideTickMarksWithoutLabel();
+      if (this.tickLabelPositioning === "bottom" ||
+          this.tickLabelPositioning === "top"    ||
+          this.tickLabelPositioning === "left"   ||
+          this.tickLabelPositioning === "right") {
+        this.hideTickMarksWithoutLabel();
       }
     }
 
-    private _showAllTickMarks() {
+    private showAllTickMarks() {
       var visibleTickMarks = this.tickMarkContainer
                                  .selectAll("." + Axis.TICK_MARK_CLASS)
                                  .each(function() {
@@ -222,7 +222,7 @@ export module Axes {
     /**
      * Hides the Tick Marks which have no corresponding Tick Labels
      */
-    private _hideTickMarksWithoutLabel() {
+    private hideTickMarksWithoutLabel() {
       var visibleTickMarks = this.tickMarkContainer.selectAll("." + Axis.TICK_MARK_CLASS);
       var visibleTickLabels = this.tickLabelContainer
                                   .selectAll("." + Axis.TICK_LABEL_CLASS)
@@ -259,7 +259,7 @@ export module Axes {
     public tickLabelPosition(position: string): Numeric;
     public tickLabelPosition(position?: string): any {
       if (position == null) {
-        return this._tickLabelPositioning;
+        return this.tickLabelPositioning;
       } else {
         var positionLC = position.toLowerCase();
         if (this.isHorizontal()) {
@@ -271,7 +271,7 @@ export module Axes {
             throw new Error(positionLC + " is not a valid tick label position for a vertical NumericAxis");
           }
         }
-        this._tickLabelPositioning = positionLC;
+        this.tickLabelPositioning = positionLC;
         this.invalidateLayout();
         return this;
       }
@@ -305,18 +305,18 @@ export module Axes {
       if ((this.isHorizontal() && orientation === "left") ||
           (!this.isHorizontal() && orientation === "bottom")) {
         if (show === undefined) {
-          return this._showFirstTickLabel;
+          return this.showFirstTickLabel;
         } else {
-          this._showFirstTickLabel = show;
+          this.showFirstTickLabel = show;
           this.render();
           return this;
         }
       } else if ((this.isHorizontal() && orientation === "right") ||
                  (!this.isHorizontal() && orientation === "top")) {
         if (show === undefined) {
-          return this._showLastTickLabel;
+          return this.showLastTickLabel;
         } else {
-          this._showLastTickLabel = show;
+          this.showLastTickLabel = show;
           this.render();
           return this;
         }
@@ -327,7 +327,7 @@ export module Axes {
       }
     }
 
-    private _hideEndTickLabels() {
+    private hideEndTickLabels() {
       var boundingBox = this.boundingBox.node().getBoundingClientRect();
       var tickLabels = this.tickLabelContainer.selectAll("." + Axis.TICK_LABEL_CLASS);
       if (tickLabels[0].length === 0) {
@@ -344,7 +344,7 @@ export module Axes {
     }
 
     // Responsible for hiding any tick labels that break out of the bounding container
-    private _hideOverflowingTickLabels() {
+    private hideOverflowingTickLabels() {
       var boundingBox = this.boundingBox.node().getBoundingClientRect();
       var tickLabels = this.tickLabelContainer.selectAll("." + Axis.TICK_LABEL_CLASS);
       if (tickLabels.empty()) {
@@ -357,7 +357,7 @@ export module Axes {
       });
     }
 
-    private _hideOverlappingTickLabels() {
+    private hideOverlappingTickLabels() {
       var visibleTickLabels = this.tickLabelContainer
                                     .selectAll("." + Axis.TICK_LABEL_CLASS)
                                     .filter(function(d: any, i: number) {
@@ -369,7 +369,7 @@ export module Axes {
       var visibleTickLabelRects = visibleTickLabels[0].map((label: HTMLScriptElement) => label.getBoundingClientRect());
       var interval = 1;
 
-      while (!this._hasOverlapWithInterval(interval, visibleTickLabelRects) && interval < visibleTickLabelRects.length) {
+      while (!this.hasOverlapWithInterval(interval, visibleTickLabelRects) && interval < visibleTickLabelRects.length) {
         interval += 1;
       }
 
@@ -391,14 +391,14 @@ export module Axes {
      * from the tick and 2 * `padding` distance (or more) from the next tick
      *
      */
-    private _hasOverlapWithInterval(interval: number, rects: ClientRect[]): boolean {
+    private hasOverlapWithInterval(interval: number, rects: ClientRect[]): boolean {
 
       var padding = this.tickLabelPadding();
 
-      if (this._tickLabelPositioning === "bottom" ||
-          this._tickLabelPositioning === "top"    ||
-          this._tickLabelPositioning === "left"   ||
-          this._tickLabelPositioning === "right"  ) {
+      if (this.tickLabelPositioning === "bottom" ||
+          this.tickLabelPositioning === "top"    ||
+          this.tickLabelPositioning === "left"   ||
+          this.tickLabelPositioning === "right"  ) {
         padding *= 3;
       }
 

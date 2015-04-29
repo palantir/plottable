@@ -4347,7 +4347,7 @@ var Plottable;
                 this._tierLabelPositions = [];
                 this.classed("time-axis", true);
                 this.tickLabelPadding(5);
-                this.axisConfigurations(Time._DEFAULT_TIME_AXIS_CONFIGURATIONS);
+                this.axisConfigurations(Time.DEFAULT_TIME_AXIS_CONFIGURATIONS);
             }
             Time.prototype.tierLabelPositions = function (newPositions) {
                 if (newPositions == null) {
@@ -4364,16 +4364,16 @@ var Plottable;
             };
             Time.prototype.axisConfigurations = function (configurations) {
                 if (configurations == null) {
-                    return this._possibleTimeAxisConfigurations;
+                    return this.possibleTimeAxisConfigurations;
                 }
-                this._possibleTimeAxisConfigurations = configurations;
-                this._numTiers = Plottable.Utils.Methods.max(this._possibleTimeAxisConfigurations.map(function (config) { return config.length; }), 0);
+                this.possibleTimeAxisConfigurations = configurations;
+                this.numTiers = Plottable.Utils.Methods.max(this.possibleTimeAxisConfigurations.map(function (config) { return config.length; }), 0);
                 if (this.isAnchored) {
-                    this._setupDomElements();
+                    this.setupDomElements();
                 }
                 var oldLabelPositions = this.tierLabelPositions();
                 var newLabelPositions = [];
-                for (var i = 0; i < this._numTiers; i++) {
+                for (var i = 0; i < this.numTiers; i++) {
                     newLabelPositions.push(oldLabelPositions[i] || "between");
                 }
                 this.tierLabelPositions(newLabelPositions);
@@ -4383,15 +4383,15 @@ var Plottable;
             /**
              * Gets the index of the most precise TimeAxisConfiguration that will fit in the current width.
              */
-            Time.prototype._getMostPreciseConfigurationIndex = function () {
+            Time.prototype.getMostPreciseConfigurationIndex = function () {
                 var _this = this;
-                var mostPreciseIndex = this._possibleTimeAxisConfigurations.length;
-                this._possibleTimeAxisConfigurations.forEach(function (interval, index) {
-                    if (index < mostPreciseIndex && interval.every(function (tier) { return _this._checkTimeAxisTierConfigurationWidth(tier); })) {
+                var mostPreciseIndex = this.possibleTimeAxisConfigurations.length;
+                this.possibleTimeAxisConfigurations.forEach(function (interval, index) {
+                    if (index < mostPreciseIndex && interval.every(function (tier) { return _this.checkTimeAxisTierConfigurationWidth(tier); })) {
                         mostPreciseIndex = index;
                     }
                 });
-                if (mostPreciseIndex === this._possibleTimeAxisConfigurations.length) {
+                if (mostPreciseIndex === this.possibleTimeAxisConfigurations.length) {
                     Plottable.Utils.Methods.warn("zoomed out too far: could not find suitable interval to display labels");
                     --mostPreciseIndex;
                 }
@@ -4404,15 +4404,15 @@ var Plottable;
                 return _super.prototype.orient.call(this, orientation); // maintains getter-setter functionality
             };
             Time.prototype.computeHeight = function () {
-                var textHeight = this._measurer.measure().height;
-                this._tierHeights = [];
-                for (var i = 0; i < this._numTiers; i++) {
-                    this._tierHeights.push(textHeight + this.tickLabelPadding() + ((this._tierLabelPositions[i]) === "between" ? 0 : this.maxLabelTickLength()));
+                var textHeight = this.measurer.measure().height;
+                this.tierHeights = [];
+                for (var i = 0; i < this.numTiers; i++) {
+                    this.tierHeights.push(textHeight + this.tickLabelPadding() + ((this._tierLabelPositions[i]) === "between" ? 0 : this.maxLabelTickLength()));
                 }
-                this.computedHeight = d3.sum(this._tierHeights);
+                this.computedHeight = d3.sum(this.tierHeights);
                 return this.computedHeight;
             };
-            Time.prototype._getIntervalLength = function (config) {
+            Time.prototype.getIntervalLength = function (config) {
                 var startDate = this.scale.domain()[0];
                 var endDate = config.interval.offset(startDate, config.step);
                 if (endDate > this.scale.domain()[1]) {
@@ -4423,59 +4423,59 @@ var Plottable;
                 var stepLength = Math.abs(this.scale.scale(endDate) - this.scale.scale(startDate));
                 return stepLength;
             };
-            Time.prototype._maxWidthForInterval = function (config) {
-                return this._measurer.measure(config.formatter(Time._LONG_DATE)).width;
+            Time.prototype.maxWidthForInterval = function (config) {
+                return this.measurer.measure(config.formatter(Time.LONG_DATE)).width;
             };
             /**
              * Check if tier configuration fits in the current width.
              */
-            Time.prototype._checkTimeAxisTierConfigurationWidth = function (config) {
-                var worstWidth = this._maxWidthForInterval(config) + 2 * this.tickLabelPadding();
-                return Math.min(this._getIntervalLength(config), this.width()) >= worstWidth;
+            Time.prototype.checkTimeAxisTierConfigurationWidth = function (config) {
+                var worstWidth = this.maxWidthForInterval(config) + 2 * this.tickLabelPadding();
+                return Math.min(this.getIntervalLength(config), this.width()) >= worstWidth;
             };
             Time.prototype.getSize = function (availableWidth, availableHeight) {
                 // Makes sure that the size it requires is a multiple of tier sizes, such that
                 // we have no leftover tiers
                 var size = _super.prototype.getSize.call(this, availableWidth, availableHeight);
-                size.height = this._tierHeights.reduce(function (prevValue, currValue, index, arr) {
+                size.height = this.tierHeights.reduce(function (prevValue, currValue, index, arr) {
                     return (prevValue + currValue > size.height) ? prevValue : (prevValue + currValue);
                 });
                 return size;
             };
             Time.prototype.setup = function () {
                 _super.prototype.setup.call(this);
-                this._setupDomElements();
+                this.setupDomElements();
             };
-            Time.prototype._setupDomElements = function () {
+            Time.prototype.setupDomElements = function () {
                 this.element.selectAll("." + Time.TIME_AXIS_TIER_CLASS).remove();
-                this._tierLabelContainers = [];
-                this._tierMarkContainers = [];
-                this._tierBaselines = [];
+                this.tierLabelContainers = [];
+                this.tierMarkContainers = [];
+                this.tierBaselines = [];
                 this.tickLabelContainer.remove();
                 this._baseline.remove();
-                for (var i = 0; i < this._numTiers; ++i) {
+                for (var i = 0; i < this.numTiers; ++i) {
                     var tierContainer = this._content.append("g").classed(Time.TIME_AXIS_TIER_CLASS, true);
-                    this._tierLabelContainers.push(tierContainer.append("g").classed(Plottable.Axis.TICK_LABEL_CLASS + "-container", true));
-                    this._tierMarkContainers.push(tierContainer.append("g").classed(Plottable.Axis.TICK_MARK_CLASS + "-container", true));
-                    this._tierBaselines.push(tierContainer.append("line").classed("baseline", true));
+                    this.tierLabelContainers.push(tierContainer.append("g").classed(Plottable.Axis.TICK_LABEL_CLASS + "-container", true));
+                    this.tierMarkContainers.push(tierContainer.append("g").classed(Plottable.Axis.TICK_MARK_CLASS + "-container", true));
+                    this.tierBaselines.push(tierContainer.append("line").classed("baseline", true));
                 }
-                this._measurer = new SVGTypewriter.Measurers.Measurer(this._tierLabelContainers[0]);
+                this.measurer = new SVGTypewriter.Measurers.Measurer(this.tierLabelContainers[0]);
             };
-            Time.prototype._getTickIntervalValues = function (config) {
+            Time.prototype.getTickIntervalValues = function (config) {
                 return this.scale.tickInterval(config.interval, config.step);
             };
             Time.prototype.getTickValues = function () {
                 var _this = this;
-                return this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex].reduce(function (ticks, config) { return ticks.concat(_this._getTickIntervalValues(config)); }, []);
+                return this.possibleTimeAxisConfigurations[this.mostPreciseConfigIndex].reduce(function (ticks, config) { return ticks.concat(_this.getTickIntervalValues(config)); }, []);
             };
-            Time.prototype._cleanTiers = function () {
-                for (var index = 0; index < this._tierLabelContainers.length; index++) {
-                    this._tierLabelContainers[index].selectAll("." + Plottable.Axis.TICK_LABEL_CLASS).remove();
-                    this._tierMarkContainers[index].selectAll("." + Plottable.Axis.TICK_MARK_CLASS).remove();
-                    this._tierBaselines[index].style("visibility", "hidden");
+            Time.prototype.cleanTiers = function () {
+                for (var index = 0; index < this.tierLabelContainers.length; index++) {
+                    this.tierLabelContainers[index].selectAll("." + Plottable.Axis.TICK_LABEL_CLASS).remove();
+                    this.tierMarkContainers[index].selectAll("." + Plottable.Axis.TICK_MARK_CLASS).remove();
+                    this.tierBaselines[index].style("visibility", "hidden");
                 }
             };
-            Time.prototype._getTickValuesForConfiguration = function (config) {
+            Time.prototype.getTickValuesForConfiguration = function (config) {
                 var tickPos = this.scale.tickInterval(config.interval, config.step);
                 var domain = this.scale.domain();
                 var tickPosValues = tickPos.map(function (d) { return d.valueOf(); }); // can't indexOf with objects
@@ -4487,9 +4487,9 @@ var Plottable;
                 }
                 return tickPos;
             };
-            Time.prototype._renderTierLabels = function (container, config, index) {
+            Time.prototype.renderTierLabels = function (container, config, index) {
                 var _this = this;
-                var tickPos = this._getTickValuesForConfiguration(config);
+                var tickPos = this.getTickValuesForConfiguration(config);
                 var labelPos = [];
                 if (this._tierLabelPositions[index] === "between" && config.step === 1) {
                     tickPos.map(function (datum, index) {
@@ -4506,8 +4506,8 @@ var Plottable;
                 var tickLabelsEnter = tickLabels.enter().append("g").classed(Plottable.Axis.TICK_LABEL_CLASS, true);
                 tickLabelsEnter.append("text");
                 var xTranslate = (this._tierLabelPositions[index] === "center" || config.step === 1) ? 0 : this.tickLabelPadding();
-                var markLength = this._measurer.measure().height;
-                var yTranslate = this.orient() === "bottom" ? d3.sum(this._tierHeights.slice(0, index + 1)) - this.tickLabelPadding() : this.height() - d3.sum(this._tierHeights.slice(0, index)) - this.tickLabelPadding();
+                var markLength = this.measurer.measure().height;
+                var yTranslate = this.orient() === "bottom" ? d3.sum(this.tierHeights.slice(0, index + 1)) - this.tickLabelPadding() : this.height() - d3.sum(this.tierHeights.slice(0, index)) - this.tickLabelPadding();
                 var textSelection = tickLabels.selectAll("text");
                 if (textSelection.size() > 0) {
                     Plottable.Utils.DOM.translate(textSelection, xTranslate, yTranslate);
@@ -4517,27 +4517,27 @@ var Plottable;
                 var anchor = (this._tierLabelPositions[index] === "center" || config.step === 1) ? "middle" : "start";
                 tickLabels.selectAll("text").text(config.formatter).style("text-anchor", anchor);
             };
-            Time.prototype._renderTickMarks = function (tickValues, index) {
-                var tickMarks = this._tierMarkContainers[index].selectAll("." + Plottable.Axis.TICK_MARK_CLASS).data(tickValues);
+            Time.prototype.renderTickMarks = function (tickValues, index) {
+                var tickMarks = this.tierMarkContainers[index].selectAll("." + Plottable.Axis.TICK_MARK_CLASS).data(tickValues);
                 tickMarks.enter().append("line").classed(Plottable.Axis.TICK_MARK_CLASS, true);
                 var attr = this.generateTickMarkAttrHash();
-                var offset = this._tierHeights.slice(0, index).reduce(function (translate, height) { return translate + height; }, 0);
+                var offset = this.tierHeights.slice(0, index).reduce(function (translate, height) { return translate + height; }, 0);
                 if (this.orient() === "bottom") {
                     attr["y1"] = offset;
-                    attr["y2"] = offset + (this._tierLabelPositions[index] === "center" ? this.tickLength() : this._tierHeights[index]);
+                    attr["y2"] = offset + (this._tierLabelPositions[index] === "center" ? this.tickLength() : this.tierHeights[index]);
                 }
                 else {
                     attr["y1"] = this.height() - offset;
-                    attr["y2"] = this.height() - (offset + (this._tierLabelPositions[index] === "center" ? this.tickLength() : this._tierHeights[index]));
+                    attr["y2"] = this.height() - (offset + (this._tierLabelPositions[index] === "center" ? this.tickLength() : this.tierHeights[index]));
                 }
                 tickMarks.attr(attr);
                 if (this.orient() === "bottom") {
                     attr["y1"] = offset;
-                    attr["y2"] = offset + this._tierHeights[index];
+                    attr["y2"] = offset + this.tierHeights[index];
                 }
                 else {
                     attr["y1"] = this.height() - offset;
-                    attr["y2"] = this.height() - (offset + this._tierHeights[index]);
+                    attr["y2"] = this.height() - (offset + this.tierHeights[index]);
                 }
                 d3.select(tickMarks[0][0]).attr(attr);
                 // Add end-tick classes to first and last tick for CSS customization purposes
@@ -4545,7 +4545,7 @@ var Plottable;
                 d3.select(tickMarks[0][tickMarks.size() - 1]).classed(Plottable.Axis.END_TICK_MARK_CLASS, true);
                 tickMarks.exit().remove();
             };
-            Time.prototype._renderLabellessTickMarks = function (tickValues) {
+            Time.prototype.renderLabellessTickMarks = function (tickValues) {
                 var tickMarks = this.tickMarkContainer.selectAll("." + Plottable.Axis.TICK_MARK_CLASS).data(tickValues);
                 tickMarks.enter().append("line").classed(Plottable.Axis.TICK_MARK_CLASS, true);
                 var attr = this.generateTickMarkAttrHash();
@@ -4553,63 +4553,63 @@ var Plottable;
                 tickMarks.attr(attr);
                 tickMarks.exit().remove();
             };
-            Time.prototype._generateLabellessTicks = function () {
-                if (this._mostPreciseConfigIndex < 1) {
+            Time.prototype.generateLabellessTicks = function () {
+                if (this.mostPreciseConfigIndex < 1) {
                     return [];
                 }
-                return this._getTickIntervalValues(this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex - 1][0]);
+                return this.getTickIntervalValues(this.possibleTimeAxisConfigurations[this.mostPreciseConfigIndex - 1][0]);
             };
             Time.prototype.doRender = function () {
                 var _this = this;
-                this._mostPreciseConfigIndex = this._getMostPreciseConfigurationIndex();
-                var tierConfigs = this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex];
-                this._cleanTiers();
-                tierConfigs.forEach(function (config, i) { return _this._renderTierLabels(_this._tierLabelContainers[i], config, i); });
-                var tierTicks = tierConfigs.map(function (config, i) { return _this._getTickValuesForConfiguration(config); });
+                this.mostPreciseConfigIndex = this.getMostPreciseConfigurationIndex();
+                var tierConfigs = this.possibleTimeAxisConfigurations[this.mostPreciseConfigIndex];
+                this.cleanTiers();
+                tierConfigs.forEach(function (config, i) { return _this.renderTierLabels(_this.tierLabelContainers[i], config, i); });
+                var tierTicks = tierConfigs.map(function (config, i) { return _this.getTickValuesForConfiguration(config); });
                 var baselineOffset = 0;
                 for (var i = 0; i < Math.max(tierConfigs.length, 1); ++i) {
                     var attr = this.generateBaselineAttrHash();
                     attr["y1"] += (this.orient() === "bottom") ? baselineOffset : -baselineOffset;
                     attr["y2"] = attr["y1"];
-                    this._tierBaselines[i].attr(attr).style("visibility", "inherit");
-                    baselineOffset += this._tierHeights[i];
+                    this.tierBaselines[i].attr(attr).style("visibility", "inherit");
+                    baselineOffset += this.tierHeights[i];
                 }
                 var labelLessTicks = [];
                 var domain = this.scale.domain();
                 var totalLength = this.scale.scale(domain[1]) - this.scale.scale(domain[0]);
-                if (this._getIntervalLength(tierConfigs[0]) * 1.5 >= totalLength) {
-                    labelLessTicks = this._generateLabellessTicks();
+                if (this.getIntervalLength(tierConfigs[0]) * 1.5 >= totalLength) {
+                    labelLessTicks = this.generateLabellessTicks();
                 }
-                this._renderLabellessTickMarks(labelLessTicks);
-                this._hideOverflowingTiers();
+                this.renderLabellessTickMarks(labelLessTicks);
+                this.hideOverflowingTiers();
                 for (i = 0; i < tierConfigs.length; ++i) {
-                    this._renderTickMarks(tierTicks[i], i);
-                    this._hideOverlappingAndCutOffLabels(i);
+                    this.renderTickMarks(tierTicks[i], i);
+                    this.hideOverlappingAndCutOffLabels(i);
                 }
                 return this;
             };
-            Time.prototype._hideOverflowingTiers = function () {
+            Time.prototype.hideOverflowingTiers = function () {
                 var _this = this;
                 var availableHeight = this.height();
                 var usedHeight = 0;
                 this.element.selectAll("." + Time.TIME_AXIS_TIER_CLASS).attr("visibility", function (d, i) {
-                    usedHeight += _this._tierHeights[i];
+                    usedHeight += _this.tierHeights[i];
                     return usedHeight <= availableHeight ? "inherit" : "hidden";
                 });
             };
-            Time.prototype._hideOverlappingAndCutOffLabels = function (index) {
+            Time.prototype.hideOverlappingAndCutOffLabels = function (index) {
                 var _this = this;
                 var boundingBox = this.element.select(".bounding-box")[0][0].getBoundingClientRect();
                 var isInsideBBox = function (tickBox) {
                     return (Math.floor(boundingBox.left) <= Math.ceil(tickBox.left) && Math.floor(boundingBox.top) <= Math.ceil(tickBox.top) && Math.floor(tickBox.right) <= Math.ceil(boundingBox.left + _this.width()) && Math.floor(tickBox.bottom) <= Math.ceil(boundingBox.top + _this.height()));
                 };
-                var visibleTickMarks = this._tierMarkContainers[index].selectAll("." + Plottable.Axis.TICK_MARK_CLASS).filter(function (d, i) {
+                var visibleTickMarks = this.tierMarkContainers[index].selectAll("." + Plottable.Axis.TICK_MARK_CLASS).filter(function (d, i) {
                     var visibility = d3.select(this).style("visibility");
                     return visibility === "visible" || visibility === "inherit";
                 });
                 // We use the ClientRects because x1/x2 attributes are not comparable to ClientRects of labels
                 var visibleTickMarkRects = visibleTickMarks[0].map(function (mark) { return mark.getBoundingClientRect(); });
-                var visibleTickLabels = this._tierLabelContainers[index].selectAll("." + Plottable.Axis.TICK_LABEL_CLASS).filter(function (d, i) {
+                var visibleTickLabels = this.tierLabelContainers[index].selectAll("." + Plottable.Axis.TICK_LABEL_CLASS).filter(function (d, i) {
                     var visibility = d3.select(this).style("visibility");
                     return visibility === "visible" || visibility === "inherit";
                 });
@@ -4635,7 +4635,7 @@ var Plottable;
             /*
              * Default possible axis configurations.
              */
-            Time._DEFAULT_TIME_AXIS_CONFIGURATIONS = [
+            Time.DEFAULT_TIME_AXIS_CONFIGURATIONS = [
                 [
                     { interval: d3.time.second, step: 1, formatter: Plottable.Formatters.time("%I:%M:%S %p") },
                     { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
@@ -4744,7 +4744,7 @@ var Plottable;
                     { interval: d3.time.year, step: 1000, formatter: Plottable.Formatters.time("%Y") }
                 ]
             ];
-            Time._LONG_DATE = new Date(9999, 8, 29, 12, 59, 9999);
+            Time.LONG_DATE = new Date(9999, 8, 29, 12, 59, 9999);
             return Time;
         })(Plottable.Axis);
         Axes.Time = Time;
@@ -4778,11 +4778,11 @@ var Plottable;
             function Numeric(scale, orientation, formatter) {
                 if (formatter === void 0) { formatter = Plottable.Formatters.general(); }
                 _super.call(this, scale, orientation, formatter);
-                this._tickLabelPositioning = "center";
+                this.tickLabelPositioning = "center";
                 // Whether or not first/last tick label will still be displayed even if
                 // the label is cut off.
-                this._showFirstTickLabel = false;
-                this._showLastTickLabel = false;
+                this.showFirstTickLabel = false;
+                this.showLastTickLabel = false;
             }
             Numeric.prototype.setup = function () {
                 _super.prototype.setup.call(this);
@@ -4797,7 +4797,7 @@ var Plottable;
                     return _this.measurer.measure(formattedValue).width;
                 });
                 var maxTextLength = Plottable.Utils.Methods.max(textLengths, 0);
-                if (this._tickLabelPositioning === "center") {
+                if (this.tickLabelPositioning === "center") {
                     this.computedWidth = this.maxLabelTickLength() + this.tickLabelPadding() + maxTextLength;
                 }
                 else {
@@ -4807,7 +4807,7 @@ var Plottable;
             };
             Numeric.prototype.computeHeight = function () {
                 var textHeight = this.measurer.measure().height;
-                if (this._tickLabelPositioning === "center") {
+                if (this.tickLabelPositioning === "center") {
                     this.computedHeight = this.maxLabelTickLength() + this.tickLabelPadding() + textHeight;
                 }
                 else {
@@ -4857,7 +4857,7 @@ var Plottable;
                 var labelGroupShiftX = 0;
                 var labelGroupShiftY = 0;
                 if (this.isHorizontal()) {
-                    switch (this._tickLabelPositioning) {
+                    switch (this.tickLabelPositioning) {
                         case "left":
                             tickLabelTextAnchor = "end";
                             labelGroupTransformX = -tickLabelPadding;
@@ -4874,7 +4874,7 @@ var Plottable;
                     }
                 }
                 else {
-                    switch (this._tickLabelPositioning) {
+                    switch (this.tickLabelPositioning) {
                         case "top":
                             tickLabelAttrHash["dy"] = "-0.3em";
                             labelGroupShiftX = tickLabelPadding;
@@ -4921,24 +4921,24 @@ var Plottable;
                     var formattedText = _this.formatter()(s);
                     if (!_this.isHorizontal()) {
                         var availableTextSpace = _this.width() - _this.tickLabelPadding();
-                        availableTextSpace -= _this._tickLabelPositioning === "center" ? _this.maxLabelTickLength() : 0;
+                        availableTextSpace -= _this.tickLabelPositioning === "center" ? _this.maxLabelTickLength() : 0;
                         formattedText = _this.wrapper.wrap(formattedText, _this.measurer, availableTextSpace).wrappedText;
                     }
                     return formattedText;
                 });
                 var labelGroupTransform = "translate(" + labelGroupTransformX + ", " + labelGroupTransformY + ")";
                 this.tickLabelContainer.attr("transform", labelGroupTransform);
-                this._showAllTickMarks();
+                this.showAllTickMarks();
                 if (!this.showEndTickLabels()) {
-                    this._hideEndTickLabels();
+                    this.hideEndTickLabels();
                 }
-                this._hideOverflowingTickLabels();
-                this._hideOverlappingTickLabels();
-                if (this._tickLabelPositioning === "bottom" || this._tickLabelPositioning === "top" || this._tickLabelPositioning === "left" || this._tickLabelPositioning === "right") {
-                    this._hideTickMarksWithoutLabel();
+                this.hideOverflowingTickLabels();
+                this.hideOverlappingTickLabels();
+                if (this.tickLabelPositioning === "bottom" || this.tickLabelPositioning === "top" || this.tickLabelPositioning === "left" || this.tickLabelPositioning === "right") {
+                    this.hideTickMarksWithoutLabel();
                 }
             };
-            Numeric.prototype._showAllTickMarks = function () {
+            Numeric.prototype.showAllTickMarks = function () {
                 var visibleTickMarks = this.tickMarkContainer.selectAll("." + Plottable.Axis.TICK_MARK_CLASS).each(function () {
                     d3.select(this).style("visibility", "inherit");
                 });
@@ -4946,7 +4946,7 @@ var Plottable;
             /**
              * Hides the Tick Marks which have no corresponding Tick Labels
              */
-            Numeric.prototype._hideTickMarksWithoutLabel = function () {
+            Numeric.prototype.hideTickMarksWithoutLabel = function () {
                 var visibleTickMarks = this.tickMarkContainer.selectAll("." + Plottable.Axis.TICK_MARK_CLASS);
                 var visibleTickLabels = this.tickLabelContainer.selectAll("." + Plottable.Axis.TICK_LABEL_CLASS).filter(function (d, i) {
                     var visibility = d3.select(this).style("visibility");
@@ -4962,7 +4962,7 @@ var Plottable;
             };
             Numeric.prototype.tickLabelPosition = function (position) {
                 if (position == null) {
-                    return this._tickLabelPositioning;
+                    return this.tickLabelPositioning;
                 }
                 else {
                     var positionLC = position.toLowerCase();
@@ -4976,7 +4976,7 @@ var Plottable;
                             throw new Error(positionLC + " is not a valid tick label position for a vertical NumericAxis");
                         }
                     }
-                    this._tickLabelPositioning = positionLC;
+                    this.tickLabelPositioning = positionLC;
                     this.invalidateLayout();
                     return this;
                 }
@@ -4984,20 +4984,20 @@ var Plottable;
             Numeric.prototype.showEndTickLabel = function (orientation, show) {
                 if ((this.isHorizontal() && orientation === "left") || (!this.isHorizontal() && orientation === "bottom")) {
                     if (show === undefined) {
-                        return this._showFirstTickLabel;
+                        return this.showFirstTickLabel;
                     }
                     else {
-                        this._showFirstTickLabel = show;
+                        this.showFirstTickLabel = show;
                         this.render();
                         return this;
                     }
                 }
                 else if ((this.isHorizontal() && orientation === "right") || (!this.isHorizontal() && orientation === "top")) {
                     if (show === undefined) {
-                        return this._showLastTickLabel;
+                        return this.showLastTickLabel;
                     }
                     else {
-                        this._showLastTickLabel = show;
+                        this.showLastTickLabel = show;
                         this.render();
                         return this;
                     }
@@ -5006,7 +5006,7 @@ var Plottable;
                     throw new Error("Attempt to show " + orientation + " tick label on a " + (this.isHorizontal() ? "horizontal" : "vertical") + " axis");
                 }
             };
-            Numeric.prototype._hideEndTickLabels = function () {
+            Numeric.prototype.hideEndTickLabels = function () {
                 var boundingBox = this.boundingBox.node().getBoundingClientRect();
                 var tickLabels = this.tickLabelContainer.selectAll("." + Plottable.Axis.TICK_LABEL_CLASS);
                 if (tickLabels[0].length === 0) {
@@ -5022,7 +5022,7 @@ var Plottable;
                 }
             };
             // Responsible for hiding any tick labels that break out of the bounding container
-            Numeric.prototype._hideOverflowingTickLabels = function () {
+            Numeric.prototype.hideOverflowingTickLabels = function () {
                 var boundingBox = this.boundingBox.node().getBoundingClientRect();
                 var tickLabels = this.tickLabelContainer.selectAll("." + Plottable.Axis.TICK_LABEL_CLASS);
                 if (tickLabels.empty()) {
@@ -5034,7 +5034,7 @@ var Plottable;
                     }
                 });
             };
-            Numeric.prototype._hideOverlappingTickLabels = function () {
+            Numeric.prototype.hideOverlappingTickLabels = function () {
                 var visibleTickLabels = this.tickLabelContainer.selectAll("." + Plottable.Axis.TICK_LABEL_CLASS).filter(function (d, i) {
                     var visibility = d3.select(this).style("visibility");
                     return (visibility === "inherit") || (visibility === "visible");
@@ -5042,7 +5042,7 @@ var Plottable;
                 var lastLabelClientRect;
                 var visibleTickLabelRects = visibleTickLabels[0].map(function (label) { return label.getBoundingClientRect(); });
                 var interval = 1;
-                while (!this._hasOverlapWithInterval(interval, visibleTickLabelRects) && interval < visibleTickLabelRects.length) {
+                while (!this.hasOverlapWithInterval(interval, visibleTickLabelRects) && interval < visibleTickLabelRects.length) {
                     interval += 1;
                 }
                 visibleTickLabels.each(function (d, i) {
@@ -5062,9 +5062,9 @@ var Plottable;
              * from the tick and 2 * `padding` distance (or more) from the next tick
              *
              */
-            Numeric.prototype._hasOverlapWithInterval = function (interval, rects) {
+            Numeric.prototype.hasOverlapWithInterval = function (interval, rects) {
                 var padding = this.tickLabelPadding();
-                if (this._tickLabelPositioning === "bottom" || this._tickLabelPositioning === "top" || this._tickLabelPositioning === "left" || this._tickLabelPositioning === "right") {
+                if (this.tickLabelPositioning === "bottom" || this.tickLabelPositioning === "top" || this.tickLabelPositioning === "left" || this.tickLabelPositioning === "right") {
                     padding *= 3;
                 }
                 for (var i = 0; i < rects.length - (interval); i += interval) {
