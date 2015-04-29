@@ -121,7 +121,7 @@ export module Component {
       }
     }
 
-    private _iterateLayout(availableWidth : number, availableHeight: number): _IterateLayoutResult {
+    private _iterateLayout(availableWidth: number, availableHeight: number): _IterateLayoutResult {
     /*
      * Given availableWidth and availableHeight, figure out how to allocate it between rows and columns using an iterative algorithm.
      *
@@ -254,7 +254,7 @@ export module Component {
               wantsHeightArr   : layoutWantsHeight};
     }
 
-    public _requestedSpace(offeredWidth : number, offeredHeight: number): _SpaceRequest {
+    public _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
       this._calculatedLayout = this._iterateLayout(offeredWidth , offeredHeight);
       return {width : d3.sum(this._calculatedLayout.guaranteedWidths ),
               height: d3.sum(this._calculatedLayout.guaranteedHeights),
