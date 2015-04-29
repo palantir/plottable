@@ -709,7 +709,6 @@ var Plottable;
                 for (var _i = 0; _i < arguments.length; _i++) {
                     args[_i - 0] = arguments[_i];
                 }
-                // no fat-arrow notation to set "this" to current "this" context
                 this.values().forEach(function (callback) {
                     callback.apply(this, args);
                 });

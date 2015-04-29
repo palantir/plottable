@@ -34,7 +34,6 @@ module Plottable {
       }
 
       public callCallbacks(...args: any[]) {
-        // no fat-arrow notation to set "this" to current "this" context
         this.values().forEach(function(callback) {
           callback.apply(this, args);
         });
