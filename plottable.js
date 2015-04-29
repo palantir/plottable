@@ -1088,12 +1088,12 @@ var Plottable;
          */
         var PlottableObject = (function () {
             function PlottableObject() {
-                this._plottableID = PlottableObject._nextID++;
+                this._plottableID = PlottableObject.nextID++;
             }
             PlottableObject.prototype.getID = function () {
                 return this._plottableID;
             };
-            PlottableObject._nextID = 0;
+            PlottableObject.nextID = 0;
             return PlottableObject;
         })();
         Core.PlottableObject = PlottableObject;

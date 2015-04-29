@@ -6533,7 +6533,7 @@ describe("Component behavior", function () {
         svg.remove();
     });
     it("componentID works as expected", function () {
-        var expectedID = Plottable.Core.PlottableObject._nextID;
+        var expectedID = Plottable.Core.PlottableObject.nextID;
         var c1 = new Plottable.Component();
         assert.equal(c1.getID(), expectedID, "component id on next component was as expected");
         var c2 = new Plottable.Component();
