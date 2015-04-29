@@ -3,19 +3,19 @@
 module Plottable {
 export module Component {
   type _LayoutAllocation = {
-    guaranteedWidths : number[];
+    guaranteedWidths: number[];
     guaranteedHeights: number[];
-    wantsWidthArr : boolean[];
+    wantsWidthArr: boolean[];
     wantsHeightArr: boolean[];
   }
 
   export type _IterateLayoutResult = {
     colProportionalSpace: number[];
     rowProportionalSpace: number[];
-    guaranteedWidths    : number[];
-    guaranteedHeights   : number[];
-    wantsWidth          : boolean;
-    wantsHeight         : boolean;
+    guaranteedWidths: number[];
+    guaranteedHeights: number[];
+    wantsWidth: boolean;
+    wantsHeight: boolean;
   };
 
   export class Table extends AbstractComponentContainer {
