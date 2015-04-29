@@ -75,8 +75,8 @@ export module Components {
       };
     }
 
-    protected _setup() {
-      super._setup();
+    protected setup() {
+      super.setup();
       this._textContainer = this._content.append("g");
       this._measurer = new SVGTypewriter.Measurers.Measurer(this._textContainer);
       this._wrapper = new SVGTypewriter.Wrappers.Wrapper();

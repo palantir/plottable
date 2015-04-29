@@ -18,8 +18,8 @@ export module Components {
       this.fixedHeightFlag = true;
     }
 
-    protected _setup() {
-      super._setup();
+    protected setup() {
+      super.setup();
 
       this._box = this._content.append("g").classed("selection-box", true).remove();
       this._boxArea = this._box.append("rect").classed("selection-area", true);
@@ -51,7 +51,7 @@ export module Components {
       }
 
       this._setBounds(newBounds);
-      this._render();
+      this.render();
       return this;
     }
 
@@ -105,7 +105,7 @@ export module Components {
       }
 
       this._boxVisible = show;
-      this._render();
+      this.render();
       return this;
     }
   }

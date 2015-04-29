@@ -33,7 +33,7 @@ export module Components {
       };
     }
 
-    public _merge(c: Component, below: boolean): Group {
+    public merge(c: Component, below: boolean): Group {
       this._addComponent(c, !below);
       return this;
     }

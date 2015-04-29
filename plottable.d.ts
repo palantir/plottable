@@ -1580,7 +1580,7 @@ declare module Plottable {
          * Called during anchor() if the Component's element has not been created yet.
          * Override in subclasses to provide additional functionality.
          */
-        protected _setup(): void;
+        protected setup(): void;
         _requestedSpace(availableWidth: number, availableHeight: number): _SpaceRequest;
         /**
          * Computes the size, position, and alignment from the specified values.
@@ -1597,7 +1597,7 @@ declare module Plottable {
             width: number;
             height: number;
         };
-        _render(): void;
+        render(): void;
         _doRender(): void;
         _useLastCalculatedLayout(): boolean;
         _useLastCalculatedLayout(useLast: boolean): Component;
@@ -1696,7 +1696,7 @@ declare module Plottable {
          * @returns {boolean} Whether the component has a fixed height.
          */
         isFixedHeight(): boolean;
-        _merge(c: Component, below: boolean): Components.Group;
+        merge(c: Component, below: boolean): Components.Group;
         /**
          * Merges this Component above another Component, returning a
          * ComponentGroup. This is used to layer Components on top of each other.
@@ -1734,8 +1734,8 @@ declare module Plottable {
          * @returns The calling Component.
          */
         detach(): Component;
-        _parent(): ComponentContainer;
-        _parent(parentElement: ComponentContainer): any;
+        parent(): ComponentContainer;
+        parent(parentElement: ComponentContainer): any;
         /**
          * Removes a Component from the DOM and disconnects it from everything it's
          * listening to (effectively destroying it).
@@ -1808,7 +1808,7 @@ declare module Plottable {
 declare module Plottable {
     class ComponentContainer extends Component {
         anchor(element: D3.Selection): void;
-        _render(): void;
+        render(): void;
         _removeComponent(c: Component): void;
         _addComponent(c: Component, prepend?: boolean): boolean;
         /**
@@ -1855,7 +1855,7 @@ declare module Plottable {
              */
             constructor(components?: Component[]);
             _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
-            _merge(c: Component, below: boolean): Group;
+            merge(c: Component, below: boolean): Group;
             _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): Group;
             protected _getSize(availableWidth: number, availableHeight: number): {
                 width: number;
@@ -1909,7 +1909,7 @@ declare module Plottable {
         isFixedWidth(): boolean;
         protected _rescale(): void;
         _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;
-        protected _setup(): void;
+        protected setup(): void;
         protected _getTickValues(): any[];
         _doRender(): void;
         protected _generateBaselineAttrHash(): {
@@ -2093,7 +2093,7 @@ declare module Plottable {
                 width: number;
                 height: number;
             };
-            protected _setup(): void;
+            protected setup(): void;
             protected _getTickValues(): any[];
             _doRender(): Time;
         }
@@ -2115,7 +2115,7 @@ declare module Plottable {
              * @param {Formatter} formatter A function to format tick labels (default Formatters.general()).
              */
             constructor(scale: QuantitativeScale<number>, orientation: string, formatter?: (d: any) => string);
-            protected _setup(): void;
+            protected setup(): void;
             _computeWidth(): number;
             _computeHeight(): number;
             protected _getTickValues(): any[];
@@ -2182,7 +2182,7 @@ declare module Plottable {
              * @param {Formatter} formatter The Formatter for the Axis (default Formatters.identity())
              */
             constructor(scale: Scales.Category, orientation?: string, formatter?: (d: any) => string);
-            protected _setup(): void;
+            protected setup(): void;
             protected _rescale(): void;
             _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
             protected _getTickValues(): string[];
@@ -2238,7 +2238,7 @@ declare module Plottable {
              */
             yAlign(alignment: string): Label;
             _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
-            protected _setup(): void;
+            protected setup(): void;
             /**
              * Gets the current text on the Label.
              *
@@ -2326,7 +2326,7 @@ declare module Plottable {
              * @param {Scale.Color} colorScale
              */
             constructor(colorScale: Scales.Color);
-            protected _setup(): void;
+            protected setup(): void;
             /**
              * Gets the current max number of entries in Legend row.
              * @returns {number} The current max number of entries in row.
@@ -2441,7 +2441,7 @@ declare module Plottable {
              * @returns {InterpolatedColorLegend} The calling InterpolatedColorLegend.
              */
             orient(newOrientation: string): InterpolatedColorLegend;
-            protected _setup(): void;
+            protected setup(): void;
             _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
             _doRender(): void;
         }
@@ -2461,7 +2461,7 @@ declare module Plottable {
              */
             constructor(xScale: QuantitativeScale<any>, yScale: QuantitativeScale<any>);
             remove(): Gridlines;
-            protected _setup(): void;
+            protected setup(): void;
             _doRender(): void;
         }
     }
@@ -2577,7 +2577,7 @@ declare module Plottable {
         class SelectionBoxLayer extends Component {
             protected _box: D3.Selection;
             constructor();
-            protected _setup(): void;
+            protected setup(): void;
             protected _getSize(availableWidth: number, availableHeight: number): {
                 width: number;
                 height: number;
@@ -2658,7 +2658,7 @@ declare module Plottable {
          */
         constructor();
         anchor(element: D3.Selection): void;
-        protected _setup(): void;
+        protected setup(): void;
         remove(): void;
         /**
          * Adds a dataset to this plot. Identify this dataset with a key.
@@ -2987,7 +2987,7 @@ declare module Plottable {
              */
             constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>, isVertical?: boolean);
             protected _getDrawer(key: string): Drawers.Rect;
-            protected _setup(): void;
+            protected setup(): void;
             /**
              * Gets the baseline value for the bars
              *
@@ -3236,7 +3236,7 @@ declare module Plottable {
             constructor(xScale: QuantitativeScale<X>, yScale: QuantitativeScale<number>);
             protected _getDrawer(key: string): Drawers.Area;
             _getAnimator(key: string): Animators.PlotAnimator;
-            protected _setup(): void;
+            protected setup(): void;
             protected _additionalPaint(): void;
             protected _updateYDomainer(): void;
             project(attrToSet: string, accessor: any, scale?: Scale<any, any>): StackedArea<X>;
@@ -3949,7 +3949,7 @@ declare module Plottable {
         class DragBoxLayer extends Components.SelectionBoxLayer {
             protected _hasCorners: boolean;
             constructor();
-            protected _setup(): void;
+            protected setup(): void;
             _doRender(): void;
             /**
              * Gets the detection radius of the drag box.

@@ -12,10 +12,10 @@ describe("ComponentGroups", () => {
     var cg = new Plottable.Components.Group([c1, c2, c3]);
     var svg = generateSVG(400, 400);
     cg.anchor(svg);
-    (<any> c1)._addBox("test-box1");
-    (<any> c2)._addBox("test-box2");
-    (<any> c3)._addBox("test-box3");
-    cg._computeLayout()._render();
+    (<any> c1).addBox("test-box1");
+    (<any> c2).addBox("test-box2");
+    (<any> c3).addBox("test-box3");
+    cg._computeLayout().render();
     var t1 = svg.select(".test-box1");
     var t2 = svg.select(".test-box2");
     var t3 = svg.select(".test-box3");
@@ -33,16 +33,16 @@ describe("ComponentGroups", () => {
     var cg = new Plottable.Components.Group([c1]);
     var svg = generateSVG(400, 400);
     cg.below(c2).anchor(svg);
-    (<any> c1)._addBox("test-box1");
-    (<any> c2)._addBox("test-box2");
-    cg._computeLayout()._render();
+    (<any> c1).addBox("test-box1");
+    (<any> c2).addBox("test-box2");
+    cg._computeLayout().render();
     var t1 = svg.select(".test-box1");
     var t2 = svg.select(".test-box2");
     assertWidthHeight(t1, 10, 10, "rect1 sized correctly");
     assertWidthHeight(t2, 20, 20, "rect2 sized correctly");
     cg.below(c3);
-    (<any> c3)._addBox("test-box3");
-    cg._computeLayout()._render();
+    (<any> c3).addBox("test-box3");
+    cg._computeLayout().render();
     var t3 = svg.select(".test-box3");
     assertWidthHeight(t3, 400, 400, "rect3 sized correctly");
     svg.remove();
@@ -204,7 +204,7 @@ describe("ComponentGroups", () => {
       assert.strictEqual(cg1.components().length, 1,
         "first group should have 1 component before movement");
 
-      assert.strictEqual(c._parent(), cg1,
+      assert.strictEqual(c.parent(), cg1,
         "component's parent before moving should be the group 1"
       );
 
@@ -218,7 +218,7 @@ describe("ComponentGroups", () => {
       assert.strictEqual(cg1.components().length, 0,
         "first group should have no components after movement");
 
-      assert.strictEqual(c._parent(), cg2,
+      assert.strictEqual(c.parent(), cg2,
         "component's parent after movement should be the group 2"
       );
 

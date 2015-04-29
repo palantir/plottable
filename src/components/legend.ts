@@ -53,8 +53,8 @@ export module Components {
       this._symbolFactoryAccessor = () => SymbolFactories.circle();
     }
 
-    protected _setup() {
-      super._setup();
+    protected setup() {
+      super.setup();
       var fakeLegendRow = this._content.append("g").classed(Legend.LEGEND_ROW_CLASS, true);
       var fakeLegendEntry = fakeLegendRow.append("g").classed(Legend.LEGEND_ENTRY_CLASS, true);
       fakeLegendEntry.append("text");
@@ -316,7 +316,7 @@ export module Components {
         return this._symbolFactoryAccessor;
       } else {
         this._symbolFactoryAccessor = symbolFactoryAccessor;
-        this._render();
+        this.render();
         return this;
       }
     }

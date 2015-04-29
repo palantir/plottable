@@ -119,8 +119,8 @@ export module Components {
       return ticks;
     }
 
-    protected _setup() {
-      super._setup();
+    protected setup() {
+      super.setup();
 
       this._swatchContainer = this._content.append("g").classed("swatch-container", true);
       this._swatchBoundingBox = this._content.append("rect").classed("swatch-bounding-box", true);

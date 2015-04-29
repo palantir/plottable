@@ -22,7 +22,7 @@ describe("Gridlines", () => {
     basicTable._computeLayout();
     xScale.range([0, xAxis.width() ]); // manually set range since we don't have a renderer
     yScale.range([yAxis.height(), 0]);
-    basicTable._render();
+    basicTable.render();
 
     var xAxisTickMarks = (<any> xAxis).element.selectAll("." + Plottable.Axis.TICK_MARK_CLASS)[0];
     var xGridlines = (<any> gridlines).element.select(".x-gridlines").selectAll("line")[0];

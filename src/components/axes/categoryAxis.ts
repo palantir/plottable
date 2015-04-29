@@ -25,8 +25,8 @@ export module Axes {
       this.classed("category-axis", true);
     }
 
-    protected _setup() {
-      super._setup();
+    protected setup() {
+      super.setup();
       this._measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(this._tickLabelContainer);
       this._wrapper = new SVGTypewriter.Wrappers.SingleLineWrapper();
       this._writer = new SVGTypewriter.Writers.Writer(this._measurer, this._wrapper);

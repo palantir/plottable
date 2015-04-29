@@ -13,8 +13,8 @@ module Plottable {
       this.components().forEach((c) => c.anchor(this._content));
     }
 
-    public _render() {
-      this._components.forEach((c) => c._render());
+    public render() {
+      this._components.forEach((c) => c.render());
     }
 
     public _removeComponent(c: Component) {
@@ -35,7 +35,7 @@ module Plottable {
       } else {
         this.components().push(c);
       }
-      c._parent(this);
+      c.parent(this);
       if (this.isAnchored) {
         c.anchor(this._content);
       }

@@ -97,7 +97,7 @@ export module Core {
         // Top level render.
         // Containers will put their children in the toRender queue
         var toRender = d3.values(_componentsNeedingRender);
-        toRender.forEach((c) => c._render());
+        toRender.forEach((c) => c.render());
 
         // now we are flushing
         _isCurrentlyFlushing = true;

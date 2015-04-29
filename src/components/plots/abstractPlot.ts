@@ -65,8 +65,8 @@ module Plottable {
       this._updateScaleExtents();
     }
 
-    protected _setup() {
-      super._setup();
+    protected setup() {
+      super.setup();
       this._renderArea = this._content.append("g").classed("render-area", true);
       // HACKHACK on 591
       this._getDrawersInOrder().forEach((d) => d.setup(this._renderArea.append("g")));
@@ -144,7 +144,7 @@ module Plottable {
       this._updateScaleExtents();
       this._animateOnNextRender = true;
       this._dataChanged = true;
-      this._render();
+      this.render();
     }
 
     /**
@@ -190,12 +190,12 @@ module Plottable {
       }
 
       if (scale) {
-        scale.broadcaster.registerListener(this, () => this._render());
+        scale.broadcaster.registerListener(this, () => this.render());
       }
       accessor = Utils.Methods.accessorize(accessor);
       this._projections[attrToSet] = {accessor: accessor, scale: scale, attribute: attrToSet};
       this._updateScaleExtent(attrToSet);
-      this._render(); // queue a re-render upon changing projector
+      this.render(); // queue a re-render upon changing projector
       return this;
     }
 

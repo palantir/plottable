@@ -204,7 +204,7 @@ describe("Component behavior", () => {
     var expectedClipPathID = c.getID();
     c.anchor(svg);
     c._computeLayout(0, 0, 100, 100);
-    c._render();
+    c.render();
     var expectedPrefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
     expectedPrefix = expectedPrefix.replace(/#.*/g, "");
     var expectedClipPathURL = "url(" + expectedPrefix + "#clipPath" + expectedClipPathID + ")";
@@ -228,9 +228,9 @@ describe("Component behavior", () => {
   });
 
   it("boxes work as expected", () => {
-    assert.throws(() => (<any> c)._addBox("pre-anchor"), Error, "Adding boxes before anchoring is currently disallowed");
+    assert.throws(() => (<any> c).addBox("pre-anchor"), Error, "Adding boxes before anchoring is currently disallowed");
     c.renderTo(svg);
-    (<any> c)._addBox("post-anchor");
+    (<any> c).addBox("post-anchor");
     var e = (<any> c).element;
     var boxContainer = e.select(".box-container");
     var boxStrings = [".bounding-box", ".post-anchor"];
@@ -387,17 +387,17 @@ describe("Component behavior", () => {
     var c: any = new Plottable.Component();
     c._doRender = () => renderFlag = true;
     c.anchor(svg);
-    c._setup();
-    c._render();
+    c.setup();
+    c.render();
     assert.isFalse(renderFlag, "no render until width/height set to nonzero");
 
     c._width = 10;
     c._height = 0;
-    c._render();
+    c.render();
     assert.isTrue(renderFlag, "render still occurs if one of width/height is zero");
 
     c._height = 10;
-    c._render();
+    c.render();
     assert.isTrue(renderFlag, "render occurs if width and height are positive");
 
     svg.remove();
@@ -417,12 +417,12 @@ describe("Component behavior", () => {
 
     group._addComponent(plot);
 
-    assert.deepEqual(plot._parent(), group, "the plot should be inside the group");
+    assert.deepEqual(plot.parent(), group, "the plot should be inside the group");
     assert.strictEqual(plot.height(), SVG_HEIGHT_1, "the plot should occupy the entire space of the first svg");
 
     plot.renderTo(svg2);
 
-    assert.equal(plot._parent(), null, "the plot should be outside the group");
+    assert.equal(plot.parent(), null, "the plot should be outside the group");
     assert.strictEqual(plot.height(), SVG_HEIGHT_2, "the plot should occupy the entire space of the second svg");
 
     svg1.remove();

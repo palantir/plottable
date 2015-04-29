@@ -1472,7 +1472,7 @@ describe("Gridlines", function () {
         basicTable._computeLayout();
         xScale.range([0, xAxis.width()]); // manually set range since we don't have a renderer
         yScale.range([yAxis.height(), 0]);
-        basicTable._render();
+        basicTable.render();
         var xAxisTickMarks = xAxis.element.selectAll("." + Plottable.Axis.TICK_MARK_CLASS)[0];
         var xGridlines = gridlines.element.select(".x-gridlines").selectAll("line")[0];
         assert.equal(xAxisTickMarks.length, xGridlines.length, "There is an x gridline for each x tick");
@@ -1725,7 +1725,7 @@ describe("Legend", function () {
         legend.renderTo(svg);
         var numRows = legend._content.selectAll(rowSelector)[0].length;
         assert.equal(numRows, 3, "there are 3 legend rows initially");
-        legend._render();
+        legend.render();
         numRows = legend._content.selectAll(rowSelector)[0].length;
         assert.equal(numRows, 3, "there are 3 legend rows after second render");
         svg.remove();
@@ -1795,11 +1795,11 @@ describe("Legend", function () {
         verifySymbolHeight();
         style.text(".plottable .legend text { font-size: 60px; }");
         legend._computeLayout();
-        legend._render();
+        legend.render();
         verifySymbolHeight();
         style.text(".plottable .legend text { font-size: 10px; }");
         legend._computeLayout();
-        legend._render();
+        legend.render();
         verifySymbolHeight();
         svg.remove();
     });
@@ -2110,9 +2110,9 @@ var CountingPlot = (function (_super) {
         _super.apply(this, arguments);
         this.renders = 0;
     }
-    CountingPlot.prototype._render = function () {
+    CountingPlot.prototype.render = function () {
         ++this.renders;
-        return _super.prototype._render.call(this);
+        return _super.prototype.render.call(this);
     };
     return CountingPlot;
 })(Plottable.Plot);
@@ -4470,8 +4470,8 @@ describe("Plots", function () {
                 svg.remove();
             });
             it("rendering is idempotent", function () {
-                circlePlot._render();
-                circlePlot._render();
+                circlePlot.render();
+                circlePlot.render();
                 circlePlot.getAllSelections().each(getCirclePlotVerifier());
                 assert.equal(circlesInArea, 10, "10 circles were drawn");
                 svg.remove();
@@ -6095,10 +6095,10 @@ describe("ComponentGroups", function () {
         var cg = new Plottable.Components.Group([c1, c2, c3]);
         var svg = generateSVG(400, 400);
         cg.anchor(svg);
-        c1._addBox("test-box1");
-        c2._addBox("test-box2");
-        c3._addBox("test-box3");
-        cg._computeLayout()._render();
+        c1.addBox("test-box1");
+        c2.addBox("test-box2");
+        c3.addBox("test-box3");
+        cg._computeLayout().render();
         var t1 = svg.select(".test-box1");
         var t2 = svg.select(".test-box2");
         var t3 = svg.select(".test-box3");
@@ -6114,16 +6114,16 @@ describe("ComponentGroups", function () {
         var cg = new Plottable.Components.Group([c1]);
         var svg = generateSVG(400, 400);
         cg.below(c2).anchor(svg);
-        c1._addBox("test-box1");
-        c2._addBox("test-box2");
-        cg._computeLayout()._render();
+        c1.addBox("test-box1");
+        c2.addBox("test-box2");
+        cg._computeLayout().render();
         var t1 = svg.select(".test-box1");
         var t2 = svg.select(".test-box2");
         assertWidthHeight(t1, 10, 10, "rect1 sized correctly");
         assertWidthHeight(t2, 20, 20, "rect2 sized correctly");
         cg.below(c3);
-        c3._addBox("test-box3");
-        cg._computeLayout()._render();
+        c3.addBox("test-box3");
+        cg._computeLayout().render();
         var t3 = svg.select(".test-box3");
         assertWidthHeight(t3, 400, 400, "rect3 sized correctly");
         svg.remove();
@@ -6247,11 +6247,11 @@ describe("ComponentGroups", function () {
             cg2.renderTo(svg);
             assert.strictEqual(cg2.components().length, 0, "second group should have no component before movement");
             assert.strictEqual(cg1.components().length, 1, "first group should have 1 component before movement");
-            assert.strictEqual(c._parent(), cg1, "component's parent before moving should be the group 1");
+            assert.strictEqual(c.parent(), cg1, "component's parent before moving should be the group 1");
             assert.doesNotThrow(function () { return cg2._addComponent(c); }, Error, "should be able to move components between groups after anchoring");
             assert.strictEqual(cg2.components().length, 1, "second group should have 1 component after movement");
             assert.strictEqual(cg1.components().length, 0, "first group should have no components after movement");
-            assert.strictEqual(c._parent(), cg2, "component's parent after movement should be the group 2");
+            assert.strictEqual(c.parent(), cg2, "component's parent after movement should be the group 2");
             svg.remove();
         });
         it("can add null to a component without failing", function () {
@@ -6520,7 +6520,7 @@ describe("Component behavior", function () {
         var expectedClipPathID = c.getID();
         c.anchor(svg);
         c._computeLayout(0, 0, 100, 100);
-        c._render();
+        c.render();
         var expectedPrefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
         expectedPrefix = expectedPrefix.replace(/#.*/g, "");
         var expectedClipPathURL = "url(" + expectedPrefix + "#clipPath" + expectedClipPathID + ")";
@@ -6541,9 +6541,9 @@ describe("Component behavior", function () {
         svg.remove();
     });
     it("boxes work as expected", function () {
-        assert.throws(function () { return c._addBox("pre-anchor"); }, Error, "Adding boxes before anchoring is currently disallowed");
+        assert.throws(function () { return c.addBox("pre-anchor"); }, Error, "Adding boxes before anchoring is currently disallowed");
         c.renderTo(svg);
-        c._addBox("post-anchor");
+        c.addBox("post-anchor");
         var e = c.element;
         var boxContainer = e.select(".box-container");
         var boxStrings = [".bounding-box", ".post-anchor"];
@@ -6677,15 +6677,15 @@ describe("Component behavior", function () {
         var c = new Plottable.Component();
         c._doRender = function () { return renderFlag = true; };
         c.anchor(svg);
-        c._setup();
-        c._render();
+        c.setup();
+        c.render();
         assert.isFalse(renderFlag, "no render until width/height set to nonzero");
         c._width = 10;
         c._height = 0;
-        c._render();
+        c.render();
         assert.isTrue(renderFlag, "render still occurs if one of width/height is zero");
         c._height = 10;
-        c._render();
+        c.render();
         assert.isTrue(renderFlag, "render occurs if width and height are positive");
         svg.remove();
     });
@@ -6700,10 +6700,10 @@ describe("Component behavior", function () {
         var group = new Plottable.Components.Group;
         group.renderTo(svg1);
         group._addComponent(plot);
-        assert.deepEqual(plot._parent(), group, "the plot should be inside the group");
+        assert.deepEqual(plot.parent(), group, "the plot should be inside the group");
         assert.strictEqual(plot.height(), SVG_HEIGHT_1, "the plot should occupy the entire space of the first svg");
         plot.renderTo(svg2);
-        assert.equal(plot._parent(), null, "the plot should be outside the group");
+        assert.equal(plot.parent(), null, "the plot should be outside the group");
         assert.strictEqual(plot.height(), SVG_HEIGHT_2, "the plot should occupy the entire space of the second svg");
         svg1.remove();
         svg2.remove();

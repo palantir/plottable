@@ -300,8 +300,8 @@ export module Axes {
       return size;
     }
 
-    protected _setup() {
-      super._setup();
+    protected setup() {
+      super.setup();
       this._setupDomElements();
     }
 

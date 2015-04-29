@@ -112,7 +112,7 @@ module Plottable {
 
     protected _rescale() {
       // default implementation; subclasses may call _invalidateLayout() here
-      this._render();
+      this.render();
     }
 
     public _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number) {
@@ -124,8 +124,8 @@ module Plottable {
       }
     }
 
-    protected _setup() {
-      super._setup();
+    protected setup() {
+      super.setup();
       this._tickMarkContainer = this._content.append("g")
                                             .classed(Axis.TICK_MARK_CLASS + "-container", true);
       this._tickLabelContainer = this._content.append("g")
@@ -449,7 +449,7 @@ module Plottable {
         return this._showEndTickLabels;
       }
       this._showEndTickLabels = show;
-      this._render();
+      this.render();
       return this;
     }
   }

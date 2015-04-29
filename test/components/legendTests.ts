@@ -83,7 +83,7 @@ describe("Legend", () => {
     legend.renderTo(svg);
     var numRows = (<any> legend)._content.selectAll(rowSelector)[0].length;
     assert.equal(numRows, 3, "there are 3 legend rows initially");
-    legend._render();
+    legend.render();
     numRows = (<any> legend)._content.selectAll(rowSelector)[0].length;
     assert.equal(numRows, 3, "there are 3 legend rows after second render");
     svg.remove();
@@ -167,12 +167,12 @@ describe("Legend", () => {
 
     style.text(".plottable .legend text { font-size: 60px; }");
     legend._computeLayout();
-    legend._render();
+    legend.render();
     verifySymbolHeight();
 
     style.text(".plottable .legend text { font-size: 10px; }");
     legend._computeLayout();
-    legend._render();
+    legend.render();
     verifySymbolHeight();
 
     svg.remove();

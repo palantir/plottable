@@ -27,8 +27,8 @@ export module Axes {
       super(scale, orientation, formatter);
     }
 
-    protected _setup() {
-      super._setup();
+    protected setup() {
+      super.setup();
       this._measurer = new SVGTypewriter.Measurers.Measurer(this._tickLabelContainer, Axis.TICK_LABEL_CLASS);
       this._wrapper = new SVGTypewriter.Wrappers.Wrapper().maxLines(1);
     }
@@ -88,7 +88,7 @@ export module Axes {
         }
       }
 
-      this._render();
+      this.render();
     }
 
     public _doRender() {
@@ -308,7 +308,7 @@ export module Axes {
           return this._showFirstTickLabel;
         } else {
           this._showFirstTickLabel = show;
-          this._render();
+          this.render();
           return this;
         }
       } else if ((this._isHorizontal() && orientation === "right") ||
@@ -317,7 +317,7 @@ export module Axes {
           return this._showLastTickLabel;
         } else {
           this._showLastTickLabel = show;
-          this._render();
+          this.render();
           return this;
         }
       } else {

@@ -57,7 +57,7 @@ module Plottable {
         element.node().appendChild(this.element.node());
       } else {
         this.element = element.append("g");
-        this._setup();
+        this.setup();
       }
       this.isAnchored = true;
     }
@@ -67,7 +67,7 @@ module Plottable {
      * Called during anchor() if the Component's element has not been created yet.
      * Override in subclasses to provide additional functionality.
      */
-    protected _setup() {
+    protected setup() {
       if (this.isSetup) {
         return;
       }
@@ -77,7 +77,7 @@ module Plottable {
       this.cssClasses = null;
 
       this.backgroundContainer = this.element.append("g").classed("background-container", true);
-      this._addBox("background-fill", this.backgroundContainer);
+      this.addBox("background-fill", this.backgroundContainer);
       this._content = this.element.append("g").classed("content", true);
       this.foregroundContainer = this.element.append("g").classed("foreground-container", true);
       this.boxContainer = this.element.append("g").classed("box-container", true);
@@ -86,7 +86,7 @@ module Plottable {
         this.generateClipPath();
       };
 
-      this.boundingBox = this._addBox("bounding-box");
+      this.boundingBox = this.addBox("bounding-box");
 
       this.interactionsToRegister.forEach((r) => this.registerInteraction(r));
       this.interactionsToRegister = null;
@@ -150,13 +150,13 @@ module Plottable {
       };
     }
 
-    public _render() {
+    public render() {
       if (this.isAnchored && this.isSetup && this.width() >= 0 && this.height() >= 0) {
         Core.RenderControllers.registerToRender(this);
       }
     }
 
-    private _scheduleComputeLayout() {
+    private scheduleComputeLayout() {
       if (this.isAnchored && this.isSetup) {
         Core.RenderControllers.registerToComputeLayout(this);
       }
@@ -179,9 +179,9 @@ module Plottable {
       this._useLastCalculatedLayout(false);
       if (this.isAnchored && this.isSetup) {
         if (this.isTopLevelComponent) {
-          this._scheduleComputeLayout();
+          this.scheduleComputeLayout();
         } else {
-          this._parent()._invalidateLayout();
+          this.parent()._invalidateLayout();
         }
       }
     }
@@ -211,7 +211,7 @@ module Plottable {
           or a D3.Selection, or a selector string");
       }
       this._computeLayout();
-      this._render();
+      this.render();
       // flush so that consumers can immediately attach to stuff we create in the DOM
       Core.RenderControllers.flush();
       return this;
@@ -310,7 +310,7 @@ module Plottable {
       return this;
     }
 
-    private _addBox(className?: string, parentElement?: D3.Selection) {
+    private addBox(className?: string, parentElement?: D3.Selection) {
       if (this.element == null) {
         throw new Error("Adding boxes before anchoring is currently disallowed");
       }
@@ -334,7 +334,7 @@ module Plottable {
       this.element.attr("clip-path", "url(\"" + prefix + "#clipPath" + this.getID() + "\")");
       var clipPathParent = this.boxContainer.append("clipPath")
                                       .attr("id", "clipPath" + this.getID());
-      this._addBox("clip-rect", clipPathParent);
+      this.addBox("clip-rect", clipPathParent);
     }
 
     /**
@@ -349,7 +349,7 @@ module Plottable {
       // registered immediately
       if (this.element) {
         if (!this._hitBox && interaction._requiresHitbox()) {
-            this._hitBox = this._addBox("hit-box");
+            this._hitBox = this.addBox("hit-box");
             this._hitBox.style("fill", "#ffffff").style("opacity", 0); // We need to set these so Chrome will register events
         }
         interaction.anchor(this, this._hitBox);
@@ -421,7 +421,7 @@ module Plottable {
       return this.fixedHeightFlag;
     }
 
-    public _merge(c: Component, below: boolean): Components.Group {
+    public merge(c: Component, below: boolean): Components.Group {
       var cg: Components.Group;
       if (Plottable.Components.Group.prototype.isPrototypeOf(c)) {
         cg = (<Plottable.Components.Group> c);
@@ -448,7 +448,7 @@ module Plottable {
      * @returns {ComponentGroup} The relevant ComponentGroup out of the above four cases.
      */
     public above(c: Component): Components.Group {
-      return this._merge(c, false);
+      return this.merge(c, false);
     }
 
     /**
@@ -465,7 +465,7 @@ module Plottable {
      * @returns {ComponentGroup} The relevant ComponentGroup out of the above four cases.
      */
     public below(c: Component): Components.Group {
-      return this._merge(c, true);
+      return this.merge(c, true);
     }
 
     /**
@@ -481,7 +481,7 @@ module Plottable {
         this.element.remove();
       }
 
-      var parent: ComponentContainer = this._parent();
+      var parent: ComponentContainer = this.parent();
 
       if (parent != null) {
         parent._removeComponent(this);
@@ -491,9 +491,9 @@ module Plottable {
       return this;
     }
 
-    public _parent(): ComponentContainer;
-    public _parent(parentElement: ComponentContainer): any;
-    public _parent(parentElement?: ComponentContainer): any {
+    public parent(): ComponentContainer;
+    public parent(parentElement: ComponentContainer): any;
+    public parent(parentElement?: ComponentContainer): any {
       if (parentElement === undefined) {
         return this._parentElement;
       }
@@ -548,12 +548,12 @@ module Plottable {
      */
     public originToSVG(): Point {
       var origin = this.origin();
-      var ancestor = this._parent();
+      var ancestor = this.parent();
       while (ancestor != null) {
         var ancestorOrigin = ancestor.origin();
         origin.x += ancestorOrigin.x;
         origin.y += ancestorOrigin.y;
-        ancestor = ancestor._parent();
+        ancestor = ancestor.parent();
       }
       return origin;
     }
