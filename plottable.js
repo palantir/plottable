@@ -1088,10 +1088,10 @@ var Plottable;
          */
         var PlottableObject = (function () {
             function PlottableObject() {
-                this._plottableID = PlottableObject.nextID++;
+                this.plottableID = PlottableObject.nextID++;
             }
             PlottableObject.prototype.getID = function () {
-                return this._plottableID;
+                return this.plottableID;
             };
             PlottableObject.nextID = 0;
             return PlottableObject;
@@ -1130,8 +1130,8 @@ var Plottable;
              */
             function Broadcaster(listenable) {
                 _super.call(this);
-                this._key2callback = new Plottable.Utils.StrictEqualityAssociativeArray();
-                this._listenable = listenable;
+                this.key2callback = new Plottable.Utils.StrictEqualityAssociativeArray();
+                this.listenable = listenable;
             }
             /**
              * Registers a callback to be called when the broadcast method is called. Also takes a key which
@@ -1144,7 +1144,7 @@ var Plottable;
              * @returns {Broadcaster} The calling Broadcaster
              */
             Broadcaster.prototype.registerListener = function (key, callback) {
-                this._key2callback.set(key, callback);
+                this.key2callback.set(key, callback);
                 return this;
             };
             /**
@@ -1159,9 +1159,9 @@ var Plottable;
                 for (var _i = 0; _i < arguments.length; _i++) {
                     args[_i - 0] = arguments[_i];
                 }
-                args.unshift(this._listenable);
-                this._key2callback.values().forEach(function (callback) {
-                    callback.apply(_this._listenable, args);
+                args.unshift(this.listenable);
+                this.key2callback.values().forEach(function (callback) {
+                    callback.apply(_this.listenable, args);
                 });
                 return this;
             };
@@ -1172,7 +1172,7 @@ var Plottable;
              * @returns {Broadcaster} The calling Broadcaster
              */
             Broadcaster.prototype.deregisterListener = function (key) {
-                this._key2callback.delete(key);
+                this.key2callback.delete(key);
                 return this;
             };
             /**
@@ -1181,7 +1181,7 @@ var Plottable;
              * @returns {any[]} An array of the keys.
              */
             Broadcaster.prototype.getListenerKeys = function () {
-                return this._key2callback.keys();
+                return this.key2callback.keys();
             };
             /**
              * Deregisters all listeners and callbacks associated with the Broadcaster.
@@ -1189,7 +1189,7 @@ var Plottable;
              * @returns {Broadcaster} The calling Broadcaster
              */
             Broadcaster.prototype.deregisterAllListeners = function () {
-                this._key2callback = new Plottable.Utils.StrictEqualityAssociativeArray();
+                this.key2callback = new Plottable.Utils.StrictEqualityAssociativeArray();
             };
             return Broadcaster;
         })(Core.PlottableObject);
