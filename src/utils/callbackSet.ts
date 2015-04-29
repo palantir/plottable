@@ -2,6 +2,11 @@
 
 module Plottable {
   export module Utils {
+    /**
+     * A set of callbacks which can be all invoked at once.
+     * Each callback exists at most once in the set (based on reference equality).
+     * Ideally, all callbacks should have the same signature.
+     */
     export class CallbackSet<CB extends Function> {
       private _values: CB[];
 
@@ -30,7 +35,9 @@ module Plottable {
 
       public callCallbacks(...args: any[]) {
         // no fat-arrow notation to set "this" to current "this" context
-        this.values().forEach(function(callback) { callback.apply(this, args); });
+        this.values().forEach(function(callback) {
+          callback.apply(this, args);
+        });
         return this;
       }
     }
