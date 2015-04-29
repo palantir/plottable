@@ -78,7 +78,7 @@ module Plottable {
       return this._computedHeight;
     }
 
-    public _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
+    public _requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest {
       var requestedWidth = 0;
       var requestedHeight = 0;
 

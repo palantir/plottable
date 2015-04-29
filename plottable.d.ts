@@ -681,7 +681,7 @@ declare module Plottable {
     /**
      * Defines a way how specific attribute needs be retrieved before rendering.
      */
-    type _Projection = {
+    type Projection = {
         accessor: Accessor;
         scale?: Scale<any, any>;
         attribute: string;
@@ -709,7 +709,7 @@ declare module Plottable {
         yMin: number;
         yMax: number;
     };
-    type _SpaceRequest = {
+    type SpaceRequest = {
         width: number;
         height: number;
         wantsWidth: boolean;
@@ -1581,7 +1581,7 @@ declare module Plottable {
          * Override in subclasses to provide additional functionality.
          */
         protected _setup(): void;
-        _requestedSpace(availableWidth: number, availableHeight: number): _SpaceRequest;
+        _requestedSpace(availableWidth: number, availableHeight: number): SpaceRequest;
         /**
          * Computes the size, position, and alignment from the specified values.
          * If no parameters are supplied and the Component is a root node,
@@ -1854,7 +1854,7 @@ declare module Plottable {
              * @param {Component[]} components The Components in the resultant Component.Group (default = []).
              */
             constructor(components?: Component[]);
-            _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
+            _requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
             _merge(c: Component, below: boolean): Group;
             _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): Group;
             protected _getSize(availableWidth: number, availableHeight: number): {
@@ -1904,7 +1904,7 @@ declare module Plottable {
         protected _isHorizontal(): boolean;
         protected _computeWidth(): number;
         protected _computeHeight(): number;
-        _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
+        _requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
         _isFixedHeight(): boolean;
         _isFixedWidth(): boolean;
         protected _rescale(): void;
@@ -2184,7 +2184,7 @@ declare module Plottable {
             constructor(scale: Scales.Category, orientation?: string, formatter?: (d: any) => string);
             protected _setup(): void;
             protected _rescale(): void;
-            _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
+            _requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
             protected _getTickValues(): string[];
             /**
              * Sets the angle for the tick labels. Right now vertical-left (-90), horizontal (0), and vertical-right (90) are the only options.
@@ -2237,7 +2237,7 @@ declare module Plottable {
              * @returns {Label} The calling Label.
              */
             yAlign(alignment: string): Label;
-            _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
+            _requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
             protected _setup(): void;
             /**
              * Gets the current text on the Label.
@@ -2365,7 +2365,7 @@ declare module Plottable {
              */
             scale(scale: Scales.Color): Legend;
             remove(): void;
-            _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
+            _requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
             /**
              * Gets the legend entry under the given pixel position.
              *
@@ -2442,7 +2442,7 @@ declare module Plottable {
              */
             orient(newOrientation: string): InterpolatedColorLegend;
             protected _setup(): void;
-            _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
+            _requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
             _doRender(): void;
         }
     }
@@ -2518,7 +2518,7 @@ declare module Plottable {
              */
             addComponent(row: number, col: number, component: Component): Table;
             _removeComponent(component: Component): void;
-            _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
+            _requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
             _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;
             /**
              * Sets the row and column padding on the Table.
@@ -2641,7 +2641,7 @@ declare module Plottable {
         protected _datasetKeysInOrder: string[];
         protected _renderArea: D3.Selection;
         protected _projections: {
-            [attrToSet: string]: _Projection;
+            [attrToSet: string]: Projection;
         };
         protected _animate: boolean;
         protected _animateOnNextRender: boolean;

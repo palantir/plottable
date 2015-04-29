@@ -31,7 +31,7 @@ module Plottable {
     protected _datasetKeysInOrder: string[];
 
     protected _renderArea: D3.Selection;
-    protected _projections: { [attrToSet: string]: _Projection; } = {};
+    protected _projections: { [attrToSet: string]: Projection; } = {};
 
     protected _animate: boolean = false;
     private _animators: Animators.PlotAnimatorMap = {};

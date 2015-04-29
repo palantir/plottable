@@ -17,7 +17,7 @@ module Plottable {
   /**
    * Defines a way how specific attribute needs be retrieved before rendering.
    */
-  export type _Projection = {
+  export type Projection = {
     accessor: Accessor;
     scale?: Scale<any, any>;
     attribute: string;
@@ -45,7 +45,7 @@ module Plottable {
     yMax: number;
   }
 
-  export type _SpaceRequest = {
+  export type SpaceRequest = {
     width: number;
     height: number;
     wantsWidth: boolean;
