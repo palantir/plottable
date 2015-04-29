@@ -281,7 +281,7 @@ declare module Plottable {
         /**
          * A set of callbacks which can be all invoked at once.
          * Each callback exists at most once in the set (based on reference equality).
-         * Ideally, all callbacks should have the same signature.
+         * All callbacks should have the same signature.
          */
         class CallbackSet<CB extends Function> {
             constructor();

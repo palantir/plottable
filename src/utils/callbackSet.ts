@@ -5,7 +5,7 @@ module Plottable {
     /**
      * A set of callbacks which can be all invoked at once.
      * Each callback exists at most once in the set (based on reference equality).
-     * Ideally, all callbacks should have the same signature.
+     * All callbacks should have the same signature.
      */
     export class CallbackSet<CB extends Function> {
       private _values: CB[];
