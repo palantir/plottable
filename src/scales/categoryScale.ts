@@ -142,10 +142,7 @@ export module Scale {
     }
 
     public copy(): Category {
-      return new Category(this._d3Scale.copy())
-                  .range(this.range())
-                  .innerPadding(this.innerPadding())
-                  .outerPadding(this.outerPadding());
+      return new Category(this._d3Scale.copy());
     }
 
     public scale(value: string): number {

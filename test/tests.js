@@ -7615,19 +7615,6 @@ describe("Scales", function () {
             var widthSum = scale.rangeBand() * (1 + scale.innerPadding());
             assert.strictEqual(scale.stepWidth(), widthSum, "step width is the sum of innerPadding width and band width");
         });
-        it("copy()", function () {
-            var original = new Plottable.Scale.Category();
-            original.domain(["1", "2", "3", "4"]);
-            original.range([0, 2679]);
-            // change the padding to get a different value than the default
-            original.innerPadding(0.1 + original.innerPadding());
-            original.outerPadding(0.1 + original.outerPadding());
-            var clone = original.copy();
-            assert.deepEqual(clone.domain(), original.domain(), "domain was copied");
-            assert.deepEqual(clone.range(), original.range(), "range was copied");
-            assert.strictEqual(clone.innerPadding(), original.innerPadding(), "inner padding was copied");
-            assert.strictEqual(clone.outerPadding(), original.outerPadding(), "outer padding was copied");
-        });
     });
     it("CategoryScale + BarPlot combo works as expected when the data is swapped", function () {
         // This unit test taken from SLATE, see SLATE-163 a fix for SLATE-102

@@ -2299,7 +2299,7 @@ var Plottable;
                 return this;
             };
             Category.prototype.copy = function () {
-                return new Category(this._d3Scale.copy()).range(this.range()).innerPadding(this.innerPadding()).outerPadding(this.outerPadding());
+                return new Category(this._d3Scale.copy());
             };
             Category.prototype.scale = function (value) {
                 //scale it to the middle
