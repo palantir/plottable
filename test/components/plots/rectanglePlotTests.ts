@@ -15,7 +15,7 @@ describe("Plots", () => {
     ];
 
     var VERIFY_CELLS = (cells: D3.Selection) => {
-      assert.equal(cells[0].length, 5);
+      assert.strictEqual(cells[0].length, 5);
       cells.each(function(d: D3.Selection, i: number) {
         var cell = d3.select(this);
         assert.closeTo(+cell.attr("height"), 50, 0.5, "Cell height is correct");

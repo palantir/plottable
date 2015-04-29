@@ -34,24 +34,24 @@ describe("Plots", () => {
       var r = new CountingPlot();
       r.addDataset("foo", dFoo);
 
-      assert.equal(1, r.renders, "initial render due to addDataset");
+      assert.strictEqual(1, r.renders, "initial render due to addDataset");
 
       dFoo.broadcaster.broadcast();
-      assert.equal(2, r.renders, "we re-render when our dataset changes");
+      assert.strictEqual(2, r.renders, "we re-render when our dataset changes");
 
       r.addDataset("bar", dBar);
-      assert.equal(3, r.renders, "we should redraw when we add a dataset");
+      assert.strictEqual(3, r.renders, "we should redraw when we add a dataset");
 
       dFoo.broadcaster.broadcast();
-      assert.equal(4, r.renders, "we should still listen to the first dataset");
+      assert.strictEqual(4, r.renders, "we should still listen to the first dataset");
 
       dBar.broadcaster.broadcast();
-      assert.equal(5, r.renders, "we should listen to the new dataset");
+      assert.strictEqual(5, r.renders, "we should listen to the new dataset");
 
       r.removeDataset("foo");
-      assert.equal(6, r.renders, "we re-render on dataset removal");
+      assert.strictEqual(6, r.renders, "we re-render on dataset removal");
       dFoo.broadcaster.broadcast();
-      assert.equal(6, r.renders, "we don't listen to removed datasets");
+      assert.strictEqual(6, r.renders, "we don't listen to removed datasets");
 
     });
 
@@ -69,34 +69,34 @@ describe("Plots", () => {
       r.project("y", "y", yScale);
       r.project("meta", metadataProjector);
       xScale.broadcaster.registerListener("unitTest", (listenable: Plottable.Scale.Linear) => {
-        assert.equal(listenable, xScale, "Callback received the calling scale as the first argument");
+        assert.strictEqual(listenable, xScale, "Callback received the calling scale as the first argument");
         ++xScaleCalls;
       });
       yScale.broadcaster.registerListener("unitTest", (listenable: Plottable.Scale.Linear) => {
-        assert.equal(listenable, yScale, "Callback received the calling scale as the first argument");
+        assert.strictEqual(listenable, yScale, "Callback received the calling scale as the first argument");
         ++yScaleCalls;
       });
 
-      assert.equal(0, xScaleCalls, "initially hasn't made any X callbacks");
-      assert.equal(0, yScaleCalls, "initially hasn't made any Y callbacks");
+      assert.strictEqual(0, xScaleCalls, "initially hasn't made any X callbacks");
+      assert.strictEqual(0, yScaleCalls, "initially hasn't made any Y callbacks");
 
       d1.broadcaster.broadcast();
-      assert.equal(1, xScaleCalls, "X scale was wired up to datasource correctly");
-      assert.equal(1, yScaleCalls, "Y scale was wired up to datasource correctly");
+      assert.strictEqual(1, xScaleCalls, "X scale was wired up to datasource correctly");
+      assert.strictEqual(1, yScaleCalls, "Y scale was wired up to datasource correctly");
 
       var d2 = new Plottable.Dataset([{x: 7, y: 8}], {cssClass: "boo"});
       r.removeDataset("d1");
       r.addDataset(d2);
-      assert.equal(3, xScaleCalls, "Changing datasource fires X scale listeners (but doesn't coalesce callbacks)");
-      assert.equal(3, yScaleCalls, "Changing datasource fires Y scale listeners (but doesn't coalesce callbacks)");
+      assert.strictEqual(3, xScaleCalls, "Changing datasource fires X scale listeners (but doesn't coalesce callbacks)");
+      assert.strictEqual(3, yScaleCalls, "Changing datasource fires Y scale listeners (but doesn't coalesce callbacks)");
 
       d1.broadcaster.broadcast();
-      assert.equal(3, xScaleCalls, "X scale was unhooked from old datasource");
-      assert.equal(3, yScaleCalls, "Y scale was unhooked from old datasource");
+      assert.strictEqual(3, xScaleCalls, "X scale was unhooked from old datasource");
+      assert.strictEqual(3, yScaleCalls, "Y scale was unhooked from old datasource");
 
       d2.broadcaster.broadcast();
-      assert.equal(4, xScaleCalls, "X scale was hooked into new datasource");
-      assert.equal(4, yScaleCalls, "Y scale was hooked into new datasource");
+      assert.strictEqual(4, xScaleCalls, "X scale was hooked into new datasource");
+      assert.strictEqual(4, yScaleCalls, "Y scale was hooked into new datasource");
 
     });
 
@@ -114,7 +114,7 @@ describe("Plots", () => {
       r.project("attr", "a", s);
       var attrToProjector = (<any> r)._generateAttrToProjector();
       var projector = attrToProjector["attr"];
-      assert.equal(projector({"a": 0.5}, 0, null, null), 5, "projector works as intended");
+      assert.strictEqual(projector({"a": 0.5}, 0, null, null), 5, "projector works as intended");
     });
 
     it("Changing Plot.dataset().data to [] causes scale to contract", () => {
@@ -377,8 +377,8 @@ describe("Plots", () => {
         plot.addDataset(a1);
         plot.addDataset(a2);
         assert.lengthOf(plot.datasets(), 4, "there are four datasets");
-        assert.equal(plot.datasets()[3].data(), a2, "second array dataset correct");
-        assert.equal(plot.datasets()[2].data(), a1, "first array dataset correct");
+        assert.strictEqual(plot.datasets()[3].data(), a2, "second array dataset correct");
+        assert.strictEqual(plot.datasets()[2].data(), a1, "first array dataset correct");
         plot.removeDataset(a2);
         plot.removeDataset(a1);
         assert.deepEqual(plot.datasets(), [d1, d2], "datasets as expected");
@@ -465,7 +465,7 @@ describe("Plots", () => {
       plot.project("y", "y", y);
       plot.renderTo(svg);
       svg.remove();
-      assert.equal(recordedTime, 20, "additionalPaint passed appropriate time argument");
+      assert.strictEqual(recordedTime, 20, "additionalPaint passed appropriate time argument");
     });
 
     it("extent calculation done in correct dataset order", () => {

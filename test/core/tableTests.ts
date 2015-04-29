@@ -37,7 +37,7 @@ describe("Tables", () => {
     (<any> t)._padTableToSize(5, 2);
     assert.lengthOf(rows, 5, "there are five rows");
     rows.forEach((r: Plottable.Component.AbstractComponent[]) => assert.lengthOf(r, 2, "there are two columsn per row"));
-    assert.equal(rows[0][0], firstComponent, "the first component is unchanged");
+    assert.strictEqual(rows[0][0], firstComponent, "the first component is unchanged");
   });
 
   it("table constructor can take a list of lists of components", () => {
@@ -45,10 +45,10 @@ describe("Tables", () => {
     var row1 = [null, c0];
     var row2 = [new Plottable.Component.AbstractComponent(), null];
     var table = new Plottable.Component.Table([row1, row2]);
-    assert.equal((<any> table)._rows[0][1], c0, "the component is in the right spot");
+    assert.strictEqual((<any> table)._rows[0][1], c0, "the component is in the right spot");
     var c1 = new Plottable.Component.AbstractComponent();
     table.addComponent(2, 2, c1);
-    assert.equal((<any> table)._rows[2][2], c1, "the inserted component went to the right spot");
+    assert.strictEqual((<any> table)._rows[2][2], c1, "the inserted component went to the right spot");
   });
 
   it("tables can be constructed by adding components in matrix style", () => {
@@ -61,8 +61,8 @@ describe("Tables", () => {
     assert.lengthOf(rows, 2, "there are two rows");
     assert.lengthOf(rows[0], 2, "two cols in first row");
     assert.lengthOf(rows[1], 2, "two cols in second row");
-    assert.equal(rows[0][0], c1, "first component added correctly");
-    assert.equal(rows[1][1], c2, "second component added correctly");
+    assert.strictEqual(rows[0][0], c1, "first component added correctly");
+    assert.strictEqual(rows[1][1], c2, "second component added correctly");
     assert.isNull(rows[0][1], "component at (0, 1) is null");
     assert.isNull(rows[1][0], "component at (1, 0) is null");
   });
@@ -81,8 +81,8 @@ describe("Tables", () => {
 
     var components: Plottable.Component.AbstractComponent[] = (<any> t)._rows[0][2].components();
     assert.lengthOf(components, 2, "The group created should have 2 components");
-    assert.equal(components[0], c1, "First element in the group at (0, 2) should be c1");
-    assert.equal(components[1], c3, "Second element in the group at (0, 2) should be c3");
+    assert.strictEqual(components[0], c1, "First element in the group at (0, 2) should be c1");
+    assert.strictEqual(components[1], c3, "Second element in the group at (0, 2) should be c3");
   });
 
   it("add a component where a group already exists adds the component to the group", () => {
@@ -100,9 +100,9 @@ describe("Tables", () => {
 
     var components: Plottable.Component.AbstractComponent[] = (<any> t)._rows[0][2].components();
     assert.lengthOf(components, 3, "The group created should have 3 components");
-    assert.equal(components[0], c1, "First element in the group at (0, 2) should still be c1");
-    assert.equal(components[1], c2, "Second element in the group at (0, 2) should still be c2");
-    assert.equal(components[2], c3, "The Component was added to the existing Group");
+    assert.strictEqual(components[0], c1, "First element in the group at (0, 2) should still be c1");
+    assert.strictEqual(components[1], c2, "Second element in the group at (0, 2) should still be c2");
+    assert.strictEqual(components[2], c3, "The Component was added to the existing Group");
   });
 
   it("adding null to a table cell should throw an error", () => {
@@ -138,8 +138,8 @@ describe("Tables", () => {
     assert.deepEqual(translates[3], [200, 200], "fourth element is located properly");
     var bboxes = elements.map((e) => Plottable._Util.DOM.getBBox(e));
     bboxes.forEach((b) => {
-      assert.equal(b.width, 200, "bbox is 200 pixels wide");
-      assert.equal(b.height, 200, "bbox is 200 pixels tall");
+      assert.strictEqual(b.width, 200, "bbox is 200 pixels wide");
+      assert.strictEqual(b.height, 200, "bbox is 200 pixels tall");
       });
     svg.remove();
   });
@@ -161,8 +161,8 @@ describe("Tables", () => {
     assert.deepEqual(translates[2], [0, 210], "third element is located properly");
     assert.deepEqual(translates[3], [210, 210], "fourth element is located properly");
     bboxes.forEach((b) => {
-      assert.equal(b.width, 205, "bbox is 205 pixels wide");
-      assert.equal(b.height, 205, "bbox is 205 pixels tall");
+      assert.strictEqual(b.width, 205, "bbox is 205 pixels wide");
+      assert.strictEqual(b.height, 205, "bbox is 205 pixels tall");
       });
     svg.remove();
   });

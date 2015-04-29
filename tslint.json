@@ -1,5 +1,10 @@
 {
   "rules": {
+    "ban": [true,
+        ["d3", "max"],
+        ["d3", "min"],
+        ["assert", "equal"]
+    ],
     "class-name": true,
     "comment-format": [true, "check-space"],
     "curly": true,
@@ -45,7 +50,6 @@
     "semicolon": true,
     "triple-equals": [true, "allow-null-check"],
     "variable-name": false,
-    "whitespace": ["check-branch", "check-decl", "check-operator", "check-separator", "check-type"],
-    "ban": [true, ["d3", "max"], ["d3", "min"]]
+    "whitespace": ["check-branch", "check-decl", "check-operator", "check-separator", "check-type"]
   }
 }

@@ -21,10 +21,10 @@ var TestMethods;
     }
     TestMethods.getSVGParent = getSVGParent;
     function verifySpaceRequest(sr, w, h, ww, wh, message) {
-        assert.equal(sr.width, w, message + " (space request: width)");
-        assert.equal(sr.height, h, message + " (space request: height)");
-        assert.equal(sr.wantsWidth, ww, message + " (space request: wantsWidth)");
-        assert.equal(sr.wantsHeight, wh, message + " (space request: wantsHeight)");
+        assert.strictEqual(sr.width, w, message + " (space request: width)");
+        assert.strictEqual(sr.height, h, message + " (space request: height)");
+        assert.strictEqual(sr.wantsWidth, ww, message + " (space request: wantsWidth)");
+        assert.strictEqual(sr.wantsHeight, wh, message + " (space request: wantsHeight)");
     }
     TestMethods.verifySpaceRequest = verifySpaceRequest;
     function fixComponentSize(c, fixedWidth, fixedHeight) {
@@ -52,8 +52,8 @@ var TestMethods;
     function assertBBoxEquivalence(bbox, widthAndHeightPair, message) {
         var width = widthAndHeightPair[0];
         var height = widthAndHeightPair[1];
-        assert.equal(bbox.width, width, "width: " + message);
-        assert.equal(bbox.height, height, "height: " + message);
+        assert.strictEqual(bbox.width, width, "width: " + message);
+        assert.strictEqual(bbox.height, height, "height: " + message);
     }
     TestMethods.assertBBoxEquivalence = assertBBoxEquivalence;
     function assertBBoxInclusion(outerEl, innerEl) {
@@ -85,10 +85,10 @@ var TestMethods;
     TestMethods.assertPointsClose = assertPointsClose;
     ;
     function assertWidthHeight(el, widthExpected, heightExpected, message) {
-        var width = el.attr("width");
-        var height = el.attr("height");
-        assert.equal(width, widthExpected, "width: " + message);
-        assert.equal(height, heightExpected, "height: " + message);
+        var width = +el.attr("width");
+        var height = +el.attr("height");
+        assert.strictEqual(width, widthExpected, "width: " + message);
+        assert.strictEqual(height, heightExpected, "height: " + message);
     }
     TestMethods.assertWidthHeight = assertWidthHeight;
     function makeLinearSeries(n) {
@@ -666,13 +666,13 @@ describe("BaseAxis", function () {
     it("default alignment based on orientation", function () {
         var scale = new Plottable.Scale.Linear();
         var baseAxis = new Plottable.Axis.AbstractAxis(scale, "bottom");
-        assert.equal(baseAxis._yAlignProportion, 0, "yAlignProportion defaults to 0 for bottom axis");
+        assert.strictEqual(baseAxis._yAlignProportion, 0, "yAlignProportion defaults to 0 for bottom axis");
         baseAxis = new Plottable.Axis.AbstractAxis(scale, "top");
-        assert.equal(baseAxis._yAlignProportion, 1, "yAlignProportion defaults to 1 for top axis");
+        assert.strictEqual(baseAxis._yAlignProportion, 1, "yAlignProportion defaults to 1 for top axis");
         baseAxis = new Plottable.Axis.AbstractAxis(scale, "left");
-        assert.equal(baseAxis._xAlignProportion, 1, "xAlignProportion defaults to 1 for left axis");
+        assert.strictEqual(baseAxis._xAlignProportion, 1, "xAlignProportion defaults to 1 for left axis");
         baseAxis = new Plottable.Axis.AbstractAxis(scale, "right");
-        assert.equal(baseAxis._xAlignProportion, 0, "xAlignProportion defaults to 0 for right axis");
+        assert.strictEqual(baseAxis._xAlignProportion, 0, "xAlignProportion defaults to 0 for right axis");
     });
 });
 
@@ -692,7 +692,7 @@ describe("TimeAxis", function () {
     it("cannot change time axis orientation to vertical", function () {
         assert.throws(function () { return axis.orient("left"); }, "horizontal");
         assert.throws(function () { return axis.orient("right"); }, "horizontal");
-        assert.equal(axis.orient(), "bottom", "orientation unchanged");
+        assert.strictEqual(axis.orient(), "bottom", "orientation unchanged");
     });
     it("Computing the default ticks doesn't error out for edge cases", function () {
         var svg = TestMethods.generateSVG(400, 100);
@@ -772,11 +772,11 @@ describe("TimeAxis", function () {
         scale.domain(["2010", "2014"]);
         axis.renderTo(svg);
         var firstTick = d3.select(".tick-mark");
-        assert.equal(firstTick.attr("x1"), 0, "xPos (x1) of first end tick is at the beginning of the axis container");
-        assert.equal(firstTick.attr("x2"), 0, "xPos (x2) of first end tick is at the beginning of the axis container");
+        assert.strictEqual(+firstTick.attr("x1"), 0, "xPos (x1) of first end tick is at the beginning of the axis container");
+        assert.strictEqual(+firstTick.attr("x2"), 0, "xPos (x2) of first end tick is at the beginning of the axis container");
         var lastTick = d3.select(d3.selectAll(".tick-mark")[0].pop());
-        assert.equal(lastTick.attr("x1"), width, "xPos (x1) of last end tick is at the end of the axis container");
-        assert.equal(lastTick.attr("x2"), width, "xPos (x2) of last end tick is at the end of the axis container");
+        assert.strictEqual(+lastTick.attr("x1"), width, "xPos (x1) of last end tick is at the end of the axis container");
+        assert.strictEqual(+lastTick.attr("x2"), width, "xPos (x2) of last end tick is at the end of the axis container");
         svg.remove();
     });
     it("adds a class corresponding to the end-tick for the first and last ticks", function () {
@@ -1461,7 +1461,7 @@ describe("Gridlines", function () {
         basicTable._render();
         var xAxisTickMarks = xAxis._element.selectAll("." + Plottable.Axis.AbstractAxis.TICK_MARK_CLASS)[0];
         var xGridlines = gridlines._element.select(".x-gridlines").selectAll("line")[0];
-        assert.equal(xAxisTickMarks.length, xGridlines.length, "There is an x gridline for each x tick");
+        assert.strictEqual(xAxisTickMarks.length, xGridlines.length, "There is an x gridline for each x tick");
         for (var i = 0; i < xAxisTickMarks.length; i++) {
             var xTickMarkRect = xAxisTickMarks[i].getBoundingClientRect();
             var xGridlineRect = xGridlines[i].getBoundingClientRect();
@@ -1469,7 +1469,7 @@ describe("Gridlines", function () {
         }
         var yAxisTickMarks = yAxis._element.selectAll("." + Plottable.Axis.AbstractAxis.TICK_MARK_CLASS)[0];
         var yGridlines = gridlines._element.select(".y-gridlines").selectAll("line")[0];
-        assert.equal(yAxisTickMarks.length, yGridlines.length, "There is an x gridline for each x tick");
+        assert.strictEqual(yAxisTickMarks.length, yGridlines.length, "There is an x gridline for each x tick");
         for (var j = 0; j < yAxisTickMarks.length; j++) {
             var yTickMarkRect = yAxisTickMarks[j].getBoundingClientRect();
             var yGridlineRect = yGridlines[j].getBoundingClientRect();
@@ -1494,7 +1494,7 @@ describe("Labels", function () {
         var text = content.select("text");
         var bbox = Plottable._Util.DOM.getBBox(text);
         assert.closeTo(bbox.height, label.height(), 0.5, "text height === label.minimumHeight()");
-        assert.equal(text.node().textContent, "A CHART TITLE", "node's text content is as expected");
+        assert.strictEqual(text.node().textContent, "A CHART TITLE", "node's text content is as expected");
         svg.remove();
     });
     // Skipping due to FF odd client bounding rect computation - #1470.
@@ -1525,11 +1525,11 @@ describe("Labels", function () {
         var svg = TestMethods.generateSVG(400, 80);
         var label = new Plottable.Component.TitleLabel("a");
         label.renderTo(svg);
-        assert.equal(label._content.select("text").text(), "a", "the text starts at the specified string");
+        assert.strictEqual(label._content.select("text").text(), "a", "the text starts at the specified string");
         assert.operator(label.height(), ">", 0, "rowMin is > 0 for non-empty string");
         label.text("hello world");
         label.renderTo(svg);
-        assert.equal(label._content.select("text").text(), "hello world", "the label text updated properly");
+        assert.strictEqual(label._content.select("text").text(), "hello world", "the label text updated properly");
         assert.operator(label.height(), ">", 0, "rowMin is > 0 for non-empty string");
         svg.remove();
     });
@@ -1542,7 +1542,7 @@ describe("Labels", function () {
         var content = label._content;
         var text = content.select("text");
         var bbox = Plottable._Util.DOM.getBBox(text);
-        assert.equal(bbox.height, label.height(), "text height === label.minimumHeight()");
+        assert.strictEqual(bbox.height, label.height(), "text height === label.minimumHeight()");
         assert.operator(bbox.width, "<=", svgWidth, "the text is not wider than the SVG width");
         svg.remove();
     });
@@ -1551,7 +1551,7 @@ describe("Labels", function () {
         var label = new Plottable.Component.TitleLabel("Yeah, not gonna fit...");
         label.renderTo(svg);
         var text = label._content.select("text");
-        assert.equal(text.text(), "", "text was truncated to empty string");
+        assert.strictEqual(text.text(), "", "text was truncated to empty string");
         svg.remove();
     });
     it("centered text in a table is positioned properly", function () {
@@ -1570,7 +1570,7 @@ describe("Labels", function () {
         var label = new Plottable.Component.TitleLabel("foo");
         label.renderTo(svg);
         label.text("");
-        assert.equal(label.width(), 0, "width updated to 0");
+        assert.strictEqual(label.width(), 0, "width updated to 0");
         svg.remove();
     });
     it("unsupported alignments and orientations are unsupported", function () {
@@ -1652,19 +1652,19 @@ describe("Legend", function () {
         var rows = legend._content.selectAll(entrySelector);
         assert.lengthOf(rows[0], color.domain().length, "one entry is created for each item in the domain");
         rows.each(function (d, i) {
-            assert.equal(d, color.domain()[i], "the data is set properly");
+            assert.strictEqual(d, color.domain()[i], "the data is set properly");
             var d3this = d3.select(this);
             var text = d3this.select("text").text();
-            assert.equal(text, d, "the text node has correct text");
+            assert.strictEqual(text, d, "the text node has correct text");
             var symbol = d3this.select("." + Plottable.Component.Legend.LEGEND_SYMBOL_CLASS);
-            assert.equal(symbol.attr("fill"), color.scale(d), "the symbol's fill is set properly");
+            assert.strictEqual(symbol.attr("fill"), color.scale(d), "the symbol's fill is set properly");
         });
         svg.remove();
     });
     it("legend domain can be updated after initialization, and height updates as well", function () {
         legend.renderTo(svg);
         legend.scale(color);
-        assert.equal(legend._requestedSpace(200, 200).height, 10, "there is a padding requested height when domain is empty");
+        assert.strictEqual(legend._requestedSpace(200, 200).height, 10, "there is a padding requested height when domain is empty");
         color.domain(["foo", "bar"]);
         var height1 = legend._requestedSpace(400, 400).height;
         var actualHeight1 = legend.height();
@@ -1674,7 +1674,7 @@ describe("Legend", function () {
         var actualHeight2 = legend.height();
         assert.operator(actualHeight1, "<", actualHeight2, "Changing the domain caused the legend to re-layout with more height");
         var numRows = legend._content.selectAll(rowSelector)[0].length;
-        assert.equal(numRows, 3, "there are 3 rows");
+        assert.strictEqual(numRows, 3, "there are 3 rows");
         svg.remove();
     });
     it("a legend with many labels does not overflow vertically", function () {
@@ -1704,10 +1704,10 @@ describe("Legend", function () {
         color.domain(["foo", "bar", "baz"]);
         legend.renderTo(svg);
         var numRows = legend._content.selectAll(rowSelector)[0].length;
-        assert.equal(numRows, 3, "there are 3 legend rows initially");
+        assert.strictEqual(numRows, 3, "there are 3 legend rows initially");
         legend._render();
         numRows = legend._content.selectAll(rowSelector)[0].length;
-        assert.equal(numRows, 3, "there are 3 legend rows after second render");
+        assert.strictEqual(numRows, 3, "there are 3 legend rows after second render");
         svg.remove();
     });
     it("re-rendering the legend with a new domain will do the right thing", function () {
@@ -1716,11 +1716,11 @@ describe("Legend", function () {
         var newDomain = ["mushu", "foo", "persei", "baz", "eight"];
         color.domain(newDomain);
         legend._content.selectAll(entrySelector).each(function (d, i) {
-            assert.equal(d, newDomain[i], "the data is set correctly");
+            assert.strictEqual(d, newDomain[i], "the data is set correctly");
             var text = d3.select(this).select("text").text();
-            assert.equal(text, d, "the text was set properly");
+            assert.strictEqual(text, d, "the text was set properly");
             var fill = d3.select(this).select("." + Plottable.Component.Legend.LEGEND_SYMBOL_CLASS).attr("fill");
-            assert.equal(fill, color.scale(d), "the fill was set properly");
+            assert.strictEqual(fill, color.scale(d), "the fill was set properly");
         });
         assert.lengthOf(legend._content.selectAll(rowSelector)[0], 5, "there are the right number of legend elements");
         svg.remove();
@@ -1733,11 +1733,11 @@ describe("Legend", function () {
         newColorScale.domain(newDomain);
         legend.scale(newColorScale);
         legend._content.selectAll(entrySelector).each(function (d, i) {
-            assert.equal(d, newDomain[i], "the data is set correctly");
+            assert.strictEqual(d, newDomain[i], "the data is set correctly");
             var text = d3.select(this).select("text").text();
-            assert.equal(text, d, "the text was set properly");
+            assert.strictEqual(text, d, "the text was set properly");
             var fill = d3.select(this).select("." + Plottable.Component.Legend.LEGEND_SYMBOL_CLASS).attr("fill");
-            assert.equal(fill, newColorScale.scale(d), "the fill was set properly");
+            assert.strictEqual(fill, newColorScale.scale(d), "the fill was set properly");
         });
         svg.remove();
     });
@@ -1751,11 +1751,11 @@ describe("Legend", function () {
         var newDomain = ["a", "foo", "d"];
         newColorScale.domain(newDomain);
         legend._content.selectAll(entrySelector).each(function (d, i) {
-            assert.equal(d, newDomain[i], "the data is set correctly");
+            assert.strictEqual(d, newDomain[i], "the data is set correctly");
             var text = d3.select(this).select("text").text();
-            assert.equal(text, d, "the text was set properly");
+            assert.strictEqual(text, d, "the text was set properly");
             var fill = d3.select(this).select("." + Plottable.Component.Legend.LEGEND_SYMBOL_CLASS).attr("fill");
-            assert.equal(fill, newColorScale.scale(d), "the fill was set properly");
+            assert.strictEqual(fill, newColorScale.scale(d), "the fill was set properly");
         });
         svg.remove();
     });
@@ -2116,19 +2116,19 @@ describe("Plots", function () {
             var dBar = new Plottable.Dataset(["bar"], { cssClass: "boo" });
             var r = new CountingPlot();
             r.addDataset("foo", dFoo);
-            assert.equal(1, r.renders, "initial render due to addDataset");
+            assert.strictEqual(1, r.renders, "initial render due to addDataset");
             dFoo.broadcaster.broadcast();
-            assert.equal(2, r.renders, "we re-render when our dataset changes");
+            assert.strictEqual(2, r.renders, "we re-render when our dataset changes");
             r.addDataset("bar", dBar);
-            assert.equal(3, r.renders, "we should redraw when we add a dataset");
+            assert.strictEqual(3, r.renders, "we should redraw when we add a dataset");
             dFoo.broadcaster.broadcast();
-            assert.equal(4, r.renders, "we should still listen to the first dataset");
+            assert.strictEqual(4, r.renders, "we should still listen to the first dataset");
             dBar.broadcaster.broadcast();
-            assert.equal(5, r.renders, "we should listen to the new dataset");
+            assert.strictEqual(5, r.renders, "we should listen to the new dataset");
             r.removeDataset("foo");
-            assert.equal(6, r.renders, "we re-render on dataset removal");
+            assert.strictEqual(6, r.renders, "we re-render on dataset removal");
             dFoo.broadcaster.broadcast();
-            assert.equal(6, r.renders, "we don't listen to removed datasets");
+            assert.strictEqual(6, r.renders, "we don't listen to removed datasets");
         });
         it("Updates its projectors when the Dataset is changed", function () {
             var d1 = new Plottable.Dataset([{ x: 5, y: 6 }], { cssClass: "bar" });
@@ -2143,29 +2143,29 @@ describe("Plots", function () {
             r.project("y", "y", yScale);
             r.project("meta", metadataProjector);
             xScale.broadcaster.registerListener("unitTest", function (listenable) {
-                assert.equal(listenable, xScale, "Callback received the calling scale as the first argument");
+                assert.strictEqual(listenable, xScale, "Callback received the calling scale as the first argument");
                 ++xScaleCalls;
             });
             yScale.broadcaster.registerListener("unitTest", function (listenable) {
-                assert.equal(listenable, yScale, "Callback received the calling scale as the first argument");
+                assert.strictEqual(listenable, yScale, "Callback received the calling scale as the first argument");
                 ++yScaleCalls;
             });
-            assert.equal(0, xScaleCalls, "initially hasn't made any X callbacks");
-            assert.equal(0, yScaleCalls, "initially hasn't made any Y callbacks");
+            assert.strictEqual(0, xScaleCalls, "initially hasn't made any X callbacks");
+            assert.strictEqual(0, yScaleCalls, "initially hasn't made any Y callbacks");
             d1.broadcaster.broadcast();
-            assert.equal(1, xScaleCalls, "X scale was wired up to datasource correctly");
-            assert.equal(1, yScaleCalls, "Y scale was wired up to datasource correctly");
+            assert.strictEqual(1, xScaleCalls, "X scale was wired up to datasource correctly");
+            assert.strictEqual(1, yScaleCalls, "Y scale was wired up to datasource correctly");
             var d2 = new Plottable.Dataset([{ x: 7, y: 8 }], { cssClass: "boo" });
             r.removeDataset("d1");
             r.addDataset(d2);
-            assert.equal(3, xScaleCalls, "Changing datasource fires X scale listeners (but doesn't coalesce callbacks)");
-            assert.equal(3, yScaleCalls, "Changing datasource fires Y scale listeners (but doesn't coalesce callbacks)");
+            assert.strictEqual(3, xScaleCalls, "Changing datasource fires X scale listeners (but doesn't coalesce callbacks)");
+            assert.strictEqual(3, yScaleCalls, "Changing datasource fires Y scale listeners (but doesn't coalesce callbacks)");
             d1.broadcaster.broadcast();
-            assert.equal(3, xScaleCalls, "X scale was unhooked from old datasource");
-            assert.equal(3, yScaleCalls, "Y scale was unhooked from old datasource");
+            assert.strictEqual(3, xScaleCalls, "X scale was unhooked from old datasource");
+            assert.strictEqual(3, yScaleCalls, "Y scale was unhooked from old datasource");
             d2.broadcaster.broadcast();
-            assert.equal(4, xScaleCalls, "X scale was hooked into new datasource");
-            assert.equal(4, yScaleCalls, "Y scale was hooked into new datasource");
+            assert.strictEqual(4, xScaleCalls, "X scale was hooked into new datasource");
+            assert.strictEqual(4, yScaleCalls, "Y scale was hooked into new datasource");
         });
         it("Plot automatically generates a Dataset if only data is provided", function () {
             var data = ["foo", "bar"];
@@ -2180,7 +2180,7 @@ describe("Plots", function () {
             r.project("attr", "a", s);
             var attrToProjector = r._generateAttrToProjector();
             var projector = attrToProjector["attr"];
-            assert.equal(projector({ "a": 0.5 }, 0, null, null), 5, "projector works as intended");
+            assert.strictEqual(projector({ "a": 0.5 }, 0, null, null), 5, "projector works as intended");
         });
         it("Changing Plot.dataset().data to [] causes scale to contract", function () {
             var ds1 = new Plottable.Dataset([0, 1, 2]);
@@ -2404,8 +2404,8 @@ describe("Plots", function () {
                 plot.addDataset(a1);
                 plot.addDataset(a2);
                 assert.lengthOf(plot.datasets(), 4, "there are four datasets");
-                assert.equal(plot.datasets()[3].data(), a2, "second array dataset correct");
-                assert.equal(plot.datasets()[2].data(), a1, "first array dataset correct");
+                assert.strictEqual(plot.datasets()[3].data(), a2, "second array dataset correct");
+                assert.strictEqual(plot.datasets()[2].data(), a1, "first array dataset correct");
                 plot.removeDataset(a2);
                 plot.removeDataset(a1);
                 assert.deepEqual(plot.datasets(), [d1, d2], "datasets as expected");
@@ -2479,7 +2479,7 @@ describe("Plots", function () {
             plot.project("y", "y", y);
             plot.renderTo(svg);
             svg.remove();
-            assert.equal(recordedTime, 20, "additionalPaint passed appropriate time argument");
+            assert.strictEqual(recordedTime, 20, "additionalPaint passed appropriate time argument");
         });
         it("extent calculation done in correct dataset order", function () {
             var CategoryScale = new Plottable.Scale.Category();
@@ -2760,7 +2760,7 @@ describe("Plots", function () {
             piePlot.removeDataset("simpleDataset");
             var negativeDataset = new Plottable.Dataset([{ value: -5 }, { value: 15 }]);
             piePlot.addDataset("negativeDataset", negativeDataset);
-            assert.equal(message, "Negative values will not render correctly in a pie chart.");
+            assert.strictEqual(message, "Negative values will not render correctly in a pie chart.");
             Plottable._Util.Methods.warn = oldWarn;
             svg.remove();
         });
@@ -2829,9 +2829,9 @@ describe("Plots", function () {
             assert.deepEqual(p._datasetKeysInOrder, ["foo", "bar", "_0", "_1"], "dataset keys as expected");
             var datasets = p.datasets();
             assert.deepEqual(datasets[0].data(), [1, 2, 3]);
-            assert.equal(datasets[1], d2);
+            assert.strictEqual(datasets[1], d2);
             assert.deepEqual(datasets[2].data(), [7, 8, 9]);
-            assert.equal(datasets[3], d4);
+            assert.strictEqual(datasets[3], d4);
             p.removeDataset("foo");
             p.removeDataset("_0");
             assert.deepEqual(p._datasetKeysInOrder, ["bar", "_1"]);
@@ -2843,11 +2843,11 @@ describe("Plots", function () {
             p._onDatasetUpdate = callback;
             var d = new Plottable.Dataset([1, 2, 3]);
             p.addDataset("foo", d);
-            assert.equal(callbackCounter, 1, "adding dataset triggers listener");
+            assert.strictEqual(callbackCounter, 1, "adding dataset triggers listener");
             d.data([1, 2, 3, 4]);
-            assert.equal(callbackCounter, 2, "modifying data triggers listener");
+            assert.strictEqual(callbackCounter, 2, "modifying data triggers listener");
             p.removeDataset("foo");
-            assert.equal(callbackCounter, 3, "removing dataset triggers listener");
+            assert.strictEqual(callbackCounter, 3, "removing dataset triggers listener");
         });
         it("Datasets can be reordered", function () {
             p.addDataset("foo", [1]);
@@ -2859,22 +2859,22 @@ describe("Plots", function () {
             var warned = 0;
             Plottable._Util.Methods.warn = function () { return warned++; }; // suppress expected warnings
             p.datasetOrder(["blah", "blee", "bar", "baz", "foo"]);
-            assert.equal(warned, 1);
+            assert.strictEqual(warned, 1);
             assert.deepEqual(p.datasetOrder(), ["bar", "baz", "foo"]);
         });
         it("Has proper warnings", function () {
             var warned = 0;
             Plottable._Util.Methods.warn = function () { return warned++; };
             p.addDataset("_foo", []);
-            assert.equal(warned, 1);
+            assert.strictEqual(warned, 1);
             p.addDataset("2", []);
             p.addDataset("4", []);
             // get warning for not a permutation
             p.datasetOrder(["_bar", "4", "2"]);
-            assert.equal(warned, 2);
+            assert.strictEqual(warned, 2);
             // do not get warning for a permutation
             p.datasetOrder(["2", "_foo", "4"]);
-            assert.equal(warned, 2);
+            assert.strictEqual(warned, 2);
         });
     });
 });
@@ -2956,7 +2956,7 @@ describe("Plots", function () {
         });
         it("attributes set appropriately from accessor", function () {
             var areaPath = renderArea.select(".line");
-            assert.equal(areaPath.attr("stroke"), "#000000", "stroke set correctly");
+            assert.strictEqual(areaPath.attr("stroke"), "#000000", "stroke set correctly");
             svg.remove();
         });
         it("attributes can be changed by projecting new accessor and re-render appropriately", function () {
@@ -2964,7 +2964,7 @@ describe("Plots", function () {
             linePlot.project("stroke", newColorAccessor);
             linePlot.renderTo(svg);
             var linePath = renderArea.select(".line");
-            assert.equal(linePath.attr("stroke"), "pink", "stroke changed correctly");
+            assert.strictEqual(linePath.attr("stroke"), "pink", "stroke changed correctly");
             svg.remove();
         });
         it("attributes can be changed by projecting attribute accessor (sets to first datum attribute)", function () {
@@ -2975,10 +2975,10 @@ describe("Plots", function () {
             simpleDataset.data(data);
             linePlot.project("stroke", "stroke");
             var areaPath = renderArea.select(".line");
-            assert.equal(areaPath.attr("stroke"), "pink", "stroke set to uniform stroke color");
+            assert.strictEqual(areaPath.attr("stroke"), "pink", "stroke set to uniform stroke color");
             data[0].stroke = "green";
             simpleDataset.data(data);
-            assert.equal(areaPath.attr("stroke"), "green", "stroke set to first datum stroke color");
+            assert.strictEqual(areaPath.attr("stroke"), "green", "stroke set to first datum stroke color");
             svg.remove();
         });
         it("correctly handles NaN and undefined x and y values", function () {
@@ -3266,7 +3266,7 @@ describe("Plots", function () {
             areaPlot.renderTo(svg);
             renderArea = areaPlot._renderArea;
             var areaPath = renderArea.select(".area");
-            assert.equal(TestMethods.normalizePath(areaPath.attr("d")), "M0,500L500,0L500,250L0,500Z");
+            assert.strictEqual(TestMethods.normalizePath(areaPath.attr("d")), "M0,500L500,0L500,250L0,500Z");
             svg.remove();
         });
         it("area is appended before line", function () {
@@ -3415,17 +3415,17 @@ describe("Plots", function () {
                 var bar1 = d3.select(bars[0][1]);
                 assert.closeTo(TestMethods.numAttr(bar0, "width"), xScale.rangeBand(), 1, "bar0 width is correct");
                 assert.closeTo(TestMethods.numAttr(bar1, "width"), xScale.rangeBand(), 1, "bar1 width is correct");
-                assert.equal(bar0.attr("height"), "100", "bar0 height is correct");
-                assert.equal(bar1.attr("height"), "150", "bar1 height is correct");
+                assert.strictEqual(+bar0.attr("height"), 100, "bar0 height is correct");
+                assert.strictEqual(+bar1.attr("height"), 150, "bar1 height is correct");
                 assert.closeTo(TestMethods.numAttr(bar0, "x"), 111, 1, "bar0 x is correct");
                 assert.closeTo(TestMethods.numAttr(bar1, "x"), 333, 1, "bar1 x is correct");
-                assert.equal(bar0.attr("y"), "100", "bar0 y is correct");
-                assert.equal(bar1.attr("y"), "200", "bar1 y is correct");
+                assert.strictEqual(+bar0.attr("y"), 100, "bar0 y is correct");
+                assert.strictEqual(+bar1.attr("y"), 200, "bar1 y is correct");
                 var baseline = renderArea.select(".baseline");
-                assert.equal(baseline.attr("y1"), "200", "the baseline is in the correct vertical position");
-                assert.equal(baseline.attr("y2"), "200", "the baseline is in the correct vertical position");
-                assert.equal(baseline.attr("x1"), "0", "the baseline starts at the edge of the chart");
-                assert.equal(baseline.attr("x2"), SVG_WIDTH, "the baseline ends at the edge of the chart");
+                assert.strictEqual(+baseline.attr("y1"), 200, "the baseline is in the correct vertical position");
+                assert.strictEqual(+baseline.attr("y2"), 200, "the baseline is in the correct vertical position");
+                assert.strictEqual(+baseline.attr("x1"), 0, "the baseline starts at the edge of the chart");
+                assert.strictEqual(+baseline.attr("x2"), SVG_WIDTH, "the baseline ends at the edge of the chart");
                 svg.remove();
             });
             it("baseline value can be changed; barPlot updates appropriately", function () {
@@ -3434,21 +3434,21 @@ describe("Plots", function () {
                 var bars = renderArea.selectAll("rect");
                 var bar0 = d3.select(bars[0][0]);
                 var bar1 = d3.select(bars[0][1]);
-                assert.equal(bar0.attr("height"), "200", "bar0 height is correct");
-                assert.equal(bar1.attr("height"), "50", "bar1 height is correct");
-                assert.equal(bar0.attr("y"), "100", "bar0 y is correct");
-                assert.equal(bar1.attr("y"), "300", "bar1 y is correct");
+                assert.strictEqual(+bar0.attr("height"), 200, "bar0 height is correct");
+                assert.strictEqual(+bar1.attr("height"), 50, "bar1 height is correct");
+                assert.strictEqual(+bar0.attr("y"), 100, "bar0 y is correct");
+                assert.strictEqual(+bar1.attr("y"), 300, "bar1 y is correct");
                 var baseline = renderArea.select(".baseline");
-                assert.equal(baseline.attr("y1"), "300", "the baseline is in the correct vertical position");
-                assert.equal(baseline.attr("y2"), "300", "the baseline is in the correct vertical position");
-                assert.equal(baseline.attr("x1"), "0", "the baseline starts at the edge of the chart");
-                assert.equal(baseline.attr("x2"), SVG_WIDTH, "the baseline ends at the edge of the chart");
+                assert.strictEqual(+baseline.attr("y1"), 300, "the baseline is in the correct vertical position");
+                assert.strictEqual(+baseline.attr("y2"), 300, "the baseline is in the correct vertical position");
+                assert.strictEqual(+baseline.attr("x1"), 0, "the baseline starts at the edge of the chart");
+                assert.strictEqual(+baseline.attr("x2"), SVG_WIDTH, "the baseline ends at the edge of the chart");
                 svg.remove();
             });
             it("getBar()", function () {
                 var bar = barPlot.getBars(155, 150); // in the middle of bar 0
                 assert.lengthOf(bar[0], 1, "getBar returns a bar");
-                assert.equal(bar.data()[0], dataset.data()[0], "the data in the bar matches the datasource");
+                assert.strictEqual(bar.data()[0], dataset.data()[0], "the data in the bar matches the datasource");
                 bar = barPlot.getBars(-1, -1); // no bars here
                 assert.isTrue(bar.empty(), "returns empty selection if no bar was selected");
                 bar = barPlot.getBars(200, 50); // between the two bars
@@ -3459,13 +3459,13 @@ describe("Plots", function () {
                 // origin is at the top left!
                 bar = barPlot.getBars({ min: 155, max: 455 }, { min: 150, max: 150 });
                 assert.lengthOf(bar.data(), 2, "selected 2 bars (not the negative one)");
-                assert.equal(bar.data()[0], dataset.data()[0], "the data in bar 0 matches the datasource");
-                assert.equal(bar.data()[1], dataset.data()[2], "the data in bar 1 matches the datasource");
+                assert.strictEqual(bar.data()[0], dataset.data()[0], "the data in bar 0 matches the datasource");
+                assert.strictEqual(bar.data()[1], dataset.data()[2], "the data in bar 1 matches the datasource");
                 bar = barPlot.getBars({ min: 155, max: 455 }, { min: 150, max: 350 });
                 assert.lengthOf(bar.data(), 3, "selected all the bars");
-                assert.equal(bar.data()[0], dataset.data()[0], "the data in bar 0 matches the datasource");
-                assert.equal(bar.data()[1], dataset.data()[1], "the data in bar 1 matches the datasource");
-                assert.equal(bar.data()[2], dataset.data()[2], "the data in bar 2 matches the datasource");
+                assert.strictEqual(bar.data()[0], dataset.data()[0], "the data in bar 0 matches the datasource");
+                assert.strictEqual(bar.data()[1], dataset.data()[1], "the data in bar 1 matches the datasource");
+                assert.strictEqual(bar.data()[2], dataset.data()[2], "the data in bar 2 matches the datasource");
                 svg.remove();
             });
             it("don't show points from outside of domain", function () {
@@ -3744,17 +3744,17 @@ describe("Plots", function () {
                 var bar1 = d3.select(bars[0][1]);
                 assert.closeTo(TestMethods.numAttr(bar0, "height"), yScale.rangeBand(), 1, "bar0 height is correct");
                 assert.closeTo(TestMethods.numAttr(bar1, "height"), yScale.rangeBand(), 1, "bar1 height is correct");
-                assert.equal(bar0.attr("width"), "100", "bar0 width is correct");
-                assert.equal(bar1.attr("width"), "150", "bar1 width is correct");
+                assert.strictEqual(+bar0.attr("width"), 100, "bar0 width is correct");
+                assert.strictEqual(+bar1.attr("width"), 150, "bar1 width is correct");
                 assert.closeTo(TestMethods.numAttr(bar0, "y"), 74, 1, "bar0 y is correct");
                 assert.closeTo(TestMethods.numAttr(bar1, "y"), 222, 1, "bar1 y is correct");
-                assert.equal(bar0.attr("x"), "300", "bar0 x is correct");
-                assert.equal(bar1.attr("x"), "150", "bar1 x is correct");
+                assert.strictEqual(+bar0.attr("x"), 300, "bar0 x is correct");
+                assert.strictEqual(+bar1.attr("x"), 150, "bar1 x is correct");
                 var baseline = renderArea.select(".baseline");
-                assert.equal(baseline.attr("x1"), "300", "the baseline is in the correct horizontal position");
-                assert.equal(baseline.attr("x2"), "300", "the baseline is in the correct horizontal position");
-                assert.equal(baseline.attr("y1"), "0", "the baseline starts at the top of the chart");
-                assert.equal(baseline.attr("y2"), SVG_HEIGHT, "the baseline ends at the bottom of the chart");
+                assert.strictEqual(+baseline.attr("x1"), 300, "the baseline is in the correct horizontal position");
+                assert.strictEqual(+baseline.attr("x2"), 300, "the baseline is in the correct horizontal position");
+                assert.strictEqual(+baseline.attr("y1"), 0, "the baseline starts at the top of the chart");
+                assert.strictEqual(+baseline.attr("y2"), SVG_HEIGHT, "the baseline ends at the bottom of the chart");
                 svg.remove();
             });
             it("baseline value can be changed; barPlot updates appropriately", function () {
@@ -3763,15 +3763,15 @@ describe("Plots", function () {
                 var bars = renderArea.selectAll("rect");
                 var bar0 = d3.select(bars[0][0]);
                 var bar1 = d3.select(bars[0][1]);
-                assert.equal(bar0.attr("width"), "200", "bar0 width is correct");
-                assert.equal(bar1.attr("width"), "50", "bar1 width is correct");
-                assert.equal(bar0.attr("x"), "200", "bar0 x is correct");
-                assert.equal(bar1.attr("x"), "150", "bar1 x is correct");
+                assert.strictEqual(+bar0.attr("width"), 200, "bar0 width is correct");
+                assert.strictEqual(+bar1.attr("width"), 50, "bar1 width is correct");
+                assert.strictEqual(+bar0.attr("x"), 200, "bar0 x is correct");
+                assert.strictEqual(+bar1.attr("x"), 150, "bar1 x is correct");
                 var baseline = renderArea.select(".baseline");
-                assert.equal(baseline.attr("x1"), "200", "the baseline is in the correct horizontal position");
-                assert.equal(baseline.attr("x2"), "200", "the baseline is in the correct horizontal position");
-                assert.equal(baseline.attr("y1"), "0", "the baseline starts at the top of the chart");
-                assert.equal(baseline.attr("y2"), SVG_HEIGHT, "the baseline ends at the bottom of the chart");
+                assert.strictEqual(+baseline.attr("x1"), 200, "the baseline is in the correct horizontal position");
+                assert.strictEqual(+baseline.attr("x2"), 200, "the baseline is in the correct horizontal position");
+                assert.strictEqual(+baseline.attr("y1"), 0, "the baseline starts at the top of the chart");
+                assert.strictEqual(+baseline.attr("y2"), SVG_HEIGHT, "the baseline ends at the bottom of the chart");
                 svg.remove();
             });
             it("width projector may be overwritten, and calling project queues rerender", function () {
@@ -3919,8 +3919,8 @@ describe("Plots", function () {
                 plot.barLabelsEnabled(true);
                 var texts = svg.selectAll("text")[0].map(function (n) { return d3.select(n).text(); });
                 assert.lengthOf(texts, 2, "both texts drawn");
-                assert.equal(texts[0], "640", "first label is 640");
-                assert.equal(texts[1], "12345", "first label is 12345");
+                assert.strictEqual(texts[0], "640", "first label is 640");
+                assert.strictEqual(texts[1], "12345", "first label is 12345");
                 svg.remove();
             });
             it("bar labels hide if bars too skinny", function () {
@@ -3937,8 +3937,8 @@ describe("Plots", function () {
                 plot.renderTo(svg);
                 var texts = svg.selectAll("text")[0].map(function (n) { return d3.select(n).text(); });
                 assert.lengthOf(texts, 2, "both texts drawn");
-                assert.equal(texts[0], "640%", "first label is 640%");
-                assert.equal(texts[1], "12345%", "first label is 12345%");
+                assert.strictEqual(texts[0], "640%", "first label is 640%");
+                assert.strictEqual(texts[1], "12345%", "first label is 12345%");
                 svg.remove();
             });
             it("bar labels are removed instantly on dataset change", function (done) {
@@ -4056,31 +4056,31 @@ describe("Plots", function () {
             { x: "B", y: "V", magnitude: 8 },
         ];
         var VERIFY_CELLS = function (cells) {
-            assert.equal(cells.length, 4);
+            assert.strictEqual(cells.length, 4);
             var cellAU = d3.select(cells[0]);
             var cellBU = d3.select(cells[1]);
             var cellAV = d3.select(cells[2]);
             var cellBV = d3.select(cells[3]);
-            assert.equal(cellAU.attr("height"), "100", "cell 'AU' height is correct");
-            assert.equal(cellAU.attr("width"), "200", "cell 'AU' width is correct");
-            assert.equal(cellAU.attr("x"), "0", "cell 'AU' x coord is correct");
-            assert.equal(cellAU.attr("y"), "0", "cell 'AU' y coord is correct");
-            assert.equal(cellAU.attr("fill"), "#000000", "cell 'AU' color is correct");
-            assert.equal(cellBU.attr("height"), "100", "cell 'BU' height is correct");
-            assert.equal(cellBU.attr("width"), "200", "cell 'BU' width is correct");
-            assert.equal(cellBU.attr("x"), "200", "cell 'BU' x coord is correct");
-            assert.equal(cellBU.attr("y"), "0", "cell 'BU' y coord is correct");
-            assert.equal(cellBU.attr("fill"), "#212121", "cell 'BU' color is correct");
-            assert.equal(cellAV.attr("height"), "100", "cell 'AV' height is correct");
-            assert.equal(cellAV.attr("width"), "200", "cell 'AV' width is correct");
-            assert.equal(cellAV.attr("x"), "0", "cell 'AV' x coord is correct");
-            assert.equal(cellAV.attr("y"), "100", "cell 'AV' y coord is correct");
-            assert.equal(cellAV.attr("fill"), "#ffffff", "cell 'AV' color is correct");
-            assert.equal(cellBV.attr("height"), "100", "cell 'BV' height is correct");
-            assert.equal(cellBV.attr("width"), "200", "cell 'BV' width is correct");
-            assert.equal(cellBV.attr("x"), "200", "cell 'BV' x coord is correct");
-            assert.equal(cellBV.attr("y"), "100", "cell 'BV' y coord is correct");
-            assert.equal(cellBV.attr("fill"), "#777777", "cell 'BV' color is correct");
+            assert.strictEqual(cellAU.attr("height"), "100", "cell 'AU' height is correct");
+            assert.strictEqual(cellAU.attr("width"), "200", "cell 'AU' width is correct");
+            assert.strictEqual(cellAU.attr("x"), "0", "cell 'AU' x coord is correct");
+            assert.strictEqual(cellAU.attr("y"), "0", "cell 'AU' y coord is correct");
+            assert.strictEqual(cellAU.attr("fill"), "#000000", "cell 'AU' color is correct");
+            assert.strictEqual(cellBU.attr("height"), "100", "cell 'BU' height is correct");
+            assert.strictEqual(cellBU.attr("width"), "200", "cell 'BU' width is correct");
+            assert.strictEqual(cellBU.attr("x"), "200", "cell 'BU' x coord is correct");
+            assert.strictEqual(cellBU.attr("y"), "0", "cell 'BU' y coord is correct");
+            assert.strictEqual(cellBU.attr("fill"), "#212121", "cell 'BU' color is correct");
+            assert.strictEqual(cellAV.attr("height"), "100", "cell 'AV' height is correct");
+            assert.strictEqual(cellAV.attr("width"), "200", "cell 'AV' width is correct");
+            assert.strictEqual(cellAV.attr("x"), "0", "cell 'AV' x coord is correct");
+            assert.strictEqual(cellAV.attr("y"), "100", "cell 'AV' y coord is correct");
+            assert.strictEqual(cellAV.attr("fill"), "#ffffff", "cell 'AV' color is correct");
+            assert.strictEqual(cellBV.attr("height"), "100", "cell 'BV' height is correct");
+            assert.strictEqual(cellBV.attr("width"), "200", "cell 'BV' width is correct");
+            assert.strictEqual(cellBV.attr("x"), "200", "cell 'BV' x coord is correct");
+            assert.strictEqual(cellBV.attr("y"), "100", "cell 'BV' y coord is correct");
+            assert.strictEqual(cellBV.attr("fill"), "#777777", "cell 'BV' color is correct");
         };
         it("renders correctly", function () {
             var xScale = new Plottable.Scale.Category();
@@ -4123,13 +4123,13 @@ describe("Plots", function () {
             ];
             dataset.data(data);
             var cells = gridPlot._renderArea.selectAll("rect")[0];
-            assert.equal(cells.length, data.length);
+            assert.strictEqual(cells.length, data.length);
             for (var i = 0; i < cells.length; i++) {
                 var cell = d3.select(cells[i]);
-                assert.equal(cell.attr("x"), i * CELL_WIDTH, "Cell x coord is correct");
-                assert.equal(cell.attr("y"), i * CELL_HEIGHT, "Cell y coord is correct");
-                assert.equal(cell.attr("width"), CELL_WIDTH, "Cell width is correct");
-                assert.equal(cell.attr("height"), CELL_HEIGHT, "Cell height is correct");
+                assert.strictEqual(+cell.attr("x"), i * CELL_WIDTH, "Cell x coord is correct");
+                assert.strictEqual(+cell.attr("y"), i * CELL_HEIGHT, "Cell y coord is correct");
+                assert.strictEqual(+cell.attr("width"), CELL_WIDTH, "Cell width is correct");
+                assert.strictEqual(+cell.attr("height"), CELL_HEIGHT, "Cell height is correct");
             }
             svg.remove();
         });
@@ -4236,7 +4236,7 @@ describe("Plots", function () {
             { x: 4, y: 4, x2: 5, y2: 5 }
         ];
         var VERIFY_CELLS = function (cells) {
-            assert.equal(cells[0].length, 5);
+            assert.strictEqual(cells[0].length, 5);
             cells.each(function (d, i) {
                 var cell = d3.select(this);
                 assert.closeTo(+cell.attr("height"), 50, 0.5, "Cell height is correct");
@@ -4486,7 +4486,7 @@ describe("Plots", function () {
                         circlesInArea++;
                         assert.closeTo(x, xScale.scale(datum.x), 0.01, "the scaled/translated x is correct");
                         assert.closeTo(y, yScale.scale(datum.y), 0.01, "the scaled/translated y is correct");
-                        assert.equal(selection.attr("fill"), colorAccessor(datum, index, null), "fill is correct");
+                        assert.strictEqual(selection.attr("fill"), colorAccessor(datum, index, null), "fill is correct");
                     }
                     ;
                 };
@@ -4507,14 +4507,14 @@ describe("Plots", function () {
                 assert.deepEqual(xScale.range(), [0, SVG_WIDTH], "xScale range was set by the renderer");
                 assert.deepEqual(yScale.range(), [SVG_HEIGHT, 0], "yScale range was set by the renderer");
                 circlePlot.getAllSelections().each(getCirclePlotVerifier());
-                assert.equal(circlesInArea, 10, "10 circles were drawn");
+                assert.strictEqual(circlesInArea, 10, "10 circles were drawn");
                 svg.remove();
             });
             it("rendering is idempotent", function () {
                 circlePlot._render();
                 circlePlot._render();
                 circlePlot.getAllSelections().each(getCirclePlotVerifier());
-                assert.equal(circlesInArea, 10, "10 circles were drawn");
+                assert.strictEqual(circlesInArea, 10, "10 circles were drawn");
                 svg.remove();
             });
             describe("after the scale has changed", function () {
@@ -4527,7 +4527,7 @@ describe("Plots", function () {
                 it("the circles re-rendered properly", function () {
                     var circles = circlePlot.getAllSelections();
                     circles.each(getCirclePlotVerifier());
-                    assert.equal(circlesInArea, 4, "four circles were found in the render area");
+                    assert.strictEqual(circlesInArea, 4, "four circles were found in the render area");
                     svg.remove();
                 });
             });
@@ -6178,12 +6178,12 @@ describe("ComponentGroups", function () {
         var cgTranslate = d3.transform(cg._element.attr("transform")).translate;
         var c1Translate = d3.transform(c1._element.attr("transform")).translate;
         var c2Translate = d3.transform(c2._element.attr("transform")).translate;
-        assert.equal(cgTranslate[0], 50, "componentGroup has 50 xOffset");
-        assert.equal(cgTranslate[1], 50, "componentGroup has 50 yOffset");
-        assert.equal(c1Translate[0], 0, "componentGroup has 0 xOffset");
-        assert.equal(c1Translate[1], 0, "componentGroup has 0 yOffset");
-        assert.equal(c2Translate[0], 0, "componentGroup has 0 xOffset");
-        assert.equal(c2Translate[1], 0, "componentGroup has 0 yOffset");
+        assert.strictEqual(cgTranslate[0], 50, "componentGroup has 50 xOffset");
+        assert.strictEqual(cgTranslate[1], 50, "componentGroup has 50 yOffset");
+        assert.strictEqual(c1Translate[0], 0, "componentGroup has 0 xOffset");
+        assert.strictEqual(c1Translate[1], 0, "componentGroup has 0 yOffset");
+        assert.strictEqual(c2Translate[0], 0, "componentGroup has 0 xOffset");
+        assert.strictEqual(c2Translate[1], 0, "componentGroup has 0 yOffset");
         svg.remove();
     });
     it("detach() and _removeComponent work correctly for componentGroup", function () {
@@ -6312,38 +6312,38 @@ describe("ComponentGroups", function () {
                 var cg = c2.above(c1);
                 var innerComponents = cg.components();
                 assert.lengthOf(innerComponents, 2, "There are two components");
-                assert.equal(innerComponents[0], c1, "first component correct");
-                assert.equal(innerComponents[1], c2, "second component correct");
+                assert.strictEqual(innerComponents[0], c1, "first component correct");
+                assert.strictEqual(innerComponents[1], c2, "second component correct");
             });
             it("Component.above works as expected (Component.above ComponentGroup)", function () {
                 var cg = new Plottable.Component.Group([c1, c2, c3]);
                 var cg2 = c4.above(cg);
-                assert.equal(cg, cg2, "c4.above(cg) returns cg");
+                assert.strictEqual(cg, cg2, "c4.above(cg) returns cg");
                 var components = cg.components();
                 assert.lengthOf(components, 4, "four components");
-                assert.equal(components[2], c3, "third component in third");
-                assert.equal(components[3], c4, "fourth component is last");
+                assert.strictEqual(components[2], c3, "third component in third");
+                assert.strictEqual(components[3], c4, "fourth component is last");
             });
             it("Component.above works as expected (ComponentGroup.above Component)", function () {
                 var cg = new Plottable.Component.Group([c2, c3, c4]);
                 var cg2 = cg.above(c1);
-                assert.equal(cg, cg2, "cg.merge(c1) returns cg");
+                assert.strictEqual(cg, cg2, "cg.merge(c1) returns cg");
                 var components = cg.components();
                 assert.lengthOf(components, 4, "there are four components");
-                assert.equal(components[0], c1, "first is first");
-                assert.equal(components[3], c4, "fourth is fourth");
+                assert.strictEqual(components[0], c1, "first is first");
+                assert.strictEqual(components[3], c4, "fourth is fourth");
             });
             it("Component.above works as expected (ComponentGroup.above ComponentGroup)", function () {
                 var cg1 = new Plottable.Component.Group([c1, c2]);
                 var cg2 = new Plottable.Component.Group([c3, c4]);
                 var cg = cg1.above(cg2);
-                assert.equal(cg, cg1, "merged == cg1");
+                assert.strictEqual(cg, cg1, "merged == cg1");
                 assert.notEqual(cg, cg2, "merged != cg2");
                 var components = cg.components();
                 assert.lengthOf(components, 3, "there are three inner components");
-                assert.equal(components[0], cg2, "componentGroup2 inside componentGroup1");
-                assert.equal(components[1], c1, "components are inside");
-                assert.equal(components[2], c2, "components are inside");
+                assert.strictEqual(components[0], cg2, "componentGroup2 inside componentGroup1");
+                assert.strictEqual(components[1], c1, "components are inside");
+                assert.strictEqual(components[2], c2, "components are inside");
             });
         });
         describe("below()", function () {
@@ -6351,38 +6351,38 @@ describe("ComponentGroups", function () {
                 var cg = c1.below(c2);
                 var innerComponents = cg.components();
                 assert.lengthOf(innerComponents, 2, "There are two components");
-                assert.equal(innerComponents[0], c1, "first component correct");
-                assert.equal(innerComponents[1], c2, "second component correct");
+                assert.strictEqual(innerComponents[0], c1, "first component correct");
+                assert.strictEqual(innerComponents[1], c2, "second component correct");
             });
             it("Component.below works as expected (Component.below ComponentGroup)", function () {
                 var cg = new Plottable.Component.Group([c2, c3, c4]);
                 var cg2 = c1.below(cg);
-                assert.equal(cg, cg2, "c1.below(cg) returns cg");
+                assert.strictEqual(cg, cg2, "c1.below(cg) returns cg");
                 var components = cg.components();
                 assert.lengthOf(components, 4, "four components");
-                assert.equal(components[0], c1, "first component in front");
-                assert.equal(components[1], c2, "second component is second");
+                assert.strictEqual(components[0], c1, "first component in front");
+                assert.strictEqual(components[1], c2, "second component is second");
             });
             it("Component.below works as expected (ComponentGroup.below Component)", function () {
                 var cg = new Plottable.Component.Group([c1, c2, c3]);
                 var cg2 = cg.below(c4);
-                assert.equal(cg, cg2, "cg.merge(c4) returns cg");
+                assert.strictEqual(cg, cg2, "cg.merge(c4) returns cg");
                 var components = cg.components();
                 assert.lengthOf(components, 4, "there are four components");
-                assert.equal(components[0], c1, "first is first");
-                assert.equal(components[3], c4, "fourth is fourth");
+                assert.strictEqual(components[0], c1, "first is first");
+                assert.strictEqual(components[3], c4, "fourth is fourth");
             });
             it("Component.below works as expected (ComponentGroup.below ComponentGroup)", function () {
                 var cg1 = new Plottable.Component.Group([c1, c2]);
                 var cg2 = new Plottable.Component.Group([c3, c4]);
                 var cg = cg1.below(cg2);
-                assert.equal(cg, cg1, "merged group == cg1");
+                assert.strictEqual(cg, cg1, "merged group == cg1");
                 assert.notEqual(cg, cg2, "merged group != cg2");
                 var components = cg.components();
                 assert.lengthOf(components, 3, "there are three inner components");
-                assert.equal(components[0], c1, "components are inside");
-                assert.equal(components[1], c2, "components are inside");
-                assert.equal(components[2], cg2, "componentGroup2 inside componentGroup1");
+                assert.strictEqual(components[0], c1, "components are inside");
+                assert.strictEqual(components[1], c2, "components are inside");
+                assert.strictEqual(components[2], cg2, "componentGroup2 inside componentGroup1");
             });
         });
     });
@@ -6395,8 +6395,8 @@ function assertComponentXY(component, x, y, message) {
     var translate = d3.transform(component._element.attr("transform")).translate;
     var xActual = translate[0];
     var yActual = translate[1];
-    assert.equal(xActual, x, "X: " + message);
-    assert.equal(yActual, y, "Y: " + message);
+    assert.strictEqual(xActual, x, "X: " + message);
+    assert.strictEqual(yActual, y, "Y: " + message);
 }
 describe("Component behavior", function () {
     var svg;
@@ -6410,7 +6410,7 @@ describe("Component behavior", function () {
     describe("anchor", function () {
         it("anchoring works as expected", function () {
             c._anchor(svg);
-            assert.equal(c._element.node(), svg.select("g").node(), "the component anchored to a <g> beneath the <svg>");
+            assert.strictEqual(c._element.node(), svg.select("g").node(), "the component anchored to a <g> beneath the <svg>");
             assert.isTrue(svg.classed("plottable"), "<svg> was given \"plottable\" CSS class");
             svg.remove();
         });
@@ -6418,7 +6418,7 @@ describe("Component behavior", function () {
             c._anchor(svg);
             var svg2 = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
             c._anchor(svg2);
-            assert.equal(c._element.node(), svg2.select("g").node(), "the component re-achored under the second <svg>");
+            assert.strictEqual(c._element.node(), svg2.select("g").node(), "the component re-achored under the second <svg>");
             assert.isTrue(svg2.classed("plottable"), "second <svg> was given \"plottable\" CSS class");
             svg.remove();
             svg2.remove();
@@ -6428,16 +6428,16 @@ describe("Component behavior", function () {
         it("computeLayout defaults and updates intelligently", function () {
             c._anchor(svg);
             c._computeLayout();
-            assert.equal(c.width(), SVG_WIDTH, "computeLayout defaulted width to svg width");
-            assert.equal(c.height(), SVG_HEIGHT, "computeLayout defaulted height to svg height");
-            assert.equal(c._xOrigin, 0, "xOrigin defaulted to 0");
-            assert.equal(c._yOrigin, 0, "yOrigin defaulted to 0");
+            assert.strictEqual(c.width(), SVG_WIDTH, "computeLayout defaulted width to svg width");
+            assert.strictEqual(c.height(), SVG_HEIGHT, "computeLayout defaulted height to svg height");
+            assert.strictEqual(c._xOrigin, 0, "xOrigin defaulted to 0");
+            assert.strictEqual(c._yOrigin, 0, "yOrigin defaulted to 0");
             svg.attr("width", 2 * SVG_WIDTH).attr("height", 2 * SVG_HEIGHT);
             c._computeLayout();
-            assert.equal(c.width(), 2 * SVG_WIDTH, "computeLayout updated width to new svg width");
-            assert.equal(c.height(), 2 * SVG_HEIGHT, "computeLayout updated height to new svg height");
-            assert.equal(c._xOrigin, 0, "xOrigin is still 0");
-            assert.equal(c._yOrigin, 0, "yOrigin is still 0");
+            assert.strictEqual(c.width(), 2 * SVG_WIDTH, "computeLayout updated width to new svg width");
+            assert.strictEqual(c.height(), 2 * SVG_HEIGHT, "computeLayout updated height to new svg height");
+            assert.strictEqual(c._xOrigin, 0, "xOrigin is still 0");
+            assert.strictEqual(c._yOrigin, 0, "yOrigin is still 0");
             svg.remove();
         });
         it("computeLayout works with CSS layouts", function () {
@@ -6449,22 +6449,22 @@ describe("Component behavior", function () {
             svg.attr("width", null).attr("height", null);
             c._anchor(svg);
             c._computeLayout();
-            assert.equal(c.width(), 400, "defaults to width of parent if width is not specified on <svg>");
-            assert.equal(c.height(), 200, "defaults to height of parent if width is not specified on <svg>");
-            assert.equal(c._xOrigin, 0, "xOrigin defaulted to 0");
-            assert.equal(c._yOrigin, 0, "yOrigin defaulted to 0");
+            assert.strictEqual(c.width(), 400, "defaults to width of parent if width is not specified on <svg>");
+            assert.strictEqual(c.height(), 200, "defaults to height of parent if width is not specified on <svg>");
+            assert.strictEqual(c._xOrigin, 0, "xOrigin defaulted to 0");
+            assert.strictEqual(c._yOrigin, 0, "yOrigin defaulted to 0");
             svg.style("width", "50%").style("height", "50%");
             c._computeLayout();
-            assert.equal(c.width(), 200, "computeLayout defaulted width to svg width");
-            assert.equal(c.height(), 100, "computeLayout defaulted height to svg height");
-            assert.equal(c._xOrigin, 0, "xOrigin defaulted to 0");
-            assert.equal(c._yOrigin, 0, "yOrigin defaulted to 0");
+            assert.strictEqual(c.width(), 200, "computeLayout defaulted width to svg width");
+            assert.strictEqual(c.height(), 100, "computeLayout defaulted height to svg height");
+            assert.strictEqual(c._xOrigin, 0, "xOrigin defaulted to 0");
+            assert.strictEqual(c._yOrigin, 0, "yOrigin defaulted to 0");
             svg.style("width", "25%").style("height", "25%");
             c._computeLayout();
-            assert.equal(c.width(), 100, "computeLayout updated width to new svg width");
-            assert.equal(c.height(), 50, "computeLayout updated height to new svg height");
-            assert.equal(c._xOrigin, 0, "xOrigin is still 0");
-            assert.equal(c._yOrigin, 0, "yOrigin is still 0");
+            assert.strictEqual(c.width(), 100, "computeLayout updated width to new svg width");
+            assert.strictEqual(c.height(), 50, "computeLayout updated height to new svg height");
+            assert.strictEqual(c._xOrigin, 0, "xOrigin is still 0");
+            assert.strictEqual(c._yOrigin, 0, "yOrigin is still 0");
             // reset test page DOM
             parent.style("width", "auto");
             parent.style("height", "auto");
@@ -6489,8 +6489,8 @@ describe("Component behavior", function () {
             c._computeLayout(xOff, yOff, width, height);
             var translate = TestMethods.getTranslate(c._element);
             assert.deepEqual(translate, [xOff, yOff], "the element translated appropriately");
-            assert.equal(c.width(), width, "the width set properly");
-            assert.equal(c.height(), height, "the height set propery");
+            assert.strictEqual(c.width(), width, "the width set properly");
+            assert.strictEqual(c.height(), height, "the height set propery");
             svg.remove();
         });
     });
@@ -6542,14 +6542,14 @@ describe("Component behavior", function () {
     });
     it("component defaults are as expected", function () {
         var layout = c._requestedSpace(1, 1);
-        assert.equal(layout.width, 0, "requested width defaults to 0");
-        assert.equal(layout.height, 0, "requested height defaults to 0");
-        assert.equal(layout.wantsWidth, false, "_requestedSpace().wantsWidth  defaults to false");
-        assert.equal(layout.wantsHeight, false, "_requestedSpace().wantsHeight defaults to false");
-        assert.equal(c._xAlignProportion, 0, "_xAlignProportion defaults to 0");
-        assert.equal(c._yAlignProportion, 0, "_yAlignProportion defaults to 0");
-        assert.equal(c._xOffset, 0, "xOffset defaults to 0");
-        assert.equal(c._yOffset, 0, "yOffset defaults to 0");
+        assert.strictEqual(layout.width, 0, "requested width defaults to 0");
+        assert.strictEqual(layout.height, 0, "requested height defaults to 0");
+        assert.strictEqual(layout.wantsWidth, false, "_requestedSpace().wantsWidth  defaults to false");
+        assert.strictEqual(layout.wantsHeight, false, "_requestedSpace().wantsHeight defaults to false");
+        assert.strictEqual(c._xAlignProportion, 0, "_xAlignProportion defaults to 0");
+        assert.strictEqual(c._yAlignProportion, 0, "_yAlignProportion defaults to 0");
+        assert.strictEqual(c._xOffset, 0, "xOffset defaults to 0");
+        assert.strictEqual(c._yOffset, 0, "yOffset defaults to 0");
         svg.remove();
     });
     it("clipPath works as expected", function () {
@@ -6566,16 +6566,16 @@ describe("Component behavior", function () {
         var normalizeClipPath = function (s) { return s.replace(/"/g, ""); };
         assert.isTrue(normalizeClipPath(c._element.attr("clip-path")) === expectedClipPathURL, "the element has clip-path url attached");
         var clipRect = c._boxContainer.select(".clip-rect");
-        assert.equal(clipRect.attr("width"), 100, "the clipRect has an appropriate width");
-        assert.equal(clipRect.attr("height"), 100, "the clipRect has an appropriate height");
+        assert.strictEqual(+clipRect.attr("width"), 100, "the clipRect has an appropriate width");
+        assert.strictEqual(+clipRect.attr("height"), 100, "the clipRect has an appropriate height");
         svg.remove();
     });
     it("componentID works as expected", function () {
         var expectedID = Plottable.Core.PlottableObject._nextID;
         var c1 = new Plottable.Component.AbstractComponent();
-        assert.equal(c1.getID(), expectedID, "component id on next component was as expected");
+        assert.strictEqual(c1.getID(), expectedID, "component id on next component was as expected");
         var c2 = new Plottable.Component.AbstractComponent();
-        assert.equal(c2.getID(), expectedID + 1, "future components increment appropriately");
+        assert.strictEqual(c2.getID(), expectedID + 1, "future components increment appropriately");
         svg.remove();
     });
     it("boxes work as expected", function () {
@@ -6589,8 +6589,8 @@ describe("Component behavior", function () {
             var box = boxContainer.select(s);
             assert.isNotNull(box.node(), s + " box was created and placed inside boxContainer");
             var bb = Plottable._Util.DOM.getBBox(box);
-            assert.equal(bb.width, SVG_WIDTH, s + " width as expected");
-            assert.equal(bb.height, SVG_HEIGHT, s + " height as expected");
+            assert.strictEqual(bb.width, SVG_WIDTH, s + " width as expected");
+            assert.strictEqual(bb.height, SVG_HEIGHT, s + " height as expected");
         });
         svg.remove();
     });
@@ -6601,7 +6601,7 @@ describe("Component behavior", function () {
             var hitBoxFill = hitBox.style("fill");
             var hitBoxFilled = hitBoxFill === "#ffffff" || hitBoxFill === "rgb(255, 255, 255)";
             assert.isTrue(hitBoxFilled, hitBoxFill + " <- this should be filled, so the hitbox will detect events");
-            assert.equal(hitBox.style("opacity"), "0", "the hitBox is transparent, otherwise it would look weird");
+            assert.strictEqual(hitBox.style("opacity"), "0", "the hitBox is transparent, otherwise it would look weird");
         }
         c._anchor(svg);
         assert.isUndefined(c._hitBox, "no hitBox was created when there were no registered interactions");
@@ -6647,7 +6647,7 @@ describe("Component behavior", function () {
         c.classed("CSS-POSTANCHOR", false);
         assert.isFalse(c.classed("CSS-POSTANCHOR"));
         assert.isFalse(c.classed(undefined), "returns false when classed called w/ undefined");
-        assert.equal(c.classed(undefined, true), c, "returns this when classed called w/ undefined and true");
+        assert.strictEqual(c.classed(undefined, true), c, "returns this when classed called w/ undefined and true");
         svg.remove();
     });
     it("detach() works as expected", function () {
@@ -6670,12 +6670,12 @@ describe("Component behavior", function () {
         var c = TestMethods.makeFixedSizeComponent(10, 10);
         cg._addComponent(c);
         cg.renderTo(svg);
-        assert.equal(cg.height(), 300, "height() is the entire available height");
-        assert.equal(cg.width(), 400, "width() is the entire available width");
+        assert.strictEqual(cg.height(), 300, "height() is the entire available height");
+        assert.strictEqual(cg.width(), 400, "width() is the entire available width");
         TestMethods.fixComponentSize(c, 50, 50);
         c._invalidateLayout();
-        assert.equal(cg.height(), 300, "height() after resizing is the entire available height");
-        assert.equal(cg.width(), 400, "width() after resizing is the entire available width");
+        assert.strictEqual(cg.height(), 300, "height() after resizing is the entire available height");
+        assert.strictEqual(cg.width(), 400, "width() after resizing is the entire available width");
         svg.remove();
     });
     it("components can be detached even if not anchored", function () {
@@ -6741,7 +6741,7 @@ describe("Component behavior", function () {
         assert.deepEqual(plot._parent(), group, "the plot should be inside the group");
         assert.strictEqual(plot.height(), SVG_HEIGHT_1, "the plot should occupy the entire space of the first svg");
         plot.renderTo(svg2);
-        assert.equal(plot._parent(), null, "the plot should be outside the group");
+        assert.strictEqual(plot._parent(), null, "the plot should be outside the group");
         assert.strictEqual(plot.height(), SVG_HEIGHT_2, "the plot should occupy the entire space of the second svg");
         svg1.remove();
         svg2.remove();
@@ -6859,7 +6859,7 @@ describe("Dataset", function () {
         var newData = [1, 2, 3];
         var callbackCalled = false;
         var callback = function (listenable) {
-            assert.equal(listenable, ds, "Callback received the Dataset as the first argument");
+            assert.strictEqual(listenable, ds, "Callback received the Dataset as the first argument");
             assert.deepEqual(ds.data(), newData, "Dataset arrives with correct data");
             callbackCalled = true;
         };
@@ -6872,7 +6872,7 @@ describe("Dataset", function () {
         var newMetadata = "blargh";
         var callbackCalled = false;
         var callback = function (listenable) {
-            assert.equal(listenable, ds, "Callback received the Dataset as the first argument");
+            assert.strictEqual(listenable, ds, "Callback received the Dataset as the first argument");
             assert.deepEqual(ds.metadata(), newMetadata, "Dataset arrives with correct metadata");
             callbackCalled = true;
         };
@@ -6933,17 +6933,17 @@ describe("Tables", function () {
         t._padTableToSize(5, 2);
         assert.lengthOf(rows, 5, "there are five rows");
         rows.forEach(function (r) { return assert.lengthOf(r, 2, "there are two columsn per row"); });
-        assert.equal(rows[0][0], firstComponent, "the first component is unchanged");
+        assert.strictEqual(rows[0][0], firstComponent, "the first component is unchanged");
     });
     it("table constructor can take a list of lists of components", function () {
         var c0 = new Plottable.Component.AbstractComponent();
         var row1 = [null, c0];
         var row2 = [new Plottable.Component.AbstractComponent(), null];
         var table = new Plottable.Component.Table([row1, row2]);
-        assert.equal(table._rows[0][1], c0, "the component is in the right spot");
+        assert.strictEqual(table._rows[0][1], c0, "the component is in the right spot");
         var c1 = new Plottable.Component.AbstractComponent();
         table.addComponent(2, 2, c1);
-        assert.equal(table._rows[2][2], c1, "the inserted component went to the right spot");
+        assert.strictEqual(table._rows[2][2], c1, "the inserted component went to the right spot");
     });
     it("tables can be constructed by adding components in matrix style", function () {
         var table = new Plottable.Component.Table();
@@ -6955,8 +6955,8 @@ describe("Tables", function () {
         assert.lengthOf(rows, 2, "there are two rows");
         assert.lengthOf(rows[0], 2, "two cols in first row");
         assert.lengthOf(rows[1], 2, "two cols in second row");
-        assert.equal(rows[0][0], c1, "first component added correctly");
-        assert.equal(rows[1][1], c2, "second component added correctly");
+        assert.strictEqual(rows[0][0], c1, "first component added correctly");
+        assert.strictEqual(rows[1][1], c2, "second component added correctly");
         assert.isNull(rows[0][1], "component at (0, 1) is null");
         assert.isNull(rows[1][0], "component at (1, 0) is null");
     });
@@ -6971,8 +6971,8 @@ describe("Tables", function () {
         assert.isTrue(Plottable.Component.Group.prototype.isPrototypeOf(t._rows[0][2]), "A group was created");
         var components = t._rows[0][2].components();
         assert.lengthOf(components, 2, "The group created should have 2 components");
-        assert.equal(components[0], c1, "First element in the group at (0, 2) should be c1");
-        assert.equal(components[1], c3, "Second element in the group at (0, 2) should be c3");
+        assert.strictEqual(components[0], c1, "First element in the group at (0, 2) should be c1");
+        assert.strictEqual(components[1], c3, "Second element in the group at (0, 2) should be c3");
     });
     it("add a component where a group already exists adds the component to the group", function () {
         var c1 = new Plottable.Component.AbstractComponent();
@@ -6985,9 +6985,9 @@ describe("Tables", function () {
         assert.isTrue(Plottable.Component.Group.prototype.isPrototypeOf(t._rows[0][2]), "The cell still contains a group");
         var components = t._rows[0][2].components();
         assert.lengthOf(components, 3, "The group created should have 3 components");
-        assert.equal(components[0], c1, "First element in the group at (0, 2) should still be c1");
-        assert.equal(components[1], c2, "Second element in the group at (0, 2) should still be c2");
-        assert.equal(components[2], c3, "The Component was added to the existing Group");
+        assert.strictEqual(components[0], c1, "First element in the group at (0, 2) should still be c1");
+        assert.strictEqual(components[1], c2, "Second element in the group at (0, 2) should still be c2");
+        assert.strictEqual(components[2], c3, "The Component was added to the existing Group");
     });
     it("adding null to a table cell should throw an error", function () {
         var c1 = new Plottable.Component.AbstractComponent();
@@ -7017,8 +7017,8 @@ describe("Tables", function () {
         assert.deepEqual(translates[3], [200, 200], "fourth element is located properly");
         var bboxes = elements.map(function (e) { return Plottable._Util.DOM.getBBox(e); });
         bboxes.forEach(function (b) {
-            assert.equal(b.width, 200, "bbox is 200 pixels wide");
-            assert.equal(b.height, 200, "bbox is 200 pixels tall");
+            assert.strictEqual(b.width, 200, "bbox is 200 pixels wide");
+            assert.strictEqual(b.height, 200, "bbox is 200 pixels tall");
         });
         svg.remove();
     });
@@ -7037,8 +7037,8 @@ describe("Tables", function () {
         assert.deepEqual(translates[2], [0, 210], "third element is located properly");
         assert.deepEqual(translates[3], [210, 210], "fourth element is located properly");
         bboxes.forEach(function (b) {
-            assert.equal(b.width, 205, "bbox is 205 pixels wide");
-            assert.equal(b.height, 205, "bbox is 205 pixels tall");
+            assert.strictEqual(b.width, 205, "bbox is 205 pixels wide");
+            assert.strictEqual(b.height, 205, "bbox is 205 pixels tall");
         });
         svg.remove();
     });
@@ -7225,8 +7225,8 @@ describe("Domainer", function () {
         assert.isNotNull(dd1.toDateString, "padDomain produced dates");
         assert.notEqual(d1.valueOf(), dd1.valueOf(), "date1 changed");
         assert.notEqual(d2.valueOf(), dd2.valueOf(), "date2 changed");
-        assert.equal(dd1.valueOf(), dd1.valueOf(), "date1 is not NaN");
-        assert.equal(dd2.valueOf(), dd2.valueOf(), "date2 is not NaN");
+        assert.strictEqual(dd1.valueOf(), dd1.valueOf(), "date1 is not NaN");
+        assert.strictEqual(dd2.valueOf(), dd2.valueOf(), "date2 is not NaN");
     });
     it("pad() works on log scales", function () {
         var logScale = new Plottable.Scale.Log();
@@ -7421,7 +7421,7 @@ describe("Scales", function () {
         var scale = new Plottable.Scale.Linear();
         var callbackWasCalled = false;
         var testCallback = function (listenable) {
-            assert.equal(listenable, scale, "Callback received the calling scale as the first argument");
+            assert.strictEqual(listenable, scale, "Callback received the calling scale as the first argument");
             callbackWasCalled = true;
         };
         scale.broadcaster.registerListener(null, testCallback);
@@ -7525,8 +7525,8 @@ describe("Scales", function () {
             var scale = new Plottable.Scale.Linear();
             scale.autoDomain();
             var d = scale.domain();
-            assert.equal(d[0], 0);
-            assert.equal(d[1], 1);
+            assert.strictEqual(d[0], 0);
+            assert.strictEqual(d[1], 1);
         });
         it("can change the number of ticks generated", function () {
             var scale = new Plottable.Scale.Linear();
@@ -7631,9 +7631,9 @@ describe("Scales", function () {
         it("accepts categorical string types and Category domain", function () {
             var scale = new Plottable.Scale.Color("10");
             scale.domain(["yes", "no", "maybe"]);
-            assert.equal("#1f77b4", scale.scale("yes"));
-            assert.equal("#ff7f0e", scale.scale("no"));
-            assert.equal("#2ca02c", scale.scale("maybe"));
+            assert.strictEqual("#1f77b4", scale.scale("yes"));
+            assert.strictEqual("#ff7f0e", scale.scale("no"));
+            assert.strictEqual("#2ca02c", scale.scale("maybe"));
         });
         it("default colors are generated", function () {
             var scale = new Plottable.Scale.Color();
@@ -7650,8 +7650,8 @@ describe("Scales", function () {
             var scale = new Plottable.Scale.Color();
             scale.range(["red", "blue"]);
             scale.domain(["a", "b"]);
-            assert.equal(scale.scale("a"), "#ff0000");
-            assert.equal(scale.scale("b"), "#0000ff");
+            assert.strictEqual(scale.scale("a"), "#ff0000");
+            assert.strictEqual(scale.scale("b"), "#0000ff");
         });
         it("accepts CSS specified colors", function () {
             var style = d3.select("body").append("style");
@@ -7692,56 +7692,56 @@ describe("Scales", function () {
         it("default scale uses reds and a linear scale type", function () {
             var scale = new Plottable.Scale.InterpolatedColor();
             scale.domain([0, 16]);
-            assert.equal("#ffffff", scale.scale(0));
-            assert.equal("#feb24c", scale.scale(8));
-            assert.equal("#b10026", scale.scale(16));
+            assert.strictEqual("#ffffff", scale.scale(0));
+            assert.strictEqual("#feb24c", scale.scale(8));
+            assert.strictEqual("#b10026", scale.scale(16));
         });
         it("linearly interpolates colors in L*a*b color space", function () {
             var scale = new Plottable.Scale.InterpolatedColor("reds");
             scale.domain([0, 1]);
-            assert.equal("#b10026", scale.scale(1));
-            assert.equal("#d9151f", scale.scale(0.9));
+            assert.strictEqual("#b10026", scale.scale(1));
+            assert.strictEqual("#d9151f", scale.scale(0.9));
         });
         it("accepts array types with color hex values", function () {
             var scale = new Plottable.Scale.InterpolatedColor(["#000", "#FFF"]);
             scale.domain([0, 16]);
-            assert.equal("#000000", scale.scale(0));
-            assert.equal("#ffffff", scale.scale(16));
-            assert.equal("#777777", scale.scale(8));
+            assert.strictEqual("#000000", scale.scale(0));
+            assert.strictEqual("#ffffff", scale.scale(16));
+            assert.strictEqual("#777777", scale.scale(8));
         });
         it("accepts array types with color names", function () {
             var scale = new Plottable.Scale.InterpolatedColor(["black", "white"]);
             scale.domain([0, 16]);
-            assert.equal("#000000", scale.scale(0));
-            assert.equal("#ffffff", scale.scale(16));
-            assert.equal("#777777", scale.scale(8));
+            assert.strictEqual("#000000", scale.scale(0));
+            assert.strictEqual("#ffffff", scale.scale(16));
+            assert.strictEqual("#777777", scale.scale(8));
         });
         it("overflow scale values clamp to range", function () {
             var scale = new Plottable.Scale.InterpolatedColor(["black", "white"]);
             scale.domain([0, 16]);
-            assert.equal("#000000", scale.scale(0));
-            assert.equal("#ffffff", scale.scale(16));
-            assert.equal("#000000", scale.scale(-100));
-            assert.equal("#ffffff", scale.scale(100));
+            assert.strictEqual("#000000", scale.scale(0));
+            assert.strictEqual("#ffffff", scale.scale(16));
+            assert.strictEqual("#000000", scale.scale(-100));
+            assert.strictEqual("#ffffff", scale.scale(100));
         });
         it("can be converted to a different range", function () {
             var scale = new Plottable.Scale.InterpolatedColor(["black", "white"]);
             scale.domain([0, 16]);
-            assert.equal("#000000", scale.scale(0));
-            assert.equal("#ffffff", scale.scale(16));
+            assert.strictEqual("#000000", scale.scale(0));
+            assert.strictEqual("#ffffff", scale.scale(16));
             scale.colorRange("reds");
-            assert.equal("#b10026", scale.scale(16));
+            assert.strictEqual("#b10026", scale.scale(16));
         });
         it("can be converted to a different scale type", function () {
             var scale = new Plottable.Scale.InterpolatedColor(["black", "white"]);
             scale.domain([0, 16]);
-            assert.equal("#000000", scale.scale(0));
-            assert.equal("#ffffff", scale.scale(16));
-            assert.equal("#777777", scale.scale(8));
+            assert.strictEqual("#000000", scale.scale(0));
+            assert.strictEqual("#ffffff", scale.scale(16));
+            assert.strictEqual("#777777", scale.scale(8));
             scale.scaleType("log");
-            assert.equal("#000000", scale.scale(0));
-            assert.equal("#ffffff", scale.scale(16));
-            assert.equal("#e3e3e3", scale.scale(8));
+            assert.strictEqual("#000000", scale.scale(0));
+            assert.strictEqual("#ffffff", scale.scale(16));
+            assert.strictEqual("#e3e3e3", scale.scale(8));
         });
     });
     describe("Modified Log Scale", function () {
@@ -7842,9 +7842,9 @@ describe("TimeScale tests", function () {
         function checkDomain(domain) {
             scale.domain(domain);
             var time1 = scale.domain()[0].valueOf();
-            assert.equal(time1, firstDate, "first value of domain set correctly");
+            assert.strictEqual(time1, firstDate, "first value of domain set correctly");
             var time2 = scale.domain()[1].valueOf();
-            assert.equal(time2, secondDate, "first value of domain set correctly");
+            assert.strictEqual(time2, secondDate, "first value of domain set correctly");
         }
         checkDomain(["10/1/2014", "11/1/2014"]);
         checkDomain(["October 1, 2014", "November 1, 2014"]);
@@ -7856,43 +7856,43 @@ describe("TimeScale tests", function () {
     });
     it("time coercer works as intended", function () {
         var tc = new Plottable.Scale.Time()._typeCoercer;
-        assert.equal(tc(null).getMilliseconds(), 0, "null converted to Date(0)");
+        assert.strictEqual(tc(null).getMilliseconds(), 0, "null converted to Date(0)");
         // converting null to Date(0) is the correct behavior as it mirror's d3's semantics
-        assert.equal(tc("Wed Dec 31 1969 16:00:00 GMT-0800 (PST)").getMilliseconds(), 0, "string parsed to date");
-        assert.equal(tc(0).getMilliseconds(), 0, "number parsed to date");
+        assert.strictEqual(tc("Wed Dec 31 1969 16:00:00 GMT-0800 (PST)").getMilliseconds(), 0, "string parsed to date");
+        assert.strictEqual(tc(0).getMilliseconds(), 0, "number parsed to date");
         var d = new Date(0);
-        assert.equal(tc(d), d, "date passed thru unchanged");
+        assert.strictEqual(tc(d), d, "date passed thru unchanged");
     });
     it("tickInterval produces correct number of ticks", function () {
         var scale = new Plottable.Scale.Time();
         // 100 year span
         scale.domain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2100, 0, 1, 0, 0, 0, 0)]);
         var ticks = scale.tickInterval(d3.time.year);
-        assert.equal(ticks.length, 101, "generated correct number of ticks");
+        assert.strictEqual(ticks.length, 101, "generated correct number of ticks");
         // 1 year span
         scale.domain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 11, 31, 0, 0, 0, 0)]);
         ticks = scale.tickInterval(d3.time.month);
-        assert.equal(ticks.length, 12, "generated correct number of ticks");
+        assert.strictEqual(ticks.length, 12, "generated correct number of ticks");
         ticks = scale.tickInterval(d3.time.month, 3);
-        assert.equal(ticks.length, 4, "generated correct number of ticks");
+        assert.strictEqual(ticks.length, 4, "generated correct number of ticks");
         // 1 month span
         scale.domain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 1, 1, 0, 0, 0, 0)]);
         ticks = scale.tickInterval(d3.time.day);
-        assert.equal(ticks.length, 32, "generated correct number of ticks");
+        assert.strictEqual(ticks.length, 32, "generated correct number of ticks");
         // 1 day span
         scale.domain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 0, 1, 23, 0, 0, 0)]);
         ticks = scale.tickInterval(d3.time.hour);
-        assert.equal(ticks.length, 24, "generated correct number of ticks");
+        assert.strictEqual(ticks.length, 24, "generated correct number of ticks");
         // 1 hour span
         scale.domain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 0, 1, 1, 0, 0, 0)]);
         ticks = scale.tickInterval(d3.time.minute);
-        assert.equal(ticks.length, 61, "generated correct number of ticks");
+        assert.strictEqual(ticks.length, 61, "generated correct number of ticks");
         ticks = scale.tickInterval(d3.time.minute, 10);
-        assert.equal(ticks.length, 7, "generated correct number of ticks");
+        assert.strictEqual(ticks.length, 7, "generated correct number of ticks");
         // 1 minute span
         scale.domain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 0, 1, 0, 1, 0, 0)]);
         ticks = scale.tickInterval(d3.time.second);
-        assert.equal(ticks.length, 61, "generated correct number of ticks");
+        assert.strictEqual(ticks.length, 61, "generated correct number of ticks");
     });
 });
 
@@ -7991,17 +7991,17 @@ describe("_Util.DOM", function () {
             parent.style("height", "200px");
             var parentElem = parent[0][0];
             var width = Plottable._Util.DOM.getElementWidth(parentElem);
-            assert.equal(width, 300, "measured width matches set width");
+            assert.strictEqual(width, 300, "measured width matches set width");
             var height = Plottable._Util.DOM.getElementHeight(parentElem);
-            assert.equal(height, 200, "measured height matches set height");
+            assert.strictEqual(height, 200, "measured height matches set height");
         });
         it("can get the svg's size", function () {
             var svg = TestMethods.generateSVG(450, 120);
             var svgElem = svg[0][0];
             var width = Plottable._Util.DOM.getElementWidth(svgElem);
-            assert.equal(width, 450, "measured width matches set width");
+            assert.strictEqual(width, 450, "measured width matches set width");
             var height = Plottable._Util.DOM.getElementHeight(svgElem);
-            assert.equal(height, 120, "measured height matches set height");
+            assert.strictEqual(height, 120, "measured height matches set height");
             svg.remove();
         });
         it("can accept multiple units and convert to pixels", function () {
@@ -8011,20 +8011,20 @@ describe("_Util.DOM", function () {
             var childElem = child[0][0];
             parent.style("width", "200px");
             parent.style("height", "50px");
-            assert.equal(Plottable._Util.DOM.getElementWidth(parentElem), 200, "width is correct");
-            assert.equal(Plottable._Util.DOM.getElementHeight(parentElem), 50, "height is correct");
+            assert.strictEqual(Plottable._Util.DOM.getElementWidth(parentElem), 200, "width is correct");
+            assert.strictEqual(Plottable._Util.DOM.getElementHeight(parentElem), 50, "height is correct");
             child.style("width", "20px");
             child.style("height", "10px");
-            assert.equal(Plottable._Util.DOM.getElementWidth(childElem), 20, "width is correct");
-            assert.equal(Plottable._Util.DOM.getElementHeight(childElem), 10, "height is correct");
+            assert.strictEqual(Plottable._Util.DOM.getElementWidth(childElem), 20, "width is correct");
+            assert.strictEqual(Plottable._Util.DOM.getElementHeight(childElem), 10, "height is correct");
             child.style("width", "100%");
             child.style("height", "100%");
-            assert.equal(Plottable._Util.DOM.getElementWidth(childElem), 200, "width is correct");
-            assert.equal(Plottable._Util.DOM.getElementHeight(childElem), 50, "height is correct");
+            assert.strictEqual(Plottable._Util.DOM.getElementWidth(childElem), 200, "width is correct");
+            assert.strictEqual(Plottable._Util.DOM.getElementHeight(childElem), 50, "height is correct");
             child.style("width", "50%");
             child.style("height", "50%");
-            assert.equal(Plottable._Util.DOM.getElementWidth(childElem), 100, "width is correct");
-            assert.equal(Plottable._Util.DOM.getElementHeight(childElem), 25, "height is correct");
+            assert.strictEqual(Plottable._Util.DOM.getElementWidth(childElem), 100, "width is correct");
+            assert.strictEqual(Plottable._Util.DOM.getElementHeight(childElem), 25, "height is correct");
             // reset test page DOM
             parent.style("width", "auto");
             parent.style("height", "auto");
@@ -8224,20 +8224,20 @@ describe("StrictEqualityAssociativeArray", function () {
         assert.isFalse(s.delete(o1));
         assert.isUndefined(s.get(o1));
         assert.isFalse(s.set(o1, "foo"));
-        assert.equal(s.get(o1), "foo");
+        assert.strictEqual(s.get(o1), "foo");
         assert.isTrue(s.set(o1, "bar"));
-        assert.equal(s.get(o1), "bar");
+        assert.strictEqual(s.get(o1), "bar");
         s.set(o2, "baz");
         s.set(3, "bam");
         s.set("3", "ball");
-        assert.equal(s.get(o1), "bar");
-        assert.equal(s.get(o2), "baz");
-        assert.equal(s.get(3), "bam");
-        assert.equal(s.get("3"), "ball");
+        assert.strictEqual(s.get(o1), "bar");
+        assert.strictEqual(s.get(o2), "baz");
+        assert.strictEqual(s.get(3), "bam");
+        assert.strictEqual(s.get("3"), "ball");
         assert.isTrue(s.delete(3));
         assert.isUndefined(s.get(3));
-        assert.equal(s.get(o2), "baz");
-        assert.equal(s.get("3"), "ball");
+        assert.strictEqual(s.get(o2), "baz");
+        assert.strictEqual(s.get("3"), "ball");
     });
     it("Array-level operations (retrieve keys, vals, and map)", function () {
         var s = new Plottable._Util.StrictEqualityAssociativeArray();
@@ -8292,23 +8292,23 @@ describe("_Util.Methods", function () {
     it("sortedIndex works properly", function () {
         var a = [1, 2, 3, 4, 5];
         var si = Plottable._Util.OpenSource.sortedIndex;
-        assert.equal(si(0, a), 0, "return 0 when val is <= arr[0]");
-        assert.equal(si(6, a), a.length, "returns a.length when val >= arr[arr.length-1]");
-        assert.equal(si(1.5, a), 1, "returns 1 when val is between the first and second elements");
+        assert.strictEqual(si(0, a), 0, "return 0 when val is <= arr[0]");
+        assert.strictEqual(si(6, a), a.length, "returns a.length when val >= arr[arr.length-1]");
+        assert.strictEqual(si(1.5, a), 1, "returns 1 when val is between the first and second elements");
     });
     it("accessorize works properly", function () {
         var datum = { "foo": 2, "bar": 3, "key": 4 };
         var f = function (d, i, m) { return d + i; };
         var a1 = Plottable._Util.Methods.accessorize(f);
-        assert.equal(f, a1, "function passes through accessorize unchanged");
+        assert.strictEqual(f, a1, "function passes through accessorize unchanged");
         var a2 = Plottable._Util.Methods.accessorize("key");
-        assert.equal(a2(datum, 0, null), 4, "key accessor works appropriately");
+        assert.strictEqual(a2(datum, 0, null), 4, "key accessor works appropriately");
         var a3 = Plottable._Util.Methods.accessorize("#aaaa");
-        assert.equal(a3(datum, 0, null), "#aaaa", "strings beginning with # are returned as final value");
+        assert.strictEqual(a3(datum, 0, null), "#aaaa", "strings beginning with # are returned as final value");
         var a4 = Plottable._Util.Methods.accessorize(33);
-        assert.equal(a4(datum, 0, null), 33, "numbers are return as final value");
+        assert.strictEqual(a4(datum, 0, null), 33, "numbers are return as final value");
         var a5 = Plottable._Util.Methods.accessorize(datum);
-        assert.equal(a5(datum, 0, null), datum, "objects are return as final value");
+        assert.strictEqual(a5(datum, 0, null), datum, "objects are return as final value");
     });
     it("uniq works as expected", function () {
         var strings = ["foo", "bar", "foo", "foo", "baz", "bam"];

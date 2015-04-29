@@ -18,7 +18,7 @@ describe("TimeAxis", () => {
   it("cannot change time axis orientation to vertical", () => {
       assert.throws(() => axis.orient("left"), "horizontal");
       assert.throws(() => axis.orient("right"), "horizontal");
-      assert.equal(axis.orient(), "bottom", "orientation unchanged");
+      assert.strictEqual(axis.orient(), "bottom", "orientation unchanged");
   });
 
   it("Computing the default ticks doesn't error out for edge cases", () => {
@@ -112,11 +112,11 @@ describe("TimeAxis", () => {
     scale.domain(["2010", "2014"]);
     axis.renderTo(svg);
     var firstTick = d3.select(".tick-mark");
-    assert.equal(firstTick.attr("x1"), 0, "xPos (x1) of first end tick is at the beginning of the axis container");
-    assert.equal(firstTick.attr("x2"), 0, "xPos (x2) of first end tick is at the beginning of the axis container");
+    assert.strictEqual(+firstTick.attr("x1"), 0, "xPos (x1) of first end tick is at the beginning of the axis container");
+    assert.strictEqual(+firstTick.attr("x2"), 0, "xPos (x2) of first end tick is at the beginning of the axis container");
     var lastTick = d3.select(d3.selectAll(".tick-mark")[0].pop());
-    assert.equal(lastTick.attr("x1"), width, "xPos (x1) of last end tick is at the end of the axis container");
-    assert.equal(lastTick.attr("x2"), width, "xPos (x2) of last end tick is at the end of the axis container");
+    assert.strictEqual(+lastTick.attr("x1"), width, "xPos (x1) of last end tick is at the end of the axis container");
+    assert.strictEqual(+lastTick.attr("x2"), width, "xPos (x2) of last end tick is at the end of the axis container");
     svg.remove();
   });
 

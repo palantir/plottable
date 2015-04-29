@@ -248,7 +248,7 @@ describe("Plots", () => {
             circlesInArea++;
             assert.closeTo(x, xScale.scale(datum.x), 0.01, "the scaled/translated x is correct");
             assert.closeTo(y, yScale.scale(datum.y), 0.01, "the scaled/translated y is correct");
-            assert.equal(selection.attr("fill"), colorAccessor(datum, index, null), "fill is correct");
+            assert.strictEqual(selection.attr("fill"), colorAccessor(datum, index, null), "fill is correct");
           };
         };
       };
@@ -269,7 +269,7 @@ describe("Plots", () => {
         assert.deepEqual(xScale.range(), [0, SVG_WIDTH], "xScale range was set by the renderer");
         assert.deepEqual(yScale.range(), [SVG_HEIGHT, 0], "yScale range was set by the renderer");
         circlePlot.getAllSelections().each(getCirclePlotVerifier());
-        assert.equal(circlesInArea, 10, "10 circles were drawn");
+        assert.strictEqual(circlesInArea, 10, "10 circles were drawn");
         svg.remove();
       });
 
@@ -277,7 +277,7 @@ describe("Plots", () => {
         circlePlot._render();
         circlePlot._render();
         circlePlot.getAllSelections().each(getCirclePlotVerifier());
-        assert.equal(circlesInArea, 10, "10 circles were drawn");
+        assert.strictEqual(circlesInArea, 10, "10 circles were drawn");
         svg.remove();
       });
 
@@ -292,7 +292,7 @@ describe("Plots", () => {
         it("the circles re-rendered properly", () => {
           var circles = circlePlot.getAllSelections();
           circles.each(getCirclePlotVerifier());
-          assert.equal(circlesInArea, 4, "four circles were found in the render area");
+          assert.strictEqual(circlesInArea, 4, "four circles were found in the render area");
           svg.remove();
         });
       });

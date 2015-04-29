@@ -19,10 +19,10 @@ module TestMethods {
   }
 
   export function verifySpaceRequest(sr: Plottable._SpaceRequest, w: number, h: number, ww: boolean, wh: boolean, message: string) {
-    assert.equal(sr.width, w, message + " (space request: width)");
-    assert.equal(sr.height, h, message + " (space request: height)");
-    assert.equal(sr.wantsWidth, ww, message + " (space request: wantsWidth)");
-    assert.equal(sr.wantsHeight, wh, message + " (space request: wantsHeight)");
+    assert.strictEqual(sr.width, w, message + " (space request: width)");
+    assert.strictEqual(sr.height, h, message + " (space request: height)");
+    assert.strictEqual(sr.wantsWidth, ww, message + " (space request: wantsWidth)");
+    assert.strictEqual(sr.wantsHeight, wh, message + " (space request: wantsHeight)");
   }
 
   export function fixComponentSize(c: Plottable.Component.AbstractComponent, fixedWidth?: number, fixedHeight?: number) {
@@ -50,8 +50,8 @@ module TestMethods {
   export function assertBBoxEquivalence(bbox: SVGRect, widthAndHeightPair: number[], message: string) {
     var width = widthAndHeightPair[0];
     var height = widthAndHeightPair[1];
-    assert.equal(bbox.width, width, "width: " + message);
-    assert.equal(bbox.height, height, "height: " + message);
+    assert.strictEqual(bbox.width, width, "width: " + message);
+    assert.strictEqual(bbox.height, height, "height: " + message);
   }
 
   export function assertBBoxInclusion(outerEl: D3.Selection, innerEl: D3.Selection) {
@@ -89,10 +89,10 @@ module TestMethods {
   };
 
   export function assertWidthHeight(el: D3.Selection, widthExpected: number, heightExpected: number, message: string) {
-    var width = el.attr("width");
-    var height = el.attr("height");
-    assert.equal(width, widthExpected, "width: " + message);
-    assert.equal(height, heightExpected, "height: " + message);
+    var width = +el.attr("width");
+    var height = +el.attr("height");
+    assert.strictEqual(width, widthExpected, "width: " + message);
+    assert.strictEqual(height, heightExpected, "height: " + message);
   }
 
   export function makeLinearSeries(n: number): { x: number; y: number }[] {
