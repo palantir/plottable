@@ -184,6 +184,60 @@ describe("ComponentGroups", () => {
       assert.strictEqual(cg.height(), SVG_HEIGHT, "occupies all offered height");
       svg.remove();
     });
+
+    it("can move components to other groups after anchoring", () => {
+      var svg = TestMethods.generateSVG();
+
+      var cg1 = new Plottable.Component.AbstractComponentContainer();
+      var cg2 = new Plottable.Component.AbstractComponentContainer();
+      var c = new Plottable.Component.AbstractComponent();
+
+      cg1._addComponent(c);
+
+      cg1.renderTo(svg);
+      cg2.renderTo(svg);
+
+      assert.strictEqual(cg2.components().length, 0,
+        "second group should have no component before movement");
+
+      assert.strictEqual(cg1.components().length, 1,
+        "first group should have 1 component before movement");
+
+      assert.strictEqual(c._parent(), cg1,
+        "component's parent before moving should be the group 1"
+      );
+
+      assert.doesNotThrow(() => cg2._addComponent(c), Error,
+        "should be able to move components between groups after anchoring"
+      );
+
+      assert.strictEqual(cg2.components().length, 1,
+        "second group should have 1 component after movement");
+
+      assert.strictEqual(cg1.components().length, 0,
+        "first group should have no components after movement");
+
+      assert.strictEqual(c._parent(), cg2,
+        "component's parent after movement should be the group 2"
+      );
+
+      svg.remove();
+    });
+
+    it("can add null to a component without failing", () => {
+      var cg1 = new Plottable.Component.AbstractComponentContainer();
+      var c = new Plottable.Component.AbstractComponent;
+
+      cg1._addComponent(c);
+
+      assert.strictEqual(cg1.components().length, 1,
+        "there should first be 1 element in the group");
+
+      assert.doesNotThrow(() => cg1._addComponent(null));
+
+      assert.strictEqual(cg1.components().length, 1,
+        "adding null to a group should have no effect on the group");
+    });
   });
 
     describe("Merging components works as expected", () => {

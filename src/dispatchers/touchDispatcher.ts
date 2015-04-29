@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Dispatcher {
-  export type TouchCallback = (p: Point, e: TouchEvent) => any;
+  export type TouchCallback = (ids: number[], idToPoint: { [id: number]: Point; }, e: TouchEvent) => any;
 
   export class Touch extends AbstractDispatcher {
     /**
@@ -13,10 +13,10 @@ export module Dispatcher {
 
     private static _DISPATCHER_KEY = "__Plottable_Dispatcher_Touch";
     private translator: _Util.ClientToSVGTranslator;
-    private _lastTouchPosition: Point;
     private _startBroadcaster: Core.Broadcaster<Dispatcher.Touch>;
     private _moveBroadcaster: Core.Broadcaster<Dispatcher.Touch>;
     private _endBroadcaster: Core.Broadcaster<Dispatcher.Touch>;
+    private _cancelBroadcaster: Core.Broadcaster<Dispatcher.Touch>;
 
     /**
      * Get a Dispatcher.Touch for the <svg> containing elem. If one already exists
@@ -47,8 +47,6 @@ export module Dispatcher {
 
       this.translator = _Util.ClientToSVGTranslator.getTranslator(svg);
 
-      this._lastTouchPosition = { x: -1, y: -1 };
-
       this._startBroadcaster = new Core.Broadcaster(this);
       this._event2Callback["touchstart"] = (e: TouchEvent) => this._measureAndBroadcast(e, this._startBroadcaster);
 
@@ -58,11 +56,14 @@ export module Dispatcher {
       this._endBroadcaster = new Core.Broadcaster(this);
       this._event2Callback["touchend"] = (e: TouchEvent) => this._measureAndBroadcast(e, this._endBroadcaster);
 
-      this._broadcasters = [this._moveBroadcaster, this._startBroadcaster, this._endBroadcaster];
+      this._cancelBroadcaster = new Core.Broadcaster(this);
+      this._event2Callback["touchcancel"] = (e: TouchEvent) => this._measureAndBroadcast(e, this._cancelBroadcaster);
+
+      this._broadcasters = [this._moveBroadcaster, this._startBroadcaster, this._endBroadcaster, this._cancelBroadcaster];
     }
 
     protected _getWrappedCallback(callback: Function): Core.BroadcasterCallback<Dispatcher.Touch> {
-      return (td: Dispatcher.Touch, p: Point, e: MouseEvent) => callback(p, e);
+      return (td: Dispatcher.Touch, ids: number[], idToPoint: { [id: number]: Point; }, e: MouseEvent) => callback(ids, idToPoint, e);
     }
 
     /**
@@ -114,25 +115,41 @@ export module Dispatcher {
     }
 
     /**
+     * Registers a callback to be called whenever a touch is cancelled,
+     * or removes the callback if `null` is passed as the callback.
+     *
+     * @param {any} key The key associated with the callback.
+     *                  Key uniqueness is determined by deep equality.
+     * @param {TouchCallback} callback A callback that takes the pixel position
+     *                                     in svg-coordinate-space. Pass `null`
+     *                                     to remove a callback.
+     * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
+     */
+    public onTouchCancel(key: any, callback: TouchCallback): Dispatcher.Touch {
+      this._setCallback(this._cancelBroadcaster, key, callback);
+      return this;
+    }
+
+    /**
      * Computes the Touch position from the given event, and if successful
      * calls broadcast() on the supplied Broadcaster.
      */
     private _measureAndBroadcast(e: TouchEvent, b: Core.Broadcaster<Dispatcher.Touch>) {
-      var touch = e.changedTouches[0];
-      var newTouchPosition = this.translator.computePosition(touch.clientX, touch.clientY);
-      if (newTouchPosition != null) {
-        this._lastTouchPosition = newTouchPosition;
-        b.broadcast(this.getLastTouchPosition(), e);
+      var touches = e.changedTouches;
+      var touchPositions: { [id: number]: Point; } = {};
+      var touchIdentifiers: number[] = [];
+      for (var i = 0; i < touches.length; i++) {
+        var touch = touches[i];
+        var touchID = touch.identifier;
+        var newTouchPosition = this.translator.computePosition(touch.clientX, touch.clientY);
+        if (newTouchPosition != null) {
+          touchPositions[touchID] = newTouchPosition;
+          touchIdentifiers.push(touchID);
+        }
+      };
+      if (touchIdentifiers.length > 0) {
+        b.broadcast(touchIdentifiers, touchPositions, e);
       }
-    }
-
-    /**
-     * Returns the last computed Touch position.
-     *
-     * @return {Point} The last known Touch position in <svg> coordinate space.
-     */
-    public getLastTouchPosition() {
-      return this._lastTouchPosition;
     }
   }
 }

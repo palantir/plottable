@@ -194,12 +194,50 @@ export module Axis {
       var labelGroupTransform = "translate(" + labelGroupTransformX + ", " + labelGroupTransformY + ")";
       this._tickLabelContainer.attr("transform", labelGroupTransform);
 
+      this._showAllTickMarks();
+
       if (!this.showEndTickLabels()) {
         this._hideEndTickLabels();
       }
 
       this._hideOverflowingTickLabels();
       this._hideOverlappingTickLabels();
+
+      if (this._tickLabelPositioning === "bottom" ||
+          this._tickLabelPositioning === "top"    ||
+          this._tickLabelPositioning === "left"   ||
+          this._tickLabelPositioning === "right") {
+        this._hideTickMarksWithoutLabel();
+      }
+    }
+
+    private _showAllTickMarks() {
+      this._tickMarkContainer.selectAll("." + AbstractAxis.TICK_MARK_CLASS)
+                             .each(function() {
+                                     d3.select(this).style("visibility", "inherit");
+                                   });
+    }
+
+    /**
+     * Hides the Tick Marks which have no corresponding Tick Labels
+     */
+    private _hideTickMarksWithoutLabel() {
+      var visibleTickMarks = this._tickMarkContainer.selectAll("." + AbstractAxis.TICK_MARK_CLASS);
+      var visibleTickLabels = this._tickLabelContainer
+                                  .selectAll("." + AbstractAxis.TICK_LABEL_CLASS)
+                                  .filter(function(d: any, i: number) {
+                                    var visibility = d3.select(this).style("visibility");
+                                    return (visibility === "inherit") || (visibility === "visible");
+                                  });
+
+      var labelNumbersShown: number[] = [];
+      visibleTickLabels.each((labelNumber: number) => labelNumbersShown.push(labelNumber));
+
+      visibleTickMarks.each(function(e, i) {
+        if (labelNumbersShown.indexOf(e) === -1) {
+            d3.select(this).style("visibility", "hidden");
+        }
+      });
     }
 
     /**
@@ -287,6 +325,96 @@ export module Axis {
                         " axis");
       }
     }
-}
+
+    private _hideEndTickLabels() {
+      var boundingBox = this._boundingBox.node().getBoundingClientRect();
+      var tickLabels = this._tickLabelContainer.selectAll("." + AbstractAxis.TICK_LABEL_CLASS);
+      if (tickLabels[0].length === 0) {
+        return;
+      }
+      var firstTickLabel = tickLabels[0][0];
+      if (!_Util.DOM.boxIsInside(firstTickLabel.getBoundingClientRect(), boundingBox)) {
+        d3.select(firstTickLabel).style("visibility", "hidden");
+      }
+      var lastTickLabel = tickLabels[0][tickLabels[0].length - 1];
+      if (!_Util.DOM.boxIsInside(lastTickLabel.getBoundingClientRect(), boundingBox)) {
+        d3.select(lastTickLabel).style("visibility", "hidden");
+      }
+    }
+
+    // Responsible for hiding any tick labels that break out of the bounding container
+    private _hideOverflowingTickLabels() {
+      var boundingBox = this._boundingBox.node().getBoundingClientRect();
+      var tickLabels = this._tickLabelContainer.selectAll("." + AbstractAxis.TICK_LABEL_CLASS);
+      if (tickLabels.empty()) {
+        return;
+      }
+      tickLabels.each(function(d: any, i: number) {
+        if (!_Util.DOM.boxIsInside(this.getBoundingClientRect(), boundingBox)) {
+          d3.select(this).style("visibility", "hidden");
+        }
+      });
+    }
+
+    private _hideOverlappingTickLabels() {
+      var visibleTickLabels = this._tickLabelContainer
+                                    .selectAll("." + AbstractAxis.TICK_LABEL_CLASS)
+                                    .filter(function(d: any, i: number) {
+                                      var visibility = d3.select(this).style("visibility");
+                                      return (visibility === "inherit") || (visibility === "visible");
+                                    });
+
+      var visibleTickLabelRects = visibleTickLabels[0].map((label: HTMLScriptElement) => label.getBoundingClientRect());
+      var interval = 1;
+
+      while (!this._hasOverlapWithInterval(interval, visibleTickLabelRects) && interval < visibleTickLabelRects.length) {
+        interval += 1;
+      }
+
+      visibleTickLabels.each(function (d: string, i: number) {
+        var tickLabel = d3.select(this);
+        if (i % interval !== 0) {
+          tickLabel.style("visibility", "hidden");
+        }
+      });
+    }
+
+    /**
+     * The method is responsible for evenly spacing the labels on the axis.
+     * @return test to see if taking every `interval` recrangle from `rects`
+     *         will result in labels not overlapping
+     *
+     * For top, bottom, left, right positioning of the thicks, we want the padding
+     * between the labels to be 3x, such that the label will be  `padding` distance
+     * from the tick and 2 * `padding` distance (or more) from the next tick
+     *
+     */
+    private _hasOverlapWithInterval(interval: number, rects: ClientRect[]): boolean {
+
+      var padding = this.tickLabelPadding();
+
+      if (this._tickLabelPositioning === "bottom" ||
+          this._tickLabelPositioning === "top"    ||
+          this._tickLabelPositioning === "left"   ||
+          this._tickLabelPositioning === "right"  ) {
+        padding *= 3;
+      }
+
+      for (var i = 0; i < rects.length - (interval); i += interval) {
+        var currRect = rects[i];
+        var nextRect = rects[i + interval];
+        if (this._isHorizontal()) {
+          if (currRect.right + padding >= nextRect.left) {
+            return false;
+          }
+        } else {
+          if (currRect.top - padding <= nextRect.bottom) {
+            return false;
+          }
+        }
+      }
+      return true;
+    }
+  }
 }
 }

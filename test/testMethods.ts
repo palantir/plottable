@@ -160,26 +160,29 @@ module TestMethods {
     target.node().dispatchEvent(event);
   }
 
-  export function triggerFakeTouchEvent(type: string, target: D3.Selection, relativeX: number, relativeY: number) {
+  export function triggerFakeTouchEvent( type: string, target: D3.Selection, touchPoints: Plottable.Point[], ids: number[] = [] ) {
     var targetNode = target.node();
     var clientRect = targetNode.getBoundingClientRect();
-    var xPos = clientRect.left + relativeX;
-    var yPos = clientRect.top + relativeY;
-    var e = <TouchEvent> document.createEvent("UIEvent");
-    e.initUIEvent(type, true, true, window, 1);
-    var fakeTouch: Touch = {
-      identifier: 0,
-      target: targetNode,
-      screenX: xPos,
-      screenY: yPos,
-      clientX: xPos,
-      clientY: yPos,
-      pageX: xPos,
-      pageY: yPos
-    };
+    var e = <TouchEvent> document.createEvent( "UIEvent" );
+    e.initUIEvent( type, true, true, window, 1 );
+    var fakeTouchList: any = [];
 
-    var fakeTouchList: any = [fakeTouch];
-    fakeTouchList.item = (index: number) => fakeTouchList[index];
+    touchPoints.forEach(( touchPoint, i ) => {
+      var xPos = clientRect.left + touchPoint.x;
+      var yPos = clientRect.top + touchPoint.y;
+      var identifier = ids[i] == null ? 0 : ids[i];
+      fakeTouchList.push( {
+        identifier: identifier,
+        target: targetNode,
+        screenX: xPos,
+        screenY: yPos,
+        clientX: xPos,
+        clientY: yPos,
+        pageX: xPos,
+        pageY: yPos
+      });
+    });
+    fakeTouchList.item = ( index: number ) => fakeTouchList[index];
     e.touches = <TouchList> fakeTouchList;
     e.targetTouches = <TouchList> fakeTouchList;
     e.changedTouches = <TouchList> fakeTouchList;
@@ -188,7 +191,7 @@ module TestMethods {
     e.metaKey = false;
     e.ctrlKey = false;
     e.shiftKey = false;
-    target.node().dispatchEvent(e);
+    target.node().dispatchEvent( e );
   }
 
   export function assertAreaPathCloseTo(actualPath: string, expectedPath: string, precision: number, msg: string) {

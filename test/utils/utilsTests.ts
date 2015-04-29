@@ -107,6 +107,49 @@ describe("_Util.Methods", () => {
     assert.isFalse(isNaN({}), "empty Objects should fail the isNaN check");
   });
 
+  it("isValidNumber works as expected", () => {
+    var isValidNumber = Plottable._Util.Methods.isValidNumber;
+
+    assert.isTrue(isValidNumber(0),
+      "(0 is a valid number");
+    assert.isTrue(isValidNumber(1),
+      "(1 is a valid number");
+    assert.isTrue(isValidNumber(-1),
+      "(-1 is a valid number");
+    assert.isTrue(isValidNumber(0.1),
+      "(0.1 is a valid number");
+
+    assert.isFalse(isValidNumber(null),
+      "(null is not a valid number");
+    assert.isFalse(isValidNumber(NaN),
+      "(NaN is not a valid number");
+    assert.isFalse(isValidNumber(undefined),
+      "(undefined is not a valid number");
+    assert.isFalse(isValidNumber(Infinity),
+      "(Infinity is not a valid number");
+    assert.isFalse(isValidNumber(-Infinity),
+      "(-Infinity is not a valid number");
+
+    assert.isFalse(isValidNumber("number"),
+      "('number' is not a valid number");
+    assert.isFalse(isValidNumber("string"),
+      "('string' is not a valid number");
+    assert.isFalse(isValidNumber("0"),
+      "('0' is not a valid number");
+    assert.isFalse(isValidNumber("1"),
+      "('1' is not a valid number");
+
+    assert.isFalse(isValidNumber([]),
+      "([] is not a valid number");
+    assert.isFalse(isValidNumber([1]),
+      "([1] is not a valid number");
+    assert.isFalse(isValidNumber({}),
+      "({} is not a valid number");
+    assert.isFalse(isValidNumber({1: 1}),
+      "({1: 1} is not a valid number");
+
+  });
+
   it("objEq works as expected", () => {
     assert.isTrue(Plottable._Util.Methods.objEq({}, {}));
     assert.isTrue(Plottable._Util.Methods.objEq({a: 5}, {a: 5}));

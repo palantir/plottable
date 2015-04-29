@@ -38,15 +38,15 @@ describe("Interactions", () => {
 
       callbackCalled = false;
       lastPoint = null;
-      TestMethods.triggerFakeTouchEvent("touchstart", target, SVG_WIDTH / 2, SVG_HEIGHT / 2);
+      TestMethods.triggerFakeTouchEvent("touchstart", target, [{x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2}]);
       assert.isTrue(callbackCalled, "callback called on entering Component (touch)");
       assert.deepEqual(lastPoint, { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 }, "was passed correct point (touch)");
 
       callbackCalled = false;
-      TestMethods.triggerFakeTouchEvent("touchstart", target, SVG_WIDTH / 4, SVG_HEIGHT / 4);
+      TestMethods.triggerFakeTouchEvent("touchstart", target, [{x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4}]);
       assert.isFalse(callbackCalled, "callback not called again if already in Component (touch)");
 
-      TestMethods.triggerFakeTouchEvent("touchstart", target, 2 * SVG_WIDTH, 2 * SVG_HEIGHT);
+      TestMethods.triggerFakeTouchEvent("touchstart", target, [{x: 2 * SVG_WIDTH, y: 2 * SVG_HEIGHT}]);
       assert.isFalse(callbackCalled, "not called when moving outside of the Component (touch)");
 
       pointerInteraction.onPointerEnter(null);
@@ -88,17 +88,17 @@ describe("Interactions", () => {
       assert.isFalse(callbackCalled, "not called when moving outside of the Component (mouse)");
 
       callbackCalled = false;
-      TestMethods.triggerFakeTouchEvent("touchstart", target, SVG_WIDTH / 2, SVG_HEIGHT / 2);
+      TestMethods.triggerFakeTouchEvent("touchstart", target, [{x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2}]);
       assert.isTrue(callbackCalled, "callback called on entering Component (touch)");
       assert.deepEqual(lastPoint, { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 }, "was passed correct point (touch)");
 
       callbackCalled = false;
-      TestMethods.triggerFakeTouchEvent("touchstart", target, SVG_WIDTH / 4, SVG_HEIGHT / 4);
+      TestMethods.triggerFakeTouchEvent("touchstart", target, [{x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4}]);
       assert.isTrue(callbackCalled, "callback on moving inside Component (touch)");
       assert.deepEqual(lastPoint, { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 }, "was passed correct point (touch)");
 
       callbackCalled = false;
-      TestMethods.triggerFakeTouchEvent("touchstart", target, 2 * SVG_WIDTH, 2 * SVG_HEIGHT);
+      TestMethods.triggerFakeTouchEvent("touchstart", target, [{x: 2 * SVG_WIDTH, y: 2 * SVG_HEIGHT}]);
       assert.isFalse(callbackCalled, "not called when moving outside of the Component (touch)");
 
       pointerInteraction.onPointerMove(null);
@@ -140,16 +140,16 @@ describe("Interactions", () => {
 
       callbackCalled = false;
       lastPoint = null;
-      TestMethods.triggerFakeTouchEvent("touchstart", target, 2 * SVG_WIDTH, 2 * SVG_HEIGHT);
+      TestMethods.triggerFakeTouchEvent("touchstart", target, [{x: 2 * SVG_WIDTH, y: 2 * SVG_HEIGHT}]);
       assert.isFalse(callbackCalled, "not called when moving outside of the Component (touch)");
 
-      TestMethods.triggerFakeTouchEvent("touchstart", target, SVG_WIDTH / 2, SVG_HEIGHT / 2);
-      TestMethods.triggerFakeTouchEvent("touchstart", target, 2 * SVG_WIDTH, 2 * SVG_HEIGHT);
+      TestMethods.triggerFakeTouchEvent("touchstart", target, [{x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2}]);
+      TestMethods.triggerFakeTouchEvent("touchstart", target, [{x: 2 * SVG_WIDTH, y: 2 * SVG_HEIGHT}]);
       assert.isTrue(callbackCalled, "callback called on exiting Component (touch)");
       assert.deepEqual(lastPoint, { x: 2 * SVG_WIDTH, y: 2 * SVG_HEIGHT }, "was passed correct point (touch)");
 
       callbackCalled = false;
-      TestMethods.triggerFakeTouchEvent("touchstart", target, 3 * SVG_WIDTH, 3 * SVG_HEIGHT);
+      TestMethods.triggerFakeTouchEvent("touchstart", target, [{x: 3 * SVG_WIDTH, y: 3 * SVG_HEIGHT}]);
       assert.isFalse(callbackCalled, "callback not called again if already outside of Component (touch)");
 
       pointerInteraction.onPointerExit(null);

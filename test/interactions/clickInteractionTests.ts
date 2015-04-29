@@ -52,32 +52,52 @@ describe("Interactions", () => {
 
       callbackCalled = false;
       lastPoint = null;
-      TestMethods.triggerFakeTouchEvent("touchstart", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
-      TestMethods.triggerFakeTouchEvent("touchend", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+      TestMethods.triggerFakeTouchEvent("touchstart", c.content(), [{x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2}]);
+      TestMethods.triggerFakeTouchEvent("touchend", c.content(), [{x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2}]);
       assert.isTrue(callbackCalled, "callback called on entering Component (touch)");
       assert.deepEqual(lastPoint, { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 }, "was passed correct point (touch)");
 
       callbackCalled = false;
       lastPoint = null;
-      TestMethods.triggerFakeTouchEvent("touchstart", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
-      TestMethods.triggerFakeTouchEvent("touchend", c.content(), SVG_WIDTH / 4, SVG_HEIGHT / 4);
+      TestMethods.triggerFakeTouchEvent("touchstart", c.content(), [{x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2}]);
+      TestMethods.triggerFakeTouchEvent("touchend", c.content(), [{x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4}]);
       assert.isTrue(callbackCalled, "callback called on clicking Component (mouse)");
       assert.deepEqual(lastPoint, { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 }, "was passed mouseup point (touch)");
 
       callbackCalled = false;
-      TestMethods.triggerFakeTouchEvent("touchstart", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
-      TestMethods.triggerFakeTouchEvent("touchend", c.content(), SVG_WIDTH * 2, SVG_HEIGHT * 2);
+      TestMethods.triggerFakeTouchEvent("touchstart", c.content(), [{x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2}]);
+      TestMethods.triggerFakeTouchEvent("touchend", c.content(), [{x: SVG_WIDTH * 2, y: SVG_HEIGHT * 2}]);
       assert.isFalse(callbackCalled, "callback not called if released outside component (touch)");
 
       callbackCalled = false;
-      TestMethods.triggerFakeTouchEvent("touchstart", c.content(), SVG_WIDTH * 2, SVG_HEIGHT * 2);
-      TestMethods.triggerFakeTouchEvent("touchend", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+      TestMethods.triggerFakeTouchEvent("touchstart", c.content(), [{x: SVG_WIDTH * 2, y: SVG_HEIGHT * 2}]);
+      TestMethods.triggerFakeTouchEvent("touchend", c.content(), [{x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2}]);
       assert.isFalse(callbackCalled, "callback not called if started outside component (touch)");
 
-      TestMethods.triggerFakeTouchEvent("touchstart", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
-      TestMethods.triggerFakeTouchEvent("touchmove", c.content(), SVG_WIDTH * 2, SVG_HEIGHT * 2);
-      TestMethods.triggerFakeTouchEvent("touchend", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+      TestMethods.triggerFakeTouchEvent("touchstart", c.content(), [{x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2}]);
+      TestMethods.triggerFakeTouchEvent("touchmove", c.content(), [{x: SVG_WIDTH * 2, y: SVG_HEIGHT * 2}]);
+      TestMethods.triggerFakeTouchEvent("touchend", c.content(), [{x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2}]);
       assert.isTrue(callbackCalled, "callback called even if moved outside component (touch)");
+
+      svg.remove();
+    });
+
+    it("cancelling touches cancels any ongoing clicks", () => {
+      var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      var c = new Plottable.Component.AbstractComponent();
+      c.renderTo(svg);
+
+      var clickInteraction = new Plottable.Interaction.Click();
+      c.registerInteraction(clickInteraction);
+
+      var callbackCalled = false;
+      var callback = () => callbackCalled = true;
+      clickInteraction.onClick(callback);
+
+      TestMethods.triggerFakeTouchEvent("touchstart", c.content(), [{x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2}]);
+      TestMethods.triggerFakeTouchEvent("touchcancel", c.content(), [{x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2}]);
+      TestMethods.triggerFakeTouchEvent("touchend", c.content(), [{x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2}]);
+      assert.isFalse(callbackCalled, "callback not called since click was interrupted");
 
       svg.remove();
     });
