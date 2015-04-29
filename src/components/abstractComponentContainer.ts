@@ -81,8 +81,8 @@ export module Component {
     }
 
     public _useLastCalculatedLayout(): boolean;
-    public _useLastCalculatedLayout(calculated: boolean) : AbstractComponent;
-    public _useLastCalculatedLayout(calculated?: boolean) : any {
+    public _useLastCalculatedLayout(calculated: boolean): AbstractComponent;
+    public _useLastCalculatedLayout(calculated?: boolean): any {
       if (calculated != null) {
         this.components().slice().forEach((c: AbstractComponent) => c._useLastCalculatedLayout(calculated));
       }

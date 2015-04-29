@@ -17,7 +17,7 @@ module Plottable {
        *
        * @returns {TickGenerator} A tick generator using the specified interval.
        */
-      export function intervalTickGenerator(interval: number) : TickGenerator<number> {
+      export function intervalTickGenerator(interval: number): TickGenerator<number> {
         if(interval <= 0) {
            throw new Error("interval must be positive number");
         }
