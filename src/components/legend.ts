@@ -165,7 +165,7 @@ export module Components {
       };
     }
 
-    public _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
+    public _requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest {
       var estimatedLayout = this._calculateLayoutInfo(offeredWidth, offeredHeight);
       var rowLengths = estimatedLayout.rows.map((row: string[]) => {
         return d3.sum(row, (entry: string) => estimatedLayout.entryLengths.get(entry));

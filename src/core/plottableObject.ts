@@ -7,11 +7,11 @@ export module Core {
    * unique ID.
    */
   export class PlottableObject {
-    private static _nextID = 0;
-    private _plottableID = PlottableObject._nextID++;
+    private static nextID = 0;
+    private plottableID = PlottableObject.nextID++;
 
     public getID() {
-      return this._plottableID;
+      return this.plottableID;
     }
   }
 }

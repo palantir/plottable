@@ -203,9 +203,9 @@ describe("Metadata", () => {
     };
     plot.addDataset(dataset);
     plot.renderTo(svg);
-    assert.deepEqual(dataset._getExtent(a, id), [16, 17], "plot metadata is reflected in extent results");
+    assert.deepEqual(dataset.getExtent(a, id), [16, 17], "plot metadata is reflected in extent results");
     dataset.metadata({foo: 0});
-    assert.deepEqual(dataset._getExtent(a, id), [5, 6], "plot metadata is reflected in extent results after change user metadata");
+    assert.deepEqual(dataset.getExtent(a, id), [5, 6], "plot metadata is reflected in extent results after change user metadata");
     svg.remove();
   });
 
