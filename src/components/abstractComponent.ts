@@ -93,7 +93,7 @@ module Plottable {
       this.isSetup = true;
     }
 
-    public _requestedSpace(availableWidth: number, availableHeight: number): _SpaceRequest {
+    public requestedSpace(availableWidth: number, availableHeight: number): _SpaceRequest {
       return {width: 0, height: 0, wantsWidth: false, wantsHeight: false};
     }
 
@@ -107,7 +107,7 @@ module Plottable {
      * @param {number} availableWidth available width for the Component to render in
      * @param {number} availableHeight available height for the Component to render in
      */
-    public _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number) {
+    public computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number) {
       if (offeredXOrigin == null || offeredYOrigin == null || availableWidth == null || availableHeight == null) {
         if (this.element == null) {
           throw new Error("anchor must be called before computeLayout");
@@ -133,7 +133,7 @@ module Plottable {
           throw new Error("null arguments cannot be passed to _computeLayout() on a non-root node");
         }
       }
-      var size = this._getSize(availableWidth, availableHeight);
+      var size = this.getSize(availableWidth, availableHeight);
       this._width = size.width;
       this._height = size.height;
       this.xOrigin = offeredXOrigin + this._xOffset + (availableWidth - this.width()) * this.xAlignProportion;
@@ -142,8 +142,8 @@ module Plottable {
       this.boxes.forEach((b: D3.Selection) => b.attr("width", this.width()).attr("height", this.height()));
     }
 
-    protected _getSize(availableWidth: number, availableHeight: number) {
-      var requestedSpace = this._requestedSpace(availableWidth, availableHeight);
+    protected getSize(availableWidth: number, availableHeight: number) {
+      var requestedSpace = this.requestedSpace(availableWidth, availableHeight);
       return {
         width: this.isFixedWidth()  ? Math.min(availableWidth , requestedSpace.width)  : availableWidth,
         height: this.isFixedHeight() ? Math.min(availableHeight, requestedSpace.height) : availableHeight
@@ -175,13 +175,13 @@ module Plottable {
       }
     }
 
-    public _invalidateLayout() {
+    public invalidateLayout() {
       this._useLastCalculatedLayout(false);
       if (this.isAnchored && this.isSetup) {
         if (this.isTopLevelComponent) {
           this.scheduleComputeLayout();
         } else {
-          this.parent()._invalidateLayout();
+          this.parent().invalidateLayout();
         }
       }
     }
@@ -210,7 +210,7 @@ module Plottable {
         throw new Error("If a component has never been rendered before, then renderTo must be given a node to render to, \
           or a D3.Selection, or a selector string");
       }
-      this._computeLayout();
+      this.computeLayout();
       this.render();
       // flush so that consumers can immediately attach to stuff we create in the DOM
       Core.RenderControllers.flush();
@@ -226,7 +226,7 @@ module Plottable {
      * @returns {Component} The calling component.
      */
     public redraw(): Component {
-      this._invalidateLayout();
+      this.invalidateLayout();
       return this;
     }
 
@@ -252,7 +252,7 @@ module Plottable {
       } else {
         throw new Error("Unsupported alignment");
       }
-      this._invalidateLayout();
+      this.invalidateLayout();
       return this;
     }
 
@@ -278,7 +278,7 @@ module Plottable {
       } else {
         throw new Error("Unsupported alignment");
       }
-      this._invalidateLayout();
+      this.invalidateLayout();
       return this;
     }
 
@@ -292,7 +292,7 @@ module Plottable {
      */
     public xOffset(offset: number): Component {
       this._xOffset = offset;
-      this._invalidateLayout();
+      this.invalidateLayout();
       return this;
     }
 
@@ -306,7 +306,7 @@ module Plottable {
      */
     public yOffset(offset: number): Component {
       this._yOffset = offset;
-      this._invalidateLayout();
+      this.invalidateLayout();
       return this;
     }
 

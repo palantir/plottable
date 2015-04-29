@@ -23,8 +23,8 @@ export module Components {
       components.forEach((c: Component) => this._addComponent(c));
     }
 
-    public _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
-      var requests = this.components().map((c: Component) => c._requestedSpace(offeredWidth, offeredHeight));
+    public requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
+      var requests = this.components().map((c: Component) => c.requestedSpace(offeredWidth, offeredHeight));
       return {
         width: Utils.Methods.max<_SpaceRequest, number>(requests, (request: _SpaceRequest) => request.width, 0),
         height: Utils.Methods.max<_SpaceRequest, number>(requests, (request: _SpaceRequest) => request.height, 0),
@@ -38,18 +38,18 @@ export module Components {
       return this;
     }
 
-    public _computeLayout(offeredXOrigin?: number,
+    public computeLayout(offeredXOrigin?: number,
                           offeredYOrigin?: number,
                    availableWidth?: number,
                   availableHeight?: number): Group {
-      super._computeLayout(offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
+      super.computeLayout(offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
       this.components().forEach((c) => {
-        c._computeLayout(0, 0, this.width(), this.height());
+        c.computeLayout(0, 0, this.width(), this.height());
       });
       return this;
     }
 
-    protected _getSize(availableWidth: number, availableHeight: number) {
+    protected getSize(availableWidth: number, availableHeight: number) {
       return {
         width: availableWidth,
         height: availableHeight

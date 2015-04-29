@@ -22,7 +22,7 @@ describe("Plots", () => {
       var svg = generateSVG(400, 300);
       var r = new Plottable.Plot();
       r.anchor(svg);
-      r._computeLayout();
+      r.computeLayout();
       var renderArea = (<any> r)._content.select(".render-area");
       assert.isNotNull(renderArea.node(), "there is a render-area");
       svg.remove();

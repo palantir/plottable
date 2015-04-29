@@ -44,7 +44,7 @@ export module Components {
       }
 
       this._scale = colorScale;
-      this._scale.broadcaster.registerListener(this, () => this._invalidateLayout());
+      this._scale.broadcaster.registerListener(this, () => this.invalidateLayout());
 
       this.xAlign("right").yAlign("top");
       this.fixedWidthFlag = true;
@@ -80,7 +80,7 @@ export module Components {
         return this._maxEntriesPerRow;
       } else {
         this._maxEntriesPerRow = numEntries;
-        this._invalidateLayout();
+        this.invalidateLayout();
         return this;
       }
     }
@@ -102,7 +102,7 @@ export module Components {
         return this._sortFn;
       } else {
         this._sortFn = newFn;
-        this._invalidateLayout();
+        this.invalidateLayout();
         return this;
       }
     }
@@ -124,8 +124,8 @@ export module Components {
       if (scale != null) {
         this._scale.broadcaster.deregisterListener(this);
         this._scale = scale;
-        this._scale.broadcaster.registerListener(this, () => this._invalidateLayout());
-        this._invalidateLayout();
+        this._scale.broadcaster.registerListener(this, () => this.invalidateLayout());
+        this.invalidateLayout();
         return this;
       } else {
         return this._scale;
@@ -165,7 +165,7 @@ export module Components {
       };
     }
 
-    public _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
+    public requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
       var estimatedLayout = this._calculateLayoutInfo(offeredWidth, offeredHeight);
       var rowLengths = estimatedLayout.rows.map((row: string[]) => {
         return d3.sum(row, (entry: string) => estimatedLayout.entryLengths.get(entry));

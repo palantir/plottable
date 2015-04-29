@@ -83,7 +83,7 @@ export module Axes {
       if (!this._isHorizontal()) {
         var reComputedWidth = this._computeWidth();
         if (reComputedWidth > this.width() || reComputedWidth < (this.width() - this.gutter())) {
-          this._invalidateLayout();
+          this.invalidateLayout();
           return;
         }
       }
@@ -272,7 +272,7 @@ export module Axes {
           }
         }
         this._tickLabelPositioning = positionLC;
-        this._invalidateLayout();
+        this.invalidateLayout();
         return this;
       }
     }

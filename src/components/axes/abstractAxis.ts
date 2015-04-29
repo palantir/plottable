@@ -78,7 +78,7 @@ module Plottable {
       return this._computedHeight;
     }
 
-    public _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
+    public requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
       var requestedWidth = 0;
       var requestedHeight = 0;
 
@@ -115,8 +115,8 @@ module Plottable {
       this.render();
     }
 
-    public _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number) {
-      super._computeLayout(offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
+    public computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number) {
+      super.computeLayout(offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
       if (this._isHorizontal()) {
         this._scale.range([0, this.width()]);
       } else {
@@ -229,10 +229,10 @@ module Plottable {
       return tickMarkAttrHash;
     }
 
-    public _invalidateLayout() {
+    public invalidateLayout() {
       this._computedWidth = null;
       this._computedHeight = null;
-      super._invalidateLayout();
+      super.invalidateLayout();
     }
 
     protected _setDefaultAlignment() {
@@ -276,7 +276,7 @@ module Plottable {
         return this._formatter;
       }
       this._formatter = formatter;
-      this._invalidateLayout();
+      this.invalidateLayout();
       return this;
     }
 
@@ -301,7 +301,7 @@ module Plottable {
           throw new Error("tick length must be positive");
         }
         this._tickLength = length;
-        this._invalidateLayout();
+        this.invalidateLayout();
         return this;
       }
     }
@@ -327,7 +327,7 @@ module Plottable {
           throw new Error("end tick length must be positive");
         }
         this._endTickLength = length;
-        this._invalidateLayout();
+        this.invalidateLayout();
         return this;
       }
     }
@@ -362,7 +362,7 @@ module Plottable {
           throw new Error("tick label padding must be positive");
         }
         this._tickLabelPadding = padding;
-        this._invalidateLayout();
+        this.invalidateLayout();
         return this;
       }
     }
@@ -391,7 +391,7 @@ module Plottable {
           throw new Error("gutter size must be positive");
         }
         this._gutter = size;
-        this._invalidateLayout();
+        this.invalidateLayout();
         return this;
       }
     }
@@ -422,7 +422,7 @@ module Plottable {
           throw new Error("unsupported orientation");
         }
         this._orientation = newOrientationLC;
-        this._invalidateLayout();
+        this.invalidateLayout();
         return this;
       }
     }

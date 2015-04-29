@@ -37,13 +37,13 @@ describe("Legend", () => {
   it("legend domain can be updated after initialization, and height updates as well", () => {
     legend.renderTo(svg);
     legend.scale(color);
-    assert.equal(legend._requestedSpace(200, 200).height, 10, "there is a padding requested height when domain is empty");
+    assert.equal(legend.requestedSpace(200, 200).height, 10, "there is a padding requested height when domain is empty");
     color.domain(["foo", "bar"]);
-    var height1 = legend._requestedSpace(400, 400).height;
+    var height1 = legend.requestedSpace(400, 400).height;
     var actualHeight1 = legend.height();
     assert.operator(height1, ">", 0, "changing the domain gives a positive height");
     color.domain(["foo", "bar", "baz"]);
-    assert.operator(legend._requestedSpace(400, 400).height, ">", height1, "adding to the domain increases the height requested");
+    assert.operator(legend.requestedSpace(400, 400).height, ">", height1, "adding to the domain increases the height requested");
     var actualHeight2 = legend.height();
     assert.operator(actualHeight1, "<", actualHeight2, "Changing the domain caused the legend to re-layout with more height");
     var numRows = (<any> legend)._content.selectAll(rowSelector)[0].length;
@@ -166,12 +166,12 @@ describe("Legend", () => {
     verifySymbolHeight();
 
     style.text(".plottable .legend text { font-size: 60px; }");
-    legend._computeLayout();
+    legend.computeLayout();
     legend.render();
     verifySymbolHeight();
 
     style.text(".plottable .legend text { font-size: 10px; }");
-    legend._computeLayout();
+    legend.computeLayout();
     legend.render();
     verifySymbolHeight();
 

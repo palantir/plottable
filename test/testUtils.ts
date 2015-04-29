@@ -40,7 +40,7 @@ function verifySpaceRequest(sr: Plottable._SpaceRequest, w: number, h: number, w
 }
 
 function fixComponentSize(c: Plottable.Component, fixedWidth?: number, fixedHeight?: number) {
-  c._requestedSpace = function(w, h) {
+  c.requestedSpace = function(w, h) {
     return {
       width:  fixedWidth  == null ? 0 : fixedWidth,
       height: fixedHeight == null ? 0 : fixedHeight,

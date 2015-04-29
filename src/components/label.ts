@@ -62,7 +62,7 @@ export module Components {
       return this;
     }
 
-    public _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
+    public requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
       var desiredWH = this._measurer.measure(this._text);
       var desiredWidth  = (this.orient() === "horizontal" ? desiredWH.width : desiredWH.height) + 2 * this.padding();
       var desiredHeight = (this.orient() === "horizontal" ? desiredWH.height : desiredWH.width) + 2 * this.padding();
@@ -102,7 +102,7 @@ export module Components {
         return this._text;
       } else {
         this._text = displayText;
-        this._invalidateLayout();
+        this.invalidateLayout();
         return this;
       }
     }
@@ -131,7 +131,7 @@ export module Components {
         } else {
           throw new Error(newOrientation + " is not a valid orientation for LabelComponent");
         }
-        this._invalidateLayout();
+        this.invalidateLayout();
         return this;
       }
     }
@@ -158,7 +158,7 @@ export module Components {
           throw new Error(padAmount + " is not a valid padding value.  Cannot be less than 0.");
         }
         this._padding = padAmount;
-        this._invalidateLayout();
+        this.invalidateLayout();
         return this;
       }
     }

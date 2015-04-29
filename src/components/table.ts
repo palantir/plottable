@@ -227,7 +227,7 @@ export module Components {
         row.forEach((component: Component, colIndex: number) => {
           var spaceRequest: _SpaceRequest;
           if (component != null) {
-            spaceRequest = component._requestedSpace(offeredWidths[colIndex], offeredHeights[rowIndex]);
+            spaceRequest = component.requestedSpace(offeredWidths[colIndex], offeredHeights[rowIndex]);
           } else {
             spaceRequest = {width: 0, height: 0, wantsWidth: false, wantsHeight: false};
           }
@@ -248,7 +248,7 @@ export module Components {
     }
 
 
-    public _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
+    public requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
       this._calculatedLayout = this._iterateLayout(offeredWidth , offeredHeight);
       return {width: d3.sum(this._calculatedLayout.guaranteedWidths ),
               height: d3.sum(this._calculatedLayout.guaranteedHeights),
@@ -256,8 +256,8 @@ export module Components {
               wantsHeight: this._calculatedLayout.wantsHeight};
     }
 
-    public _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number) {
-      super._computeLayout(offeredXOrigin, offeredYOrigin, availableWidth , availableHeight);
+    public computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number) {
+      super.computeLayout(offeredXOrigin, offeredYOrigin, availableWidth , availableHeight);
       var layout = this._useLastCalculatedLayout() ? this._calculatedLayout : this._iterateLayout(this.width(), this.height());
 
       this._useLastCalculatedLayout(true);
@@ -270,7 +270,7 @@ export module Components {
         row.forEach((component: Component, colIndex: number) => {
           // recursively compute layout
           if (component != null) {
-            component._computeLayout(childXOrigin, childYOrigin, colWidths[colIndex], rowHeights[rowIndex]);
+            component.computeLayout(childXOrigin, childYOrigin, colWidths[colIndex], rowHeights[rowIndex]);
           }
           childXOrigin += colWidths[colIndex] + this._colPadding;
         });
@@ -288,7 +288,7 @@ export module Components {
     public padding(rowPadding: number, colPadding: number) {
       this._rowPadding = rowPadding;
       this._colPadding = colPadding;
-      this._invalidateLayout();
+      this.invalidateLayout();
       return this;
     }
 
@@ -319,7 +319,7 @@ export module Components {
      */
     public rowWeight(index: number, weight: number) {
       this._rowWeights[index] = weight;
-      this._invalidateLayout();
+      this.invalidateLayout();
       return this;
     }
 
@@ -335,7 +335,7 @@ export module Components {
      */
     public colWeight(index: number, weight: number) {
       this._colWeights[index] = weight;
-      this._invalidateLayout();
+      this.invalidateLayout();
       return this;
     }
 

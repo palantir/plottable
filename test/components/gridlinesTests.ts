@@ -19,7 +19,7 @@ describe("Gridlines", () => {
                                           .addComponent(1, 1, xAxis);
 
     basicTable.anchor(svg);
-    basicTable._computeLayout();
+    basicTable.computeLayout();
     xScale.range([0, xAxis.width() ]); // manually set range since we don't have a renderer
     yScale.range([yAxis.height(), 0]);
     basicTable.render();

@@ -181,7 +181,7 @@ export module Axes {
           throw new Error("Unsupported position for tier labels");
         }
         this._tierLabelPositions = newPositions;
-        this._invalidateLayout();
+        this.invalidateLayout();
         return this;
       }
     }
@@ -219,7 +219,7 @@ export module Axes {
       }
       this.tierLabelPositions(newLabelPositions);
 
-      this._invalidateLayout();
+      this.invalidateLayout();
       return this;
     }
 
@@ -289,11 +289,11 @@ export module Axes {
       return Math.min(this._getIntervalLength(config), this.width()) >= worstWidth;
     }
 
-    protected _getSize(availableWidth: number, availableHeight: number) {
+    protected getSize(availableWidth: number, availableHeight: number) {
       // Makes sure that the size it requires is a multiple of tier sizes, such that
       // we have no leftover tiers
 
-      var size = super._getSize(availableWidth, availableHeight);
+      var size = super.getSize(availableWidth, availableHeight);
       size.height = this._tierHeights.reduce((prevValue, currValue, index, arr) => {
         return (prevValue + currValue > size.height) ? prevValue : (prevValue + currValue);
       });

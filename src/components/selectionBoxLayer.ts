@@ -25,7 +25,7 @@ export module Components {
       this._boxArea = this._box.append("rect").classed("selection-area", true);
     }
 
-    protected _getSize(availableWidth: number, availableHeight: number) {
+    protected getSize(availableWidth: number, availableHeight: number) {
       return {
         width: availableWidth,
         height: availableHeight
