@@ -71,12 +71,8 @@ export module Interaction {
       var oldCornerDistance = this.cornerDistance();
 
       ids.forEach((id) => {
-        if (!this._touchIds.has(id.toString())) {
-          return;
-        }
-        var translatedP = this._translateToComponentSpace(idToPoint[id]);
-        if (this._isInsideComponent(translatedP)) {
-          this._touchIds.set(id.toString(), translatedP);
+        if (this._touchIds.has(id.toString())) {
+          this._touchIds.set(id.toString(), this._translateToComponentSpace(idToPoint[id]));
         }
       });
 
@@ -152,6 +148,8 @@ export module Interaction {
     }
 
     private _setupDragInteraction() {
+      this._dragInteraction.constrainToComponent(false);
+
       var lastDragPoint: Point;
       this._dragInteraction.onDragStart(() => lastDragPoint = null);
       this._dragInteraction.onDrag((startPoint, endPoint) => {

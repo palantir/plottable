@@ -9929,12 +9929,8 @@ var Plottable;
                 var oldCenterPoint = this.centerPoint();
                 var oldCornerDistance = this.cornerDistance();
                 ids.forEach(function (id) {
-                    if (!_this._touchIds.has(id.toString())) {
-                        return;
-                    }
-                    var translatedP = _this._translateToComponentSpace(idToPoint[id]);
-                    if (_this._isInsideComponent(translatedP)) {
-                        _this._touchIds.set(id.toString(), translatedP);
+                    if (_this._touchIds.has(id.toString())) {
+                        _this._touchIds.set(id.toString(), _this._translateToComponentSpace(idToPoint[id]));
                     }
                 });
                 var newCenterPoint = this.centerPoint();
@@ -9998,6 +9994,7 @@ var Plottable;
             };
             PanZoom.prototype._setupDragInteraction = function () {
                 var _this = this;
+                this._dragInteraction.constrainToComponent(false);
                 var lastDragPoint;
                 this._dragInteraction.onDragStart(function () { return lastDragPoint = null; });
                 this._dragInteraction.onDrag(function (startPoint, endPoint) {

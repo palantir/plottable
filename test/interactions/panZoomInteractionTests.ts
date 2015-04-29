@@ -59,6 +59,16 @@ describe("Interactions", () => {
         svg.remove();
       });
 
+      it("dragging to outside the component will translate the scale correctly (touch)", () => {
+        var startPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 4 };
+        var endPoint = { x: -SVG_WIDTH / 2, y: SVG_HEIGHT / 4 };
+        triggerFakeTouchEvent("touchstart", eventTarget, [startPoint]);
+        triggerFakeTouchEvent("touchmove", eventTarget, [endPoint]);
+        triggerFakeTouchEvent("touchend", eventTarget, [endPoint]);
+        assert.deepEqual(xScale.domain(), [SVG_WIDTH / 2, SVG_WIDTH], "xScale pans to the correct domain via drag (mouse)");
+        svg.remove();
+      });
+
     });
 
     it("mousewheeling a certain amount will magnify the scale correctly", () => {
