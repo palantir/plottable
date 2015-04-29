@@ -538,7 +538,7 @@ module Plottable {
         var datum = plotData.data[index];
         var selection = d3.select(plotData.selection[0][index]);
 
-        if (!this._isVisibleOnPlot(datum, pixelPoint, selection)) {
+        if (!this.isVisibleOnPlot(datum, pixelPoint, selection)) {
           return;
         }
 
@@ -558,7 +558,7 @@ module Plottable {
               selection: d3.select(plotData.selection[0][closestIndex])};
     }
 
-    protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean {
+    protected isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean {
       return !(pixelPoint.x < 0 || pixelPoint.y < 0 ||
         pixelPoint.x > this.width() || pixelPoint.y > this.height());
     }

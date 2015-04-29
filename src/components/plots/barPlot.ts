@@ -174,7 +174,7 @@ export module Plots {
           var datum = plotData.data[index];
           var bar = plotData.selection[0][index];
 
-          if (!this._isVisibleOnPlot(datum, plotPt, d3.select(bar))) {
+          if (!this.isVisibleOnPlot(datum, plotPt, d3.select(bar))) {
             return;
           }
 
@@ -227,7 +227,7 @@ export module Plots {
       };
     }
 
-    protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean {
+    protected isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean {
       var xRange = { min: 0, max: this.width() };
       var yRange = { min: 0, max: this.height() };
       var barBBox = selection[0][0].getBBox();

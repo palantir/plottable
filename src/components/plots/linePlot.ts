@@ -135,7 +135,7 @@ export module Plots {
           var datum = plotData.data[index];
           var line = plotData.selection[0][0];
 
-          if (!this._isVisibleOnPlot(datum, pixelPoint, d3.select(line))) {
+          if (!this.isVisibleOnPlot(datum, pixelPoint, d3.select(line))) {
             return;
           }
 

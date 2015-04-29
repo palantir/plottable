@@ -6910,7 +6910,7 @@ var Plottable;
             plotData.pixelPoints.forEach(function (pixelPoint, index) {
                 var datum = plotData.data[index];
                 var selection = d3.select(plotData.selection[0][index]);
-                if (!_this._isVisibleOnPlot(datum, pixelPoint, selection)) {
+                if (!_this.isVisibleOnPlot(datum, pixelPoint, selection)) {
                     return;
                 }
                 var distance = Plottable.Utils.Methods.distanceSquared(pixelPoint, queryPoint);
@@ -6924,7 +6924,7 @@ var Plottable;
             }
             return { data: [plotData.data[closestIndex]], pixelPoints: [plotData.pixelPoints[closestIndex]], selection: d3.select(plotData.selection[0][closestIndex]) };
         };
-        Plot.prototype._isVisibleOnPlot = function (datum, pixelPoint, selection) {
+        Plot.prototype.isVisibleOnPlot = function (datum, pixelPoint, selection) {
             return !(pixelPoint.x < 0 || pixelPoint.y < 0 || pixelPoint.x > this.width() || pixelPoint.y > this.height());
         };
         return Plot;
@@ -7302,9 +7302,9 @@ var Plottable;
              */
             function Scatter(xScale, yScale) {
                 _super.call(this, xScale, yScale);
-                this._closeDetectionRadius = 5;
+                this.closeDetectionRadius = 5;
                 this.classed("scatter-plot", true);
-                this._defaultFillColor = new Plottable.Scales.Color().range()[0];
+                this.defaultFillColor = new Plottable.Scales.Color().range()[0];
                 this.animator("symbols-reset", new Plottable.Animators.Null());
                 this.animator("symbols", new Plottable.Animators.Base().duration(250).delay(5));
             }
@@ -7315,7 +7315,7 @@ var Plottable;
                 var attrToProjector = _super.prototype.generateAttrToProjector.call(this);
                 attrToProjector["size"] = attrToProjector["size"] || d3.functor(6);
                 attrToProjector["opacity"] = attrToProjector["opacity"] || d3.functor(0.6);
-                attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this._defaultFillColor);
+                attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this.defaultFillColor);
                 attrToProjector["symbol"] = attrToProjector["symbol"] || (function () { return Plottable.SymbolFactories.circle(); });
                 return attrToProjector;
             };
@@ -7329,7 +7329,7 @@ var Plottable;
                 drawSteps.push({ attrToProjector: this.generateAttrToProjector(), animator: this.getAnimator("symbols") });
                 return drawSteps;
             };
-            Scatter.prototype._isVisibleOnPlot = function (datum, pixelPoint, selection) {
+            Scatter.prototype.isVisibleOnPlot = function (datum, pixelPoint, selection) {
                 var xRange = { min: 0, max: this.width() };
                 var yRange = { min: 0, max: this.height() };
                 var translation = d3.transform(selection.attr("transform")).translate;
@@ -7570,7 +7570,7 @@ var Plottable;
                     plotData.pixelPoints.forEach(function (plotPt, index) {
                         var datum = plotData.data[index];
                         var bar = plotData.selection[0][index];
-                        if (!_this._isVisibleOnPlot(datum, plotPt, d3.select(bar))) {
+                        if (!_this.isVisibleOnPlot(datum, plotPt, d3.select(bar))) {
                             return;
                         }
                         var primaryDist = 0;
@@ -7614,7 +7614,7 @@ var Plottable;
                     selection: d3.selectAll(closestElements)
                 };
             };
-            Bar.prototype._isVisibleOnPlot = function (datum, pixelPoint, selection) {
+            Bar.prototype.isVisibleOnPlot = function (datum, pixelPoint, selection) {
                 var xRange = { min: 0, max: this.width() };
                 var yRange = { min: 0, max: this.height() };
                 var barBBox = selection[0][0].getBBox();
@@ -7965,7 +7965,7 @@ var Plottable;
                     plotData.pixelPoints.forEach(function (pixelPoint, index) {
                         var datum = plotData.data[index];
                         var line = plotData.selection[0][0];
-                        if (!_this._isVisibleOnPlot(datum, pixelPoint, d3.select(line))) {
+                        if (!_this.isVisibleOnPlot(datum, pixelPoint, d3.select(line))) {
                             return;
                         }
                         var xDist = Math.abs(queryPoint.x - pixelPoint.x);
