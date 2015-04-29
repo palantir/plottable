@@ -162,7 +162,7 @@ export module Component {
       var guaranteedWidths  = _Util.Methods.createFilledArray(0, this._nCols);
       var guaranteedHeights = _Util.Methods.createFilledArray(0, this._nRows);
 
-      var freeWidth : number;
+      var freeWidth: number;
       var freeHeight: number;
 
       var nIterations = 0;
