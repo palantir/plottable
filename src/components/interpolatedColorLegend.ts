@@ -7,7 +7,7 @@ export module Components {
     private wrapper: SVGTypewriter.Wrappers.Wrapper;
     private writer: SVGTypewriter.Writers.Writer;
     private scale: Scales.InterpolatedColor;
-    private _orientation: String ;
+    private orientation: String ;
     private padding = 5;
     private numSwatches = 10;
     private _formatter: Formatter;
@@ -42,7 +42,7 @@ export module Components {
       this.scale = interpolatedColorScale;
       this.scale.broadcaster.registerListener(this, () => this.invalidateLayout());
       this._formatter = formatter;
-      this._orientation = InterpolatedColorLegend.ensureOrientation(orientation);
+      this.orientation = InterpolatedColorLegend.ensureOrientation(orientation);
 
       this.fixedWidthFlag = true;
       this.fixedHeightFlag = true;
@@ -101,9 +101,9 @@ export module Components {
     public orient(newOrientation: string): InterpolatedColorLegend;
     public orient(newOrientation?: string): any {
       if (newOrientation == null) {
-        return this._orientation;
+        return this.orientation;
       } else {
-        this._orientation = InterpolatedColorLegend.ensureOrientation(newOrientation);
+        this.orientation = InterpolatedColorLegend.ensureOrientation(newOrientation);
         this.invalidateLayout();
         return this;
       }
@@ -163,7 +163,7 @@ export module Components {
     }
 
     private isVertical() {
-      return this._orientation !== "horizontal";
+      return this.orientation !== "horizontal";
     }
 
     public doRender() {
@@ -220,7 +220,7 @@ export module Components {
         lowerWriteOptions.yAlign = "bottom";
         lowerLabelShift.y = -padding;
 
-        if (this._orientation === "left") {
+        if (this.orientation === "left") {
           swatchX = (d: any, i: number) => padding + longestTextWidth + padding;
           upperWriteOptions.xAlign = "right";
           upperLabelShift.x = -(padding + swatchWidth + padding);

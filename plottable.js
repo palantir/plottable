@@ -5747,7 +5747,7 @@ var Plottable;
                 this.scale = interpolatedColorScale;
                 this.scale.broadcaster.registerListener(this, function () { return _this.invalidateLayout(); });
                 this._formatter = formatter;
-                this._orientation = InterpolatedColorLegend.ensureOrientation(orientation);
+                this.orientation = InterpolatedColorLegend.ensureOrientation(orientation);
                 this.fixedWidthFlag = true;
                 this.fixedHeightFlag = true;
                 this.classed("legend", true).classed("interpolated-color-legend", true);
@@ -5775,10 +5775,10 @@ var Plottable;
             };
             InterpolatedColorLegend.prototype.orient = function (newOrientation) {
                 if (newOrientation == null) {
-                    return this._orientation;
+                    return this.orientation;
                 }
                 else {
-                    this._orientation = InterpolatedColorLegend.ensureOrientation(newOrientation);
+                    this.orientation = InterpolatedColorLegend.ensureOrientation(newOrientation);
                     this.invalidateLayout();
                     return this;
                 }
@@ -5828,7 +5828,7 @@ var Plottable;
                 };
             };
             InterpolatedColorLegend.prototype.isVertical = function () {
-                return this._orientation !== "horizontal";
+                return this.orientation !== "horizontal";
             };
             InterpolatedColorLegend.prototype.doRender = function () {
                 var _this = this;
@@ -5875,7 +5875,7 @@ var Plottable;
                     upperLabelShift.y = padding;
                     lowerWriteOptions.yAlign = "bottom";
                     lowerLabelShift.y = -padding;
-                    if (this._orientation === "left") {
+                    if (this.orientation === "left") {
                         swatchX = function (d, i) { return padding + longestTextWidth + padding; };
                         upperWriteOptions.xAlign = "right";
                         upperLabelShift.x = -(padding + swatchWidth + padding);
