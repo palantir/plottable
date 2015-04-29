@@ -173,7 +173,7 @@ module Plottable {
                                              fromX: boolean) {
       if (toScale instanceof QuantitativeScale) {
         var toScaleQ = <QuantitativeScale<B>> toScale;
-        var normalizedData = this._normalizeDatasets<A, B>(fromX);
+        var normalizedData = this.normalizeDatasets<A, B>(fromX);
 
         var filterFn: (v: A) => boolean;
         if (fromScale instanceof QuantitativeScale) {
@@ -193,7 +193,7 @@ module Plottable {
       }
     }
 
-    protected _normalizeDatasets<A, B>(fromX: boolean): {a: A; b: B}[] {
+    protected normalizeDatasets<A, B>(fromX: boolean): {a: A; b: B}[] {
       var aAccessor: (d: any, i: number, u: any, m: Plots.PlotMetadata) => A = this._projections[fromX ? "x" : "y"].accessor;
       var bAccessor: (d: any, i: number, u: any, m: Plots.PlotMetadata) => B = this._projections[fromX ? "y" : "x"].accessor;
       return Utils.Methods.flatten(this._datasetKeysInOrder.map((key: string) => {

@@ -5917,7 +5917,7 @@ describe("Metadata", function () {
         var xAccessor = function (d, i, u, m) { return d.x + (i + 1) * m.foo; };
         var yAccessor = function () { return 0; };
         var plot = new Plottable.Plots.Scatter(xScale, yScale).project("x", xAccessor).project("y", yAccessor);
-        plot._getPlotMetadataForDataset = function (key) {
+        plot.getPlotMetadataForDataset = function (key) {
             return {
                 datasetKey: key,
                 foo: 10
@@ -5946,7 +5946,7 @@ describe("Metadata", function () {
         var xAccessor = function (d, i, u, m) { return d.x + (i + 1) * m.foo; };
         var yAccessor = function () { return 0; };
         var plot1 = new Plottable.Plots.Scatter(xScale, yScale).project("x", xAccessor).project("y", yAccessor);
-        plot1._getPlotMetadataForDataset = function (key) {
+        plot1.getPlotMetadataForDataset = function (key) {
             return {
                 datasetKey: key,
                 foo: 10
@@ -5955,7 +5955,7 @@ describe("Metadata", function () {
         plot1.addDataset(data1);
         plot1.addDataset(data2);
         var plot2 = new Plottable.Plots.Scatter(xScale, yScale).project("x", xAccessor).project("y", yAccessor);
-        plot2._getPlotMetadataForDataset = function (key) {
+        plot2.getPlotMetadataForDataset = function (key) {
             return {
                 datasetKey: key,
                 foo: 20
@@ -6000,7 +6000,7 @@ describe("Metadata", function () {
         var dataset = new Plottable.Dataset(data1, metadata);
         var a = function (d, i, u, m) { return d.x + u.foo + m.foo; };
         var plot = new Plottable.Plot().project("a", a, xScale);
-        plot._getPlotMetadataForDataset = function (key) {
+        plot.getPlotMetadataForDataset = function (key) {
             return {
                 datasetKey: key,
                 foo: 5

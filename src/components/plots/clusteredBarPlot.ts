@@ -70,8 +70,8 @@ export module Plots {
       return super._getDataToDraw();
     }
 
-    protected _getPlotMetadataForDataset(key: string): ClusteredPlotMetadata {
-      var metadata = <ClusteredPlotMetadata>super._getPlotMetadataForDataset(key);
+    protected getPlotMetadataForDataset(key: string): ClusteredPlotMetadata {
+      var metadata = <ClusteredPlotMetadata>super.getPlotMetadataForDataset(key);
       metadata.position = 0;
       return metadata;
     }

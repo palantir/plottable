@@ -5,8 +5,8 @@ export module Plots {
   export class StackedArea<X> extends Area<X> {
 
     private _isVertical: boolean;
-    private _baseline: D3.Selection;
-    private _baselineValue = 0;
+    private baseline: D3.Selection;
+    private baselineValue = 0;
 
     /**
      * Constructs a StackedArea plot.
@@ -31,11 +31,11 @@ export module Plots {
 
     protected setup() {
       super.setup();
-      this._baseline = this._renderArea.append("line").classed("baseline", true);
+      this.baseline = this._renderArea.append("line").classed("baseline", true);
     }
 
     protected _additionalPaint() {
-      var scaledBaseline = this.yScale.scale(this._baselineValue);
+      var scaledBaseline = this.yScale.scale(this.baselineValue);
       var baselineAttr: any = {
         "x1": 0,
         "y1": scaledBaseline,
@@ -43,7 +43,7 @@ export module Plots {
         "y2": scaledBaseline
       };
 
-      this.getAnimator("baseline").animate(this._baseline, baselineAttr);
+      this.getAnimator("baseline").animate(this.baseline, baselineAttr);
     }
 
     protected updateYDomainer() {
@@ -91,9 +91,9 @@ export module Plots {
     }
 
     //===== Stack logic from StackedPlot =====
-    public _updateStackOffsets() {
+    public updateStackOffsets() {
       if (!this._projectorsReady()) { return; }
-      var domainKeys = this._getDomainKeys();
+      var domainKeys = this.getDomainKeys();
       var keyAccessor = this._isVertical ? this._projections["x"].accessor : this._projections["y"].accessor;
       var keySets = this._datasetKeysInOrder.map((k) => {
         var dataset = this._key2PlotDatasetKey.get(k).dataset;
@@ -104,47 +104,47 @@ export module Plots {
       if (keySets.some((keySet) => keySet.length !== domainKeys.length)) {
         Utils.Methods.warn("the domains across the datasets are not the same.  Plot may produce unintended behavior.");
       }
-      Stacked.prototype._updateStackOffsets.call(this);
+      Stacked.prototype.updateStackOffsets.call(this);
     }
 
-    public _updateStackExtents() {
-      Stacked.prototype._updateStackExtents.call(this);
+    public updateStackExtents() {
+      Stacked.prototype.updateStackExtents.call(this);
     }
 
-    public _stack(dataArray: D3.Map<StackedDatum>[]): D3.Map<StackedDatum>[] {
-      return Stacked.prototype._stack.call(this, dataArray);
+    public stack(dataArray: D3.Map<StackedDatum>[]): D3.Map<StackedDatum>[] {
+      return Stacked.prototype.stack.call(this, dataArray);
     }
 
-    public _setDatasetStackOffsets(positiveDataMapArray: D3.Map<StackedDatum>[], negativeDataMapArray: D3.Map<StackedDatum>[]) {
-      Stacked.prototype._setDatasetStackOffsets.call(this, positiveDataMapArray, negativeDataMapArray);
+    public setDatasetStackOffsets(positiveDataMapArray: D3.Map<StackedDatum>[], negativeDataMapArray: D3.Map<StackedDatum>[]) {
+      Stacked.prototype.setDatasetStackOffsets.call(this, positiveDataMapArray, negativeDataMapArray);
     }
 
-    public _getDomainKeys() {
-      return Stacked.prototype._getDomainKeys.call(this);
+    public getDomainKeys() {
+      return Stacked.prototype.getDomainKeys.call(this);
     }
 
-    public _generateDefaultMapArray(): D3.Map<StackedDatum>[] {
-      return Stacked.prototype._generateDefaultMapArray.call(this);
+    public generateDefaultMapArray(): D3.Map<StackedDatum>[] {
+      return Stacked.prototype.generateDefaultMapArray.call(this);
     }
 
-    public _updateScaleExtents() {
-      Stacked.prototype._updateScaleExtents.call(this);
+    public updateScaleExtents() {
+      Stacked.prototype.updateScaleExtents.call(this);
     }
 
-    public _keyAccessor(): Accessor {
-      return Stacked.prototype._keyAccessor.call(this);
+    public keyAccessor(): Accessor {
+      return Stacked.prototype.keyAccessor.call(this);
     }
 
-    public _valueAccessor(): Accessor {
-      return Stacked.prototype._valueAccessor.call(this);
+    public valueAccessor(): Accessor {
+      return Stacked.prototype.valueAccessor.call(this);
     }
 
-    public _getPlotMetadataForDataset(key: string): StackedPlotMetadata {
-      return Stacked.prototype._getPlotMetadataForDataset.call(this, key);
+    public getPlotMetadataForDataset(key: string): StackedPlotMetadata {
+      return Stacked.prototype.getPlotMetadataForDataset.call(this, key);
     }
 
-    protected _normalizeDatasets<A, B>(fromX: boolean): {a: A; b: B}[] {
-      return Stacked.prototype._normalizeDatasets.call(this, fromX);
+    protected normalizeDatasets<A, B>(fromX: boolean): {a: A; b: B}[] {
+      return Stacked.prototype.normalizeDatasets.call(this, fromX);
     }
     //===== /Stack logic =====
   }

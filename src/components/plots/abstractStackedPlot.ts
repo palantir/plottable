@@ -18,8 +18,8 @@ module Plottable {
     private _stackedExtent = [0, 0];
     protected _isVertical: boolean;
 
-    public _getPlotMetadataForDataset(key: string): Plots.StackedPlotMetadata {
-      var metadata = <Plots.StackedPlotMetadata> super._getPlotMetadataForDataset(key);
+    public getPlotMetadataForDataset(key: string): Plots.StackedPlotMetadata {
+      var metadata = <Plots.StackedPlotMetadata> super.getPlotMetadataForDataset(key);
       metadata.offsets = d3.map();
       return metadata;
     }
@@ -27,21 +27,21 @@ module Plottable {
     public project(attrToSet: string, accessor: any, scale?: Scale<any, any>) {
       super.project(attrToSet, accessor, scale);
       if (this._projections["x"] && this._projections["y"] && (attrToSet === "x" || attrToSet === "y")) {
-        this._updateStackOffsets();
+        this.updateStackOffsets();
       }
       return this;
     }
 
     public onDatasetUpdate() {
       if (this._projectorsReady()) {
-        this._updateStackOffsets();
+        this.updateStackOffsets();
       }
       super.onDatasetUpdate();
     }
 
-    public _updateStackOffsets() {
-      var dataMapArray = this._generateDefaultMapArray();
-      var domainKeys = this._getDomainKeys();
+    public updateStackOffsets() {
+      var dataMapArray = this.generateDefaultMapArray();
+      var domainKeys = this.getDomainKeys();
 
       var positiveDataMapArray: D3.Map<Plots.StackedDatum>[] = dataMapArray.map((dataMap) => {
         return Utils.Methods.populateMap(domainKeys, (domainKey) => {
@@ -55,14 +55,14 @@ module Plottable {
         });
       });
 
-      this._setDatasetStackOffsets(this._stack(positiveDataMapArray), this._stack(negativeDataMapArray));
-      this._updateStackExtents();
+      this.setDatasetStackOffsets(this.stack(positiveDataMapArray), this.stack(negativeDataMapArray));
+      this.updateStackExtents();
     }
 
-    public _updateStackExtents() {
+    public updateStackExtents() {
       var datasets = this.datasets();
-      var valueAccessor = this._valueAccessor();
-      var keyAccessor = this._keyAccessor();
+      var valueAccessor = this.valueAccessor();
+      var keyAccessor = this.keyAccessor();
       var maxStackExtent = Utils.Methods.max<string, number>(this._datasetKeysInOrder, (k: string) => {
         var dataset = this._key2PlotDatasetKey.get(k).dataset;
         var plotMetadata = <Plots.StackedPlotMetadata>this._key2PlotDatasetKey.get(k).plotMetadata;
@@ -88,7 +88,7 @@ module Plottable {
      * Feeds the data through d3's stack layout function which will calculate
      * the stack offsets and use the the function declared in .out to set the offsets on the data.
      */
-    public _stack(dataArray: D3.Map<Plots.StackedDatum>[]): D3.Map<Plots.StackedDatum>[] {
+    public stack(dataArray: D3.Map<Plots.StackedDatum>[]): D3.Map<Plots.StackedDatum>[] {
       var outFunction = (d: Plots.StackedDatum, y0: number, y: number) => {
         d.offset = y0;
       };
@@ -96,7 +96,7 @@ module Plottable {
       d3.layout.stack()
                .x((d) => d.key)
                .y((d) => +d.value)
-               .values((d) => this._getDomainKeys().map((domainKey) => d.get(domainKey)))
+               .values((d) => this.getDomainKeys().map((domainKey) => d.get(domainKey)))
                .out(outFunction)(dataArray);
 
       return dataArray;
@@ -106,9 +106,9 @@ module Plottable {
      * After the stack offsets have been determined on each separate dataset, the offsets need
      * to be determined correctly on the overall datasets
      */
-    public _setDatasetStackOffsets(positiveDataMapArray: D3.Map<Plots.StackedDatum>[], negativeDataMapArray: D3.Map<Plots.StackedDatum>[]) {
-      var keyAccessor = this._keyAccessor();
-      var valueAccessor = this._valueAccessor();
+    public setDatasetStackOffsets(positiveDataMapArray: D3.Map<Plots.StackedDatum>[], negativeDataMapArray: D3.Map<Plots.StackedDatum>[]) {
+      var keyAccessor = this.keyAccessor();
+      var valueAccessor = this.valueAccessor();
 
       this._datasetKeysInOrder.forEach((k, index) => {
         var dataset = this._key2PlotDatasetKey.get(k).dataset;
@@ -134,8 +134,8 @@ module Plottable {
       });
     }
 
-    public _getDomainKeys(): string[] {
-      var keyAccessor = this._keyAccessor();
+    public getDomainKeys(): string[] {
+      var keyAccessor = this.keyAccessor();
       var domainKeys = d3.set();
 
       this._datasetKeysInOrder.forEach((k) => {
@@ -149,10 +149,10 @@ module Plottable {
       return domainKeys.values();
     }
 
-    public _generateDefaultMapArray(): D3.Map<Plots.StackedDatum>[] {
-      var keyAccessor = this._keyAccessor();
-      var valueAccessor = this._valueAccessor();
-      var domainKeys = this._getDomainKeys();
+    public generateDefaultMapArray(): D3.Map<Plots.StackedDatum>[] {
+      var keyAccessor = this.keyAccessor();
+      var valueAccessor = this.valueAccessor();
+      var domainKeys = this.getDomainKeys();
 
       var dataMapArray = this._datasetKeysInOrder.map(() => {
         return Utils.Methods.populateMap(domainKeys, (domainKey) => {
@@ -173,8 +173,8 @@ module Plottable {
       return dataMapArray;
     }
 
-    public _updateScaleExtents() {
-      super._updateScaleExtents();
+    public updateScaleExtents() {
+      super.updateScaleExtents();
       var primaryScale: Scale<any, number> = this._isVertical ? this.yScale : this.xScale;
       if (!primaryScale) {
         return;
@@ -186,7 +186,7 @@ module Plottable {
       }
     }
 
-    public _normalizeDatasets<A, B>(fromX: boolean): {a: A; b: B}[] {
+    public normalizeDatasets<A, B>(fromX: boolean): {a: A; b: B}[] {
       var aAccessor = this._projections[fromX ? "x" : "y"].accessor;
       var bAccessor = this._projections[fromX ? "y" : "x"].accessor;
       var aStackedAccessor = (d: any, i: number, u: any, m: Plots.StackedPlotMetadata) => {
@@ -217,11 +217,11 @@ module Plottable {
       }));
     }
 
-    public _keyAccessor(): Accessor {
+    public keyAccessor(): Accessor {
        return this._isVertical ? this._projections["x"].accessor : this._projections["y"].accessor;
     }
 
-    public _valueAccessor(): Accessor {
+    public valueAccessor(): Accessor {
        return this._isVertical ? this._projections["y"].accessor : this._projections["x"].accessor;
     }
   }

@@ -62,7 +62,7 @@ module Plottable {
       super.anchor(element);
       this._animateOnNextRender = true;
       this._dataChanged = true;
-      this._updateScaleExtents();
+      this.updateScaleExtents();
     }
 
     protected setup() {
@@ -116,7 +116,7 @@ module Plottable {
         this.removeDataset(key);
       };
       var drawer = this.getDrawer(key);
-      var metadata = this._getPlotMetadataForDataset(key);
+      var metadata = this.getPlotMetadataForDataset(key);
       var pdk = {drawer: drawer, dataset: dataset, key: key, plotMetadata: metadata};
       this._datasetKeysInOrder.push(key);
       this._key2PlotDatasetKey.set(key, pdk);
@@ -141,7 +141,7 @@ module Plottable {
     }
 
     protected onDatasetUpdate() {
-      this._updateScaleExtents();
+      this.updateScaleExtents();
       this._animateOnNextRender = true;
       this._dataChanged = true;
       this.render();
@@ -253,7 +253,7 @@ module Plottable {
     public detach() {
       super.detach();
       // make the domain resize
-      this._updateScaleExtents();
+      this.updateScaleExtents();
       return this;
     }
 
@@ -261,7 +261,7 @@ module Plottable {
      * This function makes sure that all of the scales in this._projections
      * have an extent that includes all the data that is projected onto them.
      */
-    protected _updateScaleExtents() {
+    protected updateScaleExtents() {
       d3.keys(this._projections).forEach((attr: string) => this._updateScaleExtent(attr));
     }
 
@@ -422,7 +422,7 @@ module Plottable {
      *
      * @param {string} key The key of new dataset
      */
-    protected _getPlotMetadataForDataset(key: string): Plots.PlotMetadata {
+    protected getPlotMetadataForDataset(key: string): Plots.PlotMetadata {
       return {
         datasetKey: key
       };
