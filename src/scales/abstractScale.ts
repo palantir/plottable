@@ -2,12 +2,12 @@
 
 module Plottable {
   export class Scale<D, R> extends Core.PlottableObject {
-    protected _d3Scale: D3.Scale.Scale;
-    private _autoDomainAutomatically = true;
+    protected d3Scale: D3.Scale.Scale;
+    private autoDomainAutomatically = true;
     public broadcaster: Core.Broadcaster<Scale<D, R>>;
-    private _rendererAttrID2Extent: {[rendererAttrID: string]: D[]} = {};
-    public _typeCoercer: (d: any) => any = (d: any) => d;
-    private _domainModificationInProgress: boolean = false;
+    private rendererAttrID2Extent: {[rendererAttrID: string]: D[]} = {};
+    public typeCoercer: (d: any) => any = (d: any) => d;
+    private domainModificationInProgress: boolean = false;
     /**
      * Constructs a new Scale.
      *
@@ -20,15 +20,15 @@ module Plottable {
      */
     constructor(scale: D3.Scale.Scale) {
       super();
-      this._d3Scale = scale;
+      this.d3Scale = scale;
       this.broadcaster = new Core.Broadcaster(this);
     }
 
-    protected _getAllExtents(): D[][] {
-      return d3.values(this._rendererAttrID2Extent);
+    protected getAllExtents(): D[][] {
+      return d3.values(this.rendererAttrID2Extent);
     }
 
-    protected _getExtent(): D[] {
+    protected getExtent(): D[] {
       return []; // this should be overwritten
     }
 
@@ -48,13 +48,13 @@ module Plottable {
      * @returns {Scale} The calling Scale.
      */
     public autoDomain() {
-      this._autoDomainAutomatically = true;
-      this._setDomain(this._getExtent());
+      this.autoDomainAutomatically = true;
+      this.setDomain(this.getExtent());
       return this;
     }
 
-    public _autoDomainIfAutomaticMode() {
-      if (this._autoDomainAutomatically) {
+    public autoDomainIfAutomaticMode() {
+      if (this.autoDomainAutomatically) {
         this.autoDomain();
       }
     }
@@ -67,7 +67,7 @@ module Plottable {
      * @returns {R} The range value corresponding to the supplied domain value.
      */
     public scale(value: D): R {
-      return this._d3Scale(value);
+      return this.d3Scale(value);
     }
 
     /**
@@ -88,24 +88,24 @@ module Plottable {
     public domain(values: D[]): Scale<D, R>;
     public domain(values?: D[]): any {
       if (values == null) {
-        return this._getDomain();
+        return this.getDomain();
       } else {
-        this._autoDomainAutomatically = false;
-        this._setDomain(values);
+        this.autoDomainAutomatically = false;
+        this.setDomain(values);
         return this;
       }
     }
 
-    protected _getDomain() {
-      return this._d3Scale.domain();
+    protected getDomain() {
+      return this.d3Scale.domain();
     }
 
-    protected _setDomain(values: D[]) {
-      if (!this._domainModificationInProgress) {
-        this._domainModificationInProgress = true;
-        this._d3Scale.domain(values);
+    protected setDomain(values: D[]) {
+      if (!this.domainModificationInProgress) {
+        this.domainModificationInProgress = true;
+        this.d3Scale.domain(values);
         this.broadcaster.broadcast();
-        this._domainModificationInProgress = false;
+        this.domainModificationInProgress = false;
       }
     }
 
@@ -132,9 +132,9 @@ module Plottable {
     public range(values: R[]): Scale<D, R>;
     public range(values?: R[]): any {
       if (values == null) {
-        return this._d3Scale.range();
+        return this.d3Scale.range();
       } else {
-        this._d3Scale.range(values);
+        this.d3Scale.range(values);
         return this;
       }
     }
@@ -146,7 +146,7 @@ module Plottable {
      * @returns {Scale} A copy of the calling Scale.
      */
     public copy(): Scale<D, R> {
-      return new Scale<D, R>(this._d3Scale.copy());
+      return new Scale<D, R>(this.d3Scale.copy());
     }
 
     /**
@@ -159,15 +159,15 @@ module Plottable {
      * @param {string} attr The attribute being projected, e.g. "x", "y0", "r"
      * @param {D[]} extent The new extent to be included in the scale.
      */
-    public _updateExtent(plotProvidedKey: string, attr: string, extent: D[]) {
-      this._rendererAttrID2Extent[plotProvidedKey + attr] = extent;
-      this._autoDomainIfAutomaticMode();
+    public updateExtent(plotProvidedKey: string, attr: string, extent: D[]) {
+      this.rendererAttrID2Extent[plotProvidedKey + attr] = extent;
+      this.autoDomainIfAutomaticMode();
       return this;
     }
 
-    public _removeExtent(plotProvidedKey: string, attr: string) {
-      delete this._rendererAttrID2Extent[plotProvidedKey + attr];
-      this._autoDomainIfAutomaticMode();
+    public removeExtent(plotProvidedKey: string, attr: string) {
+      delete this.rendererAttrID2Extent[plotProvidedKey + attr];
+      this.autoDomainIfAutomaticMode();
       return this;
     }
   }
