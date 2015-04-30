@@ -3956,6 +3956,10 @@ declare module Plottable {
     module Interaction {
         class PanZoom extends AbstractInteraction {
             /**
+             * The number of pixels occupied in a line.
+             */
+            static PIXELS_PER_LINE: number;
+            /**
              * Creates a PanZoomInteraction.
              *
              * The allows you to move around and zoom in on a plot, interactively. It
@@ -3966,12 +3970,7 @@ declare module Plottable {
              * @param {QuantitativeScale} [yScale] The Y scale to update on panning/zooming.
              */
             constructor(xScale?: Scale.AbstractQuantitative<any>, yScale?: Scale.AbstractQuantitative<any>);
-            /**
-             * Sets the scales back to their original domains.
-             */
-            resetZoom(): void;
             _anchor(component: Component.AbstractComponent, hitBox: D3.Selection): void;
-            _requiresHitbox(): boolean;
         }
     }
 }
