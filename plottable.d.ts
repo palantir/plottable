@@ -3684,6 +3684,18 @@ declare module Plottable {
              * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
              */
             onTouchEnd(key: any, callback: TouchCallback): Dispatchers.Touch;
+            /**
+             * Registers a callback to be called whenever a touch is cancelled,
+             * or removes the callback if `null` is passed as the callback.
+             *
+             * @param {any} key The key associated with the callback.
+             *                  Key uniqueness is determined by deep equality.
+             * @param {TouchCallback} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space. Pass `null`
+             *                                     to remove a callback.
+             * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
+             */
+            onTouchCancel(key: any, callback: TouchCallback): Dispatchers.Touch;
         }
     }
 }
@@ -3870,6 +3882,10 @@ declare module Plottable {
     module Interactions {
         class PanZoom extends Interaction {
             /**
+             * The number of pixels occupied in a line.
+             */
+            static PIXELS_PER_LINE: number;
+            /**
              * Creates a PanZoomInteraction.
              *
              * The allows you to move around and zoom in on a plot, interactively. It
@@ -3880,12 +3896,7 @@ declare module Plottable {
              * @param {QuantitativeScaleScale} [yScale] The Y scale to update on panning/zooming.
              */
             constructor(xScale?: QuantitativeScale<any>, yScale?: QuantitativeScale<any>);
-            /**
-             * Sets the scales back to their original domains.
-             */
-            resetZoom(): void;
             _anchor(component: Component, hitBox: D3.Selection): void;
-            _requiresHitbox(): boolean;
         }
     }
 }

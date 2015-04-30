@@ -8492,64 +8492,6 @@ describe("CallbackSet", function () {
 ///<reference path="../testReference.ts" />
 var assert = chai.assert;
 describe("Interactions", function () {
-    describe("PanZoomInteraction", function () {
-        it("Pans properly", function () {
-            // The only difference between pan and zoom is internal to d3
-            // Simulating zoom events is painful, so panning will suffice here
-            var xScale = new Plottable.Scales.Linear().domain([0, 11]);
-            var yScale = new Plottable.Scales.Linear().domain([11, 0]);
-            var svg = generateSVG();
-            var dataset = makeLinearSeries(11);
-            var plot = new Plottable.Plots.Scatter(xScale, yScale).addDataset(dataset);
-            plot.project("x", "x", xScale);
-            plot.project("y", "y", yScale);
-            plot.renderTo(svg);
-            var xDomainBefore = xScale.domain();
-            var yDomainBefore = yScale.domain();
-            var interaction = new Plottable.Interactions.PanZoom(xScale, yScale);
-            plot.registerInteraction(interaction);
-            var hb = plot.hitBox().node();
-            var dragDistancePixelX = 10;
-            var dragDistancePixelY = 20;
-            $(hb).simulate("drag", {
-                dx: dragDistancePixelX,
-                dy: dragDistancePixelY
-            });
-            var xDomainAfter = xScale.domain();
-            var yDomainAfter = yScale.domain();
-            assert.notDeepEqual(xDomainAfter, xDomainBefore, "x domain was changed by panning");
-            assert.notDeepEqual(yDomainAfter, yDomainBefore, "y domain was changed by panning");
-            function getSlope(scale) {
-                var range = scale.range();
-                var domain = scale.domain();
-                return (domain[1] - domain[0]) / (range[1] - range[0]);
-            }
-            ;
-            var expectedXDragChange = -dragDistancePixelX * getSlope(xScale);
-            var expectedYDragChange = -dragDistancePixelY * getSlope(yScale);
-            assert.closeTo(xDomainAfter[0] - xDomainBefore[0], expectedXDragChange, 1, "x domain changed by the correct amount");
-            assert.closeTo(yDomainAfter[0] - yDomainBefore[0], expectedYDragChange, 1, "y domain changed by the correct amount");
-            svg.remove();
-        });
-        it("Resets zoom when the scale domain changes", function () {
-            var xScale = new Plottable.Scales.Linear();
-            var yScale = new Plottable.Scales.Linear();
-            var svg = generateSVG();
-            var c = new Plottable.Component();
-            c.renderTo(svg);
-            var pzi = new Plottable.Interactions.PanZoom(xScale, yScale);
-            c.registerInteraction(pzi);
-            var zoomBeforeX = pzi._zoom;
-            xScale.domain([10, 1000]);
-            var zoomAfterX = pzi._zoom;
-            assert.notStrictEqual(zoomBeforeX, zoomAfterX, "D3 Zoom was regenerated after x scale domain changed");
-            var zoomBeforeY = pzi._zoom;
-            yScale.domain([10, 1000]);
-            var zoomAfterY = pzi._zoom;
-            assert.notStrictEqual(zoomBeforeY, zoomAfterY, "D3 Zoom was regenerated after y scale domain changed");
-            svg.remove();
-        });
-    });
     describe("KeyInteraction", function () {
         it("Triggers appropriate callback for the key pressed", function () {
             var svg = generateSVG(400, 400);
@@ -8779,6 +8721,21 @@ describe("Interactions", function () {
             assert.isTrue(callbackCalled, "callback called even if moved outside component (touch)");
             svg.remove();
         });
+        it("cancelling touches cancels any ongoing clicks", function () {
+            var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var c = new Plottable.Component();
+            c.renderTo(svg);
+            var clickInteraction = new Plottable.Interactions.Click();
+            c.registerInteraction(clickInteraction);
+            var callbackCalled = false;
+            var callback = function () { return callbackCalled = true; };
+            clickInteraction.onClick(callback);
+            triggerFakeTouchEvent("touchstart", c.content(), [{ x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 }]);
+            triggerFakeTouchEvent("touchcancel", c.content(), [{ x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 }]);
+            triggerFakeTouchEvent("touchend", c.content(), [{ x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 }]);
+            assert.isFalse(callbackCalled, "callback not called since click was interrupted");
+            svg.remove();
+        });
     });
 });
 
@@ -8835,6 +8792,17 @@ describe("Interactions", function () {
                 triggerFakeMouseEvent("mouseup", component.content(), userClickPoint.x, userClickPoint.y);
                 triggerFakeMouseEvent("mousedown", component.content(), userClickPoint.x, userClickPoint.y);
                 triggerFakeMouseEvent("mouseup", component.content(), userClickPoint.x, userClickPoint.y);
+                assert.deepEqual(doubleClickedPoint, null, "point never set");
+                svg.remove();
+            });
+            it("callback not called does not receive dblclick confirmation", function () {
+                var userClickPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
+                triggerFakeTouchEvent("touchstart", component.content(), [{ x: userClickPoint.x, y: userClickPoint.y }]);
+                triggerFakeTouchEvent("touchend", component.content(), [{ x: userClickPoint.x, y: userClickPoint.y }]);
+                triggerFakeTouchEvent("touchstart", component.content(), [{ x: userClickPoint.x, y: userClickPoint.y }]);
+                triggerFakeTouchEvent("touchend", component.content(), [{ x: userClickPoint.x, y: userClickPoint.y }]);
+                triggerFakeTouchEvent("touchcancel", component.content(), [{ x: userClickPoint.x, y: userClickPoint.y }]);
+                triggerFakeMouseEvent("dblclick", component.content(), userClickPoint.x, userClickPoint.y);
                 assert.deepEqual(doubleClickedPoint, null, "point never set");
                 svg.remove();
             });
@@ -9053,6 +9021,134 @@ describe("Interactions", function () {
             triggerFakeTouchEvent("touchstart", target, [{ x: startPoint.x, y: startPoint.y }]);
             triggerFakeTouchEvent("touchend", target, [{ x: outsidePointNeg.x, y: outsidePointNeg.y }]);
             assert.deepEqual(receivedEnd, outsidePointNeg, "dragging outside the Component is no longer constrained (negative) (touchend)");
+            svg.remove();
+        });
+        it("touchcancel cancels the current drag", function () {
+            var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var c = new Plottable.Component();
+            c.renderTo(svg);
+            var drag = new Plottable.Interactions.Drag();
+            var moveCallbackCalled = false;
+            var receivedStart;
+            var receivedEnd;
+            var moveCallback = function (start, end) {
+                moveCallbackCalled = true;
+                receivedStart = start;
+                receivedEnd = end;
+            };
+            drag.onDrag(moveCallback);
+            c.registerInteraction(drag);
+            var target = c.background();
+            receivedStart = null;
+            receivedEnd = null;
+            triggerFakeTouchEvent("touchstart", target, [{ x: startPoint.x, y: startPoint.y }]);
+            triggerFakeTouchEvent("touchmove", target, [{ x: endPoint.x - 10, y: endPoint.y - 10 }]);
+            triggerFakeTouchEvent("touchcancel", target, [{ x: endPoint.x - 10, y: endPoint.y - 10 }]);
+            triggerFakeTouchEvent("touchmove", target, [{ x: endPoint.x, y: endPoint.y }]);
+            assert.notEqual(receivedEnd, endPoint, "was not passed touch point after cancelled");
+            svg.remove();
+        });
+    });
+});
+
+///<reference path="../testReference.ts" />
+var assert = chai.assert;
+describe("Interactions", function () {
+    describe("PanZoomInteraction", function () {
+        var svg;
+        var SVG_WIDTH = 400;
+        var SVG_HEIGHT = 500;
+        var eventTarget;
+        var xScale;
+        var yScale;
+        beforeEach(function () {
+            svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var component = new Plottable.Component();
+            component.renderTo(svg);
+            xScale = new Plottable.Scales.Linear();
+            xScale.domain([0, SVG_WIDTH / 2]).range([0, SVG_WIDTH]);
+            yScale = new Plottable.Scales.Linear();
+            yScale.domain([0, SVG_HEIGHT / 2]).range([0, SVG_HEIGHT]);
+            component.registerInteraction(new Plottable.Interactions.PanZoom(xScale, yScale));
+            eventTarget = component.background();
+        });
+        describe("Panning", function () {
+            it("dragging a certain amount will translate the scale correctly (mouse)", function () {
+                var startPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
+                var endPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT * 3 / 4 };
+                triggerFakeMouseEvent("mousedown", eventTarget, startPoint.x, startPoint.y);
+                triggerFakeMouseEvent("mousemove", eventTarget, endPoint.x, endPoint.y);
+                triggerFakeMouseEvent("mouseend", eventTarget, endPoint.x, endPoint.y);
+                assert.deepEqual(xScale.domain(), [-SVG_WIDTH / 8, SVG_WIDTH * 3 / 8], "xScale pans to the correct domain via drag (mouse)");
+                assert.deepEqual(yScale.domain(), [-SVG_HEIGHT / 4, SVG_HEIGHT / 4], "yScale pans to the correct domain via drag (mouse)");
+                svg.remove();
+            });
+            it("dragging to outside the component will translate the scale correctly (mouse)", function () {
+                var startPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
+                var endPoint = { x: -SVG_WIDTH / 2, y: -SVG_HEIGHT / 2 };
+                triggerFakeMouseEvent("mousedown", eventTarget, startPoint.x, startPoint.y);
+                triggerFakeMouseEvent("mousemove", eventTarget, endPoint.x, endPoint.y);
+                triggerFakeMouseEvent("mouseend", eventTarget, endPoint.x, endPoint.y);
+                assert.deepEqual(xScale.domain(), [SVG_WIDTH / 2, SVG_WIDTH], "xScale pans to the correct domain via drag (mouse)");
+                assert.deepEqual(yScale.domain(), [SVG_HEIGHT / 2, SVG_HEIGHT], "yScale pans to the correct domain via drag (mouse)");
+                svg.remove();
+            });
+            it("dragging a certain amount will translate the scale correctly (touch)", function () {
+                // HACKHACK PhantomJS doesn't implement fake creation of WheelEvents
+                // https://github.com/ariya/phantomjs/issues/11289
+                if (window.PHANTOMJS) {
+                    svg.remove();
+                    return;
+                }
+                var startPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
+                var endPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT * 3 / 4 };
+                triggerFakeTouchEvent("touchstart", eventTarget, [startPoint]);
+                triggerFakeTouchEvent("touchmove", eventTarget, [endPoint]);
+                triggerFakeTouchEvent("touchend", eventTarget, [endPoint]);
+                assert.deepEqual(xScale.domain(), [-SVG_WIDTH / 8, SVG_WIDTH * 3 / 8], "xScale pans to the correct domain via drag (touch)");
+                assert.deepEqual(yScale.domain(), [-SVG_HEIGHT / 4, SVG_HEIGHT / 4], "yScale pans to the correct domain via drag (touch)");
+                svg.remove();
+            });
+            it("dragging to outside the component will translate the scale correctly (touch)", function () {
+                var startPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
+                var endPoint = { x: -SVG_WIDTH / 2, y: -SVG_HEIGHT / 2 };
+                triggerFakeTouchEvent("touchstart", eventTarget, [startPoint]);
+                triggerFakeTouchEvent("touchmove", eventTarget, [endPoint]);
+                triggerFakeTouchEvent("touchend", eventTarget, [endPoint]);
+                assert.deepEqual(xScale.domain(), [SVG_WIDTH / 2, SVG_WIDTH], "xScale pans to the correct domain via drag (touch)");
+                assert.deepEqual(yScale.domain(), [SVG_HEIGHT / 2, SVG_HEIGHT], "yScale pans to the correct domain via drag (touch)");
+                svg.remove();
+            });
+        });
+        it("mousewheeling a certain amount will magnify the scale correctly", function () {
+            // HACKHACK PhantomJS doesn't implement fake creation of WheelEvents
+            // https://github.com/ariya/phantomjs/issues/11289
+            if (window.PHANTOMJS) {
+                svg.remove();
+                return;
+            }
+            var scrollPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
+            var deltaY = 500;
+            triggerFakeWheelEvent("wheel", svg, scrollPoint.x, scrollPoint.y, deltaY);
+            assert.deepEqual(xScale.domain(), [-SVG_WIDTH / 8, SVG_WIDTH * 7 / 8], "xScale zooms to the correct domain via scroll");
+            assert.deepEqual(yScale.domain(), [-SVG_HEIGHT / 8, SVG_HEIGHT * 7 / 8], "yScale zooms to the correct domain via scroll");
+            svg.remove();
+        });
+        it("pinching a certain amount will magnify the scale correctly", function () {
+            // HACKHACK PhantomJS doesn't implement fake creation of WheelEvents
+            // https://github.com/ariya/phantomjs/issues/11289
+            if (window.PHANTOMJS) {
+                svg.remove();
+                return;
+            }
+            var startPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
+            var startPoint2 = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
+            triggerFakeTouchEvent("touchstart", eventTarget, [startPoint, startPoint2], [0, 1]);
+            var endPoint = { x: SVG_WIDTH * 3 / 4, y: SVG_HEIGHT * 3 / 4 };
+            triggerFakeTouchEvent("touchmove", eventTarget, [endPoint], [1]);
+            triggerFakeTouchEvent("touchend", eventTarget, [endPoint], [1]);
+            assert.deepEqual(xScale.domain(), [SVG_WIDTH / 16, SVG_WIDTH * 5 / 16], "xScale transforms to the correct domain via pinch");
+            assert.deepEqual(yScale.domain(), [SVG_HEIGHT / 16, SVG_HEIGHT * 5 / 16], "yScale transforms to the correct domain via pinch");
             svg.remove();
         });
     });
@@ -9429,6 +9525,36 @@ describe("Dispatchers", function () {
             triggerFakeTouchEvent("touchend", target, expectedPoints, ids);
             assert.isTrue(callbackWasCalled, "callback was called on touchend");
             td.onTouchEnd(keyString, null);
+            target.remove();
+        });
+        it("onTouchCancel()", function () {
+            var targetWidth = 400, targetHeight = 400;
+            var target = generateSVG(targetWidth, targetHeight);
+            // HACKHACK: PhantomJS can't measure SVGs unless they have something in them occupying space
+            target.append("rect").attr("width", targetWidth).attr("height", targetHeight);
+            var targetXs = [17, 18, 12, 23, 44];
+            var targetYs = [77, 78, 52, 43, 14];
+            var expectedPoints = targetXs.map(function (targetX, i) {
+                return {
+                    x: targetX,
+                    y: targetYs[i]
+                };
+            });
+            var ids = targetXs.map(function (targetX, i) { return i; });
+            var td = Plottable.Dispatchers.Touch.getDispatcher(target.node());
+            var callbackWasCalled = false;
+            var callback = function (ids, points, e) {
+                callbackWasCalled = true;
+                ids.forEach(function (id) {
+                    assertPointsClose(points[id], expectedPoints[id], 0.5, "touch position is correct");
+                });
+                assert.isNotNull(e, "TouchEvent was passed to the Dispatcher");
+            };
+            var keyString = "unit test";
+            td.onTouchCancel(keyString, callback);
+            triggerFakeTouchEvent("touchcancel", target, expectedPoints, ids);
+            assert.isTrue(callbackWasCalled, "callback was called on touchend");
+            td.onTouchCancel(keyString, null);
             target.remove();
         });
         it("doesn't call callbacks if not in the DOM", function () {

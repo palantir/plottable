@@ -72,6 +72,20 @@ describe("Interactions", () => {
         svg.remove();
       });
 
+      it ("callback not called does not receive dblclick confirmation", () => {
+        var userClickPoint = {x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2};
+
+        triggerFakeTouchEvent("touchstart", component.content(), [{x: userClickPoint.x, y: userClickPoint.y}]);
+        triggerFakeTouchEvent("touchend", component.content(), [{x: userClickPoint.x, y: userClickPoint.y}]);
+        triggerFakeTouchEvent("touchstart", component.content(), [{x: userClickPoint.x, y: userClickPoint.y}]);
+        triggerFakeTouchEvent("touchend", component.content(), [{x: userClickPoint.x, y: userClickPoint.y}]);
+        triggerFakeTouchEvent("touchcancel", component.content(), [{x: userClickPoint.x, y: userClickPoint.y}]);
+        triggerFakeMouseEvent("dblclick", component.content(), userClickPoint.x, userClickPoint.y);
+        assert.deepEqual(doubleClickedPoint, null, "point never set");
+
+        svg.remove();
+      });
+
     });
   });
 });

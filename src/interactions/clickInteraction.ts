@@ -21,6 +21,8 @@ export module Interactions {
                                                                                this._handleClickDown(idToPoint[ids[0]]));
       this._touchDispatcher.onTouchEnd("Interaction.Click" + this.getID(), (ids, idToPoint) =>
                                                                                this._handleClickUp(idToPoint[ids[0]]));
+      this._touchDispatcher.onTouchCancel("Interaction.Click" + this.getID(), (ids, idToPoint) =>
+                                                                               this._clickedDown = false);
     }
 
     private _handleClickDown(p: Point) {
