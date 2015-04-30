@@ -5,10 +5,6 @@ export module Axes {
   export class Numeric extends Axis {
 
     private _tickLabelPositioning = "center";
-    // Whether or not first/last tick label will still be displayed even if
-    // the label is cut off.
-    private _showFirstTickLabel = false;
-    private _showLastTickLabel = false;
     private _measurer: SVGTypewriter.Measurers.Measurer;
     private _wrapper: SVGTypewriter.Wrappers.Wrapper;
 
