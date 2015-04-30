@@ -8473,64 +8473,6 @@ describe("_Util.Methods", function () {
 ///<reference path="../testReference.ts" />
 var assert = chai.assert;
 describe("Interactions", function () {
-    describe("PanZoomInteraction", function () {
-        it("Pans properly", function () {
-            // The only difference between pan and zoom is internal to d3
-            // Simulating zoom events is painful, so panning will suffice here
-            var xScale = new Plottable.Scale.Linear().domain([0, 11]);
-            var yScale = new Plottable.Scale.Linear().domain([11, 0]);
-            var svg = TestMethods.generateSVG();
-            var dataset = TestMethods.makeLinearSeries(11);
-            var plot = new Plottable.Plot.Scatter(xScale, yScale).addDataset(dataset);
-            plot.project("x", "x", xScale);
-            plot.project("y", "y", yScale);
-            plot.renderTo(svg);
-            var xDomainBefore = xScale.domain();
-            var yDomainBefore = yScale.domain();
-            var interaction = new Plottable.Interaction.PanZoom(xScale, yScale);
-            plot.registerInteraction(interaction);
-            var hb = plot.hitBox().node();
-            var dragDistancePixelX = 10;
-            var dragDistancePixelY = 20;
-            $(hb).simulate("drag", {
-                dx: dragDistancePixelX,
-                dy: dragDistancePixelY
-            });
-            var xDomainAfter = xScale.domain();
-            var yDomainAfter = yScale.domain();
-            assert.notDeepEqual(xDomainAfter, xDomainBefore, "x domain was changed by panning");
-            assert.notDeepEqual(yDomainAfter, yDomainBefore, "y domain was changed by panning");
-            function getSlope(scale) {
-                var range = scale.range();
-                var domain = scale.domain();
-                return (domain[1] - domain[0]) / (range[1] - range[0]);
-            }
-            ;
-            var expectedXDragChange = -dragDistancePixelX * getSlope(xScale);
-            var expectedYDragChange = -dragDistancePixelY * getSlope(yScale);
-            assert.closeTo(xDomainAfter[0] - xDomainBefore[0], expectedXDragChange, 1, "x domain changed by the correct amount");
-            assert.closeTo(yDomainAfter[0] - yDomainBefore[0], expectedYDragChange, 1, "y domain changed by the correct amount");
-            svg.remove();
-        });
-        it("Resets zoom when the scale domain changes", function () {
-            var xScale = new Plottable.Scale.Linear();
-            var yScale = new Plottable.Scale.Linear();
-            var svg = TestMethods.generateSVG();
-            var c = new Plottable.Component.AbstractComponent();
-            c.renderTo(svg);
-            var pzi = new Plottable.Interaction.PanZoom(xScale, yScale);
-            c.registerInteraction(pzi);
-            var zoomBeforeX = pzi._zoom;
-            xScale.domain([10, 1000]);
-            var zoomAfterX = pzi._zoom;
-            assert.notStrictEqual(zoomBeforeX, zoomAfterX, "D3 Zoom was regenerated after x scale domain changed");
-            var zoomBeforeY = pzi._zoom;
-            yScale.domain([10, 1000]);
-            var zoomAfterY = pzi._zoom;
-            assert.notStrictEqual(zoomBeforeY, zoomAfterY, "D3 Zoom was regenerated after y scale domain changed");
-            svg.remove();
-        });
-    });
     describe("KeyInteraction", function () {
         it("Triggers appropriate callback for the key pressed", function () {
             var svg = TestMethods.generateSVG(400, 400);
@@ -9257,6 +9199,109 @@ describe("Interactions", function () {
             TestMethods.triggerFakeTouchEvent("touchcancel", target, [{ x: endPoint.x - 10, y: endPoint.y - 10 }]);
             TestMethods.triggerFakeTouchEvent("touchmove", target, [{ x: endPoint.x, y: endPoint.y }]);
             assert.notEqual(receivedEnd, endPoint, "was not passed touch point after cancelled");
+            svg.remove();
+        });
+    });
+});
+
+///<reference path="../testReference.ts" />
+var assert = chai.assert;
+describe("Interactions", function () {
+    describe("PanZoomInteraction", function () {
+        var svg;
+        var SVG_WIDTH = 400;
+        var SVG_HEIGHT = 500;
+        var eventTarget;
+        var xScale;
+        var yScale;
+        beforeEach(function () {
+            svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var component = new Plottable.Component.AbstractComponent();
+            component.renderTo(svg);
+            xScale = new Plottable.Scale.Linear();
+            xScale.domain([0, SVG_WIDTH / 2]).range([0, SVG_WIDTH]);
+            yScale = new Plottable.Scale.Linear();
+            yScale.domain([0, SVG_HEIGHT / 2]).range([0, SVG_HEIGHT]);
+            component.registerInteraction(new Plottable.Interaction.PanZoom(xScale, yScale));
+            eventTarget = component.background();
+        });
+        describe("Panning", function () {
+            it("dragging a certain amount will translate the scale correctly (mouse)", function () {
+                var startPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
+                var endPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT * 3 / 4 };
+                TestMethods.triggerFakeMouseEvent("mousedown", eventTarget, startPoint.x, startPoint.y);
+                TestMethods.triggerFakeMouseEvent("mousemove", eventTarget, endPoint.x, endPoint.y);
+                TestMethods.triggerFakeMouseEvent("mouseend", eventTarget, endPoint.x, endPoint.y);
+                assert.deepEqual(xScale.domain(), [-SVG_WIDTH / 8, SVG_WIDTH * 3 / 8], "xScale pans to the correct domain via drag (mouse)");
+                assert.deepEqual(yScale.domain(), [-SVG_HEIGHT / 4, SVG_HEIGHT / 4], "yScale pans to the correct domain via drag (mouse)");
+                svg.remove();
+            });
+            it("dragging to outside the component will translate the scale correctly (mouse)", function () {
+                var startPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
+                var endPoint = { x: -SVG_WIDTH / 2, y: -SVG_HEIGHT / 2 };
+                TestMethods.triggerFakeMouseEvent("mousedown", eventTarget, startPoint.x, startPoint.y);
+                TestMethods.triggerFakeMouseEvent("mousemove", eventTarget, endPoint.x, endPoint.y);
+                TestMethods.triggerFakeMouseEvent("mouseend", eventTarget, endPoint.x, endPoint.y);
+                assert.deepEqual(xScale.domain(), [SVG_WIDTH / 2, SVG_WIDTH], "xScale pans to the correct domain via drag (mouse)");
+                assert.deepEqual(yScale.domain(), [SVG_HEIGHT / 2, SVG_HEIGHT], "yScale pans to the correct domain via drag (mouse)");
+                svg.remove();
+            });
+            it("dragging a certain amount will translate the scale correctly (touch)", function () {
+                // HACKHACK PhantomJS doesn't implement fake creation of WheelEvents
+                // https://github.com/ariya/phantomjs/issues/11289
+                if (window.PHANTOMJS) {
+                    svg.remove();
+                    return;
+                }
+                var startPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
+                var endPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT * 3 / 4 };
+                TestMethods.triggerFakeTouchEvent("touchstart", eventTarget, [startPoint]);
+                TestMethods.triggerFakeTouchEvent("touchmove", eventTarget, [endPoint]);
+                TestMethods.triggerFakeTouchEvent("touchend", eventTarget, [endPoint]);
+                assert.deepEqual(xScale.domain(), [-SVG_WIDTH / 8, SVG_WIDTH * 3 / 8], "xScale pans to the correct domain via drag (touch)");
+                assert.deepEqual(yScale.domain(), [-SVG_HEIGHT / 4, SVG_HEIGHT / 4], "yScale pans to the correct domain via drag (touch)");
+                svg.remove();
+            });
+            it("dragging to outside the component will translate the scale correctly (touch)", function () {
+                var startPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
+                var endPoint = { x: -SVG_WIDTH / 2, y: -SVG_HEIGHT / 2 };
+                TestMethods.triggerFakeTouchEvent("touchstart", eventTarget, [startPoint]);
+                TestMethods.triggerFakeTouchEvent("touchmove", eventTarget, [endPoint]);
+                TestMethods.triggerFakeTouchEvent("touchend", eventTarget, [endPoint]);
+                assert.deepEqual(xScale.domain(), [SVG_WIDTH / 2, SVG_WIDTH], "xScale pans to the correct domain via drag (touch)");
+                assert.deepEqual(yScale.domain(), [SVG_HEIGHT / 2, SVG_HEIGHT], "yScale pans to the correct domain via drag (touch)");
+                svg.remove();
+            });
+        });
+        it("mousewheeling a certain amount will magnify the scale correctly", function () {
+            // HACKHACK PhantomJS doesn't implement fake creation of WheelEvents
+            // https://github.com/ariya/phantomjs/issues/11289
+            if (window.PHANTOMJS) {
+                svg.remove();
+                return;
+            }
+            var scrollPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
+            var deltaY = 500;
+            TestMethods.triggerFakeWheelEvent("wheel", svg, scrollPoint.x, scrollPoint.y, deltaY);
+            assert.deepEqual(xScale.domain(), [-SVG_WIDTH / 8, SVG_WIDTH * 7 / 8], "xScale zooms to the correct domain via scroll");
+            assert.deepEqual(yScale.domain(), [-SVG_HEIGHT / 8, SVG_HEIGHT * 7 / 8], "yScale zooms to the correct domain via scroll");
+            svg.remove();
+        });
+        it("pinching a certain amount will magnify the scale correctly", function () {
+            // HACKHACK PhantomJS doesn't implement fake creation of WheelEvents
+            // https://github.com/ariya/phantomjs/issues/11289
+            if (window.PHANTOMJS) {
+                svg.remove();
+                return;
+            }
+            var startPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
+            var startPoint2 = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
+            TestMethods.triggerFakeTouchEvent("touchstart", eventTarget, [startPoint, startPoint2], [0, 1]);
+            var endPoint = { x: SVG_WIDTH * 3 / 4, y: SVG_HEIGHT * 3 / 4 };
+            TestMethods.triggerFakeTouchEvent("touchmove", eventTarget, [endPoint], [1]);
+            TestMethods.triggerFakeTouchEvent("touchend", eventTarget, [endPoint], [1]);
+            assert.deepEqual(xScale.domain(), [SVG_WIDTH / 16, SVG_WIDTH * 5 / 16], "xScale transforms to the correct domain via pinch");
+            assert.deepEqual(yScale.domain(), [SVG_HEIGHT / 16, SVG_HEIGHT * 5 / 16], "yScale transforms to the correct domain via pinch");
             svg.remove();
         });
     });
