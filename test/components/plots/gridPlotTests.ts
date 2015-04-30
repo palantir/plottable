@@ -103,10 +103,10 @@ describe("Plots", () => {
       assert.strictEqual(cells.length, data.length);
       for (var i = 0; i < cells.length; i++) {
         var cell = d3.select(cells[i]);
-        assert.strictEqual(+cell.attr("x"), i * CELL_WIDTH, "Cell x coord is correct");
-        assert.strictEqual(+cell.attr("y"), i * CELL_HEIGHT, "Cell y coord is correct");
-        assert.strictEqual(+cell.attr("width"), CELL_WIDTH, "Cell width is correct");
-        assert.strictEqual(+cell.attr("height"), CELL_HEIGHT, "Cell height is correct");
+        assert.strictEqual(cell.attr("x"), String(i * CELL_WIDTH), "Cell x coord is correct");
+        assert.strictEqual(cell.attr("y"), String(i * CELL_HEIGHT), "Cell y coord is correct");
+        assert.strictEqual(cell.attr("width"), String(CELL_WIDTH), "Cell width is correct");
+        assert.strictEqual(cell.attr("height"), String(CELL_HEIGHT), "Cell height is correct");
       }
       svg.remove();
     });

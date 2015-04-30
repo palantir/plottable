@@ -85,10 +85,10 @@ var TestMethods;
     TestMethods.assertPointsClose = assertPointsClose;
     ;
     function assertWidthHeight(el, widthExpected, heightExpected, message) {
-        var width = +el.attr("width");
-        var height = +el.attr("height");
-        assert.strictEqual(width, widthExpected, "width: " + message);
-        assert.strictEqual(height, heightExpected, "height: " + message);
+        var width = el.attr("width");
+        var height = el.attr("height");
+        assert.strictEqual(width, String(widthExpected), "width: " + message);
+        assert.strictEqual(height, String(heightExpected), "height: " + message);
     }
     TestMethods.assertWidthHeight = assertWidthHeight;
     function makeLinearSeries(n) {
@@ -772,11 +772,11 @@ describe("TimeAxis", function () {
         scale.domain(["2010", "2014"]);
         axis.renderTo(svg);
         var firstTick = d3.select(".tick-mark");
-        assert.strictEqual(+firstTick.attr("x1"), 0, "xPos (x1) of first end tick is at the beginning of the axis container");
-        assert.strictEqual(+firstTick.attr("x2"), 0, "xPos (x2) of first end tick is at the beginning of the axis container");
+        assert.strictEqual(firstTick.attr("x1"), "0", "xPos (x1) of first end tick is at the beginning of the axis container");
+        assert.strictEqual(firstTick.attr("x2"), "0", "xPos (x2) of first end tick is at the beginning of the axis container");
         var lastTick = d3.select(d3.selectAll(".tick-mark")[0].pop());
-        assert.strictEqual(+lastTick.attr("x1"), width, "xPos (x1) of last end tick is at the end of the axis container");
-        assert.strictEqual(+lastTick.attr("x2"), width, "xPos (x2) of last end tick is at the end of the axis container");
+        assert.strictEqual(lastTick.attr("x1"), String(width), "xPos (x1) of last end tick is at the end of the axis container");
+        assert.strictEqual(lastTick.attr("x2"), String(width), "xPos (x2) of last end tick is at the end of the axis container");
         svg.remove();
     });
     it("adds a class corresponding to the end-tick for the first and last ticks", function () {
@@ -4126,10 +4126,10 @@ describe("Plots", function () {
             assert.strictEqual(cells.length, data.length);
             for (var i = 0; i < cells.length; i++) {
                 var cell = d3.select(cells[i]);
-                assert.strictEqual(+cell.attr("x"), i * CELL_WIDTH, "Cell x coord is correct");
-                assert.strictEqual(+cell.attr("y"), i * CELL_HEIGHT, "Cell y coord is correct");
-                assert.strictEqual(+cell.attr("width"), CELL_WIDTH, "Cell width is correct");
-                assert.strictEqual(+cell.attr("height"), CELL_HEIGHT, "Cell height is correct");
+                assert.strictEqual(cell.attr("x"), String(i * CELL_WIDTH), "Cell x coord is correct");
+                assert.strictEqual(cell.attr("y"), String(i * CELL_HEIGHT), "Cell y coord is correct");
+                assert.strictEqual(cell.attr("width"), String(CELL_WIDTH), "Cell width is correct");
+                assert.strictEqual(cell.attr("height"), String(CELL_HEIGHT), "Cell height is correct");
             }
             svg.remove();
         });
@@ -6566,8 +6566,8 @@ describe("Component behavior", function () {
         var normalizeClipPath = function (s) { return s.replace(/"/g, ""); };
         assert.isTrue(normalizeClipPath(c._element.attr("clip-path")) === expectedClipPathURL, "the element has clip-path url attached");
         var clipRect = c._boxContainer.select(".clip-rect");
-        assert.strictEqual(+clipRect.attr("width"), 100, "the clipRect has an appropriate width");
-        assert.strictEqual(+clipRect.attr("height"), 100, "the clipRect has an appropriate height");
+        assert.strictEqual(clipRect.attr("width"), "100", "the clipRect has an appropriate width");
+        assert.strictEqual(clipRect.attr("height"), "100", "the clipRect has an appropriate height");
         svg.remove();
     });
     it("componentID works as expected", function () {

@@ -210,8 +210,8 @@ describe("Component behavior", () => {
     assert.isTrue(normalizeClipPath((<any> c)._element.attr("clip-path")) === expectedClipPathURL,
                   "the element has clip-path url attached");
     var clipRect = (<any> c)._boxContainer.select(".clip-rect");
-    assert.strictEqual(+clipRect.attr("width"), 100, "the clipRect has an appropriate width");
-    assert.strictEqual(+clipRect.attr("height"), 100, "the clipRect has an appropriate height");
+    assert.strictEqual(clipRect.attr("width"), "100", "the clipRect has an appropriate width");
+    assert.strictEqual(clipRect.attr("height"), "100", "the clipRect has an appropriate height");
     svg.remove();
   });
 

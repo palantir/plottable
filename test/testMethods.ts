@@ -89,10 +89,10 @@ module TestMethods {
   };
 
   export function assertWidthHeight(el: D3.Selection, widthExpected: number, heightExpected: number, message: string) {
-    var width = +el.attr("width");
-    var height = +el.attr("height");
-    assert.strictEqual(width, widthExpected, "width: " + message);
-    assert.strictEqual(height, heightExpected, "height: " + message);
+    var width = el.attr("width");
+    var height = el.attr("height");
+    assert.strictEqual(width, String(widthExpected), "width: " + message);
+    assert.strictEqual(height, String(heightExpected), "height: " + message);
   }
 
   export function makeLinearSeries(n: number): { x: number; y: number }[] {
