@@ -6556,37 +6556,6 @@ describe("Component behavior", function () {
         });
         svg.remove();
     });
-    it("hitboxes are created iff there are registered interactions that require hitboxes", function () {
-        function verifyHitbox(component) {
-            var hitBox = component._hitBox;
-            assert.isNotNull(hitBox, "the hitbox was created");
-            var hitBoxFill = hitBox.style("fill");
-            var hitBoxFilled = hitBoxFill === "#ffffff" || hitBoxFill === "rgb(255, 255, 255)";
-            assert.isTrue(hitBoxFilled, hitBoxFill + " <- this should be filled, so the hitbox will detect events");
-            assert.equal(hitBox.style("opacity"), "0", "the hitBox is transparent, otherwise it would look weird");
-        }
-        c._anchor(svg);
-        assert.isUndefined(c._hitBox, "no hitBox was created when there were no registered interactions");
-        svg.remove();
-        svg = generateSVG();
-        // registration before anchoring
-        c = new Plottable.Component();
-        var i = new Plottable.Interaction();
-        i._requiresHitbox = function () { return true; };
-        c.registerInteraction(i);
-        c._anchor(svg);
-        verifyHitbox(c);
-        svg.remove();
-        svg = generateSVG();
-        // registration after anchoring
-        c = new Plottable.Component();
-        c._anchor(svg);
-        i = new Plottable.Interaction();
-        i._requiresHitbox = function () { return true; };
-        c.registerInteraction(i);
-        verifyHitbox(c);
-        svg.remove();
-    });
     it("errors are thrown on bad alignments", function () {
         assert.throws(function () { return c.xAlign("foo"); }, Error, "Unsupported alignment");
         assert.throws(function () { return c.yAlign("foo"); }, Error, "Unsupported alignment");

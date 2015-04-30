@@ -12,8 +12,8 @@ export module Interactions {
     private _dragCallback: (start: Point, end: Point) => any;
     private _dragEndCallback: (start: Point, end: Point) => any;
 
-    public _anchor(component: Component, hitBox: D3.Selection) {
-      super._anchor(component, hitBox);
+    public _anchor(component: Component) {
+      super._anchor(component);
       this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(<SVGElement> this._componentToListenTo.content().node());
       this._mouseDispatcher.onMouseDown("Interactions.Drag" + this.getID(),
         (p: Point, e: MouseEvent) => this._startDrag(p, e));

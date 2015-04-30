@@ -19,7 +19,6 @@ module Plottable {
     protected _isSetup = false;
     protected _isAnchored = false;
 
-    private _hitBox: D3.Selection;
     private _interactionsToRegister: Interaction[] = [];
     private _boxes: D3.Selection[] = [];
     private _boxContainer: D3.Selection;
@@ -348,11 +347,7 @@ module Plottable {
       // pushed to this._interactionsToRegister and registered during anchoring. If after, they are
       // registered immediately
       if (this._element) {
-        if (!this._hitBox && interaction._requiresHitbox()) {
-            this._hitBox = this._addBox("hit-box");
-            this._hitBox.style("fill", "#ffffff").style("opacity", 0); // We need to set these so Chrome will register events
-        }
-        interaction._anchor(this, this._hitBox);
+        interaction._anchor(this);
       } else {
         this._interactionsToRegister.push(interaction);
       }
@@ -592,18 +587,6 @@ module Plottable {
      */
     public background(): D3.Selection {
       return this._backgroundContainer;
-    }
-
-    /**
-     * Returns the hitbox selection for the component
-     * (A selection in front of the foreground used mainly for interactions)
-     *
-     * Will return undefined if the component has not been anchored
-     *
-     * @return {D3.Selection} hitbox selection for the component
-     */
-    public hitBox(): D3.Selection {
-      return this._hitBox;
     }
   }
 }

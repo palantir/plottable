@@ -1810,15 +1810,6 @@ declare module Plottable {
          * @return {D3.Selection} background selection for the Component
          */
         background(): D3.Selection;
-        /**
-         * Returns the hitbox selection for the component
-         * (A selection in front of the foreground used mainly for interactions)
-         *
-         * Will return undefined if the component has not been anchored
-         *
-         * @return {D3.Selection} hitbox selection for the component
-         */
-        hitBox(): D3.Selection;
     }
 }
 
@@ -3744,10 +3735,8 @@ declare module Plottable {
          * "foreground" and "background" elements where it can draw things,
          * e.g. crosshairs.
          */
-        protected _hitBox: D3.Selection;
         protected _componentToListenTo: Component;
-        _anchor(component: Component, hitBox: D3.Selection): void;
-        _requiresHitbox(): boolean;
+        _anchor(component: Component): void;
         /**
          * Translates an <svg>-coordinate-space point to Component-space coordinates.
          *
@@ -3771,7 +3760,7 @@ declare module Plottable {
 declare module Plottable {
     module Interactions {
         class Click extends Interaction {
-            _anchor(component: Component, hitBox: D3.Selection): void;
+            _anchor(component: Component): void;
             /**
              * Gets the callback called when the Component is clicked.
              *
@@ -3793,7 +3782,7 @@ declare module Plottable {
 declare module Plottable {
     module Interactions {
         class DoubleClick extends Interaction {
-            _anchor(component: Component, hitBox: D3.Selection): void;
+            _anchor(component: Component): void;
             /**
              * Gets the callback called when the Component is double-clicked.
              *
@@ -3815,7 +3804,7 @@ declare module Plottable {
 declare module Plottable {
     module Interactions {
         class Key extends Interaction {
-            _anchor(component: Component, hitBox: D3.Selection): void;
+            _anchor(component: Component): void;
             /**
              * Sets a callback to be called when the key with the given keyCode is
              * pressed and the user is moused over the Component.
@@ -3833,7 +3822,7 @@ declare module Plottable {
 declare module Plottable {
     module Interactions {
         class Pointer extends Interaction {
-            _anchor(component: Component, hitBox: D3.Selection): void;
+            _anchor(component: Component): void;
             /**
              * Gets the callback called when the pointer enters the Component.
              *
@@ -3896,7 +3885,7 @@ declare module Plottable {
              * @param {QuantitativeScaleScale} [yScale] The Y scale to update on panning/zooming.
              */
             constructor(xScale?: QuantitativeScale<any>, yScale?: QuantitativeScale<any>);
-            _anchor(component: Component, hitBox: D3.Selection): void;
+            _anchor(component: Component): void;
         }
     }
 }
@@ -3905,7 +3894,7 @@ declare module Plottable {
 declare module Plottable {
     module Interactions {
         class Drag extends Interaction {
-            _anchor(component: Component, hitBox: D3.Selection): void;
+            _anchor(component: Component): void;
             /**
              * Returns whether or not this Interactions constrains Points passed to its
              * callbacks to lie inside its Component.
