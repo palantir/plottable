@@ -224,7 +224,7 @@ describe("Plots", () => {
       piePlot.removeDataset("simpleDataset");
       var negativeDataset = new Plottable.Dataset([{value: -5}, {value: 15}]);
       piePlot.addDataset("negativeDataset", negativeDataset);
-      assert.equal(message, "Negative values will not render correctly in a pie chart.");
+      assert.strictEqual(message, "Negative values will not render correctly in a pie chart.");
       Plottable._Util.Methods.warn = oldWarn;
       svg.remove();
     });

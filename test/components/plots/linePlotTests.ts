@@ -93,7 +93,7 @@ describe("Plots", () => {
 
     it("attributes set appropriately from accessor", () => {
       var areaPath = renderArea.select(".line");
-      assert.equal(areaPath.attr("stroke"), "#000000", "stroke set correctly");
+      assert.strictEqual(areaPath.attr("stroke"), "#000000", "stroke set correctly");
       svg.remove();
     });
 
@@ -102,7 +102,7 @@ describe("Plots", () => {
       linePlot.project("stroke", newColorAccessor);
       linePlot.renderTo(svg);
       var linePath = renderArea.select(".line");
-      assert.equal(linePath.attr("stroke"), "pink", "stroke changed correctly");
+      assert.strictEqual(linePath.attr("stroke"), "pink", "stroke changed correctly");
       svg.remove();
     });
 
@@ -112,11 +112,11 @@ describe("Plots", () => {
       simpleDataset.data(data);
       linePlot.project("stroke", "stroke");
       var areaPath = renderArea.select(".line");
-      assert.equal(areaPath.attr("stroke"), "pink", "stroke set to uniform stroke color");
+      assert.strictEqual(areaPath.attr("stroke"), "pink", "stroke set to uniform stroke color");
 
       data[0].stroke = "green";
       simpleDataset.data(data);
-      assert.equal(areaPath.attr("stroke"), "green", "stroke set to first datum stroke color");
+      assert.strictEqual(areaPath.attr("stroke"), "green", "stroke set to first datum stroke color");
       svg.remove();
     });
 

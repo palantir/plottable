@@ -30,8 +30,8 @@ describe("Domainer", () => {
     assert.isNotNull(dd1.toDateString, "padDomain produced dates");
     assert.notEqual(d1.valueOf(), dd1.valueOf(), "date1 changed");
     assert.notEqual(d2.valueOf(), dd2.valueOf(), "date2 changed");
-    assert.equal(dd1.valueOf(), dd1.valueOf(), "date1 is not NaN");
-    assert.equal(dd2.valueOf(), dd2.valueOf(), "date2 is not NaN");
+    assert.strictEqual(dd1.valueOf(), dd1.valueOf(), "date1 is not NaN");
+    assert.strictEqual(dd2.valueOf(), dd2.valueOf(), "date2 is not NaN");
   });
 
   it("pad() works on log scales", () => {

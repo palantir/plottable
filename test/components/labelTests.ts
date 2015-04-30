@@ -18,7 +18,7 @@ describe("Labels", () => {
     var text = content.select("text");
     var bbox = Plottable._Util.DOM.getBBox(text);
     assert.closeTo(bbox.height, label.height(), 0.5, "text height === label.minimumHeight()");
-    assert.equal(text.node().textContent, "A CHART TITLE", "node's text content is as expected");
+    assert.strictEqual(text.node().textContent, "A CHART TITLE", "node's text content is as expected");
     svg.remove();
   });
 
@@ -52,11 +52,11 @@ describe("Labels", () => {
     var svg = TestMethods.generateSVG(400, 80);
     var label = new Plottable.Component.TitleLabel("a");
     label.renderTo(svg);
-    assert.equal((<any> label)._content.select("text").text(), "a", "the text starts at the specified string");
+    assert.strictEqual((<any> label)._content.select("text").text(), "a", "the text starts at the specified string");
     assert.operator(label.height(), ">", 0, "rowMin is > 0 for non-empty string");
     label.text("hello world");
     label.renderTo(svg);
-    assert.equal((<any> label)._content.select("text").text(), "hello world", "the label text updated properly");
+    assert.strictEqual((<any> label)._content.select("text").text(), "hello world", "the label text updated properly");
     assert.operator(label.height(), ">", 0, "rowMin is > 0 for non-empty string");
     svg.remove();
   });
@@ -70,7 +70,7 @@ describe("Labels", () => {
     var content = (<any> label)._content;
     var text = content.select("text");
     var bbox = Plottable._Util.DOM.getBBox(text);
-    assert.equal(bbox.height, label.height(), "text height === label.minimumHeight()");
+    assert.strictEqual(bbox.height, label.height(), "text height === label.minimumHeight()");
     assert.operator(bbox.width, "<=", svgWidth, "the text is not wider than the SVG width");
     svg.remove();
   });
@@ -80,7 +80,7 @@ describe("Labels", () => {
     var label = new Plottable.Component.TitleLabel("Yeah, not gonna fit...");
     label.renderTo(svg);
     var text = (<any> label)._content.select("text");
-    assert.equal(text.text(), "", "text was truncated to empty string");
+    assert.strictEqual(text.text(), "", "text was truncated to empty string");
     svg.remove();
   });
 
@@ -102,7 +102,7 @@ describe("Labels", () => {
     var label = new Plottable.Component.TitleLabel("foo");
     label.renderTo(svg);
     label.text("");
-    assert.equal(label.width(), 0, "width updated to 0");
+    assert.strictEqual(label.width(), 0, "width updated to 0");
     svg.remove();
   });
 

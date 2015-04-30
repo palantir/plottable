@@ -60,12 +60,12 @@ describe("ComponentGroups", () => {
     var cgTranslate = d3.transform((<any> cg)._element.attr("transform")).translate;
     var c1Translate = d3.transform((<any> c1)._element.attr("transform")).translate;
     var c2Translate = d3.transform((<any> c2)._element.attr("transform")).translate;
-    assert.equal(cgTranslate[0], 50, "componentGroup has 50 xOffset");
-    assert.equal(cgTranslate[1], 50, "componentGroup has 50 yOffset");
-    assert.equal(c1Translate[0], 0, "componentGroup has 0 xOffset");
-    assert.equal(c1Translate[1], 0, "componentGroup has 0 yOffset");
-    assert.equal(c2Translate[0], 0, "componentGroup has 0 xOffset");
-    assert.equal(c2Translate[1], 0, "componentGroup has 0 yOffset");
+    assert.strictEqual(cgTranslate[0], 50, "componentGroup has 50 xOffset");
+    assert.strictEqual(cgTranslate[1], 50, "componentGroup has 50 yOffset");
+    assert.strictEqual(c1Translate[0], 0, "componentGroup has 0 xOffset");
+    assert.strictEqual(c1Translate[1], 0, "componentGroup has 0 yOffset");
+    assert.strictEqual(c2Translate[0], 0, "componentGroup has 0 xOffset");
+    assert.strictEqual(c2Translate[1], 0, "componentGroup has 0 yOffset");
     svg.remove();
     });
 
@@ -252,41 +252,41 @@ describe("ComponentGroups", () => {
           var cg: Plottable.Component.Group = c2.above(c1);
           var innerComponents: Plottable.Component.AbstractComponent[] = cg.components();
           assert.lengthOf(innerComponents, 2, "There are two components");
-          assert.equal(innerComponents[0], c1, "first component correct");
-          assert.equal(innerComponents[1], c2, "second component correct");
+          assert.strictEqual(innerComponents[0], c1, "first component correct");
+          assert.strictEqual(innerComponents[1], c2, "second component correct");
         });
 
         it("Component.above works as expected (Component.above ComponentGroup)", () => {
           var cg = new Plottable.Component.Group([c1, c2, c3]);
           var cg2 = c4.above(cg);
-          assert.equal(cg, cg2, "c4.above(cg) returns cg");
+          assert.strictEqual(cg, cg2, "c4.above(cg) returns cg");
           var components: Plottable.Component.AbstractComponent[] = cg.components();
           assert.lengthOf(components, 4, "four components");
-          assert.equal(components[2], c3, "third component in third");
-          assert.equal(components[3], c4, "fourth component is last");
+          assert.strictEqual(components[2], c3, "third component in third");
+          assert.strictEqual(components[3], c4, "fourth component is last");
         });
 
         it("Component.above works as expected (ComponentGroup.above Component)", () => {
           var cg = new Plottable.Component.Group([c2, c3, c4]);
           var cg2 = cg.above(c1);
-          assert.equal(cg, cg2, "cg.merge(c1) returns cg");
+          assert.strictEqual(cg, cg2, "cg.merge(c1) returns cg");
           var components: Plottable.Component.AbstractComponent[] = cg.components();
           assert.lengthOf(components, 4, "there are four components");
-          assert.equal(components[0], c1, "first is first");
-          assert.equal(components[3], c4, "fourth is fourth");
+          assert.strictEqual(components[0], c1, "first is first");
+          assert.strictEqual(components[3], c4, "fourth is fourth");
         });
 
         it("Component.above works as expected (ComponentGroup.above ComponentGroup)", () => {
           var cg1 = new Plottable.Component.Group([c1, c2]);
           var cg2 = new Plottable.Component.Group([c3, c4]);
           var cg = cg1.above(cg2);
-          assert.equal(cg, cg1, "merged == cg1");
+          assert.strictEqual(cg, cg1, "merged == cg1");
           assert.notEqual(cg, cg2, "merged != cg2");
           var components: Plottable.Component.AbstractComponent[] = cg.components();
           assert.lengthOf(components, 3, "there are three inner components");
-          assert.equal(components[0], cg2, "componentGroup2 inside componentGroup1");
-          assert.equal(components[1], c1, "components are inside");
-          assert.equal(components[2], c2, "components are inside");
+          assert.strictEqual(components[0], cg2, "componentGroup2 inside componentGroup1");
+          assert.strictEqual(components[1], c1, "components are inside");
+          assert.strictEqual(components[2], c2, "components are inside");
         });
 
       });
@@ -297,41 +297,41 @@ describe("ComponentGroups", () => {
           var cg: Plottable.Component.Group = c1.below(c2);
           var innerComponents: Plottable.Component.AbstractComponent[] = cg.components();
           assert.lengthOf(innerComponents, 2, "There are two components");
-          assert.equal(innerComponents[0], c1, "first component correct");
-          assert.equal(innerComponents[1], c2, "second component correct");
+          assert.strictEqual(innerComponents[0], c1, "first component correct");
+          assert.strictEqual(innerComponents[1], c2, "second component correct");
         });
 
         it("Component.below works as expected (Component.below ComponentGroup)", () => {
           var cg = new Plottable.Component.Group([c2, c3, c4]);
           var cg2 = c1.below(cg);
-          assert.equal(cg, cg2, "c1.below(cg) returns cg");
+          assert.strictEqual(cg, cg2, "c1.below(cg) returns cg");
           var components: Plottable.Component.AbstractComponent[] = cg.components();
           assert.lengthOf(components, 4, "four components");
-          assert.equal(components[0], c1, "first component in front");
-          assert.equal(components[1], c2, "second component is second");
+          assert.strictEqual(components[0], c1, "first component in front");
+          assert.strictEqual(components[1], c2, "second component is second");
         });
 
         it("Component.below works as expected (ComponentGroup.below Component)", () => {
           var cg = new Plottable.Component.Group([c1, c2, c3]);
           var cg2 = cg.below(c4);
-          assert.equal(cg, cg2, "cg.merge(c4) returns cg");
+          assert.strictEqual(cg, cg2, "cg.merge(c4) returns cg");
           var components: Plottable.Component.AbstractComponent[] = cg.components();
           assert.lengthOf(components, 4, "there are four components");
-          assert.equal(components[0], c1, "first is first");
-          assert.equal(components[3], c4, "fourth is fourth");
+          assert.strictEqual(components[0], c1, "first is first");
+          assert.strictEqual(components[3], c4, "fourth is fourth");
         });
 
         it("Component.below works as expected (ComponentGroup.below ComponentGroup)", () => {
           var cg1 = new Plottable.Component.Group([c1, c2]);
           var cg2 = new Plottable.Component.Group([c3, c4]);
           var cg = cg1.below(cg2);
-          assert.equal(cg, cg1, "merged group == cg1");
+          assert.strictEqual(cg, cg1, "merged group == cg1");
           assert.notEqual(cg, cg2, "merged group != cg2");
           var components: Plottable.Component.AbstractComponent[] = cg.components();
           assert.lengthOf(components, 3, "there are three inner components");
-          assert.equal(components[0], c1, "components are inside");
-          assert.equal(components[1], c2, "components are inside");
-          assert.equal(components[2], cg2, "componentGroup2 inside componentGroup1");
+          assert.strictEqual(components[0], c1, "components are inside");
+          assert.strictEqual(components[1], c2, "components are inside");
+          assert.strictEqual(components[2], cg2, "componentGroup2 inside componentGroup1");
         });
 
       });

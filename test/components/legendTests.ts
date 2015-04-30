@@ -23,12 +23,12 @@ describe("Legend", () => {
     assert.lengthOf(rows[0], color.domain().length, "one entry is created for each item in the domain");
 
     rows.each(function(d: any, i: number) {
-      assert.equal(d, color.domain()[i], "the data is set properly");
+      assert.strictEqual(d, color.domain()[i], "the data is set properly");
       var d3this = d3.select(this);
       var text = d3this.select("text").text();
-      assert.equal(text, d, "the text node has correct text");
+      assert.strictEqual(text, d, "the text node has correct text");
       var symbol = d3this.select("." + Plottable.Component.Legend.LEGEND_SYMBOL_CLASS);
-      assert.equal(symbol.attr("fill"), color.scale(d), "the symbol's fill is set properly");
+      assert.strictEqual(symbol.attr("fill"), color.scale(d), "the symbol's fill is set properly");
     });
     svg.remove();
   });
@@ -36,7 +36,7 @@ describe("Legend", () => {
   it("legend domain can be updated after initialization, and height updates as well", () => {
     legend.renderTo(svg);
     legend.scale(color);
-    assert.equal(legend._requestedSpace(200, 200).height, 10, "there is a padding requested height when domain is empty");
+    assert.strictEqual(legend._requestedSpace(200, 200).height, 10, "there is a padding requested height when domain is empty");
     color.domain(["foo", "bar"]);
     var height1 = legend._requestedSpace(400, 400).height;
     var actualHeight1 = legend.height();
@@ -46,7 +46,7 @@ describe("Legend", () => {
     var actualHeight2 = legend.height();
     assert.operator(actualHeight1, "<", actualHeight2, "Changing the domain caused the legend to re-layout with more height");
     var numRows = (<any> legend)._content.selectAll(rowSelector)[0].length;
-    assert.equal(numRows, 3, "there are 3 rows");
+    assert.strictEqual(numRows, 3, "there are 3 rows");
     svg.remove();
   });
 
@@ -81,10 +81,10 @@ describe("Legend", () => {
     color.domain(["foo", "bar", "baz"]);
     legend.renderTo(svg);
     var numRows = (<any> legend)._content.selectAll(rowSelector)[0].length;
-    assert.equal(numRows, 3, "there are 3 legend rows initially");
+    assert.strictEqual(numRows, 3, "there are 3 legend rows initially");
     legend._render();
     numRows = (<any> legend)._content.selectAll(rowSelector)[0].length;
-    assert.equal(numRows, 3, "there are 3 legend rows after second render");
+    assert.strictEqual(numRows, 3, "there are 3 legend rows after second render");
     svg.remove();
   });
 
@@ -95,11 +95,11 @@ describe("Legend", () => {
     color.domain(newDomain);
 
     (<any> legend)._content.selectAll(entrySelector).each(function(d: any, i: number) {
-      assert.equal(d, newDomain[i], "the data is set correctly");
+      assert.strictEqual(d, newDomain[i], "the data is set correctly");
       var text = d3.select(this).select("text").text();
-      assert.equal(text, d, "the text was set properly");
+      assert.strictEqual(text, d, "the text was set properly");
       var fill = d3.select(this).select("." + Plottable.Component.Legend.LEGEND_SYMBOL_CLASS).attr("fill");
-      assert.equal(fill, color.scale(d), "the fill was set properly");
+      assert.strictEqual(fill, color.scale(d), "the fill was set properly");
     });
     assert.lengthOf((<any> legend)._content.selectAll(rowSelector)[0], 5, "there are the right number of legend elements");
     svg.remove();
@@ -115,11 +115,11 @@ describe("Legend", () => {
     legend.scale(newColorScale);
 
     (<any> legend)._content.selectAll(entrySelector).each(function(d: any, i: number) {
-      assert.equal(d, newDomain[i], "the data is set correctly");
+      assert.strictEqual(d, newDomain[i], "the data is set correctly");
       var text = d3.select(this).select("text").text();
-      assert.equal(text, d, "the text was set properly");
+      assert.strictEqual(text, d, "the text was set properly");
       var fill = d3.select(this).select("." + Plottable.Component.Legend.LEGEND_SYMBOL_CLASS).attr("fill");
-      assert.equal(fill, newColorScale.scale(d), "the fill was set properly");
+      assert.strictEqual(fill, newColorScale.scale(d), "the fill was set properly");
     });
 
     svg.remove();
@@ -137,11 +137,11 @@ describe("Legend", () => {
     var newDomain = ["a", "foo", "d"];
     newColorScale.domain(newDomain);
     (<any> legend)._content.selectAll(entrySelector).each(function(d: any, i: number) {
-      assert.equal(d, newDomain[i], "the data is set correctly");
+      assert.strictEqual(d, newDomain[i], "the data is set correctly");
       var text = d3.select(this).select("text").text();
-      assert.equal(text, d, "the text was set properly");
+      assert.strictEqual(text, d, "the text was set properly");
       var fill = d3.select(this).select("." + Plottable.Component.Legend.LEGEND_SYMBOL_CLASS).attr("fill");
-      assert.equal(fill, newColorScale.scale(d), "the fill was set properly");
+      assert.strictEqual(fill, newColorScale.scale(d), "the fill was set properly");
     });
     svg.remove();
   });

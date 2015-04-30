@@ -7,8 +7,8 @@ function assertComponentXY(component: Plottable.Component.AbstractComponent, x: 
   var translate = d3.transform((<any> component)._element.attr("transform")).translate;
   var xActual = translate[0];
   var yActual = translate[1];
-  assert.equal(xActual, x, "X: " + message);
-  assert.equal(yActual, y, "Y: " + message);
+  assert.strictEqual(xActual, x, "X: " + message);
+  assert.strictEqual(yActual, y, "Y: " + message);
 }
 
 describe("Component behavior", () => {
@@ -24,7 +24,7 @@ describe("Component behavior", () => {
   describe("anchor", () => {
     it("anchoring works as expected", () => {
       c._anchor(svg);
-      assert.equal((<any> c)._element.node(), svg.select("g").node(), "the component anchored to a <g> beneath the <svg>");
+      assert.strictEqual((<any> c)._element.node(), svg.select("g").node(), "the component anchored to a <g> beneath the <svg>");
       assert.isTrue(svg.classed("plottable"), "<svg> was given \"plottable\" CSS class");
       svg.remove();
     });
@@ -34,7 +34,7 @@ describe("Component behavior", () => {
 
       var svg2 = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       c._anchor(svg2);
-      assert.equal((<any> c)._element.node(), svg2.select("g").node(), "the component re-achored under the second <svg>");
+      assert.strictEqual((<any> c)._element.node(), svg2.select("g").node(), "the component re-achored under the second <svg>");
       assert.isTrue(svg2.classed("plottable"), "second <svg> was given \"plottable\" CSS class");
 
       svg.remove();
@@ -46,17 +46,17 @@ describe("Component behavior", () => {
     it("computeLayout defaults and updates intelligently", () => {
       c._anchor(svg);
       c._computeLayout();
-      assert.equal(c.width() , SVG_WIDTH, "computeLayout defaulted width to svg width");
-      assert.equal(c.height(), SVG_HEIGHT, "computeLayout defaulted height to svg height");
-      assert.equal((<any> c)._xOrigin, 0 , "xOrigin defaulted to 0");
-      assert.equal((<any> c)._yOrigin, 0 , "yOrigin defaulted to 0");
+      assert.strictEqual(c.width() , SVG_WIDTH, "computeLayout defaulted width to svg width");
+      assert.strictEqual(c.height(), SVG_HEIGHT, "computeLayout defaulted height to svg height");
+      assert.strictEqual((<any> c)._xOrigin, 0 , "xOrigin defaulted to 0");
+      assert.strictEqual((<any> c)._yOrigin, 0 , "yOrigin defaulted to 0");
 
       svg.attr("width", 2 * SVG_WIDTH).attr("height", 2 * SVG_HEIGHT);
       c._computeLayout();
-      assert.equal(c.width() , 2 * SVG_WIDTH, "computeLayout updated width to new svg width");
-      assert.equal(c.height(), 2 * SVG_HEIGHT, "computeLayout updated height to new svg height");
-      assert.equal((<any> c)._xOrigin, 0 , "xOrigin is still 0");
-      assert.equal((<any> c)._yOrigin, 0 , "yOrigin is still 0");
+      assert.strictEqual(c.width() , 2 * SVG_WIDTH, "computeLayout updated width to new svg width");
+      assert.strictEqual(c.height(), 2 * SVG_HEIGHT, "computeLayout updated height to new svg height");
+      assert.strictEqual((<any> c)._xOrigin, 0 , "xOrigin is still 0");
+      assert.strictEqual((<any> c)._yOrigin, 0 , "yOrigin is still 0");
 
       svg.remove();
     });
@@ -71,27 +71,27 @@ describe("Component behavior", () => {
       svg.attr("width", null).attr("height", null);
       c._anchor(svg);
       c._computeLayout();
-      assert.equal(c.width(), 400, "defaults to width of parent if width is not specified on <svg>");
-      assert.equal(c.height(), 200, "defaults to height of parent if width is not specified on <svg>");
-      assert.equal((<any> c)._xOrigin, 0, "xOrigin defaulted to 0");
-      assert.equal((<any> c)._yOrigin, 0, "yOrigin defaulted to 0");
+      assert.strictEqual(c.width(), 400, "defaults to width of parent if width is not specified on <svg>");
+      assert.strictEqual(c.height(), 200, "defaults to height of parent if width is not specified on <svg>");
+      assert.strictEqual((<any> c)._xOrigin, 0, "xOrigin defaulted to 0");
+      assert.strictEqual((<any> c)._yOrigin, 0, "yOrigin defaulted to 0");
 
       svg.style("width", "50%").style("height", "50%");
       c._computeLayout();
 
-      assert.equal(c.width(), 200, "computeLayout defaulted width to svg width");
-      assert.equal(c.height(), 100, "computeLayout defaulted height to svg height");
-      assert.equal((<any> c)._xOrigin, 0, "xOrigin defaulted to 0");
-      assert.equal((<any> c)._yOrigin, 0, "yOrigin defaulted to 0");
+      assert.strictEqual(c.width(), 200, "computeLayout defaulted width to svg width");
+      assert.strictEqual(c.height(), 100, "computeLayout defaulted height to svg height");
+      assert.strictEqual((<any> c)._xOrigin, 0, "xOrigin defaulted to 0");
+      assert.strictEqual((<any> c)._yOrigin, 0, "yOrigin defaulted to 0");
 
       svg.style("width", "25%").style("height", "25%");
 
       c._computeLayout();
 
-      assert.equal(c.width(), 100, "computeLayout updated width to new svg width");
-      assert.equal(c.height(), 50, "computeLayout updated height to new svg height");
-      assert.equal((<any> c)._xOrigin, 0, "xOrigin is still 0");
-      assert.equal((<any> c)._yOrigin, 0, "yOrigin is still 0");
+      assert.strictEqual(c.width(), 100, "computeLayout updated width to new svg width");
+      assert.strictEqual(c.height(), 50, "computeLayout updated height to new svg height");
+      assert.strictEqual((<any> c)._xOrigin, 0, "xOrigin is still 0");
+      assert.strictEqual((<any> c)._yOrigin, 0, "yOrigin is still 0");
 
       // reset test page DOM
       parent.style("width", "auto");
@@ -120,8 +120,8 @@ describe("Component behavior", () => {
       c._computeLayout(xOff, yOff, width, height);
       var translate = TestMethods.getTranslate((<any> c)._element);
       assert.deepEqual(translate, [xOff, yOff], "the element translated appropriately");
-      assert.equal(c.width() , width, "the width set properly");
-      assert.equal(c.height(), height, "the height set propery");
+      assert.strictEqual(c.width() , width, "the width set properly");
+      assert.strictEqual(c.height(), height, "the height set propery");
       svg.remove();
     });
   });
@@ -184,14 +184,14 @@ describe("Component behavior", () => {
 
   it("component defaults are as expected", () => {
     var layout = c._requestedSpace(1, 1);
-    assert.equal(layout.width, 0, "requested width defaults to 0");
-    assert.equal(layout.height, 0, "requested height defaults to 0");
-    assert.equal(layout.wantsWidth , false, "_requestedSpace().wantsWidth  defaults to false");
-    assert.equal(layout.wantsHeight, false, "_requestedSpace().wantsHeight defaults to false");
-    assert.equal((<any> c)._xAlignProportion, 0, "_xAlignProportion defaults to 0");
-    assert.equal((<any> c)._yAlignProportion, 0, "_yAlignProportion defaults to 0");
-    assert.equal((<any> c)._xOffset, 0, "xOffset defaults to 0");
-    assert.equal((<any> c)._yOffset, 0, "yOffset defaults to 0");
+    assert.strictEqual(layout.width, 0, "requested width defaults to 0");
+    assert.strictEqual(layout.height, 0, "requested height defaults to 0");
+    assert.strictEqual(layout.wantsWidth , false, "_requestedSpace().wantsWidth  defaults to false");
+    assert.strictEqual(layout.wantsHeight, false, "_requestedSpace().wantsHeight defaults to false");
+    assert.strictEqual((<any> c)._xAlignProportion, 0, "_xAlignProportion defaults to 0");
+    assert.strictEqual((<any> c)._yAlignProportion, 0, "_yAlignProportion defaults to 0");
+    assert.strictEqual((<any> c)._xOffset, 0, "xOffset defaults to 0");
+    assert.strictEqual((<any> c)._yOffset, 0, "yOffset defaults to 0");
     svg.remove();
   });
 
@@ -210,17 +210,17 @@ describe("Component behavior", () => {
     assert.isTrue(normalizeClipPath((<any> c)._element.attr("clip-path")) === expectedClipPathURL,
                   "the element has clip-path url attached");
     var clipRect = (<any> c)._boxContainer.select(".clip-rect");
-    assert.equal(clipRect.attr("width"), 100, "the clipRect has an appropriate width");
-    assert.equal(clipRect.attr("height"), 100, "the clipRect has an appropriate height");
+    assert.strictEqual(clipRect.attr("width"), "100", "the clipRect has an appropriate width");
+    assert.strictEqual(clipRect.attr("height"), "100", "the clipRect has an appropriate height");
     svg.remove();
   });
 
   it("componentID works as expected", () => {
     var expectedID = (<any> Plottable.Core.PlottableObject)._nextID;
     var c1 = new Plottable.Component.AbstractComponent();
-    assert.equal(c1.getID(), expectedID, "component id on next component was as expected");
+    assert.strictEqual(c1.getID(), expectedID, "component id on next component was as expected");
     var c2 = new Plottable.Component.AbstractComponent();
-    assert.equal(c2.getID(), expectedID + 1, "future components increment appropriately");
+    assert.strictEqual(c2.getID(), expectedID + 1, "future components increment appropriately");
     svg.remove();
   });
 
@@ -236,8 +236,8 @@ describe("Component behavior", () => {
       var box = boxContainer.select(s);
       assert.isNotNull(box.node(), s + " box was created and placed inside boxContainer");
       var bb = Plottable._Util.DOM.getBBox(box);
-      assert.equal(bb.width, SVG_WIDTH, s + " width as expected");
-      assert.equal(bb.height, SVG_HEIGHT, s + " height as expected");
+      assert.strictEqual(bb.width, SVG_WIDTH, s + " width as expected");
+      assert.strictEqual(bb.height, SVG_HEIGHT, s + " height as expected");
     });
     svg.remove();
   });
@@ -249,7 +249,7 @@ describe("Component behavior", () => {
       var hitBoxFill = hitBox.style("fill");
       var hitBoxFilled = hitBoxFill === "#ffffff" || hitBoxFill === "rgb(255, 255, 255)";
       assert.isTrue(hitBoxFilled, hitBoxFill + " <- this should be filled, so the hitbox will detect events");
-      assert.equal(hitBox.style("opacity"), "0", "the hitBox is transparent, otherwise it would look weird");
+      assert.strictEqual(hitBox.style("opacity"), "0", "the hitBox is transparent, otherwise it would look weird");
     }
 
     c._anchor(svg);
@@ -301,7 +301,7 @@ describe("Component behavior", () => {
     c.classed("CSS-POSTANCHOR", false);
     assert.isFalse(c.classed("CSS-POSTANCHOR"));
     assert.isFalse(c.classed(undefined), "returns false when classed called w/ undefined");
-    assert.equal(c.classed(undefined, true), c, "returns this when classed called w/ undefined and true");
+    assert.strictEqual(c.classed(undefined, true), c, "returns this when classed called w/ undefined and true");
     svg.remove();
   });
 
@@ -330,12 +330,12 @@ describe("Component behavior", () => {
     var c = TestMethods.makeFixedSizeComponent(10, 10);
     cg._addComponent(c);
     cg.renderTo(svg);
-    assert.equal(cg.height(), 300, "height() is the entire available height");
-    assert.equal(cg.width(), 400, "width() is the entire available width");
+    assert.strictEqual(cg.height(), 300, "height() is the entire available height");
+    assert.strictEqual(cg.width(), 400, "width() is the entire available width");
     TestMethods.fixComponentSize(c, 50, 50);
     c._invalidateLayout();
-    assert.equal(cg.height(), 300, "height() after resizing is the entire available height");
-    assert.equal(cg.width(), 400, "width() after resizing is the entire available width");
+    assert.strictEqual(cg.height(), 300, "height() after resizing is the entire available height");
+    assert.strictEqual(cg.width(), 400, "width() after resizing is the entire available width");
     svg.remove();
   });
 
@@ -420,7 +420,7 @@ describe("Component behavior", () => {
 
     plot.renderTo(svg2);
 
-    assert.equal(plot._parent(), null, "the plot should be outside the group");
+    assert.strictEqual(plot._parent(), null, "the plot should be outside the group");
     assert.strictEqual(plot.height(), SVG_HEIGHT_2, "the plot should occupy the entire space of the second svg");
 
     svg1.remove();
