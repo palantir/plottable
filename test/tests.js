@@ -9269,6 +9269,15 @@ describe("Interactions", function () {
                 assert.deepEqual(yScale.domain(), [-SVG_HEIGHT / 4, SVG_HEIGHT / 4], "yScale pans to the correct domain via drag (mouse)");
                 svg.remove();
             });
+            it("dragging to outside the component will translate the scale correctly (mouse)", function () {
+                var startPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 4 };
+                var endPoint = { x: -SVG_WIDTH / 2, y: SVG_HEIGHT / 4 };
+                triggerFakeMouseEvent("mousedown", eventTarget, startPoint.x, startPoint.y);
+                triggerFakeMouseEvent("mousemove", eventTarget, endPoint.x, endPoint.y);
+                triggerFakeMouseEvent("mouseend", eventTarget, endPoint.x, endPoint.y);
+                assert.deepEqual(xScale.domain(), [SVG_WIDTH / 2, SVG_WIDTH], "xScale pans to the correct domain via drag (mouse)");
+                svg.remove();
+            });
             it("dragging a certain amount will translate the scale correctly (touch)", function () {
                 // HACKHACK PhantomJS doesn't implement fake creation of WheelEvents
                 // https://github.com/ariya/phantomjs/issues/11289
@@ -9291,7 +9300,7 @@ describe("Interactions", function () {
                 triggerFakeTouchEvent("touchstart", eventTarget, [startPoint]);
                 triggerFakeTouchEvent("touchmove", eventTarget, [endPoint]);
                 triggerFakeTouchEvent("touchend", eventTarget, [endPoint]);
-                assert.deepEqual(xScale.domain(), [SVG_WIDTH / 2, SVG_WIDTH], "xScale pans to the correct domain via drag (mouse)");
+                assert.deepEqual(xScale.domain(), [SVG_WIDTH / 2, SVG_WIDTH], "xScale pans to the correct domain via drag (touch)");
                 svg.remove();
             });
         });
