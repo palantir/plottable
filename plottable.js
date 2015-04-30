@@ -5028,31 +5028,6 @@ var Plottable;
                     return this;
                 }
             };
-            Numeric.prototype.showEndTickLabel = function (orientation, show) {
-                if ((this._isHorizontal() && orientation === "left") || (!this._isHorizontal() && orientation === "bottom")) {
-                    if (show === undefined) {
-                        return this._showFirstTickLabel;
-                    }
-                    else {
-                        this._showFirstTickLabel = show;
-                        this._render();
-                        return this;
-                    }
-                }
-                else if ((this._isHorizontal() && orientation === "right") || (!this._isHorizontal() && orientation === "top")) {
-                    if (show === undefined) {
-                        return this._showLastTickLabel;
-                    }
-                    else {
-                        this._showLastTickLabel = show;
-                        this._render();
-                        return this;
-                    }
-                }
-                else {
-                    throw new Error("Attempt to show " + orientation + " tick label on a " + (this._isHorizontal() ? "horizontal" : "vertical") + " axis");
-                }
-            };
             Numeric.prototype._hideEndTickLabels = function () {
                 var boundingBox = this._boundingBox.node().getBoundingClientRect();
                 var tickLabels = this._tickLabelContainer.selectAll("." + Plottable.Axis.TICK_LABEL_CLASS);
