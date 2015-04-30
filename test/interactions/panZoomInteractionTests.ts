@@ -42,12 +42,13 @@ describe("Interactions", () => {
       });
 
       it("dragging to outside the component will translate the scale correctly (mouse)", () => {
-        var startPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 4 };
-        var endPoint = { x: -SVG_WIDTH / 2, y: SVG_HEIGHT / 4 };
+        var startPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
+        var endPoint = { x: -SVG_WIDTH / 2, y: -SVG_HEIGHT / 2 };
         triggerFakeMouseEvent("mousedown", eventTarget, startPoint.x, startPoint.y);
         triggerFakeMouseEvent("mousemove", eventTarget, endPoint.x, endPoint.y);
         triggerFakeMouseEvent("mouseend", eventTarget, endPoint.x, endPoint.y);
         assert.deepEqual(xScale.domain(), [SVG_WIDTH / 2, SVG_WIDTH], "xScale pans to the correct domain via drag (mouse)");
+        assert.deepEqual(yScale.domain(), [SVG_HEIGHT / 2, SVG_HEIGHT], "yScale pans to the correct domain via drag (mouse)");
         svg.remove();
       });
 
@@ -70,12 +71,13 @@ describe("Interactions", () => {
       });
 
       it("dragging to outside the component will translate the scale correctly (touch)", () => {
-        var startPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 4 };
-        var endPoint = { x: -SVG_WIDTH / 2, y: SVG_HEIGHT / 4 };
+        var startPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
+        var endPoint = { x: -SVG_WIDTH / 2, y: -SVG_HEIGHT / 2 };
         triggerFakeTouchEvent("touchstart", eventTarget, [startPoint]);
         triggerFakeTouchEvent("touchmove", eventTarget, [endPoint]);
         triggerFakeTouchEvent("touchend", eventTarget, [endPoint]);
         assert.deepEqual(xScale.domain(), [SVG_WIDTH / 2, SVG_WIDTH], "xScale pans to the correct domain via drag (touch)");
+        assert.deepEqual(yScale.domain(), [SVG_HEIGHT / 2, SVG_HEIGHT], "yScale pans to the correct domain via drag (touch)");
         svg.remove();
       });
 
