@@ -1648,8 +1648,6 @@ declare module Plottable {
             };
             _render(): void;
             _doRender(): void;
-            _useLastCalculatedLayout(): boolean;
-            _useLastCalculatedLayout(useLast: boolean): AbstractComponent;
             _invalidateLayout(): void;
             /**
              * Renders the Component into a given DOM element. The element must be as <svg>.
@@ -1882,8 +1880,6 @@ declare module Plottable {
              */
             detachAll(): AbstractComponentContainer;
             remove(): void;
-            _useLastCalculatedLayout(): boolean;
-            _useLastCalculatedLayout(calculated: boolean): AbstractComponent;
         }
     }
 }
@@ -2170,8 +2166,8 @@ declare module Plottable {
              */
             constructor(scale: Scale.AbstractQuantitative<number>, orientation: string, formatter?: (d: any) => string);
             protected _setup(): void;
-            _computeWidth(): number;
-            _computeHeight(): number;
+            protected _computeWidth(): number;
+            protected _computeHeight(): number;
             protected _getTickValues(): any[];
             protected _rescale(): void;
             _doRender(): void;

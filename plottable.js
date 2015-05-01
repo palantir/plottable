@@ -3335,7 +3335,6 @@ var Plottable;
                 this._yOffset = 0;
                 this._cssClasses = ["component"];
                 this._removed = false;
-                this._usedLastLayout = false;
             }
             /**
              * Attaches the Component as a child of a given a DOM element. Usually only directly invoked on root-level Components.
@@ -3462,17 +3461,7 @@ var Plottable;
             };
             AbstractComponent.prototype._doRender = function () {
             };
-            AbstractComponent.prototype._useLastCalculatedLayout = function (useLast) {
-                if (useLast == null) {
-                    return this._usedLastLayout;
-                }
-                else {
-                    this._usedLastLayout = useLast;
-                    return this;
-                }
-            };
             AbstractComponent.prototype._invalidateLayout = function () {
-                this._useLastCalculatedLayout(false);
                 if (this._isAnchored && this._isSetup) {
                     if (this._isTopLevelComponent) {
                         this._scheduleComputeLayout();
@@ -3961,12 +3950,6 @@ var Plottable;
             AbstractComponentContainer.prototype.remove = function () {
                 _super.prototype.remove.call(this);
                 this.components().slice().forEach(function (c) { return c.remove(); });
-            };
-            AbstractComponentContainer.prototype._useLastCalculatedLayout = function (calculated) {
-                if (calculated != null) {
-                    this.components().slice().forEach(function (c) { return c._useLastCalculatedLayout(calculated); });
-                }
-                return _super.prototype._useLastCalculatedLayout.call(this, calculated);
             };
             return AbstractComponentContainer;
         })(Component.AbstractComponent);
@@ -5622,7 +5605,7 @@ var Plottable;
                 var longestEstimatedRowLength = Plottable._Util.Methods.max(estimatedRowLengths, 0);
                 return {
                     minWidth: this._padding + longestEstimatedRowLength,
-                    minHeight: estimatedLayout.numRowsToDraw * estimatedLayout.textHeight + 2 * this._padding
+                    minHeight: estimatedLayout.rows.length * estimatedLayout.textHeight + 2 * this._padding
                 };
             };
             Legend.prototype._packRows = function (availableWidth, entries, entryLengths) {
@@ -6157,7 +6140,8 @@ var Plottable;
                     this._rows[rowpos][colpos] = null;
                 }
             };
-            Table.prototype._iterateLayout = function (availableWidth, availableHeight) {
+            Table.prototype._iterateLayout = function (availableWidth, availableHeight, isFinalOffer) {
+                if (isFinalOffer === void 0) { isFinalOffer = false; }
                 /*
                  * Given availableWidth and availableHeight, figure out how to allocate it between rows and columns using an iterative algorithm.
                  *
@@ -6199,7 +6183,7 @@ var Plottable;
                 while (true) {
                     var offeredHeights = Plottable._Util.Methods.addArrays(guaranteedHeights, rowProportionalSpace);
                     var offeredWidths = Plottable._Util.Methods.addArrays(guaranteedWidths, colProportionalSpace);
-                    var guarantees = this._determineGuarantees(offeredWidths, offeredHeights);
+                    var guarantees = this._determineGuarantees(offeredWidths, offeredHeights, isFinalOffer);
                     guaranteedWidths = guarantees.guaranteedWidths;
                     guaranteedHeights = guarantees.guaranteedHeights;
                     var wantsWidth = guarantees.wantsWidthArr.some(function (x) { return x; });
@@ -6243,7 +6227,8 @@ var Plottable;
                 rowProportionalSpace = Table._calcProportionalSpace(rowWeights, freeHeight);
                 return { colProportionalSpace: colProportionalSpace, rowProportionalSpace: rowProportionalSpace, guaranteedWidths: guarantees.guaranteedWidths, guaranteedHeights: guarantees.guaranteedHeights, wantsWidth: wantsWidth, wantsHeight: wantsHeight };
             };
-            Table.prototype._determineGuarantees = function (offeredWidths, offeredHeights) {
+            Table.prototype._determineGuarantees = function (offeredWidths, offeredHeights, isFinalOffer) {
+                if (isFinalOffer === void 0) { isFinalOffer = false; }
                 var requestedWidths = Plottable._Util.Methods.createFilledArray(0, this._nCols);
                 var requestedHeights = Plottable._Util.Methods.createFilledArray(0, this._nRows);
                 var columnNeedsWidth = Plottable._Util.Methods.createFilledArray(false, this._nCols);
@@ -6260,9 +6245,9 @@ var Plottable;
                                 minHeight: 0
                             };
                         }
-                        var allocatedWidth = Math.min(spaceRequest.minWidth, offeredWidths[colIndex]);
+                        var allocatedWidth = isFinalOffer ? Math.min(spaceRequest.minWidth, offeredWidths[colIndex]) : spaceRequest.minWidth;
                         requestedWidths[colIndex] = Math.max(requestedWidths[colIndex], allocatedWidth);
-                        var allocatedHeight = Math.min(spaceRequest.minHeight, offeredHeights[rowIndex]);
+                        var allocatedHeight = isFinalOffer ? Math.min(spaceRequest.minHeight, offeredHeights[rowIndex]) : spaceRequest.minHeight;
                         requestedHeights[rowIndex] = Math.max(requestedHeights[rowIndex], allocatedHeight);
                         var componentNeedsWidth = spaceRequest.minWidth > offeredWidths[colIndex];
                         columnNeedsWidth[colIndex] = columnNeedsWidth[colIndex] || componentNeedsWidth;
@@ -6287,8 +6272,12 @@ var Plottable;
             Table.prototype._computeLayout = function (offeredXOrigin, offeredYOrigin, availableWidth, availableHeight) {
                 var _this = this;
                 _super.prototype._computeLayout.call(this, offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
-                var layout = this._useLastCalculatedLayout() ? this._calculatedLayout : this._iterateLayout(this.width(), this.height());
-                this._useLastCalculatedLayout(true);
+                var lastLayoutWidth = d3.sum(this._calculatedLayout.guaranteedWidths);
+                var lastLayoutHeight = d3.sum(this._calculatedLayout.guaranteedHeights);
+                var layout = this._calculatedLayout;
+                if (lastLayoutWidth > this.width() || lastLayoutHeight > this.height()) {
+                    layout = this._iterateLayout(this.width(), this.height(), true);
+                }
                 var childYOrigin = 0;
                 var rowHeights = Plottable._Util.Methods.addArrays(layout.rowProportionalSpace, layout.guaranteedHeights);
                 var colWidths = Plottable._Util.Methods.addArrays(layout.colProportionalSpace, layout.guaranteedWidths);

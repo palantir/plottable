@@ -121,7 +121,7 @@ export module Component {
       }
     }
 
-    private _iterateLayout(availableWidth : number, availableHeight: number): _IterateLayoutResult {
+    private _iterateLayout(availableWidth : number, availableHeight: number, isFinalOffer = false): _IterateLayoutResult {
     /*
      * Given availableWidth and availableHeight, figure out how to allocate it between rows and columns using an iterative algorithm.
      *
@@ -169,7 +169,7 @@ export module Component {
       while (true) {
         var offeredHeights = _Util.Methods.addArrays(guaranteedHeights, rowProportionalSpace);
         var offeredWidths  = _Util.Methods.addArrays(guaranteedWidths,  colProportionalSpace);
-        var guarantees = this._determineGuarantees(offeredWidths, offeredHeights);
+        var guarantees = this._determineGuarantees(offeredWidths, offeredHeights, isFinalOffer);
         guaranteedWidths = guarantees.guaranteedWidths;
         guaranteedHeights = guarantees.guaranteedHeights;
         var wantsWidth  = guarantees.wantsWidthArr .some((x: boolean) => x);
@@ -225,7 +225,7 @@ export module Component {
               wantsHeight         : wantsHeight                 };
     }
 
-    private _determineGuarantees(offeredWidths: number[], offeredHeights: number[]): _LayoutAllocation {
+    private _determineGuarantees(offeredWidths: number[], offeredHeights: number[], isFinalOffer = false): _LayoutAllocation {
       var requestedWidths  = _Util.Methods.createFilledArray(0, this._nCols);
       var requestedHeights = _Util.Methods.createFilledArray(0, this._nRows);
       var columnNeedsWidth  = _Util.Methods.createFilledArray(false, this._nCols);
@@ -243,10 +243,10 @@ export module Component {
             };
           }
 
-          var allocatedWidth = Math.min(spaceRequest.minWidth, offeredWidths[colIndex]);
+          var allocatedWidth = isFinalOffer ? Math.min(spaceRequest.minWidth, offeredWidths[colIndex]) : spaceRequest.minWidth;
           requestedWidths[colIndex] = Math.max(requestedWidths[colIndex], allocatedWidth);
 
-          var allocatedHeight = Math.min(spaceRequest.minHeight, offeredHeights[rowIndex]);
+          var allocatedHeight = isFinalOffer ? Math.min(spaceRequest.minHeight, offeredHeights[rowIndex]) : spaceRequest.minHeight;
           requestedHeights[rowIndex] = Math.max(requestedHeights[rowIndex], allocatedHeight);
 
           var componentNeedsWidth = spaceRequest.minWidth > offeredWidths[colIndex];
@@ -266,7 +266,7 @@ export module Component {
     }
 
     public _requestedSpace(offeredWidth : number, offeredHeight: number): _SpaceRequest {
-      this._calculatedLayout = this._iterateLayout(offeredWidth , offeredHeight);
+      this._calculatedLayout = this._iterateLayout(offeredWidth, offeredHeight);
       return {
         minWidth: d3.sum(this._calculatedLayout.guaranteedWidths),
         minHeight: d3.sum(this._calculatedLayout.guaranteedHeights)
@@ -275,9 +275,12 @@ export module Component {
 
     public _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number) {
       super._computeLayout(offeredXOrigin, offeredYOrigin, availableWidth , availableHeight);
-      var layout = this._useLastCalculatedLayout() ? this._calculatedLayout : this._iterateLayout(this.width(), this.height());
-
-      this._useLastCalculatedLayout(true);
+      var lastLayoutWidth = d3.sum(this._calculatedLayout.guaranteedWidths);
+      var lastLayoutHeight = d3.sum(this._calculatedLayout.guaranteedHeights);
+      var layout = this._calculatedLayout;
+      if (lastLayoutWidth > this.width() || lastLayoutHeight > this.height()) {
+        layout = this._iterateLayout(this.width(), this.height(), true);
+      }
 
       var childYOrigin = 0;
       var rowHeights = _Util.Methods.addArrays(layout.rowProportionalSpace, layout.guaranteedHeights);

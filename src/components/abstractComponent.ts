@@ -32,7 +32,6 @@ export module Component {
     private _yOffset = 0;
     private _cssClasses: string[] = ["component"];
     private _removed = false;
-    private _usedLastLayout = false;
 
     /**
      * Attaches the Component as a child of a given a DOM element. Usually only directly invoked on root-level Components.
@@ -168,19 +167,7 @@ export module Component {
 
     public _doRender() {/* overwrite */}
 
-    public _useLastCalculatedLayout(): boolean;
-    public _useLastCalculatedLayout(useLast: boolean) : AbstractComponent;
-    public _useLastCalculatedLayout(useLast?: boolean) : any {
-      if (useLast == null) {
-        return this._usedLastLayout;
-      } else {
-        this._usedLastLayout = useLast;
-        return this;
-      }
-    }
-
     public _invalidateLayout() {
-      this._useLastCalculatedLayout(false);
       if (this._isAnchored && this._isSetup) {
         if (this._isTopLevelComponent) {
           this._scheduleComputeLayout();

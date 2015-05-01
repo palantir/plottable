@@ -175,7 +175,7 @@ export module Component {
 
       return {
         minWidth : this._padding + longestEstimatedRowLength,
-        minHeight: estimatedLayout.numRowsToDraw * estimatedLayout.textHeight + 2 * this._padding
+        minHeight: estimatedLayout.rows.length * estimatedLayout.textHeight + 2 * this._padding
       };
     }
 
