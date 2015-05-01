@@ -3648,11 +3648,7 @@ var Plottable;
             // pushed to this._interactionsToRegister and registered during anchoring. If after, they are
             // registered immediately
             if (this._element) {
-                if (!this._hitBox && interaction._requiresHitbox()) {
-                    this._hitBox = this._addBox("hit-box");
-                    this._hitBox.style("fill", "#ffffff").style("opacity", 0); // We need to set these so Chrome will register events
-                }
-                interaction._anchor(this, this._hitBox);
+                interaction._anchor(this);
             }
             else {
                 this._interactionsToRegister.push(interaction);
@@ -3863,17 +3859,6 @@ var Plottable;
          */
         Component.prototype.background = function () {
             return this._backgroundContainer;
-        };
-        /**
-         * Returns the hitbox selection for the component
-         * (A selection in front of the foreground used mainly for interactions)
-         *
-         * Will return undefined if the component has not been anchored
-         *
-         * @return {D3.Selection} hitbox selection for the component
-         */
-        Component.prototype.hitBox = function () {
-            return this._hitBox;
         };
         return Component;
     })(Plottable.Core.PlottableObject);
@@ -9341,13 +9326,8 @@ var Plottable;
         function Interaction() {
             _super.apply(this, arguments);
         }
-        Interaction.prototype._anchor = function (component, hitBox) {
+        Interaction.prototype._anchor = function (component) {
             this._componentToListenTo = component;
-            this._hitBox = hitBox;
-        };
-        // HACKHACK: After all Interactions use Dispatchers, we won't need hitboxes at all (#1757)
-        Interaction.prototype._requiresHitbox = function () {
-            return false;
         };
         /**
          * Translates an <svg>-coordinate-space point to Component-space coordinates.
@@ -9395,9 +9375,9 @@ var Plottable;
                 _super.apply(this, arguments);
                 this._clickedDown = false;
             }
-            Click.prototype._anchor = function (component, hitBox) {
+            Click.prototype._anchor = function (component) {
                 var _this = this;
-                _super.prototype._anchor.call(this, component, hitBox);
+                _super.prototype._anchor.call(this, component);
                 this._mouseDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(component.content().node());
                 this._mouseDispatcher.onMouseDown("Interaction.Click" + this.getID(), function (p) { return _this._handleClickDown(p); });
                 this._mouseDispatcher.onMouseUp("Interaction.Click" + this.getID(), function (p) { return _this._handleClickUp(p); });
@@ -9457,9 +9437,9 @@ var Plottable;
                 this._clickState = 0 /* NotClicked */;
                 this._clickedDown = false;
             }
-            DoubleClick.prototype._anchor = function (component, hitBox) {
+            DoubleClick.prototype._anchor = function (component) {
                 var _this = this;
-                _super.prototype._anchor.call(this, component, hitBox);
+                _super.prototype._anchor.call(this, component);
                 this._mouseDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(component.content().node());
                 this._mouseDispatcher.onMouseDown("Interactions.DoubleClick" + this.getID(), function (p) { return _this._handleClickDown(p); });
                 this._mouseDispatcher.onMouseUp("Interactions.DoubleClick" + this.getID(), function (p) { return _this._handleClickUp(p); });
@@ -9534,9 +9514,9 @@ var Plottable;
                 _super.apply(this, arguments);
                 this._keyCode2Callback = {};
             }
-            Key.prototype._anchor = function (component, hitBox) {
+            Key.prototype._anchor = function (component) {
                 var _this = this;
-                _super.prototype._anchor.call(this, component, hitBox);
+                _super.prototype._anchor.call(this, component);
                 this._positionDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(this._componentToListenTo._element.node());
                 this._positionDispatcher.onMouseMove("Interaction.Key" + this.getID(), function (p) { return null; }); // HACKHACK: registering a listener
                 this._keyDispatcher = Plottable.Dispatchers.Key.getDispatcher();
@@ -9583,9 +9563,9 @@ var Plottable;
                 _super.apply(this, arguments);
                 this._overComponent = false;
             }
-            Pointer.prototype._anchor = function (component, hitBox) {
+            Pointer.prototype._anchor = function (component) {
                 var _this = this;
-                _super.prototype._anchor.call(this, component, hitBox);
+                _super.prototype._anchor.call(this, component);
                 this._mouseDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(this._componentToListenTo.content().node());
                 this._mouseDispatcher.onMouseMove("Interaction.Pointer" + this.getID(), function (p) { return _this._handlePointerEvent(p); });
                 this._touchDispatcher = Plottable.Dispatchers.Touch.getDispatcher(this._componentToListenTo.content().node());
@@ -9668,10 +9648,10 @@ var Plottable;
                 this._setupDragInteraction();
                 this._touchIds = d3.map();
             }
-            PanZoom.prototype._anchor = function (component, hitBox) {
+            PanZoom.prototype._anchor = function (component) {
                 var _this = this;
-                _super.prototype._anchor.call(this, component, hitBox);
-                this._dragInteraction._anchor(component, hitBox);
+                _super.prototype._anchor.call(this, component);
+                this._dragInteraction._anchor(component);
                 var mouseDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(this._componentToListenTo.content().node());
                 mouseDispatcher.onWheel("Interaction.PanZoom" + this.getID(), function (p, e) { return _this._handleWheelEvent(p, e); });
                 this._touchDispatcher = Plottable.Dispatchers.Touch.getDispatcher(this._componentToListenTo.content().node());
@@ -9805,9 +9785,9 @@ var Plottable;
                 this._dragging = false;
                 this._constrain = true;
             }
-            Drag.prototype._anchor = function (component, hitBox) {
+            Drag.prototype._anchor = function (component) {
                 var _this = this;
-                _super.prototype._anchor.call(this, component, hitBox);
+                _super.prototype._anchor.call(this, component);
                 this._mouseDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(this._componentToListenTo.content().node());
                 this._mouseDispatcher.onMouseDown("Interactions.Drag" + this.getID(), function (p, e) { return _this._startDrag(p, e); });
                 this._mouseDispatcher.onMouseMove("Interactions.Drag" + this.getID(), function (p, e) { return _this._doDrag(p, e); });

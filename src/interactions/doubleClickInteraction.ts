@@ -12,8 +12,8 @@ export module Interactions {
     private _clickedDown = false;
     private _clickedPoint: Point;
 
-    public _anchor(component: Component, hitBox: D3.Selection) {
-      super._anchor(component, hitBox);
+    public _anchor(component: Component) {
+      super._anchor(component);
 
       this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(<SVGElement> component.content().node());
       this._mouseDispatcher.onMouseDown("Interactions.DoubleClick" + this.getID(), (p: Point) => this._handleClickDown(p));

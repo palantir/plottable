@@ -36,9 +36,9 @@ export module Interactions {
       this._touchIds = d3.map();
     }
 
-    public _anchor(component: Component, hitBox: D3.Selection) {
-      super._anchor(component, hitBox);
-      this._dragInteraction._anchor(component, hitBox);
+    public _anchor(component: Component) {
+      super._anchor(component);
+      this._dragInteraction._anchor(component);
 
       var mouseDispatcher = Dispatchers.Mouse.getDispatcher(<SVGElement> this._componentToListenTo.content().node());
       mouseDispatcher.onWheel("Interaction.PanZoom" + this.getID(), (p: Point, e: WheelEvent) => this._handleWheelEvent(p, e));

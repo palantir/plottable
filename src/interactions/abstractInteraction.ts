@@ -9,17 +9,10 @@ module Plottable {
      * "foreground" and "background" elements where it can draw things,
      * e.g. crosshairs.
      */
-    protected _hitBox: D3.Selection;
     protected _componentToListenTo: Component;
 
-    public _anchor(component: Component, hitBox: D3.Selection) {
+    public _anchor(component: Component) {
       this._componentToListenTo = component;
-      this._hitBox = hitBox;
-    }
-
-    // HACKHACK: After all Interactions use Dispatchers, we won't need hitboxes at all (#1757)
-    public _requiresHitbox() {
-      return false;
     }
 
     /**
