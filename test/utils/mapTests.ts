@@ -2,10 +2,10 @@
 
 var assert = chai.assert;
 
-describe("StrictEqualityAssociativeArray", () => {
+describe("Map", () => {
 
-  it("StrictEqualityAssociativeArray works as expected", () => {
-    var s = new Plottable.Utils.StrictEqualityAssociativeArray();
+  it("Map works as expected", () => {
+    var s = new Plottable.Utils.Map();
     var o1 = {};
     var o2 = {};
     assert.isFalse(s.has(o1));
@@ -29,7 +29,7 @@ describe("StrictEqualityAssociativeArray", () => {
   });
 
   it("Array-level operations (retrieve keys, vals, and map)", () => {
-    var s = new Plottable.Utils.StrictEqualityAssociativeArray();
+    var s = new Plottable.Utils.Map();
     s.set(2, "foo");
     s.set(3, "bar");
     s.set(4, "baz");

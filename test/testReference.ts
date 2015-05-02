@@ -55,7 +55,7 @@
 
 ///<reference path="utils/domUtilsTests.ts" />
 ///<reference path="utils/formattersTests.ts" />
-///<reference path="utils/strictEqualityAssociativeArrayTests.ts" />
+///<reference path="utils/mapTests.ts" />
 ///<reference path="utils/clientToSVGTranslatorTests.ts" />
 ///<reference path="utils/utilsTests.ts" />
 ///<reference path="utils/callbackSetTests.ts" />

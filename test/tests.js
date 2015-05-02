@@ -8153,9 +8153,9 @@ describe("Formatters", function () {
 
 ///<reference path="../testReference.ts" />
 var assert = chai.assert;
-describe("StrictEqualityAssociativeArray", function () {
-    it("StrictEqualityAssociativeArray works as expected", function () {
-        var s = new Plottable.Utils.StrictEqualityAssociativeArray();
+describe("Map", function () {
+    it("Map works as expected", function () {
+        var s = new Plottable.Utils.Map();
         var o1 = {};
         var o2 = {};
         assert.isFalse(s.has(o1));
@@ -8178,7 +8178,7 @@ describe("StrictEqualityAssociativeArray", function () {
         assert.equal(s.get("3"), "ball");
     });
     it("Array-level operations (retrieve keys, vals, and map)", function () {
-        var s = new Plottable.Utils.StrictEqualityAssociativeArray();
+        var s = new Plottable.Utils.Map();
         s.set(2, "foo");
         s.set(3, "bar");
         s.set(4, "baz");

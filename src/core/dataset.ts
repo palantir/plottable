@@ -8,7 +8,7 @@ module Plottable {
   export class Dataset extends Core.PlottableObject {
     private _data: any[];
     private _metadata: any;
-    private _accessor2cachedExtent: Utils.StrictEqualityAssociativeArray;
+    private _accessor2cachedExtent: Utils.Map;
     public broadcaster: Core.Broadcaster<Dataset>;
 
     /**
@@ -25,7 +25,7 @@ module Plottable {
       super();
       this._data = data;
       this._metadata = metadata;
-      this._accessor2cachedExtent = new Utils.StrictEqualityAssociativeArray();
+      this._accessor2cachedExtent = new Utils.Map();
       this.broadcaster = new Core.Broadcaster(this);
     }
 
@@ -47,7 +47,7 @@ module Plottable {
         return this._data;
       } else {
         this._data = data;
-        this._accessor2cachedExtent = new Utils.StrictEqualityAssociativeArray();
+        this._accessor2cachedExtent = new Utils.Map();
         this.broadcaster.broadcast();
         return this;
       }
@@ -72,7 +72,7 @@ module Plottable {
         return this._metadata;
       } else {
         this._metadata = metadata;
-        this._accessor2cachedExtent = new Utils.StrictEqualityAssociativeArray();
+        this._accessor2cachedExtent = new Utils.Map();
         this.broadcaster.broadcast();
         return this;
       }
