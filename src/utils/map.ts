@@ -3,13 +3,11 @@
 module Plottable {
 export module Utils {
   /**
-   * An associative array that can be keyed by anything (inc objects).
-   * Uses pointer equality checks which is why this works.
-   * This power has a price: everything is linear time since it is actually backed by an array...
+   * Shim for the ES6 map (although NaN is not allowed as a key).
    */
-  export class StrictEqualityAssociativeArray {
+  export class Map {
     private _keyValuePairs: any[][] = [];
-
+    
     /**
      * Set a new key/value pair in the store.
      *
@@ -19,7 +17,7 @@ export module Utils {
      */
     public set(key: any, value: any) {
       if (key !== key) {
-        throw new Error("NaN may not be used as a key to the StrictEqualityAssociativeArray");
+        throw new Error("NaN may not be used as a key to Map");
       }
       for (var i = 0; i < this._keyValuePairs.length; i++) {
         if (this._keyValuePairs[i][0] === key) {
