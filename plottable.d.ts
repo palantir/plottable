@@ -176,62 +176,37 @@ declare module Plottable {
 declare module Plottable {
     module Utils {
         /**
-         * An associative array that can be keyed by anything (inc objects).
-         * Uses pointer equality checks which is why this works.
-         * This power has a price: everything is linear time since it is actually backed by an array...
+         * Shim for the ES6 map (although NaN is not allowed as a key).
          */
-        class StrictEqualityAssociativeArray {
+        class Map<K, V> {
             /**
              * Set a new key/value pair in the store.
              *
-             * @param {any} key Key to set in the store
-             * @param {any} value Value to set in the store
              * @return {boolean} True if key already in store, false otherwise
              */
-            set(key: any, value: any): boolean;
+            set(key: K, value: V): boolean;
             /**
              * Get a value from the store, given a key.
              *
-             * @param {any} key Key associated with value to retrieve
-             * @return {any} Value if found, undefined otherwise
+             * @return {V} value if found, undefined otherwise
              */
-            get(key: any): any;
+            get(key: K): V;
             /**
              * Test whether store has a value associated with given key.
              *
              * Will return true if there is a key/value entry,
              * even if the value is explicitly `undefined`.
              *
-             * @param {any} key Key to test for presence of an entry
-             * @return {boolean} Whether there was a matching entry for that key
              */
-            has(key: any): boolean;
+            has(key: K): boolean;
+            values(): V[];
+            keys(): K[];
             /**
-             * Return an array of the values in the key-value store
+             * Delete a key from the key-value store.
              *
-             * @return {any[]} The values in the store
-             */
-            values(): any[];
-            /**
-             * Return an array of keys in the key-value store
-             *
-             * @return {any[]} The keys in the store
-             */
-            keys(): any[];
-            /**
-             * Execute a callback for each entry in the array.
-             *
-             * @param {(key: any, val?: any, index?: number) => any} callback The callback to eecute
-             * @return {any[]} The results of mapping the callback over the entries
-             */
-            map(cb: (key?: any, val?: any, index?: number) => any): any[];
-            /**
-             * Delete a key from the key-value store. Return whether the key was present.
-             *
-             * @param {any} The key to remove
              * @return {boolean} Whether a matching entry was found and removed
              */
-            delete(key: any): boolean;
+            delete(key: K): boolean;
         }
     }
 }
@@ -875,7 +850,7 @@ declare module Plottable {
          */
         constructor(scale: D3.Scale.Scale);
         protected _getAllExtents(): D[][];
-        protected _getExtent(): D[];
+        protected _combinedDomainFromExtents(): D[];
         /**
          * Modifies the domain on the scale so that it includes the extent of all
          * perspectives it depends on. This will normally happen automatically, but
@@ -979,7 +954,7 @@ declare module Plottable {
          * backing the QuantitativeScaleScale.
          */
         constructor(scale: D3.Scale.QuantitativeScale);
-        protected _getExtent(): D[];
+        protected _combinedDomainFromExtents(): D[];
         /**
          * Retrieves the domain value corresponding to a supplied range value.
          *
@@ -1070,7 +1045,7 @@ declare module Plottable {
          * @return {QuantitativeScale} The calling QuantitativeScaleScale.
          */
         domainer(domainer: Domainer): QuantitativeScale<D>;
-        _defaultExtent(): any[];
+        _defaultDomain(): any[];
         /**
          * Gets the tick generator of the QuantitativeScale.
          *
@@ -1214,7 +1189,7 @@ declare module Plottable {
              * @constructor
              */
             constructor(scale?: D3.Scale.OrdinalScale);
-            protected _getExtent(): string[];
+            protected _combinedDomainFromExtents(): string[];
             domain(): string[];
             domain(values: string[]): Category;
             protected _setDomain(values: string[]): void;
@@ -1290,7 +1265,7 @@ declare module Plottable {
              * See https://github.com/mbostock/d3/wiki/Ordinal-Scales#categorical-colors
              */
             constructor(scaleType?: string);
-            protected _getExtent(): string[];
+            protected _combinedDomainFromExtents(): string[];
             scale(value: string): string;
         }
     }

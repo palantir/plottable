@@ -28,7 +28,7 @@ module Plottable {
       return d3.values(this._rendererAttrID2Extent);
     }
 
-    protected _getExtent(): D[] {
+    protected _combinedDomainFromExtents(): D[] {
       return []; // this should be overwritten
     }
 
@@ -49,7 +49,7 @@ module Plottable {
      */
     public autoDomain() {
       this._autoDomainAutomatically = true;
-      this._setDomain(this._getExtent());
+      this._setDomain(this._combinedDomainFromExtents());
       return this;
     }
 
