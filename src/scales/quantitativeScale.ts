@@ -25,7 +25,7 @@ module Plottable {
       super(scale);
     }
 
-    protected _getExtent(): D[] {
+    protected _combinedDomainFromExtents(): D[] {
       return this._domainer.computeDomain(this._getAllExtents(), this);
     }
 
@@ -185,7 +185,7 @@ module Plottable {
       }
     }
 
-    public _defaultExtent(): any[] {
+    public _defaultDomain(): any[] {
       return [0, 1];
     }
 

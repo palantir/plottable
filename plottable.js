@@ -1559,7 +1559,7 @@ var Plottable;
                 domain = this._combineExtents(extents);
             }
             else if (extents.length === 0) {
-                domain = scale._defaultExtent();
+                domain = scale._defaultDomain();
             }
             else {
                 domain = [Plottable.Utils.Methods.min(extents, function (e) { return e[0]; }, 0), Plottable.Utils.Methods.max(extents, function (e) { return e[1]; }, 0)];
@@ -1759,7 +1759,7 @@ var Plottable;
         Scale.prototype._getAllExtents = function () {
             return d3.values(this._rendererAttrID2Extent);
         };
-        Scale.prototype._getExtent = function () {
+        Scale.prototype._combinedDomainFromExtents = function () {
             return []; // this should be overwritten
         };
         /**
@@ -1779,7 +1779,7 @@ var Plottable;
          */
         Scale.prototype.autoDomain = function () {
             this._autoDomainAutomatically = true;
-            this._setDomain(this._getExtent());
+            this._setDomain(this._combinedDomainFromExtents());
             return this;
         };
         Scale.prototype._autoDomainIfAutomaticMode = function () {
@@ -1891,7 +1891,7 @@ var Plottable;
             this._typeCoercer = function (d) { return +d; };
             this._tickGenerator = function (scale) { return scale.getDefaultTicks(); };
         }
-        QuantitativeScale.prototype._getExtent = function () {
+        QuantitativeScale.prototype._combinedDomainFromExtents = function () {
             return this._domainer.computeDomain(this._getAllExtents(), this);
         };
         /**
@@ -1984,7 +1984,7 @@ var Plottable;
                 return this;
             }
         };
-        QuantitativeScale.prototype._defaultExtent = function () {
+        QuantitativeScale.prototype._defaultDomain = function () {
             return [0, 1];
         };
         QuantitativeScale.prototype.tickGenerator = function (generator) {
@@ -2114,7 +2114,7 @@ var Plottable;
                 this._showIntermediateTicks = false;
                 this.base = base;
                 this.pivot = this.base;
-                this.untransformedDomain = this._defaultExtent();
+                this.untransformedDomain = this._defaultDomain();
                 this.numTicks(10);
                 if (base <= 1) {
                     throw new Error("ModifiedLogScale: The base must be > 1");
@@ -2282,7 +2282,7 @@ var Plottable;
                 this._innerPadding = Category._convertToPlottableInnerPadding(d3InnerPadding);
                 this._outerPadding = Category._convertToPlottableOuterPadding(0.5, d3InnerPadding);
             }
-            Category.prototype._getExtent = function () {
+            Category.prototype._combinedDomainFromExtents = function () {
                 var extents = this._getAllExtents();
                 return Plottable.Utils.Methods.uniq(Plottable.Utils.Methods.flatten(extents));
             };
@@ -2415,7 +2415,7 @@ var Plottable;
                 _super.call(this, scale);
             }
             // Duplicated from OrdinalScale._getExtent - should be removed in #388
-            Color.prototype._getExtent = function () {
+            Color.prototype._combinedDomainFromExtents = function () {
                 var extents = this._getAllExtents();
                 var concatenatedExtents = [];
                 extents.forEach(function (e) {

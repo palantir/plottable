@@ -37,7 +37,7 @@ export module Scales {
       super(d3.scale.linear());
       this.base = base;
       this.pivot = this.base;
-      this.untransformedDomain = this._defaultExtent();
+      this.untransformedDomain = this._defaultDomain();
       this.numTicks(10);
       if (base <= 1) {
         throw new Error("ModifiedLogScale: The base must be > 1");

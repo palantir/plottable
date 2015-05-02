@@ -875,7 +875,7 @@ declare module Plottable {
          */
         constructor(scale: D3.Scale.Scale);
         protected _getAllExtents(): D[][];
-        protected _getExtent(): D[];
+        protected _combinedDomainFromExtents(): D[];
         /**
          * Modifies the domain on the scale so that it includes the extent of all
          * perspectives it depends on. This will normally happen automatically, but
@@ -979,7 +979,7 @@ declare module Plottable {
          * backing the QuantitativeScaleScale.
          */
         constructor(scale: D3.Scale.QuantitativeScale);
-        protected _getExtent(): D[];
+        protected _combinedDomainFromExtents(): D[];
         /**
          * Retrieves the domain value corresponding to a supplied range value.
          *
@@ -1070,7 +1070,7 @@ declare module Plottable {
          * @return {QuantitativeScale} The calling QuantitativeScaleScale.
          */
         domainer(domainer: Domainer): QuantitativeScale<D>;
-        _defaultExtent(): any[];
+        _defaultDomain(): any[];
         /**
          * Gets the tick generator of the QuantitativeScale.
          *
@@ -1214,7 +1214,7 @@ declare module Plottable {
              * @constructor
              */
             constructor(scale?: D3.Scale.OrdinalScale);
-            protected _getExtent(): string[];
+            protected _combinedDomainFromExtents(): string[];
             domain(): string[];
             domain(values: string[]): Category;
             protected _setDomain(values: string[]): void;
@@ -1290,7 +1290,7 @@ declare module Plottable {
              * See https://github.com/mbostock/d3/wiki/Ordinal-Scales#categorical-colors
              */
             constructor(scaleType?: string);
-            protected _getExtent(): string[];
+            protected _combinedDomainFromExtents(): string[];
             scale(value: string): string;
         }
     }
