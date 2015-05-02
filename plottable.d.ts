@@ -178,58 +178,35 @@ declare module Plottable {
         /**
          * Shim for the ES6 map (although NaN is not allowed as a key).
          */
-        class Map {
+        class Map<K, V> {
             /**
              * Set a new key/value pair in the store.
              *
-             * @param {any} key Key to set in the store
-             * @param {any} value Value to set in the store
              * @return {boolean} True if key already in store, false otherwise
              */
-            set(key: any, value: any): boolean;
+            set(key: K, value: V): boolean;
             /**
              * Get a value from the store, given a key.
              *
-             * @param {any} key Key associated with value to retrieve
-             * @return {any} Value if found, undefined otherwise
+             * @return {V} value if found, undefined otherwise
              */
-            get(key: any): any;
+            get(key: K): V;
             /**
              * Test whether store has a value associated with given key.
              *
              * Will return true if there is a key/value entry,
              * even if the value is explicitly `undefined`.
              *
-             * @param {any} key Key to test for presence of an entry
-             * @return {boolean} Whether there was a matching entry for that key
              */
-            has(key: any): boolean;
+            has(key: K): boolean;
+            values(): V[];
+            keys(): K[];
             /**
-             * Return an array of the values in the key-value store
+             * Delete a key from the key-value store.
              *
-             * @return {any[]} The values in the store
-             */
-            values(): any[];
-            /**
-             * Return an array of keys in the key-value store
-             *
-             * @return {any[]} The keys in the store
-             */
-            keys(): any[];
-            /**
-             * Execute a callback for each entry in the array.
-             *
-             * @param {(key: any, val?: any, index?: number) => any} callback The callback to eecute
-             * @return {any[]} The results of mapping the callback over the entries
-             */
-            map(cb: (key?: any, val?: any, index?: number) => any): any[];
-            /**
-             * Delete a key from the key-value store. Return whether the key was present.
-             *
-             * @param {any} The key to remove
              * @return {boolean} Whether a matching entry was found and removed
              */
-            delete(key: any): boolean;
+            delete(key: K): boolean;
         }
     }
 }

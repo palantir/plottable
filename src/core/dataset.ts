@@ -8,7 +8,7 @@ module Plottable {
   export class Dataset extends Core.PlottableObject {
     private _data: any[];
     private _metadata: any;
-    private _accessor2cachedExtent: Utils.Map;
+    private _accessor2cachedExtent: Utils.Map<any, any>;
     public broadcaster: Core.Broadcaster<Dataset>;
 
     /**
