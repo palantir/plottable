@@ -500,6 +500,42 @@ var Plottable;
     })(Utils = Plottable.Utils || (Plottable.Utils = {}));
 })(Plottable || (Plottable = {}));
 
+///<reference path="../reference.ts" />
+var Plottable;
+(function (Plottable) {
+    var Utils;
+    (function (Utils) {
+        /**
+         * Shim for ES6 set.
+         * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set
+         */
+        var Set = (function () {
+            function Set() {
+                this._values = [];
+            }
+            Set.prototype.add = function (value) {
+                if (this._values.indexOf(value) === -1) {
+                    this._values.push(value);
+                }
+                return this;
+            };
+            Set.prototype.delete = function (value) {
+                var index = this._values.indexOf(value);
+                if (index !== -1) {
+                    this._values.splice(index, 1);
+                    return true;
+                }
+                return false;
+            };
+            Set.prototype.values = function () {
+                return this._values;
+            };
+            return Set;
+        })();
+        Utils.Set = Set;
+    })(Utils = Plottable.Utils || (Plottable.Utils = {}));
+})(Plottable || (Plottable = {}));
+
 var Plottable;
 (function (Plottable) {
     var Utils;
@@ -675,6 +711,12 @@ var Plottable;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
 var Plottable;
 (function (Plottable) {
     var Utils;
@@ -684,26 +726,11 @@ var Plottable;
          * Each callback exists at most once in the set (based on reference equality).
          * All callbacks should have the same signature.
          */
-        var CallbackSet = (function () {
+        var CallbackSet = (function (_super) {
+            __extends(CallbackSet, _super);
             function CallbackSet() {
-                this._values = [];
+                _super.apply(this, arguments);
             }
-            CallbackSet.prototype.add = function (value) {
-                if (this._values.indexOf(value) === -1) {
-                    this._values.push(value);
-                }
-                return this;
-            };
-            CallbackSet.prototype.remove = function (value) {
-                var index = this._values.indexOf(value);
-                if (index !== -1) {
-                    this._values.splice(index, 1);
-                }
-                return this;
-            };
-            CallbackSet.prototype.values = function () {
-                return this._values;
-            };
             CallbackSet.prototype.callCallbacks = function () {
                 var _this = this;
                 var args = [];
@@ -716,7 +743,7 @@ var Plottable;
                 return this;
             };
             return CallbackSet;
-        })();
+        })(Utils.Set);
         Utils.CallbackSet = CallbackSet;
     })(Utils = Plottable.Utils || (Plottable.Utils = {}));
 })(Plottable || (Plottable = {}));
