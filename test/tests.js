@@ -8245,11 +8245,30 @@ describe("Utils.Methods", function () {
         var strings = ["foo", "bar", "foo", "foo", "baz", "bam"];
         assert.deepEqual(Plottable.Utils.Methods.uniq(strings), ["foo", "bar", "baz", "bam"]);
     });
-    describe("min/max", function () {
+    describe("max() and min()", function () {
         var max = Plottable.Utils.Methods.max;
         var min = Plottable.Utils.Methods.min;
         var today = new Date();
-        it("max/min work as expected", function () {
+        it("return the default value if max or min can't be computed", function () {
+            var minValue = 1;
+            var maxValue = 5;
+            var defaultValue = 3;
+            var goodArray = [
+                [minValue],
+                [maxValue]
+            ];
+            // bad array is technically of type number[][], but subarrays are empty!
+            var badArray = [
+                [],
+                []
+            ];
+            var accessor = function (arr) { return arr[0]; };
+            assert.strictEqual(min(goodArray, accessor, defaultValue), minValue, "min(): minimum value is returned in good case");
+            assert.strictEqual(min(badArray, accessor, defaultValue), defaultValue, "min(): default value is returned in bad case");
+            assert.strictEqual(max(goodArray, accessor, defaultValue), maxValue, "max(): maximum value is returned in good case");
+            assert.strictEqual(max(badArray, accessor, defaultValue), defaultValue, "max(): default value is returned in bad case");
+        });
+        it("max() and min() work on numbers", function () {
             var alist = [1, 2, 3, 4, 5];
             var dbl = function (x) { return x * 2; };
             var dblIndexOffset = function (x, i) { return x * 2 - i; };
@@ -8272,12 +8291,12 @@ describe("Utils.Methods", function () {
             assert.deepEqual(min([], dbl, 5), 5, "min accepts custom default and function");
             assert.deepEqual(min([], numToDate, today), today, "min accepts non-numeric default and function");
         });
-        it("max/min works as expected on non-numeric values (strings)", function () {
+        it("max() and min() work on strings", function () {
             var strings = ["a", "bb", "ccc", "ddd"];
             assert.deepEqual(max(strings, function (s) { return s.length; }, 0), 3, "works on arrays of non-numbers with a function");
             assert.deepEqual(max([], function (s) { return s.length; }, 5), 5, "defaults work even with non-number function type");
         });
-        it("max/min works as expected on non-numeric values (dates)", function () {
+        it("max() and min() work on dates", function () {
             var tomorrow = new Date(today.getTime());
             tomorrow.setDate(today.getDate() + 1);
             var dayAfterTomorrow = new Date(today.getTime());
@@ -8285,8 +8304,8 @@ describe("Utils.Methods", function () {
             var dates = [today, tomorrow, dayAfterTomorrow, null];
             assert.deepEqual(min(dates, dayAfterTomorrow), today, "works on arrays of non-numeric values but comparable");
             assert.deepEqual(max(dates, today), dayAfterTomorrow, "works on arrays of non-number values but comparable");
-            assert.deepEqual(max([null], today), undefined, "returns undefined from array of null values");
-            assert.deepEqual(max([], today), today, "correct default non-numeric value returned");
+            assert.deepEqual(max([null], today), today, "returns default value if passed array of null values");
+            assert.deepEqual(max([], today), today, "returns default value if passed empty");
         });
     });
     it("isNaN works as expected", function () {

@@ -216,34 +216,22 @@ var Plottable;
                 return arrayEq(keysA, keysB) && arrayEq(valuesA, valuesB);
             }
             Methods.objEq = objEq;
-            function max(arr, one, two) {
-                if (arr.length === 0) {
-                    if (typeof (one) !== "function") {
-                        return one;
-                    }
-                    else {
-                        return two;
-                    }
-                }
+            function max(array, firstArg, secondArg) {
+                var accessor = typeof (firstArg) === "function" ? firstArg : null;
+                var defaultValue = accessor == null ? firstArg : secondArg;
                 /* tslint:disable:ban */
-                var acc = typeof (one) === "function" ? one : typeof (two) === "function" ? two : undefined;
-                return acc === undefined ? d3.max(arr) : d3.max(arr, acc);
+                var maxValue = accessor == null ? d3.max(array) : d3.max(array, accessor);
                 /* tslint:enable:ban */
+                return maxValue !== undefined ? maxValue : defaultValue;
             }
             Methods.max = max;
-            function min(arr, one, two) {
-                if (arr.length === 0) {
-                    if (typeof (one) !== "function") {
-                        return one;
-                    }
-                    else {
-                        return two;
-                    }
-                }
+            function min(array, firstArg, secondArg) {
+                var accessor = typeof (firstArg) === "function" ? firstArg : null;
+                var defaultValue = accessor == null ? firstArg : secondArg;
                 /* tslint:disable:ban */
-                var acc = typeof (one) === "function" ? one : typeof (two) === "function" ? two : undefined;
-                return acc === undefined ? d3.min(arr) : d3.min(arr, acc);
+                var minValue = accessor == null ? d3.min(array) : d3.min(array, accessor);
                 /* tslint:enable:ban */
+                return minValue !== undefined ? minValue : defaultValue;
             }
             Methods.min = min;
             /**
