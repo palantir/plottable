@@ -255,8 +255,8 @@ export module Components {
               wantsHeight: this._calculatedLayout.wantsHeight};
     }
 
-    public _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number) {
-      super._computeLayout(offeredXOrigin, offeredYOrigin, availableWidth , availableHeight);
+    public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
+      super.computeLayout(origin, availableWidth, availableHeight);
       var layout = this._useLastCalculatedLayout() ? this._calculatedLayout : this._iterateLayout(this.width(), this.height());
 
       this._useLastCalculatedLayout(true);
@@ -269,12 +269,13 @@ export module Components {
         row.forEach((component: Component, colIndex: number) => {
           // recursively compute layout
           if (component != null) {
-            component._computeLayout(childXOrigin, childYOrigin, colWidths[colIndex], rowHeights[rowIndex]);
+            component.computeLayout({ x: childXOrigin, y: childYOrigin }, colWidths[colIndex], rowHeights[rowIndex]);
           }
           childXOrigin += colWidths[colIndex] + this._colPadding;
         });
         childYOrigin += rowHeights[rowIndex] + this._rowPadding;
       });
+      return this;
     }
 
     /**
@@ -287,7 +288,7 @@ export module Components {
     public padding(rowPadding: number, colPadding: number) {
       this._rowPadding = rowPadding;
       this._colPadding = colPadding;
-      this._invalidateLayout();
+      this.redraw();
       return this;
     }
 
@@ -318,7 +319,7 @@ export module Components {
      */
     public rowWeight(index: number, weight: number) {
       this._rowWeights[index] = weight;
-      this._invalidateLayout();
+      this.redraw();
       return this;
     }
 
@@ -334,7 +335,7 @@ export module Components {
      */
     public colWeight(index: number, weight: number) {
       this._colWeights[index] = weight;
-      this._invalidateLayout();
+      this.redraw();
       return this;
     }
 

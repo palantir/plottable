@@ -181,7 +181,7 @@ export module Axes {
           throw new Error("Unsupported position for tier labels");
         }
         this._tierLabelPositions = newPositions;
-        this._invalidateLayout();
+        this.redraw();
         return this;
       }
     }
@@ -219,7 +219,7 @@ export module Axes {
       }
       this.tierLabelPositions(newLabelPositions);
 
-      this._invalidateLayout();
+      this.redraw();
       return this;
     }
 

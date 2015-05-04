@@ -92,7 +92,7 @@ export module Core {
       if (_animationRequested) {
         // Layout
         var toCompute = d3.values(_componentsNeedingComputeLayout);
-        toCompute.forEach((c) => c._computeLayout());
+        toCompute.forEach((c) => c.computeLayout());
 
         // Top level render.
         // Containers will put their children in the toRender queue

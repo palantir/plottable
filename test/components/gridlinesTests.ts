@@ -18,8 +18,8 @@ describe("Gridlines", () => {
                                           .addComponent(0, 1, gridlines)
                                           .addComponent(1, 1, xAxis);
 
-    basicTable._anchor(svg);
-    basicTable._computeLayout();
+    basicTable.anchor(svg);
+    basicTable.computeLayout();
     xScale.range([0, xAxis.width() ]); // manually set range since we don't have a renderer
     yScale.range([yAxis.height(), 0]);
     basicTable._render();

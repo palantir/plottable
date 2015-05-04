@@ -164,12 +164,12 @@ describe("Legend", () => {
     verifySymbolHeight();
 
     style.text(".plottable .legend text { font-size: 60px; }");
-    legend._computeLayout();
+    legend.computeLayout();
     legend._render();
     verifySymbolHeight();
 
     style.text(".plottable .legend text { font-size: 10px; }");
-    legend._computeLayout();
+    legend.computeLayout();
     legend._render();
     verifySymbolHeight();
 
