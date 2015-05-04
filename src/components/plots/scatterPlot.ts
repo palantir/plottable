@@ -3,7 +3,6 @@
 module Plottable {
 export module Plots {
   export class Scatter<X, Y> extends XYPlot<X, Y> {
-    private _closeDetectionRadius = 5;
     private _defaultFillColor: string;
 
     /**
@@ -63,7 +62,7 @@ export module Plots {
         height: bbox.height
       };
 
-      return Plottable.Utils.Methods.intersectsBBox(xRange, yRange, translatedBbox);
+      return Utils.Methods.intersectsBBox(xRange, yRange, translatedBbox);
     }
   }
 }

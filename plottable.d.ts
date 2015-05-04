@@ -2128,6 +2128,7 @@ declare module Plottable {
     }
 }
 
+
 declare module Plottable {
     module Axes {
         class Numeric extends Axis {

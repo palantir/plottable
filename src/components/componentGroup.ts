@@ -17,7 +17,7 @@ export module Components {
      * @constructor
      * @param {Component[]} components The Components in the resultant Component.Group (default = []).
      */
-    constructor(components: Component[] = []){
+    constructor(components: Component[] = []) {
       super();
       this.classed("component-group", true);
       components.forEach((c: Component) => this._addComponent(c));

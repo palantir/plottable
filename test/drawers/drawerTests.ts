@@ -11,7 +11,6 @@ class MockAnimator implements Plottable.Animators.PlotAnimator {
     return this.time;
   }
 
-
   public animate(selection: any, attrToProjector: Plottable.AttributeToProjector): any {
     if (this.callback) {
       this.callback();
@@ -46,7 +45,7 @@ describe("Drawers", () => {
 
     beforeEach(() => {
       timings = [];
-      svg = generateSVG();
+      svg = TestMethods.generateSVG();
       drawer = new MockDrawer("foo");
       drawer.setup(svg);
     });
@@ -91,7 +90,7 @@ describe("Drawers", () => {
     });
 
     it("_getSelection", () => {
-      var svg = generateSVG(300, 300);
+      var svg = TestMethods.generateSVG(300, 300);
       var drawer = new Plottable.Drawers.AbstractDrawer("test");
       drawer.setup(svg.append("g"));
       (<any> drawer)._getSelector = () => "circle";

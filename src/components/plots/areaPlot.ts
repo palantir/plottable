@@ -6,7 +6,6 @@ export module Plots {
    * An AreaPlot draws a filled region (area) between the plot's projected "y" and projected "y0" values.
    */
   export class Area<X> extends Line<X> {
-    private _areaPath: D3.Selection;
     private _defaultFillColor: string;
 
     /**

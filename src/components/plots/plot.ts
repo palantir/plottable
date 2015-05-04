@@ -299,7 +299,7 @@ module Plottable {
      */
     public animator(animatorKey: string, animator: Animators.PlotAnimator): Plot;
     public animator(animatorKey: string, animator?: Animators.PlotAnimator): any {
-      if (animator === undefined){
+      if (animator === undefined) {
         return this._animators[animatorKey];
       } else {
         this._animators[animatorKey] = animator;

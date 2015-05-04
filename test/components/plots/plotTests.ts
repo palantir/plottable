@@ -19,7 +19,7 @@ describe("Plots", () => {
     });
 
     it("Base Plot functionality works", () => {
-      var svg = generateSVG(400, 300);
+      var svg = TestMethods.generateSVG(400, 300);
       var r = new Plottable.Plot();
       r._anchor(svg);
       r._computeLayout();
@@ -34,25 +34,24 @@ describe("Plots", () => {
       var r = new CountingPlot();
       r.addDataset("foo", dFoo);
 
-      assert.equal(1, r.renders, "initial render due to addDataset");
+      assert.strictEqual(1, r.renders, "initial render due to addDataset");
 
       dFoo.broadcaster.broadcast();
-      assert.equal(2, r.renders, "we re-render when our dataset changes");
-
+      assert.strictEqual(2, r.renders, "we re-render when our dataset changes");
 
       r.addDataset("bar", dBar);
-      assert.equal(3, r.renders, "we should redraw when we add a dataset");
+      assert.strictEqual(3, r.renders, "we should redraw when we add a dataset");
 
       dFoo.broadcaster.broadcast();
-      assert.equal(4, r.renders, "we should still listen to the first dataset");
+      assert.strictEqual(4, r.renders, "we should still listen to the first dataset");
 
       dBar.broadcaster.broadcast();
-      assert.equal(5, r.renders, "we should listen to the new dataset");
+      assert.strictEqual(5, r.renders, "we should listen to the new dataset");
 
       r.removeDataset("foo");
-      assert.equal(6, r.renders, "we re-render on dataset removal");
+      assert.strictEqual(6, r.renders, "we re-render on dataset removal");
       dFoo.broadcaster.broadcast();
-      assert.equal(6, r.renders, "we don't listen to removed datasets");
+      assert.strictEqual(6, r.renders, "we don't listen to removed datasets");
 
     });
 
@@ -70,34 +69,34 @@ describe("Plots", () => {
       r.project("y", "y", yScale);
       r.project("meta", metadataProjector);
       xScale.broadcaster.registerListener("unitTest", (listenable: Plottable.Scales.Linear) => {
-        assert.equal(listenable, xScale, "Callback received the calling scale as the first argument");
+        assert.strictEqual(listenable, xScale, "Callback received the calling scale as the first argument");
         ++xScaleCalls;
       });
       yScale.broadcaster.registerListener("unitTest", (listenable: Plottable.Scales.Linear) => {
-        assert.equal(listenable, yScale, "Callback received the calling scale as the first argument");
+        assert.strictEqual(listenable, yScale, "Callback received the calling scale as the first argument");
         ++yScaleCalls;
       });
 
-      assert.equal(0, xScaleCalls, "initially hasn't made any X callbacks");
-      assert.equal(0, yScaleCalls, "initially hasn't made any Y callbacks");
+      assert.strictEqual(0, xScaleCalls, "initially hasn't made any X callbacks");
+      assert.strictEqual(0, yScaleCalls, "initially hasn't made any Y callbacks");
 
       d1.broadcaster.broadcast();
-      assert.equal(1, xScaleCalls, "X scale was wired up to datasource correctly");
-      assert.equal(1, yScaleCalls, "Y scale was wired up to datasource correctly");
+      assert.strictEqual(1, xScaleCalls, "X scale was wired up to datasource correctly");
+      assert.strictEqual(1, yScaleCalls, "Y scale was wired up to datasource correctly");
 
       var d2 = new Plottable.Dataset([{x: 7, y: 8}], {cssClass: "boo"});
       r.removeDataset("d1");
       r.addDataset(d2);
-      assert.equal(3, xScaleCalls, "Changing datasource fires X scale listeners (but doesn't coalesce callbacks)");
-      assert.equal(3, yScaleCalls, "Changing datasource fires Y scale listeners (but doesn't coalesce callbacks)");
+      assert.strictEqual(3, xScaleCalls, "Changing datasource fires X scale listeners (but doesn't coalesce callbacks)");
+      assert.strictEqual(3, yScaleCalls, "Changing datasource fires Y scale listeners (but doesn't coalesce callbacks)");
 
       d1.broadcaster.broadcast();
-      assert.equal(3, xScaleCalls, "X scale was unhooked from old datasource");
-      assert.equal(3, yScaleCalls, "Y scale was unhooked from old datasource");
+      assert.strictEqual(3, xScaleCalls, "X scale was unhooked from old datasource");
+      assert.strictEqual(3, yScaleCalls, "Y scale was unhooked from old datasource");
 
       d2.broadcaster.broadcast();
-      assert.equal(4, xScaleCalls, "X scale was hooked into new datasource");
-      assert.equal(4, yScaleCalls, "Y scale was hooked into new datasource");
+      assert.strictEqual(4, xScaleCalls, "X scale was hooked into new datasource");
+      assert.strictEqual(4, yScaleCalls, "Y scale was hooked into new datasource");
 
     });
 
@@ -115,23 +114,23 @@ describe("Plots", () => {
       r.project("attr", "a", s);
       var attrToProjector = (<any> r)._generateAttrToProjector();
       var projector = attrToProjector["attr"];
-      assert.equal(projector({"a": 0.5}, 0, null, null), 5, "projector works as intended");
+      assert.strictEqual(projector({"a": 0.5}, 0, null, null), 5, "projector works as intended");
     });
 
     it("Changing Plot.dataset().data to [] causes scale to contract", () => {
       var ds1 = new Plottable.Dataset([0, 1, 2]);
       var ds2 = new Plottable.Dataset([1, 2, 3]);
       var s = new Plottable.Scales.Linear();
-      var svg1 = generateSVG(100, 100);
-      var svg2 = generateSVG(100, 100);
-      var r1 = new Plottable.Plot()
-                    .addDataset(ds1)
-                    .project("x", (x: number) => x, s)
-                    .renderTo(svg1);
-      var r2 = new Plottable.Plot()
-                    .addDataset(ds2)
-                    .project("x", (x: number) => x, s)
-                    .renderTo(svg2);
+      var svg1 = TestMethods.generateSVG(100, 100);
+      var svg2 = TestMethods.generateSVG(100, 100);
+      new Plottable.Plot()
+        .addDataset(ds1)
+        .project("x", (x: number) => x, s)
+        .renderTo(svg1);
+      new Plottable.Plot()
+        .addDataset(ds2)
+        .project("x", (x: number) => x, s)
+        .renderTo(svg2);
       assert.deepEqual(s.domain(), [0, 3], "Simple domain combining");
       ds1.data([]);
       assert.deepEqual(s.domain(), [1, 3], "Contracting domain due to projection becoming empty");
@@ -140,7 +139,7 @@ describe("Plots", () => {
     });
 
     it("getAllSelections() with dataset retrieval", () => {
-      var svg = generateSVG(400, 400);
+      var svg = TestMethods.generateSVG(400, 400);
       var plot = new Plottable.Plot();
 
       // Create mock drawers with already drawn items
@@ -174,20 +173,20 @@ describe("Plots", () => {
 
       var oneSelection = plot.getAllSelections("ds1");
       assert.strictEqual(oneSelection.size(), 1);
-      assert.strictEqual(numAttr(oneSelection, "cx"), 100, "retrieved selection in renderArea1");
+      assert.strictEqual(TestMethods.numAttr(oneSelection, "cx"), 100, "retrieved selection in renderArea1");
 
       var oneElementSelection = plot.getAllSelections(["ds2"]);
       assert.strictEqual(oneElementSelection.size(), 1);
-      assert.strictEqual(numAttr(oneElementSelection, "cy"), 10, "retreived selection in renderArea2");
+      assert.strictEqual(TestMethods.numAttr(oneElementSelection, "cy"), 10, "retreived selection in renderArea2");
 
       var nonExcludedSelection = plot.getAllSelections(["ds1"], true);
       assert.strictEqual(nonExcludedSelection.size(), 1);
-      assert.strictEqual(numAttr(nonExcludedSelection, "cy"), 10, "retreived non-excluded selection in renderArea2");
+      assert.strictEqual(TestMethods.numAttr(nonExcludedSelection, "cy"), 10, "retreived non-excluded selection in renderArea2");
       svg.remove();
     });
 
     it("getAllPlotData() with dataset retrieval", () => {
-      var svg = generateSVG(400, 400);
+      var svg = TestMethods.generateSVG(400, 400);
       var plot = new Plottable.Plot();
 
       var data1 = [{value: 0}, {value: 1}, {value: 2}];
@@ -237,21 +236,21 @@ describe("Plots", () => {
       var singlePlotData = plot.getAllPlotData("ds1");
       var oneSelection = singlePlotData.selection;
       assert.strictEqual(oneSelection.size(), 1);
-      assert.strictEqual(numAttr(oneSelection, "cx"), 100, "retrieved selection in renderArea1");
+      assert.strictEqual(TestMethods.numAttr(oneSelection, "cx"), 100, "retrieved selection in renderArea1");
       assert.includeMembers(singlePlotData.data, data1, "includes data1 members");
       assert.includeMembers(singlePlotData.pixelPoints, data1.map(data1PointConverter), "includes data1 points");
 
       var oneElementPlotData = plot.getAllPlotData(["ds2"]);
       var oneElementSelection = oneElementPlotData.selection;
       assert.strictEqual(oneElementSelection.size(), 1);
-      assert.strictEqual(numAttr(oneElementSelection, "cy"), 10, "retreieved selection in renderArea2");
+      assert.strictEqual(TestMethods.numAttr(oneElementSelection, "cy"), 10, "retreieved selection in renderArea2");
       assert.includeMembers(oneElementPlotData.data, data2, "includes data2 members");
       assert.includeMembers(oneElementPlotData.pixelPoints, data2.map(data2PointConverter), "includes data2 points");
       svg.remove();
     });
 
     it("getAllPlotData() with NaN pixel points", () => {
-      var svg = generateSVG(400, 400);
+      var svg = TestMethods.generateSVG(400, 400);
       var plot = new Plottable.Plot();
 
       var data = [{value: NaN}, {value: 1}, {value: 2}];
@@ -290,7 +289,7 @@ describe("Plots", () => {
     });
 
     it("getClosestPlotData", () => {
-      var svg = generateSVG(400, 400);
+      var svg = TestMethods.generateSVG(400, 400);
       var plot = new Plottable.Plot();
 
       var data1 = [{value: 0}, {value: 1}, {value: 2}];
@@ -378,8 +377,8 @@ describe("Plots", () => {
         plot.addDataset(a1);
         plot.addDataset(a2);
         assert.lengthOf(plot.datasets(), 4, "there are four datasets");
-        assert.equal(plot.datasets()[3].data(), a2, "second array dataset correct");
-        assert.equal(plot.datasets()[2].data(), a1, "first array dataset correct");
+        assert.strictEqual(plot.datasets()[3].data(), a2, "second array dataset correct");
+        assert.strictEqual(plot.datasets()[2].data(), a1, "first array dataset correct");
         plot.removeDataset(a2);
         plot.removeDataset(a1);
         assert.deepEqual(plot.datasets(), [d1, d2], "datasets as expected");
@@ -420,7 +419,7 @@ describe("Plots", () => {
       var id = (d: number) => d;
       var plot1 = new Plottable.Plot();
       var plot2 = new Plottable.Plot();
-      var svg = generateSVG(400, 400);
+      var svg = TestMethods.generateSVG(400, 400);
       plot1.attr("null", id, scale1);
       plot2.attr("null", id, scale1);
       plot1.renderTo(svg);
@@ -461,30 +460,29 @@ describe("Plots", () => {
       };
       (<any> plot)._additionalPaint = additionalPaint;
       plot.animator("bars", animator);
-      var svg = generateSVG();
+      var svg = TestMethods.generateSVG();
       plot.project("x", "x", x);
       plot.project("y", "y", y);
       plot.renderTo(svg);
       svg.remove();
-      assert.equal(recordedTime, 20, "additionalPaint passed appropriate time argument");
+      assert.strictEqual(recordedTime, 20, "additionalPaint passed appropriate time argument");
     });
 
     it("extent calculation done in correct dataset order", () => {
-      var animator = new Plottable.Animators.Base().delay(10).duration(10).maxIterativeDelay(0);
-      var CategoryScale = new Plottable.Scales.Category();
+      var categoryScale = new Plottable.Scales.Category();
       var dataset1 = [{key: "A"}];
       var dataset2 = [{key: "B"}];
       var plot = new Plottable.Plot()
                                    .addDataset("b", dataset2)
                                    .addDataset("a", dataset1);
-      plot.project("key", "key", CategoryScale);
+      plot.project("key", "key", categoryScale);
 
       plot.datasetOrder(["a", "b"]);
 
-      var svg = generateSVG();
+      var svg = TestMethods.generateSVG();
       plot.renderTo(svg);
 
-      assert.deepEqual(CategoryScale.domain(), ["A", "B"], "extent is in the right order");
+      assert.deepEqual(categoryScale.domain(), ["A", "B"], "extent is in the right order");
       svg.remove();
     });
   });
@@ -504,7 +502,7 @@ describe("Plots", () => {
     });
 
     beforeEach(() => {
-      svg = generateSVG(500, 500);
+      svg = TestMethods.generateSVG(500, 500);
       simpleDataset = new Plottable.Dataset([{a: -5, b: 6}, {a: -2, b: 2}, {a: 2, b: -2}, {a: 5, b: -6}], {foo: 0});
       xScale = new Plottable.Scales.Linear();
       yScale = new Plottable.Scales.Linear();

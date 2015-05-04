@@ -146,7 +146,7 @@ export module Scales {
     }
 
     public scale(value: string): number {
-      //scale it to the middle
+      // scale it to the middle
       return super.scale(value) + this.rangeBand() / 2;
     }
   }
