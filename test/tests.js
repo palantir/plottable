@@ -3899,7 +3899,7 @@ describe("Plots", function () {
             });
             it("bar labels render properly", function () {
                 plot.renderTo(svg);
-                plot.barLabelsEnabled(true);
+                plot.labelsEnabled(true);
                 var texts = svg.selectAll("text")[0].map(function (n) { return d3.select(n).text(); });
                 assert.lengthOf(texts, 2, "both texts drawn");
                 assert.equal(texts[0], "640", "first label is 640");
@@ -3907,7 +3907,7 @@ describe("Plots", function () {
                 svg.remove();
             });
             it("bar labels hide if bars too skinny", function () {
-                plot.barLabelsEnabled(true);
+                plot.labelsEnabled(true);
                 plot.renderTo(svg);
                 plot.barLabelFormatter(function (n) { return n.toString() + (n === 12345 ? "looong" : ""); });
                 var texts = svg.selectAll("text")[0].map(function (n) { return d3.select(n).text(); });
@@ -3915,7 +3915,7 @@ describe("Plots", function () {
                 svg.remove();
             });
             it("formatters are used properly", function () {
-                plot.barLabelsEnabled(true);
+                plot.labelsEnabled(true);
                 plot.barLabelFormatter(function (n) { return n.toString() + "%"; });
                 plot.renderTo(svg);
                 var texts = svg.selectAll("text")[0].map(function (n) { return d3.select(n).text(); });
@@ -3925,7 +3925,7 @@ describe("Plots", function () {
                 svg.remove();
             });
             it("bar labels are removed instantly on dataset change", function (done) {
-                plot.barLabelsEnabled(true);
+                plot.labelsEnabled(true);
                 plot.renderTo(svg);
                 var texts = svg.selectAll("text")[0].map(function (n) { return d3.select(n).text(); });
                 assert.lengthOf(texts, 2, "both texts drawn");

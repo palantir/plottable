@@ -3038,14 +3038,14 @@ declare module Plottable {
              *
              * @returns {boolean} Whether bars should display labels or not.
              */
-            barLabelsEnabled(): boolean;
+            labelsEnabled(): boolean;
             /**
              * Set whether bar labels are enabled.
              * @param {boolean} Whether bars should display labels or not.
              *
              * @returns {Bar} The calling plot.
              */
-            barLabelsEnabled(enabled: boolean): Bar<X, Y>;
+            labelsEnabled(enabled: boolean): Bar<X, Y>;
             /**
              * Get the formatter for bar labels.
              *
