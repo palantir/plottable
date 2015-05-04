@@ -79,14 +79,7 @@ module Plottable {
     public remove() {
       super.remove();
       this._datasetKeysInOrder.forEach((k) => this.removeDataset(k));
-      // deregister from all scales
-      var properties = Object.keys(this._projections);
-      properties.forEach((property) => {
-        var projector = this._projections[property];
-        if (projector.scale) {
-          projector.scale.broadcaster.deregisterListener(this);
-        }
-      });
+      this._scales().forEach((scale) => scale.broadcaster.deregisterListener(this));
     }
 
     /**
@@ -191,13 +184,7 @@ module Plottable {
       this._updateExtentsForAttr(attrToSet);
 
       if (previousScale) {
-        var listeningTopreviousScale = false;
-        Object.keys(this._projections).forEach((attr: string) => {
-          if (this._projections[attr].scale === previousScale) {
-            listeningTopreviousScale = true;
-          }
-        });
-        if (!listeningTopreviousScale) {
+        if (this._scales().indexOf(previousScale) !== -1) {
           previousScale.broadcaster.deregisterListener(this);
           previousScale.removeExtentProvider(this._extentProvider);
         }
@@ -272,10 +259,9 @@ module Plottable {
     }
 
     /**
-     * Updates the extents associated with each attribute, then autodomains all scales the Plot uses.
+     * @returns {Scale[]} A unique array of all scales currently used by the Plot.
      */
-    protected _updateExtents() {
-      Object.keys(this._projections).forEach((attr: string) => { this._updateExtentsForAttr(attr); });
+    private _scales() {
       var scales: Scale<any, any>[] = [];
       Object.keys(this._projections).forEach((attr: string) => {
         var scale = this._projections[attr].scale;
@@ -283,7 +269,15 @@ module Plottable {
           scales.push(scale);
         }
       });
-      scales.forEach((scale) => scale._autoDomainIfAutomaticMode());
+      return scales;
+    }
+
+    /**
+     * Updates the extents associated with each attribute, then autodomains all scales the Plot uses.
+     */
+    protected _updateExtents() {
+      Object.keys(this._projections).forEach((attr: string) => { this._updateExtentsForAttr(attr); });
+      this._scales().forEach((scale) => scale._autoDomainIfAutomaticMode());
     }
 
     private _updateExtentsForAttr(attr: string) {

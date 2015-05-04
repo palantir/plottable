@@ -6551,14 +6551,7 @@ var Plottable;
             var _this = this;
             _super.prototype.remove.call(this);
             this._datasetKeysInOrder.forEach(function (k) { return _this.removeDataset(k); });
-            // deregister from all scales
-            var properties = Object.keys(this._projections);
-            properties.forEach(function (property) {
-                var projector = _this._projections[property];
-                if (projector.scale) {
-                    projector.scale.broadcaster.deregisterListener(_this);
-                }
-            });
+            this._scales().forEach(function (scale) { return scale.broadcaster.deregisterListener(_this); });
         };
         Plot.prototype.addDataset = function (keyOrDataset, dataset) {
             if (typeof (keyOrDataset) !== "string" && dataset !== undefined) {
@@ -6645,13 +6638,7 @@ var Plottable;
             this._projections[attrToSet] = { accessor: accessor, scale: scale, attribute: attrToSet };
             this._updateExtentsForAttr(attrToSet);
             if (previousScale) {
-                var listeningTopreviousScale = false;
-                Object.keys(this._projections).forEach(function (attr) {
-                    if (_this._projections[attr].scale === previousScale) {
-                        listeningTopreviousScale = true;
-                    }
-                });
-                if (!listeningTopreviousScale) {
+                if (this._scales().indexOf(previousScale) !== -1) {
                     previousScale.broadcaster.deregisterListener(this);
                     previousScale.removeExtentProvider(this._extentProvider);
                 }
@@ -6720,13 +6707,10 @@ var Plottable;
             return this;
         };
         /**
-         * Updates the extents associated with each attribute, then autodomains all scales the Plot uses.
+         * @returns {Scale[]} A unique array of all scales currently used by the Plot.
          */
-        Plot.prototype._updateExtents = function () {
+        Plot.prototype._scales = function () {
             var _this = this;
-            Object.keys(this._projections).forEach(function (attr) {
-                _this._updateExtentsForAttr(attr);
-            });
             var scales = [];
             Object.keys(this._projections).forEach(function (attr) {
                 var scale = _this._projections[attr].scale;
@@ -6734,7 +6718,17 @@ var Plottable;
                     scales.push(scale);
                 }
             });
-            scales.forEach(function (scale) { return scale._autoDomainIfAutomaticMode(); });
+            return scales;
+        };
+        /**
+         * Updates the extents associated with each attribute, then autodomains all scales the Plot uses.
+         */
+        Plot.prototype._updateExtents = function () {
+            var _this = this;
+            Object.keys(this._projections).forEach(function (attr) {
+                _this._updateExtentsForAttr(attr);
+            });
+            this._scales().forEach(function (scale) { return scale._autoDomainIfAutomaticMode(); });
         };
         Plot.prototype._updateExtentsForAttr = function (attr) {
             var _this = this;
