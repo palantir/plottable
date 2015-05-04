@@ -75,12 +75,12 @@ export module Dispatchers {
      *                                     to remove a callback.
      * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
      */
-    public onMouseMove(key: any, callback: MouseCallback): Dispatchers.Mouse {
+    public onMouseMove(callback: MouseCallback): Dispatchers.Mouse {
       this._setCallback(this._moveCallbackSet, callback);
       return this;
     }
 
-    public offMouseMove(key: any, callback: MouseCallback): Dispatchers.Mouse {
+    public offMouseMove(callback: MouseCallback): Dispatchers.Mouse {
       this._unsetCallback(this._moveCallbackSet, callback);
       return this;
     }
@@ -96,12 +96,12 @@ export module Dispatchers {
      *                                     to remove a callback.
      * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
      */
-    public onMouseDown(key: any, callback: MouseCallback): Dispatchers.Mouse {
+    public onMouseDown(callback: MouseCallback): Dispatchers.Mouse {
       this._setCallback(this._downCallbackSet, callback);
       return this;
     }
 
-    public offMouseDown(key: any, callback: MouseCallback): Dispatchers.Mouse {
+    public offMouseDown(callback: MouseCallback): Dispatchers.Mouse {
       this._unsetCallback(this._downCallbackSet, callback);
       return this;
     }
@@ -117,12 +117,12 @@ export module Dispatchers {
      *                                     to remove a callback.
      * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
      */
-    public onMouseUp(key: any, callback: MouseCallback): Dispatchers.Mouse {
+    public onMouseUp(callback: MouseCallback): Dispatchers.Mouse {
       this._setCallback(this._upCallbackSet, callback);
       return this;
     }
 
-    public offMouseUp(key: any, callback: MouseCallback): Dispatchers.Mouse {
+    public offMouseUp(callback: MouseCallback): Dispatchers.Mouse {
       this._unsetCallback(this._upCallbackSet, callback);
       return this;
     }
@@ -138,12 +138,12 @@ export module Dispatchers {
      *                                     Pass `null` to remove a callback.
      * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
      */
-    public onWheel(key: any, callback: MouseCallback): Dispatchers.Mouse {
+    public onWheel(callback: MouseCallback): Dispatchers.Mouse {
       this._setCallback(this._wheelCallbackSet, callback);
       return this;
     }
 
-    public offWheel(key: any, callback: MouseCallback): Dispatchers.Mouse {
+    public offWheel(callback: MouseCallback): Dispatchers.Mouse {
       this._unsetCallback(this._wheelCallbackSet, callback);
       return this;
     }
@@ -159,12 +159,12 @@ export module Dispatchers {
      *                                     Pass `null` to remove a callback.
      * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
      */
-    public onDblClick(key: any, callback: MouseCallback): Dispatchers.Mouse {
+    public onDblClick(callback: MouseCallback): Dispatchers.Mouse {
       this._setCallback(this._dblClickCallbackSet, callback);
       return this;
     }
 
-    public offDblClick(key: any, callback: MouseCallback): Dispatchers.Mouse {
+    public offDblClick(callback: MouseCallback): Dispatchers.Mouse {
       this._unsetCallback(this._dblClickCallbackSet, callback);
       return this;
     }

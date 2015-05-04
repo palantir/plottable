@@ -42,13 +42,12 @@ describe("Dispatchers", () => {
         assert.isNotNull(e, "TouchEvent was passed to the Dispatcher");
       };
 
-      var keyString = "unit test";
-      td.onTouchStart(keyString, callback);
+      td.onTouchStart(callback);
 
       triggerFakeTouchEvent("touchstart", target, expectedPoints, ids);
       assert.isTrue(callbackWasCalled, "callback was called on touchstart");
 
-      td.offTouchStart(keyString, callback);
+      td.offTouchStart(callback);
       target.remove();
     });
 
@@ -79,13 +78,12 @@ describe("Dispatchers", () => {
         assert.isNotNull(e, "TouchEvent was passed to the Dispatcher");
       };
 
-      var keyString = "unit test";
-      td.onTouchMove(keyString, callback);
+      td.onTouchMove(callback);
 
       triggerFakeTouchEvent("touchmove", target, expectedPoints, ids);
       assert.isTrue(callbackWasCalled, "callback was called on touchmove");
 
-      td.offTouchMove(keyString, callback);
+      td.offTouchMove(callback);
       target.remove();
     });
 
@@ -116,13 +114,12 @@ describe("Dispatchers", () => {
         assert.isNotNull(e, "TouchEvent was passed to the Dispatcher");
       };
 
-      var keyString = "unit test";
-      td.onTouchEnd(keyString, callback);
+      td.onTouchEnd(callback);
 
       triggerFakeTouchEvent("touchend", target, expectedPoints, ids);
       assert.isTrue(callbackWasCalled, "callback was called on touchend");
 
-      td.offTouchEnd(keyString, callback);
+      td.offTouchEnd(callback);
       target.remove();
     });
 
@@ -150,8 +147,7 @@ describe("Dispatchers", () => {
         assert.isNotNull(e, "TouchEvent was passed to the Dispatcher");
       };
 
-      var keyString = "notInDomTest";
-      td.onTouchMove(keyString, callback);
+      td.onTouchMove(callback);
       triggerFakeTouchEvent("touchmove", target, expectedPoints, ids);
       assert.isTrue(callbackWasCalled, "callback was called on touchmove");
 
@@ -160,7 +156,7 @@ describe("Dispatchers", () => {
       triggerFakeTouchEvent("touchmove", target, expectedPoints, ids);
       assert.isFalse(callbackWasCalled, "callback was not called after <svg> was removed from DOM");
 
-      td.offTouchMove(keyString, callback);
+      td.offTouchMove(callback);
     });
   });
 });

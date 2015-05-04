@@ -9015,11 +9015,11 @@ var Plottable;
              *                                     to remove a callback.
              * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
              */
-            Mouse.prototype.onMouseMove = function (key, callback) {
+            Mouse.prototype.onMouseMove = function (callback) {
                 this._setCallback(this._moveCallbackSet, callback);
                 return this;
             };
-            Mouse.prototype.offMouseMove = function (key, callback) {
+            Mouse.prototype.offMouseMove = function (callback) {
                 this._unsetCallback(this._moveCallbackSet, callback);
                 return this;
             };
@@ -9034,11 +9034,11 @@ var Plottable;
              *                                     to remove a callback.
              * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
              */
-            Mouse.prototype.onMouseDown = function (key, callback) {
+            Mouse.prototype.onMouseDown = function (callback) {
                 this._setCallback(this._downCallbackSet, callback);
                 return this;
             };
-            Mouse.prototype.offMouseDown = function (key, callback) {
+            Mouse.prototype.offMouseDown = function (callback) {
                 this._unsetCallback(this._downCallbackSet, callback);
                 return this;
             };
@@ -9053,11 +9053,11 @@ var Plottable;
              *                                     to remove a callback.
              * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
              */
-            Mouse.prototype.onMouseUp = function (key, callback) {
+            Mouse.prototype.onMouseUp = function (callback) {
                 this._setCallback(this._upCallbackSet, callback);
                 return this;
             };
-            Mouse.prototype.offMouseUp = function (key, callback) {
+            Mouse.prototype.offMouseUp = function (callback) {
                 this._unsetCallback(this._upCallbackSet, callback);
                 return this;
             };
@@ -9072,11 +9072,11 @@ var Plottable;
              *                                     Pass `null` to remove a callback.
              * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
              */
-            Mouse.prototype.onWheel = function (key, callback) {
+            Mouse.prototype.onWheel = function (callback) {
                 this._setCallback(this._wheelCallbackSet, callback);
                 return this;
             };
-            Mouse.prototype.offWheel = function (key, callback) {
+            Mouse.prototype.offWheel = function (callback) {
                 this._unsetCallback(this._wheelCallbackSet, callback);
                 return this;
             };
@@ -9091,11 +9091,11 @@ var Plottable;
              *                                     Pass `null` to remove a callback.
              * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
              */
-            Mouse.prototype.onDblClick = function (key, callback) {
+            Mouse.prototype.onDblClick = function (callback) {
                 this._setCallback(this._dblClickCallbackSet, callback);
                 return this;
             };
-            Mouse.prototype.offDblClick = function (key, callback) {
+            Mouse.prototype.offDblClick = function (callback) {
                 this._unsetCallback(this._dblClickCallbackSet, callback);
                 return this;
             };
@@ -9183,11 +9183,11 @@ var Plottable;
              *                                     to remove a callback.
              * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
              */
-            Touch.prototype.onTouchStart = function (key, callback) {
+            Touch.prototype.onTouchStart = function (callback) {
                 this._setCallback(this._startCallbackSet, callback);
                 return this;
             };
-            Touch.prototype.offTouchStart = function (key, callback) {
+            Touch.prototype.offTouchStart = function (callback) {
                 this._unsetCallback(this._startCallbackSet, callback);
                 return this;
             };
@@ -9202,11 +9202,11 @@ var Plottable;
              *                                     to remove a callback.
              * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
              */
-            Touch.prototype.onTouchMove = function (key, callback) {
+            Touch.prototype.onTouchMove = function (callback) {
                 this._setCallback(this._moveCallbackSet, callback);
                 return this;
             };
-            Touch.prototype.offTouchMove = function (key, callback) {
+            Touch.prototype.offTouchMove = function (callback) {
                 this._unsetCallback(this._moveCallbackSet, callback);
                 return this;
             };
@@ -9221,11 +9221,11 @@ var Plottable;
              *                                     to remove a callback.
              * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
              */
-            Touch.prototype.onTouchEnd = function (key, callback) {
+            Touch.prototype.onTouchEnd = function (callback) {
                 this._setCallback(this._endCallbackSet, callback);
                 return this;
             };
-            Touch.prototype.offTouchEnd = function (key, callback) {
+            Touch.prototype.offTouchEnd = function (callback) {
                 this._unsetCallback(this._endCallbackSet, callback);
                 return this;
             };
@@ -9402,11 +9402,11 @@ var Plottable;
                 var _this = this;
                 _super.prototype._anchor.call(this, component, hitBox);
                 this._mouseDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(component.content().node());
-                this._mouseDispatcher.onMouseDown("Interaction.Click" + this.getID(), function (p) { return _this._handleClickDown(p); });
-                this._mouseDispatcher.onMouseUp("Interaction.Click" + this.getID(), function (p) { return _this._handleClickUp(p); });
+                this._mouseDispatcher.onMouseDown(function (p) { return _this._handleClickDown(p); });
+                this._mouseDispatcher.onMouseUp(function (p) { return _this._handleClickUp(p); });
                 this._touchDispatcher = Plottable.Dispatchers.Touch.getDispatcher(component.content().node());
-                this._touchDispatcher.onTouchStart("Interaction.Click" + this.getID(), function (ids, idToPoint) { return _this._handleClickDown(idToPoint[ids[0]]); });
-                this._touchDispatcher.onTouchEnd("Interaction.Click" + this.getID(), function (ids, idToPoint) { return _this._handleClickUp(idToPoint[ids[0]]); });
+                this._touchDispatcher.onTouchStart(function (ids, idToPoint) { return _this._handleClickDown(idToPoint[ids[0]]); });
+                this._touchDispatcher.onTouchEnd(function (ids, idToPoint) { return _this._handleClickUp(idToPoint[ids[0]]); });
             };
             Click.prototype._handleClickDown = function (p) {
                 var translatedPoint = this._translateToComponentSpace(p);
@@ -9463,12 +9463,12 @@ var Plottable;
                 var _this = this;
                 _super.prototype._anchor.call(this, component, hitBox);
                 this._mouseDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(component.content().node());
-                this._mouseDispatcher.onMouseDown("Interactions.DoubleClick" + this.getID(), function (p) { return _this._handleClickDown(p); });
-                this._mouseDispatcher.onMouseUp("Interactions.DoubleClick" + this.getID(), function (p) { return _this._handleClickUp(p); });
-                this._mouseDispatcher.onDblClick("Interactions.DoubleClick" + this.getID(), function (p) { return _this._handleDblClick(); });
+                this._mouseDispatcher.onMouseDown(function (p) { return _this._handleClickDown(p); });
+                this._mouseDispatcher.onMouseUp(function (p) { return _this._handleClickUp(p); });
+                this._mouseDispatcher.onDblClick(function (p) { return _this._handleDblClick(); });
                 this._touchDispatcher = Plottable.Dispatchers.Touch.getDispatcher(component.content().node());
-                this._touchDispatcher.onTouchStart("Interactions.DoubleClick" + this.getID(), function (ids, idToPoint) { return _this._handleClickDown(idToPoint[ids[0]]); });
-                this._touchDispatcher.onTouchEnd("Interactions.DoubleClick" + this.getID(), function (ids, idToPoint) { return _this._handleClickUp(idToPoint[ids[0]]); });
+                this._touchDispatcher.onTouchStart(function (ids, idToPoint) { return _this._handleClickDown(idToPoint[ids[0]]); });
+                this._touchDispatcher.onTouchEnd(function (ids, idToPoint) { return _this._handleClickUp(idToPoint[ids[0]]); });
             };
             DoubleClick.prototype._handleClickDown = function (p) {
                 var translatedP = this._translateToComponentSpace(p);
@@ -9535,7 +9535,7 @@ var Plottable;
                 var _this = this;
                 _super.prototype._anchor.call(this, component, hitBox);
                 this._positionDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(this._componentToListenTo._element.node());
-                this._positionDispatcher.onMouseMove("Interaction.Key" + this.getID(), function (p) { return null; }); // HACKHACK: registering a listener
+                this._positionDispatcher.onMouseMove(function (p) { return null; }); // HACKHACK: registering a listener
                 this._keyDispatcher = Plottable.Dispatchers.Key.getDispatcher();
                 this._keyDispatcher.onKeyDown(function (keyCode) { return _this._handleKeyEvent(keyCode); });
             };
@@ -9584,9 +9584,9 @@ var Plottable;
                 var _this = this;
                 _super.prototype._anchor.call(this, component, hitBox);
                 this._mouseDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(this._componentToListenTo.content().node());
-                this._mouseDispatcher.onMouseMove("Interaction.Pointer" + this.getID(), function (p) { return _this._handlePointerEvent(p); });
+                this._mouseDispatcher.onMouseMove(function (p) { return _this._handlePointerEvent(p); });
                 this._touchDispatcher = Plottable.Dispatchers.Touch.getDispatcher(this._componentToListenTo.content().node());
-                this._touchDispatcher.onTouchStart("Interaction.Pointer" + this.getID(), function (ids, idToPoint) { return _this._handlePointerEvent(idToPoint[ids[0]]); });
+                this._touchDispatcher.onTouchStart(function (ids, idToPoint) { return _this._handlePointerEvent(idToPoint[ids[0]]); });
             };
             Pointer.prototype._handlePointerEvent = function (p) {
                 var translatedP = this._translateToComponentSpace(p);
@@ -9734,13 +9734,13 @@ var Plottable;
                 var _this = this;
                 _super.prototype._anchor.call(this, component, hitBox);
                 this._mouseDispatchers = Plottable.Dispatchers.Mouse.getDispatcher(this._componentToListenTo.content().node());
-                this._mouseDispatchers.onMouseDown("Interactions.Drag" + this.getID(), function (p, e) { return _this._startDrag(p, e); });
-                this._mouseDispatchers.onMouseMove("Interactions.Drag" + this.getID(), function (p, e) { return _this._doDrag(p, e); });
-                this._mouseDispatchers.onMouseUp("Interactions.Drag" + this.getID(), function (p, e) { return _this._endDrag(p, e); });
+                this._mouseDispatchers.onMouseDown(function (p, e) { return _this._startDrag(p, e); });
+                this._mouseDispatchers.onMouseMove(function (p, e) { return _this._doDrag(p, e); });
+                this._mouseDispatchers.onMouseUp(function (p, e) { return _this._endDrag(p, e); });
                 this._touchDispatchers = Plottable.Dispatchers.Touch.getDispatcher(this._componentToListenTo.content().node());
-                this._touchDispatchers.onTouchStart("Interactions.Drag" + this.getID(), function (ids, idToPoint, e) { return _this._startDrag(idToPoint[ids[0]], e); });
-                this._touchDispatchers.onTouchMove("Interactions.Drag" + this.getID(), function (ids, idToPoint, e) { return _this._doDrag(idToPoint[ids[0]], e); });
-                this._touchDispatchers.onTouchEnd("Interactions.Drag" + this.getID(), function (ids, idToPoint, e) { return _this._endDrag(idToPoint[ids[0]], e); });
+                this._touchDispatchers.onTouchStart(function (ids, idToPoint, e) { return _this._startDrag(idToPoint[ids[0]], e); });
+                this._touchDispatchers.onTouchMove(function (ids, idToPoint, e) { return _this._doDrag(idToPoint[ids[0]], e); });
+                this._touchDispatchers.onTouchEnd(function (ids, idToPoint, e) { return _this._endDrag(idToPoint[ids[0]], e); });
             };
             Drag.prototype._translateAndConstrain = function (p) {
                 var translatedP = this._translateToComponentSpace(p);

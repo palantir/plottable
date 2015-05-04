@@ -13,14 +13,12 @@ export module Interactions {
       super._anchor(component, hitBox);
 
       this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(<SVGElement> component.content().node());
-      this._mouseDispatcher.onMouseDown("Interaction.Click" + this.getID(), (p: Point) => this._handleClickDown(p));
-      this._mouseDispatcher.onMouseUp("Interaction.Click" + this.getID(), (p: Point) => this._handleClickUp(p));
+      this._mouseDispatcher.onMouseDown((p: Point) => this._handleClickDown(p));
+      this._mouseDispatcher.onMouseUp((p: Point) => this._handleClickUp(p));
 
       this._touchDispatcher = Dispatchers.Touch.getDispatcher(<SVGElement> component.content().node());
-      this._touchDispatcher.onTouchStart("Interaction.Click" + this.getID(), (ids, idToPoint) =>
-                                                                               this._handleClickDown(idToPoint[ids[0]]));
-      this._touchDispatcher.onTouchEnd("Interaction.Click" + this.getID(), (ids, idToPoint) =>
-                                                                               this._handleClickUp(idToPoint[ids[0]]));
+      this._touchDispatcher.onTouchStart((ids, idToPoint) => this._handleClickDown(idToPoint[ids[0]]));
+      this._touchDispatcher.onTouchEnd((ids, idToPoint) => this._handleClickUp(idToPoint[ids[0]]));
     }
 
     private _handleClickDown(p: Point) {

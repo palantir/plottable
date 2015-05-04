@@ -3559,8 +3559,8 @@ declare module Plottable {
              *                                     to remove a callback.
              * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
              */
-            onMouseMove(key: any, callback: MouseCallback): Dispatchers.Mouse;
-            offMouseMove(key: any, callback: MouseCallback): Dispatchers.Mouse;
+            onMouseMove(callback: MouseCallback): Dispatchers.Mouse;
+            offMouseMove(callback: MouseCallback): Dispatchers.Mouse;
             /**
              * Registers a callback to be called whenever a mousedown occurs,
              * or removes the callback if `null` is passed as the callback.
@@ -3572,8 +3572,8 @@ declare module Plottable {
              *                                     to remove a callback.
              * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
              */
-            onMouseDown(key: any, callback: MouseCallback): Dispatchers.Mouse;
-            offMouseDown(key: any, callback: MouseCallback): Dispatchers.Mouse;
+            onMouseDown(callback: MouseCallback): Dispatchers.Mouse;
+            offMouseDown(callback: MouseCallback): Dispatchers.Mouse;
             /**
              * Registers a callback to be called whenever a mouseup occurs,
              * or removes the callback if `null` is passed as the callback.
@@ -3585,8 +3585,8 @@ declare module Plottable {
              *                                     to remove a callback.
              * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
              */
-            onMouseUp(key: any, callback: MouseCallback): Dispatchers.Mouse;
-            offMouseUp(key: any, callback: MouseCallback): Dispatchers.Mouse;
+            onMouseUp(callback: MouseCallback): Dispatchers.Mouse;
+            offMouseUp(callback: MouseCallback): Dispatchers.Mouse;
             /**
              * Registers a callback to be called whenever a wheel occurs,
              * or removes the callback if `null` is passed as the callback.
@@ -3598,8 +3598,8 @@ declare module Plottable {
              *                                     Pass `null` to remove a callback.
              * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
              */
-            onWheel(key: any, callback: MouseCallback): Dispatchers.Mouse;
-            offWheel(key: any, callback: MouseCallback): Dispatchers.Mouse;
+            onWheel(callback: MouseCallback): Dispatchers.Mouse;
+            offWheel(callback: MouseCallback): Dispatchers.Mouse;
             /**
              * Registers a callback to be called whenever a dblClick occurs,
              * or removes the callback if `null` is passed as the callback.
@@ -3611,8 +3611,8 @@ declare module Plottable {
              *                                     Pass `null` to remove a callback.
              * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
              */
-            onDblClick(key: any, callback: MouseCallback): Dispatchers.Mouse;
-            offDblClick(key: any, callback: MouseCallback): Dispatchers.Mouse;
+            onDblClick(callback: MouseCallback): Dispatchers.Mouse;
+            offDblClick(callback: MouseCallback): Dispatchers.Mouse;
             /**
              * Returns the last computed mouse position.
              *
@@ -3659,8 +3659,8 @@ declare module Plottable {
              *                                     to remove a callback.
              * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
              */
-            onTouchStart(key: any, callback: TouchCallback): Dispatchers.Touch;
-            offTouchStart(key: any, callback: TouchCallback): Dispatchers.Touch;
+            onTouchStart(callback: TouchCallback): Dispatchers.Touch;
+            offTouchStart(callback: TouchCallback): Dispatchers.Touch;
             /**
              * Registers a callback to be called whenever the touch position changes,
              * or removes the callback if `null` is passed as the callback.
@@ -3672,8 +3672,8 @@ declare module Plottable {
              *                                     to remove a callback.
              * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
              */
-            onTouchMove(key: any, callback: TouchCallback): Dispatchers.Touch;
-            offTouchMove(key: any, callback: TouchCallback): Dispatchers.Touch;
+            onTouchMove(callback: TouchCallback): Dispatchers.Touch;
+            offTouchMove(callback: TouchCallback): Dispatchers.Touch;
             /**
              * Registers a callback to be called whenever a touch ends,
              * or removes the callback if `null` is passed as the callback.
@@ -3685,8 +3685,8 @@ declare module Plottable {
              *                                     to remove a callback.
              * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
              */
-            onTouchEnd(key: any, callback: TouchCallback): Dispatchers.Touch;
-            offTouchEnd(key: any, callback: TouchCallback): Dispatchers.Touch;
+            onTouchEnd(callback: TouchCallback): Dispatchers.Touch;
+            offTouchEnd(callback: TouchCallback): Dispatchers.Touch;
         }
     }
 }

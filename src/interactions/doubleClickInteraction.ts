@@ -16,15 +16,13 @@ export module Interactions {
       super._anchor(component, hitBox);
 
       this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(<SVGElement> component.content().node());
-      this._mouseDispatcher.onMouseDown("Interactions.DoubleClick" + this.getID(), (p: Point) => this._handleClickDown(p));
-      this._mouseDispatcher.onMouseUp("Interactions.DoubleClick" + this.getID(), (p: Point) => this._handleClickUp(p));
-      this._mouseDispatcher.onDblClick("Interactions.DoubleClick" + this.getID(), (p: Point) => this._handleDblClick());
+      this._mouseDispatcher.onMouseDown((p: Point) => this._handleClickDown(p));
+      this._mouseDispatcher.onMouseUp((p: Point) => this._handleClickUp(p));
+      this._mouseDispatcher.onDblClick((p: Point) => this._handleDblClick());
 
       this._touchDispatcher = Dispatchers.Touch.getDispatcher(<SVGElement> component.content().node());
-      this._touchDispatcher.onTouchStart("Interactions.DoubleClick" + this.getID(), (ids, idToPoint) =>
-                                                                                     this._handleClickDown(idToPoint[ids[0]]));
-      this._touchDispatcher.onTouchEnd("Interactions.DoubleClick" + this.getID(), (ids, idToPoint) =>
-                                                                                     this._handleClickUp(idToPoint[ids[0]]));
+      this._touchDispatcher.onTouchStart((ids, idToPoint) => this._handleClickDown(idToPoint[ids[0]]));
+      this._touchDispatcher.onTouchEnd((ids, idToPoint) => this._handleClickUp(idToPoint[ids[0]]));
     }
 
     private _handleClickDown(p: Point) {
