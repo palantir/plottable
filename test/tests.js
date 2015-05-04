@@ -9257,7 +9257,7 @@ describe("Dispatchers", function () {
             cb2Called = false;
             md.offMouseMove(cb1);
             triggerFakeMouseEvent("mousemove", target, targetX, targetY);
-            // assert.isFalse(cb1Called, "callback was not called after blanking");
+            assert.isFalse(cb1Called, "callback was not called after blanking");
             assert.isTrue(cb2Called, "callback 2 was still called");
             target.remove();
         });
@@ -9585,7 +9585,7 @@ describe("Dispatchers", function () {
             var keyDowned = false;
             var callback = function (code, e) {
                 keyDowned = true;
-                assert.strictEqual(code, keyCodeToSend, "correct keycode was passed");
+                assert.strictEqual(code, 66, "correct keycode was passed");
                 assert.isNotNull(e, "key event was passed to the callback");
             };
             ked.onKeyDown(callback);
