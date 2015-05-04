@@ -2737,10 +2737,9 @@ declare module Plottable {
         animate(enabled: boolean): Plot;
         detach(): Plot;
         /**
-         * This function makes sure that all of the scales in this._projections
-         * have an extent that includes all the data that is projected onto them.
+         * Updates the extents associated with each attribute, then autodomains all scales the Plot uses.
          */
-        protected _updateAllExtents(): void;
+        protected _updateExtents(): void;
         /**
          * Override in subclass to add special extents, such as included values
          */

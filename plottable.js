@@ -6538,7 +6538,7 @@ var Plottable;
             _super.prototype._anchor.call(this, element);
             this._animateOnNextRender = true;
             this._dataChanged = true;
-            this._updateAllExtents();
+            this._updateExtents();
         };
         Plot.prototype._setup = function () {
             var _this = this;
@@ -6602,7 +6602,7 @@ var Plottable;
             }
         };
         Plot.prototype._onDatasetUpdate = function () {
-            this._updateAllExtents();
+            this._updateExtents();
             this._animateOnNextRender = true;
             this._dataChanged = true;
             this._render();
@@ -6646,12 +6646,11 @@ var Plottable;
             this._updateExtentsForAttr(attrToSet);
             if (previousScale) {
                 var listeningTopreviousScale = false;
-                for (var attr in this._projections) {
-                    if (this._projections[attr].scale === previousScale) {
+                Object.keys(this._projections).forEach(function (attr) {
+                    if (_this._projections[attr].scale === previousScale) {
                         listeningTopreviousScale = true;
-                        break;
                     }
-                }
+                });
                 if (!listeningTopreviousScale) {
                     previousScale.broadcaster.deregisterListener(this);
                     previousScale.removeExtentProvider(this._extentProvider);
@@ -6717,20 +6716,19 @@ var Plottable;
         Plot.prototype.detach = function () {
             _super.prototype.detach.call(this);
             // make the domain resize
-            this._updateAllExtents();
+            this._updateExtents();
             return this;
         };
         /**
-         * This function makes sure that all of the scales in this._projections
-         * have an extent that includes all the data that is projected onto them.
+         * Updates the extents associated with each attribute, then autodomains all scales the Plot uses.
          */
-        Plot.prototype._updateAllExtents = function () {
+        Plot.prototype._updateExtents = function () {
             var _this = this;
-            d3.keys(this._projections).forEach(function (attr) {
+            Object.keys(this._projections).forEach(function (attr) {
                 _this._updateExtentsForAttr(attr);
             });
             var scales = [];
-            d3.keys(this._projections).forEach(function (attr) {
+            Object.keys(this._projections).forEach(function (attr) {
                 var scale = _this._projections[attr].scale;
                 if (scale != null && scales.indexOf(scale) === -1) {
                     scales.push(scale);
@@ -6742,7 +6740,7 @@ var Plottable;
             var _this = this;
             var accessor = this._projections[attr].accessor;
             var scale = this._projections[attr].scale;
-            var coercer = (scale != null) ? this._projections[attr].scale._typeCoercer : function (d) { return d; };
+            var coercer = (scale != null) ? scale._typeCoercer : function (d) { return d; };
             var extents = this._datasetKeysInOrder.map(function (key) {
                 var plotDatasetKey = _this._key2PlotDatasetKey.get(key);
                 var dataset = plotDatasetKey.dataset;
@@ -6758,18 +6756,19 @@ var Plottable;
             return this._attrToExtents.get(attr);
         };
         Plot.prototype._extentsForScale = function (scale) {
+            var _this = this;
             if (!this._isAnchored) {
                 return [];
             }
             var allSetsOfExtents = [];
-            for (var attr in this._projections) {
-                if (this._projections[attr].scale === scale) {
-                    var extents = this._extentsForAttr(attr);
+            Object.keys(this._projections).forEach(function (attr) {
+                if (_this._projections[attr].scale === scale) {
+                    var extents = _this._extentsForAttr(attr);
                     if (extents != null) {
                         allSetsOfExtents.push(extents);
                     }
                 }
-            }
+            });
             return d3.merge(allSetsOfExtents);
         };
         Plot.prototype.animator = function (animatorKey, animator) {
