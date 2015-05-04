@@ -3,7 +3,6 @@
 module Plottable {
   export class Dispatcher extends Core.PlottableObject {
     protected _event2Callback: { [eventName: string]: (e: Event) => any; } = {};
-    protected _broadcasters: Core.Broadcaster<Dispatcher>[] = [];
     protected _callbackSets: Utils.CallbackSet<Function>[] = [];
     private _connected = false;
 
@@ -47,6 +46,5 @@ module Plottable {
       callbackSet.remove(callback);
       this._disconnect();
     }
-
   }
 }

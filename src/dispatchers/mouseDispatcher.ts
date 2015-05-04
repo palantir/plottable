@@ -57,12 +57,8 @@ export module Dispatchers {
       this._upCallbackSet = new Plottable.Utils.CallbackSet();
       this._wheelCallbackSet = new Plottable.Utils.CallbackSet();
       this._dblClickCallbackSet = new Plottable.Utils.CallbackSet();
-
-      this._moveBroadcaster = new Core.Broadcaster(this);
-      this._downBroadcaster = new Core.Broadcaster(this);
-      this._upBroadcaster = new Core.Broadcaster(this);
-      this._wheelBroadcaster = new Core.Broadcaster(this);
-      this._dblClickBroadcaster = new Core.Broadcaster(this);
+      this._callbackSets = [this._moveCallbackSet, this._downCallbackSet, this._upCallbackSet, this._wheelCallbackSet,
+                            this._dblClickCallbackSet];
 
       var processMoveCallback = (e: MouseEvent) => this._measureAndBroadcast(e, this._moveBroadcaster, this._moveCallbackSet);
       this._event2Callback["mouseover"] = processMoveCallback;
@@ -76,11 +72,6 @@ export module Dispatchers {
         this._wheelCallbackSet);
       this._event2Callback["dblclick"] = (e: MouseEvent) => this._measureAndBroadcast(e, this._dblClickBroadcaster,
         this._dblClickCallbackSet);
-      this._broadcasters = [this._moveBroadcaster, this._downBroadcaster, this._upBroadcaster, this._wheelBroadcaster,
-                            this._dblClickBroadcaster];
-      this._callbackSets = [this._moveCallbackSet, this._downCallbackSet, this._upCallbackSet, this._wheelCallbackSet,
-                            this._dblClickCallbackSet];
-
     }
 
     /**
@@ -98,6 +89,7 @@ export module Dispatchers {
       this._setCallback(this._moveCallbackSet, key, callback);
       return this;
     }
+
     public offMouseMove(key: any, callback: MouseCallback): Dispatchers.Mouse {
       this._unsetCallback(this._moveCallbackSet, key, callback);
       return this;
@@ -118,6 +110,7 @@ export module Dispatchers {
       this._setCallback(this._downCallbackSet, key, callback);
       return this;
     }
+
     public offMouseDown(key: any, callback: MouseCallback): Dispatchers.Mouse {
       this._unsetCallback(this._downCallbackSet, key, callback);
       return this;
@@ -138,6 +131,7 @@ export module Dispatchers {
       this._setCallback(this._upCallbackSet, key, callback);
       return this;
     }
+
     public offMouseUp(key: any, callback: MouseCallback): Dispatchers.Mouse {
       this._unsetCallback(this._upCallbackSet, key, callback);
       return this;
@@ -158,6 +152,7 @@ export module Dispatchers {
       this._setCallback(this._wheelCallbackSet, key, callback);
       return this;
     }
+
     public offWheel(key: any, callback: MouseCallback): Dispatchers.Mouse {
       this._unsetCallback(this._wheelCallbackSet, key, callback);
       return this;
@@ -178,6 +173,7 @@ export module Dispatchers {
       this._setCallback(this._dblClickCallbackSet, key, callback);
       return this;
     }
+
     public offDblClick(key: any, callback: MouseCallback): Dispatchers.Mouse {
       this._unsetCallback(this._dblClickCallbackSet, key, callback);
       return this;

@@ -13,11 +13,6 @@ export module Dispatchers {
 
     private static _DISPATCHER_KEY = "__Plottable_Dispatcher_Touch";
     private translator: Utils.ClientToSVGTranslator;
-    private _startBroadcaster: Core.Broadcaster<Dispatchers.Touch>;
-    private _moveBroadcaster: Core.Broadcaster<Dispatchers.Touch>;
-    private _endBroadcaster: Core.Broadcaster<Dispatchers.Touch>;
-
-
     private _startCallbackSet: Utils.CallbackSet<Function>;
     private _moveCallbackSet: Utils.CallbackSet<Function>;
     private _endCallbackSet: Utils.CallbackSet<Function>;
@@ -51,13 +46,10 @@ export module Dispatchers {
 
       this.translator = Utils.ClientToSVGTranslator.getTranslator(svg);
 
-      this._startBroadcaster = new Core.Broadcaster(this);
-      this._moveBroadcaster = new Core.Broadcaster(this);
-      this._endBroadcaster = new Core.Broadcaster(this);
-
       this._startCallbackSet = new Utils.CallbackSet();
       this._moveCallbackSet = new Utils.CallbackSet();
       this._endCallbackSet = new Utils.CallbackSet();
+      this._callbackSets = [this._moveCallbackSet, this._startCallbackSet, this._endCallbackSet];
 
       this._event2Callback["touchstart"] = (e: TouchEvent) => this._measureAndBroadcast(e, this._startBroadcaster,
         this._startCallbackSet);
@@ -65,9 +57,6 @@ export module Dispatchers {
         this._moveCallbackSet);
       this._event2Callback["touchend"] = (e: TouchEvent) => this._measureAndBroadcast(e, this._endBroadcaster,
         this._endCallbackSet);
-
-      this._broadcasters = [this._moveBroadcaster, this._startBroadcaster, this._endBroadcaster];
-      this._callbackSets = [this._moveCallbackSet, this._startCallbackSet, this._endCallbackSet];
     }
 
     /**
@@ -85,6 +74,7 @@ export module Dispatchers {
       this._setCallback(this._startCallbackSet, key, callback);
       return this;
     }
+
     public offTouchStart(key: any, callback: TouchCallback): Dispatchers.Touch {
       this._unsetCallback(this._startCallbackSet, key, callback);
       return this;
@@ -105,6 +95,7 @@ export module Dispatchers {
       this._setCallback(this._moveCallbackSet, key, callback);
       return this;
     }
+
     public offTouchMove(key: any, callback: TouchCallback): Dispatchers.Touch {
       this._unsetCallback(this._moveCallbackSet, key, callback);
       return this;
@@ -125,6 +116,7 @@ export module Dispatchers {
       this._setCallback(this._endCallbackSet, key, callback);
       return this;
     }
+
     public offTouchEnd(key: any, callback: TouchCallback): Dispatchers.Touch {
       this._unsetCallback(this._endCallbackSet, key, callback);
       return this;

@@ -8909,7 +8909,6 @@ var Plottable;
         function Dispatcher() {
             _super.apply(this, arguments);
             this._event2Callback = {};
-            this._broadcasters = [];
             this._callbackSets = [];
             this._connected = false;
         }
@@ -8986,11 +8985,7 @@ var Plottable;
                 this._upCallbackSet = new Plottable.Utils.CallbackSet();
                 this._wheelCallbackSet = new Plottable.Utils.CallbackSet();
                 this._dblClickCallbackSet = new Plottable.Utils.CallbackSet();
-                this._moveBroadcaster = new Plottable.Core.Broadcaster(this);
-                this._downBroadcaster = new Plottable.Core.Broadcaster(this);
-                this._upBroadcaster = new Plottable.Core.Broadcaster(this);
-                this._wheelBroadcaster = new Plottable.Core.Broadcaster(this);
-                this._dblClickBroadcaster = new Plottable.Core.Broadcaster(this);
+                this._callbackSets = [this._moveCallbackSet, this._downCallbackSet, this._upCallbackSet, this._wheelCallbackSet, this._dblClickCallbackSet];
                 var processMoveCallback = function (e) { return _this._measureAndBroadcast(e, _this._moveBroadcaster, _this._moveCallbackSet); };
                 this._event2Callback["mouseover"] = processMoveCallback;
                 this._event2Callback["mousemove"] = processMoveCallback;
@@ -8999,8 +8994,6 @@ var Plottable;
                 this._event2Callback["mouseup"] = function (e) { return _this._measureAndBroadcast(e, _this._upBroadcaster, _this._upCallbackSet); };
                 this._event2Callback["wheel"] = function (e) { return _this._measureAndBroadcast(e, _this._wheelBroadcaster, _this._wheelCallbackSet); };
                 this._event2Callback["dblclick"] = function (e) { return _this._measureAndBroadcast(e, _this._dblClickBroadcaster, _this._dblClickCallbackSet); };
-                this._broadcasters = [this._moveBroadcaster, this._downBroadcaster, this._upBroadcaster, this._wheelBroadcaster, this._dblClickBroadcaster];
-                this._callbackSets = [this._moveCallbackSet, this._downCallbackSet, this._upCallbackSet, this._wheelCallbackSet, this._dblClickCallbackSet];
             }
             /**
              * Get a Dispatcher.Mouse for the <svg> containing elem. If one already exists
@@ -9162,17 +9155,13 @@ var Plottable;
                 var _this = this;
                 _super.call(this);
                 this.translator = Plottable.Utils.ClientToSVGTranslator.getTranslator(svg);
-                this._startBroadcaster = new Plottable.Core.Broadcaster(this);
-                this._moveBroadcaster = new Plottable.Core.Broadcaster(this);
-                this._endBroadcaster = new Plottable.Core.Broadcaster(this);
                 this._startCallbackSet = new Plottable.Utils.CallbackSet();
                 this._moveCallbackSet = new Plottable.Utils.CallbackSet();
                 this._endCallbackSet = new Plottable.Utils.CallbackSet();
+                this._callbackSets = [this._moveCallbackSet, this._startCallbackSet, this._endCallbackSet];
                 this._event2Callback["touchstart"] = function (e) { return _this._measureAndBroadcast(e, _this._startBroadcaster, _this._startCallbackSet); };
                 this._event2Callback["touchmove"] = function (e) { return _this._measureAndBroadcast(e, _this._moveBroadcaster, _this._moveCallbackSet); };
                 this._event2Callback["touchend"] = function (e) { return _this._measureAndBroadcast(e, _this._endBroadcaster, _this._endCallbackSet); };
-                this._broadcasters = [this._moveBroadcaster, this._startBroadcaster, this._endBroadcaster];
-                this._callbackSets = [this._moveCallbackSet, this._startCallbackSet, this._endCallbackSet];
             }
             /**
              * Get a Dispatcher.Touch for the <svg> containing elem. If one already exists
@@ -9303,10 +9292,8 @@ var Plottable;
             function Key() {
                 var _this = this;
                 _super.call(this);
-                this._keydownBroadcaster = new Plottable.Core.Broadcaster(this);
-                this._keydownCallbackSet = new Plottable.Utils.CallbackSet();
                 this._event2Callback["keydown"] = function (e) { return _this._processKeydown(e); };
-                this._broadcasters = [this._keydownBroadcaster];
+                this._keydownCallbackSet = new Plottable.Utils.CallbackSet();
                 this._callbackSets = [this._keydownCallbackSet];
             }
             /**
