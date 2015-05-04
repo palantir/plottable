@@ -57,19 +57,18 @@ describe("Dispatchers", () => {
 
     it("_setCallback()", () => {
       var dispatcher = new Plottable.Dispatcher();
-      var b = new Plottable.Core.Broadcaster<Plottable.Dispatcher>(dispatcher);
+      var callbackSet = new Plottable.Utils.CallbackSet<Function>();
 
-      var key = "unit test";
       var callbackWasCalled = false;
       var callback = () => callbackWasCalled = true;
 
-      (<any> dispatcher)._setCallback(b, key, callback);
-      b.broadcast();
+      (<any> dispatcher)._setCallback(callbackSet, null, callback);
+      callbackSet.callCallbacks();
       assert.isTrue(callbackWasCalled, "callback was called after setting with _setCallback()");
 
-      (<any> dispatcher)._setCallback(b, key, null);
+      (<any> dispatcher)._unsetCallback(callbackSet, null, callback);
       callbackWasCalled = false;
-      b.broadcast();
+      callbackSet.callCallbacks();
       assert.isFalse(callbackWasCalled, "callback was removed by calling _setCallback() with null");
     });
   });

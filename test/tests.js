@@ -9103,16 +9103,15 @@ describe("Dispatchers", function () {
         });
         it("_setCallback()", function () {
             var dispatcher = new Plottable.Dispatcher();
-            var b = new Plottable.Core.Broadcaster(dispatcher);
-            var key = "unit test";
+            var callbackSet = new Plottable.Utils.CallbackSet();
             var callbackWasCalled = false;
             var callback = function () { return callbackWasCalled = true; };
-            dispatcher._setCallback(b, key, callback);
-            b.broadcast();
+            dispatcher._setCallback(callbackSet, null, callback);
+            callbackSet.callCallbacks();
             assert.isTrue(callbackWasCalled, "callback was called after setting with _setCallback()");
-            dispatcher._setCallback(b, key, null);
+            dispatcher._unsetCallback(callbackSet, null, callback);
             callbackWasCalled = false;
-            b.broadcast();
+            callbackSet.callCallbacks();
             assert.isFalse(callbackWasCalled, "callback was removed by calling _setCallback() with null");
         });
     });
