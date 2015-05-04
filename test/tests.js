@@ -9083,10 +9083,10 @@ describe("Dispatchers", function () {
             var dispatcher = new Plottable.Dispatcher();
             var callbackWasCalled = false;
             dispatcher._event2Callback["click"] = function () { return callbackWasCalled = true; };
-            var b = new Plottable.Core.Broadcaster(dispatcher);
-            var key = "unit test";
-            b.registerListener(key, function () { return null; });
-            dispatcher._broadcasters = [b];
+            var callback = function () { return null; };
+            var callbackSet = new Plottable.Utils.CallbackSet();
+            callbackSet.add(callback);
+            dispatcher._callbackSets = [callbackSet];
             var d3document = d3.select(document);
             dispatcher._connect();
             triggerFakeUIEvent("click", d3document);
@@ -9095,7 +9095,7 @@ describe("Dispatchers", function () {
             callbackWasCalled = false;
             triggerFakeUIEvent("click", d3document);
             assert.isTrue(callbackWasCalled, "didn't disconnect while broadcaster had listener");
-            b.deregisterListener(key);
+            callbackSet.remove(callback);
             dispatcher._disconnect();
             callbackWasCalled = false;
             triggerFakeUIEvent("click", d3document);

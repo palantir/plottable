@@ -32,10 +32,10 @@ describe("Dispatchers", () => {
       var callbackWasCalled = false;
       (<any> dispatcher)._event2Callback["click"] = () => callbackWasCalled = true;
 
-      var b = new Plottable.Core.Broadcaster<Plottable.Dispatcher>(dispatcher);
-      var key = "unit test";
-      b.registerListener(key, () => null);
-      (<any> dispatcher)._broadcasters = [b];
+      var callback = () => null;
+      var callbackSet = new Plottable.Utils.CallbackSet<Function>();
+      callbackSet.add(callback);
+      (<any> dispatcher)._callbackSets = [callbackSet];
 
       var d3document = d3.select(document);
       (<any> dispatcher)._connect();
@@ -48,7 +48,7 @@ describe("Dispatchers", () => {
       triggerFakeUIEvent("click", d3document);
       assert.isTrue(callbackWasCalled, "didn't disconnect while broadcaster had listener");
 
-      b.deregisterListener(key);
+      callbackSet.remove(callback);
       (<any> dispatcher)._disconnect();
       callbackWasCalled = false;
       triggerFakeUIEvent("click", d3document);
