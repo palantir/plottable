@@ -216,12 +216,12 @@ export module Axes {
       return this;
     }
 
-    public _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number) {
-      // When anyone calls _invalidateLayout, _computeLayout will be called
+    public computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number) {
+      // When anyone calls _invalidateLayout, computeLayout will be called
       // on everyone, including this. Since CSS or something might have
       // affected the size of the characters, clear the cache.
       this._measurer.reset();
-      return super._computeLayout(offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
+      return super.computeLayout(offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
     }
   }
 }

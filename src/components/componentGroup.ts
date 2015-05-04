@@ -38,13 +38,13 @@ export module Components {
       return this;
     }
 
-    public _computeLayout(offeredXOrigin?: number,
+    public computeLayout(offeredXOrigin?: number,
                           offeredYOrigin?: number,
                    availableWidth?: number,
                   availableHeight?: number): Group {
-      super._computeLayout(offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
+      super.computeLayout(offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
       this.components().forEach((c) => {
-        c._computeLayout(0, 0, this.width(), this.height());
+        c.computeLayout(0, 0, this.width(), this.height());
       });
       return this;
     }

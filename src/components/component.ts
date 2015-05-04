@@ -107,10 +107,10 @@ module Plottable {
      * @param {number} availableWidth available width for the Component to render in
      * @param {number} availableHeight available height for the Component to render in
      */
-    public _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number) {
+    public computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number) {
       if (offeredXOrigin == null || offeredYOrigin == null || availableWidth == null || availableHeight == null) {
         if (this._element == null) {
-          throw new Error("anchor must be called before computeLayout");
+          throw new Error("anchor() must be called before computeLayout()");
         } else if (this._isTopLevelComponent) {
           // we are the root node, retrieve height/width from root SVG
           offeredXOrigin = 0;
@@ -130,7 +130,7 @@ module Plottable {
           availableWidth  = Utils.DOM.getElementWidth(elem);
           availableHeight = Utils.DOM.getElementHeight(elem);
         } else {
-          throw new Error("null arguments cannot be passed to _computeLayout() on a non-root node");
+          throw new Error("null arguments cannot be passed to computeLayout() on a non-root node");
         }
       }
       var size = this._getSize(availableWidth, availableHeight);
@@ -140,6 +140,7 @@ module Plottable {
       this._yOrigin = offeredYOrigin + this._yOffset + (availableHeight - this.height()) * this._yAlignProportion;
       this._element.attr("transform", "translate(" + this._xOrigin + "," + this._yOrigin + ")");
       this._boxes.forEach((b: D3.Selection) => b.attr("width", this.width()).attr("height", this.height()));
+      return this;
     }
 
     protected _getSize(availableWidth: number, availableHeight: number) {
@@ -210,7 +211,7 @@ module Plottable {
         throw new Error("If a component has never been rendered before, then renderTo must be given a node to render to, \
           or a D3.Selection, or a selector string");
       }
-      this._computeLayout();
+      this.computeLayout();
       this._render();
       // flush so that consumers can immediately attach to stuff we create in the DOM
       Core.RenderControllers.flush();

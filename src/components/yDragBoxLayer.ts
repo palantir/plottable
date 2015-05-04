@@ -9,10 +9,11 @@ export module Components {
       this._hasCorners = false;
     }
 
-    public _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number,
+    public computeLayout(offeredXOrigin?: number, offeredYOrigin?: number,
                           availableWidth?: number, availableHeight?: number) {
-      super._computeLayout(offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
+      super.computeLayout(offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
       this.bounds(this.bounds()); // set correct bounds when width/height changes
+      return this;
     }
 
     protected _setBounds(newBounds: Bounds) {
