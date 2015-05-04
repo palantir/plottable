@@ -27,7 +27,7 @@ describe("ComponentContainer", () => {
     assert.deepEqual(container.components(), [c3, c1, c2], "component list was unchanged");
   });
 
-  it("_removeComponent()", () => {
+  it("removeComponent()", () => {
     var container = new Plottable.ComponentContainer();
     var c1 = new Plottable.Component();
     var c2 = new Plottable.Component();

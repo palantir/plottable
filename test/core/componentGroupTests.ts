@@ -70,7 +70,7 @@ describe("ComponentGroups", () => {
     svg.remove();
     });
 
-  it("detach() and _removeComponent work correctly for componentGroup", () => {
+  it("detach() and removeComponent work correctly for componentGroup", () => {
     var c1 = new Plottable.Component().classed("component-1", true);
     var c2 = new Plottable.Component().classed("component-2", true);
     var cg = new Plottable.Components.Group([c1, c2]);

@@ -2525,18 +2525,18 @@ declare module Plottable {
              * could call
              * ```typescript
              * var table = new Table();
-             * table.addComponent(0, 0, a);
-             * table.addComponent(0, 1, b);
-             * table.addComponent(1, 1, c);
+             * table.addComponent(a, 0, 0);
+             * table.addComponent(b, 0, 1);
+             * table.addComponent(c, 1, 1);
              * ```
              *
+             * @param {Component} component The Component to be added.
              * @param {number} row The row in which to add the Component.
              * @param {number} col The column in which to add the Component.
-             * @param {Component} component The Component to be added.
              * @returns {Table} The calling Table.
              */
-            addComponent(row: number, col: number, component: Component): Table;
-            _removeComponent(component: Component): void;
+            addComponent(component: Component, row: number, col: number): Table;
+            removeComponent(component: Component): void;
             _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
             _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;
             /**

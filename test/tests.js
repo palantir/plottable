@@ -1467,7 +1467,7 @@ describe("Gridlines", function () {
         yScale.domain([0, 10]);
         var yAxis = new Plottable.Axes.Numeric(yScale, "left");
         var gridlines = new Plottable.Components.Gridlines(xScale, yScale);
-        var basicTable = new Plottable.Components.Table().addComponent(0, 0, yAxis).addComponent(0, 1, gridlines).addComponent(1, 1, xAxis);
+        var basicTable = new Plottable.Components.Table().addComponent(yAxis, 0, 0).addComponent(gridlines, 0, 1).addComponent(xAxis, 1, 1);
         basicTable._anchor(svg);
         basicTable._computeLayout();
         xScale.range([0, xAxis.width()]); // manually set range since we don't have a renderer
@@ -1577,7 +1577,7 @@ describe("Labels", function () {
     it("centered text in a table is positioned properly", function () {
         var svg = generateSVG(400, 400);
         var label = new Plottable.Components.TitleLabel("X");
-        var t = new Plottable.Components.Table().addComponent(0, 0, label).addComponent(1, 0, new Plottable.Component());
+        var t = new Plottable.Components.Table().addComponent(label, 0, 0).addComponent(new Plottable.Component(), 1, 0);
         t.renderTo(svg);
         var textTranslate = d3.transform(label._content.select("g").attr("transform")).translate;
         var eleTranslate = d3.transform(label._element.attr("transform")).translate;
@@ -6056,7 +6056,7 @@ describe("ComponentContainer", function () {
         assert.isFalse(container._addComponent(c1), "returns false if adding an already-added component");
         assert.deepEqual(container.components(), [c3, c1, c2], "component list was unchanged");
     });
-    it("_removeComponent()", function () {
+    it("removeComponent()", function () {
         var container = new Plottable.ComponentContainer();
         var c1 = new Plottable.Component();
         var c2 = new Plottable.Component();
@@ -6147,7 +6147,7 @@ describe("ComponentGroups", function () {
         assert.equal(c2Translate[1], 0, "componentGroup has 0 yOffset");
         svg.remove();
     });
-    it("detach() and _removeComponent work correctly for componentGroup", function () {
+    it("detach() and removeComponent work correctly for componentGroup", function () {
         var c1 = new Plottable.Component().classed("component-1", true);
         var c2 = new Plottable.Component().classed("component-2", true);
         var cg = new Plottable.Components.Group([c1, c2]);
@@ -6618,7 +6618,7 @@ describe("Component behavior", function () {
         var horizontalComponent = new Plottable.Component();
         var verticalComponent = new Plottable.Component();
         var placeHolder = new Plottable.Component();
-        var t = new Plottable.Components.Table().addComponent(0, 0, verticalComponent).addComponent(0, 1, new Plottable.Component()).addComponent(1, 0, placeHolder).addComponent(1, 1, horizontalComponent);
+        var t = new Plottable.Components.Table().addComponent(verticalComponent, 0, 0).addComponent(new Plottable.Component(), 0, 1).addComponent(placeHolder, 1, 0).addComponent(horizontalComponent, 1, 1);
         t.renderTo(svg);
         horizontalComponent.xAlign("center");
         verticalComponent.yAlign("bottom");
@@ -6842,7 +6842,7 @@ function generateBasicTable(nRows, nCols) {
     for (var i = 0; i < nRows; i++) {
         for (var j = 0; j < nCols; j++) {
             var r = new Plottable.Component();
-            table.addComponent(i, j, r);
+            table.addComponent(r, i, j);
             components.push(r);
         }
     }
@@ -6875,15 +6875,15 @@ describe("Tables", function () {
         var table = new Plottable.Components.Table([row1, row2]);
         assert.equal(table._rows[0][1], c0, "the component is in the right spot");
         var c1 = new Plottable.Component();
-        table.addComponent(2, 2, c1);
+        table.addComponent(c1, 2, 2);
         assert.equal(table._rows[2][2], c1, "the inserted component went to the right spot");
     });
     it("tables can be constructed by adding components in matrix style", function () {
         var table = new Plottable.Components.Table();
         var c1 = new Plottable.Component();
         var c2 = new Plottable.Component();
-        table.addComponent(0, 0, c1);
-        table.addComponent(1, 1, c2);
+        table.addComponent(c1, 0, 0);
+        table.addComponent(c2, 1, 1);
         var rows = table._rows;
         assert.lengthOf(rows, 2, "there are two rows");
         assert.lengthOf(rows[0], 2, "two cols in first row");
@@ -6898,9 +6898,9 @@ describe("Tables", function () {
         var c2 = new Plottable.Component();
         var c3 = new Plottable.Component();
         var t = new Plottable.Components.Table();
-        t.addComponent(0, 2, c1);
-        t.addComponent(0, 0, c2);
-        t.addComponent(0, 2, c3);
+        t.addComponent(c1, 0, 2);
+        t.addComponent(c2, 0, 0);
+        t.addComponent(c3, 0, 2);
         assert.isTrue(Plottable.Components.Group.prototype.isPrototypeOf(t._rows[0][2]), "A group was created");
         var components = t._rows[0][2].components();
         assert.lengthOf(components, 2, "The group created should have 2 components");
@@ -6913,8 +6913,8 @@ describe("Tables", function () {
         var grp = new Plottable.Components.Group([c1, c2]);
         var c3 = new Plottable.Component();
         var t = new Plottable.Components.Table();
-        t.addComponent(0, 2, grp);
-        t.addComponent(0, 2, c3);
+        t.addComponent(grp, 0, 2);
+        t.addComponent(c3, 0, 2);
         assert.isTrue(Plottable.Components.Group.prototype.isPrototypeOf(t._rows[0][2]), "The cell still contains a group");
         var components = t._rows[0][2].components();
         assert.lengthOf(components, 3, "The group created should have 3 components");
@@ -6925,14 +6925,14 @@ describe("Tables", function () {
     it("adding null to a table cell should throw an error", function () {
         var c1 = new Plottable.Component();
         var t = new Plottable.Components.Table([[c1]]);
-        assert.throw(function () { return t.addComponent(0, 0, null); }, "Cannot add null to a table cell");
+        assert.throw(function () { return t.addComponent(null, 0, 0); }, "Cannot add null to a table cell");
     });
     it("addComponent works even if a component is added with a high column and low row index", function () {
         // Solves #180, a weird bug
         var t = new Plottable.Components.Table();
         var svg = generateSVG();
-        t.addComponent(1, 0, new Plottable.Component());
-        t.addComponent(0, 2, new Plottable.Component());
+        t.addComponent(new Plottable.Component(), 1, 0);
+        t.addComponent(new Plottable.Component(), 0, 2);
         t.renderTo(svg); //would throw an error without the fix (tested);
         svg.remove();
     });
@@ -7107,24 +7107,24 @@ describe("Tables", function () {
         var table;
         it("table._removeComponent works in basic case", function () {
             table = new Plottable.Components.Table([[c1, c2], [c3, c4], [c5, c6]]);
-            table._removeComponent(c4);
+            table.removeComponent(c4);
             assert.deepEqual(table._rows, [[c1, c2], [c3, null], [c5, c6]], "remove one element");
         });
         it("table._removeComponent does nothing when component is not found", function () {
             table = new Plottable.Components.Table([[c1, c2], [c3, c4]]);
-            table._removeComponent(c5);
+            table.removeComponent(c5);
             assert.deepEqual(table._rows, [[c1, c2], [c3, c4]], "remove nonexistent component");
         });
         it("table._removeComponent removing component twice should have same effect as removing it once", function () {
             table = new Plottable.Components.Table([[c1, c2, c3], [c4, c5, c6]]);
-            table._removeComponent(c1);
+            table.removeComponent(c1);
             assert.deepEqual(table._rows, [[null, c2, c3], [c4, c5, c6]], "item twice");
-            table._removeComponent(c1);
+            table.removeComponent(c1);
             assert.deepEqual(table._rows, [[null, c2, c3], [c4, c5, c6]], "item twice");
         });
         it("table._removeComponent doesn't do anything weird when called with null", function () {
             table = new Plottable.Components.Table([[c1, null], [c2, c3]]);
-            table._removeComponent(null);
+            table.removeComponent(null);
             assert.deepEqual(table._rows, [[c1, null], [c2, c3]]);
         });
     });

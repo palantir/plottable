@@ -6112,7 +6112,7 @@ var Plottable;
                 rows.forEach(function (row, rowIndex) {
                     row.forEach(function (component, colIndex) {
                         if (component != null) {
-                            _this.addComponent(rowIndex, colIndex, component);
+                            _this.addComponent(component, rowIndex, colIndex);
                         }
                     });
                 });
@@ -6129,17 +6129,17 @@ var Plottable;
              * could call
              * ```typescript
              * var table = new Table();
-             * table.addComponent(0, 0, a);
-             * table.addComponent(0, 1, b);
-             * table.addComponent(1, 1, c);
+             * table.addComponent(a, 0, 0);
+             * table.addComponent(b, 0, 1);
+             * table.addComponent(c, 1, 1);
              * ```
              *
+             * @param {Component} component The Component to be added.
              * @param {number} row The row in which to add the Component.
              * @param {number} col The column in which to add the Component.
-             * @param {Component} component The Component to be added.
              * @returns {Table} The calling Table.
              */
-            Table.prototype.addComponent = function (row, col, component) {
+            Table.prototype.addComponent = function (component, row, col) {
                 if (component == null) {
                     throw Error("Cannot add null to a table cell");
                 }
@@ -6155,7 +6155,7 @@ var Plottable;
                 }
                 return this;
             };
-            Table.prototype._removeComponent = function (component) {
+            Table.prototype.removeComponent = function (component) {
                 _super.prototype._removeComponent.call(this, component);
                 for (var r = 0; r < this._nRows; r++) {
                     for (var c = 0; c < this._nCols; c++) {

@@ -52,7 +52,7 @@ export module Components {
       rows.forEach((row, rowIndex) => {
         row.forEach((component, colIndex) => {
           if (component != null) {
-            this.addComponent(rowIndex, colIndex, component);
+            this.addComponent(component, rowIndex, colIndex);
           }
         });
       });
@@ -70,17 +70,17 @@ export module Components {
      * could call
      * ```typescript
      * var table = new Table();
-     * table.addComponent(0, 0, a);
-     * table.addComponent(0, 1, b);
-     * table.addComponent(1, 1, c);
+     * table.addComponent(a, 0, 0);
+     * table.addComponent(b, 0, 1);
+     * table.addComponent(c, 1, 1);
      * ```
      *
+     * @param {Component} component The Component to be added.
      * @param {number} row The row in which to add the Component.
      * @param {number} col The column in which to add the Component.
-     * @param {Component} component The Component to be added.
      * @returns {Table} The calling Table.
      */
-    public addComponent(row: number, col: number, component: Component): Table {
+    public addComponent(component: Component, row: number, col: number): Table {
 
       if (component == null) {
         throw Error("Cannot add null to a table cell");
@@ -102,7 +102,7 @@ export module Components {
       return this;
     }
 
-    public _removeComponent(component: Component) {
+    public removeComponent(component: Component) {
       super._removeComponent(component);
       for (var r = 0; r < this._nRows; r++) {
         for (var c = 0; c < this._nCols; c++) {
