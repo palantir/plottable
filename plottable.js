@@ -8937,6 +8937,9 @@ var Plottable;
             }
         };
         Dispatcher.prototype._setCallback = function (callbackSet, callback) {
+            if (typeof callback !== "function") {
+                console.error("the callback is not a function");
+            }
             if (callback === null) {
                 console.error("THIS SHOULD NOT HAPPEN");
                 callbackSet.remove(callback);
@@ -8986,14 +8989,14 @@ var Plottable;
                 this._wheelCallbackSet = new Plottable.Utils.CallbackSet();
                 this._dblClickCallbackSet = new Plottable.Utils.CallbackSet();
                 this._callbackSets = [this._moveCallbackSet, this._downCallbackSet, this._upCallbackSet, this._wheelCallbackSet, this._dblClickCallbackSet];
-                var processMoveCallback = function (e) { return _this._measureAndBroadcast(e, _this._moveBroadcaster, _this._moveCallbackSet); };
+                var processMoveCallback = function (e) { return _this._measureAndBroadcast(e, _this._moveCallbackSet); };
                 this._event2Callback["mouseover"] = processMoveCallback;
                 this._event2Callback["mousemove"] = processMoveCallback;
                 this._event2Callback["mouseout"] = processMoveCallback;
-                this._event2Callback["mousedown"] = function (e) { return _this._measureAndBroadcast(e, _this._downBroadcaster, _this._downCallbackSet); };
-                this._event2Callback["mouseup"] = function (e) { return _this._measureAndBroadcast(e, _this._upBroadcaster, _this._upCallbackSet); };
-                this._event2Callback["wheel"] = function (e) { return _this._measureAndBroadcast(e, _this._wheelBroadcaster, _this._wheelCallbackSet); };
-                this._event2Callback["dblclick"] = function (e) { return _this._measureAndBroadcast(e, _this._dblClickBroadcaster, _this._dblClickCallbackSet); };
+                this._event2Callback["mousedown"] = function (e) { return _this._measureAndBroadcast(e, _this._downCallbackSet); };
+                this._event2Callback["mouseup"] = function (e) { return _this._measureAndBroadcast(e, _this._upCallbackSet); };
+                this._event2Callback["wheel"] = function (e) { return _this._measureAndBroadcast(e, _this._wheelCallbackSet); };
+                this._event2Callback["dblclick"] = function (e) { return _this._measureAndBroadcast(e, _this._dblClickCallbackSet); };
             }
             /**
              * Get a Dispatcher.Mouse for the <svg> containing elem. If one already exists
@@ -9110,7 +9113,7 @@ var Plottable;
              * Computes the mouse position from the given event, and if successful
              * calls broadcast() on the supplied Broadcaster.
              */
-            Mouse.prototype._measureAndBroadcast = function (e, b, callbackSet) {
+            Mouse.prototype._measureAndBroadcast = function (e, callbackSet) {
                 var newMousePosition = this.translator.computePosition(e.clientX, e.clientY);
                 if (newMousePosition != null) {
                     this._lastMousePosition = newMousePosition;
@@ -9159,9 +9162,9 @@ var Plottable;
                 this._moveCallbackSet = new Plottable.Utils.CallbackSet();
                 this._endCallbackSet = new Plottable.Utils.CallbackSet();
                 this._callbackSets = [this._moveCallbackSet, this._startCallbackSet, this._endCallbackSet];
-                this._event2Callback["touchstart"] = function (e) { return _this._measureAndBroadcast(e, _this._startBroadcaster, _this._startCallbackSet); };
-                this._event2Callback["touchmove"] = function (e) { return _this._measureAndBroadcast(e, _this._moveBroadcaster, _this._moveCallbackSet); };
-                this._event2Callback["touchend"] = function (e) { return _this._measureAndBroadcast(e, _this._endBroadcaster, _this._endCallbackSet); };
+                this._event2Callback["touchstart"] = function (e) { return _this._measureAndBroadcast(e, _this._startCallbackSet); };
+                this._event2Callback["touchmove"] = function (e) { return _this._measureAndBroadcast(e, _this._moveCallbackSet); };
+                this._event2Callback["touchend"] = function (e) { return _this._measureAndBroadcast(e, _this._endCallbackSet); };
             }
             /**
              * Get a Dispatcher.Touch for the <svg> containing elem. If one already exists
@@ -9240,7 +9243,7 @@ var Plottable;
              * Computes the Touch position from the given event, and if successful
              * calls broadcast() on the supplied Broadcaster.
              */
-            Touch.prototype._measureAndBroadcast = function (e, b, callbackSet) {
+            Touch.prototype._measureAndBroadcast = function (e, callbackSet) {
                 var touches = e.changedTouches;
                 var touchPositions = {};
                 var touchIdentifiers = [];

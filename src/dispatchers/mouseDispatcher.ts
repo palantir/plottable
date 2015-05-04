@@ -60,18 +60,14 @@ export module Dispatchers {
       this._callbackSets = [this._moveCallbackSet, this._downCallbackSet, this._upCallbackSet, this._wheelCallbackSet,
                             this._dblClickCallbackSet];
 
-      var processMoveCallback = (e: MouseEvent) => this._measureAndBroadcast(e, this._moveBroadcaster, this._moveCallbackSet);
+      var processMoveCallback = (e: MouseEvent) => this._measureAndBroadcast(e, this._moveCallbackSet);
       this._event2Callback["mouseover"] = processMoveCallback;
       this._event2Callback["mousemove"] = processMoveCallback;
       this._event2Callback["mouseout"] = processMoveCallback;
-      this._event2Callback["mousedown"] = (e: MouseEvent) => this._measureAndBroadcast(e, this._downBroadcaster,
-        this._downCallbackSet);
-      this._event2Callback["mouseup"] = (e: MouseEvent) => this._measureAndBroadcast(e, this._upBroadcaster,
-        this._upCallbackSet);
-      this._event2Callback["wheel"] = (e: WheelEvent) => this._measureAndBroadcast(e, this._wheelBroadcaster,
-        this._wheelCallbackSet);
-      this._event2Callback["dblclick"] = (e: MouseEvent) => this._measureAndBroadcast(e, this._dblClickBroadcaster,
-        this._dblClickCallbackSet);
+      this._event2Callback["mousedown"] = (e: MouseEvent) => this._measureAndBroadcast(e, this._downCallbackSet);
+      this._event2Callback["mouseup"] = (e: MouseEvent) => this._measureAndBroadcast(e, this._upCallbackSet);
+      this._event2Callback["wheel"] = (e: WheelEvent) => this._measureAndBroadcast(e, this._wheelCallbackSet);
+      this._event2Callback["dblclick"] = (e: MouseEvent) => this._measureAndBroadcast(e, this._dblClickCallbackSet);
     }
 
     /**
@@ -183,7 +179,7 @@ export module Dispatchers {
      * Computes the mouse position from the given event, and if successful
      * calls broadcast() on the supplied Broadcaster.
      */
-    private _measureAndBroadcast(e: MouseEvent, b: Core.Broadcaster<Dispatchers.Mouse>, callbackSet: Utils.CallbackSet<Function>) {
+    private _measureAndBroadcast(e: MouseEvent, callbackSet: Utils.CallbackSet<Function>) {
       var newMousePosition = this.translator.computePosition(e.clientX, e.clientY);
       if (newMousePosition != null) {
         this._lastMousePosition = newMousePosition;
