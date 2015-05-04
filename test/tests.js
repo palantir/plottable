@@ -7140,8 +7140,7 @@ describe("Domainer", function () {
         domainer = new Plottable.Domainer();
     });
     it("pad() works in general case", function () {
-        var provider = function (scale) { return [[100, 200]]; };
-        scale.addExtentProvider(provider);
+        scale.addExtentProvider(function (scale) { return [[100, 200]]; });
         scale.autoDomain();
         scale.domainer(new Plottable.Domainer().pad(0.2));
         assert.closeTo(scale.domain()[0], 90, 0.1, "lower bound of domain correct");
@@ -7152,8 +7151,7 @@ describe("Domainer", function () {
         var f = d3.time.format("%x");
         var d1 = f.parse("06/02/2014");
         var d2 = f.parse("06/03/2014");
-        var provider = function (scale) { return [[d1, d2]]; };
-        timeScale.addExtentProvider(provider);
+        timeScale.addExtentProvider(function (scale) { return [[d1, d2]]; });
         timeScale.autoDomain();
         timeScale.domainer(new Plottable.Domainer().pad());
         var dd1 = timeScale.domain()[0];
@@ -7167,8 +7165,7 @@ describe("Domainer", function () {
     });
     it("pad() works on log scales", function () {
         var logScale = new Plottable.Scales.Log();
-        var provider = function (scale) { return [[10, 100]]; };
-        logScale.addExtentProvider(provider);
+        logScale.addExtentProvider(function (scale) { return [[10, 100]]; });
         logScale.autoDomain();
         logScale.range([0, 1]);
         logScale.domainer(domainer.pad(2.0));
@@ -7235,8 +7232,7 @@ describe("Domainer", function () {
         var startDate = new Date(2000, 5, 5);
         var endDate = new Date(2003, 0, 1);
         var timeScale = new Plottable.Scales.Time();
-        var provider = function (scale) { return [[startDate, endDate]]; };
-        timeScale.addExtentProvider(provider);
+        timeScale.addExtentProvider(function (scale) { return [[startDate, endDate]]; });
         timeScale.autoDomain();
         domainer.pad().addPaddingException(startDate);
         timeScale.domainer(domainer);
@@ -7274,8 +7270,7 @@ describe("Domainer", function () {
         var startDate = new Date(2000, 5, 6);
         var endDate = new Date(2003, 0, 1);
         var timeScale = new Plottable.Scales.Time();
-        var provider = function (scale) { return [[startDate, endDate]]; };
-        timeScale.addExtentProvider(provider);
+        timeScale.addExtentProvider(function (scale) { return [[startDate, endDate]]; });
         timeScale.autoDomain();
         domainer.addIncludedValue(includedDate);
         timeScale.domainer(domainer);
@@ -7377,8 +7372,7 @@ describe("Scales", function () {
             scale = new Plottable.Scales.Linear();
         });
         it("scale autoDomain flag is not overwritten without explicitly setting the domain", function () {
-            var fooProvider = function (scale) { return [d3.extent(data, function (e) { return e.foo; })]; };
-            scale.addExtentProvider(fooProvider);
+            scale.addExtentProvider(function (scale) { return [d3.extent(data, function (e) { return e.foo; })]; });
             scale.domainer(new Plottable.Domainer().pad().nice());
             assert.isTrue(scale._autoDomainAutomatically, "the autoDomain flag is still set after autoranginging and padding and nice-ing");
             scale.domain([0, 5]);
@@ -7717,8 +7711,7 @@ describe("Scales", function () {
             assert.deepEqual(scale.domain(), [0, 1]);
         });
         it("works with a Domainer", function () {
-            var logProvider = function (scale) { return [[0, base * 2]]; };
-            scale.addExtentProvider(logProvider);
+            scale.addExtentProvider(function (scale) { return [[0, base * 2]]; });
             var domain = scale.domain();
             scale.domainer(new Plottable.Domainer().pad(0.1));
             assert.operator(scale.domain()[0], "<", domain[0]);
@@ -7748,8 +7741,7 @@ describe("Scales", function () {
             assert.operator(betweenPivots.length, ">", 0, "should be ticks between -base and base");
         });
         it("works on inverted domain", function () {
-            var provider = function (scale) { return [[200, -100]]; };
-            scale.addExtentProvider(provider);
+            scale.addExtentProvider(function (scale) { return [[200, -100]]; });
             scale.autoDomain();
             var range = scale.range();
             assert.closeTo(scale.scale(-100), range[1], epsilon);

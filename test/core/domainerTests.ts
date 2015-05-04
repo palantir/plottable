@@ -11,8 +11,7 @@ describe("Domainer", () => {
   });
 
   it("pad() works in general case", () => {
-    var provider: Plottable.Scales.ExtentProvider<number> = (scale: Plottable.Scale<number, number>) => [[100, 200]];
-    scale.addExtentProvider(provider);
+    scale.addExtentProvider((scale: Plottable.Scale<number, number>) => [[100, 200]]);
     scale.autoDomain();
     scale.domainer(new Plottable.Domainer().pad(0.2));
     assert.closeTo(scale.domain()[0], 90, 0.1, "lower bound of domain correct");
@@ -24,8 +23,7 @@ describe("Domainer", () => {
     var f = d3.time.format("%x");
     var d1 = f.parse("06/02/2014");
     var d2 = f.parse("06/03/2014");
-    var provider: Plottable.Scales.ExtentProvider<Date> = (scale: Plottable.Scale<Date, number>) => [[d1, d2]];
-    timeScale.addExtentProvider(provider);
+    timeScale.addExtentProvider((scale: Plottable.Scale<Date, number>) => [[d1, d2]]);
     timeScale.autoDomain();
     timeScale.domainer(new Plottable.Domainer().pad());
     var dd1 = timeScale.domain()[0];
@@ -40,8 +38,7 @@ describe("Domainer", () => {
 
   it("pad() works on log scales", () => {
     var logScale = new Plottable.Scales.Log();
-    var provider: Plottable.Scales.ExtentProvider<number> = (scale: Plottable.Scale<number, number>) => [[10, 100]];
-    logScale.addExtentProvider(provider);
+    logScale.addExtentProvider((scale: Plottable.Scale<number, number>) => [[10, 100]]);
     logScale.autoDomain();
     logScale.range([0, 1]);
     logScale.domainer(domainer.pad(2.0));
@@ -115,8 +112,7 @@ describe("Domainer", () => {
     var startDate = new Date(2000, 5, 5);
     var endDate = new Date(2003, 0, 1);
     var timeScale = new Plottable.Scales.Time();
-    var provider: Plottable.Scales.ExtentProvider<Date> = (scale: Plottable.Scale<Date, number>) => [[startDate, endDate]];
-    timeScale.addExtentProvider(provider);
+    timeScale.addExtentProvider((scale: Plottable.Scale<Date, number>) => [[startDate, endDate]]);
     timeScale.autoDomain();
     domainer.pad().addPaddingException(startDate);
     timeScale.domainer(domainer);
@@ -159,8 +155,7 @@ describe("Domainer", () => {
     var startDate = new Date(2000, 5, 6);
     var endDate = new Date(2003, 0, 1);
     var timeScale = new Plottable.Scales.Time();
-    var provider: Plottable.Scales.ExtentProvider<Date> = (scale: Plottable.Scale<Date, number>) => [[startDate, endDate]];
-    timeScale.addExtentProvider(provider);
+    timeScale.addExtentProvider((scale: Plottable.Scale<Date, number>) => [[startDate, endDate]]);
     timeScale.autoDomain();
     domainer.addIncludedValue(includedDate);
     timeScale.domainer(domainer);

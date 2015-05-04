@@ -40,8 +40,7 @@ describe("Scales", () => {
     });
 
     it("scale autoDomain flag is not overwritten without explicitly setting the domain", () => {
-      var fooProvider: Plottable.Scales.ExtentProvider<number> = (scale: Plottable.Scale<number, number>) => [d3.extent(data, (e) => e.foo)];
-      scale.addExtentProvider(fooProvider);
+      scale.addExtentProvider((scale: Plottable.Scale<number, number>) => [d3.extent(data, (e) => e.foo)]);
       scale.domainer(new Plottable.Domainer().pad().nice());
       assert.isTrue((<any> scale)._autoDomainAutomatically,
                           "the autoDomain flag is still set after autoranginging and padding and nice-ing");
@@ -447,8 +446,7 @@ describe("Scales", () => {
     });
 
     it("works with a Domainer", () => {
-      var logProvider: Plottable.Scales.ExtentProvider<number> = (scale: Plottable.Scale<number, number>) => [[0, base * 2]];
-      scale.addExtentProvider(logProvider);
+      scale.addExtentProvider((scale: Plottable.Scale<number, number>) => [[0, base * 2]]);
       var domain = scale.domain();
       scale.domainer(new Plottable.Domainer().pad(0.1));
       assert.operator(scale.domain()[0], "<", domain[0]);
@@ -483,8 +481,7 @@ describe("Scales", () => {
     });
 
     it("works on inverted domain", () => {
-      var provider: Plottable.Scales.ExtentProvider<number> = (scale: Plottable.Scale<number, number>) => [[200, -100]];
-      scale.addExtentProvider(provider);
+      scale.addExtentProvider((scale: Plottable.Scale<number, number>) => [[200, -100]]);
       scale.autoDomain();
       var range = scale.range();
       assert.closeTo(scale.scale(-100), range[1], epsilon);
