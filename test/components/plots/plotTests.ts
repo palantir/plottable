@@ -69,11 +69,11 @@ describe("Plots", () => {
       r.project("x", "x", xScale);
       r.project("y", "y", yScale);
       r.project("meta", metadataProjector);
-      xScale.broadcaster.registerListener("unitTest", (listenable: Plottable.Scales.Linear) => {
+      xScale.registerCoolListener("unitTest", (listenable: Plottable.Scales.Linear) => {
         assert.equal(listenable, xScale, "Callback received the calling scale as the first argument");
         ++xScaleCalls;
       });
-      yScale.broadcaster.registerListener("unitTest", (listenable: Plottable.Scales.Linear) => {
+      yScale.registerCoolListener("unitTest", (listenable: Plottable.Scales.Linear) => {
         assert.equal(listenable, yScale, "Callback received the calling scale as the first argument");
         ++yScaleCalls;
       });

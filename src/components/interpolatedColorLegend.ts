@@ -40,7 +40,7 @@ export module Components {
         throw new Error("InterpolatedColorLegend requires a interpolatedColorScale");
       }
       this._scale = interpolatedColorScale;
-      this._scale.broadcaster.registerListener(this, () => this._invalidateLayout());
+      this._scale.registerCoolListener(this, () => this._invalidateLayout());
       this._formatter = formatter;
       this._orientation = InterpolatedColorLegend._ensureOrientation(orientation);
 
@@ -51,7 +51,7 @@ export module Components {
 
     public remove() {
       super.remove();
-      this._scale.broadcaster.deregisterListener(this);
+      this._scale.deregisterCoolListener(this);
     }
 
     /**

@@ -26,7 +26,7 @@ describe("Dispatchers", () => {
       assert.strictEqual(callbackCalls, 0, "disconnected correctly (callback not called)");
     });
 
-    it("won't _disconnect() if broadcasters still have listeners", () => {
+    it("won't _disconnect() if dispatcher still have listeners", () => {
       var dispatcher = new Plottable.Dispatcher();
 
       var callbackWasCalled = false;
@@ -46,13 +46,13 @@ describe("Dispatchers", () => {
       (<any> dispatcher)._disconnect();
       callbackWasCalled = false;
       triggerFakeUIEvent("click", d3document);
-      assert.isTrue(callbackWasCalled, "didn't disconnect while broadcaster had listener");
+      assert.isTrue(callbackWasCalled, "didn't disconnect while dispatcher had listener");
 
       callbackSet.delete(callback);
       (<any> dispatcher)._disconnect();
       callbackWasCalled = false;
       triggerFakeUIEvent("click", d3document);
-      assert.isFalse(callbackWasCalled, "disconnected when broadcaster had no listeners");
+      assert.isFalse(callbackWasCalled, "disconnected when dispatcher had no listeners");
     });
 
     it("setCallback()", () => {

@@ -196,7 +196,7 @@ export module Dispatchers {
 
     /**
      * Computes the mouse position from the given event, and if successful
-     * calls broadcast() on the supplied Broadcaster.
+     * calls all the callbacks in the provided callbackSet.
      */
     private _measureAndBroadcast(event: MouseEvent, callbackSet: Utils.CallbackSet<MouseCallback>) {
       var newMousePosition = this.translator.computePosition(event.clientX, event.clientY);

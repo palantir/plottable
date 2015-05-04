@@ -44,7 +44,7 @@ export module Components {
       }
 
       this._scale = colorScale;
-      this._scale.broadcaster.registerListener(this, () => this._invalidateLayout());
+      this._scale.registerCoolListener(this, () => this._invalidateLayout());
 
       this.xAlign("right").yAlign("top");
       this._fixedWidthFlag = true;
@@ -122,9 +122,9 @@ export module Components {
     public scale(scale: Scales.Color): Legend;
     public scale(scale?: Scales.Color): any {
       if (scale != null) {
-        this._scale.broadcaster.deregisterListener(this);
+        this._scale.deregisterCoolListener(this);
         this._scale = scale;
-        this._scale.broadcaster.registerListener(this, () => this._invalidateLayout());
+        this._scale.registerCoolListener(this, () => this._invalidateLayout());
         this._invalidateLayout();
         return this;
       } else {
@@ -134,7 +134,7 @@ export module Components {
 
     public remove() {
       super.remove();
-      this._scale.broadcaster.deregisterListener(this);
+      this._scale.deregisterCoolListener(this);
     }
 
     private _calculateLayoutInfo(availableWidth: number, availableHeight: number) {

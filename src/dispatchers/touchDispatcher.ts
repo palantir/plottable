@@ -165,7 +165,7 @@ export module Dispatchers {
 
     /**
      * Computes the Touch position from the given event, and if successful
-     * calls broadcast() on the supplied Broadcaster.
+     * calls all the callbacks in the provided callbackSet.
      */
     private _measureAndBroadcast(event: TouchEvent, callbackSet: Utils.CallbackSet<TouchCallback>) {
       var touches = event.changedTouches;

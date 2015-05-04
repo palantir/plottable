@@ -4,7 +4,7 @@ module Plottable {
   export class Scale<D, R> extends Core.PlottableObject {
     protected _d3Scale: D3.Scale.Scale;
     private _autoDomainAutomatically = true;
-    public broadcaster: Core.Broadcaster<Scale<D, R>>;
+    private broadcaster: Core.Broadcaster<Scale<D, R>>;
     private _rendererAttrID2Extent: {[rendererAttrID: string]: D[]} = {};
     public _typeCoercer: (d: any) => any = (d: any) => d;
     private _domainModificationInProgress: boolean = false;
@@ -30,6 +30,18 @@ module Plottable {
 
     protected _getExtent(): D[] {
       return []; // this should be overwritten
+    }
+
+    public registerCoolListener(key: any, callback: Core.BroadcasterCallback<Scale<D, R>>) {
+        this.broadcaster.registerListener(key, callback);
+    }
+
+    public deregisterCoolListener(key: any, callback: Core.BroadcasterCallback<Scale<D, R>>) {
+        this.broadcaster.deregisterListener(key);
+    }
+
+    public broadcast() {
+        this.broadcaster.broadcast();
     }
 
     /**
@@ -104,7 +116,7 @@ module Plottable {
       if (!this._domainModificationInProgress) {
         this._domainModificationInProgress = true;
         this._d3Scale.domain(values);
-        this.broadcaster.broadcast();
+        this.broadcast();
         this._domainModificationInProgress = false;
       }
     }

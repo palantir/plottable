@@ -1777,6 +1777,15 @@ var Plottable;
         Scale.prototype._getExtent = function () {
             return []; // this should be overwritten
         };
+        Scale.prototype.registerCoolListener = function (key, callback) {
+            this.broadcaster.registerListener(key, callback);
+        };
+        Scale.prototype.deregisterCoolListener = function (key, callback) {
+            this.broadcaster.deregisterListener(key);
+        };
+        Scale.prototype.broadcast = function () {
+            this.broadcaster.broadcast();
+        };
         /**
          * Modifies the domain on the scale so that it includes the extent of all
          * perspectives it depends on. This will normally happen automatically, but
@@ -1829,7 +1838,7 @@ var Plottable;
             if (!this._domainModificationInProgress) {
                 this._domainModificationInProgress = true;
                 this._d3Scale.domain(values);
-                this.broadcaster.broadcast();
+                this.broadcast();
                 this._domainModificationInProgress = false;
             }
         };
@@ -2176,7 +2185,7 @@ var Plottable;
                 this.untransformedDomain = values;
                 var transformedDomain = [this.adjustedLog(values[0]), this.adjustedLog(values[1])];
                 this._d3Scale.domain(transformedDomain);
-                this.broadcaster.broadcast();
+                this.broadcast();
             };
             ModifiedLog.prototype.ticks = function (count) {
                 if (count === void 0) { count = this.numTicks(); }
@@ -2351,7 +2360,7 @@ var Plottable;
                 }
                 this._innerPadding = innerPadding;
                 this.range(this.range());
-                this.broadcaster.broadcast();
+                this.broadcast();
                 return this;
             };
             Category.prototype.outerPadding = function (outerPadding) {
@@ -2360,7 +2369,7 @@ var Plottable;
                 }
                 this._outerPadding = outerPadding;
                 this.range(this.range());
-                this.broadcaster.broadcast();
+                this.broadcast();
                 return this;
             };
             Category.prototype.copy = function () {
@@ -2637,7 +2646,7 @@ var Plottable;
             InterpolatedColor.prototype._resetScale = function () {
                 this._d3Scale = InterpolatedColor._getD3InterpolatedScale(this._colorRange, this._scaleType);
                 this._autoDomainIfAutomaticMode();
-                this.broadcaster.broadcast();
+                this.broadcast();
             };
             InterpolatedColor.prototype._resolveColorValues = function (colorRange) {
                 if (typeof (colorRange) === "object") {
@@ -4106,11 +4115,11 @@ var Plottable;
                 this.classed("y-axis", true);
             }
             this.formatter(formatter);
-            this._scale.broadcaster.registerListener(this, function () { return _this._rescale(); });
+            this._scale.registerCoolListener(this, function () { return _this._rescale(); });
         }
         Axis.prototype.remove = function () {
             _super.prototype.remove.call(this);
-            this._scale.broadcaster.deregisterListener(this);
+            this._scale.deregisterCoolListener(this);
         };
         Axis.prototype._isHorizontal = function () {
             return this._orientation === "top" || this._orientation === "bottom";
@@ -5555,7 +5564,7 @@ var Plottable;
                     throw new Error("Legend requires a colorScale");
                 }
                 this._scale = colorScale;
-                this._scale.broadcaster.registerListener(this, function () { return _this._invalidateLayout(); });
+                this._scale.registerCoolListener(this, function () { return _this._invalidateLayout(); });
                 this.xAlign("right").yAlign("top");
                 this._fixedWidthFlag = true;
                 this._fixedHeightFlag = true;
@@ -5594,9 +5603,9 @@ var Plottable;
             Legend.prototype.scale = function (scale) {
                 var _this = this;
                 if (scale != null) {
-                    this._scale.broadcaster.deregisterListener(this);
+                    this._scale.deregisterCoolListener(this);
                     this._scale = scale;
-                    this._scale.broadcaster.registerListener(this, function () { return _this._invalidateLayout(); });
+                    this._scale.registerCoolListener(this, function () { return _this._invalidateLayout(); });
                     this._invalidateLayout();
                     return this;
                 }
@@ -5606,7 +5615,7 @@ var Plottable;
             };
             Legend.prototype.remove = function () {
                 _super.prototype.remove.call(this);
-                this._scale.broadcaster.deregisterListener(this);
+                this._scale.deregisterCoolListener(this);
             };
             Legend.prototype._calculateLayoutInfo = function (availableWidth, availableHeight) {
                 var _this = this;
@@ -5806,7 +5815,7 @@ var Plottable;
                     throw new Error("InterpolatedColorLegend requires a interpolatedColorScale");
                 }
                 this._scale = interpolatedColorScale;
-                this._scale.broadcaster.registerListener(this, function () { return _this._invalidateLayout(); });
+                this._scale.registerCoolListener(this, function () { return _this._invalidateLayout(); });
                 this._formatter = formatter;
                 this._orientation = InterpolatedColorLegend._ensureOrientation(orientation);
                 this._fixedWidthFlag = true;
@@ -5815,7 +5824,7 @@ var Plottable;
             }
             InterpolatedColorLegend.prototype.remove = function () {
                 _super.prototype.remove.call(this);
-                this._scale.broadcaster.deregisterListener(this);
+                this._scale.deregisterCoolListener(this);
             };
             InterpolatedColorLegend.prototype.formatter = function (formatter) {
                 if (formatter === undefined) {
@@ -6029,19 +6038,19 @@ var Plottable;
                 this._xScale = xScale;
                 this._yScale = yScale;
                 if (this._xScale) {
-                    this._xScale.broadcaster.registerListener(this, function () { return _this._render(); });
+                    this._xScale.registerCoolListener(this, function () { return _this._render(); });
                 }
                 if (this._yScale) {
-                    this._yScale.broadcaster.registerListener(this, function () { return _this._render(); });
+                    this._yScale.registerCoolListener(this, function () { return _this._render(); });
                 }
             }
             Gridlines.prototype.remove = function () {
                 _super.prototype.remove.call(this);
                 if (this._xScale) {
-                    this._xScale.broadcaster.deregisterListener(this);
+                    this._xScale.deregisterCoolListener(this);
                 }
                 if (this._yScale) {
-                    this._yScale.broadcaster.deregisterListener(this);
+                    this._yScale.deregisterCoolListener(this);
                 }
                 return this;
             };
@@ -6579,7 +6588,7 @@ var Plottable;
             properties.forEach(function (property) {
                 var projector = _this._projections[property];
                 if (projector.scale) {
-                    projector.scale.broadcaster.deregisterListener(_this);
+                    projector.scale.deregisterCoolListener(_this);
                 }
             });
         };
@@ -6667,11 +6676,11 @@ var Plottable;
             if (existingScale) {
                 this._datasetKeysInOrder.forEach(function (key) {
                     existingScale._removeExtent(_this.getID().toString() + "_" + key, attrToSet);
-                    existingScale.broadcaster.deregisterListener(_this);
+                    existingScale.deregisterCoolListener(_this);
                 });
             }
             if (scale) {
-                scale.broadcaster.registerListener(this, function () { return _this._render(); });
+                scale.registerCoolListener(this, function () { return _this._render(); });
             }
             accessor = Plottable.Utils.Methods.accessorize(accessor);
             this._projections[attrToSet] = { accessor: accessor, scale: scale, attribute: attrToSet };
@@ -7099,9 +7108,9 @@ var Plottable;
             this._xScale = xScale;
             this._yScale = yScale;
             this._updateXDomainer();
-            xScale.broadcaster.registerListener("yDomainAdjustment" + this.getID(), function () { return _this._adjustYDomainOnChangeFromX(); });
+            xScale.registerCoolListener("yDomainAdjustment" + this.getID(), function () { return _this._adjustYDomainOnChangeFromX(); });
             this._updateYDomainer();
-            yScale.broadcaster.registerListener("xDomainAdjustment" + this.getID(), function () { return _this._adjustXDomainOnChangeFromY(); });
+            yScale.registerCoolListener("xDomainAdjustment" + this.getID(), function () { return _this._adjustXDomainOnChangeFromY(); });
         }
         /**
          * @param {string} attrToSet One of ["x", "y"] which determines the point's
@@ -7113,19 +7122,19 @@ var Plottable;
             // So when we get an "x" or "y" scale, enable autoNiceing and autoPadding.
             if (attrToSet === "x" && scale) {
                 if (this._xScale) {
-                    this._xScale.broadcaster.deregisterListener("yDomainAdjustment" + this.getID());
+                    this._xScale.deregisterCoolListener("yDomainAdjustment" + this.getID());
                 }
                 this._xScale = scale;
                 this._updateXDomainer();
-                scale.broadcaster.registerListener("yDomainAdjustment" + this.getID(), function () { return _this._adjustYDomainOnChangeFromX(); });
+                scale.registerCoolListener("yDomainAdjustment" + this.getID(), function () { return _this._adjustYDomainOnChangeFromX(); });
             }
             if (attrToSet === "y" && scale) {
                 if (this._yScale) {
-                    this._yScale.broadcaster.deregisterListener("xDomainAdjustment" + this.getID());
+                    this._yScale.deregisterCoolListener("xDomainAdjustment" + this.getID());
                 }
                 this._yScale = scale;
                 this._updateYDomainer();
-                scale.broadcaster.registerListener("xDomainAdjustment" + this.getID(), function () { return _this._adjustXDomainOnChangeFromY(); });
+                scale.registerCoolListener("xDomainAdjustment" + this.getID(), function () { return _this._adjustXDomainOnChangeFromY(); });
             }
             _super.prototype.project.call(this, attrToSet, accessor, scale);
             return this;
@@ -7133,10 +7142,10 @@ var Plottable;
         XYPlot.prototype.remove = function () {
             _super.prototype.remove.call(this);
             if (this._xScale) {
-                this._xScale.broadcaster.deregisterListener("yDomainAdjustment" + this.getID());
+                this._xScale.deregisterCoolListener("yDomainAdjustment" + this.getID());
             }
             if (this._yScale) {
-                this._yScale.broadcaster.deregisterListener("xDomainAdjustment" + this.getID());
+                this._yScale.deregisterCoolListener("xDomainAdjustment" + this.getID());
             }
             return this;
         };
@@ -9140,7 +9149,7 @@ var Plottable;
             };
             /**
              * Computes the mouse position from the given event, and if successful
-             * calls broadcast() on the supplied Broadcaster.
+             * calls all the callbacks in the provided callbackSet.
              */
             Mouse.prototype._measureAndBroadcast = function (event, callbackSet) {
                 var newMousePosition = this.translator.computePosition(event.clientX, event.clientY);
@@ -9311,7 +9320,7 @@ var Plottable;
             };
             /**
              * Computes the Touch position from the given event, and if successful
-             * calls broadcast() on the supplied Broadcaster.
+             * calls all the callbacks in the provided callbackSet.
              */
             Touch.prototype._measureAndBroadcast = function (event, callbackSet) {
                 var touches = event.changedTouches;

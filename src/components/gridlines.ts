@@ -27,20 +27,20 @@ export module Components {
       this._xScale = xScale;
       this._yScale = yScale;
       if (this._xScale) {
-        this._xScale.broadcaster.registerListener(this, () => this._render());
+        this._xScale.registerCoolListener(this, () => this._render());
       }
       if (this._yScale) {
-        this._yScale.broadcaster.registerListener(this, () => this._render());
+        this._yScale.registerCoolListener(this, () => this._render());
       }
     }
 
     public remove() {
       super.remove();
       if (this._xScale) {
-        this._xScale.broadcaster.deregisterListener(this);
+        this._xScale.deregisterCoolListener(this);
       }
       if (this._yScale) {
-        this._yScale.broadcaster.deregisterListener(this);
+        this._yScale.deregisterCoolListener(this);
       }
       return this;
     }

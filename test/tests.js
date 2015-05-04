@@ -2162,11 +2162,11 @@ describe("Plots", function () {
             r.project("x", "x", xScale);
             r.project("y", "y", yScale);
             r.project("meta", metadataProjector);
-            xScale.broadcaster.registerListener("unitTest", function (listenable) {
+            xScale.registerCoolListener("unitTest", function (listenable) {
                 assert.equal(listenable, xScale, "Callback received the calling scale as the first argument");
                 ++xScaleCalls;
             });
-            yScale.broadcaster.registerListener("unitTest", function (listenable) {
+            yScale.registerCoolListener("unitTest", function (listenable) {
                 assert.equal(listenable, yScale, "Callback received the calling scale as the first argument");
                 ++yScaleCalls;
             });
@@ -9172,7 +9172,7 @@ describe("Dispatchers", function () {
             triggerFakeUIEvent("click", d3document);
             assert.strictEqual(callbackCalls, 0, "disconnected correctly (callback not called)");
         });
-        it("won't _disconnect() if broadcasters still have listeners", function () {
+        it("won't _disconnect() if dispatcher still have listeners", function () {
             var dispatcher = new Plottable.Dispatcher();
             var callbackWasCalled = false;
             dispatcher._event2Callback["click"] = function () { return callbackWasCalled = true; };
@@ -9187,12 +9187,12 @@ describe("Dispatchers", function () {
             dispatcher._disconnect();
             callbackWasCalled = false;
             triggerFakeUIEvent("click", d3document);
-            assert.isTrue(callbackWasCalled, "didn't disconnect while broadcaster had listener");
+            assert.isTrue(callbackWasCalled, "didn't disconnect while dispatcher had listener");
             callbackSet.delete(callback);
             dispatcher._disconnect();
             callbackWasCalled = false;
             triggerFakeUIEvent("click", d3document);
-            assert.isFalse(callbackWasCalled, "disconnected when broadcaster had no listeners");
+            assert.isFalse(callbackWasCalled, "disconnected when dispatcher had no listeners");
         });
         it("setCallback()", function () {
             var dispatcher = new Plottable.Dispatcher();

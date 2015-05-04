@@ -54,12 +54,12 @@ module Plottable {
 
       this.formatter(formatter);
 
-      this._scale.broadcaster.registerListener(this, () => this._rescale());
+      this._scale.registerCoolListener(this, () => this._rescale());
     }
 
     public remove() {
       super.remove();
-      this._scale.broadcaster.deregisterListener(this);
+      this._scale.deregisterCoolListener(this);
     }
 
     protected _isHorizontal() {

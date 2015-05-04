@@ -28,9 +28,9 @@ module Plottable {
       this._xScale = xScale;
       this._yScale = yScale;
       this._updateXDomainer();
-      xScale.broadcaster.registerListener("yDomainAdjustment" + this.getID(), () => this._adjustYDomainOnChangeFromX());
+      xScale.registerCoolListener("yDomainAdjustment" + this.getID(), () => this._adjustYDomainOnChangeFromX());
       this._updateYDomainer();
-      yScale.broadcaster.registerListener("xDomainAdjustment" + this.getID(), () => this._adjustXDomainOnChangeFromY());
+      yScale.registerCoolListener("xDomainAdjustment" + this.getID(), () => this._adjustXDomainOnChangeFromY());
     }
 
     /**
@@ -42,20 +42,20 @@ module Plottable {
       // So when we get an "x" or "y" scale, enable autoNiceing and autoPadding.
       if (attrToSet === "x" && scale) {
         if (this._xScale) {
-          this._xScale.broadcaster.deregisterListener("yDomainAdjustment" + this.getID());
+          this._xScale.deregisterCoolListener("yDomainAdjustment" + this.getID());
         }
         this._xScale = scale;
         this._updateXDomainer();
-        scale.broadcaster.registerListener("yDomainAdjustment" + this.getID(), () => this._adjustYDomainOnChangeFromX());
+        scale.registerCoolListener("yDomainAdjustment" + this.getID(), () => this._adjustYDomainOnChangeFromX());
       }
 
       if (attrToSet === "y" && scale) {
         if (this._yScale) {
-          this._yScale.broadcaster.deregisterListener("xDomainAdjustment" + this.getID());
+          this._yScale.deregisterCoolListener("xDomainAdjustment" + this.getID());
         }
         this._yScale = scale;
         this._updateYDomainer();
-        scale.broadcaster.registerListener("xDomainAdjustment" + this.getID(), () => this._adjustXDomainOnChangeFromY());
+        scale.registerCoolListener("xDomainAdjustment" + this.getID(), () => this._adjustXDomainOnChangeFromY());
       }
 
       super.project(attrToSet, accessor, scale);
@@ -66,10 +66,10 @@ module Plottable {
     public remove() {
       super.remove();
       if (this._xScale) {
-        this._xScale.broadcaster.deregisterListener("yDomainAdjustment" + this.getID());
+        this._xScale.deregisterCoolListener("yDomainAdjustment" + this.getID());
       }
       if (this._yScale) {
-        this._yScale.broadcaster.deregisterListener("xDomainAdjustment" + this.getID());
+        this._yScale.deregisterCoolListener("xDomainAdjustment" + this.getID());
       }
       return this;
     }
