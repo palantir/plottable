@@ -4,10 +4,13 @@ module Plottable {
   export class Dispatcher extends Core.PlottableObject {
     protected _event2Callback: { [eventName: string]: (e: Event) => any; } = {};
     protected _broadcasters: Core.Broadcaster<Dispatcher>[] = [];
+    protected _callbackSets: Utils.CallbackSet<Function>[] = [];
     private _connected = false;
 
     private _hasNoListeners() {
-      return this._broadcasters.every((b) => b.getListenerKeys().length === 0);
+      // return this._broadcasters.every((b) => b.getListenerKeys().length === 0);
+      return this._callbackSets.every((cbs) => cbs.values().length === 0);
+
     }
 
     private _connect() {
@@ -49,5 +52,11 @@ module Plottable {
         // broadcaster.registerListener(key, this._getWrappedCallback(callback));
       }
     }
+
+    protected _unsetCallback(callbackSet: Utils.CallbackSet<Function>, callback: Function) {
+      callbackSet.remove(callback);
+      this._disconnect();
+    }
+
   }
 }

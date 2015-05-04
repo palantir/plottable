@@ -8910,10 +8910,12 @@ var Plottable;
             _super.apply(this, arguments);
             this._event2Callback = {};
             this._broadcasters = [];
+            this._callbackSets = [];
             this._connected = false;
         }
         Dispatcher.prototype._hasNoListeners = function () {
-            return this._broadcasters.every(function (b) { return b.getListenerKeys().length === 0; });
+            // return this._broadcasters.every((b) => b.getListenerKeys().length === 0);
+            return this._callbackSets.every(function (cbs) { return cbs.values().length === 0; });
         };
         Dispatcher.prototype._connect = function () {
             var _this = this;
@@ -8952,6 +8954,10 @@ var Plottable;
                 this._connect();
                 callbackSet.add(callback);
             }
+        };
+        Dispatcher.prototype._unsetCallback = function (callbackSet, callback) {
+            callbackSet.remove(callback);
+            this._disconnect();
         };
         return Dispatcher;
     })(Plottable.Core.PlottableObject);
@@ -9001,6 +9007,7 @@ var Plottable;
                 this._event2Callback["wheel"] = function (e) { return _this._measureAndBroadcast(e, _this._wheelBroadcaster, _this._wheelCallbackSet); };
                 this._event2Callback["dblclick"] = function (e) { return _this._measureAndBroadcast(e, _this._dblClickBroadcaster, _this._dblClickCallbackSet); };
                 this._broadcasters = [this._moveBroadcaster, this._downBroadcaster, this._upBroadcaster, this._wheelBroadcaster, this._dblClickBroadcaster];
+                this._callbackSets = [this._moveCallbackSet, this._downCallbackSet, this._upCallbackSet, this._wheelCallbackSet, this._dblClickCallbackSet];
             }
             /**
              * Get a Dispatcher.Mouse for the <svg> containing elem. If one already exists
@@ -9034,6 +9041,10 @@ var Plottable;
              */
             Mouse.prototype.onMouseMove = function (key, callback) {
                 this._setCallback(this._moveCallbackSet, key, callback);
+                return this;
+            };
+            Mouse.prototype.offMouseMove = function (key, callback) {
+                this._unsetCallback(this._moveCallbackSet, callback);
                 return this;
             };
             /**
@@ -9156,6 +9167,7 @@ var Plottable;
                 this._event2Callback["touchmove"] = function (e) { return _this._measureAndBroadcast(e, _this._moveBroadcaster, _this._moveCallbackSet); };
                 this._event2Callback["touchend"] = function (e) { return _this._measureAndBroadcast(e, _this._endBroadcaster, _this._endCallbackSet); };
                 this._broadcasters = [this._moveBroadcaster, this._startBroadcaster, this._endBroadcaster];
+                this._callbackSets = [this._movecallbackSet, this._startcallbackSet, this._endcallbackSet];
             }
             /**
              * Get a Dispatcher.Touch for the <svg> containing elem. If one already exists
@@ -9282,6 +9294,7 @@ var Plottable;
                 this._keydownCallbackSet = new Plottable.Utils.CallbackSet();
                 this._event2Callback["keydown"] = function (e) { return _this._processKeydown(e); };
                 this._broadcasters = [this._keydownBroadcaster];
+                this._callbackSets = [this._keydownCallbackSet];
             }
             /**
              * Get a Dispatcher.Key. If one already exists it will be returned;

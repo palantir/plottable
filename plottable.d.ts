@@ -3528,6 +3528,7 @@ declare module Plottable {
          */
         protected _getWrappedCallback(callback: Function): Core.BroadcasterCallback<Dispatcher>;
         protected _setCallback(callbackSet: Utils.CallbackSet<Function>, key: any, callback: Function): void;
+        protected _unsetCallback(callbackSet: Utils.CallbackSet<Function>, callback: Function): void;
     }
 }
 
@@ -3564,6 +3565,7 @@ declare module Plottable {
              * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
              */
             onMouseMove(key: any, callback: MouseCallback): Dispatchers.Mouse;
+            offMouseMove(key: any, callback: MouseCallback): Dispatchers.Mouse;
             /**
              * Registers a callback to be called whenever a mousedown occurs,
              * or removes the callback if `null` is passed as the callback.

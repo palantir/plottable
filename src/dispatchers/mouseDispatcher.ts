@@ -78,6 +78,9 @@ export module Dispatchers {
         this._dblClickCallbackSet);
       this._broadcasters = [this._moveBroadcaster, this._downBroadcaster, this._upBroadcaster, this._wheelBroadcaster,
                             this._dblClickBroadcaster];
+      this._callbackSets = [this._moveCallbackSet, this._downCallbackSet, this._upCallbackSet, this._wheelCallbackSet,
+                            this._dblClickCallbackSet];
+
     }
 
     protected _getWrappedCallback(callback: Function): Core.BroadcasterCallback<Dispatchers.Mouse> {
@@ -97,6 +100,11 @@ export module Dispatchers {
      */
     public onMouseMove(key: any, callback: MouseCallback): Dispatchers.Mouse {
       this._setCallback(this._moveCallbackSet, key, callback);
+      return this;
+    }
+
+    public offMouseMove(key: any, callback: MouseCallback): Dispatchers.Mouse {
+      this._unsetCallback(this._moveCallbackSet, callback);
       return this;
     }
 

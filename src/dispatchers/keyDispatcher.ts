@@ -39,6 +39,7 @@ export module Dispatchers {
 
       this._event2Callback["keydown"] = (e: KeyboardEvent) => this._processKeydown(e);
       this._broadcasters = [this._keydownBroadcaster];
+      this._callbackSets = [this._keydownCallbackSet];
     }
 
     protected _getWrappedCallback(callback: Function): Core.BroadcasterCallback<Dispatchers.Key> {
