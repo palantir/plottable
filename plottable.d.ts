@@ -234,6 +234,22 @@ declare module Plottable {
     }
 }
 
+
+declare module Plottable {
+    module Utils {
+        /**
+         * Shim for ES6 set.
+         * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set
+         */
+        class Set<T> {
+            constructor();
+            add(value: T): Set<T>;
+            delete(value: T): boolean;
+            values(): T[];
+        }
+    }
+}
+
 declare module Plottable {
     module Utils {
         module DOM {
@@ -281,11 +297,7 @@ declare module Plottable {
          * Each callback exists at most once in the set (based on reference equality).
          * All callbacks should have the same signature.
          */
-        class CallbackSet<CB extends Function> {
-            constructor();
-            add(value: CB): CallbackSet<CB>;
-            remove(value: CB): CallbackSet<CB>;
-            values(): CB[];
+        class CallbackSet<CB extends Function> extends Set<CB> {
             callCallbacks(...args: any[]): CallbackSet<CB>;
         }
     }

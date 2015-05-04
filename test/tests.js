@@ -8190,6 +8190,43 @@ describe("StrictEqualityAssociativeArray", function () {
 
 ///<reference path="../testReference.ts" />
 var assert = chai.assert;
+describe("Utils", function () {
+    describe("Set", function () {
+        it("add()", function () {
+            var set = new Plottable.Utils.Set();
+            var value1 = { value: "one" };
+            set.add(value1);
+            var setValues = set.values();
+            assert.lengthOf(setValues, 1, "set contains one value");
+            assert.strictEqual(setValues[0], value1, "the value was added to the set");
+            set.add(value1);
+            setValues = set.values();
+            assert.lengthOf(setValues, 1, "same value is not added twice");
+            assert.strictEqual(setValues[0], value1, "list still contains the value");
+            var value2 = { value: "two" };
+            set.add(value2);
+            setValues = set.values();
+            assert.lengthOf(setValues, 2, "set now contains two values");
+            assert.strictEqual(setValues[0], value1, "set contains value 1");
+            assert.strictEqual(setValues[1], value2, "set contains value 2");
+        });
+        it("delete()", function () {
+            var set = new Plottable.Utils.Set();
+            var value1 = { value: "one" };
+            set.add(value1);
+            assert.lengthOf(set.values(), 1, "set contains one value after adding");
+            set.delete(value1);
+            assert.lengthOf(set.values(), 0, "value was delete");
+            set.add(value1);
+            var value2 = { value: "two" };
+            set.delete(value2);
+            assert.lengthOf(set.values(), 1, "removing a non-existent value does nothing");
+        });
+    });
+});
+
+///<reference path="../testReference.ts" />
+var assert = chai.assert;
 describe("ClientToSVGTranslator", function () {
     it("getTranslator() creates only one ClientToSVGTranslator per <svg>", function () {
         var svg = generateSVG();
@@ -8422,58 +8459,30 @@ describe("Utils.Methods", function () {
 
 ///<reference path="../testReference.ts" />
 var assert = chai.assert;
-describe("CallbackSet", function () {
-    it("add()", function () {
-        var callbackSet = new Plottable.Utils.CallbackSet();
-        var cb1 = function () { return "one"; };
-        callbackSet.add(cb1);
-        var assignedCallbacks = callbackSet.values();
-        assert.lengthOf(assignedCallbacks, 1, "set contains one callback");
-        assert.strictEqual(assignedCallbacks[0], cb1, "the callback was added to the list");
-        callbackSet.add(cb1);
-        assignedCallbacks = callbackSet.values();
-        assert.lengthOf(assignedCallbacks, 1, "same callback is not added twice");
-        assert.strictEqual(assignedCallbacks[0], cb1, "list still contains the callback");
-        var cb2 = function () { return "two"; };
-        callbackSet.add(cb2);
-        assignedCallbacks = callbackSet.values();
-        assert.lengthOf(assignedCallbacks, 2, "set now contains two callbacks");
-        assert.strictEqual(assignedCallbacks[0], cb1, "set contains callback 1");
-        assert.strictEqual(assignedCallbacks[1], cb2, "set contains callback 2");
-    });
-    it("remove()", function () {
-        var callbackSet = new Plottable.Utils.CallbackSet();
-        var cb1 = function () { return "one"; };
-        callbackSet.add(cb1);
-        assert.lengthOf(callbackSet.values(), 1, "set contains one callback after adding");
-        callbackSet.remove(cb1);
-        assert.lengthOf(callbackSet.values(), 0, "callback was removed");
-        callbackSet.add(cb1);
-        var cb2 = function () { return "two"; };
-        callbackSet.remove(cb2);
-        assert.lengthOf(callbackSet.values(), 1, "removing a non-existent value does nothing");
-    });
-    it("callCallbacks()", function () {
-        var expectedS = "Plottable";
-        var expectedI = 1;
-        var cb1called = false;
-        var cb1 = function (s, i) {
-            assert.strictEqual(s, expectedS, "was passed the correct first argument");
-            assert.strictEqual(i, expectedI, "was passed the correct second argument");
-            cb1called = true;
-        };
-        var cb2called = false;
-        var cb2 = function (s, i) {
-            assert.strictEqual(s, expectedS, "was passed the correct first argument");
-            assert.strictEqual(i, expectedI, "was passed the correct second argument");
-            cb2called = true;
-        };
-        var callbackSet = new Plottable.Utils.CallbackSet();
-        callbackSet.add(cb1);
-        callbackSet.add(cb2);
-        callbackSet.callCallbacks(expectedS, expectedI);
-        assert.isTrue(cb1called, "callback 1 was called");
-        assert.isTrue(cb2called, "callback 2 was called");
+describe("Utils", function () {
+    describe("CallbackSet", function () {
+        it("callCallbacks()", function () {
+            var expectedS = "Plottable";
+            var expectedI = 1;
+            var cb1called = false;
+            var cb1 = function (s, i) {
+                assert.strictEqual(s, expectedS, "was passed the correct first argument");
+                assert.strictEqual(i, expectedI, "was passed the correct second argument");
+                cb1called = true;
+            };
+            var cb2called = false;
+            var cb2 = function (s, i) {
+                assert.strictEqual(s, expectedS, "was passed the correct first argument");
+                assert.strictEqual(i, expectedI, "was passed the correct second argument");
+                cb2called = true;
+            };
+            var callbackSet = new Plottable.Utils.CallbackSet();
+            callbackSet.add(cb1);
+            callbackSet.add(cb2);
+            callbackSet.callCallbacks(expectedS, expectedI);
+            assert.isTrue(cb1called, "callback 1 was called");
+            assert.isTrue(cb2called, "callback 2 was called");
+        });
     });
 });
 

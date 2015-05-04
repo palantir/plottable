@@ -2,6 +2,7 @@
 
 /// <reference path="utils/utils.ts" />
 /// <reference path="utils/strictEqualityAssociativeArray.ts" />
+/// <reference path="utils/set.ts" />
 /// <reference path="utils/domUtils.ts" />
 /// <reference path="utils/color.ts" />
 /// <reference path="utils/callbackSet.ts" />
