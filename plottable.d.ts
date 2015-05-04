@@ -2146,30 +2146,6 @@ declare module Plottable {
              * @returns {Numeric} The calling Axis.Numeric.
              */
             tickLabelPosition(position: string): Numeric;
-            /**
-             * Gets whether or not the tick labels at the end of the graph are
-             * displayed when partially cut off.
-             *
-             * @param {string} orientation Where on the scale to change tick labels.
-             *                 On a "top" or "bottom" axis, this can be "left" or
-             *                 "right". On a "left" or "right" axis, this can be "top"
-             *                 or "bottom".
-             * @returns {boolean} The current setting.
-             */
-            showEndTickLabel(orientation: string): boolean;
-            /**
-             * Sets whether or not the tick labels at the end of the graph are
-             * displayed when partially cut off.
-             *
-             * @param {string} orientation If provided, where on the scale to change tick labels.
-             *                 On a "top" or "bottom" axis, this can be "left" or
-             *                 "right". On a "left" or "right" axis, this can be "top"
-             *                 or "bottom".
-             * @param {boolean} show Whether or not the given tick should be
-             * displayed.
-             * @returns {Numeric} The calling NumericAxis.
-             */
-            showEndTickLabel(orientation: string, show: boolean): Numeric;
         }
     }
 }
