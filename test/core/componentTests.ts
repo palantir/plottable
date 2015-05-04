@@ -24,17 +24,17 @@ describe("Component behavior", () => {
 
   describe("anchor", () => {
     it("anchoring works as expected", () => {
-      c._anchor(svg);
+      c.anchor(svg);
       assert.equal((<any> c)._element.node(), svg.select("g").node(), "the component anchored to a <g> beneath the <svg>");
       assert.isTrue(svg.classed("plottable"), "<svg> was given \"plottable\" CSS class");
       svg.remove();
     });
 
     it("can re-anchor to a different element", () => {
-      c._anchor(svg);
+      c.anchor(svg);
 
       var svg2 = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      c._anchor(svg2);
+      c.anchor(svg2);
       assert.equal((<any> c)._element.node(), svg2.select("g").node(), "the component re-achored under the second <svg>");
       assert.isTrue(svg2.classed("plottable"), "second <svg> was given \"plottable\" CSS class");
 
@@ -45,19 +45,21 @@ describe("Component behavior", () => {
 
   describe("computeLayout", () => {
     it("computeLayout defaults and updates intelligently", () => {
-      c._anchor(svg);
-      c._computeLayout();
+      c.anchor(svg);
+      c.computeLayout();
       assert.equal(c.width() , SVG_WIDTH, "computeLayout defaulted width to svg width");
       assert.equal(c.height(), SVG_HEIGHT, "computeLayout defaulted height to svg height");
-      assert.equal((<any> c)._xOrigin, 0 , "xOrigin defaulted to 0");
-      assert.equal((<any> c)._yOrigin, 0 , "yOrigin defaulted to 0");
+      var origin = c.origin();
+      assert.equal(origin.x, 0 , "xOrigin defaulted to 0");
+      assert.equal(origin.y, 0 , "yOrigin defaulted to 0");
 
       svg.attr("width", 2 * SVG_WIDTH).attr("height", 2 * SVG_HEIGHT);
-      c._computeLayout();
+      c.computeLayout();
       assert.equal(c.width() , 2 * SVG_WIDTH, "computeLayout updated width to new svg width");
       assert.equal(c.height(), 2 * SVG_HEIGHT, "computeLayout updated height to new svg height");
-      assert.equal((<any> c)._xOrigin, 0 , "xOrigin is still 0");
-      assert.equal((<any> c)._yOrigin, 0 , "yOrigin is still 0");
+      origin = c.origin();
+      assert.equal(origin.x, 0 , "xOrigin is still 0");
+      assert.equal(origin.y, 0 , "yOrigin is still 0");
 
       svg.remove();
     });
@@ -70,30 +72,33 @@ describe("Component behavior", () => {
 
       // Remove width/height attributes and style with CSS
       svg.attr("width", null).attr("height", null);
-      c._anchor(svg);
-      c._computeLayout();
+      c.anchor(svg);
+      c.computeLayout();
       assert.equal(c.width(), 400, "defaults to width of parent if width is not specified on <svg>");
       assert.equal(c.height(), 200, "defaults to height of parent if width is not specified on <svg>");
-      assert.equal((<any> c)._xOrigin, 0, "xOrigin defaulted to 0");
-      assert.equal((<any> c)._yOrigin, 0, "yOrigin defaulted to 0");
+      var origin = c.origin();
+      assert.equal(origin.x, 0, "xOrigin defaulted to 0");
+      assert.equal(origin.y, 0, "yOrigin defaulted to 0");
 
 
       svg.style("width", "50%").style("height", "50%");
-      c._computeLayout();
+      c.computeLayout();
 
       assert.equal(c.width(), 200, "computeLayout defaulted width to svg width");
       assert.equal(c.height(), 100, "computeLayout defaulted height to svg height");
-      assert.equal((<any> c)._xOrigin, 0, "xOrigin defaulted to 0");
-      assert.equal((<any> c)._yOrigin, 0, "yOrigin defaulted to 0");
+      origin = c.origin();
+      assert.equal(origin.x, 0, "xOrigin defaulted to 0");
+      assert.equal(origin.y, 0, "yOrigin defaulted to 0");
 
       svg.style("width", "25%").style("height", "25%");
 
-      c._computeLayout();
+      c.computeLayout();
 
       assert.equal(c.width(), 100, "computeLayout updated width to new svg width");
       assert.equal(c.height(), 50, "computeLayout updated height to new svg height");
-      assert.equal((<any> c)._xOrigin, 0, "xOrigin is still 0");
-      assert.equal((<any> c)._yOrigin, 0, "yOrigin is still 0");
+      origin = c.origin();
+      assert.equal(origin.x, 0, "xOrigin is still 0");
+      assert.equal(origin.y, 0, "yOrigin is still 0");
 
       // reset test page DOM
       parent.style("width", "auto");
@@ -103,26 +108,28 @@ describe("Component behavior", () => {
 
     it("computeLayout will not default when attached to non-root node", () => {
       var g = svg.append("g");
-      c._anchor(g);
-      assert.throws(() => c._computeLayout(), "null arguments");
+      c.anchor(g);
+      assert.throws(() => c.computeLayout(), "null arguments");
       svg.remove();
     });
 
     it("computeLayout throws an error when called on un-anchored component", () => {
-      assert.throws(() => c._computeLayout(), Error, "anchor must be called before computeLayout");
+      assert.throws(() => c.computeLayout(), Error);
       svg.remove();
     });
 
     it("computeLayout uses its arguments apropriately", () => {
       var g = svg.append("g");
-      var xOff = 10;
-      var yOff = 20;
+      var origin = {
+        x: 10,
+        y: 20
+      };
       var width = 100;
       var height = 200;
-      c._anchor(svg);
-      c._computeLayout(xOff, yOff, width, height);
+      c.anchor(svg);
+      c.computeLayout(origin, width, height);
       var translate = getTranslate((<any> c)._element);
-      assert.deepEqual(translate, [xOff, yOff], "the element translated appropriately");
+      assert.deepEqual(translate, [origin.x, origin.y], "the element translated appropriately");
       assert.equal(c.width() , width, "the width set properly");
       assert.equal(c.height(), height, "the height set propery");
       svg.remove();
@@ -145,41 +152,41 @@ describe("Component behavior", () => {
 
   it("fixed-width component will align to the right spot", () => {
     fixComponentSize(c, 100, 100);
-    c._anchor(svg);
-    c._computeLayout();
+    c.anchor(svg);
+    c.computeLayout();
     assertComponentXY(c, 0, 0, "top-left component aligns correctly");
 
     c.xAlign("CENTER").yAlign("CENTER");
-    c._computeLayout();
+    c.computeLayout();
     assertComponentXY(c, 150, 100, "center component aligns correctly");
 
     c.xAlign("RIGHT").yAlign("BOTTOM");
-    c._computeLayout();
+    c.computeLayout();
     assertComponentXY(c, 300, 200, "bottom-right component aligns correctly");
     svg.remove();
   });
 
   it("components can be offset relative to their alignment, and throw errors if there is insufficient space", () => {
     fixComponentSize(c, 100, 100);
-    c._anchor(svg);
+    c.anchor(svg);
     c.xOffset(20).yOffset(20);
-    c._computeLayout();
+    c.computeLayout();
     assertComponentXY(c, 20, 20, "top-left component offsets correctly");
 
     c.xAlign("CENTER").yAlign("CENTER");
-    c._computeLayout();
+    c.computeLayout();
     assertComponentXY(c, 170, 120, "center component offsets correctly");
 
     c.xAlign("RIGHT").yAlign("BOTTOM");
-    c._computeLayout();
+    c.computeLayout();
     assertComponentXY(c, 320, 220, "bottom-right component offsets correctly");
 
     c.xOffset(0).yOffset(0);
-    c._computeLayout();
+    c.computeLayout();
     assertComponentXY(c, 300, 200, "bottom-right component offset resets");
 
     c.xOffset(-20).yOffset(-30);
-    c._computeLayout();
+    c.computeLayout();
     assertComponentXY(c, 280, 170, "negative offsets work properly");
 
     svg.remove();
@@ -202,8 +209,8 @@ describe("Component behavior", () => {
     assert.isFalse(c.clipPathEnabled, "clipPathEnabled defaults to false");
     c.clipPathEnabled = true;
     var expectedClipPathID = c.getID();
-    c._anchor(svg);
-    c._computeLayout(0, 0, 100, 100);
+    c.anchor(svg);
+    c.computeLayout({ x: 0, y: 0 }, 100, 100);
     c._render();
     var expectedPrefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
     expectedPrefix = expectedPrefix.replace(/#.*/g, "");
@@ -260,7 +267,7 @@ describe("Component behavior", () => {
     c.classed("CSS-PREANCHOR-REMOVE", false);
     assert.isFalse(c.classed("CSS-PREANCHOR-REMOVE"));
 
-    c._anchor(svg);
+    c.anchor(svg);
     assert.isTrue(c.classed("CSS-PREANCHOR-KEEP"));
     assert.isFalse(c.classed("CSS-PREANCHOR-REMOVE"));
     assert.isFalse(c.classed("CSS-POSTANCHOR"));
@@ -293,7 +300,7 @@ describe("Component behavior", () => {
     svg.remove();
   });
 
-  it("_invalidateLayout works as expected", () => {
+  it("redraw() works as expected", () => {
     var cg = new Plottable.Components.Group();
     var c = makeFixedSizeComponent(10, 10);
     cg._addComponent(c);
@@ -301,7 +308,7 @@ describe("Component behavior", () => {
     assert.equal(cg.height(), 300, "height() is the entire available height");
     assert.equal(cg.width(), 400, "width() is the entire available width");
     fixComponentSize(c, 50, 50);
-    c._invalidateLayout();
+    c.redraw();
     assert.equal(cg.height(), 300, "height() after resizing is the entire available height");
     assert.equal(cg.width(), 400, "width() after resizing is the entire available width");
     svg.remove();
@@ -351,7 +358,7 @@ describe("Component behavior", () => {
     var renderFlag = false;
     var c: any = new Plottable.Component();
     c._doRender = () => renderFlag = true;
-    c._anchor(svg);
+    c.anchor(svg);
     c._setup();
     c._render();
     assert.isFalse(renderFlag, "no render until width/height set to nonzero");

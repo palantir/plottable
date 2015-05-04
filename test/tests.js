@@ -1318,7 +1318,7 @@ describe("Category Axes", function () {
         var svg = generateSVG(400, 400);
         var scale = new Plottable.Scales.Category();
         var ca = new Plottable.Axes.Category(scale);
-        ca._anchor(svg);
+        ca.anchor(svg);
         var s = ca._requestedSpace(400, 400);
         assert.operator(s.width, ">=", 0, "it requested 0 or more width");
         assert.operator(s.height, ">=", 0, "it requested 0 or more height");
@@ -1468,8 +1468,8 @@ describe("Gridlines", function () {
         var yAxis = new Plottable.Axes.Numeric(yScale, "left");
         var gridlines = new Plottable.Components.Gridlines(xScale, yScale);
         var basicTable = new Plottable.Components.Table().addComponent(0, 0, yAxis).addComponent(0, 1, gridlines).addComponent(1, 1, xAxis);
-        basicTable._anchor(svg);
-        basicTable._computeLayout();
+        basicTable.anchor(svg);
+        basicTable.computeLayout();
         xScale.range([0, xAxis.width()]); // manually set range since we don't have a renderer
         yScale.range([yAxis.height(), 0]);
         basicTable._render();
@@ -1794,11 +1794,11 @@ describe("Legend", function () {
         }
         verifySymbolHeight();
         style.text(".plottable .legend text { font-size: 60px; }");
-        legend._computeLayout();
+        legend.computeLayout();
         legend._render();
         verifySymbolHeight();
         style.text(".plottable .legend text { font-size: 10px; }");
-        legend._computeLayout();
+        legend.computeLayout();
         legend._render();
         verifySymbolHeight();
         svg.remove();
@@ -2125,8 +2125,8 @@ describe("Plots", function () {
         it("Base Plot functionality works", function () {
             var svg = generateSVG(400, 300);
             var r = new Plottable.Plot();
-            r._anchor(svg);
-            r._computeLayout();
+            r.anchor(svg);
+            r.computeLayout();
             var renderArea = r._content.select(".render-area");
             assert.isNotNull(renderArea.node(), "there is a render-area");
             svg.remove();
@@ -6094,11 +6094,11 @@ describe("ComponentGroups", function () {
         var c3 = new Plottable.Component();
         var cg = new Plottable.Components.Group([c1, c2, c3]);
         var svg = generateSVG(400, 400);
-        cg._anchor(svg);
+        cg.anchor(svg);
         c1._addBox("test-box1");
         c2._addBox("test-box2");
         c3._addBox("test-box3");
-        cg._computeLayout()._render();
+        cg.computeLayout()._render();
         var t1 = svg.select(".test-box1");
         var t2 = svg.select(".test-box2");
         var t3 = svg.select(".test-box3");
@@ -6113,17 +6113,17 @@ describe("ComponentGroups", function () {
         var c3 = new Plottable.Component();
         var cg = new Plottable.Components.Group([c1]);
         var svg = generateSVG(400, 400);
-        cg.below(c2)._anchor(svg);
+        cg.below(c2).anchor(svg);
         c1._addBox("test-box1");
         c2._addBox("test-box2");
-        cg._computeLayout()._render();
+        cg.computeLayout()._render();
         var t1 = svg.select(".test-box1");
         var t2 = svg.select(".test-box2");
         assertWidthHeight(t1, 10, 10, "rect1 sized correctly");
         assertWidthHeight(t2, 20, 20, "rect2 sized correctly");
         cg.below(c3);
         c3._addBox("test-box3");
-        cg._computeLayout()._render();
+        cg.computeLayout()._render();
         var t3 = svg.select(".test-box3");
         assertWidthHeight(t3, 400, 400, "rect3 sized correctly");
         svg.remove();
@@ -6134,8 +6134,8 @@ describe("ComponentGroups", function () {
         var c2 = new Plottable.Component();
         cg.below(c1).below(c2);
         var svg = generateSVG();
-        cg._anchor(svg);
-        cg._computeLayout(50, 50, 350, 350);
+        cg.anchor(svg);
+        cg.computeLayout({ x: 50, y: 50 }, 350, 350);
         var cgTranslate = d3.transform(cg._element.attr("transform")).translate;
         var c1Translate = d3.transform(c1._element.attr("transform")).translate;
         var c2Translate = d3.transform(c2._element.attr("transform")).translate;
@@ -6370,15 +6370,15 @@ describe("Component behavior", function () {
     });
     describe("anchor", function () {
         it("anchoring works as expected", function () {
-            c._anchor(svg);
+            c.anchor(svg);
             assert.equal(c._element.node(), svg.select("g").node(), "the component anchored to a <g> beneath the <svg>");
             assert.isTrue(svg.classed("plottable"), "<svg> was given \"plottable\" CSS class");
             svg.remove();
         });
         it("can re-anchor to a different element", function () {
-            c._anchor(svg);
+            c.anchor(svg);
             var svg2 = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-            c._anchor(svg2);
+            c.anchor(svg2);
             assert.equal(c._element.node(), svg2.select("g").node(), "the component re-achored under the second <svg>");
             assert.isTrue(svg2.classed("plottable"), "second <svg> was given \"plottable\" CSS class");
             svg.remove();
@@ -6387,18 +6387,20 @@ describe("Component behavior", function () {
     });
     describe("computeLayout", function () {
         it("computeLayout defaults and updates intelligently", function () {
-            c._anchor(svg);
-            c._computeLayout();
+            c.anchor(svg);
+            c.computeLayout();
             assert.equal(c.width(), SVG_WIDTH, "computeLayout defaulted width to svg width");
             assert.equal(c.height(), SVG_HEIGHT, "computeLayout defaulted height to svg height");
-            assert.equal(c._xOrigin, 0, "xOrigin defaulted to 0");
-            assert.equal(c._yOrigin, 0, "yOrigin defaulted to 0");
+            var origin = c.origin();
+            assert.equal(origin.x, 0, "xOrigin defaulted to 0");
+            assert.equal(origin.y, 0, "yOrigin defaulted to 0");
             svg.attr("width", 2 * SVG_WIDTH).attr("height", 2 * SVG_HEIGHT);
-            c._computeLayout();
+            c.computeLayout();
             assert.equal(c.width(), 2 * SVG_WIDTH, "computeLayout updated width to new svg width");
             assert.equal(c.height(), 2 * SVG_HEIGHT, "computeLayout updated height to new svg height");
-            assert.equal(c._xOrigin, 0, "xOrigin is still 0");
-            assert.equal(c._yOrigin, 0, "yOrigin is still 0");
+            origin = c.origin();
+            assert.equal(origin.x, 0, "xOrigin is still 0");
+            assert.equal(origin.y, 0, "yOrigin is still 0");
             svg.remove();
         });
         it("computeLayout works with CSS layouts", function () {
@@ -6408,24 +6410,27 @@ describe("Component behavior", function () {
             parent.style("height", "200px");
             // Remove width/height attributes and style with CSS
             svg.attr("width", null).attr("height", null);
-            c._anchor(svg);
-            c._computeLayout();
+            c.anchor(svg);
+            c.computeLayout();
             assert.equal(c.width(), 400, "defaults to width of parent if width is not specified on <svg>");
             assert.equal(c.height(), 200, "defaults to height of parent if width is not specified on <svg>");
-            assert.equal(c._xOrigin, 0, "xOrigin defaulted to 0");
-            assert.equal(c._yOrigin, 0, "yOrigin defaulted to 0");
+            var origin = c.origin();
+            assert.equal(origin.x, 0, "xOrigin defaulted to 0");
+            assert.equal(origin.y, 0, "yOrigin defaulted to 0");
             svg.style("width", "50%").style("height", "50%");
-            c._computeLayout();
+            c.computeLayout();
             assert.equal(c.width(), 200, "computeLayout defaulted width to svg width");
             assert.equal(c.height(), 100, "computeLayout defaulted height to svg height");
-            assert.equal(c._xOrigin, 0, "xOrigin defaulted to 0");
-            assert.equal(c._yOrigin, 0, "yOrigin defaulted to 0");
+            origin = c.origin();
+            assert.equal(origin.x, 0, "xOrigin defaulted to 0");
+            assert.equal(origin.y, 0, "yOrigin defaulted to 0");
             svg.style("width", "25%").style("height", "25%");
-            c._computeLayout();
+            c.computeLayout();
             assert.equal(c.width(), 100, "computeLayout updated width to new svg width");
             assert.equal(c.height(), 50, "computeLayout updated height to new svg height");
-            assert.equal(c._xOrigin, 0, "xOrigin is still 0");
-            assert.equal(c._yOrigin, 0, "yOrigin is still 0");
+            origin = c.origin();
+            assert.equal(origin.x, 0, "xOrigin is still 0");
+            assert.equal(origin.y, 0, "yOrigin is still 0");
             // reset test page DOM
             parent.style("width", "auto");
             parent.style("height", "auto");
@@ -6433,24 +6438,26 @@ describe("Component behavior", function () {
         });
         it("computeLayout will not default when attached to non-root node", function () {
             var g = svg.append("g");
-            c._anchor(g);
-            assert.throws(function () { return c._computeLayout(); }, "null arguments");
+            c.anchor(g);
+            assert.throws(function () { return c.computeLayout(); }, "null arguments");
             svg.remove();
         });
         it("computeLayout throws an error when called on un-anchored component", function () {
-            assert.throws(function () { return c._computeLayout(); }, Error, "anchor must be called before computeLayout");
+            assert.throws(function () { return c.computeLayout(); }, Error);
             svg.remove();
         });
         it("computeLayout uses its arguments apropriately", function () {
             var g = svg.append("g");
-            var xOff = 10;
-            var yOff = 20;
+            var origin = {
+                x: 10,
+                y: 20
+            };
             var width = 100;
             var height = 200;
-            c._anchor(svg);
-            c._computeLayout(xOff, yOff, width, height);
+            c.anchor(svg);
+            c.computeLayout(origin, width, height);
             var translate = getTranslate(c._element);
-            assert.deepEqual(translate, [xOff, yOff], "the element translated appropriately");
+            assert.deepEqual(translate, [origin.x, origin.y], "the element translated appropriately");
             assert.equal(c.width(), width, "the width set properly");
             assert.equal(c.height(), height, "the height set propery");
             svg.remove();
@@ -6471,34 +6478,34 @@ describe("Component behavior", function () {
     });
     it("fixed-width component will align to the right spot", function () {
         fixComponentSize(c, 100, 100);
-        c._anchor(svg);
-        c._computeLayout();
+        c.anchor(svg);
+        c.computeLayout();
         assertComponentXY(c, 0, 0, "top-left component aligns correctly");
         c.xAlign("CENTER").yAlign("CENTER");
-        c._computeLayout();
+        c.computeLayout();
         assertComponentXY(c, 150, 100, "center component aligns correctly");
         c.xAlign("RIGHT").yAlign("BOTTOM");
-        c._computeLayout();
+        c.computeLayout();
         assertComponentXY(c, 300, 200, "bottom-right component aligns correctly");
         svg.remove();
     });
     it("components can be offset relative to their alignment, and throw errors if there is insufficient space", function () {
         fixComponentSize(c, 100, 100);
-        c._anchor(svg);
+        c.anchor(svg);
         c.xOffset(20).yOffset(20);
-        c._computeLayout();
+        c.computeLayout();
         assertComponentXY(c, 20, 20, "top-left component offsets correctly");
         c.xAlign("CENTER").yAlign("CENTER");
-        c._computeLayout();
+        c.computeLayout();
         assertComponentXY(c, 170, 120, "center component offsets correctly");
         c.xAlign("RIGHT").yAlign("BOTTOM");
-        c._computeLayout();
+        c.computeLayout();
         assertComponentXY(c, 320, 220, "bottom-right component offsets correctly");
         c.xOffset(0).yOffset(0);
-        c._computeLayout();
+        c.computeLayout();
         assertComponentXY(c, 300, 200, "bottom-right component offset resets");
         c.xOffset(-20).yOffset(-30);
-        c._computeLayout();
+        c.computeLayout();
         assertComponentXY(c, 280, 170, "negative offsets work properly");
         svg.remove();
     });
@@ -6518,8 +6525,8 @@ describe("Component behavior", function () {
         assert.isFalse(c.clipPathEnabled, "clipPathEnabled defaults to false");
         c.clipPathEnabled = true;
         var expectedClipPathID = c.getID();
-        c._anchor(svg);
-        c._computeLayout(0, 0, 100, 100);
+        c.anchor(svg);
+        c.computeLayout({ x: 0, y: 0 }, 100, 100);
         c._render();
         var expectedPrefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
         expectedPrefix = expectedPrefix.replace(/#.*/g, "");
@@ -6569,7 +6576,7 @@ describe("Component behavior", function () {
         assert.isTrue(c.classed("CSS-PREANCHOR-REMOVE"));
         c.classed("CSS-PREANCHOR-REMOVE", false);
         assert.isFalse(c.classed("CSS-PREANCHOR-REMOVE"));
-        c._anchor(svg);
+        c.anchor(svg);
         assert.isTrue(c.classed("CSS-PREANCHOR-KEEP"));
         assert.isFalse(c.classed("CSS-PREANCHOR-REMOVE"));
         assert.isFalse(c.classed("CSS-POSTANCHOR"));
@@ -6596,7 +6603,7 @@ describe("Component behavior", function () {
         assert.throws(function () { return c1.renderTo(svg); }, "reuse");
         svg.remove();
     });
-    it("_invalidateLayout works as expected", function () {
+    it("redraw() works as expected", function () {
         var cg = new Plottable.Components.Group();
         var c = makeFixedSizeComponent(10, 10);
         cg._addComponent(c);
@@ -6604,7 +6611,7 @@ describe("Component behavior", function () {
         assert.equal(cg.height(), 300, "height() is the entire available height");
         assert.equal(cg.width(), 400, "width() is the entire available width");
         fixComponentSize(c, 50, 50);
-        c._invalidateLayout();
+        c.redraw();
         assert.equal(cg.height(), 300, "height() after resizing is the entire available height");
         assert.equal(cg.width(), 400, "width() after resizing is the entire available width");
         svg.remove();
@@ -6645,7 +6652,7 @@ describe("Component behavior", function () {
         var renderFlag = false;
         var c = new Plottable.Component();
         c._doRender = function () { return renderFlag = true; };
-        c._anchor(svg);
+        c.anchor(svg);
         c._setup();
         c._render();
         assert.isFalse(renderFlag, "no render until width/height set to nonzero");
