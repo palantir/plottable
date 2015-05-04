@@ -256,8 +256,8 @@ export module Components {
               wantsHeight: this._calculatedLayout.wantsHeight};
     }
 
-    public computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number) {
-      super.computeLayout(offeredXOrigin, offeredYOrigin, availableWidth , availableHeight);
+    public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
+      super.computeLayout(origin, availableWidth, availableHeight);
       var layout = this._useLastCalculatedLayout() ? this._calculatedLayout : this._iterateLayout(this.width(), this.height());
 
       this._useLastCalculatedLayout(true);
@@ -270,7 +270,7 @@ export module Components {
         row.forEach((component: Component, colIndex: number) => {
           // recursively compute layout
           if (component != null) {
-            component.computeLayout(childXOrigin, childYOrigin, colWidths[colIndex], rowHeights[rowIndex]);
+            component.computeLayout({ x: childXOrigin, y: childYOrigin }, colWidths[colIndex], rowHeights[rowIndex]);
           }
           childXOrigin += colWidths[colIndex] + this._colPadding;
         });

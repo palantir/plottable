@@ -3409,21 +3409,19 @@ var Plottable;
          * If no parameters are supplied and the Component is a root node,
          * they are inferred from the size of the Component's element.
          *
-         * @param {number} offeredXOrigin x-coordinate of the origin of the space offered the Component
-         * @param {number} offeredYOrigin y-coordinate of the origin of the space offered the Component
-         * @param {number} availableWidth available width for the Component to render in
-         * @param {number} availableHeight available height for the Component to render in
+         * @param {Point} origin Origin of the space offered to the Component.
+         * @param {number} availableWidth Available width for the Component to render in
+         * @param {number} availableHeight Available height for the Component to render in
          */
-        Component.prototype.computeLayout = function (offeredXOrigin, offeredYOrigin, availableWidth, availableHeight) {
+        Component.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
             var _this = this;
-            if (offeredXOrigin == null || offeredYOrigin == null || availableWidth == null || availableHeight == null) {
+            if (origin == null || availableWidth == null || availableHeight == null) {
                 if (this._element == null) {
                     throw new Error("anchor() must be called before computeLayout()");
                 }
                 else if (this._isTopLevelComponent) {
                     // we are the root node, retrieve height/width from root SVG
-                    offeredXOrigin = 0;
-                    offeredYOrigin = 0;
+                    origin = { x: 0, y: 0 };
                     // Set width/height to 100% if not specified, to allow accurate size calculation
                     // see http://www.w3.org/TR/CSS21/visudet.html#block-replaced-width
                     // and http://www.w3.org/TR/CSS21/visudet.html#inline-replaced-height
@@ -3444,8 +3442,8 @@ var Plottable;
             var size = this._getSize(availableWidth, availableHeight);
             this._width = size.width;
             this._height = size.height;
-            this._xOrigin = offeredXOrigin + this._xOffset + (availableWidth - this.width()) * this._xAlignProportion;
-            this._yOrigin = offeredYOrigin + this._yOffset + (availableHeight - this.height()) * this._yAlignProportion;
+            this._xOrigin = origin.x + this._xOffset + (availableWidth - this.width()) * this._xAlignProportion;
+            this._yOrigin = origin.y + this._yOffset + (availableHeight - this.height()) * this._yAlignProportion;
             this._element.attr("transform", "translate(" + this._xOrigin + "," + this._yOrigin + ")");
             this._boxes.forEach(function (b) { return b.attr("width", _this.width()).attr("height", _this.height()); });
             return this;
@@ -4009,11 +4007,11 @@ var Plottable;
                 this._addComponent(c, !below);
                 return this;
             };
-            Group.prototype.computeLayout = function (offeredXOrigin, offeredYOrigin, availableWidth, availableHeight) {
+            Group.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
                 var _this = this;
-                _super.prototype.computeLayout.call(this, offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
+                _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
                 this.components().forEach(function (c) {
-                    c.computeLayout(0, 0, _this.width(), _this.height());
+                    c.computeLayout({ x: 0, y: 0 }, _this.width(), _this.height());
                 });
                 return this;
             };
@@ -4131,8 +4129,8 @@ var Plottable;
             // default implementation; subclasses may call _invalidateLayout() here
             this._render();
         };
-        Axis.prototype.computeLayout = function (offeredXOrigin, offeredYOrigin, availableWidth, availableHeight) {
-            _super.prototype.computeLayout.call(this, offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
+        Axis.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
+            _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
             if (this._isHorizontal()) {
                 this._scale.range([0, this.width()]);
             }
@@ -5312,12 +5310,12 @@ var Plottable;
                 Plottable.Utils.DOM.translate(this._tickLabelContainer, xTranslate, yTranslate);
                 return this;
             };
-            Category.prototype.computeLayout = function (offeredXOrigin, offeredYOrigin, availableWidth, availableHeight) {
+            Category.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
                 // When anyone calls _invalidateLayout, computeLayout will be called
                 // on everyone, including this. Since CSS or something might have
                 // affected the size of the characters, clear the cache.
                 this._measurer.reset();
-                return _super.prototype.computeLayout.call(this, offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
+                return _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
             };
             return Category;
         })(Plottable.Axis);
@@ -6269,9 +6267,9 @@ var Plottable;
                 this._calculatedLayout = this._iterateLayout(offeredWidth, offeredHeight);
                 return { width: d3.sum(this._calculatedLayout.guaranteedWidths), height: d3.sum(this._calculatedLayout.guaranteedHeights), wantsWidth: this._calculatedLayout.wantsWidth, wantsHeight: this._calculatedLayout.wantsHeight };
             };
-            Table.prototype.computeLayout = function (offeredXOrigin, offeredYOrigin, availableWidth, availableHeight) {
+            Table.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
                 var _this = this;
-                _super.prototype.computeLayout.call(this, offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
+                _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
                 var layout = this._useLastCalculatedLayout() ? this._calculatedLayout : this._iterateLayout(this.width(), this.height());
                 this._useLastCalculatedLayout(true);
                 var childYOrigin = 0;
@@ -6282,7 +6280,7 @@ var Plottable;
                     row.forEach(function (component, colIndex) {
                         // recursively compute layout
                         if (component != null) {
-                            component.computeLayout(childXOrigin, childYOrigin, colWidths[colIndex], rowHeights[rowIndex]);
+                            component.computeLayout({ x: childXOrigin, y: childYOrigin }, colWidths[colIndex], rowHeights[rowIndex]);
                         }
                         childXOrigin += colWidths[colIndex] + _this._colPadding;
                     });
@@ -7003,8 +7001,8 @@ var Plottable;
                 this._colorScale = new Plottable.Scales.Color();
                 this.classed("pie-plot", true);
             }
-            Pie.prototype.computeLayout = function (offeredXOrigin, offeredYOrigin, availableWidth, availableHeight) {
-                _super.prototype.computeLayout.call(this, offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
+            Pie.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
+                _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
                 this._renderArea.attr("transform", "translate(" + this.width() / 2 + "," + this.height() / 2 + ")");
                 return this;
             };
@@ -7155,8 +7153,8 @@ var Plottable;
             };
             return attrToProjector;
         };
-        XYPlot.prototype.computeLayout = function (offeredXOrigin, offeredYOffset, availableWidth, availableHeight) {
-            _super.prototype.computeLayout.call(this, offeredXOrigin, offeredYOffset, availableWidth, availableHeight);
+        XYPlot.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
+            _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
             this._xScale.range([0, this.width()]);
             if (this._yScale instanceof Plottable.Scales.Category) {
                 this._yScale.range([0, this.height()]);
@@ -10150,8 +10148,8 @@ var Plottable;
                 this.classed("x-drag-box-layer", true);
                 this._hasCorners = false;
             }
-            XDragBoxLayer.prototype.computeLayout = function (offeredXOrigin, offeredYOrigin, availableWidth, availableHeight) {
-                _super.prototype.computeLayout.call(this, offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
+            XDragBoxLayer.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
+                _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
                 this.bounds(this.bounds()); // set correct bounds when width/height changes
                 return this;
             };
@@ -10188,8 +10186,8 @@ var Plottable;
                 this.classed("y-drag-box-layer", true);
                 this._hasCorners = false;
             }
-            YDragBoxLayer.prototype.computeLayout = function (offeredXOrigin, offeredYOrigin, availableWidth, availableHeight) {
-                _super.prototype.computeLayout.call(this, offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
+            YDragBoxLayer.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
+                _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
                 this.bounds(this.bounds()); // set correct bounds when width/height changes
                 return this;
             };

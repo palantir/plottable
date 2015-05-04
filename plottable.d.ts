@@ -1605,12 +1605,11 @@ declare module Plottable {
          * If no parameters are supplied and the Component is a root node,
          * they are inferred from the size of the Component's element.
          *
-         * @param {number} offeredXOrigin x-coordinate of the origin of the space offered the Component
-         * @param {number} offeredYOrigin y-coordinate of the origin of the space offered the Component
-         * @param {number} availableWidth available width for the Component to render in
-         * @param {number} availableHeight available height for the Component to render in
+         * @param {Point} origin Origin of the space offered to the Component.
+         * @param {number} availableWidth Available width for the Component to render in
+         * @param {number} availableHeight Available height for the Component to render in
          */
-        computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): Component;
+        computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Component;
         protected _getSize(availableWidth: number, availableHeight: number): {
             width: number;
             height: number;
@@ -1865,7 +1864,7 @@ declare module Plottable {
             constructor(components?: Component[]);
             _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
             _merge(c: Component, below: boolean): Group;
-            computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): Group;
+            computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Group;
             protected _getSize(availableWidth: number, availableHeight: number): {
                 width: number;
                 height: number;
@@ -1917,7 +1916,7 @@ declare module Plottable {
         _isFixedHeight(): boolean;
         _isFixedWidth(): boolean;
         protected _rescale(): void;
-        computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): Axis;
+        computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Axis;
         protected _setup(): void;
         protected _getTickValues(): any[];
         _doRender(): void;
@@ -2210,7 +2209,7 @@ declare module Plottable {
              */
             tickLabelAngle(): number;
             _doRender(): Category;
-            computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): Axis;
+            computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Axis;
         }
     }
 }
@@ -2528,7 +2527,7 @@ declare module Plottable {
             addComponent(row: number, col: number, component: Component): Table;
             _removeComponent(component: Component): void;
             _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
-            computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): Table;
+            computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Table;
             /**
              * Sets the row and column padding on the Table.
              *
@@ -2829,7 +2828,7 @@ declare module Plottable {
              * @constructor
              */
             constructor();
-            computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): Pie;
+            computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Pie;
             addDataset(keyOrDataset: any, dataset?: any): Pie;
             protected _generateAttrToProjector(): AttributeToProjector;
             protected _getDrawer(key: string): Drawers.AbstractDrawer;
@@ -2880,7 +2879,7 @@ declare module Plottable {
          */
         automaticallyAdjustXScaleOverVisiblePoints(autoAdjustment: boolean): XYPlot<X, Y>;
         protected _generateAttrToProjector(): AttributeToProjector;
-        computeLayout(offeredXOrigin?: number, offeredYOffset?: number, availableWidth?: number, availableHeight?: number): XYPlot<X, Y>;
+        computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): XYPlot<X, Y>;
         protected _updateXDomainer(): void;
         protected _updateYDomainer(): void;
         /**
@@ -4044,7 +4043,7 @@ declare module Plottable {
     module Components {
         class XDragBoxLayer extends DragBoxLayer {
             constructor();
-            computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): XDragBoxLayer;
+            computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): XDragBoxLayer;
             protected _setBounds(newBounds: Bounds): void;
             protected _setResizableClasses(canResize: boolean): void;
         }
@@ -4056,7 +4055,7 @@ declare module Plottable {
     module Components {
         class YDragBoxLayer extends DragBoxLayer {
             constructor();
-            computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): YDragBoxLayer;
+            computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): YDragBoxLayer;
             protected _setBounds(newBounds: Bounds): void;
             protected _setResizableClasses(canResize: boolean): void;
         }

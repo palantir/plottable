@@ -102,19 +102,17 @@ module Plottable {
      * If no parameters are supplied and the Component is a root node,
      * they are inferred from the size of the Component's element.
      *
-     * @param {number} offeredXOrigin x-coordinate of the origin of the space offered the Component
-     * @param {number} offeredYOrigin y-coordinate of the origin of the space offered the Component
-     * @param {number} availableWidth available width for the Component to render in
-     * @param {number} availableHeight available height for the Component to render in
+     * @param {Point} origin Origin of the space offered to the Component.
+     * @param {number} availableWidth Available width for the Component to render in
+     * @param {number} availableHeight Available height for the Component to render in
      */
-    public computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number) {
-      if (offeredXOrigin == null || offeredYOrigin == null || availableWidth == null || availableHeight == null) {
+    public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
+      if (origin == null || availableWidth == null || availableHeight == null) {
         if (this._element == null) {
           throw new Error("anchor() must be called before computeLayout()");
         } else if (this._isTopLevelComponent) {
           // we are the root node, retrieve height/width from root SVG
-          offeredXOrigin = 0;
-          offeredYOrigin = 0;
+          origin = { x: 0, y: 0 };
 
           // Set width/height to 100% if not specified, to allow accurate size calculation
           // see http://www.w3.org/TR/CSS21/visudet.html#block-replaced-width
@@ -136,8 +134,8 @@ module Plottable {
       var size = this._getSize(availableWidth, availableHeight);
       this._width = size.width;
       this._height = size.height;
-      this._xOrigin = offeredXOrigin + this._xOffset + (availableWidth - this.width()) * this._xAlignProportion;
-      this._yOrigin = offeredYOrigin + this._yOffset + (availableHeight - this.height()) * this._yAlignProportion;
+      this._xOrigin = origin.x + this._xOffset + (availableWidth - this.width()) * this._xAlignProportion;
+      this._yOrigin = origin.y + this._yOffset + (availableHeight - this.height()) * this._yAlignProportion;
       this._element.attr("transform", "translate(" + this._xOrigin + "," + this._yOrigin + ")");
       this._boxes.forEach((b: D3.Selection) => b.attr("width", this.width()).attr("height", this.height()));
       return this;

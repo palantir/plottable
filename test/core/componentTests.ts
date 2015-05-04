@@ -115,14 +115,16 @@ describe("Component behavior", () => {
 
     it("computeLayout uses its arguments apropriately", () => {
       var g = svg.append("g");
-      var xOff = 10;
-      var yOff = 20;
+      var origin = {
+        x: 10,
+        y: 20
+      };
       var width = 100;
       var height = 200;
       c.anchor(svg);
-      c.computeLayout(xOff, yOff, width, height);
+      c.computeLayout(origin, width, height);
       var translate = getTranslate((<any> c)._element);
-      assert.deepEqual(translate, [xOff, yOff], "the element translated appropriately");
+      assert.deepEqual(translate, [origin.x, origin.y], "the element translated appropriately");
       assert.equal(c.width() , width, "the width set properly");
       assert.equal(c.height(), height, "the height set propery");
       svg.remove();
@@ -203,7 +205,7 @@ describe("Component behavior", () => {
     c.clipPathEnabled = true;
     var expectedClipPathID = c.getID();
     c.anchor(svg);
-    c.computeLayout(0, 0, 100, 100);
+    c.computeLayout({ x: 0, y: 0 }, 100, 100);
     c._render();
     var expectedPrefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
     expectedPrefix = expectedPrefix.replace(/#.*/g, "");

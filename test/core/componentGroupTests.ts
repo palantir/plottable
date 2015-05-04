@@ -56,7 +56,7 @@ describe("ComponentGroups", () => {
 
     var svg = generateSVG();
     cg.anchor(svg);
-    cg.computeLayout(50, 50, 350, 350);
+    cg.computeLayout({ x: 50, y: 50 }, 350, 350);
 
     var cgTranslate = d3.transform((<any> cg)._element.attr("transform")).translate;
     var c1Translate = d3.transform((<any> c1)._element.attr("transform")).translate;

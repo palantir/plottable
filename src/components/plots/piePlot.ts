@@ -27,8 +27,8 @@ export module Plots {
       this.classed("pie-plot", true);
     }
 
-    public computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number) {
-      super.computeLayout(offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
+    public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
+      super.computeLayout(origin, availableWidth, availableHeight);
       this._renderArea.attr("transform", "translate(" + this.width() / 2 + "," + this.height() / 2 + ")");
       return this;
     }

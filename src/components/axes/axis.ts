@@ -115,8 +115,8 @@ module Plottable {
       this._render();
     }
 
-    public computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number) {
-      super.computeLayout(offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
+    public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
+      super.computeLayout(origin, availableWidth, availableHeight);
       if (this._isHorizontal()) {
         this._scale.range([0, this.width()]);
       } else {

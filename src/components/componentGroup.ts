@@ -38,13 +38,10 @@ export module Components {
       return this;
     }
 
-    public computeLayout(offeredXOrigin?: number,
-                          offeredYOrigin?: number,
-                   availableWidth?: number,
-                  availableHeight?: number): Group {
-      super.computeLayout(offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
+    public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
+      super.computeLayout(origin, availableWidth, availableHeight);
       this.components().forEach((c) => {
-        c.computeLayout(0, 0, this.width(), this.height());
+        c.computeLayout({ x: 0, y: 0 }, this.width(), this.height());
       });
       return this;
     }
