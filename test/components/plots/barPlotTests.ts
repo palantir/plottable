@@ -7,7 +7,7 @@ describe("Plots", () => {
 
     // HACKHACK #1798: beforeEach being used below
     it("renders correctly with no data", () => {
-      var svg = generateSVG(400, 400);
+      var svg = TestMethods.generateSVG(400, 400);
       var xScale = new Plottable.Scale.Linear();
       var yScale = new Plottable.Scale.Linear();
       var plot = new Plottable.Plot.Bar(xScale, yScale);
@@ -37,7 +37,7 @@ describe("Plots", () => {
       var SVG_HEIGHT = 400;
 
       beforeEach(() => {
-        svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
         xScale = new Plottable.Scale.Category().domain(["A", "B"]);
         yScale = new Plottable.Scale.Linear();
         var data = [
@@ -62,20 +62,20 @@ describe("Plots", () => {
         assert.lengthOf(bars[0], 3, "One bar was created per data point");
         var bar0 = d3.select(bars[0][0]);
         var bar1 = d3.select(bars[0][1]);
-        assert.closeTo(numAttr(bar0, "width"), xScale.rangeBand(), 1, "bar0 width is correct");
-        assert.closeTo(numAttr(bar1, "width"), xScale.rangeBand(), 1, "bar1 width is correct");
-        assert.equal(bar0.attr("height"), "100", "bar0 height is correct");
-        assert.equal(bar1.attr("height"), "150", "bar1 height is correct");
-        assert.closeTo(numAttr(bar0, "x"), 111, 1, "bar0 x is correct");
-        assert.closeTo(numAttr(bar1, "x"), 333, 1, "bar1 x is correct");
-        assert.equal(bar0.attr("y"), "100", "bar0 y is correct");
-        assert.equal(bar1.attr("y"), "200", "bar1 y is correct");
+        assert.closeTo(TestMethods.numAttr(bar0, "width"), xScale.rangeBand(), 1, "bar0 width is correct");
+        assert.closeTo(TestMethods.numAttr(bar1, "width"), xScale.rangeBand(), 1, "bar1 width is correct");
+        assert.strictEqual(bar0.attr("height"), "100", "bar0 height is correct");
+        assert.strictEqual(bar1.attr("height"), "150", "bar1 height is correct");
+        assert.closeTo(TestMethods.numAttr(bar0, "x"), 111, 1, "bar0 x is correct");
+        assert.closeTo(TestMethods.numAttr(bar1, "x"), 333, 1, "bar1 x is correct");
+        assert.strictEqual(bar0.attr("y"), "100", "bar0 y is correct");
+        assert.strictEqual(bar1.attr("y"), "200", "bar1 y is correct");
 
         var baseline = renderArea.select(".baseline");
-        assert.equal(baseline.attr("y1"), "200", "the baseline is in the correct vertical position");
-        assert.equal(baseline.attr("y2"), "200", "the baseline is in the correct vertical position");
-        assert.equal(baseline.attr("x1"), "0", "the baseline starts at the edge of the chart");
-        assert.equal(baseline.attr("x2"), SVG_WIDTH, "the baseline ends at the edge of the chart");
+        assert.strictEqual(baseline.attr("y1"), "200", "the baseline is in the correct vertical position");
+        assert.strictEqual(baseline.attr("y2"), "200", "the baseline is in the correct vertical position");
+        assert.strictEqual(baseline.attr("x1"), "0", "the baseline starts at the edge of the chart");
+        assert.strictEqual(baseline.attr("x2"), String(SVG_WIDTH), "the baseline ends at the edge of the chart");
         svg.remove();
       });
 
@@ -86,16 +86,16 @@ describe("Plots", () => {
         var bars = renderArea.selectAll("rect");
         var bar0 = d3.select(bars[0][0]);
         var bar1 = d3.select(bars[0][1]);
-        assert.equal(bar0.attr("height"), "200", "bar0 height is correct");
-        assert.equal(bar1.attr("height"), "50", "bar1 height is correct");
-        assert.equal(bar0.attr("y"), "100", "bar0 y is correct");
-        assert.equal(bar1.attr("y"), "300", "bar1 y is correct");
+        assert.strictEqual(bar0.attr("height"), "200", "bar0 height is correct");
+        assert.strictEqual(bar1.attr("height"), "50", "bar1 height is correct");
+        assert.strictEqual(bar0.attr("y"), "100", "bar0 y is correct");
+        assert.strictEqual(bar1.attr("y"), "300", "bar1 y is correct");
 
         var baseline = renderArea.select(".baseline");
-        assert.equal(baseline.attr("y1"), "300", "the baseline is in the correct vertical position");
-        assert.equal(baseline.attr("y2"), "300", "the baseline is in the correct vertical position");
-        assert.equal(baseline.attr("x1"), "0", "the baseline starts at the edge of the chart");
-        assert.equal(baseline.attr("x2"), SVG_WIDTH, "the baseline ends at the edge of the chart");
+        assert.strictEqual(baseline.attr("y1"), "300", "the baseline is in the correct vertical position");
+        assert.strictEqual(baseline.attr("y2"), "300", "the baseline is in the correct vertical position");
+        assert.strictEqual(baseline.attr("x1"), "0", "the baseline starts at the edge of the chart");
+        assert.strictEqual(baseline.attr("x2"), String(SVG_WIDTH), "the baseline ends at the edge of the chart");
         svg.remove();
       });
 
@@ -103,7 +103,7 @@ describe("Plots", () => {
         var bar: D3.Selection = barPlot.getBars(155, 150); // in the middle of bar 0
 
         assert.lengthOf(bar[0], 1, "getBar returns a bar");
-        assert.equal(bar.data()[0], dataset.data()[0], "the data in the bar matches the datasource");
+        assert.strictEqual(bar.data()[0], dataset.data()[0], "the data in the bar matches the datasource");
 
         bar = barPlot.getBars(-1, -1); // no bars here
         assert.isTrue(bar.empty(), "returns empty selection if no bar was selected");
@@ -119,14 +119,14 @@ describe("Plots", () => {
 
         bar = barPlot.getBars({min: 155, max: 455}, {min: 150, max: 150});
         assert.lengthOf(bar.data(), 2, "selected 2 bars (not the negative one)");
-        assert.equal(bar.data()[0], dataset.data()[0], "the data in bar 0 matches the datasource");
-        assert.equal(bar.data()[1], dataset.data()[2], "the data in bar 1 matches the datasource");
+        assert.strictEqual(bar.data()[0], dataset.data()[0], "the data in bar 0 matches the datasource");
+        assert.strictEqual(bar.data()[1], dataset.data()[2], "the data in bar 1 matches the datasource");
 
         bar = barPlot.getBars({min: 155, max: 455}, {min: 150, max: 350});
         assert.lengthOf(bar.data(), 3, "selected all the bars");
-        assert.equal(bar.data()[0], dataset.data()[0], "the data in bar 0 matches the datasource");
-        assert.equal(bar.data()[1], dataset.data()[1], "the data in bar 1 matches the datasource");
-        assert.equal(bar.data()[2], dataset.data()[2], "the data in bar 2 matches the datasource");
+        assert.strictEqual(bar.data()[0], dataset.data()[0], "the data in bar 0 matches the datasource");
+        assert.strictEqual(bar.data()[1], dataset.data()[1], "the data in bar 1 matches the datasource");
+        assert.strictEqual(bar.data()[2], dataset.data()[2], "the data in bar 2 matches the datasource");
 
         svg.remove();
       });
@@ -282,7 +282,7 @@ describe("Plots", () => {
       var SVG_HEIGHT = 400;
 
       beforeEach(() => {
-        svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
         xScale = new Plottable.Scale.ModifiedLog();
         yScale = new Plottable.Scale.Linear();
         var data = [
@@ -315,9 +315,9 @@ describe("Plots", () => {
         var bar0 = d3.select(bars[0][0]);
         var bar1 = d3.select(bars[0][1]);
         var bar2 = d3.select(bars[0][2]);
-        assert.closeTo(numAttr(bar0, "width"), barPixelWidth, 0.1, "bar0 width is correct");
-        assert.closeTo(numAttr(bar1, "width"), barPixelWidth, 0.1, "bar1 width is correct");
-        assert.closeTo(numAttr(bar2, "width"), barPixelWidth, 0.1, "bar2 width is correct");
+        assert.closeTo(TestMethods.numAttr(bar0, "width"), barPixelWidth, 0.1, "bar0 width is correct");
+        assert.closeTo(TestMethods.numAttr(bar1, "width"), barPixelWidth, 0.1, "bar1 width is correct");
+        assert.closeTo(TestMethods.numAttr(bar2, "width"), barPixelWidth, 0.1, "bar2 width is correct");
         svg.remove();
       });
     });
@@ -332,7 +332,7 @@ describe("Plots", () => {
       var SVG_HEIGHT = 400;
 
       beforeEach(() => {
-        svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
         xScale = new Plottable.Scale.Linear();
         yScale = new Plottable.Scale.Linear();
         var data = [
@@ -363,9 +363,9 @@ describe("Plots", () => {
         var bar0 = d3.select(bars[0][0]);
         var bar1 = d3.select(bars[0][1]);
         var bar2 = d3.select(bars[0][2]);
-        assert.closeTo(numAttr(bar0, "width"), barPixelWidth, 0.1, "bar0 width is correct");
-        assert.closeTo(numAttr(bar1, "width"), barPixelWidth, 0.1, "bar1 width is correct");
-        assert.closeTo(numAttr(bar2, "width"), barPixelWidth, 0.1, "bar2 width is correct");
+        assert.closeTo(TestMethods.numAttr(bar0, "width"), barPixelWidth, 0.1, "bar0 width is correct");
+        assert.closeTo(TestMethods.numAttr(bar1, "width"), barPixelWidth, 0.1, "bar1 width is correct");
+        assert.closeTo(TestMethods.numAttr(bar2, "width"), barPixelWidth, 0.1, "bar2 width is correct");
         svg.remove();
       });
 
@@ -398,7 +398,7 @@ describe("Plots", () => {
       var xScale: Plottable.Scale.Time;
 
       beforeEach(() => {
-        svg = generateSVG(600, 400);
+        svg = TestMethods.generateSVG(600, 400);
         var data = [{ x: "12/01/92", y: 0, type: "a" },
           { x: "12/01/93", y: 1, type: "a" },
           { x: "12/01/94", y: 1, type: "a" },
@@ -432,7 +432,7 @@ describe("Plots", () => {
       var SVG_WIDTH = 600;
       var SVG_HEIGHT = 400;
       beforeEach(() => {
-        svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
         yScale = new Plottable.Scale.Category().domain(["A", "B"]);
         xScale = new Plottable.Scale.Linear();
         xScale.domain([-3, 3]);
@@ -459,20 +459,20 @@ describe("Plots", () => {
         assert.lengthOf(bars[0], 3, "One bar was created per data point");
         var bar0 = d3.select(bars[0][0]);
         var bar1 = d3.select(bars[0][1]);
-        assert.closeTo(numAttr(bar0, "height"), yScale.rangeBand(), 1, "bar0 height is correct");
-        assert.closeTo(numAttr(bar1, "height"), yScale.rangeBand(), 1, "bar1 height is correct");
-        assert.equal(bar0.attr("width"), "100", "bar0 width is correct");
-        assert.equal(bar1.attr("width"), "150", "bar1 width is correct");
-        assert.closeTo(numAttr(bar0, "y"), 74, 1, "bar0 y is correct");
-        assert.closeTo(numAttr(bar1, "y"), 222, 1, "bar1 y is correct");
-        assert.equal(bar0.attr("x"), "300", "bar0 x is correct");
-        assert.equal(bar1.attr("x"), "150", "bar1 x is correct");
+        assert.closeTo(TestMethods.numAttr(bar0, "height"), yScale.rangeBand(), 1, "bar0 height is correct");
+        assert.closeTo(TestMethods.numAttr(bar1, "height"), yScale.rangeBand(), 1, "bar1 height is correct");
+        assert.strictEqual(bar0.attr("width"), "100", "bar0 width is correct");
+        assert.strictEqual(bar1.attr("width"), "150", "bar1 width is correct");
+        assert.closeTo(TestMethods.numAttr(bar0, "y"), 74, 1, "bar0 y is correct");
+        assert.closeTo(TestMethods.numAttr(bar1, "y"), 222, 1, "bar1 y is correct");
+        assert.strictEqual(bar0.attr("x"), "300", "bar0 x is correct");
+        assert.strictEqual(bar1.attr("x"), "150", "bar1 x is correct");
 
         var baseline = renderArea.select(".baseline");
-        assert.equal(baseline.attr("x1"), "300", "the baseline is in the correct horizontal position");
-        assert.equal(baseline.attr("x2"), "300", "the baseline is in the correct horizontal position");
-        assert.equal(baseline.attr("y1"), "0", "the baseline starts at the top of the chart");
-        assert.equal(baseline.attr("y2"), SVG_HEIGHT, "the baseline ends at the bottom of the chart");
+        assert.strictEqual(baseline.attr("x1"), "300", "the baseline is in the correct horizontal position");
+        assert.strictEqual(baseline.attr("x2"), "300", "the baseline is in the correct horizontal position");
+        assert.strictEqual(baseline.attr("y1"), "0", "the baseline starts at the top of the chart");
+        assert.strictEqual(baseline.attr("y2"), String(SVG_HEIGHT), "the baseline ends at the bottom of the chart");
         svg.remove();
       });
 
@@ -483,16 +483,16 @@ describe("Plots", () => {
         var bars = renderArea.selectAll("rect");
         var bar0 = d3.select(bars[0][0]);
         var bar1 = d3.select(bars[0][1]);
-        assert.equal(bar0.attr("width"), "200", "bar0 width is correct");
-        assert.equal(bar1.attr("width"), "50", "bar1 width is correct");
-        assert.equal(bar0.attr("x"), "200", "bar0 x is correct");
-        assert.equal(bar1.attr("x"), "150", "bar1 x is correct");
+        assert.strictEqual(bar0.attr("width"), "200", "bar0 width is correct");
+        assert.strictEqual(bar1.attr("width"), "50", "bar1 width is correct");
+        assert.strictEqual(bar0.attr("x"), "200", "bar0 x is correct");
+        assert.strictEqual(bar1.attr("x"), "150", "bar1 x is correct");
 
         var baseline = renderArea.select(".baseline");
-        assert.equal(baseline.attr("x1"), "200", "the baseline is in the correct horizontal position");
-        assert.equal(baseline.attr("x2"), "200", "the baseline is in the correct horizontal position");
-        assert.equal(baseline.attr("y1"), "0", "the baseline starts at the top of the chart");
-        assert.equal(baseline.attr("y2"), SVG_HEIGHT, "the baseline ends at the bottom of the chart");
+        assert.strictEqual(baseline.attr("x1"), "200", "the baseline is in the correct horizontal position");
+        assert.strictEqual(baseline.attr("x2"), "200", "the baseline is in the correct horizontal position");
+        assert.strictEqual(baseline.attr("y1"), "0", "the baseline starts at the top of the chart");
+        assert.strictEqual(baseline.attr("y2"), String(SVG_HEIGHT), "the baseline ends at the bottom of the chart");
         svg.remove();
       });
 
@@ -503,12 +503,12 @@ describe("Plots", () => {
         var bar0y = bar0.data()[0].y;
         var bar1y = bar1.data()[0].y;
         barPlot.project("width", 10);
-        assert.closeTo(numAttr(bar0, "height"), 10, 0.01, "bar0 height");
-        assert.closeTo(numAttr(bar1, "height"), 10, 0.01, "bar1 height");
-        assert.closeTo(numAttr(bar0, "width"), 100, 0.01, "bar0 width");
-        assert.closeTo(numAttr(bar1, "width"), 150, 0.01, "bar1 width");
-        assert.closeTo(numAttr(bar0, "y"), yScale.scale(bar0y) - numAttr(bar0, "height") / 2, 0.01, "bar0 ypos");
-        assert.closeTo(numAttr(bar1, "y"), yScale.scale(bar1y) - numAttr(bar1, "height") / 2, 0.01, "bar1 ypos");
+        assert.closeTo(TestMethods.numAttr(bar0, "height"), 10, 0.01, "bar0 height");
+        assert.closeTo(TestMethods.numAttr(bar1, "height"), 10, 0.01, "bar1 height");
+        assert.closeTo(TestMethods.numAttr(bar0, "width"), 100, 0.01, "bar0 width");
+        assert.closeTo(TestMethods.numAttr(bar1, "width"), 150, 0.01, "bar1 width");
+        assert.closeTo(TestMethods.numAttr(bar0, "y"), yScale.scale(bar0y) - TestMethods.numAttr(bar0, "height") / 2, 0.01, "bar0 ypos");
+        assert.closeTo(TestMethods.numAttr(bar1, "y"), yScale.scale(bar1y) - TestMethods.numAttr(bar1, "height") / 2, 0.01, "bar1 ypos");
         svg.remove();
       });
 
@@ -645,7 +645,7 @@ describe("Plots", () => {
       var svg: D3.Selection;
 
       beforeEach(() => {
-        svg = generateSVG();
+        svg = TestMethods.generateSVG();
         data = [{x: "foo", y: 5}, {x: "bar", y: 640}, {x: "zoo", y: 12345}];
         dataset = new Plottable.Dataset(data);
         xScale = new Plottable.Scale.Category();
@@ -663,14 +663,13 @@ describe("Plots", () => {
         svg.remove();
       });
 
-
       it("bar labels render properly", () => {
         plot.renderTo(svg);
         plot.barLabelsEnabled(true);
         var texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
         assert.lengthOf(texts, 2, "both texts drawn");
-        assert.equal(texts[0], "640", "first label is 640");
-        assert.equal(texts[1], "12345", "first label is 12345");
+        assert.strictEqual(texts[0], "640", "first label is 640");
+        assert.strictEqual(texts[1], "12345", "first label is 12345");
         svg.remove();
       });
 
@@ -689,8 +688,8 @@ describe("Plots", () => {
         plot.renderTo(svg);
         var texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
         assert.lengthOf(texts, 2, "both texts drawn");
-        assert.equal(texts[0], "640%", "first label is 640%");
-        assert.equal(texts[1], "12345%", "first label is 12345%");
+        assert.strictEqual(texts[0], "640%", "first label is 640%");
+        assert.strictEqual(texts[1], "12345%", "first label is 12345%");
         svg.remove();
       });
 
@@ -723,7 +722,7 @@ describe("Plots", () => {
       var svg: D3.Selection;
 
       beforeEach(() => {
-        svg = generateSVG();
+        svg = TestMethods.generateSVG();
         dataset = new Plottable.Dataset();
         var xScale = new Plottable.Scale.Category();
         var yScale = new Plottable.Scale.Linear();
@@ -795,7 +794,7 @@ describe("Plots", () => {
     });
 
     it("plot auto domain scale to visible points on Category scale", () => {
-      var svg = generateSVG(500, 500);
+      var svg = TestMethods.generateSVG(500, 500);
       var xAccessor = (d: any, i: number, u: any) => d.a;
       var yAccessor = (d: any, i: number, u: any) => d.b + u.foo;
       var simpleDataset = new Plottable.Dataset([{a: "a", b: 6}, {a: "b", b: 2}, {a: "c", b: -2}, {a: "d", b: -6}], {foo: 0});

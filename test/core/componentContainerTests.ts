@@ -2,7 +2,6 @@
 
 var assert = chai.assert;
 
-
 describe("ComponentContainer", () => {
 
   it("_addComponent()", () => {

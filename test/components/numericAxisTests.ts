@@ -3,14 +3,6 @@
 var assert = chai.assert;
 
 describe("NumericAxis", () => {
-  function boxesOverlap(boxA: ClientRect, boxB: ClientRect) {
-    if (boxA.right < boxB.left) { return false; }
-    if (boxA.left > boxB.right) { return false; }
-    if (boxA.bottom < boxB.top) { return false; }
-    if (boxA.top > boxB.bottom) { return false; }
-    return true;
-  }
-
   function boxIsInside(inner: ClientRect, outer: ClientRect, epsilon = 0) {
     if (inner.left < outer.left - epsilon) { return false; }
     if (inner.right > outer.right + epsilon) { return false; }
@@ -40,7 +32,7 @@ describe("NumericAxis", () => {
   it("draws tick labels correctly (horizontal)", () => {
     var SVG_WIDTH = 500;
     var SVG_HEIGHT = 100;
-    var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+    var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
     var scale = new Plottable.Scale.Linear();
     scale.range([0, SVG_WIDTH]);
     var numericAxis = new Plottable.Axis.Numeric(scale, "bottom");
@@ -88,7 +80,7 @@ describe("NumericAxis", () => {
   it("draws ticks correctly (vertical)", () => {
     var SVG_WIDTH = 100;
     var SVG_HEIGHT = 500;
-    var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+    var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
     var scale = new Plottable.Scale.Linear();
     scale.range([0, SVG_HEIGHT]);
     var numericAxis = new Plottable.Axis.Numeric(scale, "left");
@@ -136,7 +128,7 @@ describe("NumericAxis", () => {
   it("uses the supplied Formatter", () => {
     var SVG_WIDTH = 100;
     var SVG_HEIGHT = 500;
-    var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+    var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
     var scale = new Plottable.Scale.Linear();
     scale.range([0, SVG_HEIGHT]);
 
@@ -158,7 +150,7 @@ describe("NumericAxis", () => {
   it("can hide tick labels that don't fit", () => {
     var SVG_WIDTH = 500;
     var SVG_HEIGHT = 100;
-    var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+    var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
     var scale = new Plottable.Scale.Linear();
     scale.range([0, SVG_WIDTH]);
     var numericAxis = new Plottable.Axis.Numeric(scale, "bottom");
@@ -181,11 +173,10 @@ describe("NumericAxis", () => {
     svg.remove();
   });
 
-
   it("tick labels don't overlap in a constrained space", () => {
     var SVG_WIDTH = 100;
     var SVG_HEIGHT = 100;
-    var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+    var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
     var scale = new Plottable.Scale.Linear();
     scale.range([0, SVG_WIDTH]);
     var numericAxis = new Plottable.Axis.Numeric(scale, "bottom");
@@ -231,7 +222,7 @@ describe("NumericAxis", () => {
   it("allocates enough width to show all tick labels when vertical", () => {
     var SVG_WIDTH = 150;
     var SVG_HEIGHT = 500;
-    var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+    var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
     var scale = new Plottable.Scale.Linear();
     scale.domain([5, -5]);
     scale.range([0, SVG_HEIGHT]);
@@ -270,14 +261,13 @@ describe("NumericAxis", () => {
       assertBoxInside(labelBox, boundingBox, 0, "long tick " + label.textContent + " is inside the bounding box");
     });
 
-
     svg.remove();
   });
 
   it("allocates enough height to show all tick labels when horizontal", () => {
     var SVG_WIDTH = 500;
     var SVG_HEIGHT = 100;
-    var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+    var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
     var scale = new Plottable.Scale.Linear();
     scale.domain([5, -5]);
     scale.range([0, SVG_WIDTH]);
@@ -309,7 +299,7 @@ describe("NumericAxis", () => {
     ];
     var SVG_WIDTH = 120;
     var SVG_HEIGHT = 300;
-    var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+    var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
 
     var xScale = new Plottable.Scale.Category();
     var yScale = new Plottable.Scale.Linear();
@@ -327,7 +317,7 @@ describe("NumericAxis", () => {
 
     var labelContainer = d3.select(".tick-label-container");
     d3.selectAll(".tick-label").each(function() {
-      assertBBoxInclusion(labelContainer, d3.select(this));
+      TestMethods.assertBBoxInclusion(labelContainer, d3.select(this));
     });
     svg.remove();
   });
@@ -335,7 +325,7 @@ describe("NumericAxis", () => {
   it("confines labels to the bounding box for the axis", () => {
     var SVG_WIDTH = 500;
     var SVG_HEIGHT = 100;
-    var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+    var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
     var scale = new Plottable.Scale.Linear();
     var axis = new Plottable.Axis.Numeric(scale, "bottom");
     axis.formatter((d: any) => "longstringsareverylong");
@@ -344,7 +334,7 @@ describe("NumericAxis", () => {
     d3.selectAll(".x-axis .tick-label").each(function() {
       var tickLabel = d3.select(this);
       if (tickLabel.style("visibility") === "inherit") {
-        assertBBoxInclusion(boundingBox, tickLabel);
+        TestMethods.assertBBoxInclusion(boundingBox, tickLabel);
       }
     });
     svg.remove();
@@ -357,7 +347,7 @@ describe("NumericAxis", () => {
   it("tick labels follow a sensible interval", () => {
     var SVG_WIDTH = 500;
     var SVG_HEIGHT = 100;
-    var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+    var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
 
     var scale = new Plottable.Scale.Linear();
     scale.domain([-2500000, 2500000]);
@@ -384,7 +374,7 @@ describe("NumericAxis", () => {
   it("does not draw ticks marks outside of the svg", () => {
     var SVG_WIDTH = 300;
     var SVG_HEIGHT = 100;
-    var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+    var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
     var scale = new Plottable.Scale.Linear();
     scale.domain([0, 3]);
     scale.tickGenerator(function(s) {
@@ -404,7 +394,7 @@ describe("NumericAxis", () => {
   it("renders tick labels properly when the domain is reversed", () => {
     var SVG_WIDTH = 300;
     var SVG_HEIGHT = 100;
-    var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+    var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
 
     var scale = new Plottable.Scale.Linear();
     scale.domain([3, 0]);
@@ -430,7 +420,7 @@ describe("NumericAxis", () => {
 
   it("constrained tick labels do not overlap tick marks", () => {
 
-    var svg = generateSVG(300, 400);
+    var svg = TestMethods.generateSVG(300, 400);
 
     var yScale = new Plottable.Scale.Linear().numTicks(100);
     yScale.domain([175, 185]);
@@ -456,7 +446,6 @@ describe("NumericAxis", () => {
           return (visibility === "visible") || (visibility === "inherit");
         });
 
-
     tickLabels.each(function() {
       var tickLabelBox = this.getBoundingClientRect();
 
@@ -469,7 +458,5 @@ describe("NumericAxis", () => {
 
     svg.remove();
   });
-
-
 
 });

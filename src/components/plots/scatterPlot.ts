@@ -52,8 +52,6 @@ export module Plot {
 
     protected _getClosestStruckPoint(p: Point, range: number): Interaction.HoverData {
       var attrToProjector = this._generateAttrToProjector();
-      var xProjector = attrToProjector["x"];
-      var yProjector = attrToProjector["y"];
       var getDistSq = (d: any, i: number, userMetdata: any, plotMetadata: PlotMetadata) => {
         var dx = attrToProjector["x"](d, i, userMetdata, plotMetadata) - p.x;
         var dy = attrToProjector["y"](d, i, userMetdata, plotMetadata) - p.y;
@@ -131,7 +129,7 @@ export module Plot {
       return Plottable._Util.Methods.intersectsBBox(xRange, yRange, translatedBbox);
     }
 
-    //===== Hover logic =====
+    // ===== Hover logic =====
     public _hoverOverComponent(p: Point) {
       // no-op
     }
@@ -143,7 +141,7 @@ export module Plot {
     public _doHover(p: Point): Interaction.HoverData {
       return this._getClosestStruckPoint(p, this._closeDetectionRadius);
     }
-    //===== /Hover logic =====
+    // ===== /Hover logic =====
   }
 }
 }

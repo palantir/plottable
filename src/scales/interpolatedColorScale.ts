@@ -67,7 +67,7 @@ export module Scale {
      */
     private static _getD3InterpolatedScale(colors: string[], scaleType: string): D3.Scale.QuantitativeScale {
       var scale: D3.Scale.QuantitativeScale;
-      switch(scaleType){
+      switch(scaleType) {
         case "linear":
           scale = d3.scale.linear();
           break;
@@ -81,7 +81,7 @@ export module Scale {
           scale = d3.scale.pow();
           break;
       }
-      if (scale == null){
+      if (scale == null) {
         throw new Error("unknown Quantitative scale type " + scaleType);
       }
       return scale
@@ -181,7 +181,7 @@ export module Scale {
      */
     public scaleType(scaleType: string): InterpolatedColor;
     public scaleType(scaleType?: string): any {
-      if (scaleType == null){
+      if (scaleType == null) {
         return this._scaleType;
       }
       this._scaleType = scaleType;

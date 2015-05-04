@@ -90,7 +90,7 @@ module Plottable {
     private _computeExtent(accessor: _Accessor, typeCoercer: (d: any) => any, plotMetadata: any): any[] {
       var appliedAccessor = (d: any, i: number) => accessor(d, i, this._metadata, plotMetadata);
       var mappedData = this._data.map(appliedAccessor).map(typeCoercer);
-      if (mappedData.length === 0){
+      if (mappedData.length === 0) {
         return [];
       } else if (typeof(mappedData[0]) === "string") {
         return _Util.Methods.uniq(mappedData);

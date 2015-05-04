@@ -213,7 +213,7 @@ export module Plot {
       };
     }
 
-    //===== Hover logic =====
+    // ===== Hover logic =====
     public _hoverOverComponent(p: Point) {
       // no-op
     }
@@ -245,7 +245,7 @@ export module Plot {
         selection: this._hoverTarget
       };
     }
-    //===== /Hover logic =====
+    // ===== /Hover logic =====
   }
 }
 }

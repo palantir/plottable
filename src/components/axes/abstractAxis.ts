@@ -453,6 +453,7 @@ export module Axis {
       this._render();
       return this;
     }
+
   }
 }
 }

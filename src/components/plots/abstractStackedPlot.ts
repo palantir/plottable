@@ -58,7 +58,6 @@ export module Plot {
     }
 
     public _updateStackExtents() {
-      var datasets = this.datasets();
       var valueAccessor = this._valueAccessor();
       var keyAccessor = this._keyAccessor();
       var maxStackExtent = _Util.Methods.max<string, number>(this._datasetKeysInOrder, (k: string) => {

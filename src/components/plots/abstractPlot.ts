@@ -296,7 +296,7 @@ export module Plot {
      */
     public animator(animatorKey: string, animator: Animator.PlotAnimator): AbstractPlot;
     public animator(animatorKey: string, animator?: Animator.PlotAnimator): any {
-      if (animator === undefined){
+      if (animator === undefined) {
         return this._animators[animatorKey];
       } else {
         this._animators[animatorKey] = animator;

@@ -1,4 +1,4 @@
-//<reference path="../../reference.ts" />
+///<reference path="../../reference.ts" />
 
 module Plottable {
 export module Axis {
@@ -212,11 +212,10 @@ export module Axis {
     }
 
     private _showAllTickMarks() {
-      var visibleTickMarks = this._tickMarkContainer
-                                 .selectAll("." + AbstractAxis.TICK_MARK_CLASS)
-                                 .each(function() {
-                                   d3.select(this).style("visibility", "inherit");
-                                 });
+      this._tickMarkContainer.selectAll("." + AbstractAxis.TICK_MARK_CLASS)
+                             .each(function() {
+                                     d3.select(this).style("visibility", "inherit");
+                                   });
     }
 
     /**
@@ -364,7 +363,6 @@ export module Axis {
                                       var visibility = d3.select(this).style("visibility");
                                       return (visibility === "inherit") || (visibility === "visible");
                                     });
-      var lastLabelClientRect: ClientRect;
 
       var visibleTickLabelRects = visibleTickLabels[0].map((label: HTMLScriptElement) => label.getBoundingClientRect());
       var interval = 1;

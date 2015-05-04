@@ -4,7 +4,7 @@ var assert = chai.assert;
 
 describe("SelectionBoxLayer", () => {
   it("boxVisible()", () => {
-    var svg = generateSVG();
+    var svg = TestMethods.generateSVG();
     var sbl = new Plottable.Component.SelectionBoxLayer();
     sbl.renderTo(svg);
 
@@ -23,7 +23,7 @@ describe("SelectionBoxLayer", () => {
   });
 
   it("bounds()", () => {
-    var svg = generateSVG();
+    var svg = TestMethods.generateSVG();
     var sbl = new Plottable.Component.SelectionBoxLayer();
 
     var topLeft: Plottable.Point = {
@@ -71,7 +71,7 @@ describe("SelectionBoxLayer", () => {
   it("has an effective size of 0, but will occupy all offered space", () => {
     var sbl = new Plottable.Component.SelectionBoxLayer();
     var request = sbl._requestedSpace(400, 400);
-    verifySpaceRequest(request, 0, 0, false, false, "occupies and asks for no space");
+    TestMethods.verifySpaceRequest(request, 0, 0, false, false, "occupies and asks for no space");
     assert.isTrue(sbl._isFixedWidth(), "fixed width");
     assert.isTrue(sbl._isFixedHeight(), "fixed height");
   });

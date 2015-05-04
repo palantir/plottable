@@ -2,11 +2,10 @@
 
 var assert = chai.assert;
 
-
 describe("Labels", () => {
 
   it("Standard text title label generates properly", () => {
-    var svg = generateSVG(400, 80);
+    var svg = TestMethods.generateSVG(400, 80);
     var label = new Plottable.Component.TitleLabel("A CHART TITLE");
     label.renderTo(svg);
 
@@ -19,45 +18,45 @@ describe("Labels", () => {
     var text = content.select("text");
     var bbox = Plottable._Util.DOM.getBBox(text);
     assert.closeTo(bbox.height, label.height(), 0.5, "text height === label.minimumHeight()");
-    assert.equal(text.node().textContent, "A CHART TITLE", "node's text content is as expected");
+    assert.strictEqual(text.node().textContent, "A CHART TITLE", "node's text content is as expected");
     svg.remove();
   });
 
   // Skipping due to FF odd client bounding rect computation - #1470.
   it.skip("Left-rotated text is handled properly", () => {
-    var svg = generateSVG(100, 400);
+    var svg = TestMethods.generateSVG(100, 400);
     var label = new Plottable.Component.AxisLabel("LEFT-ROTATED LABEL", "left");
     label.renderTo(svg);
     var content = (<any> label)._content;
     var text = content.select("text");
     var textBBox = Plottable._Util.DOM.getBBox(text);
-    assertBBoxInclusion((<any> label)._element.select(".bounding-box"), text);
+    TestMethods.assertBBoxInclusion((<any> label)._element.select(".bounding-box"), text);
     assert.closeTo(textBBox.height, label.width(), window.Pixel_CloseTo_Requirement, "text height");
     svg.remove();
   });
 
   // Skipping due to FF odd client bounding rect computation - #1470.
   it.skip("Right-rotated text is handled properly", () => {
-    var svg = generateSVG(100, 400);
+    var svg = TestMethods.generateSVG(100, 400);
     var label = new Plottable.Component.AxisLabel("RIGHT-ROTATED LABEL", "right");
     label.renderTo(svg);
     var content = (<any> label)._content;
     var text = content.select("text");
     var textBBox = Plottable._Util.DOM.getBBox(text);
-    assertBBoxInclusion((<any> label)._element.select(".bounding-box"), text);
+    TestMethods.assertBBoxInclusion((<any> label)._element.select(".bounding-box"), text);
     assert.closeTo(textBBox.height, label.width(), window.Pixel_CloseTo_Requirement, "text height");
     svg.remove();
   });
 
   it("Label text can be changed after label is created", () => {
-    var svg = generateSVG(400, 80);
+    var svg = TestMethods.generateSVG(400, 80);
     var label = new Plottable.Component.TitleLabel("a");
     label.renderTo(svg);
-    assert.equal((<any> label)._content.select("text").text(), "a", "the text starts at the specified string");
+    assert.strictEqual((<any> label)._content.select("text").text(), "a", "the text starts at the specified string");
     assert.operator(label.height(), ">", 0, "rowMin is > 0 for non-empty string");
     label.text("hello world");
     label.renderTo(svg);
-    assert.equal((<any> label)._content.select("text").text(), "hello world", "the label text updated properly");
+    assert.strictEqual((<any> label)._content.select("text").text(), "hello world", "the label text updated properly");
     assert.operator(label.height(), ">", 0, "rowMin is > 0 for non-empty string");
     svg.remove();
   });
@@ -65,28 +64,28 @@ describe("Labels", () => {
   // skipping because Dan is rewriting labels and the height test fails
   it.skip("Superlong text is handled in a sane fashion", () => {
     var svgWidth = 400;
-    var svg = generateSVG(svgWidth, 80);
+    var svg = TestMethods.generateSVG(svgWidth, 80);
     var label = new Plottable.Component.TitleLabel("THIS LABEL IS SO LONG WHOEVER WROTE IT WAS PROBABLY DERANGED");
     label.renderTo(svg);
     var content = (<any> label)._content;
     var text = content.select("text");
     var bbox = Plottable._Util.DOM.getBBox(text);
-    assert.equal(bbox.height, label.height(), "text height === label.minimumHeight()");
+    assert.strictEqual(bbox.height, label.height(), "text height === label.minimumHeight()");
     assert.operator(bbox.width, "<=", svgWidth, "the text is not wider than the SVG width");
     svg.remove();
   });
 
   it("text in a tiny box is truncated to empty string", () => {
-    var svg = generateSVG(10, 10);
+    var svg = TestMethods.generateSVG(10, 10);
     var label = new Plottable.Component.TitleLabel("Yeah, not gonna fit...");
     label.renderTo(svg);
     var text = (<any> label)._content.select("text");
-    assert.equal(text.text(), "", "text was truncated to empty string");
+    assert.strictEqual(text.text(), "", "text was truncated to empty string");
     svg.remove();
   });
 
   it("centered text in a table is positioned properly", () => {
-    var svg = generateSVG(400, 400);
+    var svg = TestMethods.generateSVG(400, 400);
     var label = new Plottable.Component.TitleLabel("X");
     var t = new Plottable.Component.Table().addComponent(0, 0, label)
                                  .addComponent(1, 0, new Plottable.Component.AbstractComponent());
@@ -99,11 +98,11 @@ describe("Labels", () => {
   });
 
   it("if a label text is changed to empty string, width updates to 0", () => {
-    var svg = generateSVG(400, 400);
+    var svg = TestMethods.generateSVG(400, 400);
     var label = new Plottable.Component.TitleLabel("foo");
     label.renderTo(svg);
     label.text("");
-    assert.equal(label.width(), 0, "width updated to 0");
+    assert.strictEqual(label.width(), 0, "width updated to 0");
     svg.remove();
   });
 
@@ -113,7 +112,7 @@ describe("Labels", () => {
 
   // Skipping due to FF odd client bounding rect computation - #1470.
   it.skip("Label orientation can be changed after label is created", () => {
-    var svg = generateSVG(400, 400);
+    var svg = TestMethods.generateSVG(400, 400);
     var label = new Plottable.Component.AxisLabel("CHANGING ORIENTATION");
     label.renderTo(svg);
 
@@ -125,14 +124,14 @@ describe("Labels", () => {
     label.orient("right");
     text = content.select("text");
     bbox = Plottable._Util.DOM.getBBox(text);
-    assertBBoxInclusion((<any> label)._element.select(".bounding-box"), text);
+    TestMethods.assertBBoxInclusion((<any> label)._element.select(".bounding-box"), text);
     assert.closeTo(bbox.height, label.width(), window.Pixel_CloseTo_Requirement, "label is in vertical position");
 
     svg.remove();
   });
 
   it("padding reacts well under align", () => {
-    var svg = generateSVG(400, 200);
+    var svg = TestMethods.generateSVG(400, 200);
     var testLabel = new Plottable.Component.Label("testing label").padding(30).xAlign("left");
     var longLabel = new Plottable.Component.Label("LONG LABELLLLLLLLLLLLLLLLL").xAlign("left");
     var topLabel = new Plottable.Component.Label("label").yAlign("bottom");
@@ -167,7 +166,7 @@ describe("Labels", () => {
   });
 
   it("padding puts space around the label", () => {
-    var svg = generateSVG(400, 200);
+    var svg = TestMethods.generateSVG(400, 200);
     var testLabel = new Plottable.Component.Label("testing label").padding(30);
     testLabel.renderTo(svg);
 

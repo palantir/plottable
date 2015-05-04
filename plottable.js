@@ -1834,7 +1834,6 @@ var Plottable;
             function AbstractQuantitative(scale) {
                 _super.call(this, scale);
                 this._numTicks = 10;
-                this._PADDING_FOR_IDENTICAL_DOMAIN = 1;
                 this._userSetDomainer = false;
                 this._domainer = new Plottable.Domainer();
                 this._typeCoercer = function (d) { return +d; };
@@ -2302,7 +2301,7 @@ var Plottable;
                 return new Category(this._d3Scale.copy());
             };
             Category.prototype.scale = function (value) {
-                //scale it to the middle
+                // scale it to the middle
                 return _super.prototype.scale.call(this, value) + this.rangeBand() / 2;
             };
             return Category;
@@ -2398,9 +2397,8 @@ var Plottable;
                 var modifyFactor = Math.log(numLooped * Color.LOOP_LIGHTEN_FACTOR + 1);
                 return Plottable._Util.Methods.lightenColor(color, modifyFactor);
             };
-            Color.HEX_SCALE_FACTOR = 20;
             Color.LOOP_LIGHTEN_FACTOR = 1.6;
-            //The maximum number of colors we are getting from CSS stylesheets
+            // The maximum number of colors we are getting from CSS stylesheets
             Color.MAXIMUM_COLORS_FROM_CSS = 256;
             return Color;
         })(Scale.AbstractScale);
@@ -2890,7 +2888,6 @@ var Plottable;
                 return 1;
             };
             Line.prototype._drawStep = function (step) {
-                var baseTime = _super.prototype._drawStep.call(this, step);
                 var attrToProjector = Plottable._Util.Methods.copyMap(step.attrToProjector);
                 var definedFunction = attrToProjector["defined"];
                 var xProjector = attrToProjector["x"];
@@ -4552,7 +4549,6 @@ var Plottable;
                 var tickLabelsEnter = tickLabels.enter().append("g").classed(Axis.AbstractAxis.TICK_LABEL_CLASS, true);
                 tickLabelsEnter.append("text");
                 var xTranslate = (this._tierLabelPositions[index] === "center" || config.step === 1) ? 0 : this.tickLabelPadding();
-                var markLength = this._measurer.measure().height;
                 var yTranslate = this.orient() === "bottom" ? d3.sum(this._tierHeights.slice(0, index + 1)) - this.tickLabelPadding() : this.height() - d3.sum(this._tierHeights.slice(0, index)) - this.tickLabelPadding();
                 var textSelection = tickLabels.selectAll("text");
                 if (textSelection.size() > 0) {
@@ -4797,7 +4793,7 @@ var Plottable;
     })(Axis = Plottable.Axis || (Plottable.Axis = {}));
 })(Plottable || (Plottable = {}));
 
-//<reference path="../../reference.ts" />
+///<reference path="../../reference.ts" />
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -4985,7 +4981,7 @@ var Plottable;
                 }
             };
             Numeric.prototype._showAllTickMarks = function () {
-                var visibleTickMarks = this._tickMarkContainer.selectAll("." + Axis.AbstractAxis.TICK_MARK_CLASS).each(function () {
+                this._tickMarkContainer.selectAll("." + Axis.AbstractAxis.TICK_MARK_CLASS).each(function () {
                     d3.select(this).style("visibility", "inherit");
                 });
             };
@@ -5085,7 +5081,6 @@ var Plottable;
                     var visibility = d3.select(this).style("visibility");
                     return (visibility === "inherit") || (visibility === "visible");
                 });
-                var lastLabelClientRect;
                 var visibleTickLabelRects = visibleTickLabels[0].map(function (label) { return label.getBoundingClientRect(); });
                 var interval = 1;
                 while (!this._hasOverlapWithInterval(interval, visibleTickLabelRects) && interval < visibleTickLabelRects.length) {
@@ -5316,7 +5311,6 @@ var Plottable;
                 // erase all text first, then rewrite
                 tickLabels.text("");
                 this._drawTicks(this.width(), this.height(), catScale, tickLabels);
-                var translate = this._isHorizontal() ? [catScale.rangeBand() / 2, 0] : [0, catScale.rangeBand() / 2];
                 var xTranslate = this.orient() === "right" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
                 var yTranslate = this.orient() === "bottom" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
                 Plottable._Util.DOM.translate(this._tickLabelContainer, xTranslate, yTranslate);
@@ -5880,7 +5874,6 @@ var Plottable;
                 var _this = this;
                 _super.prototype._doRender.call(this);
                 var domain = this._scale.domain();
-                var textHeight = this._measurer.measure().height;
                 var text0 = this._formatter(domain[0]);
                 var text0Width = this._measurer.measure(text0).width;
                 var text1 = this._formatter(domain[1]);
@@ -7387,8 +7380,6 @@ var Plottable;
             Scatter.prototype._getClosestStruckPoint = function (p, range) {
                 var _this = this;
                 var attrToProjector = this._generateAttrToProjector();
-                var xProjector = attrToProjector["x"];
-                var yProjector = attrToProjector["y"];
                 var getDistSq = function (d, i, userMetdata, plotMetadata) {
                     var dx = attrToProjector["x"](d, i, userMetdata, plotMetadata) - p.x;
                     var dy = attrToProjector["y"](d, i, userMetdata, plotMetadata) - p.y;
@@ -7458,7 +7449,7 @@ var Plottable;
                 };
                 return Plottable._Util.Methods.intersectsBBox(xRange, yRange, translatedBbox);
             };
-            //===== Hover logic =====
+            // ===== Hover logic =====
             Scatter.prototype._hoverOverComponent = function (p) {
                 // no-op
             };
@@ -7679,8 +7670,6 @@ var Plottable;
              */
             Bar.prototype.getClosestPlotData = function (queryPoint) {
                 var _this = this;
-                var chartXExtent = { min: 0, max: this.width() };
-                var chartYExtent = { min: 0, max: this.height() };
                 var minPrimaryDist = Infinity;
                 var minSecondaryDist = Infinity;
                 var closestData = [];
@@ -7952,7 +7941,7 @@ var Plottable;
                     d._getRenderArea().selectAll("rect").classed("not-hovered hovered", false);
                 });
             };
-            //===== Hover logic =====
+            // ===== Hover logic =====
             Bar.prototype._hoverOverComponent = function (p) {
                 // no-op
             };
@@ -8018,10 +8007,9 @@ var Plottable;
                     selection: barsSelection
                 };
             };
-            //===== /Hover logic =====
+            // ===== /Hover logic =====
             Bar.prototype._getAllPlotData = function (datasetKeys) {
                 var plotData = _super.prototype._getAllPlotData.call(this, datasetKeys);
-                var valueScale = this._isVertical ? this._yScale : this._xScale;
                 var scaledBaseline = (this._isVertical ? this._yScale : this._xScale).scale(this.baseline());
                 var isVertical = this._isVertical;
                 var barAlignmentFactor = this._barAlignmentFactor;
@@ -8238,7 +8226,7 @@ var Plottable;
                     selection: d3.selectAll(closestElements)
                 };
             };
-            //===== Hover logic =====
+            // ===== Hover logic =====
             Line.prototype._hoverOverComponent = function (p) {
                 // no-op
             };
@@ -8499,7 +8487,6 @@ var Plottable;
             };
             AbstractStacked.prototype._updateStackExtents = function () {
                 var _this = this;
-                var datasets = this.datasets();
                 var valueAccessor = this._valueAccessor();
                 var keyAccessor = this._keyAccessor();
                 var maxStackExtent = Plottable._Util.Methods.max(this._datasetKeysInOrder, function (k) {
@@ -8728,7 +8715,7 @@ var Plottable;
             StackedArea.prototype._wholeDatumAttributes = function () {
                 return ["x", "y", "defined"];
             };
-            //===== Stack logic from AbstractStackedPlot =====
+            // ===== Stack logic from AbstractStackedPlot =====
             StackedArea.prototype._updateStackOffsets = function () {
                 var _this = this;
                 if (!this._projectorsReady()) {
@@ -8855,7 +8842,7 @@ var Plottable;
             StackedBar.prototype._normalizeDatasets = function (fromX) {
                 return Plot.AbstractStacked.prototype._normalizeDatasets.call(this, fromX);
             };
-            //===== Stack logic from AbstractStackedPlot =====
+            // ===== Stack logic from AbstractStackedPlot =====
             StackedBar.prototype._updateStackOffsets = function () {
                 Plot.AbstractStacked.prototype._updateStackOffsets.call(this);
             };

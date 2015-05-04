@@ -1,5 +1,4 @@
 ///<reference path="../testReference.ts" />
-
 var assert = chai.assert;
 
 describe("BaseAxis", () => {
@@ -25,7 +24,7 @@ describe("BaseAxis", () => {
   it("width() + gutter()", () => {
     var SVG_WIDTH = 100;
     var SVG_HEIGHT = 500;
-    var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+    var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
     var scale = new Plottable.Scale.Linear();
     var verticalAxis = new Plottable.Axis.AbstractAxis(scale, "right");
     verticalAxis.renderTo(svg);
@@ -43,7 +42,7 @@ describe("BaseAxis", () => {
   it("height() + gutter()", () => {
     var SVG_WIDTH = 500;
     var SVG_HEIGHT = 100;
-    var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+    var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
     var scale = new Plottable.Scale.Linear();
     var horizontalAxis = new Plottable.Axis.AbstractAxis(scale, "bottom");
     horizontalAxis.renderTo(svg);
@@ -61,7 +60,7 @@ describe("BaseAxis", () => {
   it("draws ticks and baseline (horizontal)", () => {
     var SVG_WIDTH = 500;
     var SVG_HEIGHT = 100;
-    var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+    var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
     var scale = new Plottable.Scale.Linear();
     scale.domain([0, 10]);
     scale.range([0, SVG_WIDTH]);
@@ -93,7 +92,7 @@ describe("BaseAxis", () => {
   it("draws ticks and baseline (vertical)", () => {
     var SVG_WIDTH = 100;
     var SVG_HEIGHT = 500;
-    var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+    var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
     var scale = new Plottable.Scale.Linear();
     scale.domain([0, 10]);
     scale.range([0, SVG_HEIGHT]);
@@ -125,7 +124,7 @@ describe("BaseAxis", () => {
   it("tickLength()", () => {
     var SVG_WIDTH = 500;
     var SVG_HEIGHT = 100;
-    var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+    var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
     var scale = new Plottable.Scale.Linear();
     scale.domain([0, 10]);
     scale.range([0, SVG_WIDTH]);
@@ -150,7 +149,7 @@ describe("BaseAxis", () => {
   it("endTickLength()", () => {
     var SVG_WIDTH = 500;
     var SVG_HEIGHT = 100;
-    var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+    var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
     var scale = new Plottable.Scale.Linear();
     scale.domain([0, 10]);
     scale.range([0, SVG_WIDTH]);
@@ -176,7 +175,7 @@ describe("BaseAxis", () => {
   it("height is adjusted to greater of tickLength or endTickLength", () => {
     var SVG_WIDTH = 500;
     var SVG_HEIGHT = 100;
-    var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+    var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
     var scale = new Plottable.Scale.Linear();
     var baseAxis = new Plottable.Axis.AbstractAxis(scale, "bottom");
     baseAxis.showEndTickLabels(true);
@@ -200,12 +199,12 @@ describe("BaseAxis", () => {
   it("default alignment based on orientation", () => {
     var scale = new Plottable.Scale.Linear();
     var baseAxis = new Plottable.Axis.AbstractAxis(scale, "bottom");
-    assert.equal((<any> baseAxis)._yAlignProportion, 0, "yAlignProportion defaults to 0 for bottom axis");
+    assert.strictEqual((<any> baseAxis)._yAlignProportion, 0, "yAlignProportion defaults to 0 for bottom axis");
     baseAxis = new Plottable.Axis.AbstractAxis(scale, "top");
-    assert.equal((<any> baseAxis)._yAlignProportion, 1, "yAlignProportion defaults to 1 for top axis");
+    assert.strictEqual((<any> baseAxis)._yAlignProportion, 1, "yAlignProportion defaults to 1 for top axis");
     baseAxis = new Plottable.Axis.AbstractAxis(scale, "left");
-    assert.equal((<any> baseAxis)._xAlignProportion, 1, "xAlignProportion defaults to 1 for left axis");
+    assert.strictEqual((<any> baseAxis)._xAlignProportion, 1, "xAlignProportion defaults to 1 for left axis");
     baseAxis = new Plottable.Axis.AbstractAxis(scale, "right");
-    assert.equal((<any> baseAxis)._xAlignProportion, 0, "xAlignProportion defaults to 0 for right axis");
+    assert.strictEqual((<any> baseAxis)._xAlignProportion, 0, "xAlignProportion defaults to 0 for right axis");
   });
 });

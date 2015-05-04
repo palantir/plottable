@@ -15,7 +15,7 @@ describe("Plots", () => {
     ];
 
     var VERIFY_CELLS = (cells: D3.Selection) => {
-      assert.equal(cells[0].length, 5);
+      assert.strictEqual(cells[0].length, 5);
       cells.each(function(d: D3.Selection, i: number) {
         var cell = d3.select(this);
         assert.closeTo(+cell.attr("height"), 50, 0.5, "Cell height is correct");
@@ -28,7 +28,7 @@ describe("Plots", () => {
     it("renders correctly", () => {
       var xScale        = new Plottable.Scale.Linear();
       var yScale        = new Plottable.Scale.Linear();
-      var svg           = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      var svg           = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       var rectanglePlot = new Plottable.Plot.Rectangle(xScale, yScale);
       rectanglePlot.addDataset(DATA)
               .project("x", "x", xScale)
@@ -45,7 +45,7 @@ describe("Plots", () => {
 
   describe("fail safe tests", () => {
     it("illegal rectangles don't get displayed", () => {
-      var svg = generateSVG();
+      var svg = TestMethods.generateSVG();
 
       var data1 = [
         { x: "A", y1: 1, y2: 2, v: 1 },

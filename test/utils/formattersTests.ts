@@ -48,12 +48,10 @@ describe("Formatters", () => {
 
     it("throws an error on strange precision", () => {
       assert.throws(() => {
-          var general = Plottable.Formatters.general(-1);
-          var result = general(5);
+          Plottable.Formatters.general(-1);
       });
       assert.throws(() => {
-          var general = Plottable.Formatters.general(100);
-          var result = general(5);
+          Plottable.Formatters.general(100);
       });
     });
   });
