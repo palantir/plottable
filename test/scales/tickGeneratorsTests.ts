@@ -33,7 +33,6 @@ describe("Tick generators", () => {
     });
 
     it("passing non positive interval", () => {
-      var scale = new Plottable.Scales.Linear().domain([0, 1]);
       assert.throws(() => Plottable.Scales.TickGenerators.intervalTickGenerator(0), "interval must be positive number");
       assert.throws(() => Plottable.Scales.TickGenerators.intervalTickGenerator(-2), "interval must be positive number");
     });

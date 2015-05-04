@@ -208,7 +208,6 @@ export module Axes {
       // erase all text first, then rewrite
       tickLabels.text("");
       this._drawTicks(this.width(), this.height(), catScale, tickLabels);
-      var translate = this._isHorizontal() ? [catScale.rangeBand() / 2, 0] : [0, catScale.rangeBand() / 2];
 
       var xTranslate = this.orient() === "right" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
       var yTranslate = this.orient() === "bottom" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;

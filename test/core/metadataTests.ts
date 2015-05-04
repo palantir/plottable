@@ -28,7 +28,7 @@ describe("Metadata", () => {
   });
 
   it("user metadata is applied", () => {
-    var svg = generateSVG(400, 400);
+    var svg = TestMethods.generateSVG(400, 400);
     var metadata = {foo: 10, bar: 20};
     var xAccessor = (d: any, i: number, u: any) => d.x + i * u.foo;
     var yAccessor = (d: any, i: number, u: any) => u.bar;
@@ -62,7 +62,7 @@ describe("Metadata", () => {
   });
 
   it("user metadata is applied to associated dataset", () => {
-    var svg = generateSVG(400, 400);
+    var svg = TestMethods.generateSVG(400, 400);
     var metadata1 = {foo: 10};
     var metadata2 = {foo: 30};
     var xAccessor = (d: any, i: number, u: any) => d.x + (i + 1) * u.foo;
@@ -94,7 +94,7 @@ describe("Metadata", () => {
   });
 
   it("plot metadata is applied", () => {
-    var svg = generateSVG(400, 400);
+    var svg = TestMethods.generateSVG(400, 400);
     var xAccessor = (d: any, i: number, u: any, m: any) => d.x + (i + 1) * m.foo;
     var yAccessor = () => 0;
     var plot = new Plottable.Plots.Scatter(xScale, yScale)
@@ -128,7 +128,7 @@ describe("Metadata", () => {
   });
 
   it("plot metadata is per plot", () => {
-    var svg = generateSVG(400, 400);
+    var svg = TestMethods.generateSVG(400, 400);
     var xAccessor = (d: any, i: number, u: any, m: any) => d.x + (i + 1) * m.foo;
     var yAccessor = () => 0;
     var plot1 = new Plottable.Plots.Scatter(xScale, yScale)
@@ -189,7 +189,7 @@ describe("Metadata", () => {
   });
 
   it("_getExtent works as expected with plot metadata", () => {
-    var svg = generateSVG(400, 400);
+    var svg = TestMethods.generateSVG(400, 400);
     var metadata = {foo: 11};
     var id = (d: any) => d;
     var dataset = new Plottable.Dataset(data1, metadata);
@@ -210,7 +210,7 @@ describe("Metadata", () => {
   });
 
   it("each plot passes metadata to projectors", () => {
-    var svg = generateSVG(400, 400);
+    var svg = TestMethods.generateSVG(400, 400);
     var metadata = {foo: 11};
     var dataset1 = new Plottable.Dataset(data1, metadata);
     var dataset2 = new Plottable.Dataset(data2, metadata);

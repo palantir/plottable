@@ -6,7 +6,7 @@ describe("Plots", () => {
   describe("PiePlot", () => {
     // HACKHACK #1798: beforeEach being used below
     it("renders correctly with no data", () => {
-      var svg = generateSVG(400, 400);
+      var svg = TestMethods.generateSVG(400, 400);
       var plot = new Plottable.Plots.Pie();
       plot.project("value", (d: any) => d.value);
       assert.doesNotThrow(() => plot.renderTo(svg), Error);
@@ -24,7 +24,7 @@ describe("Plots", () => {
     var renderArea: D3.Selection;
 
     beforeEach(() => {
-      svg = generateSVG(500, 500);
+      svg = TestMethods.generateSVG(500, 500);
       simpleData = [{value: 5, value2: 10, type: "A"}, {value: 15, value2: 10, type: "B"}];
       simpleDataset = new Plottable.Dataset(simpleData);
       piePlot = new Plottable.Plots.Pie();
@@ -38,7 +38,7 @@ describe("Plots", () => {
       var arcPaths = renderArea.selectAll(".arc");
       assert.lengthOf(arcPaths[0], 2, "only has two sectors");
       var arcPath0 = d3.select(arcPaths[0][0]);
-      var pathPoints0 = normalizePath(arcPath0.attr("d")).split(/[A-Z]/).slice(1, 4);
+      var pathPoints0 = TestMethods.normalizePath(arcPath0.attr("d")).split(/[A-Z]/).slice(1, 4);
 
       var firstPathPoints0 = pathPoints0[0].split(",");
       assert.closeTo(parseFloat(firstPathPoints0[0]), 0, 1, "draws line vertically at beginning");
@@ -53,7 +53,7 @@ describe("Plots", () => {
       assert.closeTo(parseFloat(secondPathPoints0[1]), 0, 1, "draws line to origin");
 
       var arcPath1 = d3.select(arcPaths[0][1]);
-      var pathPoints1 = normalizePath(arcPath1.attr("d")).split(/[A-Z]/).slice(1, 4);
+      var pathPoints1 = TestMethods.normalizePath(arcPath1.attr("d")).split(/[A-Z]/).slice(1, 4);
 
       var firstPathPoints1 = pathPoints1[0].split(",");
       assert.operator(parseFloat(firstPathPoints1[0]), ">", 0, "draws line to the right");
@@ -75,7 +75,7 @@ describe("Plots", () => {
       var arcPaths = renderArea.selectAll(".arc");
       assert.lengthOf(arcPaths[0], 2, "only has two sectors");
       var arcPath0 = d3.select(arcPaths[0][0]);
-      var pathPoints0 = normalizePath(arcPath0.attr("d")).split(/[A-Z]/).slice(1, 4);
+      var pathPoints0 = TestMethods.normalizePath(arcPath0.attr("d")).split(/[A-Z]/).slice(1, 4);
 
       var firstPathPoints0 = pathPoints0[0].split(",");
       assert.closeTo(parseFloat(firstPathPoints0[0]), 0, 1, "draws line vertically at beginning");
@@ -86,7 +86,7 @@ describe("Plots", () => {
       assert.operator(parseFloat(arcDestPoint0[1]), ">", 0, "ends below the center");
 
       var arcPath1 = d3.select(arcPaths[0][1]);
-      var pathPoints1 = normalizePath(arcPath1.attr("d")).split(/[A-Z]/).slice(1, 4);
+      var pathPoints1 = TestMethods.normalizePath(arcPath1.attr("d")).split(/[A-Z]/).slice(1, 4);
 
       var firstPathPoints1 = pathPoints1[0].split(",");
       assert.closeTo(parseFloat(firstPathPoints1[0]), 0, 1, "draws line vertically at beginning");
@@ -105,7 +105,7 @@ describe("Plots", () => {
       var arcPaths = renderArea.selectAll(".arc");
       assert.lengthOf(arcPaths[0], 2, "only has two sectors");
 
-      var pathPoints0 = normalizePath(d3.select(arcPaths[0][0]).attr("d")).split(/[A-Z]/).slice(1, 5);
+      var pathPoints0 = TestMethods.normalizePath(d3.select(arcPaths[0][0]).attr("d")).split(/[A-Z]/).slice(1, 5);
 
       var radiusPath0 = pathPoints0[2].split(",").map((coordinate: string) => parseFloat(coordinate));
       assert.closeTo(radiusPath0[0], 5, 1, "stops line at innerRadius point");
@@ -126,7 +126,7 @@ describe("Plots", () => {
       var arcPaths = renderArea.selectAll(".arc");
       assert.lengthOf(arcPaths[0], 2, "only has two sectors");
 
-      var pathPoints0 = normalizePath(d3.select(arcPaths[0][0]).attr("d")).split(/[A-Z]/).slice(1, 5);
+      var pathPoints0 = TestMethods.normalizePath(d3.select(arcPaths[0][0]).attr("d")).split(/[A-Z]/).slice(1, 5);
 
       var radiusPath0 = pathPoints0[0].split(",").map((coordinate: string) => parseFloat(coordinate));
       assert.closeTo(radiusPath0[0], 0, 1, "starts at outerRadius point");
@@ -224,7 +224,7 @@ describe("Plots", () => {
       piePlot.removeDataset("simpleDataset");
       var negativeDataset = new Plottable.Dataset([{value: -5}, {value: 15}]);
       piePlot.addDataset("negativeDataset", negativeDataset);
-      assert.equal(message, "Negative values will not render correctly in a pie chart.");
+      assert.strictEqual(message, "Negative values will not render correctly in a pie chart.");
       Plottable.Utils.Methods.warn = oldWarn;
       svg.remove();
     });
@@ -232,7 +232,7 @@ describe("Plots", () => {
 
   describe("fail safe tests", () => {
     it("undefined, NaN and non-numeric strings not be represented in a Pie Chart", () => {
-      var svg = generateSVG();
+      var svg = TestMethods.generateSVG();
 
       var data1 = [
         { v: 1 },
@@ -260,7 +260,7 @@ describe("Plots", () => {
     });
 
     it("nulls and 0s should be represented in a Pie Chart as DOM elements, but have radius 0", () => {
-      var svg = generateSVG();
+      var svg = TestMethods.generateSVG();
 
       var data1 = [
         { v: 1 },

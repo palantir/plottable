@@ -12,17 +12,17 @@ describe("Dispatchers", () => {
 
       var d3document = d3.select(document);
       (<any> dispatcher)._connect();
-      triggerFakeUIEvent("click", d3document);
+      TestMethods.triggerFakeUIEvent("click", d3document);
       assert.strictEqual(callbackCalls, 1, "connected correctly (callback was called)");
 
       (<any> dispatcher)._connect();
       callbackCalls = 0;
-      triggerFakeUIEvent("click", d3document);
+      TestMethods.triggerFakeUIEvent("click", d3document);
       assert.strictEqual(callbackCalls, 1, "can't double-connect (callback only called once)");
 
       (<any> dispatcher)._disconnect();
       callbackCalls = 0;
-      triggerFakeUIEvent("click", d3document);
+      TestMethods.triggerFakeUIEvent("click", d3document);
       assert.strictEqual(callbackCalls, 0, "disconnected correctly (callback not called)");
     });
 
@@ -40,18 +40,18 @@ describe("Dispatchers", () => {
       var d3document = d3.select(document);
       (<any> dispatcher)._connect();
 
-      triggerFakeUIEvent("click", d3document);
+      TestMethods.triggerFakeUIEvent("click", d3document);
       assert.isTrue(callbackWasCalled, "connected correctly (callback was called)");
 
       (<any> dispatcher)._disconnect();
       callbackWasCalled = false;
-      triggerFakeUIEvent("click", d3document);
+      TestMethods.triggerFakeUIEvent("click", d3document);
       assert.isTrue(callbackWasCalled, "didn't disconnect while broadcaster had listener");
 
       callbackSet.delete(callback);
       (<any> dispatcher)._disconnect();
       callbackWasCalled = false;
-      triggerFakeUIEvent("click", d3document);
+      TestMethods.triggerFakeUIEvent("click", d3document);
       assert.isFalse(callbackWasCalled, "disconnected when broadcaster had no listeners");
     });
 

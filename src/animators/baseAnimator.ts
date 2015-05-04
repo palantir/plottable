@@ -88,7 +88,7 @@ export module Animators {
      * @returns {Default} The calling Default Animator.
      */
     public duration(duration: number): Base;
-    public duration(duration?: number): any{
+    public duration(duration?: number): any {
       if (duration == null) {
         return this._duration;
       } else {
@@ -110,7 +110,7 @@ export module Animators {
      * @returns {Default} The calling Default Animator.
      */
     public delay(delay: number): Base;
-    public delay(delay?: number): any{
+    public delay(delay?: number): any {
       if (delay == null) {
         return this._delay;
       } else {
@@ -132,7 +132,7 @@ export module Animators {
      * @returns {Default} The calling Default Animator.
      */
     public easing(easing: string): Base;
-    public easing(easing?: string): any{
+    public easing(easing?: string): any {
       if (easing == null) {
         return this._easing;
       } else {

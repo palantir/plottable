@@ -4,7 +4,7 @@ var assert = chai.assert;
 
 describe("ClientToSVGTranslator", () => {
   it("getTranslator() creates only one ClientToSVGTranslator per <svg>", () => {
-    var svg = generateSVG();
+    var svg = TestMethods.generateSVG();
 
     var t1 = Plottable.Utils.ClientToSVGTranslator.getTranslator(<SVGElement> svg.node());
     assert.isNotNull(t1, "created a new ClientToSVGTranslator on a <svg>");
@@ -15,7 +15,7 @@ describe("ClientToSVGTranslator", () => {
   });
 
   it("converts points to <svg>-space correctly", () => {
-    var svg = generateSVG();
+    var svg = TestMethods.generateSVG();
 
     var rectOrigin: Plottable.Point = {
       x: 19,
@@ -32,7 +32,7 @@ describe("ClientToSVGTranslator", () => {
 
     var rectBCR = rect.node().getBoundingClientRect();
     var computedOrigin = translator.computePosition(rectBCR.left, rectBCR.top);
-    assertPointsClose(computedOrigin, rectOrigin, 0.5, "translates client coordinates to <svg> coordinates correctly");
+    TestMethods.assertPointsClose(computedOrigin, rectOrigin, 0.5, "translates client coordinates to <svg> coordinates correctly");
 
     svg.remove();
   });

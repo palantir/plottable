@@ -49,7 +49,6 @@ export module Plots {
       delete attrToProjector["x2"];
       delete attrToProjector["y2"];
 
-
       attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this._defaultFillColor);
       return attrToProjector;
     }
