@@ -8,9 +8,10 @@ module Plottable {
   export class ComponentContainer extends Component {
     private _components: Component[] = [];
 
-    public _anchor(element: D3.Selection) {
-      super._anchor(element);
-      this.components().forEach((c) => c._anchor(this._content));
+    public anchor(selection: D3.Selection) {
+      super.anchor(selection);
+      this.components().forEach((c) => c.anchor(this._content));
+      return this;
     }
 
     public _render() {
@@ -37,7 +38,7 @@ module Plottable {
       }
       c._parent(this);
       if (this._isAnchored) {
-        c._anchor(this._content);
+        c.anchor(this._content);
       }
       this._invalidateLayout();
       return true;

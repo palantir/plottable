@@ -33,18 +33,18 @@ module Plottable {
     private _usedLastLayout = false;
 
     /**
-     * Attaches the Component as a child of a given a DOM element. Usually only directly invoked on root-level Components.
+     * Attaches the Component as a child of a given a D3 selection.
      *
-     * @param {D3.Selection} element A D3 selection consisting of the element to anchor under.
+     * @param {D3.Selection} selection The Selection containing the Element to anchor under.
      */
-    public _anchor(element: D3.Selection) {
+    public anchor(selection: D3.Selection) {
       if (this._removed) {
         throw new Error("Can't reuse remove()-ed components!");
       }
 
-      if (element.node().nodeName.toLowerCase() === "svg") {
+      if (selection.node().nodeName.toLowerCase() === "svg") {
         // svg node gets the "plottable" CSS class
-        this._rootSVG = element;
+        this._rootSVG = selection;
         this._rootSVG.classed("plottable", true);
         // visible overflow for firefox https://stackoverflow.com/questions/5926986/why-does-firefox-appear-to-truncate-embedded-svgs
         this._rootSVG.style("overflow", "visible");
@@ -53,12 +53,13 @@ module Plottable {
 
       if (this._element != null) {
         // reattach existing element
-        element.node().appendChild(this._element.node());
+        selection.node().appendChild(this._element.node());
       } else {
-        this._element = element.append("g");
+        this._element = selection.append("g");
         this._setup();
       }
       this._isAnchored = true;
+      return this;
     }
 
     /**
@@ -203,7 +204,7 @@ module Plottable {
         if (!selection.node() || selection.node().nodeName.toLowerCase() !== "svg") {
           throw new Error("Plottable requires a valid SVG to renderTo");
         }
-        this._anchor(selection);
+        this.anchor(selection);
       }
       if (this._element == null) {
         throw new Error("If a component has never been rendered before, then renderTo must be given a node to render to, \

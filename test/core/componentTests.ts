@@ -24,17 +24,17 @@ describe("Component behavior", () => {
 
   describe("anchor", () => {
     it("anchoring works as expected", () => {
-      c._anchor(svg);
+      c.anchor(svg);
       assert.equal((<any> c)._element.node(), svg.select("g").node(), "the component anchored to a <g> beneath the <svg>");
       assert.isTrue(svg.classed("plottable"), "<svg> was given \"plottable\" CSS class");
       svg.remove();
     });
 
     it("can re-anchor to a different element", () => {
-      c._anchor(svg);
+      c.anchor(svg);
 
       var svg2 = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      c._anchor(svg2);
+      c.anchor(svg2);
       assert.equal((<any> c)._element.node(), svg2.select("g").node(), "the component re-achored under the second <svg>");
       assert.isTrue(svg2.classed("plottable"), "second <svg> was given \"plottable\" CSS class");
 
@@ -45,7 +45,7 @@ describe("Component behavior", () => {
 
   describe("computeLayout", () => {
     it("computeLayout defaults and updates intelligently", () => {
-      c._anchor(svg);
+      c.anchor(svg);
       c._computeLayout();
       assert.equal(c.width() , SVG_WIDTH, "computeLayout defaulted width to svg width");
       assert.equal(c.height(), SVG_HEIGHT, "computeLayout defaulted height to svg height");
@@ -70,7 +70,7 @@ describe("Component behavior", () => {
 
       // Remove width/height attributes and style with CSS
       svg.attr("width", null).attr("height", null);
-      c._anchor(svg);
+      c.anchor(svg);
       c._computeLayout();
       assert.equal(c.width(), 400, "defaults to width of parent if width is not specified on <svg>");
       assert.equal(c.height(), 200, "defaults to height of parent if width is not specified on <svg>");
@@ -103,7 +103,7 @@ describe("Component behavior", () => {
 
     it("computeLayout will not default when attached to non-root node", () => {
       var g = svg.append("g");
-      c._anchor(g);
+      c.anchor(g);
       assert.throws(() => c._computeLayout(), "null arguments");
       svg.remove();
     });
@@ -119,7 +119,7 @@ describe("Component behavior", () => {
       var yOff = 20;
       var width = 100;
       var height = 200;
-      c._anchor(svg);
+      c.anchor(svg);
       c._computeLayout(xOff, yOff, width, height);
       var translate = getTranslate((<any> c)._element);
       assert.deepEqual(translate, [xOff, yOff], "the element translated appropriately");
@@ -145,7 +145,7 @@ describe("Component behavior", () => {
 
   it("fixed-width component will align to the right spot", () => {
     fixComponentSize(c, 100, 100);
-    c._anchor(svg);
+    c.anchor(svg);
     c._computeLayout();
     assertComponentXY(c, 0, 0, "top-left component aligns correctly");
 
@@ -161,7 +161,7 @@ describe("Component behavior", () => {
 
   it("components can be offset relative to their alignment, and throw errors if there is insufficient space", () => {
     fixComponentSize(c, 100, 100);
-    c._anchor(svg);
+    c.anchor(svg);
     c.xOffset(20).yOffset(20);
     c._computeLayout();
     assertComponentXY(c, 20, 20, "top-left component offsets correctly");
@@ -202,7 +202,7 @@ describe("Component behavior", () => {
     assert.isFalse(c.clipPathEnabled, "clipPathEnabled defaults to false");
     c.clipPathEnabled = true;
     var expectedClipPathID = c.getID();
-    c._anchor(svg);
+    c.anchor(svg);
     c._computeLayout(0, 0, 100, 100);
     c._render();
     var expectedPrefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
@@ -260,7 +260,7 @@ describe("Component behavior", () => {
     c.classed("CSS-PREANCHOR-REMOVE", false);
     assert.isFalse(c.classed("CSS-PREANCHOR-REMOVE"));
 
-    c._anchor(svg);
+    c.anchor(svg);
     assert.isTrue(c.classed("CSS-PREANCHOR-KEEP"));
     assert.isFalse(c.classed("CSS-PREANCHOR-REMOVE"));
     assert.isFalse(c.classed("CSS-POSTANCHOR"));
@@ -351,7 +351,7 @@ describe("Component behavior", () => {
     var renderFlag = false;
     var c: any = new Plottable.Component();
     c._doRender = () => renderFlag = true;
-    c._anchor(svg);
+    c.anchor(svg);
     c._setup();
     c._render();
     assert.isFalse(renderFlag, "no render until width/height set to nonzero");

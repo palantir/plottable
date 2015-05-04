@@ -3346,17 +3346,17 @@ var Plottable;
             this._usedLastLayout = false;
         }
         /**
-         * Attaches the Component as a child of a given a DOM element. Usually only directly invoked on root-level Components.
+         * Attaches the Component as a child of a given a D3 selection.
          *
-         * @param {D3.Selection} element A D3 selection consisting of the element to anchor under.
+         * @param {D3.Selection} selection The Selection containing the Element to anchor under.
          */
-        Component.prototype._anchor = function (element) {
+        Component.prototype.anchor = function (selection) {
             if (this._removed) {
                 throw new Error("Can't reuse remove()-ed components!");
             }
-            if (element.node().nodeName.toLowerCase() === "svg") {
+            if (selection.node().nodeName.toLowerCase() === "svg") {
                 // svg node gets the "plottable" CSS class
-                this._rootSVG = element;
+                this._rootSVG = selection;
                 this._rootSVG.classed("plottable", true);
                 // visible overflow for firefox https://stackoverflow.com/questions/5926986/why-does-firefox-appear-to-truncate-embedded-svgs
                 this._rootSVG.style("overflow", "visible");
@@ -3364,13 +3364,14 @@ var Plottable;
             }
             if (this._element != null) {
                 // reattach existing element
-                element.node().appendChild(this._element.node());
+                selection.node().appendChild(this._element.node());
             }
             else {
-                this._element = element.append("g");
+                this._element = selection.append("g");
                 this._setup();
             }
             this._isAnchored = true;
+            return this;
         };
         /**
          * Creates additional elements as necessary for the Component to function.
@@ -3506,7 +3507,7 @@ var Plottable;
                 if (!selection.node() || selection.node().nodeName.toLowerCase() !== "svg") {
                     throw new Error("Plottable requires a valid SVG to renderTo");
                 }
-                this._anchor(selection);
+                this.anchor(selection);
             }
             if (this._element == null) {
                 throw new Error("If a component has never been rendered before, then renderTo must be given a node to render to, \
@@ -3884,10 +3885,11 @@ var Plottable;
             _super.apply(this, arguments);
             this._components = [];
         }
-        ComponentContainer.prototype._anchor = function (element) {
+        ComponentContainer.prototype.anchor = function (selection) {
             var _this = this;
-            _super.prototype._anchor.call(this, element);
-            this.components().forEach(function (c) { return c._anchor(_this._content); });
+            _super.prototype.anchor.call(this, selection);
+            this.components().forEach(function (c) { return c.anchor(_this._content); });
+            return this;
         };
         ComponentContainer.prototype._render = function () {
             this._components.forEach(function (c) { return c._render(); });
@@ -3912,7 +3914,7 @@ var Plottable;
             }
             c._parent(this);
             if (this._isAnchored) {
-                c._anchor(this._content);
+                c.anchor(this._content);
             }
             this._invalidateLayout();
             return true;
@@ -6528,11 +6530,12 @@ var Plottable;
             this._datasetKeysInOrder = [];
             this._nextSeriesIndex = 0;
         }
-        Plot.prototype._anchor = function (element) {
-            _super.prototype._anchor.call(this, element);
+        Plot.prototype.anchor = function (selection) {
+            _super.prototype.anchor.call(this, selection);
             this._animateOnNextRender = true;
             this._dataChanged = true;
             this._updateScaleExtents();
+            return this;
         };
         Plot.prototype._setup = function () {
             var _this = this;

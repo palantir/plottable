@@ -58,11 +58,12 @@ module Plottable {
       this._nextSeriesIndex = 0;
     }
 
-    public _anchor(element: D3.Selection) {
-      super._anchor(element);
+    public anchor(selection: D3.Selection) {
+      super.anchor(selection);
       this._animateOnNextRender = true;
       this._dataChanged = true;
       this._updateScaleExtents();
+      return this;
     }
 
     protected _setup() {

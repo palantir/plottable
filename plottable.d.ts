@@ -1588,11 +1588,11 @@ declare module Plottable {
         protected _isSetup: boolean;
         protected _isAnchored: boolean;
         /**
-         * Attaches the Component as a child of a given a DOM element. Usually only directly invoked on root-level Components.
+         * Attaches the Component as a child of a given a D3 selection.
          *
-         * @param {D3.Selection} element A D3 selection consisting of the element to anchor under.
+         * @param {D3.Selection} selection The Selection containing the Element to anchor under.
          */
-        _anchor(element: D3.Selection): void;
+        anchor(selection: D3.Selection): Component;
         /**
          * Creates additional elements as necessary for the Component to function.
          * Called during _anchor() if the Component's element has not been created yet.
@@ -1816,7 +1816,7 @@ declare module Plottable {
 
 declare module Plottable {
     class ComponentContainer extends Component {
-        _anchor(element: D3.Selection): void;
+        anchor(selection: D3.Selection): ComponentContainer;
         _render(): void;
         _removeComponent(c: Component): void;
         _addComponent(c: Component, prepend?: boolean): boolean;
@@ -2666,7 +2666,7 @@ declare module Plottable {
          * @param {any[]|Dataset} [dataset] If provided, the data or Dataset to be associated with this Plot.
          */
         constructor();
-        _anchor(element: D3.Selection): void;
+        anchor(selection: D3.Selection): Plot;
         protected _setup(): void;
         remove(): void;
         /**
