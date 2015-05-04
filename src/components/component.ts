@@ -1,6 +1,15 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
+  export module Components {
+    export class Alignment {
+      static TOP = "top";
+      static BOTTOM = "bottom";
+      static LEFT = "left";
+      static RIGHT = "right";
+      static CENTER = "center";
+    }
+  }
   export class Component extends Core.PlottableObject {
     protected _element: D3.Selection;
     protected _content: D3.Selection;
@@ -242,11 +251,11 @@ module Plottable {
      */
     public xAlign(alignment: string): Component {
       alignment = alignment.toLowerCase();
-      if (alignment === Alignment.LEFT) {
+      if (alignment === Components.Alignment.LEFT) {
         this._xAlignProportion = 0;
-      } else if (alignment === Alignment.CENTER) {
+      } else if (alignment === Components.Alignment.CENTER) {
         this._xAlignProportion = 0.5;
-      } else if (alignment === Alignment.RIGHT) {
+      } else if (alignment === Components.Alignment.RIGHT) {
         this._xAlignProportion = 1;
       } else {
         throw new Error("Unsupported alignment");
@@ -268,11 +277,11 @@ module Plottable {
      */
     public yAlign(alignment: string): Component {
       alignment = alignment.toLowerCase();
-      if (alignment === Alignment.TOP) {
+      if (alignment === Components.Alignment.TOP) {
         this._yAlignProportion = 0;
-      } else if (alignment === Alignment.CENTER) {
+      } else if (alignment === Components.Alignment.CENTER) {
         this._yAlignProportion = 0.5;
-      } else if (alignment === Alignment.BOTTOM) {
+      } else if (alignment === Components.Alignment.BOTTOM) {
         this._yAlignProportion = 1;
       } else {
         throw new Error("Unsupported alignment");
@@ -588,12 +597,5 @@ module Plottable {
     public background(): D3.Selection {
       return this._backgroundContainer;
     }
-  }
-  export class Alignment {
-    static TOP = "top";
-    static BOTTOM = "bottom";
-    static LEFT = "left";
-    static RIGHT = "right";
-    static CENTER = "center";
   }
 }

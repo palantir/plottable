@@ -1588,6 +1588,15 @@ declare module Plottable {
 
 
 declare module Plottable {
+    module Components {
+        class Alignment {
+            static TOP: string;
+            static BOTTOM: string;
+            static LEFT: string;
+            static RIGHT: string;
+            static CENTER: string;
+        }
+    }
     class Component extends Core.PlottableObject {
         protected _element: D3.Selection;
         protected _content: D3.Selection;
@@ -1820,13 +1829,6 @@ declare module Plottable {
          * @return {D3.Selection} background selection for the Component
          */
         background(): D3.Selection;
-    }
-    class Alignment {
-        static TOP: string;
-        static BOTTOM: string;
-        static LEFT: string;
-        static RIGHT: string;
-        static CENTER: string;
     }
 }
 

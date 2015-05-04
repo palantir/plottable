@@ -3340,6 +3340,20 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    var Components;
+    (function (Components) {
+        var Alignment = (function () {
+            function Alignment() {
+            }
+            Alignment.TOP = "top";
+            Alignment.BOTTOM = "bottom";
+            Alignment.LEFT = "left";
+            Alignment.RIGHT = "right";
+            Alignment.CENTER = "center";
+            return Alignment;
+        })();
+        Components.Alignment = Alignment;
+    })(Components = Plottable.Components || (Plottable.Components = {}));
     var Component = (function (_super) {
         __extends(Component, _super);
         function Component() {
@@ -3558,13 +3572,13 @@ var Plottable;
          */
         Component.prototype.xAlign = function (alignment) {
             alignment = alignment.toLowerCase();
-            if (alignment === Alignment.LEFT) {
+            if (alignment === Components.Alignment.LEFT) {
                 this._xAlignProportion = 0;
             }
-            else if (alignment === Alignment.CENTER) {
+            else if (alignment === Components.Alignment.CENTER) {
                 this._xAlignProportion = 0.5;
             }
-            else if (alignment === Alignment.RIGHT) {
+            else if (alignment === Components.Alignment.RIGHT) {
                 this._xAlignProportion = 1;
             }
             else {
@@ -3586,13 +3600,13 @@ var Plottable;
          */
         Component.prototype.yAlign = function (alignment) {
             alignment = alignment.toLowerCase();
-            if (alignment === Alignment.TOP) {
+            if (alignment === Components.Alignment.TOP) {
                 this._yAlignProportion = 0;
             }
-            else if (alignment === Alignment.CENTER) {
+            else if (alignment === Components.Alignment.CENTER) {
                 this._yAlignProportion = 0.5;
             }
-            else if (alignment === Alignment.BOTTOM) {
+            else if (alignment === Components.Alignment.BOTTOM) {
                 this._yAlignProportion = 1;
             }
             else {
@@ -3878,17 +3892,6 @@ var Plottable;
         return Component;
     })(Plottable.Core.PlottableObject);
     Plottable.Component = Component;
-    var Alignment = (function () {
-        function Alignment() {
-        }
-        Alignment.TOP = "top";
-        Alignment.BOTTOM = "bottom";
-        Alignment.LEFT = "left";
-        Alignment.RIGHT = "right";
-        Alignment.CENTER = "center";
-        return Alignment;
-    })();
-    Plottable.Alignment = Alignment;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
