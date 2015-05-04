@@ -452,6 +452,5 @@ module Plottable {
       this._render();
       return this;
     }
-
   }
 }
