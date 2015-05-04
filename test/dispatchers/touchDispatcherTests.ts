@@ -85,7 +85,7 @@ describe("Dispatchers", () => {
       triggerFakeTouchEvent("touchmove", target, expectedPoints, ids);
       assert.isTrue(callbackWasCalled, "callback was called on touchmove");
 
-      td.onTouchMove(keyString, null);
+      td.offTouchMove(keyString, callback);
       target.remove();
     });
 
@@ -122,7 +122,7 @@ describe("Dispatchers", () => {
       triggerFakeTouchEvent("touchend", target, expectedPoints, ids);
       assert.isTrue(callbackWasCalled, "callback was called on touchend");
 
-      td.onTouchEnd(keyString, null);
+      td.offTouchEnd(keyString, callback);
       target.remove();
     });
 
@@ -160,7 +160,7 @@ describe("Dispatchers", () => {
       triggerFakeTouchEvent("touchmove", target, expectedPoints, ids);
       assert.isFalse(callbackWasCalled, "callback was not called after <svg> was removed from DOM");
 
-      td.onTouchMove(keyString, null);
+      td.offTouchMove(keyString, callback);
     });
   });
 });

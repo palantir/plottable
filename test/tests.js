@@ -9186,7 +9186,7 @@ describe("Dispatchers", function () {
             callbackWasCalled = false;
             triggerFakeMouseEvent("mousemove", target, targetX, targetY);
             assert.isFalse(callbackWasCalled, "callback was not called after <svg> was removed from DOM");
-            md.onMouseMove(keyString, null);
+            md.offMouseMove(keyString, callback);
         });
         it("calls callbacks on mouseover, mousemove, and mouseout", function () {
             var targetWidth = 400, targetHeight = 400;
@@ -9216,7 +9216,7 @@ describe("Dispatchers", function () {
             callbackWasCalled = false;
             triggerFakeMouseEvent("mouseout", target, targetX, targetY);
             assert.isTrue(callbackWasCalled, "callback was called on mouseout");
-            md.onMouseMove(keyString, null);
+            md.offMouseMove(keyString, callback);
             target.remove();
         });
         it("onMouseDown()", function () {
@@ -9241,7 +9241,7 @@ describe("Dispatchers", function () {
             md.onMouseDown(keyString, callback);
             triggerFakeMouseEvent("mousedown", target, targetX, targetY);
             assert.isTrue(callbackWasCalled, "callback was called on mousedown");
-            md.onMouseDown(keyString, null);
+            md.offMouseDown(keyString, callback);
             target.remove();
         });
         it("onMouseUp()", function () {
@@ -9266,7 +9266,7 @@ describe("Dispatchers", function () {
             md.onMouseUp(keyString, callback);
             triggerFakeMouseEvent("mouseup", target, targetX, targetY);
             assert.isTrue(callbackWasCalled, "callback was called on mouseup");
-            md.onMouseUp(keyString, null);
+            md.offMouseUp(keyString, callback);
             target.remove();
         });
         it("onWheel()", function () {
@@ -9298,7 +9298,7 @@ describe("Dispatchers", function () {
             md.onWheel(keyString, callback);
             triggerFakeWheelEvent("wheel", svg, targetX, targetY, targetDeltaY);
             assert.isTrue(callbackWasCalled, "callback was called on wheel");
-            md.onWheel(keyString, null);
+            md.offWheel(keyString, callback);
             svg.remove();
         });
         it("onDblClick()", function () {
@@ -9322,7 +9322,7 @@ describe("Dispatchers", function () {
             md.onDblClick(keyString, callback);
             triggerFakeMouseEvent("dblclick", target, targetX, targetY);
             assert.isTrue(callbackWasCalled, "callback was called on dblClick");
-            md.onDblClick(keyString, null);
+            md.offDblClick(keyString, callback);
             target.remove();
         });
     });
@@ -9397,7 +9397,7 @@ describe("Dispatchers", function () {
             td.onTouchMove(keyString, callback);
             triggerFakeTouchEvent("touchmove", target, expectedPoints, ids);
             assert.isTrue(callbackWasCalled, "callback was called on touchmove");
-            td.onTouchMove(keyString, null);
+            td.offTouchMove(keyString, callback);
             target.remove();
         });
         it("onTouchEnd()", function () {
@@ -9427,7 +9427,7 @@ describe("Dispatchers", function () {
             td.onTouchEnd(keyString, callback);
             triggerFakeTouchEvent("touchend", target, expectedPoints, ids);
             assert.isTrue(callbackWasCalled, "callback was called on touchend");
-            td.onTouchEnd(keyString, null);
+            td.offTouchEnd(keyString, callback);
             target.remove();
         });
         it("doesn't call callbacks if not in the DOM", function () {
@@ -9458,7 +9458,7 @@ describe("Dispatchers", function () {
             callbackWasCalled = false;
             triggerFakeTouchEvent("touchmove", target, expectedPoints, ids);
             assert.isFalse(callbackWasCalled, "callback was not called after <svg> was removed from DOM");
-            td.onTouchMove(keyString, null);
+            td.offTouchMove(keyString, callback);
         });
     });
 });
@@ -9480,7 +9480,7 @@ describe("Dispatchers", function () {
             ked.onKeyDown(keyString, callback);
             $("body").simulate("keydown", { keyCode: keyCodeToSend });
             assert.isTrue(keyDowned, "callback when a key was pressed");
-            ked.onKeyDown(keyString, null); // clean up
+            ked.offKeyDown(keyString, callback); // clean up
         });
     });
 });

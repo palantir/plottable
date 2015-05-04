@@ -32,18 +32,8 @@ module Plottable {
     }
 
     protected _setCallback(callbackSet: Utils.CallbackSet<Function>, callback: Function) {
-      if (typeof callback !== "function") {
-        console.error("the callback is not a function")
-      }
-
-      if (callback === null) { // remove listener if callback is null
-        console.error("THIS SHOULD NOT HAPPEN");
-        callbackSet.remove(callback);
-        this._disconnect();
-      } else {
-        this._connect();
-        callbackSet.add(callback);
-      }
+      this._connect();
+      callbackSet.add(callback);
     }
 
     protected _unsetCallback(callbackSet: Utils.CallbackSet<Function>, callback: Function) {

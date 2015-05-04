@@ -88,7 +88,7 @@ describe("Dispatchers", () => {
       triggerFakeMouseEvent("mousemove", target, targetX, targetY);
       assert.isFalse(callbackWasCalled, "callback was not called after <svg> was removed from DOM");
 
-      md.onMouseMove(keyString, null);
+      md.offMouseMove(keyString, callback);
     });
 
     it("calls callbacks on mouseover, mousemove, and mouseout", () => {
@@ -125,7 +125,7 @@ describe("Dispatchers", () => {
       triggerFakeMouseEvent("mouseout", target, targetX, targetY);
       assert.isTrue(callbackWasCalled, "callback was called on mouseout");
 
-      md.onMouseMove(keyString, null);
+      md.offMouseMove(keyString, callback);
       target.remove();
     });
 
@@ -157,7 +157,7 @@ describe("Dispatchers", () => {
       triggerFakeMouseEvent("mousedown", target, targetX, targetY);
       assert.isTrue(callbackWasCalled, "callback was called on mousedown");
 
-      md.onMouseDown(keyString, null);
+      md.offMouseDown(keyString, callback);
       target.remove();
     });
 
@@ -189,7 +189,7 @@ describe("Dispatchers", () => {
       triggerFakeMouseEvent("mouseup", target, targetX, targetY);
       assert.isTrue(callbackWasCalled, "callback was called on mouseup");
 
-      md.onMouseUp(keyString, null);
+      md.offMouseUp(keyString, callback);
       target.remove();
     });
 
@@ -228,7 +228,7 @@ describe("Dispatchers", () => {
       triggerFakeWheelEvent("wheel", svg, targetX, targetY, targetDeltaY);
       assert.isTrue(callbackWasCalled, "callback was called on wheel");
 
-      md.onWheel(keyString, null);
+      md.offWheel(keyString, callback);
       svg.remove();
     });
 
@@ -259,7 +259,7 @@ describe("Dispatchers", () => {
       triggerFakeMouseEvent("dblclick", target, targetX, targetY);
       assert.isTrue(callbackWasCalled, "callback was called on dblClick");
 
-      md.onDblClick(keyString, null);
+      md.offDblClick(keyString, callback);
       target.remove();
     });
   });

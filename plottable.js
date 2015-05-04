@@ -8937,18 +8937,8 @@ var Plottable;
             }
         };
         Dispatcher.prototype._setCallback = function (callbackSet, callback) {
-            if (typeof callback !== "function") {
-                console.error("the callback is not a function");
-            }
-            if (callback === null) {
-                console.error("THIS SHOULD NOT HAPPEN");
-                callbackSet.remove(callback);
-                this._disconnect();
-            }
-            else {
-                this._connect();
-                callbackSet.add(callback);
-            }
+            this._connect();
+            callbackSet.add(callback);
         };
         Dispatcher.prototype._unsetCallback = function (callbackSet, callback) {
             callbackSet.remove(callback);

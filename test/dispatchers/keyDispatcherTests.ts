@@ -22,7 +22,7 @@ describe("Dispatchers", () => {
       $("body").simulate("keydown", { keyCode: keyCodeToSend });
       assert.isTrue(keyDowned, "callback when a key was pressed");
 
-      ked.onKeyDown(keyString, null); // clean up
+      ked.offKeyDown(keyString, callback); // clean up
     });
   });
 });
