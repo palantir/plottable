@@ -6150,6 +6150,11 @@ var Plottable;
                 }
                 return this;
             };
+            /**
+             * Removes a Component.
+             *
+             * @param {Component} component The Component to be removed.
+             */
             Table.prototype.removeComponent = function (component) {
                 _super.prototype._removeComponent.call(this, component);
                 for (var r = 0; r < this._nRows; r++) {

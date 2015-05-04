@@ -97,6 +97,11 @@ export module Components {
       return this;
     }
 
+    /**
+     * Removes a Component.
+     * 
+     * @param {Component} component The Component to be removed.
+     */
     public removeComponent(component: Component) {
       super._removeComponent(component);
       for (var r = 0; r < this._nRows; r++) {

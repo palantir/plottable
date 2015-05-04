@@ -2531,6 +2531,11 @@ declare module Plottable {
              * @returns {Table} The calling Table.
              */
             addComponent(component: Component, row: number, col: number): Table;
+            /**
+             * Removes a Component.
+             *
+             * @param {Component} component The Component to be removed.
+             */
             removeComponent(component: Component): void;
             _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
             _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;
