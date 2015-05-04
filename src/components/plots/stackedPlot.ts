@@ -173,16 +173,15 @@ module Plottable {
       return dataMapArray;
     }
 
-    public _updateScaleExtents() {
-      super._updateScaleExtents();
-      var primaryScale: Scale<any, number> = this._isVertical ? this._yScale : this._xScale;
-      if (!primaryScale) {
-        return;
-      }
-      if (this._isAnchored && this._stackedExtent.length > 0) {
-        primaryScale._updateExtent(this.getID().toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT", this._stackedExtent);
+    protected _extentsForAttr(attr: string) {
+      var extents = super._extentsForAttr(attr);
+      var primaryAttr = this._isVertical ? "y" : "x";
+      if (attr === primaryAttr && this._stackedExtent) {
+        var clonedExtents = extents.slice();
+        clonedExtents.push(this._stackedExtent);
+        return clonedExtents;
       } else {
-        primaryScale._removeExtent(this.getID().toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT");
+        return extents;
       }
     }
 

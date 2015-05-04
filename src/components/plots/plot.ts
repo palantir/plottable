@@ -32,6 +32,8 @@ module Plottable {
 
     protected _renderArea: D3.Selection;
     protected _projections: { [attrToSet: string]: _Projection; } = {};
+    protected _attrToExtents: D3.Map<any[]>;
+    private _extentProvider: Scales.ExtentProvider<any>;
 
     protected _animate: boolean = false;
     private _animators: Animators.PlotAnimatorMap = {};
@@ -54,6 +56,8 @@ module Plottable {
       this.clipPathEnabled = true;
       this.classed("plot", true);
       this._key2PlotDatasetKey = d3.map();
+      this._attrToExtents = d3.map();
+      this._extentProvider = (scale: Scale<any, any>) => this._extentsForScale(scale);
       this._datasetKeysInOrder = [];
       this._nextSeriesIndex = 0;
     }
@@ -62,7 +66,7 @@ module Plottable {
       super._anchor(element);
       this._animateOnNextRender = true;
       this._dataChanged = true;
-      this._updateScaleExtents();
+      this._updateAllExtents();
     }
 
     protected _setup() {
@@ -141,7 +145,7 @@ module Plottable {
     }
 
     protected _onDatasetUpdate() {
-      this._updateScaleExtents();
+      this._updateAllExtents();
       this._animateOnNextRender = true;
       this._dataChanged = true;
       this._render();
@@ -179,22 +183,33 @@ module Plottable {
      */
     public project(attrToSet: string, accessor: any, scale?: Scale<any, any>) {
       attrToSet = attrToSet.toLowerCase();
-      var currentProjection = this._projections[attrToSet];
-      var existingScale = currentProjection && currentProjection.scale;
+      var previousProjection = this._projections[attrToSet];
+      var previousScale = previousProjection && previousProjection.scale;
 
-      if (existingScale) {
-        this._datasetKeysInOrder.forEach((key) => {
-          existingScale._removeExtent(this.getID().toString() + "_" + key, attrToSet);
-          existingScale.broadcaster.deregisterListener(this);
-        });
+      accessor = Utils.Methods.accessorize(accessor);
+      this._projections[attrToSet] = {accessor: accessor, scale: scale, attribute: attrToSet};
+      this._updateExtentsForAttr(attrToSet);
+
+      if (previousScale) {
+        var listeningTopreviousScale = false;
+        for (var attr in this._projections) {
+          if (this._projections[attr].scale === previousScale) {
+            listeningTopreviousScale = true;
+            break;
+          }
+        }
+        if (!listeningTopreviousScale) {
+          previousScale.broadcaster.deregisterListener(this);
+          previousScale.removeExtentProvider(this._extentProvider);
+        }
+        previousScale._autoDomainIfAutomaticMode();
       }
 
       if (scale) {
         scale.broadcaster.registerListener(this, () => this._render());
+        scale.addExtentProvider(this._extentProvider);
+        scale._autoDomainIfAutomaticMode();
       }
-      accessor = Utils.Methods.accessorize(accessor);
-      this._projections[attrToSet] = {accessor: accessor, scale: scale, attribute: attrToSet};
-      this._updateScaleExtent(attrToSet);
       this._render(); // queue a re-render upon changing projector
       return this;
     }
@@ -253,7 +268,7 @@ module Plottable {
     public detach() {
       super.detach();
       // make the domain resize
-      this._updateScaleExtents();
+      this._updateAllExtents();
       return this;
     }
 
@@ -261,26 +276,52 @@ module Plottable {
      * This function makes sure that all of the scales in this._projections
      * have an extent that includes all the data that is projected onto them.
      */
-    protected _updateScaleExtents() {
-      d3.keys(this._projections).forEach((attr: string) => this._updateScaleExtent(attr));
+    protected _updateAllExtents() {
+      d3.keys(this._projections).forEach((attr: string) => { this._updateExtentsForAttr(attr); });
+      var scales: Scale<any, any>[] = [];
+      d3.keys(this._projections).forEach((attr: string) => {
+        var scale = this._projections[attr].scale;
+        if (scale != null && scales.indexOf(scale) === -1) {
+          scales.push(scale);
+        }
+      });
+      scales.forEach((scale) => scale._autoDomainIfAutomaticMode());
     }
 
-    public _updateScaleExtent(attr: string) {
-      var projector = this._projections[attr];
-      if (projector.scale) {
-        this._datasetKeysInOrder.forEach((key) => {
-          var plotDatasetKey = this._key2PlotDatasetKey.get(key);
-          var dataset = plotDatasetKey.dataset;
-          var plotMetadata = plotDatasetKey.plotMetadata;
-          var extent = dataset._getExtent(projector.accessor, projector.scale._typeCoercer, plotMetadata);
-          var scaleKey = this.getID().toString() + "_" + key;
-          if (extent.length === 0 || !this._isAnchored) {
-            projector.scale._removeExtent(scaleKey, attr);
-          } else {
-            projector.scale._updateExtent(scaleKey, attr, extent);
-          }
-        });
+    private _updateExtentsForAttr(attr: string) {
+      var accessor = this._projections[attr].accessor;
+      var scale = this._projections[attr].scale;
+      var coercer = (scale != null) ? this._projections[attr].scale._typeCoercer : (d: any) => d;
+      var extents = this._datasetKeysInOrder.map((key) => {
+        var plotDatasetKey = this._key2PlotDatasetKey.get(key);
+        var dataset = plotDatasetKey.dataset;
+        var plotMetadata = plotDatasetKey.plotMetadata;
+        return dataset._getExtent(accessor, coercer, plotMetadata);
+      });
+      this._attrToExtents.set(attr, extents);
+    }
+
+    /**
+     * Override in subclass to add special extents, such as included values
+     */
+    protected _extentsForAttr(attr: string) {
+      return this._attrToExtents.get(attr);
+    }
+
+    private _extentsForScale<D>(scale: Scale<D, any>): D[][] {
+      if (!this._isAnchored) {
+        return [];
       }
+      var allSetsOfExtents: D[][][] = [];
+      for (var attr in this._projections) {
+        if (this._projections[attr].scale === scale) {
+          var extents = this._extentsForAttr(attr);
+          if (extents != null) {
+            allSetsOfExtents.push(extents);
+          }
+        }
+      }
+      return d3.merge(allSetsOfExtents);
     }
 
     /**
@@ -376,15 +417,6 @@ module Plottable {
       if (key != null && this._key2PlotDatasetKey.has(key)) {
         var pdk = this._key2PlotDatasetKey.get(key);
         pdk.drawer.remove();
-
-        var projectors = d3.values(this._projections);
-        var scaleKey = this.getID().toString() + "_" + key;
-        projectors.forEach((p) => {
-          if (p.scale != null) {
-            p.scale._removeExtent(scaleKey, p.attribute);
-          }
-        });
-
         pdk.dataset.broadcaster.deregisterListener(this);
         this._datasetKeysInOrder.splice(this._datasetKeysInOrder.indexOf(key), 1);
         this._key2PlotDatasetKey.remove(key);
