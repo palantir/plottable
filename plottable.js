@@ -9006,10 +9006,7 @@ var Plottable;
             };
             /**
              * Registers a callback to be called whenever the mouse position changes,
-             * or removes the callback if `null` is passed as the callback.
              *
-             * @param {any} key The key associated with the callback.
-             *                  Key uniqueness is determined by deep equality.
              * @param {(p: Point) => any} callback A callback that takes the pixel position
              *                                     in svg-coordinate-space. Pass `null`
              *                                     to remove a callback.
@@ -9019,16 +9016,21 @@ var Plottable;
                 this._setCallback(this._moveCallbackSet, callback);
                 return this;
             };
+            /**
+             * Registers the callback to be called whenever the mouse position changes,
+             *
+             * @param {(p: Point) => any} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space. Pass `null`
+             *                                     to remove a callback.
+             * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+             */
             Mouse.prototype.offMouseMove = function (callback) {
                 this._unsetCallback(this._moveCallbackSet, callback);
                 return this;
             };
             /**
              * Registers a callback to be called whenever a mousedown occurs,
-             * or removes the callback if `null` is passed as the callback.
              *
-             * @param {any} key The key associated with the callback.
-             *                  Key uniqueness is determined by deep equality.
              * @param {(p: Point) => any} callback A callback that takes the pixel position
              *                                     in svg-coordinate-space. Pass `null`
              *                                     to remove a callback.
@@ -9038,16 +9040,21 @@ var Plottable;
                 this._setCallback(this._downCallbackSet, callback);
                 return this;
             };
+            /**
+             * Registers the callback to be called whenever a mousedown occurs,
+             *
+             * @param {(p: Point) => any} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space. Pass `null`
+             *                                     to remove a callback.
+             * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+             */
             Mouse.prototype.offMouseDown = function (callback) {
                 this._unsetCallback(this._downCallbackSet, callback);
                 return this;
             };
             /**
              * Registers a callback to be called whenever a mouseup occurs,
-             * or removes the callback if `null` is passed as the callback.
              *
-             * @param {any} key The key associated with the callback.
-             *                  Key uniqueness is determined by deep equality.
              * @param {(p: Point) => any} callback A callback that takes the pixel position
              *                                     in svg-coordinate-space. Pass `null`
              *                                     to remove a callback.
@@ -9057,16 +9064,21 @@ var Plottable;
                 this._setCallback(this._upCallbackSet, callback);
                 return this;
             };
+            /**
+             * Registers the callback to be called whenever a mouseup occurs,
+             *
+             * @param {(p: Point) => any} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space. Pass `null`
+             *                                     to remove a callback.
+             * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+             */
             Mouse.prototype.offMouseUp = function (callback) {
                 this._unsetCallback(this._upCallbackSet, callback);
                 return this;
             };
             /**
              * Registers a callback to be called whenever a wheel occurs,
-             * or removes the callback if `null` is passed as the callback.
              *
-             * @param {any} key The key associated with the callback.
-             *                  Key uniqueness is determined by deep equality.
              * @param {MouseCallback} callback A callback that takes the pixel position
              *                                     in svg-coordinate-space.
              *                                     Pass `null` to remove a callback.
@@ -9076,16 +9088,21 @@ var Plottable;
                 this._setCallback(this._wheelCallbackSet, callback);
                 return this;
             };
+            /**
+             * Registers the callback to be called whenever a wheel occurs,
+             *
+             * @param {MouseCallback} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space.
+             *                                     Pass `null` to remove a callback.
+             * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+             */
             Mouse.prototype.offWheel = function (callback) {
                 this._unsetCallback(this._wheelCallbackSet, callback);
                 return this;
             };
             /**
              * Registers a callback to be called whenever a dblClick occurs,
-             * or removes the callback if `null` is passed as the callback.
              *
-             * @param {any} key The key associated with the callback.
-             *                  Key uniqueness is determined by deep equality.
              * @param {MouseCallback} callback A callback that takes the pixel position
              *                                     in svg-coordinate-space.
              *                                     Pass `null` to remove a callback.
@@ -9095,6 +9112,14 @@ var Plottable;
                 this._setCallback(this._dblClickCallbackSet, callback);
                 return this;
             };
+            /**
+             * Registers the callback to be called whenever a dblClick occurs,
+             *
+             * @param {MouseCallback} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space.
+             *                                     Pass `null` to remove a callback.
+             * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+             */
             Mouse.prototype.offDblClick = function (callback) {
                 this._unsetCallback(this._dblClickCallbackSet, callback);
                 return this;
@@ -9174,10 +9199,7 @@ var Plottable;
             };
             /**
              * Registers a callback to be called whenever a touch starts,
-             * or removes the callback if `null` is passed as the callback.
              *
-             * @param {any} key The key associated with the callback.
-             *                  Key uniqueness is determined by deep equality.
              * @param {TouchCallback} callback A callback that takes the pixel position
              *                                     in svg-coordinate-space. Pass `null`
              *                                     to remove a callback.
@@ -9187,16 +9209,21 @@ var Plottable;
                 this._setCallback(this._startCallbackSet, callback);
                 return this;
             };
+            /**
+             * Removes the callback to be called whenever a touch starts,
+             *
+             * @param {TouchCallback} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space. Pass `null`
+             *                                     to remove a callback.
+             * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
+             */
             Touch.prototype.offTouchStart = function (callback) {
                 this._unsetCallback(this._startCallbackSet, callback);
                 return this;
             };
             /**
              * Registers a callback to be called whenever the touch position changes,
-             * or removes the callback if `null` is passed as the callback.
              *
-             * @param {any} key The key associated with the callback.
-             *                  Key uniqueness is determined by deep equality.
              * @param {TouchCallback} callback A callback that takes the pixel position
              *                                     in svg-coordinate-space. Pass `null`
              *                                     to remove a callback.
@@ -9206,16 +9233,21 @@ var Plottable;
                 this._setCallback(this._moveCallbackSet, callback);
                 return this;
             };
+            /**
+             * Removes the callback to be called whenever the touch position changes,
+             *
+             * @param {TouchCallback} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space. Pass `null`
+             *                                     to remove a callback.
+             * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
+             */
             Touch.prototype.offTouchMove = function (callback) {
                 this._unsetCallback(this._moveCallbackSet, callback);
                 return this;
             };
             /**
              * Registers a callback to be called whenever a touch ends,
-             * or removes the callback if `null` is passed as the callback.
              *
-             * @param {any} key The key associated with the callback.
-             *                  Key uniqueness is determined by deep equality.
              * @param {TouchCallback} callback A callback that takes the pixel position
              *                                     in svg-coordinate-space. Pass `null`
              *                                     to remove a callback.
@@ -9225,6 +9257,14 @@ var Plottable;
                 this._setCallback(this._endCallbackSet, callback);
                 return this;
             };
+            /**
+             * Removes the callback to be called whenever a touch ends,
+             *
+             * @param {TouchCallback} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space. Pass `null`
+             *                                     to remove a callback.
+             * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
+             */
             Touch.prototype.offTouchEnd = function (callback) {
                 this._unsetCallback(this._endCallbackSet, callback);
                 return this;
@@ -9305,10 +9345,7 @@ var Plottable;
             };
             /**
              * Registers a callback to be called whenever a key is pressed,
-             * or removes the callback if `null` is passed as the callback.
              *
-             * @param {any} key The registration key associated with the callback.
-             *                  Registration key uniqueness is determined by deep equality.
              * @param {KeyCallback} callback
              * @return {Dispatcher.Key} The calling Dispatcher.Key.
              */
@@ -9316,6 +9353,12 @@ var Plottable;
                 this._setCallback(this._keydownCallbackSet, callback);
                 return this;
             };
+            /**
+             * Removes the callback to be called whenever a key is pressed,
+             *
+             * @param {KeyCallback} callback
+             * @return {Dispatcher.Key} The calling Dispatcher.Key.
+             */
             Key.prototype.offKeyDown = function (callback) {
                 this._unsetCallback(this._keydownCallbackSet, callback);
                 return this;

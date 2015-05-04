@@ -66,10 +66,7 @@ export module Dispatchers {
 
     /**
      * Registers a callback to be called whenever the mouse position changes,
-     * or removes the callback if `null` is passed as the callback.
      *
-     * @param {any} key The key associated with the callback.
-     *                  Key uniqueness is determined by deep equality.
      * @param {(p: Point) => any} callback A callback that takes the pixel position
      *                                     in svg-coordinate-space. Pass `null`
      *                                     to remove a callback.
@@ -80,6 +77,14 @@ export module Dispatchers {
       return this;
     }
 
+    /**
+     * Registers the callback to be called whenever the mouse position changes,
+     *
+     * @param {(p: Point) => any} callback A callback that takes the pixel position
+     *                                     in svg-coordinate-space. Pass `null`
+     *                                     to remove a callback.
+     * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+     */
     public offMouseMove(callback: MouseCallback): Dispatchers.Mouse {
       this._unsetCallback(this._moveCallbackSet, callback);
       return this;
@@ -87,10 +92,7 @@ export module Dispatchers {
 
     /**
      * Registers a callback to be called whenever a mousedown occurs,
-     * or removes the callback if `null` is passed as the callback.
      *
-     * @param {any} key The key associated with the callback.
-     *                  Key uniqueness is determined by deep equality.
      * @param {(p: Point) => any} callback A callback that takes the pixel position
      *                                     in svg-coordinate-space. Pass `null`
      *                                     to remove a callback.
@@ -101,6 +103,14 @@ export module Dispatchers {
       return this;
     }
 
+    /**
+     * Registers the callback to be called whenever a mousedown occurs,
+     *
+     * @param {(p: Point) => any} callback A callback that takes the pixel position
+     *                                     in svg-coordinate-space. Pass `null`
+     *                                     to remove a callback.
+     * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+     */
     public offMouseDown(callback: MouseCallback): Dispatchers.Mouse {
       this._unsetCallback(this._downCallbackSet, callback);
       return this;
@@ -108,10 +118,7 @@ export module Dispatchers {
 
     /**
      * Registers a callback to be called whenever a mouseup occurs,
-     * or removes the callback if `null` is passed as the callback.
      *
-     * @param {any} key The key associated with the callback.
-     *                  Key uniqueness is determined by deep equality.
      * @param {(p: Point) => any} callback A callback that takes the pixel position
      *                                     in svg-coordinate-space. Pass `null`
      *                                     to remove a callback.
@@ -122,6 +129,14 @@ export module Dispatchers {
       return this;
     }
 
+    /**
+     * Registers the callback to be called whenever a mouseup occurs,
+     *
+     * @param {(p: Point) => any} callback A callback that takes the pixel position
+     *                                     in svg-coordinate-space. Pass `null`
+     *                                     to remove a callback.
+     * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+     */
     public offMouseUp(callback: MouseCallback): Dispatchers.Mouse {
       this._unsetCallback(this._upCallbackSet, callback);
       return this;
@@ -129,10 +144,7 @@ export module Dispatchers {
 
     /**
      * Registers a callback to be called whenever a wheel occurs,
-     * or removes the callback if `null` is passed as the callback.
      *
-     * @param {any} key The key associated with the callback.
-     *                  Key uniqueness is determined by deep equality.
      * @param {MouseCallback} callback A callback that takes the pixel position
      *                                     in svg-coordinate-space.
      *                                     Pass `null` to remove a callback.
@@ -143,6 +155,14 @@ export module Dispatchers {
       return this;
     }
 
+    /**
+     * Registers the callback to be called whenever a wheel occurs,
+     *
+     * @param {MouseCallback} callback A callback that takes the pixel position
+     *                                     in svg-coordinate-space.
+     *                                     Pass `null` to remove a callback.
+     * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+     */
     public offWheel(callback: MouseCallback): Dispatchers.Mouse {
       this._unsetCallback(this._wheelCallbackSet, callback);
       return this;
@@ -150,10 +170,7 @@ export module Dispatchers {
 
     /**
      * Registers a callback to be called whenever a dblClick occurs,
-     * or removes the callback if `null` is passed as the callback.
      *
-     * @param {any} key The key associated with the callback.
-     *                  Key uniqueness is determined by deep equality.
      * @param {MouseCallback} callback A callback that takes the pixel position
      *                                     in svg-coordinate-space.
      *                                     Pass `null` to remove a callback.
@@ -164,6 +181,14 @@ export module Dispatchers {
       return this;
     }
 
+    /**
+     * Registers the callback to be called whenever a dblClick occurs,
+     *
+     * @param {MouseCallback} callback A callback that takes the pixel position
+     *                                     in svg-coordinate-space.
+     *                                     Pass `null` to remove a callback.
+     * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+     */
     public offDblClick(callback: MouseCallback): Dispatchers.Mouse {
       this._unsetCallback(this._dblClickCallbackSet, callback);
       return this;

@@ -40,10 +40,7 @@ export module Dispatchers {
 
     /**
      * Registers a callback to be called whenever a key is pressed,
-     * or removes the callback if `null` is passed as the callback.
      *
-     * @param {any} key The registration key associated with the callback.
-     *                  Registration key uniqueness is determined by deep equality.
      * @param {KeyCallback} callback
      * @return {Dispatcher.Key} The calling Dispatcher.Key.
      */
@@ -52,6 +49,12 @@ export module Dispatchers {
       return this;
     }
 
+    /**
+     * Removes the callback to be called whenever a key is pressed,
+     *
+     * @param {KeyCallback} callback
+     * @return {Dispatcher.Key} The calling Dispatcher.Key.
+     */
     public offKeyDown(callback: KeyCallback): Key {
       this._unsetCallback(this._keydownCallbackSet, callback);
       return this;
