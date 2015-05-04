@@ -1821,6 +1821,13 @@ declare module Plottable {
          */
         background(): D3.Selection;
     }
+    class Alignment {
+        static TOP: string;
+        static BOTTOM: string;
+        static LEFT: string;
+        static RIGHT: string;
+        static CENTER: string;
+    }
 }
 
 

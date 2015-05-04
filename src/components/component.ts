@@ -242,11 +242,11 @@ module Plottable {
      */
     public xAlign(alignment: string): Component {
       alignment = alignment.toLowerCase();
-      if (alignment === "left") {
+      if (alignment === Alignment.LEFT) {
         this._xAlignProportion = 0;
-      } else if (alignment === "center") {
+      } else if (alignment === Alignment.CENTER) {
         this._xAlignProportion = 0.5;
-      } else if (alignment === "right") {
+      } else if (alignment === Alignment.RIGHT) {
         this._xAlignProportion = 1;
       } else {
         throw new Error("Unsupported alignment");
@@ -268,11 +268,11 @@ module Plottable {
      */
     public yAlign(alignment: string): Component {
       alignment = alignment.toLowerCase();
-      if (alignment === "top") {
+      if (alignment === Alignment.TOP) {
         this._yAlignProportion = 0;
-      } else if (alignment === "center") {
+      } else if (alignment === Alignment.CENTER) {
         this._yAlignProportion = 0.5;
-      } else if (alignment === "bottom") {
+      } else if (alignment === Alignment.BOTTOM) {
         this._yAlignProportion = 1;
       } else {
         throw new Error("Unsupported alignment");
@@ -588,5 +588,12 @@ module Plottable {
     public background(): D3.Selection {
       return this._backgroundContainer;
     }
+  }
+  export class Alignment {
+    static TOP = "top";
+    static BOTTOM = "bottom";
+    static LEFT = "left";
+    static RIGHT = "right";
+    static CENTER = "center"; 
   }
 }
