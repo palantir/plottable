@@ -102,9 +102,8 @@ export module Dispatchers {
       this._setCallback(this._moveCallbackSet, key, callback);
       return this;
     }
-
     public offMouseMove(key: any, callback: MouseCallback): Dispatchers.Mouse {
-      this._unsetCallback(this._moveCallbackSet, callback);
+      this._unsetCallback(this._moveCallbackSet, key, callback);
       return this;
     }
 
@@ -123,6 +122,10 @@ export module Dispatchers {
       this._setCallback(this._downCallbackSet, key, callback);
       return this;
     }
+    public offMouseDown(key: any, callback: MouseCallback): Dispatchers.Mouse {
+      this._unsetCallback(this._downCallbackSet, key, callback);
+      return this;
+    }
 
     /**
      * Registers a callback to be called whenever a mouseup occurs,
@@ -137,6 +140,10 @@ export module Dispatchers {
      */
     public onMouseUp(key: any, callback: MouseCallback): Dispatchers.Mouse {
       this._setCallback(this._upCallbackSet, key, callback);
+      return this;
+    }
+    public offMouseUp(key: any, callback: MouseCallback): Dispatchers.Mouse {
+      this._unsetCallback(this._upCallbackSet, key, callback);
       return this;
     }
 
@@ -155,6 +162,10 @@ export module Dispatchers {
       this._setCallback(this._wheelCallbackSet, key, callback);
       return this;
     }
+    public offWheel(key: any, callback: MouseCallback): Dispatchers.Mouse {
+      this._unsetCallback(this._wheelCallbackSet, key, callback);
+      return this;
+    }
 
     /**
      * Registers a callback to be called whenever a dblClick occurs,
@@ -169,6 +180,10 @@ export module Dispatchers {
      */
     public onDblClick(key: any, callback: MouseCallback): Dispatchers.Mouse {
       this._setCallback(this._dblClickCallbackSet, key, callback);
+      return this;
+    }
+    public offDblClick(key: any, callback: MouseCallback): Dispatchers.Mouse {
+      this._unsetCallback(this._dblClickCallbackSet, key, callback);
       return this;
     }
 

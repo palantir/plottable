@@ -8955,7 +8955,7 @@ var Plottable;
                 callbackSet.add(callback);
             }
         };
-        Dispatcher.prototype._unsetCallback = function (callbackSet, callback) {
+        Dispatcher.prototype._unsetCallback = function (callbackSet, key, callback) {
             callbackSet.remove(callback);
             this._disconnect();
         };
@@ -9044,7 +9044,7 @@ var Plottable;
                 return this;
             };
             Mouse.prototype.offMouseMove = function (key, callback) {
-                this._unsetCallback(this._moveCallbackSet, callback);
+                this._unsetCallback(this._moveCallbackSet, key, callback);
                 return this;
             };
             /**
@@ -9062,6 +9062,10 @@ var Plottable;
                 this._setCallback(this._downCallbackSet, key, callback);
                 return this;
             };
+            Mouse.prototype.offMouseDown = function (key, callback) {
+                this._unsetCallback(this._downCallbackSet, key, callback);
+                return this;
+            };
             /**
              * Registers a callback to be called whenever a mouseup occurs,
              * or removes the callback if `null` is passed as the callback.
@@ -9075,6 +9079,10 @@ var Plottable;
              */
             Mouse.prototype.onMouseUp = function (key, callback) {
                 this._setCallback(this._upCallbackSet, key, callback);
+                return this;
+            };
+            Mouse.prototype.offMouseUp = function (key, callback) {
+                this._unsetCallback(this._upCallbackSet, key, callback);
                 return this;
             };
             /**
@@ -9092,6 +9100,10 @@ var Plottable;
                 this._setCallback(this._wheelCallbackSet, key, callback);
                 return this;
             };
+            Mouse.prototype.offWheel = function (key, callback) {
+                this._unsetCallback(this._wheelCallbackSet, key, callback);
+                return this;
+            };
             /**
              * Registers a callback to be called whenever a dblClick occurs,
              * or removes the callback if `null` is passed as the callback.
@@ -9105,6 +9117,10 @@ var Plottable;
              */
             Mouse.prototype.onDblClick = function (key, callback) {
                 this._setCallback(this._dblClickCallbackSet, key, callback);
+                return this;
+            };
+            Mouse.prototype.offDblClick = function (key, callback) {
+                this._unsetCallback(this._dblClickCallbackSet, key, callback);
                 return this;
             };
             /**
@@ -9203,6 +9219,10 @@ var Plottable;
                 this._setCallback(this._startCallbackSet, key, callback);
                 return this;
             };
+            Touch.prototype.offTouchStart = function (key, callback) {
+                this._unsetCallback(this._startCallbackSet, key, callback);
+                return this;
+            };
             /**
              * Registers a callback to be called whenever the touch position changes,
              * or removes the callback if `null` is passed as the callback.
@@ -9218,6 +9238,10 @@ var Plottable;
                 this._setCallback(this._moveCallbackSet, key, callback);
                 return this;
             };
+            Touch.prototype.offTouchMove = function (key, callback) {
+                this._unsetCallback(this._moveCallbackSet, key, callback);
+                return this;
+            };
             /**
              * Registers a callback to be called whenever a touch ends,
              * or removes the callback if `null` is passed as the callback.
@@ -9231,6 +9255,10 @@ var Plottable;
              */
             Touch.prototype.onTouchEnd = function (key, callback) {
                 this._setCallback(this._endCallbackSet, key, callback);
+                return this;
+            };
+            Touch.prototype.offTouchEnd = function (key, callback) {
+                this._unsetCallback(this._endCallbackSet, key, callback);
                 return this;
             };
             /**
@@ -9324,6 +9352,10 @@ var Plottable;
              */
             Key.prototype.onKeyDown = function (key, callback) {
                 this._setCallback(this._keydownCallbackSet, key, callback);
+                return this;
+            };
+            Key.prototype.offKeyDown = function (key, callback) {
+                this._unsetCallback(this._keydownCallbackSet, key, callback);
                 return this;
             };
             Key.prototype._processKeydown = function (e) {

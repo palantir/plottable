@@ -53,7 +53,7 @@ module Plottable {
       }
     }
 
-    protected _unsetCallback(callbackSet: Utils.CallbackSet<Function>, callback: Function) {
+    protected _unsetCallback(callbackSet: Utils.CallbackSet<Function>, key: any, callback: Function) {
       callbackSet.remove(callback);
       this._disconnect();
     }

@@ -91,6 +91,10 @@ export module Dispatchers {
       this._setCallback(this._startCallbackSet, key, callback);
       return this;
     }
+    public offTouchStart(key: any, callback: TouchCallback): Dispatchers.Touch {
+      this._unsetCallback(this._startCallbackSet, key, callback);
+      return this;
+    }
 
     /**
      * Registers a callback to be called whenever the touch position changes,
@@ -107,6 +111,10 @@ export module Dispatchers {
       this._setCallback(this._moveCallbackSet, key, callback);
       return this;
     }
+    public offTouchMove(key: any, callback: TouchCallback): Dispatchers.Touch {
+      this._unsetCallback(this._moveCallbackSet, key, callback);
+      return this;
+    }
 
     /**
      * Registers a callback to be called whenever a touch ends,
@@ -121,6 +129,10 @@ export module Dispatchers {
      */
     public onTouchEnd(key: any, callback: TouchCallback): Dispatchers.Touch {
       this._setCallback(this._endCallbackSet, key, callback);
+      return this;
+    }
+    public offTouchEnd(key: any, callback: TouchCallback): Dispatchers.Touch {
+      this._unsetCallback(this._endCallbackSet, key, callback);
       return this;
     }
 

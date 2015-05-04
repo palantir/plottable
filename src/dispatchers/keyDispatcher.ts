@@ -59,6 +59,10 @@ export module Dispatchers {
       this._setCallback(this._keydownCallbackSet, key, callback);
       return this;
     }
+    public offKeyDown(key: any, callback: KeyCallback): Key {
+      this._unsetCallback(this._keydownCallbackSet, key, callback);
+      return this;
+    }
 
     private _processKeydown(e: KeyboardEvent) {
       this._keydownCallbackSet.callCallbacks(e.keyCode, e);
