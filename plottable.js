@@ -9312,11 +9312,11 @@ var Plottable;
              * @param {KeyCallback} callback
              * @return {Dispatcher.Key} The calling Dispatcher.Key.
              */
-            Key.prototype.onKeyDown = function (key, callback) {
+            Key.prototype.onKeyDown = function (callback) {
                 this._setCallback(this._keydownCallbackSet, callback);
                 return this;
             };
-            Key.prototype.offKeyDown = function (key, callback) {
+            Key.prototype.offKeyDown = function (callback) {
                 this._unsetCallback(this._keydownCallbackSet, callback);
                 return this;
             };
@@ -9537,7 +9537,7 @@ var Plottable;
                 this._positionDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(this._componentToListenTo._element.node());
                 this._positionDispatcher.onMouseMove("Interaction.Key" + this.getID(), function (p) { return null; }); // HACKHACK: registering a listener
                 this._keyDispatcher = Plottable.Dispatchers.Key.getDispatcher();
-                this._keyDispatcher.onKeyDown("Interaction.Key" + this.getID(), function (keyCode) { return _this._handleKeyEvent(keyCode); });
+                this._keyDispatcher.onKeyDown(function (keyCode) { return _this._handleKeyEvent(keyCode); });
             };
             Key.prototype._handleKeyEvent = function (keyCode) {
                 var p = this._translateToComponentSpace(this._positionDispatcher.getLastMousePosition());

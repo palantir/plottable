@@ -3719,8 +3719,8 @@ declare module Plottable {
              * @param {KeyCallback} callback
              * @return {Dispatcher.Key} The calling Dispatcher.Key.
              */
-            onKeyDown(key: any, callback: KeyCallback): Key;
-            offKeyDown(key: any, callback: KeyCallback): Key;
+            onKeyDown(callback: KeyCallback): Key;
+            offKeyDown(callback: KeyCallback): Key;
         }
     }
 }

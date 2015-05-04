@@ -16,13 +16,12 @@ describe("Dispatchers", () => {
         assert.isNotNull(e, "key event was passed to the callback");
       };
 
-      var keyString = "unit test";
-      ked.onKeyDown(keyString, callback);
+      ked.onKeyDown(callback);
 
       $("body").simulate("keydown", { keyCode: keyCodeToSend });
       assert.isTrue(keyDowned, "callback when a key was pressed");
 
-      ked.offKeyDown(keyString, callback); // clean up
+      ked.offKeyDown(callback); // clean up
     });
   });
 });

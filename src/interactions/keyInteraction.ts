@@ -20,7 +20,7 @@ export module Interactions {
       this._positionDispatcher.onMouseMove("Interaction.Key" + this.getID(), (p: Point) => null); // HACKHACK: registering a listener
 
       this._keyDispatcher = Dispatchers.Key.getDispatcher();
-      this._keyDispatcher.onKeyDown("Interaction.Key" + this.getID(), (keyCode: number) => this._handleKeyEvent(keyCode));
+      this._keyDispatcher.onKeyDown((keyCode: number) => this._handleKeyEvent(keyCode));
     }
 
     private _handleKeyEvent(keyCode: number) {
