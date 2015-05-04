@@ -8945,12 +8945,12 @@ var Plottable;
         Dispatcher.prototype._setCallback = function (callbackSet, key, callback) {
             if (callback === null) {
                 // broadcaster.deregisterListener(key);
-                callbackSet.remove(this._getWrappedCallback(callback));
+                callbackSet.remove(callback);
                 this._disconnect();
             }
             else {
                 this._connect();
-                callbackSet.add(this._getWrappedCallback(callback));
+                callbackSet.add(callback);
             }
         };
         return Dispatcher;
@@ -9105,8 +9105,7 @@ var Plottable;
                 if (newMousePosition != null) {
                     this._lastMousePosition = newMousePosition;
                     // b.broadcast(this.getLastMousePosition(), e);
-                    var args = [this, this.getLastMousePosition(), e];
-                    callbackSet.callCallbacks(this, this.getLastMousePosition(), e);
+                    callbackSet.callCallbacks(this.getLastMousePosition(), e);
                 }
             };
             /**
@@ -9242,7 +9241,7 @@ var Plottable;
                 ;
                 if (touchIdentifiers.length > 0) {
                     // b.broadcast(touchIdentifiers, touchPositions, e);
-                    callbackSet.callCallbacks(this, touchIdentifiers, touchPositions, e);
+                    callbackSet.callCallbacks(touchIdentifiers, touchPositions, e);
                 }
             };
             /**
@@ -9315,7 +9314,7 @@ var Plottable;
                 return this;
             };
             Key.prototype._processKeydown = function (e) {
-                this._keydownCallbackSet.callCallbacks(this, e);
+                this._keydownCallbackSet.callCallbacks(e.keyCode, e);
                 // this._keydownBroadcaster.broadcast(e);
             };
             Key._DISPATCHER_KEY = "__Plottable_Dispatcher_Key";

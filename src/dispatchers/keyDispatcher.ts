@@ -60,7 +60,7 @@ export module Dispatchers {
     }
 
     private _processKeydown(e: KeyboardEvent) {
-      this._keydownCallbackSet.callCallbacks(this, e);
+      this._keydownCallbackSet.callCallbacks(e.keyCode, e);
       // this._keydownBroadcaster.broadcast(e);
     }
   }

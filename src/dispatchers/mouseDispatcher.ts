@@ -174,8 +174,7 @@ export module Dispatchers {
         this._lastMousePosition = newMousePosition;
         // b.broadcast(this.getLastMousePosition(), e);
 
-        var args = [this, this.getLastMousePosition(), e];
-        callbackSet.callCallbacks(this, this.getLastMousePosition(), e);
+        callbackSet.callCallbacks(this.getLastMousePosition(), e);
       }
     }
 

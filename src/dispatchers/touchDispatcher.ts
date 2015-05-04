@@ -142,7 +142,7 @@ export module Dispatchers {
       };
       if (touchIdentifiers.length > 0) {
         // b.broadcast(touchIdentifiers, touchPositions, e);
-        callbackSet.callCallbacks(this, touchIdentifiers, touchPositions, e);
+        callbackSet.callCallbacks(touchIdentifiers, touchPositions, e);
       }
     }
   }
