@@ -48,7 +48,7 @@ describe("Dispatchers", () => {
       triggerFakeTouchEvent("touchstart", target, expectedPoints, ids);
       assert.isTrue(callbackWasCalled, "callback was called on touchstart");
 
-      td.onTouchStart(keyString, null);
+      td.offTouchStart(keyString, callback);
       target.remove();
     });
 

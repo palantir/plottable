@@ -69,7 +69,7 @@ export module Dispatchers {
         this._endCallbackSet);
 
       this._broadcasters = [this._moveBroadcaster, this._startBroadcaster, this._endBroadcaster];
-      this._callbackSets = [this._movecallbackSet, this._startcallbackSet, this._endcallbackSet];
+      this._callbackSets = [this._moveCallbackSet, this._startCallbackSet, this._endCallbackSet];
     }
 
     protected _getWrappedCallback(callback: Function): Core.BroadcasterCallback<Dispatchers.Touch> {

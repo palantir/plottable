@@ -3523,12 +3523,13 @@ declare module Plottable {
             [eventName: string]: (e: Event) => any;
         };
         protected _broadcasters: Core.Broadcaster<Dispatcher>[];
+        protected _callbackSets: Utils.CallbackSet<Function>[];
         /**
          * Creates a wrapped version of the callback that can be registered to a Broadcaster
          */
         protected _getWrappedCallback(callback: Function): Core.BroadcasterCallback<Dispatcher>;
         protected _setCallback(callbackSet: Utils.CallbackSet<Function>, key: any, callback: Function): void;
-        protected _unsetCallback(callbackSet: Utils.CallbackSet<Function>, callback: Function): void;
+        protected _unsetCallback(callbackSet: Utils.CallbackSet<Function>, key: any, callback: Function): void;
     }
 }
 
@@ -3578,6 +3579,7 @@ declare module Plottable {
              * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
              */
             onMouseDown(key: any, callback: MouseCallback): Dispatchers.Mouse;
+            offMouseDown(key: any, callback: MouseCallback): Dispatchers.Mouse;
             /**
              * Registers a callback to be called whenever a mouseup occurs,
              * or removes the callback if `null` is passed as the callback.
@@ -3590,6 +3592,7 @@ declare module Plottable {
              * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
              */
             onMouseUp(key: any, callback: MouseCallback): Dispatchers.Mouse;
+            offMouseUp(key: any, callback: MouseCallback): Dispatchers.Mouse;
             /**
              * Registers a callback to be called whenever a wheel occurs,
              * or removes the callback if `null` is passed as the callback.
@@ -3602,6 +3605,7 @@ declare module Plottable {
              * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
              */
             onWheel(key: any, callback: MouseCallback): Dispatchers.Mouse;
+            offWheel(key: any, callback: MouseCallback): Dispatchers.Mouse;
             /**
              * Registers a callback to be called whenever a dblClick occurs,
              * or removes the callback if `null` is passed as the callback.
@@ -3614,6 +3618,7 @@ declare module Plottable {
              * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
              */
             onDblClick(key: any, callback: MouseCallback): Dispatchers.Mouse;
+            offDblClick(key: any, callback: MouseCallback): Dispatchers.Mouse;
             /**
              * Returns the last computed mouse position.
              *
@@ -3662,6 +3667,7 @@ declare module Plottable {
              * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
              */
             onTouchStart(key: any, callback: TouchCallback): Dispatchers.Touch;
+            offTouchStart(key: any, callback: TouchCallback): Dispatchers.Touch;
             /**
              * Registers a callback to be called whenever the touch position changes,
              * or removes the callback if `null` is passed as the callback.
@@ -3674,6 +3680,7 @@ declare module Plottable {
              * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
              */
             onTouchMove(key: any, callback: TouchCallback): Dispatchers.Touch;
+            offTouchMove(key: any, callback: TouchCallback): Dispatchers.Touch;
             /**
              * Registers a callback to be called whenever a touch ends,
              * or removes the callback if `null` is passed as the callback.
@@ -3686,6 +3693,7 @@ declare module Plottable {
              * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
              */
             onTouchEnd(key: any, callback: TouchCallback): Dispatchers.Touch;
+            offTouchEnd(key: any, callback: TouchCallback): Dispatchers.Touch;
         }
     }
 }
@@ -3720,6 +3728,7 @@ declare module Plottable {
              * @return {Dispatcher.Key} The calling Dispatcher.Key.
              */
             onKeyDown(key: any, callback: KeyCallback): Key;
+            offKeyDown(key: any, callback: KeyCallback): Key;
         }
     }
 }

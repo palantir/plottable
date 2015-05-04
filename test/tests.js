@@ -9368,7 +9368,7 @@ describe("Dispatchers", function () {
             td.onTouchStart(keyString, callback);
             triggerFakeTouchEvent("touchstart", target, expectedPoints, ids);
             assert.isTrue(callbackWasCalled, "callback was called on touchstart");
-            td.onTouchStart(keyString, null);
+            td.offTouchStart(keyString, callback);
             target.remove();
         });
         it("onTouchMove()", function () {

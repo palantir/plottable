@@ -9183,7 +9183,7 @@ var Plottable;
                 this._event2Callback["touchmove"] = function (e) { return _this._measureAndBroadcast(e, _this._moveBroadcaster, _this._moveCallbackSet); };
                 this._event2Callback["touchend"] = function (e) { return _this._measureAndBroadcast(e, _this._endBroadcaster, _this._endCallbackSet); };
                 this._broadcasters = [this._moveBroadcaster, this._startBroadcaster, this._endBroadcaster];
-                this._callbackSets = [this._movecallbackSet, this._startcallbackSet, this._endcallbackSet];
+                this._callbackSets = [this._moveCallbackSet, this._startCallbackSet, this._endCallbackSet];
             }
             /**
              * Get a Dispatcher.Touch for the <svg> containing elem. If one already exists
