@@ -7521,7 +7521,7 @@ var Plottable;
                 _super.call(this, xScale, yScale);
                 this._barAlignmentFactor = 0.5;
                 this._barLabelFormatter = Plottable.Formatters.identity();
-                this._barLabelsEnabled = false;
+                this._labelsEnabled = false;
                 this._hideBarsIfAnyAreTooWide = true;
                 this.classed("bar-plot", true);
                 this._defaultFillColor = new Plottable.Scales.Color().range()[0];
@@ -7566,12 +7566,12 @@ var Plottable;
                 this._render();
                 return this;
             };
-            Bar.prototype.barLabelsEnabled = function (enabled) {
+            Bar.prototype.labelsEnabled = function (enabled) {
                 if (enabled === undefined) {
-                    return this._barLabelsEnabled;
+                    return this._labelsEnabled;
                 }
                 else {
-                    this._barLabelsEnabled = enabled;
+                    this._labelsEnabled = enabled;
                     this._render();
                     return this;
                 }
@@ -7741,7 +7741,7 @@ var Plottable;
                 this._getAnimator("baseline").animate(this._baseline, baselineAttr);
                 var drawers = this._getDrawersInOrder();
                 drawers.forEach(function (d) { return d.removeLabels(); });
-                if (this._barLabelsEnabled) {
+                if (this._labelsEnabled) {
                     Plottable.Utils.Methods.setTimeout(function () { return _this._drawLabels(); }, time);
                 }
             };
@@ -7805,7 +7805,7 @@ var Plottable;
                     return (originalPos > scaledBaseline) ? scaledBaseline : originalPos;
                 };
                 var primaryAccessor = this._projections[primaryAttr].accessor;
-                if (this.barLabelsEnabled && this.barLabelFormatter) {
+                if (this.labelsEnabled && this.barLabelFormatter) {
                     attrToProjector["label"] = function (d, i, u, m) {
                         return _this._barLabelFormatter(primaryAccessor(d, i, u, m));
                     };

@@ -666,7 +666,7 @@ describe("Plots", () => {
 
       it("bar labels render properly", () => {
         plot.renderTo(svg);
-        plot.barLabelsEnabled(true);
+        plot.labelsEnabled(true);
         var texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
         assert.lengthOf(texts, 2, "both texts drawn");
         assert.equal(texts[0], "640", "first label is 640");
@@ -675,7 +675,7 @@ describe("Plots", () => {
       });
 
       it("bar labels hide if bars too skinny", () => {
-        plot.barLabelsEnabled(true);
+        plot.labelsEnabled(true);
         plot.renderTo(svg);
         plot.barLabelFormatter((n: number) => n.toString() + (n === 12345 ? "looong" : ""));
         var texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
@@ -684,7 +684,7 @@ describe("Plots", () => {
       });
 
       it("formatters are used properly", () => {
-        plot.barLabelsEnabled(true);
+        plot.labelsEnabled(true);
         plot.barLabelFormatter((n: number) => n.toString() + "%");
         plot.renderTo(svg);
         var texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
@@ -695,7 +695,7 @@ describe("Plots", () => {
       });
 
       it("bar labels are removed instantly on dataset change", (done) => {
-        plot.barLabelsEnabled(true);
+        plot.labelsEnabled(true);
         plot.renderTo(svg);
         var texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
         assert.lengthOf(texts, 2, "both texts drawn");

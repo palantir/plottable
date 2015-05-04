@@ -12,7 +12,7 @@ export module Plots {
     private _barAlignmentFactor = 0.5;
     protected _isVertical: boolean;
     private _barLabelFormatter: Formatter = Formatters.identity();
-    private _barLabelsEnabled = false;
+    private _labelsEnabled = false;
     private _hideBarsIfAnyAreTooWide = true;
     private _defaultFillColor: string;
 
@@ -97,19 +97,19 @@ export module Plots {
      *
      * @returns {boolean} Whether bars should display labels or not.
      */
-    public barLabelsEnabled(): boolean;
+    public labelsEnabled(): boolean;
     /**
      * Set whether bar labels are enabled.
      * @param {boolean} Whether bars should display labels or not.
      *
      * @returns {Bar} The calling plot.
      */
-    public barLabelsEnabled(enabled: boolean): Bar<X, Y>;
-    public barLabelsEnabled(enabled?: boolean): any {
+    public labelsEnabled(enabled: boolean): Bar<X, Y>;
+    public labelsEnabled(enabled?: boolean): any {
       if (enabled === undefined) {
-        return this._barLabelsEnabled;
+        return this._labelsEnabled;
       } else {
-        this._barLabelsEnabled = enabled;
+        this._labelsEnabled = enabled;
         this._render();
         return this;
       }
@@ -321,7 +321,7 @@ export module Plots {
 
       var drawers: Drawers.Rect[] = <any> this._getDrawersInOrder();
       drawers.forEach((d: Drawers.Rect) => d.removeLabels());
-      if (this._barLabelsEnabled) {
+      if (this._labelsEnabled) {
         Utils.Methods.setTimeout(() => this._drawLabels(), time);
       }
     }
@@ -394,7 +394,7 @@ export module Plots {
       };
 
       var primaryAccessor = this._projections[primaryAttr].accessor;
-      if (this.barLabelsEnabled && this.barLabelFormatter) {
+      if (this.labelsEnabled && this.barLabelFormatter) {
         attrToProjector["label"] = (d: any, i: number, u: any, m: PlotMetadata) => {
           return this._barLabelFormatter(primaryAccessor(d, i, u, m));
         };
