@@ -42,13 +42,12 @@ describe("Dispatchers", () => {
         assert.isNotNull(e, "TouchEvent was passed to the Dispatcher");
       };
 
-      var keyString = "unit test";
-      td.onTouchStart(keyString, callback);
+      td.onTouchStart(callback);
 
       TestMethods.triggerFakeTouchEvent("touchstart", target, expectedPoints, ids);
       assert.isTrue(callbackWasCalled, "callback was called on touchstart");
 
-      td.onTouchStart(keyString, null);
+      td.offTouchStart(callback);
       target.remove();
     });
 
@@ -79,13 +78,12 @@ describe("Dispatchers", () => {
         assert.isNotNull(e, "TouchEvent was passed to the Dispatcher");
       };
 
-      var keyString = "unit test";
-      td.onTouchMove(keyString, callback);
+      td.onTouchMove(callback);
 
       TestMethods.triggerFakeTouchEvent("touchmove", target, expectedPoints, ids);
       assert.isTrue(callbackWasCalled, "callback was called on touchmove");
 
-      td.onTouchMove(keyString, null);
+      td.offTouchMove(callback);
       target.remove();
     });
 
@@ -116,13 +114,12 @@ describe("Dispatchers", () => {
         assert.isNotNull(e, "TouchEvent was passed to the Dispatcher");
       };
 
-      var keyString = "unit test";
-      td.onTouchEnd(keyString, callback);
+      td.onTouchEnd(callback);
 
       TestMethods.triggerFakeTouchEvent("touchend", target, expectedPoints, ids);
       assert.isTrue(callbackWasCalled, "callback was called on touchend");
 
-      td.onTouchEnd(keyString, null);
+      td.offTouchEnd(callback);
       target.remove();
     });
 
@@ -153,13 +150,12 @@ describe("Dispatchers", () => {
         assert.isNotNull(e, "TouchEvent was passed to the Dispatcher");
       };
 
-      var keyString = "unit test";
-      td.onTouchCancel(keyString, callback);
+      td.onTouchCancel(callback);
 
       TestMethods.triggerFakeTouchEvent("touchcancel", target, expectedPoints, ids);
       assert.isTrue(callbackWasCalled, "callback was called on touchend");
 
-      td.onTouchCancel(keyString, null);
+      td.offTouchCancel(callback);
       target.remove();
     });
 
@@ -187,8 +183,7 @@ describe("Dispatchers", () => {
         assert.isNotNull(e, "TouchEvent was passed to the Dispatcher");
       };
 
-      var keyString = "notInDomTest";
-      td.onTouchMove(keyString, callback);
+      td.onTouchMove(callback);
       TestMethods.triggerFakeTouchEvent("touchmove", target, expectedPoints, ids);
       assert.isTrue(callbackWasCalled, "callback was called on touchmove");
 
@@ -197,7 +192,7 @@ describe("Dispatchers", () => {
       TestMethods.triggerFakeTouchEvent("touchmove", target, expectedPoints, ids);
       assert.isFalse(callbackWasCalled, "callback was not called after <svg> was removed from DOM");
 
-      td.onTouchMove(keyString, null);
+      td.offTouchMove(callback);
     });
   });
 });

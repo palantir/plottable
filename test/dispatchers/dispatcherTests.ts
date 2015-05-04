@@ -32,10 +32,10 @@ describe("Dispatchers", () => {
       var callbackWasCalled = false;
       (<any> dispatcher)._event2Callback["click"] = () => callbackWasCalled = true;
 
-      var b = new Plottable.Core.Broadcaster<Plottable.Dispatcher>(dispatcher);
-      var key = "unit test";
-      b.registerListener(key, () => null);
-      (<any> dispatcher)._broadcasters = [b];
+      var callback = () => null;
+      var callbackSet = new Plottable.Utils.CallbackSet<Function>();
+      callbackSet.add(callback);
+      (<any> dispatcher)._callbacks = [callbackSet];
 
       var d3document = d3.select(document);
       (<any> dispatcher)._connect();
@@ -48,29 +48,28 @@ describe("Dispatchers", () => {
       TestMethods.triggerFakeUIEvent("click", d3document);
       assert.isTrue(callbackWasCalled, "didn't disconnect while broadcaster had listener");
 
-      b.deregisterListener(key);
+      callbackSet.delete(callback);
       (<any> dispatcher)._disconnect();
       callbackWasCalled = false;
       TestMethods.triggerFakeUIEvent("click", d3document);
       assert.isFalse(callbackWasCalled, "disconnected when broadcaster had no listeners");
     });
 
-    it("_setCallback()", () => {
+    it("setCallback()", () => {
       var dispatcher = new Plottable.Dispatcher();
-      var b = new Plottable.Core.Broadcaster<Plottable.Dispatcher>(dispatcher);
+      var callbackSet = new Plottable.Utils.CallbackSet<Function>();
 
-      var key = "unit test";
       var callbackWasCalled = false;
       var callback = () => callbackWasCalled = true;
 
-      (<any> dispatcher)._setCallback(b, key, callback);
-      b.broadcast();
-      assert.isTrue(callbackWasCalled, "callback was called after setting with _setCallback()");
+      (<any> dispatcher).setCallback(callbackSet, callback);
+      callbackSet.callCallbacks();
+      assert.isTrue(callbackWasCalled, "callback was called after setting with setCallback()");
 
-      (<any> dispatcher)._setCallback(b, key, null);
+      (<any> dispatcher).unsetCallback(callbackSet, callback);
       callbackWasCalled = false;
-      b.broadcast();
-      assert.isFalse(callbackWasCalled, "callback was removed by calling _setCallback() with null");
+      callbackSet.callCallbacks();
+      assert.isFalse(callbackWasCalled, "callback was removed by calling setCallback() with null");
     });
   });
 });

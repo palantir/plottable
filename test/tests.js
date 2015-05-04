@@ -9143,10 +9143,10 @@ describe("Dispatchers", function () {
             var dispatcher = new Plottable.Dispatcher();
             var callbackWasCalled = false;
             dispatcher._event2Callback["click"] = function () { return callbackWasCalled = true; };
-            var b = new Plottable.Core.Broadcaster(dispatcher);
-            var key = "unit test";
-            b.registerListener(key, function () { return null; });
-            dispatcher._broadcasters = [b];
+            var callback = function () { return null; };
+            var callbackSet = new Plottable.Utils.CallbackSet();
+            callbackSet.add(callback);
+            dispatcher._callbacks = [callbackSet];
             var d3document = d3.select(document);
             dispatcher._connect();
             TestMethods.triggerFakeUIEvent("click", d3document);
@@ -9155,25 +9155,24 @@ describe("Dispatchers", function () {
             callbackWasCalled = false;
             TestMethods.triggerFakeUIEvent("click", d3document);
             assert.isTrue(callbackWasCalled, "didn't disconnect while broadcaster had listener");
-            b.deregisterListener(key);
+            callbackSet.delete(callback);
             dispatcher._disconnect();
             callbackWasCalled = false;
             TestMethods.triggerFakeUIEvent("click", d3document);
             assert.isFalse(callbackWasCalled, "disconnected when broadcaster had no listeners");
         });
-        it("_setCallback()", function () {
+        it("setCallback()", function () {
             var dispatcher = new Plottable.Dispatcher();
-            var b = new Plottable.Core.Broadcaster(dispatcher);
-            var key = "unit test";
+            var callbackSet = new Plottable.Utils.CallbackSet();
             var callbackWasCalled = false;
             var callback = function () { return callbackWasCalled = true; };
-            dispatcher._setCallback(b, key, callback);
-            b.broadcast();
-            assert.isTrue(callbackWasCalled, "callback was called after setting with _setCallback()");
-            dispatcher._setCallback(b, key, null);
+            dispatcher.setCallback(callbackSet, callback);
+            callbackSet.callCallbacks();
+            assert.isTrue(callbackWasCalled, "callback was called after setting with setCallback()");
+            dispatcher.unsetCallback(callbackSet, callback);
             callbackWasCalled = false;
-            b.broadcast();
-            assert.isFalse(callbackWasCalled, "callback was removed by calling _setCallback() with null");
+            callbackSet.callCallbacks();
+            assert.isFalse(callbackWasCalled, "callback was removed by calling setCallback() with null");
         });
     });
 });
@@ -9211,14 +9210,14 @@ describe("Dispatchers", function () {
             var cb1 = function (p, e) { return cb1Called = true; };
             var cb2Called = false;
             var cb2 = function (p, e) { return cb2Called = true; };
-            md.onMouseMove("callback1", cb1);
-            md.onMouseMove("callback2", cb2);
+            md.onMouseMove(cb1);
+            md.onMouseMove(cb2);
             TestMethods.triggerFakeMouseEvent("mousemove", target, targetX, targetY);
             assert.isTrue(cb1Called, "callback 1 was called on mousemove");
             assert.isTrue(cb2Called, "callback 2 was called on mousemove");
             cb1Called = false;
             cb2Called = false;
-            md.onMouseMove("callback1", null);
+            md.offMouseMove(cb1);
             TestMethods.triggerFakeMouseEvent("mousemove", target, targetX, targetY);
             assert.isFalse(cb1Called, "callback was not called after blanking");
             assert.isTrue(cb2Called, "callback 2 was still called");
@@ -9234,15 +9233,14 @@ describe("Dispatchers", function () {
             var md = Plottable.Dispatchers.Mouse.getDispatcher(target.node());
             var callbackWasCalled = false;
             var callback = function (p, e) { return callbackWasCalled = true; };
-            var keyString = "notInDomTest";
-            md.onMouseMove(keyString, callback);
+            md.onMouseMove(callback);
             TestMethods.triggerFakeMouseEvent("mousemove", target, targetX, targetY);
             assert.isTrue(callbackWasCalled, "callback was called on mousemove");
             target.remove();
             callbackWasCalled = false;
             TestMethods.triggerFakeMouseEvent("mousemove", target, targetX, targetY);
             assert.isFalse(callbackWasCalled, "callback was not called after <svg> was removed from DOM");
-            md.onMouseMove(keyString, null);
+            md.offMouseMove(callback);
         });
         it("calls callbacks on mouseover, mousemove, and mouseout", function () {
             var targetWidth = 400, targetHeight = 400;
@@ -9262,8 +9260,7 @@ describe("Dispatchers", function () {
                 TestMethods.assertPointsClose(p, expectedPoint, 0.5, "mouse position is correct");
                 assert.isNotNull(e, "mouse event was passed to the callback");
             };
-            var keyString = "unit test";
-            md.onMouseMove(keyString, callback);
+            md.onMouseMove(callback);
             TestMethods.triggerFakeMouseEvent("mouseover", target, targetX, targetY);
             assert.isTrue(callbackWasCalled, "callback was called on mouseover");
             callbackWasCalled = false;
@@ -9272,7 +9269,7 @@ describe("Dispatchers", function () {
             callbackWasCalled = false;
             TestMethods.triggerFakeMouseEvent("mouseout", target, targetX, targetY);
             assert.isTrue(callbackWasCalled, "callback was called on mouseout");
-            md.onMouseMove(keyString, null);
+            md.offMouseMove(callback);
             target.remove();
         });
         it("onMouseDown()", function () {
@@ -9293,11 +9290,10 @@ describe("Dispatchers", function () {
                 TestMethods.assertPointsClose(p, expectedPoint, 0.5, "mouse position is correct");
                 assert.isNotNull(e, "mouse event was passed to the callback");
             };
-            var keyString = "unit test";
-            md.onMouseDown(keyString, callback);
+            md.onMouseDown(callback);
             TestMethods.triggerFakeMouseEvent("mousedown", target, targetX, targetY);
             assert.isTrue(callbackWasCalled, "callback was called on mousedown");
-            md.onMouseDown(keyString, null);
+            md.offMouseDown(callback);
             target.remove();
         });
         it("onMouseUp()", function () {
@@ -9318,11 +9314,10 @@ describe("Dispatchers", function () {
                 TestMethods.assertPointsClose(p, expectedPoint, 0.5, "mouse position is correct");
                 assert.isNotNull(e, "mouse event was passed to the callback");
             };
-            var keyString = "unit test";
-            md.onMouseUp(keyString, callback);
+            md.onMouseUp(callback);
             TestMethods.triggerFakeMouseEvent("mouseup", target, targetX, targetY);
             assert.isTrue(callbackWasCalled, "callback was called on mouseup");
-            md.onMouseUp(keyString, null);
+            md.offMouseUp(callback);
             target.remove();
         });
         it("onWheel()", function () {
@@ -9350,11 +9345,10 @@ describe("Dispatchers", function () {
                 TestMethods.assertPointsClose(p, expectedPoint, 0.5, "mouse position is correct");
                 assert.isNotNull(e, "mouse event was passed to the callback");
             };
-            var keyString = "unit test";
-            md.onWheel(keyString, callback);
+            md.onWheel(callback);
             TestMethods.triggerFakeWheelEvent("wheel", svg, targetX, targetY, targetDeltaY);
             assert.isTrue(callbackWasCalled, "callback was called on wheel");
-            md.onWheel(keyString, null);
+            md.offWheel(callback);
             svg.remove();
         });
         it("onDblClick()", function () {
@@ -9370,11 +9364,10 @@ describe("Dispatchers", function () {
                 callbackWasCalled = true;
                 assert.isNotNull(e, "mouse event was passed to the callback");
             };
-            var keyString = "unit test";
-            md.onDblClick(keyString, callback);
+            md.onDblClick(callback);
             TestMethods.triggerFakeMouseEvent("dblclick", target, targetX, targetY);
             assert.isTrue(callbackWasCalled, "callback was called on dblClick");
-            md.onDblClick(keyString, null);
+            md.offDblClick(callback);
             target.remove();
         });
     });
@@ -9415,11 +9408,10 @@ describe("Dispatchers", function () {
                 });
                 assert.isNotNull(e, "TouchEvent was passed to the Dispatcher");
             };
-            var keyString = "unit test";
-            td.onTouchStart(keyString, callback);
+            td.onTouchStart(callback);
             TestMethods.triggerFakeTouchEvent("touchstart", target, expectedPoints, ids);
             assert.isTrue(callbackWasCalled, "callback was called on touchstart");
-            td.onTouchStart(keyString, null);
+            td.offTouchStart(callback);
             target.remove();
         });
         it("onTouchMove()", function () {
@@ -9445,11 +9437,10 @@ describe("Dispatchers", function () {
                 });
                 assert.isNotNull(e, "TouchEvent was passed to the Dispatcher");
             };
-            var keyString = "unit test";
-            td.onTouchMove(keyString, callback);
+            td.onTouchMove(callback);
             TestMethods.triggerFakeTouchEvent("touchmove", target, expectedPoints, ids);
             assert.isTrue(callbackWasCalled, "callback was called on touchmove");
-            td.onTouchMove(keyString, null);
+            td.offTouchMove(callback);
             target.remove();
         });
         it("onTouchEnd()", function () {
@@ -9475,11 +9466,10 @@ describe("Dispatchers", function () {
                 });
                 assert.isNotNull(e, "TouchEvent was passed to the Dispatcher");
             };
-            var keyString = "unit test";
-            td.onTouchEnd(keyString, callback);
+            td.onTouchEnd(callback);
             TestMethods.triggerFakeTouchEvent("touchend", target, expectedPoints, ids);
             assert.isTrue(callbackWasCalled, "callback was called on touchend");
-            td.onTouchEnd(keyString, null);
+            td.offTouchEnd(callback);
             target.remove();
         });
         it("onTouchCancel()", function () {
@@ -9505,11 +9495,10 @@ describe("Dispatchers", function () {
                 });
                 assert.isNotNull(e, "TouchEvent was passed to the Dispatcher");
             };
-            var keyString = "unit test";
-            td.onTouchCancel(keyString, callback);
+            td.onTouchCancel(callback);
             TestMethods.triggerFakeTouchEvent("touchcancel", target, expectedPoints, ids);
             assert.isTrue(callbackWasCalled, "callback was called on touchend");
-            td.onTouchCancel(keyString, null);
+            td.offTouchCancel(callback);
             target.remove();
         });
         it("doesn't call callbacks if not in the DOM", function () {
@@ -9532,15 +9521,14 @@ describe("Dispatchers", function () {
                 callbackWasCalled = true;
                 assert.isNotNull(e, "TouchEvent was passed to the Dispatcher");
             };
-            var keyString = "notInDomTest";
-            td.onTouchMove(keyString, callback);
+            td.onTouchMove(callback);
             TestMethods.triggerFakeTouchEvent("touchmove", target, expectedPoints, ids);
             assert.isTrue(callbackWasCalled, "callback was called on touchmove");
             target.remove();
             callbackWasCalled = false;
             TestMethods.triggerFakeTouchEvent("touchmove", target, expectedPoints, ids);
             assert.isFalse(callbackWasCalled, "callback was not called after <svg> was removed from DOM");
-            td.onTouchMove(keyString, null);
+            td.offTouchMove(callback);
         });
     });
 });
@@ -9558,11 +9546,10 @@ describe("Dispatchers", function () {
                 assert.strictEqual(code, keyCodeToSend, "correct keycode was passed");
                 assert.isNotNull(e, "key event was passed to the callback");
             };
-            var keyString = "unit test";
-            ked.onKeyDown(keyString, callback);
+            ked.onKeyDown(callback);
             $("body").simulate("keydown", { keyCode: keyCodeToSend });
             assert.isTrue(keyDowned, "callback when a key was pressed");
-            ked.onKeyDown(keyString, null); // clean up
+            ked.offKeyDown(callback); // clean up
         });
     });
 });
