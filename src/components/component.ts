@@ -594,6 +594,6 @@ module Plottable {
     static BOTTOM = "bottom";
     static LEFT = "left";
     static RIGHT = "right";
-    static CENTER = "center"; 
+    static CENTER = "center";
   }
 }
