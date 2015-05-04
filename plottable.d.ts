@@ -1618,14 +1618,6 @@ declare module Plottable {
         _doRender(): void;
         _useLastCalculatedLayout(): boolean;
         _useLastCalculatedLayout(useLast: boolean): Component;
-        _invalidateLayout(): void;
-        /**
-         * Renders the Component into a given DOM element. The element must be as <svg>.
-         *
-         * @param {String|D3.Selection} element A D3 selection or a selector for getting the element to render into.
-         * @returns {Component} The calling component.
-         */
-        renderTo(element: String | D3.Selection): Component;
         /**
          * Causes the Component to recompute layout and redraw.
          *
@@ -1635,6 +1627,13 @@ declare module Plottable {
          * @returns {Component} The calling component.
          */
         redraw(): Component;
+        /**
+         * Renders the Component into a given DOM element. The element must be as <svg>.
+         *
+         * @param {String|D3.Selection} element A D3 selection or a selector for getting the element to render into.
+         * @returns {Component} The calling component.
+         */
+        renderTo(element: String | D3.Selection): Component;
         /**
          * Sets the x alignment of the Component. This will be used if the
          * Component is given more space than it needs.
@@ -1932,7 +1931,7 @@ declare module Plottable {
             x2: any;
             y2: any;
         };
-        _invalidateLayout(): void;
+        redraw(): Component;
         protected _setDefaultAlignment(): void;
         /**
          * Gets the current formatter on the axis. Data is passed through the
@@ -2191,7 +2190,7 @@ declare module Plottable {
              */
             constructor(scale: Scales.Category, orientation?: string, formatter?: (d: any) => string);
             protected _setup(): void;
-            protected _rescale(): void;
+            protected _rescale(): Component;
             _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
             protected _getTickValues(): string[];
             /**

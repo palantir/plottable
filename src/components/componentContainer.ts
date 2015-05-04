@@ -22,7 +22,7 @@ module Plottable {
       var removeIndex = this._components.indexOf(c);
       if (removeIndex >= 0) {
         this.components().splice(removeIndex, 1);
-        this._invalidateLayout();
+        this.redraw();
       }
     }
 
@@ -40,7 +40,7 @@ module Plottable {
       if (this._isAnchored) {
         c.anchor(this._content);
       }
-      this._invalidateLayout();
+      this.redraw();
       return true;
     }
 

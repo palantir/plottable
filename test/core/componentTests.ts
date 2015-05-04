@@ -300,7 +300,7 @@ describe("Component behavior", () => {
     svg.remove();
   });
 
-  it("_invalidateLayout works as expected", () => {
+  it("redraw() works as expected", () => {
     var cg = new Plottable.Components.Group();
     var c = makeFixedSizeComponent(10, 10);
     cg._addComponent(c);
@@ -308,7 +308,7 @@ describe("Component behavior", () => {
     assert.equal(cg.height(), 300, "height() is the entire available height");
     assert.equal(cg.width(), 400, "width() is the entire available width");
     fixComponentSize(c, 50, 50);
-    c._invalidateLayout();
+    c.redraw();
     assert.equal(cg.height(), 300, "height() after resizing is the entire available height");
     assert.equal(cg.width(), 400, "width() after resizing is the entire available width");
     svg.remove();

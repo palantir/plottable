@@ -289,7 +289,7 @@ export module Components {
     public padding(rowPadding: number, colPadding: number) {
       this._rowPadding = rowPadding;
       this._colPadding = colPadding;
-      this._invalidateLayout();
+      this.redraw();
       return this;
     }
 
@@ -320,7 +320,7 @@ export module Components {
      */
     public rowWeight(index: number, weight: number) {
       this._rowWeights[index] = weight;
-      this._invalidateLayout();
+      this.redraw();
       return this;
     }
 
@@ -336,7 +336,7 @@ export module Components {
      */
     public colWeight(index: number, weight: number) {
       this._colWeights[index] = weight;
-      this._invalidateLayout();
+      this.redraw();
       return this;
     }
 

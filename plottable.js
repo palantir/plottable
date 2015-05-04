@@ -3479,16 +3479,25 @@ var Plottable;
                 return this;
             }
         };
-        Component.prototype._invalidateLayout = function () {
+        /**
+         * Causes the Component to recompute layout and redraw.
+         *
+         * This function should be called when CSS changes could influence the size
+         * of the components, e.g. changing the font size.
+         *
+         * @returns {Component} The calling component.
+         */
+        Component.prototype.redraw = function () {
             this._useLastCalculatedLayout(false);
             if (this._isAnchored && this._isSetup) {
                 if (this._isTopLevelComponent) {
                     this._scheduleComputeLayout();
                 }
                 else {
-                    this._parent()._invalidateLayout();
+                    this._parent().redraw();
                 }
             }
+            return this;
         };
         /**
          * Renders the Component into a given DOM element. The element must be as <svg>.
@@ -3522,18 +3531,6 @@ var Plottable;
             return this;
         };
         /**
-         * Causes the Component to recompute layout and redraw.
-         *
-         * This function should be called when CSS changes could influence the size
-         * of the components, e.g. changing the font size.
-         *
-         * @returns {Component} The calling component.
-         */
-        Component.prototype.redraw = function () {
-            this._invalidateLayout();
-            return this;
-        };
-        /**
          * Sets the x alignment of the Component. This will be used if the
          * Component is given more space than it needs.
          *
@@ -3558,7 +3555,7 @@ var Plottable;
             else {
                 throw new Error("Unsupported alignment");
             }
-            this._invalidateLayout();
+            this.redraw();
             return this;
         };
         /**
@@ -3586,7 +3583,7 @@ var Plottable;
             else {
                 throw new Error("Unsupported alignment");
             }
-            this._invalidateLayout();
+            this.redraw();
             return this;
         };
         /**
@@ -3599,7 +3596,7 @@ var Plottable;
          */
         Component.prototype.xOffset = function (offset) {
             this._xOffset = offset;
-            this._invalidateLayout();
+            this.redraw();
             return this;
         };
         /**
@@ -3612,7 +3609,7 @@ var Plottable;
          */
         Component.prototype.yOffset = function (offset) {
             this._yOffset = offset;
-            this._invalidateLayout();
+            this.redraw();
             return this;
         };
         Component.prototype._addBox = function (className, parentElement) {
@@ -3897,7 +3894,7 @@ var Plottable;
             var removeIndex = this._components.indexOf(c);
             if (removeIndex >= 0) {
                 this.components().splice(removeIndex, 1);
-                this._invalidateLayout();
+                this.redraw();
             }
         };
         ComponentContainer.prototype._addComponent = function (c, prepend) {
@@ -3915,7 +3912,7 @@ var Plottable;
             if (this._isAnchored) {
                 c.anchor(this._content);
             }
-            this._invalidateLayout();
+            this.redraw();
             return true;
         };
         /**
@@ -4126,7 +4123,7 @@ var Plottable;
             return !this._isHorizontal();
         };
         Axis.prototype._rescale = function () {
-            // default implementation; subclasses may call _invalidateLayout() here
+            // default implementation; subclasses may call redraw() here
             this._render();
         };
         Axis.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
@@ -4226,10 +4223,10 @@ var Plottable;
             }
             return tickMarkAttrHash;
         };
-        Axis.prototype._invalidateLayout = function () {
+        Axis.prototype.redraw = function () {
             this._computedWidth = null;
             this._computedHeight = null;
-            _super.prototype._invalidateLayout.call(this);
+            return _super.prototype.redraw.call(this);
         };
         Axis.prototype._setDefaultAlignment = function () {
             switch (this._orientation) {
@@ -4252,7 +4249,7 @@ var Plottable;
                 return this._formatter;
             }
             this._formatter = formatter;
-            this._invalidateLayout();
+            this.redraw();
             return this;
         };
         Axis.prototype.tickLength = function (length) {
@@ -4264,7 +4261,7 @@ var Plottable;
                     throw new Error("tick length must be positive");
                 }
                 this._tickLength = length;
-                this._invalidateLayout();
+                this.redraw();
                 return this;
             }
         };
@@ -4277,7 +4274,7 @@ var Plottable;
                     throw new Error("end tick length must be positive");
                 }
                 this._endTickLength = length;
-                this._invalidateLayout();
+                this.redraw();
                 return this;
             }
         };
@@ -4298,7 +4295,7 @@ var Plottable;
                     throw new Error("tick label padding must be positive");
                 }
                 this._tickLabelPadding = padding;
-                this._invalidateLayout();
+                this.redraw();
                 return this;
             }
         };
@@ -4311,7 +4308,7 @@ var Plottable;
                     throw new Error("gutter size must be positive");
                 }
                 this._gutter = size;
-                this._invalidateLayout();
+                this.redraw();
                 return this;
             }
         };
@@ -4325,7 +4322,7 @@ var Plottable;
                     throw new Error("unsupported orientation");
                 }
                 this._orientation = newOrientationLC;
-                this._invalidateLayout();
+                this.redraw();
                 return this;
             }
         };
@@ -4392,7 +4389,7 @@ var Plottable;
                         throw new Error("Unsupported position for tier labels");
                     }
                     this._tierLabelPositions = newPositions;
-                    this._invalidateLayout();
+                    this.redraw();
                     return this;
                 }
             };
@@ -4411,7 +4408,7 @@ var Plottable;
                     newLabelPositions.push(oldLabelPositions[i] || "between");
                 }
                 this.tierLabelPositions(newLabelPositions);
-                this._invalidateLayout();
+                this.redraw();
                 return this;
             };
             /**
@@ -4868,7 +4865,7 @@ var Plottable;
                 if (!this._isHorizontal()) {
                     var reComputedWidth = this._computeWidth();
                     if (reComputedWidth > this.width() || reComputedWidth < (this.width() - this.gutter())) {
-                        this._invalidateLayout();
+                        this.redraw();
                         return;
                     }
                 }
@@ -5011,7 +5008,7 @@ var Plottable;
                         }
                     }
                     this._tickLabelPositioning = positionLC;
-                    this._invalidateLayout();
+                    this.redraw();
                     return this;
                 }
             };
@@ -5162,7 +5159,7 @@ var Plottable;
                 this._writer = new SVGTypewriter.Writers.Writer(this._measurer, this._wrapper);
             };
             Category.prototype._rescale = function () {
-                return this._invalidateLayout();
+                return this.redraw();
             };
             Category.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
                 var widthRequiredByTicks = this._isHorizontal() ? 0 : this._maxLabelTickLength() + this.tickLabelPadding() + this.gutter();
@@ -5197,7 +5194,7 @@ var Plottable;
                     throw new Error("Angle " + angle + " not supported; only 0, 90, and -90 are valid values");
                 }
                 this._tickLabelAngle = angle;
-                this._invalidateLayout();
+                this.redraw();
                 return this;
             };
             /**
@@ -5311,7 +5308,7 @@ var Plottable;
                 return this;
             };
             Category.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
-                // When anyone calls _invalidateLayout, computeLayout will be called
+                // When anyone calls redraw(), computeLayout() will be called
                 // on everyone, including this. Since CSS or something might have
                 // affected the size of the characters, clear the cache.
                 this._measurer.reset();
@@ -5409,7 +5406,7 @@ var Plottable;
                 }
                 else {
                     this._text = displayText;
-                    this._invalidateLayout();
+                    this.redraw();
                     return this;
                 }
             };
@@ -5425,7 +5422,7 @@ var Plottable;
                     else {
                         throw new Error(newOrientation + " is not a valid orientation for LabelComponent");
                     }
-                    this._invalidateLayout();
+                    this.redraw();
                     return this;
                 }
             };
@@ -5439,7 +5436,7 @@ var Plottable;
                         throw new Error(padAmount + " is not a valid padding value.  Cannot be less than 0.");
                     }
                     this._padding = padAmount;
-                    this._invalidateLayout();
+                    this.redraw();
                     return this;
                 }
             };
@@ -5528,7 +5525,7 @@ var Plottable;
                     throw new Error("Legend requires a colorScale");
                 }
                 this._scale = colorScale;
-                this._scale.broadcaster.registerListener(this, function () { return _this._invalidateLayout(); });
+                this._scale.broadcaster.registerListener(this, function () { return _this.redraw(); });
                 this.xAlign("right").yAlign("top");
                 this._fixedWidthFlag = true;
                 this._fixedHeightFlag = true;
@@ -5550,7 +5547,7 @@ var Plottable;
                 }
                 else {
                     this._maxEntriesPerRow = numEntries;
-                    this._invalidateLayout();
+                    this.redraw();
                     return this;
                 }
             };
@@ -5560,7 +5557,7 @@ var Plottable;
                 }
                 else {
                     this._sortFn = newFn;
-                    this._invalidateLayout();
+                    this.redraw();
                     return this;
                 }
             };
@@ -5569,8 +5566,8 @@ var Plottable;
                 if (scale != null) {
                     this._scale.broadcaster.deregisterListener(this);
                     this._scale = scale;
-                    this._scale.broadcaster.registerListener(this, function () { return _this._invalidateLayout(); });
-                    this._invalidateLayout();
+                    this._scale.broadcaster.registerListener(this, function () { return _this.redraw(); });
+                    this.redraw();
                     return this;
                 }
                 else {
@@ -5779,7 +5776,7 @@ var Plottable;
                     throw new Error("InterpolatedColorLegend requires a interpolatedColorScale");
                 }
                 this._scale = interpolatedColorScale;
-                this._scale.broadcaster.registerListener(this, function () { return _this._invalidateLayout(); });
+                this._scale.broadcaster.registerListener(this, function () { return _this.redraw(); });
                 this._formatter = formatter;
                 this._orientation = InterpolatedColorLegend._ensureOrientation(orientation);
                 this._fixedWidthFlag = true;
@@ -5795,7 +5792,7 @@ var Plottable;
                     return this._formatter;
                 }
                 this._formatter = formatter;
-                this._invalidateLayout();
+                this.redraw();
                 return this;
             };
             InterpolatedColorLegend._ensureOrientation = function (orientation) {
@@ -5813,7 +5810,7 @@ var Plottable;
                 }
                 else {
                     this._orientation = InterpolatedColorLegend._ensureOrientation(newOrientation);
-                    this._invalidateLayout();
+                    this.redraw();
                     return this;
                 }
             };
@@ -6298,7 +6295,7 @@ var Plottable;
             Table.prototype.padding = function (rowPadding, colPadding) {
                 this._rowPadding = rowPadding;
                 this._colPadding = colPadding;
-                this._invalidateLayout();
+                this.redraw();
                 return this;
             };
             /**
@@ -6328,7 +6325,7 @@ var Plottable;
              */
             Table.prototype.rowWeight = function (index, weight) {
                 this._rowWeights[index] = weight;
-                this._invalidateLayout();
+                this.redraw();
                 return this;
             };
             /**
@@ -6343,7 +6340,7 @@ var Plottable;
              */
             Table.prototype.colWeight = function (index, weight) {
                 this._colWeights[index] = weight;
-                this._invalidateLayout();
+                this.redraw();
                 return this;
             };
             Table.prototype._isFixedWidth = function () {

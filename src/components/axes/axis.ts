@@ -111,7 +111,7 @@ module Plottable {
     }
 
     protected _rescale() {
-      // default implementation; subclasses may call _invalidateLayout() here
+      // default implementation; subclasses may call redraw() here
       this._render();
     }
 
@@ -230,10 +230,10 @@ module Plottable {
       return tickMarkAttrHash;
     }
 
-    public _invalidateLayout() {
+    public redraw() {
       this._computedWidth = null;
       this._computedHeight = null;
-      super._invalidateLayout();
+      return super.redraw();
     }
 
     protected _setDefaultAlignment() {
@@ -277,7 +277,7 @@ module Plottable {
         return this._formatter;
       }
       this._formatter = formatter;
-      this._invalidateLayout();
+      this.redraw();
       return this;
     }
 
@@ -302,7 +302,7 @@ module Plottable {
           throw new Error("tick length must be positive");
         }
         this._tickLength = length;
-        this._invalidateLayout();
+        this.redraw();
         return this;
       }
     }
@@ -328,7 +328,7 @@ module Plottable {
           throw new Error("end tick length must be positive");
         }
         this._endTickLength = length;
-        this._invalidateLayout();
+        this.redraw();
         return this;
       }
     }
@@ -363,7 +363,7 @@ module Plottable {
           throw new Error("tick label padding must be positive");
         }
         this._tickLabelPadding = padding;
-        this._invalidateLayout();
+        this.redraw();
         return this;
       }
     }
@@ -392,7 +392,7 @@ module Plottable {
           throw new Error("gutter size must be positive");
         }
         this._gutter = size;
-        this._invalidateLayout();
+        this.redraw();
         return this;
       }
     }
@@ -423,7 +423,7 @@ module Plottable {
           throw new Error("unsupported orientation");
         }
         this._orientation = newOrientationLC;
-        this._invalidateLayout();
+        this.redraw();
         return this;
       }
     }

@@ -175,15 +175,24 @@ module Plottable {
       }
     }
 
-    public _invalidateLayout() {
+    /**
+     * Causes the Component to recompute layout and redraw.
+     *
+     * This function should be called when CSS changes could influence the size
+     * of the components, e.g. changing the font size.
+     *
+     * @returns {Component} The calling component.
+     */
+    public redraw() {
       this._useLastCalculatedLayout(false);
       if (this._isAnchored && this._isSetup) {
         if (this._isTopLevelComponent) {
           this._scheduleComputeLayout();
         } else {
-          this._parent()._invalidateLayout();
+          this._parent().redraw();
         }
       }
+      return this;
     }
 
     /**
@@ -218,19 +227,6 @@ module Plottable {
     }
 
     /**
-     * Causes the Component to recompute layout and redraw.
-     *
-     * This function should be called when CSS changes could influence the size
-     * of the components, e.g. changing the font size.
-     *
-     * @returns {Component} The calling component.
-     */
-    public redraw(): Component {
-      this._invalidateLayout();
-      return this;
-    }
-
-    /**
      * Sets the x alignment of the Component. This will be used if the
      * Component is given more space than it needs.
      *
@@ -252,7 +248,7 @@ module Plottable {
       } else {
         throw new Error("Unsupported alignment");
       }
-      this._invalidateLayout();
+      this.redraw();
       return this;
     }
 
@@ -278,7 +274,7 @@ module Plottable {
       } else {
         throw new Error("Unsupported alignment");
       }
-      this._invalidateLayout();
+      this.redraw();
       return this;
     }
 
@@ -292,7 +288,7 @@ module Plottable {
      */
     public xOffset(offset: number): Component {
       this._xOffset = offset;
-      this._invalidateLayout();
+      this.redraw();
       return this;
     }
 
@@ -306,7 +302,7 @@ module Plottable {
      */
     public yOffset(offset: number): Component {
       this._yOffset = offset;
-      this._invalidateLayout();
+      this.redraw();
       return this;
     }
 
