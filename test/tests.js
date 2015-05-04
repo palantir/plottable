@@ -7406,12 +7406,10 @@ describe("Scales", function () {
             svg2.remove();
         });
         it("addExtentProvider()", function () {
-            var posProvider = function (scale) { return [[0, 10]]; };
-            scale.addExtentProvider(posProvider);
+            scale.addExtentProvider(function (scale) { return [[0, 10]]; });
             scale.autoDomain();
             assert.deepEqual(scale.domain(), [0, 10], "scale domain accounts for first provider");
-            var negProvider = function (scale) { return [[-10, 0]]; };
-            scale.addExtentProvider(negProvider);
+            scale.addExtentProvider(function (scale) { return [[-10, 0]]; });
             scale.autoDomain();
             assert.deepEqual(scale.domain(), [-10, 10], "scale domain accounts for second provider");
         });
@@ -7725,8 +7723,7 @@ describe("Scales", function () {
         });
         it("gives reasonable values for ticks()", function () {
             var providedExtents = [[0, base / 2]];
-            var provider = function (scale) { return providedExtents; };
-            scale.addExtentProvider(provider);
+            scale.addExtentProvider(function (scale) { return providedExtents; });
             scale.autoDomain();
             var ticks = scale.ticks();
             assert.operator(ticks.length, ">", 0);
@@ -7762,8 +7759,7 @@ describe("Scales", function () {
         });
         it("ticks() is always non-empty", function () {
             var desiredExtents = [];
-            var provider = function (scale) { return desiredExtents; };
-            scale.addExtentProvider(provider);
+            scale.addExtentProvider(function (scale) { return desiredExtents; });
             [[2, 9], [0, 1], [1, 2], [0.001, 0.01], [-0.1, 0.1], [-3, -2]].forEach(function (extent) {
                 desiredExtents = [extent];
                 scale.autoDomain();

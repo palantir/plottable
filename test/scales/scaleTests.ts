@@ -85,18 +85,16 @@ describe("Scales", () => {
     });
 
     it("addExtentProvider()", () => {
-      var posProvider: Plottable.Scales.ExtentProvider<number> = (scale: Plottable.Scale<number, number>) => [[0, 10]];
-      scale.addExtentProvider(posProvider);
+      scale.addExtentProvider((scale: Plottable.Scale<number, number>) => [[0, 10]]);
       scale.autoDomain();
       assert.deepEqual(scale.domain(), [0, 10], "scale domain accounts for first provider");
 
-      var negProvider: Plottable.Scales.ExtentProvider<number> = (scale: Plottable.Scale<number, number>) => [[-10, 0]];
-      scale.addExtentProvider(negProvider);
+      scale.addExtentProvider((scale: Plottable.Scale<number, number>) => [[-10, 0]]);
       scale.autoDomain();
       assert.deepEqual(scale.domain(), [-10, 10], "scale domain accounts for second provider");
     });
 
-     it("removeExtentProvider()", () => {
+   	it("removeExtentProvider()", () => {
       var posProvider: Plottable.Scales.ExtentProvider<number> = (scale: Plottable.Scale<number, number>) => [[0, 10]];
       scale.addExtentProvider(posProvider);
       var negProvider: Plottable.Scales.ExtentProvider<number> = (scale: Plottable.Scale<number, number>) => [[-10, 0]];
@@ -463,8 +461,7 @@ describe("Scales", () => {
 
     it("gives reasonable values for ticks()", () => {
       var providedExtents = [[0, base / 2]];
-      var provider: Plottable.Scales.ExtentProvider<number> = (scale: Plottable.Scale<number, number>) => providedExtents;
-      scale.addExtentProvider(provider);
+      scale.addExtentProvider((scale: Plottable.Scale<number, number>) => providedExtents);
       scale.autoDomain();
       var ticks = scale.ticks();
       assert.operator(ticks.length, ">", 0);
@@ -504,8 +501,7 @@ describe("Scales", () => {
 
     it("ticks() is always non-empty", () => {
       var desiredExtents: number[][] = [];
-      var provider: Plottable.Scales.ExtentProvider<number> = (scale: Plottable.Scale<number, number>) => desiredExtents;
-      scale.addExtentProvider(provider);
+      scale.addExtentProvider((scale: Plottable.Scale<number, number>) => desiredExtents);
       [[2, 9], [0, 1], [1, 2], [0.001, 0.01], [-0.1, 0.1], [-3, -2]].forEach((extent) => {
         desiredExtents = [extent];
         scale.autoDomain();
