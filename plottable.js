@@ -381,44 +381,42 @@ var Plottable;
     var Utils;
     (function (Utils) {
         /**
-         * An associative array that can be keyed by anything (inc objects).
-         * Uses pointer equality checks which is why this works.
-         * This power has a price: everything is linear time since it is actually backed by an array...
+         * Shim for the ES6 map (although NaN is not allowed as a key).
          */
-        var StrictEqualityAssociativeArray = (function () {
-            function StrictEqualityAssociativeArray() {
+        var Map = (function () {
+            function Map() {
                 this._keyValuePairs = [];
             }
             /**
              * Set a new key/value pair in the store.
              *
-             * @param {any} key Key to set in the store
-             * @param {any} value Value to set in the store
              * @return {boolean} True if key already in store, false otherwise
              */
-            StrictEqualityAssociativeArray.prototype.set = function (key, value) {
+            Map.prototype.set = function (key, value) {
                 if (key !== key) {
-                    throw new Error("NaN may not be used as a key to the StrictEqualityAssociativeArray");
+                    throw new Error("NaN may not be used as a key to Map");
                 }
                 for (var i = 0; i < this._keyValuePairs.length; i++) {
-                    if (this._keyValuePairs[i][0] === key) {
-                        this._keyValuePairs[i][1] = value;
+                    if (this._keyValuePairs[i].key === key) {
+                        this._keyValuePairs[i].value = value;
                         return true;
                     }
                 }
-                this._keyValuePairs.push([key, value]);
+                this._keyValuePairs.push({
+                    key: key,
+                    value: value
+                });
                 return false;
             };
             /**
              * Get a value from the store, given a key.
              *
-             * @param {any} key Key associated with value to retrieve
-             * @return {any} Value if found, undefined otherwise
+             * @return {V} value if found, undefined otherwise
              */
-            StrictEqualityAssociativeArray.prototype.get = function (key) {
+            Map.prototype.get = function (key) {
                 for (var i = 0; i < this._keyValuePairs.length; i++) {
-                    if (this._keyValuePairs[i][0] === key) {
-                        return this._keyValuePairs[i][1];
+                    if (this._keyValuePairs[i].key === key) {
+                        return this._keyValuePairs[i].value;
                     }
                 }
                 return undefined;
@@ -429,62 +427,38 @@ var Plottable;
              * Will return true if there is a key/value entry,
              * even if the value is explicitly `undefined`.
              *
-             * @param {any} key Key to test for presence of an entry
-             * @return {boolean} Whether there was a matching entry for that key
              */
-            StrictEqualityAssociativeArray.prototype.has = function (key) {
+            Map.prototype.has = function (key) {
                 for (var i = 0; i < this._keyValuePairs.length; i++) {
-                    if (this._keyValuePairs[i][0] === key) {
+                    if (this._keyValuePairs[i].key === key) {
                         return true;
                     }
                 }
                 return false;
             };
-            /**
-             * Return an array of the values in the key-value store
-             *
-             * @return {any[]} The values in the store
-             */
-            StrictEqualityAssociativeArray.prototype.values = function () {
-                return this._keyValuePairs.map(function (x) { return x[1]; });
+            Map.prototype.values = function () {
+                return this._keyValuePairs.map(function (pair) { return pair.value; });
+            };
+            Map.prototype.keys = function () {
+                return this._keyValuePairs.map(function (pair) { return pair.key; });
             };
             /**
-             * Return an array of keys in the key-value store
+             * Delete a key from the key-value store.
              *
-             * @return {any[]} The keys in the store
-             */
-            StrictEqualityAssociativeArray.prototype.keys = function () {
-                return this._keyValuePairs.map(function (x) { return x[0]; });
-            };
-            /**
-             * Execute a callback for each entry in the array.
-             *
-             * @param {(key: any, val?: any, index?: number) => any} callback The callback to eecute
-             * @return {any[]} The results of mapping the callback over the entries
-             */
-            StrictEqualityAssociativeArray.prototype.map = function (cb) {
-                return this._keyValuePairs.map(function (kv, index) {
-                    return cb(kv[0], kv[1], index);
-                });
-            };
-            /**
-             * Delete a key from the key-value store. Return whether the key was present.
-             *
-             * @param {any} The key to remove
              * @return {boolean} Whether a matching entry was found and removed
              */
-            StrictEqualityAssociativeArray.prototype.delete = function (key) {
+            Map.prototype.delete = function (key) {
                 for (var i = 0; i < this._keyValuePairs.length; i++) {
-                    if (this._keyValuePairs[i][0] === key) {
+                    if (this._keyValuePairs[i].key === key) {
                         this._keyValuePairs.splice(i, 1);
                         return true;
                     }
                 }
                 return false;
             };
-            return StrictEqualityAssociativeArray;
+            return Map;
         })();
-        Utils.StrictEqualityAssociativeArray = StrictEqualityAssociativeArray;
+        Utils.Map = Map;
     })(Utils = Plottable.Utils || (Plottable.Utils = {}));
 })(Plottable || (Plottable = {}));
 
@@ -1165,7 +1139,7 @@ var Plottable;
              */
             function Broadcaster(listenable) {
                 _super.call(this);
-                this._key2callback = new Plottable.Utils.StrictEqualityAssociativeArray();
+                this._key2callback = new Plottable.Utils.Map();
                 this._listenable = listenable;
             }
             /**
@@ -1224,7 +1198,7 @@ var Plottable;
              * @returns {Broadcaster} The calling Broadcaster
              */
             Broadcaster.prototype.deregisterAllListeners = function () {
-                this._key2callback = new Plottable.Utils.StrictEqualityAssociativeArray();
+                this._key2callback = new Plottable.Utils.Map();
             };
             return Broadcaster;
         })(Core.PlottableObject);
@@ -1259,7 +1233,7 @@ var Plottable;
             _super.call(this);
             this._data = data;
             this._metadata = metadata;
-            this._accessor2cachedExtent = new Plottable.Utils.StrictEqualityAssociativeArray();
+            this._accessor2cachedExtent = new Plottable.Utils.Map();
             this.broadcaster = new Plottable.Core.Broadcaster(this);
         }
         Dataset.prototype.data = function (data) {
@@ -1268,7 +1242,7 @@ var Plottable;
             }
             else {
                 this._data = data;
-                this._accessor2cachedExtent = new Plottable.Utils.StrictEqualityAssociativeArray();
+                this._accessor2cachedExtent = new Plottable.Utils.Map();
                 this.broadcaster.broadcast();
                 return this;
             }
@@ -1279,7 +1253,7 @@ var Plottable;
             }
             else {
                 this._metadata = metadata;
-                this._accessor2cachedExtent = new Plottable.Utils.StrictEqualityAssociativeArray();
+                this._accessor2cachedExtent = new Plottable.Utils.Map();
                 this.broadcaster.broadcast();
                 return this;
             }
