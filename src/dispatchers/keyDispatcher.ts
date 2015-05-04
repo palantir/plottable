@@ -6,7 +6,7 @@ export module Dispatchers {
 
   export class Key extends Dispatcher {
     private static _DISPATCHER_KEY = "__Plottable_Dispatcher_Key";
-    private _keydownCallbackSet: Utils.CallbackSet<Function>;
+    private _keydownCallbacks: Utils.CallbackSet<Function>;
 
     /**
      * Get a Dispatcher.Key. If one already exists it will be returned;
@@ -34,34 +34,34 @@ export module Dispatchers {
 
       this._event2Callback["keydown"] = (e: KeyboardEvent) => this._processKeydown(e);
 
-      this._keydownCallbackSet = new Utils.CallbackSet();
-      this._callbackSets = [this._keydownCallbackSet];
+      this._keydownCallbacks = new Utils.CallbackSet();
+      this._callbacks = [this._keydownCallbacks];
     }
 
     /**
-     * Registers a callback to be called whenever a key is pressed,
+     * Registers a callback to be called whenever a key is pressed.
      *
      * @param {KeyCallback} callback
      * @return {Dispatcher.Key} The calling Dispatcher.Key.
      */
     public onKeyDown(callback: KeyCallback): Key {
-      this._setCallback(this._keydownCallbackSet, callback);
+      this.setCallback(this._keydownCallbacks, callback);
       return this;
     }
 
     /**
-     * Removes the callback to be called whenever a key is pressed,
+     * Removes the callback to be called whenever a key is pressed.
      *
      * @param {KeyCallback} callback
      * @return {Dispatcher.Key} The calling Dispatcher.Key.
      */
     public offKeyDown(callback: KeyCallback): Key {
-      this._unsetCallback(this._keydownCallbackSet, callback);
+      this.unsetCallback(this._keydownCallbacks, callback);
       return this;
     }
 
     private _processKeydown(e: KeyboardEvent) {
-      this._keydownCallbackSet.callCallbacks(e.keyCode, e);
+      this._keydownCallbacks.callCallbacks(e.keyCode, e);
     }
   }
 }

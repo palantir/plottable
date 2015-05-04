@@ -3532,9 +3532,9 @@ declare module Plottable {
         protected _event2Callback: {
             [eventName: string]: (e: Event) => any;
         };
-        protected _callbackSets: Utils.CallbackSet<Function>[];
-        protected _setCallback(callbackSet: Utils.CallbackSet<Function>, callback: Function): void;
-        protected _unsetCallback(callbackSet: Utils.CallbackSet<Function>, callback: Function): void;
+        protected _callbacks: Utils.CallbackSet<Function>[];
+        protected setCallback(callbackSet: Utils.CallbackSet<Function>, callback: Function): void;
+        protected unsetCallback(callbackSet: Utils.CallbackSet<Function>, callback: Function): void;
     }
 }
 
@@ -3577,7 +3577,7 @@ declare module Plottable {
              */
             offMouseMove(callback: MouseCallback): Dispatchers.Mouse;
             /**
-             * Registers a callback to be called whenever a mousedown occurs,
+             * Registers a callback to be called whenever a mousedown occurs.
              *
              * @param {(p: Point) => any} callback A callback that takes the pixel position
              *                                     in svg-coordinate-space. Pass `null`
@@ -3586,7 +3586,7 @@ declare module Plottable {
              */
             onMouseDown(callback: MouseCallback): Dispatchers.Mouse;
             /**
-             * Registers the callback to be called whenever a mousedown occurs,
+             * Registers the callback to be called whenever a mousedown occurs.
              *
              * @param {(p: Point) => any} callback A callback that takes the pixel position
              *                                     in svg-coordinate-space. Pass `null`
@@ -3595,7 +3595,7 @@ declare module Plottable {
              */
             offMouseDown(callback: MouseCallback): Dispatchers.Mouse;
             /**
-             * Registers a callback to be called whenever a mouseup occurs,
+             * Registers a callback to be called whenever a mouseup occurs.
              *
              * @param {(p: Point) => any} callback A callback that takes the pixel position
              *                                     in svg-coordinate-space. Pass `null`
@@ -3604,7 +3604,7 @@ declare module Plottable {
              */
             onMouseUp(callback: MouseCallback): Dispatchers.Mouse;
             /**
-             * Registers the callback to be called whenever a mouseup occurs,
+             * Registers the callback to be called whenever a mouseup occurs.
              *
              * @param {(p: Point) => any} callback A callback that takes the pixel position
              *                                     in svg-coordinate-space. Pass `null`
@@ -3613,7 +3613,7 @@ declare module Plottable {
              */
             offMouseUp(callback: MouseCallback): Dispatchers.Mouse;
             /**
-             * Registers a callback to be called whenever a wheel occurs,
+             * Registers a callback to be called whenever a wheel occurs.
              *
              * @param {MouseCallback} callback A callback that takes the pixel position
              *                                     in svg-coordinate-space.
@@ -3622,7 +3622,7 @@ declare module Plottable {
              */
             onWheel(callback: MouseCallback): Dispatchers.Mouse;
             /**
-             * Registers the callback to be called whenever a wheel occurs,
+             * Registers the callback to be called whenever a wheel occurs.
              *
              * @param {MouseCallback} callback A callback that takes the pixel position
              *                                     in svg-coordinate-space.
@@ -3631,7 +3631,7 @@ declare module Plottable {
              */
             offWheel(callback: MouseCallback): Dispatchers.Mouse;
             /**
-             * Registers a callback to be called whenever a dblClick occurs,
+             * Registers a callback to be called whenever a dblClick occurs.
              *
              * @param {MouseCallback} callback A callback that takes the pixel position
              *                                     in svg-coordinate-space.
@@ -3640,7 +3640,7 @@ declare module Plottable {
              */
             onDblClick(callback: MouseCallback): Dispatchers.Mouse;
             /**
-             * Registers the callback to be called whenever a dblClick occurs,
+             * Registers the callback to be called whenever a dblClick occurs.
              *
              * @param {MouseCallback} callback A callback that takes the pixel position
              *                                     in svg-coordinate-space.
@@ -3684,7 +3684,7 @@ declare module Plottable {
              */
             constructor(svg: SVGElement);
             /**
-             * Registers a callback to be called whenever a touch starts,
+             * Registers a callback to be called whenever a touch starts.
              *
              * @param {TouchCallback} callback A callback that takes the pixel position
              *                                     in svg-coordinate-space. Pass `null`
@@ -3693,7 +3693,7 @@ declare module Plottable {
              */
             onTouchStart(callback: TouchCallback): Dispatchers.Touch;
             /**
-             * Removes the callback to be called whenever a touch starts,
+             * Removes the callback to be called whenever a touch starts.
              *
              * @param {TouchCallback} callback A callback that takes the pixel position
              *                                     in svg-coordinate-space. Pass `null`
@@ -3702,7 +3702,7 @@ declare module Plottable {
              */
             offTouchStart(callback: TouchCallback): Dispatchers.Touch;
             /**
-             * Registers a callback to be called whenever the touch position changes,
+             * Registers a callback to be called whenever the touch position changes.
              *
              * @param {TouchCallback} callback A callback that takes the pixel position
              *                                     in svg-coordinate-space. Pass `null`
@@ -3711,7 +3711,7 @@ declare module Plottable {
              */
             onTouchMove(callback: TouchCallback): Dispatchers.Touch;
             /**
-             * Removes the callback to be called whenever the touch position changes,
+             * Removes the callback to be called whenever the touch position changes.
              *
              * @param {TouchCallback} callback A callback that takes the pixel position
              *                                     in svg-coordinate-space. Pass `null`
@@ -3720,7 +3720,7 @@ declare module Plottable {
              */
             offTouchMove(callback: TouchCallback): Dispatchers.Touch;
             /**
-             * Registers a callback to be called whenever a touch ends,
+             * Registers a callback to be called whenever a touch ends.
              *
              * @param {TouchCallback} callback A callback that takes the pixel position
              *                                     in svg-coordinate-space. Pass `null`
@@ -3729,7 +3729,7 @@ declare module Plottable {
              */
             onTouchEnd(callback: TouchCallback): Dispatchers.Touch;
             /**
-             * Removes the callback to be called whenever a touch ends,
+             * Removes the callback to be called whenever a touch ends.
              *
              * @param {TouchCallback} callback A callback that takes the pixel position
              *                                     in svg-coordinate-space. Pass `null`
@@ -3738,7 +3738,7 @@ declare module Plottable {
              */
             offTouchEnd(callback: TouchCallback): Dispatchers.Touch;
             /**
-             * Registers a callback to be called whenever a touch is cancelled,
+             * Registers a callback to be called whenever a touch is cancelled.
              *
              * @param {TouchCallback} callback A callback that takes the pixel position
              *                                     in svg-coordinate-space. Pass `null`
@@ -3747,7 +3747,7 @@ declare module Plottable {
              */
             onTouchCancel(callback: TouchCallback): Dispatchers.Touch;
             /**
-             * Removes the callback to be called whenever a touch is cancelled,
+             * Removes the callback to be called whenever a touch is cancelled.
              *
              * @param {TouchCallback} callback A callback that takes the pixel position
              *                                     in svg-coordinate-space. Pass `null`
@@ -3779,14 +3779,14 @@ declare module Plottable {
              */
             constructor();
             /**
-             * Registers a callback to be called whenever a key is pressed,
+             * Registers a callback to be called whenever a key is pressed.
              *
              * @param {KeyCallback} callback
              * @return {Dispatcher.Key} The calling Dispatcher.Key.
              */
             onKeyDown(callback: KeyCallback): Key;
             /**
-             * Removes the callback to be called whenever a key is pressed,
+             * Removes the callback to be called whenever a key is pressed.
              *
              * @param {KeyCallback} callback
              * @return {Dispatcher.Key} The calling Dispatcher.Key.

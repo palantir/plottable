@@ -9179,7 +9179,7 @@ describe("Dispatchers", function () {
             var callback = function () { return null; };
             var callbackSet = new Plottable.Utils.CallbackSet();
             callbackSet.add(callback);
-            dispatcher._callbackSets = [callbackSet];
+            dispatcher._callbacks = [callbackSet];
             var d3document = d3.select(document);
             dispatcher._connect();
             triggerFakeUIEvent("click", d3document);
@@ -9194,18 +9194,18 @@ describe("Dispatchers", function () {
             triggerFakeUIEvent("click", d3document);
             assert.isFalse(callbackWasCalled, "disconnected when broadcaster had no listeners");
         });
-        it("_setCallback()", function () {
+        it("setCallback()", function () {
             var dispatcher = new Plottable.Dispatcher();
             var callbackSet = new Plottable.Utils.CallbackSet();
             var callbackWasCalled = false;
             var callback = function () { return callbackWasCalled = true; };
-            dispatcher._setCallback(callbackSet, callback);
+            dispatcher.setCallback(callbackSet, callback);
             callbackSet.callCallbacks();
-            assert.isTrue(callbackWasCalled, "callback was called after setting with _setCallback()");
-            dispatcher._unsetCallback(callbackSet, callback);
+            assert.isTrue(callbackWasCalled, "callback was called after setting with setCallback()");
+            dispatcher.unsetCallback(callbackSet, callback);
             callbackWasCalled = false;
             callbackSet.callCallbacks();
-            assert.isFalse(callbackWasCalled, "callback was removed by calling _setCallback() with null");
+            assert.isFalse(callbackWasCalled, "callback was removed by calling setCallback() with null");
         });
     });
 });
