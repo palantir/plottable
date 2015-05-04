@@ -37,7 +37,7 @@ module Plottable {
     }
 
     protected _unsetCallback(callbackSet: Utils.CallbackSet<Function>, callback: Function) {
-      callbackSet.remove(callback);
+      callbackSet.delete(callback);
       this._disconnect();
     }
   }

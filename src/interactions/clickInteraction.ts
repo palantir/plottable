@@ -9,8 +9,8 @@ export module Interactions {
     private _clickCallback: (p: Point) => any;
     private _clickedDown = false;
 
-    public _anchor(component: Component, hitBox: D3.Selection) {
-      super._anchor(component, hitBox);
+    public _anchor(component: Component) {
+      super._anchor(component);
 
       this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(<SVGElement> component.content().node());
       this._mouseDispatcher.onMouseDown((p: Point) => this._handleClickDown(p));
@@ -19,6 +19,7 @@ export module Interactions {
       this._touchDispatcher = Dispatchers.Touch.getDispatcher(<SVGElement> component.content().node());
       this._touchDispatcher.onTouchStart((ids, idToPoint) => this._handleClickDown(idToPoint[ids[0]]));
       this._touchDispatcher.onTouchEnd((ids, idToPoint) => this._handleClickUp(idToPoint[ids[0]]));
+      this._touchDispatcher.onTouchCancel((ids, idToPoint) => this._clickedDown = false);
     }
 
     private _handleClickDown(p: Point) {

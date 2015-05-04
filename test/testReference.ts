@@ -56,6 +56,7 @@
 ///<reference path="utils/domUtilsTests.ts" />
 ///<reference path="utils/formattersTests.ts" />
 ///<reference path="utils/strictEqualityAssociativeArrayTests.ts" />
+///<reference path="utils/setTests.ts" />
 ///<reference path="utils/clientToSVGTranslatorTests.ts" />
 ///<reference path="utils/utilsTests.ts" />
 ///<reference path="utils/callbackSetTests.ts" />
@@ -65,6 +66,7 @@
 ///<reference path="interactions/clickInteractionTests.ts" />
 ///<reference path="interactions/doubleClickInteractionTests.ts" />
 ///<reference path="interactions/dragInteractionTests.ts" />
+///<reference path="interactions/panZoomInteractionTests.ts" />
 
 ///<reference path="dispatchers/dispatcherTests.ts" />
 ///<reference path="dispatchers/mouseDispatcherTests.ts" />

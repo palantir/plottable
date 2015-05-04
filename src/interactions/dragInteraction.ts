@@ -5,24 +5,24 @@ export module Interactions {
   export class Drag extends Interaction {
     private _dragging = false;
     private _constrain = true;
-    private _mouseDispatchers: Plottable.Dispatchers.Mouse;
-    private _touchDispatchers: Dispatchers.Touch;
+    private _mouseDispatcher: Dispatchers.Mouse;
+    private _touchDispatcher: Dispatchers.Touch;
     private _dragOrigin: Point;
     private _dragStartCallback: (p: Point) => any;
     private _dragCallback: (start: Point, end: Point) => any;
     private _dragEndCallback: (start: Point, end: Point) => any;
 
-    public _anchor(component: Component, hitBox: D3.Selection) {
-      super._anchor(component, hitBox);
-      this._mouseDispatchers = Dispatchers.Mouse.getDispatcher(<SVGElement> this._componentToListenTo.content().node());
-      this._mouseDispatchers.onMouseDown((p: Point, e: MouseEvent) => this._startDrag(p, e));
-      this._mouseDispatchers.onMouseMove((p: Point, e: MouseEvent) => this._doDrag(p, e));
-      this._mouseDispatchers.onMouseUp((p: Point, e: MouseEvent) => this._endDrag(p, e));
+    public _anchor(component: Component) {
+      super._anchor(component);
+      this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(<SVGElement> this._componentToListenTo.content().node());
+      this._mouseDispatcher.onMouseDown((p: Point, e: MouseEvent) => this._startDrag(p, e));
+      this._mouseDispatcher.onMouseMove((p: Point, e: MouseEvent) => this._doDrag(p, e));
+      this._mouseDispatcher.onMouseUp((p: Point, e: MouseEvent) => this._endDrag(p, e));
 
-      this._touchDispatchers = Dispatchers.Touch.getDispatcher(<SVGElement> this._componentToListenTo.content().node());
-      this._touchDispatchers.onTouchStart((ids, idToPoint, e) => this._startDrag(idToPoint[ids[0]], e));
-      this._touchDispatchers.onTouchMove((ids, idToPoint, e) => this._doDrag(idToPoint[ids[0]], e));
-      this._touchDispatchers.onTouchEnd((ids, idToPoint, e) => this._endDrag(idToPoint[ids[0]], e));
+      this._touchDispatcher = Dispatchers.Touch.getDispatcher(<SVGElement> this._componentToListenTo.content().node());
+      this._touchDispatcher.onTouchStart((ids, idToPoint, e) => this._startDrag(idToPoint[ids[0]], e));
+      this._touchDispatcher.onTouchMove((ids, idToPoint, e) => this._doDrag(idToPoint[ids[0]], e));
+      this._touchDispatcher.onTouchEnd((ids, idToPoint, e) => this._endDrag(idToPoint[ids[0]], e));
     }
 
     private _translateAndConstrain(p: Point) {

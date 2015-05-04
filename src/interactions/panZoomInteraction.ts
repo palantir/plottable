@@ -4,9 +4,17 @@ module Plottable {
 export module Interactions {
   export class PanZoom extends Interaction {
 
-    private _zoom: D3.Behavior.Zoom;
+    /**
+     * The number of pixels occupied in a line.
+     */
+    public static PIXELS_PER_LINE = 120;
+
     private _xScale: QuantitativeScale<any>;
     private _yScale: QuantitativeScale<any>;
+    private _dragInteraction: Interactions.Drag;
+    private _touchDispatcher: Dispatchers.Touch;
+
+    private _touchIds: D3.Map<Point>;
 
     /**
      * Creates a PanZoomInteraction.
@@ -20,56 +28,141 @@ export module Interactions {
      */
     constructor(xScale?: QuantitativeScale<any>, yScale?: QuantitativeScale<any>) {
       super();
-      if (xScale) {
-        this._xScale = xScale;
-        // HACKHACK #1388: self-register for resetZoom()
-        this._xScale.broadcaster.registerListener("pziX" + this.getID(), () => this.resetZoom());
-      }
-      if (yScale) {
-        this._yScale = yScale;
-        // HACKHACK #1388: self-register for resetZoom()
-        this._yScale.broadcaster.registerListener("pziY" + this.getID(), () => this.resetZoom());
+      this._xScale = xScale;
+      this._yScale = yScale;
+
+      this._dragInteraction = new Interactions.Drag();
+      this._setupDragInteraction();
+      this._touchIds = d3.map();
+    }
+
+    public _anchor(component: Component) {
+      super._anchor(component);
+      this._dragInteraction._anchor(component);
+
+      var mouseDispatcher = Dispatchers.Mouse.getDispatcher(<SVGElement> this._componentToListenTo.content().node());
+      mouseDispatcher.onWheel((p: Point, e: WheelEvent) => this._handleWheelEvent(p, e));
+
+      this._touchDispatcher = Dispatchers.Touch.getDispatcher(<SVGElement> this._componentToListenTo.content().node());
+      this._touchDispatcher.onTouchStart((ids, idToPoint, e) => this._handleTouchStart(ids, idToPoint, e));
+      this._touchDispatcher.onTouchMove((ids, idToPoint, e) => this._handlePinch(ids, idToPoint, e));
+      this._touchDispatcher.onTouchEnd((ids, idToPoint, e) => this._handleTouchEnd(ids, idToPoint, e));
+      this._touchDispatcher.onTouchCancel((ids, idToPoint, e) => this._handleTouchEnd(ids, idToPoint, e));
+    }
+
+    private _handleTouchStart(ids: number[], idToPoint: { [id: number]: Point; }, e: TouchEvent) {
+      for (var i = 0; i < ids.length && this._touchIds.size() < 2; i++) {
+        var id = ids[i];
+        this._touchIds.set(id.toString(), this._translateToComponentSpace(idToPoint[id]));
       }
     }
 
-    /**
-     * Sets the scales back to their original domains.
-     */
-    public resetZoom() {
-      // HACKHACK #254
-      this._zoom = d3.behavior.zoom();
-      if (this._xScale) {
-        this._zoom.x((<any> this._xScale)._d3Scale);
-      }
-      if (this._yScale) {
-        this._zoom.y((<any> this._yScale)._d3Scale);
-      }
-      this._zoom.on("zoom", () => this._rerenderZoomed());
-      this._zoom(this._hitBox);
-    }
-
-    public _anchor(component: Component, hitBox: D3.Selection) {
-      super._anchor(component, hitBox);
-      this.resetZoom();
-    }
-
-    public _requiresHitbox() {
-      return true;
-    }
-
-    private _rerenderZoomed() {
-      // HACKHACK since the d3.zoom.x modifies d3 scales and not our TS scales, and the TS scales have the
-      // event listener machinery, let's grab the domain out of the d3 scale and pipe it back into the TS scale
-      if (this._xScale) {
-        var xDomain = (<any> this._xScale)._d3Scale.domain();
-        this._xScale.domain(xDomain);
+    private _handlePinch(ids: number[], idToPoint: { [id: number]: Point; }, e: TouchEvent) {
+      if (this._touchIds.size() < 2) {
+        return;
       }
 
-      if (this._yScale) {
-        var yDomain = (<any> this._yScale)._d3Scale.domain();
-        this._yScale.domain(yDomain);
+      var oldCenterPoint = this.centerPoint();
+      var oldCornerDistance = this.cornerDistance();
+
+      ids.forEach((id) => {
+        if (this._touchIds.has(id.toString())) {
+          this._touchIds.set(id.toString(), this._translateToComponentSpace(idToPoint[id]));
+        }
+      });
+
+      var newCenterPoint = this.centerPoint();
+      var newCornerDistance = this.cornerDistance();
+
+      if (this._xScale != null && newCornerDistance !== 0 && oldCornerDistance !== 0) {
+        PanZoom.magnifyScale(this._xScale, oldCornerDistance / newCornerDistance, oldCenterPoint.x);
+        PanZoom.translateScale(this._xScale, oldCenterPoint.x - newCenterPoint.x);
+      }
+      if (this._yScale != null && newCornerDistance !== 0 && oldCornerDistance !== 0) {
+        PanZoom.magnifyScale(this._yScale, oldCornerDistance / newCornerDistance, oldCenterPoint.y);
+        PanZoom.translateScale(this._yScale, oldCenterPoint.y - newCenterPoint.y);
       }
     }
+
+    private centerPoint() {
+      var points = this._touchIds.values();
+      var firstTouchPoint = points[0];
+      var secondTouchPoint = points[1];
+
+      var leftX = Math.min(firstTouchPoint.x, secondTouchPoint.x);
+      var rightX = Math.max(firstTouchPoint.x, secondTouchPoint.x);
+      var topY = Math.min(firstTouchPoint.y, secondTouchPoint.y);
+      var bottomY = Math.max(firstTouchPoint.y, secondTouchPoint.y);
+
+      return {x: (leftX + rightX) / 2, y: (bottomY + topY) / 2};
+    }
+
+    private cornerDistance() {
+      var points = this._touchIds.values();
+      var firstTouchPoint = points[0];
+      var secondTouchPoint = points[1];
+
+      var leftX = Math.min(firstTouchPoint.x, secondTouchPoint.x);
+      var rightX = Math.max(firstTouchPoint.x, secondTouchPoint.x);
+      var topY = Math.min(firstTouchPoint.y, secondTouchPoint.y);
+      var bottomY = Math.max(firstTouchPoint.y, secondTouchPoint.y);
+
+      return Math.sqrt(Math.pow(rightX - leftX, 2) + Math.pow(bottomY - topY, 2));
+    }
+
+    private _handleTouchEnd(ids: number[], idToPoint: { [id: number]: Point; }, e: TouchEvent) {
+      ids.forEach((id) => {
+        this._touchIds.remove(id.toString());
+      });
+    }
+
+    private static magnifyScale<D>(scale: QuantitativeScale<D>, magnifyAmount: number, centerValue: number) {
+      var magnifyTransform = (rangeValue: number) => scale.invert(centerValue - (centerValue - rangeValue) * magnifyAmount);
+      scale.domain(scale.range().map(magnifyTransform));
+    }
+
+    private static translateScale<D>(scale: QuantitativeScale<D>, translateAmount: number) {
+      var translateTransform = (rangeValue: number) => scale.invert(rangeValue + translateAmount);
+      scale.domain(scale.range().map(translateTransform));
+    }
+
+    private _handleWheelEvent(p: Point, e: WheelEvent) {
+      var translatedP = this._translateToComponentSpace(p);
+      if (this._isInsideComponent(translatedP)) {
+        e.preventDefault();
+
+        var deltaPixelAmount = e.deltaY * (e.deltaMode ? PanZoom.PIXELS_PER_LINE : 1);
+        var zoomAmount = Math.pow(2, deltaPixelAmount * .002);
+        if (this._xScale != null) {
+          PanZoom.magnifyScale(this._xScale, zoomAmount, translatedP.x);
+        }
+        if (this._yScale != null) {
+          PanZoom.magnifyScale(this._yScale, zoomAmount, translatedP.y);
+        }
+      }
+    }
+
+    private _setupDragInteraction() {
+      this._dragInteraction.constrainToComponent(false);
+
+      var lastDragPoint: Point;
+      this._dragInteraction.onDragStart(() => lastDragPoint = null);
+      this._dragInteraction.onDrag((startPoint, endPoint) => {
+        if (this._touchIds.size() >= 2) {
+          return;
+        }
+        if (this._xScale != null) {
+          var dragAmountX = endPoint.x - (lastDragPoint == null ? startPoint.x : lastDragPoint.x);
+          PanZoom.translateScale(this._xScale, -dragAmountX);
+        }
+        if (this._yScale != null) {
+          var dragAmountY = endPoint.y - (lastDragPoint == null ? startPoint.y : lastDragPoint.y);
+          PanZoom.translateScale(this._yScale, -dragAmountY);
+        }
+        lastDragPoint = endPoint;
+      });
+    }
+
   }
 }
 }

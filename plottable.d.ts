@@ -101,19 +101,17 @@ declare module Plottable {
              */
             function objEq(a: any, b: any): boolean;
             /**
-             * Computes the max value from the array.
-             *
-             * If type is not comparable then t will be converted to a comparable before computing max.
+             * Applies the accessor, if provided, to each element of `array` and returns the maximum value.
+             * If no maximum value can be computed, returns defaultValue.
              */
-            function max<C>(arr: C[], default_val: C): C;
-            function max<T, C>(arr: T[], acc: (x?: T, i?: number) => C, default_val: C): C;
+            function max<C>(array: C[], defaultValue: C): C;
+            function max<T, C>(array: T[], accessor: (t?: T, i?: number) => C, defaultValue: C): C;
             /**
-             * Computes the min value from the array.
-             *
-             * If type is not comparable then t will be converted to a comparable before computing min.
+             * Applies the accessor, if provided, to each element of `array` and returns the minimum value.
+             * If no minimum value can be computed, returns defaultValue.
              */
-            function min<C>(arr: C[], default_val: C): C;
-            function min<T, C>(arr: T[], acc: (x?: T, i?: number) => C, default_val: C): C;
+            function min<C>(array: C[], defaultValue: C): C;
+            function min<T, C>(array: T[], accessor: (t?: T, i?: number) => C, defaultValue: C): C;
             /**
              * Returns true **only** if x is NaN
              */
@@ -236,6 +234,22 @@ declare module Plottable {
     }
 }
 
+
+declare module Plottable {
+    module Utils {
+        /**
+         * Shim for ES6 set.
+         * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set
+         */
+        class Set<T> {
+            constructor();
+            add(value: T): Set<T>;
+            delete(value: T): boolean;
+            values(): T[];
+        }
+    }
+}
+
 declare module Plottable {
     module Utils {
         module DOM {
@@ -283,11 +297,7 @@ declare module Plottable {
          * Each callback exists at most once in the set (based on reference equality).
          * All callbacks should have the same signature.
          */
-        class CallbackSet<CB extends Function> {
-            constructor();
-            add(value: CB): CallbackSet<CB>;
-            remove(value: CB): CallbackSet<CB>;
-            values(): CB[];
+        class CallbackSet<CB extends Function> extends Set<CB> {
             callCallbacks(...args: any[]): CallbackSet<CB>;
         }
     }
@@ -1578,6 +1588,15 @@ declare module Plottable {
 
 
 declare module Plottable {
+    module Components {
+        class Alignment {
+            static TOP: string;
+            static BOTTOM: string;
+            static LEFT: string;
+            static RIGHT: string;
+            static CENTER: string;
+        }
+    }
     class Component extends Core.PlottableObject {
         protected _element: D3.Selection;
         protected _content: D3.Selection;
@@ -1810,15 +1829,6 @@ declare module Plottable {
          * @return {D3.Selection} background selection for the Component
          */
         background(): D3.Selection;
-        /**
-         * Returns the hitbox selection for the component
-         * (A selection in front of the foreground used mainly for interactions)
-         *
-         * Will return undefined if the component has not been anchored
-         *
-         * @return {D3.Selection} hitbox selection for the component
-         */
-        hitBox(): D3.Selection;
     }
 }
 
@@ -3037,14 +3047,14 @@ declare module Plottable {
              *
              * @returns {boolean} Whether bars should display labels or not.
              */
-            barLabelsEnabled(): boolean;
+            labelsEnabled(): boolean;
             /**
              * Set whether bar labels are enabled.
              * @param {boolean} Whether bars should display labels or not.
              *
              * @returns {Bar} The calling plot.
              */
-            barLabelsEnabled(enabled: boolean): Bar<X, Y>;
+            labelsEnabled(enabled: boolean): Bar<X, Y>;
             /**
              * Get the formatter for bar labels.
              *
@@ -3727,6 +3737,24 @@ declare module Plottable {
              * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
              */
             offTouchEnd(callback: TouchCallback): Dispatchers.Touch;
+            /**
+             * Registers a callback to be called whenever a touch is cancelled,
+             *
+             * @param {TouchCallback} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space. Pass `null`
+             *                                     to remove a callback.
+             * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
+             */
+            onTouchCancel(callback: TouchCallback): Dispatchers.Touch;
+            /**
+             * Removes the callback to be called whenever a touch is cancelled,
+             *
+             * @param {TouchCallback} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space. Pass `null`
+             *                                     to remove a callback.
+             * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
+             */
+            offTouchCancel(callback: TouchCallback): Dispatchers.Touch;
         }
     }
 }
@@ -3778,10 +3806,8 @@ declare module Plottable {
          * "foreground" and "background" elements where it can draw things,
          * e.g. crosshairs.
          */
-        protected _hitBox: D3.Selection;
         protected _componentToListenTo: Component;
-        _anchor(component: Component, hitBox: D3.Selection): void;
-        _requiresHitbox(): boolean;
+        _anchor(component: Component): void;
         /**
          * Translates an <svg>-coordinate-space point to Component-space coordinates.
          *
@@ -3805,7 +3831,7 @@ declare module Plottable {
 declare module Plottable {
     module Interactions {
         class Click extends Interaction {
-            _anchor(component: Component, hitBox: D3.Selection): void;
+            _anchor(component: Component): void;
             /**
              * Gets the callback called when the Component is clicked.
              *
@@ -3827,7 +3853,7 @@ declare module Plottable {
 declare module Plottable {
     module Interactions {
         class DoubleClick extends Interaction {
-            _anchor(component: Component, hitBox: D3.Selection): void;
+            _anchor(component: Component): void;
             /**
              * Gets the callback called when the Component is double-clicked.
              *
@@ -3849,7 +3875,7 @@ declare module Plottable {
 declare module Plottable {
     module Interactions {
         class Key extends Interaction {
-            _anchor(component: Component, hitBox: D3.Selection): void;
+            _anchor(component: Component): void;
             /**
              * Sets a callback to be called when the key with the given keyCode is
              * pressed and the user is moused over the Component.
@@ -3867,7 +3893,7 @@ declare module Plottable {
 declare module Plottable {
     module Interactions {
         class Pointer extends Interaction {
-            _anchor(component: Component, hitBox: D3.Selection): void;
+            _anchor(component: Component): void;
             /**
              * Gets the callback called when the pointer enters the Component.
              *
@@ -3916,6 +3942,10 @@ declare module Plottable {
     module Interactions {
         class PanZoom extends Interaction {
             /**
+             * The number of pixels occupied in a line.
+             */
+            static PIXELS_PER_LINE: number;
+            /**
              * Creates a PanZoomInteraction.
              *
              * The allows you to move around and zoom in on a plot, interactively. It
@@ -3926,12 +3956,7 @@ declare module Plottable {
              * @param {QuantitativeScaleScale} [yScale] The Y scale to update on panning/zooming.
              */
             constructor(xScale?: QuantitativeScale<any>, yScale?: QuantitativeScale<any>);
-            /**
-             * Sets the scales back to their original domains.
-             */
-            resetZoom(): void;
-            _anchor(component: Component, hitBox: D3.Selection): void;
-            _requiresHitbox(): boolean;
+            _anchor(component: Component): void;
         }
     }
 }
@@ -3940,7 +3965,7 @@ declare module Plottable {
 declare module Plottable {
     module Interactions {
         class Drag extends Interaction {
-            _anchor(component: Component, hitBox: D3.Selection): void;
+            _anchor(component: Component): void;
             /**
              * Returns whether or not this Interactions constrains Points passed to its
              * callbacks to lie inside its Component.

@@ -3899,7 +3899,7 @@ describe("Plots", function () {
             });
             it("bar labels render properly", function () {
                 plot.renderTo(svg);
-                plot.barLabelsEnabled(true);
+                plot.labelsEnabled(true);
                 var texts = svg.selectAll("text")[0].map(function (n) { return d3.select(n).text(); });
                 assert.lengthOf(texts, 2, "both texts drawn");
                 assert.equal(texts[0], "640", "first label is 640");
@@ -3907,7 +3907,7 @@ describe("Plots", function () {
                 svg.remove();
             });
             it("bar labels hide if bars too skinny", function () {
-                plot.barLabelsEnabled(true);
+                plot.labelsEnabled(true);
                 plot.renderTo(svg);
                 plot.barLabelFormatter(function (n) { return n.toString() + (n === 12345 ? "looong" : ""); });
                 var texts = svg.selectAll("text")[0].map(function (n) { return d3.select(n).text(); });
@@ -3915,7 +3915,7 @@ describe("Plots", function () {
                 svg.remove();
             });
             it("formatters are used properly", function () {
-                plot.barLabelsEnabled(true);
+                plot.labelsEnabled(true);
                 plot.barLabelFormatter(function (n) { return n.toString() + "%"; });
                 plot.renderTo(svg);
                 var texts = svg.selectAll("text")[0].map(function (n) { return d3.select(n).text(); });
@@ -3925,7 +3925,7 @@ describe("Plots", function () {
                 svg.remove();
             });
             it("bar labels are removed instantly on dataset change", function (done) {
-                plot.barLabelsEnabled(true);
+                plot.labelsEnabled(true);
                 plot.renderTo(svg);
                 var texts = svg.selectAll("text")[0].map(function (n) { return d3.select(n).text(); });
                 assert.lengthOf(texts, 2, "both texts drawn");
@@ -6556,37 +6556,6 @@ describe("Component behavior", function () {
         });
         svg.remove();
     });
-    it("hitboxes are created iff there are registered interactions that require hitboxes", function () {
-        function verifyHitbox(component) {
-            var hitBox = component._hitBox;
-            assert.isNotNull(hitBox, "the hitbox was created");
-            var hitBoxFill = hitBox.style("fill");
-            var hitBoxFilled = hitBoxFill === "#ffffff" || hitBoxFill === "rgb(255, 255, 255)";
-            assert.isTrue(hitBoxFilled, hitBoxFill + " <- this should be filled, so the hitbox will detect events");
-            assert.equal(hitBox.style("opacity"), "0", "the hitBox is transparent, otherwise it would look weird");
-        }
-        c._anchor(svg);
-        assert.isUndefined(c._hitBox, "no hitBox was created when there were no registered interactions");
-        svg.remove();
-        svg = generateSVG();
-        // registration before anchoring
-        c = new Plottable.Component();
-        var i = new Plottable.Interaction();
-        i._requiresHitbox = function () { return true; };
-        c.registerInteraction(i);
-        c._anchor(svg);
-        verifyHitbox(c);
-        svg.remove();
-        svg = generateSVG();
-        // registration after anchoring
-        c = new Plottable.Component();
-        c._anchor(svg);
-        i = new Plottable.Interaction();
-        i._requiresHitbox = function () { return true; };
-        c.registerInteraction(i);
-        verifyHitbox(c);
-        svg.remove();
-    });
     it("errors are thrown on bad alignments", function () {
         assert.throws(function () { return c.xAlign("foo"); }, Error, "Unsupported alignment");
         assert.throws(function () { return c.yAlign("foo"); }, Error, "Unsupported alignment");
@@ -8221,6 +8190,43 @@ describe("StrictEqualityAssociativeArray", function () {
 
 ///<reference path="../testReference.ts" />
 var assert = chai.assert;
+describe("Utils", function () {
+    describe("Set", function () {
+        it("add()", function () {
+            var set = new Plottable.Utils.Set();
+            var value1 = { value: "one" };
+            set.add(value1);
+            var setValues = set.values();
+            assert.lengthOf(setValues, 1, "set contains one value");
+            assert.strictEqual(setValues[0], value1, "the value was added to the set");
+            set.add(value1);
+            setValues = set.values();
+            assert.lengthOf(setValues, 1, "same value is not added twice");
+            assert.strictEqual(setValues[0], value1, "list still contains the value");
+            var value2 = { value: "two" };
+            set.add(value2);
+            setValues = set.values();
+            assert.lengthOf(setValues, 2, "set now contains two values");
+            assert.strictEqual(setValues[0], value1, "set contains value 1");
+            assert.strictEqual(setValues[1], value2, "set contains value 2");
+        });
+        it("delete()", function () {
+            var set = new Plottable.Utils.Set();
+            var value1 = { value: "one" };
+            set.add(value1);
+            assert.lengthOf(set.values(), 1, "set contains one value after adding");
+            set.delete(value1);
+            assert.lengthOf(set.values(), 0, "value was delete");
+            set.add(value1);
+            var value2 = { value: "two" };
+            set.delete(value2);
+            assert.lengthOf(set.values(), 1, "removing a non-existent value does nothing");
+        });
+    });
+});
+
+///<reference path="../testReference.ts" />
+var assert = chai.assert;
 describe("ClientToSVGTranslator", function () {
     it("getTranslator() creates only one ClientToSVGTranslator per <svg>", function () {
         var svg = generateSVG();
@@ -8276,11 +8282,30 @@ describe("Utils.Methods", function () {
         var strings = ["foo", "bar", "foo", "foo", "baz", "bam"];
         assert.deepEqual(Plottable.Utils.Methods.uniq(strings), ["foo", "bar", "baz", "bam"]);
     });
-    describe("min/max", function () {
+    describe("max() and min()", function () {
         var max = Plottable.Utils.Methods.max;
         var min = Plottable.Utils.Methods.min;
         var today = new Date();
-        it("max/min work as expected", function () {
+        it("return the default value if max or min can't be computed", function () {
+            var minValue = 1;
+            var maxValue = 5;
+            var defaultValue = 3;
+            var goodArray = [
+                [minValue],
+                [maxValue]
+            ];
+            // bad array is technically of type number[][], but subarrays are empty!
+            var badArray = [
+                [],
+                []
+            ];
+            var accessor = function (arr) { return arr[0]; };
+            assert.strictEqual(min(goodArray, accessor, defaultValue), minValue, "min(): minimum value is returned in good case");
+            assert.strictEqual(min(badArray, accessor, defaultValue), defaultValue, "min(): default value is returned in bad case");
+            assert.strictEqual(max(goodArray, accessor, defaultValue), maxValue, "max(): maximum value is returned in good case");
+            assert.strictEqual(max(badArray, accessor, defaultValue), defaultValue, "max(): default value is returned in bad case");
+        });
+        it("max() and min() work on numbers", function () {
             var alist = [1, 2, 3, 4, 5];
             var dbl = function (x) { return x * 2; };
             var dblIndexOffset = function (x, i) { return x * 2 - i; };
@@ -8303,12 +8328,12 @@ describe("Utils.Methods", function () {
             assert.deepEqual(min([], dbl, 5), 5, "min accepts custom default and function");
             assert.deepEqual(min([], numToDate, today), today, "min accepts non-numeric default and function");
         });
-        it("max/min works as expected on non-numeric values (strings)", function () {
+        it("max() and min() work on strings", function () {
             var strings = ["a", "bb", "ccc", "ddd"];
             assert.deepEqual(max(strings, function (s) { return s.length; }, 0), 3, "works on arrays of non-numbers with a function");
             assert.deepEqual(max([], function (s) { return s.length; }, 5), 5, "defaults work even with non-number function type");
         });
-        it("max/min works as expected on non-numeric values (dates)", function () {
+        it("max() and min() work on dates", function () {
             var tomorrow = new Date(today.getTime());
             tomorrow.setDate(today.getDate() + 1);
             var dayAfterTomorrow = new Date(today.getTime());
@@ -8316,8 +8341,8 @@ describe("Utils.Methods", function () {
             var dates = [today, tomorrow, dayAfterTomorrow, null];
             assert.deepEqual(min(dates, dayAfterTomorrow), today, "works on arrays of non-numeric values but comparable");
             assert.deepEqual(max(dates, today), dayAfterTomorrow, "works on arrays of non-number values but comparable");
-            assert.deepEqual(max([null], today), undefined, "returns undefined from array of null values");
-            assert.deepEqual(max([], today), today, "correct default non-numeric value returned");
+            assert.deepEqual(max([null], today), today, "returns default value if passed array of null values");
+            assert.deepEqual(max([], today), today, "returns default value if passed empty");
         });
     });
     it("isNaN works as expected", function () {
@@ -8434,122 +8459,36 @@ describe("Utils.Methods", function () {
 
 ///<reference path="../testReference.ts" />
 var assert = chai.assert;
-describe("CallbackSet", function () {
-    it("add()", function () {
-        var callbackSet = new Plottable.Utils.CallbackSet();
-        var cb1 = function () { return "one"; };
-        callbackSet.add(cb1);
-        var assignedCallbacks = callbackSet.values();
-        assert.lengthOf(assignedCallbacks, 1, "set contains one callback");
-        assert.strictEqual(assignedCallbacks[0], cb1, "the callback was added to the list");
-        callbackSet.add(cb1);
-        assignedCallbacks = callbackSet.values();
-        assert.lengthOf(assignedCallbacks, 1, "same callback is not added twice");
-        assert.strictEqual(assignedCallbacks[0], cb1, "list still contains the callback");
-        var cb2 = function () { return "two"; };
-        callbackSet.add(cb2);
-        assignedCallbacks = callbackSet.values();
-        assert.lengthOf(assignedCallbacks, 2, "set now contains two callbacks");
-        assert.strictEqual(assignedCallbacks[0], cb1, "set contains callback 1");
-        assert.strictEqual(assignedCallbacks[1], cb2, "set contains callback 2");
-    });
-    it("remove()", function () {
-        var callbackSet = new Plottable.Utils.CallbackSet();
-        var cb1 = function () { return "one"; };
-        callbackSet.add(cb1);
-        assert.lengthOf(callbackSet.values(), 1, "set contains one callback after adding");
-        callbackSet.remove(cb1);
-        assert.lengthOf(callbackSet.values(), 0, "callback was removed");
-        callbackSet.add(cb1);
-        var cb2 = function () { return "two"; };
-        callbackSet.remove(cb2);
-        assert.lengthOf(callbackSet.values(), 1, "removing a non-existent value does nothing");
-    });
-    it("callCallbacks()", function () {
-        var expectedS = "Plottable";
-        var expectedI = 1;
-        var cb1called = false;
-        var cb1 = function (s, i) {
-            assert.strictEqual(s, expectedS, "was passed the correct first argument");
-            assert.strictEqual(i, expectedI, "was passed the correct second argument");
-            cb1called = true;
-        };
-        var cb2called = false;
-        var cb2 = function (s, i) {
-            assert.strictEqual(s, expectedS, "was passed the correct first argument");
-            assert.strictEqual(i, expectedI, "was passed the correct second argument");
-            cb2called = true;
-        };
-        var callbackSet = new Plottable.Utils.CallbackSet();
-        callbackSet.add(cb1);
-        callbackSet.add(cb2);
-        callbackSet.callCallbacks(expectedS, expectedI);
-        assert.isTrue(cb1called, "callback 1 was called");
-        assert.isTrue(cb2called, "callback 2 was called");
+describe("Utils", function () {
+    describe("CallbackSet", function () {
+        it("callCallbacks()", function () {
+            var expectedS = "Plottable";
+            var expectedI = 1;
+            var cb1called = false;
+            var cb1 = function (s, i) {
+                assert.strictEqual(s, expectedS, "was passed the correct first argument");
+                assert.strictEqual(i, expectedI, "was passed the correct second argument");
+                cb1called = true;
+            };
+            var cb2called = false;
+            var cb2 = function (s, i) {
+                assert.strictEqual(s, expectedS, "was passed the correct first argument");
+                assert.strictEqual(i, expectedI, "was passed the correct second argument");
+                cb2called = true;
+            };
+            var callbackSet = new Plottable.Utils.CallbackSet();
+            callbackSet.add(cb1);
+            callbackSet.add(cb2);
+            callbackSet.callCallbacks(expectedS, expectedI);
+            assert.isTrue(cb1called, "callback 1 was called");
+            assert.isTrue(cb2called, "callback 2 was called");
+        });
     });
 });
 
 ///<reference path="../testReference.ts" />
 var assert = chai.assert;
 describe("Interactions", function () {
-    describe("PanZoomInteraction", function () {
-        it("Pans properly", function () {
-            // The only difference between pan and zoom is internal to d3
-            // Simulating zoom events is painful, so panning will suffice here
-            var xScale = new Plottable.Scales.Linear().domain([0, 11]);
-            var yScale = new Plottable.Scales.Linear().domain([11, 0]);
-            var svg = generateSVG();
-            var dataset = makeLinearSeries(11);
-            var plot = new Plottable.Plots.Scatter(xScale, yScale).addDataset(dataset);
-            plot.project("x", "x", xScale);
-            plot.project("y", "y", yScale);
-            plot.renderTo(svg);
-            var xDomainBefore = xScale.domain();
-            var yDomainBefore = yScale.domain();
-            var interaction = new Plottable.Interactions.PanZoom(xScale, yScale);
-            plot.registerInteraction(interaction);
-            var hb = plot.hitBox().node();
-            var dragDistancePixelX = 10;
-            var dragDistancePixelY = 20;
-            $(hb).simulate("drag", {
-                dx: dragDistancePixelX,
-                dy: dragDistancePixelY
-            });
-            var xDomainAfter = xScale.domain();
-            var yDomainAfter = yScale.domain();
-            assert.notDeepEqual(xDomainAfter, xDomainBefore, "x domain was changed by panning");
-            assert.notDeepEqual(yDomainAfter, yDomainBefore, "y domain was changed by panning");
-            function getSlope(scale) {
-                var range = scale.range();
-                var domain = scale.domain();
-                return (domain[1] - domain[0]) / (range[1] - range[0]);
-            }
-            ;
-            var expectedXDragChange = -dragDistancePixelX * getSlope(xScale);
-            var expectedYDragChange = -dragDistancePixelY * getSlope(yScale);
-            assert.closeTo(xDomainAfter[0] - xDomainBefore[0], expectedXDragChange, 1, "x domain changed by the correct amount");
-            assert.closeTo(yDomainAfter[0] - yDomainBefore[0], expectedYDragChange, 1, "y domain changed by the correct amount");
-            svg.remove();
-        });
-        it("Resets zoom when the scale domain changes", function () {
-            var xScale = new Plottable.Scales.Linear();
-            var yScale = new Plottable.Scales.Linear();
-            var svg = generateSVG();
-            var c = new Plottable.Component();
-            c.renderTo(svg);
-            var pzi = new Plottable.Interactions.PanZoom(xScale, yScale);
-            c.registerInteraction(pzi);
-            var zoomBeforeX = pzi._zoom;
-            xScale.domain([10, 1000]);
-            var zoomAfterX = pzi._zoom;
-            assert.notStrictEqual(zoomBeforeX, zoomAfterX, "D3 Zoom was regenerated after x scale domain changed");
-            var zoomBeforeY = pzi._zoom;
-            yScale.domain([10, 1000]);
-            var zoomAfterY = pzi._zoom;
-            assert.notStrictEqual(zoomBeforeY, zoomAfterY, "D3 Zoom was regenerated after y scale domain changed");
-            svg.remove();
-        });
-    });
     describe("KeyInteraction", function () {
         it("Triggers appropriate callback for the key pressed", function () {
             var svg = generateSVG(400, 400);
@@ -8779,6 +8718,21 @@ describe("Interactions", function () {
             assert.isTrue(callbackCalled, "callback called even if moved outside component (touch)");
             svg.remove();
         });
+        it("cancelling touches cancels any ongoing clicks", function () {
+            var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var c = new Plottable.Component();
+            c.renderTo(svg);
+            var clickInteraction = new Plottable.Interactions.Click();
+            c.registerInteraction(clickInteraction);
+            var callbackCalled = false;
+            var callback = function () { return callbackCalled = true; };
+            clickInteraction.onClick(callback);
+            triggerFakeTouchEvent("touchstart", c.content(), [{ x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 }]);
+            triggerFakeTouchEvent("touchcancel", c.content(), [{ x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 }]);
+            triggerFakeTouchEvent("touchend", c.content(), [{ x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 }]);
+            assert.isFalse(callbackCalled, "callback not called since click was interrupted");
+            svg.remove();
+        });
     });
 });
 
@@ -8835,6 +8789,17 @@ describe("Interactions", function () {
                 triggerFakeMouseEvent("mouseup", component.content(), userClickPoint.x, userClickPoint.y);
                 triggerFakeMouseEvent("mousedown", component.content(), userClickPoint.x, userClickPoint.y);
                 triggerFakeMouseEvent("mouseup", component.content(), userClickPoint.x, userClickPoint.y);
+                assert.deepEqual(doubleClickedPoint, null, "point never set");
+                svg.remove();
+            });
+            it("callback not called does not receive dblclick confirmation", function () {
+                var userClickPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
+                triggerFakeTouchEvent("touchstart", component.content(), [{ x: userClickPoint.x, y: userClickPoint.y }]);
+                triggerFakeTouchEvent("touchend", component.content(), [{ x: userClickPoint.x, y: userClickPoint.y }]);
+                triggerFakeTouchEvent("touchstart", component.content(), [{ x: userClickPoint.x, y: userClickPoint.y }]);
+                triggerFakeTouchEvent("touchend", component.content(), [{ x: userClickPoint.x, y: userClickPoint.y }]);
+                triggerFakeTouchEvent("touchcancel", component.content(), [{ x: userClickPoint.x, y: userClickPoint.y }]);
+                triggerFakeMouseEvent("dblclick", component.content(), userClickPoint.x, userClickPoint.y);
                 assert.deepEqual(doubleClickedPoint, null, "point never set");
                 svg.remove();
             });
@@ -9055,6 +9020,134 @@ describe("Interactions", function () {
             assert.deepEqual(receivedEnd, outsidePointNeg, "dragging outside the Component is no longer constrained (negative) (touchend)");
             svg.remove();
         });
+        it("touchcancel cancels the current drag", function () {
+            var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var c = new Plottable.Component();
+            c.renderTo(svg);
+            var drag = new Plottable.Interactions.Drag();
+            var moveCallbackCalled = false;
+            var receivedStart;
+            var receivedEnd;
+            var moveCallback = function (start, end) {
+                moveCallbackCalled = true;
+                receivedStart = start;
+                receivedEnd = end;
+            };
+            drag.onDrag(moveCallback);
+            c.registerInteraction(drag);
+            var target = c.background();
+            receivedStart = null;
+            receivedEnd = null;
+            triggerFakeTouchEvent("touchstart", target, [{ x: startPoint.x, y: startPoint.y }]);
+            triggerFakeTouchEvent("touchmove", target, [{ x: endPoint.x - 10, y: endPoint.y - 10 }]);
+            triggerFakeTouchEvent("touchcancel", target, [{ x: endPoint.x - 10, y: endPoint.y - 10 }]);
+            triggerFakeTouchEvent("touchmove", target, [{ x: endPoint.x, y: endPoint.y }]);
+            assert.notEqual(receivedEnd, endPoint, "was not passed touch point after cancelled");
+            svg.remove();
+        });
+    });
+});
+
+///<reference path="../testReference.ts" />
+var assert = chai.assert;
+describe("Interactions", function () {
+    describe("PanZoomInteraction", function () {
+        var svg;
+        var SVG_WIDTH = 400;
+        var SVG_HEIGHT = 500;
+        var eventTarget;
+        var xScale;
+        var yScale;
+        beforeEach(function () {
+            svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var component = new Plottable.Component();
+            component.renderTo(svg);
+            xScale = new Plottable.Scales.Linear();
+            xScale.domain([0, SVG_WIDTH / 2]).range([0, SVG_WIDTH]);
+            yScale = new Plottable.Scales.Linear();
+            yScale.domain([0, SVG_HEIGHT / 2]).range([0, SVG_HEIGHT]);
+            component.registerInteraction(new Plottable.Interactions.PanZoom(xScale, yScale));
+            eventTarget = component.background();
+        });
+        describe("Panning", function () {
+            it("dragging a certain amount will translate the scale correctly (mouse)", function () {
+                var startPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
+                var endPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT * 3 / 4 };
+                triggerFakeMouseEvent("mousedown", eventTarget, startPoint.x, startPoint.y);
+                triggerFakeMouseEvent("mousemove", eventTarget, endPoint.x, endPoint.y);
+                triggerFakeMouseEvent("mouseend", eventTarget, endPoint.x, endPoint.y);
+                assert.deepEqual(xScale.domain(), [-SVG_WIDTH / 8, SVG_WIDTH * 3 / 8], "xScale pans to the correct domain via drag (mouse)");
+                assert.deepEqual(yScale.domain(), [-SVG_HEIGHT / 4, SVG_HEIGHT / 4], "yScale pans to the correct domain via drag (mouse)");
+                svg.remove();
+            });
+            it("dragging to outside the component will translate the scale correctly (mouse)", function () {
+                var startPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
+                var endPoint = { x: -SVG_WIDTH / 2, y: -SVG_HEIGHT / 2 };
+                triggerFakeMouseEvent("mousedown", eventTarget, startPoint.x, startPoint.y);
+                triggerFakeMouseEvent("mousemove", eventTarget, endPoint.x, endPoint.y);
+                triggerFakeMouseEvent("mouseend", eventTarget, endPoint.x, endPoint.y);
+                assert.deepEqual(xScale.domain(), [SVG_WIDTH / 2, SVG_WIDTH], "xScale pans to the correct domain via drag (mouse)");
+                assert.deepEqual(yScale.domain(), [SVG_HEIGHT / 2, SVG_HEIGHT], "yScale pans to the correct domain via drag (mouse)");
+                svg.remove();
+            });
+            it("dragging a certain amount will translate the scale correctly (touch)", function () {
+                // HACKHACK PhantomJS doesn't implement fake creation of WheelEvents
+                // https://github.com/ariya/phantomjs/issues/11289
+                if (window.PHANTOMJS) {
+                    svg.remove();
+                    return;
+                }
+                var startPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
+                var endPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT * 3 / 4 };
+                triggerFakeTouchEvent("touchstart", eventTarget, [startPoint]);
+                triggerFakeTouchEvent("touchmove", eventTarget, [endPoint]);
+                triggerFakeTouchEvent("touchend", eventTarget, [endPoint]);
+                assert.deepEqual(xScale.domain(), [-SVG_WIDTH / 8, SVG_WIDTH * 3 / 8], "xScale pans to the correct domain via drag (touch)");
+                assert.deepEqual(yScale.domain(), [-SVG_HEIGHT / 4, SVG_HEIGHT / 4], "yScale pans to the correct domain via drag (touch)");
+                svg.remove();
+            });
+            it("dragging to outside the component will translate the scale correctly (touch)", function () {
+                var startPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
+                var endPoint = { x: -SVG_WIDTH / 2, y: -SVG_HEIGHT / 2 };
+                triggerFakeTouchEvent("touchstart", eventTarget, [startPoint]);
+                triggerFakeTouchEvent("touchmove", eventTarget, [endPoint]);
+                triggerFakeTouchEvent("touchend", eventTarget, [endPoint]);
+                assert.deepEqual(xScale.domain(), [SVG_WIDTH / 2, SVG_WIDTH], "xScale pans to the correct domain via drag (touch)");
+                assert.deepEqual(yScale.domain(), [SVG_HEIGHT / 2, SVG_HEIGHT], "yScale pans to the correct domain via drag (touch)");
+                svg.remove();
+            });
+        });
+        it("mousewheeling a certain amount will magnify the scale correctly", function () {
+            // HACKHACK PhantomJS doesn't implement fake creation of WheelEvents
+            // https://github.com/ariya/phantomjs/issues/11289
+            if (window.PHANTOMJS) {
+                svg.remove();
+                return;
+            }
+            var scrollPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
+            var deltaY = 500;
+            triggerFakeWheelEvent("wheel", svg, scrollPoint.x, scrollPoint.y, deltaY);
+            assert.deepEqual(xScale.domain(), [-SVG_WIDTH / 8, SVG_WIDTH * 7 / 8], "xScale zooms to the correct domain via scroll");
+            assert.deepEqual(yScale.domain(), [-SVG_HEIGHT / 8, SVG_HEIGHT * 7 / 8], "yScale zooms to the correct domain via scroll");
+            svg.remove();
+        });
+        it("pinching a certain amount will magnify the scale correctly", function () {
+            // HACKHACK PhantomJS doesn't implement fake creation of WheelEvents
+            // https://github.com/ariya/phantomjs/issues/11289
+            if (window.PHANTOMJS) {
+                svg.remove();
+                return;
+            }
+            var startPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
+            var startPoint2 = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
+            triggerFakeTouchEvent("touchstart", eventTarget, [startPoint, startPoint2], [0, 1]);
+            var endPoint = { x: SVG_WIDTH * 3 / 4, y: SVG_HEIGHT * 3 / 4 };
+            triggerFakeTouchEvent("touchmove", eventTarget, [endPoint], [1]);
+            triggerFakeTouchEvent("touchend", eventTarget, [endPoint], [1]);
+            assert.deepEqual(xScale.domain(), [SVG_WIDTH / 16, SVG_WIDTH * 5 / 16], "xScale transforms to the correct domain via pinch");
+            assert.deepEqual(yScale.domain(), [SVG_HEIGHT / 16, SVG_HEIGHT * 5 / 16], "yScale transforms to the correct domain via pinch");
+            svg.remove();
+        });
     });
 });
 
@@ -9095,7 +9188,7 @@ describe("Dispatchers", function () {
             callbackWasCalled = false;
             triggerFakeUIEvent("click", d3document);
             assert.isTrue(callbackWasCalled, "didn't disconnect while broadcaster had listener");
-            callbackSet.remove(callback);
+            callbackSet.delete(callback);
             dispatcher._disconnect();
             callbackWasCalled = false;
             triggerFakeUIEvent("click", d3document);
@@ -9419,6 +9512,35 @@ describe("Dispatchers", function () {
             triggerFakeTouchEvent("touchend", target, expectedPoints, ids);
             assert.isTrue(callbackWasCalled, "callback was called on touchend");
             td.offTouchEnd(callback);
+            target.remove();
+        });
+        it("onTouchCancel()", function () {
+            var targetWidth = 400, targetHeight = 400;
+            var target = generateSVG(targetWidth, targetHeight);
+            // HACKHACK: PhantomJS can't measure SVGs unless they have something in them occupying space
+            target.append("rect").attr("width", targetWidth).attr("height", targetHeight);
+            var targetXs = [17, 18, 12, 23, 44];
+            var targetYs = [77, 78, 52, 43, 14];
+            var expectedPoints = targetXs.map(function (targetX, i) {
+                return {
+                    x: targetX,
+                    y: targetYs[i]
+                };
+            });
+            var ids = targetXs.map(function (targetX, i) { return i; });
+            var td = Plottable.Dispatchers.Touch.getDispatcher(target.node());
+            var callbackWasCalled = false;
+            var callback = function (ids, points, e) {
+                callbackWasCalled = true;
+                ids.forEach(function (id) {
+                    assertPointsClose(points[id], expectedPoints[id], 0.5, "touch position is correct");
+                });
+                assert.isNotNull(e, "TouchEvent was passed to the Dispatcher");
+            };
+            td.onTouchCancel(callback);
+            triggerFakeTouchEvent("touchcancel", target, expectedPoints, ids);
+            assert.isTrue(callbackWasCalled, "callback was called on touchend");
+            td.offTouchCancel(callback);
             target.remove();
         });
         it("doesn't call callbacks if not in the DOM", function () {

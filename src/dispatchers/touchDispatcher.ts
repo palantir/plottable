@@ -16,6 +16,7 @@ export module Dispatchers {
     private _startCallbackSet: Utils.CallbackSet<Function>;
     private _moveCallbackSet: Utils.CallbackSet<Function>;
     private _endCallbackSet: Utils.CallbackSet<Function>;
+    private _cancelCallbackSet: Utils.CallbackSet<Function>;
 
     /**
      * Get a Dispatcher.Touch for the <svg> containing elem. If one already exists
@@ -49,11 +50,13 @@ export module Dispatchers {
       this._startCallbackSet = new Utils.CallbackSet();
       this._moveCallbackSet = new Utils.CallbackSet();
       this._endCallbackSet = new Utils.CallbackSet();
-      this._callbackSets = [this._moveCallbackSet, this._startCallbackSet, this._endCallbackSet];
+      this._cancelCallbackSet = new Utils.CallbackSet();
+      this._callbackSets = [this._moveCallbackSet, this._startCallbackSet, this._endCallbackSet, this._cancelCallbackSet];
 
       this._event2Callback["touchstart"] = (e: TouchEvent) => this._measureAndBroadcast(e, this._startCallbackSet);
       this._event2Callback["touchmove"] = (e: TouchEvent) => this._measureAndBroadcast(e, this._moveCallbackSet);
       this._event2Callback["touchend"] = (e: TouchEvent) => this._measureAndBroadcast(e, this._endCallbackSet);
+      this._event2Callback["touchcancel"] = (e: TouchEvent) => this._measureAndBroadcast(e, this._cancelCallbackSet);
     }
 
     /**
@@ -131,6 +134,32 @@ export module Dispatchers {
      */
     public offTouchEnd(callback: TouchCallback): Dispatchers.Touch {
       this._unsetCallback(this._endCallbackSet, callback);
+      return this;
+    }
+
+    /**
+     * Registers a callback to be called whenever a touch is cancelled,
+     *
+     * @param {TouchCallback} callback A callback that takes the pixel position
+     *                                     in svg-coordinate-space. Pass `null`
+     *                                     to remove a callback.
+     * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
+     */
+    public onTouchCancel(callback: TouchCallback): Dispatchers.Touch {
+      this._setCallback(this._cancelCallbackSet, callback);
+      return this;
+    }
+
+    /**
+     * Removes the callback to be called whenever a touch is cancelled,
+     *
+     * @param {TouchCallback} callback A callback that takes the pixel position
+     *                                     in svg-coordinate-space. Pass `null`
+     *                                     to remove a callback.
+     * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
+     */
+    public offTouchCancel(callback: TouchCallback): Dispatchers.Touch {
+      this._unsetCallback(this._cancelCallbackSet, callback);
       return this;
     }
 

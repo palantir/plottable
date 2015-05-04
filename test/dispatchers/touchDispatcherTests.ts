@@ -123,6 +123,42 @@ describe("Dispatchers", () => {
       target.remove();
     });
 
+    it("onTouchCancel()", () => {
+      var targetWidth = 400, targetHeight = 400;
+      var target = generateSVG(targetWidth, targetHeight);
+      // HACKHACK: PhantomJS can't measure SVGs unless they have something in them occupying space
+      target.append("rect").attr("width", targetWidth).attr("height", targetHeight);
+
+      var targetXs = [17, 18, 12, 23, 44];
+      var targetYs = [77, 78, 52, 43, 14];
+      var expectedPoints = targetXs.map((targetX, i) => {
+        return {
+          x: targetX,
+          y: targetYs[i]
+        };
+      });
+      var ids = targetXs.map((targetX, i) => i);
+
+      var td = Plottable.Dispatchers.Touch.getDispatcher(<SVGElement> target.node());
+
+      var callbackWasCalled = false;
+      var callback = function(ids: number[], points: { [id: number]: Plottable.Point; }, e: TouchEvent) {
+        callbackWasCalled = true;
+        ids.forEach((id) => {
+          assertPointsClose(points[id], expectedPoints[id], 0.5, "touch position is correct");
+        });
+        assert.isNotNull(e, "TouchEvent was passed to the Dispatcher");
+      };
+
+      td.onTouchCancel(callback);
+
+      triggerFakeTouchEvent("touchcancel", target, expectedPoints, ids);
+      assert.isTrue(callbackWasCalled, "callback was called on touchend");
+
+      td.offTouchCancel(callback);
+      target.remove();
+    });
+
     it("doesn't call callbacks if not in the DOM", () => {
       var targetWidth = 400, targetHeight = 400;
       var target = generateSVG(targetWidth, targetHeight);

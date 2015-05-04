@@ -48,7 +48,7 @@ describe("Dispatchers", () => {
       triggerFakeUIEvent("click", d3document);
       assert.isTrue(callbackWasCalled, "didn't disconnect while broadcaster had listener");
 
-      callbackSet.remove(callback);
+      callbackSet.delete(callback);
       (<any> dispatcher)._disconnect();
       callbackWasCalled = false;
       triggerFakeUIEvent("click", d3document);
