@@ -3347,7 +3347,7 @@ var Plottable;
             this._usedLastLayout = false;
         }
         /**
-         * Attaches the Component as a child of a given a D3 selection.
+         * Attaches the Component as a child of a given D3 Selection.
          *
          * @param {D3.Selection} selection The Selection containing the Element to anchor under.
          * @returns {Component} The calling Component.
