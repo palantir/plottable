@@ -3330,6 +3330,7 @@ var Plottable;
         function Component() {
             _super.apply(this, arguments);
             this.clipPathEnabled = false;
+            this._origin = { x: 0, y: 0 }; // Origin of the coordinate space for the Component.
             this._xAlignProportion = 0; // What % along the free space do we want to position (0 = left, .5 = center, 1 = right)
             this._yAlignProportion = 0;
             this._fixedHeightFlag = false;
@@ -3442,9 +3443,11 @@ var Plottable;
             var size = this._getSize(availableWidth, availableHeight);
             this._width = size.width;
             this._height = size.height;
-            this._xOrigin = origin.x + this._xOffset + (availableWidth - this.width()) * this._xAlignProportion;
-            this._yOrigin = origin.y + this._yOffset + (availableHeight - this.height()) * this._yAlignProportion;
-            this._element.attr("transform", "translate(" + this._xOrigin + "," + this._yOrigin + ")");
+            this._origin = {
+                x: origin.x + this._xOffset + (availableWidth - this.width()) * this._xAlignProportion,
+                y: origin.y + this._yOffset + (availableHeight - this.height()) * this._yAlignProportion
+            };
+            this._element.attr("transform", "translate(" + this._origin.x + "," + this._origin.y + ")");
             this._boxes.forEach(function (b) { return b.attr("width", _this.width()).attr("height", _this.height()); });
             return this;
         };
@@ -3806,10 +3809,7 @@ var Plottable;
          * @return {Point} The x-y position of the Component relative to its parent.
          */
         Component.prototype.origin = function () {
-            return {
-                x: this._xOrigin,
-                y: this._yOrigin
-            };
+            return this._origin;
         };
         /**
          * Gets the origin of the Component relative to the root <svg>.

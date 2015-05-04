@@ -8,8 +8,7 @@ module Plottable {
     private _backgroundContainer: D3.Selection;
     private _foregroundContainer: D3.Selection;
     public clipPathEnabled = false;
-    private _xOrigin: number; // Origin of the coordinate space for the component. Passed down from parent
-    private _yOrigin: number;
+    private _origin: Point = { x: 0, y: 0 }; // Origin of the coordinate space for the Component.
 
     private _parentElement: ComponentContainer;
     private _xAlignProportion = 0; // What % along the free space do we want to position (0 = left, .5 = center, 1 = right)
@@ -134,9 +133,11 @@ module Plottable {
       var size = this._getSize(availableWidth, availableHeight);
       this._width = size.width;
       this._height = size.height;
-      this._xOrigin = origin.x + this._xOffset + (availableWidth - this.width()) * this._xAlignProportion;
-      this._yOrigin = origin.y + this._yOffset + (availableHeight - this.height()) * this._yAlignProportion;
-      this._element.attr("transform", "translate(" + this._xOrigin + "," + this._yOrigin + ")");
+      this._origin = {
+        x: origin.x + this._xOffset + (availableWidth - this.width()) * this._xAlignProportion,
+        y: origin.y + this._yOffset + (availableHeight - this.height()) * this._yAlignProportion
+      };
+      this._element.attr("transform", "translate(" + this._origin.x + "," + this._origin.y + ")");
       this._boxes.forEach((b: D3.Selection) => b.attr("width", this.width()).attr("height", this.height()));
       return this;
     }
@@ -530,10 +531,7 @@ module Plottable {
      * @return {Point} The x-y position of the Component relative to its parent.
      */
     public origin(): Point {
-      return {
-        x: this._xOrigin,
-        y: this._yOrigin
-      };
+      return this._origin;
     }
 
     /**

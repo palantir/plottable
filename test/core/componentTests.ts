@@ -49,15 +49,17 @@ describe("Component behavior", () => {
       c.computeLayout();
       assert.equal(c.width() , SVG_WIDTH, "computeLayout defaulted width to svg width");
       assert.equal(c.height(), SVG_HEIGHT, "computeLayout defaulted height to svg height");
-      assert.equal((<any> c)._xOrigin, 0 , "xOrigin defaulted to 0");
-      assert.equal((<any> c)._yOrigin, 0 , "yOrigin defaulted to 0");
+      var origin = c.origin();
+      assert.equal(origin.x, 0 , "xOrigin defaulted to 0");
+      assert.equal(origin.y, 0 , "yOrigin defaulted to 0");
 
       svg.attr("width", 2 * SVG_WIDTH).attr("height", 2 * SVG_HEIGHT);
       c.computeLayout();
       assert.equal(c.width() , 2 * SVG_WIDTH, "computeLayout updated width to new svg width");
       assert.equal(c.height(), 2 * SVG_HEIGHT, "computeLayout updated height to new svg height");
-      assert.equal((<any> c)._xOrigin, 0 , "xOrigin is still 0");
-      assert.equal((<any> c)._yOrigin, 0 , "yOrigin is still 0");
+      origin = c.origin();
+      assert.equal(origin.x, 0 , "xOrigin is still 0");
+      assert.equal(origin.y, 0 , "yOrigin is still 0");
 
       svg.remove();
     });
@@ -74,8 +76,9 @@ describe("Component behavior", () => {
       c.computeLayout();
       assert.equal(c.width(), 400, "defaults to width of parent if width is not specified on <svg>");
       assert.equal(c.height(), 200, "defaults to height of parent if width is not specified on <svg>");
-      assert.equal((<any> c)._xOrigin, 0, "xOrigin defaulted to 0");
-      assert.equal((<any> c)._yOrigin, 0, "yOrigin defaulted to 0");
+      var origin = c.origin();
+      assert.equal(origin.x, 0, "xOrigin defaulted to 0");
+      assert.equal(origin.y, 0, "yOrigin defaulted to 0");
 
 
       svg.style("width", "50%").style("height", "50%");
@@ -83,8 +86,9 @@ describe("Component behavior", () => {
 
       assert.equal(c.width(), 200, "computeLayout defaulted width to svg width");
       assert.equal(c.height(), 100, "computeLayout defaulted height to svg height");
-      assert.equal((<any> c)._xOrigin, 0, "xOrigin defaulted to 0");
-      assert.equal((<any> c)._yOrigin, 0, "yOrigin defaulted to 0");
+      origin = c.origin();
+      assert.equal(origin.x, 0, "xOrigin defaulted to 0");
+      assert.equal(origin.y, 0, "yOrigin defaulted to 0");
 
       svg.style("width", "25%").style("height", "25%");
 
@@ -92,8 +96,9 @@ describe("Component behavior", () => {
 
       assert.equal(c.width(), 100, "computeLayout updated width to new svg width");
       assert.equal(c.height(), 50, "computeLayout updated height to new svg height");
-      assert.equal((<any> c)._xOrigin, 0, "xOrigin is still 0");
-      assert.equal((<any> c)._yOrigin, 0, "yOrigin is still 0");
+      origin = c.origin();
+      assert.equal(origin.x, 0, "xOrigin is still 0");
+      assert.equal(origin.y, 0, "yOrigin is still 0");
 
       // reset test page DOM
       parent.style("width", "auto");
