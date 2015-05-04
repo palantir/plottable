@@ -3350,6 +3350,7 @@ var Plottable;
          * Attaches the Component as a child of a given a D3 selection.
          *
          * @param {D3.Selection} selection The Selection containing the Element to anchor under.
+         * @returns {Component} The calling Component.
          */
         Component.prototype.anchor = function (selection) {
             if (this._removed) {
@@ -3411,8 +3412,9 @@ var Plottable;
          * they are inferred from the size of the Component's element.
          *
          * @param {Point} origin Origin of the space offered to the Component.
-         * @param {number} availableWidth Available width for the Component to render in
-         * @param {number} availableHeight Available height for the Component to render in
+         * @param {number} availableWidth
+         * @param {number} availableHeight
+         * @returns {Component} The calling Component.
          */
         Component.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
             var _this = this;
@@ -3485,7 +3487,7 @@ var Plottable;
          * This function should be called when CSS changes could influence the size
          * of the components, e.g. changing the font size.
          *
-         * @returns {Component} The calling component.
+         * @returns {Component} The calling Component.
          */
         Component.prototype.redraw = function () {
             this._useLastCalculatedLayout(false);

@@ -1591,6 +1591,7 @@ declare module Plottable {
          * Attaches the Component as a child of a given a D3 selection.
          *
          * @param {D3.Selection} selection The Selection containing the Element to anchor under.
+         * @returns {Component} The calling Component.
          */
         anchor(selection: D3.Selection): Component;
         /**
@@ -1606,8 +1607,9 @@ declare module Plottable {
          * they are inferred from the size of the Component's element.
          *
          * @param {Point} origin Origin of the space offered to the Component.
-         * @param {number} availableWidth Available width for the Component to render in
-         * @param {number} availableHeight Available height for the Component to render in
+         * @param {number} availableWidth
+         * @param {number} availableHeight
+         * @returns {Component} The calling Component.
          */
         computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Component;
         protected _getSize(availableWidth: number, availableHeight: number): {
@@ -1624,7 +1626,7 @@ declare module Plottable {
          * This function should be called when CSS changes could influence the size
          * of the components, e.g. changing the font size.
          *
-         * @returns {Component} The calling component.
+         * @returns {Component} The calling Component.
          */
         redraw(): Component;
         /**
