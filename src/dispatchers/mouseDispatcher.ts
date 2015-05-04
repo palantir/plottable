@@ -15,12 +15,6 @@ export module Dispatchers {
     private _wheelCallbackSet: Utils.CallbackSet<Function>;
     private _dblClickCallbackSet: Utils.CallbackSet<Function>;
 
-    private _moveBroadcaster: Core.Broadcaster<Dispatchers.Mouse>;
-    private _downBroadcaster: Core.Broadcaster<Dispatchers.Mouse>;
-    private _upBroadcaster: Core.Broadcaster<Dispatchers.Mouse>;
-    private _wheelBroadcaster: Core.Broadcaster<Dispatchers.Mouse>;
-    private _dblClickBroadcaster: Core.Broadcaster<Dispatchers.Mouse>;
-
     /**
      * Get a Dispatcher.Mouse for the <svg> containing elem. If one already exists
      * on that <svg>, it will be returned; otherwise, a new one will be created.
