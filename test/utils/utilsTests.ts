@@ -35,12 +35,36 @@ describe("Utils.Methods", () => {
   });
 
 
-  describe("min/max", () => {
+  describe("max() and min()", () => {
     var max = Plottable.Utils.Methods.max;
     var min = Plottable.Utils.Methods.min;
     var today = new Date();
 
-    it("max/min work as expected", () => {
+    it("return the default value if max or min can't be computed", () => {
+      var minValue = 1;
+      var maxValue = 5;
+      var defaultValue = 3;
+      var goodArray: number[][] = [
+        [minValue],
+        [maxValue]
+      ];
+      // bad array is technically of type number[][], but subarrays are empty!
+      var badArray: number[][] = [
+        [],
+        []
+      ];
+      var accessor = (arr: number[]) => arr[0];
+      assert.strictEqual(min<number[], number>(goodArray, accessor, defaultValue),
+        minValue, "min(): minimum value is returned in good case");
+      assert.strictEqual(min<number[], number>(badArray, accessor, defaultValue),
+        defaultValue, "min(): default value is returned in bad case");
+      assert.strictEqual(max<number[], number>(goodArray, accessor, defaultValue),
+        maxValue, "max(): maximum value is returned in good case");
+      assert.strictEqual(max<number[], number>(badArray, accessor, defaultValue),
+        defaultValue, "max(): default value is returned in bad case");
+    });
+
+    it("max() and min() work on numbers", () => {
       var alist = [1, 2, 3, 4, 5];
       var dbl = (x: number) => x * 2;
       var dblIndexOffset = (x: number, i: number) => x * 2 - i;
@@ -66,13 +90,13 @@ describe("Utils.Methods", () => {
       assert.deepEqual(min([], numToDate, today), today, "min accepts non-numeric default and function");
     });
 
-    it("max/min works as expected on non-numeric values (strings)", () => {
+    it("max() and min() work on strings", () => {
       var strings = ["a", "bb", "ccc", "ddd"];
       assert.deepEqual(max(strings, (s: string) => s.length, 0), 3, "works on arrays of non-numbers with a function");
       assert.deepEqual(max([], (s: string) => s.length, 5), 5, "defaults work even with non-number function type");
     });
 
-    it("max/min works as expected on non-numeric values (dates)", () => {
+    it("max() and min() work on dates", () => {
       var tomorrow = new Date(today.getTime());
       tomorrow.setDate(today.getDate() + 1);
       var dayAfterTomorrow = new Date(today.getTime());
@@ -80,8 +104,8 @@ describe("Utils.Methods", () => {
       var dates: Date[] = [today, tomorrow, dayAfterTomorrow, null];
       assert.deepEqual(min<Date>(dates, dayAfterTomorrow), today, "works on arrays of non-numeric values but comparable");
       assert.deepEqual(max<Date>(dates, today), dayAfterTomorrow, "works on arrays of non-number values but comparable");
-      assert.deepEqual(max<Date>([null], today), undefined, "returns undefined from array of null values");
-      assert.deepEqual(max<Date>([], today), today, "correct default non-numeric value returned");
+      assert.deepEqual(max<Date>([null], today), today, "returns default value if passed array of null values");
+      assert.deepEqual(max<Date>([], today), today, "returns default value if passed empty");
     });
   });
 
