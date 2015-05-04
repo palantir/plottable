@@ -8923,21 +8923,22 @@ var Plottable;
         function Dispatcher() {
             _super.apply(this, arguments);
             this._event2Callback = {};
-            this._broadcasters = [];
+            this._callbacks = [];
             this._connected = false;
         }
         Dispatcher.prototype._hasNoListeners = function () {
-            return this._broadcasters.every(function (b) { return b.getListenerKeys().length === 0; });
+            return this._callbacks.every(function (cbs) { return cbs.values().length === 0; });
         };
         Dispatcher.prototype._connect = function () {
             var _this = this;
-            if (!this._connected) {
-                Object.keys(this._event2Callback).forEach(function (event) {
-                    var callback = _this._event2Callback[event];
-                    document.addEventListener(event, callback);
-                });
-                this._connected = true;
+            if (this._connected) {
+                return;
             }
+            Object.keys(this._event2Callback).forEach(function (event) {
+                var callback = _this._event2Callback[event];
+                document.addEventListener(event, callback);
+            });
+            this._connected = true;
         };
         Dispatcher.prototype._disconnect = function () {
             var _this = this;
@@ -8949,21 +8950,13 @@ var Plottable;
                 this._connected = false;
             }
         };
-        /**
-         * Creates a wrapped version of the callback that can be registered to a Broadcaster
-         */
-        Dispatcher.prototype._getWrappedCallback = function (callback) {
-            return function () { return callback(); };
+        Dispatcher.prototype.setCallback = function (callbackSet, callback) {
+            this._connect();
+            callbackSet.add(callback);
         };
-        Dispatcher.prototype._setCallback = function (b, key, callback) {
-            if (callback === null) {
-                b.deregisterListener(key);
-                this._disconnect();
-            }
-            else {
-                this._connect();
-                b.registerListener(key, this._getWrappedCallback(callback));
-            }
+        Dispatcher.prototype.unsetCallback = function (callbackSet, callback) {
+            callbackSet.delete(callback);
+            this._disconnect();
         };
         return Dispatcher;
     })(Plottable.Core.PlottableObject);
@@ -8994,20 +8987,20 @@ var Plottable;
                 _super.call(this);
                 this.translator = Plottable.Utils.ClientToSVGTranslator.getTranslator(svg);
                 this._lastMousePosition = { x: -1, y: -1 };
-                this._moveBroadcaster = new Plottable.Core.Broadcaster(this);
-                var processMoveCallback = function (e) { return _this._measureAndBroadcast(e, _this._moveBroadcaster); };
+                this._moveCallbacks = new Plottable.Utils.CallbackSet();
+                this._downCallbacks = new Plottable.Utils.CallbackSet();
+                this._upCallbacks = new Plottable.Utils.CallbackSet();
+                this._wheelCallbacks = new Plottable.Utils.CallbackSet();
+                this._dblClickCallbacks = new Plottable.Utils.CallbackSet();
+                this._callbacks = [this._moveCallbacks, this._downCallbacks, this._upCallbacks, this._wheelCallbacks, this._dblClickCallbacks];
+                var processMoveCallback = function (e) { return _this._measureAndBroadcast(e, _this._moveCallbacks); };
                 this._event2Callback["mouseover"] = processMoveCallback;
                 this._event2Callback["mousemove"] = processMoveCallback;
                 this._event2Callback["mouseout"] = processMoveCallback;
-                this._downBroadcaster = new Plottable.Core.Broadcaster(this);
-                this._event2Callback["mousedown"] = function (e) { return _this._measureAndBroadcast(e, _this._downBroadcaster); };
-                this._upBroadcaster = new Plottable.Core.Broadcaster(this);
-                this._event2Callback["mouseup"] = function (e) { return _this._measureAndBroadcast(e, _this._upBroadcaster); };
-                this._wheelBroadcaster = new Plottable.Core.Broadcaster(this);
-                this._event2Callback["wheel"] = function (e) { return _this._measureAndBroadcast(e, _this._wheelBroadcaster); };
-                this._dblClickBroadcaster = new Plottable.Core.Broadcaster(this);
-                this._event2Callback["dblclick"] = function (e) { return _this._measureAndBroadcast(e, _this._dblClickBroadcaster); };
-                this._broadcasters = [this._moveBroadcaster, this._downBroadcaster, this._upBroadcaster, this._wheelBroadcaster, this._dblClickBroadcaster];
+                this._event2Callback["mousedown"] = function (e) { return _this._measureAndBroadcast(e, _this._downCallbacks); };
+                this._event2Callback["mouseup"] = function (e) { return _this._measureAndBroadcast(e, _this._upCallbacks); };
+                this._event2Callback["wheel"] = function (e) { return _this._measureAndBroadcast(e, _this._wheelCallbacks); };
+                this._event2Callback["dblclick"] = function (e) { return _this._measureAndBroadcast(e, _this._dblClickCallbacks); };
             }
             /**
              * Get a Dispatcher.Mouse for the <svg> containing elem. If one already exists
@@ -9025,93 +9018,135 @@ var Plottable;
                 }
                 return dispatcher;
             };
-            Mouse.prototype._getWrappedCallback = function (callback) {
-                return function (md, p, e) { return callback(p, e); };
-            };
             /**
              * Registers a callback to be called whenever the mouse position changes,
-             * or removes the callback if `null` is passed as the callback.
              *
-             * @param {any} key The key associated with the callback.
-             *                  Key uniqueness is determined by deep equality.
              * @param {(p: Point) => any} callback A callback that takes the pixel position
              *                                     in svg-coordinate-space. Pass `null`
              *                                     to remove a callback.
              * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
              */
-            Mouse.prototype.onMouseMove = function (key, callback) {
-                this._setCallback(this._moveBroadcaster, key, callback);
+            Mouse.prototype.onMouseMove = function (callback) {
+                this.setCallback(this._moveCallbacks, callback);
                 return this;
             };
             /**
-             * Registers a callback to be called whenever a mousedown occurs,
-             * or removes the callback if `null` is passed as the callback.
+             * Registers the callback to be called whenever the mouse position changes,
              *
-             * @param {any} key The key associated with the callback.
-             *                  Key uniqueness is determined by deep equality.
              * @param {(p: Point) => any} callback A callback that takes the pixel position
              *                                     in svg-coordinate-space. Pass `null`
              *                                     to remove a callback.
              * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
              */
-            Mouse.prototype.onMouseDown = function (key, callback) {
-                this._setCallback(this._downBroadcaster, key, callback);
+            Mouse.prototype.offMouseMove = function (callback) {
+                this.unsetCallback(this._moveCallbacks, callback);
                 return this;
             };
             /**
-             * Registers a callback to be called whenever a mouseup occurs,
-             * or removes the callback if `null` is passed as the callback.
+             * Registers a callback to be called whenever a mousedown occurs.
              *
-             * @param {any} key The key associated with the callback.
-             *                  Key uniqueness is determined by deep equality.
              * @param {(p: Point) => any} callback A callback that takes the pixel position
              *                                     in svg-coordinate-space. Pass `null`
              *                                     to remove a callback.
              * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
              */
-            Mouse.prototype.onMouseUp = function (key, callback) {
-                this._setCallback(this._upBroadcaster, key, callback);
+            Mouse.prototype.onMouseDown = function (callback) {
+                this.setCallback(this._downCallbacks, callback);
                 return this;
             };
             /**
-             * Registers a callback to be called whenever a wheel occurs,
-             * or removes the callback if `null` is passed as the callback.
+             * Registers the callback to be called whenever a mousedown occurs.
              *
-             * @param {any} key The key associated with the callback.
-             *                  Key uniqueness is determined by deep equality.
+             * @param {(p: Point) => any} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space. Pass `null`
+             *                                     to remove a callback.
+             * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+             */
+            Mouse.prototype.offMouseDown = function (callback) {
+                this.unsetCallback(this._downCallbacks, callback);
+                return this;
+            };
+            /**
+             * Registers a callback to be called whenever a mouseup occurs.
+             *
+             * @param {(p: Point) => any} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space. Pass `null`
+             *                                     to remove a callback.
+             * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+             */
+            Mouse.prototype.onMouseUp = function (callback) {
+                this.setCallback(this._upCallbacks, callback);
+                return this;
+            };
+            /**
+             * Registers the callback to be called whenever a mouseup occurs.
+             *
+             * @param {(p: Point) => any} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space. Pass `null`
+             *                                     to remove a callback.
+             * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+             */
+            Mouse.prototype.offMouseUp = function (callback) {
+                this.unsetCallback(this._upCallbacks, callback);
+                return this;
+            };
+            /**
+             * Registers a callback to be called whenever a wheel occurs.
+             *
              * @param {MouseCallback} callback A callback that takes the pixel position
              *                                     in svg-coordinate-space.
              *                                     Pass `null` to remove a callback.
              * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
              */
-            Mouse.prototype.onWheel = function (key, callback) {
-                this._setCallback(this._wheelBroadcaster, key, callback);
+            Mouse.prototype.onWheel = function (callback) {
+                this.setCallback(this._wheelCallbacks, callback);
                 return this;
             };
             /**
-             * Registers a callback to be called whenever a dblClick occurs,
-             * or removes the callback if `null` is passed as the callback.
+             * Registers the callback to be called whenever a wheel occurs.
              *
-             * @param {any} key The key associated with the callback.
-             *                  Key uniqueness is determined by deep equality.
              * @param {MouseCallback} callback A callback that takes the pixel position
              *                                     in svg-coordinate-space.
              *                                     Pass `null` to remove a callback.
              * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
              */
-            Mouse.prototype.onDblClick = function (key, callback) {
-                this._setCallback(this._dblClickBroadcaster, key, callback);
+            Mouse.prototype.offWheel = function (callback) {
+                this.unsetCallback(this._wheelCallbacks, callback);
+                return this;
+            };
+            /**
+             * Registers a callback to be called whenever a dblClick occurs.
+             *
+             * @param {MouseCallback} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space.
+             *                                     Pass `null` to remove a callback.
+             * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+             */
+            Mouse.prototype.onDblClick = function (callback) {
+                this.setCallback(this._dblClickCallbacks, callback);
+                return this;
+            };
+            /**
+             * Registers the callback to be called whenever a dblClick occurs.
+             *
+             * @param {MouseCallback} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space.
+             *                                     Pass `null` to remove a callback.
+             * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+             */
+            Mouse.prototype.offDblClick = function (callback) {
+                this.unsetCallback(this._dblClickCallbacks, callback);
                 return this;
             };
             /**
              * Computes the mouse position from the given event, and if successful
              * calls broadcast() on the supplied Broadcaster.
              */
-            Mouse.prototype._measureAndBroadcast = function (e, b) {
-                var newMousePosition = this.translator.computePosition(e.clientX, e.clientY);
+            Mouse.prototype._measureAndBroadcast = function (event, callbackSet) {
+                var newMousePosition = this.translator.computePosition(event.clientX, event.clientY);
                 if (newMousePosition != null) {
                     this._lastMousePosition = newMousePosition;
-                    b.broadcast(this.getLastMousePosition(), e);
+                    callbackSet.callCallbacks(this.getLastMousePosition(), event);
                 }
             };
             /**
@@ -9152,15 +9187,15 @@ var Plottable;
                 var _this = this;
                 _super.call(this);
                 this.translator = Plottable.Utils.ClientToSVGTranslator.getTranslator(svg);
-                this._startBroadcaster = new Plottable.Core.Broadcaster(this);
-                this._event2Callback["touchstart"] = function (e) { return _this._measureAndBroadcast(e, _this._startBroadcaster); };
-                this._moveBroadcaster = new Plottable.Core.Broadcaster(this);
-                this._event2Callback["touchmove"] = function (e) { return _this._measureAndBroadcast(e, _this._moveBroadcaster); };
-                this._endBroadcaster = new Plottable.Core.Broadcaster(this);
-                this._event2Callback["touchend"] = function (e) { return _this._measureAndBroadcast(e, _this._endBroadcaster); };
-                this._cancelBroadcaster = new Plottable.Core.Broadcaster(this);
-                this._event2Callback["touchcancel"] = function (e) { return _this._measureAndBroadcast(e, _this._cancelBroadcaster); };
-                this._broadcasters = [this._moveBroadcaster, this._startBroadcaster, this._endBroadcaster, this._cancelBroadcaster];
+                this._startCallbacks = new Plottable.Utils.CallbackSet();
+                this._moveCallbacks = new Plottable.Utils.CallbackSet();
+                this._endCallbacks = new Plottable.Utils.CallbackSet();
+                this._cancelCallbacks = new Plottable.Utils.CallbackSet();
+                this._callbacks = [this._moveCallbacks, this._startCallbacks, this._endCallbacks, this._cancelCallbacks];
+                this._event2Callback["touchstart"] = function (e) { return _this._measureAndBroadcast(e, _this._startCallbacks); };
+                this._event2Callback["touchmove"] = function (e) { return _this._measureAndBroadcast(e, _this._moveCallbacks); };
+                this._event2Callback["touchend"] = function (e) { return _this._measureAndBroadcast(e, _this._endCallbacks); };
+                this._event2Callback["touchcancel"] = function (e) { return _this._measureAndBroadcast(e, _this._cancelCallbacks); };
             }
             /**
              * Get a Dispatcher.Touch for the <svg> containing elem. If one already exists
@@ -9178,75 +9213,108 @@ var Plottable;
                 }
                 return dispatcher;
             };
-            Touch.prototype._getWrappedCallback = function (callback) {
-                return function (td, ids, idToPoint, e) { return callback(ids, idToPoint, e); };
-            };
             /**
-             * Registers a callback to be called whenever a touch starts,
-             * or removes the callback if `null` is passed as the callback.
+             * Registers a callback to be called whenever a touch starts.
              *
-             * @param {any} key The key associated with the callback.
-             *                  Key uniqueness is determined by deep equality.
              * @param {TouchCallback} callback A callback that takes the pixel position
              *                                     in svg-coordinate-space. Pass `null`
              *                                     to remove a callback.
              * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
              */
-            Touch.prototype.onTouchStart = function (key, callback) {
-                this._setCallback(this._startBroadcaster, key, callback);
+            Touch.prototype.onTouchStart = function (callback) {
+                this.setCallback(this._startCallbacks, callback);
                 return this;
             };
             /**
-             * Registers a callback to be called whenever the touch position changes,
-             * or removes the callback if `null` is passed as the callback.
+             * Removes the callback to be called whenever a touch starts.
              *
-             * @param {any} key The key associated with the callback.
-             *                  Key uniqueness is determined by deep equality.
              * @param {TouchCallback} callback A callback that takes the pixel position
              *                                     in svg-coordinate-space. Pass `null`
              *                                     to remove a callback.
              * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
              */
-            Touch.prototype.onTouchMove = function (key, callback) {
-                this._setCallback(this._moveBroadcaster, key, callback);
+            Touch.prototype.offTouchStart = function (callback) {
+                this.unsetCallback(this._startCallbacks, callback);
                 return this;
             };
             /**
-             * Registers a callback to be called whenever a touch ends,
-             * or removes the callback if `null` is passed as the callback.
+             * Registers a callback to be called whenever the touch position changes.
              *
-             * @param {any} key The key associated with the callback.
-             *                  Key uniqueness is determined by deep equality.
              * @param {TouchCallback} callback A callback that takes the pixel position
              *                                     in svg-coordinate-space. Pass `null`
              *                                     to remove a callback.
              * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
              */
-            Touch.prototype.onTouchEnd = function (key, callback) {
-                this._setCallback(this._endBroadcaster, key, callback);
+            Touch.prototype.onTouchMove = function (callback) {
+                this.setCallback(this._moveCallbacks, callback);
                 return this;
             };
             /**
-             * Registers a callback to be called whenever a touch is cancelled,
-             * or removes the callback if `null` is passed as the callback.
+             * Removes the callback to be called whenever the touch position changes.
              *
-             * @param {any} key The key associated with the callback.
-             *                  Key uniqueness is determined by deep equality.
              * @param {TouchCallback} callback A callback that takes the pixel position
              *                                     in svg-coordinate-space. Pass `null`
              *                                     to remove a callback.
              * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
              */
-            Touch.prototype.onTouchCancel = function (key, callback) {
-                this._setCallback(this._cancelBroadcaster, key, callback);
+            Touch.prototype.offTouchMove = function (callback) {
+                this.unsetCallback(this._moveCallbacks, callback);
+                return this;
+            };
+            /**
+             * Registers a callback to be called whenever a touch ends.
+             *
+             * @param {TouchCallback} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space. Pass `null`
+             *                                     to remove a callback.
+             * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
+             */
+            Touch.prototype.onTouchEnd = function (callback) {
+                this.setCallback(this._endCallbacks, callback);
+                return this;
+            };
+            /**
+             * Removes the callback to be called whenever a touch ends.
+             *
+             * @param {TouchCallback} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space. Pass `null`
+             *                                     to remove a callback.
+             * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
+             */
+            Touch.prototype.offTouchEnd = function (callback) {
+                this.unsetCallback(this._endCallbacks, callback);
+                return this;
+            };
+            /**
+             * Registers a callback to be called whenever a touch is cancelled.
+             *
+             * @param {TouchCallback} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space. Pass `null`
+             *                                     to remove a callback.
+             * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
+             */
+            Touch.prototype.onTouchCancel = function (callback) {
+                this.setCallback(this._cancelCallbacks, callback);
+                return this;
+            };
+            /**
+             * Removes the callback to be called whenever a touch is cancelled.
+             *
+             * @param {TouchCallback} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space. Pass `null`
+             *                                     to remove a callback.
+             * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
+             */
+            Touch.prototype.offTouchCancel = function (callback) {
+                this.unsetCallback(this._cancelCallbacks, callback);
                 return this;
             };
             /**
              * Computes the Touch position from the given event, and if successful
              * calls broadcast() on the supplied Broadcaster.
              */
-            Touch.prototype._measureAndBroadcast = function (e, b) {
-                var touches = e.changedTouches;
+            Touch.prototype._measureAndBroadcast = function (event, callbackSet) {
+                var touches = event.changedTouches;
                 var touchPositions = {};
                 var touchIdentifiers = [];
                 for (var i = 0; i < touches.length; i++) {
@@ -9260,7 +9328,7 @@ var Plottable;
                 }
                 ;
                 if (touchIdentifiers.length > 0) {
-                    b.broadcast(touchIdentifiers, touchPositions, e);
+                    callbackSet.callCallbacks(touchIdentifiers, touchPositions, event);
                 }
             };
             /**
@@ -9298,8 +9366,8 @@ var Plottable;
                 var _this = this;
                 _super.call(this);
                 this._event2Callback["keydown"] = function (e) { return _this._processKeydown(e); };
-                this._keydownBroadcaster = new Plottable.Core.Broadcaster(this);
-                this._broadcasters = [this._keydownBroadcaster];
+                this._keydownCallbacks = new Plottable.Utils.CallbackSet();
+                this._callbacks = [this._keydownCallbacks];
             }
             /**
              * Get a Dispatcher.Key. If one already exists it will be returned;
@@ -9315,24 +9383,28 @@ var Plottable;
                 }
                 return dispatcher;
             };
-            Key.prototype._getWrappedCallback = function (callback) {
-                return function (d, e) { return callback(e.keyCode, e); };
-            };
             /**
-             * Registers a callback to be called whenever a key is pressed,
-             * or removes the callback if `null` is passed as the callback.
+             * Registers a callback to be called whenever a key is pressed.
              *
-             * @param {any} key The registration key associated with the callback.
-             *                  Registration key uniqueness is determined by deep equality.
              * @param {KeyCallback} callback
              * @return {Dispatcher.Key} The calling Dispatcher.Key.
              */
-            Key.prototype.onKeyDown = function (key, callback) {
-                this._setCallback(this._keydownBroadcaster, key, callback);
+            Key.prototype.onKeyDown = function (callback) {
+                this.setCallback(this._keydownCallbacks, callback);
                 return this;
             };
-            Key.prototype._processKeydown = function (e) {
-                this._keydownBroadcaster.broadcast(e);
+            /**
+             * Removes the callback to be called whenever a key is pressed.
+             *
+             * @param {KeyCallback} callback
+             * @return {Dispatcher.Key} The calling Dispatcher.Key.
+             */
+            Key.prototype.offKeyDown = function (callback) {
+                this.unsetCallback(this._keydownCallbacks, callback);
+                return this;
+            };
+            Key.prototype._processKeydown = function (event) {
+                this._keydownCallbacks.callCallbacks(event.keyCode, event);
             };
             Key._DISPATCHER_KEY = "__Plottable_Dispatcher_Key";
             return Key;
@@ -9408,12 +9480,12 @@ var Plottable;
                 var _this = this;
                 _super.prototype._anchor.call(this, component);
                 this._mouseDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(component.content().node());
-                this._mouseDispatcher.onMouseDown("Interaction.Click" + this.getID(), function (p) { return _this._handleClickDown(p); });
-                this._mouseDispatcher.onMouseUp("Interaction.Click" + this.getID(), function (p) { return _this._handleClickUp(p); });
+                this._mouseDispatcher.onMouseDown(function (p) { return _this._handleClickDown(p); });
+                this._mouseDispatcher.onMouseUp(function (p) { return _this._handleClickUp(p); });
                 this._touchDispatcher = Plottable.Dispatchers.Touch.getDispatcher(component.content().node());
-                this._touchDispatcher.onTouchStart("Interaction.Click" + this.getID(), function (ids, idToPoint) { return _this._handleClickDown(idToPoint[ids[0]]); });
-                this._touchDispatcher.onTouchEnd("Interaction.Click" + this.getID(), function (ids, idToPoint) { return _this._handleClickUp(idToPoint[ids[0]]); });
-                this._touchDispatcher.onTouchCancel("Interaction.Click" + this.getID(), function (ids, idToPoint) { return _this._clickedDown = false; });
+                this._touchDispatcher.onTouchStart(function (ids, idToPoint) { return _this._handleClickDown(idToPoint[ids[0]]); });
+                this._touchDispatcher.onTouchEnd(function (ids, idToPoint) { return _this._handleClickUp(idToPoint[ids[0]]); });
+                this._touchDispatcher.onTouchCancel(function (ids, idToPoint) { return _this._clickedDown = false; });
             };
             Click.prototype._handleClickDown = function (p) {
                 var translatedPoint = this._translateToComponentSpace(p);
@@ -9470,13 +9542,13 @@ var Plottable;
                 var _this = this;
                 _super.prototype._anchor.call(this, component);
                 this._mouseDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(component.content().node());
-                this._mouseDispatcher.onMouseDown("Interactions.DoubleClick" + this.getID(), function (p) { return _this._handleClickDown(p); });
-                this._mouseDispatcher.onMouseUp("Interactions.DoubleClick" + this.getID(), function (p) { return _this._handleClickUp(p); });
-                this._mouseDispatcher.onDblClick("Interactions.DoubleClick" + this.getID(), function (p) { return _this._handleDblClick(); });
+                this._mouseDispatcher.onMouseDown(function (p) { return _this._handleClickDown(p); });
+                this._mouseDispatcher.onMouseUp(function (p) { return _this._handleClickUp(p); });
+                this._mouseDispatcher.onDblClick(function (p) { return _this._handleDblClick(); });
                 this._touchDispatcher = Plottable.Dispatchers.Touch.getDispatcher(component.content().node());
-                this._touchDispatcher.onTouchStart("Interactions.DoubleClick" + this.getID(), function (ids, idToPoint) { return _this._handleClickDown(idToPoint[ids[0]]); });
-                this._touchDispatcher.onTouchEnd("Interactions.DoubleClick" + this.getID(), function (ids, idToPoint) { return _this._handleClickUp(idToPoint[ids[0]]); });
-                this._touchDispatcher.onTouchCancel("Interaction.DoubleClick" + this.getID(), function (ids, idToPoint) { return _this._handleClickCancel(); });
+                this._touchDispatcher.onTouchStart(function (ids, idToPoint) { return _this._handleClickDown(idToPoint[ids[0]]); });
+                this._touchDispatcher.onTouchEnd(function (ids, idToPoint) { return _this._handleClickUp(idToPoint[ids[0]]); });
+                this._touchDispatcher.onTouchCancel(function (ids, idToPoint) { return _this._handleClickCancel(); });
             };
             DoubleClick.prototype._handleClickDown = function (p) {
                 var translatedP = this._translateToComponentSpace(p);
@@ -9547,9 +9619,9 @@ var Plottable;
                 var _this = this;
                 _super.prototype._anchor.call(this, component);
                 this._positionDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(this._componentToListenTo._element.node());
-                this._positionDispatcher.onMouseMove("Interaction.Key" + this.getID(), function (p) { return null; }); // HACKHACK: registering a listener
+                this._positionDispatcher.onMouseMove(function (p) { return null; }); // HACKHACK: registering a listener
                 this._keyDispatcher = Plottable.Dispatchers.Key.getDispatcher();
-                this._keyDispatcher.onKeyDown("Interaction.Key" + this.getID(), function (keyCode) { return _this._handleKeyEvent(keyCode); });
+                this._keyDispatcher.onKeyDown(function (keyCode) { return _this._handleKeyEvent(keyCode); });
             };
             Key.prototype._handleKeyEvent = function (keyCode) {
                 var p = this._translateToComponentSpace(this._positionDispatcher.getLastMousePosition());
@@ -9596,9 +9668,9 @@ var Plottable;
                 var _this = this;
                 _super.prototype._anchor.call(this, component);
                 this._mouseDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(this._componentToListenTo.content().node());
-                this._mouseDispatcher.onMouseMove("Interaction.Pointer" + this.getID(), function (p) { return _this._handlePointerEvent(p); });
+                this._mouseDispatcher.onMouseMove(function (p) { return _this._handlePointerEvent(p); });
                 this._touchDispatcher = Plottable.Dispatchers.Touch.getDispatcher(this._componentToListenTo.content().node());
-                this._touchDispatcher.onTouchStart("Interaction.Pointer" + this.getID(), function (ids, idToPoint) { return _this._handlePointerEvent(idToPoint[ids[0]]); });
+                this._touchDispatcher.onTouchStart(function (ids, idToPoint) { return _this._handlePointerEvent(idToPoint[ids[0]]); });
             };
             Pointer.prototype._handlePointerEvent = function (p) {
                 var translatedP = this._translateToComponentSpace(p);
@@ -9682,12 +9754,12 @@ var Plottable;
                 _super.prototype._anchor.call(this, component);
                 this._dragInteraction._anchor(component);
                 var mouseDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(this._componentToListenTo.content().node());
-                mouseDispatcher.onWheel("Interaction.PanZoom" + this.getID(), function (p, e) { return _this._handleWheelEvent(p, e); });
+                mouseDispatcher.onWheel(function (p, e) { return _this._handleWheelEvent(p, e); });
                 this._touchDispatcher = Plottable.Dispatchers.Touch.getDispatcher(this._componentToListenTo.content().node());
-                this._touchDispatcher.onTouchStart("Interaction.PanZoom" + this.getID(), function (ids, idToPoint, e) { return _this._handleTouchStart(ids, idToPoint, e); });
-                this._touchDispatcher.onTouchMove("Interaction.PanZoom" + this.getID(), function (ids, idToPoint, e) { return _this._handlePinch(ids, idToPoint, e); });
-                this._touchDispatcher.onTouchEnd("Interaction.PanZoom" + this.getID(), function (ids, idToPoint, e) { return _this._handleTouchEnd(ids, idToPoint, e); });
-                this._touchDispatcher.onTouchCancel("Interaction.PanZoom" + this.getID(), function (ids, idToPoint, e) { return _this._handleTouchEnd(ids, idToPoint, e); });
+                this._touchDispatcher.onTouchStart(function (ids, idToPoint, e) { return _this._handleTouchStart(ids, idToPoint, e); });
+                this._touchDispatcher.onTouchMove(function (ids, idToPoint, e) { return _this._handlePinch(ids, idToPoint, e); });
+                this._touchDispatcher.onTouchEnd(function (ids, idToPoint, e) { return _this._handleTouchEnd(ids, idToPoint, e); });
+                this._touchDispatcher.onTouchCancel(function (ids, idToPoint, e) { return _this._handleTouchEnd(ids, idToPoint, e); });
             };
             PanZoom.prototype._handleTouchStart = function (ids, idToPoint, e) {
                 for (var i = 0; i < ids.length && this._touchIds.size() < 2; i++) {
@@ -9818,14 +9890,13 @@ var Plottable;
                 var _this = this;
                 _super.prototype._anchor.call(this, component);
                 this._mouseDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(this._componentToListenTo.content().node());
-                this._mouseDispatcher.onMouseDown("Interactions.Drag" + this.getID(), function (p, e) { return _this._startDrag(p, e); });
-                this._mouseDispatcher.onMouseMove("Interactions.Drag" + this.getID(), function (p, e) { return _this._doDrag(p, e); });
-                this._mouseDispatcher.onMouseUp("Interactions.Drag" + this.getID(), function (p, e) { return _this._endDrag(p, e); });
+                this._mouseDispatcher.onMouseDown(function (p, e) { return _this._startDrag(p, e); });
+                this._mouseDispatcher.onMouseMove(function (p, e) { return _this._doDrag(p, e); });
+                this._mouseDispatcher.onMouseUp(function (p, e) { return _this._endDrag(p, e); });
                 this._touchDispatcher = Plottable.Dispatchers.Touch.getDispatcher(this._componentToListenTo.content().node());
-                this._touchDispatcher.onTouchStart("Interactions.Drag" + this.getID(), function (ids, idToPoint, e) { return _this._startDrag(idToPoint[ids[0]], e); });
-                this._touchDispatcher.onTouchMove("Interactions.Drag" + this.getID(), function (ids, idToPoint, e) { return _this._doDrag(idToPoint[ids[0]], e); });
-                this._touchDispatcher.onTouchEnd("Interactions.Drag" + this.getID(), function (ids, idToPoint, e) { return _this._endDrag(idToPoint[ids[0]], e); });
-                this._touchDispatcher.onTouchCancel("Interaction.Drag" + this.getID(), function (ids, idToPoint, e) { return _this._dragging = false; });
+                this._touchDispatcher.onTouchStart(function (ids, idToPoint, e) { return _this._startDrag(idToPoint[ids[0]], e); });
+                this._touchDispatcher.onTouchMove(function (ids, idToPoint, e) { return _this._doDrag(idToPoint[ids[0]], e); });
+                this._touchDispatcher.onTouchEnd(function (ids, idToPoint, e) { return _this._endDrag(idToPoint[ids[0]], e); });
             };
             Drag.prototype._translateAndConstrain = function (p) {
                 var translatedP = this._translateToComponentSpace(p);

@@ -48,15 +48,15 @@ describe("Dispatchers", () => {
       var cb2Called = false;
       var cb2 = (p: Plottable.Point, e: MouseEvent) => cb2Called = true;
 
-      md.onMouseMove("callback1", cb1);
-      md.onMouseMove("callback2", cb2);
+      md.onMouseMove(cb1);
+      md.onMouseMove(cb2);
       triggerFakeMouseEvent("mousemove", target, targetX, targetY);
       assert.isTrue(cb1Called, "callback 1 was called on mousemove");
       assert.isTrue(cb2Called, "callback 2 was called on mousemove");
 
       cb1Called = false;
       cb2Called = false;
-      md.onMouseMove("callback1", null);
+      md.offMouseMove(cb1);
       triggerFakeMouseEvent("mousemove", target, targetX, targetY);
       assert.isFalse(cb1Called, "callback was not called after blanking");
       assert.isTrue(cb2Called, "callback 2 was still called");
@@ -78,8 +78,7 @@ describe("Dispatchers", () => {
       var callbackWasCalled = false;
       var callback = (p: Plottable.Point, e: MouseEvent) => callbackWasCalled = true;
 
-      var keyString = "notInDomTest";
-      md.onMouseMove(keyString, callback);
+      md.onMouseMove(callback);
       triggerFakeMouseEvent("mousemove", target, targetX, targetY);
       assert.isTrue(callbackWasCalled, "callback was called on mousemove");
 
@@ -88,7 +87,7 @@ describe("Dispatchers", () => {
       triggerFakeMouseEvent("mousemove", target, targetX, targetY);
       assert.isFalse(callbackWasCalled, "callback was not called after <svg> was removed from DOM");
 
-      md.onMouseMove(keyString, null);
+      md.offMouseMove(callback);
     });
 
     it("calls callbacks on mouseover, mousemove, and mouseout", () => {
@@ -113,8 +112,7 @@ describe("Dispatchers", () => {
         assert.isNotNull(e, "mouse event was passed to the callback");
       };
 
-      var keyString = "unit test";
-      md.onMouseMove(keyString, callback);
+      md.onMouseMove(callback);
 
       triggerFakeMouseEvent("mouseover", target, targetX, targetY);
       assert.isTrue(callbackWasCalled, "callback was called on mouseover");
@@ -125,7 +123,7 @@ describe("Dispatchers", () => {
       triggerFakeMouseEvent("mouseout", target, targetX, targetY);
       assert.isTrue(callbackWasCalled, "callback was called on mouseout");
 
-      md.onMouseMove(keyString, null);
+      md.offMouseMove(callback);
       target.remove();
     });
 
@@ -151,13 +149,12 @@ describe("Dispatchers", () => {
         assert.isNotNull(e, "mouse event was passed to the callback");
       };
 
-      var keyString = "unit test";
-      md.onMouseDown(keyString, callback);
+      md.onMouseDown(callback);
 
       triggerFakeMouseEvent("mousedown", target, targetX, targetY);
       assert.isTrue(callbackWasCalled, "callback was called on mousedown");
 
-      md.onMouseDown(keyString, null);
+      md.offMouseDown(callback);
       target.remove();
     });
 
@@ -183,13 +180,12 @@ describe("Dispatchers", () => {
         assert.isNotNull(e, "mouse event was passed to the callback");
       };
 
-      var keyString = "unit test";
-      md.onMouseUp(keyString, callback);
+      md.onMouseUp(callback);
 
       triggerFakeMouseEvent("mouseup", target, targetX, targetY);
       assert.isTrue(callbackWasCalled, "callback was called on mouseup");
 
-      md.onMouseUp(keyString, null);
+      md.offMouseUp(callback);
       target.remove();
     });
 
@@ -222,13 +218,12 @@ describe("Dispatchers", () => {
         assert.isNotNull(e, "mouse event was passed to the callback");
       };
 
-      var keyString = "unit test";
-      md.onWheel(keyString, callback);
+      md.onWheel(callback);
 
       triggerFakeWheelEvent("wheel", svg, targetX, targetY, targetDeltaY);
       assert.isTrue(callbackWasCalled, "callback was called on wheel");
 
-      md.onWheel(keyString, null);
+      md.offWheel(callback);
       svg.remove();
     });
 
@@ -253,13 +248,12 @@ describe("Dispatchers", () => {
         assert.isNotNull(e, "mouse event was passed to the callback");
       };
 
-      var keyString = "unit test";
-      md.onDblClick(keyString, callback);
+      md.onDblClick(callback);
 
       triggerFakeMouseEvent("dblclick", target, targetX, targetY);
       assert.isTrue(callbackWasCalled, "callback was called on dblClick");
 
-      md.onDblClick(keyString, null);
+      md.offDblClick(callback);
       target.remove();
     });
   });

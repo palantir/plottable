@@ -15,22 +15,14 @@ export module Interactions {
     public _anchor(component: Component) {
       super._anchor(component);
       this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(<SVGElement> this._componentToListenTo.content().node());
-      this._mouseDispatcher.onMouseDown("Interactions.Drag" + this.getID(),
-        (p: Point, e: MouseEvent) => this._startDrag(p, e));
-      this._mouseDispatcher.onMouseMove("Interactions.Drag" + this.getID(),
-        (p: Point, e: MouseEvent) => this._doDrag(p, e));
-      this._mouseDispatcher.onMouseUp("Interactions.Drag" + this.getID(),
-        (p: Point, e: MouseEvent) => this._endDrag(p, e));
+      this._mouseDispatcher.onMouseDown((p: Point, e: MouseEvent) => this._startDrag(p, e));
+      this._mouseDispatcher.onMouseMove((p: Point, e: MouseEvent) => this._doDrag(p, e));
+      this._mouseDispatcher.onMouseUp((p: Point, e: MouseEvent) => this._endDrag(p, e));
 
       this._touchDispatcher = Dispatchers.Touch.getDispatcher(<SVGElement> this._componentToListenTo.content().node());
-      this._touchDispatcher.onTouchStart("Interactions.Drag" + this.getID(),
-        (ids, idToPoint, e) => this._startDrag(idToPoint[ids[0]], e));
-      this._touchDispatcher.onTouchMove("Interactions.Drag" + this.getID(),
-        (ids, idToPoint, e) => this._doDrag(idToPoint[ids[0]], e));
-      this._touchDispatcher.onTouchEnd("Interactions.Drag" + this.getID(),
-        (ids, idToPoint, e) => this._endDrag(idToPoint[ids[0]], e));
-      this._touchDispatcher.onTouchCancel("Interaction.Drag" + this.getID(),
-        (ids, idToPoint, e) => this._dragging = false);
+      this._touchDispatcher.onTouchStart((ids, idToPoint, e) => this._startDrag(idToPoint[ids[0]], e));
+      this._touchDispatcher.onTouchMove((ids, idToPoint, e) => this._doDrag(idToPoint[ids[0]], e));
+      this._touchDispatcher.onTouchEnd((ids, idToPoint, e) => this._endDrag(idToPoint[ids[0]], e));
     }
 
     private _translateAndConstrain(p: Point) {
