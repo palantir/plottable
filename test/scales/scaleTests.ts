@@ -94,7 +94,7 @@ describe("Scales", () => {
       assert.deepEqual(scale.domain(), [-10, 10], "scale domain accounts for second provider");
     });
 
-   	it("removeExtentProvider()", () => {
+    it("removeExtentProvider()", () => {
       var posProvider: Plottable.Scales.ExtentProvider<number> = (scale: Plottable.Scale<number, number>) => [[0, 10]];
       scale.addExtentProvider(posProvider);
       var negProvider: Plottable.Scales.ExtentProvider<number> = (scale: Plottable.Scale<number, number>) => [[-10, 0]];
