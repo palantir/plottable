@@ -59,8 +59,6 @@ export module Dispatchers {
       this._moveCallbackSet = new Utils.CallbackSet();
       this._endCallbackSet = new Utils.CallbackSet();
 
-
-
       this._event2Callback["touchstart"] = (e: TouchEvent) => this._measureAndBroadcast(e, this._startBroadcaster,
         this._startCallbackSet);
       this._event2Callback["touchmove"] = (e: TouchEvent) => this._measureAndBroadcast(e, this._moveBroadcaster,
@@ -70,10 +68,6 @@ export module Dispatchers {
 
       this._broadcasters = [this._moveBroadcaster, this._startBroadcaster, this._endBroadcaster];
       this._callbackSets = [this._moveCallbackSet, this._startCallbackSet, this._endCallbackSet];
-    }
-
-    protected _getWrappedCallback(callback: Function): Core.BroadcasterCallback<Dispatchers.Touch> {
-      return (td: Dispatchers.Touch, ids: number[], idToPoint: { [id: number]: Point; }, e: MouseEvent) => callback(ids, idToPoint, e);
     }
 
     /**
@@ -154,7 +148,6 @@ export module Dispatchers {
         }
       };
       if (touchIdentifiers.length > 0) {
-        // b.broadcast(touchIdentifiers, touchPositions, e);
         callbackSet.callCallbacks(touchIdentifiers, touchPositions, e);
       }
     }

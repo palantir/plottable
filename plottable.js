@@ -8914,7 +8914,6 @@ var Plottable;
             this._connected = false;
         }
         Dispatcher.prototype._hasNoListeners = function () {
-            // return this._broadcasters.every((b) => b.getListenerKeys().length === 0);
             return this._callbackSets.every(function (cbs) { return cbs.values().length === 0; });
         };
         Dispatcher.prototype._connect = function () {
@@ -8938,15 +8937,9 @@ var Plottable;
                 this._connected = false;
             }
         };
-        /**
-         * Creates a wrapped version of the callback that can be registered to a Broadcaster
-         */
-        Dispatcher.prototype._getWrappedCallback = function (callback) {
-            return function () { return callback(); };
-        };
         Dispatcher.prototype._setCallback = function (callbackSet, key, callback) {
             if (callback === null) {
-                // broadcaster.deregisterListener(key);
+                console.error("THIS SHOULD NOT HAPPEN");
                 callbackSet.remove(callback);
                 this._disconnect();
             }
@@ -9024,9 +9017,6 @@ var Plottable;
                     svg[Mouse._DISPATCHER_KEY] = dispatcher;
                 }
                 return dispatcher;
-            };
-            Mouse.prototype._getWrappedCallback = function (callback) {
-                return function (md, p, e) { return callback(p, e); };
             };
             /**
              * Registers a callback to be called whenever the mouse position changes,
@@ -9131,7 +9121,6 @@ var Plottable;
                 var newMousePosition = this.translator.computePosition(e.clientX, e.clientY);
                 if (newMousePosition != null) {
                     this._lastMousePosition = newMousePosition;
-                    // b.broadcast(this.getLastMousePosition(), e);
                     callbackSet.callCallbacks(this.getLastMousePosition(), e);
                 }
             };
@@ -9200,9 +9189,6 @@ var Plottable;
                     svg[Touch._DISPATCHER_KEY] = dispatcher;
                 }
                 return dispatcher;
-            };
-            Touch.prototype._getWrappedCallback = function (callback) {
-                return function (td, ids, idToPoint, e) { return callback(ids, idToPoint, e); };
             };
             /**
              * Registers a callback to be called whenever a touch starts,
@@ -9280,7 +9266,6 @@ var Plottable;
                 }
                 ;
                 if (touchIdentifiers.length > 0) {
-                    // b.broadcast(touchIdentifiers, touchPositions, e);
                     callbackSet.callCallbacks(touchIdentifiers, touchPositions, e);
                 }
             };
@@ -9338,9 +9323,6 @@ var Plottable;
                 }
                 return dispatcher;
             };
-            Key.prototype._getWrappedCallback = function (callback) {
-                return function (d, e) { return callback(e.keyCode, e); };
-            };
             /**
              * Registers a callback to be called whenever a key is pressed,
              * or removes the callback if `null` is passed as the callback.
@@ -9360,7 +9342,6 @@ var Plottable;
             };
             Key.prototype._processKeydown = function (e) {
                 this._keydownCallbackSet.callCallbacks(e.keyCode, e);
-                // this._keydownBroadcaster.broadcast(e);
             };
             Key._DISPATCHER_KEY = "__Plottable_Dispatcher_Key";
             return Key;

@@ -8,9 +8,7 @@ module Plottable {
     private _connected = false;
 
     private _hasNoListeners() {
-      // return this._broadcasters.every((b) => b.getListenerKeys().length === 0);
       return this._callbackSets.every((cbs) => cbs.values().length === 0);
-
     }
 
     private _connect() {
@@ -34,22 +32,14 @@ module Plottable {
       }
     }
 
-    /**
-     * Creates a wrapped version of the callback that can be registered to a Broadcaster
-     */
-    protected _getWrappedCallback(callback: Function): Core.BroadcasterCallback<Dispatcher> {
-      return () => callback();
-    }
-
     protected _setCallback(callbackSet: Utils.CallbackSet<Function>, key: any, callback: Function) {
       if (callback === null) { // remove listener if callback is null
-        // broadcaster.deregisterListener(key);
+        console.error("THIS SHOULD NOT HAPPEN");
         callbackSet.remove(callback);
         this._disconnect();
       } else {
         this._connect();
         callbackSet.add(callback);
-        // broadcaster.registerListener(key, this._getWrappedCallback(callback));
       }
     }
 

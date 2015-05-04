@@ -3524,10 +3524,6 @@ declare module Plottable {
         };
         protected _broadcasters: Core.Broadcaster<Dispatcher>[];
         protected _callbackSets: Utils.CallbackSet<Function>[];
-        /**
-         * Creates a wrapped version of the callback that can be registered to a Broadcaster
-         */
-        protected _getWrappedCallback(callback: Function): Core.BroadcasterCallback<Dispatcher>;
         protected _setCallback(callbackSet: Utils.CallbackSet<Function>, key: any, callback: Function): void;
         protected _unsetCallback(callbackSet: Utils.CallbackSet<Function>, key: any, callback: Function): void;
     }
@@ -3553,7 +3549,6 @@ declare module Plottable {
              * @param {SVGElement} svg The root <svg> element to attach to.
              */
             constructor(svg: SVGElement);
-            protected _getWrappedCallback(callback: Function): Core.BroadcasterCallback<Dispatchers.Mouse>;
             /**
              * Registers a callback to be called whenever the mouse position changes,
              * or removes the callback if `null` is passed as the callback.
@@ -3654,7 +3649,6 @@ declare module Plottable {
              * @param {SVGElement} svg The root <svg> element to attach to.
              */
             constructor(svg: SVGElement);
-            protected _getWrappedCallback(callback: Function): Core.BroadcasterCallback<Dispatchers.Touch>;
             /**
              * Registers a callback to be called whenever a touch starts,
              * or removes the callback if `null` is passed as the callback.
@@ -3717,7 +3711,6 @@ declare module Plottable {
              * @param {SVGElement} svg The root <svg> element to attach to.
              */
             constructor();
-            protected _getWrappedCallback(callback: Function): Core.BroadcasterCallback<Dispatchers.Key>;
             /**
              * Registers a callback to be called whenever a key is pressed,
              * or removes the callback if `null` is passed as the callback.

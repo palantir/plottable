@@ -42,10 +42,6 @@ export module Dispatchers {
       this._callbackSets = [this._keydownCallbackSet];
     }
 
-    protected _getWrappedCallback(callback: Function): Core.BroadcasterCallback<Dispatchers.Key> {
-      return (d: Dispatchers.Key, e: KeyboardEvent) => callback(e.keyCode, e);
-    }
-
     /**
      * Registers a callback to be called whenever a key is pressed,
      * or removes the callback if `null` is passed as the callback.
@@ -59,6 +55,7 @@ export module Dispatchers {
       this._setCallback(this._keydownCallbackSet, key, callback);
       return this;
     }
+
     public offKeyDown(key: any, callback: KeyCallback): Key {
       this._unsetCallback(this._keydownCallbackSet, key, callback);
       return this;
@@ -66,7 +63,6 @@ export module Dispatchers {
 
     private _processKeydown(e: KeyboardEvent) {
       this._keydownCallbackSet.callCallbacks(e.keyCode, e);
-      // this._keydownBroadcaster.broadcast(e);
     }
   }
 }

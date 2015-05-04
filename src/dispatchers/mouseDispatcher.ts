@@ -83,10 +83,6 @@ export module Dispatchers {
 
     }
 
-    protected _getWrappedCallback(callback: Function): Core.BroadcasterCallback<Dispatchers.Mouse> {
-      return (md: Dispatchers.Mouse, p: Point, e: MouseEvent) => callback(p, e);
-    }
-
     /**
      * Registers a callback to be called whenever the mouse position changes,
      * or removes the callback if `null` is passed as the callback.
@@ -195,8 +191,6 @@ export module Dispatchers {
       var newMousePosition = this.translator.computePosition(e.clientX, e.clientY);
       if (newMousePosition != null) {
         this._lastMousePosition = newMousePosition;
-        // b.broadcast(this.getLastMousePosition(), e);
-
         callbackSet.callCallbacks(this.getLastMousePosition(), e);
       }
     }
