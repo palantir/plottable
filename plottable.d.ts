@@ -3541,7 +3541,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Dispatchers {
-        type MouseCallback = (p: Point, e: MouseEvent) => any;
+        type MouseCallback = (p: Point, event: MouseEvent) => any;
         class Mouse extends Dispatcher {
             /**
              * Get a Dispatcher.Mouse for the <svg> containing elem. If one already exists
@@ -3666,7 +3666,7 @@ declare module Plottable {
     module Dispatchers {
         type TouchCallback = (ids: number[], idToPoint: {
             [id: number]: Point;
-        }, e: TouchEvent) => any;
+        }, event: TouchEvent) => any;
         class Touch extends Dispatcher {
             /**
              * Get a Dispatcher.Touch for the <svg> containing elem. If one already exists
@@ -3762,7 +3762,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Dispatchers {
-        type KeyCallback = (keyCode: number, e: KeyboardEvent) => any;
+        type KeyCallback = (keyCode: number, event: KeyboardEvent) => any;
         class Key extends Dispatcher {
             /**
              * Get a Dispatcher.Key. If one already exists it will be returned;

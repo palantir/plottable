@@ -9142,11 +9142,11 @@ var Plottable;
              * Computes the mouse position from the given event, and if successful
              * calls broadcast() on the supplied Broadcaster.
              */
-            Mouse.prototype._measureAndBroadcast = function (e, callbackSet) {
-                var newMousePosition = this.translator.computePosition(e.clientX, e.clientY);
+            Mouse.prototype._measureAndBroadcast = function (event, callbackSet) {
+                var newMousePosition = this.translator.computePosition(event.clientX, event.clientY);
                 if (newMousePosition != null) {
                     this._lastMousePosition = newMousePosition;
-                    callbackSet.callCallbacks(this.getLastMousePosition(), e);
+                    callbackSet.callCallbacks(this.getLastMousePosition(), event);
                 }
             };
             /**
@@ -9313,8 +9313,8 @@ var Plottable;
              * Computes the Touch position from the given event, and if successful
              * calls broadcast() on the supplied Broadcaster.
              */
-            Touch.prototype._measureAndBroadcast = function (e, callbackSet) {
-                var touches = e.changedTouches;
+            Touch.prototype._measureAndBroadcast = function (event, callbackSet) {
+                var touches = event.changedTouches;
                 var touchPositions = {};
                 var touchIdentifiers = [];
                 for (var i = 0; i < touches.length; i++) {
@@ -9328,7 +9328,7 @@ var Plottable;
                 }
                 ;
                 if (touchIdentifiers.length > 0) {
-                    callbackSet.callCallbacks(touchIdentifiers, touchPositions, e);
+                    callbackSet.callCallbacks(touchIdentifiers, touchPositions, event);
                 }
             };
             /**
@@ -9403,8 +9403,8 @@ var Plottable;
                 this.unsetCallback(this._keydownCallbacks, callback);
                 return this;
             };
-            Key.prototype._processKeydown = function (e) {
-                this._keydownCallbacks.callCallbacks(e.keyCode, e);
+            Key.prototype._processKeydown = function (event) {
+                this._keydownCallbacks.callCallbacks(event.keyCode, event);
             };
             Key._DISPATCHER_KEY = "__Plottable_Dispatcher_Key";
             return Key;

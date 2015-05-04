@@ -2,11 +2,11 @@
 
 module Plottable {
 export module Dispatchers {
-  export type KeyCallback = (keyCode: number, e: KeyboardEvent) => any;
+  export type KeyCallback = (keyCode: number, event: KeyboardEvent) => any;
 
   export class Key extends Dispatcher {
     private static _DISPATCHER_KEY = "__Plottable_Dispatcher_Key";
-    private _keydownCallbacks: Utils.CallbackSet<Function>;
+    private _keydownCallbacks: Utils.CallbackSet<KeyCallback>;
 
     /**
      * Get a Dispatcher.Key. If one already exists it will be returned;
@@ -34,7 +34,7 @@ export module Dispatchers {
 
       this._event2Callback["keydown"] = (e: KeyboardEvent) => this._processKeydown(e);
 
-      this._keydownCallbacks = new Utils.CallbackSet();
+      this._keydownCallbacks = new Utils.CallbackSet<KeyCallback>();
       this._callbacks = [this._keydownCallbacks];
     }
 
@@ -60,8 +60,8 @@ export module Dispatchers {
       return this;
     }
 
-    private _processKeydown(e: KeyboardEvent) {
-      this._keydownCallbacks.callCallbacks(e.keyCode, e);
+    private _processKeydown(event: KeyboardEvent) {
+      this._keydownCallbacks.callCallbacks(event.keyCode, event);
     }
   }
 }

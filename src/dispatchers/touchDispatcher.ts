@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Dispatchers {
-  export type TouchCallback = (ids: number[], idToPoint: { [id: number]: Point; }, e: TouchEvent) => any;
+  export type TouchCallback = (ids: number[], idToPoint: { [id: number]: Point; }, event: TouchEvent) => any;
 
   export class Touch extends Dispatcher {
     /**
@@ -13,10 +13,10 @@ export module Dispatchers {
 
     private static _DISPATCHER_KEY = "__Plottable_Dispatcher_Touch";
     private translator: Utils.ClientToSVGTranslator;
-    private _startCallbacks: Utils.CallbackSet<Function>;
-    private _moveCallbacks: Utils.CallbackSet<Function>;
-    private _endCallbacks: Utils.CallbackSet<Function>;
-    private _cancelCallbacks: Utils.CallbackSet<Function>;
+    private _startCallbacks: Utils.CallbackSet<TouchCallback>;
+    private _moveCallbacks: Utils.CallbackSet<TouchCallback>;
+    private _endCallbacks: Utils.CallbackSet<TouchCallback>;
+    private _cancelCallbacks: Utils.CallbackSet<TouchCallback>;
 
     /**
      * Get a Dispatcher.Touch for the <svg> containing elem. If one already exists
@@ -47,10 +47,10 @@ export module Dispatchers {
 
       this.translator = Utils.ClientToSVGTranslator.getTranslator(svg);
 
-      this._startCallbacks = new Utils.CallbackSet();
-      this._moveCallbacks = new Utils.CallbackSet();
-      this._endCallbacks = new Utils.CallbackSet();
-      this._cancelCallbacks = new Utils.CallbackSet();
+      this._startCallbacks = new Utils.CallbackSet<TouchCallback>();
+      this._moveCallbacks = new Utils.CallbackSet<TouchCallback>();
+      this._endCallbacks = new Utils.CallbackSet<TouchCallback>();
+      this._cancelCallbacks = new Utils.CallbackSet<TouchCallback>();
       this._callbacks = [this._moveCallbacks, this._startCallbacks, this._endCallbacks, this._cancelCallbacks];
 
       this._event2Callback["touchstart"] = (e: TouchEvent) => this._measureAndBroadcast(e, this._startCallbacks);
@@ -167,8 +167,8 @@ export module Dispatchers {
      * Computes the Touch position from the given event, and if successful
      * calls broadcast() on the supplied Broadcaster.
      */
-    private _measureAndBroadcast(e: TouchEvent, callbackSet: Utils.CallbackSet<Function>) {
-      var touches = e.changedTouches;
+    private _measureAndBroadcast(event: TouchEvent, callbackSet: Utils.CallbackSet<TouchCallback>) {
+      var touches = event.changedTouches;
       var touchPositions: { [id: number]: Point; } = {};
       var touchIdentifiers: number[] = [];
       for (var i = 0; i < touches.length; i++) {
@@ -181,7 +181,7 @@ export module Dispatchers {
         }
       };
       if (touchIdentifiers.length > 0) {
-        callbackSet.callCallbacks(touchIdentifiers, touchPositions, e);
+        callbackSet.callCallbacks(touchIdentifiers, touchPositions, event);
       }
     }
   }

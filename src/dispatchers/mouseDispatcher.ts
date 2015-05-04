@@ -2,18 +2,18 @@
 
 module Plottable {
 export module Dispatchers {
-  export type MouseCallback = (p: Point, e: MouseEvent) => any;
+  export type MouseCallback = (p: Point, event: MouseEvent) => any;
 
   export class Mouse extends Dispatcher {
     private static _DISPATCHER_KEY = "__Plottable_Dispatcher_Mouse";
     private translator: Utils.ClientToSVGTranslator;
     private _lastMousePosition: Point;
 
-    private _moveCallbacks: Utils.CallbackSet<Function>;
-    private _downCallbacks: Utils.CallbackSet<Function>;
-    private _upCallbacks: Utils.CallbackSet<Function>;
-    private _wheelCallbacks: Utils.CallbackSet<Function>;
-    private _dblClickCallbacks: Utils.CallbackSet<Function>;
+    private _moveCallbacks: Utils.CallbackSet<MouseCallback>;
+    private _downCallbacks: Utils.CallbackSet<MouseCallback>;
+    private _upCallbacks: Utils.CallbackSet<MouseCallback>;
+    private _wheelCallbacks: Utils.CallbackSet<MouseCallback>;
+    private _dblClickCallbacks: Utils.CallbackSet<MouseCallback>;
 
     /**
      * Get a Dispatcher.Mouse for the <svg> containing elem. If one already exists
@@ -46,11 +46,11 @@ export module Dispatchers {
 
       this._lastMousePosition = { x: -1, y: -1 };
 
-      this._moveCallbacks = new Plottable.Utils.CallbackSet();
-      this._downCallbacks = new Plottable.Utils.CallbackSet();
-      this._upCallbacks = new Plottable.Utils.CallbackSet();
-      this._wheelCallbacks = new Plottable.Utils.CallbackSet();
-      this._dblClickCallbacks = new Plottable.Utils.CallbackSet();
+      this._moveCallbacks = new Plottable.Utils.CallbackSet<MouseCallback>();
+      this._downCallbacks = new Plottable.Utils.CallbackSet<MouseCallback>();
+      this._upCallbacks = new Plottable.Utils.CallbackSet<MouseCallback>();
+      this._wheelCallbacks = new Plottable.Utils.CallbackSet<MouseCallback>();
+      this._dblClickCallbacks = new Plottable.Utils.CallbackSet<MouseCallback>();
       this._callbacks = [this._moveCallbacks, this._downCallbacks, this._upCallbacks, this._wheelCallbacks,
                          this._dblClickCallbacks];
 
@@ -198,11 +198,11 @@ export module Dispatchers {
      * Computes the mouse position from the given event, and if successful
      * calls broadcast() on the supplied Broadcaster.
      */
-    private _measureAndBroadcast(e: MouseEvent, callbackSet: Utils.CallbackSet<Function>) {
-      var newMousePosition = this.translator.computePosition(e.clientX, e.clientY);
+    private _measureAndBroadcast(event: MouseEvent, callbackSet: Utils.CallbackSet<MouseCallback>) {
+      var newMousePosition = this.translator.computePosition(event.clientX, event.clientY);
       if (newMousePosition != null) {
         this._lastMousePosition = newMousePosition;
-        callbackSet.callCallbacks(this.getLastMousePosition(), e);
+        callbackSet.callCallbacks(this.getLastMousePosition(), event);
       }
     }
 
