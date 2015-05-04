@@ -6,8 +6,6 @@ describe("Plots", () => {
 
   describe("Stacked Plot Stacking", () => {
     var stackedPlot: Plottable.Stacked<number, number>;
-    var SVG_WIDTH = 600;
-    var SVG_HEIGHT = 400;
 
     beforeEach(() => {
       var xScale = new Plottable.Scales.Linear();
@@ -173,7 +171,7 @@ describe("Plots", () => {
     var data2: any[];
 
     beforeEach(() => {
-      svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       xScale = new Plottable.Scales.Linear().domain([1, 2]);
       yScale = new Plottable.Scales.Linear();
 
@@ -225,7 +223,7 @@ describe("Plots", () => {
     var data2: any[];
 
     beforeEach(() => {
-      svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       xScale = new Plottable.Scales.Category().domain(["a", "b"]);
       yScale = new Plottable.Scales.Linear();
 
@@ -274,7 +272,7 @@ describe("Plots", () => {
     var stackedBarPlot: Plottable.Plots.StackedBar<string, number>;
 
     beforeEach(() => {
-      svg = generateSVG(600, 400);
+      svg = TestMethods.generateSVG(600, 400);
 
       xScale = new Plottable.Scales.Category();
       yScale = new Plottable.Scales.Linear();

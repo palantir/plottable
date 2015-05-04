@@ -40,7 +40,7 @@ export module Components {
         throw new Error("InterpolatedColorLegend requires a interpolatedColorScale");
       }
       this._scale = interpolatedColorScale;
-      this._scale.registerCoolListener(this, () => this._invalidateLayout());
+      this._scale.registerCoolListener(this, () => this.redraw());
       this._formatter = formatter;
       this._orientation = InterpolatedColorLegend._ensureOrientation(orientation);
 
@@ -72,7 +72,7 @@ export module Components {
         return this._formatter;
       }
       this._formatter = formatter;
-      this._invalidateLayout();
+      this.redraw();
       return this;
     }
 
@@ -104,7 +104,7 @@ export module Components {
         return this._orientation;
       } else {
         this._orientation = InterpolatedColorLegend._ensureOrientation(newOrientation);
-        this._invalidateLayout();
+        this.redraw();
         return this;
       }
     }
@@ -171,7 +171,6 @@ export module Components {
 
       var domain = this._scale.domain();
 
-      var textHeight = this._measurer.measure().height;
       var text0 = this._formatter(domain[0]);
       var text0Width = this._measurer.measure(text0).width;
       var text1 = this._formatter(domain[1]);

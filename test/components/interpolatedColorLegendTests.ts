@@ -7,7 +7,7 @@ describe("InterpolatedColorLegend", () => {
   var colorScale: Plottable.Scales.InterpolatedColor;
 
   beforeEach(() => {
-    svg = generateSVG(400, 400);
+    svg = TestMethods.generateSVG(400, 400);
     colorScale = new Plottable.Scales.InterpolatedColor();
   });
 

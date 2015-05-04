@@ -4,7 +4,7 @@ module Plottable {
   export class Scale<D, R> extends Core.PlottableObject {
     protected _d3Scale: D3.Scale.Scale;
     private _autoDomainAutomatically = true;
-    private broadcaster: Core.Broadcaster<Scale<D, R>>;
+    public broadcaster: Core.Broadcaster<Scale<D, R>>;
     private _rendererAttrID2Extent: {[rendererAttrID: string]: D[]} = {};
     public _typeCoercer: (d: any) => any = (d: any) => d;
     private _domainModificationInProgress: boolean = false;
@@ -36,7 +36,7 @@ module Plottable {
         this.broadcaster.registerListener(key, callback);
     }
 
-    public deregisterCoolListener(key: any, callback: Core.BroadcasterCallback<Scale<D, R>>) {
+    public deregisterCoolListener(key: any) {
         this.broadcaster.deregisterListener(key);
     }
 

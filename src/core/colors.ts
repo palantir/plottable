@@ -17,7 +17,6 @@ export module Core {
     public static BRIGHT_SUN      = "#fad419";
     public static JACARTA         = "#2c2b6f";
 
-
     public static PLOTTABLE_COLORS = [
       Colors.INDIGO,
       Colors.CORAL_RED,

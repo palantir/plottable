@@ -4,13 +4,9 @@ var assert = chai.assert;
 
 describe("Dispatchers", () => {
   describe("Mouse Dispatcher", () => {
-    function assertPointsClose(actual: Plottable.Point, expected: Plottable.Point, epsilon: number, message: String) {
-      assert.closeTo(actual.x, expected.x, epsilon, message + " (x)");
-      assert.closeTo(actual.y, expected.y, epsilon, message + " (y)");
-    };
 
     it("getDispatcher() creates only one Dispatcher.Mouse per <svg>", () => {
-      var svg = generateSVG();
+      var svg = TestMethods.generateSVG();
 
       var md1 = Plottable.Dispatchers.Mouse.getDispatcher(<SVGElement> svg.node());
       assert.isNotNull(md1, "created a new Dispatcher on an SVG");
@@ -21,7 +17,7 @@ describe("Dispatchers", () => {
     });
 
     it("getLastMousePosition() defaults to a non-null value", () => {
-      var svg = generateSVG();
+      var svg = TestMethods.generateSVG();
 
       var md = Plottable.Dispatchers.Mouse.getDispatcher(<SVGElement> svg.node());
       var p = md.getLastMousePosition();
@@ -34,7 +30,7 @@ describe("Dispatchers", () => {
 
     it("can remove callbacks by passing null", () => {
       var targetWidth = 400, targetHeight = 400;
-      var target = generateSVG(targetWidth, targetHeight);
+      var target = TestMethods.generateSVG(targetWidth, targetHeight);
       // HACKHACK: PhantomJS can't measure SVGs unless they have something in them occupying space
       target.append("rect").attr("width", targetWidth).attr("height", targetHeight);
 
@@ -50,14 +46,14 @@ describe("Dispatchers", () => {
 
       md.onMouseMove(cb1);
       md.onMouseMove(cb2);
-      triggerFakeMouseEvent("mousemove", target, targetX, targetY);
+      TestMethods.triggerFakeMouseEvent("mousemove", target, targetX, targetY);
       assert.isTrue(cb1Called, "callback 1 was called on mousemove");
       assert.isTrue(cb2Called, "callback 2 was called on mousemove");
 
       cb1Called = false;
       cb2Called = false;
       md.offMouseMove(cb1);
-      triggerFakeMouseEvent("mousemove", target, targetX, targetY);
+      TestMethods.triggerFakeMouseEvent("mousemove", target, targetX, targetY);
       assert.isFalse(cb1Called, "callback was not called after blanking");
       assert.isTrue(cb2Called, "callback 2 was still called");
 
@@ -66,7 +62,7 @@ describe("Dispatchers", () => {
 
     it("doesn't call callbacks if not in the DOM", () => {
       var targetWidth = 400, targetHeight = 400;
-      var target = generateSVG(targetWidth, targetHeight);
+      var target = TestMethods.generateSVG(targetWidth, targetHeight);
       // HACKHACK: PhantomJS can't measure SVGs unless they have something in them occupying space
       target.append("rect").attr("width", targetWidth).attr("height", targetHeight);
 
@@ -79,12 +75,12 @@ describe("Dispatchers", () => {
       var callback = (p: Plottable.Point, e: MouseEvent) => callbackWasCalled = true;
 
       md.onMouseMove(callback);
-      triggerFakeMouseEvent("mousemove", target, targetX, targetY);
+      TestMethods.triggerFakeMouseEvent("mousemove", target, targetX, targetY);
       assert.isTrue(callbackWasCalled, "callback was called on mousemove");
 
       target.remove();
       callbackWasCalled = false;
-      triggerFakeMouseEvent("mousemove", target, targetX, targetY);
+      TestMethods.triggerFakeMouseEvent("mousemove", target, targetX, targetY);
       assert.isFalse(callbackWasCalled, "callback was not called after <svg> was removed from DOM");
 
       md.offMouseMove(callback);
@@ -92,7 +88,7 @@ describe("Dispatchers", () => {
 
     it("calls callbacks on mouseover, mousemove, and mouseout", () => {
       var targetWidth = 400, targetHeight = 400;
-      var target = generateSVG(targetWidth, targetHeight);
+      var target = TestMethods.generateSVG(targetWidth, targetHeight);
       // HACKHACK: PhantomJS can't measure SVGs unless they have something in them occupying space
       target.append("rect").attr("width", targetWidth).attr("height", targetHeight);
 
@@ -108,19 +104,19 @@ describe("Dispatchers", () => {
       var callbackWasCalled = false;
       var callback = (p: Plottable.Point, e: MouseEvent) => {
         callbackWasCalled = true;
-        assertPointsClose(p, expectedPoint, 0.5, "mouse position is correct");
+        TestMethods.assertPointsClose(p, expectedPoint, 0.5, "mouse position is correct");
         assert.isNotNull(e, "mouse event was passed to the callback");
       };
 
       md.onMouseMove(callback);
 
-      triggerFakeMouseEvent("mouseover", target, targetX, targetY);
+      TestMethods.triggerFakeMouseEvent("mouseover", target, targetX, targetY);
       assert.isTrue(callbackWasCalled, "callback was called on mouseover");
       callbackWasCalled = false;
-      triggerFakeMouseEvent("mousemove", target, targetX, targetY);
+      TestMethods.triggerFakeMouseEvent("mousemove", target, targetX, targetY);
       assert.isTrue(callbackWasCalled, "callback was called on mousemove");
       callbackWasCalled = false;
-      triggerFakeMouseEvent("mouseout", target, targetX, targetY);
+      TestMethods.triggerFakeMouseEvent("mouseout", target, targetX, targetY);
       assert.isTrue(callbackWasCalled, "callback was called on mouseout");
 
       md.offMouseMove(callback);
@@ -129,7 +125,7 @@ describe("Dispatchers", () => {
 
     it("onMouseDown()", () => {
       var targetWidth = 400, targetHeight = 400;
-      var target = generateSVG(targetWidth, targetHeight);
+      var target = TestMethods.generateSVG(targetWidth, targetHeight);
       // HACKHACK: PhantomJS can't measure SVGs unless they have something in them occupying space
       target.append("rect").attr("width", targetWidth).attr("height", targetHeight);
 
@@ -145,13 +141,13 @@ describe("Dispatchers", () => {
       var callbackWasCalled = false;
       var callback = (p: Plottable.Point, e: MouseEvent) => {
         callbackWasCalled = true;
-        assertPointsClose(p, expectedPoint, 0.5, "mouse position is correct");
+        TestMethods.assertPointsClose(p, expectedPoint, 0.5, "mouse position is correct");
         assert.isNotNull(e, "mouse event was passed to the callback");
       };
 
       md.onMouseDown(callback);
 
-      triggerFakeMouseEvent("mousedown", target, targetX, targetY);
+      TestMethods.triggerFakeMouseEvent("mousedown", target, targetX, targetY);
       assert.isTrue(callbackWasCalled, "callback was called on mousedown");
 
       md.offMouseDown(callback);
@@ -160,7 +156,7 @@ describe("Dispatchers", () => {
 
     it("onMouseUp()", () => {
       var targetWidth = 400, targetHeight = 400;
-      var target = generateSVG(targetWidth, targetHeight);
+      var target = TestMethods.generateSVG(targetWidth, targetHeight);
       // HACKHACK: PhantomJS can't measure SVGs unless they have something in them occupying space
       target.append("rect").attr("width", targetWidth).attr("height", targetHeight);
 
@@ -176,13 +172,13 @@ describe("Dispatchers", () => {
       var callbackWasCalled = false;
       var callback = (p: Plottable.Point, e: MouseEvent) => {
         callbackWasCalled = true;
-        assertPointsClose(p, expectedPoint, 0.5, "mouse position is correct");
+        TestMethods.assertPointsClose(p, expectedPoint, 0.5, "mouse position is correct");
         assert.isNotNull(e, "mouse event was passed to the callback");
       };
 
       md.onMouseUp(callback);
 
-      triggerFakeMouseEvent("mouseup", target, targetX, targetY);
+      TestMethods.triggerFakeMouseEvent("mouseup", target, targetX, targetY);
       assert.isTrue(callbackWasCalled, "callback was called on mouseup");
 
       md.offMouseUp(callback);
@@ -196,7 +192,7 @@ describe("Dispatchers", () => {
         return;
       }
       var targetWidth = 400, targetHeight = 400;
-      var svg = generateSVG(targetWidth, targetHeight);
+      var svg = TestMethods.generateSVG(targetWidth, targetHeight);
       // HACKHACK: PhantomJS can't measure SVGs unless they have something in them occupying space
       svg.append("rect").attr("width", targetWidth).attr("height", targetHeight);
 
@@ -214,13 +210,13 @@ describe("Dispatchers", () => {
       var callback = (p: Plottable.Point, e: WheelEvent) => {
         callbackWasCalled = true;
         assert.strictEqual(e.deltaY, targetDeltaY, "deltaY value was passed to callback");
-        assertPointsClose(p, expectedPoint, 0.5, "mouse position is correct");
+        TestMethods.assertPointsClose(p, expectedPoint, 0.5, "mouse position is correct");
         assert.isNotNull(e, "mouse event was passed to the callback");
       };
 
       md.onWheel(callback);
 
-      triggerFakeWheelEvent("wheel", svg, targetX, targetY, targetDeltaY);
+      TestMethods.triggerFakeWheelEvent("wheel", svg, targetX, targetY, targetDeltaY);
       assert.isTrue(callbackWasCalled, "callback was called on wheel");
 
       md.offWheel(callback);
@@ -229,16 +225,12 @@ describe("Dispatchers", () => {
 
     it("onDblClick()", () => {
       var targetWidth = 400, targetHeight = 400;
-      var target = generateSVG(targetWidth, targetHeight);
+      var target = TestMethods.generateSVG(targetWidth, targetHeight);
       // HACKHACK: PhantomJS can't measure SVGs unless they have something in them occupying space
       target.append("rect").attr("width", targetWidth).attr("height", targetHeight);
 
       var targetX = 17;
       var targetY = 76;
-      var expectedPoint = {
-        x: targetX,
-        y: targetY
-      };
 
       var md = Plottable.Dispatchers.Mouse.getDispatcher(<SVGElement> target.node());
 
@@ -250,7 +242,7 @@ describe("Dispatchers", () => {
 
       md.onDblClick(callback);
 
-      triggerFakeMouseEvent("dblclick", target, targetX, targetY);
+      TestMethods.triggerFakeMouseEvent("dblclick", target, targetX, targetY);
       assert.isTrue(callbackWasCalled, "callback was called on dblClick");
 
       md.offDblClick(callback);
