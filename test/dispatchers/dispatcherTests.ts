@@ -62,11 +62,11 @@ describe("Dispatchers", () => {
       var callbackWasCalled = false;
       var callback = () => callbackWasCalled = true;
 
-      (<any> dispatcher)._setCallback(callbackSet, null, callback);
+      (<any> dispatcher)._setCallback(callbackSet, callback);
       callbackSet.callCallbacks();
       assert.isTrue(callbackWasCalled, "callback was called after setting with _setCallback()");
 
-      (<any> dispatcher)._unsetCallback(callbackSet, null, callback);
+      (<any> dispatcher)._unsetCallback(callbackSet, callback);
       callbackWasCalled = false;
       callbackSet.callCallbacks();
       assert.isFalse(callbackWasCalled, "callback was removed by calling _setCallback() with null");

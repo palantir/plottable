@@ -9106,10 +9106,10 @@ describe("Dispatchers", function () {
             var callbackSet = new Plottable.Utils.CallbackSet();
             var callbackWasCalled = false;
             var callback = function () { return callbackWasCalled = true; };
-            dispatcher._setCallback(callbackSet, null, callback);
+            dispatcher._setCallback(callbackSet, callback);
             callbackSet.callCallbacks();
             assert.isTrue(callbackWasCalled, "callback was called after setting with _setCallback()");
-            dispatcher._unsetCallback(callbackSet, null, callback);
+            dispatcher._unsetCallback(callbackSet, callback);
             callbackWasCalled = false;
             callbackSet.callCallbacks();
             assert.isFalse(callbackWasCalled, "callback was removed by calling _setCallback() with null");

@@ -8936,7 +8936,7 @@ var Plottable;
                 this._connected = false;
             }
         };
-        Dispatcher.prototype._setCallback = function (callbackSet, key, callback) {
+        Dispatcher.prototype._setCallback = function (callbackSet, callback) {
             if (callback === null) {
                 console.error("THIS SHOULD NOT HAPPEN");
                 callbackSet.remove(callback);
@@ -8947,7 +8947,7 @@ var Plottable;
                 callbackSet.add(callback);
             }
         };
-        Dispatcher.prototype._unsetCallback = function (callbackSet, key, callback) {
+        Dispatcher.prototype._unsetCallback = function (callbackSet, callback) {
             callbackSet.remove(callback);
             this._disconnect();
         };
@@ -9023,11 +9023,11 @@ var Plottable;
              * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
              */
             Mouse.prototype.onMouseMove = function (key, callback) {
-                this._setCallback(this._moveCallbackSet, key, callback);
+                this._setCallback(this._moveCallbackSet, callback);
                 return this;
             };
             Mouse.prototype.offMouseMove = function (key, callback) {
-                this._unsetCallback(this._moveCallbackSet, key, callback);
+                this._unsetCallback(this._moveCallbackSet, callback);
                 return this;
             };
             /**
@@ -9042,11 +9042,11 @@ var Plottable;
              * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
              */
             Mouse.prototype.onMouseDown = function (key, callback) {
-                this._setCallback(this._downCallbackSet, key, callback);
+                this._setCallback(this._downCallbackSet, callback);
                 return this;
             };
             Mouse.prototype.offMouseDown = function (key, callback) {
-                this._unsetCallback(this._downCallbackSet, key, callback);
+                this._unsetCallback(this._downCallbackSet, callback);
                 return this;
             };
             /**
@@ -9061,11 +9061,11 @@ var Plottable;
              * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
              */
             Mouse.prototype.onMouseUp = function (key, callback) {
-                this._setCallback(this._upCallbackSet, key, callback);
+                this._setCallback(this._upCallbackSet, callback);
                 return this;
             };
             Mouse.prototype.offMouseUp = function (key, callback) {
-                this._unsetCallback(this._upCallbackSet, key, callback);
+                this._unsetCallback(this._upCallbackSet, callback);
                 return this;
             };
             /**
@@ -9080,11 +9080,11 @@ var Plottable;
              * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
              */
             Mouse.prototype.onWheel = function (key, callback) {
-                this._setCallback(this._wheelCallbackSet, key, callback);
+                this._setCallback(this._wheelCallbackSet, callback);
                 return this;
             };
             Mouse.prototype.offWheel = function (key, callback) {
-                this._unsetCallback(this._wheelCallbackSet, key, callback);
+                this._unsetCallback(this._wheelCallbackSet, callback);
                 return this;
             };
             /**
@@ -9099,11 +9099,11 @@ var Plottable;
              * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
              */
             Mouse.prototype.onDblClick = function (key, callback) {
-                this._setCallback(this._dblClickCallbackSet, key, callback);
+                this._setCallback(this._dblClickCallbackSet, callback);
                 return this;
             };
             Mouse.prototype.offDblClick = function (key, callback) {
-                this._unsetCallback(this._dblClickCallbackSet, key, callback);
+                this._unsetCallback(this._dblClickCallbackSet, callback);
                 return this;
             };
             /**
@@ -9191,11 +9191,11 @@ var Plottable;
              * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
              */
             Touch.prototype.onTouchStart = function (key, callback) {
-                this._setCallback(this._startCallbackSet, key, callback);
+                this._setCallback(this._startCallbackSet, callback);
                 return this;
             };
             Touch.prototype.offTouchStart = function (key, callback) {
-                this._unsetCallback(this._startCallbackSet, key, callback);
+                this._unsetCallback(this._startCallbackSet, callback);
                 return this;
             };
             /**
@@ -9210,11 +9210,11 @@ var Plottable;
              * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
              */
             Touch.prototype.onTouchMove = function (key, callback) {
-                this._setCallback(this._moveCallbackSet, key, callback);
+                this._setCallback(this._moveCallbackSet, callback);
                 return this;
             };
             Touch.prototype.offTouchMove = function (key, callback) {
-                this._unsetCallback(this._moveCallbackSet, key, callback);
+                this._unsetCallback(this._moveCallbackSet, callback);
                 return this;
             };
             /**
@@ -9229,11 +9229,11 @@ var Plottable;
              * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
              */
             Touch.prototype.onTouchEnd = function (key, callback) {
-                this._setCallback(this._endCallbackSet, key, callback);
+                this._setCallback(this._endCallbackSet, callback);
                 return this;
             };
             Touch.prototype.offTouchEnd = function (key, callback) {
-                this._unsetCallback(this._endCallbackSet, key, callback);
+                this._unsetCallback(this._endCallbackSet, callback);
                 return this;
             };
             /**
@@ -9320,11 +9320,11 @@ var Plottable;
              * @return {Dispatcher.Key} The calling Dispatcher.Key.
              */
             Key.prototype.onKeyDown = function (key, callback) {
-                this._setCallback(this._keydownCallbackSet, key, callback);
+                this._setCallback(this._keydownCallbackSet, callback);
                 return this;
             };
             Key.prototype.offKeyDown = function (key, callback) {
-                this._unsetCallback(this._keydownCallbackSet, key, callback);
+                this._unsetCallback(this._keydownCallbackSet, callback);
                 return this;
             };
             Key.prototype._processKeydown = function (e) {

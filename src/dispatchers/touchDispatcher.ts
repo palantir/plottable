@@ -71,12 +71,12 @@ export module Dispatchers {
      * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
      */
     public onTouchStart(key: any, callback: TouchCallback): Dispatchers.Touch {
-      this._setCallback(this._startCallbackSet, key, callback);
+      this._setCallback(this._startCallbackSet, callback);
       return this;
     }
 
     public offTouchStart(key: any, callback: TouchCallback): Dispatchers.Touch {
-      this._unsetCallback(this._startCallbackSet, key, callback);
+      this._unsetCallback(this._startCallbackSet, callback);
       return this;
     }
 
@@ -92,12 +92,12 @@ export module Dispatchers {
      * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
      */
     public onTouchMove(key: any, callback: TouchCallback): Dispatchers.Touch {
-      this._setCallback(this._moveCallbackSet, key, callback);
+      this._setCallback(this._moveCallbackSet, callback);
       return this;
     }
 
     public offTouchMove(key: any, callback: TouchCallback): Dispatchers.Touch {
-      this._unsetCallback(this._moveCallbackSet, key, callback);
+      this._unsetCallback(this._moveCallbackSet, callback);
       return this;
     }
 
@@ -113,12 +113,12 @@ export module Dispatchers {
      * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
      */
     public onTouchEnd(key: any, callback: TouchCallback): Dispatchers.Touch {
-      this._setCallback(this._endCallbackSet, key, callback);
+      this._setCallback(this._endCallbackSet, callback);
       return this;
     }
 
     public offTouchEnd(key: any, callback: TouchCallback): Dispatchers.Touch {
-      this._unsetCallback(this._endCallbackSet, key, callback);
+      this._unsetCallback(this._endCallbackSet, callback);
       return this;
     }
 

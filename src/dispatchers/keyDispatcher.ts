@@ -48,12 +48,12 @@ export module Dispatchers {
      * @return {Dispatcher.Key} The calling Dispatcher.Key.
      */
     public onKeyDown(key: any, callback: KeyCallback): Key {
-      this._setCallback(this._keydownCallbackSet, key, callback);
+      this._setCallback(this._keydownCallbackSet, callback);
       return this;
     }
 
     public offKeyDown(key: any, callback: KeyCallback): Key {
-      this._unsetCallback(this._keydownCallbackSet, key, callback);
+      this._unsetCallback(this._keydownCallbackSet, callback);
       return this;
     }
 

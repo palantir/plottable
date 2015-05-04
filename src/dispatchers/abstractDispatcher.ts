@@ -31,7 +31,7 @@ module Plottable {
       }
     }
 
-    protected _setCallback(callbackSet: Utils.CallbackSet<Function>, key: any, callback: Function) {
+    protected _setCallback(callbackSet: Utils.CallbackSet<Function>, callback: Function) {
       if (callback === null) { // remove listener if callback is null
         console.error("THIS SHOULD NOT HAPPEN");
         callbackSet.remove(callback);
@@ -42,7 +42,7 @@ module Plottable {
       }
     }
 
-    protected _unsetCallback(callbackSet: Utils.CallbackSet<Function>, key: any, callback: Function) {
+    protected _unsetCallback(callbackSet: Utils.CallbackSet<Function>, callback: Function) {
       callbackSet.remove(callback);
       this._disconnect();
     }

@@ -86,12 +86,12 @@ export module Dispatchers {
      * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
      */
     public onMouseMove(key: any, callback: MouseCallback): Dispatchers.Mouse {
-      this._setCallback(this._moveCallbackSet, key, callback);
+      this._setCallback(this._moveCallbackSet, callback);
       return this;
     }
 
     public offMouseMove(key: any, callback: MouseCallback): Dispatchers.Mouse {
-      this._unsetCallback(this._moveCallbackSet, key, callback);
+      this._unsetCallback(this._moveCallbackSet, callback);
       return this;
     }
 
@@ -107,12 +107,12 @@ export module Dispatchers {
      * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
      */
     public onMouseDown(key: any, callback: MouseCallback): Dispatchers.Mouse {
-      this._setCallback(this._downCallbackSet, key, callback);
+      this._setCallback(this._downCallbackSet, callback);
       return this;
     }
 
     public offMouseDown(key: any, callback: MouseCallback): Dispatchers.Mouse {
-      this._unsetCallback(this._downCallbackSet, key, callback);
+      this._unsetCallback(this._downCallbackSet, callback);
       return this;
     }
 
@@ -128,12 +128,12 @@ export module Dispatchers {
      * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
      */
     public onMouseUp(key: any, callback: MouseCallback): Dispatchers.Mouse {
-      this._setCallback(this._upCallbackSet, key, callback);
+      this._setCallback(this._upCallbackSet, callback);
       return this;
     }
 
     public offMouseUp(key: any, callback: MouseCallback): Dispatchers.Mouse {
-      this._unsetCallback(this._upCallbackSet, key, callback);
+      this._unsetCallback(this._upCallbackSet, callback);
       return this;
     }
 
@@ -149,12 +149,12 @@ export module Dispatchers {
      * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
      */
     public onWheel(key: any, callback: MouseCallback): Dispatchers.Mouse {
-      this._setCallback(this._wheelCallbackSet, key, callback);
+      this._setCallback(this._wheelCallbackSet, callback);
       return this;
     }
 
     public offWheel(key: any, callback: MouseCallback): Dispatchers.Mouse {
-      this._unsetCallback(this._wheelCallbackSet, key, callback);
+      this._unsetCallback(this._wheelCallbackSet, callback);
       return this;
     }
 
@@ -170,12 +170,12 @@ export module Dispatchers {
      * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
      */
     public onDblClick(key: any, callback: MouseCallback): Dispatchers.Mouse {
-      this._setCallback(this._dblClickCallbackSet, key, callback);
+      this._setCallback(this._dblClickCallbackSet, callback);
       return this;
     }
 
     public offDblClick(key: any, callback: MouseCallback): Dispatchers.Mouse {
-      this._unsetCallback(this._dblClickCallbackSet, key, callback);
+      this._unsetCallback(this._dblClickCallbackSet, callback);
       return this;
     }
 
