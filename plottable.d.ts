@@ -545,6 +545,7 @@ declare module Plottable {
 
 
 declare module Plottable {
+    type DatasetCallback = (dataset: Dataset) => any;
     class Dataset extends Core.PlottableObject {
         /**
          * Constructs a new set.
@@ -557,8 +558,8 @@ declare module Plottable {
          * @param {any} metadata An object containing additional information (default = {}).
          */
         constructor(data?: any[], metadata?: any);
-        registerCoolListener(key: any, callback: Function): void;
-        deregisterCoolListener(key: any, callback: Function): void;
+        registerCoolListener(callback: DatasetCallback): void;
+        deregisterCoolListener(callback: DatasetCallback): void;
         /**
          * Gets the data.
          *

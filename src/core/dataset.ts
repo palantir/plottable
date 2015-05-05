@@ -1,6 +1,9 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
+
+  export type DatasetCallback = (dataset: Dataset) => any;
+
   type CachedExtent = {
     accessor: _Accessor;
     extent: any[];
@@ -9,7 +12,7 @@ module Plottable {
     private _data: any[];
     private _metadata: any;
     private _accessor2cachedExtent: Utils.StrictEqualityAssociativeArray;
-    private _callbacks: Utils.CallbackSet<Function>
+    private _callbacks: Utils.CallbackSet<DatasetCallback>
 
     /**
      * Constructs a new set.
@@ -26,16 +29,14 @@ module Plottable {
       this._data = data;
       this._metadata = metadata;
       this._accessor2cachedExtent = new Utils.StrictEqualityAssociativeArray();
-      this._callbacks = new Utils.CallbackSet<Function>();
+      this._callbacks = new Utils.CallbackSet<DatasetCallback>();
     }
 
-    public registerCoolListener(key: any, callback: Function) {
-      // this.broadcaster.registerListener(key, callback);
+    public registerCoolListener(callback: DatasetCallback) {
       this._callbacks.add(callback);
     }
 
-    public deregisterCoolListener(key: any, callback: Function) {
-      // this.broadcaster.deregisterListener(key);
+    public deregisterCoolListener(callback: DatasetCallback) {
       this._callbacks.delete(callback);
     }
 
