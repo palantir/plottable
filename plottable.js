@@ -1456,11 +1456,11 @@ var Plottable;
              *
              * @param {Component} component Any Plottable component.
              */
-            function registerToRender(c) {
+            function registerToRender(component) {
                 if (_isCurrentlyFlushing) {
                     Plottable.Utils.Methods.warn("Registered to render while other components are flushing: request may be ignored");
                 }
-                _componentsNeedingRender.add(c);
+                _componentsNeedingRender.add(component);
                 requestRender();
             }
             RenderControllers.registerToRender = registerToRender;
@@ -1470,9 +1470,9 @@ var Plottable;
              *
              * @param {Component} component Any Plottable component.
              */
-            function registerToComputeLayout(c) {
-                _componentsNeedingComputeLayout.add(c);
-                _componentsNeedingRender.add(c);
+            function registerToComputeLayout(component) {
+                _componentsNeedingComputeLayout.add(component);
+                _componentsNeedingRender.add(component);
                 requestRender();
             }
             RenderControllers.registerToComputeLayout = registerToComputeLayout;
@@ -1492,21 +1492,21 @@ var Plottable;
             function flush() {
                 if (_animationRequested) {
                     // Layout
-                    _componentsNeedingComputeLayout.values().forEach(function (c) { return c.computeLayout(); });
+                    _componentsNeedingComputeLayout.values().forEach(function (component) { return component.computeLayout(); });
                     // Top level render; Containers will put their children in the toRender queue
-                    _componentsNeedingRender.values().forEach(function (c) { return c.render(); });
+                    _componentsNeedingRender.values().forEach(function (component) { return component.render(); });
                     _isCurrentlyFlushing = true;
                     var failed = new Plottable.Utils.Set();
-                    _componentsNeedingRender.values().forEach(function (c) {
+                    _componentsNeedingRender.values().forEach(function (component) {
                         try {
-                            c._doRender();
+                            component._doRender();
                         }
                         catch (err) {
                             // throw error with timeout to avoid interrupting further renders
                             window.setTimeout(function () {
                                 throw err;
                             }, 0);
-                            failed.add(c);
+                            failed.add(component);
                         }
                     });
                     _componentsNeedingComputeLayout = new Plottable.Utils.Set();

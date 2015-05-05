@@ -54,11 +54,11 @@ export module Core {
      *
      * @param {Component} component Any Plottable component.
      */
-    export function registerToRender(c: Component) {
+    export function registerToRender(component: Component) {
       if (_isCurrentlyFlushing) {
         Utils.Methods.warn("Registered to render while other components are flushing: request may be ignored");
       }
-      _componentsNeedingRender.add(c);
+      _componentsNeedingRender.add(component);
       requestRender();
     }
 
@@ -68,9 +68,9 @@ export module Core {
      *
      * @param {Component} component Any Plottable component.
      */
-    export function registerToComputeLayout(c: Component) {
-      _componentsNeedingComputeLayout.add(c);
-      _componentsNeedingRender.add(c);
+    export function registerToComputeLayout(component: Component) {
+      _componentsNeedingComputeLayout.add(component);
+      _componentsNeedingRender.add(component);
       requestRender();
     }
 
@@ -91,20 +91,20 @@ export module Core {
     export function flush() {
       if (_animationRequested) {
         // Layout
-        _componentsNeedingComputeLayout.values().forEach((c: Component) => c.computeLayout());
+        _componentsNeedingComputeLayout.values().forEach((component: Component) => component.computeLayout());
 
         // Top level render; Containers will put their children in the toRender queue
-        _componentsNeedingRender.values().forEach((c: Component) => c.render());
+        _componentsNeedingRender.values().forEach((component: Component) => component.render());
 
         _isCurrentlyFlushing = true;
         var failed = new Utils.Set<Component>();
-        _componentsNeedingRender.values().forEach((c: Component) => {
+        _componentsNeedingRender.values().forEach((component: Component) => {
           try {
-            c._doRender();
+            component._doRender();
           } catch (err) {
             // throw error with timeout to avoid interrupting further renders
             window.setTimeout(() => { throw err; }, 0);
-            failed.add(c);
+            failed.add(component);
           }
         });
         _componentsNeedingComputeLayout = new Utils.Set<Component>();

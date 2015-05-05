@@ -674,14 +674,14 @@ declare module Plottable {
              *
              * @param {Component} component Any Plottable component.
              */
-            function registerToRender(c: Component): void;
+            function registerToRender(component: Component): void;
             /**
              * If the RenderController is enabled, we enqueue the component for
              * layout and render. Otherwise, it is rendered immediately.
              *
              * @param {Component} component Any Plottable component.
              */
-            function registerToComputeLayout(c: Component): void;
+            function registerToComputeLayout(component: Component): void;
             /**
              * Render everything that is waiting to be rendered right now, instead of
              * waiting until the next frame.
