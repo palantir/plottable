@@ -3230,7 +3230,9 @@ var Plottable;
                 var _this = this;
                 var metadata = this._piePlot._key2PlotDatasetKey.get(this.key).dataset.metadata();
                 var plotMetadata = this._piePlot._key2PlotDatasetKey.get(this.key).plotMetadata;
-                return d3.svg.arc().innerRadius(function (d, i) { return _this._piePlot.innerRadiusAccessor()(d, i, metadata, plotMetadata); }).outerRadius(function (d, i) { return _this._piePlot.outerRadiusAccessor()(d, i, metadata, plotMetadata); });
+                var innerRadius = this._piePlot.innerRadius();
+                var innerRadiusAccessor = typeof innerRadius === "number" ? d3.functor(innerRadius) : innerRadius;
+                return d3.svg.arc().innerRadius(function (d, i) { return innerRadiusAccessor(d, i, metadata, plotMetadata); }).outerRadius(function (d, i) { return _this._piePlot.outerRadiusAccessor()(d, i, metadata, plotMetadata); });
             };
             Arc.prototype.retargetProjectors = function (attrToProjector) {
                 var retargetedAttrToProjector = {};
@@ -3262,9 +3264,11 @@ var Plottable;
                 var _this = this;
                 var metadata = this._piePlot._key2PlotDatasetKey.get(this.key).dataset.metadata();
                 var plotMetadata = this._piePlot._key2PlotDatasetKey.get(this.key).plotMetadata;
-                var innerRadiusAccessor = function (d, i) { return _this._piePlot.innerRadiusAccessor()(d, i, metadata, plotMetadata); };
+                var innerRadius = this._piePlot.innerRadius();
+                var innerRadiusAccessor = typeof innerRadius === "number" ? d3.functor(innerRadius) : innerRadius;
+                var innerRadiusValue = innerRadiusAccessor(datum, index, metadata, plotMetadata);
                 var outerRadiusAccessor = function (d, i) { return _this._piePlot.outerRadiusAccessor()(d, i, metadata, plotMetadata); };
-                var avgRadius = (innerRadiusAccessor(datum, index) + outerRadiusAccessor(datum, index)) / 2;
+                var avgRadius = (innerRadiusValue + outerRadiusAccessor(datum, index)) / 2;
                 var startAngle = +this._getSelection(index).datum().startAngle;
                 var endAngle = +this._getSelection(index).datum().endAngle;
                 var avgAngle = (startAngle + endAngle) / 2;
@@ -7035,7 +7039,7 @@ var Plottable;
                 var _this = this;
                 _super.call(this);
                 this._colorScale = new Plottable.Scales.Color();
-                this._innerRadiusAccessor = function () { return 0; };
+                this._innerRadius = 0;
                 this._outerRadiusAccessor = function () { return Math.min(_this.width(), _this.height()) / 2; };
                 this.classed("pie-plot", true);
             }
@@ -7079,11 +7083,11 @@ var Plottable;
                 this._render();
                 return this;
             };
-            Pie.prototype.innerRadiusAccessor = function (innerRadiusAccessor) {
-                if (innerRadiusAccessor == null) {
-                    return this._innerRadiusAccessor;
+            Pie.prototype.innerRadius = function (innerRadius) {
+                if (innerRadius == null) {
+                    return this._innerRadius;
                 }
-                this._innerRadiusAccessor = innerRadiusAccessor;
+                this._innerRadius = innerRadius;
                 this._render();
                 return this;
             };

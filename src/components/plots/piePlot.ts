@@ -15,7 +15,7 @@ export module Plots {
   export class Pie extends Plot {
 
     private _colorScale: Scales.Color;
-    private _innerRadiusAccessor: _Accessor;
+    private _innerRadius: number | _Accessor;
     private _outerRadiusAccessor: _Accessor;
     private _valueAccessor: _Accessor;
 
@@ -27,7 +27,7 @@ export module Plots {
     constructor() {
       super();
       this._colorScale = new Scales.Color();
-      this._innerRadiusAccessor = () => 0;
+      this._innerRadius = 0;
       this._outerRadiusAccessor = () => Math.min(this.width(), this.height()) / 2;
       this.classed("pie-plot", true);
     }
@@ -82,13 +82,13 @@ export module Plots {
       return this;
     }
 
-    public innerRadiusAccessor(): _Accessor;
-    public innerRadiusAccessor(innerRadiusAccessor: _Accessor): Plots.Pie;
-    public innerRadiusAccessor(innerRadiusAccessor?: _Accessor): any {
-      if (innerRadiusAccessor == null) {
-        return this._innerRadiusAccessor;
+    public innerRadius(): number | _Accessor;
+    public innerRadius(innerRadius: number | _Accessor): Plots.Pie;
+    public innerRadius(innerRadius?: number | _Accessor): any {
+      if (innerRadius == null) {
+        return this._innerRadius;
       }
-      this._innerRadiusAccessor = innerRadiusAccessor;
+      this._innerRadius = innerRadius;
       this._render();
       return this;
     }
