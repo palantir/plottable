@@ -2,6 +2,12 @@
 
 module Plottable {
 export module Plots {
+
+  export interface PieValueBinding<D> {
+    accessor: _Accessor;
+    scale?: Scale<D, number>;
+  }
+
   /*
    * A PiePlot is a plot meant to show how much out of a total an attribute's value is.
    * One usecase is to show how much funding departments are given out of a total budget.
@@ -12,10 +18,11 @@ export module Plots {
    *   "outer-radius" - Accessor determining the distance from the center to the outer edge of the sector
    *   "value" - Accessor to extract the value determining the proportion of each slice to the total
    */
-  export class Pie extends Plot {
+  export class Pie<D> extends Plot {
 
     private _colorScale: Scales.Color;
-    private _innerRadius: number | _Accessor;
+    private _innerRadius: number | D | _Accessor;
+    private _innerRadiusScale: Scale<D, number>;
     private _outerRadiusAccessor: _Accessor;
     private _valueAccessor: _Accessor;
 
@@ -72,7 +79,7 @@ export module Plots {
     }
 
     public valueAccessor(): _Accessor;
-    public valueAccessor(valueAccessor: _Accessor): Plots.Pie;
+    public valueAccessor(valueAccessor: _Accessor): Plots.Pie<D>;
     public valueAccessor(valueAccessor?: _Accessor): any {
       if (valueAccessor == null) {
         return this._valueAccessor;
@@ -82,9 +89,9 @@ export module Plots {
       return this;
     }
 
-    public innerRadius(): number | _Accessor;
-    public innerRadius(innerRadius: number | _Accessor): Plots.Pie;
-    public innerRadius(innerRadius?: number | _Accessor): any {
+    public innerRadius(): number | _Accessor | D;
+    public innerRadius(innerRadius: number | _Accessor | D): Plots.Pie<D>;
+    public innerRadius(innerRadius?: number | _Accessor | D): any {
       if (innerRadius == null) {
         return this._innerRadius;
       }
@@ -93,8 +100,34 @@ export module Plots {
       return this;
     }
 
+    public innerRadiusScale(): Scale<D, number>;
+    public innerRadiusScale(innerRadiusScale: Scale<D, number>): Plots.Pie<D>;
+    public innerRadiusScale(innerRadiusScale?: Scale<D, number>): any {
+      if (innerRadiusScale == null) {
+        return this._innerRadiusScale;
+      }
+      var prevScale = this._innerRadiusScale;
+      if (prevScale !== innerRadiusScale) {
+        if (prevScale != null) {
+          prevScale.offUpdate(this._renderCallback);
+        }
+
+        if (innerRadiusScale != null) {
+          this._innerRadiusScale.onUpdate(this._renderCallback);
+        }
+      }
+      this._render();
+      return this;
+    }
+
+    public innerRadiusScaledAccessor(): _Accessor {
+      return this._innerRadiusScale == null ?
+               d3.functor(this._innerRadius) :
+               (d: any, i: number, u: any, m: Plots.PlotMetadata) => this._innerRadiusScale.scale(<D> this._innerRadius);
+    }
+
     public outerRadiusAccessor(): _Accessor;
-    public outerRadiusAccessor(outerRadiusAccessor: _Accessor): Plots.Pie;
+    public outerRadiusAccessor(outerRadiusAccessor: _Accessor): Plots.Pie<D>;
     public outerRadiusAccessor(outerRadiusAccessor?: _Accessor): any {
       if (outerRadiusAccessor == null) {
         return this._outerRadiusAccessor;

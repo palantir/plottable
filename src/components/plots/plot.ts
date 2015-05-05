@@ -39,7 +39,7 @@ module Plottable {
     private _animators: Animators.PlotAnimatorMap = {};
     protected _animateOnNextRender = true;
     private _nextSeriesIndex: number;
-    private _renderCallback: ScaleCallback<Scale<any, any>>;
+    protected _renderCallback: ScaleCallback<Scale<any, any>>;
 
     /**
      * Constructs a Plot.

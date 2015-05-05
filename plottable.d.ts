@@ -1550,8 +1550,8 @@ declare module Plottable {
 
 declare module Plottable {
     module Drawers {
-        class Arc extends Element {
-            constructor(key: string, plot: Plots.Pie);
+        class Arc<D> extends Element {
+            constructor(key: string, plot: Plots.Pie<D>);
             _drawStep(step: AppliedDrawStep): void;
             draw(data: any[], drawSteps: DrawStep[], userMetadata: any, plotMetadata: Plots.PlotMetadata): number;
             _getPixelPoint(datum: any, index: number): Point;
@@ -2659,6 +2659,7 @@ declare module Plottable {
         protected _attrToExtents: D3.Map<any[]>;
         protected _animate: boolean;
         protected _animateOnNextRender: boolean;
+        protected _renderCallback: ScaleCallback<Scale<any, any>>;
         /**
          * Constructs a Plot.
          *
@@ -2829,24 +2830,31 @@ declare module Plottable {
 
 declare module Plottable {
     module Plots {
-        class Pie extends Plot {
+        interface PieValueBinding<D> {
+            accessor: _Accessor;
+            scale?: Scale<D, number>;
+        }
+        class Pie<D> extends Plot {
             /**
              * Constructs a PiePlot.
              *
              * @constructor
              */
             constructor();
-            computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Pie;
-            addDataset(keyOrDataset: any, dataset?: any): Pie;
+            computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Pie<D>;
+            addDataset(keyOrDataset: any, dataset?: any): Pie<D>;
             protected _generateAttrToProjector(): AttributeToProjector;
             protected _getDrawer(key: string): Drawers.AbstractDrawer;
             getAllPlotData(datasetKeys?: string | string[]): PlotData;
             valueAccessor(): _Accessor;
-            valueAccessor(valueAccessor: _Accessor): Plots.Pie;
-            innerRadius(): number | _Accessor;
-            innerRadius(innerRadius: number | _Accessor): Plots.Pie;
+            valueAccessor(valueAccessor: _Accessor): Plots.Pie<D>;
+            innerRadius(): number | _Accessor | D;
+            innerRadius(innerRadius: number | _Accessor | D): Plots.Pie<D>;
+            innerRadiusScale(): Scale<D, number>;
+            innerRadiusScale(innerRadiusScale: Scale<D, number>): Plots.Pie<D>;
+            innerRadiusScaledAccessor(): _Accessor;
             outerRadiusAccessor(): _Accessor;
-            outerRadiusAccessor(outerRadiusAccessor: _Accessor): Plots.Pie;
+            outerRadiusAccessor(outerRadiusAccessor: _Accessor): Plots.Pie<D>;
         }
     }
 }
