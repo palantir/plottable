@@ -11,7 +11,6 @@
 /// <reference path="utils/symbolFactories.ts" />
 
 /// <reference path="utils/clientToSVGTranslator.ts" />
-/// <reference path="utils/scaleDomainCoordinator.ts" />
 
 /// <reference path="core/config.ts" />
 /// <reference path="core/version.ts" />

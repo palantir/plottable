@@ -5,15 +5,18 @@ var assert = chai.assert;
 describe("Scales", () => {
   it("Scale's copy() works correctly", () => {
     var testCallback = (listenable: any) => {
-      return true; // doesn't do anything
+      return true;
     };
     var scale = new Plottable.Scales.Linear();
-    scale.broadcaster.registerListener(null, testCallback);
+    scale.onUpdate(testCallback);
     var scaleCopy = scale.copy();
     assert.deepEqual(scale.domain(), scaleCopy.domain(), "Copied scale has the same domain as the original.");
     assert.deepEqual(scale.range(), scaleCopy.range(), "Copied scale has the same range as the original.");
-    assert.notDeepEqual(scale.broadcaster, scaleCopy.broadcaster,
-                              "Broadcasters are not copied over");
+
+    assert.strictEqual((<any>scale)._callbacks.values().length, 1,
+      "The initial scale should have a callback attached");
+    assert.strictEqual((<any>scaleCopy)._callbacks.values().length, 0,
+      "The copied scale should not have any callback from the original scale attached");
   });
 
   it("Scale alerts listeners when its domain is updated", () => {
@@ -24,9 +27,27 @@ describe("Scales", () => {
       assert.strictEqual(listenable, scale, "Callback received the calling scale as the first argument");
       callbackWasCalled = true;
     };
-    scale.broadcaster.registerListener(null, testCallback);
+    scale.onUpdate(testCallback);
     scale.domain([0, 10]);
     assert.isTrue(callbackWasCalled, "The registered callback was called");
+  });
+
+  it("Scale update listeners can be turned off", () => {
+    var scale = new Plottable.Scale(d3.scale.identity());
+
+    var callbackWasCalled = false;
+    var testCallback = (listenable: Plottable.Scale<any, any>) => {
+      assert.strictEqual(listenable, scale, "Callback received the calling scale as the first argument");
+      callbackWasCalled = true;
+    };
+    scale.onUpdate(testCallback);
+    scale.domain([0, 10]);
+    assert.isTrue(callbackWasCalled, "The registered callback was called");
+
+    callbackWasCalled = false;
+    scale.offUpdate(testCallback);
+    scale.domain([11, 19]);
+    assert.isFalse(callbackWasCalled, "The registered callback was not called because the callback was removed");
   });
 
   describe("autoranging behavior", () => {
