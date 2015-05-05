@@ -1739,17 +1739,13 @@ var Plottable;
             return []; // this should be overwritten
         };
         Scale.prototype.registerCoolListener = function (key, callback) {
-            this.broadcaster.registerListener(key, callback);
             this._callbacks.add(callback);
         };
         Scale.prototype.deregisterCoolListener = function (key, callback) {
-            this.broadcaster.deregisterListener(key);
-        };
-        Scale.prototype.deregisterAllListeners = function (key) {
-            this.broadcaster.deregisterListener(key);
+            this._callbacks.delete(callback);
         };
         Scale.prototype.broadcast = function () {
-            this.broadcaster.broadcast();
+            this._callbacks.callCallbacks();
         };
         /**
          * Modifies the domain on the scale so that it includes the extent of all
