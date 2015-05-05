@@ -2852,6 +2852,8 @@ declare module Plottable {
             protected _generateAttrToProjector(): AttributeToProjector;
             protected _getDrawer(key: string): Drawers.AbstractDrawer;
             getAllPlotData(datasetKeys?: string | string[]): PlotData;
+            valueAccessor(): _Accessor;
+            valueAccessor(valueAccessor: _Accessor): Plots.Pie;
         }
     }
 }

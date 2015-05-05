@@ -15,6 +15,7 @@ export module Plots {
   export class Pie extends Plot {
 
     private _colorScale: Scales.Color;
+    private _valueAccessor: _Accessor;
 
     /**
      * Constructs a PiePlot.
@@ -66,6 +67,17 @@ export module Plots {
       });
 
       return allPlotData;
+    }
+
+    public valueAccessor(): _Accessor;
+    public valueAccessor(valueAccessor: _Accessor): Plots.Pie;
+    public valueAccessor(valueAccessor?: _Accessor): any {
+      if (valueAccessor == null) {
+        return this._valueAccessor;
+      }
+      this._valueAccessor = valueAccessor;
+      this._render();
+      return this;
     }
   }
 }

@@ -3248,11 +3248,11 @@ var Plottable;
                 return _super.prototype._drawStep.call(this, { attrToProjector: attrToProjector, animator: step.animator });
             };
             Arc.prototype.draw = function (data, drawSteps, userMetadata, plotMetadata) {
+                var _this = this;
                 // HACKHACK Applying metadata should be done in base class
-                var valueAccessor = function (d, i) { return drawSteps[0].attrToProjector["value"](d, i, userMetadata, plotMetadata); };
+                var valueAccessor = function (d, i) { return _this._piePlot.valueAccessor()(d, i, userMetadata, plotMetadata); };
                 data = data.filter(function (e) { return Plottable.Utils.Methods.isValidNumber(+valueAccessor(e, null)); });
                 var pie = d3.layout.pie().sort(null).value(valueAccessor)(data);
-                drawSteps.forEach(function (s) { return delete s.attrToProjector["value"]; });
                 pie.forEach(function (slice) {
                     if (slice.value < 0) {
                         Plottable.Utils.Methods.warn("Negative values will not render correctly in a pie chart.");
@@ -7068,6 +7068,14 @@ var Plottable;
                     pixelPoint.y = pixelPoint.y + _this.height() / 2;
                 });
                 return allPlotData;
+            };
+            Pie.prototype.valueAccessor = function (valueAccessor) {
+                if (valueAccessor == null) {
+                    return this._valueAccessor;
+                }
+                this._valueAccessor = valueAccessor;
+                this._render();
+                return this;
             };
             return Pie;
         })(Plottable.Plot);

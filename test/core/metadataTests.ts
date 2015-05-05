@@ -232,7 +232,7 @@ describe("Metadata", () => {
     checkPlot(new Plottable.Plots.StackedBar(xScale, yScale));
     checkPlot(new Plottable.Plots.StackedBar(yScale, xScale, false));
     checkPlot(new Plottable.Plots.ClusteredBar(xScale, yScale));
-    checkPlot(new Plottable.Plots.Pie().project("value", "x"));
+    checkPlot(new Plottable.Plots.Pie().valueAccessor((d) => d.x));
     checkPlot(new Plottable.Plots.Bar(xScale, yScale, false));
     checkPlot(new Plottable.Plots.Scatter(xScale, yScale));
     svg.remove();

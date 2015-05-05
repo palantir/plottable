@@ -8,7 +8,7 @@ describe("Plots", () => {
     it("renders correctly with no data", () => {
       var svg = TestMethods.generateSVG(400, 400);
       var plot = new Plottable.Plots.Pie();
-      plot.project("value", (d: any) => d.value);
+      plot.valueAccessor((d) => d.value);
       assert.doesNotThrow(() => plot.renderTo(svg), Error);
       assert.strictEqual(plot.width(), 400, "was allocated width");
       assert.strictEqual(plot.height(), 400, "was allocated height");
@@ -29,7 +29,7 @@ describe("Plots", () => {
       simpleDataset = new Plottable.Dataset(simpleData);
       piePlot = new Plottable.Plots.Pie();
       piePlot.addDataset("simpleDataset", simpleDataset);
-      piePlot.project("value", "value");
+      piePlot.valueAccessor((d) => d.value);
       piePlot.renderTo(svg);
       renderArea = (<any> piePlot)._renderArea;
     });
@@ -70,7 +70,7 @@ describe("Plots", () => {
     });
 
     it("project value onto different attribute", () => {
-      piePlot.project("value", "value2");
+      piePlot.valueAccessor((d) => d.value2);
 
       var arcPaths = renderArea.selectAll(".arc");
       assert.lengthOf(arcPaths[0], 2, "only has two sectors");
@@ -96,7 +96,7 @@ describe("Plots", () => {
       assert.closeTo(parseFloat(arcDestPoint1[0]), 0, 1, "ends on a line vertically from beginning");
       assert.operator(parseFloat(arcDestPoint1[1]), "<", 0, "ends above the center");
 
-      piePlot.project("value", "value");
+      piePlot.valueAccessor((d) => d.value);
       svg.remove();
     });
 
@@ -246,7 +246,7 @@ describe("Plots", () => {
 
       var plot = new Plottable.Plots.Pie();
       plot.addDataset(data1);
-      plot.project("value", "v");
+      plot.valueAccessor((d) => d.v);
 
       plot.renderTo(svg);
 
@@ -271,7 +271,7 @@ describe("Plots", () => {
 
       var plot = new Plottable.Plots.Pie();
       plot.addDataset(data1);
-      plot.project("value", "v");
+      plot.valueAccessor((d) => d.v);
 
       plot.renderTo(svg);
 
