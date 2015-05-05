@@ -869,8 +869,8 @@ declare module Plottable {
         constructor(scale: D3.Scale.Scale);
         protected _getAllExtents(): D[][];
         protected _getExtent(): D[];
-        registerCoolListener(callback: Function): void;
-        deregisterCoolListener(callback: Function): void;
+        registerListener(callback: Function): void;
+        deregisterListener(callback: Function): void;
         broadcast(): void;
         /**
          * Modifies the domain on the scale so that it includes the extent of all

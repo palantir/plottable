@@ -43,7 +43,7 @@ export module Components {
       }
       this._scale = interpolatedColorScale;
       this._redrawFunctionWrapper = () => this.redraw();
-      this._scale.registerCoolListener(this._redrawFunctionWrapper);
+      this._scale.registerListener(this._redrawFunctionWrapper);
       this._formatter = formatter;
       this._orientation = InterpolatedColorLegend._ensureOrientation(orientation);
 
@@ -54,7 +54,7 @@ export module Components {
 
     public remove() {
       super.remove();
-      this._scale.deregisterCoolListener(this._redrawFunctionWrapper);
+      this._scale.deregisterListener(this._redrawFunctionWrapper);
     }
 
     /**

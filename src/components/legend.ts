@@ -47,7 +47,7 @@ export module Components {
 
       this._scale = colorScale;
       this._redrawFunctionWrapper = () => this.redraw();
-      this._scale.registerCoolListener(this._redrawFunctionWrapper);
+      this._scale.registerListener(this._redrawFunctionWrapper);
 
       this.xAlign("right").yAlign("top");
       this._fixedWidthFlag = true;
@@ -125,9 +125,9 @@ export module Components {
     public scale(scale: Scales.Color): Legend;
     public scale(scale?: Scales.Color): any {
       if (scale != null) {
-        this._scale.deregisterCoolListener(this._redrawFunctionWrapper);
+        this._scale.deregisterListener(this._redrawFunctionWrapper);
         this._scale = scale;
-        this._scale.registerCoolListener(this._redrawFunctionWrapper);
+        this._scale.registerListener(this._redrawFunctionWrapper);
         this.redraw();
         return this;
       } else {
@@ -137,7 +137,7 @@ export module Components {
 
     public remove() {
       super.remove();
-      this._scale.deregisterCoolListener(this._redrawFunctionWrapper);
+      this._scale.deregisterListener(this._redrawFunctionWrapper);
     }
 
     private _calculateLayoutInfo(availableWidth: number, availableHeight: number) {
