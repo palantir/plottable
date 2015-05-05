@@ -464,8 +464,8 @@ describe("Plots", () => {
       plot.project("x", "x", x);
       plot.project("y", "y", y);
       plot.renderTo(svg);
-      svg.remove();
       assert.strictEqual(recordedTime, 20, "additionalPaint passed appropriate time argument");
+      svg.remove();
     });
 
     it("extent calculation done in correct dataset order", () => {

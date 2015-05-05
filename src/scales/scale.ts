@@ -1,13 +1,21 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
+  export module Scales {
+    export interface ExtentProvider<D> {
+      (scale: Scale<D, any>): D[][];
+    }
+  }
+
   export class Scale<D, R> extends Core.PlottableObject {
     protected _d3Scale: D3.Scale.Scale;
     private _autoDomainAutomatically = true;
     public broadcaster: Core.Broadcaster<Scale<D, R>>;
-    private _rendererAttrID2Extent: {[rendererAttrID: string]: D[]} = {};
     public _typeCoercer: (d: any) => any = (d: any) => d;
     private _domainModificationInProgress: boolean = false;
+
+    private _extentProviders: Utils.Set<Scales.ExtentProvider<D>>;
+
     /**
      * Constructs a new Scale.
      *
@@ -22,10 +30,11 @@ module Plottable {
       super();
       this._d3Scale = scale;
       this.broadcaster = new Core.Broadcaster(this);
+      this._extentProviders = new Utils.Set<Scales.ExtentProvider<D>>();
     }
 
     protected _getAllExtents(): D[][] {
-      return d3.values(this._rendererAttrID2Extent);
+      return d3.merge(this._extentProviders.values().map((provider) => provider(this)));
     }
 
     protected _getExtent(): D[] {
@@ -149,26 +158,12 @@ module Plottable {
       return new Scale<D, R>(this._d3Scale.copy());
     }
 
-    /**
-     * When a renderer determines that the extent of a projector has changed,
-     * it will call this function. This function should ensure that
-     * the scale has a domain at least large enough to include extent.
-     *
-     * @param {number} rendererID A unique indentifier of the renderer sending
-     *                 the new extent.
-     * @param {string} attr The attribute being projected, e.g. "x", "y0", "r"
-     * @param {D[]} extent The new extent to be included in the scale.
-     */
-    public _updateExtent(plotProvidedKey: string, attr: string, extent: D[]) {
-      this._rendererAttrID2Extent[plotProvidedKey + attr] = extent;
-      this._autoDomainIfAutomaticMode();
-      return this;
+    public addExtentProvider(provider: Scales.ExtentProvider<D>) {
+      this._extentProviders.add(provider);
     }
 
-    public _removeExtent(plotProvidedKey: string, attr: string) {
-      delete this._rendererAttrID2Extent[plotProvidedKey + attr];
-      this._autoDomainIfAutomaticMode();
-      return this;
+    public removeExtentProvider(provider: Scales.ExtentProvider<D>) {
+      this._extentProviders.delete(provider);
     }
   }
 }
