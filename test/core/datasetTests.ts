@@ -6,7 +6,7 @@ describe("Dataset", () => {
   it("Updates listeners when the data is changed", () => {
     var ds = new Plottable.Dataset();
 
-    var newData = [ 1, 2, 3 ];
+    var newData = [1, 2, 3];
 
     var callbackCalled = false;
     var callback = (listenable: Plottable.Dataset) => {
@@ -35,6 +35,28 @@ describe("Dataset", () => {
 
     ds.metadata(newMetadata);
     assert.isTrue(callbackCalled, "callback was called when the metadata was changed");
+  });
+
+  it("Removing listener from dataset should be possible", () => {
+    var ds = new Plottable.Dataset();
+
+    var newData1 = [1, 2, 3];
+    var newData2 = [4, 5, 6];
+
+    var callbackCalled = false;
+    var callback = (listenable: Plottable.Dataset) => {
+      assert.strictEqual(listenable, ds, "Callback received the Dataset as the first argument");
+      callbackCalled = true;
+    };
+    ds.onUpdate(callback);
+
+    ds.data(newData1);
+    assert.isTrue(callbackCalled, "callback was called when the data was changed");
+
+    callbackCalled = false;
+    ds.offUpdate(callback);
+    ds.data(newData2);
+    assert.isFalse(callbackCalled, "callback was called when the data was changed");
   });
 
   it("_getExtent works as expected with user metadata", () => {
