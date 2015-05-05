@@ -853,6 +853,11 @@ declare module Plottable {
 
 
 declare module Plottable {
+    module Scales {
+        interface ExtentProvider<D> {
+            (scale: Scale<D, any>): D[][];
+        }
+    }
     class Scale<D, R> extends Core.PlottableObject {
         _typeCoercer: (d: any) => any;
         protected _d3Scale: D3.Scale.Scale;
@@ -943,18 +948,8 @@ declare module Plottable {
          * @returns {Scale} A copy of the calling Scale.
          */
         copy(): Scale<D, R>;
-        /**
-         * When a renderer determines that the extent of a projector has changed,
-         * it will call this function. This function should ensure that
-         * the scale has a domain at least large enough to include extent.
-         *
-         * @param {number} rendererID A unique indentifier of the renderer sending
-         *                 the new extent.
-         * @param {string} attr The attribute being projected, e.g. "x", "y0", "r"
-         * @param {D[]} extent The new extent to be included in the scale.
-         */
-        _updateExtent(plotProvidedKey: string, attr: string, extent: D[]): Scale<D, R>;
-        _removeExtent(plotProvidedKey: string, attr: string): Scale<D, R>;
+        addExtentProvider(provider: Scales.ExtentProvider<D>): void;
+        removeExtentProvider(provider: Scales.ExtentProvider<D>): void;
     }
 }
 
@@ -2658,6 +2653,7 @@ declare module Plottable {
         protected _projections: {
             [attrToSet: string]: _Projection;
         };
+        protected _attrToExtents: D3.Map<any[]>;
         protected _animate: boolean;
         protected _animateOnNextRender: boolean;
         /**
@@ -2737,11 +2733,13 @@ declare module Plottable {
         animate(enabled: boolean): Plot;
         detach(): Plot;
         /**
-         * This function makes sure that all of the scales in this._projections
-         * have an extent that includes all the data that is projected onto them.
+         * Updates the extents associated with each attribute, then autodomains all scales the Plot uses.
          */
-        protected _updateScaleExtents(): void;
-        _updateScaleExtent(attr: string): void;
+        protected _updateExtents(): void;
+        /**
+         * Override in subclass to add special extents, such as included values
+         */
+        protected _extentsForAttr(attr: string): any[];
         /**
          * Get the animator associated with the specified Animator key.
          *
@@ -3227,7 +3225,7 @@ declare module Plottable {
         _setDatasetStackOffsets(positiveDataMapArray: D3.Map<Plots.StackedDatum>[], negativeDataMapArray: D3.Map<Plots.StackedDatum>[]): void;
         _getDomainKeys(): string[];
         _generateDefaultMapArray(): D3.Map<Plots.StackedDatum>[];
-        _updateScaleExtents(): void;
+        protected _extentsForAttr(attr: string): any[];
         _normalizeDatasets<A, B>(fromX: boolean): {
             a: A;
             b: B;
@@ -3266,7 +3264,7 @@ declare module Plottable {
             _setDatasetStackOffsets(positiveDataMapArray: D3.Map<StackedDatum>[], negativeDataMapArray: D3.Map<StackedDatum>[]): void;
             _getDomainKeys(): any;
             _generateDefaultMapArray(): D3.Map<StackedDatum>[];
-            _updateScaleExtents(): void;
+            protected _extentsForAttr(attr: string): any;
             _keyAccessor(): _Accessor;
             _valueAccessor(): _Accessor;
             _getPlotMetadataForDataset(key: string): StackedPlotMetadata;
@@ -3310,7 +3308,7 @@ declare module Plottable {
             _setDatasetStackOffsets(positiveDataMapArray: D3.Map<StackedDatum>[], negativeDataMapArray: D3.Map<StackedDatum>[]): void;
             _getDomainKeys(): any;
             _generateDefaultMapArray(): D3.Map<StackedDatum>[];
-            _updateScaleExtents(): void;
+            protected _extentsForAttr(attr: string): any;
             _keyAccessor(): _Accessor;
             _valueAccessor(): _Accessor;
         }

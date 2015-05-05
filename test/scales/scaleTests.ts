@@ -17,25 +17,16 @@ describe("Scales", () => {
   });
 
   it("Scale alerts listeners when its domain is updated", () => {
-    var scale = new Plottable.Scales.Linear();
+    var scale = new Plottable.Scale(d3.scale.identity());
+
     var callbackWasCalled = false;
-    var testCallback = (listenable: Plottable.Scales.Linear) => {
+    var testCallback = (listenable: Plottable.Scale<any, any>) => {
       assert.strictEqual(listenable, scale, "Callback received the calling scale as the first argument");
       callbackWasCalled = true;
     };
     scale.registerListener(testCallback);
     scale.domain([0, 10]);
     assert.isTrue(callbackWasCalled, "The registered callback was called");
-
-    (<any> scale)._autoDomainAutomatically = true;
-    scale._updateExtent("1", "x", [0.08, 9.92]);
-    callbackWasCalled = false;
-    scale.domainer(new Plottable.Domainer().nice());
-    assert.isTrue(callbackWasCalled, "The registered callback was called when nice() is used to set the domain");
-
-    callbackWasCalled = false;
-    scale.domainer(new Plottable.Domainer().pad());
-    assert.isTrue(callbackWasCalled, "The registered callback was called when padDomain() is used to set the domain");
   });
 
   describe("autoranging behavior", () => {
@@ -49,7 +40,7 @@ describe("Scales", () => {
     });
 
     it("scale autoDomain flag is not overwritten without explicitly setting the domain", () => {
-      scale._updateExtent("1", "x", d3.extent(data, (e) => e.foo));
+      scale.addExtentProvider((scale: Plottable.Scale<number, number>) => [d3.extent(data, (e) => e.foo)]);
       scale.domainer(new Plottable.Domainer().pad().nice());
       assert.isTrue((<any> scale)._autoDomainAutomatically,
                           "the autoDomain flag is still set after autoranginging and padding and nice-ing");
@@ -93,21 +84,27 @@ describe("Scales", () => {
       svg2.remove();
     });
 
-    it("scale perspectives can be removed appropriately", () => {
-      assert.isTrue((<any> scale)._autoDomainAutomatically, "autoDomain enabled1");
-      scale._updateExtent("1", "x", d3.extent(data, (e) => e.foo));
-      scale._updateExtent("2", "x", d3.extent(data, (e) => e.bar));
-      assert.isTrue((<any> scale)._autoDomainAutomatically, "autoDomain enabled2");
-      assert.deepEqual(scale.domain(), [-20, 5], "scale domain includes both perspectives");
-      assert.isTrue((<any> scale)._autoDomainAutomatically, "autoDomain enabled3");
-      scale._removeExtent("1", "x");
-      assert.isTrue((<any> scale)._autoDomainAutomatically, "autoDomain enabled4");
-      assert.closeTo(scale.domain()[0], -20, 0.1, "only the bar accessor is active");
-      assert.closeTo(scale.domain()[1], 1, 0.1, "only the bar accessor is active");
-      scale._updateExtent("2", "x", d3.extent(data, (e) => e.foo));
-      assert.isTrue((<any> scale)._autoDomainAutomatically, "autoDomain enabled5");
-      assert.closeTo(scale.domain()[0], 0, 0.1, "the bar accessor was overwritten");
-      assert.closeTo(scale.domain()[1], 5, 0.1, "the bar accessor was overwritten");
+    it("addExtentProvider()", () => {
+      scale.addExtentProvider((scale: Plottable.Scale<number, number>) => [[0, 10]]);
+      scale.autoDomain();
+      assert.deepEqual(scale.domain(), [0, 10], "scale domain accounts for first provider");
+
+      scale.addExtentProvider((scale: Plottable.Scale<number, number>) => [[-10, 0]]);
+      scale.autoDomain();
+      assert.deepEqual(scale.domain(), [-10, 10], "scale domain accounts for second provider");
+    });
+
+    it("removeExtentProvider()", () => {
+      var posProvider: Plottable.Scales.ExtentProvider<number> = (scale: Plottable.Scale<number, number>) => [[0, 10]];
+      scale.addExtentProvider(posProvider);
+      var negProvider: Plottable.Scales.ExtentProvider<number> = (scale: Plottable.Scale<number, number>) => [[-10, 0]];
+      scale.addExtentProvider(negProvider);
+      scale.autoDomain();
+      assert.deepEqual(scale.domain(), [-10, 10], "scale domain accounts for both providers");
+
+      scale.removeExtentProvider(negProvider);
+      scale.autoDomain();
+      assert.deepEqual(scale.domain(), [0, 10], "scale domain only accounts for remaining provider");
     });
 
     it("should resize when a plot is removed", () => {
@@ -405,6 +402,7 @@ describe("Scales", () => {
       assert.strictEqual("#e3e3e3", scale.scale(8));
     });
   });
+
   describe("Modified Log Scale", () => {
     var scale: Plottable.Scales.ModifiedLog;
     var base = 10;
@@ -443,8 +441,8 @@ describe("Scales", () => {
       assert.deepEqual(scale.domain(), [0, 1]);
     });
 
-    it("works with a domainer", () => {
-      scale._updateExtent("1", "x", [0, base * 2]);
+    it("works with a Domainer", () => {
+      scale.addExtentProvider((scale: Plottable.Scale<number, number>) => [[0, base * 2]]);
       var domain = scale.domain();
       scale.domainer(new Plottable.Domainer().pad(0.1));
       assert.operator(scale.domain()[0], "<", domain[0]);
@@ -460,11 +458,14 @@ describe("Scales", () => {
     });
 
     it("gives reasonable values for ticks()", () => {
-      scale._updateExtent("1", "x", [0, base / 2]);
+      var providedExtents = [[0, base / 2]];
+      scale.addExtentProvider((scale: Plottable.Scale<number, number>) => providedExtents);
+      scale.autoDomain();
       var ticks = scale.ticks();
       assert.operator(ticks.length, ">", 0);
 
-      scale._updateExtent("1", "x", [-base * 2, base * 2]);
+      providedExtents = [[-base * 2, base * 2]];
+      scale.autoDomain();
       ticks = scale.ticks();
       var beforePivot = ticks.filter((x) => x <= -base);
       var afterPivot = ticks.filter((x) => base <= x);
@@ -475,7 +476,8 @@ describe("Scales", () => {
     });
 
     it("works on inverted domain", () => {
-      scale._updateExtent("1", "x", [200, -100]);
+      scale.addExtentProvider((scale: Plottable.Scale<number, number>) => [[200, -100]]);
+      scale.autoDomain();
       var range = scale.range();
       assert.closeTo(scale.scale(-100), range[1], epsilon);
       assert.closeTo(scale.scale(200), range[0], epsilon);
@@ -496,8 +498,11 @@ describe("Scales", () => {
     });
 
     it("ticks() is always non-empty", () => {
-      [[2, 9], [0, 1], [1, 2], [0.001, 0.01], [-0.1, 0.1], [-3, -2]].forEach((domain) => {
-        scale._updateExtent("1", "x", domain);
+      var desiredExtents: number[][] = [];
+      scale.addExtentProvider((scale: Plottable.Scale<number, number>) => desiredExtents);
+      [[2, 9], [0, 1], [1, 2], [0.001, 0.01], [-0.1, 0.1], [-3, -2]].forEach((extent) => {
+        desiredExtents = [extent];
+        scale.autoDomain();
         var ticks = scale.ticks();
         assert.operator(ticks.length, ">", 0);
       });

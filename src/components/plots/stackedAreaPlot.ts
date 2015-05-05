@@ -127,8 +127,8 @@ export module Plots {
       return Stacked.prototype._generateDefaultMapArray.call(this);
     }
 
-    public _updateScaleExtents() {
-      Stacked.prototype._updateScaleExtents.call(this);
+    protected _extentsForAttr(attr: string) {
+      return (<any> Stacked.prototype)._extentsForAttr.call(this, attr);
     }
 
     public _keyAccessor(): _Accessor {
