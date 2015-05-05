@@ -48,7 +48,6 @@
 ///<reference path="core/tableTests.ts" />
 ///<reference path="core/domainerTests.ts" />
 
-///<reference path="scales/coordinatorTests.ts" />
 ///<reference path="scales/scaleTests.ts" />
 ///<reference path="scales/timeScaleTests.ts" />
 ///<reference path="scales/tickGeneratorsTests.ts" />

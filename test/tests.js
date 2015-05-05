@@ -2142,11 +2142,11 @@ describe("Plots", function () {
             r.project("x", "x", xScale);
             r.project("y", "y", yScale);
             r.project("meta", metadataProjector);
-            xScale.broadcaster.registerListener("unitTest", function (listenable) {
+            xScale.onUpdate(function (listenable) {
                 assert.strictEqual(listenable, xScale, "Callback received the calling scale as the first argument");
                 ++xScaleCalls;
             });
-            yScale.broadcaster.registerListener("unitTest", function (listenable) {
+            yScale.onUpdate(function (listenable) {
                 assert.strictEqual(listenable, yScale, "Callback received the calling scale as the first argument");
                 ++yScaleCalls;
             });
@@ -2425,12 +2425,12 @@ describe("Plots", function () {
             });
         });
         it("remove() disconnects plots from its scales", function () {
-            var r = new Plottable.Plot();
-            var s = new Plottable.Scales.Linear();
-            r.project("attr", "a", s);
-            r.remove();
-            var key2callback = s.broadcaster._key2callback;
-            assert.isUndefined(key2callback.get(r), "the plot is no longer attached to the scale");
+            var plot2 = new Plottable.Plot();
+            var scale = new Plottable.Scales.Linear();
+            plot2.project("attr", "a", scale);
+            plot2.remove();
+            var scaleCallbacks = scale._callbacks.values();
+            assert.strictEqual(scaleCallbacks.length, 0, "the plot is no longer attached to the scale");
         });
         it("extent registration works as intended", function () {
             var scale1 = new Plottable.Scales.Linear();
@@ -2571,10 +2571,10 @@ describe("Plots", function () {
         it("listeners are deregistered after removal", function () {
             plot.automaticallyAdjustYScaleOverVisiblePoints(true);
             plot.remove();
-            var key2callback = xScale.broadcaster._key2callback;
-            assert.isUndefined(key2callback.get("yDomainAdjustment" + plot.getID()), "the plot is no longer attached to the xScale");
-            key2callback = yScale.broadcaster._key2callback;
-            assert.isUndefined(key2callback.get("xDomainAdjustment" + plot.getID()), "the plot is no longer attached to the yScale");
+            var xScaleCallbacks = xScale._callbacks.values();
+            assert.strictEqual(xScaleCallbacks.length, 0, "the plot is no longer attached to xScale");
+            var yScaleCallbacks = yScale._callbacks.values();
+            assert.strictEqual(yScaleCallbacks.length, 0, "the plot is no longer attached to yScale");
             svg.remove();
         });
         it("listeners are deregistered for changed scale", function () {
@@ -6662,6 +6662,16 @@ describe("Component behavior", function () {
     describe("origin methods", function () {
         var cWidth = 100;
         var cHeight = 100;
+        it("modifying returned value does not affect origin", function () {
+            c.renderTo(svg);
+            var receivedOrigin = c.origin();
+            var delta = 10;
+            receivedOrigin.x += delta;
+            receivedOrigin.y += delta;
+            assert.notStrictEqual(receivedOrigin.x, c.origin().x, "receieved point can be modified without affecting origin (x)");
+            assert.notStrictEqual(receivedOrigin.y, c.origin().y, "receieved point can be modified without affecting origin (y)");
+            svg.remove();
+        });
         it("origin() (top-level component)", function () {
             TestMethods.fixComponentSize(c, cWidth, cHeight);
             c.renderTo(svg);
@@ -7296,40 +7306,18 @@ describe("Domainer", function () {
 
 ///<reference path="../testReference.ts" />
 var assert = chai.assert;
-describe("Coordinators", function () {
-    describe("ScaleDomainCoordinator", function () {
-        it("domains are coordinated", function () {
-            var s1 = new Plottable.Scales.Linear();
-            var s2 = new Plottable.Scales.Linear();
-            var s3 = new Plottable.Scales.Linear();
-            var coordinator = new Plottable.Utils.ScaleDomainCoordinator([s1, s2, s3]);
-            // HACKHACK: #1893 ScaleDomainCoordinator should not do so much magic on construction
-            assert.isNotNull(coordinator, "proper coordination is set up");
-            s1.domain([0, 100]);
-            assert.deepEqual(s1.domain(), [0, 100]);
-            assert.deepEqual(s1.domain(), s2.domain());
-            assert.deepEqual(s1.domain(), s3.domain());
-            s1.domain([-100, 5000]);
-            assert.deepEqual(s1.domain(), [-100, 5000]);
-            assert.deepEqual(s1.domain(), s2.domain());
-            assert.deepEqual(s1.domain(), s3.domain());
-        });
-    });
-});
-
-///<reference path="../testReference.ts" />
-var assert = chai.assert;
 describe("Scales", function () {
     it("Scale's copy() works correctly", function () {
         var testCallback = function (listenable) {
-            return true; // doesn't do anything
+            return true;
         };
         var scale = new Plottable.Scales.Linear();
-        scale.broadcaster.registerListener(null, testCallback);
+        scale.onUpdate(testCallback);
         var scaleCopy = scale.copy();
         assert.deepEqual(scale.domain(), scaleCopy.domain(), "Copied scale has the same domain as the original.");
         assert.deepEqual(scale.range(), scaleCopy.range(), "Copied scale has the same range as the original.");
-        assert.notDeepEqual(scale.broadcaster, scaleCopy.broadcaster, "Broadcasters are not copied over");
+        assert.strictEqual(scale._callbacks.values().length, 1, "The initial scale should have a callback attached");
+        assert.strictEqual(scaleCopy._callbacks.values().length, 0, "The copied scale should not have any callback from the original scale attached");
     });
     it("Scale alerts listeners when its domain is updated", function () {
         var scale = new Plottable.Scale(d3.scale.identity());
@@ -7338,9 +7326,24 @@ describe("Scales", function () {
             assert.strictEqual(listenable, scale, "Callback received the calling scale as the first argument");
             callbackWasCalled = true;
         };
-        scale.broadcaster.registerListener(null, testCallback);
+        scale.onUpdate(testCallback);
         scale.domain([0, 10]);
         assert.isTrue(callbackWasCalled, "The registered callback was called");
+    });
+    it("Scale update listeners can be turned off", function () {
+        var scale = new Plottable.Scale(d3.scale.identity());
+        var callbackWasCalled = false;
+        var testCallback = function (listenable) {
+            assert.strictEqual(listenable, scale, "Callback received the calling scale as the first argument");
+            callbackWasCalled = true;
+        };
+        scale.onUpdate(testCallback);
+        scale.domain([0, 10]);
+        assert.isTrue(callbackWasCalled, "The registered callback was called");
+        callbackWasCalled = false;
+        scale.offUpdate(testCallback);
+        scale.domain([11, 19]);
+        assert.isFalse(callbackWasCalled, "The registered callback was not called because the callback was removed");
     });
     describe("autoranging behavior", function () {
         var data;
@@ -9150,7 +9153,7 @@ describe("Dispatchers", function () {
             TestMethods.triggerFakeUIEvent("click", d3document);
             assert.strictEqual(callbackCalls, 0, "disconnected correctly (callback not called)");
         });
-        it("won't _disconnect() if broadcasters still have listeners", function () {
+        it("won't _disconnect() if dispatcher still have listeners", function () {
             var dispatcher = new Plottable.Dispatcher();
             var callbackWasCalled = false;
             dispatcher._event2Callback["click"] = function () { return callbackWasCalled = true; };
@@ -9165,12 +9168,12 @@ describe("Dispatchers", function () {
             dispatcher._disconnect();
             callbackWasCalled = false;
             TestMethods.triggerFakeUIEvent("click", d3document);
-            assert.isTrue(callbackWasCalled, "didn't disconnect while broadcaster had listener");
+            assert.isTrue(callbackWasCalled, "didn't disconnect while dispatcher had listener");
             callbackSet.delete(callback);
             dispatcher._disconnect();
             callbackWasCalled = false;
             TestMethods.triggerFakeUIEvent("click", d3document);
-            assert.isFalse(callbackWasCalled, "disconnected when broadcaster had no listeners");
+            assert.isFalse(callbackWasCalled, "disconnected when dispatcher had no listeners");
         });
         it("setCallback()", function () {
             var dispatcher = new Plottable.Dispatcher();

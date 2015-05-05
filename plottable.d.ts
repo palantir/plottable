@@ -426,22 +426,6 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Utils {
-        class ScaleDomainCoordinator<D> {
-            /**
-             * Constructs a ScaleDomainCoordinator.
-             *
-             * @constructor
-             * @param {Scale[]} scales A list of scales whose domains should be linked.
-             */
-            constructor(scales: Scale<D, any>[]);
-            rescale(scale: Scale<D, any>): void;
-        }
-    }
-}
-
-
-declare module Plottable {
     module Configs {
         /**
          * Specifies if Plottable should show warnings.
@@ -869,15 +853,17 @@ declare module Plottable {
 
 
 declare module Plottable {
+    interface ScaleCallback<S extends Scale<any, any>> {
+        (scale: S): any;
+    }
     module Scales {
         interface ExtentProvider<D> {
             (scale: Scale<D, any>): D[][];
         }
     }
     class Scale<D, R> extends Core.PlottableObject {
-        protected _d3Scale: D3.Scale.Scale;
-        broadcaster: Core.Broadcaster<Scale<D, R>>;
         _typeCoercer: (d: any) => any;
+        protected _d3Scale: D3.Scale.Scale;
         /**
          * Constructs a new Scale.
          *
@@ -891,6 +877,9 @@ declare module Plottable {
         constructor(scale: D3.Scale.Scale);
         protected _getAllExtents(): D[][];
         protected _getExtent(): D[];
+        onUpdate(callback: ScaleCallback<Scale<D, R>>): void;
+        offUpdate(callback: ScaleCallback<Scale<D, R>>): void;
+        protected _dispatchUpdate(): void;
         /**
          * Modifies the domain on the scale so that it includes the extent of all
          * perspectives it depends on. This will normally happen automatically, but

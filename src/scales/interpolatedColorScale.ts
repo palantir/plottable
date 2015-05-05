@@ -192,7 +192,7 @@ export module Scales {
     private _resetScale(): any {
       this._d3Scale = InterpolatedColor._getD3InterpolatedScale(this._colorRange, this._scaleType);
       this._autoDomainIfAutomaticMode();
-      this.broadcaster.broadcast();
+      this._dispatchUpdate();
     }
 
     private _resolveColorValues(colorRange: string | string[]): string[] {

@@ -53,10 +53,10 @@ export module Dispatchers {
       this._cancelCallbacks = new Utils.CallbackSet<TouchCallback>();
       this._callbacks = [this._moveCallbacks, this._startCallbacks, this._endCallbacks, this._cancelCallbacks];
 
-      this._event2Callback["touchstart"] = (e: TouchEvent) => this._measureAndBroadcast(e, this._startCallbacks);
-      this._event2Callback["touchmove"] = (e: TouchEvent) => this._measureAndBroadcast(e, this._moveCallbacks);
-      this._event2Callback["touchend"] = (e: TouchEvent) => this._measureAndBroadcast(e, this._endCallbacks);
-      this._event2Callback["touchcancel"] = (e: TouchEvent) => this._measureAndBroadcast(e, this._cancelCallbacks);
+      this._event2Callback["touchstart"] = (e: TouchEvent) => this._measureAndDispatch(e, this._startCallbacks);
+      this._event2Callback["touchmove"] = (e: TouchEvent) => this._measureAndDispatch(e, this._moveCallbacks);
+      this._event2Callback["touchend"] = (e: TouchEvent) => this._measureAndDispatch(e, this._endCallbacks);
+      this._event2Callback["touchcancel"] = (e: TouchEvent) => this._measureAndDispatch(e, this._cancelCallbacks);
     }
 
     /**
@@ -165,9 +165,9 @@ export module Dispatchers {
 
     /**
      * Computes the Touch position from the given event, and if successful
-     * calls broadcast() on the supplied Broadcaster.
+     * calls all the callbacks in the provided callbackSet.
      */
-    private _measureAndBroadcast(event: TouchEvent, callbackSet: Utils.CallbackSet<TouchCallback>) {
+    private _measureAndDispatch(event: TouchEvent, callbackSet: Utils.CallbackSet<TouchCallback>) {
       var touches = event.changedTouches;
       var touchPositions: { [id: number]: Point; } = {};
       var touchIdentifiers: number[] = [];
