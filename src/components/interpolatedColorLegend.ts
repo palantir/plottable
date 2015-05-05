@@ -17,6 +17,8 @@ export module Components {
     private _lowerLabel: D3.Selection;
     private _upperLabel: D3.Selection;
 
+    private _redrawFunctionWrapper: Function;
+
     /**
      * The css class applied to the legend labels.
      */
@@ -40,7 +42,8 @@ export module Components {
         throw new Error("InterpolatedColorLegend requires a interpolatedColorScale");
       }
       this._scale = interpolatedColorScale;
-      this._scale.registerCoolListener(this, () => this.redraw());
+      this._redrawFunctionWrapper = () => this.redraw();
+      this._scale.registerCoolListener(this, this._redrawFunctionWrapper);
       this._formatter = formatter;
       this._orientation = InterpolatedColorLegend._ensureOrientation(orientation);
 
@@ -51,7 +54,7 @@ export module Components {
 
     public remove() {
       super.remove();
-      this._scale.deregisterCoolListener(this);
+      this._scale.deregisterCoolListener(this, this._redrawFunctionWrapper);
     }
 
     /**

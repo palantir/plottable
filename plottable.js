@@ -1742,7 +1742,10 @@ var Plottable;
             this.broadcaster.registerListener(key, callback);
             this._callbacks.add(callback);
         };
-        Scale.prototype.deregisterCoolListener = function (key) {
+        Scale.prototype.deregisterCoolListener = function (key, callback) {
+            this.broadcaster.deregisterListener(key);
+        };
+        Scale.prototype.deregisterAllListeners = function (key) {
             this.broadcaster.deregisterListener(key);
         };
         Scale.prototype.broadcast = function () {
@@ -4075,11 +4078,12 @@ var Plottable;
                 this.classed("y-axis", true);
             }
             this.formatter(formatter);
-            this._scale.registerCoolListener(this, function () { return _this._rescale(); });
+            this._rescaleFunctionWrapper = function () { return _this._rescale(); };
+            this._scale.registerCoolListener(this, this._rescaleFunctionWrapper);
         }
         Axis.prototype.remove = function () {
             _super.prototype.remove.call(this);
-            this._scale.deregisterCoolListener(this);
+            this._scale.deregisterCoolListener(this, _rescaleFunctionWrapper);
         };
         Axis.prototype._isHorizontal = function () {
             return this._orientation === "top" || this._orientation === "bottom";
@@ -5522,7 +5526,8 @@ var Plottable;
                     throw new Error("Legend requires a colorScale");
                 }
                 this._scale = colorScale;
-                this._scale.registerCoolListener(this, function () { return _this.redraw(); });
+                this._redrawFunctionWrapper = function () { return _this.redraw(); };
+                this._scale.registerCoolListener(this, this._redrawFunctionWrapper);
                 this.xAlign("right").yAlign("top");
                 this._fixedWidthFlag = true;
                 this._fixedHeightFlag = true;
@@ -5559,11 +5564,10 @@ var Plottable;
                 }
             };
             Legend.prototype.scale = function (scale) {
-                var _this = this;
                 if (scale != null) {
-                    this._scale.deregisterCoolListener(this);
+                    this._scale.deregisterCoolListener(this, this._redrawFunctionWrapper);
                     this._scale = scale;
-                    this._scale.registerCoolListener(this, function () { return _this.redraw(); });
+                    this._scale.registerCoolListener(this, this._redrawFunctionWrapper);
                     this.redraw();
                     return this;
                 }
@@ -5573,7 +5577,7 @@ var Plottable;
             };
             Legend.prototype.remove = function () {
                 _super.prototype.remove.call(this);
-                this._scale.deregisterCoolListener(this);
+                this._scale.deregisterCoolListener(this, this._redrawFunctionWrapper);
             };
             Legend.prototype._calculateLayoutInfo = function (availableWidth, availableHeight) {
                 var _this = this;
@@ -5773,7 +5777,8 @@ var Plottable;
                     throw new Error("InterpolatedColorLegend requires a interpolatedColorScale");
                 }
                 this._scale = interpolatedColorScale;
-                this._scale.registerCoolListener(this, function () { return _this.redraw(); });
+                this._redrawFunctionWrapper = function () { return _this.redraw(); };
+                this._scale.registerCoolListener(this, this._redrawFunctionWrapper);
                 this._formatter = formatter;
                 this._orientation = InterpolatedColorLegend._ensureOrientation(orientation);
                 this._fixedWidthFlag = true;
@@ -5782,7 +5787,7 @@ var Plottable;
             }
             InterpolatedColorLegend.prototype.remove = function () {
                 _super.prototype.remove.call(this);
-                this._scale.deregisterCoolListener(this);
+                this._scale.deregisterCoolListener(this, this._redrawFunctionWrapper);
             };
             InterpolatedColorLegend.prototype.formatter = function (formatter) {
                 if (formatter === undefined) {
@@ -5994,20 +5999,21 @@ var Plottable;
                 this.classed("gridlines", true);
                 this._xScale = xScale;
                 this._yScale = yScale;
+                this._renderFunctionWrapper = function () { return _this._render(); };
                 if (this._xScale) {
-                    this._xScale.registerCoolListener(this, function () { return _this._render(); });
+                    this._xScale.registerCoolListener(this, this._renderFunctionWrapper);
                 }
                 if (this._yScale) {
-                    this._yScale.registerCoolListener(this, function () { return _this._render(); });
+                    this._yScale.registerCoolListener(this, this._renderFunctionWrapper);
                 }
             }
             Gridlines.prototype.remove = function () {
                 _super.prototype.remove.call(this);
                 if (this._xScale) {
-                    this._xScale.deregisterCoolListener(this);
+                    this._xScale.deregisterCoolListener(this, this._renderFunctionWrapper);
                 }
                 if (this._yScale) {
-                    this._yScale.deregisterCoolListener(this);
+                    this._yScale.deregisterCoolListener(this, this._renderFunctionWrapper);
                 }
                 return this;
             };

@@ -25,6 +25,8 @@ export module Components {
     private _writer: SVGTypewriter.Writers.Writer;
     private _symbolFactoryAccessor: (datum: any, index: number) => SymbolFactory;
 
+    private _redrawFunctionWrapper: Function;
+
     /**
      * Creates a Legend.
      *
@@ -44,7 +46,8 @@ export module Components {
       }
 
       this._scale = colorScale;
-      this._scale.registerCoolListener(this, () => this.redraw());
+      this._redrawFunctionWrapper = () => this.redraw();
+      this._scale.registerCoolListener(this, this._redrawFunctionWrapper);
 
       this.xAlign("right").yAlign("top");
       this._fixedWidthFlag = true;
@@ -122,9 +125,9 @@ export module Components {
     public scale(scale: Scales.Color): Legend;
     public scale(scale?: Scales.Color): any {
       if (scale != null) {
-        this._scale.deregisterCoolListener(this);
+        this._scale.deregisterCoolListener(this, this._redrawFunctionWrapper);
         this._scale = scale;
-        this._scale.registerCoolListener(this, () => this.redraw());
+        this._scale.registerCoolListener(this, this._redrawFunctionWrapper);
         this.redraw();
         return this;
       } else {
@@ -134,7 +137,7 @@ export module Components {
 
     public remove() {
       super.remove();
-      this._scale.deregisterCoolListener(this);
+      this._scale.deregisterCoolListener(this, this._redrawFunctionWrapper);
     }
 
     private _calculateLayoutInfo(availableWidth: number, availableHeight: number) {

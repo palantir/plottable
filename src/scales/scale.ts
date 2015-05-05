@@ -43,7 +43,11 @@ module Plottable {
         this._callbacks.add(callback);
     }
 
-    public deregisterCoolListener(key: any) {
+    public deregisterCoolListener(key: any, callback: Core.BroadcasterCallback<Scale<D, R>>) {
+        this.broadcaster.deregisterListener(key);
+    }
+
+    public deregisterAllListeners(key: any) {
         this.broadcaster.deregisterListener(key);
     }
 

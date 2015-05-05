@@ -8,6 +8,8 @@ export module Components {
     private _xLinesContainer: D3.Selection;
     private _yLinesContainer: D3.Selection;
 
+    private _renderFunctionWrapper: Function;
+
     /**
      * Creates a set of Gridlines.
      * @constructor
@@ -26,21 +28,22 @@ export module Components {
       this.classed("gridlines", true);
       this._xScale = xScale;
       this._yScale = yScale;
+      this._renderFunctionWrapper = () => this._render();
       if (this._xScale) {
-        this._xScale.registerCoolListener(this, () => this._render());
+        this._xScale.registerCoolListener(this, this._renderFunctionWrapper);
       }
       if (this._yScale) {
-        this._yScale.registerCoolListener(this, () => this._render());
+        this._yScale.registerCoolListener(this, this._renderFunctionWrapper);
       }
     }
 
     public remove() {
       super.remove();
       if (this._xScale) {
-        this._xScale.deregisterCoolListener(this);
+        this._xScale.deregisterCoolListener(this, this._renderFunctionWrapper);
       }
       if (this._yScale) {
-        this._yScale.deregisterCoolListener(this);
+        this._yScale.deregisterCoolListener(this, this._renderFunctionWrapper);
       }
       return this;
     }

@@ -28,6 +28,8 @@ module Plottable {
     private _gutter = 15;
     private _showEndTickLabels = false;
 
+    private _rescaleFunctionWrapper: Function;
+
     /**
      * Constructs an axis. An axis is a wrapper around a scale for rendering.
      *
@@ -54,12 +56,13 @@ module Plottable {
 
       this.formatter(formatter);
 
-      this._scale.registerCoolListener(this, () => this._rescale());
+      this._rescaleFunctionWrapper = () => this._rescale();
+      this._scale.registerCoolListener(this, this._rescaleFunctionWrapper);
     }
 
     public remove() {
       super.remove();
-      this._scale.deregisterCoolListener(this);
+      this._scale.deregisterCoolListener(this, _rescaleFunctionWrapper);
     }
 
     protected _isHorizontal() {
