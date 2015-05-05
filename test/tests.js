@@ -7318,6 +7318,21 @@ describe("Scales", function () {
         scale.onUpdate(testCallback);
         scale.domain([0, 10]);
         assert.isTrue(callbackWasCalled, "The registered callback was called");
+        callbackWasCalled = false;
+        scale.offUpdate(testCallback);
+        scale.domain([11, 19]);
+        assert.isFalse(callbackWasCalled, "The registered callback was called");
+    });
+    it("Scale update listeners can be turned off", function () {
+        var scale = new Plottable.Scale(d3.scale.identity());
+        var callbackWasCalled = false;
+        var testCallback = function (listenable) {
+            assert.strictEqual(listenable, scale, "Callback received the calling scale as the first argument");
+            callbackWasCalled = true;
+        };
+        scale.onUpdate(testCallback);
+        scale.domain([0, 10]);
+        assert.isTrue(callbackWasCalled, "The registered callback was called");
     });
     describe("autoranging behavior", function () {
         var data;
