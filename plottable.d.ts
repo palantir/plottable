@@ -658,14 +658,14 @@ declare module Plottable {
              *
              * @param {Component} component Any Plottable component.
              */
-            function registerToRender(c: Component): void;
+            function registerToRender(component: Component): void;
             /**
              * If the RenderController is enabled, we enqueue the component for
              * layout and render. Otherwise, it is rendered immediately.
              *
              * @param {Component} component Any Plottable component.
              */
-            function registerToComputeLayout(c: Component): void;
+            function registerToComputeLayout(component: Component): void;
             /**
              * Render everything that is waiting to be rendered right now, instead of
              * waiting until the next frame.
@@ -1619,7 +1619,7 @@ declare module Plottable {
             width: number;
             height: number;
         };
-        _render(): void;
+        render(): Component;
         _doRender(): void;
         _useLastCalculatedLayout(): boolean;
         _useLastCalculatedLayout(useLast: boolean): Component;
@@ -1820,7 +1820,7 @@ declare module Plottable {
 declare module Plottable {
     class ComponentContainer extends Component {
         anchor(selection: D3.Selection): ComponentContainer;
-        _render(): void;
+        render(): ComponentContainer;
         _removeComponent(c: Component): void;
         _addComponent(c: Component, prepend?: boolean): boolean;
         /**

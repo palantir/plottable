@@ -228,7 +228,7 @@ export module Components {
         throw new Error("detection radius cannot be negative.");
       }
       this._detectionRadius = r;
-      this._render();
+      this.render();
       return this;
     }
 

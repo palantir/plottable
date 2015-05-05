@@ -51,7 +51,7 @@ export module Components {
       }
 
       this._setBounds(newBounds);
-      this._render();
+      this.render();
       return this;
     }
 
@@ -105,7 +105,7 @@ export module Components {
       }
 
       this._boxVisible = show;
-      this._render();
+      this.render();
       return this;
     }
   }

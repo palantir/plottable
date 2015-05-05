@@ -114,7 +114,7 @@ module Plottable {
 
     protected _rescale() {
       // default implementation; subclasses may call redraw() here
-      this._render();
+      this.render();
     }
 
     public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
@@ -452,7 +452,7 @@ module Plottable {
         return this._showEndTickLabels;
       }
       this._showEndTickLabels = show;
-      this._render();
+      this.render();
       return this;
     }
   }
