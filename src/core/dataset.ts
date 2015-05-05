@@ -40,7 +40,7 @@ module Plottable {
     }
 
     private _dispatchChange() {
-      this._callbacks.callCallbacks();
+      this._callbacks.callCallbacks(this);
     }
 
     /**

@@ -1258,7 +1258,7 @@ var Plottable;
             this._callbacks.delete(callback);
         };
         Dataset.prototype._dispatchChange = function () {
-            this._callbacks.callCallbacks();
+            this._callbacks.callCallbacks(this);
         };
         Dataset.prototype.data = function (data) {
             if (data == null) {
