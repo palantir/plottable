@@ -6529,6 +6529,7 @@ var Plottable;
             this._datasetKeysInOrder = [];
             this._nextSeriesIndex = 0;
             this._renderCallback = function (scale) { return _this._render(); };
+            this._onDatasetUpdateCallback = function () { return _this._onDatasetUpdate(); };
         }
         Plot.prototype.anchor = function (selection) {
             _super.prototype.anchor.call(this, selection);
@@ -6564,7 +6565,6 @@ var Plottable;
             return this;
         };
         Plot.prototype._addDataset = function (key, dataset) {
-            var _this = this;
             if (this._key2PlotDatasetKey.has(key)) {
                 this.removeDataset(key);
             }
@@ -6577,7 +6577,6 @@ var Plottable;
             if (this._isSetup) {
                 drawer.setup(this._renderArea.append("g"));
             }
-            this._onDatasetUpdateCallback = function () { return _this._onDatasetUpdate(); };
             dataset.registerCoolListener(this, this._onDatasetUpdateCallback);
             this._onDatasetUpdate();
         };

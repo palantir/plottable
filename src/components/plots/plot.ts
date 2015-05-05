@@ -63,6 +63,7 @@ module Plottable {
       this._datasetKeysInOrder = [];
       this._nextSeriesIndex = 0;
       this._renderCallback = (scale) => this._render();
+      this._onDatasetUpdateCallback = () => this._onDatasetUpdate();
     }
 
     public anchor(selection: D3.Selection) {
@@ -126,7 +127,6 @@ module Plottable {
         drawer.setup(this._renderArea.append("g"));
       }
 
-      this._onDatasetUpdateCallback = () => this._onDatasetUpdate();
       dataset.registerCoolListener(this, this._onDatasetUpdateCallback);
       this._onDatasetUpdate();
     }
