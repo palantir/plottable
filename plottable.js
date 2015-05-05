@@ -1247,7 +1247,6 @@ var Plottable;
             this._data = data;
             this._metadata = metadata;
             this._accessor2cachedExtent = new Plottable.Utils.StrictEqualityAssociativeArray();
-            this.broadcaster = new Plottable.Core.Broadcaster(this);
             this._callbacks = new Plottable.Utils.CallbackSet();
         }
         Dataset.prototype.registerCoolListener = function (key, callback) {

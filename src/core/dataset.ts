@@ -9,8 +9,6 @@ module Plottable {
     private _data: any[];
     private _metadata: any;
     private _accessor2cachedExtent: Utils.StrictEqualityAssociativeArray;
-    private broadcaster: Core.Broadcaster<Dataset>;
-
     private _callbacks: Utils.CallbackSet<Function>
 
     /**
@@ -28,7 +26,6 @@ module Plottable {
       this._data = data;
       this._metadata = metadata;
       this._accessor2cachedExtent = new Utils.StrictEqualityAssociativeArray();
-      this.broadcaster = new Core.Broadcaster(this);
       this._callbacks = new Utils.CallbackSet<Function>();
     }
 
