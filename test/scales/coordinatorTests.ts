@@ -8,7 +8,11 @@ describe("Coordinators", () => {
       var s1 = new Plottable.Scales.Linear();
       var s2 = new Plottable.Scales.Linear();
       var s3 = new Plottable.Scales.Linear();
-      var dc = new Plottable.Utils.ScaleDomainCoordinator([s1, s2, s3]);
+      var coordinator = new Plottable.Utils.ScaleDomainCoordinator([s1, s2, s3]);
+
+      // HACKHACK: #1893 ScaleDomainCoordinator should not do so much magic on construction
+      assert.isNotNull(coordinator, "proper coordination is set up");
+
       s1.domain([0, 100]);
       assert.deepEqual(s1.domain(), [0, 100]);
       assert.deepEqual(s1.domain(), s2.domain());

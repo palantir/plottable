@@ -14,26 +14,25 @@ describe("Utils.Methods", () => {
 
     var f = (d: any, i: number, m: any) => d + i;
     var a1 = Plottable.Utils.Methods.accessorize(f);
-    assert.equal(f, a1, "function passes through accessorize unchanged");
+    assert.strictEqual(f, a1, "function passes through accessorize unchanged");
 
     var a2 = Plottable.Utils.Methods.accessorize("key");
-    assert.equal(a2(datum, 0, null), 4, "key accessor works appropriately");
+    assert.strictEqual(a2(datum, 0, null), 4, "key accessor works appropriately");
 
     var a3 = Plottable.Utils.Methods.accessorize("#aaaa");
-    assert.equal(a3(datum, 0, null), "#aaaa", "strings beginning with # are returned as final value");
+    assert.strictEqual(a3(datum, 0, null), "#aaaa", "strings beginning with # are returned as final value");
 
     var a4 = Plottable.Utils.Methods.accessorize(33);
-    assert.equal(a4(datum, 0, null), 33, "numbers are return as final value");
+    assert.strictEqual(a4(datum, 0, null), 33, "numbers are return as final value");
 
     var a5 = Plottable.Utils.Methods.accessorize(datum);
-    assert.equal(a5(datum, 0, null), datum, "objects are return as final value");
+    assert.strictEqual(a5(datum, 0, null), datum, "objects are return as final value");
   });
 
   it("uniq works as expected", () => {
     var strings = ["foo", "bar", "foo", "foo", "baz", "bam"];
     assert.deepEqual(Plottable.Utils.Methods.uniq(strings), ["foo", "bar", "baz", "bam"]);
   });
-
 
   describe("max() and min()", () => {
     var max = Plottable.Utils.Methods.max;

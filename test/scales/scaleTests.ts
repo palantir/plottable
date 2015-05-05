@@ -21,7 +21,7 @@ describe("Scales", () => {
 
     var callbackWasCalled = false;
     var testCallback = (listenable: Plottable.Scale<any, any>) => {
-      assert.equal(listenable, scale, "Callback received the calling scale as the first argument");
+      assert.strictEqual(listenable, scale, "Callback received the calling scale as the first argument");
       callbackWasCalled = true;
     };
     scale.broadcaster.registerListener(null, testCallback);
@@ -49,11 +49,11 @@ describe("Scales", () => {
     });
 
     it("scale autorange works as expected with single dataset", () => {
-      var svg = generateSVG(100, 100);
-      var renderer = new Plottable.Plot()
-                        .addDataset(dataset)
-                        .project("x", "foo", scale)
-                        .renderTo(svg);
+      var svg = TestMethods.generateSVG(100, 100);
+      new Plottable.Plot()
+        .addDataset(dataset)
+        .project("x", "foo", scale)
+        .renderTo(svg);
       assert.deepEqual(scale.domain(), [0, 5], "scale domain was autoranged properly");
       data.push({foo: 100, bar: 200});
       dataset.data(data);
@@ -62,8 +62,8 @@ describe("Scales", () => {
     });
 
     it("scale reference counting works as expected", () => {
-      var svg1 = generateSVG(100, 100);
-      var svg2 = generateSVG(100, 100);
+      var svg1 = TestMethods.generateSVG(100, 100);
+      var svg2 = TestMethods.generateSVG(100, 100);
       var renderer1 = new Plottable.Plot()
                           .addDataset(dataset)
                           .project("x", "foo", scale);
@@ -108,14 +108,12 @@ describe("Scales", () => {
     });
 
     it("should resize when a plot is removed", () => {
-      var svg = generateSVG(400, 400);
+      var svg = TestMethods.generateSVG(400, 400);
       var ds1 = [{x: 0, y: 0}, {x: 1, y: 1}];
       var ds2 = [{x: 1, y: 1}, {x: 2, y: 2}];
       var xScale = new Plottable.Scales.Linear();
       var yScale = new Plottable.Scales.Linear();
       xScale.domainer(new Plottable.Domainer());
-      var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
-      var yAxis = new Plottable.Axes.Numeric(yScale, "left");
       var renderAreaD1 = new Plottable.Plots.Line(xScale, yScale);
       renderAreaD1.addDataset(ds1);
       renderAreaD1.project("x", "x", xScale);
@@ -140,8 +138,8 @@ describe("Scales", () => {
       var scale = new Plottable.Scales.Linear();
       scale.autoDomain();
       var d = scale.domain();
-      assert.equal(d[0], 0);
-      assert.equal(d[1], 1);
+      assert.strictEqual(d[0], 0);
+      assert.strictEqual(d[1], 1);
     });
 
     it("can change the number of ticks generated", () => {
@@ -183,7 +181,7 @@ describe("Scales", () => {
       xScale.domainer(new Plottable.Domainer()); // to disable padding, etc
       plot.project("x", id, xScale);
       plot.project("y", id, yScale);
-      var svg = generateSVG();
+      var svg = TestMethods.generateSVG();
       plot.renderTo(svg);
       assert.deepEqual(xScale.domain(), [2, 1000], "the domain was calculated appropriately");
       svg.remove();
@@ -235,7 +233,7 @@ describe("Scales", () => {
     var barPlot = new Plottable.Plots.Bar(xScale, yScale).addDataset(dataset);
     barPlot.project("x", "x", xScale);
     barPlot.project("y", "y", yScale);
-    var svg = generateSVG();
+    var svg = TestMethods.generateSVG();
     assert.deepEqual(xScale.domain(), [], "before anchoring, the bar plot doesn't proxy data to the scale");
     barPlot.renderTo(svg);
     assert.deepEqual(xScale.domain(), ["A", "B"], "after anchoring, the bar plot's data is on the scale");
@@ -260,9 +258,9 @@ describe("Scales", () => {
     it("accepts categorical string types and Category domain", () => {
       var scale = new Plottable.Scales.Color("10");
       scale.domain(["yes", "no", "maybe"]);
-      assert.equal("#1f77b4", scale.scale("yes"));
-      assert.equal("#ff7f0e", scale.scale("no"));
-      assert.equal("#2ca02c", scale.scale("maybe"));
+      assert.strictEqual("#1f77b4", scale.scale("yes"));
+      assert.strictEqual("#ff7f0e", scale.scale("no"));
+      assert.strictEqual("#2ca02c", scale.scale("maybe"));
     });
 
     it("default colors are generated", () => {
@@ -284,8 +282,8 @@ describe("Scales", () => {
       var scale = new Plottable.Scales.Color();
       scale.range(["red", "blue"]);
       scale.domain(["a", "b"]);
-      assert.equal(scale.scale("a"), "#ff0000");
-      assert.equal(scale.scale("b"), "#0000ff");
+      assert.strictEqual(scale.scale("a"), "#ff0000");
+      assert.strictEqual(scale.scale("b"), "#0000ff");
     });
 
     it("accepts CSS specified colors", () => {
@@ -345,63 +343,63 @@ describe("Scales", () => {
     it("default scale uses reds and a linear scale type", () => {
       var scale = new Plottable.Scales.InterpolatedColor();
       scale.domain([0, 16]);
-      assert.equal("#ffffff", scale.scale(0));
-      assert.equal("#feb24c", scale.scale(8));
-      assert.equal("#b10026", scale.scale(16));
+      assert.strictEqual("#ffffff", scale.scale(0));
+      assert.strictEqual("#feb24c", scale.scale(8));
+      assert.strictEqual("#b10026", scale.scale(16));
     });
 
     it("linearly interpolates colors in L*a*b color space", () => {
       var scale = new Plottable.Scales.InterpolatedColor("reds");
       scale.domain([0, 1]);
-      assert.equal("#b10026", scale.scale(1));
-      assert.equal("#d9151f", scale.scale(0.9));
+      assert.strictEqual("#b10026", scale.scale(1));
+      assert.strictEqual("#d9151f", scale.scale(0.9));
     });
 
     it("accepts array types with color hex values", () => {
       var scale = new Plottable.Scales.InterpolatedColor(["#000", "#FFF"]);
       scale.domain([0, 16]);
-      assert.equal("#000000", scale.scale(0));
-      assert.equal("#ffffff", scale.scale(16));
-      assert.equal("#777777", scale.scale(8));
+      assert.strictEqual("#000000", scale.scale(0));
+      assert.strictEqual("#ffffff", scale.scale(16));
+      assert.strictEqual("#777777", scale.scale(8));
     });
 
     it("accepts array types with color names", () => {
       var scale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
       scale.domain([0, 16]);
-      assert.equal("#000000", scale.scale(0));
-      assert.equal("#ffffff", scale.scale(16));
-      assert.equal("#777777", scale.scale(8));
+      assert.strictEqual("#000000", scale.scale(0));
+      assert.strictEqual("#ffffff", scale.scale(16));
+      assert.strictEqual("#777777", scale.scale(8));
     });
 
     it("overflow scale values clamp to range", () => {
       var scale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
       scale.domain([0, 16]);
-      assert.equal("#000000", scale.scale(0));
-      assert.equal("#ffffff", scale.scale(16));
-      assert.equal("#000000", scale.scale(-100));
-      assert.equal("#ffffff", scale.scale(100));
+      assert.strictEqual("#000000", scale.scale(0));
+      assert.strictEqual("#ffffff", scale.scale(16));
+      assert.strictEqual("#000000", scale.scale(-100));
+      assert.strictEqual("#ffffff", scale.scale(100));
     });
 
     it("can be converted to a different range", () => {
       var scale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
       scale.domain([0, 16]);
-      assert.equal("#000000", scale.scale(0));
-      assert.equal("#ffffff", scale.scale(16));
+      assert.strictEqual("#000000", scale.scale(0));
+      assert.strictEqual("#ffffff", scale.scale(16));
       scale.colorRange("reds");
-      assert.equal("#b10026", scale.scale(16));
+      assert.strictEqual("#b10026", scale.scale(16));
     });
 
     it("can be converted to a different scale type", () => {
       var scale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
       scale.domain([0, 16]);
-      assert.equal("#000000", scale.scale(0));
-      assert.equal("#ffffff", scale.scale(16));
-      assert.equal("#777777", scale.scale(8));
+      assert.strictEqual("#000000", scale.scale(0));
+      assert.strictEqual("#ffffff", scale.scale(16));
+      assert.strictEqual("#777777", scale.scale(8));
 
       scale.scaleType("log");
-      assert.equal("#000000", scale.scale(0));
-      assert.equal("#ffffff", scale.scale(16));
-      assert.equal("#e3e3e3", scale.scale(8));
+      assert.strictEqual("#000000", scale.scale(0));
+      assert.strictEqual("#ffffff", scale.scale(16));
+      assert.strictEqual("#e3e3e3", scale.scale(8));
     });
   });
 

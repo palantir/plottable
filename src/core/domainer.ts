@@ -96,7 +96,6 @@ module Plottable {
       return this;
     }
 
-
     /**
      * Removes a padding exception, allowing the domain to pad out that value again.
      *

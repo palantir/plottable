@@ -13,12 +13,10 @@ export module Interactions {
     public _anchor(component: Component) {
       super._anchor(component);
       this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(<SVGElement> this._componentToListenTo.content().node());
-      this._mouseDispatcher.onMouseMove("Interaction.Pointer" + this.getID(), (p: Point) => this._handlePointerEvent(p));
+      this._mouseDispatcher.onMouseMove((p: Point) => this._handlePointerEvent(p));
 
       this._touchDispatcher = Dispatchers.Touch.getDispatcher(<SVGElement> this._componentToListenTo.content().node());
-
-      this._touchDispatcher.onTouchStart("Interaction.Pointer" + this.getID(), (ids, idToPoint) =>
-                                                                                this._handlePointerEvent(idToPoint[ids[0]]));
+      this._touchDispatcher.onTouchStart((ids, idToPoint) => this._handlePointerEvent(idToPoint[ids[0]]));
     }
 
     private _handlePointerEvent(p: Point) {

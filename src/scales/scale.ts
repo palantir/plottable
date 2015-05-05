@@ -11,7 +11,6 @@ module Plottable {
     protected _d3Scale: D3.Scale.Scale;
     private _autoDomainAutomatically = true;
     public broadcaster: Core.Broadcaster<Scale<D, R>>;
-    private _rendererAttrID2Extent: {[rendererAttrID: string]: D[]} = {};
     public _typeCoercer: (d: any) => any = (d: any) => d;
     private _domainModificationInProgress: boolean = false;
 

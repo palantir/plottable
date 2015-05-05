@@ -60,7 +60,6 @@ module Plottable {
     }
 
     public _updateStackExtents() {
-      var datasets = this.datasets();
       var valueAccessor = this._valueAccessor();
       var keyAccessor = this._keyAccessor();
       var maxStackExtent = Utils.Methods.max<string, number>(this._datasetKeysInOrder, (k: string) => {

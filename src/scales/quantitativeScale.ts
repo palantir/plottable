@@ -4,12 +4,10 @@ module Plottable {
   export class QuantitativeScale<D> extends Scale<D, number> {
     protected _d3Scale: D3.Scale.QuantitativeScale;
     private _numTicks = 10;
-    private _PADDING_FOR_IDENTICAL_DOMAIN = 1;
     public _userSetDomainer: boolean = false;
     private _domainer: Domainer = new Domainer();
     public _typeCoercer = (d: any) => +d;
     private _tickGenerator: Scales.TickGenerators.TickGenerator<D> = (scale: Plottable.QuantitativeScale<D>) => scale.getDefaultTicks();
-
 
     /**
      * Constructs a new QuantitativeScaleScale.
