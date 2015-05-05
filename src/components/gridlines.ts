@@ -30,20 +30,20 @@ export module Components {
       this._yScale = yScale;
       this._renderFunctionWrapper = () => this._render();
       if (this._xScale) {
-        this._xScale.registerListener(this._renderFunctionWrapper);
+        this._xScale.onDomainChange(this._renderFunctionWrapper);
       }
       if (this._yScale) {
-        this._yScale.registerListener(this._renderFunctionWrapper);
+        this._yScale.onDomainChange(this._renderFunctionWrapper);
       }
     }
 
     public remove() {
       super.remove();
       if (this._xScale) {
-        this._xScale.deregisterListener(this._renderFunctionWrapper);
+        this._xScale.offDomainChange(this._renderFunctionWrapper);
       }
       if (this._yScale) {
-        this._yScale.deregisterListener(this._renderFunctionWrapper);
+        this._yScale.offDomainChange(this._renderFunctionWrapper);
       }
       return this;
     }

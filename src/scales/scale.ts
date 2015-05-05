@@ -42,11 +42,11 @@ module Plottable {
       return []; // this should be overwritten
     }
 
-    public registerListener(callback: Function) {
+    public onDomainChange(callback: Function) {
         this._callbacks.add(callback);
     }
 
-    public deregisterListener(callback: Function) {
+    public offDomainChange(callback: Function) {
         this._callbacks.delete(callback);
     }
 

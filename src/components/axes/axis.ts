@@ -57,12 +57,12 @@ module Plottable {
       this.formatter(formatter);
 
       this._rescaleFunctionWrapper = () => this._rescale();
-      this._scale.registerListener(this._rescaleFunctionWrapper);
+      this._scale.onDomainChange(this._rescaleFunctionWrapper);
     }
 
     public remove() {
       super.remove();
-      this._scale.deregisterListener(this._rescaleFunctionWrapper);
+      this._scale.offDomainChange(this._rescaleFunctionWrapper);
     }
 
     protected _isHorizontal() {

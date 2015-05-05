@@ -35,10 +35,10 @@ module Plottable {
       this._adjustXDomainOnChangeFromYFunctionWrapper = () => this._adjustXDomainOnChangeFromY();
 
       this._updateXDomainer();
-      xScale.registerListener(this._adjustYDomainOnChangeFromXFunctionWrapper);
+      xScale.onDomainChange(this._adjustYDomainOnChangeFromXFunctionWrapper);
 
       this._updateYDomainer();
-      yScale.registerListener(this._adjustXDomainOnChangeFromYFunctionWrapper);
+      yScale.onDomainChange(this._adjustXDomainOnChangeFromYFunctionWrapper);
     }
 
     /**
@@ -50,21 +50,21 @@ module Plottable {
       // So when we get an "x" or "y" scale, enable autoNiceing and autoPadding.
       if (attrToSet === "x" && scale) {
         if (this._xScale) {
-          this._xScale.deregisterListener(this._adjustYDomainOnChangeFromXFunctionWrapper);
+          this._xScale.offDomainChange(this._adjustYDomainOnChangeFromXFunctionWrapper);
         }
         this._xScale = scale;
         this._updateXDomainer();
 
-        scale.registerListener(this._adjustYDomainOnChangeFromXFunctionWrapper);
+        scale.onDomainChange(this._adjustYDomainOnChangeFromXFunctionWrapper);
       }
 
       if (attrToSet === "y" && scale) {
         if (this._yScale) {
-          this._yScale.deregisterListener(this._adjustXDomainOnChangeFromYFunctionWrapper);
+          this._yScale.offDomainChange(this._adjustXDomainOnChangeFromYFunctionWrapper);
         }
         this._yScale = scale;
         this._updateYDomainer();
-        scale.registerListener(this._adjustXDomainOnChangeFromYFunctionWrapper);
+        scale.onDomainChange(this._adjustXDomainOnChangeFromYFunctionWrapper);
       }
 
       super.project(attrToSet, accessor, scale);
@@ -75,10 +75,10 @@ module Plottable {
     public remove() {
       super.remove();
       if (this._xScale) {
-        this._xScale.deregisterListener(this._adjustYDomainOnChangeFromXFunctionWrapper);
+        this._xScale.offDomainChange(this._adjustYDomainOnChangeFromXFunctionWrapper);
       }
       if (this._yScale) {
-        this._yScale.deregisterListener(this._adjustXDomainOnChangeFromYFunctionWrapper);
+        this._yScale.offDomainChange(this._adjustXDomainOnChangeFromYFunctionWrapper);
       }
       return this;
     }
