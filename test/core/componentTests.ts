@@ -403,6 +403,18 @@ describe("Component behavior", () => {
   describe("origin methods", () => {
     var cWidth = 100;
     var cHeight = 100;
+    
+    it("returns cloned point", () => {
+      TestMethods.fixComponentSize(c, cWidth, cHeight);
+      c.renderTo(svg);
+      var originCall1 = c.origin();
+      var originCall2 = c.origin();
+      assert.strictEqual(originCall1.x, originCall2.x, "returned points have same x value");
+      assert.strictEqual(originCall1.y, originCall2.y, "returned points have same y value");
+      assert.notStrictEqual(originCall1, originCall2, "returned points not the same object");
+      svg.remove();
+    });
+    
     it("origin() (top-level component)", () => {
       TestMethods.fixComponentSize(c, cWidth, cHeight);
       c.renderTo(svg);
