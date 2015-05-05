@@ -5,15 +5,18 @@ var assert = chai.assert;
 describe("Scales", () => {
   it("Scale's copy() works correctly", () => {
     var testCallback = (listenable: any) => {
-      return true; // doesn't do anything
+      return true;
     };
     var scale = new Plottable.Scales.Linear();
     scale.onUpdate(testCallback);
     var scaleCopy = scale.copy();
     assert.deepEqual(scale.domain(), scaleCopy.domain(), "Copied scale has the same domain as the original.");
     assert.deepEqual(scale.range(), scaleCopy.range(), "Copied scale has the same range as the original.");
-    assert.notDeepEqual((<any>scale)._callbacks, (<any>scaleCopy)._callbacks,
-                              "Callback sets are not copied over");
+
+    assert.strictEqual((<any>scale)._callbacks.values().length, 1,
+      "The initial scale should have a callback attached");
+    assert.strictEqual((<any>scaleCopy)._callbacks.values().length, 0,
+      "The copied scale should not have any callback from the original scale attached");
   });
 
   it("Scale alerts listeners when its domain is updated", () => {
