@@ -55,7 +55,7 @@ module Plottable {
         this._callbacks.delete(callback);
     }
 
-    protected dispatchUpdate() {
+    protected _dispatchUpdate() {
         this._callbacks.callCallbacks(this);
     }
 
@@ -131,7 +131,7 @@ module Plottable {
       if (!this._domainModificationInProgress) {
         this._domainModificationInProgress = true;
         this._d3Scale.domain(values);
-        this.dispatchUpdate();
+        this._dispatchUpdate();
         this._domainModificationInProgress = false;
       }
     }

@@ -1744,7 +1744,7 @@ var Plottable;
         Scale.prototype.offUpdate = function (callback) {
             this._callbacks.delete(callback);
         };
-        Scale.prototype.dispatchUpdate = function () {
+        Scale.prototype._dispatchUpdate = function () {
             this._callbacks.callCallbacks(this);
         };
         /**
@@ -1799,7 +1799,7 @@ var Plottable;
             if (!this._domainModificationInProgress) {
                 this._domainModificationInProgress = true;
                 this._d3Scale.domain(values);
-                this.dispatchUpdate();
+                this._dispatchUpdate();
                 this._domainModificationInProgress = false;
             }
         };
@@ -2131,7 +2131,7 @@ var Plottable;
                 this.untransformedDomain = values;
                 var transformedDomain = [this.adjustedLog(values[0]), this.adjustedLog(values[1])];
                 this._d3Scale.domain(transformedDomain);
-                this.dispatchUpdate();
+                this._dispatchUpdate();
             };
             ModifiedLog.prototype.ticks = function (count) {
                 if (count === void 0) { count = this.numTicks(); }
@@ -2306,7 +2306,7 @@ var Plottable;
                 }
                 this._innerPadding = innerPadding;
                 this.range(this.range());
-                this.dispatchUpdate();
+                this._dispatchUpdate();
                 return this;
             };
             Category.prototype.outerPadding = function (outerPadding) {
@@ -2315,7 +2315,7 @@ var Plottable;
                 }
                 this._outerPadding = outerPadding;
                 this.range(this.range());
-                this.dispatchUpdate();
+                this._dispatchUpdate();
                 return this;
             };
             Category.prototype.copy = function () {
@@ -2591,7 +2591,7 @@ var Plottable;
             InterpolatedColor.prototype._resetScale = function () {
                 this._d3Scale = InterpolatedColor._getD3InterpolatedScale(this._colorRange, this._scaleType);
                 this._autoDomainIfAutomaticMode();
-                this.dispatchUpdate();
+                this._dispatchUpdate();
             };
             InterpolatedColor.prototype._resolveColorValues = function (colorRange) {
                 if (typeof (colorRange) === "object") {

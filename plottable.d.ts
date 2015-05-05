@@ -879,7 +879,7 @@ declare module Plottable {
         protected _getExtent(): D[];
         onUpdate(callback: ScaleCallback<Scale<D, R>>): void;
         offUpdate(callback: ScaleCallback<Scale<D, R>>): void;
-        protected dispatchUpdate(): void;
+        protected _dispatchUpdate(): void;
         /**
          * Modifies the domain on the scale so that it includes the extent of all
          * perspectives it depends on. This will normally happen automatically, but
