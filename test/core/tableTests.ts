@@ -231,16 +231,16 @@ describe("Tables", () => {
     var table = new Plottable.Components.Table([[c0, c1], [c2, c3]]);
 
     var spaceRequest = table._requestedSpace(30, 30);
-    TestMethods.verifySpaceRequest(spaceRequest, 30, 30, true, true, "1");
+    TestMethods.verifySpaceRequest(spaceRequest, 30, 30, "1");
 
     spaceRequest = table._requestedSpace(50, 50);
-    TestMethods.verifySpaceRequest(spaceRequest, 50, 50, true, true, "2");
+    TestMethods.verifySpaceRequest(spaceRequest, 50, 50, "2");
 
     spaceRequest = table._requestedSpace(90, 90);
-    TestMethods.verifySpaceRequest(spaceRequest, 70, 90, false, true, "3");
+    TestMethods.verifySpaceRequest(spaceRequest, 70, 90, "3");
 
     spaceRequest = table._requestedSpace(200, 200);
-    TestMethods.verifySpaceRequest(spaceRequest, 70, 100, false, false, "4");
+    TestMethods.verifySpaceRequest(spaceRequest, 70, 100, "4");
   });
 
   describe("table._iterateLayout works properly", () => {

@@ -20,9 +20,9 @@ var TestMethods;
         }
     }
     TestMethods.getSVGParent = getSVGParent;
-    function verifySpaceRequest(sr, w, h, ww, wh, message) {
-        assert.equal(sr.minWidth, w, message + " (space request: minWidth)");
-        assert.equal(sr.minHeight, h, message + " (space request: minHeight)");
+    function verifySpaceRequest(sr, expectedMinWidth, expectedMinHeight, message) {
+        assert.equal(sr.minWidth, expectedMinWidth, message + " (space request: minWidth)");
+        assert.equal(sr.minHeight, expectedMinHeight, message + " (space request: minHeight)");
     }
     TestMethods.verifySpaceRequest = verifySpaceRequest;
     function fixComponentSize(c, fixedWidth, fixedHeight) {
@@ -2063,7 +2063,7 @@ describe("SelectionBoxLayer", function () {
     it("has an effective size of 0, but will occupy all offered space", function () {
         var sbl = new Plottable.Components.SelectionBoxLayer();
         var request = sbl._requestedSpace(400, 400);
-        TestMethods.verifySpaceRequest(request, 0, 0, false, false, "occupies and asks for no space");
+        TestMethods.verifySpaceRequest(request, 0, 0, "does not request any space");
         assert.isTrue(sbl._isFixedWidth(), "fixed width");
         assert.isTrue(sbl._isFixedHeight(), "fixed height");
     });
@@ -6164,7 +6164,7 @@ describe("ComponentGroups", function () {
             var svg = TestMethods.generateSVG();
             var cg = new Plottable.Components.Group([]);
             var request = cg._requestedSpace(SVG_WIDTH, SVG_HEIGHT);
-            TestMethods.verifySpaceRequest(request, 0, 0, false, false, "empty Group doesn't request any space");
+            TestMethods.verifySpaceRequest(request, 0, 0, "empty Group doesn't request any space");
             cg.renderTo(svg);
             assert.strictEqual(cg.width(), SVG_WIDTH, "occupies all offered width");
             assert.strictEqual(cg.height(), SVG_HEIGHT, "occupies all offered height");
@@ -6996,13 +6996,13 @@ describe("Tables", function () {
         var c3 = TestMethods.makeFixedSizeComponent(20, 20);
         var table = new Plottable.Components.Table([[c0, c1], [c2, c3]]);
         var spaceRequest = table._requestedSpace(30, 30);
-        TestMethods.verifySpaceRequest(spaceRequest, 30, 30, true, true, "1");
+        TestMethods.verifySpaceRequest(spaceRequest, 30, 30, "1");
         spaceRequest = table._requestedSpace(50, 50);
-        TestMethods.verifySpaceRequest(spaceRequest, 50, 50, true, true, "2");
+        TestMethods.verifySpaceRequest(spaceRequest, 50, 50, "2");
         spaceRequest = table._requestedSpace(90, 90);
-        TestMethods.verifySpaceRequest(spaceRequest, 70, 90, false, true, "3");
+        TestMethods.verifySpaceRequest(spaceRequest, 70, 90, "3");
         spaceRequest = table._requestedSpace(200, 200);
-        TestMethods.verifySpaceRequest(spaceRequest, 70, 100, false, false, "4");
+        TestMethods.verifySpaceRequest(spaceRequest, 70, 100, "4");
     });
     describe("table._iterateLayout works properly", function () {
         // This test battery would have caught #405

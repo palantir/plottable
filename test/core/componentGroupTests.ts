@@ -134,7 +134,7 @@ describe("ComponentGroups", () => {
       var cg = new Plottable.Components.Group([]);
 
       var request = cg._requestedSpace(SVG_WIDTH, SVG_HEIGHT);
-      TestMethods.verifySpaceRequest(request, 0, 0, false, false, "empty Group doesn't request any space");
+      TestMethods.verifySpaceRequest(request, 0, 0, "empty Group doesn't request any space");
 
       cg.renderTo(svg);
       assert.strictEqual(cg.width(), SVG_WIDTH, "occupies all offered width");

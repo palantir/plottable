@@ -18,9 +18,9 @@ module TestMethods {
     }
   }
 
-  export function verifySpaceRequest(sr: Plottable._SpaceRequest, w: number, h: number, ww: boolean, wh: boolean, message: string) {
-    assert.equal(sr.minWidth,  w, message + " (space request: minWidth)");
-    assert.equal(sr.minHeight, h, message + " (space request: minHeight)");
+  export function verifySpaceRequest(sr: Plottable._SpaceRequest, expectedMinWidth: number, expectedMinHeight: number, message: string) {
+    assert.equal(sr.minWidth, expectedMinWidth, message + " (space request: minWidth)");
+    assert.equal(sr.minHeight, expectedMinHeight, message + " (space request: minHeight)");
   }
 
   export function fixComponentSize(c: Plottable.Component, fixedWidth?: number, fixedHeight?: number) {
