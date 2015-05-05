@@ -15,7 +15,7 @@ module Plottable {
     }
 
     export interface PlotMetadata {
-      datasetKey: string
+      datasetKey: string;
     }
 
     export type PlotData = {
