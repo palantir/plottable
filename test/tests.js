@@ -6785,7 +6785,7 @@ describe("Dataset", function () {
             assert.deepEqual(ds.data(), newData, "Dataset arrives with correct data");
             callbackCalled = true;
         };
-        ds.registerCoolListener(callback);
+        ds.onUpdate(callback);
         ds.data(newData);
         assert.isTrue(callbackCalled, "callback was called when the data was changed");
     });
@@ -6798,7 +6798,7 @@ describe("Dataset", function () {
             assert.deepEqual(ds.metadata(), newMetadata, "Dataset arrives with correct metadata");
             callbackCalled = true;
         };
-        ds.registerCoolListener(callback);
+        ds.onUpdate(callback);
         ds.metadata(newMetadata);
         assert.isTrue(callbackCalled, "callback was called when the metadata was changed");
     });

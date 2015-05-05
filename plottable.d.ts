@@ -558,8 +558,8 @@ declare module Plottable {
          * @param {any} metadata An object containing additional information (default = {}).
          */
         constructor(data?: any[], metadata?: any);
-        registerCoolListener(callback: DatasetCallback): void;
-        deregisterCoolListener(callback: DatasetCallback): void;
+        onUpdate(callback: DatasetCallback): void;
+        offUpdate(callback: DatasetCallback): void;
         /**
          * Gets the data.
          *

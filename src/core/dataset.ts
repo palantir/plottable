@@ -32,11 +32,11 @@ module Plottable {
       this._callbacks = new Utils.CallbackSet<DatasetCallback>();
     }
 
-    public registerCoolListener(callback: DatasetCallback) {
+    public onUpdate(callback: DatasetCallback) {
       this._callbacks.add(callback);
     }
 
-    public deregisterCoolListener(callback: DatasetCallback) {
+    public offUpdate(callback: DatasetCallback) {
       this._callbacks.delete(callback);
     }
 
