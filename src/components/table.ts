@@ -258,7 +258,7 @@ export module Components {
       };
     }
 
-    public _requestedSpace(offeredWidth : number, offeredHeight: number): _SpaceRequest {
+    public _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
       this._calculatedLayout = this._iterateLayout(offeredWidth, offeredHeight);
       return {
         minWidth: d3.sum(this._calculatedLayout.guaranteedWidths),

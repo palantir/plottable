@@ -21,8 +21,8 @@ var TestMethods;
     }
     TestMethods.getSVGParent = getSVGParent;
     function verifySpaceRequest(sr, expectedMinWidth, expectedMinHeight, message) {
-        assert.equal(sr.minWidth, expectedMinWidth, message + " (space request: minWidth)");
-        assert.equal(sr.minHeight, expectedMinHeight, message + " (space request: minHeight)");
+        assert.strictEqual(sr.minWidth, expectedMinWidth, message + " (space request: minWidth)");
+        assert.strictEqual(sr.minHeight, expectedMinHeight, message + " (space request: minHeight)");
     }
     TestMethods.verifySpaceRequest = verifySpaceRequest;
     function fixComponentSize(c, fixedWidth, fixedHeight) {

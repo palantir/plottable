@@ -255,7 +255,7 @@ describe("Tables", () => {
       assert.deepEqual(result.wantsWidth, wW, "wantsWidth:" + id);
       assert.deepEqual(result.wantsHeight, wH, "wantsHeight:" + id);
     }
-    
+
     it("iterateLayout works in the easy case where there is plenty of space and everything is satisfied on first go", () => {
       var c1 = new Mocks.FixedSizeComponent(50, 50);
       var c2 = new Plottable.Component();
@@ -298,7 +298,6 @@ describe("Tables", () => {
       verifyLayoutResult(result, [0, 0], [0, 0], [50, 50], [50, 50], true, true, "still requests more space if constrained");
       result = (<any> table)._iterateLayout(80, 80, true);
       verifyLayoutResult(result, [0, 0], [0, 0], [40, 40], [40, 40], true, true, "accepts suboptimal layout if it's the final offer");
-
 
       result = (<any> table)._iterateLayout(120, 120);
       // If there is extra space in a fixed-size table, the extra space should not be allocated to proportional space
