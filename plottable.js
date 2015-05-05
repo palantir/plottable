@@ -6245,10 +6245,10 @@ var Plottable;
                                 minHeight: 0
                             };
                         }
-                        var allocatedWidth = isFinalOffer ? Math.min(spaceRequest.minWidth, offeredWidths[colIndex]) : spaceRequest.minWidth;
-                        requestedWidths[colIndex] = Math.max(requestedWidths[colIndex], allocatedWidth);
-                        var allocatedHeight = isFinalOffer ? Math.min(spaceRequest.minHeight, offeredHeights[rowIndex]) : spaceRequest.minHeight;
-                        requestedHeights[rowIndex] = Math.max(requestedHeights[rowIndex], allocatedHeight);
+                        var columnWidth = isFinalOffer ? Math.min(spaceRequest.minWidth, offeredWidths[colIndex]) : spaceRequest.minWidth;
+                        requestedWidths[colIndex] = Math.max(requestedWidths[colIndex], columnWidth);
+                        var rowHeight = isFinalOffer ? Math.min(spaceRequest.minHeight, offeredHeights[rowIndex]) : spaceRequest.minHeight;
+                        requestedHeights[rowIndex] = Math.max(requestedHeights[rowIndex], rowHeight);
                         var componentNeedsWidth = spaceRequest.minWidth > offeredWidths[colIndex];
                         columnNeedsWidth[colIndex] = columnNeedsWidth[colIndex] || componentNeedsWidth;
                         var componentNeedsHeight = spaceRequest.minHeight > offeredHeights[rowIndex];
