@@ -9,7 +9,9 @@ module Plottable {
     private _data: any[];
     private _metadata: any;
     private _accessor2cachedExtent: Utils.StrictEqualityAssociativeArray;
-    public broadcaster: Core.Broadcaster<Dataset>;
+    private broadcaster: Core.Broadcaster<Dataset>;
+
+    private _callbacks: Utils.CallbackSet<Function>
 
     /**
      * Constructs a new set.
@@ -27,6 +29,21 @@ module Plottable {
       this._metadata = metadata;
       this._accessor2cachedExtent = new Utils.StrictEqualityAssociativeArray();
       this.broadcaster = new Core.Broadcaster(this);
+      this._callbacks = new Utils.CallbackSet<Function>();
+    }
+
+    public registerCoolListener(key: any, callback: Function) {
+      // this.broadcaster.registerListener(key, callback);
+      this._callbacks.add(callback);
+    }
+
+    public deregisterCoolListener(key: any, callback: Function) {
+      // this.broadcaster.deregisterListener(key);
+      this._callbacks.delete(callback);
+    }
+
+    private _dispatchChange() {
+      this._callbacks.callCallbacks();
     }
 
     /**
@@ -48,7 +65,7 @@ module Plottable {
       } else {
         this._data = data;
         this._accessor2cachedExtent = new Utils.StrictEqualityAssociativeArray();
-        this.broadcaster.broadcast();
+        this._dispatchChange();
         return this;
       }
     }
@@ -73,7 +90,7 @@ module Plottable {
       } else {
         this._metadata = metadata;
         this._accessor2cachedExtent = new Utils.StrictEqualityAssociativeArray();
-        this.broadcaster.broadcast();
+        this._dispatchChange();
         return this;
       }
     }

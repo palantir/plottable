@@ -1248,7 +1248,19 @@ var Plottable;
             this._metadata = metadata;
             this._accessor2cachedExtent = new Plottable.Utils.StrictEqualityAssociativeArray();
             this.broadcaster = new Plottable.Core.Broadcaster(this);
+            this._callbacks = new Plottable.Utils.CallbackSet();
         }
+        Dataset.prototype.registerCoolListener = function (key, callback) {
+            // this.broadcaster.registerListener(key, callback);
+            this._callbacks.add(callback);
+        };
+        Dataset.prototype.deregisterCoolListener = function (key, callback) {
+            // this.broadcaster.deregisterListener(key);
+            this._callbacks.delete(callback);
+        };
+        Dataset.prototype._dispatchChange = function () {
+            this._callbacks.callCallbacks();
+        };
         Dataset.prototype.data = function (data) {
             if (data == null) {
                 return this._data;
@@ -1256,7 +1268,7 @@ var Plottable;
             else {
                 this._data = data;
                 this._accessor2cachedExtent = new Plottable.Utils.StrictEqualityAssociativeArray();
-                this.broadcaster.broadcast();
+                this._dispatchChange();
                 return this;
             }
         };
@@ -1267,7 +1279,7 @@ var Plottable;
             else {
                 this._metadata = metadata;
                 this._accessor2cachedExtent = new Plottable.Utils.StrictEqualityAssociativeArray();
-                this.broadcaster.broadcast();
+                this._dispatchChange();
                 return this;
             }
         };
@@ -6566,7 +6578,8 @@ var Plottable;
             if (this._isSetup) {
                 drawer.setup(this._renderArea.append("g"));
             }
-            dataset.broadcaster.registerListener(this, function () { return _this._onDatasetUpdate(); });
+            this._onDatasetUpdateCallback = function () { return _this._onDatasetUpdate(); };
+            dataset.registerCoolListener(this, this._onDatasetUpdateCallback);
             this._onDatasetUpdate();
         };
         Plot.prototype._getDrawer = function (key) {
@@ -6811,7 +6824,7 @@ var Plottable;
             if (key != null && this._key2PlotDatasetKey.has(key)) {
                 var pdk = this._key2PlotDatasetKey.get(key);
                 pdk.drawer.remove();
-                pdk.dataset.broadcaster.deregisterListener(this);
+                pdk.dataset.deregisterCoolListener(this, this._onDatasetUpdateCallback);
                 this._datasetKeysInOrder.splice(this._datasetKeysInOrder.indexOf(key), 1);
                 this._key2PlotDatasetKey.remove(key);
                 this._onDatasetUpdate();

@@ -546,7 +546,6 @@ declare module Plottable {
 
 declare module Plottable {
     class Dataset extends Core.PlottableObject {
-        broadcaster: Core.Broadcaster<Dataset>;
         /**
          * Constructs a new set.
          *
@@ -558,6 +557,8 @@ declare module Plottable {
          * @param {any} metadata An object containing additional information (default = {}).
          */
         constructor(data?: any[], metadata?: any);
+        registerCoolListener(key: any, callback: Function): void;
+        deregisterCoolListener(key: any, callback: Function): void;
         /**
          * Gets the data.
          *
