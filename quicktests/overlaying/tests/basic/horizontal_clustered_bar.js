@@ -10,13 +10,13 @@ function makeData() {
 function run(svg, data, Plottable) {
   "use strict";
 
-  var nameScale = new Plottable.Scale.Category();
-  var valueScale = new Plottable.Scale.Linear();
-  var colorScale = new Plottable.Scale.Color("10");
+  var nameScale = new Plottable.Scales.Category();
+  var valueScale = new Plottable.Scales.Linear();
+  var colorScale = new Plottable.Scales.Color("10");
 
-  var nameAxis = new Plottable.Axis.Category(nameScale, "left");
-  var valueAxis = new Plottable.Axis.Numeric(valueScale, "bottom");
-  var clusteredBarRenderer = new Plottable.Plot.ClusteredBar(valueScale, nameScale, false)
+  var nameAxis = new Plottable.Axes.Category(nameScale, "left");
+  var valueAxis = new Plottable.Axes.Numeric(valueScale, "bottom");
+  var clusteredBarRenderer = new Plottable.Plots.ClusteredBar(valueScale, nameScale, false)
     .addDataset("d1", data[0])
     .addDataset("d2", data[1])
     .addDataset("d3", data[2])
@@ -25,11 +25,11 @@ function run(svg, data, Plottable) {
     .attr("fill", "type", colorScale)
     .attr("type", "type")
     .attr("yval", "y")
-    .barLabelsEnabled(true);
+    .labelsEnabled(true);
 
-  var center = clusteredBarRenderer.below(new Plottable.Component.Legend(colorScale));
+  var center = clusteredBarRenderer.below(new Plottable.Components.Legend(colorScale));
 
-  var horizChart = new Plottable.Component.Table([
+  var horizChart = new Plottable.Components.Table([
     [nameAxis, center], [null, valueAxis]
     ]).renderTo(svg);
 }

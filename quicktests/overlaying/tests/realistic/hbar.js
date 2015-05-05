@@ -23,42 +23,42 @@ function makeData() {
 function run(svg, data, Plottable){
   "use strict";
 
-    var xScale = new Plottable.Scale.Linear();
-    var yScale = new Plottable.Scale.Category();
-    var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
-    var yAxis = new Plottable.Axis.Category(yScale, "left"); 
-    var xLabel = new Plottable.Component.Label("");
-    var yLabel = new Plottable.Component.Label("");
-                
-    var plot = new Plottable.Plot.Bar(xScale, yScale, false);
+    var xScale = new Plottable.Scales.Linear();
+    var yScale = new Plottable.Scales.Category();
+    var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
+    var yAxis = new Plottable.Axes.Category(yScale, "left");
+    var xLabel = new Plottable.Components.Label("");
+    var yLabel = new Plottable.Components.Label("");
+
+    var plot = new Plottable.Plots.Bar(xScale, yScale, false);
     plot.addDataset(data[0]);
     plot.project("x", "y", xScale)
         .project("y", "x", yScale);
-    
+
     var matrix = [[yLabel, yAxis, plot],
                  [null, null, xAxis],
-                 [null, null, xLabel]];  
+                 [null, null, xLabel]];
 
-    new Plottable.Component.Table(matrix)
+    new Plottable.Components.Table(matrix)
                                 .renderTo(svg);
 
     var flipDomain = function(){
-      xScale.domain(xScale.domain().reverse());  
+      xScale.domain(xScale.domain().reverse());
       var tmp = matrix[0][0];
       matrix[0][0] = matrix[0][2];
       matrix[0][2] = tmp;
       tmp = matrix[1][0];
       matrix[1][0] = matrix[1][2];
-      matrix[1][2] = tmp;  
+      matrix[1][2] = tmp;
       tmp = matrix[2][0];
       matrix[2][0] = matrix[2][2];
-      matrix[2][2] = tmp;  
+      matrix[2][2] = tmp;
 
       yAxis.orient(yAxis.orient() === "left" ? "right" : "left");
-      new Plottable.Component.Table(matrix)
+      new Plottable.Components.Table(matrix)
                                 .renderTo(svg);
-    };   
+    };
 
-    var clickInteraction = new Plottable.Interaction.Click().callback(flipDomain);
+    var clickInteraction = new Plottable.Interactions.Click().onClick(flipDomain);
     plot.registerInteraction(clickInteraction);
 }

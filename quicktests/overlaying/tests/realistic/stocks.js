@@ -44,30 +44,30 @@ function run(svg, data, Plottable) {
             });
           }
 
-          var xScale = new Plottable.Scale.Time();
-          var xAxis = new Plottable.Axis.Time(xScale, "bottom");
-          var xAxisTop = new Plottable.Axis.Time(xScale, "top");
+          var xScale = new Plottable.Scales.Time();
+          var xAxis = new Plottable.Axes.Time(xScale, "bottom");
+          var xAxisTop = new Plottable.Axes.Time(xScale, "top");
 
-          var yScale_aapl = new Plottable.Scale.Linear();
-          var yAxis_aapl = new Plottable.Axis.Numeric(yScale_aapl, "right").showEndTickLabels(true);
-          var label_aapl = new Plottable.Component.AxisLabel("AAPL", "right");
+          var yScale_aapl = new Plottable.Scales.Linear();
+          var yAxis_aapl = new Plottable.Axes.Numeric(yScale_aapl, "right").showEndTickLabels(true);
+          var label_aapl = new Plottable.Components.AxisLabel("AAPL", "right");
 
-          var yScale_goog = new Plottable.Scale.Linear();
-          var yAxis_goog = new Plottable.Axis.Numeric(yScale_goog, "left").xAlign("right").showEndTickLabels(true);
-          var label_goog = new Plottable.Component.AxisLabel("GOOG", "left");
+          var yScale_goog = new Plottable.Scales.Linear();
+          var yAxis_goog = new Plottable.Axes.Numeric(yScale_goog, "left").xAlign("right").showEndTickLabels(true);
+          var label_goog = new Plottable.Components.AxisLabel("GOOG", "left");
 
-          var colorScale = new Plottable.Scale.Color();
+          var colorScale = new Plottable.Scales.Color();
 
           var aaplSource = new Plottable.Dataset(aapl, {name: "AAPL"} );
           var googSource = new Plottable.Dataset(goog, {name: "GOOG"} );
 
-          var line_aapl = new Plottable.Plot.Line(xScale, yScale_aapl).animate(true)
+          var line_aapl = new Plottable.Plots.Line(xScale, yScale_aapl).animate(true)
                                   .addDataset("aapl", aaplSource)
                                   .project("x", "Date", xScale)
                                   .project("y", "Adj Close", yScale_aapl)
                                   .project("stroke", function(d, i, m) { return m.name; }, colorScale)
                                   .automaticallyAdjustYScaleOverVisiblePoints(true);
-          var line_goog = new Plottable.Plot.Line(xScale, yScale_goog).animate(true)
+          var line_goog = new Plottable.Plots.Line(xScale, yScale_goog).animate(true)
                                   .addDataset("goog", googSource)
                                   .project("x", "Date", xScale)
                                   .project("y", "Adj Close", yScale_goog)
@@ -76,16 +76,16 @@ function run(svg, data, Plottable) {
 
           // should be one line plot, pending #917
 
-          var legend = new Plottable.Component.Legend(colorScale);
+          var legend = new Plottable.Components.Legend(colorScale);
           legend.maxEntriesPerRow(1);
           legend.yAlign("top").xOffset(-5);
-          var plotArea = new Plottable.Component.Group([line_aapl, line_goog, legend]);
+          var plotArea = new Plottable.Components.Group([line_aapl, line_goog, legend]);
 
-          var yScale_diff = new Plottable.Scale.Linear();
-          var yAxis_diff = new Plottable.Axis.Numeric(yScale_diff, "left");
+          var yScale_diff = new Plottable.Scales.Linear();
+          var yAxis_diff = new Plottable.Axes.Numeric(yScale_diff, "left");
 
           var DAY_MILLIS = 24 * 60 * 60 * 1000;
-          var bar_diff = new Plottable.Plot.Bar(xScale, yScale_diff, true).animate(true)
+          var bar_diff = new Plottable.Plots.Bar(xScale, yScale_diff, true).animate(true)
                                   .addDataset(diffData)
                                   .project("x", "Date", xScale)
                                   .project("y", "net change", yScale_diff)
@@ -94,7 +94,7 @@ function run(svg, data, Plottable) {
                                     return d["net change"] > 0 ? Plottable.Core.Colors.FERN : Plottable.Core.Colors.CERISE_RED;
                                   });
 
-          var table = new Plottable.Component.Table([
+          var table = new Plottable.Components.Table([
                             [null      , null      , xAxisTop, null      , null      ],
                             [label_goog, yAxis_goog, plotArea, yAxis_aapl, label_aapl],
                             [null      , null      , bar_diff, null      , null      ],
@@ -104,10 +104,10 @@ function run(svg, data, Plottable) {
 
           table.renderTo(svg);
 
-          var pzi = new Plottable.Interaction.PanZoom(xScale, null);
+          var pzi = new Plottable.Interactions.PanZoom(xScale, null);
           plotArea.registerInteraction(pzi);
           plotArea.registerInteraction(
-            new Plottable.Interaction.Key()
+            new Plottable.Interactions.Key()
                                      .on(65, function() {
                                        xScale.autoDomain();
                                        pzi.resetZoom();

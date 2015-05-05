@@ -19,16 +19,16 @@ function run(svg, data, Plottable) {
         {x: "D", y: 2, val: 0.9},
         {x: "E", y: 2, val: 1.0},
     ];
-    var xScale = new Plottable.Scale.Category();
-    var yScale = new Plottable.Scale.Category();
+    var xScale = new Plottable.Scales.Category();
+    var yScale = new Plottable.Scales.Category();
 
-    var colorScale = new Plottable.Scale.Color();
-    colorScale.range(["blue", "teal", "purple"]);  
-    var plot = new Plottable.Plot.Grid(xScale, yScale, colorScale);
+    var colorScale = new Plottable.Scales.Color();
+    colorScale.range(["blue", "teal", "purple"]);
+    var plot = new Plottable.Plots.Grid(xScale, yScale, colorScale);
     plot.addDataset(data);
     plot.project("x", "x", xScale).project("y", "y", yScale);
     plot.project("fill", function(d) { return d.val; }, colorScale);
-    
+
     plot.renderTo(svg);
 
 }

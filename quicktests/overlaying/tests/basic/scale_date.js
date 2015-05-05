@@ -13,15 +13,15 @@ function run(svg, data, Plottable) {
   {x: "05/06/2014", y: 4}
   ];
 
-  var xScale = new Plottable.Scale.Time();
-  var yScale = new Plottable.Scale.Linear();
-  var linePlot = new Plottable.Plot.Line(xScale, yScale).addDataset(dataPts)
+  var xScale = new Plottable.Scales.Time();
+  var yScale = new Plottable.Scales.Linear();
+  var linePlot = new Plottable.Plots.Line(xScale, yScale).addDataset(dataPts)
                               .attr("x", function (d) { return d3.time.format("%x").parse(d.x);}, xScale)
                               .project("y", "y", yScale);
-  var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
-  var yAxis = new Plottable.Axis.Numeric(yScale, "left");
+  var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
+  var yAxis = new Plottable.Axes.Numeric(yScale, "left");
 
-  var chart = new Plottable.Component.Table([[yAxis, linePlot],[null, xAxis]]);
+  var chart = new Plottable.Components.Table([[yAxis, linePlot],[null, xAxis]]);
 
   chart.renderTo(svg);
 

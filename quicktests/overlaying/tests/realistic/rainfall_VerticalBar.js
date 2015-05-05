@@ -11,54 +11,54 @@ function makeData() {
 function run(svg, data, Plottable){
   "use strict";
 
-  var xScale = new Plottable.Scale.Category();
-  var yScale = new Plottable.Scale.Linear();
-  var colorScale = new Plottable.Scale.Color();
+  var xScale = new Plottable.Scales.Category();
+  var yScale = new Plottable.Scales.Linear();
+  var colorScale = new Plottable.Scales.Color();
 
   yScale.domain([0, 5.5]).ticks(5);
 
-  var xAxis = new Plottable.Axis.Category(xScale, "bottom");
-  var yAxis1 = new Plottable.Axis.Numeric(yScale, "left");
-  var yAxis2 = new Plottable.Axis.Numeric(yScale, "left");
-  var yAxis3 = new Plottable.Axis.Numeric(yScale, "left");
+  var xAxis = new Plottable.Axes.Category(xScale, "bottom");
+  var yAxis1 = new Plottable.Axes.Numeric(yScale, "left");
+  var yAxis2 = new Plottable.Axes.Numeric(yScale, "left");
+  var yAxis3 = new Plottable.Axes.Numeric(yScale, "left");
 
 
-  var paloAltoBar = new Plottable.Plot.Bar(xScale, yScale, true)
+  var paloAltoBar = new Plottable.Plots.Bar(xScale, yScale, true)
     .addDataset(data[0])
     .animate(true)
     .project("x", "month", xScale)
     .project("y", "avg", yScale)
     .project("fill", "city", colorScale);
 
-  var sanFranciscoBar = new Plottable.Plot.Bar(xScale, yScale, true)
+  var sanFranciscoBar = new Plottable.Plots.Bar(xScale, yScale, true)
     .addDataset(data[1])
     .animate(true)
     .project("x", "month", xScale)
     .project("y", "avg", yScale)
     .project("fill", "city", colorScale);
 
-  var sanJoseBar = new Plottable.Plot.Bar(xScale, yScale, true)
+  var sanJoseBar = new Plottable.Plots.Bar(xScale, yScale, true)
     .addDataset(data[2])
     .animate(true)
     .project("x", "month", xScale)
     .project("y", "avg", yScale)
     .project("fill", "city", colorScale);
 
-  var legend = new Plottable.Component.Legend(colorScale);
-  var title = new Plottable.Component.TitleLabel("Average Rainfall in Different Cities between 2013-2014", "horizontal" );
-  var yUnitLabel = new Plottable.Component.AxisLabel("Inches", "left" );
+  var legend = new Plottable.Components.Legend(colorScale);
+  var title = new Plottable.Components.TitleLabel("Average Rainfall in Different Cities between 2013-2014", "horizontal" );
+  var yUnitLabel = new Plottable.Components.AxisLabel("Inches", "left" );
 
 
   legend.xAlign("right");
 
-  var g1 = new Plottable.Component.Gridlines(null, yScale);
-  var g2 = new Plottable.Component.Gridlines(null, yScale);
-  var g3 = new Plottable.Component.Gridlines(null, yScale);
+  var g1 = new Plottable.Components.Gridlines(null, yScale);
+  var g2 = new Plottable.Components.Gridlines(null, yScale);
+  var g3 = new Plottable.Components.Gridlines(null, yScale);
   var bar1 = g1.below(paloAltoBar);
   var bar2 = g2.below(sanFranciscoBar);
   var bar3 = g3.below(sanJoseBar);
 
-  var chart = new Plottable.Component.Table([
+  var chart = new Plottable.Components.Table([
                                             [null     ,   title ],
                                             [null     ,   legend],
                                             [yAxis1   ,   bar1  ],
@@ -66,7 +66,7 @@ function run(svg, data, Plottable){
                                             [yAxis3   ,   bar3  ],
                                             [null     ,   xAxis ]]);
 
-  var finalchart = new Plottable.Component.Table([
+  var finalchart = new Plottable.Components.Table([
     [yUnitLabel, chart]]);
 
   finalchart.renderTo(svg);

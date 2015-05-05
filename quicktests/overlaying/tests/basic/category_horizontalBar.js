@@ -14,18 +14,18 @@ function run(svg, data, Plottable) {
   "use strict";
 
     var ds = new Plottable.Dataset(data);
-    var yScale = new Plottable.Scale.Category();
-    var yAxis = new Plottable.Axis.Category(yScale, "left");
+    var yScale = new Plottable.Scales.Category();
+    var yAxis = new Plottable.Axes.Category(yScale, "left");
 
-    var xScale = new Plottable.Scale.Linear();
-    var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
+    var xScale = new Plottable.Scales.Linear();
+    var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
 
-    var barPlot = new Plottable.Plot.Bar(xScale, yScale, false)
+    var barPlot = new Plottable.Plots.Bar(xScale, yScale, false)
         .addDataset(ds)
         .attr("y", "name", yScale)
         .attr("x", "age", xScale)
         .animate(true);
-    var chart = new Plottable.Component.Table([[new Plottable.Component.Label(""), yAxis, barPlot],
+    var chart = new Plottable.Components.Table([[new Plottable.Components.Label(""), yAxis, barPlot],
                                                [null,  null, xAxis]]);
     chart.renderTo(svg);
 

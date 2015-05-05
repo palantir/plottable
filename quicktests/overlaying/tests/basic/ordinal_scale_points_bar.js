@@ -8,13 +8,13 @@ function makeData() {
 function run(svg, data, Plottable) {
   "use strict";
 
-  var xScale = new Plottable.Scale.Category();
-  var yScale = new Plottable.Scale.Linear();
-  var colorScale = new Plottable.Scale.Color("10");
+  var xScale = new Plottable.Scales.Category();
+  var yScale = new Plottable.Scales.Linear();
+  var colorScale = new Plottable.Scales.Color("10");
 
-  var xAxis = new Plottable.Axis.Category(xScale, "bottom");
-  var yAxis = new Plottable.Axis.Numeric(yScale, "left");
-  var clusteredBarRenderer = new Plottable.Plot.Bar(xScale, yScale, true)
+  var xAxis = new Plottable.Axes.Category(xScale, "bottom");
+  var yAxis = new Plottable.Axes.Numeric(yScale, "left");
+  var clusteredBarRenderer = new Plottable.Plots.Bar(xScale, yScale, true)
     .addDataset("d1", data)
     .attr("x", "name", xScale)
     .attr("y", "y", yScale)
@@ -22,9 +22,9 @@ function run(svg, data, Plottable) {
     .attr("type", "type")
     .attr("yval", "y");
 
-  var center = clusteredBarRenderer.below(new Plottable.Component.Legend(colorScale));
+  var center = clusteredBarRenderer.below(new Plottable.Components.Legend(colorScale));
 
-  new Plottable.Component.Table([
+  new Plottable.Components.Table([
     [yAxis, center], [null, xAxis]
     ]).renderTo(svg);
 }

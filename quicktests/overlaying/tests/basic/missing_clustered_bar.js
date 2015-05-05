@@ -10,13 +10,13 @@ function makeData() {
 function run(svg, data, Plottable) {
   "use strict";
 
-  var xScale = new Plottable.Scale.Category();
-  var yScale = new Plottable.Scale.Linear();
-  var colorScale = new Plottable.Scale.Color("10");
+  var xScale = new Plottable.Scales.Category();
+  var yScale = new Plottable.Scales.Linear();
+  var colorScale = new Plottable.Scales.Color("10");
 
-  var xAxis = new Plottable.Axis.Category(xScale, "bottom");
-  var yAxis = new Plottable.Axis.Numeric(yScale, "left");
-  var clusteredBarRenderer = new Plottable.Plot.ClusteredBar(xScale, yScale)
+  var xAxis = new Plottable.Axes.Category(xScale, "bottom");
+  var yAxis = new Plottable.Axes.Numeric(yScale, "left");
+  var clusteredBarRenderer = new Plottable.Plots.ClusteredBar(xScale, yScale)
     .addDataset("d1", data[0])
     .addDataset("d2", data[1])
     .addDataset("d3", data[2])
@@ -25,11 +25,11 @@ function run(svg, data, Plottable) {
     .attr("fill", "type", colorScale)
     .attr("type", "type")
     .attr("yval", "y")
-    .barLabelsEnabled(true);
+    .labelsEnabled(true);
 
-  var center = clusteredBarRenderer.below(new Plottable.Component.Legend(colorScale));
+  var center = clusteredBarRenderer.below(new Plottable.Components.Legend(colorScale));
 
-  new Plottable.Component.Table([
+  new Plottable.Components.Table([
     [yAxis, center], [null, xAxis]
     ]).renderTo(svg);
 }
