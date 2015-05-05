@@ -6518,6 +6518,7 @@ var Plottable;
          * @param {any[]|Dataset} [dataset] If provided, the data or Dataset to be associated with this Plot.
          */
         function Plot() {
+            var _this = this;
             _super.call(this);
             this._dataChanged = false;
             this._projections = {};
@@ -6529,6 +6530,7 @@ var Plottable;
             this._key2PlotDatasetKey = d3.map();
             this._datasetKeysInOrder = [];
             this._nextSeriesIndex = 0;
+            this._renderFunctionWrapper = function () { return _this._render(); };
         }
         Plot.prototype.anchor = function (selection) {
             _super.prototype.anchor.call(this, selection);
@@ -6553,7 +6555,7 @@ var Plottable;
             properties.forEach(function (property) {
                 var projector = _this._projections[property];
                 if (projector.scale) {
-                    projector.scale.deregisterCoolListener(_this);
+                    projector.scale.deregisterCoolListener(_this, _this._renderFunctionWrapper);
                 }
             });
         };
@@ -6641,11 +6643,11 @@ var Plottable;
             if (existingScale) {
                 this._datasetKeysInOrder.forEach(function (key) {
                     existingScale._removeExtent(_this.getID().toString() + "_" + key, attrToSet);
-                    existingScale.deregisterCoolListener(_this);
+                    existingScale.deregisterCoolListener(_this, _this._renderFunctionWrapper);
                 });
             }
             if (scale) {
-                scale.registerCoolListener(this, function () { return _this._render(); });
+                scale.registerCoolListener(this, this._renderFunctionWrapper);
             }
             accessor = Plottable.Utils.Methods.accessorize(accessor);
             this._projections[attrToSet] = { accessor: accessor, scale: scale, attribute: attrToSet };

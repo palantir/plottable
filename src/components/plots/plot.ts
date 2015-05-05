@@ -38,6 +38,8 @@ module Plottable {
     protected _animateOnNextRender = true;
     private _nextSeriesIndex: number;
 
+    private _renderFunctionWrapper: Function;
+
     /**
      * Constructs a Plot.
      *
@@ -56,6 +58,7 @@ module Plottable {
       this._key2PlotDatasetKey = d3.map();
       this._datasetKeysInOrder = [];
       this._nextSeriesIndex = 0;
+      this._renderFunctionWrapper = () => this._render();
     }
 
     public anchor(selection: D3.Selection) {
@@ -81,7 +84,7 @@ module Plottable {
       properties.forEach((property) => {
         var projector = this._projections[property];
         if (projector.scale) {
-          projector.scale.deregisterCoolListener(this);
+          projector.scale.deregisterCoolListener(this, this._renderFunctionWrapper);
         }
       });
     }
@@ -186,12 +189,12 @@ module Plottable {
       if (existingScale) {
         this._datasetKeysInOrder.forEach((key) => {
           existingScale._removeExtent(this.getID().toString() + "_" + key, attrToSet);
-          existingScale.deregisterCoolListener(this);
+          existingScale.deregisterCoolListener(this, this._renderFunctionWrapper);
         });
       }
 
       if (scale) {
-        scale.registerCoolListener(this, () => this._render());
+        scale.registerCoolListener(this, this._renderFunctionWrapper);
       }
       accessor = Utils.Methods.accessorize(accessor);
       this._projections[attrToSet] = {accessor: accessor, scale: scale, attribute: attrToSet};
