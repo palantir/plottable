@@ -4060,12 +4060,12 @@ var Plottable;
                 this.classed("y-axis", true);
             }
             this.formatter(formatter);
-            this._rescaleFunctionWrapper = function (scale) { return _this._rescale(); };
-            this._scale.onUpdate(this._rescaleFunctionWrapper);
+            this._rescaleCallback = function (scale) { return _this._rescale(); };
+            this._scale.onUpdate(this._rescaleCallback);
         }
         Axis.prototype.remove = function () {
             _super.prototype.remove.call(this);
-            this._scale.offUpdate(this._rescaleFunctionWrapper);
+            this._scale.offUpdate(this._rescaleCallback);
         };
         Axis.prototype._isHorizontal = function () {
             return this._orientation === "top" || this._orientation === "bottom";
@@ -5508,8 +5508,8 @@ var Plottable;
                     throw new Error("Legend requires a colorScale");
                 }
                 this._scale = colorScale;
-                this._redrawFunctionWrapper = function (scale) { return _this.redraw(); };
-                this._scale.onUpdate(this._redrawFunctionWrapper);
+                this._redrawCallback = function (scale) { return _this.redraw(); };
+                this._scale.onUpdate(this._redrawCallback);
                 this.xAlign("right").yAlign("top");
                 this._fixedWidthFlag = true;
                 this._fixedHeightFlag = true;
@@ -5547,9 +5547,9 @@ var Plottable;
             };
             Legend.prototype.scale = function (scale) {
                 if (scale != null) {
-                    this._scale.offUpdate(this._redrawFunctionWrapper);
+                    this._scale.offUpdate(this._redrawCallback);
                     this._scale = scale;
-                    this._scale.onUpdate(this._redrawFunctionWrapper);
+                    this._scale.onUpdate(this._redrawCallback);
                     this.redraw();
                     return this;
                 }
@@ -5559,7 +5559,7 @@ var Plottable;
             };
             Legend.prototype.remove = function () {
                 _super.prototype.remove.call(this);
-                this._scale.offUpdate(this._redrawFunctionWrapper);
+                this._scale.offUpdate(this._redrawCallback);
             };
             Legend.prototype._calculateLayoutInfo = function (availableWidth, availableHeight) {
                 var _this = this;
@@ -5759,8 +5759,8 @@ var Plottable;
                     throw new Error("InterpolatedColorLegend requires a interpolatedColorScale");
                 }
                 this._scale = interpolatedColorScale;
-                this._redrawFunctionWrapper = function (scale) { return _this.redraw(); };
-                this._scale.onUpdate(this._redrawFunctionWrapper);
+                this._redrawCallback = function (scale) { return _this.redraw(); };
+                this._scale.onUpdate(this._redrawCallback);
                 this._formatter = formatter;
                 this._orientation = InterpolatedColorLegend._ensureOrientation(orientation);
                 this._fixedWidthFlag = true;
@@ -5769,7 +5769,7 @@ var Plottable;
             }
             InterpolatedColorLegend.prototype.remove = function () {
                 _super.prototype.remove.call(this);
-                this._scale.offUpdate(this._redrawFunctionWrapper);
+                this._scale.offUpdate(this._redrawCallback);
             };
             InterpolatedColorLegend.prototype.formatter = function (formatter) {
                 if (formatter === undefined) {
@@ -5981,21 +5981,21 @@ var Plottable;
                 this.classed("gridlines", true);
                 this._xScale = xScale;
                 this._yScale = yScale;
-                this._renderFunctionWrapper = function (scale) { return _this._render(); };
+                this._renderCallback = function (scale) { return _this._render(); };
                 if (this._xScale) {
-                    this._xScale.onUpdate(this._renderFunctionWrapper);
+                    this._xScale.onUpdate(this._renderCallback);
                 }
                 if (this._yScale) {
-                    this._yScale.onUpdate(this._renderFunctionWrapper);
+                    this._yScale.onUpdate(this._renderCallback);
                 }
             }
             Gridlines.prototype.remove = function () {
                 _super.prototype.remove.call(this);
                 if (this._xScale) {
-                    this._xScale.offUpdate(this._renderFunctionWrapper);
+                    this._xScale.offUpdate(this._renderCallback);
                 }
                 if (this._yScale) {
-                    this._yScale.offUpdate(this._renderFunctionWrapper);
+                    this._yScale.offUpdate(this._renderCallback);
                 }
                 return this;
             };
@@ -6514,7 +6514,7 @@ var Plottable;
             this._extentProvider = function (scale) { return _this._extentsForScale(scale); };
             this._datasetKeysInOrder = [];
             this._nextSeriesIndex = 0;
-            this._renderFunctionWrapper = function (scale) { return _this._render(); };
+            this._renderCallback = function (scale) { return _this._render(); };
         }
         Plot.prototype.anchor = function (selection) {
             _super.prototype.anchor.call(this, selection);
@@ -6534,7 +6534,7 @@ var Plottable;
             var _this = this;
             _super.prototype.remove.call(this);
             this._datasetKeysInOrder.forEach(function (k) { return _this.removeDataset(k); });
-            this._scales().forEach(function (scale) { return scale.offUpdate(_this._renderFunctionWrapper); });
+            this._scales().forEach(function (scale) { return scale.offUpdate(_this._renderCallback); });
         };
         Plot.prototype.addDataset = function (keyOrDataset, dataset) {
             if (typeof (keyOrDataset) !== "string" && dataset !== undefined) {
@@ -6621,13 +6621,13 @@ var Plottable;
             this._updateExtentsForAttr(attrToSet);
             if (previousScale) {
                 if (this._scales().indexOf(previousScale) !== -1) {
-                    previousScale.offUpdate(this._renderFunctionWrapper);
+                    previousScale.offUpdate(this._renderCallback);
                     previousScale.removeExtentProvider(this._extentProvider);
                 }
                 previousScale._autoDomainIfAutomaticMode();
             }
             if (scale) {
-                scale.onUpdate(this._renderFunctionWrapper);
+                scale.onUpdate(this._renderCallback);
                 scale.addExtentProvider(this._extentProvider);
                 scale._autoDomainIfAutomaticMode();
             }
@@ -7079,12 +7079,12 @@ var Plottable;
             this.classed("xy-plot", true);
             this._xScale = xScale;
             this._yScale = yScale;
-            this._adjustYDomainOnChangeFromXFunctionWrapper = function (scale) { return _this._adjustYDomainOnChangeFromX(); };
-            this._adjustXDomainOnChangeFromYFunctionWrapper = function (scale) { return _this._adjustXDomainOnChangeFromY(); };
+            this._adjustYDomainOnChangeFromXCallback = function (scale) { return _this._adjustYDomainOnChangeFromX(); };
+            this._adjustXDomainOnChangeFromYCallback = function (scale) { return _this._adjustXDomainOnChangeFromY(); };
             this._updateXDomainer();
-            xScale.onUpdate(this._adjustYDomainOnChangeFromXFunctionWrapper);
+            xScale.onUpdate(this._adjustYDomainOnChangeFromXCallback);
             this._updateYDomainer();
-            yScale.onUpdate(this._adjustXDomainOnChangeFromYFunctionWrapper);
+            yScale.onUpdate(this._adjustXDomainOnChangeFromYCallback);
         }
         /**
          * @param {string} attrToSet One of ["x", "y"] which determines the point's
@@ -7095,19 +7095,19 @@ var Plottable;
             // So when we get an "x" or "y" scale, enable autoNiceing and autoPadding.
             if (attrToSet === "x" && scale) {
                 if (this._xScale) {
-                    this._xScale.offUpdate(this._adjustYDomainOnChangeFromXFunctionWrapper);
+                    this._xScale.offUpdate(this._adjustYDomainOnChangeFromXCallback);
                 }
                 this._xScale = scale;
                 this._updateXDomainer();
-                scale.onUpdate(this._adjustYDomainOnChangeFromXFunctionWrapper);
+                scale.onUpdate(this._adjustYDomainOnChangeFromXCallback);
             }
             if (attrToSet === "y" && scale) {
                 if (this._yScale) {
-                    this._yScale.offUpdate(this._adjustXDomainOnChangeFromYFunctionWrapper);
+                    this._yScale.offUpdate(this._adjustXDomainOnChangeFromYCallback);
                 }
                 this._yScale = scale;
                 this._updateYDomainer();
-                scale.onUpdate(this._adjustXDomainOnChangeFromYFunctionWrapper);
+                scale.onUpdate(this._adjustXDomainOnChangeFromYCallback);
             }
             _super.prototype.project.call(this, attrToSet, accessor, scale);
             return this;
@@ -7115,10 +7115,10 @@ var Plottable;
         XYPlot.prototype.remove = function () {
             _super.prototype.remove.call(this);
             if (this._xScale) {
-                this._xScale.offUpdate(this._adjustYDomainOnChangeFromXFunctionWrapper);
+                this._xScale.offUpdate(this._adjustYDomainOnChangeFromXCallback);
             }
             if (this._yScale) {
-                this._yScale.offUpdate(this._adjustXDomainOnChangeFromYFunctionWrapper);
+                this._yScale.offUpdate(this._adjustXDomainOnChangeFromYCallback);
             }
             return this;
         };

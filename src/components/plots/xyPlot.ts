@@ -6,8 +6,8 @@ module Plottable {
     protected _yScale: Scale<Y, number>;
     private _autoAdjustXScaleDomain = false;
     private _autoAdjustYScaleDomain = false;
-    private _adjustYDomainOnChangeFromXFunctionWrapper: ScaleCallback<Scale<any, any>>;
-    private _adjustXDomainOnChangeFromYFunctionWrapper: ScaleCallback<Scale<any, any>>;
+    private _adjustYDomainOnChangeFromXCallback: ScaleCallback<Scale<any, any>>;
+    private _adjustXDomainOnChangeFromYCallback: ScaleCallback<Scale<any, any>>;
 
     /**
      * Constructs an XYPlot.
@@ -30,14 +30,14 @@ module Plottable {
       this._xScale = xScale;
       this._yScale = yScale;
 
-      this._adjustYDomainOnChangeFromXFunctionWrapper = (scale) => this._adjustYDomainOnChangeFromX();
-      this._adjustXDomainOnChangeFromYFunctionWrapper = (scale) => this._adjustXDomainOnChangeFromY();
+      this._adjustYDomainOnChangeFromXCallback = (scale) => this._adjustYDomainOnChangeFromX();
+      this._adjustXDomainOnChangeFromYCallback = (scale) => this._adjustXDomainOnChangeFromY();
 
       this._updateXDomainer();
-      xScale.onUpdate(this._adjustYDomainOnChangeFromXFunctionWrapper);
+      xScale.onUpdate(this._adjustYDomainOnChangeFromXCallback);
 
       this._updateYDomainer();
-      yScale.onUpdate(this._adjustXDomainOnChangeFromYFunctionWrapper);
+      yScale.onUpdate(this._adjustXDomainOnChangeFromYCallback);
     }
 
     /**
@@ -49,21 +49,21 @@ module Plottable {
       // So when we get an "x" or "y" scale, enable autoNiceing and autoPadding.
       if (attrToSet === "x" && scale) {
         if (this._xScale) {
-          this._xScale.offUpdate(this._adjustYDomainOnChangeFromXFunctionWrapper);
+          this._xScale.offUpdate(this._adjustYDomainOnChangeFromXCallback);
         }
         this._xScale = scale;
         this._updateXDomainer();
 
-        scale.onUpdate(this._adjustYDomainOnChangeFromXFunctionWrapper);
+        scale.onUpdate(this._adjustYDomainOnChangeFromXCallback);
       }
 
       if (attrToSet === "y" && scale) {
         if (this._yScale) {
-          this._yScale.offUpdate(this._adjustXDomainOnChangeFromYFunctionWrapper);
+          this._yScale.offUpdate(this._adjustXDomainOnChangeFromYCallback);
         }
         this._yScale = scale;
         this._updateYDomainer();
-        scale.onUpdate(this._adjustXDomainOnChangeFromYFunctionWrapper);
+        scale.onUpdate(this._adjustXDomainOnChangeFromYCallback);
       }
 
       super.project(attrToSet, accessor, scale);
@@ -74,10 +74,10 @@ module Plottable {
     public remove() {
       super.remove();
       if (this._xScale) {
-        this._xScale.offUpdate(this._adjustYDomainOnChangeFromXFunctionWrapper);
+        this._xScale.offUpdate(this._adjustYDomainOnChangeFromXCallback);
       }
       if (this._yScale) {
-        this._yScale.offUpdate(this._adjustXDomainOnChangeFromYFunctionWrapper);
+        this._yScale.offUpdate(this._adjustXDomainOnChangeFromYCallback);
       }
       return this;
     }
