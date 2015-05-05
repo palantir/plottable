@@ -10,44 +10,43 @@ function run(svg, data, Plottable) {
   var newData = JSON.parse(JSON.stringify(data));
   var dataSeries = newData;
 
-  var xScale = new Plottable.Scale.Linear();
-  var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
+  var xScale = new Plottable.Scales.Linear();
+  var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
 
-  var yScale = new Plottable.Scale.Linear();
-  var yAxis = new Plottable.Axis.Numeric(yScale, "left");
+  var yScale = new Plottable.Scales.Linear();
+  var yAxis = new Plottable.Axes.Numeric(yScale, "left");
 
-  var plot = new Plottable.Plot.Area(xScale, yScale).addDataset(dataSeries);
+  var plot = new Plottable.Plots.Area(xScale, yScale).addDataset(dataSeries);
   var fillAccessor = function() { return "steelblue"; };
   plot.attr("fill", fillAccessor);
   plot.project("x", "x", xScale).project("y", "y", yScale);
 
-  var gridlines = new Plottable.Component.Gridlines(xScale, yScale);
-  var renderGroup = new Plottable.Component.Group([gridlines, plot]);
+  var gridlines = new Plottable.Components.Gridlines(xScale, yScale);
+  var renderGroup = new Plottable.Components.Group([gridlines, plot]);
 
-  var chart = new Plottable.Component.Table([
+  var chart = new Plottable.Components.Table([
                                             [yAxis, renderGroup],
                                             [null,  xAxis]]);
 
   chart.renderTo(svg);
 
-  var xDrag = new Plottable.Interaction.XDragBox();
-  xDrag.dragend(function(start, end) {
-    xDrag.clearBox();
-    if (start.x === end.x) {
+  var xDBL = new Plottable.Components.XDragBoxLayer();
+  xDBL.onDragEnd(function(bounds) {
+    xDBL.boxVisible(false);
+    if (bounds.topLeft.x === bounds.bottomRight.x) {
       return;
     }
-    var scaledStartX = xScale.invert(start.x);
-    var scaledEndX = xScale.invert(end.x);
+    var scaledStartX = xScale.invert(bounds.topLeft.x);
+    var scaledEndX = xScale.invert(bounds.bottomRight.x);
 
     var minX = Math.min(scaledStartX, scaledEndX);
     var maxX = Math.max(scaledStartX, scaledEndX);
 
-    xScale.domain([minX, maxX]);
+    xScale.domain([scaledStartX, scaledEndX]);
   });
+  xDBL.above(renderGroup);
 
-  renderGroup.registerInteraction(xDrag);
-
-  var reset = new Plottable.Interaction.DoubleClick();
-  reset.callback(function() { xScale.autoDomain(); });
+  var reset = new Plottable.Interactions.DoubleClick();
+  reset.onDoubleClick(function() { xScale.autoDomain(); });
   renderGroup.registerInteraction(reset);
 }

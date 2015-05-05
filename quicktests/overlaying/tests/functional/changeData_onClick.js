@@ -13,19 +13,19 @@ function run(svg, data, Plottable) {
 
     var dataseries1 = new Plottable.Dataset(data[0].slice(0, 5));
 
-    var xScale = new Plottable.Scale.Linear();
-    var yScale = new Plottable.Scale.Linear();
-    var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
-    var yAxis = new Plottable.Axis.Numeric(yScale, "left");
+    var xScale = new Plottable.Scales.Linear();
+    var yScale = new Plottable.Scales.Linear();
+    var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
+    var yAxis = new Plottable.Axes.Numeric(yScale, "left");
 
 
-    var barPlot = new Plottable.Plot.Bar(xScale, yScale, true)
+    var barPlot = new Plottable.Plots.Bar(xScale, yScale, true)
         .addDataset(dataseries1)
         .animate(true)
         .project("x", "x", xScale)
         .project("y", "y", yScale);
 
-    var scatterPlot = new Plottable.Plot.Scatter(xScale, yScale)
+    var scatterPlot = new Plottable.Plots.Scatter(xScale, yScale)
         .addDataset(dataseries1)
         .attr("fill", function() { return "purple"; })
         .animate(true)
@@ -34,7 +34,7 @@ function run(svg, data, Plottable) {
 
     var renderGroup = barPlot.below(scatterPlot);
 
-    var basicTable = new Plottable.Component.Table()
+    var basicTable = new Plottable.Components.Table()
                 .addComponent(2, 0, yAxis)
                 .addComponent(2, 1, renderGroup)
                 .addComponent(3, 1, xAxis);
@@ -53,7 +53,7 @@ function run(svg, data, Plottable) {
     };
 
     renderGroup.registerInteraction(
-        new Plottable.Interaction.Click().callback(cb)
+        new Plottable.Interactions.Click().onClick(cb)
     );
 
 }

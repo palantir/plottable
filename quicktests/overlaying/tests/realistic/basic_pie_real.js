@@ -24,15 +24,15 @@ function makeData() {
 function run(svg, data, Plottable) {
   "use strict";
 
-  var colorScale = new Plottable.Scale.Color();
-  var legend = new Plottable.Component.Legend(colorScale).xAlign("left");
+  var colorScale = new Plottable.Scales.Color();
+  var legend = new Plottable.Components.Legend(colorScale).xAlign("left");
   legend.maxEntriesPerRow(1);
-  var title = new Plottable.Component.TitleLabel("Sales by Region");
-  var Alabel = new Plottable.Component.Label("Product A");
-  var Blabel = new Plottable.Component.Label("Product B");
-  var ABlabel = new Plottable.Component.Label("Combined");
+  var title = new Plottable.Components.TitleLabel("Sales by Region");
+  var Alabel = new Plottable.Components.Label("Product A");
+  var Blabel = new Plottable.Components.Label("Product B");
+  var ABlabel = new Plottable.Components.Label("Combined");
 
-  var Aplot = new Plottable.Plot.Pie();
+  var Aplot = new Plottable.Plots.Pie();
     Aplot.addDataset("d1", data[0]);
     Aplot.project("value", "percent");
     Aplot.project("fill", "region", colorScale);
@@ -40,7 +40,7 @@ function run(svg, data, Plottable) {
     Aplot.project("outer-radius", 80);
     Aplot = Alabel.above(Aplot);
 
-  var Bplot = new Plottable.Plot.Pie();
+  var Bplot = new Plottable.Plots.Pie();
     Bplot.addDataset("d2", data[1]);
     Bplot.project("value", "percent");
     Bplot.project("fill", "region", colorScale);
@@ -48,7 +48,7 @@ function run(svg, data, Plottable) {
     Bplot.project("outer-radius", 80);
     Bplot = Blabel.above(Bplot);
 
-  var ABplot = new Plottable.Plot.Pie();
+  var ABplot = new Plottable.Plots.Pie();
     ABplot.addDataset("d3", data[2]);
     ABplot.project("value", "percent");
     ABplot.project("fill", "region", colorScale);
@@ -56,16 +56,16 @@ function run(svg, data, Plottable) {
     ABplot.project("outer-radius", 100);
     ABplot = ABlabel.above(ABplot);
 
-  var productPlots = new Plottable.Component.Table([
+  var productPlots = new Plottable.Components.Table([
       [Aplot],
       [Bplot],
   ]);
 
-  var allPlots = new Plottable.Component.Table([
+  var allPlots = new Plottable.Components.Table([
       [productPlots, ABplot, legend]
   ]);
 
-  var chart = new Plottable.Component.Table([
+  var chart = new Plottable.Components.Table([
       [title],
       [allPlots]
   ]);

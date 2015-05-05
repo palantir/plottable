@@ -15,32 +15,32 @@ function run(svg, data, Plottable) {
 
   var dataseries = new Plottable.Dataset(boringData());
 
-  var xScale = new Plottable.Scale.Linear();
-  var yScale = new Plottable.Scale.Linear();
+  var xScale = new Plottable.Scales.Linear();
+  var yScale = new Plottable.Scales.Linear();
   xScale.domain([0, 3]);
   yScale.domain([0, 8]);
-  var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
-  var yAxis = new Plottable.Axis.Numeric(yScale, "left");
-  var xAxis2 = new Plottable.Axis.Numeric(xScale, "bottom");
-  var yAxis2 = new Plottable.Axis.Numeric(yScale, "left");
+  var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
+  var yAxis = new Plottable.Axes.Numeric(yScale, "left");
+  var xAxis2 = new Plottable.Axes.Numeric(xScale, "bottom");
+  var yAxis2 = new Plottable.Axes.Numeric(yScale, "left");
 
   //rendering
-  var linePlot = new Plottable.Plot.Line(xScale, yScale).addDataset(dataseries);
+  var linePlot = new Plottable.Plots.Line(xScale, yScale).addDataset(dataseries);
   linePlot.project("x", "x", xScale).project("y", "y", yScale);
-  var scatterPlot = new Plottable.Plot.Scatter(xScale, yScale).addDataset(dataseries);
+  var scatterPlot = new Plottable.Plots.Scatter(xScale, yScale).addDataset(dataseries);
   scatterPlot.project("x", "x", xScale).project("y", "y", yScale);
 
-  var autoXLabel = new Plottable.Component.Label("autodomain X");
-  var focusXLabel = new Plottable.Component.Label("focus X");
-  var autoYLabel = new Plottable.Component.Label("autodomain Y");
-  var focusYLabel = new Plottable.Component.Label("focus Y");
+  var autoXLabel = new Plottable.Components.Label("autodomain X");
+  var focusXLabel = new Plottable.Components.Label("focus X");
+  var autoYLabel = new Plottable.Components.Label("autodomain Y");
+  var focusYLabel = new Plottable.Components.Label("focus Y");
 
-  var labelTable = new Plottable.Component.Table([
+  var labelTable = new Plottable.Components.Table([
     [autoXLabel, focusXLabel],
     [autoYLabel, focusYLabel]
   ]);
 
-  var basicTable = new Plottable.Component.Table([
+  var basicTable = new Plottable.Components.Table([
     [yAxis, yAxis2, linePlot.below(scatterPlot)],
     [null, null, xAxis],
     [null, null, xAxis2],
@@ -61,9 +61,9 @@ function run(svg, data, Plottable) {
     yScale.domain([0, 8]);
   }
 
-  autoXLabel.registerInteraction(new Plottable.Interaction.Click().onClick(xAuto));
-  autoYLabel.registerInteraction(new Plottable.Interaction.Click().onClick(yAuto));
-  focusXLabel.registerInteraction(new Plottable.Interaction.Click().onClick(xFocus));
-  focusYLabel.registerInteraction(new Plottable.Interaction.Click().onClick(yFocus));
+  autoXLabel.registerInteraction(new Plottable.Interactions.Click().onClick(xAuto));
+  autoYLabel.registerInteraction(new Plottable.Interactions.Click().onClick(yAuto));
+  focusXLabel.registerInteraction(new Plottable.Interactions.Click().onClick(xFocus));
+  focusYLabel.registerInteraction(new Plottable.Interactions.Click().onClick(yFocus));
 
 }

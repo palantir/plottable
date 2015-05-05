@@ -22,19 +22,19 @@ function run(svg, data, Plottable) {
     dataseries_top[i].y += dataseries[i].y;
   }
 
-  var xScale = new Plottable.Scale.Linear();
-  var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
+  var xScale = new Plottable.Scales.Linear();
+  var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
 
-  var yScale = new Plottable.Scale.Linear();
-  var yAxis = new Plottable.Axis.Numeric(yScale, "left");
+  var yScale = new Plottable.Scales.Linear();
+  var yAxis = new Plottable.Axes.Numeric(yScale, "left");
 
   var y0Accessor = function(d, i) { return dataseries[i].y; };
 
-  var areaPlot1 = new Plottable.Plot.Area(xScale, yScale)
+  var areaPlot1 = new Plottable.Plots.Area(xScale, yScale)
   .addDataset(dataseries).project("x", "x", xScale)
   .project("y", "y", yScale);
-  
-  var areaPlot2 = new Plottable.Plot.Area(xScale, yScale)
+
+  var areaPlot2 = new Plottable.Plots.Area(xScale, yScale)
   .addDataset(dataseries_top)
   .attr("y0", y0Accessor, yScale)
   .project("x", "x", xScale)
@@ -45,10 +45,10 @@ function run(svg, data, Plottable) {
   areaPlot1.attr("fill", fillAccessor);
   areaPlot2.attr("fill", fillAccessorTop);
 
-  var gridlines = new Plottable.Component.Gridlines(xScale, yScale);
-  var renderGroup = new Plottable.Component.Group([gridlines, areaPlot1, areaPlot2]);
+  var gridlines = new Plottable.Components.Gridlines(xScale, yScale);
+  var renderGroup = new Plottable.Components.Group([gridlines, areaPlot1, areaPlot2]);
 
-  new Plottable.Component.Table([
+  new Plottable.Components.Table([
                                  [yAxis, renderGroup],
                                  [null, xAxis]
                                  ]).renderTo(svg);

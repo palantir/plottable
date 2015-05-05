@@ -9,27 +9,27 @@ function run(svg, data, Plottable) {
 
   var dates = [];
 
-  var xScale = new Plottable.Scale.Time();
-  var yScale = new Plottable.Scale.Linear();
+  var xScale = new Plottable.Scales.Time();
+  var yScale = new Plottable.Scales.Linear();
   var ds = new Plottable.Dataset(dates);
   var parse = function(d) {return d3.time.format("%x").parse(d.x);};
-  var plot = new Plottable.Plot.Bar(xScale, yScale, true)
+  var plot = new Plottable.Plots.Bar(xScale, yScale, true)
                       .addDataset(ds)
                       .attr("x", parse, xScale)
                       .project("y", "y", yScale);
 
-  var xAxis = new Plottable.Axis.Time(xScale, "bottom");
-  var yAxis = new Plottable.Axis.Numeric(yScale, "left");
+  var xAxis = new Plottable.Axes.Time(xScale, "bottom");
+  var yAxis = new Plottable.Axes.Numeric(yScale, "left");
 
-  var title = new Plottable.Component.TitleLabel("Click to add data");
+  var title = new Plottable.Components.TitleLabel("Click to add data");
 
-  var gridlines = new Plottable.Component.Gridlines(xScale, yScale);
+  var gridlines = new Plottable.Components.Gridlines(xScale, yScale);
   var renderGroup = plot.above(gridlines);
-  var titleTable = new Plottable.Component.Table([[title]]);
-  var contentTable = new Plottable.Component.Table([
+  var titleTable = new Plottable.Components.Table([[title]]);
+  var contentTable = new Plottable.Components.Table([
                                                     [yAxis, renderGroup],
                                                     [null, xAxis]]);
-  new Plottable.Component.Table([
+  new Plottable.Components.Table([
                                  [titleTable],
                                  [contentTable]
                                  ]).renderTo(svg);
@@ -50,6 +50,6 @@ function run(svg, data, Plottable) {
     ds.data(d);
 
   }
-  var clickInteraction = new Plottable.Interaction.Click().onClick(addData);
+  var clickInteraction = new Plottable.Interactions.Click().onClick(addData);
   title.registerInteraction(clickInteraction);
 }
