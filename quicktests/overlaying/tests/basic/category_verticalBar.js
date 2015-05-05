@@ -15,19 +15,19 @@ function run(svg, data, Plottable) {
 
     var ds = new Plottable.Dataset(data);
 
-    var xScale = new Plottable.Scale.Category();
-    var xAxis = new Plottable.Axis.Category(xScale, "bottom");
+    var xScale = new Plottable.Scales.Category();
+    var xAxis = new Plottable.Axes.Category(xScale, "bottom");
 
-    var yScale = new Plottable.Scale.Linear();
-    var yAxis = new Plottable.Axis.Numeric(yScale, "left");
+    var yScale = new Plottable.Scales.Linear();
+    var yAxis = new Plottable.Axes.Numeric(yScale, "left");
 
-    var barPlot = new Plottable.Plot.Bar(xScale, yScale, true)
+    var barPlot = new Plottable.Plots.Bar(xScale, yScale, true)
         .addDataset(ds)
         .attr("x", "name", xScale)
         .attr("y", "age", yScale)
         .animate(true);
 
-    var chart = new Plottable.Component.Table([[yAxis, barPlot],
+    var chart = new Plottable.Components.Table([[yAxis, barPlot],
        [null,  xAxis]]);
 
     chart.renderTo(svg);

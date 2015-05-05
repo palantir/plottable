@@ -10,31 +10,31 @@ function makeData() {
 function run(svg, data, Plottable) {
   "use strict";
 
-    var xScale = new Plottable.Scale.Category();
-    var yScale = new Plottable.Scale.Linear();
-    var colorScale = new Plottable.Scale.Color();
+    var xScale = new Plottable.Scales.Category();
+    var yScale = new Plottable.Scales.Linear();
+    var colorScale = new Plottable.Scales.Color();
 
 
-    var yAxis = new Plottable.Axis.Numeric(yScale, "left");
-    var xAxis = new Plottable.Axis.Category(xScale, "bottom");
-    var animator = new Plottable.Animator.Base();
+    var yAxis = new Plottable.Axes.Numeric(yScale, "left");
+    var xAxis = new Plottable.Axes.Category(xScale, "bottom");
+    var animator = new Plottable.Animators.Base();
         animator.duration(1000);
         animator.maxTotalDuration(2000);
         animator.maxIterativeDelay(100);
 
 
-    var vbar = new Plottable.Plot.Bar(xScale, yScale)
+    var vbar = new Plottable.Plots.Bar(xScale, yScale)
       .project("x", "x", xScale)
       .project("y", "y", yScale)
       .project("fill", "type", colorScale)
-      .barLabelsEnabled(true)
+      .labelsEnabled(true)
       .barLabelFormatter(function(text){return text + "!";})
       .addDataset(data)
       .animator( "bars", animator)
       .animate(true);
 
 
-    var chart = new Plottable.Component.Table([
+    var chart = new Plottable.Components.Table([
                     [yAxis, vbar],
                     [null,  xAxis]
                   ]);
@@ -43,7 +43,7 @@ function run(svg, data, Plottable) {
     var cb = function(){
       vbar.datasets()[0].data(data);
     };
-    var click = new Plottable.Interaction.Click().onClick(cb);
+    var click = new Plottable.Interactions.Click().onClick(cb);
 
     vbar.registerInteraction(click);
 

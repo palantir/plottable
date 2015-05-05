@@ -11,36 +11,37 @@ function run(svg, data, Plottable) {
 
   var dataseries = data[0].slice(0, 20);
 
-  var xScale = new Plottable.Scale.Linear();
-  var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
+  var xScale = new Plottable.Scales.Linear();
+  var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
 
-  var yScale = new Plottable.Scale.Linear();
-  var yAxis = new Plottable.Axis.Numeric(yScale, "left");
+  var yScale = new Plottable.Scales.Linear();
+  var yAxis = new Plottable.Axes.Numeric(yScale, "left");
 
-  var barPlot = new Plottable.Plot.Bar(xScale, yScale, true).addDataset(dataseries);
+  var barPlot = new Plottable.Plots.Bar(xScale, yScale, true).addDataset(dataseries);
   barPlot.project("x", "x", xScale).project("y", "y", yScale);
-  var gridlines = new Plottable.Component.Gridlines(xScale, yScale);
+  var gridlines = new Plottable.Components.Gridlines(xScale, yScale);
   var renderGroup = gridlines.below(barPlot);
-  var title = new Plottable.Component.TitleLabel("reset");
+  var title = new Plottable.Components.TitleLabel("reset");
 
-  var chart = new Plottable.Component.Table([
+  var chart = new Plottable.Components.Table([
                                             [null, title],
                                             [yAxis, renderGroup],
                                             [null,  xAxis]]).renderTo(svg);
 
-  //callbacks
-  var dragBox = new Plottable.Interaction.DragBox().resizeEnabled(true);
-  var cb_drag = function(start, end) {
-    var minX = Math.min(start.x, end.x);
-    var maxX = Math.max(start.x, end.x);
-    var minY = Math.min(start.y, end.y);
-    var maxY = Math.max(start.y, end.y);
+
+  var dbl = new Plottable.Components.DragBoxLayer();
+  dbl.resizable(true);
+  dbl.onDragEnd(function(bounds) {
+    var minX = Math.min(bounds.topLeft.x, bounds.bottomRight.x);
+    var maxX = Math.max(bounds.topLeft.x, bounds.bottomRight.x);
+    var minY = Math.min(bounds.topLeft.y, bounds.bottomRight.y);
+    var maxY = Math.max(bounds.topLeft.y, bounds.bottomRight.y);
 
     var bars = barPlot.getBars({min: minX, max: maxX},
                       {min: minY, max: maxY}).classed("selected", true);
     title.text(String(bars[0].length));
-  };
-  dragBox.dragend(cb_drag);
+  });
+  dbl.above(renderGroup);
 
   var cb_click = function(p) {
     var bars = barPlot.getBars(p.x, p.y).classed("selected", true);
@@ -52,11 +53,7 @@ function run(svg, data, Plottable) {
     dragBox.clearBox();
   };
 
-    //register interactions
-  renderGroup.registerInteraction(dragBox);
-
-  renderGroup.registerInteraction(new Plottable.Interaction.Click().onClick(cb_click));
-
-  title.registerInteraction(new Plottable.Interaction.Click().onClick(cb_reset));
-
+  //register interactions
+  renderGroup.registerInteraction(new Plottable.Interactions.Click().onClick(cb_click));
+  title.registerInteraction(new Plottable.Interactions.Click().onClick(cb_reset));
 }

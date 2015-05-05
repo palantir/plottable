@@ -8,17 +8,17 @@ function makeData() {
 
 function run(svg, data, Plottable) {
   "use strict";
-  var xScale = new Plottable.Scale.Category();
-  var yScale = new Plottable.Scale.Linear();
-  var colorScale = new Plottable.Scale.Color("10");
+  var xScale = new Plottable.Scales.Category();
+  var yScale = new Plottable.Scales.Linear();
+  var colorScale = new Plottable.Scales.Color("10");
 
-  var xAxis = new Plottable.Axis.Category(xScale, "bottom");
-  var yAxis = new Plottable.Axis.Numeric(yScale, "left");
+  var xAxis = new Plottable.Axes.Category(xScale, "bottom");
+  var yAxis = new Plottable.Axes.Numeric(yScale, "left");
 
-  // if (!Plottable.Plot.Area) {
+  // if (!Plottable.Plots.Area) {
   //   return;
   // }
-  var stackedAreaPlot = new Plottable.Plot.StackedArea(xScale, yScale)
+  var stackedAreaPlot = new Plottable.Plots.StackedArea(xScale, yScale)
     .project("x", "name", xScale)
     .project("y", "y", yScale)
     .project("fill", "type", colorScale)
@@ -27,11 +27,11 @@ function run(svg, data, Plottable) {
     .addDataset("d3", data[2])
     .animate(true);
 
-  var legend = new Plottable.Component.Legend(colorScale);
+  var legend = new Plottable.Components.Legend(colorScale);
   legend.maxEntriesPerRow(1);
   var center = stackedAreaPlot.below(legend);
 
-  new Plottable.Component.Table([
+  new Plottable.Components.Table([
     [yAxis, center], [null, xAxis]
     ]).renderTo(svg);
 }

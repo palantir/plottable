@@ -10,13 +10,13 @@ function makeData() {
 function run(svg, data, Plottable) {
   "use strict";
 
-  var xScale = new Plottable.Scale.Category();
-  var yScale = new Plottable.Scale.Linear();
-  var colorScale = new Plottable.Scale.Color("10");
+  var xScale = new Plottable.Scales.Category();
+  var yScale = new Plottable.Scales.Linear();
+  var colorScale = new Plottable.Scales.Color("10");
 
-  var xAxis = new Plottable.Axis.Category(xScale, "bottom");
-  var yAxis = new Plottable.Axis.Numeric(yScale, "left");
-  var stackedBarPlot = new Plottable.Plot.StackedBar(xScale, yScale)
+  var xAxis = new Plottable.Axes.Category(xScale, "bottom");
+  var yAxis = new Plottable.Axes.Numeric(yScale, "left");
+  var stackedBarPlot = new Plottable.Plots.StackedBar(xScale, yScale)
                                     .attr("x", "name", xScale)
                                     .attr("y", "y", yScale)
                                     .attr("fill", "type", colorScale)
@@ -26,13 +26,13 @@ function run(svg, data, Plottable) {
                                     .addDataset("d2", data[1])
                                     .addDataset("d3", data[2])
                                     .animate(true)
-                                    .barLabelsEnabled(true);
+                                    .labelsEnabled(true);
 
-  var legend = new Plottable.Component.Legend(colorScale);
+  var legend = new Plottable.Components.Legend(colorScale);
   legend.maxEntriesPerRow(1);
   var center = stackedBarPlot.below(legend);
 
-  var horizChart = new Plottable.Component.Table([
+  var horizChart = new Plottable.Components.Table([
     [yAxis, center], [null, xAxis]
     ]).renderTo(svg);
 }

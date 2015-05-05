@@ -10,56 +10,56 @@ function run(svg, data, Plottable) {
   var backPlot = 0;
   //data
   var dataseries = data[0].slice(0, 10);
-  var colorScale1 = new Plottable.Scale.Color("20");
+  var colorScale1 = new Plottable.Scales.Color("20");
   colorScale1.domain(["scatter", "line", "area"]);
 
   //Axis
 
-  var xScale = new Plottable.Scale.Linear();
-  var yScale = new Plottable.Scale.Linear();
-  var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
-  var yAxis = new Plottable.Axis.Numeric(yScale, "left");
+  var xScale = new Plottable.Scales.Linear();
+  var yScale = new Plottable.Scales.Linear();
+  var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
+  var yAxis = new Plottable.Axes.Numeric(yScale, "left");
 
   var colorProjector = function(d, i, m) {
      return colorScale1.scale(m.name);
   };
 
   //rendering
-  var scatterPlot = new Plottable.Plot.Scatter(xScale, yScale).addDataset(dataseries) //0
+  var scatterPlot = new Plottable.Plots.Scatter(xScale, yScale).addDataset(dataseries) //0
                                                               .attr("fill", colorScale1.scale("scatter"))
                                                               .attr("size", function(){return 20;})
                                                               .project("x", "x", xScale)
                                                               .project("y", "y", yScale);
 
-  var linePlot = new Plottable.Plot.Line(xScale, yScale)
+  var linePlot = new Plottable.Plots.Line(xScale, yScale)
           .addDataset(dataseries) //1
           .attr("stroke", colorScale1.scale("line"))
           .attr("stroke-width", function(){ return 5;})
           .project("x", "x", xScale)
           .project("y", "y", yScale);
 
-  var areaPlot = new Plottable.Plot.Area(xScale, yScale)
+  var areaPlot = new Plottable.Plots.Area(xScale, yScale)
           .addDataset(dataseries) //2
           .attr("fill", colorScale1.scale("area"))
           .project("x", "x", xScale)
           .project("y", "y", yScale);
 
   //title + legend
-  var title1 = new Plottable.Component.TitleLabel( "front: areaPlot", "horizontal");
-  var legend1 = new Plottable.Component.Legend(colorScale1);
+  var title1 = new Plottable.Components.TitleLabel( "front: areaPlot", "horizontal");
+  var legend1 = new Plottable.Components.Legend(colorScale1);
   legend1.maxEntriesPerRow(1);
 
-  var titleTable = new Plottable.Component.Table().addComponent(0,0, title1)
+  var titleTable = new Plottable.Components.Table().addComponent(0,0, title1)
                                         .addComponent(0,1, legend1);
 
   var plotGroup = scatterPlot.below(linePlot).below(areaPlot);
 
-  var basicTable = new Plottable.Component.Table()
+  var basicTable = new Plottable.Components.Table()
               .addComponent(2, 0, yAxis)
               .addComponent(2, 1, plotGroup)
               .addComponent(3, 1, xAxis);
 
-  var bigTable = new Plottable.Component.Table()
+  var bigTable = new Plottable.Components.Table()
              .addComponent(0, 0, titleTable)
              .addComponent(1,0, basicTable);
 
@@ -78,7 +78,7 @@ function run(svg, data, Plottable) {
   }
 
   plotGroup.registerInteraction(
-    new Plottable.Interaction.Click().onClick(cb)
+    new Plottable.Interactions.Click().onClick(cb)
   );
 
 }

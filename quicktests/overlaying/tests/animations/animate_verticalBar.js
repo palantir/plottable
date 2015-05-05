@@ -10,21 +10,21 @@ function run(svg, data, Plottable) {
   var doAnimate = true;
 
 
-  var xScale = new Plottable.Scale.Linear();
-  var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
+  var xScale = new Plottable.Scales.Linear();
+  var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
 
-  var yScale = new Plottable.Scale.Linear();
-  var yAxis = new Plottable.Axis.Numeric(yScale, "left");
+  var yScale = new Plottable.Scales.Linear();
+  var yAxis = new Plottable.Axes.Numeric(yScale, "left");
 
   var dataset = new Plottable.Dataset(data);
-  var verticalBarPlot = new Plottable.Plot.Bar(xScale, yScale, true)
+  var verticalBarPlot = new Plottable.Plots.Bar(xScale, yScale, true)
                               .addDataset(dataset)
                               .project("x", "x", xScale)
                               .project("y", "y", yScale)
                               .attr("opacity", 0.75)
                               .animate(doAnimate);
 
-  var chart = new Plottable.Component.Table([[yAxis, verticalBarPlot],
+  var chart = new Plottable.Components.Table([[yAxis, verticalBarPlot],
    [null,  xAxis]]);
 
   chart.renderTo(svg);
@@ -34,5 +34,5 @@ function run(svg, data, Plottable) {
     dataset.data(d);
   };
 
-  verticalBarPlot.registerInteraction(new Plottable.Interaction.Click().onClick(cb));
+  verticalBarPlot.registerInteraction(new Plottable.Interactions.Click().onClick(cb));
 }
