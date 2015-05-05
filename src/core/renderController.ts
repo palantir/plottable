@@ -94,7 +94,7 @@ export module Core {
         _componentsNeedingComputeLayout.values().slice().forEach((c: Component) => c.computeLayout());
 
         // Top level render; Containers will put their children in the toRender queue
-        _componentsNeedingRender.values().slice().forEach((c: Component) => c._render() );
+        _componentsNeedingRender.values().slice().forEach((c: Component) => c.render() );
 
         _isCurrentlyFlushing = true;
         var failed = new Utils.Set<Component>();

@@ -161,10 +161,11 @@ module Plottable {
       };
     }
 
-    public _render() {
+    public render() {
       if (this._isAnchored && this._isSetup && this.width() >= 0 && this.height() >= 0) {
         Core.RenderControllers.registerToRender(this);
       }
+      return this;
     }
 
     private _scheduleComputeLayout() {
@@ -231,7 +232,7 @@ module Plottable {
           or a D3.Selection, or a selector string");
       }
       this.computeLayout();
-      this._render();
+      this.render();
       // flush so that consumers can immediately attach to stuff we create in the DOM
       Core.RenderControllers.flush();
       return this;

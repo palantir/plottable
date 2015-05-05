@@ -14,7 +14,7 @@ describe("ComponentGroups", () => {
     (<any> c1)._addBox("test-box1");
     (<any> c2)._addBox("test-box2");
     (<any> c3)._addBox("test-box3");
-    cg.computeLayout()._render();
+    cg.computeLayout().render();
     var t1 = svg.select(".test-box1");
     var t2 = svg.select(".test-box2");
     var t3 = svg.select(".test-box3");
@@ -34,14 +34,14 @@ describe("ComponentGroups", () => {
     cg.below(c2).anchor(svg);
     (<any> c1)._addBox("test-box1");
     (<any> c2)._addBox("test-box2");
-    cg.computeLayout()._render();
+    cg.computeLayout().render();
     var t1 = svg.select(".test-box1");
     var t2 = svg.select(".test-box2");
     TestMethods.assertWidthHeight(t1, 10, 10, "rect1 sized correctly");
     TestMethods.assertWidthHeight(t2, 20, 20, "rect2 sized correctly");
     cg.below(c3);
     (<any> c3)._addBox("test-box3");
-    cg.computeLayout()._render();
+    cg.computeLayout().render();
     var t3 = svg.select(".test-box3");
     TestMethods.assertWidthHeight(t3, 400, 400, "rect3 sized correctly");
     svg.remove();

@@ -142,7 +142,7 @@ module Plottable {
       this._updateExtents();
       this._animateOnNextRender = true;
       this._dataChanged = true;
-      this._render();
+      this.render();
     }
 
     /**
@@ -193,11 +193,11 @@ module Plottable {
       }
 
       if (scale) {
-        scale.broadcaster.registerListener(this, () => this._render());
+        scale.broadcaster.registerListener(this, () => this.render());
         scale.addExtentProvider(this._extentProvider);
         scale._autoDomainIfAutomaticMode();
       }
-      this._render(); // queue a re-render upon changing projector
+      this.render(); // queue a re-render upon changing projector
       return this;
     }
 

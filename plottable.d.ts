@@ -1630,7 +1630,7 @@ declare module Plottable {
             width: number;
             height: number;
         };
-        _render(): void;
+        render(): Component;
         _doRender(): void;
         _useLastCalculatedLayout(): boolean;
         _useLastCalculatedLayout(useLast: boolean): Component;
@@ -1831,7 +1831,7 @@ declare module Plottable {
 declare module Plottable {
     class ComponentContainer extends Component {
         anchor(selection: D3.Selection): ComponentContainer;
-        _render(): void;
+        render(): ComponentContainer;
         _removeComponent(c: Component): void;
         _addComponent(c: Component, prepend?: boolean): boolean;
         /**

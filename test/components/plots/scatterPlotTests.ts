@@ -236,8 +236,8 @@ describe("Plots", () => {
       });
 
       it("rendering is idempotent", () => {
-        circlePlot._render();
-        circlePlot._render();
+        circlePlot.render();
+        circlePlot.render();
         circlePlot.getAllSelections().each(getCirclePlotVerifier());
         assert.strictEqual(circlesInArea, 10, "10 circles were drawn");
         svg.remove();
