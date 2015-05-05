@@ -69,11 +69,11 @@ describe("Plots", () => {
       r.project("y", "y", yScale);
       r.project("meta", metadataProjector);
       xScale.registerCoolListener("unitTest", (listenable: Plottable.Scales.Linear) => {
-        assert.strictEqual(listenable, xScale, "Callback received the calling scale as the first argument");
+        assert.strictEqual(listenable, xScale, "Callback received the calling scale as the first argument xScale");
         ++xScaleCalls;
       });
       yScale.registerCoolListener("unitTest", (listenable: Plottable.Scales.Linear) => {
-        assert.strictEqual(listenable, yScale, "Callback received the calling scale as the first argument");
+        assert.strictEqual(listenable, yScale, "Callback received the calling scale as the first argument yScale");
         ++yScaleCalls;
       });
 

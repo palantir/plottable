@@ -1745,7 +1745,7 @@ var Plottable;
             this._callbacks.delete(callback);
         };
         Scale.prototype.broadcast = function () {
-            this._callbacks.callCallbacks();
+            this._callbacks.callCallbacks(this);
         };
         /**
          * Modifies the domain on the scale so that it includes the extent of all

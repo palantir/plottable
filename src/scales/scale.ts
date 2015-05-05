@@ -47,7 +47,7 @@ module Plottable {
     }
 
     public broadcast() {
-        this._callbacks.callCallbacks();
+        this._callbacks.callCallbacks(this);
     }
 
     /**
