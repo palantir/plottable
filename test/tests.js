@@ -6662,14 +6662,14 @@ describe("Component behavior", function () {
     describe("origin methods", function () {
         var cWidth = 100;
         var cHeight = 100;
-        it("returns cloned point", function () {
-            TestMethods.fixComponentSize(c, cWidth, cHeight);
+        it("modifying returned value does not affect origin", function () {
             c.renderTo(svg);
-            var originCall1 = c.origin();
-            var originCall2 = c.origin();
-            assert.strictEqual(originCall1.x, originCall2.x, "returned points have same x value");
-            assert.strictEqual(originCall1.y, originCall2.y, "returned points have same y value");
-            assert.notStrictEqual(originCall1, originCall2, "returned points not the same object");
+            var receivedOrigin = c.origin();
+            var delta = 10;
+            receivedOrigin.x += delta;
+            receivedOrigin.y += delta;
+            assert.strictEqual(receivedOrigin.x - delta, c.origin().x, "receieved point can be modified without affecting origin (x)");
+            assert.strictEqual(receivedOrigin.y - delta, c.origin().y, "receieved point can be modified without affecting origin (y)");
             svg.remove();
         });
         it("origin() (top-level component)", function () {
