@@ -38,11 +38,11 @@ module Plottable {
       return []; // this should be overwritten
     }
 
-    public registerCoolListener(key: any, callback: Core.BroadcasterCallback<Scale<D, R>>) {
+    public registerCoolListener(callback: Function) {
         this._callbacks.add(callback);
     }
 
-    public deregisterCoolListener(key: any, callback: Core.BroadcasterCallback<Scale<D, R>>) {
+    public deregisterCoolListener(callback: Function) {
         this._callbacks.delete(callback);
     }
 

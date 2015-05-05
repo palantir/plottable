@@ -2142,11 +2142,11 @@ describe("Plots", function () {
             r.project("x", "x", xScale);
             r.project("y", "y", yScale);
             r.project("meta", metadataProjector);
-            xScale.registerCoolListener("unitTest", function (listenable) {
+            xScale.registerCoolListener(function (listenable) {
                 assert.strictEqual(listenable, xScale, "Callback received the calling scale as the first argument");
                 ++xScaleCalls;
             });
-            yScale.registerCoolListener("unitTest", function (listenable) {
+            yScale.registerCoolListener(function (listenable) {
                 assert.strictEqual(listenable, yScale, "Callback received the calling scale as the first argument");
                 ++yScaleCalls;
             });
@@ -7300,7 +7300,7 @@ describe("Scales", function () {
             return true; // doesn't do anything
         };
         var scale = new Plottable.Scales.Linear();
-        scale.registerCoolListener(null, testCallback);
+        scale.registerCoolListener(testCallback);
         var scaleCopy = scale.copy();
         assert.deepEqual(scale.domain(), scaleCopy.domain(), "Copied scale has the same domain as the original.");
         assert.deepEqual(scale.range(), scaleCopy.range(), "Copied scale has the same range as the original.");
@@ -7313,7 +7313,7 @@ describe("Scales", function () {
             assert.strictEqual(listenable, scale, "Callback received the calling scale as the first argument");
             callbackWasCalled = true;
         };
-        scale.registerCoolListener(null, testCallback);
+        scale.registerCoolListener(testCallback);
         scale.domain([0, 10]);
         assert.isTrue(callbackWasCalled, "The registered callback was called");
         scale._autoDomainAutomatically = true;

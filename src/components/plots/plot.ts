@@ -84,7 +84,7 @@ module Plottable {
       properties.forEach((property) => {
         var projector = this._projections[property];
         if (projector.scale) {
-          projector.scale.deregisterCoolListener(this, this._renderFunctionWrapper);
+          projector.scale.deregisterCoolListener(this._renderFunctionWrapper);
         }
       });
     }
@@ -189,12 +189,12 @@ module Plottable {
       if (existingScale) {
         this._datasetKeysInOrder.forEach((key) => {
           existingScale._removeExtent(this.getID().toString() + "_" + key, attrToSet);
-          existingScale.deregisterCoolListener(this, this._renderFunctionWrapper);
+          existingScale.deregisterCoolListener(this._renderFunctionWrapper);
         });
       }
 
       if (scale) {
-        scale.registerCoolListener(this, this._renderFunctionWrapper);
+        scale.registerCoolListener(this._renderFunctionWrapper);
       }
       accessor = Utils.Methods.accessorize(accessor);
       this._projections[attrToSet] = {accessor: accessor, scale: scale, attribute: attrToSet};

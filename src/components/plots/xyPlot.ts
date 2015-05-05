@@ -35,10 +35,10 @@ module Plottable {
       this._adjustXDomainOnChangeFromYFunctionWrapper = () => this._adjustXDomainOnChangeFromY();
 
       this._updateXDomainer();
-      xScale.registerCoolListener("yDomainAdjustment" + this.getID(), this._adjustYDomainOnChangeFromXFunctionWrapper);
+      xScale.registerCoolListener(this._adjustYDomainOnChangeFromXFunctionWrapper);
 
       this._updateYDomainer();
-      yScale.registerCoolListener("xDomainAdjustment" + this.getID(), this._adjustXDomainOnChangeFromYFunctionWrapper);
+      yScale.registerCoolListener(this._adjustXDomainOnChangeFromYFunctionWrapper);
     }
 
     /**
@@ -50,21 +50,21 @@ module Plottable {
       // So when we get an "x" or "y" scale, enable autoNiceing and autoPadding.
       if (attrToSet === "x" && scale) {
         if (this._xScale) {
-          this._xScale.deregisterCoolListener("yDomainAdjustment" + this.getID(), this._adjustYDomainOnChangeFromXFunctionWrapper);
+          this._xScale.deregisterCoolListener(this._adjustYDomainOnChangeFromXFunctionWrapper);
         }
         this._xScale = scale;
         this._updateXDomainer();
 
-        scale.registerCoolListener("yDomainAdjustment" + this.getID(), this._adjustYDomainOnChangeFromXFunctionWrapper);
+        scale.registerCoolListener(this._adjustYDomainOnChangeFromXFunctionWrapper);
       }
 
       if (attrToSet === "y" && scale) {
         if (this._yScale) {
-          this._yScale.deregisterCoolListener("xDomainAdjustment" + this.getID(), this._adjustXDomainOnChangeFromYFunctionWrapper);
+          this._yScale.deregisterCoolListener(this._adjustXDomainOnChangeFromYFunctionWrapper);
         }
         this._yScale = scale;
         this._updateYDomainer();
-        scale.registerCoolListener("xDomainAdjustment" + this.getID(), this._adjustXDomainOnChangeFromYFunctionWrapper);
+        scale.registerCoolListener(this._adjustXDomainOnChangeFromYFunctionWrapper);
       }
 
       super.project(attrToSet, accessor, scale);
@@ -75,10 +75,10 @@ module Plottable {
     public remove() {
       super.remove();
       if (this._xScale) {
-        this._xScale.deregisterCoolListener("yDomainAdjustment" + this.getID(), this._adjustYDomainOnChangeFromXFunctionWrapper);
+        this._xScale.deregisterCoolListener(this._adjustYDomainOnChangeFromXFunctionWrapper);
       }
       if (this._yScale) {
-        this._yScale.deregisterCoolListener("xDomainAdjustment" + this.getID(), this._adjustXDomainOnChangeFromYFunctionWrapper);
+        this._yScale.deregisterCoolListener(this._adjustXDomainOnChangeFromYFunctionWrapper);
       }
       return this;
     }
