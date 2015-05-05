@@ -3226,8 +3226,11 @@ var Plottable;
                 this._piePlot = plot;
                 this._svgElement = "path";
             }
-            Arc.prototype._createArc = function (innerRadiusF, outerRadiusF) {
-                return d3.svg.arc().innerRadius(innerRadiusF).outerRadius(outerRadiusF);
+            Arc.prototype._createArc = function (outerRadiusF) {
+                var _this = this;
+                var metadata = this._piePlot._key2PlotDatasetKey.get(this.key).dataset.metadata();
+                var plotMetadata = this._piePlot._key2PlotDatasetKey.get(this.key).plotMetadata;
+                return d3.svg.arc().innerRadius(function (d, i) { return _this._piePlot.innerRadiusAccessor()(d, i, metadata, plotMetadata); }).outerRadius(outerRadiusF);
             };
             Arc.prototype.retargetProjectors = function (attrToProjector) {
                 var retargetedAttrToProjector = {};
@@ -3240,11 +3243,9 @@ var Plottable;
                 var attrToProjector = Plottable.Utils.Methods.copyMap(step.attrToProjector);
                 attrToProjector = this.retargetProjectors(attrToProjector);
                 this._attrToProjector = this.retargetProjectors(this._attrToProjector);
-                var innerRadiusAccessor = attrToProjector["inner-radius"];
                 var outerRadiusAccessor = attrToProjector["outer-radius"];
-                delete attrToProjector["inner-radius"];
                 delete attrToProjector["outer-radius"];
-                attrToProjector["d"] = this._createArc(innerRadiusAccessor, outerRadiusAccessor);
+                attrToProjector["d"] = this._createArc(outerRadiusAccessor);
                 return _super.prototype._drawStep.call(this, { attrToProjector: attrToProjector, animator: step.animator });
             };
             Arc.prototype.draw = function (data, drawSteps, userMetadata, plotMetadata) {
@@ -3261,7 +3262,10 @@ var Plottable;
                 return _super.prototype.draw.call(this, pie, drawSteps, userMetadata, plotMetadata);
             };
             Arc.prototype._getPixelPoint = function (datum, index) {
-                var innerRadiusAccessor = this._attrToProjector["inner-radius"];
+                var _this = this;
+                var metadata = this._piePlot._key2PlotDatasetKey.get(this.key).dataset.metadata();
+                var plotMetadata = this._piePlot._key2PlotDatasetKey.get(this.key).plotMetadata;
+                var innerRadiusAccessor = function (d, i) { return _this._piePlot.innerRadiusAccessor()(d, i, metadata, plotMetadata); };
                 var outerRadiusAccessor = this._attrToProjector["outer-radius"];
                 var avgRadius = (innerRadiusAccessor(datum, index) + outerRadiusAccessor(datum, index)) / 2;
                 var startAngle = +this._getSelection(index).datum().startAngle;
@@ -7033,6 +7037,7 @@ var Plottable;
             function Pie() {
                 _super.call(this);
                 this._colorScale = new Plottable.Scales.Color();
+                this._innerRadiusAccessor = function () { return 0; };
                 this.classed("pie-plot", true);
             }
             Pie.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
@@ -7051,7 +7056,6 @@ var Plottable;
             Pie.prototype._generateAttrToProjector = function () {
                 var _this = this;
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
-                attrToProjector["inner-radius"] = attrToProjector["inner-radius"] || d3.functor(0);
                 attrToProjector["outer-radius"] = attrToProjector["outer-radius"] || d3.functor(Math.min(this.width(), this.height()) / 2);
                 var defaultFillFunction = function (d, i) { return _this._colorScale.scale(String(i)); };
                 attrToProjector["fill"] = attrToProjector["fill"] || defaultFillFunction;
@@ -7074,6 +7078,14 @@ var Plottable;
                     return this._valueAccessor;
                 }
                 this._valueAccessor = valueAccessor;
+                this._render();
+                return this;
+            };
+            Pie.prototype.innerRadiusAccessor = function (innerRadiusAccessor) {
+                if (innerRadiusAccessor == null) {
+                    return this._innerRadiusAccessor;
+                }
+                this._innerRadiusAccessor = innerRadiusAccessor;
                 this._render();
                 return this;
             };

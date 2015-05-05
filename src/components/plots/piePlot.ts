@@ -15,6 +15,7 @@ export module Plots {
   export class Pie extends Plot {
 
     private _colorScale: Scales.Color;
+    private _innerRadiusAccessor: _Accessor;
     private _valueAccessor: _Accessor;
 
     /**
@@ -25,6 +26,7 @@ export module Plots {
     constructor() {
       super();
       this._colorScale = new Scales.Color();
+      this._innerRadiusAccessor = () => 0;
       this.classed("pie-plot", true);
     }
 
@@ -45,7 +47,6 @@ export module Plots {
 
     protected _generateAttrToProjector(): AttributeToProjector {
       var attrToProjector = super._generateAttrToProjector();
-      attrToProjector["inner-radius"] = attrToProjector["inner-radius"] || d3.functor(0);
       attrToProjector["outer-radius"] = attrToProjector["outer-radius"] || d3.functor(Math.min(this.width(), this.height()) / 2);
 
       var defaultFillFunction = (d: any, i: number) => this._colorScale.scale(String(i));
@@ -76,6 +77,17 @@ export module Plots {
         return this._valueAccessor;
       }
       this._valueAccessor = valueAccessor;
+      this._render();
+      return this;
+    }
+
+    public innerRadiusAccessor(): _Accessor;
+    public innerRadiusAccessor(innerRadiusAccessor: _Accessor): Plots.Pie;
+    public innerRadiusAccessor(innerRadiusAccessor?: _Accessor): any {
+      if (innerRadiusAccessor == null) {
+        return this._innerRadiusAccessor;
+      }
+      this._innerRadiusAccessor = innerRadiusAccessor;
       this._render();
       return this;
     }

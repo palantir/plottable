@@ -12,9 +12,11 @@ export module Drawers {
       this._svgElement = "path";
     }
 
-    private _createArc(innerRadiusF: AppliedProjector, outerRadiusF: AppliedProjector) {
+    private _createArc(outerRadiusF: AppliedProjector) {
+      var metadata = (<any> this._piePlot)._key2PlotDatasetKey.get(this.key).dataset.metadata();
+      var plotMetadata = (<any> this._piePlot)._key2PlotDatasetKey.get(this.key).plotMetadata;
       return d3.svg.arc()
-                   .innerRadius(innerRadiusF)
+                   .innerRadius((d, i) => this._piePlot.innerRadiusAccessor()(d, i, metadata, plotMetadata))
                    .outerRadius(outerRadiusF);
     }
 
@@ -30,12 +32,10 @@ export module Drawers {
       var attrToProjector = <AttributeToAppliedProjector>Utils.Methods.copyMap(step.attrToProjector);
       attrToProjector = this.retargetProjectors(attrToProjector);
       this._attrToProjector = this.retargetProjectors(this._attrToProjector);
-      var innerRadiusAccessor = attrToProjector["inner-radius"];
       var outerRadiusAccessor = attrToProjector["outer-radius"];
-      delete attrToProjector["inner-radius"];
       delete attrToProjector["outer-radius"];
 
-      attrToProjector["d"] = this._createArc(innerRadiusAccessor, outerRadiusAccessor);
+      attrToProjector["d"] = this._createArc(outerRadiusAccessor);
       return super._drawStep({attrToProjector: attrToProjector, animator: step.animator});
     }
 
@@ -58,7 +58,9 @@ export module Drawers {
     }
 
     public _getPixelPoint(datum: any, index: number): Point {
-      var innerRadiusAccessor = this._attrToProjector["inner-radius"];
+      var metadata = (<any> this._piePlot)._key2PlotDatasetKey.get(this.key).dataset.metadata();
+      var plotMetadata = (<any> this._piePlot)._key2PlotDatasetKey.get(this.key).plotMetadata;
+      var innerRadiusAccessor = (d: any, i: number) => this._piePlot.innerRadiusAccessor()(d, i, metadata, plotMetadata);
       var outerRadiusAccessor = this._attrToProjector["outer-radius"];
       var avgRadius = (innerRadiusAccessor(datum, index) + outerRadiusAccessor(datum, index)) / 2;
       var startAngle = +this._getSelection(index).datum().startAngle;

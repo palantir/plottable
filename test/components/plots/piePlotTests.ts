@@ -101,7 +101,7 @@ describe("Plots", () => {
     });
 
     it("innerRadius project", () => {
-      piePlot.project("inner-radius", () => 5);
+      piePlot.innerRadiusAccessor(() => 5);
       var arcPaths = renderArea.selectAll(".arc");
       assert.lengthOf(arcPaths[0], 2, "only has two sectors");
 
@@ -117,7 +117,7 @@ describe("Plots", () => {
       assert.closeTo(innerArcPath0[5], 0, 1, "make inner arc to center");
       assert.closeTo(innerArcPath0[6], -5, 1, "makes inner arc to top of inner circle");
 
-      piePlot.project("inner-radius", () => 0);
+      piePlot.innerRadiusAccessor(() => 0);
       svg.remove();
     });
 
