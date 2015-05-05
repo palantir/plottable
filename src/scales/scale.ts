@@ -48,15 +48,15 @@ module Plottable {
     }
 
     public onUpdate(callback: ScaleCallback<Scale<D, R>>) {
-        this._callbacks.add(callback);
+      this._callbacks.add(callback);
     }
 
     public offUpdate(callback: ScaleCallback<Scale<D, R>>) {
-        this._callbacks.delete(callback);
+      this._callbacks.delete(callback);
     }
 
     protected _dispatchUpdate() {
-        this._callbacks.callCallbacks(this);
+      this._callbacks.callCallbacks(this);
     }
 
     /**
