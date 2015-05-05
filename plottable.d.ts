@@ -854,9 +854,8 @@ declare module Plottable {
 
 declare module Plottable {
     class Scale<D, R> extends Core.PlottableObject {
-        protected _d3Scale: D3.Scale.Scale;
-        broadcaster: Core.Broadcaster<Scale<D, R>>;
         _typeCoercer: (d: any) => any;
+        protected _d3Scale: D3.Scale.Scale;
         /**
          * Constructs a new Scale.
          *

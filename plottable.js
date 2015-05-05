@@ -1724,12 +1724,13 @@ var Plottable;
          */
         function Scale(scale) {
             _super.call(this);
+            this._typeCoercer = function (d) { return d; };
             this._autoDomainAutomatically = true;
             this._rendererAttrID2Extent = {};
-            this._typeCoercer = function (d) { return d; };
             this._domainModificationInProgress = false;
             this._d3Scale = scale;
             this.broadcaster = new Plottable.Core.Broadcaster(this);
+            this._callbacks = new Plottable.Utils.CallbackSet();
         }
         Scale.prototype._getAllExtents = function () {
             return d3.values(this._rendererAttrID2Extent);
@@ -1739,6 +1740,7 @@ var Plottable;
         };
         Scale.prototype.registerCoolListener = function (key, callback) {
             this.broadcaster.registerListener(key, callback);
+            this._callbacks.add(callback);
         };
         Scale.prototype.deregisterCoolListener = function (key) {
             this.broadcaster.deregisterListener(key);

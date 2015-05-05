@@ -2,12 +2,17 @@
 
 module Plottable {
   export class Scale<D, R> extends Core.PlottableObject {
-    protected _d3Scale: D3.Scale.Scale;
-    private _autoDomainAutomatically = true;
-    public broadcaster: Core.Broadcaster<Scale<D, R>>;
-    private _rendererAttrID2Extent: {[rendererAttrID: string]: D[]} = {};
     public _typeCoercer: (d: any) => any = (d: any) => d;
+
+    protected _d3Scale: D3.Scale.Scale;
+
+    private broadcaster: Core.Broadcaster<Scale<D, R>>;
+    private _autoDomainAutomatically = true;
+    private _rendererAttrID2Extent: {[rendererAttrID: string]: D[]} = {};
     private _domainModificationInProgress: boolean = false;
+
+    private _callbacks: Utils.CallbackSet<Function>;
+
     /**
      * Constructs a new Scale.
      *
@@ -22,6 +27,7 @@ module Plottable {
       super();
       this._d3Scale = scale;
       this.broadcaster = new Core.Broadcaster(this);
+      this._callbacks = new Utils.CallbackSet<Function>();
     }
 
     protected _getAllExtents(): D[][] {
@@ -34,6 +40,7 @@ module Plottable {
 
     public registerCoolListener(key: any, callback: Core.BroadcasterCallback<Scale<D, R>>) {
         this.broadcaster.registerListener(key, callback);
+        this._callbacks.add(callback);
     }
 
     public deregisterCoolListener(key: any) {

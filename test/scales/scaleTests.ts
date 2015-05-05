@@ -8,12 +8,12 @@ describe("Scales", () => {
       return true; // doesn't do anything
     };
     var scale = new Plottable.Scales.Linear();
-    scale.broadcaster.registerListener(null, testCallback);
+    scale.registerCoolListener(null, testCallback);
     var scaleCopy = scale.copy();
     assert.deepEqual(scale.domain(), scaleCopy.domain(), "Copied scale has the same domain as the original.");
     assert.deepEqual(scale.range(), scaleCopy.range(), "Copied scale has the same range as the original.");
-    assert.notDeepEqual(scale.broadcaster, scaleCopy.broadcaster,
-                              "Broadcasters are not copied over");
+    assert.notDeepEqual((<any>scale)._callbacks, (<any>scaleCopy)._callbacks,
+                              "Callback sets are not copied over");
   });
 
   it("Scale alerts listeners when its domain is updated", () => {
@@ -23,7 +23,7 @@ describe("Scales", () => {
       assert.strictEqual(listenable, scale, "Callback received the calling scale as the first argument");
       callbackWasCalled = true;
     };
-    scale.broadcaster.registerListener(null, testCallback);
+    scale.registerCoolListener(null, testCallback);
     scale.domain([0, 10]);
     assert.isTrue(callbackWasCalled, "The registered callback was called");
 
