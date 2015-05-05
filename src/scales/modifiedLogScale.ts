@@ -96,7 +96,7 @@ export module Scales {
       this.untransformedDomain = values;
       var transformedDomain = [this.adjustedLog(values[0]), this.adjustedLog(values[1])];
       this._d3Scale.domain(transformedDomain);
-      this.broadcast();
+      this.dispatchUpdate();
     }
 
     public ticks(count = this.numTicks()): number[] {

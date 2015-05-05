@@ -109,7 +109,7 @@ export module Scales {
       }
       this._innerPadding = innerPadding;
       this.range(this.range());
-      this.broadcast();
+      this.dispatchUpdate();
       return this;
     }
 
@@ -137,7 +137,7 @@ export module Scales {
       }
       this._outerPadding = outerPadding;
       this.range(this.range());
-      this.broadcast();
+      this.dispatchUpdate();
       return this;
     }
 
