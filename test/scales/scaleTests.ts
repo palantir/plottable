@@ -8,7 +8,7 @@ describe("Scales", () => {
       return true; // doesn't do anything
     };
     var scale = new Plottable.Scales.Linear();
-    scale.onDomainChange(testCallback);
+    scale.onUpdate(testCallback);
     var scaleCopy = scale.copy();
     assert.deepEqual(scale.domain(), scaleCopy.domain(), "Copied scale has the same domain as the original.");
     assert.deepEqual(scale.range(), scaleCopy.range(), "Copied scale has the same range as the original.");
@@ -24,7 +24,7 @@ describe("Scales", () => {
       assert.strictEqual(listenable, scale, "Callback received the calling scale as the first argument");
       callbackWasCalled = true;
     };
-    scale.onDomainChange(testCallback);
+    scale.onUpdate(testCallback);
     scale.domain([0, 10]);
     assert.isTrue(callbackWasCalled, "The registered callback was called");
   });

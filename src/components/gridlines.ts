@@ -8,7 +8,7 @@ export module Components {
     private _xLinesContainer: D3.Selection;
     private _yLinesContainer: D3.Selection;
 
-    private _renderFunctionWrapper: DomainChangeCallback;
+    private _renderFunctionWrapper: ScaleCallback<QuantitativeScale<any>>;
 
     /**
      * Creates a set of Gridlines.
@@ -30,20 +30,20 @@ export module Components {
       this._yScale = yScale;
       this._renderFunctionWrapper = (scale) => this._render();
       if (this._xScale) {
-        this._xScale.onDomainChange(this._renderFunctionWrapper);
+        this._xScale.onUpdate(this._renderFunctionWrapper);
       }
       if (this._yScale) {
-        this._yScale.onDomainChange(this._renderFunctionWrapper);
+        this._yScale.onUpdate(this._renderFunctionWrapper);
       }
     }
 
     public remove() {
       super.remove();
       if (this._xScale) {
-        this._xScale.offDomainChange(this._renderFunctionWrapper);
+        this._xScale.offUpdate(this._renderFunctionWrapper);
       }
       if (this._yScale) {
-        this._yScale.offDomainChange(this._renderFunctionWrapper);
+        this._yScale.offUpdate(this._renderFunctionWrapper);
       }
       return this;
     }

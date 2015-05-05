@@ -24,7 +24,7 @@ export module Components {
     private _wrapper: SVGTypewriter.Wrappers.Wrapper;
     private _writer: SVGTypewriter.Writers.Writer;
     private _symbolFactoryAccessor: (datum: any, index: number) => SymbolFactory;
-    private _redrawFunctionWrapper: DomainChangeCallback;
+    private _redrawFunctionWrapper: ScaleCallback<Scales.Color>;
 
     /**
      * Creates a Legend.
@@ -46,7 +46,7 @@ export module Components {
 
       this._scale = colorScale;
       this._redrawFunctionWrapper = (scale) => this.redraw();
-      this._scale.onDomainChange(this._redrawFunctionWrapper);
+      this._scale.onUpdate(this._redrawFunctionWrapper);
 
       this.xAlign("right").yAlign("top");
       this._fixedWidthFlag = true;
@@ -124,9 +124,9 @@ export module Components {
     public scale(scale: Scales.Color): Legend;
     public scale(scale?: Scales.Color): any {
       if (scale != null) {
-        this._scale.offDomainChange(this._redrawFunctionWrapper);
+        this._scale.offUpdate(this._redrawFunctionWrapper);
         this._scale = scale;
-        this._scale.onDomainChange(this._redrawFunctionWrapper);
+        this._scale.onUpdate(this._redrawFunctionWrapper);
         this.redraw();
         return this;
       } else {
@@ -136,7 +136,7 @@ export module Components {
 
     public remove() {
       super.remove();
-      this._scale.offDomainChange(this._redrawFunctionWrapper);
+      this._scale.offUpdate(this._redrawFunctionWrapper);
     }
 
     private _calculateLayoutInfo(availableWidth: number, availableHeight: number) {

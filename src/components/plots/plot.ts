@@ -39,7 +39,7 @@ module Plottable {
     private _animators: Animators.PlotAnimatorMap = {};
     protected _animateOnNextRender = true;
     private _nextSeriesIndex: number;
-    private _renderFunctionWrapper: DomainChangeCallback;
+    private _renderFunctionWrapper: ScaleCallback<Scale<any, any>>;
 
     /**
      * Constructs a Plot.
@@ -82,7 +82,7 @@ module Plottable {
     public remove() {
       super.remove();
       this._datasetKeysInOrder.forEach((k) => this.removeDataset(k));
-      this._scales().forEach((scale) => scale.offDomainChange(this._renderFunctionWrapper));
+      this._scales().forEach((scale) => scale.offUpdate(this._renderFunctionWrapper));
     }
 
     /**
@@ -188,14 +188,14 @@ module Plottable {
 
       if (previousScale) {
         if (this._scales().indexOf(previousScale) !== -1) {
-          previousScale.offDomainChange(this._renderFunctionWrapper);
+          previousScale.offUpdate(this._renderFunctionWrapper);
           previousScale.removeExtentProvider(this._extentProvider);
         }
         previousScale._autoDomainIfAutomaticMode();
       }
 
       if (scale) {
-        scale.onDomainChange(this._renderFunctionWrapper);
+        scale.onUpdate(this._renderFunctionWrapper);
         scale.addExtentProvider(this._extentProvider);
         scale._autoDomainIfAutomaticMode();
       }

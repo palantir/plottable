@@ -68,11 +68,11 @@ describe("Plots", () => {
       r.project("x", "x", xScale);
       r.project("y", "y", yScale);
       r.project("meta", metadataProjector);
-      xScale.onDomainChange((listenable: Plottable.Scales.Linear) => {
+      xScale.onUpdate((listenable: Plottable.Scales.Linear) => {
         assert.strictEqual(listenable, xScale, "Callback received the calling scale as the first argument");
         ++xScaleCalls;
       });
-      yScale.onDomainChange((listenable: Plottable.Scales.Linear) => {
+      yScale.onUpdate((listenable: Plottable.Scales.Linear) => {
         assert.strictEqual(listenable, yScale, "Callback received the calling scale as the first argument");
         ++yScaleCalls;
       });

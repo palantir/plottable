@@ -853,7 +853,9 @@ declare module Plottable {
 
 
 declare module Plottable {
-    type DomainChangeCallback = (scale: Plottable.Scale<any, any>) => any;
+    interface ScaleCallback<S extends Scale<any, any>> {
+        (scale: S): any;
+    }
     module Scales {
         interface ExtentProvider<D> {
             (scale: Scale<D, any>): D[][];
@@ -875,8 +877,8 @@ declare module Plottable {
         constructor(scale: D3.Scale.Scale);
         protected _getAllExtents(): D[][];
         protected _getExtent(): D[];
-        onDomainChange(callback: DomainChangeCallback): void;
-        offDomainChange(callback: DomainChangeCallback): void;
+        onUpdate(callback: ScaleCallback<Scale<D, R>>): void;
+        offUpdate(callback: ScaleCallback<Scale<D, R>>): void;
         broadcast(): void;
         /**
          * Modifies the domain on the scale so that it includes the extent of all

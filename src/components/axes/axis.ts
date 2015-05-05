@@ -27,8 +27,7 @@ module Plottable {
     private _tickLabelPadding = 10;
     private _gutter = 15;
     private _showEndTickLabels = false;
-
-    private _rescaleFunctionWrapper: DomainChangeCallback;
+    private _rescaleFunctionWrapper: ScaleCallback<Scale<any, number>>;
 
     /**
      * Constructs an axis. An axis is a wrapper around a scale for rendering.
@@ -57,12 +56,12 @@ module Plottable {
       this.formatter(formatter);
 
       this._rescaleFunctionWrapper = (scale) => this._rescale();
-      this._scale.onDomainChange(this._rescaleFunctionWrapper);
+      this._scale.onUpdate(this._rescaleFunctionWrapper);
     }
 
     public remove() {
       super.remove();
-      this._scale.offDomainChange(this._rescaleFunctionWrapper);
+      this._scale.offUpdate(this._rescaleFunctionWrapper);
     }
 
     protected _isHorizontal() {
