@@ -410,8 +410,8 @@ describe("Component behavior", () => {
       var delta = 10;
       receivedOrigin.x += delta;
       receivedOrigin.y += delta;
-      assert.strictEqual(receivedOrigin.x - delta, c.origin().x, "receieved point can be modified without affecting origin (x)");
-      assert.strictEqual(receivedOrigin.y - delta, c.origin().y, "receieved point can be modified without affecting origin (y)");
+      assert.notStrictEqual(receivedOrigin.x, c.origin().x, "receieved point can be modified without affecting origin (x)");
+      assert.notStrictEqual(receivedOrigin.y, c.origin().y, "receieved point can be modified without affecting origin (y)");
       svg.remove();
     });
 
