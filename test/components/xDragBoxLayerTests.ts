@@ -1,4 +1,4 @@
-///<reference path="../../testReference.ts" />
+///<reference path="../testReference.ts" />
 
 var assert = chai.assert;
 
@@ -8,8 +8,8 @@ describe("Interactive Components", () => {
     var SVG_HEIGHT = 400;
 
     it("bounds()", () => {
-      var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var dbl = new Plottable.Component.XDragBoxLayer();
+      var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      var dbl = new Plottable.Components.XDragBoxLayer();
       dbl.boxVisible(true);
       dbl.renderTo(svg);
 
@@ -37,8 +37,8 @@ describe("Interactive Components", () => {
     });
 
     it("resizes only in x", () => {
-      var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var dbl = new Plottable.Component.XDragBoxLayer();
+      var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      var dbl = new Plottable.Components.XDragBoxLayer();
       dbl.boxVisible(true);
       dbl.resizable(true);
       dbl.renderTo(svg);
@@ -63,7 +63,7 @@ describe("Interactive Components", () => {
         y: SVG_HEIGHT / 2
       };
       var target = dbl.background();
-      triggerFakeDragSequence(target, actualBounds.bottomRight, dragTo);
+      TestMethods.triggerFakeDragSequence(target, actualBounds.bottomRight, dragTo);
       actualBounds = dbl.bounds();
       assert.strictEqual(actualBounds.bottomRight.x, dragTo.x, "resized in x");
       assert.strictEqual(actualBounds.topLeft.y, 0, "box still starts at top");
@@ -72,8 +72,8 @@ describe("Interactive Components", () => {
     });
 
     it("stays full height after resizing", () => {
-      var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var dbl = new Plottable.Component.XDragBoxLayer();
+      var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      var dbl = new Plottable.Components.XDragBoxLayer();
       dbl.boxVisible(true);
       dbl.resizable(true);
       dbl.renderTo(svg);

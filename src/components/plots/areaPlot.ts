@@ -1,31 +1,30 @@
 ///<reference path="../../reference.ts" />
 
 module Plottable {
-export module Plot {
+export module Plots {
   /**
    * An AreaPlot draws a filled region (area) between the plot's projected "y" and projected "y0" values.
    */
   export class Area<X> extends Line<X> {
-    private _areaPath: D3.Selection;
     private _defaultFillColor: string;
 
     /**
      * Constructs an AreaPlot.
      *
      * @constructor
-     * @param {QuantitativeScale} xScale The x scale to use.
-     * @param {QuantitativeScale} yScale The y scale to use.
+     * @param {QuantitativeScaleScale} xScale The x scale to use.
+     * @param {QuantitativeScaleScale} yScale The y scale to use.
      */
-    constructor(xScale: Scale.AbstractQuantitative<X>, yScale: Scale.AbstractQuantitative<number>) {
+    constructor(xScale: QuantitativeScale<X>, yScale: QuantitativeScale<number>) {
       super(xScale, yScale);
       this.classed("area-plot", true);
       this.project("y0", 0, yScale); // default
 
-      this.animator("reset", new Animator.Null());
-      this.animator("main", new Animator.Base()
+      this.animator("reset", new Animators.Null());
+      this.animator("main", new Animators.Base()
                                         .duration(600)
                                         .easing("exp-in-out"));
-      this._defaultFillColor = new Scale.Color().range()[0];
+      this._defaultFillColor = new Scales.Color().range()[0];
     }
 
     protected _onDatasetUpdate() {
@@ -36,7 +35,7 @@ export module Plot {
     }
 
     protected _getDrawer(key: string) {
-      return new Plottable._Drawer.Area(key);
+      return new Plottable.Drawers.Area(key);
     }
 
     protected _updateYDomainer() {
@@ -47,8 +46,8 @@ export module Plot {
       var y0Accessor = y0Projector && y0Projector.accessor;
       if (y0Accessor != null) {
         var extents = this.datasets().map((d) => d._getExtent(y0Accessor, this._yScale._typeCoercer));
-        var extent = _Util.Methods.flatten(extents);
-        var uniqExtentVals = _Util.Methods.uniq(extent);
+        var extent = Utils.Methods.flatten(extents);
+        var uniqExtentVals = Utils.Methods.uniq(extent);
         if (uniqExtentVals.length === 1) {
           constantBaseline = uniqExtentVals[0];
         }
@@ -65,7 +64,7 @@ export module Plot {
       }
     }
 
-    public project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>) {
+    public project(attrToSet: string, accessor: any, scale?: Scale<any, any>) {
       super.project(attrToSet, accessor, scale);
       if (attrToSet === "y0") {
         this._updateYDomainer();

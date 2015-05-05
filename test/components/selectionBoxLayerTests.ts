@@ -4,8 +4,8 @@ var assert = chai.assert;
 
 describe("SelectionBoxLayer", () => {
   it("boxVisible()", () => {
-    var svg = generateSVG();
-    var sbl = new Plottable.Component.SelectionBoxLayer();
+    var svg = TestMethods.generateSVG();
+    var sbl = new Plottable.Components.SelectionBoxLayer();
     sbl.renderTo(svg);
 
     var selectionBox = svg.select(".selection-box");
@@ -23,8 +23,8 @@ describe("SelectionBoxLayer", () => {
   });
 
   it("bounds()", () => {
-    var svg = generateSVG();
-    var sbl = new Plottable.Component.SelectionBoxLayer();
+    var svg = TestMethods.generateSVG();
+    var sbl = new Plottable.Components.SelectionBoxLayer();
 
     var topLeft: Plottable.Point = {
       x: 100,
@@ -44,7 +44,7 @@ describe("SelectionBoxLayer", () => {
 
     function assertCorrectRendering(expectedTL: Plottable.Point, expectedBR: Plottable.Point, msg: string) {
       var selectionBox = svg.select(".selection-box");
-      var bbox = Plottable._Util.DOM.getBBox(selectionBox);
+      var bbox = Plottable.Utils.DOM.getBBox(selectionBox);
       assert.strictEqual(bbox.x, expectedTL.x, msg + " (x-origin)");
       assert.strictEqual(bbox.x, expectedTL.y, msg + " (y-origin)");
       assert.strictEqual(bbox.width, expectedBR.x - expectedTL.x, msg + " (width)");
@@ -69,9 +69,9 @@ describe("SelectionBoxLayer", () => {
   });
 
   it("has an effective size of 0, but will occupy all offered space", () => {
-    var sbl = new Plottable.Component.SelectionBoxLayer();
+    var sbl = new Plottable.Components.SelectionBoxLayer();
     var request = sbl._requestedSpace(400, 400);
-    verifySpaceRequest(request, 0, 0, false, false, "occupies and asks for no space");
+    TestMethods.verifySpaceRequest(request, 0, 0, false, false, "occupies and asks for no space");
     assert.isTrue(sbl._isFixedWidth(), "fixed width");
     assert.isTrue(sbl._isFixedHeight(), "fixed height");
   });

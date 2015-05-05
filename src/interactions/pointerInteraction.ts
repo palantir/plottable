@@ -1,24 +1,22 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Interaction {
-  export class Pointer extends Interaction.AbstractInteraction {
-    private _mouseDispatcher: Dispatcher.Mouse;
-    private _touchDispatcher: Dispatcher.Touch;
+export module Interactions {
+  export class Pointer extends Interaction {
+    private _mouseDispatcher: Dispatchers.Mouse;
+    private _touchDispatcher: Dispatchers.Touch;
     private _overComponent = false;
     private _pointerEnterCallback: (p: Point) => any;
     private _pointerMoveCallback: (p: Point) => any;
     private _pointerExitCallback: (p: Point) => any;
 
-    public _anchor(component: Component.AbstractComponent, hitBox: D3.Selection) {
-      super._anchor(component, hitBox);
-      this._mouseDispatcher = Dispatcher.Mouse.getDispatcher(<SVGElement> this._componentToListenTo.content().node());
-      this._mouseDispatcher.onMouseMove("Interaction.Pointer" + this.getID(), (p: Point) => this._handlePointerEvent(p));
+    public _anchor(component: Component) {
+      super._anchor(component);
+      this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(<SVGElement> this._componentToListenTo.content().node());
+      this._mouseDispatcher.onMouseMove((p: Point) => this._handlePointerEvent(p));
 
-      this._touchDispatcher = Dispatcher.Touch.getDispatcher(<SVGElement> this._componentToListenTo.content().node());
-
-      this._touchDispatcher.onTouchStart("Interaction.Pointer" + this.getID(), (ids, idToPoint) =>
-                                                                                this._handlePointerEvent(idToPoint[ids[0]]));
+      this._touchDispatcher = Dispatchers.Touch.getDispatcher(<SVGElement> this._componentToListenTo.content().node());
+      this._touchDispatcher.onTouchStart((ids, idToPoint) => this._handlePointerEvent(idToPoint[ids[0]]));
     }
 
     private _handlePointerEvent(p: Point) {
@@ -52,7 +50,7 @@ export module Interaction {
      * @param {(p: Point) => any} callback The callback to set.
      * @return {Interaction.Pointer} The calling Interaction.Pointer.
      */
-    public onPointerEnter(callback: (p: Point) => any): Interaction.Pointer;
+    public onPointerEnter(callback: (p: Point) => any): Interactions.Pointer;
     public onPointerEnter(callback?: (p: Point) => any): any {
       if (callback === undefined) {
         return this._pointerEnterCallback;
@@ -73,7 +71,7 @@ export module Interaction {
      * @param {(p: Point) => any} callback The callback to set.
      * @return {Interaction.Pointer} The calling Interaction.Pointer.
      */
-    public onPointerMove(callback: (p: Point) => any): Interaction.Pointer;
+    public onPointerMove(callback: (p: Point) => any): Interactions.Pointer;
     public onPointerMove(callback?: (p: Point) => any): any {
       if (callback === undefined) {
         return this._pointerMoveCallback;
@@ -94,7 +92,7 @@ export module Interaction {
      * @param {(p: Point) => any} callback The callback to set.
      * @return {Interaction.Pointer} The calling Interaction.Pointer.
      */
-    public onPointerExit(callback: (p: Point) => any): Interaction.Pointer;
+    public onPointerExit(callback: (p: Point) => any): Interactions.Pointer;
     public onPointerExit(callback?: (p: Point) => any): any {
       if (callback === undefined) {
         return this._pointerExitCallback;

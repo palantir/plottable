@@ -13,15 +13,15 @@ function run(svg, data, Plottable) {
   "t", "u", "v", "w", "x", "y", "z"];
 
   var ds = new Plottable.Dataset();
-  var xScale = new Plottable.Scale.Category();
-  var xAxis = new Plottable.Axis.Category(xScale, "bottom");
+  var xScale = new Plottable.Scales.Category();
+  var xAxis = new Plottable.Axes.Category(xScale, "bottom");
 
-  var yScale = new Plottable.Scale.Linear();
-  var yAxis = new Plottable.Axis.Numeric(yScale, "left");
+  var yScale = new Plottable.Scales.Linear();
+  var yAxis = new Plottable.Axes.Numeric(yScale, "left");
 
-  var gridlines = new Plottable.Component.Gridlines(null, yScale);
-  var addLabel = new Plottable.Component.Label("add bar");
-  var removeLabel = new Plottable.Component.Label("remove bar");
+  var gridlines = new Plottable.Components.Gridlines(null, yScale);
+  var addLabel = new Plottable.Components.Label("add bar");
+  var removeLabel = new Plottable.Components.Label("remove bar");
 
   var widthPicker = function(){
     var availableSpace = xAxis.width();
@@ -30,12 +30,12 @@ function run(svg, data, Plottable) {
     return w;
   };
 
-  var barRenderer = new Plottable.Plot.Bar(xScale, yScale, true)
+  var barRenderer = new Plottable.Plots.Bar(xScale, yScale, true)
                                  .addDataset(ds)
                                  .attr("x", "name", xScale)
                                  .attr("y", "age", yScale)
                                  .attr("width", widthPicker);
-  var chart = new Plottable.Component.Table([
+  var chart = new Plottable.Components.Table([
                                             [yAxis, gridlines.above(barRenderer)],
                                             [null,  xAxis],
                                             [addLabel, removeLabel]
@@ -58,6 +58,6 @@ function run(svg, data, Plottable) {
     barRenderer.attr("width", widthPicker);
   }
 
-  addLabel.registerInteraction(new Plottable.Interaction.Click().onClick(addBar));
-  removeLabel.registerInteraction(new Plottable.Interaction.Click().onClick(removeBar));
+  addLabel.registerInteraction(new Plottable.Interactions.Click().onClick(addBar));
+  removeLabel.registerInteraction(new Plottable.Interactions.Click().onClick(removeBar));
 }

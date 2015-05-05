@@ -3,13 +3,13 @@
 describe("Drawers", () => {
   describe("Line Drawer", () => {
     it("getPixelPoint", () => {
-      var svg = generateSVG(300, 300);
+      var svg = TestMethods.generateSVG(300, 300);
       var data = [{a: 12, b: 10}, {a: 13, b: 24}, {a: 14, b: 21}, {a: 15, b: 14}];
-      var xScale = new Plottable.Scale.Linear();
-      var yScale = new Plottable.Scale.Linear();
-      var linePlot = new Plottable.Plot.Line(xScale, yScale);
+      var xScale = new Plottable.Scales.Linear();
+      var yScale = new Plottable.Scales.Linear();
+      var linePlot = new Plottable.Plots.Line(xScale, yScale);
 
-      var drawer = new Plottable._Drawer.Line("one");
+      var drawer = new Plottable.Drawers.Line("one");
       (<any> linePlot)._getDrawer = () => drawer;
 
       linePlot.addDataset("one", data);
@@ -27,13 +27,13 @@ describe("Drawers", () => {
     });
 
     it("getSelection", () => {
-      var svg = generateSVG(300, 300);
+      var svg = TestMethods.generateSVG(300, 300);
       var data = [{a: 12, b: 10}, {a: 13, b: 24}, {a: 14, b: 21}, {a: 15, b: 14}];
-      var xScale = new Plottable.Scale.Linear();
-      var yScale = new Plottable.Scale.Linear();
-      var linePlot = new Plottable.Plot.Line(xScale, yScale);
+      var xScale = new Plottable.Scales.Linear();
+      var yScale = new Plottable.Scales.Linear();
+      var linePlot = new Plottable.Plots.Line(xScale, yScale);
 
-      var drawer = new Plottable._Drawer.Line("one");
+      var drawer = new Plottable.Drawers.Line("one");
       (<any> linePlot)._getDrawer = () => drawer;
 
       linePlot.addDataset("one", data);

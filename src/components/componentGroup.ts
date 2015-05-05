@@ -1,8 +1,8 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Component {
-  export class Group extends AbstractComponentContainer {
+export module Components {
+  export class Group extends ComponentContainer {
 
     /**
      * Constructs a Component.Group.
@@ -17,32 +17,29 @@ export module Component {
      * @constructor
      * @param {Component[]} components The Components in the resultant Component.Group (default = []).
      */
-    constructor(components: AbstractComponent[] = []){
+    constructor(components: Component[] = []) {
       super();
       this.classed("component-group", true);
-      components.forEach((c: AbstractComponent) => this._addComponent(c));
+      components.forEach((c: Component) => this._addComponent(c));
     }
 
     public _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
-      var requests = this.components().map((c: AbstractComponent) => c._requestedSpace(offeredWidth, offeredHeight));
+      var requests = this.components().map((c: Component) => c._requestedSpace(offeredWidth, offeredHeight));
       return {
-        minWidth : _Util.Methods.max<_SpaceRequest, number>(requests, (request: _SpaceRequest) => request.minWidth, 0),
-        minHeight: _Util.Methods.max<_SpaceRequest, number>(requests, (request: _SpaceRequest) => request.minHeight, 0)
+        minWidth: Utils.Methods.max<_SpaceRequest, number>(requests, (request: _SpaceRequest) => request.minWidth, 0),
+        minHeight: Utils.Methods.max<_SpaceRequest, number>(requests, (request: _SpaceRequest) => request.minHeight, 0)
       };
     }
 
-    public _merge(c: AbstractComponent, below: boolean): Group {
+    public _merge(c: Component, below: boolean): Group {
       this._addComponent(c, !below);
       return this;
     }
 
-    public _computeLayout(offeredXOrigin?: number,
-                          offeredYOrigin?: number,
-                   availableWidth?: number,
-                  availableHeight?: number): Group {
-      super._computeLayout(offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
+    public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
+      super.computeLayout(origin, availableWidth, availableHeight);
       this.components().forEach((c) => {
-        c._computeLayout(0, 0, this.width(), this.height());
+        c.computeLayout({ x: 0, y: 0 }, this.width(), this.height());
       });
       return this;
     }

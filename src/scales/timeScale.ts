@@ -1,8 +1,8 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Scale {
-  export class Time extends AbstractQuantitative<any> {
+export module Scales {
+  export class Time extends QuantitativeScale<any> {
     public _typeCoercer = (d: any) => d && d._isAMomentObject || d instanceof Date ? d : new Date(d);
 
     /**
@@ -16,7 +16,7 @@ export module Scale {
     constructor();
     constructor(scale: D3.Scale.LinearScale);
     constructor(scale?: any) {
-      // need to cast since d3 time scales do not descend from Quantitative scales
+      // need to cast since d3 time scales do not descend from QuantitativeScale scales
       super(scale == null ? (<any>d3.time.scale()) : scale);
     }
 

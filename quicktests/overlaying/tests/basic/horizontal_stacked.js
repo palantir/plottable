@@ -9,14 +9,14 @@ function makeData() {
 function run(svg, data, Plottable) {
   "use strict";
 
-  var yScale = new Plottable.Scale.Category().domain(["jon", "dan", "zoo"]);
-  var xScale = new Plottable.Scale.Linear();
-  var colorScale = new Plottable.Scale.Color();
+  var yScale = new Plottable.Scales.Category().domain(["jon", "dan", "zoo"]);
+  var xScale = new Plottable.Scales.Linear();
+  var colorScale = new Plottable.Scales.Color();
 
-  var yAxis = new Plottable.Axis.Category(yScale, "left");
-  var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
-  
-  var stackedBarRenderer = new Plottable.Plot.StackedBar(xScale, yScale, false)
+  var yAxis = new Plottable.Axes.Category(yScale, "left");
+  var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
+
+  var stackedBarRenderer = new Plottable.Plots.StackedBar(xScale, yScale, false)
     .project("y", "name", yScale)
     .project("x", "y", xScale)
     .project("fill", "type", colorScale)
@@ -25,7 +25,7 @@ function run(svg, data, Plottable) {
     .addDataset("d3", data[2])
     .animate(true);
 
-  var chart = new Plottable.Component.Table([
+  var chart = new Plottable.Components.Table([
                   [yAxis, stackedBarRenderer],
                   [null,  xAxis]
                 ]);

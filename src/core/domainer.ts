@@ -36,20 +36,20 @@ module Plottable {
     /**
      * @param {any[][]} extents The list of extents to be reduced to a single
      *        extent.
-     * @param {QuantitativeScale} scale
+     * @param {QuantitativeScaleScale} scale
      *        Since nice() must do different things depending on Linear, Log,
      *        or Time scale, the scale must be passed in for nice() to work.
      * @returns {any[]} The domain, as a merging of all exents, as a [min, max]
      *                 pair.
      */
-    public computeDomain(extents: any[][], scale: Scale.AbstractQuantitative<any>): any[] {
+    public computeDomain(extents: any[][], scale: QuantitativeScale<any>): any[] {
       var domain: any[];
       if (this._combineExtents != null) {
         domain = this._combineExtents(extents);
       } else if (extents.length === 0) {
         domain = scale._defaultExtent();
       } else {
-        domain = [_Util.Methods.min(extents, (e) => e[0], 0), _Util.Methods.max(extents, (e) => e[1], 0)];
+        domain = [Utils.Methods.min(extents, (e) => e[0], 0), Utils.Methods.max(extents, (e) => e[1], 0)];
       }
       domain = this._includeDomain(domain);
       domain = this._padDomain(scale, domain);
@@ -95,7 +95,6 @@ module Plottable {
       }
       return this;
     }
-
 
     /**
      * Removes a padding exception, allowing the domain to pad out that value again.
@@ -165,7 +164,7 @@ module Plottable {
       return this;
     }
 
-    private _padDomain(scale: Scale.AbstractQuantitative<any>, domain: any[]): any[] {
+    private _padDomain(scale: QuantitativeScale<any>, domain: any[]): any[] {
       var min = domain[0];
       var max = domain[1];
       // valueOf accounts for dates properly
@@ -201,7 +200,7 @@ module Plottable {
       return [newMin, newMax];
     }
 
-    private _niceDomain(scale: Scale.AbstractQuantitative<any>, domain: any[]): any[] {
+    private _niceDomain(scale: QuantitativeScale<any>, domain: any[]): any[] {
       if (this._doNice) {
         return scale._niceDomain(domain, this._niceCount);
       } else {

@@ -1,38 +1,28 @@
 ///<reference path="../../reference.ts" />
 
 module Plottable {
-export module Plot {
-  export class Line<X> extends AbstractXYPlot<X, number> implements Interaction.Hoverable {
-    private _hoverDetectionRadius = 15;
-    private _hoverTarget: D3.Selection;
+export module Plots {
+  export class Line<X> extends XYPlot<X, number> {
     private _defaultStrokeColor: string;
 
-    protected _yScale: Scale.AbstractQuantitative<number>;
+    protected _yScale: QuantitativeScale<number>;
 
     /**
      * Constructs a LinePlot.
      *
      * @constructor
-     * @param {QuantitativeScale} xScale The x scale to use.
-     * @param {QuantitativeScale} yScale The y scale to use.
+     * @param {QuantitativeScaleScale} xScale The x scale to use.
+     * @param {QuantitativeScaleScale} yScale The y scale to use.
      */
-    constructor(xScale: Scale.AbstractQuantitative<X>, yScale: Scale.AbstractQuantitative<number>) {
+    constructor(xScale: QuantitativeScale<X>, yScale: QuantitativeScale<number>) {
       super(xScale, yScale);
       this.classed("line-plot", true);
-      this.animator("reset", new Animator.Null());
-      this.animator("main", new Animator.Base()
+      this.animator("reset", new Animators.Null());
+      this.animator("main", new Animators.Base()
                                          .duration(600)
                                          .easing("exp-in-out"));
 
-      this._defaultStrokeColor = new Scale.Color().range()[0];
-    }
-
-    protected _setup() {
-      super._setup();
-      this._hoverTarget = this.foreground().append("circle")
-                                           .classed("hover-target", true)
-                                           .attr("r", this._hoverDetectionRadius)
-                                           .style("visibility", "hidden");
+      this._defaultStrokeColor = new Scales.Color().range()[0];
     }
 
     protected _rejectNullsAndNaNs(d: any, i: number, userMetdata: any, plotMetadata: any, accessor: _Accessor) {
@@ -41,7 +31,7 @@ export module Plot {
     }
 
     protected _getDrawer(key: string) {
-      return new Plottable._Drawer.Line(key);
+      return new Plottable.Drawers.Line(key);
     }
 
     protected _getResetYFunction() {
@@ -56,8 +46,8 @@ export module Plot {
       return (d: any, i: number, u: any, m: PlotMetadata) => scaledStartValue;
     }
 
-    protected _generateDrawSteps(): _Drawer.DrawStep[] {
-      var drawSteps: _Drawer.DrawStep[] = [];
+    protected _generateDrawSteps(): Drawers.DrawStep[] {
+      var drawSteps: Drawers.DrawStep[] = [];
       if (this._dataChanged && this._animate) {
         var attrToProjector = this._generateAttrToProjector();
         attrToProjector["y"] = this._getResetYFunction();
@@ -80,8 +70,8 @@ export module Plot {
           data.length > 0 ? projector(data[0], i, u, m) : null;
       });
 
-      var xFunction       = attrToProjector["x"];
-      var yFunction       = attrToProjector["y"];
+      var xFunction = attrToProjector["x"];
+      var yFunction = attrToProjector["y"];
 
       attrToProjector["defined"] = (d: any, i: number, u: any, m: any) =>
           this._rejectNullsAndNaNs(d, i, u, m, xFunction) && this._rejectNullsAndNaNs(d, i, u, m, yFunction);
@@ -93,43 +83,6 @@ export module Plot {
 
     protected _wholeDatumAttributes() {
       return ["x", "y"];
-    }
-
-    protected _getClosestWithinRange(p: Point, range: number) {
-      var attrToProjector = this._generateAttrToProjector();
-      var xProjector = attrToProjector["x"];
-      var yProjector = attrToProjector["y"];
-
-      var getDistSq = (d: any, i: number, userMetdata: any, plotMetadata: PlotMetadata) => {
-        var dx = +xProjector(d, i, userMetdata, plotMetadata) - p.x;
-        var dy = +yProjector(d, i, userMetdata, plotMetadata) - p.y;
-        return (dx * dx + dy * dy);
-      };
-
-      var closestOverall: any;
-      var closestPoint: Point;
-      var closestDistSq = range * range;
-
-       this._datasetKeysInOrder.forEach((key: string) => {
-        var dataset = this._key2PlotDatasetKey.get(key).dataset;
-        var plotMetadata = this._key2PlotDatasetKey.get(key).plotMetadata;
-        dataset.data().forEach((d: any, i: number) => {
-          var distSq = getDistSq(d, i, dataset.metadata(), plotMetadata);
-          if (distSq < closestDistSq) {
-            closestOverall = d;
-            closestPoint = {
-              x: xProjector(d, i, dataset.metadata(), plotMetadata),
-              y: yProjector(d, i, dataset.metadata(), plotMetadata)
-            };
-            closestDistSq = distSq;
-          }
-        });
-      });
-
-      return {
-        closestValue: closestOverall,
-        closestPoint: closestPoint
-      };
     }
 
     protected _getAllPlotData(datasetKeys: string[]): PlotData {
@@ -212,40 +165,6 @@ export module Plot {
         selection: d3.selectAll(closestElements)
       };
     }
-
-    //===== Hover logic =====
-    public _hoverOverComponent(p: Point) {
-      // no-op
-    }
-
-    public _hoverOutComponent(p: Point) {
-      // no-op
-    }
-
-    public _doHover(p: Point): Interaction.HoverData {
-      var closestInfo = this._getClosestWithinRange(p, this._hoverDetectionRadius);
-      var closestValue = closestInfo.closestValue;
-      if (closestValue === undefined) {
-        return {
-          data: null,
-          pixelPositions: null,
-          selection: null
-        };
-      }
-
-      var closestPoint = closestInfo.closestPoint;
-      this._hoverTarget.attr({
-        "cx": closestInfo.closestPoint.x,
-        "cy": closestInfo.closestPoint.y
-      });
-
-      return {
-        data: [closestValue],
-        pixelPositions: [closestPoint],
-        selection: this._hoverTarget
-      };
-    }
-    //===== /Hover logic =====
   }
 }
 }

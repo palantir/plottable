@@ -1,8 +1,8 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Component {
-  export class Label extends AbstractComponent {
+export module Components {
+  export class Label extends Component {
     private _textContainer: D3.Selection;
     private _text: string; // text assigned to the Label; may not be the actual text displayed due to truncation
     private _orientation: string;
@@ -68,7 +68,7 @@ export module Component {
       var desiredHeight = (this.orient() === "horizontal" ? desiredWH.height : desiredWH.width) + 2 * this.padding();
 
       return {
-        minWidth : desiredWidth,
+        minWidth: desiredWidth,
         minHeight: desiredHeight
       };
     }
@@ -100,7 +100,7 @@ export module Component {
         return this._text;
       } else {
         this._text = displayText;
-        this._invalidateLayout();
+        this.redraw();
         return this;
       }
     }
@@ -129,7 +129,7 @@ export module Component {
         } else {
           throw new Error(newOrientation + " is not a valid orientation for LabelComponent");
         }
-        this._invalidateLayout();
+        this.redraw();
         return this;
       }
     }
@@ -156,7 +156,7 @@ export module Component {
           throw new Error(padAmount + " is not a valid padding value.  Cannot be less than 0.");
         }
         this._padding = padAmount;
-        this._invalidateLayout();
+        this.redraw();
         return this;
       }
     }

@@ -1,7 +1,7 @@
 ///<reference path="../../reference.ts" />
 
 module Plottable {
-export module Plot {
+export module Plots {
   /*
    * A PiePlot is a plot meant to show how much out of a total an attribute's value is.
    * One usecase is to show how much funding departments are given out of a total budget.
@@ -12,9 +12,9 @@ export module Plot {
    *   "outer-radius" - Accessor determining the distance from the center to the outer edge of the sector
    *   "value" - Accessor to extract the value determining the proportion of each slice to the total
    */
-  export class Pie extends AbstractPlot {
+  export class Pie extends Plot {
 
-    private _colorScale: Scale.Color;
+    private _colorScale: Scales.Color;
 
     /**
      * Constructs a PiePlot.
@@ -23,18 +23,19 @@ export module Plot {
      */
     constructor() {
       super();
-      this._colorScale = new Scale.Color();
+      this._colorScale = new Scales.Color();
       this.classed("pie-plot", true);
     }
 
-    public _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number) {
-      super._computeLayout(offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
+    public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
+      super.computeLayout(origin, availableWidth, availableHeight);
       this._renderArea.attr("transform", "translate(" + this.width() / 2 + "," + this.height() / 2 + ")");
+      return this;
     }
 
     public addDataset(keyOrDataset: any, dataset?: any) {
       if (this._datasetKeysInOrder.length === 1) {
-        _Util.Methods.warn("Only one dataset is supported in Pie plots");
+        Utils.Methods.warn("Only one dataset is supported in Pie plots");
         return this;
       }
       super.addDataset(keyOrDataset, dataset);
@@ -52,8 +53,8 @@ export module Plot {
       return attrToProjector;
     }
 
-    protected _getDrawer(key: string): _Drawer.AbstractDrawer {
-      return new Plottable._Drawer.Arc(key).setClass("arc");
+    protected _getDrawer(key: string): Drawers.AbstractDrawer {
+      return new Plottable.Drawers.Arc(key).setClass("arc");
     }
 
     public getAllPlotData(datasetKeys?: string | string[]): PlotData {

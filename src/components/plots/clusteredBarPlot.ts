@@ -1,7 +1,7 @@
 ///<reference path="../../reference.ts" />
 
 module Plottable {
-export module Plot {
+export module Plots {
   export interface ClusteredPlotMetadata extends PlotMetadata {
     position: number;
   }
@@ -20,7 +20,7 @@ export module Plot {
      * @param {Scale} yScale The y scale to use.
      * @param {boolean} isVertical if the plot if vertical.
      */
-    constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<Y, number>, isVertical = true) {
+    constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>, isVertical = true) {
       super(xScale, yScale, isVertical);
     }
 
@@ -50,8 +50,8 @@ export module Plot {
       });
     }
 
-    private _makeInnerScale(){
-      var innerScale = new Scale.Category();
+    private _makeInnerScale() {
+      var innerScale = new Scales.Category();
       innerScale.domain(this._datasetKeysInOrder);
       if (!this._projections["width"]) {
         innerScale.range([0, this._getBarPixelWidth()]);

@@ -7,17 +7,17 @@ describe("Plots", () => {
     var svg: D3.Selection;
     var dataset1: Plottable.Dataset;
     var dataset2: Plottable.Dataset;
-    var xScale: Plottable.Scale.Linear;
-    var yScale: Plottable.Scale.Linear;
-    var renderer: Plottable.Plot.StackedArea<number>;
+    var xScale: Plottable.Scales.Linear;
+    var yScale: Plottable.Scales.Linear;
+    var renderer: Plottable.Plots.StackedArea<number>;
     var SVG_WIDTH = 600;
     var SVG_HEIGHT = 400;
 
     beforeEach(() => {
-      svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      xScale = new Plottable.Scale.Linear().domain([1, 3]);
-      yScale = new Plottable.Scale.Linear().domain([0, 4]);
-      var colorScale = new Plottable.Scale.Color("10").domain(["a", "b"]);
+      svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      xScale = new Plottable.Scales.Linear().domain([1, 3]);
+      yScale = new Plottable.Scales.Linear().domain([0, 4]);
+      var colorScale = new Plottable.Scales.Color("10").domain(["a", "b"]);
 
       var data1 = [
         {x: 1, y: 1, type: "a"},
@@ -30,25 +30,25 @@ describe("Plots", () => {
       dataset1 = new Plottable.Dataset(data1);
       dataset2 = new Plottable.Dataset(data2);
 
-      renderer = new Plottable.Plot.StackedArea(xScale, yScale);
+      renderer = new Plottable.Plots.StackedArea(xScale, yScale);
       renderer.addDataset(data1);
       renderer.addDataset(data2);
       renderer.project("x", "x", xScale);
       renderer.project("y", "y", yScale);
       renderer.project("fill", "type", colorScale);
-      var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
-      var table = new Plottable.Component.Table([[renderer], [xAxis]]).renderTo(svg);
+      var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
+      new Plottable.Components.Table([[renderer], [xAxis]]).renderTo(svg);
     });
 
     it("renders correctly", () => {
       var areas = (<any> renderer)._renderArea.selectAll(".area");
       var area0 = d3.select(areas[0][0]);
-      var d0 = normalizePath(area0.attr("d")).split(/[a-zA-Z]/);
+      var d0 = TestMethods.normalizePath(area0.attr("d")).split(/[a-zA-Z]/);
       var d0Ys = d0.slice(1, d0.length - 1).map((s) => parseFloat(s.split(",")[1]));
       assert.strictEqual(d0Ys.indexOf(0), -1, "bottom area never touches the top");
 
       var area1 = d3.select(areas[0][1]);
-      var d1 = normalizePath(area1.attr("d")).split(/[a-zA-Z]/);
+      var d1 = TestMethods.normalizePath(area1.attr("d")).split(/[a-zA-Z]/);
       var d1Ys = d1.slice(1, d1.length - 1).map((s) => parseFloat(s.split(",")[1]));
       assert.notEqual(d1Ys.indexOf(0), -1, "touches the top");
 
@@ -62,15 +62,15 @@ describe("Plots", () => {
 
   describe("Stacked Area Plot no data", () => {
     var svg: D3.Selection;
-    var renderer: Plottable.Plot.StackedArea<number>;
+    var renderer: Plottable.Plots.StackedArea<number>;
     var SVG_WIDTH = 600;
     var SVG_HEIGHT = 400;
 
     beforeEach(() => {
-      svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var xScale = new Plottable.Scale.Linear().domain([1, 3]);
-      var yScale = new Plottable.Scale.Linear().domain([0, 4]);
-      var colorScale = new Plottable.Scale.Color("10");
+      svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      var xScale = new Plottable.Scales.Linear().domain([1, 3]);
+      var yScale = new Plottable.Scales.Linear().domain([0, 4]);
+      var colorScale = new Plottable.Scales.Color("10");
 
       var data1: any[] = [
       ];
@@ -79,13 +79,13 @@ describe("Plots", () => {
         {x: 3, y: 1, type: "b"}
       ];
 
-      renderer = new Plottable.Plot.StackedArea(xScale, yScale);
+      renderer = new Plottable.Plots.StackedArea(xScale, yScale);
       renderer.addDataset(data1);
       renderer.addDataset(data2);
       renderer.project("fill", "type", colorScale);
       renderer.project("x", "x", xScale);
       renderer.project("y", "y", yScale);
-      new Plottable.Component.Table([[renderer]]).renderTo(svg);
+      new Plottable.Components.Table([[renderer]]).renderTo(svg);
     });
 
     it("path elements rendered correctly", () => {
@@ -104,17 +104,17 @@ describe("Plots", () => {
 
   describe("Stacked Area Plot Stacking", () => {
     var svg: D3.Selection;
-    var xScale: Plottable.Scale.Linear;
-    var yScale: Plottable.Scale.Linear;
-    var renderer: Plottable.Plot.StackedArea<number>;
+    var xScale: Plottable.Scales.Linear;
+    var yScale: Plottable.Scales.Linear;
+    var renderer: Plottable.Plots.StackedArea<number>;
     var SVG_WIDTH = 600;
     var SVG_HEIGHT = 400;
 
     beforeEach(() => {
-      svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      xScale = new Plottable.Scale.Linear().domain([1, 3]);
-      yScale = new Plottable.Scale.Linear();
-      var colorScale = new Plottable.Scale.Color("10").domain(["a", "b"]);
+      svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      xScale = new Plottable.Scales.Linear().domain([1, 3]);
+      yScale = new Plottable.Scales.Linear();
+      var colorScale = new Plottable.Scales.Color("10").domain(["a", "b"]);
 
       var data1 = [
         {x: 1, y: 1, type: "a"},
@@ -125,7 +125,7 @@ describe("Plots", () => {
         {x: 3, y: 1, type: "b"}
       ];
 
-      renderer = new Plottable.Plot.StackedArea(xScale, yScale);
+      renderer = new Plottable.Plots.StackedArea(xScale, yScale);
       renderer.addDataset(data1);
       renderer.addDataset(data2);
       renderer.project("fill", "type", colorScale);
@@ -290,8 +290,8 @@ describe("Plots", () => {
 
     it("warning is thrown when datasets are updated with different domains", () => {
       var flag = false;
-      var oldWarn = Plottable._Util.Methods.warn;
-      (<any> Plottable._Util.Methods).warn = (msg: string) => {
+      var oldWarn = Plottable.Utils.Methods.warn;
+      (<any> Plottable.Utils.Methods).warn = (msg: string) => {
         if (msg.indexOf("domain") > -1) { flag = true; }
       };
 
@@ -301,7 +301,7 @@ describe("Plots", () => {
       var dataset = new Plottable.Dataset(missingDomainData);
       renderer.addDataset(dataset);
 
-      (<any> Plottable._Util.Methods).warn = oldWarn;
+      (<any> Plottable.Utils.Methods).warn = oldWarn;
       assert.isTrue(flag, "warning has been issued about differing domains");
 
       svg.remove();
@@ -310,17 +310,17 @@ describe("Plots", () => {
 
   describe("Stacked Area Plot Project", () => {
     var svg: D3.Selection;
-    var xScale: Plottable.Scale.Linear;
-    var yScale: Plottable.Scale.Linear;
-    var renderer: Plottable.Plot.StackedArea<number>;
+    var xScale: Plottable.Scales.Linear;
+    var yScale: Plottable.Scales.Linear;
+    var renderer: Plottable.Plots.StackedArea<number>;
     var SVG_WIDTH = 600;
     var SVG_HEIGHT = 400;
 
     beforeEach(() => {
-      svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      xScale = new Plottable.Scale.Linear().domain([1, 3]);
-      yScale = new Plottable.Scale.Linear().domain([0, 4]);
-      var colorScale = new Plottable.Scale.Color("10").domain(["a", "b"]);
+      svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      xScale = new Plottable.Scales.Linear().domain([1, 3]);
+      yScale = new Plottable.Scales.Linear().domain([0, 4]);
+      var colorScale = new Plottable.Scales.Color("10").domain(["a", "b"]);
 
       var data1 = [
         {x: 1, yTest: 1, type: "a"},
@@ -331,25 +331,25 @@ describe("Plots", () => {
         {x: 3, yTest: 1, type: "b"}
       ];
 
-      renderer = new Plottable.Plot.StackedArea(xScale, yScale);
+      renderer = new Plottable.Plots.StackedArea(xScale, yScale);
       renderer.project("y", "yTest", yScale);
       renderer.project("x", "x", xScale);
       renderer.addDataset(data1);
       renderer.addDataset(data2);
       renderer.project("fill", "type", colorScale);
-      var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
-      var table = new Plottable.Component.Table([[renderer], [xAxis]]).renderTo(svg);
+      var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
+      new Plottable.Components.Table([[renderer], [xAxis]]).renderTo(svg);
     });
 
     it("renders correctly", () => {
       var areas = (<any> renderer)._renderArea.selectAll(".area");
       var area0 = d3.select(areas[0][0]);
-      var d0 = normalizePath(area0.attr("d")).split(/[a-zA-Z]/);
+      var d0 = TestMethods.normalizePath(area0.attr("d")).split(/[a-zA-Z]/);
       var d0Ys = d0.slice(1, d0.length - 1).map((s) => parseFloat(s.split(",")[1]));
       assert.strictEqual(d0Ys.indexOf(0), -1, "bottom area never touches the top");
 
       var area1 = d3.select(areas[0][1]);
-      var d1 = normalizePath(area1.attr("d")).split(/[a-zA-Z]/);
+      var d1 = TestMethods.normalizePath(area1.attr("d")).split(/[a-zA-Z]/);
       var d1Ys = d1.slice(1, d1.length - 1).map((s) => parseFloat(s.split(",")[1]));
       assert.notEqual(d1Ys.indexOf(0), -1, "touches the top");
 
@@ -389,10 +389,10 @@ describe("Plots", () => {
         { x: 2, y: 2, fill: "green" },
         { x: 3, y: 3, fill: "green" },
       ];
-      var xScale = new Plottable.Scale.Linear();
-      var yScale = new Plottable.Scale.Linear();
+      var xScale = new Plottable.Scales.Linear();
+      var yScale = new Plottable.Scales.Linear();
 
-      var plot = new Plottable.Plot.StackedArea(xScale, yScale);
+      var plot = new Plottable.Plots.StackedArea(xScale, yScale);
       plot.addDataset("d1", data1);
       plot.addDataset("d2", data2);
       plot.addDataset("d3", data3);
@@ -427,10 +427,10 @@ describe("Plots", () => {
         { x: 2, y: 2, fill: "green" },
         { x: 3, y: 3, fill: "green" },
       ];
-      var xScale = new Plottable.Scale.Linear();
-      var yScale = new Plottable.Scale.Linear();
+      var xScale = new Plottable.Scales.Linear();
+      var yScale = new Plottable.Scales.Linear();
 
-      var plot = new Plottable.Plot.StackedArea(xScale, yScale);
+      var plot = new Plottable.Plots.StackedArea(xScale, yScale);
       plot.addDataset("d1", data1);
       plot.addDataset("d2", data2);
       plot.addDataset("d3", data3);

@@ -1,7 +1,7 @@
 ///<reference path="testReference.ts" />
 
 module Mocks {
-  export class FixedSizeComponent extends Plottable.Component.AbstractComponent {
+  export class FixedSizeComponent extends Plottable.Component {
     public fixedWidth: number;
     public fixedHeight: number;
 
@@ -13,9 +13,9 @@ module Mocks {
       this._fixedHeightFlag = true;
     }
 
-    public _requestedSpace(availableWidth : number, availableHeight: number): Plottable._SpaceRequest {
+    public _requestedSpace(availableWidth: number, availableHeight: number): Plottable._SpaceRequest {
       return {
-        minWidth:  this.fixedWidth,
+        minWidth: this.fixedWidth,
         minHeight: this.fixedHeight
       };
     }

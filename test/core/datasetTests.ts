@@ -10,7 +10,7 @@ describe("Dataset", () => {
 
     var callbackCalled = false;
     var callback = (listenable: Plottable.Dataset) => {
-      assert.equal(listenable, ds, "Callback received the Dataset as the first argument");
+      assert.strictEqual(listenable, ds, "Callback received the Dataset as the first argument");
       assert.deepEqual(ds.data(), newData, "Dataset arrives with correct data");
       callbackCalled = true;
     };
@@ -27,7 +27,7 @@ describe("Dataset", () => {
 
     var callbackCalled = false;
     var callback = (listenable: Plottable.Dataset) => {
-      assert.equal(listenable, ds, "Callback received the Dataset as the first argument");
+      assert.strictEqual(listenable, ds, "Callback received the Dataset as the first argument");
       assert.deepEqual(ds.metadata(), newMetadata, "Dataset arrives with correct metadata");
       callbackCalled = true;
     };
@@ -42,7 +42,6 @@ describe("Dataset", () => {
     var metadata = {foo: 11};
     var id = (d: any) => d;
     var dataset = new Plottable.Dataset(data, metadata);
-    var plot = new Plottable.Plot.AbstractPlot().addDataset(dataset);
     var a1 = (d: number, i: number, m: any) => d + i - 2;
     assert.deepEqual(dataset._getExtent(a1, id), [-1, 5], "extent for numerical data works properly");
     var a2 = (d: number, i: number, m: any) => d + m.foo;

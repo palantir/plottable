@@ -23,7 +23,7 @@ export module Core {
    * The listeners are called synchronously.
    */
   export class Broadcaster<L> extends Core.PlottableObject {
-    private _key2callback = new _Util.StrictEqualityAssociativeArray();
+    private _key2callback = new Utils.StrictEqualityAssociativeArray();
     private _listenable: L;
 
     /**
@@ -92,7 +92,7 @@ export module Core {
      * @returns {Broadcaster} The calling Broadcaster
      */
     public deregisterAllListeners() {
-      this._key2callback = new _Util.StrictEqualityAssociativeArray();
+      this._key2callback = new Utils.StrictEqualityAssociativeArray();
     }
   }
 }

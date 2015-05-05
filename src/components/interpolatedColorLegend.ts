@@ -1,12 +1,12 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Component {
-  export class InterpolatedColorLegend extends AbstractComponent {
+export module Components {
+  export class InterpolatedColorLegend extends Component {
     private _measurer: SVGTypewriter.Measurers.Measurer;
     private _wrapper: SVGTypewriter.Wrappers.Wrapper;
     private _writer: SVGTypewriter.Writers.Writer;
-    private _scale: Scale.InterpolatedColor;
+    private _scale: Scales.InterpolatedColor;
     private _orientation: String ;
     private _padding = 5;
     private _numSwatches = 10;
@@ -34,13 +34,13 @@ export module Component {
      * @param {string} orientation (horizontal/left/right).
      * @param {Formatter} The labels are formatted using this function.
      */
-    constructor(interpolatedColorScale: Scale.InterpolatedColor, orientation = "horizontal", formatter = Formatters.general()) {
+    constructor(interpolatedColorScale: Scales.InterpolatedColor, orientation = "horizontal", formatter = Formatters.general()) {
       super();
       if (interpolatedColorScale == null ) {
         throw new Error("InterpolatedColorLegend requires a interpolatedColorScale");
       }
       this._scale = interpolatedColorScale;
-      this._scale.broadcaster.registerListener(this, () => this._invalidateLayout());
+      this._scale.broadcaster.registerListener(this, () => this.redraw());
       this._formatter = formatter;
       this._orientation = InterpolatedColorLegend._ensureOrientation(orientation);
 
@@ -72,7 +72,7 @@ export module Component {
         return this._formatter;
       }
       this._formatter = formatter;
-      this._invalidateLayout();
+      this.redraw();
       return this;
     }
 
@@ -104,7 +104,7 @@ export module Component {
         return this._orientation;
       } else {
         this._orientation = InterpolatedColorLegend._ensureOrientation(newOrientation);
-        this._invalidateLayout();
+        this.redraw();
         return this;
       }
     }
@@ -144,7 +144,7 @@ export module Component {
       var desiredHeight: number;
       var desiredWidth: number;
       if (this._isVertical()) {
-        var longestWidth = _Util.Methods.max(labelWidths, 0);
+        var longestWidth = Utils.Methods.max(labelWidths, 0);
         desiredWidth = this._padding + textHeight + this._padding + longestWidth + this._padding;
         desiredHeight = this._padding + numSwatches * textHeight + this._padding;
       } else {
@@ -155,7 +155,7 @@ export module Component {
       }
 
       return {
-        minWidth : desiredWidth,
+        minWidth: desiredWidth,
         minHeight: desiredHeight
       };
     }
@@ -169,7 +169,6 @@ export module Component {
 
       var domain = this._scale.domain();
 
-      var textHeight = this._measurer.measure().height;
       var text0 = this._formatter(domain[0]);
       var text0Width = this._measurer.measure(text0).width;
       var text1 = this._formatter(domain[1]);

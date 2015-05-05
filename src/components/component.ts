@@ -1,18 +1,25 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Component {
-  export class AbstractComponent extends Core.PlottableObject {
+  export module Components {
+    export class Alignment {
+      static TOP = "top";
+      static BOTTOM = "bottom";
+      static LEFT = "left";
+      static RIGHT = "right";
+      static CENTER = "center";
+    }
+  }
+  export class Component extends Core.PlottableObject {
     protected _element: D3.Selection;
     protected _content: D3.Selection;
     protected _boundingBox: D3.Selection;
     private _backgroundContainer: D3.Selection;
     private _foregroundContainer: D3.Selection;
     public clipPathEnabled = false;
-    private _xOrigin: number; // Origin of the coordinate space for the component. Passed down from parent
-    private _yOrigin: number;
+    private _origin: Point = { x: 0, y: 0 }; // Origin of the coordinate space for the Component.
 
-    private _parentElement: AbstractComponentContainer;
+    private _parentElement: ComponentContainer;
     private _xAlignProportion = 0; // What % along the free space do we want to position (0 = left, .5 = center, 1 = right)
     private _yAlignProportion = 0;
     protected _fixedHeightFlag = false;
@@ -20,8 +27,7 @@ export module Component {
     protected _isSetup = false;
     protected _isAnchored = false;
 
-    private _hitBox: D3.Selection;
-    private _interactionsToRegister: Interaction.AbstractInteraction[] = [];
+    private _interactionsToRegister: Interaction[] = [];
     private _boxes: D3.Selection[] = [];
     private _boxContainer: D3.Selection;
     private _rootSVG: D3.Selection;
@@ -34,18 +40,19 @@ export module Component {
     private _removed = false;
 
     /**
-     * Attaches the Component as a child of a given a DOM element. Usually only directly invoked on root-level Components.
+     * Attaches the Component as a child of a given D3 Selection.
      *
-     * @param {D3.Selection} element A D3 selection consisting of the element to anchor under.
+     * @param {D3.Selection} selection The Selection containing the Element to anchor under.
+     * @returns {Component} The calling Component.
      */
-    public _anchor(element: D3.Selection) {
+    public anchor(selection: D3.Selection) {
       if (this._removed) {
         throw new Error("Can't reuse remove()-ed components!");
       }
 
-      if (element.node().nodeName.toLowerCase() === "svg") {
+      if (selection.node().nodeName.toLowerCase() === "svg") {
         // svg node gets the "plottable" CSS class
-        this._rootSVG = element;
+        this._rootSVG = selection;
         this._rootSVG.classed("plottable", true);
         // visible overflow for firefox https://stackoverflow.com/questions/5926986/why-does-firefox-appear-to-truncate-embedded-svgs
         this._rootSVG.style("overflow", "visible");
@@ -54,12 +61,13 @@ export module Component {
 
       if (this._element != null) {
         // reattach existing element
-        element.node().appendChild(this._element.node());
+        selection.node().appendChild(this._element.node());
       } else {
-        this._element = element.append("g");
+        this._element = selection.append("g");
         this._setup();
       }
       this._isAnchored = true;
+      return this;
     }
 
     /**
@@ -105,19 +113,18 @@ export module Component {
      * If no parameters are supplied and the Component is a root node,
      * they are inferred from the size of the Component's element.
      *
-     * @param {number} offeredXOrigin x-coordinate of the origin of the space offered the Component
-     * @param {number} offeredYOrigin y-coordinate of the origin of the space offered the Component
-     * @param {number} availableWidth available width for the Component to render in
-     * @param {number} availableHeight available height for the Component to render in
+     * @param {Point} origin Origin of the space offered to the Component.
+     * @param {number} availableWidth
+     * @param {number} availableHeight
+     * @returns {Component} The calling Component.
      */
-    public _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number) {
-      if (offeredXOrigin == null || offeredYOrigin == null || availableWidth == null || availableHeight == null) {
+    public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
+      if (origin == null || availableWidth == null || availableHeight == null) {
         if (this._element == null) {
-          throw new Error("anchor must be called before computeLayout");
+          throw new Error("anchor() must be called before computeLayout()");
         } else if (this._isTopLevelComponent) {
           // we are the root node, retrieve height/width from root SVG
-          offeredXOrigin = 0;
-          offeredYOrigin = 0;
+          origin = { x: 0, y: 0 };
 
           // Set width/height to 100% if not specified, to allow accurate size calculation
           // see http://www.w3.org/TR/CSS21/visudet.html#block-replaced-width
@@ -130,19 +137,22 @@ export module Component {
           }
 
           var elem: HTMLScriptElement = (<HTMLScriptElement> this._rootSVG.node());
-          availableWidth  = _Util.DOM.getElementWidth(elem);
-          availableHeight = _Util.DOM.getElementHeight(elem);
+          availableWidth  = Utils.DOM.getElementWidth(elem);
+          availableHeight = Utils.DOM.getElementHeight(elem);
         } else {
-          throw new Error("null arguments cannot be passed to _computeLayout() on a non-root node");
+          throw new Error("null arguments cannot be passed to computeLayout() on a non-root node");
         }
       }
       var size = this._getSize(availableWidth, availableHeight);
       this._width = size.width;
       this._height = size.height;
-      this._xOrigin = offeredXOrigin + this._xOffset + (availableWidth - this.width()) * this._xAlignProportion;
-      this._yOrigin = offeredYOrigin + this._yOffset + (availableHeight - this.height()) * this._yAlignProportion;
-      this._element.attr("transform", "translate(" + this._xOrigin + "," + this._yOrigin + ")");
+      this._origin = {
+        x: origin.x + this._xOffset + (availableWidth - this.width()) * this._xAlignProportion,
+        y: origin.y + this._yOffset + (availableHeight - this.height()) * this._yAlignProportion
+      };
+      this._element.attr("transform", "translate(" + this._origin.x + "," + this._origin.y + ")");
       this._boxes.forEach((b: D3.Selection) => b.attr("width", this.width()).attr("height", this.height()));
+      return this;
     }
 
     protected _getSize(availableWidth: number, availableHeight: number) {
@@ -155,26 +165,35 @@ export module Component {
 
     public _render() {
       if (this._isAnchored && this._isSetup && this.width() >= 0 && this.height() >= 0) {
-        Core.RenderController.registerToRender(this);
+        Core.RenderControllers.registerToRender(this);
       }
     }
 
     private _scheduleComputeLayout() {
       if (this._isAnchored && this._isSetup) {
-        Core.RenderController.registerToComputeLayout(this);
+        Core.RenderControllers.registerToComputeLayout(this);
       }
     }
 
     public _doRender() {/* overwrite */}
 
-    public _invalidateLayout() {
+    /**
+     * Causes the Component to recompute layout and redraw.
+     *
+     * This function should be called when CSS changes could influence the size
+     * of the components, e.g. changing the font size.
+     *
+     * @returns {Component} The calling Component.
+     */
+    public redraw() {
       if (this._isAnchored && this._isSetup) {
         if (this._isTopLevelComponent) {
           this._scheduleComputeLayout();
         } else {
-          this._parent()._invalidateLayout();
+          this._parent().redraw();
         }
       }
+      return this;
     }
 
     /**
@@ -183,7 +202,7 @@ export module Component {
      * @param {String|D3.Selection} element A D3 selection or a selector for getting the element to render into.
      * @returns {Component} The calling component.
      */
-    public renderTo(element: String | D3.Selection): AbstractComponent {
+    public renderTo(element: String | D3.Selection): Component {
       this.detach();
       if (element != null) {
         var selection: D3.Selection;
@@ -195,29 +214,16 @@ export module Component {
         if (!selection.node() || selection.node().nodeName.toLowerCase() !== "svg") {
           throw new Error("Plottable requires a valid SVG to renderTo");
         }
-        this._anchor(selection);
+        this.anchor(selection);
       }
       if (this._element == null) {
         throw new Error("If a component has never been rendered before, then renderTo must be given a node to render to, \
           or a D3.Selection, or a selector string");
       }
-      this._computeLayout();
+      this.computeLayout();
       this._render();
       // flush so that consumers can immediately attach to stuff we create in the DOM
-      Core.RenderController.flush();
-      return this;
-    }
-
-    /**
-     * Causes the Component to recompute layout and redraw.
-     *
-     * This function should be called when CSS changes could influence the size
-     * of the components, e.g. changing the font size.
-     *
-     * @returns {Component} The calling component.
-     */
-    public redraw(): AbstractComponent {
-      this._invalidateLayout();
+      Core.RenderControllers.flush();
       return this;
     }
 
@@ -232,18 +238,18 @@ export module Component {
      * @param {string} alignment The x alignment of the Component (one of ["left", "center", "right"]).
      * @returns {Component} The calling Component.
      */
-    public xAlign(alignment: string): AbstractComponent {
+    public xAlign(alignment: string): Component {
       alignment = alignment.toLowerCase();
-      if (alignment === "left") {
+      if (alignment === Components.Alignment.LEFT) {
         this._xAlignProportion = 0;
-      } else if (alignment === "center") {
+      } else if (alignment === Components.Alignment.CENTER) {
         this._xAlignProportion = 0.5;
-      } else if (alignment === "right") {
+      } else if (alignment === Components.Alignment.RIGHT) {
         this._xAlignProportion = 1;
       } else {
         throw new Error("Unsupported alignment");
       }
-      this._invalidateLayout();
+      this.redraw();
       return this;
     }
 
@@ -258,18 +264,18 @@ export module Component {
      * @param {string} alignment The x alignment of the Component (one of ["top", "center", "bottom"]).
      * @returns {Component} The calling Component.
      */
-    public yAlign(alignment: string): AbstractComponent {
+    public yAlign(alignment: string): Component {
       alignment = alignment.toLowerCase();
-      if (alignment === "top") {
+      if (alignment === Components.Alignment.TOP) {
         this._yAlignProportion = 0;
-      } else if (alignment === "center") {
+      } else if (alignment === Components.Alignment.CENTER) {
         this._yAlignProportion = 0.5;
-      } else if (alignment === "bottom") {
+      } else if (alignment === Components.Alignment.BOTTOM) {
         this._yAlignProportion = 1;
       } else {
         throw new Error("Unsupported alignment");
       }
-      this._invalidateLayout();
+      this.redraw();
       return this;
     }
 
@@ -281,9 +287,9 @@ export module Component {
      * side of the container.
      * @returns {Component} The calling Component.
      */
-    public xOffset(offset: number): AbstractComponent {
+    public xOffset(offset: number): Component {
       this._xOffset = offset;
-      this._invalidateLayout();
+      this.redraw();
       return this;
     }
 
@@ -295,9 +301,9 @@ export module Component {
      * side of the container.
      * @returns {Component} The calling Component.
      */
-    public yOffset(offset: number): AbstractComponent {
+    public yOffset(offset: number): Component {
       this._yOffset = offset;
-      this._invalidateLayout();
+      this.redraw();
       return this;
     }
 
@@ -334,16 +340,12 @@ export module Component {
      * @param {Interaction} interaction The Interaction to attach to the Component.
      * @returns {Component} The calling Component.
      */
-    public registerInteraction(interaction: Interaction.AbstractInteraction) {
+    public registerInteraction(interaction: Interaction) {
       // Interactions can be registered before or after anchoring. If registered before, they are
       // pushed to this._interactionsToRegister and registered during anchoring. If after, they are
       // registered immediately
       if (this._element) {
-        if (!this._hitBox && interaction._requiresHitbox()) {
-            this._hitBox = this._addBox("hit-box");
-            this._hitBox.style("fill", "#ffffff").style("opacity", 0); // We need to set these so Chrome will register events
-        }
-        interaction._anchor(this, this._hitBox);
+        interaction._anchor(this);
       } else {
         this._interactionsToRegister.push(interaction);
       }
@@ -362,9 +364,9 @@ export module Component {
      *
      * @param {string} cssClass The CSS class to add or remove.
      * @param {boolean} addClass If true, adds the provided CSS class; otherwise, removes it.
-     * @returns {AbstractComponent} The calling Component.
+     * @returns {Component} The calling Component.
      */
-    public classed(cssClass: string, addClass: boolean): AbstractComponent;
+    public classed(cssClass: string, addClass: boolean): Component;
     public classed(cssClass: string, addClass?: boolean): any {
       if (addClass == null) {
         if (cssClass == null) {
@@ -412,15 +414,15 @@ export module Component {
       return this._fixedHeightFlag;
     }
 
-    public _merge(c: AbstractComponent, below: boolean): Component.Group {
-      var cg: Component.Group;
-      if (Plottable.Component.Group.prototype.isPrototypeOf(c)) {
-        cg = (<Plottable.Component.Group> c);
+    public _merge(c: Component, below: boolean): Components.Group {
+      var cg: Components.Group;
+      if (Plottable.Components.Group.prototype.isPrototypeOf(c)) {
+        cg = (<Plottable.Components.Group> c);
         cg._addComponent(this, below);
         return cg;
       } else {
         var mergedComponents = below ? [this, c] : [c, this];
-        cg = new Plottable.Component.Group(mergedComponents);
+        cg = new Plottable.Components.Group(mergedComponents);
         return cg;
       }
     }
@@ -438,7 +440,7 @@ export module Component {
      * @param {Component} c The component to merge in.
      * @returns {ComponentGroup} The relevant ComponentGroup out of the above four cases.
      */
-    public above(c: AbstractComponent): Component.Group {
+    public above(c: Component): Components.Group {
       return this._merge(c, false);
     }
 
@@ -455,7 +457,7 @@ export module Component {
      * @param {Component} c The component to merge in.
      * @returns {ComponentGroup} The relevant ComponentGroup out of the above four cases.
      */
-    public below(c: AbstractComponent): Component.Group {
+    public below(c: Component): Components.Group {
       return this._merge(c, true);
     }
 
@@ -472,7 +474,7 @@ export module Component {
         this._element.remove();
       }
 
-      var parent: AbstractComponentContainer = this._parent();
+      var parent: ComponentContainer = this._parent();
 
       if (parent != null) {
         parent._removeComponent(this);
@@ -482,9 +484,9 @@ export module Component {
       return this;
     }
 
-    public _parent(): AbstractComponentContainer;
-    public _parent(parentElement: AbstractComponentContainer): any;
-    public _parent(parentElement?: AbstractComponentContainer): any {
+    public _parent(): ComponentContainer;
+    public _parent(parentElement: ComponentContainer): any;
+    public _parent(parentElement?: ComponentContainer): any {
       if (parentElement === undefined) {
         return this._parentElement;
       }
@@ -526,10 +528,7 @@ export module Component {
      * @return {Point} The x-y position of the Component relative to its parent.
      */
     public origin(): Point {
-      return {
-        x: this._xOrigin,
-        y: this._yOrigin
-      };
+      return this._origin;
     }
 
     /**
@@ -584,18 +583,5 @@ export module Component {
     public background(): D3.Selection {
       return this._backgroundContainer;
     }
-
-    /**
-     * Returns the hitbox selection for the component
-     * (A selection in front of the foreground used mainly for interactions)
-     *
-     * Will return undefined if the component has not been anchored
-     *
-     * @return {D3.Selection} hitbox selection for the component
-     */
-    public hitBox(): D3.Selection {
-      return this._hitBox;
-    }
   }
-}
 }

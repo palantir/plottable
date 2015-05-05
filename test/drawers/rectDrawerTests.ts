@@ -3,13 +3,13 @@
 describe("Drawers", () => {
   describe("Rect Drawer", () => {
     it("getPixelPoint vertical", () => {
-      var svg = generateSVG(300, 300);
+      var svg = TestMethods.generateSVG(300, 300);
       var data = [{a: "foo", b: 10}, {a: "bar", b: 24}];
-      var xScale = new Plottable.Scale.Category();
-      var yScale = new Plottable.Scale.Linear();
-      var barPlot = new Plottable.Plot.Bar(xScale, yScale);
+      var xScale = new Plottable.Scales.Category();
+      var yScale = new Plottable.Scales.Linear();
+      var barPlot = new Plottable.Plots.Bar(xScale, yScale);
 
-      var drawer = new Plottable._Drawer.Rect("one", true);
+      var drawer = new Plottable.Drawers.Rect("one", true);
       (<any> barPlot)._getDrawer = () => drawer;
 
       barPlot.addDataset("one", data);
@@ -28,13 +28,13 @@ describe("Drawers", () => {
     });
 
     it("getPixelPoint horizontal", () => {
-      var svg = generateSVG(300, 300);
+      var svg = TestMethods.generateSVG(300, 300);
       var data = [{ a: "foo", b: 10 }, { a: "bar", b: 24 }];
-      var xScale = new Plottable.Scale.Linear();
-      var yScale = new Plottable.Scale.Category();
-      var barPlot = new Plottable.Plot.Bar(xScale, yScale, false);
+      var xScale = new Plottable.Scales.Linear();
+      var yScale = new Plottable.Scales.Category();
+      var barPlot = new Plottable.Plots.Bar(xScale, yScale, false);
 
-      var drawer = new Plottable._Drawer.Rect("one", false);
+      var drawer = new Plottable.Drawers.Rect("one", false);
       (<any> barPlot)._getDrawer = () => drawer;
 
       barPlot.addDataset("one", data);

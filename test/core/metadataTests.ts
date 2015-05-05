@@ -3,20 +3,20 @@
 var assert = chai.assert;
 
 describe("Metadata", () => {
-  var xScale: Plottable.Scale.Linear;
-  var yScale: Plottable.Scale.Linear;
+  var xScale: Plottable.Scales.Linear;
+  var yScale: Plottable.Scales.Linear;
   var data1 = [{x: 0, y: 0}, {x: 1, y: 1}];
   var data2 = [{x: 2, y: 2}, {x: 3, y: 3}];
   before(() => {
-    xScale = new Plottable.Scale.Linear();
-    yScale = new Plottable.Scale.Linear();
+    xScale = new Plottable.Scales.Linear();
+    yScale = new Plottable.Scales.Linear();
     xScale.domain([0, 400]);
     yScale.domain([400, 0]);
   });
 
   it("plot metadata is set properly", () => {
     var d1 = new Plottable.Dataset();
-    var r = new Plottable.Plot.AbstractPlot()
+    var r = new Plottable.Plot()
                               .addDataset("d1", d1)
                               .addDataset( d1)
                               .addDataset("d2", [])
@@ -28,12 +28,12 @@ describe("Metadata", () => {
   });
 
   it("user metadata is applied", () => {
-    var svg = generateSVG(400, 400);
+    var svg = TestMethods.generateSVG(400, 400);
     var metadata = {foo: 10, bar: 20};
     var xAccessor = (d: any, i: number, u: any) => d.x + i * u.foo;
     var yAccessor = (d: any, i: number, u: any) => u.bar;
     var dataset = new Plottable.Dataset(data1, metadata);
-    var plot = new Plottable.Plot.Scatter(xScale, yScale)
+    var plot = new Plottable.Plots.Scatter(xScale, yScale)
                                 .project("x", xAccessor)
                                 .project("y", yAccessor);
     plot.addDataset(dataset);
@@ -62,14 +62,14 @@ describe("Metadata", () => {
   });
 
   it("user metadata is applied to associated dataset", () => {
-    var svg = generateSVG(400, 400);
+    var svg = TestMethods.generateSVG(400, 400);
     var metadata1 = {foo: 10};
     var metadata2 = {foo: 30};
     var xAccessor = (d: any, i: number, u: any) => d.x + (i + 1) * u.foo;
     var yAccessor = () => 0;
     var dataset1 = new Plottable.Dataset(data1, metadata1);
     var dataset2 = new Plottable.Dataset(data2, metadata2);
-    var plot = new Plottable.Plot.Scatter(xScale, yScale)
+    var plot = new Plottable.Plots.Scatter(xScale, yScale)
                                 .project("x", xAccessor)
                                 .project("y", yAccessor);
     plot.addDataset(dataset1);
@@ -94,10 +94,10 @@ describe("Metadata", () => {
   });
 
   it("plot metadata is applied", () => {
-    var svg = generateSVG(400, 400);
+    var svg = TestMethods.generateSVG(400, 400);
     var xAccessor = (d: any, i: number, u: any, m: any) => d.x + (i + 1) * m.foo;
     var yAccessor = () => 0;
-    var plot = new Plottable.Plot.Scatter(xScale, yScale)
+    var plot = new Plottable.Plots.Scatter(xScale, yScale)
                                 .project("x", xAccessor)
                                 .project("y", yAccessor);
     (<any> plot)._getPlotMetadataForDataset = (key: string) => {
@@ -128,10 +128,10 @@ describe("Metadata", () => {
   });
 
   it("plot metadata is per plot", () => {
-    var svg = generateSVG(400, 400);
+    var svg = TestMethods.generateSVG(400, 400);
     var xAccessor = (d: any, i: number, u: any, m: any) => d.x + (i + 1) * m.foo;
     var yAccessor = () => 0;
-    var plot1 = new Plottable.Plot.Scatter(xScale, yScale)
+    var plot1 = new Plottable.Plots.Scatter(xScale, yScale)
                                 .project("x", xAccessor)
                                 .project("y", yAccessor);
     (<any> plot1)._getPlotMetadataForDataset = (key: string) => {
@@ -142,7 +142,7 @@ describe("Metadata", () => {
     };
     plot1.addDataset(data1);
     plot1.addDataset(data2);
-    var plot2 = new Plottable.Plot.Scatter(xScale, yScale)
+    var plot2 = new Plottable.Plots.Scatter(xScale, yScale)
                                 .project("x", xAccessor)
                                 .project("y", yAccessor);
     (<any> plot2)._getPlotMetadataForDataset = (key: string) => {
@@ -189,12 +189,12 @@ describe("Metadata", () => {
   });
 
   it("_getExtent works as expected with plot metadata", () => {
-    var svg = generateSVG(400, 400);
+    var svg = TestMethods.generateSVG(400, 400);
     var metadata = {foo: 11};
     var id = (d: any) => d;
     var dataset = new Plottable.Dataset(data1, metadata);
     var a = (d: any, i: number, u: any, m: any) => d.x + u.foo + m.foo;
-    var plot = new Plottable.Plot.AbstractPlot().project("a", a, xScale);
+    var plot = new Plottable.Plot().project("a", a, xScale);
     (<any> plot)._getPlotMetadataForDataset = (key: string) => {
       return {
         datasetKey: key,
@@ -210,31 +210,31 @@ describe("Metadata", () => {
   });
 
   it("each plot passes metadata to projectors", () => {
-    var svg = generateSVG(400, 400);
+    var svg = TestMethods.generateSVG(400, 400);
     var metadata = {foo: 11};
     var dataset1 = new Plottable.Dataset(data1, metadata);
     var dataset2 = new Plottable.Dataset(data2, metadata);
 
-    var checkPlot = (plot: Plottable.Plot.AbstractPlot) => {
+    var checkPlot = (plot: Plottable.Plot) => {
       plot.addDataset("ds1", dataset1)
           .addDataset("ds2", dataset2)
-          .project("x", (d: any, i: number, u: any, m: Plottable.Plot.PlotMetadata) => d.x + u.foo + m.datasetKey.length)
-          .project("y", (d: any, i: number, u: any, m: Plottable.Plot.PlotMetadata) => d.y + u.foo - m.datasetKey.length);
+          .project("x", (d: any, i: number, u: any, m: Plottable.Plots.PlotMetadata) => d.x + u.foo + m.datasetKey.length)
+          .project("y", (d: any, i: number, u: any, m: Plottable.Plots.PlotMetadata) => d.y + u.foo - m.datasetKey.length);
 
       // This should not crash. If some metadata is not passed, undefined property error will be raised during accessor call.
       plot.renderTo(svg);
       plot.remove();
     };
 
-    checkPlot(new Plottable.Plot.Area(xScale, yScale));
-    checkPlot(new Plottable.Plot.StackedArea(xScale, yScale));
-    checkPlot(new Plottable.Plot.Bar(xScale, yScale));
-    checkPlot(new Plottable.Plot.StackedBar(xScale, yScale));
-    checkPlot(new Plottable.Plot.StackedBar(yScale, xScale, false));
-    checkPlot(new Plottable.Plot.ClusteredBar(xScale, yScale));
-    checkPlot(new Plottable.Plot.Pie().project("value", "x"));
-    checkPlot(new Plottable.Plot.Bar(xScale, yScale, false));
-    checkPlot(new Plottable.Plot.Scatter(xScale, yScale));
+    checkPlot(new Plottable.Plots.Area(xScale, yScale));
+    checkPlot(new Plottable.Plots.StackedArea(xScale, yScale));
+    checkPlot(new Plottable.Plots.Bar(xScale, yScale));
+    checkPlot(new Plottable.Plots.StackedBar(xScale, yScale));
+    checkPlot(new Plottable.Plots.StackedBar(yScale, xScale, false));
+    checkPlot(new Plottable.Plots.ClusteredBar(xScale, yScale));
+    checkPlot(new Plottable.Plots.Pie().project("value", "x"));
+    checkPlot(new Plottable.Plots.Bar(xScale, yScale, false));
+    checkPlot(new Plottable.Plots.Scatter(xScale, yScale));
     svg.remove();
   });
 });

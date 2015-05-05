@@ -1,7 +1,7 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Animator {
+export module Animators {
 
   /**
    * An animator implementation with no animation. The attributes are

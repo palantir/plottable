@@ -19,26 +19,26 @@ function run(svg, data, Plottable) {
 
 
   //Axis
-  var xScale = new Plottable.Scale.Linear();
-  var yScale = new Plottable.Scale.Linear();
-  var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
-  var yAxis = new Plottable.Axis.Numeric(yScale, "left");
+  var xScale = new Plottable.Scales.Linear();
+  var yScale = new Plottable.Scales.Linear();
+  var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
+  var yAxis = new Plottable.Axes.Numeric(yScale, "left");
 
-  var IdTitle = new Plottable.Component.Label("Identity");
-  var GenTitle = new Plottable.Component.Label("General");
-  var FixTitle = new Plottable.Component.Label("Fixed");
-  var CurrTitle = new Plottable.Component.Label("Currency");
-  var PerTitle = new Plottable.Component.Label("Percentage");
-  var SITitle = new Plottable.Component.Label("SI");
-  var CustTitle = new Plottable.Component.Label("Custom");
+  var IdTitle = new Plottable.Components.Label("Identity");
+  var GenTitle = new Plottable.Components.Label("General");
+  var FixTitle = new Plottable.Components.Label("Fixed");
+  var CurrTitle = new Plottable.Components.Label("Currency");
+  var PerTitle = new Plottable.Components.Label("Percentage");
+  var SITitle = new Plottable.Components.Label("SI");
+  var CustTitle = new Plottable.Components.Label("Custom");
 
   var custFormatter = function(d) { return "= ' w ' ="; };
 
-  var plot = new Plottable.Plot.Line(xScale, yScale).addDataset(dataseries1);
+  var plot = new Plottable.Plots.Line(xScale, yScale).addDataset(dataseries1);
   plot.project("x", "x", xScale).project("y", "y", yScale);
-  var basicTable = new Plottable.Component.Table([[yAxis, plot], [null, xAxis]]);
-  var formatChoices = new Plottable.Component.Table([[IdTitle, GenTitle, FixTitle],[CurrTitle, null, PerTitle], [SITitle, null, CustTitle]]);
-  var bigTable = new Plottable.Component.Table([[basicTable],[formatChoices]]);
+  var basicTable = new Plottable.Components.Table([[yAxis, plot], [null, xAxis]]);
+  var formatChoices = new Plottable.Components.Table([[IdTitle, GenTitle, FixTitle],[CurrTitle, null, PerTitle], [SITitle, null, CustTitle]]);
+  var bigTable = new Plottable.Components.Table([[basicTable],[formatChoices]]);
   formatChoices.xAlign("center");
 
   bigTable.renderTo(svg);
@@ -73,12 +73,12 @@ function run(svg, data, Plottable) {
      yAxis.formatter(custFormatter);
   }
 
-  IdTitle.registerInteraction(new Plottable.Interaction.Click().onClick(identity_frmt));
-  GenTitle.registerInteraction(new Plottable.Interaction.Click().onClick(general_frmt));
-  FixTitle.registerInteraction(new Plottable.Interaction.Click().onClick(fixed_frmt));
-  CurrTitle.registerInteraction(new Plottable.Interaction.Click().onClick(currency_frmt));
-  PerTitle.registerInteraction(new Plottable.Interaction.Click().onClick(percentage_frmt));
-  SITitle.registerInteraction(new Plottable.Interaction.Click().onClick(SI_frmt));
-  CustTitle.registerInteraction(new Plottable.Interaction.Click().onClick(custom_frmt));
+  IdTitle.registerInteraction(new Plottable.Interactions.Click().onClick(identity_frmt));
+  GenTitle.registerInteraction(new Plottable.Interactions.Click().onClick(general_frmt));
+  FixTitle.registerInteraction(new Plottable.Interactions.Click().onClick(fixed_frmt));
+  CurrTitle.registerInteraction(new Plottable.Interactions.Click().onClick(currency_frmt));
+  PerTitle.registerInteraction(new Plottable.Interactions.Click().onClick(percentage_frmt));
+  SITitle.registerInteraction(new Plottable.Interactions.Click().onClick(SI_frmt));
+  CustTitle.registerInteraction(new Plottable.Interactions.Click().onClick(custom_frmt));
 
 }

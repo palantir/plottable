@@ -1,8 +1,8 @@
 ///<reference path="../../reference.ts" />
 
 module Plottable {
-export module Axis {
-  export class Category extends AbstractAxis {
+export module Axes {
+  export class Category extends Axis {
     private _tickLabelAngle = 0;
     private _measurer: SVGTypewriter.Measurers.CacheCharacterMeasurer;
     private _wrapper: SVGTypewriter.Wrappers.SingleLineWrapper;
@@ -20,7 +20,7 @@ export module Axis {
      * @param {string} orientation The orientation of the Axis (top/bottom/left/right) (default = "bottom").
      * @param {Formatter} formatter The Formatter for the Axis (default Formatters.identity())
      */
-    constructor(scale: Scale.Category, orientation = "bottom", formatter = Formatters.identity()) {
+    constructor(scale: Scales.Category, orientation = "bottom", formatter = Formatters.identity()) {
       super(scale, orientation, formatter);
       this.classed("category-axis", true);
     }
@@ -33,7 +33,7 @@ export module Axis {
     }
 
     protected _rescale() {
-      return this._invalidateLayout();
+      return this.redraw();
     }
 
     public _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
@@ -47,7 +47,7 @@ export module Axis {
         };
       }
 
-      var categoryScale: Scale.Category = <Scale.Category> this._scale;
+      var categoryScale: Scales.Category = <Scales.Category> this._scale;
       var fakeScale = categoryScale.copy();
       if (this._isHorizontal()) {
         fakeScale.range([0, offeredWidth]);
@@ -88,7 +88,7 @@ export module Axis {
         throw new Error("Angle " + angle + " not supported; only 0, 90, and -90 are valid values");
       }
       this._tickLabelAngle = angle;
-      this._invalidateLayout();
+      this.redraw();
       return this;
     }
 
@@ -96,11 +96,11 @@ export module Axis {
      * Measures the size of the ticks while also writing them to the DOM.
      * @param {D3.Selection} ticks The tick elements to be written to.
      */
-    private _drawTicks(axisWidth: number, axisHeight: number, scale: Scale.Category, ticks: D3.Selection) {
+    private _drawTicks(axisWidth: number, axisHeight: number, scale: Scales.Category, ticks: D3.Selection) {
       var self = this;
       var xAlign: {[s: string]: string};
       var yAlign: {[s: string]: string};
-      switch(this.tickLabelAngle()) {
+      switch (this.tickLabelAngle()) {
         case 0:
           xAlign = {left: "right",  right: "left", top: "center", bottom: "center"};
           yAlign = {left: "center",  right: "center", top: "bottom", bottom: "top"};
@@ -134,7 +134,7 @@ export module Axis {
      *
      * @param {string[]} ticks The strings that will be printed on the ticks.
      */
-    private _measureTicks(axisWidth: number, axisHeight: number, scale: Scale.Category, ticks: string[]) {
+    private _measureTicks(axisWidth: number, axisHeight: number, scale: Scales.Category, ticks: string[]) {
       var wrappingResults = ticks.map((s: string) => {
         var bandWidth = scale.stepWidth();
 
@@ -164,8 +164,8 @@ export module Axis {
       });
 
       // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
-      var widthFn = (this._isHorizontal() && this._tickLabelAngle === 0) ? d3.sum : _Util.Methods.max;
-      var heightFn = (this._isHorizontal() && this._tickLabelAngle === 0) ? _Util.Methods.max : d3.sum;
+      var widthFn = (this._isHorizontal() && this._tickLabelAngle === 0) ? d3.sum : Utils.Methods.max;
+      var heightFn = (this._isHorizontal() && this._tickLabelAngle === 0) ? Utils.Methods.max : d3.sum;
 
       var textFits = wrappingResults.every((t: SVGTypewriter.Wrappers.WrappingResult) =>
                     !SVGTypewriter.Utils.StringMethods.isNotEmptyString(t.truncatedText) && t.noLines === 1);
@@ -191,8 +191,8 @@ export module Axis {
 
     public _doRender() {
       super._doRender();
-      var catScale = <Scale.Category> this._scale;
-      var tickLabels = this._tickLabelContainer.selectAll("." + AbstractAxis.TICK_LABEL_CLASS).data(this._scale.domain(), (d) => d);
+      var catScale = <Scales.Category> this._scale;
+      var tickLabels = this._tickLabelContainer.selectAll("." + Axis.TICK_LABEL_CLASS).data(this._scale.domain(), (d) => d);
 
       var getTickLabelTransform = (d: string, i: number) => {
         var innerPaddingWidth = catScale.stepWidth() - catScale.rangeBand();
@@ -201,26 +201,25 @@ export module Axis {
         var y = this._isHorizontal() ? 0 : scaledValue;
         return "translate(" + x + "," + y + ")";
       };
-      tickLabels.enter().append("g").classed(AbstractAxis.TICK_LABEL_CLASS, true);
+      tickLabels.enter().append("g").classed(Axis.TICK_LABEL_CLASS, true);
       tickLabels.exit().remove();
       tickLabels.attr("transform", getTickLabelTransform);
       // erase all text first, then rewrite
       tickLabels.text("");
       this._drawTicks(this.width(), this.height(), catScale, tickLabels);
-      var translate = this._isHorizontal() ? [catScale.rangeBand() / 2, 0] : [0, catScale.rangeBand() / 2];
 
       var xTranslate = this.orient() === "right" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
       var yTranslate = this.orient() === "bottom" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
-      _Util.DOM.translate(this._tickLabelContainer, xTranslate, yTranslate);
+      Utils.DOM.translate(this._tickLabelContainer, xTranslate, yTranslate);
       return this;
     }
 
-    public _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number) {
-      // When anyone calls _invalidateLayout, _computeLayout will be called
+    public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
+      // When anyone calls redraw(), computeLayout() will be called
       // on everyone, including this. Since CSS or something might have
       // affected the size of the characters, clear the cache.
       this._measurer.reset();
-      return super._computeLayout(offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
+      return super.computeLayout(origin, availableWidth, availableHeight);
     }
   }
 }

@@ -12,49 +12,71 @@ function run(svg, data, Plottable){
   deep_copy(data[0], d);
   var dataset = new Plottable.Dataset(d);
 
-  var xScale = new Plottable.Scale.Linear();
-  var yScale = new Plottable.Scale.Linear();
-  var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
-  var yAxis = new Plottable.Axis.Numeric(yScale, "left");
-  
-  var plot = new Plottable.Plot.Scatter(xScale, yScale);
+  var xScale = new Plottable.Scales.Linear();
+  var yScale = new Plottable.Scales.Linear();
+  var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
+  var yAxis = new Plottable.Axes.Numeric(yScale, "left");
+
+  var plot = new Plottable.Plots.Scatter(xScale, yScale);
   plot.addDataset(dataset);
+
+  var triangleUpFactory = Plottable.SymbolFactories.triangleUp();
+  var circleFactory = Plottable.SymbolFactories.circle();
+  var crossFactory = Plottable.SymbolFactories.cross();
+  var triangleDownFactory = Plottable.SymbolFactories.triangleDown();
+  var fourSymbolAccessor = function (datum) {
+    if (datum.y > 0) {
+      return (datum.x > 0) ? triangleUpFactory : circleFactory;
+    } else {
+      return (datum.x > 0) ? crossFactory : triangleDownFactory;
+    }
+  };
+  var symbolSize = 15;
   plot.project("x", "x", xScale)
   .project("y", "y", yScale)
-  .project("r", 15)
-  .project("symbol", Plottable.SymbolGenerators.d3Symbol( function (datum) {return datum.y>0?(datum.x>0?"triangle-up":"circle"):(datum.x>0?"cross":"triangle-down");}))
+  .project("size", symbolSize)
+  .project("symbol", fourSymbolAccessor)
   .project("fill", function(datum){return datum.y>0?(datum.x>0?"#00bb00":"#bbbbbb"):(datum.x>0?"#bbbbbb":"#bb0000");});
-    
-  var title = new Plottable.Component.Label("n = new point, d = delete point");
-  var cs = new Plottable.Scale.Color();
-  var legend = new Plottable.Component.Legend(cs);
-  cs.domain(["x+y+", "x+y-", "x-y+", "x-y-"]); 
+
+  var title = new Plottable.Components.Label("n = new point, d = delete point");
+  var cs = new Plottable.Scales.Color();
+  var legend = new Plottable.Components.Legend(cs);
+  cs.domain(["x+y+", "x+y-", "x-y+", "x-y-"]);
   cs.range(["#00bb00", "#bbbbbb", "#bbbbbb", "#bb0000"]);
-  
-  legend.symbolGenerator(Plottable.SymbolGenerators.d3Symbol( function (d, i) {
-      if(d === "x+y+"){ return "triangle-up";}
-      if(d === "x+y-"){ return "cross";}
-      if(d === "x-y+") { return "circle";}
-      if(d === "x-y-"){ return "triangle-down";}
-  }));
-  
-  var table = new Plottable.Component.Table([[null, title, null],
+
+  legend.symbolFactoryAccessor(function (d, i) {
+    if(d === "x+y+") { return triangleUpFactory; }
+    if(d === "x+y-") { return crossFactory; }
+    if(d === "x-y+") { return circleFactory; }
+    if(d === "x-y-") { return triangleDownFactory; }
+  });
+
+  var table = new Plottable.Components.Table([[null, title, null],
                                              [yAxis, plot, legend],
                                              [null, xAxis, null]]);
   table.renderTo(svg);
-  
-  var hover = new Plottable.Interaction.Hover();
-  hover.onHoverOver(function(hoverData) {
-    var xString = hoverData.data[0].x.toFixed(2);
-    var yString = hoverData.data[0].y.toFixed(2);
-    title.text("[ " + xString + ", " + yString + " ]");
+
+  var pointer = new Plottable.Interactions.Pointer();
+  var defaultTitleText = "n = new point, d = delete last point, c = log points";
+  pointer.onPointerMove(function(p) {
+    var cpd = plot.getClosestPlotData(p);
+    if (cpd.data.length > 0) {
+      var dist = Math.sqrt(Math.pow((p.x - cpd.pixelPoints[0].x), 2) + Math.pow((p.y - cpd.pixelPoints[0].y), 2));
+      if (dist < symbolSize / 2) {
+        var xString = cpd.data[0].x.toFixed(2);
+        var yString = cpd.data[0].y.toFixed(2);
+        title.text("[ " + xString + ", " + yString + " ]");
+        return;
+      }
+    }
+    title.text(defaultTitleText);
   });
-  hover.onHoverOut(function(hoverData) {
-    title.text("n = new point, d = delete point, c = log points");
+  pointer.onPointerExit(function() {
+    title.text(defaultTitleText);
   });
-  
-  var key = new Plottable.Interaction.Key();
-  key.on(78, function(keyData){     
+
+  var key = new Plottable.Interactions.Key();
+  key.on(78, function(keyData){
       d.push({x: Math.random() - 0.5, y: Math.random() - 0.5});
       dataset.data(d);
   });
@@ -63,9 +85,9 @@ function run(svg, data, Plottable){
       if(d.length > 0){
         d.splice(d.length-1,1);
         dataset.data(d);
-      }     
+      }
   });
-    
-  plot.registerInteraction(hover);
+
+  plot.registerInteraction(pointer);
   plot.registerInteraction(key);
 }

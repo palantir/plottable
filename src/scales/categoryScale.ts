@@ -1,8 +1,8 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Scale {
-  export class Category extends AbstractScale<string, number> {
+export module Scales {
+  export class Category extends Scale<string, number> {
     protected _d3Scale: D3.Scale.OrdinalScale;
     private _range = [0, 1];
 
@@ -28,7 +28,7 @@ export module Scale {
 
     protected _getExtent(): string[] {
       var extents: string[][] = this._getAllExtents();
-      return _Util.Methods.uniq(_Util.Methods.flatten(extents));
+      return Utils.Methods.uniq(Utils.Methods.flatten(extents));
     }
 
     public domain(): string[];
@@ -69,7 +69,7 @@ export module Scale {
      *
      * @returns {number} The range band width
      */
-    public rangeBand() : number {
+    public rangeBand(): number {
       return this._d3Scale.rangeBand();
     }
 
@@ -146,7 +146,7 @@ export module Scale {
     }
 
     public scale(value: string): number {
-      //scale it to the middle
+      // scale it to the middle
       return super.scale(value) + this.rangeBand() / 2;
     }
   }

@@ -1,10 +1,10 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Component {
-  export class Gridlines extends AbstractComponent {
-    private _xScale: Scale.AbstractQuantitative<any>;
-    private _yScale: Scale.AbstractQuantitative<any>;
+export module Components {
+  export class Gridlines extends Component {
+    private _xScale: QuantitativeScale<any>;
+    private _yScale: QuantitativeScale<any>;
     private _xLinesContainer: D3.Selection;
     private _yLinesContainer: D3.Selection;
 
@@ -12,15 +12,15 @@ export module Component {
      * Creates a set of Gridlines.
      * @constructor
      *
-     * @param {QuantitativeScale} xScale The scale to base the x gridlines on. Pass null if no gridlines are desired.
-     * @param {QuantitativeScale} yScale The scale to base the y gridlines on. Pass null if no gridlines are desired.
+     * @param {QuantitativeScaleScale} xScale The scale to base the x gridlines on. Pass null if no gridlines are desired.
+     * @param {QuantitativeScaleScale} yScale The scale to base the y gridlines on. Pass null if no gridlines are desired.
      */
-    constructor(xScale: Scale.AbstractQuantitative<any>, yScale: Scale.AbstractQuantitative<any>) {
-      if (xScale != null && !(Scale.AbstractQuantitative.prototype.isPrototypeOf(xScale))) {
-        throw new Error("xScale needs to inherit from Scale.AbstractQuantitative");
+    constructor(xScale: QuantitativeScale<any>, yScale: QuantitativeScale<any>) {
+      if (xScale != null && !(QuantitativeScale.prototype.isPrototypeOf(xScale))) {
+        throw new Error("xScale needs to inherit from Scale.QuantitativeScale");
       }
-      if (yScale != null && !(Scale.AbstractQuantitative.prototype.isPrototypeOf(yScale))) {
-        throw new Error("yScale needs to inherit from Scale.AbstractQuantitative");
+      if (yScale != null && !(QuantitativeScale.prototype.isPrototypeOf(yScale))) {
+        throw new Error("yScale needs to inherit from Scale.QuantitativeScale");
       }
       super();
       this.classed("gridlines", true);

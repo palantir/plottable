@@ -1,23 +1,22 @@
 ///<reference path="../testReference.ts" />
-
 var assert = chai.assert;
 
 describe("BaseAxis", () => {
   it("orientation", () => {
-    var scale = new Plottable.Scale.Linear();
-    assert.throws(() => new Plottable.Axis.AbstractAxis(scale, "blargh"), "unsupported");
+    var scale = new Plottable.Scales.Linear();
+    assert.throws(() => new Plottable.Axis(scale, "blargh"), "unsupported");
   });
 
   it("tickLabelPadding() rejects negative values", () => {
-    var scale = new Plottable.Scale.Linear();
-    var baseAxis = new Plottable.Axis.AbstractAxis(scale, "bottom");
+    var scale = new Plottable.Scales.Linear();
+    var baseAxis = new Plottable.Axis(scale, "bottom");
 
     assert.throws(() => baseAxis.tickLabelPadding(-1), "must be positive");
   });
 
   it("gutter() rejects negative values", () => {
-    var scale = new Plottable.Scale.Linear();
-    var axis = new Plottable.Axis.AbstractAxis(scale, "right");
+    var scale = new Plottable.Scales.Linear();
+    var axis = new Plottable.Axis(scale, "right");
 
     assert.throws(() => axis.gutter(-1), "must be positive");
   });
@@ -25,9 +24,9 @@ describe("BaseAxis", () => {
   it("width() + gutter()", () => {
     var SVG_WIDTH = 100;
     var SVG_HEIGHT = 500;
-    var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-    var scale = new Plottable.Scale.Linear();
-    var verticalAxis = new Plottable.Axis.AbstractAxis(scale, "right");
+    var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+    var scale = new Plottable.Scales.Linear();
+    var verticalAxis = new Plottable.Axis(scale, "right");
     verticalAxis.renderTo(svg);
 
     var expectedWidth = verticalAxis.tickLength() + verticalAxis.gutter(); // tick length and gutter by default
@@ -43,9 +42,9 @@ describe("BaseAxis", () => {
   it("height() + gutter()", () => {
     var SVG_WIDTH = 500;
     var SVG_HEIGHT = 100;
-    var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-    var scale = new Plottable.Scale.Linear();
-    var horizontalAxis = new Plottable.Axis.AbstractAxis(scale, "bottom");
+    var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+    var scale = new Plottable.Scales.Linear();
+    var horizontalAxis = new Plottable.Axis(scale, "bottom");
     horizontalAxis.renderTo(svg);
 
     var expectedHeight = horizontalAxis.tickLength() + horizontalAxis.gutter(); // tick length and gutter by default
@@ -61,16 +60,16 @@ describe("BaseAxis", () => {
   it("draws ticks and baseline (horizontal)", () => {
     var SVG_WIDTH = 500;
     var SVG_HEIGHT = 100;
-    var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-    var scale = new Plottable.Scale.Linear();
+    var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+    var scale = new Plottable.Scales.Linear();
     scale.domain([0, 10]);
     scale.range([0, SVG_WIDTH]);
-    var baseAxis = new Plottable.Axis.AbstractAxis(scale, "bottom");
+    var baseAxis = new Plottable.Axis(scale, "bottom");
     var tickValues = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
     (<any> baseAxis)._getTickValues = function() { return tickValues; };
     baseAxis.renderTo(svg);
 
-    var tickMarks = svg.selectAll("." + Plottable.Axis.AbstractAxis.TICK_MARK_CLASS);
+    var tickMarks = svg.selectAll("." + Plottable.Axis.TICK_MARK_CLASS);
     assert.strictEqual(tickMarks[0].length, tickValues.length, "A tick mark was created for each value");
     var baseline = svg.select(".baseline");
 
@@ -93,16 +92,16 @@ describe("BaseAxis", () => {
   it("draws ticks and baseline (vertical)", () => {
     var SVG_WIDTH = 100;
     var SVG_HEIGHT = 500;
-    var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-    var scale = new Plottable.Scale.Linear();
+    var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+    var scale = new Plottable.Scales.Linear();
     scale.domain([0, 10]);
     scale.range([0, SVG_HEIGHT]);
-    var baseAxis = new Plottable.Axis.AbstractAxis(scale, "left");
+    var baseAxis = new Plottable.Axis(scale, "left");
     var tickValues = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
     (<any> baseAxis)._getTickValues = function() { return tickValues; };
     baseAxis.renderTo(svg);
 
-    var tickMarks = svg.selectAll("." + Plottable.Axis.AbstractAxis.TICK_MARK_CLASS);
+    var tickMarks = svg.selectAll("." + Plottable.Axis.TICK_MARK_CLASS);
     assert.strictEqual(tickMarks[0].length, tickValues.length, "A tick mark was created for each value");
     var baseline = svg.select(".baseline");
 
@@ -125,15 +124,15 @@ describe("BaseAxis", () => {
   it("tickLength()", () => {
     var SVG_WIDTH = 500;
     var SVG_HEIGHT = 100;
-    var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-    var scale = new Plottable.Scale.Linear();
+    var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+    var scale = new Plottable.Scales.Linear();
     scale.domain([0, 10]);
     scale.range([0, SVG_WIDTH]);
-    var baseAxis = new Plottable.Axis.AbstractAxis(scale, "bottom");
+    var baseAxis = new Plottable.Axis(scale, "bottom");
     var tickValues = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
     (<any> baseAxis)._getTickValues = function() { return tickValues; };
     baseAxis.renderTo(svg);
-    var secondTickMark = svg.selectAll("." + Plottable.Axis.AbstractAxis.TICK_MARK_CLASS + ":nth-child(2)");
+    var secondTickMark = svg.selectAll("." + Plottable.Axis.TICK_MARK_CLASS + ":nth-child(2)");
     assert.strictEqual(secondTickMark.attr("x1"), "50");
     assert.strictEqual(secondTickMark.attr("x2"), "50");
     assert.strictEqual(secondTickMark.attr("y1"), "0");
@@ -150,16 +149,16 @@ describe("BaseAxis", () => {
   it("endTickLength()", () => {
     var SVG_WIDTH = 500;
     var SVG_HEIGHT = 100;
-    var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-    var scale = new Plottable.Scale.Linear();
+    var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+    var scale = new Plottable.Scales.Linear();
     scale.domain([0, 10]);
     scale.range([0, SVG_WIDTH]);
-    var baseAxis = new Plottable.Axis.AbstractAxis(scale, "bottom");
+    var baseAxis = new Plottable.Axis(scale, "bottom");
     var tickValues = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
     (<any> baseAxis)._getTickValues = () => tickValues;
     baseAxis.renderTo(svg);
 
-    var firstTickMark = svg.selectAll("." + Plottable.Axis.AbstractAxis.END_TICK_MARK_CLASS);
+    var firstTickMark = svg.selectAll("." + Plottable.Axis.END_TICK_MARK_CLASS);
     assert.strictEqual(firstTickMark.attr("x1"), "0");
     assert.strictEqual(firstTickMark.attr("x2"), "0");
     assert.strictEqual(firstTickMark.attr("y1"), "0");
@@ -176,9 +175,9 @@ describe("BaseAxis", () => {
   it("height is adjusted to greater of tickLength or endTickLength", () => {
     var SVG_WIDTH = 500;
     var SVG_HEIGHT = 100;
-    var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-    var scale = new Plottable.Scale.Linear();
-    var baseAxis = new Plottable.Axis.AbstractAxis(scale, "bottom");
+    var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+    var scale = new Plottable.Scales.Linear();
+    var baseAxis = new Plottable.Axis(scale, "bottom");
     baseAxis.showEndTickLabels(true);
     baseAxis.renderTo(svg);
 
@@ -198,14 +197,14 @@ describe("BaseAxis", () => {
   });
 
   it("default alignment based on orientation", () => {
-    var scale = new Plottable.Scale.Linear();
-    var baseAxis = new Plottable.Axis.AbstractAxis(scale, "bottom");
-    assert.equal((<any> baseAxis)._yAlignProportion, 0, "yAlignProportion defaults to 0 for bottom axis");
-    baseAxis = new Plottable.Axis.AbstractAxis(scale, "top");
-    assert.equal((<any> baseAxis)._yAlignProportion, 1, "yAlignProportion defaults to 1 for top axis");
-    baseAxis = new Plottable.Axis.AbstractAxis(scale, "left");
-    assert.equal((<any> baseAxis)._xAlignProportion, 1, "xAlignProportion defaults to 1 for left axis");
-    baseAxis = new Plottable.Axis.AbstractAxis(scale, "right");
-    assert.equal((<any> baseAxis)._xAlignProportion, 0, "xAlignProportion defaults to 0 for right axis");
+    var scale = new Plottable.Scales.Linear();
+    var baseAxis = new Plottable.Axis(scale, "bottom");
+    assert.strictEqual((<any> baseAxis)._yAlignProportion, 0, "yAlignProportion defaults to 0 for bottom axis");
+    baseAxis = new Plottable.Axis(scale, "top");
+    assert.strictEqual((<any> baseAxis)._yAlignProportion, 1, "yAlignProportion defaults to 1 for top axis");
+    baseAxis = new Plottable.Axis(scale, "left");
+    assert.strictEqual((<any> baseAxis)._xAlignProportion, 1, "xAlignProportion defaults to 1 for left axis");
+    baseAxis = new Plottable.Axis(scale, "right");
+    assert.strictEqual((<any> baseAxis)._xAlignProportion, 0, "xAlignProportion defaults to 0 for right axis");
   });
 });

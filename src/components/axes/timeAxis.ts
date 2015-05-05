@@ -1,7 +1,7 @@
 ///<reference path="../../reference.ts" />
 
 module Plottable {
-export module Axis {
+export module Axes {
   /**
    * Defines a configuration for a time axis tier.
    * For details on how ticks are generated see: https://github.com/mbostock/d3/wiki/Time-Scales#ticks
@@ -22,7 +22,7 @@ export module Axis {
    */
   export type TimeAxisConfiguration = TimeAxisTierConfiguration[];
 
-  export class Time extends AbstractAxis {
+  export class Time extends Axis {
     /**
      * The css class applied to each time axis tier
      */
@@ -164,7 +164,7 @@ export module Axis {
      * @param {TimeScale} scale The scale to base the Axis on.
      * @param {string} orientation The orientation of the Axis (top/bottom)
      */
-    constructor(scale: Scale.Time, orientation: string) {
+    constructor(scale: Scales.Time, orientation: string) {
       super(scale, orientation);
       this.classed("time-axis", true);
       this.tickLabelPadding(5);
@@ -181,7 +181,7 @@ export module Axis {
           throw new Error("Unsupported position for tier labels");
         }
         this._tierLabelPositions = newPositions;
-        this._invalidateLayout();
+        this.redraw();
         return this;
       }
     }
@@ -202,11 +202,11 @@ export module Axis {
      */
     public axisConfigurations(configurations: TimeAxisConfiguration[]): Time;
     public axisConfigurations(configurations?: any): any {
-      if(configurations == null){
+      if (configurations == null) {
         return this._possibleTimeAxisConfigurations;
       }
       this._possibleTimeAxisConfigurations = configurations;
-      this._numTiers = _Util.Methods.max(this._possibleTimeAxisConfigurations.map((config: TimeAxisConfiguration) => config.length), 0);
+      this._numTiers = Utils.Methods.max(this._possibleTimeAxisConfigurations.map((config: TimeAxisConfiguration) => config.length), 0);
 
       if (this._isAnchored) {
         this._setupDomElements();
@@ -219,7 +219,7 @@ export module Axis {
       }
       this.tierLabelPositions(newLabelPositions);
 
-      this._invalidateLayout();
+      this.redraw();
       return this;
     }
 
@@ -236,7 +236,7 @@ export module Axis {
       });
 
       if (mostPreciseIndex === this._possibleTimeAxisConfigurations.length) {
-        _Util.Methods.warn("zoomed out too far: could not find suitable interval to display labels");
+        Utils.Methods.warn("zoomed out too far: could not find suitable interval to display labels");
         --mostPreciseIndex;
       }
 
@@ -316,8 +316,8 @@ export module Axis {
 
       for (var i = 0; i < this._numTiers; ++i) {
         var tierContainer = this._content.append("g").classed(Time.TIME_AXIS_TIER_CLASS, true);
-        this._tierLabelContainers.push(tierContainer.append("g").classed(AbstractAxis.TICK_LABEL_CLASS + "-container", true));
-        this._tierMarkContainers.push(tierContainer.append("g").classed(AbstractAxis.TICK_MARK_CLASS + "-container", true));
+        this._tierLabelContainers.push(tierContainer.append("g").classed(Axis.TICK_LABEL_CLASS + "-container", true));
+        this._tierMarkContainers.push(tierContainer.append("g").classed(Axis.TICK_MARK_CLASS + "-container", true));
         this._tierBaselines.push(tierContainer.append("line").classed("baseline", true));
       }
 
@@ -325,7 +325,7 @@ export module Axis {
     }
 
     private _getTickIntervalValues(config: TimeAxisTierConfiguration): any[] {
-      return (<Scale.Time> this._scale).tickInterval(config.interval, config.step);
+      return (<Scales.Time> this._scale).tickInterval(config.interval, config.step);
     }
 
     protected _getTickValues(): any[] {
@@ -337,14 +337,14 @@ export module Axis {
 
     private _cleanTiers() {
       for (var index = 0; index < this._tierLabelContainers.length; index++) {
-        this._tierLabelContainers[index].selectAll("." + AbstractAxis.TICK_LABEL_CLASS).remove();
-        this._tierMarkContainers[index].selectAll("." + AbstractAxis.TICK_MARK_CLASS).remove();
+        this._tierLabelContainers[index].selectAll("." + Axis.TICK_LABEL_CLASS).remove();
+        this._tierMarkContainers[index].selectAll("." + Axis.TICK_MARK_CLASS).remove();
         this._tierBaselines[index].style("visibility", "hidden");
       }
     }
 
     private _getTickValuesForConfiguration(config: TimeAxisTierConfiguration) {
-      var tickPos = (<Scale.Time> this._scale).tickInterval(config.interval, config.step);
+      var tickPos = (<Scales.Time> this._scale).tickInterval(config.interval, config.step);
       var domain = this._scale.domain();
       var tickPosValues = tickPos.map((d: Date) => d.valueOf()); // can't indexOf with objects
       if (tickPosValues.indexOf(domain[0].valueOf()) === -1) {
@@ -370,18 +370,17 @@ export module Axis {
         labelPos = tickPos;
       }
 
-      var tickLabels = container.selectAll("." + AbstractAxis.TICK_LABEL_CLASS).data(labelPos, (d) => d.valueOf());
-      var tickLabelsEnter = tickLabels.enter().append("g").classed(AbstractAxis.TICK_LABEL_CLASS, true);
+      var tickLabels = container.selectAll("." + Axis.TICK_LABEL_CLASS).data(labelPos, (d) => d.valueOf());
+      var tickLabelsEnter = tickLabels.enter().append("g").classed(Axis.TICK_LABEL_CLASS, true);
       tickLabelsEnter.append("text");
       var xTranslate = (this._tierLabelPositions[index] === "center" || config.step === 1) ? 0 : this.tickLabelPadding();
-      var markLength = this._measurer.measure().height;
       var yTranslate = this.orient() === "bottom" ?
           d3.sum(this._tierHeights.slice(0, index + 1)) - this.tickLabelPadding() :
           this.height() - d3.sum(this._tierHeights.slice(0, index)) - this.tickLabelPadding();
 
       var textSelection = tickLabels.selectAll("text");
       if (textSelection.size() > 0) {
-        _Util.DOM.translate(textSelection, xTranslate, yTranslate);
+        Utils.DOM.translate(textSelection, xTranslate, yTranslate);
       }
       tickLabels.exit().remove();
       tickLabels.attr("transform", (d: any) => "translate(" + this._scale.scale(d) + ",0)");
@@ -390,8 +389,8 @@ export module Axis {
     }
 
     private _renderTickMarks(tickValues: Date[], index: number) {
-      var tickMarks = this._tierMarkContainers[index].selectAll("." + AbstractAxis.TICK_MARK_CLASS).data(tickValues);
-      tickMarks.enter().append("line").classed(AbstractAxis.TICK_MARK_CLASS, true);
+      var tickMarks = this._tierMarkContainers[index].selectAll("." + Axis.TICK_MARK_CLASS).data(tickValues);
+      tickMarks.enter().append("line").classed(Axis.TICK_MARK_CLASS, true);
       var attr = this._generateTickMarkAttrHash();
       var offset = this._tierHeights.slice(0, index).reduce((translate: number, height: number) => translate + height, 0);
       if (this.orient() === "bottom") {
@@ -413,15 +412,15 @@ export module Axis {
       d3.select(tickMarks[0][0]).attr(attr);
 
       // Add end-tick classes to first and last tick for CSS customization purposes
-      d3.select(tickMarks[0][0]).classed(AbstractAxis.END_TICK_MARK_CLASS, true);
-      d3.select(tickMarks[0][tickMarks.size() - 1]).classed(AbstractAxis.END_TICK_MARK_CLASS, true);
+      d3.select(tickMarks[0][0]).classed(Axis.END_TICK_MARK_CLASS, true);
+      d3.select(tickMarks[0][tickMarks.size() - 1]).classed(Axis.END_TICK_MARK_CLASS, true);
 
       tickMarks.exit().remove();
     }
 
     private _renderLabellessTickMarks(tickValues: Date[]) {
-      var tickMarks = this._tickMarkContainer.selectAll("." + AbstractAxis.TICK_MARK_CLASS).data(tickValues);
-      tickMarks.enter().append("line").classed(AbstractAxis.TICK_MARK_CLASS, true);
+      var tickMarks = this._tickMarkContainer.selectAll("." + Axis.TICK_MARK_CLASS).data(tickValues);
+      tickMarks.enter().append("line").classed(Axis.TICK_MARK_CLASS, true);
       var attr = this._generateTickMarkAttrHash();
       attr["y2"] = (this.orient() === "bottom") ? this.tickLabelPadding() : this.height() - this.tickLabelPadding();
       tickMarks.attr(attr);
@@ -501,7 +500,7 @@ export module Axis {
       };
 
       var visibleTickMarks = this._tierMarkContainers[index]
-                                    .selectAll("." + AbstractAxis.TICK_MARK_CLASS)
+                                    .selectAll("." + Axis.TICK_MARK_CLASS)
                                     .filter(function(d: Element, i: number) {
                                       var visibility = d3.select(this).style("visibility");
                                       return visibility === "visible" || visibility === "inherit";
@@ -511,7 +510,7 @@ export module Axis {
       var visibleTickMarkRects = visibleTickMarks[0].map((mark: Element) => mark.getBoundingClientRect() );
 
       var visibleTickLabels = this._tierLabelContainers[index]
-                                    .selectAll("." + AbstractAxis.TICK_LABEL_CLASS)
+                                    .selectAll("." + Axis.TICK_LABEL_CLASS)
                                     .filter(function(d: Element, i: number) {
                                       var visibility = d3.select(this).style("visibility");
                                       return visibility === "visible" || visibility === "inherit";
@@ -523,7 +522,7 @@ export module Axis {
         var tickLabel = d3.select(this);
         var leadingTickMark = visibleTickMarkRects[i];
         var trailingTickMark = visibleTickMarkRects[i + 1];
-        if (!isInsideBBox(clientRect) || (lastLabelClientRect != null && _Util.DOM.boxesOverlap(clientRect, lastLabelClientRect))
+        if (!isInsideBBox(clientRect) || (lastLabelClientRect != null && Utils.DOM.boxesOverlap(clientRect, lastLabelClientRect))
             || (leadingTickMark.right > clientRect.left || trailingTickMark.left < clientRect.right)) {
           tickLabel.style("visibility", "hidden");
         } else {

@@ -1,8 +1,8 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Component {
-  export class Legend extends AbstractComponent {
+export module Components {
+  export class Legend extends Component {
     /**
      * The css class applied to each legend row
      */
@@ -17,7 +17,7 @@ export module Component {
     public static LEGEND_SYMBOL_CLASS = "legend-symbol";
 
     private _padding = 5;
-    private _scale: Scale.Color;
+    private _scale: Scales.Color;
     private _maxEntriesPerRow: number;
     private _sortFn: (a: string, b: string) => number;
     private _measurer: SVGTypewriter.Measurers.Measurer;
@@ -34,7 +34,7 @@ export module Component {
      * @constructor
      * @param {Scale.Color} colorScale
      */
-    constructor(colorScale: Scale.Color) {
+    constructor(colorScale: Scales.Color) {
       super();
       this.classed("legend", true);
       this.maxEntriesPerRow(1);
@@ -44,7 +44,7 @@ export module Component {
       }
 
       this._scale = colorScale;
-      this._scale.broadcaster.registerListener(this, () => this._invalidateLayout());
+      this._scale.broadcaster.registerListener(this, () => this.redraw());
 
       this.xAlign("right").yAlign("top");
       this._fixedWidthFlag = true;
@@ -80,7 +80,7 @@ export module Component {
         return this._maxEntriesPerRow;
       } else {
         this._maxEntriesPerRow = numEntries;
-        this._invalidateLayout();
+        this.redraw();
         return this;
       }
     }
@@ -102,7 +102,7 @@ export module Component {
         return this._sortFn;
       } else {
         this._sortFn = newFn;
-        this._invalidateLayout();
+        this.redraw();
         return this;
       }
     }
@@ -112,20 +112,20 @@ export module Component {
      *
      * @returns {ColorScale} The current color scale.
      */
-    public scale(): Scale.Color;
+    public scale(): Scales.Color;
     /**
      * Assigns a new color scale to the Legend.
      *
      * @param {Scale.Color} scale If provided, the new scale.
      * @returns {Legend} The calling Legend.
      */
-    public scale(scale: Scale.Color): Legend;
-    public scale(scale?: Scale.Color): any {
+    public scale(scale: Scales.Color): Legend;
+    public scale(scale?: Scales.Color): any {
       if (scale != null) {
         this._scale.broadcaster.deregisterListener(this);
         this._scale = scale;
-        this._scale.broadcaster.registerListener(this, () => this._invalidateLayout());
-        this._invalidateLayout();
+        this._scale.broadcaster.registerListener(this, () => this.redraw());
+        this.redraw();
         return this;
       } else {
         return this._scale;
@@ -148,7 +148,7 @@ export module Component {
 
       var entries = this._scale.domain().slice();
       entries.sort(this.sortFunction());
-      var entryLengths = _Util.Methods.populateMap(entries, measureEntry);
+      var entryLengths = Utils.Methods.populateMap(entries, measureEntry);
 
       var rows = this._packRows(availableWidthForEntries, entries, entryLengths);
 
@@ -171,10 +171,10 @@ export module Component {
       var estimatedRowLengths = estimatedLayout.rows.map((row: string[]) => {
         return d3.sum(row, (entry: string) => estimatedLayout.entryLengths.get(entry));
       });
-      var longestEstimatedRowLength = _Util.Methods.max(estimatedRowLengths, 0);
+      var longestEstimatedRowLength = Utils.Methods.max(estimatedRowLengths, 0);
 
       return {
-        minWidth : this._padding + longestEstimatedRowLength,
+        minWidth: this._padding + longestEstimatedRowLength,
         minHeight: estimatedLayout.rows.length * estimatedLayout.textHeight + 2 * this._padding
       };
     }
@@ -194,7 +194,7 @@ export module Component {
         spaceLeft -= entryLength;
       });
 
-      if(currentRow.length !== 0) {
+      if (currentRow.length !== 0) {
         rows.push(currentRow);
       }
       return rows;

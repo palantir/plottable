@@ -1,8 +1,7 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Interaction {
-  export class AbstractInteraction extends Core.PlottableObject {
+  export class Interaction extends Core.PlottableObject {
     /**
      * It maintains a 'hitBox' which is where all event listeners are
      * attached. Due to cross- browser weirdness, the hitbox needs to be an
@@ -10,17 +9,10 @@ export module Interaction {
      * "foreground" and "background" elements where it can draw things,
      * e.g. crosshairs.
      */
-    protected _hitBox: D3.Selection;
-    protected _componentToListenTo: Component.AbstractComponent;
+    protected _componentToListenTo: Component;
 
-    public _anchor(component: Component.AbstractComponent, hitBox: D3.Selection) {
+    public _anchor(component: Component) {
       this._componentToListenTo = component;
-      this._hitBox = hitBox;
-    }
-
-    // HACKHACK: After all Interactions use Dispatchers, we won't need hitboxes at all (#1757)
-    public _requiresHitbox() {
-      return false;
     }
 
     /**
@@ -51,5 +43,4 @@ export module Interaction {
              && p.y <= this._componentToListenTo.height();
     }
   }
-}
 }

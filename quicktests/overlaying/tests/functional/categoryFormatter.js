@@ -11,14 +11,14 @@ function run(svg, data, Plottable) {
   var DOW = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
   var Emp = ["Justin", "Cassie", "Brandon", "Roger", "Dan", "Lewin", "Brian"];
 
-  var xScale = new Plottable.Scale.Category();
-  var yScale = new Plottable.Scale.Linear();
-  var xAxis = new Plottable.Axis.Category(xScale, "bottom");
-  var yAxis = new Plottable.Axis.Numeric(yScale, "left");
+  var xScale = new Plottable.Scales.Category();
+  var yScale = new Plottable.Scales.Linear();
+  var xAxis = new Plottable.Axes.Category(xScale, "bottom");
+  var yAxis = new Plottable.Axes.Numeric(yScale, "left");
 
-  var IdTitle = new Plottable.Component.Label("Identity");
-  var DowTitle = new Plottable.Component.Label("Day of Week");
-  var EmpIDTitle = new Plottable.Component.Label("Emp ID");
+  var IdTitle = new Plottable.Components.Label("Identity");
+  var DowTitle = new Plottable.Components.Label("Day of Week");
+  var EmpIDTitle = new Plottable.Components.Label("Emp ID");
 
   var DOWFormatter = function(d) {
       return DOW[d%7];
@@ -27,11 +27,11 @@ function run(svg, data, Plottable) {
       return Emp[d%7];
   };
 
-  var plot = new Plottable.Plot.Bar(xScale, yScale).addDataset(data);
+  var plot = new Plottable.Plots.Bar(xScale, yScale).addDataset(data);
   plot.project("x", "x", xScale).project("y", "y", yScale);
-  var basicTable = new Plottable.Component.Table([[yAxis, plot], [null, xAxis]]);
-  var formatChoices = new Plottable.Component.Table([[IdTitle],[DowTitle],[EmpIDTitle]]);
-  var bigTable = new Plottable.Component.Table([[basicTable],[formatChoices]]);
+  var basicTable = new Plottable.Components.Table([[yAxis, plot], [null, xAxis]]);
+  var formatChoices = new Plottable.Components.Table([[IdTitle],[DowTitle],[EmpIDTitle]]);
+  var bigTable = new Plottable.Components.Table([[basicTable],[formatChoices]]);
   formatChoices.xAlign("center");
 
   bigTable.renderTo(svg);
@@ -46,8 +46,8 @@ function run(svg, data, Plottable) {
      xAxis.formatter(EmpIDFormatter);
   }
 
-  IdTitle.registerInteraction(new Plottable.Interaction.Click().onClick(identity_frmt));
-  DowTitle.registerInteraction(new Plottable.Interaction.Click().onClick(dow_frmt));
-  EmpIDTitle.registerInteraction(new Plottable.Interaction.Click().onClick(emp_frmt));
+  IdTitle.registerInteraction(new Plottable.Interactions.Click().onClick(identity_frmt));
+  DowTitle.registerInteraction(new Plottable.Interactions.Click().onClick(dow_frmt));
+  EmpIDTitle.registerInteraction(new Plottable.Interactions.Click().onClick(emp_frmt));
 
 }

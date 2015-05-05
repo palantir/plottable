@@ -1,8 +1,8 @@
 ///<reference path="../../reference.ts" />
 
 module Plottable {
-export module Plot {
-  export class Rectangle<X, Y> extends AbstractXYPlot<X, Y> {
+export module Plots {
+  export class Rectangle<X, Y> extends XYPlot<X, Y> {
     private _defaultFillColor: string;
 
     /**
@@ -13,17 +13,17 @@ export module Plot {
      * as well as the bottom and top bounds (y1 and y2 respectively)
      *
      * @constructor
-     * @param {Scale.AbstractScale} xScale The x scale to use.
-     * @param {Scale.AbstractScale} yScale The y scale to use.
+     * @param {Scale.Scale} xScale The x scale to use.
+     * @param {Scale.Scale} yScale The y scale to use.
      */
-    constructor(xScale: Scale.AbstractScale<X, any>, yScale: Scale.AbstractScale<Y, any>) {
+    constructor(xScale: Scale<X, any>, yScale: Scale<Y, any>) {
       super(xScale, yScale);
-      this._defaultFillColor = new Scale.Color().range()[0];
+      this._defaultFillColor = new Scales.Color().range()[0];
       this.classed("rectangle-plot", true);
     }
 
     protected _getDrawer(key: string) {
-      return new _Drawer.Rect(key, true);
+      return new Drawers.Rect(key, true);
     }
 
     protected _generateAttrToProjector() {
@@ -49,12 +49,11 @@ export module Plot {
       delete attrToProjector["x2"];
       delete attrToProjector["y2"];
 
-
       attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this._defaultFillColor);
       return attrToProjector;
     }
 
-    protected _generateDrawSteps(): _Drawer.DrawStep[] {
+    protected _generateDrawSteps(): Drawers.DrawStep[] {
       return [{attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("rectangles")}];
     }
   }

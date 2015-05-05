@@ -1,8 +1,8 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Scale {
-  export class Log extends AbstractQuantitative<number> {
+export module Scales {
+  export class Log extends QuantitativeScale<number> {
 
     private static warned = false;
 
@@ -24,7 +24,7 @@ export module Scale {
       super(scale == null ? d3.scale.log() : scale);
       if (!Log.warned) {
         Log.warned = true;
-        _Util.Methods.warn("Plottable.Scale.Log is deprecated. If possible, use Plottable.Scale.ModifiedLog instead.");
+        Utils.Methods.warn("Plottable.Scale.Log is deprecated. If possible, use Plottable.Scale.ModifiedLog instead.");
       }
     }
 

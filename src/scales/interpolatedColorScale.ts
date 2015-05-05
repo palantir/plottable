@@ -1,7 +1,7 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Scale {
+export module Scales {
   type ColorGroups = { [key: string]: string[]; };
 
   /**
@@ -11,9 +11,9 @@ export module Scale {
    *
    * By default it generates a linear scale internally.
    */
-  export class InterpolatedColor extends AbstractScale<number, string> {
+  export class InterpolatedColor extends Scale<number, string> {
     private static _COLOR_SCALES: ColorGroups = {
-      reds : [
+      reds: [
         "#FFFFFF", // white
         "#FFF6E1",
         "#FEF4C0",
@@ -24,7 +24,7 @@ export module Scale {
         "#E31A1C",
         "#B10026"  // red
       ],
-      blues : [
+      blues: [
         "#FFFFFF", // white
         "#CCFFFF",
         "#A5FFFD",
@@ -35,7 +35,7 @@ export module Scale {
         "#2545D3",
         "#0B02E1"  // blue
       ],
-      posneg : [
+      posneg: [
         "#0B02E1", // blue
         "#2545D3",
         "#417FD0",
@@ -63,11 +63,11 @@ export module Scale {
      *     values in hex ("#FFFFFF") or keywords ("white").
      * @param {string} scaleType a string representing the underlying scale
      *     type ("linear"/"log"/"sqrt"/"pow")
-     * @returns {D3.Scale.QuantitativeScale} The converted Quantitative d3 scale.
+     * @returns {D3.Scale.QuantitativeScaleScale} The converted QuantitativeScale d3 scale.
      */
     private static _getD3InterpolatedScale(colors: string[], scaleType: string): D3.Scale.QuantitativeScale {
       var scale: D3.Scale.QuantitativeScale;
-      switch(scaleType){
+      switch (scaleType) {
         case "linear":
           scale = d3.scale.linear();
           break;
@@ -81,8 +81,8 @@ export module Scale {
           scale = d3.scale.pow();
           break;
       }
-      if (scale == null){
-        throw new Error("unknown Quantitative scale type " + scaleType);
+      if (scale == null) {
+        throw new Error("unknown QuantitativeScale scale type " + scaleType);
       }
       return scale
                   .range([0, 1])
@@ -181,7 +181,7 @@ export module Scale {
      */
     public scaleType(scaleType: string): InterpolatedColor;
     public scaleType(scaleType?: string): any {
-      if (scaleType == null){
+      if (scaleType == null) {
         return this._scaleType;
       }
       this._scaleType = scaleType;
@@ -206,10 +206,10 @@ export module Scale {
     }
 
     public autoDomain() {
-      // unlike other QuantitativeScales, interpolatedColorScale ignores its domainer
+      // unlike other QuantitativeScaleScales, interpolatedColorScale ignores its domainer
       var extents = this._getAllExtents();
       if (extents.length > 0) {
-        this._setDomain([_Util.Methods.min(extents, (x) => x[0], 0), _Util.Methods.max(extents, (x) => x[1], 0)]);
+        this._setDomain([Utils.Methods.min(extents, (x) => x[0], 0), Utils.Methods.max(extents, (x) => x[1], 0)]);
       }
       return this;
     }

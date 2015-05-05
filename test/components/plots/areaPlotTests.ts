@@ -6,10 +6,10 @@ describe("Plots", () => {
   describe("AreaPlot", () => {
     // HACKHACK #1798: beforeEach being used below
     it("renders correctly with no data", () => {
-      var svg = generateSVG(400, 400);
-      var xScale = new Plottable.Scale.Linear();
-      var yScale = new Plottable.Scale.Linear();
-      var plot = new Plottable.Plot.Area(xScale, yScale);
+      var svg = TestMethods.generateSVG(400, 400);
+      var xScale = new Plottable.Scales.Linear();
+      var yScale = new Plottable.Scales.Linear();
+      var plot = new Plottable.Plots.Area(xScale, yScale);
       plot.project("x", (d: any) => d.x, xScale);
       plot.project("y", (d: any) => d.y, yScale);
       assert.doesNotThrow(() => plot.renderTo(svg), Error);
@@ -21,8 +21,8 @@ describe("Plots", () => {
 
   describe("AreaPlot", () => {
     var svg: D3.Selection;
-    var xScale: Plottable.Scale.Linear;
-    var yScale: Plottable.Scale.Linear;
+    var xScale: Plottable.Scales.Linear;
+    var yScale: Plottable.Scales.Linear;
     var xAccessor: any;
     var yAccessor: any;
     var y0Accessor: any;
@@ -30,12 +30,12 @@ describe("Plots", () => {
     var fillAccessor: any;
     var twoPointData = [{foo: 0, bar: 0}, {foo: 1, bar: 1}];
     var simpleDataset: Plottable.Dataset;
-    var areaPlot: Plottable.Plot.Area<number>;
+    var areaPlot: Plottable.Plots.Area<number>;
     var renderArea: D3.Selection;
 
     before(() => {
-      xScale = new Plottable.Scale.Linear().domain([0, 1]);
-      yScale = new Plottable.Scale.Linear().domain([0, 1]);
+      xScale = new Plottable.Scales.Linear().domain([0, 1]);
+      yScale = new Plottable.Scales.Linear().domain([0, 1]);
       xAccessor = (d: any) => d.foo;
       yAccessor = (d: any) => d.bar;
       y0Accessor = () => 0;
@@ -44,9 +44,9 @@ describe("Plots", () => {
     });
 
     beforeEach(() => {
-      svg = generateSVG(500, 500);
+      svg = TestMethods.generateSVG(500, 500);
       simpleDataset = new Plottable.Dataset(twoPointData);
-      areaPlot = new Plottable.Plot.Area(xScale, yScale);
+      areaPlot = new Plottable.Plots.Area(xScale, yScale);
       areaPlot.addDataset("sd", simpleDataset)
               .project("x", xAccessor, xScale)
               .project("y", yAccessor, yScale)
@@ -59,13 +59,13 @@ describe("Plots", () => {
 
     it("draws area and line correctly", () => {
       var areaPath = renderArea.select(".area");
-      assert.strictEqual(normalizePath(areaPath.attr("d")), "M0,500L500,0L500,500L0,500Z", "area d was set correctly");
+      assert.strictEqual(TestMethods.normalizePath(areaPath.attr("d")), "M0,500L500,0L500,500L0,500Z", "area d was set correctly");
       assert.strictEqual(areaPath.attr("fill"), "steelblue", "area fill was set correctly");
       var areaComputedStyle = window.getComputedStyle(areaPath.node());
       assert.strictEqual(areaComputedStyle.stroke, "none", "area stroke renders as \"none\"");
 
       var linePath = renderArea.select(".line");
-      assert.strictEqual(normalizePath(linePath.attr("d")), "M0,500L500,0", "line d was set correctly");
+      assert.strictEqual(TestMethods.normalizePath(linePath.attr("d")), "M0,500L500,0", "line d was set correctly");
       assert.strictEqual(linePath.attr("stroke"), "#000000", "line stroke was set correctly");
       var lineComputedStyle = window.getComputedStyle(linePath.node());
       assert.strictEqual(lineComputedStyle.fill, "none", "line fill renders as \"none\"");
@@ -77,7 +77,7 @@ describe("Plots", () => {
       areaPlot.renderTo(svg);
       renderArea = (<any> areaPlot)._renderArea;
       var areaPath = renderArea.select(".area");
-      assert.equal(normalizePath(areaPath.attr("d")), "M0,500L500,0L500,250L0,500Z");
+      assert.strictEqual(TestMethods.normalizePath(areaPath.attr("d")), "M0,500L500,0L500,250L0,500Z");
       svg.remove();
     });
 
@@ -104,27 +104,27 @@ describe("Plots", () => {
       dataWithNaN[2] = { foo: 0.4, bar: NaN };
       simpleDataset.data(dataWithNaN);
 
-      var areaPathString = normalizePath(areaPath.attr("d"));
-      assertAreaPathCloseTo(areaPathString, expectedPath, 0.1, "area d was set correctly (y=NaN case)");
+      var areaPathString = TestMethods.normalizePath(areaPath.attr("d"));
+      TestMethods.assertAreaPathCloseTo(areaPathString, expectedPath, 0.1, "area d was set correctly (y=NaN case)");
 
       dataWithNaN[2] = { foo: NaN, bar: 0.4 };
       simpleDataset.data(dataWithNaN);
 
-      areaPathString = normalizePath(areaPath.attr("d"));
-      assertAreaPathCloseTo(areaPathString, expectedPath, 0.1, "area d was set correctly (x=NaN case)");
+      areaPathString = TestMethods.normalizePath(areaPath.attr("d"));
+      TestMethods.assertAreaPathCloseTo(areaPathString, expectedPath, 0.1, "area d was set correctly (x=NaN case)");
 
       var dataWithUndefined = areaData.slice();
       dataWithUndefined[2] = { foo: 0.4, bar: undefined };
       simpleDataset.data(dataWithUndefined);
 
-      areaPathString = normalizePath(areaPath.attr("d"));
-      assertAreaPathCloseTo(areaPathString, expectedPath, 0.1, "area d was set correctly (y=undefined case)");
+      areaPathString = TestMethods.normalizePath(areaPath.attr("d"));
+      TestMethods.assertAreaPathCloseTo(areaPathString, expectedPath, 0.1, "area d was set correctly (y=undefined case)");
 
       dataWithUndefined[2] = { foo: undefined, bar: 0.4 };
       simpleDataset.data(dataWithUndefined);
 
-      areaPathString = normalizePath(areaPath.attr("d"));
-      assertAreaPathCloseTo(areaPathString, expectedPath, 0.1, "area d was set correctly (x=undefined case)");
+      areaPathString = TestMethods.normalizePath(areaPath.attr("d"));
+      TestMethods.assertAreaPathCloseTo(areaPathString, expectedPath, 0.1, "area d was set correctly (x=undefined case)");
 
       svg.remove();
     });
@@ -182,9 +182,9 @@ describe("Plots", () => {
       var newClassProjector = () => "pink";
       areaPlot.project("class", newClassProjector);
       areaPlot.renderTo(svg);
-      var areaPath = renderArea.select("." + Plottable._Drawer.Area.AREA_CLASS);
+      var areaPath = renderArea.select("." + Plottable.Drawers.Area.AREA_CLASS);
       assert.isTrue(areaPath.classed("pink"));
-      assert.isTrue(areaPath.classed(Plottable._Drawer.Area.AREA_CLASS));
+      assert.isTrue(areaPath.classed(Plottable.Drawers.Area.AREA_CLASS));
       svg.remove();
     });
   });

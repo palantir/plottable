@@ -1,32 +1,29 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Interaction {
-
+export module Interactions {
   enum ClickState {NotClicked, SingleClicked, DoubleClicked};
+  export class DoubleClick extends Interaction {
 
-  export class DoubleClick extends AbstractInteraction {
-
-    private _mouseDispatcher: Plottable.Dispatcher.Mouse;
-    private _touchDispatcher: Plottable.Dispatcher.Touch;
+    private _mouseDispatcher: Plottable.Dispatchers.Mouse;
+    private _touchDispatcher: Plottable.Dispatchers.Touch;
     private _doubleClickCallback: (p: Point) => any;
     private _clickState = ClickState.NotClicked;
     private _clickedDown = false;
     private _clickedPoint: Point;
 
-    public _anchor(component: Component.AbstractComponent, hitBox: D3.Selection) {
-      super._anchor(component, hitBox);
+    public _anchor(component: Component) {
+      super._anchor(component);
 
-      this._mouseDispatcher = Dispatcher.Mouse.getDispatcher(<SVGElement> component.content().node());
-      this._mouseDispatcher.onMouseDown("Interaction.DoubleClick" + this.getID(), (p: Point) => this._handleClickDown(p));
-      this._mouseDispatcher.onMouseUp("Interaction.DoubleClick" + this.getID(), (p: Point) => this._handleClickUp(p));
-      this._mouseDispatcher.onDblClick("Interaction.DoubleClick" + this.getID(), (p: Point) => this._handleDblClick());
+      this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(<SVGElement> component.content().node());
+      this._mouseDispatcher.onMouseDown((p: Point) => this._handleClickDown(p));
+      this._mouseDispatcher.onMouseUp((p: Point) => this._handleClickUp(p));
+      this._mouseDispatcher.onDblClick((p: Point) => this._handleDblClick());
 
-      this._touchDispatcher = Dispatcher.Touch.getDispatcher(<SVGElement> component.content().node());
-      this._touchDispatcher.onTouchStart("Interaction.DoubleClick" + this.getID(), (ids, idToPoint) =>
-                                                                                     this._handleClickDown(idToPoint[ids[0]]));
-      this._touchDispatcher.onTouchEnd("Interaction.DoubleClick" + this.getID(), (ids, idToPoint) =>
-                                                                                     this._handleClickUp(idToPoint[ids[0]]));
+      this._touchDispatcher = Dispatchers.Touch.getDispatcher(<SVGElement> component.content().node());
+      this._touchDispatcher.onTouchStart((ids, idToPoint) => this._handleClickDown(idToPoint[ids[0]]));
+      this._touchDispatcher.onTouchEnd((ids, idToPoint) => this._handleClickUp(idToPoint[ids[0]]));
+      this._touchDispatcher.onTouchCancel((ids, idToPoint) => this._handleClickCancel());
     }
 
     private _handleClickDown(p: Point) {
@@ -59,6 +56,11 @@ export module Interaction {
       }
     }
 
+    private _handleClickCancel() {
+      this._clickState = ClickState.NotClicked;
+      this._clickedDown = false;
+    }
+
     private static pointsEqual(p1: Point, p2: Point) {
       return p1.x === p2.x && p1.y === p2.y;
     }
@@ -75,7 +77,7 @@ export module Interaction {
      * @param {(p: Point) => any} callback The callback to set.
      * @return {Interaction.DoubleClick} The calling Interaction.DoubleClick.
      */
-    public onDoubleClick(callback: (p: Point) => any): Interaction.DoubleClick;
+    public onDoubleClick(callback: (p: Point) => any): Interactions.DoubleClick;
     public onDoubleClick(callback?: (p: Point) => any): any {
       if (callback === undefined) {
         return this._doubleClickCallback;

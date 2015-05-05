@@ -1,7 +1,7 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module _Drawer {
+export module Drawers {
   export class Arc extends Element {
 
     constructor(key: string) {
@@ -24,7 +24,7 @@ export module _Drawer {
     }
 
     public _drawStep(step: AppliedDrawStep) {
-      var attrToProjector = <AttributeToAppliedProjector>_Util.Methods.copyMap(step.attrToProjector);
+      var attrToProjector = <AttributeToAppliedProjector>Utils.Methods.copyMap(step.attrToProjector);
       attrToProjector = this.retargetProjectors(attrToProjector);
       this._attrToProjector = this.retargetProjectors(this._attrToProjector);
       var innerRadiusAccessor = attrToProjector["inner-radius"];
@@ -36,11 +36,11 @@ export module _Drawer {
       return super._drawStep({attrToProjector: attrToProjector, animator: step.animator});
     }
 
-    public draw(data: any[], drawSteps: DrawStep[], userMetadata: any, plotMetadata: Plot.PlotMetadata) {
+    public draw(data: any[], drawSteps: DrawStep[], userMetadata: any, plotMetadata: Plots.PlotMetadata) {
       // HACKHACK Applying metadata should be done in base class
       var valueAccessor = (d: any, i: number) => drawSteps[0].attrToProjector["value"](d, i, userMetadata, plotMetadata);
 
-      data = data.filter(e => Plottable._Util.Methods.isValidNumber(+valueAccessor(e, null)));
+      data = data.filter(e => Plottable.Utils.Methods.isValidNumber(+valueAccessor(e, null)));
 
       var pie = d3.layout.pie()
                           .sort(null)
@@ -49,7 +49,7 @@ export module _Drawer {
       drawSteps.forEach(s => delete s.attrToProjector["value"]);
       pie.forEach((slice) => {
         if (slice.value < 0) {
-          _Util.Methods.warn("Negative values will not render correctly in a pie chart.");
+          Utils.Methods.warn("Negative values will not render correctly in a pie chart.");
         }
       });
       return super.draw(pie, drawSteps, userMetadata, plotMetadata);

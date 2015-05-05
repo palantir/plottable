@@ -1,10 +1,10 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Dispatcher {
-  export type TouchCallback = (ids: number[], idToPoint: { [id: number]: Point; }, e: TouchEvent) => any;
+export module Dispatchers {
+  export type TouchCallback = (ids: number[], idToPoint: { [id: number]: Point; }, event: TouchEvent) => any;
 
-  export class Touch extends AbstractDispatcher {
+  export class Touch extends Dispatcher {
     /**
      * Dispatcher.Touch calls callbacks when touch events occur.
      * It reports the (x, y) position of the first Touch relative to the
@@ -12,10 +12,11 @@ export module Dispatcher {
      */
 
     private static _DISPATCHER_KEY = "__Plottable_Dispatcher_Touch";
-    private translator: _Util.ClientToSVGTranslator;
-    private _startBroadcaster: Core.Broadcaster<Dispatcher.Touch>;
-    private _moveBroadcaster: Core.Broadcaster<Dispatcher.Touch>;
-    private _endBroadcaster: Core.Broadcaster<Dispatcher.Touch>;
+    private translator: Utils.ClientToSVGTranslator;
+    private _startCallbacks: Utils.CallbackSet<TouchCallback>;
+    private _moveCallbacks: Utils.CallbackSet<TouchCallback>;
+    private _endCallbacks: Utils.CallbackSet<TouchCallback>;
+    private _cancelCallbacks: Utils.CallbackSet<TouchCallback>;
 
     /**
      * Get a Dispatcher.Touch for the <svg> containing elem. If one already exists
@@ -24,8 +25,8 @@ export module Dispatcher {
      * @param {SVGElement} elem A svg DOM element.
      * @return {Dispatcher.Touch} A Dispatcher.Touch
      */
-    public static getDispatcher(elem: SVGElement): Dispatcher.Touch {
-      var svg = _Util.DOM.getBoundingSVG(elem);
+    public static getDispatcher(elem: SVGElement): Dispatchers.Touch {
+      var svg = Utils.DOM.getBoundingSVG(elem);
 
       var dispatcher: Touch = (<any> svg)[Touch._DISPATCHER_KEY];
       if (dispatcher == null) {
@@ -44,69 +45,121 @@ export module Dispatcher {
     constructor(svg: SVGElement) {
       super();
 
-      this.translator = _Util.ClientToSVGTranslator.getTranslator(svg);
+      this.translator = Utils.ClientToSVGTranslator.getTranslator(svg);
 
-      this._startBroadcaster = new Core.Broadcaster(this);
-      this._event2Callback["touchstart"] = (e: TouchEvent) => this._measureAndBroadcast(e, this._startBroadcaster);
+      this._startCallbacks = new Utils.CallbackSet<TouchCallback>();
+      this._moveCallbacks = new Utils.CallbackSet<TouchCallback>();
+      this._endCallbacks = new Utils.CallbackSet<TouchCallback>();
+      this._cancelCallbacks = new Utils.CallbackSet<TouchCallback>();
+      this._callbacks = [this._moveCallbacks, this._startCallbacks, this._endCallbacks, this._cancelCallbacks];
 
-      this._moveBroadcaster = new Core.Broadcaster(this);
-      this._event2Callback["touchmove"] = (e: TouchEvent) => this._measureAndBroadcast(e, this._moveBroadcaster);
-
-      this._endBroadcaster = new Core.Broadcaster(this);
-      this._event2Callback["touchend"] = (e: TouchEvent) => this._measureAndBroadcast(e, this._endBroadcaster);
-
-      this._broadcasters = [this._moveBroadcaster, this._startBroadcaster, this._endBroadcaster];
-    }
-
-    protected _getWrappedCallback(callback: Function): Core.BroadcasterCallback<Dispatcher.Touch> {
-      return (td: Dispatcher.Touch, ids: number[], idToPoint: { [id: number]: Point; }, e: MouseEvent) => callback(ids, idToPoint, e);
+      this._event2Callback["touchstart"] = (e: TouchEvent) => this._measureAndBroadcast(e, this._startCallbacks);
+      this._event2Callback["touchmove"] = (e: TouchEvent) => this._measureAndBroadcast(e, this._moveCallbacks);
+      this._event2Callback["touchend"] = (e: TouchEvent) => this._measureAndBroadcast(e, this._endCallbacks);
+      this._event2Callback["touchcancel"] = (e: TouchEvent) => this._measureAndBroadcast(e, this._cancelCallbacks);
     }
 
     /**
-     * Registers a callback to be called whenever a touch starts,
-     * or removes the callback if `null` is passed as the callback.
+     * Registers a callback to be called whenever a touch starts.
      *
-     * @param {any} key The key associated with the callback.
-     *                  Key uniqueness is determined by deep equality.
      * @param {TouchCallback} callback A callback that takes the pixel position
      *                                     in svg-coordinate-space. Pass `null`
      *                                     to remove a callback.
      * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
      */
-    public onTouchStart(key: any, callback: TouchCallback): Dispatcher.Touch {
-      this._setCallback(this._startBroadcaster, key, callback);
+    public onTouchStart(callback: TouchCallback): Dispatchers.Touch {
+      this.setCallback(this._startCallbacks, callback);
       return this;
     }
 
     /**
-     * Registers a callback to be called whenever the touch position changes,
-     * or removes the callback if `null` is passed as the callback.
+     * Removes the callback to be called whenever a touch starts.
      *
-     * @param {any} key The key associated with the callback.
-     *                  Key uniqueness is determined by deep equality.
      * @param {TouchCallback} callback A callback that takes the pixel position
      *                                     in svg-coordinate-space. Pass `null`
      *                                     to remove a callback.
      * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
      */
-    public onTouchMove(key: any, callback: TouchCallback): Dispatcher.Touch {
-      this._setCallback(this._moveBroadcaster, key, callback);
+    public offTouchStart(callback: TouchCallback): Dispatchers.Touch {
+      this.unsetCallback(this._startCallbacks, callback);
       return this;
     }
 
     /**
-     * Registers a callback to be called whenever a touch ends,
-     * or removes the callback if `null` is passed as the callback.
+     * Registers a callback to be called whenever the touch position changes.
      *
-     * @param {any} key The key associated with the callback.
-     *                  Key uniqueness is determined by deep equality.
      * @param {TouchCallback} callback A callback that takes the pixel position
      *                                     in svg-coordinate-space. Pass `null`
      *                                     to remove a callback.
      * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
      */
-    public onTouchEnd(key: any, callback: TouchCallback): Dispatcher.Touch {
-      this._setCallback(this._endBroadcaster, key, callback);
+    public onTouchMove(callback: TouchCallback): Dispatchers.Touch {
+      this.setCallback(this._moveCallbacks, callback);
+      return this;
+    }
+
+    /**
+     * Removes the callback to be called whenever the touch position changes.
+     *
+     * @param {TouchCallback} callback A callback that takes the pixel position
+     *                                     in svg-coordinate-space. Pass `null`
+     *                                     to remove a callback.
+     * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
+     */
+    public offTouchMove(callback: TouchCallback): Dispatchers.Touch {
+      this.unsetCallback(this._moveCallbacks, callback);
+      return this;
+    }
+
+    /**
+     * Registers a callback to be called whenever a touch ends.
+     *
+     * @param {TouchCallback} callback A callback that takes the pixel position
+     *                                     in svg-coordinate-space. Pass `null`
+     *                                     to remove a callback.
+     * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
+     */
+    public onTouchEnd(callback: TouchCallback): Dispatchers.Touch {
+      this.setCallback(this._endCallbacks, callback);
+      return this;
+    }
+
+    /**
+     * Removes the callback to be called whenever a touch ends.
+     *
+     * @param {TouchCallback} callback A callback that takes the pixel position
+     *                                     in svg-coordinate-space. Pass `null`
+     *                                     to remove a callback.
+     * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
+     */
+    public offTouchEnd(callback: TouchCallback): Dispatchers.Touch {
+      this.unsetCallback(this._endCallbacks, callback);
+      return this;
+    }
+
+    /**
+     * Registers a callback to be called whenever a touch is cancelled.
+     *
+     * @param {TouchCallback} callback A callback that takes the pixel position
+     *                                     in svg-coordinate-space. Pass `null`
+     *                                     to remove a callback.
+     * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
+     */
+    public onTouchCancel(callback: TouchCallback): Dispatchers.Touch {
+      this.setCallback(this._cancelCallbacks, callback);
+      return this;
+    }
+
+    /**
+     * Removes the callback to be called whenever a touch is cancelled.
+     *
+     * @param {TouchCallback} callback A callback that takes the pixel position
+     *                                     in svg-coordinate-space. Pass `null`
+     *                                     to remove a callback.
+     * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
+     */
+    public offTouchCancel(callback: TouchCallback): Dispatchers.Touch {
+      this.unsetCallback(this._cancelCallbacks, callback);
       return this;
     }
 
@@ -114,8 +167,8 @@ export module Dispatcher {
      * Computes the Touch position from the given event, and if successful
      * calls broadcast() on the supplied Broadcaster.
      */
-    private _measureAndBroadcast(e: TouchEvent, b: Core.Broadcaster<Dispatcher.Touch>) {
-      var touches = e.changedTouches;
+    private _measureAndBroadcast(event: TouchEvent, callbackSet: Utils.CallbackSet<TouchCallback>) {
+      var touches = event.changedTouches;
       var touchPositions: { [id: number]: Point; } = {};
       var touchIdentifiers: number[] = [];
       for (var i = 0; i < touches.length; i++) {
@@ -128,7 +181,7 @@ export module Dispatcher {
         }
       };
       if (touchIdentifiers.length > 0) {
-        b.broadcast(touchIdentifiers, touchPositions, e);
+        callbackSet.callCallbacks(touchIdentifiers, touchPositions, event);
       }
     }
   }

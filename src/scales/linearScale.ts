@@ -1,8 +1,8 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Scale {
-  export class Linear extends AbstractQuantitative<number> {
+export module Scales {
+  export class Linear extends QuantitativeScale<number> {
 
     /**
      * Constructs a new LinearScale.
