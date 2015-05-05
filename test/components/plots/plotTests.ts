@@ -400,12 +400,12 @@ describe("Plots", () => {
     });
 
     it("remove() disconnects plots from its scales", () => {
-      var r = new Plottable.Plot();
-      var s = new Plottable.Scales.Linear();
-      r.project("attr", "a", s);
-      r.remove();
-      var key2callback = (<any> s).broadcaster._key2callback;
-      assert.isUndefined(key2callback.get(r), "the plot is no longer attached to the scale");
+      var plot2 = new Plottable.Plot();
+      var scale = new Plottable.Scales.Linear();
+      plot2.project("attr", "a", scale);
+      plot2.remove();
+      var scaleCallbacks = (<any> scale)._callbacks.values();
+      assert.strictEqual(scaleCallbacks.length, 0, "the plot is no longer attached to the scale");
     });
 
     it("extent registration works as intended", () => {
@@ -586,10 +586,13 @@ describe("Plots", () => {
     it("listeners are deregistered after removal", () => {
       plot.automaticallyAdjustYScaleOverVisiblePoints(true);
       plot.remove();
-      var key2callback = (<any> xScale).broadcaster._key2callback;
-      assert.isUndefined(key2callback.get("yDomainAdjustment" + plot.getID()), "the plot is no longer attached to the xScale");
-      key2callback = (<any> yScale).broadcaster._key2callback;
-      assert.isUndefined(key2callback.get("xDomainAdjustment" + plot.getID()), "the plot is no longer attached to the yScale");
+
+      var xScaleCallbacks = (<any> xScale)._callbacks.values();
+      assert.strictEqual(xScaleCallbacks.length, 0, "the plot is no longer attached to xScale");
+
+      var yScaleCallbacks = (<any> yScale)._callbacks.values();
+      assert.strictEqual(yScaleCallbacks.length, 0, "the plot is no longer attached to yScale");
+
       svg.remove();
     });
 

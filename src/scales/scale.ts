@@ -6,12 +6,10 @@ module Plottable {
 
     protected _d3Scale: D3.Scale.Scale;
 
-    private broadcaster: Core.Broadcaster<Scale<D, R>>;
+    private _callbacks: Utils.CallbackSet<Function>;
     private _autoDomainAutomatically = true;
     private _rendererAttrID2Extent: {[rendererAttrID: string]: D[]} = {};
     private _domainModificationInProgress: boolean = false;
-
-    private _callbacks: Utils.CallbackSet<Function>;
 
     /**
      * Constructs a new Scale.
@@ -26,7 +24,6 @@ module Plottable {
     constructor(scale: D3.Scale.Scale) {
       super();
       this._d3Scale = scale;
-      this.broadcaster = new Core.Broadcaster(this);
       this._callbacks = new Utils.CallbackSet<Function>();
     }
 

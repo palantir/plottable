@@ -1729,7 +1729,6 @@ var Plottable;
             this._rendererAttrID2Extent = {};
             this._domainModificationInProgress = false;
             this._d3Scale = scale;
-            this.broadcaster = new Plottable.Core.Broadcaster(this);
             this._callbacks = new Plottable.Utils.CallbackSet();
         }
         Scale.prototype._getAllExtents = function () {
