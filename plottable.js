@@ -8970,14 +8970,14 @@ var Plottable;
                 this._wheelCallbacks = new Plottable.Utils.CallbackSet();
                 this._dblClickCallbacks = new Plottable.Utils.CallbackSet();
                 this._callbacks = [this._moveCallbacks, this._downCallbacks, this._upCallbacks, this._wheelCallbacks, this._dblClickCallbacks];
-                var processMoveCallback = function (e) { return _this._measureAndBroadcast(e, _this._moveCallbacks); };
+                var processMoveCallback = function (e) { return _this._measureAndDispatch(e, _this._moveCallbacks); };
                 this._event2Callback["mouseover"] = processMoveCallback;
                 this._event2Callback["mousemove"] = processMoveCallback;
                 this._event2Callback["mouseout"] = processMoveCallback;
-                this._event2Callback["mousedown"] = function (e) { return _this._measureAndBroadcast(e, _this._downCallbacks); };
-                this._event2Callback["mouseup"] = function (e) { return _this._measureAndBroadcast(e, _this._upCallbacks); };
-                this._event2Callback["wheel"] = function (e) { return _this._measureAndBroadcast(e, _this._wheelCallbacks); };
-                this._event2Callback["dblclick"] = function (e) { return _this._measureAndBroadcast(e, _this._dblClickCallbacks); };
+                this._event2Callback["mousedown"] = function (e) { return _this._measureAndDispatch(e, _this._downCallbacks); };
+                this._event2Callback["mouseup"] = function (e) { return _this._measureAndDispatch(e, _this._upCallbacks); };
+                this._event2Callback["wheel"] = function (e) { return _this._measureAndDispatch(e, _this._wheelCallbacks); };
+                this._event2Callback["dblclick"] = function (e) { return _this._measureAndDispatch(e, _this._dblClickCallbacks); };
             }
             /**
              * Get a Dispatcher.Mouse for the <svg> containing elem. If one already exists
@@ -9119,7 +9119,7 @@ var Plottable;
              * Computes the mouse position from the given event, and if successful
              * calls all the callbacks in the provided callbackSet.
              */
-            Mouse.prototype._measureAndBroadcast = function (event, callbackSet) {
+            Mouse.prototype._measureAndDispatch = function (event, callbackSet) {
                 var newMousePosition = this.translator.computePosition(event.clientX, event.clientY);
                 if (newMousePosition != null) {
                     this._lastMousePosition = newMousePosition;
@@ -9169,10 +9169,10 @@ var Plottable;
                 this._endCallbacks = new Plottable.Utils.CallbackSet();
                 this._cancelCallbacks = new Plottable.Utils.CallbackSet();
                 this._callbacks = [this._moveCallbacks, this._startCallbacks, this._endCallbacks, this._cancelCallbacks];
-                this._event2Callback["touchstart"] = function (e) { return _this._measureAndBroadcast(e, _this._startCallbacks); };
-                this._event2Callback["touchmove"] = function (e) { return _this._measureAndBroadcast(e, _this._moveCallbacks); };
-                this._event2Callback["touchend"] = function (e) { return _this._measureAndBroadcast(e, _this._endCallbacks); };
-                this._event2Callback["touchcancel"] = function (e) { return _this._measureAndBroadcast(e, _this._cancelCallbacks); };
+                this._event2Callback["touchstart"] = function (e) { return _this._measureAndDispatch(e, _this._startCallbacks); };
+                this._event2Callback["touchmove"] = function (e) { return _this._measureAndDispatch(e, _this._moveCallbacks); };
+                this._event2Callback["touchend"] = function (e) { return _this._measureAndDispatch(e, _this._endCallbacks); };
+                this._event2Callback["touchcancel"] = function (e) { return _this._measureAndDispatch(e, _this._cancelCallbacks); };
             }
             /**
              * Get a Dispatcher.Touch for the <svg> containing elem. If one already exists
@@ -9290,7 +9290,7 @@ var Plottable;
              * Computes the Touch position from the given event, and if successful
              * calls all the callbacks in the provided callbackSet.
              */
-            Touch.prototype._measureAndBroadcast = function (event, callbackSet) {
+            Touch.prototype._measureAndDispatch = function (event, callbackSet) {
                 var touches = event.changedTouches;
                 var touchPositions = {};
                 var touchIdentifiers = [];

@@ -55,7 +55,7 @@ module Plottable {
         this._callbacks.delete(callback);
     }
 
-    public dispatchUpdate() {
+    protected dispatchUpdate() {
         this._callbacks.callCallbacks(this);
     }
 

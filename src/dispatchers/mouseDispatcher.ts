@@ -54,14 +54,14 @@ export module Dispatchers {
       this._callbacks = [this._moveCallbacks, this._downCallbacks, this._upCallbacks, this._wheelCallbacks,
                          this._dblClickCallbacks];
 
-      var processMoveCallback = (e: MouseEvent) => this._measureAndBroadcast(e, this._moveCallbacks);
+      var processMoveCallback = (e: MouseEvent) => this._measureAndDispatch(e, this._moveCallbacks);
       this._event2Callback["mouseover"] = processMoveCallback;
       this._event2Callback["mousemove"] = processMoveCallback;
       this._event2Callback["mouseout"] = processMoveCallback;
-      this._event2Callback["mousedown"] = (e: MouseEvent) => this._measureAndBroadcast(e, this._downCallbacks);
-      this._event2Callback["mouseup"] = (e: MouseEvent) => this._measureAndBroadcast(e, this._upCallbacks);
-      this._event2Callback["wheel"] = (e: WheelEvent) => this._measureAndBroadcast(e, this._wheelCallbacks);
-      this._event2Callback["dblclick"] = (e: MouseEvent) => this._measureAndBroadcast(e, this._dblClickCallbacks);
+      this._event2Callback["mousedown"] = (e: MouseEvent) => this._measureAndDispatch(e, this._downCallbacks);
+      this._event2Callback["mouseup"] = (e: MouseEvent) => this._measureAndDispatch(e, this._upCallbacks);
+      this._event2Callback["wheel"] = (e: WheelEvent) => this._measureAndDispatch(e, this._wheelCallbacks);
+      this._event2Callback["dblclick"] = (e: MouseEvent) => this._measureAndDispatch(e, this._dblClickCallbacks);
     }
 
     /**
@@ -198,7 +198,7 @@ export module Dispatchers {
      * Computes the mouse position from the given event, and if successful
      * calls all the callbacks in the provided callbackSet.
      */
-    private _measureAndBroadcast(event: MouseEvent, callbackSet: Utils.CallbackSet<MouseCallback>) {
+    private _measureAndDispatch(event: MouseEvent, callbackSet: Utils.CallbackSet<MouseCallback>) {
       var newMousePosition = this.translator.computePosition(event.clientX, event.clientY);
       if (newMousePosition != null) {
         this._lastMousePosition = newMousePosition;
