@@ -22,8 +22,8 @@ export module Core {
    * ```
    */
   export module RenderControllers {
-    var _componentsNeedingRender: {[key: string]: Component} = {};
-    var _componentsNeedingComputeLayout: {[key: string]: Component} = {};
+    var _componentsNeedingRender = new Utils.Set<Component>();
+    var _componentsNeedingComputeLayout = new Utils.Set<Component>();
     var _animationRequested: boolean = false;
     var _isCurrentlyFlushing: boolean = false;
     export var _renderPolicy: RenderPolicies.RenderPolicy = new RenderPolicies.AnimationFrame();
@@ -58,7 +58,7 @@ export module Core {
       if (_isCurrentlyFlushing) {
         Utils.Methods.warn("Registered to render while other components are flushing: request may be ignored");
       }
-      _componentsNeedingRender[c.getID()] = c;
+      _componentsNeedingRender.add(c);
       requestRender();
     }
 
@@ -69,8 +69,8 @@ export module Core {
      * @param {Component} component Any Plottable component.
      */
     export function registerToComputeLayout(c: Component) {
-      _componentsNeedingComputeLayout[c.getID()] = c;
-      _componentsNeedingRender[c.getID()] = c;
+      _componentsNeedingComputeLayout.add(c);
+      _componentsNeedingRender.add(c);
       requestRender();
     }
 
@@ -91,34 +91,23 @@ export module Core {
     export function flush() {
       if (_animationRequested) {
         // Layout
-        var toCompute = d3.values(_componentsNeedingComputeLayout);
-        toCompute.forEach((c) => c.computeLayout());
+        _componentsNeedingComputeLayout.values().slice().forEach((c: Component) => c.computeLayout());
 
-        // Top level render.
-        // Containers will put their children in the toRender queue
-        var toRender = d3.values(_componentsNeedingRender);
-        toRender.forEach((c) => c._render());
+        // Top level render; Containers will put their children in the toRender queue
+        _componentsNeedingRender.values().slice().forEach((c: Component) => c._render() );
 
-        // now we are flushing
         _isCurrentlyFlushing = true;
-
-        // Finally, perform render of all components
-        var failed: {[key: string]: Component} = {};
-        Object.keys(_componentsNeedingRender).forEach((k) => {
+        var failed = new Utils.Set<Component>();
+        _componentsNeedingRender.values().slice().forEach((c: Component) => {
           try {
-            _componentsNeedingRender[k]._doRender();
+            c._doRender();
           } catch (err) {
-            // using setTimeout instead of console.log, we get the familiar red
-            // stack trace
-            setTimeout(() => {
-              throw err;
-            }, 0);
-            failed[k] = _componentsNeedingRender[k];
+            // throw error with timeout to avoid interrupting further renders
+            window.setTimeout(() => { throw err; }, 0);
+            failed.add(c);
           }
         });
-
-        // Reset queues
-        _componentsNeedingComputeLayout = {};
+        _componentsNeedingComputeLayout = new Utils.Set<Component>();
         _componentsNeedingRender = failed;
         _animationRequested = false;
         _isCurrentlyFlushing = false;
