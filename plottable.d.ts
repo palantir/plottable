@@ -2856,6 +2856,8 @@ declare module Plottable {
             valueAccessor(valueAccessor: _Accessor): Plots.Pie;
             innerRadiusAccessor(): _Accessor;
             innerRadiusAccessor(innerRadiusAccessor: _Accessor): Plots.Pie;
+            outerRadiusAccessor(): _Accessor;
+            outerRadiusAccessor(outerRadiusAccessor: _Accessor): Plots.Pie;
         }
     }
 }

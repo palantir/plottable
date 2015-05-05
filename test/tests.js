@@ -2686,7 +2686,7 @@ describe("Plots", function () {
             svg.remove();
         });
         it("outerRadius project", function () {
-            piePlot.project("outer-radius", function () { return 150; });
+            piePlot.outerRadiusAccessor(function () { return 150; });
             var arcPaths = renderArea.selectAll(".arc");
             assert.lengthOf(arcPaths[0], 2, "only has two sectors");
             var pathPoints0 = TestMethods.normalizePath(d3.select(arcPaths[0][0]).attr("d")).split(/[A-Z]/).slice(1, 5);
@@ -2698,7 +2698,7 @@ describe("Plots", function () {
             assert.closeTo(outerArcPath0[1], 150, 1, "makes outer arc of radius 150");
             assert.closeTo(outerArcPath0[5], 150, 1, "makes outer arc to right edge");
             assert.closeTo(outerArcPath0[6], 0, 1, "makes outer arc to right edge");
-            piePlot.project("outer-radius", function () { return 250; });
+            piePlot.outerRadiusAccessor(function () { return 250; });
             svg.remove();
         });
         describe("getAllSelections", function () {

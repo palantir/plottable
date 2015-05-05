@@ -122,7 +122,7 @@ describe("Plots", () => {
     });
 
     it("outerRadius project", () => {
-      piePlot.project("outer-radius", () => 150);
+      piePlot.outerRadiusAccessor(() => 150);
       var arcPaths = renderArea.selectAll(".arc");
       assert.lengthOf(arcPaths[0], 2, "only has two sectors");
 
@@ -138,7 +138,7 @@ describe("Plots", () => {
       assert.closeTo(outerArcPath0[5], 150, 1, "makes outer arc to right edge");
       assert.closeTo(outerArcPath0[6], 0, 1, "makes outer arc to right edge");
 
-      piePlot.project("outer-radius", () => 250);
+      piePlot.outerRadiusAccessor(() => 250);
       svg.remove();
     });
 
