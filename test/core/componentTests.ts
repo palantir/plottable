@@ -403,7 +403,7 @@ describe("Component behavior", () => {
   describe("origin methods", () => {
     var cWidth = 100;
     var cHeight = 100;
-    
+
     it("returns cloned point", () => {
       TestMethods.fixComponentSize(c, cWidth, cHeight);
       c.renderTo(svg);
@@ -414,7 +414,7 @@ describe("Component behavior", () => {
       assert.notStrictEqual(originCall1, originCall2, "returned points not the same object");
       svg.remove();
     });
-    
+
     it("origin() (top-level component)", () => {
       TestMethods.fixComponentSize(c, cWidth, cHeight);
       c.renderTo(svg);
