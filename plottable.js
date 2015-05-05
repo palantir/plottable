@@ -1045,46 +1045,6 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    var Utils;
-    (function (Utils) {
-        var ScaleDomainCoordinator = (function () {
-            /**
-             * Constructs a ScaleDomainCoordinator.
-             *
-             * @constructor
-             * @param {Scale[]} scales A list of scales whose domains should be linked.
-             */
-            function ScaleDomainCoordinator(scales) {
-                var _this = this;
-                /* This class is responsible for maintaining coordination between linked scales.
-                It registers event listeners for when one of its scales changes its domain. When the scale
-                does change its domain, it re-propogates the change to every linked scale.
-                */
-                this._rescaleInProgress = false;
-                if (scales == null) {
-                    throw new Error("ScaleDomainCoordinator requires scales to coordinate");
-                }
-                this._scales = scales;
-                this._scales.forEach(function (s) { return s.broadcaster.registerListener(_this, function (sx) { return _this.rescale(sx); }); });
-            }
-            ScaleDomainCoordinator.prototype.rescale = function (scale) {
-                if (this._rescaleInProgress) {
-                    return;
-                }
-                this._rescaleInProgress = true;
-                var newDomain = scale.domain();
-                this._scales.forEach(function (s) { return s.domain(newDomain); });
-                this._rescaleInProgress = false;
-            };
-            return ScaleDomainCoordinator;
-        })();
-        Utils.ScaleDomainCoordinator = ScaleDomainCoordinator;
-    })(Utils = Plottable.Utils || (Plottable.Utils = {}));
-})(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var Plottable;
-(function (Plottable) {
     var Configs;
     (function (Configs) {
         /**
