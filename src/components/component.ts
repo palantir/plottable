@@ -11,7 +11,7 @@ module Plottable {
     }
   }
   export class Component extends Core.PlottableObject {
-    protected _element: D3.Selection;
+    protected _element: D3.Selection
     protected _content: D3.Selection;
     protected _boundingBox: D3.Selection;
     private _backgroundContainer: D3.Selection;
