@@ -8,7 +8,7 @@ export module Components {
     private _xLinesContainer: D3.Selection;
     private _yLinesContainer: D3.Selection;
 
-    private _renderFunctionWrapper: Function;
+    private _renderFunctionWrapper: DomainChangeCallback;
 
     /**
      * Creates a set of Gridlines.
@@ -28,7 +28,7 @@ export module Components {
       this.classed("gridlines", true);
       this._xScale = xScale;
       this._yScale = yScale;
-      this._renderFunctionWrapper = () => this._render();
+      this._renderFunctionWrapper = (scale) => this._render();
       if (this._xScale) {
         this._xScale.onDomainChange(this._renderFunctionWrapper);
       }

@@ -24,8 +24,7 @@ export module Components {
     private _wrapper: SVGTypewriter.Wrappers.Wrapper;
     private _writer: SVGTypewriter.Writers.Writer;
     private _symbolFactoryAccessor: (datum: any, index: number) => SymbolFactory;
-
-    private _redrawFunctionWrapper: Function;
+    private _redrawFunctionWrapper: DomainChangeCallback;
 
     /**
      * Creates a Legend.
@@ -46,7 +45,7 @@ export module Components {
       }
 
       this._scale = colorScale;
-      this._redrawFunctionWrapper = () => this.redraw();
+      this._redrawFunctionWrapper = (scale) => this.redraw();
       this._scale.onDomainChange(this._redrawFunctionWrapper);
 
       this.xAlign("right").yAlign("top");

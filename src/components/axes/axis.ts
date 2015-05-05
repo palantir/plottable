@@ -28,7 +28,7 @@ module Plottable {
     private _gutter = 15;
     private _showEndTickLabels = false;
 
-    private _rescaleFunctionWrapper: Function;
+    private _rescaleFunctionWrapper: DomainChangeCallback;
 
     /**
      * Constructs an axis. An axis is a wrapper around a scale for rendering.
@@ -56,7 +56,7 @@ module Plottable {
 
       this.formatter(formatter);
 
-      this._rescaleFunctionWrapper = () => this._rescale();
+      this._rescaleFunctionWrapper = (scale) => this._rescale();
       this._scale.onDomainChange(this._rescaleFunctionWrapper);
     }
 

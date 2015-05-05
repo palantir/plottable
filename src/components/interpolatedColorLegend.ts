@@ -16,8 +16,7 @@ export module Components {
     private _swatchBoundingBox: D3.Selection;
     private _lowerLabel: D3.Selection;
     private _upperLabel: D3.Selection;
-
-    private _redrawFunctionWrapper: Function;
+    private _redrawFunctionWrapper: DomainChangeCallback;
 
     /**
      * The css class applied to the legend labels.
@@ -42,7 +41,7 @@ export module Components {
         throw new Error("InterpolatedColorLegend requires a interpolatedColorScale");
       }
       this._scale = interpolatedColorScale;
-      this._redrawFunctionWrapper = () => this.redraw();
+      this._redrawFunctionWrapper = (scale) => this.redraw();
       this._scale.onDomainChange(this._redrawFunctionWrapper);
       this._formatter = formatter;
       this._orientation = InterpolatedColorLegend._ensureOrientation(orientation);

@@ -39,8 +39,7 @@ module Plottable {
     private _animators: Animators.PlotAnimatorMap = {};
     protected _animateOnNextRender = true;
     private _nextSeriesIndex: number;
-
-    private _renderFunctionWrapper: Function;
+    private _renderFunctionWrapper: DomainChangeCallback;
 
     /**
      * Constructs a Plot.
@@ -62,7 +61,7 @@ module Plottable {
       this._extentProvider = (scale: Scale<any, any>) => this._extentsForScale(scale);
       this._datasetKeysInOrder = [];
       this._nextSeriesIndex = 0;
-      this._renderFunctionWrapper = () => this._render();
+      this._renderFunctionWrapper = (scale) => this._render();
     }
 
     public anchor(selection: D3.Selection) {

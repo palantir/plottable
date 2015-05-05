@@ -6,9 +6,8 @@ module Plottable {
     protected _yScale: Scale<Y, number>;
     private _autoAdjustXScaleDomain = false;
     private _autoAdjustYScaleDomain = false;
-
-    private _adjustYDomainOnChangeFromXFunctionWrapper: Function;
-    private _adjustXDomainOnChangeFromYFunctionWrapper: Function
+    private _adjustYDomainOnChangeFromXFunctionWrapper: DomainChangeCallback;
+    private _adjustXDomainOnChangeFromYFunctionWrapper: DomainChangeCallback;
 
     /**
      * Constructs an XYPlot.
@@ -31,8 +30,8 @@ module Plottable {
       this._xScale = xScale;
       this._yScale = yScale;
 
-      this._adjustYDomainOnChangeFromXFunctionWrapper = () => this._adjustYDomainOnChangeFromX();
-      this._adjustXDomainOnChangeFromYFunctionWrapper = () => this._adjustXDomainOnChangeFromY();
+      this._adjustYDomainOnChangeFromXFunctionWrapper = (scale) => this._adjustYDomainOnChangeFromX();
+      this._adjustXDomainOnChangeFromYFunctionWrapper = (scale) => this._adjustXDomainOnChangeFromY();
 
       this._updateXDomainer();
       xScale.onDomainChange(this._adjustYDomainOnChangeFromXFunctionWrapper);

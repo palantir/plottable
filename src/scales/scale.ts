@@ -1,6 +1,9 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
+
+  export type DomainChangeCallback = (scale: Plottable.Scale<any, any>) => any;
+
   export module Scales {
     export interface ExtentProvider<D> {
       (scale: Scale<D, any>): D[][];
@@ -30,7 +33,7 @@ module Plottable {
     constructor(scale: D3.Scale.Scale) {
       super();
       this._d3Scale = scale;
-      this._callbacks = new Utils.CallbackSet<Function>();
+      this._callbacks = new Utils.CallbackSet<DomainChangeCallback>();
       this._extentProviders = new Utils.Set<Scales.ExtentProvider<D>>();
     }
 
@@ -42,11 +45,11 @@ module Plottable {
       return []; // this should be overwritten
     }
 
-    public onDomainChange(callback: Function) {
+    public onDomainChange(callback: DomainChangeCallback) {
         this._callbacks.add(callback);
     }
 
-    public offDomainChange(callback: Function) {
+    public offDomainChange(callback: DomainChangeCallback) {
         this._callbacks.delete(callback);
     }
 
