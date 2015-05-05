@@ -401,6 +401,18 @@ describe("Component behavior", () => {
   describe("origin methods", () => {
     var cWidth = 100;
     var cHeight = 100;
+
+    it("modifying returned value does not affect origin", () => {
+      c.renderTo(svg);
+      var receivedOrigin = c.origin();
+      var delta = 10;
+      receivedOrigin.x += delta;
+      receivedOrigin.y += delta;
+      assert.notStrictEqual(receivedOrigin.x, c.origin().x, "receieved point can be modified without affecting origin (x)");
+      assert.notStrictEqual(receivedOrigin.y, c.origin().y, "receieved point can be modified without affecting origin (y)");
+      svg.remove();
+    });
+
     it("origin() (top-level component)", () => {
       TestMethods.fixComponentSize(c, cWidth, cHeight);
       c.renderTo(svg);

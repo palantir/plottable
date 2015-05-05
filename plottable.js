@@ -3814,7 +3814,10 @@ var Plottable;
          * @return {Point} The x-y position of the Component relative to its parent.
          */
         Component.prototype.origin = function () {
-            return this._origin;
+            return {
+                x: this._origin.x,
+                y: this._origin.y
+            };
         };
         /**
          * Gets the origin of the Component relative to the root <svg>.

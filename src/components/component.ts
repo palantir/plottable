@@ -528,7 +528,10 @@ module Plottable {
      * @return {Point} The x-y position of the Component relative to its parent.
      */
     public origin(): Point {
-      return this._origin;
+      return {
+        x: this._origin.x,
+        y: this._origin.y
+      };
     }
 
     /**
