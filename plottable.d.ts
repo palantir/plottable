@@ -2138,7 +2138,7 @@ declare module Plottable {
             axisConfigurations(configurations: TimeAxisConfiguration[]): Time;
             orient(): string;
             orient(orientation: string): Time;
-            _computeHeight(): number;
+            protected _computeHeight(): number;
             protected _getSize(availableWidth: number, availableHeight: number): {
                 width: number;
                 height: number;

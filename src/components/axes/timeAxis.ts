@@ -252,7 +252,7 @@ export module Axis {
       return super.orient(orientation); // maintains getter-setter functionality
     }
 
-    public _computeHeight() {
+    protected _computeHeight() {
       var textHeight = this._measurer.measure().height;
 
       this._tierHeights = [];
