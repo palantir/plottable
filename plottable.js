@@ -1492,12 +1492,12 @@ var Plottable;
             function flush() {
                 if (_animationRequested) {
                     // Layout
-                    _componentsNeedingComputeLayout.values().slice().forEach(function (c) { return c.computeLayout(); });
+                    _componentsNeedingComputeLayout.values().forEach(function (c) { return c.computeLayout(); });
                     // Top level render; Containers will put their children in the toRender queue
-                    _componentsNeedingRender.values().slice().forEach(function (c) { return c.render(); });
+                    _componentsNeedingRender.values().forEach(function (c) { return c.render(); });
                     _isCurrentlyFlushing = true;
                     var failed = new Plottable.Utils.Set();
-                    _componentsNeedingRender.values().slice().forEach(function (c) {
+                    _componentsNeedingRender.values().forEach(function (c) {
                         try {
                             c._doRender();
                         }

@@ -91,14 +91,14 @@ export module Core {
     export function flush() {
       if (_animationRequested) {
         // Layout
-        _componentsNeedingComputeLayout.values().slice().forEach((c: Component) => c.computeLayout());
+        _componentsNeedingComputeLayout.values().forEach((c: Component) => c.computeLayout());
 
         // Top level render; Containers will put their children in the toRender queue
-        _componentsNeedingRender.values().slice().forEach((c: Component) => c.render() );
+        _componentsNeedingRender.values().forEach((c: Component) => c.render());
 
         _isCurrentlyFlushing = true;
         var failed = new Utils.Set<Component>();
-        _componentsNeedingRender.values().slice().forEach((c: Component) => {
+        _componentsNeedingRender.values().forEach((c: Component) => {
           try {
             c._doRender();
           } catch (err) {
