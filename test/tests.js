@@ -389,7 +389,7 @@ describe("Drawers", function () {
             var svg = TestMethods.generateSVG(300, 300);
             var data = [{ value: 10 }, { value: 10 }, { value: 10 }, { value: 10 }];
             var piePlot = new Plottable.Plots.Pie();
-            var drawer = new Plottable.Drawers.Arc("one");
+            var drawer = new Plottable.Drawers.Arc("one", piePlot);
             piePlot._getDrawer = function () { return drawer; };
             piePlot.addDataset("one", data);
             piePlot.project("value", "value");

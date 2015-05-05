@@ -3221,8 +3221,9 @@ var Plottable;
     (function (Drawers) {
         var Arc = (function (_super) {
             __extends(Arc, _super);
-            function Arc(key) {
+            function Arc(key, plot) {
                 _super.call(this, key);
+                this._piePlot = plot;
                 this._svgElement = "path";
             }
             Arc.prototype._createArc = function (innerRadiusF, outerRadiusF) {
@@ -7057,7 +7058,7 @@ var Plottable;
                 return attrToProjector;
             };
             Pie.prototype._getDrawer = function (key) {
-                return new Plottable.Drawers.Arc(key).setClass("arc");
+                return new Plottable.Drawers.Arc(key, this).setClass("arc");
             };
             Pie.prototype.getAllPlotData = function (datasetKeys) {
                 var _this = this;

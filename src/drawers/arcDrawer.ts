@@ -4,8 +4,11 @@ module Plottable {
 export module Drawers {
   export class Arc extends Element {
 
-    constructor(key: string) {
+    private _piePlot: Plots.Pie;
+
+    constructor(key: string, plot: Plots.Pie) {
       super(key);
+      this._piePlot = plot;
       this._svgElement = "path";
     }
 

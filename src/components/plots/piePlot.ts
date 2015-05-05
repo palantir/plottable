@@ -53,8 +53,8 @@ export module Plots {
       return attrToProjector;
     }
 
-    protected _getDrawer(key: string): Drawers.AbstractDrawer {
-      return new Plottable.Drawers.Arc(key).setClass("arc");
+    protected _getDrawer(key: string) {
+      return new Plottable.Drawers.Arc(key, this).setClass("arc");
     }
 
     public getAllPlotData(datasetKeys?: string | string[]): PlotData {
