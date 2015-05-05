@@ -1,6 +1,11 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
+
+  export interface ScaleCallback<S extends Scale<any, any>> {
+    (scale: S): any;
+  }
+
   export module Scales {
     export interface ExtentProvider<D> {
       (scale: Scale<D, any>): D[][];
@@ -8,12 +13,13 @@ module Plottable {
   }
 
   export class Scale<D, R> extends Core.PlottableObject {
-    protected _d3Scale: D3.Scale.Scale;
-    private _autoDomainAutomatically = true;
-    public broadcaster: Core.Broadcaster<Scale<D, R>>;
     public _typeCoercer: (d: any) => any = (d: any) => d;
-    private _domainModificationInProgress: boolean = false;
 
+    protected _d3Scale: D3.Scale.Scale;
+
+    private _callbacks: Utils.CallbackSet<ScaleCallback<Scale<D, R>>>;
+    private _autoDomainAutomatically = true;
+    private _domainModificationInProgress: boolean = false;
     private _extentProviders: Utils.Set<Scales.ExtentProvider<D>>;
 
     /**
@@ -29,7 +35,7 @@ module Plottable {
     constructor(scale: D3.Scale.Scale) {
       super();
       this._d3Scale = scale;
-      this.broadcaster = new Core.Broadcaster(this);
+      this._callbacks = new Utils.CallbackSet<ScaleCallback<Scale<D, R>>>();
       this._extentProviders = new Utils.Set<Scales.ExtentProvider<D>>();
     }
 
@@ -39,6 +45,18 @@ module Plottable {
 
     protected _getExtent(): D[] {
       return []; // this should be overwritten
+    }
+
+    public onUpdate(callback: ScaleCallback<Scale<D, R>>) {
+      this._callbacks.add(callback);
+    }
+
+    public offUpdate(callback: ScaleCallback<Scale<D, R>>) {
+      this._callbacks.delete(callback);
+    }
+
+    protected _dispatchUpdate() {
+      this._callbacks.callCallbacks(this);
     }
 
     /**
@@ -113,7 +131,7 @@ module Plottable {
       if (!this._domainModificationInProgress) {
         this._domainModificationInProgress = true;
         this._d3Scale.domain(values);
-        this.broadcaster.broadcast();
+        this._dispatchUpdate();
         this._domainModificationInProgress = false;
       }
     }

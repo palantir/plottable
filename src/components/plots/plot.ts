@@ -39,6 +39,7 @@ module Plottable {
     private _animators: Animators.PlotAnimatorMap = {};
     protected _animateOnNextRender = true;
     private _nextSeriesIndex: number;
+    private _renderCallback: ScaleCallback<Scale<any, any>>;
 
     /**
      * Constructs a Plot.
@@ -60,6 +61,7 @@ module Plottable {
       this._extentProvider = (scale: Scale<any, any>) => this._extentsForScale(scale);
       this._datasetKeysInOrder = [];
       this._nextSeriesIndex = 0;
+      this._renderCallback = (scale) => this.render();
     }
 
     public anchor(selection: D3.Selection) {
@@ -80,7 +82,7 @@ module Plottable {
     public remove() {
       super.remove();
       this._datasetKeysInOrder.forEach((k) => this.removeDataset(k));
-      this._scales().forEach((scale) => scale.broadcaster.deregisterListener(this));
+      this._scales().forEach((scale) => scale.offUpdate(this._renderCallback));
     }
 
     /**
@@ -186,14 +188,14 @@ module Plottable {
 
       if (previousScale) {
         if (this._scales().indexOf(previousScale) !== -1) {
-          previousScale.broadcaster.deregisterListener(this);
+          previousScale.offUpdate(this._renderCallback);
           previousScale.removeExtentProvider(this._extentProvider);
         }
         previousScale._autoDomainIfAutomaticMode();
       }
 
       if (scale) {
-        scale.broadcaster.registerListener(this, () => this.render());
+        scale.onUpdate(this._renderCallback);
         scale.addExtentProvider(this._extentProvider);
         scale._autoDomainIfAutomaticMode();
       }
