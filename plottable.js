@@ -7073,34 +7073,35 @@ var Plottable;
             this.classed("xy-plot", true);
             this._xScale = xScale;
             this._yScale = yScale;
+            this._adjustYDomainOnChangeFromXFunctionWrapper = function () { return _this._adjustYDomainOnChangeFromX(); };
+            this._adjustXDomainOnChangeFromYFunctionWrapper = function () { return _this._adjustXDomainOnChangeFromY(); };
             this._updateXDomainer();
-            xScale.registerCoolListener("yDomainAdjustment" + this.getID(), function () { return _this._adjustYDomainOnChangeFromX(); });
+            xScale.registerCoolListener("yDomainAdjustment" + this.getID(), this._adjustYDomainOnChangeFromXFunctionWrapper);
             this._updateYDomainer();
-            yScale.registerCoolListener("xDomainAdjustment" + this.getID(), function () { return _this._adjustXDomainOnChangeFromY(); });
+            yScale.registerCoolListener("xDomainAdjustment" + this.getID(), this._adjustXDomainOnChangeFromYFunctionWrapper);
         }
         /**
          * @param {string} attrToSet One of ["x", "y"] which determines the point's
          * x and y position in the Plot.
          */
         XYPlot.prototype.project = function (attrToSet, accessor, scale) {
-            var _this = this;
             // We only want padding and nice-ing on scales that will correspond to axes / pixel layout.
             // So when we get an "x" or "y" scale, enable autoNiceing and autoPadding.
             if (attrToSet === "x" && scale) {
                 if (this._xScale) {
-                    this._xScale.deregisterCoolListener("yDomainAdjustment" + this.getID());
+                    this._xScale.deregisterCoolListener("yDomainAdjustment" + this.getID(), this._adjustYDomainOnChangeFromXFunctionWrapper);
                 }
                 this._xScale = scale;
                 this._updateXDomainer();
-                scale.registerCoolListener("yDomainAdjustment" + this.getID(), function () { return _this._adjustYDomainOnChangeFromX(); });
+                scale.registerCoolListener("yDomainAdjustment" + this.getID(), this._adjustYDomainOnChangeFromXFunctionWrapper);
             }
             if (attrToSet === "y" && scale) {
                 if (this._yScale) {
-                    this._yScale.deregisterCoolListener("xDomainAdjustment" + this.getID());
+                    this._yScale.deregisterCoolListener("xDomainAdjustment" + this.getID(), this._adjustXDomainOnChangeFromYFunctionWrapper);
                 }
                 this._yScale = scale;
                 this._updateYDomainer();
-                scale.registerCoolListener("xDomainAdjustment" + this.getID(), function () { return _this._adjustXDomainOnChangeFromY(); });
+                scale.registerCoolListener("xDomainAdjustment" + this.getID(), this._adjustXDomainOnChangeFromYFunctionWrapper);
             }
             _super.prototype.project.call(this, attrToSet, accessor, scale);
             return this;
@@ -7108,10 +7109,10 @@ var Plottable;
         XYPlot.prototype.remove = function () {
             _super.prototype.remove.call(this);
             if (this._xScale) {
-                this._xScale.deregisterCoolListener("yDomainAdjustment" + this.getID());
+                this._xScale.deregisterCoolListener("yDomainAdjustment" + this.getID(), this._adjustYDomainOnChangeFromXFunctionWrapper);
             }
             if (this._yScale) {
-                this._yScale.deregisterCoolListener("xDomainAdjustment" + this.getID());
+                this._yScale.deregisterCoolListener("xDomainAdjustment" + this.getID(), this._adjustXDomainOnChangeFromYFunctionWrapper);
             }
             return this;
         };

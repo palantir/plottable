@@ -7,6 +7,9 @@ module Plottable {
     private _autoAdjustXScaleDomain = false;
     private _autoAdjustYScaleDomain = false;
 
+    private _adjustYDomainOnChangeFromXFunctionWrapper: Function;
+    private _adjustXDomainOnChangeFromYFunctionWrapper: Function
+
     /**
      * Constructs an XYPlot.
      *
@@ -27,10 +30,15 @@ module Plottable {
 
       this._xScale = xScale;
       this._yScale = yScale;
+
+      this._adjustYDomainOnChangeFromXFunctionWrapper = () => this._adjustYDomainOnChangeFromX();
+      this._adjustXDomainOnChangeFromYFunctionWrapper = () => this._adjustXDomainOnChangeFromY();
+
       this._updateXDomainer();
-      xScale.registerCoolListener("yDomainAdjustment" + this.getID(), () => this._adjustYDomainOnChangeFromX());
+      xScale.registerCoolListener("yDomainAdjustment" + this.getID(), this._adjustYDomainOnChangeFromXFunctionWrapper);
+
       this._updateYDomainer();
-      yScale.registerCoolListener("xDomainAdjustment" + this.getID(), () => this._adjustXDomainOnChangeFromY());
+      yScale.registerCoolListener("xDomainAdjustment" + this.getID(), this._adjustXDomainOnChangeFromYFunctionWrapper);
     }
 
     /**
@@ -42,20 +50,21 @@ module Plottable {
       // So when we get an "x" or "y" scale, enable autoNiceing and autoPadding.
       if (attrToSet === "x" && scale) {
         if (this._xScale) {
-          this._xScale.deregisterCoolListener("yDomainAdjustment" + this.getID());
+          this._xScale.deregisterCoolListener("yDomainAdjustment" + this.getID(), this._adjustYDomainOnChangeFromXFunctionWrapper);
         }
         this._xScale = scale;
         this._updateXDomainer();
-        scale.registerCoolListener("yDomainAdjustment" + this.getID(), () => this._adjustYDomainOnChangeFromX());
+
+        scale.registerCoolListener("yDomainAdjustment" + this.getID(), this._adjustYDomainOnChangeFromXFunctionWrapper);
       }
 
       if (attrToSet === "y" && scale) {
         if (this._yScale) {
-          this._yScale.deregisterCoolListener("xDomainAdjustment" + this.getID());
+          this._yScale.deregisterCoolListener("xDomainAdjustment" + this.getID(), this._adjustXDomainOnChangeFromYFunctionWrapper);
         }
         this._yScale = scale;
         this._updateYDomainer();
-        scale.registerCoolListener("xDomainAdjustment" + this.getID(), () => this._adjustXDomainOnChangeFromY());
+        scale.registerCoolListener("xDomainAdjustment" + this.getID(), this._adjustXDomainOnChangeFromYFunctionWrapper);
       }
 
       super.project(attrToSet, accessor, scale);
@@ -66,10 +75,10 @@ module Plottable {
     public remove() {
       super.remove();
       if (this._xScale) {
-        this._xScale.deregisterCoolListener("yDomainAdjustment" + this.getID());
+        this._xScale.deregisterCoolListener("yDomainAdjustment" + this.getID(), this._adjustYDomainOnChangeFromXFunctionWrapper);
       }
       if (this._yScale) {
-        this._yScale.deregisterCoolListener("xDomainAdjustment" + this.getID());
+        this._yScale.deregisterCoolListener("xDomainAdjustment" + this.getID(), this._adjustXDomainOnChangeFromYFunctionWrapper);
       }
       return this;
     }
