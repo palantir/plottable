@@ -518,7 +518,6 @@ declare module Plottable {
          * @returns {Dataset} The calling Dataset.
          */
         metadata(metadata: any): Dataset;
-        _getExtent(accessor: _Accessor, typeCoercer: (d: any) => any, plotMetadata?: any): any[];
     }
 }
 
@@ -655,10 +654,8 @@ declare module Plottable {
         yMax: number;
     };
     type _SpaceRequest = {
-        width: number;
-        height: number;
-        wantsWidth: boolean;
-        wantsHeight: boolean;
+        minWidth: number;
+        minHeight: number;
     };
     /**
      * The range of your current data. For example, [1, 2, 6, -5] has the Extent
@@ -1554,8 +1551,6 @@ declare module Plottable {
         };
         render(): Component;
         _doRender(): void;
-        _useLastCalculatedLayout(): boolean;
-        _useLastCalculatedLayout(useLast: boolean): Component;
         /**
          * Causes the Component to recompute layout and redraw.
          *
@@ -1786,8 +1781,6 @@ declare module Plottable {
          * @returns {ComponentContainer} The calling ComponentContainer
          */
         detachAll(): ComponentContainer;
-        _useLastCalculatedLayout(): boolean;
-        _useLastCalculatedLayout(calculated: boolean): Component;
         destroy(): void;
     }
 }
@@ -2044,7 +2037,7 @@ declare module Plottable {
             axisConfigurations(configurations: TimeAxisConfiguration[]): Time;
             orient(): string;
             orient(orientation: string): Time;
-            _computeHeight(): number;
+            protected _computeHeight(): number;
             protected _getSize(availableWidth: number, availableHeight: number): {
                 width: number;
                 height: number;
@@ -2073,8 +2066,8 @@ declare module Plottable {
              */
             constructor(scale: QuantitativeScale<number>, orientation: string, formatter?: (d: any) => string);
             protected _setup(): void;
-            _computeWidth(): number;
-            _computeHeight(): number;
+            protected _computeWidth(): number;
+            protected _computeHeight(): number;
             protected _getTickValues(): any[];
             protected _rescale(): void;
             _doRender(): void;

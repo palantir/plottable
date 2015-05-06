@@ -38,7 +38,6 @@ module Plottable {
     private _yOffset = 0;
     private _cssClasses: string[] = ["component"];
     private _removed = false;
-    private _usedLastLayout = false;
 
     /**
      * Attaches the Component as a child of a given D3 Selection.
@@ -103,7 +102,10 @@ module Plottable {
     }
 
     public _requestedSpace(availableWidth: number, availableHeight: number): _SpaceRequest {
-      return {width: 0, height: 0, wantsWidth: false, wantsHeight: false};
+      return {
+        minWidth: 0,
+        minHeight: 0
+      };
     }
 
     /**
@@ -156,8 +158,8 @@ module Plottable {
     protected _getSize(availableWidth: number, availableHeight: number) {
       var requestedSpace = this._requestedSpace(availableWidth, availableHeight);
       return {
-        width: this._isFixedWidth()  ? Math.min(availableWidth , requestedSpace.width)  : availableWidth,
-        height: this._isFixedHeight() ? Math.min(availableHeight, requestedSpace.height) : availableHeight
+        width: this._isFixedWidth()  ? Math.min(availableWidth , requestedSpace.minWidth)  : availableWidth,
+        height: this._isFixedHeight() ? Math.min(availableHeight, requestedSpace.minHeight) : availableHeight
       };
     }
 
@@ -176,17 +178,6 @@ module Plottable {
 
     public _doRender() {/* overwrite */}
 
-    public _useLastCalculatedLayout(): boolean;
-    public _useLastCalculatedLayout(useLast: boolean): Component;
-    public _useLastCalculatedLayout(useLast?: boolean): any {
-      if (useLast == null) {
-        return this._usedLastLayout;
-      } else {
-        this._usedLastLayout = useLast;
-        return this;
-      }
-    }
-
     /**
      * Causes the Component to recompute layout and redraw.
      *
@@ -196,7 +187,6 @@ module Plottable {
      * @returns {Component} The calling Component.
      */
     public redraw() {
-      this._useLastCalculatedLayout(false);
       if (this._isAnchored && this._isSetup) {
         if (this._isTopLevelComponent) {
           this._scheduleComputeLayout();

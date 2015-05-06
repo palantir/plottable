@@ -157,10 +157,8 @@ export module Components {
       }
 
       return {
-        width: desiredWidth,
-        height: desiredHeight,
-        wantsWidth: offeredWidth < desiredWidth,
-        wantsHeight: offeredHeight < desiredHeight
+        minWidth: desiredWidth,
+        minHeight: desiredHeight
       };
     }
 

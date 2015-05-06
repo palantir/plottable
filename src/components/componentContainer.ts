@@ -87,15 +87,6 @@ module Plottable {
       return this;
     }
 
-    public _useLastCalculatedLayout(): boolean;
-    public _useLastCalculatedLayout(calculated: boolean): Component;
-    public _useLastCalculatedLayout(calculated?: boolean): any {
-      if (calculated != null) {
-        this.components().slice().forEach((c: Component) => c._useLastCalculatedLayout(calculated));
-      }
-      return super._useLastCalculatedLayout(calculated);
-    }
-
     public destroy() {
       super.destroy();
       this.components().slice().forEach((c: Component) => c.destroy());

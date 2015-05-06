@@ -19,10 +19,8 @@ describe("Category Axes", () => {
     var ca = new Plottable.Axes.Category(scale);
     ca.anchor(svg);
     var s = ca._requestedSpace(400, 400);
-    assert.operator(s.width, ">=", 0, "it requested 0 or more width");
-    assert.operator(s.height, ">=", 0, "it requested 0 or more height");
-    assert.isFalse(s.wantsWidth, "it doesn't want width");
-    assert.isFalse(s.wantsHeight, "it doesn't want height");
+    assert.operator(s.minWidth, ">=", 0, "it requested 0 or more width");
+    assert.operator(s.minHeight, ">=", 0, "it requested 0 or more height");
     svg.remove();
   });
 
@@ -131,12 +129,12 @@ describe("Category Axes", () => {
     var scale = new Plottable.Scales.Category().domain(years);
     var axis = new Plottable.Axes.Category(scale, "bottom");
     axis.renderTo(svg);
-    var requestedSpace = axis._requestedSpace(300, 10);
-    assert.isTrue(requestedSpace.wantsHeight, "axis should ask for more space (horizontal orientation)");
+    var smallDimension = 10;
+    var spaceRequest = axis._requestedSpace(300, smallDimension);
+    assert.operator(spaceRequest.minHeight, ">", smallDimension, "horizontal axis requested more height if constrained");
     axis.orient("left");
-    requestedSpace = axis._requestedSpace(10, 300);
-    assert.isTrue(requestedSpace.wantsWidth, "axis should ask for more space (vertical orientation)");
-
+    spaceRequest = axis._requestedSpace(smallDimension, 300);
+    assert.operator(spaceRequest.minWidth, ">", smallDimension, "vertical axis requested more width if constrained");
     svg.remove();
   });
 
@@ -172,11 +170,11 @@ describe("Category Axes", () => {
     axis.renderTo(svg);
 
     var requestedSpace = axis._requestedSpace(300, 50);
-    var flatHeight = requestedSpace.height;
+    var flatHeight = requestedSpace.minHeight;
 
     axis.tickLabelAngle(-90);
     requestedSpace = axis._requestedSpace(300, 50);
-    assert.isTrue(flatHeight < requestedSpace.height, "axis should request more height when tick labels are rotated");
+    assert.isTrue(flatHeight < requestedSpace.minHeight, "axis should request more height when tick labels are rotated");
 
     svg.remove();
   });
