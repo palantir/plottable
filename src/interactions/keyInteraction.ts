@@ -10,7 +10,9 @@ export module Interactions {
      */
     private _positionDispatcher: Plottable.Dispatchers.Mouse;
     private _keyDispatcher: Plottable.Dispatchers.Key;
-    private _keyCode2Callback: { [keyCode: string]: () => void; } = {};
+    private _keyCode2Callback: { [keyCode: string]: KeyCallback } = {};
+
+    private _keyCodeCallbacks: { [keyCode: string]: Utils.CallbackSet<KeyCallback> } = {};
 
     public _anchor(component: Component) {
       super._anchor(component);
@@ -25,8 +27,8 @@ export module Interactions {
 
     private _handleKeyEvent(keyCode: number) {
       var p = this._translateToComponentSpace(this._positionDispatcher.getLastMousePosition());
-      if (this._isInsideComponent(p) && this._keyCode2Callback[keyCode]) {
-        this._keyCode2Callback[keyCode]();
+      if (this._isInsideComponent(p) && this._keyCodeCallbacks[keyCode]) {
+        this._keyCodeCallbacks[keyCode].callCallbacks();
       }
     }
 
@@ -38,8 +40,27 @@ export module Interactions {
      * @param {() => void} callback Callback to be called.
      * @returns The calling Interaction.Key.
      */
-    public onKey(keyCode: number, callback: KeyCallback): Key {
-      this._keyCode2Callback[keyCode] = callback;
+    public onKey(keyCode: number, callback: KeyCallback) {
+      if (!this._keyCodeCallbacks[keyCode]) {
+        this._keyCodeCallbacks[keyCode] = new Utils.CallbackSet<KeyCallback>();
+      }
+      this._keyCodeCallbacks[keyCode].add(callback);
+      return this;
+    }
+
+    /**
+     * Removes the callback to be called when the key with the given keyCode is
+     * pressed and the user is moused over the Component.
+     *
+     * @param {number} keyCode The key code associated with the key.
+     * @param {() => void} callback Callback to be called.
+     * @returns The calling Interaction.Key.
+     */
+    public offKey(keyCode: number, callback: KeyCallback) {
+      this._keyCodeCallbacks[keyCode].delete(callback);
+      if (this._keyCodeCallbacks[keyCode].values().length === 0) {
+        delete this._keyCodeCallbacks[keyCode];
+      }
       return this;
     }
   }

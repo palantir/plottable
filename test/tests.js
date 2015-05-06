@@ -8494,7 +8494,7 @@ describe("Interactions", function () {
             aCallback2Called = false;
             $target.simulate("keydown", { keyCode: aCode });
             assert.isFalse(aCallback1Called, "callback 1 for \"a\" was disconnected from the interaction");
-            assert.isTrue(aCallback1Called, "callback 2 for \"a\" is still connected to the interaction");
+            assert.isTrue(aCallback2Called, "callback 2 for \"a\" is still connected to the interaction");
             svg.remove();
         });
     });

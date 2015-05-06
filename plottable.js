@@ -9522,6 +9522,7 @@ var Plottable;
             function Key() {
                 _super.apply(this, arguments);
                 this._keyCode2Callback = {};
+                this._keyCodeCallbacks = {};
             }
             Key.prototype._anchor = function (component) {
                 var _this = this;
@@ -9533,8 +9534,8 @@ var Plottable;
             };
             Key.prototype._handleKeyEvent = function (keyCode) {
                 var p = this._translateToComponentSpace(this._positionDispatcher.getLastMousePosition());
-                if (this._isInsideComponent(p) && this._keyCode2Callback[keyCode]) {
-                    this._keyCode2Callback[keyCode]();
+                if (this._isInsideComponent(p) && this._keyCodeCallbacks[keyCode]) {
+                    this._keyCodeCallbacks[keyCode].callCallbacks();
                 }
             };
             /**
@@ -9546,7 +9547,25 @@ var Plottable;
              * @returns The calling Interaction.Key.
              */
             Key.prototype.onKey = function (keyCode, callback) {
-                this._keyCode2Callback[keyCode] = callback;
+                if (!this._keyCodeCallbacks[keyCode]) {
+                    this._keyCodeCallbacks[keyCode] = new Plottable.Utils.CallbackSet();
+                }
+                this._keyCodeCallbacks[keyCode].add(callback);
+                return this;
+            };
+            /**
+             * Removes the callback to be called when the key with the given keyCode is
+             * pressed and the user is moused over the Component.
+             *
+             * @param {number} keyCode The key code associated with the key.
+             * @param {() => void} callback Callback to be called.
+             * @returns The calling Interaction.Key.
+             */
+            Key.prototype.offKey = function (keyCode, callback) {
+                this._keyCodeCallbacks[keyCode].delete(callback);
+                if (this._keyCodeCallbacks[keyCode].values().length === 0) {
+                    delete this._keyCodeCallbacks[keyCode];
+                }
                 return this;
             };
             return Key;
