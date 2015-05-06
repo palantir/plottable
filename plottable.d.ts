@@ -2608,16 +2608,10 @@ declare module Plottable {
         protected _setup(): void;
         remove(): void;
         /**
-         * Adds a dataset to this plot. Identify this dataset with a key.
-         *
-         * A key is automatically generated if not supplied.
-         *
-         * @param {string} [key] The key of the dataset.
-         * @param {Dataset | any[]} dataset dataset to add.
+         * @param {Dataset} dataset
          * @returns {Plot} The calling Plot.
          */
-        addDataset(dataset: Dataset | any[]): Plot;
-        addDataset(key: string, dataset: Dataset | any[]): Plot;
+        addDataset(dataset: Dataset): Plot;
         protected _getDrawer(key: string): Drawers.AbstractDrawer;
         protected _getAnimator(key: string): Animators.PlotAnimator;
         protected _onDatasetUpdate(): void;
@@ -2656,10 +2650,10 @@ declare module Plottable {
          *
          * Note that this will return all of the data attributes, which may not perfectly align to svg attributes
          *
-         * @param {datasetKey} the key of the dataset to generate the dictionary for
+         * @param {Dataset} dataset The dataset to generate the dictionary for
          * @returns {AttributeToAppliedProjector} A dictionary mapping attributes to functions
          */
-        generateProjectors(datasetKey: string): AttributeToAppliedProjector;
+        generateProjectors(dataset: Dataset): AttributeToAppliedProjector;
         _doRender(): void;
         /**
          * Enables or disables animation.
@@ -2707,15 +2701,14 @@ declare module Plottable {
          */
         datasetOrder(order: string[]): Plot;
         /**
-         * Removes a dataset by the given identifier
-         *
-         * @param {string | Dataset | any[]} datasetIdentifer The identifier as the key of the Dataset to remove
-         * If string is inputted, it is interpreted as the dataset key to remove.
-         * If Dataset is inputted, the first Dataset in the plot that is the same will be removed.
-         * If any[] is inputted, the first data array in the plot that is the same will be removed.
+         * @param {Dataset} dataset
          * @returns {Plot} The calling Plot.
          */
-        removeDataset(datasetIdentifier: string | Dataset | any[]): Plot;
+        removeDataset(dataset: Dataset): Plot;
+        /**
+         * Returns an array of internal keys corresponding to those Datasets actually on the plot
+         */
+        protected _keysForDatasets(datasets: Dataset[]): string[];
         datasets(): Dataset[];
         protected _getDrawersInOrder(): Drawers.AbstractDrawer[];
         protected _generateDrawSteps(): Drawers.DrawStep[];
@@ -2728,24 +2721,23 @@ declare module Plottable {
          */
         protected _getPlotMetadataForDataset(key: string): Plots.PlotMetadata;
         /**
-         * Retrieves all of the selections of this plot for the specified dataset(s)
+         * Retrieves all of the Selections of this Plot for the specified Datasets.
          *
-         * @param {string | string[]} datasetKeys The dataset(s) to retrieve the selections from.
+         * @param {Dataset[]} datasets The Datasets to retrieve the selections from.
          * If not provided, all selections will be retrieved.
-         * @param {boolean} exclude If set to true, all datasets will be queried excluding the keys referenced
+         * @param {boolean} exclude If set to true, all Datasets will be queried excluding the keys referenced
          * in the previous datasetKeys argument (default = false).
-         * @returns {D3.Selection} The retrieved selections.
+         * @returns {D3.Selection} The retrieved Selections.
          */
-        getAllSelections(datasetKeys?: string | string[], exclude?: boolean): D3.Selection;
+        getAllSelections(datasets?: Dataset[], exclude?: boolean): D3.Selection;
         /**
          * Retrieves all of the PlotData of this plot for the specified dataset(s)
          *
-         * @param {string | string[]} datasetKeys The dataset(s) to retrieve the selections from.
-         * If not provided, all selections will be retrieved.
+         * @param {Dataset[]} datasets The Datasets to retrieve the PlotData from.
+         * If not provided, all PlotData will be retrieved.
          * @returns {PlotData} The retrieved PlotData.
          */
-        getAllPlotData(datasetKeys?: string | string[]): Plots.PlotData;
-        protected _getAllPlotData(datasetKeys: string[]): Plots.PlotData;
+        getAllPlotData(datasets?: Dataset[]): Plots.PlotData;
         /**
          * Retrieves PlotData with the lowest distance, where distance is defined
          * to be the Euclidiean norm.
@@ -2770,10 +2762,10 @@ declare module Plottable {
              */
             constructor();
             computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Pie;
-            addDataset(keyOrDataset: any, dataset?: any): Pie;
+            addDataset(dataset: Dataset): Pie;
             protected _generateAttrToProjector(): AttributeToProjector;
             protected _getDrawer(key: string): Drawers.AbstractDrawer;
-            getAllPlotData(datasetKeys?: string | string[]): PlotData;
+            getAllPlotData(datasets?: Dataset[]): Plots.PlotData;
         }
     }
 }
@@ -2905,7 +2897,7 @@ declare module Plottable {
              * to use for each grid cell.
              */
             constructor(xScale: Scale<any, any>, yScale: Scale<any, any>, colorScale: Scale<any, string>);
-            addDataset(keyOrDataset: any, dataset?: any): Grid;
+            addDataset(dataset: Dataset): Grid;
             protected _getDrawer(key: string): Drawers.Rect;
             /**
              * @param {string} attrToSet One of ["x", "y", "x2", "y2", "fill"]. If "fill" is used,
@@ -3031,7 +3023,7 @@ declare module Plottable {
              * If the position scale of the plot is a QuantitativeScaleScale, then _getMinimumDataWidth is scaled to compute the barPixelWidth
              */
             protected _getBarPixelWidth(): number;
-            protected _getAllPlotData(datasetKeys: string[]): PlotData;
+            getAllPlotData(datasets?: Dataset[]): Plots.PlotData;
         }
     }
 }
@@ -3057,7 +3049,7 @@ declare module Plottable {
                 [attrToSet: string]: (datum: any, index: number, userMetadata: any, plotMetadata: PlotMetadata) => any;
             };
             protected _wholeDatumAttributes(): string[];
-            protected _getAllPlotData(datasetKeys: string[]): PlotData;
+            getAllPlotData(datasets?: Dataset[]): Plots.PlotData;
             /**
              * Retrieves the closest PlotData to queryPoint.
              *

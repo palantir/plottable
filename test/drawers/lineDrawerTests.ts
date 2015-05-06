@@ -9,10 +9,10 @@ describe("Drawers", () => {
       var yScale = new Plottable.Scales.Linear();
       var linePlot = new Plottable.Plots.Line(xScale, yScale);
 
-      var drawer = new Plottable.Drawers.Line("one");
+      var drawer = new Plottable.Drawers.Line("_0"); // HACKHACK: Dataset keys are being removed, so this is the internal key
       (<any> linePlot)._getDrawer = () => drawer;
 
-      linePlot.addDataset("one", data);
+      linePlot.addDataset(new Plottable.Dataset(data));
       linePlot.project("x", "a", xScale);
       linePlot.project("y", "b", yScale);
       linePlot.renderTo(svg);
@@ -33,10 +33,10 @@ describe("Drawers", () => {
       var yScale = new Plottable.Scales.Linear();
       var linePlot = new Plottable.Plots.Line(xScale, yScale);
 
-      var drawer = new Plottable.Drawers.Line("one");
+      var drawer = new Plottable.Drawers.Line("_0"); // HACKHACK: Dataset keys are being removed, so this is the internal key
       (<any> linePlot)._getDrawer = () => drawer;
 
-      linePlot.addDataset("one", data);
+      linePlot.addDataset(new Plottable.Dataset(data));
       linePlot.project("x", "a", xScale);
       linePlot.project("y", "b", yScale);
       linePlot.renderTo(svg);

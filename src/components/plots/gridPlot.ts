@@ -34,12 +34,12 @@ export module Plots {
       this.animator("cells", new Animators.Null());
     }
 
-    public addDataset(keyOrDataset: any, dataset?: any) {
+    public addDataset(dataset: Dataset) {
       if (this._datasetKeysInOrder.length === 1) {
         Utils.Methods.warn("Only one dataset is supported in Grid plots");
         return this;
       }
-      super.addDataset(keyOrDataset, dataset);
+      super.addDataset(dataset);
       return this;
     }
 

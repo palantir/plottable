@@ -293,10 +293,10 @@ describe("NumericAxis", () => {
   });
 
   it("truncates long labels", () => {
-    var data = [
+    var dataset = new Plottable.Dataset([
       { x: "A", y: 500000000 },
       { x: "B", y:  400000000 }
-    ];
+    ]);
     var SVG_WIDTH = 120;
     var SVG_HEIGHT = 300;
     var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
@@ -308,7 +308,7 @@ describe("NumericAxis", () => {
     var barPlot = new Plottable.Plots.Bar(xScale, yScale);
     barPlot.project("x", "x", xScale);
     barPlot.project("y", "y", yScale);
-    barPlot.addDataset(data);
+    barPlot.addDataset(dataset);
 
     var chart = new Plottable.Components.Table([
         [ yLabel, yAxis, barPlot ]

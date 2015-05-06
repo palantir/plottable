@@ -99,7 +99,7 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("getBar()", () => {
+      it("getBars()", () => {
         var bar: D3.Selection = barPlot.getBars(155, 150); // in the middle of bar 0
 
         assert.lengthOf(bar[0], 1, "getBar returns a bar");
@@ -340,8 +340,8 @@ describe("Plots", () => {
           {x: 10, y: -1.5},
           {x: 100, y: 1}
         ];
-        dataset = new Plottable.Dataset(data);
         barPlot = new Plottable.Plots.Bar(xScale, yScale);
+        dataset = new Plottable.Dataset(data);
         barPlot.addDataset(dataset);
         barPlot.baseline(0);
         barPlot.project("x", "x", xScale);
@@ -371,21 +371,21 @@ describe("Plots", () => {
 
       it("sensible bar width one datum", () => {
         barPlot.removeDataset(dataset);
-        barPlot.addDataset([{x: 10, y: 2}]);
+        barPlot.addDataset(new Plottable.Dataset([{x: 10, y: 2}]));
         assert.closeTo((<any> barPlot)._getBarPixelWidth(), 228, 0.1, "sensible bar width for only one datum");
         svg.remove();
       });
 
       it("sensible bar width same datum", () => {
         barPlot.removeDataset(dataset);
-        barPlot.addDataset([{x: 10, y: 2}, {x: 10, y: 2}]);
+        barPlot.addDataset(new Plottable.Dataset([{x: 10, y: 2}, {x: 10, y: 2}]));
         assert.closeTo((<any> barPlot)._getBarPixelWidth(), 228, 0.1, "uses the width sensible for one datum");
         svg.remove();
       });
 
       it("sensible bar width unsorted data", () => {
         barPlot.removeDataset(dataset);
-        barPlot.addDataset([{x: 2, y: 2}, {x: 20, y: 2}, {x: 5, y: 2}]);
+        barPlot.addDataset(new Plottable.Dataset([{x: 2, y: 2}, {x: 20, y: 2}, {x: 5, y: 2}]));
         var expectedBarPixelWidth = (xScale.scale(5) - xScale.scale(2)) * 0.95;
         assert.closeTo((<any> barPlot)._getBarPixelWidth(), expectedBarPixelWidth, 0.1, "bar width uses closest sorted x values");
         svg.remove();
@@ -408,7 +408,7 @@ describe("Plots", () => {
         xScale = new Plottable.Scales.Time();
         var yScale = new Plottable.Scales.Linear();
         barPlot = new Plottable.Plots.Bar(xScale, yScale);
-        barPlot.addDataset(data)
+        barPlot.addDataset(new Plottable.Dataset(data))
                .project("x", (d: any) => d3.time.format("%m/%d/%y").parse(d.x), xScale)
                .project("y", "y", yScale)
                .renderTo(svg);
@@ -443,7 +443,6 @@ describe("Plots", () => {
           {y: "B", x: 1} // duplicate Y-value
         ];
         dataset = new Plottable.Dataset(data);
-
         barPlot = new Plottable.Plots.Bar(xScale, yScale, false);
         barPlot.addDataset(dataset);
         barPlot.animate(false);
@@ -647,9 +646,9 @@ describe("Plots", () => {
       beforeEach(() => {
         svg = TestMethods.generateSVG();
         data = [{x: "foo", y: 5}, {x: "bar", y: 640}, {x: "zoo", y: 12345}];
-        dataset = new Plottable.Dataset(data);
         xScale = new Plottable.Scales.Category();
         yScale = new Plottable.Scales.Linear();
+        dataset = new Plottable.Dataset(data);
         plot = new Plottable.Plots.Bar<string, number>(xScale, yScale);
         plot.addDataset(dataset);
         plot.project("x", "x", xScale);
@@ -733,60 +732,40 @@ describe("Plots", () => {
 
       it("retrieves all dataset selections with no args", () => {
         var barData = [{ x: "foo", y: 5 }, { x: "bar", y: 640 }, { x: "zoo", y: 12345 }];
-        var barData2 = [{ x: "one", y: 5 }, { x: "two", y: 640 }, { x: "three", y: 12345 }];
-        verticalBarPlot.addDataset("a", barData);
-        verticalBarPlot.addDataset("b", barData2);
+        verticalBarPlot.addDataset(new Plottable.Dataset(barData));
         verticalBarPlot.renderTo(svg);
 
         var allBars = verticalBarPlot.getAllSelections();
-        var allBars2 = verticalBarPlot.getAllSelections((<any> verticalBarPlot)._datasetKeysInOrder);
-        assert.deepEqual(allBars, allBars2, "both ways of getting all selections work");
+        assert.strictEqual(allBars.size(), 3, "retrieved all bars");
 
         svg.remove();
       });
 
-      it("retrieves correct selections (string arg)", () => {
-        var barData = [{ x: "foo", y: 5 }, { x: "bar", y: 640 }, { x: "zoo", y: 12345 }];
-        var barData2 = [{ x: "one", y: 5 }, { x: "two", y: 640 }, { x: "three", y: 12345 }];
-        verticalBarPlot.addDataset("a", barData);
-        verticalBarPlot.addDataset(barData2);
+      it("retrieves correct selections for supplied Datasets", () => {
+        var dataset1 = new Plottable.Dataset([{ x: "foo", y: 5 }, { x: "bar", y: 640 }, { x: "zoo", y: 12345 }]);
+        var dataset2 = new Plottable.Dataset([{ x: "one", y: 5 }, { x: "two", y: 640 }, { x: "three", y: 12345 }]);
+        verticalBarPlot.addDataset(dataset1);
+        verticalBarPlot.addDataset(dataset2);
         verticalBarPlot.renderTo(svg);
 
-        var allBars = verticalBarPlot.getAllSelections("a");
+        var allBars = verticalBarPlot.getAllSelections([dataset1]);
         assert.strictEqual(allBars.size(), 3, "all bars retrieved");
         var selectionData = allBars.data();
-        assert.includeMembers(selectionData, barData, "first dataset data in selection data");
+        assert.includeMembers(selectionData, dataset1.data(), "first dataset data in selection data");
 
         svg.remove();
       });
 
-      it("retrieves correct selections (array arg)", () => {
-        var barData = [{ x: "foo", y: 5 }, { x: "bar", y: 640 }, { x: "zoo", y: 12345 }];
-        var barData2 = [{ x: "one", y: 5 }, { x: "two", y: 640 }, { x: "three", y: 12345 }];
-        verticalBarPlot.addDataset("a", barData);
-        verticalBarPlot.addDataset("b", barData2);
+      it("skips invalid Datasets", () => {
+        var dataset1 = new Plottable.Dataset([{ x: "foo", y: 5 }, { x: "bar", y: 640 }, { x: "zoo", y: 12345 }]);
+        var notAddedDataset = new Plottable.Dataset([{ x: "one", y: 5 }, { x: "two", y: 640 }, { x: "three", y: 12345 }]);
+        verticalBarPlot.addDataset(dataset1);
         verticalBarPlot.renderTo(svg);
 
-        var allBars = verticalBarPlot.getAllSelections(["a", "b"]);
-        assert.strictEqual(allBars.size(), 6, "all bars retrieved");
-        var selectionData = allBars.data();
-        assert.includeMembers(selectionData, barData, "first dataset data in selection data");
-        assert.includeMembers(selectionData, barData2, "second dataset data in selection data");
-
-        svg.remove();
-      });
-
-      it("skips invalid keys", () => {
-        var barData = [{ x: "foo", y: 5 }, { x: "bar", y: 640 }, { x: "zoo", y: 12345 }];
-        var barData2 = [{ x: "one", y: 5 }, { x: "two", y: 640 }, { x: "three", y: 12345 }];
-        verticalBarPlot.addDataset("a", barData);
-        verticalBarPlot.addDataset("b", barData2);
-        verticalBarPlot.renderTo(svg);
-
-        var allBars = verticalBarPlot.getAllSelections(["a", "c"]);
+        var allBars = verticalBarPlot.getAllSelections([dataset1, notAddedDataset]);
         assert.strictEqual(allBars.size(), 3, "all bars retrieved");
         var selectionData = allBars.data();
-        assert.includeMembers(selectionData, barData, "first dataset data in selection data");
+        assert.includeMembers(selectionData, dataset1.data(), "first dataset data in selection data");
 
         svg.remove();
       });

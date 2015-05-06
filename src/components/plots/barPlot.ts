@@ -165,8 +165,8 @@ export module Plots {
       // mouse events) usually have pixel accuracy. We add a tolerance of 0.5 pixels.
       var tolerance = 0.5;
 
-      this.datasetOrder().forEach((key) => {
-        var plotData = this.getAllPlotData(key);
+      this.datasets().forEach((dataset) => {
+        var plotData = this.getAllPlotData([dataset]);
         plotData.pixelPoints.forEach((plotPt, index) => {
           var datum = plotData.data[index];
           var bar = plotData.selection[0][index];
@@ -451,8 +451,8 @@ export module Plots {
       return barPixelWidth;
     }
 
-    protected _getAllPlotData(datasetKeys: string[]): PlotData {
-      var plotData = super._getAllPlotData(datasetKeys);
+    public getAllPlotData(datasets = this.datasets()): Plots.PlotData {
+      var plotData = super.getAllPlotData(datasets);
 
       var scaledBaseline = (<Scale<any, any>> (this._isVertical ? this._yScale : this._xScale)).scale(this.baseline());
       var isVertical = this._isVertical;

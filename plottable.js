@@ -6441,8 +6441,8 @@ var Plottable;
         Plot.prototype.remove = function () {
             var _this = this;
             _super.prototype.remove.call(this);
-            this._datasetKeysInOrder.forEach(function (k) { return _this.removeDataset(k); });
             this._scales().forEach(function (scale) { return scale.offUpdate(_this._renderCallback); });
+            this.datasets().forEach(function (dataset) { return _this.removeDataset(dataset); });
         };
         /**
          * @param {Dataset} dataset
@@ -6455,7 +6455,7 @@ var Plottable;
         };
         Plot.prototype._addDataset = function (key, dataset) {
             if (this._key2PlotDatasetKey.has(key)) {
-                this.removeDataset(key);
+                this.removeDataset(dataset);
             }
             ;
             var drawer = this._getDrawer(key);
@@ -6555,18 +6555,21 @@ var Plottable;
          *
          * Note that this will return all of the data attributes, which may not perfectly align to svg attributes
          *
-         * @param {datasetKey} the key of the dataset to generate the dictionary for
+         * @param {Dataset} dataset The dataset to generate the dictionary for
          * @returns {AttributeToAppliedProjector} A dictionary mapping attributes to functions
          */
-        Plot.prototype.generateProjectors = function (datasetKey) {
-            var attrToProjector = this._generateAttrToProjector();
-            var plotDatasetKey = this._key2PlotDatasetKey.get(datasetKey);
-            var plotMetadata = plotDatasetKey.plotMetadata;
-            var userMetadata = plotDatasetKey.dataset.metadata();
+        Plot.prototype.generateProjectors = function (dataset) {
             var attrToAppliedProjector = {};
-            d3.entries(attrToProjector).forEach(function (keyValue) {
-                attrToAppliedProjector[keyValue.key] = function (datum, index) { return keyValue.value(datum, index, userMetadata, plotMetadata); };
-            });
+            var datasetKey = this._keyForDataset(dataset);
+            if (datasetKey != null) {
+                var attrToProjector = this._generateAttrToProjector();
+                var plotDatasetKey = this._key2PlotDatasetKey.get(datasetKey);
+                var plotMetadata = plotDatasetKey.plotMetadata;
+                var userMetadata = plotDatasetKey.dataset.metadata();
+                d3.entries(attrToProjector).forEach(function (keyValue) {
+                    attrToAppliedProjector[keyValue.key] = function (datum, index) { return keyValue.value(datum, index, userMetadata, plotMetadata); };
+                });
+            }
             return attrToAppliedProjector;
         };
         Plot.prototype._doRender = function () {
@@ -6682,12 +6685,20 @@ var Plottable;
          * @returns {Plot} The calling Plot.
          */
         Plot.prototype.removeDataset = function (dataset) {
-            var index = this.datasets().indexOf(dataset);
-            if (index !== -1) {
-                var key = this._datasetKeysInOrder[index];
-                return this._removeDataset(key);
-            }
-            return this;
+            return this._removeDataset(this._keyForDataset(dataset));
+        };
+        /**
+         * Returns the internal key for the Dataset, or undefined if not found
+         */
+        Plot.prototype._keyForDataset = function (dataset) {
+            return this._datasetKeysInOrder[this.datasets().indexOf(dataset)];
+        };
+        /**
+         * Returns an array of internal keys corresponding to those Datasets actually on the plot
+         */
+        Plot.prototype._keysForDatasets = function (datasets) {
+            var _this = this;
+            return datasets.map(function (dataset) { return _this._keyForDataset(dataset); }).filter(function (key) { return key != null; });
         };
         Plot.prototype._removeDataset = function (key) {
             if (key != null && this._key2PlotDatasetKey.has(key)) {
@@ -6743,25 +6754,19 @@ var Plottable;
             this._additionalPaint(maxTime);
         };
         /**
-         * Retrieves all of the selections of this plot for the specified dataset(s)
+         * Retrieves all of the Selections of this Plot for the specified Datasets.
          *
-         * @param {string | string[]} datasetKeys The dataset(s) to retrieve the selections from.
+         * @param {Dataset[]} datasets The Datasets to retrieve the selections from.
          * If not provided, all selections will be retrieved.
-         * @param {boolean} exclude If set to true, all datasets will be queried excluding the keys referenced
+         * @param {boolean} exclude If set to true, all Datasets will be queried excluding the keys referenced
          * in the previous datasetKeys argument (default = false).
-         * @returns {D3.Selection} The retrieved selections.
+         * @returns {D3.Selection} The retrieved Selections.
          */
-        Plot.prototype.getAllSelections = function (datasetKeys, exclude) {
+        Plot.prototype.getAllSelections = function (datasets, exclude) {
             var _this = this;
-            if (datasetKeys === void 0) { datasetKeys = this.datasetOrder(); }
+            if (datasets === void 0) { datasets = this.datasets(); }
             if (exclude === void 0) { exclude = false; }
-            var datasetKeyArray = [];
-            if (typeof (datasetKeys) === "string") {
-                datasetKeyArray = [datasetKeys];
-            }
-            else {
-                datasetKeyArray = datasetKeys;
-            }
+            var datasetKeyArray = this._keysForDatasets(datasets);
             if (exclude) {
                 var excludedDatasetKeys = d3.set(datasetKeyArray);
                 datasetKeyArray = this.datasetOrder().filter(function (datasetKey) { return !excludedDatasetKeys.has(datasetKey); });
@@ -6782,27 +6787,17 @@ var Plottable;
         /**
          * Retrieves all of the PlotData of this plot for the specified dataset(s)
          *
-         * @param {string | string[]} datasetKeys The dataset(s) to retrieve the selections from.
-         * If not provided, all selections will be retrieved.
+         * @param {Dataset[]} datasets The Datasets to retrieve the PlotData from.
+         * If not provided, all PlotData will be retrieved.
          * @returns {PlotData} The retrieved PlotData.
          */
-        Plot.prototype.getAllPlotData = function (datasetKeys) {
-            if (datasetKeys === void 0) { datasetKeys = this.datasetOrder(); }
-            var datasetKeyArray = [];
-            if (typeof (datasetKeys) === "string") {
-                datasetKeyArray = [datasetKeys];
-            }
-            else {
-                datasetKeyArray = datasetKeys;
-            }
-            return this._getAllPlotData(datasetKeyArray);
-        };
-        Plot.prototype._getAllPlotData = function (datasetKeys) {
+        Plot.prototype.getAllPlotData = function (datasets) {
             var _this = this;
+            if (datasets === void 0) { datasets = this.datasets(); }
             var data = [];
             var pixelPoints = [];
             var allElements = [];
-            datasetKeys.forEach(function (datasetKey) {
+            this._keysForDatasets(datasets).forEach(function (datasetKey) {
                 var plotDatasetKey = _this._key2PlotDatasetKey.get(datasetKey);
                 if (plotDatasetKey == null) {
                     return;
@@ -6896,12 +6891,12 @@ var Plottable;
                 this._renderArea.attr("transform", "translate(" + this.width() / 2 + "," + this.height() / 2 + ")");
                 return this;
             };
-            Pie.prototype.addDataset = function (keyOrDataset, dataset) {
+            Pie.prototype.addDataset = function (dataset) {
                 if (this._datasetKeysInOrder.length === 1) {
                     Plottable.Utils.Methods.warn("Only one dataset is supported in Pie plots");
                     return this;
                 }
-                _super.prototype.addDataset.call(this, keyOrDataset, dataset);
+                _super.prototype.addDataset.call(this, dataset);
                 return this;
             };
             Pie.prototype._generateAttrToProjector = function () {
@@ -6916,9 +6911,10 @@ var Plottable;
             Pie.prototype._getDrawer = function (key) {
                 return new Plottable.Drawers.Arc(key).setClass("arc");
             };
-            Pie.prototype.getAllPlotData = function (datasetKeys) {
+            Pie.prototype.getAllPlotData = function (datasets) {
                 var _this = this;
-                var allPlotData = _super.prototype.getAllPlotData.call(this, datasetKeys);
+                if (datasets === void 0) { datasets = this.datasets(); }
+                var allPlotData = _super.prototype.getAllPlotData.call(this, datasets);
                 allPlotData.pixelPoints.forEach(function (pixelPoint) {
                     pixelPoint.x = pixelPoint.x + _this.width() / 2;
                     pixelPoint.y = pixelPoint.y + _this.height() / 2;
@@ -7314,12 +7310,12 @@ var Plottable;
                 this._colorScale = colorScale;
                 this.animator("cells", new Plottable.Animators.Null());
             }
-            Grid.prototype.addDataset = function (keyOrDataset, dataset) {
+            Grid.prototype.addDataset = function (dataset) {
                 if (this._datasetKeysInOrder.length === 1) {
                     Plottable.Utils.Methods.warn("Only one dataset is supported in Grid plots");
                     return this;
                 }
-                _super.prototype.addDataset.call(this, keyOrDataset, dataset);
+                _super.prototype.addDataset.call(this, dataset);
                 return this;
             };
             Grid.prototype._getDrawer = function (key) {
@@ -7491,8 +7487,8 @@ var Plottable;
                 // for the x, y, height & width attributes), but user selections (e.g. via
                 // mouse events) usually have pixel accuracy. We add a tolerance of 0.5 pixels.
                 var tolerance = 0.5;
-                this.datasetOrder().forEach(function (key) {
-                    var plotData = _this.getAllPlotData(key);
+                this.datasets().forEach(function (dataset) {
+                    var plotData = _this.getAllPlotData([dataset]);
                     plotData.pixelPoints.forEach(function (plotPt, index) {
                         var datum = plotData.data[index];
                         var bar = plotData.selection[0][index];
@@ -7735,8 +7731,9 @@ var Plottable;
                 }
                 return barPixelWidth;
             };
-            Bar.prototype._getAllPlotData = function (datasetKeys) {
-                var plotData = _super.prototype._getAllPlotData.call(this, datasetKeys);
+            Bar.prototype.getAllPlotData = function (datasets) {
+                if (datasets === void 0) { datasets = this.datasets(); }
+                var plotData = _super.prototype.getAllPlotData.call(this, datasets);
                 var scaledBaseline = (this._isVertical ? this._yScale : this._xScale).scale(this.baseline());
                 var isVertical = this._isVertical;
                 var barAlignmentFactor = this._barAlignmentFactor;
@@ -7843,12 +7840,13 @@ var Plottable;
             Line.prototype._wholeDatumAttributes = function () {
                 return ["x", "y"];
             };
-            Line.prototype._getAllPlotData = function (datasetKeys) {
+            Line.prototype.getAllPlotData = function (datasets) {
                 var _this = this;
+                if (datasets === void 0) { datasets = this.datasets(); }
                 var data = [];
                 var pixelPoints = [];
                 var allElements = [];
-                datasetKeys.forEach(function (datasetKey) {
+                this._keysForDatasets(datasets).forEach(function (datasetKey) {
                     var plotDatasetKey = _this._key2PlotDatasetKey.get(datasetKey);
                     if (plotDatasetKey == null) {
                         return;
@@ -7885,8 +7883,8 @@ var Plottable;
                 var closestData = [];
                 var closestPixelPoints = [];
                 var closestElements = [];
-                this.datasetOrder().forEach(function (key) {
-                    var plotData = _this.getAllPlotData(key);
+                this.datasets().forEach(function (dataset) {
+                    var plotData = _this.getAllPlotData([dataset]);
                     plotData.pixelPoints.forEach(function (pixelPoint, index) {
                         var datum = plotData.data[index];
                         var line = plotData.selection[0][0];

@@ -16,11 +16,10 @@ describe("Metadata", () => {
 
   it("plot metadata is set properly", () => {
     var d1 = new Plottable.Dataset();
+    var d2 = new Plottable.Dataset();
     var r = new Plottable.Plot()
-                              .addDataset("d1", d1)
-                              .addDataset( d1)
-                              .addDataset("d2", [])
-                              .addDataset([]);
+                              .addDataset(d1)
+                              .addDataset(d2);
     (<any> r)._datasetKeysInOrder.forEach((key: string) => {
       var plotMetadata = (<any> r)._key2PlotDatasetKey.get(key).plotMetadata;
       assert.propertyVal(plotMetadata, "datasetKey", key, "metadata has correct dataset key");
@@ -106,8 +105,8 @@ describe("Metadata", () => {
         foo: 10
       };
     };
-    plot.addDataset(data1);
-    plot.addDataset(data2);
+    plot.addDataset(new Plottable.Dataset(data1));
+    plot.addDataset(new Plottable.Dataset(data2));
     plot.renderTo(svg);
     var circles = plot.getAllSelections();
     var c1 = d3.select(circles[0][0]);
@@ -140,8 +139,10 @@ describe("Metadata", () => {
         foo: 10
       };
     };
-    plot1.addDataset(data1);
-    plot1.addDataset(data2);
+    var dataset1 = new Plottable.Dataset(data1);
+    var dataset2 = new Plottable.Dataset(data2);
+    plot1.addDataset(dataset1);
+    plot1.addDataset(dataset2);
     var plot2 = new Plottable.Plots.Scatter(xScale, yScale)
                                 .project("x", xAccessor)
                                 .project("y", yAccessor);
@@ -151,8 +152,8 @@ describe("Metadata", () => {
         foo: 20
       };
     };
-    plot2.addDataset(data1);
-    plot2.addDataset(data2);
+    plot2.addDataset(dataset1);
+    plot2.addDataset(dataset2);
     plot1.renderTo(svg);
     plot2.renderTo(svg);
     var circles = plot1.getAllSelections();
@@ -216,8 +217,8 @@ describe("Metadata", () => {
     var dataset2 = new Plottable.Dataset(data2, metadata);
 
     var checkPlot = (plot: Plottable.Plot) => {
-      plot.addDataset("ds1", dataset1)
-          .addDataset("ds2", dataset2)
+      plot.addDataset(dataset1)
+          .addDataset(dataset2)
           .project("x", (d: any, i: number, u: any, m: Plottable.Plots.PlotMetadata) => d.x + u.foo + m.datasetKey.length)
           .project("y", (d: any, i: number, u: any, m: Plottable.Plots.PlotMetadata) => d.y + u.foo - m.datasetKey.length);
 

@@ -74,8 +74,8 @@ describe("Plots", () => {
       var plot = new Plottable.Plots.Scatter(xScale, yScale)
                                    .project("x", "x", xScale)
                                    .project("y", "y", yScale)
-                                   .addDataset(data)
-                                   .addDataset(data2);
+                                   .addDataset(new Plottable.Dataset(data))
+                                   .addDataset(new Plottable.Dataset(data2));
       plot.renderTo(svg);
       var allCircles = plot.getAllSelections();
       assert.strictEqual(allCircles.size(), 4, "all circles retrieved");
@@ -103,8 +103,8 @@ describe("Plots", () => {
       var plot = new Plottable.Plots.Scatter(xScale, yScale)
                                    .project("x", "x", xScale)
                                    .project("y", "y", yScale)
-                                   .addDataset(data)
-                                   .addDataset(data2);
+                                   .addDataset(new Plottable.Dataset(data))
+                                   .addDataset(new Plottable.Dataset(data2));
       plot.renderTo(svg);
 
       var points = d3.selectAll(".scatter-plot path");
@@ -188,7 +188,7 @@ describe("Plots", () => {
       var dataAreaPart = {xMin: 3, xMax: 9, yMin: 54, yMax: 27};
       var colorAccessor = (d: any, i: number, m: any) => d3.rgb(d.x, d.y, i).toString();
       var circlesInArea: number;
-      var quadraticDataset = TestMethods.makeQuadraticSeries(10);
+      var quadraticDataset = new Plottable.Dataset(TestMethods.makeQuadraticSeries(10));
 
       function getCirclePlotVerifier() {
         // creates a function that verifies that circles are drawn properly after accounting for svg transform

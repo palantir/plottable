@@ -83,11 +83,11 @@ module Plottable {
 
     public remove() {
       super.remove();
-      this._datasetKeysInOrder.forEach((k) => this.removeDataset(k));
       this._scales().forEach((scale) => scale.offUpdate(this._renderCallback));
+      this.datasets().forEach((dataset) => this.removeDataset(dataset));
     }
 
-    /** 
+    /**
      * @param {Dataset} dataset
      * @returns {Plot} The calling Plot.
      */
@@ -99,7 +99,7 @@ module Plottable {
 
     private _addDataset(key: string, dataset: Dataset) {
       if (this._key2PlotDatasetKey.has(key)) {
-        this.removeDataset(key);
+        this.removeDataset(dataset);
       };
       var drawer = this._getDrawer(key);
       var metadata = this._getPlotMetadataForDataset(key);
@@ -208,18 +208,21 @@ module Plottable {
      *
      * Note that this will return all of the data attributes, which may not perfectly align to svg attributes
      *
-     * @param {datasetKey} the key of the dataset to generate the dictionary for
+     * @param {Dataset} dataset The dataset to generate the dictionary for
      * @returns {AttributeToAppliedProjector} A dictionary mapping attributes to functions
      */
-    public generateProjectors(datasetKey: string): AttributeToAppliedProjector {
-      var attrToProjector = this._generateAttrToProjector();
-      var plotDatasetKey = this._key2PlotDatasetKey.get(datasetKey);
-      var plotMetadata = plotDatasetKey.plotMetadata;
-      var userMetadata = plotDatasetKey.dataset.metadata();
+    public generateProjectors(dataset: Dataset): AttributeToAppliedProjector {
       var attrToAppliedProjector: AttributeToAppliedProjector = {};
-      d3.entries(attrToProjector).forEach((keyValue: any) => {
-        attrToAppliedProjector[keyValue.key] = (datum: any, index: number) => keyValue.value(datum, index, userMetadata, plotMetadata);
-      });
+      var datasetKey = this._keyForDataset(dataset);
+      if (datasetKey != null) {
+        var attrToProjector = this._generateAttrToProjector();
+        var plotDatasetKey = this._key2PlotDatasetKey.get(datasetKey);
+        var plotMetadata = plotDatasetKey.plotMetadata;
+        var userMetadata = plotDatasetKey.dataset.metadata();
+        d3.entries(attrToProjector).forEach((keyValue: any) => {
+          attrToAppliedProjector[keyValue.key] = (datum: any, index: number) => keyValue.value(datum, index, userMetadata, plotMetadata);
+        });
+      }
       return attrToAppliedProjector;
     }
 
@@ -368,12 +371,21 @@ module Plottable {
      * @returns {Plot} The calling Plot.
      */
     public removeDataset(dataset: Dataset): Plot {
-      var index = this.datasets().indexOf(dataset);
-      if (index !== -1) {
-        var key = this._datasetKeysInOrder[index];
-        return this._removeDataset(key);
-      }
-      return this;
+      return this._removeDataset(this._keyForDataset(dataset));
+    }
+
+    /**
+     * Returns the internal key for the Dataset, or undefined if not found
+     */
+    private _keyForDataset(dataset: Dataset) {
+      return this._datasetKeysInOrder[this.datasets().indexOf(dataset)];
+    }
+
+    /**
+     * Returns an array of internal keys corresponding to those Datasets actually on the plot
+     */
+    protected _keysForDatasets(datasets: Dataset[]) {
+      return datasets.map((dataset) => this._keyForDataset(dataset)).filter((key) => key != null);
     }
 
     private _removeDataset(key: string): Plot {
@@ -441,21 +453,16 @@ module Plottable {
     }
 
     /**
-     * Retrieves all of the selections of this plot for the specified dataset(s)
+     * Retrieves all of the Selections of this Plot for the specified Datasets.
      *
-     * @param {string | string[]} datasetKeys The dataset(s) to retrieve the selections from.
+     * @param {Dataset[]} datasets The Datasets to retrieve the selections from.
      * If not provided, all selections will be retrieved.
-     * @param {boolean} exclude If set to true, all datasets will be queried excluding the keys referenced
+     * @param {boolean} exclude If set to true, all Datasets will be queried excluding the keys referenced
      * in the previous datasetKeys argument (default = false).
-     * @returns {D3.Selection} The retrieved selections.
+     * @returns {D3.Selection} The retrieved Selections.
      */
-    public getAllSelections(datasetKeys: string | string[] = this.datasetOrder(), exclude = false): D3.Selection {
-      var datasetKeyArray: string[] = [];
-      if (typeof(datasetKeys) === "string") {
-        datasetKeyArray = [<string> datasetKeys];
-      } else {
-        datasetKeyArray = <string[]> datasetKeys;
-      }
+    public getAllSelections(datasets = this.datasets(), exclude = false): D3.Selection {
+      var datasetKeyArray = this._keysForDatasets(datasets);
 
       if (exclude) {
         var excludedDatasetKeys = d3.set(datasetKeyArray);
@@ -479,27 +486,16 @@ module Plottable {
     /**
      * Retrieves all of the PlotData of this plot for the specified dataset(s)
      *
-     * @param {string | string[]} datasetKeys The dataset(s) to retrieve the selections from.
-     * If not provided, all selections will be retrieved.
+     * @param {Dataset[]} datasets The Datasets to retrieve the PlotData from.
+     * If not provided, all PlotData will be retrieved.
      * @returns {PlotData} The retrieved PlotData.
      */
-    public getAllPlotData(datasetKeys: string | string[] = this.datasetOrder()): Plots.PlotData {
-      var datasetKeyArray: string[] = [];
-      if (typeof(datasetKeys) === "string") {
-        datasetKeyArray = [<string> datasetKeys];
-      } else {
-        datasetKeyArray = <string[]> datasetKeys;
-      }
-
-      return this._getAllPlotData(datasetKeyArray);
-    }
-
-    protected _getAllPlotData(datasetKeys: string[]): Plots.PlotData {
+    public getAllPlotData(datasets = this.datasets()): Plots.PlotData {
       var data: any[] = [];
       var pixelPoints: Point[] = [];
       var allElements: EventTarget[] = [];
 
-      datasetKeys.forEach((datasetKey) => {
+      this._keysForDatasets(datasets).forEach((datasetKey) => {
         var plotDatasetKey = this._key2PlotDatasetKey.get(datasetKey);
         if (plotDatasetKey == null) { return; }
         var drawer = plotDatasetKey.drawer;

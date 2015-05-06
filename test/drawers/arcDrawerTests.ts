@@ -7,10 +7,10 @@ describe("Drawers", () => {
       var data = [{value: 10}, {value: 10}, {value: 10}, {value: 10}];
       var piePlot = new Plottable.Plots.Pie();
 
-      var drawer = new Plottable.Drawers.Arc("one");
+      var drawer = new Plottable.Drawers.Arc("_0"); // HACKHACK: Dataset keys are being removed, so this is the internal key
       (<any> piePlot)._getDrawer = () => drawer;
 
-      piePlot.addDataset("one", data);
+      piePlot.addDataset(new Plottable.Dataset(data));
       piePlot.project("value", "value");
       piePlot.renderTo(svg);
 
