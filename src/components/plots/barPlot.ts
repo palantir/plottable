@@ -391,7 +391,7 @@ export module Plots {
       };
 
       var primaryAccessor = this._projections[primaryAttr].accessor;
-      if (this.labelsEnabled && this._labelFormatter) {
+      if (this._labelsEnabled && this._labelFormatter) {
         attrToProjector["label"] = (d: any, i: number, u: any, m: PlotMetadata) => {
           return this._labelFormatter(primaryAccessor(d, i, u, m));
         };

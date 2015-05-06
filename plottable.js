@@ -7690,7 +7690,7 @@ var Plottable;
                     return (originalPos > scaledBaseline) ? scaledBaseline : originalPos;
                 };
                 var primaryAccessor = this._projections[primaryAttr].accessor;
-                if (this.labelsEnabled && this.labelFormatter) {
+                if (this._labelsEnabled && this._labelFormatter) {
                     attrToProjector["label"] = function (d, i, u, m) {
                         return _this._labelFormatter(primaryAccessor(d, i, u, m));
                     };
