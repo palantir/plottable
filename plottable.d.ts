@@ -1544,11 +1544,12 @@ declare module Plottable {
             height: number;
         };
         /**
-         * Queues the Component for rendering.
+         * Queues the Component for rendering. Set immediately to true if the Component should be rendered
+         * immediately as opposed to queued to the RenderController.
          *
-         * @param immediate boolean Immediately renders the Component.
+         * @returns {Component} The calling Component
          */
-        render(immediate?: boolean): Component;
+        render(immediately?: boolean): Component;
         protected _render(): void;
         /**
          * Causes the Component to recompute layout and redraw.

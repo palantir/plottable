@@ -3308,13 +3308,14 @@ var Plottable;
             };
         };
         /**
-         * Queues the Component for rendering.
+         * Queues the Component for rendering. Set immediately to true if the Component should be rendered
+         * immediately as opposed to queued to the RenderController.
          *
-         * @param immediate boolean Immediately renders the Component.
+         * @returns {Component} The calling Component
          */
-        Component.prototype.render = function (immediate) {
-            if (immediate === void 0) { immediate = false; }
-            if (immediate) {
+        Component.prototype.render = function (immediately) {
+            if (immediately === void 0) { immediately = false; }
+            if (immediately) {
                 this._render();
                 return this;
             }
