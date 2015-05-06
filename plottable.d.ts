@@ -178,7 +178,7 @@ declare module Plottable {
          * Uses pointer equality checks which is why this works.
          * This power has a price: everything is linear time since it is actually backed by an array...
          */
-        class StrictEqualityAssociativeArray {
+        class Map {
             /**
              * Set a new key/value pair in the store.
              *

@@ -6,8 +6,8 @@ module Plottable {
     private _doNice = false;
     private _niceCount: number;
     private _padProportion = 0.0;
-    private _paddingExceptions = new Utils.StrictEqualityAssociativeArray();
-    private _includedValues = new Utils.StrictEqualityAssociativeArray();
+    private _paddingExceptions = new Utils.Map();
+    private _includedValues = new Utils.Map();
     private _combineExtents: (extents: any[][]) => any[];
     private static _PADDING_FOR_IDENTICAL_DOMAIN = 1;
     private static _ONE_DAY = 1000 * 60 * 60 * 24;
