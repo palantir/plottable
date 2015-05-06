@@ -9521,7 +9521,6 @@ var Plottable;
             __extends(Key, _super);
             function Key() {
                 _super.apply(this, arguments);
-                this._keyCode2Callback = {};
                 this._keyCodeCallbacks = {};
             }
             Key.prototype._anchor = function (component) {
@@ -9535,7 +9534,7 @@ var Plottable;
             Key.prototype._handleKeyEvent = function (keyCode) {
                 var p = this._translateToComponentSpace(this._positionDispatcher.getLastMousePosition());
                 if (this._isInsideComponent(p) && this._keyCodeCallbacks[keyCode]) {
-                    this._keyCodeCallbacks[keyCode].callCallbacks();
+                    this._keyCodeCallbacks[keyCode].callCallbacks(keyCode);
                 }
             };
             /**

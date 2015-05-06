@@ -8451,6 +8451,25 @@ describe("Interactions", function () {
             assert.isFalse(aCallbackCalled, "callback for \"a\" was not called when not moused over the Component");
             svg.remove();
         });
+        it("appropriate keyCode is sent to the callback", function () {
+            var svg = TestMethods.generateSVG(400, 400);
+            var component = new Plottable.Component();
+            component.renderTo(svg);
+            var keyInteraction = new Plottable.Interactions.Key();
+            var bCode = 66; // "b" key
+            var bCallbackCalled = false;
+            var bCallback = function (keyCode) {
+                bCallbackCalled = true;
+                assert.strictEqual(keyCode, bCode, "keyCode 65(a) was sent to the callback");
+            };
+            keyInteraction.onKey(bCode, bCallback);
+            component.registerInteraction(keyInteraction);
+            var $target = $(component.background().node());
+            TestMethods.triggerFakeMouseEvent("mouseover", component.background(), 100, 100);
+            $target.simulate("keydown", { keyCode: bCode });
+            assert.isTrue(bCallbackCalled, "callback for \"b\" was called when \"b\" key was pressed");
+            svg.remove();
+        });
         it("canceling callbacks is possible", function () {
             var svg = TestMethods.generateSVG(400, 400);
             var component = new Plottable.Component();

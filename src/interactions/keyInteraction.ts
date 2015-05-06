@@ -1,7 +1,7 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export type KeyCallback = () => void;
+export type KeyCallback = (keyCode: number) => void;
 export module Interactions {
   export class Key extends Interaction {
     /**
@@ -10,8 +10,6 @@ export module Interactions {
      */
     private _positionDispatcher: Plottable.Dispatchers.Mouse;
     private _keyDispatcher: Plottable.Dispatchers.Key;
-    private _keyCode2Callback: { [keyCode: string]: KeyCallback } = {};
-
     private _keyCodeCallbacks: { [keyCode: string]: Utils.CallbackSet<KeyCallback> } = {};
 
     public _anchor(component: Component) {
@@ -28,7 +26,7 @@ export module Interactions {
     private _handleKeyEvent(keyCode: number) {
       var p = this._translateToComponentSpace(this._positionDispatcher.getLastMousePosition());
       if (this._isInsideComponent(p) && this._keyCodeCallbacks[keyCode]) {
-        this._keyCodeCallbacks[keyCode].callCallbacks();
+        this._keyCodeCallbacks[keyCode].callCallbacks(keyCode);
       }
     }
 
