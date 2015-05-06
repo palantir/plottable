@@ -98,22 +98,25 @@ describe("Interactive Components", () => {
       };
 
       var receivedBounds: Plottable.Bounds;
+      var callbackCalled = false;
       var callback = (b: Plottable.Bounds) => {
         receivedBounds = b;
+        callbackCalled = true;
       };
       dbl.onDragStart(callback);
 
       var target = dbl.background();
       TestMethods.triggerFakeDragSequence(target, startPoint, endPoint);
 
+      assert.isTrue(callbackCalled, "the callback was called");
       assert.deepEqual(receivedBounds.topLeft, startPoint, "top-left point was set correctly");
       assert.deepEqual(receivedBounds.bottomRight, startPoint, "bottom-right point was set correctly");
 
       dbl.offDragStart(callback);
 
-
-      //TODO:
-      // assert.isNull(dbl.onDragStart(), "can blank callback by passing null");
+      callbackCalled = false;
+      TestMethods.triggerFakeDragSequence(target, startPoint, endPoint);
+      assert.isFalse(callbackCalled, "the callback was detached from the dragBoxLayer and not called");
 
       svg.remove();
     });
@@ -133,21 +136,25 @@ describe("Interactive Components", () => {
       };
 
       var receivedBounds: Plottable.Bounds;
+      var callbackCalled = false;
       var callback = (b: Plottable.Bounds) => {
         receivedBounds = b;
+        callbackCalled = true;
       };
       dbl.onDrag(callback);
 
       var target = dbl.background();
       TestMethods.triggerFakeDragSequence(target, startPoint, endPoint);
 
+      assert.isTrue(callbackCalled, "the callback was called");
       assert.deepEqual(receivedBounds.topLeft, startPoint, "top-left point was set correctly");
       assert.deepEqual(receivedBounds.bottomRight, endPoint, "bottom-right point was set correctly");
+
+      callbackCalled = false;
       dbl.offDrag(callback);
 
-
-      //TODO:
-      // assert.isNull(dbl.onDrag(), "can blank callback by passing null");
+      TestMethods.triggerFakeDragSequence(target, startPoint, endPoint);
+      assert.isFalse(callbackCalled, "the callback was detached from the dragoBoxLayer and not called");
 
       svg.remove();
     });
@@ -167,21 +174,24 @@ describe("Interactive Components", () => {
       };
 
       var receivedBounds: Plottable.Bounds;
+      var callbackCalled = false
       var callback = (b: Plottable.Bounds) => {
         receivedBounds = b;
+        callbackCalled = true
       };
       dbl.onDragEnd(callback);
 
       var target = dbl.background();
       TestMethods.triggerFakeDragSequence(target, startPoint, endPoint);
 
+      assert.isTrue(callbackCalled, "the callback was called")
       assert.deepEqual(receivedBounds.topLeft, startPoint, "top-left point was set correctly");
       assert.deepEqual(receivedBounds.bottomRight, endPoint, "bottom-right point was set correctly");
-
       dbl.offDragEnd(callback);
+            callbackCalled = false
 
-      //TODO
-      // assert.isNull(dbl.onDragEnd(), "can blank callback by passing null");
+      TestMethods.triggerFakeDragSequence(target, startPoint, endPoint);
+      assert.isFalse(callbackCalled, "the callback was detached from the dragoBoxLayer and not called")
 
       svg.remove();
     });
