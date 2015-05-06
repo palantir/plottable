@@ -29,7 +29,7 @@ module Plottable {
       if (removeIndex >= 0) {
         this.components().splice(removeIndex, 1);
         this.redraw();
-      }        
+      }
     }
 
     /**

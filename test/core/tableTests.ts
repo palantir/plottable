@@ -118,7 +118,7 @@ describe("Tables", () => {
     var svg = TestMethods.generateSVG();
     t.addComponent(new Plottable.Component(), 1, 0);
     t.addComponent(new Plottable.Component(), 0, 2);
-    t.renderTo(svg); //would throw an error without the fix (tested);
+    t.renderTo(svg); // would throw an error without the fix (tested);
     svg.remove();
   });
 

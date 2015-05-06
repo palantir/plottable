@@ -6831,7 +6831,7 @@ describe("Tables", function () {
         var svg = TestMethods.generateSVG();
         t.addComponent(new Plottable.Component(), 1, 0);
         t.addComponent(new Plottable.Component(), 0, 2);
-        t.renderTo(svg); //would throw an error without the fix (tested);
+        t.renderTo(svg); // would throw an error without the fix (tested);
         svg.remove();
     });
     it("basic table with 2 rows 2 cols lays out properly", function () {
