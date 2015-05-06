@@ -7,10 +7,11 @@ export module Interactions {
 
     private _mouseDispatcher: Plottable.Dispatchers.Mouse;
     private _touchDispatcher: Plottable.Dispatchers.Touch;
-    private _doubleClickCallback: (p: Point) => any;
     private _clickState = ClickState.NotClicked;
     private _clickedDown = false;
     private _clickedPoint: Point;
+
+    private _onDoubleClickCallbacks = new Utils.CallbackSet<ClickCallback>();
 
     public _anchor(component: Component) {
       super._anchor(component);
@@ -49,9 +50,7 @@ export module Interactions {
 
     private _handleDblClick() {
       if (this._clickState === ClickState.DoubleClicked) {
-        if (this._doubleClickCallback) {
-          this._doubleClickCallback(this._clickedPoint);
-        }
+        this._onDoubleClickCallbacks.callCallbacks(this._clickedPoint);
         this._clickState = ClickState.NotClicked;
       }
     }
@@ -66,26 +65,24 @@ export module Interactions {
     }
 
     /**
-     * Gets the callback called when the Component is double-clicked.
-     *
-     * @return {(p: Point) => any} The current callback.
-     */
-    public onDoubleClick(): (p: Point) => any;
-    /**
      * Sets the callback called when the Component is double-clicked.
      *
      * @param {(p: Point) => any} callback The callback to set.
      * @return {Interaction.DoubleClick} The calling Interaction.DoubleClick.
      */
-    public onDoubleClick(callback: (p: Point) => any): Interactions.DoubleClick;
-    public onDoubleClick(callback?: (p: Point) => any): any {
-      if (callback === undefined) {
-        return this._doubleClickCallback;
-      }
-      this._doubleClickCallback = callback;
-      return this;
+    public onDoubleClick(callback: ClickCallback) {
+      this._onDoubleClickCallbacks.add(callback);
     }
 
+    /**
+     * Removes the callback called when the Component is double-clicked.
+     *
+     * @param {(p: Point) => any} callback The callback to remove.
+     * @return {Interaction.DoubleClick} The calling Interaction.DoubleClick.
+     */
+    public offDoubleClick(callback: ClickCallback) {
+      this._onDoubleClickCallbacks.delete(callback);
+    }
   }
 }
 }

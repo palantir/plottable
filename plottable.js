@@ -9435,6 +9435,7 @@ var Plottable;
                 _super.apply(this, arguments);
                 this._clickState = 0 /* NotClicked */;
                 this._clickedDown = false;
+                this._onDoubleClickCallbacks = new Plottable.Utils.CallbackSet();
             }
             DoubleClick.prototype._anchor = function (component) {
                 var _this = this;
@@ -9470,9 +9471,7 @@ var Plottable;
             };
             DoubleClick.prototype._handleDblClick = function () {
                 if (this._clickState === 2 /* DoubleClicked */) {
-                    if (this._doubleClickCallback) {
-                        this._doubleClickCallback(this._clickedPoint);
-                    }
+                    this._onDoubleClickCallbacks.callCallbacks(this._clickedPoint);
                     this._clickState = 0 /* NotClicked */;
                 }
             };
@@ -9483,12 +9482,23 @@ var Plottable;
             DoubleClick.pointsEqual = function (p1, p2) {
                 return p1.x === p2.x && p1.y === p2.y;
             };
+            /**
+             * Sets the callback called when the Component is double-clicked.
+             *
+             * @param {(p: Point) => any} callback The callback to set.
+             * @return {Interaction.DoubleClick} The calling Interaction.DoubleClick.
+             */
             DoubleClick.prototype.onDoubleClick = function (callback) {
-                if (callback === undefined) {
-                    return this._doubleClickCallback;
-                }
-                this._doubleClickCallback = callback;
-                return this;
+                this._onDoubleClickCallbacks.add(callback);
+            };
+            /**
+             * Removes the callback called when the Component is double-clicked.
+             *
+             * @param {(p: Point) => any} callback The callback to remove.
+             * @return {Interaction.DoubleClick} The calling Interaction.DoubleClick.
+             */
+            DoubleClick.prototype.offDoubleClick = function (callback) {
+                this._onDoubleClickCallbacks.delete(callback);
             };
             return DoubleClick;
         })(Plottable.Interaction);

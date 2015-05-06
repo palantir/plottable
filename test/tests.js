@@ -8734,8 +8734,31 @@ describe("Interactions", function () {
             afterEach(function () {
                 doubleClickedPoint = null;
             });
-            it("onDblClick callback can be retrieved", function () {
-                assert.strictEqual(dblClickInteraction.onDoubleClick(), dblClickCallback, "callback can be retrieved");
+            it("double click interaction accepts multiple callbacks", function () {
+                var userClickPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
+                var newCallback1WasCalled = false;
+                var newCallback1 = function () { return newCallback1WasCalled = true; };
+                var newCallback2WasCalled = false;
+                var newCallback2 = function () { return newCallback2WasCalled = true; };
+                dblClickInteraction.onDoubleClick(newCallback1);
+                dblClickInteraction.onDoubleClick(newCallback2);
+                TestMethods.triggerFakeMouseEvent("mousedown", component.content(), userClickPoint.x, userClickPoint.y);
+                TestMethods.triggerFakeMouseEvent("mouseup", component.content(), userClickPoint.x, userClickPoint.y);
+                TestMethods.triggerFakeMouseEvent("mousedown", component.content(), userClickPoint.x, userClickPoint.y);
+                TestMethods.triggerFakeMouseEvent("mouseup", component.content(), userClickPoint.x, userClickPoint.y);
+                TestMethods.triggerFakeMouseEvent("dblclick", component.content(), userClickPoint.x, userClickPoint.y);
+                assert.isTrue(newCallback1WasCalled, "Callback 1 should be called on double click");
+                assert.isTrue(newCallback2WasCalled, "Callback 2 should be called on double click");
+                newCallback1WasCalled = false;
+                newCallback2WasCalled = false;
+                dblClickInteraction.offDoubleClick(newCallback1);
+                TestMethods.triggerFakeMouseEvent("mousedown", component.content(), userClickPoint.x, userClickPoint.y);
+                TestMethods.triggerFakeMouseEvent("mouseup", component.content(), userClickPoint.x, userClickPoint.y);
+                TestMethods.triggerFakeMouseEvent("mousedown", component.content(), userClickPoint.x, userClickPoint.y);
+                TestMethods.triggerFakeMouseEvent("mouseup", component.content(), userClickPoint.x, userClickPoint.y);
+                TestMethods.triggerFakeMouseEvent("dblclick", component.content(), userClickPoint.x, userClickPoint.y);
+                assert.isFalse(newCallback1WasCalled, "Callback 1 should be disconnected from the interaction");
+                assert.isTrue(newCallback2WasCalled, "Callback 2 should still be connected to the interaction");
                 svg.remove();
             });
             it("callback sets correct point on normal case", function () {

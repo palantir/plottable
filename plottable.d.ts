@@ -3778,18 +3778,19 @@ declare module Plottable {
         class DoubleClick extends Interaction {
             _anchor(component: Component): void;
             /**
-             * Gets the callback called when the Component is double-clicked.
-             *
-             * @return {(p: Point) => any} The current callback.
-             */
-            onDoubleClick(): (p: Point) => any;
-            /**
              * Sets the callback called when the Component is double-clicked.
              *
              * @param {(p: Point) => any} callback The callback to set.
              * @return {Interaction.DoubleClick} The calling Interaction.DoubleClick.
              */
-            onDoubleClick(callback: (p: Point) => any): Interactions.DoubleClick;
+            onDoubleClick(callback: ClickCallback): void;
+            /**
+             * Removes the callback called when the Component is double-clicked.
+             *
+             * @param {(p: Point) => any} callback The callback to remove.
+             * @return {Interaction.DoubleClick} The calling Interaction.DoubleClick.
+             */
+            offDoubleClick(callback: ClickCallback): void;
         }
     }
 }
