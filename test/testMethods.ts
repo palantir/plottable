@@ -18,20 +18,16 @@ module TestMethods {
     }
   }
 
-  export function verifySpaceRequest(sr: Plottable._SpaceRequest, w: number, h: number, ww: boolean, wh: boolean, message: string) {
-    assert.strictEqual(sr.width, w, message + " (space request: width)");
-    assert.strictEqual(sr.height, h, message + " (space request: height)");
-    assert.strictEqual(sr.wantsWidth, ww, message + " (space request: wantsWidth)");
-    assert.strictEqual(sr.wantsHeight, wh, message + " (space request: wantsHeight)");
+  export function verifySpaceRequest(sr: Plottable._SpaceRequest, expectedMinWidth: number, expectedMinHeight: number, message: string) {
+    assert.strictEqual(sr.minWidth, expectedMinWidth, message + " (space request: minWidth)");
+    assert.strictEqual(sr.minHeight, expectedMinHeight, message + " (space request: minHeight)");
   }
 
   export function fixComponentSize(c: Plottable.Component, fixedWidth?: number, fixedHeight?: number) {
     c._requestedSpace = function(w, h) {
       return {
-        width: fixedWidth == null ? 0 : fixedWidth,
-        height: fixedHeight == null ? 0 : fixedHeight,
-        wantsWidth: fixedWidth == null ? false : w < fixedWidth,
-        wantsHeight: fixedHeight == null ? false : h < fixedHeight
+        minWidth: fixedWidth  == null ? 0 : fixedWidth,
+        minHeight: fixedHeight == null ? 0 : fixedHeight
       };
     };
     (<any> c)._fixedWidthFlag = fixedWidth == null ? false : true;

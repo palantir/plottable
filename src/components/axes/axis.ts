@@ -97,10 +97,8 @@ module Plottable {
       }
 
       return {
-        width: requestedWidth,
-        height: requestedHeight,
-        wantsWidth: !this._isHorizontal() && offeredWidth < requestedWidth,
-        wantsHeight: this._isHorizontal() && offeredHeight < requestedHeight
+        minWidth: requestedWidth,
+        minHeight: requestedHeight
       };
     }
 

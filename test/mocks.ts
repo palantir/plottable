@@ -15,10 +15,8 @@ module Mocks {
 
     public _requestedSpace(availableWidth: number, availableHeight: number): Plottable._SpaceRequest {
       return {
-        width:  this.fixedWidth,
-        height: this.fixedHeight,
-        wantsWidth: availableWidth < this.fixedWidth,
-        wantsHeight: availableHeight < this.fixedHeight
+        minWidth: this.fixedWidth,
+        minHeight: this.fixedHeight
       };
     }
   }

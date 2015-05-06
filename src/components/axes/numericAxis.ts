@@ -33,7 +33,7 @@ export module Axes {
       this._wrapper = new SVGTypewriter.Wrappers.Wrapper().maxLines(1);
     }
 
-    public _computeWidth() {
+    protected _computeWidth() {
       var tickValues = this._getTickValues();
       var textLengths = tickValues.map((v: any) => {
         var formattedValue = this.formatter()(v);
@@ -51,7 +51,7 @@ export module Axes {
       return this._computedWidth;
     }
 
-    public _computeHeight() {
+    protected _computeHeight() {
       var textHeight = this._measurer.measure().height;
 
       if (this._tickLabelPositioning === "center") {
