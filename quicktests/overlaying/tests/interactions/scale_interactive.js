@@ -7,7 +7,7 @@ function makeData() {
 function run(svg, data, Plottable) {
   "use strict";
 
-  var dataseries = data[0].slice(0, 20);
+  var dataseries = new Plottable.Dataset(data[0].slice(0, 20));
 
   var xScale = new Plottable.Scales.Linear();
   var xAxisLeft = new Plottable.Axes.Numeric(xScale, "bottom").tickLabelPosition("left");

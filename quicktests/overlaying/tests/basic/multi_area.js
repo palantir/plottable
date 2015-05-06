@@ -15,10 +15,10 @@ function makePowerFunction(pow) {
 function run(svg, data, Plottable) {
   "use strict";
 
-  var d1 = data[0].map(makePowerFunction(2));
-  var d2 = data[1].map(makePowerFunction(4));
-  var d3 = data[2].map(makePowerFunction(8));
-  var d4 = data[3].map(makePowerFunction(16));
+  var d1 = new Plottable.Dataset(data[0].map(makePowerFunction(2)));
+  var d2 = new Plottable.Dataset(data[1].map(makePowerFunction(4)));
+  var d3 = new Plottable.Dataset(data[2].map(makePowerFunction(8)));
+  var d4 = new Plottable.Dataset(data[3].map(makePowerFunction(16)));
 
   var colorScale = new Plottable.Scales.Color();
 

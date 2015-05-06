@@ -8,7 +8,7 @@ function run(svg, data, Plottable) {
   "use strict";
 
   var newData = JSON.parse(JSON.stringify(data));
-  var dataSeries = newData;
+  var dataSeries = new Plottable.Dataset(newData);
 
   var xScale = new Plottable.Scales.Linear();
   var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");

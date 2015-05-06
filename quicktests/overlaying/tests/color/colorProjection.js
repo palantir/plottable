@@ -7,7 +7,7 @@ function makeData() {
 function run(svg, data, Plottable) {
   "use strict";
 
-  var DotData = [
+  var dotDataset = new Plottable.Dataset([
     { "x" : 1,
       "y" : 4,
       "r" : 0x99,
@@ -38,12 +38,12 @@ function run(svg, data, Plottable) {
       "g" : 0xDB,
       "b" : 0x00
     }
-  ];
+  ]);
 
     var xScale = new Plottable.Scales.Linear();
     var yScale = new Plottable.Scales.Linear();
 
-    var scatterPlot = new Plottable.Plots.Scatter(xScale, yScale).addDataset(DotData)
+    var scatterPlot = new Plottable.Plots.Scatter(xScale, yScale).addDataset(dotDataset)
                                                                 .project("x", "x", xScale)
                                                                 .project("y", "y", yScale)
                                                                 .project("size", function(d){return 30;})

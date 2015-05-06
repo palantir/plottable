@@ -24,21 +24,21 @@ function run(svg, data, Plottable){
 
 
   var paloAltoBar = new Plottable.Plots.Bar(xScale, yScale, true)
-    .addDataset(data[0])
+    .addDataset(new Plottable.Dataset(data[0]))
     .animate(true)
     .project("x", "month", xScale)
     .project("y", "avg", yScale)
     .project("fill", "city", colorScale);
 
   var sanFranciscoBar = new Plottable.Plots.Bar(xScale, yScale, true)
-    .addDataset(data[1])
+    .addDataset(new Plottable.Dataset(data[1]))
     .animate(true)
     .project("x", "month", xScale)
     .project("y", "avg", yScale)
     .project("fill", "city", colorScale);
 
   var sanJoseBar = new Plottable.Plots.Bar(xScale, yScale, true)
-    .addDataset(data[2])
+    .addDataset(new Plottable.Dataset(data[2]))
     .animate(true)
     .project("x", "month", xScale)
     .project("y", "avg", yScale)
