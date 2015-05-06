@@ -3976,6 +3976,7 @@ declare module Plottable {
 
 
 declare module Plottable {
+    type DragBoxCallback = (bounds: Bounds) => any;
     module Components {
         class DragBoxLayer extends Components.SelectionBoxLayer {
             protected _hasCorners: boolean;
@@ -4010,44 +4011,47 @@ declare module Plottable {
             resizable(canResize: boolean): DragBoxLayer;
             protected _setResizableClasses(canResize: boolean): void;
             /**
-             * Gets the callback that is called when dragging starts.
-             *
-             * @returns {(b: Bounds) => any} The callback called when dragging starts.
-             */
-            onDragStart(): (b: Bounds) => any;
-            /**
              * Sets the callback to be called when dragging starts.
              *
-             * @param {(b: Bounds) => any} cb The callback to be called. Passed the current Bounds in pixels.
+             * @param {DragBoxCallback} cb The callback to be called. Passed the current Bounds in pixels.
              * @returns {DragBoxLayer} The calling DragBoxLayer.
              */
-            onDragStart(cb: (b: Bounds) => any): DragBoxLayer;
+            onDragStart(callback: DragBoxCallback): DragBoxLayer;
             /**
-             * Gets the callback that is called during dragging.
+             * Removes a callback to be called when dragging starts.
              *
-             * @returns {(b: Bounds) => any} The callback called during dragging.
+             * @param {DragBoxCallback} cb The callback to be removed.
+             * @returns {DragBoxLayer} The calling DragBoxLayer.
              */
-            onDrag(): (b: Bounds) => any;
+            offDragStart(callback: DragBoxCallback): DragBoxLayer;
             /**
              * Sets a callback to be called during dragging.
              *
-             * @param {(b: Bounds) => any} cb The callback to be called. Passed the current Bounds in pixels.
+             * @param {DragBoxCallback} cb The callback to be called. Passed the current Bounds in pixels.
              * @returns {DragBoxLayer} The calling DragBoxLayer.
              */
-            onDrag(cb: (b: Bounds) => any): DragBoxLayer;
+            onDrag(callback: DragBoxCallback): DragBoxLayer;
             /**
-             * Gets the callback that is called when dragging ends.
+             * Removes a callback to be called during dragging.
              *
-             * @returns {(b: Bounds) => any} The callback called when dragging ends.
+             * @param {DragBoxCallback} cb The callback to be removed.
+             * @returns {DragBoxLayer} The calling DragBoxLayer.
              */
-            onDragEnd(): (b: Bounds) => any;
+            offDrag(callback: DragBoxCallback): DragBoxLayer;
             /**
              * Sets a callback to be called when the dragging ends.
              *
-             * @param {(b: Bounds) => any} cb The callback to be called. Passed the current Bounds in pixels.
+             * @param {DragBoxCallback} cb The callback to be called. Passed the current Bounds in pixels.
              * @returns {DragBoxLayer} The calling DragBoxLayer.
              */
-            onDragEnd(cb: (b: Bounds) => any): DragBoxLayer;
+            onDragEnd(callback: DragBoxCallback): DragBoxLayer;
+            /**
+             * Removes a callback to be called when the dragging ends.
+             *
+             * @param {DragBoxCallback} cb The callback to be removed.
+             * @returns {DragBoxLayer} The calling DragBoxLayer.
+             */
+            offDragEnd(callback: DragBoxCallback): DragBoxLayer;
         }
     }
 }

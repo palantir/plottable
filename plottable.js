@@ -10003,6 +10003,9 @@ var Plottable;
                 this._dragInteraction = new Plottable.Interactions.Drag();
                 this._setUpCallbacks();
                 this.registerInteraction(this._dragInteraction);
+                this._dragStartCallbacks = new Plottable.Utils.CallbackSet();
+                this._dragCallbacks = new Plottable.Utils.CallbackSet();
+                this._dragEndCallbacks = new Plottable.Utils.CallbackSet();
             }
             DragBoxLayer.prototype._setUpCallbacks = function () {
                 var _this = this;
@@ -10027,9 +10030,7 @@ var Plottable;
                     // copy points so changes to topLeft and bottomRight don't mutate bounds
                     topLeft = { x: bounds.topLeft.x, y: bounds.topLeft.y };
                     bottomRight = { x: bounds.bottomRight.x, y: bounds.bottomRight.y };
-                    if (_this._dragStartCallback) {
-                        _this._dragStartCallback(bounds);
-                    }
+                    _this._dragStartCallbacks.callCallbacks(bounds);
                 });
                 this._dragInteraction.onDrag(function (s, e) {
                     if (startedNewBox) {
@@ -10054,17 +10055,13 @@ var Plottable;
                         topLeft: topLeft,
                         bottomRight: bottomRight
                     });
-                    if (_this._dragCallback) {
-                        _this._dragCallback(_this.bounds());
-                    }
+                    _this._dragCallbacks.callCallbacks(_this.bounds());
                 });
                 this._dragInteraction.onDragEnd(function (s, e) {
                     if (startedNewBox && s.x === e.x && s.y === e.y) {
                         _this.boxVisible(false);
                     }
-                    if (_this._dragEndCallback) {
-                        _this._dragEndCallback(_this.bounds());
-                    }
+                    _this._dragEndCallbacks.callCallbacks(_this.bounds());
                 });
             };
             DragBoxLayer.prototype._setup = function () {
@@ -10183,32 +10180,65 @@ var Plottable;
                 this.classed("x-resizable", canResize);
                 this.classed("y-resizable", canResize);
             };
-            DragBoxLayer.prototype.onDragStart = function (cb) {
-                if (cb === undefined) {
-                    return this._dragStartCallback;
-                }
-                else {
-                    this._dragStartCallback = cb;
-                    return this;
-                }
+            /**
+             * Sets the callback to be called when dragging starts.
+             *
+             * @param {DragBoxCallback} cb The callback to be called. Passed the current Bounds in pixels.
+             * @returns {DragBoxLayer} The calling DragBoxLayer.
+             */
+            DragBoxLayer.prototype.onDragStart = function (callback) {
+                this._dragStartCallbacks.add(callback);
+                return this;
             };
-            DragBoxLayer.prototype.onDrag = function (cb) {
-                if (cb === undefined) {
-                    return this._dragCallback;
-                }
-                else {
-                    this._dragCallback = cb;
-                    return this;
-                }
+            /**
+             * Removes a callback to be called when dragging starts.
+             *
+             * @param {DragBoxCallback} cb The callback to be removed.
+             * @returns {DragBoxLayer} The calling DragBoxLayer.
+             */
+            DragBoxLayer.prototype.offDragStart = function (callback) {
+                this._dragStartCallbacks.delete(callback);
+                return this;
             };
-            DragBoxLayer.prototype.onDragEnd = function (cb) {
-                if (cb === undefined) {
-                    return this._dragEndCallback;
-                }
-                else {
-                    this._dragEndCallback = cb;
-                    return this;
-                }
+            /**
+             * Sets a callback to be called during dragging.
+             *
+             * @param {DragBoxCallback} cb The callback to be called. Passed the current Bounds in pixels.
+             * @returns {DragBoxLayer} The calling DragBoxLayer.
+             */
+            DragBoxLayer.prototype.onDrag = function (callback) {
+                this._dragCallbacks.add(callback);
+                return this;
+            };
+            /**
+             * Removes a callback to be called during dragging.
+             *
+             * @param {DragBoxCallback} cb The callback to be removed.
+             * @returns {DragBoxLayer} The calling DragBoxLayer.
+             */
+            DragBoxLayer.prototype.offDrag = function (callback) {
+                this._dragCallbacks.delete(callback);
+                return this;
+            };
+            /**
+             * Sets a callback to be called when the dragging ends.
+             *
+             * @param {DragBoxCallback} cb The callback to be called. Passed the current Bounds in pixels.
+             * @returns {DragBoxLayer} The calling DragBoxLayer.
+             */
+            DragBoxLayer.prototype.onDragEnd = function (callback) {
+                this._dragEndCallbacks.add(callback);
+                return this;
+            };
+            /**
+             * Removes a callback to be called when the dragging ends.
+             *
+             * @param {DragBoxCallback} cb The callback to be removed.
+             * @returns {DragBoxLayer} The calling DragBoxLayer.
+             */
+            DragBoxLayer.prototype.offDragEnd = function (callback) {
+                this._dragEndCallbacks.delete(callback);
+                return this;
             };
             return DragBoxLayer;
         })(Components.SelectionBoxLayer);
