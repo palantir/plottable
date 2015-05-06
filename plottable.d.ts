@@ -1694,7 +1694,7 @@ declare module Plottable {
          * Removes a Component from the DOM and disconnects it from everything it's
          * listening to (effectively destroying it).
          */
-        remove(): void;
+        destroy(): void;
         /**
          * Return the width of the component
          *
@@ -1755,10 +1755,6 @@ declare module Plottable {
         anchor(selection: D3.Selection): ComponentContainer;
         render(): ComponentContainer;
         /**
-         * Removes the ComponentContainer.
-         */
-        remove(): void;
-        /**
          * Removes the specified Component from the ComponentContainer
          *
          * @param c Component the Component to remove.
@@ -1792,6 +1788,7 @@ declare module Plottable {
         detachAll(): ComponentContainer;
         _useLastCalculatedLayout(): boolean;
         _useLastCalculatedLayout(calculated: boolean): Component;
+        destroy(): void;
     }
 }
 
@@ -1859,7 +1856,7 @@ declare module Plottable {
          * displayed.
          */
         constructor(scale: Scale<any, number>, orientation: string, formatter?: (d: any) => string);
-        remove(): void;
+        destroy(): void;
         protected _isHorizontal(): boolean;
         protected _computeWidth(): number;
         protected _computeHeight(): number;
@@ -2324,7 +2321,7 @@ declare module Plottable {
              * @returns {Legend} The calling Legend.
              */
             scale(scale: Scales.Color): Legend;
-            remove(): void;
+            destroy(): void;
             _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
             /**
              * Gets the legend entry under the given pixel position.
@@ -2373,7 +2370,7 @@ declare module Plottable {
              * @param {Formatter} The labels are formatted using this function.
              */
             constructor(interpolatedColorScale: Scales.InterpolatedColor, orientation?: string, formatter?: (d: any) => string);
-            remove(): void;
+            destroy(): void;
             /**
              * Gets the current formatter on the InterpolatedColorLegend.
              *
@@ -2420,7 +2417,7 @@ declare module Plottable {
              * @param {QuantitativeScaleScale} yScale The scale to base the y gridlines on. Pass null if no gridlines are desired.
              */
             constructor(xScale: QuantitativeScale<any>, yScale: QuantitativeScale<any>);
-            remove(): Gridlines;
+            destroy(): Gridlines;
             protected _setup(): void;
             _doRender(): void;
         }
@@ -2620,7 +2617,7 @@ declare module Plottable {
         constructor();
         anchor(selection: D3.Selection): Plot;
         protected _setup(): void;
-        remove(): void;
+        destroy(): void;
         /**
          * Adds a dataset to this plot. Identify this dataset with a key.
          *
@@ -2814,7 +2811,7 @@ declare module Plottable {
          * x and y position in the Plot.
          */
         project(attrToSet: string, accessor: any, scale?: Scale<any, any>): XYPlot<X, Y>;
-        remove(): XYPlot<X, Y>;
+        destroy(): XYPlot<X, Y>;
         /**
          * Sets the automatic domain adjustment over visible points for y scale.
          *

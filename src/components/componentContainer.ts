@@ -20,26 +20,16 @@ module Plottable {
     }
 
     /**
-     * Removes the ComponentContainer.
-     */
-    public remove(): void;
-    /**
      * Removes the specified Component from the ComponentContainer
      * 
      * @param c Component the Component to remove.
      */
-    public remove(c: Component): void;
-    public remove(c?: Component): void {
-      if (!c) {
-        super.remove();
-        this.components().slice().forEach((c: Component) => c.remove());
-      } else {
-        var removeIndex = this._components.indexOf(c);
-        if (removeIndex >= 0) {
-          this.components().splice(removeIndex, 1);
-          this.redraw();
-        }        
-      }
+    public remove(c: Component) {
+      var removeIndex = this._components.indexOf(c);
+      if (removeIndex >= 0) {
+        this.components().splice(removeIndex, 1);
+        this.redraw();
+      }        
     }
 
     /**
@@ -104,6 +94,11 @@ module Plottable {
         this.components().slice().forEach((c: Component) => c._useLastCalculatedLayout(calculated));
       }
       return super._useLastCalculatedLayout(calculated);
+    }
+
+    public destroy() {
+      super.destroy();
+      this.components().slice().forEach((c: Component) => c.destroy());
     }
   }
 }

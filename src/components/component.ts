@@ -510,7 +510,7 @@ module Plottable {
      * Removes a Component from the DOM and disconnects it from everything it's
      * listening to (effectively destroying it).
      */
-    public remove() {
+    public destroy() {
       this._removed = true;
       this.detach();
     }

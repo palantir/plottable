@@ -2424,11 +2424,11 @@ describe("Plots", function () {
                 assert.lengthOf(plot.datasets(), 2, "the dataset called 'undefined' could be removed");
             });
         });
-        it("remove() disconnects plots from its scales", function () {
+        it("destroy() disconnects plots from its scales", function () {
             var plot2 = new Plottable.Plot();
             var scale = new Plottable.Scales.Linear();
             plot2.project("attr", "a", scale);
-            plot2.remove();
+            plot2.destroy();
             var scaleCallbacks = scale._callbacks.values();
             assert.strictEqual(scaleCallbacks.length, 0, "the plot is no longer attached to the scale");
         });
@@ -2570,7 +2570,7 @@ describe("Plots", function () {
         });
         it("listeners are deregistered after removal", function () {
             plot.automaticallyAdjustYScaleOverVisiblePoints(true);
-            plot.remove();
+            plot.destroy();
             var xScaleCallbacks = xScale._callbacks.values();
             assert.strictEqual(xScaleCallbacks.length, 0, "the plot is no longer attached to xScale");
             var yScaleCallbacks = yScale._callbacks.values();
@@ -5931,7 +5931,7 @@ describe("Metadata", function () {
             plot.addDataset("ds1", dataset1).addDataset("ds2", dataset2).project("x", function (d, i, u, m) { return d.x + u.foo + m.datasetKey.length; }).project("y", function (d, i, u, m) { return d.y + u.foo - m.datasetKey.length; });
             // This should not crash. If some metadata is not passed, undefined property error will be raised during accessor call.
             plot.renderTo(svg);
-            plot.remove();
+            plot.destroy();
         };
         checkPlot(new Plottable.Plots.Area(xScale, yScale));
         checkPlot(new Plottable.Plots.StackedArea(xScale, yScale));
@@ -6507,7 +6507,7 @@ describe("Component behavior", function () {
     it("can't reuse component if it's been remove()-ed", function () {
         var c1 = new Plottable.Component();
         c1.renderTo(svg);
-        c1.remove();
+        c1.destroy();
         assert.throws(function () { return c1.renderTo(svg); }, "reuse");
         svg.remove();
     });

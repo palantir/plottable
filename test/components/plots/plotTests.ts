@@ -399,11 +399,11 @@ describe("Plots", () => {
       });
     });
 
-    it("remove() disconnects plots from its scales", () => {
+    it("destroy() disconnects plots from its scales", () => {
       var plot2 = new Plottable.Plot();
       var scale = new Plottable.Scales.Linear();
       plot2.project("attr", "a", scale);
-      plot2.remove();
+      plot2.destroy();
       var scaleCallbacks = (<any> scale)._callbacks.values();
       assert.strictEqual(scaleCallbacks.length, 0, "the plot is no longer attached to the scale");
     });
@@ -585,7 +585,7 @@ describe("Plots", () => {
 
     it("listeners are deregistered after removal", () => {
       plot.automaticallyAdjustYScaleOverVisiblePoints(true);
-      plot.remove();
+      plot.destroy();
 
       var xScaleCallbacks = (<any> xScale)._callbacks.values();
       assert.strictEqual(xScaleCallbacks.length, 0, "the plot is no longer attached to xScale");

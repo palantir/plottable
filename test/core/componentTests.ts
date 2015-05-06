@@ -291,7 +291,7 @@ describe("Component behavior", () => {
   it("can't reuse component if it's been remove()-ed", () => {
     var c1 = new Plottable.Component();
     c1.renderTo(svg);
-    c1.remove();
+    c1.destroy();
 
     assert.throws(() => c1.renderTo(svg), "reuse");
     svg.remove();

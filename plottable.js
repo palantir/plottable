@@ -3668,7 +3668,7 @@ var Plottable;
          * Removes a Component from the DOM and disconnects it from everything it's
          * listening to (effectively destroying it).
          */
-        Component.prototype.remove = function () {
+        Component.prototype.destroy = function () {
             this._removed = true;
             this.detach();
         };
@@ -3782,17 +3782,16 @@ var Plottable;
             this._components.forEach(function (c) { return c.render(); });
             return this;
         };
+        /**
+         * Removes the specified Component from the ComponentContainer
+         *
+         * @param c Component the Component to remove.
+         */
         ComponentContainer.prototype.remove = function (c) {
-            if (!c) {
-                _super.prototype.remove.call(this);
-                this.components().slice().forEach(function (c) { return c.remove(); });
-            }
-            else {
-                var removeIndex = this._components.indexOf(c);
-                if (removeIndex >= 0) {
-                    this.components().splice(removeIndex, 1);
-                    this.redraw();
-                }
+            var removeIndex = this._components.indexOf(c);
+            if (removeIndex >= 0) {
+                this.components().splice(removeIndex, 1);
+                this.redraw();
             }
         };
         /**
@@ -3852,6 +3851,10 @@ var Plottable;
                 this.components().slice().forEach(function (c) { return c._useLastCalculatedLayout(calculated); });
             }
             return _super.prototype._useLastCalculatedLayout.call(this, calculated);
+        };
+        ComponentContainer.prototype.destroy = function () {
+            _super.prototype.destroy.call(this);
+            this.components().slice().forEach(function (c) { return c.destroy(); });
         };
         return ComponentContainer;
     })(Plottable.Component);
@@ -3978,8 +3981,8 @@ var Plottable;
             this._rescaleCallback = function (scale) { return _this._rescale(); };
             this._scale.onUpdate(this._rescaleCallback);
         }
-        Axis.prototype.remove = function () {
-            _super.prototype.remove.call(this);
+        Axis.prototype.destroy = function () {
+            _super.prototype.destroy.call(this);
             this._scale.offUpdate(this._rescaleCallback);
         };
         Axis.prototype._isHorizontal = function () {
@@ -5472,8 +5475,8 @@ var Plottable;
                     return this._scale;
                 }
             };
-            Legend.prototype.remove = function () {
-                _super.prototype.remove.call(this);
+            Legend.prototype.destroy = function () {
+                _super.prototype.destroy.call(this);
                 this._scale.offUpdate(this._redrawCallback);
             };
             Legend.prototype._calculateLayoutInfo = function (availableWidth, availableHeight) {
@@ -5682,8 +5685,8 @@ var Plottable;
                 this._fixedHeightFlag = true;
                 this.classed("legend", true).classed("interpolated-color-legend", true);
             }
-            InterpolatedColorLegend.prototype.remove = function () {
-                _super.prototype.remove.call(this);
+            InterpolatedColorLegend.prototype.destroy = function () {
+                _super.prototype.destroy.call(this);
                 this._scale.offUpdate(this._redrawCallback);
             };
             InterpolatedColorLegend.prototype.formatter = function (formatter) {
@@ -5904,8 +5907,8 @@ var Plottable;
                     this._yScale.onUpdate(this._renderCallback);
                 }
             }
-            Gridlines.prototype.remove = function () {
-                _super.prototype.remove.call(this);
+            Gridlines.prototype.destroy = function () {
+                _super.prototype.destroy.call(this);
                 if (this._xScale) {
                     this._xScale.offUpdate(this._renderCallback);
                 }
@@ -6446,9 +6449,9 @@ var Plottable;
             // HACKHACK on 591
             this._getDrawersInOrder().forEach(function (d) { return d.setup(_this._renderArea.append("g")); });
         };
-        Plot.prototype.remove = function () {
+        Plot.prototype.destroy = function () {
             var _this = this;
-            _super.prototype.remove.call(this);
+            _super.prototype.destroy.call(this);
             this._datasetKeysInOrder.forEach(function (k) { return _this.removeDataset(k); });
             this._scales().forEach(function (scale) { return scale.offUpdate(_this._renderCallback); });
         };
@@ -7027,8 +7030,8 @@ var Plottable;
             _super.prototype.project.call(this, attrToSet, accessor, scale);
             return this;
         };
-        XYPlot.prototype.remove = function () {
-            _super.prototype.remove.call(this);
+        XYPlot.prototype.destroy = function () {
+            _super.prototype.destroy.call(this);
             if (this._xScale) {
                 this._xScale.offUpdate(this._adjustYDomainOnChangeFromXCallback);
             }

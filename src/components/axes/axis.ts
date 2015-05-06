@@ -59,8 +59,8 @@ module Plottable {
       this._scale.onUpdate(this._rescaleCallback);
     }
 
-    public remove() {
-      super.remove();
+    public destroy() {
+      super.destroy();
       this._scale.offUpdate(this._rescaleCallback);
     }
 

@@ -134,8 +134,8 @@ export module Components {
       }
     }
 
-    public remove() {
-      super.remove();
+    public destroy() {
+      super.destroy();
       this._scale.offUpdate(this._redrawCallback);
     }
 
