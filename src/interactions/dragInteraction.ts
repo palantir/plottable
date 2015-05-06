@@ -11,10 +11,6 @@ export module Interactions {
     private _mouseDispatcher: Dispatchers.Mouse;
     private _touchDispatcher: Dispatchers.Touch;
     private _dragOrigin: Point;
-    private _dragStartCallback: (p: Point) => any;
-    private _dragCallback: (start: Point, end: Point) => any;
-    private _dragEndCallback: (start: Point, end: Point) => any;
-
     private _dragStartCallbacks = new Utils.CallbackSet<DragCallback>();
     private _dragCallbacks = new Utils.CallbackSet<DragCallback>();
     private _dragEndCallbacks = new Utils.CallbackSet<DragCallback>();
