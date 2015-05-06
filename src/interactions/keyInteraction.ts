@@ -1,6 +1,7 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
+export type KeyCallback = () => void;
 export module Interactions {
   export class Key extends Interaction {
     /**
@@ -37,7 +38,7 @@ export module Interactions {
      * @param {() => void} callback Callback to be called.
      * @returns The calling Interaction.Key.
      */
-    public on(keyCode: number, callback: () => void): Key {
+    public onKey(keyCode: number, callback: KeyCallback): Key {
       this._keyCode2Callback[keyCode] = callback;
       return this;
     }

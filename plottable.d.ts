@@ -3797,6 +3797,7 @@ declare module Plottable {
 
 
 declare module Plottable {
+    type KeyCallback = () => void;
     module Interactions {
         class Key extends Interaction {
             _anchor(component: Component): void;
@@ -3808,7 +3809,7 @@ declare module Plottable {
              * @param {() => void} callback Callback to be called.
              * @returns The calling Interaction.Key.
              */
-            on(keyCode: number, callback: () => void): Key;
+            onKey(keyCode: number, callback: KeyCallback): Key;
         }
     }
 }

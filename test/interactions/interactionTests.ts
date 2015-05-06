@@ -9,7 +9,7 @@ describe("Interactions", () => {
       var component = new Plottable.Component();
       component.renderTo(svg);
 
-      var ki = new Plottable.Interactions.Key();
+      var keyInteraction = new Plottable.Interactions.Key();
 
       var aCode = 65; // "a" key
       var bCode = 66; // "b" key
@@ -19,9 +19,9 @@ describe("Interactions", () => {
       var bCallbackCalled = false;
       var bCallback = () => bCallbackCalled = true;
 
-      ki.on(aCode, aCallback);
-      ki.on(bCode, bCallback);
-      component.registerInteraction(ki);
+      keyInteraction.onKey(aCode, aCallback);
+      keyInteraction.onKey(bCode, bCallback);
+      component.registerInteraction(keyInteraction);
 
       var $target = $(component.background().node());
 
@@ -41,6 +41,71 @@ describe("Interactions", () => {
       assert.isFalse(aCallbackCalled, "callback for \"a\" was not called when not moused over the Component");
 
       svg.remove();
+    });
+
+    it("canceling callbacks is possible", () => {
+        var svg = TestMethods.generateSVG(400, 400);
+        var component = new Plottable.Component();
+        component.renderTo(svg);
+
+        var keyInteraction = new Plottable.Interactions.Key();
+
+        var aCode = 65; // "a" key
+
+        var aCallbackCalled = false;
+        var aCallback = () => aCallbackCalled = true;
+
+        keyInteraction.onKey(aCode, aCallback);
+
+        component.registerInteraction(keyInteraction);
+
+        var $target = $(component.background().node());
+
+        TestMethods.triggerFakeMouseEvent("mouseover", component.background(), 100, 100);
+        $target.simulate("keydown", { keyCode: aCode });
+        assert.isTrue(aCallbackCalled, "callback for \"a\" was called when \"a\" key was pressed");
+
+        keyInteraction.offKey(aCode, aCallback);
+        aCallbackCalled = false;
+        $target.simulate("keydown", { keyCode: aCode });
+        assert.isFalse(aCallbackCalled, "callback for \"a\" was not called when \"a\" key was pressed");
+
+        svg.remove();
+    });
+
+    it("multiple callbacks are possible", () => {
+        var svg = TestMethods.generateSVG(400, 400);
+        var component = new Plottable.Component();
+        component.renderTo(svg);
+
+        var keyInteraction = new Plottable.Interactions.Key();
+
+        var aCode = 65; // "a" key
+
+        var aCallback1Called = false;
+        var aCallback1 = () => aCallback1Called = true;
+        var aCallback2Called = false;
+        var aCallback2 = () => aCallback2Called = true;
+
+        keyInteraction.onKey(aCode, aCallback1);
+        keyInteraction.onKey(aCode, aCallback2);
+        component.registerInteraction(keyInteraction);
+
+        var $target = $(component.background().node());
+
+        TestMethods.triggerFakeMouseEvent("mouseover", component.background(), 100, 100);
+        $target.simulate("keydown", { keyCode: aCode });
+        assert.isTrue(aCallback1Called, "callback 1 for \"a\" was called when \"a\" key was pressed");
+        assert.isTrue(aCallback1Called, "callback 2 for \"b\" was called when \"a\" key was pressed");
+
+        keyInteraction.offKey(aCode, aCallback1);
+        aCallback1Called = false;
+        aCallback2Called = false;
+        $target.simulate("keydown", { keyCode: aCode });
+        assert.isFalse(aCallback1Called, "callback 1 for \"a\" was disconnected from the interaction");
+        assert.isTrue(aCallback1Called, "callback 2 for \"a\" is still connected to the interaction");
+
+        svg.remove();
     });
   });
 });

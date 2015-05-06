@@ -9545,7 +9545,7 @@ var Plottable;
              * @param {() => void} callback Callback to be called.
              * @returns The calling Interaction.Key.
              */
-            Key.prototype.on = function (keyCode, callback) {
+            Key.prototype.onKey = function (keyCode, callback) {
                 this._keyCode2Callback[keyCode] = callback;
                 return this;
             };
