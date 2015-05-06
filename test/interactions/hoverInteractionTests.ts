@@ -1,0 +1,222 @@
+///<reference path="../testReference.ts" />
+
+var assert = chai.assert;
+
+class TestHoverable extends Plottable.Component.AbstractComponent implements Plottable.Interaction.Hoverable {
+  public leftPoint = { x: 100, y: 200 };
+  public rightPoint = { x: 300, y: 200 };
+
+  public _hoverOverComponent(p: Plottable.Point) {
+    // cast-override
+  }
+
+  public _hoverOutComponent(p: Plottable.Point) {
+    // cast-override
+  }
+
+  public _doHover(p: Plottable.Point): Plottable.Interaction.HoverData {
+    var data: string[] = [];
+    var points: Plottable.Point[] = [];
+    if (p.x < 250) {
+      data.push("left");
+      points.push(this.leftPoint);
+    }
+    if (p.x > 150) {
+      data.push("right");
+      points.push(this.rightPoint);
+    }
+    return {
+      data: data,
+      pixelPositions: points,
+      selection: this._element
+    };
+  }
+}
+
+describe("Interactions", () => {
+  describe("Hover", () => {
+    var svg: D3.Selection;
+    var testTarget: TestHoverable;
+    var target: D3.Selection;
+    var hoverInteraction: Plottable.Interaction.Hover;
+    var overData: Plottable.Interaction.HoverData;
+    var overCallbackCalled = false;
+    var outData: Plottable.Interaction.HoverData;
+    var outCallbackCalled = false;
+
+    beforeEach(() => {
+      svg = TestMethods.generateSVG();
+      testTarget = new TestHoverable();
+      testTarget.classed("test-hoverable", true);
+      testTarget.renderTo(svg);
+
+      hoverInteraction = new Plottable.Interaction.Hover();
+      overCallbackCalled = false;
+      hoverInteraction.onHoverOver((hd: Plottable.Interaction.HoverData) => {
+        overCallbackCalled = true;
+        overData = hd;
+      });
+
+      outCallbackCalled = false;
+      hoverInteraction.onHoverOut((hd: Plottable.Interaction.HoverData) => {
+        outCallbackCalled = true;
+        outData = hd;
+      });
+
+      testTarget.registerInteraction(hoverInteraction);
+      target = testTarget.background();
+    });
+
+    it("correctly triggers onHoverOver() callbacks (mouse events)", () => {
+      overCallbackCalled = false;
+      TestMethods.triggerFakeMouseEvent("mouseover", target, 100, 200);
+      assert.isTrue(overCallbackCalled, "onHoverOver was called on mousing over a target area");
+      assert.deepEqual(overData.pixelPositions, [testTarget.leftPoint],
+                        "onHoverOver was called with the correct pixel position (mouse onto left)");
+      assert.deepEqual(overData.data, ["left"],
+                        "onHoverOver was called with the correct data (mouse onto left)");
+
+      overCallbackCalled = false;
+      TestMethods.triggerFakeMouseEvent("mousemove", target, 100, 200);
+      assert.isFalse(overCallbackCalled,
+                    "onHoverOver isn't called if the hover data didn't change");
+
+      overCallbackCalled = false;
+      TestMethods.triggerFakeMouseEvent("mousemove", target, 200, 200);
+      assert.isTrue(overCallbackCalled, "onHoverOver was called when mousing into a new region");
+      assert.deepEqual(overData.pixelPositions, [testTarget.rightPoint],
+                        "onHoverOver was called with the correct pixel position (left --> center)");
+      assert.deepEqual(overData.data, ["right"],
+                        "onHoverOver was called with the new data only (left --> center)");
+
+      TestMethods.triggerFakeMouseEvent("mouseout", target, 401, 200);
+      overCallbackCalled = false;
+      TestMethods.triggerFakeMouseEvent("mouseover", target, 200, 200);
+      assert.deepEqual(overData.pixelPositions, [testTarget.leftPoint, testTarget.rightPoint],
+                        "onHoverOver was called with the correct pixel positions");
+      assert.deepEqual(overData.data, ["left", "right"], "onHoverOver is called with the correct data");
+
+      svg.remove();
+    });
+
+    it("correctly triggers onHoverOver() callbacks (touch events)", () => {
+      overCallbackCalled = false;
+      TestMethods.triggerFakeTouchEvent("touchstart", target, [{x: 100, y: 200}]);
+      assert.isTrue(overCallbackCalled, "onHoverOver was called on touching a target area");
+      assert.deepEqual(overData.pixelPositions, [testTarget.leftPoint],
+                        "onHoverOver was called with the correct pixel position (mouse onto left)");
+      assert.deepEqual(overData.data, ["left"],
+                        "onHoverOver was called with the correct data (mouse onto left)");
+
+      overCallbackCalled = false;
+      TestMethods.triggerFakeTouchEvent("touchstart", target, [{x: 100, y: 200}]);
+      assert.isFalse(overCallbackCalled,
+                    "onHoverOver isn't called if the hover data didn't change");
+
+      overCallbackCalled = false;
+      TestMethods.triggerFakeTouchEvent("touchstart", target, [{x: 200, y: 200}]);
+      assert.isTrue(overCallbackCalled, "onHoverOver was called when touch moves into a new region");
+      assert.deepEqual(overData.pixelPositions, [testTarget.rightPoint],
+                        "onHoverOver was called with the correct pixel position (left --> center)");
+      assert.deepEqual(overData.data, ["right"],
+                        "onHoverOver was called with the new data only (left --> center)");
+
+      TestMethods.triggerFakeTouchEvent("touchstart", target, [{x: 401, y: 200}]);
+      overCallbackCalled = false;
+      TestMethods.triggerFakeTouchEvent("touchstart", target, [{x: 200, y: 200}]);
+      assert.deepEqual(overData.pixelPositions, [testTarget.leftPoint, testTarget.rightPoint],
+                        "onHoverOver was called with the correct pixel positions");
+      assert.deepEqual(overData.data, ["left", "right"], "onHoverOver is called with the correct data");
+
+      svg.remove();
+    });
+
+    it("correctly triggers onHoverOut() callbacks (mouse events)", () => {
+      TestMethods.triggerFakeMouseEvent("mouseover", target, 100, 200);
+
+      outCallbackCalled = false;
+      TestMethods.triggerFakeMouseEvent("mousemove", target, 200, 200);
+      assert.isFalse(outCallbackCalled,
+        "onHoverOut isn't called when mousing into a new region without leaving the old one");
+
+      outCallbackCalled = false;
+      TestMethods.triggerFakeMouseEvent("mousemove", target, 300, 200);
+      assert.isTrue(outCallbackCalled, "onHoverOut was called when the hover data changes");
+      assert.deepEqual(outData.pixelPositions, [testTarget.leftPoint],
+                        "onHoverOut was called with the correct pixel position (center --> right)");
+      assert.deepEqual(outData.data, ["left"],
+                        "onHoverOut was called with the correct data (center --> right)");
+
+      outCallbackCalled = false;
+      TestMethods.triggerFakeMouseEvent("mouseout", target, 401, 200);
+      assert.isTrue(outCallbackCalled, "onHoverOut is called on mousing out of the Component");
+      assert.deepEqual(outData.pixelPositions, [testTarget.rightPoint],
+                        "onHoverOut was called with the correct pixel position");
+      assert.deepEqual(outData.data, ["right"], "onHoverOut was called with the correct data");
+
+      outCallbackCalled = false;
+      TestMethods.triggerFakeMouseEvent("mouseover", target, 200, 200);
+      TestMethods.triggerFakeMouseEvent("mouseout", target, 200, 401);
+      assert.deepEqual(outData.pixelPositions, [testTarget.leftPoint, testTarget.rightPoint],
+                        "onHoverOut was called with the correct pixel positions");
+      assert.deepEqual(outData.data, ["left", "right"], "onHoverOut is called with the correct data");
+
+      svg.remove();
+    });
+
+    it("correctly triggers onHoverOut() callbacks (touch events)", () => {
+      TestMethods.triggerFakeTouchEvent("touchstart", target, [{x: 100, y: 200}]);
+
+      outCallbackCalled = false;
+      TestMethods.triggerFakeTouchEvent("touchstart", target, [{x: 200, y: 200}]);
+      assert.isFalse(outCallbackCalled,
+        "onHoverOut isn't called when mousing into a new region without leaving the old one");
+
+      outCallbackCalled = false;
+      TestMethods.triggerFakeTouchEvent("touchstart", target, [{x: 300, y: 200}]);
+      assert.isTrue(outCallbackCalled, "onHoverOut was called when the hover data changes");
+      assert.deepEqual(outData.pixelPositions, [testTarget.leftPoint],
+                        "onHoverOut was called with the correct pixel position (center --> right)");
+      assert.deepEqual(outData.data, ["left"],
+                        "onHoverOut was called with the correct data (center --> right)");
+
+      outCallbackCalled = false;
+      TestMethods.triggerFakeTouchEvent("touchstart", target, [{x: 401, y: 200}]);
+      assert.isTrue(outCallbackCalled, "onHoverOut is called on mousing out of the Component");
+      assert.deepEqual(outData.pixelPositions, [testTarget.rightPoint],
+                        "onHoverOut was called with the correct pixel position");
+      assert.deepEqual(outData.data, ["right"], "onHoverOut was called with the correct data");
+
+      outCallbackCalled = false;
+      TestMethods.triggerFakeTouchEvent("touchstart", target, [{x: 200, y: 200}]);
+      TestMethods.triggerFakeTouchEvent("touchstart", target, [{x: 200, y: 401}]);
+      assert.deepEqual(outData.pixelPositions, [testTarget.leftPoint, testTarget.rightPoint],
+                        "onHoverOut was called with the correct pixel positions");
+      assert.deepEqual(outData.data, ["left", "right"], "onHoverOut is called with the correct data");
+
+      svg.remove();
+    });
+
+    it("getCurrentHoverData()", () => {
+      TestMethods.triggerFakeMouseEvent("mouseover", target, 100, 200);
+      var currentlyHovered = hoverInteraction.getCurrentHoverData();
+      assert.deepEqual(currentlyHovered.pixelPositions, [testTarget.leftPoint],
+                       "retrieves pixel positions corresponding to the current position");
+      assert.deepEqual(currentlyHovered.data, ["left"],
+                       "retrieves data corresponding to the current position");
+
+      TestMethods.triggerFakeMouseEvent("mousemove", target, 200, 200);
+      currentlyHovered = hoverInteraction.getCurrentHoverData();
+      assert.deepEqual(currentlyHovered.pixelPositions, [testTarget.leftPoint, testTarget.rightPoint],
+                       "retrieves pixel positions corresponding to the current position");
+      assert.deepEqual(currentlyHovered.data, ["left", "right"],
+                       "retrieves data corresponding to the current position");
+
+      TestMethods.triggerFakeMouseEvent("mouseout", target, 401, 200);
+      currentlyHovered = hoverInteraction.getCurrentHoverData();
+      assert.isNull(currentlyHovered.data, "returns null if not currently hovering");
+
+      svg.remove();
+    });
+  });
+});

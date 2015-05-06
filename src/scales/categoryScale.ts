@@ -109,7 +109,7 @@ export module Scales {
       }
       this._innerPadding = innerPadding;
       this.range(this.range());
-      this.broadcaster.broadcast();
+      this._dispatchUpdate();
       return this;
     }
 
@@ -137,7 +137,7 @@ export module Scales {
       }
       this._outerPadding = outerPadding;
       this.range(this.range());
-      this.broadcaster.broadcast();
+      this._dispatchUpdate();
       return this;
     }
 
@@ -146,7 +146,7 @@ export module Scales {
     }
 
     public scale(value: string): number {
-      //scale it to the middle
+      // scale it to the middle
       return super.scale(value) + this.rangeBand() / 2;
     }
   }

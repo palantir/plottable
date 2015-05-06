@@ -33,7 +33,7 @@ export module Axes {
     }
 
     protected _rescale() {
-      return this._invalidateLayout();
+      return this.redraw();
     }
 
     public _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
@@ -89,7 +89,7 @@ export module Axes {
         throw new Error("Angle " + angle + " not supported; only 0, 90, and -90 are valid values");
       }
       this._tickLabelAngle = angle;
-      this._invalidateLayout();
+      this.redraw();
       return this;
     }
 
@@ -208,7 +208,6 @@ export module Axes {
       // erase all text first, then rewrite
       tickLabels.text("");
       this._drawTicks(this.width(), this.height(), catScale, tickLabels);
-      var translate = this._isHorizontal() ? [catScale.rangeBand() / 2, 0] : [0, catScale.rangeBand() / 2];
 
       var xTranslate = this.orient() === "right" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
       var yTranslate = this.orient() === "bottom" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
@@ -216,12 +215,12 @@ export module Axes {
       return this;
     }
 
-    public _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number) {
-      // When anyone calls _invalidateLayout, _computeLayout will be called
+    public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
+      // When anyone calls redraw(), computeLayout() will be called
       // on everyone, including this. Since CSS or something might have
       // affected the size of the characters, clear the cache.
       this._measurer.reset();
-      return super._computeLayout(offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
+      return super.computeLayout(origin, availableWidth, availableHeight);
     }
   }
 }

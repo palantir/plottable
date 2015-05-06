@@ -7,22 +7,22 @@ function makeData() {
 function run(svg, data, Plottable) {
   "use strict";
 
-  var xScale = new Plottable.Scale.Linear();
-  var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
+  var xScale = new Plottable.Scales.Linear();
+  var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
 
-  var yScale = new Plottable.Scale.Linear();
-  var yAxis = new Plottable.Axis.Numeric(yScale, "left").tickLabelPosition("bottom");
+  var yScale = new Plottable.Scales.Linear();
+  var yAxis = new Plottable.Axes.Numeric(yScale, "left").tickLabelPosition("bottom");
 
-  var plot = new Plottable.Plot.Scatter(xScale, yScale).addDataset(data);
+  var plot = new Plottable.Plots.Scatter(xScale, yScale).addDataset(data);
   plot.project("x", "x", xScale).project("y", "y", yScale);
-  var gridlines = new Plottable.Component.Gridlines(xScale, yScale);
+  var gridlines = new Plottable.Components.Gridlines(xScale, yScale);
   var group = plot.above(gridlines);
-  var chart = new Plottable.Component.Table([[yAxis, group],
+  var chart = new Plottable.Components.Table([[yAxis, group],
                                              [null,  xAxis]]);
 
   chart.renderTo(svg);
 
   plot.registerInteraction(
-    new Plottable.Interaction.PanZoom(xScale, yScale)
+    new Plottable.Interactions.PanZoom(xScale, yScale)
   );
 }

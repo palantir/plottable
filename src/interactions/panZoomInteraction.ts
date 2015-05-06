@@ -41,17 +41,13 @@ export module Interactions {
       this._dragInteraction._anchor(component);
 
       var mouseDispatcher = Dispatchers.Mouse.getDispatcher(<SVGElement> this._componentToListenTo.content().node());
-      mouseDispatcher.onWheel("Interaction.PanZoom" + this.getID(), (p: Point, e: WheelEvent) => this._handleWheelEvent(p, e));
+      mouseDispatcher.onWheel((p: Point, e: WheelEvent) => this._handleWheelEvent(p, e));
 
       this._touchDispatcher = Dispatchers.Touch.getDispatcher(<SVGElement> this._componentToListenTo.content().node());
-      this._touchDispatcher.onTouchStart("Interaction.PanZoom" + this.getID(),
-        (ids, idToPoint, e) => this._handleTouchStart(ids, idToPoint, e));
-      this._touchDispatcher.onTouchMove("Interaction.PanZoom" + this.getID(),
-        (ids, idToPoint, e) => this._handlePinch(ids, idToPoint, e));
-      this._touchDispatcher.onTouchEnd("Interaction.PanZoom" + this.getID(),
-        (ids, idToPoint, e) => this._handleTouchEnd(ids, idToPoint, e));
-      this._touchDispatcher.onTouchCancel("Interaction.PanZoom" + this.getID(),
-        (ids, idToPoint, e) => this._handleTouchEnd(ids, idToPoint, e));
+      this._touchDispatcher.onTouchStart((ids, idToPoint, e) => this._handleTouchStart(ids, idToPoint, e));
+      this._touchDispatcher.onTouchMove((ids, idToPoint, e) => this._handlePinch(ids, idToPoint, e));
+      this._touchDispatcher.onTouchEnd((ids, idToPoint, e) => this._handleTouchEnd(ids, idToPoint, e));
+      this._touchDispatcher.onTouchCancel((ids, idToPoint, e) => this._handleTouchEnd(ids, idToPoint, e));
     }
 
     private _handleTouchStart(ids: number[], idToPoint: { [id: number]: Point; }, e: TouchEvent) {

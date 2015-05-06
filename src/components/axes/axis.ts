@@ -27,6 +27,7 @@ module Plottable {
     private _tickLabelPadding = 10;
     private _gutter = 15;
     private _showEndTickLabels = false;
+    private _rescaleCallback: ScaleCallback<Scale<any, number>>;
 
     /**
      * Constructs an axis. An axis is a wrapper around a scale for rendering.
@@ -54,12 +55,13 @@ module Plottable {
 
       this.formatter(formatter);
 
-      this._scale.broadcaster.registerListener(this, () => this._rescale());
+      this._rescaleCallback = (scale) => this._rescale();
+      this._scale.onUpdate(this._rescaleCallback);
     }
 
     public remove() {
       super.remove();
-      this._scale.broadcaster.deregisterListener(this);
+      this._scale.offUpdate(this._rescaleCallback);
     }
 
     protected _isHorizontal() {
@@ -111,17 +113,18 @@ module Plottable {
     }
 
     protected _rescale() {
-      // default implementation; subclasses may call _invalidateLayout() here
-      this._render();
+      // default implementation; subclasses may call redraw() here
+      this.render();
     }
 
-    public _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number) {
-      super._computeLayout(offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
+    public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
+      super.computeLayout(origin, availableWidth, availableHeight);
       if (this._isHorizontal()) {
         this._scale.range([0, this.width()]);
       } else {
         this._scale.range([this.height(), 0]);
       }
+      return this;
     }
 
     protected _setup() {
@@ -229,10 +232,10 @@ module Plottable {
       return tickMarkAttrHash;
     }
 
-    public _invalidateLayout() {
+    public redraw() {
       this._computedWidth = null;
       this._computedHeight = null;
-      super._invalidateLayout();
+      return super.redraw();
     }
 
     protected _setDefaultAlignment() {
@@ -276,7 +279,7 @@ module Plottable {
         return this._formatter;
       }
       this._formatter = formatter;
-      this._invalidateLayout();
+      this.redraw();
       return this;
     }
 
@@ -301,7 +304,7 @@ module Plottable {
           throw new Error("tick length must be positive");
         }
         this._tickLength = length;
-        this._invalidateLayout();
+        this.redraw();
         return this;
       }
     }
@@ -327,7 +330,7 @@ module Plottable {
           throw new Error("end tick length must be positive");
         }
         this._endTickLength = length;
-        this._invalidateLayout();
+        this.redraw();
         return this;
       }
     }
@@ -362,7 +365,7 @@ module Plottable {
           throw new Error("tick label padding must be positive");
         }
         this._tickLabelPadding = padding;
-        this._invalidateLayout();
+        this.redraw();
         return this;
       }
     }
@@ -391,7 +394,7 @@ module Plottable {
           throw new Error("gutter size must be positive");
         }
         this._gutter = size;
-        this._invalidateLayout();
+        this.redraw();
         return this;
       }
     }
@@ -422,7 +425,7 @@ module Plottable {
           throw new Error("unsupported orientation");
         }
         this._orientation = newOrientationLC;
-        this._invalidateLayout();
+        this.redraw();
         return this;
       }
     }
@@ -449,7 +452,7 @@ module Plottable {
         return this._showEndTickLabels;
       }
       this._showEndTickLabels = show;
-      this._render();
+      this.render();
       return this;
     }
   }

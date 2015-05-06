@@ -9,7 +9,7 @@ function makeData() {
          o.y = y_init;
          y_init *= decrease;
          d.push(o);
-      } 
+      }
       return d;
   };
 
@@ -22,55 +22,55 @@ function makeData() {
 
 function run(svg, data, Plottable){
   "use strict";
- 
+
   var data1 = [];
   var data2 = [];
   var data3 = [];
-  deep_copy(data[0], data1);   
-  deep_copy(data[1], data2);   
-  deep_copy(data[2], data3);   
-    
-  var xScale = new Plottable.Scale.Linear();
+  deep_copy(data[0], data1);
+  deep_copy(data[1], data2);
+  deep_copy(data[2], data3);
+
+  var xScale = new Plottable.Scales.Linear();
   xScale.domain([0, 10]);
-  var xAxis = new Plottable.Axis.Numeric(xScale, 'bottom');
-  var yScale = new Plottable.Scale.Linear();
-  var yAxis = new Plottable.Axis.Numeric(yScale, 'left');    
-  
-  var plot1 = new Plottable.Plot.Area(xScale, yScale);
+  var xAxis = new Plottable.Axes.Numeric(xScale, 'bottom');
+  var yScale = new Plottable.Scales.Linear();
+  var yAxis = new Plottable.Axes.Numeric(yScale, 'left');
+
+  var plot1 = new Plottable.Plots.Area(xScale, yScale);
   plot1.addDataset(data1);
   plot1.project("x", "x", xScale).project("y", "y", yScale);
   plot1.project("fill", '#923458')
   .project("opacity", 0.2)
   .project("stroke-width", 0);
-                
-  var plot2 = new Plottable.Plot.Area(xScale, yScale);
+
+  var plot2 = new Plottable.Plots.Area(xScale, yScale);
   plot2.addDataset(data2);
   plot2.project("x", "x", xScale).project("y", "y", yScale);
   plot2.project("fill", '#923458')
   .project("opacity", 0.3)
   .project("stroke-width", 0);
-      
-  var plot3 = new Plottable.Plot.Area(xScale, yScale);
+
+  var plot3 = new Plottable.Plots.Area(xScale, yScale);
   plot3.addDataset(data3);
   plot3.project("x", "x", xScale).project("y", "y", yScale);
   plot3.project("fill", '#923458')
   .project("opacity", 0.4)
   .project("stroke-width", 0);
-  
-  var cs = new Plottable.Scale.Color();
+
+  var cs = new Plottable.Scales.Color();
   cs.domain(["#434343", "#923458", "#384658"]);
   cs.range(["#434343", "#923458", "#38ff58"]);
-  var legend = new Plottable.Component.Legend(cs);
-  
+  var legend = new Plottable.Components.Legend(cs);
+
   var plots = plot1.above(plot2).above(plot3);
-  var label = new Plottable.Component.Label("TITLE LABEL");
-  
-  var table = new Plottable.Component.Table([[null, label, null],
+  var label = new Plottable.Components.Label("TITLE LABEL");
+
+  var table = new Plottable.Components.Table([[null, label, null],
                                              [yAxis, plots, legend],
                                              [null, xAxis, null]]);
- 
+
   table.renderTo(svg);
-        
+
   plots.background()
   .select('.background-fill')
   .style('fill', '#923458')
@@ -80,17 +80,17 @@ function run(svg, data, Plottable){
   .select('.background-fill')
   .style('fill', '#120378')
   .style('opacity', 0.1);
-  
+
   yAxis.background()
   .select('.background-fill')
   .style('fill', '#bba411')
   .style('opacity', 0.1);
-  
+
   label.background()
   .select('.background-fill')
   .style('fill', '#358923')
   .style('opacity', 0.3);
-  
+
   legend.background()
   .select('.background-fill')
   .style('fill', '#33e4e9')

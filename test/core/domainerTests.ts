@@ -11,7 +11,8 @@ describe("Domainer", () => {
   });
 
   it("pad() works in general case", () => {
-    scale._updateExtent("1", "x", [100, 200]);
+    scale.addExtentProvider((scale: Plottable.Scale<number, number>) => [[100, 200]]);
+    scale.autoDomain();
     scale.domainer(new Plottable.Domainer().pad(0.2));
     assert.closeTo(scale.domain()[0], 90, 0.1, "lower bound of domain correct");
     assert.closeTo(scale.domain()[1], 210, 0.1, "upper bound of domain correct");
@@ -22,7 +23,8 @@ describe("Domainer", () => {
     var f = d3.time.format("%x");
     var d1 = f.parse("06/02/2014");
     var d2 = f.parse("06/03/2014");
-    timeScale._updateExtent("1", "x", [d1, d2]);
+    timeScale.addExtentProvider((scale: Plottable.Scale<Date, number>) => [[d1, d2]]);
+    timeScale.autoDomain();
     timeScale.domainer(new Plottable.Domainer().pad());
     var dd1 = timeScale.domain()[0];
     var dd2 = timeScale.domain()[1];
@@ -30,13 +32,14 @@ describe("Domainer", () => {
     assert.isNotNull(dd1.toDateString, "padDomain produced dates");
     assert.notEqual(d1.valueOf(), dd1.valueOf(), "date1 changed");
     assert.notEqual(d2.valueOf(), dd2.valueOf(), "date2 changed");
-    assert.equal(dd1.valueOf(), dd1.valueOf(), "date1 is not NaN");
-    assert.equal(dd2.valueOf(), dd2.valueOf(), "date2 is not NaN");
+    assert.strictEqual(dd1.valueOf(), dd1.valueOf(), "date1 is not NaN");
+    assert.strictEqual(dd2.valueOf(), dd2.valueOf(), "date2 is not NaN");
   });
 
   it("pad() works on log scales", () => {
     var logScale = new Plottable.Scales.Log();
-    logScale._updateExtent("1", "x", [10, 100]);
+    logScale.addExtentProvider((scale: Plottable.Scale<number, number>) => [[10, 100]]);
+    logScale.autoDomain();
     logScale.range([0, 1]);
     logScale.domainer(domainer.pad(2.0));
     assert.closeTo(logScale.domain()[0], 1, 0.001);
@@ -62,13 +65,10 @@ describe("Domainer", () => {
     var d2 = new Date(2000, 5, 5);
     var dayBefore = new Date(2000, 5, 4);
     var dayAfter = new Date(2000, 5, 6);
-    var timeScale = new Plottable.Scales.Time();
-    // the result of computeDomain() will be number[], but when it
-    // gets fed back into timeScale, it will be adjusted back to a Date.
-    // That's why I'm using _updateExtent() instead of domainer.computeDomain()
-    timeScale._updateExtent("1", "x", [d, d2]);
-    timeScale.domainer(new Plottable.Domainer().pad());
-    assert.deepEqual(timeScale.domain(), [dayBefore, dayAfter]);
+    domainer.pad();
+    var domain = domainer.computeDomain([[d, d2]], scale);
+    assert.strictEqual(domain[0], dayBefore.valueOf(), "domain start was set to the day before");
+    assert.strictEqual(domain[1], dayAfter.valueOf(), "domain end was set to the day after");
   });
 
   it("pad() only takes the last value", () => {
@@ -109,15 +109,16 @@ describe("Domainer", () => {
   });
 
   it("paddingException(n) works on dates", () => {
-    var a = new Date(2000, 5, 5);
-    var b = new Date(2003, 0, 1);
-    domainer.pad().addPaddingException(a);
+    var startDate = new Date(2000, 5, 5);
+    var endDate = new Date(2003, 0, 1);
     var timeScale = new Plottable.Scales.Time();
-    timeScale._updateExtent("1", "x", [a, b]);
+    timeScale.addExtentProvider((scale: Plottable.Scale<Date, number>) => [[startDate, endDate]]);
+    timeScale.autoDomain();
+    domainer.pad().addPaddingException(startDate);
     timeScale.domainer(domainer);
     var domain = timeScale.domain();
-    assert.deepEqual(domain[0], a);
-    assert.isTrue(b < domain[1]);
+    assert.deepEqual(domain[0], startDate);
+    assert.isTrue(endDate < domain[1]);
   });
 
   it("include(n) works an expected", () => {
@@ -150,26 +151,25 @@ describe("Domainer", () => {
   });
 
   it("include(n) works on dates", () => {
-    var a = new Date(2000, 5, 4);
-    var b = new Date(2000, 5, 5);
-    var c = new Date(2000, 5, 6);
-    var d = new Date(2003, 0, 1);
-    domainer.addIncludedValue(b);
+    var includedDate = new Date(2000, 5, 5);
+    var startDate = new Date(2000, 5, 6);
+    var endDate = new Date(2003, 0, 1);
     var timeScale = new Plottable.Scales.Time();
-    timeScale._updateExtent("1", "x", [c, d]);
+    timeScale.addExtentProvider((scale: Plottable.Scale<Date, number>) => [[startDate, endDate]]);
+    timeScale.autoDomain();
+    domainer.addIncludedValue(includedDate);
     timeScale.domainer(domainer);
-    assert.deepEqual(timeScale.domain(), [b, d]);
+    assert.deepEqual(timeScale.domain(), [includedDate, endDate], "domain was expanded to contain included date");
   });
 
   it("exceptions are setup properly on an area plot", () => {
     var xScale = new Plottable.Scales.Linear();
     var yScale = new Plottable.Scales.Linear();
-    var domainer = yScale.domainer();
     var data = [{x: 0, y: 0, y0: 0}, {x: 5, y: 5, y0: 5}];
     var dataset = new Plottable.Dataset(data);
     var r = new Plottable.Plots.Area(xScale, yScale);
     r.addDataset(dataset);
-    var svg = generateSVG();
+    var svg = TestMethods.generateSVG();
     r.project("x", "x", xScale);
     r.project("y", "y", yScale);
     r.renderTo(svg);

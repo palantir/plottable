@@ -90,7 +90,7 @@ export module Plots {
       return ["x", "y", "defined"];
     }
 
-    //===== Stack logic from StackedPlot =====
+    // ===== Stack logic from StackedPlot =====
     public _updateStackOffsets() {
       if (!this._projectorsReady()) { return; }
       var domainKeys = this._getDomainKeys();
@@ -127,8 +127,8 @@ export module Plots {
       return Stacked.prototype._generateDefaultMapArray.call(this);
     }
 
-    public _updateScaleExtents() {
-      Stacked.prototype._updateScaleExtents.call(this);
+    protected _extentsForAttr(attr: string) {
+      return (<any> Stacked.prototype)._extentsForAttr.call(this, attr);
     }
 
     public _keyAccessor(): _Accessor {
@@ -146,7 +146,7 @@ export module Plots {
     protected _normalizeDatasets<A, B>(fromX: boolean): {a: A; b: B}[] {
       return Stacked.prototype._normalizeDatasets.call(this, fromX);
     }
-    //===== /Stack logic =====
+    // ===== /Stack logic =====
   }
 }
 }

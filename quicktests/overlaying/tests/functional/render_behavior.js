@@ -13,20 +13,20 @@ function run(svg, data, Plottable) {
   var i = 0;
 
   //Axis
-  var xScale = new Plottable.Scale.Linear();
-  var yScale = new Plottable.Scale.Linear();
-  var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
-  var yAxis = new Plottable.Axis.Numeric(yScale, "left");
+  var xScale = new Plottable.Scales.Linear();
+  var yScale = new Plottable.Scales.Linear();
+  var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
+  var yAxis = new Plottable.Axes.Numeric(yScale, "left");
 
-  var areaPlot = new Plottable.Plot.Area(xScale, yScale).addDataset(dataseries).animate("true");
+  var areaPlot = new Plottable.Plots.Area(xScale, yScale).addDataset(dataseries).animate("true");
   areaPlot.project("x", "x", xScale).project("y", "y", yScale);
 
-  var label1  = new Plottable.Component.Label("dataset.data()", "horizontal");
-  var label2  = new Plottable.Component.Label("change width + resize", "horizontal");
-  var label3  = new Plottable.Component.Label("remove + renderTo", "horizontal");
-  var label4  = new Plottable.Component.Label("_render()", "horizontal");
+  var label1  = new Plottable.Components.Label("dataset.data()", "horizontal");
+  var label2  = new Plottable.Components.Label("change width + resize", "horizontal");
+  var label3  = new Plottable.Components.Label("remove + renderTo", "horizontal");
+  var label4  = new Plottable.Components.Label("_render()", "horizontal");
 
-  var basicTable = new Plottable.Component.Table([[yAxis, areaPlot],
+  var basicTable = new Plottable.Components.Table([[yAxis, areaPlot],
    [null, xAxis],
    [null, label1],
    [null, label2],
@@ -51,11 +51,11 @@ function run(svg, data, Plottable) {
     basicTable.renderTo(svg);
   }
 
-  label1.registerInteraction(new Plottable.Interaction.Click().onClick(newData));
+  label1.registerInteraction(new Plottable.Interactions.Click().onClick(newData));
 
-  label2.registerInteraction(new Plottable.Interaction.Click().onClick(changeWidth));
+  label2.registerInteraction(new Plottable.Interactions.Click().onClick(changeWidth));
 
-  label3.registerInteraction(new Plottable.Interaction.Click().onClick(removeAndRenderTo));
+  label3.registerInteraction(new Plottable.Interactions.Click().onClick(removeAndRenderTo));
 
-  label4.registerInteraction(new Plottable.Interaction.Click().onClick(function(){basicTable._render();}));
+  label4.registerInteraction(new Plottable.Interactions.Click().onClick(function(){basicTable._render();}));
 }

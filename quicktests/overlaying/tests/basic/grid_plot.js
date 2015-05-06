@@ -10,20 +10,20 @@ function makeData() {
 function run(svg, data, Plottable) {
   "use strict";
 
-    var xScale = new Plottable.Scale.Category();
-    var yScale = new Plottable.Scale.Category();
-    var colorScale = new Plottable.Scale.Color();
+    var xScale = new Plottable.Scales.Category();
+    var yScale = new Plottable.Scales.Category();
+    var colorScale = new Plottable.Scales.Color();
 
-    var xAxis = new Plottable.Axis.Category(xScale, "bottom");
-    var yAxis = new Plottable.Axis.Category(yScale, "left");
-    
-    var grid = new Plottable.Plot.Grid(xScale, yScale)
+    var xAxis = new Plottable.Axes.Category(xScale, "bottom");
+    var yAxis = new Plottable.Axes.Category(yScale, "left");
+
+    var grid = new Plottable.Plots.Grid(xScale, yScale)
       .project("x", "name", xScale)
       .project("y", "y", yScale)
       .attr("fill", "type", colorScale)
       .addDataset(data);
 
-    var chart = new Plottable.Component.Table([
+    var chart = new Plottable.Components.Table([
                     [yAxis, grid],
                     [null,  xAxis]
                   ]);

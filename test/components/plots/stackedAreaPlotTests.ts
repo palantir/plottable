@@ -14,7 +14,7 @@ describe("Plots", () => {
     var SVG_HEIGHT = 400;
 
     beforeEach(() => {
-      svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       xScale = new Plottable.Scales.Linear().domain([1, 3]);
       yScale = new Plottable.Scales.Linear().domain([0, 4]);
       var colorScale = new Plottable.Scales.Color("10").domain(["a", "b"]);
@@ -37,18 +37,18 @@ describe("Plots", () => {
       renderer.project("y", "y", yScale);
       renderer.project("fill", "type", colorScale);
       var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
-      var table = new Plottable.Components.Table([[renderer], [xAxis]]).renderTo(svg);
+      new Plottable.Components.Table([[renderer], [xAxis]]).renderTo(svg);
     });
 
     it("renders correctly", () => {
       var areas = (<any> renderer)._renderArea.selectAll(".area");
       var area0 = d3.select(areas[0][0]);
-      var d0 = normalizePath(area0.attr("d")).split(/[a-zA-Z]/);
+      var d0 = TestMethods.normalizePath(area0.attr("d")).split(/[a-zA-Z]/);
       var d0Ys = d0.slice(1, d0.length - 1).map((s) => parseFloat(s.split(",")[1]));
       assert.strictEqual(d0Ys.indexOf(0), -1, "bottom area never touches the top");
 
       var area1 = d3.select(areas[0][1]);
-      var d1 = normalizePath(area1.attr("d")).split(/[a-zA-Z]/);
+      var d1 = TestMethods.normalizePath(area1.attr("d")).split(/[a-zA-Z]/);
       var d1Ys = d1.slice(1, d1.length - 1).map((s) => parseFloat(s.split(",")[1]));
       assert.notEqual(d1Ys.indexOf(0), -1, "touches the top");
 
@@ -67,7 +67,7 @@ describe("Plots", () => {
     var SVG_HEIGHT = 400;
 
     beforeEach(() => {
-      svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       var xScale = new Plottable.Scales.Linear().domain([1, 3]);
       var yScale = new Plottable.Scales.Linear().domain([0, 4]);
       var colorScale = new Plottable.Scales.Color("10");
@@ -111,7 +111,7 @@ describe("Plots", () => {
     var SVG_HEIGHT = 400;
 
     beforeEach(() => {
-      svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       xScale = new Plottable.Scales.Linear().domain([1, 3]);
       yScale = new Plottable.Scales.Linear();
       var colorScale = new Plottable.Scales.Color("10").domain(["a", "b"]);
@@ -317,7 +317,7 @@ describe("Plots", () => {
     var SVG_HEIGHT = 400;
 
     beforeEach(() => {
-      svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       xScale = new Plottable.Scales.Linear().domain([1, 3]);
       yScale = new Plottable.Scales.Linear().domain([0, 4]);
       var colorScale = new Plottable.Scales.Color("10").domain(["a", "b"]);
@@ -338,18 +338,18 @@ describe("Plots", () => {
       renderer.addDataset(data2);
       renderer.project("fill", "type", colorScale);
       var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
-      var table = new Plottable.Components.Table([[renderer], [xAxis]]).renderTo(svg);
+      new Plottable.Components.Table([[renderer], [xAxis]]).renderTo(svg);
     });
 
     it("renders correctly", () => {
       var areas = (<any> renderer)._renderArea.selectAll(".area");
       var area0 = d3.select(areas[0][0]);
-      var d0 = normalizePath(area0.attr("d")).split(/[a-zA-Z]/);
+      var d0 = TestMethods.normalizePath(area0.attr("d")).split(/[a-zA-Z]/);
       var d0Ys = d0.slice(1, d0.length - 1).map((s) => parseFloat(s.split(",")[1]));
       assert.strictEqual(d0Ys.indexOf(0), -1, "bottom area never touches the top");
 
       var area1 = d3.select(areas[0][1]);
-      var d1 = normalizePath(area1.attr("d")).split(/[a-zA-Z]/);
+      var d1 = TestMethods.normalizePath(area1.attr("d")).split(/[a-zA-Z]/);
       var d1Ys = d1.slice(1, d1.length - 1).map((s) => parseFloat(s.split(",")[1]));
       assert.notEqual(d1Ys.indexOf(0), -1, "touches the top");
 

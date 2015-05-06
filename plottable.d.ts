@@ -426,22 +426,6 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Utils {
-        class ScaleDomainCoordinator<D> {
-            /**
-             * Constructs a ScaleDomainCoordinator.
-             *
-             * @constructor
-             * @param {Scale[]} scales A list of scales whose domains should be linked.
-             */
-            constructor(scales: Scale<D, any>[]);
-            rescale(scale: Scale<D, any>): void;
-        }
-    }
-}
-
-
-declare module Plottable {
     module Configs {
         /**
          * Specifies if Plottable should show warnings.
@@ -492,77 +476,8 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Core {
-        /**
-         * A callback for a Broadcaster. The callback will be called with the Broadcaster's
-         * "listenable" as the first argument, with subsequent optional arguments depending
-         * on the listenable.
-         */
-        interface BroadcasterCallback<L> {
-            (listenable: L, ...args: any[]): any;
-        }
-        /**
-         * The Broadcaster holds a reference to a "listenable" object.
-         * Third parties can register and deregister listeners from the Broadcaster.
-         * When the broadcaster.broadcast() method is called, all registered callbacks
-         * are called with the Broadcaster's "listenable", along with optional
-         * arguments passed to the `broadcast` method.
-         *
-         * The listeners are called synchronously.
-         */
-        class Broadcaster<L> extends Core.PlottableObject {
-            /**
-             * Constructs a broadcaster, taking a "listenable" object to broadcast about.
-             *
-             * @constructor
-             * @param {L} listenable The listenable object to broadcast.
-             */
-            constructor(listenable: L);
-            /**
-             * Registers a callback to be called when the broadcast method is called. Also takes a key which
-             * is used to support deregistering the same callback later, by passing in the same key.
-             * If there is already a callback associated with that key, then the callback will be replaced.
-             * The callback will be passed the Broadcaster's "listenable" as the `this` context.
-             *
-             * @param key The key associated with the callback. Key uniqueness is determined by deep equality.
-             * @param {BroadcasterCallback<L>} callback A callback to be called.
-             * @returns {Broadcaster} The calling Broadcaster
-             */
-            registerListener(key: any, callback: BroadcasterCallback<L>): Broadcaster<L>;
-            /**
-             * Call all listening callbacks, optionally with arguments passed through.
-             *
-             * @param ...args A variable number of optional arguments
-             * @returns {Broadcaster} The calling Broadcaster
-             */
-            broadcast(...args: any[]): Broadcaster<L>;
-            /**
-             * Deregisters the callback associated with a key.
-             *
-             * @param key The key to deregister.
-             * @returns {Broadcaster} The calling Broadcaster
-             */
-            deregisterListener(key: any): Broadcaster<L>;
-            /**
-             * Gets the keys for all listeners attached to the Broadcaster.
-             *
-             * @returns {any[]} An array of the keys.
-             */
-            getListenerKeys(): any[];
-            /**
-             * Deregisters all listeners and callbacks associated with the Broadcaster.
-             *
-             * @returns {Broadcaster} The calling Broadcaster
-             */
-            deregisterAllListeners(): void;
-        }
-    }
-}
-
-
-declare module Plottable {
+    type DatasetCallback = (dataset: Dataset) => any;
     class Dataset extends Core.PlottableObject {
-        broadcaster: Core.Broadcaster<Dataset>;
         /**
          * Constructs a new set.
          *
@@ -574,6 +489,8 @@ declare module Plottable {
          * @param {any} metadata An object containing additional information (default = {}).
          */
         constructor(data?: any[], metadata?: any);
+        onUpdate(callback: DatasetCallback): void;
+        offUpdate(callback: DatasetCallback): void;
         /**
          * Gets the data.
          *
@@ -674,14 +591,14 @@ declare module Plottable {
              *
              * @param {Component} component Any Plottable component.
              */
-            function registerToRender(c: Component): void;
+            function registerToRender(component: Component): void;
             /**
              * If the RenderController is enabled, we enqueue the component for
              * layout and render. Otherwise, it is rendered immediately.
              *
              * @param {Component} component Any Plottable component.
              */
-            function registerToComputeLayout(c: Component): void;
+            function registerToComputeLayout(component: Component): void;
             /**
              * Render everything that is waiting to be rendered right now, instead of
              * waiting until the next frame.
@@ -869,10 +786,17 @@ declare module Plottable {
 
 
 declare module Plottable {
+    interface ScaleCallback<S extends Scale<any, any>> {
+        (scale: S): any;
+    }
+    module Scales {
+        interface ExtentProvider<D> {
+            (scale: Scale<D, any>): D[][];
+        }
+    }
     class Scale<D, R> extends Core.PlottableObject {
-        protected _d3Scale: D3.Scale.Scale;
-        broadcaster: Core.Broadcaster<Scale<D, R>>;
         _typeCoercer: (d: any) => any;
+        protected _d3Scale: D3.Scale.Scale;
         /**
          * Constructs a new Scale.
          *
@@ -886,6 +810,9 @@ declare module Plottable {
         constructor(scale: D3.Scale.Scale);
         protected _getAllExtents(): D[][];
         protected _getExtent(): D[];
+        onUpdate(callback: ScaleCallback<Scale<D, R>>): void;
+        offUpdate(callback: ScaleCallback<Scale<D, R>>): void;
+        protected _dispatchUpdate(): void;
         /**
          * Modifies the domain on the scale so that it includes the extent of all
          * perspectives it depends on. This will normally happen automatically, but
@@ -957,18 +884,8 @@ declare module Plottable {
          * @returns {Scale} A copy of the calling Scale.
          */
         copy(): Scale<D, R>;
-        /**
-         * When a renderer determines that the extent of a projector has changed,
-         * it will call this function. This function should ensure that
-         * the scale has a domain at least large enough to include extent.
-         *
-         * @param {number} rendererID A unique indentifier of the renderer sending
-         *                 the new extent.
-         * @param {string} attr The attribute being projected, e.g. "x", "y0", "r"
-         * @param {D[]} extent The new extent to be included in the scale.
-         */
-        _updateExtent(plotProvidedKey: string, attr: string, extent: D[]): Scale<D, R>;
-        _removeExtent(plotProvidedKey: string, attr: string): Scale<D, R>;
+        addExtentProvider(provider: Scales.ExtentProvider<D>): void;
+        removeExtentProvider(provider: Scales.ExtentProvider<D>): void;
     }
 }
 
@@ -1588,6 +1505,15 @@ declare module Plottable {
 
 
 declare module Plottable {
+    module Components {
+        class Alignment {
+            static TOP: string;
+            static BOTTOM: string;
+            static LEFT: string;
+            static RIGHT: string;
+            static CENTER: string;
+        }
+    }
     class Component extends Core.PlottableObject {
         protected _element: D3.Selection;
         protected _content: D3.Selection;
@@ -1598,11 +1524,12 @@ declare module Plottable {
         protected _isSetup: boolean;
         protected _isAnchored: boolean;
         /**
-         * Attaches the Component as a child of a given a DOM element. Usually only directly invoked on root-level Components.
+         * Attaches the Component as a child of a given D3 Selection.
          *
-         * @param {D3.Selection} element A D3 selection consisting of the element to anchor under.
+         * @param {D3.Selection} selection The Selection containing the Element to anchor under.
+         * @returns {Component} The calling Component.
          */
-        _anchor(element: D3.Selection): void;
+        anchor(selection: D3.Selection): Component;
         /**
          * Creates additional elements as necessary for the Component to function.
          * Called during _anchor() if the Component's element has not been created yet.
@@ -1615,21 +1542,29 @@ declare module Plottable {
          * If no parameters are supplied and the Component is a root node,
          * they are inferred from the size of the Component's element.
          *
-         * @param {number} offeredXOrigin x-coordinate of the origin of the space offered the Component
-         * @param {number} offeredYOrigin y-coordinate of the origin of the space offered the Component
-         * @param {number} availableWidth available width for the Component to render in
-         * @param {number} availableHeight available height for the Component to render in
+         * @param {Point} origin Origin of the space offered to the Component.
+         * @param {number} availableWidth
+         * @param {number} availableHeight
+         * @returns {Component} The calling Component.
          */
-        _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;
+        computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Component;
         protected _getSize(availableWidth: number, availableHeight: number): {
             width: number;
             height: number;
         };
-        _render(): void;
+        render(): Component;
         _doRender(): void;
         _useLastCalculatedLayout(): boolean;
         _useLastCalculatedLayout(useLast: boolean): Component;
-        _invalidateLayout(): void;
+        /**
+         * Causes the Component to recompute layout and redraw.
+         *
+         * This function should be called when CSS changes could influence the size
+         * of the components, e.g. changing the font size.
+         *
+         * @returns {Component} The calling Component.
+         */
+        redraw(): Component;
         /**
          * Renders the Component into a given DOM element. The element must be as <svg>.
          *
@@ -1637,15 +1572,6 @@ declare module Plottable {
          * @returns {Component} The calling component.
          */
         renderTo(element: String | D3.Selection): Component;
-        /**
-         * Causes the Component to recompute layout and redraw.
-         *
-         * This function should be called when CSS changes could influence the size
-         * of the components, e.g. changing the font size.
-         *
-         * @returns {Component} The calling component.
-         */
-        redraw(): Component;
         /**
          * Sets the x alignment of the Component. This will be used if the
          * Component is given more space than it needs.
@@ -1826,8 +1752,8 @@ declare module Plottable {
 
 declare module Plottable {
     class ComponentContainer extends Component {
-        _anchor(element: D3.Selection): void;
-        _render(): void;
+        anchor(selection: D3.Selection): ComponentContainer;
+        render(): ComponentContainer;
         _removeComponent(c: Component): void;
         _addComponent(c: Component, prepend?: boolean): boolean;
         /**
@@ -1875,7 +1801,7 @@ declare module Plottable {
             constructor(components?: Component[]);
             _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
             _merge(c: Component, below: boolean): Group;
-            _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): Group;
+            computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Group;
             protected _getSize(availableWidth: number, availableHeight: number): {
                 width: number;
                 height: number;
@@ -1927,7 +1853,7 @@ declare module Plottable {
         _isFixedHeight(): boolean;
         _isFixedWidth(): boolean;
         protected _rescale(): void;
-        _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;
+        computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Axis;
         protected _setup(): void;
         protected _getTickValues(): any[];
         _doRender(): void;
@@ -1943,7 +1869,7 @@ declare module Plottable {
             x2: any;
             y2: any;
         };
-        _invalidateLayout(): void;
+        redraw(): Component;
         protected _setDefaultAlignment(): void;
         /**
          * Gets the current formatter on the axis. Data is passed through the
@@ -2119,6 +2045,7 @@ declare module Plottable {
     }
 }
 
+
 declare module Plottable {
     module Axes {
         class Numeric extends Axis {
@@ -2202,7 +2129,7 @@ declare module Plottable {
              */
             constructor(scale: Scales.Category, orientation?: string, formatter?: (d: any) => string);
             protected _setup(): void;
-            protected _rescale(): void;
+            protected _rescale(): Component;
             _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
             protected _getTickValues(): string[];
             /**
@@ -2220,7 +2147,7 @@ declare module Plottable {
              */
             tickLabelAngle(): number;
             _doRender(): Category;
-            _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;
+            computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Axis;
         }
     }
 }
@@ -2538,7 +2465,7 @@ declare module Plottable {
              */
             removeComponent(component: Component): void;
             _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
-            _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;
+            computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Table;
             /**
              * Sets the row and column padding on the Table.
              *
@@ -2662,6 +2589,7 @@ declare module Plottable {
         protected _projections: {
             [attrToSet: string]: _Projection;
         };
+        protected _attrToExtents: D3.Map<any[]>;
         protected _animate: boolean;
         protected _animateOnNextRender: boolean;
         /**
@@ -2676,7 +2604,7 @@ declare module Plottable {
          * @param {any[]|Dataset} [dataset] If provided, the data or Dataset to be associated with this Plot.
          */
         constructor();
-        _anchor(element: D3.Selection): void;
+        anchor(selection: D3.Selection): Plot;
         protected _setup(): void;
         remove(): void;
         /**
@@ -2741,11 +2669,13 @@ declare module Plottable {
         animate(enabled: boolean): Plot;
         detach(): Plot;
         /**
-         * This function makes sure that all of the scales in this._projections
-         * have an extent that includes all the data that is projected onto them.
+         * Updates the extents associated with each attribute, then autodomains all scales the Plot uses.
          */
-        protected _updateScaleExtents(): void;
-        _updateScaleExtent(attr: string): void;
+        protected _updateExtents(): void;
+        /**
+         * Override in subclass to add special extents, such as included values
+         */
+        protected _extentsForAttr(attr: string): any[];
         /**
          * Get the animator associated with the specified Animator key.
          *
@@ -2839,7 +2769,7 @@ declare module Plottable {
              * @constructor
              */
             constructor();
-            _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;
+            computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Pie;
             addDataset(keyOrDataset: any, dataset?: any): Pie;
             protected _generateAttrToProjector(): AttributeToProjector;
             protected _getDrawer(key: string): Drawers.AbstractDrawer;
@@ -2890,7 +2820,7 @@ declare module Plottable {
          */
         automaticallyAdjustXScaleOverVisiblePoints(autoAdjustment: boolean): XYPlot<X, Y>;
         protected _generateAttrToProjector(): AttributeToProjector;
-        _computeLayout(offeredXOrigin?: number, offeredYOffset?: number, availableWidth?: number, availableHeight?: number): void;
+        computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): XYPlot<X, Y>;
         protected _updateXDomainer(): void;
         protected _updateYDomainer(): void;
         /**
@@ -3231,7 +3161,7 @@ declare module Plottable {
         _setDatasetStackOffsets(positiveDataMapArray: D3.Map<Plots.StackedDatum>[], negativeDataMapArray: D3.Map<Plots.StackedDatum>[]): void;
         _getDomainKeys(): string[];
         _generateDefaultMapArray(): D3.Map<Plots.StackedDatum>[];
-        _updateScaleExtents(): void;
+        protected _extentsForAttr(attr: string): any[];
         _normalizeDatasets<A, B>(fromX: boolean): {
             a: A;
             b: B;
@@ -3270,7 +3200,7 @@ declare module Plottable {
             _setDatasetStackOffsets(positiveDataMapArray: D3.Map<StackedDatum>[], negativeDataMapArray: D3.Map<StackedDatum>[]): void;
             _getDomainKeys(): any;
             _generateDefaultMapArray(): D3.Map<StackedDatum>[];
-            _updateScaleExtents(): void;
+            protected _extentsForAttr(attr: string): any;
             _keyAccessor(): _Accessor;
             _valueAccessor(): _Accessor;
             _getPlotMetadataForDataset(key: string): StackedPlotMetadata;
@@ -3314,7 +3244,7 @@ declare module Plottable {
             _setDatasetStackOffsets(positiveDataMapArray: D3.Map<StackedDatum>[], negativeDataMapArray: D3.Map<StackedDatum>[]): void;
             _getDomainKeys(): any;
             _generateDefaultMapArray(): D3.Map<StackedDatum>[];
-            _updateScaleExtents(): void;
+            protected _extentsForAttr(attr: string): any;
             _keyAccessor(): _Accessor;
             _valueAccessor(): _Accessor;
         }
@@ -3523,19 +3453,16 @@ declare module Plottable {
         protected _event2Callback: {
             [eventName: string]: (e: Event) => any;
         };
-        protected _broadcasters: Core.Broadcaster<Dispatcher>[];
-        /**
-         * Creates a wrapped version of the callback that can be registered to a Broadcaster
-         */
-        protected _getWrappedCallback(callback: Function): Core.BroadcasterCallback<Dispatcher>;
-        protected _setCallback(b: Core.Broadcaster<Dispatcher>, key: any, callback: Function): void;
+        protected _callbacks: Utils.CallbackSet<Function>[];
+        protected setCallback(callbackSet: Utils.CallbackSet<Function>, callback: Function): void;
+        protected unsetCallback(callbackSet: Utils.CallbackSet<Function>, callback: Function): void;
     }
 }
 
 
 declare module Plottable {
     module Dispatchers {
-        type MouseCallback = (p: Point, e: MouseEvent) => any;
+        type MouseCallback = (p: Point, event: MouseEvent) => any;
         class Mouse extends Dispatcher {
             /**
              * Get a Dispatcher.Mouse for the <svg> containing elem. If one already exists
@@ -3552,67 +3479,96 @@ declare module Plottable {
              * @param {SVGElement} svg The root <svg> element to attach to.
              */
             constructor(svg: SVGElement);
-            protected _getWrappedCallback(callback: Function): Core.BroadcasterCallback<Dispatchers.Mouse>;
             /**
              * Registers a callback to be called whenever the mouse position changes,
-             * or removes the callback if `null` is passed as the callback.
              *
-             * @param {any} key The key associated with the callback.
-             *                  Key uniqueness is determined by deep equality.
              * @param {(p: Point) => any} callback A callback that takes the pixel position
              *                                     in svg-coordinate-space. Pass `null`
              *                                     to remove a callback.
              * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
              */
-            onMouseMove(key: any, callback: MouseCallback): Dispatchers.Mouse;
+            onMouseMove(callback: MouseCallback): Dispatchers.Mouse;
             /**
-             * Registers a callback to be called whenever a mousedown occurs,
-             * or removes the callback if `null` is passed as the callback.
+             * Registers the callback to be called whenever the mouse position changes,
              *
-             * @param {any} key The key associated with the callback.
-             *                  Key uniqueness is determined by deep equality.
              * @param {(p: Point) => any} callback A callback that takes the pixel position
              *                                     in svg-coordinate-space. Pass `null`
              *                                     to remove a callback.
              * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
              */
-            onMouseDown(key: any, callback: MouseCallback): Dispatchers.Mouse;
+            offMouseMove(callback: MouseCallback): Dispatchers.Mouse;
             /**
-             * Registers a callback to be called whenever a mouseup occurs,
-             * or removes the callback if `null` is passed as the callback.
+             * Registers a callback to be called whenever a mousedown occurs.
              *
-             * @param {any} key The key associated with the callback.
-             *                  Key uniqueness is determined by deep equality.
              * @param {(p: Point) => any} callback A callback that takes the pixel position
              *                                     in svg-coordinate-space. Pass `null`
              *                                     to remove a callback.
              * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
              */
-            onMouseUp(key: any, callback: MouseCallback): Dispatchers.Mouse;
+            onMouseDown(callback: MouseCallback): Dispatchers.Mouse;
             /**
-             * Registers a callback to be called whenever a wheel occurs,
-             * or removes the callback if `null` is passed as the callback.
+             * Registers the callback to be called whenever a mousedown occurs.
              *
-             * @param {any} key The key associated with the callback.
-             *                  Key uniqueness is determined by deep equality.
+             * @param {(p: Point) => any} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space. Pass `null`
+             *                                     to remove a callback.
+             * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+             */
+            offMouseDown(callback: MouseCallback): Dispatchers.Mouse;
+            /**
+             * Registers a callback to be called whenever a mouseup occurs.
+             *
+             * @param {(p: Point) => any} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space. Pass `null`
+             *                                     to remove a callback.
+             * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+             */
+            onMouseUp(callback: MouseCallback): Dispatchers.Mouse;
+            /**
+             * Registers the callback to be called whenever a mouseup occurs.
+             *
+             * @param {(p: Point) => any} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space. Pass `null`
+             *                                     to remove a callback.
+             * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+             */
+            offMouseUp(callback: MouseCallback): Dispatchers.Mouse;
+            /**
+             * Registers a callback to be called whenever a wheel occurs.
+             *
              * @param {MouseCallback} callback A callback that takes the pixel position
              *                                     in svg-coordinate-space.
              *                                     Pass `null` to remove a callback.
              * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
              */
-            onWheel(key: any, callback: MouseCallback): Dispatchers.Mouse;
+            onWheel(callback: MouseCallback): Dispatchers.Mouse;
             /**
-             * Registers a callback to be called whenever a dblClick occurs,
-             * or removes the callback if `null` is passed as the callback.
+             * Registers the callback to be called whenever a wheel occurs.
              *
-             * @param {any} key The key associated with the callback.
-             *                  Key uniqueness is determined by deep equality.
              * @param {MouseCallback} callback A callback that takes the pixel position
              *                                     in svg-coordinate-space.
              *                                     Pass `null` to remove a callback.
              * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
              */
-            onDblClick(key: any, callback: MouseCallback): Dispatchers.Mouse;
+            offWheel(callback: MouseCallback): Dispatchers.Mouse;
+            /**
+             * Registers a callback to be called whenever a dblClick occurs.
+             *
+             * @param {MouseCallback} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space.
+             *                                     Pass `null` to remove a callback.
+             * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+             */
+            onDblClick(callback: MouseCallback): Dispatchers.Mouse;
+            /**
+             * Registers the callback to be called whenever a dblClick occurs.
+             *
+             * @param {MouseCallback} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space.
+             *                                     Pass `null` to remove a callback.
+             * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+             */
+            offDblClick(callback: MouseCallback): Dispatchers.Mouse;
             /**
              * Returns the last computed mouse position.
              *
@@ -3631,7 +3587,7 @@ declare module Plottable {
     module Dispatchers {
         type TouchCallback = (ids: number[], idToPoint: {
             [id: number]: Point;
-        }, e: TouchEvent) => any;
+        }, event: TouchEvent) => any;
         class Touch extends Dispatcher {
             /**
              * Get a Dispatcher.Touch for the <svg> containing elem. If one already exists
@@ -3648,55 +3604,78 @@ declare module Plottable {
              * @param {SVGElement} svg The root <svg> element to attach to.
              */
             constructor(svg: SVGElement);
-            protected _getWrappedCallback(callback: Function): Core.BroadcasterCallback<Dispatchers.Touch>;
             /**
-             * Registers a callback to be called whenever a touch starts,
-             * or removes the callback if `null` is passed as the callback.
+             * Registers a callback to be called whenever a touch starts.
              *
-             * @param {any} key The key associated with the callback.
-             *                  Key uniqueness is determined by deep equality.
              * @param {TouchCallback} callback A callback that takes the pixel position
              *                                     in svg-coordinate-space. Pass `null`
              *                                     to remove a callback.
              * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
              */
-            onTouchStart(key: any, callback: TouchCallback): Dispatchers.Touch;
+            onTouchStart(callback: TouchCallback): Dispatchers.Touch;
             /**
-             * Registers a callback to be called whenever the touch position changes,
-             * or removes the callback if `null` is passed as the callback.
+             * Removes the callback to be called whenever a touch starts.
              *
-             * @param {any} key The key associated with the callback.
-             *                  Key uniqueness is determined by deep equality.
              * @param {TouchCallback} callback A callback that takes the pixel position
              *                                     in svg-coordinate-space. Pass `null`
              *                                     to remove a callback.
              * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
              */
-            onTouchMove(key: any, callback: TouchCallback): Dispatchers.Touch;
+            offTouchStart(callback: TouchCallback): Dispatchers.Touch;
             /**
-             * Registers a callback to be called whenever a touch ends,
-             * or removes the callback if `null` is passed as the callback.
+             * Registers a callback to be called whenever the touch position changes.
              *
-             * @param {any} key The key associated with the callback.
-             *                  Key uniqueness is determined by deep equality.
              * @param {TouchCallback} callback A callback that takes the pixel position
              *                                     in svg-coordinate-space. Pass `null`
              *                                     to remove a callback.
              * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
              */
-            onTouchEnd(key: any, callback: TouchCallback): Dispatchers.Touch;
+            onTouchMove(callback: TouchCallback): Dispatchers.Touch;
             /**
-             * Registers a callback to be called whenever a touch is cancelled,
-             * or removes the callback if `null` is passed as the callback.
+             * Removes the callback to be called whenever the touch position changes.
              *
-             * @param {any} key The key associated with the callback.
-             *                  Key uniqueness is determined by deep equality.
              * @param {TouchCallback} callback A callback that takes the pixel position
              *                                     in svg-coordinate-space. Pass `null`
              *                                     to remove a callback.
              * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
              */
-            onTouchCancel(key: any, callback: TouchCallback): Dispatchers.Touch;
+            offTouchMove(callback: TouchCallback): Dispatchers.Touch;
+            /**
+             * Registers a callback to be called whenever a touch ends.
+             *
+             * @param {TouchCallback} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space. Pass `null`
+             *                                     to remove a callback.
+             * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
+             */
+            onTouchEnd(callback: TouchCallback): Dispatchers.Touch;
+            /**
+             * Removes the callback to be called whenever a touch ends.
+             *
+             * @param {TouchCallback} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space. Pass `null`
+             *                                     to remove a callback.
+             * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
+             */
+            offTouchEnd(callback: TouchCallback): Dispatchers.Touch;
+            /**
+             * Registers a callback to be called whenever a touch is cancelled.
+             *
+             * @param {TouchCallback} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space. Pass `null`
+             *                                     to remove a callback.
+             * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
+             */
+            onTouchCancel(callback: TouchCallback): Dispatchers.Touch;
+            /**
+             * Removes the callback to be called whenever a touch is cancelled.
+             *
+             * @param {TouchCallback} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space. Pass `null`
+             *                                     to remove a callback.
+             * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
+             */
+            offTouchCancel(callback: TouchCallback): Dispatchers.Touch;
         }
     }
 }
@@ -3704,7 +3683,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Dispatchers {
-        type KeyCallback = (keyCode: number, e: KeyboardEvent) => any;
+        type KeyCallback = (keyCode: number, event: KeyboardEvent) => any;
         class Key extends Dispatcher {
             /**
              * Get a Dispatcher.Key. If one already exists it will be returned;
@@ -3720,17 +3699,20 @@ declare module Plottable {
              * @param {SVGElement} svg The root <svg> element to attach to.
              */
             constructor();
-            protected _getWrappedCallback(callback: Function): Core.BroadcasterCallback<Dispatchers.Key>;
             /**
-             * Registers a callback to be called whenever a key is pressed,
-             * or removes the callback if `null` is passed as the callback.
+             * Registers a callback to be called whenever a key is pressed.
              *
-             * @param {any} key The registration key associated with the callback.
-             *                  Registration key uniqueness is determined by deep equality.
              * @param {KeyCallback} callback
              * @return {Dispatcher.Key} The calling Dispatcher.Key.
              */
-            onKeyDown(key: any, callback: KeyCallback): Key;
+            onKeyDown(callback: KeyCallback): Key;
+            /**
+             * Removes the callback to be called whenever a key is pressed.
+             *
+             * @param {KeyCallback} callback
+             * @return {Dispatcher.Key} The calling Dispatcher.Key.
+             */
+            offKeyDown(callback: KeyCallback): Key;
         }
     }
 }
@@ -4054,7 +4036,7 @@ declare module Plottable {
     module Components {
         class XDragBoxLayer extends DragBoxLayer {
             constructor();
-            _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;
+            computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): XDragBoxLayer;
             protected _setBounds(newBounds: Bounds): void;
             protected _setResizableClasses(canResize: boolean): void;
         }
@@ -4066,7 +4048,7 @@ declare module Plottable {
     module Components {
         class YDragBoxLayer extends DragBoxLayer {
             constructor();
-            _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number): void;
+            computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): YDragBoxLayer;
             protected _setBounds(newBounds: Bounds): void;
             protected _setResizableClasses(canResize: boolean): void;
         }

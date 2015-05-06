@@ -40,10 +40,10 @@ function run(svg, data, Plottable) {
     }
   ];
 
-    var xScale = new Plottable.Scale.Linear();
-    var yScale = new Plottable.Scale.Linear();
+    var xScale = new Plottable.Scales.Linear();
+    var yScale = new Plottable.Scales.Linear();
 
-    var scatterPlot = new Plottable.Plot.Scatter(xScale, yScale).addDataset(DotData)
+    var scatterPlot = new Plottable.Plots.Scatter(xScale, yScale).addDataset(DotData)
                                                                 .project("x", "x", xScale)
                                                                 .project("y", "y", yScale)
                                                                 .project("size", function(d){return 30;})
@@ -52,10 +52,10 @@ function run(svg, data, Plottable) {
                                                                 .project("stroke-width", function(){ return 5; });
 
 
-    var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
-    var yAxis = new Plottable.Axis.Numeric(yScale, "left");
+    var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
+    var yAxis = new Plottable.Axes.Numeric(yScale, "left");
 
-    var chart = new Plottable.Component.Table([[yAxis, ScatterPlot],
+    var chart = new Plottable.Components.Table([[yAxis, scatterPlot],
                                             [null,   xAxis]]);
     chart.renderTo(svg);
 

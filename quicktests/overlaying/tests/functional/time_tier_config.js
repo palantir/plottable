@@ -10,9 +10,9 @@ function makeData() {
 function run(svg, data, Plottable) {
   "use strict";
 
-    var xScale = new Plottable.Scale.Time();
-    var yScale = new Plottable.Scale.Linear();
-    var colorScale = new Plottable.Scale.Color();
+    var xScale = new Plottable.Scales.Time();
+    var yScale = new Plottable.Scales.Linear();
+    var colorScale = new Plottable.Scales.Color();
 
 
     var axisconf = [
@@ -29,13 +29,13 @@ function run(svg, data, Plottable) {
         var axisconf5 = {tierConfigurations: []};
 
 
-    var xAxis1 = new Plottable.Axis.Time(xScale, "bottom").axisConfigurations([axisconf, axisconf2, axisconf3, axisconf4, axisconf5]);
-    var xAxis2 = new Plottable.Axis.Time(xScale, "top").axisConfigurations([axisconf, axisconf2, axisconf3, axisconf4, axisconf5]);
+    var xAxis1 = new Plottable.Axes.Time(xScale, "bottom").axisConfigurations([axisconf, axisconf2, axisconf3, axisconf4, axisconf5]);
+    var xAxis2 = new Plottable.Axes.Time(xScale, "top").axisConfigurations([axisconf, axisconf2, axisconf3, axisconf4, axisconf5]);
 
-    var yAxis = new Plottable.Axis.Numeric(yScale, "left");
+    var yAxis = new Plottable.Axes.Numeric(yScale, "left");
 
 
-    var plot = new Plottable.Plot.Line(xScale, yScale)
+    var plot = new Plottable.Plots.Line(xScale, yScale)
       .animate(true)
       .project("x",function (d) { return d3.time.format("%m/%d/%y/%H").parse(d.x);}, xScale)
       .project("y", "y", yScale)
@@ -44,13 +44,13 @@ function run(svg, data, Plottable) {
 
 
 
-    var chart = new Plottable.Component.Table([
+    var chart = new Plottable.Components.Table([
                     [null, xAxis2],
                     [yAxis, plot],
                     [null,  xAxis1]
                   ]);
     chart.renderTo(svg);
 
-    var pzi = new Plottable.Interaction.PanZoom(xScale, yScale);
+    var pzi = new Plottable.Interactions.PanZoom(xScale, yScale);
     plot.registerInteraction(pzi);
 }

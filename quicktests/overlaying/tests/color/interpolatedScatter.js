@@ -19,12 +19,12 @@ function run(svg, data, Plottable) {
         {x: "D", y: 2, val: 0.9},
         {x: "E", y: 2, val: 1.0},
     ];
-    var xScale = new Plottable.Scale.Category();
-    var yScale = new Plottable.Scale.Category();
+    var xScale = new Plottable.Scales.Category();
+    var yScale = new Plottable.Scales.Category();
 
-    var colorScale = new Plottable.Scale.InterpolatedColor();
+    var colorScale = new Plottable.Scales.InterpolatedColor();
     colorScale.colorRange(["#76DE5D","#A12A23"]);
-    var plot = new Plottable.Plot.Scatter(xScale, yScale).addDataset(data)
+    var plot = new Plottable.Plots.Scatter(xScale, yScale).addDataset(data)
                                                          .project("x", "x", xScale).project("y", "y", yScale)
                                                          .project("size", function(){ return 20;})
                                                          .project("fill", function(d) { return d.val; }, colorScale);

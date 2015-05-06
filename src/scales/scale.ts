@@ -1,13 +1,27 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
+
+  export interface ScaleCallback<S extends Scale<any, any>> {
+    (scale: S): any;
+  }
+
+  export module Scales {
+    export interface ExtentProvider<D> {
+      (scale: Scale<D, any>): D[][];
+    }
+  }
+
   export class Scale<D, R> extends Core.PlottableObject {
-    protected _d3Scale: D3.Scale.Scale;
-    private _autoDomainAutomatically = true;
-    public broadcaster: Core.Broadcaster<Scale<D, R>>;
-    private _rendererAttrID2Extent: {[rendererAttrID: string]: D[]} = {};
     public _typeCoercer: (d: any) => any = (d: any) => d;
+
+    protected _d3Scale: D3.Scale.Scale;
+
+    private _callbacks: Utils.CallbackSet<ScaleCallback<Scale<D, R>>>;
+    private _autoDomainAutomatically = true;
     private _domainModificationInProgress: boolean = false;
+    private _extentProviders: Utils.Set<Scales.ExtentProvider<D>>;
+
     /**
      * Constructs a new Scale.
      *
@@ -21,15 +35,28 @@ module Plottable {
     constructor(scale: D3.Scale.Scale) {
       super();
       this._d3Scale = scale;
-      this.broadcaster = new Core.Broadcaster(this);
+      this._callbacks = new Utils.CallbackSet<ScaleCallback<Scale<D, R>>>();
+      this._extentProviders = new Utils.Set<Scales.ExtentProvider<D>>();
     }
 
     protected _getAllExtents(): D[][] {
-      return d3.values(this._rendererAttrID2Extent);
+      return d3.merge(this._extentProviders.values().map((provider) => provider(this)));
     }
 
     protected _getExtent(): D[] {
       return []; // this should be overwritten
+    }
+
+    public onUpdate(callback: ScaleCallback<Scale<D, R>>) {
+      this._callbacks.add(callback);
+    }
+
+    public offUpdate(callback: ScaleCallback<Scale<D, R>>) {
+      this._callbacks.delete(callback);
+    }
+
+    protected _dispatchUpdate() {
+      this._callbacks.callCallbacks(this);
     }
 
     /**
@@ -104,7 +131,7 @@ module Plottable {
       if (!this._domainModificationInProgress) {
         this._domainModificationInProgress = true;
         this._d3Scale.domain(values);
-        this.broadcaster.broadcast();
+        this._dispatchUpdate();
         this._domainModificationInProgress = false;
       }
     }
@@ -149,26 +176,12 @@ module Plottable {
       return new Scale<D, R>(this._d3Scale.copy());
     }
 
-    /**
-     * When a renderer determines that the extent of a projector has changed,
-     * it will call this function. This function should ensure that
-     * the scale has a domain at least large enough to include extent.
-     *
-     * @param {number} rendererID A unique indentifier of the renderer sending
-     *                 the new extent.
-     * @param {string} attr The attribute being projected, e.g. "x", "y0", "r"
-     * @param {D[]} extent The new extent to be included in the scale.
-     */
-    public _updateExtent(plotProvidedKey: string, attr: string, extent: D[]) {
-      this._rendererAttrID2Extent[plotProvidedKey + attr] = extent;
-      this._autoDomainIfAutomaticMode();
-      return this;
+    public addExtentProvider(provider: Scales.ExtentProvider<D>) {
+      this._extentProviders.add(provider);
     }
 
-    public _removeExtent(plotProvidedKey: string, attr: string) {
-      delete this._rendererAttrID2Extent[plotProvidedKey + attr];
-      this._autoDomainIfAutomaticMode();
-      return this;
+    public removeExtentProvider(provider: Scales.ExtentProvider<D>) {
+      this._extentProviders.delete(provider);
     }
   }
 }

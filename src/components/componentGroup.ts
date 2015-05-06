@@ -17,7 +17,7 @@ export module Components {
      * @constructor
      * @param {Component[]} components The Components in the resultant Component.Group (default = []).
      */
-    constructor(components: Component[] = []){
+    constructor(components: Component[] = []) {
       super();
       this.classed("component-group", true);
       components.forEach((c: Component) => this._addComponent(c));
@@ -38,13 +38,10 @@ export module Components {
       return this;
     }
 
-    public _computeLayout(offeredXOrigin?: number,
-                          offeredYOrigin?: number,
-                   availableWidth?: number,
-                  availableHeight?: number): Group {
-      super._computeLayout(offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
+    public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
+      super.computeLayout(origin, availableWidth, availableHeight);
       this.components().forEach((c) => {
-        c._computeLayout(0, 0, this.width(), this.height());
+        c.computeLayout({ x: 0, y: 0 }, this.width(), this.height());
       });
       return this;
     }

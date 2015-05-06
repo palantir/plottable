@@ -1,6 +1,15 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
+  export module Components {
+    export class Alignment {
+      static TOP = "top";
+      static BOTTOM = "bottom";
+      static LEFT = "left";
+      static RIGHT = "right";
+      static CENTER = "center";
+    }
+  }
   export class Component extends Core.PlottableObject {
     protected _element: D3.Selection;
     protected _content: D3.Selection;
@@ -8,8 +17,7 @@ module Plottable {
     private _backgroundContainer: D3.Selection;
     private _foregroundContainer: D3.Selection;
     public clipPathEnabled = false;
-    private _xOrigin: number; // Origin of the coordinate space for the component. Passed down from parent
-    private _yOrigin: number;
+    private _origin: Point = { x: 0, y: 0 }; // Origin of the coordinate space for the Component.
 
     private _parentElement: ComponentContainer;
     private _xAlignProportion = 0; // What % along the free space do we want to position (0 = left, .5 = center, 1 = right)
@@ -33,18 +41,19 @@ module Plottable {
     private _usedLastLayout = false;
 
     /**
-     * Attaches the Component as a child of a given a DOM element. Usually only directly invoked on root-level Components.
+     * Attaches the Component as a child of a given D3 Selection.
      *
-     * @param {D3.Selection} element A D3 selection consisting of the element to anchor under.
+     * @param {D3.Selection} selection The Selection containing the Element to anchor under.
+     * @returns {Component} The calling Component.
      */
-    public _anchor(element: D3.Selection) {
+    public anchor(selection: D3.Selection) {
       if (this._removed) {
         throw new Error("Can't reuse remove()-ed components!");
       }
 
-      if (element.node().nodeName.toLowerCase() === "svg") {
+      if (selection.node().nodeName.toLowerCase() === "svg") {
         // svg node gets the "plottable" CSS class
-        this._rootSVG = element;
+        this._rootSVG = selection;
         this._rootSVG.classed("plottable", true);
         // visible overflow for firefox https://stackoverflow.com/questions/5926986/why-does-firefox-appear-to-truncate-embedded-svgs
         this._rootSVG.style("overflow", "visible");
@@ -53,12 +62,13 @@ module Plottable {
 
       if (this._element != null) {
         // reattach existing element
-        element.node().appendChild(this._element.node());
+        selection.node().appendChild(this._element.node());
       } else {
-        this._element = element.append("g");
+        this._element = selection.append("g");
         this._setup();
       }
       this._isAnchored = true;
+      return this;
     }
 
     /**
@@ -101,19 +111,18 @@ module Plottable {
      * If no parameters are supplied and the Component is a root node,
      * they are inferred from the size of the Component's element.
      *
-     * @param {number} offeredXOrigin x-coordinate of the origin of the space offered the Component
-     * @param {number} offeredYOrigin y-coordinate of the origin of the space offered the Component
-     * @param {number} availableWidth available width for the Component to render in
-     * @param {number} availableHeight available height for the Component to render in
+     * @param {Point} origin Origin of the space offered to the Component.
+     * @param {number} availableWidth
+     * @param {number} availableHeight
+     * @returns {Component} The calling Component.
      */
-    public _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number) {
-      if (offeredXOrigin == null || offeredYOrigin == null || availableWidth == null || availableHeight == null) {
+    public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
+      if (origin == null || availableWidth == null || availableHeight == null) {
         if (this._element == null) {
-          throw new Error("anchor must be called before computeLayout");
+          throw new Error("anchor() must be called before computeLayout()");
         } else if (this._isTopLevelComponent) {
           // we are the root node, retrieve height/width from root SVG
-          offeredXOrigin = 0;
-          offeredYOrigin = 0;
+          origin = { x: 0, y: 0 };
 
           // Set width/height to 100% if not specified, to allow accurate size calculation
           // see http://www.w3.org/TR/CSS21/visudet.html#block-replaced-width
@@ -129,16 +138,19 @@ module Plottable {
           availableWidth  = Utils.DOM.getElementWidth(elem);
           availableHeight = Utils.DOM.getElementHeight(elem);
         } else {
-          throw new Error("null arguments cannot be passed to _computeLayout() on a non-root node");
+          throw new Error("null arguments cannot be passed to computeLayout() on a non-root node");
         }
       }
       var size = this._getSize(availableWidth, availableHeight);
       this._width = size.width;
       this._height = size.height;
-      this._xOrigin = offeredXOrigin + this._xOffset + (availableWidth - this.width()) * this._xAlignProportion;
-      this._yOrigin = offeredYOrigin + this._yOffset + (availableHeight - this.height()) * this._yAlignProportion;
-      this._element.attr("transform", "translate(" + this._xOrigin + "," + this._yOrigin + ")");
+      this._origin = {
+        x: origin.x + this._xOffset + (availableWidth - this.width()) * this._xAlignProportion,
+        y: origin.y + this._yOffset + (availableHeight - this.height()) * this._yAlignProportion
+      };
+      this._element.attr("transform", "translate(" + this._origin.x + "," + this._origin.y + ")");
       this._boxes.forEach((b: D3.Selection) => b.attr("width", this.width()).attr("height", this.height()));
+      return this;
     }
 
     protected _getSize(availableWidth: number, availableHeight: number) {
@@ -149,10 +161,11 @@ module Plottable {
       };
     }
 
-    public _render() {
+    public render() {
       if (this._isAnchored && this._isSetup && this.width() >= 0 && this.height() >= 0) {
         Core.RenderControllers.registerToRender(this);
       }
+      return this;
     }
 
     private _scheduleComputeLayout() {
@@ -174,15 +187,24 @@ module Plottable {
       }
     }
 
-    public _invalidateLayout() {
+    /**
+     * Causes the Component to recompute layout and redraw.
+     *
+     * This function should be called when CSS changes could influence the size
+     * of the components, e.g. changing the font size.
+     *
+     * @returns {Component} The calling Component.
+     */
+    public redraw() {
       this._useLastCalculatedLayout(false);
       if (this._isAnchored && this._isSetup) {
         if (this._isTopLevelComponent) {
           this._scheduleComputeLayout();
         } else {
-          this._parent()._invalidateLayout();
+          this._parent().redraw();
         }
       }
+      return this;
     }
 
     /**
@@ -203,29 +225,16 @@ module Plottable {
         if (!selection.node() || selection.node().nodeName.toLowerCase() !== "svg") {
           throw new Error("Plottable requires a valid SVG to renderTo");
         }
-        this._anchor(selection);
+        this.anchor(selection);
       }
       if (this._element == null) {
         throw new Error("If a component has never been rendered before, then renderTo must be given a node to render to, \
           or a D3.Selection, or a selector string");
       }
-      this._computeLayout();
-      this._render();
+      this.computeLayout();
+      this.render();
       // flush so that consumers can immediately attach to stuff we create in the DOM
       Core.RenderControllers.flush();
-      return this;
-    }
-
-    /**
-     * Causes the Component to recompute layout and redraw.
-     *
-     * This function should be called when CSS changes could influence the size
-     * of the components, e.g. changing the font size.
-     *
-     * @returns {Component} The calling component.
-     */
-    public redraw(): Component {
-      this._invalidateLayout();
       return this;
     }
 
@@ -242,16 +251,16 @@ module Plottable {
      */
     public xAlign(alignment: string): Component {
       alignment = alignment.toLowerCase();
-      if (alignment === "left") {
+      if (alignment === Components.Alignment.LEFT) {
         this._xAlignProportion = 0;
-      } else if (alignment === "center") {
+      } else if (alignment === Components.Alignment.CENTER) {
         this._xAlignProportion = 0.5;
-      } else if (alignment === "right") {
+      } else if (alignment === Components.Alignment.RIGHT) {
         this._xAlignProportion = 1;
       } else {
         throw new Error("Unsupported alignment");
       }
-      this._invalidateLayout();
+      this.redraw();
       return this;
     }
 
@@ -268,16 +277,16 @@ module Plottable {
      */
     public yAlign(alignment: string): Component {
       alignment = alignment.toLowerCase();
-      if (alignment === "top") {
+      if (alignment === Components.Alignment.TOP) {
         this._yAlignProportion = 0;
-      } else if (alignment === "center") {
+      } else if (alignment === Components.Alignment.CENTER) {
         this._yAlignProportion = 0.5;
-      } else if (alignment === "bottom") {
+      } else if (alignment === Components.Alignment.BOTTOM) {
         this._yAlignProportion = 1;
       } else {
         throw new Error("Unsupported alignment");
       }
-      this._invalidateLayout();
+      this.redraw();
       return this;
     }
 
@@ -291,7 +300,7 @@ module Plottable {
      */
     public xOffset(offset: number): Component {
       this._xOffset = offset;
-      this._invalidateLayout();
+      this.redraw();
       return this;
     }
 
@@ -305,7 +314,7 @@ module Plottable {
      */
     public yOffset(offset: number): Component {
       this._yOffset = offset;
-      this._invalidateLayout();
+      this.redraw();
       return this;
     }
 
@@ -531,8 +540,8 @@ module Plottable {
      */
     public origin(): Point {
       return {
-        x: this._xOrigin,
-        y: this._yOrigin
+        x: this._origin.x,
+        y: this._origin.y
       };
     }
 

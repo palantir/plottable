@@ -16,6 +16,7 @@ export module Components {
     private _swatchBoundingBox: D3.Selection;
     private _lowerLabel: D3.Selection;
     private _upperLabel: D3.Selection;
+    private _redrawCallback: ScaleCallback<Scales.InterpolatedColor>;
 
     /**
      * The css class applied to the legend labels.
@@ -40,7 +41,8 @@ export module Components {
         throw new Error("InterpolatedColorLegend requires a interpolatedColorScale");
       }
       this._scale = interpolatedColorScale;
-      this._scale.broadcaster.registerListener(this, () => this._invalidateLayout());
+      this._redrawCallback = (scale) => this.redraw();
+      this._scale.onUpdate(this._redrawCallback);
       this._formatter = formatter;
       this._orientation = InterpolatedColorLegend._ensureOrientation(orientation);
 
@@ -51,7 +53,7 @@ export module Components {
 
     public remove() {
       super.remove();
-      this._scale.broadcaster.deregisterListener(this);
+      this._scale.offUpdate(this._redrawCallback);
     }
 
     /**
@@ -72,7 +74,7 @@ export module Components {
         return this._formatter;
       }
       this._formatter = formatter;
-      this._invalidateLayout();
+      this.redraw();
       return this;
     }
 
@@ -104,7 +106,7 @@ export module Components {
         return this._orientation;
       } else {
         this._orientation = InterpolatedColorLegend._ensureOrientation(newOrientation);
-        this._invalidateLayout();
+        this.redraw();
         return this;
       }
     }
@@ -171,7 +173,6 @@ export module Components {
 
       var domain = this._scale.domain();
 
-      var textHeight = this._measurer.measure().height;
       var text0 = this._formatter(domain[0]);
       var text0Width = this._measurer.measure(text0).width;
       var text1 = this._formatter(domain[1]);

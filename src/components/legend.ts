@@ -24,6 +24,7 @@ export module Components {
     private _wrapper: SVGTypewriter.Wrappers.Wrapper;
     private _writer: SVGTypewriter.Writers.Writer;
     private _symbolFactoryAccessor: (datum: any, index: number) => SymbolFactory;
+    private _redrawCallback: ScaleCallback<Scales.Color>;
 
     /**
      * Creates a Legend.
@@ -44,7 +45,8 @@ export module Components {
       }
 
       this._scale = colorScale;
-      this._scale.broadcaster.registerListener(this, () => this._invalidateLayout());
+      this._redrawCallback = (scale) => this.redraw();
+      this._scale.onUpdate(this._redrawCallback);
 
       this.xAlign("right").yAlign("top");
       this._fixedWidthFlag = true;
@@ -80,7 +82,7 @@ export module Components {
         return this._maxEntriesPerRow;
       } else {
         this._maxEntriesPerRow = numEntries;
-        this._invalidateLayout();
+        this.redraw();
         return this;
       }
     }
@@ -102,7 +104,7 @@ export module Components {
         return this._sortFn;
       } else {
         this._sortFn = newFn;
-        this._invalidateLayout();
+        this.redraw();
         return this;
       }
     }
@@ -122,10 +124,10 @@ export module Components {
     public scale(scale: Scales.Color): Legend;
     public scale(scale?: Scales.Color): any {
       if (scale != null) {
-        this._scale.broadcaster.deregisterListener(this);
+        this._scale.offUpdate(this._redrawCallback);
         this._scale = scale;
-        this._scale.broadcaster.registerListener(this, () => this._invalidateLayout());
-        this._invalidateLayout();
+        this._scale.onUpdate(this._redrawCallback);
+        this.redraw();
         return this;
       } else {
         return this._scale;
@@ -134,7 +136,7 @@ export module Components {
 
     public remove() {
       super.remove();
-      this._scale.broadcaster.deregisterListener(this);
+      this._scale.offUpdate(this._redrawCallback);
     }
 
     private _calculateLayoutInfo(availableWidth: number, availableHeight: number) {
@@ -316,7 +318,7 @@ export module Components {
         return this._symbolFactoryAccessor;
       } else {
         this._symbolFactoryAccessor = symbolFactoryAccessor;
-        this._render();
+        this.render();
         return this;
       }
     }

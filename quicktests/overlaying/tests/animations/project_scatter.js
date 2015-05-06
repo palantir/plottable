@@ -11,10 +11,10 @@ function run(svg, data, Plottable) {
     var dataseries1 = new Plottable.Dataset(data[0]);
 
     //Axis
-    var xScale = new Plottable.Scale.Linear();
-    var yScale = new Plottable.Scale.Linear();
-    var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
-    var yAxis = new Plottable.Axis.Numeric(yScale, "left");
+    var xScale = new Plottable.Scales.Linear();
+    var yScale = new Plottable.Scales.Linear();
+    var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
+    var yAxis = new Plottable.Axes.Numeric(yScale, "left");
 
     var widthProjector = function(d, i, m) {
        return (25 - (d.y * 7)) * 2;
@@ -33,7 +33,7 @@ function run(svg, data, Plottable) {
     };
 
     //rendering
-    var renderAreaD1 = new Plottable.Plot.Scatter(xScale, yScale).addDataset(dataseries1)
+    var renderAreaD1 = new Plottable.Plots.Scatter(xScale, yScale).addDataset(dataseries1)
                                                                  .attr("size", widthProjector)
                                                                  .attr("fill", colorProjector)
                                                                  .attr("opacity", opacityProjector)
@@ -42,9 +42,9 @@ function run(svg, data, Plottable) {
                                                                  .animate(true);
 
     //title + legend
-    var title1 = new Plottable.Component.TitleLabel( "Opacity, r, color", "horizontal");
+    var title1 = new Plottable.Components.TitleLabel( "Opacity, r, color", "horizontal");
 
-    var basicTable = new Plottable.Component.Table().addComponent(0,2, title1)
+    var basicTable = new Plottable.Components.Table().addComponent(0,2, title1)
                 .addComponent(1, 1, yAxis)
                 .addComponent(1, 2, renderAreaD1)
                 .addComponent(2, 2, xAxis);
@@ -56,6 +56,6 @@ function run(svg, data, Plottable) {
       dataseries1.data(d);
     };
 
-    renderAreaD1.registerInteraction(new Plottable.Interaction.Click().onClick(cb));
+    renderAreaD1.registerInteraction(new Plottable.Interactions.Click().onClick(cb));
 
 }

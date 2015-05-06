@@ -3,21 +3,22 @@
 module Plottable {
   export class Dispatcher extends Core.PlottableObject {
     protected _event2Callback: { [eventName: string]: (e: Event) => any; } = {};
-    protected _broadcasters: Core.Broadcaster<Dispatcher>[] = [];
+    protected _callbacks: Utils.CallbackSet<Function>[] = [];
     private _connected = false;
 
     private _hasNoListeners() {
-      return this._broadcasters.every((b) => b.getListenerKeys().length === 0);
+      return this._callbacks.every((cbs) => cbs.values().length === 0);
     }
 
     private _connect() {
-      if (!this._connected) {
-        Object.keys(this._event2Callback).forEach((event: string) => {
-          var callback = this._event2Callback[event];
-          document.addEventListener(event, callback);
-        });
-        this._connected = true;
+      if (this._connected) {
+        return;
       }
+      Object.keys(this._event2Callback).forEach((event: string) => {
+        var callback = this._event2Callback[event];
+        document.addEventListener(event, callback);
+      });
+      this._connected = true;
     }
 
     private _disconnect() {
@@ -30,21 +31,14 @@ module Plottable {
       }
     }
 
-    /**
-     * Creates a wrapped version of the callback that can be registered to a Broadcaster
-     */
-    protected _getWrappedCallback(callback: Function): Core.BroadcasterCallback<Dispatcher> {
-      return () => callback();
+    protected setCallback(callbackSet: Utils.CallbackSet<Function>, callback: Function) {
+      this._connect();
+      callbackSet.add(callback);
     }
 
-    protected _setCallback(b: Core.Broadcaster<Dispatcher>, key: any, callback: Function) {
-      if (callback === null) { // remove listener if callback is null
-        b.deregisterListener(key);
-        this._disconnect();
-      } else {
-        this._connect();
-        b.registerListener(key, this._getWrappedCallback(callback));
-      }
+    protected unsetCallback(callbackSet: Utils.CallbackSet<Function>, callback: Function) {
+      callbackSet.delete(callback);
+      this._disconnect();
     }
   }
 }

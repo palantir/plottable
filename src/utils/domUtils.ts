@@ -46,7 +46,7 @@ export module Utils {
       return (n == null);
     }
 
-    export function getElementWidth(elem: HTMLScriptElement): number{
+    export function getElementWidth(elem: HTMLScriptElement): number {
       var style: CSSStyleDeclaration = window.getComputedStyle(elem);
       return getParsedStyleValue(style, "width")
         + getParsedStyleValue(style, "padding-left")
@@ -55,7 +55,7 @@ export module Utils {
         + getParsedStyleValue(style, "border-right-width");
     }
 
-    export function getElementHeight(elem: HTMLScriptElement): number{
+    export function getElementHeight(elem: HTMLScriptElement): number {
       var style: CSSStyleDeclaration = window.getComputedStyle(elem);
       return getParsedStyleValue(style, "height")
         + getParsedStyleValue(style, "padding-top")

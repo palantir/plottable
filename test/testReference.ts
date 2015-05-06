@@ -5,7 +5,7 @@
 ///<reference path="../typings/jquery.simulate/jquery.simulate.d.ts" />
 ///<reference path="../build/plottable.d.ts" />
 ///<reference path="../bower_components/svg-typewriter/svgtypewriter.d.ts" />
-///<reference path="testUtils.ts" />
+///<reference path="testMethods.ts" />
 ///<reference path="mocks.ts" />
 
 ///<reference path="globalInitialization.ts" />
@@ -39,7 +39,6 @@
 ///<reference path="components/plots/stackedBarPlotTests.ts" />
 ///<reference path="components/plots/clusteredBarPlotTests.ts" />
 
-///<reference path="core/broadcasterTests.ts" />
 ///<reference path="core/metadataTests.ts" />
 ///<reference path="core/componentContainerTests.ts" />
 ///<reference path="core/componentGroupTests.ts" />
@@ -48,7 +47,6 @@
 ///<reference path="core/tableTests.ts" />
 ///<reference path="core/domainerTests.ts" />
 
-///<reference path="scales/coordinatorTests.ts" />
 ///<reference path="scales/scaleTests.ts" />
 ///<reference path="scales/timeScaleTests.ts" />
 ///<reference path="scales/tickGeneratorsTests.ts" />

@@ -1045,46 +1045,6 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    var Utils;
-    (function (Utils) {
-        var ScaleDomainCoordinator = (function () {
-            /**
-             * Constructs a ScaleDomainCoordinator.
-             *
-             * @constructor
-             * @param {Scale[]} scales A list of scales whose domains should be linked.
-             */
-            function ScaleDomainCoordinator(scales) {
-                var _this = this;
-                /* This class is responsible for maintaining coordination between linked scales.
-                It registers event listeners for when one of its scales changes its domain. When the scale
-                does change its domain, it re-propogates the change to every linked scale.
-                */
-                this._rescaleInProgress = false;
-                if (scales == null) {
-                    throw new Error("ScaleDomainCoordinator requires scales to coordinate");
-                }
-                this._scales = scales;
-                this._scales.forEach(function (s) { return s.broadcaster.registerListener(_this, function (sx) { return _this.rescale(sx); }); });
-            }
-            ScaleDomainCoordinator.prototype.rescale = function (scale) {
-                if (this._rescaleInProgress) {
-                    return;
-                }
-                this._rescaleInProgress = true;
-                var newDomain = scale.domain();
-                this._scales.forEach(function (s) { return s.domain(newDomain); });
-                this._rescaleInProgress = false;
-            };
-            return ScaleDomainCoordinator;
-        })();
-        Utils.ScaleDomainCoordinator = ScaleDomainCoordinator;
-    })(Utils = Plottable.Utils || (Plottable.Utils = {}));
-})(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var Plottable;
-(function (Plottable) {
     var Configs;
     (function (Configs) {
         /**
@@ -1171,103 +1131,6 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
-    var Core;
-    (function (Core) {
-        /**
-         * The Broadcaster holds a reference to a "listenable" object.
-         * Third parties can register and deregister listeners from the Broadcaster.
-         * When the broadcaster.broadcast() method is called, all registered callbacks
-         * are called with the Broadcaster's "listenable", along with optional
-         * arguments passed to the `broadcast` method.
-         *
-         * The listeners are called synchronously.
-         */
-        var Broadcaster = (function (_super) {
-            __extends(Broadcaster, _super);
-            /**
-             * Constructs a broadcaster, taking a "listenable" object to broadcast about.
-             *
-             * @constructor
-             * @param {L} listenable The listenable object to broadcast.
-             */
-            function Broadcaster(listenable) {
-                _super.call(this);
-                this._key2callback = new Plottable.Utils.StrictEqualityAssociativeArray();
-                this._listenable = listenable;
-            }
-            /**
-             * Registers a callback to be called when the broadcast method is called. Also takes a key which
-             * is used to support deregistering the same callback later, by passing in the same key.
-             * If there is already a callback associated with that key, then the callback will be replaced.
-             * The callback will be passed the Broadcaster's "listenable" as the `this` context.
-             *
-             * @param key The key associated with the callback. Key uniqueness is determined by deep equality.
-             * @param {BroadcasterCallback<L>} callback A callback to be called.
-             * @returns {Broadcaster} The calling Broadcaster
-             */
-            Broadcaster.prototype.registerListener = function (key, callback) {
-                this._key2callback.set(key, callback);
-                return this;
-            };
-            /**
-             * Call all listening callbacks, optionally with arguments passed through.
-             *
-             * @param ...args A variable number of optional arguments
-             * @returns {Broadcaster} The calling Broadcaster
-             */
-            Broadcaster.prototype.broadcast = function () {
-                var _this = this;
-                var args = [];
-                for (var _i = 0; _i < arguments.length; _i++) {
-                    args[_i - 0] = arguments[_i];
-                }
-                args.unshift(this._listenable);
-                this._key2callback.values().forEach(function (callback) {
-                    callback.apply(_this._listenable, args);
-                });
-                return this;
-            };
-            /**
-             * Deregisters the callback associated with a key.
-             *
-             * @param key The key to deregister.
-             * @returns {Broadcaster} The calling Broadcaster
-             */
-            Broadcaster.prototype.deregisterListener = function (key) {
-                this._key2callback.delete(key);
-                return this;
-            };
-            /**
-             * Gets the keys for all listeners attached to the Broadcaster.
-             *
-             * @returns {any[]} An array of the keys.
-             */
-            Broadcaster.prototype.getListenerKeys = function () {
-                return this._key2callback.keys();
-            };
-            /**
-             * Deregisters all listeners and callbacks associated with the Broadcaster.
-             *
-             * @returns {Broadcaster} The calling Broadcaster
-             */
-            Broadcaster.prototype.deregisterAllListeners = function () {
-                this._key2callback = new Plottable.Utils.StrictEqualityAssociativeArray();
-            };
-            return Broadcaster;
-        })(Core.PlottableObject);
-        Core.Broadcaster = Broadcaster;
-    })(Core = Plottable.Core || (Plottable.Core = {}));
-})(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
     var Dataset = (function (_super) {
         __extends(Dataset, _super);
         /**
@@ -1287,8 +1150,14 @@ var Plottable;
             this._data = data;
             this._metadata = metadata;
             this._accessor2cachedExtent = new Plottable.Utils.StrictEqualityAssociativeArray();
-            this.broadcaster = new Plottable.Core.Broadcaster(this);
+            this._callbacks = new Plottable.Utils.CallbackSet();
         }
+        Dataset.prototype.onUpdate = function (callback) {
+            this._callbacks.add(callback);
+        };
+        Dataset.prototype.offUpdate = function (callback) {
+            this._callbacks.delete(callback);
+        };
         Dataset.prototype.data = function (data) {
             if (data == null) {
                 return this._data;
@@ -1296,7 +1165,7 @@ var Plottable;
             else {
                 this._data = data;
                 this._accessor2cachedExtent = new Plottable.Utils.StrictEqualityAssociativeArray();
-                this.broadcaster.broadcast();
+                this._callbacks.callCallbacks(this);
                 return this;
             }
         };
@@ -1307,7 +1176,7 @@ var Plottable;
             else {
                 this._metadata = metadata;
                 this._accessor2cachedExtent = new Plottable.Utils.StrictEqualityAssociativeArray();
-                this.broadcaster.broadcast();
+                this._callbacks.callCallbacks(this);
                 return this;
             }
         };
@@ -1425,8 +1294,8 @@ var Plottable;
          */
         var RenderControllers;
         (function (RenderControllers) {
-            var _componentsNeedingRender = {};
-            var _componentsNeedingComputeLayout = {};
+            var _componentsNeedingRender = new Plottable.Utils.Set();
+            var _componentsNeedingComputeLayout = new Plottable.Utils.Set();
             var _animationRequested = false;
             var _isCurrentlyFlushing = false;
             RenderControllers._renderPolicy = new RenderControllers.RenderPolicies.AnimationFrame();
@@ -1456,11 +1325,11 @@ var Plottable;
              *
              * @param {Component} component Any Plottable component.
              */
-            function registerToRender(c) {
+            function registerToRender(component) {
                 if (_isCurrentlyFlushing) {
                     Plottable.Utils.Methods.warn("Registered to render while other components are flushing: request may be ignored");
                 }
-                _componentsNeedingRender[c.getID()] = c;
+                _componentsNeedingRender.add(component);
                 requestRender();
             }
             RenderControllers.registerToRender = registerToRender;
@@ -1470,9 +1339,9 @@ var Plottable;
              *
              * @param {Component} component Any Plottable component.
              */
-            function registerToComputeLayout(c) {
-                _componentsNeedingComputeLayout[c.getID()] = c;
-                _componentsNeedingRender[c.getID()] = c;
+            function registerToComputeLayout(component) {
+                _componentsNeedingComputeLayout.add(component);
+                _componentsNeedingRender.add(component);
                 requestRender();
             }
             RenderControllers.registerToComputeLayout = registerToComputeLayout;
@@ -1492,31 +1361,24 @@ var Plottable;
             function flush() {
                 if (_animationRequested) {
                     // Layout
-                    var toCompute = d3.values(_componentsNeedingComputeLayout);
-                    toCompute.forEach(function (c) { return c._computeLayout(); });
-                    // Top level render.
-                    // Containers will put their children in the toRender queue
-                    var toRender = d3.values(_componentsNeedingRender);
-                    toRender.forEach(function (c) { return c._render(); });
-                    // now we are flushing
+                    _componentsNeedingComputeLayout.values().forEach(function (component) { return component.computeLayout(); });
+                    // Top level render; Containers will put their children in the toRender queue
+                    _componentsNeedingRender.values().forEach(function (component) { return component.render(); });
                     _isCurrentlyFlushing = true;
-                    // Finally, perform render of all components
-                    var failed = {};
-                    Object.keys(_componentsNeedingRender).forEach(function (k) {
+                    var failed = new Plottable.Utils.Set();
+                    _componentsNeedingRender.values().forEach(function (component) {
                         try {
-                            _componentsNeedingRender[k]._doRender();
+                            component._doRender();
                         }
                         catch (err) {
-                            // using setTimeout instead of console.log, we get the familiar red
-                            // stack trace
-                            setTimeout(function () {
+                            // throw error with timeout to avoid interrupting further renders
+                            window.setTimeout(function () {
                                 throw err;
                             }, 0);
-                            failed[k] = _componentsNeedingRender[k];
+                            failed.add(component);
                         }
                     });
-                    // Reset queues
-                    _componentsNeedingComputeLayout = {};
+                    _componentsNeedingComputeLayout = new Plottable.Utils.Set();
                     _componentsNeedingRender = failed;
                     _animationRequested = false;
                     _isCurrentlyFlushing = false;
@@ -1764,18 +1626,28 @@ var Plottable;
          */
         function Scale(scale) {
             _super.call(this);
-            this._autoDomainAutomatically = true;
-            this._rendererAttrID2Extent = {};
             this._typeCoercer = function (d) { return d; };
+            this._autoDomainAutomatically = true;
             this._domainModificationInProgress = false;
             this._d3Scale = scale;
-            this.broadcaster = new Plottable.Core.Broadcaster(this);
+            this._callbacks = new Plottable.Utils.CallbackSet();
+            this._extentProviders = new Plottable.Utils.Set();
         }
         Scale.prototype._getAllExtents = function () {
-            return d3.values(this._rendererAttrID2Extent);
+            var _this = this;
+            return d3.merge(this._extentProviders.values().map(function (provider) { return provider(_this); }));
         };
         Scale.prototype._getExtent = function () {
             return []; // this should be overwritten
+        };
+        Scale.prototype.onUpdate = function (callback) {
+            this._callbacks.add(callback);
+        };
+        Scale.prototype.offUpdate = function (callback) {
+            this._callbacks.delete(callback);
+        };
+        Scale.prototype._dispatchUpdate = function () {
+            this._callbacks.callCallbacks(this);
         };
         /**
          * Modifies the domain on the scale so that it includes the extent of all
@@ -1829,7 +1701,7 @@ var Plottable;
             if (!this._domainModificationInProgress) {
                 this._domainModificationInProgress = true;
                 this._d3Scale.domain(values);
-                this.broadcaster.broadcast();
+                this._dispatchUpdate();
                 this._domainModificationInProgress = false;
             }
         };
@@ -1851,25 +1723,11 @@ var Plottable;
         Scale.prototype.copy = function () {
             return new Scale(this._d3Scale.copy());
         };
-        /**
-         * When a renderer determines that the extent of a projector has changed,
-         * it will call this function. This function should ensure that
-         * the scale has a domain at least large enough to include extent.
-         *
-         * @param {number} rendererID A unique indentifier of the renderer sending
-         *                 the new extent.
-         * @param {string} attr The attribute being projected, e.g. "x", "y0", "r"
-         * @param {D[]} extent The new extent to be included in the scale.
-         */
-        Scale.prototype._updateExtent = function (plotProvidedKey, attr, extent) {
-            this._rendererAttrID2Extent[plotProvidedKey + attr] = extent;
-            this._autoDomainIfAutomaticMode();
-            return this;
+        Scale.prototype.addExtentProvider = function (provider) {
+            this._extentProviders.add(provider);
         };
-        Scale.prototype._removeExtent = function (plotProvidedKey, attr) {
-            delete this._rendererAttrID2Extent[plotProvidedKey + attr];
-            this._autoDomainIfAutomaticMode();
-            return this;
+        Scale.prototype.removeExtentProvider = function (provider) {
+            this._extentProviders.delete(provider);
         };
         return Scale;
     })(Plottable.Core.PlottableObject);
@@ -1900,7 +1758,6 @@ var Plottable;
         function QuantitativeScale(scale) {
             _super.call(this, scale);
             this._numTicks = 10;
-            this._PADDING_FOR_IDENTICAL_DOMAIN = 1;
             this._userSetDomainer = false;
             this._domainer = new Plottable.Domainer();
             this._typeCoercer = function (d) { return +d; };
@@ -2176,7 +2033,7 @@ var Plottable;
                 this.untransformedDomain = values;
                 var transformedDomain = [this.adjustedLog(values[0]), this.adjustedLog(values[1])];
                 this._d3Scale.domain(transformedDomain);
-                this.broadcaster.broadcast();
+                this._dispatchUpdate();
             };
             ModifiedLog.prototype.ticks = function (count) {
                 if (count === void 0) { count = this.numTicks(); }
@@ -2351,7 +2208,7 @@ var Plottable;
                 }
                 this._innerPadding = innerPadding;
                 this.range(this.range());
-                this.broadcaster.broadcast();
+                this._dispatchUpdate();
                 return this;
             };
             Category.prototype.outerPadding = function (outerPadding) {
@@ -2360,14 +2217,14 @@ var Plottable;
                 }
                 this._outerPadding = outerPadding;
                 this.range(this.range());
-                this.broadcaster.broadcast();
+                this._dispatchUpdate();
                 return this;
             };
             Category.prototype.copy = function () {
                 return new Category(this._d3Scale.copy());
             };
             Category.prototype.scale = function (value) {
-                //scale it to the middle
+                // scale it to the middle
                 return _super.prototype.scale.call(this, value) + this.rangeBand() / 2;
             };
             return Category;
@@ -2463,9 +2320,8 @@ var Plottable;
                 var modifyFactor = Math.log(numLooped * Color.LOOP_LIGHTEN_FACTOR + 1);
                 return Plottable.Utils.Methods.lightenColor(color, modifyFactor);
             };
-            Color.HEX_SCALE_FACTOR = 20;
             Color.LOOP_LIGHTEN_FACTOR = 1.6;
-            //The maximum number of colors we are getting from CSS stylesheets
+            // The maximum number of colors we are getting from CSS stylesheets
             Color.MAXIMUM_COLORS_FROM_CSS = 256;
             return Color;
         })(Plottable.Scale);
@@ -2637,7 +2493,7 @@ var Plottable;
             InterpolatedColor.prototype._resetScale = function () {
                 this._d3Scale = InterpolatedColor._getD3InterpolatedScale(this._colorRange, this._scaleType);
                 this._autoDomainIfAutomaticMode();
-                this.broadcaster.broadcast();
+                this._dispatchUpdate();
             };
             InterpolatedColor.prototype._resolveColorValues = function (colorRange) {
                 if (typeof (colorRange) === "object") {
@@ -2915,7 +2771,7 @@ var Plottable;
                 return 1;
             };
             Line.prototype._drawStep = function (step) {
-                var baseTime = _super.prototype._drawStep.call(this, step);
+                _super.prototype._drawStep.call(this, step);
                 var attrToProjector = Plottable.Utils.Methods.copyMap(step.attrToProjector);
                 var definedFunction = attrToProjector["defined"];
                 var xProjector = attrToProjector["x"];
@@ -3340,11 +3196,26 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    var Components;
+    (function (Components) {
+        var Alignment = (function () {
+            function Alignment() {
+            }
+            Alignment.TOP = "top";
+            Alignment.BOTTOM = "bottom";
+            Alignment.LEFT = "left";
+            Alignment.RIGHT = "right";
+            Alignment.CENTER = "center";
+            return Alignment;
+        })();
+        Components.Alignment = Alignment;
+    })(Components = Plottable.Components || (Plottable.Components = {}));
     var Component = (function (_super) {
         __extends(Component, _super);
         function Component() {
             _super.apply(this, arguments);
             this.clipPathEnabled = false;
+            this._origin = { x: 0, y: 0 }; // Origin of the coordinate space for the Component.
             this._xAlignProportion = 0; // What % along the free space do we want to position (0 = left, .5 = center, 1 = right)
             this._yAlignProportion = 0;
             this._fixedHeightFlag = false;
@@ -3361,17 +3232,18 @@ var Plottable;
             this._usedLastLayout = false;
         }
         /**
-         * Attaches the Component as a child of a given a DOM element. Usually only directly invoked on root-level Components.
+         * Attaches the Component as a child of a given D3 Selection.
          *
-         * @param {D3.Selection} element A D3 selection consisting of the element to anchor under.
+         * @param {D3.Selection} selection The Selection containing the Element to anchor under.
+         * @returns {Component} The calling Component.
          */
-        Component.prototype._anchor = function (element) {
+        Component.prototype.anchor = function (selection) {
             if (this._removed) {
                 throw new Error("Can't reuse remove()-ed components!");
             }
-            if (element.node().nodeName.toLowerCase() === "svg") {
+            if (selection.node().nodeName.toLowerCase() === "svg") {
                 // svg node gets the "plottable" CSS class
-                this._rootSVG = element;
+                this._rootSVG = selection;
                 this._rootSVG.classed("plottable", true);
                 // visible overflow for firefox https://stackoverflow.com/questions/5926986/why-does-firefox-appear-to-truncate-embedded-svgs
                 this._rootSVG.style("overflow", "visible");
@@ -3379,13 +3251,14 @@ var Plottable;
             }
             if (this._element != null) {
                 // reattach existing element
-                element.node().appendChild(this._element.node());
+                selection.node().appendChild(this._element.node());
             }
             else {
-                this._element = element.append("g");
+                this._element = selection.append("g");
                 this._setup();
             }
             this._isAnchored = true;
+            return this;
         };
         /**
          * Creates additional elements as necessary for the Component to function.
@@ -3423,21 +3296,20 @@ var Plottable;
          * If no parameters are supplied and the Component is a root node,
          * they are inferred from the size of the Component's element.
          *
-         * @param {number} offeredXOrigin x-coordinate of the origin of the space offered the Component
-         * @param {number} offeredYOrigin y-coordinate of the origin of the space offered the Component
-         * @param {number} availableWidth available width for the Component to render in
-         * @param {number} availableHeight available height for the Component to render in
+         * @param {Point} origin Origin of the space offered to the Component.
+         * @param {number} availableWidth
+         * @param {number} availableHeight
+         * @returns {Component} The calling Component.
          */
-        Component.prototype._computeLayout = function (offeredXOrigin, offeredYOrigin, availableWidth, availableHeight) {
+        Component.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
             var _this = this;
-            if (offeredXOrigin == null || offeredYOrigin == null || availableWidth == null || availableHeight == null) {
+            if (origin == null || availableWidth == null || availableHeight == null) {
                 if (this._element == null) {
-                    throw new Error("anchor must be called before computeLayout");
+                    throw new Error("anchor() must be called before computeLayout()");
                 }
                 else if (this._isTopLevelComponent) {
                     // we are the root node, retrieve height/width from root SVG
-                    offeredXOrigin = 0;
-                    offeredYOrigin = 0;
+                    origin = { x: 0, y: 0 };
                     // Set width/height to 100% if not specified, to allow accurate size calculation
                     // see http://www.w3.org/TR/CSS21/visudet.html#block-replaced-width
                     // and http://www.w3.org/TR/CSS21/visudet.html#inline-replaced-height
@@ -3452,16 +3324,19 @@ var Plottable;
                     availableHeight = Plottable.Utils.DOM.getElementHeight(elem);
                 }
                 else {
-                    throw new Error("null arguments cannot be passed to _computeLayout() on a non-root node");
+                    throw new Error("null arguments cannot be passed to computeLayout() on a non-root node");
                 }
             }
             var size = this._getSize(availableWidth, availableHeight);
             this._width = size.width;
             this._height = size.height;
-            this._xOrigin = offeredXOrigin + this._xOffset + (availableWidth - this.width()) * this._xAlignProportion;
-            this._yOrigin = offeredYOrigin + this._yOffset + (availableHeight - this.height()) * this._yAlignProportion;
-            this._element.attr("transform", "translate(" + this._xOrigin + "," + this._yOrigin + ")");
+            this._origin = {
+                x: origin.x + this._xOffset + (availableWidth - this.width()) * this._xAlignProportion,
+                y: origin.y + this._yOffset + (availableHeight - this.height()) * this._yAlignProportion
+            };
+            this._element.attr("transform", "translate(" + this._origin.x + "," + this._origin.y + ")");
             this._boxes.forEach(function (b) { return b.attr("width", _this.width()).attr("height", _this.height()); });
+            return this;
         };
         Component.prototype._getSize = function (availableWidth, availableHeight) {
             var requestedSpace = this._requestedSpace(availableWidth, availableHeight);
@@ -3470,10 +3345,11 @@ var Plottable;
                 height: this._isFixedHeight() ? Math.min(availableHeight, requestedSpace.height) : availableHeight
             };
         };
-        Component.prototype._render = function () {
+        Component.prototype.render = function () {
             if (this._isAnchored && this._isSetup && this.width() >= 0 && this.height() >= 0) {
                 Plottable.Core.RenderControllers.registerToRender(this);
             }
+            return this;
         };
         Component.prototype._scheduleComputeLayout = function () {
             if (this._isAnchored && this._isSetup) {
@@ -3491,16 +3367,25 @@ var Plottable;
                 return this;
             }
         };
-        Component.prototype._invalidateLayout = function () {
+        /**
+         * Causes the Component to recompute layout and redraw.
+         *
+         * This function should be called when CSS changes could influence the size
+         * of the components, e.g. changing the font size.
+         *
+         * @returns {Component} The calling Component.
+         */
+        Component.prototype.redraw = function () {
             this._useLastCalculatedLayout(false);
             if (this._isAnchored && this._isSetup) {
                 if (this._isTopLevelComponent) {
                     this._scheduleComputeLayout();
                 }
                 else {
-                    this._parent()._invalidateLayout();
+                    this._parent().redraw();
                 }
             }
+            return this;
         };
         /**
          * Renders the Component into a given DOM element. The element must be as <svg>.
@@ -3521,28 +3406,16 @@ var Plottable;
                 if (!selection.node() || selection.node().nodeName.toLowerCase() !== "svg") {
                     throw new Error("Plottable requires a valid SVG to renderTo");
                 }
-                this._anchor(selection);
+                this.anchor(selection);
             }
             if (this._element == null) {
                 throw new Error("If a component has never been rendered before, then renderTo must be given a node to render to, \
           or a D3.Selection, or a selector string");
             }
-            this._computeLayout();
-            this._render();
+            this.computeLayout();
+            this.render();
             // flush so that consumers can immediately attach to stuff we create in the DOM
             Plottable.Core.RenderControllers.flush();
-            return this;
-        };
-        /**
-         * Causes the Component to recompute layout and redraw.
-         *
-         * This function should be called when CSS changes could influence the size
-         * of the components, e.g. changing the font size.
-         *
-         * @returns {Component} The calling component.
-         */
-        Component.prototype.redraw = function () {
-            this._invalidateLayout();
             return this;
         };
         /**
@@ -3558,19 +3431,19 @@ var Plottable;
          */
         Component.prototype.xAlign = function (alignment) {
             alignment = alignment.toLowerCase();
-            if (alignment === "left") {
+            if (alignment === Components.Alignment.LEFT) {
                 this._xAlignProportion = 0;
             }
-            else if (alignment === "center") {
+            else if (alignment === Components.Alignment.CENTER) {
                 this._xAlignProportion = 0.5;
             }
-            else if (alignment === "right") {
+            else if (alignment === Components.Alignment.RIGHT) {
                 this._xAlignProportion = 1;
             }
             else {
                 throw new Error("Unsupported alignment");
             }
-            this._invalidateLayout();
+            this.redraw();
             return this;
         };
         /**
@@ -3586,19 +3459,19 @@ var Plottable;
          */
         Component.prototype.yAlign = function (alignment) {
             alignment = alignment.toLowerCase();
-            if (alignment === "top") {
+            if (alignment === Components.Alignment.TOP) {
                 this._yAlignProportion = 0;
             }
-            else if (alignment === "center") {
+            else if (alignment === Components.Alignment.CENTER) {
                 this._yAlignProportion = 0.5;
             }
-            else if (alignment === "bottom") {
+            else if (alignment === Components.Alignment.BOTTOM) {
                 this._yAlignProportion = 1;
             }
             else {
                 throw new Error("Unsupported alignment");
             }
-            this._invalidateLayout();
+            this.redraw();
             return this;
         };
         /**
@@ -3611,7 +3484,7 @@ var Plottable;
          */
         Component.prototype.xOffset = function (offset) {
             this._xOffset = offset;
-            this._invalidateLayout();
+            this.redraw();
             return this;
         };
         /**
@@ -3624,7 +3497,7 @@ var Plottable;
          */
         Component.prototype.yOffset = function (offset) {
             this._yOffset = offset;
-            this._invalidateLayout();
+            this.redraw();
             return this;
         };
         Component.prototype._addBox = function (className, parentElement) {
@@ -3822,8 +3695,8 @@ var Plottable;
          */
         Component.prototype.origin = function () {
             return {
-                x: this._xOrigin,
-                y: this._yOrigin
+                x: this._origin.x,
+                y: this._origin.y
             };
         };
         /**
@@ -3899,19 +3772,21 @@ var Plottable;
             _super.apply(this, arguments);
             this._components = [];
         }
-        ComponentContainer.prototype._anchor = function (element) {
+        ComponentContainer.prototype.anchor = function (selection) {
             var _this = this;
-            _super.prototype._anchor.call(this, element);
-            this.components().forEach(function (c) { return c._anchor(_this._content); });
+            _super.prototype.anchor.call(this, selection);
+            this.components().forEach(function (c) { return c.anchor(_this._content); });
+            return this;
         };
-        ComponentContainer.prototype._render = function () {
-            this._components.forEach(function (c) { return c._render(); });
+        ComponentContainer.prototype.render = function () {
+            this._components.forEach(function (c) { return c.render(); });
+            return this;
         };
         ComponentContainer.prototype._removeComponent = function (c) {
             var removeIndex = this._components.indexOf(c);
             if (removeIndex >= 0) {
                 this.components().splice(removeIndex, 1);
-                this._invalidateLayout();
+                this.redraw();
             }
         };
         ComponentContainer.prototype._addComponent = function (c, prepend) {
@@ -3927,9 +3802,9 @@ var Plottable;
             }
             c._parent(this);
             if (this._isAnchored) {
-                c._anchor(this._content);
+                c.anchor(this._content);
             }
-            this._invalidateLayout();
+            this.redraw();
             return true;
         };
         /**
@@ -4021,11 +3896,11 @@ var Plottable;
                 this._addComponent(c, !below);
                 return this;
             };
-            Group.prototype._computeLayout = function (offeredXOrigin, offeredYOrigin, availableWidth, availableHeight) {
+            Group.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
                 var _this = this;
-                _super.prototype._computeLayout.call(this, offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
+                _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
                 this.components().forEach(function (c) {
-                    c._computeLayout(0, 0, _this.width(), _this.height());
+                    c.computeLayout({ x: 0, y: 0 }, _this.width(), _this.height());
                 });
                 return this;
             };
@@ -4092,11 +3967,12 @@ var Plottable;
                 this.classed("y-axis", true);
             }
             this.formatter(formatter);
-            this._scale.broadcaster.registerListener(this, function () { return _this._rescale(); });
+            this._rescaleCallback = function (scale) { return _this._rescale(); };
+            this._scale.onUpdate(this._rescaleCallback);
         }
         Axis.prototype.remove = function () {
             _super.prototype.remove.call(this);
-            this._scale.broadcaster.deregisterListener(this);
+            this._scale.offUpdate(this._rescaleCallback);
         };
         Axis.prototype._isHorizontal = function () {
             return this._orientation === "top" || this._orientation === "bottom";
@@ -4140,17 +4016,18 @@ var Plottable;
             return !this._isHorizontal();
         };
         Axis.prototype._rescale = function () {
-            // default implementation; subclasses may call _invalidateLayout() here
-            this._render();
+            // default implementation; subclasses may call redraw() here
+            this.render();
         };
-        Axis.prototype._computeLayout = function (offeredXOrigin, offeredYOrigin, availableWidth, availableHeight) {
-            _super.prototype._computeLayout.call(this, offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
+        Axis.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
+            _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
             if (this._isHorizontal()) {
                 this._scale.range([0, this.width()]);
             }
             else {
                 this._scale.range([this.height(), 0]);
             }
+            return this;
         };
         Axis.prototype._setup = function () {
             _super.prototype._setup.call(this);
@@ -4239,10 +4116,10 @@ var Plottable;
             }
             return tickMarkAttrHash;
         };
-        Axis.prototype._invalidateLayout = function () {
+        Axis.prototype.redraw = function () {
             this._computedWidth = null;
             this._computedHeight = null;
-            _super.prototype._invalidateLayout.call(this);
+            return _super.prototype.redraw.call(this);
         };
         Axis.prototype._setDefaultAlignment = function () {
             switch (this._orientation) {
@@ -4265,7 +4142,7 @@ var Plottable;
                 return this._formatter;
             }
             this._formatter = formatter;
-            this._invalidateLayout();
+            this.redraw();
             return this;
         };
         Axis.prototype.tickLength = function (length) {
@@ -4277,7 +4154,7 @@ var Plottable;
                     throw new Error("tick length must be positive");
                 }
                 this._tickLength = length;
-                this._invalidateLayout();
+                this.redraw();
                 return this;
             }
         };
@@ -4290,7 +4167,7 @@ var Plottable;
                     throw new Error("end tick length must be positive");
                 }
                 this._endTickLength = length;
-                this._invalidateLayout();
+                this.redraw();
                 return this;
             }
         };
@@ -4311,7 +4188,7 @@ var Plottable;
                     throw new Error("tick label padding must be positive");
                 }
                 this._tickLabelPadding = padding;
-                this._invalidateLayout();
+                this.redraw();
                 return this;
             }
         };
@@ -4324,7 +4201,7 @@ var Plottable;
                     throw new Error("gutter size must be positive");
                 }
                 this._gutter = size;
-                this._invalidateLayout();
+                this.redraw();
                 return this;
             }
         };
@@ -4338,7 +4215,7 @@ var Plottable;
                     throw new Error("unsupported orientation");
                 }
                 this._orientation = newOrientationLC;
-                this._invalidateLayout();
+                this.redraw();
                 return this;
             }
         };
@@ -4347,7 +4224,7 @@ var Plottable;
                 return this._showEndTickLabels;
             }
             this._showEndTickLabels = show;
-            this._render();
+            this.render();
             return this;
         };
         /**
@@ -4405,7 +4282,7 @@ var Plottable;
                         throw new Error("Unsupported position for tier labels");
                     }
                     this._tierLabelPositions = newPositions;
-                    this._invalidateLayout();
+                    this.redraw();
                     return this;
                 }
             };
@@ -4424,7 +4301,7 @@ var Plottable;
                     newLabelPositions.push(oldLabelPositions[i] || "between");
                 }
                 this.tierLabelPositions(newLabelPositions);
-                this._invalidateLayout();
+                this.redraw();
                 return this;
             };
             /**
@@ -4553,7 +4430,6 @@ var Plottable;
                 var tickLabelsEnter = tickLabels.enter().append("g").classed(Plottable.Axis.TICK_LABEL_CLASS, true);
                 tickLabelsEnter.append("text");
                 var xTranslate = (this._tierLabelPositions[index] === "center" || config.step === 1) ? 0 : this.tickLabelPadding();
-                var markLength = this._measurer.measure().height;
                 var yTranslate = this.orient() === "bottom" ? d3.sum(this._tierHeights.slice(0, index + 1)) - this.tickLabelPadding() : this.height() - d3.sum(this._tierHeights.slice(0, index)) - this.tickLabelPadding();
                 var textSelection = tickLabels.selectAll("text");
                 if (textSelection.size() > 0) {
@@ -4798,7 +4674,7 @@ var Plottable;
     })(Axes = Plottable.Axes || (Plottable.Axes = {}));
 })(Plottable || (Plottable = {}));
 
-//<reference path="../../reference.ts" />
+///<reference path="../../reference.ts" />
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -4881,11 +4757,11 @@ var Plottable;
                 if (!this._isHorizontal()) {
                     var reComputedWidth = this._computeWidth();
                     if (reComputedWidth > this.width() || reComputedWidth < (this.width() - this.gutter())) {
-                        this._invalidateLayout();
+                        this.redraw();
                         return;
                     }
                 }
-                this._render();
+                this.render();
             };
             Numeric.prototype._doRender = function () {
                 var _this = this;
@@ -4986,7 +4862,7 @@ var Plottable;
                 }
             };
             Numeric.prototype._showAllTickMarks = function () {
-                var visibleTickMarks = this._tickMarkContainer.selectAll("." + Plottable.Axis.TICK_MARK_CLASS).each(function () {
+                this._tickMarkContainer.selectAll("." + Plottable.Axis.TICK_MARK_CLASS).each(function () {
                     d3.select(this).style("visibility", "inherit");
                 });
             };
@@ -5024,7 +4900,7 @@ var Plottable;
                         }
                     }
                     this._tickLabelPositioning = positionLC;
-                    this._invalidateLayout();
+                    this.redraw();
                     return this;
                 }
             };
@@ -5035,7 +4911,7 @@ var Plottable;
                     }
                     else {
                         this._showFirstTickLabel = show;
-                        this._render();
+                        this.render();
                         return this;
                     }
                 }
@@ -5045,7 +4921,7 @@ var Plottable;
                     }
                     else {
                         this._showLastTickLabel = show;
-                        this._render();
+                        this.render();
                         return this;
                     }
                 }
@@ -5086,7 +4962,6 @@ var Plottable;
                     var visibility = d3.select(this).style("visibility");
                     return (visibility === "inherit") || (visibility === "visible");
                 });
-                var lastLabelClientRect;
                 var visibleTickLabelRects = visibleTickLabels[0].map(function (label) { return label.getBoundingClientRect(); });
                 var interval = 1;
                 while (!this._hasOverlapWithInterval(interval, visibleTickLabelRects) && interval < visibleTickLabelRects.length) {
@@ -5175,7 +5050,7 @@ var Plottable;
                 this._writer = new SVGTypewriter.Writers.Writer(this._measurer, this._wrapper);
             };
             Category.prototype._rescale = function () {
-                return this._invalidateLayout();
+                return this.redraw();
             };
             Category.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
                 var widthRequiredByTicks = this._isHorizontal() ? 0 : this._maxLabelTickLength() + this.tickLabelPadding() + this.gutter();
@@ -5210,7 +5085,7 @@ var Plottable;
                     throw new Error("Angle " + angle + " not supported; only 0, 90, and -90 are valid values");
                 }
                 this._tickLabelAngle = angle;
-                this._invalidateLayout();
+                this.redraw();
                 return this;
             };
             /**
@@ -5317,18 +5192,17 @@ var Plottable;
                 // erase all text first, then rewrite
                 tickLabels.text("");
                 this._drawTicks(this.width(), this.height(), catScale, tickLabels);
-                var translate = this._isHorizontal() ? [catScale.rangeBand() / 2, 0] : [0, catScale.rangeBand() / 2];
                 var xTranslate = this.orient() === "right" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
                 var yTranslate = this.orient() === "bottom" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
                 Plottable.Utils.DOM.translate(this._tickLabelContainer, xTranslate, yTranslate);
                 return this;
             };
-            Category.prototype._computeLayout = function (offeredXOrigin, offeredYOrigin, availableWidth, availableHeight) {
-                // When anyone calls _invalidateLayout, _computeLayout will be called
+            Category.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
+                // When anyone calls redraw(), computeLayout() will be called
                 // on everyone, including this. Since CSS or something might have
                 // affected the size of the characters, clear the cache.
                 this._measurer.reset();
-                return _super.prototype._computeLayout.call(this, offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
+                return _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
             };
             return Category;
         })(Plottable.Axis);
@@ -5422,7 +5296,7 @@ var Plottable;
                 }
                 else {
                     this._text = displayText;
-                    this._invalidateLayout();
+                    this.redraw();
                     return this;
                 }
             };
@@ -5438,7 +5312,7 @@ var Plottable;
                     else {
                         throw new Error(newOrientation + " is not a valid orientation for LabelComponent");
                     }
-                    this._invalidateLayout();
+                    this.redraw();
                     return this;
                 }
             };
@@ -5452,7 +5326,7 @@ var Plottable;
                         throw new Error(padAmount + " is not a valid padding value.  Cannot be less than 0.");
                     }
                     this._padding = padAmount;
-                    this._invalidateLayout();
+                    this.redraw();
                     return this;
                 }
             };
@@ -5541,7 +5415,8 @@ var Plottable;
                     throw new Error("Legend requires a colorScale");
                 }
                 this._scale = colorScale;
-                this._scale.broadcaster.registerListener(this, function () { return _this._invalidateLayout(); });
+                this._redrawCallback = function (scale) { return _this.redraw(); };
+                this._scale.onUpdate(this._redrawCallback);
                 this.xAlign("right").yAlign("top");
                 this._fixedWidthFlag = true;
                 this._fixedHeightFlag = true;
@@ -5563,7 +5438,7 @@ var Plottable;
                 }
                 else {
                     this._maxEntriesPerRow = numEntries;
-                    this._invalidateLayout();
+                    this.redraw();
                     return this;
                 }
             };
@@ -5573,17 +5448,16 @@ var Plottable;
                 }
                 else {
                     this._sortFn = newFn;
-                    this._invalidateLayout();
+                    this.redraw();
                     return this;
                 }
             };
             Legend.prototype.scale = function (scale) {
-                var _this = this;
                 if (scale != null) {
-                    this._scale.broadcaster.deregisterListener(this);
+                    this._scale.offUpdate(this._redrawCallback);
                     this._scale = scale;
-                    this._scale.broadcaster.registerListener(this, function () { return _this._invalidateLayout(); });
-                    this._invalidateLayout();
+                    this._scale.onUpdate(this._redrawCallback);
+                    this.redraw();
                     return this;
                 }
                 else {
@@ -5592,7 +5466,7 @@ var Plottable;
             };
             Legend.prototype.remove = function () {
                 _super.prototype.remove.call(this);
-                this._scale.broadcaster.deregisterListener(this);
+                this._scale.offUpdate(this._redrawCallback);
             };
             Legend.prototype._calculateLayoutInfo = function (availableWidth, availableHeight) {
                 var _this = this;
@@ -5734,7 +5608,7 @@ var Plottable;
                 }
                 else {
                     this._symbolFactoryAccessor = symbolFactoryAccessor;
-                    this._render();
+                    this.render();
                     return this;
                 }
             };
@@ -5792,7 +5666,8 @@ var Plottable;
                     throw new Error("InterpolatedColorLegend requires a interpolatedColorScale");
                 }
                 this._scale = interpolatedColorScale;
-                this._scale.broadcaster.registerListener(this, function () { return _this._invalidateLayout(); });
+                this._redrawCallback = function (scale) { return _this.redraw(); };
+                this._scale.onUpdate(this._redrawCallback);
                 this._formatter = formatter;
                 this._orientation = InterpolatedColorLegend._ensureOrientation(orientation);
                 this._fixedWidthFlag = true;
@@ -5801,14 +5676,14 @@ var Plottable;
             }
             InterpolatedColorLegend.prototype.remove = function () {
                 _super.prototype.remove.call(this);
-                this._scale.broadcaster.deregisterListener(this);
+                this._scale.offUpdate(this._redrawCallback);
             };
             InterpolatedColorLegend.prototype.formatter = function (formatter) {
                 if (formatter === undefined) {
                     return this._formatter;
                 }
                 this._formatter = formatter;
-                this._invalidateLayout();
+                this.redraw();
                 return this;
             };
             InterpolatedColorLegend._ensureOrientation = function (orientation) {
@@ -5826,7 +5701,7 @@ var Plottable;
                 }
                 else {
                     this._orientation = InterpolatedColorLegend._ensureOrientation(newOrientation);
-                    this._invalidateLayout();
+                    this.redraw();
                     return this;
                 }
             };
@@ -5881,7 +5756,6 @@ var Plottable;
                 var _this = this;
                 _super.prototype._doRender.call(this);
                 var domain = this._scale.domain();
-                var textHeight = this._measurer.measure().height;
                 var text0 = this._formatter(domain[0]);
                 var text0Width = this._measurer.measure(text0).width;
                 var text1 = this._formatter(domain[1]);
@@ -6014,20 +5888,21 @@ var Plottable;
                 this.classed("gridlines", true);
                 this._xScale = xScale;
                 this._yScale = yScale;
+                this._renderCallback = function (scale) { return _this.render(); };
                 if (this._xScale) {
-                    this._xScale.broadcaster.registerListener(this, function () { return _this._render(); });
+                    this._xScale.onUpdate(this._renderCallback);
                 }
                 if (this._yScale) {
-                    this._yScale.broadcaster.registerListener(this, function () { return _this._render(); });
+                    this._yScale.onUpdate(this._renderCallback);
                 }
             }
             Gridlines.prototype.remove = function () {
                 _super.prototype.remove.call(this);
                 if (this._xScale) {
-                    this._xScale.broadcaster.deregisterListener(this);
+                    this._xScale.offUpdate(this._renderCallback);
                 }
                 if (this._yScale) {
-                    this._yScale.broadcaster.deregisterListener(this);
+                    this._yScale.offUpdate(this._renderCallback);
                 }
                 return this;
             };
@@ -6280,9 +6155,9 @@ var Plottable;
                 this._calculatedLayout = this._iterateLayout(offeredWidth, offeredHeight);
                 return { width: d3.sum(this._calculatedLayout.guaranteedWidths), height: d3.sum(this._calculatedLayout.guaranteedHeights), wantsWidth: this._calculatedLayout.wantsWidth, wantsHeight: this._calculatedLayout.wantsHeight };
             };
-            Table.prototype._computeLayout = function (offeredXOrigin, offeredYOrigin, availableWidth, availableHeight) {
+            Table.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
                 var _this = this;
-                _super.prototype._computeLayout.call(this, offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
+                _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
                 var layout = this._useLastCalculatedLayout() ? this._calculatedLayout : this._iterateLayout(this.width(), this.height());
                 this._useLastCalculatedLayout(true);
                 var childYOrigin = 0;
@@ -6293,12 +6168,13 @@ var Plottable;
                     row.forEach(function (component, colIndex) {
                         // recursively compute layout
                         if (component != null) {
-                            component._computeLayout(childXOrigin, childYOrigin, colWidths[colIndex], rowHeights[rowIndex]);
+                            component.computeLayout({ x: childXOrigin, y: childYOrigin }, colWidths[colIndex], rowHeights[rowIndex]);
                         }
                         childXOrigin += colWidths[colIndex] + _this._colPadding;
                     });
                     childYOrigin += rowHeights[rowIndex] + _this._rowPadding;
                 });
+                return this;
             };
             /**
              * Sets the row and column padding on the Table.
@@ -6310,7 +6186,7 @@ var Plottable;
             Table.prototype.padding = function (rowPadding, colPadding) {
                 this._rowPadding = rowPadding;
                 this._colPadding = colPadding;
-                this._invalidateLayout();
+                this.redraw();
                 return this;
             };
             /**
@@ -6340,7 +6216,7 @@ var Plottable;
              */
             Table.prototype.rowWeight = function (index, weight) {
                 this._rowWeights[index] = weight;
-                this._invalidateLayout();
+                this.redraw();
                 return this;
             };
             /**
@@ -6355,7 +6231,7 @@ var Plottable;
              */
             Table.prototype.colWeight = function (index, weight) {
                 this._colWeights[index] = weight;
-                this._invalidateLayout();
+                this.redraw();
                 return this;
             };
             Table.prototype._isFixedWidth = function () {
@@ -6456,7 +6332,7 @@ var Plottable;
                     return this._boxBounds;
                 }
                 this._setBounds(newBounds);
-                this._render();
+                this.render();
                 return this;
             };
             SelectionBoxLayer.prototype._setBounds = function (newBounds) {
@@ -6496,7 +6372,7 @@ var Plottable;
                     return this._boxVisible;
                 }
                 this._boxVisible = show;
-                this._render();
+                this.render();
                 return this;
             };
             return SelectionBoxLayer;
@@ -6531,6 +6407,7 @@ var Plottable;
          * @param {any[]|Dataset} [dataset] If provided, the data or Dataset to be associated with this Plot.
          */
         function Plot() {
+            var _this = this;
             _super.call(this);
             this._dataChanged = false;
             this._projections = {};
@@ -6540,14 +6417,19 @@ var Plottable;
             this.clipPathEnabled = true;
             this.classed("plot", true);
             this._key2PlotDatasetKey = d3.map();
+            this._attrToExtents = d3.map();
+            this._extentProvider = function (scale) { return _this._extentsForScale(scale); };
             this._datasetKeysInOrder = [];
             this._nextSeriesIndex = 0;
+            this._renderCallback = function (scale) { return _this.render(); };
+            this._onDatasetUpdateCallback = function () { return _this._onDatasetUpdate(); };
         }
-        Plot.prototype._anchor = function (element) {
-            _super.prototype._anchor.call(this, element);
+        Plot.prototype.anchor = function (selection) {
+            _super.prototype.anchor.call(this, selection);
             this._animateOnNextRender = true;
             this._dataChanged = true;
-            this._updateScaleExtents();
+            this._updateExtents();
+            return this;
         };
         Plot.prototype._setup = function () {
             var _this = this;
@@ -6560,14 +6442,7 @@ var Plottable;
             var _this = this;
             _super.prototype.remove.call(this);
             this._datasetKeysInOrder.forEach(function (k) { return _this.removeDataset(k); });
-            // deregister from all scales
-            var properties = Object.keys(this._projections);
-            properties.forEach(function (property) {
-                var projector = _this._projections[property];
-                if (projector.scale) {
-                    projector.scale.broadcaster.deregisterListener(_this);
-                }
-            });
+            this._scales().forEach(function (scale) { return scale.offUpdate(_this._renderCallback); });
         };
         Plot.prototype.addDataset = function (keyOrDataset, dataset) {
             if (typeof (keyOrDataset) !== "string" && dataset !== undefined) {
@@ -6583,7 +6458,6 @@ var Plottable;
             return this;
         };
         Plot.prototype._addDataset = function (key, dataset) {
-            var _this = this;
             if (this._key2PlotDatasetKey.has(key)) {
                 this.removeDataset(key);
             }
@@ -6596,7 +6470,7 @@ var Plottable;
             if (this._isSetup) {
                 drawer.setup(this._renderArea.append("g"));
             }
-            dataset.broadcaster.registerListener(this, function () { return _this._onDatasetUpdate(); });
+            dataset.onUpdate(this._onDatasetUpdateCallback);
             this._onDatasetUpdate();
         };
         Plot.prototype._getDrawer = function (key) {
@@ -6611,10 +6485,10 @@ var Plottable;
             }
         };
         Plot.prototype._onDatasetUpdate = function () {
-            this._updateScaleExtents();
+            this._updateExtents();
             this._animateOnNextRender = true;
             this._dataChanged = true;
-            this._render();
+            this.render();
         };
         /**
          * Sets an attribute of every data point.
@@ -6646,23 +6520,25 @@ var Plottable;
          * Identical to plot.attr
          */
         Plot.prototype.project = function (attrToSet, accessor, scale) {
-            var _this = this;
             attrToSet = attrToSet.toLowerCase();
-            var currentProjection = this._projections[attrToSet];
-            var existingScale = currentProjection && currentProjection.scale;
-            if (existingScale) {
-                this._datasetKeysInOrder.forEach(function (key) {
-                    existingScale._removeExtent(_this.getID().toString() + "_" + key, attrToSet);
-                    existingScale.broadcaster.deregisterListener(_this);
-                });
-            }
-            if (scale) {
-                scale.broadcaster.registerListener(this, function () { return _this._render(); });
-            }
+            var previousProjection = this._projections[attrToSet];
+            var previousScale = previousProjection && previousProjection.scale;
             accessor = Plottable.Utils.Methods.accessorize(accessor);
             this._projections[attrToSet] = { accessor: accessor, scale: scale, attribute: attrToSet };
-            this._updateScaleExtent(attrToSet);
-            this._render(); // queue a re-render upon changing projector
+            this._updateExtentsForAttr(attrToSet);
+            if (previousScale) {
+                if (this._scales().indexOf(previousScale) !== -1) {
+                    previousScale.offUpdate(this._renderCallback);
+                    previousScale.removeExtentProvider(this._extentProvider);
+                }
+                previousScale._autoDomainIfAutomaticMode();
+            }
+            if (scale) {
+                scale.onUpdate(this._renderCallback);
+                scale.addExtentProvider(this._extentProvider);
+                scale._autoDomainIfAutomaticMode();
+            }
+            this.render(); // queue a re-render upon changing projector
             return this;
         };
         Plot.prototype._generateAttrToProjector = function () {
@@ -6716,35 +6592,67 @@ var Plottable;
         Plot.prototype.detach = function () {
             _super.prototype.detach.call(this);
             // make the domain resize
-            this._updateScaleExtents();
+            this._updateExtents();
             return this;
         };
         /**
-         * This function makes sure that all of the scales in this._projections
-         * have an extent that includes all the data that is projected onto them.
+         * @returns {Scale[]} A unique array of all scales currently used by the Plot.
          */
-        Plot.prototype._updateScaleExtents = function () {
+        Plot.prototype._scales = function () {
             var _this = this;
-            d3.keys(this._projections).forEach(function (attr) { return _this._updateScaleExtent(attr); });
+            var scales = [];
+            Object.keys(this._projections).forEach(function (attr) {
+                var scale = _this._projections[attr].scale;
+                if (scale != null && scales.indexOf(scale) === -1) {
+                    scales.push(scale);
+                }
+            });
+            return scales;
         };
-        Plot.prototype._updateScaleExtent = function (attr) {
+        /**
+         * Updates the extents associated with each attribute, then autodomains all scales the Plot uses.
+         */
+        Plot.prototype._updateExtents = function () {
             var _this = this;
-            var projector = this._projections[attr];
-            if (projector.scale) {
-                this._datasetKeysInOrder.forEach(function (key) {
-                    var plotDatasetKey = _this._key2PlotDatasetKey.get(key);
-                    var dataset = plotDatasetKey.dataset;
-                    var plotMetadata = plotDatasetKey.plotMetadata;
-                    var extent = dataset._getExtent(projector.accessor, projector.scale._typeCoercer, plotMetadata);
-                    var scaleKey = _this.getID().toString() + "_" + key;
-                    if (extent.length === 0 || !_this._isAnchored) {
-                        projector.scale._removeExtent(scaleKey, attr);
-                    }
-                    else {
-                        projector.scale._updateExtent(scaleKey, attr, extent);
-                    }
-                });
+            Object.keys(this._projections).forEach(function (attr) {
+                _this._updateExtentsForAttr(attr);
+            });
+            this._scales().forEach(function (scale) { return scale._autoDomainIfAutomaticMode(); });
+        };
+        Plot.prototype._updateExtentsForAttr = function (attr) {
+            var _this = this;
+            var accessor = this._projections[attr].accessor;
+            var scale = this._projections[attr].scale;
+            var coercer = (scale != null) ? scale._typeCoercer : function (d) { return d; };
+            var extents = this._datasetKeysInOrder.map(function (key) {
+                var plotDatasetKey = _this._key2PlotDatasetKey.get(key);
+                var dataset = plotDatasetKey.dataset;
+                var plotMetadata = plotDatasetKey.plotMetadata;
+                return dataset._getExtent(accessor, coercer, plotMetadata);
+            });
+            this._attrToExtents.set(attr, extents);
+        };
+        /**
+         * Override in subclass to add special extents, such as included values
+         */
+        Plot.prototype._extentsForAttr = function (attr) {
+            return this._attrToExtents.get(attr);
+        };
+        Plot.prototype._extentsForScale = function (scale) {
+            var _this = this;
+            if (!this._isAnchored) {
+                return [];
             }
+            var allSetsOfExtents = [];
+            Object.keys(this._projections).forEach(function (attr) {
+                if (_this._projections[attr].scale === scale) {
+                    var extents = _this._extentsForAttr(attr);
+                    if (extents != null) {
+                        allSetsOfExtents.push(extents);
+                    }
+                }
+            });
+            return d3.merge(allSetsOfExtents);
         };
         Plot.prototype.animator = function (animatorKey, animator) {
             if (animator === undefined) {
@@ -6807,14 +6715,7 @@ var Plottable;
             if (key != null && this._key2PlotDatasetKey.has(key)) {
                 var pdk = this._key2PlotDatasetKey.get(key);
                 pdk.drawer.remove();
-                var projectors = d3.values(this._projections);
-                var scaleKey = this.getID().toString() + "_" + key;
-                projectors.forEach(function (p) {
-                    if (p.scale != null) {
-                        p.scale._removeExtent(scaleKey, p.attribute);
-                    }
-                });
-                pdk.dataset.broadcaster.deregisterListener(this);
+                pdk.dataset.offUpdate(this._onDatasetUpdateCallback);
                 this._datasetKeysInOrder.splice(this._datasetKeysInOrder.indexOf(key), 1);
                 this._key2PlotDatasetKey.remove(key);
                 this._onDatasetUpdate();
@@ -7012,9 +6913,10 @@ var Plottable;
                 this._colorScale = new Plottable.Scales.Color();
                 this.classed("pie-plot", true);
             }
-            Pie.prototype._computeLayout = function (offeredXOrigin, offeredYOrigin, availableWidth, availableHeight) {
-                _super.prototype._computeLayout.call(this, offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
+            Pie.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
+                _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
                 this._renderArea.attr("transform", "translate(" + this.width() / 2 + "," + this.height() / 2 + ")");
+                return this;
             };
             Pie.prototype.addDataset = function (keyOrDataset, dataset) {
                 if (this._datasetKeysInOrder.length === 1) {
@@ -7084,34 +6986,35 @@ var Plottable;
             this.classed("xy-plot", true);
             this._xScale = xScale;
             this._yScale = yScale;
+            this._adjustYDomainOnChangeFromXCallback = function (scale) { return _this._adjustYDomainOnChangeFromX(); };
+            this._adjustXDomainOnChangeFromYCallback = function (scale) { return _this._adjustXDomainOnChangeFromY(); };
             this._updateXDomainer();
-            xScale.broadcaster.registerListener("yDomainAdjustment" + this.getID(), function () { return _this._adjustYDomainOnChangeFromX(); });
+            xScale.onUpdate(this._adjustYDomainOnChangeFromXCallback);
             this._updateYDomainer();
-            yScale.broadcaster.registerListener("xDomainAdjustment" + this.getID(), function () { return _this._adjustXDomainOnChangeFromY(); });
+            yScale.onUpdate(this._adjustXDomainOnChangeFromYCallback);
         }
         /**
          * @param {string} attrToSet One of ["x", "y"] which determines the point's
          * x and y position in the Plot.
          */
         XYPlot.prototype.project = function (attrToSet, accessor, scale) {
-            var _this = this;
             // We only want padding and nice-ing on scales that will correspond to axes / pixel layout.
             // So when we get an "x" or "y" scale, enable autoNiceing and autoPadding.
             if (attrToSet === "x" && scale) {
                 if (this._xScale) {
-                    this._xScale.broadcaster.deregisterListener("yDomainAdjustment" + this.getID());
+                    this._xScale.offUpdate(this._adjustYDomainOnChangeFromXCallback);
                 }
                 this._xScale = scale;
                 this._updateXDomainer();
-                scale.broadcaster.registerListener("yDomainAdjustment" + this.getID(), function () { return _this._adjustYDomainOnChangeFromX(); });
+                scale.onUpdate(this._adjustYDomainOnChangeFromXCallback);
             }
             if (attrToSet === "y" && scale) {
                 if (this._yScale) {
-                    this._yScale.broadcaster.deregisterListener("xDomainAdjustment" + this.getID());
+                    this._yScale.offUpdate(this._adjustXDomainOnChangeFromYCallback);
                 }
                 this._yScale = scale;
                 this._updateYDomainer();
-                scale.broadcaster.registerListener("xDomainAdjustment" + this.getID(), function () { return _this._adjustXDomainOnChangeFromY(); });
+                scale.onUpdate(this._adjustXDomainOnChangeFromYCallback);
             }
             _super.prototype.project.call(this, attrToSet, accessor, scale);
             return this;
@@ -7119,10 +7022,10 @@ var Plottable;
         XYPlot.prototype.remove = function () {
             _super.prototype.remove.call(this);
             if (this._xScale) {
-                this._xScale.broadcaster.deregisterListener("yDomainAdjustment" + this.getID());
+                this._xScale.offUpdate(this._adjustYDomainOnChangeFromXCallback);
             }
             if (this._yScale) {
-                this._yScale.broadcaster.deregisterListener("xDomainAdjustment" + this.getID());
+                this._yScale.offUpdate(this._adjustXDomainOnChangeFromYCallback);
             }
             return this;
         };
@@ -7163,8 +7066,8 @@ var Plottable;
             };
             return attrToProjector;
         };
-        XYPlot.prototype._computeLayout = function (offeredXOrigin, offeredYOffset, availableWidth, availableHeight) {
-            _super.prototype._computeLayout.call(this, offeredXOrigin, offeredYOffset, availableWidth, availableHeight);
+        XYPlot.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
+            _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
             this._xScale.range([0, this.width()]);
             if (this._yScale instanceof Plottable.Scales.Category) {
                 this._yScale.range([0, this.height()]);
@@ -7172,6 +7075,7 @@ var Plottable;
             else {
                 this._yScale.range([this.height(), 0]);
             }
+            return this;
         };
         XYPlot.prototype._updateXDomainer = function () {
             if (this._xScale instanceof Plottable.QuantitativeScale) {
@@ -7349,7 +7253,6 @@ var Plottable;
              */
             function Scatter(xScale, yScale) {
                 _super.call(this, xScale, yScale);
-                this._closeDetectionRadius = 5;
                 this.classed("scatter-plot", true);
                 this._defaultFillColor = new Plottable.Scales.Color().range()[0];
                 this.animator("symbols-reset", new Plottable.Animators.Null());
@@ -7545,7 +7448,7 @@ var Plottable;
                 this._baselineValue = value;
                 this._updateXDomainer();
                 this._updateYDomainer();
-                this._render();
+                this.render();
                 return this;
             };
             /**
@@ -7563,7 +7466,7 @@ var Plottable;
                     throw new Error("unsupported bar alignment");
                 }
                 this._barAlignmentFactor = align2factor[alignmentLC];
-                this._render();
+                this.render();
                 return this;
             };
             Bar.prototype.labelsEnabled = function (enabled) {
@@ -7572,7 +7475,7 @@ var Plottable;
                 }
                 else {
                     this._labelsEnabled = enabled;
-                    this._render();
+                    this.render();
                     return this;
                 }
             };
@@ -7582,7 +7485,7 @@ var Plottable;
                 }
                 else {
                     this._barLabelFormatter = formatter;
-                    this._render();
+                    this.render();
                     return this;
                 }
             };
@@ -7599,8 +7502,6 @@ var Plottable;
              */
             Bar.prototype.getClosestPlotData = function (queryPoint) {
                 var _this = this;
-                var chartXExtent = { min: 0, max: this.width() };
-                var chartYExtent = { min: 0, max: this.height() };
                 var minPrimaryDist = Infinity;
                 var minSecondaryDist = Infinity;
                 var closestData = [];
@@ -7858,7 +7759,6 @@ var Plottable;
             };
             Bar.prototype._getAllPlotData = function (datasetKeys) {
                 var plotData = _super.prototype._getAllPlotData.call(this, datasetKeys);
-                var valueScale = this._isVertical ? this._yScale : this._xScale;
                 var scaledBaseline = (this._isVertical ? this._yScale : this._xScale).scale(this.baseline());
                 var isVertical = this._isVertical;
                 var barAlignmentFactor = this._barAlignmentFactor;
@@ -8271,7 +8171,6 @@ var Plottable;
         };
         Stacked.prototype._updateStackExtents = function () {
             var _this = this;
-            var datasets = this.datasets();
             var valueAccessor = this._valueAccessor();
             var keyAccessor = this._keyAccessor();
             var maxStackExtent = Plottable.Utils.Methods.max(this._datasetKeysInOrder, function (k) {
@@ -8366,17 +8265,16 @@ var Plottable;
             });
             return dataMapArray;
         };
-        Stacked.prototype._updateScaleExtents = function () {
-            _super.prototype._updateScaleExtents.call(this);
-            var primaryScale = this._isVertical ? this._yScale : this._xScale;
-            if (!primaryScale) {
-                return;
-            }
-            if (this._isAnchored && this._stackedExtent.length > 0) {
-                primaryScale._updateExtent(this.getID().toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT", this._stackedExtent);
+        Stacked.prototype._extentsForAttr = function (attr) {
+            var extents = _super.prototype._extentsForAttr.call(this, attr);
+            var primaryAttr = this._isVertical ? "y" : "x";
+            if (attr === primaryAttr && this._stackedExtent) {
+                var clonedExtents = extents.slice();
+                clonedExtents.push(this._stackedExtent);
+                return clonedExtents;
             }
             else {
-                primaryScale._removeExtent(this.getID().toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT");
+                return extents;
             }
         };
         Stacked.prototype._normalizeDatasets = function (fromX) {
@@ -8499,7 +8397,7 @@ var Plottable;
             StackedArea.prototype._wholeDatumAttributes = function () {
                 return ["x", "y", "defined"];
             };
-            //===== Stack logic from StackedPlot =====
+            // ===== Stack logic from StackedPlot =====
             StackedArea.prototype._updateStackOffsets = function () {
                 var _this = this;
                 if (!this._projectorsReady()) {
@@ -8532,8 +8430,8 @@ var Plottable;
             StackedArea.prototype._generateDefaultMapArray = function () {
                 return Plottable.Stacked.prototype._generateDefaultMapArray.call(this);
             };
-            StackedArea.prototype._updateScaleExtents = function () {
-                Plottable.Stacked.prototype._updateScaleExtents.call(this);
+            StackedArea.prototype._extentsForAttr = function (attr) {
+                return Plottable.Stacked.prototype._extentsForAttr.call(this, attr);
             };
             StackedArea.prototype._keyAccessor = function () {
                 return Plottable.Stacked.prototype._keyAccessor.call(this);
@@ -8626,7 +8524,7 @@ var Plottable;
             StackedBar.prototype._normalizeDatasets = function (fromX) {
                 return Plottable.Stacked.prototype._normalizeDatasets.call(this, fromX);
             };
-            //===== Stack logic from StackedPlot =====
+            // ===== Stack logic from StackedPlot =====
             StackedBar.prototype._updateStackOffsets = function () {
                 Plottable.Stacked.prototype._updateStackOffsets.call(this);
             };
@@ -8645,8 +8543,8 @@ var Plottable;
             StackedBar.prototype._generateDefaultMapArray = function () {
                 return Plottable.Stacked.prototype._generateDefaultMapArray.call(this);
             };
-            StackedBar.prototype._updateScaleExtents = function () {
-                Plottable.Stacked.prototype._updateScaleExtents.call(this);
+            StackedBar.prototype._extentsForAttr = function (attr) {
+                return Plottable.Stacked.prototype._extentsForAttr.call(this, attr);
             };
             StackedBar.prototype._keyAccessor = function () {
                 return Plottable.Stacked.prototype._keyAccessor.call(this);
@@ -8909,21 +8807,22 @@ var Plottable;
         function Dispatcher() {
             _super.apply(this, arguments);
             this._event2Callback = {};
-            this._broadcasters = [];
+            this._callbacks = [];
             this._connected = false;
         }
         Dispatcher.prototype._hasNoListeners = function () {
-            return this._broadcasters.every(function (b) { return b.getListenerKeys().length === 0; });
+            return this._callbacks.every(function (cbs) { return cbs.values().length === 0; });
         };
         Dispatcher.prototype._connect = function () {
             var _this = this;
-            if (!this._connected) {
-                Object.keys(this._event2Callback).forEach(function (event) {
-                    var callback = _this._event2Callback[event];
-                    document.addEventListener(event, callback);
-                });
-                this._connected = true;
+            if (this._connected) {
+                return;
             }
+            Object.keys(this._event2Callback).forEach(function (event) {
+                var callback = _this._event2Callback[event];
+                document.addEventListener(event, callback);
+            });
+            this._connected = true;
         };
         Dispatcher.prototype._disconnect = function () {
             var _this = this;
@@ -8935,21 +8834,13 @@ var Plottable;
                 this._connected = false;
             }
         };
-        /**
-         * Creates a wrapped version of the callback that can be registered to a Broadcaster
-         */
-        Dispatcher.prototype._getWrappedCallback = function (callback) {
-            return function () { return callback(); };
+        Dispatcher.prototype.setCallback = function (callbackSet, callback) {
+            this._connect();
+            callbackSet.add(callback);
         };
-        Dispatcher.prototype._setCallback = function (b, key, callback) {
-            if (callback === null) {
-                b.deregisterListener(key);
-                this._disconnect();
-            }
-            else {
-                this._connect();
-                b.registerListener(key, this._getWrappedCallback(callback));
-            }
+        Dispatcher.prototype.unsetCallback = function (callbackSet, callback) {
+            callbackSet.delete(callback);
+            this._disconnect();
         };
         return Dispatcher;
     })(Plottable.Core.PlottableObject);
@@ -8980,20 +8871,20 @@ var Plottable;
                 _super.call(this);
                 this.translator = Plottable.Utils.ClientToSVGTranslator.getTranslator(svg);
                 this._lastMousePosition = { x: -1, y: -1 };
-                this._moveBroadcaster = new Plottable.Core.Broadcaster(this);
-                var processMoveCallback = function (e) { return _this._measureAndBroadcast(e, _this._moveBroadcaster); };
+                this._moveCallbacks = new Plottable.Utils.CallbackSet();
+                this._downCallbacks = new Plottable.Utils.CallbackSet();
+                this._upCallbacks = new Plottable.Utils.CallbackSet();
+                this._wheelCallbacks = new Plottable.Utils.CallbackSet();
+                this._dblClickCallbacks = new Plottable.Utils.CallbackSet();
+                this._callbacks = [this._moveCallbacks, this._downCallbacks, this._upCallbacks, this._wheelCallbacks, this._dblClickCallbacks];
+                var processMoveCallback = function (e) { return _this._measureAndDispatch(e, _this._moveCallbacks); };
                 this._event2Callback["mouseover"] = processMoveCallback;
                 this._event2Callback["mousemove"] = processMoveCallback;
                 this._event2Callback["mouseout"] = processMoveCallback;
-                this._downBroadcaster = new Plottable.Core.Broadcaster(this);
-                this._event2Callback["mousedown"] = function (e) { return _this._measureAndBroadcast(e, _this._downBroadcaster); };
-                this._upBroadcaster = new Plottable.Core.Broadcaster(this);
-                this._event2Callback["mouseup"] = function (e) { return _this._measureAndBroadcast(e, _this._upBroadcaster); };
-                this._wheelBroadcaster = new Plottable.Core.Broadcaster(this);
-                this._event2Callback["wheel"] = function (e) { return _this._measureAndBroadcast(e, _this._wheelBroadcaster); };
-                this._dblClickBroadcaster = new Plottable.Core.Broadcaster(this);
-                this._event2Callback["dblclick"] = function (e) { return _this._measureAndBroadcast(e, _this._dblClickBroadcaster); };
-                this._broadcasters = [this._moveBroadcaster, this._downBroadcaster, this._upBroadcaster, this._wheelBroadcaster, this._dblClickBroadcaster];
+                this._event2Callback["mousedown"] = function (e) { return _this._measureAndDispatch(e, _this._downCallbacks); };
+                this._event2Callback["mouseup"] = function (e) { return _this._measureAndDispatch(e, _this._upCallbacks); };
+                this._event2Callback["wheel"] = function (e) { return _this._measureAndDispatch(e, _this._wheelCallbacks); };
+                this._event2Callback["dblclick"] = function (e) { return _this._measureAndDispatch(e, _this._dblClickCallbacks); };
             }
             /**
              * Get a Dispatcher.Mouse for the <svg> containing elem. If one already exists
@@ -9011,93 +8902,135 @@ var Plottable;
                 }
                 return dispatcher;
             };
-            Mouse.prototype._getWrappedCallback = function (callback) {
-                return function (md, p, e) { return callback(p, e); };
-            };
             /**
              * Registers a callback to be called whenever the mouse position changes,
-             * or removes the callback if `null` is passed as the callback.
              *
-             * @param {any} key The key associated with the callback.
-             *                  Key uniqueness is determined by deep equality.
              * @param {(p: Point) => any} callback A callback that takes the pixel position
              *                                     in svg-coordinate-space. Pass `null`
              *                                     to remove a callback.
              * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
              */
-            Mouse.prototype.onMouseMove = function (key, callback) {
-                this._setCallback(this._moveBroadcaster, key, callback);
+            Mouse.prototype.onMouseMove = function (callback) {
+                this.setCallback(this._moveCallbacks, callback);
                 return this;
             };
             /**
-             * Registers a callback to be called whenever a mousedown occurs,
-             * or removes the callback if `null` is passed as the callback.
+             * Registers the callback to be called whenever the mouse position changes,
              *
-             * @param {any} key The key associated with the callback.
-             *                  Key uniqueness is determined by deep equality.
              * @param {(p: Point) => any} callback A callback that takes the pixel position
              *                                     in svg-coordinate-space. Pass `null`
              *                                     to remove a callback.
              * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
              */
-            Mouse.prototype.onMouseDown = function (key, callback) {
-                this._setCallback(this._downBroadcaster, key, callback);
+            Mouse.prototype.offMouseMove = function (callback) {
+                this.unsetCallback(this._moveCallbacks, callback);
                 return this;
             };
             /**
-             * Registers a callback to be called whenever a mouseup occurs,
-             * or removes the callback if `null` is passed as the callback.
+             * Registers a callback to be called whenever a mousedown occurs.
              *
-             * @param {any} key The key associated with the callback.
-             *                  Key uniqueness is determined by deep equality.
              * @param {(p: Point) => any} callback A callback that takes the pixel position
              *                                     in svg-coordinate-space. Pass `null`
              *                                     to remove a callback.
              * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
              */
-            Mouse.prototype.onMouseUp = function (key, callback) {
-                this._setCallback(this._upBroadcaster, key, callback);
+            Mouse.prototype.onMouseDown = function (callback) {
+                this.setCallback(this._downCallbacks, callback);
                 return this;
             };
             /**
-             * Registers a callback to be called whenever a wheel occurs,
-             * or removes the callback if `null` is passed as the callback.
+             * Registers the callback to be called whenever a mousedown occurs.
              *
-             * @param {any} key The key associated with the callback.
-             *                  Key uniqueness is determined by deep equality.
+             * @param {(p: Point) => any} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space. Pass `null`
+             *                                     to remove a callback.
+             * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+             */
+            Mouse.prototype.offMouseDown = function (callback) {
+                this.unsetCallback(this._downCallbacks, callback);
+                return this;
+            };
+            /**
+             * Registers a callback to be called whenever a mouseup occurs.
+             *
+             * @param {(p: Point) => any} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space. Pass `null`
+             *                                     to remove a callback.
+             * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+             */
+            Mouse.prototype.onMouseUp = function (callback) {
+                this.setCallback(this._upCallbacks, callback);
+                return this;
+            };
+            /**
+             * Registers the callback to be called whenever a mouseup occurs.
+             *
+             * @param {(p: Point) => any} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space. Pass `null`
+             *                                     to remove a callback.
+             * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+             */
+            Mouse.prototype.offMouseUp = function (callback) {
+                this.unsetCallback(this._upCallbacks, callback);
+                return this;
+            };
+            /**
+             * Registers a callback to be called whenever a wheel occurs.
+             *
              * @param {MouseCallback} callback A callback that takes the pixel position
              *                                     in svg-coordinate-space.
              *                                     Pass `null` to remove a callback.
              * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
              */
-            Mouse.prototype.onWheel = function (key, callback) {
-                this._setCallback(this._wheelBroadcaster, key, callback);
+            Mouse.prototype.onWheel = function (callback) {
+                this.setCallback(this._wheelCallbacks, callback);
                 return this;
             };
             /**
-             * Registers a callback to be called whenever a dblClick occurs,
-             * or removes the callback if `null` is passed as the callback.
+             * Registers the callback to be called whenever a wheel occurs.
              *
-             * @param {any} key The key associated with the callback.
-             *                  Key uniqueness is determined by deep equality.
              * @param {MouseCallback} callback A callback that takes the pixel position
              *                                     in svg-coordinate-space.
              *                                     Pass `null` to remove a callback.
              * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
              */
-            Mouse.prototype.onDblClick = function (key, callback) {
-                this._setCallback(this._dblClickBroadcaster, key, callback);
+            Mouse.prototype.offWheel = function (callback) {
+                this.unsetCallback(this._wheelCallbacks, callback);
+                return this;
+            };
+            /**
+             * Registers a callback to be called whenever a dblClick occurs.
+             *
+             * @param {MouseCallback} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space.
+             *                                     Pass `null` to remove a callback.
+             * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+             */
+            Mouse.prototype.onDblClick = function (callback) {
+                this.setCallback(this._dblClickCallbacks, callback);
+                return this;
+            };
+            /**
+             * Registers the callback to be called whenever a dblClick occurs.
+             *
+             * @param {MouseCallback} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space.
+             *                                     Pass `null` to remove a callback.
+             * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+             */
+            Mouse.prototype.offDblClick = function (callback) {
+                this.unsetCallback(this._dblClickCallbacks, callback);
                 return this;
             };
             /**
              * Computes the mouse position from the given event, and if successful
-             * calls broadcast() on the supplied Broadcaster.
+             * calls all the callbacks in the provided callbackSet.
              */
-            Mouse.prototype._measureAndBroadcast = function (e, b) {
-                var newMousePosition = this.translator.computePosition(e.clientX, e.clientY);
+            Mouse.prototype._measureAndDispatch = function (event, callbackSet) {
+                var newMousePosition = this.translator.computePosition(event.clientX, event.clientY);
                 if (newMousePosition != null) {
                     this._lastMousePosition = newMousePosition;
-                    b.broadcast(this.getLastMousePosition(), e);
+                    callbackSet.callCallbacks(this.getLastMousePosition(), event);
                 }
             };
             /**
@@ -9138,15 +9071,15 @@ var Plottable;
                 var _this = this;
                 _super.call(this);
                 this.translator = Plottable.Utils.ClientToSVGTranslator.getTranslator(svg);
-                this._startBroadcaster = new Plottable.Core.Broadcaster(this);
-                this._event2Callback["touchstart"] = function (e) { return _this._measureAndBroadcast(e, _this._startBroadcaster); };
-                this._moveBroadcaster = new Plottable.Core.Broadcaster(this);
-                this._event2Callback["touchmove"] = function (e) { return _this._measureAndBroadcast(e, _this._moveBroadcaster); };
-                this._endBroadcaster = new Plottable.Core.Broadcaster(this);
-                this._event2Callback["touchend"] = function (e) { return _this._measureAndBroadcast(e, _this._endBroadcaster); };
-                this._cancelBroadcaster = new Plottable.Core.Broadcaster(this);
-                this._event2Callback["touchcancel"] = function (e) { return _this._measureAndBroadcast(e, _this._cancelBroadcaster); };
-                this._broadcasters = [this._moveBroadcaster, this._startBroadcaster, this._endBroadcaster, this._cancelBroadcaster];
+                this._startCallbacks = new Plottable.Utils.CallbackSet();
+                this._moveCallbacks = new Plottable.Utils.CallbackSet();
+                this._endCallbacks = new Plottable.Utils.CallbackSet();
+                this._cancelCallbacks = new Plottable.Utils.CallbackSet();
+                this._callbacks = [this._moveCallbacks, this._startCallbacks, this._endCallbacks, this._cancelCallbacks];
+                this._event2Callback["touchstart"] = function (e) { return _this._measureAndDispatch(e, _this._startCallbacks); };
+                this._event2Callback["touchmove"] = function (e) { return _this._measureAndDispatch(e, _this._moveCallbacks); };
+                this._event2Callback["touchend"] = function (e) { return _this._measureAndDispatch(e, _this._endCallbacks); };
+                this._event2Callback["touchcancel"] = function (e) { return _this._measureAndDispatch(e, _this._cancelCallbacks); };
             }
             /**
              * Get a Dispatcher.Touch for the <svg> containing elem. If one already exists
@@ -9164,75 +9097,108 @@ var Plottable;
                 }
                 return dispatcher;
             };
-            Touch.prototype._getWrappedCallback = function (callback) {
-                return function (td, ids, idToPoint, e) { return callback(ids, idToPoint, e); };
-            };
             /**
-             * Registers a callback to be called whenever a touch starts,
-             * or removes the callback if `null` is passed as the callback.
+             * Registers a callback to be called whenever a touch starts.
              *
-             * @param {any} key The key associated with the callback.
-             *                  Key uniqueness is determined by deep equality.
              * @param {TouchCallback} callback A callback that takes the pixel position
              *                                     in svg-coordinate-space. Pass `null`
              *                                     to remove a callback.
              * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
              */
-            Touch.prototype.onTouchStart = function (key, callback) {
-                this._setCallback(this._startBroadcaster, key, callback);
+            Touch.prototype.onTouchStart = function (callback) {
+                this.setCallback(this._startCallbacks, callback);
                 return this;
             };
             /**
-             * Registers a callback to be called whenever the touch position changes,
-             * or removes the callback if `null` is passed as the callback.
+             * Removes the callback to be called whenever a touch starts.
              *
-             * @param {any} key The key associated with the callback.
-             *                  Key uniqueness is determined by deep equality.
              * @param {TouchCallback} callback A callback that takes the pixel position
              *                                     in svg-coordinate-space. Pass `null`
              *                                     to remove a callback.
              * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
              */
-            Touch.prototype.onTouchMove = function (key, callback) {
-                this._setCallback(this._moveBroadcaster, key, callback);
+            Touch.prototype.offTouchStart = function (callback) {
+                this.unsetCallback(this._startCallbacks, callback);
                 return this;
             };
             /**
-             * Registers a callback to be called whenever a touch ends,
-             * or removes the callback if `null` is passed as the callback.
+             * Registers a callback to be called whenever the touch position changes.
              *
-             * @param {any} key The key associated with the callback.
-             *                  Key uniqueness is determined by deep equality.
              * @param {TouchCallback} callback A callback that takes the pixel position
              *                                     in svg-coordinate-space. Pass `null`
              *                                     to remove a callback.
              * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
              */
-            Touch.prototype.onTouchEnd = function (key, callback) {
-                this._setCallback(this._endBroadcaster, key, callback);
+            Touch.prototype.onTouchMove = function (callback) {
+                this.setCallback(this._moveCallbacks, callback);
                 return this;
             };
             /**
-             * Registers a callback to be called whenever a touch is cancelled,
-             * or removes the callback if `null` is passed as the callback.
+             * Removes the callback to be called whenever the touch position changes.
              *
-             * @param {any} key The key associated with the callback.
-             *                  Key uniqueness is determined by deep equality.
              * @param {TouchCallback} callback A callback that takes the pixel position
              *                                     in svg-coordinate-space. Pass `null`
              *                                     to remove a callback.
              * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
              */
-            Touch.prototype.onTouchCancel = function (key, callback) {
-                this._setCallback(this._cancelBroadcaster, key, callback);
+            Touch.prototype.offTouchMove = function (callback) {
+                this.unsetCallback(this._moveCallbacks, callback);
+                return this;
+            };
+            /**
+             * Registers a callback to be called whenever a touch ends.
+             *
+             * @param {TouchCallback} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space. Pass `null`
+             *                                     to remove a callback.
+             * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
+             */
+            Touch.prototype.onTouchEnd = function (callback) {
+                this.setCallback(this._endCallbacks, callback);
+                return this;
+            };
+            /**
+             * Removes the callback to be called whenever a touch ends.
+             *
+             * @param {TouchCallback} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space. Pass `null`
+             *                                     to remove a callback.
+             * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
+             */
+            Touch.prototype.offTouchEnd = function (callback) {
+                this.unsetCallback(this._endCallbacks, callback);
+                return this;
+            };
+            /**
+             * Registers a callback to be called whenever a touch is cancelled.
+             *
+             * @param {TouchCallback} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space. Pass `null`
+             *                                     to remove a callback.
+             * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
+             */
+            Touch.prototype.onTouchCancel = function (callback) {
+                this.setCallback(this._cancelCallbacks, callback);
+                return this;
+            };
+            /**
+             * Removes the callback to be called whenever a touch is cancelled.
+             *
+             * @param {TouchCallback} callback A callback that takes the pixel position
+             *                                     in svg-coordinate-space. Pass `null`
+             *                                     to remove a callback.
+             * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
+             */
+            Touch.prototype.offTouchCancel = function (callback) {
+                this.unsetCallback(this._cancelCallbacks, callback);
                 return this;
             };
             /**
              * Computes the Touch position from the given event, and if successful
-             * calls broadcast() on the supplied Broadcaster.
+             * calls all the callbacks in the provided callbackSet.
              */
-            Touch.prototype._measureAndBroadcast = function (e, b) {
-                var touches = e.changedTouches;
+            Touch.prototype._measureAndDispatch = function (event, callbackSet) {
+                var touches = event.changedTouches;
                 var touchPositions = {};
                 var touchIdentifiers = [];
                 for (var i = 0; i < touches.length; i++) {
@@ -9246,7 +9212,7 @@ var Plottable;
                 }
                 ;
                 if (touchIdentifiers.length > 0) {
-                    b.broadcast(touchIdentifiers, touchPositions, e);
+                    callbackSet.callCallbacks(touchIdentifiers, touchPositions, event);
                 }
             };
             /**
@@ -9284,8 +9250,8 @@ var Plottable;
                 var _this = this;
                 _super.call(this);
                 this._event2Callback["keydown"] = function (e) { return _this._processKeydown(e); };
-                this._keydownBroadcaster = new Plottable.Core.Broadcaster(this);
-                this._broadcasters = [this._keydownBroadcaster];
+                this._keydownCallbacks = new Plottable.Utils.CallbackSet();
+                this._callbacks = [this._keydownCallbacks];
             }
             /**
              * Get a Dispatcher.Key. If one already exists it will be returned;
@@ -9301,24 +9267,28 @@ var Plottable;
                 }
                 return dispatcher;
             };
-            Key.prototype._getWrappedCallback = function (callback) {
-                return function (d, e) { return callback(e.keyCode, e); };
-            };
             /**
-             * Registers a callback to be called whenever a key is pressed,
-             * or removes the callback if `null` is passed as the callback.
+             * Registers a callback to be called whenever a key is pressed.
              *
-             * @param {any} key The registration key associated with the callback.
-             *                  Registration key uniqueness is determined by deep equality.
              * @param {KeyCallback} callback
              * @return {Dispatcher.Key} The calling Dispatcher.Key.
              */
-            Key.prototype.onKeyDown = function (key, callback) {
-                this._setCallback(this._keydownBroadcaster, key, callback);
+            Key.prototype.onKeyDown = function (callback) {
+                this.setCallback(this._keydownCallbacks, callback);
                 return this;
             };
-            Key.prototype._processKeydown = function (e) {
-                this._keydownBroadcaster.broadcast(e);
+            /**
+             * Removes the callback to be called whenever a key is pressed.
+             *
+             * @param {KeyCallback} callback
+             * @return {Dispatcher.Key} The calling Dispatcher.Key.
+             */
+            Key.prototype.offKeyDown = function (callback) {
+                this.unsetCallback(this._keydownCallbacks, callback);
+                return this;
+            };
+            Key.prototype._processKeydown = function (event) {
+                this._keydownCallbacks.callCallbacks(event.keyCode, event);
             };
             Key._DISPATCHER_KEY = "__Plottable_Dispatcher_Key";
             return Key;
@@ -9394,12 +9364,12 @@ var Plottable;
                 var _this = this;
                 _super.prototype._anchor.call(this, component);
                 this._mouseDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(component.content().node());
-                this._mouseDispatcher.onMouseDown("Interaction.Click" + this.getID(), function (p) { return _this._handleClickDown(p); });
-                this._mouseDispatcher.onMouseUp("Interaction.Click" + this.getID(), function (p) { return _this._handleClickUp(p); });
+                this._mouseDispatcher.onMouseDown(function (p) { return _this._handleClickDown(p); });
+                this._mouseDispatcher.onMouseUp(function (p) { return _this._handleClickUp(p); });
                 this._touchDispatcher = Plottable.Dispatchers.Touch.getDispatcher(component.content().node());
-                this._touchDispatcher.onTouchStart("Interaction.Click" + this.getID(), function (ids, idToPoint) { return _this._handleClickDown(idToPoint[ids[0]]); });
-                this._touchDispatcher.onTouchEnd("Interaction.Click" + this.getID(), function (ids, idToPoint) { return _this._handleClickUp(idToPoint[ids[0]]); });
-                this._touchDispatcher.onTouchCancel("Interaction.Click" + this.getID(), function (ids, idToPoint) { return _this._clickedDown = false; });
+                this._touchDispatcher.onTouchStart(function (ids, idToPoint) { return _this._handleClickDown(idToPoint[ids[0]]); });
+                this._touchDispatcher.onTouchEnd(function (ids, idToPoint) { return _this._handleClickUp(idToPoint[ids[0]]); });
+                this._touchDispatcher.onTouchCancel(function (ids, idToPoint) { return _this._clickedDown = false; });
             };
             Click.prototype._handleClickDown = function (p) {
                 var translatedPoint = this._translateToComponentSpace(p);
@@ -9456,13 +9426,13 @@ var Plottable;
                 var _this = this;
                 _super.prototype._anchor.call(this, component);
                 this._mouseDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(component.content().node());
-                this._mouseDispatcher.onMouseDown("Interactions.DoubleClick" + this.getID(), function (p) { return _this._handleClickDown(p); });
-                this._mouseDispatcher.onMouseUp("Interactions.DoubleClick" + this.getID(), function (p) { return _this._handleClickUp(p); });
-                this._mouseDispatcher.onDblClick("Interactions.DoubleClick" + this.getID(), function (p) { return _this._handleDblClick(); });
+                this._mouseDispatcher.onMouseDown(function (p) { return _this._handleClickDown(p); });
+                this._mouseDispatcher.onMouseUp(function (p) { return _this._handleClickUp(p); });
+                this._mouseDispatcher.onDblClick(function (p) { return _this._handleDblClick(); });
                 this._touchDispatcher = Plottable.Dispatchers.Touch.getDispatcher(component.content().node());
-                this._touchDispatcher.onTouchStart("Interactions.DoubleClick" + this.getID(), function (ids, idToPoint) { return _this._handleClickDown(idToPoint[ids[0]]); });
-                this._touchDispatcher.onTouchEnd("Interactions.DoubleClick" + this.getID(), function (ids, idToPoint) { return _this._handleClickUp(idToPoint[ids[0]]); });
-                this._touchDispatcher.onTouchCancel("Interaction.DoubleClick" + this.getID(), function (ids, idToPoint) { return _this._handleClickCancel(); });
+                this._touchDispatcher.onTouchStart(function (ids, idToPoint) { return _this._handleClickDown(idToPoint[ids[0]]); });
+                this._touchDispatcher.onTouchEnd(function (ids, idToPoint) { return _this._handleClickUp(idToPoint[ids[0]]); });
+                this._touchDispatcher.onTouchCancel(function (ids, idToPoint) { return _this._handleClickCancel(); });
             };
             DoubleClick.prototype._handleClickDown = function (p) {
                 var translatedP = this._translateToComponentSpace(p);
@@ -9533,9 +9503,9 @@ var Plottable;
                 var _this = this;
                 _super.prototype._anchor.call(this, component);
                 this._positionDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(this._componentToListenTo._element.node());
-                this._positionDispatcher.onMouseMove("Interaction.Key" + this.getID(), function (p) { return null; }); // HACKHACK: registering a listener
+                this._positionDispatcher.onMouseMove(function (p) { return null; }); // HACKHACK: registering a listener
                 this._keyDispatcher = Plottable.Dispatchers.Key.getDispatcher();
-                this._keyDispatcher.onKeyDown("Interaction.Key" + this.getID(), function (keyCode) { return _this._handleKeyEvent(keyCode); });
+                this._keyDispatcher.onKeyDown(function (keyCode) { return _this._handleKeyEvent(keyCode); });
             };
             Key.prototype._handleKeyEvent = function (keyCode) {
                 var p = this._translateToComponentSpace(this._positionDispatcher.getLastMousePosition());
@@ -9582,9 +9552,9 @@ var Plottable;
                 var _this = this;
                 _super.prototype._anchor.call(this, component);
                 this._mouseDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(this._componentToListenTo.content().node());
-                this._mouseDispatcher.onMouseMove("Interaction.Pointer" + this.getID(), function (p) { return _this._handlePointerEvent(p); });
+                this._mouseDispatcher.onMouseMove(function (p) { return _this._handlePointerEvent(p); });
                 this._touchDispatcher = Plottable.Dispatchers.Touch.getDispatcher(this._componentToListenTo.content().node());
-                this._touchDispatcher.onTouchStart("Interaction.Pointer" + this.getID(), function (ids, idToPoint) { return _this._handlePointerEvent(idToPoint[ids[0]]); });
+                this._touchDispatcher.onTouchStart(function (ids, idToPoint) { return _this._handlePointerEvent(idToPoint[ids[0]]); });
             };
             Pointer.prototype._handlePointerEvent = function (p) {
                 var translatedP = this._translateToComponentSpace(p);
@@ -9668,12 +9638,12 @@ var Plottable;
                 _super.prototype._anchor.call(this, component);
                 this._dragInteraction._anchor(component);
                 var mouseDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(this._componentToListenTo.content().node());
-                mouseDispatcher.onWheel("Interaction.PanZoom" + this.getID(), function (p, e) { return _this._handleWheelEvent(p, e); });
+                mouseDispatcher.onWheel(function (p, e) { return _this._handleWheelEvent(p, e); });
                 this._touchDispatcher = Plottable.Dispatchers.Touch.getDispatcher(this._componentToListenTo.content().node());
-                this._touchDispatcher.onTouchStart("Interaction.PanZoom" + this.getID(), function (ids, idToPoint, e) { return _this._handleTouchStart(ids, idToPoint, e); });
-                this._touchDispatcher.onTouchMove("Interaction.PanZoom" + this.getID(), function (ids, idToPoint, e) { return _this._handlePinch(ids, idToPoint, e); });
-                this._touchDispatcher.onTouchEnd("Interaction.PanZoom" + this.getID(), function (ids, idToPoint, e) { return _this._handleTouchEnd(ids, idToPoint, e); });
-                this._touchDispatcher.onTouchCancel("Interaction.PanZoom" + this.getID(), function (ids, idToPoint, e) { return _this._handleTouchEnd(ids, idToPoint, e); });
+                this._touchDispatcher.onTouchStart(function (ids, idToPoint, e) { return _this._handleTouchStart(ids, idToPoint, e); });
+                this._touchDispatcher.onTouchMove(function (ids, idToPoint, e) { return _this._handlePinch(ids, idToPoint, e); });
+                this._touchDispatcher.onTouchEnd(function (ids, idToPoint, e) { return _this._handleTouchEnd(ids, idToPoint, e); });
+                this._touchDispatcher.onTouchCancel(function (ids, idToPoint, e) { return _this._handleTouchEnd(ids, idToPoint, e); });
             };
             PanZoom.prototype._handleTouchStart = function (ids, idToPoint, e) {
                 for (var i = 0; i < ids.length && this._touchIds.size() < 2; i++) {
@@ -9804,14 +9774,13 @@ var Plottable;
                 var _this = this;
                 _super.prototype._anchor.call(this, component);
                 this._mouseDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(this._componentToListenTo.content().node());
-                this._mouseDispatcher.onMouseDown("Interactions.Drag" + this.getID(), function (p, e) { return _this._startDrag(p, e); });
-                this._mouseDispatcher.onMouseMove("Interactions.Drag" + this.getID(), function (p, e) { return _this._doDrag(p, e); });
-                this._mouseDispatcher.onMouseUp("Interactions.Drag" + this.getID(), function (p, e) { return _this._endDrag(p, e); });
+                this._mouseDispatcher.onMouseDown(function (p, e) { return _this._startDrag(p, e); });
+                this._mouseDispatcher.onMouseMove(function (p, e) { return _this._doDrag(p, e); });
+                this._mouseDispatcher.onMouseUp(function (p, e) { return _this._endDrag(p, e); });
                 this._touchDispatcher = Plottable.Dispatchers.Touch.getDispatcher(this._componentToListenTo.content().node());
-                this._touchDispatcher.onTouchStart("Interactions.Drag" + this.getID(), function (ids, idToPoint, e) { return _this._startDrag(idToPoint[ids[0]], e); });
-                this._touchDispatcher.onTouchMove("Interactions.Drag" + this.getID(), function (ids, idToPoint, e) { return _this._doDrag(idToPoint[ids[0]], e); });
-                this._touchDispatcher.onTouchEnd("Interactions.Drag" + this.getID(), function (ids, idToPoint, e) { return _this._endDrag(idToPoint[ids[0]], e); });
-                this._touchDispatcher.onTouchCancel("Interaction.Drag" + this.getID(), function (ids, idToPoint, e) { return _this._dragging = false; });
+                this._touchDispatcher.onTouchStart(function (ids, idToPoint, e) { return _this._startDrag(idToPoint[ids[0]], e); });
+                this._touchDispatcher.onTouchMove(function (ids, idToPoint, e) { return _this._doDrag(idToPoint[ids[0]], e); });
+                this._touchDispatcher.onTouchEnd(function (ids, idToPoint, e) { return _this._endDrag(idToPoint[ids[0]], e); });
             };
             Drag.prototype._translateAndConstrain = function (p) {
                 var translatedP = this._translateToComponentSpace(p);
@@ -10090,7 +10059,7 @@ var Plottable;
                     throw new Error("detection radius cannot be negative.");
                 }
                 this._detectionRadius = r;
-                this._render();
+                this.render();
                 return this;
             };
             DragBoxLayer.prototype.resizable = function (canResize) {
@@ -10157,9 +10126,10 @@ var Plottable;
                 this.classed("x-drag-box-layer", true);
                 this._hasCorners = false;
             }
-            XDragBoxLayer.prototype._computeLayout = function (offeredXOrigin, offeredYOrigin, availableWidth, availableHeight) {
-                _super.prototype._computeLayout.call(this, offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
+            XDragBoxLayer.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
+                _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
                 this.bounds(this.bounds()); // set correct bounds when width/height changes
+                return this;
             };
             XDragBoxLayer.prototype._setBounds = function (newBounds) {
                 _super.prototype._setBounds.call(this, {
@@ -10194,9 +10164,10 @@ var Plottable;
                 this.classed("y-drag-box-layer", true);
                 this._hasCorners = false;
             }
-            YDragBoxLayer.prototype._computeLayout = function (offeredXOrigin, offeredYOrigin, availableWidth, availableHeight) {
-                _super.prototype._computeLayout.call(this, offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
+            YDragBoxLayer.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
+                _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
                 this.bounds(this.bounds()); // set correct bounds when width/height changes
+                return this;
             };
             YDragBoxLayer.prototype._setBounds = function (newBounds) {
                 _super.prototype._setBounds.call(this, {

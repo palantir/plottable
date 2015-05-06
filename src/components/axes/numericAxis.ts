@@ -1,4 +1,4 @@
-//<reference path="../../reference.ts" />
+///<reference path="../../reference.ts" />
 
 module Plottable {
 export module Axes {
@@ -83,12 +83,12 @@ export module Axes {
       if (!this._isHorizontal()) {
         var reComputedWidth = this._computeWidth();
         if (reComputedWidth > this.width() || reComputedWidth < (this.width() - this.gutter())) {
-          this._invalidateLayout();
+          this.redraw();
           return;
         }
       }
 
-      this._render();
+      this.render();
     }
 
     public _doRender() {
@@ -212,11 +212,10 @@ export module Axes {
     }
 
     private _showAllTickMarks() {
-      var visibleTickMarks = this._tickMarkContainer
-                                 .selectAll("." + Axis.TICK_MARK_CLASS)
-                                 .each(function() {
-                                   d3.select(this).style("visibility", "inherit");
-                                 });
+      this._tickMarkContainer.selectAll("." + Axis.TICK_MARK_CLASS)
+                             .each(function() {
+                                     d3.select(this).style("visibility", "inherit");
+                                   });
     }
 
     /**
@@ -272,7 +271,7 @@ export module Axes {
           }
         }
         this._tickLabelPositioning = positionLC;
-        this._invalidateLayout();
+        this.redraw();
         return this;
       }
     }
@@ -308,7 +307,7 @@ export module Axes {
           return this._showFirstTickLabel;
         } else {
           this._showFirstTickLabel = show;
-          this._render();
+          this.render();
           return this;
         }
       } else if ((this._isHorizontal() && orientation === "right") ||
@@ -317,7 +316,7 @@ export module Axes {
           return this._showLastTickLabel;
         } else {
           this._showLastTickLabel = show;
-          this._render();
+          this.render();
           return this;
         }
       } else {
@@ -364,7 +363,6 @@ export module Axes {
                                       var visibility = d3.select(this).style("visibility");
                                       return (visibility === "inherit") || (visibility === "visible");
                                     });
-      var lastLabelClientRect: ClientRect;
 
       var visibleTickLabelRects = visibleTickLabels[0].map((label: HTMLScriptElement) => label.getBoundingClientRect());
       var interval = 1;

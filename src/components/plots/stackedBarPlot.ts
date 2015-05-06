@@ -79,7 +79,7 @@ export module Plots {
       return Stacked.prototype._normalizeDatasets.call(this, fromX);
     }
 
-    //===== Stack logic from StackedPlot =====
+    // ===== Stack logic from StackedPlot =====
     public _updateStackOffsets() {
       Stacked.prototype._updateStackOffsets.call(this);
     }
@@ -104,8 +104,8 @@ export module Plots {
       return Stacked.prototype._generateDefaultMapArray.call(this);
     }
 
-    public _updateScaleExtents() {
-      Stacked.prototype._updateScaleExtents.call(this);
+    protected _extentsForAttr(attr: string) {
+      return (<any> Stacked.prototype)._extentsForAttr.call(this, attr);
     }
 
     public _keyAccessor(): _Accessor {
@@ -115,7 +115,7 @@ export module Plots {
     public _valueAccessor(): _Accessor {
       return Stacked.prototype._valueAccessor.call(this);
     }
-    //===== /Stack logic =====
+    // ===== /Stack logic =====
   }
 }
 }
