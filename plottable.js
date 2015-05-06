@@ -5579,14 +5579,17 @@ var Plottable;
                 var _this = this;
                 var textHeight = this._measurer.measure().height;
                 var availableWidthForEntries = Math.max(0, (availableWidth - this._padding));
-                var measureEntry = function (entryText) {
-                    var originalEntryLength = (textHeight + _this._measurer.measure(entryText).width + _this._padding);
-                    return Math.min(originalEntryLength, availableWidthForEntries);
-                };
-                var entries = this._scale.domain().slice();
-                entries.sort(this.sortFunction());
-                var entryLengths = Plottable.Utils.Methods.populateMap(entries, measureEntry);
-                var rows = this._packRows(availableWidthForEntries, entries, entryLengths);
+                var entryNames = this._scale.domain().slice();
+                entryNames.sort(this.sortFunction());
+                var entryLengths = d3.map();
+                var untruncatedEntryLengths = d3.map();
+                entryNames.forEach(function (entryName) {
+                    var untruncatedEntryLength = (textHeight + _this._measurer.measure(entryName).width + _this._padding);
+                    var entryLength = Math.min(untruncatedEntryLength, availableWidthForEntries);
+                    entryLengths.set(entryName, entryLength);
+                    untruncatedEntryLengths.set(entryName, untruncatedEntryLength);
+                });
+                var rows = this._packRows(availableWidthForEntries, entryNames, entryLengths);
                 var rowsAvailable = Math.floor((availableHeight - 2 * this._padding) / textHeight);
                 if (rowsAvailable !== rowsAvailable) {
                     rowsAvailable = 0;
@@ -5594,18 +5597,19 @@ var Plottable;
                 return {
                     textHeight: textHeight,
                     entryLengths: entryLengths,
+                    untruncatedEntryLengths: untruncatedEntryLengths,
                     rows: rows,
                     numRowsToDraw: Math.max(Math.min(rowsAvailable, rows.length), 0)
                 };
             };
             Legend.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
                 var estimatedLayout = this._calculateLayoutInfo(offeredWidth, offeredHeight);
-                var estimatedRowLengths = estimatedLayout.rows.map(function (row) {
-                    return d3.sum(row, function (entry) { return estimatedLayout.entryLengths.get(entry); });
+                var untruncatedRowLengths = estimatedLayout.rows.map(function (row) {
+                    return d3.sum(row, function (entry) { return estimatedLayout.untruncatedEntryLengths.get(entry); });
                 });
-                var longestEstimatedRowLength = Plottable.Utils.Methods.max(estimatedRowLengths, 0);
+                var longestUntruncatedRowLength = Plottable.Utils.Methods.max(untruncatedRowLengths, 0);
                 return {
-                    minWidth: this._padding + longestEstimatedRowLength,
+                    minWidth: this._padding + longestUntruncatedRowLength,
                     minHeight: estimatedLayout.rows.length * estimatedLayout.textHeight + 2 * this._padding
                 };
             };

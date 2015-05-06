@@ -141,16 +141,20 @@ export module Components {
       var textHeight = this._measurer.measure().height;
 
       var availableWidthForEntries = Math.max(0, (availableWidth - this._padding));
-      var measureEntry = (entryText: string) => {
-        var originalEntryLength = (textHeight + this._measurer.measure(entryText).width + this._padding);
-        return Math.min(originalEntryLength, availableWidthForEntries);
-      };
 
-      var entries = this._scale.domain().slice();
-      entries.sort(this.sortFunction());
-      var entryLengths = Utils.Methods.populateMap(entries, measureEntry);
+      var entryNames = this._scale.domain().slice();
+      entryNames.sort(this.sortFunction());
 
-      var rows = this._packRows(availableWidthForEntries, entries, entryLengths);
+      var entryLengths: D3.Map<number> = d3.map();
+      var untruncatedEntryLengths: D3.Map<number> = d3.map();
+      entryNames.forEach((entryName) => {
+        var untruncatedEntryLength = (textHeight + this._measurer.measure(entryName).width + this._padding);
+        var entryLength = Math.min(untruncatedEntryLength, availableWidthForEntries);
+        entryLengths.set(entryName, entryLength);
+        untruncatedEntryLengths.set(entryName, untruncatedEntryLength);
+      });
+
+      var rows = this._packRows(availableWidthForEntries, entryNames, entryLengths);
 
       var rowsAvailable = Math.floor((availableHeight - 2 * this._padding) / textHeight);
       if (rowsAvailable !== rowsAvailable) { // rowsAvailable can be NaN if this.textHeight = 0
@@ -160,6 +164,7 @@ export module Components {
       return {
         textHeight: textHeight,
         entryLengths: entryLengths,
+        untruncatedEntryLengths: untruncatedEntryLengths,
         rows: rows,
         numRowsToDraw: Math.max(Math.min(rowsAvailable, rows.length), 0)
       };
@@ -168,13 +173,13 @@ export module Components {
     public _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
       var estimatedLayout = this._calculateLayoutInfo(offeredWidth, offeredHeight);
 
-      var estimatedRowLengths = estimatedLayout.rows.map((row: string[]) => {
-        return d3.sum(row, (entry: string) => estimatedLayout.entryLengths.get(entry));
+      var untruncatedRowLengths = estimatedLayout.rows.map((row: string[]) => {
+        return d3.sum(row, (entry: string) => estimatedLayout.untruncatedEntryLengths.get(entry));
       });
-      var longestEstimatedRowLength = Utils.Methods.max(estimatedRowLengths, 0);
+      var longestUntruncatedRowLength = Utils.Methods.max(untruncatedRowLengths, 0);
 
       return {
-        minWidth: this._padding + longestEstimatedRowLength,
+        minWidth: this._padding + longestUntruncatedRowLength,
         minHeight: estimatedLayout.rows.length * estimatedLayout.textHeight + 2 * this._padding
       };
     }

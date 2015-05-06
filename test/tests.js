@@ -1808,6 +1808,14 @@ describe("Legend", function () {
         assert.lengthOf(rows[0], 3, "Wrapped text on to three rows when further constrained");
         svg.remove();
     });
+    it("requests more width if entries would be truncated", function () {
+        color.domain(["George Waaaaaashington", "John Adaaaams", "Thomaaaaas Jefferson"]);
+        legend.renderTo(svg); // have to be in DOM to measure
+        var idealSpaceRequest = legend._requestedSpace(Infinity, Infinity);
+        var constrainedRequest = legend._requestedSpace(idealSpaceRequest.minWidth * 0.9, Infinity);
+        assert.strictEqual(idealSpaceRequest.minWidth, constrainedRequest.minWidth, "won't settle for less width if entries would be truncated");
+        svg.remove();
+    });
     it("getEntry() retrieves the correct entry for vertical legends", function () {
         color.domain(["AA", "BB", "CC"]);
         legend.maxEntriesPerRow(1);
