@@ -732,7 +732,7 @@ declare module Plottable {
          * @param {string} key The key to register the exception under.
          * @returns {Domainer} The calling domainer
          */
-        addPaddingException(exception: any, key?: string): Domainer;
+        addPaddingException(exception: any, key: any): Domainer;
         /**
          * Removes a padding exception, allowing the domain to pad out that value again.
          *
@@ -742,7 +742,7 @@ declare module Plottable {
          * @param {any} keyOrException The key for the value to remove, or the value to remove
          * @return {Domainer} The calling domainer
          */
-        removePaddingException(keyOrException: any): Domainer;
+        removePaddingException(key: any): Domainer;
         /**
          * Adds an included value, a value that must be included inside the domain.
          *
@@ -754,7 +754,7 @@ declare module Plottable {
          * @param {string} key The key to register the value under.
          * @returns {Domainer} The calling domainer
          */
-        addIncludedValue(value: any, key?: string): Domainer;
+        addIncludedValue(value: any, key: any): Domainer;
         /**
          * Remove an included value, allowing the domain to not include that value gain again.
          *
@@ -764,7 +764,7 @@ declare module Plottable {
          * @param {any} keyOrException The key for the value to remove, or the value to remove
          * @return {Domainer} The calling domainer
          */
-        removeIncludedValue(valueOrKey: any): Domainer;
+        removeIncludedValue(key: any): Domainer;
         /**
          * Extends the scale's domain so it starts and ends with "nice" values.
          *

@@ -6,11 +6,8 @@ module Plottable {
     private _doNice = false;
     private _niceCount: number;
     private _padProportion = 0.0;
-    private _paddingExceptions: D3.Map<any> = d3.map();
-    private _unregisteredPaddingExceptions: D3.Set<any> = d3.set();
-    private _includedValues: D3.Map<any> = d3.map();
-    // _includedValues needs to be a map, even unregistered, to support getting un-stringified values back out
-    private _unregisteredIncludedValues: D3.Map<any> = d3.map();
+    private _paddingExceptions = new Utils.StrictEqualityAssociativeArray();
+    private _includedValues = new Utils.StrictEqualityAssociativeArray();
     private _combineExtents: (extents: any[][]) => any[];
     private static _PADDING_FOR_IDENTICAL_DOMAIN = 1;
     private static _ONE_DAY = 1000 * 60 * 60 * 24;
@@ -87,12 +84,8 @@ module Plottable {
      * @param {string} key The key to register the exception under.
      * @returns {Domainer} The calling domainer
      */
-    public addPaddingException(exception: any, key?: string): Domainer {
-      if (key != null) {
-        this._paddingExceptions.set(key, exception);
-      } else {
-        this._unregisteredPaddingExceptions.add(exception);
-      }
+    public addPaddingException(exception: any, key: any): Domainer {
+      this._paddingExceptions.set(key, exception);
       return this;
     }
 
@@ -105,12 +98,8 @@ module Plottable {
      * @param {any} keyOrException The key for the value to remove, or the value to remove
      * @return {Domainer} The calling domainer
      */
-    public removePaddingException(keyOrException: any): Domainer {
-      if (typeof(keyOrException) === "string") {
-        this._paddingExceptions.remove(keyOrException);
-      } else {
-        this._unregisteredPaddingExceptions.remove(keyOrException);
-      }
+    public removePaddingException(key: any): Domainer {
+      this._paddingExceptions.delete(key);
       return this;
     }
 
@@ -125,12 +114,8 @@ module Plottable {
      * @param {string} key The key to register the value under.
      * @returns {Domainer} The calling domainer
      */
-    public addIncludedValue(value: any, key?: string): Domainer {
-      if (key != null) {
-        this._includedValues.set(key, value);
-      } else {
-        this._unregisteredIncludedValues.set(value, value);
-      }
+    public addIncludedValue(value: any, key: any): Domainer {
+      this._includedValues.set(key, value);
       return this;
     }
 
@@ -143,12 +128,8 @@ module Plottable {
      * @param {any} keyOrException The key for the value to remove, or the value to remove
      * @return {Domainer} The calling domainer
      */
-    public removeIncludedValue(valueOrKey: any) {
-      if (typeof(valueOrKey) === "string") {
-        this._includedValues.remove(valueOrKey);
-      } else {
-        this._unregisteredIncludedValues.remove(valueOrKey);
-      }
+    public removeIncludedValue(key: any) {
+      this._includedValues.delete(key);
       return this;
     }
 
@@ -189,7 +170,7 @@ module Plottable {
                                         (scale.scale(max) - scale.scale(min)) * p);
       var newMax = scale.invert(scale.scale(max) +
                                         (scale.scale(max) - scale.scale(min)) * p);
-      var exceptionValues = this._paddingExceptions.values().concat(this._unregisteredPaddingExceptions.values());
+      var exceptionValues = this._paddingExceptions.values();
       var exceptionSet = d3.set(exceptionValues);
       if (exceptionSet.has(min)) {
         newMin = min;
@@ -209,7 +190,7 @@ module Plottable {
     }
 
     private _includeDomain(domain: any[]): any[] {
-      var includedValues = this._includedValues.values().concat(this._unregisteredIncludedValues.values());
+      var includedValues = this._includedValues.values();
       return includedValues.reduce(
         (domain, value) => [Math.min(domain[0], value), Math.max(domain[1], value)],
         domain
