@@ -3,7 +3,7 @@
 module Plottable {
 export module Plots {
 
-  export interface ValueScaleBinding<D, R> {
+  export interface AccessorScaleBinding<D, R> {
     value: _Accessor;
     scale?: Scale<D, R>;
   }
@@ -80,7 +80,7 @@ export module Plots {
       return allPlotData;
     }
 
-    public sectorValue(): ValueScaleBinding<D, number>;
+    public sectorValue(): AccessorScaleBinding<D, number>;
     public sectorValue(sectorValue: number | _Accessor): Plots.Pie<D>;
     public sectorValue(sectorValue: D | _Accessor, sectorValueScale: Scale<D, number>): Plots.Pie<D>;
     public sectorValue(sectorValue?: number | _Accessor | D, sectorValueScale?: Scale<D, number>): any {
@@ -94,7 +94,7 @@ export module Plots {
       return this;
     }
 
-    public innerRadius(): ValueScaleBinding<D, number>;
+    public innerRadius(): AccessorScaleBinding<D, number>;
     public innerRadius(innerRadius: number | _Accessor): Plots.Pie<D>;
     public innerRadius(innerRadius: D | _Accessor, innerRadiusScale: Scale<D, number>): Plots.Pie<D>;
     public innerRadius(innerRadius?: number | _Accessor | D, innerRadiusScale?: Scale<D, number>): any {
@@ -108,7 +108,7 @@ export module Plots {
       return this;
     }
 
-    public outerRadius(): ValueScaleBinding<D, number>;
+    public outerRadius(): AccessorScaleBinding<D, number>;
     public outerRadius(outerRadius: number | _Accessor): Plots.Pie<D>;
     public outerRadius(outerRadius: D | _Accessor, outerRadiusScale: Scale<D, number>): Plots.Pie<D>;
     public outerRadius(outerRadius?: number | _Accessor | D, outerRadiusScale?: Scale<D, number>): any {

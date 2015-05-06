@@ -2830,7 +2830,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Plots {
-        interface ValueScaleBinding<D, R> {
+        interface AccessorScaleBinding<D, R> {
             value: _Accessor;
             scale?: Scale<D, R>;
         }
@@ -2846,13 +2846,13 @@ declare module Plottable {
             protected _generateAttrToProjector(): AttributeToProjector;
             protected _getDrawer(key: string): Drawers.AbstractDrawer;
             getAllPlotData(datasetKeys?: string | string[]): PlotData;
-            sectorValue(): ValueScaleBinding<D, number>;
+            sectorValue(): AccessorScaleBinding<D, number>;
             sectorValue(sectorValue: number | _Accessor): Plots.Pie<D>;
             sectorValue(sectorValue: D | _Accessor, sectorValueScale: Scale<D, number>): Plots.Pie<D>;
-            innerRadius(): ValueScaleBinding<D, number>;
+            innerRadius(): AccessorScaleBinding<D, number>;
             innerRadius(innerRadius: number | _Accessor): Plots.Pie<D>;
             innerRadius(innerRadius: D | _Accessor, innerRadiusScale: Scale<D, number>): Plots.Pie<D>;
-            outerRadius(): ValueScaleBinding<D, number>;
+            outerRadius(): AccessorScaleBinding<D, number>;
             outerRadius(outerRadius: number | _Accessor): Plots.Pie<D>;
             outerRadius(outerRadius: D | _Accessor, outerRadiusScale: Scale<D, number>): Plots.Pie<D>;
             scaledInnerRadiusAccessor(): _Accessor;
