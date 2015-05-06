@@ -77,9 +77,13 @@ describe("Interactions", () => {
 
       drag.offDragStart(startCallback);
 
-      //TODO
+      startCallbackCalled = false;
+      TestMethods.triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
+      assert.isFalse(startCallbackCalled, "callback was decoupled from the interaction");
 
-      // assert.isNull(drag.onDragStart(), "removes the callback if called with null");
+      TestMethods.triggerFakeTouchEvent("touchstart", target, [{x: startPoint.x, y: startPoint.y}]);
+      assert.isFalse(startCallbackCalled, "callback was decoupled from the interaction");
+
       svg.remove();
     });
 
@@ -117,8 +121,15 @@ describe("Interactions", () => {
 
       drag.offDrag(moveCallback);
 
-      //TODO
-      // assert.isNull(drag.onDrag(), "removes the callback if called with null");
+      moveCallbackCalled = false;
+      TestMethods.triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
+      TestMethods.triggerFakeMouseEvent("mousemove", target, endPoint.x, endPoint.y);
+      assert.isFalse(moveCallbackCalled, "callback was decoupled from interaction");
+
+      TestMethods.triggerFakeTouchEvent("touchstart", target, [{x: startPoint.x, y: startPoint.y}]);
+      TestMethods.triggerFakeTouchEvent("touchmove", target, [{x: endPoint.x, y: endPoint.y}]);
+      assert.isFalse(moveCallbackCalled, "callback was decoupled from interaction");
+
       svg.remove();
     });
 
@@ -163,8 +174,15 @@ describe("Interactions", () => {
 
       drag.offDragEnd(endCallback);
 
-      //TODO
-      // assert.isNull(drag.onDragEnd(), "removes the callback if called with null");
+      endCallbackCalled = false;
+      TestMethods.triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
+      TestMethods.triggerFakeMouseEvent("mouseup", target, endPoint.x, endPoint.y);
+      assert.isFalse(endCallbackCalled, "callback was called on drag ending (mouseup)");
+
+      TestMethods.triggerFakeTouchEvent("touchstart", target, [{ x: startPoint.x, y: startPoint.y }]);
+      TestMethods.triggerFakeTouchEvent("touchend", target, [{ x: endPoint.x, y: endPoint.y }]);
+      assert.isFalse(endCallbackCalled, "callback decoupled from interaction");
+
       svg.remove();
     });
 
