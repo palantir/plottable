@@ -1131,103 +1131,6 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
-    var Core;
-    (function (Core) {
-        /**
-         * The Broadcaster holds a reference to a "listenable" object.
-         * Third parties can register and deregister listeners from the Broadcaster.
-         * When the broadcaster.broadcast() method is called, all registered callbacks
-         * are called with the Broadcaster's "listenable", along with optional
-         * arguments passed to the `broadcast` method.
-         *
-         * The listeners are called synchronously.
-         */
-        var Broadcaster = (function (_super) {
-            __extends(Broadcaster, _super);
-            /**
-             * Constructs a broadcaster, taking a "listenable" object to broadcast about.
-             *
-             * @constructor
-             * @param {L} listenable The listenable object to broadcast.
-             */
-            function Broadcaster(listenable) {
-                _super.call(this);
-                this._key2callback = new Plottable.Utils.StrictEqualityAssociativeArray();
-                this._listenable = listenable;
-            }
-            /**
-             * Registers a callback to be called when the broadcast method is called. Also takes a key which
-             * is used to support deregistering the same callback later, by passing in the same key.
-             * If there is already a callback associated with that key, then the callback will be replaced.
-             * The callback will be passed the Broadcaster's "listenable" as the `this` context.
-             *
-             * @param key The key associated with the callback. Key uniqueness is determined by deep equality.
-             * @param {BroadcasterCallback<L>} callback A callback to be called.
-             * @returns {Broadcaster} The calling Broadcaster
-             */
-            Broadcaster.prototype.registerListener = function (key, callback) {
-                this._key2callback.set(key, callback);
-                return this;
-            };
-            /**
-             * Call all listening callbacks, optionally with arguments passed through.
-             *
-             * @param ...args A variable number of optional arguments
-             * @returns {Broadcaster} The calling Broadcaster
-             */
-            Broadcaster.prototype.broadcast = function () {
-                var _this = this;
-                var args = [];
-                for (var _i = 0; _i < arguments.length; _i++) {
-                    args[_i - 0] = arguments[_i];
-                }
-                args.unshift(this._listenable);
-                this._key2callback.values().forEach(function (callback) {
-                    callback.apply(_this._listenable, args);
-                });
-                return this;
-            };
-            /**
-             * Deregisters the callback associated with a key.
-             *
-             * @param key The key to deregister.
-             * @returns {Broadcaster} The calling Broadcaster
-             */
-            Broadcaster.prototype.deregisterListener = function (key) {
-                this._key2callback.delete(key);
-                return this;
-            };
-            /**
-             * Gets the keys for all listeners attached to the Broadcaster.
-             *
-             * @returns {any[]} An array of the keys.
-             */
-            Broadcaster.prototype.getListenerKeys = function () {
-                return this._key2callback.keys();
-            };
-            /**
-             * Deregisters all listeners and callbacks associated with the Broadcaster.
-             *
-             * @returns {Broadcaster} The calling Broadcaster
-             */
-            Broadcaster.prototype.deregisterAllListeners = function () {
-                this._key2callback = new Plottable.Utils.StrictEqualityAssociativeArray();
-            };
-            return Broadcaster;
-        })(Core.PlottableObject);
-        Core.Broadcaster = Broadcaster;
-    })(Core = Plottable.Core || (Plottable.Core = {}));
-})(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
     var Dataset = (function (_super) {
         __extends(Dataset, _super);
         /**
@@ -1247,8 +1150,14 @@ var Plottable;
             this._data = data;
             this._metadata = metadata;
             this._accessor2cachedExtent = new Plottable.Utils.StrictEqualityAssociativeArray();
-            this.broadcaster = new Plottable.Core.Broadcaster(this);
+            this._callbacks = new Plottable.Utils.CallbackSet();
         }
+        Dataset.prototype.onUpdate = function (callback) {
+            this._callbacks.add(callback);
+        };
+        Dataset.prototype.offUpdate = function (callback) {
+            this._callbacks.delete(callback);
+        };
         Dataset.prototype.data = function (data) {
             if (data == null) {
                 return this._data;
@@ -1256,7 +1165,7 @@ var Plottable;
             else {
                 this._data = data;
                 this._accessor2cachedExtent = new Plottable.Utils.StrictEqualityAssociativeArray();
-                this.broadcaster.broadcast();
+                this._callbacks.callCallbacks(this);
                 return this;
             }
         };
@@ -1267,7 +1176,7 @@ var Plottable;
             else {
                 this._metadata = metadata;
                 this._accessor2cachedExtent = new Plottable.Utils.StrictEqualityAssociativeArray();
-                this.broadcaster.broadcast();
+                this._callbacks.callCallbacks(this);
                 return this;
             }
         };
@@ -6513,6 +6422,7 @@ var Plottable;
             this._datasetKeysInOrder = [];
             this._nextSeriesIndex = 0;
             this._renderCallback = function (scale) { return _this.render(); };
+            this._onDatasetUpdateCallback = function () { return _this._onDatasetUpdate(); };
         }
         Plot.prototype.anchor = function (selection) {
             _super.prototype.anchor.call(this, selection);
@@ -6548,7 +6458,6 @@ var Plottable;
             return this;
         };
         Plot.prototype._addDataset = function (key, dataset) {
-            var _this = this;
             if (this._key2PlotDatasetKey.has(key)) {
                 this.removeDataset(key);
             }
@@ -6561,7 +6470,7 @@ var Plottable;
             if (this._isSetup) {
                 drawer.setup(this._renderArea.append("g"));
             }
-            dataset.broadcaster.registerListener(this, function () { return _this._onDatasetUpdate(); });
+            dataset.onUpdate(this._onDatasetUpdateCallback);
             this._onDatasetUpdate();
         };
         Plot.prototype._getDrawer = function (key) {
@@ -6806,7 +6715,7 @@ var Plottable;
             if (key != null && this._key2PlotDatasetKey.has(key)) {
                 var pdk = this._key2PlotDatasetKey.get(key);
                 pdk.drawer.remove();
-                pdk.dataset.broadcaster.deregisterListener(this);
+                pdk.dataset.offUpdate(this._onDatasetUpdateCallback);
                 this._datasetKeysInOrder.splice(this._datasetKeysInOrder.indexOf(key), 1);
                 this._key2PlotDatasetKey.remove(key);
                 this._onDatasetUpdate();

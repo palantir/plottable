@@ -40,6 +40,7 @@ module Plottable {
     protected _animateOnNextRender = true;
     private _nextSeriesIndex: number;
     private _renderCallback: ScaleCallback<Scale<any, any>>;
+    private _onDatasetUpdateCallback: DatasetCallback;
 
     /**
      * Constructs a Plot.
@@ -62,6 +63,7 @@ module Plottable {
       this._datasetKeysInOrder = [];
       this._nextSeriesIndex = 0;
       this._renderCallback = (scale) => this.render();
+      this._onDatasetUpdateCallback = () => this._onDatasetUpdate();
     }
 
     public anchor(selection: D3.Selection) {
@@ -124,7 +126,8 @@ module Plottable {
       if (this._isSetup) {
         drawer.setup(this._renderArea.append("g"));
       }
-      dataset.broadcaster.registerListener(this, () => this._onDatasetUpdate());
+
+      dataset.onUpdate(this._onDatasetUpdateCallback);
       this._onDatasetUpdate();
     }
 
@@ -412,7 +415,7 @@ module Plottable {
       if (key != null && this._key2PlotDatasetKey.has(key)) {
         var pdk = this._key2PlotDatasetKey.get(key);
         pdk.drawer.remove();
-        pdk.dataset.broadcaster.deregisterListener(this);
+        pdk.dataset.offUpdate(this._onDatasetUpdateCallback);
         this._datasetKeysInOrder.splice(this._datasetKeysInOrder.indexOf(key), 1);
         this._key2PlotDatasetKey.remove(key);
         this._onDatasetUpdate();

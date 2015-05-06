@@ -1,6 +1,9 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
+
+  export type DatasetCallback = (dataset: Dataset) => any;
+
   type CachedExtent = {
     accessor: _Accessor;
     extent: any[];
@@ -9,7 +12,7 @@ module Plottable {
     private _data: any[];
     private _metadata: any;
     private _accessor2cachedExtent: Utils.StrictEqualityAssociativeArray;
-    public broadcaster: Core.Broadcaster<Dataset>;
+    private _callbacks: Utils.CallbackSet<DatasetCallback>;
 
     /**
      * Constructs a new set.
@@ -26,7 +29,15 @@ module Plottable {
       this._data = data;
       this._metadata = metadata;
       this._accessor2cachedExtent = new Utils.StrictEqualityAssociativeArray();
-      this.broadcaster = new Core.Broadcaster(this);
+      this._callbacks = new Utils.CallbackSet<DatasetCallback>();
+    }
+
+    public onUpdate(callback: DatasetCallback) {
+      this._callbacks.add(callback);
+    }
+
+    public offUpdate(callback: DatasetCallback) {
+      this._callbacks.delete(callback);
     }
 
     /**
@@ -48,7 +59,7 @@ module Plottable {
       } else {
         this._data = data;
         this._accessor2cachedExtent = new Utils.StrictEqualityAssociativeArray();
-        this.broadcaster.broadcast();
+        this._callbacks.callCallbacks(this);
         return this;
       }
     }
@@ -73,7 +84,7 @@ module Plottable {
       } else {
         this._metadata = metadata;
         this._accessor2cachedExtent = new Utils.StrictEqualityAssociativeArray();
-        this.broadcaster.broadcast();
+        this._callbacks.callCallbacks(this);
         return this;
       }
     }

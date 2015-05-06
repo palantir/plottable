@@ -2117,17 +2117,17 @@ describe("Plots", function () {
             var r = new CountingPlot();
             r.addDataset("foo", dFoo);
             assert.strictEqual(1, r.renders, "initial render due to addDataset");
-            dFoo.broadcaster.broadcast();
+            dFoo.data(dFoo.data());
             assert.strictEqual(2, r.renders, "we re-render when our dataset changes");
             r.addDataset("bar", dBar);
             assert.strictEqual(3, r.renders, "we should redraw when we add a dataset");
-            dFoo.broadcaster.broadcast();
+            dFoo.data(dFoo.data());
             assert.strictEqual(4, r.renders, "we should still listen to the first dataset");
-            dBar.broadcaster.broadcast();
+            dFoo.data(dFoo.data());
             assert.strictEqual(5, r.renders, "we should listen to the new dataset");
             r.removeDataset("foo");
             assert.strictEqual(6, r.renders, "we re-render on dataset removal");
-            dFoo.broadcaster.broadcast();
+            dFoo.data(dFoo.data());
             assert.strictEqual(6, r.renders, "we don't listen to removed datasets");
         });
         it("Updates its projectors when the Dataset is changed", function () {
@@ -2152,7 +2152,7 @@ describe("Plots", function () {
             });
             assert.strictEqual(0, xScaleCalls, "initially hasn't made any X callbacks");
             assert.strictEqual(0, yScaleCalls, "initially hasn't made any Y callbacks");
-            d1.broadcaster.broadcast();
+            d1.data(d1.data());
             assert.strictEqual(1, xScaleCalls, "X scale was wired up to datasource correctly");
             assert.strictEqual(1, yScaleCalls, "Y scale was wired up to datasource correctly");
             var d2 = new Plottable.Dataset([{ x: 7, y: 8 }], { cssClass: "boo" });
@@ -2160,10 +2160,10 @@ describe("Plots", function () {
             r.addDataset(d2);
             assert.strictEqual(3, xScaleCalls, "Changing datasource fires X scale listeners (but doesn't coalesce callbacks)");
             assert.strictEqual(3, yScaleCalls, "Changing datasource fires Y scale listeners (but doesn't coalesce callbacks)");
-            d1.broadcaster.broadcast();
+            d1.data(d1.data());
             assert.strictEqual(3, xScaleCalls, "X scale was unhooked from old datasource");
             assert.strictEqual(3, yScaleCalls, "Y scale was unhooked from old datasource");
-            d2.broadcaster.broadcast();
+            d2.data(d2.data());
             assert.strictEqual(4, xScaleCalls, "X scale was hooked into new datasource");
             assert.strictEqual(4, yScaleCalls, "Y scale was hooked into new datasource");
         });
@@ -5747,72 +5747,6 @@ describe("Plots", function () {
 
 ///<reference path="../testReference.ts" />
 var assert = chai.assert;
-describe("Broadcasters", function () {
-    var b;
-    var called;
-    var cb;
-    var listenable = {};
-    beforeEach(function () {
-        b = new Plottable.Core.Broadcaster(listenable);
-        called = false;
-        cb = function () {
-            called = true;
-        };
-    });
-    it("listeners are called by the broadcast method", function () {
-        b.registerListener(null, cb);
-        b.broadcast();
-        assert.isTrue(called, "callback was called");
-    });
-    it("same listener can only be associated with one callback", function () {
-        var called2 = false;
-        var cb2 = function () {
-            called2 = true;
-        };
-        var listener = {};
-        b.registerListener(listener, cb);
-        b.registerListener(listener, cb2);
-        b.broadcast();
-        assert.isFalse(called, "first (overwritten) callback not called");
-        assert.isTrue(called2, "second callback was called");
-    });
-    it("listeners can be deregistered", function () {
-        var listener = {};
-        b.registerListener(listener, cb);
-        b.deregisterListener(listener);
-        b.broadcast();
-        assert.isFalse(called, "callback was not called after deregistering only listener");
-        b.registerListener(5, cb);
-        b.registerListener(6, cb);
-        b.deregisterAllListeners();
-        b.broadcast();
-        assert.isFalse(called, "callback was not called after deregistering all listeners");
-        b.registerListener(5, cb);
-        b.registerListener(6, cb);
-        b.deregisterListener(5);
-        b.broadcast();
-        assert.isTrue(called, "callback was called even after 1/2 listeners were deregistered");
-    });
-    it("arguments are passed through to callback", function () {
-        var g2 = {};
-        var g3 = "foo";
-        var cb = function (arg1, arg2, arg3) {
-            assert.strictEqual(listenable, arg1, "broadcaster passed through");
-            assert.strictEqual(g2, arg2, "g2 passed through");
-            assert.strictEqual(g3, arg3, "g3 passed through");
-            called = true;
-        };
-        b.registerListener(null, cb);
-        b.broadcast(g2, g3);
-        assert.isTrue(called, "the cb was called");
-    });
-    it("deregistering an unregistered listener doesn't throw an error", function () {
-        assert.doesNotThrow(function () { return b.deregisterListener({}); });
-    });
-});
-
-///<reference path="../testReference.ts" />
-var assert = chai.assert;
 describe("Metadata", function () {
     var xScale;
     var yScale;
@@ -6785,7 +6719,7 @@ describe("Dataset", function () {
             assert.deepEqual(ds.data(), newData, "Dataset arrives with correct data");
             callbackCalled = true;
         };
-        ds.broadcaster.registerListener(null, callback);
+        ds.onUpdate(callback);
         ds.data(newData);
         assert.isTrue(callbackCalled, "callback was called when the data was changed");
     });
@@ -6798,9 +6732,26 @@ describe("Dataset", function () {
             assert.deepEqual(ds.metadata(), newMetadata, "Dataset arrives with correct metadata");
             callbackCalled = true;
         };
-        ds.broadcaster.registerListener(null, callback);
+        ds.onUpdate(callback);
         ds.metadata(newMetadata);
         assert.isTrue(callbackCalled, "callback was called when the metadata was changed");
+    });
+    it("Removing listener from dataset should be possible", function () {
+        var ds = new Plottable.Dataset();
+        var newData1 = [1, 2, 3];
+        var newData2 = [4, 5, 6];
+        var callbackCalled = false;
+        var callback = function (listenable) {
+            assert.strictEqual(listenable, ds, "Callback received the Dataset as the first argument");
+            callbackCalled = true;
+        };
+        ds.onUpdate(callback);
+        ds.data(newData1);
+        assert.isTrue(callbackCalled, "callback was called when the data was changed");
+        callbackCalled = false;
+        ds.offUpdate(callback);
+        ds.data(newData2);
+        assert.isFalse(callbackCalled, "callback was called when the data was changed");
     });
     it("_getExtent works as expected with user metadata", function () {
         var data = [1, 2, 3, 4, 1];
