@@ -44,6 +44,13 @@ export module Plots {
     public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
       super.computeLayout(origin, availableWidth, availableHeight);
       this._renderArea.attr("transform", "translate(" + this.width() / 2 + "," + this.height() / 2 + ")");
+      var radiusLimit = Math.min(this.width(), this.height()) / 2;
+      if (this._innerRadiusScale != null) {
+        this._innerRadiusScale.range([0, radiusLimit]);
+      }
+      if (this._outerRadiusScale != null) {
+        this._outerRadiusScale.range([0, radiusLimit]);
+      }
       return this;
     }
 

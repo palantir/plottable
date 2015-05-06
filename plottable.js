@@ -7016,6 +7016,13 @@ var Plottable;
             Pie.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
                 _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
                 this._renderArea.attr("transform", "translate(" + this.width() / 2 + "," + this.height() / 2 + ")");
+                var radiusLimit = Math.min(this.width(), this.height()) / 2;
+                if (this._innerRadiusScale != null) {
+                    this._innerRadiusScale.range([0, radiusLimit]);
+                }
+                if (this._outerRadiusScale != null) {
+                    this._outerRadiusScale.range([0, radiusLimit]);
+                }
                 return this;
             };
             Pie.prototype.addDataset = function (keyOrDataset, dataset) {
