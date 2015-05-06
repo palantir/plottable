@@ -524,89 +524,83 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Core {
-        module RenderControllers {
-            module RenderPolicies {
-                /**
-                 * A policy to render components.
-                 */
-                interface RenderPolicy {
-                    render(): any;
-                }
-                /**
-                 * Never queue anything, render everything immediately. Useful for
-                 * debugging, horrible for performance.
-                 */
-                class Immediate implements RenderPolicy {
-                    render(): void;
-                }
-                /**
-                 * The default way to render, which only tries to render every frame
-                 * (usually, 1/60th of a second).
-                 */
-                class AnimationFrame implements RenderPolicy {
-                    render(): void;
-                }
-                /**
-                 * Renders with `setTimeout`. This is generally an inferior way to render
-                 * compared to `requestAnimationFrame`, but it's still there if you want
-                 * it.
-                 */
-                class Timeout implements RenderPolicy {
-                    _timeoutMsec: number;
-                    render(): void;
-                }
-            }
+    module RenderPolicies {
+        /**
+         * A policy to render components.
+         */
+        interface RenderPolicy {
+            render(): any;
+        }
+        /**
+         * Never queue anything, render everything immediately. Useful for
+         * debugging, horrible for performance.
+         */
+        class Immediate implements RenderPolicy {
+            render(): void;
+        }
+        /**
+         * The default way to render, which only tries to render every frame
+         * (usually, 1/60th of a second).
+         */
+        class AnimationFrame implements RenderPolicy {
+            render(): void;
+        }
+        /**
+         * Renders with `setTimeout`. This is generally an inferior way to render
+         * compared to `requestAnimationFrame`, but it's still there if you want
+         * it.
+         */
+        class Timeout implements RenderPolicy {
+            _timeoutMsec: number;
+            render(): void;
         }
     }
 }
 
 
 declare module Plottable {
-    module Core {
+    /**
+     * The RenderController is responsible for enqueueing and synchronizing
+     * layout and render calls for Plottable components.
+     *
+     * Layouts and renders occur inside an animation callback
+     * (window.requestAnimationFrame if available).
+     *
+     * If you require immediate rendering, call RenderController.flush() to
+     * perform enqueued layout and rendering serially.
+     *
+     * If you want to always have immediate rendering (useful for debugging),
+     * call
+     * ```typescript
+     * Plottable.RenderController.setRenderPolicy(
+     *   new Plottable.RenderPolicy.Immediate()
+     * );
+     * ```
+     */
+    module RenderController {
+        var _renderPolicy: RenderPolicies.RenderPolicy;
+        function setRenderPolicy(policy: string | RenderPolicies.RenderPolicy): void;
         /**
-         * The RenderController is responsible for enqueueing and synchronizing
-         * layout and render calls for Plottable components.
+         * If the RenderController is enabled, we enqueue the component for
+         * render. Otherwise, it is rendered immediately.
          *
-         * Layouts and renders occur inside an animation callback
-         * (window.requestAnimationFrame if available).
-         *
-         * If you require immediate rendering, call RenderController.flush() to
-         * perform enqueued layout and rendering serially.
-         *
-         * If you want to always have immediate rendering (useful for debugging),
-         * call
-         * ```typescript
-         * Plottable.Core.RenderController.setRenderPolicy(
-         *   new Plottable.Core.RenderController.RenderPolicy.Immediate()
-         * );
-         * ```
+         * @param {Component} component Any Plottable component.
          */
-        module RenderControllers {
-            var _renderPolicy: RenderPolicies.RenderPolicy;
-            function setRenderPolicy(policy: string | RenderPolicies.RenderPolicy): void;
-            /**
-             * If the RenderController is enabled, we enqueue the component for
-             * render. Otherwise, it is rendered immediately.
-             *
-             * @param {Component} component Any Plottable component.
-             */
-            function registerToRender(component: Component): void;
-            /**
-             * If the RenderController is enabled, we enqueue the component for
-             * layout and render. Otherwise, it is rendered immediately.
-             *
-             * @param {Component} component Any Plottable component.
-             */
-            function registerToComputeLayout(component: Component): void;
-            /**
-             * Render everything that is waiting to be rendered right now, instead of
-             * waiting until the next frame.
-             *
-             * Useful to call when debugging.
-             */
-            function flush(): void;
-        }
+        function registerToRender(component: Component): void;
+        /**
+         * If the RenderController is enabled, we enqueue the component for
+         * layout and render. Otherwise, it is rendered immediately.
+         *
+         * @param {Component} component Any Plottable component.
+         */
+        function registerToComputeLayout(component: Component): void;
+        /**
+         * Render everything that is waiting to be rendered right now, instead of
+         * waiting until the next frame.
+         *
+         * Useful to call when debugging.
+         */
+        function flush(): void;
     }
 }
 
