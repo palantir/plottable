@@ -151,8 +151,8 @@ describe("ComponentGroups", () => {
       var groupRequest = cg._requestedSpace(SVG_WIDTH, SVG_HEIGHT);
       var c1Request = c1._requestedSpace(SVG_WIDTH, SVG_HEIGHT);
       assert.deepEqual(groupRequest, c1Request, "request reflects request of sub-component");
-      assert.isFalse(cg._isFixedWidth(), "width is not fixed if subcomponents are not fixed width");
-      assert.isFalse(cg._isFixedHeight(), "height is not fixed if subcomponents are not fixed height");
+      assert.isFalse(cg.hasFixedWidth(), "width is not fixed if subcomponents are not fixed width");
+      assert.isFalse(cg.hasFixedHeight(), "height is not fixed if subcomponents are not fixed height");
 
       cg.renderTo(svg);
       assert.strictEqual(cg.width(), SVG_WIDTH, "occupies all offered width");

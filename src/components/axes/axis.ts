@@ -102,11 +102,11 @@ module Plottable {
       };
     }
 
-    public _isFixedHeight() {
+    public hasFixedHeight() {
       return this._isHorizontal();
     }
 
-    public _isFixedWidth() {
+    public hasFixedWidth() {
       return !this._isHorizontal();
     }
 

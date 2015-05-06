@@ -51,12 +51,12 @@ export module Components {
       };
     }
 
-    public _isFixedWidth(): boolean {
-      return this.components().every((c) => c._isFixedWidth());
+    public hasFixedWidth(): boolean {
+      return this.components().every((c) => c.hasFixedWidth());
     }
 
-    public _isFixedHeight(): boolean {
-      return this.components().every((c) => c._isFixedHeight());
+    public hasFixedHeight(): boolean {
+      return this.components().every((c) => c.hasFixedHeight());
     }
   }
 }

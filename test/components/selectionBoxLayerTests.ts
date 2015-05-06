@@ -72,7 +72,7 @@ describe("SelectionBoxLayer", () => {
     var sbl = new Plottable.Components.SelectionBoxLayer();
     var request = sbl._requestedSpace(400, 400);
     TestMethods.verifySpaceRequest(request, 0, 0, "does not request any space");
-    assert.isTrue(sbl._isFixedWidth(), "fixed width");
-    assert.isTrue(sbl._isFixedHeight(), "fixed height");
+    assert.isTrue(sbl.hasFixedWidth(), "fixed width");
+    assert.isTrue(sbl.hasFixedHeight(), "fixed height");
   });
 });
