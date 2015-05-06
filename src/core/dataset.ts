@@ -58,7 +58,7 @@ module Plottable {
         return this._data;
       } else {
         this._data = data;
-        this._accessor2cachedExtent = new Utils.Map();
+        this._accessor2cachedExtent = new Utils.Map<any, any>();
         this._callbacks.callCallbacks(this);
         return this;
       }
@@ -83,7 +83,7 @@ module Plottable {
         return this._metadata;
       } else {
         this._metadata = metadata;
-        this._accessor2cachedExtent = new Utils.Map();
+        this._accessor2cachedExtent = new Utils.Map<any, any>();
         this._callbacks.callCallbacks(this);
         return this;
       }
