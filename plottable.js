@@ -3199,7 +3199,7 @@ var Plottable;
                 var _this = this;
                 var metadata = this._piePlot._key2PlotDatasetKey.get(this.key).dataset.metadata();
                 var plotMetadata = this._piePlot._key2PlotDatasetKey.get(this.key).plotMetadata;
-                return d3.svg.arc().innerRadius(function (d, i) { return _this._piePlot.scaledInnerRadiusAccessor()(d, i, metadata, plotMetadata); }).outerRadius(function (d, i) { return _this._piePlot.outerRadiusAccessor()(d, i, metadata, plotMetadata); });
+                return d3.svg.arc().innerRadius(function (d, i) { return _this._piePlot.scaledInnerRadiusAccessor()(d, i, metadata, plotMetadata); }).outerRadius(function (d, i) { return _this._piePlot.scaledOuterRadiusAccessor()(d, i, metadata, plotMetadata); });
             };
             Arc.prototype.retargetProjectors = function (attrToProjector) {
                 var retargetedAttrToProjector = {};
@@ -3217,7 +3217,7 @@ var Plottable;
             Arc.prototype.draw = function (data, drawSteps, userMetadata, plotMetadata) {
                 var _this = this;
                 // HACKHACK Applying metadata should be done in base class
-                var valueAccessor = function (d, i) { return _this._piePlot.valueAccessor()(d, i, userMetadata, plotMetadata); };
+                var valueAccessor = function (d, i) { return _this._piePlot.scaledSectorValueAccessor()(d, i, userMetadata, plotMetadata); };
                 data = data.filter(function (e) { return Plottable.Utils.Methods.isValidNumber(+valueAccessor(e, null)); });
                 var pie = d3.layout.pie().sort(null).value(valueAccessor)(data);
                 pie.forEach(function (slice) {
@@ -3228,12 +3228,11 @@ var Plottable;
                 return _super.prototype.draw.call(this, pie, drawSteps, userMetadata, plotMetadata);
             };
             Arc.prototype._getPixelPoint = function (datum, index) {
-                var _this = this;
                 var metadata = this._piePlot._key2PlotDatasetKey.get(this.key).dataset.metadata();
                 var plotMetadata = this._piePlot._key2PlotDatasetKey.get(this.key).plotMetadata;
                 var innerRadius = this._piePlot.scaledInnerRadiusAccessor()(datum, index, metadata, plotMetadata);
-                var outerRadiusAccessor = function (d, i) { return _this._piePlot.outerRadiusAccessor()(d, i, metadata, plotMetadata); };
-                var avgRadius = (innerRadius + outerRadiusAccessor(datum, index)) / 2;
+                var outerRadius = this._piePlot.scaledOuterRadiusAccessor()(datum, index, metadata, plotMetadata);
+                var avgRadius = (innerRadius + outerRadius) / 2;
                 var startAngle = +this._getSelection(index).datum().startAngle;
                 var endAngle = +this._getSelection(index).datum().endAngle;
                 var avgAngle = (startAngle + endAngle) / 2;
@@ -7011,7 +7010,7 @@ var Plottable;
                 _super.call(this);
                 this._colorScale = new Plottable.Scales.Color();
                 this._innerRadius = 0;
-                this._outerRadiusAccessor = function () { return Math.min(_this.width(), _this.height()) / 2; };
+                this._outerRadius = function () { return Math.min(_this.width(), _this.height()) / 2; };
                 this.classed("pie-plot", true);
             }
             Pie.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
@@ -7046,17 +7045,19 @@ var Plottable;
                 });
                 return allPlotData;
             };
-            Pie.prototype.valueAccessor = function (valueAccessor) {
-                if (valueAccessor == null) {
-                    return this._valueAccessor;
+            Pie.prototype.sectorValue = function (sectorValue, sectorValueScale) {
+                if (sectorValue == null) {
+                    return Pie._constructBinding(this._sectorValue, this._sectorValueScale);
                 }
-                this._valueAccessor = valueAccessor;
+                this._sectorValue = sectorValue;
+                Pie._replaceScaleBinding(this._sectorValueScale, sectorValueScale, this._renderCallback);
+                this._sectorValueScale = sectorValueScale;
                 this._render();
                 return this;
             };
             Pie.prototype.innerRadius = function (innerRadius, innerRadiusScale) {
                 if (innerRadius == null) {
-                    return this._innerRadiusScale == null ? { value: this._innerRadius } : { value: this._innerRadius, scale: this._innerRadiusScale };
+                    return Pie._constructBinding(this._innerRadius, this._innerRadiusScale);
                 }
                 this._innerRadius = innerRadius;
                 Pie._replaceScaleBinding(this._innerRadiusScale, innerRadiusScale, this._renderCallback);
@@ -7064,11 +7065,30 @@ var Plottable;
                 this._render();
                 return this;
             };
+            Pie.prototype.outerRadius = function (outerRadius, outerRadiusScale) {
+                if (outerRadius == null) {
+                    return Pie._constructBinding(this._outerRadius, this._outerRadiusScale);
+                }
+                this._outerRadius = outerRadius;
+                Pie._replaceScaleBinding(this._outerRadiusScale, outerRadiusScale, this._renderCallback);
+                this._outerRadiusScale = outerRadiusScale;
+                this._render();
+                return this;
+            };
             Pie.prototype.scaledInnerRadiusAccessor = function () {
                 return Pie._scaledValueAccessor(this._innerRadius, this._innerRadiusScale);
             };
+            Pie.prototype.scaledOuterRadiusAccessor = function () {
+                return Pie._scaledValueAccessor(this._outerRadius, this._outerRadiusScale);
+            };
+            Pie.prototype.scaledSectorValueAccessor = function () {
+                return Pie._scaledValueAccessor(this._sectorValue, this._sectorValueScale);
+            };
             Pie._scaledValueAccessor = function (value, scale) {
                 return scale == null ? d3.functor(value) : function (d, i, u, m) { return scale.scale(value); };
+            };
+            Pie._constructBinding = function (value, scale) {
+                return scale == null ? { accessor: value } : { accessor: value, scale: scale };
             };
             Pie._replaceScaleBinding = function (oldScale, newScale, callback) {
                 if (oldScale !== newScale) {
@@ -7079,14 +7099,6 @@ var Plottable;
                         newScale.onUpdate(callback);
                     }
                 }
-            };
-            Pie.prototype.outerRadiusAccessor = function (outerRadiusAccessor) {
-                if (outerRadiusAccessor == null) {
-                    return this._outerRadiusAccessor;
-                }
-                this._outerRadiusAccessor = outerRadiusAccessor;
-                this._render();
-                return this;
             };
             return Pie;
         })(Plottable.Plot);

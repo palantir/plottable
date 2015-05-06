@@ -2830,9 +2830,9 @@ declare module Plottable {
 
 declare module Plottable {
     module Plots {
-        interface ValueScaleBinding<V, D> {
+        interface ValueScaleBinding<V, D, R> {
             value: V | _Accessor | D;
-            scale?: Scale<D, number>;
+            scale?: Scale<D, R>;
         }
         class Pie<D> extends Plot {
             /**
@@ -2846,14 +2846,18 @@ declare module Plottable {
             protected _generateAttrToProjector(): AttributeToProjector;
             protected _getDrawer(key: string): Drawers.AbstractDrawer;
             getAllPlotData(datasetKeys?: string | string[]): PlotData;
-            valueAccessor(): _Accessor;
-            valueAccessor(valueAccessor: _Accessor): Plots.Pie<D>;
-            innerRadius(): ValueScaleBinding<number, D>;
+            sectorValue(): ValueScaleBinding<number, D, number>;
+            sectorValue(sectorValue: number | _Accessor): Plots.Pie<D>;
+            sectorValue(sectorValue: D | _Accessor, sectorValueScale: Scale<D, number>): Plots.Pie<D>;
+            innerRadius(): ValueScaleBinding<number, D, number>;
             innerRadius(innerRadius: number | _Accessor): Plots.Pie<D>;
             innerRadius(innerRadius: D | _Accessor, innerRadiusScale: Scale<D, number>): Plots.Pie<D>;
+            outerRadius(): ValueScaleBinding<number, D, number>;
+            outerRadius(outerRadius: number | _Accessor): Plots.Pie<D>;
+            outerRadius(outerRadius: D | _Accessor, outerRadiusScale: Scale<D, number>): Plots.Pie<D>;
             scaledInnerRadiusAccessor(): _Accessor;
-            outerRadiusAccessor(): _Accessor;
-            outerRadiusAccessor(outerRadiusAccessor: _Accessor): Plots.Pie<D>;
+            scaledOuterRadiusAccessor(): _Accessor;
+            scaledSectorValueAccessor(): _Accessor;
         }
     }
 }

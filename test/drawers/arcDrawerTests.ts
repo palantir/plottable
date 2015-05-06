@@ -11,7 +11,7 @@ describe("Drawers", () => {
       (<any> piePlot)._getDrawer = () => drawer;
 
       piePlot.addDataset("one", data);
-      piePlot.valueAccessor((d) => d.value);
+      piePlot.sectorValue((d) => d.value);
       piePlot.renderTo(svg);
 
       piePlot.getAllSelections().each(function (datum: any, index: number) {

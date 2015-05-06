@@ -17,7 +17,7 @@ export module Drawers {
       var plotMetadata = (<any> this._piePlot)._key2PlotDatasetKey.get(this.key).plotMetadata;
       return d3.svg.arc()
                    .innerRadius((d, i) => this._piePlot.scaledInnerRadiusAccessor()(d, i, metadata, plotMetadata))
-                   .outerRadius((d, i) => this._piePlot.outerRadiusAccessor()(d, i, metadata, plotMetadata));
+                   .outerRadius((d, i) => this._piePlot.scaledOuterRadiusAccessor()(d, i, metadata, plotMetadata));
     }
 
     private retargetProjectors(attrToProjector: AttributeToAppliedProjector): AttributeToAppliedProjector {
@@ -38,7 +38,7 @@ export module Drawers {
 
     public draw(data: any[], drawSteps: DrawStep[], userMetadata: any, plotMetadata: Plots.PlotMetadata) {
       // HACKHACK Applying metadata should be done in base class
-      var valueAccessor = (d: any, i: number) => this._piePlot.valueAccessor()(d, i, userMetadata, plotMetadata);
+      var valueAccessor = (d: any, i: number) => this._piePlot.scaledSectorValueAccessor()(d, i, userMetadata, plotMetadata);
 
       data = data.filter(e => Plottable.Utils.Methods.isValidNumber(+valueAccessor(e, null)));
 
@@ -58,8 +58,8 @@ export module Drawers {
       var metadata = (<any> this._piePlot)._key2PlotDatasetKey.get(this.key).dataset.metadata();
       var plotMetadata = (<any> this._piePlot)._key2PlotDatasetKey.get(this.key).plotMetadata;
       var innerRadius = this._piePlot.scaledInnerRadiusAccessor()(datum, index, metadata, plotMetadata);
-      var outerRadiusAccessor = (d: any, i: number) => this._piePlot.outerRadiusAccessor()(d, i, metadata, plotMetadata);
-      var avgRadius = (innerRadius + outerRadiusAccessor(datum, index)) / 2;
+      var outerRadius = this._piePlot.scaledOuterRadiusAccessor()(datum, index, metadata, plotMetadata);
+      var avgRadius = (innerRadius + outerRadius) / 2;
       var startAngle = +this._getSelection(index).datum().startAngle;
       var endAngle = +this._getSelection(index).datum().endAngle;
       var avgAngle = (startAngle + endAngle) / 2;
