@@ -8468,7 +8468,10 @@ describe("Interactions", function () {
             keyInteraction.offKey(aCode, aCallback);
             aCallbackCalled = false;
             $target.simulate("keydown", { keyCode: aCode });
-            assert.isFalse(aCallbackCalled, "callback for \"a\" was not called when \"a\" key was pressed");
+            assert.isFalse(aCallbackCalled, "callback for \"a\" was disconnected from the interaction");
+            keyInteraction.onKey(aCode, aCallback);
+            $target.simulate("keydown", { keyCode: aCode });
+            assert.isTrue(aCallbackCalled, "callback for \"a\" was properly connected back to the interaction");
             svg.remove();
         });
         it("multiple callbacks are possible", function () {
