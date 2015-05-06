@@ -3,8 +3,8 @@
 module Plottable {
 export module Plots {
 
-  export interface PieValueBinding<D> {
-    accessor: _Accessor;
+  export interface ValueScaleBinding<V, D> {
+    value: V | _Accessor | D;
     scale?: Scale<D, number>;
   }
 
@@ -89,37 +89,28 @@ export module Plots {
       return this;
     }
 
-    public innerRadius(): number | _Accessor | D;
-    public innerRadius(innerRadius: number | _Accessor | D): Plots.Pie<D>;
-    public innerRadius(innerRadius?: number | _Accessor | D): any {
+    public innerRadius(): ValueScaleBinding<number, D>;
+    public innerRadius(innerRadius: number | _Accessor): Plots.Pie<D>;
+    public innerRadius(innerRadius: D | _Accessor, innerRadiusScale: Scale<D, number>): Plots.Pie<D>;
+    public innerRadius(innerRadius?: number | _Accessor | D, innerRadiusScale?: Scale<D, number>): any {
       if (innerRadius == null) {
-        return this._innerRadius;
+        return this._innerRadiusScale == null ? { value: this._innerRadius } : { value: this._innerRadius, scale: this._innerRadiusScale };
       }
       this._innerRadius = innerRadius;
-      this._render();
-      return this;
-    }
-
-    public innerRadiusScale(): Scale<D, number>;
-    public innerRadiusScale(innerRadiusScale: Scale<D, number>): Plots.Pie<D>;
-    public innerRadiusScale(innerRadiusScale?: Scale<D, number>): any {
-      if (innerRadiusScale == null) {
-        return this._innerRadiusScale;
-      }
       Pie._replaceScaleBinding(this._innerRadiusScale, innerRadiusScale, this._renderCallback);
       this._innerRadiusScale = innerRadiusScale;
       this._render();
       return this;
     }
 
-    public innerRadiusScaledAccessor(): _Accessor {
-      return Pie._scaledAccessor(this._innerRadius, this._innerRadiusScale);
+    public scaledInnerRadiusAccessor(): _Accessor {
+      return Pie._scaledValueAccessor(this._innerRadius, this._innerRadiusScale);
     }
 
-    private static _scaledAccessor<SD, SR>(value: SD, scale: Scale<SD, SR>): _Accessor {
+    private static _scaledValueAccessor<V, SD, SR>(value: V | SD | _Accessor, scale: Scale<SD, SR>): _Accessor {
       return scale == null ?
-               d3.functor(value) :
-               (d: any, i: number, u: any, m: Plots.PlotMetadata) => scale.scale(value);
+               d3.functor(<_Accessor> value) :
+               (d: any, i: number, u: any, m: Plots.PlotMetadata) => scale.scale(<SD> value);
     }
 
     private static _replaceScaleBinding(oldScale: Scale<any, any>, newScale: Scale<any, any>, callback: ScaleCallback<Scale<any, any>>) {

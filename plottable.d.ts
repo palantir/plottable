@@ -2830,8 +2830,8 @@ declare module Plottable {
 
 declare module Plottable {
     module Plots {
-        interface PieValueBinding<D> {
-            accessor: _Accessor;
+        interface ValueScaleBinding<V, D> {
+            value: V | _Accessor | D;
             scale?: Scale<D, number>;
         }
         class Pie<D> extends Plot {
@@ -2848,11 +2848,10 @@ declare module Plottable {
             getAllPlotData(datasetKeys?: string | string[]): PlotData;
             valueAccessor(): _Accessor;
             valueAccessor(valueAccessor: _Accessor): Plots.Pie<D>;
-            innerRadius(): number | _Accessor | D;
-            innerRadius(innerRadius: number | _Accessor | D): Plots.Pie<D>;
-            innerRadiusScale(): Scale<D, number>;
-            innerRadiusScale(innerRadiusScale: Scale<D, number>): Plots.Pie<D>;
-            innerRadiusScaledAccessor(): _Accessor;
+            innerRadius(): ValueScaleBinding<number, D>;
+            innerRadius(innerRadius: number | _Accessor): Plots.Pie<D>;
+            innerRadius(innerRadius: D | _Accessor, innerRadiusScale: Scale<D, number>): Plots.Pie<D>;
+            scaledInnerRadiusAccessor(): _Accessor;
             outerRadiusAccessor(): _Accessor;
             outerRadiusAccessor(outerRadiusAccessor: _Accessor): Plots.Pie<D>;
         }

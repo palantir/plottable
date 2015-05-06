@@ -16,7 +16,7 @@ export module Drawers {
       var metadata = (<any> this._piePlot)._key2PlotDatasetKey.get(this.key).dataset.metadata();
       var plotMetadata = (<any> this._piePlot)._key2PlotDatasetKey.get(this.key).plotMetadata;
       return d3.svg.arc()
-                   .innerRadius((d, i) => this._piePlot.innerRadiusScaledAccessor()(d, i, metadata, plotMetadata))
+                   .innerRadius((d, i) => this._piePlot.scaledInnerRadiusAccessor()(d, i, metadata, plotMetadata))
                    .outerRadius((d, i) => this._piePlot.outerRadiusAccessor()(d, i, metadata, plotMetadata));
     }
 
@@ -57,7 +57,7 @@ export module Drawers {
     public _getPixelPoint(datum: any, index: number): Point {
       var metadata = (<any> this._piePlot)._key2PlotDatasetKey.get(this.key).dataset.metadata();
       var plotMetadata = (<any> this._piePlot)._key2PlotDatasetKey.get(this.key).plotMetadata;
-      var innerRadius = this._piePlot.innerRadiusScaledAccessor()(datum, index, metadata, plotMetadata);
+      var innerRadius = this._piePlot.scaledInnerRadiusAccessor()(datum, index, metadata, plotMetadata);
       var outerRadiusAccessor = (d: any, i: number) => this._piePlot.outerRadiusAccessor()(d, i, metadata, plotMetadata);
       var avgRadius = (innerRadius + outerRadiusAccessor(datum, index)) / 2;
       var startAngle = +this._getSelection(index).datum().startAngle;
