@@ -42,15 +42,15 @@ describe("Plots", () => {
       r.addDataset("bar", dBar);
       assert.strictEqual(3, r.renders, "we should redraw when we add a dataset");
 
-      dFoo.data(dFoo.data())
+      dFoo.data(dFoo.data());
       assert.strictEqual(4, r.renders, "we should still listen to the first dataset");
 
-      dFoo.data(dFoo.data())
+      dFoo.data(dFoo.data());
       assert.strictEqual(5, r.renders, "we should listen to the new dataset");
 
       r.removeDataset("foo");
       assert.strictEqual(6, r.renders, "we re-render on dataset removal");
-      dFoo.data(dFoo.data())
+      dFoo.data(dFoo.data());
       assert.strictEqual(6, r.renders, "we don't listen to removed datasets");
 
     });
