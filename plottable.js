@@ -1329,7 +1329,7 @@ var Plottable;
                 var failed = new Plottable.Utils.Set();
                 _componentsNeedingRender.values().forEach(function (component) {
                     try {
-                        component._doRender();
+                        component.render(true);
                     }
                     catch (err) {
                         // throw error with timeout to avoid interrupting further renders
@@ -3307,7 +3307,18 @@ var Plottable;
                 height: this._isFixedHeight() ? Math.min(availableHeight, requestedSpace.minHeight) : availableHeight
             };
         };
-        Component.prototype.render = function () {
+        /**
+         * Queues the Component for rendering. Set immediately to true if the Component should be rendered
+         * immediately as opposed to queued to the RenderController.
+         *
+         * @returns {Component} The calling Component
+         */
+        Component.prototype.render = function (immediately) {
+            if (immediately === void 0) { immediately = false; }
+            if (immediately) {
+                this._render();
+                return this;
+            }
             if (this._isAnchored && this._isSetup && this.width() >= 0 && this.height() >= 0) {
                 Plottable.RenderController.registerToRender(this);
             }
@@ -3318,7 +3329,7 @@ var Plottable;
                 Plottable.RenderController.registerToComputeLayout(this);
             }
         };
-        Component.prototype._doRender = function () {
+        Component.prototype._render = function () {
         };
         /**
          * Causes the Component to recompute layout and redraw.
@@ -3995,7 +4006,7 @@ var Plottable;
         Axis.prototype._getTickValues = function () {
             return [];
         };
-        Axis.prototype._doRender = function () {
+        Axis.prototype._render = function () {
             var tickMarkValues = this._getTickValues();
             var tickMarks = this._tickMarkContainer.selectAll("." + Axis.TICK_MARK_CLASS).data(tickMarkValues);
             tickMarks.enter().append("line").classed(Axis.TICK_MARK_CLASS, true);
@@ -4435,7 +4446,7 @@ var Plottable;
                 }
                 return this._getTickIntervalValues(this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex - 1][0]);
             };
-            Time.prototype._doRender = function () {
+            Time.prototype._render = function () {
                 var _this = this;
                 this._mostPreciseConfigIndex = this._getMostPreciseConfigurationIndex();
                 var tierConfigs = this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex];
@@ -4716,9 +4727,9 @@ var Plottable;
                 }
                 this.render();
             };
-            Numeric.prototype._doRender = function () {
+            Numeric.prototype._render = function () {
                 var _this = this;
-                _super.prototype._doRender.call(this);
+                _super.prototype._render.call(this);
                 var tickLabelAttrHash = {
                     x: 0,
                     y: 0,
@@ -5128,9 +5139,9 @@ var Plottable;
                     usedHeight: usedHeight
                 };
             };
-            Category.prototype._doRender = function () {
+            Category.prototype._render = function () {
                 var _this = this;
-                _super.prototype._doRender.call(this);
+                _super.prototype._render.call(this);
                 var catScale = this._scale;
                 var tickLabels = this._tickLabelContainer.selectAll("." + Plottable.Axis.TICK_LABEL_CLASS).data(this._scale.domain(), function (d) { return d; });
                 var getTickLabelTransform = function (d, i) {
@@ -5282,8 +5293,8 @@ var Plottable;
                     return this;
                 }
             };
-            Label.prototype._doRender = function () {
-                _super.prototype._doRender.call(this);
+            Label.prototype._render = function () {
+                _super.prototype._render.call(this);
                 // HACKHACK SVGTypewriter should remove existing content - #21 on SVGTypewriter.
                 this._textContainer.selectAll("g").remove();
                 var textMeasurement = this._measurer.measure(this._text);
@@ -5506,9 +5517,9 @@ var Plottable;
                 });
                 return entry;
             };
-            Legend.prototype._doRender = function () {
+            Legend.prototype._render = function () {
                 var _this = this;
-                _super.prototype._doRender.call(this);
+                _super.prototype._render.call(this);
                 var layout = this._calculateLayoutInfo(this.width(), this.height());
                 var rowsToDraw = layout.rows.slice(0, layout.numRowsToDraw);
                 var rows = this._content.selectAll("g." + Legend.LEGEND_ROW_CLASS).data(rowsToDraw);
@@ -5696,9 +5707,9 @@ var Plottable;
             InterpolatedColorLegend.prototype._isVertical = function () {
                 return this._orientation !== "horizontal";
             };
-            InterpolatedColorLegend.prototype._doRender = function () {
+            InterpolatedColorLegend.prototype._render = function () {
                 var _this = this;
-                _super.prototype._doRender.call(this);
+                _super.prototype._render.call(this);
                 var domain = this._scale.domain();
                 var text0 = this._formatter(domain[0]);
                 var text0Width = this._measurer.measure(text0).width;
@@ -5855,8 +5866,8 @@ var Plottable;
                 this._xLinesContainer = this._content.append("g").classed("x-gridlines", true);
                 this._yLinesContainer = this._content.append("g").classed("y-gridlines", true);
             };
-            Gridlines.prototype._doRender = function () {
-                _super.prototype._doRender.call(this);
+            Gridlines.prototype._render = function () {
+                _super.prototype._render.call(this);
                 this._redrawXLines();
                 this._redrawYLines();
             };
@@ -6312,7 +6323,7 @@ var Plottable;
                     bottomRight: bottomRight
                 };
             };
-            SelectionBoxLayer.prototype._doRender = function () {
+            SelectionBoxLayer.prototype._render = function () {
                 if (this._boxVisible) {
                     var t = this._boxBounds.topLeft.y;
                     var b = this._boxBounds.bottomRight.y;
@@ -6536,7 +6547,7 @@ var Plottable;
             });
             return attrToAppliedProjector;
         };
-        Plot.prototype._doRender = function () {
+        Plot.prototype._render = function () {
             if (this._isAnchored) {
                 this._paint();
                 this._dataChanged = false;
@@ -7407,7 +7418,7 @@ var Plottable;
                 if (isVertical === void 0) { isVertical = true; }
                 _super.call(this, xScale, yScale);
                 this._barAlignmentFactor = 0.5;
-                this._barLabelFormatter = Plottable.Formatters.identity();
+                this._labelFormatter = Plottable.Formatters.identity();
                 this._labelsEnabled = false;
                 this._hideBarsIfAnyAreTooWide = true;
                 this.classed("bar-plot", true);
@@ -7463,12 +7474,12 @@ var Plottable;
                     return this;
                 }
             };
-            Bar.prototype.barLabelFormatter = function (formatter) {
+            Bar.prototype.labelFormatter = function (formatter) {
                 if (formatter == null) {
-                    return this._barLabelFormatter;
+                    return this._labelFormatter;
                 }
                 else {
-                    this._barLabelFormatter = formatter;
+                    this._labelFormatter = formatter;
                     this.render();
                     return this;
                 }
@@ -7690,9 +7701,9 @@ var Plottable;
                     return (originalPos > scaledBaseline) ? scaledBaseline : originalPos;
                 };
                 var primaryAccessor = this._projections[primaryAttr].accessor;
-                if (this.labelsEnabled && this.barLabelFormatter) {
+                if (this._labelsEnabled && this._labelFormatter) {
                     attrToProjector["label"] = function (d, i, u, m) {
-                        return _this._barLabelFormatter(primaryAccessor(d, i, u, m));
+                        return _this._labelFormatter(primaryAccessor(d, i, u, m));
                     };
                     attrToProjector["positive"] = function (d, i, u, m) { return originalPositionFn(d, i, u, m) <= scaledBaseline; };
                 }
@@ -10088,8 +10099,8 @@ var Plottable;
                 }
                 return edges;
             };
-            DragBoxLayer.prototype._doRender = function () {
-                _super.prototype._doRender.call(this);
+            DragBoxLayer.prototype._render = function () {
+                _super.prototype._render.call(this);
                 if (this.boxVisible()) {
                     var bounds = this.bounds();
                     var t = bounds.topLeft.y;

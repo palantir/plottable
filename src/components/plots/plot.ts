@@ -239,7 +239,7 @@ module Plottable {
       return attrToAppliedProjector;
     }
 
-    public _doRender() {
+    protected _render() {
       if (this._isAnchored) {
         this._paint();
         this._dataChanged = false;

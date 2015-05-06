@@ -70,7 +70,7 @@ export module Components {
       };
     }
 
-    public _doRender() {
+    protected _render() {
       if (this._boxVisible) {
         var t = this._boxBounds.topLeft.y;
         var b = this._boxBounds.bottomRight.y;
