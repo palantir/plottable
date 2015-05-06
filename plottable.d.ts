@@ -725,21 +725,17 @@ declare module Plottable {
          * Adds a padding exception, a value that will not be padded at either end of the domain.
          *
          * Eg, if a padding exception is added at x=0, then [0, 100] will pad to [0, 105] instead of [-2.5, 102.5].
-         * If a key is provided, it will be registered under that key with standard map semantics. (Overwrite / remove by key)
-         * If a key is not provided, it will be added with set semantics (Can be removed by value)
+         * The exception will be registered under the provided with standard map semantics. (Overwrite / remove by key).
          *
          * @param {any} exception The padding exception to add.
-         * @param {string} key The key to register the exception under.
+         * @param {any} key The key to register the exception under.
          * @returns {Domainer} The calling domainer
          */
         addPaddingException(exception: any, key: any): Domainer;
         /**
          * Removes a padding exception, allowing the domain to pad out that value again.
          *
-         * If a string is provided, it is assumed to be a key and the exception associated with that key is removed.
-         * If a non-string is provdied, it is assumed to be an unkeyed exception and that exception is removed.
-         *
-         * @param {any} keyOrException The key for the value to remove, or the value to remove
+         * @param {any} key The key for the value to remove.
          * @return {Domainer} The calling domainer
          */
         removePaddingException(key: any): Domainer;
@@ -747,21 +743,17 @@ declare module Plottable {
          * Adds an included value, a value that must be included inside the domain.
          *
          * Eg, if a value exception is added at x=0, then [50, 100] will expand to [0, 100] rather than [50, 100].
-         * If a key is provided, it will be registered under that key with standard map semantics. (Overwrite / remove by key)
-         * If a key is not provided, it will be added with set semantics (Can be removed by value)
+         * The value will be registered under that key with standard map semantics. (Overwrite / remove by key).
          *
          * @param {any} value The included value to add.
-         * @param {string} key The key to register the value under.
+         * @param {any} key The key to register the value under.
          * @returns {Domainer} The calling domainer
          */
         addIncludedValue(value: any, key: any): Domainer;
         /**
          * Remove an included value, allowing the domain to not include that value gain again.
          *
-         * If a string is provided, it is assumed to be a key and the value associated with that key is removed.
-         * If a non-string is provdied, it is assumed to be an unkeyed value and that value is removed.
-         *
-         * @param {any} keyOrException The key for the value to remove, or the value to remove
+         * @param {any} key The key for the value to remove.
          * @return {Domainer} The calling domainer
          */
         removeIncludedValue(key: any): Domainer;
