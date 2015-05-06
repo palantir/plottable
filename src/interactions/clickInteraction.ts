@@ -9,8 +9,8 @@ export module Interactions {
 
     private _mouseDispatcher: Plottable.Dispatchers.Mouse;
     private _touchDispatcher: Plottable.Dispatchers.Touch;
-    private _clickCallback: (p: Point) => any;
     private _clickedDown = false;
+    private _onClickCallbacks = new Utils.CallbackSet<ClickCallback>();
 
     public _anchor(component: Component) {
       super._anchor(component);
@@ -34,8 +34,8 @@ export module Interactions {
 
     private _handleClickUp(p: Point) {
       var translatedPoint = this._translateToComponentSpace(p);
-      if (this._clickedDown && this._isInsideComponent(translatedPoint) && (this._clickCallback != null)) {
-        this._clickCallback(translatedPoint);
+      if (this._clickedDown && this._isInsideComponent(translatedPoint)) {
+        this._onClickCallbacks.callCallbacks(translatedPoint);
       }
       this._clickedDown = false;
     }
@@ -47,7 +47,7 @@ export module Interactions {
      * @return {Interaction.Click} The calling Interaction.Click.
      */
     public onClick(callback: ClickCallback) {
-      this._clickCallback = callback;
+      this._onClickCallbacks.add(callback);
       return this;
     }
 
@@ -58,7 +58,7 @@ export module Interactions {
      * @return {Interaction.Click} The calling Interaction.Click.
      */
     public offClick(callback: ClickCallback) {
-      this._clickCallback = () => true;
+      this._onClickCallbacks.delete(callback);
       return this;
     }
   }

@@ -9359,6 +9359,7 @@ var Plottable;
             function Click() {
                 _super.apply(this, arguments);
                 this._clickedDown = false;
+                this._onClickCallbacks = new Plottable.Utils.CallbackSet();
             }
             Click.prototype._anchor = function (component) {
                 var _this = this;
@@ -9379,8 +9380,8 @@ var Plottable;
             };
             Click.prototype._handleClickUp = function (p) {
                 var translatedPoint = this._translateToComponentSpace(p);
-                if (this._clickedDown && this._isInsideComponent(translatedPoint) && (this._clickCallback != null)) {
-                    this._clickCallback(translatedPoint);
+                if (this._clickedDown && this._isInsideComponent(translatedPoint)) {
+                    this._onClickCallbacks.callCallbacks(translatedPoint);
                 }
                 this._clickedDown = false;
             };
@@ -9391,7 +9392,7 @@ var Plottable;
              * @return {Interaction.Click} The calling Interaction.Click.
              */
             Click.prototype.onClick = function (callback) {
-                this._clickCallback = callback;
+                this._onClickCallbacks.add(callback);
                 return this;
             };
             /**
@@ -9401,7 +9402,7 @@ var Plottable;
              * @return {Interaction.Click} The calling Interaction.Click.
              */
             Click.prototype.offClick = function (callback) {
-                this._clickCallback = function () { return true; };
+                this._onClickCallbacks.delete(callback);
                 return this;
             };
             return Click;
