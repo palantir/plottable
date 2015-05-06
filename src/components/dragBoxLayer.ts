@@ -172,8 +172,8 @@ export module Components {
       return edges;
     }
 
-    public _doRender() {
-      super._doRender();
+    protected _render() {
+      super._render();
       if (this.boxVisible()) {
         var bounds = this.bounds();
         var t = bounds.topLeft.y;

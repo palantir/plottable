@@ -163,7 +163,16 @@ module Plottable {
       };
     }
 
-    public render() {
+    /**
+     * Queues the Component for rendering.
+     * 
+     * @param immediate boolean Immediately renders the Component.
+     */
+    public render(immediate = false) {
+      if (immediate) {
+        this._render();
+        return this;
+      }
       if (this._isAnchored && this._isSetup && this.width() >= 0 && this.height() >= 0) {
         RenderController.registerToRender(this);
       }
@@ -176,7 +185,7 @@ module Plottable {
       }
     }
 
-    public _doRender() {/* overwrite */}
+    protected _render() {/* overwrite */}
 
     /**
      * Causes the Component to recompute layout and redraw.

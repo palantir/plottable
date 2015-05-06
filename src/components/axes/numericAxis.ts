@@ -91,8 +91,8 @@ export module Axes {
       this.render();
     }
 
-    public _doRender() {
-      super._doRender();
+    protected _render() {
+      super._render();
 
       var tickLabelAttrHash = {
         x: <any> 0,
