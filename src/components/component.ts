@@ -158,8 +158,8 @@ module Plottable {
     protected _getSize(availableWidth: number, availableHeight: number) {
       var requestedSpace = this.requestedSpace(availableWidth, availableHeight);
       return {
-        width: this._isFixedWidth()  ? Math.min(availableWidth , requestedSpace.minWidth)  : availableWidth,
-        height: this._isFixedHeight() ? Math.min(availableHeight, requestedSpace.minHeight) : availableHeight
+        width: this.fixedWidth()  ? Math.min(availableWidth , requestedSpace.minWidth)  : availableWidth,
+        height: this.fixedHeight() ? Math.min(availableHeight, requestedSpace.minHeight) : availableHeight
       };
     }
 
@@ -411,7 +411,7 @@ module Plottable {
      *
      * @returns {boolean} Whether the component has a fixed width.
      */
-    public _isFixedWidth(): boolean {
+    public fixedWidth(): boolean {
       return this._fixedWidthFlag;
     }
 
@@ -421,7 +421,7 @@ module Plottable {
      *
      * @returns {boolean} Whether the component has a fixed height.
      */
-    public _isFixedHeight(): boolean {
+    public fixedHeight(): boolean {
       return this._fixedHeightFlag;
     }
 

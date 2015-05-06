@@ -209,15 +209,15 @@ describe("Tables", () => {
     var table = tableAndcomponents.table;
     var components = tableAndcomponents.components;
     components.forEach((c) => TestMethods.fixComponentSize(c, 10, 10));
-    assert.isTrue(table._isFixedWidth(), "fixed width when all subcomponents fixed width");
-    assert.isTrue(table._isFixedHeight(), "fixedHeight when all subcomponents fixed height");
+    assert.isTrue(table.fixedWidth(), "fixed width when all subcomponents fixed width");
+    assert.isTrue(table.fixedHeight(), "fixedHeight when all subcomponents fixed height");
     TestMethods.fixComponentSize(components[0], null, 10);
-    assert.isFalse(table._isFixedWidth(), "width not fixed when some subcomponent width not fixed");
-    assert.isTrue(table._isFixedHeight(), "the height is still fixed when some subcomponent width not fixed");
+    assert.isFalse(table.fixedWidth(), "width not fixed when some subcomponent width not fixed");
+    assert.isTrue(table.fixedHeight(), "the height is still fixed when some subcomponent width not fixed");
     TestMethods.fixComponentSize(components[8], 10, null);
     TestMethods.fixComponentSize(components[0], 10, 10);
-    assert.isTrue(table._isFixedWidth(), "width fixed again once no subcomponent width not fixed");
-    assert.isFalse(table._isFixedHeight(), "height unfixed now that a subcomponent has unfixed height");
+    assert.isTrue(table.fixedWidth(), "width fixed again once no subcomponent width not fixed");
+    assert.isFalse(table.fixedHeight(), "height unfixed now that a subcomponent has unfixed height");
   });
 
   it.skip("table.requestedSpace works properly", () => {

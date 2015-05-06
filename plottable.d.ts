@@ -1629,14 +1629,14 @@ declare module Plottable {
          *
          * @returns {boolean} Whether the component has a fixed width.
          */
-        _isFixedWidth(): boolean;
+        fixedWidth(): boolean;
         /**
          * Checks if the Component has a fixed height or false if it grows to fill available space.
          * Returns false by default on the base Component class.
          *
          * @returns {boolean} Whether the component has a fixed height.
          */
-        _isFixedHeight(): boolean;
+        fixedHeight(): boolean;
         _merge(c: Component, below: boolean): Components.Group;
         /**
          * Merges this Component above another Component, returning a
@@ -1802,8 +1802,8 @@ declare module Plottable {
                 width: number;
                 height: number;
             };
-            _isFixedWidth(): boolean;
-            _isFixedHeight(): boolean;
+            fixedWidth(): boolean;
+            fixedHeight(): boolean;
         }
     }
 }
@@ -1846,8 +1846,8 @@ declare module Plottable {
         protected _computeWidth(): number;
         protected _computeHeight(): number;
         requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
-        _isFixedHeight(): boolean;
-        _isFixedWidth(): boolean;
+        fixedHeight(): boolean;
+        fixedWidth(): boolean;
         protected _rescale(): void;
         computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Axis;
         protected _setup(): void;
@@ -2507,8 +2507,8 @@ declare module Plottable {
              * @returns {Table} The calling Table.
              */
             colWeight(index: number, weight: number): Table;
-            _isFixedWidth(): boolean;
-            _isFixedHeight(): boolean;
+            fixedWidth(): boolean;
+            fixedHeight(): boolean;
         }
     }
 }

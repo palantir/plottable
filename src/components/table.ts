@@ -141,8 +141,8 @@ export module Components {
       var availableWidthAfterPadding  = availableWidth  - this._colPadding * (this._nCols - 1);
       var availableHeightAfterPadding = availableHeight - this._rowPadding * (this._nRows - 1);
 
-      var rowWeights = Table._calcComponentWeights(this._rowWeights, rows, (c: Component) => (c == null) || c._isFixedHeight());
-      var colWeights = Table._calcComponentWeights(this._colWeights,  cols, (c: Component) => (c == null) || c._isFixedWidth());
+      var rowWeights = Table._calcComponentWeights(this._rowWeights, rows, (c: Component) => (c == null) || c.fixedHeight());
+      var colWeights = Table._calcComponentWeights(this._colWeights,  cols, (c: Component) => (c == null) || c.fixedWidth());
 
       // To give the table a good starting position to iterate from, we give the fixed-width components half-weight
       // so that they will get some initial space allocated to work with
@@ -353,13 +353,13 @@ export module Components {
       return this;
     }
 
-    public _isFixedWidth(): boolean {
+    public fixedWidth(): boolean {
       var cols = d3.transpose(this._rows);
-      return Table._fixedSpace(cols, (c: Component) => (c == null) || c._isFixedWidth());
+      return Table._fixedSpace(cols, (c: Component) => (c == null) || c.fixedWidth());
     }
 
-    public _isFixedHeight(): boolean {
-      return Table._fixedSpace(this._rows, (c: Component) => (c == null) || c._isFixedHeight());
+    public fixedHeight(): boolean {
+      return Table._fixedSpace(this._rows, (c: Component) => (c == null) || c.fixedHeight());
     }
 
     private _padTableToSize(nRows: number, nCols: number) {
