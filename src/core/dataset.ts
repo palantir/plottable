@@ -12,7 +12,7 @@ module Plottable {
     private _data: any[];
     private _metadata: any;
     private _accessor2cachedExtent: Utils.StrictEqualityAssociativeArray;
-    private _callbacks: Utils.CallbackSet<DatasetCallback>
+    private _callbacks: Utils.CallbackSet<DatasetCallback>;
 
     /**
      * Constructs a new set.
