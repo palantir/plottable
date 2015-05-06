@@ -9542,7 +9542,7 @@ var Plottable;
              * pressed and the user is moused over the Component.
              *
              * @param {number} keyCode The key code associated with the key.
-             * @param {() => void} callback Callback to be called.
+             * @param {() => void} callback Callback to be set.
              * @returns The calling Interaction.Key.
              */
             Key.prototype.onKey = function (keyCode, callback) {
@@ -9557,7 +9557,7 @@ var Plottable;
              * pressed and the user is moused over the Component.
              *
              * @param {number} keyCode The key code associated with the key.
-             * @param {() => void} callback Callback to be called.
+             * @param {() => void} callback Callback to be removed.
              * @returns The calling Interaction.Key.
              */
             Key.prototype.offKey = function (keyCode, callback) {
@@ -9603,39 +9603,74 @@ var Plottable;
                 if (this._isInsideComponent(translatedP)) {
                     var wasOverComponent = this._overComponent;
                     this._overComponent = true;
-                    if (!wasOverComponent && this._pointerEnterCallback) {
-                        this._pointerEnterCallback(translatedP);
+                    if (!wasOverComponent) {
+                        this._pointerEnterCallbacks.callCallbacks(translatedP);
                     }
-                    if (this._pointerMoveCallback) {
-                        this._pointerMoveCallback(translatedP);
-                    }
+                    this._pointerMoveCallbacks.callCallbacks(translatedP);
                 }
                 else if (this._overComponent) {
                     this._overComponent = false;
-                    if (this._pointerExitCallback) {
-                        this._pointerExitCallback(translatedP);
-                    }
+                    this._pointerExitCallbacks.callCallbacks(translatedP);
                 }
             };
+            /**
+             * Sets the callback called when the pointer enters the Component.
+             *
+             * @param {(p: Point) => any} callback The callback to set.
+             * @return {Interaction.Pointer} The calling Interaction.Pointer.
+             */
             Pointer.prototype.onPointerEnter = function (callback) {
-                if (callback === undefined) {
-                    return this._pointerEnterCallback;
-                }
-                this._pointerEnterCallback = callback;
+                this._pointerEnterCallbacks.add(callback);
                 return this;
             };
+            /**
+             * Removes a callback called when the pointer enters the Component.
+             *
+             * @param {(p: Point) => any} callback The callback to remove.
+             * @return {Interaction.Pointer} The calling Interaction.Pointer.
+             */
+            Pointer.prototype.offPointerEnter = function (callback) {
+                this._pointerEnterCallbacks.delete(callback);
+                return this;
+            };
+            /**
+             * Sets the callback called when the pointer moves.
+             *
+             * @param {(p: Point) => any} callback The callback to set.
+             * @return {Interaction.Pointer} The calling Interaction.Pointer.
+             */
             Pointer.prototype.onPointerMove = function (callback) {
-                if (callback === undefined) {
-                    return this._pointerMoveCallback;
-                }
-                this._pointerMoveCallback = callback;
+                this._pointerMoveCallbacks.add(callback);
                 return this;
             };
+            /**
+             * Removes a callback called when the pointer moves.
+             *
+             * @param {(p: Point) => any} callback The callback to remove.
+             * @return {Interaction.Pointer} The calling Interaction.Pointer.
+             */
+            Pointer.prototype.offPointerMove = function (callback) {
+                this._pointerMoveCallbacks.delete(callback);
+                return this;
+            };
+            /**
+             * Sets the callback called when the pointer exits the Component.
+             *
+             * @param {(p: Point) => any} callback The callback to set.
+             * @return {Interaction.Pointer} The calling Interaction.Pointer.
+             */
             Pointer.prototype.onPointerExit = function (callback) {
-                if (callback === undefined) {
-                    return this._pointerExitCallback;
-                }
-                this._pointerExitCallback = callback;
+                this._pointerExitCallbacks.add(callback);
+                return this;
+            };
+            /**
+             * Removes a callback called when the pointer exits the Component.
+             *
+             * @param {(p: Point) => any} callback The callback to remove.
+             * @return {Interaction.Pointer} The calling Interaction.Pointer.
+             */
+            Pointer.prototype.offPointerExit = function (callback) {
+                this._pointerExitCallbacks.delete(callback);
                 return this;
             };
             return Pointer;

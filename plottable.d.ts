@@ -3806,7 +3806,7 @@ declare module Plottable {
              * pressed and the user is moused over the Component.
              *
              * @param {number} keyCode The key code associated with the key.
-             * @param {() => void} callback Callback to be called.
+             * @param {() => void} callback Callback to be set.
              * @returns The calling Interaction.Key.
              */
             onKey(keyCode: number, callback: KeyCallback): Key;
@@ -3815,7 +3815,7 @@ declare module Plottable {
              * pressed and the user is moused over the Component.
              *
              * @param {number} keyCode The key code associated with the key.
-             * @param {() => void} callback Callback to be called.
+             * @param {() => void} callback Callback to be removed.
              * @returns The calling Interaction.Key.
              */
             offKey(keyCode: number, callback: KeyCallback): Key;
@@ -3825,48 +3825,52 @@ declare module Plottable {
 
 
 declare module Plottable {
+    type PointerCallback = (point: Point) => any;
     module Interactions {
         class Pointer extends Interaction {
             _anchor(component: Component): void;
-            /**
-             * Gets the callback called when the pointer enters the Component.
-             *
-             * @return {(p: Point) => any} The current callback.
-             */
-            onPointerEnter(): (p: Point) => any;
             /**
              * Sets the callback called when the pointer enters the Component.
              *
              * @param {(p: Point) => any} callback The callback to set.
              * @return {Interaction.Pointer} The calling Interaction.Pointer.
              */
-            onPointerEnter(callback: (p: Point) => any): Interactions.Pointer;
+            onPointerEnter(callback: PointerCallback): Pointer;
             /**
-             * Gets the callback called when the pointer moves.
+             * Removes a callback called when the pointer enters the Component.
              *
-             * @return {(p: Point) => any} The current callback.
+             * @param {(p: Point) => any} callback The callback to remove.
+             * @return {Interaction.Pointer} The calling Interaction.Pointer.
              */
-            onPointerMove(): (p: Point) => any;
+            offPointerEnter(callback: PointerCallback): Pointer;
             /**
              * Sets the callback called when the pointer moves.
              *
              * @param {(p: Point) => any} callback The callback to set.
              * @return {Interaction.Pointer} The calling Interaction.Pointer.
              */
-            onPointerMove(callback: (p: Point) => any): Interactions.Pointer;
+            onPointerMove(callback: PointerCallback): Pointer;
             /**
-             * Gets the callback called when the pointer exits the Component.
+             * Removes a callback called when the pointer moves.
              *
-             * @return {(p: Point) => any} The current callback.
+             * @param {(p: Point) => any} callback The callback to remove.
+             * @return {Interaction.Pointer} The calling Interaction.Pointer.
              */
-            onPointerExit(): (p: Point) => any;
+            offPointerMove(callback: PointerCallback): Pointer;
             /**
              * Sets the callback called when the pointer exits the Component.
              *
              * @param {(p: Point) => any} callback The callback to set.
              * @return {Interaction.Pointer} The calling Interaction.Pointer.
              */
-            onPointerExit(callback: (p: Point) => any): Interactions.Pointer;
+            onPointerExit(callback: PointerCallback): Pointer;
+            /**
+             * Removes a callback called when the pointer exits the Component.
+             *
+             * @param {(p: Point) => any} callback The callback to remove.
+             * @return {Interaction.Pointer} The calling Interaction.Pointer.
+             */
+            offPointerExit(callback: PointerCallback): Pointer;
         }
     }
 }
