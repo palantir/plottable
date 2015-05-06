@@ -294,9 +294,28 @@ module Plottable {
         var plotDatasetKey = this._key2PlotDatasetKey.get(key);
         var dataset = plotDatasetKey.dataset;
         var plotMetadata = plotDatasetKey.plotMetadata;
-        return dataset._getExtent(accessor, coercer, plotMetadata);
+        return this._computeExtent(dataset, accessor, coercer, plotMetadata);
       });
       this._attrToExtents.set(attr, extents);
+    }
+
+    private _computeExtent(dataset: Dataset, accessor: _Accessor, typeCoercer: (d: any) => any, plotMetadata: any): any[] {
+      var data = dataset.data();
+      var metadata = dataset.metadata();
+      var appliedAccessor = (d: any, i: number) => accessor(d, i, metadata, plotMetadata);
+      var mappedData = data.map(appliedAccessor).map(typeCoercer);
+      if (mappedData.length === 0) {
+        return [];
+      } else if (typeof(mappedData[0]) === "string") {
+        return Utils.Methods.uniq(mappedData);
+      } else {
+        var extent = d3.extent(mappedData);
+        if (extent[0] == null || extent[1] == null) {
+          return [];
+        } else {
+          return extent;
+        }
+      }
     }
 
     /**

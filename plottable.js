@@ -1180,35 +1180,6 @@ var Plottable;
                 return this;
             }
         };
-        Dataset.prototype._getExtent = function (accessor, typeCoercer, plotMetadata) {
-            if (plotMetadata === void 0) { plotMetadata = {}; }
-            var cachedExtent = this._accessor2cachedExtent.get(accessor);
-            if (cachedExtent === undefined) {
-                cachedExtent = this._computeExtent(accessor, typeCoercer, plotMetadata);
-                this._accessor2cachedExtent.set(accessor, cachedExtent);
-            }
-            return cachedExtent;
-        };
-        Dataset.prototype._computeExtent = function (accessor, typeCoercer, plotMetadata) {
-            var _this = this;
-            var appliedAccessor = function (d, i) { return accessor(d, i, _this._metadata, plotMetadata); };
-            var mappedData = this._data.map(appliedAccessor).map(typeCoercer);
-            if (mappedData.length === 0) {
-                return [];
-            }
-            else if (typeof (mappedData[0]) === "string") {
-                return Plottable.Utils.Methods.uniq(mappedData);
-            }
-            else {
-                var extent = d3.extent(mappedData);
-                if (extent[0] == null || extent[1] == null) {
-                    return [];
-                }
-                else {
-                    return extent;
-                }
-            }
-        };
         return Dataset;
     })(Plottable.Core.PlottableObject);
     Plottable.Dataset = Dataset;
@@ -6620,9 +6591,30 @@ var Plottable;
                 var plotDatasetKey = _this._key2PlotDatasetKey.get(key);
                 var dataset = plotDatasetKey.dataset;
                 var plotMetadata = plotDatasetKey.plotMetadata;
-                return dataset._getExtent(accessor, coercer, plotMetadata);
+                return _this._computeExtent(dataset, accessor, coercer, plotMetadata);
             });
             this._attrToExtents.set(attr, extents);
+        };
+        Plot.prototype._computeExtent = function (dataset, accessor, typeCoercer, plotMetadata) {
+            var data = dataset.data();
+            var metadata = dataset.metadata();
+            var appliedAccessor = function (d, i) { return accessor(d, i, metadata, plotMetadata); };
+            var mappedData = data.map(appliedAccessor).map(typeCoercer);
+            if (mappedData.length === 0) {
+                return [];
+            }
+            else if (typeof (mappedData[0]) === "string") {
+                return Plottable.Utils.Methods.uniq(mappedData);
+            }
+            else {
+                var extent = d3.extent(mappedData);
+                if (extent[0] == null || extent[1] == null) {
+                    return [];
+                }
+                else {
+                    return extent;
+                }
+            }
         };
         /**
          * Override in subclass to add special extents, such as included values
@@ -7976,19 +7968,11 @@ var Plottable;
                 return new Plottable.Drawers.Area(key);
             };
             Area.prototype._updateYDomainer = function () {
-                var _this = this;
                 _super.prototype._updateYDomainer.call(this);
-                var constantBaseline;
-                var y0Projector = this._projections["y0"];
-                var y0Accessor = y0Projector && y0Projector.accessor;
-                if (y0Accessor != null) {
-                    var extents = this.datasets().map(function (d) { return d._getExtent(y0Accessor, _this._yScale._typeCoercer); });
-                    var extent = Plottable.Utils.Methods.flatten(extents);
-                    var uniqExtentVals = Plottable.Utils.Methods.uniq(extent);
-                    if (uniqExtentVals.length === 1) {
-                        constantBaseline = uniqExtentVals[0];
-                    }
-                }
+                var extents = this._extentsForAttr("y0");
+                var extent = Plottable.Utils.Methods.flatten(extents);
+                var uniqExtentVals = Plottable.Utils.Methods.uniq(extent);
+                var constantBaseline = uniqExtentVals.length === 1 ? uniqExtentVals[0] : null;
                 if (!this._yScale._userSetDomainer) {
                     if (constantBaseline != null) {
                         this._yScale.domainer().addPaddingException(constantBaseline, "AREA_PLOT+" + this.getID());

@@ -88,31 +88,5 @@ module Plottable {
         return this;
       }
     }
-
-    public _getExtent(accessor: _Accessor, typeCoercer: (d: any) => any, plotMetadata: any = {}): any[] {
-      var cachedExtent = this._accessor2cachedExtent.get(accessor);
-      if (cachedExtent === undefined) {
-        cachedExtent = this._computeExtent(accessor, typeCoercer, plotMetadata);
-        this._accessor2cachedExtent.set(accessor, cachedExtent);
-      }
-      return cachedExtent;
-    }
-
-    private _computeExtent(accessor: _Accessor, typeCoercer: (d: any) => any, plotMetadata: any): any[] {
-      var appliedAccessor = (d: any, i: number) => accessor(d, i, this._metadata, plotMetadata);
-      var mappedData = this._data.map(appliedAccessor).map(typeCoercer);
-      if (mappedData.length === 0) {
-        return [];
-      } else if (typeof(mappedData[0]) === "string") {
-        return Utils.Methods.uniq(mappedData);
-      } else {
-        var extent = d3.extent(mappedData);
-        if (extent[0] == null || extent[1] == null) {
-          return [];
-        } else {
-          return extent;
-        }
-      }
-    }
   }
 }

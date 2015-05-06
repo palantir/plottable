@@ -41,17 +41,10 @@ export module Plots {
     protected _updateYDomainer() {
       super._updateYDomainer();
 
-      var constantBaseline: number;
-      var y0Projector = this._projections["y0"];
-      var y0Accessor = y0Projector && y0Projector.accessor;
-      if (y0Accessor != null) {
-        var extents = this.datasets().map((d) => d._getExtent(y0Accessor, this._yScale._typeCoercer));
-        var extent = Utils.Methods.flatten(extents);
-        var uniqExtentVals = Utils.Methods.uniq(extent);
-        if (uniqExtentVals.length === 1) {
-          constantBaseline = uniqExtentVals[0];
-        }
-      }
+      var extents = this._extentsForAttr("y0");
+      var extent = Utils.Methods.flatten(extents);
+      var uniqExtentVals = Utils.Methods.uniq(extent);
+      var constantBaseline = uniqExtentVals.length === 1 ? uniqExtentVals[0] : null;
 
       if (!this._yScale._userSetDomainer) {
         if (constantBaseline != null) {
