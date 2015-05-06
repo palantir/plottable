@@ -9929,6 +9929,62 @@ describe("Interactive Components", function () {
             assert.isFalse(callbackCalled, "the callback was detached from the dragoBoxLayer and not called");
             svg.remove();
         });
+        it("multiple drag interaction callbacks", function () {
+            var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var dbl = new Plottable.Components.DragBoxLayer();
+            dbl.renderTo(svg);
+            var startPoint = {
+                x: SVG_WIDTH / 4,
+                y: SVG_HEIGHT / 4
+            };
+            var endPoint = {
+                x: SVG_WIDTH / 2,
+                y: SVG_HEIGHT / 2
+            };
+            var callbackDragStart1Called = false;
+            var callbackDragStart2Called = false;
+            var callbackDrag1Called = false;
+            var callbackDrag2Called = false;
+            var callbackDragEnd1Called = false;
+            var callbackDragEnd2Called = false;
+            var callbackDragStart1 = function () { return callbackDragStart1Called = true; };
+            var callbackDragStart2 = function () { return callbackDragStart2Called = true; };
+            var callbackDrag1 = function () { return callbackDrag1Called = true; };
+            var callbackDrag2 = function () { return callbackDrag2Called = true; };
+            var callbackDragEnd1 = function () { return callbackDragEnd1Called = true; };
+            var callbackDragEnd2 = function () { return callbackDragEnd2Called = true; };
+            dbl.onDragStart(callbackDragStart1);
+            dbl.onDragStart(callbackDragStart2);
+            dbl.onDrag(callbackDrag1);
+            dbl.onDrag(callbackDrag2);
+            dbl.onDragEnd(callbackDragEnd1);
+            dbl.onDragEnd(callbackDragEnd2);
+            var target = dbl.background();
+            TestMethods.triggerFakeDragSequence(target, startPoint, endPoint);
+            assert.isTrue(callbackDragStart1Called, "the callback 1 for drag start was called");
+            assert.isTrue(callbackDragStart2Called, "the callback 2 for drag start was called");
+            assert.isTrue(callbackDrag1Called, "the callback 1 for drag was called");
+            assert.isTrue(callbackDrag2Called, "the callback 2 for drag was called");
+            assert.isTrue(callbackDragEnd1Called, "the callback 1 for drag end was called");
+            assert.isTrue(callbackDragEnd2Called, "the callback 2 for drag end was called");
+            dbl.offDragStart(callbackDragStart1);
+            dbl.offDrag(callbackDrag1);
+            dbl.offDragEnd(callbackDragEnd1);
+            callbackDragStart1Called = false;
+            callbackDragStart2Called = false;
+            callbackDrag1Called = false;
+            callbackDrag2Called = false;
+            callbackDragEnd1Called = false;
+            callbackDragEnd2Called = false;
+            TestMethods.triggerFakeDragSequence(target, startPoint, endPoint);
+            assert.isFalse(callbackDragStart1Called, "the callback 1 for drag start was disconnected");
+            assert.isTrue(callbackDragStart2Called, "the callback 2 for drag start is still connected");
+            assert.isFalse(callbackDrag1Called, "the callback 1 for drag was called disconnected");
+            assert.isTrue(callbackDrag2Called, "the callback 2 for drag is still connected");
+            assert.isFalse(callbackDragEnd1Called, "the callback 1 for drag end was disconnected");
+            assert.isTrue(callbackDragEnd2Called, "the callback 2 for drag end is still connected");
+            svg.remove();
+        });
         describe("resizing", function () {
             var svg;
             var dbl;
