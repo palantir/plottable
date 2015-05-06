@@ -81,8 +81,8 @@ module Plottable {
       this._getDrawersInOrder().forEach((d) => d.setup(this._renderArea.append("g")));
     }
 
-    public remove() {
-      super.remove();
+    public destroy() {
+      super.destroy();
       this._datasetKeysInOrder.forEach((k) => this.removeDataset(k));
       this._scales().forEach((scale) => scale.offUpdate(this._renderCallback));
     }

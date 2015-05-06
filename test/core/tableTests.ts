@@ -10,7 +10,7 @@ function generateBasicTable(nRows: number, nCols: number) {
   for (var i = 0; i < nRows; i++) {
     for (var j = 0; j < nCols; j++) {
       var r = new Plottable.Component();
-      table.addComponent(i, j, r);
+      table.addComponent(r, i, j);
       components.push(r);
     }
   }
@@ -47,7 +47,7 @@ describe("Tables", () => {
     var table = new Plottable.Components.Table([row1, row2]);
     assert.strictEqual((<any> table)._rows[0][1], c0, "the component is in the right spot");
     var c1 = new Plottable.Component();
-    table.addComponent(2, 2, c1);
+    table.addComponent(c1, 2, 2);
     assert.strictEqual((<any> table)._rows[2][2], c1, "the inserted component went to the right spot");
   });
 
@@ -55,8 +55,8 @@ describe("Tables", () => {
     var table = new Plottable.Components.Table();
     var c1 = new Plottable.Component();
     var c2 = new Plottable.Component();
-    table.addComponent(0, 0, c1);
-    table.addComponent(1, 1, c2);
+    table.addComponent(c1, 0, 0);
+    table.addComponent(c2, 1, 1);
     var rows = (<any> table)._rows;
     assert.lengthOf(rows, 2, "there are two rows");
     assert.lengthOf(rows[0], 2, "two cols in first row");
@@ -73,9 +73,9 @@ describe("Tables", () => {
     var c3 = new Plottable.Component();
     var t = new Plottable.Components.Table();
 
-    t.addComponent(0, 2, c1);
-    t.addComponent(0, 0, c2);
-    t.addComponent(0, 2, c3);
+    t.addComponent(c1, 0, 2);
+    t.addComponent(c2, 0, 0);
+    t.addComponent(c3, 0, 2);
 
     assert.isTrue(Plottable.Components.Group.prototype.isPrototypeOf((<any> t)._rows[0][2]), "A group was created");
 
@@ -94,8 +94,8 @@ describe("Tables", () => {
 
     var t = new Plottable.Components.Table();
 
-    t.addComponent(0, 2, grp);
-    t.addComponent(0, 2, c3);
+    t.addComponent(grp, 0, 2);
+    t.addComponent(c3, 0, 2);
     assert.isTrue(Plottable.Components.Group.prototype.isPrototypeOf((<any> t)._rows[0][2]), "The cell still contains a group");
 
     var components: Plottable.Component[] = (<any> t)._rows[0][2].components();
@@ -109,15 +109,15 @@ describe("Tables", () => {
     var c1 = new Plottable.Component();
     var t = new Plottable.Components.Table([[c1]]);
 
-    assert.throw(() => t.addComponent(0, 0, null), "Cannot add null to a table cell");
+    assert.throw(() => t.addComponent(null, 0, 0), "Cannot add null to a table cell");
   });
 
   it("addComponent works even if a component is added with a high column and low row index", () => {
     // Solves #180, a weird bug
     var t = new Plottable.Components.Table();
     var svg = TestMethods.generateSVG();
-    t.addComponent(1, 0, new Plottable.Component());
-    t.addComponent(0, 2, new Plottable.Component());
+    t.addComponent(new Plottable.Component(), 1, 0);
+    t.addComponent(new Plottable.Component(), 0, 2);
     t.renderTo(svg); // would throw an error without the fix (tested);
     svg.remove();
   });
@@ -315,13 +315,13 @@ describe("Tables", () => {
     var table: Plottable.Components.Table;
     it("table._removeComponent works in basic case", () => {
       table = new Plottable.Components.Table([[c1, c2], [c3, c4], [c5, c6]]);
-      table._removeComponent(c4);
+      table.removeComponent(c4);
       assert.deepEqual((<any> table)._rows, [[c1, c2], [c3, null], [c5, c6]], "remove one element");
     });
 
     it("table._removeComponent does nothing when component is not found", () =>  {
       table = new Plottable.Components.Table([[c1, c2], [c3, c4]]);
-      table._removeComponent (c5);
+      table.removeComponent(c5);
 
       assert.deepEqual((<any> table)._rows, [[c1, c2], [c3, c4]], "remove nonexistent component");
     });
@@ -329,17 +329,17 @@ describe("Tables", () => {
     it("table._removeComponent removing component twice should have same effect as removing it once", () =>  {
       table = new Plottable.Components.Table([[c1, c2, c3], [c4, c5, c6]]);
 
-      table._removeComponent(c1);
+      table.removeComponent(c1);
       assert.deepEqual((<any> table)._rows, [[null, c2, c3], [c4, c5, c6]], "item twice");
 
-      table._removeComponent(c1);
+      table.removeComponent(c1);
       assert.deepEqual((<any> table)._rows, [[null, c2, c3], [c4, c5, c6]], "item twice");
     });
 
     it("table._removeComponent doesn't do anything weird when called with null", () => {
       table = new Plottable.Components.Table([[c1, null], [c2, c3]]);
 
-      table._removeComponent(null);
+      table.removeComponent(null);
       assert.deepEqual((<any> table)._rows, [[c1, null], [c2, c3]]);
     });
   });

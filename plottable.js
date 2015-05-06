@@ -3199,7 +3199,7 @@ var Plottable;
             this._xOffset = 0; // Offset from Origin, used for alignment and floating positioning
             this._yOffset = 0;
             this._cssClasses = ["component"];
-            this._removed = false;
+            this._destroyed = false;
         }
         /**
          * Attaches the Component as a child of a given D3 Selection.
@@ -3208,7 +3208,7 @@ var Plottable;
          * @returns {Component} The calling Component.
          */
         Component.prototype.anchor = function (selection) {
-            if (this._removed) {
+            if (this._destroyed) {
                 throw new Error("Can't reuse remove()-ed components!");
             }
             if (selection.node().nodeName.toLowerCase() === "svg") {
@@ -3559,7 +3559,7 @@ var Plottable;
             var cg;
             if (Plottable.Components.Group.prototype.isPrototypeOf(c)) {
                 cg = c;
-                cg._addComponent(this, below);
+                cg.add(this, below);
                 return cg;
             }
             else {
@@ -3614,7 +3614,7 @@ var Plottable;
             }
             var parent = this._parent();
             if (parent != null) {
-                parent._removeComponent(this);
+                parent.remove(this);
             }
             this._isAnchored = false;
             this._parentElement = null;
@@ -3631,8 +3631,8 @@ var Plottable;
          * Removes a Component from the DOM and disconnects it from everything it's
          * listening to (effectively destroying it).
          */
-        Component.prototype.remove = function () {
-            this._removed = true;
+        Component.prototype.destroy = function () {
+            this._destroyed = true;
             this.detach();
         };
         /**
@@ -3745,14 +3745,25 @@ var Plottable;
             this._components.forEach(function (c) { return c.render(); });
             return this;
         };
-        ComponentContainer.prototype._removeComponent = function (c) {
+        /**
+         * Removes the specified Component from the ComponentContainer
+         *
+         * @param c Component the Component to remove.
+         */
+        ComponentContainer.prototype.remove = function (c) {
             var removeIndex = this._components.indexOf(c);
             if (removeIndex >= 0) {
                 this.components().splice(removeIndex, 1);
                 this.redraw();
             }
         };
-        ComponentContainer.prototype._addComponent = function (c, prepend) {
+        /**
+         * Adds the specified Component to the ComponentContainer.
+         *
+         * @param c Component the component to add
+         * @param prepend boolean whether the component should be prepended to the componentContainer or not.
+         */
+        ComponentContainer.prototype.add = function (c, prepend) {
             if (prepend === void 0) { prepend = false; }
             if (!c || this._components.indexOf(c) >= 0) {
                 return false;
@@ -3798,9 +3809,9 @@ var Plottable;
             this.components().slice().forEach(function (c) { return c.detach(); });
             return this;
         };
-        ComponentContainer.prototype.remove = function () {
-            _super.prototype.remove.call(this);
-            this.components().slice().forEach(function (c) { return c.remove(); });
+        ComponentContainer.prototype.destroy = function () {
+            _super.prototype.destroy.call(this);
+            this.components().slice().forEach(function (c) { return c.destroy(); });
         };
         return ComponentContainer;
     })(Plottable.Component);
@@ -3838,7 +3849,7 @@ var Plottable;
                 if (components === void 0) { components = []; }
                 _super.call(this);
                 this.classed("component-group", true);
-                components.forEach(function (c) { return _this._addComponent(c); });
+                components.forEach(function (c) { return _this.add(c); });
             }
             Group.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
                 var requests = this.components().map(function (c) { return c._requestedSpace(offeredWidth, offeredHeight); });
@@ -3848,7 +3859,7 @@ var Plottable;
                 };
             };
             Group.prototype._merge = function (c, below) {
-                this._addComponent(c, !below);
+                this.add(c, !below);
                 return this;
             };
             Group.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
@@ -3925,8 +3936,8 @@ var Plottable;
             this._rescaleCallback = function (scale) { return _this._rescale(); };
             this._scale.onUpdate(this._rescaleCallback);
         }
-        Axis.prototype.remove = function () {
-            _super.prototype.remove.call(this);
+        Axis.prototype.destroy = function () {
+            _super.prototype.destroy.call(this);
             this._scale.offUpdate(this._rescaleCallback);
         };
         Axis.prototype._isHorizontal = function () {
@@ -5416,8 +5427,8 @@ var Plottable;
                     return this._scale;
                 }
             };
-            Legend.prototype.remove = function () {
-                _super.prototype.remove.call(this);
+            Legend.prototype.destroy = function () {
+                _super.prototype.destroy.call(this);
                 this._scale.offUpdate(this._redrawCallback);
             };
             Legend.prototype._calculateLayoutInfo = function (availableWidth, availableHeight) {
@@ -5620,8 +5631,8 @@ var Plottable;
                 this._fixedHeightFlag = true;
                 this.classed("legend", true).classed("interpolated-color-legend", true);
             }
-            InterpolatedColorLegend.prototype.remove = function () {
-                _super.prototype.remove.call(this);
+            InterpolatedColorLegend.prototype.destroy = function () {
+                _super.prototype.destroy.call(this);
                 this._scale.offUpdate(this._redrawCallback);
             };
             InterpolatedColorLegend.prototype.formatter = function (formatter) {
@@ -5840,8 +5851,8 @@ var Plottable;
                     this._yScale.onUpdate(this._renderCallback);
                 }
             }
-            Gridlines.prototype.remove = function () {
-                _super.prototype.remove.call(this);
+            Gridlines.prototype.destroy = function () {
+                _super.prototype.destroy.call(this);
                 if (this._xScale) {
                     this._xScale.offUpdate(this._renderCallback);
                 }
@@ -5931,34 +5942,29 @@ var Plottable;
                 rows.forEach(function (row, rowIndex) {
                     row.forEach(function (component, colIndex) {
                         if (component != null) {
-                            _this.addComponent(rowIndex, colIndex, component);
+                            _this.addComponent(component, rowIndex, colIndex);
                         }
                     });
                 });
             }
             /**
-             * Adds a Component in the specified cell.
-             *
-             * If the cell is already occupied, there are 3 cases
-             *  - Component + Component => Group containing both components
-             *  - Component + Group => Component is added to the group
-             *  - Group + Component => Component is added to the group
+             * Adds a Component in the specified row and column position.
              *
              * For example, instead of calling `new Table([[a, b], [null, c]])`, you
              * could call
              * ```typescript
              * var table = new Table();
-             * table.addComponent(0, 0, a);
-             * table.addComponent(0, 1, b);
-             * table.addComponent(1, 1, c);
+             * table.addComponent(a, 0, 0);
+             * table.addComponent(b, 0, 1);
+             * table.addComponent(c, 1, 1);
              * ```
              *
+             * @param {Component} component The Component to be added.
              * @param {number} row The row in which to add the Component.
              * @param {number} col The column in which to add the Component.
-             * @param {Component} component The Component to be added.
              * @returns {Table} The calling Table.
              */
-            Table.prototype.addComponent = function (row, col, component) {
+            Table.prototype.addComponent = function (component, row, col) {
                 if (component == null) {
                     throw Error("Cannot add null to a table cell");
                 }
@@ -5966,7 +5972,7 @@ var Plottable;
                 if (currentComponent) {
                     component = component.above(currentComponent);
                 }
-                if (this._addComponent(component)) {
+                if (_super.prototype.add.call(this, component)) {
                     this._nRows = Math.max(row + 1, this._nRows);
                     this._nCols = Math.max(col + 1, this._nCols);
                     this._padTableToSize(this._nRows, this._nCols);
@@ -5974,8 +5980,13 @@ var Plottable;
                 }
                 return this;
             };
-            Table.prototype._removeComponent = function (component) {
-                _super.prototype._removeComponent.call(this, component);
+            /**
+             * Removes a Component.
+             *
+             * @param {Component} component The Component to be removed.
+             */
+            Table.prototype.removeComponent = function (component) {
+                _super.prototype.remove.call(this, component);
                 for (var r = 0; r < this._nRows; r++) {
                     for (var c = 0; c < this._nCols; c++) {
                         if (this._rows[r][c] === component) {
@@ -6401,9 +6412,9 @@ var Plottable;
             // HACKHACK on 591
             this._getDrawersInOrder().forEach(function (d) { return d.setup(_this._renderArea.append("g")); });
         };
-        Plot.prototype.remove = function () {
+        Plot.prototype.destroy = function () {
             var _this = this;
-            _super.prototype.remove.call(this);
+            _super.prototype.destroy.call(this);
             this._datasetKeysInOrder.forEach(function (k) { return _this.removeDataset(k); });
             this._scales().forEach(function (scale) { return scale.offUpdate(_this._renderCallback); });
         };
@@ -7003,8 +7014,8 @@ var Plottable;
             _super.prototype.project.call(this, attrToSet, accessor, scale);
             return this;
         };
-        XYPlot.prototype.remove = function () {
-            _super.prototype.remove.call(this);
+        XYPlot.prototype.destroy = function () {
+            _super.prototype.destroy.call(this);
             if (this._xScale) {
                 this._xScale.offUpdate(this._adjustYDomainOnChangeFromXCallback);
             }

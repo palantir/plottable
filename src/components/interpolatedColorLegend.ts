@@ -51,8 +51,8 @@ export module Components {
       this.classed("legend", true).classed("interpolated-color-legend", true);
     }
 
-    public remove() {
-      super.remove();
+    public destroy() {
+      super.destroy();
       this._scale.offUpdate(this._redrawCallback);
     }
 

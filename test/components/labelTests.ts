@@ -87,8 +87,8 @@ describe("Labels", () => {
   it("centered text in a table is positioned properly", () => {
     var svg = TestMethods.generateSVG(400, 400);
     var label = new Plottable.Components.TitleLabel("X");
-    var t = new Plottable.Components.Table().addComponent(0, 0, label)
-                                 .addComponent(1, 0, new Plottable.Component());
+    var t = new Plottable.Components.Table().addComponent(label, 0, 0)
+                                 .addComponent(new Plottable.Component(), 1, 0);
     t.renderTo(svg);
     var textTranslate = d3.transform((<any> label)._content.select("g").attr("transform")).translate;
     var eleTranslate  = d3.transform((<any> label)._element.attr("transform")).translate;

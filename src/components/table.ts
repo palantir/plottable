@@ -52,35 +52,30 @@ export module Components {
       rows.forEach((row, rowIndex) => {
         row.forEach((component, colIndex) => {
           if (component != null) {
-            this.addComponent(rowIndex, colIndex, component);
+            this.addComponent(component, rowIndex, colIndex);
           }
         });
       });
     }
 
     /**
-     * Adds a Component in the specified cell.
-     *
-     * If the cell is already occupied, there are 3 cases
-     *  - Component + Component => Group containing both components
-     *  - Component + Group => Component is added to the group
-     *  - Group + Component => Component is added to the group
+     * Adds a Component in the specified row and column position.
      *
      * For example, instead of calling `new Table([[a, b], [null, c]])`, you
      * could call
      * ```typescript
      * var table = new Table();
-     * table.addComponent(0, 0, a);
-     * table.addComponent(0, 1, b);
-     * table.addComponent(1, 1, c);
+     * table.addComponent(a, 0, 0);
+     * table.addComponent(b, 0, 1);
+     * table.addComponent(c, 1, 1);
      * ```
      *
+     * @param {Component} component The Component to be added.
      * @param {number} row The row in which to add the Component.
      * @param {number} col The column in which to add the Component.
-     * @param {Component} component The Component to be added.
      * @returns {Table} The calling Table.
      */
-    public addComponent(row: number, col: number, component: Component): Table {
+    public addComponent(component: Component, row: number, col: number): Table {
 
       if (component == null) {
         throw Error("Cannot add null to a table cell");
@@ -92,7 +87,7 @@ export module Components {
         component = component.above(currentComponent);
       }
 
-      if (this._addComponent(component)) {
+      if (super.add(component)) {
         this._nRows = Math.max(row + 1, this._nRows);
         this._nCols = Math.max(col + 1, this._nCols);
         this._padTableToSize(this._nRows, this._nCols);
@@ -102,8 +97,13 @@ export module Components {
       return this;
     }
 
-    public _removeComponent(component: Component) {
-      super._removeComponent(component);
+    /**
+     * Removes a Component.
+     * 
+     * @param {Component} component The Component to be removed.
+     */
+    public removeComponent(component: Component) {
+      super.remove(component);
       for (var r = 0; r < this._nRows; r++) {
         for (var c = 0; c < this._nCols; c++) {
           if (this._rows[r][c] === component) {

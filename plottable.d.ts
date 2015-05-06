@@ -1689,7 +1689,7 @@ declare module Plottable {
          * Removes a Component from the DOM and disconnects it from everything it's
          * listening to (effectively destroying it).
          */
-        remove(): void;
+        destroy(): void;
         /**
          * Return the width of the component
          *
@@ -1749,8 +1749,19 @@ declare module Plottable {
     class ComponentContainer extends Component {
         anchor(selection: D3.Selection): ComponentContainer;
         render(): ComponentContainer;
-        _removeComponent(c: Component): void;
-        _addComponent(c: Component, prepend?: boolean): boolean;
+        /**
+         * Removes the specified Component from the ComponentContainer
+         *
+         * @param c Component the Component to remove.
+         */
+        remove(c: Component): void;
+        /**
+         * Adds the specified Component to the ComponentContainer.
+         *
+         * @param c Component the component to add
+         * @param prepend boolean whether the component should be prepended to the componentContainer or not.
+         */
+        add(c: Component, prepend?: boolean): boolean;
         /**
          * Returns a list of components in the ComponentContainer.
          *
@@ -1770,7 +1781,7 @@ declare module Plottable {
          * @returns {ComponentContainer} The calling ComponentContainer
          */
         detachAll(): ComponentContainer;
-        remove(): void;
+        destroy(): void;
     }
 }
 
@@ -1838,7 +1849,7 @@ declare module Plottable {
          * displayed.
          */
         constructor(scale: Scale<any, number>, orientation: string, formatter?: (d: any) => string);
-        remove(): void;
+        destroy(): void;
         protected _isHorizontal(): boolean;
         protected _computeWidth(): number;
         protected _computeHeight(): number;
@@ -2303,7 +2314,7 @@ declare module Plottable {
              * @returns {Legend} The calling Legend.
              */
             scale(scale: Scales.Color): Legend;
-            remove(): void;
+            destroy(): void;
             _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
             /**
              * Gets the legend entry under the given pixel position.
@@ -2352,7 +2363,7 @@ declare module Plottable {
              * @param {Formatter} The labels are formatted using this function.
              */
             constructor(interpolatedColorScale: Scales.InterpolatedColor, orientation?: string, formatter?: (d: any) => string);
-            remove(): void;
+            destroy(): void;
             /**
              * Gets the current formatter on the InterpolatedColorLegend.
              *
@@ -2399,7 +2410,7 @@ declare module Plottable {
              * @param {QuantitativeScaleScale} yScale The scale to base the y gridlines on. Pass null if no gridlines are desired.
              */
             constructor(xScale: QuantitativeScale<any>, yScale: QuantitativeScale<any>);
-            remove(): Gridlines;
+            destroy(): Gridlines;
             protected _setup(): void;
             _doRender(): void;
         }
@@ -2434,29 +2445,29 @@ declare module Plottable {
              */
             constructor(rows?: Component[][]);
             /**
-             * Adds a Component in the specified cell.
-             *
-             * If the cell is already occupied, there are 3 cases
-             *  - Component + Component => Group containing both components
-             *  - Component + Group => Component is added to the group
-             *  - Group + Component => Component is added to the group
+             * Adds a Component in the specified row and column position.
              *
              * For example, instead of calling `new Table([[a, b], [null, c]])`, you
              * could call
              * ```typescript
              * var table = new Table();
-             * table.addComponent(0, 0, a);
-             * table.addComponent(0, 1, b);
-             * table.addComponent(1, 1, c);
+             * table.addComponent(a, 0, 0);
+             * table.addComponent(b, 0, 1);
+             * table.addComponent(c, 1, 1);
              * ```
              *
+             * @param {Component} component The Component to be added.
              * @param {number} row The row in which to add the Component.
              * @param {number} col The column in which to add the Component.
-             * @param {Component} component The Component to be added.
              * @returns {Table} The calling Table.
              */
-            addComponent(row: number, col: number, component: Component): Table;
-            _removeComponent(component: Component): void;
+            addComponent(component: Component, row: number, col: number): Table;
+            /**
+             * Removes a Component.
+             *
+             * @param {Component} component The Component to be removed.
+             */
+            removeComponent(component: Component): void;
             _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
             computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Table;
             /**
@@ -2599,7 +2610,7 @@ declare module Plottable {
         constructor();
         anchor(selection: D3.Selection): Plot;
         protected _setup(): void;
-        remove(): void;
+        destroy(): void;
         /**
          * Adds a dataset to this plot. Identify this dataset with a key.
          *
@@ -2793,7 +2804,7 @@ declare module Plottable {
          * x and y position in the Plot.
          */
         project(attrToSet: string, accessor: any, scale?: Scale<any, any>): XYPlot<X, Y>;
-        remove(): XYPlot<X, Y>;
+        destroy(): XYPlot<X, Y>;
         /**
          * Sets the automatic domain adjustment over visible points for y scale.
          *

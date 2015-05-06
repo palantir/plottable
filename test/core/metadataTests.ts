@@ -202,7 +202,7 @@ describe("Metadata", () => {
 
       // This should not crash. If some metadata is not passed, undefined property error will be raised during accessor call.
       plot.renderTo(svg);
-      plot.remove();
+      plot.destroy();
     };
 
     checkPlot(new Plottable.Plots.Area(xScale, yScale));

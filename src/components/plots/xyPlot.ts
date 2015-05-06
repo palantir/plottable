@@ -71,8 +71,8 @@ module Plottable {
       return this;
     }
 
-    public remove() {
-      super.remove();
+    public destroy() {
+      super.destroy();
       if (this._xScale) {
         this._xScale.offUpdate(this._adjustYDomainOnChangeFromXCallback);
       }

@@ -37,7 +37,7 @@ module Plottable {
     private _xOffset = 0; // Offset from Origin, used for alignment and floating positioning
     private _yOffset = 0;
     private _cssClasses: string[] = ["component"];
-    private _removed = false;
+    private _destroyed = false;
 
     /**
      * Attaches the Component as a child of a given D3 Selection.
@@ -46,7 +46,7 @@ module Plottable {
      * @returns {Component} The calling Component.
      */
     public anchor(selection: D3.Selection) {
-      if (this._removed) {
+      if (this._destroyed) {
         throw new Error("Can't reuse remove()-ed components!");
       }
 
@@ -419,7 +419,7 @@ module Plottable {
       var cg: Components.Group;
       if (Plottable.Components.Group.prototype.isPrototypeOf(c)) {
         cg = (<Plottable.Components.Group> c);
-        cg._addComponent(this, below);
+        cg.add(this, below);
         return cg;
       } else {
         var mergedComponents = below ? [this, c] : [c, this];
@@ -478,7 +478,7 @@ module Plottable {
       var parent: ComponentContainer = this._parent();
 
       if (parent != null) {
-        parent._removeComponent(this);
+        parent.remove(this);
       }
       this._isAnchored = false;
       this._parentElement = null;
@@ -500,8 +500,8 @@ module Plottable {
      * Removes a Component from the DOM and disconnects it from everything it's
      * listening to (effectively destroying it).
      */
-    public remove() {
-      this._removed = true;
+    public destroy() {
+      this._destroyed = true;
       this.detach();
     }
 

@@ -289,7 +289,7 @@ describe("Component behavior", () => {
   it("can't reuse component if it's been remove()-ed", () => {
     var c1 = new Plottable.Component();
     c1.renderTo(svg);
-    c1.remove();
+    c1.destroy();
 
     assert.throws(() => c1.renderTo(svg), "reuse");
     svg.remove();
@@ -298,7 +298,7 @@ describe("Component behavior", () => {
   it("redraw() works as expected", () => {
     var cg = new Plottable.Components.Group();
     var c = TestMethods.makeFixedSizeComponent(10, 10);
-    cg._addComponent(c);
+    cg.add(c);
     cg.renderTo(svg);
     assert.strictEqual(cg.height(), 300, "height() is the entire available height");
     assert.strictEqual(cg.width(), 400, "width() is the entire available width");
@@ -319,10 +319,10 @@ describe("Component behavior", () => {
     var horizontalComponent = new Plottable.Component();
     var verticalComponent = new Plottable.Component();
     var placeHolder = new Plottable.Component();
-    var t = new Plottable.Components.Table().addComponent(0, 0, verticalComponent)
-                                 .addComponent(0, 1, new Plottable.Component())
-                                 .addComponent(1, 0, placeHolder)
-                                 .addComponent(1, 1, horizontalComponent);
+    var t = new Plottable.Components.Table().addComponent(verticalComponent, 0, 0)
+                                 .addComponent(new Plottable.Component(), 0, 1)
+                                 .addComponent(placeHolder, 1, 0)
+                                 .addComponent(horizontalComponent, 1, 1);
     t.renderTo(svg);
     horizontalComponent.xAlign("center");
     verticalComponent.yAlign("bottom");
@@ -383,7 +383,7 @@ describe("Component behavior", () => {
     var group = new Plottable.Components.Group;
     group.renderTo(svg1);
 
-    group._addComponent(plot);
+    group.add(plot);
 
     assert.deepEqual(plot._parent(), group, "the plot should be inside the group");
     assert.strictEqual(plot.height(), SVG_HEIGHT_1, "the plot should occupy the entire space of the first svg");
