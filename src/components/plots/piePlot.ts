@@ -4,7 +4,7 @@ module Plottable {
 export module Plots {
 
   export interface AccessorScaleBinding<D, R> {
-    value: _Accessor;
+    accessor: _Accessor;
     scale?: Scale<D, R>;
   }
 
@@ -160,15 +160,15 @@ export module Plots {
     }
 
     public scaledInnerRadiusAccessor(): _Accessor {
-      return Pie._scaledValueAccessor(this._innerRadius, this._innerRadiusScale);
+      return Pie._scaledAccessor(this._innerRadius, this._innerRadiusScale);
     }
 
     public scaledOuterRadiusAccessor(): _Accessor {
-      return Pie._scaledValueAccessor(this._outerRadius, this._outerRadiusScale);
+      return Pie._scaledAccessor(this._outerRadius, this._outerRadiusScale);
     }
 
     public scaledSectorValueAccessor(): _Accessor {
-      return Pie._scaledValueAccessor(this._sectorValue, this._sectorValueScale);
+      return Pie._scaledAccessor(this._sectorValue, this._sectorValueScale);
     }
 
     private _updateOuterRadiusScaleExtents() {
@@ -235,7 +235,7 @@ export module Plots {
       return this._sectorValueExtents;
     }
 
-    private static _scaledValueAccessor<SD, SR>(accessor: _Accessor, scale: Scale<SD, SR>): _Accessor {
+    private static _scaledAccessor<SD, SR>(accessor: _Accessor, scale: Scale<SD, SR>): _Accessor {
       return scale == null ?
                accessor :
                (d: any, i: number, u: any, m: Plots.PlotMetadata) => scale.scale(accessor(d, i, u, m));

@@ -7111,13 +7111,13 @@ var Plottable;
                 return this;
             };
             Pie.prototype.scaledInnerRadiusAccessor = function () {
-                return Pie._scaledValueAccessor(this._innerRadius, this._innerRadiusScale);
+                return Pie._scaledAccessor(this._innerRadius, this._innerRadiusScale);
             };
             Pie.prototype.scaledOuterRadiusAccessor = function () {
-                return Pie._scaledValueAccessor(this._outerRadius, this._outerRadiusScale);
+                return Pie._scaledAccessor(this._outerRadius, this._outerRadiusScale);
             };
             Pie.prototype.scaledSectorValueAccessor = function () {
-                return Pie._scaledValueAccessor(this._sectorValue, this._sectorValueScale);
+                return Pie._scaledAccessor(this._sectorValue, this._sectorValueScale);
             };
             Pie.prototype._updateOuterRadiusScaleExtents = function () {
                 var _this = this;
@@ -7188,7 +7188,7 @@ var Plottable;
                 }
                 return this._sectorValueExtents;
             };
-            Pie._scaledValueAccessor = function (accessor, scale) {
+            Pie._scaledAccessor = function (accessor, scale) {
                 return scale == null ? accessor : function (d, i, u, m) { return scale.scale(accessor(d, i, u, m)); };
             };
             Pie._replaceScaleBinding = function (oldScale, newScale, callback, extentProvider) {

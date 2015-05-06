@@ -2831,7 +2831,7 @@ declare module Plottable {
 declare module Plottable {
     module Plots {
         interface AccessorScaleBinding<D, R> {
-            value: _Accessor;
+            accessor: _Accessor;
             scale?: Scale<D, R>;
         }
         class Pie<D> extends Plot {
