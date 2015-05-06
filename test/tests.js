@@ -220,15 +220,15 @@ var Mocks;
             if (width === void 0) { width = 0; }
             if (height === void 0) { height = 0; }
             _super.call(this);
-            this.fixedWidth = width;
-            this.fixedHeight = height;
+            this.fsWidth = width;
+            this.fsHeight = height;
             this._fixedWidthFlag = true;
             this._fixedHeightFlag = true;
         }
         FixedSizeComponent.prototype.requestedSpace = function (availableWidth, availableHeight) {
             return {
-                minWidth: this.fixedWidth,
-                minHeight: this.fixedHeight
+                minWidth: this.fsWidth,
+                minHeight: this.fsHeight
             };
         };
         return FixedSizeComponent;
@@ -2072,8 +2072,8 @@ describe("SelectionBoxLayer", function () {
         var sbl = new Plottable.Components.SelectionBoxLayer();
         var request = sbl.requestedSpace(400, 400);
         TestMethods.verifySpaceRequest(request, 0, 0, "does not request any space");
-        assert.isTrue(sbl.hasFixedWidth(), "fixed width");
-        assert.isTrue(sbl.hasFixedHeight(), "fixed height");
+        assert.isTrue(sbl.fixedWidth(), "fixed width");
+        assert.isTrue(sbl.fixedHeight(), "fixed height");
     });
 });
 
@@ -6100,8 +6100,8 @@ describe("ComponentGroups", function () {
             var groupRequest = cg.requestedSpace(SVG_WIDTH, SVG_HEIGHT);
             var c1Request = c1.requestedSpace(SVG_WIDTH, SVG_HEIGHT);
             assert.deepEqual(groupRequest, c1Request, "request reflects request of sub-component");
-            assert.isFalse(cg.hasFixedWidth(), "width is not fixed if subcomponents are not fixed width");
-            assert.isFalse(cg.hasFixedHeight(), "height is not fixed if subcomponents are not fixed height");
+            assert.isFalse(cg.fixedWidth(), "width is not fixed if subcomponents are not fixed width");
+            assert.isFalse(cg.fixedHeight(), "height is not fixed if subcomponents are not fixed height");
             cg.renderTo(svg);
             assert.strictEqual(cg.width(), SVG_WIDTH, "occupies all offered width");
             assert.strictEqual(cg.height(), SVG_HEIGHT, "occupies all offered height");
@@ -6909,15 +6909,15 @@ describe("Tables", function () {
         var table = tableAndcomponents.table;
         var components = tableAndcomponents.components;
         components.forEach(function (c) { return TestMethods.fixComponentSize(c, 10, 10); });
-        assert.isTrue(table.hasFixedWidth(), "fixed width when all subcomponents fixed width");
-        assert.isTrue(table.hasFixedHeight(), "fixedHeight when all subcomponents fixed height");
+        assert.isTrue(table.fixedWidth(), "fixed width when all subcomponents fixed width");
+        assert.isTrue(table.fixedHeight(), "fixedHeight when all subcomponents fixed height");
         TestMethods.fixComponentSize(components[0], null, 10);
-        assert.isFalse(table.hasFixedWidth(), "width not fixed when some subcomponent width not fixed");
-        assert.isTrue(table.hasFixedHeight(), "the height is still fixed when some subcomponent width not fixed");
+        assert.isFalse(table.fixedWidth(), "width not fixed when some subcomponent width not fixed");
+        assert.isTrue(table.fixedHeight(), "the height is still fixed when some subcomponent width not fixed");
         TestMethods.fixComponentSize(components[8], 10, null);
         TestMethods.fixComponentSize(components[0], 10, 10);
-        assert.isTrue(table.hasFixedWidth(), "width fixed again once no subcomponent width not fixed");
-        assert.isFalse(table.hasFixedHeight(), "height unfixed now that a subcomponent has unfixed height");
+        assert.isTrue(table.fixedWidth(), "width fixed again once no subcomponent width not fixed");
+        assert.isFalse(table.fixedHeight(), "height unfixed now that a subcomponent has unfixed height");
     });
     it.skip("table.requestedSpace works properly", function () {
         // [0 1]

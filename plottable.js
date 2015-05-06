@@ -3303,8 +3303,8 @@ var Plottable;
         Component.prototype._getSize = function (availableWidth, availableHeight) {
             var requestedSpace = this.requestedSpace(availableWidth, availableHeight);
             return {
-                width: this.hasFixedWidth() ? Math.min(availableWidth, requestedSpace.minWidth) : availableWidth,
-                height: this.hasFixedHeight() ? Math.min(availableHeight, requestedSpace.minHeight) : availableHeight
+                width: this.fixedWidth() ? Math.min(availableWidth, requestedSpace.minWidth) : availableWidth,
+                height: this.fixedHeight() ? Math.min(availableHeight, requestedSpace.minHeight) : availableHeight
             };
         };
         /**
@@ -3543,7 +3543,7 @@ var Plottable;
          *
          * @returns {boolean} Whether the component has a fixed width.
          */
-        Component.prototype.hasFixedWidth = function () {
+        Component.prototype.fixedWidth = function () {
             return this._fixedWidthFlag;
         };
         /**
@@ -3552,7 +3552,7 @@ var Plottable;
          *
          * @returns {boolean} Whether the component has a fixed height.
          */
-        Component.prototype.hasFixedHeight = function () {
+        Component.prototype.fixedHeight = function () {
             return this._fixedHeightFlag;
         };
         Component.prototype._merge = function (c, below) {
@@ -3876,11 +3876,11 @@ var Plottable;
                     height: availableHeight
                 };
             };
-            Group.prototype.hasFixedWidth = function () {
-                return this.components().every(function (c) { return c.hasFixedWidth(); });
+            Group.prototype.fixedWidth = function () {
+                return this.components().every(function (c) { return c.fixedWidth(); });
             };
-            Group.prototype.hasFixedHeight = function () {
-                return this.components().every(function (c) { return c.hasFixedHeight(); });
+            Group.prototype.fixedHeight = function () {
+                return this.components().every(function (c) { return c.fixedHeight(); });
             };
             return Group;
         })(Plottable.ComponentContainer);
@@ -3973,10 +3973,10 @@ var Plottable;
                 minHeight: requestedHeight
             };
         };
-        Axis.prototype.hasFixedHeight = function () {
+        Axis.prototype.fixedHeight = function () {
             return this._isHorizontal();
         };
-        Axis.prototype.hasFixedWidth = function () {
+        Axis.prototype.fixedWidth = function () {
             return !this._isHorizontal();
         };
         Axis.prototype._rescale = function () {
@@ -6023,8 +6023,8 @@ var Plottable;
                 var cols = d3.transpose(this._rows);
                 var availableWidthAfterPadding = availableWidth - this._colPadding * (this._nCols - 1);
                 var availableHeightAfterPadding = availableHeight - this._rowPadding * (this._nRows - 1);
-                var rowWeights = Table._calcComponentWeights(this._rowWeights, rows, function (c) { return (c == null) || c.hasFixedHeight(); });
-                var colWeights = Table._calcComponentWeights(this._colWeights, cols, function (c) { return (c == null) || c.hasFixedWidth(); });
+                var rowWeights = Table._calcComponentWeights(this._rowWeights, rows, function (c) { return (c == null) || c.fixedHeight(); });
+                var colWeights = Table._calcComponentWeights(this._colWeights, cols, function (c) { return (c == null) || c.fixedWidth(); });
                 // To give the table a good starting position to iterate from, we give the fixed-width components half-weight
                 // so that they will get some initial space allocated to work with
                 var heuristicColWeights = colWeights.map(function (c) { return c === 0 ? 0.5 : c; });
@@ -6208,12 +6208,12 @@ var Plottable;
                 this.redraw();
                 return this;
             };
-            Table.prototype.hasFixedWidth = function () {
+            Table.prototype.fixedWidth = function () {
                 var cols = d3.transpose(this._rows);
-                return Table._fixedSpace(cols, function (c) { return (c == null) || c.hasFixedWidth(); });
+                return Table._fixedSpace(cols, function (c) { return (c == null) || c.fixedWidth(); });
             };
-            Table.prototype.hasFixedHeight = function () {
-                return Table._fixedSpace(this._rows, function (c) { return (c == null) || c.hasFixedHeight(); });
+            Table.prototype.fixedHeight = function () {
+                return Table._fixedSpace(this._rows, function (c) { return (c == null) || c.fixedHeight(); });
             };
             Table.prototype._padTableToSize = function (nRows, nCols) {
                 for (var i = 0; i < nRows; i++) {
