@@ -164,12 +164,13 @@ module Plottable {
     }
 
     /**
-     * Queues the Component for rendering.
+     * Queues the Component for rendering. Set immediately to true if the Component should be rendered
+     * immediately as opposed to queued to the RenderController.
      * 
-     * @param immediate boolean Immediately renders the Component.
+     * @returns {Component} The calling Component
      */
-    public render(immediate = false) {
-      if (immediate) {
+    public render(immediately = false) {
+      if (immediately) {
         this._render();
         return this;
       }
