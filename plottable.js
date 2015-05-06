@@ -9589,6 +9589,9 @@ var Plottable;
             function Pointer() {
                 _super.apply(this, arguments);
                 this._overComponent = false;
+                this._pointerEnterCallbacks = new Plottable.Utils.CallbackSet();
+                this._pointerMoveCallbacks = new Plottable.Utils.CallbackSet();
+                this._pointerExitCallbacks = new Plottable.Utils.CallbackSet();
             }
             Pointer.prototype._anchor = function (component) {
                 var _this = this;

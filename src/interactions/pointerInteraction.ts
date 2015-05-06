@@ -8,9 +8,9 @@ export module Interactions {
     private _mouseDispatcher: Dispatchers.Mouse;
     private _touchDispatcher: Dispatchers.Touch;
     private _overComponent = false;
-    private _pointerEnterCallbacks: Utils.CallbackSet<PointerCallback>;
-    private _pointerMoveCallbacks: Utils.CallbackSet<PointerCallback>;
-    private _pointerExitCallbacks: Utils.CallbackSet<PointerCallback>;
+    private _pointerEnterCallbacks = new Utils.CallbackSet<PointerCallback>();
+    private _pointerMoveCallbacks = new Utils.CallbackSet<PointerCallback>();
+    private _pointerExitCallbacks = new Utils.CallbackSet<PointerCallback>();
 
     public _anchor(component: Component) {
       super._anchor(component);
