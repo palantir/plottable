@@ -3887,6 +3887,7 @@ declare module Plottable {
 
 
 declare module Plottable {
+    type DragCallback = (start: Point, end: Point) => any;
     module Interactions {
         class Drag extends Interaction {
             _anchor(component: Component): void;
@@ -3914,44 +3915,47 @@ declare module Plottable {
              */
             constrainToComponent(constrain: boolean): Drag;
             /**
-             * Gets the callback that is called when dragging starts.
-             *
-             * @returns {(start: Point) => any} The callback called when dragging starts.
-             */
-            onDragStart(): (start: Point) => any;
-            /**
              * Sets the callback to be called when dragging starts.
              *
              * @param {(start: Point) => any} cb The callback to be called. Takes in a Point in pixels.
              * @returns {Drag} The calling Interactions.Drag.
              */
-            onDragStart(cb: (start: Point) => any): Drag;
+            onDragStart(callback: DragCallback): Drag;
             /**
-             * Gets the callback that is called during dragging.
+             * Removes the callback to be called when dragging starts.
              *
-             * @returns {(start: Point, end: Point) => any} The callback called during dragging.
+             * @param {(start: Point) => any} cb The callback to be removed.
+             * @returns {Drag} The calling Interactions.Drag.
              */
-            onDrag(): (start: Point, end: Point) => any;
+            offDragStart(callback: DragCallback): Drag;
             /**
              * Adds a callback to be called during dragging.
              *
              * @param {(start: Point, end: Point) => any} cb The callback to be called. Takes in Points in pixels.
              * @returns {Drag} The calling Interactions.Drag.
              */
-            onDrag(cb: (start: Point, end: Point) => any): Drag;
+            onDrag(callback: DragCallback): Drag;
             /**
-             * Gets the callback that is called when dragging ends.
+             * Removes a callback to be called during dragging.
              *
-             * @returns {(start: Point, end: Point) => any} The callback called when dragging ends.
+             * @param {(start: Point, end: Point) => any} cb The callback to be removed.
+             * @returns {Drag} The calling Interactions.Drag.
              */
-            onDragEnd(): (start: Point, end: Point) => any;
+            offDrag(callback: DragCallback): Drag;
             /**
              * Adds a callback to be called when the dragging ends.
              *
              * @param {(start: Point, end: Point) => any} cb The callback to be called. Takes in Points in pixels.
              * @returns {Drag} The calling Interactions.Drag.
              */
-            onDragEnd(cb: (start: Point, end: Point) => any): Drag;
+            onDragEnd(callback: DragCallback): Drag;
+            /**
+             * Removes a callback to be called when the dragging ends.
+             *
+             * @param {(start: Point, end: Point) => any} cb The callback to be removed
+             * @returns {Drag} The calling Interactions.Drag.
+             */
+            offDragEnd(callback: DragCallback): Drag;
         }
     }
 }

@@ -9793,6 +9793,9 @@ var Plottable;
                 _super.apply(this, arguments);
                 this._dragging = false;
                 this._constrain = true;
+                this._dragStartCallbacks = new Plottable.Utils.CallbackSet();
+                this._dragCallbacks = new Plottable.Utils.CallbackSet();
+                this._dragEndCallbacks = new Plottable.Utils.CallbackSet();
             }
             Drag.prototype._anchor = function (component) {
                 var _this = this;
@@ -9816,38 +9819,30 @@ var Plottable;
                     y: Plottable.Utils.Methods.clamp(translatedP.y, 0, this._componentToListenTo.height())
                 };
             };
-            Drag.prototype._startDrag = function (p, e) {
-                if (e instanceof MouseEvent && e.button !== 0) {
+            Drag.prototype._startDrag = function (point, event) {
+                if (event instanceof MouseEvent && event.button !== 0) {
                     return;
                 }
-                var translatedP = this._translateToComponentSpace(p);
+                var translatedP = this._translateToComponentSpace(point);
                 if (this._isInsideComponent(translatedP)) {
-                    e.preventDefault();
+                    event.preventDefault();
                     this._dragging = true;
                     this._dragOrigin = translatedP;
-                    if (this._dragStartCallback) {
-                        this._dragStartCallback(this._dragOrigin);
-                    }
+                    this._dragStartCallbacks.callCallbacks(this._dragOrigin);
                 }
             };
-            Drag.prototype._doDrag = function (p, e) {
+            Drag.prototype._doDrag = function (point, event) {
                 if (this._dragging) {
-                    if (this._dragCallback) {
-                        var constrainedP = this._translateAndConstrain(p);
-                        this._dragCallback(this._dragOrigin, constrainedP);
-                    }
+                    this._dragCallbacks.callCallbacks(this._dragOrigin, this._translateAndConstrain(point));
                 }
             };
-            Drag.prototype._endDrag = function (p, e) {
-                if (e instanceof MouseEvent && e.button !== 0) {
+            Drag.prototype._endDrag = function (point, event) {
+                if (event instanceof MouseEvent && event.button !== 0) {
                     return;
                 }
                 if (this._dragging) {
                     this._dragging = false;
-                    if (this._dragEndCallback) {
-                        var constrainedP = this._translateAndConstrain(p);
-                        this._dragEndCallback(this._dragOrigin, constrainedP);
-                    }
+                    this._dragEndCallbacks.callCallbacks(this._dragOrigin, this._translateAndConstrain(point));
                 }
             };
             Drag.prototype.constrainToComponent = function (constrain) {
@@ -9857,32 +9852,65 @@ var Plottable;
                 this._constrain = constrain;
                 return this;
             };
-            Drag.prototype.onDragStart = function (cb) {
-                if (cb === undefined) {
-                    return this._dragStartCallback;
-                }
-                else {
-                    this._dragStartCallback = cb;
-                    return this;
-                }
+            /**
+             * Sets the callback to be called when dragging starts.
+             *
+             * @param {(start: Point) => any} cb The callback to be called. Takes in a Point in pixels.
+             * @returns {Drag} The calling Interactions.Drag.
+             */
+            Drag.prototype.onDragStart = function (callback) {
+                this._dragStartCallbacks.add(callback);
+                return this;
             };
-            Drag.prototype.onDrag = function (cb) {
-                if (cb === undefined) {
-                    return this._dragCallback;
-                }
-                else {
-                    this._dragCallback = cb;
-                    return this;
-                }
+            /**
+             * Removes the callback to be called when dragging starts.
+             *
+             * @param {(start: Point) => any} cb The callback to be removed.
+             * @returns {Drag} The calling Interactions.Drag.
+             */
+            Drag.prototype.offDragStart = function (callback) {
+                this._dragStartCallbacks.delete(callback);
+                return this;
             };
-            Drag.prototype.onDragEnd = function (cb) {
-                if (cb === undefined) {
-                    return this._dragEndCallback;
-                }
-                else {
-                    this._dragEndCallback = cb;
-                    return this;
-                }
+            /**
+             * Adds a callback to be called during dragging.
+             *
+             * @param {(start: Point, end: Point) => any} cb The callback to be called. Takes in Points in pixels.
+             * @returns {Drag} The calling Interactions.Drag.
+             */
+            Drag.prototype.onDrag = function (callback) {
+                this._dragCallbacks.add(callback);
+                return this;
+            };
+            /**
+             * Removes a callback to be called during dragging.
+             *
+             * @param {(start: Point, end: Point) => any} cb The callback to be removed.
+             * @returns {Drag} The calling Interactions.Drag.
+             */
+            Drag.prototype.offDrag = function (callback) {
+                this._dragCallbacks.delete(callback);
+                return this;
+            };
+            /**
+             * Adds a callback to be called when the dragging ends.
+             *
+             * @param {(start: Point, end: Point) => any} cb The callback to be called. Takes in Points in pixels.
+             * @returns {Drag} The calling Interactions.Drag.
+             */
+            Drag.prototype.onDragEnd = function (callback) {
+                this._dragCallbacks.add(callback);
+                return this;
+            };
+            /**
+             * Removes a callback to be called when the dragging ends.
+             *
+             * @param {(start: Point, end: Point) => any} cb The callback to be removed
+             * @returns {Drag} The calling Interactions.Drag.
+             */
+            Drag.prototype.offDragEnd = function (callback) {
+                this._dragCallbacks.delete(callback);
+                return this;
             };
             return Drag;
         })(Plottable.Interaction);
