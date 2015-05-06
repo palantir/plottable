@@ -87,28 +87,12 @@ module Plottable {
       this._scales().forEach((scale) => scale.offUpdate(this._renderCallback));
     }
 
-    /**
-     * Adds a dataset to this plot. Identify this dataset with a key.
-     *
-     * A key is automatically generated if not supplied.
-     *
-     * @param {string} [key] The key of the dataset.
-     * @param {Dataset | any[]} dataset dataset to add.
+    /** 
+     * @param {Dataset} dataset
      * @returns {Plot} The calling Plot.
      */
-    public addDataset(dataset: Dataset | any[]): Plot;
-    public addDataset(key: string, dataset: Dataset | any[]): Plot;
-    public addDataset(keyOrDataset: any, dataset?: any): Plot {
-      if (typeof(keyOrDataset) !== "string" && dataset !== undefined) {
-        throw new Error("invalid input to addDataset");
-      }
-      if (typeof(keyOrDataset) === "string" && keyOrDataset[0] === "_") {
-        Utils.Methods.warn("Warning: Using _named series keys may produce collisions with unlabeled data sources");
-      }
-      var key  = typeof(keyOrDataset) === "string" ? keyOrDataset : "_" + this._nextSeriesIndex++;
-      var data = typeof(keyOrDataset) !== "string" ? keyOrDataset : dataset;
-      dataset = (data instanceof Dataset) ? data : new Dataset(data);
-
+    public addDataset(dataset: Dataset) {
+      var key = "_" + this._nextSeriesIndex++;
       this._addDataset(key, dataset);
       return this;
     }
@@ -380,35 +364,16 @@ module Plottable {
     }
 
     /**
-     * Removes a dataset by the given identifier
-     *
-     * @param {string | Dataset | any[]} datasetIdentifer The identifier as the key of the Dataset to remove
-     * If string is inputted, it is interpreted as the dataset key to remove.
-     * If Dataset is inputted, the first Dataset in the plot that is the same will be removed.
-     * If any[] is inputted, the first data array in the plot that is the same will be removed.
+     * @param {Dataset} dataset
      * @returns {Plot} The calling Plot.
      */
-    public removeDataset(datasetIdentifier: string | Dataset | any[]): Plot {
-      var key: string;
-      if (typeof datasetIdentifier === "string") {
-        key = <string> datasetIdentifier;
-      } else if (typeof datasetIdentifier === "object") {
-
-        var index = -1;
-        if (datasetIdentifier instanceof Dataset) {
-          var datasetArray = this.datasets();
-          index = datasetArray.indexOf(<Dataset> datasetIdentifier);
-        } else if (datasetIdentifier instanceof Array) {
-          var dataArray = this.datasets().map(d => d.data());
-          index = dataArray.indexOf(<any[]> datasetIdentifier);
-        }
-        if (index !== -1) {
-          key = this._datasetKeysInOrder[index];
-        }
-
+    public removeDataset(dataset: Dataset): Plot {
+      var index = this.datasets().indexOf(dataset);
+      if (index !== -1) {
+        var key = this._datasetKeysInOrder[index];
+        return this._removeDataset(key);
       }
-
-      return this._removeDataset(key);
+      return this;
     }
 
     private _removeDataset(key: string): Plot {

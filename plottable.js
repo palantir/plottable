@@ -6444,16 +6444,12 @@ var Plottable;
             this._datasetKeysInOrder.forEach(function (k) { return _this.removeDataset(k); });
             this._scales().forEach(function (scale) { return scale.offUpdate(_this._renderCallback); });
         };
-        Plot.prototype.addDataset = function (keyOrDataset, dataset) {
-            if (typeof (keyOrDataset) !== "string" && dataset !== undefined) {
-                throw new Error("invalid input to addDataset");
-            }
-            if (typeof (keyOrDataset) === "string" && keyOrDataset[0] === "_") {
-                Plottable.Utils.Methods.warn("Warning: Using _named series keys may produce collisions with unlabeled data sources");
-            }
-            var key = typeof (keyOrDataset) === "string" ? keyOrDataset : "_" + this._nextSeriesIndex++;
-            var data = typeof (keyOrDataset) !== "string" ? keyOrDataset : dataset;
-            dataset = (data instanceof Plottable.Dataset) ? data : new Plottable.Dataset(data);
+        /**
+         * @param {Dataset} dataset
+         * @returns {Plot} The calling Plot.
+         */
+        Plot.prototype.addDataset = function (dataset) {
+            var key = "_" + this._nextSeriesIndex++;
             this._addDataset(key, dataset);
             return this;
         };
@@ -6682,34 +6678,16 @@ var Plottable;
             return this;
         };
         /**
-         * Removes a dataset by the given identifier
-         *
-         * @param {string | Dataset | any[]} datasetIdentifer The identifier as the key of the Dataset to remove
-         * If string is inputted, it is interpreted as the dataset key to remove.
-         * If Dataset is inputted, the first Dataset in the plot that is the same will be removed.
-         * If any[] is inputted, the first data array in the plot that is the same will be removed.
+         * @param {Dataset} dataset
          * @returns {Plot} The calling Plot.
          */
-        Plot.prototype.removeDataset = function (datasetIdentifier) {
-            var key;
-            if (typeof datasetIdentifier === "string") {
-                key = datasetIdentifier;
+        Plot.prototype.removeDataset = function (dataset) {
+            var index = this.datasets().indexOf(dataset);
+            if (index !== -1) {
+                var key = this._datasetKeysInOrder[index];
+                return this._removeDataset(key);
             }
-            else if (typeof datasetIdentifier === "object") {
-                var index = -1;
-                if (datasetIdentifier instanceof Plottable.Dataset) {
-                    var datasetArray = this.datasets();
-                    index = datasetArray.indexOf(datasetIdentifier);
-                }
-                else if (datasetIdentifier instanceof Array) {
-                    var dataArray = this.datasets().map(function (d) { return d.data(); });
-                    index = dataArray.indexOf(datasetIdentifier);
-                }
-                if (index !== -1) {
-                    key = this._datasetKeysInOrder[index];
-                }
-            }
-            return this._removeDataset(key);
+            return this;
         };
         Plot.prototype._removeDataset = function (key) {
             if (key != null && this._key2PlotDatasetKey.has(key)) {
