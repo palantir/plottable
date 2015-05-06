@@ -1188,176 +1188,165 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    var Core;
-    (function (Core) {
-        var RenderControllers;
-        (function (RenderControllers) {
-            var RenderPolicies;
-            (function (RenderPolicies) {
-                /**
-                 * Never queue anything, render everything immediately. Useful for
-                 * debugging, horrible for performance.
-                 */
-                var Immediate = (function () {
-                    function Immediate() {
-                    }
-                    Immediate.prototype.render = function () {
-                        RenderControllers.flush();
-                    };
-                    return Immediate;
-                })();
-                RenderPolicies.Immediate = Immediate;
-                /**
-                 * The default way to render, which only tries to render every frame
-                 * (usually, 1/60th of a second).
-                 */
-                var AnimationFrame = (function () {
-                    function AnimationFrame() {
-                    }
-                    AnimationFrame.prototype.render = function () {
-                        Plottable.Utils.DOM.requestAnimationFramePolyfill(RenderControllers.flush);
-                    };
-                    return AnimationFrame;
-                })();
-                RenderPolicies.AnimationFrame = AnimationFrame;
-                /**
-                 * Renders with `setTimeout`. This is generally an inferior way to render
-                 * compared to `requestAnimationFrame`, but it's still there if you want
-                 * it.
-                 */
-                var Timeout = (function () {
-                    function Timeout() {
-                        this._timeoutMsec = Plottable.Utils.DOM.POLYFILL_TIMEOUT_MSEC;
-                    }
-                    Timeout.prototype.render = function () {
-                        setTimeout(RenderControllers.flush, this._timeoutMsec);
-                    };
-                    return Timeout;
-                })();
-                RenderPolicies.Timeout = Timeout;
-            })(RenderPolicies = RenderControllers.RenderPolicies || (RenderControllers.RenderPolicies = {}));
-        })(RenderControllers = Core.RenderControllers || (Core.RenderControllers = {}));
-    })(Core = Plottable.Core || (Plottable.Core = {}));
+    var RenderPolicies;
+    (function (RenderPolicies) {
+        /**
+         * Never queue anything, render everything immediately. Useful for
+         * debugging, horrible for performance.
+         */
+        var Immediate = (function () {
+            function Immediate() {
+            }
+            Immediate.prototype.render = function () {
+                Plottable.RenderController.flush();
+            };
+            return Immediate;
+        })();
+        RenderPolicies.Immediate = Immediate;
+        /**
+         * The default way to render, which only tries to render every frame
+         * (usually, 1/60th of a second).
+         */
+        var AnimationFrame = (function () {
+            function AnimationFrame() {
+            }
+            AnimationFrame.prototype.render = function () {
+                Plottable.Utils.DOM.requestAnimationFramePolyfill(Plottable.RenderController.flush);
+            };
+            return AnimationFrame;
+        })();
+        RenderPolicies.AnimationFrame = AnimationFrame;
+        /**
+         * Renders with `setTimeout`. This is generally an inferior way to render
+         * compared to `requestAnimationFrame`, but it's still there if you want
+         * it.
+         */
+        var Timeout = (function () {
+            function Timeout() {
+                this._timeoutMsec = Plottable.Utils.DOM.POLYFILL_TIMEOUT_MSEC;
+            }
+            Timeout.prototype.render = function () {
+                setTimeout(Plottable.RenderController.flush, this._timeoutMsec);
+            };
+            return Timeout;
+        })();
+        RenderPolicies.Timeout = Timeout;
+    })(RenderPolicies = Plottable.RenderPolicies || (Plottable.RenderPolicies = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    var Core;
-    (function (Core) {
+    /**
+     * The RenderController is responsible for enqueueing and synchronizing
+     * layout and render calls for Plottable components.
+     *
+     * Layouts and renders occur inside an animation callback
+     * (window.requestAnimationFrame if available).
+     *
+     * If you require immediate rendering, call RenderController.flush() to
+     * perform enqueued layout and rendering serially.
+     *
+     * If you want to always have immediate rendering (useful for debugging),
+     * call
+     * ```typescript
+     * Plottable.RenderController.setRenderPolicy(
+     *   new Plottable.RenderPolicy.Immediate()
+     * );
+     * ```
+     */
+    var RenderController;
+    (function (RenderController) {
+        var _componentsNeedingRender = new Plottable.Utils.Set();
+        var _componentsNeedingComputeLayout = new Plottable.Utils.Set();
+        var _animationRequested = false;
+        var _isCurrentlyFlushing = false;
+        RenderController._renderPolicy = new Plottable.RenderPolicies.AnimationFrame();
+        function setRenderPolicy(policy) {
+            if (typeof (policy) === "string") {
+                switch (policy.toLowerCase()) {
+                    case "immediate":
+                        policy = new Plottable.RenderPolicies.Immediate();
+                        break;
+                    case "animationframe":
+                        policy = new Plottable.RenderPolicies.AnimationFrame();
+                        break;
+                    case "timeout":
+                        policy = new Plottable.RenderPolicies.Timeout();
+                        break;
+                    default:
+                        Plottable.Utils.Methods.warn("Unrecognized renderPolicy: " + policy);
+                        return;
+                }
+            }
+            RenderController._renderPolicy = policy;
+        }
+        RenderController.setRenderPolicy = setRenderPolicy;
         /**
-         * The RenderController is responsible for enqueueing and synchronizing
-         * layout and render calls for Plottable components.
+         * If the RenderController is enabled, we enqueue the component for
+         * render. Otherwise, it is rendered immediately.
          *
-         * Layouts and renders occur inside an animation callback
-         * (window.requestAnimationFrame if available).
-         *
-         * If you require immediate rendering, call RenderController.flush() to
-         * perform enqueued layout and rendering serially.
-         *
-         * If you want to always have immediate rendering (useful for debugging),
-         * call
-         * ```typescript
-         * Plottable.Core.RenderController.setRenderPolicy(
-         *   new Plottable.Core.RenderController.RenderPolicy.Immediate()
-         * );
-         * ```
+         * @param {Component} component Any Plottable component.
          */
-        var RenderControllers;
-        (function (RenderControllers) {
-            var _componentsNeedingRender = new Plottable.Utils.Set();
-            var _componentsNeedingComputeLayout = new Plottable.Utils.Set();
-            var _animationRequested = false;
-            var _isCurrentlyFlushing = false;
-            RenderControllers._renderPolicy = new RenderControllers.RenderPolicies.AnimationFrame();
-            function setRenderPolicy(policy) {
-                if (typeof (policy) === "string") {
-                    switch (policy.toLowerCase()) {
-                        case "immediate":
-                            policy = new RenderControllers.RenderPolicies.Immediate();
-                            break;
-                        case "animationframe":
-                            policy = new RenderControllers.RenderPolicies.AnimationFrame();
-                            break;
-                        case "timeout":
-                            policy = new RenderControllers.RenderPolicies.Timeout();
-                            break;
-                        default:
-                            Plottable.Utils.Methods.warn("Unrecognized renderPolicy: " + policy);
-                            return;
+        function registerToRender(component) {
+            if (_isCurrentlyFlushing) {
+                Plottable.Utils.Methods.warn("Registered to render while other components are flushing: request may be ignored");
+            }
+            _componentsNeedingRender.add(component);
+            requestRender();
+        }
+        RenderController.registerToRender = registerToRender;
+        /**
+         * If the RenderController is enabled, we enqueue the component for
+         * layout and render. Otherwise, it is rendered immediately.
+         *
+         * @param {Component} component Any Plottable component.
+         */
+        function registerToComputeLayout(component) {
+            _componentsNeedingComputeLayout.add(component);
+            _componentsNeedingRender.add(component);
+            requestRender();
+        }
+        RenderController.registerToComputeLayout = registerToComputeLayout;
+        function requestRender() {
+            // Only run or enqueue flush on first request.
+            if (!_animationRequested) {
+                _animationRequested = true;
+                RenderController._renderPolicy.render();
+            }
+        }
+        /**
+         * Render everything that is waiting to be rendered right now, instead of
+         * waiting until the next frame.
+         *
+         * Useful to call when debugging.
+         */
+        function flush() {
+            if (_animationRequested) {
+                // Layout
+                _componentsNeedingComputeLayout.values().forEach(function (component) { return component.computeLayout(); });
+                _isCurrentlyFlushing = true;
+                var failed = new Plottable.Utils.Set();
+                _componentsNeedingRender.values().forEach(function (component) {
+                    try {
+                        component._doRender();
                     }
-                }
-                RenderControllers._renderPolicy = policy;
+                    catch (err) {
+                        // throw error with timeout to avoid interrupting further renders
+                        window.setTimeout(function () {
+                            throw err;
+                        }, 0);
+                        failed.add(component);
+                    }
+                });
+                _componentsNeedingComputeLayout = new Plottable.Utils.Set();
+                _componentsNeedingRender = failed;
+                _animationRequested = false;
+                _isCurrentlyFlushing = false;
             }
-            RenderControllers.setRenderPolicy = setRenderPolicy;
-            /**
-             * If the RenderController is enabled, we enqueue the component for
-             * render. Otherwise, it is rendered immediately.
-             *
-             * @param {Component} component Any Plottable component.
-             */
-            function registerToRender(component) {
-                if (_isCurrentlyFlushing) {
-                    Plottable.Utils.Methods.warn("Registered to render while other components are flushing: request may be ignored");
-                }
-                _componentsNeedingRender.add(component);
-                requestRender();
-            }
-            RenderControllers.registerToRender = registerToRender;
-            /**
-             * If the RenderController is enabled, we enqueue the component for
-             * layout and render. Otherwise, it is rendered immediately.
-             *
-             * @param {Component} component Any Plottable component.
-             */
-            function registerToComputeLayout(component) {
-                _componentsNeedingComputeLayout.add(component);
-                _componentsNeedingRender.add(component);
-                requestRender();
-            }
-            RenderControllers.registerToComputeLayout = registerToComputeLayout;
-            function requestRender() {
-                // Only run or enqueue flush on first request.
-                if (!_animationRequested) {
-                    _animationRequested = true;
-                    RenderControllers._renderPolicy.render();
-                }
-            }
-            /**
-             * Render everything that is waiting to be rendered right now, instead of
-             * waiting until the next frame.
-             *
-             * Useful to call when debugging.
-             */
-            function flush() {
-                if (_animationRequested) {
-                    // Layout
-                    _componentsNeedingComputeLayout.values().forEach(function (component) { return component.computeLayout(); });
-                    // Top level render; Containers will put their children in the toRender queue
-                    _componentsNeedingRender.values().forEach(function (component) { return component.render(); });
-                    _isCurrentlyFlushing = true;
-                    var failed = new Plottable.Utils.Set();
-                    _componentsNeedingRender.values().forEach(function (component) {
-                        try {
-                            component._doRender();
-                        }
-                        catch (err) {
-                            // throw error with timeout to avoid interrupting further renders
-                            window.setTimeout(function () {
-                                throw err;
-                            }, 0);
-                            failed.add(component);
-                        }
-                    });
-                    _componentsNeedingComputeLayout = new Plottable.Utils.Set();
-                    _componentsNeedingRender = failed;
-                    _animationRequested = false;
-                    _isCurrentlyFlushing = false;
-                }
-            }
-            RenderControllers.flush = flush;
-        })(RenderControllers = Core.RenderControllers || (Core.RenderControllers = {}));
-    })(Core = Plottable.Core || (Plottable.Core = {}));
+        }
+        RenderController.flush = flush;
+    })(RenderController = Plottable.RenderController || (Plottable.RenderController = {}));
 })(Plottable || (Plottable = {}));
 
 var Plottable;
@@ -3320,13 +3309,13 @@ var Plottable;
         };
         Component.prototype.render = function () {
             if (this._isAnchored && this._isSetup && this.width() >= 0 && this.height() >= 0) {
-                Plottable.Core.RenderControllers.registerToRender(this);
+                Plottable.RenderController.registerToRender(this);
             }
             return this;
         };
         Component.prototype._scheduleComputeLayout = function () {
             if (this._isAnchored && this._isSetup) {
-                Plottable.Core.RenderControllers.registerToComputeLayout(this);
+                Plottable.RenderController.registerToComputeLayout(this);
             }
         };
         Component.prototype._doRender = function () {
@@ -3378,7 +3367,7 @@ var Plottable;
             this.computeLayout();
             this.render();
             // flush so that consumers can immediately attach to stuff we create in the DOM
-            Plottable.Core.RenderControllers.flush();
+            Plottable.RenderController.flush();
             return this;
         };
         /**

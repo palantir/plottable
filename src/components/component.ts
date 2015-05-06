@@ -165,14 +165,14 @@ module Plottable {
 
     public render() {
       if (this._isAnchored && this._isSetup && this.width() >= 0 && this.height() >= 0) {
-        Core.RenderControllers.registerToRender(this);
+        RenderController.registerToRender(this);
       }
       return this;
     }
 
     private _scheduleComputeLayout() {
       if (this._isAnchored && this._isSetup) {
-        Core.RenderControllers.registerToComputeLayout(this);
+        RenderController.registerToComputeLayout(this);
       }
     }
 
@@ -224,7 +224,7 @@ module Plottable {
       this.computeLayout();
       this.render();
       // flush so that consumers can immediately attach to stuff we create in the DOM
-      Core.RenderControllers.flush();
+      RenderController.flush();
       return this;
     }
 
