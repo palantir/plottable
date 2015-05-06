@@ -9899,7 +9899,7 @@ var Plottable;
              * @returns {Drag} The calling Interactions.Drag.
              */
             Drag.prototype.onDragEnd = function (callback) {
-                this._dragCallbacks.add(callback);
+                this._dragEndCallbacks.add(callback);
                 return this;
             };
             /**
@@ -9909,7 +9909,7 @@ var Plottable;
              * @returns {Drag} The calling Interactions.Drag.
              */
             Drag.prototype.offDragEnd = function (callback) {
-                this._dragCallbacks.delete(callback);
+                this._dragEndCallbacks.delete(callback);
                 return this;
             };
             return Drag;

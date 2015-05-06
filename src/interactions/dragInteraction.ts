@@ -155,7 +155,7 @@ export module Interactions {
      * @returns {Drag} The calling Interactions.Drag.
      */
     public onDragEnd(callback: DragCallback) {
-      this._dragCallbacks.add(callback);
+      this._dragEndCallbacks.add(callback);
       return this;
     }
 
@@ -166,7 +166,7 @@ export module Interactions {
      * @returns {Drag} The calling Interactions.Drag.
      */
     public offDragEnd(callback: DragCallback) {
-      this._dragCallbacks.delete(callback);
+      this._dragEndCallbacks.delete(callback);
       return this;
     }
   }

@@ -75,9 +75,11 @@ describe("Interactions", () => {
       TestMethods.triggerFakeTouchEvent("touchstart", target, [{x: outsidePointNeg.x, y: outsidePointNeg.y}]);
       assert.isFalse(startCallbackCalled, "does not trigger callback if drag starts outside the Component (negative) (touchstart)");
 
-      assert.strictEqual(drag.onDragStart(), startCallback, "retrieves the callback if called with no arguments");
-      drag.onDragStart(null);
-      assert.isNull(drag.onDragStart(), "removes the callback if called with null");
+      drag.offDragStart(startCallback);
+
+      //TODO
+
+      // assert.isNull(drag.onDragStart(), "removes the callback if called with null");
       svg.remove();
     });
 
@@ -113,9 +115,10 @@ describe("Interactions", () => {
       assert.deepEqual(receivedStart, startPoint, "was passed the correct starting point");
       assert.deepEqual(receivedEnd, endPoint, "was passed the correct current point");
 
-      assert.strictEqual(drag.onDrag(), moveCallback, "retrieves the callback if called with no arguments");
-      drag.onDrag(null);
-      assert.isNull(drag.onDrag(), "removes the callback if called with null");
+      drag.offDrag(moveCallback);
+
+      //TODO
+      // assert.isNull(drag.onDrag(), "removes the callback if called with null");
       svg.remove();
     });
 
@@ -158,9 +161,10 @@ describe("Interactions", () => {
       assert.deepEqual(receivedStart, startPoint, "was passed the correct starting point");
       assert.deepEqual(receivedEnd, endPoint, "was passed the correct current point");
 
-      assert.strictEqual(drag.onDragEnd(), endCallback, "retrieves the callback if called with no arguments");
-      drag.onDragEnd(null);
-      assert.isNull(drag.onDragEnd(), "removes the callback if called with null");
+      drag.offDragEnd(endCallback);
+
+      //TODO
+      // assert.isNull(drag.onDragEnd(), "removes the callback if called with null");
       svg.remove();
     });
 

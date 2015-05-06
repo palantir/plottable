@@ -108,7 +108,6 @@ describe("Interactive Components", () => {
 
       assert.deepEqual(receivedBounds.topLeft, startPoint, "top-left point was set correctly");
       assert.deepEqual(receivedBounds.bottomRight, startPoint, "bottom-right point was set correctly");
-      assert.strictEqual(dbl.onDragStart(), callback, "can retrieve callback by calling with no args");
       dbl.onDragStart(null);
       assert.isNull(dbl.onDragStart(), "can blank callback by passing null");
 
@@ -140,7 +139,6 @@ describe("Interactive Components", () => {
 
       assert.deepEqual(receivedBounds.topLeft, startPoint, "top-left point was set correctly");
       assert.deepEqual(receivedBounds.bottomRight, endPoint, "bottom-right point was set correctly");
-      assert.strictEqual(dbl.onDrag(), callback, "can retrieve callback by calling with no args");
       dbl.onDrag(null);
       assert.isNull(dbl.onDrag(), "can blank callback by passing null");
 
@@ -172,7 +170,6 @@ describe("Interactive Components", () => {
 
       assert.deepEqual(receivedBounds.topLeft, startPoint, "top-left point was set correctly");
       assert.deepEqual(receivedBounds.bottomRight, endPoint, "bottom-right point was set correctly");
-      assert.strictEqual(dbl.onDragEnd(), callback, "can retrieve callback by calling with no args");
       dbl.onDragEnd(null);
       assert.isNull(dbl.onDragEnd(), "can blank callback by passing null");
 

@@ -8870,9 +8870,9 @@ describe("Interactions", function () {
             assert.isFalse(startCallbackCalled, "does not trigger callback if drag starts outside the Component (positive) (touchstart)");
             TestMethods.triggerFakeTouchEvent("touchstart", target, [{ x: outsidePointNeg.x, y: outsidePointNeg.y }]);
             assert.isFalse(startCallbackCalled, "does not trigger callback if drag starts outside the Component (negative) (touchstart)");
-            assert.strictEqual(drag.onDragStart(), startCallback, "retrieves the callback if called with no arguments");
-            drag.onDragStart(null);
-            assert.isNull(drag.onDragStart(), "removes the callback if called with null");
+            drag.offDragStart(startCallback);
+            //TODO
+            // assert.isNull(drag.onDragStart(), "removes the callback if called with null");
             svg.remove();
         });
         it("onDrag()", function () {
@@ -8903,9 +8903,9 @@ describe("Interactions", function () {
             assert.isTrue(moveCallbackCalled, "callback was called on dragging (touchmove)");
             assert.deepEqual(receivedStart, startPoint, "was passed the correct starting point");
             assert.deepEqual(receivedEnd, endPoint, "was passed the correct current point");
-            assert.strictEqual(drag.onDrag(), moveCallback, "retrieves the callback if called with no arguments");
-            drag.onDrag(null);
-            assert.isNull(drag.onDrag(), "removes the callback if called with null");
+            drag.offDrag(moveCallback);
+            //TODO
+            // assert.isNull(drag.onDrag(), "removes the callback if called with null");
             svg.remove();
         });
         it("onDragEnd()", function () {
@@ -8942,9 +8942,9 @@ describe("Interactions", function () {
             assert.isTrue(endCallbackCalled, "callback was called on drag ending (touchend)");
             assert.deepEqual(receivedStart, startPoint, "was passed the correct starting point");
             assert.deepEqual(receivedEnd, endPoint, "was passed the correct current point");
-            assert.strictEqual(drag.onDragEnd(), endCallback, "retrieves the callback if called with no arguments");
-            drag.onDragEnd(null);
-            assert.isNull(drag.onDragEnd(), "removes the callback if called with null");
+            drag.offDragEnd(endCallback);
+            //TODO
+            // assert.isNull(drag.onDragEnd(), "removes the callback if called with null");
             svg.remove();
         });
         it("constrainToComponent()", function () {
@@ -9672,7 +9672,6 @@ describe("Interactive Components", function () {
             TestMethods.triggerFakeDragSequence(target, startPoint, endPoint);
             assert.deepEqual(receivedBounds.topLeft, startPoint, "top-left point was set correctly");
             assert.deepEqual(receivedBounds.bottomRight, startPoint, "bottom-right point was set correctly");
-            assert.strictEqual(dbl.onDragStart(), callback, "can retrieve callback by calling with no args");
             dbl.onDragStart(null);
             assert.isNull(dbl.onDragStart(), "can blank callback by passing null");
             svg.remove();
@@ -9698,7 +9697,6 @@ describe("Interactive Components", function () {
             TestMethods.triggerFakeDragSequence(target, startPoint, endPoint);
             assert.deepEqual(receivedBounds.topLeft, startPoint, "top-left point was set correctly");
             assert.deepEqual(receivedBounds.bottomRight, endPoint, "bottom-right point was set correctly");
-            assert.strictEqual(dbl.onDrag(), callback, "can retrieve callback by calling with no args");
             dbl.onDrag(null);
             assert.isNull(dbl.onDrag(), "can blank callback by passing null");
             svg.remove();
@@ -9724,7 +9722,6 @@ describe("Interactive Components", function () {
             TestMethods.triggerFakeDragSequence(target, startPoint, endPoint);
             assert.deepEqual(receivedBounds.topLeft, startPoint, "top-left point was set correctly");
             assert.deepEqual(receivedBounds.bottomRight, endPoint, "bottom-right point was set correctly");
-            assert.strictEqual(dbl.onDragEnd(), callback, "can retrieve callback by calling with no args");
             dbl.onDragEnd(null);
             assert.isNull(dbl.onDragEnd(), "can blank callback by passing null");
             svg.remove();
