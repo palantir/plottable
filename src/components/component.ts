@@ -101,7 +101,7 @@ module Plottable {
       this._isSetup = true;
     }
 
-    public _requestedSpace(availableWidth: number, availableHeight: number): _SpaceRequest {
+    public requestedSpace(availableWidth: number, availableHeight: number): _SpaceRequest {
       return {
         minWidth: 0,
         minHeight: 0
@@ -156,7 +156,7 @@ module Plottable {
     }
 
     protected _getSize(availableWidth: number, availableHeight: number) {
-      var requestedSpace = this._requestedSpace(availableWidth, availableHeight);
+      var requestedSpace = this.requestedSpace(availableWidth, availableHeight);
       return {
         width: this._isFixedWidth()  ? Math.min(availableWidth , requestedSpace.minWidth)  : availableWidth,
         height: this._isFixedHeight() ? Math.min(availableHeight, requestedSpace.minHeight) : availableHeight

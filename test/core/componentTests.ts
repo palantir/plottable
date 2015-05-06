@@ -190,7 +190,7 @@ describe("Component behavior", () => {
   });
 
   it("component defaults are as expected", () => {
-    var layout = c._requestedSpace(1, 1);
+    var layout = c.requestedSpace(1, 1);
     assert.strictEqual(layout.minWidth, 0, "requested width defaults to 0");
     assert.strictEqual(layout.minHeight, 0, "requested height defaults to 0");
     assert.strictEqual((<any> c)._xAlignProportion, 0, "_xAlignProportion defaults to 0");
@@ -338,7 +338,7 @@ describe("Component behavior", () => {
   it("Components will not translate if they are fixed width/height and request more space than offered", () => {
     // catches #1188
     var c: any = new Plottable.Component();
-    c._requestedSpace = () => { return { minWidth: 500, minHeight: 500}; };
+    c.requestedSpace = () => { return { minWidth: 500, minHeight: 500}; };
     c._fixedWidthFlag = true;
     c._fixedHeightFlag = true;
     c.xAlign("left");

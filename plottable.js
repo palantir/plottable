@@ -3247,7 +3247,7 @@ var Plottable;
             this._interactionsToRegister = null;
             this._isSetup = true;
         };
-        Component.prototype._requestedSpace = function (availableWidth, availableHeight) {
+        Component.prototype.requestedSpace = function (availableWidth, availableHeight) {
             return {
                 minWidth: 0,
                 minHeight: 0
@@ -3301,7 +3301,7 @@ var Plottable;
             return this;
         };
         Component.prototype._getSize = function (availableWidth, availableHeight) {
-            var requestedSpace = this._requestedSpace(availableWidth, availableHeight);
+            var requestedSpace = this.requestedSpace(availableWidth, availableHeight);
             return {
                 width: this._isFixedWidth() ? Math.min(availableWidth, requestedSpace.minWidth) : availableWidth,
                 height: this._isFixedHeight() ? Math.min(availableHeight, requestedSpace.minHeight) : availableHeight
@@ -3851,8 +3851,8 @@ var Plottable;
                 this.classed("component-group", true);
                 components.forEach(function (c) { return _this.add(c); });
             }
-            Group.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
-                var requests = this.components().map(function (c) { return c._requestedSpace(offeredWidth, offeredHeight); });
+            Group.prototype.requestedSpace = function (offeredWidth, offeredHeight) {
+                var requests = this.components().map(function (c) { return c.requestedSpace(offeredWidth, offeredHeight); });
                 return {
                     minWidth: Plottable.Utils.Methods.max(requests, function (request) { return request.minWidth; }, 0),
                     minHeight: Plottable.Utils.Methods.max(requests, function (request) { return request.minHeight; }, 0)
@@ -3953,7 +3953,7 @@ var Plottable;
             this._computedHeight = this._maxLabelTickLength();
             return this._computedHeight;
         };
-        Axis.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
+        Axis.prototype.requestedSpace = function (offeredWidth, offeredHeight) {
             var requestedWidth = 0;
             var requestedHeight = 0;
             if (this._isHorizontal()) {
@@ -5016,7 +5016,7 @@ var Plottable;
             Category.prototype._rescale = function () {
                 return this.redraw();
             };
-            Category.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
+            Category.prototype.requestedSpace = function (offeredWidth, offeredHeight) {
                 var widthRequiredByTicks = this._isHorizontal() ? 0 : this._maxLabelTickLength() + this.tickLabelPadding() + this.gutter();
                 var heightRequiredByTicks = this._isHorizontal() ? this._maxLabelTickLength() + this.tickLabelPadding() + this.gutter() : 0;
                 if (this._scale.domain().length === 0) {
@@ -5236,7 +5236,7 @@ var Plottable;
                 this._yAlignment = alignmentLC;
                 return this;
             };
-            Label.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
+            Label.prototype.requestedSpace = function (offeredWidth, offeredHeight) {
                 var desiredWH = this._measurer.measure(this._text);
                 var desiredWidth = (this.orient() === "horizontal" ? desiredWH.width : desiredWH.height) + 2 * this.padding();
                 var desiredHeight = (this.orient() === "horizontal" ? desiredWH.height : desiredWH.width) + 2 * this.padding();
@@ -5458,7 +5458,7 @@ var Plottable;
                     numRowsToDraw: Math.max(Math.min(rowsAvailable, rows.length), 0)
                 };
             };
-            Legend.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
+            Legend.prototype.requestedSpace = function (offeredWidth, offeredHeight) {
                 var estimatedLayout = this._calculateLayoutInfo(offeredWidth, offeredHeight);
                 var untruncatedRowLengths = estimatedLayout.rows.map(function (row) {
                     return d3.sum(row, function (entry) { return estimatedLayout.untruncatedEntryLengths.get(entry); });
@@ -5681,7 +5681,7 @@ var Plottable;
                 this._wrapper = new SVGTypewriter.Wrappers.Wrapper();
                 this._writer = new SVGTypewriter.Writers.Writer(this._measurer, this._wrapper);
             };
-            InterpolatedColorLegend.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
+            InterpolatedColorLegend.prototype.requestedSpace = function (offeredWidth, offeredHeight) {
                 var _this = this;
                 var textHeight = this._measurer.measure().height;
                 var ticks = this._generateTicks();
@@ -6093,7 +6093,7 @@ var Plottable;
                     row.forEach(function (component, colIndex) {
                         var spaceRequest;
                         if (component != null) {
-                            spaceRequest = component._requestedSpace(offeredWidths[colIndex], offeredHeights[rowIndex]);
+                            spaceRequest = component.requestedSpace(offeredWidths[colIndex], offeredHeights[rowIndex]);
                         }
                         else {
                             spaceRequest = {
@@ -6118,7 +6118,7 @@ var Plottable;
                     wantsHeightArr: rowNeedsHeight
                 };
             };
-            Table.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
+            Table.prototype.requestedSpace = function (offeredWidth, offeredHeight) {
                 this._calculatedLayout = this._iterateLayout(offeredWidth, offeredHeight);
                 return {
                     minWidth: d3.sum(this._calculatedLayout.guaranteedWidths),
