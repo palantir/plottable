@@ -1,14 +1,16 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
+
+export type PointerCallback = (point: Point) => any;
 export module Interactions {
   export class Pointer extends Interaction {
     private _mouseDispatcher: Dispatchers.Mouse;
     private _touchDispatcher: Dispatchers.Touch;
     private _overComponent = false;
-    private _pointerEnterCallback: (p: Point) => any;
-    private _pointerMoveCallback: (p: Point) => any;
-    private _pointerExitCallback: (p: Point) => any;
+    private _pointerEnterCallbacks = new Utils.CallbackSet<PointerCallback>();
+    private _pointerMoveCallbacks = new Utils.CallbackSet<PointerCallback>();
+    private _pointerExitCallbacks = new Utils.CallbackSet<PointerCallback>();
 
     public _anchor(component: Component) {
       super._anchor(component);
@@ -24,80 +26,79 @@ export module Interactions {
       if (this._isInsideComponent(translatedP)) {
         var wasOverComponent = this._overComponent;
         this._overComponent = true;
-        if (!wasOverComponent && this._pointerEnterCallback) {
-          this._pointerEnterCallback(translatedP);
+        if (!wasOverComponent) {
+          this._pointerEnterCallbacks.callCallbacks(translatedP);
         }
-        if (this._pointerMoveCallback) {
-          this._pointerMoveCallback(translatedP);
-        }
+        this._pointerMoveCallbacks.callCallbacks(translatedP);
       } else if (this._overComponent) {
         this._overComponent = false;
-        if (this._pointerExitCallback) {
-          this._pointerExitCallback(translatedP);
-        }
+        this._pointerExitCallbacks.callCallbacks(translatedP);
       }
     }
 
-    /**
-     * Gets the callback called when the pointer enters the Component.
-     *
-     * @return {(p: Point) => any} The current callback.
-     */
-    public onPointerEnter(): (p: Point) => any;
     /**
      * Sets the callback called when the pointer enters the Component.
      *
-     * @param {(p: Point) => any} callback The callback to set.
+     * @param {PointerCallback} callback The callback to set.
      * @return {Interaction.Pointer} The calling Interaction.Pointer.
      */
-    public onPointerEnter(callback: (p: Point) => any): Interactions.Pointer;
-    public onPointerEnter(callback?: (p: Point) => any): any {
-      if (callback === undefined) {
-        return this._pointerEnterCallback;
-      }
-      this._pointerEnterCallback = callback;
+    public onPointerEnter(callback: PointerCallback) {
+      this._pointerEnterCallbacks.add(callback);
       return this;
     }
 
     /**
-     * Gets the callback called when the pointer moves.
+     * Removes a callback called when the pointer enters the Component.
      *
-     * @return {(p: Point) => any} The current callback.
+     * @param {PointerCallback} callback The callback to remove.
+     * @return {Interaction.Pointer} The calling Interaction.Pointer.
      */
-    public onPointerMove(): (p: Point) => any;
+    public offPointerEnter(callback: PointerCallback) {
+      this._pointerEnterCallbacks.delete(callback);
+      return this;
+    }
+
     /**
      * Sets the callback called when the pointer moves.
      *
-     * @param {(p: Point) => any} callback The callback to set.
+     * @param {PointerCallback} callback The callback to set.
      * @return {Interaction.Pointer} The calling Interaction.Pointer.
      */
-    public onPointerMove(callback: (p: Point) => any): Interactions.Pointer;
-    public onPointerMove(callback?: (p: Point) => any): any {
-      if (callback === undefined) {
-        return this._pointerMoveCallback;
-      }
-      this._pointerMoveCallback = callback;
+    public onPointerMove(callback: PointerCallback) {
+      this._pointerMoveCallbacks.add(callback);
       return this;
     }
 
     /**
-     * Gets the callback called when the pointer exits the Component.
+     * Removes a callback called when the pointer moves.
      *
-     * @return {(p: Point) => any} The current callback.
+     * @param {PointerCallback} callback The callback to remove.
+     * @return {Interaction.Pointer} The calling Interaction.Pointer.
      */
-    public onPointerExit(): (p: Point) => any;
+    public offPointerMove(callback: PointerCallback) {
+      this._pointerMoveCallbacks.delete(callback);
+      return this;
+    }
+
     /**
      * Sets the callback called when the pointer exits the Component.
      *
-     * @param {(p: Point) => any} callback The callback to set.
+     * @param {PointerCallback} callback The callback to set.
      * @return {Interaction.Pointer} The calling Interaction.Pointer.
      */
-    public onPointerExit(callback: (p: Point) => any): Interactions.Pointer;
-    public onPointerExit(callback?: (p: Point) => any): any {
-      if (callback === undefined) {
-        return this._pointerExitCallback;
-      }
-      this._pointerExitCallback = callback;
+    public onPointerExit(callback: PointerCallback) {
+      this._pointerExitCallbacks.add(callback);
+      return this;
+    }
+
+    /**
+     * Removes a callback called when the pointer exits the Component.
+     *
+     * @param {PointerCallback} callback The callback to remove.
+     * @return {Interaction.Pointer} The calling Interaction.Pointer.
+     */
+    public offPointerExit(callback: PointerCallback) {
+      this._pointerExitCallbacks.delete(callback);
       return this;
     }
   }

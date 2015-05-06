@@ -9335,6 +9335,7 @@ var Plottable;
             function Click() {
                 _super.apply(this, arguments);
                 this._clickedDown = false;
+                this._onClickCallbacks = new Plottable.Utils.CallbackSet();
             }
             Click.prototype._anchor = function (component) {
                 var _this = this;
@@ -9355,16 +9356,29 @@ var Plottable;
             };
             Click.prototype._handleClickUp = function (p) {
                 var translatedPoint = this._translateToComponentSpace(p);
-                if (this._clickedDown && this._isInsideComponent(translatedPoint) && (this._clickCallback != null)) {
-                    this._clickCallback(translatedPoint);
+                if (this._clickedDown && this._isInsideComponent(translatedPoint)) {
+                    this._onClickCallbacks.callCallbacks(translatedPoint);
                 }
                 this._clickedDown = false;
             };
+            /**
+             * Sets the callback called when the Component is clicked.
+             *
+             * @param {ClickCallback} callback The callback to set.
+             * @return {Interaction.Click} The calling Interaction.Click.
+             */
             Click.prototype.onClick = function (callback) {
-                if (callback === undefined) {
-                    return this._clickCallback;
-                }
-                this._clickCallback = callback;
+                this._onClickCallbacks.add(callback);
+                return this;
+            };
+            /**
+             * Removes the callback from click.
+             *
+             * @param {ClickCallback} callback The callback to remove.
+             * @return {Interaction.Click} The calling Interaction.Click.
+             */
+            Click.prototype.offClick = function (callback) {
+                this._onClickCallbacks.delete(callback);
                 return this;
             };
             return Click;
@@ -9397,6 +9411,7 @@ var Plottable;
                 _super.apply(this, arguments);
                 this._clickState = 0 /* NotClicked */;
                 this._clickedDown = false;
+                this._onDoubleClickCallbacks = new Plottable.Utils.CallbackSet();
             }
             DoubleClick.prototype._anchor = function (component) {
                 var _this = this;
@@ -9432,9 +9447,7 @@ var Plottable;
             };
             DoubleClick.prototype._handleDblClick = function () {
                 if (this._clickState === 2 /* DoubleClicked */) {
-                    if (this._doubleClickCallback) {
-                        this._doubleClickCallback(this._clickedPoint);
-                    }
+                    this._onDoubleClickCallbacks.callCallbacks(this._clickedPoint);
                     this._clickState = 0 /* NotClicked */;
                 }
             };
@@ -9445,12 +9458,23 @@ var Plottable;
             DoubleClick.pointsEqual = function (p1, p2) {
                 return p1.x === p2.x && p1.y === p2.y;
             };
+            /**
+             * Sets the callback called when the Component is double-clicked.
+             *
+             * @param {ClickCallback} callback The callback to set.
+             * @return {Interaction.DoubleClick} The calling Interaction.DoubleClick.
+             */
             DoubleClick.prototype.onDoubleClick = function (callback) {
-                if (callback === undefined) {
-                    return this._doubleClickCallback;
-                }
-                this._doubleClickCallback = callback;
-                return this;
+                this._onDoubleClickCallbacks.add(callback);
+            };
+            /**
+             * Removes the callback called when the Component is double-clicked.
+             *
+             * @param {ClickCallback} callback The callback to remove.
+             * @return {Interaction.DoubleClick} The calling Interaction.DoubleClick.
+             */
+            DoubleClick.prototype.offDoubleClick = function (callback) {
+                this._onDoubleClickCallbacks.delete(callback);
             };
             return DoubleClick;
         })(Plottable.Interaction);
@@ -9473,7 +9497,7 @@ var Plottable;
             __extends(Key, _super);
             function Key() {
                 _super.apply(this, arguments);
-                this._keyCode2Callback = {};
+                this._keyCodeCallbacks = {};
             }
             Key.prototype._anchor = function (component) {
                 var _this = this;
@@ -9485,8 +9509,8 @@ var Plottable;
             };
             Key.prototype._handleKeyEvent = function (keyCode) {
                 var p = this._translateToComponentSpace(this._positionDispatcher.getLastMousePosition());
-                if (this._isInsideComponent(p) && this._keyCode2Callback[keyCode]) {
-                    this._keyCode2Callback[keyCode]();
+                if (this._isInsideComponent(p) && this._keyCodeCallbacks[keyCode]) {
+                    this._keyCodeCallbacks[keyCode].callCallbacks(keyCode);
                 }
             };
             /**
@@ -9494,11 +9518,29 @@ var Plottable;
              * pressed and the user is moused over the Component.
              *
              * @param {number} keyCode The key code associated with the key.
-             * @param {() => void} callback Callback to be called.
+             * @param {KeyCallback} callback Callback to be set.
              * @returns The calling Interaction.Key.
              */
-            Key.prototype.on = function (keyCode, callback) {
-                this._keyCode2Callback[keyCode] = callback;
+            Key.prototype.onKey = function (keyCode, callback) {
+                if (!this._keyCodeCallbacks[keyCode]) {
+                    this._keyCodeCallbacks[keyCode] = new Plottable.Utils.CallbackSet();
+                }
+                this._keyCodeCallbacks[keyCode].add(callback);
+                return this;
+            };
+            /**
+             * Removes the callback to be called when the key with the given keyCode is
+             * pressed and the user is moused over the Component.
+             *
+             * @param {number} keyCode The key code associated with the key.
+             * @param {KeyCallback} callback Callback to be removed.
+             * @returns The calling Interaction.Key.
+             */
+            Key.prototype.offKey = function (keyCode, callback) {
+                this._keyCodeCallbacks[keyCode].delete(callback);
+                if (this._keyCodeCallbacks[keyCode].values().length === 0) {
+                    delete this._keyCodeCallbacks[keyCode];
+                }
                 return this;
             };
             return Key;
@@ -9523,6 +9565,9 @@ var Plottable;
             function Pointer() {
                 _super.apply(this, arguments);
                 this._overComponent = false;
+                this._pointerEnterCallbacks = new Plottable.Utils.CallbackSet();
+                this._pointerMoveCallbacks = new Plottable.Utils.CallbackSet();
+                this._pointerExitCallbacks = new Plottable.Utils.CallbackSet();
             }
             Pointer.prototype._anchor = function (component) {
                 var _this = this;
@@ -9537,39 +9582,74 @@ var Plottable;
                 if (this._isInsideComponent(translatedP)) {
                     var wasOverComponent = this._overComponent;
                     this._overComponent = true;
-                    if (!wasOverComponent && this._pointerEnterCallback) {
-                        this._pointerEnterCallback(translatedP);
+                    if (!wasOverComponent) {
+                        this._pointerEnterCallbacks.callCallbacks(translatedP);
                     }
-                    if (this._pointerMoveCallback) {
-                        this._pointerMoveCallback(translatedP);
-                    }
+                    this._pointerMoveCallbacks.callCallbacks(translatedP);
                 }
                 else if (this._overComponent) {
                     this._overComponent = false;
-                    if (this._pointerExitCallback) {
-                        this._pointerExitCallback(translatedP);
-                    }
+                    this._pointerExitCallbacks.callCallbacks(translatedP);
                 }
             };
+            /**
+             * Sets the callback called when the pointer enters the Component.
+             *
+             * @param {PointerCallback} callback The callback to set.
+             * @return {Interaction.Pointer} The calling Interaction.Pointer.
+             */
             Pointer.prototype.onPointerEnter = function (callback) {
-                if (callback === undefined) {
-                    return this._pointerEnterCallback;
-                }
-                this._pointerEnterCallback = callback;
+                this._pointerEnterCallbacks.add(callback);
                 return this;
             };
+            /**
+             * Removes a callback called when the pointer enters the Component.
+             *
+             * @param {PointerCallback} callback The callback to remove.
+             * @return {Interaction.Pointer} The calling Interaction.Pointer.
+             */
+            Pointer.prototype.offPointerEnter = function (callback) {
+                this._pointerEnterCallbacks.delete(callback);
+                return this;
+            };
+            /**
+             * Sets the callback called when the pointer moves.
+             *
+             * @param {PointerCallback} callback The callback to set.
+             * @return {Interaction.Pointer} The calling Interaction.Pointer.
+             */
             Pointer.prototype.onPointerMove = function (callback) {
-                if (callback === undefined) {
-                    return this._pointerMoveCallback;
-                }
-                this._pointerMoveCallback = callback;
+                this._pointerMoveCallbacks.add(callback);
                 return this;
             };
+            /**
+             * Removes a callback called when the pointer moves.
+             *
+             * @param {PointerCallback} callback The callback to remove.
+             * @return {Interaction.Pointer} The calling Interaction.Pointer.
+             */
+            Pointer.prototype.offPointerMove = function (callback) {
+                this._pointerMoveCallbacks.delete(callback);
+                return this;
+            };
+            /**
+             * Sets the callback called when the pointer exits the Component.
+             *
+             * @param {PointerCallback} callback The callback to set.
+             * @return {Interaction.Pointer} The calling Interaction.Pointer.
+             */
             Pointer.prototype.onPointerExit = function (callback) {
-                if (callback === undefined) {
-                    return this._pointerExitCallback;
-                }
-                this._pointerExitCallback = callback;
+                this._pointerExitCallbacks.add(callback);
+                return this;
+            };
+            /**
+             * Removes a callback called when the pointer exits the Component.
+             *
+             * @param {PointerCallback} callback The callback to remove.
+             * @return {Interaction.Pointer} The calling Interaction.Pointer.
+             */
+            Pointer.prototype.offPointerExit = function (callback) {
+                this._pointerExitCallbacks.delete(callback);
                 return this;
             };
             return Pointer;
@@ -9745,6 +9825,9 @@ var Plottable;
                 _super.apply(this, arguments);
                 this._dragging = false;
                 this._constrain = true;
+                this._dragStartCallbacks = new Plottable.Utils.CallbackSet();
+                this._dragCallbacks = new Plottable.Utils.CallbackSet();
+                this._dragEndCallbacks = new Plottable.Utils.CallbackSet();
             }
             Drag.prototype._anchor = function (component) {
                 var _this = this;
@@ -9768,38 +9851,30 @@ var Plottable;
                     y: Plottable.Utils.Methods.clamp(translatedP.y, 0, this._componentToListenTo.height())
                 };
             };
-            Drag.prototype._startDrag = function (p, e) {
-                if (e instanceof MouseEvent && e.button !== 0) {
+            Drag.prototype._startDrag = function (point, event) {
+                if (event instanceof MouseEvent && event.button !== 0) {
                     return;
                 }
-                var translatedP = this._translateToComponentSpace(p);
+                var translatedP = this._translateToComponentSpace(point);
                 if (this._isInsideComponent(translatedP)) {
-                    e.preventDefault();
+                    event.preventDefault();
                     this._dragging = true;
                     this._dragOrigin = translatedP;
-                    if (this._dragStartCallback) {
-                        this._dragStartCallback(this._dragOrigin);
-                    }
+                    this._dragStartCallbacks.callCallbacks(this._dragOrigin);
                 }
             };
-            Drag.prototype._doDrag = function (p, e) {
+            Drag.prototype._doDrag = function (point, event) {
                 if (this._dragging) {
-                    if (this._dragCallback) {
-                        var constrainedP = this._translateAndConstrain(p);
-                        this._dragCallback(this._dragOrigin, constrainedP);
-                    }
+                    this._dragCallbacks.callCallbacks(this._dragOrigin, this._translateAndConstrain(point));
                 }
             };
-            Drag.prototype._endDrag = function (p, e) {
-                if (e instanceof MouseEvent && e.button !== 0) {
+            Drag.prototype._endDrag = function (point, event) {
+                if (event instanceof MouseEvent && event.button !== 0) {
                     return;
                 }
                 if (this._dragging) {
                     this._dragging = false;
-                    if (this._dragEndCallback) {
-                        var constrainedP = this._translateAndConstrain(p);
-                        this._dragEndCallback(this._dragOrigin, constrainedP);
-                    }
+                    this._dragEndCallbacks.callCallbacks(this._dragOrigin, this._translateAndConstrain(point));
                 }
             };
             Drag.prototype.constrainToComponent = function (constrain) {
@@ -9809,32 +9884,65 @@ var Plottable;
                 this._constrain = constrain;
                 return this;
             };
-            Drag.prototype.onDragStart = function (cb) {
-                if (cb === undefined) {
-                    return this._dragStartCallback;
-                }
-                else {
-                    this._dragStartCallback = cb;
-                    return this;
-                }
+            /**
+             * Sets the callback to be called when dragging starts.
+             *
+             * @param {DragCallback} callback The callback to be called. Takes in a Point in pixels.
+             * @returns {Drag} The calling Interactions.Drag.
+             */
+            Drag.prototype.onDragStart = function (callback) {
+                this._dragStartCallbacks.add(callback);
+                return this;
             };
-            Drag.prototype.onDrag = function (cb) {
-                if (cb === undefined) {
-                    return this._dragCallback;
-                }
-                else {
-                    this._dragCallback = cb;
-                    return this;
-                }
+            /**
+             * Removes the callback to be called when dragging starts.
+             *
+             * @param {DragCallback} callback The callback to be removed.
+             * @returns {Drag} The calling Interactions.Drag.
+             */
+            Drag.prototype.offDragStart = function (callback) {
+                this._dragStartCallbacks.delete(callback);
+                return this;
             };
-            Drag.prototype.onDragEnd = function (cb) {
-                if (cb === undefined) {
-                    return this._dragEndCallback;
-                }
-                else {
-                    this._dragEndCallback = cb;
-                    return this;
-                }
+            /**
+             * Adds a callback to be called during dragging.
+             *
+             * @param {DragCallback} callback The callback to be called. Takes in Points in pixels.
+             * @returns {Drag} The calling Interactions.Drag.
+             */
+            Drag.prototype.onDrag = function (callback) {
+                this._dragCallbacks.add(callback);
+                return this;
+            };
+            /**
+             * Removes a callback to be called during dragging.
+             *
+             * @param {DragCallback} callback The callback to be removed.
+             * @returns {Drag} The calling Interactions.Drag.
+             */
+            Drag.prototype.offDrag = function (callback) {
+                this._dragCallbacks.delete(callback);
+                return this;
+            };
+            /**
+             * Adds a callback to be called when the dragging ends.
+             *
+             * @param {DragCallback} callback The callback to be called. Takes in Points in pixels.
+             * @returns {Drag} The calling Interactions.Drag.
+             */
+            Drag.prototype.onDragEnd = function (callback) {
+                this._dragEndCallbacks.add(callback);
+                return this;
+            };
+            /**
+             * Removes a callback to be called when the dragging ends.
+             *
+             * @param {DragCallback} callback The callback to be removed
+             * @returns {Drag} The calling Interactions.Drag.
+             */
+            Drag.prototype.offDragEnd = function (callback) {
+                this._dragEndCallbacks.delete(callback);
+                return this;
             };
             return Drag;
         })(Plottable.Interaction);
@@ -9871,6 +9979,9 @@ var Plottable;
                 this._dragInteraction = new Plottable.Interactions.Drag();
                 this._setUpCallbacks();
                 this.registerInteraction(this._dragInteraction);
+                this._dragStartCallbacks = new Plottable.Utils.CallbackSet();
+                this._dragCallbacks = new Plottable.Utils.CallbackSet();
+                this._dragEndCallbacks = new Plottable.Utils.CallbackSet();
             }
             DragBoxLayer.prototype._setUpCallbacks = function () {
                 var _this = this;
@@ -9895,9 +10006,7 @@ var Plottable;
                     // copy points so changes to topLeft and bottomRight don't mutate bounds
                     topLeft = { x: bounds.topLeft.x, y: bounds.topLeft.y };
                     bottomRight = { x: bounds.bottomRight.x, y: bounds.bottomRight.y };
-                    if (_this._dragStartCallback) {
-                        _this._dragStartCallback(bounds);
-                    }
+                    _this._dragStartCallbacks.callCallbacks(bounds);
                 });
                 this._dragInteraction.onDrag(function (s, e) {
                     if (startedNewBox) {
@@ -9922,17 +10031,13 @@ var Plottable;
                         topLeft: topLeft,
                         bottomRight: bottomRight
                     });
-                    if (_this._dragCallback) {
-                        _this._dragCallback(_this.bounds());
-                    }
+                    _this._dragCallbacks.callCallbacks(_this.bounds());
                 });
                 this._dragInteraction.onDragEnd(function (s, e) {
                     if (startedNewBox && s.x === e.x && s.y === e.y) {
                         _this.boxVisible(false);
                     }
-                    if (_this._dragEndCallback) {
-                        _this._dragEndCallback(_this.bounds());
-                    }
+                    _this._dragEndCallbacks.callCallbacks(_this.bounds());
                 });
             };
             DragBoxLayer.prototype._setup = function () {
@@ -10051,32 +10156,65 @@ var Plottable;
                 this.classed("x-resizable", canResize);
                 this.classed("y-resizable", canResize);
             };
-            DragBoxLayer.prototype.onDragStart = function (cb) {
-                if (cb === undefined) {
-                    return this._dragStartCallback;
-                }
-                else {
-                    this._dragStartCallback = cb;
-                    return this;
-                }
+            /**
+             * Sets the callback to be called when dragging starts.
+             *
+             * @param {DragBoxCallback} callback The callback to be called. Passed the current Bounds in pixels.
+             * @returns {DragBoxLayer} The calling DragBoxLayer.
+             */
+            DragBoxLayer.prototype.onDragStart = function (callback) {
+                this._dragStartCallbacks.add(callback);
+                return this;
             };
-            DragBoxLayer.prototype.onDrag = function (cb) {
-                if (cb === undefined) {
-                    return this._dragCallback;
-                }
-                else {
-                    this._dragCallback = cb;
-                    return this;
-                }
+            /**
+             * Removes a callback to be called when dragging starts.
+             *
+             * @param {DragBoxCallback} callback The callback to be removed.
+             * @returns {DragBoxLayer} The calling DragBoxLayer.
+             */
+            DragBoxLayer.prototype.offDragStart = function (callback) {
+                this._dragStartCallbacks.delete(callback);
+                return this;
             };
-            DragBoxLayer.prototype.onDragEnd = function (cb) {
-                if (cb === undefined) {
-                    return this._dragEndCallback;
-                }
-                else {
-                    this._dragEndCallback = cb;
-                    return this;
-                }
+            /**
+             * Sets a callback to be called during dragging.
+             *
+             * @param {DragBoxCallback} callback The callback to be called. Passed the current Bounds in pixels.
+             * @returns {DragBoxLayer} The calling DragBoxLayer.
+             */
+            DragBoxLayer.prototype.onDrag = function (callback) {
+                this._dragCallbacks.add(callback);
+                return this;
+            };
+            /**
+             * Removes a callback to be called during dragging.
+             *
+             * @param {DragBoxCallback} callback The callback to be removed.
+             * @returns {DragBoxLayer} The calling DragBoxLayer.
+             */
+            DragBoxLayer.prototype.offDrag = function (callback) {
+                this._dragCallbacks.delete(callback);
+                return this;
+            };
+            /**
+             * Sets a callback to be called when the dragging ends.
+             *
+             * @param {DragBoxCallback} callback The callback to be called. Passed the current Bounds in pixels.
+             * @returns {DragBoxLayer} The calling DragBoxLayer.
+             */
+            DragBoxLayer.prototype.onDragEnd = function (callback) {
+                this._dragEndCallbacks.add(callback);
+                return this;
+            };
+            /**
+             * Removes a callback to be called when the dragging ends.
+             *
+             * @param {DragBoxCallback} callback The callback to be removed.
+             * @returns {DragBoxLayer} The calling DragBoxLayer.
+             */
+            DragBoxLayer.prototype.offDragEnd = function (callback) {
+                this._dragEndCallbacks.delete(callback);
+                return this;
             };
             return DragBoxLayer;
         })(Components.SelectionBoxLayer);
