@@ -1374,11 +1374,8 @@ var Plottable;
         function Domainer(combineExtents) {
             this._doNice = false;
             this._padProportion = 0.0;
-            this._paddingExceptions = d3.map();
-            this._unregisteredPaddingExceptions = d3.set();
-            this._includedValues = d3.map();
-            // _includedValues needs to be a map, even unregistered, to support getting un-stringified values back out
-            this._unregisteredIncludedValues = d3.map();
+            this._paddingExceptions = new Plottable.Utils.StrictEqualityAssociativeArray();
+            this._includedValues = new Plottable.Utils.StrictEqualityAssociativeArray();
             this._combineExtents = combineExtents;
         }
         /**
@@ -1429,76 +1426,48 @@ var Plottable;
          * Adds a padding exception, a value that will not be padded at either end of the domain.
          *
          * Eg, if a padding exception is added at x=0, then [0, 100] will pad to [0, 105] instead of [-2.5, 102.5].
-         * If a key is provided, it will be registered under that key with standard map semantics. (Overwrite / remove by key)
-         * If a key is not provided, it will be added with set semantics (Can be removed by value)
+         * The exception will be registered under the provided with standard map semantics. (Overwrite / remove by key).
          *
          * @param {any} exception The padding exception to add.
-         * @param {string} key The key to register the exception under.
+         * @param {any} key The key to register the exception under.
          * @returns {Domainer} The calling domainer
          */
-        Domainer.prototype.addPaddingException = function (exception, key) {
-            if (key != null) {
-                this._paddingExceptions.set(key, exception);
-            }
-            else {
-                this._unregisteredPaddingExceptions.add(exception);
-            }
+        Domainer.prototype.addPaddingException = function (key, exception) {
+            this._paddingExceptions.set(key, exception);
             return this;
         };
         /**
          * Removes a padding exception, allowing the domain to pad out that value again.
          *
-         * If a string is provided, it is assumed to be a key and the exception associated with that key is removed.
-         * If a non-string is provdied, it is assumed to be an unkeyed exception and that exception is removed.
-         *
-         * @param {any} keyOrException The key for the value to remove, or the value to remove
+         * @param {any} key The key for the value to remove.
          * @return {Domainer} The calling domainer
          */
-        Domainer.prototype.removePaddingException = function (keyOrException) {
-            if (typeof (keyOrException) === "string") {
-                this._paddingExceptions.remove(keyOrException);
-            }
-            else {
-                this._unregisteredPaddingExceptions.remove(keyOrException);
-            }
+        Domainer.prototype.removePaddingException = function (key) {
+            this._paddingExceptions.delete(key);
             return this;
         };
         /**
          * Adds an included value, a value that must be included inside the domain.
          *
          * Eg, if a value exception is added at x=0, then [50, 100] will expand to [0, 100] rather than [50, 100].
-         * If a key is provided, it will be registered under that key with standard map semantics. (Overwrite / remove by key)
-         * If a key is not provided, it will be added with set semantics (Can be removed by value)
+         * The value will be registered under that key with standard map semantics. (Overwrite / remove by key).
          *
          * @param {any} value The included value to add.
-         * @param {string} key The key to register the value under.
+         * @param {any} key The key to register the value under.
          * @returns {Domainer} The calling domainer
          */
-        Domainer.prototype.addIncludedValue = function (value, key) {
-            if (key != null) {
-                this._includedValues.set(key, value);
-            }
-            else {
-                this._unregisteredIncludedValues.set(value, value);
-            }
+        Domainer.prototype.addIncludedValue = function (key, value) {
+            this._includedValues.set(key, value);
             return this;
         };
         /**
          * Remove an included value, allowing the domain to not include that value gain again.
          *
-         * If a string is provided, it is assumed to be a key and the value associated with that key is removed.
-         * If a non-string is provdied, it is assumed to be an unkeyed value and that value is removed.
-         *
-         * @param {any} keyOrException The key for the value to remove, or the value to remove
+         * @param {any} key The key for the value to remove.
          * @return {Domainer} The calling domainer
          */
-        Domainer.prototype.removeIncludedValue = function (valueOrKey) {
-            if (typeof (valueOrKey) === "string") {
-                this._includedValues.remove(valueOrKey);
-            }
-            else {
-                this._unregisteredIncludedValues.remove(valueOrKey);
-            }
+        Domainer.prototype.removeIncludedValue = function (key) {
+            this._includedValues.delete(key);
             return this;
         };
         /**
@@ -1534,7 +1503,7 @@ var Plottable;
             // scales. A log scale should be padded more on the max than on the min.
             var newMin = scale.invert(scale.scale(min) - (scale.scale(max) - scale.scale(min)) * p);
             var newMax = scale.invert(scale.scale(max) + (scale.scale(max) - scale.scale(min)) * p);
-            var exceptionValues = this._paddingExceptions.values().concat(this._unregisteredPaddingExceptions.values());
+            var exceptionValues = this._paddingExceptions.values();
             var exceptionSet = d3.set(exceptionValues);
             if (exceptionSet.has(min)) {
                 newMin = min;
@@ -1553,7 +1522,7 @@ var Plottable;
             }
         };
         Domainer.prototype._includeDomain = function (domain) {
-            var includedValues = this._includedValues.values().concat(this._unregisteredIncludedValues.values());
+            var includedValues = this._includedValues.values();
             return includedValues.reduce(function (domain, value) { return [Math.min(domain[0], value), Math.max(domain[1], value)]; }, domain);
         };
         Domainer._PADDING_FOR_IDENTICAL_DOMAIN = 1;
@@ -7597,10 +7566,10 @@ var Plottable;
                     var qscale = scale;
                     if (!qscale._userSetDomainer) {
                         if (this._baselineValue != null) {
-                            qscale.domainer().addPaddingException(this._baselineValue, "BAR_PLOT+" + this.getID()).addIncludedValue(this._baselineValue, "BAR_PLOT+" + this.getID());
+                            qscale.domainer().addPaddingException(this, this._baselineValue).addIncludedValue(this, this._baselineValue);
                         }
                         else {
-                            qscale.domainer().removePaddingException("BAR_PLOT+" + this.getID()).removeIncludedValue("BAR_PLOT+" + this.getID());
+                            qscale.domainer().removePaddingException(this).removeIncludedValue(this);
                         }
                         qscale.domainer().pad().nice();
                     }
@@ -7986,10 +7955,10 @@ var Plottable;
                 var constantBaseline = uniqExtentVals.length === 1 ? uniqExtentVals[0] : null;
                 if (!this._yScale._userSetDomainer) {
                     if (constantBaseline != null) {
-                        this._yScale.domainer().addPaddingException(constantBaseline, "AREA_PLOT+" + this.getID());
+                        this._yScale.domainer().addPaddingException(this, constantBaseline);
                     }
                     else {
-                        this._yScale.domainer().removePaddingException("AREA_PLOT+" + this.getID());
+                        this._yScale.domainer().removePaddingException(this);
                     }
                     // prepending "AREA_PLOT" is unnecessary but reduces likely of user accidentally creating collisions
                     this._yScale._autoDomainIfAutomaticMode();
@@ -8354,7 +8323,7 @@ var Plottable;
                 _super.prototype._updateYDomainer.call(this);
                 var scale = this._yScale;
                 if (!scale._userSetDomainer) {
-                    scale.domainer().addPaddingException(0, "STACKED_AREA_PLOT+" + this.getID()).addIncludedValue(0, "STACKED_AREA_PLOT+" + this.getID());
+                    scale.domainer().addPaddingException(this, 0).addIncludedValue(this, 0);
                     // prepending "AREA_PLOT" is unnecessary but reduces likely of user accidentally creating collisions
                     scale._autoDomainIfAutomaticMode();
                 }

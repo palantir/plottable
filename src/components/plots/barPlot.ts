@@ -273,12 +273,12 @@ export module Plots {
         if (!qscale._userSetDomainer) {
           if (this._baselineValue != null) {
             qscale.domainer()
-              .addPaddingException(this._baselineValue, "BAR_PLOT+" + this.getID())
-              .addIncludedValue(this._baselineValue, "BAR_PLOT+" + this.getID());
+              .addPaddingException(this, this._baselineValue)
+              .addIncludedValue(this, this._baselineValue);
           } else {
             qscale.domainer()
-              .removePaddingException("BAR_PLOT+" + this.getID())
-              .removeIncludedValue("BAR_PLOT+" + this.getID());
+              .removePaddingException(this)
+              .removeIncludedValue(this);
           }
           qscale.domainer().pad().nice();
         }

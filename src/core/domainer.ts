@@ -6,11 +6,8 @@ module Plottable {
     private _doNice = false;
     private _niceCount: number;
     private _padProportion = 0.0;
-    private _paddingExceptions: D3.Map<any> = d3.map();
-    private _unregisteredPaddingExceptions: D3.Set<any> = d3.set();
-    private _includedValues: D3.Map<any> = d3.map();
-    // _includedValues needs to be a map, even unregistered, to support getting un-stringified values back out
-    private _unregisteredIncludedValues: D3.Map<any> = d3.map();
+    private _paddingExceptions = new Utils.StrictEqualityAssociativeArray();
+    private _includedValues = new Utils.StrictEqualityAssociativeArray();
     private _combineExtents: (extents: any[][]) => any[];
     private static _PADDING_FOR_IDENTICAL_DOMAIN = 1;
     private static _ONE_DAY = 1000 * 60 * 60 * 24;
@@ -80,37 +77,25 @@ module Plottable {
      * Adds a padding exception, a value that will not be padded at either end of the domain.
      *
      * Eg, if a padding exception is added at x=0, then [0, 100] will pad to [0, 105] instead of [-2.5, 102.5].
-     * If a key is provided, it will be registered under that key with standard map semantics. (Overwrite / remove by key)
-     * If a key is not provided, it will be added with set semantics (Can be removed by value)
+     * The exception will be registered under the provided with standard map semantics. (Overwrite / remove by key).
      *
      * @param {any} exception The padding exception to add.
-     * @param {string} key The key to register the exception under.
+     * @param {any} key The key to register the exception under.
      * @returns {Domainer} The calling domainer
      */
-    public addPaddingException(exception: any, key?: string): Domainer {
-      if (key != null) {
-        this._paddingExceptions.set(key, exception);
-      } else {
-        this._unregisteredPaddingExceptions.add(exception);
-      }
+    public addPaddingException(key: any, exception: any) {
+      this._paddingExceptions.set(key, exception);
       return this;
     }
 
     /**
      * Removes a padding exception, allowing the domain to pad out that value again.
      *
-     * If a string is provided, it is assumed to be a key and the exception associated with that key is removed.
-     * If a non-string is provdied, it is assumed to be an unkeyed exception and that exception is removed.
-     *
-     * @param {any} keyOrException The key for the value to remove, or the value to remove
+     * @param {any} key The key for the value to remove.
      * @return {Domainer} The calling domainer
      */
-    public removePaddingException(keyOrException: any): Domainer {
-      if (typeof(keyOrException) === "string") {
-        this._paddingExceptions.remove(keyOrException);
-      } else {
-        this._unregisteredPaddingExceptions.remove(keyOrException);
-      }
+    public removePaddingException(key: any) {
+      this._paddingExceptions.delete(key);
       return this;
     }
 
@@ -118,37 +103,25 @@ module Plottable {
      * Adds an included value, a value that must be included inside the domain.
      *
      * Eg, if a value exception is added at x=0, then [50, 100] will expand to [0, 100] rather than [50, 100].
-     * If a key is provided, it will be registered under that key with standard map semantics. (Overwrite / remove by key)
-     * If a key is not provided, it will be added with set semantics (Can be removed by value)
+     * The value will be registered under that key with standard map semantics. (Overwrite / remove by key).
      *
      * @param {any} value The included value to add.
-     * @param {string} key The key to register the value under.
+     * @param {any} key The key to register the value under.
      * @returns {Domainer} The calling domainer
      */
-    public addIncludedValue(value: any, key?: string): Domainer {
-      if (key != null) {
-        this._includedValues.set(key, value);
-      } else {
-        this._unregisteredIncludedValues.set(value, value);
-      }
+    public addIncludedValue(key: any, value: any) {
+      this._includedValues.set(key, value);
       return this;
     }
 
     /**
      * Remove an included value, allowing the domain to not include that value gain again.
      *
-     * If a string is provided, it is assumed to be a key and the value associated with that key is removed.
-     * If a non-string is provdied, it is assumed to be an unkeyed value and that value is removed.
-     *
-     * @param {any} keyOrException The key for the value to remove, or the value to remove
+     * @param {any} key The key for the value to remove.
      * @return {Domainer} The calling domainer
      */
-    public removeIncludedValue(valueOrKey: any) {
-      if (typeof(valueOrKey) === "string") {
-        this._includedValues.remove(valueOrKey);
-      } else {
-        this._unregisteredIncludedValues.remove(valueOrKey);
-      }
+    public removeIncludedValue(key: any) {
+      this._includedValues.delete(key);
       return this;
     }
 
@@ -189,7 +162,7 @@ module Plottable {
                                         (scale.scale(max) - scale.scale(min)) * p);
       var newMax = scale.invert(scale.scale(max) +
                                         (scale.scale(max) - scale.scale(min)) * p);
-      var exceptionValues = this._paddingExceptions.values().concat(this._unregisteredPaddingExceptions.values());
+      var exceptionValues = this._paddingExceptions.values();
       var exceptionSet = d3.set(exceptionValues);
       if (exceptionSet.has(min)) {
         newMin = min;
@@ -209,7 +182,7 @@ module Plottable {
     }
 
     private _includeDomain(domain: any[]): any[] {
-      var includedValues = this._includedValues.values().concat(this._unregisteredIncludedValues.values());
+      var includedValues = this._includedValues.values();
       return includedValues.reduce(
         (domain, value) => [Math.min(domain[0], value), Math.max(domain[1], value)],
         domain

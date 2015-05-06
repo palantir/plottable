@@ -93,17 +93,17 @@ describe("Domainer", () => {
   });
 
   it("paddingException(n) will not pad beyond n", () => {
-    domainer.pad(0.1).addPaddingException(0, "key").addPaddingException(200);
+    domainer.pad(0.1).addPaddingException("keyLeft", 0).addPaddingException("keyRight", 200);
     var domain = domainer.computeDomain([[0, 100]], scale);
     assert.deepEqual(domain, [0, 105], "padding exceptions can be added by key");
     domain = domainer.computeDomain([[-100, 0]], scale);
     assert.deepEqual(domain, [-105, 0]);
     domain = domainer.computeDomain([[0, 200]], scale);
     assert.deepEqual(domain, [0, 200]);
-    domainer.removePaddingException("key");
+    domainer.removePaddingException("keyLeft");
     domain = domainer.computeDomain([[0, 200]], scale);
     assert.deepEqual(domain, [-10, 200], "paddingExceptions can be removed by key");
-    domainer.removePaddingException(200);
+    domainer.removePaddingException("keyRight");
     domain = domainer.computeDomain([[0, 200]], scale);
     assert.notEqual(domain[1], 200, "unregistered paddingExceptions can be removed using boolean argument");
   });
@@ -114,7 +114,7 @@ describe("Domainer", () => {
     var timeScale = new Plottable.Scales.Time();
     timeScale.addExtentProvider((scale: Plottable.Scale<Date, number>) => [[startDate, endDate]]);
     timeScale.autoDomain();
-    domainer.pad().addPaddingException(startDate);
+    domainer.pad().addPaddingException("key", startDate);
     timeScale.domainer(domainer);
     var domain = timeScale.domain();
     assert.deepEqual(domain[0], startDate);
@@ -122,7 +122,7 @@ describe("Domainer", () => {
   });
 
   it("include(n) works an expected", () => {
-    domainer.addIncludedValue(5);
+    domainer.addIncludedValue("key1", 5);
     var domain = domainer.computeDomain([[0, 10]], scale);
     assert.deepEqual(domain, [0, 10]);
     domain = domainer.computeDomain([[0, 3]], scale);
@@ -130,22 +130,22 @@ describe("Domainer", () => {
     domain = domainer.computeDomain([[100, 200]], scale);
     assert.deepEqual(domain, [5, 200]);
 
-    domainer.addIncludedValue(-3).addIncludedValue(0).addIncludedValue(10, "key");
+    domainer.addIncludedValue("key2", -3).addIncludedValue("key3", 0).addIncludedValue("key4", 10);
     domain = domainer.computeDomain([[100, 200]], scale);
     assert.deepEqual(domain, [-3, 200]);
     domain = domainer.computeDomain([[0, 0]], scale);
     assert.deepEqual(domain, [-3, 10]);
 
-    domainer.removeIncludedValue("key");
+    domainer.removeIncludedValue("key4");
     domain = domainer.computeDomain([[100, 200]], scale);
     assert.deepEqual(domain, [-3, 200]);
     domain = domainer.computeDomain([[-100, -50]], scale);
     assert.deepEqual(domain, [-100, 5]);
 
-    domainer.addIncludedValue(10);
+    domainer.addIncludedValue("key5", 10);
     domain = domainer.computeDomain([[-100, -50]], scale);
     assert.deepEqual(domain, [-100, 10], "unregistered includedValues can be added");
-    domainer.removeIncludedValue(10);
+    domainer.removeIncludedValue("key5");
     domain = domainer.computeDomain([[-100, -50]], scale);
     assert.deepEqual(domain, [-100, 5], "unregistered includedValues can be removed with addOrRemove argument");
   });
@@ -157,7 +157,7 @@ describe("Domainer", () => {
     var timeScale = new Plottable.Scales.Time();
     timeScale.addExtentProvider((scale: Plottable.Scale<Date, number>) => [[startDate, endDate]]);
     timeScale.autoDomain();
-    domainer.addIncludedValue(includedDate);
+    domainer.addIncludedValue("key", includedDate);
     timeScale.domainer(domainer);
     assert.deepEqual(timeScale.domain(), [includedDate, endDate], "domain was expanded to contain included date");
   });
@@ -190,13 +190,13 @@ describe("Domainer", () => {
     assert.deepEqual(getExceptions(), [0], "initializing the plot adds a padding exception at 0");
     // assert.deepEqual(getExceptions(), [], "Initially there are no padding exceptions");
     r.project("y0", "y0", yScale);
-    assert.deepEqual(getExceptions(), [], "projecting a non-constant y0 removes the padding exception");
+    assert.deepEqual(getExceptions(), [], "projecting a non-constant y0 removes the padding exception 1");
     r.project("y0", 0, yScale);
     assert.deepEqual(getExceptions(), [0], "projecting constant y0 adds the exception back");
     r.project("y0", () => 5, yScale);
     assert.deepEqual(getExceptions(), [5], "projecting a different constant y0 removed the old exception and added a new one");
     r.project("y0", "y0", yScale);
-    assert.deepEqual(getExceptions(), [], "projecting a non-constant y0 removes the padding exception");
+    assert.deepEqual(getExceptions(), [], "projecting a non-constant y0 removes the padding exception 2");
     dataset.data([{x: 0, y: 0, y0: 0}, {x: 5, y: 5, y0: 0}]);
     assert.deepEqual(getExceptions(), [0], "changing to constant values via change in datasource adds exception");
     svg.remove();
