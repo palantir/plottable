@@ -264,7 +264,7 @@ export module Components {
     /**
      * Sets the callback to be called when dragging starts.
      *
-     * @param {DragBoxCallback} cb The callback to be called. Passed the current Bounds in pixels.
+     * @param {DragBoxCallback} callback The callback to be called. Passed the current Bounds in pixels.
      * @returns {DragBoxLayer} The calling DragBoxLayer.
      */
     public onDragStart(callback: DragBoxCallback) {
@@ -275,7 +275,7 @@ export module Components {
     /**
      * Removes a callback to be called when dragging starts.
      *
-     * @param {DragBoxCallback} cb The callback to be removed.
+     * @param {DragBoxCallback} callback The callback to be removed.
      * @returns {DragBoxLayer} The calling DragBoxLayer.
      */
     public offDragStart(callback: DragBoxCallback) {
@@ -286,7 +286,7 @@ export module Components {
     /**
      * Sets a callback to be called during dragging.
      *
-     * @param {DragBoxCallback} cb The callback to be called. Passed the current Bounds in pixels.
+     * @param {DragBoxCallback} callback The callback to be called. Passed the current Bounds in pixels.
      * @returns {DragBoxLayer} The calling DragBoxLayer.
      */
     public onDrag(callback: DragBoxCallback) {
@@ -297,7 +297,7 @@ export module Components {
     /**
      * Removes a callback to be called during dragging.
      *
-     * @param {DragBoxCallback} cb The callback to be removed.
+     * @param {DragBoxCallback} callback The callback to be removed.
      * @returns {DragBoxLayer} The calling DragBoxLayer.
      */
     public offDrag(callback: DragBoxCallback) {
@@ -308,7 +308,7 @@ export module Components {
     /**
      * Sets a callback to be called when the dragging ends.
      *
-     * @param {DragBoxCallback} cb The callback to be called. Passed the current Bounds in pixels.
+     * @param {DragBoxCallback} callback The callback to be called. Passed the current Bounds in pixels.
      * @returns {DragBoxLayer} The calling DragBoxLayer.
      */
     public onDragEnd(callback: DragBoxCallback) {
@@ -319,7 +319,7 @@ export module Components {
     /**
      * Removes a callback to be called when the dragging ends.
      *
-     * @param {DragBoxCallback} cb The callback to be removed.
+     * @param {DragBoxCallback} callback The callback to be removed.
      * @returns {DragBoxLayer} The calling DragBoxLayer.
      */
     public offDragEnd(callback: DragBoxCallback) {

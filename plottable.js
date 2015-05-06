@@ -9388,7 +9388,7 @@ var Plottable;
             /**
              * Sets the callback called when the Component is clicked.
              *
-             * @param {(p: Point) => any} callback The callback to set.
+             * @param {ClickCallback} callback The callback to set.
              * @return {Interaction.Click} The calling Interaction.Click.
              */
             Click.prototype.onClick = function (callback) {
@@ -9398,7 +9398,7 @@ var Plottable;
             /**
              * Removes the callback from click.
              *
-             * @param {(p: Point) => any} callback The callback to remove.
+             * @param {ClickCallback} callback The callback to remove.
              * @return {Interaction.Click} The calling Interaction.Click.
              */
             Click.prototype.offClick = function (callback) {
@@ -9485,7 +9485,7 @@ var Plottable;
             /**
              * Sets the callback called when the Component is double-clicked.
              *
-             * @param {(p: Point) => any} callback The callback to set.
+             * @param {ClickCallback} callback The callback to set.
              * @return {Interaction.DoubleClick} The calling Interaction.DoubleClick.
              */
             DoubleClick.prototype.onDoubleClick = function (callback) {
@@ -9494,7 +9494,7 @@ var Plottable;
             /**
              * Removes the callback called when the Component is double-clicked.
              *
-             * @param {(p: Point) => any} callback The callback to remove.
+             * @param {ClickCallback} callback The callback to remove.
              * @return {Interaction.DoubleClick} The calling Interaction.DoubleClick.
              */
             DoubleClick.prototype.offDoubleClick = function (callback) {
@@ -9542,7 +9542,7 @@ var Plottable;
              * pressed and the user is moused over the Component.
              *
              * @param {number} keyCode The key code associated with the key.
-             * @param {() => void} callback Callback to be set.
+             * @param {KeyCallback} callback Callback to be set.
              * @returns The calling Interaction.Key.
              */
             Key.prototype.onKey = function (keyCode, callback) {
@@ -9557,7 +9557,7 @@ var Plottable;
              * pressed and the user is moused over the Component.
              *
              * @param {number} keyCode The key code associated with the key.
-             * @param {() => void} callback Callback to be removed.
+             * @param {KeyCallback} callback Callback to be removed.
              * @returns The calling Interaction.Key.
              */
             Key.prototype.offKey = function (keyCode, callback) {
@@ -9619,7 +9619,7 @@ var Plottable;
             /**
              * Sets the callback called when the pointer enters the Component.
              *
-             * @param {(p: Point) => any} callback The callback to set.
+             * @param {PointerCallback} callback The callback to set.
              * @return {Interaction.Pointer} The calling Interaction.Pointer.
              */
             Pointer.prototype.onPointerEnter = function (callback) {
@@ -9629,7 +9629,7 @@ var Plottable;
             /**
              * Removes a callback called when the pointer enters the Component.
              *
-             * @param {(p: Point) => any} callback The callback to remove.
+             * @param {PointerCallback} callback The callback to remove.
              * @return {Interaction.Pointer} The calling Interaction.Pointer.
              */
             Pointer.prototype.offPointerEnter = function (callback) {
@@ -9639,7 +9639,7 @@ var Plottable;
             /**
              * Sets the callback called when the pointer moves.
              *
-             * @param {(p: Point) => any} callback The callback to set.
+             * @param {PointerCallback} callback The callback to set.
              * @return {Interaction.Pointer} The calling Interaction.Pointer.
              */
             Pointer.prototype.onPointerMove = function (callback) {
@@ -9649,7 +9649,7 @@ var Plottable;
             /**
              * Removes a callback called when the pointer moves.
              *
-             * @param {(p: Point) => any} callback The callback to remove.
+             * @param {PointerCallback} callback The callback to remove.
              * @return {Interaction.Pointer} The calling Interaction.Pointer.
              */
             Pointer.prototype.offPointerMove = function (callback) {
@@ -9659,7 +9659,7 @@ var Plottable;
             /**
              * Sets the callback called when the pointer exits the Component.
              *
-             * @param {(p: Point) => any} callback The callback to set.
+             * @param {PointerCallback} callback The callback to set.
              * @return {Interaction.Pointer} The calling Interaction.Pointer.
              */
             Pointer.prototype.onPointerExit = function (callback) {
@@ -9669,7 +9669,7 @@ var Plottable;
             /**
              * Removes a callback called when the pointer exits the Component.
              *
-             * @param {(p: Point) => any} callback The callback to remove.
+             * @param {PointerCallback} callback The callback to remove.
              * @return {Interaction.Pointer} The calling Interaction.Pointer.
              */
             Pointer.prototype.offPointerExit = function (callback) {
@@ -9911,7 +9911,7 @@ var Plottable;
             /**
              * Sets the callback to be called when dragging starts.
              *
-             * @param {(start: Point) => any} cb The callback to be called. Takes in a Point in pixels.
+             * @param {DragCallback} callback The callback to be called. Takes in a Point in pixels.
              * @returns {Drag} The calling Interactions.Drag.
              */
             Drag.prototype.onDragStart = function (callback) {
@@ -9921,7 +9921,7 @@ var Plottable;
             /**
              * Removes the callback to be called when dragging starts.
              *
-             * @param {(start: Point) => any} cb The callback to be removed.
+             * @param {DragCallback} callback The callback to be removed.
              * @returns {Drag} The calling Interactions.Drag.
              */
             Drag.prototype.offDragStart = function (callback) {
@@ -9931,7 +9931,7 @@ var Plottable;
             /**
              * Adds a callback to be called during dragging.
              *
-             * @param {(start: Point, end: Point) => any} cb The callback to be called. Takes in Points in pixels.
+             * @param {DragCallback} callback The callback to be called. Takes in Points in pixels.
              * @returns {Drag} The calling Interactions.Drag.
              */
             Drag.prototype.onDrag = function (callback) {
@@ -9941,7 +9941,7 @@ var Plottable;
             /**
              * Removes a callback to be called during dragging.
              *
-             * @param {(start: Point, end: Point) => any} cb The callback to be removed.
+             * @param {DragCallback} callback The callback to be removed.
              * @returns {Drag} The calling Interactions.Drag.
              */
             Drag.prototype.offDrag = function (callback) {
@@ -9951,7 +9951,7 @@ var Plottable;
             /**
              * Adds a callback to be called when the dragging ends.
              *
-             * @param {(start: Point, end: Point) => any} cb The callback to be called. Takes in Points in pixels.
+             * @param {DragCallback} callback The callback to be called. Takes in Points in pixels.
              * @returns {Drag} The calling Interactions.Drag.
              */
             Drag.prototype.onDragEnd = function (callback) {
@@ -9961,7 +9961,7 @@ var Plottable;
             /**
              * Removes a callback to be called when the dragging ends.
              *
-             * @param {(start: Point, end: Point) => any} cb The callback to be removed
+             * @param {DragCallback} callback The callback to be removed
              * @returns {Drag} The calling Interactions.Drag.
              */
             Drag.prototype.offDragEnd = function (callback) {
@@ -10183,7 +10183,7 @@ var Plottable;
             /**
              * Sets the callback to be called when dragging starts.
              *
-             * @param {DragBoxCallback} cb The callback to be called. Passed the current Bounds in pixels.
+             * @param {DragBoxCallback} callback The callback to be called. Passed the current Bounds in pixels.
              * @returns {DragBoxLayer} The calling DragBoxLayer.
              */
             DragBoxLayer.prototype.onDragStart = function (callback) {
@@ -10193,7 +10193,7 @@ var Plottable;
             /**
              * Removes a callback to be called when dragging starts.
              *
-             * @param {DragBoxCallback} cb The callback to be removed.
+             * @param {DragBoxCallback} callback The callback to be removed.
              * @returns {DragBoxLayer} The calling DragBoxLayer.
              */
             DragBoxLayer.prototype.offDragStart = function (callback) {
@@ -10203,7 +10203,7 @@ var Plottable;
             /**
              * Sets a callback to be called during dragging.
              *
-             * @param {DragBoxCallback} cb The callback to be called. Passed the current Bounds in pixels.
+             * @param {DragBoxCallback} callback The callback to be called. Passed the current Bounds in pixels.
              * @returns {DragBoxLayer} The calling DragBoxLayer.
              */
             DragBoxLayer.prototype.onDrag = function (callback) {
@@ -10213,7 +10213,7 @@ var Plottable;
             /**
              * Removes a callback to be called during dragging.
              *
-             * @param {DragBoxCallback} cb The callback to be removed.
+             * @param {DragBoxCallback} callback The callback to be removed.
              * @returns {DragBoxLayer} The calling DragBoxLayer.
              */
             DragBoxLayer.prototype.offDrag = function (callback) {
@@ -10223,7 +10223,7 @@ var Plottable;
             /**
              * Sets a callback to be called when the dragging ends.
              *
-             * @param {DragBoxCallback} cb The callback to be called. Passed the current Bounds in pixels.
+             * @param {DragBoxCallback} callback The callback to be called. Passed the current Bounds in pixels.
              * @returns {DragBoxLayer} The calling DragBoxLayer.
              */
             DragBoxLayer.prototype.onDragEnd = function (callback) {
@@ -10233,7 +10233,7 @@ var Plottable;
             /**
              * Removes a callback to be called when the dragging ends.
              *
-             * @param {DragBoxCallback} cb The callback to be removed.
+             * @param {DragBoxCallback} callback The callback to be removed.
              * @returns {DragBoxLayer} The calling DragBoxLayer.
              */
             DragBoxLayer.prototype.offDragEnd = function (callback) {

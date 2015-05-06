@@ -39,7 +39,7 @@ export module Interactions {
     /**
      * Sets the callback called when the pointer enters the Component.
      *
-     * @param {(p: Point) => any} callback The callback to set.
+     * @param {PointerCallback} callback The callback to set.
      * @return {Interaction.Pointer} The calling Interaction.Pointer.
      */
     public onPointerEnter(callback: PointerCallback) {
@@ -50,7 +50,7 @@ export module Interactions {
     /**
      * Removes a callback called when the pointer enters the Component.
      *
-     * @param {(p: Point) => any} callback The callback to remove.
+     * @param {PointerCallback} callback The callback to remove.
      * @return {Interaction.Pointer} The calling Interaction.Pointer.
      */
     public offPointerEnter(callback: PointerCallback) {
@@ -61,7 +61,7 @@ export module Interactions {
     /**
      * Sets the callback called when the pointer moves.
      *
-     * @param {(p: Point) => any} callback The callback to set.
+     * @param {PointerCallback} callback The callback to set.
      * @return {Interaction.Pointer} The calling Interaction.Pointer.
      */
     public onPointerMove(callback: PointerCallback) {
@@ -72,7 +72,7 @@ export module Interactions {
     /**
      * Removes a callback called when the pointer moves.
      *
-     * @param {(p: Point) => any} callback The callback to remove.
+     * @param {PointerCallback} callback The callback to remove.
      * @return {Interaction.Pointer} The calling Interaction.Pointer.
      */
     public offPointerMove(callback: PointerCallback) {
@@ -83,7 +83,7 @@ export module Interactions {
     /**
      * Sets the callback called when the pointer exits the Component.
      *
-     * @param {(p: Point) => any} callback The callback to set.
+     * @param {PointerCallback} callback The callback to set.
      * @return {Interaction.Pointer} The calling Interaction.Pointer.
      */
     public onPointerExit(callback: PointerCallback) {
@@ -94,7 +94,7 @@ export module Interactions {
     /**
      * Removes a callback called when the pointer exits the Component.
      *
-     * @param {(p: Point) => any} callback The callback to remove.
+     * @param {PointerCallback} callback The callback to remove.
      * @return {Interaction.Pointer} The calling Interaction.Pointer.
      */
     public offPointerExit(callback: PointerCallback) {

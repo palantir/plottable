@@ -2,7 +2,7 @@
 
 module Plottable {
 
-export type ClickCallback = (p: Point) => any;
+export type ClickCallback = (point: Point) => any;
 
 export module Interactions {
   export class Click extends Interaction {
@@ -43,7 +43,7 @@ export module Interactions {
     /**
      * Sets the callback called when the Component is clicked.
      *
-     * @param {(p: Point) => any} callback The callback to set.
+     * @param {ClickCallback} callback The callback to set.
      * @return {Interaction.Click} The calling Interaction.Click.
      */
     public onClick(callback: ClickCallback) {
@@ -54,7 +54,7 @@ export module Interactions {
     /**
      * Removes the callback from click.
      *
-     * @param {(p: Point) => any} callback The callback to remove.
+     * @param {ClickCallback} callback The callback to remove.
      * @return {Interaction.Click} The calling Interaction.Click.
      */
     public offClick(callback: ClickCallback) {

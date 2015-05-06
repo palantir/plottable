@@ -67,7 +67,7 @@ export module Interactions {
     /**
      * Sets the callback called when the Component is double-clicked.
      *
-     * @param {(p: Point) => any} callback The callback to set.
+     * @param {ClickCallback} callback The callback to set.
      * @return {Interaction.DoubleClick} The calling Interaction.DoubleClick.
      */
     public onDoubleClick(callback: ClickCallback) {
@@ -77,7 +77,7 @@ export module Interactions {
     /**
      * Removes the callback called when the Component is double-clicked.
      *
-     * @param {(p: Point) => any} callback The callback to remove.
+     * @param {ClickCallback} callback The callback to remove.
      * @return {Interaction.DoubleClick} The calling Interaction.DoubleClick.
      */
     public offDoubleClick(callback: ClickCallback) {

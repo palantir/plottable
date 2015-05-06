@@ -3750,21 +3750,21 @@ declare module Plottable {
 
 
 declare module Plottable {
-    type ClickCallback = (p: Point) => any;
+    type ClickCallback = (point: Point) => any;
     module Interactions {
         class Click extends Interaction {
             _anchor(component: Component): void;
             /**
              * Sets the callback called when the Component is clicked.
              *
-             * @param {(p: Point) => any} callback The callback to set.
+             * @param {ClickCallback} callback The callback to set.
              * @return {Interaction.Click} The calling Interaction.Click.
              */
             onClick(callback: ClickCallback): Click;
             /**
              * Removes the callback from click.
              *
-             * @param {(p: Point) => any} callback The callback to remove.
+             * @param {ClickCallback} callback The callback to remove.
              * @return {Interaction.Click} The calling Interaction.Click.
              */
             offClick(callback: ClickCallback): Click;
@@ -3780,14 +3780,14 @@ declare module Plottable {
             /**
              * Sets the callback called when the Component is double-clicked.
              *
-             * @param {(p: Point) => any} callback The callback to set.
+             * @param {ClickCallback} callback The callback to set.
              * @return {Interaction.DoubleClick} The calling Interaction.DoubleClick.
              */
             onDoubleClick(callback: ClickCallback): void;
             /**
              * Removes the callback called when the Component is double-clicked.
              *
-             * @param {(p: Point) => any} callback The callback to remove.
+             * @param {ClickCallback} callback The callback to remove.
              * @return {Interaction.DoubleClick} The calling Interaction.DoubleClick.
              */
             offDoubleClick(callback: ClickCallback): void;
@@ -3806,7 +3806,7 @@ declare module Plottable {
              * pressed and the user is moused over the Component.
              *
              * @param {number} keyCode The key code associated with the key.
-             * @param {() => void} callback Callback to be set.
+             * @param {KeyCallback} callback Callback to be set.
              * @returns The calling Interaction.Key.
              */
             onKey(keyCode: number, callback: KeyCallback): Key;
@@ -3815,7 +3815,7 @@ declare module Plottable {
              * pressed and the user is moused over the Component.
              *
              * @param {number} keyCode The key code associated with the key.
-             * @param {() => void} callback Callback to be removed.
+             * @param {KeyCallback} callback Callback to be removed.
              * @returns The calling Interaction.Key.
              */
             offKey(keyCode: number, callback: KeyCallback): Key;
@@ -3832,42 +3832,42 @@ declare module Plottable {
             /**
              * Sets the callback called when the pointer enters the Component.
              *
-             * @param {(p: Point) => any} callback The callback to set.
+             * @param {PointerCallback} callback The callback to set.
              * @return {Interaction.Pointer} The calling Interaction.Pointer.
              */
             onPointerEnter(callback: PointerCallback): Pointer;
             /**
              * Removes a callback called when the pointer enters the Component.
              *
-             * @param {(p: Point) => any} callback The callback to remove.
+             * @param {PointerCallback} callback The callback to remove.
              * @return {Interaction.Pointer} The calling Interaction.Pointer.
              */
             offPointerEnter(callback: PointerCallback): Pointer;
             /**
              * Sets the callback called when the pointer moves.
              *
-             * @param {(p: Point) => any} callback The callback to set.
+             * @param {PointerCallback} callback The callback to set.
              * @return {Interaction.Pointer} The calling Interaction.Pointer.
              */
             onPointerMove(callback: PointerCallback): Pointer;
             /**
              * Removes a callback called when the pointer moves.
              *
-             * @param {(p: Point) => any} callback The callback to remove.
+             * @param {PointerCallback} callback The callback to remove.
              * @return {Interaction.Pointer} The calling Interaction.Pointer.
              */
             offPointerMove(callback: PointerCallback): Pointer;
             /**
              * Sets the callback called when the pointer exits the Component.
              *
-             * @param {(p: Point) => any} callback The callback to set.
+             * @param {PointerCallback} callback The callback to set.
              * @return {Interaction.Pointer} The calling Interaction.Pointer.
              */
             onPointerExit(callback: PointerCallback): Pointer;
             /**
              * Removes a callback called when the pointer exits the Component.
              *
-             * @param {(p: Point) => any} callback The callback to remove.
+             * @param {PointerCallback} callback The callback to remove.
              * @return {Interaction.Pointer} The calling Interaction.Pointer.
              */
             offPointerExit(callback: PointerCallback): Pointer;
@@ -3931,42 +3931,42 @@ declare module Plottable {
             /**
              * Sets the callback to be called when dragging starts.
              *
-             * @param {(start: Point) => any} cb The callback to be called. Takes in a Point in pixels.
+             * @param {DragCallback} callback The callback to be called. Takes in a Point in pixels.
              * @returns {Drag} The calling Interactions.Drag.
              */
             onDragStart(callback: DragCallback): Drag;
             /**
              * Removes the callback to be called when dragging starts.
              *
-             * @param {(start: Point) => any} cb The callback to be removed.
+             * @param {DragCallback} callback The callback to be removed.
              * @returns {Drag} The calling Interactions.Drag.
              */
             offDragStart(callback: DragCallback): Drag;
             /**
              * Adds a callback to be called during dragging.
              *
-             * @param {(start: Point, end: Point) => any} cb The callback to be called. Takes in Points in pixels.
+             * @param {DragCallback} callback The callback to be called. Takes in Points in pixels.
              * @returns {Drag} The calling Interactions.Drag.
              */
             onDrag(callback: DragCallback): Drag;
             /**
              * Removes a callback to be called during dragging.
              *
-             * @param {(start: Point, end: Point) => any} cb The callback to be removed.
+             * @param {DragCallback} callback The callback to be removed.
              * @returns {Drag} The calling Interactions.Drag.
              */
             offDrag(callback: DragCallback): Drag;
             /**
              * Adds a callback to be called when the dragging ends.
              *
-             * @param {(start: Point, end: Point) => any} cb The callback to be called. Takes in Points in pixels.
+             * @param {DragCallback} callback The callback to be called. Takes in Points in pixels.
              * @returns {Drag} The calling Interactions.Drag.
              */
             onDragEnd(callback: DragCallback): Drag;
             /**
              * Removes a callback to be called when the dragging ends.
              *
-             * @param {(start: Point, end: Point) => any} cb The callback to be removed
+             * @param {DragCallback} callback The callback to be removed
              * @returns {Drag} The calling Interactions.Drag.
              */
             offDragEnd(callback: DragCallback): Drag;
@@ -4013,42 +4013,42 @@ declare module Plottable {
             /**
              * Sets the callback to be called when dragging starts.
              *
-             * @param {DragBoxCallback} cb The callback to be called. Passed the current Bounds in pixels.
+             * @param {DragBoxCallback} callback The callback to be called. Passed the current Bounds in pixels.
              * @returns {DragBoxLayer} The calling DragBoxLayer.
              */
             onDragStart(callback: DragBoxCallback): DragBoxLayer;
             /**
              * Removes a callback to be called when dragging starts.
              *
-             * @param {DragBoxCallback} cb The callback to be removed.
+             * @param {DragBoxCallback} callback The callback to be removed.
              * @returns {DragBoxLayer} The calling DragBoxLayer.
              */
             offDragStart(callback: DragBoxCallback): DragBoxLayer;
             /**
              * Sets a callback to be called during dragging.
              *
-             * @param {DragBoxCallback} cb The callback to be called. Passed the current Bounds in pixels.
+             * @param {DragBoxCallback} callback The callback to be called. Passed the current Bounds in pixels.
              * @returns {DragBoxLayer} The calling DragBoxLayer.
              */
             onDrag(callback: DragBoxCallback): DragBoxLayer;
             /**
              * Removes a callback to be called during dragging.
              *
-             * @param {DragBoxCallback} cb The callback to be removed.
+             * @param {DragBoxCallback} callback The callback to be removed.
              * @returns {DragBoxLayer} The calling DragBoxLayer.
              */
             offDrag(callback: DragBoxCallback): DragBoxLayer;
             /**
              * Sets a callback to be called when the dragging ends.
              *
-             * @param {DragBoxCallback} cb The callback to be called. Passed the current Bounds in pixels.
+             * @param {DragBoxCallback} callback The callback to be called. Passed the current Bounds in pixels.
              * @returns {DragBoxLayer} The calling DragBoxLayer.
              */
             onDragEnd(callback: DragBoxCallback): DragBoxLayer;
             /**
              * Removes a callback to be called when the dragging ends.
              *
-             * @param {DragBoxCallback} cb The callback to be removed.
+             * @param {DragBoxCallback} callback The callback to be removed.
              * @returns {DragBoxLayer} The calling DragBoxLayer.
              */
             offDragEnd(callback: DragBoxCallback): DragBoxLayer;

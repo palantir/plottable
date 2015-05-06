@@ -103,7 +103,7 @@ export module Interactions {
     /**
      * Sets the callback to be called when dragging starts.
      *
-     * @param {(start: Point) => any} cb The callback to be called. Takes in a Point in pixels.
+     * @param {DragCallback} callback The callback to be called. Takes in a Point in pixels.
      * @returns {Drag} The calling Interactions.Drag.
      */
     public onDragStart(callback: DragCallback) {
@@ -114,7 +114,7 @@ export module Interactions {
     /**
      * Removes the callback to be called when dragging starts.
      *
-     * @param {(start: Point) => any} cb The callback to be removed.
+     * @param {DragCallback} callback The callback to be removed.
      * @returns {Drag} The calling Interactions.Drag.
      */
     public offDragStart(callback: DragCallback) {
@@ -125,7 +125,7 @@ export module Interactions {
     /**
      * Adds a callback to be called during dragging.
      *
-     * @param {(start: Point, end: Point) => any} cb The callback to be called. Takes in Points in pixels.
+     * @param {DragCallback} callback The callback to be called. Takes in Points in pixels.
      * @returns {Drag} The calling Interactions.Drag.
      */
     public onDrag(callback: DragCallback) {
@@ -136,7 +136,7 @@ export module Interactions {
     /**
      * Removes a callback to be called during dragging.
      *
-     * @param {(start: Point, end: Point) => any} cb The callback to be removed.
+     * @param {DragCallback} callback The callback to be removed.
      * @returns {Drag} The calling Interactions.Drag.
      */
     public offDrag(callback: DragCallback) {
@@ -147,7 +147,7 @@ export module Interactions {
     /**
      * Adds a callback to be called when the dragging ends.
      *
-     * @param {(start: Point, end: Point) => any} cb The callback to be called. Takes in Points in pixels.
+     * @param {DragCallback} callback The callback to be called. Takes in Points in pixels.
      * @returns {Drag} The calling Interactions.Drag.
      */
     public onDragEnd(callback: DragCallback) {
@@ -158,7 +158,7 @@ export module Interactions {
     /**
      * Removes a callback to be called when the dragging ends.
      *
-     * @param {(start: Point, end: Point) => any} cb The callback to be removed
+     * @param {DragCallback} callback The callback to be removed
      * @returns {Drag} The calling Interactions.Drag.
      */
     public offDragEnd(callback: DragCallback) {

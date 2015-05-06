@@ -217,15 +217,14 @@ describe("Interactions", () => {
 
       var target = component.background();
       TestMethods.triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
-      TestMethods.triggerFakeMouseEvent("mousemove", target, endPoint.x, endPoint.y);
-      TestMethods.triggerFakeMouseEvent("mouseup", target, endPoint.x, endPoint.y);
-
       assert.isTrue(startCallback1Called, "callback 1 was called on beginning drag (mousedown)");
       assert.isTrue(startCallback2Called, "callback 2 was called on beginning drag (mousedown)");
 
+      TestMethods.triggerFakeMouseEvent("mousemove", target, endPoint.x, endPoint.y);
       assert.isTrue(moveCallback1Called, "callback 1 was called on dragging (mousemove)");
       assert.isTrue(moveCallback2Called, "callback 2 was called on dragging (mousemove)");
 
+      TestMethods.triggerFakeMouseEvent("mouseup", target, endPoint.x, endPoint.y);
       assert.isTrue(endCallback1Called, "callback 1 was called on drag ending (mouseup)");
       assert.isTrue(endCallback2Called, "callback 2 was called on drag ending (mouseup)");
 
@@ -241,15 +240,14 @@ describe("Interactions", () => {
       drag.offDragEnd(endCallback1);
 
       TestMethods.triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
-      TestMethods.triggerFakeMouseEvent("mousemove", target, endPoint.x, endPoint.y);
-      TestMethods.triggerFakeMouseEvent("mouseup", target, endPoint.x, endPoint.y);
-
       assert.isFalse(startCallback1Called, "callback 1 was disconnected from drag start interaction");
       assert.isTrue(startCallback2Called, "callback 2 is still connected to the drag start interaction");
 
+      TestMethods.triggerFakeMouseEvent("mousemove", target, endPoint.x, endPoint.y);
       assert.isFalse(moveCallback1Called, "callback 1 was disconnected from drag interaction");
       assert.isTrue(moveCallback2Called, "callback 2 is still connected to the drag interaction");
 
+      TestMethods.triggerFakeMouseEvent("mouseup", target, endPoint.x, endPoint.y);
       assert.isFalse(endCallback1Called, "callback 1 was disconnected from the drag end interaction");
       assert.isTrue(endCallback2Called, "callback 2 is still connected to the drag end interaction");
 
