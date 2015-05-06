@@ -95,7 +95,7 @@ module Plottable {
         var failed = new Utils.Set<Component>();
         _componentsNeedingRender.values().forEach((component: Component) => {
           try {
-            component._doRender();
+            component.render(true);
           } catch (err) {
             // throw error with timeout to avoid interrupting further renders
             window.setTimeout(() => { throw err; }, 0);

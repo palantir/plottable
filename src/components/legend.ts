@@ -239,8 +239,8 @@ export module Components {
       return entry;
     }
 
-    public _doRender() {
-      super._doRender();
+    protected _render() {
+      super._render();
 
       var layout = this._calculateLayoutInfo(this.width(), this.height());
 

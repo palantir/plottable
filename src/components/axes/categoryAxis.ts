@@ -189,8 +189,8 @@ export module Axes {
       };
     }
 
-    public _doRender() {
-      super._doRender();
+    protected _render() {
+      super._render();
       var catScale = <Scales.Category> this._scale;
       var tickLabels = this._tickLabelContainer.selectAll("." + Axis.TICK_LABEL_CLASS).data(this._scale.domain(), (d) => d);
 

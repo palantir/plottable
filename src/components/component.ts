@@ -163,7 +163,17 @@ module Plottable {
       };
     }
 
-    public render() {
+    /**
+     * Queues the Component for rendering. Set immediately to true if the Component should be rendered
+     * immediately as opposed to queued to the RenderController.
+     * 
+     * @returns {Component} The calling Component
+     */
+    public render(immediately = false) {
+      if (immediately) {
+        this._render();
+        return this;
+      }
       if (this._isAnchored && this._isSetup && this.width() >= 0 && this.height() >= 0) {
         RenderController.registerToRender(this);
       }
@@ -176,7 +186,7 @@ module Plottable {
       }
     }
 
-    public _doRender() {/* overwrite */}
+    protected _render() {/* overwrite */}
 
     /**
      * Causes the Component to recompute layout and redraw.
