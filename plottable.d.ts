@@ -1527,7 +1527,7 @@ declare module Plottable {
          * Override in subclasses to provide additional functionality.
          */
         protected _setup(): void;
-        _requestedSpace(availableWidth: number, availableHeight: number): _SpaceRequest;
+        requestedSpace(availableWidth: number, availableHeight: number): _SpaceRequest;
         /**
          * Computes the size, position, and alignment from the specified values.
          * If no parameters are supplied and the Component is a root node,
@@ -1797,7 +1797,7 @@ declare module Plottable {
              * @param {Component[]} components The Components in the resultant Component.Group (default = []).
              */
             constructor(components?: Component[]);
-            _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
+            requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
             _merge(c: Component, below: boolean): Group;
             computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Group;
             protected _getSize(availableWidth: number, availableHeight: number): {
@@ -1847,7 +1847,7 @@ declare module Plottable {
         protected _isHorizontal(): boolean;
         protected _computeWidth(): number;
         protected _computeHeight(): number;
-        _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
+        requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
         _isFixedHeight(): boolean;
         _isFixedWidth(): boolean;
         protected _rescale(): void;
@@ -2128,7 +2128,7 @@ declare module Plottable {
             constructor(scale: Scales.Category, orientation?: string, formatter?: (d: any) => string);
             protected _setup(): void;
             protected _rescale(): Component;
-            _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
+            requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
             protected _getTickValues(): string[];
             /**
              * Sets the angle for the tick labels. Right now vertical-left (-90), horizontal (0), and vertical-right (90) are the only options.
@@ -2181,7 +2181,7 @@ declare module Plottable {
              * @returns {Label} The calling Label.
              */
             yAlign(alignment: string): Label;
-            _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
+            requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
             protected _setup(): void;
             /**
              * Gets the current text on the Label.
@@ -2309,7 +2309,7 @@ declare module Plottable {
              */
             scale(scale: Scales.Color): Legend;
             destroy(): void;
-            _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
+            requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
             /**
              * Gets the legend entry under the given pixel position.
              *
@@ -2386,7 +2386,7 @@ declare module Plottable {
              */
             orient(newOrientation: string): InterpolatedColorLegend;
             protected _setup(): void;
-            _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
+            requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
             _doRender(): void;
         }
     }
@@ -2462,7 +2462,7 @@ declare module Plottable {
              * @param {Component} component The Component to be removed.
              */
             removeComponent(component: Component): void;
-            _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
+            requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
             computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Table;
             /**
              * Sets the row and column padding on the Table.
