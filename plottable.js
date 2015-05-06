@@ -3596,7 +3596,7 @@ var Plottable;
             var cg;
             if (Plottable.Components.Group.prototype.isPrototypeOf(c)) {
                 cg = c;
-                cg._addComponent(this, below);
+                cg.add(this, below);
                 return cg;
             }
             else {
@@ -3651,7 +3651,7 @@ var Plottable;
             }
             var parent = this._parent();
             if (parent != null) {
-                parent._removeComponent(this);
+                parent.remove(this);
             }
             this._isAnchored = false;
             this._parentElement = null;
@@ -3782,14 +3782,26 @@ var Plottable;
             this._components.forEach(function (c) { return c.render(); });
             return this;
         };
-        ComponentContainer.prototype._removeComponent = function (c) {
-            var removeIndex = this._components.indexOf(c);
-            if (removeIndex >= 0) {
-                this.components().splice(removeIndex, 1);
-                this.redraw();
+        ComponentContainer.prototype.remove = function (c) {
+            if (!c) {
+                _super.prototype.remove.call(this);
+                this.components().slice().forEach(function (c) { return c.remove(); });
+            }
+            else {
+                var removeIndex = this._components.indexOf(c);
+                if (removeIndex >= 0) {
+                    this.components().splice(removeIndex, 1);
+                    this.redraw();
+                }
             }
         };
-        ComponentContainer.prototype._addComponent = function (c, prepend) {
+        /**
+         * Adds the specified Component to the ComponentContainer.
+         *
+         * @param c Component the component to add
+         * @param prepend boolean whether the component should be prepended to the componentContainer or not.
+         */
+        ComponentContainer.prototype.add = function (c, prepend) {
             if (prepend === void 0) { prepend = false; }
             if (!c || this._components.indexOf(c) >= 0) {
                 return false;
@@ -3835,10 +3847,6 @@ var Plottable;
             this.components().slice().forEach(function (c) { return c.detach(); });
             return this;
         };
-        ComponentContainer.prototype.remove = function () {
-            _super.prototype.remove.call(this);
-            this.components().slice().forEach(function (c) { return c.remove(); });
-        };
         ComponentContainer.prototype._useLastCalculatedLayout = function (calculated) {
             if (calculated != null) {
                 this.components().slice().forEach(function (c) { return c._useLastCalculatedLayout(calculated); });
@@ -3881,7 +3889,7 @@ var Plottable;
                 if (components === void 0) { components = []; }
                 _super.call(this);
                 this.classed("component-group", true);
-                components.forEach(function (c) { return _this._addComponent(c); });
+                components.forEach(function (c) { return _this.add(c); });
             }
             Group.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
                 var requests = this.components().map(function (c) { return c._requestedSpace(offeredWidth, offeredHeight); });
@@ -3893,7 +3901,7 @@ var Plottable;
                 };
             };
             Group.prototype._merge = function (c, below) {
-                this._addComponent(c, !below);
+                this.add(c, !below);
                 return this;
             };
             Group.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
@@ -6017,7 +6025,7 @@ var Plottable;
                 if (currentComponent) {
                     component = component.above(currentComponent);
                 }
-                if (this._addComponent(component)) {
+                if (_super.prototype.add.call(this, component)) {
                     this._nRows = Math.max(row + 1, this._nRows);
                     this._nCols = Math.max(col + 1, this._nCols);
                     this._padTableToSize(this._nRows, this._nCols);
@@ -6031,7 +6039,7 @@ var Plottable;
              * @param {Component} component The Component to be removed.
              */
             Table.prototype.removeComponent = function (component) {
-                _super.prototype._removeComponent.call(this, component);
+                _super.prototype.remove.call(this, component);
                 for (var r = 0; r < this._nRows; r++) {
                     for (var c = 0; c < this._nCols; c++) {
                         if (this._rows[r][c] === component) {

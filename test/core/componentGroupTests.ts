@@ -69,7 +69,7 @@ describe("ComponentGroups", () => {
     svg.remove();
     });
 
-  it("detach() and removeComponent work correctly for componentGroup", () => {
+  it("detach() and remove() work correctly for componentGroup", () => {
     var c1 = new Plottable.Component().classed("component-1", true);
     var c2 = new Plottable.Component().classed("component-2", true);
     var cg = new Plottable.Components.Group([c1, c2]);
@@ -192,7 +192,7 @@ describe("ComponentGroups", () => {
       var cg2 = new Plottable.ComponentContainer();
       var c = new Plottable.Component();
 
-      cg1._addComponent(c);
+      cg1.add(c);
 
       cg1.renderTo(svg);
       cg2.renderTo(svg);
@@ -207,7 +207,7 @@ describe("ComponentGroups", () => {
         "component's parent before moving should be the group 1"
       );
 
-      assert.doesNotThrow(() => cg2._addComponent(c), Error,
+      assert.doesNotThrow(() => cg2.add(c), Error,
         "should be able to move components between groups after anchoring"
       );
 
@@ -228,12 +228,12 @@ describe("ComponentGroups", () => {
       var cg1 = new Plottable.ComponentContainer();
       var c = new Plottable.Component;
 
-      cg1._addComponent(c);
+      cg1.add(c);
 
       assert.strictEqual(cg1.components().length, 1,
         "there should first be 1 element in the group");
 
-      assert.doesNotThrow(() => cg1._addComponent(null));
+      assert.doesNotThrow(() => cg1.add(null));
 
       assert.strictEqual(cg1.components().length, 1,
         "adding null to a group should have no effect on the group");

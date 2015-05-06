@@ -44,7 +44,7 @@
 
 /// <reference path="components/component.ts" />
 /// <reference path="components/componentContainer.ts" />
-/// <reference path="components/componentGroup.ts" />
+/// <reference path="components/group.ts" />
 
 /// <reference path="components/axes/axis.ts" />
 /// <reference path="components/axes/timeAxis.ts" />

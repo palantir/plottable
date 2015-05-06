@@ -20,7 +20,7 @@ export module Components {
     constructor(components: Component[] = []) {
       super();
       this.classed("component-group", true);
-      components.forEach((c: Component) => this._addComponent(c));
+      components.forEach((c: Component) => this.add(c));
     }
 
     public _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
@@ -34,7 +34,7 @@ export module Components {
     }
 
     public _merge(c: Component, below: boolean): Group {
-      this._addComponent(c, !below);
+      this.add(c, !below);
       return this;
     }
 

@@ -1754,8 +1754,23 @@ declare module Plottable {
     class ComponentContainer extends Component {
         anchor(selection: D3.Selection): ComponentContainer;
         render(): ComponentContainer;
-        _removeComponent(c: Component): void;
-        _addComponent(c: Component, prepend?: boolean): boolean;
+        /**
+         * Removes the ComponentContainer.
+         */
+        remove(): void;
+        /**
+         * Removes the specified Component from the ComponentContainer
+         *
+         * @param c Component the Component to remove.
+         */
+        remove(c: Component): void;
+        /**
+         * Adds the specified Component to the ComponentContainer.
+         *
+         * @param c Component the component to add
+         * @param prepend boolean whether the component should be prepended to the componentContainer or not.
+         */
+        add(c: Component, prepend?: boolean): boolean;
         /**
          * Returns a list of components in the ComponentContainer.
          *
@@ -1775,7 +1790,6 @@ declare module Plottable {
          * @returns {ComponentContainer} The calling ComponentContainer
          */
         detachAll(): ComponentContainer;
-        remove(): void;
         _useLastCalculatedLayout(): boolean;
         _useLastCalculatedLayout(calculated: boolean): Component;
     }

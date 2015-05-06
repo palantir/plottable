@@ -5949,46 +5949,46 @@ describe("Metadata", function () {
 ///<reference path="../testReference.ts" />
 var assert = chai.assert;
 describe("ComponentContainer", function () {
-    it("_addComponent()", function () {
+    it("add()", function () {
         var container = new Plottable.ComponentContainer();
         var c1 = new Plottable.Component();
         var c2 = new Plottable.Component();
         var c3 = new Plottable.Component();
-        assert.isTrue(container._addComponent(c1), "returns true on successful adding");
+        assert.isTrue(container.add(c1), "returns true on successful adding");
         assert.deepEqual(container.components(), [c1], "component was added");
-        container._addComponent(c2);
+        container.add(c2);
         assert.deepEqual(container.components(), [c1, c2], "can append components");
-        container._addComponent(c3, true);
+        container.add(c3, true);
         assert.deepEqual(container.components(), [c3, c1, c2], "can prepend components");
-        assert.isFalse(container._addComponent(null), "returns false for null arguments");
+        assert.isFalse(container.add(null), "returns false for null arguments");
         assert.deepEqual(container.components(), [c3, c1, c2], "component list was unchanged");
-        assert.isFalse(container._addComponent(c1), "returns false if adding an already-added component");
+        assert.isFalse(container.add(c1), "returns false if adding an already-added component");
         assert.deepEqual(container.components(), [c3, c1, c2], "component list was unchanged");
     });
-    it("removeComponent()", function () {
+    it("remove()", function () {
         var container = new Plottable.ComponentContainer();
         var c1 = new Plottable.Component();
         var c2 = new Plottable.Component();
-        container._addComponent(c1);
-        container._addComponent(c2);
-        container._removeComponent(c2);
+        container.add(c1);
+        container.add(c2);
+        container.remove(c2);
         assert.deepEqual(container.components(), [c1], "component 2 was removed");
-        container._removeComponent(c2);
+        container.remove(c2);
         assert.deepEqual(container.components(), [c1], "there are no side effects from removing already-removed components");
     });
     it("empty()", function () {
         var container = new Plottable.ComponentContainer();
         assert.isTrue(container.empty());
         var c1 = new Plottable.Component();
-        container._addComponent(c1);
+        container.add(c1);
         assert.isFalse(container.empty());
     });
     it("detachAll()", function () {
         var container = new Plottable.ComponentContainer();
         var c1 = new Plottable.Component();
         var c2 = new Plottable.Component();
-        container._addComponent(c1);
-        container._addComponent(c2);
+        container.add(c1);
+        container.add(c2);
         container.detachAll();
         assert.deepEqual(container.components(), [], "container was cleared of components");
     });
@@ -6056,7 +6056,7 @@ describe("ComponentGroups", function () {
         assert.strictEqual(c2Translate[1], 0, "componentGroup has 0 yOffset");
         svg.remove();
     });
-    it("detach() and removeComponent work correctly for componentGroup", function () {
+    it("detach() and remove() work correctly for componentGroup", function () {
         var c1 = new Plottable.Component().classed("component-1", true);
         var c2 = new Plottable.Component().classed("component-2", true);
         var cg = new Plottable.Components.Group([c1, c2]);
@@ -6151,13 +6151,13 @@ describe("ComponentGroups", function () {
             var cg1 = new Plottable.ComponentContainer();
             var cg2 = new Plottable.ComponentContainer();
             var c = new Plottable.Component();
-            cg1._addComponent(c);
+            cg1.add(c);
             cg1.renderTo(svg);
             cg2.renderTo(svg);
             assert.strictEqual(cg2.components().length, 0, "second group should have no component before movement");
             assert.strictEqual(cg1.components().length, 1, "first group should have 1 component before movement");
             assert.strictEqual(c._parent(), cg1, "component's parent before moving should be the group 1");
-            assert.doesNotThrow(function () { return cg2._addComponent(c); }, Error, "should be able to move components between groups after anchoring");
+            assert.doesNotThrow(function () { return cg2.add(c); }, Error, "should be able to move components between groups after anchoring");
             assert.strictEqual(cg2.components().length, 1, "second group should have 1 component after movement");
             assert.strictEqual(cg1.components().length, 0, "first group should have no components after movement");
             assert.strictEqual(c._parent(), cg2, "component's parent after movement should be the group 2");
@@ -6166,9 +6166,9 @@ describe("ComponentGroups", function () {
         it("can add null to a component without failing", function () {
             var cg1 = new Plottable.ComponentContainer();
             var c = new Plottable.Component;
-            cg1._addComponent(c);
+            cg1.add(c);
             assert.strictEqual(cg1.components().length, 1, "there should first be 1 element in the group");
-            assert.doesNotThrow(function () { return cg1._addComponent(null); });
+            assert.doesNotThrow(function () { return cg1.add(null); });
             assert.strictEqual(cg1.components().length, 1, "adding null to a group should have no effect on the group");
         });
     });
@@ -6514,7 +6514,7 @@ describe("Component behavior", function () {
     it("redraw() works as expected", function () {
         var cg = new Plottable.Components.Group();
         var c = TestMethods.makeFixedSizeComponent(10, 10);
-        cg._addComponent(c);
+        cg.add(c);
         cg.renderTo(svg);
         assert.strictEqual(cg.height(), 300, "height() is the entire available height");
         assert.strictEqual(cg.width(), 400, "width() is the entire available width");
@@ -6583,7 +6583,7 @@ describe("Component behavior", function () {
         var plot = new Plottable.Plots.Line(xScale, yScale);
         var group = new Plottable.Components.Group;
         group.renderTo(svg1);
-        group._addComponent(plot);
+        group.add(plot);
         assert.deepEqual(plot._parent(), group, "the plot should be inside the group");
         assert.strictEqual(plot.height(), SVG_HEIGHT_1, "the plot should occupy the entire space of the first svg");
         plot.renderTo(svg2);

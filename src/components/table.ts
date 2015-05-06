@@ -87,7 +87,7 @@ export module Components {
         component = component.above(currentComponent);
       }
 
-      if (this._addComponent(component)) {
+      if (super.add(component)) {
         this._nRows = Math.max(row + 1, this._nRows);
         this._nCols = Math.max(col + 1, this._nCols);
         this._padTableToSize(this._nRows, this._nCols);
@@ -103,7 +103,7 @@ export module Components {
      * @param {Component} component The Component to be removed.
      */
     public removeComponent(component: Component) {
-      super._removeComponent(component);
+      super.remove(component);
       for (var r = 0; r < this._nRows; r++) {
         for (var c = 0; c < this._nCols; c++) {
           if (this._rows[r][c] === component) {

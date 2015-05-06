@@ -429,7 +429,7 @@ module Plottable {
       var cg: Components.Group;
       if (Plottable.Components.Group.prototype.isPrototypeOf(c)) {
         cg = (<Plottable.Components.Group> c);
-        cg._addComponent(this, below);
+        cg.add(this, below);
         return cg;
       } else {
         var mergedComponents = below ? [this, c] : [c, this];
@@ -488,7 +488,7 @@ module Plottable {
       var parent: ComponentContainer = this._parent();
 
       if (parent != null) {
-        parent._removeComponent(this);
+        parent.remove(this);
       }
       this._isAnchored = false;
       this._parentElement = null;
