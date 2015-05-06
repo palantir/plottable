@@ -172,7 +172,7 @@ export module Components {
       };
     }
 
-    public _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
+    public requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
       var estimatedLayout = this._calculateLayoutInfo(offeredWidth, offeredHeight);
 
       var untruncatedRowLengths = estimatedLayout.rows.map((row) => {

@@ -133,7 +133,7 @@ describe("ComponentGroups", () => {
       var svg = TestMethods.generateSVG();
       var cg = new Plottable.Components.Group([]);
 
-      var request = cg._requestedSpace(SVG_WIDTH, SVG_HEIGHT);
+      var request = cg.requestedSpace(SVG_WIDTH, SVG_HEIGHT);
       TestMethods.verifySpaceRequest(request, 0, 0, "empty Group doesn't request any space");
 
       cg.renderTo(svg);
@@ -148,8 +148,8 @@ describe("ComponentGroups", () => {
       var c2 = new Plottable.Component();
       var cg = new Plottable.Components.Group([c1, c2]);
 
-      var groupRequest = cg._requestedSpace(SVG_WIDTH, SVG_HEIGHT);
-      var c1Request = c1._requestedSpace(SVG_WIDTH, SVG_HEIGHT);
+      var groupRequest = cg.requestedSpace(SVG_WIDTH, SVG_HEIGHT);
+      var c1Request = c1.requestedSpace(SVG_WIDTH, SVG_HEIGHT);
       assert.deepEqual(groupRequest, c1Request, "request reflects request of sub-component");
       assert.isFalse(cg.hasFixedWidth(), "width is not fixed if subcomponents are not fixed width");
       assert.isFalse(cg.hasFixedHeight(), "height is not fixed if subcomponents are not fixed height");
@@ -167,11 +167,11 @@ describe("ComponentGroups", () => {
 
       var cg = new Plottable.Components.Group([tall, wide]);
 
-      var request = cg._requestedSpace(SVG_WIDTH, SVG_HEIGHT);
+      var request = cg.requestedSpace(SVG_WIDTH, SVG_HEIGHT);
       assert.strictEqual(request.minWidth, SVG_WIDTH / 2, "requested enough space for widest Component");
       assert.strictEqual(request.minHeight, SVG_HEIGHT / 2, "requested enough space for tallest Component");
 
-      var constrainedRequest = cg._requestedSpace(SVG_WIDTH / 10, SVG_HEIGHT / 10);
+      var constrainedRequest = cg.requestedSpace(SVG_WIDTH / 10, SVG_HEIGHT / 10);
       assert.strictEqual(constrainedRequest.minWidth, SVG_WIDTH / 2, "requested enough space for widest Component");
       assert.strictEqual(constrainedRequest.minHeight, SVG_HEIGHT / 2, "requested enough space for tallest Component");
 

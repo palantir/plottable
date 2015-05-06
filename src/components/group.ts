@@ -23,8 +23,8 @@ export module Components {
       components.forEach((c: Component) => this.add(c));
     }
 
-    public _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
-      var requests = this.components().map((c: Component) => c._requestedSpace(offeredWidth, offeredHeight));
+    public requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
+      var requests = this.components().map((c: Component) => c.requestedSpace(offeredWidth, offeredHeight));
       return {
         minWidth: Utils.Methods.max<_SpaceRequest, number>(requests, (request: _SpaceRequest) => request.minWidth, 0),
         minHeight: Utils.Methods.max<_SpaceRequest, number>(requests, (request: _SpaceRequest) => request.minHeight, 0)

@@ -13,7 +13,7 @@ module Mocks {
       this._fixedHeightFlag = true;
     }
 
-    public _requestedSpace(availableWidth: number, availableHeight: number): Plottable._SpaceRequest {
+    public requestedSpace(availableWidth: number, availableHeight: number): Plottable._SpaceRequest {
       return {
         minWidth: this.fixedWidth,
         minHeight: this.fixedHeight

@@ -228,7 +228,7 @@ export module Components {
         row.forEach((component: Component, colIndex: number) => {
           var spaceRequest: _SpaceRequest;
           if (component != null) {
-            spaceRequest = component._requestedSpace(offeredWidths[colIndex], offeredHeights[rowIndex]);
+            spaceRequest = component.requestedSpace(offeredWidths[colIndex], offeredHeights[rowIndex]);
           } else {
             spaceRequest = {
               minWidth: 0,
@@ -258,7 +258,7 @@ export module Components {
       };
     }
 
-    public _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
+    public requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
       this._calculatedLayout = this._iterateLayout(offeredWidth, offeredHeight);
       return {
         minWidth: d3.sum(this._calculatedLayout.guaranteedWidths),
