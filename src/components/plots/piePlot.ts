@@ -22,13 +22,17 @@ export module Plots {
 
     private _colorScale: Scales.Color;
     private _innerRadius: _Accessor;
+    private _innerRadiusExtents: any[];
     private _innerRadiusScale: Scale<D, number>;
+    private _innerRadiusExtentProvider: Scales.ExtentProvider<any>;
     private _outerRadius: _Accessor;
-    private _outerRadiusScale: Scale<D, number>;
     private _outerRadiusExtents: any[];
+    private _outerRadiusScale: Scale<D, number>;
     private _outerRadiusExtentProvider: Scales.ExtentProvider<any>;
     private _sectorValue: _Accessor;
+    private _sectorValueExtents: any[];
     private _sectorValueScale: Scale<D, number>;
+    private _sectorValueExtentProvider: Scales.ExtentProvider<any>;
 
     /**
      * Constructs a PiePlot.
@@ -40,7 +44,9 @@ export module Plots {
       this._colorScale = new Scales.Color();
       this._innerRadius = () => 0;
       this._outerRadius = () => Math.min(this.width(), this.height()) / 2;
+      this._innerRadiusExtentProvider = (scale: Scale<any, any>) => this._innerRadiusExtentsForScale(scale);
       this._outerRadiusExtentProvider = (scale: Scale<any, any>) => this._outerRadiusExtentsForScale(scale);
+      this._sectorValueExtentProvider = (scale: Scale<any, any>) => this._sectorValueExtentsForScale(scale);
       this.classed("pie-plot", true);
     }
 
@@ -60,6 +66,8 @@ export module Plots {
     public anchor(selection: D3.Selection) {
       super.anchor(selection);
       this._updateOuterRadiusScaleExtents();
+      this._updateInnerRadiusScaleExtents();
+      this._updateSectorValueScaleExtents();
       return this;
     }
 
@@ -104,7 +112,8 @@ export module Plots {
         return { accessor: this._sectorValue, scale: this._sectorValueScale };
       }
       this._sectorValue = d3.functor(sectorValue);
-      Pie._replaceScaleBinding(this._sectorValueScale, sectorValueScale, this._renderCallback, null);
+      this._updateSectorValueScaleExtents();
+      Pie._replaceScaleBinding(this._sectorValueScale, sectorValueScale, this._renderCallback, this._sectorValueExtentProvider);
       this._sectorValueScale = sectorValueScale;
       this._render();
       return this;
@@ -118,16 +127,21 @@ export module Plots {
         return { accessor: this._outerRadius, scale: this._outerRadiusScale };
       }
       this._innerRadius = d3.functor(innerRadius);
-      Pie._replaceScaleBinding(this._innerRadiusScale, innerRadiusScale, this._renderCallback, null);
+      this._updateInnerRadiusScaleExtents();
+      Pie._replaceScaleBinding(this._innerRadiusScale, innerRadiusScale, this._renderCallback, this._innerRadiusExtentProvider);
       this._innerRadiusScale = innerRadiusScale;
       this._render();
       return this;
     }
-    
+
     protected _updateExtents() {
       super._updateExtents();
       this._updateOuterRadiusScaleExtents();
       if (this._outerRadiusScale != null) { this._outerRadiusScale._autoDomainIfAutomaticMode(); }
+      this._updateInnerRadiusScaleExtents();
+      if (this._innerRadiusScale != null) { this._innerRadiusScale._autoDomainIfAutomaticMode(); }
+      this._updateSectorValueScaleExtents();
+      if (this._sectorValueScale != null) { this._sectorValueScale._autoDomainIfAutomaticMode(); }
     }
 
     public outerRadius(): AccessorScaleBinding<D, number>;
@@ -170,12 +184,55 @@ export module Plots {
       this._outerRadiusExtents = extents;
       if (scale != null) { scale._autoDomainIfAutomaticMode(); }
     }
-    
+
     private _outerRadiusExtentsForScale<D>(scale: Scale<D, any>) {
       if (!this._isAnchored) {
         return [];
       }
       return this._outerRadiusExtents;
+    }
+
+    private _updateInnerRadiusScaleExtents() {
+      var accessor = this._innerRadius;
+      var scale = this._innerRadiusScale;
+      var coercer = (scale != null) ? scale._typeCoercer : (d: any) => d;
+      var extents = this._datasetKeysInOrder.map((key) => {
+        var plotDatasetKey = this._key2PlotDatasetKey.get(key);
+        var dataset = plotDatasetKey.dataset;
+        var plotMetadata = plotDatasetKey.plotMetadata;
+        return dataset._getExtent(accessor, coercer, plotMetadata);
+      });
+      this._innerRadiusExtents = extents;
+      if (scale != null) { scale._autoDomainIfAutomaticMode(); }
+    }
+
+    private _innerRadiusExtentsForScale<D>(scale: Scale<D, any>) {
+      if (!this._isAnchored) {
+        return [];
+      }
+      return this._innerRadiusExtents;
+    }
+
+    private _updateSectorValueScaleExtents() {
+      var accessor = this._sectorValue;
+      if (accessor == null) { return; }
+      var scale = this._sectorValueScale;
+      var coercer = (scale != null) ? scale._typeCoercer : (d: any) => d;
+      var extents = this._datasetKeysInOrder.map((key) => {
+        var plotDatasetKey = this._key2PlotDatasetKey.get(key);
+        var dataset = plotDatasetKey.dataset;
+        var plotMetadata = plotDatasetKey.plotMetadata;
+        return dataset._getExtent(accessor, coercer, plotMetadata);
+      });
+      this._sectorValueExtents = extents;
+      if (scale != null) { scale._autoDomainIfAutomaticMode(); }
+    }
+
+    private _sectorValueExtentsForScale<D>(scale: Scale<D, any>) {
+      if (!this._isAnchored) {
+        return [];
+      }
+      return this._sectorValueExtents;
     }
 
     private static _scaledValueAccessor<SD, SR>(accessor: _Accessor, scale: Scale<SD, SR>): _Accessor {
