@@ -62,7 +62,7 @@ module Plottable {
       this._extentProvider = (scale: Scale<any, any>) => this._extentsForScale(scale);
       this._datasetKeysInOrder = [];
       this._nextSeriesIndex = 0;
-      this._renderCallback = (scale) => this._render();
+      this._renderCallback = (scale) => this.render();
       this._onDatasetUpdateCallback = () => this._onDatasetUpdate();
     }
 
@@ -147,7 +147,7 @@ module Plottable {
       this._updateExtents();
       this._animateOnNextRender = true;
       this._dataChanged = true;
-      this._render();
+      this.render();
     }
 
     /**
@@ -202,7 +202,7 @@ module Plottable {
         scale.addExtentProvider(this._extentProvider);
         scale._autoDomainIfAutomaticMode();
       }
-      this._render(); // queue a re-render upon changing projector
+      this.render(); // queue a re-render upon changing projector
       return this;
     }
 

@@ -208,7 +208,7 @@ describe("Component behavior", () => {
     var expectedClipPathID = c.getID();
     c.anchor(svg);
     c.computeLayout({ x: 0, y: 0 }, 100, 100);
-    c._render();
+    c.render();
     var expectedPrefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
     expectedPrefix = expectedPrefix.replace(/#.*/g, "");
     var expectedClipPathURL = "url(" + expectedPrefix + "#clipPath" + expectedClipPathID + ")";
@@ -358,16 +358,16 @@ describe("Component behavior", () => {
     c._doRender = () => renderFlag = true;
     c.anchor(svg);
     c._setup();
-    c._render();
+    c.render();
     assert.isFalse(renderFlag, "no render until width/height set to nonzero");
 
     c._width = 10;
     c._height = 0;
-    c._render();
+    c.render();
     assert.isTrue(renderFlag, "render still occurs if one of width/height is zero");
 
     c._height = 10;
-    c._render();
+    c.render();
     assert.isTrue(renderFlag, "render occurs if width and height are positive");
 
     svg.remove();

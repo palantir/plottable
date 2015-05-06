@@ -1297,8 +1297,8 @@ var Plottable;
          */
         var RenderControllers;
         (function (RenderControllers) {
-            var _componentsNeedingRender = {};
-            var _componentsNeedingComputeLayout = {};
+            var _componentsNeedingRender = new Plottable.Utils.Set();
+            var _componentsNeedingComputeLayout = new Plottable.Utils.Set();
             var _animationRequested = false;
             var _isCurrentlyFlushing = false;
             RenderControllers._renderPolicy = new RenderControllers.RenderPolicies.AnimationFrame();
@@ -1328,11 +1328,11 @@ var Plottable;
              *
              * @param {Component} component Any Plottable component.
              */
-            function registerToRender(c) {
+            function registerToRender(component) {
                 if (_isCurrentlyFlushing) {
                     Plottable.Utils.Methods.warn("Registered to render while other components are flushing: request may be ignored");
                 }
-                _componentsNeedingRender[c.getID()] = c;
+                _componentsNeedingRender.add(component);
                 requestRender();
             }
             RenderControllers.registerToRender = registerToRender;
@@ -1342,9 +1342,9 @@ var Plottable;
              *
              * @param {Component} component Any Plottable component.
              */
-            function registerToComputeLayout(c) {
-                _componentsNeedingComputeLayout[c.getID()] = c;
-                _componentsNeedingRender[c.getID()] = c;
+            function registerToComputeLayout(component) {
+                _componentsNeedingComputeLayout.add(component);
+                _componentsNeedingRender.add(component);
                 requestRender();
             }
             RenderControllers.registerToComputeLayout = registerToComputeLayout;
@@ -1364,31 +1364,24 @@ var Plottable;
             function flush() {
                 if (_animationRequested) {
                     // Layout
-                    var toCompute = d3.values(_componentsNeedingComputeLayout);
-                    toCompute.forEach(function (c) { return c.computeLayout(); });
-                    // Top level render.
-                    // Containers will put their children in the toRender queue
-                    var toRender = d3.values(_componentsNeedingRender);
-                    toRender.forEach(function (c) { return c._render(); });
-                    // now we are flushing
+                    _componentsNeedingComputeLayout.values().forEach(function (component) { return component.computeLayout(); });
+                    // Top level render; Containers will put their children in the toRender queue
+                    _componentsNeedingRender.values().forEach(function (component) { return component.render(); });
                     _isCurrentlyFlushing = true;
-                    // Finally, perform render of all components
-                    var failed = {};
-                    Object.keys(_componentsNeedingRender).forEach(function (k) {
+                    var failed = new Plottable.Utils.Set();
+                    _componentsNeedingRender.values().forEach(function (component) {
                         try {
-                            _componentsNeedingRender[k]._doRender();
+                            component._doRender();
                         }
                         catch (err) {
-                            // using setTimeout instead of console.log, we get the familiar red
-                            // stack trace
-                            setTimeout(function () {
+                            // throw error with timeout to avoid interrupting further renders
+                            window.setTimeout(function () {
                                 throw err;
                             }, 0);
-                            failed[k] = _componentsNeedingRender[k];
+                            failed.add(component);
                         }
                     });
-                    // Reset queues
-                    _componentsNeedingComputeLayout = {};
+                    _componentsNeedingComputeLayout = new Plottable.Utils.Set();
                     _componentsNeedingRender = failed;
                     _animationRequested = false;
                     _isCurrentlyFlushing = false;
@@ -3355,10 +3348,11 @@ var Plottable;
                 height: this._isFixedHeight() ? Math.min(availableHeight, requestedSpace.height) : availableHeight
             };
         };
-        Component.prototype._render = function () {
+        Component.prototype.render = function () {
             if (this._isAnchored && this._isSetup && this.width() >= 0 && this.height() >= 0) {
                 Plottable.Core.RenderControllers.registerToRender(this);
             }
+            return this;
         };
         Component.prototype._scheduleComputeLayout = function () {
             if (this._isAnchored && this._isSetup) {
@@ -3422,7 +3416,7 @@ var Plottable;
           or a D3.Selection, or a selector string");
             }
             this.computeLayout();
-            this._render();
+            this.render();
             // flush so that consumers can immediately attach to stuff we create in the DOM
             Plottable.Core.RenderControllers.flush();
             return this;
@@ -3787,8 +3781,9 @@ var Plottable;
             this.components().forEach(function (c) { return c.anchor(_this._content); });
             return this;
         };
-        ComponentContainer.prototype._render = function () {
-            this._components.forEach(function (c) { return c._render(); });
+        ComponentContainer.prototype.render = function () {
+            this._components.forEach(function (c) { return c.render(); });
+            return this;
         };
         ComponentContainer.prototype._removeComponent = function (c) {
             var removeIndex = this._components.indexOf(c);
@@ -4025,7 +4020,7 @@ var Plottable;
         };
         Axis.prototype._rescale = function () {
             // default implementation; subclasses may call redraw() here
-            this._render();
+            this.render();
         };
         Axis.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
             _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
@@ -4232,7 +4227,7 @@ var Plottable;
                 return this._showEndTickLabels;
             }
             this._showEndTickLabels = show;
-            this._render();
+            this.render();
             return this;
         };
         /**
@@ -4769,7 +4764,7 @@ var Plottable;
                         return;
                     }
                 }
-                this._render();
+                this.render();
             };
             Numeric.prototype._doRender = function () {
                 var _this = this;
@@ -4919,7 +4914,7 @@ var Plottable;
                     }
                     else {
                         this._showFirstTickLabel = show;
-                        this._render();
+                        this.render();
                         return this;
                     }
                 }
@@ -4929,7 +4924,7 @@ var Plottable;
                     }
                     else {
                         this._showLastTickLabel = show;
-                        this._render();
+                        this.render();
                         return this;
                     }
                 }
@@ -5616,7 +5611,7 @@ var Plottable;
                 }
                 else {
                     this._symbolFactoryAccessor = symbolFactoryAccessor;
-                    this._render();
+                    this.render();
                     return this;
                 }
             };
@@ -5896,7 +5891,7 @@ var Plottable;
                 this.classed("gridlines", true);
                 this._xScale = xScale;
                 this._yScale = yScale;
-                this._renderCallback = function (scale) { return _this._render(); };
+                this._renderCallback = function (scale) { return _this.render(); };
                 if (this._xScale) {
                     this._xScale.onUpdate(this._renderCallback);
                 }
@@ -6340,7 +6335,7 @@ var Plottable;
                     return this._boxBounds;
                 }
                 this._setBounds(newBounds);
-                this._render();
+                this.render();
                 return this;
             };
             SelectionBoxLayer.prototype._setBounds = function (newBounds) {
@@ -6380,7 +6375,7 @@ var Plottable;
                     return this._boxVisible;
                 }
                 this._boxVisible = show;
-                this._render();
+                this.render();
                 return this;
             };
             return SelectionBoxLayer;
@@ -6429,7 +6424,7 @@ var Plottable;
             this._extentProvider = function (scale) { return _this._extentsForScale(scale); };
             this._datasetKeysInOrder = [];
             this._nextSeriesIndex = 0;
-            this._renderCallback = function (scale) { return _this._render(); };
+            this._renderCallback = function (scale) { return _this.render(); };
             this._onDatasetUpdateCallback = function () { return _this._onDatasetUpdate(); };
         }
         Plot.prototype.anchor = function (selection) {
@@ -6496,7 +6491,7 @@ var Plottable;
             this._updateExtents();
             this._animateOnNextRender = true;
             this._dataChanged = true;
-            this._render();
+            this.render();
         };
         /**
          * Sets an attribute of every data point.
@@ -6546,7 +6541,7 @@ var Plottable;
                 scale.addExtentProvider(this._extentProvider);
                 scale._autoDomainIfAutomaticMode();
             }
-            this._render(); // queue a re-render upon changing projector
+            this.render(); // queue a re-render upon changing projector
             return this;
         };
         Plot.prototype._generateAttrToProjector = function () {
@@ -7456,7 +7451,7 @@ var Plottable;
                 this._baselineValue = value;
                 this._updateXDomainer();
                 this._updateYDomainer();
-                this._render();
+                this.render();
                 return this;
             };
             /**
@@ -7474,7 +7469,7 @@ var Plottable;
                     throw new Error("unsupported bar alignment");
                 }
                 this._barAlignmentFactor = align2factor[alignmentLC];
-                this._render();
+                this.render();
                 return this;
             };
             Bar.prototype.labelsEnabled = function (enabled) {
@@ -7483,7 +7478,7 @@ var Plottable;
                 }
                 else {
                     this._labelsEnabled = enabled;
-                    this._render();
+                    this.render();
                     return this;
                 }
             };
@@ -7493,7 +7488,7 @@ var Plottable;
                 }
                 else {
                     this._barLabelFormatter = formatter;
-                    this._render();
+                    this.render();
                     return this;
                 }
             };
@@ -10067,7 +10062,7 @@ var Plottable;
                     throw new Error("detection radius cannot be negative.");
                 }
                 this._detectionRadius = r;
-                this._render();
+                this.render();
                 return this;
             };
             DragBoxLayer.prototype.resizable = function (canResize) {

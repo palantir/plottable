@@ -1458,7 +1458,7 @@ describe("Gridlines", function () {
         basicTable.computeLayout();
         xScale.range([0, xAxis.width()]); // manually set range since we don't have a renderer
         yScale.range([yAxis.height(), 0]);
-        basicTable._render();
+        basicTable.render();
         var xAxisTickMarks = xAxis._element.selectAll("." + Plottable.Axis.TICK_MARK_CLASS)[0];
         var xGridlines = gridlines._element.select(".x-gridlines").selectAll("line")[0];
         assert.strictEqual(xAxisTickMarks.length, xGridlines.length, "There is an x gridline for each x tick");
@@ -1705,7 +1705,7 @@ describe("Legend", function () {
         legend.renderTo(svg);
         var numRows = legend._content.selectAll(rowSelector)[0].length;
         assert.strictEqual(numRows, 3, "there are 3 legend rows initially");
-        legend._render();
+        legend.render();
         numRows = legend._content.selectAll(rowSelector)[0].length;
         assert.strictEqual(numRows, 3, "there are 3 legend rows after second render");
         svg.remove();
@@ -1775,11 +1775,11 @@ describe("Legend", function () {
         verifySymbolHeight();
         style.text(".plottable .legend text { font-size: 60px; }");
         legend.computeLayout();
-        legend._render();
+        legend.render();
         verifySymbolHeight();
         style.text(".plottable .legend text { font-size: 10px; }");
         legend.computeLayout();
-        legend._render();
+        legend.render();
         verifySymbolHeight();
         svg.remove();
     });
@@ -2090,9 +2090,9 @@ var CountingPlot = (function (_super) {
         _super.apply(this, arguments);
         this.renders = 0;
     }
-    CountingPlot.prototype._render = function () {
+    CountingPlot.prototype.render = function () {
         ++this.renders;
-        return _super.prototype._render.call(this);
+        return _super.prototype.render.call(this);
     };
     return CountingPlot;
 })(Plottable.Plot);
@@ -4447,8 +4447,8 @@ describe("Plots", function () {
                 svg.remove();
             });
             it("rendering is idempotent", function () {
-                circlePlot._render();
-                circlePlot._render();
+                circlePlot.render();
+                circlePlot.render();
                 circlePlot.getAllSelections().each(getCirclePlotVerifier());
                 assert.strictEqual(circlesInArea, 10, "10 circles were drawn");
                 svg.remove();
@@ -6007,7 +6007,7 @@ describe("ComponentGroups", function () {
         c1._addBox("test-box1");
         c2._addBox("test-box2");
         c3._addBox("test-box3");
-        cg.computeLayout()._render();
+        cg.computeLayout().render();
         var t1 = svg.select(".test-box1");
         var t2 = svg.select(".test-box2");
         var t3 = svg.select(".test-box3");
@@ -6025,14 +6025,14 @@ describe("ComponentGroups", function () {
         cg.below(c2).anchor(svg);
         c1._addBox("test-box1");
         c2._addBox("test-box2");
-        cg.computeLayout()._render();
+        cg.computeLayout().render();
         var t1 = svg.select(".test-box1");
         var t2 = svg.select(".test-box2");
         TestMethods.assertWidthHeight(t1, 10, 10, "rect1 sized correctly");
         TestMethods.assertWidthHeight(t2, 20, 20, "rect2 sized correctly");
         cg.below(c3);
         c3._addBox("test-box3");
-        cg.computeLayout()._render();
+        cg.computeLayout().render();
         var t3 = svg.select(".test-box3");
         TestMethods.assertWidthHeight(t3, 400, 400, "rect3 sized correctly");
         svg.remove();
@@ -6435,7 +6435,7 @@ describe("Component behavior", function () {
         var expectedClipPathID = c.getID();
         c.anchor(svg);
         c.computeLayout({ x: 0, y: 0 }, 100, 100);
-        c._render();
+        c.render();
         var expectedPrefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
         expectedPrefix = expectedPrefix.replace(/#.*/g, "");
         var expectedClipPathURL = "url(" + expectedPrefix + "#clipPath" + expectedClipPathID + ")";
@@ -6562,14 +6562,14 @@ describe("Component behavior", function () {
         c._doRender = function () { return renderFlag = true; };
         c.anchor(svg);
         c._setup();
-        c._render();
+        c.render();
         assert.isFalse(renderFlag, "no render until width/height set to nonzero");
         c._width = 10;
         c._height = 0;
-        c._render();
+        c.render();
         assert.isTrue(renderFlag, "render still occurs if one of width/height is zero");
         c._height = 10;
-        c._render();
+        c.render();
         assert.isTrue(renderFlag, "render occurs if width and height are positive");
         svg.remove();
     });

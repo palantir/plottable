@@ -28,7 +28,7 @@ export module Components {
       this.classed("gridlines", true);
       this._xScale = xScale;
       this._yScale = yScale;
-      this._renderCallback = (scale) => this._render();
+      this._renderCallback = (scale) => this.render();
       if (this._xScale) {
         this._xScale.onUpdate(this._renderCallback);
       }

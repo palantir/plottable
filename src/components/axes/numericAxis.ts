@@ -88,7 +88,7 @@ export module Axes {
         }
       }
 
-      this._render();
+      this.render();
     }
 
     public _doRender() {
@@ -307,7 +307,7 @@ export module Axes {
           return this._showFirstTickLabel;
         } else {
           this._showFirstTickLabel = show;
-          this._render();
+          this.render();
           return this;
         }
       } else if ((this._isHorizontal() && orientation === "right") ||
@@ -316,7 +316,7 @@ export module Axes {
           return this._showLastTickLabel;
         } else {
           this._showLastTickLabel = show;
-          this._render();
+          this.render();
           return this;
         }
       } else {

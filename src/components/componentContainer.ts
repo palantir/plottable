@@ -14,8 +14,9 @@ module Plottable {
       return this;
     }
 
-    public _render() {
-      this._components.forEach((c) => c._render());
+    public render() {
+      this._components.forEach((c) => c.render());
+      return this;
     }
 
     public _removeComponent(c: Component) {

@@ -68,7 +68,7 @@ export module Plots {
       this._baselineValue = value;
       this._updateXDomainer();
       this._updateYDomainer();
-      this._render();
+      this.render();
       return this;
     }
 
@@ -88,7 +88,7 @@ export module Plots {
       }
       this._barAlignmentFactor = align2factor[alignmentLC];
 
-      this._render();
+      this.render();
       return this;
     }
 
@@ -110,7 +110,7 @@ export module Plots {
         return this._labelsEnabled;
       } else {
         this._labelsEnabled = enabled;
-        this._render();
+        this.render();
         return this;
       }
     }
@@ -133,7 +133,7 @@ export module Plots {
         return this._barLabelFormatter;
       } else {
         this._barLabelFormatter = formatter;
-        this._render();
+        this.render();
         return this;
       }
     }

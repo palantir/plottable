@@ -318,7 +318,7 @@ export module Components {
         return this._symbolFactoryAccessor;
       } else {
         this._symbolFactoryAccessor = symbolFactoryAccessor;
-        this._render();
+        this.render();
         return this;
       }
     }
