@@ -11,7 +11,7 @@ module Plottable {
   export class Dataset extends Core.PlottableObject {
     private _data: any[];
     private _metadata: any;
-    private _accessor2cachedExtent: Utils.Map;
+    private _accessor2cachedExtent: Utils.Map<any, any>;
     private _callbacks: Utils.CallbackSet<DatasetCallback>;
 
     /**
@@ -28,7 +28,7 @@ module Plottable {
       super();
       this._data = data;
       this._metadata = metadata;
-      this._accessor2cachedExtent = new Utils.Map();
+      this._accessor2cachedExtent = new Utils.Map<any, any>();
       this._callbacks = new Utils.CallbackSet<DatasetCallback>();
     }
 

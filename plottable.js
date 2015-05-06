@@ -392,8 +392,8 @@ var Plottable;
             /**
              * Set a new key/value pair in the store.
              *
-             * @param {any} key Key to set in the store
-             * @param {any} value Value to set in the store
+             * @param {K} key Key to set in the store
+             * @param {V} value Value to set in the store
              * @return {boolean} True if key already in store, false otherwise
              */
             Map.prototype.set = function (key, value) {
@@ -412,8 +412,8 @@ var Plottable;
             /**
              * Get a value from the store, given a key.
              *
-             * @param {any} key Key associated with value to retrieve
-             * @return {any} Value if found, undefined otherwise
+             * @param {K} key Key associated with value to retrieve
+             * @return {V} Value if found, undefined otherwise
              */
             Map.prototype.get = function (key) {
                 for (var i = 0; i < this._keyValuePairs.length; i++) {
@@ -429,7 +429,7 @@ var Plottable;
              * Will return true if there is a key/value entry,
              * even if the value is explicitly `undefined`.
              *
-             * @param {any} key Key to test for presence of an entry
+             * @param {K} key Key to test for presence of an entry
              * @return {boolean} Whether there was a matching entry for that key
              */
             Map.prototype.has = function (key) {
@@ -443,7 +443,7 @@ var Plottable;
             /**
              * Return an array of the values in the key-value store
              *
-             * @return {any[]} The values in the store
+             * @return {V[]} The values in the store
              */
             Map.prototype.values = function () {
                 return this._keyValuePairs.map(function (x) { return x[1]; });
@@ -451,7 +451,7 @@ var Plottable;
             /**
              * Return an array of keys in the key-value store
              *
-             * @return {any[]} The keys in the store
+             * @return {K[]} The keys in the store
              */
             Map.prototype.keys = function () {
                 return this._keyValuePairs.map(function (x) { return x[0]; });
@@ -459,7 +459,7 @@ var Plottable;
             /**
              * Execute a callback for each entry in the array.
              *
-             * @param {(key: any, val?: any, index?: number) => any} callback The callback to eecute
+             * @param {(key: K, val?: V, index?: number) => any} callback The callback to execute
              * @return {any[]} The results of mapping the callback over the entries
              */
             Map.prototype.map = function (cb) {
@@ -470,7 +470,7 @@ var Plottable;
             /**
              * Delete a key from the key-value store. Return whether the key was present.
              *
-             * @param {any} The key to remove
+             * @param {K} The key to remove
              * @return {boolean} Whether a matching entry was found and removed
              */
             Map.prototype.delete = function (key) {
@@ -1374,9 +1374,9 @@ var Plottable;
         function Domainer(combineExtents) {
             this._doNice = false;
             this._padProportion = 0.0;
+            this._combineExtents = combineExtents;
             this._paddingExceptions = new Plottable.Utils.Map();
             this._includedValues = new Plottable.Utils.Map();
-            this._combineExtents = combineExtents;
         }
         /**
          * @param {any[][]} extents The list of extents to be reduced to a single
