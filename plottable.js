@@ -1362,8 +1362,6 @@ var Plottable;
                 if (_animationRequested) {
                     // Layout
                     _componentsNeedingComputeLayout.values().forEach(function (component) { return component.computeLayout(); });
-                    // Top level render; Containers will put their children in the toRender queue
-                    _componentsNeedingRender.values().forEach(function (component) { return component.render(); });
                     _isCurrentlyFlushing = true;
                     var failed = new Plottable.Utils.Set();
                     _componentsNeedingRender.values().forEach(function (component) {

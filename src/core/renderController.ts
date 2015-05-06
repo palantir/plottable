@@ -93,9 +93,6 @@ export module Core {
         // Layout
         _componentsNeedingComputeLayout.values().forEach((component: Component) => component.computeLayout());
 
-        // Top level render; Containers will put their children in the toRender queue
-        _componentsNeedingRender.values().forEach((component: Component) => component.render());
-
         _isCurrentlyFlushing = true;
         var failed = new Utils.Set<Component>();
         _componentsNeedingRender.values().forEach((component: Component) => {
