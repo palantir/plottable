@@ -58,7 +58,7 @@
 ///<reference path="utils/utilsTests.ts" />
 ///<reference path="utils/callbackSetTests.ts" />
 
-///<reference path="interactions/interactionTests.ts" />
+///<reference path="interactions/keyInteractionTests.ts" />
 ///<reference path="interactions/pointerInteractionTests.ts" />
 ///<reference path="interactions/clickInteractionTests.ts" />
 ///<reference path="interactions/doubleClickInteractionTests.ts" />

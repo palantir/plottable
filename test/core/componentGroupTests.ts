@@ -69,7 +69,7 @@ describe("ComponentGroups", () => {
     svg.remove();
     });
 
-  it("detach() and _removeComponent work correctly for componentGroup", () => {
+  it("detach() and remove() work correctly for componentGroup", () => {
     var c1 = new Plottable.Component().classed("component-1", true);
     var c2 = new Plottable.Component().classed("component-2", true);
     var cg = new Plottable.Components.Group([c1, c2]);
@@ -133,8 +133,8 @@ describe("ComponentGroups", () => {
       var svg = TestMethods.generateSVG();
       var cg = new Plottable.Components.Group([]);
 
-      var request = cg._requestedSpace(SVG_WIDTH, SVG_HEIGHT);
-      TestMethods.verifySpaceRequest(request, 0, 0, false, false, "empty Group doesn't request any space");
+      var request = cg.requestedSpace(SVG_WIDTH, SVG_HEIGHT);
+      TestMethods.verifySpaceRequest(request, 0, 0, "empty Group doesn't request any space");
 
       cg.renderTo(svg);
       assert.strictEqual(cg.width(), SVG_WIDTH, "occupies all offered width");
@@ -148,8 +148,8 @@ describe("ComponentGroups", () => {
       var c2 = new Plottable.Component();
       var cg = new Plottable.Components.Group([c1, c2]);
 
-      var groupRequest = cg._requestedSpace(SVG_WIDTH, SVG_HEIGHT);
-      var c1Request = c1._requestedSpace(SVG_WIDTH, SVG_HEIGHT);
+      var groupRequest = cg.requestedSpace(SVG_WIDTH, SVG_HEIGHT);
+      var c1Request = c1.requestedSpace(SVG_WIDTH, SVG_HEIGHT);
       assert.deepEqual(groupRequest, c1Request, "request reflects request of sub-component");
       assert.isFalse(cg._isFixedWidth(), "width is not fixed if subcomponents are not fixed width");
       assert.isFalse(cg._isFixedHeight(), "height is not fixed if subcomponents are not fixed height");
@@ -167,17 +167,13 @@ describe("ComponentGroups", () => {
 
       var cg = new Plottable.Components.Group([tall, wide]);
 
-      var request = cg._requestedSpace(SVG_WIDTH, SVG_HEIGHT);
-      assert.strictEqual(request.width, SVG_WIDTH / 2, "requested enough space for widest Component");
-      assert.isFalse(request.wantsWidth, "does not request more width if enough was supplied for widest Component");
-      assert.strictEqual(request.height, SVG_HEIGHT / 2, "requested enough space for tallest Component");
-      assert.isFalse(request.wantsHeight, "does not request more height if enough was supplied for tallest Component");
+      var request = cg.requestedSpace(SVG_WIDTH, SVG_HEIGHT);
+      assert.strictEqual(request.minWidth, SVG_WIDTH / 2, "requested enough space for widest Component");
+      assert.strictEqual(request.minHeight, SVG_HEIGHT / 2, "requested enough space for tallest Component");
 
-      var constrainedRequest = cg._requestedSpace(SVG_WIDTH / 10, SVG_HEIGHT / 10);
-      assert.strictEqual(constrainedRequest.width, SVG_WIDTH / 2, "requested enough space for widest Component");
-      assert.isTrue(constrainedRequest.wantsWidth, "requests more width if not enough was supplied for widest Component");
-      assert.strictEqual(constrainedRequest.height, SVG_HEIGHT / 2, "requested enough space for tallest Component");
-      assert.isTrue(constrainedRequest.wantsHeight, "requests more height if not enough was supplied for tallest Component");
+      var constrainedRequest = cg.requestedSpace(SVG_WIDTH / 10, SVG_HEIGHT / 10);
+      assert.strictEqual(constrainedRequest.minWidth, SVG_WIDTH / 2, "requested enough space for widest Component");
+      assert.strictEqual(constrainedRequest.minHeight, SVG_HEIGHT / 2, "requested enough space for tallest Component");
 
       cg.renderTo(svg);
       assert.strictEqual(cg.width(), SVG_WIDTH, "occupies all offered width");
@@ -192,7 +188,7 @@ describe("ComponentGroups", () => {
       var cg2 = new Plottable.ComponentContainer();
       var c = new Plottable.Component();
 
-      cg1._addComponent(c);
+      cg1.add(c);
 
       cg1.renderTo(svg);
       cg2.renderTo(svg);
@@ -207,7 +203,7 @@ describe("ComponentGroups", () => {
         "component's parent before moving should be the group 1"
       );
 
-      assert.doesNotThrow(() => cg2._addComponent(c), Error,
+      assert.doesNotThrow(() => cg2.add(c), Error,
         "should be able to move components between groups after anchoring"
       );
 
@@ -228,12 +224,12 @@ describe("ComponentGroups", () => {
       var cg1 = new Plottable.ComponentContainer();
       var c = new Plottable.Component;
 
-      cg1._addComponent(c);
+      cg1.add(c);
 
       assert.strictEqual(cg1.components().length, 1,
         "there should first be 1 element in the group");
 
-      assert.doesNotThrow(() => cg1._addComponent(null));
+      assert.doesNotThrow(() => cg1.add(null));
 
       assert.strictEqual(cg1.components().length, 1,
         "adding null to a group should have no effect on the group");

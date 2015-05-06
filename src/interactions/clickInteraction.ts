@@ -1,13 +1,16 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
+
+export type ClickCallback = (point: Point) => any;
+
 export module Interactions {
   export class Click extends Interaction {
 
     private _mouseDispatcher: Plottable.Dispatchers.Mouse;
     private _touchDispatcher: Plottable.Dispatchers.Touch;
-    private _clickCallback: (p: Point) => any;
     private _clickedDown = false;
+    private _onClickCallbacks = new Utils.CallbackSet<ClickCallback>();
 
     public _anchor(component: Component) {
       super._anchor(component);
@@ -31,33 +34,33 @@ export module Interactions {
 
     private _handleClickUp(p: Point) {
       var translatedPoint = this._translateToComponentSpace(p);
-      if (this._clickedDown && this._isInsideComponent(translatedPoint) && (this._clickCallback != null)) {
-        this._clickCallback(translatedPoint);
+      if (this._clickedDown && this._isInsideComponent(translatedPoint)) {
+        this._onClickCallbacks.callCallbacks(translatedPoint);
       }
       this._clickedDown = false;
     }
 
     /**
-     * Gets the callback called when the Component is clicked.
-     *
-     * @return {(p: Point) => any} The current callback.
-     */
-    public onClick(): (p: Point) => any;
-    /**
      * Sets the callback called when the Component is clicked.
      *
-     * @param {(p: Point) => any} callback The callback to set.
+     * @param {ClickCallback} callback The callback to set.
      * @return {Interaction.Click} The calling Interaction.Click.
      */
-    public onClick(callback: (p: Point) => any): Interactions.Click;
-    public onClick(callback?: (p: Point) => any): any {
-      if (callback === undefined) {
-        return this._clickCallback;
-      }
-      this._clickCallback = callback;
+    public onClick(callback: ClickCallback) {
+      this._onClickCallbacks.add(callback);
       return this;
     }
 
+    /**
+     * Removes the callback from click.
+     *
+     * @param {ClickCallback} callback The callback to remove.
+     * @return {Interaction.Click} The calling Interaction.Click.
+     */
+    public offClick(callback: ClickCallback) {
+      this._onClickCallbacks.delete(callback);
+      return this;
+    }
   }
 }
 }

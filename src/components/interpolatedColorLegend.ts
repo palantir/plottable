@@ -51,8 +51,8 @@ export module Components {
       this.classed("legend", true).classed("interpolated-color-legend", true);
     }
 
-    public remove() {
-      super.remove();
+    public destroy() {
+      super.destroy();
       this._scale.offUpdate(this._redrawCallback);
     }
 
@@ -134,7 +134,7 @@ export module Components {
       this._writer = new SVGTypewriter.Writers.Writer(this._measurer, this._wrapper);
     }
 
-    public _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
+    public requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
       var textHeight = this._measurer.measure().height;
 
       var ticks = this._generateTicks();
@@ -157,10 +157,8 @@ export module Components {
       }
 
       return {
-        width: desiredWidth,
-        height: desiredHeight,
-        wantsWidth: offeredWidth < desiredWidth,
-        wantsHeight: offeredHeight < desiredHeight
+        minWidth: desiredWidth,
+        minHeight: desiredHeight
       };
     }
 
@@ -168,8 +166,8 @@ export module Components {
       return this._orientation !== "horizontal";
     }
 
-    public _doRender() {
-      super._doRender();
+    protected _render() {
+      super._render();
 
       var domain = this._scale.domain();
 

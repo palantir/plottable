@@ -1180,35 +1180,6 @@ var Plottable;
                 return this;
             }
         };
-        Dataset.prototype._getExtent = function (accessor, typeCoercer, plotMetadata) {
-            if (plotMetadata === void 0) { plotMetadata = {}; }
-            var cachedExtent = this._accessor2cachedExtent.get(accessor);
-            if (cachedExtent === undefined) {
-                cachedExtent = this._computeExtent(accessor, typeCoercer, plotMetadata);
-                this._accessor2cachedExtent.set(accessor, cachedExtent);
-            }
-            return cachedExtent;
-        };
-        Dataset.prototype._computeExtent = function (accessor, typeCoercer, plotMetadata) {
-            var _this = this;
-            var appliedAccessor = function (d, i) { return accessor(d, i, _this._metadata, plotMetadata); };
-            var mappedData = this._data.map(appliedAccessor).map(typeCoercer);
-            if (mappedData.length === 0) {
-                return [];
-            }
-            else if (typeof (mappedData[0]) === "string") {
-                return Plottable.Utils.Methods.uniq(mappedData);
-            }
-            else {
-                var extent = d3.extent(mappedData);
-                if (extent[0] == null || extent[1] == null) {
-                    return [];
-                }
-                else {
-                    return extent;
-                }
-            }
-        };
         return Dataset;
     })(Plottable.Core.PlottableObject);
     Plottable.Dataset = Dataset;
@@ -1217,176 +1188,165 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    var Core;
-    (function (Core) {
-        var RenderControllers;
-        (function (RenderControllers) {
-            var RenderPolicies;
-            (function (RenderPolicies) {
-                /**
-                 * Never queue anything, render everything immediately. Useful for
-                 * debugging, horrible for performance.
-                 */
-                var Immediate = (function () {
-                    function Immediate() {
-                    }
-                    Immediate.prototype.render = function () {
-                        RenderControllers.flush();
-                    };
-                    return Immediate;
-                })();
-                RenderPolicies.Immediate = Immediate;
-                /**
-                 * The default way to render, which only tries to render every frame
-                 * (usually, 1/60th of a second).
-                 */
-                var AnimationFrame = (function () {
-                    function AnimationFrame() {
-                    }
-                    AnimationFrame.prototype.render = function () {
-                        Plottable.Utils.DOM.requestAnimationFramePolyfill(RenderControllers.flush);
-                    };
-                    return AnimationFrame;
-                })();
-                RenderPolicies.AnimationFrame = AnimationFrame;
-                /**
-                 * Renders with `setTimeout`. This is generally an inferior way to render
-                 * compared to `requestAnimationFrame`, but it's still there if you want
-                 * it.
-                 */
-                var Timeout = (function () {
-                    function Timeout() {
-                        this._timeoutMsec = Plottable.Utils.DOM.POLYFILL_TIMEOUT_MSEC;
-                    }
-                    Timeout.prototype.render = function () {
-                        setTimeout(RenderControllers.flush, this._timeoutMsec);
-                    };
-                    return Timeout;
-                })();
-                RenderPolicies.Timeout = Timeout;
-            })(RenderPolicies = RenderControllers.RenderPolicies || (RenderControllers.RenderPolicies = {}));
-        })(RenderControllers = Core.RenderControllers || (Core.RenderControllers = {}));
-    })(Core = Plottable.Core || (Plottable.Core = {}));
+    var RenderPolicies;
+    (function (RenderPolicies) {
+        /**
+         * Never queue anything, render everything immediately. Useful for
+         * debugging, horrible for performance.
+         */
+        var Immediate = (function () {
+            function Immediate() {
+            }
+            Immediate.prototype.render = function () {
+                Plottable.RenderController.flush();
+            };
+            return Immediate;
+        })();
+        RenderPolicies.Immediate = Immediate;
+        /**
+         * The default way to render, which only tries to render every frame
+         * (usually, 1/60th of a second).
+         */
+        var AnimationFrame = (function () {
+            function AnimationFrame() {
+            }
+            AnimationFrame.prototype.render = function () {
+                Plottable.Utils.DOM.requestAnimationFramePolyfill(Plottable.RenderController.flush);
+            };
+            return AnimationFrame;
+        })();
+        RenderPolicies.AnimationFrame = AnimationFrame;
+        /**
+         * Renders with `setTimeout`. This is generally an inferior way to render
+         * compared to `requestAnimationFrame`, but it's still there if you want
+         * it.
+         */
+        var Timeout = (function () {
+            function Timeout() {
+                this._timeoutMsec = Plottable.Utils.DOM.POLYFILL_TIMEOUT_MSEC;
+            }
+            Timeout.prototype.render = function () {
+                setTimeout(Plottable.RenderController.flush, this._timeoutMsec);
+            };
+            return Timeout;
+        })();
+        RenderPolicies.Timeout = Timeout;
+    })(RenderPolicies = Plottable.RenderPolicies || (Plottable.RenderPolicies = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    var Core;
-    (function (Core) {
+    /**
+     * The RenderController is responsible for enqueueing and synchronizing
+     * layout and render calls for Plottable components.
+     *
+     * Layouts and renders occur inside an animation callback
+     * (window.requestAnimationFrame if available).
+     *
+     * If you require immediate rendering, call RenderController.flush() to
+     * perform enqueued layout and rendering serially.
+     *
+     * If you want to always have immediate rendering (useful for debugging),
+     * call
+     * ```typescript
+     * Plottable.RenderController.setRenderPolicy(
+     *   new Plottable.RenderPolicy.Immediate()
+     * );
+     * ```
+     */
+    var RenderController;
+    (function (RenderController) {
+        var _componentsNeedingRender = new Plottable.Utils.Set();
+        var _componentsNeedingComputeLayout = new Plottable.Utils.Set();
+        var _animationRequested = false;
+        var _isCurrentlyFlushing = false;
+        RenderController._renderPolicy = new Plottable.RenderPolicies.AnimationFrame();
+        function setRenderPolicy(policy) {
+            if (typeof (policy) === "string") {
+                switch (policy.toLowerCase()) {
+                    case "immediate":
+                        policy = new Plottable.RenderPolicies.Immediate();
+                        break;
+                    case "animationframe":
+                        policy = new Plottable.RenderPolicies.AnimationFrame();
+                        break;
+                    case "timeout":
+                        policy = new Plottable.RenderPolicies.Timeout();
+                        break;
+                    default:
+                        Plottable.Utils.Methods.warn("Unrecognized renderPolicy: " + policy);
+                        return;
+                }
+            }
+            RenderController._renderPolicy = policy;
+        }
+        RenderController.setRenderPolicy = setRenderPolicy;
         /**
-         * The RenderController is responsible for enqueueing and synchronizing
-         * layout and render calls for Plottable components.
+         * If the RenderController is enabled, we enqueue the component for
+         * render. Otherwise, it is rendered immediately.
          *
-         * Layouts and renders occur inside an animation callback
-         * (window.requestAnimationFrame if available).
-         *
-         * If you require immediate rendering, call RenderController.flush() to
-         * perform enqueued layout and rendering serially.
-         *
-         * If you want to always have immediate rendering (useful for debugging),
-         * call
-         * ```typescript
-         * Plottable.Core.RenderController.setRenderPolicy(
-         *   new Plottable.Core.RenderController.RenderPolicy.Immediate()
-         * );
-         * ```
+         * @param {Component} component Any Plottable component.
          */
-        var RenderControllers;
-        (function (RenderControllers) {
-            var _componentsNeedingRender = new Plottable.Utils.Set();
-            var _componentsNeedingComputeLayout = new Plottable.Utils.Set();
-            var _animationRequested = false;
-            var _isCurrentlyFlushing = false;
-            RenderControllers._renderPolicy = new RenderControllers.RenderPolicies.AnimationFrame();
-            function setRenderPolicy(policy) {
-                if (typeof (policy) === "string") {
-                    switch (policy.toLowerCase()) {
-                        case "immediate":
-                            policy = new RenderControllers.RenderPolicies.Immediate();
-                            break;
-                        case "animationframe":
-                            policy = new RenderControllers.RenderPolicies.AnimationFrame();
-                            break;
-                        case "timeout":
-                            policy = new RenderControllers.RenderPolicies.Timeout();
-                            break;
-                        default:
-                            Plottable.Utils.Methods.warn("Unrecognized renderPolicy: " + policy);
-                            return;
+        function registerToRender(component) {
+            if (_isCurrentlyFlushing) {
+                Plottable.Utils.Methods.warn("Registered to render while other components are flushing: request may be ignored");
+            }
+            _componentsNeedingRender.add(component);
+            requestRender();
+        }
+        RenderController.registerToRender = registerToRender;
+        /**
+         * If the RenderController is enabled, we enqueue the component for
+         * layout and render. Otherwise, it is rendered immediately.
+         *
+         * @param {Component} component Any Plottable component.
+         */
+        function registerToComputeLayout(component) {
+            _componentsNeedingComputeLayout.add(component);
+            _componentsNeedingRender.add(component);
+            requestRender();
+        }
+        RenderController.registerToComputeLayout = registerToComputeLayout;
+        function requestRender() {
+            // Only run or enqueue flush on first request.
+            if (!_animationRequested) {
+                _animationRequested = true;
+                RenderController._renderPolicy.render();
+            }
+        }
+        /**
+         * Render everything that is waiting to be rendered right now, instead of
+         * waiting until the next frame.
+         *
+         * Useful to call when debugging.
+         */
+        function flush() {
+            if (_animationRequested) {
+                // Layout
+                _componentsNeedingComputeLayout.values().forEach(function (component) { return component.computeLayout(); });
+                _isCurrentlyFlushing = true;
+                var failed = new Plottable.Utils.Set();
+                _componentsNeedingRender.values().forEach(function (component) {
+                    try {
+                        component.render(true);
                     }
-                }
-                RenderControllers._renderPolicy = policy;
+                    catch (err) {
+                        // throw error with timeout to avoid interrupting further renders
+                        window.setTimeout(function () {
+                            throw err;
+                        }, 0);
+                        failed.add(component);
+                    }
+                });
+                _componentsNeedingComputeLayout = new Plottable.Utils.Set();
+                _componentsNeedingRender = failed;
+                _animationRequested = false;
+                _isCurrentlyFlushing = false;
             }
-            RenderControllers.setRenderPolicy = setRenderPolicy;
-            /**
-             * If the RenderController is enabled, we enqueue the component for
-             * render. Otherwise, it is rendered immediately.
-             *
-             * @param {Component} component Any Plottable component.
-             */
-            function registerToRender(component) {
-                if (_isCurrentlyFlushing) {
-                    Plottable.Utils.Methods.warn("Registered to render while other components are flushing: request may be ignored");
-                }
-                _componentsNeedingRender.add(component);
-                requestRender();
-            }
-            RenderControllers.registerToRender = registerToRender;
-            /**
-             * If the RenderController is enabled, we enqueue the component for
-             * layout and render. Otherwise, it is rendered immediately.
-             *
-             * @param {Component} component Any Plottable component.
-             */
-            function registerToComputeLayout(component) {
-                _componentsNeedingComputeLayout.add(component);
-                _componentsNeedingRender.add(component);
-                requestRender();
-            }
-            RenderControllers.registerToComputeLayout = registerToComputeLayout;
-            function requestRender() {
-                // Only run or enqueue flush on first request.
-                if (!_animationRequested) {
-                    _animationRequested = true;
-                    RenderControllers._renderPolicy.render();
-                }
-            }
-            /**
-             * Render everything that is waiting to be rendered right now, instead of
-             * waiting until the next frame.
-             *
-             * Useful to call when debugging.
-             */
-            function flush() {
-                if (_animationRequested) {
-                    // Layout
-                    _componentsNeedingComputeLayout.values().forEach(function (component) { return component.computeLayout(); });
-                    // Top level render; Containers will put their children in the toRender queue
-                    _componentsNeedingRender.values().forEach(function (component) { return component.render(); });
-                    _isCurrentlyFlushing = true;
-                    var failed = new Plottable.Utils.Set();
-                    _componentsNeedingRender.values().forEach(function (component) {
-                        try {
-                            component._doRender();
-                        }
-                        catch (err) {
-                            // throw error with timeout to avoid interrupting further renders
-                            window.setTimeout(function () {
-                                throw err;
-                            }, 0);
-                            failed.add(component);
-                        }
-                    });
-                    _componentsNeedingComputeLayout = new Plottable.Utils.Set();
-                    _componentsNeedingRender = failed;
-                    _animationRequested = false;
-                    _isCurrentlyFlushing = false;
-                }
-            }
-            RenderControllers.flush = flush;
-        })(RenderControllers = Core.RenderControllers || (Core.RenderControllers = {}));
-    })(Core = Plottable.Core || (Plottable.Core = {}));
+        }
+        RenderController.flush = flush;
+    })(RenderController = Plottable.RenderController || (Plottable.RenderController = {}));
 })(Plottable || (Plottable = {}));
 
 var Plottable;
@@ -3228,8 +3188,7 @@ var Plottable;
             this._xOffset = 0; // Offset from Origin, used for alignment and floating positioning
             this._yOffset = 0;
             this._cssClasses = ["component"];
-            this._removed = false;
-            this._usedLastLayout = false;
+            this._destroyed = false;
         }
         /**
          * Attaches the Component as a child of a given D3 Selection.
@@ -3238,7 +3197,7 @@ var Plottable;
          * @returns {Component} The calling Component.
          */
         Component.prototype.anchor = function (selection) {
-            if (this._removed) {
+            if (this._destroyed) {
                 throw new Error("Can't reuse remove()-ed components!");
             }
             if (selection.node().nodeName.toLowerCase() === "svg") {
@@ -3288,8 +3247,11 @@ var Plottable;
             this._interactionsToRegister = null;
             this._isSetup = true;
         };
-        Component.prototype._requestedSpace = function (availableWidth, availableHeight) {
-            return { width: 0, height: 0, wantsWidth: false, wantsHeight: false };
+        Component.prototype.requestedSpace = function (availableWidth, availableHeight) {
+            return {
+                minWidth: 0,
+                minHeight: 0
+            };
         };
         /**
          * Computes the size, position, and alignment from the specified values.
@@ -3339,33 +3301,35 @@ var Plottable;
             return this;
         };
         Component.prototype._getSize = function (availableWidth, availableHeight) {
-            var requestedSpace = this._requestedSpace(availableWidth, availableHeight);
+            var requestedSpace = this.requestedSpace(availableWidth, availableHeight);
             return {
-                width: this._isFixedWidth() ? Math.min(availableWidth, requestedSpace.width) : availableWidth,
-                height: this._isFixedHeight() ? Math.min(availableHeight, requestedSpace.height) : availableHeight
+                width: this._isFixedWidth() ? Math.min(availableWidth, requestedSpace.minWidth) : availableWidth,
+                height: this._isFixedHeight() ? Math.min(availableHeight, requestedSpace.minHeight) : availableHeight
             };
         };
-        Component.prototype.render = function () {
+        /**
+         * Queues the Component for rendering. Set immediately to true if the Component should be rendered
+         * immediately as opposed to queued to the RenderController.
+         *
+         * @returns {Component} The calling Component
+         */
+        Component.prototype.render = function (immediately) {
+            if (immediately === void 0) { immediately = false; }
+            if (immediately) {
+                this._render();
+                return this;
+            }
             if (this._isAnchored && this._isSetup && this.width() >= 0 && this.height() >= 0) {
-                Plottable.Core.RenderControllers.registerToRender(this);
+                Plottable.RenderController.registerToRender(this);
             }
             return this;
         };
         Component.prototype._scheduleComputeLayout = function () {
             if (this._isAnchored && this._isSetup) {
-                Plottable.Core.RenderControllers.registerToComputeLayout(this);
+                Plottable.RenderController.registerToComputeLayout(this);
             }
         };
-        Component.prototype._doRender = function () {
-        };
-        Component.prototype._useLastCalculatedLayout = function (useLast) {
-            if (useLast == null) {
-                return this._usedLastLayout;
-            }
-            else {
-                this._usedLastLayout = useLast;
-                return this;
-            }
+        Component.prototype._render = function () {
         };
         /**
          * Causes the Component to recompute layout and redraw.
@@ -3376,7 +3340,6 @@ var Plottable;
          * @returns {Component} The calling Component.
          */
         Component.prototype.redraw = function () {
-            this._useLastCalculatedLayout(false);
             if (this._isAnchored && this._isSetup) {
                 if (this._isTopLevelComponent) {
                     this._scheduleComputeLayout();
@@ -3415,7 +3378,7 @@ var Plottable;
             this.computeLayout();
             this.render();
             // flush so that consumers can immediately attach to stuff we create in the DOM
-            Plottable.Core.RenderControllers.flush();
+            Plottable.RenderController.flush();
             return this;
         };
         /**
@@ -3596,7 +3559,7 @@ var Plottable;
             var cg;
             if (Plottable.Components.Group.prototype.isPrototypeOf(c)) {
                 cg = c;
-                cg._addComponent(this, below);
+                cg.add(this, below);
                 return cg;
             }
             else {
@@ -3651,7 +3614,7 @@ var Plottable;
             }
             var parent = this._parent();
             if (parent != null) {
-                parent._removeComponent(this);
+                parent.remove(this);
             }
             this._isAnchored = false;
             this._parentElement = null;
@@ -3668,8 +3631,8 @@ var Plottable;
          * Removes a Component from the DOM and disconnects it from everything it's
          * listening to (effectively destroying it).
          */
-        Component.prototype.remove = function () {
-            this._removed = true;
+        Component.prototype.destroy = function () {
+            this._destroyed = true;
             this.detach();
         };
         /**
@@ -3782,14 +3745,25 @@ var Plottable;
             this._components.forEach(function (c) { return c.render(); });
             return this;
         };
-        ComponentContainer.prototype._removeComponent = function (c) {
+        /**
+         * Removes the specified Component from the ComponentContainer
+         *
+         * @param c Component the Component to remove.
+         */
+        ComponentContainer.prototype.remove = function (c) {
             var removeIndex = this._components.indexOf(c);
             if (removeIndex >= 0) {
                 this.components().splice(removeIndex, 1);
                 this.redraw();
             }
         };
-        ComponentContainer.prototype._addComponent = function (c, prepend) {
+        /**
+         * Adds the specified Component to the ComponentContainer.
+         *
+         * @param c Component the component to add
+         * @param prepend boolean whether the component should be prepended to the componentContainer or not.
+         */
+        ComponentContainer.prototype.add = function (c, prepend) {
             if (prepend === void 0) { prepend = false; }
             if (!c || this._components.indexOf(c) >= 0) {
                 return false;
@@ -3835,15 +3809,9 @@ var Plottable;
             this.components().slice().forEach(function (c) { return c.detach(); });
             return this;
         };
-        ComponentContainer.prototype.remove = function () {
-            _super.prototype.remove.call(this);
-            this.components().slice().forEach(function (c) { return c.remove(); });
-        };
-        ComponentContainer.prototype._useLastCalculatedLayout = function (calculated) {
-            if (calculated != null) {
-                this.components().slice().forEach(function (c) { return c._useLastCalculatedLayout(calculated); });
-            }
-            return _super.prototype._useLastCalculatedLayout.call(this, calculated);
+        ComponentContainer.prototype.destroy = function () {
+            _super.prototype.destroy.call(this);
+            this.components().slice().forEach(function (c) { return c.destroy(); });
         };
         return ComponentContainer;
     })(Plottable.Component);
@@ -3881,19 +3849,17 @@ var Plottable;
                 if (components === void 0) { components = []; }
                 _super.call(this);
                 this.classed("component-group", true);
-                components.forEach(function (c) { return _this._addComponent(c); });
+                components.forEach(function (c) { return _this.add(c); });
             }
-            Group.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
-                var requests = this.components().map(function (c) { return c._requestedSpace(offeredWidth, offeredHeight); });
+            Group.prototype.requestedSpace = function (offeredWidth, offeredHeight) {
+                var requests = this.components().map(function (c) { return c.requestedSpace(offeredWidth, offeredHeight); });
                 return {
-                    width: Plottable.Utils.Methods.max(requests, function (request) { return request.width; }, 0),
-                    height: Plottable.Utils.Methods.max(requests, function (request) { return request.height; }, 0),
-                    wantsWidth: requests.map(function (r) { return r.wantsWidth; }).some(function (x) { return x; }),
-                    wantsHeight: requests.map(function (r) { return r.wantsHeight; }).some(function (x) { return x; })
+                    minWidth: Plottable.Utils.Methods.max(requests, function (request) { return request.minWidth; }, 0),
+                    minHeight: Plottable.Utils.Methods.max(requests, function (request) { return request.minHeight; }, 0)
                 };
             };
             Group.prototype._merge = function (c, below) {
-                this._addComponent(c, !below);
+                this.add(c, !below);
                 return this;
             };
             Group.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
@@ -3970,8 +3936,8 @@ var Plottable;
             this._rescaleCallback = function (scale) { return _this._rescale(); };
             this._scale.onUpdate(this._rescaleCallback);
         }
-        Axis.prototype.remove = function () {
-            _super.prototype.remove.call(this);
+        Axis.prototype.destroy = function () {
+            _super.prototype.destroy.call(this);
             this._scale.offUpdate(this._rescaleCallback);
         };
         Axis.prototype._isHorizontal = function () {
@@ -3987,7 +3953,7 @@ var Plottable;
             this._computedHeight = this._maxLabelTickLength();
             return this._computedHeight;
         };
-        Axis.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
+        Axis.prototype.requestedSpace = function (offeredWidth, offeredHeight) {
             var requestedWidth = 0;
             var requestedHeight = 0;
             if (this._isHorizontal()) {
@@ -4003,10 +3969,8 @@ var Plottable;
                 requestedWidth = this._computedWidth + this._gutter;
             }
             return {
-                width: requestedWidth,
-                height: requestedHeight,
-                wantsWidth: !this._isHorizontal() && offeredWidth < requestedWidth,
-                wantsHeight: this._isHorizontal() && offeredHeight < requestedHeight
+                minWidth: requestedWidth,
+                minHeight: requestedHeight
             };
         };
         Axis.prototype._isFixedHeight = function () {
@@ -4042,7 +4006,7 @@ var Plottable;
         Axis.prototype._getTickValues = function () {
             return [];
         };
-        Axis.prototype._doRender = function () {
+        Axis.prototype._render = function () {
             var tickMarkValues = this._getTickValues();
             var tickMarks = this._tickMarkContainer.selectAll("." + Axis.TICK_MARK_CLASS).data(tickMarkValues);
             tickMarks.enter().append("line").classed(Axis.TICK_MARK_CLASS, true);
@@ -4482,7 +4446,7 @@ var Plottable;
                 }
                 return this._getTickIntervalValues(this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex - 1][0]);
             };
-            Time.prototype._doRender = function () {
+            Time.prototype._render = function () {
                 var _this = this;
                 this._mostPreciseConfigIndex = this._getMostPreciseConfigurationIndex();
                 var tierConfigs = this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex];
@@ -4763,9 +4727,9 @@ var Plottable;
                 }
                 this.render();
             };
-            Numeric.prototype._doRender = function () {
+            Numeric.prototype._render = function () {
                 var _this = this;
-                _super.prototype._doRender.call(this);
+                _super.prototype._render.call(this);
                 var tickLabelAttrHash = {
                     x: 0,
                     y: 0,
@@ -5052,11 +5016,14 @@ var Plottable;
             Category.prototype._rescale = function () {
                 return this.redraw();
             };
-            Category.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
+            Category.prototype.requestedSpace = function (offeredWidth, offeredHeight) {
                 var widthRequiredByTicks = this._isHorizontal() ? 0 : this._maxLabelTickLength() + this.tickLabelPadding() + this.gutter();
                 var heightRequiredByTicks = this._isHorizontal() ? this._maxLabelTickLength() + this.tickLabelPadding() + this.gutter() : 0;
                 if (this._scale.domain().length === 0) {
-                    return { width: 0, height: 0, wantsWidth: false, wantsHeight: false };
+                    return {
+                        minWidth: 0,
+                        minHeight: 0
+                    };
                 }
                 var categoryScale = this._scale;
                 var fakeScale = categoryScale.copy();
@@ -5066,12 +5033,10 @@ var Plottable;
                 else {
                     fakeScale.range([offeredHeight, 0]);
                 }
-                var textResult = this._measureTicks(offeredWidth, offeredHeight, fakeScale, categoryScale.domain());
+                var measureResult = this._measureTicks(offeredWidth, offeredHeight, fakeScale, categoryScale.domain());
                 return {
-                    width: textResult.usedWidth + widthRequiredByTicks,
-                    height: textResult.usedHeight + heightRequiredByTicks,
-                    wantsWidth: !textResult.textFits,
-                    wantsHeight: !textResult.textFits
+                    minWidth: measureResult.usedWidth + widthRequiredByTicks,
+                    minHeight: measureResult.usedHeight + heightRequiredByTicks
                 };
             };
             Category.prototype._getTickValues = function () {
@@ -5174,9 +5139,9 @@ var Plottable;
                     usedHeight: usedHeight
                 };
             };
-            Category.prototype._doRender = function () {
+            Category.prototype._render = function () {
                 var _this = this;
-                _super.prototype._doRender.call(this);
+                _super.prototype._render.call(this);
                 var catScale = this._scale;
                 var tickLabels = this._tickLabelContainer.selectAll("." + Plottable.Axis.TICK_LABEL_CLASS).data(this._scale.domain(), function (d) { return d; });
                 var getTickLabelTransform = function (d, i) {
@@ -5271,15 +5236,13 @@ var Plottable;
                 this._yAlignment = alignmentLC;
                 return this;
             };
-            Label.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
+            Label.prototype.requestedSpace = function (offeredWidth, offeredHeight) {
                 var desiredWH = this._measurer.measure(this._text);
                 var desiredWidth = (this.orient() === "horizontal" ? desiredWH.width : desiredWH.height) + 2 * this.padding();
                 var desiredHeight = (this.orient() === "horizontal" ? desiredWH.height : desiredWH.width) + 2 * this.padding();
                 return {
-                    width: desiredWidth,
-                    height: desiredHeight,
-                    wantsWidth: desiredWidth > offeredWidth,
-                    wantsHeight: desiredHeight > offeredHeight
+                    minWidth: desiredWidth,
+                    minHeight: desiredHeight
                 };
             };
             Label.prototype._setup = function () {
@@ -5330,8 +5293,8 @@ var Plottable;
                     return this;
                 }
             };
-            Label.prototype._doRender = function () {
-                _super.prototype._doRender.call(this);
+            Label.prototype._render = function () {
+                _super.prototype._render.call(this);
                 // HACKHACK SVGTypewriter should remove existing content - #21 on SVGTypewriter.
                 this._textContainer.selectAll("g").remove();
                 var textMeasurement = this._measurer.measure(this._text);
@@ -5464,22 +5427,25 @@ var Plottable;
                     return this._scale;
                 }
             };
-            Legend.prototype.remove = function () {
-                _super.prototype.remove.call(this);
+            Legend.prototype.destroy = function () {
+                _super.prototype.destroy.call(this);
                 this._scale.offUpdate(this._redrawCallback);
             };
             Legend.prototype._calculateLayoutInfo = function (availableWidth, availableHeight) {
                 var _this = this;
                 var textHeight = this._measurer.measure().height;
                 var availableWidthForEntries = Math.max(0, (availableWidth - this._padding));
-                var measureEntry = function (entryText) {
-                    var originalEntryLength = (textHeight + _this._measurer.measure(entryText).width + _this._padding);
-                    return Math.min(originalEntryLength, availableWidthForEntries);
-                };
-                var entries = this._scale.domain().slice();
-                entries.sort(this.sortFunction());
-                var entryLengths = Plottable.Utils.Methods.populateMap(entries, measureEntry);
-                var rows = this._packRows(availableWidthForEntries, entries, entryLengths);
+                var entryNames = this._scale.domain().slice();
+                entryNames.sort(this.sortFunction());
+                var entryLengths = d3.map();
+                var untruncatedEntryLengths = d3.map();
+                entryNames.forEach(function (entryName) {
+                    var untruncatedEntryLength = textHeight + _this._measurer.measure(entryName).width + _this._padding;
+                    var entryLength = Math.min(untruncatedEntryLength, availableWidthForEntries);
+                    entryLengths.set(entryName, entryLength);
+                    untruncatedEntryLengths.set(entryName, untruncatedEntryLength);
+                });
+                var rows = this._packRows(availableWidthForEntries, entryNames, entryLengths);
                 var rowsAvailable = Math.floor((availableHeight - 2 * this._padding) / textHeight);
                 if (rowsAvailable !== rowsAvailable) {
                     rowsAvailable = 0;
@@ -5487,29 +5453,20 @@ var Plottable;
                 return {
                     textHeight: textHeight,
                     entryLengths: entryLengths,
+                    untruncatedEntryLengths: untruncatedEntryLengths,
                     rows: rows,
                     numRowsToDraw: Math.max(Math.min(rowsAvailable, rows.length), 0)
                 };
             };
-            Legend.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
-                var _this = this;
+            Legend.prototype.requestedSpace = function (offeredWidth, offeredHeight) {
                 var estimatedLayout = this._calculateLayoutInfo(offeredWidth, offeredHeight);
-                var rowLengths = estimatedLayout.rows.map(function (row) {
-                    return d3.sum(row, function (entry) { return estimatedLayout.entryLengths.get(entry); });
+                var untruncatedRowLengths = estimatedLayout.rows.map(function (row) {
+                    return d3.sum(row, function (entry) { return estimatedLayout.untruncatedEntryLengths.get(entry); });
                 });
-                var longestRowLength = Plottable.Utils.Methods.max(rowLengths, 0);
-                var longestUntruncatedEntryLength = Plottable.Utils.Methods.max(this._scale.domain(), function (d) { return _this._measurer.measure(d).width; }, 0);
-                longestUntruncatedEntryLength += estimatedLayout.textHeight + this._padding;
-                var desiredWidth = this._padding + Math.max(longestRowLength, longestUntruncatedEntryLength);
-                var acceptableHeight = estimatedLayout.numRowsToDraw * estimatedLayout.textHeight + 2 * this._padding;
-                var desiredHeight = estimatedLayout.rows.length * estimatedLayout.textHeight + 2 * this._padding;
-                var desiredNumRows = Math.max(Math.ceil(this._scale.domain().length / this._maxEntriesPerRow), 1);
-                var wantsFitMoreEntriesInRow = estimatedLayout.rows.length > desiredNumRows;
+                var longestUntruncatedRowLength = Plottable.Utils.Methods.max(untruncatedRowLengths, 0);
                 return {
-                    width: this._padding + longestRowLength,
-                    height: acceptableHeight,
-                    wantsWidth: offeredWidth < desiredWidth || wantsFitMoreEntriesInRow,
-                    wantsHeight: offeredHeight < desiredHeight
+                    minWidth: this._padding + longestUntruncatedRowLength,
+                    minHeight: estimatedLayout.rows.length * estimatedLayout.textHeight + 2 * this._padding
                 };
             };
             Legend.prototype._packRows = function (availableWidth, entries, entryLengths) {
@@ -5560,9 +5517,9 @@ var Plottable;
                 });
                 return entry;
             };
-            Legend.prototype._doRender = function () {
+            Legend.prototype._render = function () {
                 var _this = this;
-                _super.prototype._doRender.call(this);
+                _super.prototype._render.call(this);
                 var layout = this._calculateLayoutInfo(this.width(), this.height());
                 var rowsToDraw = layout.rows.slice(0, layout.numRowsToDraw);
                 var rows = this._content.selectAll("g." + Legend.LEGEND_ROW_CLASS).data(rowsToDraw);
@@ -5674,8 +5631,8 @@ var Plottable;
                 this._fixedHeightFlag = true;
                 this.classed("legend", true).classed("interpolated-color-legend", true);
             }
-            InterpolatedColorLegend.prototype.remove = function () {
-                _super.prototype.remove.call(this);
+            InterpolatedColorLegend.prototype.destroy = function () {
+                _super.prototype.destroy.call(this);
                 this._scale.offUpdate(this._redrawCallback);
             };
             InterpolatedColorLegend.prototype.formatter = function (formatter) {
@@ -5724,7 +5681,7 @@ var Plottable;
                 this._wrapper = new SVGTypewriter.Wrappers.Wrapper();
                 this._writer = new SVGTypewriter.Writers.Writer(this._measurer, this._wrapper);
             };
-            InterpolatedColorLegend.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
+            InterpolatedColorLegend.prototype.requestedSpace = function (offeredWidth, offeredHeight) {
                 var _this = this;
                 var textHeight = this._measurer.measure().height;
                 var ticks = this._generateTicks();
@@ -5743,18 +5700,16 @@ var Plottable;
                     desiredWidth = this._padding + labelWidths[0] + this._padding + numSwatches * textHeight + this._padding + labelWidths[1] + this._padding;
                 }
                 return {
-                    width: desiredWidth,
-                    height: desiredHeight,
-                    wantsWidth: offeredWidth < desiredWidth,
-                    wantsHeight: offeredHeight < desiredHeight
+                    minWidth: desiredWidth,
+                    minHeight: desiredHeight
                 };
             };
             InterpolatedColorLegend.prototype._isVertical = function () {
                 return this._orientation !== "horizontal";
             };
-            InterpolatedColorLegend.prototype._doRender = function () {
+            InterpolatedColorLegend.prototype._render = function () {
                 var _this = this;
-                _super.prototype._doRender.call(this);
+                _super.prototype._render.call(this);
                 var domain = this._scale.domain();
                 var text0 = this._formatter(domain[0]);
                 var text0Width = this._measurer.measure(text0).width;
@@ -5896,8 +5851,8 @@ var Plottable;
                     this._yScale.onUpdate(this._renderCallback);
                 }
             }
-            Gridlines.prototype.remove = function () {
-                _super.prototype.remove.call(this);
+            Gridlines.prototype.destroy = function () {
+                _super.prototype.destroy.call(this);
                 if (this._xScale) {
                     this._xScale.offUpdate(this._renderCallback);
                 }
@@ -5911,8 +5866,8 @@ var Plottable;
                 this._xLinesContainer = this._content.append("g").classed("x-gridlines", true);
                 this._yLinesContainer = this._content.append("g").classed("y-gridlines", true);
             };
-            Gridlines.prototype._doRender = function () {
-                _super.prototype._doRender.call(this);
+            Gridlines.prototype._render = function () {
+                _super.prototype._render.call(this);
                 this._redrawXLines();
                 this._redrawYLines();
             };
@@ -5987,34 +5942,29 @@ var Plottable;
                 rows.forEach(function (row, rowIndex) {
                     row.forEach(function (component, colIndex) {
                         if (component != null) {
-                            _this.addComponent(rowIndex, colIndex, component);
+                            _this.addComponent(component, rowIndex, colIndex);
                         }
                     });
                 });
             }
             /**
-             * Adds a Component in the specified cell.
-             *
-             * If the cell is already occupied, there are 3 cases
-             *  - Component + Component => Group containing both components
-             *  - Component + Group => Component is added to the group
-             *  - Group + Component => Component is added to the group
+             * Adds a Component in the specified row and column position.
              *
              * For example, instead of calling `new Table([[a, b], [null, c]])`, you
              * could call
              * ```typescript
              * var table = new Table();
-             * table.addComponent(0, 0, a);
-             * table.addComponent(0, 1, b);
-             * table.addComponent(1, 1, c);
+             * table.addComponent(a, 0, 0);
+             * table.addComponent(b, 0, 1);
+             * table.addComponent(c, 1, 1);
              * ```
              *
+             * @param {Component} component The Component to be added.
              * @param {number} row The row in which to add the Component.
              * @param {number} col The column in which to add the Component.
-             * @param {Component} component The Component to be added.
              * @returns {Table} The calling Table.
              */
-            Table.prototype.addComponent = function (row, col, component) {
+            Table.prototype.addComponent = function (component, row, col) {
                 if (component == null) {
                     throw Error("Cannot add null to a table cell");
                 }
@@ -6022,7 +5972,7 @@ var Plottable;
                 if (currentComponent) {
                     component = component.above(currentComponent);
                 }
-                if (this._addComponent(component)) {
+                if (_super.prototype.add.call(this, component)) {
                     this._nRows = Math.max(row + 1, this._nRows);
                     this._nCols = Math.max(col + 1, this._nCols);
                     this._padTableToSize(this._nRows, this._nCols);
@@ -6030,8 +5980,13 @@ var Plottable;
                 }
                 return this;
             };
-            Table.prototype._removeComponent = function (component) {
-                _super.prototype._removeComponent.call(this, component);
+            /**
+             * Removes a Component.
+             *
+             * @param {Component} component The Component to be removed.
+             */
+            Table.prototype.removeComponent = function (component) {
+                _super.prototype.remove.call(this, component);
                 for (var r = 0; r < this._nRows; r++) {
                     for (var c = 0; c < this._nCols; c++) {
                         if (this._rows[r][c] === component) {
@@ -6041,7 +5996,8 @@ var Plottable;
                     }
                 }
             };
-            Table.prototype._iterateLayout = function (availableWidth, availableHeight) {
+            Table.prototype._iterateLayout = function (availableWidth, availableHeight, isFinalOffer) {
+                if (isFinalOffer === void 0) { isFinalOffer = false; }
                 /*
                  * Given availableWidth and availableHeight, figure out how to allocate it between rows and columns using an iterative algorithm.
                  *
@@ -6083,7 +6039,7 @@ var Plottable;
                 while (true) {
                     var offeredHeights = Plottable.Utils.Methods.addArrays(guaranteedHeights, rowProportionalSpace);
                     var offeredWidths = Plottable.Utils.Methods.addArrays(guaranteedWidths, colProportionalSpace);
-                    var guarantees = this._determineGuarantees(offeredWidths, offeredHeights);
+                    var guarantees = this._determineGuarantees(offeredWidths, offeredHeights, isFinalOffer);
                     guaranteedWidths = guarantees.guaranteedWidths;
                     guaranteedHeights = guarantees.guaranteedHeights;
                     var wantsWidth = guarantees.wantsWidthArr.some(function (x) { return x; });
@@ -6127,39 +6083,57 @@ var Plottable;
                 rowProportionalSpace = Table._calcProportionalSpace(rowWeights, freeHeight);
                 return { colProportionalSpace: colProportionalSpace, rowProportionalSpace: rowProportionalSpace, guaranteedWidths: guarantees.guaranteedWidths, guaranteedHeights: guarantees.guaranteedHeights, wantsWidth: wantsWidth, wantsHeight: wantsHeight };
             };
-            Table.prototype._determineGuarantees = function (offeredWidths, offeredHeights) {
+            Table.prototype._determineGuarantees = function (offeredWidths, offeredHeights, isFinalOffer) {
+                if (isFinalOffer === void 0) { isFinalOffer = false; }
                 var requestedWidths = Plottable.Utils.Methods.createFilledArray(0, this._nCols);
                 var requestedHeights = Plottable.Utils.Methods.createFilledArray(0, this._nRows);
-                var layoutWantsWidth = Plottable.Utils.Methods.createFilledArray(false, this._nCols);
-                var layoutWantsHeight = Plottable.Utils.Methods.createFilledArray(false, this._nRows);
+                var columnNeedsWidth = Plottable.Utils.Methods.createFilledArray(false, this._nCols);
+                var rowNeedsHeight = Plottable.Utils.Methods.createFilledArray(false, this._nRows);
                 this._rows.forEach(function (row, rowIndex) {
                     row.forEach(function (component, colIndex) {
                         var spaceRequest;
                         if (component != null) {
-                            spaceRequest = component._requestedSpace(offeredWidths[colIndex], offeredHeights[rowIndex]);
+                            spaceRequest = component.requestedSpace(offeredWidths[colIndex], offeredHeights[rowIndex]);
                         }
                         else {
-                            spaceRequest = { width: 0, height: 0, wantsWidth: false, wantsHeight: false };
+                            spaceRequest = {
+                                minWidth: 0,
+                                minHeight: 0
+                            };
                         }
-                        var allocatedWidth = Math.min(spaceRequest.width, offeredWidths[colIndex]);
-                        var allocatedHeight = Math.min(spaceRequest.height, offeredHeights[rowIndex]);
-                        requestedWidths[colIndex] = Math.max(requestedWidths[colIndex], allocatedWidth);
-                        requestedHeights[rowIndex] = Math.max(requestedHeights[rowIndex], allocatedHeight);
-                        layoutWantsWidth[colIndex] = layoutWantsWidth[colIndex] || spaceRequest.wantsWidth;
-                        layoutWantsHeight[rowIndex] = layoutWantsHeight[rowIndex] || spaceRequest.wantsHeight;
+                        var columnWidth = isFinalOffer ? Math.min(spaceRequest.minWidth, offeredWidths[colIndex]) : spaceRequest.minWidth;
+                        requestedWidths[colIndex] = Math.max(requestedWidths[colIndex], columnWidth);
+                        var rowHeight = isFinalOffer ? Math.min(spaceRequest.minHeight, offeredHeights[rowIndex]) : spaceRequest.minHeight;
+                        requestedHeights[rowIndex] = Math.max(requestedHeights[rowIndex], rowHeight);
+                        var componentNeedsWidth = spaceRequest.minWidth > offeredWidths[colIndex];
+                        columnNeedsWidth[colIndex] = columnNeedsWidth[colIndex] || componentNeedsWidth;
+                        var componentNeedsHeight = spaceRequest.minHeight > offeredHeights[rowIndex];
+                        rowNeedsHeight[rowIndex] = rowNeedsHeight[rowIndex] || componentNeedsHeight;
                     });
                 });
-                return { guaranteedWidths: requestedWidths, guaranteedHeights: requestedHeights, wantsWidthArr: layoutWantsWidth, wantsHeightArr: layoutWantsHeight };
+                return {
+                    guaranteedWidths: requestedWidths,
+                    guaranteedHeights: requestedHeights,
+                    wantsWidthArr: columnNeedsWidth,
+                    wantsHeightArr: rowNeedsHeight
+                };
             };
-            Table.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
+            Table.prototype.requestedSpace = function (offeredWidth, offeredHeight) {
                 this._calculatedLayout = this._iterateLayout(offeredWidth, offeredHeight);
-                return { width: d3.sum(this._calculatedLayout.guaranteedWidths), height: d3.sum(this._calculatedLayout.guaranteedHeights), wantsWidth: this._calculatedLayout.wantsWidth, wantsHeight: this._calculatedLayout.wantsHeight };
+                return {
+                    minWidth: d3.sum(this._calculatedLayout.guaranteedWidths),
+                    minHeight: d3.sum(this._calculatedLayout.guaranteedHeights)
+                };
             };
             Table.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
                 var _this = this;
                 _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
-                var layout = this._useLastCalculatedLayout() ? this._calculatedLayout : this._iterateLayout(this.width(), this.height());
-                this._useLastCalculatedLayout(true);
+                var lastLayoutWidth = d3.sum(this._calculatedLayout.guaranteedWidths);
+                var lastLayoutHeight = d3.sum(this._calculatedLayout.guaranteedHeights);
+                var layout = this._calculatedLayout;
+                if (lastLayoutWidth > this.width() || lastLayoutHeight > this.height()) {
+                    layout = this._iterateLayout(this.width(), this.height(), true);
+                }
                 var childYOrigin = 0;
                 var rowHeights = Plottable.Utils.Methods.addArrays(layout.rowProportionalSpace, layout.guaranteedHeights);
                 var colWidths = Plottable.Utils.Methods.addArrays(layout.colProportionalSpace, layout.guaranteedWidths);
@@ -6349,7 +6323,7 @@ var Plottable;
                     bottomRight: bottomRight
                 };
             };
-            SelectionBoxLayer.prototype._doRender = function () {
+            SelectionBoxLayer.prototype._render = function () {
                 if (this._boxVisible) {
                     var t = this._boxBounds.topLeft.y;
                     var b = this._boxBounds.bottomRight.y;
@@ -6438,9 +6412,9 @@ var Plottable;
             // HACKHACK on 591
             this._getDrawersInOrder().forEach(function (d) { return d.setup(_this._renderArea.append("g")); });
         };
-        Plot.prototype.remove = function () {
+        Plot.prototype.destroy = function () {
             var _this = this;
-            _super.prototype.remove.call(this);
+            _super.prototype.destroy.call(this);
             this._scales().forEach(function (scale) { return scale.offUpdate(_this._renderCallback); });
             this.datasets().forEach(function (dataset) { return _this.removeDataset(dataset); });
         };
@@ -6569,7 +6543,7 @@ var Plottable;
             }
             return attrToAppliedProjector;
         };
-        Plot.prototype._doRender = function () {
+        Plot.prototype._render = function () {
             if (this._isAnchored) {
                 this._paint();
                 this._dataChanged = false;
@@ -6624,9 +6598,30 @@ var Plottable;
                 var plotDatasetKey = _this._key2PlotDatasetKey.get(key);
                 var dataset = plotDatasetKey.dataset;
                 var plotMetadata = plotDatasetKey.plotMetadata;
-                return dataset._getExtent(accessor, coercer, plotMetadata);
+                return _this._computeExtent(dataset, accessor, coercer, plotMetadata);
             });
             this._attrToExtents.set(attr, extents);
+        };
+        Plot.prototype._computeExtent = function (dataset, accessor, typeCoercer, plotMetadata) {
+            var data = dataset.data();
+            var metadata = dataset.metadata();
+            var appliedAccessor = function (d, i) { return accessor(d, i, metadata, plotMetadata); };
+            var mappedData = data.map(appliedAccessor).map(typeCoercer);
+            if (mappedData.length === 0) {
+                return [];
+            }
+            else if (typeof (mappedData[0]) === "string") {
+                return Plottable.Utils.Methods.uniq(mappedData);
+            }
+            else {
+                var extent = d3.extent(mappedData);
+                if (extent[0] == null || extent[1] == null) {
+                    return [];
+                }
+                else {
+                    return extent;
+                }
+            }
         };
         /**
          * Override in subclass to add special extents, such as included values
@@ -6990,8 +6985,8 @@ var Plottable;
             _super.prototype.project.call(this, attrToSet, accessor, scale);
             return this;
         };
-        XYPlot.prototype.remove = function () {
-            _super.prototype.remove.call(this);
+        XYPlot.prototype.destroy = function () {
+            _super.prototype.destroy.call(this);
             if (this._xScale) {
                 this._xScale.offUpdate(this._adjustYDomainOnChangeFromXCallback);
             }
@@ -7394,7 +7389,7 @@ var Plottable;
                 if (isVertical === void 0) { isVertical = true; }
                 _super.call(this, xScale, yScale);
                 this._barAlignmentFactor = 0.5;
-                this._barLabelFormatter = Plottable.Formatters.identity();
+                this._labelFormatter = Plottable.Formatters.identity();
                 this._labelsEnabled = false;
                 this._hideBarsIfAnyAreTooWide = true;
                 this.classed("bar-plot", true);
@@ -7450,12 +7445,12 @@ var Plottable;
                     return this;
                 }
             };
-            Bar.prototype.barLabelFormatter = function (formatter) {
+            Bar.prototype.labelFormatter = function (formatter) {
                 if (formatter == null) {
-                    return this._barLabelFormatter;
+                    return this._labelFormatter;
                 }
                 else {
-                    this._barLabelFormatter = formatter;
+                    this._labelFormatter = formatter;
                     this.render();
                     return this;
                 }
@@ -7677,9 +7672,9 @@ var Plottable;
                     return (originalPos > scaledBaseline) ? scaledBaseline : originalPos;
                 };
                 var primaryAccessor = this._projections[primaryAttr].accessor;
-                if (this.labelsEnabled && this.barLabelFormatter) {
+                if (this._labelsEnabled && this._labelFormatter) {
                     attrToProjector["label"] = function (d, i, u, m) {
-                        return _this._barLabelFormatter(primaryAccessor(d, i, u, m));
+                        return _this._labelFormatter(primaryAccessor(d, i, u, m));
                     };
                     attrToProjector["positive"] = function (d, i, u, m) { return originalPositionFn(d, i, u, m) <= scaledBaseline; };
                 }
@@ -7957,19 +7952,11 @@ var Plottable;
                 return new Plottable.Drawers.Area(key);
             };
             Area.prototype._updateYDomainer = function () {
-                var _this = this;
                 _super.prototype._updateYDomainer.call(this);
-                var constantBaseline;
-                var y0Projector = this._projections["y0"];
-                var y0Accessor = y0Projector && y0Projector.accessor;
-                if (y0Accessor != null) {
-                    var extents = this.datasets().map(function (d) { return d._getExtent(y0Accessor, _this._yScale._typeCoercer); });
-                    var extent = Plottable.Utils.Methods.flatten(extents);
-                    var uniqExtentVals = Plottable.Utils.Methods.uniq(extent);
-                    if (uniqExtentVals.length === 1) {
-                        constantBaseline = uniqExtentVals[0];
-                    }
-                }
+                var extents = this._extentsForAttr("y0");
+                var extent = Plottable.Utils.Methods.flatten(extents);
+                var uniqExtentVals = Plottable.Utils.Methods.uniq(extent);
+                var constantBaseline = uniqExtentVals.length === 1 ? uniqExtentVals[0] : null;
                 if (!this._yScale._userSetDomainer) {
                     if (constantBaseline != null) {
                         this._yScale.domainer().addPaddingException(constantBaseline, "AREA_PLOT+" + this.getID());
@@ -9332,6 +9319,7 @@ var Plottable;
             function Click() {
                 _super.apply(this, arguments);
                 this._clickedDown = false;
+                this._onClickCallbacks = new Plottable.Utils.CallbackSet();
             }
             Click.prototype._anchor = function (component) {
                 var _this = this;
@@ -9352,16 +9340,29 @@ var Plottable;
             };
             Click.prototype._handleClickUp = function (p) {
                 var translatedPoint = this._translateToComponentSpace(p);
-                if (this._clickedDown && this._isInsideComponent(translatedPoint) && (this._clickCallback != null)) {
-                    this._clickCallback(translatedPoint);
+                if (this._clickedDown && this._isInsideComponent(translatedPoint)) {
+                    this._onClickCallbacks.callCallbacks(translatedPoint);
                 }
                 this._clickedDown = false;
             };
+            /**
+             * Sets the callback called when the Component is clicked.
+             *
+             * @param {ClickCallback} callback The callback to set.
+             * @return {Interaction.Click} The calling Interaction.Click.
+             */
             Click.prototype.onClick = function (callback) {
-                if (callback === undefined) {
-                    return this._clickCallback;
-                }
-                this._clickCallback = callback;
+                this._onClickCallbacks.add(callback);
+                return this;
+            };
+            /**
+             * Removes the callback from click.
+             *
+             * @param {ClickCallback} callback The callback to remove.
+             * @return {Interaction.Click} The calling Interaction.Click.
+             */
+            Click.prototype.offClick = function (callback) {
+                this._onClickCallbacks.delete(callback);
                 return this;
             };
             return Click;
@@ -9394,6 +9395,7 @@ var Plottable;
                 _super.apply(this, arguments);
                 this._clickState = 0 /* NotClicked */;
                 this._clickedDown = false;
+                this._onDoubleClickCallbacks = new Plottable.Utils.CallbackSet();
             }
             DoubleClick.prototype._anchor = function (component) {
                 var _this = this;
@@ -9429,9 +9431,7 @@ var Plottable;
             };
             DoubleClick.prototype._handleDblClick = function () {
                 if (this._clickState === 2 /* DoubleClicked */) {
-                    if (this._doubleClickCallback) {
-                        this._doubleClickCallback(this._clickedPoint);
-                    }
+                    this._onDoubleClickCallbacks.callCallbacks(this._clickedPoint);
                     this._clickState = 0 /* NotClicked */;
                 }
             };
@@ -9442,12 +9442,23 @@ var Plottable;
             DoubleClick.pointsEqual = function (p1, p2) {
                 return p1.x === p2.x && p1.y === p2.y;
             };
+            /**
+             * Sets the callback called when the Component is double-clicked.
+             *
+             * @param {ClickCallback} callback The callback to set.
+             * @return {Interaction.DoubleClick} The calling Interaction.DoubleClick.
+             */
             DoubleClick.prototype.onDoubleClick = function (callback) {
-                if (callback === undefined) {
-                    return this._doubleClickCallback;
-                }
-                this._doubleClickCallback = callback;
-                return this;
+                this._onDoubleClickCallbacks.add(callback);
+            };
+            /**
+             * Removes the callback called when the Component is double-clicked.
+             *
+             * @param {ClickCallback} callback The callback to remove.
+             * @return {Interaction.DoubleClick} The calling Interaction.DoubleClick.
+             */
+            DoubleClick.prototype.offDoubleClick = function (callback) {
+                this._onDoubleClickCallbacks.delete(callback);
             };
             return DoubleClick;
         })(Plottable.Interaction);
@@ -9470,7 +9481,7 @@ var Plottable;
             __extends(Key, _super);
             function Key() {
                 _super.apply(this, arguments);
-                this._keyCode2Callback = {};
+                this._keyCodeCallbacks = {};
             }
             Key.prototype._anchor = function (component) {
                 var _this = this;
@@ -9482,8 +9493,8 @@ var Plottable;
             };
             Key.prototype._handleKeyEvent = function (keyCode) {
                 var p = this._translateToComponentSpace(this._positionDispatcher.getLastMousePosition());
-                if (this._isInsideComponent(p) && this._keyCode2Callback[keyCode]) {
-                    this._keyCode2Callback[keyCode]();
+                if (this._isInsideComponent(p) && this._keyCodeCallbacks[keyCode]) {
+                    this._keyCodeCallbacks[keyCode].callCallbacks(keyCode);
                 }
             };
             /**
@@ -9491,11 +9502,29 @@ var Plottable;
              * pressed and the user is moused over the Component.
              *
              * @param {number} keyCode The key code associated with the key.
-             * @param {() => void} callback Callback to be called.
+             * @param {KeyCallback} callback Callback to be set.
              * @returns The calling Interaction.Key.
              */
-            Key.prototype.on = function (keyCode, callback) {
-                this._keyCode2Callback[keyCode] = callback;
+            Key.prototype.onKey = function (keyCode, callback) {
+                if (!this._keyCodeCallbacks[keyCode]) {
+                    this._keyCodeCallbacks[keyCode] = new Plottable.Utils.CallbackSet();
+                }
+                this._keyCodeCallbacks[keyCode].add(callback);
+                return this;
+            };
+            /**
+             * Removes the callback to be called when the key with the given keyCode is
+             * pressed and the user is moused over the Component.
+             *
+             * @param {number} keyCode The key code associated with the key.
+             * @param {KeyCallback} callback Callback to be removed.
+             * @returns The calling Interaction.Key.
+             */
+            Key.prototype.offKey = function (keyCode, callback) {
+                this._keyCodeCallbacks[keyCode].delete(callback);
+                if (this._keyCodeCallbacks[keyCode].values().length === 0) {
+                    delete this._keyCodeCallbacks[keyCode];
+                }
                 return this;
             };
             return Key;
@@ -9520,6 +9549,9 @@ var Plottable;
             function Pointer() {
                 _super.apply(this, arguments);
                 this._overComponent = false;
+                this._pointerEnterCallbacks = new Plottable.Utils.CallbackSet();
+                this._pointerMoveCallbacks = new Plottable.Utils.CallbackSet();
+                this._pointerExitCallbacks = new Plottable.Utils.CallbackSet();
             }
             Pointer.prototype._anchor = function (component) {
                 var _this = this;
@@ -9534,39 +9566,74 @@ var Plottable;
                 if (this._isInsideComponent(translatedP)) {
                     var wasOverComponent = this._overComponent;
                     this._overComponent = true;
-                    if (!wasOverComponent && this._pointerEnterCallback) {
-                        this._pointerEnterCallback(translatedP);
+                    if (!wasOverComponent) {
+                        this._pointerEnterCallbacks.callCallbacks(translatedP);
                     }
-                    if (this._pointerMoveCallback) {
-                        this._pointerMoveCallback(translatedP);
-                    }
+                    this._pointerMoveCallbacks.callCallbacks(translatedP);
                 }
                 else if (this._overComponent) {
                     this._overComponent = false;
-                    if (this._pointerExitCallback) {
-                        this._pointerExitCallback(translatedP);
-                    }
+                    this._pointerExitCallbacks.callCallbacks(translatedP);
                 }
             };
+            /**
+             * Sets the callback called when the pointer enters the Component.
+             *
+             * @param {PointerCallback} callback The callback to set.
+             * @return {Interaction.Pointer} The calling Interaction.Pointer.
+             */
             Pointer.prototype.onPointerEnter = function (callback) {
-                if (callback === undefined) {
-                    return this._pointerEnterCallback;
-                }
-                this._pointerEnterCallback = callback;
+                this._pointerEnterCallbacks.add(callback);
                 return this;
             };
+            /**
+             * Removes a callback called when the pointer enters the Component.
+             *
+             * @param {PointerCallback} callback The callback to remove.
+             * @return {Interaction.Pointer} The calling Interaction.Pointer.
+             */
+            Pointer.prototype.offPointerEnter = function (callback) {
+                this._pointerEnterCallbacks.delete(callback);
+                return this;
+            };
+            /**
+             * Sets the callback called when the pointer moves.
+             *
+             * @param {PointerCallback} callback The callback to set.
+             * @return {Interaction.Pointer} The calling Interaction.Pointer.
+             */
             Pointer.prototype.onPointerMove = function (callback) {
-                if (callback === undefined) {
-                    return this._pointerMoveCallback;
-                }
-                this._pointerMoveCallback = callback;
+                this._pointerMoveCallbacks.add(callback);
                 return this;
             };
+            /**
+             * Removes a callback called when the pointer moves.
+             *
+             * @param {PointerCallback} callback The callback to remove.
+             * @return {Interaction.Pointer} The calling Interaction.Pointer.
+             */
+            Pointer.prototype.offPointerMove = function (callback) {
+                this._pointerMoveCallbacks.delete(callback);
+                return this;
+            };
+            /**
+             * Sets the callback called when the pointer exits the Component.
+             *
+             * @param {PointerCallback} callback The callback to set.
+             * @return {Interaction.Pointer} The calling Interaction.Pointer.
+             */
             Pointer.prototype.onPointerExit = function (callback) {
-                if (callback === undefined) {
-                    return this._pointerExitCallback;
-                }
-                this._pointerExitCallback = callback;
+                this._pointerExitCallbacks.add(callback);
+                return this;
+            };
+            /**
+             * Removes a callback called when the pointer exits the Component.
+             *
+             * @param {PointerCallback} callback The callback to remove.
+             * @return {Interaction.Pointer} The calling Interaction.Pointer.
+             */
+            Pointer.prototype.offPointerExit = function (callback) {
+                this._pointerExitCallbacks.delete(callback);
                 return this;
             };
             return Pointer;
@@ -9742,6 +9809,9 @@ var Plottable;
                 _super.apply(this, arguments);
                 this._dragging = false;
                 this._constrain = true;
+                this._dragStartCallbacks = new Plottable.Utils.CallbackSet();
+                this._dragCallbacks = new Plottable.Utils.CallbackSet();
+                this._dragEndCallbacks = new Plottable.Utils.CallbackSet();
             }
             Drag.prototype._anchor = function (component) {
                 var _this = this;
@@ -9765,38 +9835,30 @@ var Plottable;
                     y: Plottable.Utils.Methods.clamp(translatedP.y, 0, this._componentToListenTo.height())
                 };
             };
-            Drag.prototype._startDrag = function (p, e) {
-                if (e instanceof MouseEvent && e.button !== 0) {
+            Drag.prototype._startDrag = function (point, event) {
+                if (event instanceof MouseEvent && event.button !== 0) {
                     return;
                 }
-                var translatedP = this._translateToComponentSpace(p);
+                var translatedP = this._translateToComponentSpace(point);
                 if (this._isInsideComponent(translatedP)) {
-                    e.preventDefault();
+                    event.preventDefault();
                     this._dragging = true;
                     this._dragOrigin = translatedP;
-                    if (this._dragStartCallback) {
-                        this._dragStartCallback(this._dragOrigin);
-                    }
+                    this._dragStartCallbacks.callCallbacks(this._dragOrigin);
                 }
             };
-            Drag.prototype._doDrag = function (p, e) {
+            Drag.prototype._doDrag = function (point, event) {
                 if (this._dragging) {
-                    if (this._dragCallback) {
-                        var constrainedP = this._translateAndConstrain(p);
-                        this._dragCallback(this._dragOrigin, constrainedP);
-                    }
+                    this._dragCallbacks.callCallbacks(this._dragOrigin, this._translateAndConstrain(point));
                 }
             };
-            Drag.prototype._endDrag = function (p, e) {
-                if (e instanceof MouseEvent && e.button !== 0) {
+            Drag.prototype._endDrag = function (point, event) {
+                if (event instanceof MouseEvent && event.button !== 0) {
                     return;
                 }
                 if (this._dragging) {
                     this._dragging = false;
-                    if (this._dragEndCallback) {
-                        var constrainedP = this._translateAndConstrain(p);
-                        this._dragEndCallback(this._dragOrigin, constrainedP);
-                    }
+                    this._dragEndCallbacks.callCallbacks(this._dragOrigin, this._translateAndConstrain(point));
                 }
             };
             Drag.prototype.constrainToComponent = function (constrain) {
@@ -9806,32 +9868,65 @@ var Plottable;
                 this._constrain = constrain;
                 return this;
             };
-            Drag.prototype.onDragStart = function (cb) {
-                if (cb === undefined) {
-                    return this._dragStartCallback;
-                }
-                else {
-                    this._dragStartCallback = cb;
-                    return this;
-                }
+            /**
+             * Sets the callback to be called when dragging starts.
+             *
+             * @param {DragCallback} callback The callback to be called. Takes in a Point in pixels.
+             * @returns {Drag} The calling Interactions.Drag.
+             */
+            Drag.prototype.onDragStart = function (callback) {
+                this._dragStartCallbacks.add(callback);
+                return this;
             };
-            Drag.prototype.onDrag = function (cb) {
-                if (cb === undefined) {
-                    return this._dragCallback;
-                }
-                else {
-                    this._dragCallback = cb;
-                    return this;
-                }
+            /**
+             * Removes the callback to be called when dragging starts.
+             *
+             * @param {DragCallback} callback The callback to be removed.
+             * @returns {Drag} The calling Interactions.Drag.
+             */
+            Drag.prototype.offDragStart = function (callback) {
+                this._dragStartCallbacks.delete(callback);
+                return this;
             };
-            Drag.prototype.onDragEnd = function (cb) {
-                if (cb === undefined) {
-                    return this._dragEndCallback;
-                }
-                else {
-                    this._dragEndCallback = cb;
-                    return this;
-                }
+            /**
+             * Adds a callback to be called during dragging.
+             *
+             * @param {DragCallback} callback The callback to be called. Takes in Points in pixels.
+             * @returns {Drag} The calling Interactions.Drag.
+             */
+            Drag.prototype.onDrag = function (callback) {
+                this._dragCallbacks.add(callback);
+                return this;
+            };
+            /**
+             * Removes a callback to be called during dragging.
+             *
+             * @param {DragCallback} callback The callback to be removed.
+             * @returns {Drag} The calling Interactions.Drag.
+             */
+            Drag.prototype.offDrag = function (callback) {
+                this._dragCallbacks.delete(callback);
+                return this;
+            };
+            /**
+             * Adds a callback to be called when the dragging ends.
+             *
+             * @param {DragCallback} callback The callback to be called. Takes in Points in pixels.
+             * @returns {Drag} The calling Interactions.Drag.
+             */
+            Drag.prototype.onDragEnd = function (callback) {
+                this._dragEndCallbacks.add(callback);
+                return this;
+            };
+            /**
+             * Removes a callback to be called when the dragging ends.
+             *
+             * @param {DragCallback} callback The callback to be removed
+             * @returns {Drag} The calling Interactions.Drag.
+             */
+            Drag.prototype.offDragEnd = function (callback) {
+                this._dragEndCallbacks.delete(callback);
+                return this;
             };
             return Drag;
         })(Plottable.Interaction);
@@ -9868,6 +9963,9 @@ var Plottable;
                 this._dragInteraction = new Plottable.Interactions.Drag();
                 this._setUpCallbacks();
                 this.registerInteraction(this._dragInteraction);
+                this._dragStartCallbacks = new Plottable.Utils.CallbackSet();
+                this._dragCallbacks = new Plottable.Utils.CallbackSet();
+                this._dragEndCallbacks = new Plottable.Utils.CallbackSet();
             }
             DragBoxLayer.prototype._setUpCallbacks = function () {
                 var _this = this;
@@ -9892,9 +9990,7 @@ var Plottable;
                     // copy points so changes to topLeft and bottomRight don't mutate bounds
                     topLeft = { x: bounds.topLeft.x, y: bounds.topLeft.y };
                     bottomRight = { x: bounds.bottomRight.x, y: bounds.bottomRight.y };
-                    if (_this._dragStartCallback) {
-                        _this._dragStartCallback(bounds);
-                    }
+                    _this._dragStartCallbacks.callCallbacks(bounds);
                 });
                 this._dragInteraction.onDrag(function (s, e) {
                     if (startedNewBox) {
@@ -9919,17 +10015,13 @@ var Plottable;
                         topLeft: topLeft,
                         bottomRight: bottomRight
                     });
-                    if (_this._dragCallback) {
-                        _this._dragCallback(_this.bounds());
-                    }
+                    _this._dragCallbacks.callCallbacks(_this.bounds());
                 });
                 this._dragInteraction.onDragEnd(function (s, e) {
                     if (startedNewBox && s.x === e.x && s.y === e.y) {
                         _this.boxVisible(false);
                     }
-                    if (_this._dragEndCallback) {
-                        _this._dragEndCallback(_this.bounds());
-                    }
+                    _this._dragEndCallbacks.callCallbacks(_this.bounds());
                 });
             };
             DragBoxLayer.prototype._setup = function () {
@@ -9980,8 +10072,8 @@ var Plottable;
                 }
                 return edges;
             };
-            DragBoxLayer.prototype._doRender = function () {
-                _super.prototype._doRender.call(this);
+            DragBoxLayer.prototype._render = function () {
+                _super.prototype._render.call(this);
                 if (this.boxVisible()) {
                     var bounds = this.bounds();
                     var t = bounds.topLeft.y;
@@ -10048,32 +10140,65 @@ var Plottable;
                 this.classed("x-resizable", canResize);
                 this.classed("y-resizable", canResize);
             };
-            DragBoxLayer.prototype.onDragStart = function (cb) {
-                if (cb === undefined) {
-                    return this._dragStartCallback;
-                }
-                else {
-                    this._dragStartCallback = cb;
-                    return this;
-                }
+            /**
+             * Sets the callback to be called when dragging starts.
+             *
+             * @param {DragBoxCallback} callback The callback to be called. Passed the current Bounds in pixels.
+             * @returns {DragBoxLayer} The calling DragBoxLayer.
+             */
+            DragBoxLayer.prototype.onDragStart = function (callback) {
+                this._dragStartCallbacks.add(callback);
+                return this;
             };
-            DragBoxLayer.prototype.onDrag = function (cb) {
-                if (cb === undefined) {
-                    return this._dragCallback;
-                }
-                else {
-                    this._dragCallback = cb;
-                    return this;
-                }
+            /**
+             * Removes a callback to be called when dragging starts.
+             *
+             * @param {DragBoxCallback} callback The callback to be removed.
+             * @returns {DragBoxLayer} The calling DragBoxLayer.
+             */
+            DragBoxLayer.prototype.offDragStart = function (callback) {
+                this._dragStartCallbacks.delete(callback);
+                return this;
             };
-            DragBoxLayer.prototype.onDragEnd = function (cb) {
-                if (cb === undefined) {
-                    return this._dragEndCallback;
-                }
-                else {
-                    this._dragEndCallback = cb;
-                    return this;
-                }
+            /**
+             * Sets a callback to be called during dragging.
+             *
+             * @param {DragBoxCallback} callback The callback to be called. Passed the current Bounds in pixels.
+             * @returns {DragBoxLayer} The calling DragBoxLayer.
+             */
+            DragBoxLayer.prototype.onDrag = function (callback) {
+                this._dragCallbacks.add(callback);
+                return this;
+            };
+            /**
+             * Removes a callback to be called during dragging.
+             *
+             * @param {DragBoxCallback} callback The callback to be removed.
+             * @returns {DragBoxLayer} The calling DragBoxLayer.
+             */
+            DragBoxLayer.prototype.offDrag = function (callback) {
+                this._dragCallbacks.delete(callback);
+                return this;
+            };
+            /**
+             * Sets a callback to be called when the dragging ends.
+             *
+             * @param {DragBoxCallback} callback The callback to be called. Passed the current Bounds in pixels.
+             * @returns {DragBoxLayer} The calling DragBoxLayer.
+             */
+            DragBoxLayer.prototype.onDragEnd = function (callback) {
+                this._dragEndCallbacks.add(callback);
+                return this;
+            };
+            /**
+             * Removes a callback to be called when the dragging ends.
+             *
+             * @param {DragBoxCallback} callback The callback to be removed.
+             * @returns {DragBoxLayer} The calling DragBoxLayer.
+             */
+            DragBoxLayer.prototype.offDragEnd = function (callback) {
+                this._dragEndCallbacks.delete(callback);
+                return this;
             };
             return DragBoxLayer;
         })(Components.SelectionBoxLayer);

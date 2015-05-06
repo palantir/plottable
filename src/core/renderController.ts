@@ -1,8 +1,6 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Core {
-
   /**
    * The RenderController is responsible for enqueueing and synchronizing
    * layout and render calls for Plottable components.
@@ -16,12 +14,12 @@ export module Core {
    * If you want to always have immediate rendering (useful for debugging),
    * call
    * ```typescript
-   * Plottable.Core.RenderController.setRenderPolicy(
-   *   new Plottable.Core.RenderController.RenderPolicy.Immediate()
+   * Plottable.RenderController.setRenderPolicy(
+   *   new Plottable.RenderPolicy.Immediate()
    * );
    * ```
    */
-  export module RenderControllers {
+  export module RenderController {
     var _componentsNeedingRender = new Utils.Set<Component>();
     var _componentsNeedingComputeLayout = new Utils.Set<Component>();
     var _animationRequested: boolean = false;
@@ -93,14 +91,11 @@ export module Core {
         // Layout
         _componentsNeedingComputeLayout.values().forEach((component: Component) => component.computeLayout());
 
-        // Top level render; Containers will put their children in the toRender queue
-        _componentsNeedingRender.values().forEach((component: Component) => component.render());
-
         _isCurrentlyFlushing = true;
         var failed = new Utils.Set<Component>();
         _componentsNeedingRender.values().forEach((component: Component) => {
           try {
-            component._doRender();
+            component.render(true);
           } catch (err) {
             // throw error with timeout to avoid interrupting further renders
             window.setTimeout(() => { throw err; }, 0);
@@ -114,6 +109,4 @@ export module Core {
       }
     }
   }
-
-}
 }

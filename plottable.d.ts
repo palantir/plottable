@@ -518,95 +518,88 @@ declare module Plottable {
          * @returns {Dataset} The calling Dataset.
          */
         metadata(metadata: any): Dataset;
-        _getExtent(accessor: _Accessor, typeCoercer: (d: any) => any, plotMetadata?: any): any[];
     }
 }
 
 
 declare module Plottable {
-    module Core {
-        module RenderControllers {
-            module RenderPolicies {
-                /**
-                 * A policy to render components.
-                 */
-                interface RenderPolicy {
-                    render(): any;
-                }
-                /**
-                 * Never queue anything, render everything immediately. Useful for
-                 * debugging, horrible for performance.
-                 */
-                class Immediate implements RenderPolicy {
-                    render(): void;
-                }
-                /**
-                 * The default way to render, which only tries to render every frame
-                 * (usually, 1/60th of a second).
-                 */
-                class AnimationFrame implements RenderPolicy {
-                    render(): void;
-                }
-                /**
-                 * Renders with `setTimeout`. This is generally an inferior way to render
-                 * compared to `requestAnimationFrame`, but it's still there if you want
-                 * it.
-                 */
-                class Timeout implements RenderPolicy {
-                    _timeoutMsec: number;
-                    render(): void;
-                }
-            }
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Core {
+    module RenderPolicies {
         /**
-         * The RenderController is responsible for enqueueing and synchronizing
-         * layout and render calls for Plottable components.
-         *
-         * Layouts and renders occur inside an animation callback
-         * (window.requestAnimationFrame if available).
-         *
-         * If you require immediate rendering, call RenderController.flush() to
-         * perform enqueued layout and rendering serially.
-         *
-         * If you want to always have immediate rendering (useful for debugging),
-         * call
-         * ```typescript
-         * Plottable.Core.RenderController.setRenderPolicy(
-         *   new Plottable.Core.RenderController.RenderPolicy.Immediate()
-         * );
-         * ```
+         * A policy to render components.
          */
-        module RenderControllers {
-            var _renderPolicy: RenderPolicies.RenderPolicy;
-            function setRenderPolicy(policy: string | RenderPolicies.RenderPolicy): void;
-            /**
-             * If the RenderController is enabled, we enqueue the component for
-             * render. Otherwise, it is rendered immediately.
-             *
-             * @param {Component} component Any Plottable component.
-             */
-            function registerToRender(component: Component): void;
-            /**
-             * If the RenderController is enabled, we enqueue the component for
-             * layout and render. Otherwise, it is rendered immediately.
-             *
-             * @param {Component} component Any Plottable component.
-             */
-            function registerToComputeLayout(component: Component): void;
-            /**
-             * Render everything that is waiting to be rendered right now, instead of
-             * waiting until the next frame.
-             *
-             * Useful to call when debugging.
-             */
-            function flush(): void;
+        interface RenderPolicy {
+            render(): any;
         }
+        /**
+         * Never queue anything, render everything immediately. Useful for
+         * debugging, horrible for performance.
+         */
+        class Immediate implements RenderPolicy {
+            render(): void;
+        }
+        /**
+         * The default way to render, which only tries to render every frame
+         * (usually, 1/60th of a second).
+         */
+        class AnimationFrame implements RenderPolicy {
+            render(): void;
+        }
+        /**
+         * Renders with `setTimeout`. This is generally an inferior way to render
+         * compared to `requestAnimationFrame`, but it's still there if you want
+         * it.
+         */
+        class Timeout implements RenderPolicy {
+            _timeoutMsec: number;
+            render(): void;
+        }
+    }
+}
+
+
+declare module Plottable {
+    /**
+     * The RenderController is responsible for enqueueing and synchronizing
+     * layout and render calls for Plottable components.
+     *
+     * Layouts and renders occur inside an animation callback
+     * (window.requestAnimationFrame if available).
+     *
+     * If you require immediate rendering, call RenderController.flush() to
+     * perform enqueued layout and rendering serially.
+     *
+     * If you want to always have immediate rendering (useful for debugging),
+     * call
+     * ```typescript
+     * Plottable.RenderController.setRenderPolicy(
+     *   new Plottable.RenderPolicy.Immediate()
+     * );
+     * ```
+     */
+    module RenderController {
+        var _renderPolicy: RenderPolicies.RenderPolicy;
+        function setRenderPolicy(policy: string | RenderPolicies.RenderPolicy): void;
+        /**
+         * If the RenderController is enabled, we enqueue the component for
+         * render. Otherwise, it is rendered immediately.
+         *
+         * @param {Component} component Any Plottable component.
+         */
+        function registerToRender(component: Component): void;
+        /**
+         * If the RenderController is enabled, we enqueue the component for
+         * layout and render. Otherwise, it is rendered immediately.
+         *
+         * @param {Component} component Any Plottable component.
+         */
+        function registerToComputeLayout(component: Component): void;
+        /**
+         * Render everything that is waiting to be rendered right now, instead of
+         * waiting until the next frame.
+         *
+         * Useful to call when debugging.
+         */
+        function flush(): void;
     }
 }
 
@@ -655,10 +648,8 @@ declare module Plottable {
         yMax: number;
     };
     type _SpaceRequest = {
-        width: number;
-        height: number;
-        wantsWidth: boolean;
-        wantsHeight: boolean;
+        minWidth: number;
+        minHeight: number;
     };
     /**
      * The range of your current data. For example, [1, 2, 6, -5] has the Extent
@@ -1536,7 +1527,7 @@ declare module Plottable {
          * Override in subclasses to provide additional functionality.
          */
         protected _setup(): void;
-        _requestedSpace(availableWidth: number, availableHeight: number): _SpaceRequest;
+        requestedSpace(availableWidth: number, availableHeight: number): _SpaceRequest;
         /**
          * Computes the size, position, and alignment from the specified values.
          * If no parameters are supplied and the Component is a root node,
@@ -1552,10 +1543,14 @@ declare module Plottable {
             width: number;
             height: number;
         };
-        render(): Component;
-        _doRender(): void;
-        _useLastCalculatedLayout(): boolean;
-        _useLastCalculatedLayout(useLast: boolean): Component;
+        /**
+         * Queues the Component for rendering. Set immediately to true if the Component should be rendered
+         * immediately as opposed to queued to the RenderController.
+         *
+         * @returns {Component} The calling Component
+         */
+        render(immediately?: boolean): Component;
+        protected _render(): void;
         /**
          * Causes the Component to recompute layout and redraw.
          *
@@ -1694,7 +1689,7 @@ declare module Plottable {
          * Removes a Component from the DOM and disconnects it from everything it's
          * listening to (effectively destroying it).
          */
-        remove(): void;
+        destroy(): void;
         /**
          * Return the width of the component
          *
@@ -1754,8 +1749,19 @@ declare module Plottable {
     class ComponentContainer extends Component {
         anchor(selection: D3.Selection): ComponentContainer;
         render(): ComponentContainer;
-        _removeComponent(c: Component): void;
-        _addComponent(c: Component, prepend?: boolean): boolean;
+        /**
+         * Removes the specified Component from the ComponentContainer
+         *
+         * @param c Component the Component to remove.
+         */
+        remove(c: Component): void;
+        /**
+         * Adds the specified Component to the ComponentContainer.
+         *
+         * @param c Component the component to add
+         * @param prepend boolean whether the component should be prepended to the componentContainer or not.
+         */
+        add(c: Component, prepend?: boolean): boolean;
         /**
          * Returns a list of components in the ComponentContainer.
          *
@@ -1775,9 +1781,7 @@ declare module Plottable {
          * @returns {ComponentContainer} The calling ComponentContainer
          */
         detachAll(): ComponentContainer;
-        remove(): void;
-        _useLastCalculatedLayout(): boolean;
-        _useLastCalculatedLayout(calculated: boolean): Component;
+        destroy(): void;
     }
 }
 
@@ -1799,7 +1803,7 @@ declare module Plottable {
              * @param {Component[]} components The Components in the resultant Component.Group (default = []).
              */
             constructor(components?: Component[]);
-            _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
+            requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
             _merge(c: Component, below: boolean): Group;
             computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Group;
             protected _getSize(availableWidth: number, availableHeight: number): {
@@ -1845,18 +1849,18 @@ declare module Plottable {
          * displayed.
          */
         constructor(scale: Scale<any, number>, orientation: string, formatter?: (d: any) => string);
-        remove(): void;
+        destroy(): void;
         protected _isHorizontal(): boolean;
         protected _computeWidth(): number;
         protected _computeHeight(): number;
-        _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
+        requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
         _isFixedHeight(): boolean;
         _isFixedWidth(): boolean;
         protected _rescale(): void;
         computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Axis;
         protected _setup(): void;
         protected _getTickValues(): any[];
-        _doRender(): void;
+        protected _render(): void;
         protected _generateBaselineAttrHash(): {
             x1: number;
             y1: number;
@@ -2033,14 +2037,14 @@ declare module Plottable {
             axisConfigurations(configurations: TimeAxisConfiguration[]): Time;
             orient(): string;
             orient(orientation: string): Time;
-            _computeHeight(): number;
+            protected _computeHeight(): number;
             protected _getSize(availableWidth: number, availableHeight: number): {
                 width: number;
                 height: number;
             };
             protected _setup(): void;
             protected _getTickValues(): any[];
-            _doRender(): Time;
+            protected _render(): Time;
         }
     }
 }
@@ -2062,11 +2066,11 @@ declare module Plottable {
              */
             constructor(scale: QuantitativeScale<number>, orientation: string, formatter?: (d: any) => string);
             protected _setup(): void;
-            _computeWidth(): number;
-            _computeHeight(): number;
+            protected _computeWidth(): number;
+            protected _computeHeight(): number;
             protected _getTickValues(): any[];
             protected _rescale(): void;
-            _doRender(): void;
+            protected _render(): void;
             /**
              * Gets the tick label position relative to the tick marks.
              *
@@ -2130,7 +2134,7 @@ declare module Plottable {
             constructor(scale: Scales.Category, orientation?: string, formatter?: (d: any) => string);
             protected _setup(): void;
             protected _rescale(): Component;
-            _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
+            requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
             protected _getTickValues(): string[];
             /**
              * Sets the angle for the tick labels. Right now vertical-left (-90), horizontal (0), and vertical-right (90) are the only options.
@@ -2146,7 +2150,7 @@ declare module Plottable {
              * @returns {number} the tick label angle
              */
             tickLabelAngle(): number;
-            _doRender(): Category;
+            protected _render(): Category;
             computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Axis;
         }
     }
@@ -2183,7 +2187,7 @@ declare module Plottable {
              * @returns {Label} The calling Label.
              */
             yAlign(alignment: string): Label;
-            _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
+            requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
             protected _setup(): void;
             /**
              * Gets the current text on the Label.
@@ -2225,7 +2229,7 @@ declare module Plottable {
              * @returns {Label} The calling Label.
              */
             padding(padAmount: number): Label;
-            _doRender(): void;
+            protected _render(): void;
         }
         class TitleLabel extends Label {
             /**
@@ -2310,8 +2314,8 @@ declare module Plottable {
              * @returns {Legend} The calling Legend.
              */
             scale(scale: Scales.Color): Legend;
-            remove(): void;
-            _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
+            destroy(): void;
+            requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
             /**
              * Gets the legend entry under the given pixel position.
              *
@@ -2319,7 +2323,7 @@ declare module Plottable {
              * @returns {D3.Selection} The selected entry, or null selection if no entry was selected.
              */
             getEntry(position: Point): D3.Selection;
-            _doRender(): void;
+            protected _render(): void;
             /**
              * Gets the symbolFactoryAccessor of the legend, which dictates how
              * the symbol in each entry is drawn.
@@ -2359,7 +2363,7 @@ declare module Plottable {
              * @param {Formatter} The labels are formatted using this function.
              */
             constructor(interpolatedColorScale: Scales.InterpolatedColor, orientation?: string, formatter?: (d: any) => string);
-            remove(): void;
+            destroy(): void;
             /**
              * Gets the current formatter on the InterpolatedColorLegend.
              *
@@ -2388,8 +2392,8 @@ declare module Plottable {
              */
             orient(newOrientation: string): InterpolatedColorLegend;
             protected _setup(): void;
-            _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
-            _doRender(): void;
+            requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
+            protected _render(): void;
         }
     }
 }
@@ -2406,9 +2410,9 @@ declare module Plottable {
              * @param {QuantitativeScaleScale} yScale The scale to base the y gridlines on. Pass null if no gridlines are desired.
              */
             constructor(xScale: QuantitativeScale<any>, yScale: QuantitativeScale<any>);
-            remove(): Gridlines;
+            destroy(): Gridlines;
             protected _setup(): void;
-            _doRender(): void;
+            protected _render(): void;
         }
     }
 }
@@ -2441,30 +2445,30 @@ declare module Plottable {
              */
             constructor(rows?: Component[][]);
             /**
-             * Adds a Component in the specified cell.
-             *
-             * If the cell is already occupied, there are 3 cases
-             *  - Component + Component => Group containing both components
-             *  - Component + Group => Component is added to the group
-             *  - Group + Component => Component is added to the group
+             * Adds a Component in the specified row and column position.
              *
              * For example, instead of calling `new Table([[a, b], [null, c]])`, you
              * could call
              * ```typescript
              * var table = new Table();
-             * table.addComponent(0, 0, a);
-             * table.addComponent(0, 1, b);
-             * table.addComponent(1, 1, c);
+             * table.addComponent(a, 0, 0);
+             * table.addComponent(b, 0, 1);
+             * table.addComponent(c, 1, 1);
              * ```
              *
+             * @param {Component} component The Component to be added.
              * @param {number} row The row in which to add the Component.
              * @param {number} col The column in which to add the Component.
-             * @param {Component} component The Component to be added.
              * @returns {Table} The calling Table.
              */
-            addComponent(row: number, col: number, component: Component): Table;
-            _removeComponent(component: Component): void;
-            _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
+            addComponent(component: Component, row: number, col: number): Table;
+            /**
+             * Removes a Component.
+             *
+             * @param {Component} component The Component to be removed.
+             */
+            removeComponent(component: Component): void;
+            requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
             computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Table;
             /**
              * Sets the row and column padding on the Table.
@@ -2542,7 +2546,7 @@ declare module Plottable {
              */
             bounds(newBounds: Bounds): SelectionBoxLayer;
             protected _setBounds(newBounds: Bounds): void;
-            _doRender(): void;
+            protected _render(): void;
             /**
              * Gets whether the box is being shown.
              *
@@ -2606,7 +2610,7 @@ declare module Plottable {
         constructor();
         anchor(selection: D3.Selection): Plot;
         protected _setup(): void;
-        remove(): void;
+        destroy(): void;
         /**
          * @param {Dataset} dataset
          * @returns {Plot} The calling Plot.
@@ -2654,7 +2658,7 @@ declare module Plottable {
          * @returns {AttributeToAppliedProjector} A dictionary mapping attributes to functions
          */
         generateProjectors(dataset: Dataset): AttributeToAppliedProjector;
-        _doRender(): void;
+        protected _render(): void;
         /**
          * Enables or disables animation.
          *
@@ -2792,7 +2796,7 @@ declare module Plottable {
          * x and y position in the Plot.
          */
         project(attrToSet: string, accessor: any, scale?: Scale<any, any>): XYPlot<X, Y>;
-        remove(): XYPlot<X, Y>;
+        destroy(): XYPlot<X, Y>;
         /**
          * Sets the automatic domain adjustment over visible points for y scale.
          *
@@ -2973,14 +2977,14 @@ declare module Plottable {
              *
              * @returns {Formatter} The formatting function for bar labels.
              */
-            barLabelFormatter(): Formatter;
+            labelFormatter(): Formatter;
             /**
              * Change the formatting function for bar labels.
              * @param {Formatter} The formatting function for bar labels.
              *
              * @returns {Bar} The calling plot.
              */
-            barLabelFormatter(formatter: Formatter): Bar<X, Y>;
+            labelFormatter(formatter: Formatter): Bar<X, Y>;
             /**
              * Retrieves the closest PlotData to queryPoint.
              *
@@ -3742,22 +3746,24 @@ declare module Plottable {
 
 
 declare module Plottable {
+    type ClickCallback = (point: Point) => any;
     module Interactions {
         class Click extends Interaction {
             _anchor(component: Component): void;
             /**
-             * Gets the callback called when the Component is clicked.
-             *
-             * @return {(p: Point) => any} The current callback.
-             */
-            onClick(): (p: Point) => any;
-            /**
              * Sets the callback called when the Component is clicked.
              *
-             * @param {(p: Point) => any} callback The callback to set.
+             * @param {ClickCallback} callback The callback to set.
              * @return {Interaction.Click} The calling Interaction.Click.
              */
-            onClick(callback: (p: Point) => any): Interactions.Click;
+            onClick(callback: ClickCallback): Click;
+            /**
+             * Removes the callback from click.
+             *
+             * @param {ClickCallback} callback The callback to remove.
+             * @return {Interaction.Click} The calling Interaction.Click.
+             */
+            offClick(callback: ClickCallback): Click;
         }
     }
 }
@@ -3768,24 +3774,26 @@ declare module Plottable {
         class DoubleClick extends Interaction {
             _anchor(component: Component): void;
             /**
-             * Gets the callback called when the Component is double-clicked.
-             *
-             * @return {(p: Point) => any} The current callback.
-             */
-            onDoubleClick(): (p: Point) => any;
-            /**
              * Sets the callback called when the Component is double-clicked.
              *
-             * @param {(p: Point) => any} callback The callback to set.
+             * @param {ClickCallback} callback The callback to set.
              * @return {Interaction.DoubleClick} The calling Interaction.DoubleClick.
              */
-            onDoubleClick(callback: (p: Point) => any): Interactions.DoubleClick;
+            onDoubleClick(callback: ClickCallback): void;
+            /**
+             * Removes the callback called when the Component is double-clicked.
+             *
+             * @param {ClickCallback} callback The callback to remove.
+             * @return {Interaction.DoubleClick} The calling Interaction.DoubleClick.
+             */
+            offDoubleClick(callback: ClickCallback): void;
         }
     }
 }
 
 
 declare module Plottable {
+    type KeyCallback = (keyCode: number) => void;
     module Interactions {
         class Key extends Interaction {
             _anchor(component: Component): void;
@@ -3794,58 +3802,71 @@ declare module Plottable {
              * pressed and the user is moused over the Component.
              *
              * @param {number} keyCode The key code associated with the key.
-             * @param {() => void} callback Callback to be called.
+             * @param {KeyCallback} callback Callback to be set.
              * @returns The calling Interaction.Key.
              */
-            on(keyCode: number, callback: () => void): Key;
+            onKey(keyCode: number, callback: KeyCallback): Key;
+            /**
+             * Removes the callback to be called when the key with the given keyCode is
+             * pressed and the user is moused over the Component.
+             *
+             * @param {number} keyCode The key code associated with the key.
+             * @param {KeyCallback} callback Callback to be removed.
+             * @returns The calling Interaction.Key.
+             */
+            offKey(keyCode: number, callback: KeyCallback): Key;
         }
     }
 }
 
 
 declare module Plottable {
+    type PointerCallback = (point: Point) => any;
     module Interactions {
         class Pointer extends Interaction {
             _anchor(component: Component): void;
             /**
-             * Gets the callback called when the pointer enters the Component.
-             *
-             * @return {(p: Point) => any} The current callback.
-             */
-            onPointerEnter(): (p: Point) => any;
-            /**
              * Sets the callback called when the pointer enters the Component.
              *
-             * @param {(p: Point) => any} callback The callback to set.
+             * @param {PointerCallback} callback The callback to set.
              * @return {Interaction.Pointer} The calling Interaction.Pointer.
              */
-            onPointerEnter(callback: (p: Point) => any): Interactions.Pointer;
+            onPointerEnter(callback: PointerCallback): Pointer;
             /**
-             * Gets the callback called when the pointer moves.
+             * Removes a callback called when the pointer enters the Component.
              *
-             * @return {(p: Point) => any} The current callback.
+             * @param {PointerCallback} callback The callback to remove.
+             * @return {Interaction.Pointer} The calling Interaction.Pointer.
              */
-            onPointerMove(): (p: Point) => any;
+            offPointerEnter(callback: PointerCallback): Pointer;
             /**
              * Sets the callback called when the pointer moves.
              *
-             * @param {(p: Point) => any} callback The callback to set.
+             * @param {PointerCallback} callback The callback to set.
              * @return {Interaction.Pointer} The calling Interaction.Pointer.
              */
-            onPointerMove(callback: (p: Point) => any): Interactions.Pointer;
+            onPointerMove(callback: PointerCallback): Pointer;
             /**
-             * Gets the callback called when the pointer exits the Component.
+             * Removes a callback called when the pointer moves.
              *
-             * @return {(p: Point) => any} The current callback.
+             * @param {PointerCallback} callback The callback to remove.
+             * @return {Interaction.Pointer} The calling Interaction.Pointer.
              */
-            onPointerExit(): (p: Point) => any;
+            offPointerMove(callback: PointerCallback): Pointer;
             /**
              * Sets the callback called when the pointer exits the Component.
              *
-             * @param {(p: Point) => any} callback The callback to set.
+             * @param {PointerCallback} callback The callback to set.
              * @return {Interaction.Pointer} The calling Interaction.Pointer.
              */
-            onPointerExit(callback: (p: Point) => any): Interactions.Pointer;
+            onPointerExit(callback: PointerCallback): Pointer;
+            /**
+             * Removes a callback called when the pointer exits the Component.
+             *
+             * @param {PointerCallback} callback The callback to remove.
+             * @return {Interaction.Pointer} The calling Interaction.Pointer.
+             */
+            offPointerExit(callback: PointerCallback): Pointer;
         }
     }
 }
@@ -3876,6 +3897,7 @@ declare module Plottable {
 
 
 declare module Plottable {
+    type DragCallback = (start: Point, end: Point) => any;
     module Interactions {
         class Drag extends Interaction {
             _anchor(component: Component): void;
@@ -3903,56 +3925,60 @@ declare module Plottable {
              */
             constrainToComponent(constrain: boolean): Drag;
             /**
-             * Gets the callback that is called when dragging starts.
-             *
-             * @returns {(start: Point) => any} The callback called when dragging starts.
-             */
-            onDragStart(): (start: Point) => any;
-            /**
              * Sets the callback to be called when dragging starts.
              *
-             * @param {(start: Point) => any} cb The callback to be called. Takes in a Point in pixels.
+             * @param {DragCallback} callback The callback to be called. Takes in a Point in pixels.
              * @returns {Drag} The calling Interactions.Drag.
              */
-            onDragStart(cb: (start: Point) => any): Drag;
+            onDragStart(callback: DragCallback): Drag;
             /**
-             * Gets the callback that is called during dragging.
+             * Removes the callback to be called when dragging starts.
              *
-             * @returns {(start: Point, end: Point) => any} The callback called during dragging.
+             * @param {DragCallback} callback The callback to be removed.
+             * @returns {Drag} The calling Interactions.Drag.
              */
-            onDrag(): (start: Point, end: Point) => any;
+            offDragStart(callback: DragCallback): Drag;
             /**
              * Adds a callback to be called during dragging.
              *
-             * @param {(start: Point, end: Point) => any} cb The callback to be called. Takes in Points in pixels.
+             * @param {DragCallback} callback The callback to be called. Takes in Points in pixels.
              * @returns {Drag} The calling Interactions.Drag.
              */
-            onDrag(cb: (start: Point, end: Point) => any): Drag;
+            onDrag(callback: DragCallback): Drag;
             /**
-             * Gets the callback that is called when dragging ends.
+             * Removes a callback to be called during dragging.
              *
-             * @returns {(start: Point, end: Point) => any} The callback called when dragging ends.
+             * @param {DragCallback} callback The callback to be removed.
+             * @returns {Drag} The calling Interactions.Drag.
              */
-            onDragEnd(): (start: Point, end: Point) => any;
+            offDrag(callback: DragCallback): Drag;
             /**
              * Adds a callback to be called when the dragging ends.
              *
-             * @param {(start: Point, end: Point) => any} cb The callback to be called. Takes in Points in pixels.
+             * @param {DragCallback} callback The callback to be called. Takes in Points in pixels.
              * @returns {Drag} The calling Interactions.Drag.
              */
-            onDragEnd(cb: (start: Point, end: Point) => any): Drag;
+            onDragEnd(callback: DragCallback): Drag;
+            /**
+             * Removes a callback to be called when the dragging ends.
+             *
+             * @param {DragCallback} callback The callback to be removed
+             * @returns {Drag} The calling Interactions.Drag.
+             */
+            offDragEnd(callback: DragCallback): Drag;
         }
     }
 }
 
 
 declare module Plottable {
+    type DragBoxCallback = (bounds: Bounds) => any;
     module Components {
         class DragBoxLayer extends Components.SelectionBoxLayer {
             protected _hasCorners: boolean;
             constructor();
             protected _setup(): void;
-            _doRender(): void;
+            protected _render(): void;
             /**
              * Gets the detection radius of the drag box.
              *
@@ -3981,44 +4007,47 @@ declare module Plottable {
             resizable(canResize: boolean): DragBoxLayer;
             protected _setResizableClasses(canResize: boolean): void;
             /**
-             * Gets the callback that is called when dragging starts.
-             *
-             * @returns {(b: Bounds) => any} The callback called when dragging starts.
-             */
-            onDragStart(): (b: Bounds) => any;
-            /**
              * Sets the callback to be called when dragging starts.
              *
-             * @param {(b: Bounds) => any} cb The callback to be called. Passed the current Bounds in pixels.
+             * @param {DragBoxCallback} callback The callback to be called. Passed the current Bounds in pixels.
              * @returns {DragBoxLayer} The calling DragBoxLayer.
              */
-            onDragStart(cb: (b: Bounds) => any): DragBoxLayer;
+            onDragStart(callback: DragBoxCallback): DragBoxLayer;
             /**
-             * Gets the callback that is called during dragging.
+             * Removes a callback to be called when dragging starts.
              *
-             * @returns {(b: Bounds) => any} The callback called during dragging.
+             * @param {DragBoxCallback} callback The callback to be removed.
+             * @returns {DragBoxLayer} The calling DragBoxLayer.
              */
-            onDrag(): (b: Bounds) => any;
+            offDragStart(callback: DragBoxCallback): DragBoxLayer;
             /**
              * Sets a callback to be called during dragging.
              *
-             * @param {(b: Bounds) => any} cb The callback to be called. Passed the current Bounds in pixels.
+             * @param {DragBoxCallback} callback The callback to be called. Passed the current Bounds in pixels.
              * @returns {DragBoxLayer} The calling DragBoxLayer.
              */
-            onDrag(cb: (b: Bounds) => any): DragBoxLayer;
+            onDrag(callback: DragBoxCallback): DragBoxLayer;
             /**
-             * Gets the callback that is called when dragging ends.
+             * Removes a callback to be called during dragging.
              *
-             * @returns {(b: Bounds) => any} The callback called when dragging ends.
+             * @param {DragBoxCallback} callback The callback to be removed.
+             * @returns {DragBoxLayer} The calling DragBoxLayer.
              */
-            onDragEnd(): (b: Bounds) => any;
+            offDrag(callback: DragBoxCallback): DragBoxLayer;
             /**
              * Sets a callback to be called when the dragging ends.
              *
-             * @param {(b: Bounds) => any} cb The callback to be called. Passed the current Bounds in pixels.
+             * @param {DragBoxCallback} callback The callback to be called. Passed the current Bounds in pixels.
              * @returns {DragBoxLayer} The calling DragBoxLayer.
              */
-            onDragEnd(cb: (b: Bounds) => any): DragBoxLayer;
+            onDragEnd(callback: DragBoxCallback): DragBoxLayer;
+            /**
+             * Removes a callback to be called when the dragging ends.
+             *
+             * @param {DragBoxCallback} callback The callback to be removed.
+             * @returns {DragBoxLayer} The calling DragBoxLayer.
+             */
+            offDragEnd(callback: DragBoxCallback): DragBoxLayer;
         }
     }
 }

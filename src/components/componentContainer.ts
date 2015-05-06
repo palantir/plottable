@@ -19,7 +19,12 @@ module Plottable {
       return this;
     }
 
-    public _removeComponent(c: Component) {
+    /**
+     * Removes the specified Component from the ComponentContainer
+     * 
+     * @param c Component the Component to remove.
+     */
+    public remove(c: Component) {
       var removeIndex = this._components.indexOf(c);
       if (removeIndex >= 0) {
         this.components().splice(removeIndex, 1);
@@ -27,7 +32,13 @@ module Plottable {
       }
     }
 
-    public _addComponent(c: Component, prepend = false): boolean {
+    /**
+     * Adds the specified Component to the ComponentContainer.
+     * 
+     * @param c Component the component to add
+     * @param prepend boolean whether the component should be prepended to the componentContainer or not.
+     */
+    public add(c: Component, prepend = false): boolean {
       if (!c || this._components.indexOf(c) >= 0) {
         return false;
       }
@@ -76,18 +87,9 @@ module Plottable {
       return this;
     }
 
-    public remove() {
-      super.remove();
-      this.components().slice().forEach((c: Component) => c.remove());
-    }
-
-    public _useLastCalculatedLayout(): boolean;
-    public _useLastCalculatedLayout(calculated: boolean): Component;
-    public _useLastCalculatedLayout(calculated?: boolean): any {
-      if (calculated != null) {
-        this.components().slice().forEach((c: Component) => c._useLastCalculatedLayout(calculated));
-      }
-      return super._useLastCalculatedLayout(calculated);
+    public destroy() {
+      super.destroy();
+      this.components().slice().forEach((c: Component) => c.destroy());
     }
   }
 }

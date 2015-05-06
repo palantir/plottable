@@ -36,12 +36,15 @@ export module Axes {
       return this.redraw();
     }
 
-    public _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
+    public requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
       var widthRequiredByTicks = this._isHorizontal() ? 0 : this._maxLabelTickLength() + this.tickLabelPadding() + this.gutter();
       var heightRequiredByTicks = this._isHorizontal() ? this._maxLabelTickLength() + this.tickLabelPadding() + this.gutter() : 0;
 
       if (this._scale.domain().length === 0) {
-        return {width: 0, height: 0, wantsWidth: false, wantsHeight: false };
+        return {
+          minWidth: 0,
+          minHeight: 0
+        };
       }
 
       var categoryScale: Scales.Category = <Scales.Category> this._scale;
@@ -51,15 +54,11 @@ export module Axes {
       } else {
         fakeScale.range([offeredHeight, 0]);
       }
-      var textResult = this._measureTicks(offeredWidth,
-                                          offeredHeight,
-                                          fakeScale,
-                                          categoryScale.domain());
+      var measureResult = this._measureTicks(offeredWidth, offeredHeight, fakeScale, categoryScale.domain());
+
       return {
-        width: textResult.usedWidth  + widthRequiredByTicks,
-        height: textResult.usedHeight + heightRequiredByTicks,
-        wantsWidth: !textResult.textFits,
-        wantsHeight: !textResult.textFits
+        minWidth: measureResult.usedWidth + widthRequiredByTicks,
+        minHeight: measureResult.usedHeight + heightRequiredByTicks
       };
     }
 
@@ -190,8 +189,8 @@ export module Axes {
       };
     }
 
-    public _doRender() {
-      super._doRender();
+    protected _render() {
+      super._render();
       var catScale = <Scales.Category> this._scale;
       var tickLabels = this._tickLabelContainer.selectAll("." + Axis.TICK_LABEL_CLASS).data(this._scale.domain(), (d) => d);
 

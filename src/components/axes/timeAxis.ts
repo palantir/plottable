@@ -252,7 +252,7 @@ export module Axes {
       return super.orient(orientation); // maintains getter-setter functionality
     }
 
-    public _computeHeight() {
+    protected _computeHeight() {
       var textHeight = this._measurer.measure().height;
 
       this._tierHeights = [];
@@ -435,7 +435,7 @@ export module Axes {
       return this._getTickIntervalValues(this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex - 1][0]);
     }
 
-    public _doRender() {
+    protected _render() {
       this._mostPreciseConfigIndex = this._getMostPreciseConfigurationIndex();
       var tierConfigs = this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex];
 

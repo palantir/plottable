@@ -189,27 +189,6 @@ describe("Metadata", () => {
     svg.remove();
   });
 
-  it("_getExtent works as expected with plot metadata", () => {
-    var svg = TestMethods.generateSVG(400, 400);
-    var metadata = {foo: 11};
-    var id = (d: any) => d;
-    var dataset = new Plottable.Dataset(data1, metadata);
-    var a = (d: any, i: number, u: any, m: any) => d.x + u.foo + m.foo;
-    var plot = new Plottable.Plot().project("a", a, xScale);
-    (<any> plot)._getPlotMetadataForDataset = (key: string) => {
-      return {
-        datasetKey: key,
-        foo: 5
-      };
-    };
-    plot.addDataset(dataset);
-    plot.renderTo(svg);
-    assert.deepEqual(dataset._getExtent(a, id), [16, 17], "plot metadata is reflected in extent results");
-    dataset.metadata({foo: 0});
-    assert.deepEqual(dataset._getExtent(a, id), [5, 6], "plot metadata is reflected in extent results after change user metadata");
-    svg.remove();
-  });
-
   it("each plot passes metadata to projectors", () => {
     var svg = TestMethods.generateSVG(400, 400);
     var metadata = {foo: 11};
@@ -224,7 +203,7 @@ describe("Metadata", () => {
 
       // This should not crash. If some metadata is not passed, undefined property error will be raised during accessor call.
       plot.renderTo(svg);
-      plot.remove();
+      plot.destroy();
     };
 
     checkPlot(new Plottable.Plots.Area(xScale, yScale));

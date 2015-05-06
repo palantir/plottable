@@ -70,8 +70,8 @@ describe("SelectionBoxLayer", () => {
 
   it("has an effective size of 0, but will occupy all offered space", () => {
     var sbl = new Plottable.Components.SelectionBoxLayer();
-    var request = sbl._requestedSpace(400, 400);
-    TestMethods.verifySpaceRequest(request, 0, 0, false, false, "occupies and asks for no space");
+    var request = sbl.requestedSpace(400, 400);
+    TestMethods.verifySpaceRequest(request, 0, 0, "does not request any space");
     assert.isTrue(sbl._isFixedWidth(), "fixed width");
     assert.isTrue(sbl._isFixedHeight(), "fixed height");
   });

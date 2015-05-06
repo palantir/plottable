@@ -1,9 +1,6 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Core {
-export module RenderControllers {
-
   export module RenderPolicies {
     /**
      * A policy to render components.
@@ -18,7 +15,7 @@ export module RenderControllers {
      */
     export class Immediate implements RenderPolicy {
       public render() {
-        RenderControllers.flush();
+        RenderController.flush();
       }
     }
 
@@ -28,7 +25,7 @@ export module RenderControllers {
      */
     export class AnimationFrame implements RenderPolicy {
       public render() {
-        Utils.DOM.requestAnimationFramePolyfill(RenderControllers.flush);
+        Utils.DOM.requestAnimationFramePolyfill(RenderController.flush);
       }
     }
 
@@ -41,11 +38,8 @@ export module RenderControllers {
       public _timeoutMsec: number = Utils.DOM.POLYFILL_TIMEOUT_MSEC;
 
       public render() {
-        setTimeout(RenderControllers.flush, this._timeoutMsec);
+        setTimeout(RenderController.flush, this._timeoutMsec);
       }
     }
   }
-
-}
-}
 }
