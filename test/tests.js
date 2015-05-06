@@ -5902,26 +5902,6 @@ describe("Metadata", function () {
         assert.closeTo(parseFloat(c4Position[0]), 43, 0.01, "fourth circle is correct for second plot");
         svg.remove();
     });
-    it("_getExtent works as expected with plot metadata", function () {
-        var svg = TestMethods.generateSVG(400, 400);
-        var metadata = { foo: 11 };
-        var id = function (d) { return d; };
-        var dataset = new Plottable.Dataset(data1, metadata);
-        var a = function (d, i, u, m) { return d.x + u.foo + m.foo; };
-        var plot = new Plottable.Plot().project("a", a, xScale);
-        plot._getPlotMetadataForDataset = function (key) {
-            return {
-                datasetKey: key,
-                foo: 5
-            };
-        };
-        plot.addDataset(dataset);
-        plot.renderTo(svg);
-        assert.deepEqual(dataset._getExtent(a, id), [16, 17], "plot metadata is reflected in extent results");
-        dataset.metadata({ foo: 0 });
-        assert.deepEqual(dataset._getExtent(a, id), [5, 6], "plot metadata is reflected in extent results after change user metadata");
-        svg.remove();
-    });
     it("each plot passes metadata to projectors", function () {
         var svg = TestMethods.generateSVG(400, 400);
         var metadata = { foo: 11 };
@@ -6752,23 +6732,6 @@ describe("Dataset", function () {
         ds.offUpdate(callback);
         ds.data(newData2);
         assert.isFalse(callbackCalled, "callback was called when the data was changed");
-    });
-    it("_getExtent works as expected with user metadata", function () {
-        var data = [1, 2, 3, 4, 1];
-        var metadata = { foo: 11 };
-        var id = function (d) { return d; };
-        var dataset = new Plottable.Dataset(data, metadata);
-        var a1 = function (d, i, m) { return d + i - 2; };
-        assert.deepEqual(dataset._getExtent(a1, id), [-1, 5], "extent for numerical data works properly");
-        var a2 = function (d, i, m) { return d + m.foo; };
-        assert.deepEqual(dataset._getExtent(a2, id), [12, 15], "extent uses metadata appropriately");
-        dataset.metadata({ foo: -1 });
-        assert.deepEqual(dataset._getExtent(a2, id), [0, 3], "metadata change is reflected in extent results");
-        var a3 = function (d, i, m) { return "_" + d; };
-        assert.deepEqual(dataset._getExtent(a3, id), ["_1", "_2", "_3", "_4"], "extent works properly on string domains (no repeats)");
-        var a_toString = function (d) { return (d + 2).toString(); };
-        var coerce = function (d) { return +d; };
-        assert.deepEqual(dataset._getExtent(a_toString, coerce), [3, 6], "type coercion works as expected");
     });
 });
 
