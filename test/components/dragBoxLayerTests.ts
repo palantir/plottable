@@ -108,8 +108,12 @@ describe("Interactive Components", () => {
 
       assert.deepEqual(receivedBounds.topLeft, startPoint, "top-left point was set correctly");
       assert.deepEqual(receivedBounds.bottomRight, startPoint, "bottom-right point was set correctly");
-      dbl.onDragStart(null);
-      assert.isNull(dbl.onDragStart(), "can blank callback by passing null");
+
+      dbl.offDragStart(callback);
+
+
+      //TODO:
+      // assert.isNull(dbl.onDragStart(), "can blank callback by passing null");
 
       svg.remove();
     });
@@ -139,8 +143,11 @@ describe("Interactive Components", () => {
 
       assert.deepEqual(receivedBounds.topLeft, startPoint, "top-left point was set correctly");
       assert.deepEqual(receivedBounds.bottomRight, endPoint, "bottom-right point was set correctly");
-      dbl.onDrag(null);
-      assert.isNull(dbl.onDrag(), "can blank callback by passing null");
+      dbl.offDrag(callback);
+
+
+      //TODO:
+      // assert.isNull(dbl.onDrag(), "can blank callback by passing null");
 
       svg.remove();
     });
@@ -170,8 +177,11 @@ describe("Interactive Components", () => {
 
       assert.deepEqual(receivedBounds.topLeft, startPoint, "top-left point was set correctly");
       assert.deepEqual(receivedBounds.bottomRight, endPoint, "bottom-right point was set correctly");
-      dbl.onDragEnd(null);
-      assert.isNull(dbl.onDragEnd(), "can blank callback by passing null");
+
+      dbl.offDragEnd(callback);
+
+      //TODO
+      // assert.isNull(dbl.onDragEnd(), "can blank callback by passing null");
 
       svg.remove();
     });
