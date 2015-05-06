@@ -386,9 +386,18 @@ module Plottable {
      * @returns {Plot} The calling Plot.
      */
     public removeDataset(dataset: Dataset): Plot {
-      return this._removeDataset(this._keyForDataset(dataset));
+      var key = this._keyForDataset(dataset);
+      if (key != null && this._key2PlotDatasetKey.has(key)) {
+        var pdk = this._key2PlotDatasetKey.get(key);
+        pdk.drawer.remove();
+        pdk.dataset.offUpdate(this._onDatasetUpdateCallback);
+        this._datasetKeysInOrder.splice(this._datasetKeysInOrder.indexOf(key), 1);
+        this._key2PlotDatasetKey.remove(key);
+        this._onDatasetUpdate();
+      }
+      return this;
     }
-
+    
     /**
      * Returns the internal key for the Dataset, or undefined if not found
      */
@@ -401,18 +410,6 @@ module Plottable {
      */
     protected _keysForDatasets(datasets: Dataset[]) {
       return datasets.map((dataset) => this._keyForDataset(dataset)).filter((key) => key != null);
-    }
-
-    private _removeDataset(key: string): Plot {
-      if (key != null && this._key2PlotDatasetKey.has(key)) {
-        var pdk = this._key2PlotDatasetKey.get(key);
-        pdk.drawer.remove();
-        pdk.dataset.offUpdate(this._onDatasetUpdateCallback);
-        this._datasetKeysInOrder.splice(this._datasetKeysInOrder.indexOf(key), 1);
-        this._key2PlotDatasetKey.remove(key);
-        this._onDatasetUpdate();
-      }
-      return this;
     }
 
     public datasets(): Dataset[] {
