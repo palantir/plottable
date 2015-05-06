@@ -273,8 +273,8 @@ export module Plots {
         if (!qscale._userSetDomainer) {
           if (this._baselineValue != null) {
             qscale.domainer()
-              .addPaddingException(this._baselineValue, this)
-              .addIncludedValue(this._baselineValue, this);
+              .addPaddingException(this, this._baselineValue)
+              .addIncludedValue(this, this._baselineValue);
           } else {
             qscale.domainer()
               .removePaddingException(this)

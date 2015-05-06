@@ -48,7 +48,7 @@ export module Plots {
 
       if (!this._yScale._userSetDomainer) {
         if (constantBaseline != null) {
-          this._yScale.domainer().addPaddingException(constantBaseline, this);
+          this._yScale.domainer().addPaddingException(this, constantBaseline);
         } else {
           this._yScale.domainer().removePaddingException(this);
         }

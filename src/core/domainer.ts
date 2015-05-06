@@ -83,7 +83,7 @@ module Plottable {
      * @param {any} key The key to register the exception under.
      * @returns {Domainer} The calling domainer
      */
-    public addPaddingException(exception: any, key: any) {
+    public addPaddingException(key: any, exception: any) {
       this._paddingExceptions.set(key, exception);
       return this;
     }
@@ -109,7 +109,7 @@ module Plottable {
      * @param {any} key The key to register the value under.
      * @returns {Domainer} The calling domainer
      */
-    public addIncludedValue(value: any, key: any) {
+    public addIncludedValue(key: any, value: any) {
       this._includedValues.set(key, value);
       return this;
     }

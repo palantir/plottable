@@ -93,7 +93,7 @@ describe("Domainer", () => {
   });
 
   it("paddingException(n) will not pad beyond n", () => {
-    domainer.pad(0.1).addPaddingException(0, "keyLeft").addPaddingException(200, "keyRight");
+    domainer.pad(0.1).addPaddingException("keyLeft", 0).addPaddingException("keyRight", 200);
     var domain = domainer.computeDomain([[0, 100]], scale);
     assert.deepEqual(domain, [0, 105], "padding exceptions can be added by key");
     domain = domainer.computeDomain([[-100, 0]], scale);
@@ -114,7 +114,7 @@ describe("Domainer", () => {
     var timeScale = new Plottable.Scales.Time();
     timeScale.addExtentProvider((scale: Plottable.Scale<Date, number>) => [[startDate, endDate]]);
     timeScale.autoDomain();
-    domainer.pad().addPaddingException(startDate, "key");
+    domainer.pad().addPaddingException("key", startDate);
     timeScale.domainer(domainer);
     var domain = timeScale.domain();
     assert.deepEqual(domain[0], startDate);
@@ -122,7 +122,7 @@ describe("Domainer", () => {
   });
 
   it("include(n) works an expected", () => {
-    domainer.addIncludedValue(5, "key1");
+    domainer.addIncludedValue("key1", 5);
     var domain = domainer.computeDomain([[0, 10]], scale);
     assert.deepEqual(domain, [0, 10]);
     domain = domainer.computeDomain([[0, 3]], scale);
@@ -130,7 +130,7 @@ describe("Domainer", () => {
     domain = domainer.computeDomain([[100, 200]], scale);
     assert.deepEqual(domain, [5, 200]);
 
-    domainer.addIncludedValue(-3, "key2").addIncludedValue(0, "key3").addIncludedValue(10, "key4");
+    domainer.addIncludedValue("key2", -3).addIncludedValue("key3", 0).addIncludedValue("key4", 10);
     domain = domainer.computeDomain([[100, 200]], scale);
     assert.deepEqual(domain, [-3, 200]);
     domain = domainer.computeDomain([[0, 0]], scale);
@@ -142,7 +142,7 @@ describe("Domainer", () => {
     domain = domainer.computeDomain([[-100, -50]], scale);
     assert.deepEqual(domain, [-100, 5]);
 
-    domainer.addIncludedValue(10, "key5");
+    domainer.addIncludedValue("key5", 10);
     domain = domainer.computeDomain([[-100, -50]], scale);
     assert.deepEqual(domain, [-100, 10], "unregistered includedValues can be added");
     domainer.removeIncludedValue("key5");
@@ -157,7 +157,7 @@ describe("Domainer", () => {
     var timeScale = new Plottable.Scales.Time();
     timeScale.addExtentProvider((scale: Plottable.Scale<Date, number>) => [[startDate, endDate]]);
     timeScale.autoDomain();
-    domainer.addIncludedValue(includedDate, "key");
+    domainer.addIncludedValue("key", includedDate);
     timeScale.domainer(domainer);
     assert.deepEqual(timeScale.domain(), [includedDate, endDate], "domain was expanded to contain included date");
   });

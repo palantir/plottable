@@ -1432,7 +1432,7 @@ var Plottable;
          * @param {any} key The key to register the exception under.
          * @returns {Domainer} The calling domainer
          */
-        Domainer.prototype.addPaddingException = function (exception, key) {
+        Domainer.prototype.addPaddingException = function (key, exception) {
             this._paddingExceptions.set(key, exception);
             return this;
         };
@@ -1456,7 +1456,7 @@ var Plottable;
          * @param {any} key The key to register the value under.
          * @returns {Domainer} The calling domainer
          */
-        Domainer.prototype.addIncludedValue = function (value, key) {
+        Domainer.prototype.addIncludedValue = function (key, value) {
             this._includedValues.set(key, value);
             return this;
         };
@@ -7555,7 +7555,7 @@ var Plottable;
                     var qscale = scale;
                     if (!qscale._userSetDomainer) {
                         if (this._baselineValue != null) {
-                            qscale.domainer().addPaddingException(this._baselineValue, this).addIncludedValue(this._baselineValue, this);
+                            qscale.domainer().addPaddingException(this, this._baselineValue).addIncludedValue(this, this._baselineValue);
                         }
                         else {
                             qscale.domainer().removePaddingException(this).removeIncludedValue(this);
@@ -7944,7 +7944,7 @@ var Plottable;
                 var constantBaseline = uniqExtentVals.length === 1 ? uniqExtentVals[0] : null;
                 if (!this._yScale._userSetDomainer) {
                     if (constantBaseline != null) {
-                        this._yScale.domainer().addPaddingException(constantBaseline, this);
+                        this._yScale.domainer().addPaddingException(this, constantBaseline);
                     }
                     else {
                         this._yScale.domainer().removePaddingException(this);
@@ -8312,7 +8312,7 @@ var Plottable;
                 _super.prototype._updateYDomainer.call(this);
                 var scale = this._yScale;
                 if (!scale._userSetDomainer) {
-                    scale.domainer().addPaddingException(0, this).addIncludedValue(0, this);
+                    scale.domainer().addPaddingException(this, 0).addIncludedValue(this, 0);
                     // prepending "AREA_PLOT" is unnecessary but reduces likely of user accidentally creating collisions
                     scale._autoDomainIfAutomaticMode();
                 }
