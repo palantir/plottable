@@ -7079,8 +7079,10 @@ var Plottable;
                 return this;
             };
             Pie.prototype.innerRadiusScaledAccessor = function () {
-                var _this = this;
-                return this._innerRadiusScale == null ? d3.functor(this._innerRadius) : function (d, i, u, m) { return _this._innerRadiusScale.scale(_this._innerRadius); };
+                return Pie._scaledAccessor(this._innerRadius, this._innerRadiusScale);
+            };
+            Pie._scaledAccessor = function (value, scale) {
+                return scale == null ? d3.functor(value) : function (d, i, u, m) { return scale.scale(value); };
             };
             Pie.prototype.outerRadiusAccessor = function (outerRadiusAccessor) {
                 if (outerRadiusAccessor == null) {

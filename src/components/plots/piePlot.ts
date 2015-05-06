@@ -121,9 +121,13 @@ export module Plots {
     }
 
     public innerRadiusScaledAccessor(): _Accessor {
-      return this._innerRadiusScale == null ?
-               d3.functor(this._innerRadius) :
-               (d: any, i: number, u: any, m: Plots.PlotMetadata) => this._innerRadiusScale.scale(<D> this._innerRadius);
+      return Pie._scaledAccessor(this._innerRadius, this._innerRadiusScale);
+    }
+
+    private static _scaledAccessor<SD, SR>(value: SD, scale: Scale<SD, SR>): _Accessor {
+      return scale == null ?
+               d3.functor(value) :
+               (d: any, i: number, u: any, m: Plots.PlotMetadata) => scale.scale(value);
     }
 
     public outerRadiusAccessor(): _Accessor;
