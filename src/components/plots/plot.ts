@@ -93,11 +93,6 @@ module Plottable {
      */
     public addDataset(dataset: Dataset) {
       var key = "_" + this._nextSeriesIndex++;
-      this._addDataset(key, dataset);
-      return this;
-    }
-
-    private _addDataset(key: string, dataset: Dataset) {
       if (this._key2PlotDatasetKey.has(key)) {
         this.removeDataset(dataset);
       };
@@ -113,6 +108,7 @@ module Plottable {
 
       dataset.onUpdate(this._onDatasetUpdateCallback);
       this._onDatasetUpdate();
+      return this;
     }
 
     protected _getDrawer(key: string): Drawers.AbstractDrawer {

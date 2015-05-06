@@ -6450,10 +6450,6 @@ var Plottable;
          */
         Plot.prototype.addDataset = function (dataset) {
             var key = "_" + this._nextSeriesIndex++;
-            this._addDataset(key, dataset);
-            return this;
-        };
-        Plot.prototype._addDataset = function (key, dataset) {
             if (this._key2PlotDatasetKey.has(key)) {
                 this.removeDataset(dataset);
             }
@@ -6468,6 +6464,7 @@ var Plottable;
             }
             dataset.onUpdate(this._onDatasetUpdateCallback);
             this._onDatasetUpdate();
+            return this;
         };
         Plot.prototype._getDrawer = function (key) {
             return new Plottable.Drawers.AbstractDrawer(key);

@@ -52,7 +52,7 @@ describe("Plots", () => {
       assert.strictEqual(ds1PlotMetadata.offsets.get("1"), 1, "positive offset was used");
       assert.strictEqual(ds4PlotMetadata.offsets.get("1"), 2, "positive offset was used");
     });
-//
+
     it("uses negative offset on stacking the 0 value on all negative/0 valued data", () => {
       var data0 = [
         {x: 1, y: -2}
