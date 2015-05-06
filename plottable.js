@@ -7120,58 +7120,38 @@ var Plottable;
                 return Pie._scaledAccessor(this._sectorValue, this._sectorValueScale);
             };
             Pie.prototype._updateOuterRadiusScaleExtents = function () {
-                var _this = this;
-                var accessor = this._outerRadius;
-                var scale = this._outerRadiusScale;
-                var coercer = (scale != null) ? scale._typeCoercer : function (d) { return d; };
-                var extents = this._datasetKeysInOrder.map(function (key) {
-                    var plotDatasetKey = _this._key2PlotDatasetKey.get(key);
-                    var dataset = plotDatasetKey.dataset;
-                    var plotMetadata = plotDatasetKey.plotMetadata;
-                    return dataset._getExtent(accessor, coercer, plotMetadata);
-                });
-                this._outerRadiusExtents = extents;
-                if (scale != null) {
-                    scale._autoDomainIfAutomaticMode();
+                this._outerRadiusExtents = this._pieDatasetExtents(this._outerRadius, this._outerRadiusScale);
+                if (this._outerRadiusScale != null) {
+                    this._outerRadiusScale._autoDomainIfAutomaticMode();
                 }
             };
             Pie.prototype._anchoredExtents = function (extents) {
                 return this._isAnchored ? extents : [];
             };
             Pie.prototype._updateInnerRadiusScaleExtents = function () {
-                var _this = this;
-                var accessor = this._innerRadius;
-                var scale = this._innerRadiusScale;
-                var coercer = (scale != null) ? scale._typeCoercer : function (d) { return d; };
-                var extents = this._datasetKeysInOrder.map(function (key) {
-                    var plotDatasetKey = _this._key2PlotDatasetKey.get(key);
-                    var dataset = plotDatasetKey.dataset;
-                    var plotMetadata = plotDatasetKey.plotMetadata;
-                    return dataset._getExtent(accessor, coercer, plotMetadata);
-                });
-                this._innerRadiusExtents = extents;
-                if (scale != null) {
-                    scale._autoDomainIfAutomaticMode();
+                this._innerRadiusExtents = this._pieDatasetExtents(this._innerRadius, this._innerRadiusScale);
+                if (this._innerRadiusScale != null) {
+                    this._innerRadiusScale._autoDomainIfAutomaticMode();
                 }
             };
             Pie.prototype._updateSectorValueScaleExtents = function () {
+                this._sectorValueExtents = this._pieDatasetExtents(this._sectorValue, this._sectorValueScale);
+                if (this._sectorValueScale != null) {
+                    this._sectorValueScale._autoDomainIfAutomaticMode();
+                }
+            };
+            Pie.prototype._pieDatasetExtents = function (accessor, scale) {
                 var _this = this;
-                var accessor = this._sectorValue;
                 if (accessor == null) {
                     return;
                 }
-                var scale = this._sectorValueScale;
                 var coercer = (scale != null) ? scale._typeCoercer : function (d) { return d; };
-                var extents = this._datasetKeysInOrder.map(function (key) {
+                return this._datasetKeysInOrder.map(function (key) {
                     var plotDatasetKey = _this._key2PlotDatasetKey.get(key);
                     var dataset = plotDatasetKey.dataset;
                     var plotMetadata = plotDatasetKey.plotMetadata;
                     return dataset._getExtent(accessor, coercer, plotMetadata);
                 });
-                this._sectorValueExtents = extents;
-                if (scale != null) {
-                    scale._autoDomainIfAutomaticMode();
-                }
             };
             Pie._scaledAccessor = function (accessor, scale) {
                 return scale == null ? accessor : function (d, i, u, m) { return scale.scale(accessor(d, i, u, m)); };

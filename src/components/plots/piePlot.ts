@@ -172,17 +172,8 @@ export module Plots {
     }
 
     private _updateOuterRadiusScaleExtents() {
-      var accessor = this._outerRadius;
-      var scale = this._outerRadiusScale;
-      var coercer = (scale != null) ? scale._typeCoercer : (d: any) => d;
-      var extents = this._datasetKeysInOrder.map((key) => {
-        var plotDatasetKey = this._key2PlotDatasetKey.get(key);
-        var dataset = plotDatasetKey.dataset;
-        var plotMetadata = plotDatasetKey.plotMetadata;
-        return dataset._getExtent(accessor, coercer, plotMetadata);
-      });
-      this._outerRadiusExtents = extents;
-      if (scale != null) { scale._autoDomainIfAutomaticMode(); }
+      this._outerRadiusExtents = this._pieDatasetExtents(this._outerRadius, this._outerRadiusScale);
+      if (this._outerRadiusScale != null) { this._outerRadiusScale._autoDomainIfAutomaticMode(); }
     }
 
     private _anchoredExtents(extents: any[]) {
@@ -190,32 +181,24 @@ export module Plots {
     }
 
     private _updateInnerRadiusScaleExtents() {
-      var accessor = this._innerRadius;
-      var scale = this._innerRadiusScale;
-      var coercer = (scale != null) ? scale._typeCoercer : (d: any) => d;
-      var extents = this._datasetKeysInOrder.map((key) => {
-        var plotDatasetKey = this._key2PlotDatasetKey.get(key);
-        var dataset = plotDatasetKey.dataset;
-        var plotMetadata = plotDatasetKey.plotMetadata;
-        return dataset._getExtent(accessor, coercer, plotMetadata);
-      });
-      this._innerRadiusExtents = extents;
-      if (scale != null) { scale._autoDomainIfAutomaticMode(); }
+      this._innerRadiusExtents = this._pieDatasetExtents(this._innerRadius, this._innerRadiusScale);
+      if (this._innerRadiusScale != null) { this._innerRadiusScale._autoDomainIfAutomaticMode(); }
     }
 
     private _updateSectorValueScaleExtents() {
-      var accessor = this._sectorValue;
+      this._sectorValueExtents = this._pieDatasetExtents(this._sectorValue, this._sectorValueScale);
+      if (this._sectorValueScale != null) { this._sectorValueScale._autoDomainIfAutomaticMode(); }
+    }
+
+    private _pieDatasetExtents(accessor: _Accessor, scale: Scale<D, number>) {
       if (accessor == null) { return; }
-      var scale = this._sectorValueScale;
       var coercer = (scale != null) ? scale._typeCoercer : (d: any) => d;
-      var extents = this._datasetKeysInOrder.map((key) => {
+      return this._datasetKeysInOrder.map((key) => {
         var plotDatasetKey = this._key2PlotDatasetKey.get(key);
         var dataset = plotDatasetKey.dataset;
         var plotMetadata = plotDatasetKey.plotMetadata;
         return dataset._getExtent(accessor, coercer, plotMetadata);
       });
-      this._sectorValueExtents = extents;
-      if (scale != null) { scale._autoDomainIfAutomaticMode(); }
     }
 
     private static _scaledAccessor<SD, SR>(accessor: _Accessor, scale: Scale<SD, SR>): _Accessor {
