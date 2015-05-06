@@ -8602,7 +8602,6 @@ describe("Interactions", function () {
                 lastPoint = p;
             };
             clickInteraction.onClick(callback);
-            assert.strictEqual(clickInteraction.onClick(), callback, "callback can be retrieved");
             TestMethods.triggerFakeMouseEvent("mousedown", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
             TestMethods.triggerFakeMouseEvent("mouseup", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
             assert.isTrue(callbackCalled, "callback called on clicking Component (mouse)");
@@ -8648,6 +8647,25 @@ describe("Interactions", function () {
             TestMethods.triggerFakeTouchEvent("touchmove", c.content(), [{ x: SVG_WIDTH * 2, y: SVG_HEIGHT * 2 }]);
             TestMethods.triggerFakeTouchEvent("touchend", c.content(), [{ x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 }]);
             assert.isTrue(callbackCalled, "callback called even if moved outside component (touch)");
+            svg.remove();
+        });
+        it("offClick()", function () {
+            var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var component = new Plottable.Component();
+            component.renderTo(svg);
+            var clickInteraction = new Plottable.Interactions.Click();
+            component.registerInteraction(clickInteraction);
+            var callbackWasCalled = false;
+            var callback = function () { return callbackWasCalled = true; };
+            clickInteraction.onClick(callback);
+            TestMethods.triggerFakeMouseEvent("mousedown", component.content(), 0, 0);
+            TestMethods.triggerFakeMouseEvent("mouseup", component.content(), 0, 0);
+            assert.isTrue(callbackWasCalled, "Click interaction should trigger the callback");
+            clickInteraction.offClick(callback);
+            callbackWasCalled = false;
+            TestMethods.triggerFakeMouseEvent("mousedown", component.content(), 0, 0);
+            TestMethods.triggerFakeMouseEvent("mouseup", component.content(), 0, 0);
+            assert.isFalse(callbackWasCalled, "Click interaction should trigger the callback");
             svg.remove();
         });
         it("cancelling touches cancels any ongoing clicks", function () {

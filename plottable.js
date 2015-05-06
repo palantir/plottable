@@ -9384,11 +9384,24 @@ var Plottable;
                 }
                 this._clickedDown = false;
             };
+            /**
+             * Sets the callback called when the Component is clicked.
+             *
+             * @param {(p: Point) => any} callback The callback to set.
+             * @return {Interaction.Click} The calling Interaction.Click.
+             */
             Click.prototype.onClick = function (callback) {
-                if (callback === undefined) {
-                    return this._clickCallback;
-                }
                 this._clickCallback = callback;
+                return this;
+            };
+            /**
+             * Removes the callback from click.
+             *
+             * @param {(p: Point) => any} callback The callback to remove.
+             * @return {Interaction.Click} The calling Interaction.Click.
+             */
+            Click.prototype.offClick = function (callback) {
+                this._clickCallback = function () { return true; };
                 return this;
             };
             return Click;

@@ -1,6 +1,9 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
+
+export type ClickCallback = (p: Point) => any;
+
 export module Interactions {
   export class Click extends Interaction {
 
@@ -38,26 +41,26 @@ export module Interactions {
     }
 
     /**
-     * Gets the callback called when the Component is clicked.
-     *
-     * @return {(p: Point) => any} The current callback.
-     */
-    public onClick(): (p: Point) => any;
-    /**
      * Sets the callback called when the Component is clicked.
      *
      * @param {(p: Point) => any} callback The callback to set.
      * @return {Interaction.Click} The calling Interaction.Click.
      */
-    public onClick(callback: (p: Point) => any): Interactions.Click;
-    public onClick(callback?: (p: Point) => any): any {
-      if (callback === undefined) {
-        return this._clickCallback;
-      }
+    public onClick(callback: ClickCallback) {
       this._clickCallback = callback;
       return this;
     }
 
+    /**
+     * Removes the callback from click.
+     *
+     * @param {(p: Point) => any} callback The callback to remove.
+     * @return {Interaction.Click} The calling Interaction.Click.
+     */
+    public offClick(callback: ClickCallback) {
+      this._clickCallback = () => true;
+      return this;
+    }
   }
 }
 }

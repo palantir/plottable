@@ -3750,22 +3750,24 @@ declare module Plottable {
 
 
 declare module Plottable {
+    type ClickCallback = (p: Point) => any;
     module Interactions {
         class Click extends Interaction {
             _anchor(component: Component): void;
-            /**
-             * Gets the callback called when the Component is clicked.
-             *
-             * @return {(p: Point) => any} The current callback.
-             */
-            onClick(): (p: Point) => any;
             /**
              * Sets the callback called when the Component is clicked.
              *
              * @param {(p: Point) => any} callback The callback to set.
              * @return {Interaction.Click} The calling Interaction.Click.
              */
-            onClick(callback: (p: Point) => any): Interactions.Click;
+            onClick(callback: ClickCallback): Click;
+            /**
+             * Removes the callback from click.
+             *
+             * @param {(p: Point) => any} callback The callback to remove.
+             * @return {Interaction.Click} The calling Interaction.Click.
+             */
+            offClick(callback: ClickCallback): Click;
         }
     }
 }
