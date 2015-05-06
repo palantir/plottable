@@ -40,10 +40,6 @@ module Plottable {
       this._callbacks.delete(callback);
     }
 
-    private _dispatchChange() {
-      this._callbacks.callCallbacks(this);
-    }
-
     /**
      * Gets the data.
      *
@@ -63,7 +59,7 @@ module Plottable {
       } else {
         this._data = data;
         this._accessor2cachedExtent = new Utils.StrictEqualityAssociativeArray();
-        this._dispatchChange();
+        this._callbacks.callCallbacks(this);
         return this;
       }
     }
@@ -88,7 +84,7 @@ module Plottable {
       } else {
         this._metadata = metadata;
         this._accessor2cachedExtent = new Utils.StrictEqualityAssociativeArray();
-        this._dispatchChange();
+        this._callbacks.callCallbacks(this);
         return this;
       }
     }

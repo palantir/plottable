@@ -1158,9 +1158,6 @@ var Plottable;
         Dataset.prototype.offUpdate = function (callback) {
             this._callbacks.delete(callback);
         };
-        Dataset.prototype._dispatchChange = function () {
-            this._callbacks.callCallbacks(this);
-        };
         Dataset.prototype.data = function (data) {
             if (data == null) {
                 return this._data;
@@ -1168,7 +1165,7 @@ var Plottable;
             else {
                 this._data = data;
                 this._accessor2cachedExtent = new Plottable.Utils.StrictEqualityAssociativeArray();
-                this._dispatchChange();
+                this._callbacks.callCallbacks(this);
                 return this;
             }
         };
@@ -1179,7 +1176,7 @@ var Plottable;
             else {
                 this._metadata = metadata;
                 this._accessor2cachedExtent = new Plottable.Utils.StrictEqualityAssociativeArray();
-                this._dispatchChange();
+                this._callbacks.callCallbacks(this);
                 return this;
             }
         };
