@@ -7066,15 +7066,8 @@ var Plottable;
                 if (innerRadiusScale == null) {
                     return this._innerRadiusScale;
                 }
-                var prevScale = this._innerRadiusScale;
-                if (prevScale !== innerRadiusScale) {
-                    if (prevScale != null) {
-                        prevScale.offUpdate(this._renderCallback);
-                    }
-                    if (innerRadiusScale != null) {
-                        this._innerRadiusScale.onUpdate(this._renderCallback);
-                    }
-                }
+                Pie._replaceScaleBinding(this._innerRadiusScale, innerRadiusScale, this._renderCallback);
+                this._innerRadiusScale = innerRadiusScale;
                 this._render();
                 return this;
             };
@@ -7083,6 +7076,16 @@ var Plottable;
             };
             Pie._scaledAccessor = function (value, scale) {
                 return scale == null ? d3.functor(value) : function (d, i, u, m) { return scale.scale(value); };
+            };
+            Pie._replaceScaleBinding = function (oldScale, newScale, callback) {
+                if (oldScale !== newScale) {
+                    if (oldScale != null) {
+                        oldScale.offUpdate(callback);
+                    }
+                    if (newScale != null) {
+                        newScale.onUpdate(callback);
+                    }
+                }
             };
             Pie.prototype.outerRadiusAccessor = function (outerRadiusAccessor) {
                 if (outerRadiusAccessor == null) {

@@ -106,16 +106,8 @@ export module Plots {
       if (innerRadiusScale == null) {
         return this._innerRadiusScale;
       }
-      var prevScale = this._innerRadiusScale;
-      if (prevScale !== innerRadiusScale) {
-        if (prevScale != null) {
-          prevScale.offUpdate(this._renderCallback);
-        }
-
-        if (innerRadiusScale != null) {
-          this._innerRadiusScale.onUpdate(this._renderCallback);
-        }
-      }
+      Pie._replaceScaleBinding(this._innerRadiusScale, innerRadiusScale, this._renderCallback);
+      this._innerRadiusScale = innerRadiusScale;
       this._render();
       return this;
     }
@@ -128,6 +120,18 @@ export module Plots {
       return scale == null ?
                d3.functor(value) :
                (d: any, i: number, u: any, m: Plots.PlotMetadata) => scale.scale(value);
+    }
+
+    private static _replaceScaleBinding(oldScale: Scale<any, any>, newScale: Scale<any, any>, callback: ScaleCallback<Scale<any, any>>) {
+      if (oldScale !== newScale) {
+        if (oldScale != null) {
+          oldScale.offUpdate(callback);
+        }
+
+        if (newScale != null) {
+          newScale.onUpdate(callback);
+        }
+      }
     }
 
     public outerRadiusAccessor(): _Accessor;
