@@ -172,7 +172,7 @@ export module Plots {
     }
 
     private _updateOuterRadiusScaleExtents() {
-      this._outerRadiusExtents = this._pieDatasetExtents(this._outerRadius, this._outerRadiusScale);
+      this._outerRadiusExtents = this._datasetExtents(this._outerRadius, this._outerRadiusScale);
       if (this._outerRadiusScale != null) { this._outerRadiusScale._autoDomainIfAutomaticMode(); }
     }
 
@@ -181,16 +181,16 @@ export module Plots {
     }
 
     private _updateInnerRadiusScaleExtents() {
-      this._innerRadiusExtents = this._pieDatasetExtents(this._innerRadius, this._innerRadiusScale);
+      this._innerRadiusExtents = this._datasetExtents(this._innerRadius, this._innerRadiusScale);
       if (this._innerRadiusScale != null) { this._innerRadiusScale._autoDomainIfAutomaticMode(); }
     }
 
     private _updateSectorValueScaleExtents() {
-      this._sectorValueExtents = this._pieDatasetExtents(this._sectorValue, this._sectorValueScale);
+      this._sectorValueExtents = this._datasetExtents(this._sectorValue, this._sectorValueScale);
       if (this._sectorValueScale != null) { this._sectorValueScale._autoDomainIfAutomaticMode(); }
     }
 
-    private _pieDatasetExtents(accessor: _Accessor, scale: Scale<D, number>) {
+    private _datasetExtents(accessor: _Accessor, scale: Scale<D, number>) {
       if (accessor == null) { return; }
       var coercer = (scale != null) ? scale._typeCoercer : (d: any) => d;
       return this._datasetKeysInOrder.map((key) => {
