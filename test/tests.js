@@ -8665,7 +8665,32 @@ describe("Interactions", function () {
             callbackWasCalled = false;
             TestMethods.triggerFakeMouseEvent("mousedown", component.content(), 0, 0);
             TestMethods.triggerFakeMouseEvent("mouseup", component.content(), 0, 0);
-            assert.isFalse(callbackWasCalled, "Click interaction should trigger the callback");
+            assert.isFalse(callbackWasCalled, "Callback should be disconnected from the click interaction");
+            svg.remove();
+        });
+        it("multiple click listeners", function () {
+            var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var component = new Plottable.Component();
+            component.renderTo(svg);
+            var clickInteraction = new Plottable.Interactions.Click();
+            component.registerInteraction(clickInteraction);
+            var callback1WasCalled = false;
+            var callback1 = function () { return callback1WasCalled = true; };
+            var callback2WasCalled = false;
+            var callback2 = function () { return callback2WasCalled = true; };
+            clickInteraction.onClick(callback1);
+            clickInteraction.onClick(callback2);
+            TestMethods.triggerFakeMouseEvent("mousedown", component.content(), 0, 0);
+            TestMethods.triggerFakeMouseEvent("mouseup", component.content(), 0, 0);
+            assert.isTrue(callback1WasCalled, "Click interaction should trigger the first callback");
+            assert.isTrue(callback2WasCalled, "Click interaction should trigger the second callback");
+            clickInteraction.offClick(callback1);
+            callback1WasCalled = false;
+            callback2WasCalled = false;
+            TestMethods.triggerFakeMouseEvent("mousedown", component.content(), 0, 0);
+            TestMethods.triggerFakeMouseEvent("mouseup", component.content(), 0, 0);
+            assert.isFalse(callback1WasCalled, "Callback1 should be disconnected from the click interaction");
+            assert.isTrue(callback2WasCalled, "Callback2 should still exist on the click interaction");
             svg.remove();
         });
         it("cancelling touches cancels any ongoing clicks", function () {
