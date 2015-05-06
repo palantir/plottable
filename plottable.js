@@ -7009,7 +7009,7 @@ var Plottable;
                 var _this = this;
                 _super.call(this);
                 this._colorScale = new Plottable.Scales.Color();
-                this._innerRadius = 0;
+                this._innerRadius = function () { return 0; };
                 this._outerRadius = function () { return Math.min(_this.width(), _this.height()) / 2; };
                 this.classed("pie-plot", true);
             }
@@ -7049,7 +7049,7 @@ var Plottable;
                 if (sectorValue == null) {
                     return Pie._constructBinding(this._sectorValue, this._sectorValueScale);
                 }
-                this._sectorValue = sectorValue;
+                this._sectorValue = d3.functor(sectorValue);
                 Pie._replaceScaleBinding(this._sectorValueScale, sectorValueScale, this._renderCallback);
                 this._sectorValueScale = sectorValueScale;
                 this._render();
@@ -7059,7 +7059,7 @@ var Plottable;
                 if (innerRadius == null) {
                     return Pie._constructBinding(this._innerRadius, this._innerRadiusScale);
                 }
-                this._innerRadius = innerRadius;
+                this._innerRadius = d3.functor(innerRadius);
                 Pie._replaceScaleBinding(this._innerRadiusScale, innerRadiusScale, this._renderCallback);
                 this._innerRadiusScale = innerRadiusScale;
                 this._render();
@@ -7069,7 +7069,7 @@ var Plottable;
                 if (outerRadius == null) {
                     return Pie._constructBinding(this._outerRadius, this._outerRadiusScale);
                 }
-                this._outerRadius = outerRadius;
+                this._outerRadius = d3.functor(outerRadius);
                 Pie._replaceScaleBinding(this._outerRadiusScale, outerRadiusScale, this._renderCallback);
                 this._outerRadiusScale = outerRadiusScale;
                 this._render();
@@ -7085,7 +7085,7 @@ var Plottable;
                 return Pie._scaledValueAccessor(this._sectorValue, this._sectorValueScale);
             };
             Pie._scaledValueAccessor = function (value, scale) {
-                return scale == null ? d3.functor(value) : function (d, i, u, m) { return scale.scale(value); };
+                return scale == null ? value : function (d, i, u, m) { return scale.scale(value(d, i, u, m)); };
             };
             Pie._constructBinding = function (value, scale) {
                 return scale == null ? { accessor: value } : { accessor: value, scale: scale };

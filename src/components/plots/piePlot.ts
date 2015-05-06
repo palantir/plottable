@@ -3,8 +3,8 @@
 module Plottable {
 export module Plots {
 
-  export interface ValueScaleBinding<V, D, R> {
-    value: V | _Accessor | D;
+  export interface ValueScaleBinding<D, R> {
+    value: _Accessor;
     scale?: Scale<D, R>;
   }
 
@@ -21,11 +21,11 @@ export module Plots {
   export class Pie<D> extends Plot {
 
     private _colorScale: Scales.Color;
-    private _innerRadius: number | _Accessor | D;
+    private _innerRadius: _Accessor;
     private _innerRadiusScale: Scale<D, number>;
-    private _outerRadius: number | _Accessor | D;
+    private _outerRadius: _Accessor;
     private _outerRadiusScale: Scale<D, number>;
-    private _sectorValue: number | _Accessor | D;
+    private _sectorValue: _Accessor;
     private _sectorValueScale: Scale<D, number>;
 
     /**
@@ -36,7 +36,7 @@ export module Plots {
     constructor() {
       super();
       this._colorScale = new Scales.Color();
-      this._innerRadius = 0;
+      this._innerRadius = () => 0;
       this._outerRadius = () => Math.min(this.width(), this.height()) / 2;
       this.classed("pie-plot", true);
     }
@@ -80,42 +80,42 @@ export module Plots {
       return allPlotData;
     }
 
-    public sectorValue(): ValueScaleBinding<number, D, number>;
+    public sectorValue(): ValueScaleBinding<D, number>;
     public sectorValue(sectorValue: number | _Accessor): Plots.Pie<D>;
     public sectorValue(sectorValue: D | _Accessor, sectorValueScale: Scale<D, number>): Plots.Pie<D>;
     public sectorValue(sectorValue?: number | _Accessor | D, sectorValueScale?: Scale<D, number>): any {
       if (sectorValue == null) {
         return Pie._constructBinding(this._sectorValue, this._sectorValueScale);
       }
-      this._sectorValue = sectorValue;
+      this._sectorValue = d3.functor(sectorValue);
       Pie._replaceScaleBinding(this._sectorValueScale, sectorValueScale, this._renderCallback);
       this._sectorValueScale = sectorValueScale;
       this._render();
       return this;
     }
 
-    public innerRadius(): ValueScaleBinding<number, D, number>;
+    public innerRadius(): ValueScaleBinding<D, number>;
     public innerRadius(innerRadius: number | _Accessor): Plots.Pie<D>;
     public innerRadius(innerRadius: D | _Accessor, innerRadiusScale: Scale<D, number>): Plots.Pie<D>;
     public innerRadius(innerRadius?: number | _Accessor | D, innerRadiusScale?: Scale<D, number>): any {
       if (innerRadius == null) {
         return Pie._constructBinding(this._innerRadius, this._innerRadiusScale);
       }
-      this._innerRadius = innerRadius;
+      this._innerRadius = d3.functor(innerRadius);
       Pie._replaceScaleBinding(this._innerRadiusScale, innerRadiusScale, this._renderCallback);
       this._innerRadiusScale = innerRadiusScale;
       this._render();
       return this;
     }
 
-    public outerRadius(): ValueScaleBinding<number, D, number>;
+    public outerRadius(): ValueScaleBinding<D, number>;
     public outerRadius(outerRadius: number | _Accessor): Plots.Pie<D>;
     public outerRadius(outerRadius: D | _Accessor, outerRadiusScale: Scale<D, number>): Plots.Pie<D>;
     public outerRadius(outerRadius?: number | _Accessor | D, outerRadiusScale?: Scale<D, number>): any {
       if (outerRadius == null) {
         return Pie._constructBinding(this._outerRadius, this._outerRadiusScale);
       }
-      this._outerRadius = outerRadius;
+      this._outerRadius = d3.functor(outerRadius);
       Pie._replaceScaleBinding(this._outerRadiusScale, outerRadiusScale, this._renderCallback);
       this._outerRadiusScale = outerRadiusScale;
       this._render();
@@ -134,10 +134,10 @@ export module Plots {
       return Pie._scaledValueAccessor(this._sectorValue, this._sectorValueScale);
     }
 
-    private static _scaledValueAccessor<V, SD, SR>(value: V | SD | _Accessor, scale: Scale<SD, SR>): _Accessor {
+    private static _scaledValueAccessor<V, SD, SR>(value: _Accessor, scale: Scale<SD, SR>): _Accessor {
       return scale == null ?
-               d3.functor(<_Accessor> value) :
-               (d: any, i: number, u: any, m: Plots.PlotMetadata) => scale.scale(<SD> value);
+               value :
+               (d: any, i: number, u: any, m: Plots.PlotMetadata) => scale.scale(value(d, i, u, m));
     }
 
     private static _constructBinding<V, D, R>(value: V | _Accessor, scale: Scale<D, number>) {
