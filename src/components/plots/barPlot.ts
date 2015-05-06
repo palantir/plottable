@@ -11,7 +11,7 @@ export module Plots {
     private _baselineValue: number;
     private _barAlignmentFactor = 0.5;
     protected _isVertical: boolean;
-    private _barLabelFormatter: Formatter = Formatters.identity();
+    private _labelFormatter: Formatter = Formatters.identity();
     private _labelsEnabled = false;
     private _hideBarsIfAnyAreTooWide = true;
     private _defaultFillColor: string;
@@ -120,19 +120,19 @@ export module Plots {
      *
      * @returns {Formatter} The formatting function for bar labels.
      */
-    public barLabelFormatter(): Formatter;
+    public labelFormatter(): Formatter;
     /**
      * Change the formatting function for bar labels.
      * @param {Formatter} The formatting function for bar labels.
      *
      * @returns {Bar} The calling plot.
      */
-    public barLabelFormatter(formatter: Formatter): Bar<X, Y>;
-    public barLabelFormatter(formatter?: Formatter): any {
+    public labelFormatter(formatter: Formatter): Bar<X, Y>;
+    public labelFormatter(formatter?: Formatter): any {
       if (formatter == null) {
-        return this._barLabelFormatter;
+        return this._labelFormatter;
       } else {
-        this._barLabelFormatter = formatter;
+        this._labelFormatter = formatter;
         this.render();
         return this;
       }
@@ -391,9 +391,9 @@ export module Plots {
       };
 
       var primaryAccessor = this._projections[primaryAttr].accessor;
-      if (this.labelsEnabled && this.barLabelFormatter) {
+      if (this.labelsEnabled && this.labelFormatter) {
         attrToProjector["label"] = (d: any, i: number, u: any, m: PlotMetadata) => {
-          return this._barLabelFormatter(primaryAccessor(d, i, u, m));
+          return this._labelFormatter(primaryAccessor(d, i, u, m));
         };
         attrToProjector["positive"] = (d: any, i: number, u: any, m: PlotMetadata) =>
           originalPositionFn(d, i, u, m) <= scaledBaseline;

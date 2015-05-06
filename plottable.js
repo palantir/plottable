@@ -7407,7 +7407,7 @@ var Plottable;
                 if (isVertical === void 0) { isVertical = true; }
                 _super.call(this, xScale, yScale);
                 this._barAlignmentFactor = 0.5;
-                this._barLabelFormatter = Plottable.Formatters.identity();
+                this._labelFormatter = Plottable.Formatters.identity();
                 this._labelsEnabled = false;
                 this._hideBarsIfAnyAreTooWide = true;
                 this.classed("bar-plot", true);
@@ -7463,12 +7463,12 @@ var Plottable;
                     return this;
                 }
             };
-            Bar.prototype.barLabelFormatter = function (formatter) {
+            Bar.prototype.labelFormatter = function (formatter) {
                 if (formatter == null) {
-                    return this._barLabelFormatter;
+                    return this._labelFormatter;
                 }
                 else {
-                    this._barLabelFormatter = formatter;
+                    this._labelFormatter = formatter;
                     this.render();
                     return this;
                 }
@@ -7690,9 +7690,9 @@ var Plottable;
                     return (originalPos > scaledBaseline) ? scaledBaseline : originalPos;
                 };
                 var primaryAccessor = this._projections[primaryAttr].accessor;
-                if (this.labelsEnabled && this.barLabelFormatter) {
+                if (this.labelsEnabled && this.labelFormatter) {
                     attrToProjector["label"] = function (d, i, u, m) {
-                        return _this._barLabelFormatter(primaryAccessor(d, i, u, m));
+                        return _this._labelFormatter(primaryAccessor(d, i, u, m));
                     };
                     attrToProjector["positive"] = function (d, i, u, m) { return originalPositionFn(d, i, u, m) <= scaledBaseline; };
                 }

@@ -2979,14 +2979,14 @@ declare module Plottable {
              *
              * @returns {Formatter} The formatting function for bar labels.
              */
-            barLabelFormatter(): Formatter;
+            labelFormatter(): Formatter;
             /**
              * Change the formatting function for bar labels.
              * @param {Formatter} The formatting function for bar labels.
              *
              * @returns {Bar} The calling plot.
              */
-            barLabelFormatter(formatter: Formatter): Bar<X, Y>;
+            labelFormatter(formatter: Formatter): Bar<X, Y>;
             /**
              * Retrieves the closest PlotData to queryPoint.
              *
