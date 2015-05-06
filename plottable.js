@@ -7011,9 +7011,9 @@ var Plottable;
                 this._colorScale = new Plottable.Scales.Color();
                 this._innerRadius = function () { return 0; };
                 this._outerRadius = function () { return Math.min(_this.width(), _this.height()) / 2; };
-                this._innerRadiusExtentProvider = function (scale) { return _this._innerRadiusExtentsForScale(scale); };
-                this._outerRadiusExtentProvider = function (scale) { return _this._outerRadiusExtentsForScale(scale); };
-                this._sectorValueExtentProvider = function (scale) { return _this._sectorValueExtentsForScale(scale); };
+                this._innerRadiusExtentProvider = function (scale) { return _this._anchoredExtents(_this._innerRadiusExtents); };
+                this._outerRadiusExtentProvider = function (scale) { return _this._anchoredExtents(_this._outerRadiusExtents); };
+                this._sectorValueExtentProvider = function (scale) { return _this._anchoredExtents(_this._sectorValueExtents); };
                 this.classed("pie-plot", true);
             }
             Pie.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
@@ -7135,11 +7135,8 @@ var Plottable;
                     scale._autoDomainIfAutomaticMode();
                 }
             };
-            Pie.prototype._outerRadiusExtentsForScale = function (scale) {
-                if (!this._isAnchored) {
-                    return [];
-                }
-                return this._outerRadiusExtents;
+            Pie.prototype._anchoredExtents = function (extents) {
+                return this._isAnchored ? extents : [];
             };
             Pie.prototype._updateInnerRadiusScaleExtents = function () {
                 var _this = this;
@@ -7156,12 +7153,6 @@ var Plottable;
                 if (scale != null) {
                     scale._autoDomainIfAutomaticMode();
                 }
-            };
-            Pie.prototype._innerRadiusExtentsForScale = function (scale) {
-                if (!this._isAnchored) {
-                    return [];
-                }
-                return this._innerRadiusExtents;
             };
             Pie.prototype._updateSectorValueScaleExtents = function () {
                 var _this = this;
@@ -7181,12 +7172,6 @@ var Plottable;
                 if (scale != null) {
                     scale._autoDomainIfAutomaticMode();
                 }
-            };
-            Pie.prototype._sectorValueExtentsForScale = function (scale) {
-                if (!this._isAnchored) {
-                    return [];
-                }
-                return this._sectorValueExtents;
             };
             Pie._scaledAccessor = function (accessor, scale) {
                 return scale == null ? accessor : function (d, i, u, m) { return scale.scale(accessor(d, i, u, m)); };

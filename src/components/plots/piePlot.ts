@@ -44,9 +44,9 @@ export module Plots {
       this._colorScale = new Scales.Color();
       this._innerRadius = () => 0;
       this._outerRadius = () => Math.min(this.width(), this.height()) / 2;
-      this._innerRadiusExtentProvider = (scale: Scale<any, any>) => this._innerRadiusExtentsForScale(scale);
-      this._outerRadiusExtentProvider = (scale: Scale<any, any>) => this._outerRadiusExtentsForScale(scale);
-      this._sectorValueExtentProvider = (scale: Scale<any, any>) => this._sectorValueExtentsForScale(scale);
+      this._innerRadiusExtentProvider = (scale: Scale<any, any>) => this._anchoredExtents(this._innerRadiusExtents);
+      this._outerRadiusExtentProvider = (scale: Scale<any, any>) => this._anchoredExtents(this._outerRadiusExtents);
+      this._sectorValueExtentProvider = (scale: Scale<any, any>) => this._anchoredExtents(this._sectorValueExtents);
       this.classed("pie-plot", true);
     }
 
@@ -185,11 +185,8 @@ export module Plots {
       if (scale != null) { scale._autoDomainIfAutomaticMode(); }
     }
 
-    private _outerRadiusExtentsForScale<D>(scale: Scale<D, any>) {
-      if (!this._isAnchored) {
-        return [];
-      }
-      return this._outerRadiusExtents;
+    private _anchoredExtents(extents: any[]) {
+      return this._isAnchored ? extents : [];
     }
 
     private _updateInnerRadiusScaleExtents() {
@@ -206,13 +203,6 @@ export module Plots {
       if (scale != null) { scale._autoDomainIfAutomaticMode(); }
     }
 
-    private _innerRadiusExtentsForScale<D>(scale: Scale<D, any>) {
-      if (!this._isAnchored) {
-        return [];
-      }
-      return this._innerRadiusExtents;
-    }
-
     private _updateSectorValueScaleExtents() {
       var accessor = this._sectorValue;
       if (accessor == null) { return; }
@@ -226,13 +216,6 @@ export module Plots {
       });
       this._sectorValueExtents = extents;
       if (scale != null) { scale._autoDomainIfAutomaticMode(); }
-    }
-
-    private _sectorValueExtentsForScale<D>(scale: Scale<D, any>) {
-      if (!this._isAnchored) {
-        return [];
-      }
-      return this._sectorValueExtents;
     }
 
     private static _scaledAccessor<SD, SR>(accessor: _Accessor, scale: Scale<SD, SR>): _Accessor {
