@@ -148,7 +148,7 @@ export module Components {
       var entryLengths: D3.Map<number> = d3.map();
       var untruncatedEntryLengths: D3.Map<number> = d3.map();
       entryNames.forEach((entryName) => {
-        var untruncatedEntryLength = (textHeight + this._measurer.measure(entryName).width + this._padding);
+        var untruncatedEntryLength = textHeight + this._measurer.measure(entryName).width + this._padding;
         var entryLength = Math.min(untruncatedEntryLength, availableWidthForEntries);
         entryLengths.set(entryName, entryLength);
         untruncatedEntryLengths.set(entryName, untruncatedEntryLength);
@@ -173,8 +173,8 @@ export module Components {
     public _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
       var estimatedLayout = this._calculateLayoutInfo(offeredWidth, offeredHeight);
 
-      var untruncatedRowLengths = estimatedLayout.rows.map((row: string[]) => {
-        return d3.sum(row, (entry: string) => estimatedLayout.untruncatedEntryLengths.get(entry));
+      var untruncatedRowLengths = estimatedLayout.rows.map((row) => {
+        return d3.sum(row, (entry) => estimatedLayout.untruncatedEntryLengths.get(entry));
       });
       var longestUntruncatedRowLength = Utils.Methods.max(untruncatedRowLengths, 0);
 

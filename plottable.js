@@ -5584,7 +5584,7 @@ var Plottable;
                 var entryLengths = d3.map();
                 var untruncatedEntryLengths = d3.map();
                 entryNames.forEach(function (entryName) {
-                    var untruncatedEntryLength = (textHeight + _this._measurer.measure(entryName).width + _this._padding);
+                    var untruncatedEntryLength = textHeight + _this._measurer.measure(entryName).width + _this._padding;
                     var entryLength = Math.min(untruncatedEntryLength, availableWidthForEntries);
                     entryLengths.set(entryName, entryLength);
                     untruncatedEntryLengths.set(entryName, untruncatedEntryLength);
