@@ -3199,7 +3199,7 @@ var Plottable;
             this._xOffset = 0; // Offset from Origin, used for alignment and floating positioning
             this._yOffset = 0;
             this._cssClasses = ["component"];
-            this._removed = false;
+            this._destroyed = false;
         }
         /**
          * Attaches the Component as a child of a given D3 Selection.
@@ -3208,7 +3208,7 @@ var Plottable;
          * @returns {Component} The calling Component.
          */
         Component.prototype.anchor = function (selection) {
-            if (this._removed) {
+            if (this._destroyed) {
                 throw new Error("Can't reuse remove()-ed components!");
             }
             if (selection.node().nodeName.toLowerCase() === "svg") {
@@ -3632,7 +3632,7 @@ var Plottable;
          * listening to (effectively destroying it).
          */
         Component.prototype.destroy = function () {
-            this._removed = true;
+            this._destroyed = true;
             this.detach();
         };
         /**

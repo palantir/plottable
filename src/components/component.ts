@@ -37,7 +37,7 @@ module Plottable {
     private _xOffset = 0; // Offset from Origin, used for alignment and floating positioning
     private _yOffset = 0;
     private _cssClasses: string[] = ["component"];
-    private _removed = false;
+    private _destroyed = false;
 
     /**
      * Attaches the Component as a child of a given D3 Selection.
@@ -46,7 +46,7 @@ module Plottable {
      * @returns {Component} The calling Component.
      */
     public anchor(selection: D3.Selection) {
-      if (this._removed) {
+      if (this._destroyed) {
         throw new Error("Can't reuse remove()-ed components!");
       }
 
@@ -501,7 +501,7 @@ module Plottable {
      * listening to (effectively destroying it).
      */
     public destroy() {
-      this._removed = true;
+      this._destroyed = true;
       this.detach();
     }
 
