@@ -16,8 +16,8 @@ export module Drawers {
       var metadata = (<any> this._piePlot)._key2PlotDatasetKey.get(this.key).dataset.metadata();
       var plotMetadata = (<any> this._piePlot)._key2PlotDatasetKey.get(this.key).plotMetadata;
       return d3.svg.arc()
-                   .innerRadius((d, i) => this._piePlot.scaledInnerRadiusAccessor()(d, i, metadata, plotMetadata))
-                   .outerRadius((d, i) => this._piePlot.scaledOuterRadiusAccessor()(d, i, metadata, plotMetadata));
+                   .innerRadius((d, i) => this._piePlot.scaledInnerRadiusAccessor()(d.data, i, metadata, plotMetadata))
+                   .outerRadius((d, i) => this._piePlot.scaledOuterRadiusAccessor()(d.data, i, metadata, plotMetadata));
     }
 
     private retargetProjectors(attrToProjector: AttributeToAppliedProjector): AttributeToAppliedProjector {

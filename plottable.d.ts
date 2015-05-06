@@ -2842,6 +2842,7 @@ declare module Plottable {
              */
             constructor();
             computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Pie<D>;
+            anchor(selection: D3.Selection): Pie<D>;
             addDataset(keyOrDataset: any, dataset?: any): Pie<D>;
             protected _generateAttrToProjector(): AttributeToProjector;
             protected _getDrawer(key: string): Drawers.AbstractDrawer;
@@ -2852,6 +2853,7 @@ declare module Plottable {
             innerRadius(): AccessorScaleBinding<D, number>;
             innerRadius(innerRadius: number | _Accessor): Plots.Pie<D>;
             innerRadius(innerRadius: D | _Accessor, innerRadiusScale: Scale<D, number>): Plots.Pie<D>;
+            protected _updateExtents(): void;
             outerRadius(): AccessorScaleBinding<D, number>;
             outerRadius(outerRadius: number | _Accessor): Plots.Pie<D>;
             outerRadius(outerRadius: D | _Accessor, outerRadiusScale: Scale<D, number>): Plots.Pie<D>;

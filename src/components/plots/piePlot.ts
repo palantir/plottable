@@ -25,6 +25,8 @@ export module Plots {
     private _innerRadiusScale: Scale<D, number>;
     private _outerRadius: _Accessor;
     private _outerRadiusScale: Scale<D, number>;
+    private _outerRadiusExtents: any[];
+    private _outerRadiusExtentProvider: Scales.ExtentProvider<any>;
     private _sectorValue: _Accessor;
     private _sectorValueScale: Scale<D, number>;
 
@@ -38,6 +40,7 @@ export module Plots {
       this._colorScale = new Scales.Color();
       this._innerRadius = () => 0;
       this._outerRadius = () => Math.min(this.width(), this.height()) / 2;
+      this._outerRadiusExtentProvider = (scale: Scale<any, any>) => this._outerRadiusExtentsForScale(scale);
       this.classed("pie-plot", true);
     }
 
@@ -51,6 +54,12 @@ export module Plots {
       if (this._outerRadiusScale != null) {
         this._outerRadiusScale.range([0, radiusLimit]);
       }
+      return this;
+    }
+
+    public anchor(selection: D3.Selection) {
+      super.anchor(selection);
+      this._updateOuterRadiusScaleExtents();
       return this;
     }
 
@@ -92,10 +101,10 @@ export module Plots {
     public sectorValue(sectorValue: D | _Accessor, sectorValueScale: Scale<D, number>): Plots.Pie<D>;
     public sectorValue(sectorValue?: number | _Accessor | D, sectorValueScale?: Scale<D, number>): any {
       if (sectorValue == null) {
-        return Pie._constructBinding(this._sectorValue, this._sectorValueScale);
+        return { accessor: this._sectorValue, scale: this._sectorValueScale };
       }
       this._sectorValue = d3.functor(sectorValue);
-      Pie._replaceScaleBinding(this._sectorValueScale, sectorValueScale, this._renderCallback);
+      Pie._replaceScaleBinding(this._sectorValueScale, sectorValueScale, this._renderCallback, null);
       this._sectorValueScale = sectorValueScale;
       this._render();
       return this;
@@ -106,13 +115,19 @@ export module Plots {
     public innerRadius(innerRadius: D | _Accessor, innerRadiusScale: Scale<D, number>): Plots.Pie<D>;
     public innerRadius(innerRadius?: number | _Accessor | D, innerRadiusScale?: Scale<D, number>): any {
       if (innerRadius == null) {
-        return Pie._constructBinding(this._innerRadius, this._innerRadiusScale);
+        return { accessor: this._outerRadius, scale: this._outerRadiusScale };
       }
       this._innerRadius = d3.functor(innerRadius);
-      Pie._replaceScaleBinding(this._innerRadiusScale, innerRadiusScale, this._renderCallback);
+      Pie._replaceScaleBinding(this._innerRadiusScale, innerRadiusScale, this._renderCallback, null);
       this._innerRadiusScale = innerRadiusScale;
       this._render();
       return this;
+    }
+    
+    protected _updateExtents() {
+      super._updateExtents();
+      this._updateOuterRadiusScaleExtents();
+      if (this._outerRadiusScale != null) { this._outerRadiusScale._autoDomainIfAutomaticMode(); }
     }
 
     public outerRadius(): AccessorScaleBinding<D, number>;
@@ -120,10 +135,11 @@ export module Plots {
     public outerRadius(outerRadius: D | _Accessor, outerRadiusScale: Scale<D, number>): Plots.Pie<D>;
     public outerRadius(outerRadius?: number | _Accessor | D, outerRadiusScale?: Scale<D, number>): any {
       if (outerRadius == null) {
-        return Pie._constructBinding(this._outerRadius, this._outerRadiusScale);
+        return { accessor: this._outerRadius, scale: this._outerRadiusScale };
       }
       this._outerRadius = d3.functor(outerRadius);
-      Pie._replaceScaleBinding(this._outerRadiusScale, outerRadiusScale, this._renderCallback);
+      this._updateOuterRadiusScaleExtents();
+      Pie._replaceScaleBinding(this._outerRadiusScale, outerRadiusScale, this._renderCallback, this._outerRadiusExtentProvider);
       this._outerRadiusScale = outerRadiusScale;
       this._render();
       return this;
@@ -141,24 +157,46 @@ export module Plots {
       return Pie._scaledValueAccessor(this._sectorValue, this._sectorValueScale);
     }
 
-    private static _scaledValueAccessor<V, SD, SR>(value: _Accessor, scale: Scale<SD, SR>): _Accessor {
+    private _updateOuterRadiusScaleExtents() {
+      var accessor = this._outerRadius;
+      var scale = this._outerRadiusScale;
+      var coercer = (scale != null) ? scale._typeCoercer : (d: any) => d;
+      var extents = this._datasetKeysInOrder.map((key) => {
+        var plotDatasetKey = this._key2PlotDatasetKey.get(key);
+        var dataset = plotDatasetKey.dataset;
+        var plotMetadata = plotDatasetKey.plotMetadata;
+        return dataset._getExtent(accessor, coercer, plotMetadata);
+      });
+      this._outerRadiusExtents = extents;
+      if (scale != null) { scale._autoDomainIfAutomaticMode(); }
+    }
+    
+    private _outerRadiusExtentsForScale<D>(scale: Scale<D, any>) {
+      if (!this._isAnchored) {
+        return [];
+      }
+      return this._outerRadiusExtents;
+    }
+
+    private static _scaledValueAccessor<SD, SR>(accessor: _Accessor, scale: Scale<SD, SR>): _Accessor {
       return scale == null ?
-               value :
-               (d: any, i: number, u: any, m: Plots.PlotMetadata) => scale.scale(value(d, i, u, m));
+               accessor :
+               (d: any, i: number, u: any, m: Plots.PlotMetadata) => scale.scale(accessor(d, i, u, m));
     }
 
-    private static _constructBinding<V, D, R>(value: V | _Accessor, scale: Scale<D, number>) {
-      return scale == null ? { accessor: value } : { accessor: value, scale: scale };
-    }
-
-    private static _replaceScaleBinding(oldScale: Scale<any, any>, newScale: Scale<any, any>, callback: ScaleCallback<Scale<any, any>>) {
+    private static _replaceScaleBinding(oldScale: Scale<any, any>, newScale: Scale<any, any>,
+                                        callback: ScaleCallback<Scale<any, any>>,
+                                        extentProvider: Scales.ExtentProvider<any>) {
       if (oldScale !== newScale) {
         if (oldScale != null) {
           oldScale.offUpdate(callback);
+          oldScale.removeExtentProvider(extentProvider);
+          oldScale._autoDomainIfAutomaticMode();
         }
 
         if (newScale != null) {
           newScale.onUpdate(callback);
+          newScale.addExtentProvider(extentProvider);
         }
       }
     }
