@@ -32,7 +32,7 @@ module Plottable {
 
     protected _renderArea: D3.Selection;
     protected _projections: { [attrToSet: string]: _Projection; } = {};
-    protected _attrToExtents: D3.Map<any[]>;
+    protected _attrExtents: D3.Map<any[]>;
     private _extentProvider: Scales.ExtentProvider<any>;
 
     protected _animate: boolean = false;
@@ -58,7 +58,7 @@ module Plottable {
       this.clipPathEnabled = true;
       this.classed("plot", true);
       this._key2PlotDatasetKey = d3.map();
-      this._attrToExtents = d3.map();
+      this._attrExtents = d3.map();
       this._extentProvider = (scale: Scale<any, any>) => this._extentsForScale(scale);
       this._datasetKeysInOrder = [];
       this._nextSeriesIndex = 0;
@@ -279,7 +279,7 @@ module Plottable {
         var plotMetadata = plotDatasetKey.plotMetadata;
         return this._computeExtent(dataset, accessor, coercer, plotMetadata);
       });
-      this._attrToExtents.set(attr, extents);
+      this._attrExtents.set(attr, extents);
     }
 
     private _computeExtent(dataset: Dataset, accessor: _Accessor, typeCoercer: (d: any) => any, plotMetadata: any): any[] {
@@ -305,7 +305,7 @@ module Plottable {
      * Override in subclass to add special extents, such as included values
      */
     protected _extentsForAttr(attr: string) {
-      return this._attrToExtents.get(attr);
+      return this._attrExtents.get(attr);
     }
 
     private _extentsForScale<D>(scale: Scale<D, any>): D[][] {
