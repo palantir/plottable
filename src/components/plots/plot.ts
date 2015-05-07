@@ -39,7 +39,7 @@ module Plottable {
     private _animators: Animators.PlotAnimatorMap = {};
     protected _animateOnNextRender = true;
     private _nextSeriesIndex: number;
-    private _renderCallback: ScaleCallback<Scale<any, any>>;
+    protected _renderCallback: ScaleCallback<Scale<any, any>>;
     private _onDatasetUpdateCallback: DatasetCallback;
 
     /**
@@ -282,7 +282,7 @@ module Plottable {
       this._attrToExtents.set(attr, extents);
     }
 
-    private _computeExtent(dataset: Dataset, accessor: _Accessor, typeCoercer: (d: any) => any, plotMetadata: any): any[] {
+    protected _computeExtent(dataset: Dataset, accessor: _Accessor, typeCoercer: (d: any) => any, plotMetadata: any): any[] {
       var data = dataset.data();
       var metadata = dataset.metadata();
       var appliedAccessor = (d: any, i: number) => accessor(d, i, metadata, plotMetadata);
@@ -308,7 +308,7 @@ module Plottable {
       return this._attrToExtents.get(attr);
     }
 
-    private _extentsForScale<D>(scale: Scale<D, any>): D[][] {
+    protected _extentsForScale<D>(scale: Scale<D, any>): D[][] {
       if (!this._isAnchored) {
         return [];
       }

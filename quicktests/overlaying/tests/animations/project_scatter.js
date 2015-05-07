@@ -52,7 +52,7 @@ function run(svg, data, Plottable) {
 
     basicTable.renderTo(svg);
 
-    var cb = function(x, y){
+    var cb = function(point){
       var d = dataseries1.data();
       dataseries1.data(d);
     };

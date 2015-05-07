@@ -7,11 +7,11 @@ describe("Drawers", () => {
       var data = [{value: 10}, {value: 10}, {value: 10}, {value: 10}];
       var piePlot = new Plottable.Plots.Pie();
 
-      var drawer = new Plottable.Drawers.Arc("_0"); // HACKHACK #1984: Dataset keys are being removed, so this is the internal key
+      var drawer = new Plottable.Drawers.Arc("_0", piePlot); // HACKHACK #1984: Dataset keys are being removed, so this is the internal key
       (<any> piePlot)._getDrawer = () => drawer;
 
       piePlot.addDataset(new Plottable.Dataset(data));
-      piePlot.project("value", "value");
+      piePlot.sectorValue((d) => d.value);
       piePlot.renderTo(svg);
 
       piePlot.getAllSelections().each(function (datum: any, index: number) {

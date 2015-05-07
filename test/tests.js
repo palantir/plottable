@@ -383,10 +383,10 @@ describe("Drawers", function () {
             var svg = TestMethods.generateSVG(300, 300);
             var data = [{ value: 10 }, { value: 10 }, { value: 10 }, { value: 10 }];
             var piePlot = new Plottable.Plots.Pie();
-            var drawer = new Plottable.Drawers.Arc("_0"); // HACKHACK #1984: Dataset keys are being removed, so this is the internal key
+            var drawer = new Plottable.Drawers.Arc("_0", piePlot); // HACKHACK #1984: Dataset keys are being removed, so this is the internal key
             piePlot._getDrawer = function () { return drawer; };
             piePlot.addDataset(new Plottable.Dataset(data));
-            piePlot.project("value", "value");
+            piePlot.sectorValue(function (d) { return d.value; });
             piePlot.renderTo(svg);
             piePlot.getAllSelections().each(function (datum, index) {
                 var pixelPoint = drawer._getPixelPoint(datum, index);
@@ -2583,7 +2583,7 @@ describe("Plots", function () {
         it("renders correctly with no data", function () {
             var svg = TestMethods.generateSVG(400, 400);
             var plot = new Plottable.Plots.Pie();
-            plot.project("value", function (d) { return d.value; });
+            plot.sectorValue(function (d) { return d.value; });
             assert.doesNotThrow(function () { return plot.renderTo(svg); }, Error);
             assert.strictEqual(plot.width(), 400, "was allocated width");
             assert.strictEqual(plot.height(), 400, "was allocated height");
@@ -2602,7 +2602,7 @@ describe("Plots", function () {
             simpleDataset = new Plottable.Dataset(simpleData);
             piePlot = new Plottable.Plots.Pie();
             piePlot.addDataset(simpleDataset);
-            piePlot.project("value", "value");
+            piePlot.sectorValue(function (d) { return d.value; });
             piePlot.renderTo(svg);
             renderArea = piePlot._renderArea;
         });
@@ -2634,7 +2634,7 @@ describe("Plots", function () {
             svg.remove();
         });
         it("project value onto different attribute", function () {
-            piePlot.project("value", "value2");
+            piePlot.sectorValue(function (d) { return d.value2; });
             var arcPaths = renderArea.selectAll(".arc");
             assert.lengthOf(arcPaths[0], 2, "only has two sectors");
             var arcPath0 = d3.select(arcPaths[0][0]);
@@ -2653,11 +2653,11 @@ describe("Plots", function () {
             var arcDestPoint1 = pathPoints1[1].split(",").slice(5);
             assert.closeTo(parseFloat(arcDestPoint1[0]), 0, 1, "ends on a line vertically from beginning");
             assert.operator(parseFloat(arcDestPoint1[1]), "<", 0, "ends above the center");
-            piePlot.project("value", "value");
+            piePlot.sectorValue(function (d) { return d.value; });
             svg.remove();
         });
         it("innerRadius project", function () {
-            piePlot.project("inner-radius", function () { return 5; });
+            piePlot.innerRadius(5);
             var arcPaths = renderArea.selectAll(".arc");
             assert.lengthOf(arcPaths[0], 2, "only has two sectors");
             var pathPoints0 = TestMethods.normalizePath(d3.select(arcPaths[0][0]).attr("d")).split(/[A-Z]/).slice(1, 5);
@@ -2669,11 +2669,11 @@ describe("Plots", function () {
             assert.closeTo(innerArcPath0[1], 5, 1, "makes inner arc of radius 5");
             assert.closeTo(innerArcPath0[5], 0, 1, "make inner arc to center");
             assert.closeTo(innerArcPath0[6], -5, 1, "makes inner arc to top of inner circle");
-            piePlot.project("inner-radius", function () { return 0; });
+            piePlot.innerRadius(0);
             svg.remove();
         });
         it("outerRadius project", function () {
-            piePlot.project("outer-radius", function () { return 150; });
+            piePlot.outerRadius(function () { return 150; });
             var arcPaths = renderArea.selectAll(".arc");
             assert.lengthOf(arcPaths[0], 2, "only has two sectors");
             var pathPoints0 = TestMethods.normalizePath(d3.select(arcPaths[0][0]).attr("d")).split(/[A-Z]/).slice(1, 5);
@@ -2685,7 +2685,7 @@ describe("Plots", function () {
             assert.closeTo(outerArcPath0[1], 150, 1, "makes outer arc of radius 150");
             assert.closeTo(outerArcPath0[5], 150, 1, "makes outer arc to right edge");
             assert.closeTo(outerArcPath0[6], 0, 1, "makes outer arc to right edge");
-            piePlot.project("outer-radius", function () { return 250; });
+            piePlot.outerRadius(function () { return 250; });
             svg.remove();
         });
         describe("getAllSelections", function () {
@@ -2758,7 +2758,7 @@ describe("Plots", function () {
             ];
             var plot = new Plottable.Plots.Pie();
             plot.addDataset(new Plottable.Dataset(data1));
-            plot.project("value", "v");
+            plot.sectorValue(function (d) { return d.v; });
             plot.renderTo(svg);
             var elementsDrawnSel = plot._element.selectAll(".arc");
             assert.strictEqual(elementsDrawnSel.size(), 4, "There should be exactly 4 slices in the pie chart, representing the valid values");
@@ -2774,7 +2774,7 @@ describe("Plots", function () {
             ];
             var plot = new Plottable.Plots.Pie();
             plot.addDataset(new Plottable.Dataset(data1));
-            plot.project("value", "v");
+            plot.sectorValue(function (d) { return d.v; });
             plot.renderTo(svg);
             var elementsDrawnSel = plot._element.selectAll(".arc");
             assert.strictEqual(elementsDrawnSel.size(), 4, "All 4 elements of the pie chart should have a DOM node");
@@ -5796,7 +5796,7 @@ describe("Metadata", function () {
         checkPlot(new Plottable.Plots.StackedBar(xScale, yScale));
         checkPlot(new Plottable.Plots.StackedBar(yScale, xScale, false));
         checkPlot(new Plottable.Plots.ClusteredBar(xScale, yScale));
-        checkPlot(new Plottable.Plots.Pie().project("value", "x"));
+        checkPlot(new Plottable.Plots.Pie().sectorValue(function (d) { return d.x; }));
         checkPlot(new Plottable.Plots.Bar(xScale, yScale, false));
         checkPlot(new Plottable.Plots.Scatter(xScale, yScale));
         svg.remove();

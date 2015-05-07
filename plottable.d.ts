@@ -1466,8 +1466,8 @@ declare module Plottable {
 
 declare module Plottable {
     module Drawers {
-        class Arc extends Element {
-            constructor(key: string);
+        class Arc<D> extends Element {
+            constructor(key: string, plot: Plots.Pie<D>);
             _drawStep(step: AppliedDrawStep): void;
             draw(data: any[], drawSteps: DrawStep[], userMetadata: any, plotMetadata: Plots.PlotMetadata): number;
             _getPixelPoint(datum: any, index: number): Point;
@@ -2588,6 +2588,7 @@ declare module Plottable {
         protected _attrToExtents: D3.Map<any[]>;
         protected _animate: boolean;
         protected _animateOnNextRender: boolean;
+        protected _renderCallback: ScaleCallback<Scale<any, any>>;
         /**
          * Constructs a Plot.
          *
@@ -2662,10 +2663,12 @@ declare module Plottable {
          * Updates the extents associated with each attribute, then autodomains all scales the Plot uses.
          */
         protected _updateExtents(): void;
+        protected _computeExtent(dataset: Dataset, accessor: _Accessor, typeCoercer: (d: any) => any, plotMetadata: any): any[];
         /**
          * Override in subclass to add special extents, such as included values
          */
         protected _extentsForAttr(attr: string): any[];
+        protected _extentsForScale<D>(scale: Scale<D, any>): D[][];
         /**
          * Get the animator associated with the specified Animator key.
          *
@@ -2736,18 +2739,34 @@ declare module Plottable {
 
 declare module Plottable {
     module Plots {
-        class Pie extends Plot {
+        interface AccessorScaleBinding<D, R> {
+            accessor: _Accessor;
+            scale?: Scale<D, R>;
+        }
+        class Pie<D> extends Plot {
             /**
              * Constructs a PiePlot.
              *
              * @constructor
              */
             constructor();
-            computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Pie;
-            addDataset(dataset: Dataset): Pie;
+            computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Pie<D>;
+            addDataset(dataset: Dataset): Pie<D>;
             protected _generateAttrToProjector(): AttributeToProjector;
             protected _getDrawer(key: string): Drawers.AbstractDrawer;
             getAllPlotData(datasets?: Dataset[]): Plots.PlotData;
+            sectorValue(): AccessorScaleBinding<D, number>;
+            sectorValue(sectorValue: number | _Accessor): Plots.Pie<D>;
+            sectorValue(sectorValue: D | _Accessor, sectorValueScale: Scale<D, number>): Plots.Pie<D>;
+            innerRadius(): AccessorScaleBinding<D, number>;
+            innerRadius(innerRadius: number | _Accessor): Plots.Pie<D>;
+            innerRadius(innerRadius: D | _Accessor, innerRadiusScale: Scale<D, number>): Plots.Pie<D>;
+            outerRadius(): AccessorScaleBinding<D, number>;
+            outerRadius(outerRadius: number | _Accessor): Plots.Pie<D>;
+            outerRadius(outerRadius: D | _Accessor, outerRadiusScale: Scale<D, number>): Plots.Pie<D>;
+            destroy(): void;
+            protected _updateExtents(): void;
+            protected _extentsForScale<D>(scale: Scale<D, any>): D[][];
         }
     }
 }
