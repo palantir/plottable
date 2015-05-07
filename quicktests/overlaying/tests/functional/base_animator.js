@@ -28,7 +28,7 @@ function run(svg, data, Plottable) {
       .project("y", "y", yScale)
       .project("fill", "type", colorScale)
       .labelsEnabled(true)
-      .barLabelFormatter(function(text){return text + "!";})
+      .labelFormatter(function(text){return text + "!";})
       .addDataset(data)
       .animator( "bars", animator)
       .animate(true);
