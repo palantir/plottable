@@ -6,8 +6,8 @@ module Plottable {
     private _doNice = false;
     private _niceCount: number;
     private _padProportion = 0.0;
-    private _paddingExceptions = new Utils.StrictEqualityAssociativeArray();
-    private _includedValues = new Utils.StrictEqualityAssociativeArray();
+    private _paddingExceptions: Utils.Map<any, any>;
+    private _includedValues: Utils.Map<any, any>;
     private _combineExtents: (extents: any[][]) => any[];
     private static _PADDING_FOR_IDENTICAL_DOMAIN = 1;
     private static _ONE_DAY = 1000 * 60 * 60 * 24;
@@ -28,6 +28,8 @@ module Plottable {
      */
     constructor(combineExtents?: (extents: any[][]) => any[]) {
       this._combineExtents = combineExtents;
+      this._paddingExceptions = new Utils.Map<any, any>();
+      this._includedValues = new Utils.Map<any, any>();
     }
 
     /**

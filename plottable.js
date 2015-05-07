@@ -385,20 +385,20 @@ var Plottable;
          * Uses pointer equality checks which is why this works.
          * This power has a price: everything is linear time since it is actually backed by an array...
          */
-        var StrictEqualityAssociativeArray = (function () {
-            function StrictEqualityAssociativeArray() {
+        var Map = (function () {
+            function Map() {
                 this._keyValuePairs = [];
             }
             /**
              * Set a new key/value pair in the store.
              *
-             * @param {any} key Key to set in the store
-             * @param {any} value Value to set in the store
+             * @param {K} key Key to set in the store
+             * @param {V} value Value to set in the store
              * @return {boolean} True if key already in store, false otherwise
              */
-            StrictEqualityAssociativeArray.prototype.set = function (key, value) {
+            Map.prototype.set = function (key, value) {
                 if (key !== key) {
-                    throw new Error("NaN may not be used as a key to the StrictEqualityAssociativeArray");
+                    throw new Error("NaN may not be used as a key to the Map");
                 }
                 for (var i = 0; i < this._keyValuePairs.length; i++) {
                     if (this._keyValuePairs[i][0] === key) {
@@ -412,10 +412,10 @@ var Plottable;
             /**
              * Get a value from the store, given a key.
              *
-             * @param {any} key Key associated with value to retrieve
-             * @return {any} Value if found, undefined otherwise
+             * @param {K} key Key associated with value to retrieve
+             * @return {V} Value if found, undefined otherwise
              */
-            StrictEqualityAssociativeArray.prototype.get = function (key) {
+            Map.prototype.get = function (key) {
                 for (var i = 0; i < this._keyValuePairs.length; i++) {
                     if (this._keyValuePairs[i][0] === key) {
                         return this._keyValuePairs[i][1];
@@ -429,10 +429,10 @@ var Plottable;
              * Will return true if there is a key/value entry,
              * even if the value is explicitly `undefined`.
              *
-             * @param {any} key Key to test for presence of an entry
+             * @param {K} key Key to test for presence of an entry
              * @return {boolean} Whether there was a matching entry for that key
              */
-            StrictEqualityAssociativeArray.prototype.has = function (key) {
+            Map.prototype.has = function (key) {
                 for (var i = 0; i < this._keyValuePairs.length; i++) {
                     if (this._keyValuePairs[i][0] === key) {
                         return true;
@@ -443,26 +443,26 @@ var Plottable;
             /**
              * Return an array of the values in the key-value store
              *
-             * @return {any[]} The values in the store
+             * @return {V[]} The values in the store
              */
-            StrictEqualityAssociativeArray.prototype.values = function () {
+            Map.prototype.values = function () {
                 return this._keyValuePairs.map(function (x) { return x[1]; });
             };
             /**
              * Return an array of keys in the key-value store
              *
-             * @return {any[]} The keys in the store
+             * @return {K[]} The keys in the store
              */
-            StrictEqualityAssociativeArray.prototype.keys = function () {
+            Map.prototype.keys = function () {
                 return this._keyValuePairs.map(function (x) { return x[0]; });
             };
             /**
              * Execute a callback for each entry in the array.
              *
-             * @param {(key: any, val?: any, index?: number) => any} callback The callback to eecute
+             * @param {(key: K, val?: V, index?: number) => any} callback The callback to execute
              * @return {any[]} The results of mapping the callback over the entries
              */
-            StrictEqualityAssociativeArray.prototype.map = function (cb) {
+            Map.prototype.map = function (cb) {
                 return this._keyValuePairs.map(function (kv, index) {
                     return cb(kv[0], kv[1], index);
                 });
@@ -470,10 +470,10 @@ var Plottable;
             /**
              * Delete a key from the key-value store. Return whether the key was present.
              *
-             * @param {any} The key to remove
+             * @param {K} The key to remove
              * @return {boolean} Whether a matching entry was found and removed
              */
-            StrictEqualityAssociativeArray.prototype.delete = function (key) {
+            Map.prototype.delete = function (key) {
                 for (var i = 0; i < this._keyValuePairs.length; i++) {
                     if (this._keyValuePairs[i][0] === key) {
                         this._keyValuePairs.splice(i, 1);
@@ -482,9 +482,9 @@ var Plottable;
                 }
                 return false;
             };
-            return StrictEqualityAssociativeArray;
+            return Map;
         })();
-        Utils.StrictEqualityAssociativeArray = StrictEqualityAssociativeArray;
+        Utils.Map = Map;
     })(Utils = Plottable.Utils || (Plottable.Utils = {}));
 })(Plottable || (Plottable = {}));
 
@@ -1149,7 +1149,7 @@ var Plottable;
             _super.call(this);
             this._data = data;
             this._metadata = metadata;
-            this._accessor2cachedExtent = new Plottable.Utils.StrictEqualityAssociativeArray();
+            this._accessor2cachedExtent = new Plottable.Utils.Map();
             this._callbacks = new Plottable.Utils.CallbackSet();
         }
         Dataset.prototype.onUpdate = function (callback) {
@@ -1164,7 +1164,7 @@ var Plottable;
             }
             else {
                 this._data = data;
-                this._accessor2cachedExtent = new Plottable.Utils.StrictEqualityAssociativeArray();
+                this._accessor2cachedExtent = new Plottable.Utils.Map();
                 this._callbacks.callCallbacks(this);
                 return this;
             }
@@ -1175,7 +1175,7 @@ var Plottable;
             }
             else {
                 this._metadata = metadata;
-                this._accessor2cachedExtent = new Plottable.Utils.StrictEqualityAssociativeArray();
+                this._accessor2cachedExtent = new Plottable.Utils.Map();
                 this._callbacks.callCallbacks(this);
                 return this;
             }
@@ -1374,9 +1374,9 @@ var Plottable;
         function Domainer(combineExtents) {
             this._doNice = false;
             this._padProportion = 0.0;
-            this._paddingExceptions = new Plottable.Utils.StrictEqualityAssociativeArray();
-            this._includedValues = new Plottable.Utils.StrictEqualityAssociativeArray();
             this._combineExtents = combineExtents;
+            this._paddingExceptions = new Plottable.Utils.Map();
+            this._includedValues = new Plottable.Utils.Map();
         }
         /**
          * @param {any[][]} extents The list of extents to be reduced to a single
