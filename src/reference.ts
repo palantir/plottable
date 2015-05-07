@@ -1,7 +1,7 @@
 /// <reference path="../bower_components/svg-typewriter/svgtypewriter.d.ts" />
 
 /// <reference path="utils/utils.ts" />
-/// <reference path="utils/strictEqualityAssociativeArray.ts" />
+/// <reference path="utils/map.ts" />
 /// <reference path="utils/set.ts" />
 /// <reference path="utils/domUtils.ts" />
 /// <reference path="utils/color.ts" />
@@ -16,7 +16,6 @@
 /// <reference path="core/version.ts" />
 /// <reference path="core/colors.ts" />
 /// <reference path="core/plottableObject.ts" />
-/// <reference path="core/broadcaster.ts" />
 
 /// <reference path="core/dataset.ts" />
 /// <reference path="core/renderPolicy.ts" />
@@ -45,7 +44,7 @@
 
 /// <reference path="components/component.ts" />
 /// <reference path="components/componentContainer.ts" />
-/// <reference path="components/componentGroup.ts" />
+/// <reference path="components/group.ts" />
 
 /// <reference path="components/axes/axis.ts" />
 /// <reference path="components/axes/timeAxis.ts" />

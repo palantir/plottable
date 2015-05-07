@@ -36,13 +36,13 @@ describe("Legend", () => {
   it("legend domain can be updated after initialization, and height updates as well", () => {
     legend.renderTo(svg);
     legend.scale(color);
-    assert.strictEqual(legend._requestedSpace(200, 200).height, 10, "there is a padding requested height when domain is empty");
+    assert.strictEqual(legend.requestedSpace(200, 200).minHeight, 10, "there is a padding requested height when domain is empty");
     color.domain(["foo", "bar"]);
-    var height1 = legend._requestedSpace(400, 400).height;
+    var height1 = legend.requestedSpace(400, 400).minHeight;
     var actualHeight1 = legend.height();
     assert.operator(height1, ">", 0, "changing the domain gives a positive height");
     color.domain(["foo", "bar", "baz"]);
-    assert.operator(legend._requestedSpace(400, 400).height, ">", height1, "adding to the domain increases the height requested");
+    assert.operator(legend.requestedSpace(400, 400).minHeight, ">", height1, "adding to the domain increases the height requested");
     var actualHeight2 = legend.height();
     assert.operator(actualHeight1, "<", actualHeight2, "Changing the domain caused the legend to re-layout with more height");
     var numRows = (<any> legend)._content.selectAll(rowSelector)[0].length;
@@ -82,7 +82,7 @@ describe("Legend", () => {
     legend.renderTo(svg);
     var numRows = (<any> legend)._content.selectAll(rowSelector)[0].length;
     assert.strictEqual(numRows, 3, "there are 3 legend rows initially");
-    legend._render();
+    legend.render();
     numRows = (<any> legend)._content.selectAll(rowSelector)[0].length;
     assert.strictEqual(numRows, 3, "there are 3 legend rows after second render");
     svg.remove();
@@ -165,12 +165,12 @@ describe("Legend", () => {
 
     style.text(".plottable .legend text { font-size: 60px; }");
     legend.computeLayout();
-    legend._render();
+    legend.render();
     verifySymbolHeight();
 
     style.text(".plottable .legend text { font-size: 10px; }");
     legend.computeLayout();
-    legend._render();
+    legend.render();
     verifySymbolHeight();
 
     svg.remove();
@@ -212,6 +212,19 @@ describe("Legend", () => {
     legend.renderTo(svg);
     rows = (<any> legend)._element.selectAll(rowSelector);
     assert.lengthOf(rows[0], 3, "Wrapped text on to three rows when further constrained");
+    svg.remove();
+  });
+
+  it("requests more width if entries would be truncated", () => {
+    color.domain(["George Waaaaaashington", "John Adaaaams", "Thomaaaaas Jefferson"]);
+
+    legend.renderTo(svg); // have to be in DOM to measure
+
+    var idealSpaceRequest = legend.requestedSpace(Infinity, Infinity);
+    var constrainedRequest = legend.requestedSpace(idealSpaceRequest.minWidth * 0.9, Infinity);
+
+    assert.strictEqual(idealSpaceRequest.minWidth, constrainedRequest.minWidth,
+      "won't settle for less width if entries would be truncated");
     svg.remove();
   });
 

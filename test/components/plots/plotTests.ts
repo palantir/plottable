@@ -4,9 +4,9 @@ var assert = chai.assert;
 class CountingPlot extends Plottable.Plot {
   public renders: number = 0;
 
-  public _render() {
+  public render() {
     ++this.renders;
-    return super._render();
+    return super.render();
   }
 }
 
@@ -36,21 +36,21 @@ describe("Plots", () => {
 
       assert.strictEqual(1, r.renders, "initial render due to addDataset");
 
-      dFoo.broadcaster.broadcast();
+      dFoo.data(dFoo.data());
       assert.strictEqual(2, r.renders, "we re-render when our dataset changes");
 
       r.addDataset("bar", dBar);
       assert.strictEqual(3, r.renders, "we should redraw when we add a dataset");
 
-      dFoo.broadcaster.broadcast();
+      dFoo.data(dFoo.data());
       assert.strictEqual(4, r.renders, "we should still listen to the first dataset");
 
-      dBar.broadcaster.broadcast();
+      dFoo.data(dFoo.data());
       assert.strictEqual(5, r.renders, "we should listen to the new dataset");
 
       r.removeDataset("foo");
       assert.strictEqual(6, r.renders, "we re-render on dataset removal");
-      dFoo.broadcaster.broadcast();
+      dFoo.data(dFoo.data());
       assert.strictEqual(6, r.renders, "we don't listen to removed datasets");
 
     });
@@ -80,7 +80,7 @@ describe("Plots", () => {
       assert.strictEqual(0, xScaleCalls, "initially hasn't made any X callbacks");
       assert.strictEqual(0, yScaleCalls, "initially hasn't made any Y callbacks");
 
-      d1.broadcaster.broadcast();
+      d1.data(d1.data());
       assert.strictEqual(1, xScaleCalls, "X scale was wired up to datasource correctly");
       assert.strictEqual(1, yScaleCalls, "Y scale was wired up to datasource correctly");
 
@@ -90,11 +90,11 @@ describe("Plots", () => {
       assert.strictEqual(3, xScaleCalls, "Changing datasource fires X scale listeners (but doesn't coalesce callbacks)");
       assert.strictEqual(3, yScaleCalls, "Changing datasource fires Y scale listeners (but doesn't coalesce callbacks)");
 
-      d1.broadcaster.broadcast();
+      d1.data(d1.data());
       assert.strictEqual(3, xScaleCalls, "X scale was unhooked from old datasource");
       assert.strictEqual(3, yScaleCalls, "Y scale was unhooked from old datasource");
 
-      d2.broadcaster.broadcast();
+      d2.data(d2.data());
       assert.strictEqual(4, xScaleCalls, "X scale was hooked into new datasource");
       assert.strictEqual(4, yScaleCalls, "Y scale was hooked into new datasource");
 
@@ -399,11 +399,11 @@ describe("Plots", () => {
       });
     });
 
-    it("remove() disconnects plots from its scales", () => {
+    it("destroy() disconnects plots from its scales", () => {
       var plot2 = new Plottable.Plot();
       var scale = new Plottable.Scales.Linear();
       plot2.project("attr", "a", scale);
-      plot2.remove();
+      plot2.destroy();
       var scaleCallbacks = (<any> scale)._callbacks.values();
       assert.strictEqual(scaleCallbacks.length, 0, "the plot is no longer attached to the scale");
     });
@@ -585,7 +585,7 @@ describe("Plots", () => {
 
     it("listeners are deregistered after removal", () => {
       plot.automaticallyAdjustYScaleOverVisiblePoints(true);
-      plot.remove();
+      plot.destroy();
 
       var xScaleCallbacks = (<any> xScale)._callbacks.values();
       assert.strictEqual(xScaleCallbacks.length, 0, "the plot is no longer attached to xScale");

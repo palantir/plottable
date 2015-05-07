@@ -134,8 +134,8 @@ export module Components {
       }
     }
 
-    public remove() {
-      super.remove();
+    public destroy() {
+      super.destroy();
       this._scale.offUpdate(this._redrawCallback);
     }
 
@@ -143,16 +143,20 @@ export module Components {
       var textHeight = this._measurer.measure().height;
 
       var availableWidthForEntries = Math.max(0, (availableWidth - this._padding));
-      var measureEntry = (entryText: string) => {
-        var originalEntryLength = (textHeight + this._measurer.measure(entryText).width + this._padding);
-        return Math.min(originalEntryLength, availableWidthForEntries);
-      };
 
-      var entries = this._scale.domain().slice();
-      entries.sort(this.sortFunction());
-      var entryLengths = Utils.Methods.populateMap(entries, measureEntry);
+      var entryNames = this._scale.domain().slice();
+      entryNames.sort(this.sortFunction());
 
-      var rows = this._packRows(availableWidthForEntries, entries, entryLengths);
+      var entryLengths: D3.Map<number> = d3.map();
+      var untruncatedEntryLengths: D3.Map<number> = d3.map();
+      entryNames.forEach((entryName) => {
+        var untruncatedEntryLength = textHeight + this._measurer.measure(entryName).width + this._padding;
+        var entryLength = Math.min(untruncatedEntryLength, availableWidthForEntries);
+        entryLengths.set(entryName, entryLength);
+        untruncatedEntryLengths.set(entryName, untruncatedEntryLength);
+      });
+
+      var rows = this._packRows(availableWidthForEntries, entryNames, entryLengths);
 
       var rowsAvailable = Math.floor((availableHeight - 2 * this._padding) / textHeight);
       if (rowsAvailable !== rowsAvailable) { // rowsAvailable can be NaN if this.textHeight = 0
@@ -162,33 +166,23 @@ export module Components {
       return {
         textHeight: textHeight,
         entryLengths: entryLengths,
+        untruncatedEntryLengths: untruncatedEntryLengths,
         rows: rows,
         numRowsToDraw: Math.max(Math.min(rowsAvailable, rows.length), 0)
       };
     }
 
-    public _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
+    public requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
       var estimatedLayout = this._calculateLayoutInfo(offeredWidth, offeredHeight);
-      var rowLengths = estimatedLayout.rows.map((row: string[]) => {
-        return d3.sum(row, (entry: string) => estimatedLayout.entryLengths.get(entry));
+
+      var untruncatedRowLengths = estimatedLayout.rows.map((row) => {
+        return d3.sum(row, (entry) => estimatedLayout.untruncatedEntryLengths.get(entry));
       });
+      var longestUntruncatedRowLength = Utils.Methods.max(untruncatedRowLengths, 0);
 
-      var longestRowLength = Utils.Methods.max(rowLengths, 0);
-
-      var longestUntruncatedEntryLength = Utils.Methods.max<string, number>(this._scale.domain(), (d: string) =>
-                                            this._measurer.measure(d).width, 0);
-      longestUntruncatedEntryLength += estimatedLayout.textHeight + this._padding;
-      var desiredWidth = this._padding + Math.max(longestRowLength, longestUntruncatedEntryLength);
-
-      var acceptableHeight = estimatedLayout.numRowsToDraw * estimatedLayout.textHeight + 2 * this._padding;
-      var desiredHeight = estimatedLayout.rows.length * estimatedLayout.textHeight + 2 * this._padding;
-      var desiredNumRows = Math.max(Math.ceil(this._scale.domain().length / this._maxEntriesPerRow), 1);
-      var wantsFitMoreEntriesInRow = estimatedLayout.rows.length > desiredNumRows;
       return {
-        width: this._padding + longestRowLength,
-        height: acceptableHeight,
-        wantsWidth: offeredWidth < desiredWidth || wantsFitMoreEntriesInRow,
-        wantsHeight: offeredHeight < desiredHeight
+        minWidth: this._padding + longestUntruncatedRowLength,
+        minHeight: estimatedLayout.rows.length * estimatedLayout.textHeight + 2 * this._padding
       };
     }
 
@@ -245,8 +239,8 @@ export module Components {
       return entry;
     }
 
-    public _doRender() {
-      super._doRender();
+    protected _render() {
+      super._render();
 
       var layout = this._calculateLayoutInfo(this.width(), this.height());
 
@@ -318,7 +312,7 @@ export module Components {
         return this._symbolFactoryAccessor;
       } else {
         this._symbolFactoryAccessor = symbolFactoryAccessor;
-        this._render();
+        this.render();
         return this;
       }
     }

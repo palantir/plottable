@@ -20,21 +20,19 @@ export module Components {
     constructor(components: Component[] = []) {
       super();
       this.classed("component-group", true);
-      components.forEach((c: Component) => this._addComponent(c));
+      components.forEach((c: Component) => this.add(c));
     }
 
-    public _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
-      var requests = this.components().map((c: Component) => c._requestedSpace(offeredWidth, offeredHeight));
+    public requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
+      var requests = this.components().map((c: Component) => c.requestedSpace(offeredWidth, offeredHeight));
       return {
-        width: Utils.Methods.max<_SpaceRequest, number>(requests, (request: _SpaceRequest) => request.width, 0),
-        height: Utils.Methods.max<_SpaceRequest, number>(requests, (request: _SpaceRequest) => request.height, 0),
-        wantsWidth: requests.map((r: _SpaceRequest) => r.wantsWidth ).some((x: boolean) => x),
-        wantsHeight: requests.map((r: _SpaceRequest) => r.wantsHeight).some((x: boolean) => x)
+        minWidth: Utils.Methods.max<_SpaceRequest, number>(requests, (request: _SpaceRequest) => request.minWidth, 0),
+        minHeight: Utils.Methods.max<_SpaceRequest, number>(requests, (request: _SpaceRequest) => request.minHeight, 0)
       };
     }
 
     public _merge(c: Component, below: boolean): Group {
-      this._addComponent(c, !below);
+      this.add(c, !below);
       return this;
     }
 
@@ -53,12 +51,12 @@ export module Components {
       };
     }
 
-    public _isFixedWidth(): boolean {
-      return this.components().every((c) => c._isFixedWidth());
+    public fixedWidth(): boolean {
+      return this.components().every((c) => c.fixedWidth());
     }
 
-    public _isFixedHeight(): boolean {
-      return this.components().every((c) => c._isFixedHeight());
+    public fixedHeight(): boolean {
+      return this.components().every((c) => c.fixedHeight());
     }
   }
 }

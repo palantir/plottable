@@ -33,7 +33,7 @@ export module Axes {
       this._wrapper = new SVGTypewriter.Wrappers.Wrapper().maxLines(1);
     }
 
-    public _computeWidth() {
+    protected _computeWidth() {
       var tickValues = this._getTickValues();
       var textLengths = tickValues.map((v: any) => {
         var formattedValue = this.formatter()(v);
@@ -51,7 +51,7 @@ export module Axes {
       return this._computedWidth;
     }
 
-    public _computeHeight() {
+    protected _computeHeight() {
       var textHeight = this._measurer.measure().height;
 
       if (this._tickLabelPositioning === "center") {
@@ -88,11 +88,11 @@ export module Axes {
         }
       }
 
-      this._render();
+      this.render();
     }
 
-    public _doRender() {
-      super._doRender();
+    protected _render() {
+      super._render();
 
       var tickLabelAttrHash = {
         x: <any> 0,
@@ -307,7 +307,7 @@ export module Axes {
           return this._showFirstTickLabel;
         } else {
           this._showFirstTickLabel = show;
-          this._render();
+          this.render();
           return this;
         }
       } else if ((this._isHorizontal() && orientation === "right") ||
@@ -316,7 +316,7 @@ export module Axes {
           return this._showLastTickLabel;
         } else {
           this._showLastTickLabel = show;
-          this._render();
+          this.render();
           return this;
         }
       } else {

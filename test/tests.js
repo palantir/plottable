@@ -20,20 +20,16 @@ var TestMethods;
         }
     }
     TestMethods.getSVGParent = getSVGParent;
-    function verifySpaceRequest(sr, w, h, ww, wh, message) {
-        assert.strictEqual(sr.width, w, message + " (space request: width)");
-        assert.strictEqual(sr.height, h, message + " (space request: height)");
-        assert.strictEqual(sr.wantsWidth, ww, message + " (space request: wantsWidth)");
-        assert.strictEqual(sr.wantsHeight, wh, message + " (space request: wantsHeight)");
+    function verifySpaceRequest(sr, expectedMinWidth, expectedMinHeight, message) {
+        assert.strictEqual(sr.minWidth, expectedMinWidth, message + " (space request: minWidth)");
+        assert.strictEqual(sr.minHeight, expectedMinHeight, message + " (space request: minHeight)");
     }
     TestMethods.verifySpaceRequest = verifySpaceRequest;
     function fixComponentSize(c, fixedWidth, fixedHeight) {
-        c._requestedSpace = function (w, h) {
+        c.requestedSpace = function (w, h) {
             return {
-                width: fixedWidth == null ? 0 : fixedWidth,
-                height: fixedHeight == null ? 0 : fixedHeight,
-                wantsWidth: fixedWidth == null ? false : w < fixedWidth,
-                wantsHeight: fixedHeight == null ? false : h < fixedHeight
+                minWidth: fixedWidth == null ? 0 : fixedWidth,
+                minHeight: fixedHeight == null ? 0 : fixedHeight
             };
         };
         c._fixedWidthFlag = fixedWidth == null ? false : true;
@@ -224,17 +220,15 @@ var Mocks;
             if (width === void 0) { width = 0; }
             if (height === void 0) { height = 0; }
             _super.call(this);
-            this.fixedWidth = width;
-            this.fixedHeight = height;
+            this.fsWidth = width;
+            this.fsHeight = height;
             this._fixedWidthFlag = true;
             this._fixedHeightFlag = true;
         }
-        FixedSizeComponent.prototype._requestedSpace = function (availableWidth, availableHeight) {
+        FixedSizeComponent.prototype.requestedSpace = function (availableWidth, availableHeight) {
             return {
-                width: this.fixedWidth,
-                height: this.fixedHeight,
-                wantsWidth: availableWidth < this.fixedWidth,
-                wantsHeight: availableHeight < this.fixedHeight
+                minWidth: this.fsWidth,
+                minHeight: this.fsHeight
             };
         };
         return FixedSizeComponent;
@@ -245,7 +239,7 @@ var Mocks;
 ///<reference path="testReference.ts" />
 before(function () {
     // Set the render policy to immediate to make sure ETE tests can check DOM change immediately
-    Plottable.Core.RenderControllers.setRenderPolicy("immediate");
+    Plottable.RenderController.setRenderPolicy("immediate");
     // Taken from https://stackoverflow.com/questions/9847580/how-to-detect-safari-chrome-ie-firefox-and-opera-browser
     var isFirefox = navigator.userAgent.indexOf("Firefox") !== -1;
     if (window.PHANTOMJS) {
@@ -1305,11 +1299,9 @@ describe("Category Axes", function () {
         var scale = new Plottable.Scales.Category();
         var ca = new Plottable.Axes.Category(scale);
         ca.anchor(svg);
-        var s = ca._requestedSpace(400, 400);
-        assert.operator(s.width, ">=", 0, "it requested 0 or more width");
-        assert.operator(s.height, ">=", 0, "it requested 0 or more height");
-        assert.isFalse(s.wantsWidth, "it doesn't want width");
-        assert.isFalse(s.wantsHeight, "it doesn't want height");
+        var s = ca.requestedSpace(400, 400);
+        assert.operator(s.minWidth, ">=", 0, "it requested 0 or more width");
+        assert.operator(s.minHeight, ">=", 0, "it requested 0 or more height");
         svg.remove();
     });
     it("doesnt blow up for non-string data", function () {
@@ -1399,11 +1391,12 @@ describe("Category Axes", function () {
         var scale = new Plottable.Scales.Category().domain(years);
         var axis = new Plottable.Axes.Category(scale, "bottom");
         axis.renderTo(svg);
-        var requestedSpace = axis._requestedSpace(300, 10);
-        assert.isTrue(requestedSpace.wantsHeight, "axis should ask for more space (horizontal orientation)");
+        var smallDimension = 10;
+        var spaceRequest = axis.requestedSpace(300, smallDimension);
+        assert.operator(spaceRequest.minHeight, ">", smallDimension, "horizontal axis requested more height if constrained");
         axis.orient("left");
-        requestedSpace = axis._requestedSpace(10, 300);
-        assert.isTrue(requestedSpace.wantsWidth, "axis should ask for more space (vertical orientation)");
+        spaceRequest = axis.requestedSpace(smallDimension, 300);
+        assert.operator(spaceRequest.minWidth, ">", smallDimension, "vertical axis requested more width if constrained");
         svg.remove();
     });
     it("axis labels respect tick labels", function () {
@@ -1432,11 +1425,11 @@ describe("Category Axes", function () {
         var scale = new Plottable.Scales.Category().domain(labels);
         var axis = new Plottable.Axes.Category(scale, "bottom");
         axis.renderTo(svg);
-        var requestedSpace = axis._requestedSpace(300, 50);
-        var flatHeight = requestedSpace.height;
+        var requestedSpace = axis.requestedSpace(300, 50);
+        var flatHeight = requestedSpace.minHeight;
         axis.tickLabelAngle(-90);
-        requestedSpace = axis._requestedSpace(300, 50);
-        assert.isTrue(flatHeight < requestedSpace.height, "axis should request more height when tick labels are rotated");
+        requestedSpace = axis.requestedSpace(300, 50);
+        assert.isTrue(flatHeight < requestedSpace.minHeight, "axis should request more height when tick labels are rotated");
         svg.remove();
     });
 });
@@ -1453,12 +1446,12 @@ describe("Gridlines", function () {
         yScale.domain([0, 10]);
         var yAxis = new Plottable.Axes.Numeric(yScale, "left");
         var gridlines = new Plottable.Components.Gridlines(xScale, yScale);
-        var basicTable = new Plottable.Components.Table().addComponent(0, 0, yAxis).addComponent(0, 1, gridlines).addComponent(1, 1, xAxis);
+        var basicTable = new Plottable.Components.Table().addComponent(yAxis, 0, 0).addComponent(gridlines, 0, 1).addComponent(xAxis, 1, 1);
         basicTable.anchor(svg);
         basicTable.computeLayout();
         xScale.range([0, xAxis.width()]); // manually set range since we don't have a renderer
         yScale.range([yAxis.height(), 0]);
-        basicTable._render();
+        basicTable.render();
         var xAxisTickMarks = xAxis._element.selectAll("." + Plottable.Axis.TICK_MARK_CLASS)[0];
         var xGridlines = gridlines._element.select(".x-gridlines").selectAll("line")[0];
         assert.strictEqual(xAxisTickMarks.length, xGridlines.length, "There is an x gridline for each x tick");
@@ -1557,7 +1550,7 @@ describe("Labels", function () {
     it("centered text in a table is positioned properly", function () {
         var svg = TestMethods.generateSVG(400, 400);
         var label = new Plottable.Components.TitleLabel("X");
-        var t = new Plottable.Components.Table().addComponent(0, 0, label).addComponent(1, 0, new Plottable.Component());
+        var t = new Plottable.Components.Table().addComponent(label, 0, 0).addComponent(new Plottable.Component(), 1, 0);
         t.renderTo(svg);
         var textTranslate = d3.transform(label._content.select("g").attr("transform")).translate;
         var eleTranslate = d3.transform(label._element.attr("transform")).translate;
@@ -1664,13 +1657,13 @@ describe("Legend", function () {
     it("legend domain can be updated after initialization, and height updates as well", function () {
         legend.renderTo(svg);
         legend.scale(color);
-        assert.strictEqual(legend._requestedSpace(200, 200).height, 10, "there is a padding requested height when domain is empty");
+        assert.strictEqual(legend.requestedSpace(200, 200).minHeight, 10, "there is a padding requested height when domain is empty");
         color.domain(["foo", "bar"]);
-        var height1 = legend._requestedSpace(400, 400).height;
+        var height1 = legend.requestedSpace(400, 400).minHeight;
         var actualHeight1 = legend.height();
         assert.operator(height1, ">", 0, "changing the domain gives a positive height");
         color.domain(["foo", "bar", "baz"]);
-        assert.operator(legend._requestedSpace(400, 400).height, ">", height1, "adding to the domain increases the height requested");
+        assert.operator(legend.requestedSpace(400, 400).minHeight, ">", height1, "adding to the domain increases the height requested");
         var actualHeight2 = legend.height();
         assert.operator(actualHeight1, "<", actualHeight2, "Changing the domain caused the legend to re-layout with more height");
         var numRows = legend._content.selectAll(rowSelector)[0].length;
@@ -1705,7 +1698,7 @@ describe("Legend", function () {
         legend.renderTo(svg);
         var numRows = legend._content.selectAll(rowSelector)[0].length;
         assert.strictEqual(numRows, 3, "there are 3 legend rows initially");
-        legend._render();
+        legend.render();
         numRows = legend._content.selectAll(rowSelector)[0].length;
         assert.strictEqual(numRows, 3, "there are 3 legend rows after second render");
         svg.remove();
@@ -1775,11 +1768,11 @@ describe("Legend", function () {
         verifySymbolHeight();
         style.text(".plottable .legend text { font-size: 60px; }");
         legend.computeLayout();
-        legend._render();
+        legend.render();
         verifySymbolHeight();
         style.text(".plottable .legend text { font-size: 10px; }");
         legend.computeLayout();
-        legend._render();
+        legend.render();
         verifySymbolHeight();
         svg.remove();
     });
@@ -1813,6 +1806,14 @@ describe("Legend", function () {
         legend.renderTo(svg);
         rows = legend._element.selectAll(rowSelector);
         assert.lengthOf(rows[0], 3, "Wrapped text on to three rows when further constrained");
+        svg.remove();
+    });
+    it("requests more width if entries would be truncated", function () {
+        color.domain(["George Waaaaaashington", "John Adaaaams", "Thomaaaaas Jefferson"]);
+        legend.renderTo(svg); // have to be in DOM to measure
+        var idealSpaceRequest = legend.requestedSpace(Infinity, Infinity);
+        var constrainedRequest = legend.requestedSpace(idealSpaceRequest.minWidth * 0.9, Infinity);
+        assert.strictEqual(idealSpaceRequest.minWidth, constrainedRequest.minWidth, "won't settle for less width if entries would be truncated");
         svg.remove();
     });
     it("getEntry() retrieves the correct entry for vertical legends", function () {
@@ -2069,10 +2070,10 @@ describe("SelectionBoxLayer", function () {
     });
     it("has an effective size of 0, but will occupy all offered space", function () {
         var sbl = new Plottable.Components.SelectionBoxLayer();
-        var request = sbl._requestedSpace(400, 400);
-        TestMethods.verifySpaceRequest(request, 0, 0, false, false, "occupies and asks for no space");
-        assert.isTrue(sbl._isFixedWidth(), "fixed width");
-        assert.isTrue(sbl._isFixedHeight(), "fixed height");
+        var request = sbl.requestedSpace(400, 400);
+        TestMethods.verifySpaceRequest(request, 0, 0, "does not request any space");
+        assert.isTrue(sbl.fixedWidth(), "fixed width");
+        assert.isTrue(sbl.fixedHeight(), "fixed height");
     });
 });
 
@@ -2090,9 +2091,9 @@ var CountingPlot = (function (_super) {
         _super.apply(this, arguments);
         this.renders = 0;
     }
-    CountingPlot.prototype._render = function () {
+    CountingPlot.prototype.render = function () {
         ++this.renders;
-        return _super.prototype._render.call(this);
+        return _super.prototype.render.call(this);
     };
     return CountingPlot;
 })(Plottable.Plot);
@@ -2117,17 +2118,17 @@ describe("Plots", function () {
             var r = new CountingPlot();
             r.addDataset("foo", dFoo);
             assert.strictEqual(1, r.renders, "initial render due to addDataset");
-            dFoo.broadcaster.broadcast();
+            dFoo.data(dFoo.data());
             assert.strictEqual(2, r.renders, "we re-render when our dataset changes");
             r.addDataset("bar", dBar);
             assert.strictEqual(3, r.renders, "we should redraw when we add a dataset");
-            dFoo.broadcaster.broadcast();
+            dFoo.data(dFoo.data());
             assert.strictEqual(4, r.renders, "we should still listen to the first dataset");
-            dBar.broadcaster.broadcast();
+            dFoo.data(dFoo.data());
             assert.strictEqual(5, r.renders, "we should listen to the new dataset");
             r.removeDataset("foo");
             assert.strictEqual(6, r.renders, "we re-render on dataset removal");
-            dFoo.broadcaster.broadcast();
+            dFoo.data(dFoo.data());
             assert.strictEqual(6, r.renders, "we don't listen to removed datasets");
         });
         it("Updates its projectors when the Dataset is changed", function () {
@@ -2152,7 +2153,7 @@ describe("Plots", function () {
             });
             assert.strictEqual(0, xScaleCalls, "initially hasn't made any X callbacks");
             assert.strictEqual(0, yScaleCalls, "initially hasn't made any Y callbacks");
-            d1.broadcaster.broadcast();
+            d1.data(d1.data());
             assert.strictEqual(1, xScaleCalls, "X scale was wired up to datasource correctly");
             assert.strictEqual(1, yScaleCalls, "Y scale was wired up to datasource correctly");
             var d2 = new Plottable.Dataset([{ x: 7, y: 8 }], { cssClass: "boo" });
@@ -2160,10 +2161,10 @@ describe("Plots", function () {
             r.addDataset(d2);
             assert.strictEqual(3, xScaleCalls, "Changing datasource fires X scale listeners (but doesn't coalesce callbacks)");
             assert.strictEqual(3, yScaleCalls, "Changing datasource fires Y scale listeners (but doesn't coalesce callbacks)");
-            d1.broadcaster.broadcast();
+            d1.data(d1.data());
             assert.strictEqual(3, xScaleCalls, "X scale was unhooked from old datasource");
             assert.strictEqual(3, yScaleCalls, "Y scale was unhooked from old datasource");
-            d2.broadcaster.broadcast();
+            d2.data(d2.data());
             assert.strictEqual(4, xScaleCalls, "X scale was hooked into new datasource");
             assert.strictEqual(4, yScaleCalls, "Y scale was hooked into new datasource");
         });
@@ -2424,11 +2425,11 @@ describe("Plots", function () {
                 assert.lengthOf(plot.datasets(), 2, "the dataset called 'undefined' could be removed");
             });
         });
-        it("remove() disconnects plots from its scales", function () {
+        it("destroy() disconnects plots from its scales", function () {
             var plot2 = new Plottable.Plot();
             var scale = new Plottable.Scales.Linear();
             plot2.project("attr", "a", scale);
-            plot2.remove();
+            plot2.destroy();
             var scaleCallbacks = scale._callbacks.values();
             assert.strictEqual(scaleCallbacks.length, 0, "the plot is no longer attached to the scale");
         });
@@ -2570,7 +2571,7 @@ describe("Plots", function () {
         });
         it("listeners are deregistered after removal", function () {
             plot.automaticallyAdjustYScaleOverVisiblePoints(true);
-            plot.remove();
+            plot.destroy();
             var xScaleCallbacks = xScale._callbacks.values();
             assert.strictEqual(xScaleCallbacks.length, 0, "the plot is no longer attached to xScale");
             var yScaleCallbacks = yScale._callbacks.values();
@@ -3888,14 +3889,14 @@ describe("Plots", function () {
             it("bar labels hide if bars too skinny", function () {
                 plot.labelsEnabled(true);
                 plot.renderTo(svg);
-                plot.barLabelFormatter(function (n) { return n.toString() + (n === 12345 ? "looong" : ""); });
+                plot.labelFormatter(function (n) { return n.toString() + (n === 12345 ? "looong" : ""); });
                 var texts = svg.selectAll("text")[0].map(function (n) { return d3.select(n).text(); });
                 assert.lengthOf(texts, 0, "no text drawn");
                 svg.remove();
             });
             it("formatters are used properly", function () {
                 plot.labelsEnabled(true);
-                plot.barLabelFormatter(function (n) { return n.toString() + "%"; });
+                plot.labelFormatter(function (n) { return n.toString() + "%"; });
                 plot.renderTo(svg);
                 var texts = svg.selectAll("text")[0].map(function (n) { return d3.select(n).text(); });
                 assert.lengthOf(texts, 2, "both texts drawn");
@@ -4447,8 +4448,8 @@ describe("Plots", function () {
                 svg.remove();
             });
             it("rendering is idempotent", function () {
-                circlePlot._render();
-                circlePlot._render();
+                circlePlot.render();
+                circlePlot.render();
                 circlePlot.getAllSelections().each(getCirclePlotVerifier());
                 assert.strictEqual(circlesInArea, 10, "10 circles were drawn");
                 svg.remove();
@@ -5747,72 +5748,6 @@ describe("Plots", function () {
 
 ///<reference path="../testReference.ts" />
 var assert = chai.assert;
-describe("Broadcasters", function () {
-    var b;
-    var called;
-    var cb;
-    var listenable = {};
-    beforeEach(function () {
-        b = new Plottable.Core.Broadcaster(listenable);
-        called = false;
-        cb = function () {
-            called = true;
-        };
-    });
-    it("listeners are called by the broadcast method", function () {
-        b.registerListener(null, cb);
-        b.broadcast();
-        assert.isTrue(called, "callback was called");
-    });
-    it("same listener can only be associated with one callback", function () {
-        var called2 = false;
-        var cb2 = function () {
-            called2 = true;
-        };
-        var listener = {};
-        b.registerListener(listener, cb);
-        b.registerListener(listener, cb2);
-        b.broadcast();
-        assert.isFalse(called, "first (overwritten) callback not called");
-        assert.isTrue(called2, "second callback was called");
-    });
-    it("listeners can be deregistered", function () {
-        var listener = {};
-        b.registerListener(listener, cb);
-        b.deregisterListener(listener);
-        b.broadcast();
-        assert.isFalse(called, "callback was not called after deregistering only listener");
-        b.registerListener(5, cb);
-        b.registerListener(6, cb);
-        b.deregisterAllListeners();
-        b.broadcast();
-        assert.isFalse(called, "callback was not called after deregistering all listeners");
-        b.registerListener(5, cb);
-        b.registerListener(6, cb);
-        b.deregisterListener(5);
-        b.broadcast();
-        assert.isTrue(called, "callback was called even after 1/2 listeners were deregistered");
-    });
-    it("arguments are passed through to callback", function () {
-        var g2 = {};
-        var g3 = "foo";
-        var cb = function (arg1, arg2, arg3) {
-            assert.strictEqual(listenable, arg1, "broadcaster passed through");
-            assert.strictEqual(g2, arg2, "g2 passed through");
-            assert.strictEqual(g3, arg3, "g3 passed through");
-            called = true;
-        };
-        b.registerListener(null, cb);
-        b.broadcast(g2, g3);
-        assert.isTrue(called, "the cb was called");
-    });
-    it("deregistering an unregistered listener doesn't throw an error", function () {
-        assert.doesNotThrow(function () { return b.deregisterListener({}); });
-    });
-});
-
-///<reference path="../testReference.ts" />
-var assert = chai.assert;
 describe("Metadata", function () {
     var xScale;
     var yScale;
@@ -5968,26 +5903,6 @@ describe("Metadata", function () {
         assert.closeTo(parseFloat(c4Position[0]), 43, 0.01, "fourth circle is correct for second plot");
         svg.remove();
     });
-    it("_getExtent works as expected with plot metadata", function () {
-        var svg = TestMethods.generateSVG(400, 400);
-        var metadata = { foo: 11 };
-        var id = function (d) { return d; };
-        var dataset = new Plottable.Dataset(data1, metadata);
-        var a = function (d, i, u, m) { return d.x + u.foo + m.foo; };
-        var plot = new Plottable.Plot().project("a", a, xScale);
-        plot._getPlotMetadataForDataset = function (key) {
-            return {
-                datasetKey: key,
-                foo: 5
-            };
-        };
-        plot.addDataset(dataset);
-        plot.renderTo(svg);
-        assert.deepEqual(dataset._getExtent(a, id), [16, 17], "plot metadata is reflected in extent results");
-        dataset.metadata({ foo: 0 });
-        assert.deepEqual(dataset._getExtent(a, id), [5, 6], "plot metadata is reflected in extent results after change user metadata");
-        svg.remove();
-    });
     it("each plot passes metadata to projectors", function () {
         var svg = TestMethods.generateSVG(400, 400);
         var metadata = { foo: 11 };
@@ -5997,7 +5912,7 @@ describe("Metadata", function () {
             plot.addDataset("ds1", dataset1).addDataset("ds2", dataset2).project("x", function (d, i, u, m) { return d.x + u.foo + m.datasetKey.length; }).project("y", function (d, i, u, m) { return d.y + u.foo - m.datasetKey.length; });
             // This should not crash. If some metadata is not passed, undefined property error will be raised during accessor call.
             plot.renderTo(svg);
-            plot.remove();
+            plot.destroy();
         };
         checkPlot(new Plottable.Plots.Area(xScale, yScale));
         checkPlot(new Plottable.Plots.StackedArea(xScale, yScale));
@@ -6015,46 +5930,46 @@ describe("Metadata", function () {
 ///<reference path="../testReference.ts" />
 var assert = chai.assert;
 describe("ComponentContainer", function () {
-    it("_addComponent()", function () {
+    it("add()", function () {
         var container = new Plottable.ComponentContainer();
         var c1 = new Plottable.Component();
         var c2 = new Plottable.Component();
         var c3 = new Plottable.Component();
-        assert.isTrue(container._addComponent(c1), "returns true on successful adding");
+        assert.isTrue(container.add(c1), "returns true on successful adding");
         assert.deepEqual(container.components(), [c1], "component was added");
-        container._addComponent(c2);
+        container.add(c2);
         assert.deepEqual(container.components(), [c1, c2], "can append components");
-        container._addComponent(c3, true);
+        container.add(c3, true);
         assert.deepEqual(container.components(), [c3, c1, c2], "can prepend components");
-        assert.isFalse(container._addComponent(null), "returns false for null arguments");
+        assert.isFalse(container.add(null), "returns false for null arguments");
         assert.deepEqual(container.components(), [c3, c1, c2], "component list was unchanged");
-        assert.isFalse(container._addComponent(c1), "returns false if adding an already-added component");
+        assert.isFalse(container.add(c1), "returns false if adding an already-added component");
         assert.deepEqual(container.components(), [c3, c1, c2], "component list was unchanged");
     });
-    it("_removeComponent()", function () {
+    it("remove()", function () {
         var container = new Plottable.ComponentContainer();
         var c1 = new Plottable.Component();
         var c2 = new Plottable.Component();
-        container._addComponent(c1);
-        container._addComponent(c2);
-        container._removeComponent(c2);
+        container.add(c1);
+        container.add(c2);
+        container.remove(c2);
         assert.deepEqual(container.components(), [c1], "component 2 was removed");
-        container._removeComponent(c2);
+        container.remove(c2);
         assert.deepEqual(container.components(), [c1], "there are no side effects from removing already-removed components");
     });
     it("empty()", function () {
         var container = new Plottable.ComponentContainer();
         assert.isTrue(container.empty());
         var c1 = new Plottable.Component();
-        container._addComponent(c1);
+        container.add(c1);
         assert.isFalse(container.empty());
     });
     it("detachAll()", function () {
         var container = new Plottable.ComponentContainer();
         var c1 = new Plottable.Component();
         var c2 = new Plottable.Component();
-        container._addComponent(c1);
-        container._addComponent(c2);
+        container.add(c1);
+        container.add(c2);
         container.detachAll();
         assert.deepEqual(container.components(), [], "container was cleared of components");
     });
@@ -6073,7 +5988,7 @@ describe("ComponentGroups", function () {
         c1._addBox("test-box1");
         c2._addBox("test-box2");
         c3._addBox("test-box3");
-        cg.computeLayout()._render();
+        cg.computeLayout().render();
         var t1 = svg.select(".test-box1");
         var t2 = svg.select(".test-box2");
         var t3 = svg.select(".test-box3");
@@ -6091,14 +6006,14 @@ describe("ComponentGroups", function () {
         cg.below(c2).anchor(svg);
         c1._addBox("test-box1");
         c2._addBox("test-box2");
-        cg.computeLayout()._render();
+        cg.computeLayout().render();
         var t1 = svg.select(".test-box1");
         var t2 = svg.select(".test-box2");
         TestMethods.assertWidthHeight(t1, 10, 10, "rect1 sized correctly");
         TestMethods.assertWidthHeight(t2, 20, 20, "rect2 sized correctly");
         cg.below(c3);
         c3._addBox("test-box3");
-        cg.computeLayout()._render();
+        cg.computeLayout().render();
         var t3 = svg.select(".test-box3");
         TestMethods.assertWidthHeight(t3, 400, 400, "rect3 sized correctly");
         svg.remove();
@@ -6122,7 +6037,7 @@ describe("ComponentGroups", function () {
         assert.strictEqual(c2Translate[1], 0, "componentGroup has 0 yOffset");
         svg.remove();
     });
-    it("detach() and _removeComponent work correctly for componentGroup", function () {
+    it("detach() and remove() work correctly for componentGroup", function () {
         var c1 = new Plottable.Component().classed("component-1", true);
         var c2 = new Plottable.Component().classed("component-2", true);
         var cg = new Plottable.Components.Group([c1, c2]);
@@ -6170,8 +6085,8 @@ describe("ComponentGroups", function () {
         it("with no Components", function () {
             var svg = TestMethods.generateSVG();
             var cg = new Plottable.Components.Group([]);
-            var request = cg._requestedSpace(SVG_WIDTH, SVG_HEIGHT);
-            TestMethods.verifySpaceRequest(request, 0, 0, false, false, "empty Group doesn't request any space");
+            var request = cg.requestedSpace(SVG_WIDTH, SVG_HEIGHT);
+            TestMethods.verifySpaceRequest(request, 0, 0, "empty Group doesn't request any space");
             cg.renderTo(svg);
             assert.strictEqual(cg.width(), SVG_WIDTH, "occupies all offered width");
             assert.strictEqual(cg.height(), SVG_HEIGHT, "occupies all offered height");
@@ -6182,11 +6097,11 @@ describe("ComponentGroups", function () {
             var c1 = new Plottable.Component();
             var c2 = new Plottable.Component();
             var cg = new Plottable.Components.Group([c1, c2]);
-            var groupRequest = cg._requestedSpace(SVG_WIDTH, SVG_HEIGHT);
-            var c1Request = c1._requestedSpace(SVG_WIDTH, SVG_HEIGHT);
+            var groupRequest = cg.requestedSpace(SVG_WIDTH, SVG_HEIGHT);
+            var c1Request = c1.requestedSpace(SVG_WIDTH, SVG_HEIGHT);
             assert.deepEqual(groupRequest, c1Request, "request reflects request of sub-component");
-            assert.isFalse(cg._isFixedWidth(), "width is not fixed if subcomponents are not fixed width");
-            assert.isFalse(cg._isFixedHeight(), "height is not fixed if subcomponents are not fixed height");
+            assert.isFalse(cg.fixedWidth(), "width is not fixed if subcomponents are not fixed width");
+            assert.isFalse(cg.fixedHeight(), "height is not fixed if subcomponents are not fixed height");
             cg.renderTo(svg);
             assert.strictEqual(cg.width(), SVG_WIDTH, "occupies all offered width");
             assert.strictEqual(cg.height(), SVG_HEIGHT, "occupies all offered height");
@@ -6197,16 +6112,12 @@ describe("ComponentGroups", function () {
             var tall = new Mocks.FixedSizeComponent(SVG_WIDTH / 4, SVG_WIDTH / 2);
             var wide = new Mocks.FixedSizeComponent(SVG_WIDTH / 2, SVG_WIDTH / 4);
             var cg = new Plottable.Components.Group([tall, wide]);
-            var request = cg._requestedSpace(SVG_WIDTH, SVG_HEIGHT);
-            assert.strictEqual(request.width, SVG_WIDTH / 2, "requested enough space for widest Component");
-            assert.isFalse(request.wantsWidth, "does not request more width if enough was supplied for widest Component");
-            assert.strictEqual(request.height, SVG_HEIGHT / 2, "requested enough space for tallest Component");
-            assert.isFalse(request.wantsHeight, "does not request more height if enough was supplied for tallest Component");
-            var constrainedRequest = cg._requestedSpace(SVG_WIDTH / 10, SVG_HEIGHT / 10);
-            assert.strictEqual(constrainedRequest.width, SVG_WIDTH / 2, "requested enough space for widest Component");
-            assert.isTrue(constrainedRequest.wantsWidth, "requests more width if not enough was supplied for widest Component");
-            assert.strictEqual(constrainedRequest.height, SVG_HEIGHT / 2, "requested enough space for tallest Component");
-            assert.isTrue(constrainedRequest.wantsHeight, "requests more height if not enough was supplied for tallest Component");
+            var request = cg.requestedSpace(SVG_WIDTH, SVG_HEIGHT);
+            assert.strictEqual(request.minWidth, SVG_WIDTH / 2, "requested enough space for widest Component");
+            assert.strictEqual(request.minHeight, SVG_HEIGHT / 2, "requested enough space for tallest Component");
+            var constrainedRequest = cg.requestedSpace(SVG_WIDTH / 10, SVG_HEIGHT / 10);
+            assert.strictEqual(constrainedRequest.minWidth, SVG_WIDTH / 2, "requested enough space for widest Component");
+            assert.strictEqual(constrainedRequest.minHeight, SVG_HEIGHT / 2, "requested enough space for tallest Component");
             cg.renderTo(svg);
             assert.strictEqual(cg.width(), SVG_WIDTH, "occupies all offered width");
             assert.strictEqual(cg.height(), SVG_HEIGHT, "occupies all offered height");
@@ -6217,13 +6128,13 @@ describe("ComponentGroups", function () {
             var cg1 = new Plottable.ComponentContainer();
             var cg2 = new Plottable.ComponentContainer();
             var c = new Plottable.Component();
-            cg1._addComponent(c);
+            cg1.add(c);
             cg1.renderTo(svg);
             cg2.renderTo(svg);
             assert.strictEqual(cg2.components().length, 0, "second group should have no component before movement");
             assert.strictEqual(cg1.components().length, 1, "first group should have 1 component before movement");
             assert.strictEqual(c._parent(), cg1, "component's parent before moving should be the group 1");
-            assert.doesNotThrow(function () { return cg2._addComponent(c); }, Error, "should be able to move components between groups after anchoring");
+            assert.doesNotThrow(function () { return cg2.add(c); }, Error, "should be able to move components between groups after anchoring");
             assert.strictEqual(cg2.components().length, 1, "second group should have 1 component after movement");
             assert.strictEqual(cg1.components().length, 0, "first group should have no components after movement");
             assert.strictEqual(c._parent(), cg2, "component's parent after movement should be the group 2");
@@ -6232,9 +6143,9 @@ describe("ComponentGroups", function () {
         it("can add null to a component without failing", function () {
             var cg1 = new Plottable.ComponentContainer();
             var c = new Plottable.Component;
-            cg1._addComponent(c);
+            cg1.add(c);
             assert.strictEqual(cg1.components().length, 1, "there should first be 1 element in the group");
-            assert.doesNotThrow(function () { return cg1._addComponent(null); });
+            assert.doesNotThrow(function () { return cg1.add(null); });
             assert.strictEqual(cg1.components().length, 1, "adding null to a group should have no effect on the group");
         });
     });
@@ -6484,11 +6395,9 @@ describe("Component behavior", function () {
         svg.remove();
     });
     it("component defaults are as expected", function () {
-        var layout = c._requestedSpace(1, 1);
-        assert.strictEqual(layout.width, 0, "requested width defaults to 0");
-        assert.strictEqual(layout.height, 0, "requested height defaults to 0");
-        assert.strictEqual(layout.wantsWidth, false, "_requestedSpace().wantsWidth  defaults to false");
-        assert.strictEqual(layout.wantsHeight, false, "_requestedSpace().wantsHeight defaults to false");
+        var layout = c.requestedSpace(1, 1);
+        assert.strictEqual(layout.minWidth, 0, "requested width defaults to 0");
+        assert.strictEqual(layout.minHeight, 0, "requested height defaults to 0");
         assert.strictEqual(c._xAlignProportion, 0, "_xAlignProportion defaults to 0");
         assert.strictEqual(c._yAlignProportion, 0, "_yAlignProportion defaults to 0");
         assert.strictEqual(c._xOffset, 0, "xOffset defaults to 0");
@@ -6501,7 +6410,7 @@ describe("Component behavior", function () {
         var expectedClipPathID = c.getID();
         c.anchor(svg);
         c.computeLayout({ x: 0, y: 0 }, 100, 100);
-        c._render();
+        c.render();
         var expectedPrefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
         expectedPrefix = expectedPrefix.replace(/#.*/g, "");
         var expectedClipPathURL = "url(" + expectedPrefix + "#clipPath" + expectedClipPathID + ")";
@@ -6573,14 +6482,14 @@ describe("Component behavior", function () {
     it("can't reuse component if it's been remove()-ed", function () {
         var c1 = new Plottable.Component();
         c1.renderTo(svg);
-        c1.remove();
+        c1.destroy();
         assert.throws(function () { return c1.renderTo(svg); }, "reuse");
         svg.remove();
     });
     it("redraw() works as expected", function () {
         var cg = new Plottable.Components.Group();
         var c = TestMethods.makeFixedSizeComponent(10, 10);
-        cg._addComponent(c);
+        cg.add(c);
         cg.renderTo(svg);
         assert.strictEqual(cg.height(), 300, "height() is the entire available height");
         assert.strictEqual(cg.width(), 400, "width() is the entire available width");
@@ -6599,7 +6508,7 @@ describe("Component behavior", function () {
         var horizontalComponent = new Plottable.Component();
         var verticalComponent = new Plottable.Component();
         var placeHolder = new Plottable.Component();
-        var t = new Plottable.Components.Table().addComponent(0, 0, verticalComponent).addComponent(0, 1, new Plottable.Component()).addComponent(1, 0, placeHolder).addComponent(1, 1, horizontalComponent);
+        var t = new Plottable.Components.Table().addComponent(verticalComponent, 0, 0).addComponent(new Plottable.Component(), 0, 1).addComponent(placeHolder, 1, 0).addComponent(horizontalComponent, 1, 1);
         t.renderTo(svg);
         horizontalComponent.xAlign("center");
         verticalComponent.yAlign("bottom");
@@ -6610,8 +6519,8 @@ describe("Component behavior", function () {
     it("Components will not translate if they are fixed width/height and request more space than offered", function () {
         // catches #1188
         var c = new Plottable.Component();
-        c._requestedSpace = function () {
-            return { width: 500, height: 500, wantsWidth: true, wantsHeight: true };
+        c.requestedSpace = function () {
+            return { minWidth: 500, minHeight: 500 };
         };
         c._fixedWidthFlag = true;
         c._fixedHeightFlag = true;
@@ -6625,17 +6534,17 @@ describe("Component behavior", function () {
     it("components do not render unless allocated space", function () {
         var renderFlag = false;
         var c = new Plottable.Component();
-        c._doRender = function () { return renderFlag = true; };
+        c._render = function () { return renderFlag = true; };
         c.anchor(svg);
         c._setup();
-        c._render();
+        c.render();
         assert.isFalse(renderFlag, "no render until width/height set to nonzero");
         c._width = 10;
         c._height = 0;
-        c._render();
+        c.render();
         assert.isTrue(renderFlag, "render still occurs if one of width/height is zero");
         c._height = 10;
-        c._render();
+        c.render();
         assert.isTrue(renderFlag, "render occurs if width and height are positive");
         svg.remove();
     });
@@ -6649,7 +6558,7 @@ describe("Component behavior", function () {
         var plot = new Plottable.Plots.Line(xScale, yScale);
         var group = new Plottable.Components.Group;
         group.renderTo(svg1);
-        group._addComponent(plot);
+        group.add(plot);
         assert.deepEqual(plot._parent(), group, "the plot should be inside the group");
         assert.strictEqual(plot.height(), SVG_HEIGHT_1, "the plot should occupy the entire space of the first svg");
         plot.renderTo(svg2);
@@ -6785,7 +6694,7 @@ describe("Dataset", function () {
             assert.deepEqual(ds.data(), newData, "Dataset arrives with correct data");
             callbackCalled = true;
         };
-        ds.broadcaster.registerListener(null, callback);
+        ds.onUpdate(callback);
         ds.data(newData);
         assert.isTrue(callbackCalled, "callback was called when the data was changed");
     });
@@ -6798,26 +6707,26 @@ describe("Dataset", function () {
             assert.deepEqual(ds.metadata(), newMetadata, "Dataset arrives with correct metadata");
             callbackCalled = true;
         };
-        ds.broadcaster.registerListener(null, callback);
+        ds.onUpdate(callback);
         ds.metadata(newMetadata);
         assert.isTrue(callbackCalled, "callback was called when the metadata was changed");
     });
-    it("_getExtent works as expected with user metadata", function () {
-        var data = [1, 2, 3, 4, 1];
-        var metadata = { foo: 11 };
-        var id = function (d) { return d; };
-        var dataset = new Plottable.Dataset(data, metadata);
-        var a1 = function (d, i, m) { return d + i - 2; };
-        assert.deepEqual(dataset._getExtent(a1, id), [-1, 5], "extent for numerical data works properly");
-        var a2 = function (d, i, m) { return d + m.foo; };
-        assert.deepEqual(dataset._getExtent(a2, id), [12, 15], "extent uses metadata appropriately");
-        dataset.metadata({ foo: -1 });
-        assert.deepEqual(dataset._getExtent(a2, id), [0, 3], "metadata change is reflected in extent results");
-        var a3 = function (d, i, m) { return "_" + d; };
-        assert.deepEqual(dataset._getExtent(a3, id), ["_1", "_2", "_3", "_4"], "extent works properly on string domains (no repeats)");
-        var a_toString = function (d) { return (d + 2).toString(); };
-        var coerce = function (d) { return +d; };
-        assert.deepEqual(dataset._getExtent(a_toString, coerce), [3, 6], "type coercion works as expected");
+    it("Removing listener from dataset should be possible", function () {
+        var ds = new Plottable.Dataset();
+        var newData1 = [1, 2, 3];
+        var newData2 = [4, 5, 6];
+        var callbackCalled = false;
+        var callback = function (listenable) {
+            assert.strictEqual(listenable, ds, "Callback received the Dataset as the first argument");
+            callbackCalled = true;
+        };
+        ds.onUpdate(callback);
+        ds.data(newData1);
+        assert.isTrue(callbackCalled, "callback was called when the data was changed");
+        callbackCalled = false;
+        ds.offUpdate(callback);
+        ds.data(newData2);
+        assert.isFalse(callbackCalled, "callback was called when the data was changed");
     });
 });
 
@@ -6831,7 +6740,7 @@ function generateBasicTable(nRows, nCols) {
     for (var i = 0; i < nRows; i++) {
         for (var j = 0; j < nCols; j++) {
             var r = new Plottable.Component();
-            table.addComponent(i, j, r);
+            table.addComponent(r, i, j);
             components.push(r);
         }
     }
@@ -6864,15 +6773,15 @@ describe("Tables", function () {
         var table = new Plottable.Components.Table([row1, row2]);
         assert.strictEqual(table._rows[0][1], c0, "the component is in the right spot");
         var c1 = new Plottable.Component();
-        table.addComponent(2, 2, c1);
+        table.addComponent(c1, 2, 2);
         assert.strictEqual(table._rows[2][2], c1, "the inserted component went to the right spot");
     });
     it("tables can be constructed by adding components in matrix style", function () {
         var table = new Plottable.Components.Table();
         var c1 = new Plottable.Component();
         var c2 = new Plottable.Component();
-        table.addComponent(0, 0, c1);
-        table.addComponent(1, 1, c2);
+        table.addComponent(c1, 0, 0);
+        table.addComponent(c2, 1, 1);
         var rows = table._rows;
         assert.lengthOf(rows, 2, "there are two rows");
         assert.lengthOf(rows[0], 2, "two cols in first row");
@@ -6887,9 +6796,9 @@ describe("Tables", function () {
         var c2 = new Plottable.Component();
         var c3 = new Plottable.Component();
         var t = new Plottable.Components.Table();
-        t.addComponent(0, 2, c1);
-        t.addComponent(0, 0, c2);
-        t.addComponent(0, 2, c3);
+        t.addComponent(c1, 0, 2);
+        t.addComponent(c2, 0, 0);
+        t.addComponent(c3, 0, 2);
         assert.isTrue(Plottable.Components.Group.prototype.isPrototypeOf(t._rows[0][2]), "A group was created");
         var components = t._rows[0][2].components();
         assert.lengthOf(components, 2, "The group created should have 2 components");
@@ -6902,8 +6811,8 @@ describe("Tables", function () {
         var grp = new Plottable.Components.Group([c1, c2]);
         var c3 = new Plottable.Component();
         var t = new Plottable.Components.Table();
-        t.addComponent(0, 2, grp);
-        t.addComponent(0, 2, c3);
+        t.addComponent(grp, 0, 2);
+        t.addComponent(c3, 0, 2);
         assert.isTrue(Plottable.Components.Group.prototype.isPrototypeOf(t._rows[0][2]), "The cell still contains a group");
         var components = t._rows[0][2].components();
         assert.lengthOf(components, 3, "The group created should have 3 components");
@@ -6914,14 +6823,14 @@ describe("Tables", function () {
     it("adding null to a table cell should throw an error", function () {
         var c1 = new Plottable.Component();
         var t = new Plottable.Components.Table([[c1]]);
-        assert.throw(function () { return t.addComponent(0, 0, null); }, "Cannot add null to a table cell");
+        assert.throw(function () { return t.addComponent(null, 0, 0); }, "Cannot add null to a table cell");
     });
     it("addComponent works even if a component is added with a high column and low row index", function () {
         // Solves #180, a weird bug
         var t = new Plottable.Components.Table();
         var svg = TestMethods.generateSVG();
-        t.addComponent(1, 0, new Plottable.Component());
-        t.addComponent(0, 2, new Plottable.Component());
+        t.addComponent(new Plottable.Component(), 1, 0);
+        t.addComponent(new Plottable.Component(), 0, 2);
         t.renderTo(svg); // would throw an error without the fix (tested);
         svg.remove();
     });
@@ -7000,17 +6909,17 @@ describe("Tables", function () {
         var table = tableAndcomponents.table;
         var components = tableAndcomponents.components;
         components.forEach(function (c) { return TestMethods.fixComponentSize(c, 10, 10); });
-        assert.isTrue(table._isFixedWidth(), "fixed width when all subcomponents fixed width");
-        assert.isTrue(table._isFixedHeight(), "fixedHeight when all subcomponents fixed height");
+        assert.isTrue(table.fixedWidth(), "fixed width when all subcomponents fixed width");
+        assert.isTrue(table.fixedHeight(), "fixedHeight when all subcomponents fixed height");
         TestMethods.fixComponentSize(components[0], null, 10);
-        assert.isFalse(table._isFixedWidth(), "width not fixed when some subcomponent width not fixed");
-        assert.isTrue(table._isFixedHeight(), "the height is still fixed when some subcomponent width not fixed");
+        assert.isFalse(table.fixedWidth(), "width not fixed when some subcomponent width not fixed");
+        assert.isTrue(table.fixedHeight(), "the height is still fixed when some subcomponent width not fixed");
         TestMethods.fixComponentSize(components[8], 10, null);
         TestMethods.fixComponentSize(components[0], 10, 10);
-        assert.isTrue(table._isFixedWidth(), "width fixed again once no subcomponent width not fixed");
-        assert.isFalse(table._isFixedHeight(), "height unfixed now that a subcomponent has unfixed height");
+        assert.isTrue(table.fixedWidth(), "width fixed again once no subcomponent width not fixed");
+        assert.isFalse(table.fixedHeight(), "height unfixed now that a subcomponent has unfixed height");
     });
-    it.skip("table._requestedSpace works properly", function () {
+    it.skip("table.requestedSpace works properly", function () {
         // [0 1]
         // [2 3]
         var c0 = new Plottable.Component();
@@ -7018,14 +6927,14 @@ describe("Tables", function () {
         var c2 = TestMethods.makeFixedSizeComponent(20, 50);
         var c3 = TestMethods.makeFixedSizeComponent(20, 20);
         var table = new Plottable.Components.Table([[c0, c1], [c2, c3]]);
-        var spaceRequest = table._requestedSpace(30, 30);
-        TestMethods.verifySpaceRequest(spaceRequest, 30, 30, true, true, "1");
-        spaceRequest = table._requestedSpace(50, 50);
-        TestMethods.verifySpaceRequest(spaceRequest, 50, 50, true, true, "2");
-        spaceRequest = table._requestedSpace(90, 90);
-        TestMethods.verifySpaceRequest(spaceRequest, 70, 90, false, true, "3");
-        spaceRequest = table._requestedSpace(200, 200);
-        TestMethods.verifySpaceRequest(spaceRequest, 70, 100, false, false, "4");
+        var spaceRequest = table.requestedSpace(30, 30);
+        TestMethods.verifySpaceRequest(spaceRequest, 30, 30, "1");
+        spaceRequest = table.requestedSpace(50, 50);
+        TestMethods.verifySpaceRequest(spaceRequest, 50, 50, "2");
+        spaceRequest = table.requestedSpace(90, 90);
+        TestMethods.verifySpaceRequest(spaceRequest, 70, 90, "3");
+        spaceRequest = table.requestedSpace(200, 200);
+        TestMethods.verifySpaceRequest(spaceRequest, 70, 100, "4");
     });
     describe("table._iterateLayout works properly", function () {
         // This test battery would have caught #405
@@ -7037,53 +6946,48 @@ describe("Tables", function () {
             assert.deepEqual(result.wantsWidth, wW, "wantsWidth:" + id);
             assert.deepEqual(result.wantsHeight, wH, "wantsHeight:" + id);
         }
-        var c1 = new Plottable.Component();
-        var c2 = new Plottable.Component();
-        var c3 = new Plottable.Component();
-        var c4 = new Plottable.Component();
-        var table = new Plottable.Components.Table([
-            [c1, c2],
-            [c3, c4]
-        ]);
         it("iterateLayout works in the easy case where there is plenty of space and everything is satisfied on first go", function () {
-            TestMethods.fixComponentSize(c1, 50, 50);
-            TestMethods.fixComponentSize(c4, 20, 10);
+            var c1 = new Mocks.FixedSizeComponent(50, 50);
+            var c2 = new Plottable.Component();
+            var c3 = new Plottable.Component();
+            var c4 = new Mocks.FixedSizeComponent(20, 10);
+            var table = new Plottable.Components.Table([
+                [c1, c2],
+                [c3, c4]
+            ]);
             var result = table._iterateLayout(500, 500);
             verifyLayoutResult(result, [215, 215], [220, 220], [50, 20], [50, 10], false, false, "");
         });
         it.skip("iterateLayout works in the difficult case where there is a shortage of space and layout requires iterations", function () {
-            TestMethods.fixComponentSize(c1, 490, 50);
+            var c1 = new Mocks.FixedSizeComponent(490, 50);
+            var c2 = new Plottable.Component();
+            var c3 = new Plottable.Component();
+            var c4 = new Plottable.Component();
+            var table = new Plottable.Components.Table([
+                [c1, c2],
+                [c3, c4]
+            ]);
             var result = table._iterateLayout(500, 500);
             verifyLayoutResult(result, [0, 0], [220, 220], [480, 20], [50, 10], true, false, "");
         });
         it("iterateLayout works in the case where all components are fixed-size", function () {
-            TestMethods.fixComponentSize(c1, 50, 50);
-            TestMethods.fixComponentSize(c2, 50, 50);
-            TestMethods.fixComponentSize(c3, 50, 50);
-            TestMethods.fixComponentSize(c4, 50, 50);
+            var c1 = new Mocks.FixedSizeComponent(50, 50);
+            var c2 = new Mocks.FixedSizeComponent(50, 50);
+            var c3 = new Mocks.FixedSizeComponent(50, 50);
+            var c4 = new Mocks.FixedSizeComponent(50, 50);
+            var table = new Plottable.Components.Table([
+                [c1, c2],
+                [c3, c4]
+            ]);
             var result = table._iterateLayout(100, 100);
-            verifyLayoutResult(result, [0, 0], [0, 0], [50, 50], [50, 50], false, false, "..when there's exactly enough space");
+            verifyLayoutResult(result, [0, 0], [0, 0], [50, 50], [50, 50], false, false, "when there's exactly enough space");
             result = table._iterateLayout(80, 80);
-            verifyLayoutResult(result, [0, 0], [0, 0], [40, 40], [40, 40], true, true, "..when there's not enough space");
+            verifyLayoutResult(result, [0, 0], [0, 0], [50, 50], [50, 50], true, true, "still requests more space if constrained");
+            result = table._iterateLayout(80, 80, true);
+            verifyLayoutResult(result, [0, 0], [0, 0], [40, 40], [40, 40], true, true, "accepts suboptimal layout if it's the final offer");
             result = table._iterateLayout(120, 120);
             // If there is extra space in a fixed-size table, the extra space should not be allocated to proportional space
-            verifyLayoutResult(result, [0, 0], [0, 0], [50, 50], [50, 50], false, false, "..when there's extra space");
-        });
-        it.skip("iterateLayout works in the tricky case when components can be unsatisfied but request little space", function () {
-            table = new Plottable.Components.Table([[c1, c2]]);
-            TestMethods.fixComponentSize(c1, null, null);
-            c2._requestedSpace = function (w, h) {
-                return {
-                    width: w >= 200 ? 200 : 0,
-                    height: h >= 200 ? 200 : 0,
-                    wantsWidth: w < 200,
-                    wantsHeight: h < 200
-                };
-            };
-            var result = table._iterateLayout(200, 200);
-            verifyLayoutResult(result, [0, 0], [0], [0, 200], [200], false, false, "when there's sufficient space");
-            result = table._iterateLayout(150, 200);
-            verifyLayoutResult(result, [150, 0], [0], [0, 0], [200], true, false, "when there's insufficient space");
+            verifyLayoutResult(result, [0, 0], [0, 0], [50, 50], [50, 50], false, false, "when there's extra space");
         });
     });
     describe("table._removeComponent works properly", function () {
@@ -7096,24 +7000,24 @@ describe("Tables", function () {
         var table;
         it("table._removeComponent works in basic case", function () {
             table = new Plottable.Components.Table([[c1, c2], [c3, c4], [c5, c6]]);
-            table._removeComponent(c4);
+            table.removeComponent(c4);
             assert.deepEqual(table._rows, [[c1, c2], [c3, null], [c5, c6]], "remove one element");
         });
         it("table._removeComponent does nothing when component is not found", function () {
             table = new Plottable.Components.Table([[c1, c2], [c3, c4]]);
-            table._removeComponent(c5);
+            table.removeComponent(c5);
             assert.deepEqual(table._rows, [[c1, c2], [c3, c4]], "remove nonexistent component");
         });
         it("table._removeComponent removing component twice should have same effect as removing it once", function () {
             table = new Plottable.Components.Table([[c1, c2, c3], [c4, c5, c6]]);
-            table._removeComponent(c1);
+            table.removeComponent(c1);
             assert.deepEqual(table._rows, [[null, c2, c3], [c4, c5, c6]], "item twice");
-            table._removeComponent(c1);
+            table.removeComponent(c1);
             assert.deepEqual(table._rows, [[null, c2, c3], [c4, c5, c6]], "item twice");
         });
         it("table._removeComponent doesn't do anything weird when called with null", function () {
             table = new Plottable.Components.Table([[c1, null], [c2, c3]]);
-            table._removeComponent(null);
+            table.removeComponent(null);
             assert.deepEqual(table._rows, [[c1, null], [c2, c3]]);
         });
     });
@@ -7203,17 +7107,17 @@ describe("Domainer", function () {
         assert.deepEqual(domain, [0, 100]);
     });
     it("paddingException(n) will not pad beyond n", function () {
-        domainer.pad(0.1).addPaddingException(0, "key").addPaddingException(200);
+        domainer.pad(0.1).addPaddingException("keyLeft", 0).addPaddingException("keyRight", 200);
         var domain = domainer.computeDomain([[0, 100]], scale);
         assert.deepEqual(domain, [0, 105], "padding exceptions can be added by key");
         domain = domainer.computeDomain([[-100, 0]], scale);
         assert.deepEqual(domain, [-105, 0]);
         domain = domainer.computeDomain([[0, 200]], scale);
         assert.deepEqual(domain, [0, 200]);
-        domainer.removePaddingException("key");
+        domainer.removePaddingException("keyLeft");
         domain = domainer.computeDomain([[0, 200]], scale);
         assert.deepEqual(domain, [-10, 200], "paddingExceptions can be removed by key");
-        domainer.removePaddingException(200);
+        domainer.removePaddingException("keyRight");
         domain = domainer.computeDomain([[0, 200]], scale);
         assert.notEqual(domain[1], 200, "unregistered paddingExceptions can be removed using boolean argument");
     });
@@ -7223,34 +7127,34 @@ describe("Domainer", function () {
         var timeScale = new Plottable.Scales.Time();
         timeScale.addExtentProvider(function (scale) { return [[startDate, endDate]]; });
         timeScale.autoDomain();
-        domainer.pad().addPaddingException(startDate);
+        domainer.pad().addPaddingException("key", startDate);
         timeScale.domainer(domainer);
         var domain = timeScale.domain();
         assert.deepEqual(domain[0], startDate);
         assert.isTrue(endDate < domain[1]);
     });
     it("include(n) works an expected", function () {
-        domainer.addIncludedValue(5);
+        domainer.addIncludedValue("key1", 5);
         var domain = domainer.computeDomain([[0, 10]], scale);
         assert.deepEqual(domain, [0, 10]);
         domain = domainer.computeDomain([[0, 3]], scale);
         assert.deepEqual(domain, [0, 5]);
         domain = domainer.computeDomain([[100, 200]], scale);
         assert.deepEqual(domain, [5, 200]);
-        domainer.addIncludedValue(-3).addIncludedValue(0).addIncludedValue(10, "key");
+        domainer.addIncludedValue("key2", -3).addIncludedValue("key3", 0).addIncludedValue("key4", 10);
         domain = domainer.computeDomain([[100, 200]], scale);
         assert.deepEqual(domain, [-3, 200]);
         domain = domainer.computeDomain([[0, 0]], scale);
         assert.deepEqual(domain, [-3, 10]);
-        domainer.removeIncludedValue("key");
+        domainer.removeIncludedValue("key4");
         domain = domainer.computeDomain([[100, 200]], scale);
         assert.deepEqual(domain, [-3, 200]);
         domain = domainer.computeDomain([[-100, -50]], scale);
         assert.deepEqual(domain, [-100, 5]);
-        domainer.addIncludedValue(10);
+        domainer.addIncludedValue("key5", 10);
         domain = domainer.computeDomain([[-100, -50]], scale);
         assert.deepEqual(domain, [-100, 10], "unregistered includedValues can be added");
-        domainer.removeIncludedValue(10);
+        domainer.removeIncludedValue("key5");
         domain = domainer.computeDomain([[-100, -50]], scale);
         assert.deepEqual(domain, [-100, 5], "unregistered includedValues can be removed with addOrRemove argument");
     });
@@ -7261,7 +7165,7 @@ describe("Domainer", function () {
         var timeScale = new Plottable.Scales.Time();
         timeScale.addExtentProvider(function (scale) { return [[startDate, endDate]]; });
         timeScale.autoDomain();
-        domainer.addIncludedValue(includedDate);
+        domainer.addIncludedValue("key", includedDate);
         timeScale.domainer(domainer);
         assert.deepEqual(timeScale.domain(), [includedDate, endDate], "domain was expanded to contain included date");
     });
@@ -7291,13 +7195,13 @@ describe("Domainer", function () {
         assert.deepEqual(getExceptions(), [0], "initializing the plot adds a padding exception at 0");
         // assert.deepEqual(getExceptions(), [], "Initially there are no padding exceptions");
         r.project("y0", "y0", yScale);
-        assert.deepEqual(getExceptions(), [], "projecting a non-constant y0 removes the padding exception");
+        assert.deepEqual(getExceptions(), [], "projecting a non-constant y0 removes the padding exception 1");
         r.project("y0", 0, yScale);
         assert.deepEqual(getExceptions(), [0], "projecting constant y0 adds the exception back");
         r.project("y0", function () { return 5; }, yScale);
         assert.deepEqual(getExceptions(), [5], "projecting a different constant y0 removed the old exception and added a new one");
         r.project("y0", "y0", yScale);
-        assert.deepEqual(getExceptions(), [], "projecting a non-constant y0 removes the padding exception");
+        assert.deepEqual(getExceptions(), [], "projecting a non-constant y0 removes the padding exception 2");
         dataset.data([{ x: 0, y: 0, y0: 0 }, { x: 5, y: 5, y0: 0 }]);
         assert.deepEqual(getExceptions(), [0], "changing to constant values via change in datasource adds exception");
         svg.remove();
@@ -8134,38 +8038,38 @@ describe("Formatters", function () {
 
 ///<reference path="../testReference.ts" />
 var assert = chai.assert;
-describe("StrictEqualityAssociativeArray", function () {
-    it("StrictEqualityAssociativeArray works as expected", function () {
-        var s = new Plottable.Utils.StrictEqualityAssociativeArray();
+describe("Map", function () {
+    it("Map works as expected", function () {
+        var map = new Plottable.Utils.Map();
         var o1 = {};
         var o2 = {};
-        assert.isFalse(s.has(o1));
-        assert.isFalse(s.delete(o1));
-        assert.isUndefined(s.get(o1));
-        assert.isFalse(s.set(o1, "foo"));
-        assert.strictEqual(s.get(o1), "foo");
-        assert.isTrue(s.set(o1, "bar"));
-        assert.strictEqual(s.get(o1), "bar");
-        s.set(o2, "baz");
-        s.set(3, "bam");
-        s.set("3", "ball");
-        assert.strictEqual(s.get(o1), "bar");
-        assert.strictEqual(s.get(o2), "baz");
-        assert.strictEqual(s.get(3), "bam");
-        assert.strictEqual(s.get("3"), "ball");
-        assert.isTrue(s.delete(3));
-        assert.isUndefined(s.get(3));
-        assert.strictEqual(s.get(o2), "baz");
-        assert.strictEqual(s.get("3"), "ball");
+        assert.isFalse(map.has(o1));
+        assert.isFalse(map.delete(o1));
+        assert.isUndefined(map.get(o1));
+        assert.isFalse(map.set(o1, "foo"));
+        assert.strictEqual(map.get(o1), "foo");
+        assert.isTrue(map.set(o1, "bar"));
+        assert.strictEqual(map.get(o1), "bar");
+        map.set(o2, "baz");
+        map.set(3, "bam");
+        map.set("3", "ball");
+        assert.strictEqual(map.get(o1), "bar");
+        assert.strictEqual(map.get(o2), "baz");
+        assert.strictEqual(map.get(3), "bam");
+        assert.strictEqual(map.get("3"), "ball");
+        assert.isTrue(map.delete(3));
+        assert.isUndefined(map.get(3));
+        assert.strictEqual(map.get(o2), "baz");
+        assert.strictEqual(map.get("3"), "ball");
     });
     it("Array-level operations (retrieve keys, vals, and map)", function () {
-        var s = new Plottable.Utils.StrictEqualityAssociativeArray();
-        s.set(2, "foo");
-        s.set(3, "bar");
-        s.set(4, "baz");
-        assert.deepEqual(s.values(), ["foo", "bar", "baz"]);
-        assert.deepEqual(s.keys(), [2, 3, 4]);
-        assert.deepEqual(s.map(function (k, v, i) { return [k, v, i]; }), [[2, "foo", 0], [3, "bar", 1], [4, "baz", 2]]);
+        var map = new Plottable.Utils.Map();
+        map.set(2, "foo");
+        map.set(3, "bar");
+        map.set(4, "baz");
+        assert.deepEqual(map.values(), ["foo", "bar", "baz"]);
+        assert.deepEqual(map.keys(), [2, 3, 4]);
+        assert.deepEqual(map.map(function (k, v, i) { return [k, v, i]; }), [[2, "foo", 0], [3, "bar", 1], [4, "baz", 2]]);
     });
 });
 
@@ -8475,16 +8379,16 @@ describe("Interactions", function () {
             var svg = TestMethods.generateSVG(400, 400);
             var component = new Plottable.Component();
             component.renderTo(svg);
-            var ki = new Plottable.Interactions.Key();
+            var keyInteraction = new Plottable.Interactions.Key();
             var aCode = 65; // "a" key
             var bCode = 66; // "b" key
             var aCallbackCalled = false;
             var aCallback = function () { return aCallbackCalled = true; };
             var bCallbackCalled = false;
             var bCallback = function () { return bCallbackCalled = true; };
-            ki.on(aCode, aCallback);
-            ki.on(bCode, bCallback);
-            component.registerInteraction(ki);
+            keyInteraction.onKey(aCode, aCallback);
+            keyInteraction.onKey(bCode, bCallback);
+            component.registerInteraction(keyInteraction);
             var $target = $(component.background().node());
             TestMethods.triggerFakeMouseEvent("mouseover", component.background(), 100, 100);
             $target.simulate("keydown", { keyCode: aCode });
@@ -8498,6 +8402,74 @@ describe("Interactions", function () {
             aCallbackCalled = false;
             $target.simulate("keydown", { keyCode: aCode });
             assert.isFalse(aCallbackCalled, "callback for \"a\" was not called when not moused over the Component");
+            svg.remove();
+        });
+        it("appropriate keyCode is sent to the callback", function () {
+            var svg = TestMethods.generateSVG(400, 400);
+            var component = new Plottable.Component();
+            component.renderTo(svg);
+            var keyInteraction = new Plottable.Interactions.Key();
+            var bCode = 66; // "b" key
+            var bCallbackCalled = false;
+            var bCallback = function (keyCode) {
+                bCallbackCalled = true;
+                assert.strictEqual(keyCode, bCode, "keyCode 65(a) was sent to the callback");
+            };
+            keyInteraction.onKey(bCode, bCallback);
+            component.registerInteraction(keyInteraction);
+            var $target = $(component.background().node());
+            TestMethods.triggerFakeMouseEvent("mouseover", component.background(), 100, 100);
+            $target.simulate("keydown", { keyCode: bCode });
+            assert.isTrue(bCallbackCalled, "callback for \"b\" was called when \"b\" key was pressed");
+            svg.remove();
+        });
+        it("canceling callbacks is possible", function () {
+            var svg = TestMethods.generateSVG(400, 400);
+            var component = new Plottable.Component();
+            component.renderTo(svg);
+            var keyInteraction = new Plottable.Interactions.Key();
+            var aCode = 65; // "a" key
+            var aCallbackCalled = false;
+            var aCallback = function () { return aCallbackCalled = true; };
+            keyInteraction.onKey(aCode, aCallback);
+            component.registerInteraction(keyInteraction);
+            var $target = $(component.background().node());
+            TestMethods.triggerFakeMouseEvent("mouseover", component.background(), 100, 100);
+            $target.simulate("keydown", { keyCode: aCode });
+            assert.isTrue(aCallbackCalled, "callback for \"a\" was called when \"a\" key was pressed");
+            keyInteraction.offKey(aCode, aCallback);
+            aCallbackCalled = false;
+            $target.simulate("keydown", { keyCode: aCode });
+            assert.isFalse(aCallbackCalled, "callback for \"a\" was disconnected from the interaction");
+            keyInteraction.onKey(aCode, aCallback);
+            $target.simulate("keydown", { keyCode: aCode });
+            assert.isTrue(aCallbackCalled, "callback for \"a\" was properly connected back to the interaction");
+            svg.remove();
+        });
+        it("multiple callbacks are possible", function () {
+            var svg = TestMethods.generateSVG(400, 400);
+            var component = new Plottable.Component();
+            component.renderTo(svg);
+            var keyInteraction = new Plottable.Interactions.Key();
+            var aCode = 65; // "a" key
+            var aCallback1Called = false;
+            var aCallback1 = function () { return aCallback1Called = true; };
+            var aCallback2Called = false;
+            var aCallback2 = function () { return aCallback2Called = true; };
+            keyInteraction.onKey(aCode, aCallback1);
+            keyInteraction.onKey(aCode, aCallback2);
+            component.registerInteraction(keyInteraction);
+            var $target = $(component.background().node());
+            TestMethods.triggerFakeMouseEvent("mouseover", component.background(), 100, 100);
+            $target.simulate("keydown", { keyCode: aCode });
+            assert.isTrue(aCallback1Called, "callback 1 for \"a\" was called when \"a\" key was pressed");
+            assert.isTrue(aCallback1Called, "callback 2 for \"b\" was called when \"a\" key was pressed");
+            keyInteraction.offKey(aCode, aCallback1);
+            aCallback1Called = false;
+            aCallback2Called = false;
+            $target.simulate("keydown", { keyCode: aCode });
+            assert.isFalse(aCallback1Called, "callback 1 for \"a\" was disconnected from the interaction");
+            assert.isTrue(aCallback2Called, "callback 2 for \"a\" is still connected to the interaction");
             svg.remove();
         });
     });
@@ -8522,7 +8494,6 @@ describe("Interactions", function () {
                 lastPoint = p;
             };
             pointerInteraction.onPointerEnter(callback);
-            assert.strictEqual(pointerInteraction.onPointerEnter(), callback, "callback can be retrieved");
             var target = c.background();
             TestMethods.triggerFakeMouseEvent("mousemove", target, SVG_WIDTH / 2, SVG_HEIGHT / 2);
             assert.isTrue(callbackCalled, "callback called on entering Component (mouse)");
@@ -8542,7 +8513,7 @@ describe("Interactions", function () {
             assert.isFalse(callbackCalled, "callback not called again if already in Component (touch)");
             TestMethods.triggerFakeTouchEvent("touchstart", target, [{ x: 2 * SVG_WIDTH, y: 2 * SVG_HEIGHT }]);
             assert.isFalse(callbackCalled, "not called when moving outside of the Component (touch)");
-            pointerInteraction.onPointerEnter(null);
+            pointerInteraction.offPointerEnter(callback);
             TestMethods.triggerFakeMouseEvent("mousemove", target, SVG_WIDTH / 2, SVG_HEIGHT / 2);
             assert.isFalse(callbackCalled, "callback removed by passing null");
             svg.remove();
@@ -8560,7 +8531,6 @@ describe("Interactions", function () {
                 lastPoint = p;
             };
             pointerInteraction.onPointerMove(callback);
-            assert.strictEqual(pointerInteraction.onPointerMove(), callback, "callback can be retrieved");
             var target = c.background();
             TestMethods.triggerFakeMouseEvent("mousemove", target, SVG_WIDTH / 2, SVG_HEIGHT / 2);
             assert.isTrue(callbackCalled, "callback called on entering Component (mouse)");
@@ -8583,7 +8553,7 @@ describe("Interactions", function () {
             callbackCalled = false;
             TestMethods.triggerFakeTouchEvent("touchstart", target, [{ x: 2 * SVG_WIDTH, y: 2 * SVG_HEIGHT }]);
             assert.isFalse(callbackCalled, "not called when moving outside of the Component (touch)");
-            pointerInteraction.onPointerMove(null);
+            pointerInteraction.offPointerMove(callback);
             TestMethods.triggerFakeMouseEvent("mousemove", target, SVG_WIDTH / 2, SVG_HEIGHT / 2);
             assert.isFalse(callbackCalled, "callback removed by passing null");
             svg.remove();
@@ -8601,7 +8571,6 @@ describe("Interactions", function () {
                 lastPoint = p;
             };
             pointerInteraction.onPointerExit(callback);
-            assert.strictEqual(pointerInteraction.onPointerExit(), callback, "callback can be retrieved");
             var target = c.background();
             TestMethods.triggerFakeMouseEvent("mousemove", target, 2 * SVG_WIDTH, 2 * SVG_HEIGHT);
             assert.isFalse(callbackCalled, "not called when moving outside of the Component (mouse)");
@@ -8623,10 +8592,66 @@ describe("Interactions", function () {
             callbackCalled = false;
             TestMethods.triggerFakeTouchEvent("touchstart", target, [{ x: 3 * SVG_WIDTH, y: 3 * SVG_HEIGHT }]);
             assert.isFalse(callbackCalled, "callback not called again if already outside of Component (touch)");
-            pointerInteraction.onPointerExit(null);
+            pointerInteraction.offPointerExit(callback);
             TestMethods.triggerFakeMouseEvent("mousemove", target, SVG_WIDTH / 2, SVG_HEIGHT / 2);
             TestMethods.triggerFakeMouseEvent("mousemove", target, 2 * SVG_WIDTH, 2 * SVG_HEIGHT);
             assert.isFalse(callbackCalled, "callback removed by passing null");
+            svg.remove();
+        });
+        it("multiple callbacks can be added to pointer interaction", function () {
+            var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var component = new Plottable.Component();
+            component.renderTo(svg);
+            var pointer = new Plottable.Interactions.Pointer();
+            var enterCallback1Called = false;
+            var enterCallback2Called = false;
+            var moveCallback1Called = false;
+            var moveCallback2Called = false;
+            var exitCallback1Called = false;
+            var exitCallback2Called = false;
+            var enterCallback1 = function () { return enterCallback1Called = true; };
+            var enterCallback2 = function () { return enterCallback2Called = true; };
+            var moveCallback1 = function () { return moveCallback1Called = true; };
+            var moveCallback2 = function () { return moveCallback2Called = true; };
+            var exitCallback1 = function () { return exitCallback1Called = true; };
+            var exitCallback2 = function () { return exitCallback2Called = true; };
+            pointer.onPointerEnter(enterCallback1);
+            pointer.onPointerEnter(enterCallback2);
+            pointer.onPointerMove(moveCallback1);
+            pointer.onPointerMove(moveCallback2);
+            pointer.onPointerExit(exitCallback1);
+            pointer.onPointerExit(exitCallback2);
+            component.registerInteraction(pointer);
+            var target = component.background();
+            var insidePoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
+            var outsidePoint = { x: SVG_WIDTH * 2, y: SVG_HEIGHT * 2 };
+            TestMethods.triggerFakeMouseEvent("mousemove", target, outsidePoint.x, outsidePoint.y);
+            TestMethods.triggerFakeMouseEvent("mousemove", target, insidePoint.x, insidePoint.y);
+            TestMethods.triggerFakeMouseEvent("mousemove", target, outsidePoint.x, outsidePoint.y);
+            assert.isTrue(enterCallback1Called, "callback 1 was called on entering Component (mouse)");
+            assert.isTrue(enterCallback2Called, "callback 2 was called on entering Component (mouse)");
+            assert.isTrue(moveCallback1Called, "callback 1 was called on moving inside Component (mouse)");
+            assert.isTrue(moveCallback2Called, "callback 2 was called on moving inside Component (mouse)");
+            assert.isTrue(exitCallback1Called, "callback 1 was called on exiting Component (mouse)");
+            assert.isTrue(exitCallback2Called, "callback 2 was called on exiting Component (mouse)");
+            enterCallback1Called = false;
+            enterCallback2Called = false;
+            moveCallback1Called = false;
+            moveCallback2Called = false;
+            exitCallback1Called = false;
+            exitCallback2Called = false;
+            pointer.offPointerEnter(enterCallback1);
+            pointer.offPointerMove(moveCallback1);
+            pointer.offPointerExit(exitCallback1);
+            TestMethods.triggerFakeMouseEvent("mousemove", target, outsidePoint.x, outsidePoint.y);
+            TestMethods.triggerFakeMouseEvent("mousemove", target, insidePoint.x, insidePoint.y);
+            TestMethods.triggerFakeMouseEvent("mousemove", target, outsidePoint.x, outsidePoint.y);
+            assert.isFalse(enterCallback1Called, "callback 1 was disconnected from pointer enter interaction");
+            assert.isTrue(enterCallback2Called, "callback 2 is still connected to the pointer enter interaction");
+            assert.isFalse(moveCallback1Called, "callback 1 was disconnected from pointer interaction");
+            assert.isTrue(moveCallback2Called, "callback 2 is still connected to the pointer interaction");
+            assert.isFalse(exitCallback1Called, "callback 1 was disconnected from the pointer exit interaction");
+            assert.isTrue(exitCallback2Called, "callback 2 is still connected to the pointer exit interaction");
             svg.remove();
         });
     });
@@ -8651,7 +8676,6 @@ describe("Interactions", function () {
                 lastPoint = p;
             };
             clickInteraction.onClick(callback);
-            assert.strictEqual(clickInteraction.onClick(), callback, "callback can be retrieved");
             TestMethods.triggerFakeMouseEvent("mousedown", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
             TestMethods.triggerFakeMouseEvent("mouseup", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
             assert.isTrue(callbackCalled, "callback called on clicking Component (mouse)");
@@ -8699,6 +8723,50 @@ describe("Interactions", function () {
             assert.isTrue(callbackCalled, "callback called even if moved outside component (touch)");
             svg.remove();
         });
+        it("offClick()", function () {
+            var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var component = new Plottable.Component();
+            component.renderTo(svg);
+            var clickInteraction = new Plottable.Interactions.Click();
+            component.registerInteraction(clickInteraction);
+            var callbackWasCalled = false;
+            var callback = function () { return callbackWasCalled = true; };
+            clickInteraction.onClick(callback);
+            TestMethods.triggerFakeMouseEvent("mousedown", component.content(), 0, 0);
+            TestMethods.triggerFakeMouseEvent("mouseup", component.content(), 0, 0);
+            assert.isTrue(callbackWasCalled, "Click interaction should trigger the callback");
+            clickInteraction.offClick(callback);
+            callbackWasCalled = false;
+            TestMethods.triggerFakeMouseEvent("mousedown", component.content(), 0, 0);
+            TestMethods.triggerFakeMouseEvent("mouseup", component.content(), 0, 0);
+            assert.isFalse(callbackWasCalled, "Callback should be disconnected from the click interaction");
+            svg.remove();
+        });
+        it("multiple click listeners", function () {
+            var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var component = new Plottable.Component();
+            component.renderTo(svg);
+            var clickInteraction = new Plottable.Interactions.Click();
+            component.registerInteraction(clickInteraction);
+            var callback1WasCalled = false;
+            var callback1 = function () { return callback1WasCalled = true; };
+            var callback2WasCalled = false;
+            var callback2 = function () { return callback2WasCalled = true; };
+            clickInteraction.onClick(callback1);
+            clickInteraction.onClick(callback2);
+            TestMethods.triggerFakeMouseEvent("mousedown", component.content(), 0, 0);
+            TestMethods.triggerFakeMouseEvent("mouseup", component.content(), 0, 0);
+            assert.isTrue(callback1WasCalled, "Click interaction should trigger the first callback");
+            assert.isTrue(callback2WasCalled, "Click interaction should trigger the second callback");
+            clickInteraction.offClick(callback1);
+            callback1WasCalled = false;
+            callback2WasCalled = false;
+            TestMethods.triggerFakeMouseEvent("mousedown", component.content(), 0, 0);
+            TestMethods.triggerFakeMouseEvent("mouseup", component.content(), 0, 0);
+            assert.isFalse(callback1WasCalled, "Callback1 should be disconnected from the click interaction");
+            assert.isTrue(callback2WasCalled, "Callback2 should still exist on the click interaction");
+            svg.remove();
+        });
         it("cancelling touches cancels any ongoing clicks", function () {
             var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
             var c = new Plottable.Component();
@@ -8740,8 +8808,31 @@ describe("Interactions", function () {
             afterEach(function () {
                 doubleClickedPoint = null;
             });
-            it("onDblClick callback can be retrieved", function () {
-                assert.strictEqual(dblClickInteraction.onDoubleClick(), dblClickCallback, "callback can be retrieved");
+            it("double click interaction accepts multiple callbacks", function () {
+                var userClickPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
+                var newCallback1WasCalled = false;
+                var newCallback1 = function () { return newCallback1WasCalled = true; };
+                var newCallback2WasCalled = false;
+                var newCallback2 = function () { return newCallback2WasCalled = true; };
+                dblClickInteraction.onDoubleClick(newCallback1);
+                dblClickInteraction.onDoubleClick(newCallback2);
+                TestMethods.triggerFakeMouseEvent("mousedown", component.content(), userClickPoint.x, userClickPoint.y);
+                TestMethods.triggerFakeMouseEvent("mouseup", component.content(), userClickPoint.x, userClickPoint.y);
+                TestMethods.triggerFakeMouseEvent("mousedown", component.content(), userClickPoint.x, userClickPoint.y);
+                TestMethods.triggerFakeMouseEvent("mouseup", component.content(), userClickPoint.x, userClickPoint.y);
+                TestMethods.triggerFakeMouseEvent("dblclick", component.content(), userClickPoint.x, userClickPoint.y);
+                assert.isTrue(newCallback1WasCalled, "Callback 1 should be called on double click");
+                assert.isTrue(newCallback2WasCalled, "Callback 2 should be called on double click");
+                newCallback1WasCalled = false;
+                newCallback2WasCalled = false;
+                dblClickInteraction.offDoubleClick(newCallback1);
+                TestMethods.triggerFakeMouseEvent("mousedown", component.content(), userClickPoint.x, userClickPoint.y);
+                TestMethods.triggerFakeMouseEvent("mouseup", component.content(), userClickPoint.x, userClickPoint.y);
+                TestMethods.triggerFakeMouseEvent("mousedown", component.content(), userClickPoint.x, userClickPoint.y);
+                TestMethods.triggerFakeMouseEvent("mouseup", component.content(), userClickPoint.x, userClickPoint.y);
+                TestMethods.triggerFakeMouseEvent("dblclick", component.content(), userClickPoint.x, userClickPoint.y);
+                assert.isFalse(newCallback1WasCalled, "Callback 1 should be disconnected from the interaction");
+                assert.isTrue(newCallback2WasCalled, "Callback 2 should still be connected to the interaction");
                 svg.remove();
             });
             it("callback sets correct point on normal case", function () {
@@ -8853,9 +8944,12 @@ describe("Interactions", function () {
             assert.isFalse(startCallbackCalled, "does not trigger callback if drag starts outside the Component (positive) (touchstart)");
             TestMethods.triggerFakeTouchEvent("touchstart", target, [{ x: outsidePointNeg.x, y: outsidePointNeg.y }]);
             assert.isFalse(startCallbackCalled, "does not trigger callback if drag starts outside the Component (negative) (touchstart)");
-            assert.strictEqual(drag.onDragStart(), startCallback, "retrieves the callback if called with no arguments");
-            drag.onDragStart(null);
-            assert.isNull(drag.onDragStart(), "removes the callback if called with null");
+            drag.offDragStart(startCallback);
+            startCallbackCalled = false;
+            TestMethods.triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
+            assert.isFalse(startCallbackCalled, "callback was decoupled from the interaction");
+            TestMethods.triggerFakeTouchEvent("touchstart", target, [{ x: startPoint.x, y: startPoint.y }]);
+            assert.isFalse(startCallbackCalled, "callback was decoupled from the interaction");
             svg.remove();
         });
         it("onDrag()", function () {
@@ -8886,9 +8980,14 @@ describe("Interactions", function () {
             assert.isTrue(moveCallbackCalled, "callback was called on dragging (touchmove)");
             assert.deepEqual(receivedStart, startPoint, "was passed the correct starting point");
             assert.deepEqual(receivedEnd, endPoint, "was passed the correct current point");
-            assert.strictEqual(drag.onDrag(), moveCallback, "retrieves the callback if called with no arguments");
-            drag.onDrag(null);
-            assert.isNull(drag.onDrag(), "removes the callback if called with null");
+            drag.offDrag(moveCallback);
+            moveCallbackCalled = false;
+            TestMethods.triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
+            TestMethods.triggerFakeMouseEvent("mousemove", target, endPoint.x, endPoint.y);
+            assert.isFalse(moveCallbackCalled, "callback was decoupled from interaction");
+            TestMethods.triggerFakeTouchEvent("touchstart", target, [{ x: startPoint.x, y: startPoint.y }]);
+            TestMethods.triggerFakeTouchEvent("touchmove", target, [{ x: endPoint.x, y: endPoint.y }]);
+            assert.isFalse(moveCallbackCalled, "callback was decoupled from interaction");
             svg.remove();
         });
         it("onDragEnd()", function () {
@@ -8925,9 +9024,68 @@ describe("Interactions", function () {
             assert.isTrue(endCallbackCalled, "callback was called on drag ending (touchend)");
             assert.deepEqual(receivedStart, startPoint, "was passed the correct starting point");
             assert.deepEqual(receivedEnd, endPoint, "was passed the correct current point");
-            assert.strictEqual(drag.onDragEnd(), endCallback, "retrieves the callback if called with no arguments");
-            drag.onDragEnd(null);
-            assert.isNull(drag.onDragEnd(), "removes the callback if called with null");
+            drag.offDragEnd(endCallback);
+            endCallbackCalled = false;
+            TestMethods.triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
+            TestMethods.triggerFakeMouseEvent("mouseup", target, endPoint.x, endPoint.y);
+            assert.isFalse(endCallbackCalled, "callback was called on drag ending (mouseup)");
+            TestMethods.triggerFakeTouchEvent("touchstart", target, [{ x: startPoint.x, y: startPoint.y }]);
+            TestMethods.triggerFakeTouchEvent("touchend", target, [{ x: endPoint.x, y: endPoint.y }]);
+            assert.isFalse(endCallbackCalled, "callback decoupled from interaction");
+            svg.remove();
+        });
+        it("multiple interactions on drag", function () {
+            var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var component = new Plottable.Component();
+            component.renderTo(svg);
+            var drag = new Plottable.Interactions.Drag();
+            var startCallback1Called = false;
+            var startCallback2Called = false;
+            var moveCallback1Called = false;
+            var moveCallback2Called = false;
+            var endCallback1Called = false;
+            var endCallback2Called = false;
+            var startCallback1 = function () { return startCallback1Called = true; };
+            var startCallback2 = function () { return startCallback2Called = true; };
+            var moveCallback1 = function () { return moveCallback1Called = true; };
+            var moveCallback2 = function () { return moveCallback2Called = true; };
+            var endCallback1 = function () { return endCallback1Called = true; };
+            var endCallback2 = function () { return endCallback2Called = true; };
+            drag.onDragStart(startCallback1);
+            drag.onDragStart(startCallback2);
+            drag.onDrag(moveCallback1);
+            drag.onDrag(moveCallback2);
+            drag.onDragEnd(endCallback1);
+            drag.onDragEnd(endCallback2);
+            component.registerInteraction(drag);
+            var target = component.background();
+            TestMethods.triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
+            assert.isTrue(startCallback1Called, "callback 1 was called on beginning drag (mousedown)");
+            assert.isTrue(startCallback2Called, "callback 2 was called on beginning drag (mousedown)");
+            TestMethods.triggerFakeMouseEvent("mousemove", target, endPoint.x, endPoint.y);
+            assert.isTrue(moveCallback1Called, "callback 1 was called on dragging (mousemove)");
+            assert.isTrue(moveCallback2Called, "callback 2 was called on dragging (mousemove)");
+            TestMethods.triggerFakeMouseEvent("mouseup", target, endPoint.x, endPoint.y);
+            assert.isTrue(endCallback1Called, "callback 1 was called on drag ending (mouseup)");
+            assert.isTrue(endCallback2Called, "callback 2 was called on drag ending (mouseup)");
+            startCallback1Called = false;
+            startCallback2Called = false;
+            moveCallback1Called = false;
+            moveCallback2Called = false;
+            endCallback1Called = false;
+            endCallback2Called = false;
+            drag.offDragStart(startCallback1);
+            drag.offDrag(moveCallback1);
+            drag.offDragEnd(endCallback1);
+            TestMethods.triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
+            assert.isFalse(startCallback1Called, "callback 1 was disconnected from drag start interaction");
+            assert.isTrue(startCallback2Called, "callback 2 is still connected to the drag start interaction");
+            TestMethods.triggerFakeMouseEvent("mousemove", target, endPoint.x, endPoint.y);
+            assert.isFalse(moveCallback1Called, "callback 1 was disconnected from drag interaction");
+            assert.isTrue(moveCallback2Called, "callback 2 is still connected to the drag interaction");
+            TestMethods.triggerFakeMouseEvent("mouseup", target, endPoint.x, endPoint.y);
+            assert.isFalse(endCallback1Called, "callback 1 was disconnected from the drag end interaction");
+            assert.isTrue(endCallback2Called, "callback 2 is still connected to the drag end interaction");
             svg.remove();
         });
         it("constrainToComponent()", function () {
@@ -9647,17 +9805,21 @@ describe("Interactive Components", function () {
                 y: SVG_HEIGHT / 2
             };
             var receivedBounds;
+            var callbackCalled = false;
             var callback = function (b) {
                 receivedBounds = b;
+                callbackCalled = true;
             };
             dbl.onDragStart(callback);
             var target = dbl.background();
             TestMethods.triggerFakeDragSequence(target, startPoint, endPoint);
+            assert.isTrue(callbackCalled, "the callback was called");
             assert.deepEqual(receivedBounds.topLeft, startPoint, "top-left point was set correctly");
             assert.deepEqual(receivedBounds.bottomRight, startPoint, "bottom-right point was set correctly");
-            assert.strictEqual(dbl.onDragStart(), callback, "can retrieve callback by calling with no args");
-            dbl.onDragStart(null);
-            assert.isNull(dbl.onDragStart(), "can blank callback by passing null");
+            dbl.offDragStart(callback);
+            callbackCalled = false;
+            TestMethods.triggerFakeDragSequence(target, startPoint, endPoint);
+            assert.isFalse(callbackCalled, "the callback was detached from the dragBoxLayer and not called");
             svg.remove();
         });
         it("onDrag()", function () {
@@ -9673,17 +9835,21 @@ describe("Interactive Components", function () {
                 y: SVG_HEIGHT / 2
             };
             var receivedBounds;
+            var callbackCalled = false;
             var callback = function (b) {
                 receivedBounds = b;
+                callbackCalled = true;
             };
             dbl.onDrag(callback);
             var target = dbl.background();
             TestMethods.triggerFakeDragSequence(target, startPoint, endPoint);
+            assert.isTrue(callbackCalled, "the callback was called");
             assert.deepEqual(receivedBounds.topLeft, startPoint, "top-left point was set correctly");
             assert.deepEqual(receivedBounds.bottomRight, endPoint, "bottom-right point was set correctly");
-            assert.strictEqual(dbl.onDrag(), callback, "can retrieve callback by calling with no args");
-            dbl.onDrag(null);
-            assert.isNull(dbl.onDrag(), "can blank callback by passing null");
+            callbackCalled = false;
+            dbl.offDrag(callback);
+            TestMethods.triggerFakeDragSequence(target, startPoint, endPoint);
+            assert.isFalse(callbackCalled, "the callback was detached from the dragoBoxLayer and not called");
             svg.remove();
         });
         it("onDragEnd()", function () {
@@ -9699,17 +9865,77 @@ describe("Interactive Components", function () {
                 y: SVG_HEIGHT / 2
             };
             var receivedBounds;
+            var callbackCalled = false;
             var callback = function (b) {
                 receivedBounds = b;
+                callbackCalled = true;
             };
             dbl.onDragEnd(callback);
             var target = dbl.background();
             TestMethods.triggerFakeDragSequence(target, startPoint, endPoint);
+            assert.isTrue(callbackCalled, "the callback was called");
             assert.deepEqual(receivedBounds.topLeft, startPoint, "top-left point was set correctly");
             assert.deepEqual(receivedBounds.bottomRight, endPoint, "bottom-right point was set correctly");
-            assert.strictEqual(dbl.onDragEnd(), callback, "can retrieve callback by calling with no args");
-            dbl.onDragEnd(null);
-            assert.isNull(dbl.onDragEnd(), "can blank callback by passing null");
+            dbl.offDragEnd(callback);
+            callbackCalled = false;
+            TestMethods.triggerFakeDragSequence(target, startPoint, endPoint);
+            assert.isFalse(callbackCalled, "the callback was detached from the dragoBoxLayer and not called");
+            svg.remove();
+        });
+        it("multiple drag interaction callbacks", function () {
+            var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var dbl = new Plottable.Components.DragBoxLayer();
+            dbl.renderTo(svg);
+            var startPoint = {
+                x: SVG_WIDTH / 4,
+                y: SVG_HEIGHT / 4
+            };
+            var endPoint = {
+                x: SVG_WIDTH / 2,
+                y: SVG_HEIGHT / 2
+            };
+            var callbackDragStart1Called = false;
+            var callbackDragStart2Called = false;
+            var callbackDrag1Called = false;
+            var callbackDrag2Called = false;
+            var callbackDragEnd1Called = false;
+            var callbackDragEnd2Called = false;
+            var callbackDragStart1 = function () { return callbackDragStart1Called = true; };
+            var callbackDragStart2 = function () { return callbackDragStart2Called = true; };
+            var callbackDrag1 = function () { return callbackDrag1Called = true; };
+            var callbackDrag2 = function () { return callbackDrag2Called = true; };
+            var callbackDragEnd1 = function () { return callbackDragEnd1Called = true; };
+            var callbackDragEnd2 = function () { return callbackDragEnd2Called = true; };
+            dbl.onDragStart(callbackDragStart1);
+            dbl.onDragStart(callbackDragStart2);
+            dbl.onDrag(callbackDrag1);
+            dbl.onDrag(callbackDrag2);
+            dbl.onDragEnd(callbackDragEnd1);
+            dbl.onDragEnd(callbackDragEnd2);
+            var target = dbl.background();
+            TestMethods.triggerFakeDragSequence(target, startPoint, endPoint);
+            assert.isTrue(callbackDragStart1Called, "the callback 1 for drag start was called");
+            assert.isTrue(callbackDragStart2Called, "the callback 2 for drag start was called");
+            assert.isTrue(callbackDrag1Called, "the callback 1 for drag was called");
+            assert.isTrue(callbackDrag2Called, "the callback 2 for drag was called");
+            assert.isTrue(callbackDragEnd1Called, "the callback 1 for drag end was called");
+            assert.isTrue(callbackDragEnd2Called, "the callback 2 for drag end was called");
+            dbl.offDragStart(callbackDragStart1);
+            dbl.offDrag(callbackDrag1);
+            dbl.offDragEnd(callbackDragEnd1);
+            callbackDragStart1Called = false;
+            callbackDragStart2Called = false;
+            callbackDrag1Called = false;
+            callbackDrag2Called = false;
+            callbackDragEnd1Called = false;
+            callbackDragEnd2Called = false;
+            TestMethods.triggerFakeDragSequence(target, startPoint, endPoint);
+            assert.isFalse(callbackDragStart1Called, "the callback 1 for drag start was disconnected");
+            assert.isTrue(callbackDragStart2Called, "the callback 2 for drag start is still connected");
+            assert.isFalse(callbackDrag1Called, "the callback 1 for drag was called disconnected");
+            assert.isTrue(callbackDrag2Called, "the callback 2 for drag is still connected");
+            assert.isFalse(callbackDragEnd1Called, "the callback 1 for drag end was disconnected");
+            assert.isTrue(callbackDragEnd2Called, "the callback 2 for drag end is still connected");
             svg.remove();
         });
         describe("resizing", function () {

@@ -37,8 +37,7 @@ module Plottable {
     private _xOffset = 0; // Offset from Origin, used for alignment and floating positioning
     private _yOffset = 0;
     private _cssClasses: string[] = ["component"];
-    private _removed = false;
-    private _usedLastLayout = false;
+    private _destroyed = false;
 
     /**
      * Attaches the Component as a child of a given D3 Selection.
@@ -47,7 +46,7 @@ module Plottable {
      * @returns {Component} The calling Component.
      */
     public anchor(selection: D3.Selection) {
-      if (this._removed) {
+      if (this._destroyed) {
         throw new Error("Can't reuse remove()-ed components!");
       }
 
@@ -102,8 +101,11 @@ module Plottable {
       this._isSetup = true;
     }
 
-    public _requestedSpace(availableWidth: number, availableHeight: number): _SpaceRequest {
-      return {width: 0, height: 0, wantsWidth: false, wantsHeight: false};
+    public requestedSpace(availableWidth: number, availableHeight: number): _SpaceRequest {
+      return {
+        minWidth: 0,
+        minHeight: 0
+      };
     }
 
     /**
@@ -154,37 +156,37 @@ module Plottable {
     }
 
     protected _getSize(availableWidth: number, availableHeight: number) {
-      var requestedSpace = this._requestedSpace(availableWidth, availableHeight);
+      var requestedSpace = this.requestedSpace(availableWidth, availableHeight);
       return {
-        width: this._isFixedWidth()  ? Math.min(availableWidth , requestedSpace.width)  : availableWidth,
-        height: this._isFixedHeight() ? Math.min(availableHeight, requestedSpace.height) : availableHeight
+        width: this.fixedWidth()  ? Math.min(availableWidth , requestedSpace.minWidth)  : availableWidth,
+        height: this.fixedHeight() ? Math.min(availableHeight, requestedSpace.minHeight) : availableHeight
       };
     }
 
-    public _render() {
-      if (this._isAnchored && this._isSetup && this.width() >= 0 && this.height() >= 0) {
-        Core.RenderControllers.registerToRender(this);
+    /**
+     * Queues the Component for rendering. Set immediately to true if the Component should be rendered
+     * immediately as opposed to queued to the RenderController.
+     * 
+     * @returns {Component} The calling Component
+     */
+    public render(immediately = false) {
+      if (immediately) {
+        this._render();
+        return this;
       }
+      if (this._isAnchored && this._isSetup && this.width() >= 0 && this.height() >= 0) {
+        RenderController.registerToRender(this);
+      }
+      return this;
     }
 
     private _scheduleComputeLayout() {
       if (this._isAnchored && this._isSetup) {
-        Core.RenderControllers.registerToComputeLayout(this);
+        RenderController.registerToComputeLayout(this);
       }
     }
 
-    public _doRender() {/* overwrite */}
-
-    public _useLastCalculatedLayout(): boolean;
-    public _useLastCalculatedLayout(useLast: boolean): Component;
-    public _useLastCalculatedLayout(useLast?: boolean): any {
-      if (useLast == null) {
-        return this._usedLastLayout;
-      } else {
-        this._usedLastLayout = useLast;
-        return this;
-      }
-    }
+    protected _render() {/* overwrite */}
 
     /**
      * Causes the Component to recompute layout and redraw.
@@ -195,7 +197,6 @@ module Plottable {
      * @returns {Component} The calling Component.
      */
     public redraw() {
-      this._useLastCalculatedLayout(false);
       if (this._isAnchored && this._isSetup) {
         if (this._isTopLevelComponent) {
           this._scheduleComputeLayout();
@@ -231,9 +232,9 @@ module Plottable {
           or a D3.Selection, or a selector string");
       }
       this.computeLayout();
-      this._render();
+      this.render();
       // flush so that consumers can immediately attach to stuff we create in the DOM
-      Core.RenderControllers.flush();
+      RenderController.flush();
       return this;
     }
 
@@ -410,7 +411,7 @@ module Plottable {
      *
      * @returns {boolean} Whether the component has a fixed width.
      */
-    public _isFixedWidth(): boolean {
+    public fixedWidth(): boolean {
       return this._fixedWidthFlag;
     }
 
@@ -420,7 +421,7 @@ module Plottable {
      *
      * @returns {boolean} Whether the component has a fixed height.
      */
-    public _isFixedHeight(): boolean {
+    public fixedHeight(): boolean {
       return this._fixedHeightFlag;
     }
 
@@ -428,7 +429,7 @@ module Plottable {
       var cg: Components.Group;
       if (Plottable.Components.Group.prototype.isPrototypeOf(c)) {
         cg = (<Plottable.Components.Group> c);
-        cg._addComponent(this, below);
+        cg.add(this, below);
         return cg;
       } else {
         var mergedComponents = below ? [this, c] : [c, this];
@@ -487,7 +488,7 @@ module Plottable {
       var parent: ComponentContainer = this._parent();
 
       if (parent != null) {
-        parent._removeComponent(this);
+        parent.remove(this);
       }
       this._isAnchored = false;
       this._parentElement = null;
@@ -509,8 +510,8 @@ module Plottable {
      * Removes a Component from the DOM and disconnects it from everything it's
      * listening to (effectively destroying it).
      */
-    public remove() {
-      this._removed = true;
+    public destroy() {
+      this._destroyed = true;
       this.detach();
     }
 

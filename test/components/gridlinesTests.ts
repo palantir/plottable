@@ -14,15 +14,15 @@ describe("Gridlines", () => {
     var yAxis = new Plottable.Axes.Numeric(yScale, "left");
 
     var gridlines = new Plottable.Components.Gridlines(xScale, yScale);
-    var basicTable = new Plottable.Components.Table().addComponent(0, 0, yAxis)
-                                          .addComponent(0, 1, gridlines)
-                                          .addComponent(1, 1, xAxis);
+    var basicTable = new Plottable.Components.Table().addComponent(yAxis, 0, 0)
+                                          .addComponent(gridlines, 0, 1)
+                                          .addComponent(xAxis, 1, 1);
 
     basicTable.anchor(svg);
     basicTable.computeLayout();
     xScale.range([0, xAxis.width() ]); // manually set range since we don't have a renderer
     yScale.range([yAxis.height(), 0]);
-    basicTable._render();
+    basicTable.render();
 
     var xAxisTickMarks = (<any> xAxis)._element.selectAll("." + Plottable.Axis.TICK_MARK_CLASS)[0];
     var xGridlines = (<any> gridlines)._element.select(".x-gridlines").selectAll("line")[0];

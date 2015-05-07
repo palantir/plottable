@@ -52,35 +52,30 @@ export module Components {
       rows.forEach((row, rowIndex) => {
         row.forEach((component, colIndex) => {
           if (component != null) {
-            this.addComponent(rowIndex, colIndex, component);
+            this.addComponent(component, rowIndex, colIndex);
           }
         });
       });
     }
 
     /**
-     * Adds a Component in the specified cell.
-     *
-     * If the cell is already occupied, there are 3 cases
-     *  - Component + Component => Group containing both components
-     *  - Component + Group => Component is added to the group
-     *  - Group + Component => Component is added to the group
+     * Adds a Component in the specified row and column position.
      *
      * For example, instead of calling `new Table([[a, b], [null, c]])`, you
      * could call
      * ```typescript
      * var table = new Table();
-     * table.addComponent(0, 0, a);
-     * table.addComponent(0, 1, b);
-     * table.addComponent(1, 1, c);
+     * table.addComponent(a, 0, 0);
+     * table.addComponent(b, 0, 1);
+     * table.addComponent(c, 1, 1);
      * ```
      *
+     * @param {Component} component The Component to be added.
      * @param {number} row The row in which to add the Component.
      * @param {number} col The column in which to add the Component.
-     * @param {Component} component The Component to be added.
      * @returns {Table} The calling Table.
      */
-    public addComponent(row: number, col: number, component: Component): Table {
+    public addComponent(component: Component, row: number, col: number): Table {
 
       if (component == null) {
         throw Error("Cannot add null to a table cell");
@@ -92,7 +87,7 @@ export module Components {
         component = component.above(currentComponent);
       }
 
-      if (this._addComponent(component)) {
+      if (super.add(component)) {
         this._nRows = Math.max(row + 1, this._nRows);
         this._nCols = Math.max(col + 1, this._nCols);
         this._padTableToSize(this._nRows, this._nCols);
@@ -102,8 +97,13 @@ export module Components {
       return this;
     }
 
-    public _removeComponent(component: Component) {
-      super._removeComponent(component);
+    /**
+     * Removes a Component.
+     * 
+     * @param {Component} component The Component to be removed.
+     */
+    public removeComponent(component: Component) {
+      super.remove(component);
       for (var r = 0; r < this._nRows; r++) {
         for (var c = 0; c < this._nCols; c++) {
           if (this._rows[r][c] === component) {
@@ -114,7 +114,7 @@ export module Components {
       }
     }
 
-    private _iterateLayout(availableWidth: number, availableHeight: number): _IterateLayoutResult {
+    private _iterateLayout(availableWidth: number, availableHeight: number, isFinalOffer = false): _IterateLayoutResult {
     /*
      * Given availableWidth and availableHeight, figure out how to allocate it between rows and columns using an iterative algorithm.
      *
@@ -141,8 +141,8 @@ export module Components {
       var availableWidthAfterPadding  = availableWidth  - this._colPadding * (this._nCols - 1);
       var availableHeightAfterPadding = availableHeight - this._rowPadding * (this._nRows - 1);
 
-      var rowWeights = Table._calcComponentWeights(this._rowWeights, rows, (c: Component) => (c == null) || c._isFixedHeight());
-      var colWeights = Table._calcComponentWeights(this._colWeights,  cols, (c: Component) => (c == null) || c._isFixedWidth());
+      var rowWeights = Table._calcComponentWeights(this._rowWeights, rows, (c: Component) => (c == null) || c.fixedHeight());
+      var colWeights = Table._calcComponentWeights(this._colWeights,  cols, (c: Component) => (c == null) || c.fixedWidth());
 
       // To give the table a good starting position to iterate from, we give the fixed-width components half-weight
       // so that they will get some initial space allocated to work with
@@ -161,8 +161,8 @@ export module Components {
       var nIterations = 0;
       while (true) {
         var offeredHeights = Utils.Methods.addArrays(guaranteedHeights, rowProportionalSpace);
-        var offeredWidths  = Utils.Methods.addArrays(guaranteedWidths,  colProportionalSpace);
-        var guarantees = this._determineGuarantees(offeredWidths, offeredHeights);
+        var offeredWidths = Utils.Methods.addArrays(guaranteedWidths,  colProportionalSpace);
+        var guarantees = this._determineGuarantees(offeredWidths, offeredHeights, isFinalOffer);
         guaranteedWidths = guarantees.guaranteedWidths;
         guaranteedHeights = guarantees.guaranteedHeights;
         var wantsWidth  = guarantees.wantsWidthArr .some((x: boolean) => x);
@@ -218,48 +218,62 @@ export module Components {
               wantsHeight: wantsHeight};
     }
 
-    private _determineGuarantees(offeredWidths: number[], offeredHeights: number[]): _LayoutAllocation {
+    private _determineGuarantees(offeredWidths: number[], offeredHeights: number[], isFinalOffer = false): _LayoutAllocation {
       var requestedWidths  = Utils.Methods.createFilledArray(0, this._nCols);
       var requestedHeights = Utils.Methods.createFilledArray(0, this._nRows);
-      var layoutWantsWidth  = Utils.Methods.createFilledArray(false, this._nCols);
-      var layoutWantsHeight = Utils.Methods.createFilledArray(false, this._nRows);
+      var columnNeedsWidth  = Utils.Methods.createFilledArray(false, this._nCols);
+      var rowNeedsHeight = Utils.Methods.createFilledArray(false, this._nRows);
+
       this._rows.forEach((row: Component[], rowIndex: number) => {
         row.forEach((component: Component, colIndex: number) => {
           var spaceRequest: _SpaceRequest;
           if (component != null) {
-            spaceRequest = component._requestedSpace(offeredWidths[colIndex], offeredHeights[rowIndex]);
+            spaceRequest = component.requestedSpace(offeredWidths[colIndex], offeredHeights[rowIndex]);
           } else {
-            spaceRequest = {width: 0, height: 0, wantsWidth: false, wantsHeight: false};
+            spaceRequest = {
+              minWidth: 0,
+              minHeight: 0
+            };
           }
 
-          var allocatedWidth = Math.min(spaceRequest.width, offeredWidths[colIndex]);
-          var allocatedHeight = Math.min(spaceRequest.height, offeredHeights[rowIndex]);
+          var columnWidth = isFinalOffer ? Math.min(spaceRequest.minWidth, offeredWidths[colIndex]) : spaceRequest.minWidth;
+          requestedWidths[colIndex] = Math.max(requestedWidths[colIndex], columnWidth);
 
-          requestedWidths [colIndex] = Math.max(requestedWidths [colIndex], allocatedWidth );
-          requestedHeights[rowIndex] = Math.max(requestedHeights[rowIndex], allocatedHeight);
-          layoutWantsWidth [colIndex] = layoutWantsWidth [colIndex] || spaceRequest.wantsWidth;
-          layoutWantsHeight[rowIndex] = layoutWantsHeight[rowIndex] || spaceRequest.wantsHeight;
+          var rowHeight = isFinalOffer ? Math.min(spaceRequest.minHeight, offeredHeights[rowIndex]) : spaceRequest.minHeight;
+          requestedHeights[rowIndex] = Math.max(requestedHeights[rowIndex], rowHeight);
+
+          var componentNeedsWidth = spaceRequest.minWidth > offeredWidths[colIndex];
+          columnNeedsWidth[colIndex] = columnNeedsWidth[colIndex] || componentNeedsWidth;
+
+          var componentNeedsHeight = spaceRequest.minHeight > offeredHeights[rowIndex];
+          rowNeedsHeight[rowIndex] = rowNeedsHeight[rowIndex] || componentNeedsHeight;
         });
       });
-      return {guaranteedWidths: requestedWidths,
-              guaranteedHeights: requestedHeights,
-              wantsWidthArr: layoutWantsWidth,
-              wantsHeightArr: layoutWantsHeight};
+
+      return {
+        guaranteedWidths: requestedWidths,
+        guaranteedHeights: requestedHeights,
+        wantsWidthArr: columnNeedsWidth,
+        wantsHeightArr: rowNeedsHeight
+      };
     }
 
-    public _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
-      this._calculatedLayout = this._iterateLayout(offeredWidth , offeredHeight);
-      return {width: d3.sum(this._calculatedLayout.guaranteedWidths ),
-              height: d3.sum(this._calculatedLayout.guaranteedHeights),
-              wantsWidth: this._calculatedLayout.wantsWidth,
-              wantsHeight: this._calculatedLayout.wantsHeight};
+    public requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
+      this._calculatedLayout = this._iterateLayout(offeredWidth, offeredHeight);
+      return {
+        minWidth: d3.sum(this._calculatedLayout.guaranteedWidths),
+        minHeight: d3.sum(this._calculatedLayout.guaranteedHeights)
+      };
     }
 
     public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
       super.computeLayout(origin, availableWidth, availableHeight);
-      var layout = this._useLastCalculatedLayout() ? this._calculatedLayout : this._iterateLayout(this.width(), this.height());
-
-      this._useLastCalculatedLayout(true);
+      var lastLayoutWidth = d3.sum(this._calculatedLayout.guaranteedWidths);
+      var lastLayoutHeight = d3.sum(this._calculatedLayout.guaranteedHeights);
+      var layout = this._calculatedLayout;
+      if (lastLayoutWidth > this.width() || lastLayoutHeight > this.height()) {
+        layout = this._iterateLayout(this.width(), this.height(), true);
+      }
 
       var childYOrigin = 0;
       var rowHeights = Utils.Methods.addArrays(layout.rowProportionalSpace, layout.guaranteedHeights);
@@ -339,13 +353,13 @@ export module Components {
       return this;
     }
 
-    public _isFixedWidth(): boolean {
+    public fixedWidth(): boolean {
       var cols = d3.transpose(this._rows);
-      return Table._fixedSpace(cols, (c: Component) => (c == null) || c._isFixedWidth());
+      return Table._fixedSpace(cols, (c: Component) => (c == null) || c.fixedWidth());
     }
 
-    public _isFixedHeight(): boolean {
-      return Table._fixedSpace(this._rows, (c: Component) => (c == null) || c._isFixedHeight());
+    public fixedHeight(): boolean {
+      return Table._fixedSpace(this._rows, (c: Component) => (c == null) || c.fixedHeight());
     }
 
     private _padTableToSize(nRows: number, nCols: number) {

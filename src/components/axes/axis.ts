@@ -59,8 +59,8 @@ module Plottable {
       this._scale.onUpdate(this._rescaleCallback);
     }
 
-    public remove() {
-      super.remove();
+    public destroy() {
+      super.destroy();
       this._scale.offUpdate(this._rescaleCallback);
     }
 
@@ -80,7 +80,7 @@ module Plottable {
       return this._computedHeight;
     }
 
-    public _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
+    public requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
       var requestedWidth = 0;
       var requestedHeight = 0;
 
@@ -97,24 +97,22 @@ module Plottable {
       }
 
       return {
-        width: requestedWidth,
-        height: requestedHeight,
-        wantsWidth: !this._isHorizontal() && offeredWidth < requestedWidth,
-        wantsHeight: this._isHorizontal() && offeredHeight < requestedHeight
+        minWidth: requestedWidth,
+        minHeight: requestedHeight
       };
     }
 
-    public _isFixedHeight() {
+    public fixedHeight() {
       return this._isHorizontal();
     }
 
-    public _isFixedWidth() {
+    public fixedWidth() {
       return !this._isHorizontal();
     }
 
     protected _rescale() {
       // default implementation; subclasses may call redraw() here
-      this._render();
+      this.render();
     }
 
     public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
@@ -144,7 +142,7 @@ module Plottable {
       return [];
     }
 
-    public _doRender() {
+    protected _render() {
       var tickMarkValues = this._getTickValues();
       var tickMarks = this._tickMarkContainer.selectAll("." + Axis.TICK_MARK_CLASS).data(tickMarkValues);
       tickMarks.enter().append("line").classed(Axis.TICK_MARK_CLASS, true);
@@ -452,7 +450,7 @@ module Plottable {
         return this._showEndTickLabels;
       }
       this._showEndTickLabels = show;
-      this._render();
+      this.render();
       return this;
     }
   }

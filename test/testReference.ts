@@ -39,7 +39,6 @@
 ///<reference path="components/plots/stackedBarPlotTests.ts" />
 ///<reference path="components/plots/clusteredBarPlotTests.ts" />
 
-///<reference path="core/broadcasterTests.ts" />
 ///<reference path="core/metadataTests.ts" />
 ///<reference path="core/componentContainerTests.ts" />
 ///<reference path="core/componentGroupTests.ts" />
@@ -54,13 +53,13 @@
 
 ///<reference path="utils/domUtilsTests.ts" />
 ///<reference path="utils/formattersTests.ts" />
-///<reference path="utils/strictEqualityAssociativeArrayTests.ts" />
+///<reference path="utils/mapTests.ts" />
 ///<reference path="utils/setTests.ts" />
 ///<reference path="utils/clientToSVGTranslatorTests.ts" />
 ///<reference path="utils/utilsTests.ts" />
 ///<reference path="utils/callbackSetTests.ts" />
 
-///<reference path="interactions/interactionTests.ts" />
+///<reference path="interactions/keyInteractionTests.ts" />
 ///<reference path="interactions/pointerInteractionTests.ts" />
 ///<reference path="interactions/clickInteractionTests.ts" />
 ///<reference path="interactions/doubleClickInteractionTests.ts" />

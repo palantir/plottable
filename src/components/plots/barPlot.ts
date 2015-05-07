@@ -11,7 +11,7 @@ export module Plots {
     private _baselineValue: number;
     private _barAlignmentFactor = 0.5;
     protected _isVertical: boolean;
-    private _barLabelFormatter: Formatter = Formatters.identity();
+    private _labelFormatter: Formatter = Formatters.identity();
     private _labelsEnabled = false;
     private _hideBarsIfAnyAreTooWide = true;
     private _defaultFillColor: string;
@@ -68,7 +68,7 @@ export module Plots {
       this._baselineValue = value;
       this._updateXDomainer();
       this._updateYDomainer();
-      this._render();
+      this.render();
       return this;
     }
 
@@ -88,7 +88,7 @@ export module Plots {
       }
       this._barAlignmentFactor = align2factor[alignmentLC];
 
-      this._render();
+      this.render();
       return this;
     }
 
@@ -110,7 +110,7 @@ export module Plots {
         return this._labelsEnabled;
       } else {
         this._labelsEnabled = enabled;
-        this._render();
+        this.render();
         return this;
       }
     }
@@ -120,20 +120,20 @@ export module Plots {
      *
      * @returns {Formatter} The formatting function for bar labels.
      */
-    public barLabelFormatter(): Formatter;
+    public labelFormatter(): Formatter;
     /**
      * Change the formatting function for bar labels.
      * @param {Formatter} The formatting function for bar labels.
      *
      * @returns {Bar} The calling plot.
      */
-    public barLabelFormatter(formatter: Formatter): Bar<X, Y>;
-    public barLabelFormatter(formatter?: Formatter): any {
+    public labelFormatter(formatter: Formatter): Bar<X, Y>;
+    public labelFormatter(formatter?: Formatter): any {
       if (formatter == null) {
-        return this._barLabelFormatter;
+        return this._labelFormatter;
       } else {
-        this._barLabelFormatter = formatter;
-        this._render();
+        this._labelFormatter = formatter;
+        this.render();
         return this;
       }
     }
@@ -273,12 +273,12 @@ export module Plots {
         if (!qscale._userSetDomainer) {
           if (this._baselineValue != null) {
             qscale.domainer()
-              .addPaddingException(this._baselineValue, "BAR_PLOT+" + this.getID())
-              .addIncludedValue(this._baselineValue, "BAR_PLOT+" + this.getID());
+              .addPaddingException(this, this._baselineValue)
+              .addIncludedValue(this, this._baselineValue);
           } else {
             qscale.domainer()
-              .removePaddingException("BAR_PLOT+" + this.getID())
-              .removeIncludedValue("BAR_PLOT+" + this.getID());
+              .removePaddingException(this)
+              .removeIncludedValue(this);
           }
           qscale.domainer().pad().nice();
         }
@@ -391,9 +391,9 @@ export module Plots {
       };
 
       var primaryAccessor = this._projections[primaryAttr].accessor;
-      if (this.labelsEnabled && this.barLabelFormatter) {
+      if (this._labelsEnabled && this._labelFormatter) {
         attrToProjector["label"] = (d: any, i: number, u: any, m: PlotMetadata) => {
-          return this._barLabelFormatter(primaryAccessor(d, i, u, m));
+          return this._labelFormatter(primaryAccessor(d, i, u, m));
         };
         attrToProjector["positive"] = (d: any, i: number, u: any, m: PlotMetadata) =>
           originalPositionFn(d, i, u, m) <= scaledBaseline;

@@ -40,6 +40,7 @@ module Plottable {
     protected _animateOnNextRender = true;
     private _nextSeriesIndex: number;
     protected _renderCallback: ScaleCallback<Scale<any, any>>;
+    private _onDatasetUpdateCallback: DatasetCallback;
 
     /**
      * Constructs a Plot.
@@ -61,7 +62,8 @@ module Plottable {
       this._extentProvider = (scale: Scale<any, any>) => this._extentsForScale(scale);
       this._datasetKeysInOrder = [];
       this._nextSeriesIndex = 0;
-      this._renderCallback = (scale) => this._render();
+      this._renderCallback = (scale) => this.render();
+      this._onDatasetUpdateCallback = () => this._onDatasetUpdate();
     }
 
     public anchor(selection: D3.Selection) {
@@ -79,8 +81,8 @@ module Plottable {
       this._getDrawersInOrder().forEach((d) => d.setup(this._renderArea.append("g")));
     }
 
-    public remove() {
-      super.remove();
+    public destroy() {
+      super.destroy();
       this._datasetKeysInOrder.forEach((k) => this.removeDataset(k));
       this._scales().forEach((scale) => scale.offUpdate(this._renderCallback));
     }
@@ -124,7 +126,8 @@ module Plottable {
       if (this._isSetup) {
         drawer.setup(this._renderArea.append("g"));
       }
-      dataset.broadcaster.registerListener(this, () => this._onDatasetUpdate());
+
+      dataset.onUpdate(this._onDatasetUpdateCallback);
       this._onDatasetUpdate();
     }
 
@@ -144,7 +147,7 @@ module Plottable {
       this._updateExtents();
       this._animateOnNextRender = true;
       this._dataChanged = true;
-      this._render();
+      this.render();
     }
 
     /**
@@ -199,7 +202,7 @@ module Plottable {
         scale.addExtentProvider(this._extentProvider);
         scale._autoDomainIfAutomaticMode();
       }
-      this._render(); // queue a re-render upon changing projector
+      this.render(); // queue a re-render upon changing projector
       return this;
     }
 
@@ -236,7 +239,7 @@ module Plottable {
       return attrToAppliedProjector;
     }
 
-    public _doRender() {
+    protected _render() {
       if (this._isAnchored) {
         this._paint();
         this._dataChanged = false;
@@ -291,9 +294,28 @@ module Plottable {
         var plotDatasetKey = this._key2PlotDatasetKey.get(key);
         var dataset = plotDatasetKey.dataset;
         var plotMetadata = plotDatasetKey.plotMetadata;
-        return dataset._getExtent(accessor, coercer, plotMetadata);
+        return this._computeExtent(dataset, accessor, coercer, plotMetadata);
       });
       this._attrToExtents.set(attr, extents);
+    }
+
+    protected _computeExtent(dataset: Dataset, accessor: _Accessor, typeCoercer: (d: any) => any, plotMetadata: any): any[] {
+      var data = dataset.data();
+      var metadata = dataset.metadata();
+      var appliedAccessor = (d: any, i: number) => accessor(d, i, metadata, plotMetadata);
+      var mappedData = data.map(appliedAccessor).map(typeCoercer);
+      if (mappedData.length === 0) {
+        return [];
+      } else if (typeof(mappedData[0]) === "string") {
+        return Utils.Methods.uniq(mappedData);
+      } else {
+        var extent = d3.extent(mappedData);
+        if (extent[0] == null || extent[1] == null) {
+          return [];
+        } else {
+          return extent;
+        }
+      }
     }
 
     /**
@@ -412,7 +434,7 @@ module Plottable {
       if (key != null && this._key2PlotDatasetKey.has(key)) {
         var pdk = this._key2PlotDatasetKey.get(key);
         pdk.drawer.remove();
-        pdk.dataset.broadcaster.deregisterListener(this);
+        pdk.dataset.offUpdate(this._onDatasetUpdateCallback);
         this._datasetKeysInOrder.splice(this._datasetKeysInOrder.indexOf(key), 1);
         this._key2PlotDatasetKey.remove(key);
         this._onDatasetUpdate();

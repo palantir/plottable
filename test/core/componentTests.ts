@@ -190,11 +190,9 @@ describe("Component behavior", () => {
   });
 
   it("component defaults are as expected", () => {
-    var layout = c._requestedSpace(1, 1);
-    assert.strictEqual(layout.width, 0, "requested width defaults to 0");
-    assert.strictEqual(layout.height, 0, "requested height defaults to 0");
-    assert.strictEqual(layout.wantsWidth , false, "_requestedSpace().wantsWidth  defaults to false");
-    assert.strictEqual(layout.wantsHeight, false, "_requestedSpace().wantsHeight defaults to false");
+    var layout = c.requestedSpace(1, 1);
+    assert.strictEqual(layout.minWidth, 0, "requested width defaults to 0");
+    assert.strictEqual(layout.minHeight, 0, "requested height defaults to 0");
     assert.strictEqual((<any> c)._xAlignProportion, 0, "_xAlignProportion defaults to 0");
     assert.strictEqual((<any> c)._yAlignProportion, 0, "_yAlignProportion defaults to 0");
     assert.strictEqual((<any> c)._xOffset, 0, "xOffset defaults to 0");
@@ -208,7 +206,7 @@ describe("Component behavior", () => {
     var expectedClipPathID = c.getID();
     c.anchor(svg);
     c.computeLayout({ x: 0, y: 0 }, 100, 100);
-    c._render();
+    c.render();
     var expectedPrefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
     expectedPrefix = expectedPrefix.replace(/#.*/g, "");
     var expectedClipPathURL = "url(" + expectedPrefix + "#clipPath" + expectedClipPathID + ")";
@@ -291,7 +289,7 @@ describe("Component behavior", () => {
   it("can't reuse component if it's been remove()-ed", () => {
     var c1 = new Plottable.Component();
     c1.renderTo(svg);
-    c1.remove();
+    c1.destroy();
 
     assert.throws(() => c1.renderTo(svg), "reuse");
     svg.remove();
@@ -300,7 +298,7 @@ describe("Component behavior", () => {
   it("redraw() works as expected", () => {
     var cg = new Plottable.Components.Group();
     var c = TestMethods.makeFixedSizeComponent(10, 10);
-    cg._addComponent(c);
+    cg.add(c);
     cg.renderTo(svg);
     assert.strictEqual(cg.height(), 300, "height() is the entire available height");
     assert.strictEqual(cg.width(), 400, "width() is the entire available width");
@@ -321,10 +319,10 @@ describe("Component behavior", () => {
     var horizontalComponent = new Plottable.Component();
     var verticalComponent = new Plottable.Component();
     var placeHolder = new Plottable.Component();
-    var t = new Plottable.Components.Table().addComponent(0, 0, verticalComponent)
-                                 .addComponent(0, 1, new Plottable.Component())
-                                 .addComponent(1, 0, placeHolder)
-                                 .addComponent(1, 1, horizontalComponent);
+    var t = new Plottable.Components.Table().addComponent(verticalComponent, 0, 0)
+                                 .addComponent(new Plottable.Component(), 0, 1)
+                                 .addComponent(placeHolder, 1, 0)
+                                 .addComponent(horizontalComponent, 1, 1);
     t.renderTo(svg);
     horizontalComponent.xAlign("center");
     verticalComponent.yAlign("bottom");
@@ -340,7 +338,7 @@ describe("Component behavior", () => {
   it("Components will not translate if they are fixed width/height and request more space than offered", () => {
     // catches #1188
     var c: any = new Plottable.Component();
-    c._requestedSpace = () => { return {width: 500, height: 500, wantsWidth: true, wantsHeight: true}; };
+    c.requestedSpace = () => { return { minWidth: 500, minHeight: 500}; };
     c._fixedWidthFlag = true;
     c._fixedHeightFlag = true;
     c.xAlign("left");
@@ -355,19 +353,19 @@ describe("Component behavior", () => {
   it("components do not render unless allocated space", () => {
     var renderFlag = false;
     var c: any = new Plottable.Component();
-    c._doRender = () => renderFlag = true;
+    c._render = () => renderFlag = true;
     c.anchor(svg);
     c._setup();
-    c._render();
+    c.render();
     assert.isFalse(renderFlag, "no render until width/height set to nonzero");
 
     c._width = 10;
     c._height = 0;
-    c._render();
+    c.render();
     assert.isTrue(renderFlag, "render still occurs if one of width/height is zero");
 
     c._height = 10;
-    c._render();
+    c.render();
     assert.isTrue(renderFlag, "render occurs if width and height are positive");
 
     svg.remove();
@@ -385,7 +383,7 @@ describe("Component behavior", () => {
     var group = new Plottable.Components.Group;
     group.renderTo(svg1);
 
-    group._addComponent(plot);
+    group.add(plot);
 
     assert.deepEqual(plot._parent(), group, "the plot should be inside the group");
     assert.strictEqual(plot.height(), SVG_HEIGHT_1, "the plot should occupy the entire space of the first svg");

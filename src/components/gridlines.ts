@@ -28,7 +28,7 @@ export module Components {
       this.classed("gridlines", true);
       this._xScale = xScale;
       this._yScale = yScale;
-      this._renderCallback = (scale) => this._render();
+      this._renderCallback = (scale) => this.render();
       if (this._xScale) {
         this._xScale.onUpdate(this._renderCallback);
       }
@@ -37,8 +37,8 @@ export module Components {
       }
     }
 
-    public remove() {
-      super.remove();
+    public destroy() {
+      super.destroy();
       if (this._xScale) {
         this._xScale.offUpdate(this._renderCallback);
       }
@@ -54,8 +54,8 @@ export module Components {
       this._yLinesContainer = this._content.append("g").classed("y-gridlines", true);
     }
 
-    public _doRender() {
-      super._doRender();
+    protected _render() {
+      super._render();
       this._redrawXLines();
       this._redrawYLines();
     }

@@ -62,16 +62,14 @@ export module Components {
       return this;
     }
 
-    public _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
+    public requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
       var desiredWH = this._measurer.measure(this._text);
       var desiredWidth  = (this.orient() === "horizontal" ? desiredWH.width : desiredWH.height) + 2 * this.padding();
       var desiredHeight = (this.orient() === "horizontal" ? desiredWH.height : desiredWH.width) + 2 * this.padding();
 
       return {
-        width: desiredWidth,
-        height: desiredHeight,
-        wantsWidth: desiredWidth  > offeredWidth,
-        wantsHeight: desiredHeight > offeredHeight
+        minWidth: desiredWidth,
+        minHeight: desiredHeight
       };
     }
 
@@ -163,8 +161,8 @@ export module Components {
       }
     }
 
-    public _doRender() {
-      super._doRender();
+    protected _render() {
+      super._render();
       // HACKHACK SVGTypewriter should remove existing content - #21 on SVGTypewriter.
       this._textContainer.selectAll("g").remove();
       var textMeasurement = this._measurer.measure(this._text);

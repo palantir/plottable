@@ -51,7 +51,7 @@ export module Components {
       }
 
       this._setBounds(newBounds);
-      this._render();
+      this.render();
       return this;
     }
 
@@ -70,7 +70,7 @@ export module Components {
       };
     }
 
-    public _doRender() {
+    protected _render() {
       if (this._boxVisible) {
         var t = this._boxBounds.topLeft.y;
         var b = this._boxBounds.bottomRight.y;
@@ -105,7 +105,7 @@ export module Components {
       }
 
       this._boxVisible = show;
-      this._render();
+      this.render();
       return this;
     }
   }

@@ -189,7 +189,7 @@ export module Plots {
         var plotDatasetKey = this._key2PlotDatasetKey.get(key);
         var dataset = plotDatasetKey.dataset;
         var plotMetadata = plotDatasetKey.plotMetadata;
-        return dataset._getExtent(accScaleBinding.accessor, coercer, plotMetadata);
+        return this._computeExtent(dataset, accScaleBinding.accessor, coercer, plotMetadata);
       });
     }
 
