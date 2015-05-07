@@ -2772,7 +2772,6 @@ declare module Plottable {
              */
             constructor();
             computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Pie<D>;
-            anchor(selection: D3.Selection): Pie<D>;
             addDataset(keyOrDataset: any, dataset?: any): Pie<D>;
             protected _generateAttrToProjector(): AttributeToProjector;
             protected _getDrawer(key: string): Drawers.AbstractDrawer;
