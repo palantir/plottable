@@ -45,7 +45,7 @@ function run(svg, data, Plottable) {
     .addDataset(dataset4)
     .addDataset(dataset5)
     .labelsEnabled(true)
-    .barLabelFormatter(Plottable.Formatters.siSuffix())
+    .labelFormatter(Plottable.Formatters.siSuffix())
     .animate(true);
 
   var horizontalPlot = new Plottable.Plots.StackedBar(xScale2, yScale2, false)
@@ -58,7 +58,7 @@ function run(svg, data, Plottable) {
     .addDataset(dataset4)
     .addDataset(dataset5)
     .labelsEnabled(true)
-    .barLabelFormatter(Plottable.Formatters.siSuffix())
+    .labelFormatter(Plottable.Formatters.siSuffix())
     .animate(true);
 
   var chart1 = new Plottable.Components.Table([
