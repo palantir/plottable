@@ -16,7 +16,6 @@
 /// <reference path="core/config.ts" />
 /// <reference path="core/version.ts" />
 /// <reference path="core/colors.ts" />
-/// <reference path="core/plottableObject.ts" />
 
 /// <reference path="core/dataset.ts" />
 /// <reference path="core/renderPolicy.ts" />

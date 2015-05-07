@@ -6283,27 +6283,19 @@ describe("Component behavior", function () {
     it("clipPath works as expected", function () {
         assert.isFalse(c.clipPathEnabled, "clipPathEnabled defaults to false");
         c.clipPathEnabled = true;
-        var expectedClipPathID = c.getID();
         c.anchor(svg);
         c.computeLayout({ x: 0, y: 0 }, 100, 100);
         c.render();
+        var clipPathId = c._boxContainer[0][0].firstChild.id;
         var expectedPrefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
         expectedPrefix = expectedPrefix.replace(/#.*/g, "");
-        var expectedClipPathURL = "url(" + expectedPrefix + "#clipPath" + expectedClipPathID + ")";
+        var expectedClipPathURL = "url(" + expectedPrefix + "#" + clipPathId + ")";
         // IE 9 has clipPath like 'url("#clipPath")', must accomodate
         var normalizeClipPath = function (s) { return s.replace(/"/g, ""); };
         assert.isTrue(normalizeClipPath(c._element.attr("clip-path")) === expectedClipPathURL, "the element has clip-path url attached");
         var clipRect = c._boxContainer.select(".clip-rect");
         assert.strictEqual(clipRect.attr("width"), "100", "the clipRect has an appropriate width");
         assert.strictEqual(clipRect.attr("height"), "100", "the clipRect has an appropriate height");
-        svg.remove();
-    });
-    it("componentID works as expected", function () {
-        var expectedID = Plottable.Core.PlottableObject._nextID;
-        var c1 = new Plottable.Component();
-        assert.strictEqual(c1.getID(), expectedID, "component id on next component was as expected");
-        var c2 = new Plottable.Component();
-        assert.strictEqual(c2.getID(), expectedID + 1, "future components increment appropriately");
         svg.remove();
     });
     it("boxes work as expected", function () {
@@ -7728,6 +7720,20 @@ describe("Utils.DOM", function () {
             parent.style("width", "auto");
             parent.style("height", "auto");
             child.remove();
+        });
+        it("getUniqueClipPathId works as expected", function () {
+            var firstClipPathId = Plottable.Utils.DOM.getUniqueClipPathId();
+            var secondClipPathId = Plottable.Utils.DOM.getUniqueClipPathId();
+            var firstClipPathIDPrefix = firstClipPathId.split(/\d/)[0];
+            var secondClipPathIDPrefix = secondClipPathId.split(/\d/)[0];
+            assert.strictEqual(firstClipPathIDPrefix, secondClipPathIDPrefix, "clip path ids should have the same prefix");
+            var prefix = firstClipPathIDPrefix;
+            assert.isTrue(/plottable/.test(prefix), "the prefix should contain the word plottable to avoid collisions");
+            var firstClipPathIdNumber = +firstClipPathId.replace(prefix, "");
+            var secondClipPathIdNumber = +secondClipPathId.replace(prefix, "");
+            assert.isFalse(Plottable.Utils.Methods.isNaN(firstClipPathIdNumber), "first clip path id should only have a number after the prefix");
+            assert.isFalse(Plottable.Utils.Methods.isNaN(secondClipPathIdNumber), "second clip path id should only have a number after the prefix");
+            assert.strictEqual(firstClipPathIdNumber + 1, secondClipPathIdNumber, "Consecutive calls to getUniqueClipPathId should give consecutive numbers after the prefix");
         });
     });
 });
