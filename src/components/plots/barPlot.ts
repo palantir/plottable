@@ -390,7 +390,7 @@ export module Plots {
         return (originalPos > scaledBaseline) ? scaledBaseline : originalPos;
       };
 
-      var primaryAccessor = this._projections[primaryAttr].accessor;
+      var primaryAccessor = this._attrBindings.get(primaryAttr).accessor;
       if (this._labelsEnabled && this._labelFormatter) {
         attrToProjector["label"] = (d: any, i: number, u: any, m: PlotMetadata) => {
           return this._labelFormatter(primaryAccessor(d, i, u, m));
@@ -418,7 +418,7 @@ export module Plots {
       if (barScale instanceof Plottable.Scales.Category) {
         barPixelWidth = (<Plottable.Scales.Category> barScale).rangeBand();
       } else {
-        var barAccessor = this._isVertical ? this._projections["x"].accessor : this._projections["y"].accessor;
+        var barAccessor = this._isVertical ? this._attrBindings.get("x").accessor : this._attrBindings.get("y").accessor;
 
         var numberBarAccessorData = d3.set(Utils.Methods.flatten(this._datasetKeysInOrder.map((k) => {
           var dataset = this._key2PlotDatasetKey.get(k).dataset;

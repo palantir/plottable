@@ -31,8 +31,8 @@ module Plottable {
     protected _datasetKeysInOrder: string[];
 
     protected _renderArea: D3.Selection;
-    protected _projections: { [attrToSet: string]: _Projection; } = {};
-    protected _attrToExtents: D3.Map<any[]>;
+    protected _attrBindings: D3.Map<_Projection>;
+    protected _attrExtents: D3.Map<any[]>;
     private _extentProvider: Scales.ExtentProvider<any>;
 
     protected _animate: boolean = false;
@@ -58,7 +58,8 @@ module Plottable {
       this.clipPathEnabled = true;
       this.classed("plot", true);
       this._key2PlotDatasetKey = d3.map();
-      this._attrToExtents = d3.map();
+      this._attrBindings = d3.map();
+      this._attrExtents = d3.map();
       this._extentProvider = (scale: Scale<any, any>) => this._extentsForScale(scale);
       this._datasetKeysInOrder = [];
       this._nextSeriesIndex = 0;
@@ -162,11 +163,11 @@ module Plottable {
      */
     public project(attrToSet: string, accessor: any, scale?: Scale<any, any>) {
       attrToSet = attrToSet.toLowerCase();
-      var previousProjection = this._projections[attrToSet];
+      var previousProjection = this._attrBindings.get(attrToSet);
       var previousScale = previousProjection && previousProjection.scale;
 
       accessor = Utils.Methods.accessorize(accessor);
-      this._projections[attrToSet] = {accessor: accessor, scale: scale, attribute: attrToSet};
+      this._attrBindings.set(attrToSet, {accessor: accessor, scale: scale, attribute: attrToSet});
       this._updateExtentsForAttr(attrToSet);
 
       if (previousScale) {
@@ -188,12 +189,11 @@ module Plottable {
 
     protected _generateAttrToProjector(): AttributeToProjector {
       var h: AttributeToProjector = {};
-      d3.keys(this._projections).forEach((a) => {
-        var projection = this._projections[a];
-        var accessor = projection.accessor;
-        var scale = projection.scale;
+      this._attrBindings.forEach((attr, binding) => {
+        var accessor = binding.accessor;
+        var scale = binding.scale;
         var fn = scale ? (d: any, i: number, u: any, m: Plots.PlotMetadata) => scale.scale(accessor(d, i, u, m)) : accessor;
-        h[a] = fn;
+        h[attr] = fn;
       });
       return h;
     }
@@ -252,8 +252,8 @@ module Plottable {
      */
     private _scales() {
       var scales: Scale<any, any>[] = [];
-      Object.keys(this._projections).forEach((attr: string) => {
-        var scale = this._projections[attr].scale;
+      this._attrBindings.forEach((attr, binding) => {
+        var scale = binding.scale;
         if (scale != null && scales.indexOf(scale) === -1) {
           scales.push(scale);
         }
@@ -265,13 +265,14 @@ module Plottable {
      * Updates the extents associated with each attribute, then autodomains all scales the Plot uses.
      */
     protected _updateExtents() {
-      Object.keys(this._projections).forEach((attr: string) => { this._updateExtentsForAttr(attr); });
+      this._attrBindings.forEach((attr) => this._updateExtentsForAttr(attr));
       this._scales().forEach((scale) => scale._autoDomainIfAutomaticMode());
     }
 
     private _updateExtentsForAttr(attr: string) {
-      var accessor = this._projections[attr].accessor;
-      var scale = this._projections[attr].scale;
+      var binding = this._attrBindings.get(attr);
+      var accessor = binding.accessor;
+      var scale = binding.scale;
       var coercer = (scale != null) ? scale._typeCoercer : (d: any) => d;
       var extents = this._datasetKeysInOrder.map((key) => {
         var plotDatasetKey = this._key2PlotDatasetKey.get(key);
@@ -279,7 +280,7 @@ module Plottable {
         var plotMetadata = plotDatasetKey.plotMetadata;
         return this._computeExtent(dataset, accessor, coercer, plotMetadata);
       });
-      this._attrToExtents.set(attr, extents);
+      this._attrExtents.set(attr, extents);
     }
 
     private _computeExtent(dataset: Dataset, accessor: _Accessor, typeCoercer: (d: any) => any, plotMetadata: any): any[] {
@@ -305,7 +306,7 @@ module Plottable {
      * Override in subclass to add special extents, such as included values
      */
     protected _extentsForAttr(attr: string) {
-      return this._attrToExtents.get(attr);
+      return this._attrExtents.get(attr);
     }
 
     private _extentsForScale<D>(scale: Scale<D, any>): D[][] {
@@ -313,8 +314,8 @@ module Plottable {
         return [];
       }
       var allSetsOfExtents: D[][][] = [];
-      Object.keys(this._projections).forEach((attr: string) => {
-        if (this._projections[attr].scale === scale) {
+      this._attrBindings.forEach((attr, binding) => {
+        if (binding.scale === scale) {
           var extents = this._extentsForAttr(attr);
           if (extents != null) {
             allSetsOfExtents.push(extents);
