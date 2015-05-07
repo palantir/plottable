@@ -26,7 +26,7 @@ module Plottable {
 
     public project(attrToSet: string, accessor: any, scale?: Scale<any, any>) {
       super.project(attrToSet, accessor, scale);
-      if (this._projections["x"] && this._projections["y"] && (attrToSet === "x" || attrToSet === "y")) {
+      if (this._attrBindings.get("x") && this._attrBindings.get("y") && (attrToSet === "x" || attrToSet === "y")) {
         this._updateStackOffsets();
       }
       return this;
@@ -185,8 +185,8 @@ module Plottable {
     }
 
     public _normalizeDatasets<A, B>(fromX: boolean): {a: A; b: B}[] {
-      var aAccessor = this._projections[fromX ? "x" : "y"].accessor;
-      var bAccessor = this._projections[fromX ? "y" : "x"].accessor;
+      var aAccessor = this._attrBindings.get(fromX ? "x" : "y").accessor;
+      var bAccessor = this._attrBindings.get(fromX ? "y" : "x").accessor;
       var aStackedAccessor = (d: any, i: number, u: any, m: Plots.StackedPlotMetadata) => {
         var value = aAccessor(d, i, u, m);
         if (this._isVertical ? !fromX : fromX) {
@@ -216,11 +216,11 @@ module Plottable {
     }
 
     public _keyAccessor(): _Accessor {
-       return this._isVertical ? this._projections["x"].accessor : this._projections["y"].accessor;
+       return this._isVertical ? this._attrBindings.get("x").accessor : this._attrBindings.get("y").accessor;
     }
 
     public _valueAccessor(): _Accessor {
-       return this._isVertical ? this._projections["y"].accessor : this._projections["x"].accessor;
+       return this._isVertical ? this._attrBindings.get("y").accessor : this._attrBindings.get("x").accessor;
     }
   }
 }

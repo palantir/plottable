@@ -53,10 +53,10 @@ export module Plots {
     private _makeInnerScale() {
       var innerScale = new Scales.Category();
       innerScale.domain(this._datasetKeysInOrder);
-      if (!this._projections["width"]) {
+      if (!this._attrBindings.get("width")) {
         innerScale.range([0, this._getBarPixelWidth()]);
       } else {
-        var projection = this._projections["width"];
+        var projection = this._attrBindings.get("width");
         var accessor = projection.accessor;
         var scale = projection.scale;
         var fn = scale ? (d: any, i: number, u: any, m: PlotMetadata) => scale.scale(accessor(d, i, u, m)) : accessor;

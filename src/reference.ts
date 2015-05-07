@@ -1,3 +1,4 @@
+/// <reference path="../typings/d3/d3.d.ts" />
 /// <reference path="../bower_components/svg-typewriter/svgtypewriter.d.ts" />
 
 /// <reference path="utils/utils.ts" />

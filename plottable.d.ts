@@ -2582,10 +2582,8 @@ declare module Plottable {
         protected _key2PlotDatasetKey: D3.Map<Plots.PlotDatasetKey>;
         protected _datasetKeysInOrder: string[];
         protected _renderArea: D3.Selection;
-        protected _projections: {
-            [attrToSet: string]: _Projection;
-        };
-        protected _attrToExtents: D3.Map<any[]>;
+        protected _attrBindings: D3.Map<_Projection>;
+        protected _attrExtents: D3.Map<any[]>;
         protected _animate: boolean;
         protected _animateOnNextRender: boolean;
         /**

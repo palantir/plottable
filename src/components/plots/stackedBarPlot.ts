@@ -37,8 +37,8 @@ export module Plots {
       var valueAttr = this._isVertical ? "y" : "x";
       var keyAttr = this._isVertical ? "x" : "y";
       var primaryScale: Scale<any, number> = this._isVertical ? this._yScale : this._xScale;
-      var primaryAccessor = this._projections[valueAttr].accessor;
-      var keyAccessor = this._projections[keyAttr].accessor;
+      var primaryAccessor = this._attrBindings.get(valueAttr).accessor;
+      var keyAccessor = this._attrBindings.get(keyAttr).accessor;
       var getStart = (d: any, i: number, u: any, m: StackedPlotMetadata) =>
         primaryScale.scale(m.offsets.get(keyAccessor(d, i, u, m)));
       var getEnd = (d: any, i: number, u: any, m: StackedPlotMetadata) =>
