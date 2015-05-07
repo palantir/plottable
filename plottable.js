@@ -6957,6 +6957,11 @@ var Plottable;
                 this._render();
                 return this;
             };
+            Pie.prototype.destroy = function () {
+                var _this = this;
+                _super.prototype.destroy.call(this);
+                this._key2DataBindings.values().forEach(function (binding) { return binding.scale.offUpdate(_this._renderCallback); });
+            };
             Pie.prototype._updateExtents = function () {
                 var _this = this;
                 _super.prototype._updateExtents.call(this);

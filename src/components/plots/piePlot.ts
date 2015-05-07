@@ -133,6 +133,11 @@ export module Plots {
       this._render();
       return this;
     }
+    
+    public destroy() {
+      super.destroy();
+      this._key2DataBindings.values().forEach((binding) => binding.scale.offUpdate(this._renderCallback));
+    }
 
     protected _updateExtents() {
       super._updateExtents();
