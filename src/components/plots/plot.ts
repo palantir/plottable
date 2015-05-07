@@ -349,39 +349,6 @@ module Plottable {
     }
 
     /**
-     * Gets the dataset order by key
-     *
-     * @returns {string[]} A string array of the keys in order
-     */
-    public datasetOrder(): string[];
-    /**
-     * Sets the dataset order by key
-     *
-     * @param {string[]} order If provided, a string array which represents the order of the keys.
-     * This must be a permutation of existing keys.
-     *
-     * @returns {Plot} The calling Plot.
-     */
-    public datasetOrder(order: string[]): Plot;
-    public datasetOrder(order?: string[]): any {
-      if (order === undefined) {
-        return this._datasetKeysInOrder;
-      }
-      function isPermutation(l1: string[], l2: string[]) {
-        var intersection = Utils.Methods.intersection(d3.set(l1), d3.set(l2));
-        var size = (<any> intersection).size(); // HACKHACK pending on borisyankov/definitelytyped/ pr #2653
-        return size === l1.length && size === l2.length;
-      }
-      if (isPermutation(order, this._datasetKeysInOrder)) {
-        this._datasetKeysInOrder = order;
-        this._onDatasetUpdate();
-      } else {
-        Utils.Methods.warn("Attempted to change datasetOrder, but new order is not permutation of old. Ignoring.");
-      }
-      return this;
-    }
-
-    /**
      * @param {Dataset} dataset
      * @returns {Plot} The calling Plot.
      */
@@ -412,8 +379,16 @@ module Plottable {
       return datasets.map((dataset) => this._keyForDataset(dataset)).filter((key) => key != null);
     }
 
-    public datasets(): Dataset[] {
-      return this._datasetKeysInOrder.map((k) => this._key2PlotDatasetKey.get(k).dataset);
+    public datasets(): Dataset[];
+    public datasets(datasets: Dataset[]): Plot;
+    public datasets(datasets?: Dataset[]): any {
+      var currentDatasets = this._datasetKeysInOrder.map((k) => this._key2PlotDatasetKey.get(k).dataset);
+      if (datasets == null) {
+        return currentDatasets;
+      }
+      currentDatasets.forEach((dataset) => this.removeDataset(dataset));
+      datasets.forEach((dataset) => this.addDataset(dataset));
+      return this;
     }
 
     protected _getDrawersInOrder(): Drawers.AbstractDrawer[] {
@@ -478,7 +453,7 @@ module Plottable {
 
       if (exclude) {
         var excludedDatasetKeys = d3.set(datasetKeyArray);
-        datasetKeyArray = this.datasetOrder().filter((datasetKey) => !excludedDatasetKeys.has(datasetKey));
+        datasetKeyArray = this._datasetKeysInOrder.filter((datasetKey) => !excludedDatasetKeys.has(datasetKey));
       }
 
       var allSelections: EventTarget[] = [];

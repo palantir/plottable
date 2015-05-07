@@ -6654,24 +6654,6 @@ var Plottable;
                 return this;
             }
         };
-        Plot.prototype.datasetOrder = function (order) {
-            if (order === undefined) {
-                return this._datasetKeysInOrder;
-            }
-            function isPermutation(l1, l2) {
-                var intersection = Plottable.Utils.Methods.intersection(d3.set(l1), d3.set(l2));
-                var size = intersection.size(); // HACKHACK pending on borisyankov/definitelytyped/ pr #2653
-                return size === l1.length && size === l2.length;
-            }
-            if (isPermutation(order, this._datasetKeysInOrder)) {
-                this._datasetKeysInOrder = order;
-                this._onDatasetUpdate();
-            }
-            else {
-                Plottable.Utils.Methods.warn("Attempted to change datasetOrder, but new order is not permutation of old. Ignoring.");
-            }
-            return this;
-        };
         /**
          * @param {Dataset} dataset
          * @returns {Plot} The calling Plot.
@@ -6701,9 +6683,15 @@ var Plottable;
             var _this = this;
             return datasets.map(function (dataset) { return _this._keyForDataset(dataset); }).filter(function (key) { return key != null; });
         };
-        Plot.prototype.datasets = function () {
+        Plot.prototype.datasets = function (datasets) {
             var _this = this;
-            return this._datasetKeysInOrder.map(function (k) { return _this._key2PlotDatasetKey.get(k).dataset; });
+            var currentDatasets = this._datasetKeysInOrder.map(function (k) { return _this._key2PlotDatasetKey.get(k).dataset; });
+            if (datasets == null) {
+                return currentDatasets;
+            }
+            currentDatasets.forEach(function (dataset) { return _this.removeDataset(dataset); });
+            datasets.forEach(function (dataset) { return _this.addDataset(dataset); });
+            return this;
         };
         Plot.prototype._getDrawersInOrder = function () {
             var _this = this;
@@ -6759,7 +6747,7 @@ var Plottable;
             var datasetKeyArray = this._keysForDatasets(datasets);
             if (exclude) {
                 var excludedDatasetKeys = d3.set(datasetKeyArray);
-                datasetKeyArray = this.datasetOrder().filter(function (datasetKey) { return !excludedDatasetKeys.has(datasetKey); });
+                datasetKeyArray = this._datasetKeysInOrder.filter(function (datasetKey) { return !excludedDatasetKeys.has(datasetKey); });
             }
             var allSelections = [];
             datasetKeyArray.forEach(function (datasetKey) {

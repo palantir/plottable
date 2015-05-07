@@ -2091,9 +2091,9 @@ var CountingPlot = (function (_super) {
         _super.apply(this, arguments);
         this.renders = 0;
     }
-    CountingPlot.prototype.render = function () {
+    CountingPlot.prototype.render = function (immediately) {
         ++this.renders;
-        return _super.prototype.render.call(this);
+        return _super.prototype.render.call(this, immediately);
     };
     return CountingPlot;
 })(Plottable.Plot);
@@ -2130,6 +2130,21 @@ describe("Plots", function () {
             assert.strictEqual(6, r.renders, "we re-render on dataset removal");
             dFoo.data(dFoo.data());
             assert.strictEqual(6, r.renders, "we don't listen to removed datasets");
+        });
+        it("datasets()", function () {
+            var dataset1 = new Plottable.Dataset([]);
+            var dataset2 = new Plottable.Dataset([]);
+            var plot = new Plottable.Plot();
+            plot.addDataset(dataset1);
+            plot.addDataset(dataset2);
+            assert.deepEqual(plot.datasets(), [dataset1, dataset2], "retrieved Datasets in order they were added");
+            plot.datasets([dataset2, dataset1]);
+            assert.deepEqual(plot.datasets(), [dataset2, dataset1], "order of Datasets was changed");
+            var dataset3 = new Plottable.Dataset([]);
+            plot.addDataset(dataset3);
+            assert.deepEqual(plot.datasets(), [dataset2, dataset1, dataset3], "adding further Datasets respects the order");
+            plot.removeDataset(dataset1);
+            assert.deepEqual(plot.datasets(), [dataset2, dataset3], "removing a Dataset leaves the remainder in the same order");
         });
         it("Updates its projectors when the Dataset is changed", function () {
             var d1 = new Plottable.Dataset([{ x: 5, y: 6 }], { cssClass: "bar" });

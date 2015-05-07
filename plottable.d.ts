@@ -2690,21 +2690,6 @@ declare module Plottable {
          */
         animator(animatorKey: string, animator: Animators.PlotAnimator): Plot;
         /**
-         * Gets the dataset order by key
-         *
-         * @returns {string[]} A string array of the keys in order
-         */
-        datasetOrder(): string[];
-        /**
-         * Sets the dataset order by key
-         *
-         * @param {string[]} order If provided, a string array which represents the order of the keys.
-         * This must be a permutation of existing keys.
-         *
-         * @returns {Plot} The calling Plot.
-         */
-        datasetOrder(order: string[]): Plot;
-        /**
          * @param {Dataset} dataset
          * @returns {Plot} The calling Plot.
          */
@@ -2714,6 +2699,7 @@ declare module Plottable {
          */
         protected _keysForDatasets(datasets: Dataset[]): string[];
         datasets(): Dataset[];
+        datasets(datasets: Dataset[]): Plot;
         protected _getDrawersInOrder(): Drawers.AbstractDrawer[];
         protected _generateDrawSteps(): Drawers.DrawStep[];
         protected _additionalPaint(time: number): void;
