@@ -6966,6 +6966,7 @@ var Plottable;
                 var _this = this;
                 _super.prototype._updateExtents.call(this);
                 this._key2DataExtents.keys().forEach(function (dataAttr) { return _this._updateDataScaleExtents(dataAttr); });
+                this._propertyScales().forEach(function (scale) { return scale._autoDomainIfAutomaticMode(); });
             };
             Pie.prototype._dataExtentsForScale = function (scale) {
                 var _this = this;
@@ -6985,10 +6986,6 @@ var Plottable;
             };
             Pie.prototype._updateDataScaleExtents = function (dataAttr) {
                 this._key2DataExtents.set(dataAttr, this._datasetExtents(dataAttr));
-                var dataScale = this._key2DataBindings.get(dataAttr).scale;
-                if (dataScale != null) {
-                    dataScale._autoDomainIfAutomaticMode();
-                }
             };
             Pie.prototype._datasetExtents = function (dataAttr) {
                 var _this = this;
@@ -7014,6 +7011,7 @@ var Plottable;
                     if (newScale != null) {
                         newScale.onUpdate(this._renderCallback);
                         newScale.addExtentProvider(this._dataExtentProvider);
+                        newScale._autoDomainIfAutomaticMode();
                     }
                 }
             };

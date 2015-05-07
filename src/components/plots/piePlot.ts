@@ -142,6 +142,7 @@ export module Plots {
     protected _updateExtents() {
       super._updateExtents();
       this._key2DataExtents.keys().forEach((dataAttr) => this._updateDataScaleExtents(dataAttr));
+      this._propertyScales().forEach((scale) => scale._autoDomainIfAutomaticMode());
     }
 
     private _dataExtentsForScale<D>(scale: Scale<D, any>): D[][] {
@@ -162,8 +163,6 @@ export module Plots {
 
     private _updateDataScaleExtents(dataAttr: string) {
       this._key2DataExtents.set(dataAttr, this._datasetExtents(dataAttr));
-      var dataScale = this._key2DataBindings.get(dataAttr).scale;
-      if (dataScale != null) { dataScale._autoDomainIfAutomaticMode(); }
     }
 
     private _datasetExtents(dataAttr: string) {
@@ -189,6 +188,7 @@ export module Plots {
         if (newScale != null) {
           newScale.onUpdate(this._renderCallback);
           newScale.addExtentProvider(this._dataExtentProvider);
+          newScale._autoDomainIfAutomaticMode();
         }
       }
     }
