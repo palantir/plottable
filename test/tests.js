@@ -6298,14 +6298,6 @@ describe("Component behavior", function () {
         assert.strictEqual(clipRect.attr("height"), "100", "the clipRect has an appropriate height");
         svg.remove();
     });
-    it("componentID works as expected", function () {
-        var expectedID = Plottable.Core.PlottableObject._nextID;
-        var c1 = new Plottable.Component();
-        assert.strictEqual(c1.getID(), expectedID, "component id on next component was as expected");
-        var c2 = new Plottable.Component();
-        assert.strictEqual(c2.getID(), expectedID + 1, "future components increment appropriately");
-        svg.remove();
-    });
     it("boxes work as expected", function () {
         assert.throws(function () { return c._addBox("pre-anchor"); }, Error, "Adding boxes before anchoring is currently disallowed");
         c.renderTo(svg);

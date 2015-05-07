@@ -464,21 +464,8 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Core {
-        /**
-         * A class most other Plottable classes inherit from, in order to have a
-         * unique ID.
-         */
-        class PlottableObject {
-            getID(): number;
-        }
-    }
-}
-
-
-declare module Plottable {
     type DatasetCallback = (dataset: Dataset) => any;
-    class Dataset extends Core.PlottableObject {
+    class Dataset {
         /**
          * Constructs a new set.
          *
@@ -778,7 +765,7 @@ declare module Plottable {
             (scale: Scale<D, any>): D[][];
         }
     }
-    class Scale<D, R> extends Core.PlottableObject {
+    class Scale<D, R> {
         _typeCoercer: (d: any) => any;
         protected _d3Scale: D3.Scale.Scale;
         /**
@@ -1498,7 +1485,7 @@ declare module Plottable {
             static CENTER: string;
         }
     }
-    class Component extends Core.PlottableObject {
+    class Component {
         protected _element: D3.Selection;
         protected _content: D3.Selection;
         protected _boundingBox: D3.Selection;
@@ -3424,7 +3411,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    class Dispatcher extends Core.PlottableObject {
+    class Dispatcher {
         protected _event2Callback: {
             [eventName: string]: (e: Event) => any;
         };
@@ -3694,7 +3681,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    class Interaction extends Core.PlottableObject {
+    class Interaction {
         /**
          * It maintains a 'hitBox' which is where all event listeners are
          * attached. Due to cross- browser weirdness, the hitbox needs to be an

@@ -12,7 +12,7 @@ module Plottable {
     }
   }
 
-  export class Scale<D, R> extends Core.PlottableObject {
+  export class Scale<D, R> {
     public _typeCoercer: (d: any) => any = (d: any) => d;
 
     protected _d3Scale: D3.Scale.Scale;
@@ -33,7 +33,6 @@ module Plottable {
      * @param {D3.Scale.Scale} scale The D3 scale backing the Scale.
      */
     constructor(scale: D3.Scale.Scale) {
-      super();
       this._d3Scale = scale;
       this._callbacks = new Utils.CallbackSet<ScaleCallback<Scale<D, R>>>();
       this._extentProviders = new Utils.Set<Scales.ExtentProvider<D>>();

@@ -220,15 +220,6 @@ describe("Component behavior", () => {
     svg.remove();
   });
 
-  it("componentID works as expected", () => {
-    var expectedID = (<any> Plottable.Core.PlottableObject)._nextID;
-    var c1 = new Plottable.Component();
-    assert.strictEqual(c1.getID(), expectedID, "component id on next component was as expected");
-    var c2 = new Plottable.Component();
-    assert.strictEqual(c2.getID(), expectedID + 1, "future components increment appropriately");
-    svg.remove();
-  });
-
   it("boxes work as expected", () => {
     assert.throws(() => (<any> c)._addBox("pre-anchor"), Error, "Adding boxes before anchoring is currently disallowed");
     c.renderTo(svg);

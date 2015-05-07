@@ -10,7 +10,7 @@ module Plottable {
       static CENTER = "center";
     }
   }
-  export class Component extends Core.PlottableObject {
+  export class Component {
     protected _element: D3.Selection;
     protected _content: D3.Selection;
     protected _boundingBox: D3.Selection;

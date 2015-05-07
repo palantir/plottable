@@ -1,7 +1,7 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-  export class Dispatcher extends Core.PlottableObject {
+  export class Dispatcher {
     protected _event2Callback: { [eventName: string]: (e: Event) => any; } = {};
     protected _callbacks: Utils.CallbackSet<Function>[] = [];
     private _connected = false;

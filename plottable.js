@@ -1107,37 +1107,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    var Core;
-    (function (Core) {
-        /**
-         * A class most other Plottable classes inherit from, in order to have a
-         * unique ID.
-         */
-        var PlottableObject = (function () {
-            function PlottableObject() {
-                this._plottableID = PlottableObject._nextID++;
-            }
-            PlottableObject.prototype.getID = function () {
-                return this._plottableID;
-            };
-            PlottableObject._nextID = 0;
-            return PlottableObject;
-        })();
-        Core.PlottableObject = PlottableObject;
-    })(Core = Plottable.Core || (Plottable.Core = {}));
-})(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    var Dataset = (function (_super) {
-        __extends(Dataset, _super);
+    var Dataset = (function () {
         /**
          * Constructs a new set.
          *
@@ -1151,7 +1121,6 @@ var Plottable;
         function Dataset(data, metadata) {
             if (data === void 0) { data = []; }
             if (metadata === void 0) { metadata = {}; }
-            _super.call(this);
             this._data = data;
             this._metadata = metadata;
             this._accessor2cachedExtent = new Plottable.Utils.Map();
@@ -1186,7 +1155,7 @@ var Plottable;
             }
         };
         return Dataset;
-    })(Plottable.Core.PlottableObject);
+    })();
     Plottable.Dataset = Dataset;
 })(Plottable || (Plottable = {}));
 
@@ -1538,16 +1507,9 @@ var Plottable;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
 var Plottable;
 (function (Plottable) {
-    var Scale = (function (_super) {
-        __extends(Scale, _super);
+    var Scale = (function () {
         /**
          * Constructs a new Scale.
          *
@@ -1559,7 +1521,6 @@ var Plottable;
          * @param {D3.Scale.Scale} scale The D3 scale backing the Scale.
          */
         function Scale(scale) {
-            _super.call(this);
             this._typeCoercer = function (d) { return d; };
             this._autoDomainAutomatically = true;
             this._domainModificationInProgress = false;
@@ -1664,7 +1625,7 @@ var Plottable;
             this._extentProviders.delete(provider);
         };
         return Scale;
-    })(Plottable.Core.PlottableObject);
+    })();
     Plottable.Scale = Scale;
 })(Plottable || (Plottable = {}));
 
@@ -3122,12 +3083,6 @@ var Plottable;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
 var Plottable;
 (function (Plottable) {
     var Components;
@@ -3144,10 +3099,8 @@ var Plottable;
         })();
         Components.Alignment = Alignment;
     })(Components = Plottable.Components || (Plottable.Components = {}));
-    var Component = (function (_super) {
-        __extends(Component, _super);
+    var Component = (function () {
         function Component() {
-            _super.apply(this, arguments);
             this.clipPathEnabled = false;
             this._origin = { x: 0, y: 0 }; // Origin of the coordinate space for the Component.
             this._xAlignProportion = 0; // What % along the free space do we want to position (0 = left, .5 = center, 1 = right)
@@ -3687,7 +3640,7 @@ var Plottable;
             return this._backgroundContainer;
         };
         return Component;
-    })(Plottable.Core.PlottableObject);
+    })();
     Plottable.Component = Component;
 })(Plottable || (Plottable = {}));
 
@@ -8715,18 +8668,10 @@ var Plottable;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
 var Plottable;
 (function (Plottable) {
-    var Dispatcher = (function (_super) {
-        __extends(Dispatcher, _super);
+    var Dispatcher = (function () {
         function Dispatcher() {
-            _super.apply(this, arguments);
             this._event2Callback = {};
             this._callbacks = [];
             this._connected = false;
@@ -8764,7 +8709,7 @@ var Plottable;
             this._disconnect();
         };
         return Dispatcher;
-    })(Plottable.Core.PlottableObject);
+    })();
     Plottable.Dispatcher = Dispatcher;
 })(Plottable || (Plottable = {}));
 
@@ -9219,18 +9164,10 @@ var Plottable;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
 var Plottable;
 (function (Plottable) {
-    var Interaction = (function (_super) {
-        __extends(Interaction, _super);
+    var Interaction = (function () {
         function Interaction() {
-            _super.apply(this, arguments);
         }
         Interaction.prototype._anchor = function (component) {
             this._componentToListenTo = component;
@@ -9260,7 +9197,7 @@ var Plottable;
             return 0 <= p.x && 0 <= p.y && p.x <= this._componentToListenTo.width() && p.y <= this._componentToListenTo.height();
         };
         return Interaction;
-    })(Plottable.Core.PlottableObject);
+    })();
     Plottable.Interaction = Interaction;
 })(Plottable || (Plottable = {}));
 
