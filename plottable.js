@@ -6933,7 +6933,7 @@ var Plottable;
                 }
                 this._replaceDataScaleBinding(this.sectorValue().scale, sectorValueScale);
                 this._key2DataBindings.set(Pie._SECTOR_VALUE_KEY, { accessor: d3.functor(sectorValue), scale: sectorValueScale });
-                this._updateDataScaleExtents(Pie._SECTOR_VALUE_KEY);
+                this._updateExtentsForProperty(Pie._SECTOR_VALUE_KEY);
                 this._render();
                 return this;
             };
@@ -6943,7 +6943,7 @@ var Plottable;
                 }
                 this._replaceDataScaleBinding(this.innerRadius().scale, innerRadiusScale);
                 this._key2DataBindings.set(Pie._INNER_RADIUS_KEY, { accessor: d3.functor(innerRadius), scale: innerRadiusScale });
-                this._updateDataScaleExtents(Pie._INNER_RADIUS_KEY);
+                this._updateExtentsForProperty(Pie._INNER_RADIUS_KEY);
                 this._render();
                 return this;
             };
@@ -6953,7 +6953,7 @@ var Plottable;
                 }
                 this._replaceDataScaleBinding(this.outerRadius().scale, outerRadiusScale);
                 this._key2DataBindings.set(Pie._OUTER_RADIUS_KEY, { accessor: d3.functor(outerRadius), scale: outerRadiusScale });
-                this._updateDataScaleExtents(Pie._OUTER_RADIUS_KEY);
+                this._updateExtentsForProperty(Pie._OUTER_RADIUS_KEY);
                 this._render();
                 return this;
             };
@@ -6965,7 +6965,7 @@ var Plottable;
             Pie.prototype._updateExtents = function () {
                 var _this = this;
                 _super.prototype._updateExtents.call(this);
-                this._key2DataExtents.keys().forEach(function (dataAttr) { return _this._updateDataScaleExtents(dataAttr); });
+                this._key2DataExtents.keys().forEach(function (dataAttr) { return _this._updateExtentsForProperty(dataAttr); });
                 this._propertyScales().forEach(function (scale) { return scale._autoDomainIfAutomaticMode(); });
             };
             Pie.prototype._dataExtentsForScale = function (scale) {
@@ -6984,22 +6984,19 @@ var Plottable;
                 });
                 return d3.merge(allSetsOfExtents);
             };
-            Pie.prototype._updateDataScaleExtents = function (dataAttr) {
-                this._key2DataExtents.set(dataAttr, this._datasetExtents(dataAttr));
-            };
-            Pie.prototype._datasetExtents = function (dataAttr) {
+            Pie.prototype._updateExtentsForProperty = function (property) {
                 var _this = this;
-                var accScaleBinding = this._key2DataBindings.get(dataAttr);
+                var accScaleBinding = this._key2DataBindings.get(property);
                 if (accScaleBinding.accessor == null) {
                     return;
                 }
                 var coercer = (accScaleBinding.scale != null) ? accScaleBinding.scale._typeCoercer : function (d) { return d; };
-                return this._datasetKeysInOrder.map(function (key) {
+                this._key2DataExtents.set(property, this._datasetKeysInOrder.map(function (key) {
                     var plotDatasetKey = _this._key2PlotDatasetKey.get(key);
                     var dataset = plotDatasetKey.dataset;
                     var plotMetadata = plotDatasetKey.plotMetadata;
                     return _this._computeExtent(dataset, accScaleBinding.accessor, coercer, plotMetadata);
-                });
+                }));
             };
             Pie.prototype._replaceDataScaleBinding = function (oldScale, newScale) {
                 if (oldScale !== newScale) {

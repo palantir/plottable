@@ -101,7 +101,7 @@ export module Plots {
       }
       this._replaceDataScaleBinding(this.sectorValue().scale, sectorValueScale);
       this._key2DataBindings.set(Pie._SECTOR_VALUE_KEY, { accessor: d3.functor(sectorValue), scale: sectorValueScale });
-      this._updateDataScaleExtents(Pie._SECTOR_VALUE_KEY);
+      this._updateExtentsForProperty(Pie._SECTOR_VALUE_KEY);
       this._render();
       return this;
     }
@@ -115,7 +115,7 @@ export module Plots {
       }
       this._replaceDataScaleBinding(this.innerRadius().scale, innerRadiusScale);
       this._key2DataBindings.set(Pie._INNER_RADIUS_KEY, { accessor: d3.functor(innerRadius), scale: innerRadiusScale });
-      this._updateDataScaleExtents(Pie._INNER_RADIUS_KEY);
+      this._updateExtentsForProperty(Pie._INNER_RADIUS_KEY);
       this._render();
       return this;
     }
@@ -129,7 +129,7 @@ export module Plots {
       }
       this._replaceDataScaleBinding(this.outerRadius().scale, outerRadiusScale);
       this._key2DataBindings.set(Pie._OUTER_RADIUS_KEY, { accessor: d3.functor(outerRadius), scale: outerRadiusScale });
-      this._updateDataScaleExtents(Pie._OUTER_RADIUS_KEY);
+      this._updateExtentsForProperty(Pie._OUTER_RADIUS_KEY);
       this._render();
       return this;
     }
@@ -141,7 +141,7 @@ export module Plots {
 
     protected _updateExtents() {
       super._updateExtents();
-      this._key2DataExtents.keys().forEach((dataAttr) => this._updateDataScaleExtents(dataAttr));
+      this._key2DataExtents.keys().forEach((dataAttr) => this._updateExtentsForProperty(dataAttr));
       this._propertyScales().forEach((scale) => scale._autoDomainIfAutomaticMode());
     }
 
@@ -161,20 +161,16 @@ export module Plots {
       return d3.merge(allSetsOfExtents);
     }
 
-    private _updateDataScaleExtents(dataAttr: string) {
-      this._key2DataExtents.set(dataAttr, this._datasetExtents(dataAttr));
-    }
-
-    private _datasetExtents(dataAttr: string) {
-      var accScaleBinding = this._key2DataBindings.get(dataAttr);
+    private _updateExtentsForProperty(property: string) {
+      var accScaleBinding = this._key2DataBindings.get(property);
       if (accScaleBinding.accessor == null) { return; }
       var coercer = (accScaleBinding.scale != null) ? accScaleBinding.scale._typeCoercer : (d: any) => d;
-      return this._datasetKeysInOrder.map((key) => {
+      this._key2DataExtents.set(property, this._datasetKeysInOrder.map((key) => {
         var plotDatasetKey = this._key2PlotDatasetKey.get(key);
         var dataset = plotDatasetKey.dataset;
         var plotMetadata = plotDatasetKey.plotMetadata;
         return this._computeExtent(dataset, accScaleBinding.accessor, coercer, plotMetadata);
-      });
+      }));
     }
 
     private _replaceDataScaleBinding(oldScale: Scale<any, any>, newScale: Scale<any, any>) {
