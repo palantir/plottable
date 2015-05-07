@@ -17,7 +17,7 @@ describe("Plots", () => {
       svg.remove();
     });
 
-    it("the accessors properly access data, index, and metadata", () => {
+    it("the accessors properly access data, index and Dataset", () => {
       var svg = TestMethods.generateSVG(400, 400);
       var xScale = new Plottable.Scales.Linear();
       var yScale = new Plottable.Scales.Linear();
@@ -25,8 +25,8 @@ describe("Plots", () => {
       yScale.domain([400, 0]);
       var data = [{x: 0, y: 0}, {x: 1, y: 1}];
       var metadata = {foo: 10, bar: 20};
-      var xAccessor = (d: any, i?: number, m?: any) => d.x + i * m.foo;
-      var yAccessor = (d: any, i?: number, m?: any) => m.bar;
+      var xAccessor = (d: any, i: number, dataset: Plottable.Dataset) => d.x + i * dataset.metadata().foo;
+      var yAccessor = (d: any, i: number, dataset: Plottable.Dataset) => dataset.metadata().bar;
       var dataset = new Plottable.Dataset(data, metadata);
       var plot = new Plottable.Plots.Scatter(xScale, yScale)
                                   .project("x", xAccessor)

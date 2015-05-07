@@ -192,7 +192,7 @@ module Plottable {
       this._attrBindings.forEach((attr, binding) => {
         var accessor = binding.accessor;
         var scale = binding.scale;
-        var fn = scale ? (d: any, i: number, u: any, m: Plots.PlotMetadata) => scale.scale(accessor(d, i, u, m)) : accessor;
+        var fn = scale ? (d: any, i: number, dataset: Dataset, m: Plots.PlotMetadata) => scale.scale(accessor(d, i, dataset, m)) : accessor;
         h[attr] = fn;
       });
       return h;
@@ -214,9 +214,10 @@ module Plottable {
         var attrToProjector = this._generateAttrToProjector();
         var plotDatasetKey = this._key2PlotDatasetKey.get(datasetKey);
         var plotMetadata = plotDatasetKey.plotMetadata;
-        var userMetadata = plotDatasetKey.dataset.metadata();
         d3.entries(attrToProjector).forEach((keyValue: any) => {
-          attrToAppliedProjector[keyValue.key] = (datum: any, index: number) => keyValue.value(datum, index, userMetadata, plotMetadata);
+          attrToAppliedProjector[keyValue.key] = (datum: any, index: number) => {
+            return keyValue.value(datum, index, plotDatasetKey.dataset, plotMetadata);
+          };
         });
       }
       return attrToAppliedProjector;
@@ -285,8 +286,7 @@ module Plottable {
 
     private _computeExtent(dataset: Dataset, accessor: _Accessor, typeCoercer: (d: any) => any, plotMetadata: any): any[] {
       var data = dataset.data();
-      var metadata = dataset.metadata();
-      var appliedAccessor = (d: any, i: number) => accessor(d, i, metadata, plotMetadata);
+      var appliedAccessor = (d: any, i: number) => accessor(d, i, dataset, plotMetadata);
       var mappedData = data.map(appliedAccessor).map(typeCoercer);
       if (mappedData.length === 0) {
         return [];
@@ -428,12 +428,11 @@ module Plottable {
       var dataToDraw = this._getDataToDraw();
       var drawers = this._getDrawersInOrder();
 
-      // TODO: Use metadata instead of dataToDraw #1297.
       var times = this._datasetKeysInOrder.map((k, i) =>
         drawers[i].draw(
           dataToDraw.get(k),
           drawSteps,
-          this._key2PlotDatasetKey.get(k).dataset.metadata(),
+          this._key2PlotDatasetKey.get(k).dataset,
           this._key2PlotDatasetKey.get(k).plotMetadata
         ));
       var maxTime = Utils.Methods.max(times, 0);

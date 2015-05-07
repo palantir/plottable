@@ -26,11 +26,11 @@ describe("Metadata", () => {
     });
   });
 
-  it("user metadata is applied", () => {
+  it("Dataset is passed in", () => {
     var svg = TestMethods.generateSVG(400, 400);
     var metadata = {foo: 10, bar: 20};
-    var xAccessor = (d: any, i: number, u: any) => d.x + i * u.foo;
-    var yAccessor = (d: any, i: number, u: any) => u.bar;
+    var xAccessor = (d: any, i: number, dataset: Plottable.Dataset) => d.x + i * dataset.metadata().foo;
+    var yAccessor = (d: any, i: number, dataset: Plottable.Dataset) => dataset.metadata().bar;
     var dataset = new Plottable.Dataset(data1, metadata);
     var plot = new Plottable.Plots.Scatter(xScale, yScale)
                                 .project("x", xAccessor)
@@ -64,7 +64,7 @@ describe("Metadata", () => {
     var svg = TestMethods.generateSVG(400, 400);
     var metadata1 = {foo: 10};
     var metadata2 = {foo: 30};
-    var xAccessor = (d: any, i: number, u: any) => d.x + (i + 1) * u.foo;
+    var xAccessor = (d: any, i: number, dataset: Plottable.Dataset) => d.x + (i + 1) * dataset.metadata().foo;
     var yAccessor = () => 0;
     var dataset1 = new Plottable.Dataset(data1, metadata1);
     var dataset2 = new Plottable.Dataset(data2, metadata2);
@@ -94,7 +94,7 @@ describe("Metadata", () => {
 
   it("plot metadata is applied", () => {
     var svg = TestMethods.generateSVG(400, 400);
-    var xAccessor = (d: any, i: number, u: any, m: any) => d.x + (i + 1) * m.foo;
+    var xAccessor = (d: any, i: number, dataset: Plottable.Dataset, m: any) => d.x + (i + 1) * m.foo;
     var yAccessor = () => 0;
     var plot = new Plottable.Plots.Scatter(xScale, yScale)
                                 .project("x", xAccessor)
@@ -128,7 +128,7 @@ describe("Metadata", () => {
 
   it("plot metadata is per plot", () => {
     var svg = TestMethods.generateSVG(400, 400);
-    var xAccessor = (d: any, i: number, u: any, m: any) => d.x + (i + 1) * m.foo;
+    var xAccessor = (d: any, i: number, dataset: Plottable.Dataset, m: any) => d.x + (i + 1) * m.foo;
     var yAccessor = () => 0;
     var plot1 = new Plottable.Plots.Scatter(xScale, yScale)
                                 .project("x", xAccessor)
@@ -196,10 +196,16 @@ describe("Metadata", () => {
     var dataset2 = new Plottable.Dataset(data2, metadata);
 
     var checkPlot = (plot: Plottable.Plot) => {
+      var xAccessor = (d: any, i: number, dataset: Plottable.Dataset, m: Plottable.Plots.PlotMetadata) => {
+          return d.x + dataset.metadata().foo + m.datasetKey.length;
+      };
+      var yAccessor = (d: any, i: number, dataset: Plottable.Dataset, m: Plottable.Plots.PlotMetadata) => {
+          return d.y + dataset.metadata().foo - m.datasetKey.length;
+      };
       plot.addDataset(dataset1)
           .addDataset(dataset2)
-          .project("x", (d: any, i: number, u: any, m: Plottable.Plots.PlotMetadata) => d.x + u.foo + m.datasetKey.length)
-          .project("y", (d: any, i: number, u: any, m: Plottable.Plots.PlotMetadata) => d.y + u.foo - m.datasetKey.length);
+          .project("x", xAccessor)
+          .project("y", yAccessor);
 
       // This should not crash. If some metadata is not passed, undefined property error will be raised during accessor call.
       plot.renderTo(svg);

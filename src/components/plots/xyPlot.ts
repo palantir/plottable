@@ -114,9 +114,9 @@ module Plottable {
       var attrToProjector: AttributeToProjector = super._generateAttrToProjector();
       var positionXFn = attrToProjector["x"];
       var positionYFn = attrToProjector["y"];
-      attrToProjector["defined"] = (d: any, i: number, u: any, m: Plots.PlotMetadata) => {
-        var positionX = positionXFn(d, i, u, m);
-        var positionY = positionYFn(d, i, u, m);
+      attrToProjector["defined"] = (d: any, i: number, dataset: Dataset, m: Plots.PlotMetadata) => {
+        var positionX = positionXFn(d, i, dataset, m);
+        var positionY = positionYFn(d, i, dataset, m);
         return positionX != null && positionX === positionX &&
                positionY != null && positionY === positionY;
       };
@@ -203,13 +203,13 @@ module Plottable {
     }
 
     protected _normalizeDatasets<A, B>(fromX: boolean): {a: A; b: B}[] {
-      var aAccessor: (d: any, i: number, u: any, m: Plots.PlotMetadata) => A = this._attrBindings.get(fromX ? "x" : "y").accessor;
-      var bAccessor: (d: any, i: number, u: any, m: Plots.PlotMetadata) => B = this._attrBindings.get(fromX ? "y" : "x").accessor;
+      var aAccessor: (d: any, i: number, dataset: Dataset, m: Plots.PlotMetadata) => A = this._attrBindings.get(fromX ? "x" : "y").accessor;
+      var bAccessor: (d: any, i: number, dataset: Dataset, m: Plots.PlotMetadata) => B = this._attrBindings.get(fromX ? "y" : "x").accessor;
       return Utils.Methods.flatten(this._datasetKeysInOrder.map((key: string) => {
         var dataset = this._key2PlotDatasetKey.get(key).dataset;
         var plotMetadata = this._key2PlotDatasetKey.get(key).plotMetadata;
         return dataset.data().map((d, i) => {
-          return { a: aAccessor(d, i, dataset.metadata(), plotMetadata), b: bAccessor(d, i, dataset.metadata(), plotMetadata) };
+          return { a: aAccessor(d, i, dataset, plotMetadata), b: bAccessor(d, i, dataset, plotMetadata) };
         });
       }));
     }

@@ -66,8 +66,8 @@ module Plottable {
         var dataset = this._key2PlotDatasetKey.get(k).dataset;
         var plotMetadata = <Plots.StackedPlotMetadata>this._key2PlotDatasetKey.get(k).plotMetadata;
         return Utils.Methods.max<any, number>(dataset.data(), (datum: any, i: number) => {
-          return +valueAccessor(datum, i, dataset.metadata(), plotMetadata) +
-            plotMetadata.offsets.get(keyAccessor(datum, i, dataset.metadata(), plotMetadata));
+          return +valueAccessor(datum, i, dataset, plotMetadata) +
+            plotMetadata.offsets.get(keyAccessor(datum, i, dataset, plotMetadata));
         }, 0);
       }, 0);
 
@@ -75,8 +75,8 @@ module Plottable {
         var dataset = this._key2PlotDatasetKey.get(k).dataset;
         var plotMetadata = <Plots.StackedPlotMetadata>this._key2PlotDatasetKey.get(k).plotMetadata;
         return Utils.Methods.min<any, number>(dataset.data(), (datum: any, i: number) => {
-          return +valueAccessor(datum, i, dataset.metadata(), plotMetadata) +
-            plotMetadata.offsets.get(keyAccessor(datum, i, dataset.metadata(), plotMetadata));
+          return +valueAccessor(datum, i, dataset, plotMetadata) +
+            plotMetadata.offsets.get(keyAccessor(datum, i, dataset, plotMetadata));
         }, 0);
       }, 0);
 
@@ -114,14 +114,14 @@ module Plottable {
         var plotMetadata = <Plots.StackedPlotMetadata>this._key2PlotDatasetKey.get(k).plotMetadata;
         var positiveDataMap = positiveDataMapArray[index];
         var negativeDataMap = negativeDataMapArray[index];
-        var isAllNegativeValues = dataset.data().every((datum, i) => valueAccessor(datum, i, dataset.metadata(), plotMetadata) <= 0);
+        var isAllNegativeValues = dataset.data().every((datum, i) => valueAccessor(datum, i, dataset, plotMetadata) <= 0);
 
         dataset.data().forEach((datum: any, datumIndex: number) => {
-          var key = keyAccessor(datum, datumIndex, dataset.metadata(), plotMetadata);
+          var key = keyAccessor(datum, datumIndex, dataset, plotMetadata);
           var positiveOffset = positiveDataMap.get(key).offset;
           var negativeOffset = negativeDataMap.get(key).offset;
 
-          var value = valueAccessor(datum, datumIndex, dataset.metadata(), plotMetadata);
+          var value = valueAccessor(datum, datumIndex, dataset, plotMetadata);
           var offset: number;
           if (!+value) {
             offset = isAllNegativeValues ? negativeOffset : positiveOffset;
@@ -141,7 +141,7 @@ module Plottable {
         var dataset = this._key2PlotDatasetKey.get(k).dataset;
         var plotMetadata = this._key2PlotDatasetKey.get(k).plotMetadata;
         dataset.data().forEach((datum, index) => {
-          domainKeys.add(keyAccessor(datum, index, dataset.metadata(), plotMetadata));
+          domainKeys.add(keyAccessor(datum, index, dataset, plotMetadata));
         });
       });
 
@@ -163,8 +163,8 @@ module Plottable {
         var dataset = this._key2PlotDatasetKey.get(k).dataset;
         var plotMetadata = this._key2PlotDatasetKey.get(k).plotMetadata;
         dataset.data().forEach((datum, index) => {
-          var key = keyAccessor(datum, index, dataset.metadata(), plotMetadata);
-          var value = valueAccessor(datum, index, dataset.metadata(), plotMetadata);
+          var key = keyAccessor(datum, index, dataset, plotMetadata);
+          var value = valueAccessor(datum, index, dataset, plotMetadata);
           dataMapArray[datasetIndex].set(key, {key: key, value: value});
         });
       });
@@ -187,18 +187,18 @@ module Plottable {
     public _normalizeDatasets<A, B>(fromX: boolean): {a: A; b: B}[] {
       var aAccessor = this._attrBindings.get(fromX ? "x" : "y").accessor;
       var bAccessor = this._attrBindings.get(fromX ? "y" : "x").accessor;
-      var aStackedAccessor = (d: any, i: number, u: any, m: Plots.StackedPlotMetadata) => {
-        var value = aAccessor(d, i, u, m);
+      var aStackedAccessor = (d: any, i: number, dataset: Dataset, m: Plots.StackedPlotMetadata) => {
+        var value = aAccessor(d, i, dataset, m);
         if (this._isVertical ? !fromX : fromX) {
-          value += m.offsets.get(bAccessor(d, i, u, m));
+          value += m.offsets.get(bAccessor(d, i, dataset, m));
         }
         return value;
       };
 
-      var bStackedAccessor = (d: any, i: number, u: any, m: Plots.StackedPlotMetadata) => {
-        var value = bAccessor(d, i, u, m);
+      var bStackedAccessor = (d: any, i: number, dataset: Dataset, m: Plots.StackedPlotMetadata) => {
+        var value = bAccessor(d, i, dataset, m);
         if (this._isVertical ? fromX : !fromX) {
-          value += m.offsets.get(aAccessor(d, i, u, m));
+          value += m.offsets.get(aAccessor(d, i, dataset, m));
         }
         return value;
       };
@@ -208,8 +208,8 @@ module Plottable {
         var plotMetadata = <Plots.StackedPlotMetadata>this._key2PlotDatasetKey.get(key).plotMetadata;
         return dataset.data().map((d, i) => {
           return {
-            a: aStackedAccessor(d, i, dataset.metadata(), plotMetadata),
-            b: bStackedAccessor(d, i, dataset.metadata(), plotMetadata)
+            a: aStackedAccessor(d, i, dataset, plotMetadata),
+            b: bStackedAccessor(d, i, dataset, plotMetadata)
           };
         });
       }));

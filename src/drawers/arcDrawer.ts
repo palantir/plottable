@@ -36,9 +36,9 @@ export module Drawers {
       return super._drawStep({attrToProjector: attrToProjector, animator: step.animator});
     }
 
-    public draw(data: any[], drawSteps: DrawStep[], userMetadata: any, plotMetadata: Plots.PlotMetadata) {
+    public draw(data: any[], drawSteps: DrawStep[], dataset: Dataset, plotMetadata: Plots.PlotMetadata) {
       // HACKHACK Applying metadata should be done in base class
-      var valueAccessor = (d: any, i: number) => drawSteps[0].attrToProjector["value"](d, i, userMetadata, plotMetadata);
+      var valueAccessor = (d: any, i: number) => drawSteps[0].attrToProjector["value"](d, i, dataset, plotMetadata);
 
       data = data.filter(e => Plottable.Utils.Methods.isValidNumber(+valueAccessor(e, null)));
 
@@ -52,7 +52,7 @@ export module Drawers {
           Utils.Methods.warn("Negative values will not render correctly in a pie chart.");
         }
       });
-      return super.draw(pie, drawSteps, userMetadata, plotMetadata);
+      return super.draw(pie, drawSteps, dataset, plotMetadata);
     }
 
     public _getPixelPoint(datum: any, index: number): Point {

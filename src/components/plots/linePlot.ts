@@ -25,8 +25,8 @@ export module Plots {
       this._defaultStrokeColor = new Scales.Color().range()[0];
     }
 
-    protected _rejectNullsAndNaNs(d: any, i: number, userMetdata: any, plotMetadata: any, accessor: _Accessor) {
-      var value = accessor(d, i, userMetdata, plotMetadata);
+    protected _rejectNullsAndNaNs(d: any, i: number, dataset: Dataset, plotMetadata: any, accessor: _Accessor) {
+      var value = accessor(d, i, dataset, plotMetadata);
       return value != null && value === value;
     }
 
@@ -43,7 +43,7 @@ export module Plots {
       // avoids lines zooming on from offscreen.
       var startValue = (domainMax < 0 && domainMax) || (domainMin > 0 && domainMin) || 0;
       var scaledStartValue = this._yScale.scale(startValue);
-      return (d: any, i: number, u: any, m: PlotMetadata) => scaledStartValue;
+      return (d: any, i: number, dataset: Dataset, m: PlotMetadata) => scaledStartValue;
     }
 
     protected _generateDrawSteps(): Drawers.DrawStep[] {
@@ -66,15 +66,15 @@ export module Plots {
       var singleDatumAttributes = d3.keys(attrToProjector).filter(isSingleDatumAttr);
       singleDatumAttributes.forEach((attribute: string) => {
         var projector = attrToProjector[attribute];
-        attrToProjector[attribute] = (data: any[], i: number, u: any, m: any) =>
-          data.length > 0 ? projector(data[0], i, u, m) : null;
+        attrToProjector[attribute] = (data: any[], i: number, dataset: Dataset, m: any) =>
+          data.length > 0 ? projector(data[0], i, dataset, m) : null;
       });
 
       var xFunction = attrToProjector["x"];
       var yFunction = attrToProjector["y"];
 
-      attrToProjector["defined"] = (d: any, i: number, u: any, m: any) =>
-          this._rejectNullsAndNaNs(d, i, u, m, xFunction) && this._rejectNullsAndNaNs(d, i, u, m, yFunction);
+      attrToProjector["defined"] = (d: any, i: number, dataset: Dataset, m: any) =>
+          this._rejectNullsAndNaNs(d, i, dataset, m, xFunction) && this._rejectNullsAndNaNs(d, i, dataset, m, yFunction);
       attrToProjector["stroke"] = attrToProjector["stroke"] || d3.functor(this._defaultStrokeColor);
       attrToProjector["stroke-width"] = attrToProjector["stroke-width"] || d3.functor("2px");
 

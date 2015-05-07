@@ -79,12 +79,12 @@ export module Drawers {
     }
 
     private _applyMetadata(attrToProjector: AttributeToProjector,
-                          userMetadata: any,
+                          dataset: Dataset,
                           plotMetadata: Plots.PlotMetadata): AttributeToAppliedProjector {
       var modifiedAttrToProjector: AttributeToAppliedProjector = {};
       d3.keys(attrToProjector).forEach((attr: string) => {
         modifiedAttrToProjector[attr] =
-          (datum: any, index: number) => attrToProjector[attr](datum, index, userMetadata, plotMetadata);
+          (datum: any, index: number) => attrToProjector[attr](datum, index, dataset, plotMetadata);
       });
 
       return modifiedAttrToProjector;
@@ -103,12 +103,12 @@ export module Drawers {
      *
      * @param{any[]} data The data to be drawn
      * @param{DrawStep[]} drawSteps The list of steps, which needs to be drawn
-     * @param{any} userMetadata The metadata provided by user
+     * @param{Dataset} dataset The Dataset
      * @param{any} plotMetadata The metadata provided by plot
      */
-    public draw(data: any[], drawSteps: DrawStep[], userMetadata: any, plotMetadata: Plots.PlotMetadata) {
+    public draw(data: any[], drawSteps: DrawStep[], dataset: Dataset, plotMetadata: Plots.PlotMetadata) {
       var appliedDrawSteps: AppliedDrawStep[] = drawSteps.map((dr: DrawStep) => {
-        var appliedAttrToProjector = this._applyMetadata(dr.attrToProjector, userMetadata, plotMetadata);
+        var appliedAttrToProjector = this._applyMetadata(dr.attrToProjector, dataset, plotMetadata);
         this._attrToProjector = <AttributeToAppliedProjector>Utils.Methods.copyMap(appliedAttrToProjector);
         return {
           attrToProjector: appliedAttrToProjector,
