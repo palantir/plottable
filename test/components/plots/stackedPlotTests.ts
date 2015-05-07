@@ -46,7 +46,8 @@ describe("Plots", () => {
       stackedPlot.addDataset(new Plottable.Dataset(data3));
       stackedPlot.addDataset(new Plottable.Dataset(data4));
 
-      var keys = (<any> stackedPlot)._key2PlotDatasetKey.keys(); // HACKHACK: Dataset keys are being removed, so these are internal keys
+      // HACKHACK #1984: Dataset keys are being removed, so these are internal keys
+      var keys = (<any> stackedPlot)._key2PlotDatasetKey.keys();
       var ds1PlotMetadata = <Plottable.Plots.StackedPlotMetadata>(<any> stackedPlot)._key2PlotDatasetKey.get(keys[1]).plotMetadata;
       var ds4PlotMetadata = <Plottable.Plots.StackedPlotMetadata>(<any> stackedPlot)._key2PlotDatasetKey.get(keys[4]).plotMetadata;
       assert.strictEqual(ds1PlotMetadata.offsets.get("1"), 1, "positive offset was used");
@@ -72,7 +73,8 @@ describe("Plots", () => {
       stackedPlot.addDataset(new Plottable.Dataset(data2));
       stackedPlot.addDataset(new Plottable.Dataset(data3));
 
-      var keys = (<any> stackedPlot)._key2PlotDatasetKey.keys(); // HACKHACK: Dataset keys are being removed, so these are internal keys
+      // HACKHACK #1984: Dataset keys are being removed, so these are internal keys
+      var keys = (<any> stackedPlot)._key2PlotDatasetKey.keys();
       var ds1PlotMetadata = <Plottable.Plots.StackedPlotMetadata>(<any> stackedPlot)._key2PlotDatasetKey.get(keys[1]).plotMetadata;
       var ds3PlotMetadata = <Plottable.Plots.StackedPlotMetadata>(<any> stackedPlot)._key2PlotDatasetKey.get(keys[3]).plotMetadata;
       assert.strictEqual(ds1PlotMetadata.offsets.get("1"), -2, "positive offset was used");
@@ -90,7 +92,8 @@ describe("Plots", () => {
       stackedPlot.addDataset(new Plottable.Dataset(data0));
       stackedPlot.addDataset(new Plottable.Dataset(data1));
 
-      var keys = (<any> stackedPlot)._key2PlotDatasetKey.keys(); // HACKHACK: Dataset keys are being removed, so these are internal keys
+      // HACKHACK #1984: Dataset keys are being removed, so these are internal keys
+      var keys = (<any> stackedPlot)._key2PlotDatasetKey.keys();
       var ds0PlotMetadata = <Plottable.Plots.StackedPlotMetadata>(<any> stackedPlot)._key2PlotDatasetKey.get(keys[0]).plotMetadata;
       var ds1PlotMetadata = <Plottable.Plots.StackedPlotMetadata>(<any> stackedPlot)._key2PlotDatasetKey.get(keys[1]).plotMetadata;
 
@@ -129,7 +132,8 @@ describe("Plots", () => {
       stackedPlot.addDataset(new Plottable.Dataset(data4));
       stackedPlot.addDataset(new Plottable.Dataset(data5));
 
-      var keys = (<any> stackedPlot)._key2PlotDatasetKey.keys(); // HACKHACK: Dataset keys are being removed, so these are internal keys
+      // HACKHACK #1984: Dataset keys are being removed, so these are internal keys
+      var keys = (<any> stackedPlot)._key2PlotDatasetKey.keys();
       var ds2PlotMetadata = <Plottable.Plots.StackedPlotMetadata>(<any> stackedPlot)._key2PlotDatasetKey.get(keys[2]).plotMetadata;
       var ds3PlotMetadata = <Plottable.Plots.StackedPlotMetadata>(<any> stackedPlot)._key2PlotDatasetKey.get(keys[3]).plotMetadata;
       var ds4PlotMetadata = <Plottable.Plots.StackedPlotMetadata>(<any> stackedPlot)._key2PlotDatasetKey.get(keys[4]).plotMetadata;

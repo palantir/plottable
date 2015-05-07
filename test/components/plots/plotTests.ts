@@ -52,7 +52,7 @@ describe("Plots", () => {
       dFoo.data(dFoo.data());
       assert.strictEqual(6, r.renders, "we don't listen to removed datasets");
     });
-    
+
     it("datasets()", () => {
       var dataset1 = new Plottable.Dataset([]);
       var dataset2 = new Plottable.Dataset([]);
@@ -153,7 +153,8 @@ describe("Plots", () => {
       var plot = new Plottable.Plot();
 
       // Create mock drawers with already drawn items
-      var mockDrawer1 = new Plottable.Drawers.AbstractDrawer("_0"); // HACKHACK: Dataset keys are being removed, so this is the internal key
+      // HACKHACK #1984: Dataset keys are being removed, so this is the internal key
+      var mockDrawer1 = new Plottable.Drawers.AbstractDrawer("_0");
       var renderArea1 = svg.append("g");
       renderArea1.append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
       (<any> mockDrawer1).setup = () => (<any> mockDrawer1)._renderArea = renderArea1;
@@ -161,7 +162,8 @@ describe("Plots", () => {
 
       var renderArea2 = svg.append("g");
       renderArea2.append("circle").attr("cx", 10).attr("cy", 10).attr("r", 10);
-      var mockDrawer2 = new Plottable.Drawers.AbstractDrawer("_1"); // HACKHACK: Dataset keys are being removed, so this is the internal key
+      // HACKHACK #1984: Dataset keys are being removed, so this is the internal key
+      var mockDrawer2 = new Plottable.Drawers.AbstractDrawer("_1");
       (<any> mockDrawer2).setup = () => (<any> mockDrawer2)._renderArea = renderArea2;
       (<any> mockDrawer2)._getSelector = () => "circle";
 
@@ -211,7 +213,8 @@ describe("Plots", () => {
       var data2PointConverter = (datum: any, index: number) => data2Points[index];
 
       // Create mock drawers with already drawn items
-      var mockDrawer1 = new Plottable.Drawers.AbstractDrawer("_0"); // HACKHACK: Dataset keys are being removed, so this is the internal key
+      // HACKHACK #1984: Dataset keys are being removed, so this is the internal key
+      var mockDrawer1 = new Plottable.Drawers.AbstractDrawer("_0");
       var renderArea1 = svg.append("g");
       renderArea1.append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
       (<any> mockDrawer1).setup = () => (<any> mockDrawer1)._renderArea = renderArea1;
@@ -220,7 +223,8 @@ describe("Plots", () => {
 
       var renderArea2 = svg.append("g");
       renderArea2.append("circle").attr("cx", 10).attr("cy", 10).attr("r", 10);
-      var mockDrawer2 = new Plottable.Drawers.AbstractDrawer("_1"); // HACKHACK: Dataset keys are being removed, so this is the internal key
+      // HACKHACK #1984: Dataset keys are being removed, so this is the internal key
+      var mockDrawer2 = new Plottable.Drawers.AbstractDrawer("_1");
       (<any> mockDrawer2).setup = () => (<any> mockDrawer2)._renderArea = renderArea2;
       (<any> mockDrawer2)._getSelector = () => "circle";
       (<any> mockDrawer2)._getPixelPoint = data2PointConverter;

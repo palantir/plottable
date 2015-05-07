@@ -364,7 +364,7 @@ module Plottable {
       }
       return this;
     }
-    
+
     /**
      * Returns the internal key for the Dataset, or undefined if not found
      */
