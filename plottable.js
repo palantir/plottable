@@ -6922,7 +6922,7 @@ var Plottable;
             Pie.prototype._updateExtents = function () {
                 var _this = this;
                 _super.prototype._updateExtents.call(this);
-                this._propertyExtents.keys().forEach(function (dataAttr) { return _this._updateExtentsForProperty(dataAttr); });
+                this._propertyExtents.forEach(function (property) { return _this._updateExtentsForProperty(property); });
                 this._propertyScales().forEach(function (scale) { return scale._autoDomainIfAutomaticMode(); });
             };
             Pie.prototype._extentsForScale = function (scale) {
@@ -6935,9 +6935,9 @@ var Plottable;
                 if (attrExtents.length > 0) {
                     allSetsOfExtents.push(attrExtents);
                 }
-                this._propertyBindings.keys().forEach(function (dataAttr) {
-                    if (_this._propertyBindings.get(dataAttr).scale === scale) {
-                        var extents = _this._propertyExtents.get(dataAttr);
+                this._propertyBindings.forEach(function (property, binding) {
+                    if (binding.scale === scale) {
+                        var extents = _this._propertyExtents.get(property);
                         if (extents != null) {
                             allSetsOfExtents.push(extents);
                         }
@@ -6975,7 +6975,7 @@ var Plottable;
             };
             Pie.prototype._propertyScales = function () {
                 var propertyScales = [];
-                this._propertyBindings.values().forEach(function (binding) {
+                this._propertyBindings.forEach(function (property, binding) {
                     var scale = binding.scale;
                     if (scale != null && propertyScales.indexOf(scale) === -1) {
                         propertyScales.push(scale);

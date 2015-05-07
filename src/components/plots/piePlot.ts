@@ -141,7 +141,7 @@ export module Plots {
 
     protected _updateExtents() {
       super._updateExtents();
-      this._propertyExtents.keys().forEach((dataAttr) => this._updateExtentsForProperty(dataAttr));
+      this._propertyExtents.forEach((property) => this._updateExtentsForProperty(property));
       this._propertyScales().forEach((scale) => scale._autoDomainIfAutomaticMode());
     }
 
@@ -152,9 +152,9 @@ export module Plots {
       var allSetsOfExtents: D[][][] = [];
       var attrExtents = super._extentsForScale(scale);
       if (attrExtents.length > 0) { allSetsOfExtents.push(attrExtents); }
-      this._propertyBindings.keys().forEach((dataAttr: string) => {
-        if (this._propertyBindings.get(dataAttr).scale === scale) {
-          var extents = this._propertyExtents.get(dataAttr);
+      this._propertyBindings.forEach((property, binding) => {
+        if (binding.scale === scale) {
+          var extents = this._propertyExtents.get(property);
           if (extents != null) {
             allSetsOfExtents.push(extents);
           }
@@ -193,7 +193,7 @@ export module Plots {
 
     private _propertyScales() {
       var propertyScales: Scale<any, any> [] = [];
-      this._propertyBindings.values().forEach((binding) => {
+      this._propertyBindings.forEach((property, binding) => {
         var scale = binding.scale;
         if (scale != null && propertyScales.indexOf(scale) === -1) {
           propertyScales.push(scale);
