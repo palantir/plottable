@@ -46,7 +46,7 @@ describe("Drawers", () => {
     beforeEach(() => {
       timings = [];
       svg = TestMethods.generateSVG();
-      drawer = new MockDrawer("foo");
+      drawer = new MockDrawer();
       drawer.setup(svg);
     });
 
@@ -91,7 +91,7 @@ describe("Drawers", () => {
 
     it("_getSelection", () => {
       var svg = TestMethods.generateSVG(300, 300);
-      var drawer = new Plottable.Drawers.AbstractDrawer("test");
+      var drawer = new Plottable.Drawers.AbstractDrawer();
       drawer.setup(svg.append("g"));
       (<any> drawer)._getSelector = () => "circle";
       var data = [{one: 2, two: 1}, {one: 33, two: 21}, {one: 11, two: 10}];

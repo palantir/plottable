@@ -1336,7 +1336,6 @@ declare module Plottable {
         };
         class AbstractDrawer {
             protected _className: string;
-            key: string;
             protected _attrToProjector: AttributeToAppliedProjector;
             /**
              * Sets the class, which needs to be applied to bound elements.
@@ -1344,13 +1343,6 @@ declare module Plottable {
              * @param{string} className The class name to be applied.
              */
             setClass(className: string): AbstractDrawer;
-            /**
-             * Constructs a Drawer
-             *
-             * @constructor
-             * @param{string} key The key associated with this Drawer
-             */
-            constructor(key: string);
             setup(area: D3.Selection): void;
             /**
              * Removes the Drawer and its renderArea
@@ -1452,7 +1444,7 @@ declare module Plottable {
 declare module Plottable {
     module Drawers {
         class Rect extends Element {
-            constructor(key: string, isVertical: boolean);
+            constructor(isVertical: boolean);
             setup(area: D3.Selection): void;
             removeLabels(): void;
             _getIfLabelsTooWide(): boolean;
@@ -1467,7 +1459,7 @@ declare module Plottable {
 declare module Plottable {
     module Drawers {
         class Arc extends Element {
-            constructor(key: string);
+            constructor();
             _drawStep(step: AppliedDrawStep): void;
             draw(data: any[], drawSteps: DrawStep[], dataset: Dataset, plotMetadata: Plots.PlotMetadata): number;
             _getPixelPoint(datum: any, index: number): Point;
@@ -1479,7 +1471,7 @@ declare module Plottable {
 declare module Plottable {
     module Drawers {
         class Symbol extends Element {
-            constructor(key: string);
+            constructor();
             protected _drawStep(step: AppliedDrawStep): void;
             _getPixelPoint(datum: any, index: number): Point;
         }
@@ -2606,7 +2598,7 @@ declare module Plottable {
          * @returns {Plot} The calling Plot.
          */
         addDataset(dataset: Dataset): Plot;
-        protected _getDrawer(key: string): Drawers.AbstractDrawer;
+        protected _getDrawer(): Drawers.AbstractDrawer;
         protected _getAnimator(key: string): Animators.PlotAnimator;
         protected _onDatasetUpdate(): void;
         /**
@@ -2744,7 +2736,7 @@ declare module Plottable {
             computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Pie;
             addDataset(dataset: Dataset): Pie;
             protected _generateAttrToProjector(): AttributeToProjector;
-            protected _getDrawer(key: string): Drawers.AbstractDrawer;
+            protected _getDrawer(): Drawers.AbstractDrawer;
             getAllPlotData(datasets?: Dataset[]): Plots.PlotData;
         }
     }
@@ -2829,7 +2821,7 @@ declare module Plottable {
              * @param {Scale.Scale} yScale The y scale to use.
              */
             constructor(xScale: Scale<X, any>, yScale: Scale<Y, any>);
-            protected _getDrawer(key: string): Drawers.Rect;
+            protected _getDrawer(): Drawers.Rect;
             protected _generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, dataset: Dataset, plotMetadata: PlotMetadata) => any;
             };
@@ -2850,7 +2842,7 @@ declare module Plottable {
              * @param {Scale} yScale The y scale to use.
              */
             constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>);
-            protected _getDrawer(key: string): Drawers.Symbol;
+            protected _getDrawer(): Drawers.Symbol;
             protected _generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, dataset: Dataset, plotMetadata: PlotMetadata) => any;
             };
@@ -2878,7 +2870,7 @@ declare module Plottable {
              */
             constructor(xScale: Scale<any, any>, yScale: Scale<any, any>, colorScale: Scale<any, string>);
             addDataset(dataset: Dataset): Grid;
-            protected _getDrawer(key: string): Drawers.Rect;
+            protected _getDrawer(): Drawers.Rect;
             /**
              * @param {string} attrToSet One of ["x", "y", "x2", "y2", "fill"]. If "fill" is used,
              * the data should return a valid CSS color.
@@ -2907,7 +2899,7 @@ declare module Plottable {
              * @param {boolean} isVertical if the plot if vertical.
              */
             constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>, isVertical?: boolean);
-            protected _getDrawer(key: string): Drawers.Rect;
+            protected _getDrawer(): Drawers.Rect;
             protected _setup(): void;
             /**
              * Gets the baseline value for the bars
@@ -3022,7 +3014,7 @@ declare module Plottable {
              */
             constructor(xScale: QuantitativeScale<X>, yScale: QuantitativeScale<number>);
             protected _rejectNullsAndNaNs(d: any, i: number, dataset: Dataset, plotMetadata: any, accessor: _Accessor): boolean;
-            protected _getDrawer(key: string): Drawers.Line;
+            protected _getDrawer(): Drawers.Line;
             protected _getResetYFunction(): (d: any, i: number, dataset: Dataset, m: PlotMetadata) => number;
             protected _generateDrawSteps(): Drawers.DrawStep[];
             protected _generateAttrToProjector(): {
@@ -3061,7 +3053,7 @@ declare module Plottable {
              */
             constructor(xScale: QuantitativeScale<X>, yScale: QuantitativeScale<number>);
             protected _onDatasetUpdate(): void;
-            protected _getDrawer(key: string): Drawers.Area;
+            protected _getDrawer(): Drawers.Area;
             protected _updateYDomainer(): void;
             project(attrToSet: string, accessor: any, scale?: Scale<any, any>): Area<X>;
             protected _getResetYFunction(): (datum: any, index: number, dataset: Dataset, plotMetadata: PlotMetadata) => any;
@@ -3155,7 +3147,7 @@ declare module Plottable {
              * @param {QuantitativeScaleScale} yScale The y scale to use.
              */
             constructor(xScale: QuantitativeScale<X>, yScale: QuantitativeScale<number>);
-            protected _getDrawer(key: string): Drawers.Area;
+            protected _getDrawer(): Drawers.Area;
             _getAnimator(key: string): Animators.PlotAnimator;
             protected _setup(): void;
             protected _additionalPaint(): void;

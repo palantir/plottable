@@ -35,8 +35,8 @@ export module Plots {
       this.baseline(0);
     }
 
-    protected _getDrawer(key: string) {
-      return new Plottable.Drawers.Rect(key, this._isVertical);
+    protected _getDrawer() {
+      return new Plottable.Drawers.Rect(this._isVertical);
     }
 
     protected _setup() {

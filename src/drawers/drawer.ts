@@ -20,7 +20,6 @@ export module Drawers {
   export class AbstractDrawer {
     private _renderArea: D3.Selection;
     protected _className: string;
-    public key: string;
     protected _attrToProjector: AttributeToAppliedProjector;
 
     /**
@@ -31,16 +30,6 @@ export module Drawers {
     public setClass(className: string): AbstractDrawer {
       this._className = className;
       return this;
-    }
-
-    /**
-     * Constructs a Drawer
-     *
-     * @constructor
-     * @param{string} key The key associated with this Drawer
-     */
-    constructor(key: string) {
-        this.key = key;
     }
 
     public setup(area: D3.Selection) {

@@ -21,8 +21,8 @@ export module Plots {
       this._isVertical = true;
     }
 
-    protected _getDrawer(key: string) {
-      return new Plottable.Drawers.Area(key).drawLine(false);
+    protected _getDrawer() {
+      return new Plottable.Drawers.Area().drawLine(false);
     }
 
     public _getAnimator(key: string): Animators.PlotAnimator {

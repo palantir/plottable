@@ -43,8 +43,8 @@ export module Plots {
       return this;
     }
 
-    protected _getDrawer(key: string) {
-      return new Drawers.Rect(key, true);
+    protected _getDrawer() {
+      return new Drawers.Rect(true);
     }
 
     /**

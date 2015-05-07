@@ -34,8 +34,8 @@ export module Plots {
       }
     }
 
-    protected _getDrawer(key: string) {
-      return new Plottable.Drawers.Area(key);
+    protected _getDrawer() {
+      return new Plottable.Drawers.Area();
     }
 
     protected _updateYDomainer() {

@@ -9,7 +9,7 @@ describe("Drawers", () => {
       var yScale = new Plottable.Scales.Linear();
       var linePlot = new Plottable.Plots.Line(xScale, yScale);
 
-      var drawer = new Plottable.Drawers.Line("_0"); // HACKHACK #1984: Dataset keys are being removed, so this is the internal key
+      var drawer = new Plottable.Drawers.Line(); // HACKHACK #1984: Dataset keys are being removed, so this is the internal key
       (<any> linePlot)._getDrawer = () => drawer;
 
       linePlot.addDataset(new Plottable.Dataset(data));
@@ -33,7 +33,7 @@ describe("Drawers", () => {
       var yScale = new Plottable.Scales.Linear();
       var linePlot = new Plottable.Plots.Line(xScale, yScale);
 
-      var drawer = new Plottable.Drawers.Line("_0"); // HACKHACK #1984: Dataset keys are being removed, so this is the internal key
+      var drawer = new Plottable.Drawers.Line(); // HACKHACK #1984: Dataset keys are being removed, so this is the internal key
       (<any> linePlot)._getDrawer = () => drawer;
 
       linePlot.addDataset(new Plottable.Dataset(data));

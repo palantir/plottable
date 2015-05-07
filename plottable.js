@@ -2549,14 +2549,7 @@ var Plottable;
     var Drawers;
     (function (Drawers) {
         var AbstractDrawer = (function () {
-            /**
-             * Constructs a Drawer
-             *
-             * @constructor
-             * @param{string} key The key associated with this Drawer
-             */
-            function AbstractDrawer(key) {
-                this.key = key;
+            function AbstractDrawer() {
             }
             /**
              * Sets the class, which needs to be applied to bound elements.
@@ -2913,8 +2906,8 @@ var Plottable;
         var LABEL_HORIZONTAL_PADDING = 5;
         var Rect = (function (_super) {
             __extends(Rect, _super);
-            function Rect(key, isVertical) {
-                _super.call(this, key);
+            function Rect(isVertical) {
+                _super.call(this);
                 this._labelsTooWide = false;
                 this.svgElement("rect");
                 this._isVertical = isVertical;
@@ -3021,8 +3014,8 @@ var Plottable;
     (function (Drawers) {
         var Arc = (function (_super) {
             __extends(Arc, _super);
-            function Arc(key) {
-                _super.call(this, key);
+            function Arc() {
+                _super.call(this);
                 this._svgElement = "path";
             }
             Arc.prototype._createArc = function (innerRadiusF, outerRadiusF) {
@@ -3087,8 +3080,8 @@ var Plottable;
     (function (Drawers) {
         var Symbol = (function (_super) {
             __extends(Symbol, _super);
-            function Symbol(key) {
-                _super.call(this, key);
+            function Symbol() {
+                _super.call(this);
                 this._svgElement = "path";
                 this._className = "symbol";
             }
@@ -6397,7 +6390,7 @@ var Plottable;
                 this.removeDataset(dataset);
             }
             ;
-            var drawer = this._getDrawer(key);
+            var drawer = this._getDrawer();
             var metadata = this._getPlotMetadataForDataset(key);
             var pdk = { drawer: drawer, dataset: dataset, key: key, plotMetadata: metadata };
             this._datasetKeysInOrder.push(key);
@@ -6409,8 +6402,8 @@ var Plottable;
             this._onDatasetUpdate();
             return this;
         };
-        Plot.prototype._getDrawer = function (key) {
-            return new Plottable.Drawers.AbstractDrawer(key);
+        Plot.prototype._getDrawer = function () {
+            return new Plottable.Drawers.AbstractDrawer();
         };
         Plot.prototype._getAnimator = function (key) {
             if (this._animate && this._animateOnNextRender) {
@@ -6850,8 +6843,8 @@ var Plottable;
                 attrToProjector["fill"] = attrToProjector["fill"] || defaultFillFunction;
                 return attrToProjector;
             };
-            Pie.prototype._getDrawer = function (key) {
-                return new Plottable.Drawers.Arc(key).setClass("arc");
+            Pie.prototype._getDrawer = function () {
+                return new Plottable.Drawers.Arc().setClass("arc");
             };
             Pie.prototype.getAllPlotData = function (datasets) {
                 var _this = this;
@@ -7114,8 +7107,8 @@ var Plottable;
                 this._defaultFillColor = new Plottable.Scales.Color().range()[0];
                 this.classed("rectangle-plot", true);
             }
-            Rectangle.prototype._getDrawer = function (key) {
-                return new Plottable.Drawers.Rect(key, true);
+            Rectangle.prototype._getDrawer = function () {
+                return new Plottable.Drawers.Rect(true);
             };
             Rectangle.prototype._generateAttrToProjector = function () {
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
@@ -7176,8 +7169,8 @@ var Plottable;
                 this.animator("symbols-reset", new Plottable.Animators.Null());
                 this.animator("symbols", new Plottable.Animators.Base().duration(250).delay(5));
             }
-            Scatter.prototype._getDrawer = function (key) {
-                return new Plottable.Drawers.Symbol(key);
+            Scatter.prototype._getDrawer = function () {
+                return new Plottable.Drawers.Symbol();
             };
             Scatter.prototype._generateAttrToProjector = function () {
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
@@ -7262,8 +7255,8 @@ var Plottable;
                 _super.prototype.addDataset.call(this, dataset);
                 return this;
             };
-            Grid.prototype._getDrawer = function (key) {
-                return new Plottable.Drawers.Rect(key, true);
+            Grid.prototype._getDrawer = function () {
+                return new Plottable.Drawers.Rect(true);
             };
             /**
              * @param {string} attrToSet One of ["x", "y", "x2", "y2", "fill"]. If "fill" is used,
@@ -7352,8 +7345,8 @@ var Plottable;
                 this._isVertical = isVertical;
                 this.baseline(0);
             }
-            Bar.prototype._getDrawer = function (key) {
-                return new Plottable.Drawers.Rect(key, this._isVertical);
+            Bar.prototype._getDrawer = function () {
+                return new Plottable.Drawers.Rect(this._isVertical);
             };
             Bar.prototype._setup = function () {
                 _super.prototype._setup.call(this);
@@ -7740,8 +7733,8 @@ var Plottable;
                 var value = accessor(d, i, dataset, plotMetadata);
                 return value != null && value === value;
             };
-            Line.prototype._getDrawer = function (key) {
-                return new Plottable.Drawers.Line(key);
+            Line.prototype._getDrawer = function () {
+                return new Plottable.Drawers.Line();
             };
             Line.prototype._getResetYFunction = function () {
                 // gets the y-value generator for the animation start point
@@ -7900,8 +7893,8 @@ var Plottable;
                     this._updateYDomainer();
                 }
             };
-            Area.prototype._getDrawer = function (key) {
-                return new Plottable.Drawers.Area(key);
+            Area.prototype._getDrawer = function () {
+                return new Plottable.Drawers.Area();
             };
             Area.prototype._updateYDomainer = function () {
                 _super.prototype._updateYDomainer.call(this);
@@ -8255,8 +8248,8 @@ var Plottable;
                 this.classed("area-plot", true);
                 this._isVertical = true;
             }
-            StackedArea.prototype._getDrawer = function (key) {
-                return new Plottable.Drawers.Area(key).drawLine(false);
+            StackedArea.prototype._getDrawer = function () {
+                return new Plottable.Drawers.Area().drawLine(false);
             };
             StackedArea.prototype._getAnimator = function (key) {
                 return new Plottable.Animators.Null();

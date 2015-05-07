@@ -23,8 +23,8 @@ export module Plots {
                                            .delay(5));
     }
 
-    protected _getDrawer(key: string) {
-      return new Plottable.Drawers.Symbol(key);
+    protected _getDrawer() {
+      return new Plottable.Drawers.Symbol();
     }
 
     protected _generateAttrToProjector() {
