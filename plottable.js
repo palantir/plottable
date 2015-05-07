@@ -3710,8 +3710,11 @@ var Plottable;
             this.components().forEach(function (c) { return c.anchor(_this._content); });
             return this;
         };
-        ComponentContainer.prototype.render = function () {
-            this._components.forEach(function (c) { return c.render(); });
+        ComponentContainer.prototype.render = function (immediately) {
+            if (immediately === void 0) { immediately = false; }
+            if (!immediately) {
+                this._components.forEach(function (c) { return c.render(false); });
+            }
             return this;
         };
         /**

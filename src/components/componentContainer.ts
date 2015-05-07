@@ -14,8 +14,10 @@ module Plottable {
       return this;
     }
 
-    public render() {
-      this._components.forEach((c) => c.render());
+    public render(immediately = false) {
+      if (!immediately) { // only enqueue children if not rendering immediately
+        this._components.forEach((c) => c.render(false));
+      }
       return this;
     }
 
