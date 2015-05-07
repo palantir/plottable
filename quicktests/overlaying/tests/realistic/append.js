@@ -58,20 +58,20 @@ function run(svg, data, Plottable){
   };
   var key = new Plottable.Interactions.Key();
   // add
-  keyonKey(78, function(keyData){
+  key.onKey(78, function(keyData){
       data.push({x: Math.random(), y: Math.random()});
       dataset.data(data);
   });
   // mark
-  keyonKey(65, function(keyData){
+  key.onKey(65, function(keyData){
     append(48);
   });
   // clear
-  keyonKey(67, function(keyData){
+  key.onKey(67, function(keyData){
     plot.foreground().text("");
   });
   // delete
-  keyonKey(68, function(keyData){
+  key.onKey(68, function(keyData){
     if(data.length > 0){
       data.splice(data.length-1,1);
       dataset.data(data);
