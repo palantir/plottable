@@ -21,7 +21,7 @@ describe("Interactions", () => {
 
       keyInteraction.onKey(aCode, aCallback);
       keyInteraction.onKey(bCode, bCallback);
-      component.registerInteraction(keyInteraction);
+      keyInteraction.attachTo(component);
 
       var $target = $(component.background().node());
 
@@ -60,7 +60,7 @@ describe("Interactions", () => {
 
       keyInteraction.onKey(bCode, bCallback);
 
-      component.registerInteraction(keyInteraction);
+      keyInteraction.attachTo(component)
 
       var $target = $(component.background().node());
 
@@ -85,7 +85,7 @@ describe("Interactions", () => {
 
         keyInteraction.onKey(aCode, aCallback);
 
-        component.registerInteraction(keyInteraction);
+        keyInteraction.attachTo(component)
 
         var $target = $(component.background().node());
 
@@ -121,7 +121,7 @@ describe("Interactions", () => {
 
         keyInteraction.onKey(aCode, aCallback1);
         keyInteraction.onKey(aCode, aCallback2);
-        component.registerInteraction(keyInteraction);
+        keyInteraction.attachTo(component)
 
         var $target = $(component.background().node());
 

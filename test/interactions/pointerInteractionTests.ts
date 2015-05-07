@@ -13,7 +13,7 @@ describe("Interactions", () => {
       c.renderTo(svg);
 
       var pointerInteraction = new Plottable.Interactions.Pointer();
-      c.registerInteraction(pointerInteraction);
+      pointerInteraction.attachTo(c);
 
       var callbackCalled = false;
       var lastPoint: Plottable.Point;
@@ -61,7 +61,7 @@ describe("Interactions", () => {
       c.renderTo(svg);
 
       var pointerInteraction = new Plottable.Interactions.Pointer();
-      c.registerInteraction(pointerInteraction);
+      pointerInteraction.attachTo(c)
 
       var callbackCalled = false;
       var lastPoint: Plottable.Point;
@@ -112,7 +112,7 @@ describe("Interactions", () => {
       c.renderTo(svg);
 
       var pointerInteraction = new Plottable.Interactions.Pointer();
-      c.registerInteraction(pointerInteraction);
+      pointerInteraction.attachTo(c)
 
       var callbackCalled = false;
       var lastPoint: Plottable.Point;
@@ -184,7 +184,7 @@ describe("Interactions", () => {
       pointer.onPointerExit(exitCallback1);
       pointer.onPointerExit(exitCallback2);
 
-      component.registerInteraction(pointer);
+      pointer.attachTo(component);
 
       var target = component.background();
       var insidePoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };

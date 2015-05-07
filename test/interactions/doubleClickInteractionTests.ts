@@ -20,7 +20,7 @@ describe("Interactions", () => {
         component.renderTo(svg);
 
         dblClickInteraction = new Plottable.Interactions.DoubleClick();
-        component.registerInteraction(dblClickInteraction);
+        dblClickInteraction.attachTo(component);
 
         dblClickInteraction.onDoubleClick(dblClickCallback);
       });

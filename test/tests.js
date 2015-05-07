@@ -8270,7 +8270,7 @@ describe("Interactions", function () {
             var bCallback = function () { return bCallbackCalled = true; };
             keyInteraction.onKey(aCode, aCallback);
             keyInteraction.onKey(bCode, bCallback);
-            component.registerInteraction(keyInteraction);
+            keyInteraction.attachTo(component);
             var $target = $(component.background().node());
             TestMethods.triggerFakeMouseEvent("mouseover", component.background(), 100, 100);
             $target.simulate("keydown", { keyCode: aCode });
@@ -8298,7 +8298,7 @@ describe("Interactions", function () {
                 assert.strictEqual(keyCode, bCode, "keyCode 65(a) was sent to the callback");
             };
             keyInteraction.onKey(bCode, bCallback);
-            component.registerInteraction(keyInteraction);
+            keyInteraction.attachTo(component);
             var $target = $(component.background().node());
             TestMethods.triggerFakeMouseEvent("mouseover", component.background(), 100, 100);
             $target.simulate("keydown", { keyCode: bCode });
@@ -8314,7 +8314,7 @@ describe("Interactions", function () {
             var aCallbackCalled = false;
             var aCallback = function () { return aCallbackCalled = true; };
             keyInteraction.onKey(aCode, aCallback);
-            component.registerInteraction(keyInteraction);
+            keyInteraction.attachTo(component);
             var $target = $(component.background().node());
             TestMethods.triggerFakeMouseEvent("mouseover", component.background(), 100, 100);
             $target.simulate("keydown", { keyCode: aCode });
@@ -8340,7 +8340,7 @@ describe("Interactions", function () {
             var aCallback2 = function () { return aCallback2Called = true; };
             keyInteraction.onKey(aCode, aCallback1);
             keyInteraction.onKey(aCode, aCallback2);
-            component.registerInteraction(keyInteraction);
+            keyInteraction.attachTo(component);
             var $target = $(component.background().node());
             TestMethods.triggerFakeMouseEvent("mouseover", component.background(), 100, 100);
             $target.simulate("keydown", { keyCode: aCode });
@@ -8368,7 +8368,7 @@ describe("Interactions", function () {
             var c = new Plottable.Component();
             c.renderTo(svg);
             var pointerInteraction = new Plottable.Interactions.Pointer();
-            c.registerInteraction(pointerInteraction);
+            pointerInteraction.attachTo(c);
             var callbackCalled = false;
             var lastPoint;
             var callback = function (p) {
@@ -8405,7 +8405,7 @@ describe("Interactions", function () {
             var c = new Plottable.Component();
             c.renderTo(svg);
             var pointerInteraction = new Plottable.Interactions.Pointer();
-            c.registerInteraction(pointerInteraction);
+            pointerInteraction.attachTo(c);
             var callbackCalled = false;
             var lastPoint;
             var callback = function (p) {
@@ -8445,7 +8445,7 @@ describe("Interactions", function () {
             var c = new Plottable.Component();
             c.renderTo(svg);
             var pointerInteraction = new Plottable.Interactions.Pointer();
-            c.registerInteraction(pointerInteraction);
+            pointerInteraction.attachTo(c);
             var callbackCalled = false;
             var lastPoint;
             var callback = function (p) {
@@ -8503,7 +8503,7 @@ describe("Interactions", function () {
             pointer.onPointerMove(moveCallback2);
             pointer.onPointerExit(exitCallback1);
             pointer.onPointerExit(exitCallback2);
-            component.registerInteraction(pointer);
+            pointer.attachTo(component);
             var target = component.background();
             var insidePoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
             var outsidePoint = { x: SVG_WIDTH * 2, y: SVG_HEIGHT * 2 };
@@ -8550,7 +8550,7 @@ describe("Interactions", function () {
             var c = new Plottable.Component();
             c.renderTo(svg);
             var clickInteraction = new Plottable.Interactions.Click();
-            c.registerInteraction(clickInteraction);
+            clickInteraction.attachTo(c);
             var callbackCalled = false;
             var lastPoint;
             var callback = function (p) {
@@ -8610,7 +8610,7 @@ describe("Interactions", function () {
             var component = new Plottable.Component();
             component.renderTo(svg);
             var clickInteraction = new Plottable.Interactions.Click();
-            component.registerInteraction(clickInteraction);
+            clickInteraction.attachTo(component);
             var callbackWasCalled = false;
             var callback = function () { return callbackWasCalled = true; };
             clickInteraction.onClick(callback);
@@ -8629,7 +8629,7 @@ describe("Interactions", function () {
             var component = new Plottable.Component();
             component.renderTo(svg);
             var clickInteraction = new Plottable.Interactions.Click();
-            component.registerInteraction(clickInteraction);
+            clickInteraction.attachTo(component);
             var callback1WasCalled = false;
             var callback1 = function () { return callback1WasCalled = true; };
             var callback2WasCalled = false;
@@ -8654,7 +8654,7 @@ describe("Interactions", function () {
             var c = new Plottable.Component();
             c.renderTo(svg);
             var clickInteraction = new Plottable.Interactions.Click();
-            c.registerInteraction(clickInteraction);
+            clickInteraction.attachTo(c);
             var callbackCalled = false;
             var callback = function () { return callbackCalled = true; };
             clickInteraction.onClick(callback);
@@ -8684,7 +8684,7 @@ describe("Interactions", function () {
                 component = new Plottable.Component();
                 component.renderTo(svg);
                 dblClickInteraction = new Plottable.Interactions.DoubleClick();
-                component.registerInteraction(dblClickInteraction);
+                dblClickInteraction.attachTo(component);
                 dblClickInteraction.onDoubleClick(dblClickCallback);
             });
             afterEach(function () {
@@ -8803,7 +8803,7 @@ describe("Interactions", function () {
                 receivedStart = p;
             };
             drag.onDragStart(startCallback);
-            c.registerInteraction(drag);
+            drag.attachTo(c);
             var target = c.background();
             TestMethods.triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
             assert.isTrue(startCallbackCalled, "callback was called on beginning drag (mousedown)");
@@ -8848,7 +8848,7 @@ describe("Interactions", function () {
                 receivedEnd = end;
             };
             drag.onDrag(moveCallback);
-            c.registerInteraction(drag);
+            drag.attachTo(c);
             var target = c.background();
             TestMethods.triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
             TestMethods.triggerFakeMouseEvent("mousemove", target, endPoint.x, endPoint.y);
@@ -8886,7 +8886,7 @@ describe("Interactions", function () {
                 receivedEnd = end;
             };
             drag.onDragEnd(endCallback);
-            c.registerInteraction(drag);
+            drag.attachTo(c);
             var target = c.background();
             TestMethods.triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
             TestMethods.triggerFakeMouseEvent("mouseup", target, endPoint.x, endPoint.y);
@@ -8939,7 +8939,7 @@ describe("Interactions", function () {
             drag.onDrag(moveCallback2);
             drag.onDragEnd(endCallback1);
             drag.onDragEnd(endCallback2);
-            component.registerInteraction(drag);
+            drag.attachTo(component);
             var target = component.background();
             TestMethods.triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
             assert.isTrue(startCallback1Called, "callback 1 was called on beginning drag (mousedown)");
@@ -8988,7 +8988,7 @@ describe("Interactions", function () {
                 receivedEnd = end;
             };
             drag.onDragEnd(endCallback);
-            c.registerInteraction(drag);
+            drag.attachTo(c);
             var target = c.content();
             TestMethods.triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
             TestMethods.triggerFakeMouseEvent("mousemove", target, outsidePointPos.x, outsidePointPos.y);
@@ -9055,7 +9055,7 @@ describe("Interactions", function () {
                 receivedEnd = end;
             };
             drag.onDrag(moveCallback);
-            c.registerInteraction(drag);
+            drag.attachTo(c);
             var target = c.background();
             receivedStart = null;
             receivedEnd = null;
@@ -9087,7 +9087,7 @@ describe("Interactions", function () {
             xScale.domain([0, SVG_WIDTH / 2]).range([0, SVG_WIDTH]);
             yScale = new Plottable.Scales.Linear();
             yScale.domain([0, SVG_HEIGHT / 2]).range([0, SVG_HEIGHT]);
-            component.registerInteraction(new Plottable.Interactions.PanZoom(xScale, yScale));
+            (new Plottable.Interactions.PanZoom(xScale, yScale)).attachTo(component);
             eventTarget = component.background();
         });
         describe("Panning", function () {

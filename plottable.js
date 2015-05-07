@@ -3109,7 +3109,6 @@ var Plottable;
             this._fixedWidthFlag = false;
             this._isSetup = false;
             this._isAnchored = false;
-            this._interactionsToRegister = [];
             this._boxes = [];
             this._isTopLevelComponent = false;
             this._xOffset = 0; // Offset from Origin, used for alignment and floating positioning
@@ -3181,8 +3180,6 @@ var Plottable;
             }
             ;
             this._boundingBox = this._addBox("bounding-box");
-            this._interactionsToRegister.forEach(function (r) { return _this.registerInteraction(r); });
-            this._interactionsToRegister = null;
             this._isSetup = true;
         };
         Component.prototype.requestedSpace = function (availableWidth, availableHeight) {
@@ -3426,24 +3423,6 @@ var Plottable;
             this._element.attr("clip-path", "url(\"" + prefix + "#" + clipPathId + "\")");
             var clipPathParent = this._boxContainer.append("clipPath").attr("id", clipPathId);
             this._addBox("clip-rect", clipPathParent);
-        };
-        /**
-         * Attaches an Interaction to the Component, so that the Interaction will listen for events on the Component.
-         *
-         * @param {Interaction} interaction The Interaction to attach to the Component.
-         * @returns {Component} The calling Component.
-         */
-        Component.prototype.registerInteraction = function (interaction) {
-            // Interactions can be registered before or after anchoring. If registered before, they are
-            // pushed to this._interactionsToRegister and registered during anchoring. If after, they are
-            // registered immediately
-            if (this._element) {
-                interaction._anchor(this);
-            }
-            else {
-                this._interactionsToRegister.push(interaction);
-            }
-            return this;
         };
         Component.prototype.classed = function (cssClass, addClass) {
             if (addClass == null) {
@@ -9879,7 +9858,7 @@ var Plottable;
                 this.classed("drag-box-layer", true);
                 this._dragInteraction = new Plottable.Interactions.Drag();
                 this._setUpCallbacks();
-                this.registerInteraction(this._dragInteraction);
+                this._dragInteraction.attachTo(this);
                 this._dragStartCallbacks = new Plottable.Utils.CallbackSet();
                 this._dragCallbacks = new Plottable.Utils.CallbackSet();
                 this._dragEndCallbacks = new Plottable.Utils.CallbackSet();

@@ -1593,13 +1593,6 @@ declare module Plottable {
          */
         yOffset(offset: number): Component;
         /**
-         * Attaches an Interaction to the Component, so that the Interaction will listen for events on the Component.
-         *
-         * @param {Interaction} interaction The Interaction to attach to the Component.
-         * @returns {Component} The calling Component.
-         */
-        registerInteraction(interaction: Interaction): Component;
-        /**
          * Checks if the Component has a given CSS class.
          *
          * @param {string} cssClass The CSS class to check for.

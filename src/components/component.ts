@@ -30,7 +30,6 @@ module Plottable {
     protected _isSetup = false;
     protected _isAnchored = false;
 
-    private _interactionsToRegister: Interaction[] = [];
     private _boxes: D3.Selection[] = [];
     private _boxContainer: D3.Selection;
     private _rootSVG: D3.Selection;
@@ -112,8 +111,6 @@ module Plottable {
 
       this._boundingBox = this._addBox("bounding-box");
 
-      this._interactionsToRegister.forEach((r) => this.registerInteraction(r));
-      this._interactionsToRegister = null;
       this._isSetup = true;
     }
 
@@ -360,24 +357,6 @@ module Plottable {
       var clipPathParent = this._boxContainer.append("clipPath")
                                              .attr("id", clipPathId);
       this._addBox("clip-rect", clipPathParent);
-    }
-
-    /**
-     * Attaches an Interaction to the Component, so that the Interaction will listen for events on the Component.
-     *
-     * @param {Interaction} interaction The Interaction to attach to the Component.
-     * @returns {Component} The calling Component.
-     */
-    public registerInteraction(interaction: Interaction) {
-      // Interactions can be registered before or after anchoring. If registered before, they are
-      // pushed to this._interactionsToRegister and registered during anchoring. If after, they are
-      // registered immediately
-      if (this._element) {
-        interaction._anchor(this);
-      } else {
-        this._interactionsToRegister.push(interaction);
-      }
-      return this;
     }
 
     /**
