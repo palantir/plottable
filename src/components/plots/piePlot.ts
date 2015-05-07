@@ -26,7 +26,6 @@ export module Plots {
     private static _SECTOR_VALUE_KEY = "sector-value";
     private _propertyExtents: D3.Map<any[]>;
     private _propertyBindings: D3.Map<AccessorScaleBinding<any, any>>;
-    private _propertyExtentProvider: Scales.ExtentProvider<any>;
 
     /**
      * Constructs a PiePlot.
@@ -37,7 +36,6 @@ export module Plots {
       super();
       this._colorScale = new Scales.Color();
       this._propertyBindings = d3.map();
-      this._propertyExtentProvider = (scale: Scale<any, any>) => this._extentsForScale(scale);
       this._propertyExtents = d3.map();
 
       this._propertyBindings.set(Pie._INNER_RADIUS_KEY, { accessor: () => 0 });
@@ -179,13 +177,13 @@ export module Plots {
       if (oldScale !== newScale) {
         if (oldScale != null) {
           oldScale.offUpdate(this._renderCallback);
-          oldScale.removeExtentProvider(this._propertyExtentProvider);
+          oldScale.removeExtentProvider(this._extentProvider);
           oldScale._autoDomainIfAutomaticMode();
         }
 
         if (newScale != null) {
           newScale.onUpdate(this._renderCallback);
-          newScale.addExtentProvider(this._propertyExtentProvider);
+          newScale.addExtentProvider(this._extentProvider);
           newScale._autoDomainIfAutomaticMode();
         }
       }

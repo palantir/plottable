@@ -6837,7 +6837,6 @@ var Plottable;
                 _super.call(this);
                 this._colorScale = new Plottable.Scales.Color();
                 this._propertyBindings = d3.map();
-                this._propertyExtentProvider = function (scale) { return _this._extentsForScale(scale); };
                 this._propertyExtents = d3.map();
                 this._propertyBindings.set(Pie._INNER_RADIUS_KEY, { accessor: function () { return 0; } });
                 this._propertyBindings.set(Pie._OUTER_RADIUS_KEY, { accessor: function () { return Math.min(_this.width(), _this.height()) / 2; } });
@@ -6963,12 +6962,12 @@ var Plottable;
                 if (oldScale !== newScale) {
                     if (oldScale != null) {
                         oldScale.offUpdate(this._renderCallback);
-                        oldScale.removeExtentProvider(this._propertyExtentProvider);
+                        oldScale.removeExtentProvider(this._extentProvider);
                         oldScale._autoDomainIfAutomaticMode();
                     }
                     if (newScale != null) {
                         newScale.onUpdate(this._renderCallback);
-                        newScale.addExtentProvider(this._propertyExtentProvider);
+                        newScale.addExtentProvider(this._extentProvider);
                         newScale._autoDomainIfAutomaticMode();
                     }
                 }
