@@ -325,7 +325,7 @@ module Plottable {
       return this._attrToExtents.get(attr);
     }
 
-    private _extentsForScale<D>(scale: Scale<D, any>): D[][] {
+    protected _extentsForScale<D>(scale: Scale<D, any>): D[][] {
       if (!this._isAnchored) {
         return [];
       }

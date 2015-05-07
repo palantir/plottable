@@ -37,7 +37,7 @@ export module Plots {
       super();
       this._colorScale = new Scales.Color();
       this._propertyBindings = d3.map();
-      this._propertyExtentProvider = (scale: Scale<any, any>) => this._propertyExtentsForScale(scale);
+      this._propertyExtentProvider = (scale: Scale<any, any>) => this._extentsForScale(scale);
       this._propertyExtents = d3.map();
 
       this._propertyBindings.set(Pie._INNER_RADIUS_KEY, { accessor: () => 0 });
@@ -145,11 +145,13 @@ export module Plots {
       this._propertyScales().forEach((scale) => scale._autoDomainIfAutomaticMode());
     }
 
-    private _propertyExtentsForScale<D>(scale: Scale<D, any>): D[][] {
+    protected _extentsForScale<D>(scale: Scale<D, any>): D[][] {
       if (!this._isAnchored) {
         return [];
       }
       var allSetsOfExtents: D[][][] = [];
+      var attrExtents = super._extentsForScale(scale);
+      if (attrExtents.length > 0) { allSetsOfExtents.push(attrExtents); }
       this._propertyBindings.keys().forEach((dataAttr: string) => {
         if (this._propertyBindings.get(dataAttr).scale === scale) {
           var extents = this._propertyExtents.get(dataAttr);

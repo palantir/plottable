@@ -6881,7 +6881,7 @@ var Plottable;
                 _super.call(this);
                 this._colorScale = new Plottable.Scales.Color();
                 this._propertyBindings = d3.map();
-                this._propertyExtentProvider = function (scale) { return _this._propertyExtentsForScale(scale); };
+                this._propertyExtentProvider = function (scale) { return _this._extentsForScale(scale); };
                 this._propertyExtents = d3.map();
                 this._propertyBindings.set(Pie._INNER_RADIUS_KEY, { accessor: function () { return 0; } });
                 this._propertyBindings.set(Pie._OUTER_RADIUS_KEY, { accessor: function () { return Math.min(_this.width(), _this.height()) / 2; } });
@@ -6968,12 +6968,16 @@ var Plottable;
                 this._propertyExtents.keys().forEach(function (dataAttr) { return _this._updateExtentsForProperty(dataAttr); });
                 this._propertyScales().forEach(function (scale) { return scale._autoDomainIfAutomaticMode(); });
             };
-            Pie.prototype._propertyExtentsForScale = function (scale) {
+            Pie.prototype._extentsForScale = function (scale) {
                 var _this = this;
                 if (!this._isAnchored) {
                     return [];
                 }
                 var allSetsOfExtents = [];
+                var attrExtents = _super.prototype._extentsForScale.call(this, scale);
+                if (attrExtents.length > 0) {
+                    allSetsOfExtents.push(attrExtents);
+                }
                 this._propertyBindings.keys().forEach(function (dataAttr) {
                     if (_this._propertyBindings.get(dataAttr).scale === scale) {
                         var extents = _this._propertyExtents.get(dataAttr);

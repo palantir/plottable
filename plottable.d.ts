@@ -2674,6 +2674,7 @@ declare module Plottable {
          * Override in subclass to add special extents, such as included values
          */
         protected _extentsForAttr(attr: string): any[];
+        protected _extentsForScale<D>(scale: Scale<D, any>): D[][];
         /**
          * Get the animator associated with the specified Animator key.
          *
@@ -2787,6 +2788,7 @@ declare module Plottable {
             outerRadius(outerRadius: D | _Accessor, outerRadiusScale: Scale<D, number>): Plots.Pie<D>;
             destroy(): void;
             protected _updateExtents(): void;
+            protected _extentsForScale<D>(scale: Scale<D, any>): D[][];
         }
     }
 }
