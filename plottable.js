@@ -6550,9 +6550,7 @@ var Plottable;
          */
         Plot.prototype._updateExtents = function () {
             var _this = this;
-            this._attrBindings.forEach(function (attr) {
-                _this._updateExtentsForAttr(attr);
-            });
+            this._attrBindings.forEach(function (attr) { return _this._updateExtentsForAttr(attr); });
             this._scales().forEach(function (scale) { return scale._autoDomainIfAutomaticMode(); });
         };
         Plot.prototype._updateExtentsForAttr = function (attr) {

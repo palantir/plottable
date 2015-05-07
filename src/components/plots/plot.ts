@@ -265,7 +265,7 @@ module Plottable {
      * Updates the extents associated with each attribute, then autodomains all scales the Plot uses.
      */
     protected _updateExtents() {
-      this._attrBindings.forEach((attr) => { this._updateExtentsForAttr(attr); });
+      this._attrBindings.forEach((attr) => this._updateExtentsForAttr(attr));
       this._scales().forEach((scale) => scale._autoDomainIfAutomaticMode());
     }
 
