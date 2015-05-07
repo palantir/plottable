@@ -14,7 +14,7 @@ describe("Plots", () => {
       stackedPlot.project("x", "x", xScale);
       stackedPlot.project("y", "y", yScale);
 
-      (<any> stackedPlot)._getDrawer = (key: string) => new Plottable.Drawers.AbstractDrawer(key);
+      (<any> stackedPlot)._getDrawer = () => new Plottable.Drawers.AbstractDrawer();
       (<any> stackedPlot)._isVertical = true;
     });
 

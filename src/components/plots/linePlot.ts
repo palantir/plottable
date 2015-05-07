@@ -30,8 +30,8 @@ export module Plots {
       return value != null && value === value;
     }
 
-    protected _getDrawer(key: string) {
-      return new Plottable.Drawers.Line(key);
+    protected _getDrawer() {
+      return new Plottable.Drawers.Line();
     }
 
     protected _getResetYFunction() {

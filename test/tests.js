@@ -322,7 +322,7 @@ describe("Drawers", function () {
         beforeEach(function () {
             timings = [];
             svg = TestMethods.generateSVG();
-            drawer = new MockDrawer("foo");
+            drawer = new MockDrawer();
             drawer.setup(svg);
         });
         afterEach(function () {
@@ -363,7 +363,7 @@ describe("Drawers", function () {
         });
         it("_getSelection", function () {
             var svg = TestMethods.generateSVG(300, 300);
-            var drawer = new Plottable.Drawers.AbstractDrawer("test");
+            var drawer = new Plottable.Drawers.AbstractDrawer();
             drawer.setup(svg.append("g"));
             drawer._getSelector = function () { return "circle"; };
             var data = [{ one: 2, two: 1 }, { one: 33, two: 21 }, { one: 11, two: 10 }];
@@ -383,7 +383,7 @@ describe("Drawers", function () {
             var svg = TestMethods.generateSVG(300, 300);
             var data = [{ value: 10 }, { value: 10 }, { value: 10 }, { value: 10 }];
             var piePlot = new Plottable.Plots.Pie();
-            var drawer = new Plottable.Drawers.Arc("_0"); // HACKHACK #1984: Dataset keys are being removed, so this is the internal key
+            var drawer = new Plottable.Drawers.Arc(); // HACKHACK #1984: Dataset keys are being removed, so this is the internal key
             piePlot._getDrawer = function () { return drawer; };
             piePlot.addDataset(new Plottable.Dataset(data));
             piePlot.project("value", "value");
@@ -411,7 +411,7 @@ describe("Drawers", function () {
             var xScale = new Plottable.Scales.Category();
             var yScale = new Plottable.Scales.Linear();
             var barPlot = new Plottable.Plots.Bar(xScale, yScale);
-            var drawer = new Plottable.Drawers.Rect("_0", true); // HACKHACK #1984: Dataset keys are being removed, so this is the internal key
+            var drawer = new Plottable.Drawers.Rect(true);
             barPlot._getDrawer = function () { return drawer; };
             barPlot.addDataset(new Plottable.Dataset(data));
             barPlot.project("x", "a", xScale);
@@ -431,7 +431,7 @@ describe("Drawers", function () {
             var xScale = new Plottable.Scales.Linear();
             var yScale = new Plottable.Scales.Category();
             var barPlot = new Plottable.Plots.Bar(xScale, yScale, false);
-            var drawer = new Plottable.Drawers.Rect("_0", false); // HACKHACK #1984: Dataset keys are being removed, so this is the internal key
+            var drawer = new Plottable.Drawers.Rect(false);
             barPlot._getDrawer = function () { return drawer; };
             barPlot.addDataset(new Plottable.Dataset(data));
             barPlot.project("x", "b", xScale);
@@ -457,7 +457,7 @@ describe("Drawers", function () {
             var xScale = new Plottable.Scales.Linear();
             var yScale = new Plottable.Scales.Linear();
             var linePlot = new Plottable.Plots.Line(xScale, yScale);
-            var drawer = new Plottable.Drawers.Line("_0"); // HACKHACK #1984: Dataset keys are being removed, so this is the internal key
+            var drawer = new Plottable.Drawers.Line(); // HACKHACK #1984: Dataset keys are being removed, so this is the internal key
             linePlot._getDrawer = function () { return drawer; };
             linePlot.addDataset(new Plottable.Dataset(data));
             linePlot.project("x", "a", xScale);
@@ -476,7 +476,7 @@ describe("Drawers", function () {
             var xScale = new Plottable.Scales.Linear();
             var yScale = new Plottable.Scales.Linear();
             var linePlot = new Plottable.Plots.Line(xScale, yScale);
-            var drawer = new Plottable.Drawers.Line("_0"); // HACKHACK #1984: Dataset keys are being removed, so this is the internal key
+            var drawer = new Plottable.Drawers.Line(); // HACKHACK #1984: Dataset keys are being removed, so this is the internal key
             linePlot._getDrawer = function () { return drawer; };
             linePlot.addDataset(new Plottable.Dataset(data));
             linePlot.project("x", "a", xScale);
@@ -2209,21 +2209,21 @@ describe("Plots", function () {
             var svg = TestMethods.generateSVG(400, 400);
             var plot = new Plottable.Plot();
             // Create mock drawers with already drawn items
-            // HACKHACK #1984: Dataset keys are being removed, so this is the internal key
-            var mockDrawer1 = new Plottable.Drawers.AbstractDrawer("_0");
+            var mockDrawer1 = new Plottable.Drawers.AbstractDrawer();
             var renderArea1 = svg.append("g");
             renderArea1.append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
             mockDrawer1.setup = function () { return mockDrawer1._renderArea = renderArea1; };
             mockDrawer1._getSelector = function () { return "circle"; };
             var renderArea2 = svg.append("g");
             renderArea2.append("circle").attr("cx", 10).attr("cy", 10).attr("r", 10);
-            // HACKHACK #1984: Dataset keys are being removed, so this is the internal key
-            var mockDrawer2 = new Plottable.Drawers.AbstractDrawer("_1");
+            var mockDrawer2 = new Plottable.Drawers.AbstractDrawer();
             mockDrawer2.setup = function () { return mockDrawer2._renderArea = renderArea2; };
             mockDrawer2._getSelector = function () { return "circle"; };
             // Mock _getDrawer to return the mock drawers
+            var firstCall = true;
             plot._getDrawer = function (key) {
-                if (key === "_0") {
+                if (firstCall) {
+                    firstCall = false;
                     return mockDrawer1;
                 }
                 else {
@@ -2262,8 +2262,7 @@ describe("Plots", function () {
             var data1PointConverter = function (datum, index) { return data1Points[index]; };
             var data2PointConverter = function (datum, index) { return data2Points[index]; };
             // Create mock drawers with already drawn items
-            // HACKHACK #1984: Dataset keys are being removed, so this is the internal key
-            var mockDrawer1 = new Plottable.Drawers.AbstractDrawer("_0");
+            var mockDrawer1 = new Plottable.Drawers.AbstractDrawer();
             var renderArea1 = svg.append("g");
             renderArea1.append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
             mockDrawer1.setup = function () { return mockDrawer1._renderArea = renderArea1; };
@@ -2271,14 +2270,15 @@ describe("Plots", function () {
             mockDrawer1._getPixelPoint = data1PointConverter;
             var renderArea2 = svg.append("g");
             renderArea2.append("circle").attr("cx", 10).attr("cy", 10).attr("r", 10);
-            // HACKHACK #1984: Dataset keys are being removed, so this is the internal key
-            var mockDrawer2 = new Plottable.Drawers.AbstractDrawer("_1");
+            var mockDrawer2 = new Plottable.Drawers.AbstractDrawer();
             mockDrawer2.setup = function () { return mockDrawer2._renderArea = renderArea2; };
             mockDrawer2._getSelector = function () { return "circle"; };
             mockDrawer2._getPixelPoint = data2PointConverter;
             // Mock _getDrawer to return the mock drawers
+            var firstCall = true;
             plot._getDrawer = function (key) {
-                if (key === "_0") {
+                if (firstCall) {
+                    firstCall = false;
                     return mockDrawer1;
                 }
                 else {
@@ -2319,7 +2319,7 @@ describe("Plots", function () {
             });
             var dataPointConverter = function (datum, index) { return dataPoints[index]; };
             // Create mock drawer with already drawn items
-            var mockDrawer = new Plottable.Drawers.AbstractDrawer("ds");
+            var mockDrawer = new Plottable.Drawers.AbstractDrawer();
             var renderArea = svg.append("g");
             var circles = renderArea.selectAll("circles").data(data);
             circles.enter().append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
@@ -2357,7 +2357,7 @@ describe("Plots", function () {
             var data1PointConverter = function (datum, index) { return data1Points[index]; };
             var data2PointConverter = function (datum, index) { return data2Points[index]; };
             // Create mock drawers with already drawn items
-            var mockDrawer1 = new Plottable.Drawers.AbstractDrawer("ds1");
+            var mockDrawer1 = new Plottable.Drawers.AbstractDrawer();
             var renderArea1 = svg.append("g");
             renderArea1.append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
             mockDrawer1.setup = function () { return mockDrawer1._renderArea = renderArea1; };
@@ -2365,13 +2365,15 @@ describe("Plots", function () {
             mockDrawer1._getPixelPoint = data1PointConverter;
             var renderArea2 = svg.append("g");
             renderArea2.append("circle").attr("cx", 10).attr("cy", 10).attr("r", 10);
-            var mockDrawer2 = new Plottable.Drawers.AbstractDrawer("ds2");
+            var mockDrawer2 = new Plottable.Drawers.AbstractDrawer();
             mockDrawer2.setup = function () { return mockDrawer2._renderArea = renderArea2; };
             mockDrawer2._getSelector = function () { return "circle"; };
             mockDrawer2._getPixelPoint = data2PointConverter;
             // Mock _getDrawer to return the mock drawers
+            var firstCall = true;
             plot._getDrawer = function (key) {
-                if (key === "ds1") {
+                if (firstCall) {
+                    firstCall = false;
                     return mockDrawer1;
                 }
                 else {
@@ -4338,7 +4340,7 @@ describe("Plots", function () {
             stackedPlot = new Plottable.Stacked(xScale, yScale);
             stackedPlot.project("x", "x", xScale);
             stackedPlot.project("y", "y", yScale);
-            stackedPlot._getDrawer = function (key) { return new Plottable.Drawers.AbstractDrawer(key); };
+            stackedPlot._getDrawer = function () { return new Plottable.Drawers.AbstractDrawer(); };
             stackedPlot._isVertical = true;
         });
         it("uses positive offset on stacking the 0 value", function () {

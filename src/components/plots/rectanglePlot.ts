@@ -22,8 +22,8 @@ export module Plots {
       this.classed("rectangle-plot", true);
     }
 
-    protected _getDrawer(key: string) {
-      return new Drawers.Rect(key, true);
+    protected _getDrawer() {
+      return new Drawers.Rect(true);
     }
 
     protected _generateAttrToProjector() {
