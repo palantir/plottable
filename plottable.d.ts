@@ -269,6 +269,7 @@ declare module Plottable {
             function boxesOverlap(boxA: ClientRect, boxB: ClientRect): boolean;
             function boxIsInside(inner: ClientRect, outer: ClientRect): boolean;
             function getBoundingSVG(elem: SVGElement): SVGElement;
+            function getUniqueClipPathId(): number;
         }
     }
 }

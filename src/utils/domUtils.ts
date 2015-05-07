@@ -127,6 +127,11 @@ export module Utils {
       }
       return null; // not in the DOM
     }
+
+    var _latestClipPathId = 0;
+    export function getUniqueClipPathId() {
+      return ++_latestClipPathId;
+    }
   }
 }
 }

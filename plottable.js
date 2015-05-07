@@ -653,6 +653,11 @@ var Plottable;
                 return null; // not in the DOM
             }
             DOM.getBoundingSVG = getBoundingSVG;
+            var _latestClipPathId = 0;
+            function getUniqueClipPathId() {
+                return ++_latestClipPathId;
+            }
+            DOM.getUniqueClipPathId = getUniqueClipPathId;
         })(DOM = Utils.DOM || (Utils.DOM = {}));
     })(Utils = Plottable.Utils || (Plottable.Utils = {}));
 })(Plottable || (Plottable = {}));
@@ -3453,8 +3458,9 @@ var Plottable;
             // They don't need the current URL in the clip path reference.
             var prefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
             prefix = prefix.split("#")[0]; // To fix cases where an anchor tag was used
-            this._element.attr("clip-path", "url(\"" + prefix + "#clipPath" + this.getID() + "\")");
-            var clipPathParent = this._boxContainer.append("clipPath").attr("id", "clipPath" + this.getID());
+            var clipPathId = Plottable.Utils.DOM.getUniqueClipPathId();
+            this._element.attr("clip-path", "url(\"" + prefix + "#clipPath" + clipPathId + "\")");
+            var clipPathParent = this._boxContainer.append("clipPath").attr("id", "clipPath" + clipPathId);
             this._addBox("clip-rect", clipPathParent);
         };
         /**

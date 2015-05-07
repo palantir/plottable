@@ -166,7 +166,7 @@ module Plottable {
     /**
      * Queues the Component for rendering. Set immediately to true if the Component should be rendered
      * immediately as opposed to queued to the RenderController.
-     * 
+     *
      * @returns {Component} The calling Component
      */
     public render(immediately = false) {
@@ -339,9 +339,10 @@ module Plottable {
       // They don't need the current URL in the clip path reference.
       var prefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
       prefix = prefix.split("#")[0]; // To fix cases where an anchor tag was used
-      this._element.attr("clip-path", "url(\"" + prefix + "#clipPath" + this.getID() + "\")");
+      var clipPathId = Utils.DOM.getUniqueClipPathId();
+      this._element.attr("clip-path", "url(\"" + prefix + "#clipPath" + clipPathId + "\")");
       var clipPathParent = this._boxContainer.append("clipPath")
-                                      .attr("id", "clipPath" + this.getID());
+                                             .attr("id", "clipPath" + clipPathId);
       this._addBox("clip-rect", clipPathParent);
     }
 
