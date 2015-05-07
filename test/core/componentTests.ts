@@ -203,17 +203,17 @@ describe("Component behavior", () => {
   it("clipPath works as expected", () => {
     assert.isFalse(c.clipPathEnabled, "clipPathEnabled defaults to false");
     c.clipPathEnabled = true;
-    var expectedClipPathID = c.getID();
     c.anchor(svg);
     c.computeLayout({ x: 0, y: 0 }, 100, 100);
     c.render();
+    var expectedClipPathID = (<any>c)._boxContainer[0][0].firstChild.id.replace(/clipPath/, "");
     var expectedPrefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
     expectedPrefix = expectedPrefix.replace(/#.*/g, "");
     var expectedClipPathURL = "url(" + expectedPrefix + "#clipPath" + expectedClipPathID + ")";
     // IE 9 has clipPath like 'url("#clipPath")', must accomodate
     var normalizeClipPath = (s: string) => s.replace(/"/g, "");
-    // assert.isTrue(normalizeClipPath((<any> c)._element.attr("clip-path")) === expectedClipPathURL,
-    //               "the element has clip-path url attached");
+    assert.isTrue(normalizeClipPath((<any> c)._element.attr("clip-path")) === expectedClipPathURL,
+                  "the element has clip-path url attached");
     var clipRect = (<any> c)._boxContainer.select(".clip-rect");
     assert.strictEqual(clipRect.attr("width"), "100", "the clipRect has an appropriate width");
     assert.strictEqual(clipRect.attr("height"), "100", "the clipRect has an appropriate height");
