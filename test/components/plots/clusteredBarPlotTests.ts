@@ -126,8 +126,8 @@ describe("Plots", () => {
       dataset2 = new Plottable.Dataset(data2);
 
       renderer = new Plottable.Plots.ClusteredBar<number, string>(xScale, yScale, false);
-      renderer.addDataset(data1);
-      renderer.addDataset(data2);
+      renderer.addDataset(new Plottable.Dataset(data1));
+      renderer.addDataset(new Plottable.Dataset(data2));
       renderer.baseline(0);
       renderer.project("x", "x", xScale);
       renderer.project("y", "y", yScale);
@@ -193,9 +193,9 @@ describe("Plots", () => {
       var data3 = [{x: "B", y: 15}, {x: "C", y: 15}];
 
       plot = new Plottable.Plots.ClusteredBar<string, number>(xScale, yScale);
-      plot.addDataset(data1);
-      plot.addDataset(data2);
-      plot.addDataset(data3);
+      plot.addDataset(new Plottable.Dataset(data1));
+      plot.addDataset(new Plottable.Dataset(data2));
+      plot.addDataset(new Plottable.Dataset(data3));
       plot.baseline(0);
       plot.project("x", "x", xScale);
       plot.project("y", "y", yScale);
@@ -254,9 +254,9 @@ describe("Plots", () => {
       var data3 = [{y: "B", x: 15}, {y: "C", x: 15}];
 
       plot = new Plottable.Plots.ClusteredBar(xScale, yScale, false);
-      plot.addDataset(data1);
-      plot.addDataset(data2);
-      plot.addDataset(data3);
+      plot.addDataset(new Plottable.Dataset(data1));
+      plot.addDataset(new Plottable.Dataset(data2));
+      plot.addDataset(new Plottable.Dataset(data3));
       plot.project("x", "x", xScale);
       plot.project("y", "y", yScale);
       plot.renderTo(svg);

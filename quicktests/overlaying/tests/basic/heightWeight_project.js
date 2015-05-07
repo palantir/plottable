@@ -25,7 +25,7 @@ function run(svg, data, Plottable) {
     };
 
     var renderer = new Plottable.Plots.Scatter(xScale, yScale);
-    renderer.addDataset(dataseries)
+    renderer.addDataset(new Plottable.Dataset(dataseries))
             .attr("x", xAccessor, xScale)
             .attr("y", yAccessor, yScale)
             .attr("size", sizeAccessor)

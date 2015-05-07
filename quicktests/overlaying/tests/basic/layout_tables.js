@@ -7,8 +7,8 @@ function makeData() {
 function run(svg, data, Plottable) {
   "use strict";
 
-    var dataseries1 = data[0].slice();
-    var dataseries2 = data[0].slice();
+    var dataset1 = new Plottable.Dataset(data[0]);
+    var dataset2 = new Plottable.Dataset(data[0]);
 
     var xScale = new Plottable.Scales.Linear();
     var yScale = new Plottable.Scales.Linear();
@@ -23,14 +23,14 @@ function run(svg, data, Plottable) {
 
     //test Component constructor (default, should be no issues)
 
-    var renderAreaD0 = new Plottable.Plots.Line(xScale, yScale).addDataset(dataseries1);
+    var renderAreaD0 = new Plottable.Plots.Line(xScale, yScale).addDataset(dataset1);
     renderAreaD0.project("x", "x", xScale).project("y", "y", yScale);
-    var renderAreaD1 = new Plottable.Plots.Line(xScale, yScale).addDataset(dataseries2)
+    var renderAreaD1 = new Plottable.Plots.Line(xScale, yScale).addDataset(dataset2)
                                       .attr( "stroke", d3.functor("red"));
     renderAreaD1.project("x", "x", xScale).project("y", "y", yScale);
-    var renderAreaD2 = new Plottable.Plots.Area(xScale, yScale).addDataset(dataseries1);
+    var renderAreaD2 = new Plottable.Plots.Area(xScale, yScale).addDataset(dataset1);
     renderAreaD2.project("x", "x", xScale).project("y", "y", yScale);
-    var renderAreaD3 = new Plottable.Plots.Area(xScale, yScale).addDataset(dataseries2)
+    var renderAreaD3 = new Plottable.Plots.Area(xScale, yScale).addDataset(dataset2)
                                       .attr( "fill", d3.functor("red"));
     renderAreaD3.project("x", "x", xScale).project("y", "y", yScale);
 

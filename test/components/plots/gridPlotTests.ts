@@ -52,7 +52,7 @@ describe("Plots", () => {
       var colorScale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
       var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       var gridPlot = new Plottable.Plots.Grid(xScale, yScale, colorScale);
-      gridPlot.addDataset(DATA)
+      gridPlot.addDataset(new Plottable.Dataset(DATA))
               .project("fill", "magnitude", colorScale)
               .project("x", "x", xScale)
               .project("y", "y", yScale);
@@ -117,7 +117,7 @@ describe("Plots", () => {
       var colorScale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
       var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       var gridPlot = new Plottable.Plots.Grid(xScale, yScale, colorScale);
-      gridPlot.addDataset(DATA)
+      gridPlot.addDataset(new Plottable.Dataset(DATA))
               .project("fill", "magnitude")
               .project("x", "x", xScale)
               .project("y", "y", yScale)
@@ -159,32 +159,33 @@ describe("Plots", () => {
         var colorScale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
         var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
         var gridPlot = new Plottable.Plots.Grid(xScale, yScale, colorScale);
-        gridPlot.addDataset("a", DATA)
+        var dataset = new Plottable.Dataset(DATA);
+        gridPlot.addDataset(dataset)
                 .project("fill", "magnitude", colorScale)
                 .project("x", "x", xScale)
                 .project("y", "y", yScale);
         gridPlot.renderTo(svg);
 
         var allCells = gridPlot.getAllSelections();
-        var allCells2 = gridPlot.getAllSelections((<any> gridPlot)._datasetKeysInOrder);
-        assert.deepEqual(allCells, allCells2, "all cells retrieved");
+        assert.strictEqual(allCells.size(), 4, "all cells retrieved");
 
         svg.remove();
       });
 
-      it("retrieves correct selections (string arg)", () => {
+      it("retrieves correct selections", () => {
         var xScale = new Plottable.Scales.Category();
         var yScale = new Plottable.Scales.Category();
         var colorScale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
         var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
         var gridPlot = new Plottable.Plots.Grid(xScale, yScale, colorScale);
-        gridPlot.addDataset("a", DATA)
+        var dataset = new Plottable.Dataset(DATA);
+        gridPlot.addDataset(dataset)
                 .project("fill", "magnitude", colorScale)
                 .project("x", "x", xScale)
                 .project("y", "y", yScale);
         gridPlot.renderTo(svg);
 
-        var allCells = gridPlot.getAllSelections("a");
+        var allCells = gridPlot.getAllSelections([dataset]);
         assert.strictEqual(allCells.size(), 4, "all cells retrieved");
         var selectionData = allCells.data();
         assert.includeMembers(selectionData, DATA, "data in selection data");
@@ -192,39 +193,21 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("retrieves correct selections (array arg)", () => {
+      it("skips invalid Datasets", () => {
         var xScale = new Plottable.Scales.Category();
         var yScale = new Plottable.Scales.Category();
         var colorScale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
         var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
         var gridPlot = new Plottable.Plots.Grid(xScale, yScale, colorScale);
-        gridPlot.addDataset("a", DATA)
+        var dataset = new Plottable.Dataset(DATA);
+        gridPlot.addDataset(dataset)
           .project("fill", "magnitude", colorScale)
           .project("x", "x", xScale)
           .project("y", "y", yScale);
         gridPlot.renderTo(svg);
 
-        var allCells = gridPlot.getAllSelections(["a"]);
-        assert.strictEqual(allCells.size(), 4, "all cells retrieved");
-        var selectionData = allCells.data();
-        assert.includeMembers(selectionData, DATA, "data in selection data");
-
-        svg.remove();
-      });
-
-      it("skips invalid keys", () => {
-        var xScale = new Plottable.Scales.Category();
-        var yScale = new Plottable.Scales.Category();
-        var colorScale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
-        var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        var gridPlot = new Plottable.Plots.Grid(xScale, yScale, colorScale);
-        gridPlot.addDataset("a", DATA)
-          .project("fill", "magnitude", colorScale)
-          .project("x", "x", xScale)
-          .project("y", "y", yScale);
-        gridPlot.renderTo(svg);
-
-        var allCells = gridPlot.getAllSelections(["a", "b"]);
+        var dummyDataset = new Plottable.Dataset([]);
+        var allCells = gridPlot.getAllSelections([dataset, dummyDataset]);
         assert.strictEqual(allCells.size(), 4, "all cells retrieved");
         var selectionData = allCells.data();
         assert.includeMembers(selectionData, DATA, "data in selection data");

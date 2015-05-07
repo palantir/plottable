@@ -30,7 +30,7 @@ describe("Plots", () => {
       var yScale        = new Plottable.Scales.Linear();
       var svg           = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       var rectanglePlot = new Plottable.Plots.Rectangle(xScale, yScale);
-      rectanglePlot.addDataset(DATA)
+      rectanglePlot.addDataset(new Plottable.Dataset(DATA))
               .project("x", "x", xScale)
               .project("y", "y", yScale)
               .project("x1", "x", xScale)
@@ -65,7 +65,7 @@ describe("Plots", () => {
         .project("x", "x", xScale)
         .project("y", "y1", yScale)
         .project("y2", "y2", yScale);
-      plot.addDataset(data1);
+      plot.addDataset(new Plottable.Dataset(data1));
 
       plot.renderTo(svg);
 

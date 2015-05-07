@@ -31,11 +31,12 @@ function run(svg, data, Plottable) {
   var y0Accessor = function(d, i) { return dataseries[i].y; };
 
   var areaPlot1 = new Plottable.Plots.Area(xScale, yScale)
-  .addDataset(dataseries).project("x", "x", xScale)
+  .addDataset(new Plottable.Dataset(dataseries))
+  .project("x", "x", xScale)
   .project("y", "y", yScale);
 
   var areaPlot2 = new Plottable.Plots.Area(xScale, yScale)
-  .addDataset(dataseries_top)
+  .addDataset(new Plottable.Dataset(dataseries_top))
   .attr("y0", y0Accessor, yScale)
   .project("x", "x", xScale)
   .project("y", "y", yScale);

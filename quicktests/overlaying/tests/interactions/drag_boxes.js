@@ -21,7 +21,7 @@ function run(svg, data, Plottable) {
   var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
 
   var line = new Plottable.Plots.Scatter( xScale, yScale)
-    .addDataset(data)
+    .addDataset(new Plottable.Dataset(data))
     .project("x", "x", xScale)
     .project("y", "y", yScale);
 

@@ -22,9 +22,9 @@ function run(svg, data, Plottable) {
                                          .attr("fill", "type", colorScale)
                                          .attr("type", "type")
                                          .attr("yval", "y")
-                                         .addDataset("d1", data[0])
-                                         .addDataset("d2", data[1])
-                                         .addDataset("d3", data[2])
+                                         .addDataset(new Plottable.Dataset(data[0]))
+                                         .addDataset(new Plottable.Dataset(data[1]))
+                                         .addDataset(new Plottable.Dataset(data[2]))
                                          .animate(true);
 
   var center = stackedAreaPlot.below(new Plottable.Components.Legend(colorScale));

@@ -130,8 +130,8 @@ describe("Scales", () => {
 
     it("should resize when a plot is removed", () => {
       var svg = TestMethods.generateSVG(400, 400);
-      var ds1 = [{x: 0, y: 0}, {x: 1, y: 1}];
-      var ds2 = [{x: 1, y: 1}, {x: 2, y: 2}];
+      var ds1 = new Plottable.Dataset([{x: 0, y: 0}, {x: 1, y: 1}]);
+      var ds2 = new Plottable.Dataset([{x: 1, y: 1}, {x: 2, y: 2}]);
       var xScale = new Plottable.Scales.Linear();
       var yScale = new Plottable.Scales.Linear();
       xScale.domainer(new Plottable.Domainer());
@@ -154,7 +154,7 @@ describe("Scales", () => {
     });
   });
 
-  describe("QuantitativeScale Scales", () => {
+  describe("Quantitative Scales", () => {
     it("autorange defaults to [0, 1] if no perspectives set", () => {
       var scale = new Plottable.Scales.Linear();
       scale.autoDomain();
@@ -197,7 +197,7 @@ describe("Scales", () => {
       var xScale = new Plottable.Scales.Linear();
       var yScale = new Plottable.Scales.Linear();
       var plot = new Plottable.Plots.Scatter(xScale, yScale);
-      plot.addDataset(sadTimesData);
+      plot.addDataset(new Plottable.Dataset(sadTimesData));
       var id = (d: any) => d;
       xScale.domainer(new Plottable.Domainer()); // to disable padding, etc
       plot.project("x", id, xScale);
