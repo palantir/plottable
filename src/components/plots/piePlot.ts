@@ -133,10 +133,10 @@ export module Plots {
       this._render();
       return this;
     }
-    
+
     public destroy() {
       super.destroy();
-      this._key2DataBindings.values().forEach((binding) => binding.scale.offUpdate(this._renderCallback));
+      this._propertyScales().forEach((scale) => scale.offUpdate(this._renderCallback));
     }
 
     protected _updateExtents() {
@@ -191,6 +191,17 @@ export module Plots {
           newScale.addExtentProvider(this._dataExtentProvider);
         }
       }
+    }
+
+    private _propertyScales() {
+      var propertyScales: Scale<any, any> [] = [];
+      this._key2DataBindings.values().forEach((binding) => {
+        var scale = binding.scale;
+        if (scale != null && propertyScales.indexOf(scale) === -1) {
+          propertyScales.push(scale);
+        }
+      });
+      return propertyScales;
     }
   }
 }

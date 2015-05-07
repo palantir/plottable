@@ -6960,7 +6960,7 @@ var Plottable;
             Pie.prototype.destroy = function () {
                 var _this = this;
                 _super.prototype.destroy.call(this);
-                this._key2DataBindings.values().forEach(function (binding) { return binding.scale.offUpdate(_this._renderCallback); });
+                this._propertyScales().forEach(function (scale) { return scale.offUpdate(_this._renderCallback); });
             };
             Pie.prototype._updateExtents = function () {
                 var _this = this;
@@ -7016,6 +7016,16 @@ var Plottable;
                         newScale.addExtentProvider(this._dataExtentProvider);
                     }
                 }
+            };
+            Pie.prototype._propertyScales = function () {
+                var propertyScales = [];
+                this._key2DataBindings.values().forEach(function (binding) {
+                    var scale = binding.scale;
+                    if (scale != null && propertyScales.indexOf(scale) === -1) {
+                        propertyScales.push(scale);
+                    }
+                });
+                return propertyScales;
             };
             Pie._INNER_RADIUS_KEY = "inner-radius";
             Pie._OUTER_RADIUS_KEY = "outer-radius";
