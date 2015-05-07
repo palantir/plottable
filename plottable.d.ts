@@ -2853,10 +2853,10 @@ declare module Plottable {
             innerRadius(): AccessorScaleBinding<D, number>;
             innerRadius(innerRadius: number | _Accessor): Plots.Pie<D>;
             innerRadius(innerRadius: D | _Accessor, innerRadiusScale: Scale<D, number>): Plots.Pie<D>;
-            protected _updateExtents(): void;
             outerRadius(): AccessorScaleBinding<D, number>;
             outerRadius(outerRadius: number | _Accessor): Plots.Pie<D>;
             outerRadius(outerRadius: D | _Accessor, outerRadiusScale: Scale<D, number>): Plots.Pie<D>;
+            protected _updateExtents(): void;
             scaledInnerRadiusAccessor(): _Accessor;
             scaledOuterRadiusAccessor(): _Accessor;
             scaledSectorValueAccessor(): _Accessor;
