@@ -76,12 +76,12 @@ function run(svg, data, Plottable){
   });
 
   var key = new Plottable.Interactions.Key();
-  key.on(78, function(keyData){
+  keyonKey(78, function(keyData){
       d.push({x: Math.random() - 0.5, y: Math.random() - 0.5});
       dataset.data(d);
   });
 
-  key.on(68, function(keyData){
+  keyonKey(68, function(keyData){
       if(d.length > 0){
         d.splice(d.length-1,1);
         dataset.data(d);

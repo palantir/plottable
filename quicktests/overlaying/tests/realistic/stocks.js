@@ -108,7 +108,7 @@ function run(svg, data, Plottable) {
           plotArea.registerInteraction(pzi);
           plotArea.registerInteraction(
             new Plottable.Interactions.Key()
-                                     .on(65, function() {
+                                     onKey(65, function() {
                                        xScale.autoDomain();
                                        pzi.resetZoom();
                                      })

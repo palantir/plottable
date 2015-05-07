@@ -28,7 +28,7 @@ function run(svg, data, Plottable) {
 
   var ki = new Plottable.Interactions.Key();
   // press "a" (keycode 65) to reset
-  ki.on(65, function() {
+  kionKey(65, function() {
     xScale.autoDomain();
     yScale.autoDomain();
     pzi.resetZoom();
