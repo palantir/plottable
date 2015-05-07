@@ -20,9 +20,9 @@ function run(svg, data, Plottable) {
     .project("y", "name", yScale)
     .project("x", "y", xScale)
     .project("fill", "type", colorScale)
-    .addDataset("d1", data[0])
-    .addDataset("d2", data[1])
-    .addDataset("d3", data[2])
+    .addDataset(new Plottable.Dataset(data[0]))
+    .addDataset(new Plottable.Dataset(data[1]))
+    .addDataset(new Plottable.Dataset(data[2]))
     .animate(true);
 
   var chart = new Plottable.Components.Table([

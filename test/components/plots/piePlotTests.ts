@@ -28,7 +28,7 @@ describe("Plots", () => {
       simpleData = [{value: 5, value2: 10, type: "A"}, {value: 15, value2: 10, type: "B"}];
       simpleDataset = new Plottable.Dataset(simpleData);
       piePlot = new Plottable.Plots.Pie<number>();
-      piePlot.addDataset("simpleDataset", simpleDataset);
+      piePlot.addDataset(simpleDataset);
       piePlot.sectorValue((d) => d.value);
       piePlot.renderTo(svg);
       renderArea = (<any> piePlot)._renderArea;
@@ -143,17 +143,15 @@ describe("Plots", () => {
     });
 
     describe("getAllSelections", () => {
-
       it("retrieves all dataset selections with no args", () => {
         var allSectors = piePlot.getAllSelections();
-        var allSectors2 = piePlot.getAllSelections((<any> piePlot)._datasetKeysInOrder);
-        assert.deepEqual(allSectors, allSectors2, "all sectors retrieved");
+        assert.strictEqual(allSectors.size(), 2, "all sectors retrieved");
 
         svg.remove();
       });
 
-      it("retrieves correct selections (array arg)", () => {
-        var allSectors = piePlot.getAllSelections(["simpleDataset"]);
+      it("retrieves correct selections", () => {
+        var allSectors = piePlot.getAllSelections([simpleDataset]);
         assert.strictEqual(allSectors.size(), 2, "all sectors retrieved");
         var selectionData = allSectors.data();
         assert.includeMembers(selectionData.map((datum) => datum.data), simpleData, "dataset data in selection data");
@@ -161,18 +159,9 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("retrieves correct selections (string arg)", () => {
-        var allSectors = piePlot.getAllSelections("simpleDataset");
-        assert.strictEqual(allSectors.size(), 2, "all sectors retrieved");
-        var selectionData = allSectors.data();
-        assert.includeMembers(selectionData.map((datum) => datum.data), simpleData, "dataset data in selection data");
-
-        svg.remove();
-      });
-
-      it("skips invalid keys", () => {
-        var allSectors = piePlot.getAllSelections(["whoo"]);
-        assert.strictEqual(allSectors.size(), 0, "all sectors retrieved");
+      it("skips invalid Datsets", () => {
+        var allSectors = piePlot.getAllSelections([new Plottable.Dataset([])]);
+        assert.strictEqual(allSectors.size(), 0, "no sectors retrieved");
 
         svg.remove();
       });
@@ -221,9 +210,9 @@ describe("Plots", () => {
       var message: String;
       var oldWarn = Plottable.Utils.Methods.warn;
       Plottable.Utils.Methods.warn = (warn) => message = warn;
-      piePlot.removeDataset("simpleDataset");
+      piePlot.removeDataset(simpleDataset);
       var negativeDataset = new Plottable.Dataset([{value: -5}, {value: 15}]);
-      piePlot.addDataset("negativeDataset", negativeDataset);
+      piePlot.addDataset(negativeDataset);
       assert.strictEqual(message, "Negative values will not render correctly in a pie chart.");
       Plottable.Utils.Methods.warn = oldWarn;
       svg.remove();
@@ -245,7 +234,7 @@ describe("Plots", () => {
       ];
 
       var plot = new Plottable.Plots.Pie<number>();
-      plot.addDataset(data1);
+      plot.addDataset(new Plottable.Dataset(data1));
       plot.sectorValue((d) => d.v);
 
       plot.renderTo(svg);
@@ -270,7 +259,7 @@ describe("Plots", () => {
       ];
 
       var plot = new Plottable.Plots.Pie<number>();
-      plot.addDataset(data1);
+      plot.addDataset(new Plottable.Dataset(data1));
       plot.sectorValue((d) => d.v);
 
       plot.renderTo(svg);

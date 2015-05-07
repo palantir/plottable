@@ -26,23 +26,25 @@ function run(svg, data, Plottable) {
     var xAxis3 = new Plottable.Axes.Category(xScale, "bottom");
         xAxis3.tickLabelAngle(0);
 
+    var dataset = new Plottable.Dataset(data);
+
     var plot1 = new Plottable.Plots.Scatter( xScale, yScale)
       .project("x", "x", xScale)
       .project("y", "y", yScale)
       .project("fill", "type", colorScale)
-      .addDataset(data);
+      .addDataset(dataset);
 
     var plot2 = new Plottable.Plots.Scatter( xScale, yScale)
       .project("x", "x", xScale)
       .project("y", "y", yScale)
       .project("fill", "type", colorScale)
-    .addDataset(data);
+    .addDataset(dataset);
 
     var plot3 = new Plottable.Plots.Scatter( xScale, yScale)
       .project("x", "x", xScale)
       .project("y", "y", yScale)
       .project("fill", "type", colorScale)
-    .addDataset(data);
+    .addDataset(dataset);
 
     var chart1 = new Plottable.Components.Table([
                     [yAxis1, plot1],

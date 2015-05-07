@@ -19,7 +19,7 @@ describe("Plots", () => {
       var yScale = new Plottable.Scales.Linear().domain([0, 1]);
 
       var linePlot = new Plottable.Plots.Line(xScale, yScale);
-      linePlot.addDataset(dataWithNaN);
+      linePlot.addDataset(new Plottable.Dataset(dataWithNaN));
       linePlot.project("x", (d: any) => d.foo, xScale);
       linePlot.project("y", (d: any) => d.bar, yScale);
       linePlot.renderTo(svg);
@@ -74,11 +74,10 @@ describe("Plots", () => {
       svg = TestMethods.generateSVG(500, 500);
       simpleDataset = new Plottable.Dataset(twoPointData);
       linePlot = new Plottable.Plots.Line(xScale, yScale);
-      linePlot.addDataset("s1", simpleDataset)
+      linePlot.addDataset(simpleDataset)
               .project("x", xAccessor, xScale)
               .project("y", yAccessor, yScale)
               .project("stroke", colorAccessor)
-              .addDataset("s2", simpleDataset)
               .renderTo(svg);
       renderArea = (<any> linePlot)._renderArea;
     });
@@ -162,62 +161,46 @@ describe("Plots", () => {
     });
 
     describe("getAllSelections()", () => {
-
       it("retrieves all dataset selections with no args", () => {
-        var dataset3 = [
+        var dataset3 = new Plottable.Dataset([
           { foo: 0, bar: 1 },
           { foo: 1, bar: 0.95 }
-        ];
-        linePlot.addDataset("d3", dataset3);
+        ]);
+        linePlot.addDataset(dataset3);
 
         var allLines = linePlot.getAllSelections();
-        var allLines2 = linePlot.getAllSelections((<any> linePlot)._datasetKeysInOrder);
-        assert.deepEqual(allLines, allLines2, "all lines retrieved");
+        assert.strictEqual(allLines.size(), 2, "all lines retrieved");
 
         svg.remove();
       });
 
-      it("retrieves correct selections (string arg)", () => {
-        var dataset3 = [
+      it("retrieves correct selections", () => {
+        var dataset3 = new Plottable.Dataset([
           { foo: 0, bar: 1 },
           { foo: 1, bar: 0.95 }
-        ];
-        linePlot.addDataset("d3", dataset3);
+        ]);
+        linePlot.addDataset(dataset3);
 
-        var allLines = linePlot.getAllSelections("d3");
+        var allLines = linePlot.getAllSelections([dataset3]);
         assert.strictEqual(allLines.size(), 1, "all lines retrieved");
         var selectionData = allLines.data();
-        assert.include(selectionData, dataset3, "third dataset data in selection data");
+        assert.include(selectionData, dataset3.data(), "third dataset data in selection data");
 
         svg.remove();
       });
 
-      it("retrieves correct selections (array arg)", () => {
-        var dataset3 = [
+      it("skips invalid Dataset", () => {
+        var dataset3 = new Plottable.Dataset([
           { foo: 0, bar: 1 },
           { foo: 1, bar: 0.95 }
-        ];
-        linePlot.addDataset("d3", dataset3);
+        ]);
+        linePlot.addDataset(dataset3);
+        var dummyDataset = new Plottable.Dataset([]);
 
-        var allLines = linePlot.getAllSelections(["d3"]);
+        var allLines = linePlot.getAllSelections([dataset3, dummyDataset]);
         assert.strictEqual(allLines.size(), 1, "all lines retrieved");
         var selectionData = allLines.data();
-        assert.include(selectionData, dataset3, "third dataset data in selection data");
-
-        svg.remove();
-      });
-
-      it("skips invalid keys", () => {
-        var dataset3 = [
-          { foo: 0, bar: 1 },
-          { foo: 1, bar: 0.95 }
-        ];
-        linePlot.addDataset("d3", dataset3);
-
-        var allLines = linePlot.getAllSelections(["d3", "test"]);
-        assert.strictEqual(allLines.size(), 1, "all lines retrieved");
-        var selectionData = allLines.data();
-        assert.include(selectionData, dataset3, "third dataset data in selection data");
+        assert.include(selectionData, dataset3.data(), "third dataset data in selection data");
 
         svg.remove();
       });
@@ -227,11 +210,11 @@ describe("Plots", () => {
     describe("getAllPlotData()", () => {
 
       it("retrieves correct data", () => {
-        var dataset3 = [
+        var dataset3 = new Plottable.Dataset([
           { foo: 0, bar: 1 },
           { foo: 1, bar: 0.95 }
-        ];
-        linePlot.addDataset("d3", dataset3);
+        ]);
+        linePlot.addDataset(dataset3);
 
         var allLines = linePlot.getAllPlotData().selection;
         assert.strictEqual(allLines.size(), linePlot.datasets().length, "single line per dataset");
@@ -243,31 +226,31 @@ describe("Plots", () => {
       var lines: D3.Selection;
       var d0: any, d1: any;
       var d0Px: Plottable.Point, d1Px: Plottable.Point;
-      var dataset3: any[];
+      var dataset2: Plottable.Dataset;
 
-      function assertPlotDataEqual(expected: Plottable.Plots.PlotData, actual: Plottable.Plots.PlotData, msg: string) {
-        assert.deepEqual(expected.data, actual.data, msg);
-        assert.closeTo(expected.pixelPoints[0].x, actual.pixelPoints[0].x, 0.01, msg);
-        assert.closeTo(expected.pixelPoints[0].y, actual.pixelPoints[0].y, 0.01, msg);
-        assert.deepEqual(expected.selection, actual.selection, msg);
+      function assertPlotDataEqual(actual: Plottable.Plots.PlotData, expected: Plottable.Plots.PlotData, msg: string) {
+        assert.deepEqual(actual.data, expected.data, msg);
+        assert.closeTo(actual.pixelPoints[0].x, expected.pixelPoints[0].x, 0.01, msg);
+        assert.closeTo(actual.pixelPoints[0].y, expected.pixelPoints[0].y, 0.01, msg);
+        assert.deepEqual(actual.selection, expected.selection, msg);
       }
 
       beforeEach(() => {
-        dataset3 = [
+        dataset2 = new Plottable.Dataset([
           { foo: 0, bar: 0.75 },
           { foo: 1, bar: 0.25 }
-        ];
+        ]);
 
-        linePlot.addDataset("d3", dataset3);
+        linePlot.addDataset(dataset2);
 
         lines = d3.selectAll(".line-plot .line");
-        d0 = dataset3[0];
+        d0 = dataset2.data()[0];
         d0Px = {
           x: xScale.scale(xAccessor(d0)),
           y: yScale.scale(yAccessor(d0))
         };
 
-        d1 = dataset3[1];
+        d1 = dataset2.data()[1];
         d1Px = {
           x: xScale.scale(xAccessor(d1)),
           y: yScale.scale(yAccessor(d1))
@@ -278,26 +261,26 @@ describe("Plots", () => {
         var expected = {
           data: [d0],
           pixelPoints: [d0Px],
-          selection: d3.selectAll([lines[0][2]])
+          selection: d3.selectAll([lines[0][1]])
         };
 
         var closest = linePlot.getClosestPlotData({x: d0Px.x, y: d0Px.y - 1});
-        assertPlotDataEqual(expected, closest, "if above a point, it is closest");
+        assertPlotDataEqual(closest, expected, "if above a point, it is closest");
 
         closest = linePlot.getClosestPlotData({x: d0Px.x, y: d0Px.y + 1});
-        assertPlotDataEqual(expected, closest, "if below a point, it is closest");
+        assertPlotDataEqual(closest, expected, "if below a point, it is closest");
 
         closest = linePlot.getClosestPlotData({x: d0Px.x + 1, y: d0Px.y + 1});
-        assertPlotDataEqual(expected, closest, "if right of a point, it is closest");
+        assertPlotDataEqual(closest, expected, "if right of a point, it is closest");
 
         expected = {
           data: [d1],
           pixelPoints: [d1Px],
-          selection: d3.selectAll([lines[0][2]])
+          selection: d3.selectAll([lines[0][1]])
         };
 
         closest = linePlot.getClosestPlotData({x: d1Px.x - 1, y: d1Px.y});
-        assertPlotDataEqual(expected, closest, "if left of a point, it is closest");
+        assertPlotDataEqual(closest, expected, "if left of a point, it is closest");
 
         svg.remove();
       });
@@ -311,11 +294,11 @@ describe("Plots", () => {
             x: xScale.scale(xAccessor(d1)),
             y: yScale.scale(yAccessor(d1))
           }],
-          selection: d3.selectAll([lines[0][2]])
+          selection: d3.selectAll([lines[0][1]])
         };
 
         var closest = linePlot.getClosestPlotData({ x: xScale.scale(0.25), y: d1Px.y });
-        assertPlotDataEqual(expected, closest, "only in-view points are considered");
+        assertPlotDataEqual(closest, expected, "only in-view points are considered");
 
         svg.remove();
       });

@@ -33,7 +33,7 @@ function run(svg, data, Plottable) {
   var ABlabel = new Plottable.Components.Label("Combined");
 
   var Aplot = new Plottable.Plots.Pie();
-    Aplot.addDataset("d1", data[0]);
+    Aplot.addDataset(new Plottable.Dataset(data[0]));
     Aplot.sectorValue(function(d) { return d.percent; });
     Aplot.project("fill", "region", colorScale);
     Aplot.innerRadius(40);
@@ -41,7 +41,7 @@ function run(svg, data, Plottable) {
     Aplot = Alabel.above(Aplot);
 
   var Bplot = new Plottable.Plots.Pie();
-    Bplot.addDataset("d2", data[1]);
+    Bplot.addDataset(new Plottable.Dataset(data[1]));
     Bplot.sectorValue(function(d) { return d.percent; });
     Bplot.project("fill", "region", colorScale);
     Bplot.innerRadius(40);
@@ -49,7 +49,7 @@ function run(svg, data, Plottable) {
     Bplot = Blabel.above(Bplot);
 
   var ABplot = new Plottable.Plots.Pie();
-    ABplot.addDataset("d3", data[2]);
+    ABplot.addDataset(new Plottable.Dataset(data[2]));
     ABplot.sectorValue(function(d) { return d.percent; });
     ABplot.project("fill", "region", colorScale);
     ABplot.innerRadius(50);

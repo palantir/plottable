@@ -383,9 +383,9 @@ describe("Drawers", function () {
             var svg = TestMethods.generateSVG(300, 300);
             var data = [{ value: 10 }, { value: 10 }, { value: 10 }, { value: 10 }];
             var piePlot = new Plottable.Plots.Pie();
-            var drawer = new Plottable.Drawers.Arc("one", piePlot);
+            var drawer = new Plottable.Drawers.Arc("_0", piePlot); // HACKHACK #1984: Dataset keys are being removed, so this is the internal key
             piePlot._getDrawer = function () { return drawer; };
-            piePlot.addDataset("one", data);
+            piePlot.addDataset(new Plottable.Dataset(data));
             piePlot.sectorValue(function (d) { return d.value; });
             piePlot.renderTo(svg);
             piePlot.getAllSelections().each(function (datum, index) {
@@ -411,9 +411,9 @@ describe("Drawers", function () {
             var xScale = new Plottable.Scales.Category();
             var yScale = new Plottable.Scales.Linear();
             var barPlot = new Plottable.Plots.Bar(xScale, yScale);
-            var drawer = new Plottable.Drawers.Rect("one", true);
+            var drawer = new Plottable.Drawers.Rect("_0", true); // HACKHACK #1984: Dataset keys are being removed, so this is the internal key
             barPlot._getDrawer = function () { return drawer; };
-            barPlot.addDataset("one", data);
+            barPlot.addDataset(new Plottable.Dataset(data));
             barPlot.project("x", "a", xScale);
             barPlot.project("y", "b", yScale);
             barPlot.renderTo(svg);
@@ -431,9 +431,9 @@ describe("Drawers", function () {
             var xScale = new Plottable.Scales.Linear();
             var yScale = new Plottable.Scales.Category();
             var barPlot = new Plottable.Plots.Bar(xScale, yScale, false);
-            var drawer = new Plottable.Drawers.Rect("one", false);
+            var drawer = new Plottable.Drawers.Rect("_0", false); // HACKHACK #1984: Dataset keys are being removed, so this is the internal key
             barPlot._getDrawer = function () { return drawer; };
-            barPlot.addDataset("one", data);
+            barPlot.addDataset(new Plottable.Dataset(data));
             barPlot.project("x", "b", xScale);
             barPlot.project("y", "a", yScale);
             barPlot.renderTo(svg);
@@ -457,9 +457,9 @@ describe("Drawers", function () {
             var xScale = new Plottable.Scales.Linear();
             var yScale = new Plottable.Scales.Linear();
             var linePlot = new Plottable.Plots.Line(xScale, yScale);
-            var drawer = new Plottable.Drawers.Line("one");
+            var drawer = new Plottable.Drawers.Line("_0"); // HACKHACK #1984: Dataset keys are being removed, so this is the internal key
             linePlot._getDrawer = function () { return drawer; };
-            linePlot.addDataset("one", data);
+            linePlot.addDataset(new Plottable.Dataset(data));
             linePlot.project("x", "a", xScale);
             linePlot.project("y", "b", yScale);
             linePlot.renderTo(svg);
@@ -476,9 +476,9 @@ describe("Drawers", function () {
             var xScale = new Plottable.Scales.Linear();
             var yScale = new Plottable.Scales.Linear();
             var linePlot = new Plottable.Plots.Line(xScale, yScale);
-            var drawer = new Plottable.Drawers.Line("one");
+            var drawer = new Plottable.Drawers.Line("_0"); // HACKHACK #1984: Dataset keys are being removed, so this is the internal key
             linePlot._getDrawer = function () { return drawer; };
-            linePlot.addDataset("one", data);
+            linePlot.addDataset(new Plottable.Dataset(data));
             linePlot.project("x", "a", xScale);
             linePlot.project("y", "b", yScale);
             linePlot.renderTo(svg);
@@ -1150,10 +1150,10 @@ describe("NumericAxis", function () {
         svg.remove();
     });
     it("truncates long labels", function () {
-        var data = [
+        var dataset = new Plottable.Dataset([
             { x: "A", y: 500000000 },
             { x: "B", y: 400000000 }
-        ];
+        ]);
         var SVG_WIDTH = 120;
         var SVG_HEIGHT = 300;
         var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
@@ -1164,7 +1164,7 @@ describe("NumericAxis", function () {
         var barPlot = new Plottable.Plots.Bar(xScale, yScale);
         barPlot.project("x", "x", xScale);
         barPlot.project("y", "y", yScale);
-        barPlot.addDataset(data);
+        barPlot.addDataset(dataset);
         var chart = new Plottable.Components.Table([
             [yLabel, yAxis, barPlot]
         ]);
@@ -2091,9 +2091,9 @@ var CountingPlot = (function (_super) {
         _super.apply(this, arguments);
         this.renders = 0;
     }
-    CountingPlot.prototype.render = function () {
+    CountingPlot.prototype.render = function (immediately) {
         ++this.renders;
-        return _super.prototype.render.call(this);
+        return _super.prototype.render.call(this, immediately);
     };
     return CountingPlot;
 })(Plottable.Plot);
@@ -2116,25 +2116,40 @@ describe("Plots", function () {
             var dFoo = new Plottable.Dataset(["foo"], { cssClass: "bar" });
             var dBar = new Plottable.Dataset(["bar"], { cssClass: "boo" });
             var r = new CountingPlot();
-            r.addDataset("foo", dFoo);
+            r.addDataset(dFoo);
             assert.strictEqual(1, r.renders, "initial render due to addDataset");
             dFoo.data(dFoo.data());
             assert.strictEqual(2, r.renders, "we re-render when our dataset changes");
-            r.addDataset("bar", dBar);
+            r.addDataset(dBar);
             assert.strictEqual(3, r.renders, "we should redraw when we add a dataset");
             dFoo.data(dFoo.data());
             assert.strictEqual(4, r.renders, "we should still listen to the first dataset");
             dFoo.data(dFoo.data());
             assert.strictEqual(5, r.renders, "we should listen to the new dataset");
-            r.removeDataset("foo");
+            r.removeDataset(dFoo);
             assert.strictEqual(6, r.renders, "we re-render on dataset removal");
             dFoo.data(dFoo.data());
             assert.strictEqual(6, r.renders, "we don't listen to removed datasets");
         });
+        it("datasets()", function () {
+            var dataset1 = new Plottable.Dataset([]);
+            var dataset2 = new Plottable.Dataset([]);
+            var plot = new Plottable.Plot();
+            plot.addDataset(dataset1);
+            plot.addDataset(dataset2);
+            assert.deepEqual(plot.datasets(), [dataset1, dataset2], "retrieved Datasets in order they were added");
+            plot.datasets([dataset2, dataset1]);
+            assert.deepEqual(plot.datasets(), [dataset2, dataset1], "order of Datasets was changed");
+            var dataset3 = new Plottable.Dataset([]);
+            plot.addDataset(dataset3);
+            assert.deepEqual(plot.datasets(), [dataset2, dataset1, dataset3], "adding further Datasets respects the order");
+            plot.removeDataset(dataset1);
+            assert.deepEqual(plot.datasets(), [dataset2, dataset3], "removing a Dataset leaves the remainder in the same order");
+        });
         it("Updates its projectors when the Dataset is changed", function () {
             var d1 = new Plottable.Dataset([{ x: 5, y: 6 }], { cssClass: "bar" });
             var r = new Plottable.Plot();
-            r.addDataset("d1", d1);
+            r.addDataset(d1);
             var xScaleCalls = 0;
             var yScaleCalls = 0;
             var xScale = new Plottable.Scales.Linear();
@@ -2157,7 +2172,7 @@ describe("Plots", function () {
             assert.strictEqual(1, xScaleCalls, "X scale was wired up to datasource correctly");
             assert.strictEqual(1, yScaleCalls, "Y scale was wired up to datasource correctly");
             var d2 = new Plottable.Dataset([{ x: 7, y: 8 }], { cssClass: "boo" });
-            r.removeDataset("d1");
+            r.removeDataset(d1);
             r.addDataset(d2);
             assert.strictEqual(3, xScaleCalls, "Changing datasource fires X scale listeners (but doesn't coalesce callbacks)");
             assert.strictEqual(3, yScaleCalls, "Changing datasource fires Y scale listeners (but doesn't coalesce callbacks)");
@@ -2167,13 +2182,6 @@ describe("Plots", function () {
             d2.data(d2.data());
             assert.strictEqual(4, xScaleCalls, "X scale was hooked into new datasource");
             assert.strictEqual(4, yScaleCalls, "Y scale was hooked into new datasource");
-        });
-        it("Plot automatically generates a Dataset if only data is provided", function () {
-            var data = ["foo", "bar"];
-            var r = new Plottable.Plot().addDataset("foo", data);
-            var dataset = r.datasets()[0];
-            assert.isNotNull(dataset, "A Dataset was automatically generated");
-            assert.deepEqual(dataset.data(), data, "The generated Dataset has the correct data");
         });
         it("Plot.project works as intended", function () {
             var r = new Plottable.Plot();
@@ -2201,37 +2209,41 @@ describe("Plots", function () {
             var svg = TestMethods.generateSVG(400, 400);
             var plot = new Plottable.Plot();
             // Create mock drawers with already drawn items
-            var mockDrawer1 = new Plottable.Drawers.AbstractDrawer("ds1");
+            // HACKHACK #1984: Dataset keys are being removed, so this is the internal key
+            var mockDrawer1 = new Plottable.Drawers.AbstractDrawer("_0");
             var renderArea1 = svg.append("g");
             renderArea1.append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
             mockDrawer1.setup = function () { return mockDrawer1._renderArea = renderArea1; };
             mockDrawer1._getSelector = function () { return "circle"; };
             var renderArea2 = svg.append("g");
             renderArea2.append("circle").attr("cx", 10).attr("cy", 10).attr("r", 10);
-            var mockDrawer2 = new Plottable.Drawers.AbstractDrawer("ds2");
+            // HACKHACK #1984: Dataset keys are being removed, so this is the internal key
+            var mockDrawer2 = new Plottable.Drawers.AbstractDrawer("_1");
             mockDrawer2.setup = function () { return mockDrawer2._renderArea = renderArea2; };
             mockDrawer2._getSelector = function () { return "circle"; };
             // Mock _getDrawer to return the mock drawers
             plot._getDrawer = function (key) {
-                if (key === "ds1") {
+                if (key === "_0") {
                     return mockDrawer1;
                 }
                 else {
                     return mockDrawer2;
                 }
             };
-            plot.addDataset("ds1", [{ value: 0 }, { value: 1 }, { value: 2 }]);
-            plot.addDataset("ds2", [{ value: 1 }, { value: 2 }, { value: 3 }]);
+            var dataset1 = new Plottable.Dataset([{ value: 0 }, { value: 1 }, { value: 2 }]);
+            plot.addDataset(dataset1);
+            var dataset2 = new Plottable.Dataset([{ value: 1 }, { value: 2 }, { value: 3 }]);
+            plot.addDataset(dataset2);
             plot.renderTo(svg);
             var selections = plot.getAllSelections();
             assert.strictEqual(selections.size(), 2, "all circle selections gotten");
-            var oneSelection = plot.getAllSelections("ds1");
+            var oneSelection = plot.getAllSelections([dataset1]);
             assert.strictEqual(oneSelection.size(), 1);
             assert.strictEqual(TestMethods.numAttr(oneSelection, "cx"), 100, "retrieved selection in renderArea1");
-            var oneElementSelection = plot.getAllSelections(["ds2"]);
+            var oneElementSelection = plot.getAllSelections([dataset2]);
             assert.strictEqual(oneElementSelection.size(), 1);
             assert.strictEqual(TestMethods.numAttr(oneElementSelection, "cy"), 10, "retreived selection in renderArea2");
-            var nonExcludedSelection = plot.getAllSelections(["ds1"], true);
+            var nonExcludedSelection = plot.getAllSelections([dataset1], true);
             assert.strictEqual(nonExcludedSelection.size(), 1);
             assert.strictEqual(TestMethods.numAttr(nonExcludedSelection, "cy"), 10, "retreived non-excluded selection in renderArea2");
             svg.remove();
@@ -2250,7 +2262,8 @@ describe("Plots", function () {
             var data1PointConverter = function (datum, index) { return data1Points[index]; };
             var data2PointConverter = function (datum, index) { return data2Points[index]; };
             // Create mock drawers with already drawn items
-            var mockDrawer1 = new Plottable.Drawers.AbstractDrawer("ds1");
+            // HACKHACK #1984: Dataset keys are being removed, so this is the internal key
+            var mockDrawer1 = new Plottable.Drawers.AbstractDrawer("_0");
             var renderArea1 = svg.append("g");
             renderArea1.append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
             mockDrawer1.setup = function () { return mockDrawer1._renderArea = renderArea1; };
@@ -2258,21 +2271,24 @@ describe("Plots", function () {
             mockDrawer1._getPixelPoint = data1PointConverter;
             var renderArea2 = svg.append("g");
             renderArea2.append("circle").attr("cx", 10).attr("cy", 10).attr("r", 10);
-            var mockDrawer2 = new Plottable.Drawers.AbstractDrawer("ds2");
+            // HACKHACK #1984: Dataset keys are being removed, so this is the internal key
+            var mockDrawer2 = new Plottable.Drawers.AbstractDrawer("_1");
             mockDrawer2.setup = function () { return mockDrawer2._renderArea = renderArea2; };
             mockDrawer2._getSelector = function () { return "circle"; };
             mockDrawer2._getPixelPoint = data2PointConverter;
             // Mock _getDrawer to return the mock drawers
             plot._getDrawer = function (key) {
-                if (key === "ds1") {
+                if (key === "_0") {
                     return mockDrawer1;
                 }
                 else {
                     return mockDrawer2;
                 }
             };
-            plot.addDataset("ds1", data1);
-            plot.addDataset("ds2", data2);
+            var dataset1 = new Plottable.Dataset(data1);
+            plot.addDataset(dataset1);
+            var dataset2 = new Plottable.Dataset(data2);
+            plot.addDataset(dataset2);
             plot.renderTo(svg);
             var allPlotData = plot.getAllPlotData();
             assert.strictEqual(allPlotData.selection.size(), 2, "all circle selections gotten");
@@ -2280,13 +2296,13 @@ describe("Plots", function () {
             assert.includeMembers(allPlotData.data, data2, "includes data2 members");
             assert.includeMembers(allPlotData.pixelPoints, data1.map(data1PointConverter), "includes data1 points");
             assert.includeMembers(allPlotData.pixelPoints, data2.map(data2PointConverter), "includes data2 points");
-            var singlePlotData = plot.getAllPlotData("ds1");
+            var singlePlotData = plot.getAllPlotData([dataset1]);
             var oneSelection = singlePlotData.selection;
             assert.strictEqual(oneSelection.size(), 1);
             assert.strictEqual(TestMethods.numAttr(oneSelection, "cx"), 100, "retrieved selection in renderArea1");
             assert.includeMembers(singlePlotData.data, data1, "includes data1 members");
             assert.includeMembers(singlePlotData.pixelPoints, data1.map(data1PointConverter), "includes data1 points");
-            var oneElementPlotData = plot.getAllPlotData(["ds2"]);
+            var oneElementPlotData = plot.getAllPlotData([dataset2]);
             var oneElementSelection = oneElementPlotData.selection;
             assert.strictEqual(oneElementSelection.size(), 1);
             assert.strictEqual(TestMethods.numAttr(oneElementSelection, "cy"), 10, "retreieved selection in renderArea2");
@@ -2313,7 +2329,8 @@ describe("Plots", function () {
             mockDrawer._getPixelPoint = dataPointConverter;
             // Mock _getDrawer to return the mock drawer
             plot._getDrawer = function () { return mockDrawer; };
-            plot.addDataset("ds", data);
+            var dataset = new Plottable.Dataset(data);
+            plot.addDataset(dataset);
             plot.renderTo(svg);
             var oneElementPlotData = plot.getAllPlotData();
             var oneElementSelection = oneElementPlotData.selection;
@@ -2361,8 +2378,8 @@ describe("Plots", function () {
                     return mockDrawer2;
                 }
             };
-            plot.addDataset("ds1", data1);
-            plot.addDataset("ds2", data2);
+            plot.addDataset(new Plottable.Dataset(data1));
+            plot.addDataset(new Plottable.Dataset(data2));
             plot.renderTo(svg);
             var queryPoint = { x: 1, y: 11 };
             var closestPlotData = plot.getClosestPlotData(queryPoint);
@@ -2377,52 +2394,20 @@ describe("Plots", function () {
                 plot = new Plottable.Plot();
                 d1 = new Plottable.Dataset();
                 d2 = new Plottable.Dataset();
-                plot.addDataset("foo", d1);
-                plot.addDataset("bar", d2);
+                plot.addDataset(d1);
+                plot.addDataset(d2);
                 assert.deepEqual(plot.datasets(), [d1, d2], "datasets as expected");
             });
-            it("removeDataset can work on keys", function () {
-                plot.removeDataset("bar");
-                assert.deepEqual(plot.datasets(), [d1], "second dataset removed");
-                plot.removeDataset("foo");
-                assert.deepEqual(plot.datasets(), [], "all datasets removed");
-            });
-            it("removeDataset can work on datasets", function () {
+            it("removeDataset()", function () {
                 plot.removeDataset(d2);
                 assert.deepEqual(plot.datasets(), [d1], "second dataset removed");
                 plot.removeDataset(d1);
                 assert.deepEqual(plot.datasets(), [], "all datasets removed");
             });
-            it("removeDataset ignores inputs that do not correspond to a dataset", function () {
+            it("removeDataset ignores Datasets not in the Plot", function () {
                 var d3 = new Plottable.Dataset();
                 plot.removeDataset(d3);
-                plot.removeDataset("bad key");
                 assert.deepEqual(plot.datasets(), [d1, d2], "datasets as expected");
-            });
-            it("removeDataset functions on inputs that are data arrays, not datasets", function () {
-                var a1 = ["foo", "bar"];
-                var a2 = [1, 2, 3];
-                plot.addDataset(a1);
-                plot.addDataset(a2);
-                assert.lengthOf(plot.datasets(), 4, "there are four datasets");
-                assert.strictEqual(plot.datasets()[3].data(), a2, "second array dataset correct");
-                assert.strictEqual(plot.datasets()[2].data(), a1, "first array dataset correct");
-                plot.removeDataset(a2);
-                plot.removeDataset(a1);
-                assert.deepEqual(plot.datasets(), [d1, d2], "datasets as expected");
-            });
-            it("removeDataset behaves appropriately when the key 'undefined' is used", function () {
-                var a = [1, 2, 3];
-                plot.addDataset("undefined", a);
-                assert.lengthOf(plot.datasets(), 3, "there are three datasets initially");
-                plot.removeDataset("foofoofoofoofoofoofoofoo");
-                assert.lengthOf(plot.datasets(), 3, "there are three datasets after bad key removal");
-                plot.removeDataset(undefined);
-                assert.lengthOf(plot.datasets(), 3, "there are three datasets after removing `undefined`");
-                plot.removeDataset([94, 93, 92]);
-                assert.lengthOf(plot.datasets(), 3, "there are three datasets after removing random dataset");
-                plot.removeDataset("undefined");
-                assert.lengthOf(plot.datasets(), 2, "the dataset called 'undefined' could be removed");
             });
         });
         it("destroy() disconnects plots from its scales", function () {
@@ -2468,7 +2453,7 @@ describe("Plots", function () {
             var animator = new Plottable.Animators.Base().delay(10).duration(10).maxIterativeDelay(0);
             var x = new Plottable.Scales.Linear();
             var y = new Plottable.Scales.Linear();
-            var plot = new Plottable.Plots.Bar(x, y).addDataset([]).animate(true);
+            var plot = new Plottable.Plots.Bar(x, y).addDataset(new Plottable.Dataset([])).animate(true);
             var recordedTime = -1;
             var additionalPaint = function (x) {
                 recordedTime = Math.max(x, recordedTime);
@@ -2484,14 +2469,15 @@ describe("Plots", function () {
         });
         it("extent calculation done in correct dataset order", function () {
             var categoryScale = new Plottable.Scales.Category();
-            var dataset1 = [{ key: "A" }];
-            var dataset2 = [{ key: "B" }];
-            var plot = new Plottable.Plot().addDataset("b", dataset2).addDataset("a", dataset1);
+            var dataset1 = new Plottable.Dataset([{ key: "A" }]);
+            var dataset2 = new Plottable.Dataset([{ key: "B" }]);
+            var plot = new Plottable.Plot();
+            plot.addDataset(dataset2);
+            plot.addDataset(dataset1);
             plot.project("key", "key", categoryScale);
-            plot.datasetOrder(["a", "b"]);
             var svg = TestMethods.generateSVG();
             plot.renderTo(svg);
-            assert.deepEqual(categoryScale.domain(), ["A", "B"], "extent is in the right order");
+            assert.deepEqual(categoryScale.domain(), ["B", "A"], "extent is in the right order");
             svg.remove();
         });
     });
@@ -2615,7 +2601,7 @@ describe("Plots", function () {
             simpleData = [{ value: 5, value2: 10, type: "A" }, { value: 15, value2: 10, type: "B" }];
             simpleDataset = new Plottable.Dataset(simpleData);
             piePlot = new Plottable.Plots.Pie();
-            piePlot.addDataset("simpleDataset", simpleDataset);
+            piePlot.addDataset(simpleDataset);
             piePlot.sectorValue(function (d) { return d.value; });
             piePlot.renderTo(svg);
             renderArea = piePlot._renderArea;
@@ -2705,27 +2691,19 @@ describe("Plots", function () {
         describe("getAllSelections", function () {
             it("retrieves all dataset selections with no args", function () {
                 var allSectors = piePlot.getAllSelections();
-                var allSectors2 = piePlot.getAllSelections(piePlot._datasetKeysInOrder);
-                assert.deepEqual(allSectors, allSectors2, "all sectors retrieved");
+                assert.strictEqual(allSectors.size(), 2, "all sectors retrieved");
                 svg.remove();
             });
-            it("retrieves correct selections (array arg)", function () {
-                var allSectors = piePlot.getAllSelections(["simpleDataset"]);
+            it("retrieves correct selections", function () {
+                var allSectors = piePlot.getAllSelections([simpleDataset]);
                 assert.strictEqual(allSectors.size(), 2, "all sectors retrieved");
                 var selectionData = allSectors.data();
                 assert.includeMembers(selectionData.map(function (datum) { return datum.data; }), simpleData, "dataset data in selection data");
                 svg.remove();
             });
-            it("retrieves correct selections (string arg)", function () {
-                var allSectors = piePlot.getAllSelections("simpleDataset");
-                assert.strictEqual(allSectors.size(), 2, "all sectors retrieved");
-                var selectionData = allSectors.data();
-                assert.includeMembers(selectionData.map(function (datum) { return datum.data; }), simpleData, "dataset data in selection data");
-                svg.remove();
-            });
-            it("skips invalid keys", function () {
-                var allSectors = piePlot.getAllSelections(["whoo"]);
-                assert.strictEqual(allSectors.size(), 0, "all sectors retrieved");
+            it("skips invalid Datsets", function () {
+                var allSectors = piePlot.getAllSelections([new Plottable.Dataset([])]);
+                assert.strictEqual(allSectors.size(), 0, "no sectors retrieved");
                 svg.remove();
             });
         });
@@ -2758,9 +2736,9 @@ describe("Plots", function () {
             var message;
             var oldWarn = Plottable.Utils.Methods.warn;
             Plottable.Utils.Methods.warn = function (warn) { return message = warn; };
-            piePlot.removeDataset("simpleDataset");
+            piePlot.removeDataset(simpleDataset);
             var negativeDataset = new Plottable.Dataset([{ value: -5 }, { value: 15 }]);
-            piePlot.addDataset("negativeDataset", negativeDataset);
+            piePlot.addDataset(negativeDataset);
             assert.strictEqual(message, "Negative values will not render correctly in a pie chart.");
             Plottable.Utils.Methods.warn = oldWarn;
             svg.remove();
@@ -2779,7 +2757,7 @@ describe("Plots", function () {
                 { v: 1 },
             ];
             var plot = new Plottable.Plots.Pie();
-            plot.addDataset(data1);
+            plot.addDataset(new Plottable.Dataset(data1));
             plot.sectorValue(function (d) { return d.v; });
             plot.renderTo(svg);
             var elementsDrawnSel = plot._element.selectAll(".arc");
@@ -2795,7 +2773,7 @@ describe("Plots", function () {
                 { v: 1 },
             ];
             var plot = new Plottable.Plots.Pie();
-            plot.addDataset(data1);
+            plot.addDataset(new Plottable.Dataset(data1));
             plot.sectorValue(function (d) { return d.v; });
             plot.renderTo(svg);
             var elementsDrawnSel = plot._element.selectAll(".arc");
@@ -2803,79 +2781,6 @@ describe("Plots", function () {
             assert.closeTo(elementsDrawnSel[0][1].getBBox().width, 0, 0.001, "0 as a value should not be visible");
             assert.closeTo(elementsDrawnSel[0][2].getBBox().width, 0, 0.001, "null as a value should not be visible");
             svg.remove();
-        });
-    });
-});
-
-///<reference path="../../testReference.ts" />
-var assert = chai.assert;
-describe("Plots", function () {
-    describe("New Style Plots", function () {
-        var p;
-        var oldWarn = Plottable.Utils.Methods.warn;
-        beforeEach(function () {
-            p = new Plottable.Plot();
-            p._getDrawer = function (k) { return new Plottable.Drawers.Element(k).svgElement("rect"); };
-        });
-        afterEach(function () {
-            Plottable.Utils.Methods.warn = oldWarn;
-        });
-        it("Datasets can be added and removed as expected", function () {
-            p.addDataset("foo", [1, 2, 3]);
-            var d2 = new Plottable.Dataset([4, 5, 6]);
-            p.addDataset("bar", d2);
-            p.addDataset([7, 8, 9]);
-            var d4 = new Plottable.Dataset([10, 11, 12]);
-            p.addDataset(d4);
-            assert.deepEqual(p._datasetKeysInOrder, ["foo", "bar", "_0", "_1"], "dataset keys as expected");
-            var datasets = p.datasets();
-            assert.deepEqual(datasets[0].data(), [1, 2, 3]);
-            assert.strictEqual(datasets[1], d2);
-            assert.deepEqual(datasets[2].data(), [7, 8, 9]);
-            assert.strictEqual(datasets[3], d4);
-            p.removeDataset("foo");
-            p.removeDataset("_0");
-            assert.deepEqual(p._datasetKeysInOrder, ["bar", "_1"]);
-            assert.lengthOf(p.datasets(), 2);
-        });
-        it("Datasets are listened to appropriately", function () {
-            var callbackCounter = 0;
-            var callback = function () { return callbackCounter++; };
-            p._onDatasetUpdate = callback;
-            var d = new Plottable.Dataset([1, 2, 3]);
-            p.addDataset("foo", d);
-            assert.strictEqual(callbackCounter, 1, "adding dataset triggers listener");
-            d.data([1, 2, 3, 4]);
-            assert.strictEqual(callbackCounter, 2, "modifying data triggers listener");
-            p.removeDataset("foo");
-            assert.strictEqual(callbackCounter, 3, "removing dataset triggers listener");
-        });
-        it("Datasets can be reordered", function () {
-            p.addDataset("foo", [1]);
-            p.addDataset("bar", [2]);
-            p.addDataset("baz", [3]);
-            assert.deepEqual(p.datasetOrder(), ["foo", "bar", "baz"]);
-            p.datasetOrder(["bar", "baz", "foo"]);
-            assert.deepEqual(p.datasetOrder(), ["bar", "baz", "foo"]);
-            var warned = 0;
-            Plottable.Utils.Methods.warn = function () { return warned++; }; // suppress expected warnings
-            p.datasetOrder(["blah", "blee", "bar", "baz", "foo"]);
-            assert.strictEqual(warned, 1);
-            assert.deepEqual(p.datasetOrder(), ["bar", "baz", "foo"]);
-        });
-        it("Has proper warnings", function () {
-            var warned = 0;
-            Plottable.Utils.Methods.warn = function () { return warned++; };
-            p.addDataset("_foo", []);
-            assert.strictEqual(warned, 1);
-            p.addDataset("2", []);
-            p.addDataset("4", []);
-            // get warning for not a permutation
-            p.datasetOrder(["_bar", "4", "2"]);
-            assert.strictEqual(warned, 2);
-            // do not get warning for a permutation
-            p.datasetOrder(["2", "_foo", "4"]);
-            assert.strictEqual(warned, 2);
         });
     });
 });
@@ -2897,7 +2802,7 @@ describe("Plots", function () {
             var xScale = new Plottable.Scales.Linear().domain([0, 1]);
             var yScale = new Plottable.Scales.Linear().domain([0, 1]);
             var linePlot = new Plottable.Plots.Line(xScale, yScale);
-            linePlot.addDataset(dataWithNaN);
+            linePlot.addDataset(new Plottable.Dataset(dataWithNaN));
             linePlot.project("x", function (d) { return d.foo; }, xScale);
             linePlot.project("y", function (d) { return d.bar; }, yScale);
             linePlot.renderTo(svg);
@@ -2945,7 +2850,7 @@ describe("Plots", function () {
             svg = TestMethods.generateSVG(500, 500);
             simpleDataset = new Plottable.Dataset(twoPointData);
             linePlot = new Plottable.Plots.Line(xScale, yScale);
-            linePlot.addDataset("s1", simpleDataset).project("x", xAccessor, xScale).project("y", yAccessor, yScale).project("stroke", colorAccessor).addDataset("s2", simpleDataset).renderTo(svg);
+            linePlot.addDataset(simpleDataset).project("x", xAccessor, xScale).project("y", yAccessor, yScale).project("stroke", colorAccessor).renderTo(svg);
             renderArea = linePlot._renderArea;
         });
         it("draws a line correctly", function () {
@@ -3020,60 +2925,48 @@ describe("Plots", function () {
         });
         describe("getAllSelections()", function () {
             it("retrieves all dataset selections with no args", function () {
-                var dataset3 = [
+                var dataset3 = new Plottable.Dataset([
                     { foo: 0, bar: 1 },
                     { foo: 1, bar: 0.95 }
-                ];
-                linePlot.addDataset("d3", dataset3);
+                ]);
+                linePlot.addDataset(dataset3);
                 var allLines = linePlot.getAllSelections();
-                var allLines2 = linePlot.getAllSelections(linePlot._datasetKeysInOrder);
-                assert.deepEqual(allLines, allLines2, "all lines retrieved");
+                assert.strictEqual(allLines.size(), 2, "all lines retrieved");
                 svg.remove();
             });
-            it("retrieves correct selections (string arg)", function () {
-                var dataset3 = [
+            it("retrieves correct selections", function () {
+                var dataset3 = new Plottable.Dataset([
                     { foo: 0, bar: 1 },
                     { foo: 1, bar: 0.95 }
-                ];
-                linePlot.addDataset("d3", dataset3);
-                var allLines = linePlot.getAllSelections("d3");
+                ]);
+                linePlot.addDataset(dataset3);
+                var allLines = linePlot.getAllSelections([dataset3]);
                 assert.strictEqual(allLines.size(), 1, "all lines retrieved");
                 var selectionData = allLines.data();
-                assert.include(selectionData, dataset3, "third dataset data in selection data");
+                assert.include(selectionData, dataset3.data(), "third dataset data in selection data");
                 svg.remove();
             });
-            it("retrieves correct selections (array arg)", function () {
-                var dataset3 = [
+            it("skips invalid Dataset", function () {
+                var dataset3 = new Plottable.Dataset([
                     { foo: 0, bar: 1 },
                     { foo: 1, bar: 0.95 }
-                ];
-                linePlot.addDataset("d3", dataset3);
-                var allLines = linePlot.getAllSelections(["d3"]);
+                ]);
+                linePlot.addDataset(dataset3);
+                var dummyDataset = new Plottable.Dataset([]);
+                var allLines = linePlot.getAllSelections([dataset3, dummyDataset]);
                 assert.strictEqual(allLines.size(), 1, "all lines retrieved");
                 var selectionData = allLines.data();
-                assert.include(selectionData, dataset3, "third dataset data in selection data");
-                svg.remove();
-            });
-            it("skips invalid keys", function () {
-                var dataset3 = [
-                    { foo: 0, bar: 1 },
-                    { foo: 1, bar: 0.95 }
-                ];
-                linePlot.addDataset("d3", dataset3);
-                var allLines = linePlot.getAllSelections(["d3", "test"]);
-                assert.strictEqual(allLines.size(), 1, "all lines retrieved");
-                var selectionData = allLines.data();
-                assert.include(selectionData, dataset3, "third dataset data in selection data");
+                assert.include(selectionData, dataset3.data(), "third dataset data in selection data");
                 svg.remove();
             });
         });
         describe("getAllPlotData()", function () {
             it("retrieves correct data", function () {
-                var dataset3 = [
+                var dataset3 = new Plottable.Dataset([
                     { foo: 0, bar: 1 },
                     { foo: 1, bar: 0.95 }
-                ];
-                linePlot.addDataset("d3", dataset3);
+                ]);
+                linePlot.addDataset(dataset3);
                 var allLines = linePlot.getAllPlotData().selection;
                 assert.strictEqual(allLines.size(), linePlot.datasets().length, "single line per dataset");
                 svg.remove();
@@ -3083,26 +2976,26 @@ describe("Plots", function () {
             var lines;
             var d0, d1;
             var d0Px, d1Px;
-            var dataset3;
-            function assertPlotDataEqual(expected, actual, msg) {
-                assert.deepEqual(expected.data, actual.data, msg);
-                assert.closeTo(expected.pixelPoints[0].x, actual.pixelPoints[0].x, 0.01, msg);
-                assert.closeTo(expected.pixelPoints[0].y, actual.pixelPoints[0].y, 0.01, msg);
-                assert.deepEqual(expected.selection, actual.selection, msg);
+            var dataset2;
+            function assertPlotDataEqual(actual, expected, msg) {
+                assert.deepEqual(actual.data, expected.data, msg);
+                assert.closeTo(actual.pixelPoints[0].x, expected.pixelPoints[0].x, 0.01, msg);
+                assert.closeTo(actual.pixelPoints[0].y, expected.pixelPoints[0].y, 0.01, msg);
+                assert.deepEqual(actual.selection, expected.selection, msg);
             }
             beforeEach(function () {
-                dataset3 = [
+                dataset2 = new Plottable.Dataset([
                     { foo: 0, bar: 0.75 },
                     { foo: 1, bar: 0.25 }
-                ];
-                linePlot.addDataset("d3", dataset3);
+                ]);
+                linePlot.addDataset(dataset2);
                 lines = d3.selectAll(".line-plot .line");
-                d0 = dataset3[0];
+                d0 = dataset2.data()[0];
                 d0Px = {
                     x: xScale.scale(xAccessor(d0)),
                     y: yScale.scale(yAccessor(d0))
                 };
-                d1 = dataset3[1];
+                d1 = dataset2.data()[1];
                 d1Px = {
                     x: xScale.scale(xAccessor(d1)),
                     y: yScale.scale(yAccessor(d1))
@@ -3112,21 +3005,21 @@ describe("Plots", function () {
                 var expected = {
                     data: [d0],
                     pixelPoints: [d0Px],
-                    selection: d3.selectAll([lines[0][2]])
+                    selection: d3.selectAll([lines[0][1]])
                 };
                 var closest = linePlot.getClosestPlotData({ x: d0Px.x, y: d0Px.y - 1 });
-                assertPlotDataEqual(expected, closest, "if above a point, it is closest");
+                assertPlotDataEqual(closest, expected, "if above a point, it is closest");
                 closest = linePlot.getClosestPlotData({ x: d0Px.x, y: d0Px.y + 1 });
-                assertPlotDataEqual(expected, closest, "if below a point, it is closest");
+                assertPlotDataEqual(closest, expected, "if below a point, it is closest");
                 closest = linePlot.getClosestPlotData({ x: d0Px.x + 1, y: d0Px.y + 1 });
-                assertPlotDataEqual(expected, closest, "if right of a point, it is closest");
+                assertPlotDataEqual(closest, expected, "if right of a point, it is closest");
                 expected = {
                     data: [d1],
                     pixelPoints: [d1Px],
-                    selection: d3.selectAll([lines[0][2]])
+                    selection: d3.selectAll([lines[0][1]])
                 };
                 closest = linePlot.getClosestPlotData({ x: d1Px.x - 1, y: d1Px.y });
-                assertPlotDataEqual(expected, closest, "if left of a point, it is closest");
+                assertPlotDataEqual(closest, expected, "if left of a point, it is closest");
                 svg.remove();
             });
             it("considers only in-view points", function () {
@@ -3137,10 +3030,10 @@ describe("Plots", function () {
                         x: xScale.scale(xAccessor(d1)),
                         y: yScale.scale(yAccessor(d1))
                     }],
-                    selection: d3.selectAll([lines[0][2]])
+                    selection: d3.selectAll([lines[0][1]])
                 };
                 var closest = linePlot.getClosestPlotData({ x: xScale.scale(0.25), y: d1Px.y });
-                assertPlotDataEqual(expected, closest, "only in-view points are considered");
+                assertPlotDataEqual(closest, expected, "only in-view points are considered");
                 svg.remove();
             });
             it("handles empty plots gracefully", function () {
@@ -3208,7 +3101,7 @@ describe("Plots", function () {
             svg = TestMethods.generateSVG(500, 500);
             simpleDataset = new Plottable.Dataset(twoPointData);
             areaPlot = new Plottable.Plots.Area(xScale, yScale);
-            areaPlot.addDataset("sd", simpleDataset).project("x", xAccessor, xScale).project("y", yAccessor, yScale).project("y0", y0Accessor, yScale).project("fill", fillAccessor).project("stroke", colorAccessor).renderTo(svg);
+            areaPlot.addDataset(simpleDataset).project("x", xAccessor, xScale).project("y", yAccessor, yScale).project("y0", y0Accessor, yScale).project("fill", fillAccessor).project("stroke", colorAccessor).renderTo(svg);
             renderArea = areaPlot._renderArea;
         });
         it("draws area and line correctly", function () {
@@ -3272,39 +3165,29 @@ describe("Plots", function () {
         describe("getAllSelections()", function () {
             it("retrieves all selections with no args", function () {
                 var newTwoPointData = [{ foo: 2, bar: 1 }, { foo: 3, bar: 2 }];
-                areaPlot.addDataset("newTwo", new Plottable.Dataset(newTwoPointData));
+                areaPlot.addDataset(new Plottable.Dataset(newTwoPointData));
                 var allAreas = areaPlot.getAllSelections();
-                var allAreas2 = areaPlot.getAllSelections(areaPlot._datasetKeysInOrder);
-                assert.deepEqual(allAreas, allAreas2, "all areas/lines retrieved");
                 assert.strictEqual(allAreas.filter(".line").size(), 2, "2 lines retrieved");
                 assert.strictEqual(allAreas.filter(".area").size(), 2, "2 areas retrieved");
                 svg.remove();
             });
-            it("retrieves correct selections (string arg)", function () {
-                var newTwoPointData = [{ foo: 2, bar: 1 }, { foo: 3, bar: 2 }];
-                areaPlot.addDataset("newTwo", new Plottable.Dataset(newTwoPointData));
-                var allAreas = areaPlot.getAllSelections("newTwo");
+            it("retrieves correct selections", function () {
+                var twoPointDataset = new Plottable.Dataset([{ foo: 2, bar: 1 }, { foo: 3, bar: 2 }]);
+                areaPlot.addDataset(twoPointDataset);
+                var allAreas = areaPlot.getAllSelections([twoPointDataset]);
                 assert.strictEqual(allAreas.size(), 2, "areas/lines retrieved");
                 var selectionData = allAreas.data();
-                assert.include(selectionData, newTwoPointData, "new dataset data in selection data");
+                assert.include(selectionData, twoPointDataset.data(), "new dataset data in selection data");
                 svg.remove();
             });
-            it("retrieves correct selections (array arg)", function () {
-                var newTwoPointData = [{ foo: 2, bar: 1 }, { foo: 3, bar: 2 }];
-                areaPlot.addDataset("newTwo", new Plottable.Dataset(newTwoPointData));
-                var allAreas = areaPlot.getAllSelections(["newTwo"]);
+            it("skips invalid Datasets", function () {
+                var twoPointDataset = new Plottable.Dataset([{ foo: 2, bar: 1 }, { foo: 3, bar: 2 }]);
+                areaPlot.addDataset(twoPointDataset);
+                var dummyDataset = new Plottable.Dataset([]);
+                var allAreas = areaPlot.getAllSelections([twoPointDataset, dummyDataset]);
                 assert.strictEqual(allAreas.size(), 2, "areas/lines retrieved");
                 var selectionData = allAreas.data();
-                assert.include(selectionData, newTwoPointData, "new dataset data in selection data");
-                svg.remove();
-            });
-            it("skips invalid keys", function () {
-                var newTwoPointData = [{ foo: 2, bar: 1 }, { foo: 3, bar: 2 }];
-                areaPlot.addDataset("newTwo", new Plottable.Dataset(newTwoPointData));
-                var allAreas = areaPlot.getAllSelections(["newTwo", "test"]);
-                assert.strictEqual(allAreas.size(), 2, "areas/lines retrieved");
-                var selectionData = allAreas.data();
-                assert.include(selectionData, newTwoPointData, "new dataset data in selection data");
+                assert.include(selectionData, twoPointDataset.data(), "new dataset data in selection data");
                 svg.remove();
             });
         });
@@ -3408,7 +3291,7 @@ describe("Plots", function () {
                 assert.strictEqual(baseline.attr("x2"), String(SVG_WIDTH), "the baseline ends at the edge of the chart");
                 svg.remove();
             });
-            it("getBar()", function () {
+            it("getBars()", function () {
                 var bar = barPlot.getBars(155, 150); // in the middle of bar 0
                 assert.lengthOf(bar[0], 1, "getBar returns a bar");
                 assert.strictEqual(bar.data()[0], dataset.data()[0], "the data in the bar matches the datasource");
@@ -3608,8 +3491,8 @@ describe("Plots", function () {
                     { x: 10, y: -1.5 },
                     { x: 100, y: 1 }
                 ];
-                dataset = new Plottable.Dataset(data);
                 barPlot = new Plottable.Plots.Bar(xScale, yScale);
+                dataset = new Plottable.Dataset(data);
                 barPlot.addDataset(dataset);
                 barPlot.baseline(0);
                 barPlot.project("x", "x", xScale);
@@ -3635,19 +3518,19 @@ describe("Plots", function () {
             });
             it("sensible bar width one datum", function () {
                 barPlot.removeDataset(dataset);
-                barPlot.addDataset([{ x: 10, y: 2 }]);
+                barPlot.addDataset(new Plottable.Dataset([{ x: 10, y: 2 }]));
                 assert.closeTo(barPlot._getBarPixelWidth(), 228, 0.1, "sensible bar width for only one datum");
                 svg.remove();
             });
             it("sensible bar width same datum", function () {
                 barPlot.removeDataset(dataset);
-                barPlot.addDataset([{ x: 10, y: 2 }, { x: 10, y: 2 }]);
+                barPlot.addDataset(new Plottable.Dataset([{ x: 10, y: 2 }, { x: 10, y: 2 }]));
                 assert.closeTo(barPlot._getBarPixelWidth(), 228, 0.1, "uses the width sensible for one datum");
                 svg.remove();
             });
             it("sensible bar width unsorted data", function () {
                 barPlot.removeDataset(dataset);
-                barPlot.addDataset([{ x: 2, y: 2 }, { x: 20, y: 2 }, { x: 5, y: 2 }]);
+                barPlot.addDataset(new Plottable.Dataset([{ x: 2, y: 2 }, { x: 20, y: 2 }, { x: 5, y: 2 }]));
                 var expectedBarPixelWidth = (xScale.scale(5) - xScale.scale(2)) * 0.95;
                 assert.closeTo(barPlot._getBarPixelWidth(), expectedBarPixelWidth, 0.1, "bar width uses closest sorted x values");
                 svg.remove();
@@ -3663,7 +3546,7 @@ describe("Plots", function () {
                 xScale = new Plottable.Scales.Time();
                 var yScale = new Plottable.Scales.Linear();
                 barPlot = new Plottable.Plots.Bar(xScale, yScale);
-                barPlot.addDataset(data).project("x", function (d) { return d3.time.format("%m/%d/%y").parse(d.x); }, xScale).project("y", "y", yScale).renderTo(svg);
+                barPlot.addDataset(new Plottable.Dataset(data)).project("x", function (d) { return d3.time.format("%m/%d/%y").parse(d.x); }, xScale).project("y", "y", yScale).renderTo(svg);
             });
             it("bar width takes an appropriate value", function () {
                 var timeFormatter = d3.time.format("%m/%d/%y");
@@ -3863,9 +3746,9 @@ describe("Plots", function () {
             beforeEach(function () {
                 svg = TestMethods.generateSVG();
                 data = [{ x: "foo", y: 5 }, { x: "bar", y: 640 }, { x: "zoo", y: 12345 }];
-                dataset = new Plottable.Dataset(data);
                 xScale = new Plottable.Scales.Category();
                 yScale = new Plottable.Scales.Linear();
+                dataset = new Plottable.Dataset(data);
                 plot = new Plottable.Plots.Bar(xScale, yScale);
                 plot.addDataset(dataset);
                 plot.project("x", "x", xScale);
@@ -3941,50 +3824,33 @@ describe("Plots", function () {
             });
             it("retrieves all dataset selections with no args", function () {
                 var barData = [{ x: "foo", y: 5 }, { x: "bar", y: 640 }, { x: "zoo", y: 12345 }];
-                var barData2 = [{ x: "one", y: 5 }, { x: "two", y: 640 }, { x: "three", y: 12345 }];
-                verticalBarPlot.addDataset("a", barData);
-                verticalBarPlot.addDataset("b", barData2);
+                verticalBarPlot.addDataset(new Plottable.Dataset(barData));
                 verticalBarPlot.renderTo(svg);
                 var allBars = verticalBarPlot.getAllSelections();
-                var allBars2 = verticalBarPlot.getAllSelections(verticalBarPlot._datasetKeysInOrder);
-                assert.deepEqual(allBars, allBars2, "both ways of getting all selections work");
+                assert.strictEqual(allBars.size(), 3, "retrieved all bars");
                 svg.remove();
             });
-            it("retrieves correct selections (string arg)", function () {
-                var barData = [{ x: "foo", y: 5 }, { x: "bar", y: 640 }, { x: "zoo", y: 12345 }];
-                var barData2 = [{ x: "one", y: 5 }, { x: "two", y: 640 }, { x: "three", y: 12345 }];
-                verticalBarPlot.addDataset("a", barData);
-                verticalBarPlot.addDataset(barData2);
+            it("retrieves correct selections for supplied Datasets", function () {
+                var dataset1 = new Plottable.Dataset([{ x: "foo", y: 5 }, { x: "bar", y: 640 }, { x: "zoo", y: 12345 }]);
+                var dataset2 = new Plottable.Dataset([{ x: "one", y: 5 }, { x: "two", y: 640 }, { x: "three", y: 12345 }]);
+                verticalBarPlot.addDataset(dataset1);
+                verticalBarPlot.addDataset(dataset2);
                 verticalBarPlot.renderTo(svg);
-                var allBars = verticalBarPlot.getAllSelections("a");
+                var allBars = verticalBarPlot.getAllSelections([dataset1]);
                 assert.strictEqual(allBars.size(), 3, "all bars retrieved");
                 var selectionData = allBars.data();
-                assert.includeMembers(selectionData, barData, "first dataset data in selection data");
+                assert.includeMembers(selectionData, dataset1.data(), "first dataset data in selection data");
                 svg.remove();
             });
-            it("retrieves correct selections (array arg)", function () {
-                var barData = [{ x: "foo", y: 5 }, { x: "bar", y: 640 }, { x: "zoo", y: 12345 }];
-                var barData2 = [{ x: "one", y: 5 }, { x: "two", y: 640 }, { x: "three", y: 12345 }];
-                verticalBarPlot.addDataset("a", barData);
-                verticalBarPlot.addDataset("b", barData2);
+            it("skips invalid Datasets", function () {
+                var dataset1 = new Plottable.Dataset([{ x: "foo", y: 5 }, { x: "bar", y: 640 }, { x: "zoo", y: 12345 }]);
+                var notAddedDataset = new Plottable.Dataset([{ x: "one", y: 5 }, { x: "two", y: 640 }, { x: "three", y: 12345 }]);
+                verticalBarPlot.addDataset(dataset1);
                 verticalBarPlot.renderTo(svg);
-                var allBars = verticalBarPlot.getAllSelections(["a", "b"]);
-                assert.strictEqual(allBars.size(), 6, "all bars retrieved");
-                var selectionData = allBars.data();
-                assert.includeMembers(selectionData, barData, "first dataset data in selection data");
-                assert.includeMembers(selectionData, barData2, "second dataset data in selection data");
-                svg.remove();
-            });
-            it("skips invalid keys", function () {
-                var barData = [{ x: "foo", y: 5 }, { x: "bar", y: 640 }, { x: "zoo", y: 12345 }];
-                var barData2 = [{ x: "one", y: 5 }, { x: "two", y: 640 }, { x: "three", y: 12345 }];
-                verticalBarPlot.addDataset("a", barData);
-                verticalBarPlot.addDataset("b", barData2);
-                verticalBarPlot.renderTo(svg);
-                var allBars = verticalBarPlot.getAllSelections(["a", "c"]);
+                var allBars = verticalBarPlot.getAllSelections([dataset1, notAddedDataset]);
                 assert.strictEqual(allBars.size(), 3, "all bars retrieved");
                 var selectionData = allBars.data();
-                assert.includeMembers(selectionData, barData, "first dataset data in selection data");
+                assert.includeMembers(selectionData, dataset1.data(), "first dataset data in selection data");
                 svg.remove();
             });
         });
@@ -4051,7 +3917,7 @@ describe("Plots", function () {
             var colorScale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
             var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
             var gridPlot = new Plottable.Plots.Grid(xScale, yScale, colorScale);
-            gridPlot.addDataset(DATA).project("fill", "magnitude", colorScale).project("x", "x", xScale).project("y", "y", yScale);
+            gridPlot.addDataset(new Plottable.Dataset(DATA)).project("fill", "magnitude", colorScale).project("x", "x", xScale).project("y", "y", yScale);
             gridPlot.renderTo(svg);
             VERIFY_CELLS(gridPlot._renderArea.selectAll("rect")[0]);
             svg.remove();
@@ -4102,7 +3968,7 @@ describe("Plots", function () {
             var colorScale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
             var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
             var gridPlot = new Plottable.Plots.Grid(xScale, yScale, colorScale);
-            gridPlot.addDataset(DATA).project("fill", "magnitude").project("x", "x", xScale).project("y", "y", yScale).renderTo(svg);
+            gridPlot.addDataset(new Plottable.Dataset(DATA)).project("fill", "magnitude").project("x", "x", xScale).project("y", "y", yScale).renderTo(svg);
             yScale.domain(["U", "V"]);
             var cells = gridPlot._renderArea.selectAll("rect")[0];
             var cellAU = d3.select(cells[0]);
@@ -4132,50 +3998,39 @@ describe("Plots", function () {
                 var colorScale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
                 var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
                 var gridPlot = new Plottable.Plots.Grid(xScale, yScale, colorScale);
-                gridPlot.addDataset("a", DATA).project("fill", "magnitude", colorScale).project("x", "x", xScale).project("y", "y", yScale);
+                var dataset = new Plottable.Dataset(DATA);
+                gridPlot.addDataset(dataset).project("fill", "magnitude", colorScale).project("x", "x", xScale).project("y", "y", yScale);
                 gridPlot.renderTo(svg);
                 var allCells = gridPlot.getAllSelections();
-                var allCells2 = gridPlot.getAllSelections(gridPlot._datasetKeysInOrder);
-                assert.deepEqual(allCells, allCells2, "all cells retrieved");
+                assert.strictEqual(allCells.size(), 4, "all cells retrieved");
                 svg.remove();
             });
-            it("retrieves correct selections (string arg)", function () {
+            it("retrieves correct selections", function () {
                 var xScale = new Plottable.Scales.Category();
                 var yScale = new Plottable.Scales.Category();
                 var colorScale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
                 var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
                 var gridPlot = new Plottable.Plots.Grid(xScale, yScale, colorScale);
-                gridPlot.addDataset("a", DATA).project("fill", "magnitude", colorScale).project("x", "x", xScale).project("y", "y", yScale);
+                var dataset = new Plottable.Dataset(DATA);
+                gridPlot.addDataset(dataset).project("fill", "magnitude", colorScale).project("x", "x", xScale).project("y", "y", yScale);
                 gridPlot.renderTo(svg);
-                var allCells = gridPlot.getAllSelections("a");
+                var allCells = gridPlot.getAllSelections([dataset]);
                 assert.strictEqual(allCells.size(), 4, "all cells retrieved");
                 var selectionData = allCells.data();
                 assert.includeMembers(selectionData, DATA, "data in selection data");
                 svg.remove();
             });
-            it("retrieves correct selections (array arg)", function () {
+            it("skips invalid Datasets", function () {
                 var xScale = new Plottable.Scales.Category();
                 var yScale = new Plottable.Scales.Category();
                 var colorScale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
                 var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
                 var gridPlot = new Plottable.Plots.Grid(xScale, yScale, colorScale);
-                gridPlot.addDataset("a", DATA).project("fill", "magnitude", colorScale).project("x", "x", xScale).project("y", "y", yScale);
+                var dataset = new Plottable.Dataset(DATA);
+                gridPlot.addDataset(dataset).project("fill", "magnitude", colorScale).project("x", "x", xScale).project("y", "y", yScale);
                 gridPlot.renderTo(svg);
-                var allCells = gridPlot.getAllSelections(["a"]);
-                assert.strictEqual(allCells.size(), 4, "all cells retrieved");
-                var selectionData = allCells.data();
-                assert.includeMembers(selectionData, DATA, "data in selection data");
-                svg.remove();
-            });
-            it("skips invalid keys", function () {
-                var xScale = new Plottable.Scales.Category();
-                var yScale = new Plottable.Scales.Category();
-                var colorScale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
-                var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-                var gridPlot = new Plottable.Plots.Grid(xScale, yScale, colorScale);
-                gridPlot.addDataset("a", DATA).project("fill", "magnitude", colorScale).project("x", "x", xScale).project("y", "y", yScale);
-                gridPlot.renderTo(svg);
-                var allCells = gridPlot.getAllSelections(["a", "b"]);
+                var dummyDataset = new Plottable.Dataset([]);
+                var allCells = gridPlot.getAllSelections([dataset, dummyDataset]);
                 assert.strictEqual(allCells.size(), 4, "all cells retrieved");
                 var selectionData = allCells.data();
                 assert.includeMembers(selectionData, DATA, "data in selection data");
@@ -4213,7 +4068,7 @@ describe("Plots", function () {
             var yScale = new Plottable.Scales.Linear();
             var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
             var rectanglePlot = new Plottable.Plots.Rectangle(xScale, yScale);
-            rectanglePlot.addDataset(DATA).project("x", "x", xScale).project("y", "y", yScale).project("x1", "x", xScale).project("y1", "y", yScale).project("x2", "x2", xScale).project("y2", "y2", yScale).renderTo(svg);
+            rectanglePlot.addDataset(new Plottable.Dataset(DATA)).project("x", "x", xScale).project("y", "y", yScale).project("x1", "x", xScale).project("y1", "y", yScale).project("x2", "x2", xScale).project("y2", "y2", yScale).renderTo(svg);
             VERIFY_CELLS(rectanglePlot._renderArea.selectAll("rect"));
             svg.remove();
         });
@@ -4234,7 +4089,7 @@ describe("Plots", function () {
             var cScale = new Plottable.Scales.Color();
             var plot = new Plottable.Plots.Grid(xScale, yScale, cScale);
             plot.project("x", "x", xScale).project("y", "y1", yScale).project("y2", "y2", yScale);
-            plot.addDataset(data1);
+            plot.addDataset(new Plottable.Dataset(data1));
             plot.renderTo(svg);
             var rectanglesSelection = plot._element.selectAll(".bar-area rect");
             assert.strictEqual(rectanglesSelection.size(), 5, "only 5 rectangles should be displayed");
@@ -4313,7 +4168,7 @@ describe("Plots", function () {
             var yScale = new Plottable.Scales.Linear();
             var data = [{ x: 0, y: 0 }, { x: 1, y: 1 }];
             var data2 = [{ x: 1, y: 2 }, { x: 3, y: 4 }];
-            var plot = new Plottable.Plots.Scatter(xScale, yScale).project("x", "x", xScale).project("y", "y", yScale).addDataset(data).addDataset(data2);
+            var plot = new Plottable.Plots.Scatter(xScale, yScale).project("x", "x", xScale).project("y", "y", yScale).addDataset(new Plottable.Dataset(data)).addDataset(new Plottable.Dataset(data2));
             plot.renderTo(svg);
             var allCircles = plot.getAllSelections();
             assert.strictEqual(allCircles.size(), 4, "all circles retrieved");
@@ -4334,7 +4189,7 @@ describe("Plots", function () {
             var yScale = new Plottable.Scales.Linear();
             var data = [{ x: 0, y: 0 }, { x: 1, y: 1 }];
             var data2 = [{ x: 1, y: 2 }, { x: 3, y: 4 }];
-            var plot = new Plottable.Plots.Scatter(xScale, yScale).project("x", "x", xScale).project("y", "y", yScale).addDataset(data).addDataset(data2);
+            var plot = new Plottable.Plots.Scatter(xScale, yScale).project("x", "x", xScale).project("y", "y", yScale).addDataset(new Plottable.Dataset(data)).addDataset(new Plottable.Dataset(data2));
             plot.renderTo(svg);
             var points = d3.selectAll(".scatter-plot path");
             var d0 = data[0];
@@ -4403,7 +4258,7 @@ describe("Plots", function () {
             var dataAreaPart = { xMin: 3, xMax: 9, yMin: 54, yMax: 27 };
             var colorAccessor = function (d, i, m) { return d3.rgb(d.x, d.y, i).toString(); };
             var circlesInArea;
-            var quadraticDataset = TestMethods.makeQuadraticSeries(10);
+            var quadraticDataset = new Plottable.Dataset(TestMethods.makeQuadraticSeries(10));
             function getCirclePlotVerifier() {
                 // creates a function that verifies that circles are drawn properly after accounting for svg transform
                 // and then modifies circlesInArea to contain the number of circles that were discovered in the plot area
@@ -4487,125 +4342,129 @@ describe("Plots", function () {
             stackedPlot._isVertical = true;
         });
         it("uses positive offset on stacking the 0 value", function () {
-            var data1 = [
+            var data0 = [
                 { x: 1, y: 1 },
                 { x: 3, y: 1 }
             ];
-            var data2 = [
+            var data1 = [
                 { x: 1, y: 0 },
                 { x: 3, y: 1 }
             ];
-            var data3 = [
+            var data2 = [
                 { x: 1, y: -1 },
                 { x: 3, y: 1 }
             ];
-            var data4 = [
+            var data3 = [
                 { x: 1, y: 1 },
                 { x: 3, y: 1 }
             ];
-            var data5 = [
+            var data4 = [
                 { x: 1, y: 0 },
                 { x: 3, y: 1 }
             ];
-            stackedPlot.addDataset("d1", data1);
-            stackedPlot.addDataset("d2", data2);
-            stackedPlot.addDataset("d3", data3);
-            stackedPlot.addDataset("d4", data4);
-            stackedPlot.addDataset("d5", data5);
-            var ds2PlotMetadata = stackedPlot._key2PlotDatasetKey.get("d2").plotMetadata;
-            var ds5PlotMetadata = stackedPlot._key2PlotDatasetKey.get("d5").plotMetadata;
-            assert.strictEqual(ds2PlotMetadata.offsets.get("1"), 1, "positive offset was used");
-            assert.strictEqual(ds5PlotMetadata.offsets.get("1"), 2, "positive offset was used");
+            stackedPlot.addDataset(new Plottable.Dataset(data0));
+            stackedPlot.addDataset(new Plottable.Dataset(data1));
+            stackedPlot.addDataset(new Plottable.Dataset(data2));
+            stackedPlot.addDataset(new Plottable.Dataset(data3));
+            stackedPlot.addDataset(new Plottable.Dataset(data4));
+            // HACKHACK #1984: Dataset keys are being removed, so these are internal keys
+            var keys = stackedPlot._key2PlotDatasetKey.keys();
+            var ds1PlotMetadata = stackedPlot._key2PlotDatasetKey.get(keys[1]).plotMetadata;
+            var ds4PlotMetadata = stackedPlot._key2PlotDatasetKey.get(keys[4]).plotMetadata;
+            assert.strictEqual(ds1PlotMetadata.offsets.get("1"), 1, "positive offset was used");
+            assert.strictEqual(ds4PlotMetadata.offsets.get("1"), 2, "positive offset was used");
         });
         it("uses negative offset on stacking the 0 value on all negative/0 valued data", function () {
-            var data1 = [
+            var data0 = [
                 { x: 1, y: -2 }
             ];
-            var data2 = [
+            var data1 = [
                 { x: 1, y: 0 }
             ];
-            var data3 = [
+            var data2 = [
                 { x: 1, y: -1 }
             ];
-            var data4 = [
+            var data3 = [
                 { x: 1, y: 0 }
             ];
-            stackedPlot.addDataset("d1", data1);
-            stackedPlot.addDataset("d2", data2);
-            stackedPlot.addDataset("d3", data3);
-            stackedPlot.addDataset("d4", data4);
-            var ds2PlotMetadata = stackedPlot._key2PlotDatasetKey.get("d2").plotMetadata;
-            var ds4PlotMetadata = stackedPlot._key2PlotDatasetKey.get("d4").plotMetadata;
-            assert.strictEqual(ds2PlotMetadata.offsets.get("1"), -2, "positive offset was used");
-            assert.strictEqual(ds4PlotMetadata.offsets.get("1"), -3, "positive offset was used");
+            stackedPlot.addDataset(new Plottable.Dataset(data0));
+            stackedPlot.addDataset(new Plottable.Dataset(data1));
+            stackedPlot.addDataset(new Plottable.Dataset(data2));
+            stackedPlot.addDataset(new Plottable.Dataset(data3));
+            // HACKHACK #1984: Dataset keys are being removed, so these are internal keys
+            var keys = stackedPlot._key2PlotDatasetKey.keys();
+            var ds1PlotMetadata = stackedPlot._key2PlotDatasetKey.get(keys[1]).plotMetadata;
+            var ds3PlotMetadata = stackedPlot._key2PlotDatasetKey.get(keys[3]).plotMetadata;
+            assert.strictEqual(ds1PlotMetadata.offsets.get("1"), -2, "positive offset was used");
+            assert.strictEqual(ds3PlotMetadata.offsets.get("1"), -3, "positive offset was used");
         });
         it("project can be called after addDataset", function () {
-            var data1 = [
+            var data0 = [
                 { a: 1, b: 2 }
             ];
-            var data2 = [
+            var data1 = [
                 { a: 1, b: 4 }
             ];
-            stackedPlot.addDataset("d1", data1);
-            stackedPlot.addDataset("d2", data2);
-            var ds1PlotMetadata = stackedPlot._key2PlotDatasetKey.get("d1").plotMetadata;
-            var ds2PlotMetadata = stackedPlot._key2PlotDatasetKey.get("d2").plotMetadata;
-            assert.isTrue(isNaN(ds1PlotMetadata.offsets.get("1")), "stacking is initially incorrect");
+            stackedPlot.addDataset(new Plottable.Dataset(data0));
+            stackedPlot.addDataset(new Plottable.Dataset(data1));
+            // HACKHACK #1984: Dataset keys are being removed, so these are internal keys
+            var keys = stackedPlot._key2PlotDatasetKey.keys();
+            var ds0PlotMetadata = stackedPlot._key2PlotDatasetKey.get(keys[0]).plotMetadata;
+            var ds1PlotMetadata = stackedPlot._key2PlotDatasetKey.get(keys[1]).plotMetadata;
+            assert.isTrue(isNaN(ds0PlotMetadata.offsets.get("1")), "stacking is initially incorrect");
             stackedPlot.project("x", "a");
             stackedPlot.project("y", "b");
-            assert.strictEqual(ds2PlotMetadata.offsets.get("1"), 2, "stacking was done correctly");
+            assert.strictEqual(ds1PlotMetadata.offsets.get("1"), 2, "stacking was done correctly");
         });
         it("strings are coerced to numbers for stacking", function () {
-            var data1 = [
+            var data0 = [
                 { x: 1, y: "-2" }
             ];
-            var data2 = [
+            var data1 = [
                 { x: 1, y: "3" }
             ];
-            var data3 = [
+            var data2 = [
                 { x: 1, y: "-1" }
             ];
-            var data4 = [
+            var data3 = [
                 { x: 1, y: "5" }
             ];
-            var data5 = [
+            var data4 = [
                 { x: 1, y: "1" }
             ];
-            var data6 = [
+            var data5 = [
                 { x: 1, y: "-1" }
             ];
-            stackedPlot.addDataset("d1", data1);
-            stackedPlot.addDataset("d2", data2);
-            stackedPlot.addDataset("d3", data3);
-            stackedPlot.addDataset("d4", data4);
-            stackedPlot.addDataset("d5", data5);
-            stackedPlot.addDataset("d6", data6);
-            var ds3PlotMetadata = stackedPlot._key2PlotDatasetKey.get("d3").plotMetadata;
-            var ds4PlotMetadata = stackedPlot._key2PlotDatasetKey.get("d4").plotMetadata;
-            var ds5PlotMetadata = stackedPlot._key2PlotDatasetKey.get("d5").plotMetadata;
-            var ds6PlotMetadata = stackedPlot._key2PlotDatasetKey.get("d6").plotMetadata;
-            assert.strictEqual(ds3PlotMetadata.offsets.get("1"), -2, "stacking on data1 numerical y value");
-            assert.strictEqual(ds4PlotMetadata.offsets.get("1"), 3, "stacking on data2 numerical y value");
-            assert.strictEqual(ds5PlotMetadata.offsets.get("1"), 8, "stacking on data1 + data3 numerical y values");
-            assert.strictEqual(ds6PlotMetadata.offsets.get("1"), -3, "stacking on data2 + data4 numerical y values");
+            stackedPlot.addDataset(new Plottable.Dataset(data0));
+            stackedPlot.addDataset(new Plottable.Dataset(data1));
+            stackedPlot.addDataset(new Plottable.Dataset(data2));
+            stackedPlot.addDataset(new Plottable.Dataset(data3));
+            stackedPlot.addDataset(new Plottable.Dataset(data4));
+            stackedPlot.addDataset(new Plottable.Dataset(data5));
+            // HACKHACK #1984: Dataset keys are being removed, so these are internal keys
+            var keys = stackedPlot._key2PlotDatasetKey.keys();
+            var ds2PlotMetadata = stackedPlot._key2PlotDatasetKey.get(keys[2]).plotMetadata;
+            var ds3PlotMetadata = stackedPlot._key2PlotDatasetKey.get(keys[3]).plotMetadata;
+            var ds4PlotMetadata = stackedPlot._key2PlotDatasetKey.get(keys[4]).plotMetadata;
+            var ds5PlotMetadata = stackedPlot._key2PlotDatasetKey.get(keys[5]).plotMetadata;
+            assert.strictEqual(ds2PlotMetadata.offsets.get("1"), -2, "stacking on data1 numerical y value");
+            assert.strictEqual(ds3PlotMetadata.offsets.get("1"), 3, "stacking on data2 numerical y value");
+            assert.strictEqual(ds4PlotMetadata.offsets.get("1"), 8, "stacking on data1 + data3 numerical y values");
+            assert.strictEqual(ds5PlotMetadata.offsets.get("1"), -3, "stacking on data2 + data4 numerical y values");
             assert.deepEqual(stackedPlot._stackedExtent, [-4, 9], "stacked extent is as normal");
         });
         it("stacks correctly on empty data", function () {
-            var data1 = [
-            ];
-            var data2 = [
-            ];
-            stackedPlot.addDataset(data1);
-            stackedPlot.addDataset(data2);
-            assert.deepEqual(data1, [], "empty data causes no stacking to happen");
-            assert.deepEqual(data2, [], "empty data causes no stacking to happen");
+            var dataset1 = new Plottable.Dataset([]);
+            var dataset2 = new Plottable.Dataset([]);
+            assert.doesNotThrow(function () { return stackedPlot.addDataset(dataset1); }, Error);
+            assert.doesNotThrow(function () { return stackedPlot.addDataset(dataset2); }, Error);
         });
         it("does not crash on stacking no datasets", function () {
-            var data1 = [
+            var dataset1 = new Plottable.Dataset([
                 { x: 1, y: -2 }
-            ];
-            stackedPlot.addDataset("a", data1);
-            assert.doesNotThrow(function () { return stackedPlot.removeDataset("a"); }, Error);
+            ]);
+            stackedPlot.addDataset(dataset1);
+            assert.doesNotThrow(function () { return stackedPlot.removeDataset(dataset1); }, Error);
         });
     });
     describe("auto scale domain on numeric", function () {
@@ -4614,32 +4473,32 @@ describe("Plots", function () {
         var SVG_HEIGHT = 400;
         var yScale;
         var xScale;
-        var data1;
-        var data2;
+        var dataset1;
+        var dataset2;
         beforeEach(function () {
             svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
             xScale = new Plottable.Scales.Linear().domain([1, 2]);
             yScale = new Plottable.Scales.Linear();
-            data1 = [
+            dataset1 = new Plottable.Dataset([
                 { x: 1, y: 1 },
                 { x: 2, y: 2 },
                 { x: 3, y: 8 }
-            ];
-            data2 = [
+            ]);
+            dataset2 = new Plottable.Dataset([
                 { x: 1, y: 2 },
                 { x: 2, y: 2 },
                 { x: 3, y: 3 }
-            ];
+            ]);
         });
         it("auto scales correctly on stacked area", function () {
-            var plot = new Plottable.Plots.StackedArea(xScale, yScale).addDataset(data1).addDataset(data2).project("x", "x", xScale).project("y", "y", yScale);
+            var plot = new Plottable.Plots.StackedArea(xScale, yScale).addDataset(dataset1).addDataset(dataset2).project("x", "x", xScale).project("y", "y", yScale);
             plot.automaticallyAdjustYScaleOverVisiblePoints(true);
             plot.renderTo(svg);
             assert.deepEqual(yScale.domain(), [0, 4.5], "auto scales takes stacking into account");
             svg.remove();
         });
         it("auto scales correctly on stacked bar", function () {
-            var plot = new Plottable.Plots.StackedBar(xScale, yScale).addDataset(data1).addDataset(data2).project("x", "x", xScale).project("y", "y", yScale);
+            var plot = new Plottable.Plots.StackedBar(xScale, yScale).addDataset(dataset1).addDataset(dataset2).project("x", "x", xScale).project("y", "y", yScale);
             plot.automaticallyAdjustYScaleOverVisiblePoints(true);
             plot.renderTo(svg);
             assert.deepEqual(yScale.domain(), [0, 4.5], "auto scales takes stacking into account");
@@ -4652,32 +4511,32 @@ describe("Plots", function () {
         var SVG_HEIGHT = 400;
         var yScale;
         var xScale;
-        var data1;
-        var data2;
+        var dataset1;
+        var dataset2;
         beforeEach(function () {
             svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
             xScale = new Plottable.Scales.Category().domain(["a", "b"]);
             yScale = new Plottable.Scales.Linear();
-            data1 = [
+            dataset1 = new Plottable.Dataset([
                 { x: "a", y: 1 },
                 { x: "b", y: 2 },
                 { x: "c", y: 8 }
-            ];
-            data2 = [
+            ]);
+            dataset2 = new Plottable.Dataset([
                 { x: "a", y: 2 },
                 { x: "b", y: 2 },
                 { x: "c", y: 3 }
-            ];
+            ]);
         });
         it("auto scales correctly on stacked area", function () {
-            var plot = new Plottable.Plots.StackedArea(yScale, yScale).addDataset(data1).addDataset(data2).project("x", "x", xScale).project("y", "y", yScale);
+            var plot = new Plottable.Plots.StackedArea(yScale, yScale).addDataset(dataset1).addDataset(dataset2).project("x", "x", xScale).project("y", "y", yScale);
             plot.automaticallyAdjustYScaleOverVisiblePoints(true);
             plot.renderTo(svg);
             assert.deepEqual(yScale.domain(), [0, 4.5], "auto scales takes stacking into account");
             svg.remove();
         });
         it("auto scales correctly on stacked bar", function () {
-            var plot = new Plottable.Plots.StackedBar(xScale, yScale).addDataset(data1).addDataset(data2).project("x", "x", xScale).project("y", "y", yScale);
+            var plot = new Plottable.Plots.StackedBar(xScale, yScale).addDataset(dataset1).addDataset(dataset2).project("x", "x", xScale).project("y", "y", yScale);
             plot.automaticallyAdjustYScaleOverVisiblePoints(true);
             plot.renderTo(svg);
             assert.deepEqual(yScale.domain(), [0, 4.5], "auto scales takes stacking into account");
@@ -4714,9 +4573,10 @@ describe("Plots", function () {
                 { key: "a", value: 1 },
                 { key: "b", value: -2 }
             ];
+            var dataset1 = new Plottable.Dataset(data1);
             var dataset2 = new Plottable.Dataset(data2);
-            stackedBarPlot.addDataset("d1", data1);
-            stackedBarPlot.addDataset("d2", dataset2);
+            stackedBarPlot.addDataset(dataset1);
+            stackedBarPlot.addDataset(dataset2);
             assert.closeTo(yScale.domain()[0], -6, 1, "min stacked extent is as normal");
             assert.closeTo(yScale.domain()[1], 4, 1, "max stacked extent is as normal");
             dataset2.data(data2_b);
@@ -4754,8 +4614,8 @@ describe("Plots", function () {
             dataset1 = new Plottable.Dataset(data1);
             dataset2 = new Plottable.Dataset(data2);
             renderer = new Plottable.Plots.StackedArea(xScale, yScale);
-            renderer.addDataset(data1);
-            renderer.addDataset(data2);
+            renderer.addDataset(dataset1);
+            renderer.addDataset(dataset2);
             renderer.project("x", "x", xScale);
             renderer.project("y", "y", yScale);
             renderer.project("fill", "type", colorScale);
@@ -4795,8 +4655,8 @@ describe("Plots", function () {
                 { x: 3, y: 1, type: "b" }
             ];
             renderer = new Plottable.Plots.StackedArea(xScale, yScale);
-            renderer.addDataset(data1);
-            renderer.addDataset(data2);
+            renderer.addDataset(new Plottable.Dataset(data1));
+            renderer.addDataset(new Plottable.Dataset(data2));
             renderer.project("fill", "type", colorScale);
             renderer.project("x", "x", xScale);
             renderer.project("y", "y", yScale);
@@ -4833,8 +4693,8 @@ describe("Plots", function () {
                 { x: 3, y: 1, type: "b" }
             ];
             renderer = new Plottable.Plots.StackedArea(xScale, yScale);
-            renderer.addDataset(data1);
-            renderer.addDataset(data2);
+            renderer.addDataset(new Plottable.Dataset(data1));
+            renderer.addDataset(new Plottable.Dataset(data2));
             renderer.project("fill", "type", colorScale);
             renderer.project("x", "x", xScale);
             renderer.project("y", "y", yScale);
@@ -4850,7 +4710,8 @@ describe("Plots", function () {
                 { x: 1, y: 0, type: "c" },
                 { x: 3, y: 0, type: "c" }
             ];
-            renderer.addDataset("a", new Plottable.Dataset(data));
+            var datasetA = new Plottable.Dataset(data);
+            renderer.addDataset(datasetA);
             renderer.renderTo(svg);
             assert.strictEqual(oldLowerBound, yScale.domain()[0], "lower bound doesn't change with 0 added");
             assert.strictEqual(oldUpperBound, yScale.domain()[1], "upper bound doesn't change with 0 added");
@@ -4861,7 +4722,8 @@ describe("Plots", function () {
                 { x: 1, y: 10, type: "d" },
                 { x: 3, y: 3, type: "d" }
             ];
-            renderer.addDataset("b", new Plottable.Dataset(data));
+            var datasetB = new Plottable.Dataset(data);
+            renderer.addDataset(datasetB);
             renderer.renderTo(svg);
             assert.closeTo(oldLowerBound, yScale.domain()[0], 2, "lower bound doesn't change on positive addition");
             assert.closeTo(oldUpperBound + 10, yScale.domain()[1], 2, "upper bound increases");
@@ -4871,12 +4733,13 @@ describe("Plots", function () {
                 { x: 1, y: 0, type: "e" },
                 { x: 3, y: 1, type: "e" }
             ];
-            renderer.addDataset("c", new Plottable.Dataset(data));
+            var datasetC = new Plottable.Dataset(data);
+            renderer.addDataset(datasetC);
             renderer.renderTo(svg);
             assert.strictEqual(oldUpperBound, yScale.domain()[1], "upper bound doesn't increase since maximum doesn't increase");
-            renderer.removeDataset("a");
-            renderer.removeDataset("b");
-            renderer.removeDataset("c");
+            renderer.removeDataset(datasetA);
+            renderer.removeDataset(datasetB);
+            renderer.removeDataset(datasetC);
             svg.remove();
         });
         it("stacks correctly on removing datasets", function () {
@@ -4885,33 +4748,36 @@ describe("Plots", function () {
                 { x: 1, y: 0, type: "c" },
                 { x: 3, y: 0, type: "c" }
             ];
-            renderer.addDataset("a", new Plottable.Dataset(data));
+            var datasetA = new Plottable.Dataset(data);
+            renderer.addDataset(datasetA);
             data = [
                 { x: 1, y: 10, type: "d" },
                 { x: 3, y: 3, type: "d" }
             ];
-            renderer.addDataset("b", new Plottable.Dataset(data));
+            var datasetB = new Plottable.Dataset(data);
+            renderer.addDataset(datasetB);
             data = [
                 { x: 1, y: 0, type: "e" },
                 { x: 3, y: 1, type: "e" }
             ];
-            renderer.addDataset("c", new Plottable.Dataset(data));
+            var datasetC = new Plottable.Dataset(data);
+            renderer.addDataset(datasetC);
             renderer.project("x", "x", xScale);
             renderer.project("y", "y", yScale);
             renderer.renderTo(svg);
             assert.closeTo(16, yScale.domain()[1], 2, "Initially starts with around 14 at highest extent");
             renderer.detach();
-            renderer.removeDataset("a");
+            renderer.removeDataset(datasetA);
             renderer.renderTo(svg);
             assert.closeTo(16, yScale.domain()[1], 2, "Remains with around 14 at highest extent");
             var oldUpperBound = yScale.domain()[1];
             renderer.detach();
-            renderer.removeDataset("b");
+            renderer.removeDataset(datasetB);
             renderer.renderTo(svg);
             assert.closeTo(oldUpperBound - 10, yScale.domain()[1], 2, "Highest extent decreases by around 10");
             oldUpperBound = yScale.domain()[1];
             renderer.detach();
-            renderer.removeDataset("c");
+            renderer.removeDataset(datasetC);
             renderer.renderTo(svg);
             assert.strictEqual(oldUpperBound, yScale.domain()[1], "Extent doesn't change if maximum doesn't change");
             svg.remove();
@@ -5005,8 +4871,8 @@ describe("Plots", function () {
             renderer = new Plottable.Plots.StackedArea(xScale, yScale);
             renderer.project("y", "yTest", yScale);
             renderer.project("x", "x", xScale);
-            renderer.addDataset(data1);
-            renderer.addDataset(data2);
+            renderer.addDataset(new Plottable.Dataset(data1));
+            renderer.addDataset(new Plottable.Dataset(data2));
             renderer.project("fill", "type", colorScale);
             var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
             new Plottable.Components.Table([[renderer], [xAxis]]).renderTo(svg);
@@ -5038,17 +4904,17 @@ describe("Plots", function () {
     });
     describe("fail safe tests", function () {
         it("0 as a string coerces correctly and is not subject to off by one errors", function () {
-            var data1 = [
+            var data0 = [
                 { x: 1, y: 1, fill: "blue" },
                 { x: 2, y: 2, fill: "blue" },
                 { x: 3, y: 3, fill: "blue" },
             ];
-            var data2 = [
+            var data1 = [
                 { x: 1, y: 1, fill: "red" },
                 { x: 2, y: "0", fill: "red" },
                 { x: 3, y: 3, fill: "red" },
             ];
-            var data3 = [
+            var data2 = [
                 { x: 1, y: 1, fill: "green" },
                 { x: 2, y: 2, fill: "green" },
                 { x: 3, y: 3, fill: "green" },
@@ -5056,30 +4922,33 @@ describe("Plots", function () {
             var xScale = new Plottable.Scales.Linear();
             var yScale = new Plottable.Scales.Linear();
             var plot = new Plottable.Plots.StackedArea(xScale, yScale);
-            plot.addDataset("d1", data1);
-            plot.addDataset("d2", data2);
-            plot.addDataset("d3", data3);
+            var dataset0 = new Plottable.Dataset(data0);
+            plot.addDataset(dataset0);
+            var dataset1 = new Plottable.Dataset(data1);
+            plot.addDataset(dataset1);
+            var dataset2 = new Plottable.Dataset(data2);
+            plot.addDataset(dataset2);
             plot.project("fill", "fill");
             plot.project("x", "x", xScale).project("y", "y", yScale);
-            var ds1Point2Offset = plot._key2PlotDatasetKey.get("d1").plotMetadata.offsets.get(2);
-            var ds2Point2Offset = plot._key2PlotDatasetKey.get("d2").plotMetadata.offsets.get(2);
-            var ds3Point2Offset = plot._key2PlotDatasetKey.get("d3").plotMetadata.offsets.get(2);
-            assert.strictEqual(ds1Point2Offset, 0, "dataset1 (blue) should have no offset on middle point");
-            assert.strictEqual(ds2Point2Offset, 2, "dataset2 (red) should have this offset and be on top of blue dataset");
-            assert.strictEqual(ds3Point2Offset, 2, "dataset3 (green) should have this offset because the red dataset (ds2) has no height in this point");
+            var ds0Point2Offset = plot._key2PlotDatasetKey.get("_0").plotMetadata.offsets.get(2);
+            var ds1Point2Offset = plot._key2PlotDatasetKey.get("_1").plotMetadata.offsets.get(2);
+            var ds2Point2Offset = plot._key2PlotDatasetKey.get("_2").plotMetadata.offsets.get(2);
+            assert.strictEqual(ds0Point2Offset, 0, "dataset0 (blue) sh1uld have no offset on middle point");
+            assert.strictEqual(ds1Point2Offset, 2, "dataset1 (red) should have this offset and be on top of blue dataset");
+            assert.strictEqual(ds2Point2Offset, 2, "dataset2 (green) should have this offset because the red dataset has no height in this point");
         });
         it("null defaults to 0", function () {
-            var data1 = [
+            var data0 = [
                 { x: 1, y: 1, fill: "blue" },
                 { x: 2, y: 2, fill: "blue" },
                 { x: 3, y: 3, fill: "blue" },
             ];
-            var data2 = [
+            var data1 = [
                 { x: 1, y: 1, fill: "red" },
                 { x: 2, y: "0", fill: "red" },
                 { x: 3, y: 3, fill: "red" },
             ];
-            var data3 = [
+            var data2 = [
                 { x: 1, y: 1, fill: "green" },
                 { x: 2, y: 2, fill: "green" },
                 { x: 3, y: 3, fill: "green" },
@@ -5087,17 +4956,20 @@ describe("Plots", function () {
             var xScale = new Plottable.Scales.Linear();
             var yScale = new Plottable.Scales.Linear();
             var plot = new Plottable.Plots.StackedArea(xScale, yScale);
-            plot.addDataset("d1", data1);
-            plot.addDataset("d2", data2);
-            plot.addDataset("d3", data3);
+            var dataset0 = new Plottable.Dataset(data0);
+            plot.addDataset(dataset0);
+            var dataset1 = new Plottable.Dataset(data1);
+            plot.addDataset(dataset1);
+            var dataset2 = new Plottable.Dataset(data2);
+            plot.addDataset(dataset2);
             plot.project("fill", "fill");
             plot.project("x", "x", xScale).project("y", "y", yScale);
-            var ds1Point2Offset = plot._key2PlotDatasetKey.get("d1").plotMetadata.offsets.get(2);
-            var ds2Point2Offset = plot._key2PlotDatasetKey.get("d2").plotMetadata.offsets.get(2);
-            var ds3Point2Offset = plot._key2PlotDatasetKey.get("d3").plotMetadata.offsets.get(2);
-            assert.strictEqual(ds1Point2Offset, 0, "dataset1 (blue) should have no offset on middle point");
-            assert.strictEqual(ds2Point2Offset, 2, "dataset2 (red) should have this offset and be on top of blue dataset");
-            assert.strictEqual(ds3Point2Offset, 2, "dataset3 (green) should have this offset because the red dataset (ds2) has no height in this point");
+            var ds0Point2Offset = plot._key2PlotDatasetKey.get("_0").plotMetadata.offsets.get(2);
+            var ds1Point2Offset = plot._key2PlotDatasetKey.get("_1").plotMetadata.offsets.get(2);
+            var ds2Point2Offset = plot._key2PlotDatasetKey.get("_2").plotMetadata.offsets.get(2);
+            assert.strictEqual(ds0Point2Offset, 0, "dataset0 (blue) should have no offset on middle point");
+            assert.strictEqual(ds1Point2Offset, 2, "dataset1 (red) should have this offset and be on top of blue dataset");
+            assert.strictEqual(ds2Point2Offset, 2, "dataset2 (green) should have this offset because the red dataset has no height in this point");
         });
     });
 });
@@ -5250,10 +5122,10 @@ describe("Plots", function () {
                 { x: "B", y: 4 }
             ];
             plot = new Plottable.Plots.StackedBar(xScale, yScale);
-            plot.addDataset(data1);
-            plot.addDataset(data2);
-            plot.addDataset(data3);
-            plot.addDataset(data4);
+            plot.addDataset(new Plottable.Dataset(data1));
+            plot.addDataset(new Plottable.Dataset(data2));
+            plot.addDataset(new Plottable.Dataset(data3));
+            plot.addDataset(new Plottable.Dataset(data4));
             plot.project("x", "x", xScale);
             plot.project("y", "y", yScale);
             plot.baseline(0);
@@ -5312,8 +5184,8 @@ describe("Plots", function () {
             renderer = new Plottable.Plots.StackedBar(xScale, yScale, false);
             renderer.project("y", "name", yScale);
             renderer.project("x", "y", xScale);
-            renderer.addDataset(data1);
-            renderer.addDataset(data2);
+            renderer.addDataset(new Plottable.Dataset(data1));
+            renderer.addDataset(new Plottable.Dataset(data2));
             renderer.baseline(0);
             var yAxis = new Plottable.Axes.Category(yScale, "left");
             new Plottable.Components.Table([[yAxis, renderer]]).renderTo(svg);
@@ -5377,9 +5249,9 @@ describe("Plots", function () {
                 { x: "C", y: 7, type: "c" }
             ];
             plot = new Plottable.Plots.StackedBar(xScale, yScale);
-            plot.addDataset(data1);
-            plot.addDataset(data2);
-            plot.addDataset(data3);
+            plot.addDataset(new Plottable.Dataset(data1));
+            plot.addDataset(new Plottable.Dataset(data2));
+            plot.addDataset(new Plottable.Dataset(data3));
             plot.project("x", "x", xScale);
             plot.project("y", "y", yScale);
             var xAxis = new Plottable.Axes.Category(xScale, "bottom");
@@ -5425,9 +5297,9 @@ describe("Plots", function () {
                 { y: "C", x: 7, type: "c" }
             ];
             plot = new Plottable.Plots.StackedBar(xScale, yScale, false);
-            plot.addDataset(data1);
-            plot.addDataset(data2);
-            plot.addDataset(data3);
+            plot.addDataset(new Plottable.Dataset(data1));
+            plot.addDataset(new Plottable.Dataset(data2));
+            plot.addDataset(new Plottable.Dataset(data3));
             plot.project("x", "x", xScale);
             plot.project("y", "y", yScale);
             plot.renderTo(svg);
@@ -5460,16 +5332,16 @@ describe("Plots", function () {
             var xScale = new Plottable.Scales.Category();
             var yScale = new Plottable.Scales.Linear();
             var plot = new Plottable.Plots.StackedBar(xScale, yScale);
-            plot.addDataset("d1", data1);
-            plot.addDataset("d2", data2);
+            plot.addDataset(new Plottable.Dataset(data1));
+            plot.addDataset(new Plottable.Dataset(data2));
             plot.project("fill", "fill");
             plot.project("x", "x", xScale).project("y", "y", yScale);
-            var ds1FirstColumnOffset = plot._key2PlotDatasetKey.get("d1").plotMetadata.offsets.get("A");
-            var ds2FirstColumnOffset = plot._key2PlotDatasetKey.get("d2").plotMetadata.offsets.get("A");
-            assert.strictEqual(typeof ds1FirstColumnOffset, "number", "ds1 offset should be a number");
-            assert.strictEqual(typeof ds2FirstColumnOffset, "number", "ds2 offset should be a number");
+            var ds1FirstColumnOffset = plot._key2PlotDatasetKey.get("_0").plotMetadata.offsets.get("A");
+            var ds2FirstColumnOffset = plot._key2PlotDatasetKey.get("_1").plotMetadata.offsets.get("A");
+            assert.strictEqual(typeof ds1FirstColumnOffset, "number", "ds0 offset should be a number");
+            assert.strictEqual(typeof ds2FirstColumnOffset, "number", "ds1 offset should be a number");
+            assert.isFalse(Plottable.Utils.Methods.isNaN(ds1FirstColumnOffset), "ds0 offset should not be NaN");
             assert.isFalse(Plottable.Utils.Methods.isNaN(ds1FirstColumnOffset), "ds1 offset should not be NaN");
-            assert.isFalse(Plottable.Utils.Methods.isNaN(ds1FirstColumnOffset), "ds2 offset should not be NaN");
         });
         it("bad values on the primary axis should default to 0 (be ignored)", function () {
             var data1 = [
@@ -5490,19 +5362,20 @@ describe("Plots", function () {
             var xScale = new Plottable.Scales.Category();
             var yScale = new Plottable.Scales.Linear();
             var plot = new Plottable.Plots.StackedBar(xScale, yScale);
-            plot.addDataset("d1", data1);
-            plot.addDataset("d2", data2);
-            plot.addDataset("d3", data3);
-            plot.addDataset("d4", data4);
-            plot.addDataset("d5", data5);
+            plot.addDataset(new Plottable.Dataset(data1));
+            plot.addDataset(new Plottable.Dataset(data2));
+            plot.addDataset(new Plottable.Dataset(data3));
+            plot.addDataset(new Plottable.Dataset(data4));
+            plot.addDataset(new Plottable.Dataset(data5));
             plot.project("fill", "fill");
             plot.project("x", "x", xScale).project("y", "y", yScale);
-            var offset1 = plot._key2PlotDatasetKey.get("d1").plotMetadata.offsets.get("A");
-            var offset3 = plot._key2PlotDatasetKey.get("d3").plotMetadata.offsets.get("A");
-            var offset5 = plot._key2PlotDatasetKey.get("d5").plotMetadata.offsets.get("A");
-            assert.strictEqual(offset1, 0, "Plot columns should start from offset 0 (at the very bottom)");
-            assert.strictEqual(offset3, 1, "Bar 3 should have offset 1, because bar 2 was not rendered");
-            assert.strictEqual(offset5, 3, "Bar 5 should have offset 3, because bar 4 was not rendered");
+            var keys = plot._key2PlotDatasetKey.keys();
+            var offset0 = plot._key2PlotDatasetKey.get(keys[0]).plotMetadata.offsets.get("A");
+            var offset2 = plot._key2PlotDatasetKey.get(keys[2]).plotMetadata.offsets.get("A");
+            var offset4 = plot._key2PlotDatasetKey.get(keys[4]).plotMetadata.offsets.get("A");
+            assert.strictEqual(offset0, 0, "Plot columns should start from offset 0 (at the very bottom)");
+            assert.strictEqual(offset2, 1, "third bar should have offset 1, because second bar was not rendered");
+            assert.strictEqual(offset4, 3, "fifth bar should have offset 3, because fourth bar was not rendered");
         });
     });
 });
@@ -5615,8 +5488,8 @@ describe("Plots", function () {
             dataset1 = new Plottable.Dataset(data1);
             dataset2 = new Plottable.Dataset(data2);
             renderer = new Plottable.Plots.ClusteredBar(xScale, yScale, false);
-            renderer.addDataset(data1);
-            renderer.addDataset(data2);
+            renderer.addDataset(new Plottable.Dataset(data1));
+            renderer.addDataset(new Plottable.Dataset(data2));
             renderer.baseline(0);
             renderer.project("x", "x", xScale);
             renderer.project("y", "y", yScale);
@@ -5669,9 +5542,9 @@ describe("Plots", function () {
             var data2 = [{ x: "A", y: 2 }, { x: "B", y: 4 }];
             var data3 = [{ x: "B", y: 15 }, { x: "C", y: 15 }];
             plot = new Plottable.Plots.ClusteredBar(xScale, yScale);
-            plot.addDataset(data1);
-            plot.addDataset(data2);
-            plot.addDataset(data3);
+            plot.addDataset(new Plottable.Dataset(data1));
+            plot.addDataset(new Plottable.Dataset(data2));
+            plot.addDataset(new Plottable.Dataset(data3));
             plot.baseline(0);
             plot.project("x", "x", xScale);
             plot.project("y", "y", yScale);
@@ -5714,9 +5587,9 @@ describe("Plots", function () {
             var data2 = [{ y: "A", x: 2 }, { y: "B", x: 4 }];
             var data3 = [{ y: "B", x: 15 }, { y: "C", x: 15 }];
             plot = new Plottable.Plots.ClusteredBar(xScale, yScale, false);
-            plot.addDataset(data1);
-            plot.addDataset(data2);
-            plot.addDataset(data3);
+            plot.addDataset(new Plottable.Dataset(data1));
+            plot.addDataset(new Plottable.Dataset(data2));
+            plot.addDataset(new Plottable.Dataset(data3));
             plot.project("x", "x", xScale);
             plot.project("y", "y", yScale);
             plot.renderTo(svg);
@@ -5761,7 +5634,8 @@ describe("Metadata", function () {
     });
     it("plot metadata is set properly", function () {
         var d1 = new Plottable.Dataset();
-        var r = new Plottable.Plot().addDataset("d1", d1).addDataset(d1).addDataset("d2", []).addDataset([]);
+        var d2 = new Plottable.Dataset();
+        var r = new Plottable.Plot().addDataset(d1).addDataset(d2);
         r._datasetKeysInOrder.forEach(function (key) {
             var plotMetadata = r._key2PlotDatasetKey.get(key).plotMetadata;
             assert.propertyVal(plotMetadata, "datasetKey", key, "metadata has correct dataset key");
@@ -5833,8 +5707,8 @@ describe("Metadata", function () {
                 foo: 10
             };
         };
-        plot.addDataset(data1);
-        plot.addDataset(data2);
+        plot.addDataset(new Plottable.Dataset(data1));
+        plot.addDataset(new Plottable.Dataset(data2));
         plot.renderTo(svg);
         var circles = plot.getAllSelections();
         var c1 = d3.select(circles[0][0]);
@@ -5862,8 +5736,10 @@ describe("Metadata", function () {
                 foo: 10
             };
         };
-        plot1.addDataset(data1);
-        plot1.addDataset(data2);
+        var dataset1 = new Plottable.Dataset(data1);
+        var dataset2 = new Plottable.Dataset(data2);
+        plot1.addDataset(dataset1);
+        plot1.addDataset(dataset2);
         var plot2 = new Plottable.Plots.Scatter(xScale, yScale).project("x", xAccessor).project("y", yAccessor);
         plot2._getPlotMetadataForDataset = function (key) {
             return {
@@ -5871,8 +5747,8 @@ describe("Metadata", function () {
                 foo: 20
             };
         };
-        plot2.addDataset(data1);
-        plot2.addDataset(data2);
+        plot2.addDataset(dataset1);
+        plot2.addDataset(dataset2);
         plot1.renderTo(svg);
         plot2.renderTo(svg);
         var circles = plot1.getAllSelections();
@@ -5909,7 +5785,7 @@ describe("Metadata", function () {
         var dataset1 = new Plottable.Dataset(data1, metadata);
         var dataset2 = new Plottable.Dataset(data2, metadata);
         var checkPlot = function (plot) {
-            plot.addDataset("ds1", dataset1).addDataset("ds2", dataset2).project("x", function (d, i, u, m) { return d.x + u.foo + m.datasetKey.length; }).project("y", function (d, i, u, m) { return d.y + u.foo - m.datasetKey.length; });
+            plot.addDataset(dataset1).addDataset(dataset2).project("x", function (d, i, u, m) { return d.x + u.foo + m.datasetKey.length; }).project("y", function (d, i, u, m) { return d.y + u.foo - m.datasetKey.length; });
             // This should not crash. If some metadata is not passed, undefined property error will be raised during accessor call.
             plot.renderTo(svg);
             plot.destroy();
@@ -7313,8 +7189,8 @@ describe("Scales", function () {
         });
         it("should resize when a plot is removed", function () {
             var svg = TestMethods.generateSVG(400, 400);
-            var ds1 = [{ x: 0, y: 0 }, { x: 1, y: 1 }];
-            var ds2 = [{ x: 1, y: 1 }, { x: 2, y: 2 }];
+            var ds1 = new Plottable.Dataset([{ x: 0, y: 0 }, { x: 1, y: 1 }]);
+            var ds2 = new Plottable.Dataset([{ x: 1, y: 1 }, { x: 2, y: 2 }]);
             var xScale = new Plottable.Scales.Linear();
             var yScale = new Plottable.Scales.Linear();
             xScale.domainer(new Plottable.Domainer());
@@ -7336,7 +7212,7 @@ describe("Scales", function () {
             svg.remove();
         });
     });
-    describe("QuantitativeScale Scales", function () {
+    describe("Quantitative Scales", function () {
         it("autorange defaults to [0, 1] if no perspectives set", function () {
             var scale = new Plottable.Scales.Linear();
             scale.autoDomain();
@@ -7374,7 +7250,7 @@ describe("Scales", function () {
             var xScale = new Plottable.Scales.Linear();
             var yScale = new Plottable.Scales.Linear();
             var plot = new Plottable.Plots.Scatter(xScale, yScale);
-            plot.addDataset(sadTimesData);
+            plot.addDataset(new Plottable.Dataset(sadTimesData));
             var id = function (d) { return d; };
             xScale.domainer(new Plottable.Domainer()); // to disable padding, etc
             plot.project("x", id, xScale);

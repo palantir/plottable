@@ -59,12 +59,12 @@ export module Plots {
       return this;
     }
 
-    public addDataset(keyOrDataset: any, dataset?: any) {
+    public addDataset(dataset: Dataset) {
       if (this._datasetKeysInOrder.length === 1) {
         Utils.Methods.warn("Only one dataset is supported in Pie plots");
         return this;
       }
-      super.addDataset(keyOrDataset, dataset);
+      super.addDataset(dataset);
       return this;
     }
 
@@ -81,8 +81,8 @@ export module Plots {
       return new Plottable.Drawers.Arc(key, this).setClass("arc");
     }
 
-    public getAllPlotData(datasetKeys?: string | string[]): PlotData {
-      var allPlotData = super.getAllPlotData(datasetKeys);
+    public getAllPlotData(datasets = this.datasets()): Plots.PlotData {
+      var allPlotData = super.getAllPlotData(datasets);
 
       allPlotData.pixelPoints.forEach((pixelPoint: Point) => {
         pixelPoint.x = pixelPoint.x + this.width() / 2;

@@ -13,7 +13,7 @@ function run(svg, data, Plottable) {
   var yScale = new Plottable.Scales.Linear();
   var yAxis = new Plottable.Axes.Numeric(yScale, "left").tickLabelPosition("bottom");
 
-  var plot = new Plottable.Plots.Scatter(xScale, yScale).addDataset(data);
+  var plot = new Plottable.Plots.Scatter(xScale, yScale).addDataset(new Plottable.Dataset(data));
   plot.project("x", "x", xScale).project("y", "y", yScale);
   var gridlines = new Plottable.Components.Gridlines(xScale, yScale);
   var group = plot.above(gridlines);

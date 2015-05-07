@@ -85,12 +85,12 @@ export module Plots {
       return ["x", "y"];
     }
 
-    protected _getAllPlotData(datasetKeys: string[]): PlotData {
+    public getAllPlotData(datasets = this.datasets()): Plots.PlotData {
       var data: any[] = [];
       var pixelPoints: Point[] = [];
       var allElements: EventTarget[] = [];
 
-      datasetKeys.forEach((datasetKey) => {
+      this._keysForDatasets(datasets).forEach((datasetKey) => {
         var plotDatasetKey = this._key2PlotDatasetKey.get(datasetKey);
         if (plotDatasetKey == null) { return; }
         var drawer = plotDatasetKey.drawer;
@@ -129,8 +129,8 @@ export module Plots {
       var closestPixelPoints: Point[] = [];
       var closestElements: Element[] = [];
 
-      this.datasetOrder().forEach((key: string) => {
-        var plotData = this.getAllPlotData(key);
+      this.datasets().forEach((dataset) => {
+        var plotData = this.getAllPlotData([dataset]);
         plotData.pixelPoints.forEach((pixelPoint: Point, index: number) => {
           var datum = plotData.data[index];
           var line = plotData.selection[0][0];

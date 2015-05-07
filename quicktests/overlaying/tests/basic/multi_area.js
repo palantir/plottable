@@ -15,10 +15,10 @@ function makePowerFunction(pow) {
 function run(svg, data, Plottable) {
   "use strict";
 
-  var d1 = data[0].map(makePowerFunction(2));
-  var d2 = data[1].map(makePowerFunction(4));
-  var d3 = data[2].map(makePowerFunction(8));
-  var d4 = data[3].map(makePowerFunction(16));
+  var d1 = new Plottable.Dataset(data[0].map(makePowerFunction(2)));
+  var d2 = new Plottable.Dataset(data[1].map(makePowerFunction(4)));
+  var d3 = new Plottable.Dataset(data[2].map(makePowerFunction(8)));
+  var d4 = new Plottable.Dataset(data[3].map(makePowerFunction(16)));
 
   var colorScale = new Plottable.Scales.Color();
 
@@ -45,13 +45,13 @@ function run(svg, data, Plottable) {
   var legend1 = new Plottable.Components.Legend(colorScale);
   legend1.maxEntriesPerRow(1);
 
-  var titleTable = new Plottable.Components.Table().addComponent(0,0, title1)
-                                        .addComponent(0,1, legend1);
+  var titleTable = new Plottable.Components.Table().addComponent(title1, 0, 0)
+                                        .addComponent(legend1, 0, 1);
 
-  var basicTable = new Plottable.Components.Table().addComponent(0,2, titleTable)
-              .addComponent(1, 1, yAxis)
-              .addComponent(1, 2, plot)
-              .addComponent(2, 2, xAxis);
+  var basicTable = new Plottable.Components.Table().addComponent(titleTable, 0, 2)
+              .addComponent(yAxis, 1, 1)
+              .addComponent(plot, 1, 2)
+              .addComponent(xAxis, 2, 2);
 
   basicTable.renderTo(svg);
 

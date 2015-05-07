@@ -18,11 +18,11 @@ function run(svg, data, Plottable) {
 
   var colorScale = new Plottable.Scales.Color();
 
-  bars.addDataset("low", [{ name:"A", value:1 }]);
-  bars.addDataset("mid", [{ name:"A", value: 2 }]);
-  bars.addDataset("high", [{ name:"A", value: 3 }]);
+  bars.addDataset(new Plottable.Dataset([{ name:"A", value: 1 }], { id: "low" }));
+  bars.addDataset(new Plottable.Dataset([{ name:"A", value: 2 }], { id: "mid" }));
+  bars.addDataset(new Plottable.Dataset([{ name:"A", value: 3 }], { id: "high" }));
 
-  bars.project("fill", function(d, i, u, m) { return m.datasetKey; }, colorScale);
+  bars.project("fill", function(d, i, u) { return u.id; }, colorScale);
 
   var reverse = function reverseComp(a, b) {
       var domain = colorScale.domain();

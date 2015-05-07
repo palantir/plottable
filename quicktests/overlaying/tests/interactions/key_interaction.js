@@ -13,7 +13,7 @@ function run(svg, data, Plottable) {
   var yScale = new Plottable.Scales.Linear();
   var yAxis = new Plottable.Axes.Numeric(yScale, "left");
 
-  var scatterPlot = new Plottable.Plots.Scatter(xScale, yScale).addDataset(data);
+  var scatterPlot = new Plottable.Plots.Scatter(xScale, yScale).addDataset(new Plottable.Dataset(data));
   scatterPlot.project("x", "x", xScale).project("y", "y", yScale);
   var explanation = new Plottable.Components.TitleLabel("Press 'a' to reset domain");
 
@@ -28,7 +28,7 @@ function run(svg, data, Plottable) {
 
   var ki = new Plottable.Interactions.Key();
   // press "a" (keycode 65) to reset
-  ki.on(65, function() {
+  ki.onKey(65, function() {
     xScale.autoDomain();
     yScale.autoDomain();
     pzi.resetZoom();

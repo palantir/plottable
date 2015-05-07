@@ -47,7 +47,7 @@ describe("Plots", () => {
       svg = TestMethods.generateSVG(500, 500);
       simpleDataset = new Plottable.Dataset(twoPointData);
       areaPlot = new Plottable.Plots.Area(xScale, yScale);
-      areaPlot.addDataset("sd", simpleDataset)
+      areaPlot.addDataset(simpleDataset)
               .project("x", xAccessor, xScale)
               .project("y", yAccessor, yScale)
               .project("y0", y0Accessor, yScale)
@@ -133,46 +133,33 @@ describe("Plots", () => {
 
       it("retrieves all selections with no args", () => {
         var newTwoPointData = [{ foo: 2, bar: 1 }, { foo: 3, bar: 2 }];
-        areaPlot.addDataset("newTwo", new Plottable.Dataset(newTwoPointData));
+        areaPlot.addDataset(new Plottable.Dataset(newTwoPointData));
         var allAreas = areaPlot.getAllSelections();
-        var allAreas2 = areaPlot.getAllSelections((<any> areaPlot)._datasetKeysInOrder);
-        assert.deepEqual(allAreas, allAreas2, "all areas/lines retrieved");
-
         assert.strictEqual(allAreas.filter(".line").size(), 2, "2 lines retrieved");
         assert.strictEqual(allAreas.filter(".area").size(), 2, "2 areas retrieved");
 
         svg.remove();
       });
 
-      it("retrieves correct selections (string arg)", () => {
-        var newTwoPointData = [{ foo: 2, bar: 1 }, { foo: 3, bar: 2 }];
-        areaPlot.addDataset("newTwo", new Plottable.Dataset(newTwoPointData));
-        var allAreas = areaPlot.getAllSelections("newTwo");
+      it("retrieves correct selections", () => {
+        var twoPointDataset = new Plottable.Dataset([{ foo: 2, bar: 1 }, { foo: 3, bar: 2 }]);
+        areaPlot.addDataset(twoPointDataset);
+        var allAreas = areaPlot.getAllSelections([twoPointDataset]);
         assert.strictEqual(allAreas.size(), 2, "areas/lines retrieved");
         var selectionData = allAreas.data();
-        assert.include(selectionData, newTwoPointData, "new dataset data in selection data");
+        assert.include(selectionData, twoPointDataset.data(), "new dataset data in selection data");
 
         svg.remove();
       });
 
-      it("retrieves correct selections (array arg)", () => {
-        var newTwoPointData = [{ foo: 2, bar: 1 }, { foo: 3, bar: 2 }];
-        areaPlot.addDataset("newTwo", new Plottable.Dataset(newTwoPointData));
-        var allAreas = areaPlot.getAllSelections(["newTwo"]);
+      it("skips invalid Datasets", () => {
+        var twoPointDataset = new Plottable.Dataset([{ foo: 2, bar: 1 }, { foo: 3, bar: 2 }]);
+        areaPlot.addDataset(twoPointDataset);
+        var dummyDataset = new Plottable.Dataset([]);
+        var allAreas = areaPlot.getAllSelections([twoPointDataset, dummyDataset]);
         assert.strictEqual(allAreas.size(), 2, "areas/lines retrieved");
         var selectionData = allAreas.data();
-        assert.include(selectionData, newTwoPointData, "new dataset data in selection data");
-
-        svg.remove();
-      });
-
-      it("skips invalid keys", () => {
-        var newTwoPointData = [{ foo: 2, bar: 1 }, { foo: 3, bar: 2 }];
-        areaPlot.addDataset("newTwo", new Plottable.Dataset(newTwoPointData));
-        var allAreas = areaPlot.getAllSelections(["newTwo", "test"]);
-        assert.strictEqual(allAreas.size(), 2, "areas/lines retrieved");
-        var selectionData = allAreas.data();
-        assert.include(selectionData, newTwoPointData, "new dataset data in selection data");
+        assert.include(selectionData, twoPointDataset.data(), "new dataset data in selection data");
 
         svg.remove();
       });

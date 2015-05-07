@@ -7,7 +7,7 @@ function run(svg, data, Plottable) {
   "use strict";
 
   new Plottable.Plots.Pie()
-                    .addDataset(data)
+                    .addDataset(new Plottable.Dataset(data))
                     .sectorValue(function(d) { return d.value; })
                     .renderTo(svg);
 }
