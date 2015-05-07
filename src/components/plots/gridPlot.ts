@@ -56,32 +56,32 @@ export module Plots {
 
       if (attrToSet === "x") {
         if (scale instanceof Scales.Category) {
-          this.project("x1", (d: any, i: number, u: any, m: Plots.PlotMetadata) => {
-            return scale.scale(this._attrBindings.get("x").accessor(d, i, u, m)) - scale.rangeBand() / 2;
+          this.project("x1", (d: any, i: number, dataset: Dataset, m: Plots.PlotMetadata) => {
+            return scale.scale(this._attrBindings.get("x").accessor(d, i, dataset, m)) - scale.rangeBand() / 2;
           });
-          this.project("x2", (d: any, i: number, u: any, m: Plots.PlotMetadata) => {
-            return scale.scale(this._attrBindings.get("x").accessor(d, i, u, m)) + scale.rangeBand() / 2;
+          this.project("x2", (d: any, i: number, dataset: Dataset, m: Plots.PlotMetadata) => {
+            return scale.scale(this._attrBindings.get("x").accessor(d, i, dataset, m)) + scale.rangeBand() / 2;
           });
         }
         if (scale instanceof QuantitativeScale) {
-          this.project("x1", (d: any, i: number, u: any, m: Plots.PlotMetadata) => {
-            return scale.scale(this._attrBindings.get("x").accessor(d, i, u, m));
+          this.project("x1", (d: any, i: number, dataset: Dataset, m: Plots.PlotMetadata) => {
+            return scale.scale(this._attrBindings.get("x").accessor(d, i, dataset, m));
           });
         }
       }
 
       if (attrToSet === "y") {
         if (scale instanceof Scales.Category) {
-          this.project("y1", (d: any, i: number, u: any, m: Plots.PlotMetadata) => {
-            return scale.scale(this._attrBindings.get("y").accessor(d, i, u, m)) - scale.rangeBand() / 2;
+          this.project("y1", (d: any, i: number, dataset: Dataset, m: Plots.PlotMetadata) => {
+            return scale.scale(this._attrBindings.get("y").accessor(d, i, dataset, m)) - scale.rangeBand() / 2;
           });
-          this.project("y2", (d: any, i: number, u: any, m: Plots.PlotMetadata) => {
-            return scale.scale(this._attrBindings.get("y").accessor(d, i, u, m)) + scale.rangeBand() / 2;
+          this.project("y2", (d: any, i: number, dataset: Dataset, m: Plots.PlotMetadata) => {
+            return scale.scale(this._attrBindings.get("y").accessor(d, i, dataset, m)) + scale.rangeBand() / 2;
           });
         }
         if (scale instanceof QuantitativeScale) {
-          this.project("y1", (d: any, i: number, u: any, m: Plots.PlotMetadata) => {
-            return scale.scale(this._attrBindings.get("y").accessor(d, i, u, m));
+          this.project("y1", (d: any, i: number, dataset: Dataset, m: Plots.PlotMetadata) => {
+            return scale.scale(this._attrBindings.get("y").accessor(d, i, dataset, m));
           });
         }
       }

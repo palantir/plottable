@@ -479,8 +479,8 @@ describe("Plots", () => {
     var plot: Plottable.XYPlot<number, number>;
 
     before(() => {
-      xAccessor = (d: any, i: number, u: any) => d.a + u.foo;
-      yAccessor = (d: any, i: number, u: any) => d.b + u.foo;
+      xAccessor = (d: any, i: number, dataset: Plottable.Dataset) => d.a + dataset.metadata().foo;
+      yAccessor = (d: any, i: number, dataset: Plottable.Dataset) => d.b + dataset.metadata().foo;
     });
 
     beforeEach(() => {

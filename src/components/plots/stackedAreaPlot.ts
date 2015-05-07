@@ -78,10 +78,10 @@ export module Plots {
 
       var yAccessor = this._attrBindings.get("y").accessor;
       var xAccessor = this._attrBindings.get("x").accessor;
-      attrToProjector["y"] = (d: any, i: number, u: any, m: StackedPlotMetadata) =>
-        this._yScale.scale(+yAccessor(d, i, u, m) + m.offsets.get(xAccessor(d, i, u, m)));
-      attrToProjector["y0"] = (d: any, i: number, u: any, m: StackedPlotMetadata) =>
-        this._yScale.scale(m.offsets.get(xAccessor(d, i, u, m)));
+      attrToProjector["y"] = (d: any, i: number, dataset: Dataset, m: StackedPlotMetadata) =>
+        this._yScale.scale(+yAccessor(d, i, dataset, m) + m.offsets.get(xAccessor(d, i, dataset, m)));
+      attrToProjector["y0"] = (d: any, i: number, dataset: Dataset, m: StackedPlotMetadata) =>
+        this._yScale.scale(m.offsets.get(xAccessor(d, i, dataset, m)));
 
       return attrToProjector;
     }
@@ -98,7 +98,7 @@ export module Plots {
       var keySets = this._datasetKeysInOrder.map((k) => {
         var dataset = this._key2PlotDatasetKey.get(k).dataset;
         var plotMetadata = this._key2PlotDatasetKey.get(k).plotMetadata;
-        return d3.set(dataset.data().map((datum, i) => keyAccessor(datum, i, dataset.metadata(), plotMetadata).toString())).values();
+        return d3.set(dataset.data().map((datum, i) => keyAccessor(datum, i, dataset, plotMetadata).toString())).values();
       });
 
       if (keySets.some((keySet) => keySet.length !== domainKeys.length)) {

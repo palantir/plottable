@@ -2,15 +2,15 @@ module Plottable {
   /**
    * Access specific datum property.
    */
-  export type _Accessor = (datum: any, index?: number, userMetadata?: any, plotMetadata?: Plots.PlotMetadata) => any;
+  export type _Accessor = (datum: any, index?: number, dataset?: Dataset, plotMetadata?: Plots.PlotMetadata) => any;
 
   /**
    * Retrieves scaled datum property.
    */
-  export type _Projector = (datum: any, index: number, userMetadata: any, plotMetadata: Plots.PlotMetadata) => any;
+  export type _Projector = (datum: any, index: number, dataset: Dataset, plotMetadata: Plots.PlotMetadata) => any;
 
   /**
-   * Projector with applied user and plot metadata
+   * Projector with dataset and plot metadata
    */
   export type AppliedProjector = (datum: any, index: number) => any;
 
