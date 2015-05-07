@@ -9154,19 +9154,18 @@ var Plottable;
 (function (Plottable) {
     var Interaction = (function () {
         function Interaction() {
+            var _this = this;
+            this._anchorCallback = function (component) { return _this._anchor(component); };
         }
         Interaction.prototype._anchor = function (component) {
         };
         Interaction.prototype.attachTo = function (component) {
-            var _this = this;
             this._componentToListenTo = component;
-            component.onAnchor(function (component) { return _this._anchor(component); });
+            component.onAnchor(this._anchorCallback);
         };
         Interaction.prototype.detachFrom = function (component) {
-            var _this = this;
             this._componentToListenTo = null;
-            //useless line bellow
-            component.offAnchor(function (component) { return _this._anchor(component); });
+            component.offAnchor(this._anchorCallback);
         };
         /**
          * Translates an <svg>-coordinate-space point to Component-space coordinates.

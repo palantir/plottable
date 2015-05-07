@@ -11,18 +11,19 @@ module Plottable {
      */
     protected _componentToListenTo: Component;
 
+    private _anchorCallback = (component: Component) => this._anchor(component);
+
     protected _anchor(component: Component) {
     }
 
     public attachTo(component: Component) {
       this._componentToListenTo = component;
-      component.onAnchor((component: Component) => this._anchor(component));
+      component.onAnchor(this._anchorCallback);
     }
 
     public detachFrom(component: Component) {
       this._componentToListenTo = null;
-      //useless line bellow
-      component.offAnchor((component: Component) => this._anchor(component));
+      component.offAnchor(this._anchorCallback);
     }
 
     /**
