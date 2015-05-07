@@ -3030,7 +3030,7 @@ var Plottable;
                 var _this = this;
                 var metadata = this._piePlot._key2PlotDatasetKey.get(this.key).dataset.metadata();
                 var plotMetadata = this._piePlot._key2PlotDatasetKey.get(this.key).plotMetadata;
-                return d3.svg.arc().innerRadius(function (d, i) { return _this._piePlot.scaledInnerRadiusAccessor()(d.data, i, metadata, plotMetadata); }).outerRadius(function (d, i) { return _this._piePlot.scaledOuterRadiusAccessor()(d.data, i, metadata, plotMetadata); });
+                return d3.svg.arc().innerRadius(function (d, i) { return Arc._scaledAccessor(_this._piePlot.innerRadius())(d.data, i, metadata, plotMetadata); }).outerRadius(function (d, i) { return Arc._scaledAccessor(_this._piePlot.outerRadius())(d.data, i, metadata, plotMetadata); });
             };
             Arc.prototype.retargetProjectors = function (attrToProjector) {
                 var retargetedAttrToProjector = {};
@@ -3048,7 +3048,7 @@ var Plottable;
             Arc.prototype.draw = function (data, drawSteps, userMetadata, plotMetadata) {
                 var _this = this;
                 // HACKHACK Applying metadata should be done in base class
-                var valueAccessor = function (d, i) { return _this._piePlot.scaledSectorValueAccessor()(d, i, userMetadata, plotMetadata); };
+                var valueAccessor = function (d, i) { return Arc._scaledAccessor(_this._piePlot.sectorValue())(d, i, userMetadata, plotMetadata); };
                 data = data.filter(function (e) { return Plottable.Utils.Methods.isValidNumber(+valueAccessor(e, null)); });
                 var pie = d3.layout.pie().sort(null).value(valueAccessor)(data);
                 pie.forEach(function (slice) {
@@ -3061,13 +3061,16 @@ var Plottable;
             Arc.prototype._getPixelPoint = function (datum, index) {
                 var metadata = this._piePlot._key2PlotDatasetKey.get(this.key).dataset.metadata();
                 var plotMetadata = this._piePlot._key2PlotDatasetKey.get(this.key).plotMetadata;
-                var innerRadius = this._piePlot.scaledInnerRadiusAccessor()(datum, index, metadata, plotMetadata);
-                var outerRadius = this._piePlot.scaledOuterRadiusAccessor()(datum, index, metadata, plotMetadata);
+                var innerRadius = Arc._scaledAccessor(this._piePlot.innerRadius())(datum, index, metadata, plotMetadata);
+                var outerRadius = Arc._scaledAccessor(this._piePlot.outerRadius())(datum, index, metadata, plotMetadata);
                 var avgRadius = (innerRadius + outerRadius) / 2;
                 var startAngle = +this._getSelection(index).datum().startAngle;
                 var endAngle = +this._getSelection(index).datum().endAngle;
                 var avgAngle = (startAngle + endAngle) / 2;
                 return { x: avgRadius * Math.sin(avgAngle), y: -avgRadius * Math.cos(avgAngle) };
+            };
+            Arc._scaledAccessor = function (accScaleBinding) {
+                return accScaleBinding.scale == null ? accScaleBinding.accessor : function (d, i, u, m) { return accScaleBinding.scale.scale(accScaleBinding.accessor(d, i, u, m)); };
             };
             return Arc;
         })(Drawers.Element);
@@ -6967,15 +6970,6 @@ var Plottable;
                 this._updateInnerRadiusScaleExtents();
                 this._updateSectorValueScaleExtents();
             };
-            Pie.prototype.scaledInnerRadiusAccessor = function () {
-                return Pie._scaledAccessor(this._innerRadius);
-            };
-            Pie.prototype.scaledOuterRadiusAccessor = function () {
-                return Pie._scaledAccessor(this._outerRadius);
-            };
-            Pie.prototype.scaledSectorValueAccessor = function () {
-                return Pie._scaledAccessor(this._sectorValue);
-            };
             Pie.prototype._updateOuterRadiusScaleExtents = function () {
                 this._outerRadiusExtents = this._datasetExtents(this._outerRadius);
                 if (this._outerRadius.scale != null) {
@@ -7009,9 +7003,6 @@ var Plottable;
                     var plotMetadata = plotDatasetKey.plotMetadata;
                     return _this._computeExtent(dataset, accScaleBinding.accessor, coercer, plotMetadata);
                 });
-            };
-            Pie._scaledAccessor = function (accScaleBinding) {
-                return accScaleBinding.scale == null ? accScaleBinding.accessor : function (d, i, u, m) { return accScaleBinding.scale.scale(accScaleBinding.accessor(d, i, u, m)); };
             };
             Pie._replaceScaleBinding = function (oldScale, newScale, callback, extentProvider) {
                 if (oldScale !== newScale) {

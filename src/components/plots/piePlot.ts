@@ -151,18 +151,6 @@ export module Plots {
       this._updateSectorValueScaleExtents();
     }
 
-    public scaledInnerRadiusAccessor(): _Accessor {
-      return Pie._scaledAccessor(this._innerRadius);
-    }
-
-    public scaledOuterRadiusAccessor(): _Accessor {
-      return Pie._scaledAccessor(this._outerRadius);
-    }
-
-    public scaledSectorValueAccessor(): _Accessor {
-      return Pie._scaledAccessor(this._sectorValue);
-    }
-
     private _updateOuterRadiusScaleExtents() {
       this._outerRadiusExtents = this._datasetExtents(this._outerRadius);
       if (this._outerRadius.scale != null) { this._outerRadius.scale._autoDomainIfAutomaticMode(); }
@@ -191,12 +179,6 @@ export module Plots {
         var plotMetadata = plotDatasetKey.plotMetadata;
         return this._computeExtent(dataset, accScaleBinding.accessor, coercer, plotMetadata);
       });
-    }
-
-    private static _scaledAccessor<SD, SR>(accScaleBinding: AccessorScaleBinding<SD, SR>): _Accessor {
-      return accScaleBinding.scale == null ?
-               accScaleBinding.accessor :
-               (d: any, i: number, u: any, m: Plots.PlotMetadata) => accScaleBinding.scale.scale(accScaleBinding.accessor(d, i, u, m));
     }
 
     private static _replaceScaleBinding(oldScale: Scale<any, any>, newScale: Scale<any, any>,

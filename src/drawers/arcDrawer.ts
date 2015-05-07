@@ -16,8 +16,8 @@ export module Drawers {
       var metadata = (<any> this._piePlot)._key2PlotDatasetKey.get(this.key).dataset.metadata();
       var plotMetadata = (<any> this._piePlot)._key2PlotDatasetKey.get(this.key).plotMetadata;
       return d3.svg.arc()
-                   .innerRadius((d, i) => this._piePlot.scaledInnerRadiusAccessor()(d.data, i, metadata, plotMetadata))
-                   .outerRadius((d, i) => this._piePlot.scaledOuterRadiusAccessor()(d.data, i, metadata, plotMetadata));
+                   .innerRadius((d, i) => Arc._scaledAccessor(this._piePlot.innerRadius())(d.data, i, metadata, plotMetadata))
+                   .outerRadius((d, i) => Arc._scaledAccessor(this._piePlot.outerRadius())(d.data, i, metadata, plotMetadata));
     }
 
     private retargetProjectors(attrToProjector: AttributeToAppliedProjector): AttributeToAppliedProjector {
@@ -38,7 +38,7 @@ export module Drawers {
 
     public draw(data: any[], drawSteps: DrawStep[], userMetadata: any, plotMetadata: Plots.PlotMetadata) {
       // HACKHACK Applying metadata should be done in base class
-      var valueAccessor = (d: any, i: number) => this._piePlot.scaledSectorValueAccessor()(d, i, userMetadata, plotMetadata);
+      var valueAccessor = (d: any, i: number) => Arc._scaledAccessor(this._piePlot.sectorValue())(d, i, userMetadata, plotMetadata);
 
       data = data.filter(e => Plottable.Utils.Methods.isValidNumber(+valueAccessor(e, null)));
 
@@ -57,13 +57,19 @@ export module Drawers {
     public _getPixelPoint(datum: any, index: number): Point {
       var metadata = (<any> this._piePlot)._key2PlotDatasetKey.get(this.key).dataset.metadata();
       var plotMetadata = (<any> this._piePlot)._key2PlotDatasetKey.get(this.key).plotMetadata;
-      var innerRadius = this._piePlot.scaledInnerRadiusAccessor()(datum, index, metadata, plotMetadata);
-      var outerRadius = this._piePlot.scaledOuterRadiusAccessor()(datum, index, metadata, plotMetadata);
+      var innerRadius = Arc._scaledAccessor(this._piePlot.innerRadius())(datum, index, metadata, plotMetadata);
+      var outerRadius = Arc._scaledAccessor(this._piePlot.outerRadius())(datum, index, metadata, plotMetadata);
       var avgRadius = (innerRadius + outerRadius) / 2;
       var startAngle = +this._getSelection(index).datum().startAngle;
       var endAngle = +this._getSelection(index).datum().endAngle;
       var avgAngle = (startAngle + endAngle) / 2;
       return { x: avgRadius * Math.sin(avgAngle), y: -avgRadius * Math.cos(avgAngle) };
+    }
+
+    private static _scaledAccessor<SD, SR>(accScaleBinding: Plots.AccessorScaleBinding<SD, SR>): _Accessor {
+      return accScaleBinding.scale == null ?
+               accScaleBinding.accessor :
+               (d: any, i: number, u: any, m: Plots.PlotMetadata) => accScaleBinding.scale.scale(accScaleBinding.accessor(d, i, u, m));
     }
   }
 }

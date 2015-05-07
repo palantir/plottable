@@ -2787,9 +2787,6 @@ declare module Plottable {
             outerRadius(outerRadius: number | _Accessor): Plots.Pie<D>;
             outerRadius(outerRadius: D | _Accessor, outerRadiusScale: Scale<D, number>): Plots.Pie<D>;
             protected _updateExtents(): void;
-            scaledInnerRadiusAccessor(): _Accessor;
-            scaledOuterRadiusAccessor(): _Accessor;
-            scaledSectorValueAccessor(): _Accessor;
         }
     }
 }
