@@ -23,6 +23,11 @@ module Plottable {
       pixelPoints: Point[];
       selection: D3.Selection;
     }
+
+    export interface AccessorScaleBinding<D, R> {
+      accessor: _Accessor;
+      scale?: Scale<D, R>;
+    }
   }
 
   export class Plot extends Component {
@@ -39,8 +44,11 @@ module Plottable {
     private _animators: Animators.PlotAnimatorMap = {};
     protected _animateOnNextRender = true;
     private _nextSeriesIndex: number;
-    protected _renderCallback: ScaleCallback<Scale<any, any>>;
+    private _renderCallback: ScaleCallback<Scale<any, any>>;
     private _onDatasetUpdateCallback: DatasetCallback;
+
+    protected _propertyExtents: D3.Map<any[]>;
+    protected _propertyBindings: D3.Map<Plots.AccessorScaleBinding<any, any>>;
 
     /**
      * Constructs a Plot.
@@ -64,6 +72,8 @@ module Plottable {
       this._nextSeriesIndex = 0;
       this._renderCallback = (scale) => this.render();
       this._onDatasetUpdateCallback = () => this._onDatasetUpdate();
+      this._propertyBindings = d3.map();
+      this._propertyExtents = d3.map();
     }
 
     public anchor(selection: D3.Selection) {
@@ -84,6 +94,7 @@ module Plottable {
     public destroy() {
       super.destroy();
       this._scales().forEach((scale) => scale.offUpdate(this._renderCallback));
+      this._propertyScales().forEach((scale) => scale.offUpdate(this._renderCallback));
       this.datasets().forEach((dataset) => this.removeDataset(dataset));
     }
 
@@ -267,6 +278,8 @@ module Plottable {
     protected _updateExtents() {
       Object.keys(this._projections).forEach((attr: string) => { this._updateExtentsForAttr(attr); });
       this._scales().forEach((scale) => scale._autoDomainIfAutomaticMode());
+      this._propertyExtents.forEach((property) => this._updateExtentsForProperty(property));
+      this._propertyScales().forEach((scale) => scale._autoDomainIfAutomaticMode());
     }
 
     private _updateExtentsForAttr(attr: string) {
@@ -321,6 +334,16 @@ module Plottable {
           }
         }
       });
+
+      this._propertyBindings.forEach((property, binding) => {
+        if (binding.scale === scale) {
+          var extents = this._propertyExtents.get(property);
+          if (extents != null) {
+            allSetsOfExtents.push(extents);
+          }
+        }
+      });
+
       return d3.merge(allSetsOfExtents);
     }
 
@@ -539,6 +562,45 @@ module Plottable {
     protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean {
       return !(pixelPoint.x < 0 || pixelPoint.y < 0 ||
         pixelPoint.x > this.width() || pixelPoint.y > this.height());
+    }
+
+    protected _updateExtentsForProperty(property: string) {
+      var accScaleBinding = this._propertyBindings.get(property);
+      if (accScaleBinding.accessor == null) { return; }
+      var coercer = (accScaleBinding.scale != null) ? accScaleBinding.scale._typeCoercer : (d: any) => d;
+      this._propertyExtents.set(property, this._datasetKeysInOrder.map((key) => {
+        var plotDatasetKey = this._key2PlotDatasetKey.get(key);
+        var dataset = plotDatasetKey.dataset;
+        var plotMetadata = plotDatasetKey.plotMetadata;
+        return this._computeExtent(dataset, accScaleBinding.accessor, coercer, plotMetadata);
+      }));
+    }
+
+    protected _replacePropertyScale(oldScale: Scale<any, any>, newScale: Scale<any, any>) {
+      if (oldScale !== newScale) {
+        if (oldScale != null) {
+          oldScale.offUpdate(this._renderCallback);
+          oldScale.removeExtentProvider(this._extentProvider);
+          oldScale._autoDomainIfAutomaticMode();
+        }
+
+        if (newScale != null) {
+          newScale.onUpdate(this._renderCallback);
+          newScale.addExtentProvider(this._extentProvider);
+          newScale._autoDomainIfAutomaticMode();
+        }
+      }
+    }
+
+    private _propertyScales() {
+      var propertyScales: Scale<any, any> [] = [];
+      this._propertyBindings.forEach((property, binding) => {
+        var scale = binding.scale;
+        if (scale != null && propertyScales.indexOf(scale) === -1) {
+          propertyScales.push(scale);
+        }
+      });
+      return propertyScales;
     }
   }
 }

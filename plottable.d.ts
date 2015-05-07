@@ -2576,6 +2576,10 @@ declare module Plottable {
             pixelPoints: Point[];
             selection: D3.Selection;
         };
+        interface AccessorScaleBinding<D, R> {
+            accessor: _Accessor;
+            scale?: Scale<D, R>;
+        }
     }
     class Plot extends Component {
         protected _dataChanged: boolean;
@@ -2588,7 +2592,8 @@ declare module Plottable {
         protected _attrToExtents: D3.Map<any[]>;
         protected _animate: boolean;
         protected _animateOnNextRender: boolean;
-        protected _renderCallback: ScaleCallback<Scale<any, any>>;
+        protected _propertyExtents: D3.Map<any[]>;
+        protected _propertyBindings: D3.Map<Plots.AccessorScaleBinding<any, any>>;
         /**
          * Constructs a Plot.
          *
@@ -2733,16 +2738,14 @@ declare module Plottable {
          */
         getClosestPlotData(queryPoint: Point): Plots.PlotData;
         protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean;
+        protected _updateExtentsForProperty(property: string): void;
+        protected _replacePropertyScale(oldScale: Scale<any, any>, newScale: Scale<any, any>): void;
     }
 }
 
 
 declare module Plottable {
     module Plots {
-        interface AccessorScaleBinding<D, R> {
-            accessor: _Accessor;
-            scale?: Scale<D, R>;
-        }
         class Pie<D> extends Plot {
             /**
              * Constructs a PiePlot.
@@ -2764,9 +2767,6 @@ declare module Plottable {
             outerRadius(): AccessorScaleBinding<D, number>;
             outerRadius(outerRadius: number | _Accessor): Plots.Pie<D>;
             outerRadius(outerRadius: D | _Accessor, outerRadiusScale: Scale<D, number>): Plots.Pie<D>;
-            destroy(): void;
-            protected _updateExtents(): void;
-            protected _extentsForScale<D>(scale: Scale<D, any>): D[][];
         }
     }
 }
