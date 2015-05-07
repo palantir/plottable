@@ -12,7 +12,7 @@ export module Interactions {
     private _keyDispatcher: Plottable.Dispatchers.Key;
     private _keyCodeCallbacks: { [keyCode: string]: Utils.CallbackSet<KeyCallback> } = {};
 
-    public _anchor(component: Component) {
+    protected _anchor(component: Component) {
       super._anchor(component);
       this._positionDispatcher = Dispatchers.Mouse.getDispatcher(
                                    <SVGElement> (<any> this._componentToListenTo)._element.node()

@@ -9156,7 +9156,6 @@ var Plottable;
         function Interaction() {
         }
         Interaction.prototype._anchor = function (component) {
-            this._componentToListenTo = component;
         };
         Interaction.prototype.attachTo = function (component) {
             var _this = this;
@@ -9166,6 +9165,7 @@ var Plottable;
         Interaction.prototype.detachFrom = function (component) {
             var _this = this;
             this._componentToListenTo = null;
+            //useless line bellow
             component.offAnchor(function (component) { return _this._anchor(component); });
         };
         /**
@@ -9572,7 +9572,7 @@ var Plottable;
             PanZoom.prototype._anchor = function (component) {
                 var _this = this;
                 _super.prototype._anchor.call(this, component);
-                this._dragInteraction._anchor(component);
+                this._dragInteraction.attachTo(component);
                 var mouseDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(this._componentToListenTo.content().node());
                 mouseDispatcher.onWheel(function (p, e) { return _this._handleWheelEvent(p, e); });
                 this._touchDispatcher = Plottable.Dispatchers.Touch.getDispatcher(this._componentToListenTo.content().node());

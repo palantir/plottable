@@ -12,7 +12,7 @@ export module Interactions {
     private _clickedDown = false;
     private _onClickCallbacks = new Utils.CallbackSet<ClickCallback>();
 
-    public _anchor(component: Component) {
+    protected _anchor(component: Component) {
       super._anchor(component);
 
       this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(<SVGElement> component.content().node());

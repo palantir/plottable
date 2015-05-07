@@ -102,7 +102,7 @@ describe("Interactions", () => {
         receivedEnd = end;
       };
       drag.onDrag(moveCallback);
-      drag.attachTo(c)
+      drag.attachTo(c);
 
       var target = c.background();
       TestMethods.triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
@@ -148,7 +148,7 @@ describe("Interactions", () => {
         receivedEnd = end;
       };
       drag.onDragEnd(endCallback);
-      drag.attachTo(c)
+      drag.attachTo(c);
 
       var target = c.background();
       TestMethods.triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
@@ -213,7 +213,7 @@ describe("Interactions", () => {
       drag.onDragEnd(endCallback1);
       drag.onDragEnd(endCallback2);
 
-      drag.attachTo(component)
+      drag.attachTo(component);
 
       var target = component.background();
       TestMethods.triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
@@ -275,7 +275,7 @@ describe("Interactions", () => {
       };
       drag.onDragEnd(endCallback);
 
-      drag.attachTo(c)
+      drag.attachTo(c);
       var target = c.content();
 
       TestMethods.triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
@@ -361,7 +361,7 @@ describe("Interactions", () => {
         receivedEnd = end;
       };
       drag.onDrag(moveCallback);
-      drag.attachTo(c)
+      drag.attachTo(c);
 
       var target = c.background();
       receivedStart = null;

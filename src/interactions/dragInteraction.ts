@@ -15,7 +15,7 @@ export module Interactions {
     private _dragCallbacks = new Utils.CallbackSet<DragCallback>();
     private _dragEndCallbacks = new Utils.CallbackSet<DragCallback>();
 
-    public _anchor(component: Component) {
+    protected _anchor(component: Component) {
       super._anchor(component);
       this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(<SVGElement> this._componentToListenTo.content().node());
       this._mouseDispatcher.onMouseDown((p: Point, e: MouseEvent) => this._startDrag(p, e));

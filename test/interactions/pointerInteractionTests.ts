@@ -61,7 +61,7 @@ describe("Interactions", () => {
       c.renderTo(svg);
 
       var pointerInteraction = new Plottable.Interactions.Pointer();
-      pointerInteraction.attachTo(c)
+      pointerInteraction.attachTo(c);
 
       var callbackCalled = false;
       var lastPoint: Plottable.Point;
@@ -112,7 +112,7 @@ describe("Interactions", () => {
       c.renderTo(svg);
 
       var pointerInteraction = new Plottable.Interactions.Pointer();
-      pointerInteraction.attachTo(c)
+      pointerInteraction.attachTo(c);
 
       var callbackCalled = false;
       var lastPoint: Plottable.Point;

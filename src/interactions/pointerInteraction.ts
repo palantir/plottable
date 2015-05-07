@@ -12,7 +12,7 @@ export module Interactions {
     private _pointerMoveCallbacks = new Utils.CallbackSet<PointerCallback>();
     private _pointerExitCallbacks = new Utils.CallbackSet<PointerCallback>();
 
-    public _anchor(component: Component) {
+    protected _anchor(component: Component) {
       super._anchor(component);
       this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(<SVGElement> this._componentToListenTo.content().node());
       this._mouseDispatcher.onMouseMove((p: Point) => this._handlePointerEvent(p));

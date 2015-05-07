@@ -36,9 +36,9 @@ export module Interactions {
       this._touchIds = d3.map();
     }
 
-    public _anchor(component: Component) {
+    protected _anchor(component: Component) {
       super._anchor(component);
-      this._dragInteraction._anchor(component);
+      this._dragInteraction.attachTo(component);
 
       var mouseDispatcher = Dispatchers.Mouse.getDispatcher(<SVGElement> this._componentToListenTo.content().node());
       mouseDispatcher.onWheel((p: Point, e: WheelEvent) => this._handleWheelEvent(p, e));

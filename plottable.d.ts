@@ -3684,7 +3684,7 @@ declare module Plottable {
          * e.g. crosshairs.
          */
         protected _componentToListenTo: Component;
-        _anchor(component: Component): void;
+        protected _anchor(component: Component): void;
         attachTo(component: Component): void;
         detachFrom(component: Component): void;
         /**
@@ -3711,7 +3711,7 @@ declare module Plottable {
     type ClickCallback = (point: Point) => any;
     module Interactions {
         class Click extends Interaction {
-            _anchor(component: Component): void;
+            protected _anchor(component: Component): void;
             /**
              * Sets the callback called when the Component is clicked.
              *
@@ -3734,7 +3734,7 @@ declare module Plottable {
 declare module Plottable {
     module Interactions {
         class DoubleClick extends Interaction {
-            _anchor(component: Component): void;
+            protected _anchor(component: Component): void;
             /**
              * Sets the callback called when the Component is double-clicked.
              *
@@ -3758,7 +3758,7 @@ declare module Plottable {
     type KeyCallback = (keyCode: number) => void;
     module Interactions {
         class Key extends Interaction {
-            _anchor(component: Component): void;
+            protected _anchor(component: Component): void;
             /**
              * Sets a callback to be called when the key with the given keyCode is
              * pressed and the user is moused over the Component.
@@ -3786,7 +3786,7 @@ declare module Plottable {
     type PointerCallback = (point: Point) => any;
     module Interactions {
         class Pointer extends Interaction {
-            _anchor(component: Component): void;
+            protected _anchor(component: Component): void;
             /**
              * Sets the callback called when the pointer enters the Component.
              *
@@ -3852,7 +3852,7 @@ declare module Plottable {
              * @param {QuantitativeScaleScale} [yScale] The Y scale to update on panning/zooming.
              */
             constructor(xScale?: QuantitativeScale<any>, yScale?: QuantitativeScale<any>);
-            _anchor(component: Component): void;
+            protected _anchor(component: Component): void;
         }
     }
 }
@@ -3862,7 +3862,7 @@ declare module Plottable {
     type DragCallback = (start: Point, end: Point) => any;
     module Interactions {
         class Drag extends Interaction {
-            _anchor(component: Component): void;
+            protected _anchor(component: Component): void;
             /**
              * Returns whether or not this Interactions constrains Points passed to its
              * callbacks to lie inside its Component.
