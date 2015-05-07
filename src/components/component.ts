@@ -1,6 +1,9 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
+
+  export type AnchorCallback = (component: Component) => any;
+
   export module Components {
     export class Alignment {
       static TOP = "top";
@@ -38,6 +41,7 @@ module Plottable {
     private _yOffset = 0;
     private _cssClasses: string[] = ["component"];
     private _destroyed = false;
+    private _onAnchorCallbacks = new Utils.CallbackSet<AnchorCallback>();
 
     /**
      * Attaches the Component as a child of a given D3 Selection.
@@ -67,7 +71,19 @@ module Plottable {
         this._setup();
       }
       this._isAnchored = true;
+      this._onAnchorCallbacks.callCallbacks(this);
       return this;
+    }
+
+    public onAnchor(callback: AnchorCallback) {
+      if (this._isAnchored) {
+        callback(this);
+      }
+      this._onAnchorCallbacks.add(callback);
+    }
+
+    public offAnchor(callback: AnchorCallback) {
+      this._onAnchorCallbacks.delete(callback);
     }
 
     /**

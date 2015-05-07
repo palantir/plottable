@@ -15,6 +15,16 @@ module Plottable {
       this._componentToListenTo = component;
     }
 
+    public attachTo(component: Component) {
+      this._componentToListenTo = component;
+      component.onAnchor((component: Component) => this._anchor(component));
+    }
+
+    public detachFrom(component: Component) {
+      this._componentToListenTo = null;
+      component.offAnchor((component: Component) => this._anchor(component));
+    }
+
     /**
      * Translates an <svg>-coordinate-space point to Component-space coordinates.
      *

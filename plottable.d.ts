@@ -1476,6 +1476,7 @@ declare module Plottable {
 
 
 declare module Plottable {
+    type AnchorCallback = (component: Component) => any;
     module Components {
         class Alignment {
             static TOP: string;
@@ -1501,6 +1502,8 @@ declare module Plottable {
          * @returns {Component} The calling Component.
          */
         anchor(selection: D3.Selection): Component;
+        onAnchor(callback: AnchorCallback): void;
+        offAnchor(callback: AnchorCallback): void;
         /**
          * Creates additional elements as necessary for the Component to function.
          * Called during _anchor() if the Component's element has not been created yet.
@@ -3689,6 +3692,8 @@ declare module Plottable {
          */
         protected _componentToListenTo: Component;
         _anchor(component: Component): void;
+        attachTo(component: Component): void;
+        detachFrom(component: Component): void;
         /**
          * Translates an <svg>-coordinate-space point to Component-space coordinates.
          *

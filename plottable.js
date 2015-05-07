@@ -3116,6 +3116,7 @@ var Plottable;
             this._yOffset = 0;
             this._cssClasses = ["component"];
             this._destroyed = false;
+            this._onAnchorCallbacks = new Plottable.Utils.CallbackSet();
         }
         /**
          * Attaches the Component as a child of a given D3 Selection.
@@ -3144,7 +3145,17 @@ var Plottable;
                 this._setup();
             }
             this._isAnchored = true;
+            this._onAnchorCallbacks.callCallbacks(this);
             return this;
+        };
+        Component.prototype.onAnchor = function (callback) {
+            if (this._isAnchored) {
+                callback(this);
+            }
+            this._onAnchorCallbacks.add(callback);
+        };
+        Component.prototype.offAnchor = function (callback) {
+            this._onAnchorCallbacks.delete(callback);
         };
         /**
          * Creates additional elements as necessary for the Component to function.
@@ -9167,6 +9178,16 @@ var Plottable;
         }
         Interaction.prototype._anchor = function (component) {
             this._componentToListenTo = component;
+        };
+        Interaction.prototype.attachTo = function (component) {
+            var _this = this;
+            this._componentToListenTo = component;
+            component.onAnchor(function (component) { return _this._anchor(component); });
+        };
+        Interaction.prototype.detachFrom = function (component) {
+            var _this = this;
+            this._componentToListenTo = null;
+            component.offAnchor(function (component) { return _this._anchor(component); });
         };
         /**
          * Translates an <svg>-coordinate-space point to Component-space coordinates.
