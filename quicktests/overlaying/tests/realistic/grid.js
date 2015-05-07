@@ -42,7 +42,7 @@ function run(svg, data, Plottable) {
   var xAxis = new Plottable.Axes.Time(xScale, "bottom");
   var yAxis = new Plottable.Axes.Category(yScale, "left");
   var plot = new Plottable.Plots.Grid(xScale, yScale);
-  plot.addDataset(data);
+  plot.addDataset(new Plottable.Dataset(data));
   plot.project("x", timeFormatStart, xScale)
   .project("y", "team", yScale)
   .project("x2", timeFormatEnd, xScale)

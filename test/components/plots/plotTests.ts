@@ -4,15 +4,14 @@ var assert = chai.assert;
 class CountingPlot extends Plottable.Plot {
   public renders: number = 0;
 
-  public render() {
+  public render(immediately: boolean) {
     ++this.renders;
-    return super.render();
+    return super.render(immediately);
   }
 }
 
 describe("Plots", () => {
   describe("Plot", () => {
-
     it("Plots default correctly", () => {
       var r = new Plottable.Plot();
       assert.isTrue(r.clipPathEnabled, "clipPathEnabled defaults to true");
@@ -32,14 +31,14 @@ describe("Plots", () => {
       var dFoo = new Plottable.Dataset(["foo"], {cssClass: "bar"});
       var dBar = new Plottable.Dataset(["bar"], {cssClass: "boo"});
       var r = new CountingPlot();
-      r.addDataset("foo", dFoo);
+      r.addDataset(dFoo);
 
       assert.strictEqual(1, r.renders, "initial render due to addDataset");
 
       dFoo.data(dFoo.data());
       assert.strictEqual(2, r.renders, "we re-render when our dataset changes");
 
-      r.addDataset("bar", dBar);
+      r.addDataset(dBar);
       assert.strictEqual(3, r.renders, "we should redraw when we add a dataset");
 
       dFoo.data(dFoo.data());
@@ -48,17 +47,36 @@ describe("Plots", () => {
       dFoo.data(dFoo.data());
       assert.strictEqual(5, r.renders, "we should listen to the new dataset");
 
-      r.removeDataset("foo");
+      r.removeDataset(dFoo);
       assert.strictEqual(6, r.renders, "we re-render on dataset removal");
       dFoo.data(dFoo.data());
       assert.strictEqual(6, r.renders, "we don't listen to removed datasets");
+    });
 
+    it("datasets()", () => {
+      var dataset1 = new Plottable.Dataset([]);
+      var dataset2 = new Plottable.Dataset([]);
+
+      var plot = new Plottable.Plot();
+      plot.addDataset(dataset1);
+      plot.addDataset(dataset2);
+      assert.deepEqual(plot.datasets(), [dataset1, dataset2], "retrieved Datasets in order they were added");
+
+      plot.datasets([dataset2, dataset1]);
+      assert.deepEqual(plot.datasets(), [dataset2, dataset1], "order of Datasets was changed");
+
+      var dataset3 = new Plottable.Dataset([]);
+      plot.addDataset(dataset3);
+      assert.deepEqual(plot.datasets(), [dataset2, dataset1, dataset3], "adding further Datasets respects the order");
+
+      plot.removeDataset(dataset1);
+      assert.deepEqual(plot.datasets(), [dataset2, dataset3], "removing a Dataset leaves the remainder in the same order");
     });
 
     it("Updates its projectors when the Dataset is changed", () => {
       var d1 = new Plottable.Dataset([{x: 5, y: 6}], {cssClass: "bar"});
       var r = new Plottable.Plot();
-      r.addDataset("d1", d1);
+      r.addDataset(d1);
 
       var xScaleCalls: number = 0;
       var yScaleCalls: number = 0;
@@ -85,7 +103,7 @@ describe("Plots", () => {
       assert.strictEqual(1, yScaleCalls, "Y scale was wired up to datasource correctly");
 
       var d2 = new Plottable.Dataset([{x: 7, y: 8}], {cssClass: "boo"});
-      r.removeDataset("d1");
+      r.removeDataset(d1);
       r.addDataset(d2);
       assert.strictEqual(3, xScaleCalls, "Changing datasource fires X scale listeners (but doesn't coalesce callbacks)");
       assert.strictEqual(3, yScaleCalls, "Changing datasource fires Y scale listeners (but doesn't coalesce callbacks)");
@@ -98,14 +116,6 @@ describe("Plots", () => {
       assert.strictEqual(4, xScaleCalls, "X scale was hooked into new datasource");
       assert.strictEqual(4, yScaleCalls, "Y scale was hooked into new datasource");
 
-    });
-
-    it("Plot automatically generates a Dataset if only data is provided", () => {
-      var data = ["foo", "bar"];
-      var r = new Plottable.Plot().addDataset("foo", data);
-      var dataset = r.datasets()[0];
-      assert.isNotNull(dataset, "A Dataset was automatically generated");
-      assert.deepEqual(dataset.data(), data, "The generated Dataset has the correct data");
     });
 
     it("Plot.project works as intended", () => {
@@ -143,7 +153,8 @@ describe("Plots", () => {
       var plot = new Plottable.Plot();
 
       // Create mock drawers with already drawn items
-      var mockDrawer1 = new Plottable.Drawers.AbstractDrawer("ds1");
+      // HACKHACK #1984: Dataset keys are being removed, so this is the internal key
+      var mockDrawer1 = new Plottable.Drawers.AbstractDrawer("_0");
       var renderArea1 = svg.append("g");
       renderArea1.append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
       (<any> mockDrawer1).setup = () => (<any> mockDrawer1)._renderArea = renderArea1;
@@ -151,35 +162,38 @@ describe("Plots", () => {
 
       var renderArea2 = svg.append("g");
       renderArea2.append("circle").attr("cx", 10).attr("cy", 10).attr("r", 10);
-      var mockDrawer2 = new Plottable.Drawers.AbstractDrawer("ds2");
+      // HACKHACK #1984: Dataset keys are being removed, so this is the internal key
+      var mockDrawer2 = new Plottable.Drawers.AbstractDrawer("_1");
       (<any> mockDrawer2).setup = () => (<any> mockDrawer2)._renderArea = renderArea2;
       (<any> mockDrawer2)._getSelector = () => "circle";
 
       // Mock _getDrawer to return the mock drawers
       (<any> plot)._getDrawer = (key: string) => {
-        if (key === "ds1") {
+        if (key === "_0") {
           return mockDrawer1;
         } else {
           return mockDrawer2;
         }
       };
 
-      plot.addDataset("ds1", [{value: 0}, {value: 1}, {value: 2}]);
-      plot.addDataset("ds2", [{value: 1}, {value: 2}, {value: 3}]);
+      var dataset1 = new Plottable.Dataset([{value: 0}, {value: 1}, {value: 2}]);
+      plot.addDataset(dataset1);
+      var dataset2 = new Plottable.Dataset([{value: 1}, {value: 2}, {value: 3}]);
+      plot.addDataset(dataset2);
       plot.renderTo(svg);
 
       var selections = plot.getAllSelections();
       assert.strictEqual(selections.size(), 2, "all circle selections gotten");
 
-      var oneSelection = plot.getAllSelections("ds1");
+      var oneSelection = plot.getAllSelections([dataset1]);
       assert.strictEqual(oneSelection.size(), 1);
       assert.strictEqual(TestMethods.numAttr(oneSelection, "cx"), 100, "retrieved selection in renderArea1");
 
-      var oneElementSelection = plot.getAllSelections(["ds2"]);
+      var oneElementSelection = plot.getAllSelections([dataset2]);
       assert.strictEqual(oneElementSelection.size(), 1);
       assert.strictEqual(TestMethods.numAttr(oneElementSelection, "cy"), 10, "retreived selection in renderArea2");
 
-      var nonExcludedSelection = plot.getAllSelections(["ds1"], true);
+      var nonExcludedSelection = plot.getAllSelections([dataset1], true);
       assert.strictEqual(nonExcludedSelection.size(), 1);
       assert.strictEqual(TestMethods.numAttr(nonExcludedSelection, "cy"), 10, "retreived non-excluded selection in renderArea2");
       svg.remove();
@@ -199,7 +213,8 @@ describe("Plots", () => {
       var data2PointConverter = (datum: any, index: number) => data2Points[index];
 
       // Create mock drawers with already drawn items
-      var mockDrawer1 = new Plottable.Drawers.AbstractDrawer("ds1");
+      // HACKHACK #1984: Dataset keys are being removed, so this is the internal key
+      var mockDrawer1 = new Plottable.Drawers.AbstractDrawer("_0");
       var renderArea1 = svg.append("g");
       renderArea1.append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
       (<any> mockDrawer1).setup = () => (<any> mockDrawer1)._renderArea = renderArea1;
@@ -208,22 +223,25 @@ describe("Plots", () => {
 
       var renderArea2 = svg.append("g");
       renderArea2.append("circle").attr("cx", 10).attr("cy", 10).attr("r", 10);
-      var mockDrawer2 = new Plottable.Drawers.AbstractDrawer("ds2");
+      // HACKHACK #1984: Dataset keys are being removed, so this is the internal key
+      var mockDrawer2 = new Plottable.Drawers.AbstractDrawer("_1");
       (<any> mockDrawer2).setup = () => (<any> mockDrawer2)._renderArea = renderArea2;
       (<any> mockDrawer2)._getSelector = () => "circle";
       (<any> mockDrawer2)._getPixelPoint = data2PointConverter;
 
       // Mock _getDrawer to return the mock drawers
       (<any> plot)._getDrawer = (key: string) => {
-        if (key === "ds1") {
+        if (key === "_0") {
           return mockDrawer1;
         } else {
           return mockDrawer2;
         }
       };
 
-      plot.addDataset("ds1", data1);
-      plot.addDataset("ds2", data2);
+      var dataset1 = new Plottable.Dataset(data1);
+      plot.addDataset(dataset1);
+      var dataset2 = new Plottable.Dataset(data2);
+      plot.addDataset(dataset2);
       plot.renderTo(svg);
 
       var allPlotData = plot.getAllPlotData();
@@ -233,14 +251,14 @@ describe("Plots", () => {
       assert.includeMembers(allPlotData.pixelPoints, data1.map(data1PointConverter), "includes data1 points");
       assert.includeMembers(allPlotData.pixelPoints, data2.map(data2PointConverter), "includes data2 points");
 
-      var singlePlotData = plot.getAllPlotData("ds1");
+      var singlePlotData = plot.getAllPlotData([dataset1]);
       var oneSelection = singlePlotData.selection;
       assert.strictEqual(oneSelection.size(), 1);
       assert.strictEqual(TestMethods.numAttr(oneSelection, "cx"), 100, "retrieved selection in renderArea1");
       assert.includeMembers(singlePlotData.data, data1, "includes data1 members");
       assert.includeMembers(singlePlotData.pixelPoints, data1.map(data1PointConverter), "includes data1 points");
 
-      var oneElementPlotData = plot.getAllPlotData(["ds2"]);
+      var oneElementPlotData = plot.getAllPlotData([dataset2]);
       var oneElementSelection = oneElementPlotData.selection;
       assert.strictEqual(oneElementSelection.size(), 1);
       assert.strictEqual(TestMethods.numAttr(oneElementSelection, "cy"), 10, "retreieved selection in renderArea2");
@@ -272,7 +290,8 @@ describe("Plots", () => {
       // Mock _getDrawer to return the mock drawer
       (<any> plot)._getDrawer = () => mockDrawer;
 
-      plot.addDataset("ds", data);
+      var dataset = new Plottable.Dataset(data);
+      plot.addDataset(dataset);
       plot.renderTo(svg);
 
       var oneElementPlotData = plot.getAllPlotData();
@@ -325,8 +344,8 @@ describe("Plots", () => {
         }
       };
 
-      plot.addDataset("ds1", data1);
-      plot.addDataset("ds2", data2);
+      plot.addDataset(new Plottable.Dataset(data1));
+      plot.addDataset(new Plottable.Dataset(data2));
       plot.renderTo(svg);
 
       var queryPoint = {x: 1, y: 11};
@@ -345,57 +364,22 @@ describe("Plots", () => {
         plot = new Plottable.Plot();
         d1 = new Plottable.Dataset();
         d2 = new Plottable.Dataset();
-        plot.addDataset("foo", d1);
-        plot.addDataset("bar", d2);
+        plot.addDataset(d1);
+        plot.addDataset(d2);
         assert.deepEqual(plot.datasets(), [d1, d2], "datasets as expected");
       });
 
-      it("removeDataset can work on keys", () => {
-        plot.removeDataset("bar");
-        assert.deepEqual(plot.datasets(), [d1], "second dataset removed");
-        plot.removeDataset("foo");
-        assert.deepEqual(plot.datasets(), [], "all datasets removed");
-      });
-
-      it("removeDataset can work on datasets", () => {
+      it("removeDataset()", () => {
         plot.removeDataset(d2);
         assert.deepEqual(plot.datasets(), [d1], "second dataset removed");
         plot.removeDataset(d1);
         assert.deepEqual(plot.datasets(), [], "all datasets removed");
       });
 
-      it("removeDataset ignores inputs that do not correspond to a dataset", () => {
+      it("removeDataset ignores Datasets not in the Plot", () => {
         var d3 = new Plottable.Dataset();
         plot.removeDataset(d3);
-        plot.removeDataset("bad key");
         assert.deepEqual(plot.datasets(), [d1, d2], "datasets as expected");
-      });
-
-      it("removeDataset functions on inputs that are data arrays, not datasets", () => {
-        var a1 = ["foo", "bar"];
-        var a2 = [1, 2, 3];
-        plot.addDataset(a1);
-        plot.addDataset(a2);
-        assert.lengthOf(plot.datasets(), 4, "there are four datasets");
-        assert.strictEqual(plot.datasets()[3].data(), a2, "second array dataset correct");
-        assert.strictEqual(plot.datasets()[2].data(), a1, "first array dataset correct");
-        plot.removeDataset(a2);
-        plot.removeDataset(a1);
-        assert.deepEqual(plot.datasets(), [d1, d2], "datasets as expected");
-      });
-
-      it("removeDataset behaves appropriately when the key 'undefined' is used", () => {
-        var a = [1, 2, 3];
-        plot.addDataset("undefined", a);
-        assert.lengthOf(plot.datasets(), 3, "there are three datasets initially");
-        plot.removeDataset("foofoofoofoofoofoofoofoo");
-        assert.lengthOf(plot.datasets(), 3, "there are three datasets after bad key removal");
-        plot.removeDataset(undefined);
-        assert.lengthOf(plot.datasets(), 3, "there are three datasets after removing `undefined`");
-        plot.removeDataset([94, 93, 92]);
-        assert.lengthOf(plot.datasets(), 3, "there are three datasets after removing random dataset");
-        plot.removeDataset("undefined");
-        assert.lengthOf(plot.datasets(), 2, "the dataset called 'undefined' could be removed");
       });
     });
 
@@ -453,7 +437,7 @@ describe("Plots", () => {
       var animator = new Plottable.Animators.Base().delay(10).duration(10).maxIterativeDelay(0);
       var x = new Plottable.Scales.Linear();
       var y = new Plottable.Scales.Linear();
-      var plot = new Plottable.Plots.Bar(x, y).addDataset([]).animate(true);
+      var plot = new Plottable.Plots.Bar(x, y).addDataset(new Plottable.Dataset([])).animate(true);
       var recordedTime: number = -1;
       var additionalPaint = (x: number) => {
         recordedTime = Math.max(x, recordedTime);
@@ -470,19 +454,17 @@ describe("Plots", () => {
 
     it("extent calculation done in correct dataset order", () => {
       var categoryScale = new Plottable.Scales.Category();
-      var dataset1 = [{key: "A"}];
-      var dataset2 = [{key: "B"}];
-      var plot = new Plottable.Plot()
-                                   .addDataset("b", dataset2)
-                                   .addDataset("a", dataset1);
+      var dataset1 = new Plottable.Dataset([{key: "A"}]);
+      var dataset2 = new Plottable.Dataset([{key: "B"}]);
+      var plot = new Plottable.Plot();
+      plot.addDataset(dataset2);
+      plot.addDataset(dataset1);
       plot.project("key", "key", categoryScale);
-
-      plot.datasetOrder(["a", "b"]);
 
       var svg = TestMethods.generateSVG();
       plot.renderTo(svg);
 
-      assert.deepEqual(categoryScale.domain(), ["A", "B"], "extent is in the right order");
+      assert.deepEqual(categoryScale.domain(), ["B", "A"], "extent is in the right order");
       svg.remove();
     });
   });

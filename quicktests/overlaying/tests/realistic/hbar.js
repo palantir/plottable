@@ -31,7 +31,7 @@ function run(svg, data, Plottable){
     var yLabel = new Plottable.Components.Label("");
 
     var plot = new Plottable.Plots.Bar(xScale, yScale, false);
-    plot.addDataset(data[0]);
+    plot.addDataset(new Plottable.Dataset(data[0]));
     plot.project("x", "y", xScale)
         .project("y", "x", yScale);
 

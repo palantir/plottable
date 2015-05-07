@@ -20,8 +20,8 @@ function run(svg, data, Plottable) {
   var yScale = new Plottable.Scales.Linear();
 
   for (var i=0; i<numRenderers; i++) {
-    var d = data[0].slice(i*10, i*10 + 10);
-    var renderer = new Plottable.Plots.Scatter(xScale, yScale).addDataset(d);
+    var dataset = new Plottable.Dataset(data[0].slice(i*10, i*10 + 10));
+    var renderer = new Plottable.Plots.Scatter(xScale, yScale).addDataset(dataset);
     renderer.project("x", "x", xScale).project("y", "y", yScale);
     renderers.push(renderer);
   }

@@ -16,12 +16,13 @@ function run(svg, data, Plottable) {
         axis_array.push(new Plottable.Axes.Numeric(yScale, "left"));
     }
 
+    var dataset = new Plottable.Dataset(data);
     //rendering
-    var scatterPlot = new Plottable.Plots.Scatter(xScale, yScale).addDataset(data).project("x", "x", xScale).project("y", "y", yScale);
-    var linePlot = new Plottable.Plots.Line(xScale, yScale).addDataset(data).project("x", "x", xScale).project("y", "y", yScale);
-    var areaPlot = new Plottable.Plots.Area(xScale, yScale).addDataset(data).project("x", "x", xScale).project("y", "y", yScale);
-    var vbarPlot = new Plottable.Plots.Bar(xScale, yScale, true).addDataset(data).project("x", "x", xScale).project("y", "y", yScale);
-    var hbarPlot = new Plottable.Plots.Bar(xScale, yScale, false).addDataset(data).project("x", "x", xScale).project("y", "y", yScale);
+    var scatterPlot = new Plottable.Plots.Scatter(xScale, yScale).addDataset(dataset).project("x", "x", xScale).project("y", "y", yScale);
+    var linePlot = new Plottable.Plots.Line(xScale, yScale).addDataset(dataset).project("x", "x", xScale).project("y", "y", yScale);
+    var areaPlot = new Plottable.Plots.Area(xScale, yScale).addDataset(dataset).project("x", "x", xScale).project("y", "y", yScale);
+    var vbarPlot = new Plottable.Plots.Bar(xScale, yScale, true).addDataset(dataset).project("x", "x", xScale).project("y", "y", yScale);
+    var hbarPlot = new Plottable.Plots.Bar(xScale, yScale, false).addDataset(dataset).project("x", "x", xScale).project("y", "y", yScale);
 
     //title + legend
 

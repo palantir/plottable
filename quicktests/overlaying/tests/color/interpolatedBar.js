@@ -25,7 +25,7 @@ function run(svg, data, Plottable) {
     var colorScale = new Plottable.Scales.InterpolatedColor();
     colorScale.colorRange(["#76DE5D","#A12A23"]);
     var plot = new Plottable.Plots.Bar(xScale, yScale, colorScale);
-    plot.addDataset(data);
+    plot.addDataset(new Plottable.Dataset(data));
     plot.project("x", "val", xScale).project("y", "y", yScale);
     plot.project("width", function(){ return 30;});
     plot.project("fill", function(d) { return d.val; }, colorScale);

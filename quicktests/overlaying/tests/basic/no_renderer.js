@@ -17,17 +17,18 @@ function run(svg, data, Plottable) {
       axis_array.push(new Plottable.Axes.Numeric(yScale, "left"));
   }
 
+  var dataset = new Plottable.Dataset(data);
   //rendering
   var scatterPlot = new Plottable.Plots.Scatter(xScale, yScale)
-                          .addDataset(data);
+                          .addDataset(dataset);
   var linePlot = new Plottable.Plots.Line(xScale, yScale)
-                          .addDataset(data);
+                          .addDataset(dataset);
   var areaPlot = new Plottable.Plots.Area(xScale, yScale)
-                          .addDataset(data);
+                          .addDataset(dataset);
   var vbarPlot = new Plottable.Plots.Bar(xScale, yScale, true)
-                          .addDataset(data);
+                          .addDataset(dataset);
   var hbarPlot = new Plottable.Plots.Bar(xScale, yScale, false)
-                          .addDataset(data);
+                          .addDataset(dataset);
 
   //title + legend
 

@@ -54,7 +54,7 @@ function showSizeControls(){
     $( ".size-controls" ).slideDown( 300, function() {
       $(this).focus();
       $("#expand").val("-");
-    }); 
+    });
   }
   else{
     $( ".size-controls" ).slideUp( 300, function() {
@@ -221,7 +221,7 @@ function runQuickTest(result, svg, data, branch){
 
 function loadAllQuickTests(quicktestsPaths, firstBranch, secondBranch){
   var div = d3.select("#results");
-  quicktestsPaths.forEach(function(path) { //for each quicktest 
+  quicktestsPaths.forEach(function(path) { //for each quicktest
     var name = path.replace(/\w*\/|\.js/g , '');
     d3.text("http://localhost:9999/" + path, function(error, text) {
       if (error !== null) {
@@ -249,7 +249,7 @@ function loadAllQuickTests(quicktestsPaths, firstBranch, secondBranch){
 function loadQuickTestsInCategory(quickTestNames, category, firstBranch, secondBranch){
 
   var div = d3.select("#results");
-  quickTestNames.forEach(function(q) { //for each quicktest 
+  quickTestNames.forEach(function(q) { //for each quicktest
     var name = q;
     d3.text("/quicktests/overlaying/tests/" + category + "/" + name + ".js", function(error, text) {
       if (error !== null) {
@@ -292,7 +292,7 @@ function filterQuickTests(category, branchList){
     }
   });
 }
-  
+
 
 //retrieve different plottable objects then push to array
 function loadPlottableBranches(category, branchList){
@@ -312,12 +312,12 @@ function loadPlottableBranches(category, branchList){
     }
   });
 
-  $.getScript(listOfUrl[0], function(data, textStatus) { 
+  $.getScript(listOfUrl[0], function(data, textStatus) {
     if(textStatus === "success"){
       plottableBranches[branchName1] =  $.extend(true, {}, Plottable);
       Plottable = null;
 
-      $.getScript(listOfUrl[1], function(data, testStatus){ //load second 
+      $.getScript(listOfUrl[1], function(data, testStatus){ //load second
         if(textStatus === "success"){
           plottableBranches[branchName2] = $.extend(true, {}, Plottable);
           Plottable = null;

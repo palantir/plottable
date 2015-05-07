@@ -25,7 +25,7 @@ function run(svg, data, Plottable) {
     var colorScale = new Plottable.Scales.Color();
     colorScale.range(["blue", "teal", "purple"]);
     var plot = new Plottable.Plots.Grid(xScale, yScale, colorScale);
-    plot.addDataset(data);
+    plot.addDataset(new Plottable.Dataset(data));
     plot.project("x", "x", xScale).project("y", "y", yScale);
     plot.project("fill", function(d) { return d.val; }, colorScale);
 

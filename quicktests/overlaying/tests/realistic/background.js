@@ -37,21 +37,21 @@ function run(svg, data, Plottable){
   var yAxis = new Plottable.Axes.Numeric(yScale, 'left');
 
   var plot1 = new Plottable.Plots.Area(xScale, yScale);
-  plot1.addDataset(data1);
+  plot1.addDataset(new Plottable.Dataset(data1));
   plot1.project("x", "x", xScale).project("y", "y", yScale);
   plot1.project("fill", '#923458')
   .project("opacity", 0.2)
   .project("stroke-width", 0);
 
   var plot2 = new Plottable.Plots.Area(xScale, yScale);
-  plot2.addDataset(data2);
+  plot2.addDataset(new Plottable.Dataset(data2));
   plot2.project("x", "x", xScale).project("y", "y", yScale);
   plot2.project("fill", '#923458')
   .project("opacity", 0.3)
   .project("stroke-width", 0);
 
   var plot3 = new Plottable.Plots.Area(xScale, yScale);
-  plot3.addDataset(data3);
+  plot3.addDataset(new Plottable.Dataset(data3));
   plot3.project("x", "x", xScale).project("y", "y", yScale);
   plot3.project("fill", '#923458')
   .project("opacity", 0.4)

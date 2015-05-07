@@ -9,10 +9,10 @@ describe("Drawers", () => {
       var yScale = new Plottable.Scales.Linear();
       var barPlot = new Plottable.Plots.Bar(xScale, yScale);
 
-      var drawer = new Plottable.Drawers.Rect("one", true);
+      var drawer = new Plottable.Drawers.Rect("_0", true); // HACKHACK #1984: Dataset keys are being removed, so this is the internal key
       (<any> barPlot)._getDrawer = () => drawer;
 
-      barPlot.addDataset("one", data);
+      barPlot.addDataset(new Plottable.Dataset(data));
       barPlot.project("x", "a", xScale);
       barPlot.project("y", "b", yScale);
       barPlot.renderTo(svg);
@@ -34,10 +34,10 @@ describe("Drawers", () => {
       var yScale = new Plottable.Scales.Category();
       var barPlot = new Plottable.Plots.Bar(xScale, yScale, false);
 
-      var drawer = new Plottable.Drawers.Rect("one", false);
+      var drawer = new Plottable.Drawers.Rect("_0", false); // HACKHACK #1984: Dataset keys are being removed, so this is the internal key
       (<any> barPlot)._getDrawer = () => drawer;
 
-      barPlot.addDataset("one", data);
+      barPlot.addDataset(new Plottable.Dataset(data));
       barPlot.project("x", "b", xScale);
       barPlot.project("y", "a", yScale);
       barPlot.renderTo(svg);

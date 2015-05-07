@@ -62,13 +62,13 @@ function run(svg, data, Plottable) {
           var googSource = new Plottable.Dataset(goog, {name: "GOOG"} );
 
           var line_aapl = new Plottable.Plots.Line(xScale, yScale_aapl).animate(true)
-                                  .addDataset("aapl", aaplSource)
+                                  .addDataset(aaplSource)
                                   .project("x", "Date", xScale)
                                   .project("y", "Adj Close", yScale_aapl)
                                   .project("stroke", function(d, i, m) { return m.name; }, colorScale)
                                   .automaticallyAdjustYScaleOverVisiblePoints(true);
           var line_goog = new Plottable.Plots.Line(xScale, yScale_goog).animate(true)
-                                  .addDataset("goog", googSource)
+                                  .addDataset(googSource)
                                   .project("x", "Date", xScale)
                                   .project("y", "Adj Close", yScale_goog)
                                   .project("stroke", function(d, i, m) { return m.name; }, colorScale)
@@ -86,7 +86,7 @@ function run(svg, data, Plottable) {
 
           var DAY_MILLIS = 24 * 60 * 60 * 1000;
           var bar_diff = new Plottable.Plots.Bar(xScale, yScale_diff, true).animate(true)
-                                  .addDataset(diffData)
+                                  .addDataset(new Plottable.Dataset(diffData))
                                   .project("x", "Date", xScale)
                                   .project("y", "net change", yScale_diff)
                                   .project("width", function() { return xScale.scale(DAY_MILLIS) - xScale.scale(0); })

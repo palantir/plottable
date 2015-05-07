@@ -29,15 +29,21 @@ function run(svg, data, Plottable) {
 
   var title = new Plottable.Components.TitleLabel("Sample Net Earnings by Teams");
 
+  var dataset1 = new Plottable.Dataset(data[0]);
+  var dataset2 = new Plottable.Dataset(data[1]);
+  var dataset3 = new Plottable.Dataset(data[2]);
+  var dataset4 = new Plottable.Dataset(data[3]);
+  var dataset5 = new Plottable.Dataset(data[4]);
+
   var verticalPlot = new Plottable.Plots.StackedBar(xScale1, yScale1, true)
     .project("x", "quarter", xScale1)
     .project("y", "earnings", yScale1)
     .project("fill", "team", colorScale)
-    .addDataset("d1", data[0])
-    .addDataset("d2", data[1])
-    .addDataset("d3", data[2])
-    .addDataset("d4", data[3])
-    .addDataset("d5", data[4])
+    .addDataset(dataset1)
+    .addDataset(dataset2)
+    .addDataset(dataset3)
+    .addDataset(dataset4)
+    .addDataset(dataset5)
     .labelsEnabled(true)
     .labelFormatter(Plottable.Formatters.siSuffix())
     .animate(true);
@@ -46,11 +52,11 @@ function run(svg, data, Plottable) {
     .project("x", "earnings", xScale2)
     .project("y", "quarter", yScale2)
     .project("fill", "team", colorScale)
-    .addDataset("d1", data[0])
-    .addDataset("d2", data[1])
-    .addDataset("d3", data[2])
-    .addDataset("d4", data[3])
-    .addDataset("d5", data[4])
+    .addDataset(dataset1)
+    .addDataset(dataset2)
+    .addDataset(dataset3)
+    .addDataset(dataset4)
+    .addDataset(dataset5)
     .labelsEnabled(true)
     .labelFormatter(Plottable.Formatters.siSuffix())
     .animate(true);

@@ -17,9 +17,9 @@ function run(svg, data, Plottable) {
   var xAxis = new Plottable.Axes.Category(xScale, "bottom");
   var yAxis = new Plottable.Axes.Numeric(yScale, "left");
   var clusteredBarRenderer = new Plottable.Plots.ClusteredBar(xScale, yScale)
-    .addDataset("d1", data[0])
-    .addDataset("d2", data[1])
-    .addDataset("d3", data[2])
+    .addDataset(new Plottable.Dataset(data[0]))
+    .addDataset(new Plottable.Dataset(data[1]))
+    .addDataset(new Plottable.Dataset(data[2]))
     .attr("x", "name", xScale)
     .attr("y", "y", yScale)
     .attr("fill", "type", colorScale)

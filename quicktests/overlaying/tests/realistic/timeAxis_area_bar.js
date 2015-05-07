@@ -66,12 +66,12 @@ function run(svg, data, Plottable) {
   var title = new Plottable.Components.TitleLabel("Area & Bar on Time Axes");
 
   var areaPlot = new Plottable.Plots.Area(xScale, yScale1)
-      .addDataset(data[0])
+      .addDataset(new Plottable.Dataset(data[0]))
       .project("x", timeFormat, xScale)
       .project("y", "y", yScale1);
 
   var barPlot = new Plottable.Plots.Bar(xScale, yScale1, true)
-      .addDataset(data[0])
+      .addDataset(new Plottable.Dataset(data[0]))
       .project("x", timeFormat, xScale)
       .project("y", "y", yScale1)
       .project("width", 40)
@@ -81,22 +81,22 @@ function run(svg, data, Plottable) {
       .project("x", timeFormat, xScale)
       .project("y", "y", yScale2)
       .project("fill", "type", colorScale)
-      .addDataset(data[0])
-      .addDataset(data[1])
-      .addDataset(data[2])
-      .addDataset(data[3])
-      .addDataset(data[4]);
+      .addDataset(new Plottable.Dataset(data[0]))
+      .addDataset(new Plottable.Dataset(data[1]))
+      .addDataset(new Plottable.Dataset(data[2]))
+      .addDataset(new Plottable.Dataset(data[3]))
+      .addDataset(new Plottable.Dataset(data[4]));
 
   var stackedBar = new Plottable.Plots.StackedBar(xScale, yScale2)
       .project("x", timeFormat, xScale)
       .project("y", "y", yScale2)
       .project("fill", "type", colorScale)
       .project("width", 40)
-      .addDataset(data[0])
-      .addDataset(data[1])
-      .addDataset(data[2])
-      .addDataset(data[3])
-      .addDataset(data[4]);
+      .addDataset(new Plottable.Dataset(data[0]))
+      .addDataset(new Plottable.Dataset(data[1]))
+      .addDataset(new Plottable.Dataset(data[2]))
+      .addDataset(new Plottable.Dataset(data[3]))
+      .addDataset(new Plottable.Dataset(data[4]));
 
   var upperChart = new Plottable.Components.Table([
     [yAxis1, areaPlot, yAxis2, barPlot],

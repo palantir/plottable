@@ -168,10 +168,10 @@ describe("Plots", () => {
       ];
 
       plot = new Plottable.Plots.StackedBar(xScale, yScale);
-      plot.addDataset(data1);
-      plot.addDataset(data2);
-      plot.addDataset(data3);
-      plot.addDataset(data4);
+      plot.addDataset(new Plottable.Dataset(data1));
+      plot.addDataset(new Plottable.Dataset(data2));
+      plot.addDataset(new Plottable.Dataset(data3));
+      plot.addDataset(new Plottable.Dataset(data4));
       plot.project("x", "x", xScale);
       plot.project("y", "y", yScale);
       plot.baseline(0);
@@ -238,8 +238,8 @@ describe("Plots", () => {
       renderer = new Plottable.Plots.StackedBar(xScale, yScale, false);
       renderer.project("y", "name", yScale);
       renderer.project("x", "y", xScale);
-      renderer.addDataset(data1);
-      renderer.addDataset(data2);
+      renderer.addDataset(new Plottable.Dataset(data1));
+      renderer.addDataset(new Plottable.Dataset(data2));
       renderer.baseline(0);
       var yAxis = new Plottable.Axes.Category(yScale, "left");
       new Plottable.Components.Table([[yAxis, renderer]]).renderTo(svg);
@@ -310,9 +310,9 @@ describe("Plots", () => {
       ];
 
       plot = new Plottable.Plots.StackedBar(xScale, yScale);
-      plot.addDataset(data1);
-      plot.addDataset(data2);
-      plot.addDataset(data3);
+      plot.addDataset(new Plottable.Dataset(data1));
+      plot.addDataset(new Plottable.Dataset(data2));
+      plot.addDataset(new Plottable.Dataset(data3));
       plot.project("x", "x", xScale);
       plot.project("y", "y", yScale);
       var xAxis = new Plottable.Axes.Category(xScale, "bottom");
@@ -371,9 +371,9 @@ describe("Plots", () => {
       ];
 
       plot = new Plottable.Plots.StackedBar(xScale, yScale, false);
-      plot.addDataset(data1);
-      plot.addDataset(data2);
-      plot.addDataset(data3);
+      plot.addDataset(new Plottable.Dataset(data1));
+      plot.addDataset(new Plottable.Dataset(data2));
+      plot.addDataset(new Plottable.Dataset(data3));
       plot.project("x", "x", xScale);
       plot.project("y", "y", yScale);
       plot.renderTo(svg);
@@ -418,19 +418,19 @@ describe("Plots", () => {
       var yScale = new Plottable.Scales.Linear();
 
       var plot = new Plottable.Plots.StackedBar(xScale, yScale);
-      plot.addDataset("d1", data1);
-      plot.addDataset("d2", data2);
+      plot.addDataset(new Plottable.Dataset(data1));
+      plot.addDataset(new Plottable.Dataset(data2));
       plot.project("fill", "fill");
       plot.project("x", "x", xScale).project("y", "y", yScale);
 
-      var ds1FirstColumnOffset = (<any> plot)._key2PlotDatasetKey.get("d1").plotMetadata.offsets.get("A");
-      var ds2FirstColumnOffset = (<any> plot)._key2PlotDatasetKey.get("d2").plotMetadata.offsets.get("A");
+      var ds1FirstColumnOffset = (<any> plot)._key2PlotDatasetKey.get("_0").plotMetadata.offsets.get("A");
+      var ds2FirstColumnOffset = (<any> plot)._key2PlotDatasetKey.get("_1").plotMetadata.offsets.get("A");
 
-      assert.strictEqual(typeof ds1FirstColumnOffset, "number", "ds1 offset should be a number");
-      assert.strictEqual(typeof ds2FirstColumnOffset, "number", "ds2 offset should be a number");
+      assert.strictEqual(typeof ds1FirstColumnOffset, "number", "ds0 offset should be a number");
+      assert.strictEqual(typeof ds2FirstColumnOffset, "number", "ds1 offset should be a number");
 
+      assert.isFalse(Plottable.Utils.Methods.isNaN(ds1FirstColumnOffset), "ds0 offset should not be NaN");
       assert.isFalse(Plottable.Utils.Methods.isNaN(ds1FirstColumnOffset), "ds1 offset should not be NaN");
-      assert.isFalse(Plottable.Utils.Methods.isNaN(ds1FirstColumnOffset), "ds2 offset should not be NaN");
     });
 
     it("bad values on the primary axis should default to 0 (be ignored)", () => {
@@ -454,24 +454,25 @@ describe("Plots", () => {
       var yScale = new Plottable.Scales.Linear();
 
       var plot = new Plottable.Plots.StackedBar(xScale, yScale);
-      plot.addDataset("d1", data1);
-      plot.addDataset("d2", data2);
-      plot.addDataset("d3", data3);
-      plot.addDataset("d4", data4);
-      plot.addDataset("d5", data5);
+      plot.addDataset(new Plottable.Dataset(data1));
+      plot.addDataset(new Plottable.Dataset(data2));
+      plot.addDataset(new Plottable.Dataset(data3));
+      plot.addDataset(new Plottable.Dataset(data4));
+      plot.addDataset(new Plottable.Dataset(data5));
       plot.project("fill", "fill");
       plot.project("x", "x", xScale).project("y", "y", yScale);
 
-      var offset1 = (<any> plot)._key2PlotDatasetKey.get("d1").plotMetadata.offsets.get("A");
-      var offset3 = (<any> plot)._key2PlotDatasetKey.get("d3").plotMetadata.offsets.get("A");
-      var offset5 = (<any> plot)._key2PlotDatasetKey.get("d5").plotMetadata.offsets.get("A");
+      var keys = (<any> plot)._key2PlotDatasetKey.keys();
+      var offset0 = (<any> plot)._key2PlotDatasetKey.get(keys[0]).plotMetadata.offsets.get("A");
+      var offset2 = (<any> plot)._key2PlotDatasetKey.get(keys[2]).plotMetadata.offsets.get("A");
+      var offset4 = (<any> plot)._key2PlotDatasetKey.get(keys[4]).plotMetadata.offsets.get("A");
 
-      assert.strictEqual(offset1, 0,
+      assert.strictEqual(offset0, 0,
         "Plot columns should start from offset 0 (at the very bottom)");
-      assert.strictEqual(offset3, 1,
-        "Bar 3 should have offset 1, because bar 2 was not rendered");
-      assert.strictEqual(offset5, 3,
-        "Bar 5 should have offset 3, because bar 4 was not rendered");
+      assert.strictEqual(offset2, 1,
+        "third bar should have offset 1, because second bar was not rendered");
+      assert.strictEqual(offset4, 3,
+        "fifth bar should have offset 3, because fourth bar was not rendered");
     });
   });
 });

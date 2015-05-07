@@ -40,7 +40,7 @@ function run(svg, data, Plottable) {
       .project("x",function (d) { return d3.time.format("%m/%d/%y/%H").parse(d.x);}, xScale)
       .project("y", "y", yScale)
       .project("fill", "type", colorScale)
-      .addDataset("d1", data);
+      .addDataset(new Plottable.Dataset(data));
 
 
 

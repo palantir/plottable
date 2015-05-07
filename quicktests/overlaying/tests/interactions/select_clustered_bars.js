@@ -18,9 +18,9 @@ function run(svg, data, Plottable) {
   var yAxis = new Plottable.Axes.Numeric(yScale, "left");
 
   var barPlot = new Plottable.Plots.ClusteredBar(xScale, yScale)
-                                  .addDataset(data[0])
-                                  .addDataset(data[1])
-                                  .addDataset(data[2])
+                                  .addDataset(new Plottable.Dataset(data[0]))
+                                  .addDataset(new Plottable.Dataset(data[1]))
+                                  .addDataset(new Plottable.Dataset(data[2]))
                                   .project("x", "name", xScale)
                                   .project("y", "y", yScale);
 

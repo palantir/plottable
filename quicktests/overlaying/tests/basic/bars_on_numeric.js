@@ -23,27 +23,31 @@ function run(svg, data, Plottable) {
   var xAxis3 = new Plottable.Axes.Numeric(xScale, "bottom");
   var yAxis3 = new Plottable.Axes.Numeric(yScale, "right");
 
+  var dataset1 = new Plottable.Dataset(data[0]);
+  var dataset2 = new Plottable.Dataset(data[1]);
+  var dataset3 = new Plottable.Dataset(data[2]);
+
   var stackedBarRenderer = new Plottable.Plots.StackedBar(xScale, yScale)
     .animate(true)
     .project("x", "x", xScale)
     .project("y", "y", yScale)
     .project("fill", "type", colorScale)
-    .addDataset("d1", data[0])
-    .addDataset("d2", data[1])
-    .addDataset("d3", data[2]);
+    .addDataset(dataset1)
+    .addDataset(dataset2)
+    .addDataset(dataset3);
 
   var clusteredBarRenderer = new Plottable.Plots.ClusteredBar(xScale, yScale, true)
     .animate(true)
     .project("fill", "type", colorScale)
-    .addDataset("d1", data[0])
-    .addDataset("d2", data[1])
-    .addDataset("d3", data[2])
+    .addDataset(dataset1)
+    .addDataset(dataset2)
+    .addDataset(dataset3)
     .project("x", "x", xScale)
     .project("y", "y", yScale);
 
-  var verticalBarRenderer = new Plottable.Plots.Bar( xScale, yScale)
+  var verticalBarRenderer = new Plottable.Plots.Bar(xScale, yScale)
     .animate(true)
-    .addDataset(data[0])
+    .addDataset(dataset1)
     .project("fill", "type", colorScale)
     .project("x", "x", xScale)
     .project("y", "y", yScale);
