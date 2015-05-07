@@ -340,9 +340,9 @@ module Plottable {
       var prefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
       prefix = prefix.split("#")[0]; // To fix cases where an anchor tag was used
       var clipPathId = Utils.DOM.getUniqueClipPathId();
-      this._element.attr("clip-path", "url(\"" + prefix + "#clipPath" + clipPathId + "\")");
+      this._element.attr("clip-path", "url(\"" + prefix + "#" + clipPathId + "\")");
       var clipPathParent = this._boxContainer.append("clipPath")
-                                             .attr("id", "clipPath" + clipPathId);
+                                             .attr("id", clipPathId);
       this._addBox("clip-rect", clipPathParent);
     }
 

@@ -130,7 +130,7 @@ export module Utils {
 
     var _latestClipPathId = 0;
     export function getUniqueClipPathId() {
-      return ++_latestClipPathId;
+      return "plottableClipPath" + ++_latestClipPathId;
     }
   }
 }
