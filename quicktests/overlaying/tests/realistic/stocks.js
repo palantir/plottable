@@ -106,13 +106,12 @@ function run(svg, data, Plottable) {
 
           var pzi = new Plottable.Interactions.PanZoom(xScale, null);
           plotArea.registerInteraction(pzi);
-          plotArea.registerInteraction(
-            new Plottable.Interactions.Key()
-                                     onKey(65, function() {
+          var keyInteraction = new Plottable.Interactions.Key();
+          keyInteraction.onKey(65, function() {
                                        xScale.autoDomain();
                                        pzi.resetZoom();
-                                     })
-          );
+                                     });
+          plotArea.registerInteraction(keyInteraction);
 
         });
     });
