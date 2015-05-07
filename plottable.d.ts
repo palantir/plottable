@@ -3757,14 +3757,14 @@ declare module Plottable {
              * @param {ClickCallback} callback The callback to set.
              * @return {Interaction.DoubleClick} The calling Interaction.DoubleClick.
              */
-            onDoubleClick(callback: ClickCallback): void;
+            onDoubleClick(callback: ClickCallback): DoubleClick;
             /**
              * Removes the callback called when the Component is double-clicked.
              *
              * @param {ClickCallback} callback The callback to remove.
              * @return {Interaction.DoubleClick} The calling Interaction.DoubleClick.
              */
-            offDoubleClick(callback: ClickCallback): void;
+            offDoubleClick(callback: ClickCallback): DoubleClick;
         }
     }
 }

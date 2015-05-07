@@ -9405,6 +9405,7 @@ var Plottable;
              */
             DoubleClick.prototype.onDoubleClick = function (callback) {
                 this._onDoubleClickCallbacks.add(callback);
+                return this;
             };
             /**
              * Removes the callback called when the Component is double-clicked.
@@ -9414,6 +9415,7 @@ var Plottable;
              */
             DoubleClick.prototype.offDoubleClick = function (callback) {
                 this._onDoubleClickCallbacks.delete(callback);
+                return this;
             };
             return DoubleClick;
         })(Plottable.Interaction);
