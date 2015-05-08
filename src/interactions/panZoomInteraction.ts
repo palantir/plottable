@@ -58,6 +58,7 @@ export module Interactions {
     }
 
     protected _unanchor() {
+      super._unanchor();
       this._mouseDispatcher.offWheel(this._wheelCallback);
       this._mouseDispatcher = null;
 

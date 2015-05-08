@@ -32,7 +32,7 @@ export module Interactions {
       this._touchDispatcher.onTouchCancel(this._touchCancelCallback);
     }
 
-    protected _unachor() {
+    protected _unanchor() {
       super._unanchor();
       this._mouseDispatcher.offMouseDown(this._mouseDownCallback);
       this._mouseDispatcher.offMouseUp(this._mouseUpCallback);

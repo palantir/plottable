@@ -18,14 +18,14 @@ describe("Interactions", () => {
       var callback = () => callbackCalled = true;
       clickInteraction.onClick(callback);
 
-      // clickInteraction.attachTo(component);
+      clickInteraction.attachTo(component);
 
-      // TestMethods.triggerFakeMouseEvent("mousedown", component.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
-      // TestMethods.triggerFakeMouseEvent("mouseup", component.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
-      // assert.isTrue(callbackCalled, "callback called on clicking Component (mouse)");
+      TestMethods.triggerFakeMouseEvent("mousedown", component.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+      TestMethods.triggerFakeMouseEvent("mouseup", component.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+      assert.isTrue(callbackCalled, "callback called on clicking Component (mouse)");
 
       callbackCalled = false;
-      // clickInteraction.detachFrom(component);
+      clickInteraction.detachFrom(component);
 
       TestMethods.triggerFakeMouseEvent("mousedown", component.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
       TestMethods.triggerFakeMouseEvent("mouseup", component.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);

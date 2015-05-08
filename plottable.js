@@ -9171,8 +9171,8 @@ var Plottable;
             component.onAnchor(this._anchorCallback);
         };
         Interaction.prototype.detachFrom = function (component) {
-            this._componentToListenTo = null;
             this._unanchor();
+            this._componentToListenTo = null;
             component.offAnchor(this._anchorCallback);
         };
         /**
@@ -9238,7 +9238,7 @@ var Plottable;
                 this._touchDispatcher.onTouchEnd(this._touchEndCallback);
                 this._touchDispatcher.onTouchCancel(this._touchCancelCallback);
             };
-            Click.prototype._unachor = function () {
+            Click.prototype._unanchor = function () {
                 _super.prototype._unanchor.call(this);
                 this._mouseDispatcher.offMouseDown(this._mouseDownCallback);
                 this._mouseDispatcher.offMouseUp(this._mouseUpCallback);
@@ -9644,6 +9644,7 @@ var Plottable;
                 this._touchDispatcher.onTouchCancel(this._touchCancelCallback);
             };
             PanZoom.prototype._unanchor = function () {
+                _super.prototype._unanchor.call(this);
                 this._mouseDispatcher.offWheel(this._wheelCallback);
                 this._mouseDispatcher = null;
                 this._touchDispatcher.offTouchStart(this._touchStartCallback);

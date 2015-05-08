@@ -32,8 +32,8 @@ module Plottable {
     }
 
     public detachFrom(component: Component) {
-      this._componentToListenTo = null;
       this._unanchor();
+      this._componentToListenTo = null;
       component.offAnchor(this._anchorCallback);
     }
 
