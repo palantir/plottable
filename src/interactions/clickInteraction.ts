@@ -15,9 +15,9 @@ export module Interactions {
     private _mouseDownCallback = (p: Point) => this._handleClickDown(p);
     private _mouseUpCallback = (p: Point) => this._handleClickUp(p);
 
-    private _touchStartCallback = (ids: any, idToPoint: any) => this._handleClickDown(idToPoint[ids[0]]);
-    private _touchEndCallback = (ids: any, idToPoint: any) => this._handleClickUp(idToPoint[ids[0]]);
-    private _touchCancelCallback = (ids: any, idToPoint: any) => this._clickedDown = false;
+    private _touchStartCallback = (ids: number[], idToPoint: Point[]) => this._handleClickDown(idToPoint[ids[0]]);
+    private _touchEndCallback = (ids: number[], idToPoint: Point[]) => this._handleClickUp(idToPoint[ids[0]]);
+    private _touchCancelCallback = (ids: number[], idToPoint: Point[]) => this._clickedDown = false;
 
     protected _anchor(component: Component) {
       super._anchor(component);

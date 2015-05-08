@@ -18,9 +18,9 @@ export module Interactions {
     private _mouseDownCallback = (p: Point, e: MouseEvent) => this._startDrag(p, e);
     private _mouseMoveCallback = (p: Point, e: MouseEvent) => this._doDrag(p, e);
     private _mouseUpCallback = (p: Point, e: MouseEvent) => this._endDrag(p, e);
-    private _touchStartCallback = (ids: any, idToPoint: any, e: any) => this._startDrag(idToPoint[ids[0]], e);
-    private _touchMoveCallback = (ids: any, idToPoint: any, e: any) => this._doDrag(idToPoint[ids[0]], e);
-    private _touchEndCallback = (ids: any, idToPoint: any, e: any) => this._endDrag(idToPoint[ids[0]], e);
+    private _touchStartCallback = (ids: number[], idToPoint: Point[], e: UIEvent) => this._startDrag(idToPoint[ids[0]], e);
+    private _touchMoveCallback = (ids: number[], idToPoint: Point[], e: UIEvent) => this._doDrag(idToPoint[ids[0]], e);
+    private _touchEndCallback = (ids: number[], idToPoint: Point[], e: UIEvent) => this._endDrag(idToPoint[ids[0]], e);
 
     protected _anchor(component: Component) {
       super._anchor(component);

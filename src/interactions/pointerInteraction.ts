@@ -13,7 +13,7 @@ export module Interactions {
     private _pointerExitCallbacks = new Utils.CallbackSet<PointerCallback>();
 
     private _mouseMoveCallback = (p: Point) => this._handlePointerEvent(p);
-    private _touchStartCallback = (ids: any, idToPoint: any) => this._handlePointerEvent(idToPoint[ids[0]]);
+    private _touchStartCallback = (ids: number[], idToPoint: Point[]) => this._handlePointerEvent(idToPoint[ids[0]]);
 
     protected _anchor(component: Component) {
       super._anchor(component);

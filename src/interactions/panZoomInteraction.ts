@@ -18,10 +18,10 @@ export module Interactions {
     private _touchIds: D3.Map<Point>;
 
     private _wheelCallback = (p: Point, e: WheelEvent) => this._handleWheelEvent(p, e);
-    private _touchStartCallback = (ids: any, idToPoint: any, e: any) => this._handleTouchStart(ids, idToPoint, e);
-    private _touchMoveCallback = (ids: any, idToPoint: any, e: any) => this._handlePinch(ids, idToPoint, e);
-    private _touchEndCallback = (ids: any, idToPoint: any, e: any) => this._handleTouchEnd(ids, idToPoint, e);
-    private _touchCancelCallback = (ids: any, idToPoint: any, e: any) => this._handleTouchEnd(ids, idToPoint, e);
+    private _touchStartCallback = (ids: number[], idToPoint: Point[], e: TouchEvent) => this._handleTouchStart(ids, idToPoint, e);
+    private _touchMoveCallback = (ids: number[], idToPoint: Point[], e: TouchEvent) => this._handlePinch(ids, idToPoint, e);
+    private _touchEndCallback = (ids: number[], idToPoint: Point[], e: TouchEvent) => this._handleTouchEnd(ids, idToPoint, e);
+    private _touchCancelCallback = (ids: number[], idToPoint: Point[], e: TouchEvent) => this._handleTouchEnd(ids, idToPoint, e);
 
     /**
      * Creates a PanZoomInteraction.
