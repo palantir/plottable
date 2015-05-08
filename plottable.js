@@ -9295,22 +9295,28 @@ var Plottable;
         var DoubleClick = (function (_super) {
             __extends(DoubleClick, _super);
             function DoubleClick() {
+                var _this = this;
                 _super.apply(this, arguments);
                 this._clickState = 0 /* NotClicked */;
                 this._clickedDown = false;
                 this._onDoubleClickCallbacks = new Plottable.Utils.CallbackSet();
+                this._mouseDownCallback = function (p) { return _this._handleClickDown(p); };
+                this._mouseUpCallback = function (p) { return _this._handleClickUp(p); };
+                this._dblClickCallback = function (p) { return _this._handleDblClick(); };
+                this._touchStartCallback = function (ids, idToPoint) { return _this._handleClickDown(idToPoint[ids[0]]); };
+                this._touchEndCallback = function (ids, idToPoint) { return _this._handleClickUp(idToPoint[ids[0]]); };
+                this._touchCancelCallback = function (ids, idToPoint) { return _this._handleClickCancel(); };
             }
             DoubleClick.prototype._anchor = function (component) {
-                var _this = this;
                 _super.prototype._anchor.call(this, component);
                 this._mouseDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(component.content().node());
-                this._mouseDispatcher.onMouseDown(function (p) { return _this._handleClickDown(p); });
-                this._mouseDispatcher.onMouseUp(function (p) { return _this._handleClickUp(p); });
-                this._mouseDispatcher.onDblClick(function (p) { return _this._handleDblClick(); });
+                this._mouseDispatcher.onMouseDown(this._mouseDownCallback);
+                this._mouseDispatcher.onMouseUp(this._mouseUpCallback);
+                this._mouseDispatcher.onDblClick(this._dblClickCallback);
                 this._touchDispatcher = Plottable.Dispatchers.Touch.getDispatcher(component.content().node());
-                this._touchDispatcher.onTouchStart(function (ids, idToPoint) { return _this._handleClickDown(idToPoint[ids[0]]); });
-                this._touchDispatcher.onTouchEnd(function (ids, idToPoint) { return _this._handleClickUp(idToPoint[ids[0]]); });
-                this._touchDispatcher.onTouchCancel(function (ids, idToPoint) { return _this._handleClickCancel(); });
+                this._touchDispatcher.onTouchStart(this._touchStartCallback);
+                this._touchDispatcher.onTouchEnd(this._touchEndCallback);
+                this._touchDispatcher.onTouchCancel(this._touchCancelCallback);
             };
             DoubleClick.prototype._handleClickDown = function (p) {
                 var translatedP = this._translateToComponentSpace(p);
