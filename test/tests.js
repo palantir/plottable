@@ -383,7 +383,7 @@ describe("Drawers", function () {
             var svg = TestMethods.generateSVG(300, 300);
             var data = [{ value: 10 }, { value: 10 }, { value: 10 }, { value: 10 }];
             var piePlot = new Plottable.Plots.Pie();
-            var drawer = new Plottable.Drawers.Arc("_0", piePlot); // HACKHACK #1984: Dataset keys are being removed, so this is the internal key
+            var drawer = new Plottable.Drawers.Arc("_0"); // HACKHACK #1984: Dataset keys are being removed, so this is the internal key
             piePlot._getDrawer = function () { return drawer; };
             piePlot.addDataset(new Plottable.Dataset(data));
             piePlot.sectorValue(function (d) { return d.value; });
