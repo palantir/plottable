@@ -2774,6 +2774,12 @@ declare module Plottable {
          * @param {Scale} yScale The y scale to use.
          */
         constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>);
+        x(): Plots.AccessorScaleBinding<X, number>;
+        x(x: number | _Accessor): XYPlot<X, Y>;
+        x(x: X | _Accessor, xScale: Scale<X, number>): XYPlot<X, Y>;
+        y(): Plots.AccessorScaleBinding<Y, number>;
+        y(y: number | _Accessor): XYPlot<X, Y>;
+        y(y: Y | _Accessor, yScale: Scale<Y, number>): XYPlot<X, Y>;
         /**
          * @param {string} attrToSet One of ["x", "y"] which determines the point's
          * x and y position in the Plot.

@@ -6940,6 +6940,26 @@ var Plottable;
             this._updateYDomainer();
             yScale.onUpdate(this._adjustXDomainOnChangeFromYCallback);
         }
+        XYPlot.prototype.x = function (x, xScale) {
+            if (x == null) {
+                return this._propertyBindings.get(XYPlot._X_KEY);
+            }
+            this._replaceScale(this.x().scale, xScale);
+            this._propertyBindings.set(XYPlot._X_KEY, { accessor: d3.functor(x), scale: xScale });
+            this._updateExtentsForKey(XYPlot._X_KEY, false);
+            this._render();
+            return this;
+        };
+        XYPlot.prototype.y = function (y, yScale) {
+            if (y == null) {
+                return this._propertyBindings.get(XYPlot._Y_KEY);
+            }
+            this._replaceScale(this.y().scale, yScale);
+            this._propertyBindings.set(XYPlot._Y_KEY, { accessor: d3.functor(y), scale: yScale });
+            this._updateExtentsForKey(XYPlot._Y_KEY, false);
+            this._render();
+            return this;
+        };
         /**
          * @param {string} attrToSet One of ["x", "y"] which determines the point's
          * x and y position in the Plot.
@@ -7111,6 +7131,8 @@ var Plottable;
         XYPlot.prototype._projectorsReady = function () {
             return this._attrBindings.get("x") && this._attrBindings.get("y");
         };
+        XYPlot._X_KEY = "x";
+        XYPlot._Y_KEY = "y";
         return XYPlot;
     })(Plottable.Plot);
     Plottable.XYPlot = XYPlot;

@@ -2,6 +2,8 @@
 
 module Plottable {
   export class XYPlot<X, Y> extends Plot {
+    private static _X_KEY = "x";
+    private static _Y_KEY = "y";
     protected _xScale: Scale<X, number>;
     protected _yScale: Scale<Y, number>;
     private _autoAdjustXScaleDomain = false;
@@ -38,6 +40,34 @@ module Plottable {
 
       this._updateYDomainer();
       yScale.onUpdate(this._adjustXDomainOnChangeFromYCallback);
+    }
+
+    public x(): Plots.AccessorScaleBinding<X, number>;
+    public x(x: number | _Accessor): XYPlot<X, Y>;
+    public x(x: X | _Accessor, xScale: Scale<X, number>): XYPlot<X, Y>;
+    public x(x?: number | _Accessor | X, xScale?: Scale<X, number>): any {
+      if (x == null) {
+        return this._propertyBindings.get(XYPlot._X_KEY);
+      }
+      this._replaceScale(this.x().scale, xScale);
+      this._propertyBindings.set(XYPlot._X_KEY, { accessor: d3.functor(x), scale: xScale });
+      this._updateExtentsForKey(XYPlot._X_KEY, false);
+      this._render();
+      return this;
+    }
+
+    public y(): Plots.AccessorScaleBinding<Y, number>;
+    public y(y: number | _Accessor): XYPlot<X, Y>;
+    public y(y: Y | _Accessor, yScale: Scale<Y, number>): XYPlot<X, Y>;
+    public y(y?: number | _Accessor | Y, yScale?: Scale<Y, number>): any {
+      if (y == null) {
+        return this._propertyBindings.get(XYPlot._Y_KEY);
+      }
+      this._replaceScale(this.y().scale, yScale);
+      this._propertyBindings.set(XYPlot._Y_KEY, { accessor: d3.functor(y), scale: yScale });
+      this._updateExtentsForKey(XYPlot._Y_KEY, false);
+      this._render();
+      return this;
     }
 
     /**
