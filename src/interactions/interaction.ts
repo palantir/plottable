@@ -16,6 +16,9 @@ module Plottable {
     protected _anchor(component: Component) {
     }
 
+    protected _unanchor() {
+    }
+
     public attachTo(component: Component) {
       this._componentToListenTo = component;
       component.onAnchor(this._anchorCallback);
@@ -23,6 +26,7 @@ module Plottable {
 
     public detachFrom(component: Component) {
       this._componentToListenTo = null;
+      this._unanchor();
       component.offAnchor(this._anchorCallback);
     }
 

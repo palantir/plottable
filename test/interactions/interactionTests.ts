@@ -13,17 +13,23 @@ describe("Interactions", () => {
       component.renderTo(svg);
 
       var clickInteraction = new Plottable.Interactions.Click();
-      clickInteraction.attachTo(component);
 
       var callbackCalled = false;
-      var callback = function(p: Plottable.Point) {
-        callbackCalled = true;
-      };
+      var callback = () => callbackCalled = true;
       clickInteraction.onClick(callback);
+
+      // clickInteraction.attachTo(component);
+
+      // TestMethods.triggerFakeMouseEvent("mousedown", component.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+      // TestMethods.triggerFakeMouseEvent("mouseup", component.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+      // assert.isTrue(callbackCalled, "callback called on clicking Component (mouse)");
+
+      callbackCalled = false;
+      // clickInteraction.detachFrom(component);
 
       TestMethods.triggerFakeMouseEvent("mousedown", component.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
       TestMethods.triggerFakeMouseEvent("mouseup", component.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
-      assert.isTrue(callbackCalled, "callback called on clicking Component (mouse)");
+      assert.isFalse(callbackCalled, "callback was removed from component and should not be called");
 
       svg.remove();
     });

@@ -3685,6 +3685,7 @@ declare module Plottable {
          */
         protected _componentToListenTo: Component;
         protected _anchor(component: Component): void;
+        protected _unanchor(): void;
         attachTo(component: Component): void;
         detachFrom(component: Component): void;
         /**
@@ -3712,6 +3713,7 @@ declare module Plottable {
     module Interactions {
         class Click extends Interaction {
             protected _anchor(component: Component): void;
+            protected _unachor(): void;
             /**
              * Sets the callback called when the Component is clicked.
              *

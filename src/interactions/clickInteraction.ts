@@ -12,17 +12,28 @@ export module Interactions {
     private _clickedDown = false;
     private _onClickCallbacks = new Utils.CallbackSet<ClickCallback>();
 
+    private _mouseDownCallback = (p: Point) => this._handleClickDown(p);
+    private _mouseUpCallback = (p: Point) => this._handleClickUp(p);
+
+    private _touchStartCallback = (ids: any, idToPoint: any) => this._handleClickDown(idToPoint[ids[0]]);
+    private _touchEndCallback = (ids: any, idToPoint: any) => this._handleClickUp(idToPoint[ids[0]]);
+    private _touchCancelCallback = (ids: any, idToPoint: any) => this._clickedDown = false;
+
     protected _anchor(component: Component) {
       super._anchor(component);
 
       this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(<SVGElement> component.content().node());
-      this._mouseDispatcher.onMouseDown((p: Point) => this._handleClickDown(p));
-      this._mouseDispatcher.onMouseUp((p: Point) => this._handleClickUp(p));
+      this._mouseDispatcher.onMouseDown(this._mouseDownCallback);
+      this._mouseDispatcher.onMouseUp(this._mouseUpCallback);
 
       this._touchDispatcher = Dispatchers.Touch.getDispatcher(<SVGElement> component.content().node());
-      this._touchDispatcher.onTouchStart((ids, idToPoint) => this._handleClickDown(idToPoint[ids[0]]));
-      this._touchDispatcher.onTouchEnd((ids, idToPoint) => this._handleClickUp(idToPoint[ids[0]]));
-      this._touchDispatcher.onTouchCancel((ids, idToPoint) => this._clickedDown = false);
+      this._touchDispatcher.onTouchStart(this._touchStartCallback);
+      this._touchDispatcher.onTouchEnd(this._touchEndCallback);
+      this._touchDispatcher.onTouchCancel(this._touchCancelCallback);
+    }
+
+    protected _unachor() {
+
     }
 
     private _handleClickDown(p: Point) {
