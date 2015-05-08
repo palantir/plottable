@@ -863,6 +863,7 @@ declare module Plottable {
 
 declare module Plottable {
     class QuantitativeScale<D> extends Scale<D, number> {
+        protected static _DEFAULT_NUM_TICKS: number;
         protected _d3Scale: D3.Scale.QuantitativeScale;
         _userSetDomainer: boolean;
         _typeCoercer: (d: any) => number;
@@ -904,19 +905,6 @@ declare module Plottable {
          * @returns {any[]} The generated ticks.
          */
         ticks(): any[];
-        /**
-         * Gets the default number of ticks.
-         *
-         * @returns {number} The default number of ticks.
-         */
-        numTicks(): number;
-        /**
-         * Sets the default number of ticks to generate.
-         *
-         * @param {number} count The new default number of ticks.
-         * @returns {QuantitativeScale} The calling QuantitativeScaleScale.
-         */
-        numTicks(count: number): QuantitativeScale<D>;
         /**
          * Given a domain, expands its domain onto "nice" values, e.g. whole
          * numbers.
@@ -1047,7 +1035,7 @@ declare module Plottable {
             invert(x: number): number;
             protected _getDomain(): number[];
             protected _setDomain(values: number[]): void;
-            ticks(count?: number): number[];
+            ticks(): number[];
             copy(): ModifiedLog;
             _niceDomain(domain: any[], count?: number): any[];
             /**

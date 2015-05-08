@@ -163,16 +163,6 @@ describe("Scales", () => {
       assert.strictEqual(d[1], 1);
     });
 
-    it("can change the number of ticks generated", () => {
-      var scale = new Plottable.Scales.Linear();
-      var ticks10 = scale.ticks();
-      assert.closeTo(ticks10.length, 10, 1, "defaults to (about) 10 ticks");
-
-      scale.numTicks(20);
-      var ticks20 = scale.ticks();
-      assert.closeTo(ticks20.length, 20, 1, "can request a different number of ticks");
-    });
-
     it("autorange defaults to [1, 10] on log scale", () => {
       var scale = new Plottable.Scales.Log();
       scale.autoDomain();

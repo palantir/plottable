@@ -419,20 +419,14 @@ describe("NumericAxis", () => {
   });
 
   it("constrained tick labels do not overlap tick marks", () => {
+    var svg = TestMethods.generateSVG(100, 50);
 
-    var svg = TestMethods.generateSVG(300, 400);
-
-    var yScale = new Plottable.Scales.Linear().numTicks(100);
+    var yScale = new Plottable.Scales.Linear();
     yScale.domain([175, 185]);
     var yAxis = new Plottable.Axes.Numeric(yScale, "left")
                                   .tickLabelPosition("top")
                                   .tickLength(50);
-
-    var chartTable = new Plottable.Components.Table([
-      [yAxis],
-    ]);
-
-    chartTable.renderTo(svg);
+    yAxis.renderTo(svg);
 
     var tickLabels = (<any> yAxis)._element.selectAll("." + Plottable.Axis.TICK_LABEL_CLASS)
         .filter(function(d: any, i: number) {
