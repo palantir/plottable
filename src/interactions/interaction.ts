@@ -13,11 +13,18 @@ module Plottable {
 
     private _anchorCallback = (component: Component) => this._anchor(component);
 
+    private _isAnchored: Boolean;
+
+    /* tslint:disable: */
+    // tslint disable does not really work
     protected _anchor(component: Component) {
+      this._isAnchored = true;
     }
 
     protected _unanchor() {
+      this._isAnchored = false;
     }
+    /* tslint:enable */
 
     public attachTo(component: Component) {
       this._componentToListenTo = component;

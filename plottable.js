@@ -9157,10 +9157,15 @@ var Plottable;
             var _this = this;
             this._anchorCallback = function (component) { return _this._anchor(component); };
         }
+        /* tslint:disable: */
+        // tslint disable does not really work
         Interaction.prototype._anchor = function (component) {
+            this._isAnchored = true;
         };
         Interaction.prototype._unanchor = function () {
+            this._isAnchored = false;
         };
+        /* tslint:enable */
         Interaction.prototype.attachTo = function (component) {
             this._componentToListenTo = component;
             component.onAnchor(this._anchorCallback);
@@ -9776,33 +9781,33 @@ var Plottable;
                 this._dragStartCallbacks = new Plottable.Utils.CallbackSet();
                 this._dragCallbacks = new Plottable.Utils.CallbackSet();
                 this._dragEndCallbacks = new Plottable.Utils.CallbackSet();
-                this.mouseDownCallback = function (p, e) { return _this._startDrag(p, e); };
-                this.mouseMoveCallback = function (p, e) { return _this._doDrag(p, e); };
-                this.mouseUpCallback = function (p, e) { return _this._endDrag(p, e); };
-                this.touchStartCallback = function (ids, idToPoint, e) { return _this._startDrag(idToPoint[ids[0]], e); };
-                this.touchMoveCallback = function (ids, idToPoint, e) { return _this._doDrag(idToPoint[ids[0]], e); };
-                this.touchEndCallback = function (ids, idToPoint, e) { return _this._endDrag(idToPoint[ids[0]], e); };
+                this._mouseDownCallback = function (p, e) { return _this._startDrag(p, e); };
+                this._mouseMoveCallback = function (p, e) { return _this._doDrag(p, e); };
+                this._mouseUpCallback = function (p, e) { return _this._endDrag(p, e); };
+                this._touchStartCallback = function (ids, idToPoint, e) { return _this._startDrag(idToPoint[ids[0]], e); };
+                this._touchMoveCallback = function (ids, idToPoint, e) { return _this._doDrag(idToPoint[ids[0]], e); };
+                this._touchEndCallback = function (ids, idToPoint, e) { return _this._endDrag(idToPoint[ids[0]], e); };
             }
             Drag.prototype._anchor = function (component) {
                 _super.prototype._anchor.call(this, component);
                 this._mouseDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(this._componentToListenTo.content().node());
-                this._mouseDispatcher.onMouseDown(this.mouseDownCallback);
-                this._mouseDispatcher.onMouseMove(this.mouseMoveCallback);
-                this._mouseDispatcher.onMouseUp(this.mouseUpCallback);
+                this._mouseDispatcher.onMouseDown(this._mouseDownCallback);
+                this._mouseDispatcher.onMouseMove(this._mouseMoveCallback);
+                this._mouseDispatcher.onMouseUp(this._mouseUpCallback);
                 this._touchDispatcher = Plottable.Dispatchers.Touch.getDispatcher(this._componentToListenTo.content().node());
-                this._touchDispatcher.onTouchStart(this.touchStartCallback);
-                this._touchDispatcher.onTouchMove(this.touchMoveCallback);
-                this._touchDispatcher.onTouchEnd(this.touchEndCallback);
+                this._touchDispatcher.onTouchStart(this._touchStartCallback);
+                this._touchDispatcher.onTouchMove(this._touchMoveCallback);
+                this._touchDispatcher.onTouchEnd(this._touchEndCallback);
             };
             Drag.prototype._unanchor = function () {
                 _super.prototype._unanchor.call(this);
-                this._mouseDispatcher.offMouseDown(this.mouseDownCallback);
-                this._mouseDispatcher.offMouseMove(this.mouseMoveCallback);
-                this._mouseDispatcher.offMouseUp(this.mouseUpCallback);
+                this._mouseDispatcher.offMouseDown(this._mouseDownCallback);
+                this._mouseDispatcher.offMouseMove(this._mouseMoveCallback);
+                this._mouseDispatcher.offMouseUp(this._mouseUpCallback);
                 this._mouseDispatcher = null;
-                this._touchDispatcher.offTouchStart(this.touchStartCallback);
-                this._touchDispatcher.offTouchMove(this.touchMoveCallback);
-                this._touchDispatcher.offTouchEnd(this.touchEndCallback);
+                this._touchDispatcher.offTouchStart(this._touchStartCallback);
+                this._touchDispatcher.offTouchMove(this._touchMoveCallback);
+                this._touchDispatcher.offTouchEnd(this._touchEndCallback);
                 this._touchDispatcher = null;
             };
             Drag.prototype._translateAndConstrain = function (p) {

@@ -15,7 +15,6 @@ export module Interactions {
     private _mouseMoveCallback = (p: Point) => this._handlePointerEvent(p);
     private _touchStartCallback = (ids: any, idToPoint: any) => this._handlePointerEvent(idToPoint[ids[0]]);
 
-
     protected _anchor(component: Component) {
       super._anchor(component);
       this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(<SVGElement> this._componentToListenTo.content().node());

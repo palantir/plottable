@@ -15,37 +15,36 @@ export module Interactions {
     private _dragCallbacks = new Utils.CallbackSet<DragCallback>();
     private _dragEndCallbacks = new Utils.CallbackSet<DragCallback>();
 
-    private mouseDownCallback = (p: Point, e: MouseEvent) => this._startDrag(p, e);
-    private mouseMoveCallback = (p: Point, e: MouseEvent) => this._doDrag(p, e);
-    private mouseUpCallback = (p: Point, e: MouseEvent) => this._endDrag(p, e);
-    private touchStartCallback = (ids: any, idToPoint: any, e: any) => this._startDrag(idToPoint[ids[0]], e);
-    private touchMoveCallback = (ids: any, idToPoint: any, e: any) => this._doDrag(idToPoint[ids[0]], e);
-    private touchEndCallback = (ids: any, idToPoint: any, e: any) => this._endDrag(idToPoint[ids[0]], e);
-
+    private _mouseDownCallback = (p: Point, e: MouseEvent) => this._startDrag(p, e);
+    private _mouseMoveCallback = (p: Point, e: MouseEvent) => this._doDrag(p, e);
+    private _mouseUpCallback = (p: Point, e: MouseEvent) => this._endDrag(p, e);
+    private _touchStartCallback = (ids: any, idToPoint: any, e: any) => this._startDrag(idToPoint[ids[0]], e);
+    private _touchMoveCallback = (ids: any, idToPoint: any, e: any) => this._doDrag(idToPoint[ids[0]], e);
+    private _touchEndCallback = (ids: any, idToPoint: any, e: any) => this._endDrag(idToPoint[ids[0]], e);
 
     protected _anchor(component: Component) {
       super._anchor(component);
       this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(<SVGElement> this._componentToListenTo.content().node());
-      this._mouseDispatcher.onMouseDown(this.mouseDownCallback);
-      this._mouseDispatcher.onMouseMove(this.mouseMoveCallback);
-      this._mouseDispatcher.onMouseUp(this.mouseUpCallback);
+      this._mouseDispatcher.onMouseDown(this._mouseDownCallback);
+      this._mouseDispatcher.onMouseMove(this._mouseMoveCallback);
+      this._mouseDispatcher.onMouseUp(this._mouseUpCallback);
 
       this._touchDispatcher = Dispatchers.Touch.getDispatcher(<SVGElement> this._componentToListenTo.content().node());
-      this._touchDispatcher.onTouchStart(this.touchStartCallback);
-      this._touchDispatcher.onTouchMove(this.touchMoveCallback);
-      this._touchDispatcher.onTouchEnd(this.touchEndCallback);
+      this._touchDispatcher.onTouchStart(this._touchStartCallback);
+      this._touchDispatcher.onTouchMove(this._touchMoveCallback);
+      this._touchDispatcher.onTouchEnd(this._touchEndCallback);
     }
 
     protected _unanchor() {
       super._unanchor();
-      this._mouseDispatcher.offMouseDown(this.mouseDownCallback);
-      this._mouseDispatcher.offMouseMove(this.mouseMoveCallback);
-      this._mouseDispatcher.offMouseUp(this.mouseUpCallback);
+      this._mouseDispatcher.offMouseDown(this._mouseDownCallback);
+      this._mouseDispatcher.offMouseMove(this._mouseMoveCallback);
+      this._mouseDispatcher.offMouseUp(this._mouseUpCallback);
       this._mouseDispatcher = null;
 
-      this._touchDispatcher.offTouchStart(this.touchStartCallback);
-      this._touchDispatcher.offTouchMove(this.touchMoveCallback);
-      this._touchDispatcher.offTouchEnd(this.touchEndCallback);
+      this._touchDispatcher.offTouchStart(this._touchStartCallback);
+      this._touchDispatcher.offTouchMove(this._touchMoveCallback);
+      this._touchDispatcher.offTouchEnd(this._touchEndCallback);
       this._touchDispatcher = null;
     }
 
