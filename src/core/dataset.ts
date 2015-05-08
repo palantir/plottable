@@ -8,7 +8,7 @@ module Plottable {
     accessor: _Accessor;
     extent: any[];
   }
-  export class Dataset extends Core.PlottableObject {
+  export class Dataset {
     private _data: any[];
     private _metadata: any;
     private _accessor2cachedExtent: Utils.Map<any, any>;
@@ -25,7 +25,6 @@ module Plottable {
      * @param {any} metadata An object containing additional information (default = {}).
      */
     constructor(data: any[] = [], metadata: any = {}) {
-      super();
       this._data = data;
       this._metadata = metadata;
       this._accessor2cachedExtent = new Utils.Map<any, any>();

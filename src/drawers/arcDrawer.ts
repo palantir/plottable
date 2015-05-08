@@ -13,11 +13,11 @@ export module Drawers {
     }
 
     private _createArc() {
-      var metadata = (<any> this._piePlot)._key2PlotDatasetKey.get(this.key).dataset.metadata();
+      var dataset = (<any> this._piePlot)._key2PlotDatasetKey.get(this.key).dataset;
       var plotMetadata = (<any> this._piePlot)._key2PlotDatasetKey.get(this.key).plotMetadata;
       return d3.svg.arc()
-                   .innerRadius((d, i) => Arc._scaledAccessor(this._piePlot.innerRadius())(d.data, i, metadata, plotMetadata))
-                   .outerRadius((d, i) => Arc._scaledAccessor(this._piePlot.outerRadius())(d.data, i, metadata, plotMetadata));
+                   .innerRadius((d, i) => Arc._scaledAccessor(this._piePlot.innerRadius())(d.data, i, dataset, plotMetadata))
+                   .outerRadius((d, i) => Arc._scaledAccessor(this._piePlot.outerRadius())(d.data, i, dataset, plotMetadata));
     }
 
     private retargetProjectors(attrToProjector: AttributeToAppliedProjector): AttributeToAppliedProjector {
@@ -36,9 +36,9 @@ export module Drawers {
       return super._drawStep({attrToProjector: attrToProjector, animator: step.animator});
     }
 
-    public draw(data: any[], drawSteps: DrawStep[], userMetadata: any, plotMetadata: Plots.PlotMetadata) {
+    public draw(data: any[], drawSteps: DrawStep[], dataset: Dataset, plotMetadata: Plots.PlotMetadata) {
       // HACKHACK Applying metadata should be done in base class
-      var valueAccessor = (d: any, i: number) => Arc._scaledAccessor(this._piePlot.sectorValue())(d, i, userMetadata, plotMetadata);
+      var valueAccessor = (d: any, i: number) => Arc._scaledAccessor(this._piePlot.sectorValue())(d, i, dataset, plotMetadata);
 
       data = data.filter(e => Plottable.Utils.Methods.isValidNumber(+valueAccessor(e, null)));
 
@@ -51,14 +51,14 @@ export module Drawers {
           Utils.Methods.warn("Negative values will not render correctly in a pie chart.");
         }
       });
-      return super.draw(pie, drawSteps, userMetadata, plotMetadata);
+      return super.draw(pie, drawSteps, dataset, plotMetadata);
     }
 
     public _getPixelPoint(datum: any, index: number): Point {
-      var metadata = (<any> this._piePlot)._key2PlotDatasetKey.get(this.key).dataset.metadata();
+      var dataset = (<any> this._piePlot)._key2PlotDatasetKey.get(this.key).dataset;
       var plotMetadata = (<any> this._piePlot)._key2PlotDatasetKey.get(this.key).plotMetadata;
-      var innerRadius = Arc._scaledAccessor(this._piePlot.innerRadius())(datum, index, metadata, plotMetadata);
-      var outerRadius = Arc._scaledAccessor(this._piePlot.outerRadius())(datum, index, metadata, plotMetadata);
+      var innerRadius = Arc._scaledAccessor(this._piePlot.innerRadius())(datum, index, dataset, plotMetadata);
+      var outerRadius = Arc._scaledAccessor(this._piePlot.outerRadius())(datum, index, dataset, plotMetadata);
       var avgRadius = (innerRadius + outerRadius) / 2;
       var startAngle = +this._getSelection(index).datum().startAngle;
       var endAngle = +this._getSelection(index).datum().endAngle;
@@ -69,7 +69,8 @@ export module Drawers {
     private static _scaledAccessor<SD, SR>(accScaleBinding: Plots.AccessorScaleBinding<SD, SR>): _Accessor {
       return accScaleBinding.scale == null ?
                accScaleBinding.accessor :
-               (d: any, i: number, u: any, m: Plots.PlotMetadata) => accScaleBinding.scale.scale(accScaleBinding.accessor(d, i, u, m));
+               (d: any, i: number, dataset: Dataset, m: Plots.PlotMetadata) =>
+                 accScaleBinding.scale.scale(accScaleBinding.accessor(d, i, dataset, m));
     }
   }
 }

@@ -774,8 +774,8 @@ describe("Plots", () => {
 
     it("plot auto domain scale to visible points on Category scale", () => {
       var svg = TestMethods.generateSVG(500, 500);
-      var xAccessor = (d: any, i: number, u: any) => d.a;
-      var yAccessor = (d: any, i: number, u: any) => d.b + u.foo;
+      var xAccessor = (d: any, i: number, dataset: Plottable.Dataset) => d.a;
+      var yAccessor = (d: any, i: number, dataset: Plottable.Dataset) => d.b + dataset.metadata().foo;
       var simpleDataset = new Plottable.Dataset([{a: "a", b: 6}, {a: "b", b: 2}, {a: "c", b: -2}, {a: "d", b: -6}], {foo: 0});
       var xScale = new Plottable.Scales.Category();
       var yScale = new Plottable.Scales.Linear();

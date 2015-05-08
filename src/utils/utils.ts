@@ -82,15 +82,15 @@ export module Utils {
 
     /**
      * Take an accessor object (may be a string to be made into a key, or a value, or a color code)
-     * and "activate" it by turning it into a function in (datum, index, metadata)
+     * and "activate" it by turning it into a function in (datum, index,  dataset)
      */
     export function accessorize(accessor: any): _Accessor {
       if (typeof(accessor) === "function") {
         return (<_Accessor> accessor);
       } else if (typeof(accessor) === "string" && accessor[0] !== "#") {
-        return (d: any, i: number, s: any) => d[accessor];
+        return (datum: any, index: number, dataset: Dataset) => datum[accessor];
       } else {
-        return (d: any, i: number, s: any) => accessor;
+        return (datum: any, index: number, dataset: Dataset) => accessor;
       };
     }
 
