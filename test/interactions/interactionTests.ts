@@ -24,7 +24,27 @@ describe("Interactions", () => {
       svg.remove();
     });
 
-    it("can attach/detach interaction to/from component", () => {
+    it("can attach interaction to component", () => {
+      var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      var component = new Plottable.Component();
+      component.renderTo(svg);
+
+      var clickInteraction = new Plottable.Interactions.Click();
+
+      var callbackCalled = false;
+      var callback = () => callbackCalled = true;
+      clickInteraction.onClick(callback);
+
+      clickInteraction.attachTo(component);
+
+      TestMethods.triggerFakeMouseEvent("mousedown", component.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+      TestMethods.triggerFakeMouseEvent("mouseup", component.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+      assert.isTrue(callbackCalled, "callback called on clicking Component (mouse)");
+
+      svg.remove();
+    });
+
+    it("can detach interaction from component", () => {
       var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       var component = new Plottable.Component();
       component.renderTo(svg);
@@ -51,7 +71,7 @@ describe("Interactions", () => {
       svg.remove();
     });
 
-    it("interactions are reusable", () => {
+    it("can move interaction from one component to another", () => {
       var svg1 = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       var svg2 = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       var component1 = new Plottable.Component();
