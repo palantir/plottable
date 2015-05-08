@@ -120,7 +120,7 @@ module Plottable {
      *
      * @returns {any[]} The generated ticks.
      */
-    public ticks(): any[] {
+    public ticks(): D[] {
       return this._tickGenerator(this);
     }
 

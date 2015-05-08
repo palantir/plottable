@@ -78,7 +78,7 @@ module Plottable {
      * Adds a callback to be called on anchoring the Component to the DOM.
      * If the component is already anchored, the callback is called immediately.
      *
-     * @param {AnchorCallback} callback The callback to be called on Anchor
+     * @param {AnchorCallback} callback The callback to be added.
      *
      * @return {Component}
      */
@@ -94,7 +94,7 @@ module Plottable {
      * Removes a callback to be called on anchoring the Component to the DOM.
      * The callback is identified by reference equality.
      *
-     * @param {AnchorCallback} callback The callback to be removed
+     * @param {AnchorCallback} callback The callback to be removed.
      *
      * @return {Component}
      */

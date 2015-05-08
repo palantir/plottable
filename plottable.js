@@ -3151,7 +3151,7 @@ var Plottable;
          * Adds a callback to be called on anchoring the Component to the DOM.
          * If the component is already anchored, the callback is called immediately.
          *
-         * @param {AnchorCallback} callback The callback to be called on Anchor
+         * @param {AnchorCallback} callback The callback to be added.
          *
          * @return {Component}
          */
@@ -3166,7 +3166,7 @@ var Plottable;
          * Removes a callback to be called on anchoring the Component to the DOM.
          * The callback is identified by reference equality.
          *
-         * @param {AnchorCallback} callback The callback to be removed
+         * @param {AnchorCallback} callback The callback to be removed.
          *
          * @return {Component}
          */
@@ -9182,8 +9182,8 @@ var Plottable;
             this._isAnchored = false;
         };
         /**
-         * Attaches current interaction to a Component. If the interaction was already
-         * attached to a Component, it first detaches itself from the old component.
+         * Attaches this interaction to a Component.
+         * If the interaction was already attached to a Component, it first detaches itself from the old Component.
          *
          * @param {Component} component The component to which to attach the interaction.
          *
@@ -9198,9 +9198,10 @@ var Plottable;
             return this;
         };
         /**
-         * Detaches current interaction from the Component. Interaction can be reused.
+         * Detaches this interaction from the Component.
+         * This interaction can be reused.
          *
-         * @param {Component} component The component to which to attach the interaction.
+         * @param {Component} component The component from which to detach the interaction.
          *
          * @return {Interaction}
          */

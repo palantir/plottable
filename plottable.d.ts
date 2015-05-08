@@ -930,7 +930,7 @@ declare module Plottable {
          *
          * @returns {any[]} The generated ticks.
          */
-        ticks(): any[];
+        ticks(): D[];
         /**
          * Gets the default number of ticks.
          *
@@ -1506,7 +1506,7 @@ declare module Plottable {
          * Adds a callback to be called on anchoring the Component to the DOM.
          * If the component is already anchored, the callback is called immediately.
          *
-         * @param {AnchorCallback} callback The callback to be called on Anchor
+         * @param {AnchorCallback} callback The callback to be added.
          *
          * @return {Component}
          */
@@ -1515,7 +1515,7 @@ declare module Plottable {
          * Removes a callback to be called on anchoring the Component to the DOM.
          * The callback is identified by reference equality.
          *
-         * @param {AnchorCallback} callback The callback to be removed
+         * @param {AnchorCallback} callback The callback to be removed.
          *
          * @return {Component}
          */
@@ -3696,8 +3696,8 @@ declare module Plottable {
         protected _anchor(component: Component): void;
         protected _unanchor(): void;
         /**
-         * Attaches current interaction to a Component. If the interaction was already
-         * attached to a Component, it first detaches itself from the old component.
+         * Attaches this interaction to a Component.
+         * If the interaction was already attached to a Component, it first detaches itself from the old Component.
          *
          * @param {Component} component The component to which to attach the interaction.
          *
@@ -3705,9 +3705,10 @@ declare module Plottable {
          */
         attachTo(component: Component): Interaction;
         /**
-         * Detaches current interaction from the Component. Interaction can be reused.
+         * Detaches this interaction from the Component.
+         * This interaction can be reused.
          *
-         * @param {Component} component The component to which to attach the interaction.
+         * @param {Component} component The component from which to detach the interaction.
          *
          * @return {Interaction}
          */

@@ -17,8 +17,8 @@ module Plottable {
     }
 
     /**
-     * Attaches current interaction to a Component. If the interaction was already
-     * attached to a Component, it first detaches itself from the old component.
+     * Attaches this interaction to a Component.
+     * If the interaction was already attached to a Component, it first detaches itself from the old Component.
      *
      * @param {Component} component The component to which to attach the interaction.
      *
@@ -36,9 +36,10 @@ module Plottable {
     }
 
     /**
-     * Detaches current interaction from the Component. Interaction can be reused.
+     * Detaches this interaction from the Component.
+     * This interaction can be reused.
      *
-     * @param {Component} component The component to which to attach the interaction.
+     * @param {Component} component The component from which to detach the interaction.
      *
      * @return {Interaction}
      */
