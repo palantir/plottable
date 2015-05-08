@@ -56,11 +56,13 @@ export module Plots {
       var defaultFillFunction = (d: any, i: number) => this._colorScale.scale(String(i));
       attrToProjector["fill"] = attrToProjector["fill"] || defaultFillFunction;
 
+      this._propertyBindings.forEach((key, binding) => attrToProjector[key] = Pie._scaledAccessor(binding));
+
       return attrToProjector;
     }
 
     protected _getDrawer(key: string) {
-      return new Plottable.Drawers.Arc(key, this).setClass("arc");
+      return new Plottable.Drawers.Arc(key).setClass("arc");
     }
 
     public getAllPlotData(datasets = this.datasets()): Plots.PlotData {
@@ -114,6 +116,13 @@ export module Plots {
       this._updateExtentsForProperty(Pie._OUTER_RADIUS_KEY);
       this._render();
       return this;
+    }
+
+    private static _scaledAccessor<SD, SR>(accScaleBinding: Plots.AccessorScaleBinding<SD, SR>): _Accessor {
+      return accScaleBinding.scale == null ?
+               accScaleBinding.accessor :
+               (d: any, i: number, dataset: Dataset, m: Plots.PlotMetadata) =>
+                 accScaleBinding.scale.scale(accScaleBinding.accessor(d, i, dataset, m));
     }
   }
 }

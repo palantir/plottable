@@ -2987,16 +2987,12 @@ var Plottable;
     (function (Drawers) {
         var Arc = (function (_super) {
             __extends(Arc, _super);
-            function Arc(key, plot) {
+            function Arc(key) {
                 _super.call(this, key);
-                this._piePlot = plot;
                 this._svgElement = "path";
             }
-            Arc.prototype._createArc = function () {
-                var _this = this;
-                var dataset = this._piePlot._key2PlotDatasetKey.get(this.key).dataset;
-                var plotMetadata = this._piePlot._key2PlotDatasetKey.get(this.key).plotMetadata;
-                return d3.svg.arc().innerRadius(function (d, i) { return Arc._scaledAccessor(_this._piePlot.innerRadius())(d.data, i, dataset, plotMetadata); }).outerRadius(function (d, i) { return Arc._scaledAccessor(_this._piePlot.outerRadius())(d.data, i, dataset, plotMetadata); });
+            Arc.prototype._createArc = function (innerRadiusF, outerRadiusF) {
+                return d3.svg.arc().innerRadius(innerRadiusF).outerRadius(outerRadiusF);
             };
             Arc.prototype.retargetProjectors = function (attrToProjector) {
                 var retargetedAttrToProjector = {};
@@ -3008,15 +3004,20 @@ var Plottable;
             Arc.prototype._drawStep = function (step) {
                 var attrToProjector = Plottable.Utils.Methods.copyMap(step.attrToProjector);
                 attrToProjector = this.retargetProjectors(attrToProjector);
-                attrToProjector["d"] = this._createArc();
+                this._attrToProjector = this.retargetProjectors(this._attrToProjector);
+                var innerRadiusAccessor = attrToProjector["inner-radius"];
+                var outerRadiusAccessor = attrToProjector["outer-radius"];
+                delete attrToProjector["inner-radius"];
+                delete attrToProjector["outer-radius"];
+                attrToProjector["d"] = this._createArc(innerRadiusAccessor, outerRadiusAccessor);
                 return _super.prototype._drawStep.call(this, { attrToProjector: attrToProjector, animator: step.animator });
             };
             Arc.prototype.draw = function (data, drawSteps, dataset, plotMetadata) {
-                var _this = this;
                 // HACKHACK Applying metadata should be done in base class
-                var valueAccessor = function (d, i) { return Arc._scaledAccessor(_this._piePlot.sectorValue())(d, i, dataset, plotMetadata); };
+                var valueAccessor = function (d, i) { return drawSteps[0].attrToProjector["sector-value"](d, i, dataset, plotMetadata); };
                 data = data.filter(function (e) { return Plottable.Utils.Methods.isValidNumber(+valueAccessor(e, null)); });
                 var pie = d3.layout.pie().sort(null).value(valueAccessor)(data);
+                drawSteps.forEach(function (s) { return delete s.attrToProjector["sector-value"]; });
                 pie.forEach(function (slice) {
                     if (slice.value < 0) {
                         Plottable.Utils.Methods.warn("Negative values will not render correctly in a pie chart.");
@@ -3025,18 +3026,13 @@ var Plottable;
                 return _super.prototype.draw.call(this, pie, drawSteps, dataset, plotMetadata);
             };
             Arc.prototype._getPixelPoint = function (datum, index) {
-                var dataset = this._piePlot._key2PlotDatasetKey.get(this.key).dataset;
-                var plotMetadata = this._piePlot._key2PlotDatasetKey.get(this.key).plotMetadata;
-                var innerRadius = Arc._scaledAccessor(this._piePlot.innerRadius())(datum, index, dataset, plotMetadata);
-                var outerRadius = Arc._scaledAccessor(this._piePlot.outerRadius())(datum, index, dataset, plotMetadata);
-                var avgRadius = (innerRadius + outerRadius) / 2;
+                var innerRadiusAccessor = this._attrToProjector["inner-radius"];
+                var outerRadiusAccessor = this._attrToProjector["outer-radius"];
+                var avgRadius = (innerRadiusAccessor(datum, index) + outerRadiusAccessor(datum, index)) / 2;
                 var startAngle = +this._getSelection(index).datum().startAngle;
                 var endAngle = +this._getSelection(index).datum().endAngle;
                 var avgAngle = (startAngle + endAngle) / 2;
                 return { x: avgRadius * Math.sin(avgAngle), y: -avgRadius * Math.cos(avgAngle) };
-            };
-            Arc._scaledAccessor = function (accScaleBinding) {
-                return accScaleBinding.scale == null ? accScaleBinding.accessor : function (d, i, dataset, m) { return accScaleBinding.scale.scale(accScaleBinding.accessor(d, i, dataset, m)); };
             };
             return Arc;
         })(Drawers.Element);
@@ -6865,10 +6861,11 @@ var Plottable;
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
                 var defaultFillFunction = function (d, i) { return _this._colorScale.scale(String(i)); };
                 attrToProjector["fill"] = attrToProjector["fill"] || defaultFillFunction;
+                this._propertyBindings.forEach(function (key, binding) { return attrToProjector[key] = Pie._scaledAccessor(binding); });
                 return attrToProjector;
             };
             Pie.prototype._getDrawer = function (key) {
-                return new Plottable.Drawers.Arc(key, this).setClass("arc");
+                return new Plottable.Drawers.Arc(key).setClass("arc");
             };
             Pie.prototype.getAllPlotData = function (datasets) {
                 var _this = this;
@@ -6909,6 +6906,9 @@ var Plottable;
                 this._updateExtentsForProperty(Pie._OUTER_RADIUS_KEY);
                 this._render();
                 return this;
+            };
+            Pie._scaledAccessor = function (accScaleBinding) {
+                return accScaleBinding.scale == null ? accScaleBinding.accessor : function (d, i, dataset, m) { return accScaleBinding.scale.scale(accScaleBinding.accessor(d, i, dataset, m)); };
             };
             Pie._INNER_RADIUS_KEY = "inner-radius";
             Pie._OUTER_RADIUS_KEY = "outer-radius";

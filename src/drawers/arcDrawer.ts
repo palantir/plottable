@@ -2,22 +2,17 @@
 
 module Plottable {
 export module Drawers {
-  export class Arc<D> extends Element {
+  export class Arc extends Element {
 
-    private _piePlot: Plots.Pie<D>;
-
-    constructor(key: string, plot: Plots.Pie<D>) {
+    constructor(key: string) {
       super(key);
-      this._piePlot = plot;
       this._svgElement = "path";
     }
 
-    private _createArc() {
-      var dataset = (<any> this._piePlot)._key2PlotDatasetKey.get(this.key).dataset;
-      var plotMetadata = (<any> this._piePlot)._key2PlotDatasetKey.get(this.key).plotMetadata;
+    private _createArc(innerRadiusF: AppliedProjector, outerRadiusF: AppliedProjector) {
       return d3.svg.arc()
-                   .innerRadius((d, i) => Arc._scaledAccessor(this._piePlot.innerRadius())(d.data, i, dataset, plotMetadata))
-                   .outerRadius((d, i) => Arc._scaledAccessor(this._piePlot.outerRadius())(d.data, i, dataset, plotMetadata));
+                   .innerRadius(innerRadiusF)
+                   .outerRadius(outerRadiusF);
     }
 
     private retargetProjectors(attrToProjector: AttributeToAppliedProjector): AttributeToAppliedProjector {
@@ -31,14 +26,19 @@ export module Drawers {
     public _drawStep(step: AppliedDrawStep) {
       var attrToProjector = <AttributeToAppliedProjector>Utils.Methods.copyMap(step.attrToProjector);
       attrToProjector = this.retargetProjectors(attrToProjector);
+      this._attrToProjector = this.retargetProjectors(this._attrToProjector);
+      var innerRadiusAccessor = attrToProjector["inner-radius"];
+      var outerRadiusAccessor = attrToProjector["outer-radius"];
+      delete attrToProjector["inner-radius"];
+      delete attrToProjector["outer-radius"];
 
-      attrToProjector["d"] = this._createArc();
+      attrToProjector["d"] = this._createArc(innerRadiusAccessor, outerRadiusAccessor);
       return super._drawStep({attrToProjector: attrToProjector, animator: step.animator});
     }
 
     public draw(data: any[], drawSteps: DrawStep[], dataset: Dataset, plotMetadata: Plots.PlotMetadata) {
       // HACKHACK Applying metadata should be done in base class
-      var valueAccessor = (d: any, i: number) => Arc._scaledAccessor(this._piePlot.sectorValue())(d, i, dataset, plotMetadata);
+      var valueAccessor = (d: any, i: number) => drawSteps[0].attrToProjector["sector-value"](d, i, dataset, plotMetadata);
 
       data = data.filter(e => Plottable.Utils.Methods.isValidNumber(+valueAccessor(e, null)));
 
@@ -46,6 +46,7 @@ export module Drawers {
                           .sort(null)
                           .value(valueAccessor)(data);
 
+      drawSteps.forEach(s => delete s.attrToProjector["sector-value"]);
       pie.forEach((slice) => {
         if (slice.value < 0) {
           Utils.Methods.warn("Negative values will not render correctly in a pie chart.");
@@ -55,22 +56,13 @@ export module Drawers {
     }
 
     public _getPixelPoint(datum: any, index: number): Point {
-      var dataset = (<any> this._piePlot)._key2PlotDatasetKey.get(this.key).dataset;
-      var plotMetadata = (<any> this._piePlot)._key2PlotDatasetKey.get(this.key).plotMetadata;
-      var innerRadius = Arc._scaledAccessor(this._piePlot.innerRadius())(datum, index, dataset, plotMetadata);
-      var outerRadius = Arc._scaledAccessor(this._piePlot.outerRadius())(datum, index, dataset, plotMetadata);
-      var avgRadius = (innerRadius + outerRadius) / 2;
+      var innerRadiusAccessor = this._attrToProjector["inner-radius"];
+      var outerRadiusAccessor = this._attrToProjector["outer-radius"];
+      var avgRadius = (innerRadiusAccessor(datum, index) + outerRadiusAccessor(datum, index)) / 2;
       var startAngle = +this._getSelection(index).datum().startAngle;
       var endAngle = +this._getSelection(index).datum().endAngle;
       var avgAngle = (startAngle + endAngle) / 2;
       return { x: avgRadius * Math.sin(avgAngle), y: -avgRadius * Math.cos(avgAngle) };
-    }
-
-    private static _scaledAccessor<SD, SR>(accScaleBinding: Plots.AccessorScaleBinding<SD, SR>): _Accessor {
-      return accScaleBinding.scale == null ?
-               accScaleBinding.accessor :
-               (d: any, i: number, dataset: Dataset, m: Plots.PlotMetadata) =>
-                 accScaleBinding.scale.scale(accScaleBinding.accessor(d, i, dataset, m));
     }
   }
 }
