@@ -13,11 +13,11 @@ export module Drawers {
     }
 
     private _createArc() {
-      var metadata = (<any> this._piePlot)._key2PlotDatasetKey.get(this.key).dataset.metadata();
+      var dataset = (<any> this._piePlot)._key2PlotDatasetKey.get(this.key).dataset;
       var plotMetadata = (<any> this._piePlot)._key2PlotDatasetKey.get(this.key).plotMetadata;
       return d3.svg.arc()
-                   .innerRadius((d, i) => Arc._scaledAccessor(this._piePlot.innerRadius())(d.data, i, metadata, plotMetadata))
-                   .outerRadius((d, i) => Arc._scaledAccessor(this._piePlot.outerRadius())(d.data, i, metadata, plotMetadata));
+                   .innerRadius((d, i) => Arc._scaledAccessor(this._piePlot.innerRadius())(d.data, i, dataset, plotMetadata))
+                   .outerRadius((d, i) => Arc._scaledAccessor(this._piePlot.outerRadius())(d.data, i, dataset, plotMetadata));
     }
 
     private retargetProjectors(attrToProjector: AttributeToAppliedProjector): AttributeToAppliedProjector {
@@ -55,10 +55,10 @@ export module Drawers {
     }
 
     public _getPixelPoint(datum: any, index: number): Point {
-      var metadata = (<any> this._piePlot)._key2PlotDatasetKey.get(this.key).dataset.metadata();
+      var dataset = (<any> this._piePlot)._key2PlotDatasetKey.get(this.key).dataset;
       var plotMetadata = (<any> this._piePlot)._key2PlotDatasetKey.get(this.key).plotMetadata;
-      var innerRadius = Arc._scaledAccessor(this._piePlot.innerRadius())(datum, index, metadata, plotMetadata);
-      var outerRadius = Arc._scaledAccessor(this._piePlot.outerRadius())(datum, index, metadata, plotMetadata);
+      var innerRadius = Arc._scaledAccessor(this._piePlot.innerRadius())(datum, index, dataset, plotMetadata);
+      var outerRadius = Arc._scaledAccessor(this._piePlot.outerRadius())(datum, index, dataset, plotMetadata);
       var avgRadius = (innerRadius + outerRadius) / 2;
       var startAngle = +this._getSelection(index).datum().startAngle;
       var endAngle = +this._getSelection(index).datum().endAngle;

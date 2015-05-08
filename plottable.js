@@ -2994,9 +2994,9 @@ var Plottable;
             }
             Arc.prototype._createArc = function () {
                 var _this = this;
-                var metadata = this._piePlot._key2PlotDatasetKey.get(this.key).dataset.metadata();
+                var dataset = this._piePlot._key2PlotDatasetKey.get(this.key).dataset;
                 var plotMetadata = this._piePlot._key2PlotDatasetKey.get(this.key).plotMetadata;
-                return d3.svg.arc().innerRadius(function (d, i) { return Arc._scaledAccessor(_this._piePlot.innerRadius())(d.data, i, metadata, plotMetadata); }).outerRadius(function (d, i) { return Arc._scaledAccessor(_this._piePlot.outerRadius())(d.data, i, metadata, plotMetadata); });
+                return d3.svg.arc().innerRadius(function (d, i) { return Arc._scaledAccessor(_this._piePlot.innerRadius())(d.data, i, dataset, plotMetadata); }).outerRadius(function (d, i) { return Arc._scaledAccessor(_this._piePlot.outerRadius())(d.data, i, dataset, plotMetadata); });
             };
             Arc.prototype.retargetProjectors = function (attrToProjector) {
                 var retargetedAttrToProjector = {};
@@ -3025,10 +3025,10 @@ var Plottable;
                 return _super.prototype.draw.call(this, pie, drawSteps, dataset, plotMetadata);
             };
             Arc.prototype._getPixelPoint = function (datum, index) {
-                var metadata = this._piePlot._key2PlotDatasetKey.get(this.key).dataset.metadata();
+                var dataset = this._piePlot._key2PlotDatasetKey.get(this.key).dataset;
                 var plotMetadata = this._piePlot._key2PlotDatasetKey.get(this.key).plotMetadata;
-                var innerRadius = Arc._scaledAccessor(this._piePlot.innerRadius())(datum, index, metadata, plotMetadata);
-                var outerRadius = Arc._scaledAccessor(this._piePlot.outerRadius())(datum, index, metadata, plotMetadata);
+                var innerRadius = Arc._scaledAccessor(this._piePlot.innerRadius())(datum, index, dataset, plotMetadata);
+                var outerRadius = Arc._scaledAccessor(this._piePlot.outerRadius())(datum, index, dataset, plotMetadata);
                 var avgRadius = (innerRadius + outerRadius) / 2;
                 var startAngle = +this._getSelection(index).datum().startAngle;
                 var endAngle = +this._getSelection(index).datum().endAngle;
