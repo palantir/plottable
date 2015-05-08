@@ -26,6 +26,14 @@ module Plottable {
     }
     /* tslint:enable */
 
+    /**
+     * Attaches current interaction to a Component. If the interaction was already
+     * attached to a Component, it first detaches itself from the old component.
+     *
+     * @param {Component} component The component to which to attach the interaction.
+     *
+     * @return {Interaction}
+     */
     public attachTo(component: Component) {
       if (this._componentToListenTo) {
         this.detachFrom(this._componentToListenTo);
@@ -33,12 +41,23 @@ module Plottable {
 
       this._componentToListenTo = component;
       component.onAnchor(this._anchorCallback);
+
+      return this;
     }
 
+    /**
+     * Detaches current interaction from the Component. Interaction can be reused.
+     *
+     * @param {Component} component The component to which to attach the interaction.
+     *
+     * @return {Interaction}
+     */
     public detachFrom(component: Component) {
       this._unanchor();
       this._componentToListenTo = null;
       component.offAnchor(this._anchorCallback);
+
+      return this;
     }
 
     /**

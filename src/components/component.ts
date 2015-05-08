@@ -74,15 +74,33 @@ module Plottable {
       return this;
     }
 
+    /**
+     * Adds a callback to be called on anchoring the current Component to the DOM.
+     * If the component is already anchored, the callback is called immediately.
+     *
+     * @param {AnchorCallback} callback The callback to be called on Anchor
+     *
+     * @return {Component}
+     */
     public onAnchor(callback: AnchorCallback) {
       if (this._isAnchored) {
         callback(this);
       }
       this._onAnchorCallbacks.add(callback);
+      return this;
     }
 
+    /**
+     * Removes a callback to be called on anchoring the Component to the DOM.
+     * The callback is identified by reference equality.
+     *
+     * @param {AnchorCallback} callback The callback to be removed
+     *
+     * @return {Component}
+     */
     public offAnchor(callback: AnchorCallback) {
       this._onAnchorCallbacks.delete(callback);
+      return this;
     }
 
     /**

@@ -3147,14 +3147,32 @@ var Plottable;
             this._onAnchorCallbacks.callCallbacks(this);
             return this;
         };
+        /**
+         * Adds a callback to be called on anchoring the current Component to the DOM.
+         * If the component is already anchored, the callback is called immediately.
+         *
+         * @param {AnchorCallback} callback The callback to be called on Anchor
+         *
+         * @return {Component}
+         */
         Component.prototype.onAnchor = function (callback) {
             if (this._isAnchored) {
                 callback(this);
             }
             this._onAnchorCallbacks.add(callback);
+            return this;
         };
+        /**
+         * Removes a callback to be called on anchoring the Component to the DOM.
+         * The callback is identified by reference equality.
+         *
+         * @param {AnchorCallback} callback The callback to be removed
+         *
+         * @return {Component}
+         */
         Component.prototype.offAnchor = function (callback) {
             this._onAnchorCallbacks.delete(callback);
+            return this;
         };
         /**
          * Creates additional elements as necessary for the Component to function.
@@ -9166,17 +9184,34 @@ var Plottable;
             this._isAnchored = false;
         };
         /* tslint:enable */
+        /**
+         * Attaches current interaction to a Component. If the interaction was already
+         * attached to a Component, it first detaches itself from the old component.
+         *
+         * @param {Component} component The component to which to attach the interaction.
+         *
+         * @return {Interaction}
+         */
         Interaction.prototype.attachTo = function (component) {
             if (this._componentToListenTo) {
                 this.detachFrom(this._componentToListenTo);
             }
             this._componentToListenTo = component;
             component.onAnchor(this._anchorCallback);
+            return this;
         };
+        /**
+         * Detaches current interaction from the Component. Interaction can be reused.
+         *
+         * @param {Component} component The component to which to attach the interaction.
+         *
+         * @return {Interaction}
+         */
         Interaction.prototype.detachFrom = function (component) {
             this._unanchor();
             this._componentToListenTo = null;
             component.offAnchor(this._anchorCallback);
+            return this;
         };
         /**
          * Translates an <svg>-coordinate-space point to Component-space coordinates.

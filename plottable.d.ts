@@ -1502,8 +1502,24 @@ declare module Plottable {
          * @returns {Component} The calling Component.
          */
         anchor(selection: D3.Selection): Component;
-        onAnchor(callback: AnchorCallback): void;
-        offAnchor(callback: AnchorCallback): void;
+        /**
+         * Adds a callback to be called on anchoring the current Component to the DOM.
+         * If the component is already anchored, the callback is called immediately.
+         *
+         * @param {AnchorCallback} callback The callback to be called on Anchor
+         *
+         * @return {Component}
+         */
+        onAnchor(callback: AnchorCallback): Component;
+        /**
+         * Removes a callback to be called on anchoring the Component to the DOM.
+         * The callback is identified by reference equality.
+         *
+         * @param {AnchorCallback} callback The callback to be removed
+         *
+         * @return {Component}
+         */
+        offAnchor(callback: AnchorCallback): Component;
         /**
          * Creates additional elements as necessary for the Component to function.
          * Called during _anchor() if the Component's element has not been created yet.
@@ -3686,8 +3702,23 @@ declare module Plottable {
         protected _componentToListenTo: Component;
         protected _anchor(component: Component): void;
         protected _unanchor(): void;
-        attachTo(component: Component): void;
-        detachFrom(component: Component): void;
+        /**
+         * Attaches current interaction to a Component. If the interaction was already
+         * attached to a Component, it first detaches itself from the old component.
+         *
+         * @param {Component} component The component to which to attach the interaction.
+         *
+         * @return {Interaction}
+         */
+        attachTo(component: Component): Interaction;
+        /**
+         * Detaches current interaction from the Component. Interaction can be reused.
+         *
+         * @param {Component} component The component to which to attach the interaction.
+         *
+         * @return {Interaction}
+         */
+        detachFrom(component: Component): Interaction;
         /**
          * Translates an <svg>-coordinate-space point to Component-space coordinates.
          *
