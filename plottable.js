@@ -9234,6 +9234,14 @@ var Plottable;
                 this._touchDispatcher.onTouchCancel(this._touchCancelCallback);
             };
             Click.prototype._unachor = function () {
+                _super.prototype._unanchor.call(this);
+                this._mouseDispatcher.offMouseDown(this._mouseDownCallback);
+                this._mouseDispatcher.offMouseUp(this._mouseUpCallback);
+                this._mouseDispatcher = null;
+                this._touchDispatcher.offTouchStart(this._touchStartCallback);
+                this._touchDispatcher.offTouchEnd(this._touchEndCallback);
+                this._touchDispatcher.offTouchCancel(this._touchCancelCallback);
+                this._touchDispatcher = null;
             };
             Click.prototype._handleClickDown = function (p) {
                 var translatedPoint = this._translateToComponentSpace(p);
@@ -9317,6 +9325,17 @@ var Plottable;
                 this._touchDispatcher.onTouchStart(this._touchStartCallback);
                 this._touchDispatcher.onTouchEnd(this._touchEndCallback);
                 this._touchDispatcher.onTouchCancel(this._touchCancelCallback);
+            };
+            DoubleClick.prototype._unanchor = function () {
+                _super.prototype._unanchor.call(this);
+                this._mouseDispatcher.offMouseDown(this._mouseDownCallback);
+                this._mouseDispatcher.offMouseUp(this._mouseUpCallback);
+                this._mouseDispatcher.offDblClick(this._dblClickCallback);
+                this._mouseDispatcher = null;
+                this._touchDispatcher.offTouchStart(this._touchStartCallback);
+                this._touchDispatcher.offTouchEnd(this._touchEndCallback);
+                this._touchDispatcher.offTouchCancel(this._touchCancelCallback);
+                this._touchDispatcher = null;
             };
             DoubleClick.prototype._handleClickDown = function (p) {
                 var translatedP = this._translateToComponentSpace(p);
@@ -9404,6 +9423,13 @@ var Plottable;
                 this._keyDispatcher = Plottable.Dispatchers.Key.getDispatcher();
                 this._keyDispatcher.onKeyDown(this._keyDownCallback);
             };
+            Key.prototype._unanchor = function () {
+                _super.prototype._unanchor.call(this);
+                this._positionDispatcher.offMouseMove(this._mouseMoveCallback);
+                this._positionDispatcher = null;
+                this._keyDispatcher.offKeyDown(this._keyDownCallback);
+                this._keyDispatcher = null;
+            };
             Key.prototype._handleKeyEvent = function (keyCode) {
                 var p = this._translateToComponentSpace(this._positionDispatcher.getLastMousePosition());
                 if (this._isInsideComponent(p) && this._keyCodeCallbacks[keyCode]) {
@@ -9475,6 +9501,13 @@ var Plottable;
                 this._mouseDispatcher.onMouseMove(this._mouseMoveCallback);
                 this._touchDispatcher = Plottable.Dispatchers.Touch.getDispatcher(this._componentToListenTo.content().node());
                 this._touchDispatcher.onTouchStart(this._touchStartCallback);
+            };
+            Pointer.prototype._unanchor = function () {
+                _super.prototype._unanchor.call(this);
+                this._mouseDispatcher.offMouseMove(this._mouseMoveCallback);
+                this._mouseDispatcher = null;
+                this._touchDispatcher.offTouchStart(this._touchStartCallback);
+                this._touchDispatcher = null;
             };
             Pointer.prototype._handlePointerEvent = function (p) {
                 var translatedP = this._translateToComponentSpace(p);
@@ -9745,6 +9778,17 @@ var Plottable;
                 this._touchDispatcher.onTouchStart(this.touchStartCallback);
                 this._touchDispatcher.onTouchMove(this.touchMoveCallback);
                 this._touchDispatcher.onTouchEnd(this.touchEndCallback);
+            };
+            Drag.prototype._unanchor = function () {
+                _super.prototype._unanchor.call(this);
+                this._mouseDispatcher.offMouseDown(this.mouseDownCallback);
+                this._mouseDispatcher.offMouseMove(this.mouseMoveCallback);
+                this._mouseDispatcher.offMouseUp(this.mouseUpCallback);
+                this._mouseDispatcher = null;
+                this._touchDispatcher.offTouchStart(this.touchStartCallback);
+                this._touchDispatcher.offTouchMove(this.touchMoveCallback);
+                this._touchDispatcher.offTouchEnd(this.touchEndCallback);
+                this._touchDispatcher = null;
             };
             Drag.prototype._translateAndConstrain = function (p) {
                 var translatedP = this._translateToComponentSpace(p);

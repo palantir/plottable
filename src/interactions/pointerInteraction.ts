@@ -25,6 +25,15 @@ export module Interactions {
       this._touchDispatcher.onTouchStart(this._touchStartCallback);
     }
 
+    protected _unanchor() {
+      super._unanchor();
+      this._mouseDispatcher.offMouseMove(this._mouseMoveCallback);
+      this._mouseDispatcher = null;
+
+      this._touchDispatcher.offTouchStart(this._touchStartCallback);
+      this._touchDispatcher = null;
+    }
+
     private _handlePointerEvent(p: Point) {
       var translatedP = this._translateToComponentSpace(p);
       if (this._isInsideComponent(translatedP)) {

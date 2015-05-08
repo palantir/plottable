@@ -26,6 +26,15 @@ export module Interactions {
       this._keyDispatcher.onKeyDown(this._keyDownCallback);
     }
 
+    protected _unanchor() {
+      super._unanchor();
+      this._positionDispatcher.offMouseMove(this._mouseMoveCallback);
+      this._positionDispatcher = null;
+
+      this._keyDispatcher.offKeyDown(this._keyDownCallback);
+      this._keyDispatcher = null;
+    }
+
     private _handleKeyEvent(keyCode: number) {
       var p = this._translateToComponentSpace(this._positionDispatcher.getLastMousePosition());
       if (this._isInsideComponent(p) && this._keyCodeCallbacks[keyCode]) {

@@ -36,6 +36,19 @@ export module Interactions {
       this._touchDispatcher.onTouchEnd(this.touchEndCallback);
     }
 
+    protected _unanchor() {
+      super._unanchor();
+      this._mouseDispatcher.offMouseDown(this.mouseDownCallback);
+      this._mouseDispatcher.offMouseMove(this.mouseMoveCallback);
+      this._mouseDispatcher.offMouseUp(this.mouseUpCallback);
+      this._mouseDispatcher = null;
+
+      this._touchDispatcher.offTouchStart(this.touchStartCallback);
+      this._touchDispatcher.offTouchMove(this.touchMoveCallback);
+      this._touchDispatcher.offTouchEnd(this.touchEndCallback);
+      this._touchDispatcher = null;
+    }
+
     private _translateAndConstrain(p: Point) {
       var translatedP = this._translateToComponentSpace(p);
       if (!this._constrain) {

@@ -3737,6 +3737,7 @@ declare module Plottable {
     module Interactions {
         class DoubleClick extends Interaction {
             protected _anchor(component: Component): void;
+            protected _unanchor(): void;
             /**
              * Sets the callback called when the Component is double-clicked.
              *
@@ -3761,6 +3762,7 @@ declare module Plottable {
     module Interactions {
         class Key extends Interaction {
             protected _anchor(component: Component): void;
+            protected _unanchor(): void;
             /**
              * Sets a callback to be called when the key with the given keyCode is
              * pressed and the user is moused over the Component.
@@ -3789,6 +3791,7 @@ declare module Plottable {
     module Interactions {
         class Pointer extends Interaction {
             protected _anchor(component: Component): void;
+            protected _unanchor(): void;
             /**
              * Sets the callback called when the pointer enters the Component.
              *
@@ -3865,6 +3868,7 @@ declare module Plottable {
     module Interactions {
         class Drag extends Interaction {
             protected _anchor(component: Component): void;
+            protected _unanchor(): void;
             /**
              * Returns whether or not this Interactions constrains Points passed to its
              * callbacks to lie inside its Component.
