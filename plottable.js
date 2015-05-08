@@ -6423,18 +6423,7 @@ var Plottable;
             accessor = Plottable.Utils.Methods.accessorize(accessor);
             this._attrBindings.set(attrToSet, { accessor: accessor, scale: scale, attribute: attrToSet });
             this._updateExtentsForAttr(attrToSet);
-            if (previousScale) {
-                if (this._scales().indexOf(previousScale) !== -1) {
-                    previousScale.offUpdate(this._renderCallback);
-                    previousScale.removeExtentProvider(this._extentProvider);
-                }
-                previousScale._autoDomainIfAutomaticMode();
-            }
-            if (scale) {
-                scale.onUpdate(this._renderCallback);
-                scale.addExtentProvider(this._extentProvider);
-                scale._autoDomainIfAutomaticMode();
-            }
+            this._replaceScale(previousScale, scale);
             this.render(); // queue a re-render upon changing projector
             return this;
         };
@@ -6786,7 +6775,7 @@ var Plottable;
                 return _this._computeExtent(dataset, accScaleBinding.accessor, coercer, plotMetadata);
             }));
         };
-        Plot.prototype._replacePropertyScale = function (oldScale, newScale) {
+        Plot.prototype._replaceScale = function (oldScale, newScale) {
             if (oldScale !== newScale) {
                 if (oldScale != null) {
                     oldScale.offUpdate(this._renderCallback);
@@ -6888,7 +6877,7 @@ var Plottable;
                 if (sectorValue == null) {
                     return this._propertyBindings.get(Pie._SECTOR_VALUE_KEY);
                 }
-                this._replacePropertyScale(this.sectorValue().scale, sectorValueScale);
+                this._replaceScale(this.sectorValue().scale, sectorValueScale);
                 this._propertyBindings.set(Pie._SECTOR_VALUE_KEY, { accessor: d3.functor(sectorValue), scale: sectorValueScale });
                 this._updateExtentsForProperty(Pie._SECTOR_VALUE_KEY);
                 this._render();
@@ -6898,7 +6887,7 @@ var Plottable;
                 if (innerRadius == null) {
                     return this._propertyBindings.get(Pie._INNER_RADIUS_KEY);
                 }
-                this._replacePropertyScale(this.innerRadius().scale, innerRadiusScale);
+                this._replaceScale(this.innerRadius().scale, innerRadiusScale);
                 this._propertyBindings.set(Pie._INNER_RADIUS_KEY, { accessor: d3.functor(innerRadius), scale: innerRadiusScale });
                 this._updateExtentsForProperty(Pie._INNER_RADIUS_KEY);
                 this._render();
@@ -6908,7 +6897,7 @@ var Plottable;
                 if (outerRadius == null) {
                     return this._propertyBindings.get(Pie._OUTER_RADIUS_KEY);
                 }
-                this._replacePropertyScale(this.outerRadius().scale, outerRadiusScale);
+                this._replaceScale(this.outerRadius().scale, outerRadiusScale);
                 this._propertyBindings.set(Pie._OUTER_RADIUS_KEY, { accessor: d3.functor(outerRadius), scale: outerRadiusScale });
                 this._updateExtentsForProperty(Pie._OUTER_RADIUS_KEY);
                 this._render();

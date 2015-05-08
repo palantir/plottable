@@ -81,7 +81,7 @@ export module Plots {
       if (sectorValue == null) {
         return this._propertyBindings.get(Pie._SECTOR_VALUE_KEY);
       }
-      this._replacePropertyScale(this.sectorValue().scale, sectorValueScale);
+      this._replaceScale(this.sectorValue().scale, sectorValueScale);
       this._propertyBindings.set(Pie._SECTOR_VALUE_KEY, { accessor: d3.functor(sectorValue), scale: sectorValueScale });
       this._updateExtentsForProperty(Pie._SECTOR_VALUE_KEY);
       this._render();
@@ -95,7 +95,7 @@ export module Plots {
       if (innerRadius == null) {
         return this._propertyBindings.get(Pie._INNER_RADIUS_KEY);
       }
-      this._replacePropertyScale(this.innerRadius().scale, innerRadiusScale);
+      this._replaceScale(this.innerRadius().scale, innerRadiusScale);
       this._propertyBindings.set(Pie._INNER_RADIUS_KEY, { accessor: d3.functor(innerRadius), scale: innerRadiusScale });
       this._updateExtentsForProperty(Pie._INNER_RADIUS_KEY);
       this._render();
@@ -109,7 +109,7 @@ export module Plots {
       if (outerRadius == null) {
         return this._propertyBindings.get(Pie._OUTER_RADIUS_KEY);
       }
-      this._replacePropertyScale(this.outerRadius().scale, outerRadiusScale);
+      this._replaceScale(this.outerRadius().scale, outerRadiusScale);
       this._propertyBindings.set(Pie._OUTER_RADIUS_KEY, { accessor: d3.functor(outerRadius), scale: outerRadiusScale });
       this._updateExtentsForProperty(Pie._OUTER_RADIUS_KEY);
       this._render();

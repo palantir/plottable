@@ -2725,7 +2725,7 @@ declare module Plottable {
         getClosestPlotData(queryPoint: Point): Plots.PlotData;
         protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean;
         protected _updateExtentsForProperty(property: string): void;
-        protected _replacePropertyScale(oldScale: Scale<any, any>, newScale: Scale<any, any>): void;
+        protected _replaceScale(oldScale: Scale<any, any>, newScale: Scale<any, any>): void;
     }
 }
 

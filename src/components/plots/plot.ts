@@ -180,19 +180,7 @@ module Plottable {
       this._attrBindings.set(attrToSet, {accessor: accessor, scale: scale, attribute: attrToSet});
       this._updateExtentsForAttr(attrToSet);
 
-      if (previousScale) {
-        if (this._scales().indexOf(previousScale) !== -1) {
-          previousScale.offUpdate(this._renderCallback);
-          previousScale.removeExtentProvider(this._extentProvider);
-        }
-        previousScale._autoDomainIfAutomaticMode();
-      }
-
-      if (scale) {
-        scale.onUpdate(this._renderCallback);
-        scale.addExtentProvider(this._extentProvider);
-        scale._autoDomainIfAutomaticMode();
-      }
+      this._replaceScale(previousScale, scale);
       this.render(); // queue a re-render upon changing projector
       return this;
     }
@@ -586,7 +574,7 @@ module Plottable {
       }));
     }
 
-    protected _replacePropertyScale(oldScale: Scale<any, any>, newScale: Scale<any, any>) {
+    protected _replaceScale(oldScale: Scale<any, any>, newScale: Scale<any, any>) {
       if (oldScale !== newScale) {
         if (oldScale != null) {
           oldScale.offUpdate(this._renderCallback);
