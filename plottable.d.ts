@@ -1574,24 +1574,6 @@ declare module Plottable {
          */
         yAlign(alignment: string): Component;
         /**
-         * Sets the x offset of the Component. This will be used if the Component
-         * is given more space than it needs.
-         *
-         * @param {number} offset The desired x offset, in pixels, from the left
-         * side of the container.
-         * @returns {Component} The calling Component.
-         */
-        xOffset(offset: number): Component;
-        /**
-         * Sets the y offset of the Component. This will be used if the Component
-         * is given more space than it needs.
-         *
-         * @param {number} offset The desired y offset, in pixels, from the top
-         * side of the container.
-         * @returns {Component} The calling Component.
-         */
-        yOffset(offset: number): Component;
-        /**
          * Attaches an Interaction to the Component, so that the Interaction will listen for events on the Component.
          *
          * @param {Interaction} interaction The Interaction to attach to the Component.

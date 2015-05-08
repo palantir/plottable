@@ -44,8 +44,6 @@ module Plottable {
     private _isTopLevelComponent = false;
     private _width: number; // Width and height of the component. Used to size the hitbox, bounding box, etc
     private _height: number;
-    private _xOffset = 0; // Offset from Origin, used for alignment and floating positioning
-    private _yOffset = 0;
     private _cssClasses: string[] = ["component"];
     private _destroyed = false;
 
@@ -159,8 +157,8 @@ module Plottable {
       var xAlignProportion = Component._xAlignToProportion[this._xAlignment];
       var yAlignProportion = Component._yAlignToProportion[this._yAlignment];
       this._origin = {
-        x: origin.x + this._xOffset + (availableWidth - this.width()) * xAlignProportion,
-        y: origin.y + this._yOffset + (availableHeight - this.height()) * yAlignProportion
+        x: origin.x + (availableWidth - this.width()) * xAlignProportion,
+        y: origin.y + (availableHeight - this.height()) * yAlignProportion
       };
       this._element.attr("transform", "translate(" + this._origin.x + "," + this._origin.y + ")");
       this._boxes.forEach((b: D3.Selection) => b.attr("width", this.width()).attr("height", this.height()));
@@ -300,34 +298,6 @@ module Plottable {
         throw new Error("Unsupported alignment: " + alignment);
       }
       this._yAlignment = alignment;
-      this.redraw();
-      return this;
-    }
-
-    /**
-     * Sets the x offset of the Component. This will be used if the Component
-     * is given more space than it needs.
-     *
-     * @param {number} offset The desired x offset, in pixels, from the left
-     * side of the container.
-     * @returns {Component} The calling Component.
-     */
-    public xOffset(offset: number): Component {
-      this._xOffset = offset;
-      this.redraw();
-      return this;
-    }
-
-    /**
-     * Sets the y offset of the Component. This will be used if the Component
-     * is given more space than it needs.
-     *
-     * @param {number} offset The desired y offset, in pixels, from the top
-     * side of the container.
-     * @returns {Component} The calling Component.
-     */
-    public yOffset(offset: number): Component {
-      this._yOffset = offset;
       this.redraw();
       return this;
     }

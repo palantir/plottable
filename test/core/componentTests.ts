@@ -151,10 +151,8 @@ describe("Component behavior", () => {
     assert.strictEqual(c.xAlign(), "left", "x alignment defaults to \"left\"");
     assert.strictEqual(c.yAlign(), "top", "y alignment defaults to \"top\"");
     var layout = c.requestedSpace(1, 1);
-    assert.strictEqual(layout.minWidth, 0, "requested width defaults to 0");
-    assert.strictEqual(layout.minHeight, 0, "requested height defaults to 0");
-    assert.strictEqual((<any> c)._xOffset, 0, "xOffset defaults to 0");
-    assert.strictEqual((<any> c)._yOffset, 0, "yOffset defaults to 0");
+    assert.strictEqual(layout.minWidth, 0, "requested minWidth defaults to 0");
+    assert.strictEqual(layout.minHeight, 0, "requested minHeight defaults to 0");
     svg.remove();
   });
 
@@ -172,32 +170,6 @@ describe("Component behavior", () => {
     c.xAlign("right").yAlign("bottom");
     c.computeLayout();
     assertComponentXY(c, 300, 200, "bottom-right component aligns correctly");
-    svg.remove();
-  });
-
-  it("components can be offset relative to their alignment", () => {
-    TestMethods.fixComponentSize(c, 100, 100);
-    c.anchor(svg);
-    c.xOffset(20).yOffset(20);
-    c.computeLayout();
-    assertComponentXY(c, 20, 20, "top-left component offsets correctly");
-
-    c.xAlign("CENTER").yAlign("CENTER");
-    c.computeLayout();
-    assertComponentXY(c, 170, 120, "center component offsets correctly");
-
-    c.xAlign("RIGHT").yAlign("BOTTOM");
-    c.computeLayout();
-    assertComponentXY(c, 320, 220, "bottom-right component offsets correctly");
-
-    c.xOffset(0).yOffset(0);
-    c.computeLayout();
-    assertComponentXY(c, 300, 200, "bottom-right component offset resets");
-
-    c.xOffset(-20).yOffset(-30);
-    c.computeLayout();
-    assertComponentXY(c, 280, 170, "negative offsets work properly");
-
     svg.remove();
   });
 
@@ -424,25 +396,12 @@ describe("Component behavior", () => {
       assert.strictEqual(origin.x, SVG_WIDTH - cWidth, "returns correct value (xAlign right)");
       assert.strictEqual(origin.y, SVG_HEIGHT - cHeight, "returns correct value (yAlign bottom)");
 
-      c.xAlign("left").yAlign("top");
-      var xOffsetValue = 40;
-      var yOffsetValue = 30;
-      c.xOffset(xOffsetValue);
-      c.yOffset(yOffsetValue);
-      origin = c.origin();
-      assert.strictEqual(origin.x, xOffsetValue, "accounts for xOffset");
-      assert.strictEqual(origin.y, yOffsetValue, "accounts for yOffset");
-
       svg.remove();
     });
 
     it("origin() (nested)", () => {
       TestMethods.fixComponentSize(c, cWidth, cHeight);
       var group = new Plottable.Components.Group([c]);
-      var groupXOffset = 40;
-      var groupYOffset = 30;
-      group.xOffset(groupXOffset);
-      group.yOffset(groupYOffset);
       group.renderTo(svg);
 
       var groupWidth = group.width();
@@ -485,25 +444,12 @@ describe("Component behavior", () => {
       assert.strictEqual(origin.x, SVG_WIDTH - cWidth, "returns correct value (xAlign right)");
       assert.strictEqual(origin.y, SVG_HEIGHT - cHeight, "returns correct value (yAlign bottom)");
 
-      c.xAlign("left").yAlign("top");
-      var xOffsetValue = 40;
-      var yOffsetValue = 30;
-      c.xOffset(xOffsetValue);
-      c.yOffset(yOffsetValue);
-      origin = c.originToSVG();
-      assert.strictEqual(origin.x, xOffsetValue, "accounts for xOffset");
-      assert.strictEqual(origin.y, yOffsetValue, "accounts for yOffset");
-
       svg.remove();
     });
 
     it("originToSVG() (nested)", () => {
       TestMethods.fixComponentSize(c, cWidth, cHeight);
       var group = new Plottable.Components.Group([c]);
-      var groupXOffset = 40;
-      var groupYOffset = 30;
-      group.xOffset(groupXOffset);
-      group.yOffset(groupYOffset);
       group.renderTo(svg);
 
       var groupWidth = group.width();
@@ -511,18 +457,18 @@ describe("Component behavior", () => {
 
       c.xAlign("left").yAlign("top");
       var origin = c.originToSVG();
-      assert.strictEqual(origin.x, groupXOffset, "returns correct value (xAlign left)");
-      assert.strictEqual(origin.y, groupYOffset, "returns correct value (yAlign top)");
+      assert.strictEqual(origin.x, 0, "returns correct value (xAlign left)");
+      assert.strictEqual(origin.y, 0, "returns correct value (yAlign top)");
 
       c.xAlign("center").yAlign("center");
       origin = c.originToSVG();
-      assert.strictEqual(origin.x, (groupWidth - cWidth) / 2 + groupXOffset, "returns correct value (xAlign center)");
-      assert.strictEqual(origin.y, (groupHeight - cHeight) / 2 + groupYOffset, "returns correct value (yAlign center)");
+      assert.strictEqual(origin.x, (groupWidth - cWidth) / 2, "returns correct value (xAlign center)");
+      assert.strictEqual(origin.y, (groupHeight - cHeight) / 2, "returns correct value (yAlign center)");
 
       c.xAlign("right").yAlign("bottom");
       origin = c.originToSVG();
-      assert.strictEqual(origin.x, groupWidth - cWidth + groupXOffset, "returns correct value (xAlign right)");
-      assert.strictEqual(origin.y, groupHeight - cHeight + groupYOffset, "returns correct value (yAlign bottom)");
+      assert.strictEqual(origin.x, groupWidth - cWidth, "returns correct value (xAlign right)");
+      assert.strictEqual(origin.y, groupHeight - cHeight, "returns correct value (yAlign bottom)");
 
       svg.remove();
     });
