@@ -47,28 +47,6 @@ describe("ComponentGroups", () => {
     svg.remove();
   });
 
-  it("componentGroup subcomponents have xOffset, yOffset of 0", () => {
-    var cg = new Plottable.Components.Group();
-    var c1 = new Plottable.Component();
-    var c2 = new Plottable.Component();
-    cg.below(c1).below(c2);
-
-    var svg = TestMethods.generateSVG();
-    cg.anchor(svg);
-    cg.computeLayout({ x: 50, y: 50 }, 350, 350);
-
-    var cgTranslate = d3.transform((<any> cg)._element.attr("transform")).translate;
-    var c1Translate = d3.transform((<any> c1)._element.attr("transform")).translate;
-    var c2Translate = d3.transform((<any> c2)._element.attr("transform")).translate;
-    assert.strictEqual(cgTranslate[0], 50, "componentGroup has 50 xOffset");
-    assert.strictEqual(cgTranslate[1], 50, "componentGroup has 50 yOffset");
-    assert.strictEqual(c1Translate[0], 0, "componentGroup has 0 xOffset");
-    assert.strictEqual(c1Translate[1], 0, "componentGroup has 0 yOffset");
-    assert.strictEqual(c2Translate[0], 0, "componentGroup has 0 xOffset");
-    assert.strictEqual(c2Translate[1], 0, "componentGroup has 0 yOffset");
-    svg.remove();
-    });
-
   it("detach() and remove() work correctly for componentGroup", () => {
     var c1 = new Plottable.Component().classed("component-1", true);
     var c2 = new Plottable.Component().classed("component-2", true);
