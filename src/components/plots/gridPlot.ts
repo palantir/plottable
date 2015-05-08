@@ -96,6 +96,54 @@ export module Plots {
     protected _generateDrawSteps(): Drawers.DrawStep[] {
       return [{attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("cells")}];
     }
+
+    public x(): Plots.AccessorScaleBinding<any, number>;
+    public x(x: number | _Accessor): Grid;
+    public x(x: any | _Accessor, xScale: Scale<any, number>): Grid;
+    public x(x?: number | _Accessor | any, xScale?: Scale<any, number>): any {
+      if (x == null) {
+        return super.x();
+      }
+      super.x(<any> x, xScale);
+      if (xScale instanceof Scales.Category) {
+          this.project("x1", (d: any, i: number, dataset: Dataset, m: Plots.PlotMetadata) => {
+            return xScale.scale(this.x().accessor(d, i, dataset, m)) - xScale.rangeBand() / 2;
+          });
+          this.project("x2", (d: any, i: number, dataset: Dataset, m: Plots.PlotMetadata) => {
+            return xScale.scale(this.x().accessor(d, i, dataset, m)) + xScale.rangeBand() / 2;
+          });
+        }
+        if (xScale instanceof QuantitativeScale) {
+          this.project("x1", (d: any, i: number, dataset: Dataset, m: Plots.PlotMetadata) => {
+            return xScale.scale(this.x().accessor(d, i, dataset, m));
+          });
+        }
+      return this;
+    }
+
+    public y(): Plots.AccessorScaleBinding<any, number>;
+    public y(y: number | _Accessor): Grid;
+    public y(y: any | _Accessor, yScale: Scale<any, number>): Grid;
+    public y(y?: number | _Accessor | any, yScale?: Scale<any, number>): any {
+      if (y == null) {
+        return super.y();
+      }
+      super.y(<any> y, yScale);
+      if (yScale instanceof Scales.Category) {
+        this.project("y1", (d: any, i: number, dataset: Dataset, m: Plots.PlotMetadata) => {
+          return yScale.scale(this.y().accessor(d, i, dataset, m)) - yScale.rangeBand() / 2;
+        });
+        this.project("y2", (d: any, i: number, dataset: Dataset, m: Plots.PlotMetadata) => {
+          return yScale.scale(this.y().accessor(d, i, dataset, m)) + yScale.rangeBand() / 2;
+        });
+      }
+      if (yScale instanceof QuantitativeScale) {
+        this.project("y1", (d: any, i: number, dataset: Dataset, m: Plots.PlotMetadata) => {
+          return yScale.scale(this.y().accessor(d, i, dataset, m));
+        });
+      }
+      return this;
+    }
   }
 }
 }

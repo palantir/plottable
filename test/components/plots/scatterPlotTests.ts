@@ -9,8 +9,8 @@ describe("Plots", () => {
       var xScale = new Plottable.Scales.Linear();
       var yScale = new Plottable.Scales.Linear();
       var plot = new Plottable.Plots.Scatter(xScale, yScale);
-      plot.project("x", (d: any) => d.x, xScale);
-      plot.project("y", (d: any) => d.y, yScale);
+      plot.x((d: any) => d.x, xScale);
+      plot.y((d: any) => d.y, yScale);
       assert.doesNotThrow(() => plot.renderTo(svg), Error);
       assert.strictEqual(plot.width(), 400, "was allocated width");
       assert.strictEqual(plot.height(), 400, "was allocated height");
@@ -29,8 +29,8 @@ describe("Plots", () => {
       var yAccessor = (d: any, i: number, dataset: Plottable.Dataset) => dataset.metadata().bar;
       var dataset = new Plottable.Dataset(data, metadata);
       var plot = new Plottable.Plots.Scatter(xScale, yScale)
-                                  .project("x", xAccessor)
-                                  .project("y", yAccessor);
+                                  .x(xAccessor)
+                                  .y(yAccessor);
       plot.addDataset(dataset);
       plot.renderTo(svg);
       var symbols = plot.getAllSelections();
@@ -72,8 +72,8 @@ describe("Plots", () => {
       var data = [{x: 0, y: 0}, {x: 1, y: 1}];
       var data2 = [{x: 1, y: 2}, {x: 3, y: 4}];
       var plot = new Plottable.Plots.Scatter(xScale, yScale)
-                                   .project("x", "x", xScale)
-                                   .project("y", "y", yScale)
+                                   .x((d) => d.x, xScale)
+                                   .y((d) => d.y, yScale)
                                    .addDataset(new Plottable.Dataset(data))
                                    .addDataset(new Plottable.Dataset(data2));
       plot.renderTo(svg);
@@ -101,8 +101,8 @@ describe("Plots", () => {
       var data = [{x: 0, y: 0}, {x: 1, y: 1}];
       var data2 = [{x: 1, y: 2}, {x: 3, y: 4}];
       var plot = new Plottable.Plots.Scatter(xScale, yScale)
-                                   .project("x", "x", xScale)
-                                   .project("y", "y", yScale)
+                                   .x((d) => d.x, xScale)
+                                   .y((d) => d.y, yScale)
                                    .addDataset(new Plottable.Dataset(data))
                                    .addDataset(new Plottable.Dataset(data2));
       plot.renderTo(svg);
@@ -156,9 +156,9 @@ describe("Plots", () => {
       var xScale = new Plottable.Scales.Linear();
       var yScale = new Plottable.Scales.Linear();
       var plot = new Plottable.Plots.Scatter(xScale, yScale);
-      plot.addDataset(dataset)
-          .project("x", "foo", xScale)
-          .project("y", "bar", yScale);
+      plot.addDataset(dataset);
+      plot.x((d) => d.foo, xScale)
+          .y((d) => d.bar, yScale);
       plot.renderTo(svg);
 
       var dataWithNaN = data.slice();
@@ -222,8 +222,8 @@ describe("Plots", () => {
         circlePlot = new Plottable.Plots.Scatter(xScale, yScale);
         circlePlot.addDataset(quadraticDataset);
         circlePlot.project("fill", colorAccessor);
-        circlePlot.project("x", "x", xScale);
-        circlePlot.project("y", "y", yScale);
+        circlePlot.x((d) => d.x, xScale);
+        circlePlot.y((d) => d.y, yScale);
         circlePlot.renderTo(svg);
       });
 

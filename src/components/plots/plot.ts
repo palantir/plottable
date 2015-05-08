@@ -320,6 +320,13 @@ module Plottable {
       return this._attrExtents.get(attr);
     }
 
+    /**
+     * Override in subclass to add special extents, such as included values
+     */
+    protected _extentsForProperty(property: string) {
+      return this._propertyExtents.get(property);
+    }
+
     protected _extentsForScale<D>(scale: Scale<D, any>): D[][] {
       if (!this._isAnchored) {
         return [];
@@ -336,7 +343,7 @@ module Plottable {
 
       this._propertyBindings.forEach((property, binding) => {
         if (binding.scale === scale) {
-          var extents = this._propertyExtents.get(property);
+          var extents = this._extentsForProperty(property);
           if (extents != null) {
             allSetsOfExtents.push(extents);
           }
@@ -563,18 +570,16 @@ module Plottable {
     }
 
     protected _replaceScale(oldScale: Scale<any, any>, newScale: Scale<any, any>) {
-      if (oldScale !== newScale) {
-        if (oldScale != null) {
-          oldScale.offUpdate(this._renderCallback);
-          oldScale.removeExtentProvider(this._extentProvider);
-          oldScale._autoDomainIfAutomaticMode();
-        }
+      if (oldScale != null) {
+        oldScale.offUpdate(this._renderCallback);
+        oldScale.removeExtentProvider(this._extentProvider);
+        oldScale._autoDomainIfAutomaticMode();
+      }
 
-        if (newScale != null) {
-          newScale.onUpdate(this._renderCallback);
-          newScale.addExtentProvider(this._extentProvider);
-          newScale._autoDomainIfAutomaticMode();
-        }
+      if (newScale != null) {
+        newScale.onUpdate(this._renderCallback);
+        newScale.addExtentProvider(this._extentProvider);
+        newScale._autoDomainIfAutomaticMode();
       }
     }
 
@@ -585,7 +590,7 @@ module Plottable {
                  accScaleBinding.scale.scale(accScaleBinding.accessor(d, i, dataset, m));
     }
 
-    private _propertyToProjectors(): AttributeToProjector {
+    protected _propertyToProjectors(): AttributeToProjector {
       var attrToProjector: AttributeToProjector = {};
       this._propertyBindings.forEach((key, binding) => attrToProjector[key] = Plot._scaledAccessor(binding));
       return attrToProjector;

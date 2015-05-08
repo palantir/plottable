@@ -5,8 +5,6 @@ export module Plots {
   export class Line<X> extends XYPlot<X, number> {
     private _defaultStrokeColor: string;
 
-    protected _yScale: QuantitativeScale<number>;
-
     /**
      * Constructs a LinePlot.
      *
@@ -36,13 +34,13 @@ export module Plots {
 
     protected _getResetYFunction() {
       // gets the y-value generator for the animation start point
-      var yDomain = this._yScale.domain();
+      var yDomain = this.y().scale.domain();
       var domainMax = Math.max(yDomain[0], yDomain[1]);
       var domainMin = Math.min(yDomain[0], yDomain[1]);
       // start from zero, or the closest domain value to zero
       // avoids lines zooming on from offscreen.
       var startValue = (domainMax < 0 && domainMax) || (domainMin > 0 && domainMin) || 0;
-      var scaledStartValue = this._yScale.scale(startValue);
+      var scaledStartValue = this.y().scale.scale(startValue);
       return (d: any, i: number, dataset: Dataset, m: PlotMetadata) => scaledStartValue;
     }
 
@@ -70,11 +68,12 @@ export module Plots {
           data.length > 0 ? projector(data[0], i, dataset, m) : null;
       });
 
-      var xFunction = attrToProjector["x"];
-      var yFunction = attrToProjector["y"];
+      var xFunction       = attrToProjector["x"];
+      var yFunction       = attrToProjector["y"];
 
-      attrToProjector["defined"] = (d: any, i: number, dataset: Dataset, m: any) =>
-          this._rejectNullsAndNaNs(d, i, dataset, m, xFunction) && this._rejectNullsAndNaNs(d, i, dataset, m, yFunction);
+      attrToProjector["defined"] = (d: any, i: number, u: any, m: any) =>
+          this._rejectNullsAndNaNs(d, i, u, m, xFunction) && this._rejectNullsAndNaNs(d, i, u, m, yFunction);
+
       attrToProjector["stroke"] = attrToProjector["stroke"] || d3.functor(this._defaultStrokeColor);
       attrToProjector["stroke-width"] = attrToProjector["stroke-width"] || d3.functor("2px");
 

@@ -11,8 +11,8 @@ describe("Plots", () => {
       var xScale = new Plottable.Scales.Linear();
       var yScale = new Plottable.Scales.Linear();
       var plot = new Plottable.Plots.Bar(xScale, yScale);
-      plot.project("x", (d: any) => d.x, xScale);
-      plot.project("y", (d: any) => d.y, yScale);
+      plot.x((d) => d.x, xScale);
+      plot.y((d) => d.y, yScale);
       assert.doesNotThrow(() => plot.renderTo(svg), Error);
       assert.strictEqual(plot.width(), 400, "was allocated width");
       assert.strictEqual(plot.height(), 400, "was allocated height");
@@ -51,8 +51,8 @@ describe("Plots", () => {
         barPlot.animate(false);
         barPlot.baseline(0);
         yScale.domain([-2, 2]);
-        barPlot.project("x", "x", xScale);
-        barPlot.project("y", "y", yScale);
+        barPlot.x((d) => d.x, xScale);
+        barPlot.y((d) => d.y, yScale);
         barPlot.renderTo(svg);
       });
 
@@ -296,8 +296,8 @@ describe("Plots", () => {
         barPlot.animate(false);
         barPlot.baseline(0);
         yScale.domain([-2, 2]);
-        barPlot.project("x", "x", xScale);
-        barPlot.project("y", "y", yScale);
+        barPlot.x((d) => d.x, xScale);
+        barPlot.y((d) => d.y, yScale);
         barPlot.renderTo(svg);
       });
 
@@ -344,8 +344,8 @@ describe("Plots", () => {
         dataset = new Plottable.Dataset(data);
         barPlot.addDataset(dataset);
         barPlot.baseline(0);
-        barPlot.project("x", "x", xScale);
-        barPlot.project("y", "y", yScale);
+        barPlot.x((d) => d.x, xScale);
+        barPlot.y((d) => d.y, yScale);
         barPlot.renderTo(svg);
       });
 
@@ -408,9 +408,9 @@ describe("Plots", () => {
         xScale = new Plottable.Scales.Time();
         var yScale = new Plottable.Scales.Linear();
         barPlot = new Plottable.Plots.Bar(xScale, yScale);
-        barPlot.addDataset(new Plottable.Dataset(data))
-               .project("x", (d: any) => d3.time.format("%m/%d/%y").parse(d.x), xScale)
-               .project("y", "y", yScale)
+        barPlot.addDataset(new Plottable.Dataset(data));
+        barPlot.x((d: any) => d3.time.format("%m/%d/%y").parse(d.x), xScale)
+               .y((d) => d.y, yScale)
                .renderTo(svg);
       });
 
@@ -447,8 +447,8 @@ describe("Plots", () => {
         barPlot.addDataset(dataset);
         barPlot.animate(false);
         barPlot.baseline(0);
-        barPlot.project("x", "x", xScale);
-        barPlot.project("y", "y", yScale);
+        barPlot.x((d) => d.x, xScale);
+        barPlot.y((d) => d.y, yScale);
         barPlot.renderTo(svg);
       });
 
@@ -651,8 +651,8 @@ describe("Plots", () => {
         dataset = new Plottable.Dataset(data);
         plot = new Plottable.Plots.Bar<string, number>(xScale, yScale);
         plot.addDataset(dataset);
-        plot.project("x", "x", xScale);
-        plot.project("y", "y", yScale);
+        plot.x((d) => d.x, xScale);
+        plot.y((d) => d.y, yScale);
       });
 
       it("bar labels disabled by default", () => {
@@ -726,8 +726,8 @@ describe("Plots", () => {
         var xScale = new Plottable.Scales.Category();
         var yScale = new Plottable.Scales.Linear();
         verticalBarPlot = new Plottable.Plots.Bar<string, number>(xScale, yScale);
-        verticalBarPlot.project("x", "x", xScale);
-        verticalBarPlot.project("y", "y", yScale);
+        verticalBarPlot.x((d) => d.x, xScale);
+        verticalBarPlot.y((d) => d.y, yScale);
       });
 
       it("retrieves all dataset selections with no args", () => {
@@ -780,9 +780,9 @@ describe("Plots", () => {
       var xScale = new Plottable.Scales.Category();
       var yScale = new Plottable.Scales.Linear();
       var plot = new Plottable.Plots.Bar(xScale, yScale);
-      plot.addDataset(simpleDataset)
-          .project("x", xAccessor, xScale)
-          .project("y", yAccessor, yScale)
+      plot.addDataset(simpleDataset);
+      plot.x(xAccessor, xScale)
+          .y(yAccessor, yScale)
           .renderTo(svg);
       xScale.domain(["b", "c"]);
       assert.deepEqual(yScale.domain(), [-7, 7], "domain has not been adjusted to visible points");

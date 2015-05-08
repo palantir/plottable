@@ -20,8 +20,8 @@ describe("Plots", () => {
 
       var linePlot = new Plottable.Plots.Line(xScale, yScale);
       linePlot.addDataset(new Plottable.Dataset(dataWithNaN));
-      linePlot.project("x", (d: any) => d.foo, xScale);
-      linePlot.project("y", (d: any) => d.bar, yScale);
+      linePlot.x((d: any) => d.foo, xScale);
+      linePlot.y((d: any) => d.bar, yScale);
       linePlot.renderTo(svg);
 
       var apd = linePlot.getAllPlotData();
@@ -41,8 +41,8 @@ describe("Plots", () => {
       var xScale = new Plottable.Scales.Linear();
       var yScale = new Plottable.Scales.Linear();
       var plot = new Plottable.Plots.Line(xScale, yScale);
-      plot.project("x", (d: any) => d.x, xScale);
-      plot.project("y", (d: any) => d.y, yScale);
+      plot.x((d: any) => d.x, xScale);
+      plot.y((d: any) => d.y, yScale);
       assert.doesNotThrow(() => plot.renderTo(svg), Error);
       assert.strictEqual(plot.width(), 400, "was allocated width");
       assert.strictEqual(plot.height(), 400, "was allocated height");
@@ -74,9 +74,9 @@ describe("Plots", () => {
       svg = TestMethods.generateSVG(500, 500);
       simpleDataset = new Plottable.Dataset(twoPointData);
       linePlot = new Plottable.Plots.Line(xScale, yScale);
-      linePlot.addDataset(simpleDataset)
-              .project("x", xAccessor, xScale)
-              .project("y", yAccessor, yScale)
+      linePlot.addDataset(simpleDataset);
+      linePlot.x(xAccessor, xScale)
+              .y(yAccessor, yScale)
               .project("stroke", colorAccessor)
               .renderTo(svg);
       renderArea = (<any> linePlot)._renderArea;
