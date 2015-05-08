@@ -3858,6 +3858,7 @@ declare module Plottable {
              */
             constructor(xScale?: QuantitativeScale<any>, yScale?: QuantitativeScale<any>);
             protected _anchor(component: Component): void;
+            protected _unanchor(): void;
         }
     }
 }

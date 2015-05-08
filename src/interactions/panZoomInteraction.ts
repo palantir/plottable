@@ -12,9 +12,18 @@ export module Interactions {
     private _xScale: QuantitativeScale<any>;
     private _yScale: QuantitativeScale<any>;
     private _dragInteraction: Interactions.Drag;
+    private _mouseDispatcher: Dispatchers.Mouse;
     private _touchDispatcher: Dispatchers.Touch;
 
     private _touchIds: D3.Map<Point>;
+
+
+    private _wheelCallback = (p: Point, e: WheelEvent) => this._handleWheelEvent(p, e);
+    private _touchStartCallback = (ids: any, idToPoint: any, e: any) => this._handleTouchStart(ids, idToPoint, e);
+    private _touchMoveCallback = (ids: any, idToPoint: any, e: any) => this._handlePinch(ids, idToPoint, e);
+    private _touchEndCallback = (ids: any, idToPoint: any, e: any) => this._handleTouchEnd(ids, idToPoint, e);
+    private _touchCancelCallback = (ids: any, idToPoint: any, e: any) => this._handleTouchEnd(ids, idToPoint, e);
+
 
     /**
      * Creates a PanZoomInteraction.
@@ -40,14 +49,27 @@ export module Interactions {
       super._anchor(component);
       this._dragInteraction.attachTo(component);
 
-      var mouseDispatcher = Dispatchers.Mouse.getDispatcher(<SVGElement> this._componentToListenTo.content().node());
-      mouseDispatcher.onWheel((p: Point, e: WheelEvent) => this._handleWheelEvent(p, e));
+      this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(<SVGElement> this._componentToListenTo.content().node());
+      this._mouseDispatcher.onWheel(this._wheelCallback);
 
       this._touchDispatcher = Dispatchers.Touch.getDispatcher(<SVGElement> this._componentToListenTo.content().node());
-      this._touchDispatcher.onTouchStart((ids, idToPoint, e) => this._handleTouchStart(ids, idToPoint, e));
-      this._touchDispatcher.onTouchMove((ids, idToPoint, e) => this._handlePinch(ids, idToPoint, e));
-      this._touchDispatcher.onTouchEnd((ids, idToPoint, e) => this._handleTouchEnd(ids, idToPoint, e));
-      this._touchDispatcher.onTouchCancel((ids, idToPoint, e) => this._handleTouchEnd(ids, idToPoint, e));
+      this._touchDispatcher.onTouchStart(this._touchStartCallback);
+      this._touchDispatcher.onTouchMove(this._touchMoveCallback);
+      this._touchDispatcher.onTouchEnd(this._touchEndCallback);
+      this._touchDispatcher.onTouchCancel(this._touchCancelCallback);
+    }
+
+    protected _unanchor() {
+      this._mouseDispatcher.offWheel(this._wheelCallback);
+      this._mouseDispatcher = null;
+
+      this._touchDispatcher.offTouchStart(this._touchStartCallback);
+      this._touchDispatcher.offTouchMove(this._touchMoveCallback);
+      this._touchDispatcher.offTouchEnd(this._touchEndCallback);
+      this._touchDispatcher.offTouchCancel(this._touchCancelCallback);
+      this._touchDispatcher = null;
+
+      this._dragInteraction.detachFrom(this._componentToListenTo);
     }
 
     private _handleTouchStart(ids: number[], idToPoint: { [id: number]: Point; }, e: TouchEvent) {

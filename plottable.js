@@ -9614,7 +9614,13 @@ var Plottable;
              * @param {QuantitativeScaleScale} [yScale] The Y scale to update on panning/zooming.
              */
             function PanZoom(xScale, yScale) {
+                var _this = this;
                 _super.call(this);
+                this._wheelCallback = function (p, e) { return _this._handleWheelEvent(p, e); };
+                this._touchStartCallback = function (ids, idToPoint, e) { return _this._handleTouchStart(ids, idToPoint, e); };
+                this._touchMoveCallback = function (ids, idToPoint, e) { return _this._handlePinch(ids, idToPoint, e); };
+                this._touchEndCallback = function (ids, idToPoint, e) { return _this._handleTouchEnd(ids, idToPoint, e); };
+                this._touchCancelCallback = function (ids, idToPoint, e) { return _this._handleTouchEnd(ids, idToPoint, e); };
                 this._xScale = xScale;
                 this._yScale = yScale;
                 this._dragInteraction = new Interactions.Drag();
@@ -9622,16 +9628,25 @@ var Plottable;
                 this._touchIds = d3.map();
             }
             PanZoom.prototype._anchor = function (component) {
-                var _this = this;
                 _super.prototype._anchor.call(this, component);
                 this._dragInteraction.attachTo(component);
-                var mouseDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(this._componentToListenTo.content().node());
-                mouseDispatcher.onWheel(function (p, e) { return _this._handleWheelEvent(p, e); });
+                this._mouseDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(this._componentToListenTo.content().node());
+                this._mouseDispatcher.onWheel(this._wheelCallback);
                 this._touchDispatcher = Plottable.Dispatchers.Touch.getDispatcher(this._componentToListenTo.content().node());
-                this._touchDispatcher.onTouchStart(function (ids, idToPoint, e) { return _this._handleTouchStart(ids, idToPoint, e); });
-                this._touchDispatcher.onTouchMove(function (ids, idToPoint, e) { return _this._handlePinch(ids, idToPoint, e); });
-                this._touchDispatcher.onTouchEnd(function (ids, idToPoint, e) { return _this._handleTouchEnd(ids, idToPoint, e); });
-                this._touchDispatcher.onTouchCancel(function (ids, idToPoint, e) { return _this._handleTouchEnd(ids, idToPoint, e); });
+                this._touchDispatcher.onTouchStart(this._touchStartCallback);
+                this._touchDispatcher.onTouchMove(this._touchMoveCallback);
+                this._touchDispatcher.onTouchEnd(this._touchEndCallback);
+                this._touchDispatcher.onTouchCancel(this._touchCancelCallback);
+            };
+            PanZoom.prototype._unanchor = function () {
+                this._mouseDispatcher.offWheel(this._wheelCallback);
+                this._mouseDispatcher = null;
+                this._touchDispatcher.offTouchStart(this._touchStartCallback);
+                this._touchDispatcher.offTouchMove(this._touchMoveCallback);
+                this._touchDispatcher.offTouchEnd(this._touchEndCallback);
+                this._touchDispatcher.offTouchCancel(this._touchCancelCallback);
+                this._touchDispatcher = null;
+                this._dragInteraction.detachFrom(this._componentToListenTo);
             };
             PanZoom.prototype._handleTouchStart = function (ids, idToPoint, e) {
                 for (var i = 0; i < ids.length && this._touchIds.size() < 2; i++) {
