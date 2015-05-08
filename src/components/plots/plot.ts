@@ -281,7 +281,7 @@ module Plottable {
       this._scales().forEach((scale) => scale._autoDomainIfAutomaticMode());
     }
 
-    protected _updateExtentsForKey(key: string, ifAttr: boolean) {
+    private _updateExtentsForKey(key: string, ifAttr: boolean) {
       var bindingMap = ifAttr ? this._attrBindings : this._propertyBindings;
       var accScaleBinding = bindingMap.get(key);
       if (accScaleBinding.accessor == null) { return; }
@@ -562,7 +562,7 @@ module Plottable {
         pixelPoint.x > this.width() || pixelPoint.y > this.height());
     }
 
-    protected _replaceScale(oldScale: Scale<any, any>, newScale: Scale<any, any>) {
+    private _replaceScale(oldScale: Scale<any, any>, newScale: Scale<any, any>) {
       if (oldScale !== newScale) {
         if (oldScale != null) {
           oldScale.offUpdate(this._renderCallback);
@@ -589,6 +589,13 @@ module Plottable {
       var attrToProjector: AttributeToProjector = {};
       this._propertyBindings.forEach((key, binding) => attrToProjector[key] = Plot._scaledAccessor(binding));
       return attrToProjector;
+    }
+
+    protected _setupProperty(property: string, value: any, scale: Scale<any, any>) {
+      var oldScale = this._propertyBindings.get(property).scale;
+      this._replaceScale(oldScale, scale);
+      this._propertyBindings.set(property, { accessor: d3.functor(value), scale: scale });
+      this._updateExtentsForKey(property, false);
     }
   }
 }

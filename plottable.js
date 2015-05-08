@@ -6785,6 +6785,12 @@ var Plottable;
             this._propertyBindings.forEach(function (key, binding) { return attrToProjector[key] = Plot._scaledAccessor(binding); });
             return attrToProjector;
         };
+        Plot.prototype._setupProperty = function (property, value, scale) {
+            var oldScale = this._propertyBindings.get(property).scale;
+            this._replaceScale(oldScale, scale);
+            this._propertyBindings.set(property, { accessor: d3.functor(value), scale: scale });
+            this._updateExtentsForKey(property, false);
+        };
         return Plot;
     })(Plottable.Component);
     Plottable.Plot = Plot;
@@ -6865,9 +6871,7 @@ var Plottable;
                 if (sectorValue == null) {
                     return this._propertyBindings.get(Pie._SECTOR_VALUE_KEY);
                 }
-                this._replaceScale(this.sectorValue().scale, sectorValueScale);
-                this._propertyBindings.set(Pie._SECTOR_VALUE_KEY, { accessor: d3.functor(sectorValue), scale: sectorValueScale });
-                this._updateExtentsForKey(Pie._SECTOR_VALUE_KEY, false);
+                this._setupProperty(Pie._SECTOR_VALUE_KEY, sectorValue, sectorValueScale);
                 this._render();
                 return this;
             };
@@ -6875,9 +6879,7 @@ var Plottable;
                 if (innerRadius == null) {
                     return this._propertyBindings.get(Pie._INNER_RADIUS_KEY);
                 }
-                this._replaceScale(this.innerRadius().scale, innerRadiusScale);
-                this._propertyBindings.set(Pie._INNER_RADIUS_KEY, { accessor: d3.functor(innerRadius), scale: innerRadiusScale });
-                this._updateExtentsForKey(Pie._INNER_RADIUS_KEY, false);
+                this._setupProperty(Pie._INNER_RADIUS_KEY, innerRadius, innerRadiusScale);
                 this._render();
                 return this;
             };
@@ -6885,9 +6887,7 @@ var Plottable;
                 if (outerRadius == null) {
                     return this._propertyBindings.get(Pie._OUTER_RADIUS_KEY);
                 }
-                this._replaceScale(this.outerRadius().scale, outerRadiusScale);
-                this._propertyBindings.set(Pie._OUTER_RADIUS_KEY, { accessor: d3.functor(outerRadius), scale: outerRadiusScale });
-                this._updateExtentsForKey(Pie._OUTER_RADIUS_KEY, false);
+                this._setupProperty(Pie._OUTER_RADIUS_KEY, outerRadius, outerRadiusScale);
                 this._render();
                 return this;
             };
