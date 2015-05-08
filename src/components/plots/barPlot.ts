@@ -330,7 +330,7 @@ export module Plots {
       this._datasetKeysInOrder.forEach((k, i) =>
         drawers[i].drawText(dataToDraw.get(k),
                             attrToProjector,
-                            this._key2PlotDatasetKey.get(k).dataset.metadata(),
+                            this._key2PlotDatasetKey.get(k).dataset,
                             this._key2PlotDatasetKey.get(k).plotMetadata));
       if (this._hideBarsIfAnyAreTooWide && drawers.some((d: Drawers.Rect) => d._getIfLabelsTooWide())) {
         drawers.forEach((d: Drawers.Rect) => d.removeLabels());
@@ -367,36 +367,36 @@ export module Plots {
       var widthF = attrToProjector["width"];
       if (widthF == null) { widthF = () => this._getBarPixelWidth(); }
       var originalPositionFn = attrToProjector[primaryAttr];
-      var heightF = (d: any, i: number, u: any, m: PlotMetadata) => {
-        return Math.abs(scaledBaseline - originalPositionFn(d, i, u, m));
+      var heightF = (d: any, i: number, dataset: Dataset, m: PlotMetadata) => {
+        return Math.abs(scaledBaseline - originalPositionFn(d, i, dataset, m));
       };
 
       attrToProjector["width"] = this._isVertical ? widthF : heightF;
       attrToProjector["height"] = this._isVertical ? heightF : widthF;
 
       if (secondaryScale instanceof Plottable.Scales.Category) {
-        attrToProjector[secondaryAttr] = (d: any, i: number, u: any, m: PlotMetadata) =>
-          positionF(d, i, u, m) - widthF(d, i, u, m) / 2;
+        attrToProjector[secondaryAttr] = (d: any, i: number, dataset: Dataset, m: PlotMetadata) =>
+          positionF(d, i, dataset, m) - widthF(d, i, dataset, m) / 2;
       } else {
-        attrToProjector[secondaryAttr] = (d: any, i: number, u: any, m: PlotMetadata) =>
-          positionF(d, i, u, m) - widthF(d, i, u, m) * this._barAlignmentFactor;
+        attrToProjector[secondaryAttr] = (d: any, i: number, dataset: Dataset, m: PlotMetadata) =>
+          positionF(d, i, dataset, m) - widthF(d, i, dataset, m) * this._barAlignmentFactor;
       }
 
-      attrToProjector[primaryAttr] = (d: any, i: number, u: any, m: PlotMetadata) => {
-        var originalPos = originalPositionFn(d, i, u, m);
+      attrToProjector[primaryAttr] = (d: any, i: number, dataset: Dataset, m: PlotMetadata) => {
+        var originalPos = originalPositionFn(d, i, dataset, m);
         // If it is past the baseline, it should start at the baselin then width/height
         // carries it over. If it's not past the baseline, leave it at original position and
         // then width/height carries it to baseline
         return (originalPos > scaledBaseline) ? scaledBaseline : originalPos;
       };
 
-      var primaryAccessor = this._projections[primaryAttr].accessor;
+      var primaryAccessor = this._attrBindings.get(primaryAttr).accessor;
       if (this._labelsEnabled && this._labelFormatter) {
-        attrToProjector["label"] = (d: any, i: number, u: any, m: PlotMetadata) => {
-          return this._labelFormatter(primaryAccessor(d, i, u, m));
+        attrToProjector["label"] = (d: any, i: number, dataset: Dataset, m: PlotMetadata) => {
+          return this._labelFormatter(primaryAccessor(d, i, dataset, m));
         };
-        attrToProjector["positive"] = (d: any, i: number, u: any, m: PlotMetadata) =>
-          originalPositionFn(d, i, u, m) <= scaledBaseline;
+        attrToProjector["positive"] = (d: any, i: number, dataset: Dataset, m: PlotMetadata) =>
+          originalPositionFn(d, i, dataset, m) <= scaledBaseline;
       }
 
       attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this._defaultFillColor);
@@ -418,12 +418,12 @@ export module Plots {
       if (barScale instanceof Plottable.Scales.Category) {
         barPixelWidth = (<Plottable.Scales.Category> barScale).rangeBand();
       } else {
-        var barAccessor = this._isVertical ? this._projections["x"].accessor : this._projections["y"].accessor;
+        var barAccessor = this._isVertical ? this._attrBindings.get("x").accessor : this._attrBindings.get("y").accessor;
 
         var numberBarAccessorData = d3.set(Utils.Methods.flatten(this._datasetKeysInOrder.map((k) => {
           var dataset = this._key2PlotDatasetKey.get(k).dataset;
           var plotMetadata = this._key2PlotDatasetKey.get(k).plotMetadata;
-          return dataset.data().map((d, i) => barAccessor(d, i, dataset.metadata(), plotMetadata).valueOf());
+          return dataset.data().map((d, i) => barAccessor(d, i, dataset, plotMetadata).valueOf());
         }))).values().map((value) => +value);
 
         numberBarAccessorData.sort((a, b) => a - b);

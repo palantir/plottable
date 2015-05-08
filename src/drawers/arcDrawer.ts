@@ -36,9 +36,9 @@ export module Drawers {
       return super._drawStep({attrToProjector: attrToProjector, animator: step.animator});
     }
 
-    public draw(data: any[], drawSteps: DrawStep[], userMetadata: any, plotMetadata: Plots.PlotMetadata) {
+    public draw(data: any[], drawSteps: DrawStep[], dataset: Dataset, plotMetadata: Plots.PlotMetadata) {
       // HACKHACK Applying metadata should be done in base class
-      var valueAccessor = (d: any, i: number) => Arc._scaledAccessor(this._piePlot.sectorValue())(d, i, userMetadata, plotMetadata);
+      var valueAccessor = (d: any, i: number) => Arc._scaledAccessor(this._piePlot.sectorValue())(d, i, dataset, plotMetadata);
 
       data = data.filter(e => Plottable.Utils.Methods.isValidNumber(+valueAccessor(e, null)));
 
@@ -51,7 +51,7 @@ export module Drawers {
           Utils.Methods.warn("Negative values will not render correctly in a pie chart.");
         }
       });
-      return super.draw(pie, drawSteps, userMetadata, plotMetadata);
+      return super.draw(pie, drawSteps, dataset, plotMetadata);
     }
 
     public _getPixelPoint(datum: any, index: number): Point {
@@ -69,7 +69,8 @@ export module Drawers {
     private static _scaledAccessor<SD, SR>(accScaleBinding: Plots.AccessorScaleBinding<SD, SR>): _Accessor {
       return accScaleBinding.scale == null ?
                accScaleBinding.accessor :
-               (d: any, i: number, u: any, m: Plots.PlotMetadata) => accScaleBinding.scale.scale(accScaleBinding.accessor(d, i, u, m));
+               (d: any, i: number, dataset: Dataset, m: Plots.PlotMetadata) =>
+                 accScaleBinding.scale.scale(accScaleBinding.accessor(d, i, dataset, m));
     }
   }
 }

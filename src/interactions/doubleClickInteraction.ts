@@ -72,6 +72,7 @@ export module Interactions {
      */
     public onDoubleClick(callback: ClickCallback) {
       this._onDoubleClickCallbacks.add(callback);
+      return this;
     }
 
     /**
@@ -82,6 +83,7 @@ export module Interactions {
      */
     public offDoubleClick(callback: ClickCallback) {
       this._onDoubleClickCallbacks.delete(callback);
+      return this;
     }
   }
 }

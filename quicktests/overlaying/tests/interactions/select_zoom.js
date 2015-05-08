@@ -26,13 +26,13 @@ function run(svg, data, Plottable) {
     renderers.push(renderer);
   }
 
-        var cg = new Plottable.Components.Group();
-        renderers.forEach(function(renderer, i) {
-            renderer
-            .attr("fill", function() { return colors[i]; })
-            .attr("r", function(){ return 6;});
-            cg.below(renderer);
-        });
+  var cg = new Plottable.Components.Group();
+  renderers.forEach(function(renderer, i) {
+      renderer
+      .attr("fill", function() { return colors[i]; })
+      .attr("r", function(){ return 6; });
+      cg.below(renderer);
+  });
 
   var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
   var yAxis = new Plottable.Axes.Numeric(yScale, "left");

@@ -2490,8 +2490,8 @@ describe("Plots", function () {
         var simpleDataset;
         var plot;
         before(function () {
-            xAccessor = function (d, i, u) { return d.a + u.foo; };
-            yAccessor = function (d, i, u) { return d.b + u.foo; };
+            xAccessor = function (d, i, dataset) { return d.a + dataset.metadata().foo; };
+            yAccessor = function (d, i, dataset) { return d.b + dataset.metadata().foo; };
         });
         beforeEach(function () {
             svg = TestMethods.generateSVG(500, 500);
@@ -3856,8 +3856,8 @@ describe("Plots", function () {
         });
         it("plot auto domain scale to visible points on Category scale", function () {
             var svg = TestMethods.generateSVG(500, 500);
-            var xAccessor = function (d, i, u) { return d.a; };
-            var yAccessor = function (d, i, u) { return d.b + u.foo; };
+            var xAccessor = function (d, i, dataset) { return d.a; };
+            var yAccessor = function (d, i, dataset) { return d.b + dataset.metadata().foo; };
             var simpleDataset = new Plottable.Dataset([{ a: "a", b: 6 }, { a: "b", b: 2 }, { a: "c", b: -2 }, { a: "d", b: -6 }], { foo: 0 });
             var xScale = new Plottable.Scales.Category();
             var yScale = new Plottable.Scales.Linear();
@@ -4121,7 +4121,7 @@ describe("Plots", function () {
             assert.strictEqual(plot.height(), 400, "was allocated height");
             svg.remove();
         });
-        it("the accessors properly access data, index, and metadata", function () {
+        it("the accessors properly access data, index and Dataset", function () {
             var svg = TestMethods.generateSVG(400, 400);
             var xScale = new Plottable.Scales.Linear();
             var yScale = new Plottable.Scales.Linear();
@@ -4129,8 +4129,8 @@ describe("Plots", function () {
             yScale.domain([400, 0]);
             var data = [{ x: 0, y: 0 }, { x: 1, y: 1 }];
             var metadata = { foo: 10, bar: 20 };
-            var xAccessor = function (d, i, m) { return d.x + i * m.foo; };
-            var yAccessor = function (d, i, m) { return m.bar; };
+            var xAccessor = function (d, i, dataset) { return d.x + i * dataset.metadata().foo; };
+            var yAccessor = function (d, i, dataset) { return dataset.metadata().bar; };
             var dataset = new Plottable.Dataset(data, metadata);
             var plot = new Plottable.Plots.Scatter(xScale, yScale).project("x", xAccessor).project("y", yAccessor);
             plot.addDataset(dataset);
@@ -5641,11 +5641,11 @@ describe("Metadata", function () {
             assert.propertyVal(plotMetadata, "datasetKey", key, "metadata has correct dataset key");
         });
     });
-    it("user metadata is applied", function () {
+    it("Dataset is passed in", function () {
         var svg = TestMethods.generateSVG(400, 400);
         var metadata = { foo: 10, bar: 20 };
-        var xAccessor = function (d, i, u) { return d.x + i * u.foo; };
-        var yAccessor = function (d, i, u) { return u.bar; };
+        var xAccessor = function (d, i, dataset) { return d.x + i * dataset.metadata().foo; };
+        var yAccessor = function (d, i, dataset) { return dataset.metadata().bar; };
         var dataset = new Plottable.Dataset(data1, metadata);
         var plot = new Plottable.Plots.Scatter(xScale, yScale).project("x", xAccessor).project("y", yAccessor);
         plot.addDataset(dataset);
@@ -5673,7 +5673,7 @@ describe("Metadata", function () {
         var svg = TestMethods.generateSVG(400, 400);
         var metadata1 = { foo: 10 };
         var metadata2 = { foo: 30 };
-        var xAccessor = function (d, i, u) { return d.x + (i + 1) * u.foo; };
+        var xAccessor = function (d, i, dataset) { return d.x + (i + 1) * dataset.metadata().foo; };
         var yAccessor = function () { return 0; };
         var dataset1 = new Plottable.Dataset(data1, metadata1);
         var dataset2 = new Plottable.Dataset(data2, metadata2);
@@ -5698,7 +5698,7 @@ describe("Metadata", function () {
     });
     it("plot metadata is applied", function () {
         var svg = TestMethods.generateSVG(400, 400);
-        var xAccessor = function (d, i, u, m) { return d.x + (i + 1) * m.foo; };
+        var xAccessor = function (d, i, dataset, m) { return d.x + (i + 1) * m.foo; };
         var yAccessor = function () { return 0; };
         var plot = new Plottable.Plots.Scatter(xScale, yScale).project("x", xAccessor).project("y", yAccessor);
         plot._getPlotMetadataForDataset = function (key) {
@@ -5727,7 +5727,7 @@ describe("Metadata", function () {
     });
     it("plot metadata is per plot", function () {
         var svg = TestMethods.generateSVG(400, 400);
-        var xAccessor = function (d, i, u, m) { return d.x + (i + 1) * m.foo; };
+        var xAccessor = function (d, i, dataset, m) { return d.x + (i + 1) * m.foo; };
         var yAccessor = function () { return 0; };
         var plot1 = new Plottable.Plots.Scatter(xScale, yScale).project("x", xAccessor).project("y", yAccessor);
         plot1._getPlotMetadataForDataset = function (key) {
@@ -5785,7 +5785,13 @@ describe("Metadata", function () {
         var dataset1 = new Plottable.Dataset(data1, metadata);
         var dataset2 = new Plottable.Dataset(data2, metadata);
         var checkPlot = function (plot) {
-            plot.addDataset(dataset1).addDataset(dataset2).project("x", function (d, i, u, m) { return d.x + u.foo + m.datasetKey.length; }).project("y", function (d, i, u, m) { return d.y + u.foo - m.datasetKey.length; });
+            var xAccessor = function (d, i, dataset, m) {
+                return d.x + dataset.metadata().foo + m.datasetKey.length;
+            };
+            var yAccessor = function (d, i, dataset, m) {
+                return d.y + dataset.metadata().foo - m.datasetKey.length;
+            };
+            plot.addDataset(dataset1).addDataset(dataset2).project("x", xAccessor).project("y", yAccessor);
             // This should not crash. If some metadata is not passed, undefined property error will be raised during accessor call.
             plot.renderTo(svg);
             plot.destroy();
@@ -6283,27 +6289,19 @@ describe("Component behavior", function () {
     it("clipPath works as expected", function () {
         assert.isFalse(c.clipPathEnabled, "clipPathEnabled defaults to false");
         c.clipPathEnabled = true;
-        var expectedClipPathID = c.getID();
         c.anchor(svg);
         c.computeLayout({ x: 0, y: 0 }, 100, 100);
         c.render();
+        var clipPathId = c._boxContainer[0][0].firstChild.id;
         var expectedPrefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
         expectedPrefix = expectedPrefix.replace(/#.*/g, "");
-        var expectedClipPathURL = "url(" + expectedPrefix + "#clipPath" + expectedClipPathID + ")";
+        var expectedClipPathURL = "url(" + expectedPrefix + "#" + clipPathId + ")";
         // IE 9 has clipPath like 'url("#clipPath")', must accomodate
         var normalizeClipPath = function (s) { return s.replace(/"/g, ""); };
         assert.isTrue(normalizeClipPath(c._element.attr("clip-path")) === expectedClipPathURL, "the element has clip-path url attached");
         var clipRect = c._boxContainer.select(".clip-rect");
         assert.strictEqual(clipRect.attr("width"), "100", "the clipRect has an appropriate width");
         assert.strictEqual(clipRect.attr("height"), "100", "the clipRect has an appropriate height");
-        svg.remove();
-    });
-    it("componentID works as expected", function () {
-        var expectedID = Plottable.Core.PlottableObject._nextID;
-        var c1 = new Plottable.Component();
-        assert.strictEqual(c1.getID(), expectedID, "component id on next component was as expected");
-        var c2 = new Plottable.Component();
-        assert.strictEqual(c2.getID(), expectedID + 1, "future components increment appropriately");
         svg.remove();
     });
     it("boxes work as expected", function () {
@@ -7728,6 +7726,20 @@ describe("Utils.DOM", function () {
             parent.style("width", "auto");
             parent.style("height", "auto");
             child.remove();
+        });
+        it("getUniqueClipPathId works as expected", function () {
+            var firstClipPathId = Plottable.Utils.DOM.getUniqueClipPathId();
+            var secondClipPathId = Plottable.Utils.DOM.getUniqueClipPathId();
+            var firstClipPathIDPrefix = firstClipPathId.split(/\d/)[0];
+            var secondClipPathIDPrefix = secondClipPathId.split(/\d/)[0];
+            assert.strictEqual(firstClipPathIDPrefix, secondClipPathIDPrefix, "clip path ids should have the same prefix");
+            var prefix = firstClipPathIDPrefix;
+            assert.isTrue(/plottable/.test(prefix), "the prefix should contain the word plottable to avoid collisions");
+            var firstClipPathIdNumber = +firstClipPathId.replace(prefix, "");
+            var secondClipPathIdNumber = +secondClipPathId.replace(prefix, "");
+            assert.isFalse(Plottable.Utils.Methods.isNaN(firstClipPathIdNumber), "first clip path id should only have a number after the prefix");
+            assert.isFalse(Plottable.Utils.Methods.isNaN(secondClipPathIdNumber), "second clip path id should only have a number after the prefix");
+            assert.strictEqual(firstClipPathIdNumber + 1, secondClipPathIdNumber, "Consecutive calls to getUniqueClipPathId should give consecutive numbers after the prefix");
         });
     });
 });

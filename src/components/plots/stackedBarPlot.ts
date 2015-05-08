@@ -37,20 +37,22 @@ export module Plots {
       var valueAttr = this._isVertical ? "y" : "x";
       var keyAttr = this._isVertical ? "x" : "y";
       var primaryScale: Scale<any, number> = this._isVertical ? this._yScale : this._xScale;
-      var primaryAccessor = this._projections[valueAttr].accessor;
-      var keyAccessor = this._projections[keyAttr].accessor;
-      var getStart = (d: any, i: number, u: any, m: StackedPlotMetadata) =>
-        primaryScale.scale(m.offsets.get(keyAccessor(d, i, u, m)));
-      var getEnd = (d: any, i: number, u: any, m: StackedPlotMetadata) =>
-        primaryScale.scale(+primaryAccessor(d, i, u, m) + m.offsets.get(keyAccessor(d, i, u, m)));
+      var primaryAccessor = this._attrBindings.get(valueAttr).accessor;
+      var keyAccessor = this._attrBindings.get(keyAttr).accessor;
+      var getStart = (d: any, i: number, dataset: Dataset, m: StackedPlotMetadata) =>
+        primaryScale.scale(m.offsets.get(keyAccessor(d, i, dataset, m)));
+      var getEnd = (d: any, i: number, dataset: Dataset, m: StackedPlotMetadata) =>
+        primaryScale.scale(+primaryAccessor(d, i, dataset, m) + m.offsets.get(keyAccessor(d, i, dataset, m)));
 
-      var heightF = (d: any, i: number, u: any, m: StackedPlotMetadata) => Math.abs(getEnd(d, i, u, m) - getStart(d, i, u, m));
+      var heightF = (d: any, i: number, dataset: Dataset, m: StackedPlotMetadata) => {
+        return Math.abs(getEnd(d, i, dataset, m) - getStart(d, i, dataset, m));
+      };
 
-      var attrFunction = (d: any, i: number, u: any, m: StackedPlotMetadata) =>
+      var attrFunction = (d: any, i: number, dataset: Dataset, m: StackedPlotMetadata) =>
 
-        +primaryAccessor(d, i, u, m) < 0 ? getStart(d, i, u, m) : getEnd(d, i, u, m);
-      attrToProjector[valueAttr] = (d: any, i: number, u: any, m: StackedPlotMetadata) =>
-        this._isVertical ? attrFunction(d, i, u, m) : attrFunction(d, i, u, m) - heightF(d, i, u, m);
+        +primaryAccessor(d, i, dataset, m) < 0 ? getStart(d, i, dataset, m) : getEnd(d, i, dataset, m);
+      attrToProjector[valueAttr] = (d: any, i: number, dataset: Dataset, m: StackedPlotMetadata) =>
+        this._isVertical ? attrFunction(d, i, dataset, m) : attrFunction(d, i, dataset, m) - heightF(d, i, dataset, m);
 
       return attrToProjector;
     }
