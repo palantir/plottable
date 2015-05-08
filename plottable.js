@@ -6816,10 +6816,12 @@ var Plottable;
             };
             Pie.prototype._generateAttrToProjector = function () {
                 var _this = this;
-                var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
+                var attrToProjector = {};
+                this._propertyBindings.forEach(function (key, binding) { return attrToProjector[key] = Pie._scaledAccessor(binding); });
+                var superAttrToProjector = _super.prototype._generateAttrToProjector.call(this);
+                Object.keys(superAttrToProjector).forEach(function (key) { return attrToProjector[key] = superAttrToProjector[key]; });
                 var defaultFillFunction = function (d, i) { return _this._colorScale.scale(String(i)); };
                 attrToProjector["fill"] = attrToProjector["fill"] || defaultFillFunction;
-                this._propertyBindings.forEach(function (key, binding) { return attrToProjector[key] = Pie._scaledAccessor(binding); });
                 return attrToProjector;
             };
             Pie.prototype._getDrawer = function (key) {
