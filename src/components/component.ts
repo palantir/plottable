@@ -1,6 +1,9 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
+
+  export type AnchorCallback = (component: Component) => any;
+
   export module Components {
     export class Alignment {
       static TOP = "top";
@@ -37,7 +40,6 @@ module Plottable {
     protected _isSetup = false;
     protected _isAnchored = false;
 
-    private _interactionsToRegister: Interaction[] = [];
     private _boxes: D3.Selection[] = [];
     private _boxContainer: D3.Selection;
     private _rootSVG: D3.Selection;
@@ -46,6 +48,7 @@ module Plottable {
     private _height: number;
     private _cssClasses: string[] = ["component"];
     private _destroyed = false;
+    private _onAnchorCallbacks = new Utils.CallbackSet<AnchorCallback>();
 
     /**
      * Attaches the Component as a child of a given D3 Selection.
@@ -75,6 +78,36 @@ module Plottable {
         this._setup();
       }
       this._isAnchored = true;
+      this._onAnchorCallbacks.callCallbacks(this);
+      return this;
+    }
+
+    /**
+     * Adds a callback to be called on anchoring the Component to the DOM.
+     * If the component is already anchored, the callback is called immediately.
+     *
+     * @param {AnchorCallback} callback The callback to be added.
+     *
+     * @return {Component}
+     */
+    public onAnchor(callback: AnchorCallback) {
+      if (this._isAnchored) {
+        callback(this);
+      }
+      this._onAnchorCallbacks.add(callback);
+      return this;
+    }
+
+    /**
+     * Removes a callback to be called on anchoring the Component to the DOM.
+     * The callback is identified by reference equality.
+     *
+     * @param {AnchorCallback} callback The callback to be removed.
+     *
+     * @return {Component}
+     */
+    public offAnchor(callback: AnchorCallback) {
+      this._onAnchorCallbacks.delete(callback);
       return this;
     }
 
@@ -104,8 +137,6 @@ module Plottable {
 
       this._boundingBox = this._addBox("bounding-box");
 
-      this._interactionsToRegister.forEach((r) => this.registerInteraction(r));
-      this._interactionsToRegister = null;
       this._isSetup = true;
     }
 
@@ -328,24 +359,6 @@ module Plottable {
       var clipPathParent = this._boxContainer.append("clipPath")
                                              .attr("id", clipPathId);
       this._addBox("clip-rect", clipPathParent);
-    }
-
-    /**
-     * Attaches an Interaction to the Component, so that the Interaction will listen for events on the Component.
-     *
-     * @param {Interaction} interaction The Interaction to attach to the Component.
-     * @returns {Component} The calling Component.
-     */
-    public registerInteraction(interaction: Interaction) {
-      // Interactions can be registered before or after anchoring. If registered before, they are
-      // pushed to this._interactionsToRegister and registered during anchoring. If after, they are
-      // registered immediately
-      if (this._element) {
-        interaction._anchor(this);
-      } else {
-        this._interactionsToRegister.push(interaction);
-      }
-      return this;
     }
 
     /**

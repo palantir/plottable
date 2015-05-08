@@ -1437,6 +1437,7 @@ declare module Plottable {
 
 
 declare module Plottable {
+    type AnchorCallback = (component: Component) => any;
     module Components {
         class Alignment {
             static TOP: string;
@@ -1462,6 +1463,24 @@ declare module Plottable {
          * @returns {Component} The calling Component.
          */
         anchor(selection: D3.Selection): Component;
+        /**
+         * Adds a callback to be called on anchoring the Component to the DOM.
+         * If the component is already anchored, the callback is called immediately.
+         *
+         * @param {AnchorCallback} callback The callback to be added.
+         *
+         * @return {Component}
+         */
+        onAnchor(callback: AnchorCallback): Component;
+        /**
+         * Removes a callback to be called on anchoring the Component to the DOM.
+         * The callback is identified by reference equality.
+         *
+         * @param {AnchorCallback} callback The callback to be removed.
+         *
+         * @return {Component}
+         */
+        offAnchor(callback: AnchorCallback): Component;
         /**
          * Creates additional elements as necessary for the Component to function.
          * Called during _anchor() if the Component's element has not been created yet.
@@ -1534,13 +1553,6 @@ declare module Plottable {
          * @returns {Component} The calling Component.
          */
         yAlign(alignment: string): Component;
-        /**
-         * Attaches an Interaction to the Component, so that the Interaction will listen for events on the Component.
-         *
-         * @param {Interaction} interaction The Interaction to attach to the Component.
-         * @returns {Component} The calling Component.
-         */
-        registerInteraction(interaction: Interaction): Component;
         /**
          * Checks if the Component has a given CSS class.
          *
@@ -3609,15 +3621,27 @@ declare module Plottable {
 
 declare module Plottable {
     class Interaction {
+        protected _componentAttachedTo: Component;
+        protected _anchor(component: Component): void;
+        protected _unanchor(): void;
         /**
-         * It maintains a 'hitBox' which is where all event listeners are
-         * attached. Due to cross- browser weirdness, the hitbox needs to be an
-         * opaque but invisible rectangle.  TODO: We should give the interaction
-         * "foreground" and "background" elements where it can draw things,
-         * e.g. crosshairs.
+         * Attaches this interaction to a Component.
+         * If the interaction was already attached to a Component, it first detaches itself from the old Component.
+         *
+         * @param {Component} component The component to which to attach the interaction.
+         *
+         * @return {Interaction}
          */
-        protected _componentToListenTo: Component;
-        _anchor(component: Component): void;
+        attachTo(component: Component): Interaction;
+        /**
+         * Detaches this interaction from the Component.
+         * This interaction can be reused.
+         *
+         * @param {Component} component The component from which to detach the interaction.
+         *
+         * @return {Interaction}
+         */
+        detachFrom(component: Component): Interaction;
         /**
          * Translates an <svg>-coordinate-space point to Component-space coordinates.
          *
@@ -3642,7 +3666,8 @@ declare module Plottable {
     type ClickCallback = (point: Point) => any;
     module Interactions {
         class Click extends Interaction {
-            _anchor(component: Component): void;
+            protected _anchor(component: Component): void;
+            protected _unanchor(): void;
             /**
              * Sets the callback called when the Component is clicked.
              *
@@ -3665,7 +3690,8 @@ declare module Plottable {
 declare module Plottable {
     module Interactions {
         class DoubleClick extends Interaction {
-            _anchor(component: Component): void;
+            protected _anchor(component: Component): void;
+            protected _unanchor(): void;
             /**
              * Sets the callback called when the Component is double-clicked.
              *
@@ -3689,7 +3715,8 @@ declare module Plottable {
     type KeyCallback = (keyCode: number) => void;
     module Interactions {
         class Key extends Interaction {
-            _anchor(component: Component): void;
+            protected _anchor(component: Component): void;
+            protected _unanchor(): void;
             /**
              * Sets a callback to be called when the key with the given keyCode is
              * pressed and the user is moused over the Component.
@@ -3717,7 +3744,8 @@ declare module Plottable {
     type PointerCallback = (point: Point) => any;
     module Interactions {
         class Pointer extends Interaction {
-            _anchor(component: Component): void;
+            protected _anchor(component: Component): void;
+            protected _unanchor(): void;
             /**
              * Sets the callback called when the pointer enters the Component.
              *
@@ -3783,7 +3811,8 @@ declare module Plottable {
              * @param {QuantitativeScaleScale} [yScale] The Y scale to update on panning/zooming.
              */
             constructor(xScale?: QuantitativeScale<any>, yScale?: QuantitativeScale<any>);
-            _anchor(component: Component): void;
+            protected _anchor(component: Component): void;
+            protected _unanchor(): void;
         }
     }
 }
@@ -3793,7 +3822,8 @@ declare module Plottable {
     type DragCallback = (start: Point, end: Point) => any;
     module Interactions {
         class Drag extends Interaction {
-            _anchor(component: Component): void;
+            protected _anchor(component: Component): void;
+            protected _unanchor(): void;
             /**
              * Returns whether or not this Interactions constrains Points passed to its
              * callbacks to lie inside its Component.

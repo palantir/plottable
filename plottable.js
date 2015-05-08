@@ -3077,11 +3077,11 @@ var Plottable;
             this._fixedWidthFlag = false;
             this._isSetup = false;
             this._isAnchored = false;
-            this._interactionsToRegister = [];
             this._boxes = [];
             this._isTopLevelComponent = false;
             this._cssClasses = ["component"];
             this._destroyed = false;
+            this._onAnchorCallbacks = new Plottable.Utils.CallbackSet();
         }
         /**
          * Attaches the Component as a child of a given D3 Selection.
@@ -3110,6 +3110,34 @@ var Plottable;
                 this._setup();
             }
             this._isAnchored = true;
+            this._onAnchorCallbacks.callCallbacks(this);
+            return this;
+        };
+        /**
+         * Adds a callback to be called on anchoring the Component to the DOM.
+         * If the component is already anchored, the callback is called immediately.
+         *
+         * @param {AnchorCallback} callback The callback to be added.
+         *
+         * @return {Component}
+         */
+        Component.prototype.onAnchor = function (callback) {
+            if (this._isAnchored) {
+                callback(this);
+            }
+            this._onAnchorCallbacks.add(callback);
+            return this;
+        };
+        /**
+         * Removes a callback to be called on anchoring the Component to the DOM.
+         * The callback is identified by reference equality.
+         *
+         * @param {AnchorCallback} callback The callback to be removed.
+         *
+         * @return {Component}
+         */
+        Component.prototype.offAnchor = function (callback) {
+            this._onAnchorCallbacks.delete(callback);
             return this;
         };
         /**
@@ -3136,8 +3164,6 @@ var Plottable;
             }
             ;
             this._boundingBox = this._addBox("bounding-box");
-            this._interactionsToRegister.forEach(function (r) { return _this.registerInteraction(r); });
-            this._interactionsToRegister = null;
             this._isSetup = true;
         };
         Component.prototype.requestedSpace = function (availableWidth, availableHeight) {
@@ -3325,24 +3351,6 @@ var Plottable;
             this._element.attr("clip-path", "url(\"" + prefix + "#" + clipPathId + "\")");
             var clipPathParent = this._boxContainer.append("clipPath").attr("id", clipPathId);
             this._addBox("clip-rect", clipPathParent);
-        };
-        /**
-         * Attaches an Interaction to the Component, so that the Interaction will listen for events on the Component.
-         *
-         * @param {Interaction} interaction The Interaction to attach to the Component.
-         * @returns {Component} The calling Component.
-         */
-        Component.prototype.registerInteraction = function (interaction) {
-            // Interactions can be registered before or after anchoring. If registered before, they are
-            // pushed to this._interactionsToRegister and registered during anchoring. If after, they are
-            // registered immediately
-            if (this._element) {
-                interaction._anchor(this);
-            }
-            else {
-                this._interactionsToRegister.push(interaction);
-            }
-            return this;
         };
         Component.prototype.classed = function (cssClass, addClass) {
             if (addClass == null) {
@@ -9063,9 +9071,44 @@ var Plottable;
 (function (Plottable) {
     var Interaction = (function () {
         function Interaction() {
+            var _this = this;
+            this._anchorCallback = function (component) { return _this._anchor(component); };
         }
         Interaction.prototype._anchor = function (component) {
-            this._componentToListenTo = component;
+            this._isAnchored = true;
+        };
+        Interaction.prototype._unanchor = function () {
+            this._isAnchored = false;
+        };
+        /**
+         * Attaches this interaction to a Component.
+         * If the interaction was already attached to a Component, it first detaches itself from the old Component.
+         *
+         * @param {Component} component The component to which to attach the interaction.
+         *
+         * @return {Interaction}
+         */
+        Interaction.prototype.attachTo = function (component) {
+            if (this._componentAttachedTo) {
+                this.detachFrom(this._componentAttachedTo);
+            }
+            this._componentAttachedTo = component;
+            component.onAnchor(this._anchorCallback);
+            return this;
+        };
+        /**
+         * Detaches this interaction from the Component.
+         * This interaction can be reused.
+         *
+         * @param {Component} component The component from which to detach the interaction.
+         *
+         * @return {Interaction}
+         */
+        Interaction.prototype.detachFrom = function (component) {
+            this._unanchor();
+            this._componentAttachedTo = null;
+            component.offAnchor(this._anchorCallback);
+            return this;
         };
         /**
          * Translates an <svg>-coordinate-space point to Component-space coordinates.
@@ -9075,7 +9118,7 @@ var Plottable;
          * @return {Point} The same location in Component-space coordinates.
          */
         Interaction.prototype._translateToComponentSpace = function (p) {
-            var origin = this._componentToListenTo.originToSVG();
+            var origin = this._componentAttachedTo.originToSVG();
             return {
                 x: p.x - origin.x,
                 y: p.y - origin.y
@@ -9089,7 +9132,7 @@ var Plottable;
          * @return {boolean} Whether or not the point is inside the Component.
          */
         Interaction.prototype._isInsideComponent = function (p) {
-            return 0 <= p.x && 0 <= p.y && p.x <= this._componentToListenTo.width() && p.y <= this._componentToListenTo.height();
+            return 0 <= p.x && 0 <= p.y && p.x <= this._componentAttachedTo.width() && p.y <= this._componentAttachedTo.height();
         };
         return Interaction;
     })();
@@ -9110,20 +9153,35 @@ var Plottable;
         var Click = (function (_super) {
             __extends(Click, _super);
             function Click() {
+                var _this = this;
                 _super.apply(this, arguments);
                 this._clickedDown = false;
                 this._onClickCallbacks = new Plottable.Utils.CallbackSet();
+                this._mouseDownCallback = function (p) { return _this._handleClickDown(p); };
+                this._mouseUpCallback = function (p) { return _this._handleClickUp(p); };
+                this._touchStartCallback = function (ids, idToPoint) { return _this._handleClickDown(idToPoint[ids[0]]); };
+                this._touchEndCallback = function (ids, idToPoint) { return _this._handleClickUp(idToPoint[ids[0]]); };
+                this._touchCancelCallback = function (ids, idToPoint) { return _this._clickedDown = false; };
             }
             Click.prototype._anchor = function (component) {
-                var _this = this;
                 _super.prototype._anchor.call(this, component);
                 this._mouseDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(component.content().node());
-                this._mouseDispatcher.onMouseDown(function (p) { return _this._handleClickDown(p); });
-                this._mouseDispatcher.onMouseUp(function (p) { return _this._handleClickUp(p); });
+                this._mouseDispatcher.onMouseDown(this._mouseDownCallback);
+                this._mouseDispatcher.onMouseUp(this._mouseUpCallback);
                 this._touchDispatcher = Plottable.Dispatchers.Touch.getDispatcher(component.content().node());
-                this._touchDispatcher.onTouchStart(function (ids, idToPoint) { return _this._handleClickDown(idToPoint[ids[0]]); });
-                this._touchDispatcher.onTouchEnd(function (ids, idToPoint) { return _this._handleClickUp(idToPoint[ids[0]]); });
-                this._touchDispatcher.onTouchCancel(function (ids, idToPoint) { return _this._clickedDown = false; });
+                this._touchDispatcher.onTouchStart(this._touchStartCallback);
+                this._touchDispatcher.onTouchEnd(this._touchEndCallback);
+                this._touchDispatcher.onTouchCancel(this._touchCancelCallback);
+            };
+            Click.prototype._unanchor = function () {
+                _super.prototype._unanchor.call(this);
+                this._mouseDispatcher.offMouseDown(this._mouseDownCallback);
+                this._mouseDispatcher.offMouseUp(this._mouseUpCallback);
+                this._mouseDispatcher = null;
+                this._touchDispatcher.offTouchStart(this._touchStartCallback);
+                this._touchDispatcher.offTouchEnd(this._touchEndCallback);
+                this._touchDispatcher.offTouchCancel(this._touchCancelCallback);
+                this._touchDispatcher = null;
             };
             Click.prototype._handleClickDown = function (p) {
                 var translatedPoint = this._translateToComponentSpace(p);
@@ -9185,22 +9243,39 @@ var Plottable;
         var DoubleClick = (function (_super) {
             __extends(DoubleClick, _super);
             function DoubleClick() {
+                var _this = this;
                 _super.apply(this, arguments);
                 this._clickState = 0 /* NotClicked */;
                 this._clickedDown = false;
                 this._onDoubleClickCallbacks = new Plottable.Utils.CallbackSet();
+                this._mouseDownCallback = function (p) { return _this._handleClickDown(p); };
+                this._mouseUpCallback = function (p) { return _this._handleClickUp(p); };
+                this._dblClickCallback = function (p) { return _this._handleDblClick(); };
+                this._touchStartCallback = function (ids, idToPoint) { return _this._handleClickDown(idToPoint[ids[0]]); };
+                this._touchEndCallback = function (ids, idToPoint) { return _this._handleClickUp(idToPoint[ids[0]]); };
+                this._touchCancelCallback = function (ids, idToPoint) { return _this._handleClickCancel(); };
             }
             DoubleClick.prototype._anchor = function (component) {
-                var _this = this;
                 _super.prototype._anchor.call(this, component);
                 this._mouseDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(component.content().node());
-                this._mouseDispatcher.onMouseDown(function (p) { return _this._handleClickDown(p); });
-                this._mouseDispatcher.onMouseUp(function (p) { return _this._handleClickUp(p); });
-                this._mouseDispatcher.onDblClick(function (p) { return _this._handleDblClick(); });
+                this._mouseDispatcher.onMouseDown(this._mouseDownCallback);
+                this._mouseDispatcher.onMouseUp(this._mouseUpCallback);
+                this._mouseDispatcher.onDblClick(this._dblClickCallback);
                 this._touchDispatcher = Plottable.Dispatchers.Touch.getDispatcher(component.content().node());
-                this._touchDispatcher.onTouchStart(function (ids, idToPoint) { return _this._handleClickDown(idToPoint[ids[0]]); });
-                this._touchDispatcher.onTouchEnd(function (ids, idToPoint) { return _this._handleClickUp(idToPoint[ids[0]]); });
-                this._touchDispatcher.onTouchCancel(function (ids, idToPoint) { return _this._handleClickCancel(); });
+                this._touchDispatcher.onTouchStart(this._touchStartCallback);
+                this._touchDispatcher.onTouchEnd(this._touchEndCallback);
+                this._touchDispatcher.onTouchCancel(this._touchCancelCallback);
+            };
+            DoubleClick.prototype._unanchor = function () {
+                _super.prototype._unanchor.call(this);
+                this._mouseDispatcher.offMouseDown(this._mouseDownCallback);
+                this._mouseDispatcher.offMouseUp(this._mouseUpCallback);
+                this._mouseDispatcher.offDblClick(this._dblClickCallback);
+                this._mouseDispatcher = null;
+                this._touchDispatcher.offTouchStart(this._touchStartCallback);
+                this._touchDispatcher.offTouchEnd(this._touchEndCallback);
+                this._touchDispatcher.offTouchCancel(this._touchCancelCallback);
+                this._touchDispatcher = null;
             };
             DoubleClick.prototype._handleClickDown = function (p) {
                 var translatedP = this._translateToComponentSpace(p);
@@ -9275,16 +9350,25 @@ var Plottable;
         var Key = (function (_super) {
             __extends(Key, _super);
             function Key() {
+                var _this = this;
                 _super.apply(this, arguments);
                 this._keyCodeCallbacks = {};
+                this._mouseMoveCallback = function (point) { return false; }; // HACKHACK: registering a listener
+                this._keyDownCallback = function (keyCode) { return _this._handleKeyEvent(keyCode); };
             }
             Key.prototype._anchor = function (component) {
-                var _this = this;
                 _super.prototype._anchor.call(this, component);
-                this._positionDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(this._componentToListenTo._element.node());
-                this._positionDispatcher.onMouseMove(function (p) { return null; }); // HACKHACK: registering a listener
+                this._positionDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(this._componentAttachedTo._element.node());
+                this._positionDispatcher.onMouseMove(this._mouseMoveCallback);
                 this._keyDispatcher = Plottable.Dispatchers.Key.getDispatcher();
-                this._keyDispatcher.onKeyDown(function (keyCode) { return _this._handleKeyEvent(keyCode); });
+                this._keyDispatcher.onKeyDown(this._keyDownCallback);
+            };
+            Key.prototype._unanchor = function () {
+                _super.prototype._unanchor.call(this);
+                this._positionDispatcher.offMouseMove(this._mouseMoveCallback);
+                this._positionDispatcher = null;
+                this._keyDispatcher.offKeyDown(this._keyDownCallback);
+                this._keyDispatcher = null;
             };
             Key.prototype._handleKeyEvent = function (keyCode) {
                 var p = this._translateToComponentSpace(this._positionDispatcher.getLastMousePosition());
@@ -9342,19 +9426,28 @@ var Plottable;
         var Pointer = (function (_super) {
             __extends(Pointer, _super);
             function Pointer() {
+                var _this = this;
                 _super.apply(this, arguments);
                 this._overComponent = false;
                 this._pointerEnterCallbacks = new Plottable.Utils.CallbackSet();
                 this._pointerMoveCallbacks = new Plottable.Utils.CallbackSet();
                 this._pointerExitCallbacks = new Plottable.Utils.CallbackSet();
+                this._mouseMoveCallback = function (p) { return _this._handlePointerEvent(p); };
+                this._touchStartCallback = function (ids, idToPoint) { return _this._handlePointerEvent(idToPoint[ids[0]]); };
             }
             Pointer.prototype._anchor = function (component) {
-                var _this = this;
                 _super.prototype._anchor.call(this, component);
-                this._mouseDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(this._componentToListenTo.content().node());
-                this._mouseDispatcher.onMouseMove(function (p) { return _this._handlePointerEvent(p); });
-                this._touchDispatcher = Plottable.Dispatchers.Touch.getDispatcher(this._componentToListenTo.content().node());
-                this._touchDispatcher.onTouchStart(function (ids, idToPoint) { return _this._handlePointerEvent(idToPoint[ids[0]]); });
+                this._mouseDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(this._componentAttachedTo.content().node());
+                this._mouseDispatcher.onMouseMove(this._mouseMoveCallback);
+                this._touchDispatcher = Plottable.Dispatchers.Touch.getDispatcher(this._componentAttachedTo.content().node());
+                this._touchDispatcher.onTouchStart(this._touchStartCallback);
+            };
+            Pointer.prototype._unanchor = function () {
+                _super.prototype._unanchor.call(this);
+                this._mouseDispatcher.offMouseMove(this._mouseMoveCallback);
+                this._mouseDispatcher = null;
+                this._touchDispatcher.offTouchStart(this._touchStartCallback);
+                this._touchDispatcher = null;
             };
             Pointer.prototype._handlePointerEvent = function (p) {
                 var translatedP = this._translateToComponentSpace(p);
@@ -9461,7 +9554,13 @@ var Plottable;
              * @param {QuantitativeScaleScale} [yScale] The Y scale to update on panning/zooming.
              */
             function PanZoom(xScale, yScale) {
+                var _this = this;
                 _super.call(this);
+                this._wheelCallback = function (p, e) { return _this._handleWheelEvent(p, e); };
+                this._touchStartCallback = function (ids, idToPoint, e) { return _this._handleTouchStart(ids, idToPoint, e); };
+                this._touchMoveCallback = function (ids, idToPoint, e) { return _this._handlePinch(ids, idToPoint, e); };
+                this._touchEndCallback = function (ids, idToPoint, e) { return _this._handleTouchEnd(ids, idToPoint, e); };
+                this._touchCancelCallback = function (ids, idToPoint, e) { return _this._handleTouchEnd(ids, idToPoint, e); };
                 this._xScale = xScale;
                 this._yScale = yScale;
                 this._dragInteraction = new Interactions.Drag();
@@ -9469,16 +9568,26 @@ var Plottable;
                 this._touchIds = d3.map();
             }
             PanZoom.prototype._anchor = function (component) {
-                var _this = this;
                 _super.prototype._anchor.call(this, component);
-                this._dragInteraction._anchor(component);
-                var mouseDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(this._componentToListenTo.content().node());
-                mouseDispatcher.onWheel(function (p, e) { return _this._handleWheelEvent(p, e); });
-                this._touchDispatcher = Plottable.Dispatchers.Touch.getDispatcher(this._componentToListenTo.content().node());
-                this._touchDispatcher.onTouchStart(function (ids, idToPoint, e) { return _this._handleTouchStart(ids, idToPoint, e); });
-                this._touchDispatcher.onTouchMove(function (ids, idToPoint, e) { return _this._handlePinch(ids, idToPoint, e); });
-                this._touchDispatcher.onTouchEnd(function (ids, idToPoint, e) { return _this._handleTouchEnd(ids, idToPoint, e); });
-                this._touchDispatcher.onTouchCancel(function (ids, idToPoint, e) { return _this._handleTouchEnd(ids, idToPoint, e); });
+                this._dragInteraction.attachTo(component);
+                this._mouseDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(this._componentAttachedTo.content().node());
+                this._mouseDispatcher.onWheel(this._wheelCallback);
+                this._touchDispatcher = Plottable.Dispatchers.Touch.getDispatcher(this._componentAttachedTo.content().node());
+                this._touchDispatcher.onTouchStart(this._touchStartCallback);
+                this._touchDispatcher.onTouchMove(this._touchMoveCallback);
+                this._touchDispatcher.onTouchEnd(this._touchEndCallback);
+                this._touchDispatcher.onTouchCancel(this._touchCancelCallback);
+            };
+            PanZoom.prototype._unanchor = function () {
+                _super.prototype._unanchor.call(this);
+                this._mouseDispatcher.offWheel(this._wheelCallback);
+                this._mouseDispatcher = null;
+                this._touchDispatcher.offTouchStart(this._touchStartCallback);
+                this._touchDispatcher.offTouchMove(this._touchMoveCallback);
+                this._touchDispatcher.offTouchEnd(this._touchEndCallback);
+                this._touchDispatcher.offTouchCancel(this._touchCancelCallback);
+                this._touchDispatcher = null;
+                this._dragInteraction.detachFrom(this._componentAttachedTo);
             };
             PanZoom.prototype._handleTouchStart = function (ids, idToPoint, e) {
                 for (var i = 0; i < ids.length && this._touchIds.size() < 2; i++) {
@@ -9601,24 +9710,41 @@ var Plottable;
         var Drag = (function (_super) {
             __extends(Drag, _super);
             function Drag() {
+                var _this = this;
                 _super.apply(this, arguments);
                 this._dragging = false;
                 this._constrain = true;
                 this._dragStartCallbacks = new Plottable.Utils.CallbackSet();
                 this._dragCallbacks = new Plottable.Utils.CallbackSet();
                 this._dragEndCallbacks = new Plottable.Utils.CallbackSet();
+                this._mouseDownCallback = function (p, e) { return _this._startDrag(p, e); };
+                this._mouseMoveCallback = function (p, e) { return _this._doDrag(p, e); };
+                this._mouseUpCallback = function (p, e) { return _this._endDrag(p, e); };
+                this._touchStartCallback = function (ids, idToPoint, e) { return _this._startDrag(idToPoint[ids[0]], e); };
+                this._touchMoveCallback = function (ids, idToPoint, e) { return _this._doDrag(idToPoint[ids[0]], e); };
+                this._touchEndCallback = function (ids, idToPoint, e) { return _this._endDrag(idToPoint[ids[0]], e); };
             }
             Drag.prototype._anchor = function (component) {
-                var _this = this;
                 _super.prototype._anchor.call(this, component);
-                this._mouseDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(this._componentToListenTo.content().node());
-                this._mouseDispatcher.onMouseDown(function (p, e) { return _this._startDrag(p, e); });
-                this._mouseDispatcher.onMouseMove(function (p, e) { return _this._doDrag(p, e); });
-                this._mouseDispatcher.onMouseUp(function (p, e) { return _this._endDrag(p, e); });
-                this._touchDispatcher = Plottable.Dispatchers.Touch.getDispatcher(this._componentToListenTo.content().node());
-                this._touchDispatcher.onTouchStart(function (ids, idToPoint, e) { return _this._startDrag(idToPoint[ids[0]], e); });
-                this._touchDispatcher.onTouchMove(function (ids, idToPoint, e) { return _this._doDrag(idToPoint[ids[0]], e); });
-                this._touchDispatcher.onTouchEnd(function (ids, idToPoint, e) { return _this._endDrag(idToPoint[ids[0]], e); });
+                this._mouseDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(this._componentAttachedTo.content().node());
+                this._mouseDispatcher.onMouseDown(this._mouseDownCallback);
+                this._mouseDispatcher.onMouseMove(this._mouseMoveCallback);
+                this._mouseDispatcher.onMouseUp(this._mouseUpCallback);
+                this._touchDispatcher = Plottable.Dispatchers.Touch.getDispatcher(this._componentAttachedTo.content().node());
+                this._touchDispatcher.onTouchStart(this._touchStartCallback);
+                this._touchDispatcher.onTouchMove(this._touchMoveCallback);
+                this._touchDispatcher.onTouchEnd(this._touchEndCallback);
+            };
+            Drag.prototype._unanchor = function () {
+                _super.prototype._unanchor.call(this);
+                this._mouseDispatcher.offMouseDown(this._mouseDownCallback);
+                this._mouseDispatcher.offMouseMove(this._mouseMoveCallback);
+                this._mouseDispatcher.offMouseUp(this._mouseUpCallback);
+                this._mouseDispatcher = null;
+                this._touchDispatcher.offTouchStart(this._touchStartCallback);
+                this._touchDispatcher.offTouchMove(this._touchMoveCallback);
+                this._touchDispatcher.offTouchEnd(this._touchEndCallback);
+                this._touchDispatcher = null;
             };
             Drag.prototype._translateAndConstrain = function (p) {
                 var translatedP = this._translateToComponentSpace(p);
@@ -9626,8 +9752,8 @@ var Plottable;
                     return translatedP;
                 }
                 return {
-                    x: Plottable.Utils.Methods.clamp(translatedP.x, 0, this._componentToListenTo.width()),
-                    y: Plottable.Utils.Methods.clamp(translatedP.y, 0, this._componentToListenTo.height())
+                    x: Plottable.Utils.Methods.clamp(translatedP.x, 0, this._componentAttachedTo.width()),
+                    y: Plottable.Utils.Methods.clamp(translatedP.y, 0, this._componentAttachedTo.height())
                 };
             };
             Drag.prototype._startDrag = function (point, event) {
@@ -9757,7 +9883,7 @@ var Plottable;
                 this.classed("drag-box-layer", true);
                 this._dragInteraction = new Plottable.Interactions.Drag();
                 this._setUpCallbacks();
-                this.registerInteraction(this._dragInteraction);
+                this._dragInteraction.attachTo(this);
                 this._dragStartCallbacks = new Plottable.Utils.CallbackSet();
                 this._dragCallbacks = new Plottable.Utils.CallbackSet();
                 this._dragEndCallbacks = new Plottable.Utils.CallbackSet();
