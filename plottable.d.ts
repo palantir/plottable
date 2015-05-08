@@ -2654,6 +2654,7 @@ declare module Plottable {
          * Updates the extents associated with each attribute, then autodomains all scales the Plot uses.
          */
         protected _updateExtents(): void;
+        protected _updateExtentsForKey(key: string, ifAttr: boolean): void;
         protected _computeExtent(dataset: Dataset, accessor: _Accessor, typeCoercer: (d: any) => any, plotMetadata: any): any[];
         /**
          * Override in subclass to add special extents, such as included values
@@ -2724,7 +2725,6 @@ declare module Plottable {
          */
         getClosestPlotData(queryPoint: Point): Plots.PlotData;
         protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean;
-        protected _updateExtentsForProperty(property: string): void;
         protected _replaceScale(oldScale: Scale<any, any>, newScale: Scale<any, any>): void;
     }
 }

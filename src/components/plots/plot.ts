@@ -178,7 +178,7 @@ module Plottable {
 
       accessor = Utils.Methods.accessorize(accessor);
       this._attrBindings.set(attrToSet, {accessor: accessor, scale: scale, attribute: attrToSet});
-      this._updateExtentsForAttr(attrToSet);
+      this._updateExtentsForKey(attrToSet, true);
 
       this._replaceScale(previousScale, scale);
       this.render(); // queue a re-render upon changing projector
@@ -276,23 +276,23 @@ module Plottable {
      * Updates the extents associated with each attribute, then autodomains all scales the Plot uses.
      */
     protected _updateExtents() {
-      this._attrBindings.forEach((attr) => this._updateExtentsForAttr(attr));
-      this._propertyExtents.forEach((property) => this._updateExtentsForProperty(property));
+      this._attrBindings.forEach((attr) => this._updateExtentsForKey(attr, true));
+      this._propertyExtents.forEach((property) => this._updateExtentsForKey(property, false));
       this._scales().forEach((scale) => scale._autoDomainIfAutomaticMode());
     }
 
-    private _updateExtentsForAttr(attr: string) {
-      var binding = this._attrBindings.get(attr);
-      var accessor = binding.accessor;
-      var scale = binding.scale;
-      var coercer = (scale != null) ? scale._typeCoercer : (d: any) => d;
-      var extents = this._datasetKeysInOrder.map((key) => {
+    protected _updateExtentsForKey(key: string, ifAttr: boolean) {
+      var bindingMap = ifAttr ? this._attrBindings : this._propertyBindings;
+      var accScaleBinding = bindingMap.get(key);
+      if (accScaleBinding.accessor == null) { return; }
+      var coercer = (accScaleBinding.scale != null) ? accScaleBinding.scale._typeCoercer : (d: any) => d;
+      var extentMap = ifAttr ? this._attrExtents : this._propertyExtents;
+      extentMap.set(key, this._datasetKeysInOrder.map((key) => {
         var plotDatasetKey = this._key2PlotDatasetKey.get(key);
         var dataset = plotDatasetKey.dataset;
         var plotMetadata = plotDatasetKey.plotMetadata;
-        return this._computeExtent(dataset, accessor, coercer, plotMetadata);
-      });
-      this._attrExtents.set(attr, extents);
+        return this._computeExtent(dataset, accScaleBinding.accessor, coercer, plotMetadata);
+      }));
     }
 
     protected _computeExtent(dataset: Dataset, accessor: _Accessor, typeCoercer: (d: any) => any, plotMetadata: any): any[] {
@@ -560,18 +560,6 @@ module Plottable {
     protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean {
       return !(pixelPoint.x < 0 || pixelPoint.y < 0 ||
         pixelPoint.x > this.width() || pixelPoint.y > this.height());
-    }
-
-    protected _updateExtentsForProperty(property: string) {
-      var accScaleBinding = this._propertyBindings.get(property);
-      if (accScaleBinding.accessor == null) { return; }
-      var coercer = (accScaleBinding.scale != null) ? accScaleBinding.scale._typeCoercer : (d: any) => d;
-      this._propertyExtents.set(property, this._datasetKeysInOrder.map((key) => {
-        var plotDatasetKey = this._key2PlotDatasetKey.get(key);
-        var dataset = plotDatasetKey.dataset;
-        var plotMetadata = plotDatasetKey.plotMetadata;
-        return this._computeExtent(dataset, accScaleBinding.accessor, coercer, plotMetadata);
-      }));
     }
 
     protected _replaceScale(oldScale: Scale<any, any>, newScale: Scale<any, any>) {
