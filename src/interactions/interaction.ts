@@ -13,10 +13,8 @@ module Plottable {
 
     private _anchorCallback = (component: Component) => this._anchor(component);
 
-    private _isAnchored: Boolean;
+    private _isAnchored: boolean;
 
-    /* tslint:disable: */
-    // tslint disable does not really work
     protected _anchor(component: Component) {
       this._isAnchored = true;
     }
@@ -24,7 +22,6 @@ module Plottable {
     protected _unanchor() {
       this._isAnchored = false;
     }
-    /* tslint:enable */
 
     /**
      * Attaches current interaction to a Component. If the interaction was already

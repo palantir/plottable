@@ -3148,8 +3148,9 @@ var Plottable;
             return this;
         };
         /**
-         * Adds a callback to be called on anchoring the current Component to the DOM.
+         * Adds a callback to be called on anchoring the Component to the DOM.
          * If the component is already anchored, the callback is called immediately.
+         * To later deregister, use offAnchor(callback).
          *
          * @param {AnchorCallback} callback The callback to be called on Anchor
          *
@@ -3165,6 +3166,7 @@ var Plottable;
         /**
          * Removes a callback to be called on anchoring the Component to the DOM.
          * The callback is identified by reference equality.
+         * To register, use onAnchor(callback).
          *
          * @param {AnchorCallback} callback The callback to be removed
          *
@@ -9175,15 +9177,12 @@ var Plottable;
             var _this = this;
             this._anchorCallback = function (component) { return _this._anchor(component); };
         }
-        /* tslint:disable: */
-        // tslint disable does not really work
         Interaction.prototype._anchor = function (component) {
             this._isAnchored = true;
         };
         Interaction.prototype._unanchor = function () {
             this._isAnchored = false;
         };
-        /* tslint:enable */
         /**
          * Attaches current interaction to a Component. If the interaction was already
          * attached to a Component, it first detaches itself from the old component.
