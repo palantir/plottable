@@ -27,6 +27,10 @@ module Plottable {
     /* tslint:enable */
 
     public attachTo(component: Component) {
+      if (this._componentToListenTo) {
+        this.detachFrom(this._componentToListenTo);
+      }
+
       this._componentToListenTo = component;
       component.onAnchor(this._anchorCallback);
     }

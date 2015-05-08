@@ -8309,7 +8309,6 @@ describe("Interactions", function () {
             TestMethods.triggerFakeMouseEvent("mouseup", component2.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
             assert.isTrue(callbackCalled, "Round 2 callback called for component 2");
             // no detach, as this shorthand should also work
-            clickInteraction.detachFrom(component2);
             clickInteraction.attachTo(component1);
             callbackCalled = false;
             TestMethods.triggerFakeMouseEvent("mousedown", component1.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
