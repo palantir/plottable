@@ -7,6 +7,23 @@ describe("Interactions", () => {
     var SVG_WIDTH = 400;
     var SVG_HEIGHT = 400;
 
+    it("can attach interaction to component works", () => {
+      var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      var component = new Plottable.Component();
+      var interaction = new Plottable.Interaction();
+      component.renderTo(svg);
+
+      interaction.attachTo(component);
+      assert.strictEqual((<any>interaction)._componentAttachedTo, component,
+        "the _componentAttachedTo field should contain the component the interaction is attached to");
+
+      interaction.detachFrom(component);
+      assert.isNull((<any>interaction)._componentAttachedTo,
+        "the _componentAttachedTo field should be blanked upon detaching");
+
+      svg.remove();
+    });
+
     it("can attach/detach interaction to/from component", () => {
       var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       var component = new Plottable.Component();
