@@ -12,15 +12,18 @@ export module Interactions {
     private _keyDispatcher: Plottable.Dispatchers.Key;
     private _keyCodeCallbacks: { [keyCode: string]: Utils.CallbackSet<KeyCallback> } = {};
 
+    private _mouseMoveCallback = (p: Point) => null; // HACKHACK: registering a listener
+    private _keyDownCallback = (keyCode: number) => this._handleKeyEvent(keyCode);
+
     protected _anchor(component: Component) {
       super._anchor(component);
       this._positionDispatcher = Dispatchers.Mouse.getDispatcher(
                                    <SVGElement> (<any> this._componentToListenTo)._element.node()
                                  );
-      this._positionDispatcher.onMouseMove((p: Point) => null); // HACKHACK: registering a listener
+      this._positionDispatcher.onMouseMove(this._mouseMoveCallback);
 
       this._keyDispatcher = Dispatchers.Key.getDispatcher();
-      this._keyDispatcher.onKeyDown((keyCode: number) => this._handleKeyEvent(keyCode));
+      this._keyDispatcher.onKeyDown(this._keyDownCallback);
     }
 
     private _handleKeyEvent(keyCode: number) {

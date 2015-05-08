@@ -15,7 +15,6 @@ export module Interactions {
     private _dragCallbacks = new Utils.CallbackSet<DragCallback>();
     private _dragEndCallbacks = new Utils.CallbackSet<DragCallback>();
 
-
     private mouseDownCallback = (p: Point, e: MouseEvent) => this._startDrag(p, e);
     private mouseMoveCallback = (p: Point, e: MouseEvent) => this._doDrag(p, e);
     private mouseUpCallback = (p: Point, e: MouseEvent) => this._endDrag(p, e);

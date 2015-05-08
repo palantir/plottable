@@ -9391,16 +9391,18 @@ var Plottable;
         var Key = (function (_super) {
             __extends(Key, _super);
             function Key() {
+                var _this = this;
                 _super.apply(this, arguments);
                 this._keyCodeCallbacks = {};
+                this._mouseMoveCallback = function (p) { return null; }; // HACKHACK: registering a listener
+                this._keyDownCallback = function (keyCode) { return _this._handleKeyEvent(keyCode); };
             }
             Key.prototype._anchor = function (component) {
-                var _this = this;
                 _super.prototype._anchor.call(this, component);
                 this._positionDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(this._componentToListenTo._element.node());
-                this._positionDispatcher.onMouseMove(function (p) { return null; }); // HACKHACK: registering a listener
+                this._positionDispatcher.onMouseMove(this._mouseMoveCallback);
                 this._keyDispatcher = Plottable.Dispatchers.Key.getDispatcher();
-                this._keyDispatcher.onKeyDown(function (keyCode) { return _this._handleKeyEvent(keyCode); });
+                this._keyDispatcher.onKeyDown(this._keyDownCallback);
             };
             Key.prototype._handleKeyEvent = function (keyCode) {
                 var p = this._translateToComponentSpace(this._positionDispatcher.getLastMousePosition());
