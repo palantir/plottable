@@ -12,13 +12,17 @@ export module Interactions {
     private _pointerMoveCallbacks = new Utils.CallbackSet<PointerCallback>();
     private _pointerExitCallbacks = new Utils.CallbackSet<PointerCallback>();
 
+    private _mouseMoveCallback = (p: Point) => this._handlePointerEvent(p);
+    private _touchStartCallback = (ids: any, idToPoint: any) => this._handlePointerEvent(idToPoint[ids[0]]);
+
+
     protected _anchor(component: Component) {
       super._anchor(component);
       this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(<SVGElement> this._componentToListenTo.content().node());
-      this._mouseDispatcher.onMouseMove((p: Point) => this._handlePointerEvent(p));
+      this._mouseDispatcher.onMouseMove(this._mouseMoveCallback);
 
       this._touchDispatcher = Dispatchers.Touch.getDispatcher(<SVGElement> this._componentToListenTo.content().node());
-      this._touchDispatcher.onTouchStart((ids, idToPoint) => this._handlePointerEvent(idToPoint[ids[0]]));
+      this._touchDispatcher.onTouchStart(this._touchStartCallback);
     }
 
     private _handlePointerEvent(p: Point) {

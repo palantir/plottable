@@ -12,7 +12,7 @@ export module Interactions {
     private _keyDispatcher: Plottable.Dispatchers.Key;
     private _keyCodeCallbacks: { [keyCode: string]: Utils.CallbackSet<KeyCallback> } = {};
 
-    private _mouseMoveCallback = (p: Point) => null; // HACKHACK: registering a listener
+    private _mouseMoveCallback = (point: Point) => false; // HACKHACK: registering a listener
     private _keyDownCallback = (keyCode: number) => this._handleKeyEvent(keyCode);
 
     protected _anchor(component: Component) {

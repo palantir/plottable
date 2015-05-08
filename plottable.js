@@ -9394,7 +9394,7 @@ var Plottable;
                 var _this = this;
                 _super.apply(this, arguments);
                 this._keyCodeCallbacks = {};
-                this._mouseMoveCallback = function (p) { return null; }; // HACKHACK: registering a listener
+                this._mouseMoveCallback = function (point) { return false; }; // HACKHACK: registering a listener
                 this._keyDownCallback = function (keyCode) { return _this._handleKeyEvent(keyCode); };
             }
             Key.prototype._anchor = function (component) {
@@ -9460,19 +9460,21 @@ var Plottable;
         var Pointer = (function (_super) {
             __extends(Pointer, _super);
             function Pointer() {
+                var _this = this;
                 _super.apply(this, arguments);
                 this._overComponent = false;
                 this._pointerEnterCallbacks = new Plottable.Utils.CallbackSet();
                 this._pointerMoveCallbacks = new Plottable.Utils.CallbackSet();
                 this._pointerExitCallbacks = new Plottable.Utils.CallbackSet();
+                this._mouseMoveCallback = function (p) { return _this._handlePointerEvent(p); };
+                this._touchStartCallback = function (ids, idToPoint) { return _this._handlePointerEvent(idToPoint[ids[0]]); };
             }
             Pointer.prototype._anchor = function (component) {
-                var _this = this;
                 _super.prototype._anchor.call(this, component);
                 this._mouseDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(this._componentToListenTo.content().node());
-                this._mouseDispatcher.onMouseMove(function (p) { return _this._handlePointerEvent(p); });
+                this._mouseDispatcher.onMouseMove(this._mouseMoveCallback);
                 this._touchDispatcher = Plottable.Dispatchers.Touch.getDispatcher(this._componentToListenTo.content().node());
-                this._touchDispatcher.onTouchStart(function (ids, idToPoint) { return _this._handlePointerEvent(idToPoint[ids[0]]); });
+                this._touchDispatcher.onTouchStart(this._touchStartCallback);
             };
             Pointer.prototype._handlePointerEvent = function (p) {
                 var translatedP = this._translateToComponentSpace(p);
