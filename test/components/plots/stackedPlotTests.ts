@@ -195,7 +195,7 @@ describe("Plots", () => {
     it("auto scales correctly on stacked area", () => {
       var plot = new Plottable.Plots.StackedArea(xScale, yScale);
       plot.addDataset(dataset1)
-          .addDataset(dataset2)
+          .addDataset(dataset2);
       plot.x((d) => d.x, xScale)
           .y((d) => d.y, yScale);
       (<any>plot).automaticallyAdjustYScaleOverVisiblePoints(true);
@@ -260,7 +260,7 @@ describe("Plots", () => {
     it("auto scales correctly on stacked bar", () => {
       var plot = new Plottable.Plots.StackedBar(xScale, yScale);
       plot.addDataset(dataset1)
-          .addDataset(dataset2)
+          .addDataset(dataset2);
       plot.x((d) => d.x, xScale)
           .y((d) => d.y, yScale);
       (<any>plot).automaticallyAdjustYScaleOverVisiblePoints(true);

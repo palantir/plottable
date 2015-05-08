@@ -71,7 +71,7 @@ module Plottable {
       if (y == null) {
         return this._propertyBindings.get(XYPlot._Y_KEY);
       }
-      
+
       if (yScale != null) {
         if (this.y().scale) {
           this.y().scale.offUpdate(this._adjustXDomainOnChangeFromYCallback);

@@ -49,7 +49,7 @@ export module Plots {
     public y(): Plots.AccessorScaleBinding<number, number>;
     public y(y: number | _Accessor): StackedArea<X>;
     public y(y: number | _Accessor, yScale: Scale<number, number>): Area<X>;
-    public y(y?: number | _Accessor, yScale?: Scale<number, number>): any {
+    public y(y?: number | _Accessor | number, yScale?: Scale<number, number>): any {
       if (y == null) {
         return super.y();
       }

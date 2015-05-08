@@ -23,7 +23,7 @@ module Plottable {
       metadata.offsets = d3.map();
       return metadata;
     }
-    
+
     public x(): Plots.AccessorScaleBinding<X, number>;
     public x(x: number | _Accessor): XYPlot<X, Y>;
     public x(x: X | _Accessor, xScale: Scale<X, number>): XYPlot<X, Y>;

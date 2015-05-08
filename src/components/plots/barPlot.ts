@@ -418,7 +418,7 @@ export module Plots {
       if (barScale instanceof Plottable.Scales.Category) {
         barPixelWidth = (<Plottable.Scales.Category> barScale).rangeBand();
       } else {
-        var barAccessor = this._isVertical ? this.x().accessor: this.y().accessor;
+        var barAccessor = this._isVertical ? this.x().accessor : this.y().accessor;
 
         var numberBarAccessorData = d3.set(Utils.Methods.flatten(this._datasetKeysInOrder.map((k) => {
           var dataset = this._key2PlotDatasetKey.get(k).dataset;
