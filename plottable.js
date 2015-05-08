@@ -9717,24 +9717,30 @@ var Plottable;
         var Drag = (function (_super) {
             __extends(Drag, _super);
             function Drag() {
+                var _this = this;
                 _super.apply(this, arguments);
                 this._dragging = false;
                 this._constrain = true;
                 this._dragStartCallbacks = new Plottable.Utils.CallbackSet();
                 this._dragCallbacks = new Plottable.Utils.CallbackSet();
                 this._dragEndCallbacks = new Plottable.Utils.CallbackSet();
+                this.mouseDownCallback = function (p, e) { return _this._startDrag(p, e); };
+                this.mouseMoveCallback = function (p, e) { return _this._doDrag(p, e); };
+                this.mouseUpCallback = function (p, e) { return _this._endDrag(p, e); };
+                this.touchStartCallback = function (ids, idToPoint, e) { return _this._startDrag(idToPoint[ids[0]], e); };
+                this.touchMoveCallback = function (ids, idToPoint, e) { return _this._doDrag(idToPoint[ids[0]], e); };
+                this.touchEndCallback = function (ids, idToPoint, e) { return _this._endDrag(idToPoint[ids[0]], e); };
             }
             Drag.prototype._anchor = function (component) {
-                var _this = this;
                 _super.prototype._anchor.call(this, component);
                 this._mouseDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(this._componentToListenTo.content().node());
-                this._mouseDispatcher.onMouseDown(function (p, e) { return _this._startDrag(p, e); });
-                this._mouseDispatcher.onMouseMove(function (p, e) { return _this._doDrag(p, e); });
-                this._mouseDispatcher.onMouseUp(function (p, e) { return _this._endDrag(p, e); });
+                this._mouseDispatcher.onMouseDown(this.mouseDownCallback);
+                this._mouseDispatcher.onMouseMove(this.mouseMoveCallback);
+                this._mouseDispatcher.onMouseUp(this.mouseUpCallback);
                 this._touchDispatcher = Plottable.Dispatchers.Touch.getDispatcher(this._componentToListenTo.content().node());
-                this._touchDispatcher.onTouchStart(function (ids, idToPoint, e) { return _this._startDrag(idToPoint[ids[0]], e); });
-                this._touchDispatcher.onTouchMove(function (ids, idToPoint, e) { return _this._doDrag(idToPoint[ids[0]], e); });
-                this._touchDispatcher.onTouchEnd(function (ids, idToPoint, e) { return _this._endDrag(idToPoint[ids[0]], e); });
+                this._touchDispatcher.onTouchStart(this.touchStartCallback);
+                this._touchDispatcher.onTouchMove(this.touchMoveCallback);
+                this._touchDispatcher.onTouchEnd(this.touchEndCallback);
             };
             Drag.prototype._translateAndConstrain = function (p) {
                 var translatedP = this._translateToComponentSpace(p);

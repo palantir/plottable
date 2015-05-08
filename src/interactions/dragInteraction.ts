@@ -15,17 +15,26 @@ export module Interactions {
     private _dragCallbacks = new Utils.CallbackSet<DragCallback>();
     private _dragEndCallbacks = new Utils.CallbackSet<DragCallback>();
 
+
+    private mouseDownCallback = (p: Point, e: MouseEvent) => this._startDrag(p, e);
+    private mouseMoveCallback = (p: Point, e: MouseEvent) => this._doDrag(p, e);
+    private mouseUpCallback = (p: Point, e: MouseEvent) => this._endDrag(p, e);
+    private touchStartCallback = (ids: any, idToPoint: any, e: any) => this._startDrag(idToPoint[ids[0]], e);
+    private touchMoveCallback = (ids: any, idToPoint: any, e: any) => this._doDrag(idToPoint[ids[0]], e);
+    private touchEndCallback = (ids: any, idToPoint: any, e: any) => this._endDrag(idToPoint[ids[0]], e);
+
+
     protected _anchor(component: Component) {
       super._anchor(component);
       this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(<SVGElement> this._componentToListenTo.content().node());
-      this._mouseDispatcher.onMouseDown((p: Point, e: MouseEvent) => this._startDrag(p, e));
-      this._mouseDispatcher.onMouseMove((p: Point, e: MouseEvent) => this._doDrag(p, e));
-      this._mouseDispatcher.onMouseUp((p: Point, e: MouseEvent) => this._endDrag(p, e));
+      this._mouseDispatcher.onMouseDown(this.mouseDownCallback);
+      this._mouseDispatcher.onMouseMove(this.mouseMoveCallback);
+      this._mouseDispatcher.onMouseUp(this.mouseUpCallback);
 
       this._touchDispatcher = Dispatchers.Touch.getDispatcher(<SVGElement> this._componentToListenTo.content().node());
-      this._touchDispatcher.onTouchStart((ids, idToPoint, e) => this._startDrag(idToPoint[ids[0]], e));
-      this._touchDispatcher.onTouchMove((ids, idToPoint, e) => this._doDrag(idToPoint[ids[0]], e));
-      this._touchDispatcher.onTouchEnd((ids, idToPoint, e) => this._endDrag(idToPoint[ids[0]], e));
+      this._touchDispatcher.onTouchStart(this.touchStartCallback);
+      this._touchDispatcher.onTouchMove(this.touchMoveCallback);
+      this._touchDispatcher.onTouchEnd(this.touchEndCallback);
     }
 
     private _translateAndConstrain(p: Point) {
