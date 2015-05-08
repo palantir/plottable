@@ -1721,7 +1721,7 @@ var Plottable;
             }
         };
         QuantitativeScale.prototype._defaultExtent = function () {
-            return [0, 1];
+            throw Error("The quantitative scale itself does not have a default extent");
         };
         QuantitativeScale.prototype.tickGenerator = function (generator) {
             if (generator == null) {
@@ -1762,6 +1762,9 @@ var Plottable;
              */
             Linear.prototype.copy = function () {
                 return new Linear(this._d3Scale.copy());
+            };
+            Linear.prototype._defaultExtent = function () {
+                return [0, 1];
             };
             return Linear;
         })(Plottable.QuantitativeScale);
@@ -1912,7 +1915,7 @@ var Plottable;
                 var positiveUpper = max;
                 var negativeLogTicks = this.logTicks(-negativeUpper, -negativeLower).map(function (x) { return -x; }).reverse();
                 var positiveLogTicks = this.logTicks(positiveLower, positiveUpper);
-                var linearTicks = this._showIntermediateTicks ? d3.scale.linear().domain([negativeUpper, positiveLower]).ticks(this.howManyTicks(negativeUpper, positiveLower)) : [-this.pivot, 0, this.pivot].filter(function (x) { return min <= x && x <= max; });
+                var linearTicks = this._showIntermediateTicks ? d3.scale.linear().domain([negativeUpper, positiveLower]).ticks(this._howManyTicks(negativeUpper, positiveLower)) : [-this.pivot, 0, this.pivot].filter(function (x) { return min <= x && x <= max; });
                 var ticks = negativeLogTicks.concat(linearTicks).concat(positiveLogTicks);
                 // If you only have 1 tick, you can't tell how big the scale is.
                 if (ticks.length <= 1) {
@@ -1935,7 +1938,7 @@ var Plottable;
              */
             ModifiedLog.prototype.logTicks = function (lower, upper) {
                 var _this = this;
-                var nTicks = this.howManyTicks(lower, upper);
+                var nTicks = this._howManyTicks(lower, upper);
                 if (nTicks === 0) {
                     return [];
                 }
@@ -1954,11 +1957,11 @@ var Plottable;
             /**
              * How many ticks does the range [lower, upper] deserve?
              *
-             * e.g. if your domain was [10, 1000] and I asked howManyTicks(10, 100),
+             * e.g. if your domain was [10, 1000] and I asked _howManyTicks(10, 100),
              * I would get 1/2 of the ticks. The range 10, 100 takes up 1/2 of the
              * distance when plotted.
              */
-            ModifiedLog.prototype.howManyTicks = function (lower, upper) {
+            ModifiedLog.prototype._howManyTicks = function (lower, upper) {
                 var adjustedMin = this.adjustedLog(Plottable.Utils.Methods.min(this.untransformedDomain, 0));
                 var adjustedMax = this.adjustedLog(Plottable.Utils.Methods.max(this.untransformedDomain, 0));
                 var adjustedLower = this.adjustedLog(lower);
@@ -1980,6 +1983,9 @@ var Plottable;
                 else {
                     this._showIntermediateTicks = show;
                 }
+            };
+            ModifiedLog.prototype._defaultExtent = function () {
+                return [0, 1];
             };
             return ModifiedLog;
         })(Plottable.QuantitativeScale);
@@ -2218,8 +2224,6 @@ var Plottable;
                 return tempScale.ticks(interval.range, step);
             };
             Time.prototype._setDomain = function (values) {
-                // attempt to parse dates
-                values = values.map(this._typeCoercer);
                 if (values[1] < values[0]) {
                     throw new Error("Scale.Time domain values must be in chronological order");
                 }
@@ -2229,9 +2233,9 @@ var Plottable;
                 return new Time(this._d3Scale.copy());
             };
             Time.prototype._defaultExtent = function () {
-                var endTime = new Date().valueOf();
-                var startTime = endTime - Plottable.MILLISECONDS_IN_ONE_DAY;
-                return [startTime, endTime];
+                var endTimeValue = new Date().valueOf();
+                var startTimeValue = endTimeValue - Plottable.MILLISECONDS_IN_ONE_DAY;
+                return [new Date(startTimeValue), new Date(endTimeValue)];
             };
             return Time;
         })(Plottable.QuantitativeScale);

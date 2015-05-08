@@ -114,7 +114,7 @@ export module Scales {
       var positiveLogTicks = this.logTicks(positiveLower, positiveUpper);
       var linearTicks = this._showIntermediateTicks ?
                                 d3.scale.linear().domain([negativeUpper, positiveLower])
-                                        .ticks(this.howManyTicks(negativeUpper, positiveLower)) :
+                                        .ticks(this._howManyTicks(negativeUpper, positiveLower)) :
                                 [-this.pivot, 0, this.pivot].filter((x) => min <= x && x <= max);
 
       var ticks = negativeLogTicks.concat(linearTicks).concat(positiveLogTicks);
@@ -139,7 +139,7 @@ export module Scales {
      * drastically exceeding its number of ticks.
      */
     private logTicks(lower: number, upper: number): number[] {
-      var nTicks = this.howManyTicks(lower, upper);
+      var nTicks = this._howManyTicks(lower, upper);
       if (nTicks === 0) {
         return [];
       }
@@ -159,11 +159,11 @@ export module Scales {
     /**
      * How many ticks does the range [lower, upper] deserve?
      *
-     * e.g. if your domain was [10, 1000] and I asked howManyTicks(10, 100),
+     * e.g. if your domain was [10, 1000] and I asked _howManyTicks(10, 100),
      * I would get 1/2 of the ticks. The range 10, 100 takes up 1/2 of the
      * distance when plotted.
      */
-    private howManyTicks(lower: number, upper: number): number {
+    private _howManyTicks(lower: number, upper: number): number {
       var adjustedMin = this.adjustedLog(Utils.Methods.min(this.untransformedDomain, 0));
       var adjustedMax = this.adjustedLog(Utils.Methods.max(this.untransformedDomain, 0));
       var adjustedLower = this.adjustedLog(lower);
@@ -203,6 +203,10 @@ export module Scales {
       } else {
         this._showIntermediateTicks = show;
       }
+    }
+
+    public _defaultExtent(): number[] {
+      return [0, 1];
     }
 
   }

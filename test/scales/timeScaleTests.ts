@@ -15,14 +15,14 @@ describe("TimeScale tests", () => {
       var time2 = scale.domain()[1].valueOf();
       assert.strictEqual(time2, secondDate, "first value of domain set correctly");
     }
-    checkDomain(["10/1/2014", "11/1/2014"]);
-    checkDomain(["October 1, 2014", "November 1, 2014"]);
-    checkDomain(["Oct 1, 2014", "Nov 1, 2014"]);
+    checkDomain([new Date("10/1/2014"), new Date("11/1/2014")]);
+    checkDomain([new Date("October 1, 2014"), new Date("November 1, 2014")]);
+    checkDomain([new Date("Oct 1, 2014"), new Date("Nov 1, 2014")]);
   });
 
   it("can't set reversed domain", () => {
     var scale = new Plottable.Scales.Time();
-    assert.throws(() => scale.domain(["1985-10-26", "1955-11-05"]), "chronological");
+    assert.throws(() => scale.domain([new Date("1985-10-26"), new Date("1955-11-05")]), "chronological");
   });
 
   it("time coercer works as intended", () => {

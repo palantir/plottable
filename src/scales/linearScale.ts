@@ -28,6 +28,10 @@ export module Scales {
     public copy(): Linear {
       return new Linear(this._d3Scale.copy());
     }
+
+    public _defaultExtent(): number[] {
+        return [0, 1];
+    }
   }
 }
 }

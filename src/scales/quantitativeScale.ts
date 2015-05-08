@@ -115,8 +115,8 @@ module Plottable {
       }
     }
 
-    public _defaultExtent(): number[] {
-      return [0, 1];
+    public _defaultExtent(): D[] {
+      throw Error("The quantitative scale itself does not have a default extent");
     }
 
     /**

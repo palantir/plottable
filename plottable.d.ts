@@ -929,7 +929,7 @@ declare module Plottable {
          * @return {QuantitativeScale} The calling QuantitativeScaleScale.
          */
         domainer(domainer: Domainer): QuantitativeScale<D>;
-        _defaultExtent(): number[];
+        _defaultExtent(): D[];
         /**
          * Gets the tick generator of the QuantitativeScale.
          *
@@ -968,6 +968,7 @@ declare module Plottable {
              * @returns {Linear} A copy of the calling LinearScale.
              */
             copy(): Linear;
+            _defaultExtent(): number[];
         }
     }
 }
@@ -1054,6 +1055,7 @@ declare module Plottable {
              * @returns {ModifiedLog} The calling ModifiedLog.
              */
             showIntermediateTicks(show: boolean): ModifiedLog;
+            _defaultExtent(): number[];
         }
     }
 }
@@ -1158,7 +1160,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Scales {
-        class Time extends QuantitativeScale<any> {
+        class Time extends QuantitativeScale<Date> {
             _typeCoercer: (d: any) => any;
             /**
              * Constructs a TimeScale.
@@ -1170,10 +1172,10 @@ declare module Plottable {
              */
             constructor();
             constructor(scale: D3.Scale.LinearScale);
-            tickInterval(interval: D3.Time.Interval, step?: number): any[];
-            protected _setDomain(values: any[]): void;
+            tickInterval(interval: D3.Time.Interval, step?: number): Date[];
+            protected _setDomain(values: Date[]): void;
             copy(): Time;
-            _defaultExtent(): any[];
+            _defaultExtent(): Date[];
         }
     }
 }

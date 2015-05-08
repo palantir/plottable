@@ -763,7 +763,7 @@ describe("TimeAxis", function () {
     it("renders end ticks on either side", function () {
         var width = 500;
         var svg = TestMethods.generateSVG(width, 100);
-        scale.domain(["2010", "2014"]);
+        scale.domain([new Date("2010-01-01"), new Date("2014-01-01")]);
         axis.renderTo(svg);
         var firstTick = d3.select(".tick-mark");
         assert.strictEqual(firstTick.attr("x1"), "0", "xPos (x1) of first end tick is at the beginning of the axis container");
@@ -776,7 +776,7 @@ describe("TimeAxis", function () {
     it("adds a class corresponding to the end-tick for the first and last ticks", function () {
         var width = 500;
         var svg = TestMethods.generateSVG(width, 100);
-        scale.domain(["2010", "2014"]);
+        scale.domain([new Date("2010-01-01"), new Date("2014-01-01")]);
         axis.renderTo(svg);
         var firstTick = d3.select("." + Plottable.Axis.TICK_MARK_CLASS);
         assert.isTrue(firstTick.classed(Plottable.Axis.END_TICK_MARK_CLASS), "first end tick has the end-tick-mark class");
@@ -7468,13 +7468,13 @@ describe("TimeScale tests", function () {
             var time2 = scale.domain()[1].valueOf();
             assert.strictEqual(time2, secondDate, "first value of domain set correctly");
         }
-        checkDomain(["10/1/2014", "11/1/2014"]);
-        checkDomain(["October 1, 2014", "November 1, 2014"]);
-        checkDomain(["Oct 1, 2014", "Nov 1, 2014"]);
+        checkDomain([new Date("10/1/2014"), new Date("11/1/2014")]);
+        checkDomain([new Date("October 1, 2014"), new Date("November 1, 2014")]);
+        checkDomain([new Date("Oct 1, 2014"), new Date("Nov 1, 2014")]);
     });
     it("can't set reversed domain", function () {
         var scale = new Plottable.Scales.Time();
-        assert.throws(function () { return scale.domain(["1985-10-26", "1955-11-05"]); }, "chronological");
+        assert.throws(function () { return scale.domain([new Date("1985-10-26"), new Date("1955-11-05")]); }, "chronological");
     });
     it("time coercer works as intended", function () {
         var tc = new Plottable.Scales.Time()._typeCoercer;
