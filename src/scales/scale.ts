@@ -19,7 +19,7 @@ module Plottable {
 
     private _callbacks: Utils.CallbackSet<ScaleCallback<Scale<D, R>>>;
     private _autoDomainAutomatically = true;
-    private _domainModificationInProgress: boolean = false;
+    private _domainModificationInProgress = false;
     private _extentProviders: Utils.Set<Scales.ExtentProvider<D>>;
 
     /**

@@ -177,7 +177,7 @@ export module Scales {
       return new ModifiedLog(this.base);
     }
 
-    public _niceDomain(domain: any[], count?: number): any[] {
+    public _niceDomain(domain: number[], count?: number): number[] {
       return domain;
     }
 

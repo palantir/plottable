@@ -71,9 +71,9 @@ module Plottable {
     /**
      * Gets a set of tick values spanning the domain.
      *
-     * @returns {any[]} The generated ticks.
+     * @returns {D[]} The generated ticks.
      */
-    public ticks(): any[] {
+    public ticks(): D[] {
       return this._tickGenerator(this);
     }
 
@@ -81,7 +81,7 @@ module Plottable {
      * Given a domain, expands its domain onto "nice" values, e.g. whole
      * numbers.
      */
-    public _niceDomain(domain: any[], count?: number): any[] {
+    public _niceDomain(domain: D[], count?: number): D[] {
       return this._d3Scale.copy().domain(domain).nice(count).domain();
     }
 
@@ -115,7 +115,7 @@ module Plottable {
       }
     }
 
-    public _defaultExtent(): any[] {
+    public _defaultExtent(): number[] {
       return [0, 1];
     }
 

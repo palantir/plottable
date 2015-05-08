@@ -902,14 +902,14 @@ declare module Plottable {
         /**
          * Gets a set of tick values spanning the domain.
          *
-         * @returns {any[]} The generated ticks.
+         * @returns {D[]} The generated ticks.
          */
-        ticks(): any[];
+        ticks(): D[];
         /**
          * Given a domain, expands its domain onto "nice" values, e.g. whole
          * numbers.
          */
-        _niceDomain(domain: any[], count?: number): any[];
+        _niceDomain(domain: D[], count?: number): D[];
         /**
          * Gets a Domainer of a scale. A Domainer is responsible for combining
          * multiple extents into a single domain.
@@ -929,7 +929,7 @@ declare module Plottable {
          * @return {QuantitativeScale} The calling QuantitativeScaleScale.
          */
         domainer(domainer: Domainer): QuantitativeScale<D>;
-        _defaultExtent(): any[];
+        _defaultExtent(): number[];
         /**
          * Gets the tick generator of the QuantitativeScale.
          *
@@ -1037,7 +1037,7 @@ declare module Plottable {
             protected _setDomain(values: number[]): void;
             ticks(): number[];
             copy(): ModifiedLog;
-            _niceDomain(domain: any[], count?: number): any[];
+            _niceDomain(domain: number[], count?: number): number[];
             /**
              * Gets whether or not to return tick values other than powers of base.
              *
@@ -1195,14 +1195,14 @@ declare module Plottable {
              * An InterpolatedColorScale maps numbers evenly to color strings.
              *
              * @constructor
-             * @param {string|string[]} colorRange the type of color scale to
+             * @param {string | string[]} colorRange the type of color scale to
              *     create. Default is "reds". @see {@link colorRange} for further
              *     options.
              * @param {string} scaleType the type of underlying scale to use
              *     (linear/pow/log/sqrt). Default is "linear". @see {@link scaleType}
              *     for further options.
              */
-            constructor(colorRange?: any, scaleType?: string);
+            constructor(colorRange?: string | string[], scaleType?: string);
             /**
              * Gets the color range.
              *

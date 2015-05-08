@@ -1697,7 +1697,7 @@ var Plottable;
         /**
          * Gets a set of tick values spanning the domain.
          *
-         * @returns {any[]} The generated ticks.
+         * @returns {D[]} The generated ticks.
          */
         QuantitativeScale.prototype.ticks = function () {
             return this._tickGenerator(this);
@@ -2265,7 +2265,7 @@ var Plottable;
              * An InterpolatedColorScale maps numbers evenly to color strings.
              *
              * @constructor
-             * @param {string|string[]} colorRange the type of color scale to
+             * @param {string | string[]} colorRange the type of color scale to
              *     create. Default is "reds". @see {@link colorRange} for further
              *     options.
              * @param {string} scaleType the type of underlying scale to use
