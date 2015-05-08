@@ -193,7 +193,7 @@ module Plottable {
         var fn = scale ? (d: any, i: number, dataset: Dataset, m: Plots.PlotMetadata) => scale.scale(accessor(d, i, dataset, m)) : accessor;
         h[attr] = fn;
       });
-      var propertyProjectors = this._propertyToProjectors();
+      var propertyProjectors = this._generatePropertyToProjectors();
       Object.keys(propertyProjectors).forEach((key) => {
         if (h[key] == null) {
           h[key] = propertyProjectors[key];
@@ -585,7 +585,7 @@ module Plottable {
                  accScaleBinding.scale.scale(accScaleBinding.accessor(d, i, dataset, m));
     }
 
-    private _propertyToProjectors(): AttributeToProjector {
+    private _generatePropertyToProjectors(): AttributeToProjector {
       var attrToProjector: AttributeToProjector = {};
       this._propertyBindings.forEach((key, binding) => attrToProjector[key] = Plot._scaledAccessor(binding));
       return attrToProjector;

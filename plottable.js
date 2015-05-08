@@ -6435,7 +6435,7 @@ var Plottable;
                 var fn = scale ? function (d, i, dataset, m) { return scale.scale(accessor(d, i, dataset, m)); } : accessor;
                 h[attr] = fn;
             });
-            var propertyProjectors = this._propertyToProjectors();
+            var propertyProjectors = this._generatePropertyToProjectors();
             Object.keys(propertyProjectors).forEach(function (key) {
                 if (h[key] == null) {
                     h[key] = propertyProjectors[key];
@@ -6780,7 +6780,7 @@ var Plottable;
         Plot._scaledAccessor = function (accScaleBinding) {
             return accScaleBinding.scale == null ? accScaleBinding.accessor : function (d, i, dataset, m) { return accScaleBinding.scale.scale(accScaleBinding.accessor(d, i, dataset, m)); };
         };
-        Plot.prototype._propertyToProjectors = function () {
+        Plot.prototype._generatePropertyToProjectors = function () {
             var attrToProjector = {};
             this._propertyBindings.forEach(function (key, binding) { return attrToProjector[key] = Plot._scaledAccessor(binding); });
             return attrToProjector;
