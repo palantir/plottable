@@ -930,7 +930,7 @@ declare module Plottable {
          *
          * @returns {any[]} The generated ticks.
          */
-        ticks(): D[];
+        ticks(): any[];
         /**
          * Gets the default number of ticks.
          *
