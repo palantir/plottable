@@ -147,23 +147,35 @@ describe("Component behavior", () => {
     svg.remove();
   });
 
+  it("component defaults are as expected", () => {
+    assert.strictEqual(c.xAlign(), "left", "x alignment defaults to \"left\"");
+    assert.strictEqual(c.yAlign(), "top", "y alignment defaults to \"top\"");
+    var layout = c.requestedSpace(1, 1);
+    assert.strictEqual(layout.minWidth, 0, "requested width defaults to 0");
+    assert.strictEqual(layout.minHeight, 0, "requested height defaults to 0");
+    assert.strictEqual((<any> c)._xOffset, 0, "xOffset defaults to 0");
+    assert.strictEqual((<any> c)._yOffset, 0, "yOffset defaults to 0");
+    svg.remove();
+  });
+
   it("fixed-width component will align to the right spot", () => {
     TestMethods.fixComponentSize(c, 100, 100);
     c.anchor(svg);
+    c.xAlign("left").yAlign("top");
     c.computeLayout();
     assertComponentXY(c, 0, 0, "top-left component aligns correctly");
 
-    c.xAlign("CENTER").yAlign("CENTER");
+    c.xAlign("center").yAlign("center");
     c.computeLayout();
     assertComponentXY(c, 150, 100, "center component aligns correctly");
 
-    c.xAlign("RIGHT").yAlign("BOTTOM");
+    c.xAlign("right").yAlign("bottom");
     c.computeLayout();
     assertComponentXY(c, 300, 200, "bottom-right component aligns correctly");
     svg.remove();
   });
 
-  it("components can be offset relative to their alignment, and throw errors if there is insufficient space", () => {
+  it("components can be offset relative to their alignment", () => {
     TestMethods.fixComponentSize(c, 100, 100);
     c.anchor(svg);
     c.xOffset(20).yOffset(20);
@@ -186,17 +198,6 @@ describe("Component behavior", () => {
     c.computeLayout();
     assertComponentXY(c, 280, 170, "negative offsets work properly");
 
-    svg.remove();
-  });
-
-  it("component defaults are as expected", () => {
-    var layout = c.requestedSpace(1, 1);
-    assert.strictEqual(layout.minWidth, 0, "requested width defaults to 0");
-    assert.strictEqual(layout.minHeight, 0, "requested height defaults to 0");
-    assert.strictEqual((<any> c)._xAlignProportion, 0, "_xAlignProportion defaults to 0");
-    assert.strictEqual((<any> c)._yAlignProportion, 0, "_yAlignProportion defaults to 0");
-    assert.strictEqual((<any> c)._xOffset, 0, "xOffset defaults to 0");
-    assert.strictEqual((<any> c)._yOffset, 0, "yOffset defaults to 0");
     svg.remove();
   });
 

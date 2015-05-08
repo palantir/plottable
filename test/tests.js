@@ -660,13 +660,13 @@ describe("BaseAxis", function () {
     it("default alignment based on orientation", function () {
         var scale = new Plottable.Scales.Linear();
         var baseAxis = new Plottable.Axis(scale, "bottom");
-        assert.strictEqual(baseAxis._yAlignProportion, 0, "yAlignProportion defaults to 0 for bottom axis");
+        assert.strictEqual(baseAxis.yAlign(), "top", "y alignment defaults to \"top\" for bottom axis");
         baseAxis = new Plottable.Axis(scale, "top");
-        assert.strictEqual(baseAxis._yAlignProportion, 1, "yAlignProportion defaults to 1 for top axis");
+        assert.strictEqual(baseAxis.yAlign(), "bottom", "y alignment defaults to \"bottom\" for top axis");
         baseAxis = new Plottable.Axis(scale, "left");
-        assert.strictEqual(baseAxis._xAlignProportion, 1, "xAlignProportion defaults to 1 for left axis");
+        assert.strictEqual(baseAxis.xAlign(), "right", "x alignment defaults to \"right\" for left axis");
         baseAxis = new Plottable.Axis(scale, "right");
-        assert.strictEqual(baseAxis._xAlignProportion, 0, "xAlignProportion defaults to 0 for right axis");
+        assert.strictEqual(baseAxis.xAlign(), "left", "x alignment defaults to \"left\" for right axis");
     });
 });
 
@@ -6243,20 +6243,31 @@ describe("Component behavior", function () {
         assert.isTrue(g3.classed("box-container"), "the fourth g is a box container");
         svg.remove();
     });
+    it("component defaults are as expected", function () {
+        assert.strictEqual(c.xAlign(), "left", "x alignment defaults to \"left\"");
+        assert.strictEqual(c.yAlign(), "top", "y alignment defaults to \"top\"");
+        var layout = c.requestedSpace(1, 1);
+        assert.strictEqual(layout.minWidth, 0, "requested width defaults to 0");
+        assert.strictEqual(layout.minHeight, 0, "requested height defaults to 0");
+        assert.strictEqual(c._xOffset, 0, "xOffset defaults to 0");
+        assert.strictEqual(c._yOffset, 0, "yOffset defaults to 0");
+        svg.remove();
+    });
     it("fixed-width component will align to the right spot", function () {
         TestMethods.fixComponentSize(c, 100, 100);
         c.anchor(svg);
+        c.xAlign("left").yAlign("top");
         c.computeLayout();
         assertComponentXY(c, 0, 0, "top-left component aligns correctly");
-        c.xAlign("CENTER").yAlign("CENTER");
+        c.xAlign("center").yAlign("center");
         c.computeLayout();
         assertComponentXY(c, 150, 100, "center component aligns correctly");
-        c.xAlign("RIGHT").yAlign("BOTTOM");
+        c.xAlign("right").yAlign("bottom");
         c.computeLayout();
         assertComponentXY(c, 300, 200, "bottom-right component aligns correctly");
         svg.remove();
     });
-    it("components can be offset relative to their alignment, and throw errors if there is insufficient space", function () {
+    it("components can be offset relative to their alignment", function () {
         TestMethods.fixComponentSize(c, 100, 100);
         c.anchor(svg);
         c.xOffset(20).yOffset(20);
@@ -6274,16 +6285,6 @@ describe("Component behavior", function () {
         c.xOffset(-20).yOffset(-30);
         c.computeLayout();
         assertComponentXY(c, 280, 170, "negative offsets work properly");
-        svg.remove();
-    });
-    it("component defaults are as expected", function () {
-        var layout = c.requestedSpace(1, 1);
-        assert.strictEqual(layout.minWidth, 0, "requested width defaults to 0");
-        assert.strictEqual(layout.minHeight, 0, "requested height defaults to 0");
-        assert.strictEqual(c._xAlignProportion, 0, "_xAlignProportion defaults to 0");
-        assert.strictEqual(c._yAlignProportion, 0, "_yAlignProportion defaults to 0");
-        assert.strictEqual(c._xOffset, 0, "xOffset defaults to 0");
-        assert.strictEqual(c._yOffset, 0, "yOffset defaults to 0");
         svg.remove();
     });
     it("clipPath works as expected", function () {

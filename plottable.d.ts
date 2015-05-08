@@ -1548,26 +1548,28 @@ declare module Plottable {
          */
         renderTo(element: String | D3.Selection): Component;
         /**
-         * Sets the x alignment of the Component. This will be used if the
-         * Component is given more space than it needs.
+         * Gets the x alignment of the Component.
          *
-         * For example, you may want to make a Legend postition itself it the top
-         * right, so you would call `legend.xAlign("right")` and
-         * `legend.yAlign("top")`.
+         * @returns {string} The current x alignment.
+         */
+        xAlign(): string;
+        /**
+         * Sets the x alignment of the Component.
          *
          * @param {string} alignment The x alignment of the Component (one of ["left", "center", "right"]).
          * @returns {Component} The calling Component.
          */
         xAlign(alignment: string): Component;
         /**
-         * Sets the y alignment of the Component. This will be used if the
-         * Component is given more space than it needs.
+         * Gets the y alignment of the Component.
          *
-         * For example, you may want to make a Legend postition itself it the top
-         * right, so you would call `legend.xAlign("right")` and
-         * `legend.yAlign("top")`.
+         * @returns {string} The current y alignment.
+         */
+        yAlign(): string;
+        /**
+         * Sets the y alignment of the Component.
          *
-         * @param {string} alignment The x alignment of the Component (one of ["top", "center", "bottom"]).
+         * @param {string} alignment The y alignment of the Component (one of ["top", "center", "bottom"]).
          * @returns {Component} The calling Component.
          */
         yAlign(alignment: string): Component;
@@ -2151,22 +2153,6 @@ declare module Plottable {
              * @param {string} orientation The orientation of the Label (horizontal/left/right) (default = "horizontal").
              */
             constructor(displayText?: string, orientation?: string);
-            /**
-             * Sets the horizontal side the label will go to given the label is given more space that it needs
-             *
-             * @param {string} alignment The new setting, one of `["left", "center",
-             * "right"]`. Defaults to `"center"`.
-             * @returns {Label} The calling Label.
-             */
-            xAlign(alignment: string): Label;
-            /**
-             * Sets the vertical side the label will go to given the label is given more space that it needs
-             *
-             * @param {string} alignment The new setting, one of `["top", "center",
-             * "bottom"]`. Defaults to `"center"`.
-             * @returns {Label} The calling Label.
-             */
-            yAlign(alignment: string): Label;
             requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
             protected _setup(): void;
             /**
