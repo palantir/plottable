@@ -24,12 +24,12 @@ export module Interactions {
 
     protected _anchor(component: Component) {
       super._anchor(component);
-      this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(<SVGElement> this._componentToListenTo.content().node());
+      this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(<SVGElement> this._componentAttachedTo.content().node());
       this._mouseDispatcher.onMouseDown(this._mouseDownCallback);
       this._mouseDispatcher.onMouseMove(this._mouseMoveCallback);
       this._mouseDispatcher.onMouseUp(this._mouseUpCallback);
 
-      this._touchDispatcher = Dispatchers.Touch.getDispatcher(<SVGElement> this._componentToListenTo.content().node());
+      this._touchDispatcher = Dispatchers.Touch.getDispatcher(<SVGElement> this._componentAttachedTo.content().node());
       this._touchDispatcher.onTouchStart(this._touchStartCallback);
       this._touchDispatcher.onTouchMove(this._touchMoveCallback);
       this._touchDispatcher.onTouchEnd(this._touchEndCallback);
@@ -55,8 +55,8 @@ export module Interactions {
       }
 
       return {
-        x: Utils.Methods.clamp(translatedP.x, 0, this._componentToListenTo.width()),
-        y: Utils.Methods.clamp(translatedP.y, 0, this._componentToListenTo.height())
+        x: Utils.Methods.clamp(translatedP.x, 0, this._componentAttachedTo.width()),
+        y: Utils.Methods.clamp(translatedP.y, 0, this._componentAttachedTo.height())
       };
     }
 

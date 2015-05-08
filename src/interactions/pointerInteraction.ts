@@ -17,10 +17,10 @@ export module Interactions {
 
     protected _anchor(component: Component) {
       super._anchor(component);
-      this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(<SVGElement> this._componentToListenTo.content().node());
+      this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(<SVGElement> this._componentAttachedTo.content().node());
       this._mouseDispatcher.onMouseMove(this._mouseMoveCallback);
 
-      this._touchDispatcher = Dispatchers.Touch.getDispatcher(<SVGElement> this._componentToListenTo.content().node());
+      this._touchDispatcher = Dispatchers.Touch.getDispatcher(<SVGElement> this._componentAttachedTo.content().node());
       this._touchDispatcher.onTouchStart(this._touchStartCallback);
     }
 

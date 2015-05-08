@@ -3701,7 +3701,7 @@ declare module Plottable {
          * "foreground" and "background" elements where it can draw things,
          * e.g. crosshairs.
          */
-        protected _componentToListenTo: Component;
+        protected _componentAttachedTo: Component;
         protected _anchor(component: Component): void;
         protected _unanchor(): void;
         /**

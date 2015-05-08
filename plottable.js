@@ -9192,10 +9192,10 @@ var Plottable;
          * @return {Interaction}
          */
         Interaction.prototype.attachTo = function (component) {
-            if (this._componentToListenTo) {
-                this.detachFrom(this._componentToListenTo);
+            if (this._componentAttachedTo) {
+                this.detachFrom(this._componentAttachedTo);
             }
-            this._componentToListenTo = component;
+            this._componentAttachedTo = component;
             component.onAnchor(this._anchorCallback);
             return this;
         };
@@ -9208,7 +9208,7 @@ var Plottable;
          */
         Interaction.prototype.detachFrom = function (component) {
             this._unanchor();
-            this._componentToListenTo = null;
+            this._componentAttachedTo = null;
             component.offAnchor(this._anchorCallback);
             return this;
         };
@@ -9220,7 +9220,7 @@ var Plottable;
          * @return {Point} The same location in Component-space coordinates.
          */
         Interaction.prototype._translateToComponentSpace = function (p) {
-            var origin = this._componentToListenTo.originToSVG();
+            var origin = this._componentAttachedTo.originToSVG();
             return {
                 x: p.x - origin.x,
                 y: p.y - origin.y
@@ -9234,7 +9234,7 @@ var Plottable;
          * @return {boolean} Whether or not the point is inside the Component.
          */
         Interaction.prototype._isInsideComponent = function (p) {
-            return 0 <= p.x && 0 <= p.y && p.x <= this._componentToListenTo.width() && p.y <= this._componentToListenTo.height();
+            return 0 <= p.x && 0 <= p.y && p.x <= this._componentAttachedTo.width() && p.y <= this._componentAttachedTo.height();
         };
         return Interaction;
     })();
@@ -9460,7 +9460,7 @@ var Plottable;
             }
             Key.prototype._anchor = function (component) {
                 _super.prototype._anchor.call(this, component);
-                this._positionDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(this._componentToListenTo._element.node());
+                this._positionDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(this._componentAttachedTo._element.node());
                 this._positionDispatcher.onMouseMove(this._mouseMoveCallback);
                 this._keyDispatcher = Plottable.Dispatchers.Key.getDispatcher();
                 this._keyDispatcher.onKeyDown(this._keyDownCallback);
@@ -9539,9 +9539,9 @@ var Plottable;
             }
             Pointer.prototype._anchor = function (component) {
                 _super.prototype._anchor.call(this, component);
-                this._mouseDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(this._componentToListenTo.content().node());
+                this._mouseDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(this._componentAttachedTo.content().node());
                 this._mouseDispatcher.onMouseMove(this._mouseMoveCallback);
-                this._touchDispatcher = Plottable.Dispatchers.Touch.getDispatcher(this._componentToListenTo.content().node());
+                this._touchDispatcher = Plottable.Dispatchers.Touch.getDispatcher(this._componentAttachedTo.content().node());
                 this._touchDispatcher.onTouchStart(this._touchStartCallback);
             };
             Pointer.prototype._unanchor = function () {
@@ -9672,9 +9672,9 @@ var Plottable;
             PanZoom.prototype._anchor = function (component) {
                 _super.prototype._anchor.call(this, component);
                 this._dragInteraction.attachTo(component);
-                this._mouseDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(this._componentToListenTo.content().node());
+                this._mouseDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(this._componentAttachedTo.content().node());
                 this._mouseDispatcher.onWheel(this._wheelCallback);
-                this._touchDispatcher = Plottable.Dispatchers.Touch.getDispatcher(this._componentToListenTo.content().node());
+                this._touchDispatcher = Plottable.Dispatchers.Touch.getDispatcher(this._componentAttachedTo.content().node());
                 this._touchDispatcher.onTouchStart(this._touchStartCallback);
                 this._touchDispatcher.onTouchMove(this._touchMoveCallback);
                 this._touchDispatcher.onTouchEnd(this._touchEndCallback);
@@ -9689,7 +9689,7 @@ var Plottable;
                 this._touchDispatcher.offTouchEnd(this._touchEndCallback);
                 this._touchDispatcher.offTouchCancel(this._touchCancelCallback);
                 this._touchDispatcher = null;
-                this._dragInteraction.detachFrom(this._componentToListenTo);
+                this._dragInteraction.detachFrom(this._componentAttachedTo);
             };
             PanZoom.prototype._handleTouchStart = function (ids, idToPoint, e) {
                 for (var i = 0; i < ids.length && this._touchIds.size() < 2; i++) {
@@ -9828,11 +9828,11 @@ var Plottable;
             }
             Drag.prototype._anchor = function (component) {
                 _super.prototype._anchor.call(this, component);
-                this._mouseDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(this._componentToListenTo.content().node());
+                this._mouseDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(this._componentAttachedTo.content().node());
                 this._mouseDispatcher.onMouseDown(this._mouseDownCallback);
                 this._mouseDispatcher.onMouseMove(this._mouseMoveCallback);
                 this._mouseDispatcher.onMouseUp(this._mouseUpCallback);
-                this._touchDispatcher = Plottable.Dispatchers.Touch.getDispatcher(this._componentToListenTo.content().node());
+                this._touchDispatcher = Plottable.Dispatchers.Touch.getDispatcher(this._componentAttachedTo.content().node());
                 this._touchDispatcher.onTouchStart(this._touchStartCallback);
                 this._touchDispatcher.onTouchMove(this._touchMoveCallback);
                 this._touchDispatcher.onTouchEnd(this._touchEndCallback);
@@ -9854,8 +9854,8 @@ var Plottable;
                     return translatedP;
                 }
                 return {
-                    x: Plottable.Utils.Methods.clamp(translatedP.x, 0, this._componentToListenTo.width()),
-                    y: Plottable.Utils.Methods.clamp(translatedP.y, 0, this._componentToListenTo.height())
+                    x: Plottable.Utils.Methods.clamp(translatedP.x, 0, this._componentAttachedTo.width()),
+                    y: Plottable.Utils.Methods.clamp(translatedP.y, 0, this._componentAttachedTo.height())
                 };
             };
             Drag.prototype._startDrag = function (point, event) {

@@ -47,10 +47,10 @@ export module Interactions {
       super._anchor(component);
       this._dragInteraction.attachTo(component);
 
-      this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(<SVGElement> this._componentToListenTo.content().node());
+      this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(<SVGElement> this._componentAttachedTo.content().node());
       this._mouseDispatcher.onWheel(this._wheelCallback);
 
-      this._touchDispatcher = Dispatchers.Touch.getDispatcher(<SVGElement> this._componentToListenTo.content().node());
+      this._touchDispatcher = Dispatchers.Touch.getDispatcher(<SVGElement> this._componentAttachedTo.content().node());
       this._touchDispatcher.onTouchStart(this._touchStartCallback);
       this._touchDispatcher.onTouchMove(this._touchMoveCallback);
       this._touchDispatcher.onTouchEnd(this._touchEndCallback);
@@ -68,7 +68,7 @@ export module Interactions {
       this._touchDispatcher.offTouchCancel(this._touchCancelCallback);
       this._touchDispatcher = null;
 
-      this._dragInteraction.detachFrom(this._componentToListenTo);
+      this._dragInteraction.detachFrom(this._componentAttachedTo);
     }
 
     private _handleTouchStart(ids: number[], idToPoint: { [id: number]: Point; }, e: TouchEvent) {

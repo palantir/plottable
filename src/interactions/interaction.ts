@@ -9,7 +9,7 @@ module Plottable {
      * "foreground" and "background" elements where it can draw things,
      * e.g. crosshairs.
      */
-    protected _componentToListenTo: Component;
+    protected _componentAttachedTo: Component;
 
     private _anchorCallback = (component: Component) => this._anchor(component);
 
@@ -32,11 +32,11 @@ module Plottable {
      * @return {Interaction}
      */
     public attachTo(component: Component) {
-      if (this._componentToListenTo) {
-        this.detachFrom(this._componentToListenTo);
+      if (this._componentAttachedTo) {
+        this.detachFrom(this._componentAttachedTo);
       }
 
-      this._componentToListenTo = component;
+      this._componentAttachedTo = component;
       component.onAnchor(this._anchorCallback);
 
       return this;
@@ -51,7 +51,7 @@ module Plottable {
      */
     public detachFrom(component: Component) {
       this._unanchor();
-      this._componentToListenTo = null;
+      this._componentAttachedTo = null;
       component.offAnchor(this._anchorCallback);
 
       return this;
@@ -65,7 +65,7 @@ module Plottable {
      * @return {Point} The same location in Component-space coordinates.
      */
     protected _translateToComponentSpace(p: Point): Point {
-      var origin = this._componentToListenTo.originToSVG();
+      var origin = this._componentAttachedTo.originToSVG();
       return {
         x: p.x - origin.x,
         y: p.y - origin.y
@@ -81,8 +81,8 @@ module Plottable {
      */
     protected _isInsideComponent(p: Point) {
       return 0 <= p.x && 0 <= p.y
-             && p.x <= this._componentToListenTo.width()
-             && p.y <= this._componentToListenTo.height();
+             && p.x <= this._componentAttachedTo.width()
+             && p.y <= this._componentAttachedTo.height();
     }
   }
 }
