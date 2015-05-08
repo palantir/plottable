@@ -8259,7 +8259,7 @@ describe("Interactions", function () {
     describe("Interactions", function () {
         var SVG_WIDTH = 400;
         var SVG_HEIGHT = 400;
-        it("can attach interaction to component works", function () {
+        it("attaching/detaching a component modifies the state of the interaction", function () {
             var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
             var component = new Plottable.Component();
             var interaction = new Plottable.Interaction();
