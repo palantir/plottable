@@ -3692,13 +3692,6 @@ declare module Plottable {
 
 declare module Plottable {
     class Interaction {
-        /**
-         * It maintains a 'hitBox' which is where all event listeners are
-         * attached. Due to cross- browser weirdness, the hitbox needs to be an
-         * opaque but invisible rectangle.  TODO: We should give the interaction
-         * "foreground" and "background" elements where it can draw things,
-         * e.g. crosshairs.
-         */
         protected _componentAttachedTo: Component;
         protected _anchor(component: Component): void;
         protected _unanchor(): void;
