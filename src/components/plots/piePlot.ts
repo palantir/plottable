@@ -69,15 +69,23 @@ export module Plots {
     }
 
     protected _generateAttrToProjector(): AttributeToProjector {
-      var attrToProjector: AttributeToProjector = {};
-      this._propertyBindings.forEach((key, binding) => attrToProjector[key] = Pie._scaledAccessor(binding));
-
-      var superAttrToProjector = super._generateAttrToProjector();
-      Object.keys(superAttrToProjector).forEach((key) => attrToProjector[key] = superAttrToProjector[key]);
+      var attrToProjector = super._generateAttrToProjector();
+      var propertyProjectors = this._propertyToProjectors();
+      Object.keys(propertyProjectors).forEach((key) => {
+        if (attrToProjector[key] == null) {
+          attrToProjector[key] = propertyProjectors[key];
+        }
+      });
 
       var defaultFillFunction = (d: any, i: number) => this._colorScale.scale(String(i));
       attrToProjector["fill"] = attrToProjector["fill"] || defaultFillFunction;
 
+      return attrToProjector;
+    }
+
+    private _propertyToProjectors(): AttributeToProjector {
+      var attrToProjector: AttributeToProjector = {};
+      this._propertyBindings.forEach((key, binding) => attrToProjector[key] = Pie._scaledAccessor(binding));
       return attrToProjector;
     }
 
