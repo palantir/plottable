@@ -95,7 +95,6 @@ module Plottable {
     public destroy() {
       super.destroy();
       this._scales().forEach((scale) => scale.offUpdate(this._renderCallback));
-      this._propertyScales().forEach((scale) => scale.offUpdate(this._renderCallback));
       this.datasets().forEach((dataset) => this.removeDataset(dataset));
     }
 
@@ -270,6 +269,12 @@ module Plottable {
           scales.push(scale);
         }
       });
+      this._propertyBindings.forEach((property, binding) => {
+        var scale = binding.scale;
+        if (scale != null && scales.indexOf(scale) === -1) {
+          scales.push(scale);
+        }
+      });
       return scales;
     }
 
@@ -278,9 +283,8 @@ module Plottable {
      */
     protected _updateExtents() {
       this._attrBindings.forEach((attr) => this._updateExtentsForAttr(attr));
-      this._scales().forEach((scale) => scale._autoDomainIfAutomaticMode());
       this._propertyExtents.forEach((property) => this._updateExtentsForProperty(property));
-      this._propertyScales().forEach((scale) => scale._autoDomainIfAutomaticMode());
+      this._scales().forEach((scale) => scale._autoDomainIfAutomaticMode());
     }
 
     private _updateExtentsForAttr(attr: string) {
@@ -590,17 +594,6 @@ module Plottable {
           newScale._autoDomainIfAutomaticMode();
         }
       }
-    }
-
-    private _propertyScales() {
-      var propertyScales: Scale<any, any> [] = [];
-      this._propertyBindings.forEach((property, binding) => {
-        var scale = binding.scale;
-        if (scale != null && propertyScales.indexOf(scale) === -1) {
-          propertyScales.push(scale);
-        }
-      });
-      return propertyScales;
     }
   }
 }

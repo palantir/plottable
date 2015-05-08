@@ -6346,7 +6346,6 @@ var Plottable;
             var _this = this;
             _super.prototype.destroy.call(this);
             this._scales().forEach(function (scale) { return scale.offUpdate(_this._renderCallback); });
-            this._propertyScales().forEach(function (scale) { return scale.offUpdate(_this._renderCallback); });
             this.datasets().forEach(function (dataset) { return _this.removeDataset(dataset); });
         };
         /**
@@ -6506,6 +6505,12 @@ var Plottable;
                     scales.push(scale);
                 }
             });
+            this._propertyBindings.forEach(function (property, binding) {
+                var scale = binding.scale;
+                if (scale != null && scales.indexOf(scale) === -1) {
+                    scales.push(scale);
+                }
+            });
             return scales;
         };
         /**
@@ -6514,9 +6519,8 @@ var Plottable;
         Plot.prototype._updateExtents = function () {
             var _this = this;
             this._attrBindings.forEach(function (attr) { return _this._updateExtentsForAttr(attr); });
-            this._scales().forEach(function (scale) { return scale._autoDomainIfAutomaticMode(); });
             this._propertyExtents.forEach(function (property) { return _this._updateExtentsForProperty(property); });
-            this._propertyScales().forEach(function (scale) { return scale._autoDomainIfAutomaticMode(); });
+            this._scales().forEach(function (scale) { return scale._autoDomainIfAutomaticMode(); });
         };
         Plot.prototype._updateExtentsForAttr = function (attr) {
             var _this = this;
@@ -6789,16 +6793,6 @@ var Plottable;
                     newScale._autoDomainIfAutomaticMode();
                 }
             }
-        };
-        Plot.prototype._propertyScales = function () {
-            var propertyScales = [];
-            this._propertyBindings.forEach(function (property, binding) {
-                var scale = binding.scale;
-                if (scale != null && propertyScales.indexOf(scale) === -1) {
-                    propertyScales.push(scale);
-                }
-            });
-            return propertyScales;
         };
         return Plot;
     })(Plottable.Component);
