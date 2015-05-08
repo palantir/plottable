@@ -1254,14 +1254,11 @@ describe("NumericAxis", function () {
         svg.remove();
     });
     it("constrained tick labels do not overlap tick marks", function () {
-        var svg = TestMethods.generateSVG(300, 400);
-        var yScale = new Plottable.Scales.Linear().numTicks(100);
+        var svg = TestMethods.generateSVG(100, 50);
+        var yScale = new Plottable.Scales.Linear();
         yScale.domain([175, 185]);
         var yAxis = new Plottable.Axes.Numeric(yScale, "left").tickLabelPosition("top").tickLength(50);
-        var chartTable = new Plottable.Components.Table([
-            [yAxis],
-        ]);
-        chartTable.renderTo(svg);
+        yAxis.renderTo(svg);
         var tickLabels = yAxis._element.selectAll("." + Plottable.Axis.TICK_LABEL_CLASS).filter(function (d, i) {
             var visibility = d3.select(this).style("visibility");
             return (visibility === "visible") || (visibility === "inherit");
@@ -7153,14 +7150,6 @@ describe("Scales", function () {
             var d = scale.domain();
             assert.strictEqual(d[0], 0);
             assert.strictEqual(d[1], 1);
-        });
-        it("can change the number of ticks generated", function () {
-            var scale = new Plottable.Scales.Linear();
-            var ticks10 = scale.ticks();
-            assert.closeTo(ticks10.length, 10, 1, "defaults to (about) 10 ticks");
-            scale.numTicks(20);
-            var ticks20 = scale.ticks();
-            assert.closeTo(ticks20.length, 20, 1, "can request a different number of ticks");
         });
         it("autorange defaults to [1, 10] on log scale", function () {
             var scale = new Plottable.Scales.Log();
