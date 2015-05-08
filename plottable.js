@@ -3150,7 +3150,6 @@ var Plottable;
         /**
          * Adds a callback to be called on anchoring the Component to the DOM.
          * If the component is already anchored, the callback is called immediately.
-         * To later deregister, use offAnchor(callback).
          *
          * @param {AnchorCallback} callback The callback to be called on Anchor
          *
@@ -3166,7 +3165,6 @@ var Plottable;
         /**
          * Removes a callback to be called on anchoring the Component to the DOM.
          * The callback is identified by reference equality.
-         * To register, use onAnchor(callback).
          *
          * @param {AnchorCallback} callback The callback to be removed
          *

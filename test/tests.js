@@ -8256,7 +8256,7 @@ describe("Utils", function () {
 ///<reference path="../testReference.ts" />
 var assert = chai.assert;
 describe("Interactions", function () {
-    describe("Interactions", function () {
+    describe("Interaction", function () {
         var SVG_WIDTH = 400;
         var SVG_HEIGHT = 400;
         it("attaching/detaching a component modifies the state of the interaction", function () {

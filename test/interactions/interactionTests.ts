@@ -3,7 +3,7 @@
 var assert = chai.assert;
 
 describe("Interactions", () => {
-  describe("Interactions", () => {
+  describe("Interaction", () => {
     var SVG_WIDTH = 400;
     var SVG_HEIGHT = 400;
 
