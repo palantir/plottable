@@ -1454,8 +1454,8 @@ declare module Plottable {
 
 declare module Plottable {
     module Drawers {
-        class Arc<D> extends Element {
-            constructor(key: string, plot: Plots.Pie<D>);
+        class Arc extends Element {
+            constructor(key: string);
             _drawStep(step: AppliedDrawStep): void;
             draw(data: any[], drawSteps: DrawStep[], dataset: Dataset, plotMetadata: Plots.PlotMetadata): number;
             _getPixelPoint(datum: any, index: number): Point;
