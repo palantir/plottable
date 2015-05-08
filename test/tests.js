@@ -8286,7 +8286,7 @@ describe("Interactions", function () {
             component1.renderTo(svg1);
             component2.renderTo(svg2);
             var clickInteraction = new Plottable.Interactions.Click();
-            var callbackCalled;
+            var callbackCalled = false;
             var callback = function () { return callbackCalled = true; };
             clickInteraction.onClick(callback);
             clickInteraction.attachTo(component1);
@@ -8303,21 +8303,20 @@ describe("Interactions", function () {
             callbackCalled = false;
             TestMethods.triggerFakeMouseEvent("mousedown", component1.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
             TestMethods.triggerFakeMouseEvent("mouseup", component1.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
-            assert.isFalse(callbackCalled, "Round 2 callback not called for component 1");
+            assert.isFalse(callbackCalled, "Round 2 (after longhand attaching) callback not called for component 1");
             callbackCalled = false;
             TestMethods.triggerFakeMouseEvent("mousedown", component2.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
             TestMethods.triggerFakeMouseEvent("mouseup", component2.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
-            assert.isTrue(callbackCalled, "Round 2 callback called for component 2");
-            // no detach, as this shorthand should also work
+            assert.isTrue(callbackCalled, "Round 2 (after longhand attaching) callback called for component 2");
             clickInteraction.attachTo(component1);
             callbackCalled = false;
             TestMethods.triggerFakeMouseEvent("mousedown", component1.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
             TestMethods.triggerFakeMouseEvent("mouseup", component1.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
-            assert.isTrue(callbackCalled, "Round 3 callback called for component 1");
+            assert.isTrue(callbackCalled, "Round 3 (after shorthand attaching) callback called for component 1");
             callbackCalled = false;
             TestMethods.triggerFakeMouseEvent("mousedown", component2.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
             TestMethods.triggerFakeMouseEvent("mouseup", component2.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
-            assert.isFalse(callbackCalled, "Round 3 callback not called for component 2");
+            assert.isFalse(callbackCalled, "Round 3 (after shorthand attaching) callback not called for component 2");
             svg1.remove();
             svg2.remove();
         });
