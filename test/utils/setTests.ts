@@ -40,5 +40,19 @@ describe("Utils", () => {
       set.delete(value2);
       assert.lengthOf(set.values(), 1, "removing a non-existent value does nothing");
     });
+    
+    it("has()", () => {
+      var set = new Plottable.Utils.Set();
+
+      var value1 = { value: "one" };
+      set.add(value1);
+      assert.isTrue(set.has(value1), "correctly checks that value is in the set");
+
+      var similarValue1 = { value: "one" };
+      assert.isFalse(set.has(similarValue1), "correctly determines that similar object is not in the set");
+
+      set.delete(value1);
+      assert.isFalse(set.has(value1), "correctly checks that value is no longer in the set");
+    })
   });
 });

@@ -502,7 +502,7 @@ var Plottable;
                 this._values = [];
             }
             Set.prototype.add = function (value) {
-                if (this._values.indexOf(value) === -1) {
+                if (!this.has(value)) {
                     this._values.push(value);
                 }
                 return this;
@@ -514,6 +514,9 @@ var Plottable;
                     return true;
                 }
                 return false;
+            };
+            Set.prototype.has = function (value) {
+                return this._values.indexOf(value) !== -1;
             };
             Set.prototype.values = function () {
                 return this._values;
