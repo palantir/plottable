@@ -1685,7 +1685,7 @@ declare module Plottable {
 declare module Plottable {
     class ComponentContainer extends Component {
         anchor(selection: D3.Selection): ComponentContainer;
-        render(): ComponentContainer;
+        render(immediately?: boolean): ComponentContainer;
         /**
          * Removes the specified Component from the ComponentContainer
          *
