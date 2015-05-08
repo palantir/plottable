@@ -205,6 +205,12 @@ module Plottable {
         var fn = scale ? (d: any, i: number, dataset: Dataset, m: Plots.PlotMetadata) => scale.scale(accessor(d, i, dataset, m)) : accessor;
         h[attr] = fn;
       });
+      var propertyProjectors = this._propertyToProjectors();
+      Object.keys(propertyProjectors).forEach((key) => {
+        if (h[key] == null) {
+          h[key] = propertyProjectors[key];
+        }
+      });
       return h;
     }
 
@@ -594,6 +600,19 @@ module Plottable {
           newScale._autoDomainIfAutomaticMode();
         }
       }
+    }
+
+    private static _scaledAccessor<SD, SR>(accScaleBinding: Plots.AccessorScaleBinding<SD, SR>): _Accessor {
+      return accScaleBinding.scale == null ?
+               accScaleBinding.accessor :
+               (d: any, i: number, dataset: Dataset, m: Plots.PlotMetadata) =>
+                 accScaleBinding.scale.scale(accScaleBinding.accessor(d, i, dataset, m));
+    }
+
+    private _propertyToProjectors(): AttributeToProjector {
+      var attrToProjector: AttributeToProjector = {};
+      this._propertyBindings.forEach((key, binding) => attrToProjector[key] = Plot._scaledAccessor(binding));
+      return attrToProjector;
     }
   }
 }

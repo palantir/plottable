@@ -6446,6 +6446,12 @@ var Plottable;
                 var fn = scale ? function (d, i, dataset, m) { return scale.scale(accessor(d, i, dataset, m)); } : accessor;
                 h[attr] = fn;
             });
+            var propertyProjectors = this._propertyToProjectors();
+            Object.keys(propertyProjectors).forEach(function (key) {
+                if (h[key] == null) {
+                    h[key] = propertyProjectors[key];
+                }
+            });
             return h;
         };
         /**
@@ -6794,6 +6800,14 @@ var Plottable;
                 }
             }
         };
+        Plot._scaledAccessor = function (accScaleBinding) {
+            return accScaleBinding.scale == null ? accScaleBinding.accessor : function (d, i, dataset, m) { return accScaleBinding.scale.scale(accScaleBinding.accessor(d, i, dataset, m)); };
+        };
+        Plot.prototype._propertyToProjectors = function () {
+            var attrToProjector = {};
+            this._propertyBindings.forEach(function (key, binding) { return attrToProjector[key] = Plot._scaledAccessor(binding); });
+            return attrToProjector;
+        };
         return Plot;
     })(Plottable.Component);
     Plottable.Plot = Plot;
@@ -6853,19 +6867,8 @@ var Plottable;
             Pie.prototype._generateAttrToProjector = function () {
                 var _this = this;
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
-                var propertyProjectors = this._propertyToProjectors();
-                Object.keys(propertyProjectors).forEach(function (key) {
-                    if (attrToProjector[key] == null) {
-                        attrToProjector[key] = propertyProjectors[key];
-                    }
-                });
                 var defaultFillFunction = function (d, i) { return _this._colorScale.scale(String(i)); };
                 attrToProjector["fill"] = attrToProjector["fill"] || defaultFillFunction;
-                return attrToProjector;
-            };
-            Pie.prototype._propertyToProjectors = function () {
-                var attrToProjector = {};
-                this._propertyBindings.forEach(function (key, binding) { return attrToProjector[key] = Pie._scaledAccessor(binding); });
                 return attrToProjector;
             };
             Pie.prototype._getDrawer = function (key) {
@@ -6910,9 +6913,6 @@ var Plottable;
                 this._updateExtentsForProperty(Pie._OUTER_RADIUS_KEY);
                 this._render();
                 return this;
-            };
-            Pie._scaledAccessor = function (accScaleBinding) {
-                return accScaleBinding.scale == null ? accScaleBinding.accessor : function (d, i, dataset, m) { return accScaleBinding.scale.scale(accScaleBinding.accessor(d, i, dataset, m)); };
             };
             Pie._INNER_RADIUS_KEY = "inner-radius";
             Pie._OUTER_RADIUS_KEY = "outer-radius";
