@@ -40,7 +40,7 @@ describe("Utils", () => {
       set.delete(value2);
       assert.lengthOf(set.values(), 1, "removing a non-existent value does nothing");
     });
-    
+
     it("has()", () => {
       var set = new Plottable.Utils.Set();
 
@@ -53,6 +53,6 @@ describe("Utils", () => {
 
       set.delete(value1);
       assert.isFalse(set.has(value1), "correctly checks that value is no longer in the set");
-    })
+    });
   });
 });

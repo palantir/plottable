@@ -1237,7 +1237,6 @@ var Plottable;
         var _componentsNeedingRender = new Plottable.Utils.Set();
         var _componentsNeedingComputeLayout = new Plottable.Utils.Set();
         var _animationRequested = false;
-        var _isCurrentlyFlushing = false;
         RenderController._renderPolicy = new Plottable.RenderPolicies.AnimationFrame();
         function setRenderPolicy(policy) {
             if (typeof (policy) === "string") {
@@ -3219,7 +3218,6 @@ var Plottable;
          */
         Component.prototype.render = function (immediately) {
             if (immediately === void 0) { immediately = false; }
-            console.log("render(" + immediately + "): " + this.constructor.name);
             if (immediately) {
                 this._render();
                 return this;
