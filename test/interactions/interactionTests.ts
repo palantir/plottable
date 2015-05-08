@@ -35,45 +35,60 @@ describe("Interactions", () => {
     });
 
     it("interactions are reusable", () => {
-      var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var component = new Plottable.Component();
-      component.renderTo(svg);
+      var svg1 = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      var svg2 = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      var component1 = new Plottable.Component();
+      var component2 = new Plottable.Component();
+
+      component1.renderTo(svg1);
+      component2.renderTo(svg2);
 
       var clickInteraction = new Plottable.Interactions.Click();
-      clickInteraction.attachTo(component);
 
-      var callbackCalled = false;
-      var callback = function(p: Plottable.Point) {
-        callbackCalled = true;
-      };
+      var callbackCalled: Boolean;
+      var callback = () => callbackCalled = true;
       clickInteraction.onClick(callback);
 
-      TestMethods.triggerFakeMouseEvent("mousedown", component.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
-      TestMethods.triggerFakeMouseEvent("mouseup", component.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
-      assert.isTrue(callbackCalled, "callback called on clicking Component (mouse)");
+      clickInteraction.attachTo(component1);
 
-      svg.remove();
-    });
+      callbackCalled = false;
+      TestMethods.triggerFakeMouseEvent("mousedown", component1.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+      TestMethods.triggerFakeMouseEvent("mouseup", component1.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+      assert.isTrue(callbackCalled, "Round 1 callback called for component 1");
 
-    it("attaching interaction to a second component detaches it from the first component", () => {
-      var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var component = new Plottable.Component();
-      component.renderTo(svg);
+      callbackCalled = false;
+      TestMethods.triggerFakeMouseEvent("mousedown", component2.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+      TestMethods.triggerFakeMouseEvent("mouseup", component2.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+      assert.isFalse(callbackCalled, "Round 1 callback not called for component 2");
 
-      var clickInteraction = new Plottable.Interactions.Click();
-      clickInteraction.attachTo(component);
+      clickInteraction.detachFrom(component1);
+      clickInteraction.attachTo(component2);
 
-      var callbackCalled = false;
-      var callback = function(p: Plottable.Point) {
-        callbackCalled = true;
-      };
-      clickInteraction.onClick(callback);
+      callbackCalled = false;
+      TestMethods.triggerFakeMouseEvent("mousedown", component1.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+      TestMethods.triggerFakeMouseEvent("mouseup", component1.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+      assert.isFalse(callbackCalled, "Round 2 callback not called for component 1");
 
-      TestMethods.triggerFakeMouseEvent("mousedown", component.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
-      TestMethods.triggerFakeMouseEvent("mouseup", component.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
-      assert.isTrue(callbackCalled, "callback called on clicking Component (mouse)");
+      callbackCalled = false;
+      TestMethods.triggerFakeMouseEvent("mousedown", component2.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+      TestMethods.triggerFakeMouseEvent("mouseup", component2.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+      assert.isTrue(callbackCalled, "Round 2 callback called for component 2");
 
-      svg.remove();
+      // no detach, as this shorthand should also work
+      clickInteraction.attachTo(component1);
+
+      callbackCalled = false;
+      TestMethods.triggerFakeMouseEvent("mousedown", component1.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+      TestMethods.triggerFakeMouseEvent("mouseup", component1.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+      assert.isTrue(callbackCalled, "Round 3 callback called for component 1");
+
+      callbackCalled = false;
+      TestMethods.triggerFakeMouseEvent("mousedown", component2.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+      TestMethods.triggerFakeMouseEvent("mouseup", component2.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+      assert.isFalse(callbackCalled, "Round 3 callback not called for component 2");
+
+      svg1.remove();
+      svg2.remove();
     });
   });
 });
