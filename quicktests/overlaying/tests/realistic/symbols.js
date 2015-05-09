@@ -88,6 +88,6 @@ function run(svg, data, Plottable){
       }
   });
 
-  plot.registerInteraction(pointer);
-  plot.registerInteraction(key);
+  pointer.attachTo(plot);
+  key.attachTo(plot);
 }

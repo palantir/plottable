@@ -131,12 +131,12 @@ function run(svg, data, Plottable) {
   basicTable.renderTo(svg);
 
 
-  noTitleLabel.registerInteraction(new Plottable.Interactions.Click().onClick(emptyTitle));
-  shortTitleLabel.registerInteraction(new Plottable.Interactions.Click().onClick(smallTitle));
-  longTitleLabel.registerInteraction(new Plottable.Interactions.Click().onClick(longTitle));
-  noPlotsLabel.registerInteraction(new Plottable.Interactions.Click().onClick(noPlots));
-  shortLegendLabel.registerInteraction(new Plottable.Interactions.Click().onClick(twoPlots));
-  tallLegendLabel.registerInteraction(new Plottable.Interactions.Click().onClick(sixPlots));
+  new Plottable.Interactions.Click().onClick(emptyTitle).attachTo(noTitleLabel);
+  new Plottable.Interactions.Click().onClick(smallTitle).attachTo(shortTitleLabel);
+  new Plottable.Interactions.Click().onClick(longTitle).attachTo(longTitleLabel);
+  new Plottable.Interactions.Click().onClick(noPlots).attachTo(noPlotsLabel);
+  new Plottable.Interactions.Click().onClick(twoPlots).attachTo(shortLegendLabel);
+  new Plottable.Interactions.Click().onClick(sixPlots).attachTo(tallLegendLabel);
 
 
 }

@@ -52,8 +52,5 @@ function run(svg, data, Plottable) {
         }
     };
 
-    renderGroup.registerInteraction(
-        new Plottable.Interactions.Click().onClick(cb)
-    );
-
+    new Plottable.Interactions.Click().onClick(cb).attachTo(renderGroup);
 }

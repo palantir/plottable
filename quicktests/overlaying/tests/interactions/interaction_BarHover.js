@@ -17,7 +17,7 @@ function run(svg, data, Plottable) {
 
   var plot = new Plottable.Plots.Bar(xScale, yScale, true)
     .addDataset(ds)
-    .project("x", function (d, i, u) { return d.name + u.foo; }, xScale)
+    .project("x", function (d, i, dataset) { return d.name + dataset.metadata().foo; }, xScale)
     .project("y", "y", yScale)
     .project("fill", "name", colorScale);
 
@@ -38,5 +38,5 @@ function run(svg, data, Plottable) {
     }
   });
   pointer.onPointerExit(function(p) { title.text("Who?"); });
-  plot.registerInteraction(pointer);
+  pointer.attachTo(plot);
 }

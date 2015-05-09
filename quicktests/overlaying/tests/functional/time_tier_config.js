@@ -52,5 +52,5 @@ function run(svg, data, Plottable) {
     chart.renderTo(svg);
 
     var pzi = new Plottable.Interactions.PanZoom(xScale, yScale);
-    plot.registerInteraction(pzi);
+    pzi.attachTo(plot);
 }

@@ -29,7 +29,7 @@ function run(svg, data, Plottable) {
                                             [null,  xAxis]]).renderTo(svg);
 
   var clickInteraction = new Plottable.Interactions.Click();
-  barPlot.registerInteraction(clickInteraction);
+  clickInteraction.attachTo(barPlot);
   clickInteraction.onClick(function (p) {
     var bars = barPlot.getBars(p.x, p.y, true);
     if (bars == null) {

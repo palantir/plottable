@@ -245,6 +245,7 @@ declare module Plottable {
             constructor();
             add(value: T): Set<T>;
             delete(value: T): boolean;
+            has(value: T): boolean;
             values(): T[];
         }
     }
