@@ -77,8 +77,5 @@ function run(svg, data, Plottable) {
     if(backPlot === 3){ backPlot = 0; }
   }
 
-  plotGroup.registerInteraction(
-    new Plottable.Interactions.Click().onClick(cb)
-  );
-
+  new Plottable.Interactions.Click().onClick(cb).attachTo(plotGroup);
 }

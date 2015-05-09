@@ -73,7 +73,5 @@ function run(svg, data, Plottable) {
       yScale.autoDomain();
   };
 
-  cg.registerInteraction(
-    new Plottable.Interactions.DoubleClick().onDoubleClick(cb2)
-  );
+  new Plottable.Interactions.DoubleClick().onDoubleClick(cb2).attachTo(cg);
 }
