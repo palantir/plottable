@@ -6,7 +6,6 @@ module Plottable {
     protected _d3Scale: D3.Scale.QuantitativeScale;
     public _userSetDomainer: boolean = false;
     private _domainer: Domainer = new Domainer();
-    public _typeCoercer = (d: any) => +d;
     private _tickGenerator: Scales.TickGenerators.TickGenerator<D> = (scale: Plottable.QuantitativeScale<D>) => scale.getDefaultTicks();
 
     /**

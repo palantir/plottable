@@ -25,16 +25,6 @@ describe("TimeScale tests", () => {
     assert.throws(() => scale.domain([new Date("1985-10-26"), new Date("1955-11-05")]), "chronological");
   });
 
-  it("time coercer works as intended", () => {
-    var tc = new Plottable.Scales.Time()._typeCoercer;
-    assert.strictEqual(tc(null).getMilliseconds(), 0, "null converted to Date(0)");
-    // converting null to Date(0) is the correct behavior as it mirror's d3's semantics
-    assert.strictEqual(tc("Wed Dec 31 1969 16:00:00 GMT-0800 (PST)").getMilliseconds(), 0, "string parsed to date");
-    assert.strictEqual(tc(0).getMilliseconds(), 0, "number parsed to date");
-    var d = new Date(0);
-    assert.strictEqual(tc(d), d, "date passed thru unchanged");
-  });
-
   it("tickInterval produces correct number of ticks", () => {
     var scale = new Plottable.Scales.Time();
     // 100 year span

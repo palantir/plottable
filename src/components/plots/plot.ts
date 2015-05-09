@@ -274,26 +274,24 @@ module Plottable {
       var binding = this._attrBindings.get(attr);
       var accessor = binding.accessor;
       var scale = binding.scale;
-      var coercer = (scale != null) ? scale._typeCoercer : (d: any) => d;
       var extents = this._datasetKeysInOrder.map((key) => {
         var plotDatasetKey = this._key2PlotDatasetKey.get(key);
         var dataset = plotDatasetKey.dataset;
         var plotMetadata = plotDatasetKey.plotMetadata;
-        return this._computeExtent(dataset, accessor, coercer, plotMetadata);
+        return this._computeExtent(dataset, accessor, plotMetadata);
       });
       this._attrExtents.set(attr, extents);
     }
 
-    private _computeExtent(dataset: Dataset, accessor: _Accessor, typeCoercer: (d: any) => any, plotMetadata: any): any[] {
+    private _computeExtent(dataset: Dataset, accessor: _Accessor, plotMetadata: any): any[] {
       var data = dataset.data();
       var appliedAccessor = (d: any, i: number) => accessor(d, i, dataset, plotMetadata);
-      var mappedData = data.map(appliedAccessor).map(typeCoercer);
-      if (mappedData.length === 0) {
+      if (data.length === 0) {
         return [];
-      } else if (typeof(mappedData[0]) === "string") {
-        return Utils.Methods.uniq(mappedData);
+      } else if (typeof(data[0]) === "string") {
+        return Utils.Methods.uniq(data);
       } else {
-        var extent = d3.extent(mappedData);
+        var extent = d3.extent(data);
         if (extent[0] == null || extent[1] == null) {
           return [];
         } else {

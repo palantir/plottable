@@ -1521,7 +1521,6 @@ var Plottable;
          * @param {D3.Scale.Scale} scale The D3 scale backing the Scale.
          */
         function Scale(scale) {
-            this._typeCoercer = function (d) { return d; };
             this._autoDomainAutomatically = true;
             this._domainModificationInProgress = false;
             this._d3Scale = scale;
@@ -1654,7 +1653,6 @@ var Plottable;
             _super.call(this, scale);
             this._userSetDomainer = false;
             this._domainer = new Plottable.Domainer();
-            this._typeCoercer = function (d) { return +d; };
             this._tickGenerator = function (scale) { return scale.getDefaultTicks(); };
         }
         QuantitativeScale.prototype._getExtent = function () {
@@ -2018,7 +2016,6 @@ var Plottable;
                 if (scale === void 0) { scale = d3.scale.ordinal(); }
                 _super.call(this, scale);
                 this._range = [0, 1];
-                this._typeCoercer = function (d) { return d != null && d.toString ? d.toString() : d; };
                 var d3InnerPadding = 0.3;
                 this._innerPadding = Category._convertToPlottableInnerPadding(d3InnerPadding);
                 this._outerPadding = Category._convertToPlottableOuterPadding(0.5, d3InnerPadding);
@@ -2214,7 +2211,6 @@ var Plottable;
             function Time(scale) {
                 // need to cast since d3 time scales do not descend from QuantitativeScale scales
                 _super.call(this, scale == null ? d3.time.scale() : scale);
-                this._typeCoercer = function (d) { return d && d._isAMomentObject || d instanceof Date ? d : new Date(d); };
             }
             Time.prototype.tickInterval = function (interval, step) {
                 // temporarily creats a time scale from our linear scale into a time scale so we can get access to its api
@@ -6424,27 +6420,25 @@ var Plottable;
             var binding = this._attrBindings.get(attr);
             var accessor = binding.accessor;
             var scale = binding.scale;
-            var coercer = (scale != null) ? scale._typeCoercer : function (d) { return d; };
             var extents = this._datasetKeysInOrder.map(function (key) {
                 var plotDatasetKey = _this._key2PlotDatasetKey.get(key);
                 var dataset = plotDatasetKey.dataset;
                 var plotMetadata = plotDatasetKey.plotMetadata;
-                return _this._computeExtent(dataset, accessor, coercer, plotMetadata);
+                return _this._computeExtent(dataset, accessor, plotMetadata);
             });
             this._attrExtents.set(attr, extents);
         };
-        Plot.prototype._computeExtent = function (dataset, accessor, typeCoercer, plotMetadata) {
+        Plot.prototype._computeExtent = function (dataset, accessor, plotMetadata) {
             var data = dataset.data();
             var appliedAccessor = function (d, i) { return accessor(d, i, dataset, plotMetadata); };
-            var mappedData = data.map(appliedAccessor).map(typeCoercer);
-            if (mappedData.length === 0) {
+            if (data.length === 0) {
                 return [];
             }
-            else if (typeof (mappedData[0]) === "string") {
-                return Plottable.Utils.Methods.uniq(mappedData);
+            else if (typeof (data[0]) === "string") {
+                return Plottable.Utils.Methods.uniq(data);
             }
             else {
-                var extent = d3.extent(mappedData);
+                var extent = d3.extent(data);
                 if (extent[0] == null || extent[1] == null) {
                     return [];
                 }

@@ -13,8 +13,6 @@ module Plottable {
   }
 
   export class Scale<D, R> {
-    public _typeCoercer: (d: any) => any = (d: any) => d;
-
     protected _d3Scale: D3.Scale.Scale;
 
     private _callbacks: Utils.CallbackSet<ScaleCallback<Scale<D, R>>>;

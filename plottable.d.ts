@@ -766,7 +766,6 @@ declare module Plottable {
         }
     }
     class Scale<D, R> {
-        _typeCoercer: (d: any) => any;
         protected _d3Scale: D3.Scale.Scale;
         /**
          * Constructs a new Scale.
@@ -866,7 +865,6 @@ declare module Plottable {
         protected static _DEFAULT_NUM_TICKS: number;
         protected _d3Scale: D3.Scale.QuantitativeScale;
         _userSetDomainer: boolean;
-        _typeCoercer: (d: any) => number;
         /**
          * Constructs a new QuantitativeScaleScale.
          *
@@ -1065,7 +1063,6 @@ declare module Plottable {
     module Scales {
         class Category extends Scale<string, number> {
             protected _d3Scale: D3.Scale.OrdinalScale;
-            _typeCoercer: (d: any) => any;
             /**
              * Creates a CategoryScale.
              *
@@ -1161,7 +1158,6 @@ declare module Plottable {
 declare module Plottable {
     module Scales {
         class Time extends QuantitativeScale<Date> {
-            _typeCoercer: (d: any) => any;
             /**
              * Constructs a TimeScale.
              *
