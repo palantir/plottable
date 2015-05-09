@@ -14,7 +14,7 @@ module Plottable {
       }
 
       public add(value: T) {
-        if (this._values.indexOf(value) === -1) {
+        if (!this.has(value)) {
           this._values.push(value);
         }
         return this;
@@ -27,6 +27,10 @@ module Plottable {
           return true;
         }
         return false;
+      }
+
+      public has(value: T) {
+        return this._values.indexOf(value) !== -1;
       }
 
       public values() {

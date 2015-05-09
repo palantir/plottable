@@ -502,7 +502,7 @@ var Plottable;
                 this._values = [];
             }
             Set.prototype.add = function (value) {
-                if (this._values.indexOf(value) === -1) {
+                if (!this.has(value)) {
                     this._values.push(value);
                 }
                 return this;
@@ -514,6 +514,9 @@ var Plottable;
                     return true;
                 }
                 return false;
+            };
+            Set.prototype.has = function (value) {
+                return this._values.indexOf(value) !== -1;
             };
             Set.prototype.values = function () {
                 return this._values;
@@ -1234,7 +1237,6 @@ var Plottable;
         var _componentsNeedingRender = new Plottable.Utils.Set();
         var _componentsNeedingComputeLayout = new Plottable.Utils.Set();
         var _animationRequested = false;
-        var _isCurrentlyFlushing = false;
         RenderController._renderPolicy = new Plottable.RenderPolicies.AnimationFrame();
         function setRenderPolicy(policy) {
             if (typeof (policy) === "string") {
@@ -1263,9 +1265,6 @@ var Plottable;
          * @param {Component} component Any Plottable component.
          */
         function registerToRender(component) {
-            if (_isCurrentlyFlushing) {
-                Plottable.Utils.Methods.warn("Registered to render while other components are flushing: request may be ignored");
-            }
             _componentsNeedingRender.add(component);
             requestRender();
         }
@@ -1278,8 +1277,7 @@ var Plottable;
          */
         function registerToComputeLayout(component) {
             _componentsNeedingComputeLayout.add(component);
-            _componentsNeedingRender.add(component);
-            requestRender();
+            registerToRender(component);
         }
         RenderController.registerToComputeLayout = registerToComputeLayout;
         function requestRender() {
@@ -1299,9 +1297,10 @@ var Plottable;
             if (_animationRequested) {
                 // Layout
                 _componentsNeedingComputeLayout.values().forEach(function (component) { return component.computeLayout(); });
-                _isCurrentlyFlushing = true;
-                var failed = new Plottable.Utils.Set();
-                _componentsNeedingRender.values().forEach(function (component) {
+                _componentsNeedingComputeLayout = new Plottable.Utils.Set();
+                var toRender = _componentsNeedingRender;
+                _componentsNeedingRender = new Plottable.Utils.Set();
+                toRender.values().forEach(function (component) {
                     try {
                         component.render(true);
                     }
@@ -1310,13 +1309,13 @@ var Plottable;
                         window.setTimeout(function () {
                             throw err;
                         }, 0);
-                        failed.add(component);
+                        registerToRender(component); // try again later
                     }
                 });
-                _componentsNeedingComputeLayout = new Plottable.Utils.Set();
-                _componentsNeedingRender = failed;
                 _animationRequested = false;
-                _isCurrentlyFlushing = false;
+            }
+            if (_componentsNeedingRender.values().length !== 0) {
+                requestRender();
             }
         }
         RenderController.flush = flush;
