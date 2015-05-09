@@ -273,7 +273,6 @@ module Plottable {
     private _updateExtentsForAttr(attr: string) {
       var binding = this._attrBindings.get(attr);
       var accessor = binding.accessor;
-      var scale = binding.scale;
       var extents = this._datasetKeysInOrder.map((key) => {
         var plotDatasetKey = this._key2PlotDatasetKey.get(key);
         var dataset = plotDatasetKey.dataset;
@@ -286,12 +285,13 @@ module Plottable {
     private _computeExtent(dataset: Dataset, accessor: _Accessor, plotMetadata: any): any[] {
       var data = dataset.data();
       var appliedAccessor = (d: any, i: number) => accessor(d, i, dataset, plotMetadata);
-      if (data.length === 0) {
+      var mappedData = data.map(appliedAccessor);
+      if (mappedData.length === 0) {
         return [];
-      } else if (typeof(data[0]) === "string") {
-        return Utils.Methods.uniq(data);
+      } else if (typeof(mappedData[0]) === "string") {
+        return Utils.Methods.uniq(mappedData);
       } else {
-        var extent = d3.extent(data);
+        var extent = d3.extent(mappedData);
         if (extent[0] == null || extent[1] == null) {
           return [];
         } else {
