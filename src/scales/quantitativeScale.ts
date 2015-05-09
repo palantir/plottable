@@ -4,7 +4,7 @@ module Plottable {
   export class QuantitativeScale<D> extends Scale<D, number> {
     protected static _DEFAULT_NUM_TICKS = 10;
     protected _d3Scale: D3.Scale.QuantitativeScale;
-    public _userSetDomainer: boolean = false;
+    public _userSetDomainer = false;
     private _domainer: Domainer = new Domainer();
     private _tickGenerator: Scales.TickGenerators.TickGenerator<D> = (scale: Plottable.QuantitativeScale<D>) => scale.getDefaultTicks();
 
