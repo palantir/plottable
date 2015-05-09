@@ -105,13 +105,13 @@ function run(svg, data, Plottable) {
           table.renderTo(svg);
 
           var pzi = new Plottable.Interactions.PanZoom(xScale, null);
-          plotArea.registerInteraction(pzi);
+          pzi.attachTo(plotArea);
           var keyInteraction = new Plottable.Interactions.Key();
           keyInteraction.onKey(65, function() {
                                        xScale.autoDomain();
                                        pzi.resetZoom();
                                      });
-          plotArea.registerInteraction(keyInteraction);
+          keyInteraction.attachTo(plotArea);
 
         });
     });

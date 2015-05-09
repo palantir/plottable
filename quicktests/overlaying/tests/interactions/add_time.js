@@ -51,5 +51,5 @@ function run(svg, data, Plottable) {
 
   }
   var clickInteraction = new Plottable.Interactions.Click().onClick(addData);
-  title.registerInteraction(clickInteraction);
+  clickInteraction.attachTo(title);
 }

@@ -48,5 +48,5 @@ function run(svg, data, Plottable) {
 
   var reset = new Plottable.Interactions.DoubleClick();
   reset.onDoubleClick(function() { xScale.autoDomain(); });
-  renderGroup.registerInteraction(reset);
+  reset.attachTo(renderGroup);
 }

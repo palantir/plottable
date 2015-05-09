@@ -46,8 +46,8 @@ function run(svg, data, Plottable) {
      xAxis.formatter(EmpIDFormatter);
   }
 
-  IdTitle.registerInteraction(new Plottable.Interactions.Click().onClick(identity_frmt));
-  DowTitle.registerInteraction(new Plottable.Interactions.Click().onClick(dow_frmt));
-  EmpIDTitle.registerInteraction(new Plottable.Interactions.Click().onClick(emp_frmt));
+  new Plottable.Interactions.Click().onClick(identity_frmt).attachTo(IdTitle);
+  new Plottable.Interactions.Click().onClick(dow_frmt).attachTo(DowTitle);
+  new Plottable.Interactions.Click().onClick(emp_frmt).attachTo(EmpIDTitle);
 
 }

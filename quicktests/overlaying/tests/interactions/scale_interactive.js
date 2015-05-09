@@ -45,8 +45,6 @@ function run(svg, data, Plottable) {
 
   basicTable.renderTo(svg);
 
-  renderAreaD1.registerInteraction(
-    new Plottable.Interactions.PanZoom(xScale, yScale)
-  );
+  new Plottable.Interactions.PanZoom(xScale, yScale).attachTo(renderAreaD1);
 
 }

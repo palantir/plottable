@@ -22,7 +22,5 @@ function run(svg, data, Plottable) {
 
   chart.renderTo(svg);
 
-  plot.registerInteraction(
-    new Plottable.Interactions.PanZoom(xScale, yScale)
-  );
+  new Plottable.Interactions.PanZoom(xScale, yScale).attachTo(plot);
 }
