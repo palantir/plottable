@@ -46,7 +46,7 @@ function run(svg, data, Plottable) {
   "use strict";
 
   var formatter = d3.time.format("%Y");
-  var xScale = new Plottable.Scales.Time().numTicks(5);
+  var xScale = new Plottable.Scales.Time();
   var yScale1 = new Plottable.Scales.Linear();
   var yScale2 = new Plottable.Scales.Linear();
 
