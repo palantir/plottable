@@ -78,7 +78,7 @@ function run(svg, data, Plottable) {
 
           var legend = new Plottable.Components.Legend(colorScale);
           legend.maxEntriesPerRow(1);
-          legend.yAlign("top").xOffset(-5);
+          legend.yAlign("top");
           var plotArea = new Plottable.Components.Group([line_aapl, line_goog, legend]);
 
           var yScale_diff = new Plottable.Scales.Linear();
