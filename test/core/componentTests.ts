@@ -283,10 +283,10 @@ describe("Component behavior", () => {
     var horizontalComponent = new Plottable.Component();
     var verticalComponent = new Plottable.Component();
     var placeHolder = new Plottable.Component();
-    var t = new Plottable.Components.Table().addComponent(verticalComponent, 0, 0)
-                                 .addComponent(new Plottable.Component(), 0, 1)
-                                 .addComponent(placeHolder, 1, 0)
-                                 .addComponent(horizontalComponent, 1, 1);
+    var t = new Plottable.Components.Table().add(verticalComponent, 0, 0)
+                                 .add(new Plottable.Component(), 0, 1)
+                                 .add(placeHolder, 1, 0)
+                                 .add(horizontalComponent, 1, 1);
     t.renderTo(svg);
     horizontalComponent.xAlign("center");
     verticalComponent.yAlign("bottom");

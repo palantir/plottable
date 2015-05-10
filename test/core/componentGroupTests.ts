@@ -3,6 +3,52 @@
 var assert = chai.assert;
 
 describe("ComponentGroups", () => {
+  it("add()", () => {
+    var componentGroup = new Plottable.Components.Group();
+
+    var c1 = new Plottable.Component();
+    componentGroup.add(c1);
+    assert.deepEqual(componentGroup.components(), [c1], "Component 1 was added to the Group");
+
+    var c2 = new Plottable.Component();
+    componentGroup.add(c2);
+    assert.deepEqual(componentGroup.components(), [c1, c2], "appended Component 2 to the Group");
+
+    var c0 = new Plottable.Component();
+    componentGroup.add(c0, true);
+    assert.deepEqual(componentGroup.components(), [c0, c1, c2], "prepended Component 0 when called with \"true\"");
+
+    componentGroup.add(c1);
+    assert.deepEqual(componentGroup.components(), [c0, c1, c2], "adding an already-added Component does nothing");
+
+    var svg = TestMethods.generateSVG();
+    componentGroup.renderTo(svg);
+    var c3 = new Plottable.Component();
+    componentGroup.add(c3);
+    assert.deepEqual(componentGroup.components(), [c0, c1, c2, c3], "Components can be add()-ed after rendering");
+
+    svg.remove();
+  });
+
+  it("remove()", () => {
+    var c0 = new Plottable.Component();
+    var c1 = new Plottable.Component();
+    var c2 = new Plottable.Component();
+    var componentGroup = new Plottable.Components.Group([c0, c1, c2]);
+
+    componentGroup.remove(c1);
+    assert.deepEqual(componentGroup.components(), [c0, c2], "removing a Component respects the order of the remaining Components");
+
+    var svg = TestMethods.generateSVG();
+    c1.renderTo(svg);
+    componentGroup.remove(c1);
+    assert.deepEqual(componentGroup.components(), [c0, c2],
+    "removing a Component not in the Group does not remove Components from the Group");
+    assert.strictEqual(svg.node().childNodes[0], (<D3.Selection> (<any> c1)._element).node(), "The Component not in the Group stayed put");
+
+    svg.remove();
+  });
+
   it("components in componentGroups overlap", () => {
     var c1 = TestMethods.makeFixedSizeComponent(10, 10);
     var c2 = new Plottable.Component();
@@ -24,30 +70,7 @@ describe("ComponentGroups", () => {
     svg.remove();
   });
 
-  it("components can be added before and after anchoring", () => {
-    var c1 = TestMethods.makeFixedSizeComponent(10, 10);
-    var c2 = TestMethods.makeFixedSizeComponent(20, 20);
-    var c3 = new Plottable.Component();
-
-    var cg = new Plottable.Components.Group([c1]);
-    var svg = TestMethods.generateSVG(400, 400);
-    cg.below(c2).anchor(svg);
-    (<any> c1)._addBox("test-box1");
-    (<any> c2)._addBox("test-box2");
-    cg.computeLayout().render();
-    var t1 = svg.select(".test-box1");
-    var t2 = svg.select(".test-box2");
-    TestMethods.assertWidthHeight(t1, 10, 10, "rect1 sized correctly");
-    TestMethods.assertWidthHeight(t2, 20, 20, "rect2 sized correctly");
-    cg.below(c3);
-    (<any> c3)._addBox("test-box3");
-    cg.computeLayout().render();
-    var t3 = svg.select(".test-box3");
-    TestMethods.assertWidthHeight(t3, 400, 400, "rect3 sized correctly");
-    svg.remove();
-  });
-
-  it("detach() and remove() work correctly for componentGroup", () => {
+  it("detach()", () => {
     var c1 = new Plottable.Component().classed("component-1", true);
     var c2 = new Plottable.Component().classed("component-2", true);
     var cg = new Plottable.Components.Group([c1, c2]);
@@ -84,23 +107,6 @@ describe("ComponentGroups", () => {
     assert.isNotNull(c1Node, "componet 1 was also added back to the DOM");
 
     svg.remove();
-  });
-
-  it("detachAll() works as expected", () => {
-    var cg = new Plottable.Components.Group();
-    var c1 = new Plottable.Component();
-    var c2 = new Plottable.Component();
-    var c3 = new Plottable.Component();
-    assert.isTrue(cg.empty(), "cg initially empty");
-    cg.below(c1).below(c2).below(c3);
-    assert.isFalse(cg.empty(), "cg not empty after merging components");
-    cg.detachAll();
-    assert.isTrue(cg.empty(), "cg empty after detachAll()");
-
-    assert.isFalse((<any> c1)._isAnchored, "c1 was detached");
-    assert.isFalse((<any> c2)._isAnchored, "c2 was detached");
-    assert.isFalse((<any> c3)._isAnchored, "c3 was detached");
-    assert.lengthOf(cg.components(), 0, "cg has no components");
   });
 
   describe("requests space based on contents, but occupies total offered space", () => {
@@ -162,8 +168,8 @@ describe("ComponentGroups", () => {
     it("can move components to other groups after anchoring", () => {
       var svg = TestMethods.generateSVG();
 
-      var cg1 = new Plottable.ComponentContainer();
-      var cg2 = new Plottable.ComponentContainer();
+      var cg1 = new Plottable.Components.Group();
+      var cg2 = new Plottable.Components.Group();
       var c = new Plottable.Component();
 
       cg1.add(c);
@@ -198,8 +204,8 @@ describe("ComponentGroups", () => {
       svg.remove();
     });
 
-    it("can add null to a component without failing", () => {
-      var cg1 = new Plottable.ComponentContainer();
+    it("can add null to a Group without failing", () => {
+      var cg1 = new Plottable.Components.Group();
       var c = new Plottable.Component;
 
       cg1.add(c);
@@ -221,7 +227,6 @@ describe("ComponentGroups", () => {
       var c4 = new Plottable.Component();
 
       describe("above()", () => {
-
         it("Component.above works as expected (Component.above Component)", () => {
           var cg: Plottable.Components.Group = c2.above(c1);
           var innerComponents: Plottable.Component[] = cg.components();

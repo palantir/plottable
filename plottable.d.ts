@@ -1688,37 +1688,25 @@ declare module Plottable {
         anchor(selection: D3.Selection): ComponentContainer;
         render(): ComponentContainer;
         /**
-         * Removes the specified Component from the ComponentContainer
-         *
-         * @param c Component the Component to remove.
+         * Removes the specified Component from the ComponentContainer.
          */
-        remove(c: Component): void;
+        remove(component: Component): ComponentContainer;
         /**
-         * Adds the specified Component to the ComponentContainer.
+         * Carry out the actual removal of a Component.
+         * Implementation dependent on the type of container.
          *
-         * @param c Component the component to add
-         * @param prepend boolean whether the component should be prepended to the componentContainer or not.
+         * @return {boolean} true if the Component was successfully removed, false otherwise.
          */
-        add(c: Component, prepend?: boolean): boolean;
+        protected _remove(component: Component): boolean;
         /**
          * Returns a list of components in the ComponentContainer.
          *
          * @returns {Component[]} the contained Components
          */
-        components(): Component[];
+        protected _components(): Component[];
         /**
-         * Returns true iff the ComponentContainer is empty.
-         *
-         * @returns {boolean} Whether the calling ComponentContainer is empty.
+         * Destroys the ComponentContainer and all Components within it.
          */
-        empty(): boolean;
-        /**
-         * Detaches all components contained in the ComponentContainer, and
-         * empties the ComponentContainer.
-         *
-         * @returns {ComponentContainer} The calling ComponentContainer
-         */
-        detachAll(): ComponentContainer;
         destroy(): void;
     }
 }
@@ -1750,6 +1738,19 @@ declare module Plottable {
             };
             fixedWidth(): boolean;
             fixedHeight(): boolean;
+            /**
+             * @return {Component[]} The Components in this Group.
+             */
+            components(): Component[];
+            protected _components(): Component[];
+            /**
+             * Adds a Component to the Group.
+             *
+             * @param {Component} component
+             * @param {boolean} prepend If true, prepends the Component. If false, appends it.
+             */
+            add(component: Component, prepend?: boolean): Group;
+            protected _remove(component: Component): boolean;
         }
     }
 }
@@ -2366,6 +2367,7 @@ declare module Plottable {
              * null can be used if a cell is empty. (default = [])
              */
             constructor(rows?: Component[][]);
+            protected _components(): Component[];
             /**
              * Adds a Component in the specified row and column position.
              *
@@ -2373,9 +2375,9 @@ declare module Plottable {
              * could call
              * ```typescript
              * var table = new Table();
-             * table.addComponent(a, 0, 0);
-             * table.addComponent(b, 0, 1);
-             * table.addComponent(c, 1, 1);
+             * table.add(a, 0, 0);
+             * table.add(b, 0, 1);
+             * table.add(c, 1, 1);
              * ```
              *
              * @param {Component} component The Component to be added.
@@ -2383,13 +2385,8 @@ declare module Plottable {
              * @param {number} col The column in which to add the Component.
              * @returns {Table} The calling Table.
              */
-            addComponent(component: Component, row: number, col: number): Table;
-            /**
-             * Removes a Component.
-             *
-             * @param {Component} component The Component to be removed.
-             */
-            removeComponent(component: Component): void;
+            add(component: Component, row: number, col: number): Table;
+            protected _remove(component: Component): boolean;
             requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
             computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Table;
             /**

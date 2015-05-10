@@ -3,6 +3,7 @@
 module Plottable {
 export module Components {
   export class Group extends ComponentContainer {
+    private _componentList: Component[] = [];
 
     /**
      * Constructs a Component.Group.
@@ -24,7 +25,7 @@ export module Components {
     }
 
     public requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
-      var requests = this.components().map((c: Component) => c.requestedSpace(offeredWidth, offeredHeight));
+      var requests = this._components().map((c: Component) => c.requestedSpace(offeredWidth, offeredHeight));
       return {
         minWidth: Utils.Methods.max<_SpaceRequest, number>(requests, (request: _SpaceRequest) => request.minWidth, 0),
         minHeight: Utils.Methods.max<_SpaceRequest, number>(requests, (request: _SpaceRequest) => request.minHeight, 0)
@@ -38,7 +39,7 @@ export module Components {
 
     public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
       super.computeLayout(origin, availableWidth, availableHeight);
-      this.components().forEach((c) => {
+      this._components().forEach((c) => {
         c.computeLayout({ x: 0, y: 0 }, this.width(), this.height());
       });
       return this;
@@ -52,12 +53,55 @@ export module Components {
     }
 
     public fixedWidth(): boolean {
-      return this.components().every((c) => c.fixedWidth());
+      return this._components().every((c) => c.fixedWidth());
     }
 
     public fixedHeight(): boolean {
-      return this.components().every((c) => c.fixedHeight());
+      return this._components().every((c) => c.fixedHeight());
     }
+
+    /**
+     * @return {Component[]} The Components in this Group.
+     */
+    public components(): Component[] {
+      return this._componentList.slice();
+    }
+
+    protected _components(): Component[] {
+      return this._componentList;
+    }
+
+    /**
+     * Adds a Component to the Group.
+     * 
+     * @param {Component} component
+     * @param {boolean} prepend If true, prepends the Component. If false, appends it.
+     */
+    public add(component: Component, prepend = false) {
+      if (component != null && this._componentList.indexOf(component) === -1) {
+        if (prepend) {
+          this._componentList.unshift(component);
+        } else {
+          this._componentList.push(component);
+        }
+        component._parent(this);
+        if (this._isAnchored) {
+          component.anchor(this._content);
+        }
+        this.redraw();
+      }
+      return this;
+    }
+
+    protected _remove(component: Component) {
+      var removeIndex = this._componentList.indexOf(component);
+      if (removeIndex >= 0) {
+        this._componentList.splice(removeIndex, 1);
+        return true;
+      }
+      return false;
+    }
+
   }
 }
 }
