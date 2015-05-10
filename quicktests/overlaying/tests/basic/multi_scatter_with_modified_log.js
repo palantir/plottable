@@ -43,13 +43,13 @@ function run(svg, data, Plottable) {
   var legend1 = new Plottable.Components.Legend(colorScale);
   legend1.maxEntriesPerRow(1);
 
-  var titleTable = new Plottable.Components.Table().addComponent(title1, 0, 0)
-                                        .addComponent(legend1, 0, 1);
+  var titleTable = new Plottable.Components.Table().add(title1, 0, 0)
+                                        .add(legend1, 0, 1);
 
-  var basicTable = new Plottable.Components.Table().addComponent(titleTable, 0, 2)
-              .addComponent(yAxis, 1, 1)
-              .addComponent(scatterPlot, 1, 2)
-              .addComponent(xAxis, 2, 2);
+  var basicTable = new Plottable.Components.Table().add(titleTable, 0, 2)
+              .add(yAxis, 1, 1)
+              .add(scatterPlot, 1, 2)
+              .add(xAxis, 2, 2);
 
   basicTable.renderTo(svg);
 }

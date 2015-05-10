@@ -36,10 +36,10 @@ function run(svg, data, Plottable) {
   var label = new Plottable.Components.Label("Width is 3*d.x + 3", "horizontal");
 
   var xAxisTable = new Plottable.Components.Table([[xAxis],[label]]);
-  var basicTable = new Plottable.Components.Table().addComponent(title1, 0, 2)
-                                          .addComponent(yAxis, 1, 1)
-                                          .addComponent(renderAreaD1, 1, 2)
-                                          .addComponent(xAxisTable, 2, 2);
+  var basicTable = new Plottable.Components.Table().add(title1, 0, 2)
+                                          .add(yAxis, 1, 1)
+                                          .add(renderAreaD1, 1, 2)
+                                          .add(xAxisTable, 2, 2);
 
   basicTable.renderTo(svg);
 }

@@ -35,9 +35,9 @@ function run(svg, data, Plottable) {
     var renderGroup = barPlot.below(scatterPlot);
 
     var basicTable = new Plottable.Components.Table()
-                .addComponent(yAxis, 2, 0)
-                .addComponent(renderGroup, 2, 1)
-                .addComponent(xAxis, 3, 1);
+                .add(yAxis, 2, 0)
+                .add(renderGroup, 2, 1)
+                .add(xAxis, 3, 1);
 
     basicTable.renderTo(svg);
 

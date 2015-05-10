@@ -38,32 +38,32 @@ function run(svg, data, Plottable) {
     //test merge:
     //empty component + empty component
 
-    var basicTable0 = new Plottable.Components.Table().addComponent(yAxis0, 0, 0);
+    var basicTable0 = new Plottable.Components.Table().add(yAxis0, 0, 0);
 
     //empty component + XYRenderer
-    var basicTable1 = new Plottable.Components.Table().addComponent(renderAreaD0, 0, 1);
+    var basicTable1 = new Plottable.Components.Table().add(renderAreaD0, 0, 1);
 
 
     //XYRenderer + empty component
-    var basicTable2 = new Plottable.Components.Table().addComponent(yAxis2, 0, 0)
-                                          .addComponent(renderAreaD1, 0, 1)
-                                          .addComponent(xAxis2, 1, 1);
+    var basicTable2 = new Plottable.Components.Table().add(yAxis2, 0, 0)
+                                          .add(renderAreaD1, 0, 1)
+                                          .add(xAxis2, 1, 1);
     //XYRenderer + XYRenderer
     var renderGroup3 = renderAreaD3.below(renderAreaD2);
-    var basicTable3 = new Plottable.Components.Table().addComponent(renderGroup3, 0, 1)
-                                          .addComponent(xAxis3, 1, 1);
+    var basicTable3 = new Plottable.Components.Table().add(renderGroup3, 0, 1)
+                                          .add(xAxis3, 1, 1);
 
     var bigtable = new Plottable.Components.Table();
 
     var line1 = new Plottable.Components.Label("Tables in Tables", "horizontal");
     var line2 = new Plottable.Components.Label("for Dan", "horizontal");
 
-    bigtable = new Plottable.Components.Table().addComponent(basicTable0, 0, 0)
-                                          .addComponent(basicTable1, 0, 2)
-                                          .addComponent(basicTable2, 3, 0)
-                                          .addComponent(basicTable3, 3, 2)
-                                          .addComponent(line1, 1, 1)
-                                          .addComponent(line2, 2, 1);
+    bigtable = new Plottable.Components.Table().add(basicTable0, 0, 0)
+                                          .add(basicTable1, 0, 2)
+                                          .add(basicTable2, 3, 0)
+                                          .add(basicTable3, 3, 2)
+                                          .add(line1, 1, 1)
+                                          .add(line2, 2, 1);
     bigtable.renderTo(svg);
 
 

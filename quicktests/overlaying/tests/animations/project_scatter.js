@@ -45,10 +45,10 @@ function run(svg, data, Plottable) {
     var title1 = new Plottable.Components.TitleLabel( "Opacity, r, color", "horizontal");
 
     var basicTable = new Plottable.Components.Table()
-                .addComponent(title1, 0, 2)
-                .addComponent(yAxis, 1, 1)
-                .addComponent(renderAreaD1, 1, 2)
-                .addComponent(xAxis, 2, 2);
+                .add(title1, 0, 2)
+                .add(yAxis, 1, 1)
+                .add(renderAreaD1, 1, 2)
+                .add(xAxis, 2, 2);
 
     basicTable.renderTo(svg);
 

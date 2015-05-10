@@ -49,19 +49,19 @@ function run(svg, data, Plottable) {
   var legend1 = new Plottable.Components.Legend(colorScale1);
   legend1.maxEntriesPerRow(1);
 
-  var titleTable = new Plottable.Components.Table().addComponent(title1, 0, 0)
-                                        .addComponent(legend1, 0, 1);
+  var titleTable = new Plottable.Components.Table().add(title1, 0, 0)
+                                        .add(legend1, 0, 1);
 
   var plotGroup = scatterPlot.below(linePlot).below(areaPlot);
 
   var basicTable = new Plottable.Components.Table()
-              .addComponent(yAxis, 2, 0)
-              .addComponent(plotGroup, 2, 1)
-              .addComponent(xAxis, 3, 1);
+              .add(yAxis, 2, 0)
+              .add(plotGroup, 2, 1)
+              .add(xAxis, 3, 1);
 
   var bigTable = new Plottable.Components.Table()
-             .addComponent(titleTable, 0, 0)
-             .addComponent(basicTable, 1, 0);
+             .add(titleTable, 0, 0)
+             .add(basicTable, 1, 0);
 
   bigTable.renderTo(svg);
 
