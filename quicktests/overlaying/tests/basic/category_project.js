@@ -19,7 +19,7 @@ function run(svg, data, Plottable) {
   var xAxis = new Plottable.Axes.Category(xScale, "bottom");
   var yAxis = new Plottable.Axes.Numeric(yScale, "left");
 
-  var widthProjector = function(d, i, m) {
+  var widthProjector = function(d) {
     return (d.x*3 + 3);
   };
 
