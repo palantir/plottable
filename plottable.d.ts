@@ -2578,7 +2578,6 @@ declare module Plottable {
         protected _attrExtents: D3.Map<any[]>;
         protected _animate: boolean;
         protected _animateOnNextRender: boolean;
-        protected _propertyExtents: D3.Map<any[]>;
         protected _propertyBindings: D3.Map<Plots.AccessorScaleBinding<any, any>>;
         /**
          * Constructs a Plot.

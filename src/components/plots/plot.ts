@@ -47,7 +47,7 @@ module Plottable {
     private _renderCallback: ScaleCallback<Scale<any, any>>;
     private _onDatasetUpdateCallback: DatasetCallback;
 
-    protected _propertyExtents: D3.Map<any[]>;
+    private _propertyExtents: D3.Map<any[]>;
     protected _propertyBindings: D3.Map<Plots.AccessorScaleBinding<any, any>>;
 
     /**
