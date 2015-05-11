@@ -57,48 +57,21 @@ export module Scales {
     };
 
     /**
-     * Converts the string array into a d3 scale.
-     *
-     * @param {string[]} colors an array of strings representing color
-     *     values in hex ("#FFFFFF") or keywords ("white").
-     * @param {string} scaleType a string representing the underlying scale
-     *     type ("linear"/"log"/"sqrt"/"pow")
-     * @returns {D3.Scale.QuantitativeScaleScale} The converted QuantitativeScale d3 scale.
+     * Generates the converted QuantitativeScale.
+     * 
+     * @returns {D3.Scale.QuantitativeScale} The converted d3 QuantitativeScale
      */
-    private static _getD3InterpolatedScale(colors: string[], scaleType: string): D3.Scale.QuantitativeScale {
-      var scale: D3.Scale.QuantitativeScale;
-      switch (scaleType) {
-        case "linear":
-          scale = d3.scale.linear();
-          break;
-        case "log":
-          scale = d3.scale.log();
-          break;
-        case "sqrt":
-          scale = d3.scale.sqrt();
-          break;
-        case "pow":
-          scale = d3.scale.pow();
-          break;
-      }
-      if (scale == null) {
-        throw new Error("unknown QuantitativeScale scale type " + scaleType);
-      }
-      return scale
-                  .range([0, 1])
-                  .interpolate(InterpolatedColor._interpolateColors(colors));
+    private _getD3InterpolatedScale(): D3.Scale.QuantitativeScale {
+      return this._colorScale.range([0, 1]).interpolate(this._interpolateColors());
     }
 
     /**
-     * Creates a d3 interpolator given the color array.
-     *
-     * This class implements a scale that maps numbers to strings.
-     *
-     * @param {string[]} colors an array of strings representing color
-     *     values in hex ("#FFFFFF") or keywords ("white").
-     * @returns {D3.Transition.Interpolate} The d3 interpolator for colors.
+     * Generates the d3 interpolator for colors.
+     * 
+     * @return {D3.Transition.Interpolate} The d3 interpolator for colors.
      */
-    private static _interpolateColors(colors: string[]): D3.Transition.Interpolate {
+    private _interpolateColors(): D3.Transition.Interpolate {
+      var colors = this._colorRange;
       if (colors.length < 2) {
         throw new Error("Color scale arrays must have at least two elements.");
       };
@@ -120,7 +93,7 @@ export module Scales {
     }
 
     private _colorRange: string[];
-    private _scaleType: string;
+    private _colorScale: D3.Scale.QuantitativeScale;
 
     /**
      * Constructs an InterpolatedColorScale.
@@ -135,10 +108,10 @@ export module Scales {
      *     (linear/pow/log/sqrt). Default is "linear". @see {@link scaleType}
      *     for further options.
      */
-    constructor(colorRange: any = "reds", scaleType: string = "linear") {
+    constructor(colorRange: string | string[] = "reds", colorScale: D3.Scale.QuantitativeScale = d3.scale.linear()) {
       this._colorRange = this._resolveColorValues(colorRange);
-      this._scaleType = scaleType;
-      super(InterpolatedColor._getD3InterpolatedScale(this._colorRange, this._scaleType));
+      this._colorScale = colorScale;
+      super(this._getD3InterpolatedScale());
     }
 
     /**
@@ -168,29 +141,29 @@ export module Scales {
     }
 
     /**
-     * Gets the internal scale type.
-     *
-     * @returns {string} The current scale type.
+     * Gets the internal scale.
+     * 
+     * @returns {D3.Scale.QuantitativeScale} The current scale
      */
-    public scaleType(): string;
+     public colorScale(): D3.Scale.QuantitativeScale;
     /**
-     * Sets the internal scale type.
-     *
-     * @param {string} scaleType If provided, the type of d3 scale to use internally.  (linear/log/sqrt/pow).
-     * @returns {InterpolatedColor} The calling InterpolatedColor.
+     * Sets the internal scale.
+     * 
+     * @param {D3.Scale.QuantitativeScale} The d3 scale to use internally
+     * @returns {InterpolatedColor} The calling InterpolatedColor
      */
-    public scaleType(scaleType: string): InterpolatedColor;
-    public scaleType(scaleType?: string): any {
-      if (scaleType == null) {
-        return this._scaleType;
-      }
-      this._scaleType = scaleType;
-      this._resetScale();
-      return this;
-    }
+     public colorScale(colorScale: D3.Scale.QuantitativeScale): InterpolatedColor;
+     public colorScale(colorScale?: D3.Scale.QuantitativeScale): any {
+       if (colorScale == null) {
+         return this._colorScale;
+       }
+       this._colorScale = colorScale;
+       this._resetScale();
+       return this;
+     }
 
     private _resetScale(): any {
-      this._d3Scale = InterpolatedColor._getD3InterpolatedScale(this._colorRange, this._scaleType);
+      this._d3Scale = this._getD3InterpolatedScale();
       this._autoDomainIfAutomaticMode();
       this._dispatchUpdate();
     }

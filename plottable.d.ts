@@ -1203,7 +1203,7 @@ declare module Plottable {
              *     (linear/pow/log/sqrt). Default is "linear". @see {@link scaleType}
              *     for further options.
              */
-            constructor(colorRange?: any, scaleType?: string);
+            constructor(colorRange?: string | string[], colorScale?: D3.Scale.QuantitativeScale);
             /**
              * Gets the color range.
              *
@@ -1222,18 +1222,18 @@ declare module Plottable {
              */
             colorRange(colorRange: string | string[]): InterpolatedColor;
             /**
-             * Gets the internal scale type.
+             * Gets the internal scale.
              *
-             * @returns {string} The current scale type.
+             * @returns {D3.Scale.QuantitativeScale} The current scale
              */
-            scaleType(): string;
+            colorScale(): D3.Scale.QuantitativeScale;
             /**
-             * Sets the internal scale type.
+             * Sets the internal scale.
              *
-             * @param {string} scaleType If provided, the type of d3 scale to use internally.  (linear/log/sqrt/pow).
-             * @returns {InterpolatedColor} The calling InterpolatedColor.
+             * @param {D3.Scale.QuantitativeScale} The d3 scale to use internally
+             * @returns {InterpolatedColor} The calling InterpolatedColor
              */
-            scaleType(scaleType: string): InterpolatedColor;
+            colorScale(colorScale: D3.Scale.QuantitativeScale): InterpolatedColor;
             autoDomain(): InterpolatedColor;
         }
     }

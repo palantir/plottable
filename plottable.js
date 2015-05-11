@@ -2271,53 +2271,28 @@ var Plottable;
              *     (linear/pow/log/sqrt). Default is "linear". @see {@link scaleType}
              *     for further options.
              */
-            function InterpolatedColor(colorRange, scaleType) {
+            function InterpolatedColor(colorRange, colorScale) {
                 if (colorRange === void 0) { colorRange = "reds"; }
-                if (scaleType === void 0) { scaleType = "linear"; }
+                if (colorScale === void 0) { colorScale = d3.scale.linear(); }
                 this._colorRange = this._resolveColorValues(colorRange);
-                this._scaleType = scaleType;
-                _super.call(this, InterpolatedColor._getD3InterpolatedScale(this._colorRange, this._scaleType));
+                this._colorScale = colorScale;
+                _super.call(this, this._getD3InterpolatedScale());
             }
             /**
-             * Converts the string array into a d3 scale.
+             * Generates the converted QuantitativeScale.
              *
-             * @param {string[]} colors an array of strings representing color
-             *     values in hex ("#FFFFFF") or keywords ("white").
-             * @param {string} scaleType a string representing the underlying scale
-             *     type ("linear"/"log"/"sqrt"/"pow")
-             * @returns {D3.Scale.QuantitativeScaleScale} The converted QuantitativeScale d3 scale.
+             * @returns {D3.Scale.QuantitativeScale} The converted d3 QuantitativeScale
              */
-            InterpolatedColor._getD3InterpolatedScale = function (colors, scaleType) {
-                var scale;
-                switch (scaleType) {
-                    case "linear":
-                        scale = d3.scale.linear();
-                        break;
-                    case "log":
-                        scale = d3.scale.log();
-                        break;
-                    case "sqrt":
-                        scale = d3.scale.sqrt();
-                        break;
-                    case "pow":
-                        scale = d3.scale.pow();
-                        break;
-                }
-                if (scale == null) {
-                    throw new Error("unknown QuantitativeScale scale type " + scaleType);
-                }
-                return scale.range([0, 1]).interpolate(InterpolatedColor._interpolateColors(colors));
+            InterpolatedColor.prototype._getD3InterpolatedScale = function () {
+                return this._colorScale.range([0, 1]).interpolate(this._interpolateColors());
             };
             /**
-             * Creates a d3 interpolator given the color array.
+             * Generates the d3 interpolator for colors.
              *
-             * This class implements a scale that maps numbers to strings.
-             *
-             * @param {string[]} colors an array of strings representing color
-             *     values in hex ("#FFFFFF") or keywords ("white").
-             * @returns {D3.Transition.Interpolate} The d3 interpolator for colors.
+             * @return {D3.Transition.Interpolate} The d3 interpolator for colors.
              */
-            InterpolatedColor._interpolateColors = function (colors) {
+            InterpolatedColor.prototype._interpolateColors = function () {
+                var colors = this._colorRange;
                 if (colors.length < 2) {
                     throw new Error("Color scale arrays must have at least two elements.");
                 }
@@ -2344,16 +2319,16 @@ var Plottable;
                 this._resetScale();
                 return this;
             };
-            InterpolatedColor.prototype.scaleType = function (scaleType) {
-                if (scaleType == null) {
-                    return this._scaleType;
+            InterpolatedColor.prototype.colorScale = function (colorScale) {
+                if (colorScale == null) {
+                    return this._colorScale;
                 }
-                this._scaleType = scaleType;
+                this._colorScale = colorScale;
                 this._resetScale();
                 return this;
             };
             InterpolatedColor.prototype._resetScale = function () {
-                this._d3Scale = InterpolatedColor._getD3InterpolatedScale(this._colorRange, this._scaleType);
+                this._d3Scale = this._getD3InterpolatedScale();
                 this._autoDomainIfAutomaticMode();
                 this._dispatchUpdate();
             };
