@@ -9102,7 +9102,9 @@ var Plottable;
          * @return {Interaction}
          */
         Interaction.prototype.detachFrom = function (component) {
-            this._unanchor();
+            if (this._isAnchored) {
+                this._unanchor();
+            }
             this._componentAttachedTo = null;
             component.offAnchor(this._anchorCallback);
             return this;
