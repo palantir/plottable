@@ -68,11 +68,11 @@ export module Plots {
           data.length > 0 ? projector(data[0], i, dataset, m) : null;
       });
 
-      var xFunction       = attrToProjector["x"];
-      var yFunction       = attrToProjector["y"];
+      var xFunction = attrToProjector["x"];
+      var yFunction = attrToProjector["y"];
 
-      attrToProjector["defined"] = (d: any, i: number, u: any, m: any) =>
-          this._rejectNullsAndNaNs(d, i, u, m, xFunction) && this._rejectNullsAndNaNs(d, i, u, m, yFunction);
+      attrToProjector["defined"] = (d: any, i: number, dataset: Dataset, m: any) =>
+          this._rejectNullsAndNaNs(d, i, dataset, m, xFunction) && this._rejectNullsAndNaNs(d, i, dataset, m, yFunction);
 
       attrToProjector["stroke"] = attrToProjector["stroke"] || d3.functor(this._defaultStrokeColor);
       attrToProjector["stroke-width"] = attrToProjector["stroke-width"] || d3.functor("2px");
