@@ -325,13 +325,6 @@ module Plottable {
     /**
      * Override in subclass to add special extents, such as included values
      */
-    protected _extentsForAttr(attr: string) {
-      return this._attrExtents.get(attr);
-    }
-
-    /**
-     * Override in subclass to add special extents, such as included values
-     */
     protected _extentsForProperty(property: string) {
       return this._propertyExtents.get(property);
     }
@@ -343,7 +336,7 @@ module Plottable {
       var allSetsOfExtents: D[][][] = [];
       this._attrBindings.forEach((attr, binding) => {
         if (binding.scale === scale) {
-          var extents = this._extentsForAttr(attr);
+          var extents = this._attrExtents.get(attr);
           if (extents != null) {
             allSetsOfExtents.push(extents);
           }

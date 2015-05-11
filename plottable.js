@@ -6464,12 +6464,6 @@ var Plottable;
         /**
          * Override in subclass to add special extents, such as included values
          */
-        Plot.prototype._extentsForAttr = function (attr) {
-            return this._attrExtents.get(attr);
-        };
-        /**
-         * Override in subclass to add special extents, such as included values
-         */
         Plot.prototype._extentsForProperty = function (property) {
             return this._propertyExtents.get(property);
         };
@@ -6481,7 +6475,7 @@ var Plottable;
             var allSetsOfExtents = [];
             this._attrBindings.forEach(function (attr, binding) {
                 if (binding.scale === scale) {
-                    var extents = _this._extentsForAttr(attr);
+                    var extents = _this._attrExtents.get(attr);
                     if (extents != null) {
                         allSetsOfExtents.push(extents);
                     }
