@@ -2564,6 +2564,10 @@ declare module Plottable {
             pixelPoints: Point[];
             selection: D3.Selection;
         };
+        interface AccessorScaleBinding<D, R> {
+            accessor: _Accessor;
+            scale?: Scale<D, R>;
+        }
     }
     class Plot extends Component {
         protected _dataChanged: boolean;
@@ -2574,7 +2578,7 @@ declare module Plottable {
         protected _attrExtents: D3.Map<any[]>;
         protected _animate: boolean;
         protected _animateOnNextRender: boolean;
-        protected _renderCallback: ScaleCallback<Scale<any, any>>;
+        protected _propertyBindings: D3.Map<Plots.AccessorScaleBinding<any, any>>;
         /**
          * Constructs a Plot.
          *
@@ -2626,6 +2630,7 @@ declare module Plottable {
          * Identical to plot.attr
          */
         project(attrToSet: string, accessor: any, scale?: Scale<any, any>): Plot;
+        protected _bindProperty(property: string, value: any, scale: Scale<any, any>): void;
         protected _generateAttrToProjector(): AttributeToProjector;
         /**
          * Generates a dictionary mapping an attribute to a function that calculate that attribute's value
@@ -2649,12 +2654,10 @@ declare module Plottable {
          * Updates the extents associated with each attribute, then autodomains all scales the Plot uses.
          */
         protected _updateExtents(): void;
-        protected _computeExtent(dataset: Dataset, accessor: _Accessor, typeCoercer: (d: any) => any, plotMetadata: any): any[];
         /**
          * Override in subclass to add special extents, such as included values
          */
         protected _extentsForAttr(attr: string): any[];
-        protected _extentsForScale<D>(scale: Scale<D, any>): D[][];
         /**
          * Get the animator associated with the specified Animator key.
          *
@@ -2725,10 +2728,6 @@ declare module Plottable {
 
 declare module Plottable {
     module Plots {
-        interface AccessorScaleBinding<D, R> {
-            accessor: _Accessor;
-            scale?: Scale<D, R>;
-        }
         class Pie<D> extends Plot {
             /**
              * Constructs a PiePlot.
@@ -2743,16 +2742,13 @@ declare module Plottable {
             getAllPlotData(datasets?: Dataset[]): Plots.PlotData;
             sectorValue(): AccessorScaleBinding<D, number>;
             sectorValue(sectorValue: number | _Accessor): Plots.Pie<D>;
-            sectorValue(sectorValue: D | _Accessor, sectorValueScale: Scale<D, number>): Plots.Pie<D>;
+            sectorValue(sectorValue: D | _Accessor, scale: Scale<D, number>): Plots.Pie<D>;
             innerRadius(): AccessorScaleBinding<D, number>;
             innerRadius(innerRadius: number | _Accessor): Plots.Pie<D>;
-            innerRadius(innerRadius: D | _Accessor, innerRadiusScale: Scale<D, number>): Plots.Pie<D>;
+            innerRadius(innerRadius: D | _Accessor, scale: Scale<D, number>): Plots.Pie<D>;
             outerRadius(): AccessorScaleBinding<D, number>;
             outerRadius(outerRadius: number | _Accessor): Plots.Pie<D>;
-            outerRadius(outerRadius: D | _Accessor, outerRadiusScale: Scale<D, number>): Plots.Pie<D>;
-            destroy(): void;
-            protected _updateExtents(): void;
-            protected _extentsForScale<D>(scale: Scale<D, any>): D[][];
+            outerRadius(outerRadius: D | _Accessor, scale: Scale<D, number>): Plots.Pie<D>;
         }
     }
 }
