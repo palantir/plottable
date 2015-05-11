@@ -1,6 +1,9 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
+
+  export type AnchorCallback = (component: Component) => any;
+
   export module Components {
     export class Alignment {
       static TOP = "top";
@@ -20,24 +23,32 @@ module Plottable {
     private _origin: Point = { x: 0, y: 0 }; // Origin of the coordinate space for the Component.
 
     private _parentElement: ComponentContainer;
-    private _xAlignProportion = 0; // What % along the free space do we want to position (0 = left, .5 = center, 1 = right)
-    private _yAlignProportion = 0;
+    private _xAlignment: string = "left";
+    private static _xAlignToProportion: { [alignment: string]: number } = {
+      "left": 0,
+      "center": 0.5,
+      "right": 1
+    };
+    private _yAlignment: string = "top";
+    private static _yAlignToProportion: { [alignment: string]: number } = {
+      "top": 0,
+      "center": 0.5,
+      "bottom": 1
+    };
     protected _fixedHeightFlag = false;
     protected _fixedWidthFlag = false;
     protected _isSetup = false;
     protected _isAnchored = false;
 
-    private _interactionsToRegister: Interaction[] = [];
     private _boxes: D3.Selection[] = [];
     private _boxContainer: D3.Selection;
     private _rootSVG: D3.Selection;
     private _isTopLevelComponent = false;
     private _width: number; // Width and height of the component. Used to size the hitbox, bounding box, etc
     private _height: number;
-    private _xOffset = 0; // Offset from Origin, used for alignment and floating positioning
-    private _yOffset = 0;
     private _cssClasses: string[] = ["component"];
     private _destroyed = false;
+    private _onAnchorCallbacks = new Utils.CallbackSet<AnchorCallback>();
 
     /**
      * Attaches the Component as a child of a given D3 Selection.
@@ -67,6 +78,36 @@ module Plottable {
         this._setup();
       }
       this._isAnchored = true;
+      this._onAnchorCallbacks.callCallbacks(this);
+      return this;
+    }
+
+    /**
+     * Adds a callback to be called on anchoring the Component to the DOM.
+     * If the component is already anchored, the callback is called immediately.
+     *
+     * @param {AnchorCallback} callback The callback to be added.
+     *
+     * @return {Component}
+     */
+    public onAnchor(callback: AnchorCallback) {
+      if (this._isAnchored) {
+        callback(this);
+      }
+      this._onAnchorCallbacks.add(callback);
+      return this;
+    }
+
+    /**
+     * Removes a callback to be called on anchoring the Component to the DOM.
+     * The callback is identified by reference equality.
+     *
+     * @param {AnchorCallback} callback The callback to be removed.
+     *
+     * @return {Component}
+     */
+    public offAnchor(callback: AnchorCallback) {
+      this._onAnchorCallbacks.delete(callback);
       return this;
     }
 
@@ -96,8 +137,6 @@ module Plottable {
 
       this._boundingBox = this._addBox("bounding-box");
 
-      this._interactionsToRegister.forEach((r) => this.registerInteraction(r));
-      this._interactionsToRegister = null;
       this._isSetup = true;
     }
 
@@ -146,9 +185,11 @@ module Plottable {
       var size = this._getSize(availableWidth, availableHeight);
       this._width = size.width;
       this._height = size.height;
+      var xAlignProportion = Component._xAlignToProportion[this._xAlignment];
+      var yAlignProportion = Component._yAlignToProportion[this._yAlignment];
       this._origin = {
-        x: origin.x + this._xOffset + (availableWidth - this.width()) * this._xAlignProportion,
-        y: origin.y + this._yOffset + (availableHeight - this.height()) * this._yAlignProportion
+        x: origin.x + (availableWidth - this.width()) * xAlignProportion,
+        y: origin.y + (availableHeight - this.height()) * yAlignProportion
       };
       this._element.attr("transform", "translate(" + this._origin.x + "," + this._origin.y + ")");
       this._boxes.forEach((b: D3.Selection) => b.attr("width", this.width()).attr("height", this.height()));
@@ -239,81 +280,55 @@ module Plottable {
     }
 
     /**
-     * Sets the x alignment of the Component. This will be used if the
-     * Component is given more space than it needs.
+     * Gets the x alignment of the Component.
      *
-     * For example, you may want to make a Legend postition itself it the top
-     * right, so you would call `legend.xAlign("right")` and
-     * `legend.yAlign("top")`.
+     * @returns {string} The current x alignment.
+     */
+    public xAlign(): string;
+    /**
+     * Sets the x alignment of the Component.
      *
      * @param {string} alignment The x alignment of the Component (one of ["left", "center", "right"]).
      * @returns {Component} The calling Component.
      */
-    public xAlign(alignment: string): Component {
-      alignment = alignment.toLowerCase();
-      if (alignment === Components.Alignment.LEFT) {
-        this._xAlignProportion = 0;
-      } else if (alignment === Components.Alignment.CENTER) {
-        this._xAlignProportion = 0.5;
-      } else if (alignment === Components.Alignment.RIGHT) {
-        this._xAlignProportion = 1;
-      } else {
-        throw new Error("Unsupported alignment");
+    public xAlign(alignment: string): Component;
+    public xAlign(alignment?: string): any {
+      if (alignment == null) {
+        return this._xAlignment;
       }
-      this.redraw();
-      return this;
-    }
 
-    /**
-     * Sets the y alignment of the Component. This will be used if the
-     * Component is given more space than it needs.
-     *
-     * For example, you may want to make a Legend postition itself it the top
-     * right, so you would call `legend.xAlign("right")` and
-     * `legend.yAlign("top")`.
-     *
-     * @param {string} alignment The x alignment of the Component (one of ["top", "center", "bottom"]).
-     * @returns {Component} The calling Component.
-     */
-    public yAlign(alignment: string): Component {
       alignment = alignment.toLowerCase();
-      if (alignment === Components.Alignment.TOP) {
-        this._yAlignProportion = 0;
-      } else if (alignment === Components.Alignment.CENTER) {
-        this._yAlignProportion = 0.5;
-      } else if (alignment === Components.Alignment.BOTTOM) {
-        this._yAlignProportion = 1;
-      } else {
-        throw new Error("Unsupported alignment");
+      if (Component._xAlignToProportion[alignment] == null) {
+        throw new Error("Unsupported alignment: " + alignment);
       }
+      this._xAlignment = alignment;
       this.redraw();
       return this;
     }
 
     /**
-     * Sets the x offset of the Component. This will be used if the Component
-     * is given more space than it needs.
+     * Gets the y alignment of the Component.
      *
-     * @param {number} offset The desired x offset, in pixels, from the left
-     * side of the container.
-     * @returns {Component} The calling Component.
+     * @returns {string} The current y alignment.
      */
-    public xOffset(offset: number): Component {
-      this._xOffset = offset;
-      this.redraw();
-      return this;
-    }
-
+    public yAlign(): string;
     /**
-     * Sets the y offset of the Component. This will be used if the Component
-     * is given more space than it needs.
+     * Sets the y alignment of the Component.
      *
-     * @param {number} offset The desired y offset, in pixels, from the top
-     * side of the container.
+     * @param {string} alignment The y alignment of the Component (one of ["top", "center", "bottom"]).
      * @returns {Component} The calling Component.
      */
-    public yOffset(offset: number): Component {
-      this._yOffset = offset;
+    public yAlign(alignment: string): Component;
+    public yAlign(alignment?: string): any {
+      if (alignment == null) {
+        return this._yAlignment;
+      }
+
+      alignment = alignment.toLowerCase();
+      if (Component._yAlignToProportion[alignment] == null) {
+        throw new Error("Unsupported alignment: " + alignment);
+      }
+      this._yAlignment = alignment;
       this.redraw();
       return this;
     }
@@ -344,24 +359,6 @@ module Plottable {
       var clipPathParent = this._boxContainer.append("clipPath")
                                              .attr("id", clipPathId);
       this._addBox("clip-rect", clipPathParent);
-    }
-
-    /**
-     * Attaches an Interaction to the Component, so that the Interaction will listen for events on the Component.
-     *
-     * @param {Interaction} interaction The Interaction to attach to the Component.
-     * @returns {Component} The calling Component.
-     */
-    public registerInteraction(interaction: Interaction) {
-      // Interactions can be registered before or after anchoring. If registered before, they are
-      // pushed to this._interactionsToRegister and registered during anchoring. If after, they are
-      // registered immediately
-      if (this._element) {
-        interaction._anchor(this);
-      } else {
-        this._interactionsToRegister.push(interaction);
-      }
-      return this;
     }
 
     /**

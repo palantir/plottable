@@ -23,7 +23,7 @@ describe("Interactions", () => {
       xScale.domain([0, SVG_WIDTH / 2]).range([0, SVG_WIDTH]);
       yScale = new Plottable.Scales.Linear();
       yScale.domain([0, SVG_HEIGHT / 2]).range([0, SVG_HEIGHT]);
-      component.registerInteraction(new Plottable.Interactions.PanZoom(xScale, yScale));
+      (new Plottable.Interactions.PanZoom(xScale, yScale)).attachTo(component);
 
       eventTarget = component.background();
     });

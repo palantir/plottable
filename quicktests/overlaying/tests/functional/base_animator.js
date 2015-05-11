@@ -45,7 +45,7 @@ function run(svg, data, Plottable) {
     };
     var click = new Plottable.Interactions.Click().onClick(cb);
 
-    vbar.registerInteraction(click);
+    click.attachTo(vbar);
 
     chart.renderTo(svg);
 }

@@ -13,7 +13,7 @@ describe("Interactions", () => {
       c.renderTo(svg);
 
       var clickInteraction = new Plottable.Interactions.Click();
-      c.registerInteraction(clickInteraction);
+      clickInteraction.attachTo(c);
 
       var callbackCalled = false;
       var lastPoint: Plottable.Point;
@@ -87,7 +87,7 @@ describe("Interactions", () => {
       component.renderTo(svg);
       var clickInteraction = new Plottable.Interactions.Click();
 
-      component.registerInteraction(clickInteraction);
+      clickInteraction.attachTo(component);
 
       var callbackWasCalled = false;
       var callback = () => callbackWasCalled = true;
@@ -112,7 +112,7 @@ describe("Interactions", () => {
       component.renderTo(svg);
       var clickInteraction = new Plottable.Interactions.Click();
 
-      component.registerInteraction(clickInteraction);
+      clickInteraction.attachTo(component);
 
       var callback1WasCalled = false;
       var callback1 = () => callback1WasCalled = true;
@@ -145,7 +145,7 @@ describe("Interactions", () => {
       c.renderTo(svg);
 
       var clickInteraction = new Plottable.Interactions.Click();
-      c.registerInteraction(clickInteraction);
+      clickInteraction.attachTo(c);
 
       var callbackCalled = false;
       var callback = () => callbackCalled = true;

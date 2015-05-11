@@ -73,12 +73,12 @@ function run(svg, data, Plottable) {
      yAxis.formatter(custFormatter);
   }
 
-  IdTitle.registerInteraction(new Plottable.Interactions.Click().onClick(identity_frmt));
-  GenTitle.registerInteraction(new Plottable.Interactions.Click().onClick(general_frmt));
-  FixTitle.registerInteraction(new Plottable.Interactions.Click().onClick(fixed_frmt));
-  CurrTitle.registerInteraction(new Plottable.Interactions.Click().onClick(currency_frmt));
-  PerTitle.registerInteraction(new Plottable.Interactions.Click().onClick(percentage_frmt));
-  SITitle.registerInteraction(new Plottable.Interactions.Click().onClick(SI_frmt));
-  CustTitle.registerInteraction(new Plottable.Interactions.Click().onClick(custom_frmt));
+  new Plottable.Interactions.Click().onClick(identity_frmt).attachTo(IdTitle);
+  new Plottable.Interactions.Click().onClick(general_frmt).attachTo(GenTitle);
+  new Plottable.Interactions.Click().onClick(fixed_frmt).attachTo(FixTitle);
+  new Plottable.Interactions.Click().onClick(currency_frmt).attachTo(CurrTitle);
+  new Plottable.Interactions.Click().onClick(percentage_frmt).attachTo(PerTitle);
+  new Plottable.Interactions.Click().onClick(SI_frmt).attachTo(SITitle);
+  new Plottable.Interactions.Click().onClick(custom_frmt).attachTo(CustTitle);
 
 }

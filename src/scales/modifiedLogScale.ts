@@ -38,7 +38,6 @@ export module Scales {
       this.base = base;
       this.pivot = this.base;
       this.untransformedDomain = this._defaultExtent();
-      this.numTicks(10);
       if (base <= 1) {
         throw new Error("ModifiedLogScale: The base must be > 1");
       }
@@ -99,7 +98,7 @@ export module Scales {
       this._dispatchUpdate();
     }
 
-    public ticks(count = this.numTicks()): number[] {
+    public ticks(): number[] {
       // Say your domain is [-100, 100] and your pivot is 10.
       // then we're going to draw negative log ticks from -100 to -10,
       // linear ticks from -10 to 10, and positive log ticks from 10 to 100.
@@ -121,7 +120,7 @@ export module Scales {
       var ticks = negativeLogTicks.concat(linearTicks).concat(positiveLogTicks);
       // If you only have 1 tick, you can't tell how big the scale is.
       if (ticks.length <= 1) {
-        ticks = d3.scale.linear().domain([min, max]).ticks(count);
+        ticks = d3.scale.linear().domain([min, max]).ticks(ModifiedLog._DEFAULT_NUM_TICKS);
       }
       return ticks;
     }
@@ -170,7 +169,7 @@ export module Scales {
       var adjustedLower = this.adjustedLog(lower);
       var adjustedUpper = this.adjustedLog(upper);
       var proportion = (adjustedUpper - adjustedLower) / (adjustedMax - adjustedMin);
-      var ticks = Math.ceil(proportion * this.numTicks());
+      var ticks = Math.ceil(proportion * ModifiedLog._DEFAULT_NUM_TICKS);
       return ticks;
     }
 

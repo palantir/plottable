@@ -33,8 +33,8 @@ function run(svg, data, Plottable) {
 
 
   // metadata is broken
-  var colorProjector = function(d, i, m) {
-    return colorScale1.scale(m.name);
+  var colorProjector = function(d, i, dataset) {
+    return colorScale1.scale(dataset.metadata().name);
   };
 
   //rendering
@@ -121,22 +121,24 @@ function run(svg, data, Plottable) {
 
   var labelTable = new Plottable.Components.Table([[noTitleLabel, noPlotsLabel],
     [shortTitleLabel, shortLegendLabel],
-    [longTitleLabel, tallLegendLabel]]);
+    [longTitleLabel, tallLegendLabel]
+  ]);
 
   var basicTable = new Plottable.Components.Table([[null, titleTable],
-   [yAxis, renderArea],
-   [null, xAxis],
-   [null, labelTable]]);
+    [yAxis, renderArea],
+    [null, xAxis],
+    [null, labelTable]
+  ]);
 
   basicTable.renderTo(svg);
 
 
-  noTitleLabel.registerInteraction(new Plottable.Interactions.Click().onClick(emptyTitle));
-  shortTitleLabel.registerInteraction(new Plottable.Interactions.Click().onClick(smallTitle));
-  longTitleLabel.registerInteraction(new Plottable.Interactions.Click().onClick(longTitle));
-  noPlotsLabel.registerInteraction(new Plottable.Interactions.Click().onClick(noPlots));
-  shortLegendLabel.registerInteraction(new Plottable.Interactions.Click().onClick(twoPlots));
-  tallLegendLabel.registerInteraction(new Plottable.Interactions.Click().onClick(sixPlots));
+  new Plottable.Interactions.Click().onClick(emptyTitle).attachTo(noTitleLabel);
+  new Plottable.Interactions.Click().onClick(smallTitle).attachTo(shortTitleLabel);
+  new Plottable.Interactions.Click().onClick(longTitle).attachTo(longTitleLabel);
+  new Plottable.Interactions.Click().onClick(noPlots).attachTo(noPlotsLabel);
+  new Plottable.Interactions.Click().onClick(twoPlots).attachTo(shortLegendLabel);
+  new Plottable.Interactions.Click().onClick(sixPlots).attachTo(tallLegendLabel);
 
 
 }

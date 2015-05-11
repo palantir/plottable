@@ -33,5 +33,5 @@ function run(svg, data, Plottable) {
     dataset.data(d);
   };
 
-  lineRenderer.registerInteraction(new Plottable.Interactions.Click().onClick(cb));
+  new Plottable.Interactions.Click().onClick(cb).attachTo(lineRenderer);
 }

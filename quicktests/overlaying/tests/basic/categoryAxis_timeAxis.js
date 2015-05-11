@@ -32,5 +32,5 @@ function run(svg, data, Plottable) {
 
   chart.renderTo(svg);
 
-  hBarPlot.registerInteraction(new Plottable.Interactions.PanZoom(xScale, null));
+  new Plottable.Interactions.PanZoom(xScale, null).attachTo(hBarPlot);
 }

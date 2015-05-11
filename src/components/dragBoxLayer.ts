@@ -44,7 +44,7 @@ export module Components {
 
       this._dragInteraction = new Interactions.Drag();
       this._setUpCallbacks();
-      this.registerInteraction(this._dragInteraction);
+      this._dragInteraction.attachTo(this);
 
       this._dragStartCallbacks = new Utils.CallbackSet<DragBoxCallback>();
       this._dragCallbacks = new Utils.CallbackSet<DragBoxCallback>();

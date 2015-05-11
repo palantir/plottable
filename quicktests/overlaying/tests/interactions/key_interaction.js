@@ -24,7 +24,7 @@ function run(svg, data, Plottable) {
   basicTable.renderTo(svg);
 
   var pzi = new Plottable.Interactions.PanZoom(xScale, yScale);
-  scatterPlot.registerInteraction(pzi);
+  pzi.attachTo(scatterPlot);
 
   var ki = new Plottable.Interactions.Key();
   // press "a" (keycode 65) to reset
@@ -33,6 +33,6 @@ function run(svg, data, Plottable) {
     yScale.autoDomain();
     pzi.resetZoom();
   });
-  scatterPlot.registerInteraction(ki);
+  ki.attachTo(scatterPlot);
 
 }
