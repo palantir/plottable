@@ -6424,12 +6424,12 @@ var Plottable;
             return this;
         };
         Plot.prototype._bindProperty = function (property, value, scale) {
-            this._bindKey(property, value, scale, this._propertyBindings, this._propertyExtents);
+            this._bind(property, value, scale, this._propertyBindings, this._propertyExtents);
         };
         Plot.prototype._bindAttr = function (attr, value, scale) {
-            this._bindKey(attr, value, scale, this._attrBindings, this._attrExtents);
+            this._bind(attr, value, scale, this._attrBindings, this._attrExtents);
         };
-        Plot.prototype._bindKey = function (key, value, scale, bindings, extents) {
+        Plot.prototype._bind = function (key, value, scale, bindings, extents) {
             var binding = bindings.get(key);
             var oldScale = binding != null ? binding.scale : null;
             this._replaceScale(oldScale, scale);
