@@ -180,20 +180,20 @@ module Plottable {
     }
 
     protected _setupProperty(property: string, value: any, scale: Scale<any, any>) {
-      this._setupKey(property, value, scale, false);
+      this._setupKey(property, value, scale, this._propertyBindings, this._propertyExtents);
     }
 
     private _setupAttr(attr: string, value: any, scale: Scale<any, any>) {
-      this._setupKey(attr, value, scale, true);
+      this._setupKey(attr, value, scale, this._attrBindings, this._attrExtents);
     }
 
-    private _setupKey(key: string, value: any, scale: Scale<any, any>, ifAttr: boolean) {
-      var bindings = ifAttr ? this._attrBindings : this._propertyBindings;
+    private _setupKey(key: string, value: any, scale: Scale<any, any>,
+                      bindings: D3.Map<Plots.AccessorScaleBinding<any, any>>, extents: D3.Map<any[]>) {
       var binding = bindings.get(key);
       var oldScale = binding != null ? binding.scale : null;
       this._replaceScale(oldScale, scale);
       bindings.set(key, { accessor: d3.functor(value), scale: scale });
-      this._updateExtentsForKey(key, ifAttr);
+      this._updateExtentsForKey(key, bindings, extents);
     }
 
     protected _generateAttrToProjector(): AttributeToProjector {
@@ -287,18 +287,16 @@ module Plottable {
      * Updates the extents associated with each attribute, then autodomains all scales the Plot uses.
      */
     protected _updateExtents() {
-      this._attrBindings.forEach((attr) => this._updateExtentsForKey(attr, true));
-      this._propertyExtents.forEach((property) => this._updateExtentsForKey(property, false));
+      this._attrBindings.forEach((attr) => this._updateExtentsForKey(attr, this._attrBindings, this._attrExtents));
+      this._propertyExtents.forEach((property) => this._updateExtentsForKey(property, this._propertyBindings, this._propertyExtents));
       this._scales().forEach((scale) => scale._autoDomainIfAutomaticMode());
     }
 
-    private _updateExtentsForKey(key: string, ifAttr: boolean) {
-      var bindingMap = ifAttr ? this._attrBindings : this._propertyBindings;
-      var accScaleBinding = bindingMap.get(key);
+    private _updateExtentsForKey(key: string, bindings: D3.Map<Plots.AccessorScaleBinding<any, any>>, extents: D3.Map<any[]>) {
+      var accScaleBinding = bindings.get(key);
       if (accScaleBinding.accessor == null) { return; }
       var coercer = (accScaleBinding.scale != null) ? accScaleBinding.scale._typeCoercer : (d: any) => d;
-      var extentMap = ifAttr ? this._attrExtents : this._propertyExtents;
-      extentMap.set(key, this._datasetKeysInOrder.map((key) => {
+      extents.set(key, this._datasetKeysInOrder.map((key) => {
         var plotDatasetKey = this._key2PlotDatasetKey.get(key);
         var dataset = plotDatasetKey.dataset;
         var plotMetadata = plotDatasetKey.plotMetadata;

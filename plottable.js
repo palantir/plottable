@@ -6424,18 +6424,17 @@ var Plottable;
             return this;
         };
         Plot.prototype._setupProperty = function (property, value, scale) {
-            this._setupKey(property, value, scale, false);
+            this._setupKey(property, value, scale, this._propertyBindings, this._propertyExtents);
         };
         Plot.prototype._setupAttr = function (attr, value, scale) {
-            this._setupKey(attr, value, scale, true);
+            this._setupKey(attr, value, scale, this._attrBindings, this._attrExtents);
         };
-        Plot.prototype._setupKey = function (key, value, scale, ifAttr) {
-            var bindings = ifAttr ? this._attrBindings : this._propertyBindings;
+        Plot.prototype._setupKey = function (key, value, scale, bindings, extents) {
             var binding = bindings.get(key);
             var oldScale = binding != null ? binding.scale : null;
             this._replaceScale(oldScale, scale);
             bindings.set(key, { accessor: d3.functor(value), scale: scale });
-            this._updateExtentsForKey(key, ifAttr);
+            this._updateExtentsForKey(key, bindings, extents);
         };
         Plot.prototype._generateAttrToProjector = function () {
             var h = {};
@@ -6523,20 +6522,18 @@ var Plottable;
          */
         Plot.prototype._updateExtents = function () {
             var _this = this;
-            this._attrBindings.forEach(function (attr) { return _this._updateExtentsForKey(attr, true); });
-            this._propertyExtents.forEach(function (property) { return _this._updateExtentsForKey(property, false); });
+            this._attrBindings.forEach(function (attr) { return _this._updateExtentsForKey(attr, _this._attrBindings, _this._attrExtents); });
+            this._propertyExtents.forEach(function (property) { return _this._updateExtentsForKey(property, _this._propertyBindings, _this._propertyExtents); });
             this._scales().forEach(function (scale) { return scale._autoDomainIfAutomaticMode(); });
         };
-        Plot.prototype._updateExtentsForKey = function (key, ifAttr) {
+        Plot.prototype._updateExtentsForKey = function (key, bindings, extents) {
             var _this = this;
-            var bindingMap = ifAttr ? this._attrBindings : this._propertyBindings;
-            var accScaleBinding = bindingMap.get(key);
+            var accScaleBinding = bindings.get(key);
             if (accScaleBinding.accessor == null) {
                 return;
             }
             var coercer = (accScaleBinding.scale != null) ? accScaleBinding.scale._typeCoercer : function (d) { return d; };
-            var extentMap = ifAttr ? this._attrExtents : this._propertyExtents;
-            extentMap.set(key, this._datasetKeysInOrder.map(function (key) {
+            extents.set(key, this._datasetKeysInOrder.map(function (key) {
                 var plotDatasetKey = _this._key2PlotDatasetKey.get(key);
                 var dataset = plotDatasetKey.dataset;
                 var plotMetadata = plotDatasetKey.plotMetadata;
