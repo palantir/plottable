@@ -6419,17 +6419,17 @@ var Plottable;
         Plot.prototype.project = function (attrToSet, accessor, scale) {
             attrToSet = attrToSet.toLowerCase();
             accessor = Plottable.Utils.Methods.accessorize(accessor);
-            this._setupAttr(attrToSet, accessor, scale);
+            this._bindAttr(attrToSet, accessor, scale);
             this.render(); // queue a re-render upon changing projector
             return this;
         };
-        Plot.prototype._setupProperty = function (property, value, scale) {
-            this._setupKey(property, value, scale, this._propertyBindings, this._propertyExtents);
+        Plot.prototype._bindProperty = function (property, value, scale) {
+            this._bindKey(property, value, scale, this._propertyBindings, this._propertyExtents);
         };
-        Plot.prototype._setupAttr = function (attr, value, scale) {
-            this._setupKey(attr, value, scale, this._attrBindings, this._attrExtents);
+        Plot.prototype._bindAttr = function (attr, value, scale) {
+            this._bindKey(attr, value, scale, this._attrBindings, this._attrExtents);
         };
-        Plot.prototype._setupKey = function (key, value, scale, bindings, extents) {
+        Plot.prototype._bindKey = function (key, value, scale, bindings, extents) {
             var binding = bindings.get(key);
             var oldScale = binding != null ? binding.scale : null;
             this._replaceScale(oldScale, scale);
@@ -6872,7 +6872,7 @@ var Plottable;
                 if (sectorValue == null) {
                     return this._propertyBindings.get(Pie._SECTOR_VALUE_KEY);
                 }
-                this._setupProperty(Pie._SECTOR_VALUE_KEY, sectorValue, scale);
+                this._bindProperty(Pie._SECTOR_VALUE_KEY, sectorValue, scale);
                 this._render();
                 return this;
             };
@@ -6880,7 +6880,7 @@ var Plottable;
                 if (innerRadius == null) {
                     return this._propertyBindings.get(Pie._INNER_RADIUS_KEY);
                 }
-                this._setupProperty(Pie._INNER_RADIUS_KEY, innerRadius, scale);
+                this._bindProperty(Pie._INNER_RADIUS_KEY, innerRadius, scale);
                 this._render();
                 return this;
             };
@@ -6888,7 +6888,7 @@ var Plottable;
                 if (outerRadius == null) {
                     return this._propertyBindings.get(Pie._OUTER_RADIUS_KEY);
                 }
-                this._setupProperty(Pie._OUTER_RADIUS_KEY, outerRadius, scale);
+                this._bindProperty(Pie._OUTER_RADIUS_KEY, outerRadius, scale);
                 this._render();
                 return this;
             };

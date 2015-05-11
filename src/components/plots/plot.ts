@@ -174,20 +174,20 @@ module Plottable {
     public project(attrToSet: string, accessor: any, scale?: Scale<any, any>) {
       attrToSet = attrToSet.toLowerCase();
       accessor = Utils.Methods.accessorize(accessor);
-      this._setupAttr(attrToSet, accessor, scale);
+      this._bindAttr(attrToSet, accessor, scale);
       this.render(); // queue a re-render upon changing projector
       return this;
     }
 
-    protected _setupProperty(property: string, value: any, scale: Scale<any, any>) {
-      this._setupKey(property, value, scale, this._propertyBindings, this._propertyExtents);
+    protected _bindProperty(property: string, value: any, scale: Scale<any, any>) {
+      this._bindKey(property, value, scale, this._propertyBindings, this._propertyExtents);
     }
 
-    private _setupAttr(attr: string, value: any, scale: Scale<any, any>) {
-      this._setupKey(attr, value, scale, this._attrBindings, this._attrExtents);
+    private _bindAttr(attr: string, value: any, scale: Scale<any, any>) {
+      this._bindKey(attr, value, scale, this._attrBindings, this._attrExtents);
     }
 
-    private _setupKey(key: string, value: any, scale: Scale<any, any>,
+    private _bindKey(key: string, value: any, scale: Scale<any, any>,
                       bindings: D3.Map<Plots.AccessorScaleBinding<any, any>>, extents: D3.Map<any[]>) {
       var binding = bindings.get(key);
       var oldScale = binding != null ? binding.scale : null;
