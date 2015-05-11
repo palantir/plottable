@@ -2276,14 +2276,14 @@ var Plottable;
                 if (colorScale === void 0) { colorScale = d3.scale.linear(); }
                 this._colorRange = this._resolveColorValues(colorRange);
                 this._colorScale = colorScale;
-                _super.call(this, this._getD3InterpolatedScale());
+                _super.call(this, this._D3InterpolatedScale());
             }
             /**
              * Generates the converted QuantitativeScale.
              *
              * @returns {D3.Scale.QuantitativeScale} The converted d3 QuantitativeScale
              */
-            InterpolatedColor.prototype._getD3InterpolatedScale = function () {
+            InterpolatedColor.prototype._D3InterpolatedScale = function () {
                 return this._colorScale.range([0, 1]).interpolate(this._interpolateColors());
             };
             /**
@@ -2320,7 +2320,7 @@ var Plottable;
                 return this;
             };
             InterpolatedColor.prototype._resetScale = function () {
-                this._d3Scale = this._getD3InterpolatedScale();
+                this._d3Scale = this._D3InterpolatedScale();
                 this._autoDomainIfAutomaticMode();
                 this._dispatchUpdate();
             };

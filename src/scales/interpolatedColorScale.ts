@@ -75,7 +75,7 @@ export module Scales {
     constructor(colorRange: string | string[] = "reds", colorScale: D3.Scale.QuantitativeScale = d3.scale.linear()) {
       this._colorRange = this._resolveColorValues(colorRange);
       this._colorScale = colorScale;
-      super(this._getD3InterpolatedScale());
+      super(this._D3InterpolatedScale());
     }
 
     /**
@@ -83,7 +83,7 @@ export module Scales {
      * 
      * @returns {D3.Scale.QuantitativeScale} The converted d3 QuantitativeScale
      */
-    private _getD3InterpolatedScale(): D3.Scale.QuantitativeScale {
+    private _D3InterpolatedScale(): D3.Scale.QuantitativeScale {
       return this._colorScale.range([0, 1]).interpolate(this._interpolateColors());
     }
 
@@ -141,7 +141,7 @@ export module Scales {
     }
 
     private _resetScale(): any {
-      this._d3Scale = this._getD3InterpolatedScale();
+      this._d3Scale = this._D3InterpolatedScale();
       this._autoDomainIfAutomaticMode();
       this._dispatchUpdate();
     }
