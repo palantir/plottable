@@ -20,8 +20,8 @@ function run(svg, data, Plottable) {
   var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
   var yAxis = new Plottable.Axes.Numeric(yScale, "left");
 
-  var colorProjector = function(d, i, m) {
-     return colorScale1.scale(m.name);
+  var colorProjector = function(d, i, dataset) {
+     return colorScale1.scale(dataset.metadata().name);
   };
 
   //rendering
