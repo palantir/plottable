@@ -6333,7 +6333,7 @@ var Plottable;
         Plot.prototype._bind = function (key, value, scale, bindings, extents) {
             var binding = bindings.get(key);
             var oldScale = binding != null ? binding.scale : null;
-            this._replaceScale(oldScale, scale);
+            this._replaceScaleForKey(oldScale, scale, key);
             bindings.set(key, { accessor: d3.functor(value), scale: scale });
             this._updateExtentsForKey(key, bindings, extents);
         };
@@ -6671,17 +6671,23 @@ var Plottable;
         Plot.prototype._isVisibleOnPlot = function (datum, pixelPoint, selection) {
             return !(pixelPoint.x < 0 || pixelPoint.y < 0 || pixelPoint.x > this.width() || pixelPoint.y > this.height());
         };
-        Plot.prototype._replaceScale = function (oldScale, newScale) {
+        Plot.prototype._replaceScaleForKey = function (oldScale, newScale, key) {
             if (oldScale != null) {
-                oldScale.offUpdate(this._renderCallback);
-                oldScale.removeExtentProvider(this._extentProvider);
-                oldScale._autoDomainIfAutomaticMode();
+                this._uninstallScaleForKey(oldScale, key);
             }
             if (newScale != null) {
-                newScale.onUpdate(this._renderCallback);
-                newScale.addExtentProvider(this._extentProvider);
-                newScale._autoDomainIfAutomaticMode();
+                this._installScaleForKey(newScale, key);
             }
+        };
+        Plot.prototype._uninstallScaleForKey = function (scale, key) {
+            scale.offUpdate(this._renderCallback);
+            scale.removeExtentProvider(this._extentProvider);
+            scale._autoDomainIfAutomaticMode();
+        };
+        Plot.prototype._installScaleForKey = function (scale, key) {
+            scale.onUpdate(this._renderCallback);
+            scale.addExtentProvider(this._extentProvider);
+            scale._autoDomainIfAutomaticMode();
         };
         Plot.prototype._generatePropertyToProjectors = function () {
             var attrToProjector = {};
@@ -6844,15 +6850,8 @@ var Plottable;
             if (x == null) {
                 return this._propertyBindings.get(XYPlot._X_KEY);
             }
-            if (xScale != null) {
-                if (this.x().scale) {
-                    this.x().scale.offUpdate(this._adjustYDomainOnChangeFromXCallback);
-                }
-                this.x().scale = xScale;
-                this._updateXDomainer();
-                xScale.onUpdate(this._adjustYDomainOnChangeFromXCallback);
-            }
             this._bindProperty(XYPlot._X_KEY, x, xScale);
+            this._updateXDomainer();
             this._render();
             return this;
         };
@@ -6860,17 +6859,20 @@ var Plottable;
             if (y == null) {
                 return this._propertyBindings.get(XYPlot._Y_KEY);
             }
-            if (yScale != null) {
-                if (this.y().scale) {
-                    this.y().scale.offUpdate(this._adjustXDomainOnChangeFromYCallback);
-                }
-                this.y().scale = yScale;
-                this._updateYDomainer();
-                yScale.onUpdate(this._adjustXDomainOnChangeFromYCallback);
-            }
             this._bindProperty(XYPlot._Y_KEY, y, yScale);
+            this._updateYDomainer();
             this._render();
             return this;
+        };
+        XYPlot.prototype._uninstallScaleForKey = function (scale, key) {
+            _super.prototype._uninstallScaleForKey.call(this, scale, key);
+            var adjustCallback = key === XYPlot._X_KEY ? this._adjustYDomainOnChangeFromXCallback : this._adjustXDomainOnChangeFromYCallback;
+            scale.offUpdate(adjustCallback);
+        };
+        XYPlot.prototype._installScaleForKey = function (scale, key) {
+            _super.prototype._installScaleForKey.call(this, scale, key);
+            var adjustCallback = key === XYPlot._X_KEY ? this._adjustYDomainOnChangeFromXCallback : this._adjustXDomainOnChangeFromYCallback;
+            scale.onUpdate(adjustCallback);
         };
         XYPlot.prototype.destroy = function () {
             _super.prototype.destroy.call(this);

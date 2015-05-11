@@ -2665,6 +2665,8 @@ declare module Plottable {
          */
         getClosestPlotData(queryPoint: Point): Plots.PlotData;
         protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean;
+        protected _uninstallScaleForKey(scale: Scale<any, any>, key: string): void;
+        protected _installScaleForKey(scale: Scale<any, any>, key: string): void;
         protected _generatePropertyToProjectors(): AttributeToProjector;
     }
 }
@@ -2718,6 +2720,8 @@ declare module Plottable {
         y(): Plots.AccessorScaleBinding<Y, number>;
         y(y: number | _Accessor): XYPlot<X, Y>;
         y(y: Y | _Accessor, yScale: Scale<Y, number>): XYPlot<X, Y>;
+        protected _uninstallScaleForKey(scale: Scale<any, any>, key: string): void;
+        protected _installScaleForKey(scale: Scale<any, any>, key: string): void;
         destroy(): XYPlot<X, Y>;
         /**
          * Sets the automatic domain adjustment over visible points for y scale.

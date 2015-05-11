@@ -47,17 +47,9 @@ module Plottable {
       if (x == null) {
         return this._propertyBindings.get(XYPlot._X_KEY);
       }
-      if (xScale != null) {
-        if (this.x().scale) {
-          this.x().scale.offUpdate(this._adjustYDomainOnChangeFromXCallback);
-        }
-        this.x().scale = xScale;
-        this._updateXDomainer();
-
-        xScale.onUpdate(this._adjustYDomainOnChangeFromXCallback);
-      }
 
       this._bindProperty(XYPlot._X_KEY, x, xScale);
+      this._updateXDomainer();
       this._render();
       return this;
     }
@@ -70,18 +62,24 @@ module Plottable {
         return this._propertyBindings.get(XYPlot._Y_KEY);
       }
 
-      if (yScale != null) {
-        if (this.y().scale) {
-          this.y().scale.offUpdate(this._adjustXDomainOnChangeFromYCallback);
-        }
-        this.y().scale = yScale;
-        this._updateYDomainer();
-        yScale.onUpdate(this._adjustXDomainOnChangeFromYCallback);
-      }
-
       this._bindProperty(XYPlot._Y_KEY, y, yScale);
+      this._updateYDomainer();
       this._render();
       return this;
+    }
+
+    protected _uninstallScaleForKey(scale: Scale<any, any>, key: string) {
+      super._uninstallScaleForKey(scale, key);
+      var adjustCallback = key === XYPlot._X_KEY ? this._adjustYDomainOnChangeFromXCallback
+                                                 : this._adjustXDomainOnChangeFromYCallback;
+      scale.offUpdate(adjustCallback);
+    }
+
+    protected _installScaleForKey(scale: Scale<any, any>, key: string) {
+      super._installScaleForKey(scale, key);
+      var adjustCallback = key === XYPlot._X_KEY ? this._adjustYDomainOnChangeFromXCallback
+                                                 : this._adjustXDomainOnChangeFromYCallback;
+      scale.onUpdate(adjustCallback);
     }
 
     public destroy() {

@@ -191,7 +191,7 @@ module Plottable {
                       bindings: D3.Map<Plots.AccessorScaleBinding<any, any>>, extents: D3.Map<any[]>) {
       var binding = bindings.get(key);
       var oldScale = binding != null ? binding.scale : null;
-      this._replaceScale(oldScale, scale);
+      this._replaceScaleForKey(oldScale, scale, key);
       bindings.set(key, { accessor: d3.functor(value), scale: scale });
       this._updateExtentsForKey(key, bindings, extents);
     }
@@ -571,18 +571,26 @@ module Plottable {
         pixelPoint.x > this.width() || pixelPoint.y > this.height());
     }
 
-    private _replaceScale(oldScale: Scale<any, any>, newScale: Scale<any, any>) {
+    private _replaceScaleForKey(oldScale: Scale<any, any>, newScale: Scale<any, any>, key: string) {
       if (oldScale != null) {
-        oldScale.offUpdate(this._renderCallback);
-        oldScale.removeExtentProvider(this._extentProvider);
-        oldScale._autoDomainIfAutomaticMode();
+        this._uninstallScaleForKey(oldScale, key);
       }
 
       if (newScale != null) {
-        newScale.onUpdate(this._renderCallback);
-        newScale.addExtentProvider(this._extentProvider);
-        newScale._autoDomainIfAutomaticMode();
+        this._installScaleForKey(newScale, key);
       }
+    }
+
+    protected _uninstallScaleForKey(scale: Scale<any, any>, key: string) {
+      scale.offUpdate(this._renderCallback);
+      scale.removeExtentProvider(this._extentProvider);
+      scale._autoDomainIfAutomaticMode();
+    }
+
+    protected _installScaleForKey(scale: Scale<any, any>, key: string) {
+      scale.onUpdate(this._renderCallback);
+      scale.addExtentProvider(this._extentProvider);
+      scale._autoDomainIfAutomaticMode();
     }
 
     protected _generatePropertyToProjectors(): AttributeToProjector {
