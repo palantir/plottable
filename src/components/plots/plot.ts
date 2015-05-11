@@ -183,8 +183,8 @@ module Plottable {
       this._setupKey(property, value, scale, false);
     }
 
-    private _setupAttr(property: string, value: any, scale: Scale<any, any>) {
-      this._setupKey(property, value, scale, true);
+    private _setupAttr(attr: string, value: any, scale: Scale<any, any>) {
+      this._setupKey(attr, value, scale, true);
     }
 
     private _setupKey(key: string, value: any, scale: Scale<any, any>, ifAttr: boolean) {

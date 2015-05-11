@@ -6426,8 +6426,8 @@ var Plottable;
         Plot.prototype._setupProperty = function (property, value, scale) {
             this._setupKey(property, value, scale, false);
         };
-        Plot.prototype._setupAttr = function (property, value, scale) {
-            this._setupKey(property, value, scale, true);
+        Plot.prototype._setupAttr = function (attr, value, scale) {
+            this._setupKey(attr, value, scale, true);
         };
         Plot.prototype._setupKey = function (key, value, scale, ifAttr) {
             var bindings = ifAttr ? this._attrBindings : this._propertyBindings;
