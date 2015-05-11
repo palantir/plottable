@@ -6868,27 +6868,27 @@ var Plottable;
                 });
                 return allPlotData;
             };
-            Pie.prototype.sectorValue = function (sectorValue, sectorValueScale) {
+            Pie.prototype.sectorValue = function (sectorValue, scale) {
                 if (sectorValue == null) {
                     return this._propertyBindings.get(Pie._SECTOR_VALUE_KEY);
                 }
-                this._setupProperty(Pie._SECTOR_VALUE_KEY, sectorValue, sectorValueScale);
+                this._setupProperty(Pie._SECTOR_VALUE_KEY, sectorValue, scale);
                 this._render();
                 return this;
             };
-            Pie.prototype.innerRadius = function (innerRadius, innerRadiusScale) {
+            Pie.prototype.innerRadius = function (innerRadius, scale) {
                 if (innerRadius == null) {
                     return this._propertyBindings.get(Pie._INNER_RADIUS_KEY);
                 }
-                this._setupProperty(Pie._INNER_RADIUS_KEY, innerRadius, innerRadiusScale);
+                this._setupProperty(Pie._INNER_RADIUS_KEY, innerRadius, scale);
                 this._render();
                 return this;
             };
-            Pie.prototype.outerRadius = function (outerRadius, outerRadiusScale) {
+            Pie.prototype.outerRadius = function (outerRadius, scale) {
                 if (outerRadius == null) {
                     return this._propertyBindings.get(Pie._OUTER_RADIUS_KEY);
                 }
-                this._setupProperty(Pie._OUTER_RADIUS_KEY, outerRadius, outerRadiusScale);
+                this._setupProperty(Pie._OUTER_RADIUS_KEY, outerRadius, scale);
                 this._render();
                 return this;
             };

@@ -2742,13 +2742,13 @@ declare module Plottable {
             getAllPlotData(datasets?: Dataset[]): Plots.PlotData;
             sectorValue(): AccessorScaleBinding<D, number>;
             sectorValue(sectorValue: number | _Accessor): Plots.Pie<D>;
-            sectorValue(sectorValue: D | _Accessor, sectorValueScale: Scale<D, number>): Plots.Pie<D>;
+            sectorValue(sectorValue: D | _Accessor, scale: Scale<D, number>): Plots.Pie<D>;
             innerRadius(): AccessorScaleBinding<D, number>;
             innerRadius(innerRadius: number | _Accessor): Plots.Pie<D>;
-            innerRadius(innerRadius: D | _Accessor, innerRadiusScale: Scale<D, number>): Plots.Pie<D>;
+            innerRadius(innerRadius: D | _Accessor, scale: Scale<D, number>): Plots.Pie<D>;
             outerRadius(): AccessorScaleBinding<D, number>;
             outerRadius(outerRadius: number | _Accessor): Plots.Pie<D>;
-            outerRadius(outerRadius: D | _Accessor, outerRadiusScale: Scale<D, number>): Plots.Pie<D>;
+            outerRadius(outerRadius: D | _Accessor, scale: Scale<D, number>): Plots.Pie<D>;
         }
     }
 }
