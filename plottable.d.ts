@@ -2631,6 +2631,7 @@ declare module Plottable {
          * Identical to plot.attr
          */
         project(attrToSet: string, accessor: any, scale?: Scale<any, any>): Plot;
+        protected _setupProperty(property: string, value: any, scale: Scale<any, any>): void;
         protected _generateAttrToProjector(): AttributeToProjector;
         /**
          * Generates a dictionary mapping an attribute to a function that calculate that attribute's value
@@ -2654,8 +2655,6 @@ declare module Plottable {
          * Updates the extents associated with each attribute, then autodomains all scales the Plot uses.
          */
         protected _updateExtents(): void;
-        protected _updateExtentsForKey(key: string, ifAttr: boolean): void;
-        protected _computeExtent(dataset: Dataset, accessor: _Accessor, typeCoercer: (d: any) => any, plotMetadata: any): any[];
         /**
          * Override in subclass to add special extents, such as included values
          */
@@ -2664,7 +2663,6 @@ declare module Plottable {
          * Override in subclass to add special extents, such as included values
          */
         protected _extentsForProperty(property: string): any[];
-        protected _extentsForScale<D>(scale: Scale<D, any>): D[][];
         /**
          * Get the animator associated with the specified Animator key.
          *
@@ -2729,7 +2727,6 @@ declare module Plottable {
          */
         getClosestPlotData(queryPoint: Point): Plots.PlotData;
         protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean;
-        protected _replaceScale(oldScale: Scale<any, any>, newScale: Scale<any, any>): void;
         protected _propertyToProjectors(): AttributeToProjector;
     }
 }

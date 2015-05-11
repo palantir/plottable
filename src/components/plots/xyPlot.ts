@@ -57,9 +57,7 @@ module Plottable {
         xScale.onUpdate(this._adjustYDomainOnChangeFromXCallback);
       }
 
-      this._replaceScale(this.x().scale, xScale);
-      this._propertyBindings.set(XYPlot._X_KEY, { accessor: d3.functor(x), scale: xScale });
-      this._updateExtentsForKey(XYPlot._X_KEY, false);
+      this._setupProperty(XYPlot._X_KEY, x, xScale);
       this._render();
       return this;
     }
@@ -81,9 +79,7 @@ module Plottable {
         yScale.onUpdate(this._adjustXDomainOnChangeFromYCallback);
       }
 
-      this._replaceScale(this.y().scale, yScale);
-      this._propertyBindings.set(XYPlot._Y_KEY, { accessor: d3.functor(y), scale: yScale });
-      this._updateExtentsForKey(XYPlot._Y_KEY, false);
+      this._setupProperty(XYPlot._Y_KEY, y, yScale);
       this._render();
       return this;
     }

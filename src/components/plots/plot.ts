@@ -173,16 +173,27 @@ module Plottable {
      */
     public project(attrToSet: string, accessor: any, scale?: Scale<any, any>) {
       attrToSet = attrToSet.toLowerCase();
-      var previousProjection = this._attrBindings.get(attrToSet);
-      var previousScale = previousProjection && previousProjection.scale;
-
       accessor = Utils.Methods.accessorize(accessor);
-      this._attrBindings.set(attrToSet, {accessor: accessor, scale: scale, attribute: attrToSet});
-      this._updateExtentsForKey(attrToSet, true);
-
-      this._replaceScale(previousScale, scale);
+      this._setupAttr(attrToSet, accessor, scale);
       this.render(); // queue a re-render upon changing projector
       return this;
+    }
+
+    protected _setupProperty(property: string, value: any, scale: Scale<any, any>) {
+      this._setupKey(property, value, scale, false);
+    }
+
+    private _setupAttr(property: string, value: any, scale: Scale<any, any>) {
+      this._setupKey(property, value, scale, true);
+    }
+
+    private _setupKey(key: string, value: any, scale: Scale<any, any>, ifAttr: boolean) {
+      var bindings = ifAttr ? this._attrBindings : this._propertyBindings;
+      var binding = bindings.get(key);
+      var oldScale = binding != null ? binding.scale : null;
+      this._replaceScale(oldScale, scale);
+      bindings.set(key, { accessor: d3.functor(value), scale: scale });
+      this._updateExtentsForKey(key, ifAttr);
     }
 
     protected _generateAttrToProjector(): AttributeToProjector {
@@ -281,7 +292,7 @@ module Plottable {
       this._scales().forEach((scale) => scale._autoDomainIfAutomaticMode());
     }
 
-    protected _updateExtentsForKey(key: string, ifAttr: boolean) {
+    private _updateExtentsForKey(key: string, ifAttr: boolean) {
       var bindingMap = ifAttr ? this._attrBindings : this._propertyBindings;
       var accScaleBinding = bindingMap.get(key);
       if (accScaleBinding.accessor == null) { return; }
@@ -295,7 +306,7 @@ module Plottable {
       }));
     }
 
-    protected _computeExtent(dataset: Dataset, accessor: _Accessor, typeCoercer: (d: any) => any, plotMetadata: any): any[] {
+    private _computeExtent(dataset: Dataset, accessor: _Accessor, typeCoercer: (d: any) => any, plotMetadata: any): any[] {
       var data = dataset.data();
       var appliedAccessor = (d: any, i: number) => accessor(d, i, dataset, plotMetadata);
       var mappedData = data.map(appliedAccessor).map(typeCoercer);
@@ -327,7 +338,7 @@ module Plottable {
       return this._propertyExtents.get(property);
     }
 
-    protected _extentsForScale<D>(scale: Scale<D, any>): D[][] {
+    private _extentsForScale<D>(scale: Scale<D, any>): D[][] {
       if (!this._isAnchored) {
         return [];
       }
@@ -569,7 +580,7 @@ module Plottable {
         pixelPoint.x > this.width() || pixelPoint.y > this.height());
     }
 
-    protected _replaceScale(oldScale: Scale<any, any>, newScale: Scale<any, any>) {
+    private _replaceScale(oldScale: Scale<any, any>, newScale: Scale<any, any>) {
       if (oldScale != null) {
         oldScale.offUpdate(this._renderCallback);
         oldScale.removeExtentProvider(this._extentProvider);

@@ -35,9 +35,7 @@ export module Plots {
       if (y0 == null) {
         return this._propertyBindings.get(Area._Y0_KEY);
       }
-      this._replaceScale(this.y().scale, y0Scale);
-      this._propertyBindings.set(Area._Y0_KEY, { accessor: d3.functor(y0), scale: y0Scale });
-      this._updateExtentsForKey(Area._Y0_KEY, false);
+      this._setupProperty(Area._Y0_KEY, y0, y0Scale);
       this._updateYDomainer();
       this._render();
       return this;
