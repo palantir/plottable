@@ -270,20 +270,23 @@ module Plottable {
       this._scales().forEach((scale) => scale._autoDomainIfAutomaticMode());
     }
 
-    private _updateExtentsForAttr(attr: string) {
+    protected _updateExtentsForAttr(attr: string, filter?: _Accessor) {
       var binding = this._attrBindings.get(attr);
       var accessor = binding.accessor;
       var extents = this._datasetKeysInOrder.map((key) => {
         var plotDatasetKey = this._key2PlotDatasetKey.get(key);
         var dataset = plotDatasetKey.dataset;
         var plotMetadata = plotDatasetKey.plotMetadata;
-        return this._computeExtent(dataset, accessor, plotMetadata);
+        return this._computeExtent(dataset, accessor, plotMetadata, filter);
       });
       this._attrExtents.set(attr, extents);
     }
 
-    private _computeExtent(dataset: Dataset, accessor: _Accessor, plotMetadata: any): any[] {
+    private _computeExtent(dataset: Dataset, accessor: _Accessor, plotMetadata: any, filter?: _Accessor): any[] {
       var data = dataset.data();
+      if (filter) {
+        data = data.filter((d, i) => filter(d, i, dataset, plotMetadata));
+      }
       var appliedAccessor = (d: any, i: number) => accessor(d, i, dataset, plotMetadata);
       var mappedData = data.map(appliedAccessor);
       if (mappedData.length === 0) {
