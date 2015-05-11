@@ -65,20 +65,20 @@ function run(svg, data, Plottable) {
                                   .addDataset(aaplSource)
                                   .project("x", "Date", xScale)
                                   .project("y", "Adj Close", yScale_aapl)
-                                  .project("stroke", function(d, i, m) { return m.name; }, colorScale)
+                                  .project("stroke", function(d, i, dataset) { return dataset.metadata().name; }, colorScale)
                                   .automaticallyAdjustYScaleOverVisiblePoints(true);
           var line_goog = new Plottable.Plots.Line(xScale, yScale_goog).animate(true)
                                   .addDataset(googSource)
                                   .project("x", "Date", xScale)
                                   .project("y", "Adj Close", yScale_goog)
-                                  .project("stroke", function(d, i, m) { return m.name; }, colorScale)
+                                  .project("stroke", function(d, i, dataset) { return dataset.metadata().name; }, colorScale)
                                   .automaticallyAdjustYScaleOverVisiblePoints(true);
 
           // should be one line plot, pending #917
 
           var legend = new Plottable.Components.Legend(colorScale);
           legend.maxEntriesPerRow(1);
-          legend.yAlign("top").xOffset(-5);
+          legend.yAlign("top");
           var plotArea = new Plottable.Components.Group([line_aapl, line_goog, legend]);
 
           var yScale_diff = new Plottable.Scales.Linear();
@@ -105,13 +105,13 @@ function run(svg, data, Plottable) {
           table.renderTo(svg);
 
           var pzi = new Plottable.Interactions.PanZoom(xScale, null);
-          plotArea.registerInteraction(pzi);
+          pzi.attachTo(plotArea);
           var keyInteraction = new Plottable.Interactions.Key();
           keyInteraction.onKey(65, function() {
                                        xScale.autoDomain();
                                        pzi.resetZoom();
                                      });
-          plotArea.registerInteraction(keyInteraction);
+          keyInteraction.attachTo(plotArea);
 
         });
     });

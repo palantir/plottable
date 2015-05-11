@@ -18,12 +18,13 @@ function run(svg, data, Plottable) {
   var ds1 = new Plottable.Dataset(data[0], { color: "blue", size: 20 });
   var ds2 = new Plottable.Dataset(data[1], { color: "red", size: 30 });
 
-  var plot = new Plottable.Plots.Scatter(xScale, yScale).addDataset(ds1)
-                                                       .addDataset(ds2)
-                                                       .project("size", function(d, i, u) { return u.size; })
-                                                       .project("fill", function(d, i, u) { return u.color; })
-                                                       .project("x", function(d, i, u) { return d.x; }, xScale)
-                                                       .project("y", "y", yScale);
+  var plot = new Plottable.Plots.Scatter(xScale, yScale);
+  plot.addDataset(ds1);
+  plot.addDataset(ds2);
+  plot.project("size", function(d, i, dataset) { return dataset.metadata().size; });
+  plot.project("fill", function(d, i, dataset) { return dataset.metadata().color; });
+  plot.project("x", function(d, i, dataset) { return d.x; }, xScale);
+  plot.project("y", "y", yScale);
 
   var chart = new Plottable.Components.Table([
       [null, title],
@@ -59,5 +60,5 @@ function run(svg, data, Plottable) {
     title.text(defaultTitleText);
     hoverCircle.style("visibility", "hidden");
   });
-  plot.registerInteraction(pointer);
+  pointer.attachTo(plot);
 }

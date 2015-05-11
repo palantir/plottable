@@ -22,7 +22,7 @@ function run(svg, data, Plottable) {
   bars.addDataset(new Plottable.Dataset([{ name:"A", value: 2 }], { id: "mid" }));
   bars.addDataset(new Plottable.Dataset([{ name:"A", value: 3 }], { id: "high" }));
 
-  bars.project("fill", function(d, i, u) { return u.id; }, colorScale);
+  bars.project("fill", function(d, i, dataset) { return dataset.metadata().id; }, colorScale);
 
   var reverse = function reverseComp(a, b) {
       var domain = colorScale.domain();

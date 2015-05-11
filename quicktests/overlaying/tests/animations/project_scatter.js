@@ -16,11 +16,11 @@ function run(svg, data, Plottable) {
     var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
     var yAxis = new Plottable.Axes.Numeric(yScale, "left");
 
-    var widthProjector = function(d, i, m) {
+    var widthProjector = function(d) {
        return (25 - (d.y * 7)) * 2;
     };
 
-    var colorProjector = function(d, i, m) {
+    var colorProjector = function(d) {
        var x = 22;
        x += Math.floor(d.y * 30);
        var y = 10;
@@ -28,7 +28,7 @@ function run(svg, data, Plottable) {
        return ("#11" + x + y);
     };
 
-    var opacityProjector = function(d, i, m){
+    var opacityProjector = function(d) {
       return (d.x);
     };
 
@@ -57,6 +57,6 @@ function run(svg, data, Plottable) {
       dataseries1.data(d);
     };
 
-    renderAreaD1.registerInteraction(new Plottable.Interactions.Click().onClick(cb));
+    new Plottable.Interactions.Click().onClick(cb).attachTo(renderAreaD1);
 
 }

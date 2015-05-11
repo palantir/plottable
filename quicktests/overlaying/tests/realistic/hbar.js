@@ -60,5 +60,5 @@ function run(svg, data, Plottable){
     };
 
     var clickInteraction = new Plottable.Interactions.Click().onClick(flipDomain);
-    plot.registerInteraction(clickInteraction);
+    clickInteraction.attachTo(plot);
 }

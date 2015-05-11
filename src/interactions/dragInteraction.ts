@@ -15,17 +15,37 @@ export module Interactions {
     private _dragCallbacks = new Utils.CallbackSet<DragCallback>();
     private _dragEndCallbacks = new Utils.CallbackSet<DragCallback>();
 
-    public _anchor(component: Component) {
-      super._anchor(component);
-      this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(<SVGElement> this._componentToListenTo.content().node());
-      this._mouseDispatcher.onMouseDown((p: Point, e: MouseEvent) => this._startDrag(p, e));
-      this._mouseDispatcher.onMouseMove((p: Point, e: MouseEvent) => this._doDrag(p, e));
-      this._mouseDispatcher.onMouseUp((p: Point, e: MouseEvent) => this._endDrag(p, e));
+    private _mouseDownCallback = (p: Point, e: MouseEvent) => this._startDrag(p, e);
+    private _mouseMoveCallback = (p: Point, e: MouseEvent) => this._doDrag(p, e);
+    private _mouseUpCallback = (p: Point, e: MouseEvent) => this._endDrag(p, e);
+    private _touchStartCallback = (ids: number[], idToPoint: Point[], e: UIEvent) => this._startDrag(idToPoint[ids[0]], e);
+    private _touchMoveCallback = (ids: number[], idToPoint: Point[], e: UIEvent) => this._doDrag(idToPoint[ids[0]], e);
+    private _touchEndCallback = (ids: number[], idToPoint: Point[], e: UIEvent) => this._endDrag(idToPoint[ids[0]], e);
 
-      this._touchDispatcher = Dispatchers.Touch.getDispatcher(<SVGElement> this._componentToListenTo.content().node());
-      this._touchDispatcher.onTouchStart((ids, idToPoint, e) => this._startDrag(idToPoint[ids[0]], e));
-      this._touchDispatcher.onTouchMove((ids, idToPoint, e) => this._doDrag(idToPoint[ids[0]], e));
-      this._touchDispatcher.onTouchEnd((ids, idToPoint, e) => this._endDrag(idToPoint[ids[0]], e));
+    protected _anchor(component: Component) {
+      super._anchor(component);
+      this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(<SVGElement> this._componentAttachedTo.content().node());
+      this._mouseDispatcher.onMouseDown(this._mouseDownCallback);
+      this._mouseDispatcher.onMouseMove(this._mouseMoveCallback);
+      this._mouseDispatcher.onMouseUp(this._mouseUpCallback);
+
+      this._touchDispatcher = Dispatchers.Touch.getDispatcher(<SVGElement> this._componentAttachedTo.content().node());
+      this._touchDispatcher.onTouchStart(this._touchStartCallback);
+      this._touchDispatcher.onTouchMove(this._touchMoveCallback);
+      this._touchDispatcher.onTouchEnd(this._touchEndCallback);
+    }
+
+    protected _unanchor() {
+      super._unanchor();
+      this._mouseDispatcher.offMouseDown(this._mouseDownCallback);
+      this._mouseDispatcher.offMouseMove(this._mouseMoveCallback);
+      this._mouseDispatcher.offMouseUp(this._mouseUpCallback);
+      this._mouseDispatcher = null;
+
+      this._touchDispatcher.offTouchStart(this._touchStartCallback);
+      this._touchDispatcher.offTouchMove(this._touchMoveCallback);
+      this._touchDispatcher.offTouchEnd(this._touchEndCallback);
+      this._touchDispatcher = null;
     }
 
     private _translateAndConstrain(p: Point) {
@@ -35,8 +55,8 @@ export module Interactions {
       }
 
       return {
-        x: Utils.Methods.clamp(translatedP.x, 0, this._componentToListenTo.width()),
-        y: Utils.Methods.clamp(translatedP.y, 0, this._componentToListenTo.height())
+        x: Utils.Methods.clamp(translatedP.x, 0, this._componentAttachedTo.width()),
+        y: Utils.Methods.clamp(translatedP.y, 0, this._componentAttachedTo.height())
       };
     }
 
