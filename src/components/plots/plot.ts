@@ -173,16 +173,27 @@ module Plottable {
      */
     public project(attrToSet: string, accessor: any, scale?: Scale<any, any>) {
       attrToSet = attrToSet.toLowerCase();
-      var previousProjection = this._attrBindings.get(attrToSet);
-      var previousScale = previousProjection && previousProjection.scale;
-
       accessor = Utils.Methods.accessorize(accessor);
-      this._attrBindings.set(attrToSet, {accessor: accessor, scale: scale, attribute: attrToSet});
-      this._updateExtentsForKey(attrToSet, true);
-
-      this._replaceScale(previousScale, scale);
+      this._setupAttr(attrToSet, accessor, scale);
       this.render(); // queue a re-render upon changing projector
       return this;
+    }
+
+    protected _setupProperty(property: string, value: any, scale: Scale<any, any>) {
+      this._setupKey(property, value, scale, false);
+    }
+
+    private _setupAttr(property: string, value: any, scale: Scale<any, any>) {
+      this._setupKey(property, value, scale, true);
+    }
+
+    private _setupKey(key: string, value: any, scale: Scale<any, any>, ifAttr: boolean) {
+      var bindings = ifAttr ? this._attrBindings : this._propertyBindings;
+      var binding = bindings.get(key);
+      var oldScale = binding != null ? binding.scale : null;
+      this._replaceScale(oldScale, scale);
+      bindings.set(key, { accessor: d3.functor(value), scale: scale });
+      this._updateExtentsForKey(key, ifAttr);
     }
 
     protected _generateAttrToProjector(): AttributeToProjector {
@@ -295,7 +306,7 @@ module Plottable {
       }));
     }
 
-    protected _computeExtent(dataset: Dataset, accessor: _Accessor, typeCoercer: (d: any) => any, plotMetadata: any): any[] {
+    private _computeExtent(dataset: Dataset, accessor: _Accessor, typeCoercer: (d: any) => any, plotMetadata: any): any[] {
       var data = dataset.data();
       var appliedAccessor = (d: any, i: number) => accessor(d, i, dataset, plotMetadata);
       var mappedData = data.map(appliedAccessor).map(typeCoercer);
@@ -320,7 +331,7 @@ module Plottable {
       return this._attrExtents.get(attr);
     }
 
-    protected _extentsForScale<D>(scale: Scale<D, any>): D[][] {
+    private _extentsForScale<D>(scale: Scale<D, any>): D[][] {
       if (!this._isAnchored) {
         return [];
       }
@@ -589,13 +600,6 @@ module Plottable {
       var attrToProjector: AttributeToProjector = {};
       this._propertyBindings.forEach((key, binding) => attrToProjector[key] = Plot._scaledAccessor(binding));
       return attrToProjector;
-    }
-
-    protected _setupProperty(property: string, value: any, scale: Scale<any, any>) {
-      var oldScale = this._propertyBindings.get(property).scale;
-      this._replaceScale(oldScale, scale);
-      this._propertyBindings.set(property, { accessor: d3.functor(value), scale: scale });
-      this._updateExtentsForKey(property, false);
     }
   }
 }

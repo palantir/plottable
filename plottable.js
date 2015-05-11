@@ -6418,14 +6418,24 @@ var Plottable;
          */
         Plot.prototype.project = function (attrToSet, accessor, scale) {
             attrToSet = attrToSet.toLowerCase();
-            var previousProjection = this._attrBindings.get(attrToSet);
-            var previousScale = previousProjection && previousProjection.scale;
             accessor = Plottable.Utils.Methods.accessorize(accessor);
-            this._attrBindings.set(attrToSet, { accessor: accessor, scale: scale, attribute: attrToSet });
-            this._updateExtentsForKey(attrToSet, true);
-            this._replaceScale(previousScale, scale);
+            this._setupAttr(attrToSet, accessor, scale);
             this.render(); // queue a re-render upon changing projector
             return this;
+        };
+        Plot.prototype._setupProperty = function (property, value, scale) {
+            this._setupKey(property, value, scale, false);
+        };
+        Plot.prototype._setupAttr = function (property, value, scale) {
+            this._setupKey(property, value, scale, true);
+        };
+        Plot.prototype._setupKey = function (key, value, scale, ifAttr) {
+            var bindings = ifAttr ? this._attrBindings : this._propertyBindings;
+            var binding = bindings.get(key);
+            var oldScale = binding != null ? binding.scale : null;
+            this._replaceScale(oldScale, scale);
+            bindings.set(key, { accessor: d3.functor(value), scale: scale });
+            this._updateExtentsForKey(key, ifAttr);
         };
         Plot.prototype._generateAttrToProjector = function () {
             var h = {};
@@ -6784,12 +6794,6 @@ var Plottable;
             var attrToProjector = {};
             this._propertyBindings.forEach(function (key, binding) { return attrToProjector[key] = Plot._scaledAccessor(binding); });
             return attrToProjector;
-        };
-        Plot.prototype._setupProperty = function (property, value, scale) {
-            var oldScale = this._propertyBindings.get(property).scale;
-            this._replaceScale(oldScale, scale);
-            this._propertyBindings.set(property, { accessor: d3.functor(value), scale: scale });
-            this._updateExtentsForKey(property, false);
         };
         return Plot;
     })(Plottable.Component);
