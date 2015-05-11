@@ -1221,19 +1221,6 @@ declare module Plottable {
              * @returns {InterpolatedColor} The calling InterpolatedColor.
              */
             colorRange(colorRange: string | string[]): InterpolatedColor;
-            /**
-             * Gets the internal scale.
-             *
-             * @returns {D3.Scale.QuantitativeScale} The current scale
-             */
-            colorScale(): D3.Scale.QuantitativeScale;
-            /**
-             * Sets the internal scale.
-             *
-             * @param {D3.Scale.QuantitativeScale} The d3 scale to use internally
-             * @returns {InterpolatedColor} The calling InterpolatedColor
-             */
-            colorScale(colorScale: D3.Scale.QuantitativeScale): InterpolatedColor;
             autoDomain(): InterpolatedColor;
         }
     }

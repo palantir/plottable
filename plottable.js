@@ -2319,14 +2319,6 @@ var Plottable;
                 this._resetScale();
                 return this;
             };
-            InterpolatedColor.prototype.colorScale = function (colorScale) {
-                if (colorScale == null) {
-                    return this._colorScale;
-                }
-                this._colorScale = colorScale;
-                this._resetScale();
-                return this;
-            };
             InterpolatedColor.prototype._resetScale = function () {
                 this._d3Scale = this._getD3InterpolatedScale();
                 this._autoDomainIfAutomaticMode();

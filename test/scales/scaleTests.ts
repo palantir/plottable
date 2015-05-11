@@ -399,18 +399,6 @@ describe("Scales", () => {
       scale.colorRange("reds");
       assert.strictEqual("#b10026", scale.scale(16));
     });
-
-    it("can be converted to a different scale type", () => {
-      var scale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
-      scale.domain([0, 16]);
-      assert.strictEqual("#000000", scale.scale(0));
-      assert.strictEqual("#ffffff", scale.scale(16));
-      assert.strictEqual("#777777", scale.scale(8));
-  	  scale.colorScale(d3.scale.log());
-      assert.strictEqual("#000000", scale.scale(0));
-      assert.strictEqual("#ffffff", scale.scale(16));
-      assert.strictEqual("#e3e3e3", scale.scale(8));
-    });
   });
 
   describe("Modified Log Scale", () => {

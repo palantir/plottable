@@ -56,6 +56,28 @@ export module Scales {
       ]
     };
 
+    private _colorRange: string[];
+    private _colorScale: D3.Scale.QuantitativeScale;
+
+    /**
+     * Constructs an InterpolatedColorScale.
+     *
+     * An InterpolatedColorScale maps numbers evenly to color strings.
+     *
+     * @constructor
+     * @param {string|string[]} colorRange the type of color scale to
+     *     create. Default is "reds". @see {@link colorRange} for further
+     *     options.
+     * @param {string} scaleType the type of underlying scale to use
+     *     (linear/pow/log/sqrt). Default is "linear". @see {@link scaleType}
+     *     for further options.
+     */
+    constructor(colorRange: string | string[] = "reds", colorScale: D3.Scale.QuantitativeScale = d3.scale.linear()) {
+      this._colorRange = this._resolveColorValues(colorRange);
+      this._colorScale = colorScale;
+      super(this._getD3InterpolatedScale());
+    }
+
     /**
      * Generates the converted QuantitativeScale.
      * 
@@ -92,28 +114,6 @@ export module Scales {
       };
     }
 
-    private _colorRange: string[];
-    private _colorScale: D3.Scale.QuantitativeScale;
-
-    /**
-     * Constructs an InterpolatedColorScale.
-     *
-     * An InterpolatedColorScale maps numbers evenly to color strings.
-     *
-     * @constructor
-     * @param {string|string[]} colorRange the type of color scale to
-     *     create. Default is "reds". @see {@link colorRange} for further
-     *     options.
-     * @param {string} scaleType the type of underlying scale to use
-     *     (linear/pow/log/sqrt). Default is "linear". @see {@link scaleType}
-     *     for further options.
-     */
-    constructor(colorRange: string | string[] = "reds", colorScale: D3.Scale.QuantitativeScale = d3.scale.linear()) {
-      this._colorRange = this._resolveColorValues(colorRange);
-      this._colorScale = colorScale;
-      super(this._getD3InterpolatedScale());
-    }
-
     /**
      * Gets the color range.
      *
@@ -139,28 +139,6 @@ export module Scales {
       this._resetScale();
       return this;
     }
-
-    /**
-     * Gets the internal scale.
-     * 
-     * @returns {D3.Scale.QuantitativeScale} The current scale
-     */
-     public colorScale(): D3.Scale.QuantitativeScale;
-    /**
-     * Sets the internal scale.
-     * 
-     * @param {D3.Scale.QuantitativeScale} The d3 scale to use internally
-     * @returns {InterpolatedColor} The calling InterpolatedColor
-     */
-     public colorScale(colorScale: D3.Scale.QuantitativeScale): InterpolatedColor;
-     public colorScale(colorScale?: D3.Scale.QuantitativeScale): any {
-       if (colorScale == null) {
-         return this._colorScale;
-       }
-       this._colorScale = colorScale;
-       this._resetScale();
-       return this;
-     }
 
     private _resetScale(): any {
       this._d3Scale = this._getD3InterpolatedScale();
