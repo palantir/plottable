@@ -2631,7 +2631,7 @@ declare module Plottable {
          * Identical to plot.attr
          */
         project(attrToSet: string, accessor: any, scale?: Scale<any, any>): Plot;
-        protected _setupProperty(property: string, value: any, scale: Scale<any, any>): void;
+        protected _bindProperty(property: string, value: any, scale: Scale<any, any>): void;
         protected _generateAttrToProjector(): AttributeToProjector;
         /**
          * Generates a dictionary mapping an attribute to a function that calculate that attribute's value
@@ -2727,7 +2727,7 @@ declare module Plottable {
          */
         getClosestPlotData(queryPoint: Point): Plots.PlotData;
         protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean;
-        protected _propertyToProjectors(): AttributeToProjector;
+        protected _generatePropertyToProjectors(): AttributeToProjector;
     }
 }
 
@@ -2748,13 +2748,13 @@ declare module Plottable {
             getAllPlotData(datasets?: Dataset[]): Plots.PlotData;
             sectorValue(): AccessorScaleBinding<D, number>;
             sectorValue(sectorValue: number | _Accessor): Plots.Pie<D>;
-            sectorValue(sectorValue: D | _Accessor, sectorValueScale: Scale<D, number>): Plots.Pie<D>;
+            sectorValue(sectorValue: D | _Accessor, scale: Scale<D, number>): Plots.Pie<D>;
             innerRadius(): AccessorScaleBinding<D, number>;
             innerRadius(innerRadius: number | _Accessor): Plots.Pie<D>;
-            innerRadius(innerRadius: D | _Accessor, innerRadiusScale: Scale<D, number>): Plots.Pie<D>;
+            innerRadius(innerRadius: D | _Accessor, scale: Scale<D, number>): Plots.Pie<D>;
             outerRadius(): AccessorScaleBinding<D, number>;
             outerRadius(outerRadius: number | _Accessor): Plots.Pie<D>;
-            outerRadius(outerRadius: D | _Accessor, outerRadiusScale: Scale<D, number>): Plots.Pie<D>;
+            outerRadius(outerRadius: D | _Accessor, scale: Scale<D, number>): Plots.Pie<D>;
         }
     }
 }
@@ -2799,7 +2799,7 @@ declare module Plottable {
          * @returns {XYPlot} The calling XYPlot.
          */
         automaticallyAdjustXScaleOverVisiblePoints(autoAdjustment: boolean): XYPlot<X, Y>;
-        protected _propertyToProjectors(): AttributeToProjector;
+        protected _generatePropertyToProjectors(): AttributeToProjector;
         computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): XYPlot<X, Y>;
         protected _updateXDomainer(): void;
         protected _updateYDomainer(): void;

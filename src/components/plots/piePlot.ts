@@ -76,36 +76,36 @@ export module Plots {
 
     public sectorValue(): AccessorScaleBinding<D, number>;
     public sectorValue(sectorValue: number | _Accessor): Plots.Pie<D>;
-    public sectorValue(sectorValue: D | _Accessor, sectorValueScale: Scale<D, number>): Plots.Pie<D>;
-    public sectorValue(sectorValue?: number | _Accessor | D, sectorValueScale?: Scale<D, number>): any {
+    public sectorValue(sectorValue: D | _Accessor, scale: Scale<D, number>): Plots.Pie<D>;
+    public sectorValue(sectorValue?: number | _Accessor | D, scale?: Scale<D, number>): any {
       if (sectorValue == null) {
         return this._propertyBindings.get(Pie._SECTOR_VALUE_KEY);
       }
-      this._setupProperty(Pie._SECTOR_VALUE_KEY, sectorValue, sectorValueScale);
+      this._bindProperty(Pie._SECTOR_VALUE_KEY, sectorValue, scale);
       this._render();
       return this;
     }
 
     public innerRadius(): AccessorScaleBinding<D, number>;
     public innerRadius(innerRadius: number | _Accessor): Plots.Pie<D>;
-    public innerRadius(innerRadius: D | _Accessor, innerRadiusScale: Scale<D, number>): Plots.Pie<D>;
-    public innerRadius(innerRadius?: number | _Accessor | D, innerRadiusScale?: Scale<D, number>): any {
+    public innerRadius(innerRadius: D | _Accessor, scale: Scale<D, number>): Plots.Pie<D>;
+    public innerRadius(innerRadius?: number | _Accessor | D, scale?: Scale<D, number>): any {
       if (innerRadius == null) {
         return this._propertyBindings.get(Pie._INNER_RADIUS_KEY);
       }
-      this._setupProperty(Pie._INNER_RADIUS_KEY, innerRadius, innerRadiusScale);
+      this._bindProperty(Pie._INNER_RADIUS_KEY, innerRadius, scale);
       this._render();
       return this;
     }
 
     public outerRadius(): AccessorScaleBinding<D, number>;
     public outerRadius(outerRadius: number | _Accessor): Plots.Pie<D>;
-    public outerRadius(outerRadius: D | _Accessor, outerRadiusScale: Scale<D, number>): Plots.Pie<D>;
-    public outerRadius(outerRadius?: number | _Accessor | D, outerRadiusScale?: Scale<D, number>): any {
+    public outerRadius(outerRadius: D | _Accessor, scale: Scale<D, number>): Plots.Pie<D>;
+    public outerRadius(outerRadius?: number | _Accessor | D, scale?: Scale<D, number>): any {
       if (outerRadius == null) {
         return this._propertyBindings.get(Pie._OUTER_RADIUS_KEY);
       }
-      this._setupProperty(Pie._OUTER_RADIUS_KEY, outerRadius, outerRadiusScale);
+      this._bindProperty(Pie._OUTER_RADIUS_KEY, outerRadius, scale);
       this._render();
       return this;
     }

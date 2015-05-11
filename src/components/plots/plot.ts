@@ -174,26 +174,26 @@ module Plottable {
     public project(attrToSet: string, accessor: any, scale?: Scale<any, any>) {
       attrToSet = attrToSet.toLowerCase();
       accessor = Utils.Methods.accessorize(accessor);
-      this._setupAttr(attrToSet, accessor, scale);
+      this._bindAttr(attrToSet, accessor, scale);
       this.render(); // queue a re-render upon changing projector
       return this;
     }
 
-    protected _setupProperty(property: string, value: any, scale: Scale<any, any>) {
-      this._setupKey(property, value, scale, false);
+    protected _bindProperty(property: string, value: any, scale: Scale<any, any>) {
+      this._bindKey(property, value, scale, this._propertyBindings, this._propertyExtents);
     }
 
-    private _setupAttr(property: string, value: any, scale: Scale<any, any>) {
-      this._setupKey(property, value, scale, true);
+    private _bindAttr(attr: string, value: any, scale: Scale<any, any>) {
+      this._bindKey(attr, value, scale, this._attrBindings, this._attrExtents);
     }
 
-    private _setupKey(key: string, value: any, scale: Scale<any, any>, ifAttr: boolean) {
-      var bindings = ifAttr ? this._attrBindings : this._propertyBindings;
+    private _bindKey(key: string, value: any, scale: Scale<any, any>,
+                      bindings: D3.Map<Plots.AccessorScaleBinding<any, any>>, extents: D3.Map<any[]>) {
       var binding = bindings.get(key);
       var oldScale = binding != null ? binding.scale : null;
       this._replaceScale(oldScale, scale);
       bindings.set(key, { accessor: d3.functor(value), scale: scale });
-      this._updateExtentsForKey(key, ifAttr);
+      this._updateExtentsForKey(key, bindings, extents);
     }
 
     protected _generateAttrToProjector(): AttributeToProjector {
@@ -204,7 +204,7 @@ module Plottable {
         var fn = scale ? (d: any, i: number, dataset: Dataset, m: Plots.PlotMetadata) => scale.scale(accessor(d, i, dataset, m)) : accessor;
         h[attr] = fn;
       });
-      var propertyProjectors = this._propertyToProjectors();
+      var propertyProjectors = this._generatePropertyToProjectors();
       Object.keys(propertyProjectors).forEach((key) => {
         if (h[key] == null) {
           h[key] = propertyProjectors[key];
@@ -287,18 +287,16 @@ module Plottable {
      * Updates the extents associated with each attribute, then autodomains all scales the Plot uses.
      */
     protected _updateExtents() {
-      this._attrBindings.forEach((attr) => this._updateExtentsForKey(attr, true));
-      this._propertyExtents.forEach((property) => this._updateExtentsForKey(property, false));
+      this._attrBindings.forEach((attr) => this._updateExtentsForKey(attr, this._attrBindings, this._attrExtents));
+      this._propertyExtents.forEach((property) => this._updateExtentsForKey(property, this._propertyBindings, this._propertyExtents));
       this._scales().forEach((scale) => scale._autoDomainIfAutomaticMode());
     }
 
-    private _updateExtentsForKey(key: string, ifAttr: boolean) {
-      var bindingMap = ifAttr ? this._attrBindings : this._propertyBindings;
-      var accScaleBinding = bindingMap.get(key);
+    private _updateExtentsForKey(key: string, bindings: D3.Map<Plots.AccessorScaleBinding<any, any>>, extents: D3.Map<any[]>) {
+      var accScaleBinding = bindings.get(key);
       if (accScaleBinding.accessor == null) { return; }
       var coercer = (accScaleBinding.scale != null) ? accScaleBinding.scale._typeCoercer : (d: any) => d;
-      var extentMap = ifAttr ? this._attrExtents : this._propertyExtents;
-      extentMap.set(key, this._datasetKeysInOrder.map((key) => {
+      extents.set(key, this._datasetKeysInOrder.map((key) => {
         var plotDatasetKey = this._key2PlotDatasetKey.get(key);
         var dataset = plotDatasetKey.dataset;
         var plotMetadata = plotDatasetKey.plotMetadata;
@@ -594,16 +592,12 @@ module Plottable {
       }
     }
 
-    private static _scaledAccessor<SD, SR>(accScaleBinding: Plots.AccessorScaleBinding<SD, SR>): _Accessor {
-      return accScaleBinding.scale == null ?
-               accScaleBinding.accessor :
-               (d: any, i: number, dataset: Dataset, m: Plots.PlotMetadata) =>
-                 accScaleBinding.scale.scale(accScaleBinding.accessor(d, i, dataset, m));
-    }
-
-    protected _propertyToProjectors(): AttributeToProjector {
+    protected _generatePropertyToProjectors(): AttributeToProjector {
       var attrToProjector: AttributeToProjector = {};
-      this._propertyBindings.forEach((key, binding) => attrToProjector[key] = Plot._scaledAccessor(binding));
+      this._propertyBindings.forEach((key, binding) => {
+        var scaledAccessor = (d: any, i: number, dataset: Dataset, m: any) => binding.scale.scale(binding.accessor(d, i, dataset, m));
+        attrToProjector[key] = binding.scale == null ? binding.accessor : scaledAccessor;
+      });
       return attrToProjector;
     }
   }

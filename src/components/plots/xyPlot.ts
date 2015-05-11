@@ -57,7 +57,7 @@ module Plottable {
         xScale.onUpdate(this._adjustYDomainOnChangeFromXCallback);
       }
 
-      this._setupProperty(XYPlot._X_KEY, x, xScale);
+      this._bindProperty(XYPlot._X_KEY, x, xScale);
       this._render();
       return this;
     }
@@ -79,7 +79,7 @@ module Plottable {
         yScale.onUpdate(this._adjustXDomainOnChangeFromYCallback);
       }
 
-      this._setupProperty(XYPlot._Y_KEY, y, yScale);
+      this._bindProperty(XYPlot._Y_KEY, y, yScale);
       this._render();
       return this;
     }
@@ -123,8 +123,8 @@ module Plottable {
       return this;
     }
 
-    protected _propertyToProjectors(): AttributeToProjector {
-      var attrToProjector = super._propertyToProjectors();
+    protected _generatePropertyToProjectors(): AttributeToProjector {
+      var attrToProjector = super._generatePropertyToProjectors();
       var positionXFn = attrToProjector["x"];
       var positionYFn = attrToProjector["y"];
       attrToProjector["defined"] = (d: any, i: number, dataset: Dataset, m: Plots.PlotMetadata) => {

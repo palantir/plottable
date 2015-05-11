@@ -35,7 +35,7 @@ export module Plots {
       if (y0 == null) {
         return this._propertyBindings.get(Area._Y0_KEY);
       }
-      this._setupProperty(Area._Y0_KEY, y0, y0Scale);
+      this._bindProperty(Area._Y0_KEY, y0, y0Scale);
       this._updateYDomainer();
       this._render();
       return this;

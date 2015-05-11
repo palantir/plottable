@@ -6419,23 +6419,22 @@ var Plottable;
         Plot.prototype.project = function (attrToSet, accessor, scale) {
             attrToSet = attrToSet.toLowerCase();
             accessor = Plottable.Utils.Methods.accessorize(accessor);
-            this._setupAttr(attrToSet, accessor, scale);
+            this._bindAttr(attrToSet, accessor, scale);
             this.render(); // queue a re-render upon changing projector
             return this;
         };
-        Plot.prototype._setupProperty = function (property, value, scale) {
-            this._setupKey(property, value, scale, false);
+        Plot.prototype._bindProperty = function (property, value, scale) {
+            this._bindKey(property, value, scale, this._propertyBindings, this._propertyExtents);
         };
-        Plot.prototype._setupAttr = function (property, value, scale) {
-            this._setupKey(property, value, scale, true);
+        Plot.prototype._bindAttr = function (attr, value, scale) {
+            this._bindKey(attr, value, scale, this._attrBindings, this._attrExtents);
         };
-        Plot.prototype._setupKey = function (key, value, scale, ifAttr) {
-            var bindings = ifAttr ? this._attrBindings : this._propertyBindings;
+        Plot.prototype._bindKey = function (key, value, scale, bindings, extents) {
             var binding = bindings.get(key);
             var oldScale = binding != null ? binding.scale : null;
             this._replaceScale(oldScale, scale);
             bindings.set(key, { accessor: d3.functor(value), scale: scale });
-            this._updateExtentsForKey(key, ifAttr);
+            this._updateExtentsForKey(key, bindings, extents);
         };
         Plot.prototype._generateAttrToProjector = function () {
             var h = {};
@@ -6445,7 +6444,7 @@ var Plottable;
                 var fn = scale ? function (d, i, dataset, m) { return scale.scale(accessor(d, i, dataset, m)); } : accessor;
                 h[attr] = fn;
             });
-            var propertyProjectors = this._propertyToProjectors();
+            var propertyProjectors = this._generatePropertyToProjectors();
             Object.keys(propertyProjectors).forEach(function (key) {
                 if (h[key] == null) {
                     h[key] = propertyProjectors[key];
@@ -6523,20 +6522,18 @@ var Plottable;
          */
         Plot.prototype._updateExtents = function () {
             var _this = this;
-            this._attrBindings.forEach(function (attr) { return _this._updateExtentsForKey(attr, true); });
-            this._propertyExtents.forEach(function (property) { return _this._updateExtentsForKey(property, false); });
+            this._attrBindings.forEach(function (attr) { return _this._updateExtentsForKey(attr, _this._attrBindings, _this._attrExtents); });
+            this._propertyExtents.forEach(function (property) { return _this._updateExtentsForKey(property, _this._propertyBindings, _this._propertyExtents); });
             this._scales().forEach(function (scale) { return scale._autoDomainIfAutomaticMode(); });
         };
-        Plot.prototype._updateExtentsForKey = function (key, ifAttr) {
+        Plot.prototype._updateExtentsForKey = function (key, bindings, extents) {
             var _this = this;
-            var bindingMap = ifAttr ? this._attrBindings : this._propertyBindings;
-            var accScaleBinding = bindingMap.get(key);
+            var accScaleBinding = bindings.get(key);
             if (accScaleBinding.accessor == null) {
                 return;
             }
             var coercer = (accScaleBinding.scale != null) ? accScaleBinding.scale._typeCoercer : function (d) { return d; };
-            var extentMap = ifAttr ? this._attrExtents : this._propertyExtents;
-            extentMap.set(key, this._datasetKeysInOrder.map(function (key) {
+            extents.set(key, this._datasetKeysInOrder.map(function (key) {
                 var plotDatasetKey = _this._key2PlotDatasetKey.get(key);
                 var dataset = plotDatasetKey.dataset;
                 var plotMetadata = plotDatasetKey.plotMetadata;
@@ -6791,12 +6788,12 @@ var Plottable;
                 newScale._autoDomainIfAutomaticMode();
             }
         };
-        Plot._scaledAccessor = function (accScaleBinding) {
-            return accScaleBinding.scale == null ? accScaleBinding.accessor : function (d, i, dataset, m) { return accScaleBinding.scale.scale(accScaleBinding.accessor(d, i, dataset, m)); };
-        };
-        Plot.prototype._propertyToProjectors = function () {
+        Plot.prototype._generatePropertyToProjectors = function () {
             var attrToProjector = {};
-            this._propertyBindings.forEach(function (key, binding) { return attrToProjector[key] = Plot._scaledAccessor(binding); });
+            this._propertyBindings.forEach(function (key, binding) {
+                var scaledAccessor = function (d, i, dataset, m) { return binding.scale.scale(binding.accessor(d, i, dataset, m)); };
+                attrToProjector[key] = binding.scale == null ? binding.accessor : scaledAccessor;
+            });
             return attrToProjector;
         };
         return Plot;
@@ -6875,27 +6872,27 @@ var Plottable;
                 });
                 return allPlotData;
             };
-            Pie.prototype.sectorValue = function (sectorValue, sectorValueScale) {
+            Pie.prototype.sectorValue = function (sectorValue, scale) {
                 if (sectorValue == null) {
                     return this._propertyBindings.get(Pie._SECTOR_VALUE_KEY);
                 }
-                this._setupProperty(Pie._SECTOR_VALUE_KEY, sectorValue, sectorValueScale);
+                this._bindProperty(Pie._SECTOR_VALUE_KEY, sectorValue, scale);
                 this._render();
                 return this;
             };
-            Pie.prototype.innerRadius = function (innerRadius, innerRadiusScale) {
+            Pie.prototype.innerRadius = function (innerRadius, scale) {
                 if (innerRadius == null) {
                     return this._propertyBindings.get(Pie._INNER_RADIUS_KEY);
                 }
-                this._setupProperty(Pie._INNER_RADIUS_KEY, innerRadius, innerRadiusScale);
+                this._bindProperty(Pie._INNER_RADIUS_KEY, innerRadius, scale);
                 this._render();
                 return this;
             };
-            Pie.prototype.outerRadius = function (outerRadius, outerRadiusScale) {
+            Pie.prototype.outerRadius = function (outerRadius, scale) {
                 if (outerRadius == null) {
                     return this._propertyBindings.get(Pie._OUTER_RADIUS_KEY);
                 }
-                this._setupProperty(Pie._OUTER_RADIUS_KEY, outerRadius, outerRadiusScale);
+                this._bindProperty(Pie._OUTER_RADIUS_KEY, outerRadius, scale);
                 this._render();
                 return this;
             };
@@ -6960,7 +6957,7 @@ var Plottable;
                 this._updateXDomainer();
                 xScale.onUpdate(this._adjustYDomainOnChangeFromXCallback);
             }
-            this._setupProperty(XYPlot._X_KEY, x, xScale);
+            this._bindProperty(XYPlot._X_KEY, x, xScale);
             this._render();
             return this;
         };
@@ -6976,7 +6973,7 @@ var Plottable;
                 this._updateYDomainer();
                 yScale.onUpdate(this._adjustXDomainOnChangeFromYCallback);
             }
-            this._setupProperty(XYPlot._Y_KEY, y, yScale);
+            this._bindProperty(XYPlot._Y_KEY, y, yScale);
             this._render();
             return this;
         };
@@ -7016,8 +7013,8 @@ var Plottable;
             this._adjustXDomainOnChangeFromY();
             return this;
         };
-        XYPlot.prototype._propertyToProjectors = function () {
-            var attrToProjector = _super.prototype._propertyToProjectors.call(this);
+        XYPlot.prototype._generatePropertyToProjectors = function () {
+            var attrToProjector = _super.prototype._generatePropertyToProjectors.call(this);
             var positionXFn = attrToProjector["x"];
             var positionYFn = attrToProjector["y"];
             attrToProjector["defined"] = function (d, i, dataset, m) {
@@ -7993,7 +7990,7 @@ var Plottable;
                 if (y0 == null) {
                     return this._propertyBindings.get(Area._Y0_KEY);
                 }
-                this._setupProperty(Area._Y0_KEY, y0, y0Scale);
+                this._bindProperty(Area._Y0_KEY, y0, y0Scale);
                 this._updateYDomainer();
                 this._render();
                 return this;
