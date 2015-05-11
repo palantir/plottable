@@ -6784,12 +6784,12 @@ var Plottable;
                 }
             }
         };
-        Plot._scaledAccessor = function (accScaleBinding) {
-            return accScaleBinding.scale == null ? accScaleBinding.accessor : function (d, i, dataset, m) { return accScaleBinding.scale.scale(accScaleBinding.accessor(d, i, dataset, m)); };
-        };
         Plot.prototype._generatePropertyToProjectors = function () {
             var attrToProjector = {};
-            this._propertyBindings.forEach(function (key, binding) { return attrToProjector[key] = Plot._scaledAccessor(binding); });
+            this._propertyBindings.forEach(function (key, binding) {
+                var scaledAccessor = function (d, i, dataset, m) { return binding.scale.scale(binding.accessor(d, i, dataset, m)); };
+                attrToProjector[key] = binding.scale == null ? binding.accessor : scaledAccessor;
+            });
             return attrToProjector;
         };
         return Plot;

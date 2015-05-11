@@ -587,16 +587,12 @@ module Plottable {
       }
     }
 
-    private static _scaledAccessor<SD, SR>(accScaleBinding: Plots.AccessorScaleBinding<SD, SR>): _Accessor {
-      return accScaleBinding.scale == null ?
-               accScaleBinding.accessor :
-               (d: any, i: number, dataset: Dataset, m: Plots.PlotMetadata) =>
-                 accScaleBinding.scale.scale(accScaleBinding.accessor(d, i, dataset, m));
-    }
-
     private _generatePropertyToProjectors(): AttributeToProjector {
       var attrToProjector: AttributeToProjector = {};
-      this._propertyBindings.forEach((key, binding) => attrToProjector[key] = Plot._scaledAccessor(binding));
+      this._propertyBindings.forEach((key, binding) => {
+        var scaledAccessor = (d, i, dataset, m) => binding.scale.scale(binding.accessor(d, i, dataset, m));
+        attrToProjector[key] = binding.scale == null ? binding.accessor : scaledAccessor;
+      });
       return attrToProjector;
     }
   }
