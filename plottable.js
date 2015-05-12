@@ -6221,6 +6221,7 @@ var Plottable;
             this._key2PlotDatasetKey = d3.map();
             this._attrBindings = d3.map();
             this._attrExtents = d3.map();
+            this._attrFilters = d3.map();
             this._extentProvider = function (scale) { return _this._extentsForScale(scale); };
             this._datasetKeysInOrder = [];
             this._nextSeriesIndex = 0;
@@ -6414,10 +6415,11 @@ var Plottable;
             this._attrBindings.forEach(function (attr) { return _this._updateExtentsForAttr(attr); });
             this._scales().forEach(function (scale) { return scale._autoDomainIfAutomaticMode(); });
         };
-        Plot.prototype._updateExtentsForAttr = function (attr, filter) {
+        Plot.prototype._updateExtentsForAttr = function (attr) {
             var _this = this;
             var binding = this._attrBindings.get(attr);
             var accessor = binding.accessor;
+            var filter = this._attrFilters.get(attr);
             var extents = this._datasetKeysInOrder.map(function (key) {
                 var plotDatasetKey = _this._key2PlotDatasetKey.get(key);
                 var dataset = plotDatasetKey.dataset;
@@ -6470,6 +6472,21 @@ var Plottable;
                 }
             });
             return d3.merge(allSetsOfExtents);
+        };
+        Plot.prototype._makeFilterByAttr = function (attr) {
+            var _this = this;
+            return function (datum, index, dataset, metadata) {
+                var attrBinding = _this._attrBindings.get(attr);
+                if (attrBinding != null) {
+                    var accessor = attrBinding.accessor;
+                    var scale = attrBinding.scale;
+                    if (scale != null) {
+                        var range = scale.range();
+                        return Plottable.Utils.Methods.inRange(scale.scale(accessor(datum, index, dataset, metadata)), range[0], range[1]);
+                    }
+                }
+                return true;
+            };
         };
         Plot.prototype.animator = function (animatorKey, animator) {
             if (animator === undefined) {
@@ -6796,47 +6813,6 @@ var Plottable;
             _super.prototype.project.call(this, attrToSet, accessor, scale);
             return this;
         };
-        XYPlot.prototype._updateExtentsForAttr = function (attr) {
-            if (attr === "x") {
-                return _super.prototype._updateExtentsForAttr.call(this, attr, this._xFilter());
-            }
-            else if (attr === "y") {
-                return _super.prototype._updateExtentsForAttr.call(this, attr, this._yFilter());
-            }
-            return _super.prototype._updateExtentsForAttr.call(this, attr);
-        };
-        XYPlot.prototype._xFilter = function () {
-            if (this._autoAdjustXScaleDomain) {
-                var yBinding = this._attrBindings.get("y");
-                if (yBinding != null) {
-                    var yAccessor = yBinding.accessor;
-                    var yScale = yBinding.scale;
-                    if (yScale != null) {
-                        return function (d, i, dataset, metadata) {
-                            var range = yScale.range();
-                            return Plottable.Utils.Methods.inRange(yScale.scale(yAccessor(d, i, dataset, metadata)), range[0], range[1]);
-                        };
-                    }
-                }
-            }
-            return null;
-        };
-        XYPlot.prototype._yFilter = function () {
-            if (this._autoAdjustYScaleDomain) {
-                var xBinding = this._attrBindings.get("x");
-                if (xBinding != null) {
-                    var xAccessor = xBinding.accessor;
-                    var xScale = xBinding.scale;
-                    if (xScale != null) {
-                        return function (d, i, dataset, metadata) {
-                            var range = xScale.range();
-                            return Plottable.Utils.Methods.inRange(xScale.scale(xAccessor(d, i, dataset, metadata)), range[0], range[1]);
-                        };
-                    }
-                }
-            }
-            return null;
-        };
         XYPlot.prototype.destroy = function () {
             _super.prototype.destroy.call(this);
             if (this._xScale) {
@@ -6857,6 +6833,12 @@ var Plottable;
          */
         XYPlot.prototype.automaticallyAdjustYScaleOverVisiblePoints = function (autoAdjustment) {
             this._autoAdjustYScaleDomain = autoAdjustment;
+            if (this._autoAdjustYScaleDomain) {
+                this._attrFilters.set("y", this._makeFilterByAttr("x"));
+            }
+            else {
+                this._attrFilters.set("y", null);
+            }
             this._adjustYDomainOnChangeFromX();
             return this;
         };
@@ -6870,6 +6852,12 @@ var Plottable;
          */
         XYPlot.prototype.automaticallyAdjustXScaleOverVisiblePoints = function (autoAdjustment) {
             this._autoAdjustXScaleDomain = autoAdjustment;
+            if (this._autoAdjustXScaleDomain) {
+                this._attrFilters.set("x", this._makeFilterByAttr("y"));
+            }
+            else {
+                this._attrFilters.set("x", null);
+            }
             this._adjustXDomainOnChangeFromY();
             return this;
         };
@@ -7949,7 +7937,7 @@ var Plottable;
             var _this = this;
             var valueAccessor = this._valueAccessor();
             var keyAccessor = this._keyAccessor();
-            var filter = this._isVertical ? this._yFilter() : this._xFilter();
+            var filter = this._attrFilters.get(this._isVertical ? "y" : "x");
             var maxStackExtent = Plottable.Utils.Methods.max(this._datasetKeysInOrder, function (k) {
                 var dataset = _this._key2PlotDatasetKey.get(k).dataset;
                 var plotMetadata = _this._key2PlotDatasetKey.get(k).plotMetadata;
