@@ -36,9 +36,9 @@ function run(svg, data, Plottable) {
   var dataset5 = new Plottable.Dataset(data[4]);
 
   var verticalPlot = new Plottable.Plots.StackedBar(xScale1, yScale1, true)
-    .project("x", "quarter", xScale1)
-    .project("y", "earnings", yScale1)
-    .project("fill", "team", colorScale)
+    .x(function(d) { return d.quarter; }, xScale1)
+    .y(function(d) { return d.earnings; }, yScale1)
+    .attr("fill", function(d) { return d.team; }, colorScale)
     .addDataset(dataset1)
     .addDataset(dataset2)
     .addDataset(dataset3)
@@ -49,9 +49,9 @@ function run(svg, data, Plottable) {
     .animate(true);
 
   var horizontalPlot = new Plottable.Plots.StackedBar(xScale2, yScale2, false)
-    .project("x", "earnings", xScale2)
-    .project("y", "quarter", yScale2)
-    .project("fill", "team", colorScale)
+    .x(function(d) { return d.earnings; }, xScale2)
+    .y(function(d) { return d.quarter; }, yScale2)
+    .attr("fill", function(d) { return d.team; }, colorScale)
     .addDataset(dataset1)
     .addDataset(dataset2)
     .addDataset(dataset3)

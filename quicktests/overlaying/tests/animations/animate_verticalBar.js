@@ -19,8 +19,8 @@ function run(svg, data, Plottable) {
   var dataset = new Plottable.Dataset(data);
   var verticalBarPlot = new Plottable.Plots.Bar(xScale, yScale, true)
                               .addDataset(dataset)
-                              .project("x", "x", xScale)
-                              .project("y", "y", yScale)
+                              .x(function(d) { return d.x; }, xScale)
+                              .y(function(d) { return d.y; }, yScale)
                               .attr("opacity", 0.75)
                               .animate(doAnimate);
 
