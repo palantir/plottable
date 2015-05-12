@@ -2833,10 +2833,10 @@ declare module Plottable {
             protected _generateDrawSteps(): Drawers.DrawStep[];
             x(): Plots.AccessorScaleBinding<any, number>;
             x(x: number | _Accessor): Grid;
-            x(x: any | _Accessor, xScale: Scale<any, number>): Grid;
+            x(x: any | _Accessor, scale: Scale<any, number>): Grid;
             y(): Plots.AccessorScaleBinding<any, number>;
             y(y: number | _Accessor): Grid;
-            y(y: any | _Accessor, yScale: Scale<any, number>): Grid;
+            y(y: any | _Accessor, scale: Scale<any, number>): Grid;
         }
     }
 }

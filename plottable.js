@@ -7254,44 +7254,44 @@ var Plottable;
             Grid.prototype._generateDrawSteps = function () {
                 return [{ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("cells") }];
             };
-            Grid.prototype.x = function (x, xScale) {
+            Grid.prototype.x = function (x, scale) {
                 var _this = this;
                 if (x == null) {
                     return _super.prototype.x.call(this);
                 }
-                _super.prototype.x.call(this, x, xScale);
-                if (xScale instanceof Plottable.Scales.Category) {
+                _super.prototype.x.call(this, x, scale);
+                if (scale instanceof Plottable.Scales.Category) {
                     this.project("x1", function (d, i, dataset, m) {
-                        return xScale.scale(_this.x().accessor(d, i, dataset, m)) - xScale.rangeBand() / 2;
+                        return scale.scale(_this.x().accessor(d, i, dataset, m)) - scale.rangeBand() / 2;
                     });
                     this.project("x2", function (d, i, dataset, m) {
-                        return xScale.scale(_this.x().accessor(d, i, dataset, m)) + xScale.rangeBand() / 2;
+                        return scale.scale(_this.x().accessor(d, i, dataset, m)) + scale.rangeBand() / 2;
                     });
                 }
-                if (xScale instanceof Plottable.QuantitativeScale) {
+                if (scale instanceof Plottable.QuantitativeScale) {
                     this.project("x1", function (d, i, dataset, m) {
-                        return xScale.scale(_this.x().accessor(d, i, dataset, m));
+                        return scale.scale(_this.x().accessor(d, i, dataset, m));
                     });
                 }
                 return this;
             };
-            Grid.prototype.y = function (y, yScale) {
+            Grid.prototype.y = function (y, scale) {
                 var _this = this;
                 if (y == null) {
                     return _super.prototype.y.call(this);
                 }
-                _super.prototype.y.call(this, y, yScale);
-                if (yScale instanceof Plottable.Scales.Category) {
+                _super.prototype.y.call(this, y, scale);
+                if (scale instanceof Plottable.Scales.Category) {
                     this.project("y1", function (d, i, dataset, m) {
-                        return yScale.scale(_this.y().accessor(d, i, dataset, m)) - yScale.rangeBand() / 2;
+                        return scale.scale(_this.y().accessor(d, i, dataset, m)) - scale.rangeBand() / 2;
                     });
                     this.project("y2", function (d, i, dataset, m) {
-                        return yScale.scale(_this.y().accessor(d, i, dataset, m)) + yScale.rangeBand() / 2;
+                        return scale.scale(_this.y().accessor(d, i, dataset, m)) + scale.rangeBand() / 2;
                     });
                 }
-                if (yScale instanceof Plottable.QuantitativeScale) {
+                if (scale instanceof Plottable.QuantitativeScale) {
                     this.project("y1", function (d, i, dataset, m) {
-                        return yScale.scale(_this.y().accessor(d, i, dataset, m));
+                        return scale.scale(_this.y().accessor(d, i, dataset, m));
                     });
                 }
                 return this;
@@ -8041,21 +8041,21 @@ var Plottable;
             metadata.offsets = d3.map();
             return metadata;
         };
-        Stacked.prototype.x = function (x, xScale) {
+        Stacked.prototype.x = function (x, scale) {
             if (x == null) {
                 return _super.prototype.x.call(this);
             }
-            _super.prototype.x.call(this, x, xScale);
+            _super.prototype.x.call(this, x, scale);
             if (this.x().accessor != null && this.y().accessor != null) {
                 this._updateStackOffsets();
             }
             return this;
         };
-        Stacked.prototype.y = function (y, yScale) {
+        Stacked.prototype.y = function (y, scale) {
             if (y == null) {
                 return _super.prototype.y.call(this);
             }
-            _super.prototype.y.call(this, y, yScale);
+            _super.prototype.y.call(this, y, scale);
             if (this.x().accessor != null && this.y().accessor != null) {
                 this._updateStackOffsets();
             }
