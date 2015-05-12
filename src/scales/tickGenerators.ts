@@ -6,11 +6,7 @@ module Plottable {
       // HACKHACK: Generic types in type definition fails compilation
       // https://github.com/Microsoft/TypeScript/issues/1616
       export interface TickGenerator<D> {
-<<<<<<< HEAD
         (scale: Plottable.QuantitativeScale<D>): D[];
-=======
-        (scale: Plottable.Scale.AbstractQuantitative<D>): D[];
->>>>>>> develop
       }
       /**
        * Creates a tick generator using the specified interval.
