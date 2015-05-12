@@ -2780,6 +2780,18 @@ declare module Plottable {
                 [attrToSet: string]: (datum: any, index: number, dataset: Dataset, plotMetadata: PlotMetadata) => any;
             };
             protected _generateDrawSteps(): Drawers.DrawStep[];
+            x1(): AccessorScaleBinding<X, number>;
+            x1(x1: number | _Accessor): Plots.Rectangle<X, Y>;
+            x1(x1: X | _Accessor, scale: Scale<X, number>): Plots.Rectangle<X, Y>;
+            x2(): AccessorScaleBinding<X, number>;
+            x2(x2: number | _Accessor): Plots.Rectangle<X, Y>;
+            x2(x2: X | _Accessor, scale: Scale<X, number>): Plots.Rectangle<X, Y>;
+            y1(): AccessorScaleBinding<X, number>;
+            y1(y1: number | _Accessor): Plots.Rectangle<X, Y>;
+            y1(y1: Y | _Accessor, scale: Scale<Y, number>): Plots.Rectangle<X, Y>;
+            y2(): AccessorScaleBinding<X, number>;
+            y2(y2: number | _Accessor): Plots.Rectangle<X, Y>;
+            y2(y2: Y | _Accessor, scale: Scale<Y, number>): Plots.Rectangle<X, Y>;
         }
     }
 }
@@ -2800,6 +2812,11 @@ declare module Plottable {
             protected _generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, dataset: Dataset, plotMetadata: PlotMetadata) => any;
             };
+            size(): AccessorScaleBinding<X, number>;
+            size(size: number | _Accessor): Plots.Scatter<X, Y>;
+            size(size: any | _Accessor, scale: Scale<any, number>): Plots.Scatter<X, Y>;
+            symbol(): AccessorScaleBinding<any, any>;
+            symbol(symbol: _Accessor): Plots.Scatter<X, Y>;
             protected _generateDrawSteps(): Drawers.DrawStep[];
             protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean;
         }

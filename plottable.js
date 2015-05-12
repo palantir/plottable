@@ -7087,6 +7087,42 @@ var Plottable;
             Rectangle.prototype._generateDrawSteps = function () {
                 return [{ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("rectangles") }];
             };
+            Rectangle.prototype.x1 = function (x1, scale) {
+                if (x1 == null) {
+                    return this._propertyBindings.get(Rectangle._X1_KEY);
+                }
+                this._bindProperty(Rectangle._X1_KEY, x1, scale);
+                this._render();
+                return this;
+            };
+            Rectangle.prototype.x2 = function (x2, scale) {
+                if (x2 == null) {
+                    return this._propertyBindings.get(Rectangle._X2_KEY);
+                }
+                this._bindProperty(Rectangle._X2_KEY, x2, scale);
+                this._render();
+                return this;
+            };
+            Rectangle.prototype.y1 = function (y1, scale) {
+                if (y1 == null) {
+                    return this._propertyBindings.get(Rectangle._Y1_KEY);
+                }
+                this._bindProperty(Rectangle._Y1_KEY, y1, scale);
+                this._render();
+                return this;
+            };
+            Rectangle.prototype.y2 = function (y2, scale) {
+                if (y2 == null) {
+                    return this._propertyBindings.get(Rectangle._Y2_KEY);
+                }
+                this._bindProperty(Rectangle._Y2_KEY, y2, scale);
+                this._render();
+                return this;
+            };
+            Rectangle._X1_KEY = "x1";
+            Rectangle._X2_KEY = "x2";
+            Rectangle._Y1_KEY = "y1";
+            Rectangle._Y2_KEY = "y2";
             return Rectangle;
         })(Plottable.XYPlot);
         Plots.Rectangle = Rectangle;
@@ -7131,6 +7167,22 @@ var Plottable;
                 attrToProjector["symbol"] = attrToProjector["symbol"] || (function () { return Plottable.SymbolFactories.circle(); });
                 return attrToProjector;
             };
+            Scatter.prototype.size = function (size, scale) {
+                if (size == null) {
+                    return this._propertyBindings.get(Scatter._SIZE_KEY);
+                }
+                this._bindProperty(Scatter._SIZE_KEY, size, scale);
+                this._render();
+                return this;
+            };
+            Scatter.prototype.symbol = function (symbol) {
+                if (symbol == null) {
+                    return this._propertyBindings.get(Scatter._SYMBOL_KEY);
+                }
+                this._propertyBindings.set(Scatter._SYMBOL_KEY, { accessor: symbol });
+                this._render();
+                return this;
+            };
             Scatter.prototype._generateDrawSteps = function () {
                 var drawSteps = [];
                 if (this._dataChanged && this._animate) {
@@ -7154,6 +7206,8 @@ var Plottable;
                 };
                 return Plottable.Utils.Methods.intersectsBBox(xRange, yRange, translatedBbox);
             };
+            Scatter._SIZE_KEY = "size";
+            Scatter._SYMBOL_KEY = "symbol";
             return Scatter;
         })(Plottable.XYPlot);
         Plots.Scatter = Scatter;
@@ -7214,38 +7268,7 @@ var Plottable;
              * the data should return a valid CSS color.
              */
             Grid.prototype.project = function (attrToSet, accessor, scale) {
-                var _this = this;
                 _super.prototype.project.call(this, attrToSet, accessor, scale);
-                if (attrToSet === "x") {
-                    if (scale instanceof Plottable.Scales.Category) {
-                        this.project("x1", function (d, i, dataset, m) {
-                            return scale.scale(_this._attrBindings.get("x").accessor(d, i, dataset, m)) - scale.rangeBand() / 2;
-                        });
-                        this.project("x2", function (d, i, dataset, m) {
-                            return scale.scale(_this._attrBindings.get("x").accessor(d, i, dataset, m)) + scale.rangeBand() / 2;
-                        });
-                    }
-                    if (scale instanceof Plottable.QuantitativeScale) {
-                        this.project("x1", function (d, i, dataset, m) {
-                            return scale.scale(_this._attrBindings.get("x").accessor(d, i, dataset, m));
-                        });
-                    }
-                }
-                if (attrToSet === "y") {
-                    if (scale instanceof Plottable.Scales.Category) {
-                        this.project("y1", function (d, i, dataset, m) {
-                            return scale.scale(_this._attrBindings.get("y").accessor(d, i, dataset, m)) - scale.rangeBand() / 2;
-                        });
-                        this.project("y2", function (d, i, dataset, m) {
-                            return scale.scale(_this._attrBindings.get("y").accessor(d, i, dataset, m)) + scale.rangeBand() / 2;
-                        });
-                    }
-                    if (scale instanceof Plottable.QuantitativeScale) {
-                        this.project("y1", function (d, i, dataset, m) {
-                            return scale.scale(_this._attrBindings.get("y").accessor(d, i, dataset, m));
-                        });
-                    }
-                }
                 if (attrToSet === "fill") {
                     this._colorScale = this._attrBindings.get("fill").scale;
                 }
@@ -7265,17 +7288,11 @@ var Plottable;
                 else {
                     _super.prototype.x.call(this, x, scale);
                     if (scale instanceof Plottable.Scales.Category) {
-                        this.project("x1", function (d, i, dataset, m) {
-                            return scale.scale(_this.x().accessor(d, i, dataset, m)) - scale.rangeBand() / 2;
-                        });
-                        this.project("x2", function (d, i, dataset, m) {
-                            return scale.scale(_this.x().accessor(d, i, dataset, m)) + scale.rangeBand() / 2;
-                        });
+                        this.x1(function (d, i, dataset, m) { return scale.scale(_this.x().accessor(d, i, dataset, m)) - scale.rangeBand() / 2; });
+                        this.x2(function (d, i, dataset, m) { return scale.scale(_this.x().accessor(d, i, dataset, m)) + scale.rangeBand() / 2; });
                     }
                     else if (scale instanceof Plottable.QuantitativeScale) {
-                        this.project("x1", function (d, i, dataset, m) {
-                            return scale.scale(_this.x().accessor(d, i, dataset, m));
-                        });
+                        this.x1(function (d, i, dataset, m) { return scale.scale(_this.x().accessor(d, i, dataset, m)); });
                     }
                 }
                 return this;
@@ -7291,17 +7308,11 @@ var Plottable;
                 else {
                     _super.prototype.y.call(this, y, scale);
                     if (scale instanceof Plottable.Scales.Category) {
-                        this.project("y1", function (d, i, dataset, m) {
-                            return scale.scale(_this.y().accessor(d, i, dataset, m)) - scale.rangeBand() / 2;
-                        });
-                        this.project("y2", function (d, i, dataset, m) {
-                            return scale.scale(_this.y().accessor(d, i, dataset, m)) + scale.rangeBand() / 2;
-                        });
+                        this.y1(function (d, i, dataset, m) { return scale.scale(_this.y().accessor(d, i, dataset, m)) - scale.rangeBand() / 2; });
+                        this.y2(function (d, i, dataset, m) { return scale.scale(_this.y().accessor(d, i, dataset, m)) + scale.rangeBand() / 2; });
                     }
                     else if (scale instanceof Plottable.QuantitativeScale) {
-                        this.project("y1", function (d, i, dataset, m) {
-                            return scale.scale(_this.y().accessor(d, i, dataset, m));
-                        });
+                        this.y1(function (d, i, dataset, m) { return scale.scale(_this.y().accessor(d, i, dataset, m)); });
                     }
                 }
                 return this;
