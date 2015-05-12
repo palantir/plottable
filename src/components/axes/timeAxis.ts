@@ -272,7 +272,7 @@ export module Axes {
 
     private _getIntervalLength(config: TimeAxisTierConfiguration) {
       var startDate = this._scale.domain()[0];
-      var d3Interval = this._getD3TimeInterval(config.interval);
+      var d3Interval = Formatters.timeIntervalToD3Time(config.interval);
       var endDate = d3Interval.offset(startDate, config.step);
       if (endDate > this._scale.domain()[1]) {
         // this offset is too large, so just return available width
@@ -536,25 +536,6 @@ export module Axes {
           tickLabel.style("visibility", "inherit");
         }
       });
-    }
-
-    private _getD3TimeInterval(timeInterval: TimeInterval) {
-      switch (timeInterval) {
-        case TimeInterval.second:
-          return d3.time.second;
-        case TimeInterval.minute:
-          return d3.time.minute;
-        case TimeInterval.hour:
-          return d3.time.hour;
-        case TimeInterval.day:
-          return d3.time.day;
-        case TimeInterval.month:
-          return d3.time.month;
-        case TimeInterval.year:
-          return d3.time.year;
-        default:
-          throw Error("TimeInterval specified does not exist");
-      }
     }
   }
 }

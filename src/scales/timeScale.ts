@@ -21,7 +21,7 @@ export module Scales {
     public tickInterval(interval: TimeInterval, step?: number): Date[] {
       // temporarily creats a time scale from our linear scale into a time scale so we can get access to its api
       var tempScale = d3.time.scale();
-      var d3Interval = this._getD3TimeInterval(interval);
+      var d3Interval = Formatters.timeIntervalToD3Time(interval);
       tempScale.domain(this.domain());
       tempScale.range(this.range());
       return tempScale.ticks(d3Interval.range, step);
@@ -43,27 +43,6 @@ export module Scales {
       var startTimeValue = endTimeValue - Plottable.MILLISECONDS_IN_ONE_DAY;
       return [new Date(startTimeValue), new Date(endTimeValue)];
     }
-
-    private _getD3TimeInterval(timeInterval: TimeInterval) {
-      switch (timeInterval) {
-        case TimeInterval.second:
-          return d3.time.second;
-        case TimeInterval.minute:
-          return d3.time.minute;
-        case TimeInterval.hour:
-          return d3.time.hour;
-        case TimeInterval.day:
-          return d3.time.day;
-        case TimeInterval.month:
-          return d3.time.month;
-        case TimeInterval.year:
-          return d3.time.year;
-        default:
-          throw Error("TimeInterval specified does not exist");
-
-      }
-    }
-
   }
 }
 }

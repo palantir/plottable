@@ -929,6 +929,28 @@ var Plottable;
         }
         Formatters.time = time;
         /**
+         * Transforms the Plottable TimeInterval into a d3 time interval equivalent
+         */
+        function timeIntervalToD3Time(timeInterval) {
+            switch (timeInterval) {
+                case 0 /* second */:
+                    return d3.time.second;
+                case 1 /* minute */:
+                    return d3.time.minute;
+                case 2 /* hour */:
+                    return d3.time.hour;
+                case 3 /* day */:
+                    return d3.time.day;
+                case 4 /* month */:
+                    return d3.time.month;
+                case 5 /* year */:
+                    return d3.time.year;
+                default:
+                    throw Error("TimeInterval specified does not exist");
+            }
+        }
+        Formatters.timeIntervalToD3Time = timeIntervalToD3Time;
+        /**
          * Creates a formatter for relative dates.
          *
          * @param {number} baseValue The start date (as epoch time) used in computing relative dates (default 0)
@@ -2214,7 +2236,7 @@ var Plottable;
             Time.prototype.tickInterval = function (interval, step) {
                 // temporarily creats a time scale from our linear scale into a time scale so we can get access to its api
                 var tempScale = d3.time.scale();
-                var d3Interval = this._getD3TimeInterval(interval);
+                var d3Interval = Plottable.Formatters.timeIntervalToD3Time(interval);
                 tempScale.domain(this.domain());
                 tempScale.range(this.range());
                 return tempScale.ticks(d3Interval.range, step);
@@ -2232,24 +2254,6 @@ var Plottable;
                 var endTimeValue = new Date().valueOf();
                 var startTimeValue = endTimeValue - Plottable.MILLISECONDS_IN_ONE_DAY;
                 return [new Date(startTimeValue), new Date(endTimeValue)];
-            };
-            Time.prototype._getD3TimeInterval = function (timeInterval) {
-                switch (timeInterval) {
-                    case 0 /* second */:
-                        return d3.time.second;
-                    case 1 /* minute */:
-                        return d3.time.minute;
-                    case 2 /* hour */:
-                        return d3.time.hour;
-                    case 3 /* day */:
-                        return d3.time.day;
-                    case 4 /* month */:
-                        return d3.time.month;
-                    case 5 /* year */:
-                        return d3.time.year;
-                    default:
-                        throw Error("TimeInterval specified does not exist");
-                }
             };
             return Time;
         })(Plottable.QuantitativeScale);
@@ -4186,7 +4190,7 @@ var Plottable;
             };
             Time.prototype._getIntervalLength = function (config) {
                 var startDate = this._scale.domain()[0];
-                var d3Interval = this._getD3TimeInterval(config.interval);
+                var d3Interval = Plottable.Formatters.timeIntervalToD3Time(config.interval);
                 var endDate = d3Interval.offset(startDate, config.step);
                 if (endDate > this._scale.domain()[1]) {
                     // this offset is too large, so just return available width
@@ -4399,24 +4403,6 @@ var Plottable;
                         tickLabel.style("visibility", "inherit");
                     }
                 });
-            };
-            Time.prototype._getD3TimeInterval = function (timeInterval) {
-                switch (timeInterval) {
-                    case 0 /* second */:
-                        return d3.time.second;
-                    case 1 /* minute */:
-                        return d3.time.minute;
-                    case 2 /* hour */:
-                        return d3.time.hour;
-                    case 3 /* day */:
-                        return d3.time.day;
-                    case 4 /* month */:
-                        return d3.time.month;
-                    case 5 /* year */:
-                        return d3.time.year;
-                    default:
-                        throw Error("TimeInterval specified does not exist");
-                }
             };
             /**
              * The css class applied to each time axis tier

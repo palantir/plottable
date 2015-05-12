@@ -382,6 +382,10 @@ declare module Plottable {
          */
         function time(specifier: string): Formatter;
         /**
+         * Transforms the Plottable TimeInterval into a d3 time interval equivalent
+         */
+        function timeIntervalToD3Time(timeInterval: TimeInterval): D3.Time.Interval;
+        /**
          * Creates a formatter for relative dates.
          *
          * @param {number} baseValue The start date (as epoch time) used in computing relative dates (default 0)
