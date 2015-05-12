@@ -10,8 +10,8 @@ describe("Plots", () => {
       var xScale = new Plottable.Scales.Linear();
       var yScale = new Plottable.Scales.Linear();
       var plot = new Plottable.Plots.Area(xScale, yScale);
-      plot.project("x", (d: any) => d.x, xScale);
-      plot.project("y", (d: any) => d.y, yScale);
+      plot.x((d) => d.x, xScale);
+      plot.y((d) => d.y, yScale);
       assert.doesNotThrow(() => plot.renderTo(svg), Error);
       assert.strictEqual(plot.width(), 400, "was allocated width");
       assert.strictEqual(plot.height(), 400, "was allocated height");
@@ -47,10 +47,10 @@ describe("Plots", () => {
       svg = TestMethods.generateSVG(500, 500);
       simpleDataset = new Plottable.Dataset(twoPointData);
       areaPlot = new Plottable.Plots.Area(xScale, yScale);
-      areaPlot.addDataset(simpleDataset)
-              .project("x", xAccessor, xScale)
-              .project("y", yAccessor, yScale)
-              .project("y0", y0Accessor, yScale)
+      areaPlot.addDataset(simpleDataset);
+      areaPlot.x(xAccessor, xScale)
+              .y(yAccessor, yScale);
+      areaPlot.y0(y0Accessor, yScale)
               .project("fill", fillAccessor)
               .project("stroke", colorAccessor)
               .renderTo(svg);
@@ -73,7 +73,7 @@ describe("Plots", () => {
     });
 
     it("area fill works for non-zero floor values appropriately, e.g. half the height of the line", () => {
-      areaPlot.project("y0", (d: any) => d.bar / 2, yScale);
+      areaPlot.y0((d) => d.bar / 2, yScale);
       areaPlot.renderTo(svg);
       renderArea = (<any> areaPlot)._renderArea;
       var areaPath = renderArea.select(".area");

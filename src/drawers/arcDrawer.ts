@@ -38,7 +38,7 @@ export module Drawers {
 
     public draw(data: any[], drawSteps: DrawStep[], dataset: Dataset, plotMetadata: Plots.PlotMetadata) {
       // HACKHACK Applying metadata should be done in base class
-      var valueAccessor = (d: any, i: number) => drawSteps[0].attrToProjector["value"](d, i, dataset, plotMetadata);
+      var valueAccessor = (d: any, i: number) => drawSteps[0].attrToProjector["sector-value"](d, i, dataset, plotMetadata);
 
       data = data.filter(e => Plottable.Utils.Methods.isValidNumber(+valueAccessor(e, null)));
 
@@ -46,7 +46,7 @@ export module Drawers {
                           .sort(null)
                           .value(valueAccessor)(data);
 
-      drawSteps.forEach(s => delete s.attrToProjector["value"]);
+      drawSteps.forEach(s => delete s.attrToProjector["sector-value"]);
       pie.forEach((slice) => {
         if (slice.value < 0) {
           Utils.Methods.warn("Negative values will not render correctly in a pie chart.");

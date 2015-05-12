@@ -33,8 +33,8 @@ describe("Plots", () => {
       renderer = new Plottable.Plots.StackedArea(xScale, yScale);
       renderer.addDataset(dataset1);
       renderer.addDataset(dataset2);
-      renderer.project("x", "x", xScale);
-      renderer.project("y", "y", yScale);
+      renderer.x((d) => d.x, xScale);
+      renderer.y((d) => d.y, yScale);
       renderer.project("fill", "type", colorScale);
       var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
       new Plottable.Components.Table([[renderer], [xAxis]]).renderTo(svg);
@@ -83,8 +83,8 @@ describe("Plots", () => {
       renderer.addDataset(new Plottable.Dataset(data1));
       renderer.addDataset(new Plottable.Dataset(data2));
       renderer.project("fill", "type", colorScale);
-      renderer.project("x", "x", xScale);
-      renderer.project("y", "y", yScale);
+      renderer.x((d) => d.x, xScale);
+      renderer.y((d) => d.y, yScale);
       new Plottable.Components.Table([[renderer]]).renderTo(svg);
     });
 
@@ -129,8 +129,8 @@ describe("Plots", () => {
       renderer.addDataset(new Plottable.Dataset(data1));
       renderer.addDataset(new Plottable.Dataset(data2));
       renderer.project("fill", "type", colorScale);
-      renderer.project("x", "x", xScale);
-      renderer.project("y", "y", yScale);
+      renderer.x((d) => d.x, xScale);
+      renderer.y((d) => d.y, yScale);
       renderer.renderTo(svg);
     });
 
@@ -208,8 +208,8 @@ describe("Plots", () => {
       ];
       var datasetC = new Plottable.Dataset(data);
       renderer.addDataset(datasetC);
-      renderer.project("x", "x", xScale);
-      renderer.project("y", "y", yScale);
+      renderer.x((d) => d.x, xScale);
+      renderer.y((d) => d.y, yScale);
 
       renderer.renderTo(svg);
 
@@ -250,8 +250,8 @@ describe("Plots", () => {
       ];
       var dataset = new Plottable.Dataset(data);
       renderer.addDataset(dataset);
-      renderer.project("x", "x", xScale);
-      renderer.project("y", "y", yScale);
+      renderer.x((d) => d.x, xScale);
+      renderer.y((d) => d.y, yScale);
       renderer.renderTo(svg);
 
       assert.strictEqual(oldLowerBound, yScale.domain()[0], "lower bound doesn't change with 0 added");
@@ -338,8 +338,8 @@ describe("Plots", () => {
       ];
 
       renderer = new Plottable.Plots.StackedArea(xScale, yScale);
-      renderer.project("y", "yTest", yScale);
-      renderer.project("x", "x", xScale);
+      renderer.y((d) => d.yTest, yScale);
+      renderer.x((d) => d.x, xScale);
       renderer.addDataset(new Plottable.Dataset(data1));
       renderer.addDataset(new Plottable.Dataset(data2));
       renderer.project("fill", "type", colorScale);
@@ -406,7 +406,7 @@ describe("Plots", () => {
       var dataset2 = new Plottable.Dataset(data2);
       plot.addDataset(dataset2);
       plot.project("fill", "fill");
-      plot.project("x", "x", xScale).project("y", "y", yScale);
+      plot.x((d) => d.x, xScale).y((d) => d.y, yScale);
 
       var ds0Point2Offset = (<any> plot)._key2PlotDatasetKey.get("_0").plotMetadata.offsets.get(2);
       var ds1Point2Offset = (<any> plot)._key2PlotDatasetKey.get("_1").plotMetadata.offsets.get(2);
@@ -447,7 +447,7 @@ describe("Plots", () => {
       var dataset2 = new Plottable.Dataset(data2);
       plot.addDataset(dataset2);
       plot.project("fill", "fill");
-      plot.project("x", "x", xScale).project("y", "y", yScale);
+      plot.x((d) => d.x, xScale).y((d) => d.y, yScale);
 
       var ds0Point2Offset = (<any> plot)._key2PlotDatasetKey.get("_0").plotMetadata.offsets.get(2);
       var ds1Point2Offset = (<any> plot)._key2PlotDatasetKey.get("_1").plotMetadata.offsets.get(2);

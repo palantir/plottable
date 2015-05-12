@@ -33,8 +33,8 @@ describe("Metadata", () => {
     var yAccessor = (d: any, i: number, dataset: Plottable.Dataset) => dataset.metadata().bar;
     var dataset = new Plottable.Dataset(data1, metadata);
     var plot = new Plottable.Plots.Scatter(xScale, yScale)
-                                .project("x", xAccessor)
-                                .project("y", yAccessor);
+                                  .x(xAccessor, xScale)
+                                  .y(yAccessor, yScale);
     plot.addDataset(dataset);
     plot.renderTo(svg);
     var circles = plot.getAllSelections();
@@ -69,8 +69,8 @@ describe("Metadata", () => {
     var dataset1 = new Plottable.Dataset(data1, metadata1);
     var dataset2 = new Plottable.Dataset(data2, metadata2);
     var plot = new Plottable.Plots.Scatter(xScale, yScale)
-                                .project("x", xAccessor)
-                                .project("y", yAccessor);
+                                  .x(xAccessor, xScale)
+                                  .y(yAccessor, yScale);
     plot.addDataset(dataset1);
     plot.addDataset(dataset2);
     plot.renderTo(svg);
@@ -97,8 +97,8 @@ describe("Metadata", () => {
     var xAccessor = (d: any, i: number, dataset: Plottable.Dataset, m: any) => d.x + (i + 1) * m.foo;
     var yAccessor = () => 0;
     var plot = new Plottable.Plots.Scatter(xScale, yScale)
-                                .project("x", xAccessor)
-                                .project("y", yAccessor);
+                                  .x(xAccessor, xScale)
+                                  .y(yAccessor, yScale);
     (<any> plot)._getPlotMetadataForDataset = (key: string) => {
       return {
         datasetKey: key,
@@ -131,8 +131,8 @@ describe("Metadata", () => {
     var xAccessor = (d: any, i: number, dataset: Plottable.Dataset, m: any) => d.x + (i + 1) * m.foo;
     var yAccessor = () => 0;
     var plot1 = new Plottable.Plots.Scatter(xScale, yScale)
-                                .project("x", xAccessor)
-                                .project("y", yAccessor);
+                                .x(xAccessor, xScale)
+                                .y(yAccessor, yScale);
     (<any> plot1)._getPlotMetadataForDataset = (key: string) => {
       return {
         datasetKey: key,
@@ -144,8 +144,8 @@ describe("Metadata", () => {
     plot1.addDataset(dataset1);
     plot1.addDataset(dataset2);
     var plot2 = new Plottable.Plots.Scatter(xScale, yScale)
-                                .project("x", xAccessor)
-                                .project("y", yAccessor);
+                                .x(xAccessor, xScale)
+                                .y(yAccessor, yScale);
     (<any> plot2)._getPlotMetadataForDataset = (key: string) => {
       return {
         datasetKey: key,
@@ -195,7 +195,7 @@ describe("Metadata", () => {
     var dataset1 = new Plottable.Dataset(data1, metadata);
     var dataset2 = new Plottable.Dataset(data2, metadata);
 
-    var checkPlot = (plot: Plottable.Plot) => {
+    var checkXYPlot = (plot: Plottable.XYPlot<any, any>) => {
       var xAccessor = (d: any, i: number, dataset: Plottable.Dataset, m: Plottable.Plots.PlotMetadata) => {
           return d.x + dataset.metadata().foo + m.datasetKey.length;
       };
@@ -203,24 +203,32 @@ describe("Metadata", () => {
           return d.y + dataset.metadata().foo - m.datasetKey.length;
       };
       plot.addDataset(dataset1)
-          .addDataset(dataset2)
-          .project("x", xAccessor)
-          .project("y", yAccessor);
+          .addDataset(dataset2);
+      plot.x(xAccessor, xScale)
+          .y(yAccessor, yScale);
 
       // This should not crash. If some metadata is not passed, undefined property error will be raised during accessor call.
       plot.renderTo(svg);
       plot.destroy();
     };
 
-    checkPlot(new Plottable.Plots.Area(xScale, yScale));
-    checkPlot(new Plottable.Plots.StackedArea(xScale, yScale));
-    checkPlot(new Plottable.Plots.Bar(xScale, yScale));
-    checkPlot(new Plottable.Plots.StackedBar(xScale, yScale));
-    checkPlot(new Plottable.Plots.StackedBar(yScale, xScale, false));
-    checkPlot(new Plottable.Plots.ClusteredBar(xScale, yScale));
-    checkPlot(new Plottable.Plots.Pie().project("value", "x"));
-    checkPlot(new Plottable.Plots.Bar(xScale, yScale, false));
-    checkPlot(new Plottable.Plots.Scatter(xScale, yScale));
+    var checkPiePlot = (plot: Plottable.Plots.Pie<number>) => {
+      plot.sectorValue((d) => d.x).addDataset(dataset1);
+
+      // This should not crash. If some metadata is not passed, undefined property error will be raised during accessor call.
+      plot.renderTo(svg);
+      plot.destroy();
+    };
+
+    checkXYPlot(new Plottable.Plots.Area(xScale, yScale));
+    checkXYPlot(new Plottable.Plots.StackedArea(xScale, yScale));
+    checkXYPlot(new Plottable.Plots.Bar(xScale, yScale));
+    checkXYPlot(new Plottable.Plots.StackedBar(xScale, yScale));
+    checkXYPlot(new Plottable.Plots.StackedBar(yScale, xScale, false));
+    checkXYPlot(new Plottable.Plots.ClusteredBar(xScale, yScale));
+    checkXYPlot(new Plottable.Plots.Bar(xScale, yScale, false));
+    checkXYPlot(new Plottable.Plots.Scatter(xScale, yScale));
+    checkPiePlot(new Plottable.Plots.Pie<number>());
     svg.remove();
   });
 });

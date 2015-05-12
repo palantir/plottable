@@ -8,6 +8,6 @@ function run(svg, data, Plottable) {
 
   new Plottable.Plots.Pie()
                     .addDataset(new Plottable.Dataset(data))
-                    .project("value", "value")
+                    .sectorValue(function(d) { return d.value; })
                     .renderTo(svg);
 }

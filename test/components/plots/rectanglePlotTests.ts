@@ -30,14 +30,14 @@ describe("Plots", () => {
       var yScale        = new Plottable.Scales.Linear();
       var svg           = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       var rectanglePlot = new Plottable.Plots.Rectangle(xScale, yScale);
-      rectanglePlot.addDataset(new Plottable.Dataset(DATA))
-              .project("x", "x", xScale)
-              .project("y", "y", yScale)
-              .project("x1", "x", xScale)
-              .project("y1", "y", yScale)
-              .project("x2", "x2", xScale)
-              .project("y2", "y2", yScale)
-              .renderTo(svg);
+      rectanglePlot.addDataset(new Plottable.Dataset(DATA));
+      rectanglePlot.x((d) => d.x, xScale)
+                   .y((d) => d.y, yScale);
+      rectanglePlot.x1((d) => d.x, xScale)
+                   .y1((d) => d.y, yScale)
+                   .x2((d) => d.x2, xScale)
+                   .y2((d) => d.y2, yScale)
+                   .renderTo(svg);
       VERIFY_CELLS((<any> rectanglePlot)._renderArea.selectAll("rect"));
       svg.remove();
     });
@@ -62,9 +62,9 @@ describe("Plots", () => {
 
       var plot = new Plottable.Plots.Grid(xScale, yScale, cScale);
       plot
-        .project("x", "x", xScale)
-        .project("y", "y1", yScale)
-        .project("y2", "y2", yScale);
+        .x((d: any) => d.x, xScale)
+        .y((d: any) => d.y1, yScale)
+        .y2((d: any) => d.y2, yScale);
       plot.addDataset(new Plottable.Dataset(data1));
 
       plot.renderTo(svg);

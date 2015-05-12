@@ -53,9 +53,9 @@ describe("Plots", () => {
       var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       var gridPlot = new Plottable.Plots.Grid(xScale, yScale, colorScale);
       gridPlot.addDataset(new Plottable.Dataset(DATA))
-              .project("fill", "magnitude", colorScale)
-              .project("x", "x", xScale)
-              .project("y", "y", yScale);
+              .project("fill", "magnitude", colorScale);
+      gridPlot.x((d: any) => d.x, xScale)
+              .y((d: any) => d.y, yScale);
       gridPlot.renderTo(svg);
       VERIFY_CELLS((<any> gridPlot)._renderArea.selectAll("rect")[0]);
       svg.remove();
@@ -69,9 +69,9 @@ describe("Plots", () => {
       var dataset = new Plottable.Dataset();
       var gridPlot: Plottable.Plots.Grid = new Plottable.Plots.Grid(xScale, yScale, colorScale);
       gridPlot.addDataset(dataset)
-              .project("fill", "magnitude", colorScale)
-              .project("x", "x", xScale)
-              .project("y", "y", yScale)
+              .project("fill", "magnitude", colorScale);
+      gridPlot.x((d: any) => d.x, xScale)
+              .y((d: any) => d.y, yScale)
               .renderTo(svg);
       dataset.data(DATA);
       VERIFY_CELLS((<any> gridPlot)._renderArea.selectAll("rect")[0]);
@@ -88,9 +88,9 @@ describe("Plots", () => {
       var dataset = new Plottable.Dataset();
       var gridPlot: Plottable.Plots.Grid = new Plottable.Plots.Grid(xScale, yScale, colorScale);
       gridPlot.addDataset(dataset)
-              .project("fill", "magnitude", colorScale)
-              .project("x", "x", xScale)
-              .project("y", "y", yScale)
+              .project("fill", "magnitude", colorScale);
+      gridPlot.x((d: any) => d.x, xScale)
+              .y((d: any) => d.y, yScale)
               .renderTo(svg);
       var data = [
         {x: "A", y: "W", magnitude: 0},
@@ -119,8 +119,8 @@ describe("Plots", () => {
       var gridPlot = new Plottable.Plots.Grid(xScale, yScale, colorScale);
       gridPlot.addDataset(new Plottable.Dataset(DATA))
               .project("fill", "magnitude")
-              .project("x", "x", xScale)
-              .project("y", "y", yScale)
+              .x((d: any) => d.x, xScale)
+              .y((d: any) => d.y, yScale)
               .renderTo(svg);
 
       yScale.domain(["U", "V"]);
@@ -162,8 +162,8 @@ describe("Plots", () => {
         var dataset = new Plottable.Dataset(DATA);
         gridPlot.addDataset(dataset)
                 .project("fill", "magnitude", colorScale)
-                .project("x", "x", xScale)
-                .project("y", "y", yScale);
+                .x((d: any) => d.x, xScale)
+                .y((d: any) => d.y, yScale);
         gridPlot.renderTo(svg);
 
         var allCells = gridPlot.getAllSelections();
@@ -180,9 +180,9 @@ describe("Plots", () => {
         var gridPlot = new Plottable.Plots.Grid(xScale, yScale, colorScale);
         var dataset = new Plottable.Dataset(DATA);
         gridPlot.addDataset(dataset)
-                .project("fill", "magnitude", colorScale)
-                .project("x", "x", xScale)
-                .project("y", "y", yScale);
+                .project("fill", "magnitude", colorScale);
+        gridPlot.x((d: any) => d.x, xScale)
+                .y((d: any) => d.y, yScale);
         gridPlot.renderTo(svg);
 
         var allCells = gridPlot.getAllSelections([dataset]);
@@ -201,9 +201,9 @@ describe("Plots", () => {
         var gridPlot = new Plottable.Plots.Grid(xScale, yScale, colorScale);
         var dataset = new Plottable.Dataset(DATA);
         gridPlot.addDataset(dataset)
-          .project("fill", "magnitude", colorScale)
-          .project("x", "x", xScale)
-          .project("y", "y", yScale);
+          .project("fill", "magnitude", colorScale);
+         gridPlot.x((d: any) => d.x, xScale)
+          .y((d: any) => d.y, yScale);
         gridPlot.renderTo(svg);
 
         var dummyDataset = new Plottable.Dataset([]);
