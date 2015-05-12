@@ -21,10 +21,10 @@ function run(svg, data, Plottable) {
   var plot = new Plottable.Plots.Scatter(xScale, yScale);
   plot.addDataset(ds1);
   plot.addDataset(ds2);
-  plot.project("size", function(d, i, dataset) { return dataset.metadata().size; });
-  plot.project("fill", function(d, i, dataset) { return dataset.metadata().color; });
-  plot.project("x", function(d, i, dataset) { return d.x; }, xScale);
-  plot.project("y", "y", yScale);
+  plot.size(function(d, i, dataset) { return dataset.metadata().size; });
+  plot.attr("fill", function(d, i, dataset) { return dataset.metadata().color; });
+  plot.x(function(d, i, dataset) { return d.x; }, xScale);
+  plot.y(function(d) { return d.y; }, yScale);
 
   var chart = new Plottable.Components.Table([
       [null, title],

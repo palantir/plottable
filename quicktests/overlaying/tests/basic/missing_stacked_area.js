@@ -17,11 +17,11 @@ function run(svg, data, Plottable) {
   var xAxis = new Plottable.Axes.Category(xScale, "bottom");
   var yAxis = new Plottable.Axes.Numeric(yScale, "left");
   var stackedAreaPlot = new Plottable.Plots.StackedArea(xScale, yScale)
-                                         .attr("x", "name", xScale)
-                                         .attr("y", "y", yScale)
-                                         .attr("fill", "type", colorScale)
-                                         .attr("type", "type")
-                                         .attr("yval", "y")
+                                         .x(function(d) { return d.name; }, xScale)
+                                         .y(function(d) { return d.y; }, yScale)
+                                         .attr("fill", function(d) { return d.type; }, colorScale)
+                                         .attr("type", function(d) { return d.type; })
+                                         .attr("yval", function(d) { return d.y; })
                                          .addDataset(new Plottable.Dataset(data[0]))
                                          .addDataset(new Plottable.Dataset(data[1]))
                                          .addDataset(new Plottable.Dataset(data[2]))

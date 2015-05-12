@@ -63,15 +63,15 @@ function run(svg, data, Plottable) {
 
           var line_aapl = new Plottable.Plots.Line(xScale, yScale_aapl).animate(true)
                                   .addDataset(aaplSource)
-                                  .project("x", "Date", xScale)
-                                  .project("y", "Adj Close", yScale_aapl)
-                                  .project("stroke", function(d, i, dataset) { return dataset.metadata().name; }, colorScale)
+                                  .x(function(d) { return d.Date; }, xScale)
+                                  .y(function(d) { return d["Adj Close"]; }, yScale_aapl)
+                                  .attr("stroke", function(d, i, dataset) { return dataset.metadata().name; }, colorScale)
                                   .automaticallyAdjustYScaleOverVisiblePoints(true);
           var line_goog = new Plottable.Plots.Line(xScale, yScale_goog).animate(true)
                                   .addDataset(googSource)
-                                  .project("x", "Date", xScale)
-                                  .project("y", "Adj Close", yScale_goog)
-                                  .project("stroke", function(d, i, dataset) { return dataset.metadata().name; }, colorScale)
+                                  .x(function(d) { return d.Date; }, xScale)
+                                  .y(function(d) { return d["Adj Close"]; }, yScale_goog)
+                                  .attr("stroke", function(d, i, dataset) { return dataset.metadata().name; }, colorScale)
                                   .automaticallyAdjustYScaleOverVisiblePoints(true);
 
           // should be one line plot, pending #917
@@ -87,10 +87,10 @@ function run(svg, data, Plottable) {
           var DAY_MILLIS = 24 * 60 * 60 * 1000;
           var bar_diff = new Plottable.Plots.Bar(xScale, yScale_diff, true).animate(true)
                                   .addDataset(new Plottable.Dataset(diffData))
-                                  .project("x", "Date", xScale)
-                                  .project("y", "net change", yScale_diff)
-                                  .project("width", function() { return xScale.scale(DAY_MILLIS) - xScale.scale(0); })
-                                  .project("fill", function(d) {
+                                  .x(function(d) { return d.Date; }, xScale)
+                                  .y(function(d) { return d["net change"]; }, yScale_diff)
+                                  .attr("width", function() { return xScale.scale(DAY_MILLIS) - xScale.scale(0); })
+                                  .attr("fill", function(d) {
                                     return d["net change"] > 0 ? Plottable.Core.Colors.FERN : Plottable.Core.Colors.CERISE_RED;
                                   });
 
