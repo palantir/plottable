@@ -8205,24 +8205,24 @@ describe("Interactions", function () {
             assert.isFalse(callbackCalled, "callback was removed from component and should not be called");
             svg.remove();
         });
-        it("calling detach on a detached interaction has no effect", function () {
+        it("calling detachFrom on a detached Interaction has no effect", function () {
             var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
             var component = new Plottable.Component();
             var clickInteraction = new Plottable.Interactions.Click();
             assert.doesNotThrow(function () {
                 clickInteraction.detachFrom(component);
-            }, "Detaching an interaction which was not attached should not throw");
+            }, "detaching an Interaction which was not attached should not throw an error");
             clickInteraction.attachTo(component);
             clickInteraction.detachFrom(component);
             assert.doesNotThrow(function () {
                 clickInteraction.detachFrom(component);
-            }, "calling detaching a component twice should not throw");
+            }, "calling detachFrom() twice should not throw an error");
             component.renderTo(svg);
             clickInteraction.attachTo(component);
             clickInteraction.detachFrom(component);
             assert.doesNotThrow(function () {
                 clickInteraction.detachFrom(component);
-            }, "calling detaching a component twice should not throw even when attached to SVG");
+            }, "calling detachFrom() twice should not throw an error even if the Component is anchored");
             svg.remove();
         });
         it("can move interaction from one component to another", function () {
